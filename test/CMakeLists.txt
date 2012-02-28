@@ -43,11 +43,12 @@ set(MODULE_DEPENDS_STR )
 foreach(_dep ${US_LINK_LIBRARIES})
   set(MODULE_DEPENDS_STR "${MODULE_DEPENDS_STR} ${_dep}")
 endforeach()
+
 usFunctionGenerateModuleInit(_srcs
                              NAME ${_test_driver}
-                             LIBRARY_NAME ""
                              DEPENDS "${MODULE_DEPENDS_STR}"
                              VERSION "0.1.0"
+                             EXECUTABLE
                             )
 
 add_executable(${_test_driver} ${_srcs} usTestManager.cpp)

@@ -1,0 +1,27 @@
+
+/**
+
+\defgroup MicroServices Micro Services Classes
+
+\brief This category includes classes related to the C++ Micro Services component.
+
+The C++ Micro Services component provides a dynamic service registry based on the service layer
+as specified in the OSGi R4.2 specifications.
+
+*/
+
+/**
+
+\embmainpage{MicroServices_Overview} The C++ Micro Services
+
+The C++ Micro Services component provides a dynamic service registry based on the service layer
+as specified in the OSGi R4.2 specifications. It enables users to realize a service oriented
+approach within their software stack. The advantages include higher reuse of components, looser
+coupling, better organization of responsibilities, cleaner API contracts, etc.
+
+Following is a list of use cases and common patterns
+
+- \subpage MicroServices_EmulateSingleton
+
+
+*/

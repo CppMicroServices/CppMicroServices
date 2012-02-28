@@ -37,6 +37,11 @@ ServiceTracker<S,T>::~ServiceTracker()
   delete d;
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4355)
+#endif
+
 template<class S, class T>
 ServiceTracker<S,T>::ServiceTracker(ModuleContext* context,
                                     const ServiceReference& reference,
@@ -58,11 +63,6 @@ ServiceTracker<S,T>::ServiceTracker(ModuleContext* context, const LDAPFilter& fi
   : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
 {
 }
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
 
 template<class S, class T>
 ServiceTracker<S,T>::ServiceTracker(ModuleContext *context, ServiceTrackerCustomizer<T> *customizer)

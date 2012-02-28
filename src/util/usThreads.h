@@ -53,7 +53,9 @@
   #ifdef US_PLATFORM_WINDOWS
 
     #define WIN32_LEAN_AND_MEAN
-    #define NOMINMAX
+    #ifndef NOMINMAX
+      #define NOMINMAX
+    #endif
     #include <windows.h>
 
     #define US_THREADS_MUTEX(x)           HANDLE (x);

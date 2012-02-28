@@ -7,6 +7,7 @@
 #define USCONFIG_H
 
 #cmakedefine US_BUILD_SHARED_LIBS
+#cmakedefine CppMicroServices_EXPORTS
 #cmakedefine US_ENABLE_THREADING_SUPPORT
 #cmakedefine US_ENABLE_SERVICE_FACTORY_SUPPORT
 #cmakedefine US_USE_CXX11
@@ -66,7 +67,7 @@
 // Compiler defines
 //-------------------------------------------------------------------
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(_SCL_SECURE_NO_WARNINGS)
   #define _SCL_SECURE_NO_WARNINGS
 #endif
 

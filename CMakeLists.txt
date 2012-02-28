@@ -77,9 +77,11 @@ endfunction()
 
 # Determine if we are being build inside a larger project
 if(NOT DEFINED US_IS_EMBEDDED)
-  set(US_IS_EMBEDDED 1)
   if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(US_IS_EMBEDDED 0)
+  else()
+    set(US_IS_EMBEDDED 1)
+    set(CppMicroServices_EXPORTS 1)
   endif()
 endif()
 

@@ -14,7 +14,7 @@ endif()
 # Create variables of the ModuleInfo object, created in CMake/usModuleInit.cpp
 set(US_MODULE_DEPENDS_STR "")
 foreach(_dep ${US_MODULE_DEPENDS})
-  set(MODULE_DEPENDS_STR "${MODULE_DEPENDS_STR} ${_dep}")
+  set(US_MODULE_DEPENDS_STR "${US_MODULE_DEPENDS_STR} ${_dep}")
 endforeach()
 
 set(module_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/${US_MODULE_NAME}_init.cpp")

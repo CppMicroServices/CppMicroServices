@@ -271,7 +271,7 @@ endif()
 
 # link libraries for the CppMicroServices lib
 set(_link_libraries )
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
 list(APPEND US_LINK_LIBRARIES ${_link_libraries})

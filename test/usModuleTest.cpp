@@ -20,6 +20,8 @@
 =============================================================================*/
 
 #include <usModule.h>
+#include <usModuleEvent.h>
+#include <usServiceEvent.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>

@@ -20,8 +20,8 @@
 =============================================================================*/
 
 
-#include "usModuleUtils.h"
-#include <usUtils.h>
+#include "usModuleUtils_p.h"
+#include <usUtils_p.h>
 
 US_BEGIN_NAMESPACE
 

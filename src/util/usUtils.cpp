@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "usUtils.h"
+#include "usUtils_p.h"
 
 #ifdef US_PLATFORM_POSIX
 #include <errno.h>

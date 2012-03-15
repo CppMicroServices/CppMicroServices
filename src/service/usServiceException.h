@@ -25,7 +25,7 @@
 
 #include <stdexcept>
 
-#include <usExportMacros.h>
+#include <usExportMacros_p.h>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -85,7 +85,6 @@ public:
    *
    * @param msg The associated message.
    * @param type The type for this exception.
-   * @param cause The cause of this exception.
    */
   ServiceException(const std::string& msg, const Type& type = UNSPECIFIED);
 

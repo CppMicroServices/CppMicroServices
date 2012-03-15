@@ -29,7 +29,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include <usExportMacros.h>
+#include <usExportMacros_p.h>
 
 
 //-------------------------------------------------------------------

@@ -23,7 +23,7 @@
 #ifndef USSERVICEREFERENCEPRIVATE_H
 #define USSERVICEREFERENCEPRIVATE_H
 
-#include "usAtomicInt.h"
+#include "usAtomicInt_p.h"
 
 #include "usServiceProperties.h"
 

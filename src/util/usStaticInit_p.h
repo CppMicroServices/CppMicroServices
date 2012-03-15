@@ -30,7 +30,7 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 #define US_STATIC_INIT_H
 
 #include <usConfig.h>
-#include "usThreads.h"
+#include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 

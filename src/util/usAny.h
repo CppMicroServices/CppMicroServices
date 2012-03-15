@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <list>
 
-#include <usExportMacros.h>
+#include <usExportMacros_p.h>
 
 US_BEGIN_NAMESPACE
 
@@ -50,6 +50,8 @@ US_EXPORT std::string any_value_to_string(const std::vector<std::string>& val);
 US_EXPORT std::string any_value_to_string(const std::list<std::string>& val);
 
 /**
+ * \ingroup MicroServicesUtils
+ *
  * An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
  * of the internally stored data.
  *

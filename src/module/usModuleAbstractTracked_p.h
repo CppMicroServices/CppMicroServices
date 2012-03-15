@@ -25,7 +25,7 @@
 
 #include <list>
 
-#include "usAtomicInt.h"
+#include "usAtomicInt_p.h"
 #include "usAny.h"
 
 US_BEGIN_NAMESPACE

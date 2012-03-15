@@ -28,7 +28,7 @@
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usCoreModuleContext_p.h"
-#include "usStaticInit.h"
+#include "usStaticInit_p.h"
 
 #include <cassert>
 

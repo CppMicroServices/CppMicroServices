@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "usUtils.h"
+#include "usUtils_p.h"
 
 #include "usServiceListeners_p.h"
 #include "usServiceReferencePrivate.h"

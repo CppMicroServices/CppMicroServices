@@ -25,7 +25,7 @@
 
 #include "usServiceReference.h"
 #include "usServiceProperties.h"
-#include "usAtomicInt.h"
+#include "usAtomicInt_p.h"
 
 US_BEGIN_NAMESPACE
 

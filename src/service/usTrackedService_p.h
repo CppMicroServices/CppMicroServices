@@ -23,8 +23,8 @@
 #ifndef USTRACKEDSERVICE_H
 #define USTRACKEDSERVICE_H
 
-#include "usTrackedServiceListener.h"
-#include "usModuleAbstractTracked.h"
+#include "usTrackedServiceListener_p.h"
+#include "usModuleAbstractTracked_p.h"
 #include "usServiceEvent.h"
 
 US_BEGIN_NAMESPACE

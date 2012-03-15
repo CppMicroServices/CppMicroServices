@@ -540,7 +540,7 @@ SHOW_FILES             = NO
 # This will remove the Namespaces entry from the Quick Index
 # and from the Folder Tree View (if specified). The default is YES.
 
-SHOW_NAMESPACES        = NO
+SHOW_NAMESPACES        = YES
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # doxygen should invoke to get the current version for each file (typically from
@@ -649,12 +649,7 @@ INPUT_ENCODING         = UTF-8
 # *.f90 *.f *.for *.vhd *.vhdl
 
 FILE_PATTERNS          = *.h \
-                         *.cpp \
-                         *.dox \
-                         *.txx \
-                         *.tpp \
-                         *.cxx \
-                         *.cmake
+                         *.dox
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -682,7 +677,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */.git/*
+EXCLUDE_PATTERNS       = */.git/* *_p.h *Private.*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -808,7 +803,7 @@ USE_HTAGS              = NO
 # will generate a verbatim copy of the header file for each class for
 # which an include is specified. Set to NO to disable this.
 
-VERBATIM_HEADERS       = YES
+VERBATIM_HEADERS       = NO
 
 #---------------------------------------------------------------------------
 # configuration options related to the alphabetical class index

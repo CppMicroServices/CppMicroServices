@@ -24,7 +24,7 @@
 #define USATOMICINT_H
 
 #include <usConfig.h>
-#include "usThreads.h"
+#include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 

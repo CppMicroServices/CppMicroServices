@@ -21,7 +21,7 @@
 
 
 #include "usServiceTrackerPrivate.h"
-#include "usTrackedService.h"
+#include "usTrackedService_p.h"
 #include "usServiceException.h"
 #include "usModuleContext.h"
 

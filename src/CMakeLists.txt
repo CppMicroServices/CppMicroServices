@@ -36,23 +36,22 @@ set(_srcs
 )
 
 set(_private_headers
-  util/usAtomicInt.h
-  util/usExportMacros.h
-  util/usFunctor.h
-  util/usStaticInit.h
-  util/usThreads.h
-  util/usUtils.h
+  util/usAtomicInt_p.h
+  util/usExportMacros_p.h
+  util/usFunctor_p.h
+  util/usStaticInit_p.h
+  util/usUtils_p.h
   
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
   service/usServiceTrackerPrivate.tpp
-  service/usTrackedService.h
-  service/usTrackedServiceListener.h
+  service/usTrackedService_p.h
+  service/usTrackedServiceListener_p.h
   service/usTrackedService.tpp
   
-  module/usModuleAbstractTracked.h
+  module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
-  module/usModuleUtils.h
+  module/usModuleUtils_p.h
 )
 
 set(_public_headers
@@ -76,7 +75,6 @@ set(_public_headers
   module/usModuleEvent.h
   module/usModuleInfo.h
   module/usModuleRegistry.h
-  module/usModuleUtils.h
   module/usModuleVersion.h
 )
 
@@ -85,7 +83,7 @@ if(_us_baseclass_default)
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
-  list(APPEND _public_headers util/usThreads.h)
+  list(APPEND _private_headers util/usThreads_p.h)
 endif()
 
 if(US_ENABLE_SERVICE_FACTORY_SUPPORT)

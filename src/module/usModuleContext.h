@@ -22,7 +22,7 @@
 #ifndef USMODULECONTEXT_H_
 #define USMODULECONTEXT_H_
 
-#include "usUtils.h"
+#include "usUtils_p.h"
 #include "usServiceInterface.h"
 #include "usServiceEvent.h"
 #include "usServiceRegistration.h"
@@ -144,9 +144,9 @@ public:
    * <li>The framework adds the following service properties to the service
    * properties from the specified <code>ServiceProperties</code> (which may be
    * omitted): <br/>
-   * A property named {@link ServiceConstants#SERVICE_ID} identifying the
+   * A property named ServiceConstants#SERVICE_ID() identifying the
    * registration number of the service <br/>
-   * A property named {@link ServiceConstants#OBJECTCLASS} containing all the
+   * A property named ServiceConstants#OBJECTCLASS() containing all the
    * specified classes. <br/>
    * Properties with these names in the specified <code>ServiceProperties</code> will
    * be ignored.
@@ -159,7 +159,7 @@ public:
    *
    * @param clazzes The class names under which the service can be located.
    *        The class names will be stored in the service's
-   *        properties under the key {@link ServiceConstants#OBJECTCLASS}.
+   *        properties under the key ServiceConstants#OBJECTCLASS().
    * @param service The service object or a <code>ServiceFactory</code>
    *        object.
    * @param properties The properties for this service. The keys in the
@@ -255,7 +255,7 @@ public:
    * <p>
    * The specified <code>filter</code> expression is used to select the
    * registered services whose service properties contain keys and values
-   * which satisfy the filter expression. See {@link LDAPFilter} for a description
+   * which satisfy the filter expression. See LDAPFilter for a description
    * of the filter syntax. If the specified <code>filter</code> is
    * empty, all registered services are considered to match the
    * filter. If the specified <code>filter</code> expression cannot be parsed,
@@ -270,7 +270,7 @@ public:
    * empty, the service must have been registered with the
    * specified class name. The complete list of class names with which a
    * service was registered is available from the service's
-   * {@link ServiceConstants::OBJECTCLASS objectClass} property.
+   * {@link ServiceConstants#OBJECTCLASS() objectClass} property.
    * <li>If the specified <code>filter</code> is not empty, the
    * filter expression must match the service.
    * </ul>
@@ -296,7 +296,7 @@ public:
    * and match the specified filter expression.
    *
    * <p>
-   * This method is identical to GetServiceReferences(const std::tring&, const std::string&) except that
+   * This method is identical to GetServiceReferences(const std::string&, const std::string&) except that
    * the class name for the service object is automatically deduced from the template argument.
    *
    * @tparam S The type under which the requested service objects must have been registered.
@@ -335,10 +335,10 @@ public:
    * specified class.
    * <p>
    * If multiple such services exist, the service with the highest ranking (as
-   * specified in its {@link ServiceConstants::SERVICE_RANKING} property) is returned.
+   * specified in its ServiceConstants::SERVICE_RANKING() property) is returned.
    * <p>
    * If there is a tie in ranking, the service with the lowest service ID (as
-   * specified in its {@link ServiceConstants::SERVICE_ID} property); that is, the
+   * specified in its ServiceConstants::SERVICE_ID() property); that is, the
    * service that was registered first is returned.
    *
    * @param clazz The class name with which the service was registered.
@@ -518,7 +518,7 @@ public:
    * <p>
    * The callback is called if the filter criteria is met. To filter based
    * upon the class of the service, the filter should reference the
-   * {@link ServiceConstants#OBJECTCLASS} property. If <code>filter</code> is
+   * ServiceConstants#OBJECTCLASS() property. If <code>filter</code> is
    * empty, all services are considered to match the filter.
    *
    * <p>

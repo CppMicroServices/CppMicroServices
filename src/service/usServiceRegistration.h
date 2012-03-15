@@ -92,7 +92,7 @@ public:
    * Updates the properties associated with a service.
    *
    * <p>
-   * The {@link ServiceProperties#OBJECTCLASS} and {@link ServiceProperties#SERVICE_ID} keys
+   * The ServiceConstants#OBJECTCLASS and ServiceConstants#SERVICE_ID keys
    * cannot be modified by this method. These values are set by the framework
    * when the service is registered in the environment.
    *

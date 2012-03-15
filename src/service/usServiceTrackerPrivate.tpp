@@ -20,7 +20,7 @@
 =============================================================================*/
 
 
-#include "usTrackedService.h"
+#include "usTrackedService_p.h"
 
 #include "usModuleContext.h"
 #include "usLDAPFilter.h"

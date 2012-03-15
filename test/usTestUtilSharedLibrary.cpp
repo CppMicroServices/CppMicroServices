@@ -23,7 +23,7 @@
 #include <stdexcept>
 
 #include <usTestingConfig.h>
-#include <usUtils.h>
+#include <usUtils_p.h>
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 

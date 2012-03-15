@@ -23,7 +23,7 @@
 #ifndef USMODULEINFO_H
 #define USMODULEINFO_H
 
-#include <usExportMacros.h>
+#include <usExportMacros_p.h>
 
 #include <string>
 

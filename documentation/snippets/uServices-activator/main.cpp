@@ -1,4 +1,3 @@
-#include <usExportMacros.h>
 #include <usModuleActivator.h>
 
 US_USE_NAMESPACE

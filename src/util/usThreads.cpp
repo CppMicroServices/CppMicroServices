@@ -19,9 +19,9 @@
 
 =============================================================================*/
 
-#include "usThreads.h"
+#include "usThreads_p.h"
 
-#include "usUtils.h"
+#include "usUtils_p.h"
 
 #ifdef US_PLATFORM_POSIX
 #include <sys/time.h>

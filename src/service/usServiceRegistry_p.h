@@ -28,7 +28,7 @@
 #include "usServiceRegistration.h"
 #include "usServiceProperties.h"
 
-#include "usThreads.h"
+#include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 

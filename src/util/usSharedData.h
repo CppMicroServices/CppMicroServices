@@ -29,15 +29,18 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 #ifndef USSHAREDDATA_H
 #define USSHAREDDATA_H
 
-#include "usAtomicInt.h"
+#include "usAtomicInt_p.h"
 
 #include <algorithm>
 #include <utility>
 
-#include <usExportMacros.h>
+#include <usExportMacros_p.h>
 
 US_BEGIN_NAMESPACE
 
+/**
+ * \ingroup MicroServicesUtils
+ */
 class SharedData
 {
 public:
@@ -51,6 +54,9 @@ private:
   SharedData& operator=(const SharedData&);
 };
 
+/**
+ * \ingroup MicroServicesUtils
+ */
 template <class T>
 class SharedDataPointer
 {
@@ -123,6 +129,9 @@ private:
   T *d;
 };
 
+/**
+ * \ingroup MicroServicesUtils
+ */
 template <class T> class ExplicitlySharedDataPointer
 {
 public:

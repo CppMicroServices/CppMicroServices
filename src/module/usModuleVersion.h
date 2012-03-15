@@ -22,7 +22,7 @@
 #ifndef USMODULEVERSION_H
 #define USMODULEVERSION_H
 
-#include <usExportMacros.h>
+#include <usExportMacros_p.h>
 
 #include <string>
 

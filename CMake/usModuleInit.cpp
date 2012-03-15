@@ -19,13 +19,13 @@
 
 =============================================================================*/
 
-#include <usStaticInit.h>
+#include <usStaticInit_p.h>
 
 #include <usModuleRegistry.h>
 #include <usModuleContext.h>
 #include <usModule.h>
 #include <usModuleInfo.h>
-#include <usModuleUtils.h>
+#include <usModuleUtils_p.h>
 
 US_BEGIN_NAMESPACE
 

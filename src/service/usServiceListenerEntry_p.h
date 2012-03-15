@@ -23,7 +23,7 @@
 #ifndef USSERVICELISTENERENTRY_H
 #define USSERVICELISTENERENTRY_H
 
-#include <usUtils.h>
+#include <usUtils_p.h>
 #include <usModuleContext.h>
 
 #include "usLDAPExpr_p.h"

@@ -28,7 +28,7 @@
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
 
-#include "usAtomicInt.h"
+#include "usAtomicInt_p.h"
 
 US_BEGIN_NAMESPACE
 

@@ -27,6 +27,15 @@ if(NOT US_IS_EMBEDDED)
 
     configure_file(doxygen.conf.in
                    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
+                   
+    configure_file(doxygen/header.html
+                   ${CMAKE_CURRENT_BINARY_DIR}/header.html COPY_ONLY)
+
+    configure_file(doxygen/footer.html
+                   ${CMAKE_CURRENT_BINARY_DIR}/footer.html COPY_ONLY)
+
+    configure_file(doxygen/doxygen.css
+                   ${CMAKE_CURRENT_BINARY_DIR}/doxygen.css COPY_ONLY)
 
     add_custom_target(doc
                       ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf

@@ -39,14 +39,14 @@ If your design evolves, you might hit a point where you suddenly need multiple i
 
 \section MicroServices_EmulateSingleton_2 Singletons as a service
 
-The MITK Micro Services can be used to emulate the singleton pattern using a non-singleton class. This
+The C++ Micro Services can be used to emulate the singleton pattern using a non-singleton class. This
 leaves room for future extensions without the need for heavy refactoring. Additionally, it gives you
 full control about the construction and destruction order of your "singletons" inside your shared library
 or executable, making it possible to have dependencies between them during destruction.
 
 \subsection MicroServices_EmulateSingleton_2_1 Converting a classic singleton
 
-We modify the previous SingletonOne class such that it internally uses the MITK micro services API. The changes
+We modify the previous SingletonOne class such that it internally uses the micro services API. The changes
 are discussed in detail below.
 
 \snippet uServices-singleton/SingletonOne.h ss1
@@ -56,7 +56,7 @@ are discussed in detail below.
  - Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance()
    method to the module activator.
  - Service interface declaration: Because the SingletonOneService class introduces a new service interface, it must
-   be registered under a unique name using the helper macro MITK_DECLARE_SERVICE_INTERFACE.
+   be registered under a unique name using the helper macro US_DECLARE_SERVICE_INTERFACE.
    
 Let's have a look at the modified GetInstance() and ~SingletonOneService() methods.
 

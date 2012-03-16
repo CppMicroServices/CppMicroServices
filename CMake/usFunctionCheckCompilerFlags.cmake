@@ -5,7 +5,7 @@
 # If the flag(s) is/are supported, they will be appended to the string identified by RESULT_VAR
 #
 # Usage:
-#   MITKFunctionCheckCompilerFlags(FLAGS_TO_CHECK VALID_FLAGS_VAR)
+#   usFunctionCheckCompilerFlags(FLAGS_TO_CHECK VALID_FLAGS_VAR)
 #
 # Example:
 #

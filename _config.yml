@@ -1,10 +1,11 @@
 # This is the default format. 
 # For more see: https://github.com/mojombo/jekyll/wiki/Permalinks
-permalink: /:categories/:year/:month/:day/:title 
+permalink: /:year/:month/:day/:title 
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 auto: true
 pygments: true
+markdown: rdiscount
 
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
@@ -24,7 +25,7 @@ author :
 # Else if you are pushing to username.github.com, replace with your username.
 # Finally if you are pushing to a GitHub project page, include the project name at the end.
 #
-production_url : http://saschazelzer.github.com/CppMicroServices
+production_url : http://cppmicroservices.org
 
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #
@@ -77,7 +78,7 @@ JB :
   # Set 'provider' to false to turn commenting off globally.
   #
   comments :
-    provider : disqus
+    provider : false
     disqus :
       short_name : jekyllbootstrap
     livefyre :
@@ -95,7 +96,7 @@ JB :
   # Set 'provider' to false to turn analytics off globally.
   #        
   analytics :
-    provider : false 
+    provider : "custom" 
     google : 
         tracking_id : 'UA-123-12'
     getclicky :

@@ -12,7 +12,7 @@ set(CMAKE_MODULE_PATH
   )
 
 #-----------------------------------------------------------------------------
-# CMake Function(s) and Macro(s)
+# CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
 include(MacroParseArguments)

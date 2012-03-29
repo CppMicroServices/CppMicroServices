@@ -126,7 +126,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(US_PUBLIC_HEADERS ${_public_headers})
-if (US_HEADER_PREFIX)
+if(US_HEADER_PREFIX)
   set(US_PUBLIC_HEADERS )
   foreach(_public_header ${_public_headers})
     get_filename_component(_public_header_basename ${_public_header} NAME_WE)

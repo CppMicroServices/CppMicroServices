@@ -52,7 +52,7 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @PROJECT_BINARY_DIR@/documentation
+OUTPUT_DIRECTORY       = @US_DOXYGEN_OUTPUT_DIR@
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -841,7 +841,7 @@ GENERATE_HTML          = YES
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `html' will be used as the default path.
 
-HTML_OUTPUT            = html
+HTML_OUTPUT            = @US_DOXYGEN_HTML_OUTPUT@
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for
 # each generated HTML page (for example: .htm,.php,.asp). If it is left blank
@@ -852,7 +852,7 @@ HTML_FILE_EXTENSION    = .html
 # The HTML_HEADER tag can be used to specify a personal HTML header for
 # each generated HTML page. If it is left blank doxygen will generate a
 # standard header. Note that when using a custom header you are responsible
-#  for the proper inclusion of any scripts and style sheets that doxygen
+# for the proper inclusion of any scripts and style sheets that doxygen
 # needs, which is dependent on the configuration options used.
 # It is adviced to generate a default header using "doxygen -w html
 # header.html footer.html stylesheet.css YourConfigFile" and then modify
@@ -860,13 +860,13 @@ HTML_FILE_EXTENSION    = .html
 # have to redo this when upgrading to a newer version of doxygen or when
 # changing the value of configuration settings such as GENERATE_TREEVIEW!
 
-HTML_HEADER            = header.html
+HTML_HEADER            = @US_DOXYGEN_HEADER@
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for
 # each generated HTML page. If it is left blank doxygen will generate a
 # standard footer.
 
-HTML_FOOTER            = footer.html
+HTML_FOOTER            = @US_DOXYGEN_FOOTER@
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading
 # style sheet that is used by each HTML page. It can be used to
@@ -875,7 +875,7 @@ HTML_FOOTER            = footer.html
 # the style sheet file to the HTML output directory, so don't put your own
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = doxygen.css
+HTML_STYLESHEET        = @US_DOXYGEN_CSS@
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1482,7 +1482,11 @@ INCLUDE_FILE_PATTERNS  = *.h
 # undefined via #undef or recursively expanded use the := operator
 # instead of the = operator.
 
-PREDEFINED             = 
+PREDEFINED             = US_PREPEND_NAMESPACE(x)="@US_NAMESPACE@::x" \
+                         US_BEGIN_NAMESPACE="@US_BEGIN_NAMESPACE@" \
+                         US_END_NAMESPACE="@US_END_NAMESPACE@" \
+                         US_BASECLASS_NAME="@US_BASECLASS_NAME@" \
+                         US_EXPORT=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.
@@ -1490,7 +1494,7 @@ PREDEFINED             =
 # Use the PREDEFINED tag if you want to use a different macro definition that
 # overrules the definition found in the source code.
 
-EXPAND_AS_DEFINED      = US_BASECLASS_NAME
+EXPAND_AS_DEFINED      = 
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then
 # doxygen's preprocessor will remove all references to function-like macros

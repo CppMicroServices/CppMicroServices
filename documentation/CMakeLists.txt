@@ -48,15 +48,6 @@ if(NOT US_IS_EMBEDDED)
       set(US_DOXYGEN_HTML_OUTPUT "html")
     endif()
     
-    # Help doxygen with preprocessor macro expansions
-    if(US_NAMESPACE)
-      set(US_BEGIN_NAMESPACE "namespace ${US_NAMESPACE} {")
-      set(US_END_NAMESPACE "}")
-    else()
-      set(US_BEGIN_NAMESPACE )
-      set(US_END_NAMESPACE )
-    endif()
-    
     configure_file(doxygen.conf.in
                    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 

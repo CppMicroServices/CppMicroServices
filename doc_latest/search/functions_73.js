@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['service_5fid',['SERVICE_ID',['../namespaceServiceConstants.html#a36ee472bddfa04bc53835515799d128b',1,'ServiceConstants']]],
-  ['service_5franking',['SERVICE_RANKING',['../namespaceServiceConstants.html#a8c338f97452ab2c8040f1ebca25979de',1,'ServiceConstants']]],
+  ['service_5fid',['SERVICE_ID',['../namespaceServiceConstants.html#ac9f9d18808ea2f46376a1489a7b73164',1,'ServiceConstants']]],
+  ['service_5franking',['SERVICE_RANKING',['../namespaceServiceConstants.html#a9248db8f7ca4dce942fb3594b1079c3f',1,'ServiceConstants']]],
   ['serviceevent',['ServiceEvent',['../classServiceEvent.html#a8229e5ea36b4d1b9e386cffb9f291801',1,'ServiceEvent::ServiceEvent()'],['../classServiceEvent.html#abde1f51d604640854462a3381ad689d4',1,'ServiceEvent::ServiceEvent(Type type, const ServiceReference &amp;reference)'],['../classServiceEvent.html#aa21c516df3060be7ef23c399205767be',1,'ServiceEvent::ServiceEvent(const ServiceEvent &amp;other)']]],
   ['serviceexception',['ServiceException',['../classServiceException.html#a657d86b634b742d793556856f1e53175',1,'ServiceException::ServiceException(const std::string &amp;msg, const Type &amp;type=UNSPECIFIED)'],['../classServiceException.html#a9ddca002c53c2707e9b26f49b66597a2',1,'ServiceException::ServiceException(const ServiceException &amp;o)']]],
   ['servicereference',['ServiceReference',['../classServiceReference.html#af22e34a04367ca40eaf9a7634dfa775c',1,'ServiceReference::ServiceReference()'],['../classServiceReference.html#a2fb20c73aa5b910c5c354924c2dd5ed3',1,'ServiceReference::ServiceReference(const ServiceReference &amp;ref)']]],

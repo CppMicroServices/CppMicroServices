@@ -2,6 +2,7 @@ var searchData=
 [
   ['match',['Match',['../classLDAPFilter.html#a04b740718bc13c715cb1db1e2b5714e5',1,'LDAPFilter::Match(const ServiceReference &amp;reference) const '],['../classLDAPFilter.html#ac3fa9de5dadbe66db3d42f1224819421',1,'LDAPFilter::Match(const ServiceProperties &amp;dictionary) const ']]],
   ['matchcase',['MatchCase',['../classLDAPFilter.html#a543b2a16ab235369f2423d013cfd784c',1,'LDAPFilter']]],
+  ['micro_20services_20classes',['Micro Services Classes',['../group__MicroServices.html',1,'']]],
   ['modified',['MODIFIED',['../classServiceEvent.html#ae7426fe742bd938523b64d43c232a49fa25995ae997a4ee33c892e430a1fd2ca4',1,'ServiceEvent']]],
   ['modified_5fendmatch',['MODIFIED_ENDMATCH',['../classServiceEvent.html#ae7426fe742bd938523b64d43c232a49fab484788a8da6e1d61d07e6014044c6fc',1,'ServiceEvent']]],
   ['modifiedservice',['ModifiedService',['../classServiceTracker.html#aff2025eb066f2ab128c7c0aa47515c66',1,'ServiceTracker::ModifiedService()'],['../structServiceTrackerCustomizer.html#a1670abf8fc457a53d1549aae710f40d6',1,'ServiceTrackerCustomizer::ModifiedService()']]],

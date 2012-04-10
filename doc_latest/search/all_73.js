@@ -14,9 +14,9 @@ var searchData=
   ['setproperties',['SetProperties',['../classServiceRegistration.html#a089f7b4f1af195b3e24b85f3795e04f5',1,'ServiceRegistration']]],
   ['shareddata',['SharedData',['../classSharedData.html',1,'SharedData'],['../classSharedData.html#a67fec283f34fd58f1d767ca561998baf',1,'SharedData::SharedData()'],['../classSharedData.html#a6e9108864710d28126704545739d9431',1,'SharedData::SharedData(const SharedData &amp;)']]],
   ['shareddatapointer',['SharedDataPointer',['../classSharedDataPointer.html',1,'SharedDataPointer&lt; T &gt;'],['../classSharedDataPointer.html#ac669cd91018c7ca429fbeeec039c8567',1,'SharedDataPointer::SharedDataPointer()'],['../classSharedDataPointer.html#a2949a1382791d8d67f523079a44dd7b4',1,'SharedDataPointer::SharedDataPointer(T *data)'],['../classSharedDataPointer.html#a22fdcd719dc16f4d46fec8393cc04b4f',1,'SharedDataPointer::SharedDataPointer(const SharedDataPointer&lt; T &gt; &amp;o)']]],
-  ['shareddatapointer_3c_20ldapfilterdata_20_3e',['SharedDataPointer< LDAPFilterData >',['../classSharedDataPointer.html',1,'']]],
-  ['shareddatapointer_3c_20moduleeventdata_20_3e',['SharedDataPointer< ModuleEventData >',['../classSharedDataPointer.html',1,'']]],
-  ['shareddatapointer_3c_20serviceeventdata_20_3e',['SharedDataPointer< ServiceEventData >',['../classSharedDataPointer.html',1,'']]],
+  ['shareddatapointer_3c_20ldapfilterdata_20_3e',['SharedDataPointer&lt; LDAPFilterData &gt;',['../classSharedDataPointer.html',1,'']]],
+  ['shareddatapointer_3c_20moduleeventdata_20_3e',['SharedDataPointer&lt; ModuleEventData &gt;',['../classSharedDataPointer.html',1,'']]],
+  ['shareddatapointer_3c_20serviceeventdata_20_3e',['SharedDataPointer&lt; ServiceEventData &gt;',['../classSharedDataPointer.html',1,'']]],
   ['size',['Size',['../classServiceTracker.html#a1be55d427ec5a64a05e746bf019ffdec',1,'ServiceTracker']]],
   ['swap',['Swap',['../classAny.html#a0f68d75b691fc3de1a62974ff3df2789',1,'Any::Swap()'],['../classSharedDataPointer.html#aed248dda2c291979fa8e0edbc513f78c',1,'SharedDataPointer::Swap()'],['../classExplicitlySharedDataPointer.html#a34c6cdd8849d82608e6872264ef89549',1,'ExplicitlySharedDataPointer::Swap()']]]
 ];

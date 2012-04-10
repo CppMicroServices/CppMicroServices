@@ -9,7 +9,7 @@ var searchData=
   ['servicetrackercustomizer',['ServiceTrackerCustomizer',['../structServiceTrackerCustomizer.html',1,'']]],
   ['shareddata',['SharedData',['../classSharedData.html',1,'']]],
   ['shareddatapointer',['SharedDataPointer',['../classSharedDataPointer.html',1,'']]],
-  ['shareddatapointer_3c_20ldapfilterdata_20_3e',['SharedDataPointer< LDAPFilterData >',['../classSharedDataPointer.html',1,'']]],
-  ['shareddatapointer_3c_20moduleeventdata_20_3e',['SharedDataPointer< ModuleEventData >',['../classSharedDataPointer.html',1,'']]],
-  ['shareddatapointer_3c_20serviceeventdata_20_3e',['SharedDataPointer< ServiceEventData >',['../classSharedDataPointer.html',1,'']]]
+  ['shareddatapointer_3c_20ldapfilterdata_20_3e',['SharedDataPointer&lt; LDAPFilterData &gt;',['../classSharedDataPointer.html',1,'']]],
+  ['shareddatapointer_3c_20moduleeventdata_20_3e',['SharedDataPointer&lt; ModuleEventData &gt;',['../classSharedDataPointer.html',1,'']]],
+  ['shareddatapointer_3c_20serviceeventdata_20_3e',['SharedDataPointer&lt; ServiceEventData &gt;',['../classSharedDataPointer.html',1,'']]]
 ];

@@ -336,9 +336,28 @@ table.memberdecls {
 	padding: 0px;
 }
 
+.memberdecls td {
+	-webkit-transition-property: background-color, box-shadow;
+	-webkit-transition-duration: 0.5s;
+	-moz-transition-property: background-color, box-shadow;
+	-moz-transition-duration: 0.5s;
+	-ms-transition-property: background-color, box-shadow;
+	-ms-transition-duration: 0.5s;
+	-o-transition-property: background-color, box-shadow;
+	-o-transition-duration: 0.5s;
+	transition-property: background-color, box-shadow;
+	transition-duration: 0.5s;
+}
+
+.memberdecls td.glow {
+	background-color: cyan;
+	box-shadow: 0 0 15px cyan;
+}
+
 .mdescLeft, .mdescRight,
 .memItemLeft, .memItemRight,
 .memTemplItemLeft, .memTemplItemRight, .memTemplParams {
+	/*background-color: #F9FAFC;*/
 	border: none;
 	margin: 4px;
 	padding: 1px 0 0 8px;
@@ -348,6 +367,12 @@ table.memberdecls {
 	padding: 0px 8px 4px 8px;
 	color: #555;
 }
+
+/*
+.memItemLeft, .memItemRight, .memTemplParams {
+	border-top: 1px solid #C4CFE5;
+}
+*/
 
 .memItemLeft, .memTemplItemLeft {
         white-space: nowrap;
@@ -392,12 +417,24 @@ table.memberdecls {
 	padding: 0;
 	margin-bottom: 10px;
 	margin-right: 5px;
+        -webkit-transition: box-shadow 0.5s linear;
+        -moz-transition: box-shadow 0.5s linear;
+        -ms-transition: box-shadow 0.5s linear;
+        -o-transition: box-shadow 0.5s linear;
+        transition: box-shadow 0.5s linear;
+}
+
+.memitem.glow {
+         box-shadow: 0 0 15px cyan;
 }
 
 .memname {
-        white-space: nowrap;
         font-weight: bold;
         margin-left: 6px;
+}
+
+.memname td {
+	vertical-align: bottom;
 }
 
 .memproto, dl.reflist dt {
@@ -405,6 +442,7 @@ table.memberdecls {
         border-left: 1px solid #e6e6e6;
         border-right: 1px solid #e6e6e6;
         padding: 6px 0px 6px 0px;
+        color: #253555;
         font-weight: bold;
         /* opera specific markup */
         border-top-right-radius: 8px;
@@ -462,7 +500,8 @@ dl.reflist dd {
 }
 
 .params, .retval, .exception, .tparams {
-        border-spacing: 6px 2px;
+        margin-left: 0px;
+        padding-left: 0px;
 }       
 
 .params .paramname, .retval .paramname {
@@ -480,6 +519,38 @@ dl.reflist dd {
         vertical-align: top;
 }
 
+table.mlabels {
+	border-spacing: 0px;
+}
+
+td.mlabels-left {
+	width: 100%;
+	padding: 0px;
+}
+
+td.mlabels-right {
+	vertical-align: bottom;
+	padding: 0px;
+}
+
+span.mlabels {
+        margin-left: 8px;
+}
+
+span.mlabel {
+        background-color: #728DC1;
+        border-top:1px solid #405C93;
+        border-left:1px solid #405C93;
+        border-right:1px solid #C4CFE5;
+        border-bottom:1px solid #C4CFE5;
+	text-shadow: none;
+        color: white;
+        margin-right: 4px;
+        padding: 2px 3px;
+        border-radius: 3px;
+        font-size: 7pt;
+	white-space: nowrap;
+}
 
 
 
@@ -546,39 +617,62 @@ proper pixel height of your image.
 
 /* these are for tree view when not used as main index */
 
-.directory-alt {
-	font-size: 100%;
-	font-weight: bold;
+div.directoryalt {
+        margin: 10px 0px;
+      /*border-top: 1px solid #A8B8D9;
+        border-bottom: 1px solid #A8B8D9;*/
+        width: 100%;
 }
 
-.directory-alt h3 {
-	margin: 0px;
-	margin-top: 1em;
-	font-size: 11pt;
+.directoryalt table {
+        border-collapse:collapse;
 }
 
-.directory-alt > h3 {
-	margin-top: 0;
+.directoryalt td {
+        margin: 0px;
+        padding: 0px;
+	vertical-align: baseline;
 }
 
-.directory-alt p {
-	margin: 0px;
-	white-space: nowrap;
+.directoryalt td.entry {
+        white-space: nowrap;
+        padding-right: 6px;
 }
 
-.directory-alt div {
-	display: none;
-	margin: 0px;
+.directoryalt td.desc {
+        width: 100%;
+        padding-left: 6px;
+	padding-right: 6px;
+	border-left: 1px solid rgba(0,0,0,0.05);
 }
 
-.directory-alt img {
+.directoryalt tr.even {
+	padding-left: 6px;
+	/*background-color: #F7F8FB;*/
+}
+
+.directoryalt img {
 	vertical-align: -30%;
+}
+
+.directoryalt .levels {
+        white-space: nowrap;
+        width: 100%;
+        text-align: right;
+        font-size: 9pt;
+}
+
+.directoryalt .levels span {
+        cursor: pointer;
+        padding-left: 2px;
+        padding-right: 2px;
+	color: #3D578C;
 }
 
 /* @end */
 
 div.dynheader {
-        margin-top: 8px;
+  margin-top: 8px;
 }
 
 address {
@@ -758,42 +852,63 @@ dl
 /* dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug */
 dl.section
 {
-        border-left:4px solid;
-        padding: 0 0 0 6px;
+	margin-left: 0px;
+	padding-left: 0px;
 }
 
 dl.note
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #D0C000;
 }
 
 dl.warning, dl.attention
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #FF0000;
 }
 
 dl.pre, dl.post, dl.invariant
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #00D000;
 }
 
 dl.deprecated
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #505050;
 }
 
 dl.todo
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #00C0E0;
 }
 
 dl.test
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #3030E0;
 }
 
 dl.bug
 {
+        margin-left:-7px;
+        padding-left: 3px;
+        border-left:4px solid;
         border-color: #C08050;
 }
 
@@ -1021,3 +1136,4 @@ code {
     color: #fff;
     background-color: #bbb;
 }
+

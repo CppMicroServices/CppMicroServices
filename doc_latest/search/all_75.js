@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['utility_20classes',['Utility Classes',['../group__MicroServicesUtils.html',1,'']]],
   ['undefinedversion',['UndefinedVersion',['../classModuleVersion.html#a1d49e505bd4a231e33fe7b11380be5d3',1,'ModuleVersion']]],
   ['ungetservice',['UngetService',['../classModuleContext.html#a070a6218b13e363098d546425c02f13c',1,'ModuleContext::UngetService()'],['../classServiceFactory.html#afd632ca2040e8cfd403e787e9887a1bf',1,'ServiceFactory::UngetService()']]],
   ['unload',['Unload',['../structModuleActivator.html#a410a3f54b7cad990e8d670450677218c',1,'ModuleActivator']]],

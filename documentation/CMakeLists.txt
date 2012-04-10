@@ -25,6 +25,7 @@ if(NOT US_IS_EMBEDDED)
     
     # We are in standalone mode, so we generate a "mainpage"
     set(US_DOXYGEN_MAIN_PAGE_CMD "\\mainpage")
+    set(US_DOXYGEN_ENABLED_SECTIONS "us_standalone")
     
     if(US_DOCUMENTATION_FOR_WEBPAGE)
       configure_file(doxygen/header.html
@@ -39,8 +40,12 @@ if(NOT US_IS_EMBEDDED)
                      ${CMAKE_CURRENT_BINARY_DIR}/doxygen.css COPY_ONLY)
       set(US_DOXYGEN_CSS doxygen.css)
       
-      set(US_DOXYGEN_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/gh-pages CACHE PATH "Doxygen output directory" FORCE)
-      set(US_DOXYGEN_HTML_OUTPUT "doc_latest")
+      set(US_DOXYGEN_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/gh-pages)
+      if(${PROJECT_NAME}_MINOR_VERSION EQUAL 99)
+        set(US_DOXYGEN_HTML_OUTPUT "doc_latest")
+      else()
+        set(US_DOXYGEN_HTML_OUTPUT "doc_${${PROJECT_NAME}_MAJOR_VERSION}_${${PROJECT_NAME}_MINOR_VERSION}")
+      endif()
     else()
       set(US_DOXYGEN_HEADER )
       set(US_DOXYGEN_FOOTER )

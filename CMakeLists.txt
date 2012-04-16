@@ -264,7 +264,7 @@ set(US_INTERNAL_INCLUDE_DIRS
 )
 
 if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  list(APPEND _us_internal_include_dirs ${US_BASECLASS_INCLUDE_DIRS})
+  list(APPEND US_INTERNAL_INCLUDE_DIRS ${US_BASECLASS_INCLUDE_DIRS})
 endif()
 
 # link libraries for third party libs

@@ -33,13 +33,13 @@ class ModuleContext;
  * Returns the module context of the calling module.
  *
  * This function allows easy access to the own ModuleContext instance from
- * inside a US module.
+ * inside a C++ Micro Services module.
  *
  * \internal
  *
  * Note that the corresponding function definition is provided for each
- * module by the mitkModuleInit.cpp file. This file is customized via CMake
- * configure_file(...) and automatically compiled into each US module.
+ * module by the usModuleInit.cpp file. This file is customized via CMake
+ * configure_file(...) and automatically compiled into each module.
  * Consequently, the GetModuleContext function is not exported, since each
  * module gets its "own version".
  */

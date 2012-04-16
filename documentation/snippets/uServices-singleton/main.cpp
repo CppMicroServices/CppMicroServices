@@ -33,7 +33,7 @@ public:
   void Unload(ModuleContext* /*context*/)
   {
     // Services are automatically unregistered during unloading of
-    // the shared library after the call to Unload(mitk::ModuleContext*)
+    // the shared library after the call to Unload(ModuleContext*)
     // has returned.
 
     // Since SingletonOneService needs a non-null SingletonTwoService

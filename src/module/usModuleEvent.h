@@ -46,7 +46,7 @@ class ModuleEventData;
  * occurs in a modules's lifecycle. A type code is used to identify
  * the event type for future extendability.
  *
- * @see ModuleContext#connectModuleListener
+ * @see ModuleContext#AddModuleListener
  */
 class US_EXPORT ModuleEvent
 {

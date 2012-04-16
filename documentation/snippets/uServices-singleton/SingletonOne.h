@@ -8,7 +8,6 @@
 
 #include US_BASECLASS_HEADER
 
-namespace mitk { class ModuleContext; }
 
 //![s1]
 class SingletonOne

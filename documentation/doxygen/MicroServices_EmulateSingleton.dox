@@ -51,7 +51,8 @@ are discussed in detail below.
 
 \snippet uServices-singleton/SingletonOne.h ss1
 
- - Inherit itk::LightObject: All service implementations (not their interfaces) must inherit from itk::LightObject.
+ - Inherit us::Base: All service implementations (not their interfaces) must inherit from us::Base or from the base
+   class as specified in the CMake configuration.
    In the implementation above, the class SingletonOneService provides the implementation as well as the interface.
  - Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance()
    method to the module activator.
@@ -67,7 +68,7 @@ of a reference as in the classic singleton. This is necessary since we can no lo
 always exists. Clients of the GetInstance() method must check for null pointers and react appropriately.
 
 \warning Newly created "singletons" should not expose a GetInstance() method. They should be handled as proper
-services and hence should be retrieved by clients using the mitk::ModuleContext or mitk::ServiceTracker API. The
+services and hence should be retrieved by clients using the ModuleContext or ServiceTracker API. The
 GetInstance() method is for migration purposes only.
 
 \snippet uServices-singleton/SingletonOne.cpp ss1d

@@ -192,7 +192,7 @@ public:
    *
    * <p>
    * This method is otherwise identical to
-   * RegisterService(const std:vector<std::string>&, itk::LighObject*, const ServiceProperties&)
+   * RegisterService(const std:list&lt;std::string&gt;&, us::Base*, const ServiceProperties&)
    * and is provided as a convenience when <code>service</code> will only be registered under a single
    * class name. Note that even in this case the value of the service's
    * ServiceConstants::OBJECTCLASS property will be a std::list<std::string>, rather
@@ -205,7 +205,7 @@ public:
    *         registering the service to update the service's properties or to
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @see RegisterService(const std:list<std::string>&, itk::LighObject*, const ServiceProperties&)
+   * @see RegisterService(const std:list&lt;std::string&gt;&, us::Base*, const ServiceProperties&)
    */
   ServiceRegistration RegisterService(const char* clazz, US_BASECLASS_NAME* service,
                                       const ServiceProperties& properties = ServiceProperties());
@@ -227,7 +227,7 @@ public:
    *         registering the service to update the service's properties or to
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @see RegisterService(const char*, itk::LighObject*, const ServiceProperties&)
+   * @see RegisterService(const char*, us::Base*, const ServiceProperties&)
    */
   template<class S>
   ServiceRegistration RegisterService(US_BASECLASS_NAME* service, const ServiceProperties& properties = ServiceProperties())

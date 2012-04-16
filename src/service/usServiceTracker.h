@@ -386,7 +386,7 @@ protected:
    *
    * @param reference The reference to modified service.
    * @param service The service object for the modified service.
-   * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, itk::LighObject*)
+   * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
    */
   void ModifiedService(const ServiceReference& reference, T service);
 
@@ -409,7 +409,7 @@ protected:
    *
    * @param reference The reference to removed service.
    * @param service The service object for the removed service.
-   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReference&, itk::LighObject*)
+   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReference&, T)
    */
   void RemovedService(const ServiceReference& reference, T service);
 

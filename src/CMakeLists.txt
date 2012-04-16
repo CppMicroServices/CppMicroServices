@@ -74,6 +74,7 @@ set(_public_headers
   module/usModuleContext.h
   module/usModuleEvent.h
   module/usModuleInfo.h
+  module/usModuleInitialization.h
   module/usModuleRegistry.h
   module/usModuleVersion.h
 )

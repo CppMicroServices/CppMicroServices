@@ -72,6 +72,9 @@ void RegisterSomeService(ModuleContext* context, SomeInterface* service)
 
 The OSGi service model additionally allows to annotate services with properties and using these
 properties during service look-ups. It also allows to track the life-cycle of service objects.
+Please see the [Documentation](http://cppmicroservices.org/doc_latest/index.html) for more
+examples and tutorials and the API reference. There is also a blog post about
+[OSGi Lite for C++](http://blog.cppmicroservices.org/2012/04/15/osgi-lite-for-c++).
 
 Build Instructions
 ------------------

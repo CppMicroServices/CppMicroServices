@@ -91,11 +91,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a href="http://www.cmake.org">CMake</a> 2.8 (Visual Studio 2010 users should use the latest CMake version available)</li>
 </ul>
 <h1>Configuring the Build</h1>
-<p>TBD </p>
+<p>When building the C++ Micro Services library, you have a few configuration options at hand.</p>
+<h2>General build options</h2>
+<ul>
+<li><b>US_BUILD_SHARED_LIBS</b> Specify if the library should be build shared or static. Please note that static mode is experimental and has not received extensive testing yet.</li>
+<li><b>US_BUILD_TESTING</b> Build unit tests and code snippets.</li>
+<li><b>US_ENABLE_THREADING_SUPPORT</b> Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) to make the API thread-safe. If you are application is not multi-threaded, turn this option OFF to get maximum performance.</li>
+<li><b>US_USE_C++11 (advanced)</b> Enable the usage of C++11 constructs</li>
+</ul>
+<h2>Customizing naming conventions</h2>
+<ul>
+<li><b>US_NAMESPACE</b> The default namespace is <code>us</code> but you may override this at will.</li>
+<li><b>US_HEADER_PREFIX</b> By default, all public headers have a "us" prefix. You may specify an arbitrary prefix to match your naming conventions.</li>
+</ul>
+<p>The above options are mainly useful when embedding the C++ Micro Services source code in your own library and you want to make it look like native source code.</p>
+<h2>Configure the service base class</h2>
+<p>All service implementations must inherit from the same base class. The C++ Micro Services library provides a trivial class called <code>us::Base</code> for that purpose. However, most applications already have a special base class and you can configure the C++ Micro Services library to use that class.</p>
+<ul>
+<li><b>US_BASECLASS_NAME</b> The fully-qualified name of the base class, e.g. <code>my::OwnBaseClass</code>. If you don't need support for service factories (see below) and don't want to enable US_BUILD_TESTING, this is all you need.</li>
+<li><b>US_ENABLE_SERVICE_FACTORY_SUPPORT (advanced)</b> If you want support for service factories (they allow the customization of service objects for individual modules, see OSGi Service Platform Core Specification Release 4, Version 4.3, Section 5.6), switch this option to ON. If you also provided a custom US_BASECLASS_NAME, you need to set the US_BASECLASS_HEADER variable.</li>
+<li><b>US_BASECLASS_HEADER (advanced)</b> The name of the header file containing the declaration for the base class specified in US_BASECLASS_NAME, e.g. <code>myOwnBaseClass.h</code>. You will also have to set US_BASECLASS_PACKAGE or US_BASECLASS_INCLUDE_DIRS and US_BASECLASS_LIBRARIES.</li>
+<li><b>US_BASECLASS_PACKAGE (advanced)</b> If your specified a custom base class from a library which can be found via a CMake <code>find_package</code> command, enter the package name here. Most of the time, this will correctly set the values for US_BASECLASS_INCLUDE_DIRS, US_BASECLASS_LIBRARIES, and US_BASECLASS_LIBRARY_DIRS.</li>
+<li><b>US_BASECLASS_INCLUDE_DIRS (advanced)</b> A list of include dirs needed to include the base class header file as specified in US_BASECLASS_HEADER.</li>
+<li><b>US_BASECLASS_LIBRARIES (advanced)</b> A list of libraries to link the C++ Micro Services library against for resolving symbols needed for a custom base class.</li>
+<li><b>US_BASECLASS_LIBRARY_DIRS (advanced)</b> A list of directories to look for the libraries specified in US_BASECLASS_LIBRARIES </li>
+</ul>
 </div></div><!-- contents -->
 
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Tue Apr 10 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.0-20120408
+  <address class="footer"><small>Generated on Mon Apr 16 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.0-20120408
   </small></address>
 

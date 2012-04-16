@@ -785,7 +785,7 @@ A <code><a class="el" href="classServiceRegistration.html">ServiceRegistration</
       </table>
 </div><div class="memdoc">
 <p>Registers the specified service object with the specified properties under the specified class name with the framework.</p>
-<p>This method is otherwise identical to RegisterService(const std:vector&lt;std::string&gt;&amp;, itk::LighObject*, const ServiceProperties&amp;) and is provided as a convenience when <code>service</code> will only be registered under a single class name. Note that even in this case the value of the service's <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262">ServiceConstants::OBJECTCLASS</a> property will be a std::list&lt;std::string&gt;, rather than just a single string.</p>
+<p>This method is otherwise identical to RegisterService(const std:list&lt;std::string&gt;&amp;, us::Base*, const ServiceProperties&amp;) and is provided as a convenience when <code>service</code> will only be registered under a single class name. Note that even in this case the value of the service's <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262">ServiceConstants::OBJECTCLASS</a> property will be a std::list&lt;std::string&gt;, rather than just a single string.</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">clazz</td><td>The class name under which the service can be located. </td></tr>
@@ -801,7 +801,7 @@ A <code><a class="el" href="classServiceRegistration.html">ServiceRegistration</
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also:</dt><dd>RegisterService(const std:list&lt;std::string&gt;&amp;, itk::LighObject*, const ServiceProperties&amp;) </dd></dl>
+<dl class="section see"><dt>See also:</dt><dd><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6">RegisterService</a>(const std:list&lt;std::string&gt;&amp;, us::Base*, const <a class="el" href="group__MicroServices.html#gac4d162a4eba031ad968f5bd54272c166">ServiceProperties</a>&amp;) </dd></dl>
 
 </div>
 </div>
@@ -860,7 +860,7 @@ template&lt;class S &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also:</dt><dd>RegisterService(const char*, itk::LighObject*, const ServiceProperties&amp;) </dd></dl>
+<dl class="section see"><dt>See also:</dt><dd><a class="el" href="classModuleContext.html#ae5f83b5bac7475b7cce0a006696a5102">RegisterService(const char*, us::Base*, const ServiceProperties&amp;)</a> </dd></dl>
 
 </div>
 </div>
@@ -1061,6 +1061,6 @@ If the context module's use count for the service is currently zero and the serv
 
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Tue Apr 10 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.0-20120408
+  <address class="footer"><small>Generated on Mon Apr 16 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.0-20120408
   </small></address>
 

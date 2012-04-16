@@ -1,6 +1,6 @@
 ---
 layout: default
-title: SharedData Class Reference
+title: The %Module Context
 ---
 
   <head>
@@ -37,10 +37,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -59,14 +59,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -81,96 +73,45 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+  <div id="nav-path" class="navpath">
+    <ul>
+      <li class="navelem"><a class="el" href="MicroServices_Tutorials.html">Tutorials</a>      </li>
+    </ul>
+  </div>
 </div>
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a>  </div>
   <div class="headertitle">
-<div class="title">SharedData Class Reference<div class="ingroups"><a class="el" href="group__MicroServicesUtils.html">Utility Classes</a></div></div>  </div>
+<div class="title">The Module Context </div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p>In the context of the C++ Micro Services library, we will call all supported "shared library" types (DLL, DSO, DyLib, etc.) uniformly a <em>module</em>. A module accesses the C++ Micro Services API via a <a class="el" href="classModuleContext.html">ModuleContext</a> object. While multiple modules could use the same <a class="el" href="classModuleContext.html">ModuleContext</a>, it is highly recommended that each module gets its own (this will enable module specific service usage tracking and also allows the C++ Micro Services framework to properly cleanup resources after a module has been unloaded).</p>
+<h2>Creating a ModuleContext</h2>
+<p>To create a <a class="el" href="classModuleContext.html">ModuleContext</a> object for a specific library, you have two options. If your project uses CMake as the build system, use the supplied <code>usFunctionGenerateModuleInit</code> CMake function to automatically create a source file and add it to your module's sources: </p>
+<div class="fragment"><pre class="fragment">set(module_srcs )
+usFunctionGenerateModuleInit(module_srcs
+                             NAME "My Module"
+                             LIBRARY_NAME "mylibname"
+                             VERSION "1.0.0"
+                            )
+add_library(mylib ${module_srcs})</pre></div><p> If you do not use CMake, you have to add a call to the macro <code>US_INITIALIZE_MODULE</code> in one of the source files of your module:</p>
+<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &lt;usModuleInitialization.h&gt;</span>
 
-<p><a href="classSharedData-members.html">List of all members.</a></p>
-<table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a67fec283f34fd58f1d767ca561998baf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedData.html#a67fec283f34fd58f1d767ca561998baf">SharedData</a> ()</td></tr>
-<tr class="memitem:a6e9108864710d28126704545739d9431"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedData.html#a6e9108864710d28126704545739d9431">SharedData</a> (const <a class="el" href="classSharedData.html">SharedData</a> &amp;)</td></tr>
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:ac739020e27e15eeca22f38e7927ab77a"><td class="memItemLeft" align="right" valign="top">AtomicInt&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedData.html#ac739020e27e15eeca22f38e7927ab77a">ref</a></td></tr>
-</table>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a67fec283f34fd58f1d767ca561998baf"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classSharedData.html#a67fec283f34fd58f1d767ca561998baf">SharedData::SharedData</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+US_INITIALIZE_MODULE(<span class="stringliteral">&quot;My Module&quot;</span>, <span class="stringliteral">&quot;mylibname&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;1.0.0&quot;</span>)
+</pre></div> <h2>Getting a ModuleContext</h2>
+<p>To retrieve the module specific <a class="el" href="classModuleContext.html">ModuleContext</a> object from anywhere in your module, use the <code>GetModuleContext</code> function:</p>
+<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &lt;usGetModuleContext.h&gt;</span>
+<span class="preprocessor">#include &lt;usModule.h&gt;</span>
 
-</div>
-</div>
-<a class="anchor" id="a6e9108864710d28126704545739d9431"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classSharedData.html#a67fec283f34fd58f1d767ca561998baf">SharedData::SharedData</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classSharedData.html">SharedData</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+US_USE_NAMESPACE
 
-</div>
-</div>
-<hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="ac739020e27e15eeca22f38e7927ab77a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">AtomicInt <a class="el" href="classSharedData.html#ac739020e27e15eeca22f38e7927ab77a">SharedData::ref</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">mutable</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-</div><!-- contents -->
+<span class="keywordtype">void</span> RetrieveModuleContext()
+{
+  <a class="code" href="classModuleContext.html">ModuleContext</a>* context = GetModuleContext();
+  <a class="code" href="classModule.html">Module</a>* module = context-&gt;<a class="code" href="classModuleContext.html#ae4fc39476ca5a30e0cbe5af26de4b4e3">GetModule</a>();
+  std::cout &lt;&lt; <span class="stringliteral">&quot;Module name: &quot;</span> &lt;&lt; module-&gt;<a class="code" href="classModule.html#a71880e4be55811df7aeab43a5c9046b4">GetName</a>() &lt;&lt; <span class="stringliteral">&quot; [id: &quot;</span> &lt;&lt; module-&gt;<a class="code" href="classModule.html#a179725f9aecd04cf59f0a8e74cdf05a4">GetModuleId</a>() &lt;&lt; <span class="stringliteral">&quot;]\n&quot;</span>;
+}
+</pre></div><p> Please note that the call to <code>GetModuleContext</code> will fail if you did not create a module specific context. </p>
+</div></div><!-- contents -->
 
 
   <hr class="footer"/>

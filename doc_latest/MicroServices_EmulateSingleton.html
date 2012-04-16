@@ -75,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="index.html">The C++ Micro Services</a>      </li>
+      <li class="navelem"><a class="el" href="MicroServices_Tutorials.html">Tutorials</a>      </li>
     </ul>
   </div>
 </div>
@@ -156,7 +156,7 @@ Converting a classic singleton</h3>
 
 US_DECLARE_SERVICE_INTERFACE(SingletonOneService, <span class="stringliteral">&quot;org.cppmicroservices.snippet.SingletonOneService&quot;</span>)
 </pre></div><ul>
-<li>Inherit itk::LightObject: All service implementations (not their interfaces) must inherit from itk::LightObject. In the implementation above, the class SingletonOneService provides the implementation as well as the interface.</li>
+<li>Inherit us::Base: All service implementations (not their interfaces) must inherit from us::Base or from the base class as specified in the CMake configuration. In the implementation above, the class SingletonOneService provides the implementation as well as the interface.</li>
 <li>Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance() method to the module activator.</li>
 <li>Service interface declaration: Because the SingletonOneService class introduces a new service interface, it must be registered under a unique name using the helper macro US_DECLARE_SERVICE_INTERFACE.</li>
 </ul>
@@ -189,7 +189,7 @@ US_DECLARE_SERVICE_INTERFACE(SingletonOneService, <span class="stringliteral">&q
   }
 }
 </pre></div><p> The inline comments should explain the details. Note that we now had to change the return type to a pointer, instead of a reference as in the classic singleton. This is necessary since we can no longer guarantee that an instance always exists. Clients of the GetInstance() method must check for null pointers and react appropriately.</p>
-<dl class="section warning"><dt>Warning:</dt><dd>Newly created "singletons" should not expose a GetInstance() method. They should be handled as proper services and hence should be retrieved by clients using the mitk::ModuleContext or mitk::ServiceTracker API. The GetInstance() method is for migration purposes only.</dd></dl>
+<dl class="section warning"><dt>Warning:</dt><dd>Newly created "singletons" should not expose a GetInstance() method. They should be handled as proper services and hence should be retrieved by clients using the <a class="el" href="classModuleContext.html">ModuleContext</a> or <a class="el" href="classServiceTracker.html">ServiceTracker</a> API. The GetInstance() method is for migration purposes only.</dd></dl>
 <div class="fragment"><pre class="fragment">SingletonOneService::~SingletonOneService()
 {
   SingletonTwoService* singletonTwoService = SingletonTwoService::GetInstance();
@@ -219,7 +219,7 @@ US_DECLARE_SERVICE_INTERFACE(SingletonOneService, <span class="stringliteral">&q
 <div class="fragment"><pre class="fragment">  <span class="keywordtype">void</span> Unload(<a class="code" href="classModuleContext.html">ModuleContext</a>* <span class="comment">/*context*/</span>)
   {
     <span class="comment">// Services are automatically unregistered during unloading of</span>
-    <span class="comment">// the shared library after the call to Unload(mitk::ModuleContext*)</span>
+    <span class="comment">// the shared library after the call to Unload(ModuleContext*)</span>
     <span class="comment">// has returned.</span>
 
     <span class="comment">// Since SingletonOneService needs a non-null SingletonTwoService</span>
@@ -240,6 +240,6 @@ US_DECLARE_SERVICE_INTERFACE(SingletonOneService, <span class="stringliteral">&q
 
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Tue Apr 10 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.0-20120408
+  <address class="footer"><small>Generated on Mon Apr 16 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.0-20120408
   </small></address>
 

@@ -40,6 +40,7 @@ set(_private_headers
   util/usExportMacros_p.h
   util/usFunctor_p.h
   util/usStaticInit_p.h
+  util/usThreads_p.h
   util/usUtils_p.h
   
   service/usServiceTracker.tpp

@@ -30,6 +30,30 @@
 #ifndef USMODULEINITIALIZATION_H
 #define USMODULEINITIALIZATION_H
 
+/**
+ * \ingroup MicroServices
+ *
+ * \def US_INITIALIZE_MODULE(_module_name, _module_libname, _module_depends, _module_version)
+ * \brief Creates initialization code for a module.
+ *
+ * Each module which wants to register itself with the CppMicroServices library
+ * has to put a call to this macro in one of its source files.
+ *
+ * Example call for a module with file-name "libmylibname.so".
+ * \code
+ * US_INITIALIZE_MODULE("My Service Implementation", "mylibname", "", "1.0.0")
+ * \endcode
+ *
+ * \remarks If you are using CMake, consider using the provided CMake macro
+ * <code>usFunctionGenerateModuleInit()</code>.
+ *
+ * \param _module_name A human-readable name for the module.
+ *        If you use this macro in a source file for an executable, the module name must
+ *        be a valid C-identifier (no spaces etc.).
+ * \param _module_libname The physical name of the module, withou prefix or suffix.
+ * \param _module_depends A list of module dependencies. This is meta-data only.
+ * \param _module_version A version string in the form of "<major>.<minor>.<micro>.<qualifier>".
+ */
 #define US_INITIALIZE_MODULE(_module_name, _module_libname, _module_depends, _module_version) \
 US_BEGIN_NAMESPACE \
 \

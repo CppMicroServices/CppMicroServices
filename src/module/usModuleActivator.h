@@ -97,6 +97,21 @@ struct ModuleActivator
 
 US_END_NAMESPACE
 
+/**
+ * \ingroup MicroServices
+ *
+ * \def US_EXPORT_MODULE_ACTIVATOR(moduleName, type)
+ * \brief Export a module activator class.
+ *
+ * \param _module_libname The physical name of the module, withou prefix or suffix.
+ * \param _activator_type The fully-qualified type-name of the module activator class.
+ *
+ * Call this macro after the definition of your module activator to make it
+ * accessible by the CppMicroServices library.
+ *
+ * Example:
+ * \snippet uServices-activator/main.cpp 0
+ */
 
 #define US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                     \
   struct ScopedPointer                                                                  \

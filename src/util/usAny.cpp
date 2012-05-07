@@ -34,6 +34,7 @@ std::string container_to_string(Iterator i1, Iterator i2)
     if (i1 == begin) ss << *i1;
     else ss << "," << *i1;
   }
+  ss << ")";
   return ss.str();
 }
 

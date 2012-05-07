@@ -114,18 +114,18 @@ US_END_NAMESPACE
 
   #include <usExportMacros_p.h>
 
-  #define US_EXPORT_MODULE_ACTIVATOR(moduleName, type)                                  \
-    extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## moduleName () \
+  #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
+    extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
     {                                                                                   \
-      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                       \
+      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
     }
 
 #else
 
-  #define US_EXPORT_MODULE_ACTIVATOR(moduleName, type)                                  \
-    US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## moduleName () \
+  #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
+    US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
     {                                                                                   \
-      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                       \
+      US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
     }
 
 #endif

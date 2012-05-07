@@ -2,7 +2,7 @@
 function(usFunctionCreateTestModule name)
 
   set(_srcs ${ARGN})
-  usFunctionGenerateModuleInit(_srcs NAME ${name})
+  usFunctionGenerateModuleInit(_srcs NAME "${name} Module" LIBRARY_NAME ${name})
 
   add_library(${name} ${_srcs})
   target_link_libraries(${name} ${US_LINK_LIBRARIES})

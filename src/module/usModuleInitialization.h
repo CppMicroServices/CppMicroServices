@@ -47,7 +47,14 @@ public: \
     std::string location = ModuleUtils::GetLibraryPath(moduleInfo()->libName, \
                                                        reinterpret_cast<void*>(moduleInfo)); \
     std::string activator_func = "_us_module_activator_instance_"; \
-    activator_func.append(moduleInfo()->name); \
+    if(moduleInfo()->libName.empty()) \
+    { \
+      activator_func.append(moduleInfo()->name); \
+    } \
+    else \
+    { \
+      activator_func.append(moduleInfo()->libName); \
+    } \
 \
     moduleInfo()->location = location;\
 \

@@ -226,10 +226,10 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
   }
 
 #ifdef US_BUILD_SHARED_LIBS
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing moudle TestModuleA")
+  Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
+  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
-  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
+  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA Module", "Test module name")
 #endif
 
   // Check if libA registered the expected service
@@ -276,7 +276,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
 void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHandle& libA)
 {
 #ifdef US_BUILD_SHARED_LIBS
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
+  Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for non-null module")
 #endif
 

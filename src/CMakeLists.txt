@@ -84,10 +84,6 @@ if(_us_baseclass_default)
   list(APPEND _public_headers util/usBase.h)
 endif()
 
-if(US_ENABLE_THREADING_SUPPORT)
-  list(APPEND _private_headers util/usThreads_p.h)
-endif()
-
 if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
   list(APPEND _public_headers service/usServiceFactory.h)
 endif()

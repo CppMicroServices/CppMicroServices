@@ -294,6 +294,9 @@ endif()
 # Source directory
 #-----------------------------------------------------------------------------
 
+set(us_config_h_file "${PROJECT_BINARY_DIR}/include/usConfig.h")
+configure_file(usConfig.h.in ${us_config_h_file})
+
 add_subdirectory(src)
 
 #-----------------------------------------------------------------------------
@@ -314,8 +317,6 @@ add_subdirectory(documentation)
 #-----------------------------------------------------------------------------
 # Last configuration steps
 #-----------------------------------------------------------------------------
-
-configure_file(usConfig.h.in ${PROJECT_BINARY_DIR}/include/usConfig.h)
 
 configure_file(${PROJECT_NAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
 

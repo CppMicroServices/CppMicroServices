@@ -142,7 +142,7 @@ foreach(_header ${_public_headers} ${_private_headers})
 endforeach()
 
 if(NOT US_IS_EMBEDDED)
-  set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${US_PUBLIC_HEADERS})
+  set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${US_PUBLIC_HEADERS} ${us_config_h_file})
   set_property(TARGET ${PROJECT_NAME} PROPERTY PRIVATE_HEADER ${_private_headers})
 else()
   set(US_PUBLIC_HEADERS ${US_PUBLIC_HEADERS} PARENT_SCOPE)

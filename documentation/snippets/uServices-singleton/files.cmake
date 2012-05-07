@@ -7,6 +7,5 @@ set(snippet_src_files
 
 usFunctionGenerateModuleInit(snippet_src_files
                              NAME "uServices_singleton"
-                             LIBRARY_NAME ""
-                             DEPENDS ""
+                             EXECUTABLE
                             )

@@ -104,7 +104,7 @@ public: \
 \
 }; \
 \
-ModuleContext* GetModuleContext() \
+US_ABI_LOCAL ModuleContext* GetModuleContext() \
 { \
   /* make sure the module is registered */ \
   if (moduleInfo()->id == 0) \

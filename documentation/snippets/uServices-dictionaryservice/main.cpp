@@ -7,7 +7,7 @@
 #include <usServiceProperties.h>
 
 // Replace that include with your own base class declaration
-#include <usBase.h>
+#include US_BASECLASS_HEADER
 
 #include <algorithm>
 #include <memory>
@@ -30,7 +30,7 @@ private:
    * A private inner class that implements a dictionary service;
    * see DictionaryService for details of the service.
    */
-  class DictionaryImpl : public Base, public DictionaryService
+  class DictionaryImpl : public US_BASECLASS_NAME, public DictionaryService
   {
     // The set of words contained in the dictionary.
     US_UNORDERED_SET_TYPE<std::string> m_dictionary;

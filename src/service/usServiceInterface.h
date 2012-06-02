@@ -23,6 +23,8 @@
 #ifndef USSERVICEINTERFACE_H
 #define USSERVICEINTERFACE_H
 
+#include <usConfig.h>
+
 template<class T> inline const char* us_service_interface_iid()
 { return 0; }
 
@@ -35,9 +37,9 @@ template<class T> inline const char* us_service_interface_iid()
   template<> inline const char* us_service_interface_iid<IFace *>()              \
   { return IId; }                                                                \
   template<> inline IFace *qobject_cast<IFace *>(QObject *object)                \
-  { return reinterpret_cast<IFace *>((object ? object->qt_metacast(IId) : 0)); } \
+  { return dynamic_cast<IFace*>(reinterpret_cast<US_BASECLASS_NAME *>((object ? object->qt_metacast(IId) : 0))); } \
   template<> inline IFace *qobject_cast<IFace *>(const QObject *object)          \
-  { return reinterpret_cast<IFace *>((object ? const_cast<QObject *>(object)->qt_metacast(IId) : 0)); }
+  { return dynamic_cast<IFace*>(reinterpret_cast<US_BASECLASS_NAME *>((object ? const_cast<QObject *>(object)->qt_metacast(IId) : 0))); }
 
 #else
 

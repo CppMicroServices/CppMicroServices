@@ -88,7 +88,12 @@
   #define US_HASH_FUNCTION_END } };
 
   #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
-  #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>
+  
+  #ifdef US_PLATFORM_WINDOWS
+    #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
+  #else
+    #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>
+  #endif
 
   #define US_UNORDERED_MAP_TYPE ::std::unordered_map
   #define US_UNORDERED_SET_TYPE ::std::unordered_set

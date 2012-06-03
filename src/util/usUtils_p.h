@@ -138,7 +138,7 @@ US_END_NAMESPACE
 
 #else
 
-  #include <usFunctor.h>
+  #include <usFunctor_p.h>
 
   #define US_MODULE_LISTENER_FUNCTOR US_PREPEND_NAMESPACE(Functor)<const US_PREPEND_NAMESPACE(ModuleEvent)&>
 

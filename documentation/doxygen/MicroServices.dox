@@ -54,13 +54,15 @@ coupling, better organization of responsibilities, cleaner API contracts, etc.
 How to build the C++ Micro Services library is explained in detail on the \ref BuildInstructions page.
 \endif
 
-\section Examples
+<h1>Examples</h1>
+
+Here is a list of \subpage MicroServices_Examples "examples":
 
 - \ref MicroServices_DictionaryService
 
-\section Tutorials
+<h1>Tutorials</h1>
 
-Following is a list of use cases and common patterns
+The following list contains use cases and common patterns in the form of \subpage MicroServices_Tutorials "tutorials":
 
 - \ref MicroServices_TheModuleContext
 - \ref MicroServices_EmulateSingleton

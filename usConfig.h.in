@@ -12,6 +12,44 @@
 #cmakedefine US_ENABLE_SERVICE_FACTORY_SUPPORT
 #cmakedefine US_USE_CXX11
 
+///-------------------------------------------------------------------
+// Macros for import/export declarations
+//-------------------------------------------------------------------
+
+#if defined(WIN32)
+  #define US_ABI_EXPORT __declspec(dllexport)
+  #define US_ABI_IMPORT __declspec(dllimport)
+  #define US_ABI_LOCAL
+#else
+  #if __GNUC__ >= 4
+    #define US_ABI_EXPORT __attribute__ ((visibility ("default")))
+    #define US_ABI_IMPORT __attribute__ ((visibility ("default")))
+    #define US_ABI_LOCAL  __attribute__ ((visibility ("hidden")))
+  #else
+    #define US_ABI_EXPORT
+    #define US_ABI_IMPORT
+    #define US_ABI_LOCAL
+  #endif
+#endif
+
+#ifdef US_BUILD_SHARED_LIBS
+  // We are building a shared lib
+  #ifdef CppMicroServices_EXPORTS
+    #define US_EXPORT US_ABI_EXPORT
+  #else
+    #define US_EXPORT US_ABI_IMPORT
+  #endif
+#else
+  // We are building a static lib
+  #if __GNUC__ >= 4
+    // Don't hide RTTI symbols of definitions in the C++ Micro Services
+    // headers that are included in DSOs with hidden visibility
+    #define US_EXPORT US_ABI_EXPORT
+  #else
+    #define US_EXPORT
+  #endif
+#endif
+
 //-------------------------------------------------------------------
 // Namespace customization
 //-------------------------------------------------------------------
@@ -70,6 +108,20 @@
 #if defined(_MSC_VER) && !defined(_SCL_SECURE_NO_WARNINGS)
   #define _SCL_SECURE_NO_WARNINGS
 #endif
+
+//-------------------------------------------------------------------
+// Debuging & Logging
+//-------------------------------------------------------------------
+
+#if defined(NDEBUG) && !defined(US_NO_DEBUG_OUTPUT)
+  #define US_NO_DEBUG_OUTPUT
+#endif
+
+US_BEGIN_NAMESPACE
+  enum MsgType { DebugMsg = 0, InfoMsg = 1, WarningMsg = 2, ErrorMsg = 3 };
+  typedef void (*MsgHandler)(MsgType, const char *);
+  US_EXPORT MsgHandler installMsgHandler(MsgHandler);
+US_END_NAMESPACE
 
 //-------------------------------------------------------------------
 // Hash Container

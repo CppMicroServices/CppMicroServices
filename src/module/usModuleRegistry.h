@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-#include <usExportMacros_p.h>
+#include <usConfig.h>
 
 US_BEGIN_NAMESPACE
 

@@ -127,8 +127,6 @@ US_END_NAMESPACE
 
 #ifdef US_BUILD_SHARED_LIBS
 
-  #include <usExportMacros_p.h>
-
   #define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
     extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
     {                                                                                   \

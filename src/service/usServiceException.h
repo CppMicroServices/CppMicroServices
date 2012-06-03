@@ -25,7 +25,7 @@
 
 #include <stdexcept>
 
-#include <usExportMacros_p.h>
+#include <usConfig.h>
 
 #ifdef _MSC_VER
 #pragma warning(push)

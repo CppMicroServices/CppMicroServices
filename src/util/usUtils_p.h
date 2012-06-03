@@ -29,8 +29,6 @@
 #include <sstream>
 #include <algorithm>
 
-#include <usExportMacros_p.h>
-
 
 //-------------------------------------------------------------------
 // Logging
@@ -38,18 +36,17 @@
 
 US_BEGIN_NAMESPACE
 
+US_EXPORT void message_output(MsgType, const char* buf);
+
 struct LogMsg {
 
-  LogMsg() : enabled(true), buffer() {}
-  ~LogMsg() { std::cout << buffer.str() << std::endl; }
+  LogMsg(int t) : type(static_cast<MsgType>(t)), enabled(true), buffer() {}
+  ~LogMsg() { if(enabled) message_output(type, buffer.str().c_str()); }
 
   template<typename T>
   LogMsg& operator<<(T t)
   {
-    if (enabled)
-    {
-      buffer << t;
-    }
+    if (enabled) buffer << t;
     return *this;
   }
 
@@ -61,16 +58,47 @@ struct LogMsg {
 
 private:
 
+  MsgType type;
   bool enabled;
   std::stringstream buffer;
 };
 
+struct NoLogMsg {
+
+  template<typename T>
+  NoLogMsg& operator<<(T)
+  {
+    return *this;
+  }
+
+  NoLogMsg& operator()(bool)
+  {
+    return *this;
+  }
+
+};
+
 US_END_NAMESPACE
 
-#define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)()
-#define US_INFO US_PREPEND_NAMESPACE(LogMsg)()
-#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)()
-#define US_WARN US_PREPEND_NAMESPACE(LogMsg)()
+#if !defined(US_NO_DEBUG_OUTPUT)
+  #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(0)
+#else
+  #define US_DEBUG US_PREPEND_NAMESPACE(NoLogMsg)()
+#endif
+
+#if !defined(US_NO_INFO_OUTPUT)
+  #define US_INFO US_PREPEND_NAMESPACE(LogMsg)(1)
+#else
+  #define US_INFO US_PREPEND_NAMESPACE(NoLogMsg)()
+#endif
+
+#if !defined(US_NO_WARNING_OUTPUT)
+  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)(2)
+#else
+  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)()
+#endif
+
+#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(3)
 
 //-------------------------------------------------------------------
 // Error handling

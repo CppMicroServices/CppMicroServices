@@ -22,7 +22,6 @@
 #ifndef USSERVICEREFERENCE_H
 #define USSERVICEREFERENCE_H
 
-#include <usExportMacros_p.h>
 #include <usAny.h>
 
 #ifdef _MSC_VER

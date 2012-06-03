@@ -28,7 +28,6 @@
 
 #include <cctype>
 
-#include <usExportMacros_p.h>
 #include "usAny.h"
 
 /// \cond

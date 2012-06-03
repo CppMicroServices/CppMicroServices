@@ -1,0 +1,69 @@
+
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \enum MsgType
+ * This enum describes the messages that can be sent to a message handler (MsgHandler).
+ * You can use the enum to identify and associate the various message types with the
+ * appropriate actions.
+ */
+ 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \var MsgType DebugMsg
+ * A debug message.
+ */
+ 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \var MsgType InfoMsg
+ * An informational message.
+ */
+ 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \var MsgType WarningMsg
+ * A warning message.
+ */
+ 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \var MsgType ErrorMsg
+ * An error message.
+ */
+ 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \typedef MsgHandler
+ * A message handler callback function.
+ */
+ 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \fn MsgHandler installMsgHandler(MsgHandler)
+ * \brief Installs a message handler which has been defined previously.
+ *
+ * Returns a pointer to the previous message handler (which may be 0).
+ *
+ * The message handler is a function that prints out debug messages, warnings,
+ * and fatal error messages. The C++ Micro Services library (debug mode) contains
+ * warning messages that are printed when internal errors (usually invalid function
+ * arguments) occur. The library built in release mode also contains such warnings
+ * unless US_NO_WARNING_OUTPUT and/or US_NO_DEBUG_OUTPUT have been set during
+ * compilation. If you implement your own message handler, you get total control of
+ * these messages.
+ *
+ * The default message handler prints the message to the standard output. If it is
+ * an error message, the application aborts immediately.
+ *
+ * Only one message handler can be defined, since this is usually done on an
+ * application-wide basis to control debug output.
+ *
+ * To restore the message handler, call installMsgHandler(0).
+ */

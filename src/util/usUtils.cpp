@@ -21,14 +21,17 @@
 
 #include "usUtils_p.h"
 
+#include <cstdio>
+
 #ifdef US_PLATFORM_POSIX
-#include <errno.h>
-#include <string.h>
+  #include <errno.h>
+  #include <string.h>
 #else
-#ifndef WIN32_LEAN_AND_MEAN
-  #define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+  #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+  #endif
+  #include <windows.h>
+  #include <crtdbg.h>
 #endif
 
 US_BEGIN_NAMESPACE
@@ -58,6 +61,48 @@ std::string GetLastErrorStr()
 
   return errMsg;
 #endif
+}
+
+static MsgHandler handler = 0;
+
+MsgHandler installMsgHandler(MsgHandler h)
+{
+  MsgHandler old = handler;
+  handler = h;
+  return old;
+}
+
+void message_output(MsgType msgType, const char *buf)
+{
+  if (handler)
+  {
+    (*handler)(msgType, buf);
+  }
+  else
+  {
+    fprintf(stderr, "%s\n", buf);
+    fflush(stderr);
+  }
+
+  if (msgType == ErrorMsg)
+  {
+  #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_CRT_ERROR)
+    // get the current report mode
+    int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
+    _CrtSetReportMode(_CRT_ERROR, reportMode);
+    int ret = _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, QT_VERSION_STR, buf);
+    if (ret == 0  && reportMode & _CRTDBG_MODE_WNDW)
+      return; // ignore
+    else if (ret == 1)
+      _CrtDbgBreak();
+  #endif
+
+  #ifdef US_PLATFORM_POSIX
+    abort(); // trap; generates core dump
+  #else
+    exit(1); // goodbye cruel world
+  #endif
+  }
 }
 
 US_END_NAMESPACE

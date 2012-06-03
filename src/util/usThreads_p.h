@@ -24,7 +24,6 @@
 #define USTHREADINGMODEL_H
 
 #include <usConfig.h>
-#include "usExportMacros_p.h"
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 

@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <list>
 
-#include <usExportMacros_p.h>
+#include <usConfig.h>
 
 US_BEGIN_NAMESPACE
 

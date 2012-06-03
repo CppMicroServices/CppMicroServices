@@ -23,7 +23,7 @@
 #ifndef USGETMODULECONTEXT_H
 #define USGETMODULECONTEXT_H
 
-#include <usExportMacros_p.h>
+#include <usConfig.h>
 
 US_BEGIN_NAMESPACE
 

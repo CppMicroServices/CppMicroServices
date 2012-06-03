@@ -37,7 +37,6 @@ set(_srcs
 
 set(_private_headers
   util/usAtomicInt_p.h
-  util/usExportMacros_p.h
   util/usFunctor_p.h
   util/usStaticInit_p.h
   util/usThreads_p.h

@@ -181,7 +181,7 @@ ServiceReference ServiceRegistry::Get(ModulePrivate* module, const std::string& 
   {
     std::list<ServiceReference> srs;
     Get_unlocked(clazz, "", module, srs);
-    US_INFO << "get service ref " << clazz << " for module "
+    US_DEBUG << "get service ref " << clazz << " for module "
              << module->info.name << " = " << srs.size() << " refs";
 
     if (!srs.empty())

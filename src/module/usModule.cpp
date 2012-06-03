@@ -159,7 +159,7 @@ void Module::Stop()
   }
   catch (...)
   {
-    US_ERROR << "Calling the module activator Unload() method of " << d->info.name << " failed!";
+    US_WARN << "Calling the module activator Unload() method of " << d->info.name << " failed!";
 
     try
     {

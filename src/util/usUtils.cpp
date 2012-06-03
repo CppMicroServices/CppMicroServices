@@ -90,7 +90,7 @@ void message_output(MsgType msgType, const char *buf)
     // get the current report mode
     int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
     _CrtSetReportMode(_CRT_ERROR, reportMode);
-    int ret = _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, QT_VERSION_STR, buf);
+    int ret = _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, CppMicroServices_VERSION_STR, buf);
     if (ret == 0  && reportMode & _CRTDBG_MODE_WNDW)
       return; // ignore
     else if (ret == 1)

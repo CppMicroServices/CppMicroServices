@@ -56,13 +56,22 @@ How to build the C++ Micro Services library is explained in detail on the \ref B
 
 <h1>Examples</h1>
 
+\if us_standalone
 Here is a list of \ref MicroServices_Examples "examples":
+\else
+Here is a list of \subpage MicroServices_Examples "examples":
+\endif
 
 - \ref MicroServices_DictionaryService
 
 <h1>Tutorials</h1>
 
-The following list contains use cases and common patterns in the form of \ref MicroServices_Tutorials "tutorials":
+The following list contains use cases and common patterns in the form of
+\if us_standalone
+\ref MicroServices_Tutorials "tutorials":
+\else
+\subpage MicroServices_Tutorials "tutorials":
+\endif
 
 - \ref MicroServices_TheModuleContext
 - \ref MicroServices_EmulateSingleton

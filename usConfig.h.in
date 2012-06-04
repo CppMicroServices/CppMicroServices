@@ -19,8 +19,8 @@
 #define CppMicroServices_VERSION_MAJOR @CppMicroServices_VERSION_MAJOR@
 #define CppMicroServices_VERSION_MINOR @CppMicroServices_VERSION_MINOR@
 #define CppMicroServices_VERSION_PATH @CppMicroServices_VERSION_PATCH@
-#define CppMicroServices_VERSION_VERSION @CppMicroServices_VERSION@
-#define CppMicroServices_VERSION_VERSION_STR "@CppMicroServices_VERSION@"
+#define CppMicroServices_VERSION @CppMicroServices_VERSION@
+#define CppMicroServices_VERSION_STR "@CppMicroServices_VERSION@"
 
 ///-------------------------------------------------------------------
 // Macros for import/export declarations

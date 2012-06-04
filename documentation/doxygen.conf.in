@@ -1,4 +1,4 @@
-# Doxyfile 1.8.0-20120408
+# Doxyfile 1.8.1
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project.
@@ -719,7 +719,7 @@ EXCLUDE_PATTERNS       = */.git/* \
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        =
+EXCLUDE_SYMBOLS        = us US_NAMESPACE
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see
@@ -951,19 +951,22 @@ HTML_COLORSTYLE_GAMMA  = 80
 
 HTML_TIMESTAMP         = YES
 
-# If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes,
-# files or namespaces will be aligned in HTML using tables. If set to
-# NO a bullet list will be used.
-
-HTML_ALIGN_MEMBERS     = YES
-
 # If the HTML_DYNAMIC_SECTIONS tag is set to YES then the generated HTML
 # documentation will contain sections that can be hidden and shown after the
-# page has loaded. For this to work a browser that supports
-# JavaScript and DHTML is required (for instance Mozilla 1.0+, Firefox
-# Netscape 6.0+, Internet explorer 5.0+, Konqueror, or Safari).
+# page has loaded.
 
 HTML_DYNAMIC_SECTIONS  = NO
+
+# With HTML_INDEX_NUM_ENTRIES one can control the preferred number of
+# entries shown in the various tree structured indices initially; the user
+# can expand and collapse entries dynamically later on. Doxygen will expand
+# the tree to such a level that at most the specified number of entries are
+# visible (unless a fully collapsed tree already exceeds this amount).
+# So setting the number of entries 1 will produce a full collapsed tree by
+# default. 0 is a special value representing an infinite number of entries
+# and will result in a full expanded tree by default.
+
+HTML_INDEX_NUM_ENTRIES = 100
 
 # If the GENERATE_DOCSET tag is set to YES, additional index files
 # will be generated that can be used as input for Apple's Xcode 3

@@ -86,19 +86,19 @@ US_END_NAMESPACE
 #if !defined(US_NO_DEBUG_OUTPUT)
   #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(0, __FILE__, __LINE__, __FUNCTION__)
 #else
-  #define US_DEBUG US_PREPEND_NAMESPACE(NoLogMsg)()
+  #define US_DEBUG true ? US_PREPEND_NAMESPACE(NoLogMsg)() : US_PREPEND_NAMESPACE(NoLogMsg)()
 #endif
 
 #if !defined(US_NO_INFO_OUTPUT)
   #define US_INFO US_PREPEND_NAMESPACE(LogMsg)(1, __FILE__, __LINE__, __FUNCTION__)
 #else
-  #define US_INFO US_PREPEND_NAMESPACE(NoLogMsg)()
+  #define US_INFO  true ? US_PREPEND_NAMESPACE(NoLogMsg)() : US_PREPEND_NAMESPACE(NoLogMsg)()
 #endif
 
 #if !defined(US_NO_WARNING_OUTPUT)
   #define US_WARN US_PREPEND_NAMESPACE(LogMsg)(2, __FILE__, __LINE__, __FUNCTION__)
 #else
-  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)()
+  #define US_WARN true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
 #define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(3, __FILE__, __LINE__, __FUNCTION__)

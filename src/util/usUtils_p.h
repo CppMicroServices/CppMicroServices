@@ -40,7 +40,10 @@ US_EXPORT void message_output(MsgType, const char* buf);
 
 struct LogMsg {
 
-  LogMsg(int t) : type(static_cast<MsgType>(t)), enabled(true), buffer() {}
+  LogMsg(int t, const char* file, int ln, const char* func)
+    : type(static_cast<MsgType>(t)), enabled(true), buffer()
+  { buffer << "In " << func << " at " << file << ":" << ln << " : "; }
+
   ~LogMsg() { if(enabled) message_output(type, buffer.str().c_str()); }
 
   template<typename T>
@@ -81,24 +84,24 @@ struct NoLogMsg {
 US_END_NAMESPACE
 
 #if !defined(US_NO_DEBUG_OUTPUT)
-  #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(0)
+  #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(0, __FILE__, __LINE__, __FUNCTION__)
 #else
   #define US_DEBUG US_PREPEND_NAMESPACE(NoLogMsg)()
 #endif
 
 #if !defined(US_NO_INFO_OUTPUT)
-  #define US_INFO US_PREPEND_NAMESPACE(LogMsg)(1)
+  #define US_INFO US_PREPEND_NAMESPACE(LogMsg)(1, __FILE__, __LINE__, __FUNCTION__)
 #else
   #define US_INFO US_PREPEND_NAMESPACE(NoLogMsg)()
 #endif
 
 #if !defined(US_NO_WARNING_OUTPUT)
-  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)(2)
+  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)(2, __FILE__, __LINE__, __FUNCTION__)
 #else
   #define US_WARN US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
-#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(3)
+#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(3, __FILE__, __LINE__, __FUNCTION__)
 
 //-------------------------------------------------------------------
 // Error handling

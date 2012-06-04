@@ -64,7 +64,7 @@ int usDebugOutputTest(int /*argc*/, char* /*argv*/[])
 #ifdef NDEBUG
   US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing suppressed debug message")
 #else
-  US_TEST_CONDITION(lastMsgType == 0 && lastMsg == "Msg", "Testing debug message")
+  US_TEST_CONDITION(lastMsgType == 0 && lastMsg.find("Msg") != std::string::npos, "Testing debug message")
 #endif
   resetLastMsg();
 
@@ -77,13 +77,13 @@ int usDebugOutputTest(int /*argc*/, char* /*argv*/[])
   {
     US_INFO << "Info msg";
   }
-  US_TEST_CONDITION(lastMsgType == 1 && lastMsg == "Info msg", "Testing informational message")
+  US_TEST_CONDITION(lastMsgType == 1 && lastMsg.find("Info msg") != std::string::npos, "Testing informational message")
   resetLastMsg();
 
   {
     US_WARN << "Warn msg";
   }
-  US_TEST_CONDITION(lastMsgType == 2 && lastMsg == "Warn msg", "Testing warning message")
+  US_TEST_CONDITION(lastMsgType == 2 && lastMsg.find("Warn msg") != std::string::npos, "Testing warning message")
   resetLastMsg();
 
   // We cannot test US_ERROR since it will call abort().

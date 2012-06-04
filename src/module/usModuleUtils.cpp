@@ -42,13 +42,16 @@ std::string GetLibraryPath_impl(const std::string& /*libName*/, void* symbol)
   }
   else
   {
-    US_DEBUG << GetLastErrorStr();
+    US_DEBUG << "GetLibraryPath_impl() dladdr() failed: " << dlerror();
   }
   return "";
 }
 
 void* GetSymbol_impl(const std::string& libName, const char* symbol)
 {
+  // Clear the last error message
+  dlerror();
+
   void* selfHandle = 0;
   if (libName.empty())
   {
@@ -63,12 +66,20 @@ void* GetSymbol_impl(const std::string& libName, const char* symbol)
   if (selfHandle)
   {
     void* addr = dlsym(selfHandle, symbol);
+    if (!addr)
+    {
+      const char* dlerrorMsg = dlerror();
+      if (dlerrorMsg)
+      {
+        US_DEBUG << "GetSymbol_impl() failed: " << dlerrorMsg;
+      }
+    }
     dlclose(selfHandle);
     return addr;
   }
   else
   {
-    US_DEBUG << GetLastErrorStr();
+    US_DEBUG << "GetSymbol_impl() dlopen() failed: " << dlerror();
   }
   return 0;
 }

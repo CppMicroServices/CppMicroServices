@@ -292,7 +292,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistration& sr)
     std::list<ServiceRegistration>& s = classServices[*i];
     if (s.size() > 1)
     {
-      std::remove(s.begin(), s.end(), sr);
+      s.erase(std::remove(s.begin(), s.end(), sr), s.end());
     }
     else
     {

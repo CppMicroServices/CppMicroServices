@@ -33,6 +33,7 @@ set(_tests
   usLDAPFilterTest
   usModuleTest
   usServiceListenerTest
+  usServiceRegistryTest
   usServiceTrackerTest
 )
 

@@ -116,7 +116,7 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
       if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
 
       d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, before, false);
-      const std::list<std::string>& classes = ref_any_cast<std::list<std::string> >(d->properties[ServiceConstants::OBJECTCLASS()]);
+      const std::list<std::string> classes = ref_any_cast<std::list<std::string> >(d->properties[ServiceConstants::OBJECTCLASS()]);
       long int sid = any_cast<long int>(d->properties[ServiceConstants::SERVICE_ID()]);
       d->properties = ServiceRegistry::CreateServiceProperties(props, classes, sid);
 

@@ -41,14 +41,6 @@ US_BEGIN_NAMESPACE
 typedef MutexLock<ServiceRegistry::MutexType> MutexLocker;
 
 
-struct ServiceRegistrationComparator
-{
-  bool operator()(const ServiceRegistration& a, const ServiceRegistration& b) const
-  {
-    return a < b;
-  }
-};
-
 ServiceProperties ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
                                                            const std::list<std::string>& classes,
                                                            long sid)
@@ -130,7 +122,7 @@ ServiceRegistration ServiceRegistry::RegisterService(ModulePrivate* module,
     {
       std::list<ServiceRegistration>& s = classServices[*i];
       std::list<ServiceRegistration>::iterator ip =
-          std::lower_bound(s.begin(), s.end(), res, ServiceRegistrationComparator());
+          std::lower_bound(s.begin(), s.end(), res);
       s.insert(ip, res);
     }
   }
@@ -151,8 +143,8 @@ void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistration& 
        i != classes.end(); ++i)
   {
     std::list<ServiceRegistration>& s = classServices[*i];
-    std::remove(s.begin(), s.end(), sr);
-    s.insert(std::lower_bound(s.begin(), s.end(), sr, ServiceRegistrationComparator()), sr);
+    s.erase(std::remove(s.begin(), s.end(), sr), s.end());
+    s.insert(std::lower_bound(s.begin(), s.end(), sr), sr);
   }
 }
 

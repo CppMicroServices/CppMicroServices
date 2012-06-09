@@ -178,7 +178,7 @@ ServiceReference ServiceRegistry::Get(ModulePrivate* module, const std::string& 
 
     if (!srs.empty())
     {
-      return srs.front();
+      return srs.back();
     }
   }
   catch (const std::invalid_argument& )

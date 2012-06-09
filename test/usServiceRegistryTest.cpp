@@ -67,12 +67,71 @@ int TestMultipleServiceRegistrations()
   return EXIT_SUCCESS;
 }
 
+int TestServicePropertiesUpdate()
+{
+  struct TestServiceA : public US_BASECLASS_NAME, public ITestServiceA
+  {
+  };
+
+  ModuleContext* context = GetModuleContext();
+
+  TestServiceA s1;
+  ServiceProperties props;
+  props["string"] = std::string("A std::string");
+  props["bool"] = false;
+  const char* str = "A const char*";
+  props["const char*"] = str;
+
+  ServiceRegistration reg1 = context->RegisterService<ITestServiceA>(&s1, props);
+  ServiceReference ref1 = context->GetServiceReference<ITestServiceA>();
+
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").size() == 1, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == false, "Testing bool property")
+
+  // register second service with higher rank
+  TestServiceA s2;
+  ServiceProperties props2;
+  props2[ServiceConstants::SERVICE_RANKING()] = 50;
+
+  ServiceRegistration reg2 = context->RegisterService<ITestServiceA>(&s2, props2);
+
+  // Get the service with the highest rank, this should be s2.
+  ServiceReference ref2 = context->GetServiceReference<ITestServiceA>();
+  TestServiceA* service = dynamic_cast<TestServiceA*>(context->GetService<ITestServiceA>(ref2));
+  US_TEST_CONDITION_REQUIRED(service == &s2, "Testing highest service rank")
+
+  props["bool"] = true;
+  // change the service ranking
+  props[ServiceConstants::SERVICE_RANKING()] = 100;
+  reg1.SetProperties(props);
+
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").size() == 2, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == true, "Testing bool property")
+  US_TEST_CONDITION_REQUIRED(any_cast<int>(ref1.GetProperty(ServiceConstants::SERVICE_RANKING())) == 100, "Testing updated ranking")
+
+  // Service with the highest ranking should now be s1
+  service = dynamic_cast<TestServiceA*>(context->GetService<ITestServiceA>(ref1));
+  US_TEST_CONDITION_REQUIRED(service == &s1, "Testing highest service rank")
+
+  reg1.Unregister();
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").size() == 1, "Testing service count")
+
+  service = dynamic_cast<TestServiceA*>(context->GetService<ITestServiceA>(ref2));
+  US_TEST_CONDITION_REQUIRED(service == &s2, "Testing highest service rank")
+
+  reg2.Unregister();
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").empty(), "Testing service count")
+
+  return EXIT_SUCCESS;
+}
+
 
 int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryTest");
 
   US_TEST_CONDITION(TestMultipleServiceRegistrations() == EXIT_SUCCESS, "Testing service registrations: ")
+  US_TEST_CONDITION(TestServicePropertiesUpdate() == EXIT_SUCCESS, "Testing service property update: ")
 
   US_TEST_END()
 }

@@ -111,12 +111,19 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
     if (d->available)
     {
       // NYI! Optimize the MODIFIED_ENDMATCH code
-      int old_rank = any_cast<int>(d->properties[ServiceConstants::SERVICE_RANKING()]);
+      int old_rank = 0;
+      Any any = d->properties[ServiceConstants::SERVICE_RANKING()];
+      if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
+
       d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, before, false);
       const std::list<std::string>& classes = ref_any_cast<std::list<std::string> >(d->properties[ServiceConstants::OBJECTCLASS()]);
       long int sid = any_cast<long int>(d->properties[ServiceConstants::SERVICE_ID()]);
       d->properties = ServiceRegistry::CreateServiceProperties(props, classes, sid);
-      int new_rank = any_cast<int>(d->properties[ServiceConstants::SERVICE_RANKING()]);
+
+      int new_rank = 0;
+      any = d->properties[ServiceConstants::SERVICE_RANKING()];
+      if (any.Type() == typeid(int)) new_rank = any_cast<int>(any);
+
       if (old_rank != new_rank)
       {
         d->module->coreCtx->services.UpdateServiceRegistrationOrder(*this, classes);

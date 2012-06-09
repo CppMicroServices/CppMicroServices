@@ -85,7 +85,7 @@ int TestServicePropertiesUpdate()
   ServiceRegistration reg1 = context->RegisterService<ITestServiceA>(&s1, props);
   ServiceReference ref1 = context->GetServiceReference<ITestServiceA>();
 
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").size() == 1, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().size() == 1, "Testing service count")
   US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == false, "Testing bool property")
 
   // register second service with higher rank
@@ -105,7 +105,7 @@ int TestServicePropertiesUpdate()
   props[ServiceConstants::SERVICE_RANKING()] = 100;
   reg1.SetProperties(props);
 
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").size() == 2, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().size() == 2, "Testing service count")
   US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == true, "Testing bool property")
   US_TEST_CONDITION_REQUIRED(any_cast<int>(ref1.GetProperty(ServiceConstants::SERVICE_RANKING())) == 100, "Testing updated ranking")
 
@@ -114,13 +114,13 @@ int TestServicePropertiesUpdate()
   US_TEST_CONDITION_REQUIRED(service == &s1, "Testing highest service rank")
 
   reg1.Unregister();
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").size() == 1, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>("").size() == 1, "Testing service count")
 
   service = dynamic_cast<TestServiceA*>(context->GetService<ITestServiceA>(ref2));
   US_TEST_CONDITION_REQUIRED(service == &s2, "Testing highest service rank")
 
   reg2.Unregister();
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences("").empty(), "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().empty(), "Testing service count")
 
   return EXIT_SUCCESS;
 }

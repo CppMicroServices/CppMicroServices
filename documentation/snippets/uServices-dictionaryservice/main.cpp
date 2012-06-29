@@ -9,6 +9,7 @@
 // Replace that include with your own base class declaration
 #include US_BASECLASS_HEADER
 
+#include <set>
 #include <algorithm>
 #include <memory>
 
@@ -33,7 +34,7 @@ private:
   class DictionaryImpl : public US_BASECLASS_NAME, public DictionaryService
   {
     // The set of words contained in the dictionary.
-    US_UNORDERED_SET_TYPE<std::string> m_dictionary;
+    std::set<std::string> m_dictionary;
 
   public:
 

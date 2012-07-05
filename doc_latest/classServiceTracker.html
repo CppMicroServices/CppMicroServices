@@ -141,7 +141,7 @@ class ServiceTracker&lt; S, T &gt;</h3>
 <p>The <code><a class="el" href="classServiceTracker.html">ServiceTracker</a></code> class is thread-safe. It does not call a <code><a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a></code> while holding any locks. <code><a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a></code> implementations must also be thread-safe.</p>
 <dl class="tparams"><dt>Template Parameters:</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">S</td><td>The type of the service being tracked. The type must be an assignable datatype. Further, if the <code><a class="el" href="classServiceTracker.html#a888888b2a5aa82a941ad51430ee3bfee">ServiceTracker(ModuleContext*, ServiceTrackerCustomizer&lt;T&gt;*)</a></code> constructor is used, the type must have an associated interface id via US_DECLARE_SERVICE_INTERFACE. </td></tr>
+    <tr><td class="paramname">S</td><td>The type of the service being tracked. The type must be an assignable datatype. Further, if the <code><a class="el" href="classServiceTracker.html#a888888b2a5aa82a941ad51430ee3bfee">ServiceTracker(ModuleContext*, ServiceTrackerCustomizer&lt;T&gt;*)</a></code> constructor is used, the type must have an associated interface id via <a class="el" href="group__MicroServices.html#gad5c1340dcd99d403c8da0c52b8db30bb" title="Declare a CppMicroServices service interface.">US_DECLARE_SERVICE_INTERFACE</a>. </td></tr>
     <tr><td class="paramname">T</td><td>The type of the tracked object. The type must be an assignable datatype, provide a boolean conversion function, and provide a constructor and an assignment operator which can handle 0 as an argument. </td></tr>
   </table>
   </dd>
@@ -897,5 +897,5 @@ template&lt;class S  = us::Base*, class T  = S&gt; </div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Jun 4 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.1
+  <address class="footer"><small>Generated on Fri Jul 6 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.1
   </small></address>

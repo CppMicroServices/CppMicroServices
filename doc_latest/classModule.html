@@ -103,8 +103,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aad616f286d832d168958541f316e2a81"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#aad616f286d832d168958541f316e2a81">PROP_VERSION</a> ()</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>Represents a US module.</p>
-<p>A <code>Module</code> object is the access point to a US module. Each US module has an associated <code>Module</code> object.</p>
+<div class="textblock"><p>Represents a CppMicroServices module.</p>
+<p>A <code>Module</code> object is the access point to a CppMicroServices module. Each CppMicroServices module has an associated <code>Module</code> object.</p>
 <p>A module has unique identity, a <code>long</code>, chosen by the framework. This identity does not change during the lifecycle of a module.</p>
 <p>A module can be in one of two states: </p>
 <ul>
@@ -186,7 +186,7 @@ UNLOADED </li>
 <p>A module's unique identifier has the following attributes: </p>
 <ul>
 <li>
-Is unique and persistent. </li>
+Is unique. </li>
 <li>
 Is a <code>long</code>. </li>
 <li>
@@ -255,7 +255,7 @@ Does not change when a module is reloaded. </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns the version of this module as specified by the US_CREATE_MODULE CMake macro. If this module does not have a specified version then <a class="el" href="classModuleVersion.html#a75ea56c0729937b39345301674b434a2">ModuleVersion#EmptyVersion</a> is returned.</p>
+<p>Returns the version of this module as specified by the US_INITIALIZE_MODULE CMake macro. If this module does not have a specified version then <a class="el" href="classModuleVersion.html#a75ea56c0729937b39345301674b434a2">ModuleVersion::EmptyVersion</a> is returned.</p>
 <p>This method continues to return this module's version while this module is in the <code>UNLOADED</code> state.</p>
 <dl class="section return"><dt>Returns:</dt><dd>The version of this module. </dd></dl>
 
@@ -420,5 +420,5 @@ Does not change when a module is reloaded. </li>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Jun 4 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.1
+  <address class="footer"><small>Generated on Fri Jul 6 2012 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.1
   </small></address>

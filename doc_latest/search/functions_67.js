@@ -6,7 +6,7 @@ var searchData=
   ['getmicro',['GetMicro',['../classModuleVersion.html#a96b6cf23fa20771e91f5b84e997a68d2',1,'ModuleVersion']]],
   ['getminor',['GetMinor',['../classModuleVersion.html#ae189f8f11c2032585fa65fd8a746c6ff',1,'ModuleVersion']]],
   ['getmodule',['GetModule',['../classModuleContext.html#ae4fc39476ca5a30e0cbe5af26de4b4e3',1,'ModuleContext::GetModule() const '],['../classModuleContext.html#a26d5bba1c8dff99e35ccef45fb0068d3',1,'ModuleContext::GetModule(long id) const '],['../classModuleEvent.html#a12b142adcb5b98d79fb87e38554d307f',1,'ModuleEvent::GetModule()'],['../classModuleRegistry.html#ae2a12e82c874a7cbaf4884ad59ccbee5',1,'ModuleRegistry::GetModule(long id)'],['../classModuleRegistry.html#ab8834c568742e21823f49bb0c3b7c015',1,'ModuleRegistry::GetModule(const std::string &amp;name)'],['../classServiceReference.html#acbbf94823ee9c138ef328709b062b815',1,'ServiceReference::GetModule()']]],
-  ['getmodulecontext',['GetModuleContext',['../classModule.html#a66c027deb575198ba11a37cca2f2faf7',1,'Module']]],
+  ['getmodulecontext',['GetModuleContext',['../classModule.html#a66c027deb575198ba11a37cca2f2faf7',1,'Module::GetModuleContext()'],['../group__MicroServices.html#ga80e18861e658c6523a46beba5c3ac208',1,'GetModuleContext():&#160;usGetModuleContext.h']]],
   ['getmoduleid',['GetModuleId',['../classModule.html#a179725f9aecd04cf59f0a8e74cdf05a4',1,'Module']]],
   ['getmodules',['GetModules',['../classModuleContext.html#afacffe98b55d1c01aeee0c0c69dd70ee',1,'ModuleContext::GetModules()'],['../classModuleRegistry.html#a23ae2599adb0e2c12df16a7fc2314667',1,'ModuleRegistry::GetModules()']]],
   ['getname',['GetName',['../classModule.html#a71880e4be55811df7aeab43a5c9046b4',1,'Module']]],

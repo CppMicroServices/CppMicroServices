@@ -31,7 +31,7 @@ US_BEGIN_NAMESPACE
 
 /**
  * This class is not intended to be used directly. It is exported to support
- * the US module system.
+ * the CppMicroServices module system.
  */
 template<class S, class T>
 class TrackedService : public TrackedServiceListener,

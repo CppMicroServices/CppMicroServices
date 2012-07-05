@@ -100,7 +100,7 @@ public:
    * The following steps are taken to modify service properties:
    * <ol>
    * <li>The service's properties are replaced with the provided properties.
-   * <li>A service event of type {@link ServiceEvent#MODIFIED} is fired.
+   * <li>A service event of type ServiceEvent#MODIFIED is fired.
    * </ol>
    *
    * @param properties The properties for this service. See {@link ServiceProperties}
@@ -127,7 +127,7 @@ public:
    * <ol>
    * <li>The service is removed from the framework service registry so that
    * it can no longer be obtained.
-   * <li>A service event of type {@link ServiceEvent#UNREGISTERING} is fired
+   * <li>A service event of type ServiceEvent#UNREGISTERING is fired
    * so that modules using this service can release their use of the service.
    * Once delivery of the service event is complete, the
    * <code>ServiceRegistration</code> objects for the service may no longer be
@@ -135,7 +135,7 @@ public:
    * <li>For each module whose use count for this service is greater than
    * zero: <br>
    * The module's use count for this service is set to zero. <br>
-   * If the service was registered with a {@link ServiceFactory} object, the
+   * If the service was registered with a ServiceFactory object, the
    * <code>ServiceFactory#UngetService</code> method is called to release
    * the service object for the module.
    * </ol>
@@ -155,7 +155,7 @@ public:
   ServiceRegistration& operator=(const ServiceRegistration& registration);
 
 
-protected:
+private:
 
   friend class ServiceRegistry;
   friend class ServiceReferencePrivate;

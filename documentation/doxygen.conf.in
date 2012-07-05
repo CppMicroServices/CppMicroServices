@@ -630,7 +630,7 @@ WARN_IF_DOC_ERROR      = YES
 # wrong or incomplete parameter documentation, but not about the absence of
 # documentation.
 
-WARN_NO_PARAMDOC       = NO
+WARN_NO_PARAMDOC       = YES
 
 # The WARN_FORMAT tag determines the format of the warning messages that
 # doxygen can produce. The string should contain the $file, $line, and $text
@@ -1523,7 +1523,8 @@ PREDEFINED             = US_PREPEND_NAMESPACE(x)=x \
                          US_BEGIN_NAMESPACE= \
                          US_END_NAMESPACE= \
                          "US_BASECLASS_NAME=@US_BASECLASS_NAME@" \
-                         US_EXPORT=
+                         US_EXPORT= \
+                         US_ABI_LOCAL=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

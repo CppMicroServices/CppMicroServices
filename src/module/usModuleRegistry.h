@@ -62,14 +62,15 @@ public:
   /**
    * Get all known modules.
    *
-   * @return A Module list with modules.
+   * @param modules A list which is filled with all known modules.
    */
   static void GetModules(std::vector<Module*>& modules);
 
   /**
-   * Get all modules currently in module state LOADED.
+   * Get all modules currently in module state <code>LOADED</code>.
    *
-   * @return A List of Modules.
+   * @param modules A list which is filled with all modules in
+   *        state <code>LOADED</code>
    */
   static void GetLoadedModules(std::vector<Module*>& modules);
 

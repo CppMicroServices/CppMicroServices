@@ -38,7 +38,7 @@ struct ModuleActivator;
 
 /**
  * This class is not intended to be used directly. It is exported to support
- * the US module system.
+ * the CppMicroServices module system.
  */
 struct US_EXPORT ModuleInfo
 {

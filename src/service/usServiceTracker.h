@@ -64,7 +64,7 @@ class ModuleContext;
  *         assignable datatype. Further, if the
  *         <code>ServiceTracker(ModuleContext*, ServiceTrackerCustomizer<T>*)</code>
  *         constructor is used, the type must have an associated interface id via
- *         US_DECLARE_SERVICE_INTERFACE.
+ *         #US_DECLARE_SERVICE_INTERFACE.
  * \tparam T The type of the tracked object. The type must be an assignable
  *         datatype, provide a boolean conversion function, and provide
  *         a constructor and an assignment operator which can handle 0 as an argument.

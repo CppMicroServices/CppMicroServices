@@ -36,7 +36,7 @@ US_BEGIN_NAMESPACE
 /**
  * \ingroup MicroServices
  *
- * Version identifier for US modules.
+ * Version identifier for CppMicroServices modules.
  *
  * <p>
  * Version identifiers have four components.

@@ -56,12 +56,12 @@ public:
    * Simple = '(' attr '=' value ')'
    *        | '(' '|' Simple+ ')'
    * </pre>
-   * where <code>attr</code> is one of {@link Constants#OBJECTCLASS},
-   * {@link Constants#SERVICE_ID} or {@link Constants#SERVICE_PID}, and
+   * where <code>attr</code> is one of Constants#OBJECTCLASS,
+   * Constants#SERVICE_ID or Constants#SERVICE_PID, and
    * <code>value</code> must not contain a wildcard character.
    * <p>
    * The index of the vector determines which key the cache is for
-   * (see {@link ServiceListenerState#hashedKeys}). For each key, there is
+   * (see ServiceListenerState#hashedKeys). For each key, there is
    * a vector pointing out the values which are accepted by this
    * ServiceListenerEntry's filter. This cache is maintained to make
    * it easy to remove this service listener.

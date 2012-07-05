@@ -101,7 +101,7 @@ public:
    * @param registration The <code>ServiceRegistration</code> object for the
    *        service.
    * @param service The service object returned by a previous call to the
-   *        <code>ServiceFactory::getService</code> method.
+   *        <code>ServiceFactory::GetService</code> method.
    * @see ModuleContext#UngetService
    */
   virtual void UngetService(Module* module, const ServiceRegistration& registration,

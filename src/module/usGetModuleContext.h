@@ -30,10 +30,14 @@ US_BEGIN_NAMESPACE
 class ModuleContext;
 
 /**
- * Returns the module context of the calling module.
+ * \ingroup MicroServices
  *
- * This function allows easy access to the own ModuleContext instance from
+ * \brief Returns the module context of the calling module.
+ *
+ * This function allows easy access to the ModuleContext instance from
  * inside a C++ Micro Services module.
+ *
+ * \return The ModuleContext of the calling module.
  *
  * \internal
  *

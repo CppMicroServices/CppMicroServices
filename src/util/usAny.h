@@ -55,7 +55,7 @@ US_EXPORT std::string any_value_to_string(const std::list<std::string>& val);
  * An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
  * of the internally stored data.
  *
- * Code taken from the Boost 1.46.1 library. Original copyright by Kevlin Henney. Modified for US.
+ * Code taken from the Boost 1.46.1 library. Original copyright by Kevlin Henney. Modified for CppMicroServices.
  */
 class Any
 {

@@ -35,11 +35,11 @@ class ModulePrivate;
 /**
  * \ingroup MicroServices
  *
- * Represents a US module.
+ * Represents a CppMicroServices module.
  *
  * <p>
- * A <code>%Module</code> object is the access point to a US module.
- * Each US module has an associated <code>%Module</code> object.
+ * A <code>%Module</code> object is the access point to a CppMicroServices module.
+ * Each CppMicroServices module has an associated <code>%Module</code> object.
  *
  * <p>
  * A module has unique identity, a <code>long</code>, chosen by the
@@ -115,7 +115,7 @@ public:
    * <p>
    * A module's unique identifier has the following attributes:
    * <ul>
-   * <li>Is unique and persistent.
+   * <li>Is unique.
    * <li>Is a <code>long</code>.
    * <li>Its value is not reused for another module, even after a module is
    * unloaded.
@@ -158,8 +158,8 @@ public:
 
   /**
    * Returns the version of this module as specified by the
-   * US_CREATE_MODULE CMake macro. If this module does not have a
-   * specified version then {@link ModuleVersion#EmptyVersion} is returned.
+   * US_INITIALIZE_MODULE CMake macro. If this module does not have a
+   * specified version then {@link ModuleVersion::EmptyVersion} is returned.
    *
    * <p>
    * This method continues to return this module's version while

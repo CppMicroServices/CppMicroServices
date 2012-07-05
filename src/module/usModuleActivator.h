@@ -31,15 +31,15 @@ class ModuleContext;
 /**
  * \ingroup MicroServices
  *
- * Customizes the starting and stopping of a US module.
+ * Customizes the starting and stopping of a CppMicroServices module.
  * <p>
  * <code>%ModuleActivator</code> is an interface that can be implemented by
- * US modules. The US core can create instances of a
+ * CppMicroServices modules. The CppMicroServices library can create instances of a
  * module's <code>%ModuleActivator</code> as required. If an instance's
- * <code>moduleActivator::Load</code> method executes successfully, it is
+ * <code>ModuleActivator::Load</code> method executes successfully, it is
  * guaranteed that the same instance's <code>%ModuleActivator::Unload</code>
- * method will be called when the module is to be unloaded. The US core does
- * not concurrently call a <code>%ModuleActivator</code> object.
+ * method will be called when the module is to be unloaded. The CppMicroServices
+ * library does not concurrently call a <code>%ModuleActivator</code> object.
  *
  * <p>
  * <code>%ModuleActivator</code> is an abstract class interface whose implementations
@@ -52,7 +52,7 @@ class ModuleContext;
  * <p>
  * The class implementing the <code>%ModuleActivator</code> interface must have a public
  * default constructor so that a <code>%ModuleActivator</code>
- * object can be created by the US core.
+ * object can be created by the CppMicroServices library.
  *
  */
 struct ModuleActivator

@@ -32,7 +32,7 @@ US_BEGIN_NAMESPACE
 
 /**
  * This class is not intended to be used directly. It is exported to support
- * the US module system.
+ * the CppMicroServices module system.
  *
  * Abstract class to track items. If a Tracker is reused (closed then reopened),
  * then a new ModuleAbstractTracked object is used. This class acts as a map of tracked

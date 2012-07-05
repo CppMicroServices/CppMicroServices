@@ -33,7 +33,6 @@
 /**
  * \ingroup MicroServices
  *
- * \def US_INITIALIZE_MODULE(_module_name, _module_libname, _module_depends, _module_version)
  * \brief Creates initialization code for a module.
  *
  * Each module which wants to register itself with the CppMicroServices library

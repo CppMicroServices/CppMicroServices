@@ -152,7 +152,7 @@ public:
    * be ignored.
    * <li>The service is added to the framework service registry and may now be
    * used by other modules.
-   * <li>A service event of type {@link ServiceEvent#REGISTERED} is fired.
+   * <li>A service event of type ServiceEvent#REGISTERED is fired.
    * <li>A <code>ServiceRegistration</code> object for this registration is
    * returned.
    * </ol>
@@ -535,7 +535,7 @@ public:
    * callback will not be called with a <code>ServiceEvent</code> of type
    * <code>REGISTERED</code>.
    *
-   * @tparam The type of the receiver (containing the member function to be called)
+   * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
    * @param filter The filter criteria.
@@ -561,7 +561,7 @@ public:
    * If the <code>(receiver,callback)</code> pair is not contained in this
    * context module's list of listeners, this method does nothing.
    *
-   * @tparam The type of the receiver (containing the member function to be removed)
+   * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
    * @throws std::logic_error If this ModuleContext is no
@@ -584,7 +584,7 @@ public:
    * of <code>receiver</code> and <code>callback</code> such that
    * <code>(r == receiver && c == callback)</code>, then this method does nothing.
    *
-   * @tparam The type of the receiver (containing the member function to be called)
+   * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
    * @throws std::logic_error If this ModuleContext is no
@@ -605,7 +605,7 @@ public:
    * If the <code>(receiver,callback)</code> pair is not contained in this
    * context module's list of listeners, this method does nothing.
    *
-   * @tparam The type of the receiver (containing the member function to be removed)
+   * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
    * @throws std::logic_error If this ModuleContext is no

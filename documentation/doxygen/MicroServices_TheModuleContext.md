@@ -21,7 +21,7 @@ create a source file and add it to your module's sources:
                                 )
     add_library(mylib ${module_srcs})
     
-If you do not use CMake, you have to add a call to the macro `US_INITIALIZE_MODULE` in one of the source
+If you do not use CMake, you have to add a call to the macro `#US_INITIALIZE_MODULE` in one of the source
 files of your module:
 
 \snippet uServices-modulecontext/main.cpp InitializeModule
@@ -29,8 +29,8 @@ files of your module:
 ### Getting a %ModuleContext
 
 To retrieve the module specific ModuleContext object from anywhere in your module, use the
-`GetModuleContext` function:
+`#GetModuleContext` function:
 
 \snippet uServices-modulecontext/main.cpp GetModuleContext
 
-Please note that the call to `GetModuleContext` will fail if you did not create a module specific context.
+Please note that the call to `#GetModuleContext` will fail if you did not create a module specific context.

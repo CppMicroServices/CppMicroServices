@@ -37,7 +37,7 @@ class ModulePrivate;
 
 
 /**
- * Here we handle all the US services that are registered.
+ * Here we handle all the CppMicroServices services that are registered.
  */
 class ServiceRegistry
 {

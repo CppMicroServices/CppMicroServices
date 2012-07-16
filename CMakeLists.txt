@@ -95,8 +95,8 @@ us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 
-if(MSVC10)
-  # Visual Studio 2010 has support for C++11 enabled by default
+if(MSVC10 OR MSVC11)
+  # Visual Studio 2010 and newer have support for C++11 enabled by default
   set(US_USE_C++11 1)
 else()
   us_cache_var(US_USE_C++11 OFF BOOL "Enable the use of C++11 features" ADVANCED)

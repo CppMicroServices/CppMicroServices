@@ -31,6 +31,7 @@ add_subdirectory(modules)
 set(_tests
   usDebugOutputTest
   usLDAPFilterTest
+  usModuleAutoLoadTest
   usModuleTest
   usServiceListenerTest
   usServiceRegistryTest

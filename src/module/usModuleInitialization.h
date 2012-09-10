@@ -36,12 +36,18 @@
  * \brief Creates initialization code for a module.
  *
  * Each module which wants to register itself with the CppMicroServices library
- * has to put a call to this macro in one of its source files.
+ * has to put a call to this macro (or to US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR)
+ * in one of its source files.
  *
  * Example call for a module with file-name "libmylibname.so".
  * \code
  * US_INITIALIZE_MODULE("My Service Implementation", "mylibname", "", "1.0.0")
  * \endcode
+ *
+ * This will initialize the module for use with teh CppMicroServices library, using a default
+ * auto-load directory named after the provided library name in \c _module_libname.
+ *
+ * \sa US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR
  *
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateModuleInit()</code>.
@@ -54,10 +60,39 @@
  * \param _module_version A version string in the form of "<major>.<minor>.<micro>.<qualifier>".
  */
 #define US_INITIALIZE_MODULE(_module_name, _module_libname, _module_depends, _module_version) \
+  US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR(_module_name, _module_libname, _module_libname, _module_depends, _module_version)
+
+/**
+ * \ingroup MicroServices
+ *
+ * \brief Creates initialization code for a module using a custom auto-load directory.
+ *
+ * Each module which wants to register itself with the CppMicroServices library
+ * has to put a call to this macro (or to US_INITIALIZE_MODULE) in one of its source files.
+ *
+ * Example call for a module with file-name "libmylibname.so".
+ * \code
+ * US_INITIALIZE_MODULE("My Service Implementation", "mylibname", "autoload_mysublibs", "", "1.0.0")
+ * \endcode
+ *
+ * \remarks If you are using CMake, consider using the provided CMake macro
+ * <code>usFunctionGenerateModuleInit()</code>.
+ *
+ * \param _module_name A human-readable name for the module.
+ *        If you use this macro in a source file for an executable, the module name must
+ *        be a valid C-identifier (no spaces etc.).
+ * \param _module_libname The physical name of the module, withou prefix or suffix.
+ * \param _module_autoload_dir A directory name relative to this modules library location from which
+ *        modules will be auto-loaded during activation of this module. Provide an empty string to
+ *        disable auto-loading for this module.
+ * \param _module_depends A list of module dependencies. This is meta-data only.
+ * \param _module_version A version string in the form of "<major>.<minor>.<micro>.<qualifier>".
+ */
+#define US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR(_module_name, _module_libname, _module_autoload_dir, _module_depends, _module_version) \
 US_BEGIN_NAMESPACE \
 \
 /* Declare a file scoped ModuleInfo object */ \
-US_GLOBAL_STATIC_WITH_ARGS(ModuleInfo, moduleInfo, (_module_name, _module_libname, _module_depends, _module_version)) \
+US_GLOBAL_STATIC_WITH_ARGS(ModuleInfo, moduleInfo, (_module_name, _module_libname, _module_autoload_dir, _module_depends, _module_version)) \
 \
 /* This class is used to statically initialize the library within the C++ Micro services \
    library. looks up a library specific C-style function a */ \

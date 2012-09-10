@@ -36,6 +36,8 @@ US_USE_NAMESPACE
 
 extern ModuleActivator* _us_module_activator_instance_TestModuleA();
 
+namespace {
+
 class TestModuleListener {
 
 public:
@@ -333,6 +335,7 @@ void frame045a(ModuleContext* mc)
   }
 }
 
+} // end unnamed namespace
 
 int usModuleTest(int /*argc*/, char* /*argv*/[])
 {

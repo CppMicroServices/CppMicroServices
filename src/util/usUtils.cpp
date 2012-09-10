@@ -21,18 +21,150 @@
 
 #include "usUtils_p.h"
 
+#include "usModuleInfo.h"
+
 #include <cstdio>
 
 #ifdef US_PLATFORM_POSIX
   #include <errno.h>
   #include <string.h>
+  #include <dlfcn.h>
+  #include <dirent.h>
 #else
   #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
   #endif
   #include <windows.h>
   #include <crtdbg.h>
+  #include "dirent_win32_p.h"
 #endif
+
+//-------------------------------------------------------------------
+// Module auto-loading
+//-------------------------------------------------------------------
+
+namespace {
+
+std::string library_suffix()
+{
+#ifdef US_PLATFORM_WINDOWS
+  return ".dll";
+#elif defined(US_PLATFORM_APPLE)
+  return ".dylib";
+#else
+  return ".so";
+#endif
+}
+
+#ifdef US_PLATFORM_POSIX
+
+const char DIR_SEP = '/';
+
+bool load_impl(const std::string& modulePath)
+{
+  void* handle = dlopen(modulePath.c_str(), RTLD_LAZY | RTLD_LOCAL);
+  return (handle != NULL);
+}
+
+#elif defined(US_PLATFORM_WINDOWS)
+
+const char DIR_SEP = '\\';
+
+bool load_impl(const std::string& modulePath)
+{
+  void* handle = LoadLibrary(modulePath.c_str());
+  return (handle != NULL);
+}
+
+#else
+
+  #ifdef US_ENABLE_AUTOLOADING_SUPPORT
+    #error "Missing load_impl implementation for this platform."
+  #else
+bool load_impl(const std::string&) { return false; }
+  #endif
+
+#endif
+
+}
+
+US_BEGIN_NAMESPACE
+
+void AutoLoadModules(const ModuleInfo& moduleInfo)
+{
+  if (!moduleInfo.autoLoadDir.empty())
+  {
+    // Load all modules from a directory located relative to this modules location
+    // and named after this modules library name.
+    std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
+    std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
+
+    std::string searchPath = moduleBasePath + DIR_SEP + moduleInfo.autoLoadDir;
+
+    DIR* dir = opendir(searchPath.c_str());
+#ifdef CMAKE_INTDIR
+    // Try intermediate output directories
+    if (dir == NULL)
+    {
+      indexOfLastSeparator = moduleBasePath.find_last_of(DIR_SEP);
+      if (indexOfLastSeparator != -1)
+      {
+        if (moduleBasePath.substr(indexOfLastSeparator+1) == CMAKE_INTDIR)
+        {
+          searchPath = moduleBasePath.substr(0, indexOfLastSeparator+1) + moduleInfo.autoLoadDir + DIR_SEP + CMAKE_INTDIR;
+          dir = opendir(searchPath.c_str());
+        }
+      }
+    }
+#endif
+
+    if (dir != NULL)
+    {
+      struct dirent *ent = NULL;
+      while ((ent = readdir(dir)) != NULL)
+      {
+        bool loadFile = true;
+#ifdef _DIRENT_HAVE_D_TYPE
+        if (ent->d_type != DT_UNKNOWN && ent->d_type != DT_REG)
+        {
+          loadFile = false;
+        }
+#endif
+
+        std::string entryFileName(ent->d_name);
+
+        // On Linux, library file names can have version numbers appended. On other platforms, we
+        // check the file ending. This could be refined for Linux in the future.
+#if !defined(US_PLATFORM_LINUX)
+        if (entryFileName.rfind(library_suffix()) != (entryFileName.size() - library_suffix().size()))
+        {
+          loadFile = false;
+        }
+#endif
+        if (!loadFile) continue;
+
+        std::string libPath = searchPath;
+        if (!libPath.empty() && libPath.find_last_of(DIR_SEP) != libPath.size() -1)
+        {
+          libPath += DIR_SEP;
+        }
+        libPath += entryFileName;
+        US_INFO << "Auto-loading module " << libPath;
+        if (!load_impl(libPath))
+        {
+          US_WARN << "Auto-loading of module " << libPath << " failed: " << GetLastErrorStr();
+        }
+      }
+      closedir(dir);
+    }
+  }
+}
+
+US_END_NAMESPACE
+
+//-------------------------------------------------------------------
+// Error handling
+//-------------------------------------------------------------------
 
 US_BEGIN_NAMESPACE
 

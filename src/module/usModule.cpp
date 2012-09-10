@@ -125,6 +125,10 @@ void Module::Start()
       d->moduleActivator->Load(d->moduleContext);
     }
 
+#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+    AutoLoadModules(d->info);
+#endif
+
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 //  }
 //  catch (...)

@@ -31,7 +31,7 @@
 
 #include <usModulePropsInterface.h>
 
-#include "usTestUtilSharedLibrary.cpp"
+#include "usTestUtilSharedLibrary.h"
 
 US_USE_NAMESPACE
 

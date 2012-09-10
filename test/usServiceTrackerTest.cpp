@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include US_BASECLASS_HEADER
 
 #include "usServiceControlInterface.h"
-#include "usTestUtilSharedLibrary.cpp"
+#include "usTestUtilSharedLibrary.h"
 
 US_USE_NAMESPACE
 

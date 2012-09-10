@@ -27,7 +27,8 @@
 
 #include <usTestingConfig.h>
 
-#include "usTestUtilSharedLibrary.cpp"
+#include "usTestUtilSharedLibrary.h"
+#include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 
 #include <assert.h>
@@ -39,94 +40,15 @@ extern ModuleActivator* _us_module_activator_instance_TestModuleAL2();
 
 namespace {
 
-class TestModuleAutoLoadListener {
-
-public:
-
-  TestModuleAutoLoadListener(ModuleContext* mc) : mc(mc), moduleEvents()
-  {}
-
-  void ModuleChanged(const ModuleEvent event)
-  {
-    moduleEvents.push_back(event);
-    US_DEBUG << "ModuleEvent:" << event;
-  }
-
-  ModuleEvent GetModuleEvent() const
-  {
-    if (moduleEvents.empty())
-    {
-      return ModuleEvent();
-    }
-    return moduleEvents.back();
-  }
-
-  bool CheckListenerEvents(
-      bool pexp, ModuleEvent::Type ptype,
-      Module* moduleX)
-  {
-    std::vector<ModuleEvent> pEvts;
-
-    if (pexp) pEvts.push_back(ModuleEvent(ptype, moduleX));
-
-    return CheckListenerEvents(pEvts);
-  }
-
-  bool CheckListenerEvents(
-      const std::vector<ModuleEvent>& pEvts)
-  {
-    bool listenState = true; // assume everything will work
-
-    if (pEvts.size() != moduleEvents.size())
-    {
-      listenState = false;
-      US_DEBUG << "*** Module event mismatch: expected "
-          << pEvts.size() << " event(s), found "
-          << moduleEvents.size() << " event(s).";
-
-      const std::size_t max = pEvts.size() > moduleEvents.size() ? pEvts.size() : moduleEvents.size();
-      for (std::size_t i = 0; i < max; ++i)
-      {
-        const ModuleEvent& pE = i < pEvts.size() ? pEvts[i] : ModuleEvent();
-        const ModuleEvent& pR = i < moduleEvents.size() ? moduleEvents[i] : ModuleEvent();
-        US_DEBUG << "    " << pE << " - " << pR;
-      }
-    }
-    else
-    {
-      for (std::size_t i = 0; i < pEvts.size(); ++i)
-      {
-        const ModuleEvent& pE = pEvts[i];
-        const ModuleEvent& pR = moduleEvents[i];
-        if (pE.GetType() != pR.GetType()
-          || pE.GetModule() != pR.GetModule())
-        {
-          listenState = false;
-          US_DEBUG << "*** Wrong module event: " << pR << " expected " << pE;
-        }
-      }
-    }
-
-    moduleEvents.clear();
-    return listenState;
-  }
-
-private:
-
-  ModuleContext* const mc;
-
-  std::vector<ModuleEvent> moduleEvents;
-};
-
 void testDefaultAutLoadPath()
 {
   ModuleContext* mc = GetModuleContext();
   assert(mc);
-  TestModuleAutoLoadListener listener(mc);
+  TestModuleListener listener(mc);
 
   try
   {
-    mc->AddModuleListener(&listener, &TestModuleAutoLoadListener::ModuleChanged);
+    mc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -175,18 +97,18 @@ void testDefaultAutLoadPath()
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 
-  mc->RemoveModuleListener(&listener, &TestModuleAutoLoadListener::ModuleChanged);
+  mc->RemoveModuleListener(&listener, &TestModuleListener::ModuleChanged);
 }
 
 void testCustomAutoLoadPath()
 {
   ModuleContext* mc = GetModuleContext();
   assert(mc);
-  TestModuleAutoLoadListener listener(mc);
+  TestModuleListener listener(mc);
 
   try
   {
-    mc->AddModuleListener(&listener, &TestModuleAutoLoadListener::ModuleChanged);
+    mc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -235,7 +157,7 @@ void testCustomAutoLoadPath()
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 
-  mc->RemoveModuleListener(&listener, &TestModuleAutoLoadListener::ModuleChanged);
+  mc->RemoveModuleListener(&listener, &TestModuleListener::ModuleChanged);
 }
 
 } // end unnamed namespace

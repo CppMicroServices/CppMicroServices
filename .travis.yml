@@ -10,4 +10,4 @@ branches:
   only:
     - master
     
-script: ctest -S ./CMake/usCTestScript_travis_release.cmake
+script: ctest -S ./CMake/usCTestScript_travis.cmake

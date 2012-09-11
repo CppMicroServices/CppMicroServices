@@ -1,0 +1,13 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+env:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
+  
+branches:
+  only:
+    - master
+    
+script: ctest -S ./CMake/usCTestScript_travis_release.cmake

@@ -16,9 +16,20 @@ macro(build_and_test)
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "${CTEST_INITIAL_CACHE}")
   endif()
   
-  ctest_configure()
-  ctest_build()
-  ctest_test()
+  ctest_configure(RETURN_VALUE res)
+  if (res)
+    message(FATAL_ERROR "CMake configure error")
+  endif()
+  ctest_build(RETURN_VALUE res)
+  if (res)
+    message(FATAL_ERROR "CMake build error")
+  endif()
+
+  ctest_test(RETURN_VALUE res)
+  if (res)
+   message(FATAL_ERROR "CMake test error")
+  endif()
+
   
   if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
     ctest_memcheck()

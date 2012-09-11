@@ -39,11 +39,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceTrackerTest")
 
   ModuleContext* mc = GetModuleContext();
-  SharedLibraryHandle libS("TestModuleS"
-                             #ifndef US_BUILD_SHARED_LIBS
-                               , _us_module_activator_instance_TestModuleS
-                             #endif
-                               );
+  SharedLibraryHandle libS("TestModuleS");
 
   // Start the test target to get a service published.
   try

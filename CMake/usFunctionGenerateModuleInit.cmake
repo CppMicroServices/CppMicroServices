@@ -63,7 +63,12 @@ if(US_MODULE_LIBRARY_NAME)
 else()
   set(module_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/${US_MODULE_NAME}_init.cpp")
 endif()
-configure_file(${CppMicroServices_SOURCE_DIR}/CMake/usModuleInit.cpp ${module_init_src_file} @ONLY)
+
+if(US_BUILD_SHARED_LIBS OR force_module_init)
+  configure_file(${CppMicroServices_SOURCE_DIR}/CMake/usModuleInit.cpp ${module_init_src_file} @ONLY)
+else()
+  set(module_init_src_file )
+endif()
 
 set(_src ${${src_var}} ${module_init_src_file})
 set(${src_var} ${_src} PARENT_SCOPE)

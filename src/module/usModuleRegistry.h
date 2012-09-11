@@ -74,6 +74,8 @@ public:
    */
   static void GetLoadedModules(std::vector<Module*>& modules);
 
+  static void InitializeStaticModules();
+
 private:
 
   friend class ModuleInitializer;
@@ -85,35 +87,24 @@ private:
 
   static void UnRegister(const ModuleInfo* info);
 
+  static bool initialized;
+
 };
 
 typedef ModuleActivator* (*ModuleActivatorInstanceFunction)();
 
 void US_EXPORT RegisterStaticModuleActivatorInstanceFunction(ModuleActivatorInstanceFunction func);
-void US_EXPORT UnregisterStaticModuleActivatorInstanceFunction(ModuleActivatorInstanceFunction func);
 
 US_END_NAMESPACE
 
-#define US_MODULE_LOAD(moduleName, context) \
-  _us_module_activator_instance_ ## moduleName ()->Load(context);
-
-#define US_MODULE_UNLOAD(moduleName, context) \
-  _us_module_activator_instance_ ## moduleName ()->Unload(context);
-
 #define US_MODULE_IMPORT(moduleName)                                                             \
-  extern ::US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_##moduleName();  \
+  extern US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_##moduleName();    \
   class Static##moduleName##ModuleInstance                                                       \
   {                                                                                              \
   public:                                                                                        \
     Static##moduleName##ModuleInstance()                                                         \
     {                                                                                            \
       RegisterStaticModuleActivatorInstanceFunction(_us_module_activator_instance_##moduleName); \
-      _us_module_activator_instance_##moduleName()->Load(::US_PREPEND_NAMESPACE(GetModuleContext)()); \
-    }                                                                                            \
-    ~Static##moduleName##ModuleInstance()                                                        \
-    {                                                                                            \
-      UnregisterStaticModuleActivatorInstanceFunction(_us_module_activator_instance_##moduleName); \
-      _us_module_activator_instance_##moduleName()->Unload(::US_PREPEND_NAMESPACE(GetModuleContext)()); \
     }                                                                                            \
   };                                                                                             \
   static Static##moduleName##ModuleInstance static##moduleName##Instance;

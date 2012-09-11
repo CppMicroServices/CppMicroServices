@@ -47,8 +47,8 @@ public:
 
   SharedLibraryHandle() : m_Handle(0) {}
 
-  SharedLibraryHandle(const std::string& name, ModuleActivatorInstanceFunction activatorFunc = 0)
-    : m_Name(name), m_ActivatorFunc(activatorFunc), m_Handle(0)
+  SharedLibraryHandle(const std::string& name)
+    : m_Name(name), m_Handle(0)
   {}
 
   virtual ~SharedLibraryHandle() {}
@@ -81,10 +81,6 @@ public:
     }
 #endif
 
-#else // US_BUILD_SHARED_LIBS
-
-    m_ActivatorFunc()->Load(GetModuleContext());
-
 #endif
     
     m_Name = name;
@@ -102,8 +98,6 @@ public:
 #endif
      m_Handle = 0;
     }
-#else // US_BUILD_SHARED_LIBS
-    m_ActivatorFunc()->Unload(GetModuleContext());
 #endif
   }
 
@@ -152,7 +146,6 @@ private:
   SharedLibraryHandle& operator = (const SharedLibraryHandle&);
 
   std::string m_Name;
-  ModuleActivatorInstanceFunction m_ActivatorFunc;
   void* m_Handle;
 };
 

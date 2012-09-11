@@ -21,6 +21,8 @@
 
 #include "usTestManager.h"
 
+#include "usModuleRegistry.h"
+
 US_BEGIN_NAMESPACE
 
 TestManager& TestManager::GetInstance()
@@ -56,3 +58,12 @@ void TestManager::TestPassed()
 }
 
 US_END_NAMESPACE
+
+#ifndef US_BUILD_SHARED_LIBS
+US_MODULE_IMPORT(TestModuleA)
+US_MODULE_IMPORT(TestModuleA2)
+US_MODULE_IMPORT(TestModuleS)
+US_MODULE_IMPORT(TestModuleSL1)
+US_MODULE_IMPORT(TestModuleSL3)
+US_MODULE_IMPORT(TestModuleSL4)
+#endif

@@ -34,8 +34,6 @@
 
 US_USE_NAMESPACE
 
-extern ModuleActivator* _us_module_activator_instance_TestModuleA();
-
 class TestModuleListener {
 
 public:
@@ -174,9 +172,13 @@ void frame005a(ModuleContext* mc)
 
   // check expected headers
 
+#ifdef US_BUILD_SHARED_LIBS
   US_TEST_CONDITION("CppMicroServicesTestDriver" == m->GetName(), "Test module name");
-//  US_DEBUG << "Version: " << m->GetVersion();
   US_TEST_CONDITION(ModuleVersion(0,1,0) == m->GetVersion(), "Test module version")
+#else
+  US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name");
+  US_TEST_CONDITION(ModuleVersion(0,9,0) == m->GetVersion(), "Test module version")
+#endif
 }
 
 // Get context id, location and status of the module
@@ -256,7 +258,9 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
 #endif
 
     std::vector<ServiceEvent> seEvts;
+#ifdef US_BUILD_SHARED_LIBS
     seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, sr1));
+#endif
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 
@@ -303,7 +307,9 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
 #endif
 
   std::vector<ServiceEvent> seEvts;
+#ifdef US_BUILD_SHARED_LIBS
   seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, sr1));
+#endif
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 }
@@ -365,11 +371,7 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
   frame010a(mc);
   frame018a(mc);
 
-  SharedLibraryHandle libA("TestModuleA"
-                             #ifndef US_BUILD_SHARED_LIBS
-                               , _us_module_activator_instance_TestModuleA
-                             #endif
-                               );
+  SharedLibraryHandle libA("TestModuleA");
   frame020a(mc, listener, libA);
   frame030b(mc, listener, libA);
 

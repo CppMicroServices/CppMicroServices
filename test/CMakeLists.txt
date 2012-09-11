@@ -32,13 +32,21 @@ set(_tests
   usDebugOutputTest
   usLDAPFilterTest
   usModuleTest
-  usServiceListenerTest
   usServiceRegistryTest
   usServiceTrackerTest
 )
 
+if(US_BUILD_SHARED_LIBS)
+  list(APPEND _tests usServiceListenerTest)
+endif()
+
 set(_test_driver ${PROJECT_NAME}TestDriver)
-create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests})
+set(_test_sourcelist_extra_args )
+if(NOT US_BUILD_SHARED_LIBS)
+  set(_test_sourcelist_extra_args EXTRA_INCLUDE "usModuleRegistry.h")
+  set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "us::ModuleRegistry::InitializeStaticModules();")
+endif()
+create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
 # Generate a custom "module init" file for the test driver executable
 set(MODULE_DEPENDS_STR )

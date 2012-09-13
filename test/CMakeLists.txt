@@ -37,8 +37,14 @@ set(_tests
 )
 
 if(US_BUILD_SHARED_LIBS)
-  list(APPEND _tests usServiceListenerTest)
+  list(APPEND _tests usServiceListenerTest usModuleAutoLoadTest)
 endif()
+
+set(_additional_srcs
+  usTestManager.cpp
+  usTestUtilModuleListener.cpp
+  usTestUtilSharedLibrary.cpp
+)
 
 set(_test_driver ${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
@@ -61,7 +67,7 @@ usFunctionGenerateModuleInit(_srcs
                              EXECUTABLE
                             )
 
-add_executable(${_test_driver} ${_srcs} usTestManager.cpp)
+add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 if(NOT US_BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()

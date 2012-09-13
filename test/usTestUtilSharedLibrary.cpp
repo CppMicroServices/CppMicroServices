@@ -19,7 +19,8 @@
 
 =============================================================================*/
 
-#include <string>
+#include "usTestUtilSharedLibrary.h"
+
 #include <stdexcept>
 
 #include <usTestingConfig.h>
@@ -41,112 +42,100 @@
 
 US_BEGIN_NAMESPACE
 
-class SharedLibraryHandle
+SharedLibraryHandle::SharedLibraryHandle() : m_Handle(0) {}
+
+SharedLibraryHandle::SharedLibraryHandle(const std::string& name)
+  : m_Name(name), m_Handle(0)
+{}
+
+SharedLibraryHandle::~SharedLibraryHandle()
+{}
+
+void SharedLibraryHandle::Load()
 {
-public:
+  Load(m_Name);
+}
 
-  SharedLibraryHandle() : m_Handle(0) {}
-
-  SharedLibraryHandle(const std::string& name)
-    : m_Name(name), m_Handle(0)
-  {}
-
-  virtual ~SharedLibraryHandle() {}
-
-  void Load()
-  {
-    Load(m_Name);
-  }
-
-  void Load(const std::string& name)
-  {
+void SharedLibraryHandle::Load(const std::string& name)
+{
 #ifdef US_BUILD_SHARED_LIBS
-    if (m_Handle) throw std::logic_error(std::string("Library already loaded: ") + name);
-    std::string libPath = GetAbsolutePath(name);
+  if (m_Handle) throw std::logic_error(std::string("Library already loaded: ") + name);
+  std::string libPath = GetAbsolutePath(name);
 #ifdef US_PLATFORM_POSIX
-    m_Handle = dlopen(libPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-    if (!m_Handle)
-    {
-     const char* err = dlerror();
-     throw std::runtime_error(err ? std::string(err) : libPath);
-    }
-#else
-    m_Handle = LoadLibrary(libPath.c_str());
-    if (!m_Handle)
-    {
-      std::string errMsg = "Loading ";
-      errMsg.append(libPath).append("failed with error: ").append(GetLastErrorStr());
-
-      throw std::runtime_error(errMsg);
-    }
-#endif
-
-#endif
-    
-    m_Name = name;
-  }
-
-  void Unload()
+  m_Handle = dlopen(libPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+  if (!m_Handle)
   {
+    const char* err = dlerror();
+    throw std::runtime_error(err ? std::string(err) : libPath);
+  }
+#else
+  m_Handle = LoadLibrary(libPath.c_str());
+  if (!m_Handle)
+  {
+    std::string errMsg = "Loading ";
+    errMsg.append(libPath).append("failed with error: ").append(GetLastErrorStr());
+
+    throw std::runtime_error(errMsg);
+  }
+#endif
+
+#endif
+
+  m_Name = name;
+}
+
+void SharedLibraryHandle::Unload()
+{
 #ifdef US_BUILD_SHARED_LIBS
-    if (m_Handle)
-    {
+  if (m_Handle)
+  {
 #ifdef US_PLATFORM_POSIX
-     dlclose(m_Handle);
+    dlclose(m_Handle);
 #else
-      FreeLibrary((HMODULE)m_Handle);
+    FreeLibrary((HMODULE)m_Handle);
 #endif
-     m_Handle = 0;
-    }
+    m_Handle = 0;
+  }
 #endif
-  }
+}
 
-  std::string GetAbsolutePath(const std::string& name)
-  {
-    return GetLibraryPath() + "/" + Prefix() + name + Suffix();
-  }
+std::string SharedLibraryHandle::GetAbsolutePath(const std::string& name)
+{
+  return GetLibraryPath() + "/" + Prefix() + name + Suffix();
+}
 
-  std::string GetAbsolutePath()
-  {
-    return GetLibraryPath() + "/" + Prefix() + m_Name + Suffix();
-  }
+std::string SharedLibraryHandle::GetAbsolutePath()
+{
+  return GetLibraryPath() + "/" + Prefix() + m_Name + Suffix();
+}
 
-  static std::string GetLibraryPath()
-  {
+std::string SharedLibraryHandle::GetLibraryPath()
+{
 #ifdef US_PLATFORM_WINDOWS
-    return std::string(US_RUNTIME_OUTPUT_DIRECTORY);
+  return std::string(US_RUNTIME_OUTPUT_DIRECTORY);
 #else
-    return std::string(US_LIBRARY_OUTPUT_DIRECTORY);
+  return std::string(US_LIBRARY_OUTPUT_DIRECTORY);
 #endif
-  }
+}
 
-  static std::string Suffix()
-  {
+std::string SharedLibraryHandle::Suffix()
+{
 #ifdef US_PLATFORM_WINDOWS
-    return ".dll";
+  return ".dll";
 #elif defined(US_PLATFORM_APPLE)
-    return ".dylib";
+  return ".dylib";
 #else
-    return ".so";
+  return ".so";
 #endif
-  }
+}
 
-  static std::string Prefix()
-  {
+std::string SharedLibraryHandle::Prefix()
+{
 #if defined(US_PLATFORM_POSIX)
-    return "lib";
+  return "lib";
 #else
-    return "";
+  return "";
 #endif
-  }
-
-private:
-
-  SharedLibraryHandle(const SharedLibraryHandle&);
-  SharedLibraryHandle& operator = (const SharedLibraryHandle&);
-
-  std::string m_Name;
-  void* m_Handle;
-};
+}
 
 US_END_NAMESPACE

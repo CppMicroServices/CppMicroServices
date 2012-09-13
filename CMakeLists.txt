@@ -90,6 +90,7 @@ if(NOT DEFINED US_IS_EMBEDDED)
   endif()
 endif()
 
+us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_SERVICE_FACTORY_SUPPORT ON BOOL "Enable Service Factory support" ADVANCED)
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")

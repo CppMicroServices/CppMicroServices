@@ -19,17 +19,50 @@
 
 =============================================================================*/
 
+#ifndef USTESTUTILSHAREDLIBRARY_H
+#define USTESTUTILSHAREDLIBRARY_H
 
-#include "usModuleInfo.h"
+#include "usConfig.h"
+
+#include <string>
 
 US_BEGIN_NAMESPACE
 
-ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName,
-                       const std::string& autoLoadDir, const std::string& moduleDeps,
-                       const std::string& version)
-  : name(name), libName(libName), moduleDeps(moduleDeps),
-    version(version), autoLoadDir(autoLoadDir), id(0),
-    activatorHook(0)
-{}
+class SharedLibraryHandle
+{
+public:
+
+  SharedLibraryHandle();
+
+  SharedLibraryHandle(const std::string& name);
+
+  virtual ~SharedLibraryHandle();
+
+  void Load();
+
+  void Load(const std::string& name);
+
+  void Unload();
+
+  std::string GetAbsolutePath(const std::string& name);
+
+  std::string GetAbsolutePath();
+
+  static std::string GetLibraryPath();
+
+  static std::string Suffix();
+
+  static std::string Prefix();
+
+private:
+
+  SharedLibraryHandle(const SharedLibraryHandle&);
+  SharedLibraryHandle& operator = (const SharedLibraryHandle&);
+
+  std::string m_Name;
+  void* m_Handle;
+};
 
 US_END_NAMESPACE
+
+#endif // USTESTUTILSHAREDLIBRARY_H

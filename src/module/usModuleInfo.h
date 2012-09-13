@@ -42,8 +42,8 @@ struct ModuleActivator;
  */
 struct US_EXPORT ModuleInfo
 {
-  ModuleInfo(const std::string& name, const std::string& libName, const std::string& moduleDeps,
-             const std::string& version);
+  ModuleInfo(const std::string& name, const std::string& libName, const std::string& autoLoadDir,
+             const std::string& moduleDeps, const std::string& version);
 
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
 
@@ -53,6 +53,8 @@ struct US_EXPORT ModuleInfo
   std::string version;
 
   std::string location;
+
+  std::string autoLoadDir;
 
   long id;
 

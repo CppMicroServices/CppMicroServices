@@ -28,11 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include US_BASECLASS_HEADER
 
 #include "usServiceControlInterface.h"
-#include "usTestUtilSharedLibrary.cpp"
+#include "usTestUtilSharedLibrary.h"
 
 US_USE_NAMESPACE
-
-extern ModuleActivator* _us_module_activator_instance_TestModuleS();
 
 int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 {

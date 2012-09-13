@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/saschazelzer/CppMicroServices.png)](http://travis-ci.org/saschazelzer/CppMicroServices)
+
 C++ Micro Services
 ==================
 

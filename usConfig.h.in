@@ -151,7 +151,7 @@ US_END_NAMESPACE
 
   #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
   
-  #ifdef US_PLATFORM_WINDOWS
+  #if defined(US_PLATFORM_WINDOWS) && (_MSC_VER < 1700)
     #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
   #else
     #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>

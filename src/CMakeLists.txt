@@ -112,6 +112,9 @@ if(NOT US_IS_EMBEDDED)
 
   add_library(${PROJECT_NAME} ${_srcs}
               ${_public_headers} ${_private_headers} ${us_config_h_file})
+  if(NOT US_IS_EMBEDDED AND US_LINK_FLAGS)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${US_LINK_FLAGS}")
+  endif()
   set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
   if(US_LINK_LIBRARIES)
     target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})

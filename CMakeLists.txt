@@ -206,23 +206,27 @@ set(US_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 # This is used as a preprocessor define
 set(US_USE_CXX11 ${US_USE_C++11})
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
-
-  usFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
-  usFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
+# Set C++ compiler flags
+if(NOT MSVC)
+  foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
+                    -Wwrite-strings -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel
+                    -Wsign-promo -fdiagnostics-show-option -D_FORTIFY_SOURCE=2)
+    usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
+  endforeach()
 
   if(US_USE_C++11)
     usFunctionCheckCompilerFlags("-std=c++0x" US_CXX_FLAGS)
   endif()
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX)
 
   usFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
 
-  # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
-  # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
-  # Doing so should allow to build package made for distribution using older linux distro.
+  # With older versions of gcc the flag -fstack-protector-all requires an extra dependency to libssp.so.
+  # If the gcc version is lower than 4.4.0 and the build type is Release let's not include the flag.
   if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    usFunctionCheckCompilerFlags("-fstack-protector-all" cflags)
+    usFunctionCheckCompilerFlags("-fstack-protector-all" US_CXX_FLAGS)
   endif()
 
   if(MINGW)
@@ -237,15 +241,28 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
   endif()
 
-  set(US_C_FLAGS "${cflags} ${US_C_FLAGS}")
-  set(US_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${US_CXX_FLAGS}")
-elseif(MSVC90 OR MSVC10)
+elseif(MSVC90 OR MSVC10 OR MSVC11)
   set(US_CXX_FLAGS "/MP ${US_CXX_FLAGS}")
 endif()
 
 if(NOT US_IS_EMBEDDED)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
+endif()
+
+#-----------------------------------------------------------------------------
+# US Link Flags
+#-----------------------------------------------------------------------------
+
+set(US_LINK_FLAGS )
+if(NOT MSVC)
+  foreach(_linkflag -Wl,--no-undefined)
+    set(_add_flag)
+    usFunctionCheckCompilerFlags("${_linkflag}" _add_flag)
+    if(_add_flag)
+      set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
+    endif()
+  endforeach()
 endif()
 
 #-----------------------------------------------------------------------------

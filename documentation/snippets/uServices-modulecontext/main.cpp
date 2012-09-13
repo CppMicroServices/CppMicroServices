@@ -1,14 +1,9 @@
 #include <usModuleActivator.h>
 
-//! [InitializeModule]
-#include <usModuleInitialization.h>
-
-US_INITIALIZE_MODULE("My Module", "mylibname", "", "1.0.0")
-//! [InitializeModule]
-
 //! [GetModuleContext]
 #include <usGetModuleContext.h>
 #include <usModule.h>
+#include <usModuleContext.h>
 
 US_USE_NAMESPACE
 
@@ -19,6 +14,12 @@ void RetrieveModuleContext()
   std::cout << "Module name: " << module->GetName() << " [id: " << module->GetModuleId() << "]\n";
 }
 //! [GetModuleContext]
+
+//! [InitializeModule]
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE("My Module", "mylibname", "", "1.0.0")
+//! [InitializeModule]
 
 int main(int /*argc*/, char* /*argv*/[])
 {

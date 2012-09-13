@@ -25,7 +25,7 @@ macro(build_and_test)
     message(FATAL_ERROR "CMake build error")
   endif()
 
-  ctest_test(RETURN_VALUE res)
+  ctest_test(RETURN_VALUE res PARALLEL_LEVEL ${CTEST_PARALLEL_LEVEL})
   if (res)
    message(FATAL_ERROR "CMake test error")
   endif()
@@ -43,32 +43,39 @@ macro(build_and_test)
   
 endmacro()
 
-macro(_to_bool var out)
-  if(${var})
-    set(${out} "ON")
-  else()
-    set(${out} "OFF")
-  endif()
-endmacro()
+function(create_initial_cache var _shared _threading _sf _c++11 _autoload)
 
-function(create_initial_cache var)
-
-  macro_parse_arguments(_cache "" "SHARED;THREADING;SERVICE_FACTORY;C++11" ${ARGN})
-  
-  _to_bool(_cache_SHARED _bool_shared)
-  _to_bool(_cache_THREADING _bool_threading)
-  _to_bool(_cache_SERVICE_FACTORY _bool_sf)
-  _to_bool(_cache_C++11 _bool_c++11)
-  
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON
-      US_BUILD_SHARED_LIBS:BOOL=${_bool_shared}
-      US_ENABLE_THREADING_SUPPORT:BOOL=${_bool_threading}
-      US_ENABLE_SERVICE_FACTORY_SUPPORT:BOOL=${_bool_sf}
-      US_USE_C++11:BOOL=${_bool_c++11}
+      US_BUILD_SHARED_LIBS:BOOL=${_shared}
+      US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
+      US_ENABLE_SERVICE_FACTORY_SUPPORT:BOOL=${_sf}
+      US_USE_C++11:BOOL=${_c++11}
+      US_ENABLE_AUTOLOADING_SUPPORT:BOOL=${_autoload}
       ")
       
   set(${var} ${_initial_cache} PARENT_SCOPE)
+  
+  if(_shared)
+    set(CTEST_DASHBOARD_NAME "shared")
+  else()
+    set(CTEST_DASHBOARD_NAME "static")
+  endif()
+  
+  if(_threading)
+    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
+  endif()
+  if(_sf)
+    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-servicefactory")
+  endif()
+  if(_c++11)
+    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-cxx11")
+  endif()
+  if(_autoload)
+    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-autoloading")
+  endif()
+  
+  set(CTEST_DASHBOARD_NAME ${CTEST_DASHBOARD_NAME} PARENT_SCOPE)
   
 endfunction()
 
@@ -76,100 +83,49 @@ endfunction()
 
 set(CTEST_PROJECT_NAME CppMicroServices)
 
-include(${US_SOURCE_DIR}/CMake/MacroParseArguments.cmake)
-
-#==========================================================
-# Shared config
-#==========================================================
-
-if(US_TEST_SHARED)
-
-# shared, no threading, no service factory, no C++11
-set(CTEST_DASHBOARD_NAME "shared")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED)
-build_and_test()
-
-# shared, no threading, with service factory, no C++11
-set(CTEST_DASHBOARD_NAME "shared-servicefactory")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED SERVICE_FACTORY)
-build_and_test()
-
-# shared, with threading, no service factory, no C++11
-set(CTEST_DASHBOARD_NAME "shared-threading")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED THREADING)
-build_and_test()
-
-# shared, with threading, with service factory, no C++11
-set(CTEST_DASHBOARD_NAME "shared-threading-servicefactory")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED THREADING SERVICE_FACTORY)
-build_and_test()
-
-# shared, no threading, no service factory, with C++11
-set(CTEST_DASHBOARD_NAME "shared-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED C++11)
-build_and_test()
-
-# shared, no threading, with service factory, with C++11
-set(CTEST_DASHBOARD_NAME "shared-servicefactory-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED SERVICE_FACTORY C++11)
-build_and_test()
-
-# shared, with threading, no service factory, with C++11
-set(CTEST_DASHBOARD_NAME "shared-threading-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED THREADING C++11)
-build_and_test()
-
-# shared, with threading, with service factory, with C++11
-set(CTEST_DASHBOARD_NAME "shared-threading-servicefactory-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE SHARED THREADING SERVICE_FACTORY C++11)
-build_and_test()
-
+if(NOT CTEST_PARALLEL_LEVEL)
+  set(CTEST_PARALLEL_LEVEL 1)
 endif()
 
-#==========================================================
-# Static config
-#==========================================================
 
-if(US_TEST_STATIC)
+#            SHARED THREADING SERVICE_FACTORY C++11 AUTOLOAD
 
-# static, no threading, no service factory, no C++11
-set(CTEST_DASHBOARD_NAME "static")
-create_initial_cache(CTEST_INITIAL_CACHE)
-build_and_test()
+set(config0     0       0            0          0      0     )
+set(config1     0       0            0          0      1     )
+set(config2     0       0            0          1      0     )
+set(config3     0       0            0          1      1     )
+set(config4     0       0            1          0      0     )
+set(config5     0       0            1          0      1     )
+set(config6     0       0            1          1      0     )
+set(config7     0       0            1          1      1     )
+set(config8     0       1            0          0      0     )
+set(config9     0       1            0          0      1     )
+set(config10    0       1            0          1      0     )
+set(config11    0       1            0          1      1     )
+set(config12    0       1            1          0      0     )
+set(config13    0       1            1          0      1     )
+set(config14    0       1            1          1      0     )
+set(config15    0       1            1          1      1     )
+set(config16    1       0            0          0      0     )
+set(config17    1       0            0          0      1     )
+set(config18    1       0            0          1      0     )
+set(config19    1       0            0          1      1     )
+set(config20    1       0            1          0      0     )
+set(config21    1       0            1          0      1     )
+set(config22    1       0            1          1      0     )
+set(config23    1       0            1          1      1     )
+set(config24    1       1            0          0      0     )
+set(config25    1       1            0          0      1     )
+set(config26    1       1            0          1      0     )
+set(config27    1       1            0          1      1     )
+set(config28    1       1            1          0      0     )
+set(config29    1       1            1          0      1     )
+set(config30    1       1            1          1      0     )
+set(config31    1       1            1          1      1     )
 
-# static, no threading, with service factory, no C++11
-set(CTEST_DASHBOARD_NAME "static-servicefactory")
-create_initial_cache(CTEST_INITIAL_CACHE SERVICE_FACTORY)
-build_and_test()
+foreach(i ${US_BUILD_CONFIGURATION})
+  create_initial_cache(CTEST_INITIAL_CACHE ${config${i}})
+  message("Testing build configuration: ${CTEST_DASHBOARD_NAME}")
+  build_and_test()
+endforeach()
 
-# static, with threading, no service factory, no C++11
-set(CTEST_DASHBOARD_NAME "static-threading")
-create_initial_cache(CTEST_INITIAL_CACHE THREADING)
-build_and_test()
-
-# static, with threading, with service factory, no C++11
-set(CTEST_DASHBOARD_NAME "static-threading-servicefactory")
-create_initial_cache(CTEST_INITIAL_CACHE THREADING SERVICE_FACTORY)
-build_and_test()
-
-# static, no threading, no service factory, with C++11
-set(CTEST_DASHBOARD_NAME "static-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE C++11)
-build_and_test()
-
-# static, no threading, with service factory, with C++11
-set(CTEST_DASHBOARD_NAME "static-servicefactory-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE SERVICE_FACTORY C++11)
-build_and_test()
-
-# static, with threading, no service factory, with C++11
-set(CTEST_DASHBOARD_NAME "static-threading-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE THREADING C++11)
-build_and_test()
-
-# static, with threading, with service factory, with C++11
-set(CTEST_DASHBOARD_NAME "static-threading-servicefactory-cxx11")
-create_initial_cache(CTEST_INITIAL_CACHE THREADING SERVICE_FACTORY C++11)
-build_and_test()
-
-endif()

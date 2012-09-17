@@ -29,6 +29,9 @@ When building the C++ Micro Services library, you have a few configuration optio
   information about static CppMicroServices modules.
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
+- **US_ENABLE_AUTOLOADING_SUPPORT**
+  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading for
+  detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
   Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) to make
   the API thread-safe. If you are application is not multi-threaded, turn this option OFF to get maximum

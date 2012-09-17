@@ -34,6 +34,7 @@ set(_tests
   usModuleTest
   usServiceRegistryTest
   usServiceTrackerTest
+  usStaticModuleTest
 )
 
 if(US_BUILD_SHARED_LIBS)
@@ -48,10 +49,6 @@ set(_additional_srcs
 
 set(_test_driver ${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
-if(NOT US_BUILD_SHARED_LIBS)
-  set(_test_sourcelist_extra_args EXTRA_INCLUDE "usModuleRegistry.h")
-  set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "us::ModuleRegistry::InitializeStaticModules();")
-endif()
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
 # Generate a custom "module init" file for the test driver executable
@@ -60,12 +57,14 @@ foreach(_dep ${US_LINK_LIBRARIES})
   set(MODULE_DEPENDS_STR "${MODULE_DEPENDS_STR} ${_dep}")
 endforeach()
 
-usFunctionGenerateModuleInit(_srcs
-                             NAME ${_test_driver}
-                             DEPENDS "${MODULE_DEPENDS_STR}"
-                             VERSION "0.1.0"
-                             EXECUTABLE
-                            )
+if(US_BUILD_SHARED_LIBS)
+  usFunctionGenerateModuleInit(_srcs
+                               NAME ${_test_driver}
+                               DEPENDS "${MODULE_DEPENDS_STR}"
+                               VERSION "0.1.0"
+                               EXECUTABLE
+                              )
+endif()
 
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 if(NOT US_BUILD_SHARED_LIBS)

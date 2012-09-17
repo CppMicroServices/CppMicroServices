@@ -64,14 +64,6 @@ public:
   void Unload(ModuleContext* /*context*/)
   {
     tracker->Close();
-
-#ifndef US_BUILD_SHARED_LIBS
-    if (sr)
-    {
-      sr.Unregister();
-      sr = 0;
-    }
-#endif
   }
 
   const Properties& GetProperties() const

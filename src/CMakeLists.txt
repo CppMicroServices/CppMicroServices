@@ -73,6 +73,7 @@ set(_public_headers
   module/usModuleActivator.h
   module/usModuleContext.h
   module/usModuleEvent.h
+  module/usModuleImport.h
   module/usModuleInfo.h
   module/usModuleInitialization.h
   module/usModuleRegistry.h
@@ -107,7 +108,6 @@ if(NOT US_IS_EMBEDDED)
     link_directories(${US_LINK_DIRS})
   endif()
 
-  set(force_module_init 1)
   usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME} VERSION "0.9.0")
 
   add_library(${PROJECT_NAME} ${_srcs}
@@ -115,6 +115,7 @@ if(NOT US_IS_EMBEDDED)
   if(NOT US_IS_EMBEDDED AND US_LINK_FLAGS)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${US_LINK_FLAGS}")
   endif()
+  set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)
   set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
   if(US_LINK_LIBRARIES)
     target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})

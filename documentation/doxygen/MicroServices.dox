@@ -36,6 +36,7 @@ This is a list of available tutorials:
 
 - \subpage MicroServices_TheModuleContext
 - \subpage MicroServices_EmulateSingleton
+- \subpage MicroServices_StaticModules
 
 */
 
@@ -75,6 +76,7 @@ The following list contains use cases and common patterns in the form of
 
 - \ref MicroServices_TheModuleContext
 - \ref MicroServices_EmulateSingleton
+- \ref MicroServices_StaticModules
 
 
 */

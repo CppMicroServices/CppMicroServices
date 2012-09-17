@@ -25,8 +25,8 @@ When building the C++ Micro Services library, you have a few configuration optio
 ### General build options
 
 - **US_BUILD_SHARED_LIBS**
-  Specify if the library should be build shared or static. Please note that static mode is experimental
-  and has not received extensive testing yet.
+  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules for detailed
+  information about static CppMicroServices modules.
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
 - **US_ENABLE_THREADING_SUPPORT**

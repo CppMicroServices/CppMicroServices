@@ -23,7 +23,7 @@
 
 US_BEGIN_NAMESPACE
 
-struct TestModuleAL2_1_Dummy
+struct US_ABI_EXPORT TestModuleAL2_1_Dummy
 {
 };
 

@@ -74,8 +74,6 @@ public:
    */
   static void GetLoadedModules(std::vector<Module*>& modules);
 
-  static void InitializeStaticModules();
-
 private:
 
   friend class ModuleInitializer;
@@ -87,27 +85,8 @@ private:
 
   static void UnRegister(const ModuleInfo* info);
 
-  static bool initialized;
-
 };
 
-typedef ModuleActivator* (*ModuleActivatorInstanceFunction)();
-
-void US_EXPORT RegisterStaticModuleActivatorInstanceFunction(ModuleActivatorInstanceFunction func);
-
 US_END_NAMESPACE
-
-#define US_MODULE_IMPORT(moduleName)                                                             \
-  extern US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_##moduleName();    \
-  class Static##moduleName##ModuleInstance                                                       \
-  {                                                                                              \
-  public:                                                                                        \
-    Static##moduleName##ModuleInstance()                                                         \
-    {                                                                                            \
-      RegisterStaticModuleActivatorInstanceFunction(_us_module_activator_instance_##moduleName); \
-    }                                                                                            \
-  };                                                                                             \
-  static Static##moduleName##ModuleInstance static##moduleName##Instance;
-
 
 #endif // USMODULEREGISTRY_H

@@ -19,13 +19,54 @@
 
 =============================================================================*/
 
+#include "usTestModuleBService.h"
+
+#include <usModuleImport.h>
+#include <usModuleActivator.h>
+#include <usModuleContext.h>
 #include <usConfig.h>
+
+#include US_BASECLASS_HEADER
 
 US_BEGIN_NAMESPACE
 
-struct US_ABI_EXPORT TestModuleAL_1_Dummy
+struct TestModuleB : public US_BASECLASS_NAME, public TestModuleBService
 {
+
+  TestModuleB(ModuleContext* mc)
+  {
+    US_INFO << "Registering TestModuleBService";
+    mc->RegisterService<TestModuleBService>(this);
+  }
+
+};
+
+class TestModuleBActivator : public ModuleActivator
+{
+public:
+
+  TestModuleBActivator() : s(0) {}
+  ~TestModuleBActivator() { delete s; }
+
+  void Load(ModuleContext* context)
+  {
+    s = new TestModuleB(context);
+  }
+
+  void Unload(ModuleContext*)
+  {
+  }
+
+private:
+
+  TestModuleB* s;
 };
 
 US_END_NAMESPACE
 
+US_EXPORT_MODULE_ACTIVATOR(TestModuleB, US_PREPEND_NAMESPACE(TestModuleBActivator))
+
+
+US_IMPORT_MODULE(TestModuleImportedByB)
+
+US_LOAD_IMPORTED_MODULES(TestModuleB, TestModuleImportedByB)

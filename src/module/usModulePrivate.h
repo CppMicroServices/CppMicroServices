@@ -23,6 +23,7 @@
 #define USMODULEPRIVATE_H
 
 #include <map>
+#include <list>
 
 #include "usModuleRegistry.h"
 #include "usModuleVersion.h"
@@ -52,6 +53,10 @@ public:
 
   void RemoveModuleResources();
 
+  void StartStaticModules();
+
+  void StopStaticModules();
+
   CoreModuleContext* const coreCtx;
 
   std::vector<long> requiresIds;
@@ -77,6 +82,8 @@ public:
   Module* const q;
 
 private:
+
+  std::list<ModuleInfo::ModuleActivatorHook> staticActivators;
 
   static AtomicInt idCounter;
 

@@ -4,6 +4,7 @@
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include <usGetModuleContext.h>
 #include <usServiceProperties.h>
 
 // Replace that include with your own base class declaration

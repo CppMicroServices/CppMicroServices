@@ -19,13 +19,22 @@
 
 =============================================================================*/
 
-#include <usConfig.h>
+#include <usModuleActivator.h>
+#include <usModuleInitialization.h>
 
-US_BEGIN_NAMESPACE
+US_USE_NAMESPACE
 
-struct US_ABI_EXPORT TestModuleAL_1_Dummy
+struct MyStaticModuleActivator : public ModuleActivator
 {
+  void Load(ModuleContext* /*context*/)
+  {
+    std::cout << "Hello from a static module." << std::endl;
+  }
+
+  void Unload(ModuleContext* /*context*/) {}
 };
 
-US_END_NAMESPACE
+US_EXPORT_MODULE_ACTIVATOR(MyStaticModule, MyStaticModuleActivator)
+
+US_INITIALIZE_MODULE("My Static Module", "MyStaticModule", "", "1.0.0")
 

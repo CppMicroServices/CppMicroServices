@@ -19,13 +19,22 @@
 
 =============================================================================*/
 
+
+#ifndef USTESTMODULEBSERVICE_H
+#define USTESTMODULEBSERVICE_H
+
 #include <usConfig.h>
+#include <usServiceInterface.h>
 
 US_BEGIN_NAMESPACE
 
-struct US_ABI_EXPORT TestModuleAL_1_Dummy
+struct TestModuleBService
 {
+  virtual ~TestModuleBService() {}
 };
 
 US_END_NAMESPACE
 
+US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleBService), "org.cppmicroservices.TestModuleBService")
+
+#endif // USTESTMODULEASERVICE_H

@@ -209,8 +209,8 @@ set(US_USE_CXX11 ${US_USE_C++11})
 # Set C++ compiler flags
 if(NOT MSVC)
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
-                    -Wwrite-strings -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel
-                    -Wsign-promo -fdiagnostics-show-option -D_FORTIFY_SOURCE=2)
+                    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
+                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option -D_FORTIFY_SOURCE=2)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 

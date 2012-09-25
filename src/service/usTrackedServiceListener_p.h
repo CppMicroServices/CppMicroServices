@@ -33,6 +33,7 @@ US_BEGIN_NAMESPACE
  */
 struct TrackedServiceListener // : public US_BASECLASS_NAME
 {
+  virtual ~TrackedServiceListener() {}
 
   /**
    * Slot connected to service events for the

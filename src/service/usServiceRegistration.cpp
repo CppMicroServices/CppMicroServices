@@ -212,6 +212,9 @@ void ServiceRegistration::Unregister()
       d->dependents.clear();
       d->service = 0;
       d->serviceInstances.clear();
+      // increment the reference count, since "d->reference" was used originally
+      // to keep d alive.
+      d->ref.Ref();
       d->reference = 0;
       d->unregistering = false;
     }

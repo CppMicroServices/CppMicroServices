@@ -31,10 +31,11 @@ US_BEGIN_NAMESPACE
 ServiceRegistrationPrivate::ServiceRegistrationPrivate(
   ModulePrivate* module, US_BASECLASS_NAME* service,
   const ServiceProperties& props)
-  : ref(1), service(service), module(module), reference(this),
+  : ref(0), service(service), module(module), reference(this),
     properties(props), available(true), unregistering(false)
 {
-
+  // The reference counter is initialized to 0 because it will be
+  // incremented by the "reference" member.
 }
 
 ServiceRegistrationPrivate::~ServiceRegistrationPrivate()

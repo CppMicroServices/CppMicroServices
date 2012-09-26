@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "usServiceControlInterface.h"
 #include "usTestUtilSharedLibrary.cpp"
 
+#include <memory>
+
 US_USE_NAMESPACE
 
 extern ModuleActivator* _us_module_activator_instance_TestModuleS();
@@ -61,7 +63,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   ServiceControlInterface* serviceController = mc->GetService<ServiceControlInterface>(servref);
   US_TEST_CONDITION_REQUIRED(serviceController != 0, "Test valid service controller");
 
-  ServiceTracker<>* st1 = new ServiceTracker<>(mc, servref);
+  std::auto_ptr<ServiceTracker<> > st1(new ServiceTracker<>(mc, servref));
 
   // 2. Check the size method with an unopened service tracker
 
@@ -94,8 +96,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   // 8. A new Servicetracker, this time with a filter for the object
   std::string fs = std::string("(") + ServiceConstants::OBJECTCLASS() + "=" + s1 + "*" + ")";
   LDAPFilter f1(fs);
-  delete st1;
-  st1 = new ServiceTracker<>(mc, f1);
+  st1.reset(new ServiceTracker<>(mc, f1));
   // add a service
   serviceController->ServiceControl(1, "register", 7);
 

@@ -165,6 +165,63 @@ private:
   std::vector<ModuleEvent> moduleEvents;
 };
 
+// Verify that the same member function pointers registered as listeners
+// with different receivers works.
+void frame02a()
+{
+  ModuleContext* mc = GetModuleContext();
+
+  TestModuleListener listener1(mc);
+  TestModuleListener listener2(mc);
+
+  try
+  {
+    mc->RemoveModuleListener(&listener1, &TestModuleListener::ModuleChanged);
+    mc->AddModuleListener(&listener1, &TestModuleListener::ModuleChanged);
+    mc->RemoveModuleListener(&listener2, &TestModuleListener::ModuleChanged);
+    mc->AddModuleListener(&listener2, &TestModuleListener::ModuleChanged);
+  }
+  catch (const std::logic_error& ise)
+  {
+    US_TEST_FAILED_MSG( << "module listener registration failed " << ise.what()
+                        << " : frameSL02a:FAIL" );
+  }
+
+  SharedLibraryHandle target("TestModuleA");
+
+  // Start the test target
+  try
+  {
+    target.Load();
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
+                        << e.what() << " + in frameSL02a:FAIL" );
+  }
+
+#ifdef US_BUILD_SHARED_LIBS
+  Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
+  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
+#endif
+
+  std::vector<ModuleEvent> pEvts;
+#ifdef US_BUILD_SHARED_LIBS
+  pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleA));
+  pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleA));
+#endif
+
+  std::vector<ServiceEvent> seEvts;
+
+  US_TEST_CONDITION(listener1.CheckListenerEvents(pEvts, seEvts), "Check first module listener")
+  US_TEST_CONDITION(listener2.CheckListenerEvents(pEvts, seEvts), "Check second module listener")
+
+  mc->RemoveModuleListener(&listener1, &TestModuleListener::ModuleChanged);
+  mc->RemoveModuleListener(&listener2, &TestModuleListener::ModuleChanged);
+
+  target.Unload();
+}
+
 // Verify information from the ModuleInfo struct
 void frame005a(ModuleContext* mc)
 {
@@ -343,6 +400,8 @@ void frame045a(ModuleContext* mc)
 int usModuleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ModuleTest");
+
+  frame02a();
 
   ModuleContext* mc = GetModuleContext();
   TestModuleListener listener(mc);

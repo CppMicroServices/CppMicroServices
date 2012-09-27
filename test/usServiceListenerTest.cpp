@@ -284,6 +284,51 @@ bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibraryHandle& ta
   return teststatus;
 }
 
+void frameSL02a()
+{
+  ModuleContext* mc = GetModuleContext();
+
+  TestServiceListener listener1(mc);
+  TestServiceListener listener2(mc);
+
+  try
+  {
+    mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
+    mc->AddServiceListener(&listener1, &TestServiceListener::serviceChanged);
+    mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+    mc->AddServiceListener(&listener2, &TestServiceListener::serviceChanged);
+  }
+  catch (const std::logic_error& ise)
+  {
+    US_TEST_FAILED_MSG( << "service listener registration failed " << ise.what()
+                        << " : frameSL02a:FAIL" );
+  }
+
+  SharedLibraryHandle target("TestModuleA");
+
+  // Start the test target to get a service published.
+  try
+  {
+    target.Load();
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
+                        << e.what() << " + in frameSL02a:FAIL" );
+  }
+
+  std::vector<ServiceEvent::Type> events;
+  events.push_back(ServiceEvent::REGISTERED);
+
+  US_TEST_CONDITION(listener1.checkEvents(events), "Check first service listener")
+  US_TEST_CONDITION(listener2.checkEvents(events), "Check second service listener")
+
+  mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
+  mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+
+  target.Unload();
+}
+
 void frameSL05a()
 {
   std::vector<ServiceEvent::Type> events;
@@ -506,6 +551,7 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceListenerTest");
 
+  frameSL02a();
   frameSL05a();
   frameSL10a();
   frameSL25a();

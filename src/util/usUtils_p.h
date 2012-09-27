@@ -140,12 +140,14 @@ US_END_NAMESPACE
   US_END_NAMESPACE
 
   US_BEGIN_NAMESPACE
-    struct ModuleListenerCompare : std::binary_function<US_MODULE_LISTENER_FUNCTOR, US_MODULE_LISTENER_FUNCTOR, bool>
+    struct ModuleListenerCompare : std::binary_function<std::pair<US_MODULE_LISTENER_FUNCTOR, void*>,
+                                                        std::pair<US_MODULE_LISTENER_FUNCTOR, void*>, bool>
     {
-      bool operator()(const US_MODULE_LISTENER_FUNCTOR& f1,
-                      const US_MODULE_LISTENER_FUNCTOR& f2) const
+      bool operator()(const std::pair<US_MODULE_LISTENER_FUNCTOR, void*>& p1,
+                      const std::pair<US_MODULE_LISTENER_FUNCTOR, void*>& p2) const
       {
-        return f1.target<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>() == f2.target<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>();
+        return p1.second == p2.second &&
+            p1.first.target<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>() == p2.first.target<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>();
       }
     };
   US_END_NAMESPACE
@@ -180,11 +182,12 @@ US_END_NAMESPACE
   US_END_NAMESPACE
 
   US_BEGIN_NAMESPACE
-    struct ModuleListenerCompare : std::binary_function<US_MODULE_LISTENER_FUNCTOR, US_MODULE_LISTENER_FUNCTOR, bool>
+    struct ModuleListenerCompare : std::binary_function<std::pair<US_MODULE_LISTENER_FUNCTOR, void*>,
+                                                        std::pair<US_MODULE_LISTENER_FUNCTOR, void*>, bool>
     {
-      bool operator()(const US_MODULE_LISTENER_FUNCTOR& f1,
-                      const US_MODULE_LISTENER_FUNCTOR& f2) const
-      { return f1 == f2; }
+      bool operator()(const std::pair<US_MODULE_LISTENER_FUNCTOR, void*>& p1,
+                      const std::pair<US_MODULE_LISTENER_FUNCTOR, void*>& p2) const
+      { return p1.second == p2.second && p1.first == p2.first; }
     };
   US_END_NAMESPACE
 

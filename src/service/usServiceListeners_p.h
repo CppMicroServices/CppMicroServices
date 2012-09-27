@@ -50,7 +50,7 @@ private:
 public:
 
   typedef US_MODULE_LISTENER_FUNCTOR ModuleListener;
-  typedef US_UNORDERED_MAP_TYPE<ModuleContext*, std::list<ModuleListener> > ModuleListenerMap;
+  typedef US_UNORDERED_MAP_TYPE<ModuleContext*, std::list<std::pair<ModuleListener,void*> > > ModuleListenerMap;
   ModuleListenerMap moduleListenerMap;
   MutexType moduleListenerMapMutex;
 
@@ -83,12 +83,13 @@ public:
    *
    * @param mc The module context adding this listener.
    * @param listener The service listener to add.
+   * @param data Additional data to distinguish ServiceListener objects.
    * @param filter An LDAP filter string to check when a service is modified.
    * @exception org.osgi.framework.InvalidSyntaxException
    * If the filter is not a correct LDAP expression.
    */
   void AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
-                          const std::string& filter);
+                          void* data, const std::string& filter);
 
   /**
    * Remove service listener from current framework. Silently ignore
@@ -97,28 +98,29 @@ public:
    *
    * @param mc The module context who wants to remove listener.
    * @param listener Object to remove.
+   * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener);
+  void RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+                             void* data);
 
   /**
-   * Add a new service listener.
+   * Add a new module listener.
    *
    * @param mc The module context adding this listener.
-   * @param listener The service listener to add.
-   * @param filter An LDAP filter string to check when a service is modified.
-   * @exception org.osgi.framework.InvalidSyntaxException
-   * If the filter is not a correct LDAP expression.
+   * @param listener The module listener to add.
+   * @param data Additional data to distinguish ModuleListener objects.
    */
-  void AddModuleListener(ModuleContext* mc, const ModuleListener& listener);
+  void AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data);
 
   /**
-   * Remove service listener from current framework. Silently ignore
+   * Remove module listener from current framework. Silently ignore
    * if listener doesn't exist.
    *
    * @param mc The module context who wants to remove listener.
    * @param listener Object to remove.
+   * @param data Additional data to distinguish ModuleListener objects.
    */
-  void RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener);
+  void RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data);
 
   void ModuleChanged(const ModuleEvent& evt);
 

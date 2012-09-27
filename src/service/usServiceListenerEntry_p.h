@@ -61,7 +61,7 @@ public:
   void SetRemoved(bool removed) const;
   bool IsRemoved() const;
 
-  ServiceListenerEntry(Module* mc, const ServiceListener& l, const std::string& filter = "");
+  ServiceListenerEntry(Module* mc, const ServiceListener& l, void* data, const std::string& filter = "");
 
   Module* GetModule() const;
 

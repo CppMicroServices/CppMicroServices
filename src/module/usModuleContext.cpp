@@ -114,22 +114,43 @@ bool ModuleContext::UngetService(const ServiceReference& reference)
 void ModuleContext::AddServiceListener(const ServiceListener& delegate,
                                        const std::string& filter)
 {
-  d->module->coreCtx->listeners.AddServiceListener(this, delegate, filter);
+  d->module->coreCtx->listeners.AddServiceListener(this, delegate, NULL, filter);
 }
 
 void ModuleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
-  d->module->coreCtx->listeners.RemoveServiceListener(this, delegate);
+  d->module->coreCtx->listeners.RemoveServiceListener(this, delegate, NULL);
 }
 
 void ModuleContext::AddModuleListener(const ModuleListener& delegate)
 {
-  d->module->coreCtx->listeners.AddModuleListener(this, delegate);
+  d->module->coreCtx->listeners.AddModuleListener(this, delegate, NULL);
 }
 
 void ModuleContext::RemoveModuleListener(const ModuleListener& delegate)
 {
-  d->module->coreCtx->listeners.RemoveModuleListener(this, delegate);
+  d->module->coreCtx->listeners.RemoveModuleListener(this, delegate, NULL);
+}
+
+void ModuleContext::AddServiceListener(const ServiceListener& delegate, void* data,
+                                       const std::string &filter)
+{
+  d->module->coreCtx->listeners.AddServiceListener(this, delegate, data, filter);
+}
+
+void ModuleContext::RemoveServiceListener(const ServiceListener& delegate, void* data)
+{
+  d->module->coreCtx->listeners.RemoveServiceListener(this, delegate, data);
+}
+
+void ModuleContext::AddModuleListener(const ModuleListener& delegate, void* data)
+{
+  d->module->coreCtx->listeners.AddModuleListener(this, delegate, data);
+}
+
+void ModuleContext::RemoveModuleListener(const ModuleListener& delegate, void* data)
+{
+  d->module->coreCtx->listeners.RemoveModuleListener(this, delegate, data);
 }
 
 US_END_NAMESPACE

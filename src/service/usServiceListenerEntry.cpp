@@ -28,8 +28,9 @@ class ServiceListenerEntryData : public SharedData
 {
 public:
 
-  ServiceListenerEntryData(Module* mc, const ServiceListenerEntry::ServiceListener& l, const std::string& filter)
-    : mc(mc), listener(l), bRemoved(false), ldap()
+  ServiceListenerEntryData(Module* mc, const ServiceListenerEntry::ServiceListener& l,
+                           void* data, const std::string& filter)
+    : mc(mc), listener(l), data(data), bRemoved(false), ldap()
   {
     if (!filter.empty())
     {
@@ -44,6 +45,7 @@ public:
 
   Module* const mc;
   ServiceListenerEntry::ServiceListener listener;
+  void* data;
   bool bRemoved;
   LDAPExpr ldap;
 
@@ -95,12 +97,12 @@ ServiceListenerEntry& ServiceListenerEntry::operator=(const ServiceListenerEntry
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
   return ((d->mc == 0 || other.d->mc == 0) || d->mc == other.d->mc) &&
-      ServiceListenerCompare()(d->listener, other.d->listener);
+      (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
 }
 
 bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const
 {
-  return d->mc < other.d->mc;
+  return (d->mc == other.d->mc) ? (d->data < other.d->data) : (d->mc < other.d->mc);
 }
 
 void ServiceListenerEntry::SetRemoved(bool removed) const
@@ -113,8 +115,9 @@ bool ServiceListenerEntry::IsRemoved() const
   return d->bRemoved;
 }
 
-ServiceListenerEntry::ServiceListenerEntry(Module* mc, const ServiceListener& l, const std::string& filter)
-  : d(new ServiceListenerEntryData(mc, l, filter))
+ServiceListenerEntry::ServiceListenerEntry(Module* mc, const ServiceListener& l,
+                                           void* data, const std::string& filter)
+  : d(new ServiceListenerEntryData(mc, l, data, filter))
 {
 
 }

@@ -550,7 +550,8 @@ public:
   void AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent),
                           const std::string& filter = std::string())
   {
-    AddServiceListener(ServiceListenerMemberFunctor(receiver, callback), filter);
+    AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
+                       static_cast<void*>(receiver), filter);
   }
 
   /**
@@ -571,7 +572,8 @@ public:
   template<class R>
   void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent))
   {
-    RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback));
+    RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback),
+                          static_cast<void*>(receiver));
   }
 
   /**
@@ -594,7 +596,8 @@ public:
   template<class R>
   void AddModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
   {
-    AddModuleListener(ModuleListenerMemberFunctor(receiver, callback));
+    AddModuleListener(ModuleListenerMemberFunctor(receiver, callback),
+                      static_cast<void*>(receiver));
   }
 
   /**
@@ -615,7 +618,8 @@ public:
   template<class R>
   void RemoveModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
   {
-    RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback));
+    RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback),
+                         static_cast<void*>(receiver));
   }
 
 
@@ -629,6 +633,13 @@ private:
   // purposely not implemented
   ModuleContext(const ModuleContext&);
   ModuleContext& operator=(const ModuleContext&);
+
+  void AddServiceListener(const ServiceListener& delegate, void* data,
+                          const std::string& filter);
+  void RemoveServiceListener(const ServiceListener& delegate, void* data);
+
+  void AddModuleListener(const ModuleListener& delegate, void* data);
+  void RemoveModuleListener(const ModuleListener& delegate, void* data);
 
   ModuleContextPrivate * const d;
 };

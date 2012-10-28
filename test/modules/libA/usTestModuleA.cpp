@@ -67,9 +67,6 @@ public:
 
   void Unload(ModuleContext*)
   {
-#ifndef US_BUILD_SHARED_LIBS
-    s->Unregister();
-#endif
   }
 
 private:

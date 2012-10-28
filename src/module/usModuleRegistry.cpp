@@ -32,32 +32,13 @@
 #include "usStaticInit_p.h"
 
 #include <cassert>
+#include <map>
 
 
 US_BEGIN_NAMESPACE
 
 typedef Mutex MutexType;
 typedef MutexLock<MutexType> MutexLocker;
-
-typedef std::list<ModuleActivatorInstanceFunction> StaticInstanceFunctionList;
-
-bool ModuleRegistry::initialized = false;
-
-/**
- * List of all static modules in this framework.
- */
-US_GLOBAL_STATIC(StaticInstanceFunctionList, staticInstanceFunctionList)
-
-/**
- * Lock for protecting the modules object
- */
-US_GLOBAL_STATIC(MutexType, staticInstanceFunctionListLock)
-
-void RegisterStaticModuleActivatorInstanceFunction(ModuleActivatorInstanceFunction func)
-{
-  MutexLocker lock(*staticInstanceFunctionListLock());
-  staticInstanceFunctionList()->push_back(func);
-}
 
 typedef US_UNORDERED_MAP_TYPE<long, Module*> ModuleMap;
 
@@ -161,11 +142,8 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   // no sense anyway.
   if (info->id == 1)
   {
-    // Remove listeners from static modules
-    if (initialized)
-    {
-      coreModuleContext()->listeners.RemoveAllListeners(GetModuleContext());
-    }
+    // Remove listeners from static modules if they have forgotten to do so
+    coreModuleContext()->listeners.RemoveAllListeners(GetModuleContext());
 
     if (info->activatorHook)
     {
@@ -180,7 +158,9 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
     curr = modules()->operator[](info->id);
     assert(curr != 0);
   }
+
   curr->Stop();
+
   curr->Uninit();
 }
 
@@ -238,24 +218,6 @@ void ModuleRegistry::GetLoadedModules(std::vector<Module*>& m)
     {
       m.push_back(iter->second);
     }
-  }
-}
-
-void ModuleRegistry::InitializeStaticModules()
-{
-  MutexLocker lock(*staticInstanceFunctionListLock());
-  if (!initialized)
-  {
-    StaticInstanceFunctionList* functions = staticInstanceFunctionList();
-    if (functions)
-    {
-      for (StaticInstanceFunctionList::iterator i = functions->begin();
-           i != functions->end(); ++i)
-      {
-        (*i)()->Load(GetModuleContext());
-      }
-    }
-    initialized = true;
   }
 }
 

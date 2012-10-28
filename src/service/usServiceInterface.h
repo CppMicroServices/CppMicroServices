@@ -43,7 +43,7 @@ template<class T> inline const char* us_service_interface_iid()
 template<class T> inline const char* us_service_impl_name(T* /*impl*/)
 { return "(unknown implementation)"; }
 
-#if defined(QT_DEBUG) || defined(QT_NODEBUG)
+#if defined(QT_DEBUG) || defined(QT_NO_DEBUG)
 #include <qobject.h>
 #include US_BASECLASS_HEADER
 

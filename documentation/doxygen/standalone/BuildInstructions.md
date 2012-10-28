@@ -25,10 +25,13 @@ When building the C++ Micro Services library, you have a few configuration optio
 ### General build options
 
 - **US_BUILD_SHARED_LIBS**
-  Specify if the library should be build shared or static. Please note that static mode is experimental
-  and has not received extensive testing yet.
+  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules for detailed
+  information about static CppMicroServices modules.
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
+- **US_ENABLE_AUTOLOADING_SUPPORT**
+  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading for
+  detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
   Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) to make
   the API thread-safe. If you are application is not multi-threaded, turn this option OFF to get maximum

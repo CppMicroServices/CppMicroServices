@@ -24,9 +24,14 @@
 #include "usModulePrivate.h"
 
 #include "usModule.h"
+#include "usModuleActivator.h"
+#include "usModuleUtils_p.h"
 #include "usCoreModuleContext_p.h"
 #include "usServiceRegistration.h"
 #include "usServiceReferencePrivate.h"
+
+#include <algorithm>
+#include <iterator>
 
 US_BEGIN_NAMESPACE
 
@@ -124,6 +129,62 @@ void ModulePrivate::RemoveModuleResources()
        i != srs.end(); ++i)
   {
     i->GetReference().d->UngetService(q, false);
+  }
+}
+
+void ModulePrivate::StartStaticModules()
+{
+  typedef const char*(*GetImportedModulesFunc)(void);
+
+  std::string getImportedModulesSymbol("_us_get_imported_modules_for_");
+  getImportedModulesSymbol += info.libName;
+
+  std::string location = info.location;
+  if (info.libName.empty())
+  {
+    /* make sure we retrieve symbols from the executable, if "libName" is empty */
+    location.clear();
+  }
+
+  GetImportedModulesFunc getImportedModulesFunc = reinterpret_cast<GetImportedModulesFunc>(ModuleUtils::GetSymbol(location,getImportedModulesSymbol.c_str()));
+
+  if (getImportedModulesFunc == NULL) return;
+
+  std::string importedStaticModuleLibNames = getImportedModulesFunc();
+
+  std::vector<std::string> staticModuleLibNames;
+  std::istringstream iss(importedStaticModuleLibNames);
+  std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+            std::back_inserter<std::vector<std::string> >(staticModuleLibNames));
+
+  for (std::vector<std::string>::iterator i = staticModuleLibNames.begin();
+       i != staticModuleLibNames.end(); ++i)
+  {
+    std::string staticActivatorSymbol = "_us_module_activator_instance_";
+    staticActivatorSymbol += *i;
+    ModuleInfo::ModuleActivatorHook staticActivator = reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str()));
+    if (staticActivator)
+    {
+      US_DEBUG << "Loading static activator " << *i;
+      staticActivators.push_back(staticActivator);
+      staticActivator()->Load(moduleContext);
+    }
+    else
+    {
+      US_WARN << "Could not find an activator for the static module " << (*i)
+              << ". You either forgot a US_IMPORT_MODULE macro call in " << info.libName
+              << " or to link " << (*i) << " to " << info.libName << ".";
+    }
+  }
+
+}
+
+void ModulePrivate::StopStaticModules()
+{
+  for (std::list<ModuleInfo::ModuleActivatorHook>::iterator i = staticActivators.begin();
+       i != staticActivators.end(); ++i)
+  {
+    (*i)()->Unload(moduleContext);
   }
 }
 

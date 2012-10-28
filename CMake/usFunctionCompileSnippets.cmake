@@ -34,7 +34,7 @@ function(usFunctionCompileSnippets snippet_path)
     set(snippet_target_name "Snippet-${snippet_exec_name}")
     add_executable(${snippet_target_name} ${snippet_src_files})
     if(ARGN)
-      target_link_libraries(${snippet_target_name} ${ARGN})
+      target_link_libraries(${snippet_target_name} ${ARGN} ${snippet_link_libraries})
     endif()
     set_target_properties(${snippet_target_name} PROPERTIES
       LABELS Documentation

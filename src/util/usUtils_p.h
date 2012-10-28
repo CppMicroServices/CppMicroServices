@@ -104,6 +104,18 @@ US_END_NAMESPACE
 #define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(3, __FILE__, __LINE__, __FUNCTION__)
 
 //-------------------------------------------------------------------
+// Module auto-loading
+//-------------------------------------------------------------------
+
+US_BEGIN_NAMESPACE
+
+struct ModuleInfo;
+
+void AutoLoadModules(const ModuleInfo& moduleInfo);
+
+US_END_NAMESPACE
+
+//-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------
 

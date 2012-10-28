@@ -35,11 +35,11 @@ US_END_NAMESPACE
 
 /** 
  * 
- * \brief Output some text without generating a terminating newline. Include  
+ * \brief Output some text without generating a terminating newline.
  *
  * */
 #define US_TEST_OUTPUT_NO_ENDL(x) \
-  std::cout x ;
+  std::cout x << std::flush;
 
 /** \brief Output some text. */
 #define US_TEST_OUTPUT(x) \

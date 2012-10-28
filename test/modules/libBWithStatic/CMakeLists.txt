@@ -1,0 +1,7 @@
+
+usFunctionCreateTestModule(TestModuleB usTestModuleB.cpp)
+
+set(BUILD_SHARED_LIBS 0)
+usFunctionCreateTestModule(TestModuleImportedByB usTestModuleImportedByB.cpp)
+
+target_link_libraries(TestModuleB TestModuleImportedByB)

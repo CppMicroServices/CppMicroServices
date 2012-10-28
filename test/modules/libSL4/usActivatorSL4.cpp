@@ -55,15 +55,6 @@ public:
   
   void Unload(ModuleContext* /*context*/)
   {
-#ifdef US_BUILD_SHARED_LIBS
-    //unregister will be done automagically
-#else
-    if (sr)
-    {
-      sr.Unregister();
-      sr = 0;
-    }
-#endif
   }
 
 private:

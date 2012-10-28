@@ -22,6 +22,7 @@
 #include "usUtils_p.h"
 
 #include "usModuleInfo.h"
+#include "usModuleSettings.h"
 
 #include <cstdio>
 
@@ -92,72 +93,93 @@ bool load_impl(const std::string&) { return false; }
 
 US_BEGIN_NAMESPACE
 
-void AutoLoadModules(const ModuleInfo& moduleInfo)
+void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
 {
-  if (!moduleInfo.autoLoadDir.empty())
-  {
-    // Load all modules from a directory located relative to this modules location
-    // and named after this modules library name.
-    std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
-    std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
+  std::string loadPath = absoluteBasePath + DIR_SEP + subDir;
 
-    std::string searchPath = moduleBasePath + DIR_SEP + moduleInfo.autoLoadDir;
-
-    DIR* dir = opendir(searchPath.c_str());
+  DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
-    // Try intermediate output directories
-    if (dir == NULL)
+  // Try intermediate output directories
+  if (dir == NULL)
+  {
+    std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
+    if (indexOfLastSeparator != -1)
     {
-      indexOfLastSeparator = moduleBasePath.find_last_of(DIR_SEP);
-      if (indexOfLastSeparator != -1)
+      if (absoluteBasePath.substr(indexOfLastSeparator+1) == CMAKE_INTDIR)
       {
-        if (moduleBasePath.substr(indexOfLastSeparator+1) == CMAKE_INTDIR)
-        {
-          searchPath = moduleBasePath.substr(0, indexOfLastSeparator+1) + moduleInfo.autoLoadDir + DIR_SEP + CMAKE_INTDIR;
-          dir = opendir(searchPath.c_str());
-        }
+        loadPath = absoluteBasePath.substr(0, indexOfLastSeparator+1) + subDir + DIR_SEP + CMAKE_INTDIR;
+        dir = opendir(loadPath.c_str());
       }
     }
+  }
 #endif
 
-    if (dir != NULL)
+  if (dir != NULL)
+  {
+    struct dirent *ent = NULL;
+    while ((ent = readdir(dir)) != NULL)
     {
-      struct dirent *ent = NULL;
-      while ((ent = readdir(dir)) != NULL)
-      {
-        bool loadFile = true;
+      bool loadFile = true;
 #ifdef _DIRENT_HAVE_D_TYPE
-        if (ent->d_type != DT_UNKNOWN && ent->d_type != DT_REG)
-        {
-          loadFile = false;
-        }
-#endif
-
-        std::string entryFileName(ent->d_name);
-
-        // On Linux, library file names can have version numbers appended. On other platforms, we
-        // check the file ending. This could be refined for Linux in the future.
-#if !defined(US_PLATFORM_LINUX)
-        if (entryFileName.rfind(library_suffix()) != (entryFileName.size() - library_suffix().size()))
-        {
-          loadFile = false;
-        }
-#endif
-        if (!loadFile) continue;
-
-        std::string libPath = searchPath;
-        if (!libPath.empty() && libPath.find_last_of(DIR_SEP) != libPath.size() -1)
-        {
-          libPath += DIR_SEP;
-        }
-        libPath += entryFileName;
-        US_INFO << "Auto-loading module " << libPath;
-        if (!load_impl(libPath))
-        {
-          US_WARN << "Auto-loading of module " << libPath << " failed: " << GetLastErrorStr();
-        }
+      if (ent->d_type != DT_UNKNOWN && ent->d_type != DT_REG)
+      {
+        loadFile = false;
       }
-      closedir(dir);
+#endif
+
+      std::string entryFileName(ent->d_name);
+
+      // On Linux, library file names can have version numbers appended. On other platforms, we
+      // check the file ending. This could be refined for Linux in the future.
+#if !defined(US_PLATFORM_LINUX)
+      if (entryFileName.rfind(library_suffix()) != (entryFileName.size() - library_suffix().size()))
+      {
+        loadFile = false;
+      }
+#endif
+      if (!loadFile) continue;
+
+      std::string libPath = loadPath;
+      if (!libPath.empty() && libPath.find_last_of(DIR_SEP) != libPath.size() -1)
+      {
+        libPath += DIR_SEP;
+      }
+      libPath += entryFileName;
+      US_INFO << "Auto-loading module " << libPath;
+      if (!load_impl(libPath))
+      {
+        US_WARN << "Auto-loading of module " << libPath << " failed: " << GetLastErrorStr();
+      }
+    }
+    closedir(dir);
+  }
+}
+
+void AutoLoadModules(const ModuleInfo& moduleInfo)
+{
+  if (moduleInfo.autoLoadDir.empty())
+  {
+    return;
+  }
+
+  ModuleSettings::PathList autoLoadPaths = ModuleSettings::GetAutoLoadPaths();
+  for (ModuleSettings::PathList::iterator i = autoLoadPaths.begin();
+       i != autoLoadPaths.end(); ++i)
+  {
+    if (i->empty()) continue;
+
+    if (*i == ModuleSettings::CURRENT_MODULE_PATH())
+    {
+      // Load all modules from a directory located relative to this modules location
+      // and named after this modules library name.
+      std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
+      std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
+
+      AutoLoadModulesFromPath(moduleBasePath, moduleInfo.autoLoadDir);
+    }
+    else
+    {
+      AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
     }
   }
 }

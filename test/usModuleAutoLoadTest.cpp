@@ -24,6 +24,7 @@
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
 #include <usModule.h>
+#include <usModuleSettings.h>
 
 #include <usTestingConfig.h>
 
@@ -37,7 +38,7 @@ US_USE_NAMESPACE
 
 namespace {
 
-void testDefaultAutLoadPath()
+void testDefaultAutoLoadPath(bool autoLoadEnabled)
 {
   ModuleContext* mc = GetModuleContext();
   assert(mc);
@@ -65,7 +66,7 @@ void testDefaultAutLoadPath()
   }
 
   Module* moduleAL = ModuleRegistry::GetModule("TestModuleAL Module");
-  US_TEST_CONDITION_REQUIRED(moduleAL != 0, "Test for existing module TestModuleAL")
+  US_TEST_CONDITION_REQUIRED(moduleAL != NULL, "Test for existing module TestModuleAL")
 
   US_TEST_CONDITION(moduleAL->GetName() == "TestModuleAL Module", "Test module name")
 
@@ -74,21 +75,26 @@ void testDefaultAutLoadPath()
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL));
 
   Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1 Module");
-#ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  US_TEST_CONDITION_REQUIRED(moduleAL_1 != 0, "Test for existing auto-loaded module TestModuleAL_1")
-  US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1 Module", "Test module name")
+  if (autoLoadEnabled)
+  {
+    US_TEST_CONDITION_REQUIRED(moduleAL_1 != NULL, "Test for existing auto-loaded module TestModuleAL_1")
+    US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1 Module", "Test module name")
 
-  pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL_1));
-  pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL_1));
-#else
-  US_TEST_CONDITION_REQUIRED(moduleAL_1 == NULL, "Test for non-existing aut-loaded module TestModuleAL_1")
-#endif
+    pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL_1));
+    pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL_1));
+  }
+  else
+  {
+    US_TEST_CONDITION_REQUIRED(moduleAL_1 == NULL, "Test for non-existing auto-loaded module TestModuleAL_1")
+  }
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL));
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 
   mc->RemoveModuleListener(&listener, &TestModuleListener::ModuleChanged);
+
+  libAL.Unload();
 }
 
 void testCustomAutoLoadPath()
@@ -119,7 +125,7 @@ void testCustomAutoLoadPath()
   }
 
   Module* moduleAL2 = ModuleRegistry::GetModule("TestModuleAL2 Module");
-  US_TEST_CONDITION_REQUIRED(moduleAL2 != 0, "Test for existing module TestModuleAL2")
+  US_TEST_CONDITION_REQUIRED(moduleAL2 != NULL, "Test for existing module TestModuleAL2")
 
   US_TEST_CONDITION(moduleAL2->GetName() == "TestModuleAL2 Module", "Test module name")
 
@@ -129,7 +135,7 @@ void testCustomAutoLoadPath()
 
   Module* moduleAL2_1 = ModuleRegistry::GetModule("TestModuleAL2_1 Module");
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  US_TEST_CONDITION_REQUIRED(moduleAL2_1 != 0, "Test for existing auto-loaded module TestModuleAL2_1")
+  US_TEST_CONDITION_REQUIRED(moduleAL2_1 != NULL, "Test for existing auto-loaded module TestModuleAL2_1")
   US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1 Module", "Test module name")
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2_1));
@@ -152,7 +158,11 @@ int usModuleAutoLoadTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ModuleLoaderTest");
 
-  testDefaultAutLoadPath();
+  ModuleSettings::SetAutoLoadingEnabled(false);
+  testDefaultAutoLoadPath(false);
+  ModuleSettings::SetAutoLoadingEnabled(true);
+
+  testDefaultAutoLoadPath(true);
 
   testCustomAutoLoadPath();
 

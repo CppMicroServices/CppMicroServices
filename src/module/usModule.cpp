@@ -25,6 +25,7 @@
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usModulePrivate.h"
+#include "usModuleSettings.h"
 #include "usCoreModuleContext_p.h"
 
 
@@ -128,7 +129,10 @@ void Module::Start()
     d->StartStaticModules();
 
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-    AutoLoadModules(d->info);
+    if (ModuleSettings::IsAutoLoadingEnabled())
+    {
+      AutoLoadModules(d->info);
+    }
 #endif
 
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));

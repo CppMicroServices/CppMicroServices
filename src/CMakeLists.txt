@@ -31,6 +31,7 @@ set(_srcs
   module/usModuleInfo.cpp
   module/usModulePrivate.cpp
   module/usModuleRegistry.cpp
+  module/usModuleSettings.cpp
   module/usModuleUtils.cpp
   module/usModuleVersion.cpp
 )
@@ -77,6 +78,7 @@ set(_public_headers
   module/usModuleInfo.h
   module/usModuleInitialization.h
   module/usModuleRegistry.h
+  module/usModuleSettings.h
   module/usModuleVersion.h
 )
 

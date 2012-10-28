@@ -165,7 +165,7 @@ void ModulePrivate::StartStaticModules()
     ModuleInfo::ModuleActivatorHook staticActivator = reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str()));
     if (staticActivator)
     {
-      US_DEBUG << "Loading static activaotr " << *i;
+      US_DEBUG << "Loading static activator " << *i;
       staticActivators.push_back(staticActivator);
       staticActivator()->Load(moduleContext);
     }

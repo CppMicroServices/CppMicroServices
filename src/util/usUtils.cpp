@@ -64,7 +64,7 @@ const char DIR_SEP = '/';
 
 bool load_impl(const std::string& modulePath)
 {
-  void* handle = dlopen(modulePath.c_str(), RTLD_LAZY | RTLD_LOCAL);
+  void* handle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
   return (handle != NULL);
 }
 

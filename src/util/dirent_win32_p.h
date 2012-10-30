@@ -76,7 +76,9 @@
 #ifndef DIRENT_H
 #define DIRENT_H
 
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
@@ -138,13 +140,13 @@
  * only defined for compatibility.  These macros should always return false
  * on Windows.
  */
-#define	S_ISFIFO(mode) (((mode) & S_IFMT) == S_IFFIFO)
-#define	S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
-#define	S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
-#define	S_ISLNK(mode)  (((mode) & S_IFMT) == S_IFLNK)
-#define	S_ISSOCK(mode) (((mode) & S_IFMT) == S_IFSOCK)
-#define	S_ISCHR(mode)  (((mode) & S_IFMT) == S_IFCHR)
-#define	S_ISBLK(mode)  (((mode) & S_IFMT) == S_IFBLK)
+#define S_ISFIFO(mode) (((mode) & S_IFMT) == S_IFFIFO)
+#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
+#define S_ISLNK(mode)  (((mode) & S_IFMT) == S_IFLNK)
+#define S_ISSOCK(mode) (((mode) & S_IFMT) == S_IFSOCK)
+#define S_ISCHR(mode)  (((mode) & S_IFMT) == S_IFCHR)
+#define S_ISBLK(mode)  (((mode) & S_IFMT) == S_IFBLK)
 
 #ifdef __cplusplus
 extern "C" {

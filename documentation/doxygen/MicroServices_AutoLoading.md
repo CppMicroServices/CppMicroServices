@@ -66,4 +66,13 @@ module *B* from the example above is located at
 
 it will be loaded when the executable *E* is started and is then able to register its services
 before the executable queries the service registry.
-   
+
+Environment Variables
+---------------------
+
+The following environment variables influence the runtime behavior of the CppMicroServices library:
+ 
+ - *US_DISABLE_AUTOLOADING* If set, auto-loading of modules is disabled.
+ - *US_AUTOLOAD_PATHS* A `:` (Unix) or `;` (Windows) separated list of paths from which modules
+   should be auto-loaded.
+

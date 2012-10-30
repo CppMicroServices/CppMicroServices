@@ -146,6 +146,7 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
       }
       libPath += entryFileName;
       US_INFO << "Auto-loading module " << libPath;
+
       if (!load_impl(libPath))
       {
         US_WARN << "Auto-loading of module " << libPath << " failed: " << GetLastErrorStr();
@@ -163,24 +164,29 @@ void AutoLoadModules(const ModuleInfo& moduleInfo)
   }
 
   ModuleSettings::PathList autoLoadPaths = ModuleSettings::GetAutoLoadPaths();
+
+  std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
+  std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
+
   for (ModuleSettings::PathList::iterator i = autoLoadPaths.begin();
        i != autoLoadPaths.end(); ++i)
   {
-    if (i->empty()) continue;
-
     if (*i == ModuleSettings::CURRENT_MODULE_PATH())
     {
       // Load all modules from a directory located relative to this modules location
       // and named after this modules library name.
-      std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
-      std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
+      *i = moduleBasePath;
+    }
+  }
 
-      AutoLoadModulesFromPath(moduleBasePath, moduleInfo.autoLoadDir);
-    }
-    else
-    {
-      AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
-    }
+  // We could have introduced a duplicate above, so remove it.
+  std::sort(autoLoadPaths.begin(), autoLoadPaths.end());
+  autoLoadPaths.erase(std::unique(autoLoadPaths.begin(), autoLoadPaths.end()), autoLoadPaths.end());
+  for (ModuleSettings::PathList::iterator i = autoLoadPaths.begin();
+       i != autoLoadPaths.end(); ++i)
+  {
+    if (i->empty()) continue;
+    AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
   }
 }
 

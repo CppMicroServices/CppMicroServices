@@ -26,6 +26,7 @@
 #include "usConfig.h"
 
 #include <vector>
+#include <string>
 
 US_BEGIN_NAMESPACE
 
@@ -33,6 +34,13 @@ US_BEGIN_NAMESPACE
  * \ingroup MicroServices
  *
  * Query and set certain properties of the CppMicroServices library.
+ *
+ * The following environment variables influence the runtime behavior
+ * of the CppMicroServices library:
+ *
+ * - \e US_DISABLE_AUTOLOADING If set, auto-loading of modules is disabled.
+ * - \e US_AUTOLOAD_PATHS A ':' (Unix) or ';' (Windows) separated list of paths
+ *   from which modules should be auto-loaded.
  *
  * \remarks This class is thread safe.
  */
@@ -79,7 +87,8 @@ public:
    * \c false otherwise.
    *
    * \remarks This method will always return \c false if support for auto-loading
-   * has not been configured into the CppMicroServices library.
+   * has not been configured into the CppMicroServices library or if it has been
+   * disabled by defining the US_DISABLE_AUTOLOADING environment variable.
    */
   static bool IsAutoLoadingEnabled();
 
@@ -89,7 +98,8 @@ public:
    * \param enable If \c true, enable auto-loading support, disable it otherwise.
    *
    * \remarks Calling this method will have no effect if support for
-   * auto-loading has not been configured into the CppMicroServices library.
+   * auto-loading has not been configured into the CppMicroServices library of it
+   * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
    */
   static void SetAutoLoadingEnabled(bool enable);
 

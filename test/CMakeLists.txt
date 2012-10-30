@@ -38,7 +38,10 @@ set(_tests
 )
 
 if(US_BUILD_SHARED_LIBS)
-  list(APPEND _tests usServiceListenerTest usModuleAutoLoadTest)
+  list(APPEND _tests usServiceListenerTest)
+  if(US_ENABLE_AUTOLOADING_SUPPORT)
+    list(APPEND _tests usModuleAutoLoadTest)
+  endif()
 endif()
 
 set(_additional_srcs

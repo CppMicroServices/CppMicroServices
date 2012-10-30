@@ -24,9 +24,32 @@
 #include "usStaticInit_p.h"
 
 #include <string>
+#include <sstream>
 #include <set>
+#include <algorithm>
+#include <cctype>
 
 US_BEGIN_NAMESPACE
+
+namespace {
+
+  std::string RemoveTrailingPathSeparator(const std::string& in)
+  {
+#ifdef US_PLATFORM_WINDOWS
+    const char separator = '\\';
+#else
+    const char separator = '/';
+#endif
+    if (in.empty()) return in;
+    std::string::const_iterator lastChar = --in.end();
+    while (lastChar != in.begin() && std::isspace(*lastChar)) lastChar--;
+    if (*lastChar != separator) lastChar++;
+    std::string::const_iterator firstChar = in.begin();
+    while (firstChar < lastChar && std::isspace(*firstChar)) firstChar++;
+    return std::string(firstChar, lastChar);
+  }
+
+}
 
 std::string ModuleSettings::CURRENT_MODULE_PATH()
 {
@@ -43,12 +66,40 @@ struct ModuleSettingsPrivate : public US_DEFAULT_THREADING<ModuleSettingsPrivate
   #else
     , autoLoadingEnabled(false)
   #endif
+    , autoLoadingDisabled(false)
   {
     autoLoadPaths.insert(ModuleSettings::CURRENT_MODULE_PATH());
+
+    char* envPaths = getenv("US_AUTOLOAD_PATHS");
+    if (envPaths != NULL)
+    {
+      std::stringstream ss(envPaths);
+      std::string envPath;
+#ifdef US_PLATFORM_WINDOWS
+      const char separator = ';';
+#else
+      const char separator = ':';
+#endif
+      while (std::getline(ss, envPath, separator))
+      {
+        std::string normalizedEnvPath = RemoveTrailingPathSeparator(envPath);
+        if (!normalizedEnvPath.empty())
+        {
+          extraPaths.insert(normalizedEnvPath);
+        }
+      }
+    }
+
+    if (getenv("US_DISABLE_AUTOLOADING"))
+    {
+      autoLoadingDisabled = true;
+    }
   }
 
   std::set<std::string> autoLoadPaths;
+  std::set<std::string> extraPaths;
   bool autoLoadingEnabled;
+  bool autoLoadingDisabled;
 };
 
 US_GLOBAL_STATIC(ModuleSettingsPrivate, moduleSettingsPrivate)
@@ -75,7 +126,8 @@ bool ModuleSettings::IsAutoLoadingEnabled()
 {
   ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  return moduleSettingsPrivate()->autoLoadingEnabled;
+  return !moduleSettingsPrivate()->autoLoadingDisabled &&
+      moduleSettingsPrivate()->autoLoadingEnabled;
 #else
   return false;
 #endif
@@ -92,20 +144,28 @@ ModuleSettings::PathList ModuleSettings::GetAutoLoadPaths()
   ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
   ModuleSettings::PathList paths(moduleSettingsPrivate()->autoLoadPaths.begin(),
                                  moduleSettingsPrivate()->autoLoadPaths.end());
+  paths.insert(paths.end(), moduleSettingsPrivate()->extraPaths.begin(),
+               moduleSettingsPrivate()->extraPaths.end());
+  std::sort(paths.begin(), paths.end());
+  paths.erase(std::unique(paths.begin(), paths.end()), paths.end());
   return paths;
 }
 
 void ModuleSettings::SetAutoLoadPaths(const PathList& paths)
 {
+  PathList normalizedPaths;
+  normalizedPaths.resize(paths.size());
+  std::transform(paths.begin(), paths.end(), normalizedPaths.begin(), RemoveTrailingPathSeparator);
+
   ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
   moduleSettingsPrivate()->autoLoadPaths.clear();
-  moduleSettingsPrivate()->autoLoadPaths.insert(paths.begin(), paths.end());
+  moduleSettingsPrivate()->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
 }
 
 void ModuleSettings::AddAutoLoadPath(const std::string& path)
 {
   ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
-  moduleSettingsPrivate()->autoLoadPaths.insert(path);
+  moduleSettingsPrivate()->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
 }
 
 US_END_NAMESPACE

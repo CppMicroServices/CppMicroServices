@@ -8,9 +8,9 @@ dependencies.
 The Problem
 -----------
 
-Imagine that you have a module \e A which provides an interface for loading files and another
-module \e B which registers a service implementing that interface for files of type \e png.
-Your executable \e E uses the interface from \e A to query the service registry for available
+Imagine that you have a module *A* which provides an interface for loading files and another
+module *B* which registers a service implementing that interface for files of type *png*.
+Your executable *E* uses the interface from *A* to query the service registry for available
 services. Due to the link-time dependencies, this results in the following dependency graph:
 
 \dot
@@ -24,9 +24,9 @@ digraph linker_deps {
 }
 \enddot
 
-When the executable \e E is launched, the dynamic linker of your operating system loads
-module \e A to satisfy the dependencies of \e E, but module \e B will not be loaded. Therefore,
-the executable will not be able to consume any services from module \e B.
+When the executable *E* is launched, the dynamic linker of your operating system loads
+module *A* to satisfy the dependencies of *E*, but module *B* will not be loaded. Therefore,
+the executable will not be able to consume any services from module *B*.
 
 The Solution
 ------------
@@ -42,10 +42,10 @@ For each module being loaded, the following steps are taken:
  - For each auto-load path, all modules in that path with the currently loaded module's
    auto-load directory appended are explicitly loaded.
 
-See the ModuleSettings class for details about auto-load paths and the \ref US_INITIALIZE_MODULE
+See the ModuleSettings class for details about auto-load paths and the #US_INITIALIZE_MODULE
 macro for details about a module's auto-load directory.
 
-If module \e A in the example above contains initialization code like
+If module *A* in the example above contains initialization code like
 
 \code
 US_INITIALIZE_MODULE("Module A", "A", "", "1.0.0")
@@ -60,10 +60,10 @@ all libraries located at
     /myproject/A/
 
 will be automatically loaded (unless the auto-load paths have been modified). By ensuring that
-module \e B from the example above is located at
+module *B* from the example above is located at
 
     /myproject/A/libB.so
 
-it will be loaded when the executable \e E is started and is then able to register its services
+it will be loaded when the executable *E* is started and is then able to register its services
 before the executable queries the service registry.
    

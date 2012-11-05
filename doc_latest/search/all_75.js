@@ -13,6 +13,10 @@ var searchData=
   ['unspecified',['UNSPECIFIED',['../classServiceException.html#a5748dfd1ef3cabb9efc14e65246e0281aa655fb17e2cc9f83c7a49d2a62e912d6',1,'ServiceException']]],
   ['us_5fdeclare_5fservice_5finterface',['US_DECLARE_SERVICE_INTERFACE',['../group__MicroServices.html#gad5c1340dcd99d403c8da0c52b8db30bb',1,'usServiceInterface.h']]],
   ['us_5fexport_5fmodule_5factivator',['US_EXPORT_MODULE_ACTIVATOR',['../group__MicroServices.html#gac441a2e64f59a76a5f7e42de67e87cba',1,'usModuleActivator.h']]],
+  ['us_5fimport_5fmodule',['US_IMPORT_MODULE',['../group__MicroServices.html#ga374168789c5e2653f1ce3460db1b8a24',1,'usModuleImport.h']]],
   ['us_5finitialize_5fmodule',['US_INITIALIZE_MODULE',['../group__MicroServices.html#ga9a64354a3aa6adc882bd73cb193715cb',1,'usModuleInitialization.h']]],
+  ['us_5finitialize_5fmodule_5fwith_5fcustom_5fautoloaddir',['US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR',['../group__MicroServices.html#ga26fc229677b041778ba618d3d4462e23',1,'usModuleInitialization.h']]],
+  ['us_5fload_5fimported_5fmodules',['US_LOAD_IMPORTED_MODULES',['../group__MicroServices.html#gaa01807d90beef417c9107c97b19c3bde',1,'usModuleImport.h']]],
+  ['us_5fload_5fimported_5fmodules_5finto_5fmain',['US_LOAD_IMPORTED_MODULES_INTO_MAIN',['../group__MicroServices.html#ga61f2450ad1688d94b82b842f97e659f5',1,'usModuleImport.h']]],
   ['us_5fservice_5finterface_5fiid',['us_service_interface_iid',['../group__MicroServices.html#ga25c4c450fe74d9f7b0eecc17827e649b',1,'usServiceInterface.h']]]
 ];

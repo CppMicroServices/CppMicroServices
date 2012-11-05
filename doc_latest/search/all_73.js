@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['static_20modules',['Static Modules',['../MicroServices_StaticModules.html',1,'MicroServices_Tutorials']]],
   ['service_5fid',['SERVICE_ID',['../namespaceServiceConstants.html#ac9f9d18808ea2f46376a1489a7b73164',1,'ServiceConstants']]],
   ['service_5franking',['SERVICE_RANKING',['../namespaceServiceConstants.html#a9248db8f7ca4dce942fb3594b1079c3f',1,'ServiceConstants']]],
   ['serviceconstants',['ServiceConstants',['../namespaceServiceConstants.html',1,'']]],
@@ -11,6 +12,8 @@ var searchData=
   ['serviceregistration',['ServiceRegistration',['../classServiceRegistration.html',1,'ServiceRegistration'],['../classServiceRegistration.html#aaeb8bce003e790e080241050a01b81b2',1,'ServiceRegistration::ServiceRegistration()'],['../classServiceRegistration.html#af302a733bb852b1a2b045108d955f8c9',1,'ServiceRegistration::ServiceRegistration(const ServiceRegistration &amp;reg)']]],
   ['servicetracker',['ServiceTracker',['../classServiceTracker.html',1,'ServiceTracker&lt; S, T &gt;'],['../classServiceTracker.html#abc0c4005b9c26be24ecc28fc16cf0afe',1,'ServiceTracker::ServiceTracker(ModuleContext *context, const ServiceReference &amp;reference, ServiceTrackerCustomizer&lt; T &gt; *customizer=0)'],['../classServiceTracker.html#ae7ecbd80136e41f7d333f80e9d91b401',1,'ServiceTracker::ServiceTracker(ModuleContext *context, const std::string &amp;clazz, ServiceTrackerCustomizer&lt; T &gt; *customizer=0)'],['../classServiceTracker.html#ac0f6e1b18906fe446151bc5c71c67b87',1,'ServiceTracker::ServiceTracker(ModuleContext *context, const LDAPFilter &amp;filter, ServiceTrackerCustomizer&lt; T &gt; *customizer=0)'],['../classServiceTracker.html#a888888b2a5aa82a941ad51430ee3bfee',1,'ServiceTracker::ServiceTracker(ModuleContext *context, ServiceTrackerCustomizer&lt; T &gt; *customizer=0)']]],
   ['servicetrackercustomizer',['ServiceTrackerCustomizer',['../structServiceTrackerCustomizer.html',1,'']]],
+  ['setautoloadingenabled',['SetAutoLoadingEnabled',['../classModuleSettings.html#aab6743d83a679653653e23d92cf411b3',1,'ModuleSettings']]],
+  ['setautoloadpaths',['SetAutoLoadPaths',['../classModuleSettings.html#adec0d6a09058115b3b1a86fa739f351d',1,'ModuleSettings']]],
   ['setproperties',['SetProperties',['../classServiceRegistration.html#a089f7b4f1af195b3e24b85f3795e04f5',1,'ServiceRegistration']]],
   ['shareddata',['SharedData',['../classSharedData.html',1,'SharedData'],['../classSharedData.html#a67fec283f34fd58f1d767ca561998baf',1,'SharedData::SharedData()'],['../classSharedData.html#a6e9108864710d28126704545739d9431',1,'SharedData::SharedData(const SharedData &amp;)']]],
   ['shareddatapointer',['SharedDataPointer',['../classSharedDataPointer.html',1,'SharedDataPointer&lt; T &gt;'],['../classSharedDataPointer.html#ac669cd91018c7ca429fbeeec039c8567',1,'SharedDataPointer::SharedDataPointer()'],['../classSharedDataPointer.html#a2949a1382791d8d67f523079a44dd7b4',1,'SharedDataPointer::SharedDataPointer(T *data)'],['../classSharedDataPointer.html#a22fdcd719dc16f4d46fec8393cc04b4f',1,'SharedDataPointer::SharedDataPointer(const SharedDataPointer&lt; T &gt; &amp;o)']]],

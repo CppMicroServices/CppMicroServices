@@ -554,9 +554,10 @@ dl.reflist dd {
         padding-left: 0px;
 }       
 
-.params .paramname, .retval .paramname {
+.params .paramname, .tparams .paramname, .retval .paramname {
         font-weight: bold;
         vertical-align: top;
+        padding-right: 10px;
 }
         
 .params .paramtype {
@@ -852,7 +853,6 @@ dl.section
 
 dl.note
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #D0C000;
@@ -860,7 +860,6 @@ dl.note
 
 dl.warning, dl.attention
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #FF0000;
@@ -868,7 +867,6 @@ dl.warning, dl.attention
 
 dl.pre, dl.post, dl.invariant
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #00D000;
@@ -876,7 +874,6 @@ dl.pre, dl.post, dl.invariant
 
 dl.deprecated
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #505050;
@@ -884,7 +881,6 @@ dl.deprecated
 
 dl.todo
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #00C0E0;
@@ -892,7 +888,6 @@ dl.todo
 
 dl.test
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #3030E0;
@@ -900,7 +895,6 @@ dl.test
 
 dl.bug
 {
-        margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
         border-color: #C08050;

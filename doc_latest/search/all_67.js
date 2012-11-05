@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['getautoloadpaths',['GetAutoLoadPaths',['../classModuleSettings.html#a32588c72fdacb0e33e85dfbce5105567',1,'ModuleSettings']]],
   ['getloadedmodules',['GetLoadedModules',['../classModuleRegistry.html#a4a32bb76fe71e73a9f63595a97f97eab',1,'ModuleRegistry']]],
   ['getlocation',['GetLocation',['../classModule.html#a597849fb68ab647e26f887a9a5030790',1,'Module']]],
   ['getmajor',['GetMajor',['../classModuleVersion.html#ac906a36e878712e115802bb2ba3c3455',1,'ModuleVersion']]],

@@ -58,6 +58,12 @@
  * \param _module_libname The physical name of the module, withou prefix or suffix.
  * \param _module_depends A list of module dependencies. This is meta-data only.
  * \param _module_version A version string in the form of "<major>.<minor>.<micro>.<qualifier>".
+ *
+ * \note If you use this macro in a source file compiled into an executable, additional
+ * requirements for the macro arguments apply:
+ *  - The \c _module_name argument must be a valid C-identifier (no spaces etc.).
+ *  - The \c _module_libname argument must be an empty string.
+ *
  */
 #define US_INITIALIZE_MODULE(_module_name, _module_libname, _module_depends, _module_version) \
   US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR(_module_name, _module_libname, _module_libname, _module_depends, _module_version)

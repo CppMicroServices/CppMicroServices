@@ -28,6 +28,11 @@ The library should compile on many different platforms. Below is a list of teste
   - GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)
   - Visual Studio 2008 and 2010
   - Clang 3.0 (Ubuntu 11.04 and MacOS X 10.6)
+
+Legal
+-----
+
+Copyright (c) German Cancer Research Center. Licensed under the [Apache License v2.0][apache_license].
   
 Quick Start
 -----------
@@ -82,3 +87,4 @@ Build Instructions
 Please visit the [Build Instructions][bi_master] page online.
 
 [bi_master]: http://cppmicroservices.org/doc_latest/BuildInstructions.html
+[apache_license]: http://www.apache.org/licenses/LICENSE-2.0

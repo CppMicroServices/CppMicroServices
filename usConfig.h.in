@@ -24,6 +24,12 @@
 #define CppMicroServices_VERSION_STR "@CppMicroServices_VERSION@"
 
 ///-------------------------------------------------------------------
+// Macros used by the unit tests
+//-------------------------------------------------------------------
+
+#define CppMicroServices_SOURCE_DIR "@CppMicroServices_SOURCE_DIR@"
+
+///-------------------------------------------------------------------
 // Macros for import/export declarations
 //-------------------------------------------------------------------
 
@@ -117,12 +123,25 @@
 #endif
 
 //-------------------------------------------------------------------
-// Compiler defines
+// Macros for suppressing warnings
 //-------------------------------------------------------------------
 
-#if defined(_MSC_VER) && !defined(_SCL_SECURE_NO_WARNINGS)
-  #define _SCL_SECURE_NO_WARNINGS
+#ifdef _MSC_VER
+#define US_MSVC_PUSH_DISABLE_WARNING(wn) \
+__pragma(warning(push))                  \
+__pragma(warning(disable:wn))
+#define US_MSVC_POP_WARNING \
+__pragma(warning(pop))
+#define US_MSVC_DISABLE_WARNING(wn) \
+__pragma(warning(disable:wn))
+#else
+#define US_MSVC_PUSH_DISABLE_WARNING(wn)
+#define US_MSVC_POP_WARNING
+#define US_MSVC_DISABLE_WARNING(wn)
 #endif
+
+// Do not warn about the usage of deprecated unsafe functions
+US_MSVC_DISABLE_WARNING(4996)
 
 //-------------------------------------------------------------------
 // Debuging & Logging
@@ -155,7 +174,7 @@ US_END_NAMESPACE
   #define US_HASH_FUNCTION_END } };
 
   #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
-  
+
   #if defined(US_PLATFORM_WINDOWS) && (_MSC_VER < 1700)
     #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
   #else
@@ -173,14 +192,14 @@ US_END_NAMESPACE
 
   #include <tr1/unordered_map>
   #include <tr1/unordered_set>
-  
+
   #define US_HASH_FUNCTION_BEGIN(type) \
   template<> \
   struct hash<type> : std::unary_function<type, std::size_t> { \
-  std::size_t operator()(const type& arg) const { 
-  
+  std::size_t operator()(const type& arg) const {
+
   #define US_HASH_FUNCTION_END } };
-  
+
   #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
   #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::tr1::hash<type>
 
@@ -195,13 +214,13 @@ US_END_NAMESPACE
 
   #include <hash_map>
   #include <hash_set>
-  
+
   #define US_HASH_FUNCTION_BEGIN(type) \
   template<> \
-  inline std::size_t hash_value<type>(const type& arg) { 
-  
+  inline std::size_t hash_value<type>(const type& arg) {
+
   #define US_HASH_FUNCTION_END }
-  
+
   #define US_HASH_FUNCTION(type, arg) hash_value(arg)
   #define US_HASH_FUNCTION_FRIEND(type) friend std::size_t stdext::hash_value<type>(const type&)
 
@@ -225,5 +244,10 @@ US_END_NAMESPACE
   #define US_DEFAULT_THREADING US_PREPEND_NAMESPACE(SingleThreaded)
 #endif
 
+//-------------------------------------------------------------------
+// Header Availability
+//-------------------------------------------------------------------
+
+#cmakedefine HAVE_STDINT
 
 #endif // USCONFIG_H

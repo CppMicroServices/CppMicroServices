@@ -130,6 +130,14 @@ public:                                                                         
     }                                                                                        \
     moduleInfo()->activatorHook = reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, activator_func.c_str())); \
                                                                                              \
+    std::string init_res_func = "us_init_resources_";                                        \
+    init_res_func.append(moduleInfo()->libName);                                             \
+    ModuleInfo::InitResourcesHook initResourcesHook = reinterpret_cast<ModuleInfo::InitResourcesHook>(ModuleUtils::GetSymbol(location, init_res_func.c_str())); \
+    if (initResourcesHook)                                                                   \
+    {                                                                                        \
+      initResourcesHook(moduleInfo());                                                       \
+    }                                                                                        \
+                                                                                             \
     Register();                                                                              \
   }                                                                                          \
                                                                                              \

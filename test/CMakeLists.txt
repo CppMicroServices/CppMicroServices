@@ -32,6 +32,7 @@ set(_tests
   usDebugOutputTest
   usLDAPFilterTest
   usModuleTest
+  usModuleResourceTest
   usServiceRegistryTest
   usServiceTrackerTest
   usStaticModuleTest

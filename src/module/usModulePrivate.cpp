@@ -39,7 +39,8 @@ AtomicInt ModulePrivate::idCounter;
 
 ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
-  : coreCtx(coreCtx), info(*info), moduleContext(0), moduleActivator(0), q(qq)
+  : coreCtx(coreCtx), info(*info), resourceTree(info),
+    moduleContext(0), moduleActivator(0), q(qq)
 {
 
   std::stringstream propId;
@@ -105,7 +106,7 @@ ModulePrivate::~ModulePrivate()
 void ModulePrivate::RemoveModuleResources()
 {
   coreCtx->listeners.RemoveAllListeners(moduleContext);
- 
+
   std::list<ServiceRegistration> srs;
   coreCtx->services.GetRegisteredByModule(this, srs);
   for (std::list<ServiceRegistration>::iterator i = srs.begin();
@@ -130,6 +131,8 @@ void ModulePrivate::RemoveModuleResources()
   {
     i->GetReference().d->UngetService(q, false);
   }
+
+  resourceTree.Invalidate();
 }
 
 void ModulePrivate::StartStaticModules()

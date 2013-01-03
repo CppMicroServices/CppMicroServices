@@ -46,6 +46,8 @@ struct US_EXPORT ModuleInfo
              const std::string& moduleDeps, const std::string& version);
 
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
+  typedef int(*InitResourcesHook)(ModuleInfo*);
+  typedef const unsigned char* ModuleResourceData;
 
   std::string name;
   std::string libName;
@@ -59,6 +61,9 @@ struct US_EXPORT ModuleInfo
   long id;
 
   ModuleActivatorHook activatorHook;
+  ModuleResourceData resourceData;
+  ModuleResourceData resourceNames;
+  ModuleResourceData resourceTree;
 };
 
 US_END_NAMESPACE

@@ -31,6 +31,10 @@ set(_srcs
   module/usModuleInfo.cpp
   module/usModulePrivate.cpp
   module/usModuleRegistry.cpp
+  module/usModuleResource.cpp
+  module/usModuleResourceBuffer.cpp
+  module/usModuleResourceStream.cpp
+  module/usModuleResourceTree.cpp
   module/usModuleSettings.cpp
   module/usModuleUtils.cpp
   module/usModuleVersion.cpp
@@ -42,23 +46,29 @@ set(_private_headers
   util/usStaticInit_p.h
   util/usThreads_p.h
   util/usUtils_p.h
-  
+
+  util/dirent_win32_p.h
+  util/stdint_p.h
+  util/stdint_vc_p.h
+
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
   service/usServiceTrackerPrivate.tpp
   service/usTrackedService_p.h
   service/usTrackedServiceListener_p.h
   service/usTrackedService.tpp
-  
+
   module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
+  module/usModuleResourceBuffer_p.h
+  module/usModuleResourceTree_p.h
   module/usModuleUtils_p.h
 )
 
 set(_public_headers
   util/usAny.h
   util/usSharedData.h
-  
+
   service/usLDAPFilter.h
   service/usServiceEvent.h
   service/usServiceException.h
@@ -68,7 +78,7 @@ set(_public_headers
   service/usServiceRegistration.h
   service/usServiceTracker.h
   service/usServiceTrackerCustomizer.h
-  
+
   module/usGetModuleContext.h
   module/usModule.h
   module/usModuleActivator.h
@@ -78,6 +88,8 @@ set(_public_headers
   module/usModuleInfo.h
   module/usModuleInitialization.h
   module/usModuleRegistry.h
+  module/usModuleResource.h
+  module/usModuleResourceStream.h
   module/usModuleSettings.h
   module/usModuleVersion.h
 )
@@ -162,7 +174,7 @@ if(NOT US_IS_EMBEDDED)
   install(TARGETS ${PROJECT_NAME} FRAMEWORK DESTINATION .
                                   RUNTIME DESTINATION bin
                                   LIBRARY DESTINATION lib
-                                  ARCHIVE DESTINATION lib 
+                                  ARCHIVE DESTINATION lib
                                   PUBLIC_HEADER DESTINATION include
                                   PRIVATE_HEADER DESTINATION include)
 endif()

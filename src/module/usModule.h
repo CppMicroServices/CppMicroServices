@@ -25,11 +25,14 @@
 
 #include "usModuleVersion.h"
 
+#include <vector>
+
 US_BEGIN_NAMESPACE
 
 class CoreModuleContext;
 struct ModuleInfo;
 class ModuleContext;
+class ModuleResource;
 class ModulePrivate;
 
 /**
@@ -178,6 +181,10 @@ public:
    *         if the property is undefined.
    */
   std::string GetProperty(const std::string& key) const;
+
+  ModuleResource GetResource(const std::string& name) const;
+
+  std::vector<std::string> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 
 private:
 

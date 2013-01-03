@@ -23,6 +23,7 @@ set(CMAKE_MODULE_PATH
 include(MacroParseArguments)
 include(CheckCXXSourceCompiles)
 include(usFunctionCheckCompilerFlags)
+include(usFunctionEmbedResources)
 include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
 
@@ -242,8 +243,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
   endif()
 
-elseif(MSVC90 OR MSVC10 OR MSVC11)
-  set(US_CXX_FLAGS "/MP ${US_CXX_FLAGS}")
+elseif(MSVC)
+  set(US_CXX_FLAGS "/MP /wd4996 ${US_CXX_FLAGS}")
 endif()
 
 if(NOT US_IS_EMBEDDED)
@@ -265,6 +266,14 @@ if(NOT MSVC)
     endif()
   endforeach()
 endif()
+
+#-----------------------------------------------------------------------------
+# US Header Checks
+#-----------------------------------------------------------------------------
+
+include(CheckIncludeFile)
+
+CHECK_INCLUDE_FILE(stdint.h HAVE_STDINT)
 
 #-----------------------------------------------------------------------------
 # US include dirs and libraries
@@ -315,7 +324,13 @@ endif()
 set(us_config_h_file "${PROJECT_BINARY_DIR}/include/usConfig.h")
 configure_file(usConfig.h.in ${us_config_h_file})
 
+set(US_RCC_EXECUTABLE_NAME usResourceCompiler)
+set(US_RCC_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${US_RCC_EXECUTABLE_NAME}")
+
+add_subdirectory(tools)
+
 add_subdirectory(src)
+
 
 #-----------------------------------------------------------------------------
 # US testing

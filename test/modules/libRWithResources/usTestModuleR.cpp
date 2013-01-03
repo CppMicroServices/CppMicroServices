@@ -20,23 +20,25 @@
 =============================================================================*/
 
 
-#include "usModuleInfo.h"
+#include <usModuleActivator.h>
 
 US_BEGIN_NAMESPACE
 
-ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName,
-                       const std::string& autoLoadDir, const std::string& moduleDeps,
-                       const std::string& version)
-  : name(name)
-  , libName(libName)
-  , moduleDeps(moduleDeps)
-  , version(version)
-  , autoLoadDir(autoLoadDir)
-  , id(0)
-  , activatorHook(NULL)
-  , resourceData(NULL)
-  , resourceNames(NULL)
-  , resourceTree(NULL)
-{}
+class TestModuleRActivator : public ModuleActivator
+{
+public:
+
+  void Load(ModuleContext*)
+  {
+  }
+
+  void Unload(ModuleContext*)
+  {
+  }
+
+};
 
 US_END_NAMESPACE
+
+US_EXPORT_MODULE_ACTIVATOR(TestModuleR, US_PREPEND_NAMESPACE(TestModuleRActivator))
+

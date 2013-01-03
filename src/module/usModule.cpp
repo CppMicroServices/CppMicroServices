@@ -25,6 +25,7 @@
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usModulePrivate.h"
+#include "usModuleResource.h"
 #include "usModuleSettings.h"
 #include "usCoreModuleContext_p.h"
 
@@ -223,6 +224,24 @@ std::string Module::GetProperty(const std::string& key) const
 {
   if (d->properties.count(key) == 0) return "";
   return d->properties[key];
+}
+
+ModuleResource Module::GetResource(const std::string &name) const
+{
+  if (!d->resourceTree.IsValid()) return ModuleResource();
+
+  return ModuleResource(name, &d->resourceTree);
+}
+
+std::vector<std::string> Module::FindResources(const std::string& path, const std::string& filePattern,
+                                               bool recurse) const
+{
+  std::vector<std::string> result;
+  if (d->resourceTree.IsValid())
+  {
+    d->resourceTree.FindNodes(path, filePattern, recurse, result);
+  }
+  return result;
 }
 
 US_END_NAMESPACE

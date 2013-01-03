@@ -1,6 +1,10 @@
 
 macro(_us_create_test_module_helper)
 
+  if(_res_files)
+    usFunctionEmbedResources(_srcs LIBRARY_NAME ${name} ROOT_DIR resources FILES ${_res_files})
+  endif()
+
   add_library(${name} ${_srcs})
   if(NOT US_BUILD_SHARED_LIBS)
     set_property(TARGET ${name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
@@ -27,6 +31,15 @@ endfunction()
 
 function(usFunctionCreateTestModule name)
   set(_srcs ${ARGN})
+  set(_res_files )
+  usFunctionGenerateModuleInit(_srcs NAME "${name} Module" LIBRARY_NAME ${name})
+  _us_create_test_module_helper()
+endfunction()
+
+function(usFunctionCreateTestModuleWithResources name)
+  MACRO_PARSE_ARGUMENTS(US_TEST "SOURCES;RESOURCES" "" ${ARGN})
+  set(_srcs ${US_TEST_SOURCES})
+  set(_res_files ${US_TEST_RESOURCES})
   usFunctionGenerateModuleInit(_srcs NAME "${name} Module" LIBRARY_NAME ${name})
   _us_create_test_module_helper()
 endfunction()

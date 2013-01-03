@@ -397,7 +397,7 @@ void frameSL25a()
   }
 
   // Start libModuleTestSL4 that will require the serivce interface and publish
-  // ctkFooService
+  // us::FooService
   try
   {
     US_TEST_OUTPUT( << "Starting libModuleTestSL4: " << libSL4.GetAbsolutePath() );

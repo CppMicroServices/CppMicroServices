@@ -19,24 +19,15 @@
 
 =============================================================================*/
 
+#ifndef USSTDINT_H
+#define USSTDINT_H
 
-#include "usModuleInfo.h"
+#ifdef HAVE_STDINT
+#include <stdint.h>
+#elif defined(_MSC_VER)
+#include "stdint_vc_p.h"
+#else
+#error The stdint.h header is not available
+#endif
 
-US_BEGIN_NAMESPACE
-
-ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName,
-                       const std::string& autoLoadDir, const std::string& moduleDeps,
-                       const std::string& version)
-  : name(name)
-  , libName(libName)
-  , moduleDeps(moduleDeps)
-  , version(version)
-  , autoLoadDir(autoLoadDir)
-  , id(0)
-  , activatorHook(NULL)
-  , resourceData(NULL)
-  , resourceNames(NULL)
-  , resourceTree(NULL)
-{}
-
-US_END_NAMESPACE
+#endif // USSTDINT_H

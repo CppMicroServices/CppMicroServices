@@ -28,6 +28,7 @@
 #include "usModuleRegistry.h"
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
+#include "usModuleResourceTree_p.h"
 
 #include "usAtomicInt_p.h"
 
@@ -69,6 +70,8 @@ public:
   ModuleVersion version;
 
   ModuleInfo info;
+
+  ModuleResourceTree resourceTree;
 
   /**
    * ModuleContext for the module

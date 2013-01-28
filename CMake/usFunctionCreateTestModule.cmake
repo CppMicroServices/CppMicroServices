@@ -7,7 +7,8 @@ macro(_us_create_test_module_helper)
   endif()
 
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-    set_property(TARGET ${name} APPEND_STRING PROPERTY COMPILE_FLAGS "-fPIC")
+    get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
+    set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
   target_link_libraries(${name} ${US_LINK_LIBRARIES})

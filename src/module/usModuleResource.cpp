@@ -153,7 +153,7 @@ bool ModuleResource::IsValid() const
   return d->resourceTree->IsValid() && d->node > -1;
 }
 
-us::ModuleResource::operator bool() const
+ModuleResource::operator bool() const
 {
   return IsValid();
 }

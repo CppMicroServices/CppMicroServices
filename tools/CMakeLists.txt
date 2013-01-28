@@ -1,7 +1,5 @@
 
-if(NOT US_IS_EMBEDDED)
-  include_directories(${US_INTERNAL_INCLUDE_DIRS})
-endif()
+include_directories(${US_INCLUDE_DIRS})
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_NAME}\")
 

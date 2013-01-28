@@ -1,4 +1,4 @@
-The %Module Context    {#MicroServices_TheModuleContext}
+The Module Context    {#MicroServices_TheModuleContext}
 ===================
 
 In the context of the C++ Micro Services library, we will call all supported "shared library" types
@@ -7,7 +7,7 @@ ModuleContext object. While multiple modules could use the same ModuleContext, i
 that each module gets its own (this will enable module specific service usage tracking and also allows
 the C++ Micro Services framework to properly cleanup resources after a module has been unloaded).
 
-### Creating a %ModuleContext
+### Creating a ModuleContext
 
 To create a ModuleContext object for a specific library, you have two options. If your project uses
 CMake as the build system, use the supplied `usFunctionGenerateModuleInit` CMake function to automatically
@@ -26,7 +26,7 @@ files of your module:
 
 \snippet uServices-modulecontext/main.cpp InitializeModule
 
-### Getting a %ModuleContext
+### Getting a ModuleContext
 
 To retrieve the module specific ModuleContext object from anywhere in your module, use the
 `#GetModuleContext` function:

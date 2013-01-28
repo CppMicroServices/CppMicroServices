@@ -10,7 +10,7 @@ public:
 
   void Load(ModuleContext* /*context*/)
   { /* register stuff */ }
-  
+
 
   void Unload(ModuleContext* /*context*/)
   { /* cleanup */ }

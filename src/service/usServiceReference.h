@@ -201,7 +201,7 @@ private:
   US_HASH_FUNCTION_FRIEND(ServiceReference);
 
   std::size_t Hash() const;
-  
+
   ServiceReference(ServiceRegistrationPrivate* reg);
 
   ServiceReferencePrivate* d;

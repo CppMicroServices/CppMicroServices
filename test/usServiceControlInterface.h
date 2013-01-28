@@ -32,7 +32,7 @@ US_BEGIN_NAMESPACE
 
 struct ServiceControlInterface
 {
-  
+
   virtual ~ServiceControlInterface() {}
 
   virtual void ServiceControl(int service, const std::string& operation, int ranking) = 0;

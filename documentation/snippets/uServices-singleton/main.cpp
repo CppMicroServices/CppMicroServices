@@ -28,7 +28,7 @@ public:
     m_SingletonOneReg = context->RegisterService<SingletonOneService>(m_SingletonOne);
   }
   //![0]
-  
+
   //![1]
   void Unload(ModuleContext* /*context*/)
   {

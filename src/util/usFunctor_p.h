@@ -42,7 +42,7 @@ public:
 
 private:
 
-  virtual bool IsEqual(const FunctorImpl& o) const = 0; 
+  virtual bool IsEqual(const FunctorImpl& o) const = 0;
 };
 
 template<typename Arg, typename Fun>

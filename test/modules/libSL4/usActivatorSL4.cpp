@@ -34,25 +34,25 @@ US_BEGIN_NAMESPACE
 class ActivatorSL4 :
   public US_BASECLASS_NAME, public ModuleActivator, public FooService
 {
-  
+
 public:
 
   ~ActivatorSL4()
   {
-    
+
   }
 
   void foo()
   {
     US_INFO << "TestModuleSL4: Doing foo";
   }
-  
+
   void Load(ModuleContext* context)
   {
     sr = context->RegisterService<FooService>(this);
     US_INFO << "TestModuleSL4: Registered " << sr;
   }
-  
+
   void Unload(ModuleContext* /*context*/)
   {
   }
@@ -60,7 +60,7 @@ public:
 private:
 
   ServiceRegistration sr;
-}; 
+};
 
 US_END_NAMESPACE
 

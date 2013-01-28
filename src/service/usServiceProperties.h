@@ -37,7 +37,7 @@ struct ci_char_traits : public std::char_traits<char>
     // just inherit all the other functions
     //  that we don't need to override
 {
-    
+
   static bool eq(char c1, char c2)
   {
     return std::toupper(c1) == std::toupper(c2);

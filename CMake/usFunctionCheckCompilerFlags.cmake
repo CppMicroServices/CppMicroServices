@@ -1,5 +1,5 @@
 #
-# Helper macro allowing to check if the given flags are supported 
+# Helper macro allowing to check if the given flags are supported
 # by the underlying build tool
 #
 # If the flag(s) is/are supported, they will be appended to the string identified by RESULT_VAR
@@ -25,7 +25,7 @@
 include(TestCXXAcceptsFlag)
 
 function(usFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
-  
+
   if(CXX_FLAG_TO_TEST STREQUAL "")
     message(FATAL_ERROR "CXX_FLAG_TO_TEST shouldn't be empty")
   endif()
@@ -35,7 +35,7 @@ function(usFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   if(HAS_FLAG_unknown-warning-option)
     set(_test_flag "-Werror=unknown-warning-option ${CXX_FLAG_TO_TEST}")
   endif()
-  
+
   # Internally, the macro CMAKE_CXX_ACCEPTS_FLAG calls TRY_COMPILE. To avoid
   # the cost of compiling the test each time the project is configured, the variable set by
   # the macro is added to the cache so that following invocation of the macro with

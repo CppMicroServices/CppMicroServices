@@ -76,7 +76,7 @@ public:
 private:
 
   US_HASH_FUNCTION_FRIEND(ServiceListenerEntry);
-  
+
   ExplicitlySharedDataPointer<ServiceListenerEntryData> d;
 };
 

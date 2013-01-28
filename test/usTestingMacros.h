@@ -26,15 +26,15 @@
 #include "usTestManager.h"
 
 US_BEGIN_NAMESPACE
-  /** \brief Indicate a failed test. */ 
+  /** \brief Indicate a failed test. */
   class TestFailedException : public std::exception {
     public:
       TestFailedException() {}
   };
 US_END_NAMESPACE
 
-/** 
- * 
+/**
+ *
  * \brief Output some text without generating a terminating newline.
  *
  * */
@@ -45,7 +45,7 @@ US_END_NAMESPACE
 #define US_TEST_OUTPUT(x) \
   US_TEST_OUTPUT_NO_ENDL(x << "\n")
 
-/** \brief Do some general test preparations. Must be called first in the 
+/** \brief Do some general test preparations. Must be called first in the
      main test function. */
 #define US_TEST_BEGIN(testName)                                                               \
   std::string usTestName(#testName);                                                          \
@@ -105,9 +105,9 @@ US_END_NAMESPACE
  * \brief Begin block which should be checked for exceptions
  *
  * This macro, together with US_TEST_FOR_EXCEPTION_END, can be used
- * to test whether a code block throws an expected exception. The test FAILS if the 
+ * to test whether a code block throws an expected exception. The test FAILS if the
  * exception is NOT thrown.
- */ 
+ */
 #define US_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS) \
   try {
 

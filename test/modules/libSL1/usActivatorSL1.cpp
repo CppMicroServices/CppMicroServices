@@ -36,15 +36,15 @@ class ActivatorSL1 :
     public US_BASECLASS_NAME, public ModuleActivator, public ModulePropsInterface,
     public ServiceTrackerCustomizer<FooService*>
 {
-  
+
 public:
 
   ActivatorSL1()
     : tracker(0), context(0)
   {
-  
+
   }
-  
+
   ~ActivatorSL1()
   {
     delete tracker;
@@ -95,7 +95,7 @@ private:
   ServiceRegistration sr;
 
   typedef ServiceTracker<FooService*> FooTracker;
-  
+
   FooTracker* tracker;
   ModuleContext* context;
 

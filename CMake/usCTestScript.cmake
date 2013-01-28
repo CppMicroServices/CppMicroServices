@@ -3,19 +3,19 @@ macro(build_and_test)
 
   set(CTEST_SOURCE_DIRECTORY ${US_SOURCE_DIR})
   set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/${CTEST_PROJECT_NAME}_${CTEST_DASHBOARD_NAME}")
-  
+
   #if(NOT CTEST_BUILD_NAME)
   #  set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CTEST_COMPILER}_${CTEST_DASHBOARD_NAME}")
   #endif()
-  
+
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
-  
+
   ctest_start("Experimental")
-  
+
   if(NOT EXISTS "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt")
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "${CTEST_INITIAL_CACHE}")
   endif()
-  
+
   ctest_configure(RETURN_VALUE res)
   if (res)
     message(FATAL_ERROR "CMake configure error")
@@ -30,17 +30,17 @@ macro(build_and_test)
    message(FATAL_ERROR "CMake test error")
   endif()
 
-  
+
   if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
     ctest_memcheck()
   endif()
-  
+
   if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
     ctest_coverage()
   endif()
-  
+
   #ctest_submit()
-  
+
 endmacro()
 
 function(create_initial_cache var _shared _threading _sf _c++11 _autoload)
@@ -53,15 +53,15 @@ function(create_initial_cache var _shared _threading _sf _c++11 _autoload)
       US_USE_C++11:BOOL=${_c++11}
       US_ENABLE_AUTOLOADING_SUPPORT:BOOL=${_autoload}
       ")
-      
+
   set(${var} ${_initial_cache} PARENT_SCOPE)
-  
+
   if(_shared)
     set(CTEST_DASHBOARD_NAME "shared")
   else()
     set(CTEST_DASHBOARD_NAME "static")
   endif()
-  
+
   if(_threading)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
   endif()
@@ -74,9 +74,9 @@ function(create_initial_cache var _shared _threading _sf _c++11 _autoload)
   if(_autoload)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-autoloading")
   endif()
-  
+
   set(CTEST_DASHBOARD_NAME ${CTEST_DASHBOARD_NAME} PARENT_SCOPE)
-  
+
 endfunction()
 
 #=========================================================

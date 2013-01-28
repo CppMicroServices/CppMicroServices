@@ -86,7 +86,7 @@ public:
       }
     }
   }
-  
+
   void Unregister()
   {
     if (sreg)
@@ -118,7 +118,7 @@ public:
   {
     s = new TestModuleS(context);
   }
-  
+
   void Unload(ModuleContext* /*context*/)
   {
   #ifndef US_BUILD_SHARED_LIBS

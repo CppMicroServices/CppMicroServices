@@ -105,7 +105,7 @@ ModulePrivate::~ModulePrivate()
 void ModulePrivate::RemoveModuleResources()
 {
   coreCtx->listeners.RemoveAllListeners(moduleContext);
- 
+
   std::list<ServiceRegistration> srs;
   coreCtx->services.GetRegisteredByModule(this, srs);
   for (std::list<ServiceRegistration>::iterator i = srs.begin();

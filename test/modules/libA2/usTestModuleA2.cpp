@@ -44,7 +44,7 @@ struct TestModuleA2 : public US_BASECLASS_NAME, public TestModuleA2Service
       sr.Unregister();
     }
   }
-  
+
 private:
 
   ServiceRegistration sr;

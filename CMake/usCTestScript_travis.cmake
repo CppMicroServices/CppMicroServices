@@ -11,7 +11,7 @@ set(CTEST_BUILD_FLAGS "-j")
 set(CTEST_BUILD_CONFIGURATION Release)
 
 
-set(US_SOURCE_DIR "~/builds/saschazelzer/CppMicroServices")
+set(US_SOURCE_DIR "~/build/saschazelzer/CppMicroServices")
 
 set(US_BUILD_CONFIGURATION $ENV{BUILD_CONFIGURATION})
 include(${US_SOURCE_DIR}/CMake/usCTestScript.cmake)

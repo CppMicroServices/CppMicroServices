@@ -325,6 +325,7 @@ set(us_config_h_file "${PROJECT_BINARY_DIR}/include/usConfig.h")
 configure_file(usConfig.h.in ${us_config_h_file})
 
 set(US_RCC_EXECUTABLE_NAME usResourceCompiler)
+set(CppMicroServices_RCC_EXECUTABLE_NAME ${US_RCC_EXECUTABLE_NAME})
 set(US_RCC_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${US_RCC_EXECUTABLE_NAME}")
 
 add_subdirectory(tools)

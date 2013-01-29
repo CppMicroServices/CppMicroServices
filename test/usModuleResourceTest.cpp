@@ -106,7 +106,7 @@ void testTextResource(Module* module)
 void testTextResourceAsBinary(Module* module)
 {
   ModuleResource res = module->GetResource("foo.txt");
-  
+
 #ifdef US_PLATFORM_WINDOWS
   checkResourceInfo(res, "/", "foo", "foo", "txt", 16, false);
   const std::streampos ssize(16);
@@ -301,6 +301,17 @@ void testResourceOperators(Module* module)
   US_TEST_CONDITION(oss.str() == foo.GetFilePath(), "Check operator<<")
 }
 
+void testResourceFromExecutable(Module* module)
+{
+  ModuleResource resource = module->GetResource("usTestResource.txt");
+  US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid executable resource")
+
+  std::string line;
+  ModuleResourceStream rs(resource);
+  std::getline(rs, line);
+  US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
+}
+
 } // end unnamed namespace
 
 
@@ -342,6 +353,8 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   libR.Unload();
   US_TEST_CONDITION(foo.IsValid() == false, "Invalidated resource")
   US_TEST_CONDITION(foo.GetData() == NULL, "NULL data")
+
+  testResourceFromExecutable(mc->GetModule());
 
   US_TEST_END()
 }

@@ -71,8 +71,9 @@ void testResourcesWithStaticImport(Module* module)
   line = GetResourceContent(resource);
   US_TEST_CONDITION(line == "static", "Check dynamic resource content")
 
-  std::vector<ModuleResource> resources = module->FindResources("", "*.txt", true);
+  std::vector<ModuleResource> resources = module->FindResources("", "*.txt", false);
   std::stable_sort(resources.begin(), resources.end(), ResourceComparator());
+#ifdef US_BUILD_SHARED_LIBS
   US_TEST_CONDITION(resources.size() == 4, "Check imported resource count")
   line = GetResourceContent(resources[0]);
   US_TEST_CONDITION(line == "dynamic", "Check dynamic.txt resource content")
@@ -82,6 +83,19 @@ void testResourcesWithStaticImport(Module* module)
   US_TEST_CONDITION(line == "static resource", "Check res.txt (from imported module) resource content")
   line = GetResourceContent(resources[3]);
   US_TEST_CONDITION(line == "static", "Check static.txt (from importing module) resource content")
+#else
+  US_TEST_CONDITION(resources.size() == 6, "Check imported resource count")
+  line = GetResourceContent(resources[0]);
+  US_TEST_CONDITION(line == "dynamic", "Check dynamic.txt resource content")
+  // skip foo.txt
+  line = GetResourceContent(resources[2]);
+  US_TEST_CONDITION(line == "dynamic resource", "Check res.txt (from importing module) resource content")
+  line = GetResourceContent(resources[3]);
+  US_TEST_CONDITION(line == "static resource", "Check res.txt (from imported module) resource content")
+  // skip special_chars.dummy.txt
+  line = GetResourceContent(resources[5]);
+  US_TEST_CONDITION(line == "static", "Check static.txt (from importing module) resource content")
+#endif
 }
 
 } // end unnamed namespace
@@ -94,6 +108,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
   ModuleContext* mc = GetModuleContext();
   assert(mc);
 
+#ifdef US_BUILD_SHARED_LIBS
   SharedLibraryHandle libB("TestModuleB");
 
   try
@@ -105,19 +120,24 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-  Module* moduleB = ModuleRegistry::GetModule("TestModuleB Module");
-  US_TEST_CONDITION_REQUIRED(moduleB != NULL, "Test for existing module TestModuleB")
+  Module* module = ModuleRegistry::GetModule("TestModuleB Module");
+  US_TEST_CONDITION_REQUIRED(module != NULL, "Test for existing module TestModuleB")
 
-  US_TEST_CONDITION(moduleB->GetName() == "TestModuleB Module", "Test module name")
+  US_TEST_CONDITION(module->GetName() == "TestModuleB Module", "Test module name")
+#else
+  Module* module = mc->GetModule();
+#endif
 
-  testResourcesWithStaticImport(moduleB);
+  testResourcesWithStaticImport(module);
 
-  ModuleResource resource = moduleB->GetResource("static.txt");
+#ifdef US_BUILD_SHARED_LIBS
+  ModuleResource resource = module->GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
 
   libB.Unload();
 
   US_TEST_CONDITION_REQUIRED(resource.IsValid() == false, "Check invalid static.txt resource")
+#endif
 
   US_TEST_END()
 }

@@ -64,6 +64,8 @@ public:
 
   std::vector<std::string> requiresLibs;
 
+  std::vector<std::string> staticModuleLibNames;
+
   /**
    * Module version
    */
@@ -71,7 +73,7 @@ public:
 
   ModuleInfo info;
 
-  ModuleResourceTree resourceTree;
+  std::vector<ModuleResourceTree> resourceTrees;
 
   /**
    * ModuleContext for the module
@@ -85,6 +87,8 @@ public:
   Module* const q;
 
 private:
+
+  void InitializeResources(const std::string& location);
 
   std::list<ModuleInfo::ModuleActivatorHook> staticActivators;
 

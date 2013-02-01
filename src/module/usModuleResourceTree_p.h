@@ -25,6 +25,7 @@
 
 #include <usConfig.h>
 
+#include "usModuleInfo.h"
 #include "stdint_p.h"
 
 #include <vector>
@@ -33,6 +34,14 @@ US_BEGIN_NAMESPACE
 
 struct ModuleInfo;
 
+/*
+ * This class represents the triple of data pointers
+ * (us_resource_data, us_resource_name, us_resource_tree) generate by
+ * the resource compiler.
+ *
+ * Each module owns zero or one such triple but in case of a statically
+ * linked (imported) module, the resource trees are "merged" together.
+ */
 class ModuleResourceTree
 {
 
@@ -62,7 +71,9 @@ private:
 
 public:
 
-  ModuleResourceTree(const ModuleInfo* moduleInfo);
+  ModuleResourceTree(ModuleInfo::ModuleResourceData resourceTree,
+                     ModuleInfo::ModuleResourceData resourceNames,
+                     ModuleInfo::ModuleResourceData resourceData);
 
   bool IsValid() const;
   void Invalidate();

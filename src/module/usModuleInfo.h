@@ -26,6 +26,7 @@
 #include <usConfig.h>
 
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -61,9 +62,13 @@ struct US_EXPORT ModuleInfo
   long id;
 
   ModuleActivatorHook activatorHook;
-  ModuleResourceData resourceData;
-  ModuleResourceData resourceNames;
-  ModuleResourceData resourceTree;
+
+  // In case of statically linked (imported) modules, there could
+  // be more than one set of ModuleResourceData pointers. We aggregate
+  // all pointers here.
+  std::vector<ModuleResourceData> resourceData;
+  std::vector<ModuleResourceData> resourceNames;
+  std::vector<ModuleResourceData> resourceTree;
 };
 
 US_END_NAMESPACE

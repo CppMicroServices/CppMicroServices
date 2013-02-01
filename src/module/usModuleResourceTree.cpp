@@ -22,7 +22,6 @@
 
 #include "usModuleResourceTree_p.h"
 
-#include "usModuleInfo.h"
 #include "usUtils_p.h"
 #include "stdint_p.h"
 
@@ -34,22 +33,24 @@
 US_BEGIN_NAMESPACE
 
 US_EXPORT bool RegisterResourceData(int, ModuleInfo* moduleInfo,
-                                    const unsigned char* resourceTree,
-                                    const unsigned char* resourceName,
-                                    const unsigned char* resourceData)
+                                    ModuleInfo::ModuleResourceData resourceTree,
+                                    ModuleInfo::ModuleResourceData resourceNames,
+                                    ModuleInfo::ModuleResourceData resourceData)
 {
-  moduleInfo->resourceTree = resourceTree;
-  moduleInfo->resourceNames = resourceName;
-  moduleInfo->resourceData = resourceData;
+  moduleInfo->resourceTree.push_back(resourceTree);
+  moduleInfo->resourceNames.push_back(resourceNames);
+  moduleInfo->resourceData.push_back(resourceData);
   return true;
 }
 
 
-ModuleResourceTree::ModuleResourceTree(const ModuleInfo* moduleInfo)
-  : isValid(moduleInfo->resourceTree && moduleInfo->resourceNames && moduleInfo->resourceData)
-  , tree(moduleInfo->resourceTree)
-  , names(moduleInfo->resourceNames)
-  , payloads(moduleInfo->resourceData)
+ModuleResourceTree::ModuleResourceTree(ModuleInfo::ModuleResourceData resourceTree,
+                                       ModuleInfo::ModuleResourceData resourceNames,
+                                       ModuleInfo::ModuleResourceData resourceData)
+  : isValid(resourceTree && resourceNames && resourceData)
+  , tree(resourceTree)
+  , names(resourceNames)
+  , payloads(resourceData)
 {
 }
 

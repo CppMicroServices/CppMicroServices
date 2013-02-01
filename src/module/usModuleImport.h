@@ -59,6 +59,13 @@ US_END_NAMESPACE
     _us_module_activator_instance_ ## _import_module_libname();       \
   }
 
+#define US_IMPORT_MODULE_RESOURCES(_import_module_libname)                 \
+  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_init_resources_ ## _import_module_libname (); \
+  void _dummy_reference_to_ ## _import_module_libname ## _init_resources() \
+  {                                                                        \
+    _us_init_resources_ ## _import_module_libname();                       \
+  }
+
 /**
  * \ingroup MicroServices
  * \def US_LOAD_IMPORTED_MODULES_INTO_MAIN(_static_modules)

@@ -34,9 +34,6 @@ ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName,
   , autoLoadDir(autoLoadDir)
   , id(0)
   , activatorHook(NULL)
-  , resourceData(NULL)
-  , resourceNames(NULL)
-  , resourceTree(NULL)
 {}
 
 US_END_NAMESPACE

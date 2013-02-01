@@ -35,6 +35,7 @@ set(_tests
   usModuleResourceTest
   usServiceRegistryTest
   usServiceTrackerTest
+  usStaticModuleResourceTest
   usStaticModuleTest
 )
 

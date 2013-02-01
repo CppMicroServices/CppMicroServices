@@ -550,10 +550,10 @@ bool ResourceWriter::WriteDataTree()
 bool ResourceWriter::WriteRegistrationCode()
 {
   WriteString("US_BEGIN_NAMESPACE\n\n");
-  WriteString("extern US_EXPORT bool RegisterResourceData(int, ModuleInfo*, const unsigned char*, const unsigned char*, const unsigned char*);\n\n");
+  WriteString("extern US_EXPORT bool RegisterResourceData(int, ModuleInfo*, ModuleInfo::ModuleResourceData, ModuleInfo::ModuleResourceData, ModuleInfo::ModuleResourceData);\n\n");
   WriteString("US_END_NAMESPACE\n\n");
 
-  WriteString(std::string("extern \"C\" US_ABI_EXPORT int us_init_resources_") + libName +
+  WriteString(std::string("extern \"C\" US_ABI_EXPORT int _us_init_resources_") + libName +
               "(US_PREPEND_NAMESPACE(ModuleInfo)* moduleInfo)\n");
   WriteString("{\n");
   WriteString("  US_PREPEND_NAMESPACE(RegisterResourceData)(0x01, moduleInfo, us_resource_tree, us_resource_name, us_resource_data);\n");

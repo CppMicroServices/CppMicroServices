@@ -209,6 +209,13 @@ void testBinaryResource(Module* module)
   US_TEST_CONDITION(png.eof(), "EOF check");
 }
 
+struct ResourceComparator {
+  bool operator()(const ModuleResource& mr1, const ModuleResource& mr2) const
+  {
+    return mr1 < mr2;
+  }
+};
+
 void testResourceTree(Module* module)
 {
   ModuleResource res = module->GetResource("");
@@ -236,19 +243,21 @@ void testResourceTree(Module* module)
   US_TEST_CONDITION(children[0] == "cppmicroservices.png", "Check child name")
   US_TEST_CONDITION(children[1] == "readme.txt", "Check child name")
 
+  ResourceComparator resourceComparator;
+
   // find all .txt files
-  std::vector<std::string> nodes = module->FindResources("", "*.txt", false);
-  std::sort(nodes.begin(), nodes.end());
+  std::vector<ModuleResource> nodes = module->FindResources("", "*.txt", false);
+  std::sort(nodes.begin(), nodes.end(), resourceComparator);
   US_TEST_CONDITION_REQUIRED(nodes.size() == 2, "Found child count")
-  US_TEST_CONDITION(nodes[0] == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[1] == "/special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(nodes[0].GetFilePath() == "/foo.txt", "Check child name")
+  US_TEST_CONDITION(nodes[1].GetFilePath() == "/special_chars.dummy.txt", "Check child name")
 
   nodes = module->FindResources("", "*.txt", true);
-  std::sort(nodes.begin(), nodes.end());
+  std::sort(nodes.begin(), nodes.end(), resourceComparator);
   US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
-  US_TEST_CONDITION(nodes[0] == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[1] == "/icons/readme.txt", "Check child name")
-  US_TEST_CONDITION(nodes[2] == "/special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(nodes[0].GetFilePath() == "/foo.txt", "Check child name")
+  US_TEST_CONDITION(nodes[1].GetFilePath() == "/icons/readme.txt", "Check child name")
+  US_TEST_CONDITION(nodes[2].GetFilePath() == "/special_chars.dummy.txt", "Check child name")
 
   // find all resources
   nodes = module->FindResources("", "", true);
@@ -260,7 +269,7 @@ void testResourceTree(Module* module)
   // test pattern matching
   nodes.clear();
   nodes = module->FindResources("/icons", "*micro*.png", false);
-  US_TEST_CONDITION(nodes.size() == 1 && nodes[0] == "/icons/cppmicroservices.png", "Check file pattern matches")
+  US_TEST_CONDITION(nodes.size() == 1 && nodes[0].GetFilePath() == "/icons/cppmicroservices.png", "Check file pattern matches")
 
   nodes.clear();
   nodes = module->FindResources("", "*.txt", true);

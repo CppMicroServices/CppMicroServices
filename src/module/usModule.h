@@ -184,7 +184,7 @@ public:
 
   ModuleResource GetResource(const std::string& name) const;
 
-  std::vector<std::string> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
+  std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 
 private:
 

@@ -48,8 +48,8 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
   US_TEST_CONDITION(res.GetBaseName() == baseName, "GetBaseName()")
   US_TEST_CONDITION(res.GetChildren().empty() == !children, "No children")
   US_TEST_CONDITION(res.GetCompleteBaseName() == completeBaseName, "GetCompleteBaseName()")
-  US_TEST_CONDITION(res.GetFileName() == completeBaseName + "." + suffix, "GetFileName()")
-  US_TEST_CONDITION(res.GetFilePath() == path + completeBaseName + "." + suffix, "GetFilePath()")
+  US_TEST_CONDITION(res.GetName() == completeBaseName + "." + suffix, "GetName()")
+  US_TEST_CONDITION(res.GetResourcePath() == path + completeBaseName + "." + suffix, "GetResourcePath()")
   US_TEST_CONDITION(res.GetPath() == path, "GetPath()")
   US_TEST_CONDITION(res.GetSize() == size, "Data size")
   US_TEST_CONDITION(res.GetSuffix() == suffix, "Suffix")
@@ -219,7 +219,7 @@ struct ResourceComparator {
 void testResourceTree(Module* module)
 {
   ModuleResource res = module->GetResource("");
-  US_TEST_CONDITION(res.GetFilePath() == "/", "Check root file path")
+  US_TEST_CONDITION(res.GetResourcePath() == "/", "Check root file path")
   US_TEST_CONDITION(res.IsDir() == true, "Check type")
 
   std::vector<std::string> children = res.GetChildren();
@@ -249,15 +249,15 @@ void testResourceTree(Module* module)
   std::vector<ModuleResource> nodes = module->FindResources("", "*.txt", false);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
   US_TEST_CONDITION_REQUIRED(nodes.size() == 2, "Found child count")
-  US_TEST_CONDITION(nodes[0].GetFilePath() == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[1].GetFilePath() == "/special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt", "Check child name")
+  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
 
   nodes = module->FindResources("", "*.txt", true);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
   US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
-  US_TEST_CONDITION(nodes[0].GetFilePath() == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[1].GetFilePath() == "/icons/readme.txt", "Check child name")
-  US_TEST_CONDITION(nodes[2].GetFilePath() == "/special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt", "Check child name")
+  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/icons/readme.txt", "Check child name")
+  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
 
   // find all resources
   nodes = module->FindResources("", "", true);
@@ -269,7 +269,7 @@ void testResourceTree(Module* module)
   // test pattern matching
   nodes.clear();
   nodes = module->FindResources("/icons", "*micro*.png", false);
-  US_TEST_CONDITION(nodes.size() == 1 && nodes[0].GetFilePath() == "/icons/cppmicroservices.png", "Check file pattern matches")
+  US_TEST_CONDITION(nodes.size() == 1 && nodes[0].GetResourcePath() == "/icons/cppmicroservices.png", "Check file pattern matches")
 
   nodes.clear();
   nodes = module->FindResources("", "*.txt", true);
@@ -307,7 +307,7 @@ void testResourceOperators(Module* module)
   // check operator<<
   std::ostringstream oss;
   oss << foo;
-  US_TEST_CONDITION(oss.str() == foo.GetFilePath(), "Check operator<<")
+  US_TEST_CONDITION(oss.str() == foo.GetResourcePath(), "Check operator<<")
 }
 
 void testResourceFromExecutable(Module* module)

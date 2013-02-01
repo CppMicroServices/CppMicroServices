@@ -54,9 +54,9 @@ public:
   bool IsValid() const;
   operator bool() const;
 
-  std::string GetFileName() const;
+  std::string GetName() const;
   std::string GetPath() const;
-  std::string GetFilePath() const;
+  std::string GetResourcePath() const;
 
   std::string GetBaseName() const;
   std::string GetCompleteBaseName() const;

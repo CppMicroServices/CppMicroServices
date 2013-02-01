@@ -138,12 +138,12 @@ ModuleResource& ModuleResource::operator =(const ModuleResource& resource)
 
 bool ModuleResource::operator <(const ModuleResource& resource) const
 {
-  return this->GetFilePath() < resource.GetFilePath();
+  return this->GetResourcePath() < resource.GetResourcePath();
 }
 
 bool ModuleResource::operator ==(const ModuleResource& resource) const
 {
-  return this->GetFilePath() == resource.GetFilePath();
+  return this->GetResourcePath() == resource.GetResourcePath();
 }
 
 bool ModuleResource::operator !=(const ModuleResource &resource) const
@@ -161,7 +161,7 @@ ModuleResource::operator bool() const
   return IsValid();
 }
 
-std::string ModuleResource::GetFileName() const
+std::string ModuleResource::GetName() const
 {
   return d->fileName;
 }
@@ -171,7 +171,7 @@ std::string ModuleResource::GetPath() const
   return d->path;
 }
 
-std::string ModuleResource::GetFilePath() const
+std::string ModuleResource::GetResourcePath() const
 {
   return d->filePath;
 }
@@ -229,7 +229,7 @@ const unsigned char* ModuleResource::GetData() const
 std::size_t ModuleResource::Hash() const
 {
   using namespace US_HASH_FUNCTION_NAMESPACE;
-  return US_HASH_FUNCTION(std::string, this->GetFilePath());
+  return US_HASH_FUNCTION(std::string, this->GetResourcePath());
 }
 
 US_END_NAMESPACE
@@ -238,5 +238,5 @@ US_USE_NAMESPACE
 
 std::ostream& operator<<(std::ostream& os, const ModuleResource& resource)
 {
-  return os << resource.GetFilePath();
+  return os << resource.GetResourcePath();
 }

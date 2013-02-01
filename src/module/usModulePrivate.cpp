@@ -129,6 +129,11 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
 ModulePrivate::~ModulePrivate()
 {
   delete moduleContext;
+
+  for (std::size_t i = 0; i < this->resourceTreePtrs.size(); ++i)
+  {
+    delete resourceTreePtrs[i];
+  }
 }
 
 void ModulePrivate::RemoveModuleResources()
@@ -160,9 +165,9 @@ void ModulePrivate::RemoveModuleResources()
     i->GetReference().d->UngetService(q, false);
   }
 
-  for (std::size_t i = 0; i < resourceTrees.size(); ++i)
+  for (std::size_t i = 0; i < resourceTreePtrs.size(); ++i)
   {
-    resourceTrees[i].Invalidate();
+    resourceTreePtrs[i]->Invalidate();
   }
 }
 
@@ -233,9 +238,9 @@ void ModulePrivate::InitializeResources(const std::string& location)
   assert(this->info.resourceNames.size() == this->info.resourceTree.size());
   for (std::size_t i = 0; i < this->info.resourceData.size(); ++i)
   {
-    resourceTrees.push_back(ModuleResourceTree(this->info.resourceTree[i],
-                                               this->info.resourceNames[i],
-                                               this->info.resourceData[i]));
+    resourceTreePtrs.push_back(new ModuleResourceTree(this->info.resourceTree[i],
+                                                      this->info.resourceNames[i],
+                                                      this->info.resourceData[i]));
   }
 }
 

@@ -35,7 +35,7 @@ class ModuleResourcePrivate
 public:
 
   ModuleResourcePrivate()
-    : resourceTree(NULL)
+    : associatedResourceTree(NULL)
     , node(-1)
     , size(0)
     , data(NULL)
@@ -47,7 +47,8 @@ public:
   std::string path;
   std::string filePath;
 
-  ModuleResourceTree* resourceTree;
+  std::vector<ModuleResourceTree*> resourceTrees;
+  const ModuleResourceTree* associatedResourceTree;
 
   int node;
   int32_t size;
@@ -74,10 +75,12 @@ ModuleResource::ModuleResource(const ModuleResource &resource)
   d->ref.Ref();
 }
 
-ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* resourceTree)
+ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* associatedResourceTree,
+                               const std::vector<ModuleResourceTree*>& resourceTrees)
   : d(new ModuleResourcePrivate)
 {
-  d->resourceTree = resourceTree;
+  d->resourceTrees = resourceTrees;
+  d->associatedResourceTree = associatedResourceTree;
 
   std::string file = _file;
   if (file.empty()) file = "/";
@@ -104,13 +107,13 @@ ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* res
 
   d->filePath = d->path + d->fileName;
 
-  d->node = d->resourceTree->FindNode(GetFilePath());
+  d->node = d->associatedResourceTree->FindNode(GetResourcePath());
   if (d->node != -1)
   {
-    d->isFile = !resourceTree->IsDir(d->node);
+    d->isFile = !associatedResourceTree->IsDir(d->node);
     if (d->isFile)
     {
-      d->data = d->resourceTree->GetData(d->node, &d->size);
+      d->data = d->associatedResourceTree->GetData(d->node, &d->size);
     }
   }
 }
@@ -150,7 +153,7 @@ bool ModuleResource::operator !=(const ModuleResource &resource) const
 
 bool ModuleResource::IsValid() const
 {
-  return d->resourceTree->IsValid() && d->node > -1;
+  return d->associatedResourceTree->IsValid() && d->node > -1;
 }
 
 ModuleResource::operator bool() const
@@ -205,7 +208,10 @@ std::vector<std::string> ModuleResource::GetChildren() const
 
   if (!d->children.empty()) return d->children;
 
-  d->resourceTree->GetChildren(d->node, d->children);
+  for (std::size_t i = 0; i < d->resourceTrees.size(); ++i)
+  {
+    d->resourceTrees[i]->GetChildren(d->node, d->children);
+  }
   return d->children;
 }
 

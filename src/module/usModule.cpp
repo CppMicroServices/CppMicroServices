@@ -229,12 +229,12 @@ std::string Module::GetProperty(const std::string& key) const
 ModuleResource Module::GetResource(const std::string &name) const
 {
   ModuleResource result;
-  if (d->resourceTrees.empty()) return result;
+  if (d->resourceTreePtrs.empty()) return result;
 
-  for (std::size_t i = 0; i < d->resourceTrees.size(); ++i)
+  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
   {
-    if (!d->resourceTrees[i].IsValid()) continue;
-    result = ModuleResource(name, &d->resourceTrees[i]);
+    if (!d->resourceTreePtrs[i]->IsValid()) continue;
+    result = ModuleResource(name, d->resourceTreePtrs[i], d->resourceTreePtrs);
     if (result) return result;
   }
   return result;
@@ -244,18 +244,18 @@ std::vector<ModuleResource> Module::FindResources(const std::string& path, const
                                                   bool recurse) const
 {
   std::vector<ModuleResource> result;
-  if (d->resourceTrees.empty()) return result;
+  if (d->resourceTreePtrs.empty()) return result;
 
-  for (std::size_t i = 0; i < d->resourceTrees.size(); ++i)
+  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
   {
-    if (!d->resourceTrees[i].IsValid()) continue;
+    if (!d->resourceTreePtrs[i]->IsValid()) continue;
 
     std::vector<std::string> nodes;
-    d->resourceTrees[i].FindNodes(path, filePattern, recurse, nodes);
+    d->resourceTreePtrs[i]->FindNodes(path, filePattern, recurse, nodes);
     for (std::vector<std::string>::iterator nodeIter = nodes.begin();
          nodeIter != nodes.end(); ++nodeIter)
     {
-      result.push_back(ModuleResource(*nodeIter, &d->resourceTrees[i]));
+      result.push_back(ModuleResource(*nodeIter, d->resourceTreePtrs[i], d->resourceTreePtrs));
     }
   }
   return result;

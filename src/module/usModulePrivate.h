@@ -73,7 +73,7 @@ public:
 
   ModuleInfo info;
 
-  std::vector<ModuleResourceTree> resourceTrees;
+  std::vector<ModuleResourceTree*> resourceTreePtrs;
 
   /**
    * ModuleContext for the module

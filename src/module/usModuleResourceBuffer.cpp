@@ -66,13 +66,13 @@ ModuleResourceBuffer::ModuleResourceBuffer(const unsigned char* data, std::size_
   : d(NULL)
 {
   assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
-  assert(data != NULL);
+  // assert(data != NULL);
 
   const char* begin = reinterpret_cast<const char*>(data);
   std::size_t size = _size;
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-  if (!(mode & std::ios_base::binary) && begin[0] == '\r')
+  if (data != NULL && !(mode & std::ios_base::binary) && begin[0] == '\r')
   {
     ++begin;
     --size;
@@ -80,7 +80,7 @@ ModuleResourceBuffer::ModuleResourceBuffer(const unsigned char* data, std::size_
 #endif
 
 #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
-  if(!(mode & std::ios_base::binary) && begin[size-1] == '\n')
+  if(data != NULL && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
   {
     --size;
   }

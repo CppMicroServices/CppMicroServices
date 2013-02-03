@@ -54,6 +54,13 @@ struct ResourceComparator {
   }
 };
 
+void testResourceOperators(Module* module)
+{
+  std::vector<ModuleResource> resources = module->FindResources("", "res.txt", false);
+  US_TEST_CONDITION_REQUIRED(resources.size() == 2, "Check resource count")
+  US_TEST_CONDITION(resources[0] != resources[1], "Check non-equality for equally named resources")
+}
+
 void testResourcesWithStaticImport(Module* module)
 {
   ModuleResource resource = module->GetResource("res.txt");
@@ -128,6 +135,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
   Module* module = mc->GetModule();
 #endif
 
+  testResourceOperators(module);
   testResourcesWithStaticImport(module);
 
 #ifdef US_BUILD_SHARED_LIBS

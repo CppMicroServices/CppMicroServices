@@ -226,18 +226,20 @@ std::string Module::GetProperty(const std::string& key) const
   return d->properties[key];
 }
 
-ModuleResource Module::GetResource(const std::string &name) const
+ModuleResource Module::GetResource(const std::string& path) const
 {
-  ModuleResource result;
-  if (d->resourceTreePtrs.empty()) return result;
+  if (d->resourceTreePtrs.empty())
+  {
+    return ModuleResource();
+  }
 
   for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
   {
     if (!d->resourceTreePtrs[i]->IsValid()) continue;
-    result = ModuleResource(name, d->resourceTreePtrs[i], d->resourceTreePtrs);
+    ModuleResource result(path, d->resourceTreePtrs[i], d->resourceTreePtrs);
     if (result) return result;
   }
-  return result;
+  return ModuleResource();
 }
 
 std::vector<ModuleResource> Module::FindResources(const std::string& path, const std::string& filePattern,

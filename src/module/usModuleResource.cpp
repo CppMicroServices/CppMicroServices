@@ -143,7 +143,8 @@ bool ModuleResource::operator <(const ModuleResource& resource) const
 
 bool ModuleResource::operator ==(const ModuleResource& resource) const
 {
-  return this->GetResourcePath() == resource.GetResourcePath();
+  return d->associatedResourceTree == resource.d->associatedResourceTree &&
+      this->GetResourcePath() == resource.GetResourcePath();
 }
 
 bool ModuleResource::operator !=(const ModuleResource &resource) const
@@ -153,7 +154,7 @@ bool ModuleResource::operator !=(const ModuleResource &resource) const
 
 bool ModuleResource::IsValid() const
 {
-  return d->associatedResourceTree->IsValid() && d->node > -1;
+  return d->associatedResourceTree && d->associatedResourceTree->IsValid() && d->node > -1;
 }
 
 ModuleResource::operator bool() const

@@ -137,6 +137,28 @@ void testTextResourceAsBinary(Module* module)
   US_TEST_CONDITION(content == fileData, "Resource content");
 }
 
+void testInvalidResource(Module* module)
+{
+  ModuleResource res = module->GetResource("invalid");
+  US_TEST_CONDITION_REQUIRED(res.IsValid() == false, "Check invalid resource")
+  US_TEST_CONDITION(res.GetName().empty(), "Check empty name")
+  US_TEST_CONDITION(res.GetPath().empty(), "Check empty path")
+  US_TEST_CONDITION(res.GetResourcePath().empty(), "Check empty resource path")
+  US_TEST_CONDITION(res.GetBaseName().empty(), "Check empty base name")
+  US_TEST_CONDITION(res.GetCompleteBaseName().empty(), "Check empty complete base name")
+  US_TEST_CONDITION(res.GetSuffix().empty(), "Check empty suffix")
+
+  US_TEST_CONDITION(res.GetChildren().empty(), "Check empty children")
+  US_TEST_CONDITION(res.GetSize() == 0, "Check zero size")
+  US_TEST_CONDITION(res.GetData() == NULL, "Check NULL data")
+
+  ModuleResourceStream rs(res);
+  US_TEST_CONDITION(rs.good() == true, "Check invalid resource stream")
+  rs.ignore();
+  US_TEST_CONDITION(rs.good() == false, "Check invalid resource stream")
+  US_TEST_CONDITION(rs.eof() == true, "Check invalid resource stream")
+}
+
 void testSpecialCharacters(Module* module)
 {
   ModuleResource res = module->GetResource("special_chars.dummy.txt");
@@ -354,6 +376,7 @@ void testResourceOperators(Module* module)
   ModuleResource foo = module->GetResource("foo.txt");
   US_TEST_CONDITION_REQUIRED(foo.IsValid() && foo, "Check valid resource")
   ModuleResource foo2(foo);
+  US_TEST_CONDITION(foo == foo, "Check equality operator")
   US_TEST_CONDITION(foo == foo2, "Check copy constructor and equality operator")
   US_TEST_CONDITION(foo != invalid, "Check inequality with invalid resource")
 
@@ -420,6 +443,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_CONDITION(moduleR->GetName() == "TestModuleR Module", "Test module name")
 
+  testInvalidResource(moduleR);
   testResourceTree(moduleR);
   testResourceFromExecutable(mc->GetModule());
 #else

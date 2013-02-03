@@ -193,6 +193,12 @@ std::string ModuleResource::GetSuffix() const
   return index < d->fileName.size()-1 ? d->fileName.substr(index+1) : std::string("");
 }
 
+std::string ModuleResource::GetCompleteSuffix() const
+{
+  std::size_t index = d->fileName.find_first_of('.');
+  return index < d->fileName.size()-1 ? d->fileName.substr(index+1) : std::string("");
+}
+
 bool ModuleResource::IsDir() const
 {
   return !d->isFile;

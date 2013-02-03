@@ -42,6 +42,7 @@ namespace {
 void checkResourceInfo(const ModuleResource& res, const std::string& path,
                        const std::string& baseName,
                        const std::string& completeBaseName, const std::string& suffix,
+                       const std::string& completeSuffix,
                        int size, bool children = false)
 {
   US_TEST_CONDITION_REQUIRED(res.IsValid(), "Valid resource")
@@ -53,17 +54,18 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
   US_TEST_CONDITION(res.GetPath() == path, "GetPath()")
   US_TEST_CONDITION(res.GetSize() == size, "Data size")
   US_TEST_CONDITION(res.GetSuffix() == suffix, "Suffix")
+  US_TEST_CONDITION(res.GetCompleteSuffix() == completeSuffix, "Complete suffix")
 }
 
 void testTextResource(Module* module)
 {
   ModuleResource res = module->GetResource("foo.txt");
 #ifdef US_PLATFORM_WINDOWS
-  checkResourceInfo(res, "/", "foo", "foo", "txt", 16, false);
+  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 16, false);
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
 #else
-  checkResourceInfo(res, "/", "foo", "foo", "txt", 13, false);
+  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 13, false);
   const std::streampos ssize(12);
   const std::string fileData = "foo and\nbar\n";
 #endif
@@ -108,11 +110,11 @@ void testTextResourceAsBinary(Module* module)
   ModuleResource res = module->GetResource("foo.txt");
 
 #ifdef US_PLATFORM_WINDOWS
-  checkResourceInfo(res, "/", "foo", "foo", "txt", 16, false);
+  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 16, false);
   const std::streampos ssize(16);
   const std::string fileData = "foo and\r\nbar\r\n\r\n";
 #else
-  checkResourceInfo(res, "/", "foo", "foo", "txt", 13, false);
+  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 13, false);
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
 #endif
@@ -163,11 +165,11 @@ void testSpecialCharacters(Module* module)
 {
   ModuleResource res = module->GetResource("special_chars.dummy.txt");
 #ifdef US_PLATFORM_WINDOWS
-  checkResourceInfo(res, "/", "special_chars", "special_chars.dummy", "txt", 56, false);
+  checkResourceInfo(res, "/", "special_chars", "special_chars.dummy", "txt", "dummy.txt", 56, false);
   const std::streampos ssize(54);
   const std::string fileData = "German Füße (feet)\nFrench garçon de café (waiter)\n";
 #else
-  checkResourceInfo(res, "/", "special_chars", "special_chars.dummy", "txt", 54, false);
+  checkResourceInfo(res, "/", "special_chars", "special_chars.dummy", "txt", "dummy.txt", 54, false);
   const std::streampos ssize(53);
   const std::string fileData = "German Füße (feet)\nFrench garçon de café (waiter)";
 #endif
@@ -194,7 +196,7 @@ void testSpecialCharacters(Module* module)
 void testBinaryResource(Module* module)
 {
   ModuleResource res = module->GetResource("/icons/cppmicroservices.png");
-  checkResourceInfo(res, "/icons/", "cppmicroservices", "cppmicroservices", "png", 2424, false);
+  checkResourceInfo(res, "/icons/", "cppmicroservices", "cppmicroservices", "png", "png", 2424, false);
 
   ModuleResourceStream rs(res, std::ios_base::binary);
   rs.seekg(0, std::ios_base::end);

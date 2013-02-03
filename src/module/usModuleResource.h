@@ -62,6 +62,7 @@ public:
   std::string GetCompleteBaseName() const;
   std::string GetSuffix() const;
 
+  std::string GetCompleteSuffix() const;
   bool IsDir() const;
   bool IsFile() const;
 

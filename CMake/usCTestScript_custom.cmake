@@ -14,7 +14,7 @@ set(CTEST_PARALLEL_LEVEL 4)
 set(US_TEST_SHARED 1)
 set(US_TEST_STATIC 1)
 
-set(US_SOURCE_DIR "/home/sascha/git/CppMicroServices")
+set(US_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../")
 
 set(US_BUILD_CONFIGURATION )
 foreach(i RANGE 31)

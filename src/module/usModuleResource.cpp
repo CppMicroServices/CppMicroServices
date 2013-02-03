@@ -215,9 +215,22 @@ std::vector<std::string> ModuleResource::GetChildren() const
 
   if (!d->children.empty()) return d->children;
 
+  bool indexPastAssociatedResTree = false;
   for (std::size_t i = 0; i < d->resourceTrees.size(); ++i)
   {
-    d->resourceTrees[i]->GetChildren(d->node, d->children);
+    if (d->resourceTrees[i] == d->associatedResourceTree)
+    {
+      indexPastAssociatedResTree = true;
+      d->associatedResourceTree->GetChildren(d->node, d->children);
+    }
+    else if (indexPastAssociatedResTree)
+    {
+      int nodeIndex = d->resourceTrees[i]->FindNode(GetPath());
+      if (nodeIndex > -1)
+      {
+        d->resourceTrees[i]->GetChildren(d->node, d->children);
+      }
+    }
   }
   return d->children;
 }

@@ -198,7 +198,7 @@ private:
   US_HASH_FUNCTION_FRIEND(ServiceReference);
 
   std::size_t Hash() const;
-  
+
   ServiceReference(ServiceRegistrationPrivate* reg);
 
   ServiceReferencePrivate* d;
@@ -209,6 +209,9 @@ US_END_NAMESPACE
 
 US_MSVC_POP_WARNING
 
+/**
+ * \ingroup MicroServices
+ */
 US_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceReference)& serviceRef);
 
 US_HASH_FUNCTION_NAMESPACE_BEGIN

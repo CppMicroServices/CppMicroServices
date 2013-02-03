@@ -24,6 +24,8 @@
 #!        auto-loading will be disabled for this module.
 #! \param DEPENDS (optional) A string containing module dependencies.
 #! \param VERSION (optional) A version string for the module.
+#! \param EXECUTABLE (flag) A flag indicating that the initialization code is intended for
+#! an executable.
 #!
 function(usFunctionGenerateModuleInit src_var)
 
@@ -43,7 +45,7 @@ if(NOT US_MODULE_LIBRARY_NAME AND NOT US_MODULE_EXECUTABLE)
   set(US_MODULE_LIBRARY_NAME ${US_MODULE_NAME})
 endif()
 
-set(_regex_validation "[a-zA-Z-_][a-zA-Z-_0-9]*")
+set(_regex_validation "[a-zA-Z_-][a-zA-Z_0-9-]*")
 if(US_MODULE_EXECUTABLE)
   string(REGEX MATCH ${_regex_validation} _valid_chars ${US_MODULE_NAME})
   if(NOT _valid_chars STREQUAL US_MODULE_NAME)

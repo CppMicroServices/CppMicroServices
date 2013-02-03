@@ -1,3 +1,31 @@
+#! Embed resources into a shared library or executable.
+#!
+#! This CMake function uses an external command line program to generate a source
+#! file containing data from external resources such as text files or images. The path
+#! to the generated source file is appended to the \c src_var variable.
+#!
+#! Each module can call this function (at most once) to embed resources and make them
+#! available at runtime through the Module class. Resources can also be embedded into
+#! executables, using the EXECUTABLE_NAME argument instead of LIBRARY_NAME.
+#!
+#! Example usage:
+#! \verbatim
+#! set(module_srcs )
+#! usFunctionEmbedResources(module_srcs
+#!                          LIBRARY_NAME "mylib"
+#!                          ROOT_DIR resources
+#!                          FILES config.properties logo.png
+#!                         )
+#!
+#! \param LIBRARY_NAME (required if EXECUTABLE_NAME is empty) The library name of the module
+#!        which will include the generated source file, without extension.
+#! \param EXECUTABLE_NAME (required if LIBRARY_NAME is empty) The name of the executable
+#!        which will include the generated source file.
+#! \param ROOT_DIR (optional) The root path for all resources listed after the FILES argument.
+#!        If no or a relative path is given, it is considered relativ to the current CMake source directory.
+#! \param FILES (optional) A list of resources (paths to external files in the file system) relative
+#!        to the ROOT_DIR argument or the current CMake source directory if ROOT_DIR is empty.
+#!
 function(usFunctionEmbedResources src_var)
 
   MACRO_PARSE_ARGUMENTS(US_RESOURCE "LIBRARY_NAME;EXECUTABLE_NAME;ROOT_DIR;FILES" "" ${ARGN})

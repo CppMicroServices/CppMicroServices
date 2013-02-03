@@ -1,7 +1,7 @@
 Static Modules    {#MicroServices_StaticModules}
 ==============
 
-The normal and most flexible way to include a CppMicroServices module with an application is to compile
+The normal and most flexible way to include a CppMicroServices module in an application is to compile
 it into a shared library that is either linked by another library (or executable) or
 \ref MicroServices_AutoLoading "auto-loaded" during runtime.
 
@@ -25,13 +25,16 @@ somewhere in its source code. This ensures the availability of a module context 
 imported static libraries (see also \ref MicroServices_StaticModules_Context).
 
 \note Note that if your static module does not export a module activator by using the macro
-`#US_EXPORT_MODULE_ACTIVATOR` you do not need to put the special import macros explained below into
+`#US_EXPORT_MODULE_ACTIVATOR` or does not contain embedded resources (see \ref MicroServices_Resources) you
+do not need to put the special import macros explained below into
 your code. You can use and link the static module just like any other static library.
 
 For every static module you would like to import, you need to put a call to `#US_IMPORT_MODULE` into the
-source code of the importing library. Addidtionally, you need a call to `#US_LOAD_IMPORTED_MODULES`
+source code of the importing library. To make the static module's resources available to the importing module,
+you must also call `#US_IMPORT_MODULE_RESOURCES`. Addidtionally, you need a call to `#US_LOAD_IMPORTED_MODULES`
 which contains a space-deliminated list of module names in the importing libaries source code. This ensures
-that the module activators of the imported static modules are called appropriately.
+that the module activators of the imported static modules (if they exist) are called appropriately and that
+the embedded resources are registered with the importing module.
 
 \note When importing a static module into another static module, the call to `#US_LOAD_IMPORTED_MODULES` in
 the importing static module will have no effect. This macro can only be used in shared modules or executables.

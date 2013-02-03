@@ -35,6 +35,7 @@ This is a list of available examples:
 This is a list of available tutorials:
 
 - \subpage MicroServices_TheModuleContext
+- \subpage MicroServices_Resources
 - \subpage MicroServices_EmulateSingleton
 - \subpage MicroServices_AutoLoading
 - \subpage MicroServices_StaticModules

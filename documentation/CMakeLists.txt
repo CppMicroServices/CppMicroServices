@@ -36,9 +36,9 @@ if(NOT US_IS_EMBEDDED)
                      ${CMAKE_CURRENT_BINARY_DIR}/footer.html COPY_ONLY)
       set(US_DOXYGEN_FOOTER footer.html)
 
-      configure_file(doxygen/doxygen.css
-                     ${CMAKE_CURRENT_BINARY_DIR}/doxygen.css COPY_ONLY)
-      set(US_DOXYGEN_CSS doxygen.css)
+      configure_file(doxygen/doxygen_extra.css
+                     ${CMAKE_CURRENT_BINARY_DIR}/doxygen_extra.css COPY_ONLY)
+      set(US_DOXYGEN_EXTRA_CSS doxygen_extra.css)
       
       set(US_DOXYGEN_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/gh-pages)
       if(${PROJECT_NAME}_MINOR_VERSION EQUAL 99)

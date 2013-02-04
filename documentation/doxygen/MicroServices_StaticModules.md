@@ -10,13 +10,13 @@ of your application less error-prone and in the case of a complete static build 
 size and start-up time. The disadvantage is that no functionality can be added without a rebuild and
 redistribution of the application.
 
-## Creating Static Modules
+# Creating Static Modules
 
 Static modules are written just like shared modules - there are no differences in the usage of the
 CppMicroServices API or the provided preprocessor macros. The only thing you need to make sure is that
 the `US_STATIC_MODULE` preprocessor macro is defined when building a module statically.
 
-## Using Static Modules
+# Using Static Modules
 
 Static modules can be used (imported) in shared or other static libraries or in the executable itself.
 Assuming that a static module makes use of the CppMicroServices API (e.g. by registering some services
@@ -41,7 +41,7 @@ the importing static module will have no effect. This macro can only be used in 
 
 There are two main usage scenarios which are explained below together with some example code.
 
-### Using a Shared CppMicroServices Library
+## Using a Shared CppMicroServices Library
 
 Building the CppMicroServices library as a shared library allows you to import static modules into other
 shared or static modules or into the executable. As noted above, the importing shared module or executable
@@ -64,7 +64,7 @@ Having a shared CppMicroServices library, the executable also needs some initial
 Note that shared (but not static) modules also need the `#US_INITIALIZE_MODULE` call when importing static modules,
 but can omit the US_BUILD_SHARED_LIBS guard.
 
-### Using a Static CppMicroServices Library
+## Using a Static CppMicroServices Library
 
 The CppMicroServices library can be build as a static library. In that case, creating shared modules is not supported.
 If you create shared modules which link a static version of the CppMicroServices library, the runtime behavior is
@@ -78,7 +78,7 @@ import all the static modules, just like above:
 However, it can omit the `#US_INITIALIZE_MODULE` macro call (the module context from the CppMicroServices library
 will be shared across all modules and the executable).
 
-## A Note About The Module Context    {#MicroServices_StaticModules_Context}
+# A Note About The Module Context    {#MicroServices_StaticModules_Context}
 
 Modules using the CppMicroServices API frequently need a `ModuleContext` object to query, retrieve, and register services.
 Static modules will never get their own module context but will share the context with their importing module or

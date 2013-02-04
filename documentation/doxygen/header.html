@@ -5,23 +5,20 @@ title: $title
 
   <head>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    
-    <link href="$relpath$doxygen.css" rel="stylesheet" type="text/css" />
+    <!--BEGIN PROJECT_NAME--><title>$projectname: $title</title><!--END PROJECT_NAME-->
+    <!--BEGIN !PROJECT_NAME--><title>$title</title><!--END !PROJECT_NAME-->
+    <link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="$relpath^jquery.js"></script>
+    <script type="text/javascript" src="$relpath^dynsections.js"></script>
     
     $treeview
     $search
     $mathjax
-    
-    <style>
-      #MSearchField { height: 14px; }
-      #MSearchClose { top: 1px; }
-    </style>
+
+    <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
+    $extrastylesheet
 
   </head>
 
-  <div class="doxygen-header" id="top"><!-- do not remove this div! -->
+  <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
   

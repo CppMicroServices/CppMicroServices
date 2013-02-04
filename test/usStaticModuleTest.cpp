@@ -154,7 +154,7 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticModuleTest");
 
   ModuleContext* mc = GetModuleContext();
-  TestModuleListener listener(mc);
+  TestModuleListener listener;
 
   try
   {

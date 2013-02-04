@@ -35,7 +35,7 @@ class TestModuleListener {
 
 public:
 
-  TestModuleListener(ModuleContext* mc);
+  TestModuleListener();
 
   void ModuleChanged(const ModuleEvent event);
 
@@ -58,8 +58,6 @@ public:
                            const std::vector<ServiceEvent>& seEvts);
 
 private:
-
-  ModuleContext* const mc;
 
   std::vector<ServiceEvent> serviceEvents;
   std::vector<ModuleEvent> moduleEvents;

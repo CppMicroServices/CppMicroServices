@@ -42,7 +42,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
 {
   ModuleContext* mc = GetModuleContext();
   assert(mc);
-  TestModuleListener listener(mc);
+  TestModuleListener listener;
 
   try
   {
@@ -101,7 +101,7 @@ void testCustomAutoLoadPath()
 {
   ModuleContext* mc = GetModuleContext();
   assert(mc);
-  TestModuleListener listener(mc);
+  TestModuleListener listener;
 
   try
   {

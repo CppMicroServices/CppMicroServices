@@ -25,8 +25,8 @@
 
 US_BEGIN_NAMESPACE
 
-TestModuleListener::TestModuleListener(ModuleContext* mc)
-  : mc(mc), serviceEvents(), moduleEvents()
+TestModuleListener::TestModuleListener()
+  : serviceEvents(), moduleEvents()
 {}
 
 void TestModuleListener::ModuleChanged(const ModuleEvent event)

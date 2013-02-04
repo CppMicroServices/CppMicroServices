@@ -44,8 +44,8 @@ void frame02a()
 {
   ModuleContext* mc = GetModuleContext();
 
-  TestModuleListener listener1(mc);
-  TestModuleListener listener2(mc);
+  TestModuleListener listener1;
+  TestModuleListener listener2;
 
   try
   {
@@ -278,7 +278,7 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
   frame02a();
 
   ModuleContext* mc = GetModuleContext();
-  TestModuleListener listener(mc);
+  TestModuleListener listener;
 
   try
   {

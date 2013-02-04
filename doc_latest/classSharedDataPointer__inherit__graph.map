@@ -1,4 +1,4 @@
-<map id="G" name="G">
+<map id="SharedDataPointer&lt; T &gt;" name="SharedDataPointer&lt; T &gt;">
 <area shape="rect" id="node3" href="$classSharedDataPointer.html" title="SharedDataPointer\&lt;\l ServiceEventData \&gt;" alt="" coords="384,5,539,51"/>
 <area shape="rect" id="node5" href="$classSharedDataPointer.html" title="SharedDataPointer\&lt;\l LDAPFilterData \&gt;" alt="" coords="384,74,539,121"/>
 <area shape="rect" id="node7" href="$classSharedDataPointer.html" title="SharedDataPointer\&lt;\l ModuleEventData \&gt;" alt="" coords="384,143,539,190"/>

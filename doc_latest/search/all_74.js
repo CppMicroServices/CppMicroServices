@@ -1,7 +1,8 @@
 var searchData=
 [
   ['the_20c_2b_2b_20micro_20services',['The C++ Micro Services',['../index.html',1,'']]],
-  ['the_20_25module_20context',['The %Module Context',['../MicroServices_TheModuleContext.html',1,'MicroServices_Tutorials']]],
+  ['the_20resources_20system',['The Resources System',['../MicroServices_Resources.html',1,'MicroServices_Tutorials']]],
+  ['the_20module_20context',['The Module Context',['../MicroServices_TheModuleContext.html',1,'MicroServices_Tutorials']]],
   ['tutorials',['Tutorials',['../MicroServices_Tutorials.html',1,'']]],
   ['tostring',['ToString',['../classModuleVersion.html#a9cc93801954016f9fda82b344bbe6c3f',1,'ModuleVersion::ToString()'],['../classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb',1,'LDAPFilter::ToString()'],['../classAny.html#a1e02a2c71be43374cd168bcb5636a969',1,'Any::ToString()']]],
   ['trackingmap',['TrackingMap',['../classServiceTracker.html#ac5508ec6dc88a5729a8c51388341f2b0',1,'ServiceTracker']]],

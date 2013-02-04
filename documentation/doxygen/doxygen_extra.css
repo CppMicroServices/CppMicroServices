@@ -85,11 +85,6 @@ div.qindex, div.navtab {
   border: 1px solid #e6e6e6;
 }
 
-div.qindex, div.navpath {
-  padding: 0 10px;
-  line-height: 100%;
-}
-
 h2.groupheader {
   border: none;
   font-size: 120%;
@@ -132,6 +127,7 @@ div.ah {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   background-image: none;
+  color: #333333;
 }
 
 td.indexkey, td.indexvalue {

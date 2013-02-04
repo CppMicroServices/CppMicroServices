@@ -734,7 +734,9 @@ EXCLUDE_PATTERNS       = */.git/* \
 
 EXCLUDE_SYMBOLS        = us \
                          US_NAMESPACE \
-                         *Private*
+                         *Private* \
+                         ModuleInfo \
+                         TrackedService*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see

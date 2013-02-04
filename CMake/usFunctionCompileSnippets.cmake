@@ -32,6 +32,7 @@ function(usFunctionCompileSnippets snippet_path)
     string(REPLACE "/" ";" main_cpp_dir_tokens "${main_cpp_dir}")
     list(GET main_cpp_dir_tokens -1 snippet_exec_name)
     set(snippet_target_name "Snippet-${snippet_exec_name}")
+
     add_executable(${snippet_target_name} ${snippet_src_files})
     if(ARGN)
       target_link_libraries(${snippet_target_name} ${ARGN} ${snippet_link_libraries})

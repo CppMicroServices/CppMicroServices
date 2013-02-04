@@ -40,7 +40,7 @@ function(usFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   # the cost of compiling the test each time the project is configured, the variable set by
   # the macro is added to the cache so that following invocation of the macro with
   # the same variable name skip the compilation step.
-  # For that same reason, ctkFunctionCheckCompilerFlags function appends a unique suffix to
+  # For that same reason, usFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_FLAG variable. This suffix is created using a 'clean version' of the flag to test.
   string(REGEX REPLACE "-\\s\\$\\+\\*\\{\\}\\(\\)\\#" "" suffix ${CXX_FLAG_TO_TEST})
   CHECK_CXX_ACCEPTS_FLAG(${_test_flag} HAS_FLAG_${suffix})

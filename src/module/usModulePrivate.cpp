@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <cassert>
 
 US_BEGIN_NAMESPACE
 
@@ -39,8 +40,37 @@ AtomicInt ModulePrivate::idCounter;
 
 ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
-  : coreCtx(coreCtx), info(*info), moduleContext(0), moduleActivator(0), q(qq)
+  : coreCtx(coreCtx)
+  , info(*info)
+  , moduleContext(0)
+  , moduleActivator(0)
+  , q(qq)
 {
+  // Parse the statically imported module library names
+  typedef const char*(*GetImportedModulesFunc)(void);
+
+  std::string getImportedModulesSymbol("_us_get_imported_modules_for_");
+  getImportedModulesSymbol += this->info.libName;
+
+  std::string location = this->info.location;
+  if (this->info.libName.empty())
+  {
+    /* make sure we retrieve symbols from the executable, if "libName" is empty */
+    location.clear();
+  }
+
+  GetImportedModulesFunc getImportedModulesFunc = reinterpret_cast<GetImportedModulesFunc>(
+        ModuleUtils::GetSymbol(location, getImportedModulesSymbol.c_str()));
+  if (getImportedModulesFunc != NULL)
+  {
+    std::string importedStaticModuleLibNames = getImportedModulesFunc();
+
+    std::istringstream iss(importedStaticModuleLibNames);
+    std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              std::back_inserter<std::vector<std::string> >(this->staticModuleLibNames));
+  }
+
+  InitializeResources(location);
 
   std::stringstream propId;
   propId << this->info.id;
@@ -48,7 +78,6 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
 
   std::stringstream propModuleDepends;
   std::stringstream propLibDepends;
-  std::stringstream propPackageDepends;
 
   int counter = 0;
   int counter2 = 0;
@@ -100,6 +129,11 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
 ModulePrivate::~ModulePrivate()
 {
   delete moduleContext;
+
+  for (std::size_t i = 0; i < this->resourceTreePtrs.size(); ++i)
+  {
+    delete resourceTreePtrs[i];
+  }
 }
 
 void ModulePrivate::RemoveModuleResources()
@@ -130,39 +164,29 @@ void ModulePrivate::RemoveModuleResources()
   {
     i->GetReference().d->UngetService(q, false);
   }
+
+  for (std::size_t i = 0; i < resourceTreePtrs.size(); ++i)
+  {
+    resourceTreePtrs[i]->Invalidate();
+  }
 }
 
 void ModulePrivate::StartStaticModules()
 {
-  typedef const char*(*GetImportedModulesFunc)(void);
-
-  std::string getImportedModulesSymbol("_us_get_imported_modules_for_");
-  getImportedModulesSymbol += info.libName;
-
-  std::string location = info.location;
-  if (info.libName.empty())
+  std::string location = this->info.location;
+  if (this->info.libName.empty())
   {
     /* make sure we retrieve symbols from the executable, if "libName" is empty */
     location.clear();
   }
-
-  GetImportedModulesFunc getImportedModulesFunc = reinterpret_cast<GetImportedModulesFunc>(ModuleUtils::GetSymbol(location,getImportedModulesSymbol.c_str()));
-
-  if (getImportedModulesFunc == NULL) return;
-
-  std::string importedStaticModuleLibNames = getImportedModulesFunc();
-
-  std::vector<std::string> staticModuleLibNames;
-  std::istringstream iss(importedStaticModuleLibNames);
-  std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
-            std::back_inserter<std::vector<std::string> >(staticModuleLibNames));
 
   for (std::vector<std::string>::iterator i = staticModuleLibNames.begin();
        i != staticModuleLibNames.end(); ++i)
   {
     std::string staticActivatorSymbol = "_us_module_activator_instance_";
     staticActivatorSymbol += *i;
-    ModuleInfo::ModuleActivatorHook staticActivator = reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str()));
+    ModuleInfo::ModuleActivatorHook staticActivator =
+        reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str()));
     if (staticActivator)
     {
       US_DEBUG << "Loading static activator " << *i;
@@ -171,9 +195,10 @@ void ModulePrivate::StartStaticModules()
     }
     else
     {
-      US_WARN << "Could not find an activator for the static module " << (*i)
-              << ". You either forgot a US_IMPORT_MODULE macro call in " << info.libName
-              << " or to link " << (*i) << " to " << info.libName << ".";
+      US_DEBUG << "Could not find an activator for the static module " << (*i)
+               << ". It propably does not provide an activator on purpose.\n Or you either "
+                  "forgot a US_IMPORT_MODULE macro call in " << info.libName
+               << " or to link " << (*i) << " to " << info.libName << ".";
     }
   }
 
@@ -185,6 +210,37 @@ void ModulePrivate::StopStaticModules()
        i != staticActivators.end(); ++i)
   {
     (*i)()->Unload(moduleContext);
+  }
+}
+
+void ModulePrivate::InitializeResources(const std::string& location)
+{
+  // Get the resource data from static modules and this module
+  std::vector<std::string> moduleLibNames;
+  moduleLibNames.push_back(this->info.libName);
+  moduleLibNames.insert(moduleLibNames.end(),
+                        this->staticModuleLibNames.begin(), this->staticModuleLibNames.end());
+
+  std::string initResourcesSymbolPrefix = "_us_init_resources_";
+  for (std::size_t i = 0; i < moduleLibNames.size(); ++i)
+  {
+    std::string initResourcesSymbol = initResourcesSymbolPrefix + moduleLibNames[i];
+    ModuleInfo::InitResourcesHook initResourcesFunc = reinterpret_cast<ModuleInfo::InitResourcesHook>(
+          ModuleUtils::GetSymbol(location, initResourcesSymbol.c_str()));
+    if (initResourcesFunc)
+    {
+      initResourcesFunc(&this->info);
+    }
+  }
+
+  // Initialize this modules resource trees
+  assert(this->info.resourceData.size() == this->info.resourceNames.size());
+  assert(this->info.resourceNames.size() == this->info.resourceTree.size());
+  for (std::size_t i = 0; i < this->info.resourceData.size(); ++i)
+  {
+    resourceTreePtrs.push_back(new ModuleResourceTree(this->info.resourceTree[i],
+                                                      this->info.resourceNames[i],
+                                                      this->info.resourceData[i]));
   }
 }
 

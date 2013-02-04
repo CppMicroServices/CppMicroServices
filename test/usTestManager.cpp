@@ -63,10 +63,16 @@ US_END_NAMESPACE
 US_IMPORT_MODULE(TestModuleA)
 US_IMPORT_MODULE(TestModuleA2)
 US_IMPORT_MODULE(TestModuleB)
+US_IMPORT_MODULE_RESOURCES(TestModuleB)
+US_IMPORT_MODULE(TestModuleR)
+US_IMPORT_MODULE_RESOURCES(TestModuleR)
 US_IMPORT_MODULE(TestModuleS)
 US_IMPORT_MODULE(TestModuleSL1)
 US_IMPORT_MODULE(TestModuleSL3)
 US_IMPORT_MODULE(TestModuleSL4)
 
-US_LOAD_IMPORTED_MODULES_INTO_MAIN(TestModuleA TestModuleA2 TestModuleB TestModuleImportedByB TestModuleS TestModuleSL1 TestModuleSL3 TestModuleSL4)
+US_LOAD_IMPORTED_MODULES_INTO_MAIN(
+    TestModuleA TestModuleA2 TestModuleB TestModuleImportedByB TestModuleR
+    TestModuleS TestModuleSL1 TestModuleSL3 TestModuleSL4
+    )
 #endif

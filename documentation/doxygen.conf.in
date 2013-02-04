@@ -1524,7 +1524,8 @@ PREDEFINED             = US_PREPEND_NAMESPACE(x)=x \
                          US_END_NAMESPACE= \
                          "US_BASECLASS_NAME=@US_BASECLASS_NAME@" \
                          US_EXPORT= \
-                         US_ABI_LOCAL=
+                         US_ABI_LOCAL= \
+                         US_MSVC_POP_WARNING=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

@@ -25,6 +25,7 @@
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usModulePrivate.h"
+#include "usModuleResource.h"
 #include "usModuleSettings.h"
 #include "usCoreModuleContext_p.h"
 
@@ -223,6 +224,43 @@ std::string Module::GetProperty(const std::string& key) const
 {
   if (d->properties.count(key) == 0) return "";
   return d->properties[key];
+}
+
+ModuleResource Module::GetResource(const std::string& path) const
+{
+  if (d->resourceTreePtrs.empty())
+  {
+    return ModuleResource();
+  }
+
+  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
+  {
+    if (!d->resourceTreePtrs[i]->IsValid()) continue;
+    ModuleResource result(path, d->resourceTreePtrs[i], d->resourceTreePtrs);
+    if (result) return result;
+  }
+  return ModuleResource();
+}
+
+std::vector<ModuleResource> Module::FindResources(const std::string& path, const std::string& filePattern,
+                                                  bool recurse) const
+{
+  std::vector<ModuleResource> result;
+  if (d->resourceTreePtrs.empty()) return result;
+
+  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
+  {
+    if (!d->resourceTreePtrs[i]->IsValid()) continue;
+
+    std::vector<std::string> nodes;
+    d->resourceTreePtrs[i]->FindNodes(path, filePattern, recurse, nodes);
+    for (std::vector<std::string>::iterator nodeIter = nodes.begin();
+         nodeIter != nodes.end(); ++nodeIter)
+    {
+      result.push_back(ModuleResource(*nodeIter, d->resourceTreePtrs[i], d->resourceTreePtrs));
+    }
+  }
+  return result;
 }
 
 US_END_NAMESPACE

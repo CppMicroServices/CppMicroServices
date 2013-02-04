@@ -61,6 +61,31 @@ US_END_NAMESPACE
 
 /**
  * \ingroup MicroServices
+ *
+ * \brief Import a static module's resources.
+ *
+ * \param _import_module_libname The physical name of the module to import, without prefix or suffix.
+ *
+ * This macro imports the resources of the static module named \c _import_module_libname.
+ *
+ * Inserting this macro into your application's source code will allow you to make use of
+ * the resources embedded in a static module. Do not forget to list the imported module when
+ * calling the macro #US_LOAD_IMPORTED_MODULES and to actually link the static module to the
+ * importing executable or shared library.
+ *
+ * \sa US_IMPORT_MODULE
+ * \sa US_LOAD_IMPORTED_MODULES
+ * \sa \ref MicroServices_StaticModules
+ */
+#define US_IMPORT_MODULE_RESOURCES(_import_module_libname)                 \
+  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_init_resources_ ## _import_module_libname (); \
+  void _dummy_reference_to_ ## _import_module_libname ## _init_resources() \
+  {                                                                        \
+    _us_init_resources_ ## _import_module_libname();                       \
+  }
+
+/**
+ * \ingroup MicroServices
  * \def US_LOAD_IMPORTED_MODULES_INTO_MAIN(_static_modules)
  *
  * \brief Import a list of static modules into an executable.
@@ -69,7 +94,10 @@ US_END_NAMESPACE
  *        or suffix.
  *
  * This macro ensures that the ModuleActivator::Load(ModuleContext*) function is called
- * for each imported static module when the importing executable is loaded.
+ * for each imported static module when the importing executable is loaded (if the static
+ * module provides an activator). If the static module provides embedded resources and
+ * the US_IMPORT_MODULE_RESOURCES macro was called, the resources will be made available
+ * through the importing module.
  *
  * There must be exactly one call of this macro in the executable which is
  * importing static modules.
@@ -106,7 +134,10 @@ US_END_NAMESPACE
  *        or suffix.
  *
  * This macro ensures that the ModuleActivator::Load(ModuleContext*) function is called
- * for each imported static module when the importing shared library is loaded.
+ * for each imported static module when the importing shared library is loaded (if the static
+ * module provides an activator). If the static module provides embedded resources and
+ * the US_IMPORT_MODULE_RESOURCES macro was called, the resources will be made available
+ * through the importing module.
  *
  * There must be exactly one call of this macro in the shared library which is
  * importing static modules.

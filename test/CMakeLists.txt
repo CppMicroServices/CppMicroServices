@@ -32,8 +32,10 @@ set(_tests
   usDebugOutputTest
   usLDAPFilterTest
   usModuleTest
+  usModuleResourceTest
   usServiceRegistryTest
   usServiceTrackerTest
+  usStaticModuleResourceTest
   usStaticModuleTest
 )
 
@@ -53,6 +55,8 @@ set(_additional_srcs
 set(_test_driver ${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
+
+usFunctionEmbedResources(_srcs EXECUTABLE_NAME ${_test_driver} FILES usTestResource.txt)
 
 # Generate a custom "module init" file for the test driver executable
 set(MODULE_DEPENDS_STR )

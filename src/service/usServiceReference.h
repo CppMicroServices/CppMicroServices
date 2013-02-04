@@ -24,10 +24,7 @@
 
 #include <usAny.h>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4396)
-#endif
+US_MSVC_PUSH_DISABLE_WARNING(4396)
 
 US_BEGIN_NAMESPACE
 
@@ -210,10 +207,11 @@ private:
 
 US_END_NAMESPACE
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
+/**
+ * \ingroup MicroServices
+ */
 US_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceReference)& serviceRef);
 
 US_HASH_FUNCTION_NAMESPACE_BEGIN

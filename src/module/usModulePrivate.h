@@ -28,6 +28,7 @@
 #include "usModuleRegistry.h"
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
+#include "usModuleResourceTree_p.h"
 
 #include "usAtomicInt_p.h"
 
@@ -63,12 +64,16 @@ public:
 
   std::vector<std::string> requiresLibs;
 
+  std::vector<std::string> staticModuleLibNames;
+
   /**
    * Module version
    */
   ModuleVersion version;
 
   ModuleInfo info;
+
+  std::vector<ModuleResourceTree*> resourceTreePtrs;
 
   /**
    * ModuleContext for the module
@@ -82,6 +87,8 @@ public:
   Module* const q;
 
 private:
+
+  void InitializeResources(const std::string& location);
 
   std::list<ModuleInfo::ModuleActivatorHook> staticActivators;
 

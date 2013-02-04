@@ -12,12 +12,14 @@ US_LOAD_IMPORTED_MODULES(HostingModule, MyStaticModule)
 // This is just for illustration purposes in code snippets
 extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule1() { return NULL; }
 extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule2() { return NULL; }
+extern "C" ModuleActivator* _us_init_resources_MyStaticModule2() { return NULL; }
 
 //! [ImportStaticModuleIntoMain]
 #include <usModuleImport.h>
 
 US_IMPORT_MODULE(MyStaticModule1)
 US_IMPORT_MODULE(MyStaticModule2)
+US_IMPORT_MODULE_RESOURCES(MyStaticModule2)
 US_LOAD_IMPORTED_MODULES_INTO_MAIN(MyStaticModule1 MyStaticModule2)
 //! [ImportStaticModuleIntoMain]
 
@@ -29,6 +31,6 @@ int main(int /*argc*/, char* /*argv*/[])
 //! [InitializeExecutable]
 #ifdef US_BUILD_SHARED_LIBS
 #include <usModuleInitialization.h>
-US_INITIALIZE_MODULE("My Executable", "", "", "1.0.0")
+US_INITIALIZE_MODULE("MyExecutable", "", "", "1.0.0")
 #endif
 //! [InitializeExecutable]

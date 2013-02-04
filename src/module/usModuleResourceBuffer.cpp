@@ -166,7 +166,7 @@ ModuleResourceBuffer::int_type ModuleResourceBuffer::pbackfail(int_type ch)
 
 std::streamsize ModuleResourceBuffer::showmanyc()
 {
-  assert(std::less_equal<const char *>()(d->current, d->end));
+  assert(d->current <= d->end);
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
   std::streamsize ssize = 0;

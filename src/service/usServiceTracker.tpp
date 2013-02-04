@@ -230,7 +230,7 @@ ServiceReference ServiceTracker<S,T>::GetServiceReference() const
   US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::getServiceReference:" << d->filter;
   std::list<ServiceReference> references;
   GetServiceReferences(references);
-  int length = references.size();
+  std::size_t length = references.size();
   if (length == 0)
   { /* if no service is being tracked */
     throw ServiceException("No service is being tracked");
@@ -381,7 +381,7 @@ int ServiceTracker<S,T>::Size() const
   }
   {
     typename _TrackedService::Lock l(t);
-    return t->Size();
+    return static_cast<int>(t->Size());
   }
 }
 

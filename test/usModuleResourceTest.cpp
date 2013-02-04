@@ -83,7 +83,7 @@ void testTextResource(Module* module)
   {
     content.append(buffer, sizeof(buffer));
   }
-  content.append(buffer, rs.gcount());
+  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
 
   US_TEST_CONDITION(rs.eof(), "EOF check");
   US_TEST_CONDITION(content == fileData, "Resource content");
@@ -133,7 +133,7 @@ void testTextResourceAsBinary(Module* module)
   {
     content.append(buffer, sizeof(buffer));
   }
-  content.append(buffer, rs.gcount());
+  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
 
   US_TEST_CONDITION(rs.eof(), "EOF check");
   US_TEST_CONDITION(content == fileData, "Resource content");
@@ -187,7 +187,7 @@ void testSpecialCharacters(Module* module)
   {
     content.append(buffer, sizeof(buffer));
   }
-  content.append(buffer, rs.gcount());
+  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
 
   US_TEST_CONDITION(rs.eof(), "EOF check");
   US_TEST_CONDITION(content == fileData, "Resource content");

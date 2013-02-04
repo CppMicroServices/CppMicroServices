@@ -155,7 +155,7 @@ int64_t Resource::WriteName(ResourceWriter& writer, int64_t offset)
   writer.WriteString("\n  ");
 
   // write the length of the name
-  writer.WriteNumber2(name.size());
+  writer.WriteNumber2(static_cast<uint16_t>(name.size()));
   writer.WriteString("\n  ");
   offset += 2;
 
@@ -194,7 +194,7 @@ void Resource::WriteTreeInfo(ResourceWriter& writer)
     writer.WriteNumber2(flags);
 
     // child count
-    writer.WriteNumber4(children.size());
+    writer.WriteNumber4(static_cast<uint32_t>(children.size()));
 
     // first child offset (in the us_resource_tree array)
     writer.WriteNumber4(static_cast<uint32_t>(childOffset));
@@ -238,7 +238,7 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
   file.seekg(0, std::ifstream::end);
   std::ifstream::pos_type size = file.tellg();
   file.seekg(0);
-  writer.WriteNumber4(size);
+  writer.WriteNumber4(static_cast<uint32_t>(size));
   writer.WriteString("\n  ");
   offset += 4;
 

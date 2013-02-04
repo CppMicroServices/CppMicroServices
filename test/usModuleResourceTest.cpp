@@ -139,6 +139,7 @@ void testTextResourceAsBinary(Module* module)
   US_TEST_CONDITION(content == fileData, "Resource content");
 }
 
+#ifdef US_BUILD_SHARED_LIBS
 void testInvalidResource(Module* module)
 {
   ModuleResource res = module->GetResource("invalid");
@@ -160,6 +161,7 @@ void testInvalidResource(Module* module)
   US_TEST_CONDITION(rs.good() == false, "Check invalid resource stream")
   US_TEST_CONDITION(rs.eof() == true, "Check invalid resource stream")
 }
+#endif
 
 void testSpecialCharacters(Module* module)
 {
@@ -240,6 +242,7 @@ struct ResourceComparator {
   }
 };
 
+#ifdef US_BUILD_SHARED_LIBS
 void testResourceTree(Module* module)
 {
   ModuleResource res = module->GetResource("");
@@ -300,7 +303,9 @@ void testResourceTree(Module* module)
   US_TEST_CONDITION(nodes.size() == 3, "Check recursive pattern matches")
 }
 
-void testStaticResourceTree(Module* module)
+#else
+
+void testResourceTree(Module* module)
 {
   ModuleResource res = module->GetResource("");
   US_TEST_CONDITION(res.GetResourcePath() == "/", "Check root file path")
@@ -372,6 +377,8 @@ void testStaticResourceTree(Module* module)
   US_TEST_CONDITION(nodes.size() == 7, "Check recursive pattern matches")
 }
 
+#endif
+
 void testResourceOperators(Module* module)
 {
   ModuleResource invalid = module->GetResource("invalid");
@@ -407,6 +414,7 @@ void testResourceOperators(Module* module)
   US_TEST_CONDITION(oss.str() == foo.GetResourcePath(), "Check operator<<")
 }
 
+#ifdef US_BUILD_SHARED_LIBS
 void testResourceFromExecutable(Module* module)
 {
   ModuleResource resource = module->GetResource("usTestResource.txt");
@@ -417,6 +425,7 @@ void testResourceFromExecutable(Module* module)
   std::getline(rs, line);
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
+#endif
 
 } // end unnamed namespace
 
@@ -446,16 +455,15 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(moduleR->GetName() == "TestModuleR Module", "Test module name")
 
   testInvalidResource(moduleR);
-  testResourceTree(moduleR);
   testResourceFromExecutable(mc->GetModule());
 #else
   Module* moduleR = mc->GetModule();
   US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module 0")
 
   US_TEST_CONDITION(moduleR->GetName() == "CppMicroServices", "Test module name")
-
-  testStaticResourceTree(moduleR);
 #endif
+
+  testResourceTree(moduleR);
 
   testResourceOperators(moduleR);
 

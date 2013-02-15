@@ -79,9 +79,14 @@ function(usFunctionEmbedResources src_var)
     set(us_lib_name "\"\"")
   endif()
 
+  set(resource_compiler ${CppMicroServices_RCC_EXECUTABLE})
+  if(TARGET ${CppMicroServices_RCC_EXECUTABLE_NAME})
+    set(resource_compiler ${CppMicroServices_RCC_EXECUTABLE_NAME})
+  endif()
+
   add_custom_command(
     OUTPUT ${us_cpp_resource_file}
-    COMMAND ${CppMicroServices_RCC_EXECUTABLE} "${us_lib_name}" ${us_cpp_resource_file} ${absolute_res_files}
+    COMMAND ${resource_compiler} "${us_lib_name}" ${us_cpp_resource_file} ${absolute_res_files}
     WORKING_DIRECTORY ${US_RESOURCE_ROOT_DIR}
     DEPENDS ${absolute_res_files}
     COMMENT "Generating embedded resource file ${us_cpp_resource_name}"

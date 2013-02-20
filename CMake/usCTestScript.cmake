@@ -43,14 +43,14 @@ macro(build_and_test)
 
 endmacro()
 
-function(create_initial_cache var _shared _threading _sf _c++11 _autoload)
+function(create_initial_cache var _shared _threading _sf _cxx11 _autoload)
 
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON
       US_BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
       US_ENABLE_SERVICE_FACTORY_SUPPORT:BOOL=${_sf}
-      US_USE_C++11:BOOL=${_c++11}
+      US_USE_C++11:BOOL=${_cxx11}
       US_ENABLE_AUTOLOADING_SUPPORT:BOOL=${_autoload}
       ")
 
@@ -68,7 +68,7 @@ function(create_initial_cache var _shared _threading _sf _c++11 _autoload)
   if(_sf)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-servicefactory")
   endif()
-  if(_c++11)
+  if(_cxx11)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-cxx11")
   endif()
   if(_autoload)

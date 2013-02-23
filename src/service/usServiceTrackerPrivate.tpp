@@ -30,7 +30,7 @@
 US_BEGIN_NAMESPACE
 
 template<class S, class T>
-const bool ServiceTrackerPrivate<S,T>::DEBUG = true;
+const bool ServiceTrackerPrivate<S,T>::DEBUG_OUTPUT = true;
 
 template<class S, class T>
 ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
@@ -138,7 +138,7 @@ void ServiceTrackerPrivate<S,T>::Modified()
 {
   cachedReference = 0; /* clear cached value */
   cachedService = 0; /* clear cached value */
-  US_DEBUG(DEBUG) << "ServiceTracker::Modified(): " << filter;
+  US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 
 US_END_NAMESPACE

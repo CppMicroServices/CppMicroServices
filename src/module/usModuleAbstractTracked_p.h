@@ -53,7 +53,7 @@ class ModuleAbstractTracked : public US_DEFAULT_THREADING<ModuleAbstractTracked<
 public:
 
   /* set this to true to compile in debug messages */
-  static const bool DEBUG; // = false;
+  static const bool DEBUG_OUTPUT; // = false;
 
   typedef std::map<S,T> TrackingMap;
 

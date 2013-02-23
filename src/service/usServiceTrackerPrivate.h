@@ -71,7 +71,7 @@ public:
   void GetServiceReferences_unlocked(std::list<ServiceReference>& refs, TrackedService<S,T>* t) const;
 
   /* set this to true to compile in debug messages */
-  static const bool DEBUG; // = false;
+  static const bool DEBUG_OUTPUT; // = false;
 
   /**
    * The Module Context used by this <code>ServiceTracker</code>.

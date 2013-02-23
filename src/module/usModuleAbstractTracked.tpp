@@ -24,7 +24,7 @@
 US_BEGIN_NAMESPACE
 
 template<class S, class T, class R>
-const bool ModuleAbstractTracked<S,T,R>::DEBUG = false;
+const bool ModuleAbstractTracked<S,T,R>::DEBUG_OUTPUT = false;
 
 template<class S, class T, class R>
 ModuleAbstractTracked<S,T,R>::ModuleAbstractTracked()
@@ -43,7 +43,7 @@ void ModuleAbstractTracked<S,T,R>::SetInitial(const std::list<S>& initiallist)
 {
   initial = initiallist;
 
-  if (DEBUG)
+  if (DEBUG_OUTPUT)
   {
     for(typename std::list<S>::const_iterator item = initiallist.begin();
       item != initiallist.end(); ++item)
@@ -77,7 +77,7 @@ void ModuleAbstractTracked<S,T,R>::TrackInitial()
       if (tracked[item])
       {
         /* if we are already tracking this item */
-        US_DEBUG(DEBUG) << "ModuleAbstractTracked::trackInitial[already tracked]: " << item;
+        US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackInitial[already tracked]: " << item;
         continue; /* skip this item */
       }
       if (std::find(adding.begin(), adding.end(), item) != adding.end())
@@ -85,12 +85,12 @@ void ModuleAbstractTracked<S,T,R>::TrackInitial()
         /*
          * if this item is already in the process of being added.
          */
-        US_DEBUG(DEBUG) << "ModuleAbstractTracked::trackInitial[already adding]: " << item;
+        US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackInitial[already adding]: " << item;
         continue; /* skip this item */
       }
       adding.push_back(item);
     }
-    US_DEBUG(DEBUG) << "ModuleAbstractTracked::trackInitial: " << item;
+    US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackInitial: " << item;
     TrackAdding(item, R());
     /*
      * Begin tracking it. We call trackAdding
@@ -122,14 +122,14 @@ void ModuleAbstractTracked<S,T,R>::Track(S item, R related)
       if (std::find(adding.begin(), adding.end(),item) != adding.end())
       {
         /* if this item is already in the process of being added. */
-        US_DEBUG(DEBUG) << "ModuleAbstractTracked::track[already adding]: " << item;
+        US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::track[already adding]: " << item;
         return;
       }
       adding.push_back(item); /* mark this item is being added */
     }
     else
     { /* we are currently tracking this item */
-      US_DEBUG(DEBUG) << "ModuleAbstractTracked::track[modified]: " << item;
+      US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::track[modified]: " << item;
       Modified(); /* increment modification count */
     }
   }
@@ -161,7 +161,7 @@ void ModuleAbstractTracked<S,T,R>::Untrack(S item, R related)
     { /* if this item is already in the list
        * of initial references to process
        */
-      US_DEBUG(DEBUG) << "ModuleAbstractTracked::untrack[removed from initial]: " << item;
+      US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::untrack[removed from initial]: " << item;
       return; /* we have removed it from the list and it will not be
                * processed
                */
@@ -173,7 +173,7 @@ void ModuleAbstractTracked<S,T,R>::Untrack(S item, R related)
     { /* if the item is in the process of
        * being added
        */
-      US_DEBUG(DEBUG) << "ModuleAbstractTracked::untrack[being added]: " << item;
+      US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::untrack[being added]: " << item;
       return; /*
            * in case the item is untracked while in the process of
            * adding
@@ -191,7 +191,7 @@ void ModuleAbstractTracked<S,T,R>::Untrack(S item, R related)
     }
     Modified(); /* increment modification count */
   }
-  US_DEBUG(DEBUG) << "ModuleAbstractTracked::untrack[removed]: " << item;
+  US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::untrack[removed]: " << item;
   /* Call customizer outside of synchronized region */
   CustomizerRemoved(item, related, object);
   /*
@@ -277,7 +277,7 @@ bool ModuleAbstractTracked<S,T,R>::CustomizerAddingFinal(S item, const T& custom
 template<class S, class T, class R>
 void ModuleAbstractTracked<S,T,R>::TrackAdding(S item, R related)
 {
-  US_DEBUG(DEBUG) << "ModuleAbstractTracked::trackAdding:" << item;
+  US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackAdding:" << item;
   T object(0);
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
@@ -301,7 +301,7 @@ void ModuleAbstractTracked<S,T,R>::TrackAdding(S item, R related)
    */
   if (becameUntracked && object)
   {
-    US_DEBUG(DEBUG) << "ModuleAbstractTracked::trackAdding[removed]: " << item;
+    US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackAdding[removed]: " << item;
     /* Call customizer outside of synchronized region */
     CustomizerRemoved(item, related, object);
     /*

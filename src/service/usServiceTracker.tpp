@@ -87,7 +87,7 @@ void ServiceTracker<S,T>::Open()
       return;
     }
 
-    US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::Open: " << d->filter;
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,T>::Open: " << d->filter;
 
     t = new _TrackedService(this, d->customizer);
     {
@@ -138,7 +138,7 @@ void ServiceTracker<S,T>::Close()
     {
       return;
     }
-    US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::close:" << d->filter;
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,T>::close:" << d->filter;
     outgoing->Close();
     GetServiceReferences(references);
     d->trackedService = 0;
@@ -162,7 +162,7 @@ void ServiceTracker<S,T>::Close()
     outgoing->Untrack(*ref, ServiceEvent());
   }
 
-  if (d->DEBUG)
+  if (d->DEBUG_OUTPUT)
   {
     typename _ServiceTrackerPrivate::Lock l(d);
     if ((d->cachedReference.GetModule() == 0) && (d->cachedService == 0))
@@ -223,11 +223,11 @@ ServiceReference ServiceTracker<S,T>::GetServiceReference() const
   }
   if (reference.GetModule() != 0)
   {
-    US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::getServiceReference[cached]:"
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,T>::getServiceReference[cached]:"
                          << d->filter;
     return reference;
   }
-  US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::getServiceReference:" << d->filter;
+  US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,T>::getServiceReference:" << d->filter;
   std::list<ServiceReference> references;
   GetServiceReferences(references);
   std::size_t length = references.size();
@@ -339,11 +339,11 @@ T ServiceTracker<S,T>::GetService() const
   T service = d->cachedService;
   if (service != 0)
   {
-    US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::getService[cached]:"
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,T>::getService[cached]:"
                          << d->filter;
     return service;
   }
-  US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::getService:" << d->filter;
+  US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,T>::getService:" << d->filter;
 
   try
   {

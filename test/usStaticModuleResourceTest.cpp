@@ -112,8 +112,8 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("StaticModuleResourceTest");
 
-  ModuleContext* mc = GetModuleContext();
-  assert(mc);
+  assert(GetModuleContext());
+
 
 #ifdef US_BUILD_SHARED_LIBS
   SharedLibraryHandle libB("TestModuleB");

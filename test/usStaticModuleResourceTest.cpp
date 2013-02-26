@@ -132,7 +132,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_CONDITION(module->GetName() == "TestModuleB Module", "Test module name")
 #else
-  Module* module = mc->GetModule();
+  Module* module = GetModuleContext()->GetModule();
 #endif
 
   testResourceOperators(module);

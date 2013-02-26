@@ -61,7 +61,7 @@ int usDebugOutputTest(int /*argc*/, char* /*argv*/[])
   {
     US_DEBUG << "Msg";
   }
-#ifdef NDEBUG
+#if !defined(US_ENABLE_DEBUG_OUTPUT)
   US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing suppressed debug message")
 #else
   US_TEST_CONDITION(lastMsgType == 0 && lastMsg.find("Msg") != std::string::npos, "Testing debug message")

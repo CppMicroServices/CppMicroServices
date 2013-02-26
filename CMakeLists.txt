@@ -94,6 +94,7 @@ endif()
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_SERVICE_FACTORY_SUPPORT ON BOOL "Enable Service Factory support" ADVANCED)
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
+us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 

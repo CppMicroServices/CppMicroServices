@@ -147,9 +147,7 @@ US_MSVC_DISABLE_WARNING(4996)
 // Debuging & Logging
 //-------------------------------------------------------------------
 
-#if defined(NDEBUG) && !defined(US_NO_DEBUG_OUTPUT)
-  #define US_NO_DEBUG_OUTPUT
-#endif
+#cmakedefine US_ENABLE_DEBUG_OUTPUT
 
 US_BEGIN_NAMESPACE
   enum MsgType { DebugMsg = 0, InfoMsg = 1, WarningMsg = 2, ErrorMsg = 3 };

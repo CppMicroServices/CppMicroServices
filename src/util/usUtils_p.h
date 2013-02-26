@@ -83,7 +83,7 @@ struct NoLogMsg {
 
 US_END_NAMESPACE
 
-#if !defined(US_NO_DEBUG_OUTPUT)
+#if defined(US_ENABLE_DEBUG_OUTPUT)
   #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(0, __FILE__, __LINE__, __FUNCTION__)
 #else
   #define US_DEBUG true ? US_PREPEND_NAMESPACE(NoLogMsg)() : US_PREPEND_NAMESPACE(NoLogMsg)()

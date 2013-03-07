@@ -16,6 +16,7 @@
 #!                          ROOT_DIR resources
 #!                          FILES config.properties logo.png
 #!                         )
+#! \endverbatim
 #!
 #! \param LIBRARY_NAME (required if EXECUTABLE_NAME is empty) The library name of the module
 #!        which will include the generated source file, without extension.

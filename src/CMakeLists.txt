@@ -4,6 +4,8 @@
 
 set(_srcs
   util/usAny.cpp
+  util/usUncompressResourceData.c
+  util/usUncompressResourceData.cpp
   util/usThreads.cpp
   util/usUtils.cpp
 
@@ -68,6 +70,7 @@ set(_private_headers
 set(_public_headers
   util/usAny.h
   util/usSharedData.h
+  util/usUncompressResourceData.h
 
   service/usLDAPFilter.h
   service/usServiceEvent.h
@@ -132,7 +135,7 @@ if(NOT US_IS_EMBEDDED)
   set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)
   set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
   if(US_LINK_LIBRARIES)
-    target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${_link_libraries})
   endif()
 endif()
 

@@ -32,7 +32,9 @@
 #if defined(US_PLATFORM_POSIX)
   #include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
-  #define WIN32_LEAN_AND_MEAN
+  #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+  #endif
   #include <windows.h>
   #include <strsafe.h>
 #else

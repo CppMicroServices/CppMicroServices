@@ -24,7 +24,8 @@ US_MSVC_PUSH_DISABLE_WARNING(4355)
 US_BEGIN_NAMESPACE
 
 ModuleResourceStream::ModuleResourceStream(const ModuleResource& resource, std::ios_base::openmode mode)
-  : ModuleResourceBuffer(resource.GetData(), resource.GetSize(), mode | std::ios_base::in)
+  : ModuleResourceBuffer(resource.GetData(), resource.GetSize(), mode | std::ios_base::in,
+                         resource.IsCompressed())
   , std::istream(this)
 {
 }

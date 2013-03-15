@@ -11,6 +11,7 @@
 #cmakedefine US_ENABLE_AUTOLOADING_SUPPORT
 #cmakedefine US_ENABLE_THREADING_SUPPORT
 #cmakedefine US_ENABLE_SERVICE_FACTORY_SUPPORT
+#cmakedefine US_ENABLE_RESOURCE_COMPRESSION
 #cmakedefine US_USE_CXX11
 
 ///-------------------------------------------------------------------

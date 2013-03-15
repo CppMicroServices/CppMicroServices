@@ -49,7 +49,8 @@ private:
 
   enum Flags
   {
-    Directory = 0x01
+    Directory = 0x01,
+    Compressed = 0x02
   };
 
   bool isValid;
@@ -85,7 +86,8 @@ public:
   void FindNodes(const std::string& path, const std::string& filePattern,
                  bool recurse, std::vector<std::string>& result);
 
-  inline bool IsDir(int node) const { return GetFlags(node) & Directory; }
+  inline bool IsCompressed(int node) const {return GetFlags(node) & Compressed ? true : false; }
+  inline bool IsDir(int node) const { return GetFlags(node) & Directory ? true : false; }
   const unsigned char* GetData(int node, int32_t *size) const;
   void GetChildren(int node, std::vector<std::string>& children) const;
 

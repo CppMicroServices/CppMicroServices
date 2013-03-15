@@ -40,6 +40,7 @@ public:
     , size(0)
     , data(NULL)
     , isFile(false)
+    , isCompressed(false)
     , ref(1)
   {}
 
@@ -53,10 +54,12 @@ public:
   int node;
   int32_t size;
   const unsigned char* data;
+  unsigned char* uncompressedData;
 
   mutable std::vector<std::string> children;
 
   bool isFile;
+  bool isCompressed;
 
   /**
    * Reference count for implicitly shared private implementation.
@@ -110,10 +113,11 @@ ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* ass
   d->node = d->associatedResourceTree->FindNode(GetResourcePath());
   if (d->node != -1)
   {
-    d->isFile = !associatedResourceTree->IsDir(d->node);
+    d->isFile = !d->associatedResourceTree->IsDir(d->node);
     if (d->isFile)
     {
       d->data = d->associatedResourceTree->GetData(d->node, &d->size);
+      d->isCompressed = d->associatedResourceTree->IsCompressed(d->node);
     }
   }
 }
@@ -155,6 +159,11 @@ bool ModuleResource::operator !=(const ModuleResource &resource) const
 bool ModuleResource::IsValid() const
 {
   return d->associatedResourceTree && d->associatedResourceTree->IsValid() && d->node > -1;
+}
+
+bool ModuleResource::IsCompressed() const
+{
+  return d->isCompressed;
 }
 
 ModuleResource::operator bool() const

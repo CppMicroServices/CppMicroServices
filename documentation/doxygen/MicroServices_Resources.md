@@ -8,6 +8,8 @@ your compiler can handle).
 The following features are supported:
 
  * Embed arbitrary data into shared or static modules or executables.
+ * Data is embedded in a compressed format if the size reduction exceeds a
+   configurable threshold.
  * Resources are accessed via a Module instance, providing individual resource lookup and access
    for each module.
  * Resources are managed in a tree hierarchy, modeling the original child - parent relationship

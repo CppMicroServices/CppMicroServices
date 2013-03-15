@@ -43,7 +43,7 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
                        const std::string& baseName,
                        const std::string& completeBaseName, const std::string& suffix,
                        const std::string& completeSuffix,
-                       int size, bool children = false)
+                       int size, bool children = false, bool compressed = false)
 {
   US_TEST_CONDITION_REQUIRED(res.IsValid(), "Valid resource")
   US_TEST_CONDITION(res.GetBaseName() == baseName, "GetBaseName()")
@@ -55,6 +55,7 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
   US_TEST_CONDITION(res.GetSize() == size, "Data size")
   US_TEST_CONDITION(res.GetSuffix() == suffix, "Suffix")
   US_TEST_CONDITION(res.GetCompleteSuffix() == completeSuffix, "Complete suffix")
+  US_TEST_CONDITION(res.IsCompressed() == compressed, "Compression flag")
 }
 
 void testTextResource(Module* module)
@@ -213,7 +214,7 @@ void testBinaryResource(Module* module)
   png.seekg(0, std::ios_base::end);
   std::streampos pngLength = png.tellg();
   png.seekg(0);
-  US_TEST_CONDITION(resLength = res.GetSize(), "Check resource size")
+  US_TEST_CONDITION(res.GetSize() == resLength, "Check resource size")
   US_TEST_CONDITION_REQUIRED(resLength == pngLength, "Compare sizes")
 
   char c1 = 0;
@@ -234,6 +235,48 @@ void testBinaryResource(Module* module)
   US_TEST_CONDITION_REQUIRED(isEqual, "Equal binary contents");
   US_TEST_CONDITION(png.eof(), "EOF check");
 }
+
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+void testCompressedResource(Module* module)
+{
+  ModuleResource res = module->GetResource("/icons/compressable.bmp");
+  checkResourceInfo(res, "/icons/", "compressable", "compressable", "bmp", "bmp", 411, false, true);
+
+  ModuleResourceStream rs(res, std::ios_base::binary);
+  rs.seekg(0, std::ios_base::end);
+  std::streampos resLength = rs.tellg();
+  rs.seekg(0);
+
+  std::ifstream bmp(CppMicroServices_SOURCE_DIR "/test/modules/libRWithResources/resources/icons/compressable.bmp",
+                    std::ifstream::in | std::ifstream::binary);
+
+  US_TEST_CONDITION_REQUIRED(bmp.is_open(), "Open reference file")
+
+  bmp.seekg(0, std::ios_base::end);
+  std::streampos bmpLength = bmp.tellg();
+  bmp.seekg(0);
+  US_TEST_CONDITION(300122 == resLength, "Check resource size")
+  US_TEST_CONDITION_REQUIRED(resLength == bmpLength, "Compare sizes")
+
+  char c1 = 0;
+  char c2 = 0;
+  bool isEqual = true;
+  int count = 0;
+  while (bmp.get(c1) && rs.get(c2))
+  {
+    ++count;
+    if (c1 != c2)
+    {
+      isEqual = false;
+      break;
+    }
+  }
+
+  US_TEST_CONDITION_REQUIRED(count == bmpLength, "Check if everything was read");
+  US_TEST_CONDITION_REQUIRED(isEqual, "Equal binary contents");
+  US_TEST_CONDITION(bmp.eof(), "EOF check");
+}
+#endif
 
 struct ResourceComparator {
   bool operator()(const ModuleResource& mr1, const ModuleResource& mr2) const
@@ -265,10 +308,11 @@ void testResourceTree(Module* module)
   US_TEST_CONDITION(icons.IsDir() && !icons.IsFile() && !icons.GetChildren().empty(), "Check directory resource")
 
   children = icons.GetChildren();
-  US_TEST_CONDITION_REQUIRED(children.size() == 2, "Check icons child count")
+  US_TEST_CONDITION_REQUIRED(children.size() == 3, "Check icons child count")
   std::sort(children.begin(), children.end());
-  US_TEST_CONDITION(children[0] == "cppmicroservices.png", "Check child name")
-  US_TEST_CONDITION(children[1] == "readme.txt", "Check child name")
+  US_TEST_CONDITION(children[0] == "compressable.bmp", "Check child name")
+  US_TEST_CONDITION(children[1] == "cppmicroservices.png", "Check child name")
+  US_TEST_CONDITION(children[2] == "readme.txt", "Check child name")
 
   ResourceComparator resourceComparator;
 
@@ -288,9 +332,9 @@ void testResourceTree(Module* module)
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 5, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 6, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 5, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 6, "Total resource number")
 
 
   // test pattern matching
@@ -331,10 +375,11 @@ void testResourceTree(Module* module)
   US_TEST_CONDITION(icons.IsDir() && !icons.IsFile() && !icons.GetChildren().empty(), "Check directory resource")
 
   children = icons.GetChildren();
-  US_TEST_CONDITION_REQUIRED(children.size() == 2, "Check icons child count")
+  US_TEST_CONDITION_REQUIRED(children.size() == 3, "Check icons child count")
   std::sort(children.begin(), children.end());
-  US_TEST_CONDITION(children[0] == "cppmicroservices.png", "Check child name")
-  US_TEST_CONDITION(children[1] == "readme.txt", "Check child name")
+  US_TEST_CONDITION(children[0] == "compressable.bmp", "Check child name")
+  US_TEST_CONDITION(children[1] == "cppmicroservices.png", "Check child name")
+  US_TEST_CONDITION(children[2] == "readme.txt", "Check child name")
 
   ResourceComparator resourceComparator;
 
@@ -362,9 +407,9 @@ void testResourceTree(Module* module)
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 9, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 10, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 9, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 10, "Total resource number")
 
 
   // test pattern matching
@@ -472,6 +517,10 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   testSpecialCharacters(moduleR);
 
   testBinaryResource(moduleR);
+
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+  testCompressedResource(moduleR);
+#endif
 
 #ifdef US_BUILD_SHARED_LIBS
   ModuleResource foo = moduleR->GetResource("foo.txt");

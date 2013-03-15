@@ -1,5 +1,6 @@
 
 set(resource_files
+  icons/compressable.bmp
   icons/cppmicroservices.png
   icons/readme.txt
   foo.txt

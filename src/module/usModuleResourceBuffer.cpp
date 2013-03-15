@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "usModuleResourceBuffer_p.h"
+#include "usUncompressResourceData.h"
 
 #include "stdint_p.h"
 
@@ -42,10 +43,20 @@ public:
     , end(begin + size)
     , current(begin)
     , mode(mode)
+  #ifdef US_ENABLE_RESOURCE_COMPRESSION
+    , uncompressedData(NULL)
+  #endif
   #ifdef DATA_NEEDS_NEWLINE_CONVERSION
     , pos(0)
   #endif
   {
+  }
+
+  ~ModuleResourceBufferPrivate()
+  {
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+    delete[] uncompressedData;
+#endif
   }
 
   const char* const begin;
@@ -53,6 +64,10 @@ public:
   const char* current;
 
   const std::ios_base::openmode mode;
+
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+  const unsigned char* uncompressedData;
+#endif
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
   // records the stream position ignoring CR characters
@@ -62,11 +77,20 @@ public:
 };
 
 ModuleResourceBuffer::ModuleResourceBuffer(const unsigned char* data, std::size_t _size,
-                                           std::ios_base::openmode mode)
+                                           std::ios_base::openmode mode, bool compressed)
   : d(NULL)
 {
   assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
   // assert(data != NULL);
+
+  if (compressed && _size)
+  {
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+    data = UncompressResourceData(data, _size, &_size);
+#else
+    assert(!"CppMicroServices built without support for resource compression");
+#endif
+  }
 
   const char* begin = reinterpret_cast<const char*>(data);
   std::size_t size = _size;
@@ -80,13 +104,19 @@ ModuleResourceBuffer::ModuleResourceBuffer(const unsigned char* data, std::size_
 #endif
 
 #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
-  if(data != NULL && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
+  if (data != NULL && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
   {
     --size;
   }
 #endif
 
   d = new ModuleResourceBufferPrivate(begin, size, mode);
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+  if (compressed)
+  {
+    d->uncompressedData = data;
+  }
+#endif
 }
 
 ModuleResourceBuffer::~ModuleResourceBuffer()

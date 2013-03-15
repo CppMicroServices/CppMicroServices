@@ -38,6 +38,9 @@ When building the C++ Micro Services library, you have a few configuration optio
   performance.
 - **US_USE_C++11 (advanced)**
   Enable the usage of C++11 constructs
+- **US_ENABLE_RESOURCE_COMPRESSION**
+  Enable compression of embedded resources. See \ref MicroServices_Resources for detailed information
+  about the resource system.
 
 ### Customizing naming conventions
 

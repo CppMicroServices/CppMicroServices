@@ -119,6 +119,14 @@ public:
   bool IsValid() const;
 
   /**
+   * Returns \c true if the resource represents a file and the resource data
+   * is in a compressed format, \c false otherwise.
+   *
+   * @return \c true if the resource data is compressed, \c false otherwise.
+   */
+  bool IsCompressed() const;
+
+  /**
    * Boolean conversion operator using IsValid().
    */
   operator bool() const;
@@ -222,7 +230,8 @@ public:
   std::string GetCompleteSuffix() const;
 
   /**
-   * Returns \c true if this %ModuleResource object points to a directory.
+   * Returns \c true if this %ModuleResource object points to a directory and thus
+   * may have child resources.
    *
    * @return \c true if this object points to a directory, \c false otherwise.
    */
@@ -255,8 +264,10 @@ public:
 
   /**
    * Returns a data pointer pointing to the raw data of this %ModuleResource object.
+   * If the resource is compressed the data returned is compressed and UncompressResourceData()
+   * must be used to access the data. If the resource represents a directory \c 0 is returned.
    *
-   * @return A raw pointer to the embedded data.
+   * @return A raw pointer to the embedded data, or \c 0 if the resource is not a file resource.
    */
   const unsigned char* GetData() const;
 

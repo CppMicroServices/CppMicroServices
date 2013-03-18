@@ -523,6 +523,7 @@ bool ResourceWriter::WritePayloads()
         if (offset == 0)
         {
           std::cerr << errorMessage << std::endl;
+          return false;
         }
       }
     }

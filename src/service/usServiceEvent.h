@@ -22,6 +22,18 @@
 #ifndef USSERVICEEVENT_H
 #define USSERVICEEVENT_H
 
+#ifdef REGISTERED
+#ifdef _WIN32
+#error The REGISTERED preprocessor define clashes with the ServiceEvent::REGISTERED\
+ enum type. Try to reorder your includes, compile with WIN32_LEAN_AND_MEAN, or undef\
+ the REGISTERED macro befor including this header.
+#else
+#error The REGISTERED preprocessor define clashes with the ServiceEvent::REGISTERED\
+ enum type. Try to reorder your includes or undef the REGISTERED macro befor including\
+ this header.
+#endif
+#endif
+
 #include "usSharedData.h"
 
 #include "usServiceReference.h"

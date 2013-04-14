@@ -130,6 +130,8 @@ function(usFunctionEmbedResources src_var)
   set(resource_compiler ${CppMicroServices_RCC_EXECUTABLE})
   if(TARGET ${CppMicroServices_RCC_EXECUTABLE_NAME})
     set(resource_compiler ${CppMicroServices_RCC_EXECUTABLE_NAME})
+  elseif(NOT resource_compiler)
+    message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the CppMicroServices_RCC_EXECUTABLE CMake variable.")
   endif()
 
   add_custom_command(

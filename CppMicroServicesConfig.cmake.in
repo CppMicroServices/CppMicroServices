@@ -9,8 +9,11 @@ set(@PROJECT_NAME@_PRIVATE_HEADERS @US_PRIVATE_HEADERS@)
 
 set(@PROJECT_NAME@_SOURCE_DIR @CMAKE_CURRENT_SOURCE_DIR@)
 
-set(CppMicroServices_RCC_EXECUTABLE @US_RCC_EXECUTABLE@)
-set(CppMicroServices_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
+set(CppMicroServices_RCC_EXECUTABLE_NAME @CppMicroServices_RCC_EXECUTABLE_NAME@)
+
+find_program(CppMicroServices_RCC_EXECUTABLE ${CppMicroServices_RCC_EXECUTABLE_NAME}
+             PATHS "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
+             PATH_SUFFIXES Release Debug RelWithDebInfo MinSizeRel)
 
 include(@CMAKE_CURRENT_SOURCE_DIR@/CMake/usFunctionGenerateModuleInit.cmake)
 include(@CMAKE_CURRENT_SOURCE_DIR@/CMake/usFunctionEmbedResources.cmake)

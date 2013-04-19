@@ -204,8 +204,10 @@ endforeach()
 # US C/CXX Flags
 #-----------------------------------------------------------------------------
 
-set(US_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-set(US_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+set(US_C_FLAGS)
+set(US_C_FLAGS_RELEASE)
+set(US_CXX_FLAGS)
+set(US_CXX_FLAGS_RELEASE)
 
 # This is used as a preprocessor define
 set(US_USE_CXX11 ${US_USE_C++11})
@@ -214,7 +216,7 @@ set(US_USE_CXX11 ${US_USE_C++11})
 if(NOT MSVC)
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option -D_FORTIFY_SOURCE=2)
+                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
@@ -245,13 +247,21 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
   endif()
 
+  usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
+  if(_fortify_source_flag)
+    set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
+  endif()
+
+
 elseif(MSVC)
   set(US_CXX_FLAGS "/MP /wd4996 ${US_CXX_FLAGS}")
 endif()
 
 if(NOT US_IS_EMBEDDED)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
+  set(CMAKE_C_FLAGS_REALEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 endif()
 
 #-----------------------------------------------------------------------------

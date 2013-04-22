@@ -381,22 +381,41 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
       std::string boolVal = any_cast<bool>(obj) ? "true" : "false";
       return std::equal(s.begin(), s.end(), boolVal.begin(), stricomp);
     }
-    else if (objType == typeid(Byte) || objType == typeid(int))
+    else if (objType == typeid(short))
     {
-      int sInt;
-      std::stringstream ss(s);
-      ss >> sInt;
-      int intVal = any_cast<int>(obj);
-
-      switch(op)
-      {
-      case LE:
-        return intVal <= sInt;
-      case GE:
-        return intVal >= sInt;
-      default: /*APPROX and EQ*/
-        return intVal == sInt;
-      }
+      return CompareIntegralType<short>(obj, op, s);
+    }
+    else if (objType == typeid(int))
+    {
+      return CompareIntegralType<int>(obj, op, s);
+    }
+    else if (objType == typeid(long int))
+    {
+      return CompareIntegralType<long int>(obj, op, s);
+    }
+    else if (objType == typeid(long long int))
+    {
+      return CompareIntegralType<long long int>(obj, op, s);
+    }
+    else if (objType == typeid(unsigned char))
+    {
+      return CompareIntegralType<unsigned char>(obj, op, s);
+    }
+    else if (objType == typeid(unsigned short))
+    {
+      return CompareIntegralType<unsigned short>(obj, op, s);
+    }
+    else if (objType == typeid(unsigned int))
+    {
+      return CompareIntegralType<unsigned int>(obj, op, s);
+    }
+    else if (objType == typeid(unsigned long int))
+    {
+      return CompareIntegralType<unsigned long int>(obj, op, s);
+    }
+    else if (objType == typeid(unsigned long long int))
+    {
+      return CompareIntegralType<unsigned long long int>(obj, op, s);
     }
     else if (objType == typeid(float))
     {
@@ -434,23 +453,6 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
         return (diff < std::numeric_limits<double>::epsilon()) && (diff > -std::numeric_limits<double>::epsilon());
       }
     }
-    else if (objType == typeid(long long int))
-    {
-      long long int sLongInt;
-      std::stringstream ss(s);
-      ss >> sLongInt;
-      long long int longIntVal = any_cast<long long int>(obj);
-
-      switch(op)
-      {
-      case LE:
-        return longIntVal <= sLongInt;
-      case GE:
-        return longIntVal >= sLongInt;
-      default: /*APPROX and EQ*/
-        return longIntVal == sLongInt;
-      }
-    }
     else if (objType == typeid(std::vector<Any>))
     {
       const std::vector<Any>& list = ref_any_cast<std::vector<Any> >(obj);
@@ -467,6 +469,25 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
     // Just consider it a false match and ignore the exception
   }
   return false;
+}
+
+template<typename T>
+bool LDAPExpr::CompareIntegralType(const Any& obj, const int op, const std::string& s) const
+{
+  T sInt;
+  std::stringstream ss(s);
+  ss >> sInt;
+  T intVal = any_cast<T>(obj);
+
+  switch(op)
+  {
+  case LE:
+    return intVal <= sInt;
+  case GE:
+    return intVal >= sInt;
+  default: /*APPROX and EQ*/
+    return intVal == sInt;
+  }
 }
 
 bool LDAPExpr::CompareString( const std::string& s1, int op, const std::string& s2 )

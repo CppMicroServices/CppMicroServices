@@ -152,6 +152,10 @@ private:
   bool Compare(const Any& obj, int op, const std::string& s) const;
 
   //!
+  template<typename T>
+  bool CompareIntegralType(const Any& obj, const int op, const std::string& s) const;
+
+  //!
   static bool CompareString(const std::string& s1, int op, const std::string& s2);
 
   //!

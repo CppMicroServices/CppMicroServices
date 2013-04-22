@@ -33,6 +33,7 @@ set(_tests
   usLDAPFilterTest
   usModuleTest
   usModuleResourceTest
+  usServiceRegistryPerformanceTest
   usServiceRegistryTest
   usServiceTrackerTest
   usStaticModuleResourceTest
@@ -81,6 +82,10 @@ target_link_libraries(${_test_driver} ${US_LINK_LIBRARIES})
 
 if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
   target_link_libraries(${_test_driver} ${US_BASECLASS_LIBRARIES})
+endif()
+
+if(UNIX AND NOT APPLE)
+  target_link_libraries(${_test_driver} rt)
 endif()
 
 # Register tests

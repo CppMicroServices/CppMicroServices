@@ -33,6 +33,7 @@
 US_BEGIN_NAMESPACE
 
 class ModulePrivate;
+class ServicePropertiesImpl;
 
 /**
  * \ingroup MicroServices
@@ -164,7 +165,7 @@ private:
   ServiceRegistration(ServiceRegistrationPrivate* registrationPrivate);
 
   ServiceRegistration(ModulePrivate* module, US_BASECLASS_NAME* service,
-                      const ServiceProperties& props);
+                      const ServicePropertiesImpl& props);
 
   ServiceRegistrationPrivate* d;
 

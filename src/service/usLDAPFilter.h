@@ -22,7 +22,6 @@
 #ifndef USLDAPFILTER_H
 #define USLDAPFILTER_H
 
-#include "usServiceReference.h"
 #include "usServiceProperties.h"
 
 #include "usSharedData.h"
@@ -35,6 +34,7 @@
 US_BEGIN_NAMESPACE
 
 class LDAPFilterData;
+class ServiceReference;
 
 /**
  * \ingroup MicroServices

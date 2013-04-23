@@ -41,9 +41,9 @@ US_BEGIN_NAMESPACE
 typedef MutexLock<ServiceRegistry::MutexType> MutexLocker;
 
 
-ServiceProperties ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
-                                                           const std::list<std::string>& classes,
-                                                           long sid)
+ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
+                                                               const std::list<std::string>& classes,
+                                                               long sid)
 {
   static long nextServiceID = 1;
   ServiceProperties props(in);
@@ -55,7 +55,7 @@ ServiceProperties ServiceRegistry::CreateServiceProperties(const ServiceProperti
 
   props.insert(std::make_pair(ServiceConstants::SERVICE_ID(), sid != -1 ? sid : nextServiceID++));
 
-  return props;
+  return ServicePropertiesImpl(props);
 }
 
 ServiceRegistry::ServiceRegistry(CoreModuleContext* coreCtx)
@@ -275,7 +275,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistration& sr)
   MutexLocker lock(mutex);
 
   const std::list<std::string>& classes = ref_any_cast<std::list<std::string> >(
-        sr.d->properties[ServiceConstants::OBJECTCLASS()]);
+        sr.d->properties.Value(ServiceConstants::OBJECTCLASS()));
   services.erase(sr);
   serviceRegistrations.remove(sr);
   for (std::list<std::string>::const_iterator i = classes.begin();

@@ -67,7 +67,7 @@ public:
 
   std::string GetFilter() const;
 
-  LDAPExpr GetLDAPExpr() const;
+  const LDAPExpr& GetLDAPExpr() const;
 
   LDAPExpr::LocalCache& GetLocalCache() const;
 

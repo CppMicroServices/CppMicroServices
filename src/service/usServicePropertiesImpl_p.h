@@ -19,42 +19,37 @@
 
 =============================================================================*/
 
-#include "usServiceRegistrationPrivate.h"
+#ifndef USSERVICEPROPERTIESIMPL_P_H
+#define USSERVICEPROPERTIESIMPL_P_H
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
+#include "usServiceProperties.h"
 
 US_BEGIN_NAMESPACE
 
-ServiceRegistrationPrivate::ServiceRegistrationPrivate(
-  ModulePrivate* module, US_BASECLASS_NAME* service,
-  const ServicePropertiesImpl& props)
-  : ref(0), service(service), module(module), reference(this),
-    properties(props), available(true), unregistering(false)
-{
-  // The reference counter is initialized to 0 because it will be
-  // incremented by the "reference" member.
-}
-
-ServiceRegistrationPrivate::~ServiceRegistrationPrivate()
+class ServicePropertiesImpl
 {
 
-}
+public:
 
-bool ServiceRegistrationPrivate::IsUsedByModule(Module* p)
-{
-  return dependents.find(p) != dependents.end();
-}
+  explicit ServicePropertiesImpl(const ServiceProperties& props);
 
-US_BASECLASS_NAME* ServiceRegistrationPrivate::GetService()
-{
-  return service;
-}
+  const Any& Value(const std::string& key) const;
+  const Any& Value(int index) const;
+
+  int Find(const std::string& key) const;
+  int FindCaseSensitive(const std::string& key) const;
+
+  const std::vector<std::string>& Keys() const;
+
+private:
+
+  std::vector<std::string> keys;
+  std::vector<Any> values;
+
+  static Any emptyAny;
+
+};
 
 US_END_NAMESPACE
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#endif // USSERVICEPROPERTIESIMPL_P_H

@@ -187,8 +187,9 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, S
        sse != complicatedListeners.end(); ++sse)
   {
     ++n;
-    if (sse->GetLDAPExpr().IsNull() ||
-        sse->GetLDAPExpr().Evaluate(sr.d->GetProperties(), false))
+    const LDAPExpr& ldapExpr = sse->GetLDAPExpr();
+    if (ldapExpr.IsNull() ||
+        ldapExpr.Evaluate(sr.d->GetProperties(), false))
     {
       set.insert(*sse);
     }

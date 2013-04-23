@@ -66,7 +66,7 @@ US_BASECLASS_NAME* ServiceReferencePrivate::GetService(Module* module)
         registration->dependents[module] = 1;
         #ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
         const std::list<std::string>& classes =
-            ref_any_cast<std::list<std::string> >(registration->properties[ServiceConstants::OBJECTCLASS()]);
+            ref_any_cast<std::list<std::string> >(registration->properties.Value(ServiceConstants::OBJECTCLASS()));
         if (ServiceFactory* serviceFactory = dynamic_cast<ServiceFactory*>(registration->GetService()))
         {
           try
@@ -171,7 +171,7 @@ bool ServiceReferencePrivate::UngetService(Module* module, bool checkRefCounter)
   return hadReferences;
 }
 
-ServiceProperties ServiceReferencePrivate::GetProperties() const
+const ServicePropertiesImpl& ServiceReferencePrivate::GetProperties() const
 {
   return registration->properties;
 }
@@ -181,17 +181,12 @@ Any ServiceReferencePrivate::GetProperty(const std::string& key, bool lock) cons
   if (lock)
   {
     MutexLocker lock(registration->propsLock);
-    ServiceProperties::const_iterator iter = registration->properties.find(key);
-    if (iter != registration->properties.end())
-      return iter->second;
+    return registration->properties.Value(key);
   }
   else
   {
-    ServiceProperties::const_iterator iter = registration->properties.find(key);
-    if (iter != registration->properties.end())
-      return iter->second;
+    return registration->properties.Value(key);
   }
-  return Any();
 }
 
 US_END_NAMESPACE

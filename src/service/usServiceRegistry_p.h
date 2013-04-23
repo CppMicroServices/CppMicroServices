@@ -26,7 +26,6 @@
 #include <list>
 
 #include "usServiceRegistration.h"
-#include "usServiceProperties.h"
 
 #include "usThreads_p.h"
 
@@ -34,6 +33,7 @@ US_BEGIN_NAMESPACE
 
 class CoreModuleContext;
 class ModulePrivate;
+class ServicePropertiesImpl;
 
 
 /**
@@ -57,9 +57,9 @@ public:
    *        ModuleConstants::OBJECTCLASS.
    * @param sid A service id which will be used instead of a default one.
    */
-  static ServiceProperties CreateServiceProperties(const ServiceProperties& in,
-                                                   const std::list<std::string>& classes = std::list<std::string>(),
-                                                   long sid = -1);
+  static ServicePropertiesImpl CreateServiceProperties(const ServiceProperties& in,
+                                                       const std::list<std::string>& classes = std::list<std::string>(),
+                                                       long sid = -1);
 
   typedef US_UNORDERED_MAP_TYPE<ServiceRegistration, std::list<std::string> > MapServiceClasses;
   typedef US_UNORDERED_MAP_TYPE<std::string, std::list<ServiceRegistration> > MapClassServices;

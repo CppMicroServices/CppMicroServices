@@ -18,6 +18,7 @@ set(_srcs
   service/usServiceListeners.cpp
   service/usServiceListeners_p.h
   service/usServiceProperties.cpp
+  service/usServicePropertiesImpl.cpp
   service/usServiceReference.cpp
   service/usServiceReferencePrivate.cpp
   service/usServiceRegistration.cpp
@@ -53,6 +54,7 @@ set(_private_headers
   util/stdint_p.h
   util/stdint_vc_p.h
 
+  service/usServicePropertiesImpl_p.h
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
   service/usServiceTrackerPrivate.tpp

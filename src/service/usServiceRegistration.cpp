@@ -58,7 +58,7 @@ ServiceRegistration::ServiceRegistration(ServiceRegistrationPrivate* registratio
 }
 
 ServiceRegistration::ServiceRegistration(ModulePrivate* module, US_BASECLASS_NAME* service,
-                                         const ServiceProperties& props)
+                                         const ServicePropertiesImpl& props)
   : d(new ServiceRegistrationPrivate(module, service, props))
 {
 
@@ -117,16 +117,20 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
       {
         MutexLocker lock3(d->propsLock);
 
-        Any any = d->properties[ServiceConstants::SERVICE_RANKING()];
-        if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
+        {
+          const Any& any = d->properties.Value(ServiceConstants::SERVICE_RANKING());
+          if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
+        }
 
         d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, before, false);
-        classes = ref_any_cast<std::list<std::string> >(d->properties[ServiceConstants::OBJECTCLASS()]);
-        long int sid = any_cast<long int>(d->properties[ServiceConstants::SERVICE_ID()]);
+        classes = ref_any_cast<std::list<std::string> >(d->properties.Value(ServiceConstants::OBJECTCLASS()));
+        long int sid = any_cast<long int>(d->properties.Value(ServiceConstants::SERVICE_ID()));
         d->properties = ServiceRegistry::CreateServiceProperties(props, classes, sid);
 
-        any = d->properties[ServiceConstants::SERVICE_RANKING()];
-        if (any.Type() == typeid(int)) new_rank = any_cast<int>(any);
+        {
+          const Any& any = d->properties.Value(ServiceConstants::SERVICE_RANKING());
+          if (any.Type() == typeid(int)) new_rank = any_cast<int>(any);
+        }
       }
 
       if (old_rank != new_rank)

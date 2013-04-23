@@ -21,10 +21,17 @@
 
 #include "usLDAPExpr_p.h"
 
+#include "usAny.h"
+#include "usServicePropertiesImpl_p.h"
+
 #include <limits>
 #include <iterator>
 #include <cctype>
 #include <stdexcept>
+
+#include <cerrno>
+#include <cstdlib>
+#include <cmath>
 
 US_BEGIN_NAMESPACE
 
@@ -293,22 +300,19 @@ bool LDAPExpr::IsNull() const
   return !d;
 }
 
-bool LDAPExpr::Query( const std::string &filter, const ServiceProperties &pd )
+bool LDAPExpr::Query( const std::string& filter, const ServicePropertiesImpl& pd)
 {
   return LDAPExpr(filter).Evaluate(pd, false);
 }
 
-bool LDAPExpr::Evaluate( const ServiceProperties& p, bool matchCase ) const
+bool LDAPExpr::Evaluate( const ServicePropertiesImpl& p, bool matchCase ) const
 {
   if ((d->m_operator & SIMPLE) != 0)
   {
-    Any propVal;
-    ServiceProperties::const_iterator it = p.find(d->m_attrName);
-    if (it != p.end() && (matchCase ? d->m_attrName == static_cast<std::string>(it->first) : true))
-    {
-      propVal = it->second;
-    }
-    return Compare(propVal, d->m_operator, d->m_attrValue);
+    // try case sensitive match first
+    int index = p.FindCaseSensitive(d->m_attrName);
+    if (index < 0 && !matchCase) index = p.Find(d->m_attrName);
+    return index < 0 ? false : Compare(p.Value(index), d->m_operator, d->m_attrValue);
   }
   else
   { // (d->m_operator & COMPLEX) != 0
@@ -419,10 +423,16 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
     }
     else if (objType == typeid(float))
     {
-      float sFloat;
-      std::stringstream ss(s);
-      ss >> sFloat;
-      float floatVal = any_cast<float>(obj);
+      errno = 0;
+      char* endptr = 0;
+      double sFloat = strtod(s.c_str(), &endptr);
+      if ((errno == ERANGE && (sFloat == 0 || sFloat == HUGE_VAL || sFloat == -HUGE_VAL)) ||
+          (errno != 0 && sFloat == 0) || endptr == s.c_str())
+      {
+        return false;
+      }
+
+      double floatVal = static_cast<double>(any_cast<float>(obj));
 
       switch(op)
       {
@@ -431,15 +441,21 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
       case GE:
         return floatVal >= sFloat;
       default: /*APPROX and EQ*/
-        float diff = floatVal - sFloat;
+        double diff = floatVal - sFloat;
         return (diff < std::numeric_limits<float>::epsilon()) && (diff > -std::numeric_limits<float>::epsilon());
       }
     }
     else if (objType == typeid(double))
     {
-      double sDouble;
-      std::stringstream ss(s);
-      ss >> sDouble;
+      errno = 0;
+      char* endptr = 0;
+      double sDouble = strtod(s.c_str(), &endptr);
+      if ((errno == ERANGE && (sDouble == 0 || sDouble == HUGE_VAL || sDouble == -HUGE_VAL)) ||
+          (errno != 0 && sDouble == 0) || endptr == s.c_str())
+      {
+        return false;
+      }
+
       double doubleVal = any_cast<double>(obj);
 
       switch(op)
@@ -474,9 +490,16 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
 template<typename T>
 bool LDAPExpr::CompareIntegralType(const Any& obj, const int op, const std::string& s) const
 {
-  T sInt;
-  std::stringstream ss(s);
-  ss >> sInt;
+  errno = 0;
+  char* endptr = 0;
+  long longInt = strtol(s.c_str(), &endptr, 10);
+  if ((errno == ERANGE && (longInt == std::numeric_limits<long>::max() || longInt == std::numeric_limits<long>::min())) ||
+       (errno != 0 && longInt == 0) || endptr == s.c_str())
+  {
+    return false;
+  }
+
+  T sInt = static_cast<T>(longInt);
   T intVal = any_cast<T>(obj);
 
   switch(op)
@@ -510,6 +533,7 @@ bool LDAPExpr::CompareString( const std::string& s1, int op, const std::string& 
 std::string LDAPExpr::FixupString( const std::string& s )
 {
   std::string sb;
+  sb.reserve(s.size());
   std::size_t len = s.length();
   for(std::size_t i=0; i<len; i++)
   {

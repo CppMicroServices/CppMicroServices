@@ -30,113 +30,16 @@
 
 #include "usAny.h"
 
-/// \cond
-US_BEGIN_NAMESPACE
-
-struct ci_char_traits : public std::char_traits<char>
-    // just inherit all the other functions
-    //  that we don't need to override
-{
-
-  static bool eq(char c1, char c2)
-  {
-    return std::toupper(c1) == std::toupper(c2);
-  }
-
-  static bool ne(char c1, char c2)
-  {
-    return std::toupper(c1) != std::toupper(c2);
-  }
-
-  static bool lt(char c1, char c2)
-  {
-    return std::toupper(c1) < std::toupper(c2);
-  }
-
-  static bool gt(char c1, char c2)
-  {
-    return std::toupper(c1) > std::toupper(c2);
-  }
-
-  static int compare(const char* s1, const char* s2, std::size_t n)
-  {
-    while (n-- > 0)
-    {
-      if (lt(*s1, *s2)) return -1;
-      if (gt(*s1, *s2)) return 1;
-      ++s1; ++s2;
-    }
-    return 0;
-  }
-
-  static const char* find(const char* s, int n, char a)
-  {
-    while (n-- > 0 && std::toupper(*s) != std::toupper(a))
-    {
-      ++s;
-    }
-    return s;
-  }
-
-};
-
-class ci_string : public std::basic_string<char, ci_char_traits>
-{
-private:
-
-  typedef std::basic_string<char, ci_char_traits> Super;
-
-public:
-
-  inline ci_string() : Super() {}
-  inline ci_string(const ci_string& cistr) : Super(cistr) {}
-  inline ci_string(const ci_string& cistr, size_t pos, size_t n) : Super(cistr, pos, n) {}
-  inline ci_string(const char* s, size_t n) : Super(s, n) {}
-  inline ci_string(const char* s) : Super(s) {}
-  inline ci_string(size_t n, char c) : Super(n, c) {}
-
-  inline ci_string(const std::string& str) : Super(str.begin(), str.end()) {}
-
-  template<class InputIterator> ci_string(InputIterator b, InputIterator e)
-    : Super(b, e)
-  {}
-
-  inline operator std::string () const
-  {
-    return std::string(begin(), end());
-  }
-};
-
-US_END_NAMESPACE
-
-US_HASH_FUNCTION_NAMESPACE_BEGIN
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ci_string))
-
-  std::string ls(arg);
-  std::transform(ls.begin(), ls.end(), ls.begin(), ::tolower);
-
-  using namespace US_HASH_FUNCTION_NAMESPACE;
-  return US_HASH_FUNCTION(std::string, ls);
-
-US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
-
-/// \endcond
-
 US_BEGIN_NAMESPACE
 
 /**
  * \ingroup MicroServices
  *
- * A hash table based map class with case-insensitive keys. This class
- * uses ci_string as key type and Any as values. Due
- * to the conversion capabilities of ci_string, std::string objects
- * can be used transparantly to insert or retrieve key-value pairs.
- *
- * <p>
- * Note that the case of the keys will be preserved.
+ * A hash table with std::string as the key type and Any as the value
+ * type. It is typically used for passing service properties to
+ * ModuleContext::RegisterService.
  */
-typedef US_UNORDERED_MAP_TYPE<ci_string, Any> ServiceProperties;
+typedef US_UNORDERED_MAP_TYPE<std::string, Any> ServiceProperties;
 
 /**
  * \ingroup MicroServices

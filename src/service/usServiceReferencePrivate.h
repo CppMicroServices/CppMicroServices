@@ -25,12 +25,13 @@
 
 #include "usAtomicInt_p.h"
 
-#include "usServiceProperties.h"
-
+#include <string>
 
 US_BEGIN_NAMESPACE
 
+class Any;
 class Module;
+class ServicePropertiesImpl;
 class ServiceRegistrationPrivate;
 class ServiceReferencePrivate;
 
@@ -72,7 +73,7 @@ public:
    * @return A ServiceProperties object containing properties or being empty
    *         if service has been removed.
    */
-  ServiceProperties GetProperties() const;
+  const ServicePropertiesImpl& GetProperties() const;
 
   /**
    * Returns the property value to which the specified property key is mapped

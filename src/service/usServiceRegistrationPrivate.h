@@ -24,7 +24,7 @@
 #define USSERVICEREGISTRATIONPRIVATE_H
 
 #include "usServiceReference.h"
-#include "usServiceProperties.h"
+#include "usServicePropertiesImpl_p.h"
 #include "usAtomicInt_p.h"
 
 US_BEGIN_NAMESPACE
@@ -91,7 +91,7 @@ public:
   /**
    * Service properties.
    */
-  ServiceProperties properties;
+  ServicePropertiesImpl properties;
 
   /**
    * Is service available. I.e., if <code>true</code> then holders
@@ -115,7 +115,7 @@ public:
   MutexType propsLock;
 
   ServiceRegistrationPrivate(ModulePrivate* module, US_BASECLASS_NAME* service,
-                             const ServiceProperties& props);
+                             const ServicePropertiesImpl& props);
 
   ~ServiceRegistrationPrivate();
 

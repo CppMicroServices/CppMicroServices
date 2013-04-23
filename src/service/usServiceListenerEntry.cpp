@@ -132,7 +132,7 @@ std::string ServiceListenerEntry::GetFilter() const
   return d->ldap.IsNull() ? std::string() : d->ldap.ToString();
 }
 
-LDAPExpr ServiceListenerEntry::GetLDAPExpr() const
+const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {
   return d->ldap;
 }

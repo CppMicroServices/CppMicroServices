@@ -76,22 +76,15 @@ Any ServiceReference::GetProperty(const std::string& key) const
 {
   MutexLocker lock(d->registration->propsLock);
 
-  ServiceProperties::const_iterator iter = d->registration->properties.find(key);
-  if (iter != d->registration->properties.end())
-    return iter->second;
-  return Any();
+  return d->registration->properties.Value(key);
 }
 
 void ServiceReference::GetPropertyKeys(std::vector<std::string>& keys) const
 {
   MutexLocker lock(d->registration->propsLock);
 
-  ServiceProperties::const_iterator iterEnd = d->registration->properties.end();
-  for (ServiceProperties::const_iterator iter = d->registration->properties.begin();
-       iter != iterEnd; ++iter)
-  {
-    keys.push_back(iter->first);
-  }
+  const std::vector<std::string>& ks = d->registration->properties.Keys();
+  keys.assign(ks.begin(), ks.end());
 }
 
 Module* ServiceReference::GetModule() const

@@ -26,14 +26,15 @@
 #include <usConfig.h>
 
 #include "usSharedData.h"
-#include "usServiceProperties.h"
 
 #include <vector>
 #include <string>
 
 US_BEGIN_NAMESPACE
 
+class Any;
 class LDAPExprData;
+class ServicePropertiesImpl;
 
 /**
  * This class is not part of the public API.
@@ -119,10 +120,10 @@ public:
   bool IsNull() const;
 
   //!
-  static bool Query(const std::string& filter, const ServiceProperties& pd);
+  static bool Query(const std::string& filter, const ServicePropertiesImpl& pd);
 
   //! Evaluate this LDAP filter.
-  bool Evaluate(const ServiceProperties& p, bool matchCase) const;
+  bool Evaluate(const ServicePropertiesImpl& p, bool matchCase) const;
 
   //!
   const std::string ToString() const;

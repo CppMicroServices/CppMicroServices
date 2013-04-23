@@ -59,11 +59,11 @@ US_END_NAMESPACE
 
 /** \brief Must be called last in the main test function. */
 #define US_TEST_END()                                                                         \
-  } catch (US_PREPEND_NAMESPACE(TestFailedException) ex) {                                    \
+  } catch (const US_PREPEND_NAMESPACE(TestFailedException)& ex) {                             \
     US_TEST_OUTPUT(<< "Further test execution skipped.")                                      \
     US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
-  } catch (std::exception ex) {                                                               \
-    US_TEST_OUTPUT(<< "std::exception occured " << ex.what())                                 \
+  } catch (const std::exception& ex) {                                                        \
+    US_TEST_OUTPUT(<< "Exception occured " << ex.what())                                      \
     US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
   }                                                                                           \
   if (US_PREPEND_NAMESPACE(TestManager)::GetInstance().NumberOfFailedTests() > 0) {           \

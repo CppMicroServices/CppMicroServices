@@ -65,11 +65,24 @@ public:
 
   ServiceRegistration(const ServiceRegistration& reg);
 
+  /**
+   * A boolean conversion operator converting this ServiceRegistration object
+   * to \c true if it is valid and to \c false otherwise. A SeriveRegistration
+   * object is invalid if it was default-constructed or was invalidated by
+   * assigning 0 to it.
+   *
+   * \see operator=(int)
+   *
+   * \return \c true if this ServiceRegistration object is valid, \c false
+   *         otherwise.
+   */
   operator bool() const;
 
   /**
    * Releases any resources held or locked by this
    * <code>ServiceRegistration</code> and renders it invalid.
+   *
+   * \return This ServiceRegistration object.
    */
   ServiceRegistration& operator=(int null);
 
@@ -149,6 +162,17 @@ public:
    */
   void Unregister();
 
+  /**
+   * Compare two ServiceRegistration objects.
+   *
+   * If both ServiceRegistration objects are valid, the comparison is done
+   * using the underlying ServiceReference object. Otherwise, this ServiceRegistration
+   * object is less than the other object if and only if this object is invalid and
+   * the other object is valid.
+   *
+   * @param o The ServiceRegistration object to compare with.
+   * @return \c true if this ServiceRegistration object is less than the other object.
+   */
   bool operator<(const ServiceRegistration& o) const;
 
   bool operator==(const ServiceRegistration& registration) const;

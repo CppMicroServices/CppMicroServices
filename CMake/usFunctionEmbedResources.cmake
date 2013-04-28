@@ -10,14 +10,14 @@
 #! executables, using the EXECUTABLE_NAME argument instead of LIBRARY_NAME.
 #!
 #! Example usage:
-#! \verbatim
+#! \code{.cmake}
 #! set(module_srcs )
 #! usFunctionEmbedResources(module_srcs
 #!                          LIBRARY_NAME "mylib"
 #!                          ROOT_DIR resources
 #!                          FILES config.properties logo.png
 #!                         )
-#! \endverbatim
+#! \endcode
 #!
 #! \param LIBRARY_NAME (required if EXECUTABLE_NAME is empty) The library name of the module
 #!        which will include the generated source file, without extension.

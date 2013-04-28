@@ -13,14 +13,16 @@ To create a ModuleContext object for a specific library, you have two options. I
 CMake as the build system, use the supplied `#usFunctionGenerateModuleInit` CMake function to automatically
 create a source file and add it to your module's sources:
 
-    set(module_srcs )
-    usFunctionGenerateModuleInit(module_srcs
-                                 NAME "My Module"
-                                 LIBRARY_NAME "mylibname"
-                                 VERSION "1.0.0"
-                                )
-    add_library(mylib ${module_srcs})
-    
+~~~{.cpp}
+set(module_srcs )
+usFunctionGenerateModuleInit(module_srcs
+                             NAME "My Module"
+                             LIBRARY_NAME "mylibname"
+                             VERSION "1.0.0"
+                            )
+add_library(mylib ${module_srcs})
+~~~
+
 If you do not use CMake, you have to add a call to the macro `#US_INITIALIZE_MODULE` in one of the source
 files of your module:
 

@@ -4,7 +4,7 @@
 #! This CMake function will store the path to a generated source file in the
 #! src_var variable, which should be compiled into a module. Example usage:
 #!
-#! \verbatim
+#! \code{.cmake}
 #! set(module_srcs )
 #! usFunctionGenerateModuleInit(module_srcs
 #!                              NAME "My Module"
@@ -12,7 +12,7 @@
 #!                              VERSION "1.2.0"
 #!                             )
 #! add_library(mylib ${module_srcs})
-#! \endverbatim
+#! \endcode
 #!
 #! \param src_var (required) The name of a list variable to which the path of the generated
 #!        source file will be appended.
@@ -27,6 +27,8 @@
 #! \param VERSION (optional) A version string for the module.
 #! \param EXECUTABLE (flag) A flag indicating that the initialization code is intended for
 #! an executable.
+#!
+#! \see \ref MicroServices_AutoLoading
 #!
 function(usFunctionGenerateModuleInit src_var)
 

@@ -227,6 +227,7 @@ void ServiceRegistration::Unregister()
 
 bool ServiceRegistration::operator<(const ServiceRegistration& o) const
 {
+  if ((!d && !o.d) || !o.d) return false;
   if (!d) return true;
   return d->reference <(o.d->reference);
 }

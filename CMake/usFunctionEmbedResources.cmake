@@ -1,4 +1,5 @@
-#! Embed resources into a shared library or executable.
+#! \ingroup MicroServicesCMake
+#! \brief Embed resources into a shared library or executable.
 #!
 #! This CMake function uses an external command line program to generate a source
 #! file containing data from external resources such as text files or images. The path

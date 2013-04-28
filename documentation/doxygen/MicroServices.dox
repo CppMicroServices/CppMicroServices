@@ -20,6 +20,18 @@ as specified in the OSGi R4.2 specifications.
 
 /**
 
+\defgroup MicroServicesCMake CMake Functions
+
+\brief This category includes CMake utility functions for external projects.
+
+External projects can include the CMake scripts provided by the CppMicroServices
+library to automatically generate module initialization code and to embed external resources
+into a modules shared library.
+
+*/
+
+/**
+
 \page MicroServices_Examples Examples
 
 This is a list of available examples:

@@ -9,7 +9,7 @@ if(NOT US_IS_EMBEDDED)
   find_package(Doxygen)
 
   if(DOXYGEN_FOUND)
-  
+
     option(US_DOCUMENTATION_FOR_WEBPAGE "Build Doxygen documentation for the webpage" OFF)
     set(US_DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Doxygen output directory")
     mark_as_advanced(US_DOCUMENTATION_FOR_WEBPAGE US_DOXYGEN_OUTPUT_DIR)
@@ -22,11 +22,11 @@ if(NOT US_IS_EMBEDDED)
     if(NOT DEFINED US_DOXYGEN_DOT_NUM_THREADS)
       set(US_DOXYGEN_DOT_NUM_THREADS 4)
     endif()
-    
+
     # We are in standalone mode, so we generate a "mainpage"
     set(US_DOXYGEN_MAIN_PAGE_CMD "\\mainpage")
     set(US_DOXYGEN_ENABLED_SECTIONS "us_standalone")
-    
+
     if(US_DOCUMENTATION_FOR_WEBPAGE)
       configure_file(doxygen/header.html
                      ${CMAKE_CURRENT_BINARY_DIR}/header.html COPY_ONLY)
@@ -39,7 +39,7 @@ if(NOT US_IS_EMBEDDED)
       configure_file(doxygen/doxygen_extra.css
                      ${CMAKE_CURRENT_BINARY_DIR}/doxygen_extra.css COPY_ONLY)
       set(US_DOXYGEN_EXTRA_CSS doxygen_extra.css)
-      
+
       set(US_DOXYGEN_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/gh-pages)
       if(${PROJECT_NAME}_MINOR_VERSION EQUAL 99)
         set(US_DOXYGEN_HTML_OUTPUT "doc_latest")
@@ -52,7 +52,21 @@ if(NOT US_IS_EMBEDDED)
       set(US_DOXYGEN_CSS )
       set(US_DOXYGEN_HTML_OUTPUT "html")
     endif()
-    
+
+    # Compile a command line tool which transforms comments in CMake scripts into
+    # Doxygen parseable C code.
+    set(CMakeDoxygenFilter_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CMakeDoxygenFilter${CMAKE_EXECUTABLE_SUFFIX}")
+    try_compile(_result_var
+                "${CMAKE_CURRENT_BINARY_DIR}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp"
+                OUTPUT_VARIABLE _compile_output
+                COPY_FILE ${CMakeDoxygenFilter_EXECUTABLE}
+               )
+
+    if(NOT _result_var)
+      message(FATAL_ERROR "error: Faild to compile ${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp (result: ${result_var})\n${_compile_output}")
+    endif()
+
     configure_file(doxygen.conf.in
                    ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 

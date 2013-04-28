@@ -1,4 +1,5 @@
-#! Generate a source file which handles proper initialization of a module.
+#! \ingroup MicroServicesCMake
+#! \brief Generate a source file which handles proper initialization of a module.
 #!
 #! This CMake function will store the path to a generated source file in the
 #! src_var variable, which should be compiled into a module. Example usage:

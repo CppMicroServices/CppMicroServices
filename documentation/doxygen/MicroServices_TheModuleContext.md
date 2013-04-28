@@ -10,7 +10,7 @@ the C++ Micro Services framework to properly cleanup resources after a module ha
 ### Creating a ModuleContext
 
 To create a ModuleContext object for a specific library, you have two options. If your project uses
-CMake as the build system, use the supplied `usFunctionGenerateModuleInit` CMake function to automatically
+CMake as the build system, use the supplied `#usFunctionGenerateModuleInit` CMake function to automatically
 create a source file and add it to your module's sources:
 
     set(module_srcs )

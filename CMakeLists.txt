@@ -92,7 +92,6 @@ if(NOT DEFINED US_IS_EMBEDDED)
 endif()
 
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
-us_cache_var(US_ENABLE_SERVICE_FACTORY_SUPPORT ON BOOL "Enable Service Factory support" ADVANCED)
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
 us_cache_var(US_ENABLE_RESOURCE_COMPRESSION ON BOOL "Enable resource compression" ADVANCED)
@@ -108,97 +107,8 @@ endif()
 
 us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ micro services entities")
 us_cache_var(US_HEADER_PREFIX "" STRING "The file name prefix for the public C++ micro services header files")
-us_cache_var(US_BASECLASS_NAME "" STRING "The fully-qualified name of the base class")
-
-if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  us_cache_var(US_BASECLASS_PACKAGE "" STRING "The name of the package providing the base class definition" ADVANCED)
-
-  set(bc_inc_d_doc "A list of include directories containing the header files for the base class")
-  us_cache_var(US_BASECLASS_INCLUDE_DIRS "" STRING "${bc_inc_d_doc}" ADVANCED)
-
-  set(bc_lib_d_doc "A list of library directories for the base class")
-  us_cache_var(US_BASECLASS_LIBRARY_DIRS "" STRING "${bc_lib_d_doc}" ADVANCED)
-
-  set(bc_lib_doc "A list of libraries needed for the base class")
-  us_cache_var(US_BASECLASS_LIBRARIES "" STRING "${bc_lib_doc}" ADVANCED)
-
-  us_cache_var(US_BASECLASS_HEADER "" STRING "The name of the header file containing the base class declaration" ADVANCED)
-endif()
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
-
-# Sanity checks
-
-if(US_ENABLE_SERVICE_FACTORY_SUPPORT OR US_BUILD_TESTING)
-  if(US_BASECLASS_PACKAGE)
-    find_package(${US_BASECLASS_PACKAGE} REQUIRED)
-
-    # Try to get the include dirs
-    foreach(_suffix DIRECTORIES DIRS DIRECTORY DIR)
-      if(${US_BASECLASS_PACKAGE}_INCLUDE_${_suffix} AND NOT US_BASECLASS_INCLUDE_DIRS)
-        us_cache_var(US_BASECLASS_INCLUDE_DIRS "${${US_BASECLASS_PACKAGE}_INCLUDE_${_suffix}}" STRING "${bc_inc_d_doc}" FORCE)
-        break()
-      endif()
-    endforeach()
-
-    # Try to get the library dirs
-    foreach(_suffix DIRECTORIES DIRS DIRECTORY DIR)
-      if(${US_BASECLASS_PACKAGE}_LIBRARY_${_suffix} AND NOT US_BASECLASS_LIBRARY_DIRS)
-        us_cache_var(US_BASECLASS_LIBRARY_DIRS "${${US_BASECLASS_PACKAGE}_LIBRARY_${_suffix}}" STRING "${bc_lib_d_doc}" FORCE)
-        break()
-      endif()
-    endforeach()
-
-    # Try to get the libraries
-    foreach(_suffix LIBRARIES LIBS LIBRARY LIB)
-      if(${US_BASECLASS_PACKAGE}_${_suffix} AND NOT US_BASECLASS_LIBRARIES)
-        us_cache_var(US_BASECLASS_LIBRARIES "${${US_BASECLASS_PACKAGE}_${_suffix}}" STRING "${bc_lib_doc}" FORCE)
-        break()
-      endif()
-    endforeach()
-
-    if(NOT US_BASECLASS_NAME)
-      message(FATAL_ERROR "US_BASECLASS_NAME not set")
-    elseif(NOT US_BASECLASS_HEADER)
-      message(FATAL_ERROR "US_BASECLASS_HEADER not set")
-    endif()
-  endif()
-
-  if(US_ENABLE_SERVICE_FACTORY_SUPPORT AND US_BASECLASS_NAME AND NOT US_BASECLASS_HEADER)
-    message(FATAL_ERROR "US_ENABLE_SERVICE_FACTORY_SUPPORT requires a US_BASECLASS_HEADER value")
-  endif()
-endif()
-
-set(_us_baseclass_default 0)
-if(NOT US_BASECLASS_NAME)
-  message(WARNING "Using build in base class \"::${US_NAMESPACE}::Base\"")
-  set(_us_baseclass_default 1)
-  set(US_BASECLASS_NAME "${US_NAMESPACE}::Base")
-  set(US_BASECLASS_HEADER "usBase.h")
-endif()
-
-if(US_BUILD_TESTING AND US_BASECLASS_NAME AND NOT US_BASECLASS_HEADER)
-  message(FATAL_ERROR "US_BUILD_TESTING requires a US_BASECLASS_HEADER value")
-endif()
-
-set(US_BASECLASS_INCLUDE "#include <${US_BASECLASS_HEADER}>")
-
-string(REPLACE "::" ";" _bc_token "${US_BASECLASS_NAME}")
-list(GET _bc_token -1 _bc_name)
-list(REMOVE_AT _bc_token -1)
-
-set(US_BASECLASS_FORWARD_DECLARATION "")
-foreach(_namespace_tok ${_bc_token})
-  if(_namespace_tok)
-    set(US_BASECLASS_FORWARD_DECLARATION "${US_BASECLASS_FORWARD_DECLARATION}namespace ${_namespace_tok} { ")
-  endif()
-endforeach()
-set(US_BASECLASS_FORWARD_DECLARATION "${US_BASECLASS_FORWARD_DECLARATION}class ${_bc_name}; ")
-foreach(_namespace_tok ${_bc_token})
-  if(_namespace_tok)
-    set(US_BASECLASS_FORWARD_DECLARATION "${US_BASECLASS_FORWARD_DECLARATION}}")
-  endif()
-endforeach()
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -302,10 +212,6 @@ set(US_INTERNAL_INCLUDE_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module
 )
 
-if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  list(APPEND US_INTERNAL_INCLUDE_DIRS ${US_BASECLASS_INCLUDE_DIRS})
-endif()
-
 # link libraries for third party libs
 if(US_IS_EMBEDDED)
   set(US_LINK_LIBRARIES ${US_EMBEDDING_LIBRARY})
@@ -319,15 +225,6 @@ if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
 list(APPEND US_LINK_LIBRARIES ${_link_libraries})
-
-if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  list(APPEND US_LINK_LIBRARIES ${US_BASECLASS_LIBRARIES})
-endif()
-
-set(US_LINK_DIRS )
-if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  list(APPEND US_LINK_DIRS ${US_BASECLASS_LIBRARY_DIRS})
-endif()
 
 #-----------------------------------------------------------------------------
 # Source directory

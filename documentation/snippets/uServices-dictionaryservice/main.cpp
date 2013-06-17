@@ -7,9 +7,6 @@
 #include <usGetModuleContext.h>
 #include <usServiceProperties.h>
 
-// Replace that include with your own base class declaration
-#include US_BASECLASS_HEADER
-
 #include <set>
 #include <algorithm>
 #include <memory>
@@ -32,7 +29,7 @@ private:
    * A private inner class that implements a dictionary service;
    * see DictionaryService for details of the service.
    */
-  class DictionaryImpl : public US_BASECLASS_NAME, public DictionaryService
+  class DictionaryImpl : public DictionaryService
   {
     // The set of words contained in the dictionary.
     std::set<std::string> m_dictionary;
@@ -107,10 +104,10 @@ US_INITIALIZE_MODULE("DictionaryServiceModule", "", "", "1.0.0")
 int main(int /*argc*/, char* /*argv*/[])
 {
   //![GetDictionaryService]
-  ServiceReference dictionaryServiceRef = GetModuleContext()->GetServiceReference<DictionaryService>();
+  ServiceReference<DictionaryService> dictionaryServiceRef = GetModuleContext()->GetServiceReference<DictionaryService>();
   if (dictionaryServiceRef)
   {
-    DictionaryService* dictionaryService = GetModuleContext()->GetService<DictionaryService>(dictionaryServiceRef);
+    DictionaryService* dictionaryService = GetModuleContext()->GetService(dictionaryServiceRef);
     if (dictionaryService)
     {
       std::cout << "Dictionary contains 'Tutorial': " << dictionaryService->checkWord("Tutorial") << std::endl;

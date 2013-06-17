@@ -39,14 +39,14 @@ ModuleAbstractTracked<S,T,R>::~ModuleAbstractTracked()
 }
 
 template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::SetInitial(const std::list<S>& initiallist)
+void ModuleAbstractTracked<S,T,R>::SetInitial(const std::vector<S>& initiallist)
 {
-  initial = initiallist;
+  std::copy(initiallist.begin(), initiallist.end(), std::back_inserter(initial));
 
   if (DEBUG_OUTPUT)
   {
-    for(typename std::list<S>::const_iterator item = initiallist.begin();
-      item != initiallist.end(); ++item)
+    for(typename std::list<S>::const_iterator item = initial.begin();
+      item != initial.end(); ++item)
     {
       US_DEBUG << "ModuleAbstractTracked::setInitial: " << (*item);
     }
@@ -58,7 +58,7 @@ void ModuleAbstractTracked<S,T,R>::TrackInitial()
 {
   while (true)
   {
-    S item(0);
+    S item;
     {
       typename Self::Lock l(this);
       if (closed || (initial.size() == 0))
@@ -221,7 +221,7 @@ T ModuleAbstractTracked<S,T,R>::GetCustomizedObject(S item) const
 }
 
 template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::GetTracked(std::list<S>& items) const
+void ModuleAbstractTracked<S,T,R>::GetTracked(std::vector<S>& items) const
 {
   for (typename TrackingMap::const_iterator i = tracked.begin();
        i != tracked.end(); ++i)

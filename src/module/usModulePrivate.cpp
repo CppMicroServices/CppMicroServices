@@ -28,7 +28,7 @@
 #include "usModuleUtils_p.h"
 #include "usCoreModuleContext_p.h"
 #include "usServiceRegistration.h"
-#include "usServiceReferencePrivate.h"
+#include "usServiceReferenceBasePrivate.h"
 
 #include <algorithm>
 #include <iterator>
@@ -140,9 +140,9 @@ void ModulePrivate::RemoveModuleResources()
 {
   coreCtx->listeners.RemoveAllListeners(moduleContext);
 
-  std::list<ServiceRegistration> srs;
+  std::vector<ServiceRegistrationBase> srs;
   coreCtx->services.GetRegisteredByModule(this, srs);
-  for (std::list<ServiceRegistration>::iterator i = srs.begin();
+  for (std::vector<ServiceRegistrationBase>::iterator i = srs.begin();
        i != srs.end(); ++i)
   {
     try
@@ -159,10 +159,10 @@ void ModulePrivate::RemoveModuleResources()
 
   srs.clear();
   coreCtx->services.GetUsedByModule(q, srs);
-  for (std::list<ServiceRegistration>::const_iterator i = srs.begin();
+  for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin();
        i != srs.end(); ++i)
   {
-    i->GetReference().d->UngetService(q, false);
+    i->GetReference(std::string()).d->UngetService(q, false);
   }
 
   for (std::size_t i = 0; i < resourceTreePtrs.size(); ++i)

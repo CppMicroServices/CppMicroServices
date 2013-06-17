@@ -20,6 +20,7 @@
 =============================================================================*/
 
 
+#include "usServiceInterface.h"
 #include "usServiceRegistration.h"
 
 US_BEGIN_NAMESPACE
@@ -88,7 +89,7 @@ public:
    *         the classes named when the service was registered.
    * @see ModuleContext#GetService
    */
-  virtual US_BASECLASS_NAME* GetService(Module* module, const ServiceRegistration& registration) = 0;
+  virtual InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object.
@@ -104,8 +105,8 @@ public:
    *        <code>ServiceFactory::GetService</code> method.
    * @see ModuleContext#UngetService
    */
-  virtual void UngetService(Module* module, const ServiceRegistration& registration,
-                            US_BASECLASS_NAME* service) = 0;
+  virtual void UngetService(Module* module, const ServiceRegistrationBase& registration,
+                            const InterfaceMap& service) = 0;
 };
 
 US_END_NAMESPACE

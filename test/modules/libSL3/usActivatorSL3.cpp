@@ -26,13 +26,11 @@
 #include <usFooService.h>
 #include <usConfig.h>
 
-#include US_BASECLASS_HEADER
-
 US_BEGIN_NAMESPACE
 
 class ActivatorSL3 :
-    public US_BASECLASS_NAME, public ModuleActivator, public ModulePropsInterface,
-    public ServiceTrackerCustomizer<FooService*>
+    public ModuleActivator, public ModulePropsInterface,
+    public ServiceTrackerCustomizer<FooService>
 {
 
 public:
@@ -46,7 +44,9 @@ public:
   {
     this->context = context;
 
-    sr = context->RegisterService("ActivatorSL3", this);
+    InterfaceMap im = MakeInterfaceMap(this, InterfaceT<ModulePropsInterface>());
+    im.insert(std::make_pair(std::string("ActivatorSL3"), this));
+    sr = context->RegisterService(im);
     delete tracker;
     tracker = new FooTracker(context, this);
     tracker->Open();
@@ -62,22 +62,22 @@ public:
     return props;
   }
 
-  FooService* AddingService(const ServiceReference& reference)
+  FooService* AddingService(const ServiceReferenceT& reference)
   {
     props["serviceAdded"] = true;
     US_INFO << "SL3: Adding reference =" << reference;
 
-    FooService* fooService = context->GetService<FooService>(reference);
+    FooService* fooService = context->GetService(reference);
     fooService->foo();
     return fooService;
   }
 
-  void ModifiedService(const ServiceReference& /*reference*/, FooService* /*service*/)
+  void ModifiedService(const ServiceReferenceT& /*reference*/, FooService* /*service*/)
   {
 
   }
 
-  void RemovedService(const ServiceReference& reference, FooService* /*service*/)
+  void RemovedService(const ServiceReferenceT& reference, FooService* /*service*/)
   {
     props["serviceRemoved"] = true;
     US_INFO << "SL3: Removing reference =" << reference;
@@ -85,11 +85,11 @@ public:
 
 private:
 
-  typedef ServiceTracker<FooService*> FooTracker;
+  typedef ServiceTracker<FooService> FooTracker;
   FooTracker* tracker;
   ModuleContext* context;
 
-  ServiceRegistration sr;
+  ServiceRegistrationU sr;
 
   ModulePropsInterface::Properties props;
 

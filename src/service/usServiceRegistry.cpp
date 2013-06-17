@@ -24,14 +24,10 @@
 #include <iterator>
 #include <stdexcept>
 
-#ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-#include US_BASECLASS_HEADER
-#endif
-
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
 #include "usServiceRegistry_p.h"
-#include "usServiceRegistrationPrivate.h"
+#include "usServiceRegistrationBasePrivate.h"
 #include "usModulePrivate.h"
 #include "usCoreModuleContext_p.h"
 
@@ -42,7 +38,7 @@ typedef MutexLock<ServiceRegistry::MutexType> MutexLocker;
 
 
 ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
-                                                               const std::list<std::string>& classes,
+                                                               const std::vector<std::string>& classes,
                                                                long sid)
 {
   static long nextServiceID = 1;
@@ -77,57 +73,44 @@ void ServiceRegistry::Clear()
   core = 0;
 }
 
-ServiceRegistration ServiceRegistry::RegisterService(ModulePrivate* module,
-                                                     const std::list<std::string>& classes,
-                                                     US_BASECLASS_NAME* service,
+ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
+                                                     const InterfaceMap& service,
                                                      const ServiceProperties& properties)
 {
-  if (service == 0)
+  if (service.empty())
   {
-    throw std::invalid_argument("Can't register 0 as a service");
+    throw std::invalid_argument("Can't register empty InterfaceMap as a service");
   }
 
+  std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
-  for (std::list<std::string>::const_iterator i = classes.begin();
-       i != classes.end(); ++i)
+  for (InterfaceMap::const_iterator i = service.begin();
+       i != service.end(); ++i)
   {
-    if (i->empty())
+    if (i->first.empty() || i->second == NULL)
     {
       throw std::invalid_argument("Can't register as null class");
     }
-
-    #ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-    if (!(dynamic_cast<ServiceFactory*>(service)))
-    #endif
-    {
-      if (!CheckServiceClass(service, *i))
-      {
-        std::string msg;
-        std::stringstream ss(msg);
-        ss << "Service class " << us_service_impl_name(service) << " is not an instance of "
-               << (*i) << ". Maybe you forgot to export the RTTI information for the interface.";
-        throw std::invalid_argument(msg);
-      }
-    }
+    classes.push_back(i->first);
   }
 
-  ServiceRegistration res(module, service,
-                          CreateServiceProperties(properties, classes));
+  ServiceRegistrationBase res(module, service,
+                              CreateServiceProperties(properties, classes));
   {
     MutexLocker lock(mutex);
     services.insert(std::make_pair(res, classes));
     serviceRegistrations.push_back(res);
-    for (std::list<std::string>::const_iterator i = classes.begin();
+    for (std::vector<std::string>::const_iterator i = classes.begin();
          i != classes.end(); ++i)
     {
-      std::list<ServiceRegistration>& s = classServices[*i];
-      std::list<ServiceRegistration>::iterator ip =
+      std::vector<ServiceRegistrationBase>& s = classServices[*i];
+      std::vector<ServiceRegistrationBase>::iterator ip =
           std::lower_bound(s.begin(), s.end(), res);
       s.insert(ip, res);
     }
   }
 
-  ServiceReference r = res.GetReference();
+  ServiceReferenceBase r = res.GetReference(std::string());
   ServiceListeners::ServiceListenerEntries listeners;
   module->coreCtx->listeners.GetMatchingServiceListeners(r, listeners);
   module->coreCtx->listeners.ServiceChanged(listeners,
@@ -135,28 +118,21 @@ ServiceRegistration ServiceRegistry::RegisterService(ModulePrivate* module,
   return res;
 }
 
-void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistration& sr,
-                                                     const std::list<std::string>& classes)
+void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistrationBase& sr,
+                                                     const std::vector<std::string>& classes)
 {
   MutexLocker lock(mutex);
-  for (std::list<std::string>::const_iterator i = classes.begin();
+  for (std::vector<std::string>::const_iterator i = classes.begin();
        i != classes.end(); ++i)
   {
-    std::list<ServiceRegistration>& s = classServices[*i];
+    std::vector<ServiceRegistrationBase>& s = classServices[*i];
     s.erase(std::remove(s.begin(), s.end(), sr), s.end());
     s.insert(std::lower_bound(s.begin(), s.end(), sr), sr);
   }
 }
 
-bool ServiceRegistry::CheckServiceClass(US_BASECLASS_NAME* , const std::string& ) const
-{
-  //return service->inherits(cls.toAscii());
-  // No possibility to check inheritance based on string literals.
-  return true;
-}
-
 void ServiceRegistry::Get(const std::string& clazz,
-                          std::list<ServiceRegistration>& serviceRegs) const
+                          std::vector<ServiceRegistrationBase>& serviceRegs) const
 {
   MutexLocker lock(mutex);
   MapClassServices::const_iterator i = classServices.find(clazz);
@@ -166,12 +142,12 @@ void ServiceRegistry::Get(const std::string& clazz,
   }
 }
 
-ServiceReference ServiceRegistry::Get(ModulePrivate* module, const std::string& clazz) const
+ServiceReferenceBase ServiceRegistry::Get(ModulePrivate* module, const std::string& clazz) const
 {
   MutexLocker lock(mutex);
   try
   {
-    std::list<ServiceReference> srs;
+    std::vector<ServiceReferenceBase> srs;
     Get_unlocked(clazz, "", module, srs);
     US_DEBUG << "get service ref " << clazz << " for module "
              << module->info.name << " = " << srs.size() << " refs";
@@ -184,22 +160,22 @@ ServiceReference ServiceRegistry::Get(ModulePrivate* module, const std::string& 
   catch (const std::invalid_argument& )
   { }
 
-  return ServiceReference();
+  return ServiceReferenceBase();
 }
 
 void ServiceRegistry::Get(const std::string& clazz, const std::string& filter,
-                          ModulePrivate* module, std::list<ServiceReference>& res) const
+                          ModulePrivate* module, std::vector<ServiceReferenceBase>& res) const
 {
   MutexLocker lock(mutex);
   Get_unlocked(clazz, filter, module, res);
 }
 
 void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& filter,
-                          ModulePrivate* /*module*/, std::list<ServiceReference>& res) const
+                          ModulePrivate* /*module*/, std::vector<ServiceReferenceBase>& res) const
 {
-  std::list<ServiceRegistration>::const_iterator s;
-  std::list<ServiceRegistration>::const_iterator send;
-  std::list<ServiceRegistration> v;
+  std::vector<ServiceRegistrationBase>::const_iterator s;
+  std::vector<ServiceRegistrationBase>::const_iterator send;
+  std::vector<ServiceRegistrationBase> v;
   LDAPExpr ldap;
   if (clazz.empty())
   {
@@ -261,7 +237,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
 
   for (; s != send; ++s)
   {
-    ServiceReference sri = s->GetReference();
+    ServiceReferenceBase sri = s->GetReference(clazz);
 
     if (filter.empty() || ldap.Evaluate(s->d->properties, false))
     {
@@ -270,18 +246,19 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
   }
 }
 
-void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistration& sr)
+void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& sr)
 {
   MutexLocker lock(mutex);
 
-  const std::list<std::string>& classes = ref_any_cast<std::list<std::string> >(
+  const std::vector<std::string>& classes = ref_any_cast<std::vector<std::string> >(
         sr.d->properties.Value(ServiceConstants::OBJECTCLASS()));
   services.erase(sr);
-  serviceRegistrations.remove(sr);
-  for (std::list<std::string>::const_iterator i = classes.begin();
+  serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
+                             serviceRegistrations.end());
+  for (std::vector<std::string>::const_iterator i = classes.begin();
        i != classes.end(); ++i)
   {
-    std::list<ServiceRegistration>& s = classServices[*i];
+    std::vector<ServiceRegistrationBase>& s = classServices[*i];
     if (s.size() > 1)
     {
       s.erase(std::remove(s.begin(), s.end(), sr), s.end());
@@ -294,11 +271,11 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistration& sr)
 }
 
 void ServiceRegistry::GetRegisteredByModule(ModulePrivate* p,
-                                            std::list<ServiceRegistration>& res) const
+                                            std::vector<ServiceRegistrationBase>& res) const
 {
   MutexLocker lock(mutex);
 
-  for (std::list<ServiceRegistration>::const_iterator i = serviceRegistrations.begin();
+  for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
   {
     if (i->d->module == p)
@@ -309,11 +286,11 @@ void ServiceRegistry::GetRegisteredByModule(ModulePrivate* p,
 }
 
 void ServiceRegistry::GetUsedByModule(Module* p,
-                                      std::list<ServiceRegistration>& res) const
+                                      std::vector<ServiceRegistrationBase>& res) const
 {
   MutexLocker lock(mutex);
 
-  for (std::list<ServiceRegistration>::const_iterator i = serviceRegistrations.begin();
+  for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
   {
     if (i->d->IsUsedByModule(p))

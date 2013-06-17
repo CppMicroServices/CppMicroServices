@@ -19,10 +19,10 @@ set(_srcs
   service/usServiceListeners_p.h
   service/usServiceProperties.cpp
   service/usServicePropertiesImpl.cpp
-  service/usServiceReference.cpp
-  service/usServiceReferencePrivate.cpp
-  service/usServiceRegistration.cpp
-  service/usServiceRegistrationPrivate.cpp
+  service/usServiceReferenceBase.cpp
+  service/usServiceReferenceBasePrivate.cpp
+  service/usServiceRegistrationBase.cpp
+  service/usServiceRegistrationBasePrivate.cpp
   service/usServiceRegistry.cpp
   service/usServiceRegistry_p.h
 
@@ -77,10 +77,13 @@ set(_public_headers
   service/usLDAPFilter.h
   service/usServiceEvent.h
   service/usServiceException.h
+  service/usServiceFactory.h
   service/usServiceInterface.h
   service/usServiceProperties.h
   service/usServiceReference.h
+  service/usServiceReferenceBase.h
   service/usServiceRegistration.h
+  service/usServiceRegistrationBase.h
   service/usServiceTracker.h
   service/usServiceTrackerCustomizer.h
 
@@ -99,14 +102,6 @@ set(_public_headers
   module/usModuleVersion.h
 )
 
-if(_us_baseclass_default)
-  list(APPEND _public_headers util/usBase.h)
-endif()
-
-if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  list(APPEND _public_headers service/usServiceFactory.h)
-endif()
-
 if(US_IS_EMBEDDED)
   set(US_SOURCES )
   get_filename_component(_path_prefix "${PROJECT_SOURCE_DIR}" NAME)
@@ -123,9 +118,6 @@ endif()
 
 if(NOT US_IS_EMBEDDED)
   include_directories(${US_INTERNAL_INCLUDE_DIRS})
-  if(US_LINK_DIRS)
-    link_directories(${US_LINK_DIRS})
-  endif()
 
   usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME} VERSION "0.9.0")
 

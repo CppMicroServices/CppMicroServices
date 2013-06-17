@@ -35,12 +35,12 @@ US_BEGIN_NAMESPACE
  */
 template<class S, class T>
 class TrackedService : public TrackedServiceListener,
-    public ModuleAbstractTracked<ServiceReference, T, ServiceEvent>
+    public ModuleAbstractTracked<ServiceReference<S>, T, ServiceEvent>
 {
 
 public:
   TrackedService(ServiceTracker<S,T>* serviceTracker,
-                    ServiceTrackerCustomizer<T>* customizer);
+                 ServiceTrackerCustomizer<S,T>* customizer);
 
   /**
    * Method connected to service events for the
@@ -53,10 +53,10 @@ public:
 
 private:
 
-  typedef ModuleAbstractTracked<ServiceReference, T, ServiceEvent> Superclass;
+  typedef ModuleAbstractTracked<ServiceReference<S>, T, ServiceEvent> Superclass;
 
   ServiceTracker<S,T>* serviceTracker;
-  ServiceTrackerCustomizer<T>* customizer;
+  ServiceTrackerCustomizer<S,T>* customizer;
 
   /**
    * Increment the tracking count and tell the tracker there was a
@@ -75,7 +75,7 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  T CustomizerAdding(ServiceReference item, const ServiceEvent& related);
+  T CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related);
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -85,7 +85,7 @@ private:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  void CustomizerModified(ServiceReference item,
+  void CustomizerModified(ServiceReference<S> item,
                           const ServiceEvent& related, T object) ;
 
   /**
@@ -96,7 +96,7 @@ private:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  void CustomizerRemoved(ServiceReference item,
+  void CustomizerRemoved(ServiceReference<S> item,
                          const ServiceEvent& related, T object) ;
 };
 

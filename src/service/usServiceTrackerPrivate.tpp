@@ -35,10 +35,10 @@ const bool ServiceTrackerPrivate<S,T>::DEBUG_OUTPUT = true;
 template<class S, class T>
 ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st, ModuleContext* context,
-    const ServiceReference& reference,
-    ServiceTrackerCustomizer<T>* customizer)
+    const ServiceReference<S>& reference,
+    ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
-    trackedService(0), cachedReference(0), cachedService(0), q_ptr(st)
+    trackedService(0), cachedReference(), cachedService(0), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   std::stringstream ss;
@@ -64,9 +64,9 @@ template<class S, class T>
 ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
     ModuleContext* context, const std::string& clazz,
-    ServiceTrackerCustomizer<T>* customizer)
+    ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
-        trackReference(0), trackedService(0), cachedReference(0),
+        trackReference(), trackedService(0), cachedReference(),
         cachedService(0), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
@@ -92,10 +92,10 @@ template<class S, class T>
 ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
     ModuleContext* context, const LDAPFilter& filter,
-    ServiceTrackerCustomizer<T>* customizer)
+    ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
-        listenerFilter(filter.ToString()), trackReference(0),
-        trackedService(0), cachedReference(0), cachedService(0), q_ptr(st)
+        listenerFilter(filter.ToString()), trackReference(),
+        trackedService(0), cachedReference(), cachedService(0), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   if (context == 0)
@@ -111,14 +111,25 @@ ServiceTrackerPrivate<S,T>::~ServiceTrackerPrivate()
 }
 
 template<class S, class T>
-std::list<ServiceReference> ServiceTrackerPrivate<S,T>::GetInitialReferences(
+std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,T>::GetInitialReferences(
   const std::string& className, const std::string& filterString)
 {
-  return context->GetServiceReferences(className, filterString);
+  std::vector<ServiceReference<S> > result;
+  std::vector<ServiceReferenceU> refs = context->GetServiceReferences(className, filterString);
+  for(std::vector<ServiceReferenceU>::const_iterator iter = refs.begin();
+      iter != refs.end(); ++iter)
+  {
+    ServiceReference<S> ref(*iter);
+    if (ref)
+    {
+      result.push_back(ref);
+    }
+  }
+  return result;
 }
 
 template<class S, class T>
-void ServiceTrackerPrivate<S,T>::GetServiceReferences_unlocked(std::list<ServiceReference>& refs, TrackedService<S,T>* t) const
+void ServiceTrackerPrivate<S,T>::GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,T>* t) const
 {
   if (t->Size() == 0)
   {

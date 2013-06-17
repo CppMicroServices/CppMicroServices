@@ -6,14 +6,6 @@
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/usTestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/usTestingConfig.h")
 
 include_directories(${US_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
-if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  include_directories(${US_BASECLASS_INCLUDE_DIRS})
-endif()
-
-link_directories(${US_LINK_DIRS})
-if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  link_directories(${US_BASECLASS_LIBRARY_DIRS})
-endif()
 
 #-----------------------------------------------------------------------------
 # Create test modules
@@ -79,10 +71,6 @@ if(NOT US_BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()
 target_link_libraries(${_test_driver} ${US_LINK_LIBRARIES})
-
-if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
-  target_link_libraries(${_test_driver} ${US_BASECLASS_LIBRARIES})
-endif()
 
 if(UNIX AND NOT APPLE)
   target_link_libraries(${_test_driver} rt)

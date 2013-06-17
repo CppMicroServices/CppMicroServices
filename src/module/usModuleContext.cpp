@@ -27,7 +27,7 @@
 #include "usModulePrivate.h"
 #include "usCoreModuleContext_p.h"
 #include "usServiceRegistry_p.h"
-#include "usServiceReferencePrivate.h"
+#include "usServiceReferenceBasePrivate.h"
 
 US_BEGIN_NAMESPACE
 
@@ -67,47 +67,44 @@ void ModuleContext::GetModules(std::vector<Module*>& modules) const
   ModuleRegistry::GetModules(modules);
 }
 
-ServiceRegistration ModuleContext::RegisterService(const std::list<std::string>& clazzes,
-                                                   US_BASECLASS_NAME* service,
-                                                   const ServiceProperties& properties)
+ServiceRegistrationU ModuleContext::RegisterService(const InterfaceMap& service,
+                                                    const ServiceProperties& properties)
 {
-  return d->module->coreCtx->services.RegisterService(d->module, clazzes, service, properties);
+  return d->module->coreCtx->services.RegisterService(d->module, service, properties);
 }
 
-ServiceRegistration ModuleContext::RegisterService(const char* clazz, US_BASECLASS_NAME* service,
-                                                   const ServiceProperties& properties)
+std::vector<ServiceReferenceU > ModuleContext::GetServiceReferences(const std::string& clazz,
+                                                                    const std::string& filter)
 {
-  std::list<std::string> clazzes;
-  clazzes.push_back(clazz);
-  return d->module->coreCtx->services.RegisterService(d->module, clazzes, service, properties);
-}
-
-std::list<ServiceReference> ModuleContext::GetServiceReferences(const std::string& clazz,
-                                                                const std::string& filter)
-{
-  std::list<ServiceReference> result;
-  d->module->coreCtx->services.Get(clazz, filter, 0, result);
+  std::vector<ServiceReferenceU> result;
+  std::vector<ServiceReferenceBase> refs;
+  d->module->coreCtx->services.Get(clazz, filter, d->module, refs);
+  for (std::vector<ServiceReferenceBase>::const_iterator iter = refs.begin();
+       iter != refs.end(); ++iter)
+  {
+    result.push_back(ServiceReferenceU(*iter));
+  }
   return result;
 }
 
-ServiceReference ModuleContext::GetServiceReference(const std::string& clazz)
+ServiceReferenceU ModuleContext::GetServiceReference(const std::string& clazz)
 {
   return d->module->coreCtx->services.Get(d->module, clazz);
 }
 
-US_BASECLASS_NAME* ModuleContext::GetService(const ServiceReference& reference)
+void* ModuleContext::GetService(const ServiceReferenceBase& reference)
 {
   if (!reference)
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to getService()");
   }
-  ServiceReference internalRef(reference);
-  return internalRef.d->GetService(d->module->q);
+  //ServiceReference internalRef(reference);
+  return reference.d->GetService(d->module->q);
 }
 
-bool ModuleContext::UngetService(const ServiceReference& reference)
+bool ModuleContext::UngetService(const ServiceReferenceBase& reference)
 {
-  ServiceReference ref = reference;
+  ServiceReferenceBase ref = reference;
   return ref.d->UngetService(d->module->q, true);
 }
 

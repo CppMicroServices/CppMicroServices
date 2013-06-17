@@ -25,11 +25,10 @@
 #include <usModuleContext.h>
 #include <usConfig.h>
 
-#include US_BASECLASS_HEADER
 
 US_BEGIN_NAMESPACE
 
-struct TestModuleImportedByB : public US_BASECLASS_NAME, public TestModuleBService
+struct TestModuleImportedByB : public TestModuleBService
 {
 
   TestModuleImportedByB(ModuleContext* mc)

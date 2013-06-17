@@ -40,16 +40,16 @@ public:
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         ModuleContext* context,
-                        const ServiceReference& reference,
-                        ServiceTrackerCustomizer<T>* customizer);
+                        const ServiceReference<S>& reference,
+                        ServiceTrackerCustomizer<S,T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         ModuleContext* context, const std::string& clazz,
-                        ServiceTrackerCustomizer<T>* customizer);
+                        ServiceTrackerCustomizer<S,T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         ModuleContext* context, const LDAPFilter& filter,
-                        ServiceTrackerCustomizer<T>* customizer);
+                        ServiceTrackerCustomizer<S,T>* customizer);
 
   ~ServiceTrackerPrivate();
 
@@ -65,10 +65,10 @@ public:
    * @throws std::invalid_argument If the specified filterString has an
    *         invalid syntax.
    */
-  std::list<ServiceReference> GetInitialReferences(const std::string& className,
-                                                   const std::string& filterString);
+  std::vector<ServiceReference<S> > GetInitialReferences(const std::string& className,
+                                                         const std::string& filterString);
 
-  void GetServiceReferences_unlocked(std::list<ServiceReference>& refs, TrackedService<S,T>* t) const;
+  void GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,T>* t) const;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
@@ -87,7 +87,7 @@ public:
   /**
    * The <code>ServiceTrackerCustomizer</code> for this tracker.
    */
-  ServiceTrackerCustomizer<T>* customizer;
+  ServiceTrackerCustomizer<S,T>* customizer;
 
   /**
    * Filter string for use when adding the ServiceListener. If this field is
@@ -106,7 +106,7 @@ public:
    * Reference to be tracked. If this field is set, then we are tracking a
    * single ServiceReference.
    */
-  ServiceReference trackReference;
+  ServiceReference<S> trackReference;
 
   /**
    * Tracked services: <code>ServiceReference</code> -> customized Object and
@@ -137,7 +137,7 @@ public:
   /**
    * Cached ServiceReference for getServiceReference.
    */
-  mutable ServiceReference cachedReference;
+  mutable ServiceReference<S> cachedReference;
 
   /**
    * Cached service object for GetService.

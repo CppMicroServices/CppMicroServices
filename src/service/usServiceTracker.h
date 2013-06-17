@@ -60,9 +60,9 @@ class ModuleContext;
  * <code>ServiceTrackerCustomizer</code> implementations must also be
  * thread-safe.
  *
- * \tparam S The type of the service being tracked. The type must be an
+ * \tparam S The type of the service being tracked. The type S* must be an
  *         assignable datatype. Further, if the
- *         <code>ServiceTracker(ModuleContext*, ServiceTrackerCustomizer<T>*)</code>
+ *         <code>ServiceTracker(ModuleContext*, ServiceTrackerCustomizer<S,T>*)</code>
  *         constructor is used, the type must have an associated interface id via
  *         #US_DECLARE_SERVICE_INTERFACE.
  * \tparam T The type of the tracked object. The type must be an assignable
@@ -70,12 +70,15 @@ class ModuleContext;
  *         a constructor and an assignment operator which can handle 0 as an argument.
  * \remarks This class is thread safe.
  */
-template<class S = US_BASECLASS_NAME*, class T = S>
-class ServiceTracker : protected ServiceTrackerCustomizer<T>
+template<class S, class T = S*>
+class ServiceTracker : protected ServiceTrackerCustomizer<S,T>
 {
 public:
 
-  typedef std::map<ServiceReference,T> TrackingMap;
+  typedef S ServiceT;
+  typedef ServiceReference<S> ServiceReferenceT;
+
+  typedef std::map<ServiceReference<S>,T> TrackingMap;
 
   ~ServiceTracker();
 
@@ -100,8 +103,8 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context,
-                 const ServiceReference& reference,
-                 ServiceTrackerCustomizer<T>* customizer = 0);
+                 const ServiceReferenceT& reference,
+                 ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified class name.
@@ -122,7 +125,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context, const std::string& clazz,
-                 ServiceTrackerCustomizer<T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -144,7 +147,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context, const LDAPFilter& filter,
-                 ServiceTrackerCustomizer<T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
    * Create a <code>ServiceTracker</code> on the class template
@@ -163,7 +166,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<T>* customizer = 0);
+  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -217,7 +220,7 @@ public:
    *
    * @param refs List of <code>ServiceReference</code>s.
    */
-  virtual void GetServiceReferences(std::list<ServiceReference>& refs) const;
+  virtual void GetServiceReferences(std::vector<ServiceReferenceT>& refs) const;
 
   /**
    * Returns a <code>ServiceReference</code> for one of the services being
@@ -238,7 +241,7 @@ public:
    * @return A <code>ServiceReference</code> for a tracked service.
    * @throws ServiceException if no services are being tracked.
    */
-  virtual ServiceReference GetServiceReference() const;
+  virtual ServiceReferenceT GetServiceReference() const;
 
   /**
    * Returns the service object for the specified
@@ -250,7 +253,7 @@ public:
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
-  virtual T GetService(const ServiceReference& reference) const;
+  virtual T GetService(const ServiceReferenceT& reference) const;
 
   /**
    * Return a list of service objects for all services being tracked by this
@@ -265,7 +268,7 @@ public:
    * @param services A list of service objects or an empty list if no services
    *         are being tracked.
    */
-  virtual void GetServices(std::list<T>& services) const;
+  virtual void GetServices(std::vector<T>& services) const;
 
   /**
    * Returns a service object for one of the services being tracked by this
@@ -290,7 +293,7 @@ public:
    *
    * @param reference The reference to the service to be removed.
    */
-  virtual void Remove(const ServiceReference& reference);
+  virtual void Remove(const ServiceReferenceT& reference);
 
   /**
    * Return the number of services being tracked by this
@@ -371,7 +374,7 @@ protected:
    *         <code>ServiceTracker</code>.
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  T AddingService(const ServiceReference& reference);
+  T AddingService(const ServiceReferenceT& reference);
 
   /**
    * Default implementation of the
@@ -388,7 +391,7 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
    */
-  void ModifiedService(const ServiceReference& reference, T service);
+  void ModifiedService(const ServiceReferenceT& reference, T service);
 
   /**
    * Default implementation of the
@@ -411,14 +414,14 @@ protected:
    * @param service The service object for the removed service.
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReference&, T)
    */
-  void RemovedService(const ServiceReference& reference, T service);
+  void RemovedService(const ServiceReferenceT& reference, T service);
 
 private:
 
   typedef ServiceTracker<S,T> _ServiceTracker;
   typedef TrackedService<S,T> _TrackedService;
   typedef ServiceTrackerPrivate<S,T> _ServiceTrackerPrivate;
-  typedef ServiceTrackerCustomizer<T> _ServiceTrackerCustomizer;
+  typedef ServiceTrackerCustomizer<S,T> _ServiceTrackerCustomizer;
 
   friend class TrackedService<S,T>;
   friend class ServiceTrackerPrivate<S,T>;

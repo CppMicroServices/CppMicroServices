@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "usServiceRegistrationPrivate.h"
+#include "usServiceRegistrationBasePrivate.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -28,8 +28,8 @@
 
 US_BEGIN_NAMESPACE
 
-ServiceRegistrationPrivate::ServiceRegistrationPrivate(
-  ModulePrivate* module, US_BASECLASS_NAME* service,
+ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
+  ModulePrivate* module, const InterfaceMap& service,
   const ServicePropertiesImpl& props)
   : ref(0), service(service), module(module), reference(this),
     properties(props), available(true), unregistering(false)
@@ -38,19 +38,34 @@ ServiceRegistrationPrivate::ServiceRegistrationPrivate(
   // incremented by the "reference" member.
 }
 
-ServiceRegistrationPrivate::~ServiceRegistrationPrivate()
+ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 {
 
 }
 
-bool ServiceRegistrationPrivate::IsUsedByModule(Module* p)
+bool ServiceRegistrationBasePrivate::IsUsedByModule(Module* p) const
 {
   return dependents.find(p) != dependents.end();
 }
 
-US_BASECLASS_NAME* ServiceRegistrationPrivate::GetService()
+const InterfaceMap& ServiceRegistrationBasePrivate::GetInterfaces() const
 {
   return service;
+}
+
+void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
+{
+  if (interfaceId.empty() && service.size() > 0)
+  {
+    return service.begin()->second;
+  }
+
+  InterfaceMap::const_iterator iter = service.find(interfaceId);
+  if (iter != service.end())
+  {
+    return iter->second;
+  }
+  return NULL;
 }
 
 US_END_NAMESPACE

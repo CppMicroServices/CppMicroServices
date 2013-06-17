@@ -25,11 +25,9 @@
 #include <usModuleContext.h>
 #include <usConfig.h>
 
-#include US_BASECLASS_HEADER
-
 US_BEGIN_NAMESPACE
 
-struct TestModuleA : public US_BASECLASS_NAME, public TestModuleAService
+struct TestModuleA : public TestModuleAService
 {
 
   TestModuleA(ModuleContext* mc)
@@ -49,7 +47,7 @@ struct TestModuleA : public US_BASECLASS_NAME, public TestModuleAService
 
 private:
 
-  ServiceRegistration sr;
+  ServiceRegistration<TestModuleAService> sr;
 
 };
 

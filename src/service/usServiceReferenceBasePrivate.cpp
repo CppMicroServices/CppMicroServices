@@ -21,16 +21,13 @@
 
 
 #include <usConfig.h>
-#ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-#include US_BASECLASS_HEADER
-#endif
 
-#include "usServiceReferencePrivate.h"
+#include "usServiceReferenceBasePrivate.h"
 
 #include "usServiceFactory.h"
 #include "usServiceException.h"
 #include "usServiceRegistry_p.h"
-#include "usServiceRegistrationPrivate.h"
+#include "usServiceRegistrationBasePrivate.h"
 
 #include "usModule.h"
 #include "usModulePrivate.h"
@@ -39,23 +36,23 @@
 
 US_BEGIN_NAMESPACE
 
-typedef ServiceRegistrationPrivate::MutexLocker MutexLocker;
+typedef ServiceRegistrationBasePrivate::MutexLocker MutexLocker;
 
-ServiceReferencePrivate::ServiceReferencePrivate(ServiceRegistrationPrivate* reg)
+ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)
   : ref(1), registration(reg)
 {
   if(registration) registration->ref.Ref();
 }
 
-ServiceReferencePrivate::~ServiceReferencePrivate()
+ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 {
   if (registration && !registration->ref.Deref())
     delete registration;
 }
 
-US_BASECLASS_NAME* ServiceReferencePrivate::GetService(Module* module)
+void* ServiceReferenceBasePrivate::GetService(Module* module)
 {
-  US_BASECLASS_NAME* s = 0;
+  void* s = NULL;
   {
     MutexLocker lock(registration->propsLock);
     if (registration->available)
@@ -64,54 +61,54 @@ US_BASECLASS_NAME* ServiceReferencePrivate::GetService(Module* module)
       if (count == 0)
       {
         registration->dependents[module] = 1;
-        #ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-        const std::list<std::string>& classes =
-            ref_any_cast<std::list<std::string> >(registration->properties.Value(ServiceConstants::OBJECTCLASS()));
-        if (ServiceFactory* serviceFactory = dynamic_cast<ServiceFactory*>(registration->GetService()))
+        if (void* factoryPtr = registration->GetService("org.cppmicroservices.factory"))
         {
+          ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryPtr);
           try
           {
-            s = serviceFactory->GetService(module, ServiceRegistration(registration));
+            const InterfaceMap smap = serviceFactory->GetService(module,
+                                                                        ServiceRegistrationBase(registration));
+            if (smap.empty())
+            {
+              US_WARN << "ServiceFactory produced null";
+              return NULL;
+            }
+            const std::vector<std::string>& classes =
+                ref_any_cast<std::vector<std::string> >(registration->properties.Value(ServiceConstants::OBJECTCLASS()));
+            for (std::vector<std::string>::const_iterator i = classes.begin();
+                 i != classes.end(); ++i)
+            {
+              if (smap.find(*i) == smap.end())
+              {
+                US_WARN << "ServiceFactory produced an object "
+                           "that did not implement: " << (*i);
+                return NULL;
+              }
+            }
+            s = smap.find(interfaceId)->second;
+            registration->serviceInstances.insert(std::make_pair(module, smap));
           }
           catch (...)
           {
             US_WARN << "ServiceFactory threw an exception";
-            return 0;
+            return NULL;
           }
-          if (s == 0) {
-            US_WARN << "ServiceFactory produced null";
-            return 0;
-          }
-          for (std::list<std::string>::const_iterator i = classes.begin();
-               i != classes.end(); ++i)
-          {
-            if (!registration->module->coreCtx->services.CheckServiceClass(s, *i))
-            {
-              US_WARN << "ServiceFactory produced an object "
-                           "that did not implement: " << (*i);
-              return 0;
-            }
-          }
-          registration->serviceInstances.insert(std::make_pair(module, s));
         }
         else
-        #endif
         {
-          s = registration->GetService();
+          s = registration->GetService(interfaceId);
         }
       }
       else
       {
         registration->dependents.insert(std::make_pair(module, count + 1));
-        #ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-        if (dynamic_cast<ServiceFactory*>(registration->GetService()))
+        if (registration->GetService("org.cppmicroservices.factory"))
         {
-          s = registration->serviceInstances[module];
+          s = registration->serviceInstances[module][interfaceId];
         }
         else
-        #endif
         {
-          s = registration->GetService();
+          s = registration->GetService(interfaceId);
         }
       }
     }
@@ -119,7 +116,7 @@ US_BASECLASS_NAME* ServiceReferencePrivate::GetService(Module* module)
   return s;
 }
 
-bool ServiceReferencePrivate::UngetService(Module* module, bool checkRefCounter)
+bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCounter)
 {
   MutexLocker lock(registration->propsLock);
   bool hadReferences = false;
@@ -149,34 +146,33 @@ bool ServiceReferencePrivate::UngetService(Module* module, bool checkRefCounter)
 
   if (removeService)
   {
-    #ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-    US_BASECLASS_NAME* sfi = registration->serviceInstances[module];
+    InterfaceMap sfi = registration->serviceInstances[module];
     registration->serviceInstances.erase(module);
-    if (sfi != 0)
+    if (!sfi.empty())
     {
       try
       {
-        dynamic_cast<ServiceFactory*>(
-              registration->GetService())->UngetService(module, ServiceRegistration(registration), sfi);
+        ServiceFactory* sf = reinterpret_cast<ServiceFactory*>(
+                               registration->GetService("org.cppmicroservices.factory"));
+        sf->UngetService(module, ServiceRegistrationBase(registration), sfi);
       }
       catch (const std::exception& /*e*/)
       {
         US_WARN << "ServiceFactory threw an exception";
       }
     }
-    #endif
     registration->dependents.erase(module);
   }
 
   return hadReferences;
 }
 
-const ServicePropertiesImpl& ServiceReferencePrivate::GetProperties() const
+const ServicePropertiesImpl& ServiceReferenceBasePrivate::GetProperties() const
 {
   return registration->properties;
 }
 
-Any ServiceReferencePrivate::GetProperty(const std::string& key, bool lock) const
+Any ServiceReferenceBasePrivate::GetProperty(const std::string& key, bool lock) const
 {
   if (lock)
   {
@@ -187,6 +183,11 @@ Any ServiceReferencePrivate::GetProperty(const std::string& key, bool lock) cons
   {
     return registration->properties.Value(key);
   }
+}
+
+bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId) const
+{
+  return registration->service.find(interfaceId) != registration->service.end();
 }
 
 US_END_NAMESPACE

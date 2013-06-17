@@ -147,7 +147,7 @@ public:
    *
    *
    */
-  void GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& listeners,
+  void GetMatchingServiceListeners(const ServiceReferenceBase& sr, ServiceListenerEntries& listeners,
                                    bool lockProps = true);
 
 

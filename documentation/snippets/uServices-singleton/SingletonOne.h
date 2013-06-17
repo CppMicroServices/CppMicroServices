@@ -6,8 +6,6 @@
 #include <usServiceReference.h>
 #include <usServiceRegistration.h>
 
-#include US_BASECLASS_HEADER
-
 
 //![s1]
 class SingletonOne
@@ -33,7 +31,7 @@ private:
 class SingletonTwoService;
 
 //![ss1]
-class SingletonOneService : public US_BASECLASS_NAME
+class SingletonOneService
 {
 public:
 

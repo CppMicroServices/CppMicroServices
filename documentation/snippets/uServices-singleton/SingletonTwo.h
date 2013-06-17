@@ -4,7 +4,6 @@
 #include <usConfig.h>
 #include <usServiceInterface.h>
 
-#include US_BASECLASS_HEADER
 
 class SingletonTwo
 {
@@ -24,7 +23,7 @@ private:
   SingletonTwo& operator=(const SingletonTwo&);
 };
 
-class SingletonTwoService : public US_BASECLASS_NAME
+class SingletonTwoService
 {
 public:
 

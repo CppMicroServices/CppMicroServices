@@ -23,8 +23,7 @@
 #ifndef USSERVICEREGISTRY_H
 #define USSERVICEREGISTRY_H
 
-#include <list>
-
+#include "usServiceInterface.h"
 #include "usServiceRegistration.h"
 
 #include "usThreads_p.h"
@@ -58,11 +57,11 @@ public:
    * @param sid A service id which will be used instead of a default one.
    */
   static ServicePropertiesImpl CreateServiceProperties(const ServiceProperties& in,
-                                                       const std::list<std::string>& classes = std::list<std::string>(),
+                                                       const std::vector<std::string>& classes = std::vector<std::string>(),
                                                        long sid = -1);
 
-  typedef US_UNORDERED_MAP_TYPE<ServiceRegistration, std::list<std::string> > MapServiceClasses;
-  typedef US_UNORDERED_MAP_TYPE<std::string, std::list<ServiceRegistration> > MapClassServices;
+  typedef US_UNORDERED_MAP_TYPE<ServiceRegistrationBase, std::vector<std::string> > MapServiceClasses;
+  typedef US_UNORDERED_MAP_TYPE<std::string, std::vector<ServiceRegistrationBase> > MapClassServices;
 
   /**
    * All registered services in the current framework.
@@ -71,7 +70,7 @@ public:
    */
   MapServiceClasses services;
 
-  std::list<ServiceRegistration> serviceRegistrations;
+  std::vector<ServiceRegistrationBase> serviceRegistrations;
 
   /**
    * Mapping of classname to registered service.
@@ -103,10 +102,9 @@ public:
    * instance of all the named classes in the classes parameter.</li>
    * </ul>
    */
-  ServiceRegistration RegisterService(ModulePrivate* module,
-                                      const std::list<std::string>& clazzes,
-                                      US_BASECLASS_NAME* service,
-                                      const ServiceProperties& properties);
+  ServiceRegistrationBase RegisterService(ModulePrivate* module,
+                                          const InterfaceMap& service,
+                                          const ServiceProperties& properties);
 
   /**
    * Service ranking changed, reorder registered services
@@ -115,17 +113,8 @@ public:
    * @param serviceRegistration The ServiceRegistrationPrivate object.
    * @param rank New rank of object.
    */
-  void UpdateServiceRegistrationOrder(const ServiceRegistration& sr,
-                                      const std::list<std::string>& classes);
-
-  /**
-   * Checks that a given service object is an instance of the given
-   * class name.
-   *
-   * @param service The service object to check.
-   * @param cls     The class name to check for.
-   */
-  bool CheckServiceClass(US_BASECLASS_NAME* service, const std::string& cls) const;
+  void UpdateServiceRegistrationOrder(const ServiceRegistrationBase& sr,
+                                      const std::vector<std::string>& classes);
 
   /**
    * Get all services implementing a certain class.
@@ -134,7 +123,7 @@ public:
    * @param clazz The class name of the requested service.
    * @return A sorted list of {@link ServiceRegistrationPrivate} objects.
    */
-  void Get(const std::string& clazz, std::list<ServiceRegistration>& serviceRegs) const;
+  void Get(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
    * Get a service implementing a certain class.
@@ -143,7 +132,7 @@ public:
    * @param clazz The class name of the requested service.
    * @return A {@link ServiceReference} object.
    */
-  ServiceReference Get(ModulePrivate* module, const std::string& clazz) const;
+  ServiceReferenceBase Get(ModulePrivate* module, const std::string& clazz) const;
 
   /**
    * Get all services implementing a certain class and then
@@ -155,14 +144,14 @@ public:
    * @return A list of {@link ServiceReference} object.
    */
   void Get(const std::string& clazz, const std::string& filter,
-           ModulePrivate* module, std::list<ServiceReference>& serviceRefs) const;
+           ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
 
   /**
    * Remove a registered service.
    *
    * @param sr The ServiceRegistration object that is registered.
    */
-  void RemoveServiceRegistration(const ServiceRegistration& sr) ;
+  void RemoveServiceRegistration(const ServiceRegistrationBase& sr) ;
 
   /**
    * Get all services that a module has registered.
@@ -170,7 +159,7 @@ public:
    * @param p The module
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetRegisteredByModule(ModulePrivate* m, std::list<ServiceRegistration>& serviceRegs) const;
+  void GetRegisteredByModule(ModulePrivate* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
    * Get all services that a module uses.
@@ -178,12 +167,12 @@ public:
    * @param p The module
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetUsedByModule(Module* m, std::list<ServiceRegistration>& serviceRegs) const;
+  void GetUsedByModule(Module* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
 private:
 
   void Get_unlocked(const std::string& clazz, const std::string& filter,
-                    ModulePrivate* module, std::list<ServiceReference>& serviceRefs) const;
+                    ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
 
   // purposely not implemented
   ServiceRegistry(const ServiceRegistry&);

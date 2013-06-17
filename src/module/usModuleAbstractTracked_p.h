@@ -23,7 +23,7 @@
 #ifndef USMODULEABSTRACTTRACKED_H
 #define USMODULEABSTRACTTRACKED_H
 
-#include <list>
+#include <vector>
 
 #include "usAtomicInt_p.h"
 #include "usAny.h"
@@ -75,7 +75,7 @@ public:
    *        entries in the list are ignored.
    * @GuardedBy this
    */
-  void SetInitial(const std::list<S>& list);
+  void SetInitial(const std::vector<S>& list);
 
   /**
    * Track the initial list of items. This is called after events can begin to
@@ -142,7 +142,7 @@ public:
    * @return The tracked items.
    * @GuardedBy this
    */
-  void GetTracked(std::list<S>& items) const;
+  void GetTracked(std::vector<S>& items) const;
 
   /**
    * Increment the modification count. If this method is overridden, the

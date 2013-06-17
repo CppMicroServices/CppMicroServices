@@ -24,11 +24,9 @@
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include US_BASECLASS_HEADER
-
 US_BEGIN_NAMESPACE
 
-struct TestModuleA2 : public US_BASECLASS_NAME, public TestModuleA2Service
+struct TestModuleA2 : public TestModuleA2Service
 {
 
   TestModuleA2(ModuleContext* mc)
@@ -47,7 +45,7 @@ struct TestModuleA2 : public US_BASECLASS_NAME, public TestModuleA2Service
 
 private:
 
-  ServiceRegistration sr;
+  ServiceRegistration<TestModuleA2Service> sr;
 };
 
 class TestModuleA2Activator : public ModuleActivator

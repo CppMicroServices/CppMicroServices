@@ -23,7 +23,7 @@
 #include "usLDAPExpr_p.h"
 #include "usServicePropertiesImpl_p.h"
 #include "usServiceReference.h"
-#include "usServiceReferencePrivate.h"
+#include "usServiceReferenceBasePrivate.h"
 
 #include <stdexcept>
 
@@ -79,7 +79,7 @@ LDAPFilter::operator bool() const
   return d.ConstData() != 0;
 }
 
-bool LDAPFilter::Match(const ServiceReference& reference) const
+bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
   return d->ldapExpr.Evaluate(reference.d->GetProperties(), true);
 }

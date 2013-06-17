@@ -57,8 +57,8 @@ private:
   SingletonOneService* m_SingletonOne;
   SingletonTwoService* m_SingletonTwo;
 
-  ServiceRegistration m_SingletonOneReg;
-  ServiceRegistration m_SingletonTwoReg;
+  ServiceRegistration<SingletonOneService> m_SingletonOneReg;
+  ServiceRegistration<SingletonTwoService> m_SingletonTwoReg;
 
 };
 

@@ -24,8 +24,6 @@
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-#include US_BASECLASS_HEADER
-
 US_USE_NAMESPACE
 
 #ifdef US_PLATFORM_APPLE
@@ -164,6 +162,14 @@ inline long long HighPrecisionTimer::ElapsedMicro()
 
 class MyServiceListener;
 
+struct IPerfTestService
+{
+  virtual ~IPerfTestService() {}
+};
+
+US_DECLARE_SERVICE_INTERFACE(IPerfTestService, "org.cppmicroservices.test.IPerfTestService")
+
+
 class ServiceRegistryPerformanceTest
 {
 
@@ -180,9 +186,9 @@ private:
   std::size_t nUnregistering;
   std::size_t nModified;
 
-  std::vector<ServiceRegistration> regs;
+  std::vector<ServiceRegistration<IPerfTestService> > regs;
   std::vector<MyServiceListener*> listeners;
-  std::vector<US_BASECLASS_NAME*> services;
+  std::vector<IPerfTestService*> services;
 
 public:
 
@@ -210,14 +216,6 @@ private:
   void UnregisterServices();
 
 };
-
-struct IPerfTestService
-{
-  virtual ~IPerfTestService() {}
-};
-
-US_DECLARE_SERVICE_INTERFACE(IPerfTestService, "org.cppmicroservices.test.IPerfTestService")
-
 
 class MyServiceListener
 {
@@ -334,7 +332,7 @@ void ServiceRegistryPerformanceTest::TestRegisterServices()
 
 void ServiceRegistryPerformanceTest::RegisterServices(int n)
 {
-  class PerfTestService : public US_BASECLASS_NAME, public IPerfTestService
+  class PerfTestService : public IPerfTestService
   {
   };
 
@@ -348,9 +346,9 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
     props["service.pid"] = ss.str();
     props["perf.service.value"] = i+1;
 
-    US_BASECLASS_NAME* service = new PerfTestService();
+    PerfTestService* service = new PerfTestService();
     services.push_back(service);
-    ServiceRegistration reg =
+    ServiceRegistration<IPerfTestService> reg =
         mc->RegisterService<IPerfTestService>(service, props);
     regs.push_back(reg);
   }
@@ -376,7 +374,7 @@ void ServiceRegistryPerformanceTest::ModifyServices()
 
   for(std::size_t i = 0; i < regs.size(); i++)
   {
-    ServiceRegistration reg = regs[i];
+    ServiceRegistration<IPerfTestService> reg = regs[i];
     ServiceProperties props;
     props["perf.service.value"] = i * 2;
     reg.SetProperties(props);
@@ -403,7 +401,7 @@ void ServiceRegistryPerformanceTest::UnregisterServices()
         << listeners.size() << "\n";
   for(std::size_t i = 0; i < regs.size(); i++)
   {
-    ServiceRegistration reg = regs[i];
+    ServiceRegistration<IPerfTestService> reg = regs[i];
     reg.Unregister();
   }
   regs.clear();

@@ -20,12 +20,9 @@
 =============================================================================*/
 
 #include <usConfig.h>
-#ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-#include US_BASECLASS_HEADER
-#endif
 
-#include "usServiceRegistration.h"
-#include "usServiceRegistrationPrivate.h"
+#include "usServiceRegistrationBase.h"
+#include "usServiceRegistrationBasePrivate.h"
 #include "usServiceListenerEntry_p.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
@@ -37,39 +34,39 @@
 
 US_BEGIN_NAMESPACE
 
-typedef ServiceRegistrationPrivate::MutexLocker MutexLocker;
+typedef ServiceRegistrationBasePrivate::MutexLocker MutexLocker;
 
-ServiceRegistration::ServiceRegistration()
+ServiceRegistrationBase::ServiceRegistrationBase()
   : d(0)
 {
 
 }
 
-ServiceRegistration::ServiceRegistration(const ServiceRegistration& reg)
+ServiceRegistrationBase::ServiceRegistrationBase(const ServiceRegistrationBase& reg)
   : d(reg.d)
 {
   if (d) d->ref.Ref();
 }
 
-ServiceRegistration::ServiceRegistration(ServiceRegistrationPrivate* registrationPrivate)
+ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate)
   : d(registrationPrivate)
 {
   if (d) d->ref.Ref();
 }
 
-ServiceRegistration::ServiceRegistration(ModulePrivate* module, US_BASECLASS_NAME* service,
-                                         const ServicePropertiesImpl& props)
-  : d(new ServiceRegistrationPrivate(module, service, props))
+ServiceRegistrationBase::ServiceRegistrationBase(ModulePrivate* module, const InterfaceMap& service,
+                                                 const ServicePropertiesImpl& props)
+  : d(new ServiceRegistrationBasePrivate(module, service, props))
 {
 
 }
 
-ServiceRegistration::operator bool() const
+ServiceRegistrationBase::operator bool() const
 {
   return d != 0;
 }
 
-ServiceRegistration& ServiceRegistration::operator=(int null)
+ServiceRegistrationBase& ServiceRegistrationBase::operator=(int null)
 {
   if (null == 0)
   {
@@ -82,23 +79,25 @@ ServiceRegistration& ServiceRegistration::operator=(int null)
   return *this;
 }
 
-ServiceRegistration::~ServiceRegistration()
+ServiceRegistrationBase::~ServiceRegistrationBase()
 {
   if (d && !d->ref.Deref())
     delete d;
 }
 
-ServiceReference ServiceRegistration::GetReference() const
+ServiceReferenceBase ServiceRegistrationBase::GetReference(const std::string& interfaceId) const
 {
-  if (!d) throw std::logic_error("ServiceRegistration object invalid");
+  if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
   if (!d->available) throw std::logic_error("Service is unregistered");
 
-  return d->reference;
+  ServiceReferenceBase ref = d->reference;
+  ref.SetInterfaceId(interfaceId);
+  return ref;
 }
 
-void ServiceRegistration::SetProperties(const ServiceProperties& props)
+void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 {
-  if (!d) throw std::logic_error("ServiceRegistration object invalid");
+  if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
 
   MutexLocker lock(d->eventLock);
 
@@ -113,7 +112,7 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
       int old_rank = 0;
       int new_rank = 0;
 
-      std::list<std::string> classes;
+      std::vector<std::string> classes;
       {
         MutexLocker lock3(d->propsLock);
 
@@ -123,7 +122,7 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
         }
 
         d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, before, false);
-        classes = ref_any_cast<std::list<std::string> >(d->properties.Value(ServiceConstants::OBJECTCLASS()));
+        classes = ref_any_cast<std::vector<std::string> >(d->properties.Value(ServiceConstants::OBJECTCLASS()));
         long int sid = any_cast<long int>(d->properties.Value(ServiceConstants::SERVICE_ID()));
         d->properties = ServiceRegistry::CreateServiceProperties(props, classes, sid);
 
@@ -153,9 +152,9 @@ void ServiceRegistration::SetProperties(const ServiceProperties& props)
                                                ServiceEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference));
 }
 
-void ServiceRegistration::Unregister()
+void ServiceRegistrationBase::Unregister()
 {
-  if (!d) throw std::logic_error("ServiceRegistration object invalid");
+  if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
 
   if (d->unregistering) return; // Silently ignore redundant unregistration.
   {
@@ -190,20 +189,19 @@ void ServiceRegistration::Unregister()
     {
       MutexLocker lock2(d->propsLock);
       d->available = false;
-      #ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-      if (d->module)
+      InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
+      if (d->module && factoryIter != d->service.end())
       {
-        ServiceRegistrationPrivate::ModuleToServicesMap::const_iterator end = d->serviceInstances.end();
-        for (ServiceRegistrationPrivate::ModuleToServicesMap::const_iterator i = d->serviceInstances.begin();
+        ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
+        ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator end = d->serviceInstances.end();
+        for (ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator i = d->serviceInstances.begin();
              i != end; ++i)
         {
-          US_BASECLASS_NAME* obj = i->second;
+          const InterfaceMap& service = i->second;
           try
           {
             // NYI, don't call inside lock
-            dynamic_cast<ServiceFactory*>(d->service)->UngetService(i->first,
-                                                                    *this,
-                                                                    obj);
+            serviceFactory->UngetService(i->first, *this, service);
           }
           catch (const std::exception& /*ue*/)
           {
@@ -211,10 +209,9 @@ void ServiceRegistration::Unregister()
           }
         }
       }
-      #endif
       d->module = 0;
       d->dependents.clear();
-      d->service = 0;
+      d->service.clear();
       d->serviceInstances.clear();
       // increment the reference count, since "d->reference" was used originally
       // to keep d alive.
@@ -225,21 +222,21 @@ void ServiceRegistration::Unregister()
   }
 }
 
-bool ServiceRegistration::operator<(const ServiceRegistration& o) const
+bool ServiceRegistrationBase::operator<(const ServiceRegistrationBase& o) const
 {
   if ((!d && !o.d) || !o.d) return false;
   if (!d) return true;
   return d->reference <(o.d->reference);
 }
 
-bool ServiceRegistration::operator==(const ServiceRegistration& registration) const
+bool ServiceRegistrationBase::operator==(const ServiceRegistrationBase& registration) const
 {
   return d == registration.d;
 }
 
-ServiceRegistration& ServiceRegistration::operator=(const ServiceRegistration& registration)
+ServiceRegistrationBase& ServiceRegistrationBase::operator=(const ServiceRegistrationBase& registration)
 {
-  ServiceRegistrationPrivate* curr_d = d;
+  ServiceRegistrationBasePrivate* curr_d = d;
   d = registration.d;
   if (d) d->ref.Ref();
 

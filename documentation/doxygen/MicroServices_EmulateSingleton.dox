@@ -51,14 +51,12 @@ are discussed in detail below.
 
 \snippet uServices-singleton/SingletonOne.h ss1
 
- - Inherit us::Base: All service implementations (not their interfaces) must inherit from us::Base or from the base
-   class as specified in the CMake configuration.
-   In the implementation above, the class SingletonOneService provides the implementation as well as the interface.
+ - In the implementation above, the class SingletonOneService provides the implementation as well as the interface.
  - Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance()
    method to the module activator.
  - Service interface declaration: Because the SingletonOneService class introduces a new service interface, it must
    be registered under a unique name using the helper macro US_DECLARE_SERVICE_INTERFACE.
-   
+
 Let's have a look at the modified GetInstance() and ~SingletonOneService() methods.
 
 \snippet uServices-singleton/SingletonOne.cpp ss1gi

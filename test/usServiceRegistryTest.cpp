@@ -26,8 +26,6 @@
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-#include US_BASECLASS_HEADER
-
 #include <stdexcept>
 
 US_USE_NAMESPACE
@@ -41,7 +39,7 @@ US_DECLARE_SERVICE_INTERFACE(ITestServiceA, "org.cppmicroservices.testing.ITestS
 
 int TestMultipleServiceRegistrations()
 {
-  struct TestServiceA : public US_BASECLASS_NAME, public ITestServiceA
+  struct TestServiceA : public ITestServiceA
   {
   };
 
@@ -50,10 +48,10 @@ int TestMultipleServiceRegistrations()
   TestServiceA s1;
   TestServiceA s2;
 
-  ServiceRegistration reg1 = context->RegisterService<ITestServiceA>(&s1);
-  ServiceRegistration reg2 = context->RegisterService<ITestServiceA>(&s2);
+  ServiceRegistration<ITestServiceA> reg1 = context->RegisterService<ITestServiceA>(&s1);
+  ServiceRegistration<ITestServiceA> reg2 = context->RegisterService<ITestServiceA>(&s2);
 
-  std::list<ServiceReference> refs = context->GetServiceReferences<ITestServiceA>();
+  std::vector<ServiceReference<ITestServiceA> > refs = context->GetServiceReferences<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Testing for two registered ITestServiceA services")
 
   reg2.Unregister();
@@ -69,7 +67,7 @@ int TestMultipleServiceRegistrations()
 
 int TestServicePropertiesUpdate()
 {
-  struct TestServiceA : public US_BASECLASS_NAME, public ITestServiceA
+  struct TestServiceA : public ITestServiceA
   {
   };
 
@@ -82,8 +80,8 @@ int TestServicePropertiesUpdate()
   const char* str = "A const char*";
   props["const char*"] = str;
 
-  ServiceRegistration reg1 = context->RegisterService<ITestServiceA>(&s1, props);
-  ServiceReference ref1 = context->GetServiceReference<ITestServiceA>();
+  ServiceRegistration<ITestServiceA> reg1 = context->RegisterService<ITestServiceA>(&s1, props);
+  ServiceReference<ITestServiceA> ref1 = context->GetServiceReference<ITestServiceA>();
 
   US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().size() == 1, "Testing service count")
   US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == false, "Testing bool property")
@@ -93,11 +91,11 @@ int TestServicePropertiesUpdate()
   ServiceProperties props2;
   props2[ServiceConstants::SERVICE_RANKING()] = 50;
 
-  ServiceRegistration reg2 = context->RegisterService<ITestServiceA>(&s2, props2);
+  ServiceRegistration<ITestServiceA> reg2 = context->RegisterService<ITestServiceA>(&s2, props2);
 
   // Get the service with the highest rank, this should be s2.
-  ServiceReference ref2 = context->GetServiceReference<ITestServiceA>();
-  TestServiceA* service = dynamic_cast<TestServiceA*>(context->GetService<ITestServiceA>(ref2));
+  ServiceReference<ITestServiceA> ref2 = context->GetServiceReference<ITestServiceA>();
+  TestServiceA* service = dynamic_cast<TestServiceA*>(context->GetService(ref2));
   US_TEST_CONDITION_REQUIRED(service == &s2, "Testing highest service rank")
 
   props["bool"] = true;

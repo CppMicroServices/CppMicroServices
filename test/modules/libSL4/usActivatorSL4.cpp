@@ -27,12 +27,10 @@
 
 #include <usFooService.h>
 
-#include US_BASECLASS_HEADER
-
 US_BEGIN_NAMESPACE
 
 class ActivatorSL4 :
-  public US_BASECLASS_NAME, public ModuleActivator, public FooService
+  public ModuleActivator, public FooService
 {
 
 public:
@@ -59,7 +57,7 @@ public:
 
 private:
 
-  ServiceRegistration sr;
+  ServiceRegistration<FooService> sr;
 };
 
 US_END_NAMESPACE

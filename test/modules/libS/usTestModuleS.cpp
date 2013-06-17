@@ -31,12 +31,10 @@
 #include <usModuleActivator.h>
 #include <usConfig.h>
 
-#include US_BASECLASS_HEADER
 
 US_BEGIN_NAMESPACE
 
-class TestModuleS : public US_BASECLASS_NAME,
-                    public ServiceControlInterface,
+class TestModuleS : public ServiceControlInterface,
                     public TestModuleSService0,
                     public TestModuleSService1,
                     public TestModuleSService2,
@@ -50,9 +48,10 @@ public:
   {
     for(int i = 0; i <= 3; ++i)
     {
-      servregs.push_back(ServiceRegistration());
+      servregs.push_back(ServiceRegistrationU());
     }
     sreg = mc->RegisterService<TestModuleSService0>(this);
+    sciReg = mc->RegisterService<ServiceControlInterface>(this);
   }
 
   virtual const char* GetNameOfClass() const
@@ -70,16 +69,18 @@ public:
         {
           std::stringstream servicename;
           servicename << SERVICE << offset;
+          InterfaceMap ifm;
+          ifm.insert(std::make_pair(servicename.str(), static_cast<void*>(this)));
           ServiceProperties props;
           props.insert(std::make_pair(ServiceConstants::SERVICE_RANKING(), Any(ranking)));
-          servregs[offset] = mc->RegisterService(servicename.str().c_str(), this, props);
+          servregs[offset] = mc->RegisterService(ifm, props);
         }
       }
       if (operation == "unregister")
       {
         if (servregs[offset])
         {
-          ServiceRegistration sr1 = servregs[offset];
+          ServiceRegistrationU sr1 = servregs[offset];
           sr1.Unregister();
           servregs[offset] = 0;
         }
@@ -93,6 +94,10 @@ public:
     {
       sreg.Unregister();
     }
+    if (sciReg)
+    {
+      sciReg.Unregister();
+    }
   }
 
 private:
@@ -100,8 +105,9 @@ private:
   static const std::string SERVICE; // = "org.cppmicroservices.TestModuleSService"
 
   ModuleContext* mc;
-  std::vector<ServiceRegistration> servregs;
-  ServiceRegistration sreg;
+  std::vector<ServiceRegistrationU> servregs;
+  ServiceRegistration<TestModuleSService0> sreg;
+  ServiceRegistration<ServiceControlInterface> sciReg;
 };
 
 const std::string TestModuleS::SERVICE = "org.cppmicroservices.TestModuleSService";

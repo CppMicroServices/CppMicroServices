@@ -27,8 +27,6 @@
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 
-#include US_BASECLASS_HEADER
-
 #include "usTestUtilSharedLibrary.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
@@ -132,8 +130,8 @@ void frame018a(ModuleContext* mc)
 {
   try
   {
-    US_BASECLASS_NAME* obj = mc->GetService(ServiceReference());
-    US_DEBUG << "Got service object = " << us_service_impl_name(obj) << ", expected std::invalid_argument exception";
+    mc->GetService(ServiceReferenceU());
+    US_DEBUG << "Got service object, expected std::invalid_argument exception";
     US_TEST_FAILED_MSG(<< "Got service object, excpected std::invalid_argument exception")
   }
   catch (const std::invalid_argument& )
@@ -167,9 +165,9 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
   // Check if libA registered the expected service
   try
   {
-    ServiceReference sr1 = mc->GetServiceReference("org.cppmicroservices.TestModuleAService");
-    US_BASECLASS_NAME* o1 = mc->GetService(sr1);
-    US_TEST_CONDITION(o1 != 0, "Test if service object found");
+    ServiceReferenceU sr1 = mc->GetServiceReference("org.cppmicroservices.TestModuleAService");
+    void* o1 = mc->GetService(sr1);
+    US_TEST_CONDITION(o1 != NULL, "Test if service object found");
 
     try
     {
@@ -214,7 +212,7 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for non-null module")
 #endif
 
-  ServiceReference sr1
+  ServiceReferenceU sr1
       = mc->GetServiceReference("org.cppmicroservices.TestModuleAService");
   US_TEST_CONDITION(sr1, "Test for valid service reference")
 

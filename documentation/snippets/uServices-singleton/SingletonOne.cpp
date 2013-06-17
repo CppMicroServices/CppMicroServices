@@ -32,7 +32,7 @@ SingletonOne::~SingletonOne()
 //![ss1gi]
 SingletonOneService* SingletonOneService::GetInstance()
 {
-  static ServiceReference serviceRef;
+  static ServiceReference<SingletonOneService> serviceRef;
   static ModuleContext* context = GetModuleContext();
 
   if (!serviceRef)
@@ -49,7 +49,7 @@ SingletonOneService* SingletonOneService::GetInstance()
     // This still might return a null pointer, if all SingletonOneService
     // instances have been unregistered (during unloading of the library,
     // for example).
-    return context->GetService<SingletonOneService>(serviceRef);
+    return context->GetService(serviceRef);
   }
   else
   {

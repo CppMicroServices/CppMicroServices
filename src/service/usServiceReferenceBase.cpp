@@ -19,9 +19,9 @@
 
 =============================================================================*/
 
-#include "usServiceReference.h"
-#include "usServiceReferencePrivate.h"
-#include "usServiceRegistrationPrivate.h"
+#include "usServiceReferenceBase.h"
+#include "usServiceReferenceBasePrivate.h"
+#include "usServiceRegistrationBasePrivate.h"
 
 #include "usModule.h"
 #include "usModulePrivate.h"
@@ -29,57 +29,67 @@
 
 US_BEGIN_NAMESPACE
 
-typedef ServiceRegistrationPrivate::MutexType MutexType;
+typedef ServiceRegistrationBasePrivate::MutexType MutexType;
 typedef MutexLock<MutexType> MutexLocker;
 
-ServiceReference::ServiceReference()
-  : d(new ServiceReferencePrivate(0))
+ServiceReferenceBase::ServiceReferenceBase()
+  : d(new ServiceReferenceBasePrivate(0))
 {
 
 }
 
-ServiceReference::ServiceReference(const ServiceReference& ref)
+ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : d(ref.d)
 {
   d->ref.Ref();
 }
 
-ServiceReference::ServiceReference(ServiceRegistrationPrivate* reg)
-  : d(new ServiceReferencePrivate(reg))
+ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
+  : d(new ServiceReferenceBasePrivate(reg))
 {
-
 }
 
-ServiceReference::operator bool() const
+void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
+{
+  if (d->ref > 1)
+  {
+    // detach
+    d->ref.Deref();
+    d = new ServiceReferenceBasePrivate(d->registration);
+  }
+  d->interfaceId = interfaceId;
+}
+
+ServiceReferenceBase::operator bool() const
 {
   return GetModule() != 0;
 }
 
-ServiceReference& ServiceReference::operator=(int null)
+ServiceReferenceBase& ServiceReferenceBase::operator=(int null)
 {
   if (null == 0)
   {
     if (!d->ref.Deref())
       delete d;
-    d = new ServiceReferencePrivate(0);
+    d = new ServiceReferenceBasePrivate(0);
   }
   return *this;
 }
 
-ServiceReference::~ServiceReference()
+ServiceReferenceBase::~ServiceReferenceBase()
 {
   if (!d->ref.Deref())
     delete d;
 }
 
-Any ServiceReference::GetProperty(const std::string& key) const
+Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
   MutexLocker lock(d->registration->propsLock);
 
   return d->registration->properties.Value(key);
 }
 
-void ServiceReference::GetPropertyKeys(std::vector<std::string>& keys) const
+void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
   MutexLocker lock(d->registration->propsLock);
 
@@ -87,7 +97,7 @@ void ServiceReference::GetPropertyKeys(std::vector<std::string>& keys) const
   keys.assign(ks.begin(), ks.end());
 }
 
-Module* ServiceReference::GetModule() const
+Module* ServiceReferenceBase::GetModule() const
 {
   if (d->registration == 0 || d->registration->module == 0)
   {
@@ -97,19 +107,19 @@ Module* ServiceReference::GetModule() const
   return d->registration->module->q;
 }
 
-void ServiceReference::GetUsingModules(std::vector<Module*>& modules) const
+void ServiceReferenceBase::GetUsingModules(std::vector<Module*>& modules) const
 {
   MutexLocker lock(d->registration->propsLock);
 
-  ServiceRegistrationPrivate::ModuleToRefsMap::const_iterator end = d->registration->dependents.end();
-  for (ServiceRegistrationPrivate::ModuleToRefsMap::const_iterator iter = d->registration->dependents.begin();
+  ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator end = d->registration->dependents.end();
+  for (ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator iter = d->registration->dependents.begin();
        iter != end; ++iter)
   {
     modules.push_back(iter->first);
   }
 }
 
-bool ServiceReference::operator<(const ServiceReference& reference) const
+bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) const
 {
   int r1 = 0;
   int r2 = 0;
@@ -135,14 +145,14 @@ bool ServiceReference::operator<(const ServiceReference& reference) const
   }
 }
 
-bool ServiceReference::operator==(const ServiceReference& reference) const
+bool ServiceReferenceBase::operator==(const ServiceReferenceBase& reference) const
 {
   return d->registration == reference.d->registration;
 }
 
-ServiceReference& ServiceReference::operator=(const ServiceReference& reference)
+ServiceReferenceBase& ServiceReferenceBase::operator=(const ServiceReferenceBase& reference)
 {
-  ServiceReferencePrivate* curr_d = d;
+  ServiceReferenceBasePrivate* curr_d = d;
   d = reference.d;
   d->ref.Ref();
 
@@ -152,17 +162,27 @@ ServiceReference& ServiceReference::operator=(const ServiceReference& reference)
   return *this;
 }
 
-std::size_t ServiceReference::Hash() const
+bool ServiceReferenceBase::IsConvertibleTo(const std::string& interfaceId) const
+{
+  return d->IsConvertibleTo(interfaceId);
+}
+
+std::string ServiceReferenceBase::GetInterfaceId() const
+{
+  return d->interfaceId;
+}
+
+std::size_t ServiceReferenceBase::Hash() const
 {
   using namespace US_HASH_FUNCTION_NAMESPACE;
-  return US_HASH_FUNCTION(ServiceRegistrationPrivate*, this->d->registration);
+  return US_HASH_FUNCTION(ServiceRegistrationBasePrivate*, this->d->registration);
 }
 
 US_END_NAMESPACE
 
 US_USE_NAMESPACE
 
-std::ostream& operator<<(std::ostream& os, const ServiceReference& serviceRef)
+std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef)
 {
   os << "Reference for service object registered from "
      << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()

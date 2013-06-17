@@ -99,12 +99,6 @@
 
 #endif /* user namespace */
 
-#define US_BASECLASS_NAME @US_BASECLASS_NAME@
-#define US_BASECLASS_HEADER <@US_BASECLASS_HEADER@>
-
-// base class forward declaration
-@US_BASECLASS_FORWARD_DECLARATION@
-
 //-------------------------------------------------------------------
 // Platform defines
 //-------------------------------------------------------------------

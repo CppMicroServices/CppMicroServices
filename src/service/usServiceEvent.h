@@ -143,7 +143,7 @@ public:
    * @param reference A <code>ServiceReference</code> object to the service
    *        that had a lifecycle change.
    */
-  ServiceEvent(Type type, const ServiceReference& reference);
+  ServiceEvent(Type type, const ServiceReferenceBase& reference);
 
   ServiceEvent(const ServiceEvent& other);
 
@@ -157,7 +157,13 @@ public:
    *
    * @return Reference to the service that had a lifecycle change.
    */
-  ServiceReference GetServiceReference() const;
+  ServiceReferenceU GetServiceReference() const;
+
+  template<class S>
+  ServiceReference<S> GetServiceReference(InterfaceT<S>) const
+  {
+    return GetServiceReference();
+  }
 
   /**
    * Returns the type of event. The event type values are:

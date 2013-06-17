@@ -22,15 +22,12 @@
 #ifndef USSERVICEREFERENCE_H
 #define USSERVICEREFERENCE_H
 
-#include <usAny.h>
+#include <usServiceInterface.h>
+#include <usServiceReferenceBase.h>
 
-US_MSVC_PUSH_DISABLE_WARNING(4396)
+//US_MSVC_PUSH_DISABLE_WARNING(4396)
 
 US_BEGIN_NAMESPACE
-
-class Module;
-class ServiceRegistrationPrivate;
-class ServiceReferencePrivate;
 
 /**
  * \ingroup MicroServices
@@ -58,12 +55,55 @@ class ServiceReferencePrivate;
  * <code>ServiceReference</code> objects associated with different
  * <code>ServiceRegistration</code> objects are not equal.
  *
+ * @tparam S The class type of the service interface
  * @see ModuleContext::GetServiceReference
  * @see ModuleContext::GetServiceReferences
  * @see ModuleContext::GetService
  * @remarks This class is thread safe.
  */
-class US_EXPORT ServiceReference {
+template<class S>
+class ServiceReference : public ServiceReferenceBase {
+
+public:
+
+  typedef S ServiceT;
+
+  ServiceReference() : ServiceReferenceBase()
+  {
+  }
+
+  ServiceReference(const ServiceReferenceBase& base)
+    : ServiceReferenceBase(base)
+  {
+    const std::string interfaceId(us_service_interface_iid<S>());
+    if (GetInterfaceId() != interfaceId)
+    {
+      if (this->IsConvertibleTo(interfaceId))
+      {
+        this->SetInterfaceId(interfaceId);
+      }
+      else
+      {
+        this->operator =(0);
+      }
+    }
+  }
+
+  using ServiceReferenceBase::operator=;
+
+};
+
+/**
+ * \ingroup MicroServices
+ *
+ * Specialization for void. The public constructor allows
+ * framework implementations to construct this template
+ * specialization based on a ServiceReferenceBase instance.
+ *
+ */
+template<>
+class ServiceReference<void> : public ServiceReferenceBase
+{
 
 public:
 
@@ -72,152 +112,24 @@ public:
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceReference();
+  ServiceReference() : ServiceReferenceBase()
+  {
+  }
 
-  ServiceReference(const ServiceReference& ref);
+  ServiceReference(const ServiceReferenceBase& base)
+    : ServiceReferenceBase(base)
+  {
+  }
 
-  /**
-   * Converts this ServiceReference instance into a boolean
-   * expression. If this instance was default constructed or
-   * the service it references has been unregistered, the conversion
-   * returns <code>false</code>, otherwise it returns <code>true</code>.
-   */
-  operator bool() const;
+  using ServiceReferenceBase::operator=;
 
-  /**
-   * Releases any resources held or locked by this
-   * <code>ServiceReference</code> and renders it invalid.
-   */
-  ServiceReference& operator=(int null);
-
-  ~ServiceReference();
-
-  /**
-   * Returns the property value to which the specified property key is mapped
-   * in the properties <code>ServiceProperties</code> object of the service
-   * referenced by this <code>ServiceReference</code> object.
-   *
-   * <p>
-   * Property keys are case-insensitive.
-   *
-   * <p>
-   * This method continues to return property values after the service has
-   * been unregistered. This is so references to unregistered services can
-   * still be interrogated.
-   *
-   * @param key The property key.
-   * @return The property value to which the key is mapped; an invalid Any
-   *         if there is no property named after the key.
-   */
-  Any GetProperty(const std::string& key) const;
-
-  /**
-   * Returns a list of the keys in the <code>ServiceProperties</code>
-   * object of the service referenced by this <code>ServiceReference</code>
-   * object.
-   *
-   * <p>
-   * This method will continue to return the keys after the service has been
-   * unregistered. This is so references to unregistered services can
-   * still be interrogated.
-   *
-   * @param keys A vector being filled with the property keys.
-   */
-  void GetPropertyKeys(std::vector<std::string>& keys) const;
-
-  /**
-   * Returns the module that registered the service referenced by this
-   * <code>ServiceReference</code> object.
-   *
-   * <p>
-   * This method must return <code>0</code> when the service has been
-   * unregistered. This can be used to determine if the service has been
-   * unregistered.
-   *
-   * @return The module that registered the service referenced by this
-   *         <code>ServiceReference</code> object; <code>0</code> if that
-   *         service has already been unregistered.
-   * @see ModuleContext::RegisterService(const std::vector<std::string>&, US_BASECLASS_NAME*, const ServiceProperties&)
-   */
-  Module* GetModule() const;
-
-  /**
-   * Returns the modules that are using the service referenced by this
-   * <code>ServiceReference</code> object. Specifically, this method returns
-   * the modules whose usage count for that service is greater than zero.
-   *
-   * @param modules A list of modules whose usage count for the service referenced
-   *         by this <code>ServiceReference</code> object is greater than
-   *         zero.
-   */
-  void GetUsingModules(std::vector<Module*>& modules) const;
-
-  /**
-   * Compares this <code>ServiceReference</code> with the specified
-   * <code>ServiceReference</code> for order.
-   *
-   * <p>
-   * If this <code>ServiceReference</code> and the specified
-   * <code>ServiceReference</code> have the same \link ServiceConstants::SERVICE_ID()
-   * service id\endlink they are equal. This <code>ServiceReference</code> is less
-   * than the specified <code>ServiceReference</code> if it has a lower
-   * {@link ServiceConstants::SERVICE_RANKING service ranking} and greater if it has a
-   * higher service ranking. Otherwise, if this <code>ServiceReference</code>
-   * and the specified <code>ServiceReference</code> have the same
-   * {@link ServiceConstants::SERVICE_RANKING service ranking}, this
-   * <code>ServiceReference</code> is less than the specified
-   * <code>ServiceReference</code> if it has a higher
-   * {@link ServiceConstants::SERVICE_ID service id} and greater if it has a lower
-   * service id.
-   *
-   * @param reference The <code>ServiceReference</code> to be compared.
-   * @return Returns a false or true if this
-   *         <code>ServiceReference</code> is less than or greater
-   *         than the specified <code>ServiceReference</code>.
-   */
-  bool operator<(const ServiceReference& reference) const;
-
-  bool operator==(const ServiceReference& reference) const;
-
-  ServiceReference& operator=(const ServiceReference& reference);
-
-
-private:
-
-  friend class ModulePrivate;
-  friend class ModuleContext;
-  friend class ServiceFilter;
-  friend class ServiceRegistrationPrivate;
-  friend class ServiceListeners;
-  friend class LDAPFilter;
-
-  template<class S, class T> friend class ServiceTracker;
-  template<class S, class T> friend class ServiceTrackerPrivate;
-  template<class S, class R, class T> friend class ModuleAbstractTracked;
-
-  US_HASH_FUNCTION_FRIEND(ServiceReference);
-
-  std::size_t Hash() const;
-
-  ServiceReference(ServiceRegistrationPrivate* reg);
-
-  ServiceReferencePrivate* d;
-
+  typedef void ServiceType;
 };
+
+typedef ServiceReference<void> ServiceReferenceU;
 
 US_END_NAMESPACE
 
-US_MSVC_POP_WARNING
-
-/**
- * \ingroup MicroServices
- */
-US_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceReference)& serviceRef);
-
-US_HASH_FUNCTION_NAMESPACE_BEGIN
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceReference))
-  return arg.Hash();
-US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
+//US_MSVC_POP_WARNING
 
 #endif // USSERVICEREFERENCE_H

@@ -26,11 +26,9 @@
 #include <usModuleContext.h>
 #include <usConfig.h>
 
-#include US_BASECLASS_HEADER
-
 US_BEGIN_NAMESPACE
 
-struct TestModuleB : public US_BASECLASS_NAME, public TestModuleBService
+struct TestModuleB : public TestModuleBService
 {
 
   TestModuleB(ModuleContext* mc)

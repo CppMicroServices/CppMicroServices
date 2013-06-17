@@ -20,9 +20,10 @@
 =============================================================================*/
 
 
-#ifndef USSERVICEREGISTRATIONPRIVATE_H
-#define USSERVICEREGISTRATIONPRIVATE_H
+#ifndef USSERVICEREGISTRATIONBASEPRIVATE_H
+#define USSERVICEREGISTRATIONBASEPRIVATE_H
 
+#include "usServiceInterface.h"
 #include "usServiceReference.h"
 #include "usServicePropertiesImpl_p.h"
 #include "usAtomicInt_p.h"
@@ -30,24 +31,24 @@
 US_BEGIN_NAMESPACE
 
 class ModulePrivate;
-class ServiceRegistration;
+class ServiceRegistrationBase;
 
 /**
  * \ingroup MicroServices
  */
-class ServiceRegistrationPrivate
+class ServiceRegistrationBasePrivate
 {
 
 protected:
 
-  friend class ServiceRegistration;
+  friend class ServiceRegistrationBase;
 
-  // The ServiceReferencePrivate class holds a pointer to a
-  // ServiceRegistrationPrivate instance and needs to manipulate
-  // its reference count. This way it can keep the ServiceRegistrationPrivate
+  // The ServiceReferenceBasePrivate class holds a pointer to a
+  // ServiceRegistrationBasePrivate instance and needs to manipulate
+  // its reference count. This way it can keep the ServiceRegistrationBasePrivate
   // instance alive and keep returning service properties for
   // unregistered service instances.
-  friend class ServiceReferencePrivate;
+  friend class ServiceReferenceBasePrivate;
 
   /**
    * Reference count for implicitly shared private implementation.
@@ -57,7 +58,7 @@ protected:
   /**
    * Service or ServiceFactory object.
    */
-  US_BASECLASS_NAME* service;
+  InterfaceMap service;
 
 public:
 
@@ -65,7 +66,7 @@ public:
   typedef MutexLock<MutexType> MutexLocker;
 
   typedef US_UNORDERED_MAP_TYPE<Module*,int> ModuleToRefsMap;
-  typedef US_UNORDERED_MAP_TYPE<Module*, US_BASECLASS_NAME*> ModuleToServicesMap;
+  typedef US_UNORDERED_MAP_TYPE<Module*, InterfaceMap> ModuleToServicesMap;
 
   /**
    * Modules dependent on this service. Integer is used as
@@ -86,7 +87,7 @@ public:
   /**
    * Reference object to this service registration.
    */
-  ServiceReference reference;
+  ServiceReferenceBase reference;
 
   /**
    * Service properties.
@@ -114,10 +115,10 @@ public:
   // needs to be recursive
   MutexType propsLock;
 
-  ServiceRegistrationPrivate(ModulePrivate* module, US_BASECLASS_NAME* service,
-                             const ServicePropertiesImpl& props);
+  ServiceRegistrationBasePrivate(ModulePrivate* module, const InterfaceMap& service,
+                                 const ServicePropertiesImpl& props);
 
-  ~ServiceRegistrationPrivate();
+  ~ServiceRegistrationBasePrivate();
 
   /**
    * Check if a module uses this service
@@ -125,19 +126,21 @@ public:
    * @param p Module to check
    * @return true if module uses this service
    */
-  bool IsUsedByModule(Module* m);
+  bool IsUsedByModule(Module* m) const;
 
-  US_BASECLASS_NAME* GetService();
+  const InterfaceMap& GetInterfaces() const;
+
+  void* GetService(const std::string& interfaceId) const;
 
 private:
 
   // purposely not implemented
-  ServiceRegistrationPrivate(const ServiceRegistrationPrivate&);
-  ServiceRegistrationPrivate& operator=(const ServiceRegistrationPrivate&);
+  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&);
+  ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&);
 
 };
 
 US_END_NAMESPACE
 
 
-#endif // USSERVICEREGISTRATIONPRIVATE_H
+#endif // USSERVICEREGISTRATIONBASEPRIVATE_H

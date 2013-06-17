@@ -27,7 +27,7 @@ SingletonTwo::~SingletonTwo()
 
 SingletonTwoService* SingletonTwoService::GetInstance()
 {
-  static ServiceReference serviceRef;
+  static ServiceReference<SingletonTwoService> serviceRef;
   static ModuleContext* context = GetModuleContext();
 
   if (!serviceRef)
@@ -44,7 +44,7 @@ SingletonTwoService* SingletonTwoService::GetInstance()
     // This still might return a null pointer, if all SingletonTwoService
     // instances have been unregistered (during unloading of the library,
     // for example).
-    return context->GetService<SingletonTwoService>(serviceRef);
+    return context->GetService(serviceRef);
   }
   else
   {

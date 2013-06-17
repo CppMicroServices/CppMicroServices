@@ -1605,7 +1605,6 @@ INCLUDE_FILE_PATTERNS  = *.h
 PREDEFINED             = US_PREPEND_NAMESPACE(x)=x \
                          US_BEGIN_NAMESPACE= \
                          US_END_NAMESPACE= \
-                         "US_BASECLASS_NAME=@US_BASECLASS_NAME@" \
                          US_EXPORT= \
                          US_ABI_LOCAL= \
                          US_MSVC_POP_WARNING=

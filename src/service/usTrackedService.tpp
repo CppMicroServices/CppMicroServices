@@ -23,7 +23,7 @@ US_BEGIN_NAMESPACE
 
 template<class S, class T>
 TrackedService<S,T>::TrackedService(ServiceTracker<S,T>* serviceTracker,
-                  ServiceTrackerCustomizer<T>* customizer)
+                  ServiceTrackerCustomizer<S,T>* customizer)
   : serviceTracker(serviceTracker), customizer(customizer)
 {
 
@@ -41,7 +41,7 @@ void TrackedService<S,T>::ServiceChanged(const ServiceEvent event)
     return;
   }
 
-  ServiceReference reference = event.GetServiceReference();
+  ServiceReference<S> reference = event.GetServiceReference(InterfaceT<S>());
   US_DEBUG(serviceTracker->d->DEBUG_OUTPUT) << "TrackedService::ServiceChanged["
         << event.GetType() << "]: " << reference;
 
@@ -98,14 +98,14 @@ void TrackedService<S,T>::Modified()
 }
 
 template<class S, class T>
-T TrackedService<S,T>::CustomizerAdding(ServiceReference item,
+T TrackedService<S,T>::CustomizerAdding(ServiceReference<S> item,
                                         const ServiceEvent& /*related*/)
 {
   return customizer->AddingService(item);
 }
 
 template<class S, class T>
-void TrackedService<S,T>::CustomizerModified(ServiceReference item,
+void TrackedService<S,T>::CustomizerModified(ServiceReference<S> item,
                                              const ServiceEvent& /*related*/,
                                              T object)
 {
@@ -113,7 +113,7 @@ void TrackedService<S,T>::CustomizerModified(ServiceReference item,
 }
 
 template<class S, class T>
-void TrackedService<S,T>::CustomizerRemoved(ServiceReference item,
+void TrackedService<S,T>::CustomizerRemoved(ServiceReference<S> item,
                                             const ServiceEvent& /*related*/,
                                             T object)
 {

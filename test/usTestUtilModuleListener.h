@@ -48,7 +48,7 @@ public:
   bool CheckListenerEvents(
       bool pexp, ModuleEvent::Type ptype,
       bool sexp, ServiceEvent::Type stype,
-      Module* moduleX, ServiceReference* servX);
+      Module* moduleX, ServiceReferenceU* servX);
 
   bool CheckListenerEvents(const std::vector<ModuleEvent>& pEvts);
 

@@ -27,8 +27,6 @@
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 
-#include US_BASECLASS_HEADER
-
 #include "usTestUtilSharedLibrary.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
@@ -61,13 +59,13 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
   // Check if libB registered the expected service
   try
   {
-    std::list<ServiceReference> refs = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
+    std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
-    US_BASECLASS_NAME* o1 = mc->GetService(refs.front());
+    void* o1 = mc->GetService(refs.front());
     US_TEST_CONDITION(o1 != 0, "Test if first service object found");
 
-    US_BASECLASS_NAME* o2 = mc->GetService(refs.back());
+    void* o2 = mc->GetService(refs.back());
     US_TEST_CONDITION(o2 != 0, "Test if second service object found");
 
     try
@@ -115,7 +113,7 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
   US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
 #endif
 
-  std::list<ServiceReference> refs
+  std::vector<ServiceReferenceU> refs
       = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
   US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
   US_TEST_CONDITION(refs.back(), "Test for second valid service reference")

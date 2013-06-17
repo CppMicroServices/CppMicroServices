@@ -29,7 +29,7 @@ class ServiceEventData : public SharedData
 {
 public:
 
-  ServiceEventData(const ServiceEvent::Type& type, const ServiceReference& reference)
+  ServiceEventData(const ServiceEvent::Type& type, const ServiceReferenceBase& reference)
     : type(type), reference(reference)
   {
 
@@ -42,7 +42,7 @@ public:
   }
 
   const ServiceEvent::Type type;
-  const ServiceReference reference;
+  const ServiceReferenceBase reference;
 
 private:
 
@@ -66,7 +66,7 @@ bool ServiceEvent::IsNull() const
   return !d;
 }
 
-ServiceEvent::ServiceEvent(Type type, const ServiceReference& reference)
+ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)
   : d(new ServiceEventData(type, reference))
 {
 
@@ -84,7 +84,7 @@ ServiceEvent& ServiceEvent::operator=(const ServiceEvent& other)
   return *this;
 }
 
-ServiceReference ServiceEvent::GetServiceReference() const
+ServiceReferenceU ServiceEvent::GetServiceReference() const
 {
   return d->reference;
 }
@@ -117,7 +117,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
 
   os << event.GetType();
 
-  ServiceReference sr = event.GetServiceReference();
+  ServiceReferenceU sr = event.GetServiceReference();
   if (sr)
   {
     // Some events will not have a service reference

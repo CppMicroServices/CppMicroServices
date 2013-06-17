@@ -49,7 +49,7 @@ namespace ServiceConstants {
 /**
  * Service property identifying all of the class names under which a service
  * was registered in the framework. The value of this property must be of
- * type <code>std::list&lt;std::string&gt;</code>.
+ * type <code>std::vector&lt;std::string&gt;</code>.
  *
  * <p>
  * This property is set by the framework when a service is registered.

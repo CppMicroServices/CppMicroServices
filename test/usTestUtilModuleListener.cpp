@@ -62,7 +62,7 @@ ServiceEvent TestModuleListener::GetServiceEvent() const
 bool TestModuleListener::CheckListenerEvents(
     bool pexp, ModuleEvent::Type ptype,
     bool sexp, ServiceEvent::Type stype,
-    Module* moduleX, ServiceReference* servX)
+    Module* moduleX, ServiceReferenceU* servX)
 {
   std::vector<ModuleEvent> pEvts;
   std::vector<ServiceEvent> seEvts;

@@ -27,8 +27,6 @@
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 
-#include US_BASECLASS_HEADER
-
 #include <usModulePropsInterface.h>
 
 #include "usTestUtilSharedLibrary.h"
@@ -91,7 +89,7 @@ public:
     US_TEST_OUTPUT( << "ServiceEvent: " << evt );
     if (ServiceEvent::UNREGISTERING == evt.GetType())
     {
-      ServiceReference sr = evt.GetServiceReference();
+      ServiceReferenceU sr = evt.GetServiceReference();
 
       // Validate that no module is marked as using the service
       std::vector<Module*> usingModules;
@@ -103,7 +101,7 @@ public:
       }
 
       // Check if the service can be fetched
-      US_BASECLASS_NAME* service = mc->GetService(sr);
+      void* service = mc->GetService(sr);
       sr.GetUsingModules(usingModules);
       // if (UNREGISTERSERVICE_VALID_DURING_UNREGISTERING) {
       // In this mode the service shall be obtainable during
@@ -114,7 +112,7 @@ public:
         US_TEST_OUTPUT( << "*** Service should be available to ServiceListener "
                           << "while handling unregistering event." );
       }
-      US_TEST_OUTPUT( << "Service (unreg): " << us_service_impl_name(service) );
+      US_TEST_OUTPUT( << "Service (unreg): " << service );
       if (checkUsingModules && usingModules.size() != 1)
       {
         teststatus = false;
@@ -152,7 +150,7 @@ public:
         long sid = any_cast<long>(sr.GetProperty(ServiceConstants::SERVICE_ID()));
         std::stringstream ss;
         ss << "(" << ServiceConstants::SERVICE_ID() << "=" << sid << ")";
-        std::list<ServiceReference> srs = mc->GetServiceReferences("", ss.str());
+        std::vector<ServiceReferenceU> srs = mc->GetServiceReferences("", ss.str());
         if (srs.empty())
         {
           US_TEST_OUTPUT( << "ServiceReference for UNREGISTERING service is not"
@@ -164,7 +162,7 @@ public:
           US_TEST_OUTPUT( << "*** ServiceReference for UNREGISTERING service,"
                             << sr << ", not found in the service registry; fail." );
           US_TEST_OUTPUT( << "Found the following Service references:") ;
-          for(std::list<ServiceReference>::const_iterator sr = srs.begin();
+          for(std::vector<ServiceReferenceU>::const_iterator sr = srs.begin();
               sr != srs.end(); ++sr)
           {
             US_TEST_OUTPUT( << (*sr) );
@@ -181,7 +179,7 @@ public:
     }
   }
 
-  void printUsingModules(const ServiceReference& sr, const std::string& caption)
+  void printUsingModules(const ServiceReferenceU& sr, const std::string& caption)
   {
     std::vector<Module*> usingModules;
     sr.GetUsingModules(usingModules);
@@ -425,12 +423,13 @@ void frameSL25a()
   US_TEST_OUTPUT( << "Check that FooService is added to service tracker in libSL3" );
   try
   {
-    ServiceReference libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    US_BASECLASS_NAME* libSL3Activator = mc->GetService(libSL3SR);
+    ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
+    void* libSL3Activator = mc->GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(libSL3Activator, "ActivatorSL3 service != 0");
 
-    ModulePropsInterface* propsInterface = dynamic_cast<ModulePropsInterface*>(libSL3Activator);
-    US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to ModulePropsInterface");
+    ServiceReference<ModulePropsInterface> libSL3PropsI(libSL3SR);
+    ModulePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
+    US_TEST_CONDITION_REQUIRED(propsInterface, "ModulePropsInterface != 0");
 
     ModulePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
     US_TEST_CONDITION_REQUIRED(i != propsInterface->GetProperties().end(), "Property serviceAdded");
@@ -448,11 +447,12 @@ void frameSL25a()
   US_TEST_OUTPUT( << "Check that FooService is added to service tracker in libSL1" );
   try
   {
-    ServiceReference libSL1SR = mc->GetServiceReference("ActivatorSL1");
-    US_BASECLASS_NAME* libSL1Activator = mc->GetService(libSL1SR);
+    ServiceReferenceU libSL1SR = mc->GetServiceReference("ActivatorSL1");
+    void* libSL1Activator = mc->GetService(libSL1SR);
     US_TEST_CONDITION_REQUIRED(libSL1Activator, "ActivatorSL1 service != 0");
 
-    ModulePropsInterface* propsInterface = dynamic_cast<ModulePropsInterface*>(libSL1Activator);
+    ServiceReference<ModulePropsInterface> libSL1PropsI(libSL1SR);
+    ModulePropsInterface* propsInterface = mc->GetService(libSL1PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to ModulePropsInterface");
 
     ModulePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
@@ -483,11 +483,12 @@ void frameSL25a()
   US_TEST_OUTPUT( << "Check that FooService is removed from service tracker in libSL3" );
   try
   {
-    ServiceReference libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    US_BASECLASS_NAME* libSL3Activator = mc->GetService(libSL3SR);
+    ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
+    void* libSL3Activator = mc->GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(libSL3Activator, "ActivatorSL3 service != 0");
 
-    ModulePropsInterface* propsInterface = dynamic_cast<ModulePropsInterface*>(libSL3Activator);
+    ServiceReference<ModulePropsInterface> libSL3PropsI(libSL3SR);
+    ModulePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to ModulePropsInterface");
 
     ModulePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceRemoved");

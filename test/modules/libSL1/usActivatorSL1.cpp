@@ -28,13 +28,11 @@
 
 #include "usFooService.h"
 
-#include US_BASECLASS_HEADER
-
 US_BEGIN_NAMESPACE
 
 class ActivatorSL1 :
-    public US_BASECLASS_NAME, public ModuleActivator, public ModulePropsInterface,
-    public ServiceTrackerCustomizer<FooService*>
+    public ModuleActivator, public ModulePropsInterface,
+    public ServiceTrackerCustomizer<FooService>
 {
 
 public:
@@ -54,7 +52,9 @@ public:
   {
     this->context = context;
 
-    sr = context->RegisterService("ActivatorSL1", this);
+    InterfaceMap im = MakeInterfaceMap(this, InterfaceT<ModulePropsInterface>());
+    im.insert(std::make_pair(std::string("ActivatorSL1"), this));
+    sr = context->RegisterService(im);
 
     delete tracker;
     tracker = new FooTracker(context, this);
@@ -71,7 +71,7 @@ public:
     return props;
   }
 
-  FooService* AddingService(const ServiceReference& reference)
+  FooService* AddingService(const ServiceReferenceT& reference)
   {
     props["serviceAdded"] = true;
 
@@ -80,10 +80,10 @@ public:
     return fooService;
   }
 
-  void ModifiedService(const ServiceReference& /*reference*/, FooService* /*service*/)
+  void ModifiedService(const ServiceReferenceT& /*reference*/, FooService* /*service*/)
   {}
 
-  void RemovedService(const ServiceReference& /*reference*/, FooService* /*service*/)
+  void RemovedService(const ServiceReferenceT& /*reference*/, FooService* /*service*/)
   {
     props["serviceRemoved"] = true;
   }
@@ -92,9 +92,9 @@ private:
 
   ModulePropsInterface::Properties props;
 
-  ServiceRegistration sr;
+  ServiceRegistrationU sr;
 
-  typedef ServiceTracker<FooService*> FooTracker;
+  typedef ServiceTracker<FooService> FooTracker;
 
   FooTracker* tracker;
   ModuleContext* context;

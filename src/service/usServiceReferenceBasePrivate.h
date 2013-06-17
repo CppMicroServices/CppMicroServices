@@ -20,10 +20,12 @@
 =============================================================================*/
 
 
-#ifndef USSERVICEREFERENCEPRIVATE_H
-#define USSERVICEREFERENCEPRIVATE_H
+#ifndef USSERVICEREFERENCEBASEPRIVATE_H
+#define USSERVICEREFERENCEBASEPRIVATE_H
 
 #include "usAtomicInt_p.h"
+
+#include "usServiceInterface.h"
 
 #include <string>
 
@@ -32,20 +34,20 @@ US_BEGIN_NAMESPACE
 class Any;
 class Module;
 class ServicePropertiesImpl;
-class ServiceRegistrationPrivate;
-class ServiceReferencePrivate;
+class ServiceRegistrationBasePrivate;
+class ServiceReferenceBasePrivate;
 
 
 /**
  * \ingroup MicroServices
  */
-class ServiceReferencePrivate
+class ServiceReferenceBasePrivate
 {
 public:
 
-  ServiceReferencePrivate(ServiceRegistrationPrivate* reg);
+  ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
 
-  ~ServiceReferencePrivate();
+  ~ServiceReferenceBasePrivate();
 
   /**
     * Get the service object.
@@ -53,7 +55,7 @@ public:
     * @param module requester of service.
     * @return Service requested or null in case of failure.
     */
-  US_BASECLASS_NAME* GetService(Module* module);
+  void* GetService(Module* module);
 
   /**
    * Unget the service object.
@@ -97,6 +99,8 @@ public:
    */
   Any GetProperty(const std::string& key, bool lock) const;
 
+  bool IsConvertibleTo(const std::string& interfaceId) const;
+
   /**
    * Reference count for implicitly shared private implementation.
    */
@@ -105,15 +109,20 @@ public:
   /**
    * Link to registration object for this reference.
    */
-  ServiceRegistrationPrivate* const registration;
+  ServiceRegistrationBasePrivate* const registration;
+
+  /**
+   * The service interface id for this reference.
+   */
+  std::string interfaceId;
 
 private:
 
   // purposely not implemented
-  ServiceReferencePrivate(const ServiceReferencePrivate&);
-  ServiceReferencePrivate& operator=(const ServiceReferencePrivate&);
+  ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&);
+  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&);
 };
 
 US_END_NAMESPACE
 
-#endif // USSERVICEREFERENCEPRIVATE_H
+#endif // USSERVICEREFERENCEBASEPRIVATE_H

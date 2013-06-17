@@ -34,7 +34,7 @@
 US_BEGIN_NAMESPACE
 
 class LDAPFilterData;
-class ServiceReference;
+class ServiceReferenceBase;
 
 /**
  * \ingroup MicroServices
@@ -103,7 +103,7 @@ public:
    * @return <code>true</code> if the service's properties match this
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    */
-  bool Match(const ServiceReference& reference) const;
+  bool Match(const ServiceReferenceBase& reference) const;
 
   /**
    * Filter using a <code>ServiceProperties</code> object with case insensitive key lookup. This

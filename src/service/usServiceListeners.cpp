@@ -22,7 +22,7 @@
 #include "usUtils_p.h"
 
 #include "usServiceListeners_p.h"
-#include "usServiceReferencePrivate.h"
+#include "usServiceReferenceBasePrivate.h"
 
 #include "usModule.h"
 
@@ -144,7 +144,6 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
                                       const ServiceEvent& evt,
                                       ServiceListenerEntries& matchBefore)
 {
-  ServiceReference sr = evt.GetServiceReference();
   int n = 0;
 
   for (ServiceListenerEntries::const_iterator l = receivers.begin();
@@ -176,7 +175,7 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
   //US_DEBUG << "Notified " << n << " listeners";
 }
 
-void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, ServiceListenerEntries& set,
+void ServiceListeners::GetMatchingServiceListeners(const ServiceReferenceBase& sr, ServiceListenerEntries& set,
                                                    bool lockProps)
 {
   MutexLocker lock(mutex);
@@ -199,9 +198,9 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceReference& sr, S
   //         << " listeners with complicated filters";
 
   // Check the cache
-  const std::list<std::string> c(any_cast<std::list<std::string> >
+  const std::vector<std::string> c(any_cast<std::vector<std::string> >
                                  (sr.d->GetProperty(ServiceConstants::OBJECTCLASS(), lockProps)));
-  for (std::list<std::string>::const_iterator objClass = c.begin();
+  for (std::vector<std::string>::const_iterator objClass = c.begin();
        objClass != c.end(); ++objClass)
   {
     AddToSet(set, OBJECTCLASS_IX, *objClass);

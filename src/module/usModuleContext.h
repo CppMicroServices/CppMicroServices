@@ -22,6 +22,8 @@
 #ifndef USMODULECONTEXT_H_
 #define USMODULECONTEXT_H_
 
+// TODO: Replace includes with forward directives!
+
 #include "usUtils_p.h"
 #include "usServiceInterface.h"
 #include "usServiceEvent.h"
@@ -35,6 +37,7 @@ typedef US_SERVICE_LISTENER_FUNCTOR ServiceListener;
 typedef US_MODULE_LISTENER_FUNCTOR ModuleListener;
 
 class ModuleContextPrivate;
+class ServiceFactory;
 
 /**
  * \ingroup MicroServices
@@ -182,33 +185,8 @@ public:
    * @see ServiceRegistration
    * @see ServiceFactory
    */
-  ServiceRegistration RegisterService(const std::list<std::string>& clazzes,
-                                      US_BASECLASS_NAME* service,
-                                      const ServiceProperties& properties = ServiceProperties());
-
-  /**
-   * Registers the specified service object with the specified properties
-   * under the specified class name with the framework.
-   *
-   * <p>
-   * This method is otherwise identical to
-   * RegisterService(const std:list&lt;std::string&gt;&, us::Base*, const ServiceProperties&)
-   * and is provided as a convenience when <code>service</code> will only be registered under a single
-   * class name. Note that even in this case the value of the service's
-   * ServiceConstants::OBJECTCLASS property will be a std::list<std::string>, rather
-   * than just a single string.
-   *
-   * @param clazz The class name under which the service can be located.
-   * @param service The service object or a ServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
-   *         registering the service to update the service's properties or to
-   *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @see RegisterService(const std:list&lt;std::string&gt;&, us::Base*, const ServiceProperties&)
-   */
-  ServiceRegistration RegisterService(const char* clazz, US_BASECLASS_NAME* service,
-                                      const ServiceProperties& properties = ServiceProperties());
+  ServiceRegistrationU RegisterService(const InterfaceMap& service,
+                                       const ServiceProperties& properties = ServiceProperties());
 
   /**
    * Registers the specified service object with the specified properties
@@ -227,18 +205,53 @@ public:
    *         registering the service to update the service's properties or to
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @see RegisterService(const char*, us::Base*, const ServiceProperties&)
+   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class S>
-  ServiceRegistration RegisterService(US_BASECLASS_NAME* service, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<S> RegisterService(S* service, const ServiceProperties& properties = ServiceProperties())
   {
-    const char* clazz = us_service_interface_iid<S*>();
+    const char* clazz = us_service_interface_iid<S>();
     if (clazz == 0)
     {
-      throw ServiceException(std::string("The interface class you are registering your service ") +
-                             us_service_impl_name(service) + " against has no US_DECLARE_SERVICE_INTERFACE macro");
+      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
+                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
     }
-    return RegisterService(clazz, service, properties);
+    InterfaceMap servicePointers = MakeInterfaceMap(service, InterfaceT<S>());
+    return ServiceRegistration<S>(RegisterService(servicePointers, properties));
+  }
+
+  template<class S>
+  ServiceRegistration<S> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
+  {
+    const char* clazz = us_service_interface_iid<S>();
+    if (clazz == 0)
+    {
+      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
+                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
+    }
+    InterfaceMap servicePointers = MakeInterfaceMap(factory, InterfaceT<S>());
+    return ServiceRegistration<S>(RegisterService(servicePointers, properties));
+  }
+
+  template<class S, class T>
+  ServiceRegistration<S,T> RegisterService(S* sptr, T* tptr, const ServiceProperties& properties = ServiceProperties())
+  {
+    const char* siid = us_service_interface_iid<S>();
+    if (siid == 0)
+    {
+      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
+                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
+    }
+    const char* tiid = us_service_interface_iid<T>();
+    if (tiid == 0)
+    {
+      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
+                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
+    }
+    std::map<std::string,void*> servicePointers;
+    servicePointers.insert(std::make_pair(std::string(siid), static_cast<void*>(sptr)));
+    servicePointers.insert(std::make_pair(std::string(tiid), static_cast<void*>(tptr)));
+    return ServiceRegistration<S,T>(RegisterService(servicePointers, properties));
   }
 
   /**
@@ -286,8 +299,7 @@ public:
    *         contains an invalid filter expression that cannot be parsed.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    */
-  std::list<ServiceReference> GetServiceReferences(const std::string& clazz,
-                                                   const std::string& filter = std::string());
+  std::vector<ServiceReferenceU> GetServiceReferences(const std::string& clazz, const std::string& filter = std::string());
 
   /**
    * Returns a list of <code>ServiceReference</code> objects. The returned
@@ -311,11 +323,18 @@ public:
    * @see GetServiceReferences(const std::string&, const std::string&)
    */
   template<class S>
-  std::list<ServiceReference> GetServiceReferences(const std::string& filter = std::string())
+  std::vector<ServiceReference<S> > GetServiceReferences(const std::string& filter = std::string())
   {
-    const char* clazz = us_service_interface_iid<S*>();
+    const char* clazz = us_service_interface_iid<S>();
     if (clazz == 0) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
-    return GetServiceReferences(std::string(clazz), filter);
+    typedef std::vector<ServiceReferenceU> BaseVectorT;
+    BaseVectorT serviceRefs = GetServiceReferences(std::string(clazz), filter);
+    std::vector<ServiceReference<S> > result;
+    for(BaseVectorT::const_iterator i = serviceRefs.begin(); i != serviceRefs.end(); ++i)
+    {
+      result.push_back(ServiceReference<S>(*i));
+    }
+    return result;
   }
 
   /**
@@ -348,7 +367,7 @@ public:
    * @throws ServiceException If no service was registered under the given class name.
    * @see #GetServiceReferences(const std::string&, const std::string&)
    */
-  ServiceReference GetServiceReference(const std::string& clazz);
+  ServiceReferenceU GetServiceReference(const std::string& clazz);
 
   /**
    * Returns a <code>ServiceReference</code> object for a service that
@@ -367,11 +386,11 @@ public:
    * @see #GetServiceReferences(const std::string&)
    */
   template<class S>
-  ServiceReference GetServiceReference()
+  ServiceReference<S> GetServiceReference()
   {
-    const char* clazz = us_service_interface_iid<S*>();
+    const char* clazz = us_service_interface_iid<S>();
     if (clazz == 0) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
-    return GetServiceReference(std::string(clazz));
+    return ServiceReference<S>(GetServiceReference(std::string(clazz)));
   }
 
   /**
@@ -424,7 +443,7 @@ public:
    * @see #UngetService(const ServiceReference&)
    * @see ServiceFactory
    */
-  US_BASECLASS_NAME* GetService(const ServiceReference& reference);
+  void* GetService(const ServiceReferenceBase& reference);
 
   /**
    * Returns the service object referenced by the specified
@@ -447,9 +466,10 @@ public:
    * @see ServiceFactory
    */
   template<class S>
-  S* GetService(const ServiceReference& reference)
+  S* GetService(const ServiceReference<S>& reference)
   {
-    return dynamic_cast<S*>(GetService(reference));
+    const ServiceReferenceBase& baseRef = reference;
+    return reinterpret_cast<S*>(GetService(baseRef));
   }
 
   /**
@@ -487,7 +507,7 @@ public:
    * @see #GetService
    * @see ServiceFactory
    */
-  bool UngetService(const ServiceReference& reference);
+  bool UngetService(const ServiceReferenceBase& reference);
 
   void AddServiceListener(const ServiceListener& delegate,
                           const std::string& filter = std::string());

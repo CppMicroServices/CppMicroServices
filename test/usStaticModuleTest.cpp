@@ -26,21 +26,27 @@
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
+#include <usSharedLibrary.h>
 
 #include US_BASECLASS_HEADER
 
-#include "usTestUtilSharedLibrary.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
+#include "usTestingConfig.h"
 
 US_USE_NAMESPACE
 
 namespace {
 
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
 
 // Load libTestModuleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHandle& libB)
+void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libB)
 {
   try
   {
@@ -108,7 +114,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
 
 
 // Unload libB and check for correct events
-void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHandle& libB)
+void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libB)
 {
 #ifdef US_BUILD_SHARED_LIBS
   Module* moduleB = ModuleRegistry::GetModule("TestModuleB Module");
@@ -176,7 +182,7 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
     throw;
   }
 
-  SharedLibraryHandle libB("TestModuleB");
+  SharedLibrary libB(LIB_PATH, "TestModuleB");
   frame020a(mc, listener, libB);
   frame030b(mc, listener, libB);
 

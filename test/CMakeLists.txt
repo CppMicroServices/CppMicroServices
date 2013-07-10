@@ -36,6 +36,7 @@ set(_tests
   usServiceRegistryPerformanceTest
   usServiceRegistryTest
   usServiceTrackerTest
+  usSharedLibraryTest
   usStaticModuleResourceTest
   usStaticModuleTest
 )
@@ -50,7 +51,6 @@ endif()
 set(_additional_srcs
   usTestManager.cpp
   usTestUtilModuleListener.cpp
-  usTestUtilSharedLibrary.cpp
 )
 
 set(_test_driver ${PROJECT_NAME}TestDriver)

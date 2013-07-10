@@ -17,17 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usConfig.h>
 
 #include <usTestingMacros.h>
+#include <usTestingConfig.h>
 
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usServiceInterface.h>
 #include <usServiceTracker.h>
+#include <usSharedLibrary.h>
 
 #include US_BASECLASS_HEADER
 
 #include "usServiceControlInterface.h"
-#include "usTestUtilSharedLibrary.h"
 
 #include <memory>
 
@@ -37,8 +38,14 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTrackerTest")
 
+#ifdef US_PLATFORM_WINDOWS
+  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
+
   ModuleContext* mc = GetModuleContext();
-  SharedLibraryHandle libS("TestModuleS");
+  SharedLibrary libS(LIB_PATH, "TestModuleS");
 
   // Start the test target to get a service published.
   try

@@ -26,17 +26,23 @@
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
+#include <usSharedLibrary.h>
 
 #include US_BASECLASS_HEADER
 
-#include "usTestUtilSharedLibrary.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
+#include "usTestingConfig.h"
 
 US_USE_NAMESPACE
 
 namespace {
 
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
 
 // Verify that the same member function pointers registered as listeners
 // with different receivers works.
@@ -60,7 +66,7 @@ void frame02a()
                         << " : frameSL02a:FAIL" );
   }
 
-  SharedLibraryHandle target("TestModuleA");
+  SharedLibrary target(LIB_PATH, "TestModuleA");
 
   // Start the test target
   try
@@ -146,7 +152,7 @@ void frame018a(ModuleContext* mc)
 
 // Load libA and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHandle& libA)
+void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libA)
 {
   try
   {
@@ -207,7 +213,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHan
 
 
 // Unload libA and check for correct events
-void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibraryHandle& libA)
+void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libA)
 {
 #ifdef US_BUILD_SHARED_LIBS
   Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
@@ -304,7 +310,7 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
   frame010a(mc);
   frame018a(mc);
 
-  SharedLibraryHandle libA("TestModuleA");
+  SharedLibrary libA(LIB_PATH, "TestModuleA");
   frame020a(mc, listener, libA);
   frame030b(mc, listener, libA);
 

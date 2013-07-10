@@ -4,9 +4,10 @@
 
 set(_srcs
   util/usAny.cpp
+  util/usSharedLibrary.cpp
+  util/usThreads.cpp
   util/usUncompressResourceData.c
   util/usUncompressResourceData.cpp
-  util/usThreads.cpp
   util/usUtils.cpp
 
   service/usLDAPExpr.cpp
@@ -72,6 +73,7 @@ set(_private_headers
 set(_public_headers
   util/usAny.h
   util/usSharedData.h
+  util/usSharedLibrary.h
   util/usUncompressResourceData.h
 
   service/usLDAPFilter.h

@@ -109,8 +109,9 @@ public:                                                                         
                                                                                              \
   ModuleInitializer()                                                                        \
   {                                                                                          \
+    ModuleInfo*(*moduleInfoPtr)() = moduleInfo;                                              \
     std::string location = ModuleUtils::GetLibraryPath(moduleInfo()->libName,                \
-                                                       reinterpret_cast<void*>(moduleInfo)); \
+                                                       *reinterpret_cast<void**>(&moduleInfoPtr)); \
     std::string activator_func = "_us_module_activator_instance_";                           \
     if(moduleInfo()->libName.empty())                                                        \
     {                                                                                        \
@@ -128,7 +129,7 @@ public:                                                                         
       /* make sure we retrieve symbols from the executable, if "libName" is empty */         \
       location.clear();                                                                      \
     }                                                                                        \
-    moduleInfo()->activatorHook = reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, activator_func.c_str())); \
+    *reinterpret_cast<void**>(&moduleInfo()->activatorHook) = ModuleUtils::GetSymbol(location, activator_func.c_str()); \
                                                                                              \
     Register();                                                                              \
   }                                                                                          \

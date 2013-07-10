@@ -7,14 +7,15 @@ platform and IDE specific project files.
 The library should compile on many different platforms. Below is a list of tested compiler/OS combinations:
 
   - GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)
-  - Visual Studio 2008 and 2010
-  - Clang 3.0 (Ubuntu 11.04 and MacOS X 10.6)
+  - GCC 4.7 (Ubuntu 12.10)
+  - Visual Studio 2008, 2010, and 2012
+  - Clang 3.0 (Ubuntu 12.10 and MacOS X 10.6)
 
 
 Prerequisites
 -------------
 
-- [CMake][cmake] 2.8 (Visual Studio 2010 users should use the latest CMake version available)
+- [CMake][cmake] 2.8 (Visual Studio 2010 and 2012 users should use the latest CMake version available)
 
 
 Configuring the Build
@@ -24,21 +25,23 @@ When building the C++ Micro Services library, you have a few configuration optio
 
 ### General build options
 
+- **CMAKE_INSTALL_PREFIX**
+  The installation path.
 - **US_BUILD_SHARED_LIBS**
-  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules for detailed
-  information about static CppMicroServices modules.
+  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules
+  for detailed information about static CppMicroServices modules.
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
 - **US_ENABLE_AUTOLOADING_SUPPORT**
-  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading for
-  detailed information about this feature.
+  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading
+  for detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
-  Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) to make
-  the API thread-safe. If you are application is not multi-threaded, turn this option OFF to get maximum
-  performance.
+  Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives)
+  to make the API thread-safe. If you are application is not multi-threaded, turn this option OFF
+  to get maximum performance.
 - **US_USE_C++11 (advanced)**
-  Enable the usage of C++11 constructs
-- **US_ENABLE_RESOURCE_COMPRESSION**
+  Enable the usage of C++11 constructs.
+- **US_ENABLE_RESOURCE_COMPRESSION (advanced)**
   Enable compression of embedded resources. See \ref MicroServices_Resources for detailed information
   about the resource system.
 
@@ -79,5 +82,22 @@ class and you can configure the C++ Micro Services library to use that class.
   A list of libraries to link the C++ Micro Services library against for resolving symbols needed for a custom base class.
 - **US_BASECLASS_LIBRARY_DIRS (advanced)**
   A list of directories to look for the libraries specified in US_BASECLASS_LIBRARIES
+
+
+Building
+--------
+
+After CMake generated the specific build system files, just build the complete project. E.g. on Linux with Makefiles, type `make` inside the build directory and on Windows with Visual Studio
+build the `BUILD_ALL` project contained in the generated .sln file.
+
+Installation
+------------
+
+To install the header files, libraries, and executables, use `make install` for a Makefile based
+project or e.g. build the `INSTALL` project in Visual Studio. This will copy all required files
+to the path specified in the `CMAKE_INSTALL_PREFIX` variable.
+
+For more information on how to use the C++ Micro Services library, see the
+\ref MicroServices_GettingStarted guide.
 
 [cmake]: http://www.cmake.org

@@ -61,7 +61,7 @@ usFunctionEmbedResources(_srcs EXECUTABLE_NAME ${_test_driver} FILES usTestResou
 
 # Generate a custom "module init" file for the test driver executable
 set(MODULE_DEPENDS_STR )
-foreach(_dep ${US_LINK_LIBRARIES})
+foreach(_dep ${US_LIBRARY_TARGET} ${US_LINK_LIBRARIES})
   set(MODULE_DEPENDS_STR "${MODULE_DEPENDS_STR} ${_dep}")
 endforeach()
 
@@ -78,7 +78,7 @@ add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 if(NOT US_BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()
-target_link_libraries(${_test_driver} ${US_LINK_LIBRARIES})
+target_link_libraries(${_test_driver} ${US_LIBRARY_TARGET})
 
 if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
   target_link_libraries(${_test_driver} ${US_BASECLASS_LIBRARIES})
@@ -92,6 +92,7 @@ endif()
 foreach(_test ${_tests})
   add_test(NAME ${_test} COMMAND ${_test_driver} ${_test})
 endforeach()
+
 if(US_TEST_LABELS)
   set_tests_properties(${_tests} PROPERTIES LABELS "${US_TEST_LABELS}")
 endif()

@@ -74,6 +74,12 @@ if(NOT US_IS_EMBEDDED)
                       ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                       )
+
+    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" --target doc)")
+
+    install(DIRECTORY ${US_DOXYGEN_OUTPUT_DIR}/${US_DOXYGEN_HTML_OUTPUT}
+            DESTINATION ${AUXILIARY_INSTALL_DIR}/doc/
+            COMPONENT doc)
   endif()
 endif()
 

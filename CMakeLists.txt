@@ -6,6 +6,8 @@ set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
 cmake_minimum_required(VERSION 2.8)
+cmake_policy(VERSION 2.8)
+cmake_policy(SET CMP0017 NEW)
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -20,7 +22,8 @@ set(CMAKE_MODULE_PATH
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
-include(MacroParseArguments)
+include(CMakeParseArguments)
+include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
 include(usFunctionCheckCompilerFlags)
 include(usFunctionEmbedResources)
@@ -99,7 +102,27 @@ us_cache_var(US_ENABLE_RESOURCE_COMPRESSION ON BOOL "Enable resource compression
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 
-if(MSVC10 OR MSVC11)
+if(WIN32 AND NOT CYGWIN)
+  set(default_runtime_install_dir bin/)
+  set(default_library_install_dir bin/)
+  set(default_archive_install_dir lib/)
+  set(default_header_install_dir include/)
+  set(default_auxiliary_install_dir share/)
+else()
+  set(default_runtime_install_dir bin/)
+  set(default_library_install_dir lib/${PROJECT_NAME})
+  set(default_archive_install_dir lib/${PROJECT_NAME})
+  set(default_header_install_dir include/${PROJECT_NAME})
+  set(default_auxiliary_install_dir share/${PROJECT_NAME})
+endif()
+
+us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
+us_cache_var(LIBRARY_INSTALL_DIR ${default_library_install_dir} STRING "Relative install location for libraries" ADVANCED)
+us_cache_var(ARCHIVE_INSTALL_DIR ${default_archive_install_dir} STRING "Relative install location for archives" ADVANCED)
+us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative install location for headers" ADVANCED)
+us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
+
+if(MSVC10 OR MSVC11 OR MSVC12)
   # Visual Studio 2010 and newer have support for C++11 enabled by default
   set(US_USE_C++11 1)
 else()
@@ -199,6 +222,8 @@ foreach(_namespace_tok ${_bc_token})
     set(US_BASECLASS_FORWARD_DECLARATION "${US_BASECLASS_FORWARD_DECLARATION}}")
   endif()
 endforeach()
+
+set(${PROJECT_NAME}_MODULE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/usModuleInit.cpp")
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -306,19 +331,18 @@ if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
   list(APPEND US_INTERNAL_INCLUDE_DIRS ${US_BASECLASS_INCLUDE_DIRS})
 endif()
 
-# link libraries for third party libs
+# link library for third party libs
 if(US_IS_EMBEDDED)
-  set(US_LINK_LIBRARIES ${US_EMBEDDING_LIBRARY})
+  set(US_LIBRARY_TARGET ${US_EMBEDDING_LIBRARY})
 else()
-  set(US_LINK_LIBRARIES ${PROJECT_NAME})
+  set(US_LIBRARY_TARGET ${PROJECT_NAME})
 endif()
 
 # link libraries for the CppMicroServices lib
-set(_link_libraries )
+set(US_LINK_LIBRARIES )
 if(UNIX)
-  list(APPEND _link_libraries dl)
+  list(APPEND US_LINK_LIBRARIES dl)
 endif()
-list(APPEND US_LINK_LIBRARIES ${_link_libraries})
 
 if(US_ENABLE_SERVICE_FACTORY_SUPPORT)
   list(APPEND US_LINK_LIBRARIES ${US_BASECLASS_LIBRARIES})
@@ -343,7 +367,6 @@ add_subdirectory(tools)
 
 add_subdirectory(src)
 
-
 #-----------------------------------------------------------------------------
 # US testing
 #-----------------------------------------------------------------------------
@@ -360,8 +383,72 @@ endif()
 add_subdirectory(documentation)
 
 #-----------------------------------------------------------------------------
-# Last configuration steps
+# Last configuration and install steps
 #-----------------------------------------------------------------------------
 
-configure_file(${PROJECT_NAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
+if(NOT US_IS_EMBEDDED)
+  export(TARGETS ${PROJECT_NAME} ${US_RCC_EXECUTABLE_NAME}
+         FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+  install(EXPORT ${PROJECT_NAME}Targets
+          FILE ${PROJECT_NAME}Targets.cmake
+          DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/)
+endif()
 
+set(_install_cmake_scripts
+  ${${PROJECT_NAME}_MODULE_INIT_TEMPLATE}
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/CMakeParseArguments.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionGenerateModuleInit.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionEmbedResources.cmake
+  )
+
+install(FILES ${_install_cmake_scripts}
+        DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
+  )
+
+# Configure CppMicroServicesConfig.cmake for the build tree
+
+set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
+set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+set(PACKAGE_CONFIG_CMAKE_DIR ${PROJECT_SOURCE_DIR}/CMake)
+if(US_IS_EMBEDDED)
+  set(PACKAGE_EMBEDDED "if(@PROJECT_NAME@_IS_EMBEDDED)
+  set(@PROJECT_NAME@_INTERNAL_INCLUDE_DIRS @US_INTERNAL_INCLUDE_DIRS@)
+  set(@PROJECT_NAME@_SOURCES @US_SOURCES@)
+  set(@PROJECT_NAME@_PUBLIC_HEADERS @US_PUBLIC_HEADERS@)
+  set(@PROJECT_NAME@_PRIVATE_HEADERS @US_PRIVATE_HEADERS@)
+endif()")
+else()
+  set(PACKAGE_EMBEDDED )
+endif()
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+  @ONLY
+  )
+
+# Configure CppMicroServicesConfig.cmake for the install tree
+set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
+set(CONFIG_RUNTIME_DIR ${RUNTIME_INSTALL_DIR})
+set(CONFIG_CMAKE_DIR ${AUXILIARY_INSTALL_DIR}/CMake)
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+  ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+  INSTALL_DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
+  PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_DIR CONFIG_CMAKE_DIR
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+  )
+
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
+        COMPONENT sdk
+  )

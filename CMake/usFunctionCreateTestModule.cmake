@@ -17,7 +17,7 @@ macro(_us_create_test_module_helper)
 
   target_link_libraries(${name} ${US_LINK_LIBRARIES})
   if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
-    target_link_libraries(${name} ${US_BASECLASS_LIBRARIES})
+    target_link_libraries(${name} ${US_LIBRARY_TARGET})
   endif()
 
   set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
@@ -38,7 +38,7 @@ function(usFunctionCreateTestModule name)
 endfunction()
 
 function(usFunctionCreateTestModuleWithResources name)
-  MACRO_PARSE_ARGUMENTS(US_TEST "SOURCES;RESOURCES;RESOURCES_ROOT" "" ${ARGN})
+  cmake_parse_arguments(US_TEST "" "RESOURCES_ROOT" "SOURCES;RESOURCES" "" ${ARGN})
   set(_srcs ${US_TEST_SOURCES})
   set(_res_files ${US_TEST_RESOURCES})
   if(US_TEST_RESOURCES_ROOT)

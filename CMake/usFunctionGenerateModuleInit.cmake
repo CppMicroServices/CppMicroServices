@@ -32,7 +32,7 @@
 #!
 function(usFunctionGenerateModuleInit src_var)
 
-MACRO_PARSE_ARGUMENTS(US_MODULE "NAME;LIBRARY_NAME;AUTOLOAD_DIR;DEPENDS;VERSION" "EXECUTABLE" ${ARGN})
+cmake_parse_arguments(US_MODULE "EXECUTABLE" "NAME;LIBRARY_NAME;AUTOLOAD_DIR;DEPENDS;VERSION" "" ${ARGN})
 
 # sanity checks
 if(NOT US_MODULE_NAME)
@@ -80,7 +80,7 @@ else()
   set(module_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/${US_MODULE_NAME}_init.cpp")
 endif()
 
-configure_file(${CppMicroServices_SOURCE_DIR}/CMake/usModuleInit.cpp ${module_init_src_file} @ONLY)
+configure_file(${CppMicroServices_MODULE_INIT_TEMPLATE} ${module_init_src_file} @ONLY)
 
 set(_src ${${src_var}} ${module_init_src_file})
 set(${src_var} ${_src} PARENT_SCOPE)

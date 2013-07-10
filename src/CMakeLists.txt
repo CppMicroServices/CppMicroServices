@@ -137,7 +137,7 @@ if(NOT US_IS_EMBEDDED)
   set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)
   set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
   if(US_LINK_LIBRARIES)
-    target_link_libraries(${PROJECT_NAME} ${_link_libraries})
+    target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})
   endif()
 endif()
 
@@ -176,11 +176,12 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(NOT US_IS_EMBEDDED)
-  install(TARGETS ${PROJECT_NAME} FRAMEWORK DESTINATION .
-                                  RUNTIME DESTINATION bin
-                                  LIBRARY DESTINATION lib
-                                  ARCHIVE DESTINATION lib
-                                  PUBLIC_HEADER DESTINATION include
-                                  PRIVATE_HEADER DESTINATION include)
+  install(TARGETS ${PROJECT_NAME}
+          EXPORT ${PROJECT_NAME}Targets
+          FRAMEWORK DESTINATION ${RUNTIME_INSTALL_DIR} COMPONENT sdk
+          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT sdk
+          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} COMPONENT sdk
+          PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} COMPONENT sdk
+          PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} COMPONENT sdk)
 endif()
 

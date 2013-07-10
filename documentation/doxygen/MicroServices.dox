@@ -32,25 +32,39 @@ into a modules shared library.
 
 /**
 
-\page MicroServices_Examples Examples
+\page MicroServices_Tutorials Tutorial
 
-This is a list of available examples:
+This tutorial creates successively more complex modules to illustrate
+most of the features and functionality offered by the C++ Micro Services library.
+It is heavily base on the Apache Felix OSGi Tutorial.
 
-- \subpage MicroServices_DictionaryService
+- \subpage MicroServices_Example1
+- \subpage MicroServices_Example2
+- \subpage MicroServices_Example2b
+- \subpage MicroServices_Example3
+- \subpage MicroServices_Example4
+- \subpage MicroServices_Example5
+- \subpage MicroServices_Example6
+- \subpage MicroServices_Example7
 
 */
 
 /**
 
-\page MicroServices_Tutorials Tutorials
+\page MicroServices_UserDocs User Documentation
 
-This is a list of available tutorials:
+This is a list of available documentation for different aspects of the C++
+Micro Services library:
 
+\if us_standalone
+- \subpage BuildInstructions
+- \subpage MicroServices_GettingStarted
+\endif
 - \subpage MicroServices_TheModuleContext
 - \subpage MicroServices_Resources
-- \subpage MicroServices_EmulateSingleton
 - \subpage MicroServices_AutoLoading
 - \subpage MicroServices_StaticModules
+- \subpage MicroServices_EmulateSingleton
 
 */
 
@@ -58,7 +72,7 @@ This is a list of available tutorials:
 
 \embmainpage{MicroServices_Overview} The C++ Micro Services
 
-The C++ Micro Services component provides a dynamic service registry based on the service layer
+The C++ Micro Services library provides a dynamic service registry based on the service layer
 as specified in the OSGi R4.2 specifications. It enables users to realize a service oriented
 approach within their software stack. The advantages include higher reuse of components, looser
 coupling, better organization of responsibilities, cleaner API contracts, etc.
@@ -69,30 +83,42 @@ coupling, better organization of responsibilities, cleaner API contracts, etc.
 How to build the C++ Micro Services library is explained in detail on the \ref BuildInstructions page.
 \endif
 
-<h1>Examples</h1>
+<h1>Tutorial</h1>
 
 \if us_standalone
-Here is a list of \ref MicroServices_Examples "examples":
+Here is a list of \ref MicroServices_Tutorials "tutorial examples"
 \else
-Here is a list of \subpage MicroServices_Examples "examples":
+Here is a list of \subpage MicroServices_Tutorials "tutorial examples"
 \endif
+which create successively more complex modules to illustrate most of the features and
+functionality offered by the C++ Micro Services library:
 
-- \ref MicroServices_DictionaryService
+- \ref MicroServices_Example1
+- \ref MicroServices_Example2
+- \ref MicroServices_Example2b
+- \ref MicroServices_Example3
+- \ref MicroServices_Example4
+- \ref MicroServices_Example5
+- \ref MicroServices_Example6
+- \ref MicroServices_Example7
 
-<h1>Tutorials</h1>
+<h1>User Documentation</h1>
 
-The following list contains use cases and common patterns in the form of
+The links in the following list point to important
 \if us_standalone
-\ref MicroServices_Tutorials "tutorials":
+\ref MicroServices_UserDocs "user documentation":
 \else
-\subpage MicroServices_Tutorials "tutorials":
+\subpage MicroServices_UserDocs "user documentation":
 \endif
 
+\if us_standalone
+- \ref BuildInstructions
+- \ref MicroServices_GettingStarted
+\endif
 - \ref MicroServices_TheModuleContext
 - \ref MicroServices_Resources
-- \ref MicroServices_EmulateSingleton
 - \ref MicroServices_AutoLoading
 - \ref MicroServices_StaticModules
-
+- \ref MicroServices_EmulateSingleton
 
 */

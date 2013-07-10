@@ -1,17 +1,35 @@
+/*=============================================================================
+
+  Library: CppMicroServices
+
+  Copyright (c) German Cancer Research Center,
+    Division of Medical and Biological Informatics
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+=============================================================================*/
 
 //! [Activator]
-#include "DictionaryService.h"
+#include "IDictionaryService.h"
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usGetModuleContext.h>
 #include <usServiceProperties.h>
 
 // Replace that include with your own base class declaration
 #include US_BASECLASS_HEADER
 
 #include <set>
-#include <algorithm>
 #include <memory>
 
 US_USE_NAMESPACE
@@ -23,16 +41,16 @@ US_USE_NAMESPACE
  * of the module. The dictionary service interface is
  * defined in a separate file and is implemented by a nested class.
  */
-class US_ABI_LOCAL MyActivator : public ModuleActivator
+class US_ABI_LOCAL Activator : public ModuleActivator
 {
 
 private:
 
   /**
    * A private inner class that implements a dictionary service;
-   * see DictionaryService for details of the service.
+   * see IDictionaryService for details of the service.
    */
-  class DictionaryImpl : public US_BASECLASS_NAME, public DictionaryService
+  class DictionaryImpl : public US_BASECLASS_NAME, public IDictionaryService
   {
     // The set of words contained in the dictionary.
     std::set<std::string> m_dictionary;
@@ -50,13 +68,13 @@ private:
     }
 
     /**
-     * Implements DictionaryService.checkWord(). Determines
+     * Implements IDictionaryService::CheckWord(). Determines
      * if the passed in word is contained in the dictionary.
      * @param word the word to be checked.
      * @return true if the word is in the dictionary,
      *         false otherwise.
      **/
-    bool checkWord(const std::string& word)
+    bool CheckWord(const std::string& word)
     {
       std::string lword(word);
       std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
@@ -82,7 +100,7 @@ public:
     m_dictionaryService.reset(new DictionaryImpl);
     ServiceProperties props;
     props["Language"] = std::string("English");
-    context->RegisterService<DictionaryService>(m_dictionaryService.get(), props);
+    context->RegisterService<IDictionaryService>(m_dictionaryService.get(), props);
   }
 
   /**
@@ -97,25 +115,5 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(DictionaryServiceModule, MyActivator)
+US_EXPORT_MODULE_ACTIVATOR(dictionaryservice, Activator)
 //![Activator]
-
-#include <usModuleInitialization.h>
-
-US_INITIALIZE_MODULE("DictionaryServiceModule", "", "", "1.0.0")
-
-int main(int /*argc*/, char* /*argv*/[])
-{
-  //![GetDictionaryService]
-  ServiceReference dictionaryServiceRef = GetModuleContext()->GetServiceReference<DictionaryService>();
-  if (dictionaryServiceRef)
-  {
-    DictionaryService* dictionaryService = GetModuleContext()->GetService<DictionaryService>(dictionaryServiceRef);
-    if (dictionaryService)
-    {
-      std::cout << "Dictionary contains 'Tutorial': " << dictionaryService->checkWord("Tutorial") << std::endl;
-    }
-  }
-  //![GetDictionaryService]
-  return 0;
-}

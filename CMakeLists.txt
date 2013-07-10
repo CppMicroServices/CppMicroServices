@@ -452,3 +452,15 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME
         DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
         COMPONENT sdk
   )
+
+#-----------------------------------------------------------------------------
+# Build the examples
+#-----------------------------------------------------------------------------
+
+option(US_BUILD_EXAMPLES "Build example projects" OFF)
+if(US_BUILD_EXAMPLES)
+  set(CppMicroServices_DIR ${PROJECT_BINARY_DIR})
+  set(example_target_prefix "Example-")
+  set(example_output_dir_suffix "/examples")
+  add_subdirectory(examples)
+endif()

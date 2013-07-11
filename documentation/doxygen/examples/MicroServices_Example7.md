@@ -13,14 +13,14 @@ follows in a file called `spellcheckclient/Activator.cpp`:
 
 \snippet spellcheckclient/Activator.cpp Activator
 
-After running the `ExampleDriver` program use the `s` command to make sure that
+After running the `CppMicroServicesExampleDriver` program use the `s` command to make sure that
 only the modules from Example 2, Example 2b, and Example 6 are loaded; use the
 load (`l`) and un-load (`u`) commands as appropriate to load and un-load the
 various tutorial modules, respectively. Now we can load our spell checker client
 module by entering `l spellcheckclient`:
 
 \verbatim
-CppMicroServices-build> bin/ExampleDriver
+CppMicroServices-build> bin/CppMicroServicesExampleDriver
 > l 
 Starting to listen for service events.
 > l spellcheckservice
@@ -47,7 +47,7 @@ then we should see it print out the details of the service event it receives
 when our new module registers its spell checker service:
 
 \verbatim
-CppMicroServices-build> bin/ExampleDriver
+CppMicroServices-build> bin/CppMicroServicesExampleDriver
 > l spellcheckservice
 > l frenchdictionary
 > l spellcheckclient

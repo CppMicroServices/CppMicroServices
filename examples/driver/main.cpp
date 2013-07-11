@@ -23,7 +23,7 @@
 #include <usModuleRegistry.h>
 #include <usSharedLibrary.h>
 
-#include "usExampleDriverConfig.h"
+#include "usCppMicroServicesExampleDriverConfig.h"
 
 #if defined(US_PLATFORM_POSIX)
   #include <dlfcn.h>

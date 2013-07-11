@@ -43,7 +43,7 @@ manually or by using the \ref MicroServices_AutoLoading "auto-loading mechanism"
 
 For an introduction how to compile our source code, see \ref MicroServices_Example1.
 
-After running the `ExampleDriver` program we should make sure that the
+After running the `CppMicroServicesExampleDriver` program we should make sure that the
 module from Example 1 is active. We can use the `s` shell command to get
 a list of all modules, their state, and their module identifier number.
 If the Example 1 module is not active, we should load the module using the
@@ -52,7 +52,7 @@ by the `s` command. Now we can load our dictionary service module by typing
 the `l dictionaryservice` command:
 
 \verbatim
-CppMicroServices-build> bin/ExampleDriver
+CppMicroServices-build> bin/CppMicroServicesExampleDriver
 > s
 Id | Name                 | Status
 -----------------------------------
@@ -75,12 +75,12 @@ Id | Name                 | Status
 To unload the module, use the `u <id>` command. If the module from
 \ref MicroServices_Example1 "Example 1" is still active,
 then we should see it print out the details of the service event it receives
-when our new module registers its dictionary service. Using the `ExampleDriver`
+when our new module registers its dictionary service. Using the `CppMicroServicesExampleDriver`
 commands `u` and `l` we can unload and load it at will, respectively. Each
 time we load and unload our dictionary service module, we should see the details
 of the associated service event printed from the module from Example 1. In
 \ref MicroServices_Example3 "Example 3", we will create a client for our
-dictionary service. To exit `ExampleDriver`, we use the `q` command.
+dictionary service. To exit `CppMicroServicesExampleDriver`, we use the `q` command.
 
 Next: \ref MicroServices_Example2b
 

@@ -54,10 +54,10 @@ module's source code, e.g. in `Activator.cpp`. Have a look at the
 or other build systems (e.g. Makefiles) when writing modules.
 
 To run the examples contained in the C++ Micro Services library, we use a small
-driver program called `ExampleDriver`:
+driver program called `CppMicroServicesExampleDriver`:
 
 \verbatim
-CppMicroServices-build> bin/ExampleDriver
+CppMicroServices-build> bin/CppMicroServicesExampleDriver
 > h
 h               This help text
 l <id | name>   Load the module with id <id> or name <name>
@@ -92,6 +92,6 @@ The above command loaded the eventlistener module (by loading its shared library
 Keep in mind, that this module will not do much at this point since it only
 listens for service events and we are not registering any services. In the next
 example we will register a service that will generate an event for this module to
-receive. To exit the `ExampleDriver`, use the `q` command.
+receive. To exit the `CppMicroServicesExampleDriver`, use the `q` command.
 
 Next: \ref MicroServices_Example2

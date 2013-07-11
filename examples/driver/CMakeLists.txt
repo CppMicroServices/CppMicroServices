@@ -7,10 +7,10 @@ else()
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/usExampleDriverConfig.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/usExampleDriverConfig.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/usCppMicroServicesExampleDriverConfig.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/usCppMicroServicesExampleDriverConfig.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(ExampleDriver main.cpp)
-target_link_libraries(ExampleDriver ${CppMicroServices_LIBRARIES})
+add_executable(CppMicroServicesExampleDriver main.cpp)
+target_link_libraries(CppMicroServicesExampleDriver ${CppMicroServices_LIBRARIES})

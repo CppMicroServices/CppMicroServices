@@ -30,12 +30,12 @@ As in Example 3, we must link our module to the `dictionaryservice` module:
 
 \include dictionaryclient2/CMakeLists.txt
 
-After running the `ExampleDriver` executable, and loading the event
+After running the `CppMicroServicesExampleDriver` executable, and loading the event
 listener module, we can use the `l dictionaryclient2` command to load
 our robust dictionary client module:
 
 \verbatim
-CppMicroServices-debug> bin/ExampleDriver
+CppMicroServices-debug> bin/CppMicroServicesExampleDriver
 > l eventlistener
 Starting to listen for service events.
 > l dictionaryclient2

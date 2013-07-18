@@ -114,7 +114,7 @@ void frame005a(ModuleContext* mc)
 #else
   US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name");
   std::cout << "**** CppMicroServices version is: " << m->GetVersion() << std::endl;
-  US_TEST_CONDITION(ModuleVersion(0,9,0) == m->GetVersion(), "Test module version")
+  US_TEST_CONDITION(ModuleVersion(1,0,0) == m->GetVersion(), "Test module version")
 #endif
 }
 

@@ -40,7 +40,7 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
   const char PATH_SEPARATOR = '\\';
 #elif defined(US_PLATFORM_APPLE)
   const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-  const std::string LIB_PREFIX = "";
+  const std::string LIB_PREFIX = "lib";
   const std::string LIB_SUFFIX = ".dylib";
   const char PATH_SEPARATOR = '/';
 #else

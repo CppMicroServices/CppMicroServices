@@ -59,6 +59,7 @@ public:
     , m_Suffix(".dll")
   #elif defined(US_PLATFORM_APPLE)
     , m_Suffix(".dylib")
+    , m_Prefix("lib")
   #else
     , m_Suffix(".so")
     , m_Prefix("lib")

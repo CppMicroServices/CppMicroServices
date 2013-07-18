@@ -110,20 +110,24 @@ if(US_BUILD_TESTING)
   list(APPEND _example_tests usInstallCleanTest usInstallTest usExamplesCleanTest
        usExamplesCreateDirTest usExamplesConfigureTest usExamplesBuildTest)
 
-  find_program(MAKE_COMMAND NAMES make gmake)
-  find_program(CXX_COMMAND NAMES g++)
-  mark_as_advanced(MAKE_COMMAND CXX_COMMAND)
-  if(MAKE_COMMAND AND CXX_COMMAND)
-    add_test(NAME usMakefileExampleCleanTest
-             WORKING_DIRECTORY ${CppMicroServices_SOURCE_DIR}/examples/makefile
-             COMMAND ${MAKE_COMMAND} clean)
-    add_test(NAME usMakefileExampleTest
-             WORKING_DIRECTORY ${CppMicroServices_SOURCE_DIR}/examples/makefile
-             COMMAND ${MAKE_COMMAND})
-    set_tests_properties(usMakefileExampleTest PROPERTIES
-                         DEPENDS "usMakefileExampleCleanTest;usInstallTest"
-                         ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};CppMicroServices_CXX_FLAGS=${CppMicroServices_CXX_FLAGS}")
-    list(APPEND _example_tests usMakefileExampleCleanTest usMakefileExampleTest)
+  # The makefile is Linux specific, so only try to build the Makefile example
+  # if we are on a proper system
+  if(UNIX AND NOT APPLE)
+    find_program(MAKE_COMMAND NAMES make gmake)
+    find_program(CXX_COMMAND NAMES g++)
+    mark_as_advanced(MAKE_COMMAND CXX_COMMAND)
+    if(MAKE_COMMAND AND CXX_COMMAND)
+      add_test(NAME usMakefileExampleCleanTest
+               WORKING_DIRECTORY ${CppMicroServices_SOURCE_DIR}/examples/makefile
+               COMMAND ${MAKE_COMMAND} clean)
+      add_test(NAME usMakefileExampleTest
+               WORKING_DIRECTORY ${CppMicroServices_SOURCE_DIR}/examples/makefile
+               COMMAND ${MAKE_COMMAND})
+      set_tests_properties(usMakefileExampleTest PROPERTIES
+                           DEPENDS "usMakefileExampleCleanTest;usInstallTest"
+                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};CppMicroServices_CXX_FLAGS=${CppMicroServices_CXX_FLAGS}")
+      list(APPEND _example_tests usMakefileExampleCleanTest usMakefileExampleTest)
+    endif()
   endif()
 
   if(US_TEST_LABELS)

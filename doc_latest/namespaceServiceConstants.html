@@ -77,10 +77,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a0e099b4cc3cf6e80301486024950b262"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262">OBJECTCLASS</a> ()</td></tr>
+<tr class="memdesc:a0e099b4cc3cf6e80301486024950b262"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service property identifying all of the class names under which a service was registered in the framework.  <a href="#a0e099b4cc3cf6e80301486024950b262">More...</a><br/></td></tr>
 <tr class="separator:a0e099b4cc3cf6e80301486024950b262"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9f9d18808ea2f46376a1489a7b73164"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#ac9f9d18808ea2f46376a1489a7b73164">SERVICE_ID</a> ()</td></tr>
+<tr class="memdesc:ac9f9d18808ea2f46376a1489a7b73164"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service property identifying a service's registration number.  <a href="#ac9f9d18808ea2f46376a1489a7b73164">More...</a><br/></td></tr>
 <tr class="separator:ac9f9d18808ea2f46376a1489a7b73164"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9248db8f7ca4dce942fb3594b1079c3f"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#a9248db8f7ca4dce942fb3594b1079c3f">SERVICE_RANKING</a> ()</td></tr>
+<tr class="memdesc:a9248db8f7ca4dce942fb3594b1079c3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service property identifying a service's ranking number.  <a href="#a9248db8f7ca4dce942fb3594b1079c3f">More...</a><br/></td></tr>
 <tr class="separator:a9248db8f7ca4dce942fb3594b1079c3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -96,7 +99,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Service property identifying all of the class names under which a service was registered in the framework. The value of this property must be of type <code>std::list&lt;std::string&gt;</code>.</p>
+
+<p>Service property identifying all of the class names under which a service was registered in the framework. </p>
+<p>The value of this property must be of type <code>std::list&lt;std::string&gt;</code>.</p>
 <p>This property is set by the framework when a service is registered. </p>
 
 </div>
@@ -113,7 +118,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Service property identifying a service's registration number. The value of this property must be of type <code>long int</code>.</p>
+
+<p>Service property identifying a service's registration number. </p>
+<p>The value of this property must be of type <code>long int</code>.</p>
 <p>The value of this property is assigned by the framework when a service is registered. The framework assigns a unique value that is larger than all previously assigned values since the framework was started. These values are NOT persistent across restarts of the framework. </p>
 
 </div>
@@ -130,8 +137,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Service property identifying a service's ranking number.</p>
-<p>This property may be supplied in the <code>ServiceProperties</code> object passed to the <code><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6">ModuleContext::RegisterService</a></code> method. The value of this property must be of type <code>int</code>.</p>
+
+<p>Service property identifying a service's ranking number. </p>
+<p>This property may be supplied in the <code>ServiceProperties</code> object passed to the <code><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6" title="Registers the specified service object with the specified properties under the specified class names ...">ModuleContext::RegisterService</a></code> method. The value of this property must be of type <code>int</code>.</p>
 <p>The service ranking is used by the framework to determine the <em>natural order</em> of services, see ServiceReference::operator&lt;(const ServiceReference&amp;), and the <em>default</em> service to be returned from a call to the <a class="el" href="classModuleContext.html#ad4e3f72bad1067aba49283e851448253">ModuleContext::GetServiceReference</a> method.</p>
 <p>The default ranking is zero (0). A service with a ranking of <code>std::numeric_limits&lt;int&gt;::max()</code> is very likely to be returned as the default service, whereas a service with a ranking of <code>std::numeric_limits&lt;int&gt;::min()</code> is very unlikely to be returned.</p>
 <p>If the supplied property value is not of type <code>int</code>, it is deemed to have a ranking value of zero. </p>
@@ -141,5 +149,5 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

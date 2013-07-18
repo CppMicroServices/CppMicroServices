@@ -76,16 +76,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">ModuleRegistry Class Reference<div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Here we handle all the modules that are loaded in the framework.  
+ <a href="classModuleRegistry.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae2a12e82c874a7cbaf4884ad59ccbee5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classModule.html">Module</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleRegistry.html#ae2a12e82c874a7cbaf4884ad59ccbee5">GetModule</a> (long id)</td></tr>
+<tr class="memdesc:ae2a12e82c874a7cbaf4884ad59ccbee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the module that has the specified module identifier.  <a href="#ae2a12e82c874a7cbaf4884ad59ccbee5">More...</a><br/></td></tr>
 <tr class="separator:ae2a12e82c874a7cbaf4884ad59ccbee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8834c568742e21823f49bb0c3b7c015"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classModule.html">Module</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleRegistry.html#ab8834c568742e21823f49bb0c3b7c015">GetModule</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:ab8834c568742e21823f49bb0c3b7c015"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the module that has specified module name.  <a href="#ab8834c568742e21823f49bb0c3b7c015">More...</a><br/></td></tr>
 <tr class="separator:ab8834c568742e21823f49bb0c3b7c015"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23ae2599adb0e2c12df16a7fc2314667"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleRegistry.html#a23ae2599adb0e2c12df16a7fc2314667">GetModules</a> (std::vector&lt; <a class="el" href="classModule.html">Module</a> * &gt; &amp;modules)</td></tr>
+<tr class="memdesc:a23ae2599adb0e2c12df16a7fc2314667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all known modules.  <a href="#a23ae2599adb0e2c12df16a7fc2314667">More...</a><br/></td></tr>
 <tr class="separator:a23ae2599adb0e2c12df16a7fc2314667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a32bb76fe71e73a9f63595a97f97eab"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleRegistry.html#a4a32bb76fe71e73a9f63595a97f97eab">GetLoadedModules</a> (std::vector&lt; <a class="el" href="classModule.html">Module</a> * &gt; &amp;modules)</td></tr>
+<tr class="memdesc:a4a32bb76fe71e73a9f63595a97f97eab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all modules currently in module state <code>LOADED</code>.  <a href="#a4a32bb76fe71e73a9f63595a97f97eab">More...</a><br/></td></tr>
 <tr class="separator:a4a32bb76fe71e73a9f63595a97f97eab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -112,7 +119,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get all modules currently in module state <code>LOADED</code>.</p>
+
+<p>Get all modules currently in module state <code>LOADED</code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">modules</td><td>A list which is filled with all modules in state <code>LOADED</code> </td></tr>
@@ -143,14 +151,15 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the module that has the specified module identifier.</p>
+
+<p>Get the module that has the specified module identifier. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>The identifier of the module to get. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classModule.html">Module</a> or null if the module was not found. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classModule.html" title="Represents a CppMicroServices module.">Module</a> or null if the module was not found. </dd></dl>
 
 </div>
 </div>
@@ -175,14 +184,15 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the module that has specified module name.</p>
+
+<p>Get the module that has specified module name. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>The name of the module to get. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classModule.html">Module</a> or null. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classModule.html" title="Represents a CppMicroServices module.">Module</a> or null. </dd></dl>
 
 </div>
 </div>
@@ -207,7 +217,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get all known modules.</p>
+
+<p>Get all known modules. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">modules</td><td>A list which is filled with all known modules. </td></tr>
@@ -220,5 +231,5 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

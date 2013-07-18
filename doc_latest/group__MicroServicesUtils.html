@@ -78,6 +78,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAny.html">Any</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An <a class="el" href="classAny.html" title="An Any class represents a general type and is capable of storing any type, supporting type-safe extra...">Any</a> class represents a general type and is capable of storing any type, supporting type-safe extraction of the internally stored data.  <a href="classAny.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedData.html">SharedData</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -85,10 +86,14 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classExplicitlySharedDataPointer.html">ExplicitlySharedDataPointer&lt; T &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedLibrary.html">SharedLibrary</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="classSharedLibrary.html" title="The SharedLibrary class loads shared libraries at runtime.">SharedLibrary</a> class loads shared libraries at runtime.  <a href="classSharedLibrary.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ga247235a6f12c007bc97f2e32006719b9"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MicroServicesUtils.html#ga247235a6f12c007bc97f2e32006719b9">MsgHandler</a> )(<a class="el" href="group__MicroServicesUtils.html#ga2ea0bb09adcce7f655e8f8ee8d30561b">MsgType</a>, const char *)</td></tr>
+<tr class="memdesc:ga247235a6f12c007bc97f2e32006719b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A message handler callback function.  <a href="#ga247235a6f12c007bc97f2e32006719b9">More...</a><br/></td></tr>
 <tr class="separator:ga247235a6f12c007bc97f2e32006719b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -98,6 +103,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="group__MicroServicesUtils.html#gga2ea0bb09adcce7f655e8f8ee8d30561baa2def1f5c14d80bc6830f8d4cc383b0f">WarningMsg</a>, 
 <a class="el" href="group__MicroServicesUtils.html#gga2ea0bb09adcce7f655e8f8ee8d30561bac67f5ecd12857cb0f8597be43f4ab21d">ErrorMsg</a>
  }</td></tr>
+<tr class="memdesc:ga2ea0bb09adcce7f655e8f8ee8d30561b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This enum describes the messages that can be sent to a message handler (MsgHandler).  <a href="group__MicroServicesUtils.html#ga2ea0bb09adcce7f655e8f8ee8d30561b">More...</a><br/></td></tr>
 <tr class="separator:ga2ea0bb09adcce7f655e8f8ee8d30561b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -118,6 +124,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
 <p>A message handler callback function. </p>
 
 </div>
@@ -132,7 +139,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This enum describes the messages that can be sent to a message handler (MsgHandler). You can use the enum to identify and associate the various message types with the appropriate actions. </p>
+
+<p>This enum describes the messages that can be sent to a message handler (MsgHandler). </p>
+<p>You can use the enum to identify and associate the various message types with the appropriate actions. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="gga2ea0bb09adcce7f655e8f8ee8d30561ba19bfcfb4c53fceca073eaa5a8751cc08"></a>DebugMsg</em>&nbsp;</td><td class="fielddoc">
 <p>A debug message. </p>
@@ -167,7 +176,7 @@ Functions</h2></td></tr>
 
 <p>Installs a message handler which has been defined previously. </p>
 <p>Returns a pointer to the previous message handler (which may be 0).</p>
-<p>The message handler is a function that prints out debug messages, warnings, and fatal error messages. The C++ Micro Services library (debug mode) contains warning messages that are printed when internal errors (usually invalid function arguments) occur. The library built in release mode also contains such warnings unless US_NO_WARNING_OUTPUT and/or US_NO_DEBUG_OUTPUT have been set during compilation. If you implement your own message handler, you get total control of these messages.</p>
+<p>The message handler is a function that prints out debug messages, warnings, and fatal error messages. The C++ Micro Services library (debug mode) contains warning messages that are printed when internal errors (usually invalid function arguments) occur. The library built in release mode also contains such warnings unless US_NO_WARNING_OUTPUT has been set during compilation. In both debug and release mode debugging message are suppressed by default, unless US_ENABLE_DEBUGGING_OUTPUT has been set during compilation. If you implement your own message handler, you get total control of these messages.</p>
 <p>The default message handler prints the message to the standard output. If it is an error message, the application aborts immediately.</p>
 <p>Only one message handler can be defined, since this is usually done on an application-wide basis to control debug output.</p>
 <p>To restore the message handler, call installMsgHandler(0). </p>
@@ -177,5 +186,5 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

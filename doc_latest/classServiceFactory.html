@@ -76,23 +76,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">ServiceFactory Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Allows services to provide customized service objects in the module environment.  
+ <a href="classServiceFactory.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9fccf8deac202cec300caf2068aa4ff1"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceFactory.html#a9fccf8deac202cec300caf2068aa4ff1">~ServiceFactory</a> ()</td></tr>
 <tr class="separator:a9fccf8deac202cec300caf2068aa4ff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacb476e162ce8bc12509cb3bdb2adebf"><td class="memItemLeft" align="right" valign="top">virtual us::Base *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf">GetService</a> (<a class="el" href="classModule.html">Module</a> *module, const <a class="el" href="classServiceRegistration.html">ServiceRegistration</a> &amp;registration)=0</td></tr>
+<tr class="memdesc:aacb476e162ce8bc12509cb3bdb2adebf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new service object.  <a href="#aacb476e162ce8bc12509cb3bdb2adebf">More...</a><br/></td></tr>
 <tr class="separator:aacb476e162ce8bc12509cb3bdb2adebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd632ca2040e8cfd403e787e9887a1bf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceFactory.html#afd632ca2040e8cfd403e787e9887a1bf">UngetService</a> (<a class="el" href="classModule.html">Module</a> *module, const <a class="el" href="classServiceRegistration.html">ServiceRegistration</a> &amp;registration, us::Base *service)=0</td></tr>
+<tr class="memdesc:afd632ca2040e8cfd403e787e9887a1bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases a service object.  <a href="#afd632ca2040e8cfd403e787e9887a1bf">More...</a><br/></td></tr>
 <tr class="separator:afd632ca2040e8cfd403e787e9887a1bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Allows services to provide customized service objects in the module environment.</p>
-<p>When registering a service, a <code><a class="el" href="classServiceFactory.html">ServiceFactory</a></code> object can be used instead of a service object, so that the module developer can gain control of the specific service object granted to a module that is using the service.</p>
-<p>When this happens, the <code><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">ModuleContext::GetService(const ServiceReference&amp;)</a></code> method calls the <code><a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf">ServiceFactory::GetService</a></code> method to create a service object specifically for the requesting module. The service object returned by the <code><a class="el" href="classServiceFactory.html">ServiceFactory</a></code> is cached by the framework until the module releases its use of the service.</p>
-<p>When the module's use count for the service equals zero (including the module unloading or the service being unregistered), the <code><a class="el" href="classServiceFactory.html#afd632ca2040e8cfd403e787e9887a1bf">ServiceFactory::UngetService</a></code> method is called.</p>
-<p><code><a class="el" href="classServiceFactory.html">ServiceFactory</a></code> objects are only used by the framework and are not made available to other modules in the module environment. The framework may concurrently call a <code><a class="el" href="classServiceFactory.html">ServiceFactory</a></code>.</p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">ModuleContext::GetService</a> </dd></dl>
+<div class="textblock"><p>Allows services to provide customized service objects in the module environment. </p>
+<p>When registering a service, a <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> object can be used instead of a service object, so that the module developer can gain control of the specific service object granted to a module that is using the service.</p>
+<p>When this happens, the <code><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">ModuleContext::GetService(const ServiceReference&amp;)</a></code> method calls the <code><a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf" title="Creates a new service object.">ServiceFactory::GetService</a></code> method to create a service object specifically for the requesting module. The service object returned by the <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> is cached by the framework until the module releases its use of the service.</p>
+<p>When the module's use count for the service equals zero (including the module unloading or the service being unregistered), the <code><a class="el" href="classServiceFactory.html#afd632ca2040e8cfd403e787e9887a1bf" title="Releases a service object.">ServiceFactory::UngetService</a></code> method is called.</p>
+<p><code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> objects are only used by the framework and are not made available to other modules in the module environment. The framework may concurrently call a <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code>.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">ModuleContext::GetService</a> </dd></dl>
 <dl class="section remark"><dt>Remarks</dt><dd>This class is thread safe. </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9fccf8deac202cec300caf2068aa4ff1"></a>
@@ -150,18 +155,19 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Creates a new service object.</p>
-<p>The Framework invokes this method the first time the specified <code>module</code> requests a service object using the <code><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">ModuleContext::GetService(const ServiceReference&amp;)</a></code> method. The service factory can then return a specific service object for each module.</p>
-<p>The framework caches the value returned (unless it is 0), and will return the same service object on any future call to <code><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">ModuleContext::GetService</a></code> for the same modules. This means the framework must not allow this method to be concurrently called for the same module.</p>
+
+<p>Creates a new service object. </p>
+<p>The Framework invokes this method the first time the specified <code>module</code> requests a service object using the <code><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">ModuleContext::GetService(const ServiceReference&amp;)</a></code> method. The service factory can then return a specific service object for each module.</p>
+<p>The framework caches the value returned (unless it is 0), and will return the same service object on any future call to <code><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">ModuleContext::GetService</a></code> for the same modules. This means the framework must not allow this method to be concurrently called for the same module.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">module</td><td>The module using the service. </td></tr>
-    <tr><td class="paramname">registration</td><td>The <code><a class="el" href="classServiceRegistration.html">ServiceRegistration</a></code> object for the service. </td></tr>
+    <tr><td class="paramname">registration</td><td>The <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object for the service. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A service object that <b>must</b> be an instance of all the classes named when the service was registered. </dd></dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">ModuleContext::GetService</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">ModuleContext::GetService</a> </dd></dl>
 
 </div>
 </div>
@@ -202,22 +208,23 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Releases a service object.</p>
+
+<p>Releases a service object. </p>
 <p>The framework invokes this method when a service has been released by a module. The service object may then be destroyed.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">module</td><td>The <a class="el" href="classModule.html">Module</a> releasing the service. </td></tr>
-    <tr><td class="paramname">registration</td><td>The <code><a class="el" href="classServiceRegistration.html">ServiceRegistration</a></code> object for the service. </td></tr>
-    <tr><td class="paramname">service</td><td>The service object returned by a previous call to the <code><a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf">ServiceFactory::GetService</a></code> method. </td></tr>
+    <tr><td class="paramname">module</td><td>The <a class="el" href="classModule.html" title="Represents a CppMicroServices module.">Module</a> releasing the service. </td></tr>
+    <tr><td class="paramname">registration</td><td>The <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object for the service. </td></tr>
+    <tr><td class="paramname">service</td><td>The service object returned by a previous call to the <code><a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf" title="Creates a new service object.">ServiceFactory::GetService</a></code> method. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a070a6218b13e363098d546425c02f13c">ModuleContext::UngetService</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a070a6218b13e363098d546425c02f13c" title="Releases the service object referenced by the specified ServiceReference object.">ModuleContext::UngetService</a> </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

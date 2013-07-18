@@ -77,47 +77,77 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Module Class Reference<div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Represents a CppMicroServices module.  
+ <a href="classModule.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7c9d9c096786d127590fdd8aa2b7d681"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a7c9d9c096786d127590fdd8aa2b7d681">~Module</a> ()</td></tr>
 <tr class="separator:a7c9d9c096786d127590fdd8aa2b7d681"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6eb822aabcaa58664e4802d736542d9b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a6eb822aabcaa58664e4802d736542d9b">IsLoaded</a> () const </td></tr>
+<tr class="memdesc:a6eb822aabcaa58664e4802d736542d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's current state.  <a href="#a6eb822aabcaa58664e4802d736542d9b">More...</a><br/></td></tr>
 <tr class="separator:a6eb822aabcaa58664e4802d736542d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66c027deb575198ba11a37cca2f2faf7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModuleContext.html">ModuleContext</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a66c027deb575198ba11a37cca2f2faf7">GetModuleContext</a> () const </td></tr>
+<tr class="memdesc:a66c027deb575198ba11a37cca2f2faf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classModuleContext.html">ModuleContext</a>.  <a href="#a66c027deb575198ba11a37cca2f2faf7">More...</a><br/></td></tr>
 <tr class="separator:a66c027deb575198ba11a37cca2f2faf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a179725f9aecd04cf59f0a8e74cdf05a4"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a179725f9aecd04cf59f0a8e74cdf05a4">GetModuleId</a> () const </td></tr>
+<tr class="memdesc:a179725f9aecd04cf59f0a8e74cdf05a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's unique identifier.  <a href="#a179725f9aecd04cf59f0a8e74cdf05a4">More...</a><br/></td></tr>
 <tr class="separator:a179725f9aecd04cf59f0a8e74cdf05a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a597849fb68ab647e26f887a9a5030790"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a597849fb68ab647e26f887a9a5030790">GetLocation</a> () const </td></tr>
+<tr class="memdesc:a597849fb68ab647e26f887a9a5030790"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's location.  <a href="#a597849fb68ab647e26f887a9a5030790">More...</a><br/></td></tr>
 <tr class="separator:a597849fb68ab647e26f887a9a5030790"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71880e4be55811df7aeab43a5c9046b4"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a71880e4be55811df7aeab43a5c9046b4">GetName</a> () const </td></tr>
+<tr class="memdesc:a71880e4be55811df7aeab43a5c9046b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of this module as specified by the US_CREATE_MODULE CMake macro.  <a href="#a71880e4be55811df7aeab43a5c9046b4">More...</a><br/></td></tr>
 <tr class="separator:a71880e4be55811df7aeab43a5c9046b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20c96bbe3653bec5a8ed5d1b56d6cddf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModuleVersion.html">ModuleVersion</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a20c96bbe3653bec5a8ed5d1b56d6cddf">GetVersion</a> () const </td></tr>
+<tr class="memdesc:a20c96bbe3653bec5a8ed5d1b56d6cddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the version of this module as specified by the US_INITIALIZE_MODULE CMake macro.  <a href="#a20c96bbe3653bec5a8ed5d1b56d6cddf">More...</a><br/></td></tr>
 <tr class="separator:a20c96bbe3653bec5a8ed5d1b56d6cddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ea424d2b3793998c788e4174ac838fe"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a1ea424d2b3793998c788e4174ac838fe">GetProperty</a> (const std::string &amp;key) const </td></tr>
-<tr class="separator:a1ea424d2b3793998c788e4174ac838fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fa885cfb92466c142e1903bb6fab638"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classAny.html">Any</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a3fa885cfb92466c142e1903bb6fab638">GetProperty</a> (const std::string &amp;key) const </td></tr>
+<tr class="memdesc:a3fa885cfb92466c142e1903bb6fab638"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the specified property for this module.  <a href="#a3fa885cfb92466c142e1903bb6fab638">More...</a><br/></td></tr>
+<tr class="separator:a3fa885cfb92466c142e1903bb6fab638"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0417ce52b2b1dedfe513a66cb3cb432c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a0417ce52b2b1dedfe513a66cb3cb432c">GetPropertyKeys</a> () const </td></tr>
+<tr class="memdesc:a0417ce52b2b1dedfe513a66cb3cb432c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of top-level property keys for this module.  <a href="#a0417ce52b2b1dedfe513a66cb3cb432c">More...</a><br/></td></tr>
+<tr class="separator:a0417ce52b2b1dedfe513a66cb3cb432c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45c9f2f748be5ae22a466abe4533258b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a45c9f2f748be5ae22a466abe4533258b">GetRegisteredServices</a> () const </td></tr>
+<tr class="memdesc:a45c9f2f748be5ae22a466abe4533258b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it has registered or an empty list if this module has no registered services.  <a href="#a45c9f2f748be5ae22a466abe4533258b">More...</a><br/></td></tr>
+<tr class="separator:a45c9f2f748be5ae22a466abe4533258b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a743c59afd2ef4e349f10e78b95df2d5a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a743c59afd2ef4e349f10e78b95df2d5a">GetServicesInUse</a> () const </td></tr>
+<tr class="memdesc:a743c59afd2ef4e349f10e78b95df2d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it is using or returns an empty list if this module is not using any services.  <a href="#a743c59afd2ef4e349f10e78b95df2d5a">More...</a><br/></td></tr>
+<tr class="separator:a743c59afd2ef4e349f10e78b95df2d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae663b9033cb569becb414ca4d9064622"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModuleResource.html">ModuleResource</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#ae663b9033cb569becb414ca4d9064622">GetResource</a> (const std::string &amp;path) const </td></tr>
+<tr class="memdesc:ae663b9033cb569becb414ca4d9064622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the resource at the specified <code>path</code> in this module.  <a href="#ae663b9033cb569becb414ca4d9064622">More...</a><br/></td></tr>
 <tr class="separator:ae663b9033cb569becb414ca4d9064622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b9766f0366ddd2ac0b838f17d1e262e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classModuleResource.html">ModuleResource</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a1b9766f0366ddd2ac0b838f17d1e262e">FindResources</a> (const std::string &amp;path, const std::string &amp;filePattern, bool recurse) const </td></tr>
+<tr class="memdesc:a1b9766f0366ddd2ac0b838f17d1e262e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns resources in this module and its statically linked modules.  <a href="#a1b9766f0366ddd2ac0b838f17d1e262e">More...</a><br/></td></tr>
 <tr class="separator:a1b9766f0366ddd2ac0b838f17d1e262e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad6bd8ff9e1efe6f883d939481a030fbc"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#ad6bd8ff9e1efe6f883d939481a030fbc">PROP_ID</a> ()</td></tr>
+<tr class="memdesc:ad6bd8ff9e1efe6f883d939481a030fbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key for looking up this module's id.  <a href="#ad6bd8ff9e1efe6f883d939481a030fbc">More...</a><br/></td></tr>
 <tr class="separator:ad6bd8ff9e1efe6f883d939481a030fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab605045d336e05ee0c8a7925fbe3234b"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#ab605045d336e05ee0c8a7925fbe3234b">PROP_NAME</a> ()</td></tr>
+<tr class="memdesc:ab605045d336e05ee0c8a7925fbe3234b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key for looking up this module's name.  <a href="#ab605045d336e05ee0c8a7925fbe3234b">More...</a><br/></td></tr>
 <tr class="separator:ab605045d336e05ee0c8a7925fbe3234b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e41a7671443f5e0ff345950b9949b81"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a0e41a7671443f5e0ff345950b9949b81">PROP_LOCATION</a> ()</td></tr>
+<tr class="memdesc:a0e41a7671443f5e0ff345950b9949b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key for looking up this module's location the file system.  <a href="#a0e41a7671443f5e0ff345950b9949b81">More...</a><br/></td></tr>
 <tr class="separator:a0e41a7671443f5e0ff345950b9949b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b308ec78f16fc425f94e0d48fd3d5ea"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a2b308ec78f16fc425f94e0d48fd3d5ea">PROP_MODULE_DEPENDS</a> ()</td></tr>
-<tr class="separator:a2b308ec78f16fc425f94e0d48fd3d5ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84f166458393d0ec2716f9164621e939"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a84f166458393d0ec2716f9164621e939">PROP_LIB_DEPENDS</a> ()</td></tr>
-<tr class="separator:a84f166458393d0ec2716f9164621e939"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad616f286d832d168958541f316e2a81"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#aad616f286d832d168958541f316e2a81">PROP_VERSION</a> ()</td></tr>
+<tr class="memdesc:aad616f286d832d168958541f316e2a81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key with a value of <code>module.version</code> for looking up this module's version identifier.  <a href="#aad616f286d832d168958541f316e2a81">More...</a><br/></td></tr>
 <tr class="separator:aad616f286d832d168958541f316e2a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdf1aac88e946fff1ae72895698496ce"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#abdf1aac88e946fff1ae72895698496ce">PROP_VENDOR</a> ()</td></tr>
+<tr class="memdesc:abdf1aac88e946fff1ae72895698496ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key with a value of <code>module.vendor</code> for looking up this module's vendor information.  <a href="#abdf1aac88e946fff1ae72895698496ce">More...</a><br/></td></tr>
+<tr class="separator:abdf1aac88e946fff1ae72895698496ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a036bca9543c13741b0eee9656550041c"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a036bca9543c13741b0eee9656550041c">PROP_DESCRIPTION</a> ()</td></tr>
+<tr class="memdesc:a036bca9543c13741b0eee9656550041c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key with a value of <code>module.description</code> for looking up this module's description.  <a href="#a036bca9543c13741b0eee9656550041c">More...</a><br/></td></tr>
+<tr class="separator:a036bca9543c13741b0eee9656550041c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9986bc0261acc8b4a8321c561215a69"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#ae9986bc0261acc8b4a8321c561215a69">PROP_AUTOLOAD_DIR</a> ()</td></tr>
+<tr class="memdesc:ae9986bc0261acc8b4a8321c561215a69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property key with a value of <code>module.autoload_dir</code> for looking up this module's auto-load directory.  <a href="#ae9986bc0261acc8b4a8321c561215a69">More...</a><br/></td></tr>
+<tr class="separator:ae9986bc0261acc8b4a8321c561215a69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Represents a CppMicroServices module.</p>
+<div class="textblock"><p>Represents a CppMicroServices module. </p>
 <p>A <code>Module</code> object is the access point to a CppMicroServices module. Each CppMicroServices module has an associated <code>Module</code> object.</p>
 <p>A module has unique identity, a <code>long</code>, chosen by the framework. This identity does not change during the lifecycle of a module.</p>
 <p>A module can be in one of two states: </p>
@@ -127,7 +157,7 @@ LOADED </li>
 <li>
 UNLOADED </li>
 </ul>
-<p>You can determine the current state by using <a class="el" href="classModule.html#a6eb822aabcaa58664e4802d736542d9b">IsLoaded()</a>.</p>
+<p>You can determine the current state by using <a class="el" href="classModule.html#a6eb822aabcaa58664e4802d736542d9b" title="Returns this module&#39;s current state.">IsLoaded()</a>.</p>
 <p>A module can only execute code when its state is <code>LOADED</code>. An <code>UNLOADED</code> module is a zombie and can only be reached because it was loaded before. However, unloaded modules can be loaded again.</p>
 <p>The framework is the only entity that is allowed to create <code>Module</code> objects.</p>
 <dl class="section remark"><dt>Remarks</dt><dd>This class is thread safe. </dd></dl>
@@ -177,19 +207,20 @@ UNLOADED </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns resources in this module and its statically linked modules.</p>
+
+<p>Returns resources in this module and its statically linked modules. </p>
 <p>This method is intended to be used to obtain configuration, setup, localization and other information from this module.</p>
 <p>This method can either return only resources in the specified <code>path</code> or recurse into subdirectories returning resources in the directory tree beginning at the specified path.</p>
 <p>Examples: </p>
-<div class="fragment"><div class="line">  <a class="code" href="classModuleContext.html">ModuleContext</a>* moduleContext = <a class="code" href="classModule.html#a66c027deb575198ba11a37cca2f2faf7">GetModuleContext</a>();</div>
-<div class="line">  <a class="code" href="classModule.html">Module</a>* module = moduleContext-&gt;<a class="code" href="classModuleContext.html#ae4fc39476ca5a30e0cbe5af26de4b4e3">GetModule</a>();</div>
+<div class="fragment"><div class="line">  <a class="code" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a>* moduleContext = <a class="code" href="classModule.html#a66c027deb575198ba11a37cca2f2faf7" title="Returns this module&#39;s ModuleContext.">GetModuleContext</a>();</div>
+<div class="line">  <a class="code" href="classModule.html" title="Represents a CppMicroServices module.">Module</a>* module = moduleContext-&gt;<a class="code" href="classModuleContext.html#ae4fc39476ca5a30e0cbe5af26de4b4e3" title="Returns the Module object associated with this ModuleContext.">GetModule</a>();</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// List all XML files in the config directory</span></div>
-<div class="line">  std::vector&lt;ModuleResource&gt; xmlFiles = module-&gt;<a class="code" href="classModule.html#a1b9766f0366ddd2ac0b838f17d1e262e">FindResources</a>(<span class="stringliteral">&quot;config&quot;</span>, <span class="stringliteral">&quot;*.xml&quot;</span>, <span class="keyword">false</span>);</div>
+<div class="line">  std::vector&lt;ModuleResource&gt; xmlFiles = module-&gt;<a class="code" href="classModule.html#a1b9766f0366ddd2ac0b838f17d1e262e" title="Returns resources in this module and its statically linked modules.">FindResources</a>(<span class="stringliteral">&quot;config&quot;</span>, <span class="stringliteral">&quot;*.xml&quot;</span>, <span class="keyword">false</span>);</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// Find the resource named vertex_shader.txt starting at the root directory</span></div>
-<div class="line">  std::vector&lt;ModuleResource&gt; shaders = module-&gt;<a class="code" href="classModule.html#a1b9766f0366ddd2ac0b838f17d1e262e">FindResources</a>(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;vertex_shader.txt&quot;</span>, <span class="keyword">true</span>);</div>
-</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>In case of modules statically linked into this module, the returned <a class="el" href="classModuleResource.html">ModuleResource</a> objects can represent the same resource path, coming from different static modules. The order of the <a class="el" href="classModuleResource.html">ModuleResource</a> objects in the returned container matches the order of the static module names in the <a class="el" href="group__MicroServices.html#gaa01807d90beef417c9107c97b19c3bde" title="Import a list of static modules into a shared library.">US_LOAD_IMPORTED_MODULES</a> macro.</dd></dl>
+<div class="line">  std::vector&lt;ModuleResource&gt; shaders = module-&gt;<a class="code" href="classModule.html#a1b9766f0366ddd2ac0b838f17d1e262e" title="Returns resources in this module and its statically linked modules.">FindResources</a>(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;vertex_shader.txt&quot;</span>, <span class="keyword">true</span>);</div>
+</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>In case of modules statically linked into this module, the returned <a class="el" href="classModuleResource.html" title="Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.">ModuleResource</a> objects can represent the same resource path, coming from different static modules. The order of the <a class="el" href="classModuleResource.html" title="Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.">ModuleResource</a> objects in the returned container matches the order of the static module names in the <a class="el" href="group__MicroServices.html#gaa01807d90beef417c9107c97b19c3bde" title="Import a list of static modules into a shared library.">US_LOAD_IMPORTED_MODULES</a> macro.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>The path name in which to look. The path is always relative to the root of this module and may begin with '/'. A path value of "/" indicates the root of this module. </td></tr>
@@ -198,7 +229,7 @@ UNLOADED </li>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A vector of <a class="el" href="classModuleResource.html">ModuleResource</a> objects for each matching entry. The objects are sorted such that resources from this module are returned first followed by the resources from statically linked modules in the load order as specified in <a class="el" href="group__MicroServices.html#gaa01807d90beef417c9107c97b19c3bde" title="Import a list of static modules into a shared library.">US_LOAD_IMPORTED_MODULES</a>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A vector of <a class="el" href="classModuleResource.html" title="Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.">ModuleResource</a> objects for each matching entry. The objects are sorted such that resources from this module are returned first followed by the resources from statically linked modules in the load order as specified in <a class="el" href="group__MicroServices.html#gaa01807d90beef417c9107c97b19c3bde" title="Import a list of static modules into a shared library.">US_LOAD_IMPORTED_MODULES</a>. </dd></dl>
 
 </div>
 </div>
@@ -214,7 +245,8 @@ UNLOADED </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns this module's location.</p>
+
+<p>Returns this module's location. </p>
 <p>The location is the full path to the module's shared library. This method continues to return this module's location while this module is in the <code>UNLOADED</code> state.</p>
 <dl class="section return"><dt>Returns</dt><dd>The string representation of this module's location. </dd></dl>
 
@@ -232,9 +264,11 @@ UNLOADED </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns this module's <a class="el" href="classModuleContext.html">ModuleContext</a>. The returned <code><a class="el" href="classModuleContext.html">ModuleContext</a></code> can be used by the caller to act on behalf of this module.</p>
-<p>If this module is not in the <code>LOADED</code> state, then this module has no valid <code><a class="el" href="classModuleContext.html">ModuleContext</a></code>. This method will return <code>0</code> if this module has no valid <code><a class="el" href="classModuleContext.html">ModuleContext</a></code>.</p>
-<dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="classModuleContext.html">ModuleContext</a></code> for this module or <code>0</code> if this module has no valid <code><a class="el" href="classModuleContext.html">ModuleContext</a></code>. </dd></dl>
+
+<p>Returns this module's <a class="el" href="classModuleContext.html">ModuleContext</a>. </p>
+<p>The returned <code><a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a></code> can be used by the caller to act on behalf of this module.</p>
+<p>If this module is not in the <code>LOADED</code> state, then this module has no valid <code><a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a></code>. This method will return <code>0</code> if this module has no valid <code><a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a></code> for this module or <code>0</code> if this module has no valid <code><a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a></code>. </dd></dl>
 
 </div>
 </div>
@@ -250,7 +284,9 @@ UNLOADED </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns this module's unique identifier. This module is assigned a unique identifier by the framework when it was loaded.</p>
+
+<p>Returns this module's unique identifier. </p>
+<p>This module is assigned a unique identifier by the framework when it was loaded.</p>
 <p>A module's unique identifier has the following attributes: </p>
 <ul>
 <li>
@@ -281,18 +317,20 @@ Does not change when a module is reloaded. </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns the name of this module as specified by the US_CREATE_MODULE CMake macro. The module name together with a version must identify a unique module.</p>
+
+<p>Returns the name of this module as specified by the US_CREATE_MODULE CMake macro. </p>
+<p>The module name together with a version must identify a unique module.</p>
 <p>This method continues to return this module's name while this module is in the <code>UNLOADED</code> state.</p>
 <dl class="section return"><dt>Returns</dt><dd>The name of this module. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a1ea424d2b3793998c788e4174ac838fe"></a>
+<a class="anchor" id="a3fa885cfb92466c142e1903bb6fab638"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::string Module::GetProperty </td>
+          <td class="memname"><a class="el" href="classAny.html">Any</a> Module::GetProperty </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -300,14 +338,57 @@ Does not change when a module is reloaded. </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns the value of the specified property for this module. The method returns an empty string if the property is not found.</p>
+
+<p>Returns the value of the specified property for this module. </p>
+<p>The method returns an empty <a class="el" href="classAny.html" title="An Any class represents a general type and is capable of storing any type, supporting type-safe extra...">Any</a> if the property is not found.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">key</td><td>The name of the requested property. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The value of the requested property, or an empty string if the property is undefined. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The value of the requested property, or an empty string if the property is undefined.</dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModule.html#a0417ce52b2b1dedfe513a66cb3cb432c" title="Returns a list of top-level property keys for this module.">GetPropertyKeys()</a> </dd>
+<dd>
+<a class="el" href="MicroServices_ModuleProperties.html">Module Properties</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0417ce52b2b1dedfe513a66cb3cb432c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; Module::GetPropertyKeys </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a list of top-level property keys for this module. </p>
+<dl class="section return"><dt>Returns</dt><dd>A list of available property keys.</dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="MicroServices_ModuleProperties.html">Module Properties</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a45c9f2f748be5ae22a466abe4533258b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&gt; Module::GetRegisteredServices </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it has registered or an empty list if this module has no registered services. </p>
+<p>The list is valid at the time of the call to this method, however, as the framework is a very dynamic environment, services can be modified or unregistered at anytime.</p>
+<dl class="section return"><dt>Returns</dt><dd>A list of <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> objects for services this module has registered. </dd></dl>
 
 </div>
 </div>
@@ -324,7 +405,9 @@ Does not change when a module is reloaded. </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns the resource at the specified <code>path</code> in this module. The specified <code>path</code> is always relative to the root of this module and may begin with '/'. A path value of "/" indicates the root of this module.</p>
+
+<p>Returns the resource at the specified <code>path</code> in this module. </p>
+<p>The specified <code>path</code> is always relative to the root of this module and may begin with '/'. A path value of "/" indicates the root of this module.</p>
 <dl class="section note"><dt>Note</dt><dd>In case of other modules being statically linked into this module, the <code>path</code> can be ambiguous and returns the first resource matching the provided <code>path</code> according to the order of the static module names in the <a class="el" href="group__MicroServices.html#gaa01807d90beef417c9107c97b19c3bde" title="Import a list of static modules into a shared library.">US_LOAD_IMPORTED_MODULES</a> macro.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -332,7 +415,27 @@ Does not change when a module is reloaded. </li>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classModuleResource.html">ModuleResource</a> object for the given <code>path</code>. If the <code>path</code> cannot be found in this module or the module's state is <code>UNLOADED</code>, an invalid <a class="el" href="classModuleResource.html">ModuleResource</a> object is returned. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classModuleResource.html" title="Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.">ModuleResource</a> object for the given <code>path</code>. If the <code>path</code> cannot be found in this module or the module's state is <code>UNLOADED</code>, an invalid <a class="el" href="classModuleResource.html" title="Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.">ModuleResource</a> object is returned. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a743c59afd2ef4e349f10e78b95df2d5a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&gt; Module::GetServicesInUse </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it is using or returns an empty list if this module is not using any services. </p>
+<p>A module is considered to be using a service if its use count for that service is greater than zero.</p>
+<p>The list is valid at the time of the call to this method, however, as the framework is a very dynamic environment, services can be modified or unregistered at anytime.</p>
+<dl class="section return"><dt>Returns</dt><dd>A list of <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> objects for all services this module is using. </dd></dl>
 
 </div>
 </div>
@@ -348,7 +451,9 @@ Does not change when a module is reloaded. </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns the version of this module as specified by the US_INITIALIZE_MODULE CMake macro. If this module does not have a specified version then <a class="el" href="classModuleVersion.html#a75ea56c0729937b39345301674b434a2">ModuleVersion::EmptyVersion</a> is returned.</p>
+
+<p>Returns the version of this module as specified by the US_INITIALIZE_MODULE CMake macro. </p>
+<p>If this module does not have a specified version then <a class="el" href="classModuleVersion.html#a75ea56c0729937b39345301674b434a2">ModuleVersion::EmptyVersion</a> is returned.</p>
 <p>This method continues to return this module's version while this module is in the <code>UNLOADED</code> state.</p>
 <dl class="section return"><dt>Returns</dt><dd>The version of this module. </dd></dl>
 
@@ -366,9 +471,64 @@ Does not change when a module is reloaded. </li>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns this module's current state.</p>
+
+<p>Returns this module's current state. </p>
 <p>A module can be in only one state at any time.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the module is <code>LOADED</code> <code>false</code> if it is <code>UNLOADED</code> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ae9986bc0261acc8b4a8321c561215a69"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const std::string&amp; Module::PROP_AUTOLOAD_DIR </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the property key with a value of <code>module.autoload_dir</code> for looking up this module's auto-load directory. </p>
+<p>The property value is of type <code>std::string</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The version property key. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a036bca9543c13741b0eee9656550041c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const std::string&amp; Module::PROP_DESCRIPTION </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the property key with a value of <code>module.description</code> for looking up this module's description. </p>
+<p>The property value is of type <code>std::string</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The version property key. </dd></dl>
 
 </div>
 </div>
@@ -393,28 +553,9 @@ Does not change when a module is reloaded. </li>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="a84f166458393d0ec2716f9164621e939"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const std::string&amp; Module::PROP_LIB_DEPENDS </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Returns the property key for looking up this module's id. </p>
+<p>The property value is of type <code>long</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The id property key. </dd></dl>
 
 </div>
 </div>
@@ -439,28 +580,9 @@ Does not change when a module is reloaded. </li>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="a2b308ec78f16fc425f94e0d48fd3d5ea"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const std::string&amp; Module::PROP_MODULE_DEPENDS </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Returns the property key for looking up this module's location the file system. </p>
+<p>The property value is of type <code>std::string</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The location property key. </dd></dl>
 
 </div>
 </div>
@@ -485,6 +607,37 @@ Does not change when a module is reloaded. </li>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the property key for looking up this module's name. </p>
+<p>The property value is of type <code>std::string</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The name property key. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abdf1aac88e946fff1ae72895698496ce"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const std::string&amp; Module::PROP_VENDOR </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the property key with a value of <code>module.vendor</code> for looking up this module's vendor information. </p>
+<p>The property value is of type <code>std::string</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The version property key. </dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="aad616f286d832d168958541f316e2a81"></a>
@@ -508,10 +661,14 @@ Does not change when a module is reloaded. </li>
 </table>
 </div><div class="memdoc">
 
+<p>Returns the property key with a value of <code>module.version</code> for looking up this module's version identifier. </p>
+<p>The property value is of type <code>std::string</code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The version property key. </dd></dl>
+
 </div>
 </div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

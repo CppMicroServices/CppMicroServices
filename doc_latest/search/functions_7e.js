@@ -17,5 +17,6 @@ var searchData=
   ['_7eserviceregistration',['~ServiceRegistration',['../classServiceRegistration.html#acf0e647876ba12c6c77bb06219cec319',1,'ServiceRegistration']]],
   ['_7eservicetracker',['~ServiceTracker',['../classServiceTracker.html#a85ed6e510cf23dba34a4299c64eafddd',1,'ServiceTracker']]],
   ['_7eservicetrackercustomizer',['~ServiceTrackerCustomizer',['../structServiceTrackerCustomizer.html#ada180af5355a26beb6f08025c3a8381f',1,'ServiceTrackerCustomizer']]],
-  ['_7eshareddatapointer',['~SharedDataPointer',['../classSharedDataPointer.html#aa5303b0fe4736999f5ed8b24c0f7b913',1,'SharedDataPointer']]]
+  ['_7eshareddatapointer',['~SharedDataPointer',['../classSharedDataPointer.html#aa5303b0fe4736999f5ed8b24c0f7b913',1,'SharedDataPointer']]],
+  ['_7esharedlibrary',['~SharedLibrary',['../classSharedLibrary.html#a426daa8a2908a4689d73d8a59ee45bc8',1,'SharedLibrary']]]
 ];

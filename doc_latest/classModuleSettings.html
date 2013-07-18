@@ -77,6 +77,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">ModuleSettings Class Reference<div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Query and set certain properties of the CppMicroServices library.  
+ <a href="classModuleSettings.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -86,6 +89,7 @@ Public Types</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ab505ea5631d36ad276ec8d930612dc6d"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#ab505ea5631d36ad276ec8d930612dc6d">CURRENT_MODULE_PATH</a> ()</td></tr>
+<tr class="memdesc:ab505ea5631d36ad276ec8d930612dc6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a special string which can be used as an argument for a <a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b" title="Add a path in the file-system to the list of paths from which modules will be auto-loaded.">AddAutoLoadPath()</a> call.  <a href="#ab505ea5631d36ad276ec8d930612dc6d">More...</a><br/></td></tr>
 <tr class="separator:ab505ea5631d36ad276ec8d930612dc6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56403d73f18cc87fd980563c89d6d78d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#a56403d73f18cc87fd980563c89d6d78d">IsThreadingSupportEnabled</a> ()</td></tr>
 <tr class="separator:a56403d73f18cc87fd980563c89d6d78d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -94,16 +98,19 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a13e6ec225909458ce78432d82e8340a7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#a13e6ec225909458ce78432d82e8340a7">IsAutoLoadingEnabled</a> ()</td></tr>
 <tr class="separator:a13e6ec225909458ce78432d82e8340a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab6743d83a679653653e23d92cf411b3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#aab6743d83a679653653e23d92cf411b3">SetAutoLoadingEnabled</a> (bool enable)</td></tr>
+<tr class="memdesc:aab6743d83a679653653e23d92cf411b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable auto-loading support.  <a href="#aab6743d83a679653653e23d92cf411b3">More...</a><br/></td></tr>
 <tr class="separator:aab6743d83a679653653e23d92cf411b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32588c72fdacb0e33e85dfbce5105567"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classModuleSettings.html#a6b90d6474f6714e946c0a71cb9301c58">PathList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#a32588c72fdacb0e33e85dfbce5105567">GetAutoLoadPaths</a> ()</td></tr>
 <tr class="separator:a32588c72fdacb0e33e85dfbce5105567"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adec0d6a09058115b3b1a86fa739f351d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#adec0d6a09058115b3b1a86fa739f351d">SetAutoLoadPaths</a> (const <a class="el" href="classModuleSettings.html#a6b90d6474f6714e946c0a71cb9301c58">PathList</a> &amp;paths)</td></tr>
+<tr class="memdesc:adec0d6a09058115b3b1a86fa739f351d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a list of paths in the file-system from which modules should be auto-loaded.  <a href="#adec0d6a09058115b3b1a86fa739f351d">More...</a><br/></td></tr>
 <tr class="separator:adec0d6a09058115b3b1a86fa739f351d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71f56d8660ee1bb054ec99996516961b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b">AddAutoLoadPath</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:a71f56d8660ee1bb054ec99996516961b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a path in the file-system to the list of paths from which modules will be auto-loaded.  <a href="#a71f56d8660ee1bb054ec99996516961b">More...</a><br/></td></tr>
 <tr class="separator:a71f56d8660ee1bb054ec99996516961b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Query and set certain properties of the CppMicroServices library.</p>
+<div class="textblock"><p>Query and set certain properties of the CppMicroServices library. </p>
 <p>The following environment variables influence the runtime behavior of the CppMicroServices library:</p>
 <ul>
 <li><em>US_DISABLE_AUTOLOADING</em> If set, auto-loading of modules is disabled.</li>
@@ -145,7 +152,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Add a path in the file-system to the list of paths from which modules will be auto-loaded.</p>
+
+<p>Add a path in the file-system to the list of paths from which modules will be auto-loaded. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>The additional absolute auto-load path in the file-system. </td></tr>
@@ -175,13 +183,14 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Returns a special string which can be used as an argument for a <a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b">AddAutoLoadPath()</a> call.</p>
+
+<p>Returns a special string which can be used as an argument for a <a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b" title="Add a path in the file-system to the list of paths from which modules will be auto-loaded.">AddAutoLoadPath()</a> call. </p>
 <p>When a module is loaded and this string has been added as a path to the list of auto-load paths the CppMicroServices library will auto-load all modules from the currently being loaded module's auto-load directory.</p>
-<dl class="section return"><dt>Returns</dt><dd>A string to be used in <a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b">AddAutoLoadPath()</a>.</dd></dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The returned string is contained in the default set of auto-load paths, unless a new set of paths is given by a call to <a class="el" href="classModuleSettings.html#adec0d6a09058115b3b1a86fa739f351d">SetAutoLoadPaths()</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A string to be used in <a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b" title="Add a path in the file-system to the list of paths from which modules will be auto-loaded.">AddAutoLoadPath()</a>.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>The returned string is contained in the default set of auto-load paths, unless a new set of paths is given by a call to <a class="el" href="classModuleSettings.html#adec0d6a09058115b3b1a86fa739f351d" title="Set a list of paths in the file-system from which modules should be auto-loaded.">SetAutoLoadPaths()</a>.</dd></dl>
 <dl class="section see"><dt>See Also</dt><dd>MicroServices_AutoLoading </dd>
 <dd>
-<a class="el" href="group__MicroServices.html#ga9a64354a3aa6adc882bd73cb193715cb" title="Creates initialization code for a module.">US_INITIALIZE_MODULE</a> </dd></dl>
+<a class="el" href="group__MicroServices.html#ga551e9fe63f42593905f8cc9b0339500e" title="Creates initialization code for a module.">US_INITIALIZE_MODULE</a> </dd></dl>
 
 </div>
 </div>
@@ -303,7 +312,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Enable or disable auto-loading support.</p>
+
+<p>Enable or disable auto-loading support. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">enable</td><td>If <code>true</code>, enable auto-loading support, disable it otherwise.</td></tr>
@@ -335,6 +345,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
 <p>Set a list of paths in the file-system from which modules should be auto-loaded. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -348,5 +359,5 @@ Static Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

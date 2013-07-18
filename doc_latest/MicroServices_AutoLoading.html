@@ -61,7 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="MicroServices_Tutorials.html">Tutorials</a></li>  </ul>
+<li class="navelem"><a class="el" href="MicroServices_UserDocs.html">User Documentation</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -81,13 +81,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>The problem above is solved in the CppMicroServices library by automatically loading modules from a list of configurable file-system locations.</p>
 <p>For each module being loaded, the following steps are taken:</p>
 <ul>
-<li>If the module provides an activator, it's <a class="el" href="structModuleActivator.html#a1db3f85c15a814a5918eb22725229967">ModuleActivator::Load()</a> method is called.</li>
+<li>If the module provides an activator, it's <a class="el" href="structModuleActivator.html#a1db3f85c15a814a5918eb22725229967" title="Called when this module is loaded.">ModuleActivator::Load()</a> method is called.</li>
 <li>If auto-loading is enabled, and the module declared a non-empty auto-load directory, the auto-load paths returned from <a class="el" href="classModuleSettings.html#a32588c72fdacb0e33e85dfbce5105567">ModuleSettings::GetAutoLoadPaths()</a> are processed.</li>
 <li>For each auto-load path, all modules in that path with the currently loaded module's auto-load directory appended are explicitly loaded.</li>
 </ul>
-<p>See the <a class="el" href="classModuleSettings.html">ModuleSettings</a> class for details about auto-load paths and the <a class="el" href="group__MicroServices.html#ga9a64354a3aa6adc882bd73cb193715cb" title="Creates initialization code for a module.">US_INITIALIZE_MODULE</a> macro for details about a module's auto-load directory.</p>
+<p>See the <a class="el" href="classModuleSettings.html" title="Query and set certain properties of the CppMicroServices library.">ModuleSettings</a> class for details about auto-load paths. The auto-load directory of a module defaults to the module's library name, but can be customized using a <code>manifest.json</code> file (see <a class="el" href="MicroServices_ModuleProperties.html">Module Properties</a>). For executables, the auto-load directory defaults to the special value <code>main</code>. This allows third-party modules to be auto-loaded during application start-up, without having to reference a special auto-load directory.</p>
 <p>If module <em>A</em> in the example above contains initialization code like</p>
-<div class="fragment"><div class="line"><a class="code" href="group__MicroServices.html#ga9a64354a3aa6adc882bd73cb193715cb" title="Creates initialization code for a module.">US_INITIALIZE_MODULE</a>(<span class="stringliteral">&quot;Module A&quot;</span>, <span class="stringliteral">&quot;A&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;1.0.0&quot;</span>)</div>
+<div class="fragment"><div class="line"><a class="code" href="group__MicroServices.html#ga551e9fe63f42593905f8cc9b0339500e" title="Creates initialization code for a module.">US_INITIALIZE_MODULE</a>(<span class="stringliteral">&quot;Module A&quot;</span>, <span class="stringliteral">&quot;A&quot;</span>)</div>
 </div><!-- fragment --><p>and the module's library is located at </p>
 <pre class="fragment">/myproject/libA.so
 </pre><p>all libraries located at </p>
@@ -95,6 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </pre><p>will be automatically loaded (unless the auto-load paths have been modified). By ensuring that module <em>B</em> from the example above is located at </p>
 <pre class="fragment">/myproject/A/libB.so
 </pre><p>it will be loaded when the executable <em>E</em> is started and is then able to register its services before the executable queries the service registry.</p>
+<dl class="section note"><dt>Note</dt><dd>If you need to add additional auto-load search paths during application start-up, provide a <a class="el" href="structModuleActivator.html" title="Customizes the starting and stopping of a CppMicroServices module.">ModuleActivator</a> instance in your executable and call <a class="el" href="classModuleSettings.html#a71f56d8660ee1bb054ec99996516961b" title="Add a path in the file-system to the list of paths from which modules will be auto-loaded.">ModuleSettings::AddAutoLoadPath()</a> in your executable's <a class="el" href="structModuleActivator.html#a1db3f85c15a814a5918eb22725229967" title="Called when this module is loaded.">ModuleActivator::Load()</a> method. If there are modules inside a <code>main</code> sub-directory of any of the provided auto-load search paths, these modules will then be auto-loaded before your executable's main() function is executed.</dd></dl>
 <h2>Environment Variables</h2>
 <p>The following environment variables influence the runtime behavior of the CppMicroServices library:</p>
 <ul>
@@ -104,5 +105,5 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

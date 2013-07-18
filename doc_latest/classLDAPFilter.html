@@ -77,6 +77,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">LDAPFilter Class Reference<div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter.  
+ <a href="classLDAPFilter.html#details">More...</a></p>
 <div class="dynheader">
 Collaboration diagram for LDAPFilter:</div>
 <div class="dyncontent">
@@ -88,8 +91,10 @@ Collaboration diagram for LDAPFilter:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a29d8bb9d84ddfa73a1dae64462e806d6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a29d8bb9d84ddfa73a1dae64462e806d6">LDAPFilter</a> ()</td></tr>
+<tr class="memdesc:a29d8bb9d84ddfa73a1dae64462e806d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates in invalid <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> object.  <a href="#a29d8bb9d84ddfa73a1dae64462e806d6">More...</a><br/></td></tr>
 <tr class="separator:a29d8bb9d84ddfa73a1dae64462e806d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e4037bfb5728c609bfb00e830863a57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a6e4037bfb5728c609bfb00e830863a57">LDAPFilter</a> (const std::string &amp;filter)</td></tr>
+<tr class="memdesc:a6e4037bfb5728c609bfb00e830863a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> object.  <a href="#a6e4037bfb5728c609bfb00e830863a57">More...</a><br/></td></tr>
 <tr class="separator:a6e4037bfb5728c609bfb00e830863a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3239aa23f574e6c76a540217b44bc2f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#ad3239aa23f574e6c76a540217b44bc2f">LDAPFilter</a> (const <a class="el" href="classLDAPFilter.html">LDAPFilter</a> &amp;other)</td></tr>
 <tr class="separator:ad3239aa23f574e6c76a540217b44bc2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,14 +103,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a406f7f01428d0b33aa63a271003999c5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a406f7f01428d0b33aa63a271003999c5">operator bool</a> () const </td></tr>
 <tr class="separator:a406f7f01428d0b33aa63a271003999c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04b740718bc13c715cb1db1e2b5714e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a04b740718bc13c715cb1db1e2b5714e5">Match</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference) const </td></tr>
+<tr class="memdesc:a04b740718bc13c715cb1db1e2b5714e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filter using a service's properties.  <a href="#a04b740718bc13c715cb1db1e2b5714e5">More...</a><br/></td></tr>
 <tr class="separator:a04b740718bc13c715cb1db1e2b5714e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3fa9de5dadbe66db3d42f1224819421"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#ac3fa9de5dadbe66db3d42f1224819421">Match</a> (const <a class="el" href="group__MicroServices.html#gac4d162a4eba031ad968f5bd54272c166">ServiceProperties</a> &amp;dictionary) const </td></tr>
+<tr class="memitem:ac3fa9de5dadbe66db3d42f1224819421"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#ac3fa9de5dadbe66db3d42f1224819421">Match</a> (const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;dictionary) const </td></tr>
+<tr class="memdesc:ac3fa9de5dadbe66db3d42f1224819421"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filter using a <code>ServiceProperties</code> object with case insensitive key lookup.  <a href="#ac3fa9de5dadbe66db3d42f1224819421">More...</a><br/></td></tr>
 <tr class="separator:ac3fa9de5dadbe66db3d42f1224819421"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a543b2a16ab235369f2423d013cfd784c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a543b2a16ab235369f2423d013cfd784c">MatchCase</a> (const <a class="el" href="group__MicroServices.html#gac4d162a4eba031ad968f5bd54272c166">ServiceProperties</a> &amp;dictionary) const </td></tr>
+<tr class="memitem:a543b2a16ab235369f2423d013cfd784c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a543b2a16ab235369f2423d013cfd784c">MatchCase</a> (const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;dictionary) const </td></tr>
+<tr class="memdesc:a543b2a16ab235369f2423d013cfd784c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filter using a <code>ServiceProperties</code>.  <a href="#a543b2a16ab235369f2423d013cfd784c">More...</a><br/></td></tr>
 <tr class="separator:a543b2a16ab235369f2423d013cfd784c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00fd0210d13e71aa12e83b059faad1fb"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb">ToString</a> () const </td></tr>
+<tr class="memdesc:a00fd0210d13e71aa12e83b059faad1fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>'s filter string.  <a href="#a00fd0210d13e71aa12e83b059faad1fb">More...</a><br/></td></tr>
 <tr class="separator:a00fd0210d13e71aa12e83b059faad1fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a775be7a23f0e5cb16a8ae70ab26cd136"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a775be7a23f0e5cb16a8ae70ab26cd136">operator==</a> (const <a class="el" href="classLDAPFilter.html">LDAPFilter</a> &amp;other) const </td></tr>
+<tr class="memdesc:a775be7a23f0e5cb16a8ae70ab26cd136"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares this <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> to another <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>.  <a href="#a775be7a23f0e5cb16a8ae70ab26cd136">More...</a><br/></td></tr>
 <tr class="separator:a775be7a23f0e5cb16a8ae70ab26cd136"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83390e26ed183833d0d73e54d98d87a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classLDAPFilter.html">LDAPFilter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPFilter.html#a83390e26ed183833d0d73e54d98d87a5">operator=</a> (const <a class="el" href="classLDAPFilter.html">LDAPFilter</a> &amp;filter)</td></tr>
 <tr class="separator:a83390e26ed183833d0d73e54d98d87a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,13 +126,13 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a7ea265531bcf3732389b4e5c4d1d0a90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter.</p>
-<p>A <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> can be used numerous times to determine if the match argument matches the filter string that was used to create the <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code>. </p>
+<div class="textblock"><p>An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter. </p>
+<p>A <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> can be used numerous times to determine if the match argument matches the filter string that was used to create the <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>. </p>
 <p>Some examples of LDAP filters are:</p>
 <ul>
 <li>"(cn=Babs Jensen)"</li>
 <li>"(!(cn=Tim Howes))"</li>
-<li>"(&amp;(" + <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262">ServiceConstants::OBJECTCLASS()</a> + "=Person)(|(sn=Jensen)(cn=Babs J*)))"</li>
+<li>"(&amp;(" + <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262" title="Service property identifying all of the class names under which a service was registered in the frame...">ServiceConstants::OBJECTCLASS()</a> + "=Person)(|(sn=Jensen)(cn=Babs J*)))"</li>
 <li>"(o=univ*of*mich*)"</li>
 </ul>
 <dl class="section remark"><dt>Remarks</dt><dd>This class is thread safe. </dd></dl>
@@ -139,8 +149,10 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Creates in invalid <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> object. Test the validity by using the boolean conversion operator.</p>
-<p>Calling methods on an invalid <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> will result in undefined behavior. </p>
+
+<p>Creates in invalid <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> object. </p>
+<p>Test the validity by using the boolean conversion operator.</p>
+<p>Calling methods on an invalid <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> will result in undefined behavior. </p>
 
 </div>
 </div>
@@ -157,7 +169,9 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Creates a <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> object. This <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> object may be used to match a <code><a class="el" href="classServiceReference.html">ServiceReference</a></code> object or a <code>ServiceProperties</code> object.</p>
+
+<p>Creates a <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> object. </p>
+<p>This <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> object may be used to match a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object or a <code>ServiceProperties</code> object.</p>
 <p>If the filter cannot be parsed, an std::invalid_argument will be thrown with a human readable message where the filter became unparsable.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -165,7 +179,7 @@ Protected Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> object encapsulating the filter string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> object encapsulating the filter string. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::invalid_argument</td><td>If <code>filter</code> contains an invalid filter string that cannot be parsed. </td></tr>
@@ -221,15 +235,16 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
 <p>Filter using a service's properties. </p>
-<p>This <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> is executed using the keys and values of the referenced service's properties. The keys are looked up in a case insensitive manner.</p>
+<p>This <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> is executed using the keys and values of the referenced service's properties. The keys are looked up in a case insensitive manner.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reference</td><td>The reference to the service whose properties are used in the match. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the service's properties match this <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> <code>false</code> otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the service's properties match this <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> <code>false</code> otherwise. </dd></dl>
 
 </div>
 </div>
@@ -240,13 +255,15 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool LDAPFilter::Match </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__MicroServices.html#gac4d162a4eba031ad968f5bd54272c166">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
           <td class="paramname"><em>dictionary</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Filter using a <code>ServiceProperties</code> object with case insensitive key lookup. This <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> is executed using the specified <code>ServiceProperties</code>'s keys and values. The keys are looked up in a case insensitive manner.</p>
+
+<p>Filter using a <code>ServiceProperties</code> object with case insensitive key lookup. </p>
+<p>This <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> is executed using the specified <code>ServiceProperties</code>'s keys and values. The keys are looked up in a case insensitive manner.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">dictionary</td><td>The <code>ServiceProperties</code> whose key/value pairs are used in the match. </td></tr>
@@ -264,13 +281,15 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool LDAPFilter::MatchCase </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__MicroServices.html#gac4d162a4eba031ad968f5bd54272c166">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
           <td class="paramname"><em>dictionary</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Filter using a <code>ServiceProperties</code>. This <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> is executed using the specified <code>ServiceProperties</code>'s keys and values. The keys are looked up in a normal manner respecting case.</p>
+
+<p>Filter using a <code>ServiceProperties</code>. </p>
+<p>This <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> is executed using the specified <code>ServiceProperties</code>'s keys and values. The keys are looked up in a normal manner respecting case.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">dictionary</td><td>The <code>ServiceProperties</code> whose key/value pairs are used in the match. </td></tr>
@@ -325,15 +344,16 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Compares this <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code> to another <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code>.</p>
-<p>This implementation returns the result of calling <code>this-&gt;<a class="el" href="classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb">ToString()</a> == other.ToString()</code>.</p>
+
+<p>Compares this <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code> to another <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>. </p>
+<p>This implementation returns the result of calling <code>this-&gt;<a class="el" href="classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb" title="Returns this LDAPFilter&#39;s filter string.">ToString()</a> == other.ToString()</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>The object to compare against this <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code>. </td></tr>
+    <tr><td class="paramname">other</td><td>The object to compare against this <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns the result of calling <code>this-&gt;<a class="el" href="classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb">ToString()</a> == other.ToString()</code>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the result of calling <code>this-&gt;<a class="el" href="classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb" title="Returns this LDAPFilter&#39;s filter string.">ToString()</a> == other.ToString()</code>. </dd></dl>
 
 </div>
 </div>
@@ -349,9 +369,10 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns this <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code>'s filter string. </p>
+
+<p>Returns this <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>'s filter string. </p>
 <p>The filter string is normalized by removing whitespace which does not affect the meaning of the filter.</p>
-<dl class="section return"><dt>Returns</dt><dd>This <code><a class="el" href="classLDAPFilter.html">LDAPFilter</a></code>'s filter string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>This <code><a class="el" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a></code>'s filter string. </dd></dl>
 
 </div>
 </div>
@@ -379,5 +400,5 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Feb 4 2013 for C++ Micro Services 0.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

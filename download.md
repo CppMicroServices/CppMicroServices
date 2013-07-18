@@ -7,12 +7,16 @@ group: navigation
 Source Code
 -----------
 
-There is no official release yet. You can git clone the [CppMicroServices](https://github.com/saschazelzer/CppMicroServices)
+Grab the source code for all available releases below:
+
+ * CppMicroServices 1.0.0 ([tarball](https://github.com/saschazelzer/CppMicroServices/archive/v1.0.0.tar.gz) or [zipball](https://github.com/saschazelzer/CppMicroServices/archive/v1.0.0.zip))
+
+You can also git clone the [CppMicroServices](https://github.com/saschazelzer/CppMicroServices)
 repository
 
     git clone git://github.com/saschazelzer/CppMicroServices.git
 
-or download the current sources as a compressed archive:
+or download the latest sources as a compressed archive:
 
 - Current source ([tarball](https://github.com/saschazelzer/CppMicroServices/tarball/master) or [zipball](https://github.com/saschazelzer/CppMicroServices/zipball/master))
 

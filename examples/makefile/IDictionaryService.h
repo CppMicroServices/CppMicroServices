@@ -5,11 +5,17 @@
 
 #include <string>
 
+#ifdef MODULE_EXPORTS
+  #define MODULE_EXPORT US_ABI_EXPORT
+#else
+  #define MODULE_EXPORT US_ABI_IMPORT
+#endif
+
 /**
  * A simple service interface that defines a dictionary service.
  * A dictionary service simply verifies the existence of a word.
  **/
-struct IDictionaryService
+struct MODULE_EXPORT IDictionaryService
 {
   virtual ~IDictionaryService();
 

@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g -Wall -Wno-unused -pedantic -fPIC
+CXXFLAGS = -g -Wall -Wno-unused -pedantic -fPIC $(CppMicroServices_CXX_FLAGS)
 LDFLAGS = -Wl,-rpath=$(CppMicroServices_ROOT)/lib -Wl,-rpath=.
 LDLIBS = -lCppMicroServices
 
@@ -14,8 +14,11 @@ main: libmodule.so main.o
 libmodule.so: module.o IDictionaryService.o
 	$(CXX) -shared -o $@ $^ $(CXXFLAGS) $(LDFLAGS) $(INCLUDEDIRS) $(LIBDIRS) $(LDLIBS)
 
-%.o: %.cpp
+main.o: main.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDEDIRS) -c $< -o $@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -DMODULE_EXPORTS $(INCLUDEDIRS) -c $< -o $@
 
 .PHONY : clean
 

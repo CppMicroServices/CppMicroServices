@@ -8,7 +8,7 @@
 
 US_USE_NAMESPACE
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char* /*argv*/[])
 {
   ServiceReference dictionaryServiceRef = GetModuleContext()->GetServiceReference<IDictionaryService>();
   if (dictionaryServiceRef)

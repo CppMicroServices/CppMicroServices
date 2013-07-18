@@ -13,12 +13,12 @@ usFunctionGenerateModuleInit(_srcs
                              LIBRARY_NAME ${_lib_name})
 
 # Create the library
-add_library(${example_target_prefix}${_lib_name} SHARED ${_srcs})
+add_library(Example-${_lib_name} SHARED ${_srcs})
 
 # Link the CppMicroServices library
-target_link_libraries(${example_target_prefix}${_lib_name} ${CppMicroServices_LIBRARIES})
+target_link_libraries(Example-${_lib_name} ${CppMicroServices_LIBRARIES})
 
-set_target_properties(${example_target_prefix}${_lib_name} PROPERTIES
+set_target_properties(Example-${_lib_name} PROPERTIES
   LABELS Examples
   OUTPUT_NAME ${_lib_name}
 )

@@ -1,14 +1,3 @@
-
-#configure_file(CustomInstallScript.cmake.in ${PROJECT_BINARY_DIR}/CustomInstallScript.cmake)
-
-#set(example_targets )
-#  add_custom_command(TARGET ${_example_target} PRE_BUILD
-#           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-#           COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/CustomInstallScript.cmake
-#           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-#           COMMENT "Running CustomInstallScript.cmake"
-#           VERBATIM)
-
 project(CppMicroServicesExamples)
 
 cmake_minimum_required(VERSION 2.8)
@@ -17,16 +6,44 @@ find_package(CppMicroServices NO_MODULE REQUIRED)
 
 include_directories(${CppMicroServices_INCLUDE_DIRS})
 
+#-----------------------------------------------------------------------------
+# Set C/CXX flags
+#-----------------------------------------------------------------------------
+
+if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CppMicroServices_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CppMicroServices_CXX_FLAGS_RELEASE}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CppMicroServices_CXX_FLAGS_DEBUG}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CppMicroServices_C_FLAGS}")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${CppMicroServices_C_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${CppMicroServices_C_FLAGS_DEBUG}")
+endif()
+
+#-----------------------------------------------------------------------------
+# Init output directories
+#-----------------------------------------------------------------------------
+
+set(CppMicroServicesExamples_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+set(CppMicroServicesExamples_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+set(CppMicroServicesExamples_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+
+foreach(_type ARCHIVE LIBRARY RUNTIME)
+  if(NOT CMAKE_${_type}_OUTPUT_DIRECTORY)
+    set(CMAKE_${_type}_OUTPUT_DIRECTORY ${CppMicroServicesExamples_${_type}_OUTPUT_DIRECTORY})
+  endif()
+endforeach()
+
+
 function(CreateExample _name)
-  add_library(${example_target_prefix}${_name} SHARED ${ARGN})
+  add_library(Example-${_name} SHARED ${ARGN})
   if(${_name}_DEPENDS)
     foreach(_dep ${${_name}_DEPENDS})
       include_directories(${CppMicroServicesExamples_SOURCE_DIR}/${_dep})
-      target_link_libraries(${example_target_prefix}${_name} ${example_target_prefix}${_dep})
+      target_link_libraries(Example-${_name} Example-${_dep})
     endforeach()
   endif()
-  target_link_libraries(${example_target_prefix}${_name} ${CppMicroServices_LIBRARIES})
-  set_target_properties(${example_target_prefix}${_name} PROPERTIES
+  target_link_libraries(Example-${_name} ${CppMicroServices_LIBRARIES})
+  set_target_properties(Example-${_name} PROPERTIES
     LABELS Examples
     OUTPUT_NAME ${_name}
   )
@@ -105,7 +122,7 @@ if(US_BUILD_TESTING)
              COMMAND ${MAKE_COMMAND})
     set_tests_properties(usMakefileExampleTest PROPERTIES
                          DEPENDS "usMakefileExampleCleanTest;usInstallTest"
-                         ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX}")
+                         ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};CppMicroServices_CXX_FLAGS=${CppMicroServices_CXX_FLAGS}")
     list(APPEND _example_tests usMakefileExampleCleanTest usMakefileExampleTest)
   endif()
 

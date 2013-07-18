@@ -28,6 +28,7 @@
 #include "usModuleRegistry.h"
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
+#include "usModuleManifest_p.h"
 #include "usModuleResourceTree_p.h"
 
 #include "usAtomicInt_p.h"
@@ -70,6 +71,7 @@ public:
   ModuleInfo info;
 
   std::vector<ModuleResourceTree*> resourceTreePtrs;
+  std::map<std::string, ModuleResourceTree*> mapLibNameToResourceTrees;
 
   /**
    * ModuleContext for the module
@@ -78,7 +80,7 @@ public:
 
   ModuleActivator* moduleActivator;
 
-  std::map<std::string, std::string> properties;
+  ModuleManifest moduleManifest;
 
   Module* const q;
 

@@ -4,6 +4,7 @@
 
 set(_srcs
   util/usAny.cpp
+  util/jsoncpp.cpp
   util/usSharedLibrary.cpp
   util/usThreads.cpp
   util/usUncompressResourceData.c
@@ -33,6 +34,7 @@ set(_srcs
   module/usModule.cpp
   module/usModuleEvent.cpp
   module/usModuleInfo.cpp
+  module/usModuleManifest.cpp
   module/usModulePrivate.cpp
   module/usModuleRegistry.cpp
   module/usModuleResource.cpp
@@ -130,10 +132,13 @@ if(NOT US_IS_EMBEDDED)
   endif()
 
   usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME})
+  usFunctionEmbedResources(_srcs LIBRARY_NAME ${PROJECT_NAME}
+                           ROOT_DIR resources
+                           FILES manifest.json)
 
   add_library(${PROJECT_NAME} ${_srcs}
               ${_public_headers} ${_private_headers} ${us_config_h_file})
-  if(NOT US_IS_EMBEDDED AND US_LINK_FLAGS)
+  if(US_LINK_FLAGS)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${US_LINK_FLAGS}")
   endif()
   set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)

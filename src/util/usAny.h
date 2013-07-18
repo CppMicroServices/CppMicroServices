@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <sstream>
 #include <vector>
 #include <list>
+#include <map>
 
 #include <usConfig.h>
 
@@ -381,6 +382,7 @@ const ValueType* unsafe_any_cast(const Any* operand)
 }
 
 US_EXPORT std::string any_value_to_string(const std::vector<Any>& val);
+US_EXPORT std::string any_value_to_string(const std::map<std::string, Any>& val);
 
 template<class T>
 std::string any_value_to_string(const T& val)

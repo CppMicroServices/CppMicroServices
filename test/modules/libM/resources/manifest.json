@@ -1,0 +1,16 @@
+{
+  "module.name": "TestModuleM Module",
+  "module.description": "My Module description",
+  "module.version": "1.0.0",
+  "number": 5,
+  "vector": [
+    "first",
+    2,
+    "third"
+    ],
+  "map": {
+    "string": "hi",
+    "number": 4,
+    "list": [ "a", "b" ]
+    }
+}

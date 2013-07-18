@@ -53,4 +53,21 @@ std::string any_value_to_string(const std::vector<Any>& val)
   return container_to_string(val.begin(), val.end());
 }
 
+std::string any_value_to_string(const std::map<std::string, Any>& val)
+{
+  std::stringstream ss;
+  ss << "[";
+  typedef std::map<std::string, Any>::const_iterator Iterator;
+  Iterator i1 = val.begin();
+  const Iterator begin = i1;
+  const Iterator end = val.end();
+  for ( ; i1 != end; ++i1)
+  {
+    if (i1 == begin) ss << "\"" << i1->first << "\" => " << i1->second;
+    else ss << ", " << "\"" << i1->first << "\" => " << i1->second;
+  }
+  ss << "]";
+  return ss.str();
+}
+
 US_END_NAMESPACE

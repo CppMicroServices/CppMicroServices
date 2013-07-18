@@ -62,6 +62,7 @@ Micro Services library:
 \endif
 - \subpage MicroServices_TheModuleContext
 - \subpage MicroServices_Resources
+- \subpage MicroServices_ModuleProperties
 - \subpage MicroServices_AutoLoading
 - \subpage MicroServices_StaticModules
 - \subpage MicroServices_EmulateSingleton
@@ -117,6 +118,7 @@ The links in the following list point to important
 \endif
 - \ref MicroServices_TheModuleContext
 - \ref MicroServices_Resources
+- \ref MicroServices_ModuleProperties
 - \ref MicroServices_AutoLoading
 - \ref MicroServices_StaticModules
 - \ref MicroServices_EmulateSingleton

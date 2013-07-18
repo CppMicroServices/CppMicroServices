@@ -36,13 +36,12 @@ set(_tests
   usServiceRegistryPerformanceTest
   usServiceRegistryTest
   usServiceTrackerTest
-  usSharedLibraryTest
   usStaticModuleResourceTest
   usStaticModuleTest
 )
 
 if(US_BUILD_SHARED_LIBS)
-  list(APPEND _tests usServiceListenerTest)
+  list(APPEND _tests usServiceListenerTest usModuleManifestTest usSharedLibraryTest)
   if(US_ENABLE_AUTOLOADING_SUPPORT)
     list(APPEND _tests usModuleAutoLoadTest)
   endif()
@@ -57,7 +56,7 @@ set(_test_driver ${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
-usFunctionEmbedResources(_srcs EXECUTABLE_NAME ${_test_driver} FILES usTestResource.txt)
+usFunctionEmbedResources(_srcs EXECUTABLE_NAME ${_test_driver} FILES usTestResource.txt manifest.json)
 
 # Generate a custom "module init" file for the test driver executable
 if(US_BUILD_SHARED_LIBS)

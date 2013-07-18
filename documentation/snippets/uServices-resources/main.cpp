@@ -51,7 +51,7 @@ void extenderPattern()
   for(std::size_t i = 0; i < modules.size(); ++i)
   {
     Module* const module = modules[i];
-    std::string componentPath = module->GetProperty("service-component");
+    std::string componentPath = module->GetProperty("service-component").ToString();
     if (!componentPath.empty())
     {
       ModuleResource componentResource = module->GetResource(componentPath);

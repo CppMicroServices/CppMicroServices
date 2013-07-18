@@ -277,6 +277,7 @@ private:
                  const std::vector<ModuleResourceTree*>& resourceTrees);
 
   friend class Module;
+  friend class ModulePrivate;
 
   US_HASH_FUNCTION_FRIEND(ModuleResource);
 

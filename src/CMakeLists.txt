@@ -142,7 +142,10 @@ if(NOT US_IS_EMBEDDED)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${US_LINK_FLAGS}")
   endif()
   set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)
-  set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+                        FRAMEWORK 1
+                        SOVERSION ${${PROJECT_NAME}_VERSION}
+                       )
   if(US_LINK_LIBRARIES)
     target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})
   endif()

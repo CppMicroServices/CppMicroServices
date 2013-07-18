@@ -136,7 +136,11 @@ void SharedLibrary::Load(int flags)
 void SharedLibrary::Load()
 {
 #ifdef US_PLATFORM_POSIX
+#ifdef US_GCC_RTTI_WORKAROUND_NEEDED
+  Load(RTLD_LAZY | RTLD_GLOBAL);
+#else
   Load(RTLD_LAZY | RTLD_LOCAL);
+#endif
 #else
   Load(0);
 #endif

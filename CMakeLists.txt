@@ -271,6 +271,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     # Enable visibility support
     if(NOT ${GCC_VERSION} VERSION_LESS "4.5")
       usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" US_CXX_FLAGS)
+    else()
+      set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
     endif()
   endif()
 

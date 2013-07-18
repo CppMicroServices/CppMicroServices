@@ -256,6 +256,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
   usFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
 
+  if(${GCC_VERSION} VERSION_LESS "4.0.0")
+    message(FATAL_ERROR "gcc version ${GCC_VERSION} not supported. Please use gcc >= 4.")
+  endif()
+
   # With older versions of gcc the flag -fstack-protector-all requires an extra dependency to libssp.so.
   # If the gcc version is lower than 4.4.0 and the build type is Release let's not include the flag.
   if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))

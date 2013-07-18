@@ -68,6 +68,7 @@ void frame02a()
 
   SharedLibrary target(LIB_PATH, "TestModuleA");
 
+#ifdef US_BUILD_SHARED_LIBS
   // Start the test target
   try
   {
@@ -79,7 +80,6 @@ void frame02a()
                         << e.what() << " + in frameSL02a:FAIL" );
   }
 
-#ifdef US_BUILD_SHARED_LIBS
   Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 #endif
@@ -113,6 +113,7 @@ void frame005a(ModuleContext* mc)
   US_TEST_CONDITION(ModuleVersion(0,1,0) == m->GetVersion(), "Test module version")
 #else
   US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name");
+  std::cout << "**** CppMicroServices version is: " << m->GetVersion() << std::endl;
   US_TEST_CONDITION(ModuleVersion(0,9,0) == m->GetVersion(), "Test module version")
 #endif
 }
@@ -152,7 +153,9 @@ void frame018a(ModuleContext* mc)
 
 // Load libA and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libA)
+void frame020a(ModuleContext* mc, TestModuleListener& listener,
+#ifdef US_BUILD_SHARED_LIBS
+               SharedLibrary& libA)
 {
   try
   {
@@ -163,11 +166,13 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-#ifdef US_BUILD_SHARED_LIBS
   Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA Module", "Test module name")
+#else
+               SharedLibrary& /*libA*/)
+{
 #endif
 
   // Check if libA registered the expected service

@@ -46,7 +46,9 @@ namespace {
 
 // Load libTestModuleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libB)
+void frame020a(ModuleContext* mc, TestModuleListener& listener,
+#ifdef US_BUILD_SHARED_LIBS
+               SharedLibrary& libB)
 {
   try
   {
@@ -57,11 +59,13 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-#ifdef US_BUILD_SHARED_LIBS
   Module* moduleB = ModuleRegistry::GetModule("TestModuleB Module");
   US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
 
-  US_TEST_CONDITION(moduleB->GetName() == "TestModuleB Module", "Test module name")
+      US_TEST_CONDITION(moduleB->GetName() == "TestModuleB Module", "Test module name")
+#else
+               SharedLibrary& /*libB*/)
+{
 #endif
 
   // Check if libB registered the expected service

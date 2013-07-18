@@ -47,6 +47,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   ModuleContext* mc = GetModuleContext();
   SharedLibrary libS(LIB_PATH, "TestModuleS");
 
+#ifdef US_BUILD_SHARED_LIBS
   // Start the test target to get a service published.
   try
   {
@@ -56,6 +57,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   {
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what() );
   }
+#endif
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 

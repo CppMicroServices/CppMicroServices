@@ -1,3 +1,6 @@
 *~
+*.o
+*.so
 CMakeLists.txt.user*
 gh-pages
+examples/makefile/main

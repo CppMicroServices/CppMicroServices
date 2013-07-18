@@ -36,5 +36,5 @@ struct MyStaticModuleActivator : public ModuleActivator
 
 US_EXPORT_MODULE_ACTIVATOR(MyStaticModule, MyStaticModuleActivator)
 
-US_INITIALIZE_MODULE("My Static Module", "MyStaticModule", "", "1.0.0")
+US_INITIALIZE_MODULE("My Static Module", "MyStaticModule")
 

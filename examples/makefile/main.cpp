@@ -23,4 +23,4 @@ int main(int argc, char* argv[])
 
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_MODULE("main", "", "", "1.0.0")
+US_INITIALIZE_EXECUTABLE("main")

@@ -672,6 +672,7 @@ WARN_LOGFILE           =
 INPUT                  = @PROJECT_SOURCE_DIR@ \
                          @PROJECT_SOURCE_DIR@/CMake/usFunctionEmbedResources.cmake \
                          @PROJECT_SOURCE_DIR@/CMake/usFunctionGenerateModuleInit.cmake \
+                         @PROJECT_SOURCE_DIR@/CMake/usFunctionGenerateExecutableInit.cmake \
                          @PROJECT_BINARY_DIR@/include/usConfig.h
 
 # This tag can be used to specify the character encoding of the source files

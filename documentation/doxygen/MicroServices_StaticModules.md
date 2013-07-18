@@ -20,9 +20,9 @@ the `US_STATIC_MODULE` preprocessor macro is defined when building a module stat
 
 Static modules can be used (imported) in shared or other static libraries or in the executable itself.
 Assuming that a static module makes use of the CppMicroServices API (e.g. by registering some services
-using a ModuleContext), the importing library or executable needs to put a call to the `#US_INITIALIZE_MODULE` macro
-somewhere in its source code. This ensures the availability of a module context which is shared with all
-imported static libraries (see also \ref MicroServices_StaticModules_Context).
+using a ModuleContext), the importing library or executable needs to put a call to the `#US_INITIALIZE_MODULE`
+or the `#US_INITIALIZE_EXECUTABLE` macro somewhere in its source code. This ensures the availability of
+a module context which is shared with all imported static libraries (see also \ref MicroServices_StaticModules_Context).
 
 \note Note that if your static module does not export a module activator by using the macro
 `#US_EXPORT_MODULE_ACTIVATOR` or does not contain embedded resources (see \ref MicroServices_Resources) you
@@ -45,9 +45,9 @@ There are two main usage scenarios which are explained below together with some 
 
 Building the CppMicroServices library as a shared library allows you to import static modules into other
 shared or static modules or into the executable. As noted above, the importing shared module or executable
-needs to provide a module context by calling the `#US_INITIALIZE_MODULE` macro. Additionally, you must ensure
-to use the `#US_LOAD_IMPORTED_MODULES_INTO_MAIN` macro instead of `#US_LOAD_IMPORTED_MODULES` when importing
-static modules into an executable.
+needs to provide a module context by calling the `#US_INITIALIZE_MODULE` or `#US_INITIALIZE_EXECUTABLE` macro.
+Additionally, you must ensure to use the `#US_LOAD_IMPORTED_MODULES_INTO_MAIN` macro instead of
+`#US_LOAD_IMPORTED_MODULES` when importing static modules into an executable.
 
 Example code for importing the two static modules `MyStaticModule1` and `MyStaticModule2` into an executable:
 
@@ -61,8 +61,7 @@ Having a shared CppMicroServices library, the executable also needs some initial
 
 \snippet uServices-staticmodules/main.cpp InitializeExecutable
 
-Note that shared (but not static) modules also need the `#US_INITIALIZE_MODULE` call when importing static modules,
-but can omit the US_BUILD_SHARED_LIBS guard.
+Note that shared (but not static) modules also need the `#US_INITIALIZE_MODULE` call when importing static modules.
 
 ## Using a Static CppMicroServices Library
 
@@ -83,7 +82,7 @@ will be shared across all modules and the executable).
 Modules using the CppMicroServices API frequently need a `ModuleContext` object to query, retrieve, and register services.
 Static modules will never get their own module context but will share the context with their importing module or
 executable. Therefore, the importing module or executable needs to ensure the availability of such a context (by using
-the `#US_INITIALIZE_MODULE` macro).
+the `#US_INITIALIZE_MODULE` or `#US_INITIALIZE_EXECUTABLE` macro).
 
 \note The CppMicroServices library will *always* provide a module context, independent of its library build mode.
 

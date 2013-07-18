@@ -60,10 +60,6 @@ public:
 
   CoreModuleContext* const coreCtx;
 
-  std::vector<long> requiresIds;
-
-  std::vector<std::string> requiresLibs;
-
   std::vector<std::string> staticModuleLibNames;
 
   /**

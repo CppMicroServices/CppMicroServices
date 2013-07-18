@@ -18,7 +18,6 @@ set(module_srcs )
 usFunctionGenerateModuleInit(module_srcs
                              NAME "My Module"
                              LIBRARY_NAME "mylibname"
-                             VERSION "1.0.0"
                             )
 add_library(mylib ${module_srcs})
 ~~~

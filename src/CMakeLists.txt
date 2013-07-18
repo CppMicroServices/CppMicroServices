@@ -129,7 +129,7 @@ if(NOT US_IS_EMBEDDED)
     link_directories(${US_LINK_DIRS})
   endif()
 
-  usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME} VERSION "0.9.0")
+  usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME})
 
   add_library(${PROJECT_NAME} ${_srcs}
               ${_public_headers} ${_private_headers} ${us_config_h_file})

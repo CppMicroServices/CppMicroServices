@@ -60,18 +60,8 @@ create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_ex
 usFunctionEmbedResources(_srcs EXECUTABLE_NAME ${_test_driver} FILES usTestResource.txt)
 
 # Generate a custom "module init" file for the test driver executable
-set(MODULE_DEPENDS_STR )
-foreach(_dep ${US_LIBRARY_TARGET} ${US_LINK_LIBRARIES})
-  set(MODULE_DEPENDS_STR "${MODULE_DEPENDS_STR} ${_dep}")
-endforeach()
-
 if(US_BUILD_SHARED_LIBS)
-  usFunctionGenerateModuleInit(_srcs
-                               NAME ${_test_driver}
-                               DEPENDS "${MODULE_DEPENDS_STR}"
-                               VERSION "0.1.0"
-                               EXECUTABLE
-                              )
+  usFunctionGenerateExecutableInit(_srcs IDENTIFIER ${_test_driver})
 endif()
 
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs})

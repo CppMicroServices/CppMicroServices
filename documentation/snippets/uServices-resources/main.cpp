@@ -82,7 +82,5 @@ int main(int /*argc*/, char* /*argv*/[])
   return 0;
 }
 
-#ifdef US_BUILD_SHARED_LIBS
 #include <usModuleInitialization.h>
-US_INITIALIZE_MODULE("uServices-snippet-resources", "", "", "1.0.0")
-#endif
+US_INITIALIZE_EXECUTABLE("uServices-snippet-resources")

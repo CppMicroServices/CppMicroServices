@@ -15,20 +15,11 @@ macro(_us_create_test_module_helper)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
-  target_link_libraries(${name} ${US_LINK_LIBRARIES})
-  if(NOT US_ENABLE_SERVICE_FACTORY_SUPPORT)
-    target_link_libraries(${name} ${US_LIBRARY_TARGET})
-  endif()
+  target_link_libraries(${name} ${US_LIBRARY_TARGET} ${US_LINK_LIBRARIES})
 
   set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
 
 endmacro()
-
-function(usFunctionCreateTestModuleWithAutoLoadDir name autoload_dir)
-  set(_srcs ${ARGN})
-  usFunctionGenerateModuleInit(_srcs NAME "${name} Module" LIBRARY_NAME ${name} AUTOLOAD_DIR ${autoload_dir})
-  _us_create_test_module_helper()
-endfunction()
 
 function(usFunctionCreateTestModule name)
   set(_srcs ${ARGN})

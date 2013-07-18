@@ -29,6 +29,7 @@ include(usFunctionCheckCompilerFlags)
 include(usFunctionEmbedResources)
 include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
+include(usFunctionGenerateExecutableInit)
 
 #-----------------------------------------------------------------------------
 # Init output directories
@@ -224,6 +225,7 @@ foreach(_namespace_tok ${_bc_token})
 endforeach()
 
 set(${PROJECT_NAME}_MODULE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/usModuleInit.cpp")
+set(${PROJECT_NAME}_EXECUTABLE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/usExecutableInit.cpp")
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -396,8 +398,10 @@ endif()
 
 set(_install_cmake_scripts
   ${${PROJECT_NAME}_MODULE_INIT_TEMPLATE}
+  ${${PROJECT_NAME}_EXECUTABLE_INIT_TEMPLATE}
   ${CMAKE_CURRENT_SOURCE_DIR}/CMake/CMakeParseArguments.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionGenerateModuleInit.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionGenerateExecutableInit.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionEmbedResources.cmake
   )
 

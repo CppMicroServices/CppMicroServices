@@ -48,7 +48,7 @@ macro for details about a module's auto-load directory.
 If module *A* in the example above contains initialization code like
 
 \code
-US_INITIALIZE_MODULE("Module A", "A", "", "1.0.0")
+US_INITIALIZE_MODULE("Module A", "A")
 \endcode
 
 and the module's library is located at

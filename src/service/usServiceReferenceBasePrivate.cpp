@@ -78,7 +78,7 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
             for (std::vector<std::string>::const_iterator i = classes.begin();
                  i != classes.end(); ++i)
             {
-              if (smap.find(*i) == smap.end())
+              if (smap.find(*i) == smap.end() && *i != "org.cppmicroservices.factory")
               {
                 US_WARN << "ServiceFactory produced an object "
                            "that did not implement: " << (*i);

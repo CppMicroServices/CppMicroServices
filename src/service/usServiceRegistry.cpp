@@ -82,12 +82,15 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
     throw std::invalid_argument("Can't register empty InterfaceMap as a service");
   }
 
+  // Check if we got a service factory
+  bool isFactory = service.count("org.cppmicroservices.factory") > 0;
+
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
   for (InterfaceMap::const_iterator i = service.begin();
        i != service.end(); ++i)
   {
-    if (i->first.empty() || i->second == NULL)
+    if (i->first.empty() || (!isFactory && i->second == NULL))
     {
       throw std::invalid_argument("Can't register as null class");
     }

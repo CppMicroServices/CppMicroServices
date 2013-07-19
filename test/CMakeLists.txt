@@ -25,6 +25,7 @@ set(_tests
   usLDAPFilterTest
   usModuleTest
   usModuleResourceTest
+  usServiceFactoryTest
   usServiceRegistryPerformanceTest
   usServiceRegistryTest
   usServiceTrackerTest

@@ -125,7 +125,7 @@ InterfaceMap MakeInterfaceMap(ServiceFactory* factory, InterfaceT<I1>)
   InterfaceMap sim;
   sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
                             static_cast<void*>(factory)));
-  sim.insert(std::make_pair(std::string(us_service_interface_iid<I1>()), NULL));
+  sim.insert(std::make_pair(std::string(us_service_interface_iid<I1>()), static_cast<void*>(NULL)));
   return sim;
 }
 
@@ -138,6 +138,16 @@ InterfaceMap MakeInterfaceMap(S* service, const std::string& interfaceId)
   return sim;
 }
 
+template<class I1>
+I1* ExtractInterface(const InterfaceMap& map, InterfaceT<I1>)
+{
+  InterfaceMap::const_iterator iter = map.find(us_service_interface_iid<I1>());
+  if (iter != map.end())
+  {
+    return reinterpret_cast<I1*>(iter->second);
+  }
+  return NULL;
+}
 
 US_END_NAMESPACE
 

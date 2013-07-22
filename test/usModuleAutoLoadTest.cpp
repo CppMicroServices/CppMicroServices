@@ -25,10 +25,10 @@
 #include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleSettings.h>
+#include <usSharedLibrary.h>
 
 #include <usTestingConfig.h>
 
-#include "usTestUtilSharedLibrary.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 
@@ -37,6 +37,12 @@
 US_USE_NAMESPACE
 
 namespace {
+
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
 
 void testDefaultAutoLoadPath(bool autoLoadEnabled)
 {
@@ -54,7 +60,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
     throw;
   }
 
-  SharedLibraryHandle libAL("TestModuleAL");
+  SharedLibrary libAL(LIB_PATH, "TestModuleAL");
 
   try
   {
@@ -113,7 +119,7 @@ void testCustomAutoLoadPath()
     throw;
   }
 
-  SharedLibraryHandle libAL2("TestModuleAL2");
+  SharedLibrary libAL2(LIB_PATH, "TestModuleAL2");
 
   try
   {

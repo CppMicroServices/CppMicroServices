@@ -12,3 +12,8 @@ add_executable(${US_RCC_EXECUTABLE_NAME} ${srcs})
 if(WIN32)
   target_link_libraries(${US_RCC_EXECUTABLE_NAME} Shlwapi)
 endif()
+
+install(TARGETS ${US_RCC_EXECUTABLE_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        FRAMEWORK DESTINATION . COMPONENT sdk
+        RUNTIME DESTINATION bin COMPONENT sdk)

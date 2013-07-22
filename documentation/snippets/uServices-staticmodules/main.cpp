@@ -29,8 +29,6 @@ int main(int /*argc*/, char* /*argv*/[])
 }
 
 //! [InitializeExecutable]
-#ifdef US_BUILD_SHARED_LIBS
 #include <usModuleInitialization.h>
-US_INITIALIZE_MODULE("MyExecutable", "", "", "1.0.0")
-#endif
+US_INITIALIZE_EXECUTABLE("MyExecutable")
 //! [InitializeExecutable]

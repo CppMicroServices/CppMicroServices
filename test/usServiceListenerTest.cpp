@@ -22,23 +22,29 @@
 #include <usConfig.h>
 
 #include <usTestingMacros.h>
+#include <usTestingConfig.h>
 
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
+#include <usSharedLibrary.h>
 
 #include <usModulePropsInterface.h>
 
-#include "usTestUtilSharedLibrary.h"
-
 US_USE_NAMESPACE
+
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
 
 class TestServiceListener
 {
 
 private:
 
-  friend bool runLoadUnloadTest(const std::string&, int cnt, SharedLibraryHandle&,
+  friend bool runLoadUnloadTest(const std::string&, int cnt, SharedLibrary&,
                                 const std::vector<ServiceEvent::Type>&);
 
   const bool checkUsingModules;
@@ -213,7 +219,7 @@ public:
 
 }; // end of class ServiceListener
 
-bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibraryHandle& target,
+bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibrary& target,
                        const std::vector<ServiceEvent::Type>& events)
 {
   bool teststatus = true;
@@ -302,7 +308,7 @@ void frameSL02a()
                         << " : frameSL02a:FAIL" );
   }
 
-  SharedLibraryHandle target("TestModuleA");
+  SharedLibrary target(LIB_PATH, "TestModuleA");
 
   // Start the test target to get a service published.
   try
@@ -332,7 +338,7 @@ void frameSL05a()
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  SharedLibraryHandle libA("TestModuleA");
+  SharedLibrary libA(LIB_PATH, "TestModuleA");
   bool testStatus = runLoadUnloadTest("FrameSL05a", 1, libA, events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
@@ -342,7 +348,7 @@ void frameSL10a()
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  SharedLibraryHandle libA2("TestModuleA2");
+  SharedLibrary libA2(LIB_PATH, "TestModuleA2");
   bool testStatus = runLoadUnloadTest("FrameSL10a", 1, libA2, events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
@@ -362,9 +368,9 @@ void frameSL25a()
     throw;
   }
 
-  SharedLibraryHandle libSL1("TestModuleSL1");
-  SharedLibraryHandle libSL3("TestModuleSL3");
-  SharedLibraryHandle libSL4("TestModuleSL4");
+  SharedLibrary libSL1(LIB_PATH, "TestModuleSL1");
+  SharedLibrary libSL3(LIB_PATH, "TestModuleSL3");
+  SharedLibrary libSL4(LIB_PATH, "TestModuleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
@@ -385,7 +391,7 @@ void frameSL25a()
   // Start libModuleTestSL1 to ensure that the Service interface is available.
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL1: " << libSL1.GetAbsolutePath() );
+    US_TEST_OUTPUT( << "Starting libModuleTestSL1: " << libSL1.GetFilePath() );
     libSL1.Load();
   }
   catch (const std::exception& e)
@@ -398,7 +404,7 @@ void frameSL25a()
   // us::FooService
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL4: " << libSL4.GetAbsolutePath() );
+    US_TEST_OUTPUT( << "Starting libModuleTestSL4: " << libSL4.GetFilePath() );
     libSL4.Load();
   }
   catch (const std::exception& e)
@@ -410,7 +416,7 @@ void frameSL25a()
   // Start libModuleTestSL3 that will require the serivce interface and get the service
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL3: " << libSL3.GetAbsolutePath() );
+    US_TEST_OUTPUT( << "Starting libModuleTestSL3: " << libSL3.GetFilePath() );
     libSL3.Load();
   }
   catch (const std::exception& e)
@@ -470,7 +476,7 @@ void frameSL25a()
   // Stop the service provider: libSL4
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL4: " << libSL4.GetAbsolutePath() );
+    US_TEST_OUTPUT( << "Stop libSL4: " << libSL4.GetFilePath() );
     libSL4.Unload();
   }
   catch (const std::exception& e)
@@ -507,7 +513,7 @@ void frameSL25a()
   // Stop libSL1
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL1:" << libSL1.GetAbsolutePath() );
+    US_TEST_OUTPUT( << "Stop libSL1:" << libSL1.GetFilePath() );
     libSL1.Unload();
   }
   catch (const std::exception& e)
@@ -519,7 +525,7 @@ void frameSL25a()
   // Stop pSL3
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL3:" << libSL3.GetAbsolutePath() );
+    US_TEST_OUTPUT( << "Stop libSL3:" << libSL3.GetFilePath() );
     libSL3.Unload();
   }
   catch (const std::exception& e)

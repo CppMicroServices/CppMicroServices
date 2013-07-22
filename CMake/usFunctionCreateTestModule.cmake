@@ -15,17 +15,11 @@ macro(_us_create_test_module_helper)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
-  target_link_libraries(${name} ${US_LINK_LIBRARIES})
+  target_link_libraries(${name} ${US_LIBRARY_TARGET} ${US_LINK_LIBRARIES})
 
   set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
 
 endmacro()
-
-function(usFunctionCreateTestModuleWithAutoLoadDir name autoload_dir)
-  set(_srcs ${ARGN})
-  usFunctionGenerateModuleInit(_srcs NAME "${name} Module" LIBRARY_NAME ${name} AUTOLOAD_DIR ${autoload_dir})
-  _us_create_test_module_helper()
-endfunction()
 
 function(usFunctionCreateTestModule name)
   set(_srcs ${ARGN})
@@ -35,7 +29,7 @@ function(usFunctionCreateTestModule name)
 endfunction()
 
 function(usFunctionCreateTestModuleWithResources name)
-  MACRO_PARSE_ARGUMENTS(US_TEST "SOURCES;RESOURCES;RESOURCES_ROOT" "" ${ARGN})
+  cmake_parse_arguments(US_TEST "" "RESOURCES_ROOT" "SOURCES;RESOURCES" "" ${ARGN})
   set(_srcs ${US_TEST_SOURCES})
   set(_res_files ${US_TEST_RESOURCES})
   if(US_TEST_RESOURCES_ROOT)

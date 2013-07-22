@@ -25,11 +25,10 @@
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <usSharedLibrary.h>
 
-#include <usTestingConfig.h>
-
-#include "usTestUtilSharedLibrary.h"
 #include "usTestingMacros.h"
+#include "usTestingConfig.h"
 
 #include <assert.h>
 
@@ -116,7 +115,14 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
 
 #ifdef US_BUILD_SHARED_LIBS
-  SharedLibraryHandle libB("TestModuleB");
+
+#ifdef US_PLATFORM_WINDOWS
+  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
+
+  SharedLibrary libB(LIB_PATH, "TestModuleB");
 
   try
   {

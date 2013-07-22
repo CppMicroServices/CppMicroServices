@@ -42,13 +42,16 @@ For each module being loaded, the following steps are taken:
  - For each auto-load path, all modules in that path with the currently loaded module's
    auto-load directory appended are explicitly loaded.
 
-See the ModuleSettings class for details about auto-load paths and the #US_INITIALIZE_MODULE
-macro for details about a module's auto-load directory.
+See the ModuleSettings class for details about auto-load paths. The auto-load directory of
+a module defaults to the module's library name, but can be customized using a `manifest.json`
+file (see \ref MicroServices_ModuleProperties). For executables, the auto-load directory
+defaults to the special value `main`. This allows third-party modules to be auto-loaded
+during application start-up, without having to reference a special auto-load directory.
 
 If module *A* in the example above contains initialization code like
 
 \code
-US_INITIALIZE_MODULE("Module A", "A", "", "1.0.0")
+US_INITIALIZE_MODULE("Module A", "A")
 \endcode
 
 and the module's library is located at
@@ -66,6 +69,12 @@ module *B* from the example above is located at
 
 it will be loaded when the executable *E* is started and is then able to register its services
 before the executable queries the service registry.
+
+\note If you need to add additional auto-load search paths during application start-up, provide
+a ModuleActivator instance in your executable and call ModuleSettings::AddAutoLoadPath() in
+your executable's ModuleActivator::Load() method. If there are modules inside a `main` sub-directory
+of any of the provided auto-load search paths, these modules will then be auto-loaded before
+your executable's main() function is executed.
 
 Environment Variables
 ---------------------

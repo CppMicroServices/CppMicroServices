@@ -201,14 +201,13 @@ std::string ModuleVersion::ToString() const
 {
   if (undefined) return "undefined";
 
-  std::string result;
-  std::stringstream ss(result);
+  std::stringstream ss;
   ss << majorVersion << SEPARATOR << minorVersion << SEPARATOR << microVersion;
   if (!qualifier.empty())
   {
     ss << SEPARATOR << qualifier;
   }
-  return result;
+  return ss.str();
 }
 
 bool ModuleVersion::operator==(const ModuleVersion& other) const

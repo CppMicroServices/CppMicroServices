@@ -24,14 +24,9 @@
 
 US_BEGIN_NAMESPACE
 
-ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName,
-                       const std::string& autoLoadDir, const std::string& moduleDeps,
-                       const std::string& version)
+ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName)
   : name(name)
   , libName(libName)
-  , moduleDeps(moduleDeps)
-  , version(version)
-  , autoLoadDir(autoLoadDir)
   , id(0)
   , activatorHook(NULL)
 {}

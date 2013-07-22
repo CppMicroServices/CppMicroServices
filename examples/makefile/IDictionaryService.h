@@ -1,17 +1,23 @@
-#ifndef DICTIONARYSERVICE_H
-#define DICTIONARYSERVICE_H
+#ifndef IDICTIONARYSERVICE_H
+#define IDICTIONARYSERVICE_H
 
 #include <usServiceInterface.h>
 
 #include <string>
 
+#ifdef MODULE_EXPORTS
+  #define MODULE_EXPORT US_ABI_EXPORT
+#else
+  #define MODULE_EXPORT US_ABI_IMPORT
+#endif
+
 /**
  * A simple service interface that defines a dictionary service.
  * A dictionary service simply verifies the existence of a word.
  **/
-struct DictionaryService
+struct MODULE_EXPORT IDictionaryService
 {
-  virtual ~DictionaryService() {}
+  virtual ~IDictionaryService();
 
   /**
    * Check for the existence of a word.
@@ -19,9 +25,9 @@ struct DictionaryService
    * @return true if the word is in the dictionary,
    *         false otherwise.
    **/
-  virtual bool checkWord(const std::string& word) = 0;
+  virtual bool CheckWord(const std::string& word) = 0;
 };
 
-US_DECLARE_SERVICE_INTERFACE(DictionaryService, "DictionaryService/1.0")
+US_DECLARE_SERVICE_INTERFACE(IDictionaryService, "IDictionaryService/1.0")
 
 #endif // DICTIONARYSERVICE_H

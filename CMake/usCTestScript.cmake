@@ -53,6 +53,10 @@ function(create_initial_cache var _shared _threading _sf _cxx11 _autoload)
       US_USE_C++11:BOOL=${_cxx11}
       US_ENABLE_AUTOLOADING_SUPPORT:BOOL=${_autoload}
       ")
+  if(_shared)
+    set(_initial_cache "${_initial_cache} US_BUILD_EXAMPLES:BOOL=ON
+      ")
+  endif()
 
   set(${var} ${_initial_cache} PARENT_SCOPE)
 

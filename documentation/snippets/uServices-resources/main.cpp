@@ -51,7 +51,7 @@ void extenderPattern()
   for(std::size_t i = 0; i < modules.size(); ++i)
   {
     Module* const module = modules[i];
-    std::string componentPath = module->GetProperty("service-component");
+    std::string componentPath = module->GetProperty("service-component").ToString();
     if (!componentPath.empty())
     {
       ModuleResource componentResource = module->GetResource(componentPath);
@@ -82,7 +82,5 @@ int main(int /*argc*/, char* /*argv*/[])
   return 0;
 }
 
-#ifdef US_BUILD_SHARED_LIBS
 #include <usModuleInitialization.h>
-US_INITIALIZE_MODULE("uServices-snippet-resources", "", "", "1.0.0")
-#endif
+US_INITIALIZE_EXECUTABLE("uServices-snippet-resources")

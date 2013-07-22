@@ -160,9 +160,9 @@ public:
   std::string GetPath() const;
 
   /**
-   * Returns the resource name including the path.
+   * Returns the resource path including the file name.
    *
-   * @return The resource path include the name.
+   * @return The resource path including the file name.
    * @see GetPath(), GetName() and IsDir()
    */
   std::string GetResourcePath() const;
@@ -277,6 +277,7 @@ private:
                  const std::vector<ModuleResourceTree*>& resourceTrees);
 
   friend class Module;
+  friend class ModulePrivate;
 
   US_HASH_FUNCTION_FRIEND(ModuleResource);
 

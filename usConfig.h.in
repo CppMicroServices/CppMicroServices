@@ -13,6 +13,7 @@
 #cmakedefine US_ENABLE_SERVICE_FACTORY_SUPPORT
 #cmakedefine US_ENABLE_RESOURCE_COMPRESSION
 #cmakedefine US_USE_CXX11
+#cmakedefine US_GCC_RTTI_WORKAROUND_NEEDED
 
 ///-------------------------------------------------------------------
 // Version information
@@ -39,15 +40,9 @@
   #define US_ABI_IMPORT __declspec(dllimport)
   #define US_ABI_LOCAL
 #else
-  #if __GNUC__ >= 4
-    #define US_ABI_EXPORT __attribute__ ((visibility ("default")))
-    #define US_ABI_IMPORT __attribute__ ((visibility ("default")))
-    #define US_ABI_LOCAL  __attribute__ ((visibility ("hidden")))
-  #else
-    #define US_ABI_EXPORT
-    #define US_ABI_IMPORT
-    #define US_ABI_LOCAL
-  #endif
+  #define US_ABI_EXPORT __attribute__ ((visibility ("default")))
+  #define US_ABI_IMPORT __attribute__ ((visibility ("default")))
+  #define US_ABI_LOCAL  __attribute__ ((visibility ("hidden")))
 #endif
 
 #ifdef US_BUILD_SHARED_LIBS
@@ -59,13 +54,9 @@
   #endif
 #else
   // We are building a static lib
-  #if __GNUC__ >= 4
-    // Don't hide RTTI symbols of definitions in the C++ Micro Services
-    // headers that are included in DSOs with hidden visibility
-    #define US_EXPORT US_ABI_EXPORT
-  #else
-    #define US_EXPORT
-  #endif
+  // Don't hide RTTI symbols of definitions in the C++ Micro Services
+  // headers that are included in DSOs with hidden visibility
+  #define US_EXPORT US_ABI_EXPORT
 #endif
 
 //-------------------------------------------------------------------

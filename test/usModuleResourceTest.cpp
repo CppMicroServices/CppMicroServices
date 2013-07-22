@@ -25,10 +25,10 @@
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <usSharedLibrary.h>
 
 #include <usTestingConfig.h>
 
-#include "usTestUtilSharedLibrary.h"
 #include "usTestingMacros.h"
 
 #include <assert.h>
@@ -357,15 +357,17 @@ void testResourceTree(Module* module)
 
   std::vector<std::string> children = res.GetChildren();
   std::sort(children.begin(), children.end());
-  US_TEST_CONDITION_REQUIRED(children.size() == 8, "Check child count")
+  US_TEST_CONDITION_REQUIRED(children.size() == 10, "Check child count")
   US_TEST_CONDITION(children[0] == "dynamic.txt", "Check dynamic.txt child name")
   US_TEST_CONDITION(children[1] == "foo.txt", "Check foo.txt child name")
   US_TEST_CONDITION(children[2] == "icons", "Check icons child name")
-  US_TEST_CONDITION(children[3] == "res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(children[4] == "res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(children[5] == "special_chars.dummy.txt", "Check special_chars.dummy.txt child name")
-  US_TEST_CONDITION(children[6] == "static.txt", "Check static.txt child name")
-  US_TEST_CONDITION(children[7] == "test.xml", "Check test.xml child name")
+  US_TEST_CONDITION(children[3] == "manifest.json", "Check manifest.json child name")
+  US_TEST_CONDITION(children[4] == "manifest.json", "Check manifest.json child name")
+  US_TEST_CONDITION(children[5] == "res.txt", "Check res.txt child name")
+  US_TEST_CONDITION(children[6] == "res.txt", "Check res.txt child name")
+  US_TEST_CONDITION(children[7] == "special_chars.dummy.txt", "Check special_chars.dummy.txt child name")
+  US_TEST_CONDITION(children[8] == "static.txt", "Check static.txt child name")
+  US_TEST_CONDITION(children[9] == "test.xml", "Check test.xml child name")
 
 
   ModuleResource readme = module->GetResource("/icons/readme.txt");
@@ -407,9 +409,9 @@ void testResourceTree(Module* module)
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 10, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 12, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 10, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 12, "Total resource number")
 
 
   // test pattern matching
@@ -483,7 +485,13 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   assert(mc);
 
 #ifdef US_BUILD_SHARED_LIBS
-  SharedLibraryHandle libR("TestModuleR");
+
+#ifdef US_PLATFORM_WINDOWS
+  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
+  SharedLibrary libR(LIB_PATH, "TestModuleR");
 
   try
   {

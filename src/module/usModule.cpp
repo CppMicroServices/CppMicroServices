@@ -47,19 +47,27 @@ const std::string& Module::PROP_LOCATION()
   static const std::string s("module.location");
   return s;
 }
-const std::string& Module::PROP_MODULE_DEPENDS()
-{
-  static const std::string s("module.module_depends");
-  return s;
-}
-const std::string& Module::PROP_LIB_DEPENDS()
-{
-  static const std::string s("module.lib_depends");
-  return s;
-}
 const std::string& Module::PROP_VERSION()
 {
   static const std::string s("module.version");
+  return s;
+}
+
+const std::string&Module::PROP_VENDOR()
+{
+  static const std::string s("module.vendor");
+  return s;
+}
+
+const std::string&Module::PROP_DESCRIPTION()
+{
+  static const std::string s("module.description");
+  return s;
+}
+
+const std::string&Module::PROP_AUTOLOAD_DIR()
+{
+  static const std::string s("module.autoload_dir");
   return s;
 }
 
@@ -220,10 +228,40 @@ ModuleVersion Module::GetVersion() const
   return d->version;
 }
 
-std::string Module::GetProperty(const std::string& key) const
+Any Module::GetProperty(const std::string& key) const
 {
-  if (d->properties.count(key) == 0) return "";
-  return d->properties[key];
+  return d->moduleManifest.GetValue(key);
+}
+
+std::vector<std::string> Module::GetPropertyKeys() const
+{
+  return d->moduleManifest.GetKeys();
+}
+
+std::vector<ServiceReferenceU> Module::GetRegisteredServices() const
+{
+  std::vector<ServiceRegistrationBase> sr;
+  std::vector<ServiceReferenceU> res;
+  d->coreCtx->services.GetRegisteredByModule(d, sr);
+  for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
+       i != sr.end(); ++i)
+  {
+    res.push_back(i->GetReference());
+  }
+  return res;
+}
+
+std::vector<ServiceReferenceU> Module::GetServicesInUse() const
+{
+  std::vector<ServiceRegistrationBase> sr;
+  std::vector<ServiceReferenceU> res;
+  d->coreCtx->services.GetUsedByModule(const_cast<Module*>(this), sr);
+  for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
+       i != sr.end(); ++i)
+  {
+    res.push_back(i->GetReference());
+  }
+  return res;
 }
 
 ModuleResource Module::GetResource(const std::string& path) const

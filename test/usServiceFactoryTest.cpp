@@ -19,16 +19,26 @@
 
 =============================================================================*/
 
-#include "usTestingMacros.h"
-
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usModule.h>
 #include <usModuleRegistry.h>
+#include <usSharedLibrary.h>
 
-#include "usTestUtilSharedLibrary.h"
+#include "usTestingMacros.h"
+#include "usTestingConfig.h"
 
 US_USE_NAMESPACE
+
+namespace {
+
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
+
+} // end unnamed namespace
 
 void TestServiceFactoryModuleScope()
 {
@@ -36,8 +46,9 @@ void TestServiceFactoryModuleScope()
   // Install and start test module H, a service factory and test that the methods
   // in that interface works.
 
-  SharedLibraryHandle target("TestModuleH");
+  SharedLibrary target(LIB_PATH, "TestModuleH");
 
+#ifdef US_BUILD_SHARED_LIBS
   try
   {
     target.Load();
@@ -47,7 +58,6 @@ void TestServiceFactoryModuleScope()
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
   }
 
-#ifdef US_BUILD_SHARED_LIBS
   Module* moduleH = ModuleRegistry::GetModule("TestModuleH Module");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
 #endif

@@ -17,15 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usConfig.h>
 
 #include <usTestingMacros.h>
+#include <usTestingConfig.h>
 
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usServiceInterface.h>
 #include <usServiceTracker.h>
+#include <usSharedLibrary.h>
 
 #include "usServiceControlInterface.h"
-#include "usTestUtilSharedLibrary.h"
 
 #include <memory>
 
@@ -59,9 +60,16 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTrackerTest")
 
-  ModuleContext* mc = GetModuleContext();
-  SharedLibraryHandle libS("TestModuleS");
+#ifdef US_PLATFORM_WINDOWS
+  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
 
+  ModuleContext* mc = GetModuleContext();
+  SharedLibrary libS(LIB_PATH, "TestModuleS");
+
+#ifdef US_BUILD_SHARED_LIBS
   // Start the test target to get a service published.
   try
   {
@@ -71,6 +79,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   {
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what() );
   }
+#endif
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 

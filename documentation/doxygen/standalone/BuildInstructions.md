@@ -7,14 +7,15 @@ platform and IDE specific project files.
 The library should compile on many different platforms. Below is a list of tested compiler/OS combinations:
 
   - GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)
-  - Visual Studio 2008 and 2010
-  - Clang 3.0 (Ubuntu 11.04 and MacOS X 10.6)
+  - GCC 4.7 (Ubuntu 12.10)
+  - Visual Studio 2008, 2010, and 2012
+  - Clang 3.0 (Ubuntu 12.10 and MacOS X 10.6)
 
 
 Prerequisites
 -------------
 
-- [CMake][cmake] 2.8 (Visual Studio 2010 users should use the latest CMake version available)
+- [CMake][cmake] 2.8 (Visual Studio 2010 and 2012 users should use the latest CMake version available)
 
 
 Configuring the Build
@@ -24,21 +25,23 @@ When building the C++ Micro Services library, you have a few configuration optio
 
 ### General build options
 
+- **CMAKE_INSTALL_PREFIX**
+  The installation path.
 - **US_BUILD_SHARED_LIBS**
-  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules for detailed
-  information about static CppMicroServices modules.
+  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules
+  for detailed information about static CppMicroServices modules.
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
 - **US_ENABLE_AUTOLOADING_SUPPORT**
-  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading for
-  detailed information about this feature.
+  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading
+  for detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
-  Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) to make
-  the API thread-safe. If you are application is not multi-threaded, turn this option OFF to get maximum
-  performance.
+  Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives)
+  to make the API thread-safe. If you are application is not multi-threaded, turn this option OFF
+  to get maximum performance.
 - **US_USE_C++11 (advanced)**
-  Enable the usage of C++11 constructs
-- **US_ENABLE_RESOURCE_COMPRESSION**
+  Enable the usage of C++11 constructs.
+- **US_ENABLE_RESOURCE_COMPRESSION (advanced)**
   Enable compression of embedded resources. See \ref MicroServices_Resources for detailed information
   about the resource system.
 

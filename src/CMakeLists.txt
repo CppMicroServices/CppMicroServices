@@ -4,9 +4,11 @@
 
 set(_srcs
   util/usAny.cpp
+  util/jsoncpp.cpp
+  util/usSharedLibrary.cpp
+  util/usThreads.cpp
   util/usUncompressResourceData.c
   util/usUncompressResourceData.cpp
-  util/usThreads.cpp
   util/usUtils.cpp
 
   service/usLDAPExpr.cpp
@@ -32,6 +34,7 @@ set(_srcs
   module/usModule.cpp
   module/usModuleEvent.cpp
   module/usModuleInfo.cpp
+  module/usModuleManifest.cpp
   module/usModulePrivate.cpp
   module/usModuleRegistry.cpp
   module/usModuleResource.cpp
@@ -72,6 +75,7 @@ set(_private_headers
 set(_public_headers
   util/usAny.h
   util/usSharedData.h
+  util/usSharedLibrary.h
   util/usUncompressResourceData.h
 
   service/usLDAPFilter.h
@@ -119,17 +123,22 @@ endif()
 if(NOT US_IS_EMBEDDED)
   include_directories(${US_INTERNAL_INCLUDE_DIRS})
 
-  usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME} VERSION "0.9.0")
+  usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME})
+  usFunctionEmbedResources(_srcs LIBRARY_NAME ${PROJECT_NAME}
+                           ROOT_DIR resources
+                           FILES manifest.json)
 
   add_library(${PROJECT_NAME} ${_srcs}
               ${_public_headers} ${_private_headers} ${us_config_h_file})
-  if(NOT US_IS_EMBEDDED AND US_LINK_FLAGS)
+  if(US_LINK_FLAGS)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${US_LINK_FLAGS}")
   endif()
   set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT)
-  set_property(TARGET ${PROJECT_NAME} PROPERTY FRAMEWORK 1)
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+                        SOVERSION ${${PROJECT_NAME}_VERSION}
+                       )
   if(US_LINK_LIBRARIES)
-    target_link_libraries(${PROJECT_NAME} ${_link_libraries})
+    target_link_libraries(${PROJECT_NAME} ${US_LINK_LIBRARIES})
   endif()
 endif()
 
@@ -168,11 +177,12 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(NOT US_IS_EMBEDDED)
-  install(TARGETS ${PROJECT_NAME} FRAMEWORK DESTINATION .
-                                  RUNTIME DESTINATION bin
-                                  LIBRARY DESTINATION lib
-                                  ARCHIVE DESTINATION lib
-                                  PUBLIC_HEADER DESTINATION include
-                                  PRIVATE_HEADER DESTINATION include)
+  install(TARGETS ${PROJECT_NAME}
+          EXPORT ${PROJECT_NAME}Targets
+          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} COMPONENT sdk
+          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT sdk
+          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} COMPONENT sdk
+          PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} COMPONENT sdk
+          PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} COMPONENT sdk)
 endif()
 

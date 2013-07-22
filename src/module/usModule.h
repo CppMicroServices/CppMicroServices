@@ -29,11 +29,17 @@
 
 US_BEGIN_NAMESPACE
 
+class Any;
 class CoreModuleContext;
 struct ModuleInfo;
 class ModuleContext;
 class ModuleResource;
 class ModulePrivate;
+
+template<class S>
+class ServiceReference;
+
+typedef ServiceReference<void> ServiceReferenceU;
 
 /**
  * \ingroup MicroServices
@@ -74,12 +80,66 @@ class US_EXPORT Module
 
 public:
 
+  /**
+   * Returns the property key for looking up this module's id.
+   * The property value is of type \c long.
+   *
+   * @return The id property key.
+   */
   static const std::string& PROP_ID();
+
+  /**
+   * Returns the property key for looking up this module's name.
+   * The property value is of type \c std::string.
+   *
+   * @return The name property key.
+   */
   static const std::string& PROP_NAME();
+
+  /**
+   * Returns the property key for looking up this module's
+   * location the file system.
+   * The property value is of type \c std::string.
+   *
+   * @return The location property key.
+   */
   static const std::string& PROP_LOCATION();
-  static const std::string& PROP_MODULE_DEPENDS();
-  static const std::string& PROP_LIB_DEPENDS();
+
+  /**
+   * Returns the property key with a value of \c module.version for looking
+   * up this module's version identifier.
+   * The property value is of type \c std::string.
+   *
+   * @return The version property key.
+   */
   static const std::string& PROP_VERSION();
+
+  /**
+   * Returns the property key with a value of \c module.vendor for looking
+   * up this module's vendor information.
+   * The property value is of type \c std::string.
+   *
+   * @return The version property key.
+   */
+  static const std::string& PROP_VENDOR();
+
+  /**
+   * Returns the property key with a value of \c module.description for looking
+   * up this module's description.
+   * The property value is of type \c std::string.
+   *
+   * @return The version property key.
+   */
+  static const std::string& PROP_DESCRIPTION();
+
+  /**
+   * Returns the property key with a value of \c module.autoload_dir for looking
+   * up this module's auto-load directory.
+   * The property value is of type \c std::string.
+   *
+   * @return The version property key.
+   */
+  static const std::string& PROP_AUTOLOAD_DIR();
 
   ~Module();
 
@@ -174,13 +234,54 @@ public:
 
   /**
    * Returns the value of the specified property for this module. The
-   * method returns an empty string if the property is not found.
+   * method returns an empty Any if the property is not found.
    *
    * @param key The name of the requested property.
    * @return The value of the requested property, or an empty string
    *         if the property is undefined.
+   *
+   * @sa GetPropertyKeys()
+   * @sa \ref MicroServices_ModuleProperties
    */
-  std::string GetProperty(const std::string& key) const;
+  Any GetProperty(const std::string& key) const;
+
+  /**
+   * Returns a list of top-level property keys for this module.
+   *
+   * @return A list of available property keys.
+   *
+   * @sa \ref MicroServices_ModuleProperties
+   */
+  std::vector<std::string> GetPropertyKeys() const;
+
+  /**
+   * Returns this module's ServiceReference list for all services it
+   * has registered or an empty list if this module has no registered
+   * services.
+   *
+   * The list is valid at the time of the call to this method, however,
+   * as the framework is a very dynamic environment, services can be
+   * modified or unregistered at anytime.
+   *
+   * @return A list of ServiceReference objects for services this
+   * module has registered.
+   */
+  std::vector<ServiceReferenceU> GetRegisteredServices() const;
+
+  /**
+   * Returns this module's ServiceReference list for all services it is
+   * using or returns an empty list if this module is not using any
+   * services. A module is considered to be using a service if its use
+   * count for that service is greater than zero.
+   *
+   * The list is valid at the time of the call to this method, however,
+   * as the framework is a very dynamic environment, services can be
+   * modified or unregistered at anytime.
+   *
+   * @return A list of ServiceReference objects for all services this
+   * module is using.
+   */
+  std::vector<ServiceReferenceU> GetServicesInUse() const;
 
   /**
    * Returns the resource at the specified \c path in this module.

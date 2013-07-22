@@ -26,6 +26,8 @@
 #include "usModule.h"
 #include "usModuleActivator.h"
 #include "usModuleUtils_p.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 #include "usCoreModuleContext_p.h"
 #include "usServiceRegistration.h"
 #include "usServiceReferenceBasePrivate.h"
@@ -72,58 +74,75 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
 
   InitializeResources(location);
 
-  std::stringstream propId;
-  propId << this->info.id;
-  properties[Module::PROP_ID()] = propId.str();
-
-  std::stringstream propModuleDepends;
-  std::stringstream propLibDepends;
-
-  int counter = 0;
-  int counter2 = 0;
-  std::stringstream ss(this->info.moduleDeps);
-  while (ss)
+  // Check if the module provides a manifest.json file and if yes, parse it.
+  ModuleResource manifestRes;
+  std::map<std::string, ModuleResourceTree*>::iterator resourceTreeIter = mapLibNameToResourceTrees.find(this->info.libName);
+  if (resourceTreeIter != mapLibNameToResourceTrees.end() && resourceTreeIter->second->IsValid())
   {
-    std::string moduleDep;
-    ss >> moduleDep;
-    if (!moduleDep.empty())
+    manifestRes = ModuleResource("/manifest.json", resourceTreeIter->second, resourceTreePtrs);
+    if (manifestRes)
     {
-      Module* dep = ModuleRegistry::GetModule(moduleDep);
-      if (dep)
+      ModuleResourceStream manifestStream(manifestRes);
+      try
       {
-        requiresIds.push_back(dep->GetModuleId());
-        if (counter > 0) propModuleDepends << ", ";
-        propModuleDepends << moduleDep;
-        ++counter;
+        moduleManifest.Parse(manifestStream);
       }
-      else
+      catch (const std::exception& e)
       {
-        requiresLibs.push_back(moduleDep);
-        if (counter2 > 0) propLibDepends << ", ";
-        propLibDepends << moduleDep;
-        ++counter2;
+        US_ERROR << "Parsing of manifest.json for module " << info->location << " failed: " << e.what();
       }
     }
   }
 
-  properties[Module::PROP_MODULE_DEPENDS()] = propModuleDepends.str();
-  properties[Module::PROP_LIB_DEPENDS()] = propLibDepends.str();
-
-  if (!this->info.version.empty())
+  // Check if we got version information and validate the version identifier
+  if (moduleManifest.Contains(Module::PROP_VERSION()))
   {
+    Any versionAny = moduleManifest.GetValue(Module::PROP_VERSION());
+    std::string errMsg;
+    if (versionAny.Type() != typeid(std::string))
+    {
+      errMsg = std::string("The version identifier must be a string");
+    }
     try
     {
-      version = ModuleVersion(this->info.version);
-      properties[Module::PROP_VERSION()] = this->info.version;
+      version = ModuleVersion(versionAny.ToString());
     }
     catch (const std::exception& e)
     {
-      throw std::invalid_argument(std::string("CppMicroServices module does not specify a valid version identifier. Got exception: ") + e.what());
+      errMsg = std::string("The version identifier is invalid: ") + e.what();
+    }
+
+    if (!errMsg.empty())
+    {
+      throw std::invalid_argument(std::string("The Json value for ") + Module::PROP_VERSION() + " for module " +
+                                  info->location + " is not valid: " + errMsg);
     }
   }
 
-  properties[Module::PROP_LOCATION()] = this->info.location;
-  properties[Module::PROP_NAME()] = this->info.name;
+  std::stringstream propId;
+  propId << this->info.id;
+  moduleManifest.SetValue(Module::PROP_ID(), propId.str());
+  moduleManifest.SetValue(Module::PROP_LOCATION(), this->info.location);
+  moduleManifest.SetValue(Module::PROP_NAME(), this->info.name);
+
+  if (moduleManifest.Contains(Module::PROP_AUTOLOAD_DIR()))
+  {
+    this->info.autoLoadDir = moduleManifest.GetValue(Module::PROP_AUTOLOAD_DIR()).ToString();
+  }
+  else
+  {
+    // default to the library name or a special name for executables
+    if (!this->info.libName.empty())
+    {
+      this->info.autoLoadDir = this->info.libName;
+      moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
+    }
+    else
+    {
+      this->info.autoLoadDir = "main";
+      moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
+    }
+  }
 }
 
 ModulePrivate::~ModulePrivate()
@@ -241,6 +260,7 @@ void ModulePrivate::InitializeResources(const std::string& location)
     resourceTreePtrs.push_back(new ModuleResourceTree(this->info.resourceTree[i],
                                                       this->info.resourceNames[i],
                                                       this->info.resourceData[i]));
+    mapLibNameToResourceTrees[moduleLibNames[i]] = resourceTreePtrs.back();
   }
 }
 

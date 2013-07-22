@@ -672,6 +672,7 @@ WARN_LOGFILE           =
 INPUT                  = @PROJECT_SOURCE_DIR@ \
                          @PROJECT_SOURCE_DIR@/CMake/usFunctionEmbedResources.cmake \
                          @PROJECT_SOURCE_DIR@/CMake/usFunctionGenerateModuleInit.cmake \
+                         @PROJECT_SOURCE_DIR@/CMake/usFunctionGenerateExecutableInit.cmake \
                          @PROJECT_BINARY_DIR@/include/usConfig.h
 
 # This tag can be used to specify the character encoding of the source files
@@ -708,8 +709,9 @@ RECURSIVE              = YES
 
 EXCLUDE                = @PROJECT_SOURCE_DIR@/README.md \
                          @PROJECT_SOURCE_DIR@/documentation/snippets/ \
+                         @PROJECT_SOURCE_DIR@/examples/ \
                          @PROJECT_SOURCE_DIR@/test/ \
-                         @PROJECT_SOURCE_DIR@/gh-pages \
+                         @PROJECT_SOURCE_DIR@/gh-pages/ \
                          @PROJECT_SOURCE_DIR@/.git/
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -744,7 +746,8 @@ EXCLUDE_SYMBOLS        = us \
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           = @PROJECT_SOURCE_DIR@/documentation/snippets/
+EXAMPLE_PATH           = @PROJECT_SOURCE_DIR@/documentation/snippets/ \
+                         @PROJECT_SOURCE_DIR@/examples/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
@@ -829,7 +832,7 @@ INLINE_SOURCES         = NO
 # doxygen to hide any special comment blocks from generated source code
 # fragments. Normal C, C++ and Fortran comments will always remain visible.
 
-STRIP_CODE_COMMENTS    = YES
+STRIP_CODE_COMMENTS    = NO
 
 # If the REFERENCED_BY_RELATION tag is set to YES
 # then for each documented function all documented

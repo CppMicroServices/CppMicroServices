@@ -236,7 +236,7 @@ ServiceTracker<S,T>::GetServiceReference() const
   { /* if no service is being tracked */
     throw ServiceException("No service is being tracked");
   }
-  typename std::vector<ServiceReferenceT>::const_iterator selectedRef;
+  typename std::vector<ServiceReferenceT>::const_iterator selectedRef = references.begin();
   if (length > 1)
   { /* if more than one service, select highest ranking */
     std::vector<int> rankings(length);

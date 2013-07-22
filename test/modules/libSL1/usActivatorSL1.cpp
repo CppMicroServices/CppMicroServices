@@ -52,7 +52,7 @@ public:
   {
     this->context = context;
 
-    InterfaceMap im = MakeInterfaceMap(this, InterfaceT<ModulePropsInterface>());
+    InterfaceMap im = MakeInterfaceMap<ModulePropsInterface>(this);
     im.insert(std::make_pair(std::string("ActivatorSL1"), this));
     sr = context->RegisterService(im);
 

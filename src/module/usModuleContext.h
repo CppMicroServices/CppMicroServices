@@ -205,53 +205,51 @@ public:
    *         registering the service to update the service's properties or to
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid or the
+   *         \c service object is NULL.
+   *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class S>
   ServiceRegistration<S> RegisterService(S* service, const ServiceProperties& properties = ServiceProperties())
   {
-    const char* clazz = us_service_interface_iid<S>();
-    if (clazz == 0)
-    {
-      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
-                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
-    }
-    InterfaceMap servicePointers = MakeInterfaceMap(service, InterfaceT<S>());
-    return ServiceRegistration<S>(RegisterService(servicePointers, properties));
+    InterfaceMap servicePointers = MakeInterfaceMap<S>(service);
+    return RegisterService(servicePointers, properties);
+  }
+
+  template<class I1, class I2, class Impl>
+  ServiceRegistration<I1,I2> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
+  {
+    InterfaceMap servicePointers = MakeInterfaceMap<I1, I2>(impl);
+    return RegisterService(servicePointers, properties);
+  }
+
+  template<class I1, class I2, class I3, class Impl>
+  ServiceRegistration<I1,I2,I3> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
+  {
+    InterfaceMap servicePointers = MakeInterfaceMap<I1, I2, I3>(impl);
+    return RegisterService(servicePointers, properties);
   }
 
   template<class S>
   ServiceRegistration<S> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
   {
-    const char* clazz = us_service_interface_iid<S>();
-    if (clazz == 0)
-    {
-      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
-                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
-    }
-    InterfaceMap servicePointers = MakeInterfaceMap(factory, InterfaceT<S>());
-    return ServiceRegistration<S>(RegisterService(servicePointers, properties));
+    InterfaceMap servicePointers = MakeInterfaceMap<S>(factory);
+    return RegisterService(servicePointers, properties);
   }
 
-  template<class S, class T>
-  ServiceRegistration<S,T> RegisterService(S* sptr, T* tptr, const ServiceProperties& properties = ServiceProperties())
+  template<class I1, class I2>
+  ServiceRegistration<I1,I2> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
   {
-    const char* siid = us_service_interface_iid<S>();
-    if (siid == 0)
-    {
-      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
-                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
-    }
-    const char* tiid = us_service_interface_iid<T>();
-    if (tiid == 0)
-    {
-      throw ServiceException(std::string("The interface class ") + typeid(S).name() +
-                             " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
-    }
-    std::map<std::string,void*> servicePointers;
-    servicePointers.insert(std::make_pair(std::string(siid), static_cast<void*>(sptr)));
-    servicePointers.insert(std::make_pair(std::string(tiid), static_cast<void*>(tptr)));
-    return ServiceRegistration<S,T>(RegisterService(servicePointers, properties));
+    InterfaceMap servicePointers = MakeInterfaceMap<I1,I2>(factory);
+    return RegisterService(servicePointers, properties);
+  }
+
+  template<class I1, class I2, class I3>
+  ServiceRegistration<I1,I2,I3> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
+  {
+    InterfaceMap servicePointers = MakeInterfaceMap<I1,I2,I3>(factory);
+    return RegisterService(servicePointers, properties);
   }
 
   /**
@@ -320,6 +318,8 @@ public:
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
    * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid.
+   *
    * @see GetServiceReferences(const std::string&, const std::string&)
    */
   template<class S>
@@ -365,6 +365,7 @@ public:
    *         no services are registered which implement the named class.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If no service was registered under the given class name.
+   *
    * @see #GetServiceReferences(const std::string&, const std::string&)
    */
   ServiceReferenceU GetServiceReference(const std::string& clazz);

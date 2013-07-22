@@ -86,12 +86,12 @@ public:
     std::cout << "GetService in H" << std::endl;
     TestProduct* product = new TestProduct(caller);
     fcbind.insert(std::make_pair(caller->GetModuleId(), product));
-    return MakeInterfaceMap(product, InterfaceT<TestModuleH>());
+    return MakeInterfaceMap<TestModuleH>(product);
   }
 
   void UngetService(Module* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service)
   {
-    TestModuleH* product = ExtractInterface(service, InterfaceT<TestModuleH>());
+    TestModuleH* product = ExtractInterface<TestModuleH>(service);
     delete product;
     fcbind.erase(caller->GetModuleId());
   }

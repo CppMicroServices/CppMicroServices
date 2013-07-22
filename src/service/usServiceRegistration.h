@@ -44,7 +44,7 @@ US_BEGIN_NAMESPACE
  * @see ModuleContext#RegisterService()
  * @remarks This class is thread safe.
  */
-template<class S, class T = void>
+template<class I1, class I2 = void, class I3 = void>
 class ServiceRegistration : public ServiceRegistrationBase
 {
 
@@ -71,14 +71,19 @@ public:
    *         unregistered or if it is invalid.
    * @return <code>ServiceReference</code> object.
    */
-  ServiceReference<S> GetReference(InterfaceT<S>) const
+  ServiceReference<I1> GetReference(InterfaceT<I1>) const
   {
-    return ServiceReference<S>(this->GetReferenceBase(us_service_interface_iid<S>()));
+    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>());
   }
 
-  ServiceReference<T> GetReference(InterfaceT<T>) const
+  ServiceReference<I2> GetReference(InterfaceT<I2>) const
   {
-    return ServiceReference<T>(this->GetReference(us_service_interface_iid<T>()));
+    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>());
+  }
+
+  ServiceReference<I3> GetReference(InterfaceT<I3>) const
+  {
+    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I3>());
   }
 
   using ServiceRegistrationBase::operator=;
@@ -95,8 +100,8 @@ private:
 
 };
 
-template<class S>
-class ServiceRegistration<S, void> : public ServiceRegistrationBase
+template<class I1, class I2>
+class ServiceRegistration<I1, I2, void> : public ServiceRegistrationBase
 {
 
 public:
@@ -105,18 +110,51 @@ public:
   {
   }
 
-  ServiceReference<S> GetReference() const
+  ServiceReference<I1> GetReference(InterfaceT<I1>) const
   {
-    return this->GetReference(InterfaceT<S>());
+    return ServiceReference<I1>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>()));
   }
 
-  ServiceReference<S> GetReference(InterfaceT<S>) const
+  ServiceReference<I2> GetReference(InterfaceT<I2>) const
   {
-    return ServiceReference<S>(this->GetReference(us_service_interface_iid<S>()));
+    return ServiceReference<I2>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>()));
   }
 
   using ServiceRegistrationBase::operator=;
 
+
+private:
+
+  friend class ModuleContext;
+
+  ServiceRegistration(const ServiceRegistrationBase& base)
+    : ServiceRegistrationBase(base)
+  {
+  }
+
+};
+
+template<class I1>
+class ServiceRegistration<I1, void, void> : public ServiceRegistrationBase
+{
+
+public:
+
+  ServiceRegistration() : ServiceRegistrationBase()
+  {
+  }
+
+  ServiceReference<I1> GetReference() const
+  {
+    return this->GetReference(InterfaceT<I1>());
+  }
+
+  ServiceReference<I1> GetReference(InterfaceT<I1>) const
+  {
+    return ServiceReference<I1>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>()));
+  }
+
+  using ServiceRegistrationBase::operator=;
 
 private:
 
@@ -130,7 +168,7 @@ private:
 };
 
 template<>
-class ServiceRegistration<void, void> : public ServiceRegistrationBase
+class ServiceRegistration<void, void, void> : public ServiceRegistrationBase
 {
 public:
 

@@ -24,9 +24,11 @@
 #define USSERVICEINTERFACE_H
 
 #include <usConfig.h>
+#include <usServiceException.h>
 
 #include <map>
 #include <string>
+#include <typeinfo>
 
 /**
  * \ingroup MicroServices
@@ -102,44 +104,162 @@ template<class T> inline const char* us_service_interface_iid();
 
 US_BEGIN_NAMESPACE
 
+class ServiceFactory;
+
 template<class Interface>
 struct InterfaceT {};
 
-
 typedef std::map<std::string, void*> InterfaceMap;
 
-template<class S, class I1>
-InterfaceMap MakeInterfaceMap(S* service, InterfaceT<I1>)
+
+template<class I>
+bool InsertInterfaceType(InterfaceMap& im, I* i)
 {
-  InterfaceMap sim;
-  sim.insert(std::make_pair(std::string(us_service_interface_iid<I1>()),
-                            static_cast<void*>(static_cast<I1*>(service))));
-  return sim;
+  if (us_service_interface_iid<I>() == NULL)
+  {
+    throw ServiceException(std::string("The interface class ") + typeid(I).name() +
+                                " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
+  }
+  im.insert(std::make_pair(std::string(us_service_interface_iid<I>()),
+                           static_cast<void*>(static_cast<I*>(i))));
+  return true;
 }
 
-class ServiceFactory;
+template<>
+inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
+{
+  return false;
+}
+
+
+template<class I1, class I2 = void, class I3 = void>
+struct MakeInterfaceMap
+{
+  ServiceFactory* m_factory;
+  I1* m_interface1;
+  I2* m_interface2;
+  I3* m_interface3;
+
+  template<class Impl>
+  MakeInterfaceMap(Impl* impl)
+    : m_factory(NULL)
+    , m_interface1(static_cast<I1*>(impl))
+    , m_interface2(static_cast<I2*>(impl))
+    , m_interface3(static_cast<I3*>(impl))
+  {}
+
+  MakeInterfaceMap(ServiceFactory* factory)
+    : m_factory(factory)
+    , m_interface1(NULL)
+    , m_interface2(NULL)
+    , m_interface3(NULL)
+  {
+    if (factory == NULL)
+    {
+      throw ServiceException("The service factory argument must not be NULL.");
+    }
+  }
+
+  operator InterfaceMap ()
+  {
+    InterfaceMap sim;
+    InsertInterfaceType(sim, m_interface1);
+    InsertInterfaceType(sim, m_interface2);
+    InsertInterfaceType(sim, m_interface3);
+
+    if (m_factory)
+    {
+      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
+                                static_cast<void*>(m_factory)));
+    }
+
+    return sim;
+  }
+};
+
+template<class I1, class I2>
+struct MakeInterfaceMap<I1,I2,void>
+{
+  ServiceFactory* m_factory;
+  I1* m_interface1;
+  I2* m_interface2;
+
+  template<class Impl>
+  MakeInterfaceMap(Impl* impl)
+    : m_factory(NULL)
+    , m_interface1(static_cast<I1*>(impl))
+    , m_interface2(static_cast<I2*>(impl))
+  {}
+
+  MakeInterfaceMap(ServiceFactory* factory)
+    : m_factory(factory)
+    , m_interface1(NULL)
+    , m_interface2(NULL)
+  {
+    if (factory == NULL)
+    {
+      throw ServiceException("The service factory argument must not be NULL.");
+    }
+  }
+
+  operator InterfaceMap ()
+  {
+    InterfaceMap sim;
+    InsertInterfaceType(sim, m_interface1);
+    InsertInterfaceType(sim, m_interface2);
+
+    if (m_factory)
+    {
+      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
+                                static_cast<void*>(m_factory)));
+    }
+
+    return sim;
+  }
+};
 
 template<class I1>
-InterfaceMap MakeInterfaceMap(ServiceFactory* factory, InterfaceT<I1>)
+struct MakeInterfaceMap<I1,void,void>
 {
-  InterfaceMap sim;
-  sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
-                            static_cast<void*>(factory)));
-  sim.insert(std::make_pair(std::string(us_service_interface_iid<I1>()), static_cast<void*>(NULL)));
-  return sim;
-}
+  ServiceFactory* m_factory;
+  I1* m_interface1;
 
-template<class S>
-InterfaceMap MakeInterfaceMap(S* service, const std::string& interfaceId)
-{
-  InterfaceMap sim;
-  sim.insert(std::make_pair(interfaceId,
-                            static_cast<void*>(service)));
-  return sim;
-}
+  template<class Impl>
+  MakeInterfaceMap(Impl* impl)
+    : m_factory(NULL)
+    , m_interface1(static_cast<I1*>(impl))
+  {}
+
+  MakeInterfaceMap(ServiceFactory* factory)
+    : m_factory(factory)
+    , m_interface1(NULL)
+  {
+    if (factory == NULL)
+    {
+      throw ServiceException("The service factory argument must not be NULL.");
+    }
+  }
+
+  operator InterfaceMap ()
+  {
+    InterfaceMap sim;
+    InsertInterfaceType(sim, m_interface1);
+
+    if (m_factory)
+    {
+      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
+                                static_cast<void*>(m_factory)));
+    }
+
+    return sim;
+  }
+};
+
+template<>
+struct MakeInterfaceMap<void,void,void>;
 
 template<class I1>
-I1* ExtractInterface(const InterfaceMap& map, InterfaceT<I1>)
+I1* ExtractInterface(const InterfaceMap& map)
 {
   InterfaceMap::const_iterator iter = map.find(us_service_interface_iid<I1>());
   if (iter != map.end())

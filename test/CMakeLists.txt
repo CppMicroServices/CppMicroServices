@@ -28,6 +28,7 @@ set(_tests
   usServiceFactoryTest
   usServiceRegistryPerformanceTest
   usServiceRegistryTest
+  usServiceTemplateTest
   usServiceTrackerTest
   usStaticModuleResourceTest
   usStaticModuleTest

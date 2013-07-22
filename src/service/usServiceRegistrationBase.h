@@ -179,7 +179,7 @@ private:
   friend class ServiceRegistry;
   friend class ServiceReferenceBasePrivate;
 
-  template<class S, class T> friend class ServiceRegistration;
+  template<class I1, class I2, class I3> friend class ServiceRegistration;
 
   US_HASH_FUNCTION_FRIEND(ServiceRegistrationBase);
 

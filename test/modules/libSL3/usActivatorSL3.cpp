@@ -44,7 +44,7 @@ public:
   {
     this->context = context;
 
-    InterfaceMap im = MakeInterfaceMap(this, InterfaceT<ModulePropsInterface>());
+    InterfaceMap im = MakeInterfaceMap<ModulePropsInterface>(this);
     im.insert(std::make_pair(std::string("ActivatorSL3"), this));
     sr = context->RegisterService(im);
     delete tracker;

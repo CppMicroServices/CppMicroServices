@@ -26,6 +26,7 @@
 
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
+#include "usPrototypeServiceFactory.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceRegistrationBasePrivate.h"
 #include "usModulePrivate.h"
@@ -39,6 +40,7 @@ typedef MutexLock<ServiceRegistry::MutexType> MutexLocker;
 
 ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
                                                                const std::vector<std::string>& classes,
+                                                               bool isFactory, bool isPrototypeFactory,
                                                                long sid)
 {
   static long nextServiceID = 1;
@@ -50,6 +52,19 @@ ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProp
   }
 
   props.insert(std::make_pair(ServiceConstants::SERVICE_ID(), sid != -1 ? sid : nextServiceID++));
+
+  if (isPrototypeFactory)
+  {
+    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_PROTOTYPE()));
+  }
+  else if (isFactory)
+  {
+    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_MODULE()));
+  }
+  else
+  {
+    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_SINGLETON()));
+  }
 
   return ServicePropertiesImpl(props);
 }
@@ -84,6 +99,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
 
   // Check if we got a service factory
   bool isFactory = service.count("org.cppmicroservices.factory") > 0;
+  bool isPrototypeFactory = (isFactory ? dynamic_cast<PrototypeServiceFactory*>(reinterpret_cast<ServiceFactory*>(service.find("org.cppmicroservices.factory")->second)) != NULL : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
@@ -98,7 +114,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
   }
 
   ServiceRegistrationBase res(module, service,
-                              CreateServiceProperties(properties, classes));
+                              CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
   {
     MutexLocker lock(mutex);
     services.insert(std::make_pair(res, classes));

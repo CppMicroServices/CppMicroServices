@@ -58,7 +58,7 @@ public:
    */
   static ServicePropertiesImpl CreateServiceProperties(const ServiceProperties& in,
                                                        const std::vector<std::string>& classes = std::vector<std::string>(),
-                                                       long sid = -1);
+                                                       bool isFactory = false, bool isPrototypeFactory = false, long sid = -1);
 
   typedef US_UNORDERED_MAP_TYPE<ServiceRegistrationBase, std::vector<std::string> > MapServiceClasses;
   typedef US_UNORDERED_MAP_TYPE<std::string, std::vector<ServiceRegistrationBase> > MapClassServices;

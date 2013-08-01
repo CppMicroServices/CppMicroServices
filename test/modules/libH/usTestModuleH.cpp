@@ -23,6 +23,7 @@
 #include <usServiceInterface.h>
 #include <usModuleActivator.h>
 #include <usServiceFactory.h>
+#include <usPrototypeServiceFactory.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 
@@ -35,10 +36,15 @@ struct TestModuleH
   virtual ~TestModuleH() {}
 };
 
+struct TestModuleH2
+{
+  virtual ~TestModuleH2() {}
+};
+
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(us::TestModuleH, "org.cppmicroservices.TestModuleH")
-
+US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH), "org.cppmicroservices.TestModuleH")
+US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH2), "org.cppmicroservices.TestModuleH2")
 
 US_BEGIN_NAMESPACE
 
@@ -54,13 +60,49 @@ public:
 
 };
 
+class TestProduct2 : public TestProduct, public TestModuleH2
+{
+public:
+
+  TestProduct2(Module* caller)
+    : TestProduct(caller)
+  {}
+
+};
+
+class TestModuleHPrototypeServiceFactory : public PrototypeServiceFactory
+{
+  std::map<long, std::list<TestProduct2*> > fcbind;   // Map calling module with implementation
+
+public:
+
+  InterfaceMap GetService(Module* caller, const ServiceRegistrationBase& /*sReg*/)
+  {
+    std::cout << "GetService (prototype) in H" << std::endl;
+    TestProduct2* product = new TestProduct2(caller);
+    fcbind[caller->GetModuleId()].push_back(product);
+    return MakeInterfaceMap<TestModuleH,TestModuleH2>(product);
+  }
+
+  void UngetService(Module* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service)
+  {
+    TestProduct2* product = dynamic_cast<TestProduct2*>(ExtractInterface<TestModuleH>(service));
+    delete product;
+    fcbind[caller->GetModuleId()].remove(product);
+  }
+
+};
+
 
 class TestModuleHActivator : public ModuleActivator, public ServiceFactory
 {
   std::string thisServiceName;
   ServiceRegistration<TestModuleH> factoryService;
+  ServiceRegistration<TestModuleH,TestModuleH2> prototypeFactoryService;
   ModuleContext* mc;
+
   std::map<long, TestProduct*> fcbind;   // Map calling module with implementation
+  TestModuleHPrototypeServiceFactory prototypeFactory;
 
 public:
 
@@ -74,6 +116,7 @@ public:
     std::cout << "start in H" << std::endl;
     this->mc = mc;
     factoryService = mc->RegisterService<TestModuleH>(this);
+    prototypeFactoryService = mc->RegisterService<TestModuleH,TestModuleH2>(static_cast<ServiceFactory*>(&prototypeFactory));
   }
 
   void Unload(ModuleContext* /*mc*/)

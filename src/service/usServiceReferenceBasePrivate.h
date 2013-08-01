@@ -58,16 +58,33 @@ public:
   void* GetService(Module* module);
 
   /**
+    * Get new service instance.
+    *
+    * @param module requester of service.
+    * @return Service requested or null in case of failure.
+    */
+  void* GetPrototypeService(Module* module);
+
+  /**
    * Unget the service object.
    *
    * @param module Module who wants remove service.
    * @param checkRefCounter If true decrement refence counter and remove service
    *                        if we reach zero. If false remove service without
    *                        checking refence counter.
-   * @return True if service was remove or false if only refence counter was
+   * @return True if service was removed or false if only reference counter was
    *         decremented.
    */
   bool UngetService(Module* module, bool checkRefCounter);
+
+  /**
+   * Unget prototype scope service objects.
+   *
+   * @param module Module who wants to remove a prototype scope service.
+   * @param service The prototype scope service pointer.
+   * @return \c true if the service was removed, \c false otherwise.
+   */
+  bool UngetPrototypeService(Module* module, void* service);
 
   /**
    * Get all properties registered with this service.
@@ -117,6 +134,9 @@ public:
   std::string interfaceId;
 
 private:
+
+  void* GetServiceFromFactory(Module* module, ServiceFactory* factory,
+                              bool isModuleScope);
 
   // purposely not implemented
   ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&);

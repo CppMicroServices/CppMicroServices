@@ -45,7 +45,8 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 
 bool ServiceRegistrationBasePrivate::IsUsedByModule(Module* p) const
 {
-  return dependents.find(p) != dependents.end();
+  return (dependents.find(p) != dependents.end()) ||
+      (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());
 }
 
 const InterfaceMap& ServiceRegistrationBasePrivate::GetInterfaces() const

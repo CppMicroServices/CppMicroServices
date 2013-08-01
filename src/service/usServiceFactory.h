@@ -19,6 +19,8 @@
 
 =============================================================================*/
 
+#ifndef USSERVICEFACTORY_H
+#define USSERVICEFACTORY_H
 
 #include "usServiceInterface.h"
 #include "usServiceRegistration.h"
@@ -28,8 +30,8 @@ US_BEGIN_NAMESPACE
 /**
  * \ingroup MicroServices
  *
- * Allows services to provide customized service objects in the module
- * environment.
+ * A factory for \link ServiceConstants::SCOPE_MODULE module scope\endlink services.
+ * The factory can provide service objects unique to each module.
  *
  * <p>
  * When registering a service, a <code>ServiceFactory</code> object can be
@@ -56,6 +58,7 @@ US_BEGIN_NAMESPACE
  * may concurrently call a <code>ServiceFactory</code>.
  *
  * @see ModuleContext#GetService
+ * @see PrototypeServiceFactory
  * @remarks This class is thread safe.
  */
 class ServiceFactory
@@ -71,23 +74,24 @@ public:
    * <p>
    * The Framework invokes this method the first time the specified
    * <code>module</code> requests a service object using the
-   * <code>ModuleContext::GetService(const ServiceReference&)</code> method. The
+   * <code>ModuleContext::GetService(const ServiceReferenceBase&)</code> method. The
    * service factory can then return a specific service object for each
    * module.
    *
    * <p>
-   * The framework caches the value returned (unless it is 0),
+   * The framework caches the value returned (unless the InterfaceMap is empty),
    * and will return the same service object on any future call to
    * <code>ModuleContext::GetService</code> for the same modules. This means the
-   * framework must not allow this method to be concurrently called for the
+   * framework does not allow this method to be concurrently called for the
    * same module.
    *
    * @param module The module using the service.
-   * @param registration The <code>ServiceRegistration</code> object for the
+   * @param registration The <code>ServiceRegistrationBase</code> object for the
    *        service.
-   * @return A service object that <strong>must</strong> be an instance of all
-   *         the classes named when the service was registered.
+   * @return A service object that <strong>must</strong> contain entries for all
+   *         the interfaces named when the service was registered.
    * @see ModuleContext#GetService
+   * @see InterfaceMap
    */
   virtual InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) = 0;
 
@@ -104,9 +108,12 @@ public:
    * @param service The service object returned by a previous call to the
    *        <code>ServiceFactory::GetService</code> method.
    * @see ModuleContext#UngetService
+   * @see InterfaceMap
    */
   virtual void UngetService(Module* module, const ServiceRegistrationBase& registration,
                             const InterfaceMap& service) = 0;
 };
 
 US_END_NAMESPACE
+
+#endif // USSERVICEFACTORY_H

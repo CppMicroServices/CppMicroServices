@@ -95,6 +95,42 @@ US_EXPORT const std::string& SERVICE_ID(); // = "service.id"
  */
 US_EXPORT const std::string& SERVICE_RANKING(); // = "service.ranking"
 
+/**
+ * Service property identifying a service's scope.
+ * This property is set by the framework when a service is registered. If the
+ * registered object implements PrototypeServiceFactory, then the value of this
+ * service property will be SCOPE_PROTOTYPE(). Otherwise, if the registered
+ * object implements ServiceFactory, then the value of this service property will
+ * be SCOPE_MODULE(). Otherwise, the value of this service property will be
+ * SCOPE_SINGLETON().
+ */
+US_EXPORT const std::string& SERVICE_SCOPE(); // = "service.scope"
+
+/**
+ * Service scope is singleton. All modules using the service receive the same
+ * service object.
+ *
+ * @see SERVICE_SCOPE()
+ */
+US_EXPORT const std::string& SCOPE_SINGLETON(); // = "singleton"
+
+/**
+ * Service scope is module. Each module using the service receives a distinct
+ * service object.
+ *
+ * @see SERVICE_SCOPE()
+ */
+US_EXPORT const std::string& SCOPE_MODULE(); // = "module"
+
+/**
+ * Service scope is prototype. Each module using the service receives either
+ * a distinct service object or can request multiple distinct service objects
+ * via ServiceObjects.
+ *
+ * @see SERVICE_SCOPE()
+ */
+US_EXPORT const std::string& SCOPE_PROTOTYPE(); // = "prototype"
+
 }
 
 US_END_NAMESPACE

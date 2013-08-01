@@ -193,15 +193,37 @@ void ServiceRegistrationBase::Unregister()
       if (d->module && factoryIter != d->service.end())
       {
         ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
-        ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator end = d->serviceInstances.end();
-        for (ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator i = d->serviceInstances.begin();
+        ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator end = d->prototypeServiceInstances.end();
+
+        // unget all prototype services
+        for (ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator i = d->prototypeServiceInstances.begin();
              i != end; ++i)
         {
-          const InterfaceMap& service = i->second;
+          for (std::list<InterfaceMap>::const_iterator listIter = i->second.begin();
+               listIter != i->second.end(); ++listIter)
+          {
+            const InterfaceMap& service = *listIter;
+            try
+            {
+              // NYI, don't call inside lock
+              serviceFactory->UngetService(i->first, *this, service);
+            }
+            catch (const std::exception& /*ue*/)
+            {
+              US_WARN << "ServiceFactory UngetService implementation threw an exception";
+            }
+          }
+        }
+
+        // unget module scope services
+        ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator moduleEnd = d->moduleServiceInstance.end();
+        for (ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator i = d->moduleServiceInstance.begin();
+             i != moduleEnd; ++i)
+        {
           try
           {
             // NYI, don't call inside lock
-            serviceFactory->UngetService(i->first, *this, service);
+            serviceFactory->UngetService(i->first, *this, i->second);
           }
           catch (const std::exception& /*ue*/)
           {
@@ -212,7 +234,8 @@ void ServiceRegistrationBase::Unregister()
       d->module = 0;
       d->dependents.clear();
       d->service.clear();
-      d->serviceInstances.clear();
+      d->prototypeServiceInstances.clear();
+      d->moduleServiceInstance.clear();
       // increment the reference count, since "d->reference" was used originally
       // to keep d alive.
       d->ref.Ref();

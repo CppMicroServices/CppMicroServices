@@ -19,6 +19,7 @@ set(_srcs
   service/usServiceListenerEntry_p.h
   service/usServiceListeners.cpp
   service/usServiceListeners_p.h
+  service/usServiceObjects.cpp
   service/usServiceProperties.cpp
   service/usServicePropertiesImpl.cpp
   service/usServiceReferenceBase.cpp
@@ -79,10 +80,12 @@ set(_public_headers
   util/usUncompressResourceData.h
 
   service/usLDAPFilter.h
+  service/usPrototypeServiceFactory.h
   service/usServiceEvent.h
   service/usServiceException.h
   service/usServiceFactory.h
   service/usServiceInterface.h
+  service/usServiceObjects.h
   service/usServiceProperties.h
   service/usServiceReference.h
   service/usServiceReferenceBase.h

@@ -39,6 +39,8 @@ typedef US_MODULE_LISTENER_FUNCTOR ModuleListener;
 class ModuleContextPrivate;
 class ServiceFactory;
 
+template<class S> class ServiceObjects;
+
 /**
  * \ingroup MicroServices
  *
@@ -138,8 +140,8 @@ public:
    *
    * <p>
    * A module can register a service object that implements the
-   * {@link ServiceFactory} interface to have more flexibility in providing
-   * service objects to other modules.
+   * ServiceFactory or PrototypeServiceFactory interface to have more
+   * flexibility in providing service objects to other modules.
    *
    * <p>
    * The following steps are taken when registering a service:
@@ -151,6 +153,8 @@ public:
    * registration number of the service <br/>
    * A property named ServiceConstants#OBJECTCLASS() containing all the
    * specified classes. <br/>
+   * A property named ServiceConstants#SERVICE_SCOPE() identifying the scope
+   * of the service. <br/>
    * Properties with these names in the specified <code>ServiceProperties</code> will
    * be ignored.
    * <li>The service is added to the framework service registry and may now be
@@ -176,14 +180,17 @@ public:
    * @return A <code>ServiceRegistration</code> object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
+   *
    * @throws std::invalid_argument If one of the following is true:
    *         <ul>
    *         <li><code>service</code> is <code>0</code>.
    *         <li><code>properties</code> contains case variants of the same key name.
    *         </ul>
    * @throws std::logic_error If this ModuleContext is no longer valid.
+   *
    * @see ServiceRegistration
    * @see ServiceFactory
+   * @see PrototypeServiceFactory
    */
   ServiceRegistrationU RegisterService(const InterfaceMap& service,
                                        const ServiceProperties& properties = ServiceProperties());
@@ -471,6 +478,32 @@ public:
   {
     const ServiceReferenceBase& baseRef = reference;
     return reinterpret_cast<S*>(GetService(baseRef));
+  }
+
+  /**
+   * Returns the ServiceObjects object for the service referenced by the specified
+   * ServiceReference object. The ServiceObjects object can be used to obtain
+   * multiple service objects for services with prototype scope. For services with
+   * singleton or module scope, the ServiceObjects::GetService() method behaves
+   * the same as the GetService(const ServiceReference<S>&) method and the
+   * ServiceObjects::UngetService(const ServiceReferenceBase&) method behaves the
+   * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
+   * use-counted service object is available from the ServiceObjects object.
+   *
+   * @param S Type of Service.
+   * @param reference A reference to the service.
+   * @return A ServiceObjects object for the service associated with the specified
+   * reference or an invalid instance if the service is not registered.
+   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws std::invalid_argument If the specified ServiceReference is invalid
+   * (default constructed or the service has been unregistered)
+   *
+   * @see PrototypeServiceFactory
+   */
+  template<class S>
+  ServiceObjects<S> GetServiceObjects(const ServiceReference<S>& reference)
+  {
+    return ServiceObjects<S>(this, reference);
   }
 
   /**

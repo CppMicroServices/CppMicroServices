@@ -44,6 +44,30 @@ const std::string& ServiceConstants::SERVICE_RANKING()
   return s;
 }
 
+const std::string& ServiceConstants::SERVICE_SCOPE()
+{
+  static const std::string s("service.scope");
+  return s;
+}
+
+const std::string& ServiceConstants::SCOPE_SINGLETON()
+{
+  static const std::string s("singleton");
+  return s;
+}
+
+const std::string& ServiceConstants::SCOPE_MODULE()
+{
+  static const std::string s("module");
+  return s;
+}
+
+const std::string& ServiceConstants::SCOPE_PROTOTYPE()
+{
+  static const std::string s("prototype");
+  return s;
+}
+
 US_END_NAMESPACE
 
 US_USE_NAMESPACE
@@ -53,3 +77,7 @@ US_USE_NAMESPACE
 std::string tmp1 = ServiceConstants::OBJECTCLASS();
 std::string tmp2 = ServiceConstants::SERVICE_ID();
 std::string tmp3 = ServiceConstants::SERVICE_RANKING();
+std::string tmp4 = ServiceConstants::SERVICE_SCOPE();
+std::string tmp5 = ServiceConstants::SCOPE_SINGLETON();
+std::string tmp6 = ServiceConstants::SCOPE_MODULE();
+std::string tmp7 = ServiceConstants::SCOPE_PROTOTYPE();

@@ -66,7 +66,8 @@ public:
   typedef MutexLock<MutexType> MutexLocker;
 
   typedef US_UNORDERED_MAP_TYPE<Module*,int> ModuleToRefsMap;
-  typedef US_UNORDERED_MAP_TYPE<Module*, InterfaceMap> ModuleToServicesMap;
+  typedef US_UNORDERED_MAP_TYPE<Module*, InterfaceMap> ModuleToServiceMap;
+  typedef US_UNORDERED_MAP_TYPE<Module*, std::list<InterfaceMap> > ModuleToServicesMap;
 
   /**
    * Modules dependent on this service. Integer is used as
@@ -75,9 +76,14 @@ public:
   ModuleToRefsMap dependents;
 
   /**
-   * Object instances that factory has produced.
+   * Object instances that a prototype factory has produced.
    */
-  ModuleToServicesMap serviceInstances;
+  ModuleToServicesMap prototypeServiceInstances;
+
+  /**
+   * Object instance with module scope that a factory may have produced.
+   */
+  ModuleToServiceMap moduleServiceInstance;
 
   /**
    * Module registering this service.

@@ -740,6 +740,7 @@ EXCLUDE_SYMBOLS        = us \
                          US_NAMESPACE \
                          *Private* \
                          ModuleInfo \
+                         ServiceObjectsBase* \
                          TrackedService*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or

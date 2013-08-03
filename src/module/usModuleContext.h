@@ -164,11 +164,11 @@ public:
    * returned.
    * </ol>
    *
-   * @param clazzes The class names under which the service can be located.
-   *        The class names will be stored in the service's
-   *        properties under the key ServiceConstants#OBJECTCLASS().
-   * @param service The service object or a <code>ServiceFactory</code>
-   *        object.
+   * @note This is a low-level method and should normally not be used directly.
+   *       Use one of the templated RegisterService methods instead.
+   *
+   * @param service The service object, which is a map of interface identifiers
+   *        to raw service pointers.
    * @param properties The properties for this service. The keys in the
    *        properties object must all be <code>std::string</code> objects. See
    *        {@link ServiceConstants} for a list of standard service property keys.
@@ -202,8 +202,12 @@ public:
    * <p>
    * This method is provided as a convenience when <code>service</code> will only be registered under
    * a single class name whose type is available to the caller. It is otherwise identical to
-   * RegisterService(const char*, US_BASECLASS_NAME*, const ServiceProperties&) but should be preferred
+   * RegisterService(const InterfaceMap&, const ServiceProperties&) but should be preferred
    * since it avoids errors in the string literal identifying the class name or interface identifier.
+   *
+   * Example usage:
+   * \snippet uServices-registration/main.cpp 1-1
+   * \snippet uServices-registration/main.cpp 1-2
    *
    * @tparam S The type under which the service can be located.
    * @param service The service object or a ServiceFactory object.
@@ -224,6 +228,33 @@ public:
     return RegisterService(servicePointers, properties);
   }
 
+  /**
+   * Registers the specified service object with the specified properties
+   * using the specified template argument with the framework.
+   *
+   * <p>
+   * This method is provided as a convenience when registering a service under
+   * two interface classes whose type is available to the caller. It is otherwise identical to
+   * RegisterService(const InterfaceMap&, const ServiceProperties&) but should be preferred
+   * since it avoids errors in the string literal identifying the class name or interface identifier.
+   *
+   * Example usage:
+   * \snippet uServices-registration/main.cpp 2-1
+   * \snippet uServices-registration/main.cpp 2-2
+   *
+   * @tparam I1 The first interface type under which the service can be located.
+   * @tparam I2 The second interface type under which the service can be located.
+   * @param impl The service object or a ServiceFactory object.
+   * @param properties The properties for this service.
+   * @return A ServiceRegistration object for use by the module
+   *         registering the service to update the service's properties or to
+   *         unregister the service.
+   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid or the
+   *         \c service object is NULL.
+   *
+   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   */
   template<class I1, class I2, class Impl>
   ServiceRegistration<I1,I2> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
   {
@@ -231,6 +262,28 @@ public:
     return RegisterService(servicePointers, properties);
   }
 
+  /**
+   * Registers the specified service object with the specified properties
+   * using the specified template argument with the framework.
+   *
+   * <p>
+   * This method is identical to the RegisterService<I1,I2,Impl>(Impl*, const ServiceProperties&)
+   * method except that it supports three service interface types.
+   *
+   * @tparam I1 The first interface type under which the service can be located.
+   * @tparam I2 The second interface type under which the service can be located.
+   * @tparam I3 The third interface type under which the service can be located.
+   * @param impl The service object or a ServiceFactory object.
+   * @param properties The properties for this service.
+   * @return A ServiceRegistration object for use by the module
+   *         registering the service to update the service's properties or to
+   *         unregister the service.
+   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid or the
+   *         \c service object is NULL.
+   *
+   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   */
   template<class I1, class I2, class I3, class Impl>
   ServiceRegistration<I1,I2,I3> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
   {
@@ -238,6 +291,32 @@ public:
     return RegisterService(servicePointers, properties);
   }
 
+  /**
+   * Registers the specified service factory as a service with the specified properties
+   * using the specified template argument as service interface type with the framework.
+   *
+   * <p>
+   * This method is provided as a convenience when <code>factory</code> will only be registered under
+   * a single class name whose type is available to the caller. It is otherwise identical to
+   * RegisterService(const InterfaceMap&, const ServiceProperties&) but should be preferred
+   * since it avoids errors in the string literal identifying the class name or interface identifier.
+   *
+   * Example usage:
+   * \snippet uServices-registration/main.cpp 1-1
+   * \snippet uServices-registration/main.cpp f1
+   *
+   * @tparam S The type under which the service can be located.
+   * @param factory The ServiceFactory or PrototypeServiceFactory object.
+   * @param properties The properties for this service.
+   * @return A ServiceRegistration object for use by the module
+   *         registering the service to update the service's properties or to
+   *         unregister the service.
+   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid or the
+   *         \c service factory object is NULL.
+   *
+   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   */
   template<class S>
   ServiceRegistration<S> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
   {
@@ -245,6 +324,31 @@ public:
     return RegisterService(servicePointers, properties);
   }
 
+  /**
+   * Registers the specified service factory as a service with the specified properties
+   * using the specified template argument as service interface type with the framework.
+   *
+   * <p>
+   * This method is identical to the RegisterService<S>(ServiceFactory*, const ServiceProperties&)
+   * method except that it supports two service interface types.
+   *
+   * Example usage:
+   * \snippet uServices-registration/main.cpp 2-1
+   * \snippet uServices-registration/main.cpp f2
+   *
+   * @tparam I1 The first interface type under which the service can be located.
+   * @tparam I2 The second interface type under which the service can be located.
+   * @param factory The ServiceFactory or PrototypeServiceFactory object.
+   * @param properties The properties for this service.
+   * @return A ServiceRegistration object for use by the module
+   *         registering the service to update the service's properties or to
+   *         unregister the service.
+   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid or the
+   *         \c service factory object is NULL.
+   *
+   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   */
   template<class I1, class I2>
   ServiceRegistration<I1,I2> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
   {
@@ -252,6 +356,28 @@ public:
     return RegisterService(servicePointers, properties);
   }
 
+  /**
+   * Registers the specified service factory as a service with the specified properties
+   * using the specified template argument as service interface type with the framework.
+   *
+   * <p>
+   * This method is identical to the RegisterService<S>(ServiceFactory*, const ServiceProperties&)
+   * method except that it supports three service interface types.
+   *
+   * @tparam I1 The first interface type under which the service can be located.
+   * @tparam I2 The second interface type under which the service can be located.
+   * @tparam I3 The third interface type under which the service can be located.
+   * @param factory The ServiceFactory or PrototypeServiceFactory object.
+   * @param properties The properties for this service.
+   * @return A ServiceRegistration object for use by the module
+   *         registering the service to update the service's properties or to
+   *         unregister the service.
+   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * @throws ServiceException If the service type \c S is invalid or the
+   *         \c service factory object is NULL.
+   *
+   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   */
   template<class I1, class I2, class I3>
   ServiceRegistration<I1,I2,I3> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
   {
@@ -407,9 +533,9 @@ public:
    * <p>
    * A module's use of a service is tracked by the module's use count of that
    * service. Each time a service's service object is returned by
-   * {@link #GetService(const ServiceReference&)} the context module's use count for
+   * {@link #GetService(const ServiceReference<S>&)} the context module's use count for
    * that service is incremented by one. Each time the service is released by
-   * {@link #UngetService(const ServiceReference&)} the context module's use count
+   * {@link #UngetService(const ServiceReferenceBase&)} the context module's use count
    * for that service is decremented by one.
    * <p>
    * When a module's use count for a service drops to zero, the module should
@@ -448,7 +574,7 @@ public:
    *         longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
-   * @see #UngetService(const ServiceReference&)
+   * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
   void* GetService(const ServiceReferenceBase& reference);
@@ -470,7 +596,7 @@ public:
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
    * @see #GetService(const ServiceReference&)
-   * @see #UngetService(const ServiceReference&)
+   * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
   template<class S>
@@ -490,7 +616,7 @@ public:
    * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
    * use-counted service object is available from the ServiceObjects object.
    *
-   * @param S Type of Service.
+   * @tparam S Type of Service.
    * @param reference A reference to the service.
    * @return A ServiceObjects object for the service associated with the specified
    * reference or an invalid instance if the service is not registered.

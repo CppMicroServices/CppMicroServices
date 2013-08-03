@@ -50,6 +50,9 @@ class ServicePropertiesImpl;
  * The <code>ServiceRegistrationBase</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
+ * \note This class is provided as public API for low-level service management only.
+ *       In almost all cases you should use the template ServiceRegistration instead.
+ *
  * @see ModuleContext#RegisterService()
  * @remarks This class is thread safe.
  */

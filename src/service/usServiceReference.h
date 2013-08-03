@@ -68,6 +68,11 @@ public:
 
   typedef S ServiceT;
 
+  /**
+   * Creates an invalid ServiceReference object. You can use
+   * this object in boolean expressions and it will evaluate to
+   * <code>false</code>.
+   */
   ServiceReference() : ServiceReferenceBase()
   {
   }
@@ -94,11 +99,10 @@ public:
 };
 
 /**
- * \ingroup MicroServices
+ * \cond
  *
- * Specialization for void. The public constructor allows
- * framework implementations to construct this template
- * specialization based on a ServiceReferenceBase instance.
+ * Specialization for void, representing a generic service
+ * reference not bound to any interface identifier.
  *
  */
 template<>
@@ -125,7 +129,14 @@ public:
 
   typedef void ServiceType;
 };
+/// \endcond
 
+/**
+ * \ingroup MicroServices
+ *
+ * A service reference of unknown type, which is not bound to any
+ * interface identifier.
+ */
 typedef ServiceReference<void> ServiceReferenceU;
 
 US_END_NAMESPACE

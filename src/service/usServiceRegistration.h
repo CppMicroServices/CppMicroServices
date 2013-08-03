@@ -59,6 +59,7 @@ public:
   {
   }
 
+  ///@{
   /**
    * Returns a <code>ServiceReference</code> object for a service being
    * registered.
@@ -75,16 +76,15 @@ public:
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>());
   }
-
   ServiceReference<I2> GetReference(InterfaceT<I2>) const
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>());
   }
-
   ServiceReference<I3> GetReference(InterfaceT<I3>) const
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I3>());
   }
+  ///@}
 
   using ServiceRegistrationBase::operator=;
 
@@ -100,6 +100,7 @@ private:
 
 };
 
+/// \cond
 template<class I1, class I2>
 class ServiceRegistration<I1, I2, void> : public ServiceRegistrationBase
 {
@@ -188,8 +189,14 @@ public:
 
   using ServiceRegistrationBase::operator=;
 };
+/// \endcond
 
-typedef ServiceRegistration<void,void> ServiceRegistrationU;
+/**
+ * \ingroup MicroServices
+ *
+ * A service registration object of unknown type.
+ */
+typedef ServiceRegistration<void> ServiceRegistrationU;
 
 US_END_NAMESPACE
 

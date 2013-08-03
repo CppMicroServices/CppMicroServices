@@ -38,7 +38,7 @@ class ServiceReferenceBasePrivate;
  * A reference to a service.
  *
  * \note This class is provided as public API for low-level service queries only.
- *       In almost all cases you should use usServiceReference<S> instead.
+ *       In almost all cases you should use the template ServiceReference instead.
  */
 class US_EXPORT ServiceReferenceBase {
 
@@ -122,8 +122,30 @@ public:
    */
   void GetUsingModules(std::vector<Module*>& modules) const;
 
+  /**
+   * Returns the interface identifier this ServiceReferenceBase object
+   * is bound to.
+   *
+   * A default constructed ServiceReferenceBase object is not bound to
+   * any interface identifier and calling this method will return an
+   * empty string.
+   *
+   * @return The interface identifier for this ServiceReferenceBase object.
+   */
   std::string GetInterfaceId() const;
 
+  /**
+   * Checks wether this ServiceReferenceBase object can be converted to
+   * another ServiceReferenceBase object, which will be bound to the
+   * given interface identifier.
+   *
+   * ServiceReferenceBase objects can be converted if the underlying service
+   * implementation was registered under multiple service interfaces.
+   *
+   * @param interfaceid
+   * @return \c true if this ServiceReferenceBase object can be converted,
+   *         \c false otherwise.
+   */
   bool IsConvertibleTo(const std::string& interfaceid) const;
 
   /**
@@ -165,10 +187,6 @@ private:
   friend class ServiceListeners;
   friend class ServiceRegistry;
   friend class LDAPFilter;
-
-  //template<class S, class T> friend class ServiceTracker;
-  //template<class S, class T> friend class ServiceTrackerPrivate;
-  //template<class S, class R, class T> friend class ModuleAbstractTracked;
 
   template<class S> friend class ServiceReference;
 

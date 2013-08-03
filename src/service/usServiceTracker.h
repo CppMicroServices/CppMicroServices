@@ -365,7 +365,7 @@ protected:
    * This method can be overridden in a subclass to customize the service
    * object to be tracked for the service being added. In that case, take care
    * not to rely on the default implementation of
-   * \link RemovedService(const ServiceReference&, T service) removedService\endlink
+   * \link RemovedService(const ServiceReferenceT&, T service) removedService\endlink
    * to unget the service.
    *
    * @param reference The reference to the service being added to this
@@ -407,12 +407,12 @@ protected:
    * was created, passing the specified <code>ServiceReference</code>.
    * <p>
    * This method can be overridden in a subclass. If the default
-   * implementation of \link AddingService(const ServiceReference&) AddingService\endlink
+   * implementation of \link AddingService(const ServiceReferenceT&) AddingService\endlink
    * method was used, this method must unget the service.
    *
    * @param reference The reference to removed service.
    * @param service The service object for the removed service.
-   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReference&, T)
+   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceT&, T)
    */
   void RemovedService(const ServiceReferenceT& reference, T service);
 

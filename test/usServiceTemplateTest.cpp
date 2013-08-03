@@ -141,7 +141,9 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   MyFactory3 f3;
   us::ServiceRegistration<Interface1,Interface2,Interface3> sfr3 = mc->RegisterService<Interface1,Interface2,Interface3>(static_cast<ServiceFactory*>(&f3));
 
+#ifdef US_BUILD_SHARED_LIBS
   US_TEST_CONDITION(mc->GetModule()->GetRegisteredServices().size() == 6, "# of reg services")
+#endif
 
   std::vector<us::ServiceReference<Interface1> > s1refs = mc->GetServiceReferences<Interface1>();
   US_TEST_CONDITION(s1refs.size() == 6, "# of interface1 regs")

@@ -80,12 +80,12 @@ void TestServiceFactoryModuleScope()
 
   Module* moduleH = ModuleRegistry::GetModule("TestModuleH Module");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
-#endif
 
   std::vector<ServiceReferenceU> registeredRefs = moduleH->GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
   US_TEST_CONDITION(registeredRefs[0].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
   US_TEST_CONDITION(registeredRefs[1].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
+#endif
 
   ModuleContext* mc = GetModuleContext();
   // Check that a service reference exist
@@ -99,11 +99,11 @@ void TestServiceFactoryModuleScope()
   void* service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")
 
+#ifdef US_BUILD_SHARED_LIBS
   std::vector<ServiceReferenceU> usedRefs = mc->GetModule()->GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
 
-#ifdef US_BUILD_SHARED_LIBS
   void* service3 = moduleH->GetModuleContext()->GetService(sr1);
   US_TEST_CONDITION(service != service3, "Different service pointer")
   US_TEST_CONDITION(moduleH->GetModuleContext()->UngetService(sr1), "UngetService()")
@@ -145,9 +145,10 @@ void TestServiceFactoryPrototypeScope()
   ServiceObjects<TestModuleH2> svcObjects = mc->GetServiceObjects(sr1);
   TestModuleH2* prototypeServiceH2 = svcObjects.GetService();
 
+#ifdef US_BUILD_SHARED_LIBS
   // There should be only one service in use
   US_TEST_CONDITION_REQUIRED(mc->GetModule()->GetServicesInUse().size() == 1, "services in use")
-
+#endif
 
   TestModuleH2* moduleScopeService = mc->GetService(sr1);
   US_TEST_CONDITION_REQUIRED(moduleScopeService && moduleScopeService != prototypeServiceH2, "GetService()")
@@ -155,9 +156,11 @@ void TestServiceFactoryPrototypeScope()
   TestModuleH2* moduleScopeService2 = mc->GetService(sr1);
   US_TEST_CONDITION(moduleScopeService == moduleScopeService2, "Same service pointer")
 
+#ifdef US_BUILD_SHARED_LIBS
   std::vector<ServiceReferenceU> usedRefs = mc->GetModule()->GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
+#endif
 
   std::string filter = "(" + ServiceConstants::SERVICE_ID() + "=" + sr1.GetProperty(ServiceConstants::SERVICE_ID()).ToString() + ")";
   const ServiceReference<TestModuleH> sr2 = mc->GetServiceReferences<TestModuleH>(filter).front();
@@ -175,9 +178,11 @@ void TestServiceFactoryPrototypeScope()
     // this is expected
   }
 
+#ifdef US_BUILD_SHARED_LIBS
   // There should still be only one service in use
   usedRefs = mc->GetModule()->GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
+#endif
 
   ServiceObjects<TestModuleH2> svcObjects2 = svcObjects;
   ServiceObjects<TestModuleH2> svcObjects3 = mc->GetServiceObjects(sr1);

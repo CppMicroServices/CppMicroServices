@@ -106,9 +106,31 @@ US_BEGIN_NAMESPACE
 
 class ServiceFactory;
 
+/**
+ * @ingroup MicroServices
+ *
+ * A helper type used in several methods to get proper
+ * method overload resolutions.
+ */
 template<class Interface>
 struct InterfaceT {};
 
+/**
+ * @ingroup MicroServices
+ *
+ * A map containing interfaces ids and their corresponding service object
+ * pointers. InterfaceMap instances represent a complete service object
+ * which implementes one or more service interfaces. For each implemented
+ * service interface, there is an entry in the map with the key being
+ * the service interface id and the value a pointer to the service
+ * interface implementation.
+ *
+ * To create InterfaceMap instances, use the MakeInterfaceMap helper class.
+ *
+ * @note This is a low-level type and should only rarely be used.
+ *
+ * @see MakeInterfaceMap
+ */
 typedef std::map<std::string, void*> InterfaceMap;
 
 
@@ -132,6 +154,23 @@ inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
 }
 
 
+/**
+ * @ingroup MicroServices
+ *
+ * Helper class for constructing InterfaceMap instances based
+ * on service implementations or service factories.
+ *
+ * Example usage:
+ * \code
+ * MyService service; // implementes I1 and I2
+ * InterfaceMap im = MakeInterfaceMap<I1,I2>(&service);
+ * \endcode
+ *
+ * The MakeInterfaceMap supports service implementations with
+ * up to three service interfaces.
+ *
+ * @see InterfaceMap
+ */
 template<class I1, class I2 = void, class I3 = void>
 struct MakeInterfaceMap
 {
@@ -140,6 +179,12 @@ struct MakeInterfaceMap
   I2* m_interface2;
   I3* m_interface3;
 
+  /**
+   * Constructor taking a service implementation pointer.
+   *
+   * @param impl A service implementation pointer, which must
+   *        be castable to a all specified service interfaces.
+   */
   template<class Impl>
   MakeInterfaceMap(Impl* impl)
     : m_factory(NULL)
@@ -148,6 +193,11 @@ struct MakeInterfaceMap
     , m_interface3(static_cast<I3*>(impl))
   {}
 
+  /**
+   * Constructor taking a service factory.
+   *
+   * @param factory A service factory.
+   */
   MakeInterfaceMap(ServiceFactory* factory)
     : m_factory(factory)
     , m_interface1(NULL)
@@ -177,6 +227,7 @@ struct MakeInterfaceMap
   }
 };
 
+/// \cond
 template<class I1, class I2>
 struct MakeInterfaceMap<I1,I2,void>
 {
@@ -257,7 +308,20 @@ struct MakeInterfaceMap<I1,void,void>
 
 template<>
 struct MakeInterfaceMap<void,void,void>;
+/// \endcond
 
+/**
+ * @ingroup MicroServices
+ *
+ * Extract a service interface pointer from a given InterfaceMap instance.
+ *
+ * @param map a InterfaceMap instance.
+ * @return The service interface pointer for the service interface id of the
+ *         \c I1 interface type or NULL if \c map does not contain an entry
+ *         for the given type.
+ *
+ * @see MakeInterfaceMap
+ */
 template<class I1>
 I1* ExtractInterface(const InterfaceMap& map)
 {

@@ -583,7 +583,7 @@ public:
    * Returns the service object referenced by the specified
    * <code>ServiceReference</code> object.
    * <p>
-   * This is a convenience method which is identical to US_BASECLASS_NAME* GetService(const ServiceReference&)
+   * This is a convenience method which is identical to void* GetService(const ServiceReferenceBase&)
    * except that it casts the service object to the supplied template argument type
    *
    * @tparam S The type the service object will be cast to.

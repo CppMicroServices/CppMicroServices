@@ -107,7 +107,7 @@ public:
    * @return The module that registered the service referenced by this
    *         <code>ServiceReference</code> object; <code>0</code> if that
    *         service has already been unregistered.
-   * @see ModuleContext::RegisterService(const std::vector<std::string>&, US_BASECLASS_NAME*, const ServiceProperties&)
+   * @see ModuleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   Module* GetModule() const;
 

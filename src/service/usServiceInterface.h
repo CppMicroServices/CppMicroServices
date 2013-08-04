@@ -46,7 +46,6 @@ template<class T> inline const char* us_service_interface_iid();
 
 #if defined(QT_DEBUG) || defined(QT_NO_DEBUG)
 #include <qobject.h>
-#include US_BASECLASS_HEADER
 
 #define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)                  \
   template<> inline const char* qobject_interface_iid<_service_interface_type *>()                    \

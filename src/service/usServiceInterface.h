@@ -47,15 +47,15 @@ template<class T> inline const char* us_service_interface_iid();
 #if defined(QT_DEBUG) || defined(QT_NO_DEBUG)
 #include <qobject.h>
 
-#define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)                  \
-  template<> inline const char* qobject_interface_iid<_service_interface_type *>()                    \
-  { return _service_interface_id; }                                                                   \
-  template<> inline const char* us_service_interface_iid<_service_interface_type>()                   \
-  { return _service_interface_id; }                                                                   \
-  template<> inline _service_interface_type *qobject_cast<_service_interface_type *>(QObject *object) \
+#define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)                 \
+  template<> inline const char* qobject_interface_iid<_service_interface_type*>()                    \
+  { return _service_interface_id; }                                                                  \
+  template<> inline const char* us_service_interface_iid<_service_interface_type>()                  \
+  { return _service_interface_id; }                                                                  \
+  template<> inline _service_interface_type* qobject_cast<_service_interface_type*>(QObject* object) \
   { return reinterpret_cast<_service_interface_type*>(object ? object->qt_metacast(_service_interface_id) : 0); } \
-  template<> inline _service_interface_type *qobject_cast<_service_interface_type *>(const QObject *object) \
-  { return reinterpret_cast<_service_interface_type*>(object ? const_cast<QObject *>(object)->qt_metacast(_service_interface_id) : 0); }
+  template<> inline _service_interface_type* qobject_cast<_service_interface_type*>(const QObject* object) \
+  { return reinterpret_cast<_service_interface_type*>(object ? const_cast<QObject*>(object)->qt_metacast(_service_interface_id) : 0); }
 
 #else
 

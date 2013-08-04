@@ -595,7 +595,7 @@ public:
    *         longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
-   * @see #GetService(const ServiceReference&)
+   * @see #GetService(const ServiceReferenceBase&)
    * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */

@@ -47,7 +47,7 @@ public:
   ServiceReferenceBase(const ServiceReferenceBase& ref);
 
   /**
-   * Converts this ServiceReference instance into a boolean
+   * Converts this ServiceReferenceBase instance into a boolean
    * expression. If this instance was default constructed or
    * the service it references has been unregistered, the conversion
    * returns <code>false</code>, otherwise it returns <code>true</code>.
@@ -56,7 +56,7 @@ public:
 
   /**
    * Releases any resources held or locked by this
-   * <code>ServiceReference</code> and renders it invalid.
+   * <code>ServiceReferenceBase</code> and renders it invalid.
    */
   ServiceReferenceBase& operator=(int null);
 
@@ -65,7 +65,7 @@ public:
   /**
    * Returns the property value to which the specified property key is mapped
    * in the properties <code>ServiceProperties</code> object of the service
-   * referenced by this <code>ServiceReference</code> object.
+   * referenced by this <code>ServiceReferenceBase</code> object.
    *
    * <p>
    * Property keys are case-insensitive.
@@ -83,7 +83,7 @@ public:
 
   /**
    * Returns a list of the keys in the <code>ServiceProperties</code>
-   * object of the service referenced by this <code>ServiceReference</code>
+   * object of the service referenced by this <code>ServiceReferenceBase</code>
    * object.
    *
    * <p>
@@ -97,7 +97,7 @@ public:
 
   /**
    * Returns the module that registered the service referenced by this
-   * <code>ServiceReference</code> object.
+   * <code>ServiceReferenceBase</code> object.
    *
    * <p>
    * This method must return <code>0</code> when the service has been
@@ -105,7 +105,7 @@ public:
    * unregistered.
    *
    * @return The module that registered the service referenced by this
-   *         <code>ServiceReference</code> object; <code>0</code> if that
+   *         <code>ServiceReferenceBase</code> object; <code>0</code> if that
    *         service has already been unregistered.
    * @see ModuleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -113,11 +113,11 @@ public:
 
   /**
    * Returns the modules that are using the service referenced by this
-   * <code>ServiceReference</code> object. Specifically, this method returns
+   * <code>ServiceReferenceBase</code> object. Specifically, this method returns
    * the modules whose usage count for that service is greater than zero.
    *
    * @param modules A list of modules whose usage count for the service referenced
-   *         by this <code>ServiceReference</code> object is greater than
+   *         by this <code>ServiceReferenceBase</code> object is greater than
    *         zero.
    */
   void GetUsingModules(std::vector<Module*>& modules) const;
@@ -149,27 +149,27 @@ public:
   bool IsConvertibleTo(const std::string& interfaceid) const;
 
   /**
-   * Compares this <code>ServiceReference</code> with the specified
-   * <code>ServiceReference</code> for order.
+   * Compares this <code>ServiceReferenceBase</code> with the specified
+   * <code>ServiceReferenceBase</code> for order.
    *
    * <p>
-   * If this <code>ServiceReference</code> and the specified
-   * <code>ServiceReference</code> have the same \link ServiceConstants::SERVICE_ID()
-   * service id\endlink they are equal. This <code>ServiceReference</code> is less
-   * than the specified <code>ServiceReference</code> if it has a lower
+   * If this <code>ServiceReferenceBase</code> and the specified
+   * <code>ServiceReferenceBase</code> have the same \link ServiceConstants::SERVICE_ID()
+   * service id\endlink they are equal. This <code>ServiceReferenceBase</code> is less
+   * than the specified <code>ServiceReferenceBase</code> if it has a lower
    * {@link ServiceConstants::SERVICE_RANKING service ranking} and greater if it has a
-   * higher service ranking. Otherwise, if this <code>ServiceReference</code>
-   * and the specified <code>ServiceReference</code> have the same
+   * higher service ranking. Otherwise, if this <code>ServiceReferenceBase</code>
+   * and the specified <code>ServiceReferenceBase</code> have the same
    * {@link ServiceConstants::SERVICE_RANKING service ranking}, this
-   * <code>ServiceReference</code> is less than the specified
-   * <code>ServiceReference</code> if it has a higher
+   * <code>ServiceReferenceBase</code> is less than the specified
+   * <code>ServiceReferenceBase</code> if it has a higher
    * {@link ServiceConstants::SERVICE_ID service id} and greater if it has a lower
    * service id.
    *
-   * @param reference The <code>ServiceReference</code> to be compared.
+   * @param reference The <code>ServiceReferenceBase</code> to be compared.
    * @return Returns a false or true if this
-   *         <code>ServiceReference</code> is less than or greater
-   *         than the specified <code>ServiceReference</code>.
+   *         <code>ServiceReferenceBase</code> is less than or greater
+   *         than the specified <code>ServiceReferenceBase</code>.
    */
   bool operator<(const ServiceReferenceBase& reference) const;
 
@@ -195,7 +195,7 @@ private:
   std::size_t Hash() const;
 
   /**
-   * Creates an invalid ServiceReference object. You can use
+   * Creates an invalid ServiceReferenceBase object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
@@ -224,4 +224,4 @@ US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceReferenceBase))
 US_HASH_FUNCTION_END
 US_HASH_FUNCTION_NAMESPACE_END
 
-#endif // USSERVICEREFERENCE_H
+#endif // USSERVICEREFERENCEBASE_H

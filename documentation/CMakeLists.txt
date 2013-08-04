@@ -5,7 +5,7 @@ if(US_BUILD_TESTING)
   add_subdirectory(snippets)
 endif()
 
-if(NOT US_IS_EMBEDDED)
+if(NOT US_IS_EMBEDDED AND NOT US_NO_DOCUMENTATION)
   find_package(Doxygen)
 
   if(DOXYGEN_FOUND)

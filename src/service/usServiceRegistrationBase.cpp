@@ -124,7 +124,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
         d->module->coreCtx->listeners.GetMatchingServiceListeners(d->reference, before, false);
         classes = ref_any_cast<std::vector<std::string> >(d->properties.Value(ServiceConstants::OBJECTCLASS()));
         long int sid = any_cast<long int>(d->properties.Value(ServiceConstants::SERVICE_ID()));
-        d->properties = ServiceRegistry::CreateServiceProperties(props, classes, sid);
+        d->properties = ServiceRegistry::CreateServiceProperties(props, classes, false, false, sid);
 
         {
           const Any& any = d->properties.Value(ServiceConstants::SERVICE_RANKING());

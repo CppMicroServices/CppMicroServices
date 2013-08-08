@@ -125,7 +125,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
     os << " " << sid;
 
     Any classes = sr.GetProperty(ServiceConstants::OBJECTCLASS());
-    os << " objectClass=" << classes << ")";
+    os << " objectClass=" << classes.ToString() << ")";
   }
 
   return os;

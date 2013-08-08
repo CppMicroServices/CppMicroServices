@@ -394,9 +394,4 @@ std::string any_value_to_string(const T& val)
 
 US_END_NAMESPACE
 
-inline std::ostream& operator<< (std::ostream& os, const US_PREPEND_NAMESPACE(Any)& any)
-{
-  return os << any.ToString();
-}
-
 #endif // US_ANY_H

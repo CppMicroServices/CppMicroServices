@@ -192,7 +192,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
   size_t keySize = keys.size();
   for(size_t i = 0; i < keySize; ++i)
   {
-    os << keys[i] << "=" << serviceRef.GetProperty(keys[i]);
+    os << keys[i] << "=" << serviceRef.GetProperty(keys[i]).ToString();
     if (i < keySize-1) os << ",";
   }
   os << ")";

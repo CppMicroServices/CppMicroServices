@@ -23,6 +23,11 @@
 
 US_BEGIN_NAMESPACE
 
+std::ostream& operator<< (std::ostream& os, const Any& any)
+{
+  return os << any.ToString();
+}
+
 template<typename Iterator>
 std::string container_to_string(Iterator i1, Iterator i2)
 {

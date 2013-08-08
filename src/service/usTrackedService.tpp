@@ -21,16 +21,16 @@
 
 US_BEGIN_NAMESPACE
 
-template<class S, class T>
-TrackedService<S,T>::TrackedService(ServiceTracker<S,T>* serviceTracker,
+template<class S, class TTT>
+TrackedService<S,TTT>::TrackedService(ServiceTracker<S,TTT>* serviceTracker,
                   ServiceTrackerCustomizer<S,T>* customizer)
   : serviceTracker(serviceTracker), customizer(customizer)
 {
 
 }
 
-template<class S, class T>
-void TrackedService<S,T>::ServiceChanged(const ServiceEvent event)
+template<class S, class TTT>
+void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent event)
 {
   /*
    * Check if we had a delayed call (which could happen when we
@@ -90,32 +90,33 @@ void TrackedService<S,T>::ServiceChanged(const ServiceEvent event)
   }
 }
 
-template<class S, class T>
-void TrackedService<S,T>::Modified()
+template<class S, class TTT>
+void TrackedService<S,TTT>::Modified()
 {
   Superclass::Modified(); /* increment the modification count */
   serviceTracker->d->Modified();
 }
 
-template<class S, class T>
-T TrackedService<S,T>::CustomizerAdding(ServiceReference<S> item,
+template<class S, class TTT>
+typename TrackedService<S,TTT>::T
+TrackedService<S,TTT>::CustomizerAdding(ServiceReference<S> item,
                                         const ServiceEvent& /*related*/)
 {
   return customizer->AddingService(item);
 }
 
-template<class S, class T>
-void TrackedService<S,T>::CustomizerModified(ServiceReference<S> item,
-                                             const ServiceEvent& /*related*/,
-                                             T object)
+template<class S, class TTT>
+void TrackedService<S,TTT>::CustomizerModified(ServiceReference<S> item,
+                                               const ServiceEvent& /*related*/,
+                                               T object)
 {
   customizer->ModifiedService(item, object);
 }
 
-template<class S, class T>
-void TrackedService<S,T>::CustomizerRemoved(ServiceReference<S> item,
-                                            const ServiceEvent& /*related*/,
-                                            T object)
+template<class S, class TTT>
+void TrackedService<S,TTT>::CustomizerRemoved(ServiceReference<S> item,
+                                              const ServiceEvent& /*related*/,
+                                              T object)
 {
   customizer->RemovedService(item, object);
 }

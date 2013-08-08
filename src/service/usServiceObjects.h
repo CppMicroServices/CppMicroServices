@@ -46,15 +46,21 @@ protected:
 
   ServiceObjectsBase(const ServiceObjectsBase& other);
 
-public:
-
   ~ServiceObjectsBase();
 
   ServiceObjectsBase& operator=(const ServiceObjectsBase& other);
 
+  // Called by ServiceObjects<S> with S != void
   void* GetService() const;
 
+  // Called by the ServiceObjects<void> specialization
+  InterfaceMap GetServiceInterfaceMap() const;
+
+  // Called by ServiceObjects<S> with S != void
   void UngetService(void* service);
+
+  // Called by the ServiceObjects<void> specialization
+  void UngetService(const InterfaceMap& interfaceMap);
 
   ServiceReferenceBase GetReference() const;
 
@@ -101,10 +107,10 @@ public:
    *   <li>If the referenced service has been unregistered, \c NULL is returned.</li>
    *   <li>The PrototypeServiceFactory::GetService(Module*, const ServiceRegistrationBase&)
    *       method is called to create a service object for the caller.</li>
-   *   <li>If the service object returned by the PrototypeServiceFactory object is \c NULL,
-   *       does not contain all the interfaces named when the service was registered
-   *       or the PrototypeServiceFactory object throws an exception, \c NULL is returned
-   *       and a warning message is issued.</li>
+   *   <li>If the service object (an instance of InterfaceMap) returned by the
+   *       PrototypeServiceFactory object is empty, does not contain all the interfaces
+   *       named when the service was registered or the PrototypeServiceFactory object
+   *       throws an exception, \c NULL is returned and a warning message is issued.</li>
    *   <li>The service object is returned.</li>
    * </ol>
    *
@@ -166,7 +172,7 @@ public:
    */
   ServiceReference<S> GetServiceReference() const
   {
-    return this->ServiceObjectsBase::GetServiceReference();
+    return this->ServiceObjectsBase::GetReference();
   }
 
 private:
@@ -176,6 +182,75 @@ private:
   ServiceObjects(ModuleContext* context, const ServiceReference<S>& reference)
     : ServiceObjectsBase(context, reference)
   {}
+
+};
+
+/**
+ * @ingroup MicroServices
+ *
+ * Allows multiple service objects for a service to be obtained.
+ *
+ * This is a specialization of the ServiceObjects class template for
+ * "void", which maps to all service interface types.
+ *
+ * @see ServiceObjects
+ */
+template<>
+class US_EXPORT ServiceObjects<void> : private ServiceObjectsBase
+{
+
+public:
+
+  /**
+   * Returns a service object as a InterfaceMap instance for the referenced service.
+   *
+   * This method is the same as ServiceObjects<S>::GetService() except for the
+   * return type. Further, this method will always return an empty InterfaeMap
+   * object when the referenced service has been unregistered.
+   *
+   * @return A InterfaceMap object for the referenced service, which is empty if the
+   *         service is not registered, the InterfaceMap returned by a ServiceFactory
+   *         does not contain all the classes under which the service object was
+   *         registered or the ServiceFactory threw an exception.
+   *
+   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects object
+   *        is no longer valid.
+   *
+   * @see ServiceObjects<S>::GetService()
+   * @see UngetService()
+   */
+  InterfaceMap GetService() const;
+
+  /**
+   * Releases a service object for the referenced service.
+   *
+   * This method is the same as ServiceObjects<S>::UngetService() except for the
+   * parameter type.
+   *
+   * @param service An InterfaceMap object previously provided by this ServiceObjects object.
+   *
+   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects
+   *        object is no longer valid.
+   * @throw std::invalid_argument If the specified service was not provided by this
+   *        ServiceObjects object.
+   *
+   * @see ServiceObjects<S>::UngetService()
+   * @see GetService()
+   */
+  void UngetService(const InterfaceMap& service);
+
+  /**
+   * Returns the ServiceReference for this ServiceObjects object.
+   *
+   * @return The ServiceReference for this ServiceObjects object.
+   */
+  ServiceReferenceU GetServiceReference() const;
+
+private:
+
+  friend class ModuleContext;
+
+  ServiceObjects(ModuleContext* context, const ServiceReferenceU& reference);
 
 };
 

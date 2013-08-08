@@ -52,20 +52,20 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
     delete registration;
 }
 
-void* ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
-                                                         ServiceFactory* factory,
-                                                         bool isModuleScope)
+InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
+                                                                ServiceFactory* factory,
+                                                                bool isModuleScope)
 {
   assert(factory && "Factory service pointer is NULL");
-  void* s = NULL;
+  InterfaceMap s;
   try
   {
-    const InterfaceMap smap = factory->GetService(module,
-                                                  ServiceRegistrationBase(registration));
+    InterfaceMap smap = factory->GetService(module,
+                                            ServiceRegistrationBase(registration));
     if (smap.empty())
     {
       US_WARN << "ServiceFactory produced null";
-      return NULL;
+      return smap;
     }
     const std::vector<std::string>& classes =
         ref_any_cast<std::vector<std::string> >(registration->properties.Value(ServiceConstants::OBJECTCLASS()));
@@ -76,10 +76,11 @@ void* ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
       {
         US_WARN << "ServiceFactory produced an object "
                    "that did not implement: " << (*i);
-        return NULL;
+        smap.clear();
+        return smap;
       }
     }
-    s = smap.find(interfaceId)->second;
+    s = smap;
 
     if (isModuleScope)
     {
@@ -93,14 +94,14 @@ void* ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
   catch (...)
   {
     US_WARN << "ServiceFactory threw an exception";
-    return NULL;
+    s.clear();
   }
   return s;
 }
 
-void* ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
+InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
 {
-  void* s = NULL;
+  InterfaceMap s;
   {
     MutexLocker lock(registration->propsLock);
     if (registration->available)
@@ -128,7 +129,8 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
       {
         if (serviceFactory)
         {
-          s = GetServiceFromFactory(module, serviceFactory, true);
+          const InterfaceMap im = GetServiceFromFactory(module, serviceFactory, true);
+          s = im.find(interfaceId)->second;
         }
         else
         {
@@ -157,7 +159,51 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
   return s;
 }
 
-bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, void* service)
+InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
+{
+  InterfaceMap s;
+  {
+    MutexLocker lock(registration->propsLock);
+    if (registration->available)
+    {
+      ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
+            registration->GetService("org.cppmicroservices.factory"));
+
+      const int count = registration->dependents[module];
+      if (count == 0)
+      {
+        if (serviceFactory)
+        {
+          s = GetServiceFromFactory(module, serviceFactory, true);
+        }
+        else
+        {
+          s = registration->service;
+        }
+      }
+      else
+      {
+        if (serviceFactory)
+        {
+          // return the already produced instance
+          s = registration->moduleServiceInstance[module];
+        }
+        else
+        {
+          s = registration->service;
+        }
+      }
+
+      if (!s.empty())
+      {
+        registration->dependents[module] = count + 1;
+      }
+    }
+  }
+  return s;
+}
+
+bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const InterfaceMap& service)
 {
   MutexLocker lock(registration->propsLock);
 
@@ -170,28 +216,16 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, void* se
 
   std::list<InterfaceMap>& prototypeServiceMaps = iter->second;
 
-  bool serviceFound = false;
   for (std::list<InterfaceMap>::iterator imIter = prototypeServiceMaps.begin();
        imIter != prototypeServiceMaps.end(); ++imIter)
   {
-    const InterfaceMap& sfi = *imIter;
-    for (InterfaceMap::const_iterator svcIter = sfi.begin();
-         svcIter != sfi.end(); ++svcIter)
-    {
-      if (svcIter->second == service)
-      {
-        serviceFound = true;
-        break;
-      }
-    }
-
-    if (serviceFound)
+    if (service == *imIter)
     {
       try
       {
         ServiceFactory* sf = reinterpret_cast<ServiceFactory*>(
                                registration->GetService("org.cppmicroservices.factory"));
-        sf->UngetService(module, ServiceRegistrationBase(registration), sfi);
+        sf->UngetService(module, ServiceRegistrationBase(registration), service);
       }
       catch (const std::exception& /*e*/)
       {

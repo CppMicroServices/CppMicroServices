@@ -57,13 +57,15 @@ public:
     */
   void* GetService(Module* module);
 
+  InterfaceMap GetServiceInterfaceMap(Module* module);
+
   /**
     * Get new service instance.
     *
     * @param module requester of service.
     * @return Service requested or null in case of failure.
     */
-  void* GetPrototypeService(Module* module);
+  InterfaceMap GetPrototypeService(Module* module);
 
   /**
    * Unget the service object.
@@ -85,6 +87,8 @@ public:
    * @return \c true if the service was removed, \c false otherwise.
    */
   bool UngetPrototypeService(Module* module, void* service);
+
+  bool UngetPrototypeService(Module* module, const InterfaceMap& service);
 
   /**
    * Get all properties registered with this service.
@@ -135,8 +139,8 @@ public:
 
 private:
 
-  void* GetServiceFromFactory(Module* module, ServiceFactory* factory,
-                              bool isModuleScope);
+  InterfaceMap GetServiceFromFactory(Module* module, ServiceFactory* factory,
+                                     bool isModuleScope);
 
   // purposely not implemented
   ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&);

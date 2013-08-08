@@ -56,6 +56,7 @@ bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
   return ids.empty();
 }
 
+
 int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTrackerTest")
@@ -176,22 +177,22 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 
   // 14. Get the service of the highest ranked service reference
 
-  void* o1 = st1->GetService(h1);
-  US_TEST_CONDITION_REQUIRED(o1 != 0, "Check for non-null service");
+  InterfaceMap o1 = st1->GetService(h1);
+  US_TEST_CONDITION_REQUIRED(!o1.empty(), "Check for non-null service");
 
   // 14a Get the highest ranked service, directly this time
-  void* o3 = st1->GetService();
-  US_TEST_CONDITION_REQUIRED(o3 != 0, "Check for non-null service");
+  InterfaceMap o3 = st1->GetService();
+  US_TEST_CONDITION_REQUIRED(!o3.empty(), "Check for non-null service");
   US_TEST_CONDITION_REQUIRED(o1 == o3, "Check for equal service instances");
 
   // 15. Now release the tracking of that service and then try to get it
   //     from the servicetracker, which should yield a null object
   serviceController->ServiceControl(1, "unregister", 7);
-  void* o2 = st1->GetService(h1);
-  US_TEST_CONDITION_REQUIRED(o2 == 0, "Checkt that service is null");
+  InterfaceMap o2 = st1->GetService(h1);
+  US_TEST_CONDITION_REQUIRED(o2.empty(), "Checkt that service is null");
 
   // 16. Get all service objects this tracker tracks, it should be 2
-  std::vector<void*> ts1;
+  std::vector<InterfaceMap> ts1;
   st1->GetServices(ts1);
   US_TEST_CONDITION_REQUIRED(ts1.size() == 2, "Check service count");
 
@@ -215,8 +216,8 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 
 
   // 20. Test the waitForService method
-  void* o9 = st1->WaitForService(50);
-  US_TEST_CONDITION_REQUIRED(o9 != 0, "Checking WaitForService method");
+  InterfaceMap o9 = st1->WaitForService(50);
+  US_TEST_CONDITION_REQUIRED(!o9.empty(), "Checking WaitForService method");
 
   US_TEST_END()
 }

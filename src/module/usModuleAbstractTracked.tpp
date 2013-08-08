@@ -23,23 +23,23 @@
 
 US_BEGIN_NAMESPACE
 
-template<class S, class T, class R>
-const bool ModuleAbstractTracked<S,T,R>::DEBUG_OUTPUT = false;
+template<class S, class TTT, class R>
+const bool ModuleAbstractTracked<S,TTT,R>::DEBUG_OUTPUT = false;
 
-template<class S, class T, class R>
-ModuleAbstractTracked<S,T,R>::ModuleAbstractTracked()
+template<class S, class TTT, class R>
+ModuleAbstractTracked<S,TTT,R>::ModuleAbstractTracked()
 {
   closed = false;
 }
 
-template<class S, class T, class R>
-ModuleAbstractTracked<S,T,R>::~ModuleAbstractTracked()
+template<class S, class TTT, class R>
+ModuleAbstractTracked<S,TTT,R>::~ModuleAbstractTracked()
 {
 
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::SetInitial(const std::vector<S>& initiallist)
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::SetInitial(const std::vector<S>& initiallist)
 {
   std::copy(initiallist.begin(), initiallist.end(), std::back_inserter(initial));
 
@@ -53,8 +53,8 @@ void ModuleAbstractTracked<S,T,R>::SetInitial(const std::vector<S>& initiallist)
   }
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::TrackInitial()
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::TrackInitial()
 {
   while (true)
   {
@@ -74,7 +74,7 @@ void ModuleAbstractTracked<S,T,R>::TrackInitial()
        */
       item = initial.front();
       initial.pop_front();
-      if (tracked[item])
+      if (TTT::IsValid(tracked[item]))
       {
         /* if we are already tracking this item */
         US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackInitial[already tracked]: " << item;
@@ -100,16 +100,16 @@ void ModuleAbstractTracked<S,T,R>::TrackInitial()
   }
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::Close()
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::Close()
 {
   closed = true;
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::Track(S item, R related)
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::Track(S item, R related)
 {
-  T object(0);
+  T object = TTT::DefaultValue();
   {
     typename Self::Lock l(this);
     if (closed)
@@ -117,7 +117,7 @@ void ModuleAbstractTracked<S,T,R>::Track(S item, R related)
       return;
     }
     object = tracked[item];
-    if (!object)
+    if (!TTT::IsValid(object))
     { /* we are not tracking the item */
       if (std::find(adding.begin(), adding.end(),item) != adding.end())
       {
@@ -134,7 +134,7 @@ void ModuleAbstractTracked<S,T,R>::Track(S item, R related)
     }
   }
 
-  if (!object)
+  if (!TTT::IsValid(object))
   { /* we are not tracking the item */
     TrackAdding(item, related);
   }
@@ -149,10 +149,10 @@ void ModuleAbstractTracked<S,T,R>::Track(S item, R related)
   }
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::Untrack(S item, R related)
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 {
-  T object(0);
+  T object = TTT::DefaultValue();
   {
     typename Self::Lock l(this);
     std::size_t initialSize = initial.size();
@@ -185,7 +185,7 @@ void ModuleAbstractTracked<S,T,R>::Untrack(S item, R related)
      * calling customizer callback
      */
     tracked.erase(item);
-    if (!object)
+    if (!TTT::IsValid(object))
     { /* are we actually tracking the item */
       return;
     }
@@ -200,28 +200,29 @@ void ModuleAbstractTracked<S,T,R>::Untrack(S item, R related)
    */
 }
 
-template<class S, class T, class R>
-std::size_t ModuleAbstractTracked<S,T,R>::Size() const
+template<class S, class TTT, class R>
+std::size_t ModuleAbstractTracked<S,TTT,R>::Size() const
 {
   return tracked.size();
 }
 
-template<class S, class T, class R>
-bool ModuleAbstractTracked<S,T,R>::IsEmpty() const
+template<class S, class TTT, class R>
+bool ModuleAbstractTracked<S,TTT,R>::IsEmpty() const
 {
   return tracked.empty();
 }
 
-template<class S, class T, class R>
-T ModuleAbstractTracked<S,T,R>::GetCustomizedObject(S item) const
+template<class S, class TTT, class R>
+typename ModuleAbstractTracked<S,TTT,R>::T
+ModuleAbstractTracked<S,TTT,R>::GetCustomizedObject(S item) const
 {
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end()) return i->second;
   return T();
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::GetTracked(std::vector<S>& items) const
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::GetTracked(std::vector<S>& items) const
 {
   for (typename TrackingMap::const_iterator i = tracked.begin();
        i != tracked.end(); ++i)
@@ -230,26 +231,26 @@ void ModuleAbstractTracked<S,T,R>::GetTracked(std::vector<S>& items) const
   }
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::Modified()
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::Modified()
 {
   trackingCount.Ref();
 }
 
-template<class S, class T, class R>
-int ModuleAbstractTracked<S,T,R>::GetTrackingCount() const
+template<class S, class TTT, class R>
+int ModuleAbstractTracked<S,TTT,R>::GetTrackingCount() const
 {
   return trackingCount;
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::CopyEntries(TrackingMap& map) const
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::CopyEntries(TrackingMap& map) const
 {
   map.insert(tracked.begin(), tracked.end());
 }
 
-template<class S, class T, class R>
-bool ModuleAbstractTracked<S,T,R>::CustomizerAddingFinal(S item, const T& custom)
+template<class S, class TTT, class R>
+bool ModuleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const T& custom)
 {
   typename Self::Lock l(this);
   std::size_t addingSize = adding.size();
@@ -260,7 +261,7 @@ bool ModuleAbstractTracked<S,T,R>::CustomizerAddingFinal(S item, const T& custom
      * if the item was not untracked during the customizer
      * callback
      */
-    if (custom)
+    if (TTT::IsValid(custom))
     {
       tracked[item] = custom;
       Modified(); /* increment modification count */
@@ -274,11 +275,11 @@ bool ModuleAbstractTracked<S,T,R>::CustomizerAddingFinal(S item, const T& custom
   }
 }
 
-template<class S, class T, class R>
-void ModuleAbstractTracked<S,T,R>::TrackAdding(S item, R related)
+template<class S, class TTT, class R>
+void ModuleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
 {
   US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackAdding:" << item;
-  T object(0);
+  T object = TTT::DefaultValue();
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
   try
@@ -299,7 +300,7 @@ void ModuleAbstractTracked<S,T,R>::TrackAdding(S item, R related)
   /*
    * The item became untracked during the customizer callback.
    */
-  if (becameUntracked && object)
+  if (becameUntracked && TTT::IsValid(object))
   {
     US_DEBUG(DEBUG_OUTPUT) << "ModuleAbstractTracked::trackAdding[removed]: " << item;
     /* Call customizer outside of synchronized region */

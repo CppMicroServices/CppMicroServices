@@ -529,7 +529,7 @@ public:
 
   /**
    * Returns the service object referenced by the specified
-   * <code>ServiceReference</code> object.
+   * <code>ServiceReferenceBase</code> object.
    * <p>
    * A module's use of a service is tracked by the module's use count of that
    * service. Each time a service's service object is returned by
@@ -573,11 +573,13 @@ public:
    * @throws std::logic_error If this ModuleContext is no
    *         longer valid.
    * @throws std::invalid_argument If the specified
-   *         <code>ServiceReference</code> is invalid (default constructed).
+   *         <code>ServiceReferenceBase</code> is invalid (default constructed).
    * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
   void* GetService(const ServiceReferenceBase& reference);
+
+  InterfaceMap GetService(const ServiceReferenceU& reference);
 
   /**
    * Returns the service object referenced by the specified

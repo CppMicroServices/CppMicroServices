@@ -93,10 +93,13 @@ void TestServiceFactoryModuleScope()
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
   US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
 
-  void* service = mc->GetService(sr1);
-  US_TEST_CONDITION_REQUIRED(service != NULL, "GetService()")
+  InterfaceMap service = mc->GetService(sr1);
+  US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
+  InterfaceMap::const_iterator serviceIter = service.find("org.cppmicroservices.TestModuleH");
+  US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
+  US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
 
-  void* service2 = mc->GetService(sr1);
+  InterfaceMap service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")
 
 #ifdef US_BUILD_SHARED_LIBS
@@ -104,7 +107,7 @@ void TestServiceFactoryModuleScope()
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
 
-  void* service3 = moduleH->GetModuleContext()->GetService(sr1);
+  InterfaceMap service3 = moduleH->GetModuleContext()->GetService(sr1);
   US_TEST_CONDITION(service != service3, "Different service pointer")
   US_TEST_CONDITION(moduleH->GetModuleContext()->UngetService(sr1), "UngetService()")
 #endif
@@ -145,6 +148,12 @@ void TestServiceFactoryPrototypeScope()
   ServiceObjects<TestModuleH2> svcObjects = mc->GetServiceObjects(sr1);
   TestModuleH2* prototypeServiceH2 = svcObjects.GetService();
 
+  const ServiceReferenceU sr1void = mc->GetServiceReference(us_service_interface_iid<TestModuleH2>());
+  ServiceObjects<void> svcObjectsVoid = mc->GetServiceObjects(sr1void);
+  InterfaceMap prototypeServiceH2Void = svcObjectsVoid.GetService();
+  US_TEST_CONDITION_REQUIRED(prototypeServiceH2Void.find(us_service_interface_iid<TestModuleH2>()) != prototypeServiceH2Void.end(),
+                             "ServiceObjects<void>::GetService()")
+
 #ifdef US_BUILD_SHARED_LIBS
   // There should be only one service in use
   US_TEST_CONDITION_REQUIRED(mc->GetModule()->GetServicesInUse().size() == 1, "services in use")
@@ -152,6 +161,11 @@ void TestServiceFactoryPrototypeScope()
 
   TestModuleH2* moduleScopeService = mc->GetService(sr1);
   US_TEST_CONDITION_REQUIRED(moduleScopeService && moduleScopeService != prototypeServiceH2, "GetService()")
+
+  US_TEST_CONDITION_REQUIRED(prototypeServiceH2 != prototypeServiceH2Void.find(us_service_interface_iid<TestModuleH2>())->second,
+                             "GetService()")
+
+  svcObjectsVoid.UngetService(prototypeServiceH2Void);
 
   TestModuleH2* moduleScopeService2 = mc->GetService(sr1);
   US_TEST_CONDITION(moduleScopeService == moduleScopeService2, "Same service pointer")
@@ -173,7 +187,7 @@ void TestServiceFactoryPrototypeScope()
     svcObjects.UngetService(moduleScopeService2);
     US_TEST_FAILED_MSG(<< "std::invalid_argument exception expected")
   }
-  catch (const std::invalid_argument&r)
+  catch (const std::invalid_argument&)
   {
     // this is expected
   }

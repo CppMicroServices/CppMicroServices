@@ -29,16 +29,16 @@
 
 US_BEGIN_NAMESPACE
 
-template<class S, class T>
-const bool ServiceTrackerPrivate<S,T>::DEBUG_OUTPUT = true;
+template<class S, class TTT>
+const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = true;
 
-template<class S, class T>
-ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
-    ServiceTracker<S,T>* st, ModuleContext* context,
+template<class S, class TTT>
+ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
+    ServiceTracker<S,TTT>* st, ModuleContext* context,
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
-    trackedService(0), cachedReference(), cachedService(0), q_ptr(st)
+    trackedService(0), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   std::stringstream ss;
@@ -60,14 +60,14 @@ ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
   }
 }
 
-template<class S, class T>
-ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
-    ServiceTracker<S,T>* st,
+template<class S, class TTT>
+ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
+    ServiceTracker<S,TTT>* st,
     ModuleContext* context, const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
         trackReference(), trackedService(0), cachedReference(),
-        cachedService(0), q_ptr(st)
+        cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   this->listenerFilter = std::string("(") + US_PREPEND_NAMESPACE(ServiceConstants)::OBJECTCLASS() + "="
@@ -88,14 +88,14 @@ ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
   }
 }
 
-template<class S, class T>
-ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
-    ServiceTracker<S,T>* st,
+template<class S, class TTT>
+ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
+    ServiceTracker<S,TTT>* st,
     ModuleContext* context, const LDAPFilter& filter,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
         listenerFilter(filter.ToString()), trackReference(),
-        trackedService(0), cachedReference(), cachedService(0), q_ptr(st)
+        trackedService(0), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   if (context == 0)
@@ -104,14 +104,14 @@ ServiceTrackerPrivate<S,T>::ServiceTrackerPrivate(
   }
 }
 
-template<class S, class T>
-ServiceTrackerPrivate<S,T>::~ServiceTrackerPrivate()
+template<class S, class TTT>
+ServiceTrackerPrivate<S,TTT>::~ServiceTrackerPrivate()
 {
 
 }
 
-template<class S, class T>
-std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,T>::GetInitialReferences(
+template<class S, class TTT>
+std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,TTT>::GetInitialReferences(
   const std::string& className, const std::string& filterString)
 {
   std::vector<ServiceReference<S> > result;
@@ -128,8 +128,8 @@ std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,T>::GetInitialReferenc
   return result;
 }
 
-template<class S, class T>
-void ServiceTrackerPrivate<S,T>::GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,T>* t) const
+template<class S, class TTT>
+void ServiceTrackerPrivate<S,TTT>::GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,TTT>* t) const
 {
   if (t->Size() == 0)
   {
@@ -138,17 +138,17 @@ void ServiceTrackerPrivate<S,T>::GetServiceReferences_unlocked(std::vector<Servi
   t->GetTracked(refs);
 }
 
-template<class S, class T>
-TrackedService<S,T>* ServiceTrackerPrivate<S,T>::Tracked() const
+template<class S, class TTT>
+TrackedService<S,TTT>* ServiceTrackerPrivate<S,TTT>::Tracked() const
 {
   return trackedService;
 }
 
-template<class S, class T>
-void ServiceTrackerPrivate<S,T>::Modified()
+template<class S, class TTT>
+void ServiceTrackerPrivate<S,TTT>::Modified()
 {
   cachedReference = 0; /* clear cached value */
-  cachedService = 0; /* clear cached value */
+  TTT::Dispose(cachedService); /* clear cached value */
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 

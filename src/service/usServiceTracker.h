@@ -38,6 +38,146 @@ class ModuleContext;
 /**
  * \ingroup MicroServices
  *
+ * A base class template for type traits for objects tracked by a
+ * ServiceTracker instance. It provides the \c TrackedType typedef
+ * and two dummy method definitions.
+ *
+ * Tracked type traits (TTT) classes must additionally provide the
+ * following methods:
+ *
+ * <ul>
+ *   <li><em>static bool IsValid(const TrackedType& t)</em> Returns \c true if \c t is a valid object, \c false otherwise.</li>
+ *   <li><em>static void Dispose(TrackedType& t)</em> Clears any resources held by the tracked object \c t.</li>
+ *   <li><em>static TrackedType DefaultValue()</em> Returns the default value for newly created tracked objects.</li>
+ * </ul>
+ *
+ * @tparam T The type of the tracked object.
+ * @tparam TTT The tracked type traits class deriving from this class.
+ *
+ * @see ServiceTracker
+ */
+template<class T, class TTT>
+struct TrackedTypeTraitsBase
+{
+  typedef T TrackedType;
+
+  // Needed for S == void
+  static TrackedType ConvertToTrackedType(const InterfaceMap&)
+  {
+    throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+    return TTT::DefaultValue();
+  }
+
+  // Needed for S != void
+  static TrackedType ConvertToTrackedType(void*)
+  {
+    throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+    return TTT::DefaultValue();
+  }
+};
+
+/// \cond
+template<class S, class T>
+struct TrackedTypeTraits;
+/// \endcond
+
+/**
+ * \ingroup MicroServices
+ *
+ * Default type traits for custom tracked objects of pointer type.
+ *
+ * Use this tracked type traits template for custom tracked objects of
+ * pointer type with the ServiceTracker class.
+ *
+ * @tparam S The type of the service being tracked.
+ * @tparam T The type of the tracked object.
+ */
+template<class S, class T>
+struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTraits<S,T*> >
+{
+  typedef T* TrackedType;
+
+  static bool IsValid(const TrackedType& t)
+  {
+    return t != NULL;
+  }
+
+  static TrackedType DefaultValue()
+  {
+    return NULL;
+  }
+
+  static void Dispose(TrackedType& t)
+  {
+    t = 0;
+  }
+};
+
+/// \cond
+template<class S>
+struct TrackedTypeTraits<S,S*>
+{
+  typedef S* TrackedType;
+
+  static bool IsValid(const TrackedType& t)
+  {
+    return t != NULL;
+  }
+
+  static TrackedType DefaultValue()
+  {
+    return NULL;
+  }
+
+  static void Dispose(TrackedType& t)
+  {
+    t = 0;
+  }
+
+  static TrackedType ConvertToTrackedType(S* s)
+  {
+    return s;
+  }
+};
+/// \endcond
+
+/// \cond
+/*
+ * This specialization is "special" because the tracked type is not
+ * void* (as specified in the second template parameter) but InterfaceMap.
+ * This is in line with the ModuleContext::GetService(...) overloads to
+ * return either S* or InterfaceMap dependening on the template parameter.
+ */
+template<>
+struct TrackedTypeTraits<void,void*>
+{
+  typedef InterfaceMap TrackedType;
+
+  static bool IsValid(const TrackedType& t)
+  {
+    return !t.empty();
+  }
+
+  static TrackedType DefaultValue()
+  {
+    return TrackedType();
+  }
+
+  static void Dispose(TrackedType& t)
+  {
+    t.clear();
+  }
+
+  static TrackedType ConvertToTrackedType(const InterfaceMap& im)
+  {
+    return im;
+  }
+};
+/// \endcond
+
+/**
+ * \ingroup MicroServices
+ *
  * The <code>ServiceTracker</code> class simplifies using services from the
  * framework's service registry.
  * <p>
@@ -54,28 +194,52 @@ class ModuleContext;
  * to the services being tracked. The <code>GetService</code> and
  * <code>GetServices</code> methods can be called to get the service objects for
  * the tracked service.
- * <p>
- * The <code>ServiceTracker</code> class is thread-safe. It does not call a
- * <code>ServiceTrackerCustomizer</code> while holding any locks.
- * <code>ServiceTrackerCustomizer</code> implementations must also be
- * thread-safe.
  *
- * \tparam S The type of the service being tracked. The type S* must be an
+ * \note The <code>ServiceTracker</code> class is thread-safe. It does not call a
+ *       <code>ServiceTrackerCustomizer</code> while holding any locks.
+ *       <code>ServiceTrackerCustomizer</code> implementations must also be
+ *       thread-safe.
+ *
+ * Customization of the services to be tracked requires a custom tracked type traits
+ * class if the custom tracked type is not a pointer type. To customize a tracked
+ * service using a custom type with value-semantics like
+ * \snippet uServices-servicetracker/main.cpp tt
+ * the custom tracked type traits class should look like this:
+ * \snippet uServices-servicetracker/main.cpp ttt
+ *
+ * For a custom tracked type, a ServiceTrackerCustomizer is required, which knows
+ * how to associate the tracked service with the custom tracked type:
+ * \snippet uServices-servicetracker/main.cpp customizer
+ * The custom tracking type traits class and customizer can now be used to instantiate
+ * a ServiceTracker:
+ * \snippet uServices-servicetracker/main.cpp tracker
+ *
+ * If the custom tracked type is a pointer type, a suitable tracked type traits
+ * template is provided by the framework and only a ServiceTrackerCustomizer needs
+ * to be provided:
+ * \snippet uServices-servicetracker/main.cpp tracker2
+ *
+ *
+ * @tparam S The type of the service being tracked. The type S* must be an
  *         assignable datatype. Further, if the
  *         <code>ServiceTracker(ModuleContext*, ServiceTrackerCustomizer<S,T>*)</code>
  *         constructor is used, the type must have an associated interface id via
  *         #US_DECLARE_SERVICE_INTERFACE.
- * \tparam T The type of the tracked object. The type must be an assignable
- *         datatype, provide a boolean conversion function, and provide
- *         a constructor and an assignment operator which can handle 0 as an argument.
- * \remarks This class is thread safe.
+ * @tparam TTT Type traits of the tracked object. The type traits class provides
+ *         information about the customized service object, see TrackedTypeTraitsBase.
+ *
+ * @remarks This class is thread safe.
  */
-template<class S, class T = S*>
-class ServiceTracker : protected ServiceTrackerCustomizer<S,T>
+template<class S, class TTT = TrackedTypeTraits<S,S*> >
+class ServiceTracker : protected ServiceTrackerCustomizer<S,typename TTT::TrackedType>
 {
 public:
 
+  /// The type of the service being tracked
   typedef S ServiceT;
+  /// The type of the tracked object
+  typedef typename TTT::TrackedType T;
+
   typedef ServiceReference<S> ServiceReferenceT;
 
   typedef std::map<ServiceReference<S>,T> TrackingMap;
@@ -418,13 +582,13 @@ protected:
 
 private:
 
-  typedef ServiceTracker<S,T> _ServiceTracker;
-  typedef TrackedService<S,T> _TrackedService;
-  typedef ServiceTrackerPrivate<S,T> _ServiceTrackerPrivate;
+  typedef ServiceTracker<S,TTT> _ServiceTracker;
+  typedef TrackedService<S,TTT> _TrackedService;
+  typedef ServiceTrackerPrivate<S,TTT> _ServiceTrackerPrivate;
   typedef ServiceTrackerCustomizer<S,T> _ServiceTrackerCustomizer;
 
-  friend class TrackedService<S,T>;
-  friend class ServiceTrackerPrivate<S,T>;
+  friend class TrackedService<S,TTT>;
+  friend class ServiceTrackerPrivate<S,TTT>;
 
   _ServiceTrackerPrivate* const d;
 };

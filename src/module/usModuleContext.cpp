@@ -96,10 +96,18 @@ void* ModuleContext::GetService(const ServiceReferenceBase& reference)
 {
   if (!reference)
   {
-    throw std::invalid_argument("Default constructed ServiceReference is not a valid input to getService()");
+    throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  //ServiceReference internalRef(reference);
   return reference.d->GetService(d->module->q);
+}
+
+InterfaceMap ModuleContext::GetService(const ServiceReferenceU& reference)
+{
+  if (!reference)
+  {
+    throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
+  }
+  return reference.d->GetServiceInterfaceMap(d->module->q);
 }
 
 bool ModuleContext::UngetService(const ServiceReferenceBase& reference)

@@ -182,6 +182,7 @@ private:
   friend class ModulePrivate;
   friend class ModuleContext;
   friend class ServiceObjectsBase;
+  friend class ServiceObjectsBasePrivate;
   friend class ServiceRegistrationBase;
   friend class ServiceRegistrationBasePrivate;
   friend class ServiceListeners;

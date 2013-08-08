@@ -176,8 +176,8 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
   try
   {
     ServiceReferenceU sr1 = mc->GetServiceReference("org.cppmicroservices.TestModuleAService");
-    void* o1 = mc->GetService(sr1);
-    US_TEST_CONDITION(o1 != NULL, "Test if service object found");
+    InterfaceMap o1 = mc->GetService(sr1);
+    US_TEST_CONDITION(!o1.empty(), "Test if service object found");
 
     try
     {

@@ -33,13 +33,16 @@ US_BEGIN_NAMESPACE
  * This class is not intended to be used directly. It is exported to support
  * the CppMicroServices module system.
  */
-template<class S, class T>
+template<class S, class TTT>
 class TrackedService : public TrackedServiceListener,
-    public ModuleAbstractTracked<ServiceReference<S>, T, ServiceEvent>
+    public ModuleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
 {
 
 public:
-  TrackedService(ServiceTracker<S,T>* serviceTracker,
+
+  typedef typename TTT::TrackedType T;
+
+  TrackedService(ServiceTracker<S,TTT>* serviceTracker,
                  ServiceTrackerCustomizer<S,T>* customizer);
 
   /**
@@ -53,9 +56,9 @@ public:
 
 private:
 
-  typedef ModuleAbstractTracked<ServiceReference<S>, T, ServiceEvent> Superclass;
+  typedef ModuleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent> Superclass;
 
-  ServiceTracker<S,T>* serviceTracker;
+  ServiceTracker<S,TTT>* serviceTracker;
   ServiceTrackerCustomizer<S,T>* customizer;
 
   /**

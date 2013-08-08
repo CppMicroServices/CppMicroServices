@@ -46,11 +46,13 @@ US_BEGIN_NAMESPACE
  * @tparam R The reason the tracked item is  being tracked or untracked.
  * @ThreadSafe
  */
-template<class S, class T, class R>
-class ModuleAbstractTracked : public US_DEFAULT_THREADING<ModuleAbstractTracked<S,T,R> >
+template<class S, class TTT, class R>
+class ModuleAbstractTracked : public US_DEFAULT_THREADING<ModuleAbstractTracked<S,TTT,R> >
 {
 
 public:
+
+  typedef typename TTT::TrackedType T;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
@@ -263,7 +265,7 @@ public:
 
 private:
 
-  typedef ModuleAbstractTracked<S,T,R> Self;
+  typedef ModuleAbstractTracked<S,TTT,R> Self;
 
   /**
    * Map of tracked items to customized objects.

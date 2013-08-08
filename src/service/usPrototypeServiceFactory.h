@@ -44,6 +44,7 @@ US_BEGIN_NAMESPACE
  * has module scope. That is, the framework will call the GetService method to
  * obtain a module-scoped instance which will be cached and have a use count.
  * See ServiceFactory.
+ *
  * A module can use both ServiceObjects and ModuleContext::GetService(const ServiceReferenceBase&)
  * to obtain a service object for a service. ServiceObjects::GetService() will always
  * return an instance provided by a call to GetService(Module*, const ServiceRegistrationBase&)

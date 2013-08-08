@@ -107,18 +107,18 @@ public:
       }
 
       // Check if the service can be fetched
-      void* service = mc->GetService(sr);
+      InterfaceMap service = mc->GetService(sr);
       sr.GetUsingModules(usingModules);
       // if (UNREGISTERSERVICE_VALID_DURING_UNREGISTERING) {
       // In this mode the service shall be obtainable during
       // unregistration.
-      if (service == 0)
+      if (service.empty())
       {
         teststatus = false;
         US_TEST_OUTPUT( << "*** Service should be available to ServiceListener "
                           << "while handling unregistering event." );
       }
-      US_TEST_OUTPUT( << "Service (unreg): " << service );
+      US_TEST_OUTPUT( << "Service (unreg): " << service.begin()->first << " -> " << service.begin()->second );
       if (checkUsingModules && usingModules.size() != 1)
       {
         teststatus = false;
@@ -430,8 +430,8 @@ void frameSL25a()
   try
   {
     ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    void* libSL3Activator = mc->GetService(libSL3SR);
-    US_TEST_CONDITION_REQUIRED(libSL3Activator, "ActivatorSL3 service != 0");
+    InterfaceMap libSL3Activator = mc->GetService(libSL3SR);
+    US_TEST_CONDITION_REQUIRED(!libSL3Activator.empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<ModulePropsInterface> libSL3PropsI(libSL3SR);
     ModulePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
@@ -454,8 +454,8 @@ void frameSL25a()
   try
   {
     ServiceReferenceU libSL1SR = mc->GetServiceReference("ActivatorSL1");
-    void* libSL1Activator = mc->GetService(libSL1SR);
-    US_TEST_CONDITION_REQUIRED(libSL1Activator, "ActivatorSL1 service != 0");
+    InterfaceMap libSL1Activator = mc->GetService(libSL1SR);
+    US_TEST_CONDITION_REQUIRED(!libSL1Activator.empty(), "ActivatorSL1 service != 0");
 
     ServiceReference<ModulePropsInterface> libSL1PropsI(libSL1SR);
     ModulePropsInterface* propsInterface = mc->GetService(libSL1PropsI);
@@ -490,8 +490,8 @@ void frameSL25a()
   try
   {
     ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    void* libSL3Activator = mc->GetService(libSL3SR);
-    US_TEST_CONDITION_REQUIRED(libSL3Activator, "ActivatorSL3 service != 0");
+    InterfaceMap libSL3Activator = mc->GetService(libSL3SR);
+    US_TEST_CONDITION_REQUIRED(!libSL3Activator.empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<ModulePropsInterface> libSL3PropsI(libSL3SR);
     ModulePropsInterface* propsInterface = mc->GetService(libSL3PropsI);

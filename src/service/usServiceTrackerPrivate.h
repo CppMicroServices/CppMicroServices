@@ -32,22 +32,24 @@ US_BEGIN_NAMESPACE
 /**
  * \ingroup MicroServices
  */
-template<class S, class T>
-class ServiceTrackerPrivate : US_DEFAULT_THREADING<ServiceTrackerPrivate<S,T> >
+template<class S, class TTT>
+class ServiceTrackerPrivate : US_DEFAULT_THREADING<ServiceTrackerPrivate<S,TTT> >
 {
 
 public:
 
-  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
+  typedef typename TTT::TrackedType T;
+
+  ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
                         ModuleContext* context,
                         const ServiceReference<S>& reference,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
+  ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
                         ModuleContext* context, const std::string& clazz,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
+  ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
                         ModuleContext* context, const LDAPFilter& filter,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
@@ -68,7 +70,7 @@ public:
   std::vector<ServiceReference<S> > GetInitialReferences(const std::string& className,
                                                          const std::string& filterString);
 
-  void GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,T>* t) const;
+  void GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,TTT>* t) const;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
@@ -112,7 +114,7 @@ public:
    * Tracked services: <code>ServiceReference</code> -> customized Object and
    * <code>ServiceListenerEntry</code> object
    */
-  TrackedService<S,T>* trackedService;
+  TrackedService<S,TTT>* trackedService;
 
   /**
    * Accessor method for the current TrackedService object. This method is only
@@ -121,7 +123,7 @@ public:
    *
    * @return The current Tracked object.
    */
-  TrackedService<S,T>* Tracked() const;
+  TrackedService<S,TTT>* Tracked() const;
 
   /**
    * Called by the TrackedService object whenever the set of tracked services is
@@ -141,27 +143,25 @@ public:
 
   /**
    * Cached service object for GetService.
-   *
-   * This field is volatile since it is accessed by multiple threads.
    */
-  mutable T volatile cachedService;
+  mutable T cachedService;
 
 
 private:
 
-  inline ServiceTracker<S,T>* q_func()
+  inline ServiceTracker<S,TTT>* q_func()
   {
-    return static_cast<ServiceTracker<S,T> *>(q_ptr);
+    return static_cast<ServiceTracker<S,TTT> *>(q_ptr);
   }
 
-  inline const ServiceTracker<S,T>* q_func() const
+  inline const ServiceTracker<S,TTT>* q_func() const
   {
-    return static_cast<const ServiceTracker<S,T> *>(q_ptr);
+    return static_cast<const ServiceTracker<S,TTT> *>(q_ptr);
   }
 
-  friend class ServiceTracker<S,T>;
+  friend class ServiceTracker<S,TTT>;
 
-  ServiceTracker<S,T> * const q_ptr;
+  ServiceTracker<S,TTT> * const q_ptr;
 
 };
 

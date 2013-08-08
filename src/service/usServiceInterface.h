@@ -44,6 +44,10 @@
  */
 template<class T> inline const char* us_service_interface_iid();
 
+/// \cond
+template<> inline const char* us_service_interface_iid<void>() { return ""; }
+/// \endcond
+
 #if defined(QT_DEBUG) || defined(QT_NO_DEBUG)
 #include <qobject.h>
 

@@ -187,7 +187,8 @@ bool LDAPExpr::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
 {
   if (d->m_operator == EQ)
   {
-    if (std::equal(d->m_attrName.begin(), d->m_attrName.end(), ServiceConstants::OBJECTCLASS().begin(), stricomp) &&
+    if (d->m_attrName.length() == ServiceConstants::OBJECTCLASS().length() &&
+        std::equal(d->m_attrName.begin(), d->m_attrName.end(), ServiceConstants::OBJECTCLASS().begin(), stricomp) &&
         d->m_attrValue.find(WILDCARD) == std::string::npos)
     {
       objClasses.insert( d->m_attrValue );

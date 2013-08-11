@@ -24,7 +24,11 @@
 #!
 function(usFunctionGenerateModuleInit src_var)
 
-  cmake_parse_arguments(US_MODULE "" "NAME;LIBRARY_NAME" "" ${ARGN})
+  cmake_parse_arguments(US_MODULE "EXECUTABLE" "NAME;LIBRARY_NAME" "" ${ARGN})
+
+  if(US_MODULE_EXECUTABLE)
+    message(SEND_ERROR "EXECUTABLE option no longer supported. Use usFunctionGenerateExecutableInit instead.")
+  endif()
 
   # sanity checks
   if(NOT US_MODULE_NAME)

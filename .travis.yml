@@ -19,9 +19,9 @@ env:
   - BUILD_CONFIGURATION=27
   - BUILD_CONFIGURATION=29
   - BUILD_CONFIGURATION=31
-  
+
 branches:
   only:
     - master
-    
+
 script: ctest -S ./CMake/usCTestScript_travis.cmake

@@ -21,7 +21,7 @@ module by entering `l spellcheckclient`:
 
 \verbatim
 CppMicroServices-build> bin/CppMicroServicesExampleDriver
-> l 
+> l
 Starting to listen for service events.
 > l spellcheckservice
 Ex1: Service of type IDictionaryService/1.0 registered.
@@ -37,7 +37,7 @@ Id | Name                 | Status
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
  4 | Spell Check Service  | LOADED
-> 
+>
 \endverbatim
 
 To trigger the registration of the spell checker service from our module, we
@@ -68,6 +68,6 @@ spell checker service, it is robust in the scenario where the spell checker serv
 suddenly departs. Further, when a spell checker service arrives, it automatically gets
 the service if it needs it and continues to function. These capabilities are a little
 difficult to demonstrate since we are using a simple single-threaded approach, but in
-a multi-threaded or GUI-oriented application this robustness is very useful. 
+a multi-threaded or GUI-oriented application this robustness is very useful.
 
 Previous: \ref MicroServices_Example6

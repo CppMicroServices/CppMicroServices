@@ -69,7 +69,7 @@ Id | Name                 | Status
  1 | CppMicroServices     | LOADED
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
-> 
+>
 \endverbatim
 
 To unload the module, use the `u <id>` command. If the module from

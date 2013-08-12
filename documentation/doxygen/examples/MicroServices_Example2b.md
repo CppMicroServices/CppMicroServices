@@ -53,7 +53,7 @@ Id | Name                 | Status
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
  4 | French Dictionary    | LOADED
-> 
+>
 \endverbatim
 
 To unload the module, use the `u <id>` command. If the module from

@@ -93,7 +93,7 @@ Id | Name                 | Status
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
  4 | Spell Check Service  | LOADED
-> 
+>
 \endverbatim
 
 To trigger the registration of the spell checker service from our module, we

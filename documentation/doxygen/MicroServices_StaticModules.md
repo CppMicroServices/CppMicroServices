@@ -88,4 +88,3 @@ the `#US_INITIALIZE_MODULE` or `#US_INITIALIZE_EXECUTABLE` macro).
 
 So in a completely statically build application, the CppMicroServices library provides a global module context for all
 imported modules and the executable.
-

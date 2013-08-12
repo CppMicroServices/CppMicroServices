@@ -11,4 +11,3 @@ set(resource_files
 usFunctionCreateTestModuleWithResources(TestModuleR
   SOURCES usTestModuleR.cpp
   RESOURCES ${resource_files})
-

@@ -6,4 +6,3 @@ set(resource_files
 usFunctionCreateTestModuleWithResources(TestModuleM
   SOURCES usTestModuleM.cpp
   RESOURCES ${resource_files})
-

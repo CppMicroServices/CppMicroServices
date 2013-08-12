@@ -50,4 +50,3 @@ function(usFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   endif()
 
 endfunction()
-

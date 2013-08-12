@@ -147,4 +147,3 @@ int usLDAPFilterTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_END()
 }
-

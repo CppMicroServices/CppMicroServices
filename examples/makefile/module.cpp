@@ -100,4 +100,3 @@ US_EXPORT_MODULE_ACTIVATOR(module, MyActivator)
 #include <usModuleInitialization.h>
 
 US_INITIALIZE_MODULE("My Module", "module")
-

@@ -4,4 +4,3 @@ foreach(_type ARCHIVE LIBRARY RUNTIME)
 endforeach()
 
 usFunctionCreateTestModule(TestModuleAL2_1 usTestModuleAL2_1.cpp)
-

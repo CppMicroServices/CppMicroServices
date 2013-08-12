@@ -16,4 +16,3 @@ function(usFunctionGetGccVersion path_to_gcc output_var)
     set(${output_var} ${output} PARENT_SCOPE)
   endif()
 endfunction()
-

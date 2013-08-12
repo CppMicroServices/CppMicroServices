@@ -265,4 +265,3 @@ void ModulePrivate::InitializeResources(const std::string& location)
 }
 
 US_END_NAMESPACE
-

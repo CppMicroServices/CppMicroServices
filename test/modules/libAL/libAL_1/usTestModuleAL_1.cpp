@@ -28,4 +28,3 @@ struct US_ABI_EXPORT TestModuleAL_1_Dummy
 };
 
 US_END_NAMESPACE
-

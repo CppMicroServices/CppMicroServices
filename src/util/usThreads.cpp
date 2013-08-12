@@ -252,4 +252,3 @@ bool WaitCondition::Wait(MutexType&, unsigned long)
 #endif
 
 US_END_NAMESPACE
-

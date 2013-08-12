@@ -132,4 +132,3 @@ foreach(i ${US_BUILD_CONFIGURATION})
   message("Testing build configuration: ${CTEST_DASHBOARD_NAME}")
   build_and_test()
 endforeach()
-

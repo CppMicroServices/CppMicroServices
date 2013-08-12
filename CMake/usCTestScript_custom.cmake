@@ -22,4 +22,3 @@ foreach(i RANGE 31)
 endforeach()
 
 include(${US_SOURCE_DIR}/CMake/usCTestScript.cmake)
-

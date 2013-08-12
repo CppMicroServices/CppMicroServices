@@ -63,4 +63,3 @@ private:
 US_END_NAMESPACE
 
 US_EXPORT_MODULE_ACTIVATOR(TestModuleImportedByB, US_PREPEND_NAMESPACE(TestModuleImportedByBActivator))
-

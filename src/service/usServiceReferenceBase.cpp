@@ -199,4 +199,3 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
 
   return os;
 }
-

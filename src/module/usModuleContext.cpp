@@ -159,4 +159,3 @@ void ModuleContext::RemoveModuleListener(const ModuleListener& delegate, void* d
 }
 
 US_END_NAMESPACE
-

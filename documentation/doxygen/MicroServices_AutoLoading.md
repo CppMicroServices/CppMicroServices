@@ -80,7 +80,7 @@ Environment Variables
 ---------------------
 
 The following environment variables influence the runtime behavior of the CppMicroServices library:
- 
+
  - *US_DISABLE_AUTOLOADING* If set, auto-loading of modules is disabled.
  - *US_AUTOLOAD_PATHS* A `:` (Unix) or `;` (Windows) separated list of paths from which modules
    should be auto-loaded.

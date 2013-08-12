@@ -32,7 +32,7 @@ Legal
 -----
 
 Copyright (c) German Cancer Research Center. Licensed under the [Apache License v2.0][apache_license].
- 
+
 Quick Start
 -----------
 

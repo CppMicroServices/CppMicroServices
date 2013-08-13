@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cassert>
+#include <cstring>
 
 US_BEGIN_NAMESPACE
 
@@ -61,8 +62,9 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
     location.clear();
   }
 
-  GetImportedModulesFunc getImportedModulesFunc = reinterpret_cast<GetImportedModulesFunc>(
-        ModuleUtils::GetSymbol(location, getImportedModulesSymbol.c_str()));
+  GetImportedModulesFunc getImportedModulesFunc = NULL;
+  void* getImportedModulesSym = ModuleUtils::GetSymbol(location, getImportedModulesSymbol.c_str());
+  std::memcpy(&getImportedModulesFunc, &getImportedModulesSym, sizeof(void*));
   if (getImportedModulesFunc != NULL)
   {
     std::string importedStaticModuleLibNames = getImportedModulesFunc();
@@ -204,8 +206,9 @@ void ModulePrivate::StartStaticModules()
   {
     std::string staticActivatorSymbol = "_us_module_activator_instance_";
     staticActivatorSymbol += *i;
-    ModuleInfo::ModuleActivatorHook staticActivator =
-        reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str()));
+    ModuleInfo::ModuleActivatorHook staticActivator = NULL;
+    void* staticActivatorSym = ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str());
+    std::memcpy(&staticActivator, &staticActivatorSym, sizeof(void*));
     if (staticActivator)
     {
       US_DEBUG << "Loading static activator " << *i;
@@ -244,8 +247,9 @@ void ModulePrivate::InitializeResources(const std::string& location)
   for (std::size_t i = 0; i < moduleLibNames.size(); ++i)
   {
     std::string initResourcesSymbol = initResourcesSymbolPrefix + moduleLibNames[i];
-    ModuleInfo::InitResourcesHook initResourcesFunc = reinterpret_cast<ModuleInfo::InitResourcesHook>(
-          ModuleUtils::GetSymbol(location, initResourcesSymbol.c_str()));
+    ModuleInfo::InitResourcesHook initResourcesFunc = NULL;
+    void* initResourcesSym = ModuleUtils::GetSymbol(location, initResourcesSymbol.c_str());
+    std::memcpy(&initResourcesFunc, &initResourcesSym, sizeof(void*));
     if (initResourcesFunc)
     {
       initResourcesFunc(&this->info);

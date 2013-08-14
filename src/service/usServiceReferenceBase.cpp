@@ -124,6 +124,16 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   int r1 = 0;
   int r2 = 0;
 
+  if (!(*this))
+  {
+    return true;
+  }
+
+  if (!reference)
+  {
+    return false;
+  }
+
   Any anyR1 = GetProperty(ServiceConstants::SERVICE_RANKING());
   Any anyR2 = reference.GetProperty(ServiceConstants::SERVICE_RANKING());
   if (anyR1.Type() == typeid(int)) r1 = any_cast<int>(anyR1);
@@ -184,18 +194,25 @@ US_USE_NAMESPACE
 
 std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef)
 {
-  os << "Reference for service object registered from "
-     << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()
-     << " (";
-  std::vector<std::string> keys;
-  serviceRef.GetPropertyKeys(keys);
-  size_t keySize = keys.size();
-  for(size_t i = 0; i < keySize; ++i)
+  if (serviceRef)
   {
-    os << keys[i] << "=" << serviceRef.GetProperty(keys[i]).ToString();
-    if (i < keySize-1) os << ",";
+    os << "Reference for service object registered from "
+       << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()
+       << " (";
+    std::vector<std::string> keys;
+    serviceRef.GetPropertyKeys(keys);
+    size_t keySize = keys.size();
+    for(size_t i = 0; i < keySize; ++i)
+    {
+      os << keys[i] << "=" << serviceRef.GetProperty(keys[i]).ToString();
+      if (i < keySize-1) os << ",";
+    }
+    os << ")";
   }
-  os << ")";
+  else
+  {
+    os << "Invalid service reference";
+  }
 
   return os;
 }

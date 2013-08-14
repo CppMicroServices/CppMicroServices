@@ -50,12 +50,12 @@ US_BEGIN_NAMESPACE
 
 class TestProduct : public TestModuleH
 {
-  Module* caller;
+  // Module* caller;
 
 public:
 
-  TestProduct(Module* caller)
-    : caller(caller)
+  TestProduct(Module* /*caller*/)
+    //: caller(caller)
   {}
 
 };

@@ -56,10 +56,71 @@ bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
   return ids.empty();
 }
 
+struct MyInterfaceOne {
+  virtual ~MyInterfaceOne() {}
+};
+US_DECLARE_SERVICE_INTERFACE(MyInterfaceOne, "org.cppmicroservices.servicetrackertest.MyInterfaceOne")
 
-int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
+struct MyInterfaceTwo {
+  virtual ~MyInterfaceTwo() {}
+};
+US_DECLARE_SERVICE_INTERFACE(MyInterfaceTwo, "org.cppmicroservices.servicetrackertest.MyInterfaceTwo")
+
+class MyCustomizer : public us::ServiceTrackerCustomizer<MyInterfaceOne>
 {
-  US_TEST_BEGIN("ServiceTrackerTest")
+
+public:
+
+  MyCustomizer(us::ModuleContext* context)
+    : m_context(context)
+  {}
+
+  virtual MyInterfaceOne* AddingService(const ServiceReferenceT& reference)
+  {
+    US_TEST_CONDITION_REQUIRED(reference, "AddingService() valid reference")
+    return m_context->GetService(reference);
+  }
+
+  virtual void ModifiedService(const ServiceReferenceT& reference, MyInterfaceOne* service)
+  {
+    US_TEST_CONDITION(reference, "ModifiedService() valid reference")
+    US_TEST_CONDITION(service, "ModifiedService() valid service")
+  }
+
+  virtual void RemovedService(const ServiceReferenceT& reference, MyInterfaceOne* service)
+  {
+    US_TEST_CONDITION(reference, "RemovedService() valid reference")
+    US_TEST_CONDITION(service, "RemovedService() valid service")
+  }
+
+private:
+
+  us::ModuleContext* m_context;
+};
+
+void TestFilterString()
+{
+  us::ModuleContext* context = us::GetModuleContext();
+  MyCustomizer customizer(context);
+
+  us::LDAPFilter filter("(" + us::ServiceConstants::SERVICE_ID() + ">=0)");
+  us::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
+  tracker.Open();
+
+  struct MyServiceOne : public MyInterfaceOne {};
+  struct MyServiceTwo : public MyInterfaceTwo {};
+
+  MyServiceOne serviceOne;
+  MyServiceTwo serviceTwo;
+
+  context->RegisterService<MyInterfaceOne>(&serviceOne);
+  context->RegisterService<MyInterfaceTwo>(&serviceTwo);
+
+  US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
+}
+
+void TestServiceTracker()
+{
 
 #ifdef US_PLATFORM_WINDOWS
   const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
@@ -106,8 +167,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   // "org.cppmicroservices.TestModuleSService0"
 
   st1->Open();
-  std::vector<ServiceReferenceU> sa2;
-  st1->GetServiceReferences(sa2);
+  std::vector<ServiceReferenceU> sa2 = st1->GetServiceReferences();
 
   US_TEST_CONDITION_REQUIRED(sa2.size() == 1, "Checking ServiceTracker size");
   US_TEST_CONDITION_REQUIRED(s1 + "0" == sa2[0].GetInterfaceId(), "Checking service implementation name");
@@ -119,8 +179,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(st1->Size() == 0, "Checking ServiceTracker size");
 
   // 7. Check if we still track anything , we should get null
-  sa2.clear();
-  st1->GetServiceReferences(sa2);
+  sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.empty(), "Checking ServiceTracker size");
 
   // 8. A new Servicetracker, this time with a filter for the object
@@ -142,16 +201,14 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   ids.push_back((s1 + "3"));
 
   st1->Open();
-  sa2.clear();
-  st1->GetServiceReferences(sa2);
+  sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 2, "Checking service reference count");
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.begin(), ids.begin()+2), "Check for expected interface id [0]");
   US_TEST_CONDITION_REQUIRED(sa2[1].IsConvertibleTo(s1 + "1"), "Check for expected interface id [1]");
 
   // 10. Get libTestModuleS to register one more service and see if it appears
   serviceController->ServiceControl(2, "register", 1);
-  sa2.clear();
-  st1->GetServiceReferences(sa2);
+  sa2 = st1->GetServiceReferences();
 
   US_TEST_CONDITION_REQUIRED(sa2.size() == 3, "Checking service reference count");
 
@@ -159,15 +216,13 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 
   // 11. Get libTestModuleS to register one more service and see if it appears
   serviceController->ServiceControl(3, "register", 2);
-  sa2.clear();
-  st1->GetServiceReferences(sa2);
+  sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 4, "Checking service reference count");
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.begin(), ids.end()), "Check for expected interface id [3]");
 
   // 12. Get libTestModuleS to unregister one service and see if it disappears
   serviceController->ServiceControl(3, "unregister", 0);
-  sa2.clear();
-  st1->GetServiceReferences(sa2);
+  sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 3, "Checking service reference count");
 
   // 13. Get the highest ranking service reference, it should have ranking 7
@@ -192,22 +247,19 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(o2.empty(), "Checkt that service is null");
 
   // 16. Get all service objects this tracker tracks, it should be 2
-  std::vector<InterfaceMap> ts1;
-  st1->GetServices(ts1);
+  std::vector<InterfaceMap> ts1 = st1->GetServices();
   US_TEST_CONDITION_REQUIRED(ts1.size() == 2, "Check service count");
 
   // 17. Test the remove method.
   //     First register another service, then remove it being tracked
   serviceController->ServiceControl(1, "register", 7);
   h1 = st1->GetServiceReference();
-  std::vector<ServiceReferenceU> sa3;
-  st1->GetServiceReferences(sa3);
+  std::vector<ServiceReferenceU> sa3 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa3.size() == 3, "Check service reference count");
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa3, ids.begin(), ids.begin()+3), "Check for expected interface id [0]");
 
   st1->Remove(h1);           // remove tracking on one servref
-  sa2.clear();
-  st1->GetServiceReferences(sa2);
+  sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 2, "Check service reference count");
 
   // 18. Test the addingService method,add a service reference
@@ -218,6 +270,14 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   // 20. Test the waitForService method
   InterfaceMap o9 = st1->WaitForService(50);
   US_TEST_CONDITION_REQUIRED(!o9.empty(), "Checking WaitForService method");
+}
+
+int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
+{
+  US_TEST_BEGIN("ServiceTrackerTest")
+
+  TestFilterString();
+  TestServiceTracker();
 
   US_TEST_END()
 }

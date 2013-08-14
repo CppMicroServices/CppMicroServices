@@ -140,7 +140,7 @@ void ServiceTracker<S,TTT>::Close()
     }
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::close:" << d->filter;
     outgoing->Close();
-    GetServiceReferences(references);
+    references = GetServiceReferences();
     d->trackedService = 0;
     try
     {
@@ -201,17 +201,20 @@ ServiceTracker<S,TTT>::WaitForService(unsigned long timeoutMillis)
 }
 
 template<class S, class TTT>
-void ServiceTracker<S,TTT>::GetServiceReferences(std::vector<ServiceReferenceT>& refs) const
+std::vector<typename ServiceTracker<S,TTT>::ServiceReferenceT>
+ServiceTracker<S,TTT>::GetServiceReferences() const
 {
+  std::vector<ServiceReferenceT> refs;
   _TrackedService* t = d->Tracked();
   if (t == 0)
   { /* if ServiceTracker is not open */
-    return;
+    return refs;
   }
   {
     typename _TrackedService::Lock l(t);
     d->GetServiceReferences_unlocked(refs, t);
   }
+  return refs;
 }
 
 template<class S, class TTT>
@@ -230,8 +233,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
     return reference;
   }
   US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
-  std::vector<ServiceReferenceT> references;
-  GetServiceReferences(references);
+  std::vector<ServiceReferenceT> references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0)
   { /* if no service is being tracked */
@@ -317,12 +319,13 @@ ServiceTracker<S,TTT>::GetService(const ServiceReferenceT& reference) const
 }
 
 template<class S, class TTT>
-void ServiceTracker<S,TTT>::GetServices(std::vector<T>& services) const
+std::vector<typename ServiceTracker<S,TTT>::T> ServiceTracker<S,TTT>::GetServices() const
 {
+  std::vector<T> services;
   _TrackedService* t = d->Tracked();
   if (t == 0)
   { /* if ServiceTracker is not open */
-    return;
+    return services;
   }
   {
     typename _TrackedService::Lock l(t);
@@ -334,6 +337,7 @@ void ServiceTracker<S,TTT>::GetServices(std::vector<T>& services) const
       services.push_back(t->GetCustomizedObject(*ref));
     }
   }
+  return services;
 }
 
 template<class S, class TTT>

@@ -382,9 +382,9 @@ public:
    * Return a list of <code>ServiceReference</code>s for all services being
    * tracked by this <code>ServiceTracker</code>.
    *
-   * @param refs List of <code>ServiceReference</code>s.
+   * @return List of <code>ServiceReference</code>s.
    */
-  virtual void GetServiceReferences(std::vector<ServiceReferenceT>& refs) const;
+  virtual std::vector<ServiceReferenceT> GetServiceReferences() const;
 
   /**
    * Returns a <code>ServiceReference</code> for one of the services being
@@ -429,10 +429,10 @@ public:
    * GetService(const ServiceReference&) for each reference to get the
    * tracked service object.
    *
-   * @param services A list of service objects or an empty list if no services
+   * @return A list of service objects or an empty list if no services
    *         are being tracked.
    */
-  virtual void GetServices(std::vector<T>& services) const;
+  virtual std::vector<T> GetServices() const;
 
   /**
    * Returns a service object for one of the services being tracked by this

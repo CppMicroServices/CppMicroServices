@@ -20,6 +20,7 @@
 =============================================================================*/
 
 #include <usUtils_p.h>
+#include <iterator>
 
 US_BEGIN_NAMESPACE
 

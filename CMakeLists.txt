@@ -95,6 +95,14 @@ if(NOT DEFINED US_IS_EMBEDDED)
   endif()
 endif()
 
+# Determine the name of the install component for "SDK" artifacts.
+# The default is "sdk"
+if(NOT DEFINED US_SDK_INSTALL_COMPONENT)
+  set(US_SDK_INSTALL_COMPONENT COMPONENT sdk)
+elseif(US_SDK_INSTALL_COMPONENT)
+  set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
+endif()
+
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
@@ -357,7 +365,7 @@ configure_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
-        COMPONENT sdk
+        ${US_SDK_INSTALL_COMPONENT}
   )
 
 #-----------------------------------------------------------------------------

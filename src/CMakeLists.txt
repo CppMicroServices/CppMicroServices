@@ -5,6 +5,7 @@
 set(_srcs
   util/usAny.cpp
   util/jsoncpp.cpp
+  util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
   util/usThreads.cpp
   util/usUncompressResourceData.c
@@ -75,6 +76,7 @@ set(_private_headers
 
 set(_public_headers
   util/usAny.h
+  util/usLDAPProp.h
   util/usSharedData.h
   util/usSharedLibrary.h
   util/usUncompressResourceData.h

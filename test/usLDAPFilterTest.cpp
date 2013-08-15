@@ -20,6 +20,7 @@
 =============================================================================*/
 
 #include <usLDAPFilter.h>
+#include <usLDAPProp.h>
 
 #include "usTestingMacros.h"
 
@@ -138,10 +139,23 @@ int TestEvaluate()
   return EXIT_SUCCESS;
 }
 
+void TestLDAPExpressions()
+{
+  LDAPFilter filter(
+        LDAPProp("bla") == "jo" && !(LDAPProp("ha") == 1) &&
+        (LDAPProp("presence") || !LDAPProp("absence")) &&
+        LDAPProp("le") <= 4.1 && LDAPProp("ge") >= -3 &&
+        LDAPProp("approx").Approx("Approx")
+        );
+  const std::string filterStr = "(&(&(&(&(&(bla=jo)(!(ha=1)))(|(presence=*)(!(absence=*))))(le<=4.1))(ge>=-3))(approx~=Approx))";
+  US_TEST_CONDITION(filter.ToString() == filterStr, "test generated filter string")
+}
+
 int usLDAPFilterTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("LDAPFilterTest");
 
+  TestLDAPExpressions();
   US_TEST_CONDITION(TestParsing() == EXIT_SUCCESS, "Parsing LDAP expressions: ")
   US_TEST_CONDITION(TestEvaluate() == EXIT_SUCCESS, "Evaluating LDAP expressions: ")
 

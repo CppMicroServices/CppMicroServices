@@ -53,6 +53,8 @@ class ServiceReferenceBase;
  *   - "(o=univ*of*mich*)"
  *
  * \remarks This class is thread safe.
+ *
+ * \sa LDAPProp for a fluent API generating LDAP filter strings
  */
 class US_EXPORT LDAPFilter {
 

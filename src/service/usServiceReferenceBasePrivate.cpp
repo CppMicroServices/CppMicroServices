@@ -291,7 +291,7 @@ bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCoun
     registration->dependents.erase(module);
   }
 
-  return hadReferences;
+  return hadReferences && removeService;
 }
 
 const ServicePropertiesImpl& ServiceReferenceBasePrivate::GetProperties() const

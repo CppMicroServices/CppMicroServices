@@ -112,7 +112,8 @@ void TestServiceFactoryModuleScope()
   US_TEST_CONDITION(moduleH->GetModuleContext()->UngetService(sr1), "UngetService()")
 #endif
 
-  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1), "ungetService()")
+  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
+  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
 
   target.Unload();
 }
@@ -218,7 +219,8 @@ void TestServiceFactoryPrototypeScope()
 
   svcObjects2.UngetService(prototypeServiceH2);
   svcObjects3.UngetService(prototypeServiceH2_2);
-  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1), "ungetService()")
+  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
+  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
 
   target.Unload();
 }

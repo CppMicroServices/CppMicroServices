@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['match',['Match',['../classLDAPFilter.html#a04b740718bc13c715cb1db1e2b5714e5',1,'LDAPFilter::Match(const ServiceReference &amp;reference) const '],['../classLDAPFilter.html#ac3fa9de5dadbe66db3d42f1224819421',1,'LDAPFilter::Match(const ServiceProperties &amp;dictionary) const ']]],
+  ['makeinterfacemap',['MakeInterfaceMap',['../structMakeInterfaceMap.html#a4efee82995544695ed69172168d19ee6',1,'MakeInterfaceMap::MakeInterfaceMap(Impl *impl)'],['../structMakeInterfaceMap.html#a29ff40e30e42722435fa44c275c257d8',1,'MakeInterfaceMap::MakeInterfaceMap(ServiceFactory *factory)']]],
+  ['match',['Match',['../classLDAPFilter.html#a6898cf34b6dc613e609e04e54d789cb4',1,'LDAPFilter::Match(const ServiceReferenceBase &amp;reference) const '],['../classLDAPFilter.html#ac3fa9de5dadbe66db3d42f1224819421',1,'LDAPFilter::Match(const ServiceProperties &amp;dictionary) const ']]],
   ['matchcase',['MatchCase',['../classLDAPFilter.html#a543b2a16ab235369f2423d013cfd784c',1,'LDAPFilter']]],
-  ['modifiedservice',['ModifiedService',['../classServiceTracker.html#aff2025eb066f2ab128c7c0aa47515c66',1,'ServiceTracker::ModifiedService()'],['../structServiceTrackerCustomizer.html#a1670abf8fc457a53d1549aae710f40d6',1,'ServiceTrackerCustomizer::ModifiedService()']]],
+  ['modifiedservice',['ModifiedService',['../classServiceTracker.html#ad53c74684a330a6a7513ce0d8ad23055',1,'ServiceTracker::ModifiedService()'],['../structServiceTrackerCustomizer.html#aa7251aae3f7939e8f604fd12dcfacf67',1,'ServiceTrackerCustomizer::ModifiedService()']]],
   ['moduleevent',['ModuleEvent',['../classModuleEvent.html#a6604744cce7ea8cccfc8d2d21eef597e',1,'ModuleEvent::ModuleEvent()'],['../classModuleEvent.html#a01570b1ba8b212b9d8f64b88101b3ce0',1,'ModuleEvent::ModuleEvent(Type type, Module *module)'],['../classModuleEvent.html#af42815ca864f15b7193392cf348d631c',1,'ModuleEvent::ModuleEvent(const ModuleEvent &amp;other)']]],
   ['moduleresource',['ModuleResource',['../classModuleResource.html#af801aea0a209ca3b663d69785a3d47cc',1,'ModuleResource::ModuleResource()'],['../classModuleResource.html#a23ae855dd50fca77e14bb2201e7525fa',1,'ModuleResource::ModuleResource(const ModuleResource &amp;resource)']]],
   ['moduleresourcestream',['ModuleResourceStream',['../classModuleResourceStream.html#acfc3e6e784af8ba06f3f6aede1d35876',1,'ModuleResourceStream']]],

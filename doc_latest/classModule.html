@@ -109,12 +109,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0417ce52b2b1dedfe513a66cb3cb432c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a0417ce52b2b1dedfe513a66cb3cb432c">GetPropertyKeys</a> () const </td></tr>
 <tr class="memdesc:a0417ce52b2b1dedfe513a66cb3cb432c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of top-level property keys for this module.  <a href="#a0417ce52b2b1dedfe513a66cb3cb432c">More...</a><br/></td></tr>
 <tr class="separator:a0417ce52b2b1dedfe513a66cb3cb432c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45c9f2f748be5ae22a466abe4533258b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a45c9f2f748be5ae22a466abe4533258b">GetRegisteredServices</a> () const </td></tr>
-<tr class="memdesc:a45c9f2f748be5ae22a466abe4533258b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it has registered or an empty list if this module has no registered services.  <a href="#a45c9f2f748be5ae22a466abe4533258b">More...</a><br/></td></tr>
-<tr class="separator:a45c9f2f748be5ae22a466abe4533258b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a743c59afd2ef4e349f10e78b95df2d5a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a743c59afd2ef4e349f10e78b95df2d5a">GetServicesInUse</a> () const </td></tr>
-<tr class="memdesc:a743c59afd2ef4e349f10e78b95df2d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it is using or returns an empty list if this module is not using any services.  <a href="#a743c59afd2ef4e349f10e78b95df2d5a">More...</a><br/></td></tr>
-<tr class="separator:a743c59afd2ef4e349f10e78b95df2d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ab1e28d22d60b049c515d4256363b44"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReferenceU</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#a8ab1e28d22d60b049c515d4256363b44">GetRegisteredServices</a> () const </td></tr>
+<tr class="memdesc:a8ab1e28d22d60b049c515d4256363b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it has registered or an empty list if this module has no registered services.  <a href="#a8ab1e28d22d60b049c515d4256363b44">More...</a><br/></td></tr>
+<tr class="separator:a8ab1e28d22d60b049c515d4256363b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf6934e75db2be837723fb6e21125bca"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReferenceU</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#adf6934e75db2be837723fb6e21125bca">GetServicesInUse</a> () const </td></tr>
+<tr class="memdesc:adf6934e75db2be837723fb6e21125bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns this module's <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> list for all services it is using or returns an empty list if this module is not using any services.  <a href="#adf6934e75db2be837723fb6e21125bca">More...</a><br/></td></tr>
+<tr class="separator:adf6934e75db2be837723fb6e21125bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae663b9033cb569becb414ca4d9064622"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModuleResource.html">ModuleResource</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModule.html#ae663b9033cb569becb414ca4d9064622">GetResource</a> (const std::string &amp;path) const </td></tr>
 <tr class="memdesc:ae663b9033cb569becb414ca4d9064622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the resource at the specified <code>path</code> in this module.  <a href="#ae663b9033cb569becb414ca4d9064622">More...</a><br/></td></tr>
 <tr class="separator:ae663b9033cb569becb414ca4d9064622"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,12 +373,12 @@ Does not change when a module is reloaded. </li>
 
 </div>
 </div>
-<a class="anchor" id="a45c9f2f748be5ae22a466abe4533258b"></a>
+<a class="anchor" id="a8ab1e28d22d60b049c515d4256363b44"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&gt; Module::GetRegisteredServices </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReferenceU</a>&gt; Module::GetRegisteredServices </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -419,12 +419,12 @@ Does not change when a module is reloaded. </li>
 
 </div>
 </div>
-<a class="anchor" id="a743c59afd2ef4e349f10e78b95df2d5a"></a>
+<a class="anchor" id="adf6934e75db2be837723fb6e21125bca"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&gt; Module::GetServicesInUse </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReferenceU</a>&gt; Module::GetServicesInUse </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -670,5 +670,5 @@ Does not change when a module is reloaded. </li>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

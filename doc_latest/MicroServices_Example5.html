@@ -77,9 +77,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor">#include &lt;usModuleContext.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;usServiceTracker.h&gt;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Replace that include with your own base class declaration</span></div>
-<div class="line"><span class="preprocessor">#include US_BASECLASS_HEADER</span></div>
-<div class="line"><span class="preprocessor"></span></div>
 <div class="line">US_USE_NAMESPACE</div>
 <div class="line"><span class="comment"></span></div>
 <div class="line"><span class="comment">/**</span></div>
@@ -127,12 +124,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    m_context = context;</div>
 <div class="line"></div>
 <div class="line">    <span class="comment">// Create a service tracker to monitor dictionary services.</span></div>
-<div class="line">    m_tracker = <span class="keyword">new</span> <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;IDictionaryService*&gt;</a>(</div>
+<div class="line">    m_tracker = <span class="keyword">new</span> <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;IDictionaryService&gt;</a>(</div>
 <div class="line">                  m_context, <a class="code" href="classLDAPFilter.html" title="An RFC 1960-based Filter.">LDAPFilter</a>(std::string(<span class="stringliteral">&quot;(&amp;(&quot;</span>) + <a class="code" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262" title="Service property identifying all of the class names under which a service was registered in the frame...">ServiceConstants::OBJECTCLASS</a>() + <span class="stringliteral">&quot;=&quot;</span> +</div>
-<div class="line">                                        us_service_interface_iid&lt;IDictionaryService*&gt;() + <span class="stringliteral">&quot;)&quot;</span> +</div>
+<div class="line">                                        us_service_interface_iid&lt;IDictionaryService&gt;() + <span class="stringliteral">&quot;)&quot;</span> +</div>
 <div class="line">                                        <span class="stringliteral">&quot;(Language=*))&quot;</span>)</div>
 <div class="line">                  );</div>
-<div class="line">    m_tracker-&gt;<a class="code" href="classServiceTracker.html#ab15bf598b9eb79379dc6f3538f5d401b" title="Open this ServiceTracker and begin tracking services.">Open</a>();</div>
+<div class="line">    m_tracker-&gt;<a class="code" href="classServiceTracker.html#af8ac56906cfe09d1451f82a634ea5bf3" title="Open this ServiceTracker and begin tracking services.">Open</a>();</div>
 <div class="line"></div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Enter a blank line to exit.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"></div>
@@ -189,7 +186,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a class="code" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a>* m_context;</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// The service tracker</span></div>
-<div class="line">  <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;IDictionaryService*&gt;</a>* m_tracker;</div>
+<div class="line">  <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;IDictionaryService&gt;</a>* m_tracker;</div>
 <div class="line">};</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="group__MicroServices.html#gac441a2e64f59a76a5f7e42de67e87cba" title="Export a module activator class.">US_EXPORT_MODULE_ACTIVATOR</a>(dictionaryclient3, Activator)</div>
@@ -217,5 +214,5 @@ Enter word:
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

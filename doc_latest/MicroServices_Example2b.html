@@ -78,9 +78,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor">#include &lt;usGetModuleContext.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;usServiceProperties.h&gt;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Replace that include with your own base class declaration</span></div>
-<div class="line"><span class="preprocessor">#include US_BASECLASS_HEADER</span></div>
-<div class="line"><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#include &lt;set&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;algorithm&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;memory&gt;</span></div>
@@ -105,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">   * A private inner class that implements a dictionary service;</span></div>
 <div class="line"><span class="comment">   * see DictionaryService for details of the service.</span></div>
 <div class="line"><span class="comment">   */</span></div>
-<div class="line">  <span class="keyword">class </span>DictionaryImpl : <span class="keyword">public</span> US_BASECLASS_NAME, <span class="keyword">public</span> IDictionaryService</div>
+<div class="line">  <span class="keyword">class </span>DictionaryImpl : <span class="keyword">public</span> IDictionaryService</div>
 <div class="line">  {</div>
 <div class="line">    <span class="comment">// The set of words contained in the dictionary.</span></div>
 <div class="line">    std::set&lt;std::string&gt; m_dictionary;</div>
@@ -154,7 +151,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    m_dictionaryService.reset(<span class="keyword">new</span> DictionaryImpl);</div>
 <div class="line">    <a class="code" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6" title="A hash table with std::string as the key type and Any as the value type.">ServiceProperties</a> props;</div>
 <div class="line">    props[<span class="stringliteral">&quot;Language&quot;</span>] = std::string(<span class="stringliteral">&quot;French&quot;</span>);</div>
-<div class="line">    context-&gt;<a class="code" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>&lt;IDictionaryService&gt;(m_dictionaryService.get(), props);</div>
+<div class="line">    context-&gt;<a class="code" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>&lt;IDictionaryService&gt;(m_dictionaryService.get(), props);</div>
 <div class="line">  }</div>
 <div class="line"><span class="comment"></span></div>
 <div class="line"><span class="comment">  /**</span></div>
@@ -200,7 +197,7 @@ Id | Name                 | Status
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
  4 | French Dictionary    | LOADED
-&gt; 
+&gt;
 </pre><p>To unload the module, use the <code>u &lt;id&gt;</code> command. If the module from <a class="el" href="MicroServices_Example1.html">Example 1</a> is still active, then we should see it print out the details of the service event it receives when our new module registers its dictionary service. Using the <code>CppMicroServicesExampleDriver</code> commands <code>u</code> and <code>l</code> we can unload and load it at will, respectively. Each time we load and unload our dictionary service module, we should see the details of the associated service event printed from the module from Example 1. In <a class="el" href="MicroServices_Example3.html">Example 3</a>, we will create a client for our dictionary service. To exit <code>CppMicroServicesExampleDriver</code>, we use the <code>q</code> command.</p>
 <dl class="section note"><dt>Note</dt><dd>Because our french dictionary module has a link dependency on the dictionary service module from Example 2, this module is automatically loaded by the operating system loader. Unloading it will only succeed if there are no other dependent modules like our french dictionary module currently loaded.</dd></dl>
 <p>Next: <a class="el" href="MicroServices_Example3.html">Example 3 - Dictionary Client Module</a></p>
@@ -208,5 +205,5 @@ Id | Name                 | Status
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

@@ -76,9 +76,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor">#include &lt;usModuleActivator.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;usModuleContext.h&gt;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Replace that include with your own base class declaration</span></div>
-<div class="line"><span class="preprocessor">#include US_BASECLASS_HEADER</span></div>
-<div class="line"><span class="preprocessor"></span></div>
 <div class="line">US_USE_NAMESPACE</div>
 <div class="line"><span class="comment"></span></div>
 <div class="line"><span class="comment">/**</span></div>
@@ -137,17 +134,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      <span class="comment">// Listen for events pertaining to dictionary services.</span></div>
 <div class="line">      m_context-&gt;<a class="code" href="classModuleContext.html#a649b0101ead2e7beef159191484b7913">AddServiceListener</a>(<span class="keyword">this</span>, &amp;Activator::ServiceChanged,</div>
 <div class="line">                                    std::string(<span class="stringliteral">&quot;(&amp;(&quot;</span>) + <a class="code" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262" title="Service property identifying all of the class names under which a service was registered in the frame...">ServiceConstants::OBJECTCLASS</a>() + <span class="stringliteral">&quot;=&quot;</span> +</div>
-<div class="line">                                    us_service_interface_iid&lt;IDictionaryService*&gt;() + <span class="stringliteral">&quot;)&quot;</span> + <span class="stringliteral">&quot;(Language=*))&quot;</span>);</div>
+<div class="line">                                    us_service_interface_iid&lt;IDictionaryService&gt;() + <span class="stringliteral">&quot;)&quot;</span> + <span class="stringliteral">&quot;(Language=*))&quot;</span>);</div>
 <div class="line"></div>
 <div class="line">      <span class="comment">// Query for any service references matching any language.</span></div>
-<div class="line">      std::list&lt;ServiceReference&gt; refs = context-&gt;<a class="code" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed" title="Returns a list of ServiceReference objects.">GetServiceReferences</a>&lt;IDictionaryService&gt;(<span class="stringliteral">&quot;(Language=*)&quot;</span>);</div>
+<div class="line">      std::vector&lt;ServiceReference&lt;IDictionaryService&gt; &gt; refs =</div>
+<div class="line">          context-&gt;<a class="code" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a" title="Returns a list of ServiceReference objects.">GetServiceReferences</a>&lt;IDictionaryService&gt;(<span class="stringliteral">&quot;(Language=*)&quot;</span>);</div>
 <div class="line"></div>
 <div class="line">      <span class="comment">// If we found any dictionary services, then just get</span></div>
 <div class="line">      <span class="comment">// a reference to the first one so we can use it.</span></div>
 <div class="line">      <span class="keywordflow">if</span> (!refs.empty())</div>
 <div class="line">      {</div>
 <div class="line">        m_ref = refs.front();</div>
-<div class="line">        m_dictionary = m_context-&gt;GetService&lt;IDictionaryService&gt;(m_ref);</div>
+<div class="line">        m_dictionary = m_context-&gt;GetService(m_ref);</div>
 <div class="line">      }</div>
 <div class="line">    }</div>
 <div class="line"></div>
@@ -215,7 +213,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      {</div>
 <div class="line">        <span class="comment">// Get a reference to the service object.</span></div>
 <div class="line">        m_ref = <span class="keyword">event</span>.GetServiceReference();</div>
-<div class="line">        m_dictionary = m_context-&gt;GetService&lt;IDictionaryService&gt;(m_ref);</div>
+<div class="line">        m_dictionary = m_context-&gt;GetService(m_ref);</div>
 <div class="line">      }</div>
 <div class="line">    }</div>
 <div class="line">    <span class="comment">// If a dictionary service was unregistered, see if it</span></div>
@@ -223,7 +221,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="comment">// and try to query to get another one.</span></div>
 <div class="line">    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (event.<a class="code" href="classServiceEvent.html#a5aa8635186e778407c75dbbd3b0a5fc8" title="Returns the type of event.">GetType</a>() == <a class="code" href="classServiceEvent.html#ae7426fe742bd938523b64d43c232a49fa2727d97ff0e689285e6364afe42ecf81" title="This service is in the process of being unregistered.">ServiceEvent::UNREGISTERING</a>)</div>
 <div class="line">    {</div>
-<div class="line">      <span class="keywordflow">if</span> (event.<a class="code" href="classServiceEvent.html#ae789f24d3a29fbe56e1e7f67323dd72b" title="Returns a reference to the service that had a change occur in its lifecycle.">GetServiceReference</a>() == m_ref)</div>
+<div class="line">      <span class="keywordflow">if</span> (event.<a class="code" href="classServiceEvent.html#af5eebd40c7f4d97c805ca46c2ed7ef64" title="Returns a reference to the service that had a change occur in its lifecycle.">GetServiceReference</a>() == m_ref)</div>
 <div class="line">      {</div>
 <div class="line">        <span class="comment">// Unget service object and null references.</span></div>
 <div class="line">        m_context-&gt;UngetService(m_ref);</div>
@@ -231,7 +229,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        m_dictionary = NULL;</div>
 <div class="line"></div>
 <div class="line">        <span class="comment">// Query to see if we can get another service.</span></div>
-<div class="line">        std::list&lt;ServiceReference&gt; refs;</div>
+<div class="line">        std::vector&lt;ServiceReference&lt;IDictionaryService&gt; &gt; refs;</div>
 <div class="line">        <span class="keywordflow">try</span></div>
 <div class="line">        {</div>
 <div class="line">          refs = m_context-&gt;GetServiceReferences&lt;IDictionaryService&gt;(<span class="stringliteral">&quot;(Language=*)&quot;</span>);</div>
@@ -245,7 +243,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">        {</div>
 <div class="line">          <span class="comment">// Get a reference to the first service object.</span></div>
 <div class="line">          m_ref = refs.front();</div>
-<div class="line">          m_dictionary = m_context-&gt;GetService&lt;IDictionaryService&gt;(m_ref);</div>
+<div class="line">          m_dictionary = m_context-&gt;GetService(m_ref);</div>
 <div class="line">        }</div>
 <div class="line">      }</div>
 <div class="line">    }</div>
@@ -257,7 +255,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a class="code" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a>* m_context;</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// The service reference being used</span></div>
-<div class="line">  <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> m_ref;</div>
+<div class="line">  <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference&lt;IDictionaryService&gt;</a> m_ref;</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// The service object being used</span></div>
 <div class="line">  IDictionaryService* m_dictionary;</div>
@@ -289,5 +287,5 @@ Enter word:
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

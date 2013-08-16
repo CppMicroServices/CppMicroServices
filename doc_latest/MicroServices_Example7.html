@@ -76,9 +76,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor">#include &lt;usModuleContext.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;usServiceTracker.h&gt;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Replace that include with your own base class declaration</span></div>
-<div class="line"><span class="preprocessor">#include US_BASECLASS_HEADER</span></div>
-<div class="line"><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstring&gt;</span></div>
 <div class="line"></div>
@@ -122,8 +119,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    m_context = context;</div>
 <div class="line"></div>
 <div class="line">    <span class="comment">// Create a service tracker to monitor spell check services.</span></div>
-<div class="line">    m_tracker = <span class="keyword">new</span> <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;ISpellCheckService*&gt;</a>(m_context);</div>
-<div class="line">    m_tracker-&gt;<a class="code" href="classServiceTracker.html#ab15bf598b9eb79379dc6f3538f5d401b" title="Open this ServiceTracker and begin tracking services.">Open</a>();</div>
+<div class="line">    m_tracker = <span class="keyword">new</span> <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;ISpellCheckService&gt;</a>(m_context);</div>
+<div class="line">    m_tracker-&gt;<a class="code" href="classServiceTracker.html#af8ac56906cfe09d1451f82a634ea5bf3" title="Open this ServiceTracker and begin tracking services.">Open</a>();</div>
 <div class="line"></div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Enter a blank line to exit.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"></div>
@@ -189,13 +186,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a class="code" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a>* m_context;</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// The service tracker</span></div>
-<div class="line">  <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;ISpellCheckService*&gt;</a>* m_tracker;</div>
+<div class="line">  <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;ISpellCheckService&gt;</a>* m_tracker;</div>
 <div class="line">};</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="group__MicroServices.html#gac441a2e64f59a76a5f7e42de67e87cba" title="Export a module activator class.">US_EXPORT_MODULE_ACTIVATOR</a>(spellcheckclient, Activator)</div>
 </div><!-- fragment --><p> After running the <code>CppMicroServicesExampleDriver</code> program use the <code>s</code> command to make sure that only the modules from Example 2, Example 2b, and Example 6 are loaded; use the load (<code>l</code>) and un-load (<code>u</code>) commands as appropriate to load and un-load the various tutorial modules, respectively. Now we can load our spell checker client module by entering <code>l spellcheckclient</code>:</p>
 <pre class="fragment">CppMicroServices-build&gt; bin/CppMicroServicesExampleDriver
-&gt; l 
+&gt; l
 Starting to listen for service events.
 &gt; l spellcheckservice
 Ex1: Service of type IDictionaryService/1.0 registered.
@@ -211,7 +208,7 @@ Id | Name                 | Status
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
  4 | Spell Check Service  | LOADED
-&gt; 
+&gt;
 </pre><p>To trigger the registration of the spell checker service from our module, we load the frenchdictionary using the <code>l frenchdictionary</code> command. If the module from <a class="el" href="MicroServices_Example1.html">Example 1</a> is still active, then we should see it print out the details of the service event it receives when our new module registers its spell checker service:</p>
 <pre class="fragment">CppMicroServices-build&gt; bin/CppMicroServicesExampleDriver
 &gt; l spellcheckservice
@@ -225,5 +222,5 @@ Enter passage:
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

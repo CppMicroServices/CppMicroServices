@@ -129,6 +129,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>GetHandle()
 : <a class="el" href="classSharedLibrary.html#a07b957d1845c1202262108a2905af206">SharedLibrary</a>
 </li>
+<li>GetInterfaceId()
+: <a class="el" href="classServiceReferenceBase.html#a7760e6c3c52c92e008eaec40afba9034">ServiceReferenceBase</a>
+</li>
 <li>GetLibraryPath()
 : <a class="el" href="classSharedLibrary.html#ae64e55451bc56affb06f2d964be77aa8">SharedLibrary</a>
 </li>
@@ -151,7 +154,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classModuleContext.html#ae4fc39476ca5a30e0cbe5af26de4b4e3">ModuleContext</a>
 , <a class="el" href="classModuleEvent.html#a12b142adcb5b98d79fb87e38554d307f">ModuleEvent</a>
 , <a class="el" href="classModuleRegistry.html#ae2a12e82c874a7cbaf4884ad59ccbee5">ModuleRegistry</a>
-, <a class="el" href="classServiceReference.html#acbbf94823ee9c138ef328709b062b815">ServiceReference</a>
+, <a class="el" href="classServiceReferenceBase.html#a5861216c4f37ac5d26b5382fc76718d5">ServiceReferenceBase</a>
 </li>
 <li>GetModuleContext()
 : <a class="el" href="classModule.html#a66c027deb575198ba11a37cca2f2faf7">Module</a>
@@ -168,9 +171,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classModuleResource.html#a2d83b50c7d818e7a48a08074cf9d4089">ModuleResource</a>
 , <a class="el" href="classSharedLibrary.html#abd0c211b871f47bdcdc7a659fa0a1abb">SharedLibrary</a>
 </li>
-<li>GetNameOfClass()
-: <a class="el" href="classBase.html#a4600c57d4896aa40d84d1c3c088a6104">Base</a>
-</li>
 <li>GetPath()
 : <a class="el" href="classModuleResource.html#a27a63009638727f7ca7456d77ce2f10d">ModuleResource</a>
 </li>
@@ -179,20 +179,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>GetProperty()
 : <a class="el" href="classModule.html#a3fa885cfb92466c142e1903bb6fab638">Module</a>
-, <a class="el" href="classServiceReference.html#a8bb46bcb5ad44dc99c71726256a390fb">ServiceReference</a>
+, <a class="el" href="classServiceReferenceBase.html#a0df496d62089bb666e64b23914af17b5">ServiceReferenceBase</a>
 </li>
 <li>GetPropertyKeys()
 : <a class="el" href="classModule.html#a0417ce52b2b1dedfe513a66cb3cb432c">Module</a>
-, <a class="el" href="classServiceReference.html#a4ef060c0b25b9bbbada940fe62480c1d">ServiceReference</a>
+, <a class="el" href="classServiceReferenceBase.html#a9f0985db810205c03407d71ef4b00e14">ServiceReferenceBase</a>
 </li>
 <li>GetQualifier()
 : <a class="el" href="classModuleVersion.html#a27225bae7e1ce2b5cfff97f273706489">ModuleVersion</a>
 </li>
 <li>GetReference()
-: <a class="el" href="classServiceRegistration.html#ac2acba2309c8de73a58db50f9cf9a40f">ServiceRegistration</a>
+: <a class="el" href="classServiceRegistration.html#a8c56d31a3c6642ce6c6382b13cd4d7cf">ServiceRegistration&lt; I1, I2, I3 &gt;</a>
+, <a class="el" href="classServiceRegistrationBase.html#a47d1531f5ba0f8c9740b9a60f1a36c4c">ServiceRegistrationBase</a>
 </li>
 <li>GetRegisteredServices()
-: <a class="el" href="classModule.html#a45c9f2f748be5ae22a466abe4533258b">Module</a>
+: <a class="el" href="classModule.html#a8ab1e28d22d60b049c515d4256363b44">Module</a>
 </li>
 <li>GetResource()
 : <a class="el" href="classModule.html#ae663b9033cb569becb414ca4d9064622">Module</a>
@@ -201,46 +202,55 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classModuleResource.html#ad6f2e5168e7841f9efb07cc6fef8e8ac">ModuleResource</a>
 </li>
 <li>GetService()
-: <a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">ModuleContext</a>
-, <a class="el" href="classServiceTracker.html#aaa412dd20e7a53eaf4ced50031093bd5">ServiceTracker&lt; S, T &gt;</a>
-, <a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf">ServiceFactory</a>
+: <a class="el" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437">ModuleContext</a>
+, <a class="el" href="classServiceTracker.html#ad64387ec4c40e3dd06c196c69d25587b">ServiceTracker&lt; S, TTT &gt;</a>
+, <a class="el" href="classServiceFactory.html#ad11f9698cd9d71ffad77d84b02d0d04e">ServiceFactory</a>
+, <a class="el" href="classServiceObjects.html#a85779ccba243ed69fc185b54fc02f7ed">ServiceObjects&lt; S &gt;</a>
+, <a class="el" href="classServiceObjects_3_01void_01_4.html#a34a703b659677df8fdb069d0203a13fe">ServiceObjects&lt; void &gt;</a>
+, <a class="el" href="classServiceTracker.html#a48da79ab51e1b83b3c07e7535b0ff9d5">ServiceTracker&lt; S, TTT &gt;</a>
+, <a class="el" href="structPrototypeServiceFactory.html#ade26d6c7af2818e7dbabc0ab20487ce9">PrototypeServiceFactory</a>
+</li>
+<li>GetServiceObjects()
+: <a class="el" href="classModuleContext.html#abb59411d496f0f688a3fb3ccb8d50bc7">ModuleContext</a>
 </li>
 <li>GetServiceReference()
-: <a class="el" href="classModuleContext.html#a24a5e5dbed9c5aa948104a103a1d78f3">ModuleContext</a>
-, <a class="el" href="classServiceEvent.html#ae789f24d3a29fbe56e1e7f67323dd72b">ServiceEvent</a>
-, <a class="el" href="classServiceTracker.html#a8211f88cae2734c25a3531e119305fe9">ServiceTracker&lt; S, T &gt;</a>
+: <a class="el" href="classServiceObjects_3_01void_01_4.html#a3fe2fe40987d05659628e76532a6c6ff">ServiceObjects&lt; void &gt;</a>
+, <a class="el" href="classModuleContext.html#af47528f02bd276ba9b738b17f60d04f8">ModuleContext</a>
+, <a class="el" href="classServiceObjects.html#a8626361394a83d14835fd0db1008a3f4">ServiceObjects&lt; S &gt;</a>
+, <a class="el" href="classServiceEvent.html#a0c2cfa0b602d9da487dee573cf0bc8a5">ServiceEvent</a>
+, <a class="el" href="classServiceTracker.html#ad67c3c48efe8a0637595894c01e0a5d3">ServiceTracker&lt; S, TTT &gt;</a>
 </li>
 <li>GetServiceReferences()
-: <a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed">ModuleContext</a>
-, <a class="el" href="classServiceTracker.html#a72bf7bbc737310f4909f947d9f1dc644">ServiceTracker&lt; S, T &gt;</a>
-, <a class="el" href="classModuleContext.html#ad92776b8bf122ed3f28e4528bb9cd3e8">ModuleContext</a>
+: <a class="el" href="classModuleContext.html#adc06850fd324705a0463d050cbbcbf59">ModuleContext</a>
+, <a class="el" href="classServiceTracker.html#a046d8e0e6b4c44f1099739698cf08dd0">ServiceTracker&lt; S, TTT &gt;</a>
+, <a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a">ModuleContext</a>
 </li>
 <li>GetServices()
-: <a class="el" href="classServiceTracker.html#aabddd699fbe922c1c2841133c74cc2d3">ServiceTracker&lt; S, T &gt;</a>
+: <a class="el" href="classServiceTracker.html#a5c8119f683dc28feab739347e802d6da">ServiceTracker&lt; S, TTT &gt;</a>
 </li>
 <li>GetServicesInUse()
-: <a class="el" href="classModule.html#a743c59afd2ef4e349f10e78b95df2d5a">Module</a>
+: <a class="el" href="classModule.html#adf6934e75db2be837723fb6e21125bca">Module</a>
 </li>
 <li>GetSize()
 : <a class="el" href="classModuleResource.html#ac9946d13895508b4a9659b87946a3d97">ModuleResource</a>
 </li>
 <li>GetSuffix()
-: <a class="el" href="classSharedLibrary.html#a64ad9c35628e1c65f657b3d2e2d71733">SharedLibrary</a>
-, <a class="el" href="classModuleResource.html#a307d5ad13d1c6d00057a3910a2f4917b">ModuleResource</a>
+: <a class="el" href="classModuleResource.html#a307d5ad13d1c6d00057a3910a2f4917b">ModuleResource</a>
+, <a class="el" href="classSharedLibrary.html#a64ad9c35628e1c65f657b3d2e2d71733">SharedLibrary</a>
 </li>
 <li>GetTracked()
-: <a class="el" href="classServiceTracker.html#a26018a70fc32162959719eb361d97698">ServiceTracker&lt; S, T &gt;</a>
+: <a class="el" href="classServiceTracker.html#af330258ea118f7042cae94a414278851">ServiceTracker&lt; S, TTT &gt;</a>
 </li>
 <li>GetTrackingCount()
-: <a class="el" href="classServiceTracker.html#ae1ffe513585f54c83d3dd3894e6e5027">ServiceTracker&lt; S, T &gt;</a>
+: <a class="el" href="classServiceTracker.html#a3f08a0fcb1953b35a3275cda1856ba4a">ServiceTracker&lt; S, TTT &gt;</a>
 </li>
 <li>GetType()
-: <a class="el" href="classServiceEvent.html#a5aa8635186e778407c75dbbd3b0a5fc8">ServiceEvent</a>
-, <a class="el" href="classServiceException.html#a6518810555485753c48d8cae73f1df30">ServiceException</a>
+: <a class="el" href="classServiceException.html#a6518810555485753c48d8cae73f1df30">ServiceException</a>
+, <a class="el" href="classServiceEvent.html#a5aa8635186e778407c75dbbd3b0a5fc8">ServiceEvent</a>
 , <a class="el" href="classModuleEvent.html#ab01e4656fa74659e689c86bf2def8570">ModuleEvent</a>
 </li>
 <li>GetUsingModules()
-: <a class="el" href="classServiceReference.html#ac1bb286fe8c797ac8a6a90c1e2dda623">ServiceReference</a>
+: <a class="el" href="classServiceReferenceBase.html#a24ff253e6d9c8af0e088e494a1a0138e">ServiceReferenceBase</a>
 </li>
 <li>GetVersion()
 : <a class="el" href="classModule.html#a20c96bbe3653bec5a8ed5d1b56d6cddf">Module</a>
@@ -249,5 +259,5 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

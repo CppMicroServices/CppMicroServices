@@ -98,25 +98,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><b>US_NAMESPACE</b> The default namespace is <code>us</code> but you may override this at will.</li>
 <li><b>US_HEADER_PREFIX</b> By default, all public headers have a "us" prefix. You may specify an arbitrary prefix to match your naming conventions.</li>
 </ul>
-<p>The above options are mainly useful when embedding the C++ Micro Services source code in your own library and you want to make it look like native source code.</p>
-<h3>Configure the service base class</h3>
-<p>All service implementations must inherit from the same base class. The C++ Micro Services library provides a trivial class called <code>us::Base</code> for that purpose. However, most applications already have a special base class and you can configure the C++ Micro Services library to use that class.</p>
-<ul>
-<li><b>US_BASECLASS_NAME</b> The fully-qualified name of the base class, e.g. <code>my::OwnBaseClass</code>. If you don't need support for service factories (see below) and don't want to enable US_BUILD_TESTING, this is all you need.</li>
-<li><b>US_ENABLE_SERVICE_FACTORY_SUPPORT (advanced)</b> If you want support for service factories (they allow the customization of service objects for individual modules, see OSGi Service Platform Core Specification Release 4, Version 4.3, Section 5.6), switch this option to ON. If you also provided a custom US_BASECLASS_NAME, you need to set the US_BASECLASS_HEADER variable.</li>
-<li><b>US_BASECLASS_HEADER (advanced)</b> The name of the header file containing the declaration for the base class specified in US_BASECLASS_NAME, e.g. <code>myOwnBaseClass.h</code>. You will also have to set US_BASECLASS_PACKAGE or US_BASECLASS_INCLUDE_DIRS and US_BASECLASS_LIBRARIES.</li>
-<li><b>US_BASECLASS_PACKAGE (advanced)</b> If your specified a custom base class from a library which can be found via a CMake <code>find_package</code> command, enter the package name here. Most of the time, this will correctly set the values for US_BASECLASS_INCLUDE_DIRS, US_BASECLASS_LIBRARIES, and US_BASECLASS_LIBRARY_DIRS.</li>
-<li><b>US_BASECLASS_INCLUDE_DIRS (advanced)</b> A list of include dirs needed to include the base class header file as specified in US_BASECLASS_HEADER.</li>
-<li><b>US_BASECLASS_LIBRARIES (advanced)</b> A list of libraries to link the C++ Micro Services library against for resolving symbols needed for a custom base class.</li>
-<li><b>US_BASECLASS_LIBRARY_DIRS (advanced)</b> A list of directories to look for the libraries specified in US_BASECLASS_LIBRARIES</li>
-</ul>
-<h2>Building</h2>
-<p>After CMake generated the specific build system files, just build the complete project. E.g. on Linux with Makefiles, type <code>make</code> inside the build directory and on Windows with Visual Studio build the <code>BUILD_ALL</code> project contained in the generated .sln file.</p>
-<h2>Installation</h2>
-<p>To install the header files, libraries, and executables, use <code>make install</code> for a Makefile based project or e.g. build the <code>INSTALL</code> project in Visual Studio. This will copy all required files to the path specified in the <code>CMAKE_INSTALL_PREFIX</code> variable.</p>
-<p>For more information on how to use the C++ Micro Services library, see the <a class="el" href="MicroServices_GettingStarted.html">Getting Started</a> guide. </p>
+<p>The above options are mainly useful when embedding the C++ Micro Services source code in your own library and you want to make it look like native source code. </p>
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

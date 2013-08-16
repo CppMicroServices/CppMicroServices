@@ -107,7 +107,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line"><a class="code" href="group__MicroServices.html#gad5c1340dcd99d403c8da0c52b8db30bb" title="Declare a CppMicroServices service interface.">US_DECLARE_SERVICE_INTERFACE</a>(ISpellCheckService, <span class="stringliteral">&quot;ISpellCheckService/1.0&quot;</span>)</div>
 </div><!-- fragment --><p> The service interface is quite simple, with only one method that needs to be implemented. Because we provide an empty out-of-line destructor (defined in the file <code>ISpellCheckService.cpp</code>) we must export the service interface by using the module specific <code>SPELLCHECKSERVICE_EXPORT</code> macro.</p>
-<p>In the following source code, the module needs to create a complete list of all dictionary services; this is somewhat tricky and must be done carefully if done manually via service event listners. Our module makes use of the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> and <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> classes to robustly react to service events related to dictionary services. The module activator of our module now additionally implements the <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> class to be automatically notified of arriving, departing, or modified dictionary services. In case of a newly added dictionary service, our <code><a class="el" href="structServiceTrackerCustomizer.html#a5594a8e03e63decf75d898cd2f8dd5e4" title="A service is being added to the ServiceTracker.">ServiceTrackerCustomizer::AddingService()</a></code> implementation checks if a spell checker service was already registered and if not registers a new <code>ISpellCheckService</code> instance if at lead two dictionary services are available. If the number of dictionary services drops below two, our <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> implementation un-registers the previously registered spell checker service instance. These actions must be performed in a synchronized manner to avoid interference from service events originating from different threads. The implementation of our module activator is done in a file called <code>spellcheckservice/Activator.cpp</code>:</p>
+<p>In the following source code, the module needs to create a complete list of all dictionary services; this is somewhat tricky and must be done carefully if done manually via service event listners. Our module makes use of the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> and <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> classes to robustly react to service events related to dictionary services. The module activator of our module now additionally implements the <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> class to be automatically notified of arriving, departing, or modified dictionary services. In case of a newly added dictionary service, our <code><a class="el" href="structServiceTrackerCustomizer.html#a562e8704c49204fb55547c302530bf19" title="A service is being added to the ServiceTracker.">ServiceTrackerCustomizer::AddingService()</a></code> implementation checks if a spell checker service was already registered and if not registers a new <code>ISpellCheckService</code> instance if at lead two dictionary services are available. If the number of dictionary services drops below two, our <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> implementation un-registers the previously registered spell checker service instance. These actions must be performed in a synchronized manner to avoid interference from service events originating from different threads. The implementation of our module activator is done in a file called <code>spellcheckservice/Activator.cpp</code>:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;IDictionaryService.h&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;ISpellCheckService.h&quot;</span></div>
 <div class="line"></div>
@@ -117,9 +117,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor">#include &lt;usServiceTracker.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;usServiceTrackerCustomizer.h&gt;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Replace that include with your own base class declaration</span></div>
-<div class="line"><span class="preprocessor">#include US_BASECLASS_HEADER</span></div>
-<div class="line"><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#include &lt;map&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstring&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;memory&gt;</span></div>
@@ -138,7 +135,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment"> * checker service will appear and disappear as dictionary</span></div>
 <div class="line"><span class="comment"> * services appear and disappear, respectively.</span></div>
 <div class="line"><span class="comment">**/</span></div>
-<div class="line"><span class="keyword">class </span>US_ABI_LOCAL Activator : <span class="keyword">public</span> <a class="code" href="structModuleActivator.html" title="Customizes the starting and stopping of a CppMicroServices module.">ModuleActivator</a>, <span class="keyword">public</span> <a class="code" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a>&lt;IDictionaryService*&gt;</div>
+<div class="line"><span class="keyword">class </span>US_ABI_LOCAL Activator : <span class="keyword">public</span> <a class="code" href="structModuleActivator.html" title="Customizes the starting and stopping of a CppMicroServices module.">ModuleActivator</a>, <span class="keyword">public</span> <a class="code" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a>&lt;IDictionaryService&gt;</div>
 <div class="line">{</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">private</span>:</div>
@@ -147,12 +144,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="comment">   * A private inner class that implements a spell check service; see</span></div>
 <div class="line"><span class="comment">   * ISpellCheckService for details of the service.</span></div>
 <div class="line"><span class="comment">   */</span></div>
-<div class="line">  <span class="keyword">class </span>SpellCheckImpl : <span class="keyword">public</span> US_BASECLASS_NAME, <span class="keyword">public</span> ISpellCheckService</div>
+<div class="line">  <span class="keyword">class </span>SpellCheckImpl : <span class="keyword">public</span> ISpellCheckService</div>
 <div class="line">  {</div>
 <div class="line"></div>
 <div class="line">  <span class="keyword">private</span>:</div>
 <div class="line"></div>
-<div class="line">    <span class="keyword">typedef</span> std::map&lt;ServiceReference, IDictionaryService*&gt; RefToServiceType;</div>
+<div class="line">    <span class="keyword">typedef</span> std::map&lt;ServiceReference&lt;IDictionaryService&gt;, IDictionaryService*&gt; RefToServiceType;</div>
 <div class="line">    RefToServiceType m_refToSvcMap;</div>
 <div class="line"></div>
 <div class="line">  <span class="keyword">public</span>:</div>
@@ -219,7 +216,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      <span class="keywordflow">return</span> errorList;</div>
 <div class="line">    }</div>
 <div class="line"></div>
-<div class="line">    <span class="keywordtype">int</span> AddDictionary(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a>&amp; ref, IDictionaryService* dictionary)</div>
+<div class="line">    <span class="keywordtype">int</span> AddDictionary(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference&lt;IDictionaryService&gt;</a>&amp; ref, IDictionaryService* dictionary)</div>
 <div class="line">    {</div>
 <div class="line">      <span class="comment">// Lock the m_refToSvcMap member using your favorite thread library here...</span></div>
 <div class="line">      <span class="comment">// MutexLocker lock(&amp;m_refToSvcMapMutex)</span></div>
@@ -229,7 +226,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">      <span class="keywordflow">return</span> m_refToSvcMap.size();</div>
 <div class="line">    }</div>
 <div class="line"></div>
-<div class="line">    <span class="keywordtype">int</span> RemoveDictionary(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a>&amp; ref)</div>
+<div class="line">    <span class="keywordtype">int</span> RemoveDictionary(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference&lt;IDictionaryService&gt;</a>&amp; ref)</div>
 <div class="line">    {</div>
 <div class="line">      <span class="comment">// Lock the m_refToSvcMap member using your favorite thread library here...</span></div>
 <div class="line">      <span class="comment">// MutexLocker lock(&amp;m_refToSvcMapMutex)</span></div>
@@ -240,9 +237,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    }</div>
 <div class="line">  };</div>
 <div class="line"></div>
-<div class="line">  <span class="keyword">virtual</span> IDictionaryService* <a class="code" href="structServiceTrackerCustomizer.html#a5594a8e03e63decf75d898cd2f8dd5e4" title="A service is being added to the ServiceTracker.">AddingService</a>(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a>&amp; reference)</div>
+<div class="line">  <span class="keyword">virtual</span> IDictionaryService* <a class="code" href="structServiceTrackerCustomizer.html#a562e8704c49204fb55547c302530bf19" title="A service is being added to the ServiceTracker.">AddingService</a>(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference&lt;IDictionaryService&gt;</a>&amp; reference)</div>
 <div class="line">  {</div>
-<div class="line">    IDictionaryService* dictionary = m_context-&gt;<a class="code" href="classServiceTracker.html#a78e1ea3487de858f29dc4406b0b56050" title="Returns the service object for the specified ServiceReference if the specified referenced service is ...">GetService</a>&lt;IDictionaryService&gt;(reference);</div>
+<div class="line">    IDictionaryService* dictionary = m_context-&gt;<a class="code" href="classServiceTracker.html#ad64387ec4c40e3dd06c196c69d25587b" title="Returns the service object for the specified ServiceReference if the specified referenced service is ...">GetService</a>(reference);</div>
 <div class="line">    <span class="keywordtype">int</span> count = m_spellCheckService-&gt;AddDictionary(reference, dictionary);</div>
 <div class="line">    <span class="keywordflow">if</span> (!m_spellCheckReg &amp;&amp; count &gt; 1)</div>
 <div class="line">    {</div>
@@ -251,12 +248,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="keywordflow">return</span> dictionary;</div>
 <div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="structServiceTrackerCustomizer.html#a1670abf8fc457a53d1549aae710f40d6" title="A service tracked by the ServiceTracker has been modified.">ModifiedService</a>(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a>&amp; <span class="comment">/*reference*/</span>, IDictionaryService* <span class="comment">/*service*/</span>)</div>
+<div class="line">  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="structServiceTrackerCustomizer.html#aa7251aae3f7939e8f604fd12dcfacf67" title="A service tracked by the ServiceTracker has been modified.">ModifiedService</a>(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference&lt;IDictionaryService&gt;</a>&amp; <span class="comment">/*reference*/</span>,</div>
+<div class="line">                               IDictionaryService* <span class="comment">/*service*/</span>)</div>
 <div class="line">  {</div>
 <div class="line">    <span class="comment">// do nothing</span></div>
 <div class="line">  }</div>
 <div class="line"></div>
-<div class="line">  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="structServiceTrackerCustomizer.html#a4e6795fba9d71bbc4bff727985cdabf9" title="A service tracked by the ServiceTracker has been removed.">RemovedService</a>(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a>&amp; reference, IDictionaryService* <span class="comment">/*service*/</span>)</div>
+<div class="line">  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="structServiceTrackerCustomizer.html#a18a1b3b02a71903ef33bc1a8ce90c5b9" title="A service tracked by the ServiceTracker has been removed.">RemovedService</a>(<span class="keyword">const</span> <a class="code" href="classServiceReference.html" title="A reference to a service.">ServiceReference&lt;IDictionaryService&gt;</a>&amp; reference,</div>
+<div class="line">                              IDictionaryService* <span class="comment">/*service*/</span>)</div>
 <div class="line">  {</div>
 <div class="line">    <span class="keywordflow">if</span> (m_spellCheckService-&gt;RemoveDictionary(reference) &lt; 2 &amp;&amp; m_spellCheckReg)</div>
 <div class="line">    {</div>
@@ -266,10 +265,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  std::auto_ptr&lt;SpellCheckImpl&gt; m_spellCheckService;</div>
-<div class="line">  <a class="code" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> m_spellCheckReg;</div>
+<div class="line">  <a class="code" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration&lt;ISpellCheckService&gt;</a> m_spellCheckReg;</div>
 <div class="line"></div>
 <div class="line">  <a class="code" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a>* m_context;</div>
-<div class="line">  std::auto_ptr&lt;ServiceTracker&lt;IDictionaryService*&gt; &gt; m_tracker;</div>
+<div class="line">  std::auto_ptr&lt;ServiceTracker&lt;IDictionaryService&gt; &gt; m_tracker;</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line"></div>
@@ -290,7 +289,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    m_context = context;</div>
 <div class="line"></div>
 <div class="line">    m_spellCheckService.reset(<span class="keyword">new</span> SpellCheckImpl);</div>
-<div class="line">    m_tracker.reset(<span class="keyword">new</span> <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;IDictionaryService*&gt;</a>(context, <span class="keyword">this</span>));</div>
+<div class="line">    m_tracker.reset(<span class="keyword">new</span> <a class="code" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker&lt;IDictionaryService&gt;</a>(context, <span class="keyword">this</span>));</div>
 <div class="line">    m_tracker-&gt;Open();</div>
 <div class="line">  }</div>
 <div class="line"><span class="comment"></span></div>
@@ -334,7 +333,7 @@ Id | Name                 | Status
  2 | Event Listener       | LOADED
  3 | Dictionary Service   | LOADED
  4 | Spell Check Service  | LOADED
-&gt; 
+&gt;
 </pre><p>To trigger the registration of the spell checker service from our module, we load the frenchdictionary using the <code>l frenchdictionary</code> command. If the module from <a class="el" href="MicroServices_Example1.html">Example 1</a> is still active, then we should see it print out the details of the service event it receives when our new module registers its spell checker service:</p>
 <pre class="fragment">CppMicroServices-build&gt; bin/CppMicroServicesExampleDriver
 &gt; l frenchdictionary
@@ -347,5 +346,5 @@ Ex1: Service of type ISpellCheckService/1.0 registered.
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

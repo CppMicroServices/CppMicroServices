@@ -1,9 +1,9 @@
 ---
 layout: default
-title: ServiceTrackerCustomizer&lt; T &gt; Struct Template Reference
+title: ServiceTrackerCustomizer&lt; S, T &gt; Struct Template Reference
 ---
   <head>
-    <title>C++ Micro Services: ServiceTrackerCustomizer&lt; T &gt; Struct Template Reference</title>
+    <title>C++ Micro Services: ServiceTrackerCustomizer&lt; S, T &gt; Struct Template Reference</title>
     <link href="tabs.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="dynsections.js"></script>
@@ -70,64 +70,103 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structServiceTrackerCustomizer-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ServiceTrackerCustomizer&lt; T &gt; Struct Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
+<div class="title">ServiceTrackerCustomizer&lt; S, T &gt; Struct Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group__MicroServices.html">Micro Services Classes</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>The <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> interface allows a <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> to customize the service objects that are tracked.  
  <a href="structServiceTrackerCustomizer.html#details">More...</a></p>
 <div class="dynheader">
-Inheritance diagram for ServiceTrackerCustomizer&lt; T &gt;:</div>
+Inheritance diagram for ServiceTrackerCustomizer&lt; S, T &gt;:</div>
 <div class="dyncontent">
-<div class="center"><img src="structServiceTrackerCustomizer__inherit__graph.png" border="0" usemap="#ServiceTrackerCustomizer_3_01T_01_4_inherit__map" alt="Inheritance graph"/></div>
-<map name="ServiceTrackerCustomizer_3_01T_01_4_inherit__map" id="ServiceTrackerCustomizer_3_01T_01_4_inherit__map">
-<area shape="rect" id="node3" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry." alt="" coords="43,83,192,112"/></map>
+<div class="center"><img src="structServiceTrackerCustomizer__inherit__graph.png" border="0" usemap="#ServiceTrackerCustomizer_3_01S_00_01T_01_4_inherit__map" alt="Inheritance graph"/></div>
+<map name="ServiceTrackerCustomizer_3_01S_00_01T_01_4_inherit__map" id="ServiceTrackerCustomizer_3_01S_00_01T_01_4_inherit__map">
+<area shape="rect" id="node3" href="structServiceTrackerCustomizer.html" title="ServiceTrackerCustomizer\l\&lt; S, TTT::TrackedType \&gt;" alt="" coords="5,121,192,167"/><area shape="rect" id="node5" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry." alt="" coords="28,219,169,266"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aeb9c4a32413e4b56fb36320dc811f9ea"><td class="memItemLeft" align="right" valign="top">typedef S&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#aeb9c4a32413e4b56fb36320dc811f9ea">ServiceT</a></td></tr>
+<tr class="separator:aeb9c4a32413e4b56fb36320dc811f9ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bcb3758b94d982976506ac58b18ba96"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classServiceReference.html">ServiceReference</a><br class="typebreak"/>
+&lt; <a class="el" href="structServiceTrackerCustomizer.html#aeb9c4a32413e4b56fb36320dc811f9ea">ServiceT</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a></td></tr>
+<tr class="separator:a7bcb3758b94d982976506ac58b18ba96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ada180af5355a26beb6f08025c3a8381f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#ada180af5355a26beb6f08025c3a8381f">~ServiceTrackerCustomizer</a> ()</td></tr>
-<tr class="separator:ada180af5355a26beb6f08025c3a8381f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5594a8e03e63decf75d898cd2f8dd5e4"><td class="memItemLeft" align="right" valign="top">virtual T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#a5594a8e03e63decf75d898cd2f8dd5e4">AddingService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference)=0</td></tr>
-<tr class="memdesc:a5594a8e03e63decf75d898cd2f8dd5e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A service is being added to the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code>.  <a href="#a5594a8e03e63decf75d898cd2f8dd5e4">More...</a><br/></td></tr>
-<tr class="separator:a5594a8e03e63decf75d898cd2f8dd5e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1670abf8fc457a53d1549aae710f40d6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#a1670abf8fc457a53d1549aae710f40d6">ModifiedService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference, T service)=0</td></tr>
-<tr class="memdesc:a1670abf8fc457a53d1549aae710f40d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">A service tracked by the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> has been modified.  <a href="#a1670abf8fc457a53d1549aae710f40d6">More...</a><br/></td></tr>
-<tr class="separator:a1670abf8fc457a53d1549aae710f40d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e6795fba9d71bbc4bff727985cdabf9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#a4e6795fba9d71bbc4bff727985cdabf9">RemovedService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference, T service)=0</td></tr>
-<tr class="memdesc:a4e6795fba9d71bbc4bff727985cdabf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A service tracked by the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> has been removed.  <a href="#a4e6795fba9d71bbc4bff727985cdabf9">More...</a><br/></td></tr>
-<tr class="separator:a4e6795fba9d71bbc4bff727985cdabf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaea8d3a87177c37434aa75b7d935a790"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#aaea8d3a87177c37434aa75b7d935a790">~ServiceTrackerCustomizer</a> ()</td></tr>
+<tr class="separator:aaea8d3a87177c37434aa75b7d935a790"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a562e8704c49204fb55547c302530bf19"><td class="memItemLeft" align="right" valign="top">virtual T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#a562e8704c49204fb55547c302530bf19">AddingService</a> (const <a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a> &amp;reference)=0</td></tr>
+<tr class="memdesc:a562e8704c49204fb55547c302530bf19"><td class="mdescLeft">&#160;</td><td class="mdescRight">A service is being added to the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code>.  <a href="#a562e8704c49204fb55547c302530bf19">More...</a><br/></td></tr>
+<tr class="separator:a562e8704c49204fb55547c302530bf19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7251aae3f7939e8f604fd12dcfacf67"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#aa7251aae3f7939e8f604fd12dcfacf67">ModifiedService</a> (const <a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a> &amp;reference, T service)=0</td></tr>
+<tr class="memdesc:aa7251aae3f7939e8f604fd12dcfacf67"><td class="mdescLeft">&#160;</td><td class="mdescRight">A service tracked by the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> has been modified.  <a href="#aa7251aae3f7939e8f604fd12dcfacf67">More...</a><br/></td></tr>
+<tr class="separator:aa7251aae3f7939e8f604fd12dcfacf67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18a1b3b02a71903ef33bc1a8ce90c5b9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structServiceTrackerCustomizer.html#a18a1b3b02a71903ef33bc1a8ce90c5b9">RemovedService</a> (const <a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a> &amp;reference, T service)=0</td></tr>
+<tr class="memdesc:a18a1b3b02a71903ef33bc1a8ce90c5b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A service tracked by the <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> has been removed.  <a href="#a18a1b3b02a71903ef33bc1a8ce90c5b9">More...</a><br/></td></tr>
+<tr class="separator:a18a1b3b02a71903ef33bc1a8ce90c5b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class T = us::Base*&gt;<br/>
-struct ServiceTrackerCustomizer&lt; T &gt;</h3>
+<div class="textblock"><h3>template&lt;class S, class T = S*&gt;<br/>
+struct ServiceTrackerCustomizer&lt; S, T &gt;</h3>
 
 <p>The <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> interface allows a <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> to customize the service objects that are tracked. </p>
 <p>A <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> is called when a service is being added to a <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code>. The <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> can then return an object for the tracked service. A <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> is also called when a tracked service is modified or has been removed from a <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code>.</p>
-<p>The methods in this interface may be called as the result of a <code><a class="el" href="classServiceEvent.html" title="An event from the Micro Services framework describing a service lifecycle change.">ServiceEvent</a></code> being received by a <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code>. Since <code><a class="el" href="classServiceEvent.html" title="An event from the Micro Services framework describing a service lifecycle change.">ServiceEvent</a></code>s are synchronously delivered, it is highly recommended that implementations of these methods do not register (<code><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6" title="Registers the specified service object with the specified properties under the specified class names ...">ModuleContext::RegisterService</a></code>), modify ( <code><a class="el" href="classServiceRegistration.html#a089f7b4f1af195b3e24b85f3795e04f5" title="Updates the properties associated with a service.">ServiceRegistration::SetProperties</a></code>) or unregister ( <code><a class="el" href="classServiceRegistration.html#a8b448a860f269d77204a0e2043ef801c" title="Unregisters a service.">ServiceRegistration::Unregister</a></code>) a service while being synchronized on any object.</p>
+<p>The methods in this interface may be called as the result of a <code><a class="el" href="classServiceEvent.html" title="An event from the Micro Services framework describing a service lifecycle change.">ServiceEvent</a></code> being received by a <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code>. Since <code><a class="el" href="classServiceEvent.html" title="An event from the Micro Services framework describing a service lifecycle change.">ServiceEvent</a></code>s are synchronously delivered, it is highly recommended that implementations of these methods do not register (<code><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">ModuleContext::RegisterService</a></code>), modify ( <code><a class="el" href="classServiceRegistrationBase.html#a4e2865300c14dbb04e4efb955d901241" title="Updates the properties associated with a service.">ServiceRegistration::SetProperties</a></code>) or unregister ( <code><a class="el" href="classServiceRegistrationBase.html#aeae0bd412d81a0882a78d7881db47a2a" title="Unregisters a service.">ServiceRegistration::Unregister</a></code>) a service while being synchronized on any object.</p>
 <p>The <code><a class="el" href="classServiceTracker.html" title="The ServiceTracker class simplifies using services from the framework&#39;s service registry.">ServiceTracker</a></code> class is thread-safe. It does not call a <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> while holding any locks. <code><a class="el" href="structServiceTrackerCustomizer.html" title="The ServiceTrackerCustomizer interface allows a ServiceTracker to customize the service objects that ...">ServiceTrackerCustomizer</a></code> implementations must also be thread-safe.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
+    <tr><td class="paramname">S</td><td>The type of the service being tracked </td></tr>
     <tr><td class="paramname">T</td><td>The type of the tracked object. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>This class is thread safe. </dd></dl>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ada180af5355a26beb6f08025c3a8381f"></a>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a7bcb3758b94d982976506ac58b18ba96"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class T  = us::Base*&gt; </div>
+template&lt;class S, class T = S*&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classServiceReference.html">ServiceReference</a>&lt;<a class="el" href="structServiceTrackerCustomizer.html#aeb9c4a32413e4b56fb36320dc811f9ea">ServiceT</a>&gt; <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; S, T &gt;::<a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aeb9c4a32413e4b56fb36320dc811f9ea"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class S, class T = S*&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef S <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; S, T &gt;::<a class="el" href="structServiceTrackerCustomizer.html#aeb9c4a32413e4b56fb36320dc811f9ea">ServiceT</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="aaea8d3a87177c37434aa75b7d935a790"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class S, class T = S*&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; T &gt;::~<a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a> </td>
+          <td class="memname">virtual <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; S, T &gt;::~<a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -143,19 +182,19 @@ template&lt;class T  = us::Base*&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5594a8e03e63decf75d898cd2f8dd5e4"></a>
+<a class="anchor" id="a562e8704c49204fb55547c302530bf19"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class T  = us::Base*&gt; </div>
+template&lt;class S, class T = S*&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual T <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; T &gt;::AddingService </td>
+          <td class="memname">virtual T <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; S, T &gt;::AddingService </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a> &amp;&#160;</td>
           <td class="paramname"><em>reference</em></td><td>)</td>
           <td></td>
         </tr>
@@ -177,23 +216,21 @@ template&lt;class T  = us::Base*&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The service object to be tracked for the specified referenced service or <code>0</code> if the specified referenced service should not be tracked. </dd></dl>
 
-<p>Implemented in <a class="el" href="classServiceTracker.html#a833bf38aa90c1a32b172a5d5a0bfb141">ServiceTracker&lt; S, T &gt;</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="a1670abf8fc457a53d1549aae710f40d6"></a>
+<a class="anchor" id="aa7251aae3f7939e8f604fd12dcfacf67"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class T  = us::Base*&gt; </div>
+template&lt;class S, class T = S*&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; T &gt;::ModifiedService </td>
+          <td class="memname">virtual void <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; S, T &gt;::ModifiedService </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a> &amp;&#160;</td>
           <td class="paramname"><em>reference</em>, </td>
         </tr>
         <tr>
@@ -225,23 +262,21 @@ template&lt;class T  = us::Base*&gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classServiceTracker.html#aff2025eb066f2ab128c7c0aa47515c66">ServiceTracker&lt; S, T &gt;</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="a4e6795fba9d71bbc4bff727985cdabf9"></a>
+<a class="anchor" id="a18a1b3b02a71903ef33bc1a8ce90c5b9"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class T  = us::Base*&gt; </div>
+template&lt;class S, class T = S*&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; T &gt;::RemovedService </td>
+          <td class="memname">virtual void <a class="el" href="structServiceTrackerCustomizer.html">ServiceTrackerCustomizer</a>&lt; S, T &gt;::RemovedService </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structServiceTrackerCustomizer.html#a7bcb3758b94d982976506ac58b18ba96">ServiceReferenceT</a> &amp;&#160;</td>
           <td class="paramname"><em>reference</em>, </td>
         </tr>
         <tr>
@@ -273,12 +308,10 @@ template&lt;class T  = us::Base*&gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classServiceTracker.html#a27c41fcd431b0c43b55b2b814f9da462">ServiceTracker&lt; S, T &gt;</a>.</p>
-
 </div>
 </div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

@@ -2,7 +2,6 @@ var searchData=
 [
   ['_7eany',['~Any',['../classAny.html#aebc7abba71ec4596aa7715daec6c1204',1,'Any']]],
   ['_7ebadanycastexception',['~BadAnyCastException',['../classBadAnyCastException.html#ab8ae71d91f65220b42525b8d72b336ee',1,'BadAnyCastException']]],
-  ['_7ebase',['~Base',['../classBase.html#a9c3e236ef414e648e48e250a3e43a880',1,'Base']]],
   ['_7eexplicitlyshareddatapointer',['~ExplicitlySharedDataPointer',['../classExplicitlySharedDataPointer.html#acf1976bf2a6d2920aed8c1562d6a00a4',1,'ExplicitlySharedDataPointer']]],
   ['_7eldapfilter',['~LDAPFilter',['../classLDAPFilter.html#a772272b82bd21ec6ff43108e2d122731',1,'LDAPFilter']]],
   ['_7emodule',['~Module',['../classModule.html#a7c9d9c096786d127590fdd8aa2b7d681',1,'Module']]],
@@ -13,10 +12,10 @@ var searchData=
   ['_7eserviceevent',['~ServiceEvent',['../classServiceEvent.html#a43254b13d082b532e094f18cbe0e38a9',1,'ServiceEvent']]],
   ['_7eserviceexception',['~ServiceException',['../classServiceException.html#a661d31410bde80af70143ea029f37f5f',1,'ServiceException']]],
   ['_7eservicefactory',['~ServiceFactory',['../classServiceFactory.html#a9fccf8deac202cec300caf2068aa4ff1',1,'ServiceFactory']]],
-  ['_7eservicereference',['~ServiceReference',['../classServiceReference.html#a1cd59f7eba9082075adac00e4cbf45d9',1,'ServiceReference']]],
-  ['_7eserviceregistration',['~ServiceRegistration',['../classServiceRegistration.html#acf0e647876ba12c6c77bb06219cec319',1,'ServiceRegistration']]],
-  ['_7eservicetracker',['~ServiceTracker',['../classServiceTracker.html#a85ed6e510cf23dba34a4299c64eafddd',1,'ServiceTracker']]],
-  ['_7eservicetrackercustomizer',['~ServiceTrackerCustomizer',['../structServiceTrackerCustomizer.html#ada180af5355a26beb6f08025c3a8381f',1,'ServiceTrackerCustomizer']]],
+  ['_7eservicereferencebase',['~ServiceReferenceBase',['../classServiceReferenceBase.html#a12cb9334e01a498e99ad1ad968ca530f',1,'ServiceReferenceBase']]],
+  ['_7eserviceregistrationbase',['~ServiceRegistrationBase',['../classServiceRegistrationBase.html#a5e5dad92ac1e984846e5835adeda6135',1,'ServiceRegistrationBase']]],
+  ['_7eservicetracker',['~ServiceTracker',['../classServiceTracker.html#a91b75f0d6b5667622e60288ae9be904d',1,'ServiceTracker']]],
+  ['_7eservicetrackercustomizer',['~ServiceTrackerCustomizer',['../structServiceTrackerCustomizer.html#aaea8d3a87177c37434aa75b7d935a790',1,'ServiceTrackerCustomizer']]],
   ['_7eshareddatapointer',['~SharedDataPointer',['../classSharedDataPointer.html#aa5303b0fe4736999f5ed8b24c0f7b913',1,'SharedDataPointer']]],
   ['_7esharedlibrary',['~SharedLibrary',['../classSharedLibrary.html#a426daa8a2908a4689d73d8a59ee45bc8',1,'SharedLibrary']]]
 ];

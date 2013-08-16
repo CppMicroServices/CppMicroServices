@@ -93,40 +93,64 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afacffe98b55d1c01aeee0c0c69dd70ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#afacffe98b55d1c01aeee0c0c69dd70ee">GetModules</a> (std::vector&lt; <a class="el" href="classModule.html">Module</a> * &gt; &amp;modules) const </td></tr>
 <tr class="memdesc:afacffe98b55d1c01aeee0c0c69dd70ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of all known modules.  <a href="#afacffe98b55d1c01aeee0c0c69dd70ee">More...</a><br/></td></tr>
 <tr class="separator:afacffe98b55d1c01aeee0c0c69dd70ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7399fcc65ae1625cc06e4010e9e262d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6">RegisterService</a> (const std::list&lt; std::string &gt; &amp;clazzes, us::Base *service, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
-<tr class="memdesc:a7399fcc65ae1625cc06e4010e9e262d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties under the specified class names into the framework.  <a href="#a7399fcc65ae1625cc06e4010e9e262d6">More...</a><br/></td></tr>
-<tr class="separator:a7399fcc65ae1625cc06e4010e9e262d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5f83b5bac7475b7cce0a006696a5102"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#ae5f83b5bac7475b7cce0a006696a5102">RegisterService</a> (const char *clazz, us::Base *service, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
-<tr class="memdesc:ae5f83b5bac7475b7cce0a006696a5102"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties under the specified class name with the framework.  <a href="#ae5f83b5bac7475b7cce0a006696a5102">More...</a><br/></td></tr>
-<tr class="separator:ae5f83b5bac7475b7cce0a006696a5102"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88ff1db40f40f1bf3c9435458de4b00b"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
-<tr class="memitem:a88ff1db40f40f1bf3c9435458de4b00b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a88ff1db40f40f1bf3c9435458de4b00b">RegisterService</a> (us::Base *service, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
-<tr class="memdesc:a88ff1db40f40f1bf3c9435458de4b00b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties using the specified template argument with the framework.  <a href="#a88ff1db40f40f1bf3c9435458de4b00b">More...</a><br/></td></tr>
-<tr class="separator:a88ff1db40f40f1bf3c9435458de4b00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d9a232ed28caf664ffb994e24451bed"><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classServiceReference.html">ServiceReference</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed">GetServiceReferences</a> (const std::string &amp;clazz, const std::string &amp;filter=std::string())</td></tr>
-<tr class="memdesc:a9d9a232ed28caf664ffb994e24451bed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> objects.  <a href="#a9d9a232ed28caf664ffb994e24451bed">More...</a><br/></td></tr>
-<tr class="separator:a9d9a232ed28caf664ffb994e24451bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad92776b8bf122ed3f28e4528bb9cd3e8"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
-<tr class="memitem:ad92776b8bf122ed3f28e4528bb9cd3e8"><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classServiceReference.html">ServiceReference</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#ad92776b8bf122ed3f28e4528bb9cd3e8">GetServiceReferences</a> (const std::string &amp;filter=std::string())</td></tr>
-<tr class="memdesc:ad92776b8bf122ed3f28e4528bb9cd3e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> objects.  <a href="#ad92776b8bf122ed3f28e4528bb9cd3e8">More...</a><br/></td></tr>
-<tr class="separator:ad92776b8bf122ed3f28e4528bb9cd3e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4e3f72bad1067aba49283e851448253"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classServiceReference.html">ServiceReference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#ad4e3f72bad1067aba49283e851448253">GetServiceReference</a> (const std::string &amp;clazz)</td></tr>
-<tr class="memdesc:ad4e3f72bad1067aba49283e851448253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object for a service that implements and was registered under the specified class.  <a href="#ad4e3f72bad1067aba49283e851448253">More...</a><br/></td></tr>
-<tr class="separator:ad4e3f72bad1067aba49283e851448253"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24a5e5dbed9c5aa948104a103a1d78f3"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
-<tr class="memitem:a24a5e5dbed9c5aa948104a103a1d78f3"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceReference.html">ServiceReference</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a24a5e5dbed9c5aa948104a103a1d78f3">GetServiceReference</a> ()</td></tr>
-<tr class="memdesc:a24a5e5dbed9c5aa948104a103a1d78f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object for a service that implements and was registered under the specified template class argument.  <a href="#a24a5e5dbed9c5aa948104a103a1d78f3">More...</a><br/></td></tr>
-<tr class="separator:a24a5e5dbed9c5aa948104a103a1d78f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bdfe2bcbae824b0cd6aa79bc4489850"><td class="memItemLeft" align="right" valign="top">us::Base *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">GetService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference)</td></tr>
-<tr class="memdesc:a2bdfe2bcbae824b0cd6aa79bc4489850"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object.  <a href="#a2bdfe2bcbae824b0cd6aa79bc4489850">More...</a><br/></td></tr>
-<tr class="separator:a2bdfe2bcbae824b0cd6aa79bc4489850"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c1fac3d6fcb5bcce25aa183d7487cbe"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
-<tr class="memitem:a4c1fac3d6fcb5bcce25aa183d7487cbe"><td class="memTemplItemLeft" align="right" valign="top">S *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a4c1fac3d6fcb5bcce25aa183d7487cbe">GetService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference)</td></tr>
-<tr class="memdesc:a4c1fac3d6fcb5bcce25aa183d7487cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object.  <a href="#a4c1fac3d6fcb5bcce25aa183d7487cbe">More...</a><br/></td></tr>
-<tr class="separator:a4c1fac3d6fcb5bcce25aa183d7487cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a070a6218b13e363098d546425c02f13c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a070a6218b13e363098d546425c02f13c">UngetService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;reference)</td></tr>
-<tr class="memdesc:a070a6218b13e363098d546425c02f13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object.  <a href="#a070a6218b13e363098d546425c02f13c">More...</a><br/></td></tr>
-<tr class="separator:a070a6218b13e363098d546425c02f13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa68596c589b57246927067742517ce47"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__MicroServices.html#ga7be3a427a87d460600d4aa9f36a039e4">ServiceRegistrationU</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47">RegisterService</a> (const <a class="el" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb">InterfaceMap</a> &amp;service, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:aa68596c589b57246927067742517ce47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties under the specified class names into the framework.  <a href="#aa68596c589b57246927067742517ce47">More...</a><br/></td></tr>
+<tr class="separator:aa68596c589b57246927067742517ce47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a013068749e6a54ad7aaa73ec691fa3e5"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
+<tr class="memitem:a013068749e6a54ad7aaa73ec691fa3e5"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt; S &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a013068749e6a54ad7aaa73ec691fa3e5">RegisterService</a> (S *service, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:a013068749e6a54ad7aaa73ec691fa3e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties using the specified template argument with the framework.  <a href="#a013068749e6a54ad7aaa73ec691fa3e5">More...</a><br/></td></tr>
+<tr class="separator:a013068749e6a54ad7aaa73ec691fa3e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b6d9800318464a9896ffb7c61a1fb34"><td class="memTemplParams" colspan="2">template&lt;class I1 , class I2 , class Impl &gt; </td></tr>
+<tr class="memitem:a9b6d9800318464a9896ffb7c61a1fb34"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt; I1, I2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a9b6d9800318464a9896ffb7c61a1fb34">RegisterService</a> (Impl *impl, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:a9b6d9800318464a9896ffb7c61a1fb34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties using the specified template argument with the framework.  <a href="#a9b6d9800318464a9896ffb7c61a1fb34">More...</a><br/></td></tr>
+<tr class="separator:a9b6d9800318464a9896ffb7c61a1fb34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76ef7a4df92f91a62c50df4ca9100c70"><td class="memTemplParams" colspan="2">template&lt;class I1 , class I2 , class I3 , class Impl &gt; </td></tr>
+<tr class="memitem:a76ef7a4df92f91a62c50df4ca9100c70"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt; I1, I2, I3 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a76ef7a4df92f91a62c50df4ca9100c70">RegisterService</a> (Impl *impl, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:a76ef7a4df92f91a62c50df4ca9100c70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service object with the specified properties using the specified template argument with the framework.  <a href="#a76ef7a4df92f91a62c50df4ca9100c70">More...</a><br/></td></tr>
+<tr class="separator:a76ef7a4df92f91a62c50df4ca9100c70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf2b7d86b1eab471f61270a0139edbcd"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
+<tr class="memitem:abf2b7d86b1eab471f61270a0139edbcd"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt; S &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#abf2b7d86b1eab471f61270a0139edbcd">RegisterService</a> (<a class="el" href="classServiceFactory.html">ServiceFactory</a> *factory, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:abf2b7d86b1eab471f61270a0139edbcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service factory as a service with the specified properties using the specified template argument as service interface type with the framework.  <a href="#abf2b7d86b1eab471f61270a0139edbcd">More...</a><br/></td></tr>
+<tr class="separator:abf2b7d86b1eab471f61270a0139edbcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ea9afc250bf838ad37659ca37d7bbe7"><td class="memTemplParams" colspan="2">template&lt;class I1 , class I2 &gt; </td></tr>
+<tr class="memitem:a0ea9afc250bf838ad37659ca37d7bbe7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt; I1, I2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a0ea9afc250bf838ad37659ca37d7bbe7">RegisterService</a> (<a class="el" href="classServiceFactory.html">ServiceFactory</a> *factory, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:a0ea9afc250bf838ad37659ca37d7bbe7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service factory as a service with the specified properties using the specified template argument as service interface type with the framework.  <a href="#a0ea9afc250bf838ad37659ca37d7bbe7">More...</a><br/></td></tr>
+<tr class="separator:a0ea9afc250bf838ad37659ca37d7bbe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92b6070bc41fada9ec208b73ddab0f64"><td class="memTemplParams" colspan="2">template&lt;class I1 , class I2 , class I3 &gt; </td></tr>
+<tr class="memitem:a92b6070bc41fada9ec208b73ddab0f64"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt; I1, I2, I3 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a92b6070bc41fada9ec208b73ddab0f64">RegisterService</a> (<a class="el" href="classServiceFactory.html">ServiceFactory</a> *factory, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;properties=<a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>())</td></tr>
+<tr class="memdesc:a92b6070bc41fada9ec208b73ddab0f64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the specified service factory as a service with the specified properties using the specified template argument as service interface type with the framework.  <a href="#a92b6070bc41fada9ec208b73ddab0f64">More...</a><br/></td></tr>
+<tr class="separator:a92b6070bc41fada9ec208b73ddab0f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b1be96ec5dcf6452d5e3f236c9fd20a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReferenceU</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a">GetServiceReferences</a> (const std::string &amp;clazz, const std::string &amp;filter=std::string())</td></tr>
+<tr class="memdesc:a8b1be96ec5dcf6452d5e3f236c9fd20a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> objects.  <a href="#a8b1be96ec5dcf6452d5e3f236c9fd20a">More...</a><br/></td></tr>
+<tr class="separator:a8b1be96ec5dcf6452d5e3f236c9fd20a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc06850fd324705a0463d050cbbcbf59"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
+<tr class="memitem:adc06850fd324705a0463d050cbbcbf59"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classServiceReference.html">ServiceReference</a><br class="typebreak"/>
+&lt; S &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#adc06850fd324705a0463d050cbbcbf59">GetServiceReferences</a> (const std::string &amp;filter=std::string())</td></tr>
+<tr class="memdesc:adc06850fd324705a0463d050cbbcbf59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> objects.  <a href="#adc06850fd324705a0463d050cbbcbf59">More...</a><br/></td></tr>
+<tr class="separator:adc06850fd324705a0463d050cbbcbf59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af47528f02bd276ba9b738b17f60d04f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classServiceReference.html">ServiceReferenceU</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#af47528f02bd276ba9b738b17f60d04f8">GetServiceReference</a> (const std::string &amp;clazz)</td></tr>
+<tr class="memdesc:af47528f02bd276ba9b738b17f60d04f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object for a service that implements and was registered under the specified class.  <a href="#af47528f02bd276ba9b738b17f60d04f8">More...</a><br/></td></tr>
+<tr class="separator:af47528f02bd276ba9b738b17f60d04f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a044cfae083209c8ad20f7cfb3f6996"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
+<tr class="memitem:a8a044cfae083209c8ad20f7cfb3f6996"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceReference.html">ServiceReference</a>&lt; S &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a8a044cfae083209c8ad20f7cfb3f6996">GetServiceReference</a> ()</td></tr>
+<tr class="memdesc:a8a044cfae083209c8ad20f7cfb3f6996"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object for a service that implements and was registered under the specified template class argument.  <a href="#a8a044cfae083209c8ad20f7cfb3f6996">More...</a><br/></td></tr>
+<tr class="separator:a8a044cfae083209c8ad20f7cfb3f6996"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa048066fdb8b9a5cfa250d9b17915437"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437">GetService</a> (const <a class="el" href="classServiceReferenceBase.html">ServiceReferenceBase</a> &amp;reference)</td></tr>
+<tr class="memdesc:aa048066fdb8b9a5cfa250d9b17915437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the service object referenced by the specified <code><a class="el" href="classServiceReferenceBase.html" title="A reference to a service.">ServiceReferenceBase</a></code> object.  <a href="#aa048066fdb8b9a5cfa250d9b17915437">More...</a><br/></td></tr>
+<tr class="separator:aa048066fdb8b9a5cfa250d9b17915437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f80c4ac791fb842ef983c3bfe2c6838"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb">InterfaceMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a5f80c4ac791fb842ef983c3bfe2c6838">GetService</a> (const <a class="el" href="classServiceReference.html">ServiceReferenceU</a> &amp;reference)</td></tr>
+<tr class="separator:a5f80c4ac791fb842ef983c3bfe2c6838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
+<tr class="memitem:aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac"><td class="memTemplItemLeft" align="right" valign="top">S *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac">GetService</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a>&lt; S &gt; &amp;reference)</td></tr>
+<tr class="memdesc:aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object.  <a href="#aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac">More...</a><br/></td></tr>
+<tr class="separator:aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb59411d496f0f688a3fb3ccb8d50bc7"><td class="memTemplParams" colspan="2">template&lt;class S &gt; </td></tr>
+<tr class="memitem:abb59411d496f0f688a3fb3ccb8d50bc7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classServiceObjects.html">ServiceObjects</a>&lt; S &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classModuleContext.html#abb59411d496f0f688a3fb3ccb8d50bc7">GetServiceObjects</a> (const <a class="el" href="classServiceReference.html">ServiceReference</a>&lt; S &gt; &amp;reference)</td></tr>
+<tr class="memdesc:abb59411d496f0f688a3fb3ccb8d50bc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the <a class="el" href="classServiceObjects.html" title="Allows multiple service objects for a service to be obtained.">ServiceObjects</a> object for the service referenced by the specified <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> object.  <a href="#abb59411d496f0f688a3fb3ccb8d50bc7">More...</a><br/></td></tr>
+<tr class="separator:abb59411d496f0f688a3fb3ccb8d50bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a410443288166a646e6be0edd6ed77f41"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41">UngetService</a> (const <a class="el" href="classServiceReferenceBase.html">ServiceReferenceBase</a> &amp;reference)</td></tr>
+<tr class="memdesc:a410443288166a646e6be0edd6ed77f41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object.  <a href="#a410443288166a646e6be0edd6ed77f41">More...</a><br/></td></tr>
+<tr class="separator:a410443288166a646e6be0edd6ed77f41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a649b0101ead2e7beef159191484b7913"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#a649b0101ead2e7beef159191484b7913">AddServiceListener</a> (const ServiceListener &amp;delegate, const std::string &amp;filter=std::string())</td></tr>
 <tr class="separator:a649b0101ead2e7beef159191484b7913"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae59a924bd2d3bf4d8c77abe4a0f61bd8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classModuleContext.html#ae59a924bd2d3bf4d8c77abe4a0f61bd8">RemoveServiceListener</a> (const ServiceListener &amp;delegate)</td></tr>
@@ -442,22 +466,22 @@ template&lt;class R &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a2bdfe2bcbae824b0cd6aa79bc4489850"></a>
+<a class="anchor" id="aa048066fdb8b9a5cfa250d9b17915437"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">us::Base* ModuleContext::GetService </td>
+          <td class="memname">void* ModuleContext::GetService </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classServiceReferenceBase.html">ServiceReferenceBase</a> &amp;&#160;</td>
           <td class="paramname"><em>reference</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object. </p>
-<p>A module's use of a service is tracked by the module's use count of that service. Each time a service's service object is returned by <a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850">GetService(const ServiceReference&amp;)</a> the context module's use count for that service is incremented by one. Each time the service is released by <a class="el" href="classModuleContext.html#a070a6218b13e363098d546425c02f13c">UngetService(const ServiceReference&amp;)</a> the context module's use count for that service is decremented by one. </p>
+<p>Returns the service object referenced by the specified <code><a class="el" href="classServiceReferenceBase.html" title="A reference to a service.">ServiceReferenceBase</a></code> object. </p>
+<p>A module's use of a service is tracked by the module's use count of that service. Each time a service's service object is returned by <a class="el" href="classModuleContext.html#aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac">GetService(const ServiceReference&lt;S&gt;&amp;)</a> the context module's use count for that service is incremented by one. Each time the service is released by <a class="el" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41">UngetService(const ServiceReferenceBase&amp;)</a> the context module's use count for that service is decremented by one. </p>
 <p>When a module's use count for a service drops to zero, the module should no longer use that service.</p>
 <p>This method will always return <code>0</code> when the service associated with this <code>reference</code> has been unregistered.</p>
 <p>The following steps are taken to get the service object: </p>
@@ -467,8 +491,8 @@ If the service has been unregistered, <code>0</code> is returned. </li>
 <li>
 The context module's use count for this service is incremented by one. </li>
 <li>
-If the context module's use count for the service is currently one and the service was registered with an object implementing the <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> interface, the <a class="el" href="classServiceFactory.html#aacb476e162ce8bc12509cb3bdb2adebf">ServiceFactory::GetService</a> method is called to create a service object for the context module. This service object is cached by the framework. While the context module's use count for the service is greater than zero, subsequent calls to get the services's service object for the context module will return the cached service object. <br/>
- If the <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> object throws an exception, <code>0</code> is returned and a warning is logged. </li>
+If the context module's use count for the service is currently one and the service was registered with an object implementing the <code><a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></code> interface, the <a class="el" href="classServiceFactory.html#ad11f9698cd9d71ffad77d84b02d0d04e">ServiceFactory::GetService</a> method is called to create a service object for the context module. This service object is cached by the framework. While the context module's use count for the service is greater than zero, subsequent calls to get the services's service object for the context module will return the cached service object. <br/>
+ If the <code><a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></code> object throws an exception, <code>0</code> is returned and a warning is logged. </li>
 <li>
 The service object for the service is returned. </li>
 </ol>
@@ -478,21 +502,37 @@ The service object for the service is returned. </li>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A service object for the service associated with <code>reference</code> or <code>0</code> if the service is not registered or the <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> threw an exception. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A service object for the service associated with <code>reference</code> or <code>0</code> if the service is not registered or the <code><a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></code> threw an exception. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
-    <tr><td class="paramname">std::invalid_argument</td><td>If the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> is invalid (default constructed). </td></tr>
+    <tr><td class="paramname">std::invalid_argument</td><td>If the specified <code><a class="el" href="classServiceReferenceBase.html" title="A reference to a service.">ServiceReferenceBase</a></code> is invalid (default constructed). </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a070a6218b13e363098d546425c02f13c" title="Releases the service object referenced by the specified ServiceReference object.">UngetService(const ServiceReference&amp;)</a> </dd>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41" title="Releases the service object referenced by the specified ServiceReference object.">UngetService(const ServiceReferenceBase&amp;)</a> </dd>
 <dd>
-<a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a> </dd></dl>
+<a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a4c1fac3d6fcb5bcce25aa183d7487cbe"></a>
+<a class="anchor" id="a5f80c4ac791fb842ef983c3bfe2c6838"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb">InterfaceMap</a> ModuleContext::GetService </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReferenceU</a> &amp;&#160;</td>
+          <td class="paramname"><em>reference</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -504,7 +544,7 @@ template&lt;class S &gt; </div>
         <tr>
           <td class="memname">S* ModuleContext::GetService </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a>&lt; S &gt; &amp;&#160;</td>
           <td class="paramname"><em>reference</em></td><td>)</td>
           <td></td>
         </tr>
@@ -517,14 +557,14 @@ template&lt;class S &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the service object referenced by the specified <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object. </p>
-<p>This is a convenience method which is identical to US_BASECLASS_NAME* <a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">GetService(const ServiceReference&amp;)</a> except that it casts the service object to the supplied template argument type</p>
+<p>This is a convenience method which is identical to void* <a class="el" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437" title="Returns the service object referenced by the specified ServiceReferenceBase object.">GetService(const ServiceReferenceBase&amp;)</a> except that it casts the service object to the supplied template argument type</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>The type the service object will be cast to. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A service object for the service associated with <code>reference</code> or <code>0</code> if the service is not registered, the <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> threw an exception or the service could not be casted to the desired type. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A service object for the service associated with <code>reference</code> or <code>0</code> if the service is not registered, the <code><a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></code> threw an exception or the service could not be casted to the desired type. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
@@ -532,20 +572,70 @@ template&lt;class S &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">GetService(const ServiceReference&amp;)</a> </dd>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437" title="Returns the service object referenced by the specified ServiceReferenceBase object.">GetService(const ServiceReferenceBase&amp;)</a> </dd>
 <dd>
-<a class="el" href="classModuleContext.html#a070a6218b13e363098d546425c02f13c" title="Releases the service object referenced by the specified ServiceReference object.">UngetService(const ServiceReference&amp;)</a> </dd>
+<a class="el" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41" title="Releases the service object referenced by the specified ServiceReference object.">UngetService(const ServiceReferenceBase&amp;)</a> </dd>
 <dd>
-<a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a> </dd></dl>
+<a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ad4e3f72bad1067aba49283e851448253"></a>
+<a class="anchor" id="abb59411d496f0f688a3fb3ccb8d50bc7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class S &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classServiceObjects.html">ServiceObjects</a>&lt;S&gt; ModuleContext::GetServiceObjects </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a>&lt; S &gt; &amp;&#160;</td>
+          <td class="paramname"><em>reference</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the <a class="el" href="classServiceObjects.html" title="Allows multiple service objects for a service to be obtained.">ServiceObjects</a> object for the service referenced by the specified <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> object. </p>
+<p>The <a class="el" href="classServiceObjects.html" title="Allows multiple service objects for a service to be obtained.">ServiceObjects</a> object can be used to obtain multiple service objects for services with prototype scope. For services with singleton or module scope, the <a class="el" href="classServiceObjects.html#a85779ccba243ed69fc185b54fc02f7ed" title="Returns a service object for the referenced service.">ServiceObjects::GetService()</a> method behaves the same as the <a class="el" href="classModuleContext.html#aaaadc5f8c7f5d0ffa1ea4d5c5e59e7ac" title="Returns the service object referenced by the specified ServiceReference object.">GetService(const ServiceReference&lt;S&gt;&amp;)</a> method and the ServiceObjects::UngetService(const ServiceReferenceBase&amp;) method behaves the same as the <a class="el" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41" title="Releases the service object referenced by the specified ServiceReference object.">UngetService(const ServiceReferenceBase&amp;)</a> method. That is, only one, use-counted service object is available from the <a class="el" href="classServiceObjects.html" title="Allows multiple service objects for a service to be obtained.">ServiceObjects</a> object.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">S</td><td>Type of Service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reference</td><td>A reference to the service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceObjects.html" title="Allows multiple service objects for a service to be obtained.">ServiceObjects</a> object for the service associated with the specified reference or an invalid instance if the service is not registered. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname">std::invalid_argument</td><td>If the specified <a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a> is invalid (default constructed or the service has been unregistered)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af47528f02bd276ba9b738b17f60d04f8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classServiceReference.html">ServiceReference</a> ModuleContext::GetServiceReference </td>
+          <td class="memname"><a class="el" href="classServiceReference.html">ServiceReferenceU</a> ModuleContext::GetServiceReference </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>clazz</em></td><td>)</td>
@@ -556,7 +646,7 @@ template&lt;class S &gt; </div>
 
 <p>Returns a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object for a service that implements and was registered under the specified class. </p>
 <p>The returned <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object is valid at the time of the call to this method. However as the Micro Services framework is a very dynamic environment, services can be modified or unregistered at any time.</p>
-<p>This method is the same as calling <a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed">ModuleContext::GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> with an empty filter expression. It is provided as a convenience for when the caller is interested in any service that implements the specified class. </p>
+<p>This method is the same as calling <a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a">ModuleContext::GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> with an empty filter expression. It is provided as a convenience for when the caller is interested in any service that implements the specified class. </p>
 <p>If multiple such services exist, the service with the highest ranking (as specified in its <a class="el" href="namespaceServiceConstants.html#a9248db8f7ca4dce942fb3594b1079c3f" title="Service property identifying a service&#39;s ranking number.">ServiceConstants::SERVICE_RANKING()</a> property) is returned. </p>
 <p>If there is a tie in ranking, the service with the lowest service ID (as specified in its <a class="el" href="namespaceServiceConstants.html#ac9f9d18808ea2f46376a1489a7b73164" title="Service property identifying a service&#39;s registration number.">ServiceConstants::SERVICE_ID()</a> property); that is, the service that was registered first is returned.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -569,15 +659,15 @@ template&lt;class S &gt; </div>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
-    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If no service was registered under the given class name. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If no service was registered under the given class name.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a24a5e5dbed9c5aa948104a103a1d78f3"></a>
+<a class="anchor" id="a8a044cfae083209c8ad20f7cfb3f6996"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -587,7 +677,7 @@ template&lt;class S &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classServiceReference.html">ServiceReference</a> ModuleContext::GetServiceReference </td>
+          <td class="memname"><a class="el" href="classServiceReference.html">ServiceReference</a>&lt;S&gt; ModuleContext::GetServiceReference </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -601,7 +691,7 @@ template&lt;class S &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> object for a service that implements and was registered under the specified template class argument. </p>
-<p>This method is identical to <a class="el" href="classModuleContext.html#ad4e3f72bad1067aba49283e851448253" title="Returns a ServiceReference object for a service that implements and was registered under the specifie...">GetServiceReference(const std::string&amp;)</a> except that the class name for the service object is automatically deduced from the template argument.</p>
+<p>This method is identical to <a class="el" href="classModuleContext.html#af47528f02bd276ba9b738b17f60d04f8" title="Returns a ServiceReference object for a service that implements and was registered under the specifie...">GetServiceReference(const std::string&amp;)</a> except that the class name for the service object is automatically deduced from the template argument.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>The type under which the requested service must have been registered. </td></tr>
@@ -616,18 +706,18 @@ template&lt;class S &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#ad4e3f72bad1067aba49283e851448253" title="Returns a ServiceReference object for a service that implements and was registered under the specifie...">GetServiceReference(const std::string&amp;)</a> </dd>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#af47528f02bd276ba9b738b17f60d04f8" title="Returns a ServiceReference object for a service that implements and was registered under the specifie...">GetServiceReference(const std::string&amp;)</a> </dd>
 <dd>
-<a class="el" href="classModuleContext.html#ad92776b8bf122ed3f28e4528bb9cd3e8" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;)</a> </dd></dl>
+<a class="el" href="classModuleContext.html#adc06850fd324705a0463d050cbbcbf59" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;)</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a9d9a232ed28caf664ffb994e24451bed"></a>
+<a class="anchor" id="a8b1be96ec5dcf6452d5e3f236c9fd20a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::list&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&gt; ModuleContext::GetServiceReferences </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReferenceU</a>&gt; ModuleContext::GetServiceReferences </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>clazz</em>, </td>
@@ -675,7 +765,7 @@ If the specified <code>filter</code> is not empty, the filter expression must ma
 
 </div>
 </div>
-<a class="anchor" id="ad92776b8bf122ed3f28e4528bb9cd3e8"></a>
+<a class="anchor" id="adc06850fd324705a0463d050cbbcbf59"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -685,7 +775,7 @@ template&lt;class S &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::list&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&gt; ModuleContext::GetServiceReferences </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classServiceReference.html">ServiceReference</a>&lt;S&gt; &gt; ModuleContext::GetServiceReferences </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>filter</em> = <code>std::string()</code></td><td>)</td>
@@ -701,7 +791,7 @@ template&lt;class S &gt; </div>
 
 <p>Returns a list of <code><a class="el" href="classServiceReference.html" title="A reference to a service.">ServiceReference</a></code> objects. </p>
 <p>The returned list contains services that were registered under the interface id of the template argument <code>S</code> and match the specified filter expression.</p>
-<p>This method is identical to <a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> except that the class name for the service object is automatically deduced from the template argument.</p>
+<p>This method is identical to <a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> except that the class name for the service object is automatically deduced from the template argument.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>The type under which the requested service objects must have been registered. </td></tr>
@@ -719,27 +809,22 @@ template&lt;class S &gt; </div>
   <table class="exception">
     <tr><td class="paramname">std::invalid_argument</td><td>If the specified <code>filter</code> contains an invalid filter expression that cannot be parsed. </td></tr>
     <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a" title="Returns a list of ServiceReference objects.">GetServiceReferences(const std::string&amp;, const std::string&amp;)</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a7399fcc65ae1625cc06e4010e9e262d6"></a>
+<a class="anchor" id="aa68596c589b57246927067742517ce47"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a> ModuleContext::RegisterService </td>
+          <td class="memname"><a class="el" href="group__MicroServices.html#ga7be3a427a87d460600d4aa9f36a039e4">ServiceRegistrationU</a> ModuleContext::RegisterService </td>
           <td>(</td>
-          <td class="paramtype">const std::list&lt; std::string &gt; &amp;&#160;</td>
-          <td class="paramname"><em>clazzes</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">us::Base *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb">InterfaceMap</a> &amp;&#160;</td>
           <td class="paramname"><em>service</em>, </td>
         </tr>
         <tr>
@@ -757,14 +842,15 @@ template&lt;class S &gt; </div>
 </div><div class="memdoc">
 
 <p>Registers the specified service object with the specified properties under the specified class names into the framework. </p>
-<p>A <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object is returned. The <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object is for the private use of the module registering the service and should not be shared with other modules. The registering module is defined to be the context module. Other modules can locate the service by using either the <a class="el" href="classModuleContext.html#a9d9a232ed28caf664ffb994e24451bed">GetServiceReferences</a> or <a class="el" href="classModuleContext.html#ad4e3f72bad1067aba49283e851448253">GetServiceReference</a> method.</p>
-<p>A module can register a service object that implements the <a class="el" href="classServiceFactory.html">ServiceFactory</a> interface to have more flexibility in providing service objects to other modules.</p>
+<p>A <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object is returned. The <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object is for the private use of the module registering the service and should not be shared with other modules. The registering module is defined to be the context module. Other modules can locate the service by using either the <a class="el" href="classModuleContext.html#a8b1be96ec5dcf6452d5e3f236c9fd20a">GetServiceReferences</a> or <a class="el" href="classModuleContext.html#af47528f02bd276ba9b738b17f60d04f8">GetServiceReference</a> method.</p>
+<p>A module can register a service object that implements the <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> or <a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a> interface to have more flexibility in providing service objects to other modules.</p>
 <p>The following steps are taken when registering a service: </p>
 <ol>
 <li>
 The framework adds the following service properties to the service properties from the specified <code>ServiceProperties</code> (which may be omitted): <br/>
  A property named <a class="el" href="namespaceServiceConstants.html#ac9f9d18808ea2f46376a1489a7b73164" title="Service property identifying a service&#39;s registration number.">ServiceConstants::SERVICE_ID()</a> identifying the registration number of the service <br/>
  A property named <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262" title="Service property identifying all of the class names under which a service was registered in the frame...">ServiceConstants::OBJECTCLASS()</a> containing all the specified classes. <br/>
+ A property named <a class="el" href="namespaceServiceConstants.html#a7745368b1cb8eafeafb0259822302b9b" title="Service property identifying a service&#39;s scope.">ServiceConstants::SERVICE_SCOPE()</a> identifying the scope of the service. <br/>
  Properties with these names in the specified <code>ServiceProperties</code> will be ignored. </li>
 <li>
 The service is added to the framework service registry and may now be used by other modules. </li>
@@ -773,15 +859,15 @@ A service event of type <a class="el" href="classServiceEvent.html#ae7426fe742bd
 <li>
 A <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object for this registration is returned. </li>
 </ol>
+<dl class="section note"><dt>Note</dt><dd>This is a low-level method and should normally not be used directly. Use one of the templated RegisterService methods instead.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">clazzes</td><td>The class names under which the service can be located. The class names will be stored in the service's properties under the key <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262" title="Service property identifying all of the class names under which a service was registered in the frame...">ServiceConstants::OBJECTCLASS()</a>. </td></tr>
-    <tr><td class="paramname">service</td><td>The service object or a <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> object. </td></tr>
-    <tr><td class="paramname">properties</td><td>The properties for this service. The keys in the properties object must all be <code>std::string</code> objects. See <a class="el" href="namespaceServiceConstants.html">ServiceConstants</a> for a list of standard service property keys. Changes should not be made to this object after calling this method. To update the service's properties the <a class="el" href="classServiceRegistration.html#a089f7b4f1af195b3e24b85f3795e04f5">ServiceRegistration::SetProperties</a> method must be called. The set of properties may be omitted if the service has no properties. </td></tr>
+    <tr><td class="paramname">service</td><td>The service object, which is a map of interface identifiers to raw service pointers. </td></tr>
+    <tr><td class="paramname">properties</td><td>The properties for this service. The keys in the properties object must all be <code>std::string</code> objects. See <a class="el" href="namespaceServiceConstants.html">ServiceConstants</a> for a list of standard service property keys. Changes should not be made to this object after calling this method. To update the service's properties the <a class="el" href="classServiceRegistrationBase.html#a4e2865300c14dbb04e4efb955d901241">ServiceRegistration::SetProperties</a> method must be called. The set of properties may be omitted if the service has no properties. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A <code><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a></code> object for use by the module registering the service to update the service's properties or to unregister the service.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::invalid_argument</td><td>If one of the following is true: <ul>
@@ -791,68 +877,19 @@ A <code><a class="el" href="classServiceRegistration.html" title="A registered s
 <code>properties</code> contains case variants of the same key name. </li>
 </ul>
 </td></tr>
-    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> </dd>
 <dd>
-<a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a> </dd></dl>
+<a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> </dd>
+<dd>
+<a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ae5f83b5bac7475b7cce0a006696a5102"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a> ModuleContext::RegisterService </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>clazz</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">us::Base *&#160;</td>
-          <td class="paramname"><em>service</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
-          <td class="paramname"><em>properties</em> = <code><a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Registers the specified service object with the specified properties under the specified class name with the framework. </p>
-<p>This method is otherwise identical to RegisterService(const std:list&lt;std::string&gt;&amp;, us::Base*, const ServiceProperties&amp;) and is provided as a convenience when <code>service</code> will only be registered under a single class name. Note that even in this case the value of the service's <a class="el" href="namespaceServiceConstants.html#a0e099b4cc3cf6e80301486024950b262" title="Service property identifying all of the class names under which a service was registered in the frame...">ServiceConstants::OBJECTCLASS</a> property will be a std::list&lt;std::string&gt;, rather than just a single string.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">clazz</td><td>The class name under which the service can be located. </td></tr>
-    <tr><td class="paramname">service</td><td>The service object or a <a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a> object. </td></tr>
-    <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>(const std:list&lt;std::string&gt;&amp;, us::Base*, const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6" title="A hash table with std::string as the key type and Any as the value type.">ServiceProperties</a>&amp;) </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a88ff1db40f40f1bf3c9435458de4b00b"></a>
+<a class="anchor" id="a013068749e6a54ad7aaa73ec691fa3e5"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -862,9 +899,9 @@ template&lt;class S &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a> ModuleContext::RegisterService </td>
+          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt;S&gt; ModuleContext::RegisterService </td>
           <td>(</td>
-          <td class="paramtype">us::Base *&#160;</td>
+          <td class="paramtype">S *&#160;</td>
           <td class="paramname"><em>service</em>, </td>
         </tr>
         <tr>
@@ -887,8 +924,13 @@ template&lt;class S &gt; </div>
 </div><div class="memdoc">
 
 <p>Registers the specified service object with the specified properties using the specified template argument with the framework. </p>
-<p>This method is provided as a convenience when <code>service</code> will only be registered under a single class name whose type is available to the caller. It is otherwise identical to RegisterService(const char*, US_BASECLASS_NAME*, const ServiceProperties&amp;) but should be preferred since it avoids errors in the string literal identifying the class name or interface identifier.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>This method is provided as a convenience when <code>service</code> will only be registered under a single class name whose type is available to the caller. It is otherwise identical to <a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> but should be preferred since it avoids errors in the string literal identifying the class name or interface identifier.</p>
+<p>Example usage: </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyService : <span class="keyword">public</span> InterfaceA</div>
+<div class="line">{};</div>
+</div><!-- fragment --><div class="fragment"><div class="line">MyService* myService = <span class="keyword">new</span> MyService;</div>
+<div class="line">context-&gt;<a class="code" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>&lt;InterfaceA&gt;(myService);</div>
+</div><!-- fragment --> <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>The type under which the service can be located. </td></tr>
   </table>
@@ -896,7 +938,7 @@ template&lt;class S &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">service</td><td>The service object or a <a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a> object. </td></tr>
+    <tr><td class="paramname">service</td><td>The service object or a <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> object. </td></tr>
     <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
   </table>
   </dd>
@@ -905,10 +947,367 @@ template&lt;class S &gt; </div>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid or the <code>service</code> object is NULL.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#ae5f83b5bac7475b7cce0a006696a5102" title="Registers the specified service object with the specified properties under the specified class name w...">RegisterService(const char*, us::Base*, const ServiceProperties&amp;)</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9b6d9800318464a9896ffb7c61a1fb34"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class I1 , class I2 , class Impl &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt;I1,I2&gt; ModuleContext::RegisterService </td>
+          <td>(</td>
+          <td class="paramtype">Impl *&#160;</td>
+          <td class="paramname"><em>impl</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramname"><em>properties</em> = <code><a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers the specified service object with the specified properties using the specified template argument with the framework. </p>
+<p>This method is provided as a convenience when registering a service under two interface classes whose type is available to the caller. It is otherwise identical to <a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> but should be preferred since it avoids errors in the string literal identifying the class name or interface identifier.</p>
+<p>Example usage: </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyService2 : <span class="keyword">public</span> InterfaceA, <span class="keyword">public</span> InterfaceB</div>
+<div class="line">{};</div>
+</div><!-- fragment --><div class="fragment"><div class="line">MyService2* myService = <span class="keyword">new</span> MyService2;</div>
+<div class="line">context-&gt;<a class="code" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>&lt;InterfaceA, InterfaceB&gt;(myService);</div>
+</div><!-- fragment --> <dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">I1</td><td>The first interface type under which the service can be located. </td></tr>
+    <tr><td class="paramname">I2</td><td>The second interface type under which the service can be located. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">impl</td><td>The service object or a <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> object. </td></tr>
+    <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid or the <code>service</code> object is NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a76ef7a4df92f91a62c50df4ca9100c70"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class I1 , class I2 , class I3 , class Impl &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt;I1,I2,I3&gt; ModuleContext::RegisterService </td>
+          <td>(</td>
+          <td class="paramtype">Impl *&#160;</td>
+          <td class="paramname"><em>impl</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramname"><em>properties</em> = <code><a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers the specified service object with the specified properties using the specified template argument with the framework. </p>
+<p>This method is identical to the <a class="el" href="classModuleContext.html#a9b6d9800318464a9896ffb7c61a1fb34" title="Registers the specified service object with the specified properties using the specified template arg...">RegisterService&lt;I1,I2,Impl&gt;(Impl*, const ServiceProperties&amp;)</a> method except that it supports three service interface types.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">I1</td><td>The first interface type under which the service can be located. </td></tr>
+    <tr><td class="paramname">I2</td><td>The second interface type under which the service can be located. </td></tr>
+    <tr><td class="paramname">I3</td><td>The third interface type under which the service can be located. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">impl</td><td>The service object or a <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> object. </td></tr>
+    <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid or the <code>service</code> object is NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abf2b7d86b1eab471f61270a0139edbcd"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class S &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt;S&gt; ModuleContext::RegisterService </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classServiceFactory.html">ServiceFactory</a> *&#160;</td>
+          <td class="paramname"><em>factory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramname"><em>properties</em> = <code><a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers the specified service factory as a service with the specified properties using the specified template argument as service interface type with the framework. </p>
+<p>This method is provided as a convenience when <code>factory</code> will only be registered under a single class name whose type is available to the caller. It is otherwise identical to <a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> but should be preferred since it avoids errors in the string literal identifying the class name or interface identifier.</p>
+<p>Example usage: </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyService : <span class="keyword">public</span> InterfaceA</div>
+<div class="line">{};</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="keyword">class </span>MyServiceFactory : <span class="keyword">public</span> <a class="code" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></div>
+<div class="line">{</div>
+<div class="line">  <span class="keyword">virtual</span> <a class="code" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb" title="A map containing interfaces ids and their corresponding service object pointers.">InterfaceMap</a> <a class="code" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437" title="Returns the service object referenced by the specified ServiceReferenceBase object.">GetService</a>(<a class="code" href="classModule.html" title="Represents a CppMicroServices module.">Module</a>* <span class="comment">/*module*/</span>, <span class="keyword">const</span> <a class="code" href="classServiceRegistrationBase.html" title="A registered service.">ServiceRegistrationBase</a>&amp; <span class="comment">/*registration*/</span>)</div>
+<div class="line">  {</div>
+<div class="line">    MyService* myService = <span class="keyword">new</span> MyService;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="structMakeInterfaceMap.html" title="Helper class for constructing InterfaceMap instances based on service implementations or service fact...">MakeInterfaceMap&lt;InterfaceA&gt;</a>(myService);</div>
+<div class="line">  }</div>
+<div class="line"></div>
+<div class="line">  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41" title="Releases the service object referenced by the specified ServiceReference object.">UngetService</a>(<a class="code" href="classModule.html" title="Represents a CppMicroServices module.">Module</a>* <span class="comment">/*module*/</span>, <span class="keyword">const</span> <a class="code" href="classServiceRegistrationBase.html" title="A registered service.">ServiceRegistrationBase</a>&amp; <span class="comment">/*registration*/</span>,</div>
+<div class="line">                            <span class="keyword">const</span> <a class="code" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb" title="A map containing interfaces ids and their corresponding service object pointers.">InterfaceMap</a>&amp; service)</div>
+<div class="line">  {</div>
+<div class="line">    <span class="keyword">delete</span> ExtractInterface&lt;InterfaceA&gt;(service);</div>
+<div class="line">  }</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line">MyServiceFactory* myServiceFactory = <span class="keyword">new</span> MyServiceFactory;</div>
+<div class="line">context-&gt;<a class="code" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>&lt;InterfaceA&gt;(myServiceFactory);</div>
+</div><!-- fragment --> <dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">S</td><td>The type under which the service can be located. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">factory</td><td>The <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> or <a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a> object. </td></tr>
+    <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid or the <code>service</code> factory object is NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0ea9afc250bf838ad37659ca37d7bbe7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class I1 , class I2 &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt;I1,I2&gt; ModuleContext::RegisterService </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classServiceFactory.html">ServiceFactory</a> *&#160;</td>
+          <td class="paramname"><em>factory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramname"><em>properties</em> = <code><a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers the specified service factory as a service with the specified properties using the specified template argument as service interface type with the framework. </p>
+<p>This method is identical to the <a class="el" href="classModuleContext.html#abf2b7d86b1eab471f61270a0139edbcd" title="Registers the specified service factory as a service with the specified properties using the specifie...">RegisterService&lt;S&gt;(ServiceFactory*, const ServiceProperties&amp;)</a> method except that it supports two service interface types.</p>
+<p>Example usage: </p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyService2 : <span class="keyword">public</span> InterfaceA, <span class="keyword">public</span> InterfaceB</div>
+<div class="line">{};</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="keyword">class </span>MyServiceFactory : <span class="keyword">public</span> <a class="code" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></div>
+<div class="line">{</div>
+<div class="line">  <span class="keyword">virtual</span> <a class="code" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb" title="A map containing interfaces ids and their corresponding service object pointers.">InterfaceMap</a> <a class="code" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437" title="Returns the service object referenced by the specified ServiceReferenceBase object.">GetService</a>(<a class="code" href="classModule.html" title="Represents a CppMicroServices module.">Module</a>* <span class="comment">/*module*/</span>, <span class="keyword">const</span> <a class="code" href="classServiceRegistrationBase.html" title="A registered service.">ServiceRegistrationBase</a>&amp; <span class="comment">/*registration*/</span>)</div>
+<div class="line">  {</div>
+<div class="line">    MyService2* myService = <span class="keyword">new</span> MyService2;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="structMakeInterfaceMap.html" title="Helper class for constructing InterfaceMap instances based on service implementations or service fact...">MakeInterfaceMap&lt;InterfaceA,InterfaceB&gt;</a>(myService);</div>
+<div class="line">  }</div>
+<div class="line"></div>
+<div class="line">  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classModuleContext.html#a410443288166a646e6be0edd6ed77f41" title="Releases the service object referenced by the specified ServiceReference object.">UngetService</a>(<a class="code" href="classModule.html" title="Represents a CppMicroServices module.">Module</a>* <span class="comment">/*module*/</span>, <span class="keyword">const</span> <a class="code" href="classServiceRegistrationBase.html" title="A registered service.">ServiceRegistrationBase</a>&amp; <span class="comment">/*registration*/</span>,</div>
+<div class="line">                            <span class="keyword">const</span> <a class="code" href="group__MicroServices.html#ga5b79f53257c6f566b36781eca6af9beb" title="A map containing interfaces ids and their corresponding service object pointers.">InterfaceMap</a>&amp; service)</div>
+<div class="line">  {</div>
+<div class="line">    <span class="keyword">delete</span> ExtractInterface&lt;InterfaceA&gt;(service);</div>
+<div class="line">  }</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line">MyServiceFactory* myServiceFactory = <span class="keyword">new</span> MyServiceFactory;</div>
+<div class="line">context-&gt;<a class="code" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService</a>&lt;InterfaceA,InterfaceB&gt;(<span class="keyword">static_cast&lt;</span><a class="code" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a>*<span class="keyword">&gt;</span>(myServiceFactory));</div>
+</div><!-- fragment --> <dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">I1</td><td>The first interface type under which the service can be located. </td></tr>
+    <tr><td class="paramname">I2</td><td>The second interface type under which the service can be located. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">factory</td><td>The <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> or <a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a> object. </td></tr>
+    <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid or the <code>service</code> factory object is NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a92b6070bc41fada9ec208b73ddab0f64"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class I1 , class I2 , class I3 &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classServiceRegistration.html">ServiceRegistration</a>&lt;I1,I2,I3&gt; ModuleContext::RegisterService </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classServiceFactory.html">ServiceFactory</a> *&#160;</td>
+          <td class="paramname"><em>factory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a> &amp;&#160;</td>
+          <td class="paramname"><em>properties</em> = <code><a class="el" href="group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6">ServiceProperties</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers the specified service factory as a service with the specified properties using the specified template argument as service interface type with the framework. </p>
+<p>This method is identical to the <a class="el" href="classModuleContext.html#abf2b7d86b1eab471f61270a0139edbcd" title="Registers the specified service factory as a service with the specified properties using the specifie...">RegisterService&lt;S&gt;(ServiceFactory*, const ServiceProperties&amp;)</a> method except that it supports three service interface types.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">I1</td><td>The first interface type under which the service can be located. </td></tr>
+    <tr><td class="paramname">I2</td><td>The second interface type under which the service can be located. </td></tr>
+    <tr><td class="paramname">I3</td><td>The third interface type under which the service can be located. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">factory</td><td>The <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> or <a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a> object. </td></tr>
+    <tr><td class="paramname">properties</td><td>The properties for this service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classServiceRegistration.html" title="A registered service.">ServiceRegistration</a> object for use by the module registering the service to update the service's properties or to unregister the service. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>If this <a class="el" href="classModuleContext.html" title="A module&#39;s execution context within the framework.">ModuleContext</a> is no longer valid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classServiceException.html" title="A service exception used to indicate that a service problem occurred.">ServiceException</a></td><td>If the service type <code>S</code> is invalid or the <code>service</code> factory object is NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">RegisterService(const InterfaceMap&amp;, const ServiceProperties&amp;)</a> </dd></dl>
 
 </div>
 </div>
@@ -1062,14 +1461,14 @@ template&lt;class R &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a070a6218b13e363098d546425c02f13c"></a>
+<a class="anchor" id="a410443288166a646e6be0edd6ed77f41"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool ModuleContext::UngetService </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classServiceReference.html">ServiceReference</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classServiceReferenceBase.html">ServiceReferenceBase</a> &amp;&#160;</td>
           <td class="paramname"><em>reference</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1086,7 +1485,7 @@ If the context module's use count for the service is zero or the service has bee
 <li>
 The context module's use count for this service is decremented by one. </li>
 <li>
-If the context module's use count for the service is currently zero and the service was registered with a <code><a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a></code> object, the <a class="el" href="classServiceFactory.html#afd632ca2040e8cfd403e787e9887a1bf" title="Releases a service object.">ServiceFactory::UngetService</a> method is called to release the service object for the context module. </li>
+If the context module's use count for the service is currently zero and the service was registered with a <code><a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a></code> object, the <a class="el" href="classServiceFactory.html#aa80a6cbdc96eec60cf135afabcbb1a65" title="Releases a service object.">ServiceFactory::UngetService</a> method is called to release the service object for the context module. </li>
 <li>
 <code>true</code> is returned. </li>
 </ol>
@@ -1103,14 +1502,14 @@ If the context module's use count for the service is currently zero and the serv
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#a2bdfe2bcbae824b0cd6aa79bc4489850" title="Returns the service object referenced by the specified ServiceReference object.">GetService</a> </dd>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="classModuleContext.html#aa048066fdb8b9a5cfa250d9b17915437" title="Returns the service object referenced by the specified ServiceReferenceBase object.">GetService</a> </dd>
 <dd>
-<a class="el" href="classServiceFactory.html" title="Allows services to provide customized service objects in the module environment.">ServiceFactory</a> </dd></dl>
+<a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a> </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

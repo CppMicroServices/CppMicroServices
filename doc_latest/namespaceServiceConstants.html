@@ -85,6 +85,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a9248db8f7ca4dce942fb3594b1079c3f"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#a9248db8f7ca4dce942fb3594b1079c3f">SERVICE_RANKING</a> ()</td></tr>
 <tr class="memdesc:a9248db8f7ca4dce942fb3594b1079c3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service property identifying a service's ranking number.  <a href="#a9248db8f7ca4dce942fb3594b1079c3f">More...</a><br/></td></tr>
 <tr class="separator:a9248db8f7ca4dce942fb3594b1079c3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7745368b1cb8eafeafb0259822302b9b"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#a7745368b1cb8eafeafb0259822302b9b">SERVICE_SCOPE</a> ()</td></tr>
+<tr class="memdesc:a7745368b1cb8eafeafb0259822302b9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service property identifying a service's scope.  <a href="#a7745368b1cb8eafeafb0259822302b9b">More...</a><br/></td></tr>
+<tr class="separator:a7745368b1cb8eafeafb0259822302b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2927a4cb5372b097ac637f6670081b9b"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#a2927a4cb5372b097ac637f6670081b9b">SCOPE_SINGLETON</a> ()</td></tr>
+<tr class="memdesc:a2927a4cb5372b097ac637f6670081b9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service scope is singleton.  <a href="#a2927a4cb5372b097ac637f6670081b9b">More...</a><br/></td></tr>
+<tr class="separator:a2927a4cb5372b097ac637f6670081b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab298987fa3571d170e8a6bc527993818"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#ab298987fa3571d170e8a6bc527993818">SCOPE_MODULE</a> ()</td></tr>
+<tr class="memdesc:ab298987fa3571d170e8a6bc527993818"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service scope is module.  <a href="#ab298987fa3571d170e8a6bc527993818">More...</a><br/></td></tr>
+<tr class="separator:ab298987fa3571d170e8a6bc527993818"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c8d31ab79a0729525b6f0bf0678de4b"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceServiceConstants.html#a2c8d31ab79a0729525b6f0bf0678de4b">SCOPE_PROTOTYPE</a> ()</td></tr>
+<tr class="memdesc:a2c8d31ab79a0729525b6f0bf0678de4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Service scope is prototype.  <a href="#a2c8d31ab79a0729525b6f0bf0678de4b">More...</a><br/></td></tr>
+<tr class="separator:a2c8d31ab79a0729525b6f0bf0678de4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a0e099b4cc3cf6e80301486024950b262"></a>
@@ -101,8 +113,65 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Service property identifying all of the class names under which a service was registered in the framework. </p>
-<p>The value of this property must be of type <code>std::list&lt;std::string&gt;</code>.</p>
+<p>The value of this property must be of type <code>std::vector&lt;std::string&gt;</code>.</p>
 <p>This property is set by the framework when a service is registered. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab298987fa3571d170e8a6bc527993818"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; ServiceConstants::SCOPE_MODULE </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Service scope is module. </p>
+<p>Each module using the service receives a distinct service object.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespaceServiceConstants.html#a7745368b1cb8eafeafb0259822302b9b" title="Service property identifying a service&#39;s scope.">SERVICE_SCOPE()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2c8d31ab79a0729525b6f0bf0678de4b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; ServiceConstants::SCOPE_PROTOTYPE </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Service scope is prototype. </p>
+<p>Each module using the service receives either a distinct service object or can request multiple distinct service objects via <a class="el" href="classServiceObjects.html" title="Allows multiple service objects for a service to be obtained.">ServiceObjects</a>.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespaceServiceConstants.html#a7745368b1cb8eafeafb0259822302b9b" title="Service property identifying a service&#39;s scope.">SERVICE_SCOPE()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2927a4cb5372b097ac637f6670081b9b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; ServiceConstants::SCOPE_SINGLETON </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Service scope is singleton. </p>
+<p>All modules using the service receive the same service object.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespaceServiceConstants.html#a7745368b1cb8eafeafb0259822302b9b" title="Service property identifying a service&#39;s scope.">SERVICE_SCOPE()</a> </dd></dl>
 
 </div>
 </div>
@@ -139,15 +208,33 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Service property identifying a service's ranking number. </p>
-<p>This property may be supplied in the <code>ServiceProperties</code> object passed to the <code><a class="el" href="classModuleContext.html#a7399fcc65ae1625cc06e4010e9e262d6" title="Registers the specified service object with the specified properties under the specified class names ...">ModuleContext::RegisterService</a></code> method. The value of this property must be of type <code>int</code>.</p>
-<p>The service ranking is used by the framework to determine the <em>natural order</em> of services, see ServiceReference::operator&lt;(const ServiceReference&amp;), and the <em>default</em> service to be returned from a call to the <a class="el" href="classModuleContext.html#ad4e3f72bad1067aba49283e851448253">ModuleContext::GetServiceReference</a> method.</p>
+<p>This property may be supplied in the <code>ServiceProperties</code> object passed to the <code><a class="el" href="classModuleContext.html#aa68596c589b57246927067742517ce47" title="Registers the specified service object with the specified properties under the specified class names ...">ModuleContext::RegisterService</a></code> method. The value of this property must be of type <code>int</code>.</p>
+<p>The service ranking is used by the framework to determine the <em>natural order</em> of services, see ServiceReference::operator&lt;(const ServiceReference&amp;), and the <em>default</em> service to be returned from a call to the <a class="el" href="classModuleContext.html#af47528f02bd276ba9b738b17f60d04f8">ModuleContext::GetServiceReference</a> method.</p>
 <p>The default ranking is zero (0). A service with a ranking of <code>std::numeric_limits&lt;int&gt;::max()</code> is very likely to be returned as the default service, whereas a service with a ranking of <code>std::numeric_limits&lt;int&gt;::min()</code> is very unlikely to be returned.</p>
 <p>If the supplied property value is not of type <code>int</code>, it is deemed to have a ranking value of zero. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7745368b1cb8eafeafb0259822302b9b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; ServiceConstants::SERVICE_SCOPE </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Service property identifying a service's scope. </p>
+<p>This property is set by the framework when a service is registered. If the registered object implements <a class="el" href="structPrototypeServiceFactory.html" title="A factory for prototype scope services.">PrototypeServiceFactory</a>, then the value of this service property will be <a class="el" href="namespaceServiceConstants.html#a2c8d31ab79a0729525b6f0bf0678de4b" title="Service scope is prototype.">SCOPE_PROTOTYPE()</a>. Otherwise, if the registered object implements <a class="el" href="classServiceFactory.html" title="A factory for module scope services.">ServiceFactory</a>, then the value of this service property will be <a class="el" href="namespaceServiceConstants.html#ab298987fa3571d170e8a6bc527993818" title="Service scope is module.">SCOPE_MODULE()</a>. Otherwise, the value of this service property will be <a class="el" href="namespaceServiceConstants.html#a2927a4cb5372b097ac637f6670081b9b" title="Service scope is singleton.">SCOPE_SINGLETON()</a>. </p>
 
 </div>
 </div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

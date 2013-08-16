@@ -80,6 +80,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAny.html">Any</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An <a class="el" href="classAny.html" title="An Any class represents a general type and is capable of storing any type, supporting type-safe extra...">Any</a> class represents a general type and is capable of storing any type, supporting type-safe extraction of the internally stored data.  <a href="classAny.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLDAPProp.html">LDAPProp</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A fluent API for creating LDAP filter strings.  <a href="classLDAPProp.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedData.html">SharedData</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedDataPointer.html">SharedDataPointer&lt; T &gt;</a></td></tr>
@@ -108,6 +111,12 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga1726e03076f72e160208a8d4f06624fe"><td class="memItemLeft" align="right" valign="top">us::LDAPPropExpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MicroServicesUtils.html#ga1726e03076f72e160208a8d4f06624fe">operator&amp;&amp;</a> (const us::LDAPPropExpr &amp;left, const us::LDAPPropExpr &amp;right)</td></tr>
+<tr class="memdesc:ga1726e03076f72e160208a8d4f06624fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">LDAP logical and '&amp;'.  <a href="#ga1726e03076f72e160208a8d4f06624fe">More...</a><br/></td></tr>
+<tr class="separator:ga1726e03076f72e160208a8d4f06624fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga67dd9f7dd7434fe3f9311801f6c5e026"><td class="memItemLeft" align="right" valign="top">us::LDAPPropExpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MicroServicesUtils.html#ga67dd9f7dd7434fe3f9311801f6c5e026">operator||</a> (const us::LDAPPropExpr &amp;left, const us::LDAPPropExpr &amp;right)</td></tr>
+<tr class="memdesc:ga67dd9f7dd7434fe3f9311801f6c5e026"><td class="mdescLeft">&#160;</td><td class="mdescRight">LDAP logical or '|'.  <a href="#ga67dd9f7dd7434fe3f9311801f6c5e026">More...</a><br/></td></tr>
+<tr class="separator:ga67dd9f7dd7434fe3f9311801f6c5e026"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0ee2351717eb6fccf9e6841100f60c20"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__MicroServicesUtils.html#ga247235a6f12c007bc97f2e32006719b9">MsgHandler</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__MicroServicesUtils.html#ga0ee2351717eb6fccf9e6841100f60c20">installMsgHandler</a> (<a class="el" href="group__MicroServicesUtils.html#ga247235a6f12c007bc97f2e32006719b9">MsgHandler</a>)</td></tr>
 <tr class="memdesc:ga0ee2351717eb6fccf9e6841100f60c20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Installs a message handler which has been defined previously.  <a href="#ga0ee2351717eb6fccf9e6841100f60c20">More...</a><br/></td></tr>
 <tr class="separator:ga0ee2351717eb6fccf9e6841100f60c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,8 +192,80 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga1726e03076f72e160208a8d4f06624fe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">us::LDAPPropExpr operator&amp;&amp; </td>
+          <td>(</td>
+          <td class="paramtype">const us::LDAPPropExpr &amp;&#160;</td>
+          <td class="paramname"><em>left</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const us::LDAPPropExpr &amp;&#160;</td>
+          <td class="paramname"><em>right</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>LDAP logical and '&amp;'. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">left</td><td>A LDAP expression. </td></tr>
+    <tr><td class="paramname">right</td><td>A LDAP expression. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A LDAP expression </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga67dd9f7dd7434fe3f9311801f6c5e026"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">us::LDAPPropExpr operator|| </td>
+          <td>(</td>
+          <td class="paramtype">const us::LDAPPropExpr &amp;&#160;</td>
+          <td class="paramname"><em>left</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const us::LDAPPropExpr &amp;&#160;</td>
+          <td class="paramname"><em>right</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>LDAP logical or '|'. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">left</td><td>A LDAP expression. </td></tr>
+    <tr><td class="paramname">right</td><td>A LDAP expression. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A LDAP expression </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Fri Jul 19 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
+  <address class="footer"><small>Generated on Fri Aug 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.3.1
 </small></address>

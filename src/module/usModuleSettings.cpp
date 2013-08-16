@@ -113,15 +113,6 @@ bool ModuleSettings::IsThreadingSupportEnabled()
 #endif
 }
 
-bool ModuleSettings::IsServiceFactorySupportEnabled()
-{
-#ifdef US_ENABLE_SERVICE_FACTORY_SUPPORT
-  return true;
-#else
-  return false;
-#endif
-}
-
 bool ModuleSettings::IsAutoLoadingEnabled()
 {
   ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());

@@ -43,13 +43,12 @@ macro(build_and_test)
 
 endmacro()
 
-function(create_initial_cache var _shared _threading _sf _cxx11 _autoload)
+function(create_initial_cache var _shared _threading _cxx11 _autoload)
 
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON
       US_BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
-      US_ENABLE_SERVICE_FACTORY_SUPPORT:BOOL=${_sf}
       US_USE_C++11:BOOL=${_cxx11}
       US_ENABLE_AUTOLOADING_SUPPORT:BOOL=${_autoload}
       ")
@@ -68,9 +67,6 @@ function(create_initial_cache var _shared _threading _sf _cxx11 _autoload)
 
   if(_threading)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
-  endif()
-  if(_sf)
-    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-servicefactory")
   endif()
   if(_cxx11)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-cxx11")
@@ -92,40 +88,24 @@ if(NOT CTEST_PARALLEL_LEVEL)
 endif()
 
 
-#            SHARED THREADING SERVICE_FACTORY C++11 AUTOLOAD
+#            SHARED THREADING C++11 AUTOLOAD
 
-set(config0     0       0            0          0      0     )
-set(config1     0       0            0          0      1     )
-set(config2     0       0            0          1      0     )
-set(config3     0       0            0          1      1     )
-set(config4     0       0            1          0      0     )
-set(config5     0       0            1          0      1     )
-set(config6     0       0            1          1      0     )
-set(config7     0       0            1          1      1     )
-set(config8     0       1            0          0      0     )
-set(config9     0       1            0          0      1     )
-set(config10    0       1            0          1      0     )
-set(config11    0       1            0          1      1     )
-set(config12    0       1            1          0      0     )
-set(config13    0       1            1          0      1     )
-set(config14    0       1            1          1      0     )
-set(config15    0       1            1          1      1     )
-set(config16    1       0            0          0      0     )
-set(config17    1       0            0          0      1     )
-set(config18    1       0            0          1      0     )
-set(config19    1       0            0          1      1     )
-set(config20    1       0            1          0      0     )
-set(config21    1       0            1          0      1     )
-set(config22    1       0            1          1      0     )
-set(config23    1       0            1          1      1     )
-set(config24    1       1            0          0      0     )
-set(config25    1       1            0          0      1     )
-set(config26    1       1            0          1      0     )
-set(config27    1       1            0          1      1     )
-set(config28    1       1            1          0      0     )
-set(config29    1       1            1          0      1     )
-set(config30    1       1            1          1      0     )
-set(config31    1       1            1          1      1     )
+set(config0     0       0       0      0     )
+set(config1     0       0       0      1     )
+set(config2     0       0       1      0     )
+set(config3     0       0       1      1     )
+set(config4     0       1       0      0     )
+set(config5     0       1       0      1     )
+set(config6     0       1       1      0     )
+set(config7     0       1       1      1     )
+set(config8     1       0       0      0     )
+set(config9     1       0       0      1     )
+set(config10    1       0       1      0     )
+set(config11    1       0       1      1     )
+set(config12    1       1       0      0     )
+set(config13    1       1       0      1     )
+set(config14    1       1       1      0     )
+set(config15    1       1       1      1     )
 
 foreach(i ${US_BUILD_CONFIGURATION})
   create_initial_cache(CTEST_INITIAL_CACHE ${config${i}})

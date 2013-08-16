@@ -77,12 +77,6 @@ public:
   static bool IsThreadingSupportEnabled();
 
   /**
-   * \return \c true if support for service factories has been configured into the
-   * CppMicroServices library, \c false otherwise.
-   */
-  static bool IsServiceFactorySupportEnabled();
-
-  /**
    * \return \c true if support for module auto-loading is enabled,
    * \c false otherwise.
    *

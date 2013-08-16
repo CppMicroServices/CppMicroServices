@@ -74,6 +74,7 @@ ServiceObjectsBase::ServiceObjectsBase(ModuleContext* context, const ServiceRefe
     delete d;
     throw std::invalid_argument("The service reference is invalid");
   }
+  d->ref.Ref();
 }
 
 void* ServiceObjectsBase::GetService() const

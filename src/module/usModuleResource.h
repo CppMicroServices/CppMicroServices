@@ -55,6 +55,10 @@ class ModuleResourceTree;
 class US_EXPORT ModuleResource
 {
 
+private:
+
+  typedef ModuleResourcePrivate* ModuleResource::*bool_type;
+
 public:
 
   /**
@@ -129,7 +133,7 @@ public:
   /**
    * Boolean conversion operator using IsValid().
    */
-  operator bool() const;
+  operator bool_type() const;
 
   /**
    * Returns the name of the resource, excluding the path.

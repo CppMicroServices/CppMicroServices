@@ -58,6 +58,10 @@ class ServiceReferenceBase;
  */
 class US_EXPORT LDAPFilter {
 
+private:
+
+  typedef SharedDataPointer<LDAPFilterData> LDAPFilter::*bool_type;
+
 public:
 
   /**
@@ -91,7 +95,7 @@ public:
 
   ~LDAPFilter();
 
-  operator bool() const;
+  operator bool_type() const;
 
   /**
    * Filter using a service's properties.

@@ -60,9 +60,9 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
   d->interfaceId = interfaceId;
 }
 
-ServiceReferenceBase::operator bool() const
+ServiceReferenceBase::operator bool_type() const
 {
-  return GetModule() != 0;
+  return GetModule() != 0 ? &ServiceReferenceBase::d : NULL;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(int null)

@@ -56,7 +56,12 @@ class ServicePropertiesImpl;
  * @see ModuleContext#RegisterService()
  * @remarks This class is thread safe.
  */
-class US_EXPORT ServiceRegistrationBase {
+class US_EXPORT ServiceRegistrationBase
+{
+
+private:
+
+  typedef ServiceRegistrationBasePrivate* ServiceRegistrationBase::*bool_type;
 
 public:
 
@@ -73,7 +78,7 @@ public:
    * \return \c true if this ServiceRegistrationBase object is valid, \c false
    *         otherwise.
    */
-  operator bool() const;
+  operator bool_type() const;
 
   /**
    * Releases any resources held or locked by this

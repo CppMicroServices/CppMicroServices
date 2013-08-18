@@ -42,6 +42,10 @@ class ServiceReferenceBasePrivate;
  */
 class US_EXPORT ServiceReferenceBase {
 
+private:
+
+  typedef ServiceReferenceBasePrivate* ServiceReferenceBase::*bool_type;
+
 public:
 
   ServiceReferenceBase(const ServiceReferenceBase& ref);
@@ -52,7 +56,7 @@ public:
    * the service it references has been unregistered, the conversion
    * returns <code>false</code>, otherwise it returns <code>true</code>.
    */
-  operator bool() const;
+  operator bool_type() const;
 
   /**
    * Releases any resources held or locked by this

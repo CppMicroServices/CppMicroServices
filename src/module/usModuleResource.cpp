@@ -166,9 +166,9 @@ bool ModuleResource::IsCompressed() const
   return d->isCompressed;
 }
 
-ModuleResource::operator bool() const
+ModuleResource::operator bool_type() const
 {
-  return IsValid();
+  return IsValid() ? &ModuleResource::d : NULL;
 }
 
 std::string ModuleResource::GetName() const

@@ -61,9 +61,9 @@ ServiceRegistrationBase::ServiceRegistrationBase(ModulePrivate* module, const In
 
 }
 
-ServiceRegistrationBase::operator bool() const
+ServiceRegistrationBase::operator bool_type() const
 {
-  return d != 0;
+  return d != NULL ? &ServiceRegistrationBase::d : NULL;
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(int null)

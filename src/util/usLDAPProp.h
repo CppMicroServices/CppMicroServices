@@ -43,6 +43,8 @@ public:
 
   operator std::string() const;
 
+  bool IsNull() const;
+
 private:
 
   LDAPPropExpr& operator=(const LDAPPropExpr&);

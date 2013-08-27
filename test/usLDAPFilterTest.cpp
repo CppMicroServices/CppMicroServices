@@ -149,6 +149,12 @@ void TestLDAPExpressions()
         );
   const std::string filterStr = "(&(&(&(&(&(bla=jo)(!(ha=1)))(|(presence=*)(!(absence=*))))(le<=4.1))(ge>=-3))(approx~=Approx))";
   US_TEST_CONDITION(filter.ToString() == filterStr, "test generated filter string")
+
+  std::string emptyValue;
+  std::string someValue = "some";
+  std::string filter1 = LDAPProp("key2") == someValue && LDAPProp("key3");
+  std::string filter2 = LDAPProp("key2") == someValue && (LDAPProp("key1") == emptyValue || LDAPProp("key3"));
+  US_TEST_CONDITION(filter1 == filter2, "test null expressions")
 }
 
 int usLDAPFilterTest(int /*argc*/, char* /*argv*/[])

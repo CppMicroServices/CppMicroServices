@@ -21,6 +21,8 @@
 
 #include "usLDAPProp.h"
 
+#include <stdexcept>
+
 US_BEGIN_NAMESPACE
 
 LDAPPropExpr::LDAPPropExpr(const std::string& expr)
@@ -29,6 +31,8 @@ LDAPPropExpr::LDAPPropExpr(const std::string& expr)
 
 LDAPPropExpr& LDAPPropExpr::operator!()
 {
+  if (m_ldapExpr.empty()) return *this;
+
   m_ldapExpr = "(!" + m_ldapExpr + ")";
   return *this;
 }
@@ -38,13 +42,21 @@ LDAPPropExpr::operator std::string() const
   return m_ldapExpr;
 }
 
+bool LDAPPropExpr::IsNull() const
+{
+  return m_ldapExpr.empty();
+}
+
 
 LDAPProp::LDAPProp(const std::string& property)
   : m_property(property)
-{}
+{
+  if (m_property.empty()) throw std::invalid_argument("property must not be empty");
+}
 
 LDAPPropExpr LDAPProp::operator==(const std::string& s) const
 {
+  if (s.empty()) return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + "=" + s + ")");
 }
 
@@ -65,6 +77,7 @@ LDAPPropExpr LDAPProp::operator!() const
 
 LDAPPropExpr LDAPProp::operator!=(const std::string& s) const
 {
+  if (s.empty()) return LDAPPropExpr(s);
   return LDAPPropExpr("(!(" + m_property + "=" + s + "))");
 }
 
@@ -75,6 +88,7 @@ LDAPPropExpr LDAPProp::operator!=(const us::Any& any) const
 
 LDAPPropExpr LDAPProp::operator>=(const std::string& s) const
 {
+  if (s.empty()) return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + ">=" + s + ")");
 }
 
@@ -85,6 +99,7 @@ LDAPPropExpr LDAPProp::operator>=(const us::Any& any) const
 
 LDAPPropExpr LDAPProp::operator<=(const std::string& s) const
 {
+  if (s.empty()) return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + "<=" + s + ")");
 }
 
@@ -95,6 +110,7 @@ LDAPPropExpr LDAPProp::operator<=(const us::Any& any) const
 
 LDAPPropExpr LDAPProp::Approx(const std::string& s) const
 {
+  if (s.empty()) return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + "~=" + s + ")");
 }
 
@@ -103,11 +119,12 @@ LDAPPropExpr LDAPProp::Approx(const us::Any& any) const
   return Approx(any.ToString());
 }
 
-
 US_END_NAMESPACE
 
 us::LDAPPropExpr operator&&(const us::LDAPPropExpr& left, const us::LDAPPropExpr& right)
 {
+  if (left.IsNull()) return right;
+  if (right.IsNull()) return left;
   return us::LDAPPropExpr("(&" + static_cast<std::string>(left) + static_cast<std::string>(right) + ")");
 }
 

@@ -130,5 +130,7 @@ us::LDAPPropExpr operator&&(const us::LDAPPropExpr& left, const us::LDAPPropExpr
 
 us::LDAPPropExpr operator||(const us::LDAPPropExpr& left, const us::LDAPPropExpr& right)
 {
+  if (left.IsNull()) return right;
+  if (right.IsNull()) return left;
   return us::LDAPPropExpr("(|" + static_cast<std::string>(left) + static_cast<std::string>(right) + ")");
 }

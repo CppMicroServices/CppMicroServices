@@ -36,6 +36,10 @@
 
 #include <cassert>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4503) // decorated name length exceeded, name was truncated
+#endif
+
 US_BEGIN_NAMESPACE
 
 typedef ServiceRegistrationBasePrivate::MutexLocker MutexLocker;

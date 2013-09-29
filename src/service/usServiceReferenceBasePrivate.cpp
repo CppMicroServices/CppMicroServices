@@ -318,7 +318,7 @@ Any ServiceReferenceBasePrivate::GetProperty(const std::string& key, bool lock) 
 
 bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId) const
 {
-  return registration->service.find(interfaceId) != registration->service.end();
+  return registration ? registration->service.find(interfaceId) != registration->service.end() : false;
 }
 
 US_END_NAMESPACE

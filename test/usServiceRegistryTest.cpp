@@ -62,6 +62,9 @@ int TestMultipleServiceRegistrations()
   refs = context->GetServiceReferences<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(refs.empty(), "Testing for no ITestServiceA services")
 
+  ServiceReference<ITestServiceA> ref = context->GetServiceReference<ITestServiceA>();
+  US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
+
   return EXIT_SUCCESS;
 }
 

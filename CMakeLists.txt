@@ -219,7 +219,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(US_LINK_FLAGS )
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
     usFunctionCheckCompilerFlags("${_linkflag}" _add_flag)

@@ -219,7 +219,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(US_LINK_FLAGS )
-if(NOT MSVC)
+if(CMAKE_COMPILER_IS_GNUCXX)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
     usFunctionCheckCompilerFlags("${_linkflag}" _add_flag)

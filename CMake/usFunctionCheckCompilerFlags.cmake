@@ -22,7 +22,7 @@
 #    2-myflags: -fprofile-arcs
 #    3-myflags: -fprofile-arcs -Wall
 
-include(TestCXXAcceptsFlag)
+include(CheckCXXCompilerFlag)
 
 function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
 

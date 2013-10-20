@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 US_BEGIN_NAMESPACE
 
-static const std::size_t BUFFER_SIZE = 1024;
-
 class ModuleResourceBufferPrivate
 {
 public:

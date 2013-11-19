@@ -33,11 +33,11 @@ When building the C++ Micro Services library, you have a few configuration optio
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
 - **US_ENABLE_AUTOLOADING_SUPPORT**
-  Enable auto-loading of modules located in special sup-directories. See \ref MicroServices_AutoLoading
+  Enable auto-loading of modules located in special sub-directories. See \ref MicroServices_AutoLoading
   for detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
   Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives)
-  to make the API thread-safe. If you are application is not multi-threaded, turn this option OFF
+  to make the API thread-safe. If your application is not multi-threaded, turn this option OFF
   to get maximum performance.
 - **US_USE_C++11 (advanced)**
   Enable the usage of C++11 constructs.

@@ -43,7 +43,7 @@ ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
 void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
-  MutexLocker lock(mutex);
+  Lock(this);
 
   ServiceListenerEntry sle(mc->GetModule(), listener, data, filter);
   if (serviceSet.find(sle) != serviceSet.end())
@@ -59,7 +59,7 @@ void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceLis
 {
   ServiceListenerEntry entryToRemove(mc->GetModule(), listener, data);
 
-  MutexLocker lock(mutex);
+  Lock(this);
   RemoveServiceListener_unlocked(entryToRemove);
 }
 
@@ -113,7 +113,7 @@ void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
 void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
 {
   {
-    MutexLocker lock(mutex);
+    Lock(this);
     for (ServiceListenerEntries::iterator it = serviceSet.begin();
          it != serviceSet.end(); )
     {
@@ -181,7 +181,7 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
 void ServiceListeners::GetMatchingServiceListeners(const ServiceReferenceBase& sr, ServiceListenerEntries& set,
                                                    bool lockProps)
 {
-  MutexLocker lock(mutex);
+  Lock(this);
 
   // Check complicated or empty listener filters
   int n = 0;

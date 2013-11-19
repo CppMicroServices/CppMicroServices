@@ -40,7 +40,8 @@ class ModuleContext;
  * Here we handle all listeners that modules have registered.
  *
  */
-class ServiceListeners {
+class ServiceListeners : private US_DEFAULT_THREADING<ServiceListeners>
+{
 
 private:
 
@@ -73,7 +74,7 @@ private:
 
   CoreModuleContext* coreCtx;
 
-  MutexType mutex;
+  //MutexType mutex;
 
 public:
 

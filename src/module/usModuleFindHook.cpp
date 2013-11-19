@@ -19,30 +19,12 @@
 
 =============================================================================*/
 
-
-#include <usConfig.h>
-#include "usCoreModuleContext_p.h"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
+#include "usModuleFindHook.h"
 
 US_BEGIN_NAMESPACE
 
-CoreModuleContext::CoreModuleContext()
-  : listeners(this)
-  , services(this)
-  , moduleHooks(this)
-{
-}
-
-CoreModuleContext::~CoreModuleContext()
+ModuleFindHook::~ModuleFindHook()
 {
 }
 
 US_END_NAMESPACE
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif

@@ -185,6 +185,7 @@ private:
 
   friend class ModulePrivate;
   friend class ModuleContext;
+  friend class ModuleHooks;
   friend class ServiceObjectsBase;
   friend class ServiceObjectsBasePrivate;
   friend class ServiceRegistrationBase;

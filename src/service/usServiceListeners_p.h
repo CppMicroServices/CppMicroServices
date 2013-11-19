@@ -71,11 +71,13 @@ private:
 
   ServiceListenerEntries serviceSet;
 
+  CoreModuleContext* coreCtx;
+
   MutexType mutex;
 
 public:
 
-  ServiceListeners();
+  ServiceListeners(CoreModuleContext* coreCtx);
 
   /**
    * Add a new service listener. If an old one exists, and it has the

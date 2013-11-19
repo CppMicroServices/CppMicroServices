@@ -59,7 +59,7 @@ Module* ModuleContext::GetModule() const
 
 Module* ModuleContext::GetModule(long id) const
 {
-  return ModuleRegistry::GetModule(id);
+  return d->module->coreCtx->moduleHooks.FilterModule(this, ModuleRegistry::GetModule(id));
 }
 
 Module*ModuleContext::GetModule(const std::string& name)
@@ -69,7 +69,9 @@ Module*ModuleContext::GetModule(const std::string& name)
 
 std::vector<Module*> ModuleContext::GetModules() const
 {
-  return ModuleRegistry::GetModules();
+  std::vector<Module*> modules = ModuleRegistry::GetModules();
+  d->module->coreCtx->moduleHooks.FilterModules(this, modules);
+  return modules;
 }
 
 ServiceRegistrationU ModuleContext::RegisterService(const InterfaceMap& service,

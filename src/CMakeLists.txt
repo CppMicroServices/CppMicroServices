@@ -35,6 +35,9 @@ set(_srcs
   module/usModuleContext.cpp
   module/usModule.cpp
   module/usModuleEvent.cpp
+  module/usModuleEventHook.cpp
+  module/usModuleFindHook.cpp
+  module/usModuleHooks.cpp
   module/usModuleInfo.cpp
   module/usModuleManifest.cpp
   module/usModulePrivate.cpp
@@ -69,6 +72,7 @@ set(_private_headers
 
   module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
+  module/usModuleHooks_p.h
   module/usModuleResourceBuffer_p.h
   module/usModuleResourceTree_p.h
   module/usModuleUtils_p.h
@@ -79,6 +83,7 @@ set(_public_headers
   util/usLDAPProp.h
   util/usSharedData.h
   util/usSharedLibrary.h
+  util/usShrinkableVector.h
   util/usUncompressResourceData.h
 
   service/usLDAPFilter.h
@@ -101,6 +106,8 @@ set(_public_headers
   module/usModuleActivator.h
   module/usModuleContext.h
   module/usModuleEvent.h
+  module/usModuleEventHook.h
+  module/usModuleFindHook.h
   module/usModuleImport.h
   module/usModuleInfo.h
   module/usModuleInitialization.h

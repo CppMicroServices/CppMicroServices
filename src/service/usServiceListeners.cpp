@@ -24,16 +24,17 @@
 #include "usServiceListeners_p.h"
 #include "usServiceReferenceBasePrivate.h"
 
+#include "usCoreModuleContext_p.h"
 #include "usModule.h"
 
-//#include <usLogMacros.h>
 
 US_BEGIN_NAMESPACE
 
 const int ServiceListeners::OBJECTCLASS_IX = 0;
 const int ServiceListeners::SERVICE_ID_IX = 1;
 
-ServiceListeners::ServiceListeners()
+ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
+  : coreCtx(coreCtx)
 {
   hashedServiceKeys.push_back(ServiceConstants::OBJECTCLASS());
   hashedServiceKeys.push_back(ServiceConstants::SERVICE_ID());
@@ -95,14 +96,16 @@ void ServiceListeners::RemoveModuleListener(ModuleContext* mc, const ModuleListe
 
 void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
 {
-  MutexLocker lock(moduleListenerMapMutex);
-  for(ModuleListenerMap::iterator i = moduleListenerMap.begin();
-      i != moduleListenerMap.end(); ++i)
+  ModuleListenerMap filteredModuleListeners;
+  coreCtx->moduleHooks.FilterModuleEventReceivers(evt, filteredModuleListeners);
+
+  for(ModuleListenerMap::iterator iter = filteredModuleListeners.begin(), end = filteredModuleListeners.end();
+      iter != end; ++iter)
   {
-    for(std::list<std::pair<ModuleListener, void*> >::iterator j = i->second.begin();
-        j != i->second.end(); ++j)
+    for (ModuleListenerMap::mapped_type::iterator iter2 = iter->second.begin(), end2 = iter->second.end();
+         iter2 != end2; ++iter2)
     {
-      (j->first)(evt);
+      (iter2->first)(evt);
     }
   }
 }

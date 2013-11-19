@@ -25,6 +25,7 @@
 
 #include "usServiceListeners_p.h"
 #include "usServiceRegistry_p.h"
+#include "usModuleHooks_p.h"
 
 US_BEGIN_NAMESPACE
 
@@ -44,6 +45,16 @@ public:
    * All registered services in this framework.
    */
   ServiceRegistry services;
+
+  /**
+   * All service hooks.
+   */
+  //ServiceHooks serviceHooks;
+
+  /**
+   * All module hooks.
+   */
+  ModuleHooks moduleHooks;
 
   /**
    * Contruct a core context

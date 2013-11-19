@@ -19,30 +19,44 @@
 
 =============================================================================*/
 
+#ifndef USMODULEHOOKS_P_H
+#define USMODULEHOOKS_P_H
 
-#include <usConfig.h>
-#include "usCoreModuleContext_p.h"
+#include "usConfig.h"
+#include "usServiceListeners_p.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
+#include <vector>
 
 US_BEGIN_NAMESPACE
 
-CoreModuleContext::CoreModuleContext()
-  : listeners(this)
-  , services(this)
-  , moduleHooks(this)
-{
-}
+class CoreModuleContext;
+class Module;
+class ModuleContext;
+class ModuleEvent;
 
-CoreModuleContext::~CoreModuleContext()
+class ModuleHooks
 {
-}
+
+private:
+
+  typedef Mutex MutexType;
+  typedef MutexLock<MutexType> MutexLocker;
+
+  CoreModuleContext* const coreCtx;
+
+public:
+
+  ModuleHooks(CoreModuleContext* ctx);
+
+  Module* FilterModule(const ModuleContext* mc, Module* module) const;
+
+  void FilterModules(const ModuleContext* mc, std::vector<Module*>& modules) const;
+
+  void FilterModuleEventReceivers(const ModuleEvent& evt,
+                                  ServiceListeners::ModuleListenerMap& moduleListeners);
+
+};
 
 US_END_NAMESPACE
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#endif // USMODULEHOOKS_P_H

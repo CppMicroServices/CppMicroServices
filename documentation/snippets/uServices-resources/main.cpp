@@ -42,8 +42,7 @@ void extenderPattern()
 {
   //! [2]
   // Get all loaded modules
-  std::vector<Module*> modules;
-  ModuleRegistry::GetLoadedModules(modules);
+  std::vector<Module*> modules = ModuleRegistry::GetLoadedModules();
 
   // Check if a module defines a "service-component" property
   // and use its value to retrieve an embedded resource containing

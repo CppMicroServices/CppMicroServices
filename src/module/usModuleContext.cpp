@@ -62,9 +62,14 @@ Module* ModuleContext::GetModule(long id) const
   return ModuleRegistry::GetModule(id);
 }
 
-void ModuleContext::GetModules(std::vector<Module*>& modules) const
+Module*ModuleContext::GetModule(const std::string& name)
 {
-  ModuleRegistry::GetModules(modules);
+  return ModuleRegistry::GetModule(name);
+}
+
+std::vector<Module*> ModuleContext::GetModules() const
+{
+  return ModuleRegistry::GetModules();
 }
 
 ServiceRegistrationU ModuleContext::RegisterService(const InterfaceMap& service,

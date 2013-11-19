@@ -193,32 +193,36 @@ Module* ModuleRegistry::GetModule(const std::string& name)
   return 0;
 }
 
-void ModuleRegistry::GetModules(std::vector<Module*>& m)
+std::vector<Module*> ModuleRegistry::GetModules()
 {
   MutexLocker lock(*modulesLock());
 
+  std::vector<Module*> result;
   ModuleMap* map = modules();
   ModuleMap::const_iterator iter = map->begin();
   ModuleMap::const_iterator iterEnd = map->end();
   for (; iter != iterEnd; ++iter)
   {
-    m.push_back(iter->second);
+    result.push_back(iter->second);
   }
+  return result;
 }
 
-void ModuleRegistry::GetLoadedModules(std::vector<Module*>& m)
+std::vector<Module*> ModuleRegistry::GetLoadedModules()
 {
   MutexLocker lock(*modulesLock());
 
+  std::vector<Module*> result;
   ModuleMap::const_iterator iter = modules()->begin();
   ModuleMap::const_iterator iterEnd = modules()->end();
   for (; iter != iterEnd; ++iter)
   {
     if (iter->second->IsLoaded())
     {
-      m.push_back(iter->second);
+      result.push_back(iter->second);
     }
   }
+  return result;
 }
 
 US_END_NAMESPACE

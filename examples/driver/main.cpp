@@ -174,8 +174,7 @@ int main(int /*argc*/, char** /*argv*/)
               }
             }
 
-            std::vector<Module*> modules;
-            ModuleRegistry::GetModules(modules);
+            std::vector<Module*> modules = ModuleRegistry::GetModules();
             for (std::vector<Module*>::const_iterator moduleIter = modules.begin();
                  moduleIter != modules.end(); ++moduleIter)
             {
@@ -266,8 +265,7 @@ int main(int /*argc*/, char** /*argv*/)
     }
     else if (strCmd == "s")
     {
-      std::vector<Module*> modules;
-      ModuleRegistry::GetModules(modules);
+      std::vector<Module*> modules = ModuleRegistry::GetModules();
 
       std::cout << std::left;
 

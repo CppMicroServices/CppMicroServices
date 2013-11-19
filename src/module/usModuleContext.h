@@ -115,6 +115,13 @@ public:
    */
   Module* GetModule(long id) const;
 
+  /**
+   * Get the module that with the specified module name.
+   *
+   * @param name The name of the module to get.
+   * @return The requested \c Module or \c NULL.
+   */
+  Module* GetModule(const std::string& name);
 
   /**
    * Returns a list of all known modules.
@@ -126,7 +133,7 @@ public:
    * @param modules A std::vector of <code>Module</code> objects which
    *                will hold one object per known module.
    */
-  void GetModules(std::vector<Module*>& modules) const;
+  std::vector<Module*> GetModules() const;
 
   /**
    * Registers the specified service object with the specified properties

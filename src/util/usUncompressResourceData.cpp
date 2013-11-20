@@ -22,7 +22,7 @@
 #include "usUncompressResourceData.h"
 
 #ifdef US_ENABLE_RESOURCE_COMPRESSION
-#include "usUtils_p.h"
+#include "usLog_p.h"
 
 extern "C" {
 const char* us_uncompress_resource_error();

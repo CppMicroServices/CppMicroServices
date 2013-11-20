@@ -57,7 +57,7 @@ std::string ModuleSettings::CURRENT_MODULE_PATH()
   return var;
 }
 
-struct ModuleSettingsPrivate : public US_DEFAULT_THREADING<ModuleSettingsPrivate>
+struct ModuleSettingsPrivate : public MultiThreaded<>
 {
   ModuleSettingsPrivate()
     : autoLoadPaths()

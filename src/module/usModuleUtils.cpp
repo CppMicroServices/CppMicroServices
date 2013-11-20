@@ -21,6 +21,7 @@
 
 
 #include "usModuleUtils_p.h"
+#include <usLog_p.h>
 #include <usUtils_p.h>
 
 US_BEGIN_NAMESPACE

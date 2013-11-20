@@ -21,11 +21,13 @@
 
 #include "usUtils_p.h"
 
+#include "usLog_p.h"
 #include "usModuleInfo.h"
 #include "usModuleSettings.h"
 
 #include <cstdio>
 #include <cctype>
+#include <algorithm>
 
 #ifdef US_PLATFORM_POSIX
   #include <errno.h>

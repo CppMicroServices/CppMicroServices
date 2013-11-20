@@ -33,7 +33,7 @@ US_BEGIN_NAMESPACE
  * \ingroup MicroServices
  */
 template<class S, class TTT>
-class ServiceTrackerPrivate : US_DEFAULT_THREADING<ServiceTrackerPrivate<S,TTT> >
+class ServiceTrackerPrivate : MultiThreaded<>
 {
 
 public:

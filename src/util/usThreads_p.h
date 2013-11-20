@@ -126,12 +126,12 @@
   #define US_THREADS_MUTEX_DELETE(x)
   #define US_THREADS_MUTEX_LOCK(x)
   #define US_THREADS_MUTEX_UNLOCK(x)
-  #define US_THREADS_LONG
+  #define US_THREADS_LONG int
 
-#endif
+  #define US_ATOMIC_INCREMENT(x)        IntType n = ++(*x);
+  #define US_ATOMIC_DECREMENT(x)        IntType n = --(*x);
+  #define US_ATOMIC_ASSIGN(l, r)        *l = r;
 
-#ifndef US_DEFAULT_MUTEX
-  #define US_DEFAULT_MUTEX US_PREPEND_NAMESPACE(Mutex)
 #endif
 
 
@@ -162,7 +162,7 @@ public:
 
 private:
 
-  friend class WaitCondition;
+  template<class Host> friend class WaitCondition;
 
   // Copy-constructor not implemented.
   Mutex(const Mutex &);
@@ -172,11 +172,10 @@ private:
   US_THREADS_MUTEX(m_Mtx)
 };
 
-template<class MutexPolicy = US_DEFAULT_MUTEX>
 class MutexLock
 {
 public:
-  typedef MutexPolicy MutexType;
+  typedef Mutex MutexType;
 
   MutexLock(MutexType& mtx) : m_Mtx(&mtx) { m_Mtx->Lock(); }
   ~MutexLock() { m_Mtx->Unlock(); }
@@ -189,168 +188,31 @@ private:
   MutexLock& operator=(const MutexLock&);
 };
 
-typedef MutexLock<> DefaultMutexLock;
-
-
-/**
- * \brief A thread synchronization object used to suspend execution until some
- * condition on shared data is met.
- *
- * A thread calls Wait() to suspend its execution until the condition is
- * met. Each call to Notify() from an executing thread will then cause a single
- * waiting thread to be released.  A call to Notify() means, "signal
- * that the condition is true."  NotifyAll() releases all threads waiting on
- * the condition variable.
- *
- * The WaitCondition implementation is consistent with the standard
- * definition and use of condition variables in pthreads and other common
- * thread libraries.
- *
- * IMPORTANT: A condition variable always requires an associated mutex
- * object. The mutex object is used to avoid a dangerous race condition when
- * Wait() and Notify() are called simultaneously from two different
- * threads.
- *
- * On systems using pthreads, this implementation abstracts the
- * standard calls to the pthread condition variable.  On Win32
- * systems, there is no system provided condition variable.  This
- * class implements a condition variable using a critical section, a
- * semphore, an event and a number of counters.  The implementation is
- * almost an extract translation of the implementation presented by
- * Douglas C Schmidt and Irfan Pyarali in "Strategies for Implementing
- * POSIX Condition Variables on Win32". This article can be found at
- * http://www.cs.wustl.edu/~schmidt/win32-cv-1.html
- *
- */
-class US_EXPORT WaitCondition
+class AtomicCounter
 {
 public:
 
-  typedef US_DEFAULT_MUTEX MutexType;
-
-  WaitCondition();
-  ~WaitCondition();
-
-  /** Suspend execution of this thread until the condition is signaled. The
-   *  argument is a SimpleMutex object that must be locked prior to calling
-   *  this method.  */
-  bool Wait(MutexType& mutex, unsigned long time = 0);
-
-  bool Wait(MutexType* mutex, unsigned long time = 0);
-
-  /** Notify that the condition is true and release one waiting thread */
-  void Notify();
-
-  /** Notify that the condition is true and release all waiting threads */
-  void NotifyAll();
-
-private:
-
-  // purposely not implemented
-  WaitCondition(const WaitCondition& other);
-  const WaitCondition& operator=(const WaitCondition&);
-
-#ifdef US_ENABLE_THREADING_SUPPORT
-  #ifdef US_PLATFORM_POSIX
-  pthread_cond_t m_WaitCondition;
-  #else
-
-  int m_NumberOfWaiters;                   // number of waiting threads
-  CRITICAL_SECTION m_NumberOfWaitersLock;  // Serialize access to
-  // m_NumberOfWaiters
-
-  HANDLE m_Semaphore;                      // Semaphore to queue threads
-  HANDLE m_WaitersAreDone;                 // Auto-reset event used by the
-                                           // broadcast/signal thread to
-                                           // wait for all the waiting
-                                           // threads to wake up and
-                                           // release the semaphore
-
-  std::size_t m_WasNotifyAll;              // Keeps track of whether we
-                                           // were broadcasting or signaling
-  #endif
-
-#endif
-};
-
-US_END_NAMESPACE
-
-#ifdef US_ENABLE_THREADING_SUPPORT
-
-US_BEGIN_NAMESPACE
-
-template<class Host, class MutexPolicy = US_DEFAULT_MUTEX>
-class MultiThreaded
-{
-  mutable MutexPolicy m_Mtx;
-  WaitCondition m_Cond;
-
-  #if !defined(US_ATOMIC_OPTIMIZATION)
-  mutable MutexPolicy m_AtomicMtx;
-  #endif
-
-public:
-
-  MultiThreaded() : m_Mtx(), m_Cond() {}
-  MultiThreaded(const MultiThreaded&) : m_Mtx(), m_Cond() {}
-  virtual ~MultiThreaded() {}
-
-  class Lock;
-  friend class Lock;
-
-  class Lock
-  {
-  public:
-
-    // Lock object
-    explicit Lock(const MultiThreaded& host) : m_Host(host)
-    {
-      m_Host.m_Mtx.Lock();
-    }
-
-    // Lock object
-    explicit Lock(const MultiThreaded* host) : m_Host(*host)
-    {
-      m_Host.m_Mtx.Lock();
-    }
-
-    // Unlock object
-    ~Lock()
-    {
-      m_Host.m_Mtx.Unlock();
-    }
-
-  private:
-
-    // private by design
-    Lock();
-    Lock(const Lock&);
-    Lock& operator=(const Lock&);
-    const MultiThreaded& m_Host;
-
-  };
-
-  typedef volatile Host VolatileType;
   typedef US_THREADS_LONG IntType;
 
-  bool Wait(unsigned long timeoutMillis = 0)
-  {
-    return m_Cond.Wait(m_Mtx, timeoutMillis);
-  }
+  AtomicCounter(int value = 0)
+    : m_Counter(value)
+  {}
 
-  void Notify()
+  IntType AtomicIncrement() const
   {
-    m_Cond.Notify();
-  }
-
-  void NotifyAll()
-  {
-    m_Cond.NotifyAll();
+    US_ATOMIC_INCREMENT(&m_Counter);
+    return n;
   }
 
   IntType AtomicIncrement(volatile IntType& lval) const
   {
     US_ATOMIC_INCREMENT(&lval);
+    return n;
+  }
+
+  IntType AtomicDecrement() const
+  {
+    US_ATOMIC_DECREMENT(&m_Counter);
     return n;
   }
 
@@ -360,69 +222,106 @@ public:
     return n;
   }
 
+  void AtomicAssign(volatile IntType& lval) const
+  {
+    US_ATOMIC_ASSIGN(&lval, m_Counter);
+  }
+
   void AtomicAssign(volatile IntType& lval, const IntType val) const
   {
     US_ATOMIC_ASSIGN(&lval, val);
   }
 
+  mutable IntType m_Counter;
+
+private:
+
+#if !defined(US_ATOMIC_OPTIMIZATION)
+  mutable Mutex m_AtomicMtx;
+#endif
+};
+
+class MutexLockingStrategy
+{
+public:
+
+  MutexLockingStrategy()
+#ifdef US_ENABLE_THREADING_SUPPORT
+    : m_Mtx()
+#endif
+  {}
+
+  MutexLockingStrategy(const MutexLockingStrategy&)
+#ifdef US_ENABLE_THREADING_SUPPORT
+    : m_Mtx()
+#endif
+  {}
+
+  class Lock;
+  friend class Lock;
+
+  class Lock
+  {
+  public:
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+    // Lock object
+    explicit Lock(const MutexLockingStrategy& host) : m_Host(host)
+    {
+      m_Host.m_Mtx.Lock();
+    }
+
+    // Lock object
+    explicit Lock(const MutexLockingStrategy* host) : m_Host(*host)
+    {
+      m_Host.m_Mtx.Lock();
+    }
+
+    // Unlock object
+    ~Lock()
+    {
+      m_Host.m_Mtx.Unlock();
+    }
+#else
+    explicit Lock(const MutexLockingStrategy&) {}
+    explicit Lock(const MutexLockingStrategy*) {}
+#endif
+
+  private:
+
+    // private by design
+    Lock();
+    Lock(const Lock&);
+    Lock& operator=(const Lock&);
+#ifdef US_ENABLE_THREADING_SUPPORT
+    const MutexLockingStrategy& m_Host;
+#endif
+  };
+
+protected:
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+  mutable Mutex m_Mtx;
+#endif
+};
+
+class NoLockingStrategy
+{
 };
 
 US_END_NAMESPACE
 
-#endif
-
+#include <usWaitCondition_p.h>
 
 US_BEGIN_NAMESPACE
 
-template<class Host, class MutexPolicy = US_DEFAULT_MUTEX>
-class SingleThreaded
+template<class LockingStrategy = MutexLockingStrategy,
+         template<class Host> class WaitConditionStrategy = NoWaitCondition
+        >
+class MultiThreaded : public LockingStrategy,
+                      public WaitConditionStrategy<MultiThreaded<LockingStrategy, WaitConditionStrategy> >
 {
-public:
-
-  virtual ~SingleThreaded() {}
-
-  // Dummy Lock class
-  struct Lock
-  {
-    Lock() {}
-    explicit Lock(const SingleThreaded&) {}
-    explicit Lock(const SingleThreaded*) {}
-  };
-
-  typedef Host VolatileType;
-  typedef int IntType;
-
-  bool Wait(unsigned long = 0)
-  { return false; }
-
-  void Notify() {}
-
-  void NotifyAll() {}
-
-  static IntType AtomicAdd(volatile IntType& lval, const IntType val)
-  { return lval += val; }
-
-  static IntType AtomicSubtract(volatile IntType& lval, const IntType val)
-  { return lval -= val; }
-
-  static IntType AtomicMultiply(volatile IntType& lval, const IntType val)
-  { return lval *= val; }
-
-  static IntType AtomicDivide(volatile IntType& lval, const IntType val)
-  { return lval /= val; }
-
-  static IntType AtomicIncrement(volatile IntType& lval)
-  { return ++lval; }
-
-  static IntType AtomicDecrement(volatile IntType& lval)
-  { return --lval; }
-
-  static void AtomicAssign(volatile IntType & lval, const IntType val)
-  { lval = val; }
-
-  static void AtomicAssign(IntType & lval, volatile IntType & val)
-  { lval = val; }
-
+  friend class WaitConditionStrategy<MultiThreaded<LockingStrategy, WaitConditionStrategy> >;
 };
 
 US_END_NAMESPACE

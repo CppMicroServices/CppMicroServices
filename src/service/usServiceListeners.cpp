@@ -80,7 +80,7 @@ void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry
 
 void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
-  MutexLocker lock(moduleListenerMapMutex);
+  MutexLock lock(moduleListenerMapMutex);
   ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap[mc];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
   {
@@ -90,7 +90,7 @@ void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener
 
 void ServiceListeners::RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
-  MutexLocker lock(moduleListenerMapMutex);
+  MutexLock lock(moduleListenerMapMutex);
   moduleListenerMap[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
 }
 
@@ -131,7 +131,7 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
   }
 
   {
-    MutexLocker lock(moduleListenerMapMutex);
+    MutexLock lock(moduleListenerMapMutex);
     moduleListenerMap.erase(mc);
   }
 }

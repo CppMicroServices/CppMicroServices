@@ -40,20 +40,15 @@ class ModuleContext;
  * Here we handle all listeners that modules have registered.
  *
  */
-class ServiceListeners : private US_DEFAULT_THREADING<ServiceListeners>
+class ServiceListeners : private MultiThreaded<>
 {
-
-private:
-
-  typedef Mutex MutexType;
-  typedef MutexLock<MutexType> MutexLocker;
 
 public:
 
   typedef US_MODULE_LISTENER_FUNCTOR ModuleListener;
   typedef US_UNORDERED_MAP_TYPE<ModuleContext*, std::list<std::pair<ModuleListener,void*> > > ModuleListenerMap;
   ModuleListenerMap moduleListenerMap;
-  MutexType moduleListenerMapMutex;
+  Mutex moduleListenerMapMutex;
 
   typedef US_UNORDERED_MAP_TYPE<std::string, std::list<ServiceListenerEntry> > CacheType;
   typedef US_UNORDERED_SET_TYPE<ServiceListenerEntry> ServiceListenerEntries;

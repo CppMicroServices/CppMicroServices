@@ -216,17 +216,6 @@ US_END_NAMESPACE
 
 #endif
 
-
-//-------------------------------------------------------------------
-// Threading Configuration
-//-------------------------------------------------------------------
-
-#ifdef US_ENABLE_THREADING_SUPPORT
-  #define US_DEFAULT_THREADING US_PREPEND_NAMESPACE(MultiThreaded)
-#else
-  #define US_DEFAULT_THREADING US_PREPEND_NAMESPACE(SingleThreaded)
-#endif
-
 //-------------------------------------------------------------------
 // Header Availability
 //-------------------------------------------------------------------

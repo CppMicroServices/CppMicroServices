@@ -36,7 +36,7 @@ US_BEGIN_NAMESPACE
 
 // POD for US_GLOBAL_STATIC
 template <typename T>
-class GlobalStatic : public US_DEFAULT_THREADING<GlobalStatic<T> >
+class GlobalStatic : public MultiThreaded<>
 {
 public:
 

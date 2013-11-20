@@ -36,12 +36,12 @@ US_BEGIN_NAMESPACE
  * counting scenarios to minimize locking overhead in multi-threaded
  * environments.
  */
-class AtomicInt : private US_DEFAULT_THREADING<AtomicInt>
+class AtomicInt : private AtomicCounter
 {
 
 public:
 
-  AtomicInt(int value = 0) : m_ReferenceCount(value) {}
+  AtomicInt(int value = 0) : AtomicCounter(value) {}
 
   /**
    * Increase the reference count atomically by 1.
@@ -50,7 +50,7 @@ public:
    *         otherwise.
    */
   inline bool Ref() const
-  { return AtomicIncrement(m_ReferenceCount) != 0; }
+  { return AtomicIncrement() != 0; }
 
   /**
    * Decrease the reference count atomically by 1.
@@ -59,7 +59,7 @@ public:
    *         otherwise.
    */
   inline bool Deref() const
-  { return AtomicDecrement(m_ReferenceCount) != 0; }
+  { return AtomicDecrement() != 0; }
 
   /**
    * Returns the current value.
@@ -68,13 +68,9 @@ public:
   inline operator int() const
   {
     IntType curr(0);
-    AtomicAssign(curr, m_ReferenceCount);
+    AtomicAssign(curr);
     return curr;
   }
-
-private:
-
-  mutable IntType m_ReferenceCount;
 
 };
 

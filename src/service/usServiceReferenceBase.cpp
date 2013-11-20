@@ -29,9 +29,6 @@
 
 US_BEGIN_NAMESPACE
 
-typedef ServiceRegistrationBasePrivate::MutexType MutexType;
-typedef MutexLock<MutexType> MutexLocker;
-
 ServiceReferenceBase::ServiceReferenceBase()
   : d(new ServiceReferenceBasePrivate(0))
 {
@@ -84,14 +81,14 @@ ServiceReferenceBase::~ServiceReferenceBase()
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
-  MutexLocker lock(d->registration->propsLock);
+  MutexLock lock(d->registration->propsLock);
 
   return d->registration->properties.Value(key);
 }
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
-  MutexLocker lock(d->registration->propsLock);
+  MutexLock lock(d->registration->propsLock);
 
   const std::vector<std::string>& ks = d->registration->properties.Keys();
   keys.assign(ks.begin(), ks.end());
@@ -109,7 +106,7 @@ Module* ServiceReferenceBase::GetModule() const
 
 void ServiceReferenceBase::GetUsingModules(std::vector<Module*>& modules) const
 {
-  MutexLocker lock(d->registration->propsLock);
+  MutexLock lock(d->registration->propsLock);
 
   ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator end = d->registration->dependents.end();
   for (ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator iter = d->registration->dependents.begin();

@@ -7,7 +7,6 @@ set(_srcs
   util/jsoncpp.cpp
   util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
-  util/usThreads.cpp
   util/usUncompressResourceData.c
   util/usUncompressResourceData.cpp
   util/usUtils.cpp
@@ -54,9 +53,12 @@ set(_srcs
 set(_private_headers
   util/usAtomicInt_p.h
   util/usFunctor_p.h
+  util/usListenerFunctors_p.h
+  util/usLog_p.h
   util/usStaticInit_p.h
   util/usThreads_p.h
   util/usUtils_p.h
+  util/usWaitCondition_p.h
 
   util/dirent_win32_p.h
   util/stdint_p.h

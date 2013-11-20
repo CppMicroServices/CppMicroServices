@@ -47,7 +47,7 @@ US_BEGIN_NAMESPACE
  * @ThreadSafe
  */
 template<class S, class TTT, class R>
-class ModuleAbstractTracked : public US_DEFAULT_THREADING<ModuleAbstractTracked<S,TTT,R> >
+class ModuleAbstractTracked : public MultiThreaded<MutexLockingStrategy,WaitCondition>
 {
 
 public:

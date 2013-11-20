@@ -39,9 +39,6 @@ class ModuleHooks
 
 private:
 
-  typedef Mutex MutexType;
-  typedef MutexLock<MutexType> MutexLocker;
-
   CoreModuleContext* const coreCtx;
 
 public:

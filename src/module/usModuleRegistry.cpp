@@ -37,9 +37,6 @@
 
 US_BEGIN_NAMESPACE
 
-typedef Mutex MutexType;
-typedef MutexLock<MutexType> MutexLocker;
-
 typedef US_UNORDERED_MAP_TYPE<long, Module*> ModuleMap;
 
 US_GLOBAL_STATIC(CoreModuleContext, coreModuleContext)
@@ -69,12 +66,12 @@ US_GLOBAL_STATIC_WITH_DELETER(ModuleMap, modules, ModuleDeleter)
 /**
  * Lock for protecting the modules object
  */
-US_GLOBAL_STATIC(MutexType, modulesLock)
+US_GLOBAL_STATIC(Mutex, modulesLock)
 
 /**
  * Lock for protecting the register count
  */
-US_GLOBAL_STATIC(MutexType, countLock)
+US_GLOBAL_STATIC(Mutex, countLock)
 
 
 void ModuleRegistry::Register(ModuleInfo* info)
@@ -85,7 +82,7 @@ void ModuleRegistry::Register(ModuleInfo* info)
     // The module was already registered
     Module* module = 0;
     {
-      MutexLocker lock(*modulesLock());
+      MutexLock lock(*modulesLock());
       module = modules()->operator[](info->id);
       assert(module != 0);
     }
@@ -96,7 +93,7 @@ void ModuleRegistry::Register(ModuleInfo* info)
     Module* module = 0;
     // check if the module is reloaded
     {
-      MutexLocker lock(*modulesLock());
+      MutexLock lock(*modulesLock());
       ModuleMap* map = modules();
       for (ModuleMap::const_iterator i = map->begin();
            i != map->end(); ++i)
@@ -118,7 +115,7 @@ void ModuleRegistry::Register(ModuleInfo* info)
 
       module->Init(coreModuleContext(), info);
 
-      MutexLocker lock(*modulesLock());
+      MutexLock lock(*modulesLock());
       ModuleMap* map = modules();
       map->insert(std::make_pair(info->id, module));
     }
@@ -154,7 +151,7 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
 
   Module* curr = 0;
   {
-    MutexLocker lock(*modulesLock());
+    MutexLock lock(*modulesLock());
     curr = modules()->operator[](info->id);
     assert(curr != 0);
   }
@@ -166,7 +163,7 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
 
 Module* ModuleRegistry::GetModule(long id)
 {
-  MutexLocker lock(*modulesLock());
+  MutexLock lock(*modulesLock());
 
   ModuleMap::const_iterator iter = modules()->find(id);
   if (iter != modules()->end())
@@ -178,7 +175,7 @@ Module* ModuleRegistry::GetModule(long id)
 
 Module* ModuleRegistry::GetModule(const std::string& name)
 {
-  MutexLocker lock(*modulesLock());
+  MutexLock lock(*modulesLock());
 
   ModuleMap::const_iterator iter = modules()->begin();
   ModuleMap::const_iterator iterEnd = modules()->end();
@@ -195,7 +192,7 @@ Module* ModuleRegistry::GetModule(const std::string& name)
 
 std::vector<Module*> ModuleRegistry::GetModules()
 {
-  MutexLocker lock(*modulesLock());
+  MutexLock lock(*modulesLock());
 
   std::vector<Module*> result;
   ModuleMap* map = modules();
@@ -210,7 +207,7 @@ std::vector<Module*> ModuleRegistry::GetModules()
 
 std::vector<Module*> ModuleRegistry::GetLoadedModules()
 {
-  MutexLocker lock(*modulesLock());
+  MutexLock lock(*modulesLock());
 
   std::vector<Module*> result;
   ModuleMap::const_iterator iter = modules()->begin();

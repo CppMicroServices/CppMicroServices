@@ -95,7 +95,7 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
   coreCtx->services.Get(us_service_interface_iid<ModuleEventHook>(), eventHooks);
 
   {
-    MutexLocker lock(coreCtx->listeners.moduleListenerMapMutex);
+    MutexLock lock(coreCtx->listeners.moduleListenerMapMutex);
     moduleListeners = coreCtx->listeners.moduleListenerMap;
   }
 

@@ -22,6 +22,7 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include <cstdlib>
 
 #include "usTestManager.h"
 

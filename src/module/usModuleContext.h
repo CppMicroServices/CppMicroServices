@@ -24,7 +24,7 @@
 
 // TODO: Replace includes with forward directives!
 
-#include "usUtils_p.h"
+#include "usListenerFunctors_p.h"
 #include "usServiceInterface.h"
 #include "usServiceEvent.h"
 #include "usServiceRegistration.h"

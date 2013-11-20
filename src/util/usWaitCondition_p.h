@@ -19,9 +19,13 @@
 
 =============================================================================*/
 
-#include "usThreads_p.h"
+#ifndef USWAITCONDITION_P_H
+#define USWAITCONDITION_P_H
 
+#include "usConfig.h"
+#include "usLog_p.h"
 #include "usUtils_p.h"
+#include "usThreads_p.h"
 
 #ifdef US_PLATFORM_POSIX
 #include <sys/time.h>
@@ -30,9 +34,108 @@
 
 US_BEGIN_NAMESPACE
 
-WaitCondition::WaitCondition()
+/**
+ * \brief A thread synchronization object used to suspend execution until some
+ * condition on shared data is met.
+ *
+ * A thread calls Wait() to suspend its execution until the condition is
+ * met. Each call to Notify() from an executing thread will then cause a single
+ * waiting thread to be released.  A call to Notify() means, "signal
+ * that the condition is true."  NotifyAll() releases all threads waiting on
+ * the condition variable.
+ *
+ * The WaitCondition implementation is consistent with the standard
+ * definition and use of condition variables in pthreads and other common
+ * thread libraries.
+ *
+ * IMPORTANT: A condition variable always requires an associated mutex
+ * object. The mutex object is used to avoid a dangerous race condition when
+ * Wait() and Notify() are called simultaneously from two different
+ * threads.
+ *
+ * On systems using pthreads, this implementation abstracts the
+ * standard calls to the pthread condition variable.  On Win32
+ * systems, there is no system provided condition variable.  This
+ * class implements a condition variable using a critical section, a
+ * semphore, an event and a number of counters.  The implementation is
+ * almost an extract translation of the implementation presented by
+ * Douglas C Schmidt and Irfan Pyarali in "Strategies for Implementing
+ * POSIX Condition Variables on Win32". This article can be found at
+ * http://www.cs.wustl.edu/~schmidt/win32-cv-1.html
+ *
+ */
+template<class MutexHost>
+class WaitCondition
 {
+public:
+
+  WaitCondition();
+  ~WaitCondition();
+
+  bool Wait(unsigned long time = 0);
+
+  /** Notify that the condition is true and release one waiting thread */
+  void Notify();
+
+  /** Notify that the condition is true and release all waiting threads */
+  void NotifyAll();
+
+private:
+
+  // purposely not implemented
+  WaitCondition(const WaitCondition& other);
+  const WaitCondition& operator=(const WaitCondition&);
+
 #ifdef US_ENABLE_THREADING_SUPPORT
+
+  /** Suspend execution of this thread until the condition is signaled. The
+   *  argument is a SimpleMutex object that must be locked prior to calling
+   *  this method.  */
+  bool Wait(Mutex& mutex, unsigned long time = 0);
+
+  bool Wait(Mutex* mutex, unsigned long time = 0);
+
+  #ifdef US_PLATFORM_POSIX
+  pthread_cond_t m_WaitCondition;
+  #else
+
+  int m_NumberOfWaiters;                   // number of waiting threads
+  CRITICAL_SECTION m_NumberOfWaitersLock;  // Serialize access to
+  // m_NumberOfWaiters
+
+  HANDLE m_Semaphore;                      // Semaphore to queue threads
+  HANDLE m_WaitersAreDone;                 // Auto-reset event used by the
+                                           // broadcast/signal thread to
+                                           // wait for all the waiting
+                                           // threads to wake up and
+                                           // release the semaphore
+
+  std::size_t m_WasNotifyAll;              // Keeps track of whether we
+                                           // were broadcasting or signaling
+  #endif
+
+#endif // US_ENABLE_THREADING_SUPPORT
+};
+
+template<class MutexHost>
+class NoWaitCondition
+{
+public:
+  NoWaitCondition() {}
+private:
+  // purposely not implemented
+  NoWaitCondition(const NoWaitCondition& other);
+  const NoWaitCondition& operator=(const NoWaitCondition&);
+};
+
+// ------------------------------------------------------------------------
+// WaitCondition implementation
+// ------------------------------------------------------------------------
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+template<class MutexHost>
+WaitCondition<MutexHost>::WaitCondition()
+{
   #ifdef US_PLATFORM_POSIX
     pthread_cond_init(&m_WaitCondition, 0);
   #else
@@ -48,12 +151,11 @@ WaitCondition::WaitCondition()
                                    FALSE,       // non-signaled initially
                                    0 );         // unnamed
   #endif
-#endif
 }
 
-WaitCondition::~WaitCondition()
+template<class MutexHost>
+WaitCondition<MutexHost>::~WaitCondition()
 {
-#ifdef US_ENABLE_THREADING_SUPPORT
   #ifdef US_PLATFORM_POSIX
     pthread_cond_destroy(&m_WaitCondition);
   #else
@@ -61,12 +163,17 @@ WaitCondition::~WaitCondition()
     CloseHandle(m_WaitersAreDone);
     DeleteCriticalSection(&m_NumberOfWaitersLock);
   #endif
-#endif
 }
 
-void WaitCondition::Notify()
+template<class MutexHost>
+bool WaitCondition<MutexHost>::Wait(unsigned long time)
 {
-#ifdef US_ENABLE_THREADING_SUPPORT
+  return this->Wait(static_cast<MutexHost*>(this)->m_Mtx, time);
+}
+
+template<class MutexHost>
+void WaitCondition<MutexHost>::Notify()
+{
   #ifdef US_PLATFORM_POSIX
     pthread_cond_signal(&m_WaitCondition);
   #else
@@ -80,12 +187,11 @@ void WaitCondition::Notify()
       ReleaseSemaphore(m_Semaphore, 1, 0);
     }
   #endif
-#endif
 }
 
-void WaitCondition::NotifyAll()
+template<class MutexHost>
+void WaitCondition<MutexHost>::NotifyAll()
 {
-#ifdef US_ENABLE_THREADING_SUPPORT
   #ifdef US_PLATFORM_POSIX
     pthread_cond_broadcast(&m_WaitCondition);
   #else
@@ -122,16 +228,16 @@ void WaitCondition::NotifyAll()
       LeaveCriticalSection(&m_NumberOfWaitersLock);
     }
   #endif
-#endif
 }
 
-bool WaitCondition::Wait(MutexType* mutex, unsigned long timeoutMillis)
+template<class MutexHost>
+bool WaitCondition<MutexHost>::Wait(Mutex* mutex, unsigned long timeoutMillis)
 {
   return Wait(*mutex, timeoutMillis);
 }
 
-#ifdef US_ENABLE_THREADING_SUPPORT
-bool WaitCondition::Wait(MutexType& mutex, unsigned long timeoutMillis)
+template<class MutexHost>
+bool WaitCondition<MutexHost>::Wait(Mutex& mutex, unsigned long timeoutMillis)
 {
   #ifdef US_PLATFORM_POSIX
     struct timespec ts, * pts = 0;
@@ -244,11 +350,29 @@ bool WaitCondition::Wait(MutexType& mutex, unsigned long timeoutMillis)
     return result;
   #endif
 }
+
 #else
-bool WaitCondition::Wait(MutexType&, unsigned long)
+
+template<class MutexHost>
+WaitCondition<MutexHost>::WaitCondition() {}
+
+template<class MutexHost>
+WaitCondition<MutexHost>::~WaitCondition() {}
+
+template<class MutexHost>
+bool WaitCondition<MutexHost>::Wait(unsigned long)
 {
   return true;
 }
+
+template<class MutexHost>
+void WaitCondition<MutexHost>::Notify() {}
+
+template<class MutexHost>
+void WaitCondition<MutexHost>::NotifyAll() {}
+
 #endif
 
 US_END_NAMESPACE
+
+#endif // USWAITCONDITION_P_H

@@ -62,9 +62,6 @@ protected:
 
 public:
 
-  typedef Mutex MutexType;
-  typedef MutexLock<MutexType> MutexLocker;
-
   typedef US_UNORDERED_MAP_TYPE<Module*,int> ModuleToRefsMap;
   typedef US_UNORDERED_MAP_TYPE<Module*, InterfaceMap> ModuleToServiceMap;
   typedef US_UNORDERED_MAP_TYPE<Module*, std::list<InterfaceMap> > ModuleToServicesMap;
@@ -116,10 +113,10 @@ public:
   /**
    * Lock object for synchronous event delivery.
    */
-  MutexType eventLock;
+  Mutex eventLock;
 
   // needs to be recursive
-  MutexType propsLock;
+  Mutex propsLock;
 
   ServiceRegistrationBasePrivate(ModulePrivate* module, const InterfaceMap& service,
                                  const ServicePropertiesImpl& props);

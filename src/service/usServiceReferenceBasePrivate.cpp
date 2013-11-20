@@ -42,8 +42,6 @@
 
 US_BEGIN_NAMESPACE
 
-typedef ServiceRegistrationBasePrivate::MutexLocker MutexLocker;
-
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)
   : ref(1), registration(reg)
 {
@@ -107,7 +105,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
 {
   InterfaceMap s;
   {
-    MutexLocker lock(registration->propsLock);
+    MutexLock lock(registration->propsLock);
     if (registration->available)
     {
       ServiceFactory* factory = reinterpret_cast<ServiceFactory*>(
@@ -122,7 +120,7 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
 {
   void* s = NULL;
   {
-    MutexLocker lock(registration->propsLock);
+    MutexLock lock(registration->propsLock);
     if (registration->available)
     {
       ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
@@ -167,7 +165,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
 {
   InterfaceMap s;
   {
-    MutexLocker lock(registration->propsLock);
+    MutexLock lock(registration->propsLock);
     if (registration->available)
     {
       ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
@@ -209,7 +207,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
 
 bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const InterfaceMap& service)
 {
-  MutexLocker lock(registration->propsLock);
+  MutexLock lock(registration->propsLock);
 
   ServiceRegistrationBasePrivate::ModuleToServicesMap::iterator iter =
       registration->prototypeServiceInstances.find(module);
@@ -249,7 +247,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const In
 
 bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCounter)
 {
-  MutexLocker lock(registration->propsLock);
+  MutexLock lock(registration->propsLock);
   bool hadReferences = false;
   bool removeService = false;
 
@@ -307,7 +305,7 @@ Any ServiceReferenceBasePrivate::GetProperty(const std::string& key, bool lock) 
 {
   if (lock)
   {
-    MutexLocker lock(registration->propsLock);
+    MutexLock lock(registration->propsLock);
     return registration->properties.Value(key);
   }
   else

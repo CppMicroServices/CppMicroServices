@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include <usUtils_p.h>
+#include <usLog_p.h>
 
 #include "usTestingMacros.h"
 

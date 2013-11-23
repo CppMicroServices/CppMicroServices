@@ -128,9 +128,10 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
 
   ServiceReferenceBase r = res.GetReference(std::string());
   ServiceListeners::ServiceListenerEntries listeners;
-  module->coreCtx->listeners.GetMatchingServiceListeners(r, listeners);
+  ServiceEvent registeredEvent(ServiceEvent::REGISTERED, r);
+  module->coreCtx->listeners.GetMatchingServiceListeners(registeredEvent, listeners);
   module->coreCtx->listeners.ServiceChanged(listeners,
-                                            ServiceEvent(ServiceEvent::REGISTERED, r));
+                                            registeredEvent);
   return res;
 }
 
@@ -151,6 +152,12 @@ void ServiceRegistry::Get(const std::string& clazz,
                           std::vector<ServiceRegistrationBase>& serviceRegs) const
 {
   MutexLock lock(mutex);
+  Get_unlocked(clazz, serviceRegs);
+}
+
+void ServiceRegistry::Get_unlocked(const std::string& clazz,
+                                   std::vector<ServiceRegistrationBase>& serviceRegs) const
+{
   MapClassServices::const_iterator i = classServices.find(clazz);
   if (i != classServices.end())
   {
@@ -187,7 +194,7 @@ void ServiceRegistry::Get(const std::string& clazz, const std::string& filter,
 }
 
 void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& filter,
-                          ModulePrivate* /*module*/, std::vector<ServiceReferenceBase>& res) const
+                          ModulePrivate* module, std::vector<ServiceReferenceBase>& res) const
 {
   std::vector<ServiceRegistrationBase>::const_iterator s;
   std::vector<ServiceRegistrationBase>::const_iterator send;
@@ -258,6 +265,18 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
     if (filter.empty() || ldap.Evaluate(s->d->properties, false))
     {
       res.push_back(sri);
+    }
+  }
+
+  if (!res.empty())
+  {
+    if (module != NULL)
+    {
+      core->serviceHooks.FilterServiceReferences(module->moduleContext, clazz, filter, res);
+    }
+    else
+    {
+      core->serviceHooks.FilterServiceReferences(NULL, clazz, filter, res);
     }
   }
 }

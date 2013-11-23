@@ -27,6 +27,7 @@
 #include <usModuleEvent.h>
 
 #include <algorithm>
+#include <cstring>
 
 #if defined(US_USE_CXX11) || defined(__GNUC__)
 
@@ -76,6 +77,15 @@
     };
   US_END_NAMESPACE
 
+  US_HASH_FUNCTION_NAMESPACE_BEGIN
+  US_HASH_FUNCTION_BEGIN(US_SERVICE_LISTENER_FUNCTOR)
+    void(*targetFunc)(const US_PREPEND_NAMESPACE(ServiceEvent)&) = arg.target<void(const US_PREPEND_NAMESPACE(ServiceEvent)&)>();
+    void* targetPtr = NULL;
+    std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
+    return US_HASH_FUNCTION(void*, targetPtr);
+  US_HASH_FUNCTION_END
+  US_HASH_FUNCTION_NAMESPACE_END
+
 #else
 
   #include <usFunctor_p.h>
@@ -114,6 +124,12 @@
       { return f1 == f2; }
     };
   US_END_NAMESPACE
+
+  US_HASH_FUNCTION_NAMESPACE_BEGIN
+  US_HASH_FUNCTION_BEGIN(US_SERVICE_LISTENER_FUNCTOR)
+    return US_HASH_FUNCTION(void*, reinterpret_cast<void*>(arg.target()));
+  US_HASH_FUNCTION_END
+  US_HASH_FUNCTION_NAMESPACE_END
 
 #endif
 

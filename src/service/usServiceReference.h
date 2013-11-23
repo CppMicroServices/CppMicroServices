@@ -25,8 +25,6 @@
 #include <usServiceInterface.h>
 #include <usServiceReferenceBase.h>
 
-//US_MSVC_PUSH_DISABLE_WARNING(4396)
-
 US_BEGIN_NAMESPACE
 
 /**
@@ -140,7 +138,5 @@ public:
 typedef ServiceReference<void> ServiceReferenceU;
 
 US_END_NAMESPACE
-
-//US_MSVC_POP_WARNING
 
 #endif // USSERVICEREFERENCE_H

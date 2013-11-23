@@ -335,6 +335,7 @@ public:
 
 private:
 
+  friend class CoreModuleActivator;
   friend class ModuleRegistry;
   friend class ServiceReferencePrivate;
 

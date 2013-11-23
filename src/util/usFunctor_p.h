@@ -128,6 +128,11 @@ public:
     (*m_Impl)(a);
   }
 
+  void* target() const
+  {
+    return reinterpret_cast<void*>(m_Impl);
+  }
+
 private:
 
   typedef FunctorImpl<Arg> Impl;

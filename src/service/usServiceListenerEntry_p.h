@@ -24,14 +24,10 @@
 #define USSERVICELISTENERENTRY_H
 
 #include <usUtils_p.h>
-#include <usModuleContext.h>
+#include <usServiceListenerHook.h>
+#include <usListenerFunctors_p.h>
 
 #include "usLDAPExpr_p.h"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4396)
-#endif
 
 US_BEGIN_NAMESPACE
 
@@ -43,7 +39,7 @@ class ServiceListenerEntryData;
  * the optional service listener filter, in addition to the info
  * in ListenerEntry.
  */
-class ServiceListenerEntry
+class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
 {
 
 public:
@@ -51,21 +47,14 @@ public:
   typedef US_SERVICE_LISTENER_FUNCTOR ServiceListener;
 
   ServiceListenerEntry(const ServiceListenerEntry& other);
+  ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info);
+
   ~ServiceListenerEntry();
   ServiceListenerEntry& operator=(const ServiceListenerEntry& other);
 
-  bool operator==(const ServiceListenerEntry& other) const;
-
-  bool operator<(const ServiceListenerEntry& other) const;
-
   void SetRemoved(bool removed) const;
-  bool IsRemoved() const;
 
-  ServiceListenerEntry(Module* mc, const ServiceListener& l, void* data, const std::string& filter = "");
-
-  Module* GetModule() const;
-
-  std::string GetFilter() const;
+  ServiceListenerEntry(ModuleContext* mc, const ServiceListener& l, void* data, const std::string& filter = "");
 
   const LDAPExpr& GetLDAPExpr() const;
 
@@ -73,24 +62,17 @@ public:
 
   void CallDelegate(const ServiceEvent& event) const;
 
-private:
+  bool operator==(const ServiceListenerEntry& other) const;
 
-  US_HASH_FUNCTION_FRIEND(ServiceListenerEntry);
+  std::size_t Hash() const;
 
-  ExplicitlySharedDataPointer<ServiceListenerEntryData> d;
 };
 
 US_END_NAMESPACE
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
 US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListenerEntry))
-
-return US_HASH_FUNCTION(const US_PREPEND_NAMESPACE(ServiceListenerEntryData)*, arg.d.ConstData());
-
+  return arg.Hash();
 US_HASH_FUNCTION_END
 US_HASH_FUNCTION_NAMESPACE_END
 

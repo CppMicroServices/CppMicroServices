@@ -26,6 +26,7 @@
 
 #include "usCoreModuleContext_p.h"
 #include "usModule.h"
+#include "usModuleContext.h"
 
 
 US_BEGIN_NAMESPACE
@@ -45,19 +46,18 @@ void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListen
 {
   Lock(this);
 
-  ServiceListenerEntry sle(mc->GetModule(), listener, data, filter);
-  if (serviceSet.find(sle) != serviceSet.end())
-  {
-    RemoveServiceListener_unlocked(sle);
-  }
+  ServiceListenerEntry sle(mc, listener, data, filter);
+  RemoveServiceListener_unlocked(sle);
+
   serviceSet.insert(sle);
+  coreCtx->serviceHooks.HandleServiceListenerReg(sle);
   CheckSimple(sle);
 }
 
 void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
                                              void* data)
 {
-  ServiceListenerEntry entryToRemove(mc->GetModule(), listener, data);
+  ServiceListenerEntry entryToRemove(mc, listener, data);
 
   Lock(this);
   RemoveServiceListener_unlocked(entryToRemove);
@@ -65,16 +65,13 @@ void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceLis
 
 void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove)
 {
-  for (ServiceListenerEntries::iterator it = serviceSet.begin();
-       it != serviceSet.end(); ++it)
+  ServiceListenerEntries::const_iterator it = serviceSet.find(entryToRemove);
+  if (it != serviceSet.end())
   {
-    if (it->operator ==(entryToRemove))
-    {
-      it->SetRemoved(true);
-      RemoveFromCache(*it);
-      serviceSet.erase(it);
-      break;
-    }
+    it->SetRemoved(true);
+    coreCtx->serviceHooks.HandleServiceListenerUnreg(*it);
+    RemoveFromCache(*it);
+    serviceSet.erase(it);
   }
 }
 
@@ -118,7 +115,7 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
          it != serviceSet.end(); )
     {
 
-      if (it->GetModule() == mc->GetModule())
+      if (it->GetModuleContext() == mc)
       {
         RemoveFromCache(*it);
         serviceSet.erase(it++);
@@ -136,27 +133,46 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
   }
 }
 
-void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
+void ServiceListeners::HooksModuleStopped(ModuleContext* mc)
+{
+  Lock(this);
+  std::vector<ServiceListenerEntry> entries;
+  for (ServiceListenerEntries::iterator it = serviceSet.begin();
+       it != serviceSet.end(); )
+  {
+    if (it->GetModuleContext() == mc)
+    {
+      entries.push_back(*it);
+    }
+  }
+  coreCtx->serviceHooks.HandleServiceListenerUnreg(entries);
+}
+
+void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
                                       const ServiceEvent& evt)
 {
   ServiceListenerEntries matchBefore;
   ServiceChanged(receivers, evt, matchBefore);
 }
 
-void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
+void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
                                       const ServiceEvent& evt,
                                       ServiceListenerEntries& matchBefore)
 {
   int n = 0;
 
-  for (ServiceListenerEntries::const_iterator l = receivers.begin();
-       l != receivers.end(); ++l)
+  if (!matchBefore.empty())
   {
-    if (!matchBefore.empty())
+    for (ServiceListenerEntries::const_iterator l = receivers.begin();
+         l != receivers.end(); ++l)
     {
       matchBefore.erase(*l);
     }
+  }
 
+  for (ServiceListenerEntries::const_iterator l = receivers.begin();
+       l != receivers.end(); ++l)
+  {
     if (!l->IsRemoved())
     {
       try
@@ -178,20 +194,23 @@ void ServiceListeners::ServiceChanged(const ServiceListenerEntries& receivers,
   //US_DEBUG << "Notified " << n << " listeners";
 }
 
-void ServiceListeners::GetMatchingServiceListeners(const ServiceReferenceBase& sr, ServiceListenerEntries& set,
+void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set,
                                                    bool lockProps)
 {
   Lock(this);
 
+  // Filter the original set of listeners
+  ServiceListenerEntries receivers = serviceSet;
+  coreCtx->serviceHooks.FilterServiceEventReceivers(evt, receivers);
+
   // Check complicated or empty listener filters
-  int n = 0;
   for (std::list<ServiceListenerEntry>::const_iterator sse = complicatedListeners.begin();
        sse != complicatedListeners.end(); ++sse)
   {
-    ++n;
+    if (receivers.count(*sse) == 0) continue;
     const LDAPExpr& ldapExpr = sse->GetLDAPExpr();
     if (ldapExpr.IsNull() ||
-        ldapExpr.Evaluate(sr.d->GetProperties(), false))
+        ldapExpr.Evaluate(evt.GetServiceReference().d->GetProperties(), false))
     {
       set.insert(*sse);
     }
@@ -202,17 +221,30 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceReferenceBase& s
 
   // Check the cache
   const std::vector<std::string> c(any_cast<std::vector<std::string> >
-                                 (sr.d->GetProperty(ServiceConstants::OBJECTCLASS(), lockProps)));
+                                 (evt.GetServiceReference().d->GetProperty(ServiceConstants::OBJECTCLASS(), lockProps)));
   for (std::vector<std::string>::const_iterator objClass = c.begin();
        objClass != c.end(); ++objClass)
   {
-    AddToSet(set, OBJECTCLASS_IX, *objClass);
+    AddToSet(set, receivers, OBJECTCLASS_IX, *objClass);
   }
 
-  long service_id = any_cast<long>(sr.d->GetProperty(ServiceConstants::SERVICE_ID(), lockProps));
+  long service_id = any_cast<long>(evt.GetServiceReference().d->GetProperty(ServiceConstants::SERVICE_ID(), lockProps));
   std::stringstream ss;
   ss << service_id;
-  AddToSet(set, SERVICE_ID_IX, ss.str());
+  AddToSet(set, receivers, SERVICE_ID_IX, ss.str());
+}
+
+std::vector<ServiceListenerHook::ListenerInfo> ServiceListeners::GetListenerInfoCollection() const
+{
+  Lock(this);
+  std::vector<ServiceListenerHook::ListenerInfo> result;
+  result.reserve(serviceSet.size());
+  for (ServiceListenerEntries::const_iterator iter = serviceSet.begin(),
+       iterEnd = serviceSet.end(); iter != iterEnd; ++iter)
+  {
+    result.push_back(*iter);
+  }
+  return result;
 }
 
 void ServiceListeners::RemoveFromCache(const ServiceListenerEntry& sle)
@@ -271,6 +303,7 @@ void ServiceListeners::RemoveFromCache(const ServiceListenerEntry& sle)
  }
 
 void ServiceListeners::AddToSet(ServiceListenerEntries& set,
+                                const ServiceListenerEntries& receivers,
                                 int cache_ix, const std::string& val)
 {
   std::list<ServiceListenerEntry>& l = cache[cache_ix][val];
@@ -281,7 +314,10 @@ void ServiceListeners::AddToSet(ServiceListenerEntries& set,
     for (std::list<ServiceListenerEntry>::const_iterator entry = l.begin();
          entry != l.end(); ++entry)
     {
-      set.insert(*entry);
+      if (receivers.count(*entry))
+      {
+        set.insert(*entry);
+      }
     }
   }
   else

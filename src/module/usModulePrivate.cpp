@@ -24,6 +24,7 @@
 #include "usModulePrivate.h"
 
 #include "usModule.h"
+#include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usModuleUtils_p.h"
 #include "usModuleResource.h"

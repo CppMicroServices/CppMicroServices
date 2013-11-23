@@ -60,6 +60,7 @@ void TestManager::TestPassed()
 US_END_NAMESPACE
 
 #ifndef US_BUILD_SHARED_LIBS
+US_IMPORT_MODULE(CppMicroServices)
 US_IMPORT_MODULE_RESOURCES(CppMicroServices)
 US_IMPORT_MODULE(TestModuleA)
 US_IMPORT_MODULE(TestModuleA2)

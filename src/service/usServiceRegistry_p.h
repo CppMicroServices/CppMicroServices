@@ -171,6 +171,10 @@ public:
 
 private:
 
+  friend class ServiceHooks;
+
+  void Get_unlocked(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+
   void Get_unlocked(const std::string& clazz, const std::string& filter,
                     ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
 

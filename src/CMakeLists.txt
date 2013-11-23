@@ -15,8 +15,12 @@ set(_srcs
   service/usLDAPFilter.cpp
   service/usServiceException.cpp
   service/usServiceEvent.cpp
+  service/usServiceEventListenerHook.cpp
+  service/usServiceFindHook.cpp
+  service/usServiceHooks.cpp
   service/usServiceListenerEntry.cpp
   service/usServiceListenerEntry_p.h
+  service/usServiceListenerHook.cpp
   service/usServiceListeners.cpp
   service/usServiceListeners_p.h
   service/usServiceObjects.cpp
@@ -29,6 +33,7 @@ set(_srcs
   service/usServiceRegistry.cpp
   service/usServiceRegistry_p.h
 
+  module/usCoreModuleActivator.cpp
   module/usCoreModuleContext_p.h
   module/usCoreModuleContext.cpp
   module/usModuleContext.cpp
@@ -64,6 +69,8 @@ set(_private_headers
   util/stdint_p.h
   util/stdint_vc_p.h
 
+  service/usServiceHooks_p.h
+  service/usServiceListenerHook_p.h
   service/usServicePropertiesImpl_p.h
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
@@ -85,15 +92,19 @@ set(_public_headers
   util/usLDAPProp.h
   util/usSharedData.h
   util/usSharedLibrary.h
+  util/usShrinkableMap.h
   util/usShrinkableVector.h
   util/usUncompressResourceData.h
 
   service/usLDAPFilter.h
   service/usPrototypeServiceFactory.h
   service/usServiceEvent.h
+  service/usServiceEventListenerHook.h
   service/usServiceException.h
   service/usServiceFactory.h
+  service/usServiceFindHook.h
   service/usServiceInterface.h
+  service/usServiceListenerHook.h
   service/usServiceObjects.h
   service/usServiceProperties.h
   service/usServiceReference.h

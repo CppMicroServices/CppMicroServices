@@ -19,58 +19,12 @@
 
 =============================================================================*/
 
-
-#ifndef USCOREMODULECONTEXT_H
-#define USCOREMODULECONTEXT_H
-
-#include "usServiceListeners_p.h"
-#include "usServiceRegistry_p.h"
-#include "usModuleHooks_p.h"
-#include "usServiceHooks_p.h"
+#include "usServiceEventListenerHook.h"
 
 US_BEGIN_NAMESPACE
 
-/**
- * This class is not part of the public API.
- */
-class CoreModuleContext
+ServiceEventListenerHook::~ServiceEventListenerHook()
 {
-public:
-
-  /**
-   * All listeners in this framework.
-   */
-  ServiceListeners listeners;
-
-  /**
-   * All registered services in this framework.
-   */
-  ServiceRegistry services;
-
-  /**
-   * All service hooks.
-   */
-  ServiceHooks serviceHooks;
-
-  /**
-   * All module hooks.
-   */
-  ModuleHooks moduleHooks;
-
-  /**
-   * Contruct a core context
-   *
-   */
-  CoreModuleContext();
-
-  ~CoreModuleContext();
-
-  void Init();
-
-  void Uninit();
-
-};
+}
 
 US_END_NAMESPACE
-
-#endif // USCOREMODULECONTEXT_H

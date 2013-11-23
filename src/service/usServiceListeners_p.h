@@ -69,8 +69,6 @@ private:
 
   CoreModuleContext* coreCtx;
 
-  //MutexType mutex;
-
 public:
 
   ServiceListeners(CoreModuleContext* coreCtx);
@@ -130,24 +128,33 @@ public:
   void RemoveAllListeners(ModuleContext* mc);
 
   /**
+   * Notify hooks that a module is about to be stopped
+   *
+   * @param mc Module context which listeners are about to be removed.
+   */
+  void HooksModuleStopped(ModuleContext* mc);
+
+  /**
    * Receive notification that a service has had a change occur in its lifecycle.
    *
    * @see org.osgi.framework.ServiceListener#serviceChanged
    */
-  void ServiceChanged(const ServiceListenerEntries& receivers,
+  void ServiceChanged(ServiceListenerEntries& receivers,
                       const ServiceEvent& evt,
                       ServiceListenerEntries& matchBefore);
 
-  void ServiceChanged(const ServiceListenerEntries& receivers,
+  void ServiceChanged(ServiceListenerEntries& receivers,
                       const ServiceEvent& evt);
 
   /**
    *
    *
    */
-  void GetMatchingServiceListeners(const ServiceReferenceBase& sr, ServiceListenerEntries& listeners,
+  void GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& listeners,
                                    bool lockProps = true);
 
+
+  std::vector<ServiceListenerHook::ListenerInfo> GetListenerInfoCollection() const;
 
 private:
 
@@ -165,7 +172,7 @@ private:
    */
   void CheckSimple(const ServiceListenerEntry& sle);
 
-  void AddToSet(ServiceListenerEntries& set, int cache_ix, const std::string& val);
+  void AddToSet(ServiceListenerEntries& set, const ServiceListenerEntries& receivers, int cache_ix, const std::string& val);
 
 };
 

@@ -195,24 +195,25 @@ US_END_NAMESPACE
 
 #elif _MSC_VER <= 1500 // Visual Studio 2008 and lower
 
-  #include <hash_map>
-  #include <hash_set>
+  #include <unordered_map>
+  #include <unordered_set>
 
   #define US_HASH_FUNCTION_BEGIN(type) \
   template<> \
-  inline std::size_t hash_value<type>(const type& arg) {
+  class hash<type> : std::unary_function<type, std::size_t> { \
+  public: std::size_t operator()(const type& arg) const {
 
-  #define US_HASH_FUNCTION_END }
+  #define US_HASH_FUNCTION_END } };
 
-  #define US_HASH_FUNCTION(type, arg) hash_value(arg)
-  #define US_HASH_FUNCTION_FRIEND(type) friend std::size_t stdext::hash_value<type>(const type&)
+  #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
+  #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::tr1::hash<type>
 
-  #define US_UNORDERED_MAP_TYPE ::stdext::hash_map
-  #define US_UNORDERED_SET_TYPE ::stdext::hash_set
+  #define US_UNORDERED_MAP_TYPE ::std::tr1::unordered_map
+  #define US_UNORDERED_SET_TYPE ::std::tr1::unordered_set
 
-  #define US_HASH_FUNCTION_NAMESPACE ::stdext
-  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace stdext {
-  #define US_HASH_FUNCTION_NAMESPACE_END }
+  #define US_HASH_FUNCTION_NAMESPACE ::std::tr1
+  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std { namespace tr1 {
+  #define US_HASH_FUNCTION_NAMESPACE_END }}
 
 #endif
 

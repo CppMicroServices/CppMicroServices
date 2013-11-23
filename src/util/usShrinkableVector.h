@@ -31,6 +31,9 @@ US_BEGIN_NAMESPACE
 template<class E>
 class ShrinkableVector
 {
+private:
+  static std::vector<E> emptyVector;
+
 public:
 
   typedef std::vector<E> container_type;
@@ -39,6 +42,11 @@ public:
   typedef typename container_type::size_type size_type;
   typedef typename container_type::reference reference;
   typedef typename container_type::const_reference const_reference;
+
+  ShrinkableVector()
+  : container(emptyVector)
+  {
+  }
 
   iterator begin()
   {
@@ -141,6 +149,9 @@ private:
 
   container_type& container;
 };
+
+template<class E>
+std::vector<E> ShrinkableVector<E>::emptyVector;
 
 US_END_NAMESPACE
 

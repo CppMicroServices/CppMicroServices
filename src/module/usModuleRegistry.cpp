@@ -157,8 +157,6 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   }
 
   curr->Stop();
-
-  curr->Uninit();
 }
 
 Module* ModuleRegistry::GetModule(long id)

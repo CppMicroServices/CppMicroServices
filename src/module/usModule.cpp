@@ -92,12 +92,16 @@ void Module::Init(CoreModuleContext* coreCtx,
 
 void Module::Uninit()
 {
-  if (d->moduleContext)
+  if (d->moduleContext != NULL)
   {
+    //d->coreCtx->listeners.HooksModuleStopped(d->moduleContext);
+    d->RemoveModuleResources();
     delete d->moduleContext;
     d->moduleContext = 0;
+    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
+
+    d->moduleActivator = 0;
   }
-  d->moduleActivator = 0;
 }
 
 bool Module::IsLoaded() const
@@ -185,22 +189,14 @@ void Module::Stop()
 
     try
     {
-      d->RemoveModuleResources();
+      this->Uninit();
     }
     catch (...) {}
-
-    delete d->moduleContext;
-    d->moduleContext = 0;
-
-    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
 
     throw;
   }
 
-  d->RemoveModuleResources();
-  delete d->moduleContext;
-  d->moduleContext = 0;
-  d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
+  this->Uninit();
 }
 
 ModuleContext* Module::GetModuleContext() const

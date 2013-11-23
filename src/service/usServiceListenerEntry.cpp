@@ -21,16 +21,21 @@
 
 
 #include "usServiceListenerEntry_p.h"
+#include "usServiceListenerHook_p.h"
+
+#include <cassert>
 
 US_BEGIN_NAMESPACE
 
-class ServiceListenerEntryData : public SharedData
+class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
 {
 public:
 
-  ServiceListenerEntryData(Module* mc, const ServiceListenerEntry::ServiceListener& l,
+  ServiceListenerEntryData(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& l,
                            void* data, const std::string& filter)
-    : mc(mc), listener(l), data(data), bRemoved(false), ldap()
+    : ServiceListenerHook::ListenerInfoData(mc, l, data, filter)
+    , ldap()
+    , hashValue(0)
   {
     if (!filter.empty())
     {
@@ -40,13 +45,8 @@ public:
 
   ~ServiceListenerEntryData()
   {
-
   }
 
-  Module* const mc;
-  ServiceListenerEntry::ServiceListener listener;
-  void* data;
-  bool bRemoved;
   LDAPExpr ldap;
 
   /**
@@ -70,6 +70,8 @@ public:
    */
   LDAPExpr::LocalCache local_cache;
 
+  std::size_t hashValue;
+
 private:
 
   // purposely not implemented
@@ -78,14 +80,18 @@ private:
 };
 
 ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
-  : d(other.d)
+  : ServiceListenerHook::ListenerInfo(other)
 {
+}
 
+ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info)
+  : ServiceListenerHook::ListenerInfo(info)
+{
+  assert(info.d);
 }
 
 ServiceListenerEntry::~ServiceListenerEntry()
 {
-
 }
 
 ServiceListenerEntry& ServiceListenerEntry::operator=(const ServiceListenerEntry& other)
@@ -94,57 +100,49 @@ ServiceListenerEntry& ServiceListenerEntry::operator=(const ServiceListenerEntry
   return *this;
 }
 
-bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
-{
-  return ((d->mc == 0 || other.d->mc == 0) || d->mc == other.d->mc) &&
-      (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
-}
-
-bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const
-{
-  return (d->mc == other.d->mc) ? (d->data < other.d->data) : (d->mc < other.d->mc);
-}
-
 void ServiceListenerEntry::SetRemoved(bool removed) const
 {
   d->bRemoved = removed;
 }
 
-bool ServiceListenerEntry::IsRemoved() const
-{
-  return d->bRemoved;
-}
-
-ServiceListenerEntry::ServiceListenerEntry(Module* mc, const ServiceListener& l,
+ServiceListenerEntry::ServiceListenerEntry(ModuleContext* mc, const ServiceListener& l,
                                            void* data, const std::string& filter)
-  : d(new ServiceListenerEntryData(mc, l, data, filter))
+  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(mc, l, data, filter))
 {
-
-}
-
-Module* ServiceListenerEntry::GetModule() const
-{
-  return d->mc;
-}
-
-std::string ServiceListenerEntry::GetFilter() const
-{
-  return d->ldap.IsNull() ? std::string() : d->ldap.ToString();
 }
 
 const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {
-  return d->ldap;
+  return static_cast<ServiceListenerEntryData*>(d.Data())->ldap;
 }
 
 LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const
 {
-  return d->local_cache;
+  return static_cast<ServiceListenerEntryData*>(d.Data())->local_cache;
 }
 
 void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 {
   d->listener(event);
+}
+
+bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
+{
+  return ((d->mc == NULL || other.d->mc == NULL) || d->mc == other.d->mc) &&
+      (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
+}
+
+std::size_t ServiceListenerEntry::Hash() const
+{
+  using namespace US_HASH_FUNCTION_NAMESPACE;
+
+  if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0)
+  {
+    static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
+        ((US_HASH_FUNCTION(ModuleContext*, d->mc) ^ (US_HASH_FUNCTION(void*, d->data) << 1)) >> 1) ^
+        (US_HASH_FUNCTION(US_SERVICE_LISTENER_FUNCTOR, d->listener) << 1);
+  }
+  return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
 }
 
 US_END_NAMESPACE

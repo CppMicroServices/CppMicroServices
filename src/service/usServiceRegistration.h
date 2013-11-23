@@ -72,15 +72,15 @@ public:
    *         unregistered or if it is invalid.
    * @return <code>ServiceReference</code> object.
    */
-  ServiceReference<I1> GetReference(InterfaceT<I1>) const
+  ServiceReference<I1> GetReference(InterfaceType<I1>) const
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>());
   }
-  ServiceReference<I2> GetReference(InterfaceT<I2>) const
+  ServiceReference<I2> GetReference(InterfaceType<I2>) const
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>());
   }
-  ServiceReference<I3> GetReference(InterfaceT<I3>) const
+  ServiceReference<I3> GetReference(InterfaceType<I3>) const
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I3>());
   }
@@ -111,12 +111,12 @@ public:
   {
   }
 
-  ServiceReference<I1> GetReference(InterfaceT<I1>) const
+  ServiceReference<I1> GetReference(InterfaceType<I1>) const
   {
     return ServiceReference<I1>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>()));
   }
 
-  ServiceReference<I2> GetReference(InterfaceT<I2>) const
+  ServiceReference<I2> GetReference(InterfaceType<I2>) const
   {
     return ServiceReference<I2>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>()));
   }
@@ -147,10 +147,10 @@ public:
 
   ServiceReference<I1> GetReference() const
   {
-    return this->GetReference(InterfaceT<I1>());
+    return this->GetReference(InterfaceType<I1>());
   }
 
-  ServiceReference<I1> GetReference(InterfaceT<I1>) const
+  ServiceReference<I1> GetReference(InterfaceType<I1>) const
   {
     return ServiceReference<I1>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>()));
   }

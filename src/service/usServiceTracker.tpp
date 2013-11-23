@@ -44,7 +44,7 @@ ServiceTracker<S,TTT>::~ServiceTracker()
 
 template<class S, class TTT>
 ServiceTracker<S,TTT>::ServiceTracker(ModuleContext* context,
-                                      const ServiceReferenceT& reference,
+                                      const ServiceReferenceType& reference,
                                       _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, reference, customizer))
 {
@@ -94,7 +94,7 @@ void ServiceTracker<S,TTT>::Open()
       typename _TrackedService::Lock l(*t);
       try {
         d->context->AddServiceListener(t, &_TrackedService::ServiceChanged, d->listenerFilter);
-        std::vector<ServiceReferenceT> references;
+        std::vector<ServiceReferenceType> references;
         if (!d->trackClass.empty())
         {
           references = d->GetInitialReferences(d->trackClass, std::string());
@@ -130,7 +130,7 @@ template<class S, class TTT>
 void ServiceTracker<S,TTT>::Close()
 {
   _TrackedService* outgoing;
-  std::vector<ServiceReferenceT> references;
+  std::vector<ServiceReferenceType> references;
   {
     typename _ServiceTrackerPrivate::Lock l(d);
     outgoing = d->trackedService;
@@ -156,7 +156,7 @@ void ServiceTracker<S,TTT>::Close()
     typename _TrackedService::Lock l(outgoing);
     outgoing->NotifyAll(); /* wake up any waiters */
   }
-  for(typename std::vector<ServiceReferenceT>::const_iterator ref = references.begin();
+  for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
       ref != references.end(); ++ref)
   {
     outgoing->Untrack(*ref, ServiceEvent());
@@ -201,10 +201,10 @@ ServiceTracker<S,TTT>::WaitForService(unsigned long timeoutMillis)
 }
 
 template<class S, class TTT>
-std::vector<typename ServiceTracker<S,TTT>::ServiceReferenceT>
+std::vector<typename ServiceTracker<S,TTT>::ServiceReferenceType>
 ServiceTracker<S,TTT>::GetServiceReferences() const
 {
-  std::vector<ServiceReferenceT> refs;
+  std::vector<ServiceReferenceType> refs;
   _TrackedService* t = d->Tracked();
   if (t == 0)
   { /* if ServiceTracker is not open */
@@ -218,10 +218,10 @@ ServiceTracker<S,TTT>::GetServiceReferences() const
 }
 
 template<class S, class TTT>
-typename ServiceTracker<S,TTT>::ServiceReferenceT
+typename ServiceTracker<S,TTT>::ServiceReferenceType
 ServiceTracker<S,TTT>::GetServiceReference() const
 {
-  ServiceReferenceT reference;
+  ServiceReferenceType reference;
   {
     typename _ServiceTrackerPrivate::Lock l(d);
     reference = d->cachedReference;
@@ -233,19 +233,19 @@ ServiceTracker<S,TTT>::GetServiceReference() const
     return reference;
   }
   US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
-  std::vector<ServiceReferenceT> references = GetServiceReferences();
+  std::vector<ServiceReferenceType> references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0)
   { /* if no service is being tracked */
     throw ServiceException("No service is being tracked");
   }
-  typename std::vector<ServiceReferenceT>::const_iterator selectedRef = references.begin();
+  typename std::vector<ServiceReferenceType>::const_iterator selectedRef = references.begin();
   if (length > 1)
   { /* if more than one service, select highest ranking */
     std::vector<int> rankings(length);
     int count = 0;
     int maxRanking = std::numeric_limits<int>::min();
-    typename std::vector<ServiceReferenceT>::const_iterator refIter = references.begin();
+    typename std::vector<ServiceReferenceType>::const_iterator refIter = references.begin();
     for (std::size_t i = 0; i < length; i++)
     {
       Any rankingAny = refIter->GetProperty(ServiceConstants::SERVICE_RANKING());
@@ -305,7 +305,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
 
 template<class S, class TTT>
 typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::GetService(const ServiceReferenceT& reference) const
+ServiceTracker<S,TTT>::GetService(const ServiceReferenceType& reference) const
 {
   _TrackedService* t = d->Tracked();
   if (t == 0)
@@ -329,9 +329,9 @@ std::vector<typename ServiceTracker<S,TTT>::T> ServiceTracker<S,TTT>::GetService
   }
   {
     typename _TrackedService::Lock l(t);
-    std::vector<ServiceReferenceT> references;
+    std::vector<ServiceReferenceType> references;
     d->GetServiceReferences_unlocked(references, t);
-    for(typename std::vector<ServiceReferenceT>::const_iterator ref = references.begin();
+    for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
         ref != references.end(); ++ref)
     {
       services.push_back(t->GetCustomizedObject(*ref));
@@ -358,7 +358,7 @@ ServiceTracker<S,TTT>::GetService() const
 
   try
   {
-    ServiceReferenceT reference = GetServiceReference();
+    ServiceReferenceType reference = GetServiceReference();
     if (reference.GetModule() == 0)
     {
       return TTT::DefaultValue();
@@ -375,7 +375,7 @@ ServiceTracker<S,TTT>::GetService() const
 }
 
 template<class S, class TTT>
-void ServiceTracker<S,TTT>::Remove(const ServiceReferenceT& reference)
+void ServiceTracker<S,TTT>::Remove(const ServiceReferenceType& reference)
 {
   _TrackedService* t = d->Tracked();
   if (t == 0)
@@ -443,19 +443,19 @@ bool ServiceTracker<S,TTT>::IsEmpty() const
 
 template<class S, class TTT>
 typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::AddingService(const ServiceReferenceT& reference)
+ServiceTracker<S,TTT>::AddingService(const ServiceReferenceType& reference)
 {
   return TTT::ConvertToTrackedType(d->context->GetService(reference));
 }
 
 template<class S, class TTT>
-void ServiceTracker<S,TTT>::ModifiedService(const ServiceReferenceT& /*reference*/, T /*service*/)
+void ServiceTracker<S,TTT>::ModifiedService(const ServiceReferenceType& /*reference*/, T /*service*/)
 {
   /* do nothing */
 }
 
 template<class S, class TTT>
-void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceT& reference, T /*service*/)
+void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceType& reference, T /*service*/)
 {
   d->context->UngetService(reference);
 }

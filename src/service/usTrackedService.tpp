@@ -41,7 +41,7 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent event)
     return;
   }
 
-  ServiceReference<S> reference = event.GetServiceReference(InterfaceT<S>());
+  ServiceReference<S> reference = event.GetServiceReference(InterfaceType<S>());
   US_DEBUG(serviceTracker->d->DEBUG_OUTPUT) << "TrackedService::ServiceChanged["
                                             << event.GetType() << "]: " << reference;
   if (!reference)

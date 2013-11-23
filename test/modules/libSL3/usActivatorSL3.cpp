@@ -62,7 +62,7 @@ public:
     return props;
   }
 
-  FooService* AddingService(const ServiceReferenceT& reference)
+  FooService* AddingService(const ServiceReferenceType& reference)
   {
     props["serviceAdded"] = true;
     US_INFO << "SL3: Adding reference =" << reference;
@@ -72,12 +72,12 @@ public:
     return fooService;
   }
 
-  void ModifiedService(const ServiceReferenceT& /*reference*/, FooService* /*service*/)
+  void ModifiedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
   {
 
   }
 
-  void RemovedService(const ServiceReferenceT& reference, FooService* /*service*/)
+  void RemovedService(const ServiceReferenceType& reference, FooService* /*service*/)
   {
     props["serviceRemoved"] = true;
     US_INFO << "SL3: Removing reference =" << reference;

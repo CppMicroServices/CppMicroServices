@@ -116,7 +116,7 @@ class ServiceFactory;
  * method overload resolutions.
  */
 template<class Interface>
-struct InterfaceT {};
+struct InterfaceType {};
 
 /**
  * @ingroup MicroServices

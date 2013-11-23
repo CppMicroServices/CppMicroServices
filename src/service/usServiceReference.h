@@ -64,7 +64,7 @@ class ServiceReference : public ServiceReferenceBase {
 
 public:
 
-  typedef S ServiceT;
+  typedef S ServiceType;
 
   /**
    * Creates an invalid ServiceReference object. You can use

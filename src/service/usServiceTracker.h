@@ -236,11 +236,11 @@ class ServiceTracker : protected ServiceTrackerCustomizer<S,typename TTT::Tracke
 public:
 
   /// The type of the service being tracked
-  typedef S ServiceT;
+  typedef S ServiceType;
   /// The type of the tracked object
   typedef typename TTT::TrackedType T;
 
-  typedef ServiceReference<S> ServiceReferenceT;
+  typedef ServiceReference<S> ServiceReferenceType;
 
   typedef std::map<ServiceReference<S>,T> TrackingMap;
 
@@ -267,7 +267,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context,
-                 const ServiceReferenceT& reference,
+                 const ServiceReferenceType& reference,
                  ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
@@ -384,7 +384,7 @@ public:
    *
    * @return List of <code>ServiceReference</code>s.
    */
-  virtual std::vector<ServiceReferenceT> GetServiceReferences() const;
+  virtual std::vector<ServiceReferenceType> GetServiceReferences() const;
 
   /**
    * Returns a <code>ServiceReference</code> for one of the services being
@@ -405,7 +405,7 @@ public:
    * @return A <code>ServiceReference</code> for a tracked service.
    * @throws ServiceException if no services are being tracked.
    */
-  virtual ServiceReferenceT GetServiceReference() const;
+  virtual ServiceReferenceType GetServiceReference() const;
 
   /**
    * Returns the service object for the specified
@@ -417,7 +417,7 @@ public:
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
-  virtual T GetService(const ServiceReferenceT& reference) const;
+  virtual T GetService(const ServiceReferenceType& reference) const;
 
   /**
    * Return a list of service objects for all services being tracked by this
@@ -457,7 +457,7 @@ public:
    *
    * @param reference The reference to the service to be removed.
    */
-  virtual void Remove(const ServiceReferenceT& reference);
+  virtual void Remove(const ServiceReferenceType& reference);
 
   /**
    * Return the number of services being tracked by this
@@ -529,7 +529,7 @@ protected:
    * This method can be overridden in a subclass to customize the service
    * object to be tracked for the service being added. In that case, take care
    * not to rely on the default implementation of
-   * \link RemovedService(const ServiceReferenceT&, T service) removedService\endlink
+   * \link RemovedService(const ServiceReferenceType&, T service) removedService\endlink
    * to unget the service.
    *
    * @param reference The reference to the service being added to this
@@ -538,7 +538,7 @@ protected:
    *         <code>ServiceTracker</code>.
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  T AddingService(const ServiceReferenceT& reference);
+  T AddingService(const ServiceReferenceType& reference);
 
   /**
    * Default implementation of the
@@ -555,7 +555,7 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
    */
-  void ModifiedService(const ServiceReferenceT& reference, T service);
+  void ModifiedService(const ServiceReferenceType& reference, T service);
 
   /**
    * Default implementation of the
@@ -571,14 +571,14 @@ protected:
    * was created, passing the specified <code>ServiceReference</code>.
    * <p>
    * This method can be overridden in a subclass. If the default
-   * implementation of \link AddingService(const ServiceReferenceT&) AddingService\endlink
+   * implementation of \link AddingService(const ServiceReferenceType&) AddingService\endlink
    * method was used, this method must unget the service.
    *
    * @param reference The reference to removed service.
    * @param service The service object for the removed service.
-   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceT&, T)
+   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, T)
    */
-  void RemovedService(const ServiceReferenceT& reference, T service);
+  void RemovedService(const ServiceReferenceType& reference, T service);
 
 private:
 

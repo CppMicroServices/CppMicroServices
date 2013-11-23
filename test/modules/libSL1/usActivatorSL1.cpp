@@ -71,7 +71,7 @@ public:
     return props;
   }
 
-  FooService* AddingService(const ServiceReferenceT& reference)
+  FooService* AddingService(const ServiceReferenceType& reference)
   {
     props["serviceAdded"] = true;
 
@@ -80,10 +80,10 @@ public:
     return fooService;
   }
 
-  void ModifiedService(const ServiceReferenceT& /*reference*/, FooService* /*service*/)
+  void ModifiedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
   {}
 
-  void RemovedService(const ServiceReferenceT& /*reference*/, FooService* /*service*/)
+  void RemovedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
   {
     props["serviceRemoved"] = true;
   }

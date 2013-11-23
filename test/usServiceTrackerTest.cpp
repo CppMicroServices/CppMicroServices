@@ -75,19 +75,19 @@ public:
     : m_context(context)
   {}
 
-  virtual MyInterfaceOne* AddingService(const ServiceReferenceT& reference)
+  virtual MyInterfaceOne* AddingService(const ServiceReferenceType& reference)
   {
     US_TEST_CONDITION_REQUIRED(reference, "AddingService() valid reference")
     return m_context->GetService(reference);
   }
 
-  virtual void ModifiedService(const ServiceReferenceT& reference, MyInterfaceOne* service)
+  virtual void ModifiedService(const ServiceReferenceType& reference, MyInterfaceOne* service)
   {
     US_TEST_CONDITION(reference, "ModifiedService() valid reference")
     US_TEST_CONDITION(service, "ModifiedService() valid service")
   }
 
-  virtual void RemovedService(const ServiceReferenceT& reference, MyInterfaceOne* service)
+  virtual void RemovedService(const ServiceReferenceType& reference, MyInterfaceOne* service)
   {
     US_TEST_CONDITION(reference, "RemovedService() valid reference")
     US_TEST_CONDITION(service, "RemovedService() valid service")

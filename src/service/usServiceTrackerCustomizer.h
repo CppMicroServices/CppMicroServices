@@ -62,8 +62,9 @@ US_BEGIN_NAMESPACE
 template<class S, class T = S*>
 struct ServiceTrackerCustomizer {
 
-  typedef S ServiceT;
-  typedef ServiceReference<ServiceT> ServiceReferenceT;
+  typedef S ServiceType;
+  typedef T TrackedType;
+  typedef ServiceReference<ServiceType> ServiceReferenceType;
 
   virtual ~ServiceTrackerCustomizer() {}
 
@@ -85,7 +86,7 @@ struct ServiceTrackerCustomizer {
    *         service or <code>0</code> if the specified referenced service
    *         should not be tracked.
    */
-  virtual T AddingService(const ServiceReferenceT& reference) = 0;
+  virtual TrackedType AddingService(const ServiceReferenceType& reference) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been modified.
@@ -97,7 +98,7 @@ struct ServiceTrackerCustomizer {
    * @param reference The reference to the service that has been modified.
    * @param service The service object for the specified referenced service.
    */
-  virtual void ModifiedService(const ServiceReferenceT& reference, T service) = 0;
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been removed.
@@ -109,7 +110,7 @@ struct ServiceTrackerCustomizer {
    * @param reference The reference to the service that has been removed.
    * @param service The service object for the specified referenced service.
    */
-  virtual void RemovedService(const ServiceReferenceT& reference, T service) = 0;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) = 0;
 };
 
 US_END_NAMESPACE

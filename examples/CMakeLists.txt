@@ -91,24 +91,51 @@ if(US_BUILD_TESTING)
   set_tests_properties(usExamplesCreateDirTest PROPERTIES
                        DEPENDS usExamplesCleanTest)
 
-  add_test(NAME usExamplesConfigureTest
-           WORKING_DIRECTORY ${_examples_binary_dir}
-           COMMAND ${CMAKE_COMMAND}
-                   -G ${CMAKE_GENERATOR}
-                   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-                   "-DCppMicroServices_DIR:PATH=${_install_dir}/${CONFIG_CMAKE_DIR}"
-                   "${CMAKE_CURRENT_LIST_DIR}")
-  set_tests_properties(usExamplesConfigureTest PROPERTIES
-                       DEPENDS "usInstallTest;usExamplesCreateDirTest")
-
-  add_test(NAME usExamplesBuildTest
-           WORKING_DIRECTORY ${_examples_binary_dir}
-           COMMAND ${CMAKE_COMMAND} --build .)
-  set_tests_properties(usExamplesBuildTest PROPERTIES
-                       DEPENDS usExamplesConfigureTest)
-
   list(APPEND _example_tests usInstallCleanTest usInstallTest usExamplesCleanTest
-       usExamplesCreateDirTest usExamplesConfigureTest usExamplesBuildTest)
+                             usExamplesCreateDirTest)
+
+  if(CMAKE_CONFIGURATION_TYPES)
+    foreach(config ${CMAKE_CONFIGURATION_TYPES})
+      add_test(NAME usExamplesConfigureTest-${config} CONFIGURATIONS ${config}
+               WORKING_DIRECTORY ${_examples_binary_dir}
+               COMMAND ${CMAKE_COMMAND}
+                       -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                       -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                       -G ${CMAKE_GENERATOR}
+                       "-DCppMicroServices_DIR:PATH=${_install_dir}/${CONFIG_CMAKE_DIR}"
+                       "${CMAKE_CURRENT_LIST_DIR}")
+      set_tests_properties(usExamplesConfigureTest-${config} PROPERTIES
+                           DEPENDS "usInstallTest;usExamplesCreateDirTest")
+
+      add_test(NAME usExamplesBuildTest-${config} CONFIGURATIONS ${config}
+               WORKING_DIRECTORY ${_examples_binary_dir}
+               COMMAND ${CMAKE_COMMAND} --build . --config ${config})
+      set_tests_properties(usExamplesBuildTest-${config} PROPERTIES
+                           DEPENDS usExamplesConfigureTest-${config})
+
+      list(APPEND _example_tests usExamplesConfigureTest-${config} usExamplesBuildTest-${config})
+    endforeach()
+  else()
+    add_test(NAME usExamplesConfigureTest-${CMAKE_BUILD_TYPE}
+             WORKING_DIRECTORY ${_examples_binary_dir}
+             COMMAND ${CMAKE_COMMAND}
+                     -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+                     -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                     -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                     -G ${CMAKE_GENERATOR}
+                     "-DCppMicroServices_DIR:PATH=${_install_dir}/${CONFIG_CMAKE_DIR}"
+                     "${CMAKE_CURRENT_LIST_DIR}")
+    set_tests_properties(usExamplesConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
+                         DEPENDS "usInstallTest;usExamplesCreateDirTest")
+
+    add_test(NAME usExamplesBuildTest-${CMAKE_BUILD_TYPE}
+             WORKING_DIRECTORY ${_examples_binary_dir}
+             COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE})
+    set_tests_properties(usExamplesBuildTest-${CMAKE_BUILD_TYPE} PROPERTIES
+                         DEPENDS usExamplesConfigureTest-${CMAKE_BUILD_TYPE})
+
+    list(APPEND _example_tests usExamplesConfigureTest-${CMAKE_BUILD_TYPE} usExamplesBuildTest-${CMAKE_BUILD_TYPE})
+  endif()
 
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system

@@ -24,4 +24,4 @@ branches:
   only:
     - master
 
-script: ctest -V -S ./CMake/usCTestScript_travis.cmake
+script: ctest -VV -S ./CMake/usCTestScript_travis.cmake

@@ -242,7 +242,7 @@ class CMakeParser
 public:
 
   CMakeParser(std::istream& is, std::ostream& os)
-    : _is(is), _os(os), _lexer(is), _curToken(CMakeLexer::TOK_EOF), _lastToken(CMakeLexer::TOK_EOF)
+    : _os(os), _lexer(is), _curToken(CMakeLexer::TOK_EOF), _lastToken(CMakeLexer::TOK_EOF)
   { }
 
   int curToken()
@@ -435,7 +435,6 @@ private:
     return true;
   }
 
-  std::istream& _is;
   std::ostream& _os;
   CMakeLexer _lexer;
   int _curToken;

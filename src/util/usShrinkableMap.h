@@ -168,7 +168,7 @@ private:
 };
 
 template<class Key, class T>
-typename ShrinkableMap<Key,T>::container_type ShrinkableMap<Key,T>::emptyContainer;
+std::map<Key,T> ShrinkableMap<Key,T>::emptyContainer;
 
 US_END_NAMESPACE
 

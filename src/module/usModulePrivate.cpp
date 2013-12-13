@@ -27,6 +27,7 @@
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usModuleUtils_p.h"
+#include "usModuleSettings.h"
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
 #include "usCoreModuleContext_p.h"
@@ -145,6 +146,21 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
       this->info.autoLoadDir = "main";
       moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
     }
+  }
+
+  // comput the module storage path
+#ifdef US_PLATFORM_WINDOWS
+    static const char separator = '\\';
+#else
+    static const char separator = '/';
+#endif
+
+  std::string baseStoragePath = ModuleSettings::GetStoragePath();
+  if (!baseStoragePath.empty())
+  {
+    char buf[50];
+    sprintf(buf, "%ld", this->info.id);
+    storagePath = baseStoragePath + separator + buf + "_" + this->info.libName + separator;
   }
 }
 

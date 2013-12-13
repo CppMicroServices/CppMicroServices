@@ -118,6 +118,28 @@ public:
    */
   static void AddAutoLoadPath(const std::string& path);
 
+  /**
+   * Set a local storage path for persistend module data.
+   *
+   * This path is used as a base directory for providing modules
+   * with a storage path for writing persistent data. The callee
+   * must ensure that the provided path exists and is writable.
+   *
+   * @see ModuleContext::GetDataFile(const std::string&)
+   *
+   * @param path An absolute path for writing persistent data.
+   */
+  static void SetStoragePath(const std::string& path);
+
+  /**
+   * Get the absolute path for persistent data. The returned path
+   * might be empty. If the path is non-empty, it is safe to assume
+   * that the path exists and is writable.
+   *
+   * @return The absolute path to the persistent storage path.
+   */
+  static std::string GetStoragePath();
+
 private:
 
   // purposely not implemented

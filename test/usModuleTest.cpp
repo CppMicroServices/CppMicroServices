@@ -26,6 +26,7 @@
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
+#include <usModuleSettings.h>
 #include <usSharedLibrary.h>
 
 #include "usTestUtilModuleListener.h"
@@ -38,8 +39,10 @@ namespace {
 
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const char PATH_SEPARATOR = '\\';
 #else
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const char PATH_SEPARATOR = '/';
 #endif
 
 // Verify that the same member function pointers registered as listeners
@@ -128,6 +131,10 @@ void frame010a(ModuleContext* mc)
   US_TEST_CONDITION(!location.empty(), "Test for non-empty module location")
 
   US_TEST_CONDITION(m->IsLoaded(), "Test for loaded flag")
+
+  US_TEST_CONDITION(ModuleSettings::GetStoragePath().empty(), "Test for empty base storage path")
+  US_TEST_CONDITION(m->GetModuleContext()->GetDataFile("").empty(), "Test for empty data path")
+  US_TEST_CONDITION(m->GetModuleContext()->GetDataFile("bla").empty(), "Test for empty data file path")
 }
 
 //----------------------------------------------------------------------------
@@ -149,11 +156,14 @@ void frame018a(ModuleContext* mc)
 }
 
 // Load libA and check that it exists and that the service it registers exists,
-// also check that the expected events occur
+// also check that the expected events occur and that the storage paths are correct
 void frame020a(ModuleContext* mc, TestModuleListener& listener,
 #ifdef US_BUILD_SHARED_LIBS
                SharedLibrary& libA)
 {
+  ModuleSettings::SetStoragePath(std::string("/tmp") + PATH_SEPARATOR);
+  US_TEST_CONDITION(ModuleSettings::GetStoragePath() == "/tmp", "Test for valid base storage path")
+
   try
   {
     libA.Load();
@@ -167,6 +177,13 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA Module", "Test module name")
+
+  std::cout << moduleA->GetModuleContext()->GetDataFile("");
+  std::stringstream ss;
+  ss << moduleA->GetModuleId();
+  const std::string baseStoragePath = std::string("/tmp") + PATH_SEPARATOR + ss.str() + "_TestModuleA" + PATH_SEPARATOR;
+  US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("") == baseStoragePath, "Test for valid data path")
+  US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("bla") == baseStoragePath + "bla", "Test for valid data file path")
 #else
                SharedLibrary& /*libA*/)
 {

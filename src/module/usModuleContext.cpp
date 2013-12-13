@@ -165,4 +165,11 @@ void ModuleContext::RemoveModuleListener(const ModuleListener& delegate, void* d
   d->module->coreCtx->listeners.RemoveModuleListener(this, delegate, data);
 }
 
+std::string ModuleContext::GetDataFile(const std::string &filename) const
+{
+  if (d->module->storagePath.empty()) return std::string();
+  return d->module->storagePath + filename;
+}
+
+
 US_END_NAMESPACE

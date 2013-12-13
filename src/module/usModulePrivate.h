@@ -82,6 +82,8 @@ public:
 
   ModuleManifest moduleManifest;
 
+  std::string storagePath;
+
   Module* const q;
 
 private:

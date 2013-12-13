@@ -100,6 +100,7 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
   std::set<std::string> extraPaths;
   bool autoLoadingEnabled;
   bool autoLoadingDisabled;
+  std::string storagePath;
 };
 
 US_GLOBAL_STATIC(ModuleSettingsPrivate, moduleSettingsPrivate)
@@ -157,6 +158,18 @@ void ModuleSettings::AddAutoLoadPath(const std::string& path)
 {
   ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
   moduleSettingsPrivate()->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
+}
+
+void ModuleSettings::SetStoragePath(const std::string &path)
+{
+  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  moduleSettingsPrivate()->storagePath = RemoveTrailingPathSeparator(path);
+}
+
+std::string ModuleSettings::GetStoragePath()
+{
+  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  return moduleSettingsPrivate()->storagePath;
 }
 
 US_END_NAMESPACE

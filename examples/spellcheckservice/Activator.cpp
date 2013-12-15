@@ -128,7 +128,7 @@ private:
       return errorList;
     }
 
-    int AddDictionary(const ServiceReference<IDictionaryService>& ref, IDictionaryService* dictionary)
+    std::size_t AddDictionary(const ServiceReference<IDictionaryService>& ref, IDictionaryService* dictionary)
     {
       // Lock the m_refToSvcMap member using your favorite thread library here...
       // MutexLocker lock(&m_refToSvcMapMutex)
@@ -138,7 +138,7 @@ private:
       return m_refToSvcMap.size();
     }
 
-    int RemoveDictionary(const ServiceReference<IDictionaryService>& ref)
+    std::size_t RemoveDictionary(const ServiceReference<IDictionaryService>& ref)
     {
       // Lock the m_refToSvcMap member using your favorite thread library here...
       // MutexLocker lock(&m_refToSvcMapMutex)
@@ -152,7 +152,7 @@ private:
   virtual IDictionaryService* AddingService(const ServiceReference<IDictionaryService>& reference)
   {
     IDictionaryService* dictionary = m_context->GetService(reference);
-    int count = m_spellCheckService->AddDictionary(reference, dictionary);
+    std::size_t count = m_spellCheckService->AddDictionary(reference, dictionary);
     if (!m_spellCheckReg && count > 1)
     {
       m_spellCheckReg = m_context->RegisterService<ISpellCheckService>(m_spellCheckService.get());

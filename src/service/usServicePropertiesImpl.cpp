@@ -21,6 +21,7 @@
 
 #include "usServicePropertiesImpl_p.h"
 
+#include <limits>
 #include <stdexcept>
 #ifdef US_PLATFORM_WINDOWS
 #include <string.h>
@@ -36,6 +37,11 @@ Any ServicePropertiesImpl::emptyAny;
 
 ServicePropertiesImpl::ServicePropertiesImpl(const ServiceProperties& p)
 {
+  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+  {
+    throw std::runtime_error("ServiceProperties object contains too many keys");
+  }
+
   keys.reserve(p.size());
   values.reserve(p.size());
 
@@ -64,7 +70,7 @@ const Any& ServicePropertiesImpl::Value(int index) const
 {
   if (index < 0 || static_cast<std::size_t>(index) >= values.size())
     return emptyAny;
-  return values[index];
+  return values[static_cast<std::size_t>(index)];
 }
 
 int ServicePropertiesImpl::Find(const std::string& key) const
@@ -73,7 +79,7 @@ int ServicePropertiesImpl::Find(const std::string& key) const
   {
     if (ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0)
     {
-      return i;
+      return static_cast<int>(i);
     }
   }
   return -1;
@@ -85,7 +91,7 @@ int ServicePropertiesImpl::FindCaseSensitive(const std::string& key) const
   {
     if (key == keys[i])
     {
-      return i;
+      return static_cast<int>(i);
     }
   }
   return -1;

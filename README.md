@@ -6,12 +6,19 @@ C++ Micro Services
 Introduction
 ------------
 
-The C++ Micro Services library provides a dynamic service registry based on the
-service layer as specified in the OSGi R4.2 specifications. It enables users to
-realize a service oriented approach within their software stack.
+The C++ Micro Services library provides a dynamic service registry and module system,
+partially based the OSGi Core Release 5 specifications. It enables developers to create
+a service oriented and dynamic software stack.
 
-The advantages include higher reuse of components, looser coupling, better organization of
-responsibilities, cleaner API contracts, etc.
+Proper usage of the C++ Micro Services library leads to
+
+  - Re-use of software components
+  - Loose coupling
+  - Separation of concerns
+  - Clean APIs based on service interfaces
+  - Extensible systems
+
+and more.
 
 Requirements
 ------------
@@ -24,9 +31,12 @@ Supported Platforms
 
 The library should compile on many different platforms. Below is a list of tested compiler/OS combinations:
 
-  - GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)
-  - Visual Studio 2008 and 2010
-  - Clang 3.0 (Ubuntu 11.04 and MacOS X 10.6)
+  - GCC 4.5 (MacOS X 10.6)
+  - GCC 4.6 (Ubuntu 12.04)
+  - GCC 4.8 (Ubuntu 13.10)
+  - Clang 3.0 (MacOS X 10.6)
+  - Clang 3.2 (Ubuntu 13.10)
+  - Visual Studio 2008 SP1, 2010, 2012, 2013 (Windows 7)
 
 Legal
 -----

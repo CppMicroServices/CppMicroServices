@@ -34,6 +34,8 @@ class ModuleContext;
 class ServiceListenerEntry;
 
 /**
+ * @ingroup MicroServices
+ *
  * Service Listener Hook Service.
  *
  * <p>

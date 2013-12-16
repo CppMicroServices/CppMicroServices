@@ -33,6 +33,8 @@ class ModuleContext;
 class ServiceEvent;
 
 /**
+ * @ingroup MicroServices
+ *
  * Service Event Listener Hook Service.
  *
  * <p>

@@ -34,6 +34,8 @@ class ModuleContext;
 class ServiceReferenceBase;
 
 /**
+ * @ingroup MicroServices
+ *
  * Service Find Hook Service.
  *
  * <p>

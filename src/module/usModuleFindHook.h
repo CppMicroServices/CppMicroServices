@@ -31,7 +31,9 @@ class Module;
 class ModuleContext;
 
 /**
- * Module Context Hook Service.
+ * @ingroup MicroServices
+ *
+ * %Module Context Hook Service.
  *
  * <p>
  * Modules registering this service will be called during module find

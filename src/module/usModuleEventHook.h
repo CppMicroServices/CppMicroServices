@@ -31,7 +31,9 @@ class ModuleContext;
 class ModuleEvent;
 
 /**
- * Module Event Hook Service.
+ * @ingroup MicroServices
+ *
+ * %Module Event Hook Service.
  *
  * <p>
  * Modules registering this service will be called during module lifecycle

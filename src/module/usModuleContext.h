@@ -130,8 +130,8 @@ public:
    * environment at the time of the call to this method. This list will
    * also contain modules which might already have been unloaded.
    *
-   * @param modules A std::vector of <code>Module</code> objects which
-   *                will hold one object per known module.
+   * @return A std::vector of <code>Module</code> objects which
+   *         will hold one object per known module.
    */
   std::vector<Module*> GetModules() const;
 

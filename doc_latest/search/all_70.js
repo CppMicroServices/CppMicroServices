@@ -3,6 +3,7 @@ var searchData=
   ['parseversion',['ParseVersion',['../classModuleVersion.html#a19b19e15939f9ee3c430eb98f3bf3756',1,'ModuleVersion']]],
   ['pathlist',['PathList',['../classModuleSettings.html#a6b90d6474f6714e946c0a71cb9301c58',1,'ModuleSettings']]],
   ['pointer',['pointer',['../classSharedDataPointer.html#a03e4f850c3a8f8764787e867b8f23444',1,'SharedDataPointer::pointer()'],['../classExplicitlySharedDataPointer.html#aee913ad3d0893aa1b0bd6d1366c7149f',1,'ExplicitlySharedDataPointer::pointer()']]],
+  ['pop_5fback',['pop_back',['../classShrinkableVector.html#acb6b22cede4fb79bb539aa2abb0eb3f5',1,'ShrinkableVector']]],
   ['prop_5fautoload_5fdir',['PROP_AUTOLOAD_DIR',['../classModule.html#ae9986bc0261acc8b4a8321c561215a69',1,'Module']]],
   ['prop_5fdescription',['PROP_DESCRIPTION',['../classModule.html#a036bca9543c13741b0eee9656550041c',1,'Module']]],
   ['prop_5fid',['PROP_ID',['../classModule.html#ad6bd8ff9e1efe6f883d939481a030fbc',1,'Module']]],

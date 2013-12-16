@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['interfacet',['InterfaceT',['../structInterfaceT.html',1,'']]]
+  ['interfacetype',['InterfaceType',['../structInterfaceType.html',1,'']]]
 ];

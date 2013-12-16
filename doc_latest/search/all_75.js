@@ -12,6 +12,7 @@ var searchData=
   ['unregistering',['UNREGISTERING',['../classServiceEvent.html#ae7426fe742bd938523b64d43c232a49fa2727d97ff0e689285e6364afe42ecf81',1,'ServiceEvent']]],
   ['unsafe_5fany_5fcast',['unsafe_any_cast',['../classAny.html#a390278691df87bff430e531520eb0d0d',1,'Any']]],
   ['unspecified',['UNSPECIFIED',['../classServiceException.html#a5748dfd1ef3cabb9efc14e65246e0281aa655fb17e2cc9f83c7a49d2a62e912d6',1,'ServiceException']]],
+  ['upper_5fbound',['upper_bound',['../classShrinkableMap.html#a737284811a6c0da09638b049704acb57',1,'ShrinkableMap::upper_bound(const Key &amp;key)'],['../classShrinkableMap.html#a95f7011ab5ebe4917d68e7d602a945e2',1,'ShrinkableMap::upper_bound(const Key &amp;key) const ']]],
   ['us_5fdeclare_5fservice_5finterface',['US_DECLARE_SERVICE_INTERFACE',['../group__MicroServices.html#gad5c1340dcd99d403c8da0c52b8db30bb',1,'usServiceInterface.h']]],
   ['us_5fexport_5fmodule_5factivator',['US_EXPORT_MODULE_ACTIVATOR',['../group__MicroServices.html#gac441a2e64f59a76a5f7e42de67e87cba',1,'usModuleActivator.h']]],
   ['us_5fimport_5fmodule',['US_IMPORT_MODULE',['../group__MicroServices.html#ga374168789c5e2653f1ce3460db1b8a24',1,'usModuleImport.h']]],

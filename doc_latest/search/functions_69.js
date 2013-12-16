@@ -8,7 +8,8 @@ var searchData=
   ['isempty',['IsEmpty',['../classServiceTracker.html#a6fdb123650bca52b294bba1f828ba619',1,'ServiceTracker']]],
   ['isfile',['IsFile',['../classModuleResource.html#a9380891c4c5aea236a36c45cdff36bbd',1,'ModuleResource']]],
   ['isloaded',['IsLoaded',['../classModule.html#a6eb822aabcaa58664e4802d736542d9b',1,'Module::IsLoaded()'],['../classSharedLibrary.html#adc09658cde98836950b84e4d1d265a89',1,'SharedLibrary::IsLoaded()']]],
-  ['isnull',['IsNull',['../classModuleEvent.html#a75b355e6e629b2035e79fc730b6a742f',1,'ModuleEvent::IsNull()'],['../classServiceEvent.html#a406748c8f659836e5049094cfea9ad68',1,'ServiceEvent::IsNull()']]],
+  ['isnull',['IsNull',['../classModuleEvent.html#a75b355e6e629b2035e79fc730b6a742f',1,'ModuleEvent::IsNull()'],['../classServiceEvent.html#a406748c8f659836e5049094cfea9ad68',1,'ServiceEvent::IsNull()'],['../structServiceListenerHook_1_1ListenerInfo.html#ac5522544736ceac661f7a0aa14143e1f',1,'ServiceListenerHook::ListenerInfo::IsNull()']]],
+  ['isremoved',['IsRemoved',['../structServiceListenerHook_1_1ListenerInfo.html#aba4e7b2001161629b1b72e2d9f3d9b3b',1,'ServiceListenerHook::ListenerInfo']]],
   ['isthreadingsupportenabled',['IsThreadingSupportEnabled',['../classModuleSettings.html#a56403d73f18cc87fd980563c89d6d78d',1,'ModuleSettings']]],
   ['isundefined',['IsUndefined',['../classModuleVersion.html#a55d08a860a7eee1ec4604e7714ee678e',1,'ModuleVersion']]],
   ['isvalid',['IsValid',['../classModuleResource.html#a0cd14b3d80f77637f0b4be12cbbcf867',1,'ModuleResource::IsValid()'],['../structTrackedTypeTraits_3_01S_00_01T_01_5_01_4.html#accbce6b1dcc3678e8d148464f10cafb8',1,'TrackedTypeTraits&lt; S, T * &gt;::IsValid()']]]

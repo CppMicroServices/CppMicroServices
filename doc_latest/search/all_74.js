@@ -6,7 +6,7 @@ var searchData=
   ['tutorial',['Tutorial',['../MicroServices_Tutorials.html',1,'']]],
   ['t',['T',['../classServiceTracker.html#a72f976eaa5b13f674eb31260cba8f91b',1,'ServiceTracker']]],
   ['tostring',['ToString',['../classModuleVersion.html#a9cc93801954016f9fda82b344bbe6c3f',1,'ModuleVersion::ToString()'],['../classLDAPFilter.html#a00fd0210d13e71aa12e83b059faad1fb',1,'LDAPFilter::ToString()'],['../classAny.html#a1e02a2c71be43374cd168bcb5636a969',1,'Any::ToString()']]],
-  ['trackedtype',['TrackedType',['../structTrackedTypeTraitsBase.html#afa750c72cb6a6a010ba22379e023f51b',1,'TrackedTypeTraitsBase::TrackedType()'],['../structTrackedTypeTraits_3_01S_00_01T_01_5_01_4.html#a8a8a632d567f0bb750c0ed5c64d0969d',1,'TrackedTypeTraits&lt; S, T * &gt;::TrackedType()']]],
+  ['trackedtype',['TrackedType',['../structTrackedTypeTraitsBase.html#afa750c72cb6a6a010ba22379e023f51b',1,'TrackedTypeTraitsBase::TrackedType()'],['../structTrackedTypeTraits_3_01S_00_01T_01_5_01_4.html#a8a8a632d567f0bb750c0ed5c64d0969d',1,'TrackedTypeTraits&lt; S, T * &gt;::TrackedType()'],['../structServiceTrackerCustomizer.html#a253d10531f748a0cbf94ec79bbf52022',1,'ServiceTrackerCustomizer::TrackedType()']]],
   ['trackedtypetraits_3c_20s_2c_20t_20_2a_20_3e',['TrackedTypeTraits&lt; S, T * &gt;',['../structTrackedTypeTraits_3_01S_00_01T_01_5_01_4.html',1,'']]],
   ['trackedtypetraitsbase',['TrackedTypeTraitsBase',['../structTrackedTypeTraitsBase.html',1,'']]],
   ['trackedtypetraitsbase_3c_20t_20_2a_2c_20trackedtypetraits_3c_20s_2c_20t_20_2a_20_3e_20_3e',['TrackedTypeTraitsBase&lt; T *, TrackedTypeTraits&lt; S, T * &gt; &gt;',['../structTrackedTypeTraitsBase.html',1,'']]],

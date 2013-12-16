@@ -28,6 +28,12 @@
 
 US_BEGIN_NAMESPACE
 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * A std::map style associative container allowing query and removal
+ * operations only.
+ */
 template<class Key, class T>
 class ShrinkableMap
 {

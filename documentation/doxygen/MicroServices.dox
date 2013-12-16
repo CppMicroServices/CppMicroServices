@@ -64,6 +64,7 @@ Micro Services library:
 - \subpage MicroServices_Resources
 - \subpage MicroServices_ModuleProperties
 - \subpage MicroServices_AutoLoading
+- \subpage MicroServices_ServiceHooks
 - \subpage MicroServices_StaticModules
 - \subpage MicroServices_EmulateSingleton
 
@@ -120,6 +121,7 @@ The links in the following list point to important
 - \ref MicroServices_Resources
 - \ref MicroServices_ModuleProperties
 - \ref MicroServices_AutoLoading
+- \ref MicroServices_ServiceHooks
 - \ref MicroServices_StaticModules
 - \ref MicroServices_EmulateSingleton
 

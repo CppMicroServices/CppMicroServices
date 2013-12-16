@@ -45,6 +45,7 @@ class ServiceEvent;
  */
 struct US_EXPORT ServiceEventListenerHook
 {
+  typedef ShrinkableMap<ModuleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > ShrinkableMapType;
 
   virtual ~ServiceEventListenerHook();
 
@@ -61,7 +62,7 @@ struct US_EXPORT ServiceEventListenerHook
    *        values to prevent the event from being delivered to the associated
    *        listeners.
    */
-  virtual void Event(const ServiceEvent& event, ShrinkableMap<ModuleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> >& listeners) = 0;
+  virtual void Event(const ServiceEvent& event, ShrinkableMapType& listeners) = 0;
 };
 
 US_END_NAMESPACE

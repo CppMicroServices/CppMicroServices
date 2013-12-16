@@ -63,7 +63,8 @@ void ModuleHooks::FilterModules(const ModuleContext* mc, std::vector<Module*>& m
   coreCtx->services.Get(us_service_interface_iid<ModuleFindHook>(), srl);
   ShrinkableVector<Module*> filtered(modules);
 
-  for (std::vector<ServiceRegistrationBase>::iterator srBaseIter = srl.begin(), srBaseEnd = srl.end();
+  std::sort(srl.begin(), srl.end());
+  for (std::vector<ServiceRegistrationBase>::reverse_iterator srBaseIter = srl.rbegin(), srBaseEnd = srl.rend();
        srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<ModuleFindHook> sr = srBaseIter->GetReference();
@@ -113,8 +114,9 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
     const std::size_t unfilteredSize = moduleContexts.size();
     ShrinkableVector<ModuleContext*> filtered(moduleContexts);
 
-    for (std::vector<ServiceRegistrationBase>::iterator iter = eventHooks.begin(),
-         iterEnd = eventHooks.end(); iter != iterEnd; ++iter)
+    std::sort(eventHooks.begin(), eventHooks.end());
+    for (std::vector<ServiceRegistrationBase>::reverse_iterator iter = eventHooks.rbegin(),
+         iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
     {
       ServiceReference<ModuleEventHook> sr = iter->GetReference();
       ModuleEventHook* eh = reinterpret_cast<ModuleEventHook*>(sr.d->GetService(GetModuleContext()->GetModule()));

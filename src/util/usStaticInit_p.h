@@ -101,6 +101,7 @@ US_END_NAMESPACE
       bool ok = false;                                                   \
       {                                                                  \
         US_PREPEND_NAMESPACE(GlobalStatic)<TYPE>::Lock lock(this_##NAME()); \
+        US_UNUSED(lock);                                                 \
         if (!this_##NAME().pointer)                                      \
         {                                                                \
           this_##NAME().pointer = x;                                     \
@@ -125,6 +126,7 @@ US_END_NAMESPACE
       bool ok = false;                                                   \
       {                                                                  \
         US_PREPEND_NAMESPACE(GlobalStatic)<TYPE>::Lock lock(this_##NAME()); \
+        US_UNUSED(lock);                                                 \
         if (!this_##NAME().pointer)                                      \
         {                                                                \
           this_##NAME().pointer = x;                                     \
@@ -149,6 +151,7 @@ US_END_NAMESPACE
       bool ok = false;                                                   \
       {                                                                  \
         US_PREPEND_NAMESPACE(GlobalStatic)<TYPE>::Lock lock(this_##NAME()); \
+        US_UNUSED(lock);                                                 \
         if (!this_##NAME().pointer)                                      \
         {                                                                \
           this_##NAME().pointer = x;                                     \

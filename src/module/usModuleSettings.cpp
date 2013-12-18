@@ -116,7 +116,7 @@ bool ModuleSettings::IsThreadingSupportEnabled()
 
 bool ModuleSettings::IsAutoLoadingEnabled()
 {
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   return !moduleSettingsPrivate()->autoLoadingDisabled &&
       moduleSettingsPrivate()->autoLoadingEnabled;
@@ -127,13 +127,13 @@ bool ModuleSettings::IsAutoLoadingEnabled()
 
 void ModuleSettings::SetAutoLoadingEnabled(bool enable)
 {
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   moduleSettingsPrivate()->autoLoadingEnabled = enable;
 }
 
 ModuleSettings::PathList ModuleSettings::GetAutoLoadPaths()
 {
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   ModuleSettings::PathList paths(moduleSettingsPrivate()->autoLoadPaths.begin(),
                                  moduleSettingsPrivate()->autoLoadPaths.end());
   paths.insert(paths.end(), moduleSettingsPrivate()->extraPaths.begin(),
@@ -149,26 +149,26 @@ void ModuleSettings::SetAutoLoadPaths(const PathList& paths)
   normalizedPaths.resize(paths.size());
   std::transform(paths.begin(), paths.end(), normalizedPaths.begin(), RemoveTrailingPathSeparator);
 
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   moduleSettingsPrivate()->autoLoadPaths.clear();
   moduleSettingsPrivate()->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
 }
 
 void ModuleSettings::AddAutoLoadPath(const std::string& path)
 {
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   moduleSettingsPrivate()->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
 }
 
 void ModuleSettings::SetStoragePath(const std::string &path)
 {
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   moduleSettingsPrivate()->storagePath = RemoveTrailingPathSeparator(path);
 }
 
 std::string ModuleSettings::GetStoragePath()
 {
-  ModuleSettingsPrivate::Lock l(moduleSettingsPrivate());
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   return moduleSettingsPrivate()->storagePath;
 }
 

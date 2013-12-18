@@ -81,7 +81,7 @@ void ServiceTracker<S,TTT>::Open()
 {
   _TrackedService* t;
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     if (d->trackedService)
     {
       return;
@@ -91,7 +91,7 @@ void ServiceTracker<S,TTT>::Open()
 
     t = new _TrackedService(this, d->customizer);
     {
-      typename _TrackedService::Lock l(*t);
+      US_UNUSED(typename _TrackedService::Lock(*t));
       try {
         d->context->AddServiceListener(t, &_TrackedService::ServiceChanged, d->listenerFilter);
         std::vector<ServiceReferenceType> references;
@@ -132,7 +132,7 @@ void ServiceTracker<S,TTT>::Close()
   _TrackedService* outgoing;
   std::vector<ServiceReferenceType> references;
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     outgoing = d->trackedService;
     if (outgoing == 0)
     {
@@ -153,7 +153,7 @@ void ServiceTracker<S,TTT>::Close()
   }
   d->Modified(); /* clear the cache */
   {
-    typename _TrackedService::Lock l(outgoing);
+    US_UNUSED(typename _TrackedService::Lock(outgoing));
     outgoing->NotifyAll(); /* wake up any waiters */
   }
   for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
@@ -164,7 +164,7 @@ void ServiceTracker<S,TTT>::Close()
 
   if (d->DEBUG_OUTPUT)
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     if ((d->cachedReference.GetModule() == 0) && !TTT::IsValid(d->cachedService))
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
@@ -189,7 +189,7 @@ ServiceTracker<S,TTT>::WaitForService(unsigned long timeoutMillis)
       return TTT::DefaultValue();
     }
     {
-      typename _TrackedService::Lock l(t);
+      US_UNUSED(typename _TrackedService::Lock(t));
       if (t->Size() == 0)
       {
         t->Wait(timeoutMillis);
@@ -211,7 +211,7 @@ ServiceTracker<S,TTT>::GetServiceReferences() const
     return refs;
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     d->GetServiceReferences_unlocked(refs, t);
   }
   return refs;
@@ -223,7 +223,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
 {
   ServiceReferenceType reference;
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     reference = d->cachedReference;
   }
   if (reference.GetModule() != 0)
@@ -297,7 +297,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
   }
 
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     d->cachedReference = *selectedRef;
     return d->cachedReference;
   }
@@ -313,7 +313,7 @@ ServiceTracker<S,TTT>::GetService(const ServiceReferenceType& reference) const
     return TTT::DefaultValue();
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     return t->GetCustomizedObject(reference);
   }
 }
@@ -328,7 +328,7 @@ std::vector<typename ServiceTracker<S,TTT>::T> ServiceTracker<S,TTT>::GetService
     return services;
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     std::vector<ServiceReferenceType> references;
     d->GetServiceReferences_unlocked(references, t);
     for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
@@ -345,7 +345,7 @@ typename ServiceTracker<S,TTT>::T
 ServiceTracker<S,TTT>::GetService() const
 {
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     const T& service = d->cachedService;
     if (TTT::IsValid(service))
     {
@@ -364,7 +364,7 @@ ServiceTracker<S,TTT>::GetService() const
       return TTT::DefaultValue();
     }
     {
-      typename _ServiceTrackerPrivate::Lock l(d);
+      US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
       return d->cachedService = GetService(reference);
     }
   }
@@ -394,7 +394,7 @@ int ServiceTracker<S,TTT>::Size() const
     return 0;
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     return static_cast<int>(t->Size());
   }
 }
@@ -408,7 +408,7 @@ int ServiceTracker<S,TTT>::GetTrackingCount() const
     return -1;
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     return t->GetTrackingCount();
   }
 }
@@ -422,7 +422,7 @@ void ServiceTracker<S,TTT>::GetTracked(TrackingMap& map) const
     return;
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     t->CopyEntries(map);
   }
 }
@@ -436,7 +436,7 @@ bool ServiceTracker<S,TTT>::IsEmpty() const
     return true;
   }
   {
-    typename _TrackedService::Lock l(t);
+    US_UNUSED(typename _TrackedService::Lock(t));
     return t->IsEmpty();
   }
 }

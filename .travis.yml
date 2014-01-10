@@ -23,5 +23,6 @@ env:
 branches:
   only:
     - master
+    - development
 
 script: ctest -VV -S ./CMake/usCTestScript_travis.cmake

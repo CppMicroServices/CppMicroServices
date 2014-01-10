@@ -57,7 +57,6 @@ set(_srcs
 
 set(_private_headers
   util/usAtomicInt_p.h
-  util/usFunctor_p.h
   util/usListenerFunctors_p.h
   util/usLog_p.h
   util/usStaticInit_p.h

@@ -31,6 +31,8 @@ public:
   ListenerInfoData(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& l,
                    void* data, const std::string& filter);
 
+  virtual ~ListenerInfoData();
+
   ModuleContext* const mc;
   ServiceListenerEntry::ServiceListener listener;
   void* data;

@@ -17,27 +17,27 @@
 // Header Availability
 //-------------------------------------------------------------------
 
-#cmakedefine HAVE_STDINT_HEADER
-#cmakedefine HAVE_TR1_UNORDERED_MAP_HEADER
-#cmakedefine HAVE_TR1_UNORDERED_SET_HEADER
-#cmakedefine HAVE_TR1_FUNCTIONAL_HEADER
-#cmakedefine HAVE_UNORDERED_MAP_HEADER
-#cmakedefine HAVE_UNORDERED_SET_HEADER
-#cmakedefine HAVE_FUNCTIONAL_HEADER
+#cmakedefine US_HAVE_STDINT_H
+#cmakedefine US_HAVE_TR1_UNORDERED_MAP_H
+#cmakedefine US_HAVE_TR1_UNORDERED_SET_H
+#cmakedefine US_HAVE_TR1_FUNCTIONAL_H
+#cmakedefine US_HAVE_UNORDERED_MAP_H
+#cmakedefine US_HAVE_UNORDERED_SET_H
+#cmakedefine US_HAVE_FUNCTIONAL_H
 
-#cmakedefine HAVE_TR1_UNORDERED_MAP
-#cmakedefine HAVE_TR1_UNORDERED_SET
-#cmakedefine HAVE_TR1_FUNCTION
-#cmakedefine HAVE_STD_UNORDERED_MAP
-#cmakedefine HAVE_STD_UNORDERED_SET
-#cmakedefine HAVE_STD_FUNCTION
+#cmakedefine US_HAVE_TR1_UNORDERED_MAP
+#cmakedefine US_HAVE_TR1_UNORDERED_SET
+#cmakedefine US_HAVE_TR1_FUNCTION
+#cmakedefine US_HAVE_STD_UNORDERED_MAP
+#cmakedefine US_HAVE_STD_UNORDERED_SET
+#cmakedefine US_HAVE_STD_FUNCTION
 
-#cmakedefine HAVE_TR1_HASH
-#cmakedefine HAVE_TR1_HASH_STRUCT
-#cmakedefine HAVE_TR1_HASH_CLASS
-#cmakedefine HAVE_STD_HASH
-#cmakedefine HAVE_STD_HASH_STRUCT
-#cmakedefine HAVE_STD_HASH_CLASS
+#cmakedefine US_HAVE_TR1_HASH
+#cmakedefine US_HAVE_TR1_HASH_STRUCT
+#cmakedefine US_HAVE_TR1_HASH_CLASS
+#cmakedefine US_HAVE_STD_HASH
+#cmakedefine US_HAVE_STD_HASH_STRUCT
+#cmakedefine US_HAVE_STD_HASH_CLASS
 
 ///-------------------------------------------------------------------
 // Version information
@@ -172,44 +172,44 @@ US_END_NAMESPACE
 // Hash Container
 //-------------------------------------------------------------------
 
-#ifdef HAVE_UNORDERED_MAP_HEADER
+#ifdef US_HAVE_UNORDERED_MAP_H
   #include <unordered_map>
-#elif defined(HAVE_TR1_UNORDERED_MAP_HEADER)
+#elif defined(US_HAVE_TR1_UNORDERED_MAP_H)
   #include <tr1/unordered_map>
 #endif
 
-#ifdef HAVE_UNORDERED_SET_HEADER
+#ifdef US_HAVE_UNORDERED_SET_H
   #include <unordered_set>
-#elif defined(HAVE_TR1_UNORDERED_SET_HEADER)
+#elif defined(US_HAVE_TR1_UNORDERED_SET_H)
   #include <tr1/unordered_set>
 #endif
 
-#ifdef HAVE_STD_UNORDERED_MAP
+#ifdef US_HAVE_STD_UNORDERED_MAP
   #define US_UNORDERED_MAP_TYPE ::std::unordered_map
-#elif defined(HAVE_TR1_UNORDERED_MAP)
+#elif defined(US_HAVE_TR1_UNORDERED_MAP)
   #define US_UNORDERED_MAP_TYPE ::std::tr1::unordered_map
 #endif
 
-#ifdef HAVE_STD_UNORDERED_SET
+#ifdef US_HAVE_STD_UNORDERED_SET
   #define US_UNORDERED_SET_TYPE ::std::unordered_set
-#elif defined(HAVE_TR1_UNORDERED_SET)
+#elif defined(US_HAVE_TR1_UNORDERED_SET)
   #define US_UNORDERED_SET_TYPE ::std::tr1::unordered_set
 #endif
 
-#ifdef HAVE_STD_HASH
+#ifdef US_HAVE_STD_HASH
   #define US_HASH_FUNCTION_NAMESPACE ::std
-  #ifdef HAVE_STD_HASH_STRUCT
+  #ifdef US_HAVE_STD_HASH_STRUCT
     #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>
-  #elif defined(HAVE_STD_HASH_CLASS)
+  #elif defined(US_HAVE_STD_HASH_CLASS)
     #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
   #endif
   #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std {
   #define US_HASH_FUNCTION_NAMESPACE_END }
-#elif defined(HAVE_TR1_HASH)
+#elif defined(US_HAVE_TR1_HASH)
   #define US_HASH_FUNCTION_NAMESPACE ::std::tr1
-  #ifdef HAVE_TR1_HASH_STRUCT
+  #ifdef US_HAVE_TR1_HASH_STRUCT
     #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::tr1::hash<type>
-  #elif defined(HAVE_TR1_HASH_CLASS)
+  #elif defined(US_HAVE_TR1_HASH_CLASS)
     #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::tr1::hash<type>
   #endif
   #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std { namespace tr1 {

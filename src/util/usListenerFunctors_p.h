@@ -29,15 +29,15 @@
 #include <algorithm>
 #include <cstring>
 
-#ifdef HAVE_TR1_FUNCTIONAL_HEADER
+#ifdef US_HAVE_TR1_FUNCTIONAL_H
   #include <tr1/functional>
-#elif defined(HAVE_FUNCTIONAL_HEADER)
+#elif defined(US_HAVE_FUNCTIONAL_H)
   #include <functional>
 #endif
 
-#ifdef HAVE_STD_FUNCTION
+#ifdef US_HAVE_STD_FUNCTION
   #define US_FUNCTION_TYPE std::function
-#elif defined(HAVE_TR1_FUNCTION)
+#elif defined(US_HAVE_TR1_FUNCTION)
   #define US_FUNCTION_TYPE std::tr1::function
 #endif
 

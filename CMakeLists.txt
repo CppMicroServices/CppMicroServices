@@ -221,98 +221,98 @@ endif()
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 
-CHECK_INCLUDE_FILE_CXX(stdint.h HAVE_STDINT_HEADER)
-CHECK_INCLUDE_FILE_CXX(tr1/unordered_map HAVE_TR1_UNORDERED_MAP_HEADER)
-CHECK_INCLUDE_FILE_CXX(tr1/unordered_set HAVE_TR1_UNORDERED_SET_HEADER)
-CHECK_INCLUDE_FILE_CXX(tr1/functional HAVE_TR1_FUNCTIONAL_HEADER)
-CHECK_INCLUDE_FILE_CXX(unordered_map HAVE_UNORDERED_MAP_HEADER)
-CHECK_INCLUDE_FILE_CXX(unordered_set HAVE_UNORDERED_SET_HEADER)
-CHECK_INCLUDE_FILE_CXX(functional HAVE_FUNCTIONAL_HEADER)
+CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
+CHECK_INCLUDE_FILE_CXX(tr1/unordered_map US_HAVE_TR1_UNORDERED_MAP_H)
+CHECK_INCLUDE_FILE_CXX(tr1/unordered_set US_HAVE_TR1_UNORDERED_SET_H)
+CHECK_INCLUDE_FILE_CXX(tr1/functional US_HAVE_TR1_FUNCTIONAL_H)
+CHECK_INCLUDE_FILE_CXX(unordered_map US_HAVE_UNORDERED_MAP_H)
+CHECK_INCLUDE_FILE_CXX(unordered_set US_HAVE_UNORDERED_SET_H)
+CHECK_INCLUDE_FILE_CXX(functional US_HAVE_FUNCTIONAL_H)
 
-if(HAVE_UNORDERED_MAP_HEADER)
+if(US_HAVE_UNORDERED_MAP_H)
   CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
-                            HAVE_TR1_UNORDERED_MAP)
+                            US_HAVE_TR1_UNORDERED_MAP)
   CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
-                            HAVE_STD_UNORDERED_MAP)
+                            US_HAVE_STD_UNORDERED_MAP)
   CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
-                            HAVE_TR1_HASH)
+                            US_HAVE_TR1_HASH)
   CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::hash<int>(); return 0; }"
-                            HAVE_STD_HASH)
-  if(HAVE_STD_HASH)
+                            US_HAVE_STD_HASH)
+  if(US_HAVE_STD_HASH)
     CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                              HAVE_STD_HASH_STRUCT)
+                              US_HAVE_STD_HASH_STRUCT)
     CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                              HAVE_STD_HASH_CLASS)
-  elseif(HAVE_TR1_HASH)
+                              US_HAVE_STD_HASH_CLASS)
+  elseif(US_HAVE_TR1_HASH)
     CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
-                              HAVE_TR1_HASH_STRUCT)
+                              US_HAVE_TR1_HASH_STRUCT)
     CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
-                              HAVE_TR1_HASH_CLASS)
+                              US_HAVE_TR1_HASH_CLASS)
   endif()
-elseif(HAVE_TR1_UNORDERED_MAP_HEADER)
+elseif(US_HAVE_TR1_UNORDERED_MAP_H)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
-                            HAVE_TR1_UNORDERED_MAP)
+                            US_HAVE_TR1_UNORDERED_MAP)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
-                            HAVE_STD_UNORDERED_MAP)
+                            US_HAVE_STD_UNORDERED_MAP)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
-                            HAVE_TR1_HASH)
+                            US_HAVE_TR1_HASH)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::hash<int>(); return 0; }"
-                            HAVE_STD_HASH)
-  if(HAVE_STD_HASH)
+                            US_HAVE_STD_HASH)
+  if(US_HAVE_STD_HASH)
     CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                              HAVE_STD_HASH_STRUCT)
+                              US_HAVE_STD_HASH_STRUCT)
     CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                              HAVE_STD_HASH_CLASS)
-  elseif(HAVE_TR1_HASH)
+                              US_HAVE_STD_HASH_CLASS)
+  elseif(US_HAVE_TR1_HASH)
     CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
-                              HAVE_TR1_HASH_STRUCT)
+                              US_HAVE_TR1_HASH_STRUCT)
     CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
-                              HAVE_TR1_HASH_CLASS)
+                              US_HAVE_TR1_HASH_CLASS)
   endif()
 else()
   message(SEND_ERROR "The header file \"unordered_map\" is not available.")
 endif()
-if(NOT (HAVE_TR1_UNORDERED_MAP OR HAVE_STD_UNORDERED_MAP))
+if(NOT (US_HAVE_TR1_UNORDERED_MAP OR US_HAVE_STD_UNORDERED_MAP))
   message(SEND_ERROR "The \"unordered_map\" type is not available.")
 endif()
 
-if(HAVE_UNORDERED_SET_HEADER)
+if(US_HAVE_UNORDERED_SET_H)
   CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
-                            HAVE_TR1_UNORDERED_SET)
+                            US_HAVE_TR1_UNORDERED_SET)
   CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
-                            HAVE_STD_UNORDERED_SET)
-elseif(HAVE_TR1_UNORDERED_SET_HEADER)
+                            US_HAVE_STD_UNORDERED_SET)
+elseif(US_HAVE_TR1_UNORDERED_SET_H)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
-                            HAVE_TR1_UNORDERED_SET)
+                            US_HAVE_TR1_UNORDERED_SET)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
-                            HAVE_STD_UNORDERED_SET)
+                            US_HAVE_STD_UNORDERED_SET)
 else()
   message(SEND_ERROR "The header file \"unordered_set\" is not available.")
 endif()
-if(NOT (HAVE_TR1_UNORDERED_SET OR HAVE_STD_UNORDERED_SET))
+if(NOT (US_HAVE_TR1_UNORDERED_SET OR US_HAVE_STD_UNORDERED_SET))
   message(SEND_ERROR "The \"unordered_set\" type is not available.")
 endif()
 
-if(NOT (HAVE_FUNCTIONAL_HEADER OR HAVE_TR1_FUNCTIONAL_HEADER))
+if(NOT (US_HAVE_FUNCTIONAL_H OR US_HAVE_TR1_FUNCTIONAL_H))
   message(SEND_ERROR "The header file \"functional\" is not available.")
 endif()
 
-if(HAVE_FUNCTIONAL_HEADER)
+if(US_HAVE_FUNCTIONAL_H)
   CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
-                            HAVE_TR1_FUNCTION)
+                            US_HAVE_TR1_FUNCTION)
   CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::function<int(void)> f(main); return 0; }"
-                            HAVE_STD_FUNCTION)
+                            US_HAVE_STD_FUNCTION)
 endif()
-if((NOT (HAVE_STD_FUNCTION OR HAVE_TR1_FUNCTION)) AND HAVE_TR1_FUNCTIONAL_HEADER)
-  unset(HAVE_TR1_FUNCTION CACHE)
-  unset(HAVE_STD_FUNCTION CACHE)
+if((NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION)) AND US_HAVE_TR1_FUNCTIONAL_H)
+  unset(US_HAVE_TR1_FUNCTION CACHE)
+  unset(US_HAVE_STD_FUNCTION CACHE)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
-                            HAVE_TR1_FUNCTION)
+                            US_HAVE_TR1_FUNCTION)
   CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::function<int(void)> f(main); return 0; }"
-                            HAVE_STD_FUNCTION)
+                            US_HAVE_STD_FUNCTION)
 endif()
 
-if(NOT (HAVE_STD_FUNCTION OR HAVE_TR1_FUNCTION))
+if(NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION))
   message(SEND_ERROR "The \"function\" type is not available.")
 endif()
 

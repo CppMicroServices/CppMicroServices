@@ -39,6 +39,10 @@ ServiceListenerHook::ListenerInfoData::ListenerInfoData(
 {
 }
 
+ServiceListenerHook::ListenerInfoData::~ListenerInfoData()
+{
+}
+
 ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data)
   : d(data)
 {

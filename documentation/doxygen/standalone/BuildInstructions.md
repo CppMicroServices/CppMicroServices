@@ -39,8 +39,6 @@ When building the C++ Micro Services library, you have a few configuration optio
   Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives)
   to make the API thread-safe. If your application is not multi-threaded, turn this option OFF
   to get maximum performance.
-- **US_USE_C++11 (advanced)**
-  Enable the usage of C++11 constructs.
 - **US_ENABLE_RESOURCE_COMPRESSION (advanced)**
   Enable compression of embedded resources. See \ref MicroServices_Resources for detailed information
   about the resource system.

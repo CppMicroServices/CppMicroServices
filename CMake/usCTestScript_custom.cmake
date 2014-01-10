@@ -17,7 +17,7 @@ set(US_TEST_STATIC 1)
 set(US_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../")
 
 set(US_BUILD_CONFIGURATION )
-foreach(i RANGE 15)
+foreach(i RANGE 7)
   list(APPEND US_BUILD_CONFIGURATION ${i})
 endforeach()
 

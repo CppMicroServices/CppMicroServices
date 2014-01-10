@@ -22,7 +22,7 @@
 #ifndef USSTDINT_H
 #define USSTDINT_H
 
-#ifdef HAVE_STDINT
+#ifdef HAVE_STDINT_HEADER
 #include <stdint.h>
 #elif defined(_MSC_VER)
 #include "stdint_vc_p.h"

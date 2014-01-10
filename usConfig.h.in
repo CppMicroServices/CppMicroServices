@@ -18,9 +18,9 @@
 // Version information
 //-------------------------------------------------------------------
 
-#define CppMicroServices_VERSION_MAJOR @CppMicroServices_VERSION_MAJOR@
-#define CppMicroServices_VERSION_MINOR @CppMicroServices_VERSION_MINOR@
-#define CppMicroServices_VERSION_PATH @CppMicroServices_VERSION_PATCH@
+#define CppMicroServices_MAJOR_VERSION @CppMicroServices_MAJOR_VERSION@
+#define CppMicroServices_MINOR_VERSION @CppMicroServices_MINOR_VERSION@
+#define CppMicroServices_PATCH_VERSION @CppMicroServices_PATCH_VERSION@
 #define CppMicroServices_VERSION @CppMicroServices_VERSION@
 #define CppMicroServices_VERSION_STR "@CppMicroServices_VERSION@"
 

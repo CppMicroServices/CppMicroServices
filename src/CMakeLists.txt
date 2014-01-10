@@ -148,8 +148,10 @@ if(NOT US_IS_EMBEDDED)
   include_directories(${US_INTERNAL_INCLUDE_DIRS})
 
   usFunctionGenerateModuleInit(_srcs NAME ${PROJECT_NAME})
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
   usFunctionEmbedResources(_srcs LIBRARY_NAME ${PROJECT_NAME}
-                           ROOT_DIR resources
+                           ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources
                            FILES manifest.json)
 
   add_library(${PROJECT_NAME} ${_srcs}

@@ -6,10 +6,11 @@ platform and IDE specific project files.
 
 The library should compile on many different platforms. Below is a list of tested compiler/OS combinations:
 
-  - GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)
-  - GCC 4.7 (Ubuntu 12.10)
-  - Visual Studio 2008, 2010, and 2012
-  - Clang 3.0 (Ubuntu 12.10 and MacOS X 10.6)
+  - GCC 4.6 (Ubuntu 12.04)
+  - GCC 4.8 (Ubuntu 13.10)
+  - Clang 3.2 (Ubuntu 13.10)
+  - Clang (MacOS X 10.8 and 10.9)
+  - Visual Studio 2008 SP1, 2010, 2012, 2013 (Windows 7)
 
 
 Prerequisites

@@ -16,5 +16,6 @@ branches:
   only:
     - master
     - development
+    - /^release-.*$/
 
 script: ctest -VV -S ./CMake/usCTestScript_travis.cmake

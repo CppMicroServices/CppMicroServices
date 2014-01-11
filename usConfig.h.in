@@ -11,16 +11,41 @@
 #cmakedefine US_ENABLE_AUTOLOADING_SUPPORT
 #cmakedefine US_ENABLE_THREADING_SUPPORT
 #cmakedefine US_ENABLE_RESOURCE_COMPRESSION
-#cmakedefine US_USE_CXX11
 #cmakedefine US_GCC_RTTI_WORKAROUND_NEEDED
+
+//-------------------------------------------------------------------
+// Header Availability
+//-------------------------------------------------------------------
+
+#cmakedefine US_HAVE_STDINT_H
+#cmakedefine US_HAVE_TR1_UNORDERED_MAP_H
+#cmakedefine US_HAVE_TR1_UNORDERED_SET_H
+#cmakedefine US_HAVE_TR1_FUNCTIONAL_H
+#cmakedefine US_HAVE_UNORDERED_MAP_H
+#cmakedefine US_HAVE_UNORDERED_SET_H
+#cmakedefine US_HAVE_FUNCTIONAL_H
+
+#cmakedefine US_HAVE_TR1_UNORDERED_MAP
+#cmakedefine US_HAVE_TR1_UNORDERED_SET
+#cmakedefine US_HAVE_TR1_FUNCTION
+#cmakedefine US_HAVE_STD_UNORDERED_MAP
+#cmakedefine US_HAVE_STD_UNORDERED_SET
+#cmakedefine US_HAVE_STD_FUNCTION
+
+#cmakedefine US_HAVE_TR1_HASH
+#cmakedefine US_HAVE_TR1_HASH_STRUCT
+#cmakedefine US_HAVE_TR1_HASH_CLASS
+#cmakedefine US_HAVE_STD_HASH
+#cmakedefine US_HAVE_STD_HASH_STRUCT
+#cmakedefine US_HAVE_STD_HASH_CLASS
 
 ///-------------------------------------------------------------------
 // Version information
 //-------------------------------------------------------------------
 
-#define CppMicroServices_VERSION_MAJOR @CppMicroServices_VERSION_MAJOR@
-#define CppMicroServices_VERSION_MINOR @CppMicroServices_VERSION_MINOR@
-#define CppMicroServices_VERSION_PATH @CppMicroServices_VERSION_PATCH@
+#define CppMicroServices_MAJOR_VERSION @CppMicroServices_MAJOR_VERSION@
+#define CppMicroServices_MINOR_VERSION @CppMicroServices_MINOR_VERSION@
+#define CppMicroServices_PATCH_VERSION @CppMicroServices_PATCH_VERSION@
 #define CppMicroServices_VERSION @CppMicroServices_VERSION@
 #define CppMicroServices_VERSION_STR "@CppMicroServices_VERSION@"
 
@@ -147,83 +172,57 @@ US_END_NAMESPACE
 // Hash Container
 //-------------------------------------------------------------------
 
-#ifdef US_USE_CXX11
-
+#ifdef US_HAVE_UNORDERED_MAP_H
   #include <unordered_map>
-  #include <unordered_set>
-
-  #define US_HASH_FUNCTION_BEGIN(type) \
-  template<> \
-  struct hash<type> : std::unary_function<type, std::size_t> { \
-  std::size_t operator()(const type& arg) const {
-
-  #define US_HASH_FUNCTION_END } };
-
-  #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
-
-  #if defined(US_PLATFORM_WINDOWS) && (_MSC_VER < 1700)
-    #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
-  #else
-    #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>
-  #endif
-
-  #define US_UNORDERED_MAP_TYPE ::std::unordered_map
-  #define US_UNORDERED_SET_TYPE ::std::unordered_set
-
-  #define US_HASH_FUNCTION_NAMESPACE ::std
-  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std {
-  #define US_HASH_FUNCTION_NAMESPACE_END }
-
-#elif defined(__GNUC__)
-
+#elif defined(US_HAVE_TR1_UNORDERED_MAP_H)
   #include <tr1/unordered_map>
-  #include <tr1/unordered_set>
-
-  #define US_HASH_FUNCTION_BEGIN(type) \
-  template<> \
-  struct hash<type> : std::unary_function<type, std::size_t> { \
-  std::size_t operator()(const type& arg) const {
-
-  #define US_HASH_FUNCTION_END } };
-
-  #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
-  #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::tr1::hash<type>
-
-  #define US_UNORDERED_MAP_TYPE ::std::tr1::unordered_map
-  #define US_UNORDERED_SET_TYPE ::std::tr1::unordered_set
-
-  #define US_HASH_FUNCTION_NAMESPACE ::std::tr1
-  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std { namespace tr1 {
-  #define US_HASH_FUNCTION_NAMESPACE_END }}
-
-#elif _MSC_VER <= 1500 // Visual Studio 2008 and lower
-
-  #include <unordered_map>
-  #include <unordered_set>
-
-  #define US_HASH_FUNCTION_BEGIN(type) \
-  template<> \
-  class hash<type> : std::unary_function<type, std::size_t> { \
-  public: std::size_t operator()(const type& arg) const {
-
-  #define US_HASH_FUNCTION_END } };
-
-  #define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
-  #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::tr1::hash<type>
-
-  #define US_UNORDERED_MAP_TYPE ::std::tr1::unordered_map
-  #define US_UNORDERED_SET_TYPE ::std::tr1::unordered_set
-
-  #define US_HASH_FUNCTION_NAMESPACE ::std::tr1
-  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std { namespace tr1 {
-  #define US_HASH_FUNCTION_NAMESPACE_END }}
-
 #endif
 
-//-------------------------------------------------------------------
-// Header Availability
-//-------------------------------------------------------------------
+#ifdef US_HAVE_UNORDERED_SET_H
+  #include <unordered_set>
+#elif defined(US_HAVE_TR1_UNORDERED_SET_H)
+  #include <tr1/unordered_set>
+#endif
 
-#cmakedefine HAVE_STDINT
+#ifdef US_HAVE_STD_UNORDERED_MAP
+  #define US_UNORDERED_MAP_TYPE ::std::unordered_map
+#elif defined(US_HAVE_TR1_UNORDERED_MAP)
+  #define US_UNORDERED_MAP_TYPE ::std::tr1::unordered_map
+#endif
+
+#ifdef US_HAVE_STD_UNORDERED_SET
+  #define US_UNORDERED_SET_TYPE ::std::unordered_set
+#elif defined(US_HAVE_TR1_UNORDERED_SET)
+  #define US_UNORDERED_SET_TYPE ::std::tr1::unordered_set
+#endif
+
+#ifdef US_HAVE_STD_HASH
+  #define US_HASH_FUNCTION_NAMESPACE ::std
+  #ifdef US_HAVE_STD_HASH_STRUCT
+    #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>
+  #elif defined(US_HAVE_STD_HASH_CLASS)
+    #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
+  #endif
+  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std {
+  #define US_HASH_FUNCTION_NAMESPACE_END }
+#elif defined(US_HAVE_TR1_HASH)
+  #define US_HASH_FUNCTION_NAMESPACE ::std::tr1
+  #ifdef US_HAVE_TR1_HASH_STRUCT
+    #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::tr1::hash<type>
+  #elif defined(US_HAVE_TR1_HASH_CLASS)
+    #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::tr1::hash<type>
+  #endif
+  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std { namespace tr1 {
+  #define US_HASH_FUNCTION_NAMESPACE_END }}
+#endif
+
+#define US_HASH_FUNCTION_BEGIN(type) \
+template<> \
+struct hash<type> : std::unary_function<type, std::size_t> { \
+std::size_t operator()(const type& arg) const {
+
+#define US_HASH_FUNCTION_END } };
+
+#define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
 
 #endif // USCONFIG_H

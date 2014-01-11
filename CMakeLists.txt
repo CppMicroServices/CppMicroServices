@@ -1,7 +1,7 @@
 project(CppMicroServices)
 
 set(${PROJECT_NAME}_MAJOR_VERSION 2)
-set(${PROJECT_NAME}_MINOR_VERSION 0)
+set(${PROJECT_NAME}_MINOR_VERSION 1)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
@@ -130,13 +130,6 @@ us_cache_var(ARCHIVE_INSTALL_DIR ${default_archive_install_dir} STRING "Relative
 us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative install location for headers" ADVANCED)
 us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
 
-if(MSVC10 OR MSVC11 OR MSVC12)
-  # Visual Studio 2010 and newer have support for C++11 enabled by default
-  set(US_USE_C++11 1)
-else()
-  us_cache_var(US_USE_C++11 OFF BOOL "Enable the use of C++11 features" ADVANCED)
-endif()
-
 us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ micro services entities")
 us_cache_var(US_HEADER_PREFIX "" STRING "The file name prefix for the public C++ micro services header files")
 
@@ -154,9 +147,6 @@ set(US_C_FLAGS_RELEASE)
 set(US_CXX_FLAGS)
 set(US_CXX_FLAGS_RELEASE)
 
-# This is used as a preprocessor define
-set(US_USE_CXX11 ${US_USE_C++11})
-
 # Set C++ compiler flags
 if(NOT MSVC)
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
@@ -164,10 +154,6 @@ if(NOT MSVC)
                     -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
-
-  if(US_USE_C++11)
-    usFunctionCheckCompilerFlags("-std=c++0x" US_CXX_FLAGS)
-  endif()
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -203,7 +189,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
 elseif(MSVC)
-  set(US_CXX_FLAGS "/MP /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
+  set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
 endif()
 
 if(NOT US_IS_EMBEDDED)
@@ -232,9 +218,103 @@ endif()
 # US Header Checks
 #-----------------------------------------------------------------------------
 
-include(CheckIncludeFile)
+include(CheckIncludeFileCXX)
+include(CheckCXXSourceCompiles)
 
-CHECK_INCLUDE_FILE(stdint.h HAVE_STDINT)
+CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
+CHECK_INCLUDE_FILE_CXX(tr1/unordered_map US_HAVE_TR1_UNORDERED_MAP_H)
+CHECK_INCLUDE_FILE_CXX(tr1/unordered_set US_HAVE_TR1_UNORDERED_SET_H)
+CHECK_INCLUDE_FILE_CXX(tr1/functional US_HAVE_TR1_FUNCTIONAL_H)
+CHECK_INCLUDE_FILE_CXX(unordered_map US_HAVE_UNORDERED_MAP_H)
+CHECK_INCLUDE_FILE_CXX(unordered_set US_HAVE_UNORDERED_SET_H)
+CHECK_INCLUDE_FILE_CXX(functional US_HAVE_FUNCTIONAL_H)
+
+if(US_HAVE_UNORDERED_MAP_H)
+  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
+                            US_HAVE_TR1_UNORDERED_MAP)
+  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
+                            US_HAVE_STD_UNORDERED_MAP)
+  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
+                            US_HAVE_TR1_HASH)
+  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::hash<int>(); return 0; }"
+                            US_HAVE_STD_HASH)
+  if(US_HAVE_STD_HASH)
+    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_STD_HASH_STRUCT)
+    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_STD_HASH_CLASS)
+  elseif(US_HAVE_TR1_HASH)
+    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_TR1_HASH_STRUCT)
+    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_TR1_HASH_CLASS)
+  endif()
+elseif(US_HAVE_TR1_UNORDERED_MAP_H)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
+                            US_HAVE_TR1_UNORDERED_MAP)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
+                            US_HAVE_STD_UNORDERED_MAP)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
+                            US_HAVE_TR1_HASH)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::hash<int>(); return 0; }"
+                            US_HAVE_STD_HASH)
+  if(US_HAVE_STD_HASH)
+    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_STD_HASH_STRUCT)
+    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_STD_HASH_CLASS)
+  elseif(US_HAVE_TR1_HASH)
+    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_TR1_HASH_STRUCT)
+    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
+                              US_HAVE_TR1_HASH_CLASS)
+  endif()
+else()
+  message(SEND_ERROR "The header file \"unordered_map\" is not available.")
+endif()
+if(NOT (US_HAVE_TR1_UNORDERED_MAP OR US_HAVE_STD_UNORDERED_MAP))
+  message(SEND_ERROR "The \"unordered_map\" type is not available.")
+endif()
+
+if(US_HAVE_UNORDERED_SET_H)
+  CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
+                            US_HAVE_TR1_UNORDERED_SET)
+  CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
+                            US_HAVE_STD_UNORDERED_SET)
+elseif(US_HAVE_TR1_UNORDERED_SET_H)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
+                            US_HAVE_TR1_UNORDERED_SET)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
+                            US_HAVE_STD_UNORDERED_SET)
+else()
+  message(SEND_ERROR "The header file \"unordered_set\" is not available.")
+endif()
+if(NOT (US_HAVE_TR1_UNORDERED_SET OR US_HAVE_STD_UNORDERED_SET))
+  message(SEND_ERROR "The \"unordered_set\" type is not available.")
+endif()
+
+if(NOT (US_HAVE_FUNCTIONAL_H OR US_HAVE_TR1_FUNCTIONAL_H))
+  message(SEND_ERROR "The header file \"functional\" is not available.")
+endif()
+
+if(US_HAVE_FUNCTIONAL_H)
+  CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
+                            US_HAVE_TR1_FUNCTION)
+  CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::function<int(void)> f(main); return 0; }"
+                            US_HAVE_STD_FUNCTION)
+endif()
+if((NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION)) AND US_HAVE_TR1_FUNCTIONAL_H)
+  unset(US_HAVE_TR1_FUNCTION CACHE)
+  unset(US_HAVE_STD_FUNCTION CACHE)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
+                            US_HAVE_TR1_FUNCTION)
+  CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::function<int(void)> f(main); return 0; }"
+                            US_HAVE_STD_FUNCTION)
+endif()
+
+if(NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION))
+  message(SEND_ERROR "The \"function\" type is not available.")
+endif()
 
 #-----------------------------------------------------------------------------
 # US include dirs and libraries

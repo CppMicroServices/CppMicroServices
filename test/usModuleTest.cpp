@@ -110,11 +110,12 @@ void frame005a(ModuleContext* mc)
   // check expected headers
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_CONDITION("CppMicroServicesTestDriver" == m->GetName(), "Test module name");
-  US_TEST_CONDITION(ModuleVersion(0,1,0) == m->GetVersion(), "Test module version")
+  US_TEST_CONDITION("CppMicroServicesTestDriver" == m->GetName(), "Test module name")
+  US_TEST_CONDITION(ModuleVersion(0,1,0) == m->GetVersion(), "Test test driver module version")
+  US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == ModuleRegistry::GetModule(1)->GetVersion(), "Test CppMicroServices version")
 #else
-  US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name");
-  US_TEST_CONDITION(ModuleVersion(1,99,0) == m->GetVersion(), "Test module version")
+  US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name")
+  US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == m->GetVersion(), "Test module version")
 #endif
 }
 

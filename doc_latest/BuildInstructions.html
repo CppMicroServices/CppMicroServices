@@ -72,10 +72,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><p>The C++ Micro Services library provides <a href="http://www.cmake.org">CMake</a> build scripts which allow the generation of platform and IDE specific project files.</p>
 <p>The library should compile on many different platforms. Below is a list of tested compiler/OS combinations:</p>
 <ul>
-<li>GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)</li>
-<li>GCC 4.7 (Ubuntu 12.10)</li>
-<li>Visual Studio 2008, 2010, and 2012</li>
-<li>Clang 3.0 (Ubuntu 12.10 and MacOS X 10.6)</li>
+<li>GCC 4.6 (Ubuntu 12.04)</li>
+<li>GCC 4.8 (Ubuntu 13.10)</li>
+<li>Clang 3.2 (Ubuntu 13.10)</li>
+<li>Clang (MacOS X 10.8 and 10.9)</li>
+<li>Visual Studio 2008 SP1, 2010, 2012, 2013 (Windows 7)</li>
 </ul>
 <h2>Prerequisites </h2>
 <ul>
@@ -90,7 +91,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><b>US_BUILD_TESTING</b> Build unit tests and code snippets.</li>
 <li><b>US_ENABLE_AUTOLOADING_SUPPORT</b> Enable auto-loading of modules located in special sub-directories. See <a class="el" href="MicroServices_AutoLoading.html">Auto Loading Modules</a> for detailed information about this feature.</li>
 <li><b>US_ENABLE_THREADING_SUPPORT</b> Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives) to make the API thread-safe. If your application is not multi-threaded, turn this option OFF to get maximum performance.</li>
-<li><b>US_USE_C++11 (advanced)</b> Enable the usage of C++11 constructs.</li>
 <li><b>US_ENABLE_RESOURCE_COMPRESSION (advanced)</b> Enable compression of embedded resources. See <a class="el" href="MicroServices_Resources.html">The Resources System</a> for detailed information about the resource system.</li>
 </ul>
 <h3>Customizing naming conventions</h3>
@@ -102,5 +102,5 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 
   <hr class="footer"/>
-  <address class="footer"><small>Generated on Mon Dec 16 2013 for C++ Micro Services 1.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.5
+  <address class="footer"><small>Generated on Sat Jan 11 2014 for C++ Micro Services 2.99.0 by <a href="http://www.doxygen.org/index.html">Doxygen</a> 1.8.5
 </small></address>

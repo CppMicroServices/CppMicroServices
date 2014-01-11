@@ -9,12 +9,13 @@ as well as related information.
 
 Documentation for released versions:
 
+ * [CppMicroServices 2.1 Documentation](doc_2_1/index.html)
  * [CppMicroServices 2.0 Documentation](doc_2_0/index.html)
  * [CppMicroServices 1.0 Documentation](doc_1_0/index.html)
 
 The Doxygen documentation for the master branch can be found here:
 
- * [Doxygen documentation (master)](doc_latest/index.html)
+ * [Doxygen documentation (development)](doc_latest/index.html)
 
 
 

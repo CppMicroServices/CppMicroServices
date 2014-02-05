@@ -44,6 +44,7 @@ matrix:
   include:
     - language: cpp
       compiler: gcc
+      env:
       script: curl -s $COVERITY_SCAN_BUILD_URL | bash
 
 branches:

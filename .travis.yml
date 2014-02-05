@@ -3,14 +3,50 @@ compiler:
   - gcc
   - clang
 env:
-  - BUILD_CONFIGURATION=0
-  - BUILD_CONFIGURATION=1
-  - BUILD_CONFIGURATION=2
-  - BUILD_CONFIGURATION=3
-  - BUILD_CONFIGURATION=4
-  - BUILD_CONFIGURATION=5
-  - BUILD_CONFIGURATION=6
-  - BUILD_CONFIGURATION=7
+  global:
+    - STANDARD_BUILD_COMMAND="ctest -VV -S ./CMake/usCTestScript_travis.cmake"
+
+    # -- BEGIN Coverity Scan ENV
+
+    # Pre-configuration steps that should not be analyzed
+    - COVERITY_SCAN_BUILD_COMMAND_PREPEND="cmake -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_BUILD_TESTING:BOOL=ON -DUS_ENABLE_AUTOLOADING_SUPPORT:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=ON ."
+
+    # The build command with all of the arguments that you would apply to a manual `cov-build`
+    # Usually this is the same as STANDARD_BUILD_COMMAND, exluding the automated test arguments
+    - COVERITY_SCAN_BUILD_COMMAND="make -j4"
+
+    - PROJECT_NAME="saschazelzer/CppMicroServices"
+
+    # Email address for notifications related to this build
+    - OWNER_EMAIL="s.zelzer@dkfz-heidelberg.de"
+
+    # Regular expression selects on which branches to run analysis
+    # Be aware of quotas. Do not run on every branch/commit
+    - COVERITY_SCAN_BRANCH_PATTERN="development"
+
+    # COVERITY_SCAN_TOKEN via "travis encrypt" using the repo's public key
+    - secure: "byqeazsk6vCHFoWrZJvLFy/m1KI8sDIEhW7b1yvlGpcCrXQBoDk+dtr3kLCgiYl1+gC39av++0uOJnoM7xn/qiURW65CVDWxa9Giie079M63tqDRbOoeGezhBa8DEXJjhxZ77Iijt0tTOcp/VWg87uSiHSqI+B9HwrWDKwEtSzM="
+
+    - COVERITY_SCAN_BUILD_URL="https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh"
+    - COVERITY_SCAN_BUILD="curl -s $COVERITY_SCAN_BUILD_URL | bash"
+
+    # -- END Coverity Scan ENV
+
+  matrix:
+  - BUILD_CONFIGURATION=0 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=1 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=2 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=3 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=4 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=5 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=6 COVERITY_SCAN=0
+  - BUILD_CONFIGURATION=7 COVERITY_SCAN=0
+
+matrix:
+  include:
+    language: cpp
+    compiler: gcc
+    env: COVERITY_SCAN=1
 
 branches:
   only:
@@ -18,4 +54,6 @@ branches:
     - development
     - /^release-.*$/
 
-script: ctest -VV -S ./CMake/usCTestScript_travis.cmake
+script:
+  - if [ "${COVERITY_SCAN}" = '1' ]; then eval "$COVERITY_SCAN_BUILD"; else eval "$STANDARD_BUILD_COMMAND"; fi
+

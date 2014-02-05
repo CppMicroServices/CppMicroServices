@@ -44,9 +44,9 @@ env:
 
 matrix:
   include:
-    language: cpp
-    compiler: gcc
-    env: COVERITY_SCAN=1
+    - language: cpp
+      compiler: gcc
+      env: COVERITY_SCAN=1
 
 branches:
   only:

@@ -37,7 +37,7 @@ function(usFunctionGenerateExecutableInit src_var)
   set(exec_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/${US_EXECUTABLE_IDENTIFIER}_init.cpp")
   configure_file(${CppMicroServices_EXECUTABLE_INIT_TEMPLATE} ${exec_init_src_file} @ONLY)
 
-  set(_src ${${src_var}} ${exec_init_src_file})
+  set(_src ${exec_init_src_file} ${${src_var}})
   set(${src_var} ${_src} PARENT_SCOPE)
 
 endfunction()

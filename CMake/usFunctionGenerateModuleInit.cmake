@@ -48,7 +48,7 @@ function(usFunctionGenerateModuleInit src_var)
   set(module_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/${US_MODULE_LIBRARY_NAME}_init.cpp")
   configure_file(${CppMicroServices_MODULE_INIT_TEMPLATE} ${module_init_src_file} @ONLY)
 
-  set(_src ${${src_var}} ${module_init_src_file})
+  set(_src ${module_init_src_file} ${${src_var}})
   set(${src_var} ${_src} PARENT_SCOPE)
 
 endfunction()

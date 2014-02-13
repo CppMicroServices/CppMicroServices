@@ -17,7 +17,7 @@ env:
     - COVERITY_SCAN_PROJECT_NAME="saschazelzer/CppMicroServices"
 
     # Email address for notifications related to this build
-    - OWNER_EMAIL="s.zelzer@dkfz-heidelberg.de"
+    - COVERITY_SCAN_NOTIFICATION_EMAIL="s.zelzer@dkfz-heidelberg.de"
 
     # Regular expression selects on which branches to run analysis
     # Be aware of quotas. Do not run on every branch/commit

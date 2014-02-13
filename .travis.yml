@@ -14,7 +14,7 @@ env:
     # Usually this is the same as STANDARD_BUILD_COMMAND, exluding the automated test arguments
     - COVERITY_SCAN_BUILD_COMMAND="make -j4"
 
-    - PROJECT_NAME="saschazelzer/CppMicroServices"
+    - COVERITY_SCAN_PROJECT_NAME="saschazelzer/CppMicroServices"
 
     # Email address for notifications related to this build
     - OWNER_EMAIL="s.zelzer@dkfz-heidelberg.de"

@@ -735,9 +735,9 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @PROJECT_SOURCE_DIR@ \
-                         @PROJECT_SOURCE_DIR@/CMake/usFunctionEmbedResources.cmake \
-                         @PROJECT_SOURCE_DIR@/CMake/usFunctionGenerateModuleInit.cmake \
-                         @PROJECT_SOURCE_DIR@/CMake/usFunctionGenerateExecutableInit.cmake \
+                         @PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake \
+                         @PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake \
+                         @PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateExecutableInit.cmake \
                          @PROJECT_BINARY_DIR@/include/usConfig.h
 
 # This tag can be used to specify the character encoding of the source files

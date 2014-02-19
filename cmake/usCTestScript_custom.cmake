@@ -21,4 +21,4 @@ foreach(i RANGE 7)
   list(APPEND US_BUILD_CONFIGURATION ${i})
 endforeach()
 
-include(${US_SOURCE_DIR}/CMake/usCTestScript.cmake)
+include(${US_SOURCE_DIR}/cmake/usCTestScript.cmake)

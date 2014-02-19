@@ -54,5 +54,5 @@ branches:
     - /^release-.*$/
 
 script:
-  - ctest -VV -S ./CMake/usCTestScript_travis.cmake
+  - ctest -VV -S ./cmake/usCTestScript_travis.cmake
 

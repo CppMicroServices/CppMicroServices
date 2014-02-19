@@ -3,4 +3,4 @@
 *.so
 CMakeLists.txt.user*
 gh-pages
-examples/makefile/main
+core/examples/makefile/main

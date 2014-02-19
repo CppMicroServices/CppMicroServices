@@ -14,7 +14,7 @@ cmake_policy(SET CMP0017 NEW)
 #------------------------------------------------------------------------------
 
 set(CMAKE_MODULE_PATH
-  ${PROJECT_SOURCE_DIR}/CMake
+  ${PROJECT_SOURCE_DIR}/cmake
   ${CMAKE_MODULE_PATH}
   )
 
@@ -91,7 +91,6 @@ if(NOT DEFINED US_IS_EMBEDDED)
     set(US_IS_EMBEDDED 0)
   else()
     set(US_IS_EMBEDDED 1)
-    set(CppMicroServices_EXPORTS 1)
   endif()
 endif()
 
@@ -109,6 +108,11 @@ us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
 us_cache_var(US_ENABLE_RESOURCE_COMPRESSION ON BOOL "Enable resource compression" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
+us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
+
+if(US_BUILD_TESTING)
+  enable_testing()
+endif()
 
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
@@ -129,23 +133,30 @@ us_cache_var(LIBRARY_INSTALL_DIR ${default_library_install_dir} STRING "Relative
 us_cache_var(ARCHIVE_INSTALL_DIR ${default_archive_install_dir} STRING "Relative install location for archives" ADVANCED)
 us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative install location for headers" ADVANCED)
 us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
+set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
-us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ micro services entities")
-us_cache_var(US_HEADER_PREFIX "" STRING "The file name prefix for the public C++ micro services header files")
+us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services symbols")
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
-set(${PROJECT_NAME}_MODULE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
-set(${PROJECT_NAME}_EXECUTABLE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/usExecutableInit.cpp" CACHE INTERNAL "The executable initialization template code")
+set(US_MODULE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
+set(US_EXECUTABLE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/usExecutableInit.cpp" CACHE INTERNAL "The executable initialization template code")
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
 #-----------------------------------------------------------------------------
 
-set(US_C_FLAGS)
-set(US_C_FLAGS_RELEASE)
-set(US_CXX_FLAGS)
-set(US_CXX_FLAGS_RELEASE)
+if(US_IS_EMBEDDED)
+  set(CMAKE_C_FLAGS)
+  set(CMAKE_C_FLAGS_RELEASE)
+  set(CMAKE_C_FLAGS_DEBUG)
+  set(CMAKE_CXX_FLAGS)
+  set(CMAKE_CXX_FLAGS_RELEASE)
+  set(CMAKE_CXX_FLAGS_DEBUG)
+  set(CMAKE_LINK_FLAGS)
+  set(CMAKE_LINK_FLAGS_RELEASE)
+  set(CMAKE_LINK_FLAGS_DEBUG)
+endif()
 
 # Set C++ compiler flags
 if(NOT MSVC)
@@ -155,6 +166,8 @@ if(NOT MSVC)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 endif()
+
+set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -177,7 +190,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   else()
     # Enable visibility support
     if(NOT ${GCC_VERSION} VERSION_LESS "4.5")
-      usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" US_CXX_FLAGS)
+      usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+      if(_have_visibility)
+        set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
+        set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
+      endif()
     else()
       set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
     endif()
@@ -187,17 +204,22 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if(_fortify_source_flag)
     set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
   endif()
+else()
+  usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+  if(_have_visibility)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
+    set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
+  endif()
+endif()
 
-elseif(MSVC)
+if(MSVC)
   set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
 endif()
 
-if(NOT US_IS_EMBEDDED)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
-  set(CMAKE_C_FLAGS_REALEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
-endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
+set(CMAKE_C_FLAGS_REALEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 
 #-----------------------------------------------------------------------------
 # US Link Flags
@@ -317,103 +339,20 @@ if(NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION))
 endif()
 
 #-----------------------------------------------------------------------------
-# US include dirs and libraries
-#-----------------------------------------------------------------------------
-
-set(US_INCLUDE_DIRS
-  ${PROJECT_BINARY_DIR}/include
-)
-
-set(US_INTERNAL_INCLUDE_DIRS
-  ${PROJECT_BINARY_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/util
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/service
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module
-)
-
-# link library for third party libs
-if(US_IS_EMBEDDED)
-  set(US_LIBRARY_TARGET ${US_EMBEDDING_LIBRARY})
-else()
-  set(US_LIBRARY_TARGET ${PROJECT_NAME})
-endif()
-
-# link libraries for the CppMicroServices lib
-set(US_LINK_LIBRARIES )
-if(UNIX)
-  list(APPEND US_LINK_LIBRARIES dl)
-endif()
-
-#-----------------------------------------------------------------------------
 # Source directory
 #-----------------------------------------------------------------------------
 
-set(us_config_h_file "${PROJECT_BINARY_DIR}/include/usConfig.h")
-configure_file(usConfig.h.in ${us_config_h_file})
+set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
 
-set(US_RCC_EXECUTABLE_NAME usResourceCompiler)
-set(CppMicroServices_RCC_EXECUTABLE_NAME ${US_RCC_EXECUTABLE_NAME} CACHE INTERNAL "The target name of the usResourceCompiler executable.")
-
-add_subdirectory(tools)
-
-add_subdirectory(src)
-
-
-#-----------------------------------------------------------------------------
-# US testing
-#-----------------------------------------------------------------------------
-
-if(US_BUILD_TESTING)
-  enable_testing()
-  add_subdirectory(test)
-endif()
-
-#-----------------------------------------------------------------------------
-# Documentation
-#-----------------------------------------------------------------------------
-
-add_subdirectory(documentation)
-
-#-----------------------------------------------------------------------------
-# Last configuration and install steps
-#-----------------------------------------------------------------------------
-
-if(NOT US_IS_EMBEDDED)
-  export(TARGETS ${PROJECT_NAME} ${US_RCC_EXECUTABLE_NAME}
-         FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
-  install(EXPORT ${PROJECT_NAME}Targets
-          FILE ${PROJECT_NAME}Targets.cmake
-          DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/)
-endif()
-
-set(_install_cmake_scripts
-  ${${PROJECT_NAME}_MODULE_INIT_TEMPLATE}
-  ${${PROJECT_NAME}_EXECUTABLE_INIT_TEMPLATE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/CMakeParseArguments.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionGenerateModuleInit.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionGenerateExecutableInit.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/usFunctionEmbedResources.cmake
-  )
-
-install(FILES ${_install_cmake_scripts}
-        DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
-  )
-
-# Configure CppMicroServicesConfig.cmake for the build tree
+# Configure CppMicroServicesConfig.cmake for the build tree.
+# The file is used in sub-directories.
 
 set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-set(PACKAGE_CONFIG_CMAKE_DIR ${PROJECT_SOURCE_DIR}/CMake)
-if(US_IS_EMBEDDED)
-  set(PACKAGE_EMBEDDED "if(@PROJECT_NAME@_IS_EMBEDDED)
-  set(@PROJECT_NAME@_INTERNAL_INCLUDE_DIRS @US_INTERNAL_INCLUDE_DIRS@)
-  set(@PROJECT_NAME@_SOURCES @US_SOURCES@)
-  set(@PROJECT_NAME@_PUBLIC_HEADERS @US_PUBLIC_HEADERS@)
-  set(@PROJECT_NAME@_PRIVATE_HEADERS @US_PRIVATE_HEADERS@)
-endif()")
-else()
-  set(PACKAGE_EMBEDDED )
-endif()
+set(PACKAGE_CONFIG_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)
+
+set(US_RCC_EXECUTABLE_NAME usResourceCompiler)
+set(CppMicroServices_RCC_EXECUTABLE_NAME ${US_RCC_EXECUTABLE_NAME} CACHE INTERNAL "The target name of the usResourceCompiler executable.")
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
@@ -421,14 +360,57 @@ configure_file(
   @ONLY
   )
 
+set(us_global_config_h_file "${PROJECT_BINARY_DIR}/include/usGlobalConfig.h")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/usGlobalConfig.h.in ${us_global_config_h_file})
+
+include_directories(${US_INCLUDE_DIRS})
+
+add_subdirectory(tools)
+
+add_subdirectory(core)
+
+#-----------------------------------------------------------------------------
+# Documentation
+#-----------------------------------------------------------------------------
+
+add_subdirectory(doc)
+
+#-----------------------------------------------------------------------------
+# Last configuration and install steps
+#-----------------------------------------------------------------------------
+
+
+export(TARGETS ${US_RCC_EXECUTABLE_NAME}
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+
+set(_install_cmake_scripts
+  ${US_MODULE_INIT_TEMPLATE}
+  ${US_EXECUTABLE_INIT_TEMPLATE}
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeParseArguments.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPackageHandleStandardArgs.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPackageMessage.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/usFunctionGenerateModuleInit.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/usFunctionGenerateExecutableInit.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/usFunctionEmbedResources.cmake
+  )
+
+install(FILES ${_install_cmake_scripts}
+        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+
+install(FILES ${us_global_config_h_file}
+        DESTINATION ${HEADER_INSTALL_DIR})
+
 # Configure CppMicroServicesConfig.cmake for the install tree
 set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
 set(CONFIG_RUNTIME_DIR ${RUNTIME_INSTALL_DIR})
-set(CONFIG_CMAKE_DIR ${AUXILIARY_INSTALL_DIR}/CMake)
+set(CONFIG_CMAKE_DIR ${AUXILIARY_CMAKE_INSTALL_DIR})
 configure_package_config_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
   ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-  INSTALL_DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
+  INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
   PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_DIR CONFIG_CMAKE_DIR
   NO_SET_AND_CHECK_MACRO
   NO_CHECK_REQUIRED_COMPONENTS_MACRO
@@ -443,20 +425,6 @@ configure_file(
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${AUXILIARY_INSTALL_DIR}/CMake/
+        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
         ${US_SDK_INSTALL_COMPONENT}
   )
-
-#-----------------------------------------------------------------------------
-# Build the examples
-#-----------------------------------------------------------------------------
-
-option(US_BUILD_EXAMPLES "Build example projects" OFF)
-if(US_BUILD_EXAMPLES)
-  if(NOT US_BUILD_SHARED_LIBS)
-    message(WARNING "Examples are not available if US_BUILD_SHARED_LIBS is OFF")
-  else()
-    set(CppMicroServices_DIR ${PROJECT_BINARY_DIR})
-    add_subdirectory(examples)
-  endif()
-endif()

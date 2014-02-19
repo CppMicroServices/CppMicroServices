@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "usConfig.h"
+#include "usGlobalConfig.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -32,9 +32,9 @@
 #include <map>
 #include <stack>
 
-#include "stdint_p.h"
+#include "us_stdint.h"
 
-#include "usConfig.h"
+#include "usGlobalConfig.h"
 
 #ifdef US_ENABLE_RESOURCE_COMPRESSION
 extern "C" {
@@ -489,7 +489,7 @@ bool ResourceWriter::WriteHeader()
   WriteString("\n\n");
   WriteString("  WARNING! All changes made in this file will be lost!\n");
   WriteString( "=============================================================================*/\n\n");
-  WriteString("#include <usConfig.h>\n");
+  WriteString("#include <usCoreExport.h>\n");
   WriteString("#include <usModuleInfo.h>\n\n");
   return true;
 }
@@ -629,7 +629,7 @@ bool ResourceWriter::WriteDataTree()
 bool ResourceWriter::WriteRegistrationCode()
 {
   WriteString("US_BEGIN_NAMESPACE\n\n");
-  WriteString("extern US_EXPORT bool RegisterResourceData(int, ModuleInfo*, ModuleInfo::ModuleResourceData, ModuleInfo::ModuleResourceData, ModuleInfo::ModuleResourceData);\n\n");
+  WriteString("extern US_Core_EXPORT bool RegisterResourceData(int, ModuleInfo*, ModuleInfo::ModuleResourceData, ModuleInfo::ModuleResourceData, ModuleInfo::ModuleResourceData);\n\n");
   WriteString("US_END_NAMESPACE\n\n");
 
   WriteString(std::string("extern \"C\" US_ABI_EXPORT int _us_init_resources_") + libName +

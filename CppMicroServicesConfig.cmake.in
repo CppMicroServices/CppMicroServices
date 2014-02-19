@@ -1,34 +1,194 @@
+# A package config for @PROJECT_NAME@.
+# This file loads component specific configuration files and
+# sets the following variables which can be used in other
+# CMake projects to build and link against @PROJECT_NAME@:
+#
+#   US_INCLUDE_DIRS
+#   US_LIBRARIES
+#   US_RUNTIME_LIBRARY_DIRS
+#
+# The following variables are aliases for the ones above:
+#
+#   CppMicroServices_INCLUDE_DIRS
+#   CppMicroServices_LIBRARIES
+#   CppMicroServices_RUNTIME_LIBRARY_DIRS
+#
+# To specify a compatible version for a specific component,
+# set the following variable before calling find_package:
+#
+#   US_<component>_FIND_VERSION
+#
+# After find_package returns successfully, the following additional
+# variables will be set:
+#
+#   US_FOUND
+#   CPPMICROSERVICES_FOUND
+#
+#   US_RCC_EXECUTABLE
+#
+#   US_CXX_FLAGS
+#   US_CXX_FLAGS_RELEASE
+#   US_CXX_FLAGS_DEBUG
+#   US_C_FLAGS
+#   US_C_FLAGS_RELEASE
+#   US_C_FLAGS_DEBUG
+#   US_LINK_FLAGS
+#   US_LINK_FLAGS_RELEASE
+#   US_LINK_FLAGS_DEBUG
+#   US_COMPILE_DEFINITIONS
+#   US_COMPILE_DEFINITIONS_RELEASE
+#   US_COMPILE_DEFINITIONS_DEBUG
+#
+#   US_VERSION
+#   US_VERSION_MAJOR
+#   US_VERSION_MINOR
+#   US_VERSION_PATCH
+#   US_VERSION_TWEAK
+#   US_VERSION_COUNT
+#
+# Additional component specific variables:
+#
+#   US_<component>_FOUND
+#
+#   US_<component>_VERSION
+#   US_<component>_VERSION_MAJOR
+#   US_<component>_VERSION_MINOR
+#   US_<component>_VERSION_PATCH
+#   US_<component>_VERSION_TWEAK
+#   US_<component>_VERSION_COUNT
+#
+#   US_<component>_CXX_FLAGS
+#   US_<component>_CXX_FLAGS_RELEASE
+#   US_<component>_CXX_FLAGS_DEBUG
+#   US_<component>_C_FLAGS
+#   US_<component>_C_FLAGS_RELEASE
+#   US_<component>_C_FLAGS_DEBUG
+#   US_<component>_LINK_FLAGS
+#   US_<component>_LINK_FLAGS_RELEASE
+#   US_<component>_LINK_FLAGS_DEBUG
+#   US_<component>_COMPILE_DEFINITIONS
+#   US_<component>_COMPILE_DEFINITIONS_RELEASE
+#   US_<component>_COMPILE_DEFINITIONS_DEBUG
+#
+
 @PACKAGE_INIT@
 
-set(@PROJECT_NAME@_CXX_FLAGS "@US_CXX_FLAGS@")
-set(@PROJECT_NAME@_CXX_FLAGS_RELEASE "@US_CXX_FLAGS_RELEASE@")
-set(@PROJECT_NAME@_CXX_FLAGS_DEBUG "@US_CXX_FLAGS_DEBUG@")
-set(@PROJECT_NAME@_C_FLAGS "@US_C_FLAGS@")
-set(@PROJECT_NAME@_C_FLAGS_RELEASE "@US_C_FLAGS_RELEASE@")
-set(@PROJECT_NAME@_C_FLAGS_DEBUG "@US_C_FLAGS_DEBUG@")
+list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
-set(@PROJECT_NAME@_INCLUDE_DIR @PACKAGE_CONFIG_INCLUDE_DIR@)
+set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
+set(US_MODULE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usModuleInit.cpp")
+set(US_EXECUTABLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usExecutableInit.cpp")
 
-set(@PROJECT_NAME@_RCC_EXECUTABLE_NAME @CppMicroServices_RCC_EXECUTABLE_NAME@)
-set(@PROJECT_NAME@_MODULE_INIT_TEMPLATE @PACKAGE_CONFIG_CMAKE_DIR@/usModuleInit.cpp)
-set(@PROJECT_NAME@_EXECUTABLE_INIT_TEMPLATE @PACKAGE_CONFIG_CMAKE_DIR@/usExecutableInit.cpp)
+set(US_IS_EMBEDDED @US_IS_EMBEDDED@)
 
-set(@PROJECT_NAME@_INCLUDE_DIRS ${@PROJECT_NAME@_INCLUDE_DIR})
-set(@PROJECT_NAME@_LIBRARIES @US_LIBRARY_TARGET@)
-
-find_program(@PROJECT_NAME@_RCC_EXECUTABLE ${@PROJECT_NAME@_RCC_EXECUTABLE_NAME}
+# The CppMicroServices resource compiler
+find_program(US_RCC_EXECUTABLE ${US_RCC_EXECUTABLE_NAME}
              PATHS "@PACKAGE_CONFIG_RUNTIME_DIR@"
              PATH_SUFFIXES Release Debug RelWithDebInfo MinSizeRel)
-mark_as_advanced(@PROJECT_NAME@_RCC_EXECUTABLE)
+mark_as_advanced(US_RCC_EXECUTABLE)
 
-set(@PROJECT_NAME@_IS_EMBEDDED @US_IS_EMBEDDED@)
-@PACKAGE_EMBEDDED@
-
-if(NOT TARGET @PROJECT_NAME@ AND NOT @PROJECT_NAME@_IS_EMBEDDED)
-  include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake)
+# Include helper macros
+include(CMakeParseArguments)
+if(CMAKE_VERSION VERSION_LESS "2.8.8")
+  # We need the HANDLE_COMPONENTS argument
+  include(@PACKAGE_CONFIG_CMAKE_DIR@/FindPackageHandleStandardArgs.cmake)
+elseif(NOT COMMAND find_package_handle_standard_args)
+  include(FindPackageHandleStandardArgs)
 endif()
-
-include(@PACKAGE_CONFIG_CMAKE_DIR@/CMakeParseArguments.cmake)
 include(@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake)
 include(@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateExecutableInit.cmake)
 include(@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake)
+
+# Global include directory
+set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")
+
+# Clear variables
+set(US_LIBRARIES )
+set(US_RUNTIME_LIBRARY_DIRS )
+set(US_CXX_FLAGS )
+set(US_CXX_FLAGS_RELEASE )
+set(US_CXX_FLAGS_DEBUG )
+set(US_C_FLAGS )
+set(US_C_FLAGS_RELEASE )
+set(US_C_FLAGS_DEBUG )
+set(US_LINK_FLAGS )
+set(US_LINK_FLAGS_RELEASE )
+set(US_LINK_FLAGS_DEBUG )
+set(US_COMPILE_DEFINITIONS )
+set(US_COMPILE_DEFINITIONS_RELEASE )
+set(US_COMPILE_DEFINITIONS_DEBUG )
+
+# Components support
+set(US_MODULES Core) # ConfigAdmin EventAdmin ...
+
+if(NOT @PROJECT_NAME@_FIND_COMPONENTS)
+  set(@PROJECT_NAME@_FIND_COMPONENTS Core)
+endif()
+
+set(@PROJECT_NAME@_FOUND TRUE)
+foreach(component ${@PROJECT_NAME@_FIND_COMPONENTS})
+  if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/us${component}Config.cmake")
+    set(US_${component}_FOUND 0)
+    set(CppMicroServices_${component}_FOUND 0)
+  else()
+    find_package(us${component} ${US_${component}_FIND_VERSION} QUIET REQUIRED
+                 HINTS ${CMAKE_CURRENT_LIST_DIR}
+                 NO_DEFAULT_PATH
+                )
+    mark_as_advanced(us${component}_DIR)
+    set(US_${component}_FOUND ${us${component}_FOUND})
+    set(CppMicroServices_${component}_FOUND ${US_${component}_FOUND})
+  endif()
+
+  if(US_${component}_FOUND)
+    list(APPEND US_INCLUDE_DIRS ${US_${component}_INCLUDE_DIRS})
+    list(APPEND US_LIBRARIES ${US_${component}_LIBRARIES})
+    list(APPEND US_RUNTIME_LIBRARY_DIRS ${US_${component}_RUNTIME_LIBRARY_DIRS})
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_${component}_CXX_FLAGS}")
+    set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} ${US_${component}_CXX_FLAGS_RELEASE}")
+    set(US_CXX_FLAGS_DEBUG "${US_CXX_FLAGS_DEBUG} ${US_${component}_CXX_FLAGS_DEBUG}")
+    set(US_C_FLAGS "${US_C_FLAGS} ${US_${component}_C_FLAGS}")
+    set(US_C_FLAGS_RELEASE "${US_C_FLAGS_RELEASE} ${US_${component}_C_FLAGS_RELEASE}")
+    set(US_C_FLAGS_DEBUG "${US_C_FLAGS_DEBUG} ${US_${component}_C_FLAGS_DEBUG}")
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_${component}_LINK_FLAGS}")
+    set(US_LINK_FLAGS_RELEASE "${US_LINK_FLAGS_RELEASE} ${US_${component}_LINK_FLAGS_RELEASE}")
+    set(US_LINK_FLAGS_DEBUG "${US_LINK_FLAGS_DEBUG} ${US_${component}_LINK_FLAGS_DEBUG}")
+    set(US_COMPILE_DEFINITIONS "${US_COMPILE_DEFINITIONS} ${US_${component}_COMPILE_DEFINITIONS}")
+    set(US_COMPILE_DEFINITIONS_RELEASE "${US_COMPILE_DEFINITIONS_RELEASE} ${US_${component}_COMPILE_DEFINITIONS_RELEASE}")
+    set(US_COMPILE_DEFINITIONS_DEBUG "${US_COMPILE_DEFINITIONS_DEBUG} ${US_${component}_COMPILE_DEFINITIONS_DEBUG}")
+
+    set(US_${component}_VERSION ${${component}_VERSION})
+    set(US_${component}_VERSION_MAJOR ${${component}_VERSION_MAJOR})
+    set(US_${component}_VERSION_MINOR ${${component}_VERSION_MINOR})
+    set(US_${component}_VERSION_PATCH ${${component}_VERSION_PATCH})
+    set(US_${component}_VERSION_TWEAK ${${component}_VERSION_TWEAK})
+    set(US_${component}_VERSION_COUNT ${${component}_VERSION_COUNT})
+  else()
+    if(@PROJECT_NAME@_FIND_REQUIRED_${component})
+      set(@PROJECT_NAME@_FOUND FALSE)
+    endif()
+  endif()
+endforeach()
+
+if(US_INCLUDE_DIRS)
+  list(REMOVE_DUPLICATES US_INCLUDE_DIRS)
+endif()
+if(US_LIBRARIES)
+  list(REMOVE_DUPLICATES US_LIBRARIES)
+endif()
+if(US_RUNTIME_LIBRARY_DIRS)
+  list(REMOVE_DUPLICATES US_RUNTIME_LIBRARY_DIRS)
+endif()
+
+set(CppMicroServices_INCLUDE_DIRS ${US_INCLUDE_DIRS})
+set(CppMicroServices_LIBRARIES ${US_LIBRARIES})
+set(CppMicroServices_RUNTIME_LIBRARY_DIRS ${US_RUNTIME_LIBRARY_DIRS})
+
+set(@PROJECT_NAME@_CONFIG ${CMAKE_CURRENT_LIST_FILE})
+find_package_handle_standard_args(@PROJECT_NAME@
+  HANDLE_COMPONENTS
+  CONFIG_MODE
+)
+
+string(TOUPPER "@PROJECT_NAME@" @PROJECT_NAME@_UPPER)
+set(US_FOUND ${${@PROJECT_NAME@_UPPER}_FOUND})

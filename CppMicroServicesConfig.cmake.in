@@ -79,8 +79,6 @@ set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
 set(US_MODULE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usModuleInit.cpp")
 set(US_EXECUTABLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usExecutableInit.cpp")
 
-set(US_IS_EMBEDDED @US_IS_EMBEDDED@)
-
 # The CppMicroServices resource compiler
 find_program(US_RCC_EXECUTABLE ${US_RCC_EXECUTABLE_NAME}
              PATHS "@PACKAGE_CONFIG_RUNTIME_DIR@"
@@ -95,9 +93,9 @@ if(CMAKE_VERSION VERSION_LESS "2.8.8")
 elseif(NOT COMMAND find_package_handle_standard_args)
   include(FindPackageHandleStandardArgs)
 endif()
-include(@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake)
-include(@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateExecutableInit.cmake)
-include(@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake)
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateExecutableInit.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake")
 
 # Global include directory
 set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")

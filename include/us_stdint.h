@@ -25,7 +25,7 @@
 #ifdef US_HAVE_STDINT_H
 #include <stdint.h>
 #elif defined(_MSC_VER)
-#include "stdint_vc_p.h"
+#include "us_stdint_vc_p.h"
 #else
 #error The stdint.h header is not available
 #endif

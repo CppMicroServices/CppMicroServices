@@ -1,10 +1,10 @@
 CXX = g++
 CXXFLAGS = -g -Wall -Wno-unused -pedantic -fPIC $(US_CXX_FLAGS)
-LDFLAGS = -Wl,-rpath=$(CppMicroServices_ROOT)/lib -Wl,-rpath=.
+LDFLAGS = -Wl,-rpath="$(CppMicroServices_ROOT)/lib" -Wl,-rpath=.
 LDLIBS = -lCppMicroServices
 
-INCLUDEDIRS = -I$(CppMicroServices_ROOT)/include/CppMicroServices
-LIBDIRS = -L$(CppMicroServices_ROOT)/lib/CppMicroServices -L.
+INCLUDEDIRS = -I"$(CppMicroServices_ROOT)/include/CppMicroServices"
+LIBDIRS = -L"$(CppMicroServices_ROOT)/lib/CppMicroServices" -L.
 
 all : main libmodule.so
 

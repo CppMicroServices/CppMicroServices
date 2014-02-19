@@ -58,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @US_DOXYGEN_OUTPUT_DIR@
+OUTPUT_DIRECTORY       = "@US_DOXYGEN_OUTPUT_DIR@"
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -734,11 +734,11 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @PROJECT_SOURCE_DIR@ \
-                         @PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake \
-                         @PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake \
-                         @PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateExecutableInit.cmake \
-                         @PROJECT_BINARY_DIR@/include/usConfig.h
+INPUT                  = "@PROJECT_SOURCE_DIR@" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateExecutableInit.cmake" \
+                         "@PROJECT_BINARY_DIR@/include/usGlobalConfig.h"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -775,12 +775,9 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @PROJECT_SOURCE_DIR@/README.md \
-                         @PROJECT_SOURCE_DIR@/documentation/snippets/ \
-                         @PROJECT_SOURCE_DIR@/examples/ \
-                         @PROJECT_SOURCE_DIR@/test/ \
-                         @PROJECT_SOURCE_DIR@/gh-pages/ \
-                         @PROJECT_SOURCE_DIR@/.git/
+EXCLUDE                = "@PROJECT_SOURCE_DIR@/README.md" \
+                         "@PROJECT_SOURCE_DIR@/gh-pages/" \
+                         "@PROJECT_SOURCE_DIR@/.git/"
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -796,7 +793,10 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */.git/* \
+EXCLUDE_PATTERNS       = */test/* \
+                         */snippets/* \
+                         */examples/* \
+                         */.git/* \
                          *_p.h \
                          *Private.*
 
@@ -820,8 +820,8 @@ EXCLUDE_SYMBOLS        = us \
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = @PROJECT_SOURCE_DIR@/documentation/snippets/ \
-                         @PROJECT_SOURCE_DIR@/examples/
+EXAMPLE_PATH           = "@PROJECT_SOURCE_DIR@/core/doc/snippets/" \
+                         "@PROJECT_SOURCE_DIR@/core/examples/"
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -1018,7 +1018,7 @@ GENERATE_HTML          = YES
 # The default directory is: html.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_OUTPUT            = @US_DOXYGEN_HTML_OUTPUT@
+HTML_OUTPUT            = "@US_DOXYGEN_HTML_OUTPUT@"
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for each
 # generated HTML page (for example: .htm, .php, .asp).
@@ -1045,7 +1045,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            = @US_DOXYGEN_HEADER@
+HTML_HEADER            = "@US_DOXYGEN_HEADER@"
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank doxygen will generate a standard
@@ -1055,7 +1055,7 @@ HTML_HEADER            = @US_DOXYGEN_HEADER@
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = @US_DOXYGEN_FOOTER@
+HTML_FOOTER            = "@US_DOXYGEN_FOOTER@"
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
@@ -1078,7 +1078,7 @@ HTML_STYLESHEET        =
 # see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = @US_DOXYGEN_EXTRA_CSS@
+HTML_EXTRA_STYLESHEET  = "@US_DOXYGEN_EXTRA_CSS@"
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1927,7 +1927,7 @@ SEARCH_INCLUDES        = YES
 # preprocessor.
 # This tag requires that the tag SEARCH_INCLUDES is set to YES.
 
-INCLUDE_PATH           = @PROJECT_BINARY_DIR@/include/
+INCLUDE_PATH           = "@PROJECT_BINARY_DIR@/include/"
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
@@ -2229,7 +2229,7 @@ INTERACTIVE_SVG        = NO
 # found. If left blank, it is assumed the dot tool can be found in the path.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_PATH               = @US_DOXYGEN_DOT_PATH@
+DOT_PATH               = "@US_DOXYGEN_DOT_PATH@"
 
 # The DOTFILE_DIRS tag can be used to specify one or more directories that
 # contain dot files that are included in the documentation (see the \dotfile

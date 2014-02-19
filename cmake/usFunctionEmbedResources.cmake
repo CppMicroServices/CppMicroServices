@@ -69,8 +69,7 @@ function(usFunctionEmbedResources src_var)
           message(SEND_ERROR "The ROOT_DIR argument is not a directory: ${current_root_dir}")
         endif()
         get_filename_component(current_root_dir "${current_root_dir}" REALPATH)
-        file(TO_NATIVE_PATH "${current_root_dir}" current_root_dir_native)
-        list(APPEND cmd_line_args -d "${current_root_dir_native}")
+        list(APPEND cmd_line_args -d "${current_root_dir}")
       elseif(current_arg_name STREQUAL "FILES")
         set(res_file "${current_root_dir}/${arg}")
         file(TO_NATIVE_PATH "${res_file}" res_file_native)
@@ -81,8 +80,7 @@ function(usFunctionEmbedResources src_var)
           message(SEND_ERROR "Resource does not exists: ${res_file_native}")
         endif()
         list(APPEND absolute_res_files ${res_file})
-        file(TO_NATIVE_PATH "${arg}" res_filename_native)
-        list(APPEND cmd_line_args "${res_filename_native}")
+        list(APPEND cmd_line_args "${arg}")
       endif()
     endif(is_arg_name GREATER -1)
 
@@ -125,7 +123,7 @@ function(usFunctionEmbedResources src_var)
     set(us_lib_name ${US_RESOURCE_LIBRARY_NAME})
   else()
     set(us_cpp_resource_file "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_EXECUTABLE_NAME}_resources.cpp")
-    set(us_lib_name "\"\"")
+    set(us_lib_name "")
   endif()
 
   set(resource_compiler ${CppMicroServices_RCC_EXECUTABLE})
@@ -141,6 +139,7 @@ function(usFunctionEmbedResources src_var)
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${absolute_res_files} ${resource_compiler}
     COMMENT "Generating embedded resource file ${us_cpp_resource_name}"
+    VERBATIM
   )
 
   set(${src_var} "${${src_var}};${us_cpp_resource_file}" PARENT_SCOPE)

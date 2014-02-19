@@ -91,7 +91,7 @@ mark_as_advanced(US_RCC_EXECUTABLE)
 include(CMakeParseArguments)
 if(CMAKE_VERSION VERSION_LESS "2.8.8")
   # We need the HANDLE_COMPONENTS argument
-  include(@PACKAGE_CONFIG_CMAKE_DIR@/FindPackageHandleStandardArgs.cmake)
+  include("@PACKAGE_CONFIG_CMAKE_DIR@/FindPackageHandleStandardArgs.cmake")
 elseif(NOT COMMAND find_package_handle_standard_args)
   include(FindPackageHandleStandardArgs)
 endif()

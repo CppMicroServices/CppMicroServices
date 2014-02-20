@@ -30,6 +30,10 @@ function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
     message(FATAL_ERROR "FLAG_TO_TEST shouldn't be empty")
   endif()
 
+  # Save the contents of RESULT_VAR temporarily.
+  # This is needed in case ${RESULT_VAR} is one of the CMAKE_<LANG>_FLAGS_* variables.
+  set(_saved_result_var ${${RESULT_VAR}})
+
   # Clear all flags. If not, existing flags triggering warnings might lead to
   # false-negatives when checking for certain compiler flags.
   set(CMAKE_C_FLAGS )
@@ -58,7 +62,7 @@ function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
   CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST} HAS_CXX_FLAG_${suffix})
 
   if(HAS_CXX_FLAG_${suffix})
-    set(${RESULT_VAR} "${${RESULT_VAR}} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    set(${RESULT_VAR} "${_saved_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
   endif()
 
 endfunction()

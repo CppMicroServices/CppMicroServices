@@ -207,8 +207,16 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 else()
   usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   if(_have_visibility)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
+    # We only support hidden visibility with gcc for now, so no -fvisibility=hidden flag here.
+    # Clang has troubles with correctly marking template declarations and explicit template
+    # instantiations as exported across shared library boundaries. Specifically, comparing
+    # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
+    # which could be related to the default visibility of STL types declared in libstdc++ and/or libc++
+    # but also to using RTLD_LOCAL or RTLD_GLOBAL when loading shared libraries via dlopen().
+    #
+    # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
+    # and http://llvm.org/bugs/show_bug.cgi?id=10113
   endif()
 endif()
 

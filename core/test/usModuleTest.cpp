@@ -115,7 +115,7 @@ void frame005a(ModuleContext* mc)
   US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == ModuleRegistry::GetModule(1)->GetVersion(), "Test CppMicroServices version")
 #else
   US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name")
-  US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == m->GetVersion(), "Test module version")
+  US_TEST_CONDITION(ModuleVersion(US_CORE_MAJOR_VERSION, US_CORE_MINOR_VERSION, US_CORE_PATCH_VERSION) == m->GetVersion(), "Test module version")
 #endif
 }
 

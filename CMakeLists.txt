@@ -168,6 +168,10 @@ if(NOT MSVC)
 endif()
 
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
+usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+if(_have_visibility)
+  set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -188,27 +192,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     # we need to define a Windows version
     set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
   else()
-    # Enable visibility support
-    if(NOT ${GCC_VERSION} VERSION_LESS "4.5")
-      usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
-      if(_have_visibility)
-        set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
-        set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
-      endif()
-    else()
-      set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
-    endif()
-  endif()
-
-  usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
-  if(_fortify_source_flag)
-    set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
-  endif()
-else()
-  usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
-  if(_have_visibility)
-    set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
-    # We only support hidden visibility with gcc for now, so no -fvisibility=hidden flag here.
+    # Enable visibility support (only for gcc >= 4.5)
+    # We only support hidden visibility with gcc for now.
+    #
     # Clang has troubles with correctly marking template declarations and explicit template
     # instantiations as exported across shared library boundaries. Specifically, comparing
     # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
@@ -217,6 +203,17 @@ else()
     #
     # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
     # and http://llvm.org/bugs/show_bug.cgi?id=10113
+    #
+    if(_have_visibility AND NOT ${GCC_VERSION} VERSION_LESS "4.5")
+      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
+    else()
+      set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
+    endif()
+  endif()
+
+  usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
+  if(_fortify_source_flag)
+    set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
   endif()
 endif()
 

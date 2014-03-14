@@ -68,6 +68,10 @@ const char DIR_SEP = '/';
 bool load_impl(const std::string& modulePath)
 {
   void* handle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
+  if (handle == NULL)
+  {
+    US_WARN << dlerror();
+  }
   return (handle != NULL);
 }
 
@@ -78,6 +82,10 @@ const char DIR_SEP = '\\';
 bool load_impl(const std::string& modulePath)
 {
   void* handle = LoadLibrary(modulePath.c_str());
+  if (handle == NULL)
+  {
+    US_WARN << GetLastErrorStr();
+  }
   return (handle != NULL);
 }
 
@@ -159,7 +167,7 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
 
       if (!load_impl(libPath))
       {
-        US_WARN << "Auto-loading of module " << libPath << " failed: " << GetLastErrorStr();
+        US_WARN << "Auto-loading of module " << libPath << " failed.";
       }
     }
     closedir(dir);

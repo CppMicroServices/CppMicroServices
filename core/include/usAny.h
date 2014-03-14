@@ -46,9 +46,14 @@ US_BEGIN_NAMESPACE
 
 template<class T>
 std::string any_value_to_string(const T& val);
+template<class T>
+std::string any_value_to_json(const T& val);
 
 US_Core_EXPORT std::string any_value_to_string(const std::vector<std::string>& val);
 US_Core_EXPORT std::string any_value_to_string(const std::list<std::string>& val);
+
+US_Core_EXPORT std::string any_value_to_json(const std::string& val);
+US_Core_EXPORT std::string any_value_to_json(bool val);
 
 /**
  * \ingroup MicroServicesUtils
@@ -158,6 +163,16 @@ public:
   }
 
   /**
+   * Returns a JSON representation for the content.
+   *
+   * Custom types should specialize the any_value_to_json template function for meaningful output.
+   */
+  std::string ToJSON() const
+  {
+    return Empty() ? "null" : _content->ToJSON();
+  }
+
+  /**
    * Returns the type information of the stored content.
    * If the Any is empty typeid(void) is returned.
    * It is suggested to always query an Any for its type info before trying to extract
@@ -177,6 +192,7 @@ private:
     { }
 
     virtual std::string ToString() const = 0;
+    virtual std::string ToJSON() const = 0;
 
     virtual const std::type_info& Type() const = 0;
     virtual Placeholder* Clone() const = 0;
@@ -193,6 +209,11 @@ private:
     virtual std::string ToString() const
     {
       return any_value_to_string(_held);
+    }
+
+    virtual std::string ToJSON() const
+    {
+      return any_value_to_json(_held);
     }
 
     virtual const std::type_info& Type() const
@@ -390,6 +411,12 @@ std::string any_value_to_string(const T& val)
   std::stringstream ss;
   ss << val;
   return ss.str();
+}
+
+template<class T>
+std::string any_value_to_json(const T& val)
+{
+  return any_value_to_string(val);
 }
 
 US_END_NAMESPACE

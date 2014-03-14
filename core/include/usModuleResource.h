@@ -266,6 +266,8 @@ public:
    */
   int GetSize() const;
 
+  long long GetLastModified() const;
+
   /**
    * Returns a data pointer pointing to the raw data of this %ModuleResource object.
    * If the resource is compressed the data returned is compressed and UncompressResourceData()

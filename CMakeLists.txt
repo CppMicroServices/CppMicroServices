@@ -13,8 +13,10 @@ cmake_policy(SET CMP0017 NEW)
 # Update CMake module path
 #------------------------------------------------------------------------------
 
+set(US_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)
+
 set(CMAKE_MODULE_PATH
-  ${PROJECT_SOURCE_DIR}/cmake
+  ${US_CMAKE_DIR}
   ${CMAKE_MODULE_PATH}
   )
 
@@ -30,6 +32,11 @@ include(usFunctionEmbedResources)
 include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
 include(usFunctionGenerateExecutableInit)
+include(usMacroCreateModule)
+
+if(US_BUILD_TESTING)
+  include(usFunctionCompileSnippets)
+endif()
 
 #-----------------------------------------------------------------------------
 # Init output directories
@@ -139,8 +146,8 @@ us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services 
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
-set(US_MODULE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
-set(US_EXECUTABLE_INIT_TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/usExecutableInit.cpp" CACHE INTERNAL "The executable initialization template code")
+set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
+set(US_EXECUTABLE_INIT_TEMPLATE "${US_CMAKE_DIR}/usExecutableInit.cpp" CACHE INTERNAL "The executable initialization template code")
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -354,7 +361,7 @@ set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
 
 set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-set(PACKAGE_CONFIG_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)
+set(PACKAGE_CONFIG_CMAKE_DIR ${US_CMAKE_DIR})
 
 set(US_RCC_EXECUTABLE_NAME usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
 
@@ -365,7 +372,7 @@ configure_file(
   )
 
 set(us_global_config_h_file "${PROJECT_BINARY_DIR}/include/usGlobalConfig.h")
-configure_file(${PROJECT_SOURCE_DIR}/cmake/usGlobalConfig.h.in ${us_global_config_h_file})
+configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
@@ -393,12 +400,12 @@ install(EXPORT ${PROJECT_NAME}Targets
 set(_install_cmake_scripts
   ${US_MODULE_INIT_TEMPLATE}
   ${US_EXECUTABLE_INIT_TEMPLATE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeParseArguments.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPackageHandleStandardArgs.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPackageMessage.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/usFunctionGenerateModuleInit.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/usFunctionGenerateExecutableInit.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/usFunctionEmbedResources.cmake
+  ${US_CMAKE_DIR}/CMakeParseArguments.cmake
+  ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
+  ${US_CMAKE_DIR}/FindPackageMessage.cmake
+  ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
+  ${US_CMAKE_DIR}/usFunctionGenerateExecutableInit.cmake
+  ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
   )
 
 install(FILES ${_install_cmake_scripts}

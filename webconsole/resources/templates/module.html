@@ -1,0 +1,98 @@
+<script type="text/javascript" src="/js/tree.jquery.min.js"></script>
+<link rel="stylesheet" href="/js/jqtree.css">
+
+
+<h3 class="module-name"><span class="tooltip" title="Overview"><a href="/Console/modules"><i class="icon-chevron-left" style="margin-right:10px;"></i></a></span></h3>
+
+<ul class="tabs left">
+<li><a href="#tab-props">Properties</a></li>
+<li><a href="#tab-resources">Resources</a></li>
+<li><a href="#tab-regservices">Registered Services</a></li>
+<li><a href="#tab-usedservices">Used Services</a></li>
+</ul>
+
+<div id="tab-props" class="tab-content">
+<table class="tight striped sortable" cellspacing="0" celpadding="0">
+<thead><tr>
+  <th>Key</th>
+  <th>Value</th>
+</tr></thead>
+<tbody class="prop-template">
+<tr>
+<td class="prop-key"></td>
+<td class="prop-value"></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="tab-resources" class="tab-content resource-tree">
+<div id="resource-tree"></div>
+</div>
+
+<div id="tab-regservices" class="tab-content"></div>
+<div id="tab-usedservices" class="tab-content"></div>
+
+<script>
+var moduleId = window.location.pathname.split('/').pop();
+
+var request = $.getJSON(moduleId);
+
+request.done(function(data) {
+
+  var titleDirective = {
+    'h3.module-name+':'name'
+  };
+  $('div.grid').render(data, titleDirective);
+
+  var propDirective = {
+    'tr':{
+      'prop<-properties':{
+        'td.prop-key':'prop.key',
+        'td.prop-key@value':'prop.key',
+        'td.prop-value':'prop.value',
+        'td.prop-value@value':'prop.value'
+      }
+    }
+  };
+  $('tbody.prop-template').render(data, propDirective);
+
+  // fill the resources tab
+  //var resourceDirective = {
+  //  'li': {
+  //    'child<-children': {
+  //      'a': 'child.name',
+  //      'div.children': function(ctxt){
+  //        return ctxt.child.item.children ? rfn(ctxt.child.item):'';
+  //      }
+  //    }
+  //  }
+  //};
+  //var rfn = $('div.resource-tree').compile( resourceDirective );
+  //$('div.resource-tree').render( data.resources, rfn );
+
+  if(data.resources) {
+    $('div#resource-tree').tree({
+      data: data.resources.children,
+      onCreateLi: function(node, $li) {
+        var size = node.size;
+        if (size) {
+          $li.find('.jqtree-element').append("<a href='" + node.href + "'><i class='icon-download'></i>(" + size + " bytes)</a>");
+        }
+      }
+    });
+  }
+
+  // fix row classes
+  var rows = $('table.sortable').find('tbody tr');
+  rows.removeClass('alt first last');
+  var table = $('table.sortable');
+  table.find('tr:even').addClass('alt');
+  table.find('tr:first').addClass('first');
+  table.find('tr:last').addClass('last');
+});
+
+request.fail(function(jqXHR, textStatus, errorThrown) {
+  alert(errorThrown);
+});
+</script>

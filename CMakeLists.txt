@@ -379,6 +379,8 @@ include_directories(${US_INCLUDE_DIRS})
 add_subdirectory(tools)
 
 add_subdirectory(core)
+add_subdirectory(http_service)
+add_subdirectory(webconsole)
 
 #-----------------------------------------------------------------------------
 # Documentation

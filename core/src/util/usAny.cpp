@@ -32,14 +32,44 @@ template<typename Iterator>
 std::string container_to_string(Iterator i1, Iterator i2)
 {
   std::stringstream ss;
-  ss << "(";
+  ss << "[";
   const Iterator begin = i1;
   for ( ; i1 != i2; ++i1)
   {
     if (i1 == begin) ss << *i1;
     else ss << "," << *i1;
   }
-  ss << ")";
+  ss << "]";
+  return ss.str();
+}
+
+template<>
+std::string container_to_string(std::vector<std::string>::const_iterator i1, std::vector<std::string>::const_iterator i2)
+{
+  std::stringstream ss;
+  ss << "[";
+  const std::vector<std::string>::const_iterator begin = i1;
+  for ( ; i1 != i2; ++i1)
+  {
+    if (i1 == begin) ss << "\"" << *i1 << "\"";
+    else ss << ",\"" << *i1 << "\"";
+  }
+  ss << "]";
+  return ss.str();
+}
+
+template<>
+std::string container_to_string(std::vector<Any>::const_iterator i1, std::vector<Any>::const_iterator i2)
+{
+  std::stringstream ss;
+  ss << "[";
+  const std::vector<Any>::const_iterator begin = i1;
+  for ( ; i1 != i2; ++i1)
+  {
+    if (i1 == begin) ss << i1->ToJSON();
+    else ss << "," << i1->ToJSON();
+  }
+  ss << "]";
   return ss.str();
 }
 
@@ -61,18 +91,28 @@ std::string any_value_to_string(const std::vector<Any>& val)
 std::string any_value_to_string(const std::map<std::string, Any>& val)
 {
   std::stringstream ss;
-  ss << "[";
+  ss << "{";
   typedef std::map<std::string, Any>::const_iterator Iterator;
   Iterator i1 = val.begin();
   const Iterator begin = i1;
   const Iterator end = val.end();
   for ( ; i1 != end; ++i1)
   {
-    if (i1 == begin) ss << "\"" << i1->first << "\" => " << i1->second;
-    else ss << ", " << "\"" << i1->first << "\" => " << i1->second;
+    if (i1 == begin) ss << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    else ss << ", " << "\"" << i1->first << "\" : " << i1->second.ToJSON();
   }
-  ss << "]";
+  ss << "}";
   return ss.str();
+}
+
+std::string any_value_to_json(const std::string& val)
+{
+  return '"' + val + '"';
+}
+
+std::string any_value_to_json(bool val)
+{
+  return val ? "true" : "false";
 }
 
 US_END_NAMESPACE

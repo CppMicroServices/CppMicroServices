@@ -249,6 +249,11 @@ int ModuleResource::GetSize() const
   return d->size;
 }
 
+long long ModuleResource::GetLastModified() const
+{
+  return -1;
+}
+
 const unsigned char* ModuleResource::GetData() const
 {
   if (!IsValid()) return NULL;

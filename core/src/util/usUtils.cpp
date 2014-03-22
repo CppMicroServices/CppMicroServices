@@ -112,7 +112,7 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
   if (dir == NULL)
   {
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
-    if (indexOfLastSeparator != -1)
+    if (indexOfLastSeparator != std::string::npos)
     {
       std::string intermediateDir = absoluteBasePath.substr(indexOfLastSeparator+1);
       bool equalSubDir = intermediateDir.size() == std::strlen(CMAKE_INTDIR);

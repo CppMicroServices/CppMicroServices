@@ -39,6 +39,9 @@ US_USE_NAMESPACE
 
 namespace {
 
+  // Please confirm that a character count differing from the following targets is not due to
+  // a misconfiguration of your versioning software (Correct line endings for your system)
+  // See issue #18 ( https://github.com/saschazelzer/CppMicroServices/issues/18 )
 void checkResourceInfo(const ModuleResource& res, const std::string& path,
                        const std::string& baseName,
                        const std::string& completeBaseName, const std::string& suffix,

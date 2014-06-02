@@ -183,9 +183,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       catch (...)
       {
         US_WARN << "Service listener"
-            #ifdef US_MODULE_SUPPORT_ENABLED
-                << " in " << l->GetModule()->GetName()
-            #endif
+                << " in " << l->GetModuleContext()->GetModule()->GetName()
                 << " threw an exception!";
       }
     }

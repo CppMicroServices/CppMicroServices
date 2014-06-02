@@ -39,10 +39,14 @@ namespace {
 
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#ifdef US_BUILD_SHARED_LIBS
   static const char PATH_SEPARATOR = '\\';
+#endif
 #else
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#ifdef US_BUILD_SHARED_LIBS
   static const char PATH_SEPARATOR = '/';
+#endif
 #endif
 
 // Verify that the same member function pointers registered as listeners

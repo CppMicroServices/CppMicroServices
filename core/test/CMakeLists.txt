@@ -21,6 +21,7 @@ add_subdirectory(modules)
 #-----------------------------------------------------------------------------
 
 set(_tests
+  usAnyTest
   usDebugOutputTest
   usLDAPFilterTest
   usModuleTest

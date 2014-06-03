@@ -38,22 +38,119 @@ DEALINGS IN THE SOFTWARE.
 #include <sstream>
 #include <vector>
 #include <list>
+#include <set>
 #include <map>
 
 #include <usCoreConfig.h>
 
 US_BEGIN_NAMESPACE
 
-template<class T>
-std::string any_value_to_string(const T& val);
-template<class T>
-std::string any_value_to_json(const T& val);
+class Any;
 
-US_Core_EXPORT std::string any_value_to_string(const std::vector<std::string>& val);
-US_Core_EXPORT std::string any_value_to_string(const std::list<std::string>& val);
+US_Core_EXPORT std::string any_value_to_string(const Any& any);
 
+US_Core_EXPORT std::string any_value_to_json(const Any& val);
 US_Core_EXPORT std::string any_value_to_json(const std::string& val);
 US_Core_EXPORT std::string any_value_to_json(bool val);
+
+template<class T>
+std::string any_value_to_string(const T& val)
+{
+  std::stringstream ss;
+  ss << val;
+  return ss.str();
+}
+
+template<class T>
+std::string any_value_to_json(const T& val)
+{
+  return any_value_to_string(val);
+}
+
+/**
+ * \internal
+ */
+template<typename Iterator>
+std::string container_to_string(Iterator i1, Iterator i2)
+{
+  std::stringstream ss;
+  ss << "[";
+  const Iterator begin = i1;
+  for ( ; i1 != i2; ++i1)
+  {
+    if (i1 == begin) ss << any_value_to_string(*i1);
+    else ss << "," << any_value_to_string(*i1);
+  }
+  ss << "]";
+  return ss.str();
+}
+
+/**
+ * \internal
+ */
+template<typename Iterator>
+std::string container_to_json(Iterator i1, Iterator i2)
+{
+  std::stringstream ss;
+  ss << "[";
+  const Iterator begin = i1;
+  for ( ; i1 != i2; ++i1)
+  {
+    if (i1 == begin) ss << any_value_to_json(*i1);
+    else ss << "," << any_value_to_json(*i1);
+  }
+  ss << "]";
+  return ss.str();
+}
+
+template<class E>
+std::string any_value_to_string(const std::vector<E>& vec)
+{
+  return container_to_string(vec.begin(), vec.end());
+}
+
+template<class E>
+std::string any_value_to_json(const std::vector<E>& vec)
+{
+  return container_to_json(vec.begin(), vec.end());
+}
+
+template<class E>
+std::string any_value_to_string(const std::list<E>& l)
+{
+  return container_to_string(l.begin(), l.end());
+}
+
+template<class E>
+std::string any_value_to_json(const std::list<E>& l)
+{
+  return container_to_json(l.begin(), l.end());
+}
+
+template<class E>
+std::string any_value_to_string(const std::set<E>& s)
+{
+  return container_to_string(s.begin(), s.end());
+}
+
+template<class E>
+std::string any_value_to_json(const std::set<E>& s)
+{
+  return container_to_json(s.begin(), s.end());
+}
+
+template<class M>
+std::string any_value_to_string(const std::map<M, Any>& m);
+
+template<class K, class V>
+std::string any_value_to_string(const std::map<K, V>& m);
+
+template<class M>
+std::string any_value_to_json(const std::map<M, Any>& m);
+
+template<class K, class V>
+std::string any_value_to_json(const std::map<K, V>& m);
+
 
 /**
  * \ingroup MicroServicesUtils
@@ -402,21 +499,77 @@ const ValueType* unsafe_any_cast(const Any* operand)
   return any_cast<ValueType>(const_cast<Any*>(operand));
 }
 
-US_Core_EXPORT std::string any_value_to_string(const std::vector<Any>& val);
-US_Core_EXPORT std::string any_value_to_string(const std::map<std::string, Any>& val);
 
-template<class T>
-std::string any_value_to_string(const T& val)
+template<class K>
+std::string any_value_to_string(const std::map<K, Any>& m)
 {
   std::stringstream ss;
-  ss << val;
+  ss << "{";
+  typedef typename std::map<K, Any>::const_iterator Iterator;
+  Iterator i1 = m.begin();
+  const Iterator begin = i1;
+  const Iterator end = m.end();
+  for ( ; i1 != end; ++i1)
+  {
+    if (i1 == begin) ss << i1->first << " : " << i1->second.ToString();
+    else ss << ", " << i1->first << " : " << i1->second.ToString();
+  }
+  ss << "}";
   return ss.str();
 }
 
-template<class T>
-std::string any_value_to_json(const T& val)
+template<class K, class V>
+std::string any_value_to_string(const std::map<K, V>& m)
 {
-  return any_value_to_string(val);
+  std::stringstream ss;
+  ss << "{";
+  typedef typename std::map<K, V>::const_iterator Iterator;
+  Iterator i1 = m.begin();
+  const Iterator begin = i1;
+  const Iterator end = m.end();
+  for ( ; i1 != end; ++i1)
+  {
+    if (i1 == begin) ss << i1->first << " : " << i1->second;
+    else ss << ", " << i1->first << " : " << i1->second;
+  }
+  ss << "}";
+  return ss.str();
+}
+
+template<class K>
+std::string any_value_to_json(const std::map<K, Any>& m)
+{
+  std::stringstream ss;
+  ss << "{";
+  typedef typename std::map<K, Any>::const_iterator Iterator;
+  Iterator i1 = m.begin();
+  const Iterator begin = i1;
+  const Iterator end = m.end();
+  for ( ; i1 != end; ++i1)
+  {
+    if (i1 == begin) ss << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    else ss << ", " << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+  }
+  ss << "}";
+  return ss.str();
+}
+
+template<class K, class V>
+std::string any_value_to_json(const std::map<K, V>& m)
+{
+  std::stringstream ss;
+  ss << "{";
+  typedef typename std::map<K, V>::const_iterator Iterator;
+  Iterator i1 = m.begin();
+  const Iterator begin = i1;
+  const Iterator end = m.end();
+  for ( ; i1 != end; ++i1)
+  {
+    if (i1 == begin) ss << "\"" << i1->first << "\" : " << i1->second;
+    else ss << ", " << "\"" << i1->first << "\" : " << i1->second;
+  }
+  ss << "}";
+  return ss.str();
 }
 
 US_END_NAMESPACE

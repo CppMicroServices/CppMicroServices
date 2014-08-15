@@ -229,6 +229,7 @@ ServletContainer::ServletContainer(const std::string& contextPath)
 
 ServletContainer::~ServletContainer()
 {
+  this->Stop();
   delete d;
 }
 

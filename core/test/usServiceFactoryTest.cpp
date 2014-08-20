@@ -77,15 +77,15 @@ void TestServiceFactoryModuleScope()
   {
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
   }
+#endif
 
-  Module* moduleH = ModuleRegistry::GetModule("TestModuleH Module");
+  Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
 
   std::vector<ServiceReferenceU> registeredRefs = moduleH->GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
   US_TEST_CONDITION(registeredRefs[0].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
   US_TEST_CONDITION(registeredRefs[1].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
-#endif
 
   ModuleContext* mc = GetModuleContext();
   // Check that a service reference exist
@@ -102,7 +102,6 @@ void TestServiceFactoryModuleScope()
   InterfaceMap service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")
 
-#ifdef US_BUILD_SHARED_LIBS
   std::vector<ServiceReferenceU> usedRefs = mc->GetModule()->GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
@@ -110,7 +109,6 @@ void TestServiceFactoryModuleScope()
   InterfaceMap service3 = moduleH->GetModuleContext()->GetService(sr1);
   US_TEST_CONDITION(service != service3, "Different service pointer")
   US_TEST_CONDITION(moduleH->GetModuleContext()->UngetService(sr1), "UngetService()")
-#endif
 
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
@@ -136,7 +134,7 @@ void TestServiceFactoryPrototypeScope()
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
   }
 
-  Module* moduleH = ModuleRegistry::GetModule("TestModuleH Module");
+  Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
 #endif
 

@@ -27,7 +27,14 @@
 
 #include <string>
 
+#define US_STR_(x) #x
+#define US_STR(x) US_STR_(x)
+#define US_CONCAT_(x,y) x ## y
+#define US_CONCAT(x,y) US_CONCAT_(x,y)
+
 US_BEGIN_NAMESPACE
+
+struct ModuleInfo;
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -35,9 +42,9 @@ US_BEGIN_NAMESPACE
  */
 struct US_Core_EXPORT ModuleUtils
 {
-  static std::string GetLibraryPath(const std::string& libName, void* symbol);
+  static std::string GetLibraryPath(void* symbol);
 
-  static void* GetSymbol(const std::string& libName, const char* symbol);
+  static void* GetSymbol(const ModuleInfo& module, const char* symbol);
 };
 
 US_END_NAMESPACE

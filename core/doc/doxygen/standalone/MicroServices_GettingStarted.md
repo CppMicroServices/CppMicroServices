@@ -4,7 +4,9 @@ Getting Started    {#MicroServices_GettingStarted}
 Projects which want to make use of the capabilities provided by the C++ Micro Services
 library need to set-up the correct include paths and link dependencies. Further, each
 executable or shared library which needs a ModuleContext instance must contain specific
-initialization code.
+initialization code and must be compiled with a unique `US_MODULE_NAME` pre-processor
+definition. In case of executables, the value is required to be `main`, e.g. compile
+the executable with `-DUS_MODULE_NAME=main`.
 
 The C++ Micro Services library provides \ref MicroServicesCMake "CMake utility functions"
 for CMake based projects but there are no restrictions on the type of build system used
@@ -28,7 +30,8 @@ directories. Building a shared library might then look like this:
 \until target_link
 
 The call to `#usFunctionGenerateModuleInit` generates the proper module initialization
-code and provides access to the module specific ModuleContext instance.
+code and provides access to the module specific ModuleContext instance. Further, the
+`set_property`command sets the `US_MODULE_NAME` definition.
 
 Makefile based projects
 -----------------------

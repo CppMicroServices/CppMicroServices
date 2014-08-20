@@ -31,6 +31,8 @@
 
 US_USE_NAMESPACE
 
+namespace {
+
 /**
  * This class implements a module activator that uses the module
  * context to register an English language dictionary service
@@ -112,5 +114,7 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(dictionaryservice, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //![Activator]

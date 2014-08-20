@@ -121,48 +121,43 @@ void Module::Start()
 
   d->moduleContext = new ModuleContext(this->d);
 
-//  try
-//  {
-    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADING, this));
-    // try to get a ModuleActivator instance
-    if (d->info.activatorHook)
-    {
-      try
-      {
-        d->moduleActivator = d->info.activatorHook();
-      }
-      catch (...)
-      {
-        US_ERROR << "Creating the module activator of " << d->info.name << " failed";
-        throw;
-      }
+  typedef ModuleActivator*(*ModuleActivatorHook)(void);
+  ModuleActivatorHook activatorHook = NULL;
 
-      d->moduleActivator->Load(d->moduleContext);
+  std::string activator_func = "_us_module_activator_instance_" + d->info.name;
+  void* activatorHookSym = ModuleUtils::GetSymbol(d->info, activator_func.c_str());
+  std::memcpy(&activatorHook, &activatorHookSym, sizeof(void*));
+
+  d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADING, this));
+  // try to get a ModuleActivator instance
+
+  if (activatorHook)
+  {
+    try
+    {
+      d->moduleActivator = activatorHook();
+    }
+    catch (...)
+    {
+      US_ERROR << "Creating the module activator of " << d->info.name << " failed";
+      throw;
     }
 
-    d->StartStaticModules();
+    // This method should be "noexcept" and by not catching exceptions
+    // here we semantically treat it that way since any exception during
+    // static initialization will either terminate the program or cause
+    // the dynamic loader to report an error.
+    d->moduleActivator->Load(d->moduleContext);
+  }
 
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-    if (ModuleSettings::IsAutoLoadingEnabled())
-    {
-      AutoLoadModules(d->info);
-    }
+  if (ModuleSettings::IsAutoLoadingEnabled())
+  {
+    AutoLoadModules(d->info);
+  }
 #endif
 
-    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
-//  }
-//  catch (...)
-//  {
-//    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADING, this));
-//    d->RemoveModuleResources();
-
-//    delete d->moduleContext;
-//    d->moduleContext = 0;
-
-//    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
-//    US_ERROR << "Calling the module activator Load() method of " << d->info.name << " failed!";
-//    throw;
-//  }
+  d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 }
 
 void Module::Stop()
@@ -176,8 +171,6 @@ void Module::Stop()
   try
   {
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADING, this));
-
-    d->StopStaticModules();
 
     if (d->moduleActivator)
     {
@@ -263,17 +256,12 @@ std::vector<ServiceReferenceU> Module::GetServicesInUse() const
 
 ModuleResource Module::GetResource(const std::string& path) const
 {
-  if (d->resourceTreePtrs.empty())
+  if (d->resourceTreePtr == NULL || !d->resourceTreePtr->IsValid())
   {
     return ModuleResource();
   }
-
-  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
-  {
-    if (!d->resourceTreePtrs[i]->IsValid()) continue;
-    ModuleResource result(path, d->resourceTreePtrs[i], d->resourceTreePtrs);
-    if (result) return result;
-  }
+  ModuleResource result(path, d->resourceTreePtr);
+  if (result) return result;
   return ModuleResource();
 }
 
@@ -281,19 +269,17 @@ std::vector<ModuleResource> Module::FindResources(const std::string& path, const
                                                   bool recurse) const
 {
   std::vector<ModuleResource> result;
-  if (d->resourceTreePtrs.empty()) return result;
-
-  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
+  if (d->resourceTreePtr == NULL || !d->resourceTreePtr->IsValid())
   {
-    if (!d->resourceTreePtrs[i]->IsValid()) continue;
+    return result;
+  }
 
-    std::vector<std::string> nodes;
-    d->resourceTreePtrs[i]->FindNodes(path, filePattern, recurse, nodes);
-    for (std::vector<std::string>::iterator nodeIter = nodes.begin();
-         nodeIter != nodes.end(); ++nodeIter)
-    {
-      result.push_back(ModuleResource(*nodeIter, d->resourceTreePtrs[i], d->resourceTreePtrs));
-    }
+  std::vector<std::string> nodes;
+  d->resourceTreePtr->FindNodes(path, filePattern, recurse, nodes);
+  for (std::vector<std::string>::iterator nodeIter = nodes.begin();
+       nodeIter != nodes.end(); ++nodeIter)
+  {
+    result.push_back(ModuleResource(*nodeIter, d->resourceTreePtr));
   }
   return result;
 }

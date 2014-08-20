@@ -98,7 +98,7 @@ public:
 
   /**
    * Returns the property key for looking up this module's
-   * location the file system.
+   * location in the file system.
    * The property value is of type \c std::string.
    *
    * @return The location property key.

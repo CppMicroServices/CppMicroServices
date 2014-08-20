@@ -27,17 +27,21 @@
 
 #include <string>
 
+#ifdef US_BUILD_SHARED_LIBS
 #ifdef Example_dictionaryservice_EXPORTS
-  #define DICTIONAYSERVICE_EXPORT US_ABI_EXPORT
+  #define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #else
-  #define DICTIONAYSERVICE_EXPORT US_ABI_IMPORT
+  #define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT
+#endif
+#else
+#define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**
  * A simple service interface that defines a dictionary service.
  * A dictionary service simply verifies the existence of a word.
  **/
-struct DICTIONAYSERVICE_EXPORT IDictionaryService
+struct DICTIONARYSERVICE_EXPORT IDictionaryService
 {
   // Out-of-line virtual desctructor for proper dynamic cast
   // support with older versions of gcc.

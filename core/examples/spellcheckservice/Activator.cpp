@@ -35,6 +35,8 @@
 
 US_USE_NAMESPACE
 
+namespace {
+
 /**
  * This class implements a module that implements a spell
  * checker service. The spell checker service uses all available
@@ -221,5 +223,7 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(spellcheckservice, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //![Activator]

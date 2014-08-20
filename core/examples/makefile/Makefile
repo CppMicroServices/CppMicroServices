@@ -15,10 +15,10 @@ libmodule.so: module.o IDictionaryService.o
 	$(CXX) -shared -o $@ $^ $(CXXFLAGS) $(LDFLAGS) $(INCLUDEDIRS) $(LIBDIRS) $(LDLIBS)
 
 main.o: main.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDEDIRS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -DUS_MODULE_NAME=main $(INCLUDEDIRS) -c $< -o $@
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -DMODULE_EXPORTS $(INCLUDEDIRS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -DMODULE_EXPORTS -DUS_MODULE_NAME=module $(INCLUDEDIRS) -c $< -o $@
 
 .PHONY : clean
 

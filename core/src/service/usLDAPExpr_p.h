@@ -43,15 +43,15 @@ class LDAPExpr {
 
 public:
 
-  const static int AND;     // =  0;
-  const static int OR;      // =  1;
-  const static int NOT;     // =  2;
-  const static int EQ;      // =  4;
-  const static int LE;      // =  8;
-  const static int GE;      // = 16;
-  const static int APPROX;  // = 32;
-  const static int COMPLEX; // = AND | OR | NOT;
-  const static int SIMPLE;  // = EQ | LE | GE | APPROX;
+  const static int AND = 0;
+  const static int OR = 1;
+  const static int NOT = 2;
+  const static int EQ = 4;
+  const static int LE = 8;
+  const static int GE = 16;
+  const static int APPROX = 32;
+  const static int COMPLEX = AND | OR | NOT;
+  const static int SIMPLE = EQ | LE | GE | APPROX;
 
   typedef char Byte;
   typedef std::vector<std::string> StringList;
@@ -167,16 +167,6 @@ private:
 
   //!
   static bool PatSubstr(const std::string& s, int si, const std::string& pat, int pi);
-
-
-  const static Byte WILDCARD; // = 65535;
-  const static std::string WILDCARD_STRING;// = std::string( WILDCARD );
-
-  const static std::string NULLQ;     // = "Null query";
-  const static std::string GARBAGE;   // = "Trailing garbage";
-  const static std::string EOS;       // = "Unexpected end of query";
-  const static std::string MALFORMED; // = "Malformed query";
-  const static std::string OPERATOR;  // = "Undefined m_operator";
 
   //! Shared pointer
   SharedDataPointer<LDAPExprData> d;

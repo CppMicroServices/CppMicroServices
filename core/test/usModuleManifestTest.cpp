@@ -23,7 +23,6 @@
 #include <usModuleEvent.h>
 #include <usServiceEvent.h>
 #include <usModuleContext.h>
-#include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 #include <usSharedLibrary.h>
@@ -49,7 +48,7 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
 
   SharedLibrary target(LIB_PATH, "TestModuleM");
 
-  // Start the test target
+#ifdef US_BUILD_SHARED_LIBS
   try
   {
     target.Load();
@@ -59,12 +58,13 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
                         << e.what() << " + in frameSL02a:FAIL" );
   }
+#endif
 
-  Module* moduleM = ModuleRegistry::GetModule("TestModuleM Module");
+  Module* moduleM = ModuleRegistry::GetModule("TestModuleM");
   US_TEST_CONDITION_REQUIRED(moduleM != 0, "Test for existing module TestModuleM")
 
-  US_TEST_CONDITION(moduleM->GetProperty(Module::PROP_NAME()).ToString() == "TestModuleM Module", "Module name")
-  US_TEST_CONDITION(moduleM->GetName() == "TestModuleM Module", "Module name 2")
+  US_TEST_CONDITION(moduleM->GetProperty(Module::PROP_NAME()).ToString() == "TestModuleM", "Module name")
+  US_TEST_CONDITION(moduleM->GetName() == "TestModuleM", "Module name 2")
   US_TEST_CONDITION(moduleM->GetProperty(Module::PROP_DESCRIPTION()).ToString() == "My Module description", "Module description")
   US_TEST_CONDITION(moduleM->GetLocation() == moduleM->GetProperty(Module::PROP_LOCATION()).ToString(), "Module location")
   US_TEST_CONDITION(moduleM->GetProperty(Module::PROP_VERSION()).ToString() == "1.0.0", "Module version")

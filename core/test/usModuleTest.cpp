@@ -30,6 +30,7 @@
 #include <usSharedLibrary.h>
 
 #include "usTestUtilModuleListener.h"
+#include "usTestDriverActivator.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
@@ -39,15 +40,17 @@ namespace {
 
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#ifdef US_BUILD_SHARED_LIBS
   static const char PATH_SEPARATOR = '\\';
-#endif
 #else
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#ifdef US_BUILD_SHARED_LIBS
   static const char PATH_SEPARATOR = '/';
 #endif
-#endif
+
+// Check that the executable's activator was loaded and called
+void frame01()
+{
+  US_TEST_CONDITION_REQUIRED(TestDriverActivator::LoadCalled(), "ModuleActivator::Load() called for executable")
+}
 
 // Verify that the same member function pointers registered as listeners
 // with different receivers works.
@@ -84,10 +87,10 @@ void frame02a()
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
                         << e.what() << " + in frameSL02a:FAIL" );
   }
-
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 #endif
+
+  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
+  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
   std::vector<ModuleEvent> pEvts;
 #ifdef US_BUILD_SHARED_LIBS
@@ -113,14 +116,9 @@ void frame005a(ModuleContext* mc)
 
   // check expected headers
 
-#ifdef US_BUILD_SHARED_LIBS
-  US_TEST_CONDITION("usCoreTestDriver" == m->GetName(), "Test module name")
+  US_TEST_CONDITION("main" == m->GetName(), "Test module name")
   US_TEST_CONDITION(ModuleVersion(0,1,0) == m->GetVersion(), "Test test driver module version")
   US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == ModuleRegistry::GetModule(1)->GetVersion(), "Test CppMicroServices version")
-#else
-  US_TEST_CONDITION("CppMicroServices" == m->GetName(), "Test module name")
-  US_TEST_CONDITION(ModuleVersion(US_CORE_MAJOR_VERSION, US_CORE_MINOR_VERSION, US_CORE_PATCH_VERSION) == m->GetVersion(), "Test module version")
-#endif
 }
 
 // Get context id, location and status of the module
@@ -166,9 +164,6 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
 #ifdef US_BUILD_SHARED_LIBS
                SharedLibrary& libA)
 {
-  ModuleSettings::SetStoragePath(std::string("/tmp") + PATH_SEPARATOR);
-  US_TEST_CONDITION(ModuleSettings::GetStoragePath() == "/tmp", "Test for valid base storage path")
-
   try
   {
     libA.Load();
@@ -177,22 +172,25 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
   {
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
+#else
+               SharedLibrary& /*libA*/)
+{
+#endif
 
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
+  ModuleSettings::SetStoragePath(std::string("/tmp") + PATH_SEPARATOR);
+  US_TEST_CONDITION(ModuleSettings::GetStoragePath() == "/tmp", "Test for valid base storage path")
+
+  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
-  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA Module", "Test module name")
+  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
 
-  std::cout << moduleA->GetModuleContext()->GetDataFile("");
+  std::cout << moduleA->GetModuleContext()->GetDataFile("") << std::endl;
   std::stringstream ss;
   ss << moduleA->GetModuleId();
   const std::string baseStoragePath = std::string("/tmp") + PATH_SEPARATOR + ss.str() + "_TestModuleA" + PATH_SEPARATOR;
   US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("") == baseStoragePath, "Test for valid data path")
   US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("bla") == baseStoragePath + "bla", "Test for valid data file path")
-#else
-               SharedLibrary& /*libA*/)
-{
-#endif
 
   // Check if libA registered the expected service
   try
@@ -230,19 +228,15 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
     US_TEST_FAILED_MSG(<< "test module, expected service not found");
   }
 
-#ifdef US_BUILD_SHARED_LIBS
   US_TEST_CONDITION(moduleA->IsLoaded() == true, "Test if loaded correctly");
-#endif
 }
 
 
 // Unload libA and check for correct events
 void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libA)
 {
-#ifdef US_BUILD_SHARED_LIBS
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA Module");
+  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for non-null module")
-#endif
 
   ServiceReferenceU sr1
       = mc->GetServiceReference("org.cppmicroservices.TestModuleAService");
@@ -305,6 +299,14 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ModuleTest");
 
+  std::vector<Module*> modules = ModuleRegistry::GetModules();
+  for (std::vector<Module*>::iterator iter = modules.begin(), iterEnd = modules.end();
+       iter != iterEnd; ++iter)
+  {
+    std::cout << "----- " << (*iter)->GetName() << std::endl;
+  }
+
+  frame01();
   frame02a();
 
   ModuleContext* mc = GetModuleContext();

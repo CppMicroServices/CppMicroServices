@@ -71,20 +71,20 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-  Module* moduleAL = ModuleRegistry::GetModule("TestModuleAL Module");
+  Module* moduleAL = ModuleRegistry::GetModule("TestModuleAL");
   US_TEST_CONDITION_REQUIRED(moduleAL != NULL, "Test for existing module TestModuleAL")
 
-  US_TEST_CONDITION(moduleAL->GetName() == "TestModuleAL Module", "Test module name")
+  US_TEST_CONDITION(moduleAL->GetName() == "TestModuleAL", "Test module name")
 
   // check the listeners for events
   std::vector<ModuleEvent> pEvts;
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL));
 
-  Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1 Module");
+  Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1");
   if (autoLoadEnabled)
   {
     US_TEST_CONDITION_REQUIRED(moduleAL_1 != NULL, "Test for existing auto-loaded module TestModuleAL_1")
-    US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1 Module", "Test module name")
+    US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1", "Test module name")
 
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL_1));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL_1));
@@ -130,19 +130,19 @@ void testCustomAutoLoadPath()
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-  Module* moduleAL2 = ModuleRegistry::GetModule("TestModuleAL2 Module");
+  Module* moduleAL2 = ModuleRegistry::GetModule("TestModuleAL2");
   US_TEST_CONDITION_REQUIRED(moduleAL2 != NULL, "Test for existing module TestModuleAL2")
 
-  US_TEST_CONDITION(moduleAL2->GetName() == "TestModuleAL2 Module", "Test module name")
+  US_TEST_CONDITION(moduleAL2->GetName() == "TestModuleAL2", "Test module name")
 
   // check the listeners for events
   std::vector<ModuleEvent> pEvts;
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2));
 
-  Module* moduleAL2_1 = ModuleRegistry::GetModule("TestModuleAL2_1 Module");
+  Module* moduleAL2_1 = ModuleRegistry::GetModule("TestModuleAL2_1");
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   US_TEST_CONDITION_REQUIRED(moduleAL2_1 != NULL, "Test for existing auto-loaded module TestModuleAL2_1")
-  US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1 Module", "Test module name")
+  US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1", "Test module name")
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2_1));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL2_1));

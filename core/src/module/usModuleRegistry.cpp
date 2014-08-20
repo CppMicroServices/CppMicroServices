@@ -35,7 +35,7 @@
 
 US_BEGIN_NAMESPACE
 
-typedef US_UNORDERED_MAP_TYPE<long, Module*> ModuleMap;
+typedef US_UNORDERED_MAP_TYPE<std::string, Module*> ModuleMap;
 
 US_GLOBAL_STATIC(CoreModuleContext, coreModuleContext)
 
@@ -81,7 +81,7 @@ void ModuleRegistry::Register(ModuleInfo* info)
     Module* module = 0;
     {
       MutexLock lock(*modulesLock());
-      module = modules()->operator[](info->id);
+      module = modules()->operator[](info->name);
       assert(module != 0);
     }
     module->Start();
@@ -96,7 +96,8 @@ void ModuleRegistry::Register(ModuleInfo* info)
       for (ModuleMap::const_iterator i = map->begin();
            i != map->end(); ++i)
       {
-        if (i->second->GetLocation() == info->location)
+        if (i->second->GetLocation() == info->location &&
+            i->second->GetName() == info->name)
         {
           module = i->second;
           info->id = module->GetModuleId();
@@ -109,13 +110,14 @@ void ModuleRegistry::Register(ModuleInfo* info)
       module = new Module();
       countLock()->Lock();
       info->id = ++regCount;
+      assert(info->id == 1 ? info->name == "CppMicroServices" : true);
       countLock()->Unlock();
 
       module->Init(coreModuleContext(), info);
 
       MutexLock lock(*modulesLock());
       ModuleMap* map = modules();
-      map->insert(std::make_pair(info->id, module));
+      map->insert(std::make_pair(info->name, module));
     }
     else
     {
@@ -128,43 +130,30 @@ void ModuleRegistry::Register(ModuleInfo* info)
 
 void ModuleRegistry::UnRegister(const ModuleInfo* info)
 {
-  // If we are unregistering the core module, we just call
-  // the module activators Unload() method (if there is a
-  // module activator). Since we cannot be sure that the
-  // ModuleContext for the core library is still valid, we
-  // just pass a null-pointer. Using the module context during
-  // static deinitalization time of the core library makes
-  // no sense anyway.
-  if (info->id == 1)
+  if (info->id > 1)
   {
-    // Remove listeners from static modules if they have forgotten to do so
-    coreModuleContext()->listeners.RemoveAllListeners(GetModuleContext());
-
-    if (info->activatorHook)
+    Module* curr = 0;
     {
-      info->activatorHook()->Unload(0);
+      MutexLock lock(*modulesLock());
+      curr = modules()->operator[](info->name);
+      assert(curr != 0);
     }
-    return;
+    curr->Stop();
   }
-
-  Module* curr = 0;
-  {
-    MutexLock lock(*modulesLock());
-    curr = modules()->operator[](info->id);
-    assert(curr != 0);
-  }
-
-  curr->Stop();
 }
 
 Module* ModuleRegistry::GetModule(long id)
 {
   MutexLock lock(*modulesLock());
 
-  ModuleMap::const_iterator iter = modules()->find(id);
-  if (iter != modules()->end())
+  ModuleMap::const_iterator iter = modules()->begin();
+  ModuleMap::const_iterator iterEnd = modules()->end();
+  for (; iter != iterEnd; ++iter)
   {
-    return iter->second;
+    if (iter->second->GetModuleId() == id)
+    {
+      return iter->second;
+    }
   }
   return 0;
 }
@@ -173,16 +162,11 @@ Module* ModuleRegistry::GetModule(const std::string& name)
 {
   MutexLock lock(*modulesLock());
 
-  ModuleMap::const_iterator iter = modules()->begin();
-  ModuleMap::const_iterator iterEnd = modules()->end();
-  for (; iter != iterEnd; ++iter)
+  ModuleMap::const_iterator iter = modules()->find(name);
+  if (iter != modules()->end())
   {
-    if (iter->second->GetName() == name)
-    {
-      return iter->second;
-    }
+    return iter->second;
   }
-
   return 0;
 }
 

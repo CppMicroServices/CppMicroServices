@@ -23,9 +23,12 @@
 
 #include "usModuleRegistry.h"
 #include "usModulePrivate.h"
+#include "usModuleSettings.h"
 #include "usCoreModuleContext_p.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
+
+#include <stdio.h>
 
 US_BEGIN_NAMESPACE
 
@@ -60,7 +63,7 @@ Module* ModuleContext::GetModule(long id) const
   return d->module->coreCtx->moduleHooks.FilterModule(this, ModuleRegistry::GetModule(id));
 }
 
-Module*ModuleContext::GetModule(const std::string& name)
+Module* ModuleContext::GetModule(const std::string& name)
 {
   return ModuleRegistry::GetModule(name);
 }
@@ -165,7 +168,27 @@ void ModuleContext::RemoveModuleListener(const ModuleListener& delegate, void* d
 
 std::string ModuleContext::GetDataFile(const std::string &filename) const
 {
-  if (d->module->storagePath.empty()) return std::string();
+  // compute the module storage path
+#ifdef US_PLATFORM_WINDOWS
+    static const char separator = '\\';
+#else
+    static const char separator = '/';
+#endif
+
+  std::string baseStoragePath = ModuleSettings::GetStoragePath();
+  if (baseStoragePath.empty()) return std::string();
+  if (baseStoragePath != d->module->baseStoragePath)
+  {
+    d->module->baseStoragePath = baseStoragePath;
+    d->module->storagePath.clear();
+  }
+
+  if (d->module->storagePath.empty())
+  {
+    char buf[50];
+    sprintf(buf, "%ld", d->module->info.id);
+    d->module->storagePath = baseStoragePath + separator + buf + "_" + d->module->info.name + separator;
+  }
   return d->module->storagePath + filename;
 }
 

@@ -25,6 +25,8 @@
 
 US_USE_NAMESPACE
 
+namespace {
+
 /**
  * This class implements a simple module that utilizes the CppMicroServices's
  * event mechanism to listen for service events. Upon receiving a service event,
@@ -86,5 +88,7 @@ private:
   }
 };
 
-US_EXPORT_MODULE_ACTIVATOR(eventlistener, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //! [Activator]

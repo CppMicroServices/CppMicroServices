@@ -80,7 +80,7 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
   list(APPEND _resource_args ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources FILES ${${PROJECT_NAME}_BINARY_RESOURCES})
 endif()
 if(_resource_args)
-  usFunctionEmbedResources(${PROJECT_NAME}_SOURCES LIBRARY_NAME ${${PROJECT_NAME}_TARGET}
+  usFunctionEmbedResources(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET}
                            ${_resource_args})
 endif()
 
@@ -89,11 +89,17 @@ endif()
 #-----------------------------------------------------------------------------
 
 # Generate the module init file
-usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES NAME ${${PROJECT_NAME}_TARGET})
+usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET})
 
 # Create the module library
 add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_SOURCES}
             ${${PROJECT_NAME}_PRIVATE_HEADERS} ${${PROJECT_NAME}_PUBLIC_HEADERS})
+
+# Compile definitions
+set_property(TARGET ${${PROJECT_NAME}_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${${PROJECT_NAME}_TARGET})
+if(NOT US_BUILD_SHARED_LIBS)
+  set_property(TARGET ${${PROJECT_NAME}_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
+endif()
 
 # Link flags
 if(${PROJECT_NAME}_LINK_FLAGS OR US_LINK_FLAGS)

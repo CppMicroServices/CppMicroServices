@@ -77,7 +77,6 @@ list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
 set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
 set(US_MODULE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usModuleInit.cpp")
-set(US_EXECUTABLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usExecutableInit.cpp")
 
 # The CppMicroServices resource compiler
 find_program(US_RCC_EXECUTABLE ${US_RCC_EXECUTABLE_NAME}
@@ -94,7 +93,6 @@ elseif(NOT COMMAND find_package_handle_standard_args)
   include(FindPackageHandleStandardArgs)
 endif()
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake")
-include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateExecutableInit.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake")
 
 # Global include directory

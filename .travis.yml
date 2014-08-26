@@ -24,3 +24,4 @@ branches:
   only:
     - coverity_scan
 
+script:

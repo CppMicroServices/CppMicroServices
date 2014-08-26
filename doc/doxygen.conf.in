@@ -795,7 +795,7 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */test/* \
                          */snippets/* \
-                         */examples/* \
+                         */core/examples/* \
                          */.git/* \
                          *_p.h \
                          *Private.*

@@ -288,11 +288,6 @@ public:
    * The specified \c path is always relative to the root of this module and may
    * begin with '/'. A path value of "/" indicates the root of this module.
    *
-   * \note In case of other modules being statically linked into this module,
-   * the \c path can be ambiguous and returns the first resource matching the
-   * provided \c path according to the order of the static module names in the
-   * #US_LOAD_IMPORTED_MODULES macro.
-   *
    * @param path The path name of the resource.
    * @return A ModuleResource object for the given \c path. If the \c path cannot
    * be found in this module or the module's state is \c UNLOADED, an invalid
@@ -301,7 +296,7 @@ public:
   ModuleResource GetResource(const std::string& path) const;
 
   /**
-   * Returns resources in this module and its statically linked modules.
+   * Returns resources in this module.
    *
    * This method is intended to be used to obtain configuration, setup, localization
    * and other information from this module.
@@ -313,12 +308,6 @@ public:
    * Examples:
    * \snippet uServices-resources/main.cpp 0
    *
-   * \note In case of modules statically linked into this module, the returned
-   * ModuleResource objects can represent the same resource path, coming from
-   * different static modules. The order of the ModuleResource objects in the
-   * returned container matches the order of the static module names in the
-   * #US_LOAD_IMPORTED_MODULES macro.
-   *
    * @param path The path name in which to look. The path is always relative to the root
    * of this module and may begin with '/'. A path value of "/" indicates the root of this module.
    * @param filePattern The resource name pattern for selecting entries in the specified path.
@@ -327,9 +316,7 @@ public:
    * this is equivalent to "*" and matches all resources.
    * @param recurse If \c true, recurse into subdirectories. Otherwise only return resources
    * from the specified path.
-   * @return A vector of ModuleResource objects for each matching entry. The objects are sorted
-   * such that resources from this module are returned first followed by the resources from
-   * statically linked modules in the load order as specified in #US_LOAD_IMPORTED_MODULES.
+   * @return A vector of ModuleResource objects for each matching entry.
    */
   std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 

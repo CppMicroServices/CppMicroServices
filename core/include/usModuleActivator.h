@@ -108,7 +108,6 @@ US_END_NAMESPACE
  *
  * \brief Export a module activator class.
  *
- * \param _module_libname The physical name of the module, without prefix or suffix.
  * \param _activator_type The fully-qualified type-name of the module activator class.
  *
  * Call this macro after the definition of your module activator to make it
@@ -116,11 +115,6 @@ US_END_NAMESPACE
  *
  * Example:
  * \snippet uServices-activator/main.cpp 0
- *
- * \note If you use this macro in a source file compiled into an executable, additional
- * requirements for the macro arguments apply:
- *  - The \c _module_libname argument must match the value of \c _module_name used in the
- *    \c #US_INITIALIZE_MODULE macro call.
  */
 #define US_EXPORT_MODULE_ACTIVATOR(_activator_type)                                       \
   extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* US_CONCAT(_us_module_activator_instance_, US_MODULE_NAME) () \

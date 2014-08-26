@@ -44,4 +44,4 @@ class CoreModuleActivator : public ModuleActivator
 
 US_END_NAMESPACE
 
-US_EXPORT_MODULE_ACTIVATOR(CppMicroServices, US_PREPEND_NAMESPACE(CoreModuleActivator))
+US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(CoreModuleActivator))

@@ -35,7 +35,7 @@ class ModuleResourcePrivate
 public:
 
   ModuleResourcePrivate()
-    : associatedResourceTree(NULL)
+    : resourceTree(NULL)
     , node(-1)
     , size(0)
     , data(NULL)
@@ -48,8 +48,7 @@ public:
   std::string path;
   std::string filePath;
 
-  std::vector<ModuleResourceTree*> resourceTrees;
-  const ModuleResourceTree* associatedResourceTree;
+  const ModuleResourceTree* resourceTree;
 
   int node;
   int32_t size;
@@ -78,12 +77,10 @@ ModuleResource::ModuleResource(const ModuleResource &resource)
   d->ref.Ref();
 }
 
-ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* associatedResourceTree,
-                               const std::vector<ModuleResourceTree*>& resourceTrees)
+ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* resourceTree)
   : d(new ModuleResourcePrivate)
 {
-  d->resourceTrees = resourceTrees;
-  d->associatedResourceTree = associatedResourceTree;
+  d->resourceTree = resourceTree;
 
   std::string file = _file;
   if (file.empty()) file = "/";
@@ -110,14 +107,14 @@ ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* ass
 
   d->filePath = d->path + d->fileName;
 
-  d->node = d->associatedResourceTree->FindNode(GetResourcePath());
+  d->node = d->resourceTree->FindNode(GetResourcePath());
   if (d->node != -1)
   {
-    d->isFile = !d->associatedResourceTree->IsDir(d->node);
+    d->isFile = !d->resourceTree->IsDir(d->node);
     if (d->isFile)
     {
-      d->data = d->associatedResourceTree->GetData(d->node, &d->size);
-      d->isCompressed = d->associatedResourceTree->IsCompressed(d->node);
+      d->data = d->resourceTree->GetData(d->node, &d->size);
+      d->isCompressed = d->resourceTree->IsCompressed(d->node);
     }
   }
 }
@@ -147,7 +144,7 @@ bool ModuleResource::operator <(const ModuleResource& resource) const
 
 bool ModuleResource::operator ==(const ModuleResource& resource) const
 {
-  return d->associatedResourceTree == resource.d->associatedResourceTree &&
+  return d->resourceTree == resource.d->resourceTree &&
       this->GetResourcePath() == resource.GetResourcePath();
 }
 
@@ -158,7 +155,7 @@ bool ModuleResource::operator !=(const ModuleResource &resource) const
 
 bool ModuleResource::IsValid() const
 {
-  return d->associatedResourceTree && d->associatedResourceTree->IsValid() && d->node > -1;
+  return d->resourceTree && d->resourceTree->IsValid() && d->node > -1;
 }
 
 bool ModuleResource::IsCompressed() const
@@ -222,24 +219,9 @@ std::vector<std::string> ModuleResource::GetChildren() const
 {
   if (d->isFile || !IsValid()) return d->children;
 
-  if (!d->children.empty()) return d->children;
-
-  bool indexPastAssociatedResTree = false;
-  for (std::size_t i = 0; i < d->resourceTrees.size(); ++i)
+  if (d->children.empty())
   {
-    if (d->resourceTrees[i] == d->associatedResourceTree)
-    {
-      indexPastAssociatedResTree = true;
-      d->associatedResourceTree->GetChildren(d->node, d->children);
-    }
-    else if (indexPastAssociatedResTree)
-    {
-      int nodeIndex = d->resourceTrees[i]->FindNode(GetPath());
-      if (nodeIndex > -1)
-      {
-        d->resourceTrees[i]->GetChildren(d->node, d->children);
-      }
-    }
+    d->resourceTree->GetChildren(d->node, d->children);
   }
   return d->children;
 }

@@ -26,7 +26,6 @@
 #include <usCoreConfig.h>
 
 #include <string>
-#include <vector>
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -43,29 +42,20 @@ struct ModuleActivator;
  */
 struct US_Core_EXPORT ModuleInfo
 {
-  ModuleInfo(const std::string& name, const std::string& libName);
+  ModuleInfo(const std::string& name);
 
-  typedef ModuleActivator*(*ModuleActivatorHook)(void);
   typedef int(*InitResourcesHook)(ModuleInfo*);
   typedef const unsigned char* ModuleResourceData;
 
   std::string name;
-  std::string libName;
-
   std::string location;
-
   std::string autoLoadDir;
 
   long id;
 
-  ModuleActivatorHook activatorHook;
-
-  // In case of statically linked (imported) modules, there could
-  // be more than one set of ModuleResourceData pointers. We aggregate
-  // all pointers here.
-  std::vector<ModuleResourceData> resourceData;
-  std::vector<ModuleResourceData> resourceNames;
-  std::vector<ModuleResourceData> resourceTree;
+  ModuleResourceData resourceData;
+  ModuleResourceData resourceNames;
+  ModuleResourceData resourceTree;
 };
 
 US_END_NAMESPACE

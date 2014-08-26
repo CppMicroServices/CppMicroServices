@@ -21,4 +21,4 @@
 
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_MODULE("@US_MODULE_NAME@", "@US_MODULE_LIBRARY_NAME@")
+US_INITIALIZE_MODULE

@@ -13,16 +13,14 @@
 #! \code{.cmake}
 #! set(module_srcs )
 #! usFunctionEmbedResources(module_srcs
-#!                          LIBRARY_NAME "mylib"
+#!                          MODULE_NAME "mylib"
 #!                          ROOT_DIR resources
 #!                          FILES config.properties logo.png
 #!                         )
 #! \endcode
 #!
-#! \param LIBRARY_NAME (required if EXECUTABLE_NAME is empty) The library name of the module
-#!        which will include the generated source file, without extension.
-#! \param EXECUTABLE_NAME (required if LIBRARY_NAME is empty) The name of the executable
-#!        which will include the generated source file.
+#! \param MODULE_NAME (required) The module name of the module which will include the
+#!        generated source files, as specified in the \c US_MODULE_NAME pre-processor definition.
 #! \param COMPRESSION_LEVEL (optional) The zip compression level. Defaults to the default zip
 #!        level. Level 0 disables compression.
 #! \param COMPRESSION_THRESHOLD (optional) The compression threshold ranging from 0 to 100 for
@@ -40,7 +38,7 @@
 function(usFunctionEmbedResources src_var)
 
   set(prefix US_RESOURCE)
-  set(arg_names LIBRARY_NAME EXECUTABLE_NAME COMPRESSION_LEVEL COMPRESSION_THRESHOLD ROOT_DIR FILES)
+  set(arg_names MODULE_NAME COMPRESSION_LEVEL COMPRESSION_THRESHOLD ROOT_DIR FILES)
   foreach(arg_name ${arg_names})
     set(${prefix}_${arg_name})
   endforeach(arg_name)
@@ -100,12 +98,8 @@ function(usFunctionEmbedResources src_var)
     message(SEND_ERROR "Output variable name not specified.")
   endif()
 
-  if(US_RESOURCE_EXECUTABLE_NAME AND US_RESOURCE_LIBRARY_NAME)
-    message(SEND_ERROR "Only one of LIBRARY_NAME or EXECUTABLE_NAME can be specified.")
-  endif()
-
-  if(NOT US_RESOURCE_LIBRARY_NAME AND NOT US_RESOURCE_EXECUTABLE_NAME)
-    message(SEND_ERROR "LIBRARY_NAME or EXECUTABLE_NAME argument not specified.")
+  if(NOT US_RESOURCE_MODULE_NAME)
+    message(SEND_ERROR "MODULE_NAME argument not specified.")
   endif()
 
   if(NOT US_RESOURCE_FILES)
@@ -126,14 +120,7 @@ function(usFunctionEmbedResources src_var)
     set(cmd_line_args -t ${US_RESOURCE_COMPRESSION_THRESHOLD} ${cmd_line_args})
   endif()
 
-  if(US_RESOURCE_LIBRARY_NAME)
-    set(us_cpp_resource_file "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_LIBRARY_NAME}_resources.cpp")
-    set(us_lib_name ${US_RESOURCE_LIBRARY_NAME})
-  else()
-    set(us_cpp_resource_file "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_EXECUTABLE_NAME}_resources.cpp")
-    set(us_lib_name "")
-  endif()
-
+  set(us_cpp_resource_file "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_MODULE_NAME}_resources.cpp")
   set(resource_compiler ${US_RCC_EXECUTABLE})
   if(TARGET ${US_RCC_EXECUTABLE_NAME})
     set(resource_compiler ${US_RCC_EXECUTABLE_NAME})
@@ -143,7 +130,7 @@ function(usFunctionEmbedResources src_var)
 
   add_custom_command(
     OUTPUT ${us_cpp_resource_file}
-    COMMAND ${resource_compiler} "${us_lib_name}" ${us_cpp_resource_file} ${cmd_line_args}
+    COMMAND ${resource_compiler} "${US_RESOURCE_MODULE_NAME}" ${us_cpp_resource_file} ${cmd_line_args}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${absolute_res_files} ${resource_compiler}
     COMMENT "Generating embedded resource file ${us_cpp_resource_name}"

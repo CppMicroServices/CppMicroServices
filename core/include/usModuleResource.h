@@ -277,8 +277,7 @@ public:
 
 private:
 
-  ModuleResource(const std::string& file, ModuleResourceTree* resourceTree,
-                 const std::vector<ModuleResourceTree*>& resourceTrees);
+  ModuleResource(const std::string& file, ModuleResourceTree* resourceTree);
 
   friend class Module;
   friend class ModulePrivate;

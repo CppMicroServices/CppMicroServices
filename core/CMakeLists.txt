@@ -27,14 +27,6 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
                ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
-set(_options)
-if(NOT US_BUILD_SHARED_LIBS)
-  set(_options SKIP_EXAMPLES)
-  if(US_BUILD_EXAMPLES)
-    message(WARNING "Core examples are not available if US_BUILD_SHARED_LIBS is OFF")
-  endif()
-endif()
-
 usMacroCreateModule(Core
   VERSION "2.99.0"
   TARGET CppMicroServices
@@ -44,10 +36,4 @@ usMacroCreateModule(Core
   PUBLIC_HEADERS ${_core_public_headers}
   PRIVATE_HEADERS ${_core_private_headers}
   BINARY_RESOURCES manifest.json
-  ${_options}
-)
-
-# Compile definitions
-set_property(TARGET ${${PROJECT_NAME}_TARGET}
-  APPEND PROPERTY COMPILE_DEFINITIONS US_FORCE_MODULE_INIT
 )

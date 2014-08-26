@@ -61,7 +61,7 @@ private:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(uServices_singleton, MyActivator)
+US_EXPORT_MODULE_ACTIVATOR(MyActivator)
 
 int main()
 {

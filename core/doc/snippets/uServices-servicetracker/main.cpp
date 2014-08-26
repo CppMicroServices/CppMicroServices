@@ -107,4 +107,4 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
 
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_EXECUTABLE("uServices-modulecontext")
+US_INITIALIZE_MODULE

@@ -74,16 +74,14 @@ public:
    */
   static std::vector<Module*> GetLoadedModules();
 
-private:
-
-  friend class ModuleInitializer;
-
-  // disabled
-  ModuleRegistry();
-
   static void Register(ModuleInfo* info);
 
   static void UnRegister(const ModuleInfo* info);
+
+private:
+
+  // disabled
+  ModuleRegistry();
 
 };
 

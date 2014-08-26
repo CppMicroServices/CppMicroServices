@@ -144,4 +144,4 @@ public:
 
 US_END_NAMESPACE
 
-US_EXPORT_MODULE_ACTIVATOR(TestModuleH, us::TestModuleHActivator)
+US_EXPORT_MODULE_ACTIVATOR(us::TestModuleHActivator)

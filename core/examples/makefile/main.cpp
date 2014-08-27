@@ -22,4 +22,4 @@ int main(int /*argc*/, char* /*argv*/[])
 
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_EXECUTABLE("main")
+US_INITIALIZE_MODULE

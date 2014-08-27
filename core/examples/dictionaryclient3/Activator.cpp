@@ -28,6 +28,8 @@
 
 US_USE_NAMESPACE
 
+namespace {
+
 /**
  * This class implements a module activator that uses a dictionary
  * service to check for the proper spelling of a word by
@@ -138,5 +140,7 @@ private:
   ServiceTracker<IDictionaryService>* m_tracker;
 };
 
-US_EXPORT_MODULE_ACTIVATOR(dictionaryclient3, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //![Activator]

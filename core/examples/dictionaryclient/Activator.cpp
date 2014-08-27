@@ -27,6 +27,8 @@
 
 US_USE_NAMESPACE
 
+namespace {
+
 /**
  * This class implements a module activator that uses a dictionary service to check for
  * the proper spelling of a word by check for its existence in the dictionary.
@@ -113,5 +115,7 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(dictionaryclient, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //![Activator]

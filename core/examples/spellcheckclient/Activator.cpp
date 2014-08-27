@@ -31,6 +31,8 @@
 
 US_USE_NAMESPACE
 
+namespace {
+
 /**
  * This class implements a module that uses a spell checker
  * service to check the spelling of a passage. This module
@@ -139,5 +141,7 @@ private:
   ServiceTracker<ISpellCheckService>* m_tracker;
 };
 
-US_EXPORT_MODULE_ACTIVATOR(spellcheckclient, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //![Activator]

@@ -84,7 +84,7 @@ bool load_impl(const std::string& modulePath)
   void* handle = LoadLibrary(modulePath.c_str());
   if (handle == NULL)
   {
-    US_WARN << GetLastErrorStr();
+    US_WARN << us::GetLastErrorStr();
   }
   return (handle != NULL);
 }

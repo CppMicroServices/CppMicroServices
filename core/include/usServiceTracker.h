@@ -65,14 +65,14 @@ struct TrackedTypeTraitsBase
   static TrackedType ConvertToTrackedType(const InterfaceMap&)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
-    return TTT::DefaultValue();
+    //return TTT::DefaultValue();
   }
 
   // Needed for S != void
   static TrackedType ConvertToTrackedType(void*)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
-    return TTT::DefaultValue();
+    //return TTT::DefaultValue();
   }
 };
 

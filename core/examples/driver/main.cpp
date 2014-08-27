@@ -22,6 +22,7 @@
 #include <usModule.h>
 #include <usModuleRegistry.h>
 #include <usSharedLibrary.h>
+#include <usModuleImport.h>
 
 #include "usCoreExamplesDriverConfig.h"
 
@@ -53,17 +54,19 @@ US_USE_NAMESPACE
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
 #endif
 
-std::map<std::string, std::string> GetExampleModules()
+std::vector<std::string> GetExampleModules()
 {
-  std::map<std::string, std::string> names;
-  names.insert(std::make_pair("Event Listener", "eventlistener"));
-  names.insert(std::make_pair("Dictionary Service", "dictionaryservice"));
-  names.insert(std::make_pair("French Dictionary", "frenchdictionary"));
-  names.insert(std::make_pair("Dictionary Client", "dictionaryclient"));
-  names.insert(std::make_pair("Dictionary Client 2", "dictionaryclient2"));
-  names.insert(std::make_pair("Dictionary Client 3", "dictionaryclient3"));
-  names.insert(std::make_pair("Spell Check Service", "spellcheckservice"));
-  names.insert(std::make_pair("Spell Check Client", "spellcheckclient"));
+  std::vector<std::string> names;
+#ifdef US_BUILD_SHARED_LIBS
+  names.push_back("eventlistener");
+  names.push_back("dictionaryservice");
+  names.push_back("frenchdictionary");
+  names.push_back("dictionaryclient");
+  names.push_back("dictionaryclient2");
+  names.push_back("dictionaryclient3");
+  names.push_back("spellcheckservice");
+  names.push_back("spellcheckclient");
+#endif
   return names;
 }
 
@@ -71,7 +74,7 @@ int main(int /*argc*/, char** /*argv*/)
 {
   char cmd[256];
 
-  std::map<std::string, std::string> availableModules = GetExampleModules();
+  std::vector<std::string> availableModules = GetExampleModules();
 
   /* module path -> lib handle */
   std::map<std::string, SharedLibrary> libraryHandles;
@@ -154,10 +157,10 @@ int main(int /*argc*/, char** /*argv*/)
             else
             {
               bool libFound = false;
-              for (std::map<std::string, std::string>::const_iterator availableModuleIter = availableModules.begin();
+              for (std::vector<std::string>::const_iterator availableModuleIter = availableModules.begin();
                    availableModuleIter != availableModules.end(); ++availableModuleIter)
               {
-                if (availableModuleIter->second == idOrName)
+                if (*availableModuleIter == idOrName)
                 {
                   libFound = true;
                 }
@@ -178,7 +181,8 @@ int main(int /*argc*/, char** /*argv*/)
             for (std::vector<Module*>::const_iterator moduleIter = modules.begin();
                  moduleIter != modules.end(); ++moduleIter)
             {
-              availableModules.erase((*moduleIter)->GetName());
+              availableModules.erase(std::remove(availableModules.begin(), availableModules.end(), (*moduleIter)->GetName()),
+                                     availableModules.end());
             }
 
           }
@@ -272,10 +276,10 @@ int main(int /*argc*/, char** /*argv*/)
       std::cout << "Id | " << std::setw(20) << "Name" << " | " << std::setw(9) << "Status" << std::endl;
       std::cout << "-----------------------------------\n";
 
-      for (std::map<std::string, std::string>::const_iterator nameIter = availableModules.begin();
+      for (std::vector<std::string>::const_iterator nameIter = availableModules.begin();
            nameIter != availableModules.end(); ++nameIter)
       {
-        std::cout << " - | " << std::setw(20) << nameIter->second << " | " << std::setw(9) << "-" << std::endl;
+        std::cout << " - | " << std::setw(20) << *nameIter << " | " << std::setw(9) << "-" << std::endl;
       }
 
       for (std::vector<Module*>::const_iterator moduleIter = modules.begin();
@@ -296,3 +300,11 @@ int main(int /*argc*/, char** /*argv*/)
 
   return 0;
 }
+
+#ifndef US_BUILD_SHARED_LIBS
+US_IMPORT_MODULE(CppMicroServices)
+US_IMPORT_MODULE_RESOURCES(CppMicroServices)
+US_IMPORT_MODULE(eventlistener)
+US_IMPORT_MODULE(dictionaryservice)
+US_IMPORT_MODULE(dictionaryclient)
+#endif

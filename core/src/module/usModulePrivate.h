@@ -55,13 +55,7 @@ public:
 
   void RemoveModuleResources();
 
-  void StartStaticModules();
-
-  void StopStaticModules();
-
   CoreModuleContext* const coreCtx;
-
-  std::vector<std::string> staticModuleLibNames;
 
   /**
    * Module version
@@ -70,8 +64,7 @@ public:
 
   ModuleInfo info;
 
-  std::vector<ModuleResourceTree*> resourceTreePtrs;
-  std::map<std::string, ModuleResourceTree*> mapLibNameToResourceTrees;
+  ModuleResourceTree* resourceTreePtr;
 
   /**
    * ModuleContext for the module
@@ -82,15 +75,14 @@ public:
 
   ModuleManifest moduleManifest;
 
+  std::string baseStoragePath;
   std::string storagePath;
 
   Module* const q;
 
 private:
 
-  void InitializeResources(const std::string& location);
-
-  std::list<ModuleInfo::ModuleActivatorHook> staticActivators;
+  void InitializeResources();
 
   static AtomicInt idCounter;
 

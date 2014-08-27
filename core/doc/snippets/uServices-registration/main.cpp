@@ -110,7 +110,7 @@ context->RegisterService<InterfaceA,InterfaceB>(static_cast<ServiceFactory*>(myS
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(mylibname, MyActivator)
+US_EXPORT_MODULE_ACTIVATOR(MyActivator)
 
 int main(int /*argc*/, char* /*argv*/[])
 {

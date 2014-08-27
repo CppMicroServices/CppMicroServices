@@ -21,7 +21,6 @@
 
 #include "usTestManager.h"
 
-#include "usModuleImport.h"
 
 US_BEGIN_NAMESPACE
 
@@ -58,26 +57,3 @@ void TestManager::TestPassed()
 }
 
 US_END_NAMESPACE
-
-#ifndef US_BUILD_SHARED_LIBS
-US_IMPORT_MODULE(CppMicroServices)
-US_IMPORT_MODULE_RESOURCES(CppMicroServices)
-US_IMPORT_MODULE(TestModuleA)
-US_IMPORT_MODULE(TestModuleA2)
-US_IMPORT_MODULE(TestModuleB)
-US_IMPORT_MODULE_RESOURCES(TestModuleB)
-US_IMPORT_MODULE(TestModuleH)
-US_IMPORT_MODULE(TestModuleM)
-US_IMPORT_MODULE_RESOURCES(TestModuleM)
-US_IMPORT_MODULE(TestModuleR)
-US_IMPORT_MODULE_RESOURCES(TestModuleR)
-US_IMPORT_MODULE(TestModuleS)
-US_IMPORT_MODULE(TestModuleSL1)
-US_IMPORT_MODULE(TestModuleSL3)
-US_IMPORT_MODULE(TestModuleSL4)
-
-US_LOAD_IMPORTED_MODULES_INTO_MAIN(
-    TestModuleA TestModuleA2 TestModuleB TestModuleImportedByB TestModuleH TestModuleM
-    TestModuleR TestModuleS TestModuleSL1 TestModuleSL3 TestModuleSL4
-    )
-#endif

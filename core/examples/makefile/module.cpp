@@ -95,8 +95,8 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(module, MyActivator)
+US_EXPORT_MODULE_ACTIVATOR(MyActivator)
 
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_MODULE("My Module", "module")
+US_INITIALIZE_MODULE

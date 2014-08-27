@@ -24,11 +24,10 @@
 
 US_BEGIN_NAMESPACE
 
-ModuleInfo::ModuleInfo(const std::string& name, const std::string& libName)
+ModuleInfo::ModuleInfo(const std::string& name)
   : name(name)
-  , libName(libName)
   , id(0)
-  , activatorHook(NULL)
-{}
+{
+}
 
 US_END_NAMESPACE

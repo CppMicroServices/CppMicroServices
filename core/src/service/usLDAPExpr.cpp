@@ -35,23 +35,51 @@
 
 US_BEGIN_NAMESPACE
 
-const int LDAPExpr::AND     =  0;
-const int LDAPExpr::OR      =  1;
-const int LDAPExpr::NOT     =  2;
-const int LDAPExpr::EQ      =  4;
-const int LDAPExpr::LE      =  8;
-const int LDAPExpr::GE      = 16;
-const int LDAPExpr::APPROX  = 32;
-const int LDAPExpr::COMPLEX = LDAPExpr::AND | LDAPExpr::OR | LDAPExpr::NOT;
-const int LDAPExpr::SIMPLE  = LDAPExpr::EQ | LDAPExpr::LE | LDAPExpr::GE | LDAPExpr::APPROX;
+namespace LDAPExprConstants {
 
-const LDAPExpr::Byte LDAPExpr::WILDCARD = std::numeric_limits<LDAPExpr::Byte>::max();
-const std::string LDAPExpr::WILDCARD_STRING = std::string(1, LDAPExpr::WILDCARD );
-const std::string LDAPExpr::NULLQ     = "Null query";
-const std::string LDAPExpr::GARBAGE   = "Trailing garbage";
-const std::string LDAPExpr::EOS       = "Unexpected end of query";
-const std::string LDAPExpr::MALFORMED = "Malformed query";
-const std::string LDAPExpr::OPERATOR  = "Undefined operator";
+static LDAPExpr::Byte WILDCARD()
+{
+  static LDAPExpr::Byte b = std::numeric_limits<LDAPExpr::Byte>::max();
+  return b;
+}
+
+static const std::string& WILDCARD_STRING()
+{
+  static std::string s(1, WILDCARD());
+  return s;
+}
+
+static const std::string& NULLQ()
+{
+  static std::string s = "Null query";
+  return s;
+}
+
+static const std::string& GARBAGE()
+{
+  static std::string s = "Trailing garbage";
+  return s;
+}
+
+static const std::string& EOS()
+{
+  static std::string s = "Unexpected end of query";
+  return s;
+}
+
+static const std::string& MALFORMED()
+{
+  static std::string s = "Malformed query";
+  return s;
+}
+
+static const std::string& OPERATOR()
+{
+  static std::string s = "Undefined operator";
+  return s;
+}
+
+}
 
 bool stricomp(const std::string::value_type& v1, const std::string::value_type& v2)
 {
@@ -140,14 +168,14 @@ LDAPExpr::LDAPExpr( const std::string &filter ) : d()
 
     if (!Trim(ps.rest()).empty())
     {
-      ps.error(GARBAGE + " '" + ps.rest() + "'");
+      ps.error(LDAPExprConstants::GARBAGE() + " '" + ps.rest() + "'");
     }
 
     d = expr.d;
   }
   catch (const std::out_of_range&)
   {
-    ps.error(EOS);
+    ps.error(LDAPExprConstants::EOS());
   }
 }
 
@@ -189,7 +217,7 @@ bool LDAPExpr::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
   {
     if (d->m_attrName.length() == ServiceConstants::OBJECTCLASS().length() &&
         std::equal(d->m_attrName.begin(), d->m_attrName.end(), ServiceConstants::OBJECTCLASS().begin(), stricomp) &&
-        d->m_attrValue.find(WILDCARD) == std::string::npos)
+        d->m_attrValue.find(LDAPExprConstants::WILDCARD()) == std::string::npos)
     {
       objClasses.insert( d->m_attrValue );
       return true;
@@ -278,7 +306,7 @@ bool LDAPExpr::IsSimple(const StringList& keywords, LocalCache& cache,
   {
     StringList::const_iterator index;
     if ((index = std::find(keywords.begin(), keywords.end(), matchCase ? d->m_attrName : ToLower(d->m_attrName))) != keywords.end() &&
-        d->m_attrValue.find_first_of(WILDCARD) == std::string::npos)
+        d->m_attrValue.find_first_of(LDAPExprConstants::WILDCARD()) == std::string::npos)
     {
       cache[index - keywords.begin()] = StringList(1, d->m_attrValue);
       return true;
@@ -345,7 +373,7 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
 {
   if (obj.Empty())
     return false;
-  if (op == EQ && s == WILDCARD_STRING)
+  if (op == EQ && s == LDAPExprConstants::WILDCARD_STRING())
     return true;
 
   try
@@ -553,7 +581,7 @@ bool LDAPExpr::PatSubstr( const std::string& s, int si, const std::string& pat, 
 {
   if (pat.size()-pi == 0)
     return s.size()-si == 0;
-  if (pat[pi] == WILDCARD)
+  if (pat[pi] == LDAPExprConstants::WILDCARD())
   {
     pi++;
     for (;;)
@@ -588,7 +616,7 @@ LDAPExpr LDAPExpr::ParseExpr( ParseState& ps )
 {
   ps.skipWhite();
   if (!ps.prefix("("))
-    ps.error(MALFORMED);
+    ps.error(LDAPExprConstants::MALFORMED());
 
   int op;
   ps.skipWhite();
@@ -620,7 +648,7 @@ LDAPExpr LDAPExpr::ParseExpr( ParseState& ps )
 
   std::size_t n = v.size();
   if (!ps.prefix(")") || n == 0 || (op == NOT && n > 1))
-    ps.error(MALFORMED);
+    ps.error(LDAPExprConstants::MALFORMED());
 
   return LDAPExpr(op, v);
 }
@@ -629,7 +657,7 @@ LDAPExpr LDAPExpr::ParseSimple( ParseState &ps )
 {
   std::string attrName = ps.getAttributeName();
   if (attrName.empty())
-    ps.error(MALFORMED);
+    ps.error(LDAPExprConstants::MALFORMED());
   int op = 0;
   if (ps.prefix("="))
     op = EQ;
@@ -642,11 +670,11 @@ LDAPExpr LDAPExpr::ParseSimple( ParseState &ps )
   else
   {
     //      System.out.println("undef op='" + ps.peek() + "'");
-    ps.error(OPERATOR); // Does not return
+    ps.error(LDAPExprConstants::OPERATOR()); // Does not return
   }
   std::string attrValue = ps.getAttributeValue();
   if (!ps.prefix(")"))
-    ps.error(MALFORMED);
+    ps.error(LDAPExprConstants::MALFORMED());
   return LDAPExpr(op, attrName, attrValue);
 }
 
@@ -680,7 +708,7 @@ const std::string LDAPExpr::ToString() const
       {
         res.append(1, '\\');
       }
-      else if (c == WILDCARD)
+      else if (c == LDAPExprConstants::WILDCARD())
       {
         c = '*';
       }
@@ -715,7 +743,7 @@ LDAPExpr::ParseState::ParseState( const std::string& str )
 {
   if (str.empty())
   {
-    error(NULLQ);
+    error(LDAPExprConstants::NULLQ());
   }
 
   m_str = str;
@@ -796,7 +824,7 @@ std::string LDAPExpr::ParseState::getAttributeValue()
       exit = true;
       break;
     case '*':
-      sb.append(1, WILDCARD);
+      sb.append(1, LDAPExprConstants::WILDCARD());
       break;
     case '\\':
       sb.append(1, m_str.at(++m_pos));

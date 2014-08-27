@@ -35,7 +35,12 @@ endforeach()
 
 
 function(CreateExample _name)
-  add_library(Example-${_name} SHARED ${ARGN})
+  add_library(Example-${_name} ${ARGN})
+  set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_name})
+  if(NOT US_BUILD_SHARED_LIBS)
+    set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
+  endif()
+
   if(${_name}_DEPENDS)
     foreach(_dep ${${_name}_DEPENDS})
       include_directories(${PROJECT_SOURCE_DIR}/${_dep})
@@ -81,7 +86,7 @@ if(US_BUILD_TESTING)
 
   add_test(NAME usInstallTest
            WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
-           COMMAND ${CMAKE_COMMAND} --build ${CppMicroServices_BINARY_DIR} --target install)
+           COMMAND ${CMAKE_COMMAND} --build ${CppMicroServices_BINARY_DIR} --config $<CONFIGURATION> --target install)
   set_tests_properties(usInstallTest PROPERTIES
                        ENVIRONMENT "DESTDIR=${CppMicroServices_BINARY_DIR}/install_test"
                        DEPENDS usInstallCleanTest)
@@ -106,6 +111,7 @@ if(US_BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND}
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                       -D BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                        -G ${CMAKE_GENERATOR}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                        "${CMAKE_CURRENT_LIST_DIR}")
@@ -127,6 +133,7 @@ if(US_BUILD_TESTING)
                      -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                     -D BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                      -G ${CMAKE_GENERATOR}
                      "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                      "${CMAKE_CURRENT_LIST_DIR}")
@@ -144,7 +151,7 @@ if(US_BUILD_TESTING)
 
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system
-  if(UNIX AND NOT APPLE)
+  if(UNIX AND NOT APPLE AND US_BUILD_SHARED_LIBS)
     find_program(MAKE_COMMAND NAMES make gmake)
     find_program(CXX_COMMAND NAMES g++)
     mark_as_advanced(MAKE_COMMAND CXX_COMMAND)
@@ -157,7 +164,7 @@ if(US_BUILD_TESTING)
                COMMAND ${MAKE_COMMAND})
       set_tests_properties(usMakefileExampleTest PROPERTIES
                            DEPENDS "usMakefileExampleCleanTest;usInstallTest"
-                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};CppMicroServices_CXX_FLAGS=${US_CXX_FLAGS}")
+                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS}")
       list(APPEND _example_tests usMakefileExampleCleanTest usMakefileExampleTest)
     endif()
   endif()

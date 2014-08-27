@@ -267,6 +267,15 @@ public:
   int GetSize() const;
 
   /**
+   * Returns the last modified time of this resource in milli-seconds from the epoch.
+   *
+   * The time resolution is platform specific and my vary.
+   *
+   * @return Last modified time of this resource.
+   */
+  long long GetLastModified() const;
+
+  /**
    * Returns a data pointer pointing to the raw data of this %ModuleResource object.
    * If the resource is compressed the data returned is compressed and UncompressResourceData()
    * must be used to access the data. If the resource represents a directory \c 0 is returned.
@@ -277,8 +286,7 @@ public:
 
 private:
 
-  ModuleResource(const std::string& file, ModuleResourceTree* resourceTree,
-                 const std::vector<ModuleResourceTree*>& resourceTrees);
+  ModuleResource(const std::string& file, ModuleResourceTree* resourceTree);
 
   friend class Module;
   friend class ModulePrivate;

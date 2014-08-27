@@ -34,6 +34,6 @@ struct MyStaticModuleActivator : public ModuleActivator
   void Unload(ModuleContext* /*context*/) {}
 };
 
-US_EXPORT_MODULE_ACTIVATOR(MyStaticModule, MyStaticModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(MyStaticModuleActivator)
 
-US_INITIALIZE_MODULE("My Static Module", "MyStaticModule")
+US_INITIALIZE_MODULE

@@ -31,7 +31,6 @@ include(usFunctionCheckCompilerFlags)
 include(usFunctionEmbedResources)
 include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
-include(usFunctionGenerateExecutableInit)
 include(usMacroCreateModule)
 
 if(US_BUILD_TESTING)
@@ -147,7 +146,6 @@ us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
 set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
-set(US_EXECUTABLE_INIT_TEMPLATE "${US_CMAKE_DIR}/usExecutableInit.cpp" CACHE INTERNAL "The executable initialization template code")
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -399,12 +397,10 @@ install(EXPORT ${PROJECT_NAME}Targets
 
 set(_install_cmake_scripts
   ${US_MODULE_INIT_TEMPLATE}
-  ${US_EXECUTABLE_INIT_TEMPLATE}
   ${US_CMAKE_DIR}/CMakeParseArguments.cmake
   ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
   ${US_CMAKE_DIR}/FindPackageMessage.cmake
   ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
-  ${US_CMAKE_DIR}/usFunctionGenerateExecutableInit.cmake
   ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
   )
 

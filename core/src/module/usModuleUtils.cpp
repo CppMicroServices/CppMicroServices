@@ -21,7 +21,9 @@
 
 
 #include "usModuleUtils_p.h"
+
 #include <usLog_p.h>
+#include <usModuleInfo.h>
 #include <usUtils_p.h>
 
 US_BEGIN_NAMESPACE
@@ -42,7 +44,7 @@ namespace {
 
 #include <dlfcn.h>
 
-std::string GetLibraryPath_impl(const std::string& /*libName*/, void* symbol)
+std::string GetLibraryPath_impl(void* symbol)
 {
   Dl_info info;
   if (dladdr(symbol, &info))
@@ -56,20 +58,20 @@ std::string GetLibraryPath_impl(const std::string& /*libName*/, void* symbol)
   return "";
 }
 
-void* GetSymbol_impl(const std::string& libName, const char* symbol)
+void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
 {
   // Clear the last error message
   dlerror();
 
   void* selfHandle = 0;
-  if (libName.empty() || !sharedLibMode)
+  if (!sharedLibMode || moduleInfo.name == "main")
   {
     // Get the handle of the executable
     selfHandle = dlopen(0, RTLD_LAZY);
   }
   else
   {
-    selfHandle = dlopen(libName.c_str(), RTLD_LAZY);
+    selfHandle = dlopen(moduleInfo.location.c_str(), RTLD_LAZY);
   }
 
   if (selfHandle)
@@ -97,19 +99,12 @@ void* GetSymbol_impl(const std::string& libName, const char* symbol)
 
 #include <windows.h>
 
-std::string GetLibraryPath_impl(const std::string& libName, void *symbol)
+std::string GetLibraryPath_impl(void *symbol)
 {
   HMODULE handle = 0;
-  if (libName.empty() || !sharedLibMode)
-  {
-    // get the handle for the executable
-    handle = GetModuleHandle(NULL);
-  }
-  else
-  {
-    handle = GetModuleHandle(libName.c_str());
-  }
-  if (!handle)
+  BOOL handleError = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                       static_cast<LPCTSTR>(symbol), &handle);
+  if (!handleError)
   {
     // Test
     US_DEBUG << "GetLibraryPath_impl():GetModuleHandle() " << GetLastErrorStr();
@@ -126,16 +121,16 @@ std::string GetLibraryPath_impl(const std::string& libName, void *symbol)
   return "";
 }
 
-void* GetSymbol_impl(const std::string& libName, const char* symbol)
+void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
 {
   HMODULE handle = NULL;
-  if (libName.empty() || !sharedLibMode)
+  if (!sharedLibMode || moduleInfo.name == "main")
   {
     handle = GetModuleHandle(NULL);
   }
   else
   {
-    handle = GetModuleHandle(libName.c_str());
+    handle = GetModuleHandle(moduleInfo.location.c_str());
   }
 
   if (!handle)
@@ -152,25 +147,25 @@ void* GetSymbol_impl(const std::string& libName, const char* symbol)
   return addr;
 }
 #else
-std::string GetLibraryPath_impl(const std::string& libName, void* symbol)
+std::string GetLibraryPath_impl(void*)
 {
   return "";
 }
 
-void* GetSymbol_impl(const std::string& libName, const char* symbol)
+void* GetSymbol_impl(const ModuleInfo&, const char* symbol)
 {
   return 0;
 }
 #endif
 
-std::string ModuleUtils::GetLibraryPath(const std::string& libName, void* symbol)
+std::string ModuleUtils::GetLibraryPath(void* symbol)
 {
-  return GetLibraryPath_impl(libName, symbol);
+  return GetLibraryPath_impl(symbol);
 }
 
-void* ModuleUtils::GetSymbol(const std::string& libName, const char* symbol)
+void* ModuleUtils::GetSymbol(const ModuleInfo& module, const char* symbol)
 {
-  return GetSymbol_impl(libName, symbol);
+  return GetSymbol_impl(module, symbol);
 }
 
 US_END_NAMESPACE

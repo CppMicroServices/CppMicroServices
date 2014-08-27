@@ -37,9 +37,9 @@ US_Core_EXPORT bool RegisterResourceData(int, ModuleInfo* moduleInfo,
                                     ModuleInfo::ModuleResourceData resourceNames,
                                     ModuleInfo::ModuleResourceData resourceData)
 {
-  moduleInfo->resourceTree.push_back(resourceTree);
-  moduleInfo->resourceNames.push_back(resourceNames);
-  moduleInfo->resourceData.push_back(resourceData);
+  moduleInfo->resourceTree = resourceTree;
+  moduleInfo->resourceNames = resourceNames;
+  moduleInfo->resourceData = resourceData;
   return true;
 }
 

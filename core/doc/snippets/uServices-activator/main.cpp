@@ -17,7 +17,7 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(mylibname, MyActivator)
+US_EXPORT_MODULE_ACTIVATOR(MyActivator)
 //![0]
 
 int main(int /*argc*/, char* /*argv*/[])

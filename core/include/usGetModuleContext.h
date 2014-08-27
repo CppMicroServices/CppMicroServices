@@ -23,7 +23,14 @@
 #ifndef USGETMODULECONTEXT_H
 #define USGETMODULECONTEXT_H
 
+#ifndef US_MODULE_NAME
+#error Missing preprocessor define US_MODULE_NAME
+#endif
+
 #include <usGlobalConfig.h>
+#include <usModuleRegistry.h>
+#include <usModule.h>
+#include <usModuleUtils_p.h>
 
 US_BEGIN_NAMESPACE
 
@@ -38,16 +45,11 @@ class ModuleContext;
  * inside a C++ Micro Services module.
  *
  * \return The ModuleContext of the calling module.
- *
- * \internal
- *
- * Note that the corresponding function definition is provided for each
- * module by the usModuleInit.cpp file. This file is customized via CMake
- * configure_file(...) and automatically compiled into each module.
- * Consequently, the GetModuleContext function is not exported, since each
- * module gets its "own version".
  */
-US_ABI_LOCAL ModuleContext* GetModuleContext();
+static inline ModuleContext* GetModuleContext()
+{
+  return ModuleRegistry::GetModule(US_STR(US_MODULE_NAME))->GetModuleContext();
+}
 
 US_END_NAMESPACE
 

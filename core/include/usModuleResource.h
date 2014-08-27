@@ -266,6 +266,13 @@ public:
    */
   int GetSize() const;
 
+  /**
+   * Returns the last modified time of this resource in milli-seconds from the epoch.
+   *
+   * The time resolution is platform specific and my vary.
+   *
+   * @return Last modified time of this resource.
+   */
   long long GetLastModified() const;
 
   /**

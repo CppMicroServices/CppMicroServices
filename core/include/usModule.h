@@ -119,7 +119,7 @@ public:
    * up this module's vendor information.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @return The vendor property key.
    */
   static const std::string& PROP_VENDOR();
 
@@ -128,7 +128,7 @@ public:
    * up this module's description.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @return The description property key.
    */
   static const std::string& PROP_DESCRIPTION();
 
@@ -137,9 +137,20 @@ public:
    * up this module's auto-load directory.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @return The auto-load directory property key.
    */
   static const std::string& PROP_AUTOLOAD_DIR();
+
+  /**
+   * Returns the property key with a value of \c module.autoloaded_modules for
+   * looking up this module's auto-load modules.
+   * The property value is of type \c std::vector<std::string> and contains
+   * the file system locations for the auto-loaded modules triggered by this
+   * module.
+   *
+   * @return The auto-loaded modules property key.
+   */
+  static const std::string& PROP_AUTOLOADED_MODULES();
 
   ~Module();
 

@@ -50,15 +50,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   assert(mc);
   TestModuleListener listener;
 
-  try
-  {
-    mc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
-  }
-  catch (const std::logic_error& ise)
-  {
-    US_TEST_OUTPUT( << "module listener registration failed " << ise.what() );
-    throw;
-  }
+  ModuleListenerRegistrationHelper<TestModuleListener> listenerReg(mc, &listener, &TestModuleListener::ModuleChanged);
 
   SharedLibrary libAL(LIB_PATH, "TestModuleAL");
 
@@ -80,11 +72,17 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   std::vector<ModuleEvent> pEvts;
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL));
 
+  Any loadedModules = moduleAL->GetProperty(Module::PROP_AUTOLOADED_MODULES());
   Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1");
   if (autoLoadEnabled)
   {
     US_TEST_CONDITION_REQUIRED(moduleAL_1 != NULL, "Test for existing auto-loaded module TestModuleAL_1")
     US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1", "Test module name")
+    US_TEST_CONDITION_REQUIRED(!loadedModules.Empty(), "Test for PROP_AUTOLOADED_MODULES property")
+    US_TEST_CONDITION_REQUIRED(loadedModules.Type() == typeid(std::vector<std::string>), "Test for PROP_AUTOLOADED_MODULES property type")
+    std::vector<std::string> loadedModulesVec = any_cast<std::vector<std::string> >(loadedModules);
+    US_TEST_CONDITION_REQUIRED(loadedModulesVec.size() == 1, "Test for PROP_AUTOLOADED_MODULES vector size")
+    US_TEST_CONDITION_REQUIRED(loadedModulesVec[0] == moduleAL_1->GetLocation(), "Test for PROP_AUTOLOADED_MODULES vector content")
 
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL_1));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL_1));
@@ -92,6 +90,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   else
   {
     US_TEST_CONDITION_REQUIRED(moduleAL_1 == NULL, "Test for non-existing auto-loaded module TestModuleAL_1")
+    US_TEST_CONDITION_REQUIRED(loadedModules.Empty(), "Test for empty PROP_AUTOLOADED_MODULES property")
   }
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL));

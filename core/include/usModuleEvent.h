@@ -145,18 +145,18 @@ public:
 
 };
 
+/**
+ * \ingroup MicroServices
+ * @{
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, ModuleEvent::Type eventType);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ModuleEvent& event);
+/** @}*/
+
 US_END_NAMESPACE
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
-/**
- * \ingroup MicroServices
- * @{
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, US_PREPEND_NAMESPACE(ModuleEvent::Type) eventType);
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ModuleEvent)& event);
-/** @}*/
 
 #endif // USMODULEEVENT_H

@@ -25,6 +25,7 @@
 #include "usModuleInfo.h"
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
+#include "usModuleInitialization.h"
 #include "usCoreModuleContext_p.h"
 #include "usGetModuleContext.h"
 #include "usStaticInit_p.h"
@@ -70,7 +71,6 @@ US_GLOBAL_STATIC(Mutex, modulesLock)
  * Lock for protecting the register count
  */
 US_GLOBAL_STATIC(Mutex, countLock)
-
 
 void ModuleRegistry::Register(ModuleInfo* info)
 {
@@ -202,4 +202,23 @@ std::vector<Module*> ModuleRegistry::GetLoadedModules()
   return result;
 }
 
+// Control the static initialization order for several core objects
+struct StaticInitializationOrder
+{
+  StaticInitializationOrder()
+  {
+    ModuleSettings::GetLogLevel();
+    modulesLock();
+    countLock();
+    modules();
+    coreModuleContext();
+  }
+};
+
+static StaticInitializationOrder _staticInitializationOrder;
+
 US_END_NAMESPACE
+
+// We initialize the CppMicroService module after making sure
+// that all other global statics have been initialized above
+US_INITIALIZE_MODULE

@@ -94,10 +94,6 @@ ServiceEvent::Type ServiceEvent::GetType() const
   return d->type;
 }
 
-US_END_NAMESPACE
-
-US_USE_NAMESPACE
-
 std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type)
 {
   switch(type)
@@ -130,3 +126,5 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
 
   return os;
 }
+
+US_END_NAMESPACE

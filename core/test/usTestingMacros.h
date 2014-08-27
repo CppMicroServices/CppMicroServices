@@ -19,6 +19,9 @@
 
 =============================================================================*/
 
+#ifndef USTESTINGMACROS_H_
+#define USTESTINGMACROS_H_
+
 #include <exception>
 #include <string>
 #include <iostream>
@@ -131,3 +134,5 @@ US_END_NAMESPACE
   US_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS)                                                 \
   STATEMENT ;                                                                                 \
   US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
+
+#endif // USTESTINGMACROS_H_

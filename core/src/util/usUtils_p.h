@@ -26,6 +26,7 @@
 #include <usCoreConfig.h>
 
 #include <string>
+#include <vector>
 
 //-------------------------------------------------------------------
 // Module auto-loading
@@ -35,7 +36,7 @@ US_BEGIN_NAMESPACE
 
 struct ModuleInfo;
 
-void AutoLoadModules(const ModuleInfo& moduleInfo);
+std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo);
 
 US_END_NAMESPACE
 

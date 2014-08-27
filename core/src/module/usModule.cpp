@@ -72,6 +72,12 @@ const std::string&Module::PROP_AUTOLOAD_DIR()
   return s;
 }
 
+const std::string&Module::PROP_AUTOLOADED_MODULES()
+{
+  static const std::string s("module.autoloaded_modules");
+  return s;
+}
+
 Module::Module()
 : d(0)
 {
@@ -153,7 +159,11 @@ void Module::Start()
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   if (ModuleSettings::IsAutoLoadingEnabled())
   {
-    AutoLoadModules(d->info);
+    const std::vector<std::string> loadedPaths = AutoLoadModules(d->info);
+    if (!loadedPaths.empty())
+    {
+      d->moduleManifest.SetValue(PROP_AUTOLOADED_MODULES(), Any(loadedPaths));
+    }
   }
 #endif
 

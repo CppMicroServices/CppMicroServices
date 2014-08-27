@@ -5,7 +5,7 @@ macro(usMacroCreateModule _project_name)
 project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
-  "SKIP_EXAMPLES"
+  "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET"
   "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
@@ -89,7 +89,9 @@ endif()
 #-----------------------------------------------------------------------------
 
 # Generate the module init file
-usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET})
+if(NOT ${PROJECT_NAME}_SKIP_INIT)
+  usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET})
+endif()
 
 # Create the module library
 add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_SOURCES}

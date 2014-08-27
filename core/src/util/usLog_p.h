@@ -23,6 +23,7 @@
 #define USLOG_P_H
 
 #include <usCoreConfig.h>
+#include <usModuleSettings.h>
 
 #include <iostream>
 #include <sstream>
@@ -33,9 +34,17 @@ US_Core_EXPORT void message_output(MsgType, const char* buf);
 
 struct LogMsg {
 
-  LogMsg(int t, const char* file, int ln, const char* func)
-    : type(static_cast<MsgType>(t)), enabled(true), buffer()
+  LogMsg(MsgType t, const char* file, int ln, const char* func)
+    : type(t), enabled(true), buffer()
   { buffer << "In " << func << " at " << file << ":" << ln << " : "; }
+
+  LogMsg()
+    : type(DebugMsg), enabled(false), buffer()
+  {}
+
+  LogMsg(const LogMsg& other)
+    : type(other.type), enabled(other.enabled), buffer()
+  {}
 
   ~LogMsg() { if(enabled) message_output(type, buffer.str().c_str()); }
 
@@ -59,41 +68,27 @@ private:
   std::stringstream buffer;
 };
 
-struct NoLogMsg {
-
-  template<typename T>
-  NoLogMsg& operator<<(T)
-  {
-    return *this;
-  }
-
-  NoLogMsg& operator()(bool)
-  {
-    return *this;
-  }
-
-};
 
 US_END_NAMESPACE
 
 #if defined(US_ENABLE_DEBUG_OUTPUT)
-  #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(0, __FILE__, __LINE__, __FUNCTION__)
+  #define US_DEBUG (US_PREPEND_NAMESPACE(ModuleSettings)::GetLogLevel() > US_PREPEND_NAMESPACE(DebugMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(DebugMsg), __FILE__, __LINE__, __FUNCTION__))
 #else
-  #define US_DEBUG true ? US_PREPEND_NAMESPACE(NoLogMsg)() : US_PREPEND_NAMESPACE(NoLogMsg)()
+  #define US_DEBUG true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
 #if !defined(US_NO_INFO_OUTPUT)
-  #define US_INFO US_PREPEND_NAMESPACE(LogMsg)(1, __FILE__, __LINE__, __FUNCTION__)
+  #define US_INFO (US_PREPEND_NAMESPACE(ModuleSettings)::GetLogLevel() > US_PREPEND_NAMESPACE(InfoMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(InfoMsg), __FILE__, __LINE__, __FUNCTION__))
 #else
-  #define US_INFO  true ? US_PREPEND_NAMESPACE(NoLogMsg)() : US_PREPEND_NAMESPACE(NoLogMsg)()
+  #define US_INFO  true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
 #if !defined(US_NO_WARNING_OUTPUT)
-  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)(2, __FILE__, __LINE__, __FUNCTION__)
+  #define US_WARN (US_PREPEND_NAMESPACE(ModuleSettings)::GetLogLevel() > US_PREPEND_NAMESPACE(WarningMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(WarningMsg), __FILE__, __LINE__, __FUNCTION__))
 #else
   #define US_WARN true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
-#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(3, __FILE__, __LINE__, __FUNCTION__)
+#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(ErrorMsg), __FILE__, __LINE__, __FUNCTION__)
 
 #endif // USLOG_P_H

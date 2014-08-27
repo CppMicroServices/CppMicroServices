@@ -85,9 +85,12 @@ void ServiceHooks::Open()
 void ServiceHooks::Close()
 {
   US_UNUSED(Lock(this));
-  listenerHookTracker->Close();
-  delete listenerHookTracker;
-  listenerHookTracker = NULL;
+  if (listenerHookTracker)
+  {
+    listenerHookTracker->Close();
+    delete listenerHookTracker;
+    listenerHookTracker = NULL;
+  }
 
   bOpen = false;
 }

@@ -32,7 +32,7 @@
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 
-#include <assert.h>
+#include <cassert>
 
 US_USE_NAMESPACE
 

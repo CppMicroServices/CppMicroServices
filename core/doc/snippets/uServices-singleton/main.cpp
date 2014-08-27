@@ -11,6 +11,11 @@ class MyActivator : public ModuleActivator
 
 public:
 
+  MyActivator()
+    : m_SingletonOne(NULL)
+    , m_SingletonTwo(NULL)
+  {}
+
   //![0]
   void Load(ModuleContext* context)
   {

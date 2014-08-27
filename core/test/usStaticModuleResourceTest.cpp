@@ -30,7 +30,7 @@
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
-#include <assert.h>
+#include <cassert>
 
 #include <set>
 

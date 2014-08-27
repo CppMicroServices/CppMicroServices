@@ -53,7 +53,6 @@ public:
   int node;
   int32_t size;
   const unsigned char* data;
-  unsigned char* uncompressedData;
 
   mutable std::vector<std::string> children;
 

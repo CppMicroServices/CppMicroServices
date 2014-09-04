@@ -40,7 +40,7 @@
   #endif
   #include <windows.h>
   #include <crtdbg.h>
-  #include "dirent_win32_p.h"
+  #include "dirent_win32.h"
 #endif
 
 //-------------------------------------------------------------------

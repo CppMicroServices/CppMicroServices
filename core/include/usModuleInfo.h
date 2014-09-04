@@ -44,18 +44,10 @@ struct US_Core_EXPORT ModuleInfo
 {
   ModuleInfo(const std::string& name);
 
-  typedef int(*InitResourcesHook)(ModuleInfo*);
-  typedef const unsigned char* ModuleResourceData;
-
   std::string name;
   std::string location;
   std::string autoLoadDir;
-
   long id;
-
-  ModuleResourceData resourceData;
-  ModuleResourceData resourceNames;
-  ModuleResourceData resourceTree;
 };
 
 US_END_NAMESPACE

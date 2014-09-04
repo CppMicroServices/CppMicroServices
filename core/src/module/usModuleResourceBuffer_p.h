@@ -35,8 +35,8 @@ class US_Core_EXPORT ModuleResourceBuffer: public std::streambuf
 
 public:
 
-  explicit ModuleResourceBuffer(const unsigned char* data, std::size_t size,
-                                std::ios_base::openmode mode, bool compressed);
+  explicit ModuleResourceBuffer(void* data, std::size_t size,
+                                std::ios_base::openmode mode);
 
   ~ModuleResourceBuffer();
 

@@ -53,7 +53,7 @@ std::string GetLibraryPath_impl(void* symbol)
   }
   else
   {
-    US_DEBUG << "GetLibraryPath_impl() dladdr() failed: " << dlerror();
+    US_DEBUG << "GetLibraryPath_impl() failed for address " << symbol;
   }
   return "";
 }

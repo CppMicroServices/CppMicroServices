@@ -45,17 +45,15 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
   : coreCtx(coreCtx)
   , info(*info)
-  , resourceTreePtr(0)
+  , resourceContainer(info)
   , moduleContext(0)
   , moduleActivator(0)
   , q(qq)
 {
-  InitializeResources();
-
   // Check if the module provides a manifest.json file and if yes, parse it.
-  if (resourceTreePtr)
+  if (resourceContainer.IsValid())
   {
-    ModuleResource manifestRes("/manifest.json", resourceTreePtr);
+    ModuleResource manifestRes("/manifest.json", resourceContainer);
     if (manifestRes)
     {
       ModuleResourceStream manifestStream(manifestRes);
@@ -115,7 +113,6 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
 ModulePrivate::~ModulePrivate()
 {
   delete moduleContext;
-  delete resourceTreePtr;
 }
 
 void ModulePrivate::RemoveModuleResources()
@@ -145,27 +142,6 @@ void ModulePrivate::RemoveModuleResources()
        i != srs.end(); ++i)
   {
     i->GetReference(std::string()).d->UngetService(q, false);
-  }
-
-  if (resourceTreePtr)
-  {
-    resourceTreePtr->Invalidate();
-  }
-}
-
-void ModulePrivate::InitializeResources()
-{
-  std::string initResourcesSymbol = "_us_init_resources_" + this->info.name;
-  ModuleInfo::InitResourcesHook initResourcesFunc = NULL;
-  void* initResourcesSym = ModuleUtils::GetSymbol(this->info, initResourcesSymbol.c_str());
-  std::memcpy(&initResourcesFunc, &initResourcesSym, sizeof(void*));
-  if (initResourcesFunc)
-  {
-    initResourcesFunc(&this->info);
-    // Initialize this modules resource trees
-    resourceTreePtr = new ModuleResourceTree(this->info.resourceTree,
-                                             this->info.resourceNames,
-                                             this->info.resourceData);
   }
 }
 

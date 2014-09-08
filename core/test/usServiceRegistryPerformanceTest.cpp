@@ -35,6 +35,12 @@ US_USE_NAMESPACE
 #error Monotonic clock support missing on this POSIX platform
 #endif
 #elif defined(US_PLATFORM_WINDOWS)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
+#endif
 #include <windows.h>
 #else
 #error High precision timer support nod available on this platform

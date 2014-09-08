@@ -90,27 +90,4 @@ US_END_NAMESPACE
     _us_module_activator_instance_ ## _module_name();                      \
   }
 
-/**
- * \ingroup MicroServices
- *
- * \brief Import a static module's resources.
- *
- * \param _module_name The name of the module to import.
- *
- * This macro imports the resources of the static module named \c _module_name.
- *
- * Inserting this macro into your application's source code will allow you to make use of
- * the resources embedded in a static module. Do not forget to actually link the static
- * module to the importing executable or shared library.
- *
- * \sa US_IMPORT_MODULE
- * \sa \ref MicroServices_StaticModules
- */
-#define US_IMPORT_MODULE_RESOURCES(_module_name)                           \
-  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_init_resources_ ## _module_name (); \
-  void _dummy_reference_to_ ## _module_name ## _init_resources()           \
-  {                                                                        \
-    _us_init_resources_ ## _module_name();                                 \
-  }
-
 #endif // USMODULEREGISTRY_H

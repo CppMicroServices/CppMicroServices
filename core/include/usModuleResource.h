@@ -33,7 +33,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4396)
 US_BEGIN_NAMESPACE
 
 class ModuleResourcePrivate;
-class ModuleResourceTree;
+class ModuleResourceContainer;
 
 /**
  * \ingroup MicroServices
@@ -113,22 +113,12 @@ public:
    * Tests this %ModuleResource object for validity.
    *
    * Invalid %ModuleResource objects are created by the default constructor or
-   * can be returned by the Module class if the resource path is not found. If a
-   * module from which %ModuleResource objects have been obtained is un-loaded,
-   * these objects become invalid.
+   * can be returned by the Module class if the resource path is not found.
    *
    * @return \c true if this %ModuleReource object is valid and can safely be used,
    * \c false otherwise.
    */
   bool IsValid() const;
-
-  /**
-   * Returns \c true if the resource represents a file and the resource data
-   * is in a compressed format, \c false otherwise.
-   *
-   * @return \c true if the resource data is compressed, \c false otherwise.
-   */
-  bool IsCompressed() const;
 
   /**
    * Boolean conversion operator using IsValid().
@@ -155,8 +145,10 @@ public:
    * Example:
    * \code
    * ModuleResource resource = module->GetResource("/data/archive.tar.gz");
-   * std::string path = resource.GetPath(); // path = "/data"
+   * std::string path = resource.GetPath(); // path = "/data/"
    * \endcode
+   *
+   * The path with always begin and end with a forward slash.
    *
    * @return The resource path without the name.
    * @see GetResourcePath(), GetName() and IsDir()
@@ -251,49 +243,52 @@ public:
   /**
    * Returns a list of resource names which are children of this object.
    *
-   * The returned names are relative to the path of this %ModuleResource object and
-   * may contain duplicates in case of modules which are statically linked into the
-   * module from which this object was retreived.
+   * The returned names are relative to the path of this %ModuleResource object
+   * and may contain file as well as directory entries.
    *
    * @return A list of child resource names.
    */
   std::vector<std::string> GetChildren() const;
 
   /**
-   * Returns the size of the raw embedded data for this %ModuleResource object.
+   * Returns a list of resource objects which are children of this object.
+   *
+   * The return ModuleResource objects may contain files as well as
+   * directory resources.
+   *
+   * @return A list of child resource objects.
+   */
+  std::vector<ModuleResource> GetChildResources() const;
+
+  /**
+   * Returns the size of the resource data for this %ModuleResource object.
    *
    * @return The resource data size.
    */
   int GetSize() const;
 
   /**
-   * Returns the last modified time of this resource in milli-seconds from the epoch.
-   *
-   * The time resolution is platform specific and my vary.
+   * Returns the last modified time of this resource in seconds from the epoch.
    *
    * @return Last modified time of this resource.
    */
-  long long GetLastModified() const;
-
-  /**
-   * Returns a data pointer pointing to the raw data of this %ModuleResource object.
-   * If the resource is compressed the data returned is compressed and UncompressResourceData()
-   * must be used to access the data. If the resource represents a directory \c 0 is returned.
-   *
-   * @return A raw pointer to the embedded data, or \c 0 if the resource is not a file resource.
-   */
-  const unsigned char* GetData() const;
+  time_t GetLastModified() const;
 
 private:
 
-  ModuleResource(const std::string& file, ModuleResourceTree* resourceTree);
+  ModuleResource(const std::string& file, const ModuleResourceContainer& resourceContainer);
+  ModuleResource(int index, const ModuleResourceContainer& resourceContainer);
 
   friend class Module;
   friend class ModulePrivate;
+  friend class ModuleResourceContainer;
+  friend class ModuleResourceStream;
 
   US_HASH_FUNCTION_FRIEND(ModuleResource);
 
   std::size_t Hash() const;
+
+  void* GetData() const;
 
   ModuleResourcePrivate* d;
 

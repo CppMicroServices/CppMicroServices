@@ -46,7 +46,7 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
                        const std::string& baseName,
                        const std::string& completeBaseName, const std::string& suffix,
                        const std::string& completeSuffix,
-                       int size, bool children = false, bool compressed = false)
+                       int size, bool children = false)
 {
   US_TEST_CONDITION_REQUIRED(res.IsValid(), "Valid resource")
   US_TEST_CONDITION(res.GetBaseName() == baseName, "GetBaseName()")
@@ -58,7 +58,6 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
   US_TEST_CONDITION(res.GetSize() == size, "Data size")
   US_TEST_CONDITION(res.GetSuffix() == suffix, "Suffix")
   US_TEST_CONDITION(res.GetCompleteSuffix() == completeSuffix, "Complete suffix")
-  US_TEST_CONDITION(res.IsCompressed() == compressed, "Compression flag")
 }
 
 void testTextResource(Module* module)
@@ -156,7 +155,6 @@ void testInvalidResource(Module* module)
 
   US_TEST_CONDITION(res.GetChildren().empty(), "Check empty children")
   US_TEST_CONDITION(res.GetSize() == 0, "Check zero size")
-  US_TEST_CONDITION(res.GetData() == NULL, "Check NULL data")
 
   ModuleResourceStream rs(res);
   US_TEST_CONDITION(rs.good() == true, "Check invalid resource stream")
@@ -237,11 +235,10 @@ void testBinaryResource(Module* module)
   US_TEST_CONDITION(png.eof(), "EOF check");
 }
 
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
 void testCompressedResource(Module* module)
 {
   ModuleResource res = module->GetResource("/icons/compressable.bmp");
-  checkResourceInfo(res, "/icons/", "compressable", "compressable", "bmp", "bmp", 411, false, true);
+  checkResourceInfo(res, "/icons/", "compressable", "compressable", "bmp", "bmp", 300122, false);
 
   ModuleResourceStream rs(res, std::ios_base::binary);
   rs.seekg(0, std::ios_base::end);
@@ -277,7 +274,6 @@ void testCompressedResource(Module* module)
   US_TEST_CONDITION_REQUIRED(isEqual, "Equal binary contents");
   US_TEST_CONDITION(bmp.eof(), "EOF check");
 }
-#endif
 
 struct ResourceComparator {
   bool operator()(const ModuleResource& mr1, const ModuleResource& mr2) const
@@ -296,7 +292,7 @@ void testResourceTree(Module* module)
   std::sort(children.begin(), children.end());
   US_TEST_CONDITION_REQUIRED(children.size() == 4, "Check child count")
   US_TEST_CONDITION(children[0] == "foo.txt", "Check child name")
-  US_TEST_CONDITION(children[1] == "icons", "Check child name")
+  US_TEST_CONDITION(children[1] == "icons/", "Check child name")
   US_TEST_CONDITION(children[2] == "special_chars.dummy.txt", "Check child name")
   US_TEST_CONDITION(children[3] == "test.xml", "Check child name")
 
@@ -304,7 +300,7 @@ void testResourceTree(Module* module)
   ModuleResource readme = module->GetResource("/icons/readme.txt");
   US_TEST_CONDITION(readme.IsFile() && readme.GetChildren().empty(), "Check file resource")
 
-  ModuleResource icons = module->GetResource("icons");
+  ModuleResource icons = module->GetResource("icons/");
   US_TEST_CONDITION(icons.IsDir() && !icons.IsFile() && !icons.GetChildren().empty(), "Check directory resource")
 
   children = icons.GetChildren();
@@ -332,9 +328,9 @@ void testResourceTree(Module* module)
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 6, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 7, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 6, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 7, "Total resource number")
 
 
   // test pattern matching
@@ -441,16 +437,13 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   testBinaryResource(moduleR);
 
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
   testCompressedResource(moduleR);
-#endif
 
   ModuleResource foo = moduleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
 #ifdef US_BUILD_SHARED_LIBS
   libR.Unload();
-  US_TEST_CONDITION(foo.IsValid() == false, "Invalidated resource")
-  US_TEST_CONDITION(foo.GetData() == NULL, "NULL data")
+  US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
 #endif
 
   US_TEST_END()

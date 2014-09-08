@@ -71,7 +71,7 @@ function(create_initial_cache var _shared _threading _autoload)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-autoloading")
   endif()
 
-  set(CTEST_DASHBOARD_NAME ${CTEST_DASHBOARD_NAME} PARENT_SCOPE)
+  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME} (${_generator})" PARENT_SCOPE)
 
 endfunction()
 
@@ -95,8 +95,15 @@ set(config5     1       0      1     )
 set(config6     1       1      0     )
 set(config7     1       1      1     )
 
-foreach(i ${US_BUILD_CONFIGURATION})
-  create_initial_cache(CTEST_INITIAL_CACHE ${config${i}})
-  message("Testing build configuration: ${CTEST_DASHBOARD_NAME}")
-  build_and_test()
+if(NOT US_CMAKE_GENERATOR)
+  set(US_CMAKE_GENERATOR "Unix Makefiles")
+endif()
+
+foreach (_generator ${US_CMAKE_GENERATOR})
+  set(CTEST_CMAKE_GENERATOR ${_generator})
+  foreach(i ${US_BUILD_CONFIGURATION})
+    create_initial_cache(CTEST_INITIAL_CACHE ${config${i}})
+    message("Testing build configuration: ${CTEST_DASHBOARD_NAME}")
+    build_and_test()
+  endforeach()
 endforeach()

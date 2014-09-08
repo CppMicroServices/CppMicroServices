@@ -20,12 +20,12 @@
 =============================================================================*/
 
 #include "usModuleResourceBuffer_p.h"
-#include "usUncompressResourceData.h"
 
 #include "us_stdint.h"
 
 #include <limits>
 #include <cassert>
+#include <stdlib.h>
 
 #ifdef US_PLATFORM_WINDOWS
 #define DATA_NEEDS_NEWLINE_CONVERSION 1
@@ -41,14 +41,12 @@ class ModuleResourceBufferPrivate
 {
 public:
 
-  ModuleResourceBufferPrivate(const char* begin, std::size_t size, std::ios_base::openmode mode)
+  ModuleResourceBufferPrivate(void* data, std::size_t size, const char* begin, std::ios_base::openmode mode)
     : begin(begin)
     , end(begin + size)
     , current(begin)
     , mode(mode)
-  #ifdef US_ENABLE_RESOURCE_COMPRESSION
-    , uncompressedData(NULL)
-  #endif
+    , uncompressedData(reinterpret_cast<unsigned char*>(data))
   #ifdef DATA_NEEDS_NEWLINE_CONVERSION
     , pos(0)
   #endif
@@ -57,9 +55,7 @@ public:
 
   ~ModuleResourceBufferPrivate()
   {
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
-    delete[] uncompressedData;
-#endif
+    free(uncompressedData);
   }
 
   const char* const begin;
@@ -68,9 +64,7 @@ public:
 
   const std::ios_base::openmode mode;
 
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
-  const unsigned char* uncompressedData;
-#endif
+  unsigned char* uncompressedData;
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
   // records the stream position ignoring CR characters
@@ -79,23 +73,14 @@ public:
 
 };
 
-ModuleResourceBuffer::ModuleResourceBuffer(const unsigned char* data, std::size_t _size,
-                                           std::ios_base::openmode mode, bool compressed)
+ModuleResourceBuffer::ModuleResourceBuffer(void* data, std::size_t _size,
+                                           std::ios_base::openmode mode)
   : d(NULL)
 {
   assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
   // assert(data != NULL);
 
-  if (compressed && _size)
-  {
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
-    data = UncompressResourceData(data, _size, &_size);
-#else
-    assert(!"CppMicroServices built without support for resource compression");
-#endif
-  }
-
-  const char* begin = reinterpret_cast<const char*>(data);
+  char* begin = reinterpret_cast<char*>(data);
   std::size_t size = _size;
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
@@ -113,13 +98,7 @@ ModuleResourceBuffer::ModuleResourceBuffer(const unsigned char* data, std::size_
   }
 #endif
 
-  d = new ModuleResourceBufferPrivate(begin, size, mode);
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
-  if (compressed)
-  {
-    d->uncompressedData = data;
-  }
-#endif
+  d = new ModuleResourceBufferPrivate(data, size, begin, mode);
 }
 
 ModuleResourceBuffer::~ModuleResourceBuffer()

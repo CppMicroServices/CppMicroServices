@@ -38,3 +38,8 @@ usMacroCreateModule(Core
   PRIVATE_HEADERS ${_core_private_headers}
   BINARY_RESOURCES manifest.json
 )
+
+set_property(
+  TARGET CppMicroServices APPEND PROPERTY
+  COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_WRITING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES"
+  )

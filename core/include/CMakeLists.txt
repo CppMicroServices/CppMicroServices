@@ -9,7 +9,6 @@ set(_public_headers
   usSharedLibrary.h
   usShrinkableMap.h
   usShrinkableVector.h
-  usUncompressResourceData.h
 
   usLDAPFilter.h
   usPrototypeServiceFactory.h

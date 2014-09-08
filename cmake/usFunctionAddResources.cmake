@@ -11,8 +11,12 @@
 #!
 #! \note To set-up correct file dependencies from your module target to your resource
 #!       files, you have to add a file named \emph $<your-target-name>_resources.cpp
-#!       to the source list of the target. This ensures that changes resource files
-#!       will be automatically re-added to the module.
+#!       to the source list of the target. This ensures that changed resource files
+#!       will automatically be re-added to the module.
+#!
+#! In the case of linking static modules which contain resources to the target module,
+#! adding the static module target name to the ZIP_ARCHIVES list will merge its
+#! resources into the target module.
 #!
 #! Example usage:
 #! \code{.cmake}
@@ -35,10 +39,14 @@
 #!        current CMake source directory.
 #! \param FILES (optional) A list of resource files (paths to external files in the file system)
 #!        relative to the current working directory.
+#! \param ZIP_ARCHIVES (optional) A list of zip archives (relative to the current working directory
+#!        or absolute file paths) whose contents is merged into the target module. If a list entry
+#!        is a valid target name and that target is a static library, its absolute file path is
+#!        used instead.
 #!
 function(usFunctionAddResources)
 
-  cmake_parse_arguments(US_RESOURCE "" "TARGET;MODULE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES" ${ARGN})
+  cmake_parse_arguments(US_RESOURCE "" "TARGET;MODULE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
 
   if(NOT US_RESOURCE_TARGET)
     message(SEND_ERROR "TARGET argument not specified.")
@@ -51,8 +59,8 @@ function(usFunctionAddResources)
     endif()
   endif()
 
-  if(NOT US_RESOURCE_FILES)
-    message(WARNING "No FILES argument given. Skipping resource processing.")
+  if(NOT US_RESOURCE_FILES AND NOT US_RESOURCE_ZIP_ARCHIVES)
+    message(WARNING "No resources specified. Skipping resource processing.")
     return()
   endif()
 
@@ -74,10 +82,34 @@ function(usFunctionAddResources)
     message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
   endif()
 
-  set(_abs_files)
+  set(_cmd_deps )
   foreach(_file ${US_RESOURCE_FILES})
-    list(APPEND _abs_files ${US_RESOURCE_WORKING_DIRECTORY}/${_file})
+    if(IS_ABSOLUTE ${_file})
+      list(APPEND _cmd_deps ${_file})
+    else()
+      list(APPEND _cmd_deps ${US_RESOURCE_WORKING_DIRECTORY}/${_file})
+    endif()
   endforeach()
+
+  set(_zip_args )
+  if(US_RESOURCE_ZIP_ARCHIVES)
+    foreach(_zip_archive ${US_RESOURCE_ZIP_ARCHIVES})
+      if(TARGET ${_zip_archive})
+        get_target_property(_is_static_lib ${_zip_archive} TYPE)
+        if(_is_static_lib STREQUAL "STATIC_LIBRARY")
+          list(APPEND _cmd_deps ${_zip_archive})
+          list(APPEND _zip_args $<TARGET_FILE:${_zip_archive}>)
+        endif()
+      else()
+        if(IS_ABSOLUTE ${_zip_archive})
+          list(APPEND _cmd_deps ${_zip_archive})
+        else()
+          list(APPEND _cmd_deps ${US_RESOURCE_WORKING_DIRECTORY}/${_zip_archive})
+        endif()
+        list(APPEND _zip_args ${_zip_archive})
+      endif()
+    endforeach()
+  endif()
 
   # This command depends on the given resource files and creates an empty
   # cpp which must be added to the source list of the related target.
@@ -87,7 +119,7 @@ function(usFunctionAddResources)
   add_custom_command(
     OUTPUT ${US_RESOURCE_TARGET}_resources.cpp
     COMMAND ${CMAKE_COMMAND} -E touch ${US_RESOURCE_TARGET}_resources.cpp
-    DEPENDS ${_abs_files} ${resource_compiler}
+    DEPENDS ${_cmd_deps} ${resource_compiler}
     COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
     VERBATIM
    )
@@ -95,7 +127,7 @@ function(usFunctionAddResources)
   add_custom_command(
     TARGET ${US_RESOURCE_TARGET}
     POST_BUILD
-    COMMAND ${resource_compiler} ${cmd_line_args} $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} ${US_RESOURCE_FILES}
+    COMMAND ${resource_compiler} ${cmd_line_args} $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} -a ${US_RESOURCE_FILES} -m ${_zip_args}
     WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
     COMMENT "Adding resources to ${US_RESOURCE_TARGET}"
     VERBATIM

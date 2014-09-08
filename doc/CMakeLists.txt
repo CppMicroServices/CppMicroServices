@@ -66,12 +66,13 @@ if(NOT US_IS_EMBEDDED AND NOT US_NO_DOCUMENTATION)
     add_custom_target(doc
                       ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                      VERBATIM
                       )
 
     install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" --target doc)")
 
-    install(DIRECTORY ${US_DOXYGEN_OUTPUT_DIR}/${US_DOXYGEN_HTML_OUTPUT}
-            DESTINATION ${AUXILIARY_INSTALL_DIR}/doc/
+    install(DIRECTORY "${US_DOXYGEN_OUTPUT_DIR}/${US_DOXYGEN_HTML_OUTPUT}"
+            DESTINATION "${AUXILIARY_INSTALL_DIR}/doc/"
             COMPONENT doc)
   endif()
 endif()

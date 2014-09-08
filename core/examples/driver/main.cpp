@@ -303,7 +303,6 @@ int main(int /*argc*/, char** /*argv*/)
 
 #ifndef US_BUILD_SHARED_LIBS
 US_IMPORT_MODULE(CppMicroServices)
-US_IMPORT_MODULE_RESOURCES(CppMicroServices)
 US_IMPORT_MODULE(eventlistener)
 US_IMPORT_MODULE(dictionaryservice)
 US_IMPORT_MODULE(dictionaryclient)

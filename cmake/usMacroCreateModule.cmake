@@ -114,10 +114,12 @@ if(${PROJECT_NAME}_LINK_LIBRARIES OR US_LIBRARIES)
 endif()
 
 # Embed module resources
-if(${PROJECT_NAME}_RESOURCES)
+
+if(${PROJECT_NAME}_RESOURCES OR US_LIBRARIES)
   usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources
                          FILES ${${PROJECT_NAME}_RESOURCES}
+                         ZIP_ARCHIVES ${US_LIBRARIES}
                         )
 endif()
 if(${PROJECT_NAME}_BINARY_RESOURCES)
@@ -125,7 +127,6 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
                          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
                          FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
                         )
-
 endif()
 
 #-----------------------------------------------------------------------------

@@ -62,6 +62,7 @@ static void exit_printf(mz_zip_archive* writeArchive, mz_zip_archive* readArchiv
 {
   va_list args;
   cleanup_archives(writeArchive, readArchive);
+  fprintf(stderr, "error: ");
   va_start(args, format);
   vfprintf(stderr, format, args);
   va_end(args);
@@ -71,6 +72,7 @@ static void exit_printf(mz_zip_archive* writeArchive, mz_zip_archive* readArchiv
 static void exit_perror(mz_zip_archive* writeArchive, mz_zip_archive* readArchive, const char* desc)
 {
   cleanup_archives(writeArchive, readArchive);
+  fprintf(stderr, "error: ");
   perror(desc);
   exit(EXIT_FAILURE);
 }
@@ -249,7 +251,7 @@ static char* us_strncpy(char* dest, size_t dest_size, const char* src, size_t co
 // -----------------------------    DEBUGGING STUFF    -----------------------------
 // ---------------------------------------------------------------------------------
 
-#define DEBUG_TRACE
+//#define DEBUG_TRACE
 
 #ifdef DEBUG_TRACE
 #define dbg_print printf
@@ -419,13 +421,16 @@ static int us_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archiv
 {
   int retCode = 0;
 
-  mz_zip_reader_get_filename(pSource_zip, file_index, archiveName, archiveNameSize);
-  retCode = us_archived_names_append(archived_names, archiveName);
-  if (US_OK != retCode) return retCode;
-
-  if (!mz_zip_writer_add_from_zip_reader(pZip, pSource_zip, file_index))
+  mz_uint numBytes = mz_zip_reader_get_filename(pSource_zip, file_index, archiveName, archiveNameSize);
+  if (numBytes > 1 && archiveName[numBytes-2] != '/')
   {
-    return US_MZ_ERROR_ADD_FILE;
+    retCode = us_archived_names_append(archived_names, archiveName);
+    if (US_OK != retCode) return retCode;
+
+    if (!mz_zip_writer_add_from_zip_reader(pZip, pSource_zip, file_index))
+    {
+      return US_MZ_ERROR_ADD_FILE;
+    }
   }
   return us_zip_writer_add_dir_entries(pZip, archiveName, archived_dirs);
 }
@@ -442,6 +447,7 @@ int main(int argc, char** argv)
 
   int errCode = US_OK;
 
+  int mergeFlag = 0;
   const char* moduleFile = NULL;
   const char* moduleName = NULL;
   size_t moduleNameLength = 0;
@@ -459,8 +465,6 @@ int main(int argc, char** argv)
 
   char archiveName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
 
-  const char* lastFileName = NULL;
-  size_t lastFileNameLength = 0;
   int numZipArgs = 0;
   int* zipArgIndices = NULL;
 
@@ -506,28 +510,26 @@ int main(int argc, char** argv)
   if (bPrintHelp)
   {
     printf("A resource compiler for C++ Micro Services modules\n\n");
-    printf("Usage: usResourceCompiler [-#] modulefile modulename file...\n\n");
-    printf("Add files to modulefile as zip entries (zip archives are merged).\n\n");
-    printf("  modulefile The absolute path of the module (shared library).\n");
-    printf("  modulename The module name as specified in the MODULE_NAME compile definition.\n");
-    printf("  file       Path to the resource file, relative to the current working directory.\n");
+    printf("Usage: usResourceCompiler [-#] modulefile modulename [[-a] file...] [-m archive...]\n\n");
+    printf("Add files to modulefile as zip entries and merge archives.\n\n");
     printf("  -# (-0, -1, -2, -3, -4, -5, -6, -7, -8, -9)\n");
     printf("             The Zip compression level. The default compression level is -6.\n");
+    printf("  modulefile The absolute path of the module (shared library).\n");
+    printf("  modulename The module name as specified in the MODULE_NAME compile definition.\n");
+    printf("  file       Path to a resource file, relative to the current working directory.\n");
+    printf("  archive    Path to a zip archive for merging into modulefile.\n");
     exit(EXIT_SUCCESS);
   }
-
-  moduleFile = argv[++argIndex];
-  moduleName = argv[++argIndex];
-  moduleNameLength = strlen(moduleName);
-
-  // sort the file args
-  qsort(&argv[argIndex+1], argc - argIndex - 1, sizeof(char *), cmpstringp);
 
   if (NULL == US_CWD(currDir, sizeof(currDir)))
   {
     perror(US_STR(US_CWD));
     exit(EXIT_FAILURE);
   }
+
+  moduleFile = argv[++argIndex];
+  moduleName = argv[++argIndex];
+  moduleNameLength = strlen(moduleName);
 
 
   // ---------------------------------------------------------------------------------
@@ -585,20 +587,30 @@ int main(int argc, char** argv)
   {
     const char* fileName = argv[argIndex];
     const size_t fileNameLength = strlen(fileName);
-    if (lastFileNameLength == fileNameLength &&
-        US_STRCASECMP(fileName, lastFileName) == 0)
+
+    // determine the argument type
+    if (strcmp(argv[argIndex], "-a") == 0)
     {
-      // duplicate
+      mergeFlag = 0;
+      continue;
+    }
+    else if (strcmp(argv[argIndex], "-m") == 0)
+    {
+      mergeFlag = 1;
       continue;
     }
 
-    // check if the current file is a valid zip archive
-    memset(&currFileArchive, 0, sizeof(currFileArchive));
-    if (mz_zip_reader_init_file(&currFileArchive, fileName, 0))
+    if (mergeFlag)
     {
-      dbg_print("Input is a valid zip archive: %s\n", fileName);
-      zipArgIndices[numZipArgs++] = argIndex;
-      mz_zip_reader_end(&currFileArchive);
+      // check if the current file is a valid zip archive
+      memset(&currFileArchive, 0, sizeof(currFileArchive));
+      if (mz_zip_reader_init_file(&currFileArchive, fileName, 0))
+      {
+        dbg_print("Input is a valid zip archive: %s\n", fileName);
+        zipArgIndices[numZipArgs++] = argIndex;
+        mz_zip_reader_end(&currFileArchive);
+      }
+      // silently ignore files which are not zip archives
       continue;
     }
 
@@ -627,9 +639,6 @@ int main(int argc, char** argv)
     {
       printf("  adding: %s\n", archiveName);
     }
-
-    lastFileName = fileName;
-    lastFileNameLength = fileNameLength;
   }
 
   us_archived_names_sort(&archivedNames);
@@ -649,7 +658,7 @@ int main(int argc, char** argv)
                                                 &archivedDirs, archiveName, sizeof archiveName);
     if (errCode == US_ARCHIVED_NAMES_ERROR_DUPLICATE)
     {
-      // Duplicates in the module archive are not error,
+      // Duplicates in the module archive are not an error,
       // they were already treated as "updates"
       continue;
     }
@@ -681,13 +690,19 @@ int main(int argc, char** argv)
     numZipIndices = mz_zip_reader_get_num_files(&currZipArchive);
     for (currZipIndex = 0; currZipIndex < numZipIndices; ++currZipIndex)
     {
-      if (errCode = us_zip_writer_add_from_zip_reader(&writeArchive, &currZipArchive, currZipIndex, &archivedNames,
-                                                      &archivedDirs, archiveName, sizeof archiveName))
+      printf(" merging: %s (from %s)\n", archiveName, currArchiveFileName);
+      errCode = us_zip_writer_add_from_zip_reader(&writeArchive, &currZipArchive, currZipIndex, &archivedNames,
+                                                  &archivedDirs, archiveName, sizeof archiveName);
+      if (errCode == US_ARCHIVED_NAMES_ERROR_DUPLICATE)
+      {
+        printf(" warning: Merge failed: ");
+        printf(us_error_msg[errCode], archiveName, currArchiveFileName);
+      }
+      else if (errCode != US_OK)
       {
         mz_zip_reader_end(&currZipArchive);
         exit_printf(&writeArchive, &readArchive, us_error_msg[errCode], archiveName, currArchiveFileName);
       }
-      printf("  adding: %s (from %s)\n", archiveName, currArchiveFileName);
     }
 
     mz_zip_reader_end(&currZipArchive);
@@ -706,40 +721,43 @@ int main(int argc, char** argv)
   //      APPEND NEW ARCHIVE TO MODULE
   // ---------------------------------------------------------------------------------
 
-  // Append the temporary zip archive to the module
-  if (numOldEntries > 0)
+  if (archivedNames.size > 0)
   {
-    // we need to truncate the module file first
-    if (US_FTRUNCATE(US_FILENO(moduleFileStream), readArchive.m_archive_file_ofs))
+    // Append the temporary zip archive to the module
+    if (numOldEntries > 0)
     {
-      exit_perror(&writeArchive, &readArchive, "ftruncate");
+      // we need to truncate the module file first
+      if (US_FTRUNCATE(US_FILENO(moduleFileStream), readArchive.m_archive_file_ofs))
+      {
+        exit_perror(&writeArchive, &readArchive, "ftruncate");
+      }
     }
-  }
 
-  if (fseek(tmp_archive_file, 0, SEEK_SET) == -1)
-  {
-    exit_perror(&writeArchive, &readArchive, "fseek");
-  }
-  clearerr(tmp_archive_file);
-  if (fseek(moduleFileStream, 0, SEEK_END) == -1)
-  {
-    exit_perror(&writeArchive, &readArchive, "fseek");
-  }
+    if (fseek(tmp_archive_file, 0, SEEK_SET) == -1)
+    {
+      exit_perror(&writeArchive, &readArchive, "fseek");
+    }
+    clearerr(tmp_archive_file);
+    if (fseek(moduleFileStream, 0, SEEK_END) == -1)
+    {
+      exit_perror(&writeArchive, &readArchive, "fseek");
+    }
 
-  dbg_print("Appending temporary zip archive to module\n");
-  do
-  {
-    numRead = US_READ(US_FILENO(tmp_archive_file), readBuffer, sizeof(readBuffer));
-    if (numRead == -1)
+    dbg_print("Appending temporary zip archive to module\n");
+    do
     {
-      exit_perror(&writeArchive, &readArchive, "read");
-    }
-    fwrite(readBuffer, numRead, 1, moduleFileStream);
-    if (ferror(moduleFileStream))
-    {
-      exit_printf(&writeArchive, &readArchive, "Appending resources failed\n");
-    }
-  } while (numRead != 0);
+      numRead = US_READ(US_FILENO(tmp_archive_file), readBuffer, sizeof(readBuffer));
+      if (numRead == -1)
+      {
+        exit_perror(&writeArchive, &readArchive, "read");
+      }
+      fwrite(readBuffer, numRead, 1, moduleFileStream);
+      if (ferror(moduleFileStream))
+      {
+        exit_printf(&writeArchive, &readArchive, "Appending resources failed\n");
+      }
+    } while (numRead != 0);
+  }
 
 
   // ---------------------------------------------------------------------------------

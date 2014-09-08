@@ -7,8 +7,7 @@ module's shared library (the size limitation per resource is 2GB, due to the use
 The following features are supported:
 
  * Embed arbitrary data into shared or static modules or executables.
- * Data is embedded in a compressed format if the size reduction exceeds a
-   configurable threshold.
+ * Data is embedded in a compressed format (zip) with a configurable compression level.
  * Resources are accessed via a Module instance, providing individual resource lookup and access
    for each module.
  * Resources are managed in a tree hierarchy, modeling the original child - parent relationship

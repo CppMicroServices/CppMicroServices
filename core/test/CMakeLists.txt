@@ -76,7 +76,9 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Add resources
-usFunctionAddResources(TARGET ${_test_driver} FILES usTestResource.txt manifest.json)
+usFunctionAddResources(TARGET ${_test_driver}
+                       FILES usTestResource.txt manifest.json
+                       ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
 
 # Register tests
 foreach(_test ${_tests})

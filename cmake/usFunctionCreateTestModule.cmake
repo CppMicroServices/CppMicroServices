@@ -13,10 +13,12 @@ macro(_us_create_test_module_helper)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
-  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_LINK_LIBRARIES})
+  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} ${US_LINK_LIBRARIES})
 
-  if(_res_files)
-    usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root} FILES ${_res_files})
+  if(_res_files OR US_TEST_LINK_LIBRARIES)
+    usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root}
+                           FILES ${_res_files}
+                           ZIP_ARCHIVES ${US_TEST_LINK_LIBRARIES})
   endif()
 
   set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
@@ -31,7 +33,7 @@ function(usFunctionCreateTestModule name)
 endfunction()
 
 function(usFunctionCreateTestModuleWithResources name)
-  cmake_parse_arguments(US_TEST "" "RESOURCES_ROOT" "SOURCES;RESOURCES" "" ${ARGN})
+  cmake_parse_arguments(US_TEST "" "RESOURCES_ROOT" "SOURCES;RESOURCES;LINK_LIBRARIES" "" ${ARGN})
   set(_srcs ${US_TEST_SOURCES} ${name}_resources.cpp)
   set(_res_files ${US_TEST_RESOURCES})
   if(US_TEST_RESOURCES_ROOT)

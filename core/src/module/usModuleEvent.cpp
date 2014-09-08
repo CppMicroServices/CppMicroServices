@@ -94,10 +94,6 @@ ModuleEvent::Type ModuleEvent::GetType() const
   return d->type;
 }
 
-US_END_NAMESPACE
-
-US_USE_NAMESPACE
-
 std::ostream& operator<<(std::ostream& os, ModuleEvent::Type eventType)
 {
   switch (eventType)
@@ -119,3 +115,5 @@ std::ostream& operator<<(std::ostream& os, const ModuleEvent& event)
   os << event.GetType() << " #" << m->GetModuleId() << " (" << m->GetLocation() << ")";
   return os;
 }
+
+US_END_NAMESPACE

@@ -72,6 +72,12 @@ const std::string&Module::PROP_AUTOLOAD_DIR()
   return s;
 }
 
+const std::string&Module::PROP_AUTOLOADED_MODULES()
+{
+  static const std::string s("module.autoloaded_modules");
+  return s;
+}
+
 Module::Module()
 : d(0)
 {
@@ -153,7 +159,11 @@ void Module::Start()
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   if (ModuleSettings::IsAutoLoadingEnabled())
   {
-    AutoLoadModules(d->info);
+    const std::vector<std::string> loadedPaths = AutoLoadModules(d->info);
+    if (!loadedPaths.empty())
+    {
+      d->moduleManifest.SetValue(PROP_AUTOLOADED_MODULES(), Any(loadedPaths));
+    }
   }
 #endif
 
@@ -256,11 +266,11 @@ std::vector<ServiceReferenceU> Module::GetServicesInUse() const
 
 ModuleResource Module::GetResource(const std::string& path) const
 {
-  if (d->resourceTreePtr == NULL || !d->resourceTreePtr->IsValid())
+  if (!d->resourceContainer.IsValid())
   {
     return ModuleResource();
   }
-  ModuleResource result(path, d->resourceTreePtr);
+  ModuleResource result(path, d->resourceContainer);
   if (result) return result;
   return ModuleResource();
 }
@@ -269,18 +279,19 @@ std::vector<ModuleResource> Module::FindResources(const std::string& path, const
                                                   bool recurse) const
 {
   std::vector<ModuleResource> result;
-  if (d->resourceTreePtr == NULL || !d->resourceTreePtr->IsValid())
+  if (!d->resourceContainer.IsValid())
   {
     return result;
   }
 
-  std::vector<std::string> nodes;
-  d->resourceTreePtr->FindNodes(path, filePattern, recurse, nodes);
-  for (std::vector<std::string>::iterator nodeIter = nodes.begin();
-       nodeIter != nodes.end(); ++nodeIter)
-  {
-    result.push_back(ModuleResource(*nodeIter, d->resourceTreePtr));
-  }
+  std::string normalizedPath = path;
+  // add a leading and trailing slash
+  if (normalizedPath.empty()) normalizedPath.push_back('/');
+  if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
+  if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
+  d->resourceContainer.FindNodes(d->info.name + normalizedPath,
+                                 filePattern.empty() ? "*" : filePattern,
+                                 recurse, result);
   return result;
 }
 

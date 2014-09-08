@@ -24,6 +24,9 @@
 
 #include "usModuleEvent.h"
 #include "usServiceEvent.h"
+#include "usModuleContext.h"
+
+#include "usTestingMacros.h"
 
 US_BEGIN_NAMESPACE
 
@@ -59,6 +62,42 @@ private:
 
   std::vector<ServiceEvent> serviceEvents;
   std::vector<ModuleEvent> moduleEvents;
+};
+
+template<class Receiver>
+class ModuleListenerRegistrationHelper
+{
+
+public:
+
+  typedef void(Receiver::*CallbackType)(const ModuleEvent);
+
+  ModuleListenerRegistrationHelper(ModuleContext* context, Receiver* receiver, CallbackType callback)
+    : context(context)
+    , receiver(receiver)
+    , callback(callback)
+  {
+    try
+    {
+      context->AddModuleListener(receiver, callback);
+    }
+    catch (const std::logic_error& ise)
+    {
+      US_TEST_OUTPUT( << "module listener registration failed " << ise.what() );
+      throw;
+    }
+  }
+
+  ~ModuleListenerRegistrationHelper()
+  {
+    context->RemoveModuleListener(receiver, callback);
+  }
+
+private:
+
+  ModuleContext* context;
+  Receiver* receiver;
+  CallbackType callback;
 };
 
 US_END_NAMESPACE

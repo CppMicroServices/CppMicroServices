@@ -5,7 +5,7 @@ macro(usMacroCreateModule _project_name)
 project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
-  "SKIP_EXAMPLES"
+  "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET"
   "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
@@ -71,25 +71,18 @@ if(_internal_include_dirs)
   include_directories(${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
 endif()
 
-# Embed module resources
-set(_resource_args )
-if(${PROJECT_NAME}_RESOURCES)
-  list(APPEND _resource_args ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources FILES ${${PROJECT_NAME}_RESOURCES})
-endif()
-if(${PROJECT_NAME}_BINARY_RESOURCES)
-  list(APPEND _resource_args ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources FILES ${${PROJECT_NAME}_BINARY_RESOURCES})
-endif()
-if(_resource_args)
-  usFunctionEmbedResources(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET}
-                           ${_resource_args})
-endif()
-
 #-----------------------------------------------------------------------------
 # Create library
 #-----------------------------------------------------------------------------
 
 # Generate the module init file
-usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET})
+if(NOT ${PROJECT_NAME}_SKIP_INIT)
+  usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET})
+endif()
+
+if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
+  list(APPEND ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_TARGET}_resources.cpp)
+endif()
 
 # Create the module library
 add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_SOURCES}
@@ -97,6 +90,7 @@ add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_SOURCES}
 
 # Compile definitions
 set_property(TARGET ${${PROJECT_NAME}_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${${PROJECT_NAME}_TARGET})
+set_property(TARGET ${${PROJECT_NAME}_TARGET} PROPERTY US_MODULE_NAME ${${PROJECT_NAME}_TARGET})
 if(NOT US_BUILD_SHARED_LIBS)
   set_property(TARGET ${${PROJECT_NAME}_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
 endif()
@@ -119,6 +113,21 @@ if(${PROJECT_NAME}_LINK_LIBRARIES OR US_LIBRARIES)
   target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES})
 endif()
 
+# Embed module resources
+
+if(${PROJECT_NAME}_RESOURCES OR US_LIBRARIES)
+  usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
+                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources
+                         FILES ${${PROJECT_NAME}_RESOURCES}
+                         ZIP_ARCHIVES ${US_LIBRARIES}
+                        )
+endif()
+if(${PROJECT_NAME}_BINARY_RESOURCES)
+  usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
+                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
+                         FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
+                        )
+endif()
 
 #-----------------------------------------------------------------------------
 # Install support

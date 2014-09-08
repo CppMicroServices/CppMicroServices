@@ -139,7 +139,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
 #ifdef US_BUILD_SHARED_LIBS
   libB.Unload();
-  US_TEST_CONDITION_REQUIRED(resource.IsValid() == false, "Check invalid static.txt resource")
+  US_TEST_CONDITION_REQUIRED(resource.IsValid() == true, "Check still valid static.txt resource")
 #endif
 
   US_TEST_END()

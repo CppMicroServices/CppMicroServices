@@ -40,11 +40,55 @@ void resetLastMsg()
   lastMsg.clear();
 }
 
-int usDebugOutputTest(int /*argc*/, char* /*argv*/[])
+void logMsg(MsgType msgType, int logLevel)
 {
-  US_TEST_BEGIN("DebugOutputTest");
+  resetLastMsg();
+  std::string logMsg;
+  switch (msgType)
+  {
+  case DebugMsg:
+  {
+    logMsg = "Debug msg";
+    US_DEBUG << logMsg;
+#if !defined(US_ENABLE_DEBUG_OUTPUT)
+    if (logLevel == DebugMsg) logLevel = InfoMsg;
+#endif
+    break;
+  }
+  case InfoMsg:
+  {
+    logMsg = "Info msg";
+    US_INFO << logMsg;
+    break;
+  }
+  case WarningMsg:
+  {
+    logMsg = "Warning msg";
+    US_WARN << logMsg;
+    break;
+  }
+  case ErrorMsg:
+  {
+    // Skip error messages
+    logLevel = 100;
+    break;
+  }
+  }
 
+  if (msgType >= logLevel)
+  {
+    US_TEST_CONDITION(lastMsgType == msgType && lastMsg.find(logMsg) != std::string::npos, "Testing for logged message")
+  }
+  else
+  {
+    US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing for skipped log message")
+  }
+}
+
+void testLogMessages()
+{
   // Use the default message handler
+  installMsgHandler(0);
   {
     US_DEBUG << "Msg";
     US_DEBUG(false) << "Msg";
@@ -94,6 +138,40 @@ int usDebugOutputTest(int /*argc*/, char* /*argv*/[])
     US_INFO << "Info msg";
   }
   US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing message handler reset")
+  resetLastMsg();
+}
+
+void testLogLevels()
+{
+  installMsgHandler(handleMessages);
+
+  MsgType logLevel = ModuleSettings::GetLogLevel();
+  US_TEST_CONDITION_REQUIRED(logLevel == DebugMsg, "Default log level")
+
+  logMsg(DebugMsg, logLevel);
+  logMsg(InfoMsg, logLevel);
+  logMsg(WarningMsg, logLevel);
+  logMsg(ErrorMsg, logLevel);
+
+  for (int level = ErrorMsg; level >= 0; --level)
+  {
+    ModuleSettings::SetLogLevel(static_cast<MsgType>(level));
+    logMsg(DebugMsg, level);
+    logMsg(InfoMsg, level);
+    logMsg(WarningMsg, level);
+    logMsg(ErrorMsg, level);
+  }
+
+  installMsgHandler(0);
+  resetLastMsg();
+}
+
+int usLogTest(int /*argc*/, char* /*argv*/[])
+{
+  US_TEST_BEGIN("DebugOutputTest");
+
+  testLogMessages();
+  testLogLevels();
 
   US_TEST_END()
 }

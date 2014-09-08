@@ -93,7 +93,7 @@ elseif(NOT COMMAND find_package_handle_standard_args)
   include(FindPackageHandleStandardArgs)
 endif()
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake")
-include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionAddResources.cmake")
 
 # Global include directory
 set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")

@@ -21,9 +21,83 @@
 
 #include "usModuleManifest_p.h"
 
+#include "jsoncpp.h"
+
 #include <stdexcept>
 
 US_BEGIN_NAMESPACE
+
+namespace {
+
+  typedef std::map<std::string, Any> AnyMap;
+  typedef std::vector<Any> AnyVector;
+
+  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
+  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector);
+
+  Any ParseJsonValue(const Json::Value& jsonValue)
+  {
+    if (jsonValue.isObject())
+    {
+      Any any = AnyMap();
+      ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
+      return any;
+    }
+    else if (jsonValue.isArray())
+    {
+      Any any = AnyVector();
+      ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any));
+      return any;
+    }
+    else if (jsonValue.isString())
+    {
+      return Any(jsonValue.asString());
+    }
+    else if (jsonValue.isBool())
+    {
+      return Any(jsonValue.asBool());
+    }
+    else if (jsonValue.isDouble())
+    {
+      return Any(jsonValue.asDouble());
+    }
+    else if (jsonValue.isIntegral())
+    {
+      return Any(jsonValue.asInt());
+    }
+
+    return Any();
+  }
+
+  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
+  {
+    for (Json::Value::const_iterator it = jsonObject.begin();
+         it != jsonObject.end(); ++it)
+    {
+      const Json::Value& jsonValue = *it;
+      Any anyValue = ParseJsonValue(jsonValue);
+      if (!anyValue.Empty())
+      {
+        anyMap.insert(std::make_pair(it.memberName(), anyValue));
+      }
+    }
+  }
+
+  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector)
+  {
+    for (Json::Value::const_iterator it = jsonArray.begin();
+         it != jsonArray.end(); ++it)
+    {
+      const Json::Value& jsonValue = *it;
+      Any anyValue = ParseJsonValue(jsonValue);
+      if (!anyValue.Empty())
+      {
+        anyVector.push_back(anyValue);
+      }
+    }
+  }
+
+}
 
 ModuleManifest::ModuleManifest()
 {
@@ -44,68 +118,6 @@ void ModuleManifest::Parse(std::istream& is)
   }
 
   ParseJsonObject(root, m_Properties);
-}
-
-Any ModuleManifest::ParseJsonValue(const Json::Value& jsonValue)
-{
-  if (jsonValue.isObject())
-  {
-    Any any = AnyMap();
-    ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
-    return any;
-  }
-  else if (jsonValue.isArray())
-  {
-    Any any = AnyVector();
-    ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any));
-    return any;
-  }
-  else if (jsonValue.isString())
-  {
-    return Any(jsonValue.asString());
-  }
-  else if (jsonValue.isBool())
-  {
-    return Any(jsonValue.asBool());
-  }
-  else if (jsonValue.isDouble())
-  {
-    return Any(jsonValue.asDouble());
-  }
-  else if (jsonValue.isIntegral())
-  {
-    return Any(jsonValue.asInt());
-  }
-
-  return Any();
-}
-
-void ModuleManifest::ParseJsonObject(const Json::Value& jsonObject, std::map<std::string, Any>& anyMap)
-{
-  for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end(); ++it)
-  {
-    const Json::Value& jsonValue = *it;
-    Any anyValue = ParseJsonValue(jsonValue);
-    if (!anyValue.Empty())
-    {
-      anyMap.insert(std::make_pair(it.memberName(), anyValue));
-    }
-  }
-}
-
-void ModuleManifest::ParseJsonArray(const Json::Value& jsonArray, ModuleManifest::AnyVector& anyVector)
-{
-  for (Json::Value::const_iterator it = jsonArray.begin();
-       it != jsonArray.end(); ++it)
-  {
-    const Json::Value& jsonValue = *it;
-    Any anyValue = ParseJsonValue(jsonValue);
-    if (!anyValue.Empty())
-    {
-      anyVector.push_back(anyValue);
-    }
-  }
 }
 
 bool ModuleManifest::Contains(const std::string& key) const

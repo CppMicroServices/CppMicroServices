@@ -140,6 +140,24 @@ public:
    */
   static std::string GetStoragePath();
 
+  /**
+   * Set the logging level for log messages from CppMicroServices modules.
+   *
+   * Higher logging levels will discard messages with lower priority.
+   * E.g. a logging level of WarningMsg will discard all messages of
+   * type DebugMsg and InfoMsg.
+   *
+   * @param level The new logging level.
+   */
+  static void SetLogLevel(MsgType level);
+
+  /**
+   * Get the current logging level.
+   *
+   * @return The currently used logging level.
+   */
+  static MsgType GetLogLevel();
+
 private:
 
   // purposely not implemented

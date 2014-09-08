@@ -24,8 +24,6 @@
 
 #include "usAny.h"
 
-#include "json_p.h"
-
 US_BEGIN_NAMESPACE
 
 class ModuleManifest
@@ -47,12 +45,6 @@ public:
 private:
 
   typedef std::map<std::string, Any> AnyMap;
-  typedef std::vector<Any> AnyVector;
-
-  Any ParseJsonValue(const Json::Value& jsonValue);
-
-  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
-  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector);
 
   AnyMap m_Properties;
 };

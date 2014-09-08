@@ -21,8 +21,7 @@ the `US_STATIC_MODULE` preprocessor macro is defined when building a module stat
 Static modules can be used (imported) in shared or other static libraries or in the executable itself.
 For every static module you would like to import, you need to put a call to `#US_IMPORT_MODULE` or
 to `#US_INITIALIZE_STATIC_MODULE` (if the module does not provide an activator) into the
-source code of the importing library. If the static module contains resources,
-you must also call `#US_IMPORT_MODULE_RESOURCES`.
+source code of the importing library.
 
 \note While you can link static modules to other static modules, you will still need to
 import *all* of the static modules into the final executable to ensure proper initialization.
@@ -50,7 +49,7 @@ In this usage scenario, every module will be statically build and linked to an e
 \snippet uServices-staticmodules/main.cpp ImportStaticModuleIntoMain2
 
 Note that the first `#US_IMPORT_MODULE` call imports the static CppMicroServices library.
-Then the `MyStaticModule2` module and its resources are imported and finally, the
+Then the `MyStaticModule2` module is imported and finally, the
 executable itself is initialized (this is necessary if the executable itself is
 a C++ Micro Services module).
 

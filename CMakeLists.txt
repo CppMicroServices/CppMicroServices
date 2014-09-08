@@ -27,8 +27,8 @@ set(CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
+include(usFunctionAddResources)
 include(usFunctionCheckCompilerFlags)
-include(usFunctionEmbedResources)
 include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
 include(usMacroCreateModule)
@@ -111,7 +111,6 @@ endif()
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
-us_cache_var(US_ENABLE_RESOURCE_COMPRESSION ON BOOL "Enable resource compression" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
@@ -352,7 +351,7 @@ endif()
 # Source directory
 #-----------------------------------------------------------------------------
 
-set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
+set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party ${PROJECT_BINARY_DIR}/include)
 
 # Configure CppMicroServicesConfig.cmake for the build tree.
 # The file is used in sub-directories.
@@ -401,7 +400,7 @@ set(_install_cmake_scripts
   ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
   ${US_CMAKE_DIR}/FindPackageMessage.cmake
   ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
-  ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
+  ${US_CMAKE_DIR}/usFunctionAddResources.cmake
   )
 
 install(FILES ${_install_cmake_scripts}

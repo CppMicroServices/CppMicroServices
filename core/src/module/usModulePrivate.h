@@ -29,7 +29,7 @@
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
 #include "usModuleManifest_p.h"
-#include "usModuleResourceTree_p.h"
+#include "usModuleResourceContainer_p.h"
 
 #include "usAtomicInt_p.h"
 
@@ -64,7 +64,7 @@ public:
 
   ModuleInfo info;
 
-  ModuleResourceTree* resourceTreePtr;
+  ModuleResourceContainer resourceContainer;
 
   /**
    * ModuleContext for the module

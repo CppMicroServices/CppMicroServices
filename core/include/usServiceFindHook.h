@@ -71,6 +71,4 @@ struct US_Core_EXPORT ServiceFindHook
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(us::ServiceFindHook, "org.cppmicroservices.ServiceFindHook/2.0.0")
-
 #endif // USSERVICEFINDHOOK_H

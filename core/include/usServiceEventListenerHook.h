@@ -67,6 +67,4 @@ struct US_Core_EXPORT ServiceEventListenerHook
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(us::ServiceEventListenerHook, "org.cppmicroservices.ServiceEventListenerHook/2.0.0")
-
 #endif // USSERVICEEVENTLISTENERHOOK_H

@@ -61,8 +61,6 @@ struct SPELLCHECKSERVICE_EXPORT ISpellCheckService
    */
   virtual std::vector<std::string> Check(const std::string& passage) = 0;
 };
-
-US_DECLARE_SERVICE_INTERFACE(ISpellCheckService, "ISpellCheckService/1.0")
 //! [service]
 //!
 #endif // ISPELLCHECKSERVICE_H

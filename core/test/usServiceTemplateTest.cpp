@@ -27,11 +27,8 @@
 #include "usTestingMacros.h"
 
 struct Interface1 {};
-US_DECLARE_SERVICE_INTERFACE(Interface1, "org.cppmicroservices.test.Interface1")
 struct Interface2 {};
-US_DECLARE_SERVICE_INTERFACE(Interface2, "org.cppmicroservices.test.Interface2")
 struct Interface3 {};
-US_DECLARE_SERVICE_INTERFACE(Interface3, "org.cppmicroservices.test.Interface3")
 
 struct MyService1 : public Interface1
 {};

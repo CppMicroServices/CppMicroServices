@@ -373,9 +373,9 @@ void TestFindHook()
   US_TEST_CONDITION(serviceListener.events.size() == 1, "Service registered");
 #endif
 
-  std::vector<ServiceReferenceU> refs = context->GetServiceReferences("org.cppmicroservices.TestModuleAService");
+  std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestModuleAService");
   US_TEST_CONDITION(refs.empty(), "Empty references");
-  ServiceReferenceU ref = context->GetServiceReference("org.cppmicroservices.TestModuleAService");
+  ServiceReferenceU ref = context->GetServiceReference("us::TestModuleAService");
   US_TEST_CONDITION(!ref, "Invalid reference (filtered out)");
 
   expectedOrdering.push_back(2);
@@ -388,9 +388,9 @@ void TestFindHook()
   findHookReg2.Unregister();
   findHookReg1.Unregister();
 
-  refs = context->GetServiceReferences("org.cppmicroservices.TestModuleAService");
+  refs = context->GetServiceReferences("us::TestModuleAService");
   US_TEST_CONDITION(!refs.empty(), "Non-empty references");
-  ref = context->GetServiceReference("org.cppmicroservices.TestModuleAService");
+  ref = context->GetServiceReference("us::TestModuleAService");
   US_TEST_CONDITION(ref, "Valid reference");
 
 #ifdef US_BUILD_SHARED_LIBS

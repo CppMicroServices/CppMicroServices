@@ -30,29 +30,37 @@
 #include <string>
 #include <typeinfo>
 
+US_BEGIN_NAMESPACE
+std::string GetDemangledName(const std::type_info& typeInfo);
+US_END_NAMESPACE
+
 /**
  * \ingroup MicroServices
  *
- * Returns a unique id for a given type.
+ * Returns a unique id for a given type. By default, the
+ * demangled name of \c T is returned.
  *
- * This template method is specialized in the macro
- * #US_DECLARE_SERVICE_INTERFACE to return a unique id
- * for each service interface.
+ * This template method may be specialized directly or be
+ * using the macro #US_DECLARE_SERVICE_INTERFACE to return
+ * a custom id for each service interface.
  *
  * @tparam T The service interface type.
  * @return A unique id for the service interface type T.
  */
-template<class T> inline const char* us_service_interface_iid();
+template<class T> std::string us_service_interface_iid()
+{
+  return US_PREPEND_NAMESPACE(GetDemangledName)(typeid(T));
+}
 
 /// \cond
-template<> inline const char* us_service_interface_iid<void>() { return ""; }
+template<> inline std::string us_service_interface_iid<void>() { return std::string(); }
 /// \endcond
 
 
 /**
  * \ingroup MicroServices
  *
- * \brief Declare a CppMicroServices service interface.
+ * \brief Declare a service interface id.
  *
  * This macro associates the given identifier \e _service_interface_id (a string literal) to the
  * interface class called _service_interface_type. The Identifier must be unique. For example:
@@ -65,7 +73,15 @@ template<> inline const char* us_service_interface_iid<void>() { return ""; }
  * US_DECLARE_SERVICE_INTERFACE(ISomeInterface, "com.mycompany.service.ISomeInterface/1.0")
  * \endcode
  *
- * This macro is normally used right after the class definition for _service_interface_type, in a header file.
+ * The usage of this macro is optional and the service interface id which is automatically
+ * associated with any type is usually good enough (the demangled type name). However, care must
+ * be taken if the default id is compared with a string literal hard-coding a service interface
+ * id. E.g. the default id for templated types in the STL may differ between platforms. For
+ * user-defined types and templates the ids are typically consistent, but platform specific
+ * default template arguments will lead to different ids.
+ *
+ * This macro is normally used right after the class definition for _service_interface_type,
+ * in a header file.
  *
  * If you want to use #US_DECLARE_SERVICE_INTERFACE with interface classes declared in a
  * namespace then you have to make sure the #US_DECLARE_SERVICE_INTERFACE macro call is not
@@ -86,7 +102,7 @@ template<> inline const char* us_service_interface_iid<void>() { return ""; }
  * @param _service_interface_id A string literal representing a globally unique identifier.
  */
 #define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)               \
-  template<> inline const char* us_service_interface_iid<_service_interface_type>()              \
+  template<> inline std::string us_service_interface_iid<_service_interface_type>()                \
   { return _service_interface_id; }                                                                \
 
 
@@ -125,7 +141,7 @@ typedef std::map<std::string, void*> InterfaceMap;
 template<class I>
 bool InsertInterfaceType(InterfaceMap& im, I* i)
 {
-  if (us_service_interface_iid<I>() == NULL)
+  if (us_service_interface_iid<I>().empty())
   {
     throw ServiceException(std::string("The interface class ") + typeid(I).name() +
                                 " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");

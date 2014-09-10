@@ -72,7 +72,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
   // Check if libB registered the expected service
   try
   {
-    std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
+    std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("us::TestModuleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
     InterfaceMap o1 = mc->GetService(refs.front());
@@ -130,7 +130,7 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
   US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
 
   std::vector<ServiceReferenceU> refs
-      = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
+      = mc->GetServiceReferences("us::TestModuleBService");
   US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
   US_TEST_CONDITION(refs.back(), "Test for second valid service reference")
 

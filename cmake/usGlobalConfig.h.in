@@ -16,6 +16,7 @@
 // Header Availability
 //-------------------------------------------------------------------
 
+#cmakedefine US_HAVE_CXXABI_H
 #cmakedefine US_HAVE_STDINT_H
 #cmakedefine US_HAVE_TR1_UNORDERED_MAP_H
 #cmakedefine US_HAVE_TR1_UNORDERED_SET_H

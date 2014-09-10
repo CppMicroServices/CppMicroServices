@@ -35,6 +35,4 @@ struct FooService
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(FooService), "org.us.testing.FooService")
-
 #endif // USFOOSERVICE_H

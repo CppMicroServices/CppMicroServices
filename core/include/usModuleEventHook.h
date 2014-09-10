@@ -67,6 +67,4 @@ struct US_Core_EXPORT ModuleEventHook
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(us::ModuleEventHook, "org.cppmicroservices.ModuleEventHook/2.0.0")
-
 #endif // USMODULEEVENTHOOK_H

@@ -43,6 +43,4 @@ private:
   SingletonTwoService& operator=(const SingletonTwoService&);
 };
 
-US_DECLARE_SERVICE_INTERFACE(SingletonTwoService, "org.cppmicroservices.snippet.SingletonTwoService")
-
 #endif // SINGLETONTWO_H

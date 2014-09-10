@@ -167,8 +167,6 @@ struct IPerfTestService
   virtual ~IPerfTestService() {}
 };
 
-US_DECLARE_SERVICE_INTERFACE(IPerfTestService, "org.cppmicroservices.test.IPerfTestService")
-
 
 class ServiceRegistryPerformanceTest
 {

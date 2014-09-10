@@ -118,7 +118,7 @@ function(usFunctionAddResources)
   # re-linking and hence the execution of POST_BUILD commands.
   add_custom_command(
     OUTPUT ${US_RESOURCE_TARGET}_resources.cpp
-    COMMAND ${CMAKE_COMMAND} -E touch ${US_RESOURCE_TARGET}_resources.cpp
+    COMMAND ${CMAKE_COMMAND} -E copy ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} ${US_RESOURCE_TARGET}_resources.cpp
     DEPENDS ${_cmd_deps} ${resource_compiler}
     COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
     VERBATIM

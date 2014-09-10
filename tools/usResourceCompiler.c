@@ -343,7 +343,7 @@ static int us_archived_names_append(us_archived_names* archivedNames, const char
       abort();
     }
     memset(archivedNames->names + archivedNames->capacity, 0, sizeof(char*) * (newCapacity - archivedNames->capacity));
-    archivedNames->capacity = newCapacity;
+    archivedNames->capacity = (mz_uint)newCapacity;
   }
 
   if (archivedNames->names[archivedNames->size] == NULL)
@@ -420,7 +420,7 @@ static int us_zip_writer_add_file(mz_zip_archive *pZip, const char *pArchive_nam
 static int us_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archive *pSource_zip,
                                              mz_uint file_index, us_archived_names* archived_names,
                                              us_archived_names* archived_dirs,
-                                             char* archiveName, size_t archiveNameSize)
+                                             char* archiveName, mz_uint archiveNameSize)
 {
   int retCode = 0;
 
@@ -658,7 +658,7 @@ int main(int argc, char** argv)
   for (; oldIndex < numOldEntries; ++oldIndex)
   {
     errCode = us_zip_writer_add_from_zip_reader(&writeArchive, &readArchive, oldIndex, &archivedNames,
-                                                &archivedDirs, archiveName, sizeof archiveName);
+                                                &archivedDirs, archiveName, (mz_uint) sizeof archiveName);
     if (errCode == US_ARCHIVED_NAMES_ERROR_DUPLICATE)
     {
       // Duplicates in the module archive are not an error,

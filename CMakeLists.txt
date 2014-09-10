@@ -145,6 +145,7 @@ us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
 set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
+set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -397,6 +398,7 @@ install(EXPORT ${PROJECT_NAME}Targets
 
 set(_install_cmake_scripts
   ${US_MODULE_INIT_TEMPLATE}
+  ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
   ${US_CMAKE_DIR}/CMakeParseArguments.cmake
   ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
   ${US_CMAKE_DIR}/FindPackageMessage.cmake

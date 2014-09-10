@@ -40,6 +40,4 @@ struct ServiceControlInterface
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(ServiceControlInterface), "org.us.testing.ServiceControlInterface")
-
 #endif // USSERVICECONTROLINTERFACE_H

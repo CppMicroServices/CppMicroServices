@@ -35,6 +35,4 @@ struct TestModuleBService
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleBService), "org.cppmicroservices.TestModuleBService")
-
 #endif // USTESTMODULEASERVICE_H

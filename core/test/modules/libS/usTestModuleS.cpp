@@ -101,7 +101,7 @@ public:
 
 private:
 
-  static const std::string SERVICE; // = "org.cppmicroservices.TestModuleSService"
+  static const std::string SERVICE; // = "us::TestModuleSService"
 
   ModuleContext* mc;
   std::vector<ServiceRegistrationU> servregs;
@@ -109,7 +109,7 @@ private:
   ServiceRegistration<ServiceControlInterface> sciReg;
 };
 
-const std::string TestModuleS::SERVICE = "org.cppmicroservices.TestModuleSService";
+const std::string TestModuleS::SERVICE = "us::TestModuleSService";
 
 class TestModuleSActivator : public ModuleActivator
 {

@@ -10,10 +10,6 @@ struct InterfaceA { virtual ~InterfaceA() {} };
 struct InterfaceB { virtual ~InterfaceB() {} };
 struct InterfaceC { virtual ~InterfaceC() {} };
 
-US_DECLARE_SERVICE_INTERFACE(InterfaceA, "org.cppmicroservices.snippet.InterfaceA")
-US_DECLARE_SERVICE_INTERFACE(InterfaceB, "org.cppmicroservices.snippet.InterfaceB")
-US_DECLARE_SERVICE_INTERFACE(InterfaceC, "org.cppmicroservices.snippet.InterfaceC")
-
 //! [1-1]
 class MyService : public InterfaceA
 {};

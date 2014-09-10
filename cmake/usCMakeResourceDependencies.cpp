@@ -19,19 +19,10 @@
 
 =============================================================================*/
 
+namespace {
 
-#ifndef USTESTMODULESSERVICE2_H
-#define USTESTMODULESSERVICE2_H
+// This is dummy code to silence some linkers warning about
+// empty object files.
+struct CMakeResourceDependencies {};
 
-#include <usServiceInterface.h>
-
-US_BEGIN_NAMESPACE
-
-struct TestModuleSService2
-{
-  virtual ~TestModuleSService2() {}
-};
-
-US_END_NAMESPACE
-
-#endif // USTESTMODULESSERVICE0_H
+}

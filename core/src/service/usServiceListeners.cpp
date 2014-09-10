@@ -102,7 +102,14 @@ void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
     for (ModuleListenerMap::mapped_type::iterator iter2 = iter->second.begin(), end2 = iter->second.end();
          iter2 != end2; ++iter2)
     {
-      (iter2->first)(evt);
+      try
+      {
+        (iter2->first)(evt);
+      }
+      catch (const std::exception& e)
+      {
+        US_WARN << "Module listener threw an exception: " << e.what();
+      }
     }
   }
 }

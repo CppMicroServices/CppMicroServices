@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <cctype>
 #include <algorithm>
+#include <typeinfo>
 
 #ifdef US_PLATFORM_POSIX
   #include <errno.h>
@@ -294,6 +295,53 @@ void message_output(MsgType msgType, const char *buf)
     exit(1); // goodbye cruel world
   #endif
   }
+}
+
+#ifdef US_HAVE_CXXABI_H
+#include <cxxabi.h>
+#endif
+
+US_Core_EXPORT std::string GetDemangledName(const std::type_info& typeInfo)
+{
+  std::string result;
+#ifdef US_HAVE_CXXABI_H
+  int status = 0;
+  char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);
+  if (demangled && status == 0)
+  {
+    result = demangled;
+    free(demangled);
+  }
+#elif defined(US_PLATFORM_WINDOWS)
+  const char* demangled = typeInfo.name();
+  if (demangled != NULL)
+  {
+    result = demangled;
+    // remove "struct" qualifiers
+    std::size_t pos = 0;
+    while (pos != std::string::npos)
+    {
+      if ((pos = result.find("struct ", pos)) != std::string::npos)
+      {
+        result = result.substr(0, pos) + result.substr(pos + 7);
+        pos += 8;
+      }
+    }
+    // remove "class" qualifiers
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+      if ((pos = result.find("class ", pos)) != std::string::npos)
+      {
+        result = result.substr(0, pos) + result.substr(pos + 6);
+        pos += 7;
+      }
+    }
+  }
+#else
+  (void)typeInfo;
+#endif
+  return result;
 }
 
 US_END_NAMESPACE

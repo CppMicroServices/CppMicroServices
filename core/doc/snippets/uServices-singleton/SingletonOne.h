@@ -56,8 +56,6 @@ private:
   SingletonOneService(const SingletonOneService&);
   SingletonOneService& operator=(const SingletonOneService&);
 };
-
-US_DECLARE_SERVICE_INTERFACE(SingletonOneService, "org.cppmicroservices.snippet.SingletonOneService")
 //![ss1]
 
 #endif // SINGLETONONE_H

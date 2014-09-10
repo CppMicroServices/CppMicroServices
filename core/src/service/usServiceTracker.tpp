@@ -25,6 +25,7 @@
 #include "usServiceException.h"
 #include "usModuleContext.h"
 
+#include <string>
 #include <stdexcept>
 #include <limits>
 
@@ -68,8 +69,8 @@ template<class S, class TTT>
 ServiceTracker<S,TTT>::ServiceTracker(ModuleContext *context, _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
 {
-  const char* clazz = us_service_interface_iid<S>();
-  if (clazz == 0) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
+  std::string clazz = us_service_interface_iid<S>();
+  if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
 }
 
 #ifdef _MSC_VER

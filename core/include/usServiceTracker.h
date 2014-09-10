@@ -221,10 +221,7 @@ struct TrackedTypeTraits<void,void*>
  *
  *
  * @tparam S The type of the service being tracked. The type S* must be an
- *         assignable datatype. Further, if the
- *         <code>ServiceTracker(ModuleContext*, ServiceTrackerCustomizer<S,T>*)</code>
- *         constructor is used, the type must have an associated interface id via
- *         #US_DECLARE_SERVICE_INTERFACE.
+ *         assignable datatype.
  * @tparam TTT Type traits of the tracked object. The type traits class provides
  *         information about the customized service object, see TrackedTypeTraitsBase.
  *

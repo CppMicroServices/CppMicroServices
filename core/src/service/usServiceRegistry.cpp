@@ -21,6 +21,7 @@
 
 #include <iterator>
 #include <stdexcept>
+#include <cassert>
 
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
@@ -283,6 +284,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& s
 {
   MutexLock lock(mutex);
 
+  assert(sr.d->properties.Value(ServiceConstants::OBJECTCLASS()).Type() == typeid(std::vector<std::string>));
   const std::vector<std::string>& classes = ref_any_cast<std::vector<std::string> >(
         sr.d->properties.Value(ServiceConstants::OBJECTCLASS()));
   services.erase(sr);

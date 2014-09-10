@@ -380,7 +380,10 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
     if (pArchive_name[end] == '/')
     {
       US_STRNCPY(dirName, sizeof dirName, pArchive_name, end + 1);
-      dirName[end+1] = '\0';
+      if (end < length-1)
+      {
+        dirName[end+1] = '\0';
+      }
       if (us_archived_names_append(archived_dirs, dirName) == US_OK)
       {
         dbg_print("-- found new dir entry %s\n", dirName);

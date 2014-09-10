@@ -252,6 +252,7 @@ endif()
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 
+CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
 CHECK_INCLUDE_FILE_CXX(tr1/unordered_map US_HAVE_TR1_UNORDERED_MAP_H)
 CHECK_INCLUDE_FILE_CXX(tr1/unordered_set US_HAVE_TR1_UNORDERED_SET_H)

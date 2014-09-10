@@ -41,13 +41,6 @@ struct TestModuleH2
   virtual ~TestModuleH2() {}
 };
 
-US_END_NAMESPACE
-
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH), "org.cppmicroservices.TestModuleH")
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH2), "org.cppmicroservices.TestModuleH2")
-
-US_BEGIN_NAMESPACE
-
 class TestProduct : public TestModuleH
 {
   // Module* caller;

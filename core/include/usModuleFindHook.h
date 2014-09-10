@@ -68,6 +68,4 @@ struct US_Core_EXPORT ModuleFindHook
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(us::ModuleFindHook, "org.cppmicroservices.ModuleFindHook/2.0.0")
-
 #endif // USMODULEFINDHOOK_H

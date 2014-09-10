@@ -39,6 +39,4 @@ struct ModulePropsInterface
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(ModulePropsInterface), "org.us.testing.ModulePropsInterface")
-
 #endif // USMODULEPROPSINTERFACE_H

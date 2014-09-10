@@ -56,9 +56,6 @@ struct TestModuleH2
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH), "org.cppmicroservices.TestModuleH")
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH2), "org.cppmicroservices.TestModuleH2")
-
 
 void TestServiceFactoryModuleScope()
 {
@@ -89,13 +86,13 @@ void TestServiceFactoryModuleScope()
 
   ModuleContext* mc = GetModuleContext();
   // Check that a service reference exist
-  const ServiceReferenceU sr1 = mc->GetServiceReference("org.cppmicroservices.TestModuleH");
+  const ServiceReferenceU sr1 = mc->GetServiceReference("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
   US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
 
   InterfaceMap service = mc->GetService(sr1);
   US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
-  InterfaceMap::const_iterator serviceIter = service.find("org.cppmicroservices.TestModuleH");
+  InterfaceMap::const_iterator serviceIter = service.find("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
   US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
 

@@ -5,8 +5,6 @@ US_USE_NAMESPACE
 
 struct IFooService {};
 
-US_DECLARE_SERVICE_INTERFACE(IFooService, "org.cppmicroservices.snippets.IFooService")
-
 ///! [tt]
 struct MyTrackedClass { /* ... */ };
 //! [tt]

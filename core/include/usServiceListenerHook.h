@@ -171,6 +171,4 @@ US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListenerHook::ListenerInfo))
 US_HASH_FUNCTION_END
 US_HASH_FUNCTION_NAMESPACE_END
 
-US_DECLARE_SERVICE_INTERFACE(us::ServiceListenerHook, "org.cppmicroservices.ServiceListenerHook/2.0.0")
-
 #endif // USSERVICELISTENERHOOK_H

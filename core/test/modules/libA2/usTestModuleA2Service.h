@@ -35,6 +35,4 @@ struct TestModuleA2Service
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleA2Service), "org.us.TestModuleA2Service")
-
 #endif // USTESTMODULEA2SERVICE_H

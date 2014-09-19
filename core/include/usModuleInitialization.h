@@ -97,11 +97,17 @@ US_DEFINE_MODULE_INITIALIZER                                                    
                                                                                              \
 US_END_NAMESPACE                                                                             \
                                                                                              \
+extern "C" {                                                                                 \
+                                                                                             \
 /* A helper function which is called by the US_IMPORT_MODULE macro to initialize             \
-   static modules */                                                                         \
-void US_ABI_LOCAL US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()                \
+   static modules. The function is exported in order to be searchable in the exports         \
+   section of the shared library, acting as a "signature" for CppMicroservices modules       \
+   and also encoding the module name. */                                                     \
+void US_ABI_EXPORT US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()               \
 {                                                                                            \
   static US_PREPEND_NAMESPACE(ModuleInitializer) _InitializeModule;                          \
+}                                                                                            \
+                                                                                             \
 }
 
 // Create a file-scoped static object for registering the module

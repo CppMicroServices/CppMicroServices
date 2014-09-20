@@ -35,12 +35,16 @@ set(_srcs
   module/usCoreModuleContext.cpp
   module/usModuleContext.cpp
   module/usModule.cpp
+  module/usModuleElfFile.cpp
   module/usModuleEvent.cpp
   module/usModuleEventHook.cpp
   module/usModuleFindHook.cpp
   module/usModuleHooks.cpp
   module/usModuleInfo.cpp
+  module/usModuleMachOFile.cpp
   module/usModuleManifest.cpp
+  module/usModuleObjFile.cpp
+  module/usModulePEFile.cpp
   module/usModulePrivate.cpp
   module/usModuleRegistry.cpp
   module/usModuleResource.cpp
@@ -77,6 +81,7 @@ set(_private_headers
   module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
   module/usModuleHooks_p.h
+  module/usModuleObjFile_p.h
   module/usModuleResourceBuffer_p.h
   module/usModuleResourceContainer_p.h
   module/usModuleUtils_p.h

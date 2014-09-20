@@ -103,6 +103,9 @@
   #define US_PLATFORM_POSIX
 #endif
 
+#cmakedefine US_BIG_ENDIAN
+#cmakedefine US_LITTLE_ENDIAN
+
 ///-------------------------------------------------------------------
 // Macros for import/export declarations
 //-------------------------------------------------------------------

@@ -387,7 +387,7 @@ configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
-add_subdirectory(tools)
+add_subdirectory(tools/rc)
 
 add_subdirectory(core)
 

@@ -390,6 +390,9 @@ include_directories(${US_INCLUDE_DIRS})
 add_subdirectory(tools/rc)
 
 add_subdirectory(core)
+add_subdirectory(shell_service)
+
+add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation

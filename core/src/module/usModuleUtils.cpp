@@ -22,7 +22,7 @@
 
 #include "usModuleUtils_p.h"
 
-#include <usLog_p.h>
+#include <usLog.h>
 #include <usModuleInfo.h>
 #include <usUtils_p.h>
 

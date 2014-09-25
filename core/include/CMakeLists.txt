@@ -5,6 +5,7 @@
 set(_public_headers
   usAny.h
   usLDAPProp.h
+  usLog.h
   usSharedData.h
   usSharedLibrary.h
   usShrinkableMap.h

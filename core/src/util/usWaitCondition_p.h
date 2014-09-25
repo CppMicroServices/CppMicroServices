@@ -23,7 +23,7 @@
 #define USWAITCONDITION_P_H
 
 #include "usCoreConfig.h"
-#include "usLog_p.h"
+#include "usLog.h"
 #include "usUtils_p.h"
 #include "usThreads_p.h"
 

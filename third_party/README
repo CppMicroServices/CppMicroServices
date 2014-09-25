@@ -1,0 +1,94 @@
+README
+======
+
+This directory contains several minimalistic third-party libraries.
+For a record of their origin and version, see the list below or read
+the file header.
+
+If a third-party library has been modified for the purposes of the
+CppMicroServices library, it is marked as such below.
+
+dirent_win32
+------------
+
+See file for license information.
+
+http://softagalleria.net/dirent.php
+1.20.1
+
+jsoncpp
+-------
+
+MITK License or Public Domain
+
+https://github.com/open-source-parsers/jsoncpp
+(formerly http://jsoncpp.sourceforge.net)
+0.6.0-rc2
+
+miniz
+-----
+
+Public Domain
+
+https://code.google.com/p/miniz/
+v1.15 r4
+
+Patches
+
+ * Support for zip files with prepended binary blobs.
+ * Write to C file streams.
+
+TinyThread++
+------------
+
+zlib/libpng License
+
+http://tinythreadpp.bitsnbites.eu/
+e21187cb0469964f9b1d8ba784517a2a0d99a796
+
+
+us_stdint_vc
+------------
+
+Public Domain
+
+Search the Net for "stdint.h Danny Smith"
+
+libtelnet
+---------
+
+Public Domain
+
+https://github.com/seanmiddleditch/libtelnet
+574eef9fd7f373fb2812939456fc5a4c3e975b44
+
+tinyscheme
+----------
+
+BSD-style license
+
+http://tinyscheme.sourceforge.net/home.html
+1.41
+
+Patches
+
+ * Added header for missing off_t declaration.
+ * Disable Windows warnings C4244 and C4267.
+
+Linenoise
+---------
+
+BSD license
+
+https://github.com/msteveb/linenoise
+0f2343d2bc763b735b6242b5831be611703965a1
+
+This is a fork of the original antirez/linenoise project
+which contains Windows support and a few additional features.
+
+Patches
+
+ * Don't depend on utf8.h because it is not supported
+   on Windows.
+ * Disable Windows warnings C4244 and C4267.
+

@@ -1,4 +1,4 @@
 <map id="TrackedTypeTraits&lt; S, T * &gt;" name="TrackedTypeTraits&lt; S, T * &gt;">
-<area shape="rect" id="node2" href="$structTrackedTypeTraitsBase.html" title="TrackedTypeTraitsBase\l\&lt; T *, TrackedTypeTraits\l\&lt; S, T * \&gt; \&gt;" alt="" coords="5,136,176,200"/>
-<area shape="rect" id="node4" href="$structTrackedTypeTraitsBase.html" title="A base class template for type traits for objects tracked by a ServiceTracker instance. " alt="" coords="9,6,172,53"/>
+<area shape="rect" id="node2" href="$structTrackedTypeTraitsBase.html" title="TrackedTypeTraitsBase\l\&lt; T *, TrackedTypeTraits\l\&lt; S, T * \&gt; \&gt;" alt="" coords="5,125,176,181"/>
+<area shape="rect" id="node3" href="$structTrackedTypeTraitsBase.html" title="A base class template for type traits for objects tracked by a ServiceTracker instance. " alt="" coords="9,6,172,47"/>
 </map>

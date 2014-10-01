@@ -10,7 +10,7 @@
 #! input files to the target file.
 #!
 #! \note To set-up correct file dependencies from your module target to your resource
-#!       files, you have to add a file named \emph $<your-target-name>_resources.cpp
+#!       files, you have to add a file named \e $<your-target-name>_resources.cpp
 #!       to the source list of the target. This ensures that changed resource files
 #!       will automatically be re-added to the module.
 #!

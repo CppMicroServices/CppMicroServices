@@ -111,14 +111,14 @@ function(usFunctionAddResources)
     endforeach()
   endif()
 
-  # This command depends on the given resource files and creates an empty
-  # cpp which must be added to the source list of the related target.
+  # This command depends on the given resource files and creates a source
+  # file which must be added to the source list of the related target.
   # This way, the following command is executed if the resources change
-  # and it just touches the empty cpp file to fore a (actually unnecessary)
+  # and it just touches the created source file to force a (actually unnecessary)
   # re-linking and hence the execution of POST_BUILD commands.
   add_custom_command(
-    OUTPUT ${US_RESOURCE_TARGET}_resources.cpp
-    COMMAND ${CMAKE_COMMAND} -E copy ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} ${US_RESOURCE_TARGET}_resources.cpp
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_TARGET}_resources.cpp
+    COMMAND ${CMAKE_COMMAND} -E copy ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} ${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_TARGET}_resources.cpp
     DEPENDS ${_cmd_deps} ${resource_compiler}
     COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
     VERBATIM

@@ -172,32 +172,12 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
   ModuleContext* mc = GetModuleContext();
   TestModuleListener listener;
 
-  try
-  {
-    mc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
-  }
-  catch (const std::logic_error& ise)
-  {
-    US_TEST_OUTPUT( << "module listener registration failed " << ise.what() );
-    throw;
-  }
-
-  try
-  {
-    mc->AddServiceListener(&listener, &TestModuleListener::ServiceChanged);
-  }
-  catch (const std::logic_error& ise)
-  {
-    US_TEST_OUTPUT( << "service listener registration failed " << ise.what() );
-    throw;
-  }
+  ModuleListenerRegistrationHelper<TestModuleListener> ml(mc, &listener, &TestModuleListener::ModuleChanged);
+  ServiceListenerRegistrationHelper<TestModuleListener> sl(mc, &listener, &TestModuleListener::ServiceChanged);
 
   SharedLibrary libB(LIB_PATH, "TestModuleB");
   frame020a(mc, listener, libB);
   frame030b(mc, listener, libB);
-
-  mc->RemoveModuleListener(&listener, &TestModuleListener::ModuleChanged);
-  mc->RemoveServiceListener(&listener, &TestModuleListener::ServiceChanged);
 
   US_TEST_END()
 }

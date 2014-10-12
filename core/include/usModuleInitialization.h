@@ -23,6 +23,9 @@
 #error Missing US_MODULE_NAME preprocessor define
 #endif
 
+#ifndef USMODULEINITIALIZATION_H
+#define USMODULEINITIALIZATION_H
+
 #include <usStaticInit_p.h>
 
 #include <usModuleRegistry.h>
@@ -30,9 +33,6 @@
 #include <usModuleUtils_p.h>
 
 #include <cstring>
-
-#ifndef USMODULEINITIALIZATION_H
-#define USMODULEINITIALIZATION_H
 
 
 /**

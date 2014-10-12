@@ -1,6 +1,6 @@
 set(_srcs Activator.cpp)
 
-usFunctionGenerateModuleInit(_srcs MODULE_NAME dictionaryclient2)
+usFunctionGenerateModuleInit(_srcs)
 
 set(dictionaryclient2_DEPENDS dictionaryservice)
 CreateExample(dictionaryclient2 ${_srcs})

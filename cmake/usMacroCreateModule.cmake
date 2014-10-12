@@ -77,7 +77,7 @@ endif()
 
 # Generate the module init file
 if(NOT ${PROJECT_NAME}_SKIP_INIT)
-  usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES MODULE_NAME ${${PROJECT_NAME}_TARGET})
+  usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)

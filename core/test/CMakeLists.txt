@@ -59,7 +59,7 @@ set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
 # Generate a custom "module init" file for the test driver executable
-usFunctionGenerateModuleInit(_srcs MODULE_NAME ${_test_driver})
+usFunctionGenerateModuleInit(_srcs)
 
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs} ${_test_driver}_resources.cpp)
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)

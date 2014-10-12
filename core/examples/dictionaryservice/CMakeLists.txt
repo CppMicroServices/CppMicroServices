@@ -8,7 +8,7 @@ set(_srcs
 )
 
 # Generate module initialization code
-usFunctionGenerateModuleInit(_srcs MODULE_NAME ${_lib_name})
+usFunctionGenerateModuleInit(_srcs)
 
 # Create the library
 add_library(Example-${_lib_name} ${_srcs})

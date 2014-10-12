@@ -626,8 +626,8 @@ int main(int argc, char** argv)
     US_STRCPY(archiveName + moduleNameLength + 1, (sizeof archiveName) - (moduleNameLength + 1), fileName);
 
     // add the current file to the new archive
-    if (errCode = us_zip_writer_add_file(&writeArchive, archiveName, fileName, NULL, 0, compressionLevel,
-                                         &archivedNames, &archivedDirs))
+    if ((errCode = us_zip_writer_add_file(&writeArchive, archiveName, fileName, NULL, 0, compressionLevel,
+                                         &archivedNames, &archivedDirs)))
     {
       dbg_print("Adding %s failed\n", archiveName);
       exit_printf(&writeArchive, &readArchive, us_error_msg[errCode], archiveName, fileName);

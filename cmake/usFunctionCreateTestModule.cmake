@@ -21,7 +21,9 @@ macro(_us_create_test_module_helper)
                            ZIP_ARCHIVES ${US_TEST_LINK_LIBRARIES})
   endif()
 
-  set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
+  if(NOT US_TEST_SKIP_MODULE_LIST)
+    set(_us_test_module_libs "${_us_test_module_libs};${name}" CACHE INTERNAL "" FORCE)
+  endif()
 
 endmacro()
 
@@ -33,7 +35,7 @@ function(usFunctionCreateTestModule name)
 endfunction()
 
 function(usFunctionCreateTestModuleWithResources name)
-  cmake_parse_arguments(US_TEST "" "RESOURCES_ROOT" "SOURCES;RESOURCES;LINK_LIBRARIES" "" ${ARGN})
+  cmake_parse_arguments(US_TEST "SKIP_MODULE_LIST" "RESOURCES_ROOT" "SOURCES;RESOURCES;LINK_LIBRARIES" "" ${ARGN})
   set(_srcs ${US_TEST_SOURCES} ${name}_resources.cpp)
   set(_res_files ${US_TEST_RESOURCES})
   if(US_TEST_RESOURCES_ROOT)

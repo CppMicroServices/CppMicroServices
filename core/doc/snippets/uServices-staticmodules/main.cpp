@@ -9,8 +9,8 @@ US_USE_NAMESPACE
 // This is just for illustration purposes in code snippets
 extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule1() { return 0; }
 extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule2() { return 0; }
-void _us_import_module_initializer_MyStaticModule1() {}
-void _us_import_module_initializer_MyStaticModule2() {}
+extern "C" void _us_import_module_initializer_MyStaticModule1() {}
+extern "C" void _us_import_module_initializer_MyStaticModule2() {}
 
 //! [ImportStaticModuleIntoMain]
 #include <usModuleImport.h>

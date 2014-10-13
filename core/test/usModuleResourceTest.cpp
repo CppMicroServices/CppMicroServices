@@ -290,11 +290,12 @@ void testResourceTree(Module* module)
 
   std::vector<std::string> children = res.GetChildren();
   std::sort(children.begin(), children.end());
-  US_TEST_CONDITION_REQUIRED(children.size() == 4, "Check child count")
+  US_TEST_CONDITION_REQUIRED(children.size() == 5, "Check child count")
   US_TEST_CONDITION(children[0] == "foo.txt", "Check child name")
-  US_TEST_CONDITION(children[1] == "icons/", "Check child name")
-  US_TEST_CONDITION(children[2] == "special_chars.dummy.txt", "Check child name")
-  US_TEST_CONDITION(children[3] == "test.xml", "Check child name")
+  US_TEST_CONDITION(children[1] == "foo2.txt", "Check child name")
+  US_TEST_CONDITION(children[2] == "icons/", "Check child name")
+  US_TEST_CONDITION(children[3] == "special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(children[4] == "test.xml", "Check child name")
 
   US_TEST_CONDITION(module->FindResources("!$noexist=?", std::string(), "true").empty(), "Check not existant path");
 
@@ -317,22 +318,24 @@ void testResourceTree(Module* module)
   // find all .txt files
   std::vector<ModuleResource> nodes = module->FindResources("", "*.txt", false);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
-  US_TEST_CONDITION_REQUIRED(nodes.size() == 2, "Found child count")
+  US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
   US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo2.txt", "Check child name")
+  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
 
   nodes = module->FindResources("", "*.txt", true);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
-  US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
+  US_TEST_CONDITION_REQUIRED(nodes.size() == 4, "Found child count")
   US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/icons/readme.txt", "Check child name")
-  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo2.txt", "Check child name")
+  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/icons/readme.txt", "Check child name")
+  US_TEST_CONDITION(nodes[3].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 7, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 8, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 7, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 8, "Total resource number")
 
 
   // test pattern matching
@@ -342,7 +345,7 @@ void testResourceTree(Module* module)
 
   nodes.clear();
   nodes = module->FindResources("", "*.txt", true);
-  US_TEST_CONDITION(nodes.size() == 3, "Check recursive pattern matches")
+  US_TEST_CONDITION(nodes.size() == 4, "Check recursive pattern matches")
 }
 
 void testResourceOperators(Module* module)

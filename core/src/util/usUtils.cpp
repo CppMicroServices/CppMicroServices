@@ -302,7 +302,7 @@ void message_output(MsgType msgType, const char *buf)
 #include <cxxabi.h>
 #endif
 
-US_Core_EXPORT ::std::string GetDemangledName(const std::type_info& typeInfo)
+US_Core_EXPORT ::std::string GetDemangledName(const ::std::type_info& typeInfo)
 {
   ::std::string result;
 #ifdef US_HAVE_CXXABI_H

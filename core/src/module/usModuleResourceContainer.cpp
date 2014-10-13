@@ -161,6 +161,11 @@ void ModuleResourceContainer::GetChildren(const std::string& resourcePath, bool 
 
   ModuleResourceContainerPrivate::SetType::const_iterator iter =
       d->m_SortedEntries.find(std::make_pair(resourcePath, 0));
+  if (iter == d->m_SortedEntries.end())
+  {
+    return;
+  }
+
   for (++iter; iter != d->m_SortedEntries.end(); ++iter)
   {
     if (resourcePath.size() > iter->first.size()) break;

@@ -296,6 +296,8 @@ void testResourceTree(Module* module)
   US_TEST_CONDITION(children[2] == "special_chars.dummy.txt", "Check child name")
   US_TEST_CONDITION(children[3] == "test.xml", "Check child name")
 
+  US_TEST_CONDITION(module->FindResources("!$noexist=?", std::string(), "true").empty(), "Check not existant path");
+
 
   ModuleResource readme = module->GetResource("/icons/readme.txt");
   US_TEST_CONDITION(readme.IsFile() && readme.GetChildren().empty(), "Check file resource")

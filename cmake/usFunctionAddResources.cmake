@@ -124,6 +124,17 @@ function(usFunctionAddResources)
     endforeach()
   endif()
 
+  if(NOT US_RESOURCE_FILES AND NOT _zip_args)
+    return()
+  endif()
+
+  if(US_RESOURCE_FILES)
+    set(_file_args -a ${US_RESOURCE_FILES})
+  endif()
+  if(_zip_args)
+    set(_zip_args -m ${_zip_args})
+  endif()
+
   # This command depends on the given resource files and creates a source
   # file which must be added to the source list of the related target.
   # This way, the following command is executed if the resources change
@@ -140,7 +151,7 @@ function(usFunctionAddResources)
   add_custom_command(
     TARGET ${US_RESOURCE_TARGET}
     POST_BUILD
-    COMMAND ${resource_compiler} ${cmd_line_args} $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} -a ${US_RESOURCE_FILES} -m ${_zip_args}
+    COMMAND ${resource_compiler} ${cmd_line_args} $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} ${_file_args} ${_zip_args}
     WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
     COMMENT "Adding resources to ${US_RESOURCE_TARGET}"
     VERBATIM

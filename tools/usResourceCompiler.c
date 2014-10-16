@@ -542,18 +542,6 @@ int main(int argc, char** argv)
   memset(&writeArchive, 0, sizeof(writeArchive));
   memset(&readArchive, 0, sizeof(readArchive));
 
-  // Try to open the module file for appending a new zip archive later
-  dbg_print("Try open module file '%s' as r+b... ", moduleFile);
-  if (NULL == (moduleFileStream = US_FOPEN(moduleFile, "r+b")))
-  {
-    dbg_print("failure\n");
-    exit_perror(&writeArchive, &readArchive, "fopen");
-  }
-  else
-  {
-    dbg_print("success\n");
-  }
-
   dbg_print("Check for valid module zip archive... ");
 
   memset(&archivedNames, 0, sizeof archivedNames);
@@ -626,8 +614,8 @@ int main(int argc, char** argv)
     US_STRCPY(archiveName + moduleNameLength + 1, (sizeof archiveName) - (moduleNameLength + 1), fileName);
 
     // add the current file to the new archive
-    if (errCode = us_zip_writer_add_file(&writeArchive, archiveName, fileName, NULL, 0, compressionLevel,
-                                         &archivedNames, &archivedDirs))
+    if ((errCode = us_zip_writer_add_file(&writeArchive, archiveName, fileName, NULL, 0, compressionLevel,
+                                         &archivedNames, &archivedDirs)))
     {
       dbg_print("Adding %s failed\n", archiveName);
       exit_printf(&writeArchive, &readArchive, us_error_msg[errCode], archiveName, fileName);
@@ -720,12 +708,27 @@ int main(int argc, char** argv)
 
   dbg_print("Finalized tmp zip archive\n");
 
+  // Close the module file
+  mz_zip_reader_end(&readArchive);
+
   // ---------------------------------------------------------------------------------
   //      APPEND NEW ARCHIVE TO MODULE
   // ---------------------------------------------------------------------------------
 
   if (archivedNames.size > 0)
   {
+    // Open the module file for appending the temporary zip archive
+    dbg_print("Opening module file '%s' as r+b... ", moduleFile);
+    if (NULL == (moduleFileStream = US_FOPEN(moduleFile, "r+b")))
+    {
+      dbg_print("failure\n");
+      exit_perror(&writeArchive, &readArchive, "fopen");
+    }
+    else
+    {
+      dbg_print("success\n");
+    }
+
     // Append the temporary zip archive to the module
     if (numOldEntries > 0)
     {
@@ -734,6 +737,16 @@ int main(int argc, char** argv)
       {
         exit_perror(&writeArchive, &readArchive, "ftruncate");
       }
+
+#ifdef DEBUG_TRACE
+      {
+        long currPos = ftell(moduleFileStream);
+        fseek(moduleFileStream, 0, SEEK_END);
+        dbg_print("Truncated module file size: %ld bytes\n", ftell(moduleFileStream));
+        fseek(moduleFileStream, currPos, SEEK_SET);
+      }
+#endif
+
     }
 
     if (fseek(tmp_archive_file, 0, SEEK_SET) == -1)
@@ -760,6 +773,16 @@ int main(int argc, char** argv)
         exit_printf(&writeArchive, &readArchive, "Appending resources failed\n");
       }
     } while (numRead != 0);
+
+#ifdef DEBUG_TRACE
+    {
+      long currPos = ftell(moduleFileStream);
+      fseek(moduleFileStream, 0, SEEK_END);
+      dbg_print("New module file size: %ld bytes\n", ftell(moduleFileStream));
+      fseek(moduleFileStream, currPos, SEEK_SET);
+    }
+#endif
+
   }
 
 
@@ -777,7 +800,10 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  fclose(moduleFileStream);
-  dbg_print("Successfully added resources\n");
+  if (moduleFileStream)
+  {
+    fclose(moduleFileStream);
+    dbg_print("Successfully added resources\n");
+  }
   return EXIT_SUCCESS;
 }

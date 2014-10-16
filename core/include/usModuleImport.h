@@ -50,7 +50,7 @@ US_END_NAMESPACE
  * \sa \ref MicroServices_StaticModules
  */
 #define US_INITIALIZE_STATIC_MODULE(_module_name)                          \
-  extern void _us_import_module_initializer_ ## _module_name();            \
+  extern "C" void _us_import_module_initializer_ ## _module_name();        \
   struct StaticModuleInitializer_ ## _module_name                          \
   {                                                                        \
     StaticModuleInitializer_ ## _module_name()                             \

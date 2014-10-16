@@ -118,7 +118,17 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
     for (std::vector<ServiceRegistrationBase>::reverse_iterator iter = eventHooks.rbegin(),
          iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
     {
-      ServiceReference<ModuleEventHook> sr = iter->GetReference();
+      ServiceReference<ModuleEventHook> sr;
+      try
+      {
+        sr = iter->GetReference();
+      }
+      catch (const std::logic_error& e)
+      {
+        US_WARN << "Failed to get event hook service reference: " << e.what();
+        continue;
+      }
+
       ModuleEventHook* eh = reinterpret_cast<ModuleEventHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
       if (eh != NULL)
       {

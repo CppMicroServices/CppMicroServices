@@ -800,7 +800,10 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  fclose(moduleFileStream);
-  dbg_print("Successfully added resources\n");
+  if (moduleFileStream)
+  {
+    fclose(moduleFileStream);
+    dbg_print("Successfully added resources\n");
+  }
   return EXIT_SUCCESS;
 }

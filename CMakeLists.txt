@@ -28,6 +28,9 @@ include(CMakeParseArguments)
 include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
 include(usFunctionAddResources)
+include(usFunctionEmbedResources)
+include(usFunctionGetResourceSource)
+include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
 include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
@@ -145,6 +148,7 @@ us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
 set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
+set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/us_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 
 #-----------------------------------------------------------------------------
@@ -245,6 +249,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
     endif()
   endforeach()
 endif()
+
+usFunctionCheckResourceLinking()
 
 #-----------------------------------------------------------------------------
 # US Header Checks
@@ -404,6 +410,10 @@ set(_install_cmake_scripts
   ${US_CMAKE_DIR}/FindPackageMessage.cmake
   ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
   ${US_CMAKE_DIR}/usFunctionAddResources.cmake
+  ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
+  ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
+  ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
+  ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
   )
 
 install(FILES ${_install_cmake_scripts}

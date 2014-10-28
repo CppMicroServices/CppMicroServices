@@ -35,6 +35,12 @@
 
 #include <set>
 
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
+
 US_USE_NAMESPACE
 
 namespace {
@@ -394,6 +400,32 @@ void testResourceFromExecutable(Module* module)
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
 
+void testResourcesFrom(const std::string& moduleName)
+{
+#ifdef US_BUILD_SHARED_LIBS
+  SharedLibrary libR(LIB_PATH, moduleName);
+  try
+  {
+    libR.Load();
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+  }
+#endif
+
+  Module* moduleR = ModuleRegistry::GetModule(moduleName);
+  US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module")
+
+  US_TEST_CONDITION(moduleR->GetName() == moduleName, "Test module name")
+
+  US_TEST_CONDITION(moduleR->FindResources("", "*.txt", true).size() == 2, "Resource count")
+
+#ifdef US_BUILD_SHARED_LIBS
+  libR.Unload();
+#endif
+}
+
 } // end unnamed namespace
 
 
@@ -405,14 +437,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   assert(mc);
 
 #ifdef US_BUILD_SHARED_LIBS
-
-#ifdef US_PLATFORM_WINDOWS
-  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#else
-  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#endif
   SharedLibrary libR(LIB_PATH, "TestModuleR");
-
   try
   {
     libR.Load();
@@ -450,6 +475,9 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   libR.Unload();
   US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
 #endif
+
+  testResourcesFrom("TestModuleRL");
+  testResourcesFrom("TestModuleRA");
 
   US_TEST_END()
 }

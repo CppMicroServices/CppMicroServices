@@ -81,7 +81,7 @@ if(NOT ${PROJECT_NAME}_SKIP_INIT)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
-  list(APPEND ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_TARGET}_resources.cpp)
+  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
 endif()
 
 # Create the module library
@@ -128,6 +128,7 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
                          FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
                         )
 endif()
+usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
 
 #-----------------------------------------------------------------------------
 # Install support

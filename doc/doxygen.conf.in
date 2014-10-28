@@ -736,7 +736,9 @@ WARN_LOGFILE           =
 
 INPUT                  = "@PROJECT_SOURCE_DIR@" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionAddResources.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGetResourceSource.cmake" \
                          "@PROJECT_BINARY_DIR@/include/usGlobalConfig.h" \
                          "@PROJECT_BINARY_DIR@/core/include"
 

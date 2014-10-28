@@ -61,7 +61,8 @@ create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_ex
 # Generate a custom "module init" file for the test driver executable
 usFunctionGenerateModuleInit(_srcs)
 
-add_executable(${_test_driver} ${_srcs} ${_additional_srcs} ${_test_driver}_resources.cpp)
+usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
+add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)
@@ -76,9 +77,9 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Add resources
-usFunctionAddResources(TARGET ${_test_driver}
-                       FILES usTestResource.txt manifest.json
-                       ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
+usFunctionEmbedResources(TARGET ${_test_driver}
+                         FILES usTestResource.txt manifest.json
+                         ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
 
 # Register tests
 foreach(_test ${_tests})

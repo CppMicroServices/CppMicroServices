@@ -413,6 +413,7 @@ set(_install_cmake_scripts
   ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
   ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
   ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
+  ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
   )
 
 install(FILES ${_install_cmake_scripts}

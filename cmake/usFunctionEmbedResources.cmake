@@ -130,9 +130,8 @@ function(usFunctionEmbedResources)
     if(APPLE)
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_COMMAND} -E touch stub.c
-        COMMAND ${CMAKE_CXX_COMPILER} -c stub.c -o stub.o
-        COMMAND ${CMAKE_LINKER} -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
+        COMMAND ${CMAKE_CXX_COMPILER} -c stub.cpp -o stub.o
+        COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"

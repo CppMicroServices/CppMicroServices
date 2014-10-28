@@ -190,10 +190,6 @@
 // functions (such as tdefl_compress_mem_to_heap() and tinfl_decompress_mem_to_heap()) won't work.
 //#define MINIZ_NO_MALLOC
 
-#ifndef MINIZ_NO_STDIO
-  #include <stdio.h>
-#endif
-
 #if defined(__TINYC__) && (defined(__linux) || defined(__linux__))
   // TODO: Work around "error: include file 'sys\utime.h' when compiling with tcc on Linux
   #define MINIZ_NO_TIME
@@ -633,7 +629,6 @@ mz_bool mz_zip_writer_init_heap(mz_zip_archive *pZip, size_t size_to_reserve_at_
 
 #ifndef MINIZ_NO_STDIO
 mz_bool mz_zip_writer_init_file(mz_zip_archive *pZip, const char *pFilename, mz_uint64 size_to_reserve_at_beginning);
-mz_bool mz_zip_writer_init_stream(mz_zip_archive *pZip, FILE* pFile, mz_uint64 size_to_reserve_at_beginning);
 #endif
 
 // Converts a ZIP archive reader object into a writer object, to allow efficient in-place file appends to occur on an existing archive.
@@ -3222,9 +3217,7 @@ static mz_bool mz_zip_reader_read_central_dir(mz_zip_archive *pZip, mz_uint32 fl
 
   pZip->m_central_directory_file_ofs = cdir_ofs;
 
-  pZip->m_archive_file_ofs = pZip->m_archive_size -
-                             (MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_CDIR_OFS_OFS) + cdir_size +
-                              MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE + MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_COMMENT_SIZE_OFS));
+  pZip->m_archive_file_ofs = cdir_ofs - MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_CDIR_OFS_OFS);
   if (pZip->m_archive_file_ofs > pZip->m_archive_size)
     return MZ_FALSE;
 
@@ -4066,23 +4059,15 @@ static size_t mz_zip_file_write_func(void *pOpaque, mz_uint64 file_ofs, const vo
 mz_bool mz_zip_writer_init_file(mz_zip_archive *pZip, const char *pFilename, mz_uint64 size_to_reserve_at_beginning)
 {
   MZ_FILE *pFile;
-  if (NULL == (pFile = MZ_FOPEN(pFilename, "wb")))
-  {
-    return MZ_FALSE;
-  }
-  return mz_zip_writer_init_stream(pZip, pFile, size_to_reserve_at_beginning);
-}
-
-mz_bool mz_zip_writer_init_stream(mz_zip_archive *pZip, FILE *pFile, mz_uint64 size_to_reserve_at_beginning)
-{
-  if (NULL == pFile)
-  {
-    return MZ_FALSE;
-  }
   pZip->m_pWrite = mz_zip_file_write_func;
   pZip->m_pIO_opaque = pZip;
   if (!mz_zip_writer_init(pZip, size_to_reserve_at_beginning))
     return MZ_FALSE;
+  if (NULL == (pFile = MZ_FOPEN(pFilename, "wb")))
+  {
+    mz_zip_writer_end(pZip);
+    return MZ_FALSE;
+  }
   pZip->m_pState->m_pFile = pFile;
   if (size_to_reserve_at_beginning)
   {

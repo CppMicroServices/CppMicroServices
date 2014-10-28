@@ -28,13 +28,16 @@ Embedding Resources in a %Module
 
 Resources are embedded into a module's shared or static library (or into an executable)
 by using the `usResourceCompiler` executable. It will create a ZIP archive of all input
-files and append it to the module file.
+files and can append it to the module file.
 
-If you are using CMake, consider using the provided `#usFunctionAddResources` CMake macro which
+If you are using CMake, consider using the provided `#usFunctionEmbedResources` CMake macro which
 handles the invocation of the `usResourceCompiler` executable and sets up the correct file
 dependencies. Otherwise, you also need to make sure that the set of static modules linked
 into a shared module or executable is also in the input file list of your `usResourceCompiler`
 call for that shared module or executable.
+
+Here is a full example creating a module and embedding resource data:
+\include uServices-resources-cmake/CMakeLists_example.txt
 
 Accessing Resources at Runtime
 ------------------------------

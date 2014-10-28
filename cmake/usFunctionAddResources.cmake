@@ -3,17 +3,12 @@
 #!
 #! This CMake function uses an external command line program to generate a ZIP archive
 #! containing data from external resources such as text files or images or other ZIP
-#! archives. The created archive file is appended as a binary blob to the target file.
+#! archives. The created archive file can be appended or linked into the target file
+#! using the usFunctionEmbedResources macro.
 #!
 #! Each module can call this function to add resources and make them available at
 #! runtime through the Module class. Multiple calls to this function append the
-#! input files to the target file.
-#!
-#! \note To set-up correct file dependencies from your module target to your resource
-#!       files, you have to add a file named \e $<your-target-name>_resources.cpp
-#!       to the source list of the target (or the value provided to the SOURCE_OUTPUT
-#!       parameter). This ensures that changed resource files will automatically be
-#!       re-added to the module.
+#! input files.
 #!
 #! In the case of linking static modules which contain resources to the target module,
 #! adding the static module target name to the ZIP_ARCHIVES list will merge its
@@ -33,12 +28,6 @@
 #!        the \c US_MODULE_NAME pre-processor definition of that target. This parameter
 #!        is optional if a target property with the name US_MODULE_NAME exists, containing
 #!        the required module name.
-#! \param SOURCE_OUTPUT (optional) The name for a generated source which can be included in
-#!        the source list of the TARGET to set-up resource dependencies. If empty, the value
-#!        defautls to ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_resources.cpp. If a relative path
-#!        is given, it will be appended to the current binary directory. Setting this parameter
-#!        to a non-default value for repeated calls of this macro for the same target is
-#!        recommended.
 #! \param COMPRESSION_LEVEL (optional) The zip compression level (0-9). Defaults to the default zip
 #!        level. Level 0 disables compression.
 #! \param WORKING_DIRECTORY (optional) The root path for all resource files listed after the
@@ -51,9 +40,12 @@
 #!        is a valid target name and that target is a static library, its absolute file path is
 #!        used instead.
 #!
+#! \sa usFunctionEmbedResources
+#! \sa \ref MicroServices_Resources
+#!
 function(usFunctionAddResources)
 
-  cmake_parse_arguments(US_RESOURCE "" "TARGET;MODULE_NAME;SOURCE_OUTPUT;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
+  cmake_parse_arguments(US_RESOURCE "" "TARGET;MODULE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
 
   if(NOT US_RESOURCE_TARGET)
     message(SEND_ERROR "TARGET argument not specified.")
@@ -64,12 +56,6 @@ function(usFunctionAddResources)
     if(NOT US_RESOURCE_MODULE_NAME)
       message(SEND_ERROR "Either the MODULE_NAME argument or the US_MODULE_NAME target property is required.")
     endif()
-  endif()
-
-  if(NOT US_RESOURCE_SOURCE_OUTPUT)
-    set(US_RESOURCE_SOURCE_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_TARGET}_resources.cpp")
-  elseif(NOT IS_ABSOLUTE ${US_RESOURCE_SOURCE_OUTPUT})
-    set(US_RESOURCE_SOURCE_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_SOURCE_OUTPUT}")
   endif()
 
   if(NOT US_RESOURCE_FILES AND NOT US_RESOURCE_ZIP_ARCHIVES)
@@ -135,26 +121,34 @@ function(usFunctionAddResources)
     set(_zip_args -m ${_zip_args})
   endif()
 
-  # This command depends on the given resource files and creates a source
-  # file which must be added to the source list of the related target.
-  # This way, the following command is executed if the resources change
-  # and it just touches the created source file to force a (actually unnecessary)
-  # re-linking and hence the execution of POST_BUILD commands.
+  get_target_property(_counter ${US_RESOURCE_TARGET} _us_resource_counter)
+  if((NOT ${_counter} EQUAL 0) AND NOT _counter)
+    set(_counter 0)
+  else()
+    math(EXPR _counter "${_counter} + 1")
+  endif()
+
+  set(_res_zip "${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}/res_${_counter}.zip")
+
   add_custom_command(
-    OUTPUT ${US_RESOURCE_SOURCE_OUTPUT}
-    COMMAND ${CMAKE_COMMAND} -E copy ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} ${US_RESOURCE_SOURCE_OUTPUT}
+    OUTPUT ${_res_zip}
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}"
+    COMMAND ${resource_compiler} ${cmd_line_args} ${_res_zip} ${US_RESOURCE_MODULE_NAME} ${_file_args} ${_zip_args}
+    WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
     DEPENDS ${_cmd_deps} ${resource_compiler}
     COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
     VERBATIM
-   )
+  )
 
-  add_custom_command(
-    TARGET ${US_RESOURCE_TARGET}
-    POST_BUILD
-    COMMAND ${resource_compiler} ${cmd_line_args} $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} ${_file_args} ${_zip_args}
-    WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
-    COMMENT "Adding resources to ${US_RESOURCE_TARGET}"
-    VERBATIM
+  get_target_property(_res_zips ${US_RESOURCE_TARGET} _us_resource_zips)
+  if(NOT _res_zips)
+    set(_res_zips )
+  endif()
+  list(APPEND _res_zips ${_res_zip})
+
+  set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
+    _us_resource_counter "${_counter}"
+    _us_resource_zips "${_res_zips}"
   )
 
 endfunction()

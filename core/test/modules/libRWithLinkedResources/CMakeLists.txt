@@ -1,16 +1,13 @@
 
 set(resource_files
-  icons/compressable.bmp
-  icons/cppmicroservices.png
-  icons/readme.txt
   foo.txt
-  special_chars.dummy.txt
-  test.xml
 )
 
 configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt @COPYONLY)
 
-usFunctionCreateTestModuleWithResources(TestModuleR
+usFunctionCreateTestModuleWithResources(TestModuleRL
   RESOURCES ${resource_files}
   BINARY_RESOURCES foo2.txt
+  LINK_RESOURCES
 )
+

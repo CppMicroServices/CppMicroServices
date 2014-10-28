@@ -22,6 +22,11 @@ The following conventions and limitations apply:
  * Resource entries are stored with case-insensitive names. On case-sensitive file systemes,
    adding resources with the same name but different capitalization will lead to an error.
  * Looking up resources by name at runtime *is* case sensitive.
+ * The CppMicroServices library will search for a valid zip file inside a shared library,
+   starting from the end of the file. If other zip files are embedded in the module as
+   well (e.g. as an additional resource embedded via the Windows RC compiler or using
+   other techniques), it will stop at the first valid zip file and use it a the resource
+   container.
 
 Embedding Resources in a %Module
 --------------------------------

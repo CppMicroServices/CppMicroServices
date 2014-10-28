@@ -4,7 +4,7 @@ set(srcs mymodule.cpp)
 usFunctionGenerateModuleInit(srcs)
 usFunctionGetResourceSource(TARGET mymodule OUT srcs)
 
-add_library(mymodule SHARED ${srcs})
+add_library(mymodule ${srcs})
 target_link_libraries(mymodule CppMicroServices)
 
 set_property(TARGET mymodule APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${module_name})

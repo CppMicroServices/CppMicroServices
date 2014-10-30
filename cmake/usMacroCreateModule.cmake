@@ -134,13 +134,15 @@ usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
 # Install support
 #-----------------------------------------------------------------------------
 
-install(TARGETS ${${PROJECT_NAME}_TARGET}
-        EXPORT us${PROJECT_NAME}Targets
-        RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+if(NOT US_NO_INSTALL)
+  install(TARGETS ${${PROJECT_NAME}_TARGET}
+          EXPORT us${PROJECT_NAME}Targets
+          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+endif()
 
 #-----------------------------------------------------------------------------
 # US testing
@@ -163,11 +165,20 @@ endif()
 # Last configuration and install steps
 #-----------------------------------------------------------------------------
 
+# Version information
+configure_file(
+  ${US_CMAKE_DIR}/usModuleConfigVersion.cmake.in
+  ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
 export(TARGETS ${${PROJECT_NAME}_TARGET} ${US_LIBRARIES}
        FILE ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}Targets.cmake)
-install(EXPORT us${PROJECT_NAME}Targets
-        FILE us${PROJECT_NAME}Targets.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+if(NOT US_NO_INSTALL)
+  install(EXPORT us${PROJECT_NAME}Targets
+          FILE us${PROJECT_NAME}Targets.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+endif()
 
 # Configure config file for the build tree
 
@@ -184,29 +195,24 @@ configure_file(
 
 # Configure config file for the install tree
 
-set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
-set(CONFIG_RUNTIME_LIBRARY_DIR ${RUNTIME_INSTALL_DIR})
+if(NOT US_NO_INSTALL)
+  set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
+  set(CONFIG_RUNTIME_LIBRARY_DIR ${RUNTIME_INSTALL_DIR})
 
-configure_package_config_file(
-  ${US_CMAKE_DIR}/usModuleConfig.cmake.in
-  ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
-  INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-  PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_LIBRARY_DIR
-  NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-  )
+  configure_package_config_file(
+    ${US_CMAKE_DIR}/usModuleConfig.cmake.in
+    ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+    PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_LIBRARY_DIR
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
 
-# Version information
-configure_file(
-  ${US_CMAKE_DIR}/usModuleConfigVersion.cmake.in
-  ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
-  @ONLY
-  )
-
-install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
-              ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-        ${US_SDK_INSTALL_COMPONENT})
+  install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
+                ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+          ${US_SDK_INSTALL_COMPONENT})
+endif()
 
 #-----------------------------------------------------------------------------
 # Build the examples

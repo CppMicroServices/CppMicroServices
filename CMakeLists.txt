@@ -395,46 +395,6 @@ add_subdirectory(doc)
 # Last configuration and install steps
 #-----------------------------------------------------------------------------
 
-
-export(TARGETS ${US_RCC_EXECUTABLE_NAME}
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
-install(EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
-
-set(_install_cmake_scripts
-  ${US_MODULE_INIT_TEMPLATE}
-  ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-  ${US_CMAKE_DIR}/CMakeParseArguments.cmake
-  ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
-  ${US_CMAKE_DIR}/FindPackageMessage.cmake
-  ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
-  ${US_CMAKE_DIR}/usFunctionAddResources.cmake
-  ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
-  ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
-  ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
-  ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
-  )
-
-install(FILES ${_install_cmake_scripts}
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
-
-install(FILES ${us_global_config_h_file}
-        DESTINATION ${HEADER_INSTALL_DIR})
-
-# Configure CppMicroServicesConfig.cmake for the install tree
-set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
-set(CONFIG_RUNTIME_DIR ${RUNTIME_INSTALL_DIR})
-set(CONFIG_CMAKE_DIR ${AUXILIARY_CMAKE_INSTALL_DIR})
-configure_package_config_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-  ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-  INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-  PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_DIR CONFIG_CMAKE_DIR
-  NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-  )
-
 # Version information
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
@@ -442,8 +402,52 @@ configure_file(
   @ONLY
   )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-        ${US_SDK_INSTALL_COMPONENT}
-  )
+export(TARGETS ${US_RCC_EXECUTABLE_NAME}
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
+if(NOT US_NO_INSTALL)
+
+  install(EXPORT ${PROJECT_NAME}Targets
+          FILE ${PROJECT_NAME}Targets.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+
+  set(_install_cmake_scripts
+    ${US_MODULE_INIT_TEMPLATE}
+    ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
+    ${US_CMAKE_DIR}/CMakeParseArguments.cmake
+    ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
+    ${US_CMAKE_DIR}/FindPackageMessage.cmake
+    ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
+    ${US_CMAKE_DIR}/usFunctionAddResources.cmake
+    ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
+    ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
+    ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
+    ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
+    )
+
+  install(FILES ${_install_cmake_scripts}
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+
+  install(FILES ${us_global_config_h_file}
+          DESTINATION ${HEADER_INSTALL_DIR})
+
+  # Configure CppMicroServicesConfig.cmake for the install tree
+  set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
+  set(CONFIG_RUNTIME_DIR ${RUNTIME_INSTALL_DIR})
+  set(CONFIG_CMAKE_DIR ${AUXILIARY_CMAKE_INSTALL_DIR})
+  configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+    ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+    PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_DIR CONFIG_CMAKE_DIR
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
+
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+          ${US_SDK_INSTALL_COMPONENT}
+    )
+
+endif()

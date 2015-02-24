@@ -13,6 +13,34 @@ env:
   - BUILD_CONFIGURATION=6
   - BUILD_CONFIGURATION=7
 
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  # g++
+  - if [ "$CXX" = "g++" ]; then
+      sudo apt-get install -qq g++-4.8;
+      export CXX="g++-4.8" CC="gcc-4.8";
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90;
+    fi
+  # clang
+  - if [ "$CXX" = "clang++" ]; then
+      sudo apt-get install -qq clang;
+      export CXX="clang++" CC="clang";
+      sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 90;
+      sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 90;
+    fi
+
+# Install biicode
+install:
+  - wget -O bii-ubuntu64.deb http://www.biicode.com/downloads/latest/ubuntu64
+  - "(sudo dpkg -i bii-ubuntu64.deb) && sudo apt-get -f install"
+  - rm bii-ubuntu64.deb
+  - wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz
+  - tar -xzf cmake-3.0.2-Linux-64.tar.gz
+  - sudo cp -fR cmake-3.0.2-Linux-64/* /usr
+  - rm -rf cmake-3.0.2-Linux-64
+  - rm cmake-3.0.2-Linux-64.tar.gz
+
 branches:
   only:
     - master
@@ -21,4 +49,11 @@ branches:
 
 script:
   - ctest -VV -S ./cmake/usCTestScript_travis.cmake
-
+  - bii init bii-us
+  - mkdir -p ./bii-us/blocks/azriel/cppmicroservices
+  - mv !(bii-us) ./bii-us/blocks/azriel/cppmicroservices
+  - cd bii-us
+  - bii find -um
+  - bii cpp:build
+  - cd build
+  - make test

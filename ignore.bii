@@ -1,0 +1,35 @@
+# Ignore examples and documentation - they are not required to use the library
+core/examples/**
+core/doc/**
+doc/**
+
+# Ignore cmake generated files and artifacts
+cmake_install.cmake
+CMakeCache.txt
+CppMicroServicesConfig.cmake
+CppMicroServicesConfigVersion.cmake
+CppMicroServicesTargets.cmake
+Makefile
+usCoreConfig.cmake
+usCoreConfigVersion.cmake
+usCoreTargets.cmake
+
+bin/**
+
+CMakeFiles/**
+
+core/cmake_install.cmake
+core/CMakeFiles/**
+core/include/usCoreConfig.h
+core/include/usCoreExport.h
+core/Makefile
+core/resources/manifest.json
+core/us_CppMicroServices/**
+
+include/**
+
+lib/**
+
+tools/cmake_install.cmake
+tools/CMakeFiles/**
+tools/Makefile

@@ -9,6 +9,17 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(VERSION 2.8)
 cmake_policy(SET CMP0017 NEW)
 
+if(BIICODE)
+  INIT_BIICODE_BLOCK()
+
+  # Build tests if this block is open (not retrieved as a dependency)
+  if (BII_BLOCK_PREFIX MATCHES "^blocks$")
+    set(US_BUILD_TESTING ON)
+  else()
+    set(US_BUILD_TESTING OFF)
+  endif()
+endif()
+
 #-----------------------------------------------------------------------------
 # Update CMake module path
 #------------------------------------------------------------------------------
@@ -389,7 +400,9 @@ add_subdirectory(core)
 # Documentation
 #-----------------------------------------------------------------------------
 
-add_subdirectory(doc)
+if(NOT BIICODE)
+  add_subdirectory(doc)
+endif()
 
 #-----------------------------------------------------------------------------
 # Last configuration and install steps
@@ -449,5 +462,61 @@ if(NOT US_NO_INSTALL)
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
           ${US_SDK_INSTALL_COMPONENT}
     )
+
+endif()
+
+#-----------------------------------------------------------------------------
+# If using Biicode, generate the core module initialization code and resources
+#-----------------------------------------------------------------------------
+if(BIICODE)
+
+  # 'include' directories required on the build path
+  set(BII_LIB_INCLUDE_DIRS
+      ${US_INCLUDE_DIRS} # generated usGlobalConfig.h file
+      "${PROJECT_SOURCE_DIR}/core/include"
+      "${PROJECT_BINARY_DIR}/core/include" # usCoreConfig.h and usCoreExport.h
+      "${PROJECT_SOURCE_DIR}/core/src/module"
+      "${PROJECT_SOURCE_DIR}/core/src/service"
+      "${PROJECT_SOURCE_DIR}/core/src/util"
+      )
+
+  # Specify the sources to be included in the library
+  set(BII_LIB_SRC )
+  set(BII_LIB_INCLUDE_PATHS ${BII_LIB_INCLUDE_PATHS} ${BII_LIB_INCLUDE_DIRS})
+
+  # Test sources and dependencies
+  if(US_BUILD_TESTING )
+    set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp
+                                               ${PROJECT_BINARY_DIR}/core/test/usCoreTestDriver.cpp)
+    set(BII_core_test_usBiiTestPlaceholder_DEPS ${BII_core_test_usBiiTestPlaceholder_DEPS} usCoreTestDriver)
+    set(BII_core_test_usBiiTestPlaceholder_INCLUDE_PATHS ${BII_LIB_INCLUDE_DIRS})
+
+    # The module init for the test target is not inherited from the test driver otherwise it does not get a module context, so we have to
+    # generate it again
+    usFunctionGenerateModuleInit(BII_core_test_usBiiTestPlaceholder_SRC)
+    usFunctionGetResourceSource(TARGET ${BII_BLOCK_USER}_${BII_BLOCK_NAME}_core_test_usBiiTestPlaceholder
+                                OUT BII_core_test_usBiiTestPlaceholder_SRC)
+  else()
+    set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp)
+  endif()
+
+  ADD_BIICODE_TARGETS()
+
+  target_link_libraries(${BII_LIB_TARGET} INTERFACE CppMicroServices)
+
+  if(US_BUILD_TESTING)
+    # Need to declare the US_MODULE_NAME definition for the test application
+    target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PUBLIC US_MODULE_NAME=main)
+    set_property(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET} PROPERTY US_MODULE_NAME main)
+
+    # Add test resources
+    usFunctionEmbedResources(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET}
+                             FILES usTestResource.txt manifest.json
+                             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/core/test/
+                             ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
+  else()
+    # biicode still adds the placeholder source file as a target in dependencies. This prevents it from failing.
+    target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PRIVATE BII_TEST_PLACEHOLDER_MAIN=1)
+  endif()
 
 endif()

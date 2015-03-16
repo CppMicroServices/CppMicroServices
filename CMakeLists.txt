@@ -10,13 +10,11 @@ cmake_policy(VERSION 2.8)
 cmake_policy(SET CMP0017 NEW)
 
 if(BIICODE)
-  INIT_BIICODE_BLOCK()
-
-  # Build tests if this block is open (not retrieved as a dependency)
-  if (BII_BLOCK_PREFIX MATCHES "^blocks$")
-    set(US_BUILD_TESTING ON)
-  else()
+  # Only build tests if this block is open (not retrieved as a dependency)
+  if(${BII_IS_DEP})
     set(US_BUILD_TESTING OFF)
+  else()
+    set(US_BUILD_TESTING ON)
   endif()
 endif()
 

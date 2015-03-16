@@ -36,20 +36,9 @@ branches:
     - development
     - /^release-.*$/
 
-before_build:
-  - cmd: bii init %project_name%
-  - cmd: cd %project_name%
-  - cmd: bii new %block_user%/%block_name%
-    # move the files
-  - cmd: for %%i in (../*) do if %%i NEQ "%project_name%" move "..\%%i" blocks\%block_user%\%block_name%\
-    # move the directories
-  - cmd: for /d %%i in (../*) do if %%i NEQ "%project_name%" move "..\%%i" blocks\%block_user%\%block_name%\
-  - cmd: bii find -um
-  - cmd: bii cpp:configure -G "Visual Studio 12 2013"
-
 build_script:
-  - cmd: bii cpp:build
+  - cmd: bii buzz -G "Visual Studio 12 2013"
 
 test_script:
-  - cmd: cd build
+  - cmd: cd bii\build
   - cmd: msbuild RUN_TESTS.vcxproj

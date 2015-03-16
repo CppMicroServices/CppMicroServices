@@ -49,11 +49,5 @@ branches:
 
 script:
   - ctest -VV -S ./cmake/usCTestScript_travis.cmake
-  - bii init bii-us
-  - mkdir -p ./bii-us/blocks/azriel/cppmicroservices
-  - mv !(bii-us) ./bii-us/blocks/azriel/cppmicroservices
-  - cd bii-us
-  - bii find -um
-  - bii cpp:build
-  - cd build
-  - make test
+  - bii buzz
+  - bii build --target test

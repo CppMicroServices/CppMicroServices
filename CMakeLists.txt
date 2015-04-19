@@ -123,7 +123,14 @@ endif()
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
-us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
+
+# When building with Biicode, the default behaviour is to not build shared libraries
+if(BIICODE AND NOT ${BUILD_SHARED_LIBS})
+  # leave "US_BUILD_SHARED_LIBS" undefined
+else()
+  us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
+endif()
+
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 
@@ -487,6 +494,7 @@ if(BIICODE)
     set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp
                                                ${PROJECT_BINARY_DIR}/core/test/usCoreTestDriver.cpp)
     set(BII_core_test_usBiiTestPlaceholder_DEPS ${BII_core_test_usBiiTestPlaceholder_DEPS} usCoreTestDriver)
+    LIST(REMOVE_ITEM BII_core_test_usBiiTestPlaceholder_DEPS azriel_cppmicroservices)
     set(BII_core_test_usBiiTestPlaceholder_INCLUDE_PATHS ${BII_LIB_INCLUDE_DIRS})
 
     # The module init for the test target is not inherited from the test driver otherwise it does not get a module context, so we have to
@@ -498,7 +506,7 @@ if(BIICODE)
     set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp)
   endif()
 
-  ADD_BIICODE_TARGETS()
+  ADD_BII_TARGETS()
 
   target_link_libraries(${BII_LIB_TARGET} INTERFACE CppMicroServices)
 
@@ -506,6 +514,9 @@ if(BIICODE)
     # Need to declare the US_MODULE_NAME definition for the test application
     target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PUBLIC US_MODULE_NAME=main)
     set_property(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET} PROPERTY US_MODULE_NAME main)
+    if (NOT ${BUILD_SHARED_LIBS})
+      target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PRIVATE US_STATIC_MODULE)
+    endif()
 
     # Add test resources
     usFunctionEmbedResources(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET}

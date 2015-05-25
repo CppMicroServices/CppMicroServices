@@ -20,7 +20,3 @@
 =============================================================================*/
 
 // placeholder file to allow tests to be built using biicode
-// biicode still attempts to compile this file as an executable. This prevents it from failing.
-#ifdef BII_TEST_PLACEHOLDER_MAIN
-int main() { return 0; }
-#endif

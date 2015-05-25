@@ -490,7 +490,7 @@ if(BIICODE)
   set(BII_LIB_INCLUDE_PATHS ${BII_LIB_INCLUDE_PATHS} ${BII_LIB_INCLUDE_DIRS})
 
   # Test sources and dependencies
-  if(US_BUILD_TESTING )
+  if(US_BUILD_TESTING AND NOT ${BII_IS_DEP})
     set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp
                                                ${PROJECT_BINARY_DIR}/core/test/usCoreTestDriver.cpp)
     set(BII_core_test_usBiiTestPlaceholder_DEPS ${BII_core_test_usBiiTestPlaceholder_DEPS} usCoreTestDriver)
@@ -503,14 +503,14 @@ if(BIICODE)
     usFunctionGetResourceSource(TARGET ${BII_BLOCK_USER}_${BII_BLOCK_NAME}_core_test_usBiiTestPlaceholder
                                 OUT BII_core_test_usBiiTestPlaceholder_SRC)
   else()
-    set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp)
+    LIST(REMOVE_ITEM BII_BLOCK_EXES core_test_usBiiTestPlaceholder)
   endif()
 
   ADD_BII_TARGETS()
 
   target_link_libraries(${BII_LIB_TARGET} INTERFACE CppMicroServices)
 
-  if(US_BUILD_TESTING)
+  if(US_BUILD_TESTING AND NOT ${BII_IS_DEP})
     # Need to declare the US_MODULE_NAME definition for the test application
     target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PUBLIC US_MODULE_NAME=main)
     set_property(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET} PROPERTY US_MODULE_NAME main)
@@ -523,9 +523,6 @@ if(BIICODE)
                              FILES usTestResource.txt manifest.json
                              WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/core/test/
                              ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
-  else()
-    # biicode still adds the placeholder source file as a target in dependencies. This prevents it from failing.
-    target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PRIVATE BII_TEST_PLACEHOLDER_MAIN=1)
   endif()
 
 endif()

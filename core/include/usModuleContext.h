@@ -117,7 +117,7 @@ public:
   Module* GetModule(long id) const;
 
   /**
-   * Get the module that with the specified module name.
+   * Get the module with the specified module name.
    *
    * @param name The name of the module to get.
    * @return The requested \c Module or \c NULL.
@@ -825,6 +825,16 @@ public:
    */
   std::string GetDataFile(const std::string& filename) const;
 
+
+  /**
+   * Installs a bundle from the specified location.
+   *
+   * @param location The location identifier of the bundle to install. Typically a URL.
+   * @return The Bundle object of the installed bundle.
+   * @throws BundleException If the installation failed.
+   * @throws IllegalStateException If this BundleContext is no longer valid.
+   */
+  Module* InstallBundle(const std::string& location);
 
 private:
 

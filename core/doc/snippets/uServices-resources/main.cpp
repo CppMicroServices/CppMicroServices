@@ -11,7 +11,7 @@ void resourceExample()
 {
   //! [1]
   // Get this module's Module object
-  Module* module = GetModuleContext()->GetModule();
+  Module* module = GetModuleContext(0)->GetModule();
 
   ModuleResource resource = module->GetResource("config.properties");
   if (resource.IsValid())
@@ -38,11 +38,11 @@ void parseComponentDefinition(std::istream&)
 {
 }
 
-void extenderPattern()
+void extenderPattern(ModuleContext* moduleCtx)
 {
   //! [2]
   // Get all loaded modules
-  std::vector<Module*> modules = ModuleRegistry::GetLoadedModules();
+  std::vector<Module*> modules = moduleCtx->GetModules();
 
   // Check if a module defines a "service-component" property
   // and use its value to retrieve an embedded resource containing
@@ -68,7 +68,7 @@ void extenderPattern()
 int main(int /*argc*/, char* /*argv*/[])
 {
   //! [0]
-  ModuleContext* moduleContext = GetModuleContext();
+  ModuleContext* moduleContext = GetModuleContext(0);
   Module* module = moduleContext->GetModule();
 
   // List all XML files in the config directory
@@ -81,5 +81,3 @@ int main(int /*argc*/, char* /*argv*/[])
   return 0;
 }
 
-#include <usModuleInitialization.h>
-US_INITIALIZE_MODULE

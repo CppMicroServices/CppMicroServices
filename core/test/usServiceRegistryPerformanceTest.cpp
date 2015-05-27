@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include "usTestingMacros.h"
 
 #include <usGetModuleContext.h>
@@ -416,14 +418,21 @@ void ServiceRegistryPerformanceTest::UnregisterServices()
 int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
+  
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
 
-  ServiceRegistryPerformanceTest perfTest(GetModuleContext());
+  ServiceRegistryPerformanceTest perfTest(framework->GetModuleContext());
   perfTest.InitTestCase();
   perfTest.TestAddListeners();
   perfTest.TestRegisterServices();
   perfTest.TestModifyServices();
   perfTest.TestUnregisterServices();
   perfTest.CleanupTestCase();
+
+  delete framework;
 
   US_TEST_END()
 }

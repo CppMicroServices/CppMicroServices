@@ -1,3 +1,4 @@
 {
+  "module.name" : "TestModuleAL2",
   "module.autoload_dir" : "autoload_al2"
 }

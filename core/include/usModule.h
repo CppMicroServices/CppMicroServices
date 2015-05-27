@@ -153,7 +153,8 @@ public:
    */
   static const std::string& PROP_AUTOLOADED_MODULES();
 
-  ~Module();
+  Module();
+  virtual ~Module();
 
   /**
    * Returns this module's current state.
@@ -164,7 +165,7 @@ public:
    * @return <code>true</code> if the module is <code>LOADED</code>
    *         <code>false</code> if it is <code>UNLOADED</code>
    */
-  bool IsLoaded() const;
+  virtual bool IsLoaded() const;
 
   /**
    * Returns this module's {@link ModuleContext}. The returned
@@ -181,7 +182,7 @@ public:
    *         <code>0</code> if this module has no valid
    *         <code>ModuleContext</code>.
    */
-  ModuleContext* GetModuleContext() const;
+  virtual ModuleContext* GetModuleContext() const;
 
   /**
    * Returns this module's unique identifier. This module is assigned a unique
@@ -204,7 +205,7 @@ public:
    *
    * @return The unique identifier of this module.
    */
-  long GetModuleId() const;
+  virtual long GetModuleId() const;
 
   /**
    * Returns this module's location.
@@ -216,7 +217,7 @@ public:
    *
    * @return The string representation of this module's location.
    */
-  std::string GetLocation() const;
+  virtual std::string GetLocation() const;
 
   /**
    * Returns the name of this module as specified by the
@@ -229,7 +230,7 @@ public:
    *
    * @return The name of this module.
    */
-  std::string GetName() const;
+  virtual std::string GetName() const;
 
   /**
    * Returns the version of this module as specified by the
@@ -242,7 +243,7 @@ public:
    *
    * @return The version of this module.
    */
-  ModuleVersion GetVersion() const;
+  virtual ModuleVersion GetVersion() const;
 
   /**
    * Returns the value of the specified property for this module. The
@@ -255,7 +256,7 @@ public:
    * @sa GetPropertyKeys()
    * @sa \ref MicroServices_ModuleProperties
    */
-  Any GetProperty(const std::string& key) const;
+  virtual Any GetProperty(const std::string& key) const;
 
   /**
    * Returns a list of top-level property keys for this module.
@@ -264,7 +265,7 @@ public:
    *
    * @sa \ref MicroServices_ModuleProperties
    */
-  std::vector<std::string> GetPropertyKeys() const;
+  virtual std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns this module's ServiceReference list for all services it
@@ -278,7 +279,7 @@ public:
    * @return A list of ServiceReference objects for services this
    * module has registered.
    */
-  std::vector<ServiceReferenceU> GetRegisteredServices() const;
+  virtual std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
   /**
    * Returns this module's ServiceReference list for all services it is
@@ -293,7 +294,7 @@ public:
    * @return A list of ServiceReference objects for all services this
    * module is using.
    */
-  std::vector<ServiceReferenceU> GetServicesInUse() const;
+  virtual std::vector<ServiceReferenceU> GetServicesInUse() const;
 
   /**
    * Returns the resource at the specified \c path in this module.
@@ -305,7 +306,7 @@ public:
    * be found in this module or the module's state is \c UNLOADED, an invalid
    * ModuleResource object is returned.
    */
-  ModuleResource GetResource(const std::string& path) const;
+  virtual ModuleResource GetResource(const std::string& path) const;
 
   /**
    * Returns resources in this module.
@@ -330,24 +331,61 @@ public:
    * from the specified path.
    * @return A vector of ModuleResource objects for each matching entry.
    */
-  std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
+  virtual std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
+
+  virtual void Start();
+  virtual void Stop();
+
+  /**
+   * Uninstalls this bundle.
+   * 
+   * This method causes the Framework to notify other bundles that this bundle is being uninstalled,
+   * and then puts this bundle into the UNINSTALLED state. The Framework must remove any resources
+   * related to this bundle that it is able to remove.
+   * If this bundle has exported any packages, the Framework must continue to make these packages
+   * available to their importing bundles until the FrameworkWiring.refreshBundles method has been
+   * called or the Framework is relaunched.
+   * The following steps are required to uninstall a bundle:
+   * 1. If this bundle's state is UNINSTALLED then an IllegalStateException is thrown.
+   * 2. If this bundle's state is ACTIVE, STARTING or STOPPING, this bundle is stopped as described
+   * in the Bundle.stop method. If Bundle.stop throws an exception, a Framework event of type
+   * FrameworkEvent.ERROR is fired containing the exception.
+   * 3. This bundle's state is set to UNINSTALLED.
+   * 4. A bundle event of type BundleEvent.UNINSTALLED is fired.
+   * 5. This bundle and any persistent storage area provided for this bundle by the Framework are removed.
+   *
+   * Preconditions
+   * - getState() not in { UNINSTALLED }.
+   *
+   * Postconditions, no exceptions thrown
+   * - getState() in { UNINSTALLED }.
+   * - This bundle has been uninstalled.
+   *
+   * Postconditions, when an exception is thrown
+   * - getState() not in { UNINSTALLED }.
+   * - This Bundle has not been uninstalled.
+   *
+   * @throw BundleException If the uninstall failed. This can occur if another thread is attempting to change
+   * this bundle's state and does not complete in a timely manner. BundleException types thrown by this
+   * method include: BundleException.STATECHANGE_ERROR
+   * @throw IllegalStateException  If this bundle has been uninstalled or this bundle tries to change its own
+   * state.   *
+   */
+  virtual void Uninstall();
 
 private:
 
   friend class CoreModuleActivator;
   friend class ModuleRegistry;
   friend class ServiceReferencePrivate;
+  friend class Framework;
 
   ModulePrivate* d;
-
-  Module();
 
   void Init(CoreModuleContext* coreCtx, ModuleInfo* info);
   void Uninit();
 
-  void Start();
-  void Stop();
-
+protected:
   // purposely not implemented
   Module(const Module &);
   Module& operator=(const Module&);

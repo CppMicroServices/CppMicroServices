@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usModuleFindHook.h>
@@ -37,8 +38,18 @@ namespace {
 
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string DIR_SEP = "\\";
+  static const std::string LIB_PREFIX = "";
+  static const std::string LIB_EXT = ".dll";
 #else
+#if defined US_PLATFORM_APPLE
+  static const std::string LIB_EXT = ".dylib";
+#else
+  static const std::string LIB_EXT = ".so";
+#endif
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const std::string LIB_PREFIX = "lib";
+  static const std::string DIR_SEP = "/";
 #endif
 
 class TestModuleListener
@@ -82,44 +93,43 @@ public:
   {
     if (event.GetType() == ModuleEvent::LOADING || event.GetType() == ModuleEvent::UNLOADING)
     {
-      contexts.erase(std::remove(contexts.begin(), contexts.end(), GetModuleContext()), contexts.end());
+      contexts.clear();//erase(std::remove(contexts.begin(), contexts.end(), GetModuleContext()), contexts.end());
     }
   }
 };
 
-void TestFindHook()
+void TestFindHook(Framework* framework)
 {
-  SharedLibrary libA(LIB_PATH, "TestModuleA");
-
-#ifdef US_BUILD_SHARED_LIBS
   try
   {
-    libA.Load();
+    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
-#endif
 
-  Module* moduleA = GetModuleContext()->GetModule("TestModuleA");
+  Module* moduleA = framework->GetModuleContext()->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
+
+  moduleA->Start();
 
   US_TEST_CONDITION(moduleA->IsLoaded() == true, "Test if loaded correctly");
 
   long moduleAId = moduleA->GetModuleId();
   US_TEST_CONDITION_REQUIRED(moduleAId > 0, "Test for valid module id")
 
-  US_TEST_CONDITION_REQUIRED(GetModuleContext()->GetModule(moduleAId) != NULL, "Test for non-filtered GetModule(long) result")
+  US_TEST_CONDITION_REQUIRED(framework->GetModuleContext()->GetModule(moduleAId) != NULL, "Test for non-filtered GetModule(long) result")
 
   TestModuleFindHook findHook;
-  ServiceRegistration<ModuleFindHook> findHookReg = GetModuleContext()->RegisterService<ModuleFindHook>(&findHook);
+  ServiceRegistration<ModuleFindHook> findHookReg = framework->GetModuleContext()->RegisterService<ModuleFindHook>(&findHook);
 
-  US_TEST_CONDITION_REQUIRED(GetModuleContext()->GetModule(moduleAId) == NULL, "Test for filtered GetModule(long) result")
+  US_TEST_CONDITION_REQUIRED(framework->GetModuleContext()->GetModule(moduleAId) == NULL, "Test for filtered GetModule(long) result")
 
-  std::vector<Module*> modules = GetModuleContext()->GetModules();
+  std::vector<Module*> modules = framework->GetModuleContext()->GetModules();
   for (std::vector<Module*>::iterator i = modules.begin();
        i != modules.end(); ++i)
   {
@@ -131,53 +141,47 @@ void TestFindHook()
 
   findHookReg.Unregister();
 
-  libA.Unload();
+  moduleA->Stop();
 }
 
-#ifdef US_BUILD_SHARED_LIBS
-void TestEventHook()
+void TestEventHook(Framework* framework)
 {
   TestModuleListener moduleListener;
-  GetModuleContext()->AddModuleListener(&moduleListener, &TestModuleListener::ModuleChanged);
+  framework->GetModuleContext()->AddModuleListener(&moduleListener, &TestModuleListener::ModuleChanged);
 
-  SharedLibrary libA(LIB_PATH, "TestModuleA");
   try
   {
-    libA.Load();
+    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
+
+  Module* moduleA = framework->GetModuleContext()->GetModule("TestModuleA");
+  moduleA->Start();
   US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 2, "Test for received load module events")
 
-  libA.Unload();
+  moduleA->Stop();
   US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 4, "Test for received unload module events")
 
   TestModuleEventHook eventHook;
-  ServiceRegistration<ModuleEventHook> eventHookReg = GetModuleContext()->RegisterService<ModuleEventHook>(&eventHook);
+  ServiceRegistration<ModuleEventHook> eventHookReg = framework->GetModuleContext()->RegisterService<ModuleEventHook>(&eventHook);
 
   moduleListener.events.clear();
-  try
-  {
-    libA.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
-  }
-
+  
+  moduleA->Start();
   US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 1, "Test for filtered load module events")
   US_TEST_CONDITION_REQUIRED(moduleListener.events[0].GetType() == ModuleEvent::LOADED, "Test for LOADED event")
 
-  libA.Unload();
+  moduleA->Stop();
   US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 2, "Test for filtered unload module events")
   US_TEST_CONDITION_REQUIRED(moduleListener.events[1].GetType() == ModuleEvent::UNLOADED, "Test for UNLOADED event")
 
   eventHookReg.Unregister();
-  GetModuleContext()->RemoveModuleListener(&moduleListener, &TestModuleListener::ModuleChanged);
+  framework->GetModuleContext()->RemoveModuleListener(&moduleListener, &TestModuleListener::ModuleChanged);
 }
-#endif
 
 } // end unnamed namespace
 
@@ -185,11 +189,15 @@ int usModuleHooksTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ModuleHooksTest");
 
-  TestFindHook();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
 
-#ifdef US_BUILD_SHARED_LIBS
-  TestEventHook();
-#endif
+  TestFindHook(framework);
+  TestEventHook(framework);
+
+  delete framework;
 
   US_TEST_END()
 }

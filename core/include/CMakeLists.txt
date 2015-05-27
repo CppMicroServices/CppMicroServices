@@ -4,6 +4,8 @@
 
 set(_public_headers
   usAny.h
+  usFramework.h
+  usFrameworkFactory.h
   usLDAPProp.h
   usSharedData.h
   usSharedLibrary.h

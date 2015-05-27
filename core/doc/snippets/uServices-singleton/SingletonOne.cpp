@@ -33,7 +33,7 @@ SingletonOne::~SingletonOne()
 SingletonOneService* SingletonOneService::GetInstance()
 {
   static ServiceReference<SingletonOneService> serviceRef;
-  static ModuleContext* context = GetModuleContext();
+  static ModuleContext* context = GetModuleContext(0);
 
   if (!serviceRef)
   {

@@ -22,9 +22,15 @@
 
 #include "usUtils_p.h"
 
+#include "usGetModuleContext.h"
 #include "usLog_p.h"
 #include "usModuleInfo.h"
+#include "usModule.h"
+#include "usModuleContext.h"
 #include "usModuleSettings.h"
+#include "usModuleRegistry.h"
+
+#include "miniz.h"
 
 #include <string>
 #include <cstdio>
@@ -45,10 +51,6 @@
   #include <crtdbg.h>
   #include "dirent_win32.h"
 #endif
-
-//-------------------------------------------------------------------
-// Module auto-loading
-//-------------------------------------------------------------------
 
 namespace {
 #if !defined(US_PLATFORM_LINUX)
@@ -105,7 +107,26 @@ bool load_impl(const std::string&) { return false; }
 
 US_BEGIN_NAMESPACE
 
-std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
+//-------------------------------------------------------------------
+// Bundle name and location parsing
+//-------------------------------------------------------------------
+
+std::string GetBundleNameFromLocation(const std::string& location)
+{
+    return location.substr(location.find_last_of('/') + 1);
+}
+
+std::string GetBundleLocation(const std::string& location)
+{
+    return location.substr(0, location.find_last_of('/'));
+}
+
+//-------------------------------------------------------------------
+// Module auto-loading
+//-------------------------------------------------------------------
+
+
+std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir, CoreModuleContext* coreCtx)
 {
   std::vector<std::string> loadedModules;
 
@@ -168,23 +189,53 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
         libPath += DIR_SEP;
       }
       libPath += entryFileName;
-      US_DEBUG << "Auto-loading module " << libPath;
+      US_DEBUG << "Auto-installing module " << libPath;
 
-      if (!load_impl(libPath))
+      mz_zip_archive zipArchive;
+      memset(&zipArchive, 0, sizeof(mz_zip_archive));
+      if(MZ_FALSE == mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0)) continue;
+
+      // the usResourceCompiler will place resources into sub directories, 
+      // one for each module, named after the module's name. The module's
+      // manifest is stored in a file called manifest.json in the root of
+      // its sub-directory (analogous to OSGi's META-INF/MANIFEST.MF file).
+      // We use this convention to glean the module name and use that to
+      // install the module.
+      mz_uint numFiles = mz_zip_reader_get_num_files(&zipArchive);
+      for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex)
       {
-        US_WARN << "Auto-loading of module " << libPath << " failed.";
+        char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+        mz_zip_reader_get_filename(&zipArchive, fileIndex, fileName, MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE);
+        std::string file(fileName);
+        std::string::size_type pos = file.find("/manifest.json");
+        if(std::string::npos != pos)
+        {
+          std::string moduleName(file.substr(0, pos));
+          std::string location(libPath + "/" + moduleName);
+
+          // location will be in the form:
+          //  <path to module plugin>\<module-name>.<lib-extension>/<module-name>
+          Module* installedModule = GetModuleContext(coreCtx)->InstallBundle(location);
+
+          if (!installedModule)
+          {
+            US_WARN << "Auto-installing of module " << libPath << " failed.";
+          }
+          else
+          {
+            loadedModules.push_back(installedModule->GetName());
+          }
+        }
       }
-      else
-      {
-        loadedModules.push_back(libPath);
-      }
+
+      mz_zip_reader_end(&zipArchive);
     }
     closedir(dir);
   }
   return loadedModules;
 }
 
-std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo)
+std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModuleContext* coreCtx)
 {
   std::vector<std::string> loadedModules;
 
@@ -193,7 +244,7 @@ std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo)
     return loadedModules;
   }
 
-  ModuleSettings::PathList autoLoadPaths = ModuleSettings::GetAutoLoadPaths();
+  ModuleSettings::PathList autoLoadPaths = coreCtx->settings.GetAutoLoadPaths();
 
   std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
   std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
@@ -216,7 +267,7 @@ std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo)
        i != autoLoadPaths.end(); ++i)
   {
     if (i->empty()) continue;
-    std::vector<std::string> paths = AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
+    std::vector<std::string> paths = AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir, coreCtx);
     loadedModules.insert(loadedModules.end(), paths.begin(), paths.end());
   }
   return loadedModules;

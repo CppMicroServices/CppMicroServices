@@ -28,7 +28,7 @@ SingletonTwo::~SingletonTwo()
 SingletonTwoService* SingletonTwoService::GetInstance()
 {
   static ServiceReference<SingletonTwoService> serviceRef;
-  static ModuleContext* context = GetModuleContext();
+  static ModuleContext* context = GetModuleContext(0);
 
   if (!serviceRef)
   {

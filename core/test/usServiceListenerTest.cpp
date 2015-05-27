@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
@@ -34,8 +36,18 @@ US_USE_NAMESPACE
 
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string DIR_SEP = "\\";
+  static const std::string LIB_PREFIX = "";
+  static const std::string LIB_EXT = ".dll";
 #else
+#if defined US_PLATFORM_APPLE
+  static const std::string LIB_EXT = ".dylib";
+#else
+  static const std::string LIB_EXT = ".so";
+#endif
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const std::string LIB_PREFIX = "lib";
+  static const std::string DIR_SEP = "/";
 #endif
 
 class TestServiceListener
@@ -43,7 +55,8 @@ class TestServiceListener
 
 private:
 
-  friend bool runLoadUnloadTest(const std::string&, int cnt, SharedLibrary&,
+  friend bool runLoadUnloadTest(const std::string&, int cnt, Module&,
+                                ModuleContext* mc,
                                 const std::vector<ServiceEvent::Type>&);
 
   const bool checkUsingModules;
@@ -218,12 +231,11 @@ public:
 
 }; // end of class ServiceListener
 
-bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibrary& target,
+bool runLoadUnloadTest(const std::string& name, int cnt, Module& module,
+                       ModuleContext* mc,
                        const std::vector<ServiceEvent::Type>& events)
 {
   bool teststatus = true;
-
-  ModuleContext* mc = GetModuleContext();
 
   for (int i = 0; i < cnt && teststatus; ++i)
   {
@@ -243,7 +255,7 @@ bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibrary& target,
     // Start the test target to get a service published.
     try
     {
-      target.Load();
+      module.Start();
     }
     catch (const std::exception& e)
     {
@@ -255,7 +267,7 @@ bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibrary& target,
     // Stop the test target to get a service unpublished.
     try
     {
-      target.Unload();
+      module.Stop();
     }
     catch (const std::exception& e)
     {
@@ -287,9 +299,9 @@ bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibrary& target,
   return teststatus;
 }
 
-void frameSL02a()
+void frameSL02a(Framework* framework)
 {
-  ModuleContext* mc = GetModuleContext();
+  ModuleContext* mc = framework->GetModuleContext();
 
   TestServiceListener listener1(mc);
   TestServiceListener listener2(mc);
@@ -307,17 +319,15 @@ void frameSL02a()
                         << " : frameSL02a:FAIL" );
   }
 
-  SharedLibrary target(LIB_PATH, "TestModuleA");
-
-  // Start the test target to get a service published.
   try
   {
-    target.Load();
+    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
+    module->Start();
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
-                        << e.what() << " + in frameSL02a:FAIL" );
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL02a:FAIL")
   }
 
   std::vector<ServiceEvent::Type> events;
@@ -328,33 +338,53 @@ void frameSL02a()
 
   mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
   mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
-
-  target.Unload();
 }
 
-void frameSL05a()
+void frameSL05a(Framework* framework)
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  SharedLibrary libA(LIB_PATH, "TestModuleA");
-  bool testStatus = runLoadUnloadTest("FrameSL05a", 1, libA, events);
+  Module* module = 0;
+
+  try
+  {
+    module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL05a:FAIL")
+  }
+
+  bool testStatus = runLoadUnloadTest("FrameSL05a", 1, *module, framework->GetModuleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
 
-void frameSL10a()
+void frameSL10a(Framework* framework)
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  SharedLibrary libA2(LIB_PATH, "TestModuleA2");
-  bool testStatus = runLoadUnloadTest("FrameSL10a", 1, libA2, events);
+  Module* module = 0;
+
+  try
+  {
+    module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA2" + LIB_EXT + "/TestModuleA2");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA2")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL10a:FAIL")
+  }
+
+  bool testStatus = runLoadUnloadTest("FrameSL10a", 1, *module, framework->GetModuleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
 
-void frameSL25a()
+void frameSL25a(Framework* framework)
 {
-  ModuleContext* mc = GetModuleContext();
+  ModuleContext* mc = framework->GetModuleContext();
 
   TestServiceListener sListen(mc, false);
   try
@@ -367,9 +397,38 @@ void frameSL25a()
     throw;
   }
 
-  SharedLibrary libSL1(LIB_PATH, "TestModuleSL1");
-  SharedLibrary libSL3(LIB_PATH, "TestModuleSL3");
-  SharedLibrary libSL4(LIB_PATH, "TestModuleSL4");
+  Module* libSL1;
+  try
+  {
+    libSL1 = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleSL1" + LIB_EXT + "/TestModuleSL1");
+    US_TEST_CONDITION_REQUIRED(libSL1 != NULL, "Test installation of module TestModuleSL1")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL25a:FAIL")
+  }
+
+  Module* libSL3;
+  try
+  {
+    libSL3 = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleSL3" + LIB_EXT + "/TestModuleSL3");
+    US_TEST_CONDITION_REQUIRED(libSL3 != NULL, "Test installation of module TestModuleSL3")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL25a:FAIL")
+  }
+
+  Module* libSL4;
+  try
+  {
+    libSL4 = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleSL4" + LIB_EXT + "/TestModuleSL4");
+    US_TEST_CONDITION_REQUIRED(libSL4 != NULL, "Test installation of module TestModuleSL4")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL25a:FAIL")
+  }
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
@@ -390,8 +449,8 @@ void frameSL25a()
   // Start libModuleTestSL1 to ensure that the Service interface is available.
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL1: " << libSL1.GetFilePath() );
-    libSL1.Load();
+    US_TEST_OUTPUT( << "Starting libModuleTestSL1: " << libSL1->GetLocation() );
+    libSL1->Start();
   }
   catch (const std::exception& e)
   {
@@ -403,8 +462,8 @@ void frameSL25a()
   // us::FooService
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL4: " << libSL4.GetFilePath() );
-    libSL4.Load();
+    US_TEST_OUTPUT( << "Starting libModuleTestSL4: " << libSL4->GetLocation() );
+    libSL4->Start();
   }
   catch (const std::exception& e)
   {
@@ -415,8 +474,8 @@ void frameSL25a()
   // Start libModuleTestSL3 that will require the serivce interface and get the service
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL3: " << libSL3.GetFilePath() );
-    libSL3.Load();
+    US_TEST_OUTPUT( << "Starting libModuleTestSL3: " << libSL3->GetLocation() );
+    libSL3->Start();
   }
   catch (const std::exception& e)
   {
@@ -475,8 +534,8 @@ void frameSL25a()
   // Stop the service provider: libSL4
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL4: " << libSL4.GetFilePath() );
-    libSL4.Unload();
+    US_TEST_OUTPUT( << "Stop libSL4: " << libSL4->GetLocation() );
+    libSL4->Stop();
   }
   catch (const std::exception& e)
   {
@@ -512,8 +571,8 @@ void frameSL25a()
   // Stop libSL1
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL1:" << libSL1.GetFilePath() );
-    libSL1.Unload();
+    US_TEST_OUTPUT( << "Stop libSL1:" << libSL1->GetLocation() );
+    libSL1->Stop();
   }
   catch (const std::exception& e)
   {
@@ -524,8 +583,8 @@ void frameSL25a()
   // Stop pSL3
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL3:" << libSL3.GetFilePath() );
-    libSL3.Unload();
+    US_TEST_OUTPUT( << "Stop libSL3:" << libSL3->GetLocation() );
+    libSL3->Stop();
   }
   catch (const std::exception& e)
   {
@@ -557,10 +616,17 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceListenerTest");
 
-  frameSL02a();
-  frameSL05a();
-  frameSL10a();
-  frameSL25a();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  frameSL02a(framework);
+  frameSL05a(framework);
+  frameSL10a(framework);
+  frameSL25a(framework);
+
+  delete framework;
 
   US_TEST_END()
 }

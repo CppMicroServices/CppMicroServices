@@ -29,6 +29,7 @@
 #endif
 
 #include <usGlobalConfig.h>
+#include <usCoreModuleContext_p.h>
 #include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleUtils_p.h>
@@ -47,9 +48,9 @@ class ModuleContext;
  *
  * \return The ModuleContext of the calling module.
  */
-static inline ModuleContext* GetModuleContext()
+static inline ModuleContext* GetModuleContext(CoreModuleContext* coreCtx)
 {
-  return ModuleRegistry::GetModule(US_STR(US_MODULE_NAME))->GetModuleContext();
+  return coreCtx->bundleRegistry.GetModule(US_STR(US_MODULE_NAME))->GetModuleContext();
 }
 
 US_END_NAMESPACE

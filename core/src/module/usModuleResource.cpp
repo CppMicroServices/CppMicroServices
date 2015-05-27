@@ -274,7 +274,7 @@ void* ModuleResource::GetData() const
   void* data = d->resourceContainer->GetData(d->stat.index);
   if (data == NULL)
   {
-    US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
+    US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from " 
             << d->resourceContainer->GetModuleInfo()->location;
   }
   return data;

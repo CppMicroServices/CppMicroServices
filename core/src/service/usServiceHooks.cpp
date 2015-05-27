@@ -45,7 +45,7 @@ ServiceHooks::~ServiceHooks()
 
 ServiceHooks::TrackedType ServiceHooks::AddingService(const ServiceReferenceType& reference)
 {
-  ServiceListenerHook* lh = GetModuleContext()->GetService(reference);
+  ServiceListenerHook* lh = GetModuleContext(coreCtx)->GetService(reference);
   try
   {
     lh->Added(coreCtx->listeners.GetListenerInfoCollection());
@@ -70,14 +70,14 @@ void ServiceHooks::ModifiedService(const ServiceReferenceType& /*reference*/, Tr
 
 void ServiceHooks::RemovedService(const ServiceReferenceType& reference, TrackedType /*service*/)
 {
-  GetModuleContext()->UngetService(reference);
+  GetModuleContext(coreCtx)->UngetService(reference);
 }
 
 void ServiceHooks::Open()
 {
   US_UNUSED(Lock(this));
 
-  listenerHookTracker = new ServiceTracker<ServiceListenerHook>(GetModuleContext(), this);
+  listenerHookTracker = new ServiceTracker<ServiceListenerHook>(GetModuleContext(coreCtx), this);
   listenerHookTracker->Open();
 
   bOpen = true;
@@ -116,7 +116,7 @@ void ServiceHooks::FilterServiceReferences(ModuleContext* mc, const std::string&
          fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-      ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
+      ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d->GetService(GetModuleContext(coreCtx)->GetModule()));
       if (fh != NULL)
       {
         try
@@ -166,7 +166,7 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
         sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
-      ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
+      ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d->GetService(GetModuleContext(coreCtx)->GetModule()));
       if(elh != NULL)
       {
         try

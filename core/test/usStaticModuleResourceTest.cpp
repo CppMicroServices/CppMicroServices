@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
@@ -60,7 +62,7 @@ void testResourceOperators(Module* module)
   US_TEST_CONDITION_REQUIRED(resources.size() == 1, "Check resource count")
 }
 
-void testResourcesWithStaticImport(Module* module)
+void testResourcesWithStaticImport(Framework* framework, Module* module)
 {
   ModuleResource resource = module->GetResource("res.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid res.txt resource")
@@ -75,7 +77,7 @@ void testResourcesWithStaticImport(Module* module)
   resource = module->GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(!resource.IsValid(), "Check in-valid static.txt resource")
 
-  Module* importedByBModule = ModuleRegistry::GetModule("TestModuleImportedByB");
+  Module* importedByBModule = framework->GetModuleContext()->GetModule("TestModuleImportedByB");
   US_TEST_CONDITION_REQUIRED(importedByBModule != NULL, "Check valid static module")
   resource = importedByBModule->GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
@@ -106,42 +108,65 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("StaticModuleResourceTest");
 
-  assert(GetModuleContext());
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
 
+  assert(framework->GetModuleContext());
 
-#ifdef US_BUILD_SHARED_LIBS
 
 #ifdef US_PLATFORM_WINDOWS
-  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string DIR_SEP = "\\";
+  static const std::string LIB_PREFIX = "";
+  static const std::string LIB_EXT = ".dll";
 #else
-  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#if defined US_PLATFORM_APPLE
+  static const std::string LIB_EXT = ".dylib";
+#else
+  static const std::string LIB_EXT = ".so";
+#endif
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const std::string LIB_PREFIX = "lib";
+  static const std::string DIR_SEP = "/";
 #endif
 
-  SharedLibrary libB(LIB_PATH, "TestModuleB");
-
-  try
+   try
   {
-    libB.Load();
+    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + "TestModuleB.dll/TestModuleB");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleB")
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
-#endif
 
-  Module* module = ModuleRegistry::GetModule("TestModuleB");
+  try
+  {
+    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + "TestModuleB.dll/TestModuleImportedByB");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleImportedByB")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
+  }
+
+  Module* module = framework->GetModuleContext()->GetModule("TestModuleB");
   US_TEST_CONDITION_REQUIRED(module != NULL, "Test for existing module TestModuleB")
   US_TEST_CONDITION(module->GetName() == "TestModuleB", "Test module name")
 
   testResourceOperators(module);
-  testResourcesWithStaticImport(module);
+  testResourcesWithStaticImport(framework, module);
 
-  ModuleResource resource = ModuleRegistry::GetModule("TestModuleImportedByB")->GetResource("static.txt");
+  ModuleResource resource = framework->GetModuleContext()->GetModule("TestModuleImportedByB")->GetResource("static.txt");
+  module->Start();
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
-#ifdef US_BUILD_SHARED_LIBS
-  libB.Unload();
+
+  module->Stop();
   US_TEST_CONDITION_REQUIRED(resource.IsValid() == true, "Check still valid static.txt resource")
-#endif
+
+  delete framework;
 
   US_TEST_END()
 }

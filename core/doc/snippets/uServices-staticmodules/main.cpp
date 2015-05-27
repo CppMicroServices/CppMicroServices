@@ -34,6 +34,4 @@ int main(int /*argc*/, char* /*argv*/[])
 }
 
 //! [InitializeExecutable]
-#include <usModuleInitialization.h>
-US_INITIALIZE_MODULE
 //! [InitializeExecutable]

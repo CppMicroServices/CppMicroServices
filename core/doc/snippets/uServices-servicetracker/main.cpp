@@ -84,14 +84,14 @@ int main(int /*argc*/, char* /*argv*/[])
   {
 //! [tracker]
 MyTrackingCustomizer myCustomizer;
-ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetModuleContext(), &myCustomizer);
+ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetModuleContext(0), &myCustomizer);
 //! [tracker]
   }
 
   {
 //! [tracker2]
 MyTrackingPointerCustomizer myCustomizer;
-ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetModuleContext(), &myCustomizer);
+ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetModuleContext(0), &myCustomizer);
 //! [tracker2]
   }
 
@@ -99,8 +99,8 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
   MyTrackingCustomizerVoid myCustomizer2;
   try
   {
-    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(), &myCustomizer2);
-    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext());
+    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(0), &myCustomizer2);
+    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext(0));
   }
   catch (const us::ServiceException&)
   {}
@@ -108,6 +108,3 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
   return 0;
 }
 
-#include <usModuleInitialization.h>
-
-US_INITIALIZE_MODULE

@@ -9,16 +9,14 @@ US_USE_NAMESPACE
 
 void RetrieveModuleContext()
 {
-  ModuleContext* context = GetModuleContext();
+  ModuleContext* context = GetModuleContext(0);
   Module* module = context->GetModule();
   std::cout << "Module name: " << module->GetName() << " [id: " << module->GetModuleId() << "]\n";
 }
 //! [GetModuleContext]
 
 //! [InitializeModule]
-#include <usModuleInitialization.h>
 
-US_INITIALIZE_MODULE
 //! [InitializeModule]
 
 int main(int /*argc*/, char* /*argv*/[])

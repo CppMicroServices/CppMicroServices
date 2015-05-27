@@ -51,15 +51,7 @@ US_END_NAMESPACE
  * \sa \ref MicroServices_StaticModules
  */
 #define US_INITIALIZE_STATIC_MODULE(_module_name)                          \
-  extern "C" void _us_import_module_initializer_ ## _module_name();        \
-  struct StaticModuleInitializer_ ## _module_name                          \
-  {                                                                        \
-    StaticModuleInitializer_ ## _module_name()                             \
-    {                                                                      \
-      _us_import_module_initializer_ ## _module_name();                    \
-    }                                                                      \
-  };                                                                       \
-  static StaticModuleInitializer_ ## _module_name _InitializeModule_ ## _module_name;
+  extern "C" void _us_import_module_initializer_ ## _module_name();
 
 /**
  * \ingroup MicroServices
@@ -84,7 +76,6 @@ US_END_NAMESPACE
  * \sa \ref MicroServices_StaticModules
  */
 #define US_IMPORT_MODULE(_module_name)                                     \
-  US_INITIALIZE_STATIC_MODULE(_module_name)                                \
   extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_name (); \
   void _dummy_reference_to_ ## _module_name ## _activator()                \
   {                                                                        \

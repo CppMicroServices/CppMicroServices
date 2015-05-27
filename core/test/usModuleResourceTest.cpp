@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usModuleRegistry.h>
@@ -38,8 +40,20 @@
 
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string DIR_SEP = "\\";
+  static const std::string LIB_PREFIX = "";
+  static const std::string LIB_EXT = ".dll";
+  static const std::string EXE_EXT = ".exe";
 #else
+#if defined US_PLATFORM_APPLE
+  static const std::string LIB_EXT = ".dylib";
+#else
+  static const std::string LIB_EXT = ".so";
+#endif
   static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const std::string LIB_PREFIX = "lib";
+  static const std::string DIR_SEP = "/";
+  static const std::string EXE_EXT = "";
 #endif
 
 US_USE_NAMESPACE
@@ -297,12 +311,13 @@ void testResourceTree(Module* module)
 
   std::vector<std::string> children = res.GetChildren();
   std::sort(children.begin(), children.end());
-  US_TEST_CONDITION_REQUIRED(children.size() == 5, "Check child count")
+  US_TEST_CONDITION_REQUIRED(children.size() == 6, "Check child count")
   US_TEST_CONDITION(children[0] == "foo.txt", "Check child name")
   US_TEST_CONDITION(children[1] == "foo2.txt", "Check child name")
   US_TEST_CONDITION(children[2] == "icons/", "Check child name")
-  US_TEST_CONDITION(children[3] == "special_chars.dummy.txt", "Check child name")
-  US_TEST_CONDITION(children[4] == "test.xml", "Check child name")
+  US_TEST_CONDITION(children[3] == "manifest.json", "Check child name")
+  US_TEST_CONDITION(children[4] == "special_chars.dummy.txt", "Check child name")
+  US_TEST_CONDITION(children[5] == "test.xml", "Check child name")
 
   US_TEST_CONDITION(module->FindResources("!$noexist=?", std::string(), "true").empty(), "Check not existant path");
 
@@ -340,9 +355,9 @@ void testResourceTree(Module* module)
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 8, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 9, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 8, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 9, "Total resource number")
 
 
   // test pattern matching
@@ -401,30 +416,25 @@ void testResourceFromExecutable(Module* module)
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
 
-void testResourcesFrom(const std::string& moduleName)
+void testResourcesFrom(const std::string& moduleName, ModuleContext* mc)
 {
-#ifdef US_BUILD_SHARED_LIBS
-  SharedLibrary libR(LIB_PATH, moduleName);
   try
   {
-    libR.Load();
+    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + moduleName + LIB_EXT + "/" + moduleName);
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module " + moduleName)
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
-#endif
 
-  Module* moduleR = ModuleRegistry::GetModule(moduleName);
+  Module* moduleR = mc->GetModule(moduleName);
   US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module")
 
   US_TEST_CONDITION(moduleR->GetName() == moduleName, "Test module name")
 
   US_TEST_CONDITION(moduleR->FindResources("", "*.txt", true).size() == 2, "Resource count")
 
-#ifdef US_BUILD_SHARED_LIBS
-  libR.Unload();
-#endif
 }
 
 } // end unnamed namespace
@@ -434,29 +444,43 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ModuleResourceTest");
 
-  ModuleContext* mc = GetModuleContext();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  ModuleContext* mc = framework->GetModuleContext();
   assert(mc);
 
-#ifdef US_BUILD_SHARED_LIBS
-  SharedLibrary libR(LIB_PATH, "TestModuleR");
   try
   {
-    libR.Load();
+    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleR" + LIB_EXT + "/TestModuleR");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleR")
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
-#endif
 
-  Module* moduleR = ModuleRegistry::GetModule("TestModuleR");
+  Module* moduleR = mc->GetModule("TestModuleR");
   US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module TestModuleR")
 
   US_TEST_CONDITION(moduleR->GetName() == "TestModuleR", "Test module name")
 
   testInvalidResource(moduleR);
 
-  testResourceFromExecutable(mc->GetModule());
+  Module* executableBundle = 0;
+  try
+  {
+    executableBundle = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "usCoreTestDriver" + EXE_EXT + "/main");
+    US_TEST_CONDITION_REQUIRED(executableBundle != NULL, "Test installation of module main")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
+  }
+
+  testResourceFromExecutable(executableBundle);
 
   testResourceTree(moduleR);
 
@@ -472,13 +496,11 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   ModuleResource foo = moduleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
-#ifdef US_BUILD_SHARED_LIBS
-  libR.Unload();
-  US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
-#endif
 
-  testResourcesFrom("TestModuleRL");
-  testResourcesFrom("TestModuleRA");
+  testResourcesFrom("TestModuleRL", framework->GetModuleContext());
+  testResourcesFrom("TestModuleRA", framework->GetModuleContext());
+
+  delete framework;
 
   US_TEST_END()
 }

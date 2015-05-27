@@ -32,6 +32,8 @@
 
 #include "usCoreConfig.h"
 
+#include "usSharedLibrary.h"
+
 US_BEGIN_NAMESPACE
 
 const std::string& Module::PROP_ID()
@@ -119,14 +121,36 @@ bool Module::IsLoaded() const
 
 void Module::Start()
 {
-
+  MutexLockingStrategy::Lock(this->d);
   if (d->moduleContext)
   {
     US_WARN << "Module " << d->info.name << " already started.";
     return;
   }
 
+  // loading a library isn't necessary if it isn't supported
+#ifdef US_BUILD_SHARED_LIBS
+  if(d->lib.IsSharedLibrary() && !d->lib.IsLoaded())
+  {
+    d->lib.Load();
+  }
+#endif
+
   d->moduleContext = new ModuleContext(this->d);
+
+  // save this bundle's context so that it can be accessible anywhere
+  // from within this bundle's code.
+  typedef void(*SetBundleContext)(ModuleContext*);
+  SetBundleContext setBundleContext = NULL;
+
+  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
+  void* setBundleContextSym = ModuleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
+  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+
+  if (setBundleContext)
+  {
+    setBundleContext(d->moduleContext);
+  }
 
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
   ModuleActivatorHook activatorHook = NULL;
@@ -157,22 +181,12 @@ void Module::Start()
     d->moduleActivator->Load(d->moduleContext);
   }
 
-#ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  if (ModuleSettings::IsAutoLoadingEnabled())
-  {
-    const std::vector<std::string> loadedPaths = AutoLoadModules(d->info);
-    if (!loadedPaths.empty())
-    {
-      d->moduleManifest.SetValue(PROP_AUTOLOADED_MODULES(), Any(loadedPaths));
-    }
-  }
-#endif
-
   d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 }
 
 void Module::Stop()
 {
+  MutexLockingStrategy::Lock(this->d);
   if (d->moduleContext == 0)
   {
     US_WARN << "Module " << d->info.name << " already stopped.";
@@ -204,6 +218,13 @@ void Module::Stop()
   this->Uninit();
 }
 
+void Module::Uninstall()
+{
+    Stop();
+    d->coreCtx->bundleRegistry.UnRegister(&d->info);
+    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNINSTALLED, this));
+}
+
 ModuleContext* Module::GetModuleContext() const
 {
   return d->moduleContext;
@@ -231,7 +252,23 @@ ModuleVersion Module::GetVersion() const
 
 Any Module::GetProperty(const std::string& key) const
 {
-  return d->moduleManifest.GetValue(key);
+  Any property(d->moduleManifest.GetValue(key));
+
+  // Clients must be able to query both a bundle's properties
+  // and the framework's properties through any Bundle's
+  // GetProperty function.
+  // The Framework's properties include both the launch properties
+  // used to initialize the Framwork with and all relevant 
+  // "org.osgi.*" properties.
+  if (property.Empty())
+  {
+    std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
+    if (props != d->coreCtx->frameworkProperties.end())
+    {
+      property = (*props).second;
+    }
+  }
+  return property;
 }
 
 std::vector<std::string> Module::GetPropertyKeys() const

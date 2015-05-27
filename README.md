@@ -5,8 +5,6 @@
 C++ Micro Services
 ==================
 
-DISCLAIMER: This repository is used to coordinate The MathWorks' contributions to https://github.com/saschazelzer/CppMicroServices.
-
 Introduction
 ------------
 

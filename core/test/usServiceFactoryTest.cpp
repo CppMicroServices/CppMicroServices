@@ -20,28 +20,18 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usModule.h>
-#include <usModuleRegistry.h>
 #include <usServiceObjects.h>
-#include <usSharedLibrary.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
 US_USE_NAMESPACE
-
-namespace {
-
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#else
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#endif
-
-} // end unnamed namespace
-
 
 US_BEGIN_NAMESPACE
 
@@ -58,34 +48,24 @@ struct TestModuleH2
 US_END_NAMESPACE
 
 
-void TestServiceFactoryModuleScope()
+void TestServiceFactoryModuleScope(ModuleContext* mc)
 {
 
   // Install and start test module H, a service factory and test that the methods
   // in that interface works.
 
-  SharedLibrary target(LIB_PATH, "TestModuleH");
+  InstallTestBundle(mc, "TestModuleH");
 
-#ifdef US_BUILD_SHARED_LIBS
-  try
-  {
-    target.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
-  }
-#endif
-
-  Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
+  Module* moduleH = mc->GetModule("TestModuleH");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+
+  moduleH->Start();
 
   std::vector<ServiceReferenceU> registeredRefs = moduleH->GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
   US_TEST_CONDITION(registeredRefs[0].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
   US_TEST_CONDITION(registeredRefs[1].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
 
-  ModuleContext* mc = GetModuleContext();
   // Check that a service reference exist
   const ServiceReferenceU sr1 = mc->GetServiceReference("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
@@ -111,32 +91,22 @@ void TestServiceFactoryModuleScope()
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
 
-  target.Unload();
+  moduleH->Stop();
 }
 
-void TestServiceFactoryPrototypeScope()
+void TestServiceFactoryPrototypeScope(ModuleContext* mc)
 {
 
   // Install and start test module H, a service factory and test that the methods
   // in that interface works.
 
-  SharedLibrary target(LIB_PATH, "TestModuleH");
+  InstallTestBundle(mc, "TestModuleH");
 
-#ifdef US_BUILD_SHARED_LIBS
-  try
-  {
-    target.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
-  }
-
-  Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
+  Module* moduleH = mc->GetModule("TestModuleH");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
-#endif
 
-  ModuleContext* mc = GetModuleContext();
+  moduleH->Start();
+
   // Check that a service reference exist
   const ServiceReference<TestModuleH2> sr1 = mc->GetServiceReference<TestModuleH2>();
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
@@ -218,15 +188,22 @@ void TestServiceFactoryPrototypeScope()
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
 
-  target.Unload();
+  moduleH->Stop();
 }
 
 int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceFactoryTest");
 
-  TestServiceFactoryModuleScope();
-  TestServiceFactoryPrototypeScope();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  TestServiceFactoryModuleScope(framework->GetModuleContext());
+  TestServiceFactoryPrototypeScope(framework->GetModuleContext());
+
+  delete framework;
 
   US_TEST_END()
 }

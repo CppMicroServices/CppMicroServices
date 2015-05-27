@@ -92,7 +92,21 @@ public:
      * \link ModuleActivator::Unload(ModuleContext*) ModuleActivator Unload\endlink method
      * is about to be called.
      */
-    UNLOADING
+    UNLOADING,
+
+    /**
+     * The bundle has been installed.
+     * <p>
+     * The bundle has been installed by the Framework.
+     */
+    INSTALLED,
+
+    /**
+     * The bundle has been uninstalled.
+     * <p>
+     * The bundle has been removed from the Framework.
+     */
+    UNINSTALLED
 
   };
 
@@ -134,10 +148,12 @@ public:
   /**
    * Returns the type of lifecyle event. The type values are:
    * <ul>
+   * <li>{@link #INSTALLED}
    * <li>{@link #LOADING}
    * <li>{@link #LOADED}
    * <li>{@link #UNLOADING}
    * <li>{@link #UNLOADED}
+   * <li>{@link #UNINSTALLED}
    * </ul>
    *
    * @return The type of lifecycle event.

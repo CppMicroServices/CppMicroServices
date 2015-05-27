@@ -20,6 +20,9 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
+#include <usTestUtils.h>
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
@@ -100,9 +103,8 @@ private:
   us::ModuleContext* m_context;
 };
 
-void TestFilterString()
+void TestFilterString(us::ModuleContext* context)
 {
-  us::ModuleContext* context = us::GetModuleContext();
   MyCustomizer customizer(context);
 
   us::LDAPFilter filter("(" + us::ServiceConstants::SERVICE_ID() + ">=0)");
@@ -121,29 +123,12 @@ void TestFilterString()
   US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
 }
 
-void TestServiceTracker()
+void TestServiceTracker(us::ModuleContext* context)
 {
+  ModuleContext* mc = context;
 
-#ifdef US_PLATFORM_WINDOWS
-  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#else
-  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#endif
-
-  ModuleContext* mc = GetModuleContext();
-  SharedLibrary libS(LIB_PATH, "TestModuleS");
-
-#ifdef US_BUILD_SHARED_LIBS
-  // Start the test target to get a service published.
-  try
-  {
-    libS.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what() );
-  }
-#endif
+  Module* module = InstallTestBundle(mc, "TestModuleS");
+  module->Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
@@ -278,8 +263,15 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTrackerTest")
 
-  TestFilterString();
-  TestServiceTracker();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  TestFilterString(framework->GetModuleContext());
+  TestServiceTracker(framework->GetModuleContext());
+
+  delete framework;
 
   US_TEST_END()
 }

@@ -20,16 +20,18 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usServiceEvent.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 #include <usModuleSettings.h>
-#include <usSharedLibrary.h>
 
+#include "usLog_p.h"
+#include "usTestUtils.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestDriverActivator.h"
 #include "usTestingMacros.h"
@@ -39,26 +41,28 @@ US_USE_NAMESPACE
 
 namespace {
 
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-  static const char PATH_SEPARATOR = '\\';
-#else
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-  static const char PATH_SEPARATOR = '/';
-#endif
-
 // Check that the executable's activator was loaded and called
-void frame01()
+void frame01(ModuleContext* mc)
 {
+  try
+  {
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module main")
+
+    module->Start();
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frame01:FAIL")
+  }
+
   US_TEST_CONDITION_REQUIRED(TestDriverActivator::LoadCalled(), "ModuleActivator::Load() called for executable")
 }
 
 // Verify that the same member function pointers registered as listeners
 // with different receivers works.
-void frame02a()
+void frame02a(ModuleContext* mc)
 {
-  ModuleContext* mc = GetModuleContext();
-
   TestModuleListener listener1;
   TestModuleListener listener2;
 
@@ -74,30 +78,18 @@ void frame02a()
     US_TEST_FAILED_MSG( << "module listener registration failed " << ise.what()
                         << " : frameSL02a:FAIL" );
   }
+  
+  InstallTestBundle(mc, "TestModuleA");
 
-  SharedLibrary target(LIB_PATH, "TestModuleA");
-
-#ifdef US_BUILD_SHARED_LIBS
-  // Start the test target
-  try
-  {
-    target.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
-                        << e.what() << " + in frameSL02a:FAIL" );
-  }
-#endif
-
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
+  Module* moduleA = mc->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
+  moduleA->Start();
+
   std::vector<ModuleEvent> pEvts;
-#ifdef US_BUILD_SHARED_LIBS
+  pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleA));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleA));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleA));
-#endif
 
   std::vector<ServiceEvent> seEvts;
 
@@ -107,7 +99,8 @@ void frame02a()
   mc->RemoveModuleListener(&listener1, &TestModuleListener::ModuleChanged);
   mc->RemoveModuleListener(&listener2, &TestModuleListener::ModuleChanged);
 
-  target.Unload();
+  moduleA->Stop();
+
 }
 
 // Verify information from the ModuleInfo struct
@@ -119,11 +112,11 @@ void frame005a(ModuleContext* mc)
 
   US_TEST_CONDITION("main" == m->GetName(), "Test module name")
   US_TEST_CONDITION(ModuleVersion(0,1,0) == m->GetVersion(), "Test test driver module version")
-  US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == ModuleRegistry::GetModule(1)->GetVersion(), "Test CppMicroServices version")
+  US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == mc->GetModule(1)->GetVersion(), "Test CppMicroServices version")
 }
 
-// Get context id, location and status of the module
-void frame010a(ModuleContext* mc)
+// Get context id, location, persistent storage and status of the module
+void frame010a(Framework* framework, ModuleContext* mc)
 {
   Module* m = mc->GetModule();
 
@@ -136,7 +129,9 @@ void frame010a(ModuleContext* mc)
 
   US_TEST_CONDITION(m->IsLoaded(), "Test for loaded flag")
 
-  US_TEST_CONDITION(ModuleSettings::GetStoragePath().empty(), "Test for empty base storage path")
+  // launching properties should be accessible through any bundle
+  US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").Empty(), "Test for empty base storage path")
+  US_TEST_CONDITION(m->GetProperty("org.osgi.framework.storage").Empty(), "Test for empty base storage path")
   US_TEST_CONDITION(m->GetModuleContext()->GetDataFile("").empty(), "Test for empty data path")
   US_TEST_CONDITION(m->GetModuleContext()->GetDataFile("bla").empty(), "Test for empty data file path")
 }
@@ -159,39 +154,18 @@ void frame018a(ModuleContext* mc)
   }
 }
 
-// Load libA and check that it exists and that the service it registers exists,
-// also check that the expected events occur and that the storage paths are correct
-void frame020a(ModuleContext* mc, TestModuleListener& listener,
-#ifdef US_BUILD_SHARED_LIBS
-               SharedLibrary& libA)
+// Start libA and check that it exists and that the service it registers exists,
+// also check that the expected events occur
+void frame020a(Framework* framework, TestModuleListener& listener)
 {
-  try
-  {
-    libA.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
-  }
-#else
-               SharedLibrary& /*libA*/)
-{
-#endif
+  ModuleContext* mc = framework->GetModuleContext();
 
-  ModuleSettings::SetStoragePath(std::string("/tmp") + PATH_SEPARATOR);
-  US_TEST_CONDITION(ModuleSettings::GetStoragePath() == "/tmp", "Test for valid base storage path")
-
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
+  Module* moduleA = mc->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
 
-  std::cout << moduleA->GetModuleContext()->GetDataFile("") << std::endl;
-  std::stringstream ss;
-  ss << moduleA->GetModuleId();
-  const std::string baseStoragePath = std::string("/tmp") + PATH_SEPARATOR + ss.str() + "_TestModuleA" + PATH_SEPARATOR;
-  US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("") == baseStoragePath, "Test for valid data path")
-  US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("bla") == baseStoragePath + "bla", "Test for valid data file path")
+  moduleA->Start();
 
   // Check if libA registered the expected service
   try
@@ -211,15 +185,11 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
 
     // check the listeners for events
     std::vector<ModuleEvent> pEvts;
-#ifdef US_BUILD_SHARED_LIBS
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleA));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleA));
-#endif
 
     std::vector<ServiceEvent> seEvts;
-#ifdef US_BUILD_SHARED_LIBS
     seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, sr1));
-#endif
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 
@@ -233,10 +203,36 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
 }
 
 
-// Unload libA and check for correct events
-void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libA)
+// Start libA and check that it exists and that the storage paths are correct
+void frame02b(Framework* framework)
 {
-  Module* moduleA = ModuleRegistry::GetModule("TestModuleA");
+  ModuleContext* mc = framework->GetModuleContext();
+
+  US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
+
+  Module* moduleA = mc->GetModule("TestModuleA");
+  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
+  // launching properties should be accessible through any bundle
+  US_TEST_CONDITION(moduleA->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
+  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
+
+  moduleA->Start();
+
+  std::cout << moduleA->GetModuleContext()->GetDataFile("") << std::endl;
+  std::stringstream ss;
+  ss << moduleA->GetModuleId();
+  const std::string baseStoragePath = std::string("/tmp") + DIR_SEP + ss.str() + "_TestModuleA" + DIR_SEP;
+  US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("") == baseStoragePath, "Test for valid data path")
+  US_TEST_CONDITION(moduleA->GetModuleContext()->GetDataFile("bla") == baseStoragePath + "bla", "Test for valid data file path")
+
+  US_TEST_CONDITION(moduleA->IsLoaded() == true, "Test if loaded correctly");
+}
+
+
+// Stop libA and check for correct events
+void frame030b(ModuleContext* mc, TestModuleListener& listener)
+{
+  Module* moduleA = mc->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for non-null module")
 
   ServiceReferenceU sr1
@@ -245,10 +241,8 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
 
   try
   {
-    libA.Unload();
-#ifdef US_BUILD_SHARED_LIBS
+    moduleA->Stop();
     US_TEST_CONDITION(moduleA->IsLoaded() == false, "Test for unloaded state")
-#endif
   }
   catch (const std::exception& e)
   {
@@ -256,15 +250,11 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
   }
 
   std::vector<ModuleEvent> pEvts;
-#ifdef US_BUILD_SHARED_LIBS
   pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, moduleA));
   pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, moduleA));
-#endif
 
   std::vector<ServiceEvent> seEvts;
-#ifdef US_BUILD_SHARED_LIBS
   seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, sr1));
-#endif
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 }
@@ -283,6 +273,7 @@ void frame045a(ModuleContext* mc)
   try
   {
     mc->AddServiceListener(&sListen1, &LocalListener::ServiceChanged, brokenFilter);
+    US_TEST_FAILED_MSG(<< "test module, no exception on broken LDAP filter:");
   }
   catch (const std::invalid_argument& /*ia*/)
   {
@@ -294,24 +285,171 @@ void frame045a(ModuleContext* mc)
   }
 }
 
+void TestModuleStates()
+{
+    TestModuleListener listener;
+    std::vector<ModuleEvent> bundleEvents;
+    FrameworkFactory factory;
+
+    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+    framework->init();
+    framework->Start();
+
+    ModuleContext* frameworkCtx = framework->GetModuleContext();
+    frameworkCtx->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
+
+    Module* module = 0;
+
+    // Test install -> uninstall
+    // expect 2 event (INSTALLED, UNINSTALLED)
+    module = InstallTestBundle(frameworkCtx, "TestModuleA");
+    module->Uninstall();
+    US_TEST_CONDITION(0 == frameworkCtx->GetModule("TestModuleA"), "Test bundle install -> uninstall")
+    US_TEST_CONDITION(1 == frameworkCtx->GetModules().size(), "Test # of installed bundles")
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, module));
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
+    bundleEvents.clear();
+
+    // Test install -> start -> uninstall
+    // expect 6 events (INSTALLED, LOADING, LOADED, UNLOADING, UNLOADED, UNINSTALLED)
+    module = InstallTestBundle(frameworkCtx, "TestModuleA");
+    module->Start();
+    module->Uninstall();
+    US_TEST_CONDITION(0 == frameworkCtx->GetModule("TestModuleA"), "Test bundle install -> start -> uninstall")
+    US_TEST_CONDITION(1 == frameworkCtx->GetModules().size(), "Test # of installed bundles")
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::LOADING, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::LOADED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNLOADING, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNLOADED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, module));
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
+    bundleEvents.clear();
+
+    // Test install -> stop -> uninstall
+    // expect 2 event (INSTALLED, UNINSTALLED)
+    module = InstallTestBundle(frameworkCtx, "TestModuleA");
+    module->Stop();
+    module->Uninstall();
+    US_TEST_CONDITION(0 == frameworkCtx->GetModule("TestModuleA"), "Test bundle install -> stop -> uninstall")
+    US_TEST_CONDITION(1 == frameworkCtx->GetModules().size(), "Test # of installed bundles")
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, module));
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
+    bundleEvents.clear();
+
+    // Test install -> start -> stop -> uninstall
+    // expect 6 events (INSTALLED, LOADING, LOADED, UNLOADING, UNLOADED, UNINSTALLED)
+    module = InstallTestBundle(frameworkCtx, "TestModuleA");
+    module->Start();
+    module->Stop();
+    module->Uninstall();
+    US_TEST_CONDITION(0 == frameworkCtx->GetModule("TestModuleA"), "Test bundle install -> start -> stop -> uninstall")
+    US_TEST_CONDITION(1 == frameworkCtx->GetModules().size(), "Test # of installed bundles")
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::LOADING, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::LOADED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNLOADING, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNLOADED, module));
+    bundleEvents.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, module));
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
+    bundleEvents.clear();
+
+    framework->Stop();
+    delete framework;
+}
+
+void TestForInstallFailure()
+{
+    FrameworkFactory factory;
+
+    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+    framework->init();
+    framework->Start();
+
+    ModuleContext* frameworkCtx = framework->GetModuleContext();
+
+    // Test that bogus bundle installs throw the appropriate exception
+    try
+    {
+        frameworkCtx->InstallBundle(std::string());
+        US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
+    }
+    catch (const std::runtime_error& ex)
+    {
+        US_TEST_OUTPUT(<< "Caught std::runtime_exception: " << ex.what())
+    }
+    catch (...)
+    {
+        US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
+    }
+
+    try
+    {
+        frameworkCtx->InstallBundle(std::string("\\path\\which\\won't\\exist\\phantom_bundle"));
+        US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
+    }
+    catch (const std::runtime_error& ex)
+    {
+        US_TEST_OUTPUT(<< "Caught std::runtime_exception: " << ex.what())
+    }
+    catch (...)
+    {
+        US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
+    }
+
+    US_TEST_CONDITION(1 == frameworkCtx->GetModules().size(), "Test # of installed bundles")
+
+    framework->Stop();
+    delete framework;
+}
+
+void TestDuplicateInstall()
+{
+    FrameworkFactory factory;
+
+    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+    framework->init();
+    framework->Start();
+
+    ModuleContext* frameworkCtx = framework->GetModuleContext();
+
+    // Test installing the same bundle (i.e. a bundle with the same location) twice.
+    // The exact same bundle should be returned on the second install.
+    Module* module = InstallTestBundle(frameworkCtx, "TestModuleA");
+    Module* moduleDuplicate = InstallTestBundle(frameworkCtx, "TestModuleA");
+
+    US_TEST_CONDITION(module == moduleDuplicate, "Test for the same bundle instance");
+    US_TEST_CONDITION(module->GetModuleId() == moduleDuplicate->GetModuleId(), "Test for the same bundle id");
+
+    framework->Stop();
+    delete framework;
+}
+
 } // end unnamed namespace
 
 int usModuleTest(int /*argc*/, char* /*argv*/[])
 {
-  //US_TEST_BEGIN("ModuleTest");
+  US_TEST_BEGIN("ModuleTest");
 
-  std::vector<Module*> modules = ModuleRegistry::GetModules();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  std::vector<Module*> modules = framework->GetModuleContext()->GetModules();
   for (std::vector<Module*>::iterator iter = modules.begin(), iterEnd = modules.end();
        iter != iterEnd; ++iter)
   {
     std::cout << "----- " << (*iter)->GetName() << std::endl;
   }
 
-  frame01();
-  frame02a();
-
-  ModuleContext* mc = GetModuleContext();
+  ModuleContext* mc = framework->GetModuleContext();
   TestModuleListener listener;
+
+  frame01(mc);
+  frame02a(mc);
 
   try
   {
@@ -333,19 +471,36 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
     throw;
   }
 
-  frame005a(mc);
-  frame010a(mc);
+  frame005a(mc->GetModule("main")->GetModuleContext());
+  frame010a(framework, mc);
   frame018a(mc);
 
-  SharedLibrary libA(LIB_PATH, "TestModuleA");
-  frame020a(mc, listener, libA);
-  frame030b(mc, listener, libA);
+  frame020a(framework, listener);
+  frame030b(mc, listener);
 
   frame045a(mc);
 
   mc->RemoveModuleListener(&listener, &TestModuleListener::ModuleChanged);
   mc->RemoveServiceListener(&listener, &TestModuleListener::ServiceChanged);
 
-  //US_TEST_END()
-  return 0;
+  framework->Stop();
+  delete framework;
+
+  // test a non-default framework instance using a different persistent storage location.
+  std::map<std::string, std::string> frameworkConfig;
+  frameworkConfig.insert(std::pair<std::string, std::string>("org.osgi.framework.storage", "/tmp"));
+  framework = factory.newFramework(frameworkConfig);
+  framework->init();
+  framework->Start();
+
+  frame02a(framework->GetModuleContext());
+  frame02b(framework);
+
+  delete framework;
+
+  TestModuleStates();
+  TestForInstallFailure();
+  TestDuplicateInstall();
+
+  US_TEST_END()
 }

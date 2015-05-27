@@ -23,6 +23,7 @@
 #include "usServiceObjects.h"
 
 #include "usServiceReferenceBasePrivate.h"
+#include "usLog_p.h"
 
 #include <set>
 

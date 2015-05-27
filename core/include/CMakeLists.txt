@@ -4,6 +4,8 @@
 
 set(_public_headers
   usAny.h
+  usFramework.h
+  usFrameworkFactory.h
   usLDAPProp.h
   usSharedData.h
   usSharedLibrary.h
@@ -38,7 +40,6 @@ set(_public_headers
   usModuleImport.h
   usModuleInfo.h
   usModuleInitialization.h
-  usModuleRegistry.h
   usModuleResource.h
   usModuleResourceStream.h
   usModuleSettings.h

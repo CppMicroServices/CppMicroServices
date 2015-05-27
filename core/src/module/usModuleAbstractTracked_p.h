@@ -28,6 +28,7 @@
 
 #include "usAtomicInt_p.h"
 #include "usAny.h"
+#include "usWaitCondition_p.h"
 
 US_BEGIN_NAMESPACE
 

@@ -1,3 +1,6 @@
+init:
+  - git config --global core.autocrlf true
+
 environment:
   project_name:
     "bii-cppmicroservices"

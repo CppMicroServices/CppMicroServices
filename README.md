@@ -42,7 +42,12 @@ The library should compile on many different platforms. Below is a list of teste
 Legal
 -----
 
-Copyright (c) German Cancer Research Center. Licensed under the [Apache License v2.0][apache_license].
+The C++ Micro Services project was initially developed at the German Cancer Research Center.
+Its source code is hosted on the GitHub account of the primary author, located at
+https://github.com/saschazelzer/CppMicroServices. See the COPYRIGHT file in the top-level
+directory for detailed copyright information.
+
+This project is licensed under the [Apache License v2.0][apache_license].
 
 Quick Start
 -----------

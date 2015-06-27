@@ -1,0 +1,47 @@
+init:
+  - git config --global core.autocrlf true
+
+environment:
+  project_name:
+    "bii-cppmicroservices"
+  block_user:
+    "azriel"
+  block_name:
+    "cppmicroservices"
+
+  matrix:
+  - BUILD_CONFIGURATION: 0
+  - BUILD_CONFIGURATION: 1
+  - BUILD_CONFIGURATION: 2
+  - BUILD_CONFIGURATION: 3
+  - BUILD_CONFIGURATION: 4
+  - BUILD_CONFIGURATION: 5
+  - BUILD_CONFIGURATION: 6
+  - BUILD_CONFIGURATION: 7
+
+install:
+  - ps: wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-win32-x86.zip -OutFile cmake.zip
+  - cmd: echo "Unzipping cmake..."
+  - cmd: 7z x cmake.zip -o"C:\Program Files (x86)\" -y > nul
+  - cmd: set PATH=%PATH:CMake 2.8\bin=%;C:\Program Files (x86)\cmake-3.0.2-win32-x86\bin
+  - cmd: cmake --version
+  - cmd: echo "Downloading biicode..."
+  - ps: wget http://www.biicode.com/downloads/latest/win -OutFile bii-win.exe
+  - cmd: bii-win.exe /VERYSILENT
+  - cmd: set PATH=%PATH%;C:\Program Files (x86)\BiiCode\bii
+  - cmd: bii -v
+  - cmd: del bii-win.exe
+  - cmd: del cmake.zip
+
+branches:
+  only:
+    - master
+    - development
+    - /^release-.*$/
+
+build_script:
+  - cmd: bii buzz -G "Visual Studio 12 2013"
+
+test_script:
+  - cmd: cd bii\build
+  - cmd: msbuild RUN_TESTS.vcxproj

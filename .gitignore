@@ -4,3 +4,7 @@
 CMakeLists.txt.user*
 gh-pages
 core/examples/makefile/main
+
+# biicode specific
+bii
+bin

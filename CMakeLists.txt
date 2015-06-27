@@ -9,6 +9,15 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(VERSION 2.8)
 cmake_policy(SET CMP0017 NEW)
 
+if(BIICODE)
+  # Only build tests if this block is open (not retrieved as a dependency)
+  if(${BII_IS_DEP})
+    set(US_BUILD_TESTING OFF)
+  else()
+    set(US_BUILD_TESTING ON)
+  endif()
+endif()
+
 #-----------------------------------------------------------------------------
 # Update CMake module path
 #------------------------------------------------------------------------------
@@ -114,7 +123,14 @@ endif()
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
-us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
+
+# When building with Biicode, the default behaviour is to not build shared libraries
+if(BIICODE AND NOT ${BUILD_SHARED_LIBS})
+  # leave "US_BUILD_SHARED_LIBS" undefined
+else()
+  us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
+endif()
+
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 
@@ -389,7 +405,9 @@ add_subdirectory(core)
 # Documentation
 #-----------------------------------------------------------------------------
 
-add_subdirectory(doc)
+if(NOT BIICODE)
+  add_subdirectory(doc)
+endif()
 
 #-----------------------------------------------------------------------------
 # Last configuration and install steps
@@ -449,5 +467,62 @@ if(NOT US_NO_INSTALL)
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
           ${US_SDK_INSTALL_COMPONENT}
     )
+
+endif()
+
+#-----------------------------------------------------------------------------
+# If using Biicode, generate the core module initialization code and resources
+#-----------------------------------------------------------------------------
+if(BIICODE)
+
+  # 'include' directories required on the build path
+  set(BII_LIB_INCLUDE_DIRS
+      ${US_INCLUDE_DIRS} # generated usGlobalConfig.h file
+      "${PROJECT_SOURCE_DIR}/core/include"
+      "${PROJECT_BINARY_DIR}/core/include" # usCoreConfig.h and usCoreExport.h
+      "${PROJECT_SOURCE_DIR}/core/src/module"
+      "${PROJECT_SOURCE_DIR}/core/src/service"
+      "${PROJECT_SOURCE_DIR}/core/src/util"
+      )
+
+  # Specify the sources to be included in the library
+  set(BII_LIB_SRC )
+  set(BII_LIB_INCLUDE_PATHS ${BII_LIB_INCLUDE_PATHS} ${BII_LIB_INCLUDE_DIRS})
+
+  # Test sources and dependencies
+  if(US_BUILD_TESTING AND NOT ${BII_IS_DEP})
+    set(BII_core_test_usBiiTestPlaceholder_SRC ${PROJECT_SOURCE_DIR}/core/test/usBiiTestPlaceholder.cpp
+                                               ${PROJECT_BINARY_DIR}/core/test/usCoreTestDriver.cpp)
+    set(BII_core_test_usBiiTestPlaceholder_DEPS ${BII_core_test_usBiiTestPlaceholder_DEPS} usCoreTestDriver)
+    LIST(REMOVE_ITEM BII_core_test_usBiiTestPlaceholder_DEPS azriel_cppmicroservices)
+    set(BII_core_test_usBiiTestPlaceholder_INCLUDE_PATHS ${BII_LIB_INCLUDE_DIRS})
+
+    # The module init for the test target is not inherited from the test driver otherwise it does not get a module context, so we have to
+    # generate it again
+    usFunctionGenerateModuleInit(BII_core_test_usBiiTestPlaceholder_SRC)
+    usFunctionGetResourceSource(TARGET ${BII_BLOCK_USER}_${BII_BLOCK_NAME}_core_test_usBiiTestPlaceholder
+                                OUT BII_core_test_usBiiTestPlaceholder_SRC)
+  else()
+    LIST(REMOVE_ITEM BII_BLOCK_EXES core_test_usBiiTestPlaceholder)
+  endif()
+
+  ADD_BII_TARGETS()
+
+  target_link_libraries(${BII_LIB_TARGET} INTERFACE CppMicroServices)
+
+  if(US_BUILD_TESTING AND NOT ${BII_IS_DEP})
+    # Need to declare the US_MODULE_NAME definition for the test application
+    target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PUBLIC US_MODULE_NAME=main)
+    set_property(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET} PROPERTY US_MODULE_NAME main)
+    if (NOT ${BUILD_SHARED_LIBS})
+      target_compile_definitions(${BII_core_test_usBiiTestPlaceholder_TARGET} PRIVATE US_STATIC_MODULE)
+    endif()
+
+    # Add test resources
+    usFunctionEmbedResources(TARGET ${BII_core_test_usBiiTestPlaceholder_TARGET}
+                             FILES usTestResource.txt manifest.json
+                             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/core/test/
+                             ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
+  endif()
 
 endif()

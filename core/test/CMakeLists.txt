@@ -62,7 +62,17 @@ create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_ex
 usFunctionGenerateModuleInit(_srcs)
 
 usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
-add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
+
+set(_test_executable )
+if(BIICODE)
+  list(REMOVE_ITEM _srcs ${_test_driver}.cpp)
+  add_library(${_test_driver} STATIC ${_srcs} ${_additional_srcs})
+  set(_test_executable ${BII_BLOCK_USER}_${BII_BLOCK_NAME}_core_test_usBiiTestPlaceholder)
+else()
+  add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
+  set(_test_executable ${_test_driver})
+endif()
+
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)
@@ -83,7 +93,7 @@ usFunctionEmbedResources(TARGET ${_test_driver}
 
 # Register tests
 foreach(_test ${_tests})
-  add_test(NAME ${_test} COMMAND ${_test_driver} ${_test})
+  add_test(NAME ${_test} COMMAND ${_test_executable} ${_test})
 endforeach()
 
 if(US_TEST_LABELS)

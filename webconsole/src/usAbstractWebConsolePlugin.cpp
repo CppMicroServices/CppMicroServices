@@ -282,12 +282,6 @@ bool AbstractWebConsolePlugin::SpoolResource(HttpServletRequest& request, HttpSe
   // describe the contents
   response.SetContentType(GetServletContext()->GetMimeType(pi));
   int size = res.GetSize();
-  if (res.IsCompressed())
-  {
-    resStream.seekg(0, std::ios::end);
-    size = resStream.tellg();
-    resStream.seekg(0, std::ios::beg);
-  }
   response.SetIntHeader("Content-Length", size);
 
   // spool the actual contents

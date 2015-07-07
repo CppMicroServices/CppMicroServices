@@ -68,4 +68,4 @@ void WebConsoleActivator::Unload(us::ModuleContext* /*context*/)
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(usWebConsole, US_PREPEND_NAMESPACE(WebConsoleActivator))
+US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(WebConsoleActivator))

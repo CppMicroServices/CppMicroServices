@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -34,7 +35,5 @@ struct TestModuleAService
 };
 
 US_END_NAMESPACE
-
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleAService), "org.cppmicroservices.TestModuleAService")
 
 #endif // USTESTMODULEASERVICE_H

@@ -5,8 +5,6 @@ US_USE_NAMESPACE
 
 struct IFooService {};
 
-US_DECLARE_SERVICE_INTERFACE(IFooService, "org.cppmicroservices.snippets.IFooService")
-
 ///! [tt]
 struct MyTrackedClass { /* ... */ };
 //! [tt]
@@ -99,12 +97,17 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
 
   // For compilation test purposes only
   MyTrackingCustomizerVoid myCustomizer2;
-  ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(), &myCustomizer2);
-  ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext());
+  try
+  {
+    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(), &myCustomizer2);
+    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext());
+  }
+  catch (const us::ServiceException&)
+  {}
 
   return 0;
 }
 
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_EXECUTABLE("uServices-modulecontext")
+US_INITIALIZE_MODULE

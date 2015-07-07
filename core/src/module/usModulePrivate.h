@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -29,7 +30,7 @@
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
 #include "usModuleManifest_p.h"
-#include "usModuleResourceTree_p.h"
+#include "usModuleResourceContainer_p.h"
 
 #include "usAtomicInt_p.h"
 
@@ -55,13 +56,7 @@ public:
 
   void RemoveModuleResources();
 
-  void StartStaticModules();
-
-  void StopStaticModules();
-
   CoreModuleContext* const coreCtx;
-
-  std::vector<std::string> staticModuleLibNames;
 
   /**
    * Module version
@@ -70,8 +65,7 @@ public:
 
   ModuleInfo info;
 
-  std::vector<ModuleResourceTree*> resourceTreePtrs;
-  std::map<std::string, ModuleResourceTree*> mapLibNameToResourceTrees;
+  ModuleResourceContainer resourceContainer;
 
   /**
    * ModuleContext for the module
@@ -82,15 +76,14 @@ public:
 
   ModuleManifest moduleManifest;
 
+  std::string baseStoragePath;
   std::string storagePath;
 
   Module* const q;
 
 private:
 
-  void InitializeResources(const std::string& location);
-
-  std::list<ModuleInfo::ModuleActivatorHook> staticActivators;
+  void InitializeResources();
 
   static AtomicInt idCounter;
 

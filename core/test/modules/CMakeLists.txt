@@ -11,3 +11,5 @@ add_subdirectory(libSL3)
 add_subdirectory(libSL4)
 
 add_subdirectory(libRWithResources)
+add_subdirectory(libRWithAppendedResources)
+add_subdirectory(libRWithLinkedResources)

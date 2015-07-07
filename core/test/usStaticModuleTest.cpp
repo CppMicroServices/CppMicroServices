@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -56,20 +57,23 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
   {
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
-
-  Module* moduleB = ModuleRegistry::GetModule("TestModuleB Module");
-  US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
-
-  US_TEST_CONDITION(moduleB->GetName() == "TestModuleB Module", "Test module name")
 #else
                SharedLibrary& /*libB*/)
 {
 #endif
 
+  Module* moduleB = ModuleRegistry::GetModule("TestModuleB");
+  US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
+
+  Module* moduleImportedByB = ModuleRegistry::GetModule("TestModuleImportedByB");
+  US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for existing module TestModuleImportedByB")
+
+  US_TEST_CONDITION(moduleB->GetName() == "TestModuleB", "Test module name")
+
   // Check if libB registered the expected service
   try
   {
-    std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
+    std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("us::TestModuleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
     InterfaceMap o1 = mc->GetService(refs.front());
@@ -93,6 +97,8 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
 #ifdef US_BUILD_SHARED_LIBS
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleB));
+    pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleImportedByB));
+    pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleImportedByB));
 #endif
 
     std::vector<ServiceEvent> seEvts;
@@ -118,13 +124,14 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
 // Unload libB and check for correct events
 void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libB)
 {
-#ifdef US_BUILD_SHARED_LIBS
-  Module* moduleB = ModuleRegistry::GetModule("TestModuleB Module");
+  Module* moduleB = ModuleRegistry::GetModule("TestModuleB");
   US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
-#endif
+
+  Module* moduleImportedByB = ModuleRegistry::GetModule("TestModuleImportedByB");
+  US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
 
   std::vector<ServiceReferenceU> refs
-      = mc->GetServiceReferences("org.cppmicroservices.TestModuleBService");
+      = mc->GetServiceReferences("us::TestModuleBService");
   US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
   US_TEST_CONDITION(refs.back(), "Test for second valid service reference")
 
@@ -142,14 +149,16 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
 
   std::vector<ModuleEvent> pEvts;
 #ifdef US_BUILD_SHARED_LIBS
+  pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, moduleImportedByB));
+  pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, moduleImportedByB));
   pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, moduleB));
   pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, moduleB));
 #endif
 
   std::vector<ServiceEvent> seEvts;
 #ifdef US_BUILD_SHARED_LIBS
-  seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.back()));
   seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.front()));
+  seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.back()));
 #endif
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
@@ -164,32 +173,12 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
   ModuleContext* mc = GetModuleContext();
   TestModuleListener listener;
 
-  try
-  {
-    mc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
-  }
-  catch (const std::logic_error& ise)
-  {
-    US_TEST_OUTPUT( << "module listener registration failed " << ise.what() );
-    throw;
-  }
-
-  try
-  {
-    mc->AddServiceListener(&listener, &TestModuleListener::ServiceChanged);
-  }
-  catch (const std::logic_error& ise)
-  {
-    US_TEST_OUTPUT( << "service listener registration failed " << ise.what() );
-    throw;
-  }
+  ModuleListenerRegistrationHelper<TestModuleListener> ml(mc, &listener, &TestModuleListener::ModuleChanged);
+  ServiceListenerRegistrationHelper<TestModuleListener> sl(mc, &listener, &TestModuleListener::ServiceChanged);
 
   SharedLibrary libB(LIB_PATH, "TestModuleB");
   frame020a(mc, listener, libB);
   frame030b(mc, listener, libB);
-
-  mc->RemoveModuleListener(&listener, &TestModuleListener::ModuleChanged);
-  mc->RemoveServiceListener(&listener, &TestModuleListener::ServiceChanged);
 
   US_TEST_END()
 }

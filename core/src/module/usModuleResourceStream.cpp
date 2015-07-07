@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -29,8 +30,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4355)
 US_BEGIN_NAMESPACE
 
 ModuleResourceStream::ModuleResourceStream(const ModuleResource& resource, std::ios_base::openmode mode)
-  : ModuleResourceBuffer(resource.GetData(), resource.GetSize(), mode | std::ios_base::in,
-                         resource.IsCompressed())
+  : ModuleResourceBuffer(resource.GetData(), resource.GetSize(), mode | std::ios_base::in)
   , std::istream(this)
 {
 }

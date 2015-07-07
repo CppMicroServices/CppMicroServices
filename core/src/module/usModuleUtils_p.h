@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -27,7 +28,14 @@
 
 #include <string>
 
+#define US_STR_(x) #x
+#define US_STR(x) US_STR_(x)
+#define US_CONCAT_(x,y) x ## y
+#define US_CONCAT(x,y) US_CONCAT_(x,y)
+
 US_BEGIN_NAMESPACE
+
+struct ModuleInfo;
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -35,9 +43,9 @@ US_BEGIN_NAMESPACE
  */
 struct US_Core_EXPORT ModuleUtils
 {
-  static std::string GetLibraryPath(const std::string& libName, void* symbol);
+  static std::string GetLibraryPath(void* symbol);
 
-  static void* GetSymbol(const std::string& libName, const char* symbol);
+  static void* GetSymbol(const ModuleInfo& module, const char* symbol);
 };
 
 US_END_NAMESPACE

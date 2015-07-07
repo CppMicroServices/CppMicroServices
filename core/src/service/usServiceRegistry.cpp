@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,6 +22,7 @@
 
 #include <iterator>
 #include <stdexcept>
+#include <cassert>
 
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
@@ -283,6 +285,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& s
 {
   MutexLock lock(mutex);
 
+  assert(sr.d->properties.Value(ServiceConstants::OBJECTCLASS()).Type() == typeid(std::vector<std::string>));
   const std::vector<std::string>& classes = ref_any_cast<std::vector<std::string> >(
         sr.d->properties.Value(ServiceConstants::OBJECTCLASS()));
   services.erase(sr);

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -67,6 +68,7 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
     , autoLoadingEnabled(false)
   #endif
     , autoLoadingDisabled(false)
+    , logLevel(DebugMsg)
   {
     autoLoadPaths.insert(ModuleSettings::CURRENT_MODULE_PATH());
 
@@ -101,6 +103,7 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
   bool autoLoadingEnabled;
   bool autoLoadingDisabled;
   std::string storagePath;
+  MsgType logLevel;
 };
 
 US_GLOBAL_STATIC(ModuleSettingsPrivate, moduleSettingsPrivate)
@@ -170,6 +173,18 @@ std::string ModuleSettings::GetStoragePath()
 {
   US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
   return moduleSettingsPrivate()->storagePath;
+}
+
+void ModuleSettings::SetLogLevel(MsgType level)
+{
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
+  moduleSettingsPrivate()->logLevel = level;
+}
+
+MsgType ModuleSettings::GetLogLevel()
+{
+  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
+  return moduleSettingsPrivate()->logLevel;
 }
 
 US_END_NAMESPACE

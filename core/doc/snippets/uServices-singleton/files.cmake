@@ -5,6 +5,4 @@ set(snippet_src_files
   SingletonTwo.cpp
 )
 
-usFunctionGenerateExecutableInit(snippet_src_files
-                                 IDENTIFIER "uServices_singleton"
-                                )
+usFunctionGenerateModuleInit(snippet_src_files)

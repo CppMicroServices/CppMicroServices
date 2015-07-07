@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,8 +24,6 @@
 #define USMODULEMANIFEST_P_H
 
 #include "usAny.h"
-
-#include "json_p.h"
 
 US_BEGIN_NAMESPACE
 
@@ -47,12 +46,6 @@ public:
 private:
 
   typedef std::map<std::string, Any> AnyMap;
-  typedef std::vector<Any> AnyVector;
-
-  Any ParseJsonValue(const Json::Value& jsonValue);
-
-  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
-  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector);
 
   AnyMap m_Properties;
 };

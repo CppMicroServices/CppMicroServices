@@ -22,8 +22,10 @@ add_subdirectory(modules)
 
 set(_tests
   usAnyTest
-  usDebugOutputTest
   usLDAPFilterTest
+  usLogTest
+  usModuleHooksTest
+  usModuleManifestTest
   usModuleTest
   usModuleResourceTest
   usServiceFactoryTest
@@ -38,8 +40,6 @@ set(_tests
 
 if(US_BUILD_SHARED_LIBS)
   list(APPEND _tests
-       usModuleHooksTest
-       usModuleManifestTest
        usServiceListenerTest
        usSharedLibraryTest
       )
@@ -49,6 +49,7 @@ if(US_BUILD_SHARED_LIBS)
 endif()
 
 set(_additional_srcs
+  usTestDriverActivator.cpp
   usTestManager.cpp
   usTestUtilModuleListener.cpp
 )
@@ -57,22 +58,28 @@ set(_test_driver us${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
-usFunctionEmbedResources(_srcs EXECUTABLE_NAME ${_test_driver} FILES usTestResource.txt manifest.json)
-
 # Generate a custom "module init" file for the test driver executable
-if(US_BUILD_SHARED_LIBS)
-  usFunctionGenerateExecutableInit(_srcs IDENTIFIER ${_test_driver})
-endif()
+usFunctionGenerateModuleInit(_srcs)
 
+usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
+set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
+set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)
+  set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()
+
 target_link_libraries(${_test_driver} ${Core_TARGET})
 
 if(UNIX AND NOT APPLE)
   target_link_libraries(${_test_driver} rt)
 endif()
+
+# Add resources
+usFunctionEmbedResources(TARGET ${_test_driver}
+                         FILES usTestResource.txt manifest.json
+                         ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
 
 # Register tests
 foreach(_test ${_tests})

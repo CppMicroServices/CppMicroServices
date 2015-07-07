@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -65,14 +66,14 @@ struct TrackedTypeTraitsBase
   static TrackedType ConvertToTrackedType(const InterfaceMap&)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
-    return TTT::DefaultValue();
+    //return TTT::DefaultValue();
   }
 
   // Needed for S != void
   static TrackedType ConvertToTrackedType(void*)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
-    return TTT::DefaultValue();
+    //return TTT::DefaultValue();
   }
 };
 
@@ -221,10 +222,7 @@ struct TrackedTypeTraits<void,void*>
  *
  *
  * @tparam S The type of the service being tracked. The type S* must be an
- *         assignable datatype. Further, if the
- *         <code>ServiceTracker(ModuleContext*, ServiceTrackerCustomizer<S,T>*)</code>
- *         constructor is used, the type must have an associated interface id via
- *         #US_DECLARE_SERVICE_INTERFACE.
+ *         assignable datatype.
  * @tparam TTT Type traits of the tracked object. The type traits class provides
  *         information about the customized service object, see TrackedTypeTraitsBase.
  *

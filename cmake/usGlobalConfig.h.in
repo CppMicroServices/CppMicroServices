@@ -8,7 +8,6 @@
 
 #cmakedefine US_BUILD_SHARED_LIBS
 #cmakedefine US_ENABLE_THREADING_SUPPORT
-#cmakedefine US_ENABLE_RESOURCE_COMPRESSION
 #cmakedefine US_GCC_RTTI_WORKAROUND_NEEDED
 #cmakedefine US_HAVE_VISIBILITY_ATTRIBUTE
 
@@ -16,6 +15,7 @@
 // Header Availability
 //-------------------------------------------------------------------
 
+#cmakedefine US_HAVE_CXXABI_H
 #cmakedefine US_HAVE_STDINT_H
 #cmakedefine US_HAVE_TR1_UNORDERED_MAP_H
 #cmakedefine US_HAVE_TR1_UNORDERED_SET_H

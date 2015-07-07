@@ -4,11 +4,17 @@ find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
 find_program(CTEST_GIT_COMMAND NAMES git)
 
 set(CTEST_SITE "bigeye")
-set(CTEST_DASHBOARD_ROOT "/tmp/us builds")
-#set(CTEST_COMPILER "gcc-4.5")
-set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
-set(CTEST_BUILD_FLAGS "-j")
-set(CTEST_BUILD_CONFIGURATION Debug)
+if(WIN32)
+  set(CTEST_DASHBOARD_ROOT "C:/tmp/us")
+else()
+  set(CTEST_DASHBOARD_ROOT "/tmp/us")
+  set(CTEST_BUILD_FLAGS "-j")
+  #set(CTEST_COMPILER "gcc-4.5")
+endif()
+
+set(CTEST_CONFIGURATION_TYPE Release)
+set(CTEST_BUILD_CONFIGURATION Release)
+
 set(CTEST_PARALLEL_LEVEL 4)
 
 set(US_TEST_SHARED 1)
@@ -20,5 +26,13 @@ set(US_BUILD_CONFIGURATION )
 foreach(i RANGE 7)
   list(APPEND US_BUILD_CONFIGURATION ${i})
 endforeach()
+
+if(WIN32 AND NOT MINGW)
+  set(US_CMAKE_GENERATOR
+      "Visual Studio 9 2008"
+      "Visual Studio 10"
+      "Visual Studio 11"
+     )
+endif()
 
 include(${US_SOURCE_DIR}/cmake/usCTestScript.cmake)

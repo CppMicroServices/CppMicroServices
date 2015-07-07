@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -35,9 +36,14 @@ struct ITestServiceA
   virtual ~ITestServiceA() {}
 };
 
-US_DECLARE_SERVICE_INTERFACE(ITestServiceA, "org.cppmicroservices.testing.ITestServiceA")
 
-int TestMultipleServiceRegistrations()
+void TestServiceInterfaceId()
+{
+  US_TEST_CONDITION(us_service_interface_iid<int>() == "int", "Service interface id int")
+  US_TEST_CONDITION(us_service_interface_iid<ITestServiceA>() == "ITestServiceA", "Service interface id ITestServiceA")
+}
+
+void TestMultipleServiceRegistrations()
 {
   struct TestServiceA : public ITestServiceA
   {
@@ -64,11 +70,9 @@ int TestMultipleServiceRegistrations()
 
   ServiceReference<ITestServiceA> ref = context->GetServiceReference<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
-
-  return EXIT_SUCCESS;
 }
 
-int TestServicePropertiesUpdate()
+void TestServicePropertiesUpdate()
 {
   struct TestServiceA : public ITestServiceA
   {
@@ -122,8 +126,6 @@ int TestServicePropertiesUpdate()
 
   reg2.Unregister();
   US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().empty(), "Testing service count")
-
-  return EXIT_SUCCESS;
 }
 
 
@@ -131,8 +133,9 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryTest");
 
-  US_TEST_CONDITION(TestMultipleServiceRegistrations() == EXIT_SUCCESS, "Testing service registrations: ")
-  US_TEST_CONDITION(TestServicePropertiesUpdate() == EXIT_SUCCESS, "Testing service property update: ")
+  TestServiceInterfaceId();
+  TestMultipleServiceRegistrations();
+  TestServicePropertiesUpdate();
 
   US_TEST_END()
 }

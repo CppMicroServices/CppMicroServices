@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -98,7 +99,7 @@ public:
 
   /**
    * Returns the property key for looking up this module's
-   * location the file system.
+   * location in the file system.
    * The property value is of type \c std::string.
    *
    * @return The location property key.
@@ -119,7 +120,7 @@ public:
    * up this module's vendor information.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @return The vendor property key.
    */
   static const std::string& PROP_VENDOR();
 
@@ -128,7 +129,7 @@ public:
    * up this module's description.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @return The description property key.
    */
   static const std::string& PROP_DESCRIPTION();
 
@@ -137,9 +138,20 @@ public:
    * up this module's auto-load directory.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @return The auto-load directory property key.
    */
   static const std::string& PROP_AUTOLOAD_DIR();
+
+  /**
+   * Returns the property key with a value of \c module.autoloaded_modules for
+   * looking up this module's auto-load modules.
+   * The property value is of type \c std::vector<std::string> and contains
+   * the file system locations for the auto-loaded modules triggered by this
+   * module.
+   *
+   * @return The auto-loaded modules property key.
+   */
+  static const std::string& PROP_AUTOLOADED_MODULES();
 
   ~Module();
 
@@ -288,11 +300,6 @@ public:
    * The specified \c path is always relative to the root of this module and may
    * begin with '/'. A path value of "/" indicates the root of this module.
    *
-   * \note In case of other modules being statically linked into this module,
-   * the \c path can be ambiguous and returns the first resource matching the
-   * provided \c path according to the order of the static module names in the
-   * #US_LOAD_IMPORTED_MODULES macro.
-   *
    * @param path The path name of the resource.
    * @return A ModuleResource object for the given \c path. If the \c path cannot
    * be found in this module or the module's state is \c UNLOADED, an invalid
@@ -301,7 +308,7 @@ public:
   ModuleResource GetResource(const std::string& path) const;
 
   /**
-   * Returns resources in this module and its statically linked modules.
+   * Returns resources in this module.
    *
    * This method is intended to be used to obtain configuration, setup, localization
    * and other information from this module.
@@ -313,12 +320,6 @@ public:
    * Examples:
    * \snippet uServices-resources/main.cpp 0
    *
-   * \note In case of modules statically linked into this module, the returned
-   * ModuleResource objects can represent the same resource path, coming from
-   * different static modules. The order of the ModuleResource objects in the
-   * returned container matches the order of the static module names in the
-   * #US_LOAD_IMPORTED_MODULES macro.
-   *
    * @param path The path name in which to look. The path is always relative to the root
    * of this module and may begin with '/'. A path value of "/" indicates the root of this module.
    * @param filePattern The resource name pattern for selecting entries in the specified path.
@@ -327,9 +328,7 @@ public:
    * this is equivalent to "*" and matches all resources.
    * @param recurse If \c true, recurse into subdirectories. Otherwise only return resources
    * from the specified path.
-   * @return A vector of ModuleResource objects for each matching entry. The objects are sorted
-   * such that resources from this module are returned first followed by the resources from
-   * statically linked modules in the load order as specified in #US_LOAD_IMPORTED_MODULES.
+   * @return A vector of ModuleResource objects for each matching entry.
    */
   std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 

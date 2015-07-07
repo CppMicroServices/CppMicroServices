@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,15 +20,12 @@
 
 =============================================================================*/
 
-#ifndef USUNCOMPRESSRESOURCEDATA_H
-#define USUNCOMPRESSRESOURCEDATA_H
+#include <iostream>
 
-#include "usCoreConfig.h"
+namespace {
 
-US_BEGIN_NAMESPACE
+// This is dummy code to silence some linkers warning about
+// empty object files.
+struct CMakeResourceDependencies { CMakeResourceDependencies() { std::cout << std::flush; } };
 
-US_Core_EXPORT unsigned char* UncompressResourceData(const unsigned char* data, std::size_t size, std::size_t* uncompressedSize);
-
-US_END_NAMESPACE
-
-#endif // USUNCOMPRESSRESOURCEDATA_H
+}

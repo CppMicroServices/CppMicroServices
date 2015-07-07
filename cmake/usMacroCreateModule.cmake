@@ -5,7 +5,7 @@ macro(usMacroCreateModule _project_name)
 project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
-  "SKIP_EXAMPLES"
+  "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET"
   "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
@@ -71,29 +71,29 @@ if(_internal_include_dirs)
   include_directories(${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
 endif()
 
-# Embed module resources
-set(_resource_args )
-if(${PROJECT_NAME}_RESOURCES)
-  list(APPEND _resource_args ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources FILES ${${PROJECT_NAME}_RESOURCES})
-endif()
-if(${PROJECT_NAME}_BINARY_RESOURCES)
-  list(APPEND _resource_args ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources FILES ${${PROJECT_NAME}_BINARY_RESOURCES})
-endif()
-if(_resource_args)
-  usFunctionEmbedResources(${PROJECT_NAME}_SOURCES LIBRARY_NAME ${${PROJECT_NAME}_TARGET}
-                           ${_resource_args})
-endif()
-
 #-----------------------------------------------------------------------------
 # Create library
 #-----------------------------------------------------------------------------
 
 # Generate the module init file
-usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES NAME ${${PROJECT_NAME}_TARGET})
+if(NOT ${PROJECT_NAME}_SKIP_INIT)
+  usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES)
+endif()
+
+if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
+  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
+endif()
 
 # Create the module library
 add_library(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_SOURCES}
             ${${PROJECT_NAME}_PRIVATE_HEADERS} ${${PROJECT_NAME}_PUBLIC_HEADERS})
+
+# Compile definitions
+set_property(TARGET ${${PROJECT_NAME}_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${${PROJECT_NAME}_TARGET})
+set_property(TARGET ${${PROJECT_NAME}_TARGET} PROPERTY US_MODULE_NAME ${${PROJECT_NAME}_TARGET})
+if(NOT US_BUILD_SHARED_LIBS)
+  set_property(TARGET ${${PROJECT_NAME}_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
+endif()
 
 # Link flags
 if(${PROJECT_NAME}_LINK_FLAGS OR US_LINK_FLAGS)
@@ -113,18 +113,36 @@ if(${PROJECT_NAME}_LINK_LIBRARIES OR US_LIBRARIES)
   target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES})
 endif()
 
+# Embed module resources
+
+if(${PROJECT_NAME}_RESOURCES OR US_LIBRARIES)
+  usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
+                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources
+                         FILES ${${PROJECT_NAME}_RESOURCES}
+                         ZIP_ARCHIVES ${US_LIBRARIES}
+                        )
+endif()
+if(${PROJECT_NAME}_BINARY_RESOURCES)
+  usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
+                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
+                         FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
+                        )
+endif()
+usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
 
 #-----------------------------------------------------------------------------
 # Install support
 #-----------------------------------------------------------------------------
 
-install(TARGETS ${${PROJECT_NAME}_TARGET}
-        EXPORT us${PROJECT_NAME}Targets
-        RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-        PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+if(NOT US_NO_INSTALL)
+  install(TARGETS ${${PROJECT_NAME}_TARGET}
+          EXPORT us${PROJECT_NAME}Targets
+          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+endif()
 
 #-----------------------------------------------------------------------------
 # US testing
@@ -147,11 +165,20 @@ endif()
 # Last configuration and install steps
 #-----------------------------------------------------------------------------
 
+# Version information
+configure_file(
+  ${US_CMAKE_DIR}/usModuleConfigVersion.cmake.in
+  ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
 export(TARGETS ${${PROJECT_NAME}_TARGET} ${US_LIBRARIES}
        FILE ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}Targets.cmake)
-install(EXPORT us${PROJECT_NAME}Targets
-        FILE us${PROJECT_NAME}Targets.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+if(NOT US_NO_INSTALL)
+  install(EXPORT us${PROJECT_NAME}Targets
+          FILE us${PROJECT_NAME}Targets.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+endif()
 
 # Configure config file for the build tree
 
@@ -168,29 +195,24 @@ configure_file(
 
 # Configure config file for the install tree
 
-set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
-set(CONFIG_RUNTIME_LIBRARY_DIR ${RUNTIME_INSTALL_DIR})
+if(NOT US_NO_INSTALL)
+  set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
+  set(CONFIG_RUNTIME_LIBRARY_DIR ${RUNTIME_INSTALL_DIR})
 
-configure_package_config_file(
-  ${US_CMAKE_DIR}/usModuleConfig.cmake.in
-  ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
-  INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-  PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_LIBRARY_DIR
-  NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-  )
+  configure_package_config_file(
+    ${US_CMAKE_DIR}/usModuleConfig.cmake.in
+    ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+    PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_LIBRARY_DIR
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
 
-# Version information
-configure_file(
-  ${US_CMAKE_DIR}/usModuleConfigVersion.cmake.in
-  ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
-  @ONLY
-  )
-
-install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
-              ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-        ${US_SDK_INSTALL_COMPONENT})
+  install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
+                ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+          ${US_SDK_INSTALL_COMPONENT})
+endif()
 
 #-----------------------------------------------------------------------------
 # Build the examples

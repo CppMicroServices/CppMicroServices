@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -102,7 +103,14 @@ void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
     for (ModuleListenerMap::mapped_type::iterator iter2 = iter->second.begin(), end2 = iter->second.end();
          iter2 != end2; ++iter2)
     {
-      (iter2->first)(evt);
+      try
+      {
+        (iter2->first)(evt);
+      }
+      catch (const std::exception& e)
+      {
+        US_WARN << "Module listener threw an exception: " << e.what();
+      }
     }
   }
 }
@@ -183,9 +191,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       catch (...)
       {
         US_WARN << "Service listener"
-            #ifdef US_MODULE_SUPPORT_ENABLED
-                << " in " << l->GetModule()->GetName()
-            #endif
+                << " in " << l->GetModuleContext()->GetModule()->GetName()
                 << " threw an exception!";
       }
     }

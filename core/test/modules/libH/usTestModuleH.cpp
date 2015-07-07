@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -40,13 +41,6 @@ struct TestModuleH2
 {
   virtual ~TestModuleH2() {}
 };
-
-US_END_NAMESPACE
-
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH), "org.cppmicroservices.TestModuleH")
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH2), "org.cppmicroservices.TestModuleH2")
-
-US_BEGIN_NAMESPACE
 
 class TestProduct : public TestModuleH
 {
@@ -144,4 +138,4 @@ public:
 
 US_END_NAMESPACE
 
-US_EXPORT_MODULE_ACTIVATOR(TestModuleH, us::TestModuleHActivator)
+US_EXPORT_MODULE_ACTIVATOR(us::TestModuleHActivator)

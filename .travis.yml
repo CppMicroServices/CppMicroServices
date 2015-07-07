@@ -3,33 +3,6 @@ compiler:
   - gcc
   - clang
 env:
-  global:
-
-    # -- BEGIN Coverity Scan ENV
-
-    # Pre-configuration steps that should not be analyzed
-    - COVERITY_SCAN_BUILD_COMMAND_PREPEND="cmake -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_BUILD_TESTING:BOOL=ON -DUS_ENABLE_AUTOLOADING_SUPPORT:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=ON ."
-
-    # The build command with all of the arguments that you would apply to a manual `cov-build`
-    # Usually this is the same as STANDARD_BUILD_COMMAND, exluding the automated test arguments
-    - COVERITY_SCAN_BUILD_COMMAND="make -j4"
-
-    - COVERITY_SCAN_PROJECT_NAME="saschazelzer/CppMicroServices"
-
-    # Email address for notifications related to this build
-    - COVERITY_SCAN_NOTIFICATION_EMAIL="s.zelzer@dkfz-heidelberg.de"
-
-    # Regular expression selects on which branches to run analysis
-    # Be aware of quotas. Do not run on every branch/commit
-    - COVERITY_SCAN_BRANCH_PATTERN="development"
-
-    # COVERITY_SCAN_TOKEN via "travis encrypt" using the repo's public key
-    - secure: "byqeazsk6vCHFoWrZJvLFy/m1KI8sDIEhW7b1yvlGpcCrXQBoDk+dtr3kLCgiYl1+gC39av++0uOJnoM7xn/qiURW65CVDWxa9Giie079M63tqDRbOoeGezhBa8DEXJjhxZ77Iijt0tTOcp/VWg87uSiHSqI+B9HwrWDKwEtSzM="
-
-    - COVERITY_SCAN_BUILD_URL="https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh"
-
-    # -- END Coverity Scan ENV
-
   matrix:
   - BUILD_CONFIGURATION=0
   - BUILD_CONFIGURATION=1
@@ -39,13 +12,6 @@ env:
   - BUILD_CONFIGURATION=5
   - BUILD_CONFIGURATION=6
   - BUILD_CONFIGURATION=7
-
-matrix:
-  include:
-    - language: cpp
-      compiler: gcc
-      env:
-      script: curl -s $COVERITY_SCAN_BUILD_URL | bash
 
 branches:
   only:

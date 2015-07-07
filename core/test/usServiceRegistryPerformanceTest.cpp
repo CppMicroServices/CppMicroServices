@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -35,6 +36,12 @@ US_USE_NAMESPACE
 #error Monotonic clock support missing on this POSIX platform
 #endif
 #elif defined(US_PLATFORM_WINDOWS)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef VC_EXTRA_LEAN
+#define VC_EXTRA_LEAN
+#endif
 #include <windows.h>
 #else
 #error High precision timer support nod available on this platform
@@ -166,8 +173,6 @@ struct IPerfTestService
 {
   virtual ~IPerfTestService() {}
 };
-
-US_DECLARE_SERVICE_INTERFACE(IPerfTestService, "org.cppmicroservices.test.IPerfTestService")
 
 
 class ServiceRegistryPerformanceTest

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,6 +27,7 @@
 #include <usCoreConfig.h>
 
 #include <string>
+#include <vector>
 
 //-------------------------------------------------------------------
 // Module auto-loading
@@ -35,7 +37,7 @@ US_BEGIN_NAMESPACE
 
 struct ModuleInfo;
 
-void AutoLoadModules(const ModuleInfo& moduleInfo);
+std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo);
 
 US_END_NAMESPACE
 

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -45,43 +46,15 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
   : coreCtx(coreCtx)
   , info(*info)
+  , resourceContainer(info)
   , moduleContext(0)
   , moduleActivator(0)
   , q(qq)
 {
-  // Parse the statically imported module library names
-  typedef const char*(*GetImportedModulesFunc)(void);
-
-  std::string getImportedModulesSymbol("_us_get_imported_modules_for_");
-  getImportedModulesSymbol += this->info.libName;
-
-  std::string location = this->info.location;
-  if (this->info.libName.empty())
-  {
-    /* make sure we retrieve symbols from the executable, if "libName" is empty */
-    location.clear();
-  }
-
-  GetImportedModulesFunc getImportedModulesFunc = NULL;
-  void* getImportedModulesSym = ModuleUtils::GetSymbol(location, getImportedModulesSymbol.c_str());
-  std::memcpy(&getImportedModulesFunc, &getImportedModulesSym, sizeof(void*));
-  if (getImportedModulesFunc != NULL)
-  {
-    std::string importedStaticModuleLibNames = getImportedModulesFunc();
-
-    std::istringstream iss(importedStaticModuleLibNames);
-    std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
-              std::back_inserter<std::vector<std::string> >(this->staticModuleLibNames));
-  }
-
-  InitializeResources(location);
-
   // Check if the module provides a manifest.json file and if yes, parse it.
-  ModuleResource manifestRes;
-  std::map<std::string, ModuleResourceTree*>::iterator resourceTreeIter = mapLibNameToResourceTrees.find(this->info.libName);
-  if (resourceTreeIter != mapLibNameToResourceTrees.end() && resourceTreeIter->second->IsValid())
+  if (resourceContainer.IsValid())
   {
-    manifestRes = ModuleResource("/manifest.json", resourceTreeIter->second, resourceTreePtrs);
+    ModuleResource manifestRes("/manifest.json", resourceContainer);
     if (manifestRes)
     {
       ModuleResourceStream manifestStream(manifestRes);
@@ -133,43 +106,14 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   }
   else
   {
-    // default to the library name or a special name for executables
-    if (!this->info.libName.empty())
-    {
-      this->info.autoLoadDir = this->info.libName;
-      moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
-    }
-    else
-    {
-      this->info.autoLoadDir = "main";
-      moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
-    }
-  }
-
-  // comput the module storage path
-#ifdef US_PLATFORM_WINDOWS
-    static const char separator = '\\';
-#else
-    static const char separator = '/';
-#endif
-
-  std::string baseStoragePath = ModuleSettings::GetStoragePath();
-  if (!baseStoragePath.empty())
-  {
-    char buf[50];
-    sprintf(buf, "%ld", this->info.id);
-    storagePath = baseStoragePath + separator + buf + "_" + this->info.libName + separator;
+    this->info.autoLoadDir = this->info.name;
+    moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
   }
 }
 
 ModulePrivate::~ModulePrivate()
 {
   delete moduleContext;
-
-  for (std::size_t i = 0; i < this->resourceTreePtrs.size(); ++i)
-  {
-    delete resourceTreePtrs[i];
-  }
 }
 
 void ModulePrivate::RemoveModuleResources()
@@ -199,87 +143,6 @@ void ModulePrivate::RemoveModuleResources()
        i != srs.end(); ++i)
   {
     i->GetReference(std::string()).d->UngetService(q, false);
-  }
-
-  for (std::size_t i = 0; i < resourceTreePtrs.size(); ++i)
-  {
-    resourceTreePtrs[i]->Invalidate();
-  }
-}
-
-void ModulePrivate::StartStaticModules()
-{
-  std::string location = this->info.location;
-  if (this->info.libName.empty())
-  {
-    /* make sure we retrieve symbols from the executable, if "libName" is empty */
-    location.clear();
-  }
-
-  for (std::vector<std::string>::iterator i = staticModuleLibNames.begin();
-       i != staticModuleLibNames.end(); ++i)
-  {
-    std::string staticActivatorSymbol = "_us_module_activator_instance_";
-    staticActivatorSymbol += *i;
-    ModuleInfo::ModuleActivatorHook staticActivator = NULL;
-    void* staticActivatorSym = ModuleUtils::GetSymbol(location, staticActivatorSymbol.c_str());
-    std::memcpy(&staticActivator, &staticActivatorSym, sizeof(void*));
-    if (staticActivator)
-    {
-      US_DEBUG << "Loading static activator " << *i;
-      staticActivators.push_back(staticActivator);
-      staticActivator()->Load(moduleContext);
-    }
-    else
-    {
-      US_DEBUG << "Could not find an activator for the static module " << (*i)
-               << ". It propably does not provide an activator on purpose.\n Or you either "
-                  "forgot a US_IMPORT_MODULE macro call in " << info.libName
-               << " or to link " << (*i) << " to " << info.libName << ".";
-    }
-  }
-
-}
-
-void ModulePrivate::StopStaticModules()
-{
-  for (std::list<ModuleInfo::ModuleActivatorHook>::iterator i = staticActivators.begin();
-       i != staticActivators.end(); ++i)
-  {
-    (*i)()->Unload(moduleContext);
-  }
-}
-
-void ModulePrivate::InitializeResources(const std::string& location)
-{
-  // Get the resource data from static modules and this module
-  std::vector<std::string> moduleLibNames;
-  moduleLibNames.push_back(this->info.libName);
-  moduleLibNames.insert(moduleLibNames.end(),
-                        this->staticModuleLibNames.begin(), this->staticModuleLibNames.end());
-
-  std::string initResourcesSymbolPrefix = "_us_init_resources_";
-  for (std::size_t i = 0; i < moduleLibNames.size(); ++i)
-  {
-    std::string initResourcesSymbol = initResourcesSymbolPrefix + moduleLibNames[i];
-    ModuleInfo::InitResourcesHook initResourcesFunc = NULL;
-    void* initResourcesSym = ModuleUtils::GetSymbol(location, initResourcesSymbol.c_str());
-    std::memcpy(&initResourcesFunc, &initResourcesSym, sizeof(void*));
-    if (initResourcesFunc)
-    {
-      initResourcesFunc(&this->info);
-    }
-  }
-
-  // Initialize this modules resource trees
-  assert(this->info.resourceData.size() == this->info.resourceNames.size());
-  assert(this->info.resourceNames.size() == this->info.resourceTree.size());
-  for (std::size_t i = 0; i < this->info.resourceData.size(); ++i)
-  {
-    resourceTreePtrs.push_back(new ModuleResourceTree(this->info.resourceTree[i],
-                                                      this->info.resourceNames[i],
-                                                      this->info.resourceData[i]));
-    mapLibNameToResourceTrees[moduleLibNames[i]] = resourceTreePtrs.back();
   }
 }
 

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -35,124 +36,59 @@ US_END_NAMESPACE
 /**
  * \ingroup MicroServices
  *
- * \brief Import a static module.
+ * \brief Initialize a static module.
  *
- * \param _import_module_libname The physical name of the module to import, without prefix or suffix.
+ * \param _module_name The name of the module to initialize.
  *
- * This macro imports the static module named \c _import_module_libname.
+ * This macro initializes the static module named \c _module_name.
  *
- * Inserting this macro into your application's source code will allow you to make use of
- * a static module. Do not forget to list the imported module when calling the macro
- * #US_LOAD_IMPORTED_MODULES and to actually link the static module to the importing
- * executable or shared library.
- *
- * Example:
- * \snippet uServices-staticmodules/main.cpp ImportStaticModuleIntoLib
- *
- * \sa US_LOAD_IMPORTED_MODULES
- * \sa \ref MicroServices_StaticModules
- */
-#define US_IMPORT_MODULE(_import_module_libname)                      \
-  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _import_module_libname (); \
-  void _dummy_reference_to_ ## _import_module_libname ## _activator() \
-  {                                                                   \
-    _us_module_activator_instance_ ## _import_module_libname();       \
-  }
-
-/**
- * \ingroup MicroServices
- *
- * \brief Import a static module's resources.
- *
- * \param _import_module_libname The physical name of the module to import, without prefix or suffix.
- *
- * This macro imports the resources of the static module named \c _import_module_libname.
- *
- * Inserting this macro into your application's source code will allow you to make use of
- * the resources embedded in a static module. Do not forget to list the imported module when
- * calling the macro #US_LOAD_IMPORTED_MODULES and to actually link the static module to the
- * importing executable or shared library.
+ * It the module provides an activator, use the #US_IMPORT_MODULE macro instead,
+ * to ensure that the activator is called. Do not forget to actually link
+ * the static module to the importing executable or shared library.
  *
  * \sa US_IMPORT_MODULE
- * \sa US_LOAD_IMPORTED_MODULES
+ * \sa US_IMPORT_MODULE_RESOURCES
  * \sa \ref MicroServices_StaticModules
  */
-#define US_IMPORT_MODULE_RESOURCES(_import_module_libname)                 \
-  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_init_resources_ ## _import_module_libname (); \
-  void _dummy_reference_to_ ## _import_module_libname ## _init_resources() \
+#define US_INITIALIZE_STATIC_MODULE(_module_name)                          \
+  extern "C" void _us_import_module_initializer_ ## _module_name();        \
+  struct StaticModuleInitializer_ ## _module_name                          \
   {                                                                        \
-    _us_init_resources_ ## _import_module_libname();                       \
-  }
+    StaticModuleInitializer_ ## _module_name()                             \
+    {                                                                      \
+      _us_import_module_initializer_ ## _module_name();                    \
+    }                                                                      \
+  };                                                                       \
+  static StaticModuleInitializer_ ## _module_name _InitializeModule_ ## _module_name;
 
 /**
  * \ingroup MicroServices
- * \def US_LOAD_IMPORTED_MODULES_INTO_MAIN(_static_modules)
  *
- * \brief Import a list of static modules into an executable.
+ * \brief Import a static module.
  *
- * \param _static_modules A space-deliminated list of physical module names, without prefix
- *        or suffix.
+ * \param _module_name The name of the module to import.
  *
- * This macro ensures that the ModuleActivator::Load(ModuleContext*) function is called
- * for each imported static module when the importing executable is loaded (if the static
- * module provides an activator). If the static module provides embedded resources and
- * the US_IMPORT_MODULE_RESOURCES macro was called, the resources will be made available
- * through the importing module.
+ * This macro imports the static module named \c _module_name.
  *
- * There must be exactly one call of this macro in the executable which is
- * importing static modules.
+ * Inserting this macro into your application's source code will allow you to make use of
+ * a static module. It will initialize the static module and calls its
+ * ModuleActivator. It the module does not provide an activator, use the
+ * #US_INITIALIZE_STATIC_MODULE macro instead. Do not forget to actually link
+ * the static module to the importing executable or shared library.
  *
  * Example:
  * \snippet uServices-staticmodules/main.cpp ImportStaticModuleIntoMain
  *
- * \sa US_IMPORT_MODULE
- * \sa US_LOAD_IMPORTED_MODULES
+ * \sa US_INITIALIZE_STATIC_MODULE
+ * \sa US_IMPORT_MODULE_RESOURCES
  * \sa \ref MicroServices_StaticModules
  */
-
-#ifdef US_BUILD_SHARED_LIBS
-#define US_LOAD_IMPORTED_MODULES_INTO_MAIN(_static_modules)                            \
-  extern "C" US_ABI_EXPORT const char* _us_get_imported_modules_for_()                 \
-  {                                                                                    \
-    return #_static_modules;                                                           \
-  }
-#else
-#define US_LOAD_IMPORTED_MODULES_INTO_MAIN(_static_modules)                            \
-  extern "C" US_ABI_EXPORT const char* _us_get_imported_modules_for_CppMicroServices() \
-  {                                                                                    \
-    return #_static_modules;                                                           \
-  }
-#endif
-
-/**
- * \ingroup MicroServices
- *
- * \brief Import a list of static modules into a shared library.
- *
- * \param _module_libname The physical name of the importing module, without prefix or suffix.
- * \param _static_modules A space-deliminated list of physical module names, without prefix
- *        or suffix.
- *
- * This macro ensures that the ModuleActivator::Load(ModuleContext*) function is called
- * for each imported static module when the importing shared library is loaded (if the static
- * module provides an activator). If the static module provides embedded resources and
- * the US_IMPORT_MODULE_RESOURCES macro was called, the resources will be made available
- * through the importing module.
- *
- * There must be exactly one call of this macro in the shared library which is
- * importing static modules.
- *
- * Example:
- * \snippet uServices-staticmodules/main.cpp ImportStaticModuleIntoLib
- *
- * \sa US_IMPORT_MODULE
- * \sa US_LOAD_IMPORTED_MODULES_INTO_MAIN
- * \sa \ref MicroServices_StaticModules
- */
-#define US_LOAD_IMPORTED_MODULES(_module_libname, _static_modules)                         \
-  extern "C" US_ABI_EXPORT const char* _us_get_imported_modules_for_ ## _module_libname () \
-  {                                                                                        \
-    return #_static_modules;                                                               \
+#define US_IMPORT_MODULE(_module_name)                                     \
+  US_INITIALIZE_STATIC_MODULE(_module_name)                                \
+  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_name (); \
+  void _dummy_reference_to_ ## _module_name ## _activator()                \
+  {                                                                        \
+    _us_module_activator_instance_ ## _module_name();                      \
   }
 
 #endif // USMODULEREGISTRY_H

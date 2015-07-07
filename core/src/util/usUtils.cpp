@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,9 +26,11 @@
 #include "usModuleInfo.h"
 #include "usModuleSettings.h"
 
+#include <string>
 #include <cstdio>
 #include <cctype>
 #include <algorithm>
+#include <typeinfo>
 
 #ifdef US_PLATFORM_POSIX
   #include <errno.h>
@@ -40,7 +43,7 @@
   #endif
   #include <windows.h>
   #include <crtdbg.h>
-  #include "dirent_win32_p.h"
+  #include "dirent_win32.h"
 #endif
 
 //-------------------------------------------------------------------
@@ -84,7 +87,7 @@ bool load_impl(const std::string& modulePath)
   void* handle = LoadLibrary(modulePath.c_str());
   if (handle == NULL)
   {
-    US_WARN << GetLastErrorStr();
+    US_WARN << us::GetLastErrorStr();
   }
   return (handle != NULL);
 }
@@ -102,8 +105,10 @@ bool load_impl(const std::string&) { return false; }
 
 US_BEGIN_NAMESPACE
 
-void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
+std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
 {
+  std::vector<std::string> loadedModules;
+
   std::string loadPath = absoluteBasePath + DIR_SEP + subDir;
 
   DIR* dir = opendir(loadPath.c_str());
@@ -112,7 +117,7 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
   if (dir == NULL)
   {
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
-    if (indexOfLastSeparator != -1)
+    if (indexOfLastSeparator != std::string::npos)
     {
       std::string intermediateDir = absoluteBasePath.substr(indexOfLastSeparator+1);
       bool equalSubDir = intermediateDir.size() == std::strlen(CMAKE_INTDIR);
@@ -163,22 +168,29 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
         libPath += DIR_SEP;
       }
       libPath += entryFileName;
-      US_INFO << "Auto-loading module " << libPath;
+      US_DEBUG << "Auto-loading module " << libPath;
 
       if (!load_impl(libPath))
       {
         US_WARN << "Auto-loading of module " << libPath << " failed.";
       }
+      else
+      {
+        loadedModules.push_back(libPath);
+      }
     }
     closedir(dir);
   }
+  return loadedModules;
 }
 
-void AutoLoadModules(const ModuleInfo& moduleInfo)
+std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo)
 {
+  std::vector<std::string> loadedModules;
+
   if (moduleInfo.autoLoadDir.empty())
   {
-    return;
+    return loadedModules;
   }
 
   ModuleSettings::PathList autoLoadPaths = ModuleSettings::GetAutoLoadPaths();
@@ -204,8 +216,10 @@ void AutoLoadModules(const ModuleInfo& moduleInfo)
        i != autoLoadPaths.end(); ++i)
   {
     if (i->empty()) continue;
-    AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
+    std::vector<std::string> paths = AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
+    loadedModules.insert(loadedModules.end(), paths.begin(), paths.end());
   }
+  return loadedModules;
 }
 
 US_END_NAMESPACE
@@ -283,6 +297,53 @@ void message_output(MsgType msgType, const char *buf)
     exit(1); // goodbye cruel world
   #endif
   }
+}
+
+#ifdef US_HAVE_CXXABI_H
+#include <cxxabi.h>
+#endif
+
+US_Core_EXPORT ::std::string GetDemangledName(const ::std::type_info& typeInfo)
+{
+  ::std::string result;
+#ifdef US_HAVE_CXXABI_H
+  int status = 0;
+  char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);
+  if (demangled && status == 0)
+  {
+    result = demangled;
+    free(demangled);
+  }
+#elif defined(US_PLATFORM_WINDOWS)
+  const char* demangled = typeInfo.name();
+  if (demangled != NULL)
+  {
+    result = demangled;
+    // remove "struct" qualifiers
+    std::size_t pos = 0;
+    while (pos != std::string::npos)
+    {
+      if ((pos = result.find("struct ", pos)) != std::string::npos)
+      {
+        result = result.substr(0, pos) + result.substr(pos + 7);
+        pos += 8;
+      }
+    }
+    // remove "class" qualifiers
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+      if ((pos = result.find("class ", pos)) != std::string::npos)
+      {
+        result = result.substr(0, pos) + result.substr(pos + 6);
+        pos += 7;
+      }
+    }
+  }
+#else
+  (void)typeInfo;
+#endif
+  return result;
 }
 
 US_END_NAMESPACE

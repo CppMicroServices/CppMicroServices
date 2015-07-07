@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,7 +23,12 @@
 #ifndef USMODULEACTIVATOR_H_
 #define USMODULEACTIVATOR_H_
 
+#ifndef US_MODULE_NAME
+#error Missing US_MODULE_NAME preprocessor define
+#endif
+
 #include <usGlobalConfig.h>
+#include <usModuleUtils_p.h>
 
 US_BEGIN_NAMESPACE
 
@@ -97,24 +103,12 @@ struct ModuleActivator
 
 US_END_NAMESPACE
 
-#define US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(type)                                     \
-  struct ScopedPointer                                                                  \
-  {                                                                                     \
-    ScopedPointer(US_PREPEND_NAMESPACE(ModuleActivator)* activator = 0) : m_Activator(activator) {} \
-    ~ScopedPointer() { delete m_Activator; }                                            \
-    US_PREPEND_NAMESPACE(ModuleActivator)* m_Activator;                                 \
-  };                                                                                    \
-                                                                                        \
-  static ScopedPointer activatorPtr;                                                    \
-  if (activatorPtr.m_Activator == 0) activatorPtr.m_Activator = new type;               \
-  return activatorPtr.m_Activator;
 
 /**
  * \ingroup MicroServices
  *
  * \brief Export a module activator class.
  *
- * \param _module_libname The physical name of the module, without prefix or suffix.
  * \param _activator_type The fully-qualified type-name of the module activator class.
  *
  * Call this macro after the definition of your module activator to make it
@@ -122,16 +116,20 @@ US_END_NAMESPACE
  *
  * Example:
  * \snippet uServices-activator/main.cpp 0
- *
- * \note If you use this macro in a source file compiled into an executable, additional
- * requirements for the macro arguments apply:
- *  - The \c _module_libname argument must match the value of \c _module_name used in the
- *    \c #US_INITIALIZE_MODULE macro call.
  */
-#define US_EXPORT_MODULE_ACTIVATOR(_module_libname, _activator_type)                  \
-  extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_libname () \
-  {                                                                                   \
-    US_MODULE_ACTIVATOR_INSTANCE_FUNCTION(_activator_type)                            \
+#define US_EXPORT_MODULE_ACTIVATOR(_activator_type)                                       \
+  extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* US_CONCAT(_us_module_activator_instance_, US_MODULE_NAME) () \
+  {                                                                                       \
+    struct ScopedPointer                                                                  \
+    {                                                                                     \
+      ScopedPointer(US_PREPEND_NAMESPACE(ModuleActivator)* activator = 0) : m_Activator(activator) {} \
+      ~ScopedPointer() { delete m_Activator; }                                            \
+      US_PREPEND_NAMESPACE(ModuleActivator)* m_Activator;                                 \
+    };                                                                                    \
+                                                                                          \
+    static ScopedPointer activatorPtr;                                                    \
+    if (activatorPtr.m_Activator == 0) activatorPtr.m_Activator = new _activator_type;    \
+    return activatorPtr.m_Activator;                                                      \
   }
 
 #endif /* USMODULEACTIVATOR_H_ */

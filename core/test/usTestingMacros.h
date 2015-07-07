@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -18,6 +19,9 @@
   limitations under the License.
 
 =============================================================================*/
+
+#ifndef USTESTINGMACROS_H_
+#define USTESTINGMACROS_H_
 
 #include <exception>
 #include <string>
@@ -131,3 +135,5 @@ US_END_NAMESPACE
   US_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS)                                                 \
   STATEMENT ;                                                                                 \
   US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
+
+#endif // USTESTINGMACROS_H_

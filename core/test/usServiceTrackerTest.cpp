@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -62,12 +63,10 @@ bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
 struct MyInterfaceOne {
   virtual ~MyInterfaceOne() {}
 };
-US_DECLARE_SERVICE_INTERFACE(MyInterfaceOne, "org.cppmicroservices.servicetrackertest.MyInterfaceOne")
 
 struct MyInterfaceTwo {
   virtual ~MyInterfaceTwo() {}
 };
-US_DECLARE_SERVICE_INTERFACE(MyInterfaceTwo, "org.cppmicroservices.servicetrackertest.MyInterfaceTwo")
 
 class MyCustomizer : public us::ServiceTrackerCustomizer<MyInterfaceOne>
 {
@@ -148,10 +147,10 @@ void TestServiceTracker()
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
-  std::string s1("org.cppmicroservices.TestModuleSService");
+  std::string s1("us::TestModuleSService");
   ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
 
-  US_TEST_CONDITION_REQUIRED(servref != 0, "Test if registered service of id org.cppmicroservices.TestModuleSService0");
+  US_TEST_CONDITION_REQUIRED(servref != 0, "Test if registered service of id us::TestModuleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
   US_TEST_CONDITION_REQUIRED(servCtrlRef != 0, "Test if constrol service was registered");

@@ -735,10 +735,12 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "@PROJECT_SOURCE_DIR@" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionAddResources.cmake" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateExecutableInit.cmake" \
-                         "@PROJECT_BINARY_DIR@/include/usGlobalConfig.h"
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGetResourceSource.cmake" \
+                         "@PROJECT_BINARY_DIR@/include/usGlobalConfig.h" \
+                         "@PROJECT_BINARY_DIR@/core/include"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -777,6 +779,7 @@ RECURSIVE              = YES
 
 EXCLUDE                = "@PROJECT_SOURCE_DIR@/README.md" \
                          "@PROJECT_SOURCE_DIR@/gh-pages/" \
+                         "@PROJECT_SOURCE_DIR@/third_party/" \
                          "@PROJECT_SOURCE_DIR@/.git/"
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -795,7 +798,7 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */test/* \
                          */snippets/* \
-                         */examples/* \
+                         */core/examples/* \
                          */.git/* \
                          *_p.h \
                          *Private.*

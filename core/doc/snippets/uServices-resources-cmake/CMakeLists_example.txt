@@ -1,0 +1,15 @@
+set(module_name "org_me_mymodule")
+set(srcs mymodule.cpp)
+
+usFunctionGenerateModuleInit(srcs)
+usFunctionGetResourceSource(TARGET mymodule OUT srcs)
+
+add_library(mymodule ${srcs})
+target_link_libraries(mymodule CppMicroServices)
+
+set_property(TARGET mymodule APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${module_name})
+set_property(TARGET mymodule PROPERTY US_MODULE_NAME ${module_name})
+
+usFunctionEmbedResources(TARGET mymodule
+  FILES hello.txt
+)

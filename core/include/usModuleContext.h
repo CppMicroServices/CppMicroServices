@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -465,10 +466,10 @@ public:
   template<class S>
   std::vector<ServiceReference<S> > GetServiceReferences(const std::string& filter = std::string())
   {
-    const char* clazz = us_service_interface_iid<S>();
-    if (clazz == 0) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
+    std::string clazz = us_service_interface_iid<S>();
+    if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
     typedef std::vector<ServiceReferenceU> BaseVectorT;
-    BaseVectorT serviceRefs = GetServiceReferences(std::string(clazz), filter);
+    BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
     std::vector<ServiceReference<S> > result;
     for(BaseVectorT::const_iterator i = serviceRefs.begin(); i != serviceRefs.end(); ++i)
     {
@@ -529,9 +530,9 @@ public:
   template<class S>
   ServiceReference<S> GetServiceReference()
   {
-    const char* clazz = us_service_interface_iid<S>();
-    if (clazz == 0) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
-    return ServiceReference<S>(GetServiceReference(std::string(clazz)));
+    std::string clazz = us_service_interface_iid<S>();
+    if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
+    return ServiceReference<S>(GetServiceReference(clazz));
   }
 
   /**

@@ -4,11 +4,8 @@
 
 set(_srcs
   util/usAny.cpp
-  util/jsoncpp.cpp
   util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
-  util/usUncompressResourceData.c
-  util/usUncompressResourceData.cpp
   util/usUtils.cpp
 
   service/usLDAPExpr.cpp
@@ -48,11 +45,14 @@ set(_srcs
   module/usModuleRegistry.cpp
   module/usModuleResource.cpp
   module/usModuleResourceBuffer.cpp
+  module/usModuleResourceContainer.cpp
   module/usModuleResourceStream.cpp
-  module/usModuleResourceTree.cpp
   module/usModuleSettings.cpp
   module/usModuleUtils.cpp
   module/usModuleVersion.cpp
+
+  ../../third_party/jsoncpp.cpp
+  ../../third_party/miniz.c
 )
 
 set(_private_headers
@@ -63,8 +63,6 @@ set(_private_headers
   util/usThreads_p.h
   util/usUtils_p.h
   util/usWaitCondition_p.h
-
-  util/dirent_win32_p.h
 
   service/usServiceHooks_p.h
   service/usServiceListenerHook_p.h
@@ -80,7 +78,7 @@ set(_private_headers
   module/usModuleAbstractTracked.tpp
   module/usModuleHooks_p.h
   module/usModuleResourceBuffer_p.h
-  module/usModuleResourceTree_p.h
+  module/usModuleResourceContainer_p.h
   module/usModuleUtils_p.h
 )
 

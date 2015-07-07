@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -32,7 +33,7 @@
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 
-#include <assert.h>
+#include <cassert>
 
 US_USE_NAMESPACE
 
@@ -50,15 +51,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   assert(mc);
   TestModuleListener listener;
 
-  try
-  {
-    mc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
-  }
-  catch (const std::logic_error& ise)
-  {
-    US_TEST_OUTPUT( << "module listener registration failed " << ise.what() );
-    throw;
-  }
+  ModuleListenerRegistrationHelper<TestModuleListener> listenerReg(mc, &listener, &TestModuleListener::ModuleChanged);
 
   SharedLibrary libAL(LIB_PATH, "TestModuleAL");
 
@@ -71,20 +64,26 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-  Module* moduleAL = ModuleRegistry::GetModule("TestModuleAL Module");
+  Module* moduleAL = ModuleRegistry::GetModule("TestModuleAL");
   US_TEST_CONDITION_REQUIRED(moduleAL != NULL, "Test for existing module TestModuleAL")
 
-  US_TEST_CONDITION(moduleAL->GetName() == "TestModuleAL Module", "Test module name")
+  US_TEST_CONDITION(moduleAL->GetName() == "TestModuleAL", "Test module name")
 
   // check the listeners for events
   std::vector<ModuleEvent> pEvts;
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL));
 
-  Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1 Module");
+  Any loadedModules = moduleAL->GetProperty(Module::PROP_AUTOLOADED_MODULES());
+  Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1");
   if (autoLoadEnabled)
   {
     US_TEST_CONDITION_REQUIRED(moduleAL_1 != NULL, "Test for existing auto-loaded module TestModuleAL_1")
-    US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1 Module", "Test module name")
+    US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1", "Test module name")
+    US_TEST_CONDITION_REQUIRED(!loadedModules.Empty(), "Test for PROP_AUTOLOADED_MODULES property")
+    US_TEST_CONDITION_REQUIRED(loadedModules.Type() == typeid(std::vector<std::string>), "Test for PROP_AUTOLOADED_MODULES property type")
+    std::vector<std::string> loadedModulesVec = any_cast<std::vector<std::string> >(loadedModules);
+    US_TEST_CONDITION_REQUIRED(loadedModulesVec.size() == 1, "Test for PROP_AUTOLOADED_MODULES vector size")
+    US_TEST_CONDITION_REQUIRED(loadedModulesVec[0] == moduleAL_1->GetLocation(), "Test for PROP_AUTOLOADED_MODULES vector content")
 
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL_1));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL_1));
@@ -92,6 +91,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   else
   {
     US_TEST_CONDITION_REQUIRED(moduleAL_1 == NULL, "Test for non-existing auto-loaded module TestModuleAL_1")
+    US_TEST_CONDITION_REQUIRED(loadedModules.Empty(), "Test for empty PROP_AUTOLOADED_MODULES property")
   }
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL));
@@ -130,19 +130,19 @@ void testCustomAutoLoadPath()
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
 
-  Module* moduleAL2 = ModuleRegistry::GetModule("TestModuleAL2 Module");
+  Module* moduleAL2 = ModuleRegistry::GetModule("TestModuleAL2");
   US_TEST_CONDITION_REQUIRED(moduleAL2 != NULL, "Test for existing module TestModuleAL2")
 
-  US_TEST_CONDITION(moduleAL2->GetName() == "TestModuleAL2 Module", "Test module name")
+  US_TEST_CONDITION(moduleAL2->GetName() == "TestModuleAL2", "Test module name")
 
   // check the listeners for events
   std::vector<ModuleEvent> pEvts;
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2));
 
-  Module* moduleAL2_1 = ModuleRegistry::GetModule("TestModuleAL2_1 Module");
+  Module* moduleAL2_1 = ModuleRegistry::GetModule("TestModuleAL2_1");
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   US_TEST_CONDITION_REQUIRED(moduleAL2_1 != NULL, "Test for existing auto-loaded module TestModuleAL2_1")
-  US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1 Module", "Test module name")
+  US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1", "Test module name")
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2_1));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL2_1));

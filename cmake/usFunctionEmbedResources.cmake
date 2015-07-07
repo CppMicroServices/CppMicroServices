@@ -1,137 +1,105 @@
 #! \ingroup MicroServicesCMake
-#! \brief Embed resources into a shared library or executable.
+#! \brief Embed resources in a library or executable.
 #!
-#! This CMake function uses an external command line program to generate a source
-#! file containing data from external resources such as text files or images. The path
-#! to the generated source file is appended to the \c src_var variable.
+#! This CMake function uses an external command line program to generate a ZIP archive
+#! containing data from external resources such as text files or images or other ZIP
+#! archives. The created archive file is appended or embedded as a binary blob to the target file.
 #!
-#! Each module can call this function (at most once) to embed resources and make them
-#! available at runtime through the Module class. Resources can also be embedded into
-#! executables, using the EXECUTABLE_NAME argument instead of LIBRARY_NAME.
+#! \note To set-up correct file dependencies from your module target to your resource
+#!       files, you have to add a special source file to the source list of the target.
+#!       The source file name can be retrieved by using usFunctionGetResourceSoruce.
+#!       This ensures that changed resource files will automatically be re-added to the
+#!       module.
+#!
+#! There are two differend modes for including resources: APPEND and LINK. In APPEND mode,
+#! the generated zip file is appended at the end of the target file. In LINK mode, the
+#! zip file is compiled / linked into the target using platform specific techniques. LINK
+#! mode is necessary if certain tools make additional assumptions about the object layout
+#! of the target file (e.g. codesign on MacOS). LINK mode may result in slower module
+#! initialization and bigger object files. The default mode is LINK mode on MacOS and
+#! APPEND mode on all other platforms.
 #!
 #! Example usage:
 #! \code{.cmake}
 #! set(module_srcs )
-#! usFunctionEmbedResources(module_srcs
-#!                          LIBRARY_NAME "mylib"
-#!                          ROOT_DIR resources
-#!                          FILES config.properties logo.png
-#!                         )
+#! usFunctionEmbedResources(TARGET mylib
+#!                        MODULE_NAME org_me_mylib
+#!                        FILES config.properties logo.png
+#!                       )
 #! \endcode
 #!
-#! \param LIBRARY_NAME (required if EXECUTABLE_NAME is empty) The library name of the module
-#!        which will include the generated source file, without extension.
-#! \param EXECUTABLE_NAME (required if LIBRARY_NAME is empty) The name of the executable
-#!        which will include the generated source file.
-#! \param COMPRESSION_LEVEL (optional) The zip compression level. Defaults to the default zip
-#!        level. Level 0 disables compression.
-#! \param COMPRESSION_THRESHOLD (optional) The compression threshold ranging from 0 to 100 for
-#!        actually compressing the resource data. The default threshold is 30, meaning a size
-#!        reduction of 30 percent or better results in the resource data being compressed.
-#! \param ROOT_DIR (optional) The root path for all resources listed after the FILES argument.
-#!        If no or a relative path is given, it is considered relativ to the current CMake source directory.
-#! \param FILES (optional) A list of resources (paths to external files in the file system) relative
-#!        to the ROOT_DIR argument or the current CMake source directory if ROOT_DIR is empty.
+#! \param TARGET (required) The target to which the resource files are added.
+#! \param MODULE_NAME (required/optional) The module name of the target, as specified in
+#!        the \c US_MODULE_NAME pre-processor definition of that target. This parameter
+#!        is optional if a target property with the name US_MODULE_NAME exists, containing
+#!        the required module name.
+#! \param APPEND Append the resources zip file to the target file.
+#! \param LINK Link (embed) the resources zip file if possible.
 #!
-#! The ROOT_DIR and FILES arguments may be repeated any number of times to merge files from
-#! different root directories into the embedded resource tree (hence the relative file paths
-#! after the FILES argument must be unique).
+#! For the WORKING_DIRECTORY, COMPRESSION_LEVEL, FILES, ZIP_ARCHIVES parameters see the
+#! documentation of the usFunctionAddResources macro which is called with these parameters if set.
 #!
-function(usFunctionEmbedResources src_var)
+#! \sa usFunctionAddResources
+#! \sa usFunctionGetResourceSource
+#! \sa \ref MicroServices_Resources
+#!
+function(usFunctionEmbedResources)
 
-  set(prefix US_RESOURCE)
-  set(arg_names LIBRARY_NAME EXECUTABLE_NAME COMPRESSION_LEVEL COMPRESSION_THRESHOLD ROOT_DIR FILES)
-  foreach(arg_name ${arg_names})
-    set(${prefix}_${arg_name})
-  endforeach(arg_name)
+  cmake_parse_arguments(US_RESOURCE "APPEND;LINK" "TARGET;MODULE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
 
-  set(cmd_line_args )
-  set(absolute_res_files )
-  set(current_arg_name DEFAULT_ARGS)
-  set(current_arg_list)
-  set(current_root_dir ${CMAKE_CURRENT_SOURCE_DIR})
-  foreach(arg ${ARGN})
-
-    list(FIND arg_names "${arg}" is_arg_name)
-
-    if(is_arg_name GREATER -1)
-      set(${prefix}_${current_arg_name} ${current_arg_list})
-      set(current_arg_name "${arg}")
-      set(current_arg_list)
-    else()
-      set(current_arg_list ${current_arg_list} "${arg}")
-      if(current_arg_name STREQUAL "ROOT_DIR")
-        set(current_root_dir "${arg}")
-        if(NOT IS_ABSOLUTE ${current_root_dir})
-          set(current_root_dir "${CMAKE_CURRENT_SOURCE_DIR}/${current_root_dir}")
-        endif()
-        if(NOT IS_DIRECTORY ${current_root_dir})
-          message(SEND_ERROR "The ROOT_DIR argument is not a directory: ${current_root_dir}")
-        endif()
-        get_filename_component(current_root_dir "${current_root_dir}" REALPATH)
-        if(WIN32)
-          string(REPLACE "/" "\\" current_root_dir "${current_root_dir}")
-        endif()
-        list(APPEND cmd_line_args -d "${current_root_dir}")
-      elseif(current_arg_name STREQUAL "FILES")
-        set(res_file "${current_root_dir}/${arg}")
-        if(WIN32)
-          string(REPLACE "/" "\\" res_file_native "${res_file}")
-        else()
-          set(res_file_native "${res_file}")
-        endif()
-        if(IS_DIRECTORY ${res_file})
-          message(SEND_ERROR "A resource cannot be a directory: ${res_file_native}")
-        endif()
-        if(NOT EXISTS ${res_file})
-          message(SEND_ERROR "Resource does not exists: ${res_file_native}")
-        endif()
-        list(APPEND absolute_res_files ${res_file})
-        file(TO_NATIVE_PATH "${arg}" res_filename_native)
-        list(APPEND cmd_line_args "${res_filename_native}")
-      endif()
-    endif(is_arg_name GREATER -1)
-
-  endforeach(arg ${ARGN})
-
-  set(${prefix}_${current_arg_name} ${current_arg_list})
-
-  if(NOT src_var)
-    message(SEND_ERROR "Output variable name not specified.")
+  if(NOT US_RESOURCE_TARGET)
+    message(SEND_ERROR "TARGET argument not specified.")
   endif()
 
-  if(US_RESOURCE_EXECUTABLE_NAME AND US_RESOURCE_LIBRARY_NAME)
-    message(SEND_ERROR "Only one of LIBRARY_NAME or EXECUTABLE_NAME can be specified.")
+  if(US_RESOURCE_FILES OR US_RESOURCE_ZIP_ARCHIVES)
+    usFunctionAddResources(TARGET ${US_RESOURCE_TARGET}
+      MODULE_NAME ${US_RESOURCE_MODULE_NAME}
+      WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
+      COMPRESSION_LEVEL ${US_RESOURCE_COMPRESSION_LEVEL}
+      FILES ${US_RESOURCE_FILES}
+      ZIP_ARCHIVES ${US_RESOURCE_ZIP_ARCHIVES}
+    )
   endif()
 
-  if(NOT US_RESOURCE_LIBRARY_NAME AND NOT US_RESOURCE_EXECUTABLE_NAME)
-    message(SEND_ERROR "LIBRARY_NAME or EXECUTABLE_NAME argument not specified.")
-  endif()
-
-  if(NOT US_RESOURCE_FILES)
-    message(WARNING "No FILES argument given. Skipping resource processing.")
+  get_target_property(_res_zips ${US_RESOURCE_TARGET} _us_resource_zips)
+  if(NOT _res_zips)
     return()
   endif()
 
-  list(GET cmd_line_args 0 first_arg)
-  if(NOT first_arg STREQUAL "-d")
-    set(cmd_line_args -d "${CMAKE_CURRENT_SOURCE_DIR}" ${cmd_line_args})
+  if(US_RESOURCE_APPEND AND US_RESOURCE_LINK)
+    message(WARNING "Both APPEND and LINK options specified. Falling back to default behaviour.")
+    set(US_RESOURCE_APPEND 0)
+    set(US_RESOURCE_LINK 0)
   endif()
 
-  if(US_RESOURCE_COMPRESSION_LEVEL)
-    set(cmd_line_args -c ${US_RESOURCE_COMPRESSION_LEVEL} ${cmd_line_args})
+  if(US_RESOURCE_LINK AND NOT US_RESOURCE_LINKING_AVAILABLE)
+    message(WARNING "Resource linking not available. Falling back to APPEND mode.")
+    set(US_RESOURCE_LINK 0)
+    set(US_RESOURCE_APPEND 1)
   endif()
 
-  if(US_RESOURCE_COMPRESSION_THRESHOLD)
-    set(cmd_line_args -t ${US_RESOURCE_COMPRESSION_THRESHOLD} ${cmd_line_args})
+  # Set default resource mode
+  if(NOT US_RESOURCE_APPEND AND NOT US_RESOURCE_LINK)
+    if(US_DEFAULT_RESOURCE_MODE STREQUAL "LINK")
+      set(US_RESOURCE_LINK 1)
+    else()
+      set(US_RESOURCE_APPEND 1)
+    endif()
   endif()
 
-  if(US_RESOURCE_LIBRARY_NAME)
-    set(us_cpp_resource_file "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_LIBRARY_NAME}_resources.cpp")
-    set(us_lib_name ${US_RESOURCE_LIBRARY_NAME})
-  else()
-    set(us_cpp_resource_file "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_EXECUTABLE_NAME}_resources.cpp")
-    set(us_lib_name "")
+  set(_mode )
+  if(US_RESOURCE_LINK)
+    set(_mode LINK)
+  elseif(US_RESOURCE_APPEND)
+    set(_mode APPEND)
+  endif()
+  usFunctionGetResourceSource(TARGET ${US_RESOURCE_TARGET} OUT _source_output ${_mode})
+
+  if(NOT US_RESOURCE_WORKING_DIRECTORY)
+    set(US_RESOURCE_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  endif()
+  if(NOT IS_ABSOLUTE ${US_RESOURCE_WORKING_DIRECTORY})
+    set(US_RESOURCE_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${US_RESOURCE_WORKING_DIRECTORY}")
   endif()
 
   set(resource_compiler ${US_RCC_EXECUTABLE})
@@ -141,15 +109,86 @@ function(usFunctionEmbedResources src_var)
     message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
   endif()
 
-  add_custom_command(
-    OUTPUT ${us_cpp_resource_file}
-    COMMAND ${resource_compiler} "${us_lib_name}" ${us_cpp_resource_file} ${cmd_line_args}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${absolute_res_files} ${resource_compiler}
-    COMMENT "Generating embedded resource file ${us_cpp_resource_name}"
-    VERBATIM
-  )
+  set(_zip_archive )
+  get_target_property(_counter ${US_RESOURCE_TARGET} _us_resource_counter)
+  if(_counter EQUAL 0)
+    set(_zip_archive ${_res_zips})
+  else()
+    set(_zip_archive ${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}/res.zip)
+    add_custom_command(
+      OUTPUT ${_zip_archive}
+      COMMAND ${resource_compiler} ${_zip_archive} dummy -m ${_res_zips}
+      DEPENDS ${_res_zips} ${resource_compiler}
+      COMMENT "Creating resources zip file for ${US_RESOURCE_TARGET}"
+      VERBATIM
+     )
+  endif()
+  get_filename_component(_zip_archive_name ${_zip_archive} NAME)
+  get_filename_component(_zip_archive_path ${_zip_archive} PATH)
 
-  set(${src_var} "${${src_var}};${us_cpp_resource_file}" PARENT_SCOPE)
+  if(US_RESOURCE_LINK)
+    if(APPLE)
+      add_custom_command(
+        OUTPUT ${_source_output}
+        COMMAND ${CMAKE_CXX_COMPILER} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
+        DEPENDS ${_zip_archive}
+        WORKING_DIRECTORY ${_zip_archive_path}
+        COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
+        VERBATIM
+       )
+      set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
+    elseif(WIN32 AND CMAKE_RC_COMPILER)
+      set(US_RESOURCE_ARCHIVE ${_zip_archive})
+      configure_file(${US_RESOURCE_RC_TEMPLATE} ${_source_output})
+      add_custom_command(
+        OUTPUT ${_source_output}
+        COMMAND ${CMAKE_COMMAND} -E touch ${_source_output}
+        DEPENDS ${_zip_archive}
+        WORKING_DIRECTORY ${_zip_archive_path}
+        COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
+        VERBATIM
+       )
+    elseif(UNIX)
+      add_custom_command(
+        OUTPUT ${_source_output}
+        COMMAND ${CMAKE_LINKER} -r -b binary -o ${_source_output} ${_zip_archive_name}
+        COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
+        DEPENDS ${_zip_archive}
+        WORKING_DIRECTORY ${_zip_archive_path}
+        COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
+        VERBATIM
+       )
+      set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
+    else()
+      message(WARNING "Internal error: Resource linking not available. Falling back to APPEND mode.")
+      set(US_RESOURCE_LINK 0)
+      set(US_RESOURCE_APPEND 1)
+    endif()
+  endif()
+
+  if(US_RESOURCE_APPEND)
+    # This command depends on the given resource files and creates a source
+    # file which must be added to the source list of the related target.
+    # This way, the following command is executed if the resources change
+    # and it just touches the created source file to force a (actually unnecessary)
+    # re-linking and hence the execution of POST_BUILD commands.
+    add_custom_command(
+      OUTPUT ${_source_output}
+      COMMAND ${CMAKE_COMMAND} -E copy ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} ${_source_output}
+      DEPENDS ${_zip_archive}
+      COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
+      VERBATIM
+     )
+
+    add_custom_command(
+      TARGET ${US_RESOURCE_TARGET}
+      POST_BUILD
+      COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} ${_zip_archive}
+      WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
+      COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
+      VERBATIM
+    )
+  endif()
 
 endfunction()

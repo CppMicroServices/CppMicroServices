@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,6 +27,7 @@
 #include "usModule.h"
 #include "usModulePrivate.h"
 
+#include <cassert>
 
 US_BEGIN_NAMESPACE
 
@@ -118,9 +120,6 @@ void ServiceReferenceBase::GetUsingModules(std::vector<Module*>& modules) const
 
 bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) const
 {
-  int r1 = 0;
-  int r2 = 0;
-
   if (!(*this))
   {
     return true;
@@ -131,10 +130,12 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
     return false;
   }
 
-  Any anyR1 = GetProperty(ServiceConstants::SERVICE_RANKING());
-  Any anyR2 = reference.GetProperty(ServiceConstants::SERVICE_RANKING());
-  if (anyR1.Type() == typeid(int)) r1 = any_cast<int>(anyR1);
-  if (anyR2.Type() == typeid(int)) r2 = any_cast<int>(anyR2);
+  const Any anyR1 = GetProperty(ServiceConstants::SERVICE_RANKING());
+  const Any anyR2 = reference.GetProperty(ServiceConstants::SERVICE_RANKING());
+  assert(anyR1.Empty() || anyR1.Type() == typeid(int));
+  assert(anyR2.Empty() || anyR2.Type() == typeid(int));
+  const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
+  const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
 
   if (r1 != r2)
   {
@@ -143,8 +144,12 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   }
   else
   {
-    long int id1 = any_cast<long int>(GetProperty(ServiceConstants::SERVICE_ID()));
-    long int id2 = any_cast<long int>(reference.GetProperty(ServiceConstants::SERVICE_ID()));
+    const Any anyId1 = GetProperty(ServiceConstants::SERVICE_ID());
+    const Any anyId2 = reference.GetProperty(ServiceConstants::SERVICE_ID());
+    assert(anyId1.Type() == typeid(long int));
+    assert(anyId2.Type() == typeid(long int));
+    const long int id1 = *any_cast<long int>(&anyId1);
+    const long int id2 = *any_cast<long int>(&anyId2);
 
     // otherwise compare using IDs,
     // is less than if it has a higher ID.
@@ -193,6 +198,8 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
 {
   if (serviceRef)
   {
+    assert(serviceRef.GetModule() != NULL);
+
     os << "Reference for service object registered from "
        << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()
        << " (";

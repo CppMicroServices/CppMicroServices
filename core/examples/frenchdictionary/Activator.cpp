@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,7 +25,6 @@
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usGetModuleContext.h>
 #include <usServiceProperties.h>
 
 #include <set>
@@ -32,6 +32,8 @@
 #include <memory>
 
 US_USE_NAMESPACE
+
+namespace {
 
 /**
  * This class implements a module activator that uses the module
@@ -115,5 +117,7 @@ public:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(frenchdictionary, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //![Activator]

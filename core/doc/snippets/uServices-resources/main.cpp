@@ -82,4 +82,4 @@ int main(int /*argc*/, char* /*argv*/[])
 }
 
 #include <usModuleInitialization.h>
-US_INITIALIZE_EXECUTABLE("uServices-snippet-resources")
+US_INITIALIZE_MODULE

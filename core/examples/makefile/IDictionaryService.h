@@ -27,7 +27,4 @@ struct MODULE_EXPORT IDictionaryService
    **/
   virtual bool CheckWord(const std::string& word) = 0;
 };
-
-US_DECLARE_SERVICE_INTERFACE(IDictionaryService, "IDictionaryService/1.0")
-
 #endif // DICTIONARYSERVICE_H

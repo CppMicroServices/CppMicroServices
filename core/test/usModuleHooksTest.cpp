@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,7 +26,6 @@
 #include <usModuleEventHook.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usSharedLibrary.h>
 
 #include "usTestingMacros.h"
@@ -62,7 +62,7 @@ public:
     for (ShrinkableVector<Module*>::iterator i = modules.begin();
          i != modules.end();)
     {
-      if ((*i)->GetName() == "TestModuleA Module")
+      if ((*i)->GetName() == "TestModuleA")
       {
         i = modules.erase(i);
       }
@@ -90,6 +90,8 @@ public:
 void TestFindHook()
 {
   SharedLibrary libA(LIB_PATH, "TestModuleA");
+
+#ifdef US_BUILD_SHARED_LIBS
   try
   {
     libA.Load();
@@ -98,11 +100,12 @@ void TestFindHook()
   {
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
+#endif
 
-  Module* moduleA = GetModuleContext()->GetModule("TestModuleA Module");
+  Module* moduleA = GetModuleContext()->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
 
-  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA Module", "Test module name")
+  US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
 
   US_TEST_CONDITION(moduleA->IsLoaded() == true, "Test if loaded correctly");
 
@@ -120,7 +123,7 @@ void TestFindHook()
   for (std::vector<Module*>::iterator i = modules.begin();
        i != modules.end(); ++i)
   {
-    if((*i)->GetName() == "TestModuleA Module")
+    if((*i)->GetName() == "TestModuleA")
     {
       US_TEST_FAILED_MSG(<< "TestModuleA not filtered from GetModules()")
     }
@@ -131,6 +134,7 @@ void TestFindHook()
   libA.Unload();
 }
 
+#ifdef US_BUILD_SHARED_LIBS
 void TestEventHook()
 {
   TestModuleListener moduleListener;
@@ -173,6 +177,7 @@ void TestEventHook()
   eventHookReg.Unregister();
   GetModuleContext()->RemoveModuleListener(&moduleListener, &TestModuleListener::ModuleChanged);
 }
+#endif
 
 } // end unnamed namespace
 
@@ -181,7 +186,10 @@ int usModuleHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ModuleHooksTest");
 
   TestFindHook();
+
+#ifdef US_BUILD_SHARED_LIBS
   TestEventHook();
+#endif
 
   US_TEST_END()
 }

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -180,18 +181,18 @@ public:
 
 };
 
+/**
+ * \ingroup MicroServices
+ * @{
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& event);
+/** @}*/
+
 US_END_NAMESPACE
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
-/**
- * \ingroup MicroServices
- * @{
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceEvent::Type)& type);
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceEvent)& event);
-/** @}*/
 
 #endif // USSERVICEEVENT_H

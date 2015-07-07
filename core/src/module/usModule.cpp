@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -72,6 +73,12 @@ const std::string&Module::PROP_AUTOLOAD_DIR()
   return s;
 }
 
+const std::string&Module::PROP_AUTOLOADED_MODULES()
+{
+  static const std::string s("module.autoloaded_modules");
+  return s;
+}
+
 Module::Module()
 : d(0)
 {
@@ -121,48 +128,47 @@ void Module::Start()
 
   d->moduleContext = new ModuleContext(this->d);
 
-//  try
-//  {
-    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADING, this));
-    // try to get a ModuleActivator instance
-    if (d->info.activatorHook)
-    {
-      try
-      {
-        d->moduleActivator = d->info.activatorHook();
-      }
-      catch (...)
-      {
-        US_ERROR << "Creating the module activator of " << d->info.name << " failed";
-        throw;
-      }
+  typedef ModuleActivator*(*ModuleActivatorHook)(void);
+  ModuleActivatorHook activatorHook = NULL;
 
-      d->moduleActivator->Load(d->moduleContext);
+  std::string activator_func = "_us_module_activator_instance_" + d->info.name;
+  void* activatorHookSym = ModuleUtils::GetSymbol(d->info, activator_func.c_str());
+  std::memcpy(&activatorHook, &activatorHookSym, sizeof(void*));
+
+  d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADING, this));
+  // try to get a ModuleActivator instance
+
+  if (activatorHook)
+  {
+    try
+    {
+      d->moduleActivator = activatorHook();
+    }
+    catch (...)
+    {
+      US_ERROR << "Creating the module activator of " << d->info.name << " failed";
+      throw;
     }
 
-    d->StartStaticModules();
+    // This method should be "noexcept" and by not catching exceptions
+    // here we semantically treat it that way since any exception during
+    // static initialization will either terminate the program or cause
+    // the dynamic loader to report an error.
+    d->moduleActivator->Load(d->moduleContext);
+  }
 
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-    if (ModuleSettings::IsAutoLoadingEnabled())
+  if (ModuleSettings::IsAutoLoadingEnabled())
+  {
+    const std::vector<std::string> loadedPaths = AutoLoadModules(d->info);
+    if (!loadedPaths.empty())
     {
-      AutoLoadModules(d->info);
+      d->moduleManifest.SetValue(PROP_AUTOLOADED_MODULES(), Any(loadedPaths));
     }
+  }
 #endif
 
-    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
-//  }
-//  catch (...)
-//  {
-//    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADING, this));
-//    d->RemoveModuleResources();
-
-//    delete d->moduleContext;
-//    d->moduleContext = 0;
-
-//    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
-//    US_ERROR << "Calling the module activator Load() method of " << d->info.name << " failed!";
-//    throw;
-//  }
+  d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 }
 
 void Module::Stop()
@@ -176,8 +182,6 @@ void Module::Stop()
   try
   {
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADING, this));
-
-    d->StopStaticModules();
 
     if (d->moduleActivator)
     {
@@ -263,17 +267,12 @@ std::vector<ServiceReferenceU> Module::GetServicesInUse() const
 
 ModuleResource Module::GetResource(const std::string& path) const
 {
-  if (d->resourceTreePtrs.empty())
+  if (!d->resourceContainer.IsValid())
   {
     return ModuleResource();
   }
-
-  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
-  {
-    if (!d->resourceTreePtrs[i]->IsValid()) continue;
-    ModuleResource result(path, d->resourceTreePtrs[i], d->resourceTreePtrs);
-    if (result) return result;
-  }
+  ModuleResource result(path, d->resourceContainer);
+  if (result) return result;
   return ModuleResource();
 }
 
@@ -281,20 +280,19 @@ std::vector<ModuleResource> Module::FindResources(const std::string& path, const
                                                   bool recurse) const
 {
   std::vector<ModuleResource> result;
-  if (d->resourceTreePtrs.empty()) return result;
-
-  for (std::size_t i = 0; i < d->resourceTreePtrs.size(); ++i)
+  if (!d->resourceContainer.IsValid())
   {
-    if (!d->resourceTreePtrs[i]->IsValid()) continue;
-
-    std::vector<std::string> nodes;
-    d->resourceTreePtrs[i]->FindNodes(path, filePattern, recurse, nodes);
-    for (std::vector<std::string>::iterator nodeIter = nodes.begin();
-         nodeIter != nodes.end(); ++nodeIter)
-    {
-      result.push_back(ModuleResource(*nodeIter, d->resourceTreePtrs[i], d->resourceTreePtrs));
-    }
+    return result;
   }
+
+  std::string normalizedPath = path;
+  // add a leading and trailing slash
+  if (normalizedPath.empty()) normalizedPath.push_back('/');
+  if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
+  if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
+  d->resourceContainer.FindNodes(d->info.name + normalizedPath,
+                                 filePattern.empty() ? "*" : filePattern,
+                                 recurse, result);
   return result;
 }
 

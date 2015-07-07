@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -28,10 +29,14 @@
 #include <string>
 #include <vector>
 
+#ifdef US_BUILD_SHARED_LIBS
 #ifdef Example_spellcheckservice_EXPORTS
   #define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
 #else
   #define SPELLCHECKSERVICE_EXPORT US_ABI_IMPORT
+#endif
+#else
+  #define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**
@@ -57,8 +62,6 @@ struct SPELLCHECKSERVICE_EXPORT ISpellCheckService
    */
   virtual std::vector<std::string> Check(const std::string& passage) = 0;
 };
-
-US_DECLARE_SERVICE_INTERFACE(ISpellCheckService, "ISpellCheckService/1.0")
 //! [service]
 //!
 #endif // ISPELLCHECKSERVICE_H

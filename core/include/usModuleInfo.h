@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,7 +27,6 @@
 #include <usCoreConfig.h>
 
 #include <string>
-#include <vector>
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -43,29 +43,12 @@ struct ModuleActivator;
  */
 struct US_Core_EXPORT ModuleInfo
 {
-  ModuleInfo(const std::string& name, const std::string& libName);
-
-  typedef ModuleActivator*(*ModuleActivatorHook)(void);
-  typedef int(*InitResourcesHook)(ModuleInfo*);
-  typedef const unsigned char* ModuleResourceData;
+  ModuleInfo(const std::string& name);
 
   std::string name;
-  std::string libName;
-
   std::string location;
-
   std::string autoLoadDir;
-
   long id;
-
-  ModuleActivatorHook activatorHook;
-
-  // In case of statically linked (imported) modules, there could
-  // be more than one set of ModuleResourceData pointers. We aggregate
-  // all pointers here.
-  std::vector<ModuleResourceData> resourceData;
-  std::vector<ModuleResourceData> resourceNames;
-  std::vector<ModuleResourceData> resourceTree;
 };
 
 US_END_NAMESPACE

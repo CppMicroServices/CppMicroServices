@@ -11,6 +11,11 @@ class MyActivator : public ModuleActivator
 
 public:
 
+  MyActivator()
+    : m_SingletonOne(NULL)
+    , m_SingletonTwo(NULL)
+  {}
+
   //![0]
   void Load(ModuleContext* context)
   {
@@ -61,7 +66,7 @@ private:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(uServices_singleton, MyActivator)
+US_EXPORT_MODULE_ACTIVATOR(MyActivator)
 
 int main()
 {

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -27,11 +28,8 @@
 #include "usTestingMacros.h"
 
 struct Interface1 {};
-US_DECLARE_SERVICE_INTERFACE(Interface1, "org.cppmicroservices.test.Interface1")
 struct Interface2 {};
-US_DECLARE_SERVICE_INTERFACE(Interface2, "org.cppmicroservices.test.Interface2")
 struct Interface3 {};
-US_DECLARE_SERVICE_INTERFACE(Interface3, "org.cppmicroservices.test.Interface3")
 
 struct MyService1 : public Interface1
 {};

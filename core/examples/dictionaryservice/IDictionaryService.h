@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -27,17 +28,21 @@
 
 #include <string>
 
+#ifdef US_BUILD_SHARED_LIBS
 #ifdef Example_dictionaryservice_EXPORTS
-  #define DICTIONAYSERVICE_EXPORT US_ABI_EXPORT
+  #define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #else
-  #define DICTIONAYSERVICE_EXPORT US_ABI_IMPORT
+  #define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT
+#endif
+#else
+#define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**
  * A simple service interface that defines a dictionary service.
  * A dictionary service simply verifies the existence of a word.
  **/
-struct DICTIONAYSERVICE_EXPORT IDictionaryService
+struct DICTIONARYSERVICE_EXPORT IDictionaryService
 {
   // Out-of-line virtual desctructor for proper dynamic cast
   // support with older versions of gcc.
@@ -51,8 +56,6 @@ struct DICTIONAYSERVICE_EXPORT IDictionaryService
    **/
   virtual bool CheckWord(const std::string& word) = 0;
 };
-
-US_DECLARE_SERVICE_INTERFACE(IDictionaryService, "IDictionaryService/1.0")
 //! [service]
 
 #endif // DICTIONARYSERVICE_H

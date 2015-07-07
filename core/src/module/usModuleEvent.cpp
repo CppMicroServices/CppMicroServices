@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -94,10 +95,6 @@ ModuleEvent::Type ModuleEvent::GetType() const
   return d->type;
 }
 
-US_END_NAMESPACE
-
-US_USE_NAMESPACE
-
 std::ostream& operator<<(std::ostream& os, ModuleEvent::Type eventType)
 {
   switch (eventType)
@@ -119,3 +116,5 @@ std::ostream& operator<<(std::ostream& os, const ModuleEvent& event)
   os << event.GetType() << " #" << m->GetModuleId() << " (" << m->GetLocation() << ")";
   return os;
 }
+
+US_END_NAMESPACE

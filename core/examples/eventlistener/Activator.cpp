@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,6 +25,8 @@
 #include <usModuleContext.h>
 
 US_USE_NAMESPACE
+
+namespace {
 
 /**
  * This class implements a simple module that utilizes the CppMicroServices's
@@ -69,7 +72,7 @@ private:
    */
   void ServiceChanged(const ServiceEvent event)
   {
-    std::string objectClass = ref_any_cast<std::list<std::string> >(event.GetServiceReference().GetProperty(ServiceConstants::OBJECTCLASS())).front();
+    std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(ServiceConstants::OBJECTCLASS())).front();
 
     if (event.GetType() == ServiceEvent::REGISTERED)
     {
@@ -86,5 +89,7 @@ private:
   }
 };
 
-US_EXPORT_MODULE_ACTIVATOR(eventlistener, Activator)
+}
+
+US_EXPORT_MODULE_ACTIVATOR(Activator)
 //! [Activator]

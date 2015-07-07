@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,25 +20,15 @@
 
 =============================================================================*/
 
+#ifndef USSTDINT_H
+#define USSTDINT_H
 
-#include <usModuleActivator.h>
+#ifdef US_HAVE_STDINT_H
+#include <stdint.h>
+#elif defined(_MSC_VER)
+#include "us_stdint_vc_p.h"
+#else
+#error The stdint.h header is not available
+#endif
 
-US_BEGIN_NAMESPACE
-
-class TestModuleRActivator : public ModuleActivator
-{
-public:
-
-  void Load(ModuleContext*)
-  {
-  }
-
-  void Unload(ModuleContext*)
-  {
-  }
-
-};
-
-US_END_NAMESPACE
-
-US_EXPORT_MODULE_ACTIVATOR(TestModuleR, US_PREPEND_NAMESPACE(TestModuleRActivator))
+#endif // USSTDINT_H

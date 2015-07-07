@@ -8,6 +8,9 @@ set(resource_files
   test.xml
 )
 
+configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt @COPYONLY)
+
 usFunctionCreateTestModuleWithResources(TestModuleR
-  SOURCES usTestModuleR.cpp
-  RESOURCES ${resource_files})
+  RESOURCES ${resource_files}
+  BINARY_RESOURCES foo2.txt
+)

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,18 +20,21 @@
 
 =============================================================================*/
 
+#ifndef US_MODULE_NAME
+#error Missing US_MODULE_NAME preprocessor define
+#endif
+
+#ifndef USMODULEINITIALIZATION_H
+#define USMODULEINITIALIZATION_H
+
 #include <usStaticInit_p.h>
 
 #include <usModuleRegistry.h>
 #include <usModuleInfo.h>
-#include <usModuleContext.h>
-#include <usModule.h>
 #include <usModuleUtils_p.h>
 
 #include <cstring>
 
-#ifndef USMODULEINITIALIZATION_H
-#define USMODULEINITIALIZATION_H
 
 /**
  * \ingroup MicroServices
@@ -38,67 +42,40 @@
  * \brief Creates initialization code for a module.
  *
  * Each module which wants to register itself with the CppMicroServices library
- * has to put a call to this macro in one of its source files.
+ * has to put a call to this macro in one of its source files. Further, the modules
+ * source files must be compiled with the \c US_MODULE_NAME pre-processor definition
+ * set to a module-unique identifier.
  *
- * Example call for a module with file-name "libmylibname.so":
- * \code
- * US_INITIALIZE_MODULE("My Service Implementation", "mylibname")
- * \endcode
- *
- * This will initialize the module for use with the CppMicroServices library, using a default
- * auto-load directory named after the provided library name in \c _module_libname.
+ * Calling the \c US_INITIALIZE_MODULE macro will initialize the module for use with
+ * the CppMicroServices library, using a default auto-load directory named after the
+ * \c US_MODULE_NAME definition.
  *
  * \sa MicroServices_AutoLoading
  *
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateModuleInit()</code>.
- *
- * \param _module_name A human-readable name for the module.
- *        If you use this macro in a source file for an executable, the module name must
- *        be a valid C-identifier (no spaces etc.).
- * \param _module_libname The physical name of the module, withou prefix or suffix.
- *
- * \note If you want to create initialization code for an executable, see
- * #US_INITIALIZE_EXECUTABLE.
  */
-#define US_INITIALIZE_MODULE(_module_name, _module_libname)                                  \
+#define US_INITIALIZE_MODULE                                                                 \
 US_BEGIN_NAMESPACE                                                                           \
+namespace {                                                                                  \
                                                                                              \
 /* Declare a file scoped ModuleInfo object */                                                \
-US_GLOBAL_STATIC_WITH_ARGS(ModuleInfo, moduleInfo, (_module_name, _module_libname))          \
+US_GLOBAL_STATIC_WITH_ARGS(ModuleInfo, moduleInfo, (US_STR(US_MODULE_NAME)))                 \
                                                                                              \
 /* This class is used to statically initialize the library within the C++ Micro services     \
    library. It looks up a library specific C-style function returning an instance            \
    of the ModuleActivator interface. */                                                      \
-class US_ABI_LOCAL ModuleInitializer {                                                       \
+class US_ABI_LOCAL US_CONCAT(ModuleInitializer_, US_MODULE_NAME) {                           \
                                                                                              \
 public:                                                                                      \
                                                                                              \
-  ModuleInitializer()                                                                        \
+  US_CONCAT(ModuleInitializer_, US_MODULE_NAME)()                                            \
   {                                                                                          \
     ModuleInfo*(*moduleInfoPtr)() = moduleInfo;                                              \
     void* moduleInfoSym = NULL;                                                              \
     std::memcpy(&moduleInfoSym, &moduleInfoPtr, sizeof(void*));                              \
-    std::string location = ModuleUtils::GetLibraryPath(moduleInfo()->libName, moduleInfoSym); \
-    std::string activator_func = "_us_module_activator_instance_";                           \
-    if(moduleInfo()->libName.empty())                                                        \
-    {                                                                                        \
-      activator_func.append(moduleInfo()->name);                                             \
-    }                                                                                        \
-    else                                                                                     \
-    {                                                                                        \
-      activator_func.append(moduleInfo()->libName);                                          \
-    }                                                                                        \
-                                                                                             \
-    moduleInfo()->location = location;                                                       \
-                                                                                             \
-    if (moduleInfo()->libName.empty())                                                       \
-    {                                                                                        \
-      /* make sure we retrieve symbols from the executable, if "libName" is empty */         \
-      location.clear();                                                                      \
-    }                                                                                        \
-    void* activatorHookSym = ModuleUtils::GetSymbol(location, activator_func.c_str());       \
-    std::memcpy(&moduleInfo()->activatorHook, &activatorHookSym, sizeof(void*));             \
+    std::string location = ModuleUtils::GetLibraryPath(moduleInfoSym);                       \
+    moduleInfoPtr()->location = location;                                                    \
                                                                                              \
     Register();                                                                              \
   }                                                                                          \
@@ -108,67 +85,37 @@ public:                                                                         
     ModuleRegistry::Register(moduleInfo());                                                  \
   }                                                                                          \
                                                                                              \
-  ~ModuleInitializer()                                                                       \
+  ~US_CONCAT(ModuleInitializer_, US_MODULE_NAME)()                                           \
   {                                                                                          \
     ModuleRegistry::UnRegister(moduleInfo());                                                \
   }                                                                                          \
                                                                                              \
 };                                                                                           \
                                                                                              \
-US_ABI_LOCAL ModuleContext* GetModuleContext()                                               \
-{                                                                                            \
-  /* make sure the module is registered */                                                   \
-  if (moduleInfo()->id == 0)                                                                 \
-  {                                                                                          \
-    ModuleInitializer::Register();                                                           \
-  }                                                                                          \
                                                                                              \
-  return ModuleRegistry::GetModule(moduleInfo()->id)->GetModuleContext();                    \
+US_DEFINE_MODULE_INITIALIZER                                                                 \
 }                                                                                            \
                                                                                              \
 US_END_NAMESPACE                                                                             \
                                                                                              \
-static US_PREPEND_NAMESPACE(ModuleInitializer) _InitializeModule;
+/* A helper function which is called by the US_IMPORT_MODULE macro to initialize             \
+   static modules */                                                                         \
+extern "C" void US_ABI_LOCAL US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()     \
+{                                                                                            \
+  static US_PREPEND_NAMESPACE(US_CONCAT(ModuleInitializer_, US_MODULE_NAME)) US_CONCAT(_InitializeModule_, US_MODULE_NAME); \
+}
 
-/**
- * \ingroup MicroServices
- *
- * \brief Creates initialization code for an executable.
- *
- * Each executable which wants to register itself with the CppMicroServices library
- * has to put a call to this macro in one of its source files. This ensures that the
- * executable will get its own ModuleContext instance and can access the service registry.
- *
- * Example call for an executable:
- * \code
- * US_INITIALIZE_EXECUTABLE("my_executable")
- * \endcode
- *
- * This will initialize the executable for use with the CppMicroServices library, using a default
- * auto-load directory named after the provided executable id in \c _executable_id.
- *
- * \sa MicroServices_AutoLoading
- *
- * \remarks If you are using CMake, consider using the provided CMake macro
- * <code>usFunctionGenerateExecutableInit()</code>.
- *
- * \param _executable_id A valid C identifier for the executable (no spaces etc.).
- */
-#define US_INITIALIZE_EXECUTABLE(_executable_id) \
-  US_INITIALIZE_MODULE(_executable_id, "")
+// Create a file-scoped static object for registering the module
+// during static initialization of the shared library
+#define US_DEFINE_MODULE_INITIALIZER \
+static US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME);
 
-// If the CppMicroServices library was statically build, executables will share the
-// initialization code with the CppMicroServices library.
-#ifndef US_BUILD_SHARED_LIBS
-#undef US_INITIALIZE_EXECUTABLE
-#define US_INITIALIZE_EXECUTABLE(_a)
-#endif
-
-// Static modules usually don't get initialization code. They are initialized within the
-// module importing the static module(s).
-#if defined(US_STATIC_MODULE) && !defined(US_FORCE_MODULE_INIT)
-#undef US_INITIALIZE_MODULE
-#define US_INITIALIZE_MODULE(_a,_b)
+// Static modules don't create a file-scoped static object for initialization
+// (it would be discarded during static linking anyway). The initialization code
+// is triggered by the US_IMPORT_MODULE macro instead.
+#if defined(US_STATIC_MODULE)
+#undef US_DEFINE_MODULE_INITIALIZER
+#define US_DEFINE_MODULE_INITIALIZER
 #endif
 
 #endif // USMODULEINITIALIZATION_H

@@ -78,6 +78,7 @@ int main(int /*argc*/, char** /*argv*/)
     }
     shellService->ExecuteCommand(line);
     free(line);
+    std::cout << std::endl;
   }
 }
 

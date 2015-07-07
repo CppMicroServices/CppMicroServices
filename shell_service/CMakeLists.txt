@@ -11,11 +11,11 @@ set(_private_headers
 )
 
 set(_public_headers
-  include/usShellService
+  include/usShellService.h
 )
 
 set(_resources
-
+  usShellProcedures.scm
 )
 
 add_definitions(-DSTANDALONE=0 -DUSE_INTERFACE=1)
@@ -27,6 +27,7 @@ usMacroCreateModule(ShellService
   PRIVATE_HEADERS ${_private_headers}
   INTERNAL_INCLUDE_DIRS ../third_party/tinyscheme
   SOURCES ${_srcs}
+  RESOURCES ${_resources}
 )
 
 usFunctionAddResources(TARGET ${ShellService_TARGET}

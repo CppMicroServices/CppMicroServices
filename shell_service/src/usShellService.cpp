@@ -36,24 +36,235 @@
 #include <string>
 #include <map>
 #include <set>
+#include <iomanip>
 
 #include <malloc.h>
 
 US_USE_NAMESPACE
 
+#define sc_int(sc, ival) (sc->vptr->mk_integer(sc, ival))
+#define sc_string(sc, sval) (sc->vptr->mk_string(sc, sval))
+
 extern "C" {
 
-pointer lm(scheme* sc, pointer /*args*/)
+// id, name, version, state
+static const int numFields = 5;
+static const int fieldWidth[numFields] = { 4, 26, 10, 12, 40 };
+
+pointer us_module_ids(scheme* sc, pointer /*args*/)
 {
-  std::vector<Module*> modules = ModuleRegistry::GetLoadedModules();
-  std::stringstream ss;
-  pointer result = sc->NIL;
-  for (std::vector<Module*>::reverse_iterator iter = modules.rbegin(),
-       iterEnd = modules.rend(); iter != iterEnd; ++iter)
+  std::vector<Module*> modules = ModuleRegistry::GetModules();
+  std::set<long> ids;
+  for (std::vector<Module*>::iterator iter = modules.begin(),
+       iterEnd = modules.end(); iter != iterEnd; ++iter)
   {
-    result = cons(sc, sc->vptr->mk_integer(sc, (*iter)->GetModuleId()), result);
+    ids.insert((*iter)->GetModuleId());
+  }
+  pointer result = sc->NIL;
+  for (std::set<long>::reverse_iterator iter = ids.rbegin(),
+       iterEnd = ids.rend(); iter != iterEnd; ++iter)
+  {
+    result = cons(sc, sc_int(sc, *iter), result);
   }
   return result;
+}
+
+pointer us_module_info(scheme* sc, pointer args)
+{
+  if(args == sc->NIL)
+  {
+    std::cerr << "Empty argument list" << std::endl;
+    return sc->NIL;
+  }
+
+  if (sc->vptr->list_length(sc, args) != 1)
+  {
+    return sc->NIL;
+  }
+
+  const char delimChar = '-';
+  char delim[50];
+  memset(delim, delimChar, 50);
+
+  pointer arg = pair_car(args);
+  Module* module = NULL;
+  if (is_string(arg))
+  {
+    std::string name = sc->vptr->string_value(arg);
+    if (name == "_header_")
+    {
+      pointer result = sc->NIL;
+      pointer infoList = sc->NIL;
+      for (int fi = numFields-1; fi >= 0; --fi)
+      {
+        delim[fieldWidth[fi]] = '\0';
+        infoList = immutable_cons(sc, sc_string(sc, delim), infoList);
+        delim[fieldWidth[fi]] = delimChar;
+      }
+      result = immutable_cons(sc, infoList, result);
+
+      infoList = sc->NIL;
+      infoList = immutable_cons(sc, sc_string(sc, "Location"), infoList);
+      infoList = immutable_cons(sc, sc_string(sc, "State"), infoList);
+      infoList = immutable_cons(sc, sc_string(sc, "Version"), infoList);
+      infoList = immutable_cons(sc, sc_string(sc, "Name"), infoList);
+      infoList = immutable_cons(sc, sc_string(sc, "Id"), infoList);
+      return immutable_cons(sc, infoList, result);
+    }
+    else
+    {
+      module = ModuleRegistry::GetModule(name);
+    }
+  }
+  else if (is_integer(arg))
+  {
+    module = ModuleRegistry::GetModule(ivalue(arg));
+  }
+  else
+  {
+    return sc->NIL;
+  }
+
+  if (module == NULL)
+  {
+    return sc->NIL;
+  }
+
+  pointer id = sc_int(sc, module->GetModuleId());
+  pointer name = sc_string(sc, module->GetName().c_str());
+  pointer location = sc_string(sc, module->GetLocation().c_str());
+  pointer version = sc_string(sc, module->GetVersion().ToString().c_str());
+  std::string strState;
+  //std::stringstream(strState) << module->GetState();
+  strState = module->IsLoaded() ? "Loaded" : "Unloaded";
+  pointer state = sc_string(sc, strState.c_str());
+
+
+  pointer result = sc->NIL;
+  result = immutable_cons(sc, location, result);
+  result = immutable_cons(sc, state, result);
+  result = immutable_cons(sc, version, result);
+  result = immutable_cons(sc, name, result);
+  result = immutable_cons(sc, id, result);
+
+  // (id, name, version, state, location)
+  return result;
+}
+
+pointer us_display_module_info(scheme* sc, pointer args)
+{
+  if(!sc->vptr->is_list(sc, args) || args == sc->NIL)
+  {
+    std::cerr << "Expected a non-empty list" << std::endl;
+    return sc->F;
+  }
+
+  args = pair_car(args);
+  int count = sc->vptr->list_length(sc, args);
+  for (int j = 0; j < count; ++j)
+  {
+    pointer infoList = pair_car(args);
+    args = pair_cdr(args);
+
+    if(!sc->vptr->is_list(sc, infoList) || infoList == sc->NIL)
+    {
+      std::cerr << "Expected a non-empty list" << std::endl;
+      return sc->F;
+    }
+
+    int l = sc->vptr->list_length(sc, infoList);
+    for (int i = 0; i < std::min(l, 4); ++i)
+    {
+      pointer arg = pair_car(infoList);
+      infoList = pair_cdr(infoList);
+      if (sc->vptr->is_string(arg))
+      {
+        std::cout << std::left << std::setw(fieldWidth[i]) << sc->vptr->string_value(arg);
+      }
+      else if (sc->vptr->is_number(arg))
+      {
+        std::cout << std::left << std::setw(fieldWidth[i]) << sc->vptr->ivalue(arg);
+      }
+    }
+    std::cout << std::endl;
+  }
+  return sc->T;
+}
+
+pointer us_module_start(scheme* sc, pointer args)
+{
+  if(args == sc->NIL)
+  {
+    std::cerr << "Empty argument list" << std::endl;
+    return sc->F;
+  }
+
+  if (sc->vptr->list_length(sc, args) != 1)
+  {
+    return sc->F;
+  }
+
+  pointer arg = pair_car(args);
+
+  Module* module = NULL;
+  if (is_string(arg))
+  {
+    std::string name = sc->vptr->string_value(arg);
+    module = ModuleRegistry::GetModule(name);
+  }
+  else if (is_integer(arg))
+  {
+    module = ModuleRegistry::GetModule(ivalue(arg));
+  }
+  else
+  {
+    return sc->F;
+  }
+
+  if (module)
+  {
+    std::cout << "Starting module..." << std::endl;
+    return sc->T;
+  }
+  return sc->F;
+}
+
+pointer us_module_stop(scheme* sc, pointer args)
+{
+  if(args == sc->NIL)
+  {
+    std::cerr << "Empty argument list" << std::endl;
+    return sc->F;
+  }
+
+  if (sc->vptr->list_length(sc, args) != 1)
+  {
+    return sc->F;
+  }
+
+  pointer arg = pair_car(args);
+
+  Module* module = NULL;
+  if (is_string(arg))
+  {
+    std::string name = sc->vptr->string_value(arg);
+    module = ModuleRegistry::GetModule(name);
+  }
+  else if (is_integer(arg))
+  {
+    module = ModuleRegistry::GetModule(ivalue(arg));
+  }
+  else
+  {
+    return sc->F;
+  }
+
+  if (module)
+  {
+    std::cout << "Stopping module..." << std::endl;
+    return sc->T;
+  }
+  return sc->F;
 }
 
 }
@@ -117,27 +328,28 @@ ShellService::ShellService()
   ModuleResource schemeInitRes = GetModuleContext()->GetModule()->GetResource("tinyscheme/init.scm");
   if (schemeInitRes)
   {
-    ModuleResourceStream schemeInit(schemeInitRes);
-    int schemeInitBufLen = schemeInitRes.GetSize() + 1;
-    char* schemeInitBuf = new char[schemeInitBufLen];
-    schemeInit.read(schemeInitBuf, schemeInitBufLen);
-    if (schemeInit.eof() || schemeInit.good())
-    {
-      schemeInitBuf[schemeInit.tellg()] = '\0';
-      scheme_load_string(d->m_Scheme, schemeInitBuf);
-    }
-    else
-    {
-      US_WARN << "Could not read Scheme init.scm file from resource";
-    }
-    delete[] schemeInitBuf;
+    this->LoadSchemeResource(schemeInitRes);
   }
   else
   {
     US_WARN << "Scheme file init.scm not found";
   }
 
-  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "lm"), mk_foreign_func(d->m_Scheme, lm));
+  std::vector<ModuleResource> schemeResources = GetModuleContext()->GetModule()->FindResources("/", "*.scm", false);
+  for (std::vector<ModuleResource>::iterator iter = schemeResources.begin(),
+       iterEnd = schemeResources.end(); iter != iterEnd; ++iter)
+  {
+    if (*iter)
+    {
+      this->LoadSchemeResource(*iter);
+    }
+  }
+
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-ids"), mk_foreign_func(d->m_Scheme, us_module_ids));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-info"), mk_foreign_func(d->m_Scheme, us_module_info));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-display-module-info"), mk_foreign_func(d->m_Scheme, us_display_module_info));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-start"), mk_foreign_func(d->m_Scheme, us_module_start));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-stop"), mk_foreign_func(d->m_Scheme, us_module_stop));
 }
 
 ShellService::~ShellService()
@@ -147,7 +359,15 @@ ShellService::~ShellService()
 
 void ShellService::ExecuteCommand(const std::string& cmd)
 {
-  scheme_load_string(d->m_Scheme, cmd.c_str());
+  std::size_t pos = cmd.find_first_not_of(' ');
+  if (pos == std::string::npos) return;
+
+  std::string command = cmd.substr(pos);
+  if (command[0] != '(')
+  {
+    command = "(" + command + ")";
+  }
+  scheme_load_string(d->m_Scheme, command.c_str());
 }
 
 std::vector<std::string> ShellService::GetCompletions(const std::string& in)
@@ -186,6 +406,25 @@ std::vector<std::string> ShellService::GetCompletions(const std::string& in)
     }
   }
   return result;
+}
+
+void ShellService::LoadSchemeResource(const ModuleResource& res)
+{
+  US_INFO << "Reading " << res.GetResourcePath();
+  ModuleResourceStream resStream(res);
+  int resBufLen = res.GetSize() + 1;
+  char* resBuf = new char[resBufLen];
+  resStream.read(resBuf, resBufLen);
+  if (resStream.eof() || resStream.good())
+  {
+    resBuf[static_cast<std::size_t>(resStream.gcount())] = '\0';
+    scheme_load_string(d->m_Scheme, resBuf);
+  }
+  else
+  {
+    US_WARN << "Could not read " << res.GetResourcePath() << " file from resource";
+  }
+  delete[] resBuf;
 }
 
 US_END_NAMESPACE

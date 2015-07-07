@@ -28,6 +28,8 @@
 
 US_BEGIN_NAMESPACE
 
+class ModuleResource;
+
 class US_ShellService_EXPORT ShellService
 {
 public:
@@ -43,6 +45,8 @@ private:
 
   ShellService(const ShellService&);
   ShellService& operator=(const ShellService&);
+
+  void LoadSchemeResource(const ModuleResource& res);
 
   struct Impl;
   std::auto_ptr<Impl> d;

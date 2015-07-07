@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,6 +24,9 @@
 #error Missing US_MODULE_NAME preprocessor define
 #endif
 
+#ifndef USMODULEINITIALIZATION_H
+#define USMODULEINITIALIZATION_H
+
 #include <usStaticInit_p.h>
 
 #include <usModuleRegistry.h>
@@ -30,9 +34,6 @@
 #include <usModuleUtils_p.h>
 
 #include <cstring>
-
-#ifndef USMODULEINITIALIZATION_H
-#define USMODULEINITIALIZATION_H
 
 
 /**
@@ -64,11 +65,11 @@ US_GLOBAL_STATIC_WITH_ARGS(ModuleInfo, moduleInfo, (US_STR(US_MODULE_NAME)))    
 /* This class is used to statically initialize the library within the C++ Micro services     \
    library. It looks up a library specific C-style function returning an instance            \
    of the ModuleActivator interface. */                                                      \
-class US_ABI_LOCAL ModuleInitializer {                                                       \
+class US_ABI_LOCAL US_CONCAT(ModuleInitializer_, US_MODULE_NAME) {                           \
                                                                                              \
 public:                                                                                      \
                                                                                              \
-  ModuleInitializer()                                                                        \
+  US_CONCAT(ModuleInitializer_, US_MODULE_NAME)()                                            \
   {                                                                                          \
     ModuleInfo*(*moduleInfoPtr)() = moduleInfo;                                              \
     void* moduleInfoSym = NULL;                                                              \
@@ -84,7 +85,7 @@ public:                                                                         
     ModuleRegistry::Register(moduleInfo());                                                  \
   }                                                                                          \
                                                                                              \
-  ~ModuleInitializer()                                                                       \
+  ~US_CONCAT(ModuleInitializer_, US_MODULE_NAME)()                                           \
   {                                                                                          \
     ModuleRegistry::UnRegister(moduleInfo());                                                \
   }                                                                                          \
@@ -97,23 +98,19 @@ US_DEFINE_MODULE_INITIALIZER                                                    
                                                                                              \
 US_END_NAMESPACE                                                                             \
                                                                                              \
-extern "C" {                                                                                 \
-                                                                                             \
 /* A helper function which is called by the US_IMPORT_MODULE macro to initialize             \
    static modules. The function is exported in order to be searchable in the exports         \
    section of the shared library, acting as a "signature" for CppMicroservices modules       \
    and also encoding the module name. */                                                     \
-void US_ABI_EXPORT US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()               \
+extern "C" void US_ABI_EXPORT US_CONCAT(_us_import_module_initializer_, US_MODULE_NAME)()    \
 {                                                                                            \
-  static US_PREPEND_NAMESPACE(ModuleInitializer) _InitializeModule;                          \
-}                                                                                            \
-                                                                                             \
+  static US_PREPEND_NAMESPACE(US_CONCAT(ModuleInitializer_, US_MODULE_NAME)) US_CONCAT(_InitializeModule_, US_MODULE_NAME); \
 }
 
 // Create a file-scoped static object for registering the module
 // during static initialization of the shared library
 #define US_DEFINE_MODULE_INITIALIZER \
-static ModuleInitializer _InitializeModule;
+static US_CONCAT(ModuleInitializer_, US_MODULE_NAME) US_CONCAT(_InitializeModule_, US_MODULE_NAME);
 
 // Static modules don't create a file-scoped static object for initialization
 // (it would be discarded during static linking anyway). The initialization code

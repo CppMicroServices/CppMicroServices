@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -50,7 +51,7 @@ US_END_NAMESPACE
  * \sa \ref MicroServices_StaticModules
  */
 #define US_INITIALIZE_STATIC_MODULE(_module_name)                          \
-  extern void _us_import_module_initializer_ ## _module_name();            \
+  extern "C" void _us_import_module_initializer_ ## _module_name();        \
   struct StaticModuleInitializer_ ## _module_name                          \
   {                                                                        \
     StaticModuleInitializer_ ## _module_name()                             \

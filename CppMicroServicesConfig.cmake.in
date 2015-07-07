@@ -77,6 +77,7 @@ list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
 set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
 set(US_MODULE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usModuleInit.cpp")
+set(US_RESOURCE_RC_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/us_resources.rc.in")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "@PACKAGE_CONFIG_CMAKE_DIR@/usCMakeResourceDependencies.cpp")
 
 # The CppMicroServices resource compiler
@@ -95,6 +96,12 @@ elseif(NOT COMMAND find_package_handle_standard_args)
 endif()
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionAddResources.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckCompilerFlags.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckResourceLinking.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGetResourceSource.cmake")
+
+usFunctionCheckResourceLinking()
 
 # Global include directory
 set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")

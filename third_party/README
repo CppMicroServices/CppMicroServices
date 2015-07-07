@@ -1,12 +1,13 @@
 README
 ======
 
-This directory contains several minimalistic third-party libraries.
-For a record of their origin and version, see the list below or read
-the file header.
+This directory contains several third-party libraries.
+
+For detailed copyright and license information see the header of the respective
+file. A record of their origin and version is provided in the list below.
 
 If a third-party library has been modified for the purposes of the
-CppMicroServices library, it is marked as such below.
+CppMicroServices library, it is marked as such.
 
 dirent_win32
 ------------
@@ -19,7 +20,7 @@ http://softagalleria.net/dirent.php
 jsoncpp
 -------
 
-MITK License or Public Domain
+MIT License or Public Domain
 
 https://github.com/open-source-parsers/jsoncpp
 (formerly http://jsoncpp.sourceforge.net)
@@ -91,4 +92,3 @@ Patches
  * Don't depend on utf8.h because it is not supported
    on Windows.
  * Disable Windows warnings C4244 and C4267.
-

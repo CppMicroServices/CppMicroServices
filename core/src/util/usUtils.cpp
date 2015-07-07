@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,6 +26,7 @@
 #include "usModuleInfo.h"
 #include "usModuleSettings.h"
 
+#include <string>
 #include <cstdio>
 #include <cctype>
 #include <algorithm>
@@ -301,9 +303,9 @@ void message_output(MsgType msgType, const char *buf)
 #include <cxxabi.h>
 #endif
 
-US_Core_EXPORT std::string GetDemangledName(const std::type_info& typeInfo)
+US_Core_EXPORT ::std::string GetDemangledName(const ::std::type_info& typeInfo)
 {
-  std::string result;
+  ::std::string result;
 #ifdef US_HAVE_CXXABI_H
   int status = 0;
   char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -91,6 +92,42 @@ public:
   ~ModuleListenerRegistrationHelper()
   {
     context->RemoveModuleListener(receiver, callback);
+  }
+
+private:
+
+  ModuleContext* context;
+  Receiver* receiver;
+  CallbackType callback;
+};
+
+template<class Receiver>
+class ServiceListenerRegistrationHelper
+{
+
+public:
+
+  typedef void(Receiver::*CallbackType)(const ServiceEvent);
+
+  ServiceListenerRegistrationHelper(ModuleContext* context, Receiver* receiver, CallbackType callback)
+    : context(context)
+    , receiver(receiver)
+    , callback(callback)
+  {
+    try
+    {
+      context->AddServiceListener(receiver, callback);
+    }
+    catch (const std::logic_error& ise)
+    {
+      US_TEST_OUTPUT( << "service listener registration failed " << ise.what() );
+      throw;
+    }
+  }
+
+  ~ServiceListenerRegistrationHelper()
+  {
+    context->RemoveServiceListener(receiver, callback);
   }
 
 private:

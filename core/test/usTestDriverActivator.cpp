@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -59,6 +60,8 @@ US_IMPORT_MODULE(TestModuleB)
 US_IMPORT_MODULE(TestModuleH)
 US_IMPORT_MODULE(TestModuleM)
 US_INITIALIZE_STATIC_MODULE(TestModuleR)
+US_INITIALIZE_STATIC_MODULE(TestModuleRL)
+US_INITIALIZE_STATIC_MODULE(TestModuleRA)
 US_IMPORT_MODULE(TestModuleS)
 US_IMPORT_MODULE(TestModuleSL1)
 US_IMPORT_MODULE(TestModuleSL3)

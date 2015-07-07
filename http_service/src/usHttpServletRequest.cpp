@@ -194,7 +194,9 @@ std::string HttpServletRequest::GetQueryString() const
 
 std::string HttpServletRequest::GetHeader(const std::string& name) const
 {
-  return mg_get_header(d->m_Connection, name.c_str());
+  const char* header = mg_get_header(d->m_Connection, name.c_str());
+  if (header) return header;
+  return std::string();
 }
 
 long long HttpServletRequest::GetDateHeader(const std::string& name) const

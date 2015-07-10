@@ -113,10 +113,8 @@ void frame02a(ModuleContext* mc)
   moduleA->Start();
 
   std::vector<ModuleEvent> pEvts;
-#ifdef US_BUILD_SHARED_LIBS
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleA));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleA));
-#endif
 
   std::vector<ServiceEvent> seEvts;
 

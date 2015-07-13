@@ -41,30 +41,12 @@ US_USE_NAMESPACE
 
 namespace {
 
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-  static const std::string DIR_SEP = "\\";
-  static const std::string LIB_PREFIX = "";
-  static const std::string LIB_EXT = ".dll";
-  static const std::string EXE_EXT = ".exe";
-#else
-#if defined US_PLATFORM_APPLE
-  static const std::string LIB_EXT = ".dylib";
-#else
-  static const std::string LIB_EXT = ".so";
-#endif
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-  static const std::string LIB_PREFIX = "lib";
-  static const std::string DIR_SEP = "/";
-  static const std::string EXE_EXT = "";
-#endif
-
 // Check that the executable's activator was loaded and called
 void frame01(ModuleContext* mc)
 {
   try
   {
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "usCoreTestDriver" + EXE_EXT + "/main");
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module main")
 
     module->Start();
@@ -230,7 +212,7 @@ void frame020a(Framework* framework, TestModuleListener& listener)
 void frame02b(Framework* framework)
 {
   ModuleContext* mc = framework->GetModuleContext();
-  
+
   US_TEST_CONDITION(framework->GetStoragePath() == "/tmp", "Test for valid base storage path")
 
   Module* moduleA = mc->GetModule("TestModuleA");

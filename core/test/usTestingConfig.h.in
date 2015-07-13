@@ -9,4 +9,24 @@
 #define US_RUNTIME_OUTPUT_DIRECTORY "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
 #endif
 
+#ifdef US_PLATFORM_WINDOWS
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string BIN_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string DIR_SEP = "\\";
+  static const std::string LIB_PREFIX = "";
+  static const std::string LIB_EXT = ".dll";
+  static const std::string EXE_EXT = ".exe";
+#else
+#if defined US_PLATFORM_APPLE
+  static const std::string LIB_EXT = ".dylib";
+#else
+  static const std::string LIB_EXT = ".so";
+#endif
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const std::string BIN_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string LIB_PREFIX = "lib";
+  static const std::string DIR_SEP = "/";
+  static const std::string EXE_EXT = "";
+#endif
+
 #endif // USTESTINGCONFIG_H

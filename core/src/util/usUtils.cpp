@@ -70,37 +70,9 @@ std::string library_suffix()
 
 const char DIR_SEP = '/';
 
-bool load_impl(const std::string& modulePath)
-{
-  void* handle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
-  if (handle == NULL)
-  {
-    US_WARN << dlerror();
-  }
-  return (handle != NULL);
-}
-
 #elif defined(US_PLATFORM_WINDOWS)
 
 const char DIR_SEP = '\\';
-
-bool load_impl(const std::string& modulePath)
-{
-  void* handle = LoadLibrary(modulePath.c_str());
-  if (handle == NULL)
-  {
-    US_WARN << us::GetLastErrorStr();
-  }
-  return (handle != NULL);
-}
-
-#else
-
-  #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-    #error "Missing load_impl implementation for this platform."
-  #else
-bool load_impl(const std::string&) { return false; }
-  #endif
 
 #endif
 }
@@ -195,7 +167,7 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
       memset(&zipArchive, 0, sizeof(mz_zip_archive));
       if(MZ_FALSE == mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0)) continue;
 
-      // the usResourceCompiler will place resources into sub directories, 
+      // the usResourceCompiler will place resources into sub directories,
       // one for each module, named after the module's name. The module's
       // manifest is stored in a file called manifest.json in the root of
       // its sub-directory (analogous to OSGi's META-INF/MANIFEST.MF file).

@@ -38,22 +38,6 @@ US_USE_NAMESPACE
 
 namespace {
 
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-  static const std::string DIR_SEP = "\\";
-  static const std::string LIB_PREFIX = "";
-  static const std::string LIB_EXT = ".dll";
-#else
-#if defined US_PLATFORM_APPLE
-  static const std::string LIB_EXT = ".dylib";
-#else
-  static const std::string LIB_EXT = ".so";
-#endif
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-  static const std::string LIB_PREFIX = "lib";
-  static const std::string DIR_SEP = "/";
-#endif
-
 // Load libTestModuleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
 void frame020a(ModuleContext* mc, TestModuleListener& listener)

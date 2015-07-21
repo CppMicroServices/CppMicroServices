@@ -303,9 +303,10 @@ void frameSL02a(Framework* framework)
                         << " : frameSL02a:FAIL" );
   }
 
+  Module* module = 0;
   try
   {
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+    module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
     module->Start();
   }
@@ -322,6 +323,8 @@ void frameSL02a(Framework* framework)
 
   mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
   mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+
+  module->Stop();
 }
 
 void frameSL05a(Framework* framework)

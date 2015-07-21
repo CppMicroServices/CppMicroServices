@@ -76,10 +76,6 @@ Module* ModuleRegistry::Register(ModuleInfo* info)
       MutexLock lock(*modulesLock);
       modules.insert(std::make_pair(info->name, module));
     }
-    else
-    {
-      module->Init(coreCtx, info);
-    }
   }
 
   return module;

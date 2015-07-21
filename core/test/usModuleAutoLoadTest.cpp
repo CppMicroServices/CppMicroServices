@@ -176,12 +176,20 @@ int usModuleAutoLoadTest(int /*argc*/, char* /*argv*/[])
 
   framework->SetAutoLoadingEnabled(false);
   testDefaultAutoLoadPath(false, framework);
+  
+  framework->Stop();
+  delete framework;
+
+  framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
   framework->SetAutoLoadingEnabled(true);
 
   testDefaultAutoLoadPath(true, framework);
-
   testCustomAutoLoadPath(framework);
 
+  framework->Stop();
   delete framework;
 
   US_TEST_END()

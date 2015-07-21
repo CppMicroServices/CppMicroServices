@@ -416,7 +416,7 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module main")
     module->Start();
   }

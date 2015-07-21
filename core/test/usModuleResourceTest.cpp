@@ -454,7 +454,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   Module* executableBundle = 0;
   try
   {
-    executableBundle = mc->InstallBundle(LIB_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    executableBundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
     US_TEST_CONDITION_REQUIRED(executableBundle != NULL, "Test installation of module main")
   }
   catch (const std::exception& e)

@@ -128,10 +128,13 @@ void Module::Start()
     return;
   }
 
-  if(!d->lib.IsLoaded())
+  // loading a library isn't necessary if it isn't supported
+#ifdef US_BUILD_SHARED_LIBS
+  if(d->lib.IsSharedLibrary() && !d->lib.IsLoaded())
   {
     d->lib.Load();
   }
+#endif
 
   d->moduleContext = new ModuleContext(this->d);
 

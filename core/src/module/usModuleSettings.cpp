@@ -102,7 +102,6 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
   std::set<std::string> extraPaths;
   bool autoLoadingEnabled;
   bool autoLoadingDisabled;
-  std::string storagePath;
   MsgType logLevel;
 };
 
@@ -173,18 +172,6 @@ void ModuleSettings::AddAutoLoadPath(const std::string& path)
 {
   US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
   pimpl->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
-}
-
-void ModuleSettings::SetStoragePath(const std::string &path)
-{
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
-  pimpl->storagePath = RemoveTrailingPathSeparator(path);
-}
-
-std::string ModuleSettings::GetStoragePath()
-{
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
-  return pimpl->storagePath;
 }
 
 void ModuleSettings::SetLogLevel(MsgType level)

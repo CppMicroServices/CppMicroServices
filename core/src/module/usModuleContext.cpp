@@ -179,11 +179,10 @@ std::string ModuleContext::GetDataFile(const std::string &filename) const
 #endif
   
   std::string baseStoragePath;
-  // TODO: system bundle should be id '0' per the OSGi spec.
-  Module* systemBundle = d->module->coreCtx->bundleRegistry.GetModule(1);
-  if(systemBundle && !systemBundle->GetProperty("org.osgi.framework.storage").Empty())
-  {
-    baseStoragePath = systemBundle->GetProperty("org.osgi.framework.storage").ToString();
+  std::map<std::string, std::string>::iterator prop = d->module->coreCtx->launchProperties.find("org.osgi.framework.storage");
+  if(prop != d->module->coreCtx->launchProperties.end())
+  { 
+    baseStoragePath = (*prop).second;
   }
   
   if (baseStoragePath.empty()) return std::string();

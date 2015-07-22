@@ -121,14 +121,6 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
     moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
   }
 
-  // add the default and launcher specified framework configuration.
-  // TODO: revisit how we set up the framework's configuration for both the default and non-default cases.
-  for(std::map<std::string, std::string>::iterator iter = this->info.properties.begin();
-      iter != this->info.properties.end(); ++iter)
-  {
-    moduleManifest.SetValue((*iter).first, Any((*iter).second));
-  }
-
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   if (coreCtx->settings.IsAutoLoadingEnabled())
   {

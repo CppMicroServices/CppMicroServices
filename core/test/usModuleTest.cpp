@@ -81,7 +81,11 @@ void frame02a(ModuleContext* mc)
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
   }
   catch (const std::exception& e)
@@ -122,7 +126,7 @@ void frame005a(ModuleContext* mc)
   US_TEST_CONDITION(ModuleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == mc->GetModule(1)->GetVersion(), "Test CppMicroServices version")
 }
 
-// Get context id, location and status of the module
+// Get context id, location, persistent storage and status of the module
 void frame010a(Framework* framework, ModuleContext* mc)
 {
   Module* m = mc->GetModule();
@@ -136,7 +140,9 @@ void frame010a(Framework* framework, ModuleContext* mc)
 
   US_TEST_CONDITION(m->IsLoaded(), "Test for loaded flag")
 
-  US_TEST_CONDITION(framework->GetStoragePath().empty(), "Test for empty base storage path")
+  // launching properties should be accessible through any bundle
+  US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").Empty(), "Test for empty base storage path")
+  US_TEST_CONDITION(m->GetProperty("org.osgi.framework.storage").Empty(), "Test for empty base storage path")
   US_TEST_CONDITION(m->GetModuleContext()->GetDataFile("").empty(), "Test for empty data path")
   US_TEST_CONDITION(m->GetModuleContext()->GetDataFile("bla").empty(), "Test for empty data file path")
 }
@@ -213,11 +219,12 @@ void frame02b(Framework* framework)
 {
   ModuleContext* mc = framework->GetModuleContext();
 
-  US_TEST_CONDITION(framework->GetStoragePath() == "/tmp", "Test for valid base storage path")
+  US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
 
   Module* moduleA = mc->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
-
+  // launching properties should be accessible through any bundle
+  US_TEST_CONDITION(moduleA->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
 
   moduleA->Start();

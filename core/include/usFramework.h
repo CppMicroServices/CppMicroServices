@@ -98,9 +98,8 @@ public:
     /****************************************************
      * BEGIN - Non OSGi compliant functions
      *
-     * These functions originally came from the ModuleSettings class, 
-     * and are duplicated here temporarily to transition functionality 
-     * until a solution is agreed upon.
+     * Auto-load/install will be factored out into a separate
+     * service.
      ****************************************************/
 
     /**
@@ -114,14 +113,6 @@ public:
      */
     void SetAutoLoadingEnabled(bool enable);
 
-    /**
-     * Get the absolute path for persistent data. The returned path
-     * might be empty. If the path is non-empty, it is safe to assume
-     * that the path exists and is writable.
-     *
-     * \return The absolute path to the persistent storage path.
-     */
-    std::string GetStoragePath();
     /********************************************
      * END - Non OSGi compliant functions
      ********************************************/

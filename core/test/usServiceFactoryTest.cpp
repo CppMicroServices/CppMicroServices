@@ -56,7 +56,11 @@ void TestServiceFactoryModuleScope(ModuleContext* mc)
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleH" + LIB_EXT + "/TestModuleH");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleH");  
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleH")
   }
   catch (const std::exception& e)
@@ -110,7 +114,11 @@ void TestServiceFactoryPrototypeScope(ModuleContext* mc)
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleH" + LIB_EXT + "/TestModuleH");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleH");  
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleH")
   }
   catch (const std::exception& e)

@@ -117,7 +117,11 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleB");
+#else
+    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleB");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleB")
   }
   catch (const std::exception& e)
@@ -127,7 +131,11 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleImportedByB");
+#else
+    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleImportedByB");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleImportedByB")
   }
   catch (const std::exception& e)

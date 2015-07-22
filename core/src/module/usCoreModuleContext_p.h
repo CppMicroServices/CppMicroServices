@@ -70,6 +70,11 @@ public:
    */
   ModuleSettings settings;
 
+  /*
+   * Framework launch properties
+   */
+  std::map<std::string, std::string> launchProperties;
+
   /**
    * Contruct a core context
    *

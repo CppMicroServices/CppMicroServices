@@ -49,7 +49,6 @@ struct US_Core_EXPORT ModuleInfo
   std::string name;
   std::string location;
   std::string autoLoadDir;
-  std::map<std::string, std::string> properties;
   long id;
 };
 

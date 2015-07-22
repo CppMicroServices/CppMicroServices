@@ -49,7 +49,11 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleM" + LIB_EXT + "/TestModuleM");
+#else
+    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleM");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleM")
   }
   catch (const std::exception& e)

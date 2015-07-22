@@ -145,7 +145,11 @@ void TestServiceTracker(us::ModuleContext* context)
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleS" + LIB_EXT + "/TestModuleS");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleS");      
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleS")
     module->Start();
   }

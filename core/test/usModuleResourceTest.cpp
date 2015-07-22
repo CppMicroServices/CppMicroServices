@@ -402,7 +402,11 @@ void testResourcesFrom(const std::string& moduleName, ModuleContext* mc)
 {
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + moduleName + LIB_EXT + "/" + moduleName);
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + moduleName);
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module " + moduleName)
   }
   catch (const std::exception& e)
@@ -436,7 +440,11 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleR" + LIB_EXT + "/TestModuleR");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleR");   
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleR")
   }
   catch (const std::exception& e)

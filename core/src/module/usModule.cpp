@@ -265,7 +265,21 @@ ModuleVersion Module::GetVersion() const
 
 Any Module::GetProperty(const std::string& key) const
 {
-  return d->moduleManifest.GetValue(key);
+  // clients must be able to query both a bundle's properties
+  // and the framework's properties through any Bundle's
+  // GetProperty function.
+  // Further, access must be provided to all Bundles to search
+  // for "org.osgi.*" properties.
+  Any property(d->moduleManifest.GetValue(key));
+  if (property.Empty())
+  {
+    std::map<std::string, std::string>::iterator launchProp = d->coreCtx->launchProperties.find(key);
+    if (launchProp != d->coreCtx->launchProperties.end())
+    {
+      property = (*launchProp).second;
+    }
+  }
+  return property;
 }
 
 std::vector<std::string> Module::GetPropertyKeys() const

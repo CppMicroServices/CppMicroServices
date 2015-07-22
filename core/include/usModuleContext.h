@@ -818,7 +818,7 @@ public:
    * might be empty if no storage path has been set previously.
    * If the path is non-empty, it is safe to assume that the path is writable.
    *
-   * @see ModuleSettings::SetStoragePath(const std::string&)
+   * @see Framework::Framework(std::map<std::string, std::string>& configuration)
    *
    * @param filename A relative name to the file or directory to be accessed.
    * @return The absolute path to the persistent storage area for the given file name.

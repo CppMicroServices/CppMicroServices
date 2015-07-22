@@ -246,8 +246,9 @@ public:
   virtual ModuleVersion GetVersion() const;
 
   /**
-   * Returns the value of the specified property for this module. The
-   * method returns an empty Any if the property is not found.
+   * Returns the value of the specified property for this module.
+   * If not found, the framework's properties are searched. 
+   * The method returns an empty Any if the property is not found.
    *
    * @param key The name of the requested property.
    * @return The value of the requested property, or an empty string

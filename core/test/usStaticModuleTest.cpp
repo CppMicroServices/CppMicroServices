@@ -44,7 +44,11 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
 {
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleB");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleB");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleB")
   }
   catch (const std::exception& e)
@@ -57,7 +61,11 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
 
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleImportedByB");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleImportedByB");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleImportedByB")
   }
   catch (const std::exception& e)

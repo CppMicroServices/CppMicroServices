@@ -37,7 +37,7 @@ Framework::Framework(void) :
     coreModuleContext(new CoreModuleContext()),
     initialized(false)
 {
-    
+
 }
 
 Framework::Framework(std::map<std::string, std::string>& configuration) :
@@ -45,17 +45,17 @@ Framework::Framework(std::map<std::string, std::string>& configuration) :
     launchProperties(configuration),
     initialized(false)
 {
-
+  coreModuleContext->launchProperties = configuration;
 }
 
 Framework::~Framework(void)
 {
-    if(coreModuleContext)
-    {
-      delete coreModuleContext;
-    }
+  if(coreModuleContext)
+  {
+    delete coreModuleContext;
+  }
 
-    initialized = false;
+  initialized = false;
 }
 
 void Framework::init(void) 
@@ -66,8 +66,6 @@ void Framework::init(void)
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
   moduleInfo->location = ModuleUtils::GetLibraryPath(frameworkInit);
-
-  moduleInfo->properties = launchProperties;
 
   Module* systemBundle = coreModuleContext->bundleRegistry.Register(moduleInfo);
   if(systemBundle)
@@ -105,16 +103,6 @@ std::string Framework::GetLocation() const
 void Framework::SetAutoLoadingEnabled(bool enable)
 {
   coreModuleContext->settings.SetAutoLoadingEnabled(enable);
-}
-
-std::string Framework::GetStoragePath()
-{
-  Module* systemBundle = coreModuleContext->bundleRegistry.GetModule(frameworkName);
-  if(systemBundle && !systemBundle->GetProperty("org.osgi.framework.storage").Empty())
-  {
-    return systemBundle->GetProperty("org.osgi.framework.storage").ToString();
-  }
-  return std::string();
 }
 
 US_END_NAMESPACE

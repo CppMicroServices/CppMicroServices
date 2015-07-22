@@ -243,7 +243,11 @@ void TestEventListenerHook(Framework* framework)
   Module* module = 0;
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     module = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+#else
+    module = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");  
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
   }
   catch (const std::exception& e)
@@ -366,7 +370,11 @@ void TestFindHook(Framework* framework)
   Module* module = 0;
   try
   {
+#if defined (US_BUILD_SHARED_LIBS)
     module = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
+#else
+    module = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");
+#endif
     US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
   }
   catch (const std::exception& e)

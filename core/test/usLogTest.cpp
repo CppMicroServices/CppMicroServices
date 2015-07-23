@@ -21,7 +21,6 @@
 =============================================================================*/
 
 #include <usLog_p.h>
-#include <usModuleSettings.h>
 
 #include "usTestingMacros.h"
 
@@ -147,8 +146,7 @@ void testLogLevels()
 {
   installMsgHandler(handleMessages);
 
-  ModuleSettings settings;
-  MsgType logLevel = settings.GetLogLevel();
+  MsgType logLevel = Logger::instance().GetLogLevel();
   US_TEST_CONDITION_REQUIRED(logLevel == DebugMsg, "Default log level")
 
   logMsg(DebugMsg, logLevel);
@@ -158,7 +156,7 @@ void testLogLevels()
 
   for (int level = ErrorMsg; level >= 0; --level)
   {
-    settings.SetLogLevel(static_cast<MsgType>(level));
+    Logger::instance().SetLogLevel(static_cast<MsgType>(level));
     logMsg(DebugMsg, level);
     logMsg(InfoMsg, level);
     logMsg(WarningMsg, level);

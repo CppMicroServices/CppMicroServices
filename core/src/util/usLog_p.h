@@ -24,7 +24,7 @@
 #define USLOG_P_H
 
 #include <usCoreConfig.h>
-#include <usModuleSettings.h>
+#include <usThreads_p.h>
 
 #include <iostream>
 #include <sstream>
@@ -69,23 +69,70 @@ private:
   std::stringstream buffer;
 };
 
+class Logger {
+public:
+    static Logger& instance()
+    { // NOTE: This is only thread safe if compiling with a
+      //  C++11 compiler which implements §6.7.4
+      // TODO: make thread-safe.
+      static Logger inst;
+      return inst;
+    }
+
+    /**
+    * Set the logging level for log messages from CppMicroServices modules.
+    *
+    * Higher logging levels will discard messages with lower priority.
+    * E.g. a logging level of WarningMsg will discard all messages of
+    * type DebugMsg and InfoMsg.
+    *
+    * @param level The new logging level.
+    */
+    void SetLogLevel(const MsgType level)
+    {
+      MutexLock lock(levelLock);
+      logLevel = level;
+    }
+
+    /**
+    * Get the current logging level.
+    *
+    * @return The currently used logging level.
+    */
+    MsgType GetLogLevel()
+    {
+      return logLevel;
+    }
+
+private:
+    MsgType logLevel;
+    Mutex levelLock;
+
+    // disable copy/assignment
+    Logger(const Logger&);
+    Logger& operator=(const Logger&);
+
+protected:
+    Logger(void) {}
+    ~Logger() {}
+};
 
 US_END_NAMESPACE
 
 #if defined(US_ENABLE_DEBUG_OUTPUT)
-  #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(DebugMsg), __FILE__, __LINE__, __FUNCTION__)
+#define US_DEBUG (US_PREPEND_NAMESPACE(Logger)::instance().GetLogLevel() > US_PREPEND_NAMESPACE(DebugMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(DebugMsg), __FILE__, __LINE__, __FUNCTION__))
 #else
   #define US_DEBUG true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
 #if !defined(US_NO_INFO_OUTPUT)
-  #define US_INFO US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(InfoMsg), __FILE__, __LINE__, __FUNCTION__)
+#define US_INFO (US_PREPEND_NAMESPACE(Logger)::instance().GetLogLevel() > US_PREPEND_NAMESPACE(InfoMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(InfoMsg), __FILE__, __LINE__, __FUNCTION__))
 #else
   #define US_INFO  true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif
 
 #if !defined(US_NO_WARNING_OUTPUT)
-  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(WarningMsg), __FILE__, __LINE__, __FUNCTION__)
+#define US_WARN (US_PREPEND_NAMESPACE(Logger)::instance().GetLogLevel() > US_PREPEND_NAMESPACE(WarningMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(WarningMsg), __FILE__, __LINE__, __FUNCTION__))
 #else
   #define US_WARN true ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)()
 #endif

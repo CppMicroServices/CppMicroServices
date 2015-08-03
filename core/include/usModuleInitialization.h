@@ -51,7 +51,7 @@
  * <code>usFunctionGenerateModuleInit()</code>.
  */
 #define US_INITIALIZE_MODULE                                                                                                    \
-    extern "C" US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = 0;                \
+    US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = 0;                \
                                                                                                                                 \
     extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_get_bundle_context_instance_, US_MODULE_NAME) () \
     {                                                                                                                            \

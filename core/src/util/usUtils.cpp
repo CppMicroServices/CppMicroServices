@@ -98,7 +98,7 @@ std::string GetBundleLocation(const std::string& location)
 //-------------------------------------------------------------------
 
 
-std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir, CoreModuleContext* coreCtx)
+std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
 {
   std::vector<std::string> loadedModules;
 
@@ -239,7 +239,7 @@ std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModul
        i != autoLoadPaths.end(); ++i)
   {
     if (i->empty()) continue;
-    std::vector<std::string> paths = AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir, coreCtx);
+    std::vector<std::string> paths = AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
     loadedModules.insert(loadedModules.end(), paths.begin(), paths.end());
   }
   return loadedModules;

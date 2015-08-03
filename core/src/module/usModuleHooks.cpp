@@ -69,7 +69,7 @@ void ModuleHooks::FilterModules(const ModuleContext* mc, std::vector<Module*>& m
        srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<ModuleFindHook> sr = srBaseIter->GetReference();
-    ModuleFindHook* const fh = reinterpret_cast<ModuleFindHook*>(sr.d->GetService(GetModuleContext(coreCtx)->GetModule()));
+    ModuleFindHook* const fh = reinterpret_cast<ModuleFindHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
     if (fh != NULL)
     {
       try
@@ -130,7 +130,7 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
         continue;
       }
 
-      ModuleEventHook* eh = reinterpret_cast<ModuleEventHook*>(sr.d->GetService(GetModuleContext(coreCtx)->GetModule()));
+      ModuleEventHook* eh = reinterpret_cast<ModuleEventHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
       if (eh != NULL)
       {
         try

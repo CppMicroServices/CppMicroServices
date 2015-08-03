@@ -27,6 +27,9 @@
 #ifndef USMODULEINITIALIZATION_H
 #define USMODULEINITIALIZATION_H
 
+#include <usGlobalConfig.h>
+#include <usModuleContext.h>
+#include <usModuleUtils_p.h>
 
 /**
  * \ingroup MicroServices
@@ -47,6 +50,18 @@
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateModuleInit()</code>.
  */
-#define US_INITIALIZE_MODULE 
+#define US_INITIALIZE_MODULE                                                                                                    \
+    extern "C" US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = 0;                \
+                                                                                                                                \
+    extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_get_bundle_context_instance_, US_MODULE_NAME) () \
+    {                                                                                                                            \
+        return US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME);                                                           \
+    }                                                                                                                            \
+                                                                                                                                 \
+    extern "C" US_ABI_EXPORT void US_CONCAT(_us_set_bundle_context_instance_, US_MODULE_NAME) (US_PREPEND_NAMESPACE(ModuleContext)* ctx) \
+    {                                                                                                                                    \
+        US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = ctx;                                                                   \
+    }
+
 
 #endif // USMODULEINITIALIZATION_H

@@ -24,6 +24,7 @@
 
 #include "usCoreModuleContext_p.h"
 #include "usModuleInfo.h"
+#include "usModuleInitialization.h"
 #include "usModuleSettings.h"
 #include "usModuleUtils_p.h"
 
@@ -106,3 +107,5 @@ void Framework::SetAutoLoadingEnabled(bool enable)
 }
 
 US_END_NAMESPACE
+
+US_INITIALIZE_MODULE

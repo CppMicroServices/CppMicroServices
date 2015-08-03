@@ -187,7 +187,7 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
 
           // location will be in the form:
           //  <path to module plugin>\<module-name>.<lib-extension>/<module-name>
-          Module* installedModule = GetModuleContext(coreCtx)->InstallBundle(location);
+          Module* installedModule = GetModuleContext()->InstallBundle(location);
 
           if (!installedModule)
           {

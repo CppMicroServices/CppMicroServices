@@ -98,7 +98,7 @@ public:
     /****************************************************
      * BEGIN - Non OSGi compliant functions
      *
-     * Auto-load/install will be factored out into a separate
+     * Auto-install will be factored out into a separate
      * service.
      ****************************************************/
 
@@ -135,6 +135,7 @@ private:
     std::map<std::string, std::string> launchProperties;
     // TODO: make thread-safe
     bool initialized;
+
 };
 
 US_END_NAMESPACE

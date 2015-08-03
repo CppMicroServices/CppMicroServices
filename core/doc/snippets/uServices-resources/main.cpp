@@ -11,7 +11,7 @@ void resourceExample()
 {
   //! [1]
   // Get this module's Module object
-  Module* module = GetModuleContext(0)->GetModule();
+  Module* module = GetModuleContext()->GetModule();
 
   ModuleResource resource = module->GetResource("config.properties");
   if (resource.IsValid())
@@ -68,7 +68,7 @@ void extenderPattern(ModuleContext* moduleCtx)
 int main(int /*argc*/, char* /*argv*/[])
 {
   //! [0]
-  ModuleContext* moduleContext = GetModuleContext(0);
+  ModuleContext* moduleContext = GetModuleContext();
   Module* module = moduleContext->GetModule();
 
   // List all XML files in the config directory

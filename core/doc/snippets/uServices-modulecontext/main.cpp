@@ -9,7 +9,7 @@ US_USE_NAMESPACE
 
 void RetrieveModuleContext()
 {
-  ModuleContext* context = GetModuleContext(0);
+  ModuleContext* context = GetModuleContext();
   Module* module = context->GetModule();
   std::cout << "Module name: " << module->GetName() << " [id: " << module->GetModuleId() << "]\n";
 }

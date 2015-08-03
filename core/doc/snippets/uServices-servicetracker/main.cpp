@@ -84,14 +84,14 @@ int main(int /*argc*/, char* /*argv*/[])
   {
 //! [tracker]
 MyTrackingCustomizer myCustomizer;
-ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetModuleContext(0), &myCustomizer);
+ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetModuleContext(), &myCustomizer);
 //! [tracker]
   }
 
   {
 //! [tracker2]
 MyTrackingPointerCustomizer myCustomizer;
-ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetModuleContext(0), &myCustomizer);
+ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetModuleContext(), &myCustomizer);
 //! [tracker2]
   }
 
@@ -99,8 +99,8 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
   MyTrackingCustomizerVoid myCustomizer2;
   try
   {
-    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(0), &myCustomizer2);
-    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext(0));
+    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(), &myCustomizer2);
+    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext());
   }
   catch (const us::ServiceException&)
   {}

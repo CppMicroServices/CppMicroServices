@@ -138,6 +138,20 @@ void Module::Start()
 
   d->moduleContext = new ModuleContext(this->d);
 
+  // save this bundle's context so that it can be accessible anywhere
+  // from within this bundle's code.
+  typedef void(*SetBundleContext)(ModuleContext*);
+  SetBundleContext setBundleContext = NULL;
+
+  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
+  void* setBundleContextSym = ModuleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
+  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+
+  if (setBundleContext)
+  {
+      setBundleContext(d->moduleContext);
+  }
+
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
   ModuleActivatorHook activatorHook = NULL;
 

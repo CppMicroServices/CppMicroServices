@@ -23,6 +23,7 @@
 #include "usModuleSettings.h"
 #include "usThreads_p.h"
 #include "usStaticInit_p.h"
+#include "usWaitCondition_p.h"
 
 #include <string>
 #include <sstream>

@@ -26,6 +26,7 @@
 #include "usAtomicInt_p.h"
 #include "usModuleResourceContainer_p.h"
 #include "usModuleInfo.h"
+#include "usLog_p.h"
 
 #include <string>
 

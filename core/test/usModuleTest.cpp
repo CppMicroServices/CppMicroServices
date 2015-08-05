@@ -30,8 +30,8 @@
 #include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 #include <usModuleSettings.h>
-#include <usSharedLibrary.h>
 
+#include "usLog_p.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestDriverActivator.h"
 #include "usTestingMacros.h"

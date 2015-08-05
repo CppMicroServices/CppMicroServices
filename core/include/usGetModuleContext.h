@@ -29,11 +29,11 @@
 #endif
 
 #include <usGlobalConfig.h>
-#include <usCoreModuleContext_p.h>
-#include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleInfo.h>
 #include <usModuleUtils_p.h>
+
+#include <cstring>
 
 US_BEGIN_NAMESPACE
 
@@ -54,7 +54,7 @@ static inline ModuleContext* GetModuleContext()
   typedef ModuleContext*(*GetBundleContext)(void);
   GetBundleContext getBundleContext = NULL;
 
-  ModuleContext*(*getModuleContext)(/*CoreModuleContext* */) = &GetModuleContext;
+  ModuleContext*(*getModuleContext)() = &GetModuleContext;
   void* GetModuleContext = NULL;
   std::memcpy(&GetModuleContext, &getModuleContext, sizeof(void*));
   std::string libPath(ModuleUtils::GetLibraryPath(GetModuleContext));

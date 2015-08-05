@@ -22,6 +22,7 @@
 
 #include "usUtils_p.h"
 
+#include "usCoreModuleContext_p.h"
 #include "usGetModuleContext.h"
 #include "usLog_p.h"
 #include "usModuleInfo.h"

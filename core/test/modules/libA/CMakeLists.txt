@@ -1,2 +1,3 @@
 
-usFunctionCreateTestModule(TestModuleA usTestModuleA.cpp)
+usFunctionCreateTestModuleWithResources(TestModuleA SOURCES usTestModuleA.cpp RESOURCES manifest.json)
+

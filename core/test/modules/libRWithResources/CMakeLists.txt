@@ -6,6 +6,7 @@ set(resource_files
   foo.txt
   special_chars.dummy.txt
   test.xml
+  manifest.json
 )
 
 configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt @COPYONLY)

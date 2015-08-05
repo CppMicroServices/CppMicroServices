@@ -38,11 +38,11 @@ void parseComponentDefinition(std::istream&)
 {
 }
 
-void extenderPattern()
+void extenderPattern(ModuleContext* moduleCtx)
 {
   //! [2]
   // Get all loaded modules
-  std::vector<Module*> modules = ModuleRegistry::GetLoadedModules();
+  std::vector<Module*> modules = moduleCtx->GetModules();
 
   // Check if a module defines a "service-component" property
   // and use its value to retrieve an embedded resource containing
@@ -81,5 +81,3 @@ int main(int /*argc*/, char* /*argv*/[])
   return 0;
 }
 
-#include <usModuleInitialization.h>
-US_INITIALIZE_MODULE

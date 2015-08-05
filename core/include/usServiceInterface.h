@@ -32,7 +32,7 @@
 #include <typeinfo>
 
 US_BEGIN_NAMESPACE
-std::string GetDemangledName(const std::type_info& typeInfo);
+US_Core_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
 US_END_NAMESPACE
 
 /**

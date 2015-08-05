@@ -32,6 +32,8 @@
 
 #include "usCoreConfig.h"
 
+#include "usSharedLibrary.h"
+
 US_BEGIN_NAMESPACE
 
 const std::string& Module::PROP_ID()
@@ -126,7 +128,29 @@ void Module::Start()
     return;
   }
 
+  // loading a library isn't necessary if it isn't supported
+#ifdef US_BUILD_SHARED_LIBS
+  if(d->lib.IsSharedLibrary() && !d->lib.IsLoaded())
+  {
+    d->lib.Load();
+  }
+#endif
+
   d->moduleContext = new ModuleContext(this->d);
+
+  // save this bundle's context so that it can be accessible anywhere
+  // from within this bundle's code.
+  typedef void(*SetBundleContext)(ModuleContext*);
+  SetBundleContext setBundleContext = NULL;
+
+  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
+  void* setBundleContextSym = ModuleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
+  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+
+  if (setBundleContext)
+  {
+      setBundleContext(d->moduleContext);
+  }
 
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
   ModuleActivatorHook activatorHook = NULL;
@@ -157,16 +181,34 @@ void Module::Start()
     d->moduleActivator->Load(d->moduleContext);
   }
 
-#ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  if (ModuleSettings::IsAutoLoadingEnabled())
-  {
-    const std::vector<std::string> loadedPaths = AutoLoadModules(d->info);
-    if (!loadedPaths.empty())
-    {
-      d->moduleManifest.SetValue(PROP_AUTOLOADED_MODULES(), Any(loadedPaths));
-    }
-  }
-#endif
+// TODO: What are the requirements of the auto install feature now that we've moved
+//       to the OSGi life cycle? Does auto installing bundles mean that those bundles
+//       are auto started as well on bundle start?
+//#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+//  if (d->coreCtx->settings.IsAutoLoadingEnabled())
+//  {
+//    Any loadedModules = d->moduleManifest.GetValue(Module::PROP_AUTOLOADED_MODULES());
+//    if(!loadedModules.Empty())
+//    {
+//        std::vector<std::string> loadedModulesVec = any_cast<std::vector<std::string> >(loadedModules);
+//    
+//        for(std::vector<std::string>::const_iterator moduleIterator = loadedModulesVec.begin();
+//            moduleIterator != loadedModulesVec.end();
+//            ++moduleIterator)
+//        {
+//            Module* module = ModuleRegistry::GetModule((*moduleIterator));
+//            if(module)
+//            {
+//                module->Start();
+//            }
+//            else
+//            {
+//                US_WARN << "Module " << (*moduleIterator) << " is not installed. Cannot start module.";
+//            }
+//        }
+//    }
+//  }
+//#endif
 
   d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 }
@@ -204,6 +246,12 @@ void Module::Stop()
   this->Uninit();
 }
 
+void Module::Uninstall()
+{
+    Stop();
+    d->coreCtx->bundleRegistry.UnRegister(&d->info);
+}
+
 ModuleContext* Module::GetModuleContext() const
 {
   return d->moduleContext;
@@ -231,7 +279,21 @@ ModuleVersion Module::GetVersion() const
 
 Any Module::GetProperty(const std::string& key) const
 {
-  return d->moduleManifest.GetValue(key);
+  // clients must be able to query both a bundle's properties
+  // and the framework's properties through any Bundle's
+  // GetProperty function.
+  // Further, access must be provided to all Bundles to search
+  // for "org.osgi.*" properties.
+  Any property(d->moduleManifest.GetValue(key));
+  if (property.Empty())
+  {
+    std::map<std::string, std::string>::iterator launchProp = d->coreCtx->launchProperties.find(key);
+    if (launchProp != d->coreCtx->launchProperties.end())
+    {
+      property = (*launchProp).second;
+    }
+  }
+  return property;
 }
 
 std::vector<std::string> Module::GetPropertyKeys() const

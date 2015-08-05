@@ -312,19 +312,5 @@ class NoLockingStrategy
 
 US_END_NAMESPACE
 
-#include <usWaitCondition_p.h>
-
-US_BEGIN_NAMESPACE
-
-template<class LockingStrategy = MutexLockingStrategy,
-         template<class Host> class WaitConditionStrategy = NoWaitCondition
-        >
-class MultiThreaded : public LockingStrategy,
-                      public WaitConditionStrategy<MultiThreaded<LockingStrategy, WaitConditionStrategy> >
-{
-  friend class WaitConditionStrategy<MultiThreaded<LockingStrategy, WaitConditionStrategy> >;
-};
-
-US_END_NAMESPACE
 
 #endif // USTHREADINGMODEL_H

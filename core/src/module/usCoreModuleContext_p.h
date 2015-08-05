@@ -28,6 +28,8 @@
 #include "usServiceRegistry_p.h"
 #include "usModuleHooks_p.h"
 #include "usServiceHooks_p.h"
+#include "usModuleRegistry.h"
+#include "usModuleSettings.h"
 
 US_BEGIN_NAMESPACE
 
@@ -57,6 +59,21 @@ public:
    * All module hooks.
    */
   ModuleHooks moduleHooks;
+
+  /**
+   * All installed bundles.
+   */
+  ModuleRegistry bundleRegistry;
+
+  /**
+   * This framework instance's settings
+   */
+  ModuleSettings settings;
+
+  /*
+   * Framework launch properties
+   */
+  std::map<std::string, std::string> launchProperties;
 
   /**
    * Contruct a core context

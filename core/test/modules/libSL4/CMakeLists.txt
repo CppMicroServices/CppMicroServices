@@ -1,4 +1,4 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../libSL1)
 
-usFunctionCreateTestModule(TestModuleSL4 usActivatorSL4.cpp)
+usFunctionCreateTestModuleWithResources(TestModuleSL4 SOURCES usActivatorSL4.cpp RESOURCES manifest.json)

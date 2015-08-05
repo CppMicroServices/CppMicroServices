@@ -4,6 +4,8 @@
 
 set(_srcs
   util/usAny.cpp
+  util/usFramework.cpp
+  util/usFrameworkFactory.cpp
   util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
   util/usUtils.cpp

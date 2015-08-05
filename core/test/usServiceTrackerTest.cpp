@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
@@ -100,9 +102,8 @@ private:
   us::ModuleContext* m_context;
 };
 
-void TestFilterString()
+void TestFilterString(us::ModuleContext* context)
 {
-  us::ModuleContext* context = us::GetModuleContext();
   MyCustomizer customizer(context);
 
   us::LDAPFilter filter("(" + us::ServiceConstants::SERVICE_ID() + ">=0)");
@@ -121,29 +122,41 @@ void TestFilterString()
   US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
 }
 
-void TestServiceTracker()
+void TestServiceTracker(us::ModuleContext* context)
 {
 
 #ifdef US_PLATFORM_WINDOWS
-  const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+  static const std::string DIR_SEP = "\\";
+  static const std::string LIB_PREFIX = "";
+  static const std::string LIB_EXT = ".dll";
 #else
-  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#if defined US_PLATFORM_APPLE
+  static const std::string LIB_EXT = ".dylib";
+#else
+  static const std::string LIB_EXT = ".so";
+#endif
+  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+  static const std::string LIB_PREFIX = "lib";
+  static const std::string DIR_SEP = "/";
 #endif
 
-  ModuleContext* mc = GetModuleContext();
-  SharedLibrary libS(LIB_PATH, "TestModuleS");
+  ModuleContext* mc = context;
 
-#ifdef US_BUILD_SHARED_LIBS
-  // Start the test target to get a service published.
   try
   {
-    libS.Load();
+#if defined (US_BUILD_SHARED_LIBS)
+    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleS" + LIB_EXT + "/TestModuleS");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleS");      
+#endif
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleS")
+    module->Start();
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what() );
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
-#endif
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
@@ -278,8 +291,15 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTrackerTest")
 
-  TestFilterString();
-  TestServiceTracker();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  TestFilterString(framework->GetModuleContext());
+  TestServiceTracker(framework->GetModuleContext());
+
+  delete framework;
 
   US_TEST_END()
 }

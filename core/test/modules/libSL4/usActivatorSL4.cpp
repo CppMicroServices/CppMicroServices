@@ -27,6 +27,8 @@
 
 #include <usFooService.h>
 
+#include "usLog_p.h"
+
 US_BEGIN_NAMESPACE
 
 class ActivatorSL4 :

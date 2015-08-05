@@ -31,6 +31,7 @@
 #include "usModuleInfo.h"
 #include "usModuleManifest_p.h"
 #include "usModuleResourceContainer_p.h"
+#include "usSharedLibrary.h"
 
 #include "usAtomicInt_p.h"
 
@@ -81,11 +82,13 @@ public:
 
   Module* const q;
 
+  // responsible for platform specific loading and unloading
+  // of the bundle's physical form.
+  SharedLibrary lib;
+
 private:
 
   void InitializeResources();
-
-  static AtomicInt idCounter;
 
   // purposely not implemented
   ModulePrivate(const ModulePrivate&);

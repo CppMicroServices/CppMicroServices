@@ -30,14 +30,27 @@
 #include <vector>
 
 //-------------------------------------------------------------------
+// Bundle name and location parsing
+//-------------------------------------------------------------------
+
+US_BEGIN_NAMESPACE
+
+std::string GetBundleNameFromLocation(const std::string& location);
+
+std::string GetBundleLocation(const std::string& location);
+
+US_END_NAMESPACE
+
+//-------------------------------------------------------------------
 // Module auto-loading
 //-------------------------------------------------------------------
 
 US_BEGIN_NAMESPACE
 
 struct ModuleInfo;
+class CoreModuleContext;
 
-std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo);
+std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModuleContext* coreCtx);
 
 US_END_NAMESPACE
 

@@ -27,9 +27,11 @@
 #include <string>
 
 #include <usCoreConfig.h>
+#include <usThreads_p.h>
 
 US_BEGIN_NAMESPACE
 
+class CoreModuleContext;
 class Module;
 struct ModuleInfo;
 struct ModuleActivator;
@@ -42,6 +44,17 @@ struct ModuleActivator;
 class US_Core_EXPORT ModuleRegistry {
 
 public:
+  
+  ModuleRegistry(CoreModuleContext* coreCtx) : 
+      coreCtx(coreCtx), 
+      modulesLock(new Mutex()),
+      countLock(new Mutex()),
+      id(0)
+  {
+  
+  }
+
+  ~ModuleRegistry(void) {}
 
   /**
    * Get the module that has the specified module identifier.
@@ -50,7 +63,7 @@ public:
    * @return Module or null
    *         if the module was not found.
    */
-  static Module* GetModule(long id);
+  Module* GetModule(long id);
 
   /**
    * Get the module that has specified module name.
@@ -58,14 +71,14 @@ public:
    * @param name The name of the module to get.
    * @return Module or null.
    */
-  static Module* GetModule(const std::string& name);
+  Module* GetModule(const std::string& name);
 
   /**
    * Get all known modules.
    *
    * @return A list which is filled with all known modules.
    */
-  static std::vector<Module*> GetModules();
+  std::vector<Module*> GetModules();
 
   /**
    * Get all modules currently in module state <code>LOADED</code>.
@@ -73,16 +86,41 @@ public:
    * @return A list which is filled with all modules in
    *         state <code>LOADED</code>
    */
-  static std::vector<Module*> GetLoadedModules();
+  //std::vector<Module*> GetLoadedModules();
 
-  static void Register(ModuleInfo* info);
+  Module* Register(ModuleInfo* info);
 
-  static void UnRegister(const ModuleInfo* info);
+  Module* UnRegister(const ModuleInfo* info);
 
 private:
+  // don't allow copying the ModuleRegistry.
+  ModuleRegistry(const ModuleRegistry& );
+  ModuleRegistry& operator=(const ModuleRegistry& );
 
-  // disabled
-  ModuleRegistry();
+  CoreModuleContext* coreCtx;
+
+  typedef US_UNORDERED_MAP_TYPE<std::string, Module*> ModuleMap;
+
+  /**
+   * Table of all installed modules in this framework.
+   * Key is the module id.
+   */
+  ModuleMap modules;
+
+  /**
+   * Lock for protecting the modules object
+   */
+  Mutex* modulesLock;
+
+  /**
+   * Lock for protecting the register count
+   */
+  Mutex* countLock;
+
+  /**
+   * Stores the next Bundle ID.
+   */
+  long id;
 
 };
 

@@ -40,8 +40,6 @@
 
 US_BEGIN_NAMESPACE
 
-AtomicInt ModulePrivate::idCounter;
-
 ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
   : coreCtx(coreCtx)
@@ -50,6 +48,7 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   , moduleContext(0)
   , moduleActivator(0)
   , q(qq)
+  , lib(info->location)
 {
   // Check if the module provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())
@@ -98,7 +97,19 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   propId << this->info.id;
   moduleManifest.SetValue(Module::PROP_ID(), propId.str());
   moduleManifest.SetValue(Module::PROP_LOCATION(), this->info.location);
-  moduleManifest.SetValue(Module::PROP_NAME(), this->info.name);
+  
+  // Handle a transistional state where modules are moving to declaring their module names directly
+  // in the manifest file, instead of through a global static object.
+  // TODO: remove transistional code
+  if(moduleManifest.GetValue(Module::PROP_NAME()).Empty())
+  {
+    moduleManifest.SetValue(Module::PROP_NAME(), this->info.name);
+  }
+  else
+  {
+    info->name = moduleManifest.GetValue(Module::PROP_NAME()).ToString();
+    this->info.name = moduleManifest.GetValue(Module::PROP_NAME()).ToString();
+  }
 
   if (moduleManifest.Contains(Module::PROP_AUTOLOAD_DIR()))
   {
@@ -109,6 +120,17 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
     this->info.autoLoadDir = this->info.name;
     moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
   }
+
+#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+  if (coreCtx->settings.IsAutoLoadingEnabled())
+  {
+    const std::vector<std::string> loadedModuleNames = AutoLoadModules(this->info, this->coreCtx);
+    if (!loadedModuleNames.empty())
+    {
+      moduleManifest.SetValue(Module::PROP_AUTOLOADED_MODULES(), Any(loadedModuleNames));
+    }
+  }
+#endif
 }
 
 ModulePrivate::~ModulePrivate()

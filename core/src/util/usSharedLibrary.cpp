@@ -25,7 +25,6 @@
 #include <stdexcept>
 
 #include <usUtils_p.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 
 
@@ -109,6 +108,14 @@ SharedLibrary& SharedLibrary::operator =(const SharedLibrary& other)
 {
   d = other.d;
   return *this;
+}
+
+bool SharedLibrary::IsSharedLibrary()
+{ // Testing for file extension isn't the most robust way to test
+  // for file type. Furthermore, the existence of this function
+  // is out of place; why test for a shared library if this class
+  // is supposed to represent a shared library?
+  return (GetFilePath().find(d->m_Suffix) != std::string::npos);
 }
 
 void SharedLibrary::Load(int flags)

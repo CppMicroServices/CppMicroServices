@@ -30,6 +30,7 @@
 US_BEGIN_NAMESPACE
 
 struct ModuleActivator;
+class ModuleContext;
 
 US_END_NAMESPACE
 
@@ -42,7 +43,7 @@ US_END_NAMESPACE
  *
  * This macro initializes the static module named \c _module_name.
  *
- * It the module provides an activator, use the #US_IMPORT_MODULE macro instead,
+ * If the module provides an activator, use the #US_IMPORT_MODULE macro instead,
  * to ensure that the activator is called. Do not forget to actually link
  * the static module to the importing executable or shared library.
  *
@@ -51,15 +52,13 @@ US_END_NAMESPACE
  * \sa \ref MicroServices_StaticModules
  */
 #define US_INITIALIZE_STATIC_MODULE(_module_name)                          \
-  extern "C" void _us_import_module_initializer_ ## _module_name();        \
-  struct StaticModuleInitializer_ ## _module_name                          \
+  extern "C" US_PREPEND_NAMESPACE(ModuleContext)* _us_get_bundle_context_instance_ ## _module_name (); \
+  extern "C" US_PREPEND_NAMESPACE(ModuleContext)* _us_set_bundle_context_instance_ ## _module_name (); \
+  void _dummy_reference_to_ ## _module_name ## _bundle_context()           \
   {                                                                        \
-    StaticModuleInitializer_ ## _module_name()                             \
-    {                                                                      \
-      _us_import_module_initializer_ ## _module_name();                    \
-    }                                                                      \
-  };                                                                       \
-  static StaticModuleInitializer_ ## _module_name _InitializeModule_ ## _module_name;
+    _us_get_bundle_context_instance_ ## _module_name();                    \
+    _us_set_bundle_context_instance_ ## _module_name();                    \
+  }
 
 /**
  * \ingroup MicroServices
@@ -72,7 +71,7 @@ US_END_NAMESPACE
  *
  * Inserting this macro into your application's source code will allow you to make use of
  * a static module. It will initialize the static module and calls its
- * ModuleActivator. It the module does not provide an activator, use the
+ * ModuleActivator. If the module does not provide an activator, use the
  * #US_INITIALIZE_STATIC_MODULE macro instead. Do not forget to actually link
  * the static module to the importing executable or shared library.
  *

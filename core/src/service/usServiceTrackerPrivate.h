@@ -26,7 +26,7 @@
 
 #include "usServiceReference.h"
 #include "usLDAPFilter.h"
-
+#include "usWaitCondition_p.h"
 
 US_BEGIN_NAMESPACE
 

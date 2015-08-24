@@ -52,6 +52,7 @@ template<class S> class ServiceObjects;
  * <p>
  * <code>ModuleContext</code> methods allow a module to:
  * <ul>
+ * <li>Install other bundles.
  * <li>Subscribe to events published by the framework.
  * <li>Register service objects with the framework service registry.
  * <li>Retrieve <code>ServiceReference</code>s from the framework service
@@ -117,7 +118,7 @@ public:
   Module* GetModule(long id) const;
 
   /**
-   * Get the module that with the specified module name.
+   * Get the module with the specified module name.
    *
    * @param name The name of the module to get.
    * @return The requested \c Module or \c NULL.
@@ -818,13 +819,30 @@ public:
    * might be empty if no storage path has been set previously.
    * If the path is non-empty, it is safe to assume that the path is writable.
    *
-   * @see ModuleSettings::SetStoragePath(const std::string&)
+   * @see Framework::Framework(std::map<std::string, std::string>& configuration)
    *
    * @param filename A relative name to the file or directory to be accessed.
    * @return The absolute path to the persistent storage area for the given file name.
    */
   std::string GetDataFile(const std::string& filename) const;
 
+
+  /**
+   * Installs a bundle from the specified location.
+   *
+   * The following steps are required to install a bundle:
+   * -# If a bundle containing the same location identifier is already installed, the Bundle object for that 
+   *    bundle is returned.
+   * -# The bundle's associated resources are allocated. The associated resources minimally consist of a
+   *    unique identifier and a persistent storage area if the platform has file system support. If this step
+   *    fails, a std::runtime_error is thrown.
+   * -# A bundle event of type <code>BundleEvent::INSTALLED</code> is fired.   * -# The Bundle object for the newly or previously installed bundle is returned.
+   *
+   * @param location The location identifier of the bundle to install. Typically a URL.
+   * @return The Bundle object of the installed bundle.
+   * @throws std::runtime_error If the installation failed.
+   */
+  Module* InstallBundle(const std::string& location);
 
 private:
 

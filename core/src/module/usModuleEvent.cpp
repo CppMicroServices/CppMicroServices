@@ -99,10 +99,12 @@ std::ostream& operator<<(std::ostream& os, ModuleEvent::Type eventType)
 {
   switch (eventType)
   {
-  case ModuleEvent::LOADED:    return os << "LOADED";
-  case ModuleEvent::UNLOADED:  return os << "UNLOADED";
-  case ModuleEvent::LOADING:   return os << "LOADING";
-  case ModuleEvent::UNLOADING: return os << "UNLOADING";
+  case ModuleEvent::LOADED:         return os << "LOADED";
+  case ModuleEvent::UNLOADED:       return os << "UNLOADED";
+  case ModuleEvent::LOADING:        return os << "LOADING";
+  case ModuleEvent::UNLOADING:      return os << "UNLOADING";
+  case ModuleEvent::INSTALLED:      return os << "INSTALLED";
+  case ModuleEvent::UNINSTALLED:    return os << "UNINSTALLED";
 
   default: return os << "Unknown module event type (" << static_cast<int>(eventType) << ")";
   }

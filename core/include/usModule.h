@@ -56,13 +56,15 @@ typedef ServiceReference<void> ServiceReferenceU;
  * framework. This identity does not change during the lifecycle of a module.
  *
  * <p>
- * A module can be in one of two states:
+ * A module can be in one of four states:
  * <ul>
+ * <li>INSTALLED
  * <li>LOADED
  * <li>UNLOADED
+ * <li>UNINSTALLED
  * </ul>
  * <p>
- * You can determine the current state by using IsLoaded().
+ * You can determine whether a bundle is loaded or not by using IsLoaded().
  *
  * <p>
  * A module can only execute code when its state is <code>LOADED</code>.
@@ -153,7 +155,7 @@ public:
    */
   static const std::string& PROP_AUTOLOADED_MODULES();
 
-  ~Module();
+  virtual ~Module();
 
   /**
    * Returns this module's current state.
@@ -162,9 +164,9 @@ public:
    * A module can be in only one state at any time.
    *
    * @return <code>true</code> if the module is <code>LOADED</code>
-   *         <code>false</code> if it is <code>UNLOADED</code>
+   *         <code>false</code> if it is in any other state.
    */
-  bool IsLoaded() const;
+  virtual bool IsLoaded() const;
 
   /**
    * Returns this module's {@link ModuleContext}. The returned
@@ -181,7 +183,7 @@ public:
    *         <code>0</code> if this module has no valid
    *         <code>ModuleContext</code>.
    */
-  ModuleContext* GetModuleContext() const;
+  virtual ModuleContext* GetModuleContext() const;
 
   /**
    * Returns this module's unique identifier. This module is assigned a unique
@@ -204,7 +206,7 @@ public:
    *
    * @return The unique identifier of this module.
    */
-  long GetModuleId() const;
+  virtual long GetModuleId() const;
 
   /**
    * Returns this module's location.
@@ -216,7 +218,7 @@ public:
    *
    * @return The string representation of this module's location.
    */
-  std::string GetLocation() const;
+  virtual std::string GetLocation() const;
 
   /**
    * Returns the name of this module as specified by the
@@ -229,7 +231,7 @@ public:
    *
    * @return The name of this module.
    */
-  std::string GetName() const;
+  virtual std::string GetName() const;
 
   /**
    * Returns the version of this module as specified by the
@@ -242,11 +244,12 @@ public:
    *
    * @return The version of this module.
    */
-  ModuleVersion GetVersion() const;
+  virtual ModuleVersion GetVersion() const;
 
   /**
-   * Returns the value of the specified property for this module. The
-   * method returns an empty Any if the property is not found.
+   * Returns the value of the specified property for this module.
+   * If not found, the framework's properties are searched. 
+   * The method returns an empty Any if the property is not found.
    *
    * @param key The name of the requested property.
    * @return The value of the requested property, or an empty string
@@ -255,7 +258,7 @@ public:
    * @sa GetPropertyKeys()
    * @sa \ref MicroServices_ModuleProperties
    */
-  Any GetProperty(const std::string& key) const;
+  virtual Any GetProperty(const std::string& key) const;
 
   /**
    * Returns a list of top-level property keys for this module.
@@ -264,7 +267,7 @@ public:
    *
    * @sa \ref MicroServices_ModuleProperties
    */
-  std::vector<std::string> GetPropertyKeys() const;
+  virtual std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns this module's ServiceReference list for all services it
@@ -278,7 +281,7 @@ public:
    * @return A list of ServiceReference objects for services this
    * module has registered.
    */
-  std::vector<ServiceReferenceU> GetRegisteredServices() const;
+  virtual std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
   /**
    * Returns this module's ServiceReference list for all services it is
@@ -293,7 +296,7 @@ public:
    * @return A list of ServiceReference objects for all services this
    * module is using.
    */
-  std::vector<ServiceReferenceU> GetServicesInUse() const;
+  virtual std::vector<ServiceReferenceU> GetServicesInUse() const;
 
   /**
    * Returns the resource at the specified \c path in this module.
@@ -305,7 +308,7 @@ public:
    * be found in this module or the module's state is \c UNLOADED, an invalid
    * ModuleResource object is returned.
    */
-  ModuleResource GetResource(const std::string& path) const;
+  virtual ModuleResource GetResource(const std::string& path) const;
 
   /**
    * Returns resources in this module.
@@ -330,13 +333,74 @@ public:
    * from the specified path.
    * @return A vector of ModuleResource objects for each matching entry.
    */
-  std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
+  virtual std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
+
+  /**
+   * Start this bundle.
+   * 
+   * The following steps are required to start this bundle:
+   * -# If this bundle is in the process of being activated or deactivated then this method must wait for
+   *    activation or deactivation to complete before continuing. If this does not occur in a reasonable
+   *    time, a std::runtime_error exception is thrown to indicate this bundle was unable to be started.
+   * -# If this bundle was already started, then this method returns immediately.
+   * -# A bundle event of type BundleEvent::STARTING is fired.
+   * -# The BundleActivator::Start(BundleContext) method of this bundle's BundleActivator, if one is
+   *    specified, is called. If the BundleActivator is invalid or throws an exception then:
+   *    - A bundle event of type BundleEvent::STOPPING is fired.
+   *    - %Any services registered by this bundle must be unregistered.
+   *    - %Any services used by this bundle must be released.
+   *    - %Any listeners registered by this bundle must be removed.
+   *    - A bundle event of type BundleEvent::STOPPED is fired.
+   *    - A std::runtime_error exception is then thrown.
+   * -# A bundle event of type BundleEvent::STARTED is fired.
+   *
+   * @throws std::runtime_error If this bundle could not be started.
+   */
+  virtual void Start();
+
+  /**
+   * Stop this bundle.
+   *
+   * The following steps are required to stop a bundle:
+   * -# If this bundle is in the process of being activated or deactivated then this method must wait for
+   *    activation or deactivation to complete before continuing. If this does not occur in a reasonable
+   *    time, a std::runtime_error exception is thrown to indicate this bundle was unable to be stopped.
+   * -# If this bundle was already stopped, then this method returns immediately.
+   * -# A bundle event of type BundleEvent::STOPPING is fired.
+   * -# The BundleActivator::Stop(BundleContext) method of this bundle's BundleActivator, if one is specified,
+   *    is called. If that method throws an exception, this method must continue to stop this bundle
+   *    and a std::runtime_error exception must be thrown after completion of the remaining steps.
+   * -# %Any services registered by this bundle must be unregistered.
+   * -# %Any services used by this bundle must be released.
+   * -# %Any listeners registered by this bundle must be removed.
+   * -# A bundle event of type BundleEvent::STOPPED is fired.
+   *
+   * @throws std::runtime_error If the bundle failed to stop.
+   */
+  virtual void Stop();
+
+  /**
+   * Uninstalls this bundle.
+   * 
+   * This method causes the Framework to notify other bundles that this bundle is being uninstalled,
+   * and then uninstalls this bundle. The Framework must remove any resources related to this bundle 
+   * that it is able to remove.
+   *
+   * The following steps are required to uninstall a bundle:
+   * -# This bundle is stopped as described in the Bundle.Stop method.
+   * -# A bundle event of BundleEvent::UNINSTALLED is fired.
+   * -# This bundle and any persistent storage area provided for this bundle by the Framework are removed.
+   *
+   * @throws std::runtime_error If the bundle could not be uninstalled.   *
+   */
+  virtual void Uninstall();
 
 private:
 
   friend class CoreModuleActivator;
   friend class ModuleRegistry;
   friend class ServiceReferencePrivate;
+  friend class Framework;
 
   ModulePrivate* d;
 
@@ -345,9 +409,7 @@ private:
   void Init(CoreModuleContext* coreCtx, ModuleInfo* info);
   void Uninit();
 
-  void Start();
-  void Stop();
-
+protected:
   // purposely not implemented
   Module(const Module &);
   Module& operator=(const Module&);

@@ -108,6 +108,3 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
   return 0;
 }
 
-#include <usModuleInitialization.h>
-
-US_INITIALIZE_MODULE

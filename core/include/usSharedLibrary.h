@@ -75,6 +75,8 @@ public:
 
   SharedLibrary& operator=(const SharedLibrary& other);
 
+  bool IsSharedLibrary();
+
   /**
    * Loads the shared library pointed to by this SharedLibrary object.
    * On POSIX systems dlopen() is called with the RTLD_LAZY and

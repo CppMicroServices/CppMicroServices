@@ -25,6 +25,7 @@
 
 #include "usServiceTracker.h"
 #include "usServiceListeners_p.h"
+#include "usWaitCondition_p.h"
 
 US_BEGIN_NAMESPACE
 

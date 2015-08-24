@@ -34,6 +34,8 @@ CoreModuleContext::CoreModuleContext()
   , services(this)
   , serviceHooks(this)
   , moduleHooks(this)
+  , bundleRegistry(this)
+  , settings()
 {
 }
 

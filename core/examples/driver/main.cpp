@@ -20,9 +20,9 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
 #include <usModule.h>
-#include <usModuleRegistry.h>
-#include <usSharedLibrary.h>
+#include <usModuleContext.h>
 #include <usModuleImport.h>
 
 #include "usCoreExamplesDriverConfig.h"
@@ -75,12 +75,20 @@ int main(int /*argc*/, char** /*argv*/)
 {
   char cmd[256];
 
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+  ModuleContext* frameworkContext = framework->GetModuleContext();
+
   std::vector<std::string> availableModules = GetExampleModules();
 
-  /* module path -> lib handle */
-  std::map<std::string, SharedLibrary> libraryHandles;
-
-  SharedLibrary sharedLib(LIB_PATH, "");
+  /* install all available bundles for this example */
+  for (std::vector<std::string>::const_iterator iter = availableModules.begin();
+      iter != availableModules.end(); ++iter)
+  {
+      frameworkContext->InstallBundle(LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
+  }
 
   std::cout << "> ";
   while(std::cin.getline(cmd, sizeof(cmd)))
@@ -93,8 +101,8 @@ int main(int /*argc*/, char** /*argv*/)
     else if (strCmd == "h")
     {
       std::cout << std::left << std::setw(15) << "h" << " This help text\n"
-                << std::setw(15) << "l <id | name>" << " Load the module with id <id> or name <name>\n"
-                << std::setw(15) << "u <id>" << " Unload the module with id <id>\n"
+                << std::setw(15) << "l <id | name>" << " Start the bundle with id <id> or name <name>\n"
+                << std::setw(15) << "u <id>" << " Stop the bundle with id <id>\n"
                 << std::setw(15) << "s" << " Print status information\n"
                 << std::setw(15) << "q" << " Quit\n" << std::flush;
     }
@@ -108,33 +116,22 @@ int main(int /*argc*/, char** /*argv*/)
       ss >> id;
       if (id > 0)
       {
-        Module* module = ModuleRegistry::GetModule(id);
+        Module* module = frameworkContext->GetModule(id);
         if (!module)
         {
           std::cout << "Error: unknown id" << std::endl;
         }
-        else if (module->IsLoaded())
-        {
-          std::cout << "Info: module already loaded" << std::endl;
-        }
-        else
+        else 
         {
           try
           {
-            std::map<std::string, SharedLibrary>::iterator libIter =
-                libraryHandles.find(module->GetLocation());
-            if (libIter != libraryHandles.end())
+            /* starting an already started bundle does nothing.
+                There is no harm in doing it. */
+            if (module->IsLoaded())
             {
-              libIter->second.Load();
+              std::cout << "Info: module already started" << std::endl;
             }
-            else
-            {
-              // The module has been loaded previously due to a
-              // linker dependency
-              SharedLibrary libHandle(module->GetLocation());
-              libHandle.Load();
-              libraryHandles.insert(std::make_pair(libHandle.GetFilePath(), libHandle));
-            }
+            module->Start();
           }
           catch (const std::exception& e)
           {
@@ -144,80 +141,43 @@ int main(int /*argc*/, char** /*argv*/)
       }
       else
       {
-        Module* module = ModuleRegistry::GetModule(idOrName);
+        Module* module = frameworkContext->GetModule(idOrName);
         if (!module)
         {
           try
           {
-            std::map<std::string, SharedLibrary>::iterator libIter =
-                libraryHandles.find(sharedLib.GetFilePath(idOrName));
-            if (libIter != libraryHandles.end())
-            {
-              libIter->second.Load();
-            }
-            else
-            {
-              bool libFound = false;
-              for (std::vector<std::string>::const_iterator availableModuleIter = availableModules.begin();
-                   availableModuleIter != availableModules.end(); ++availableModuleIter)
-              {
-                if (*availableModuleIter == idOrName)
-                {
-                  libFound = true;
-                }
-              }
-              if (!libFound)
-              {
-                std::cout << "Error: unknown example module" << std::endl;
-              }
-              else
-              {
-                SharedLibrary libHandle(LIB_PATH, idOrName);
-                libHandle.Load();
-                libraryHandles.insert(std::make_pair(libHandle.GetFilePath(), libHandle));
-              }
-            }
-
-            std::vector<Module*> modules = ModuleRegistry::GetModules();
-            for (std::vector<Module*>::const_iterator moduleIter = modules.begin();
-                 moduleIter != modules.end(); ++moduleIter)
-            {
-              availableModules.erase(std::remove(availableModules.begin(), availableModules.end(), (*moduleIter)->GetName()),
-                                     availableModules.end());
-            }
-
+            /* It is possible to install a bundle based on its name, if its
+                physical form is named the same. Installing a bundle can't
+                be done by id since that is a framework generated piece of
+                information. */
+              module = frameworkContext->InstallBundle(LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
           }
           catch (const std::exception& e)
           {
             std::cout << e.what() << std::endl;
           }
         }
-        else if (!module->IsLoaded())
+        
+        if (module)
         {
           try
           {
-            const std::string modulePath = module->GetLocation();
-            std::map<std::string, SharedLibrary>::iterator libIter =
-                libraryHandles.find(modulePath);
-            if (libIter != libraryHandles.end())
+            /* starting an already started bundle does nothing.
+            There is no harm in doing it. */
+            if (module->IsLoaded())
             {
-              libIter->second.Load();
+              std::cout << "Info: module already started" << std::endl;
             }
-            else
-            {
-              SharedLibrary libHandle(LIB_PATH, idOrName);
-              libHandle.Load();
-              libraryHandles.insert(std::make_pair(libHandle.GetFilePath(), libHandle));
-            }
+            module->Start();
           }
           catch (const std::exception& e)
           {
             std::cout << e.what() << std::endl;
           }
         }
-        else if (module)
+        else
         {
-          std::cout << "Info: module already loaded" << std::endl;
+          std::cout << "Info: Unable to install module " << idOrName << std::endl;
         }
       }
     }
@@ -228,38 +188,30 @@ int main(int /*argc*/, char** /*argv*/)
 
       long int id = -1;
       ss >> id;
-
+      // TODO: the "system bundle" is 0 in the OSGi spec. Change this once CppMicroServices is
+      //    inline with the spec.
       if (id == 1)
       {
         std::cout << "Info: Unloading not possible" << std::endl;
       }
       else
       {
-        Module* const module = ModuleRegistry::GetModule(id);
+        Module* const module = frameworkContext->GetModule(id);
         if (module)
         {
-          std::map<std::string, SharedLibrary>::iterator libIter =
-              libraryHandles.find(module->GetLocation());
-          if (libIter == libraryHandles.end())
+          try
           {
-            std::cout << "Info: Unloading not possible. The module was loaded by a dependent module." << std::endl;
-          }
-          else
-          {
-            try
-            {
-              libIter->second.Unload();
+            module->Stop();
 
-              // Check if it has really been unloaded
-              if (module->IsLoaded())
-              {
-                std::cout << "Info: The module is still referenced by another loaded module. It will be unloaded when all dependent modules are unloaded." << std::endl;
-              }
-            }
-            catch (const std::exception& e)
+            // Check if it has really been unloaded
+            if (module->IsLoaded())
             {
-              std::cout << e.what() << std::endl;
+              std::cout << "Info: The bundle is still referenced by another active bundle. It will be stopped when all dependent bundles are stopped." << std::endl;
             }
+          }
+          catch (const std::exception& e)
+          {
+            std::cout << e.what() << std::endl;
           }
         }
         else
@@ -270,7 +222,7 @@ int main(int /*argc*/, char** /*argv*/)
     }
     else if (strCmd == "s")
     {
-      std::vector<Module*> modules = ModuleRegistry::GetModules();
+      std::vector<Module*> modules = frameworkContext->GetModules();
 
       std::cout << std::left;
 
@@ -288,7 +240,7 @@ int main(int /*argc*/, char** /*argv*/)
       {
         std::cout << std::right << std::setw(2) << (*moduleIter)->GetModuleId() << std::left << " | ";
         std::cout << std::setw(20) << (*moduleIter)->GetName() << " | ";
-        std::cout << std::setw(9) << ((*moduleIter)->IsLoaded() ? "LOADED" : "UNLOADED");
+        std::cout << std::setw(9) << ((*moduleIter)->IsLoaded() ? "ACTIVE" : "RESOLVED");
         std::cout << std::endl;
       }
     }

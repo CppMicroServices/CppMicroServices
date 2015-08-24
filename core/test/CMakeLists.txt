@@ -3,6 +3,17 @@
 # Configure files, include dirs, etc.
 #-----------------------------------------------------------------------------
 
+# Make sure that the correct paths separators are used on each platform
+if(WIN32)
+  set(DIR_SEP "\\\\")
+  string(REPLACE "/" "\\\\" CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  string(REPLACE "/" "\\\\" CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(DIR_SEP "/")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/usTestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/usTestingConfig.h")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -22,6 +33,9 @@ add_subdirectory(modules)
 
 set(_tests
   usAnyTest
+  usBundleRegistryPerformanceTest
+  usFrameworkTest
+  usFrameworkFactoryTest
   usLDAPFilterTest
   usLogTest
   usModuleHooksTest
@@ -52,6 +66,7 @@ set(_additional_srcs
   usTestDriverActivator.cpp
   usTestManager.cpp
   usTestUtilModuleListener.cpp
+  usTestUtils.cpp
 )
 
 set(_test_driver us${PROJECT_NAME}TestDriver)

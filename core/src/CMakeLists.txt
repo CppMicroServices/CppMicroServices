@@ -4,6 +4,9 @@
 
 set(_srcs
   util/usAny.cpp
+  util/usFramework.cpp
+  util/usFrameworkFactory.cpp
+  util/usFrameworkPrivate.cpp
   util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
   util/usUtils.cpp
@@ -57,9 +60,9 @@ set(_srcs
 
 set(_private_headers
   util/usAtomicInt_p.h
+  util/usFrameworkPrivate_p.h
   util/usListenerFunctors_p.h
   util/usLog_p.h
-  util/usStaticInit_p.h
   util/usThreads_p.h
   util/usUtils_p.h
   util/usWaitCondition_p.h
@@ -77,6 +80,8 @@ set(_private_headers
   module/usModuleAbstractTracked_p.h
   module/usModuleAbstractTracked.tpp
   module/usModuleHooks_p.h
+  module/usModulePrivate.h
+  module/usModuleRegistry_p.h
   module/usModuleResourceBuffer_p.h
   module/usModuleResourceContainer_p.h
   module/usModuleUtils_p.h

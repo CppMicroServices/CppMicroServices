@@ -25,6 +25,7 @@
 #include <usModuleImport.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include "usLog_p.h"
 
 US_BEGIN_NAMESPACE
 
@@ -62,6 +63,6 @@ private:
 
 US_END_NAMESPACE
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(TestModuleBActivator))
-
 US_IMPORT_MODULE(TestModuleImportedByB)
+
+US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(TestModuleBActivator))

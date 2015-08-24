@@ -146,7 +146,7 @@ void testLogLevels()
 {
   installMsgHandler(handleMessages);
 
-  MsgType logLevel = ModuleSettings::GetLogLevel();
+  MsgType logLevel = Logger::instance().GetLogLevel();
   US_TEST_CONDITION_REQUIRED(logLevel == DebugMsg, "Default log level")
 
   logMsg(DebugMsg, logLevel);
@@ -156,7 +156,7 @@ void testLogLevels()
 
   for (int level = ErrorMsg; level >= 0; --level)
   {
-    ModuleSettings::SetLogLevel(static_cast<MsgType>(level));
+    Logger::instance().SetLogLevel(static_cast<MsgType>(level));
     logMsg(DebugMsg, level);
     logMsg(InfoMsg, level);
     logMsg(WarningMsg, level);

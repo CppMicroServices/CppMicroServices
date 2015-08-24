@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usModule.h>
@@ -119,7 +121,12 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTemplateTest");
 
-  ModuleContext* mc = GetModuleContext();
+  FrameworkFactory factory;
+  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
+  framework->init();
+  framework->Start();
+
+  ModuleContext* mc = framework->GetModuleContext();
 
   // Register compile tests
   MyService1 s1;
@@ -204,6 +211,8 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   sr1.Unregister();
   sr2.Unregister();
   sr3.Unregister();
+
+  delete framework;
 
   US_TEST_END()
 }

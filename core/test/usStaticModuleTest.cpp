@@ -27,9 +27,9 @@
 #include <usServiceEvent.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 
+#include "usTestUtils.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
@@ -38,23 +38,11 @@ US_USE_NAMESPACE
 
 namespace {
 
-// Load libTestModuleB and check that it exists and that the service it registers exists,
+// Install and start libTestModuleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
 void frame020a(ModuleContext* mc, TestModuleListener& listener)
 {
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleB");
-#else
-    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleB");
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleB")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frame020a:FAIL")
-  }
+  InstallTestBundle(mc, "TestModuleB");
 
   Module* moduleB = mc->GetModule("TestModuleB");
   US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
@@ -105,6 +93,8 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
 
     // check the listeners for events
     std::vector<ModuleEvent> pEvts;
+    pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleB));
+    pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleImportedByB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleImportedByB));
@@ -126,7 +116,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
 }
 
 
-// Unload libB and check for correct events
+// Stop libB and check for correct events
 void frame030b(ModuleContext* mc, TestModuleListener& listener)
 {
   Module* moduleB = mc->GetModule("TestModuleB");
@@ -173,6 +163,27 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener)
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 }
 
+// Uninstall libB and check for correct events
+void frame040c(ModuleContext* mc, TestModuleListener& listener)
+{
+    Module* moduleB = mc->GetModule("TestModuleB");
+    US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
+
+    Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
+    US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
+
+    moduleB->Uninstall();
+    US_TEST_CONDITION(mc->GetModules().size() == 2, "Test for uninstall of TestModuleB")
+    moduleImportedByB->Uninstall();
+    US_TEST_CONDITION(mc->GetModules().size() == 1, "Test for uninstall of TestModuleImportedByB")
+
+    std::vector<ModuleEvent> pEvts;
+    pEvts.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, moduleB));
+    pEvts.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, moduleImportedByB));
+
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+}
+
 } // end unnamed namespace
 
 int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
@@ -197,6 +208,7 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
 
     frame020a(mc, listener);
     frame030b(mc, listener);
+    frame040c(mc, listener);
   }
 
   delete framework;

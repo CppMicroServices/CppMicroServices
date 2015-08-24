@@ -24,12 +24,11 @@
 #include <usModuleContext.h>
 #include <usModuleEvent.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleSettings.h>
 
 #include <usTestingConfig.h>
-
+#include "usTestUtils.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 
@@ -47,15 +46,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
 
   ModuleListenerRegistrationHelper<TestModuleListener> listenerReg(mc, &listener, &TestModuleListener::ModuleChanged);
 
-  try
-  {
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleAL" + LIB_EXT + "/TestModuleAL");
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleAL")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(mc, "TestModuleAL");
 
   Module* moduleAL = mc->GetModule("TestModuleAL");
   US_TEST_CONDITION_REQUIRED(moduleAL != NULL, "Test for existing module TestModuleAL")
@@ -64,13 +55,19 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
 
   moduleAL->Start();
 
+  Any loadedModules = moduleAL->GetProperty(Module::PROP_AUTOLOADED_MODULES());
+  Module* moduleAL_1 = mc->GetModule("TestModuleAL_1");
+
   // check the listeners for events
   std::vector<ModuleEvent> pEvts;
+  if (autoLoadEnabled)
+  {
+      pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleAL_1));
+  }
+  pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleAL));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL));
 
-  Any loadedModules = moduleAL->GetProperty(Module::PROP_AUTOLOADED_MODULES());
-  Module* moduleAL_1 = mc->GetModule("TestModuleAL_1");
   if (autoLoadEnabled)
   {
     US_TEST_CONDITION_REQUIRED(moduleAL_1 != NULL, "Test for existing auto-loaded module TestModuleAL_1")
@@ -86,7 +83,6 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL_1));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL_1));
 
-    //moduleAL_1->Stop();
   }
   else
   {
@@ -117,15 +113,7 @@ void testCustomAutoLoadPath(Framework* framework)
     throw;
   }
 
-  try
-  {
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleAL2" + LIB_EXT + "/TestModuleAL2");
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleAL2")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
-  }
+  InstallTestBundle(mc, "TestModuleAL2");
 
   Module* moduleAL2 = mc->GetModule("TestModuleAL2");
   US_TEST_CONDITION_REQUIRED(moduleAL2 != NULL, "Test for existing module TestModuleAL2")
@@ -134,22 +122,24 @@ void testCustomAutoLoadPath(Framework* framework)
 
   moduleAL2->Start();
 
+  Module* moduleAL2_1 = mc->GetModule("TestModuleAL2_1");
+
   // check the listeners for events
   std::vector<ModuleEvent> pEvts;
+#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+  pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleAL2_1));
+#endif
+  pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleAL2));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL2));
 
-  Module* moduleAL2_1 = mc->GetModule("TestModuleAL2_1");
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   US_TEST_CONDITION_REQUIRED(moduleAL2_1 != NULL, "Test for existing auto-loaded module TestModuleAL2_1")
   US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1", "Test module name")
 
   moduleAL2_1->Start();
-
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2_1));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL2_1));
-
-  //moduleAL2_1->Stop();
 
 #else
   US_TEST_CONDITION_REQUIRED(moduleAL2_1 == NULL, "Test for non-existing aut-loaded module TestModuleAL2_1")

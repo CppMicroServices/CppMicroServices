@@ -24,6 +24,14 @@
 
 US_BEGIN_NAMESPACE
 
+FrameworkFactory::FrameworkFactory(void) 
+{
+}
+
+FrameworkFactory::~FrameworkFactory(void) 
+{
+}
+
 Framework* FrameworkFactory::newFramework(std::map<std::string, std::string> configuration) 
 {
   return new Framework(configuration);

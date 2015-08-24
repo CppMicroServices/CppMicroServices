@@ -7,15 +7,22 @@ The following properties are always set by the C++ Micro Services library and ca
 the module author:
 
  * `module.id` - The unique id of the module (type `long`)
- * `module.name` - The human readable name of the module (type `std::string`)
  * `module.location` - The full path to the module's shared library on the file system (type `std::string`)
 
+Module authors must always add the following property to their module's `manifest.json` file:
+
+ * `module.name` - The human readable name of the module (type `std::string`)
+ 
+C++ Micro Services will not install any module which doesn't contain a valid 'module.name' property in 
+its `manifest.json` file.
+ 
 Module authors can add custom properties by providing a `manifest.json` file, embedded as a top-level
 resource into the module (see \ref MicroServices_Resources). The root value of the Json file must be
 a Json object. An example `manifest.json` file would be:
 
 ~~~{.json}
 {
+  "module.name" : "my module",
   "module.version" : "1.0.2",
   "module.description" : "This module provides an awesome service",
   "authors" : [ "John Doe", "Douglas Reynolds", "Daniel Cannady" ],

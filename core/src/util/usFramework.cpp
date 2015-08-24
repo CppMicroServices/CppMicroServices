@@ -23,89 +23,94 @@
 #include "usFramework.h"
 
 #include "usCoreModuleContext_p.h"
+#include "usFrameworkPrivate_p.h"
 #include "usModuleInfo.h"
 #include "usModuleInitialization.h"
 #include "usModuleSettings.h"
 #include "usModuleUtils_p.h"
+#include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 
-// TODO: how do we bootstrap the framework for installation
-// into the bundle registry? Do we hard code the Framework name or not?
-const std::string frameworkName("CppMicroServices");
-
-Framework::Framework(void) : 
-    coreModuleContext(new CoreModuleContext()),
-    initialized(false)
+Framework::Framework(void) : f(new FrameworkPrivate())
 {
 
 }
 
 Framework::Framework(std::map<std::string, std::string>& configuration) :
-    coreModuleContext(new CoreModuleContext()),
-    launchProperties(configuration),
-    initialized(false)
+    f(new FrameworkPrivate(configuration))
 {
-  coreModuleContext->launchProperties = configuration;
+  
 }
 
 Framework::~Framework(void)
 {
-  if(coreModuleContext)
-  {
-    delete coreModuleContext;
-  }
 
-  initialized = false;
 }
 
-void Framework::init(void) 
+void Framework::init(void)
 {
-  ModuleInfo* moduleInfo = new ModuleInfo(frameworkName);
+  MutexLock lock(*f->initLock);
+  if (f->initialized)
+  {
+    return;
+  }
+
+  ModuleInfo* moduleInfo = new ModuleInfo(US_CORE_FRAMEWORK_NAME);
 
   void(Framework::*initFncPtr)(void) = &Framework::init;
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
   moduleInfo->location = ModuleUtils::GetLibraryPath(frameworkInit);
 
-  Module* systemBundle = coreModuleContext->bundleRegistry.Register(moduleInfo);
-  if(systemBundle)
-  {
-    // TODO: correctly construct the Module base class. For now, temporarily allow the bundle context to be used.
-    this->d = systemBundle->d;
-    systemBundle->Start();
-    // TODO: make thread-safe
-    initialized = true;
-  }
+  f->coreModuleContext->bundleRegistry.RegisterSystemBundle(this, moduleInfo);
+
+  Module::Start();
+  f->initialized = true;
 }
 
 void Framework::Start() 
 { 
-  if(!initialized)
+  if(!f->initialized)
   {
     init();
   }
 }
 
+void Framework::Stop() 
+{ 
+  std::vector<Module*> modules(GetModuleContext()->GetModules());
+  for (std::vector<Module*>::const_iterator iter = modules.begin(); 
+      iter != modules.end(); 
+      ++iter)
+  {
+    if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
+    {
+      (*iter)->Stop();
+    }
+  }
+
+  Module::Stop();
+
+  MutexLock lock(*f->initLock);
+  f->initialized = false;
+}
+
 void Framework::Uninstall() 
 {
-  /* TODO: throw a BundleException class, per OSGi standard */ 
   throw std::runtime_error("Cannot uninstall a system bundle."); 
 }
 
 std::string Framework::GetLocation() const
 {
-  // per OSGi Core release 6, sectiopn 4.6 - 
-  //  The system bundle getLocation method returns the string: "System Bundle",   //  as defined in the Constants interface.
-  // TODO: do we need to implement an equivalent Constants interface?
+  // OSGi Core release 6, section 4.6:
+  //  The system bundle GetLocation method returns the string: "System Bundle"
   return std::string("System Bundle");
 }
 
 void Framework::SetAutoLoadingEnabled(bool enable)
 {
-  coreModuleContext->settings.SetAutoLoadingEnabled(enable);
+  f->coreModuleContext->settings.SetAutoLoadingEnabled(enable);
 }
 
 US_END_NAMESPACE
-
-US_INITIALIZE_MODULE

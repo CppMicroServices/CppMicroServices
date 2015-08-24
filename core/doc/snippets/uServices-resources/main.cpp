@@ -3,7 +3,6 @@
 #include <usModuleResource.h>
 #include <usModule.h>
 #include <usModuleResourceStream.h>
-#include <usModuleRegistry.h>
 
 US_USE_NAMESPACE
 

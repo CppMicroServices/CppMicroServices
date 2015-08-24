@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef USMODULEREGISTRY_H
-#define USMODULEREGISTRY_H
+#ifndef USMODULEREGISTRY_P_H
+#define USMODULEREGISTRY_P_H
 
 #include <vector>
 #include <string>
@@ -32,29 +32,21 @@
 US_BEGIN_NAMESPACE
 
 class CoreModuleContext;
+class Framework;
 class Module;
 struct ModuleInfo;
 struct ModuleActivator;
 
 /**
- * \ingroup MicroServices
- *
  * Here we handle all the modules that are loaded in the framework.
+ * @remarks This class is thread-safe.
  */
 class US_Core_EXPORT ModuleRegistry {
 
 public:
   
-  ModuleRegistry(CoreModuleContext* coreCtx) : 
-      coreCtx(coreCtx), 
-      modulesLock(new Mutex()),
-      countLock(new Mutex()),
-      id(0)
-  {
-  
-  }
-
-  ~ModuleRegistry(void) {}
+  ModuleRegistry(CoreModuleContext* coreCtx);
+  virtual ~ModuleRegistry(void);
 
   /**
    * Get the module that has the specified module identifier.
@@ -81,16 +73,29 @@ public:
   std::vector<Module*> GetModules();
 
   /**
-   * Get all modules currently in module state <code>LOADED</code>.
+   * Register a bundle with the Framework
    *
-   * @return A list which is filled with all modules in
-   *         state <code>LOADED</code>
+   * @return The registered bundle.
    */
-  //std::vector<Module*> GetLoadedModules();
-
   Module* Register(ModuleInfo* info);
+  
+  /**
+   * Register the system bundle.
+   *
+   * A helper function to help bootstrap the Framework.
+   *
+   * @param systemBundle The system bundle to register.
+   */
+  void RegisterSystemBundle(Framework* const systemBundle, ModuleInfo* info);
 
-  Module* UnRegister(const ModuleInfo* info);
+  /**
+   * Remove a bundle from the Framework.
+   *
+   * Register(ModuleInfo* info) must be called to re-install the bundle. 
+   * Upon which, the bundle will receive a new unique bundle id.
+   *
+   */
+  void UnRegister(const ModuleInfo* info);
 
 private:
   // don't allow copying the ModuleRegistry.
@@ -103,7 +108,7 @@ private:
 
   /**
    * Table of all installed modules in this framework.
-   * Key is the module id.
+   * Key is the module name.
    */
   ModuleMap modules;
 
@@ -126,4 +131,4 @@ private:
 
 US_END_NAMESPACE
 
-#endif // USMODULEREGISTRY_H
+#endif // USMODULEREGISTRY_P_H

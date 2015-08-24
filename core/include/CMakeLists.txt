@@ -40,7 +40,6 @@ set(_public_headers
   usModuleImport.h
   usModuleInfo.h
   usModuleInitialization.h
-  usModuleRegistry.h
   usModuleResource.h
   usModuleResourceStream.h
   usModuleSettings.h

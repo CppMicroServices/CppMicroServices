@@ -20,12 +20,14 @@
 
 =============================================================================*/
 
-#include "usModuleRegistry.h"
+#include "usModuleRegistry_p.h"
 
+#include "usFramework.h"
 #include "usModule.h"
 #include "usModuleInfo.h"
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
+#include "usModulePrivate.h"
 #include "usCoreModuleContext_p.h"
 #include "usGetModuleContext.h"
 
@@ -35,62 +37,92 @@
 
 US_BEGIN_NAMESPACE
 
+ModuleRegistry::ModuleRegistry(CoreModuleContext* coreCtx) :
+    coreCtx(coreCtx),
+    modulesLock(new Mutex()),
+    countLock(new Mutex()),
+    id(0)
+{
+
+}
+
+ModuleRegistry::~ModuleRegistry(void)
+{
+    if (modulesLock)
+    {
+        delete modulesLock;
+    }
+
+    if (countLock)
+    {
+        delete countLock;
+    }
+
+    id = 0;
+}
+
 Module* ModuleRegistry::Register(ModuleInfo* info)
 {
-  Module* module = 0;
-  if (info->id > 0)
-  {
-    // The module was already registered
-    {
-      MutexLock lock(*modulesLock);
-      module = modules[info->name];
-      assert(module != 0);
-    }
-  }
-  else
-  {
-    // check if the module is reloaded
-    {
-      MutexLock lock(*modulesLock);
-      for (ModuleMap::const_iterator i = modules.begin();
-           i != modules.end(); ++i)
-      {
-        if (i->second->GetLocation() == info->location &&
-            i->second->GetName() == info->name)
-        {
-          module = i->second;
-          info->id = module->GetModuleId();
-        }
-      }
-    }
+  Module* module = GetModule(info->name);
 
-    if (!module)
-    {
-      module = new Module();
-      countLock->Lock();
-      info->id = ++id;
-      assert(info->id == 1 ? info->name == "CppMicroServices" : true);
-      countLock->Unlock();
-      module->Init(coreCtx, info);
+  if (!module)
+  {
+    module = new Module();
+    countLock->Lock();
+    info->id = ++id;
+    assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+    countLock->Unlock();
+    module->Init(coreCtx, info);
 
-      MutexLock lock(*modulesLock);
-      modules.insert(std::make_pair(info->name, module));
-    }
+    MutexLock lock(*modulesLock);
+    std::pair<ModuleMap::iterator, bool> return_pair(modules.insert(std::make_pair(info->name, module)));
+
+    // A race condition exists when creating a new bundle instance. To resolve
+    // this requires either scoping the mutex to the entire function or adding
+    // additional logic to check for duplicates on insert into the bundle registry.
+    // Otherwise, an "orphan" bundle instance could be returned to the caller,
+    // which isn't actually contained within the bundle registry.
+    //
+    // Based on the bundle registry performance unit test, deleting the
+    // orphaned bundle instance is faster than increasing the scope of the
+    // mutex.
+    if (!return_pair.second)
+    {
+      ModuleMap::iterator iter(return_pair.first);
+      delete module;
+      module = (*iter).second;
+    }    
   }
 
   return module;
 }
 
-Module* ModuleRegistry::UnRegister(const ModuleInfo* info)
+void ModuleRegistry::RegisterSystemBundle(Framework* const systemBundle, ModuleInfo* info)
 {
-  Module* curr = 0;
+  if (!systemBundle)
+  {
+    throw std::invalid_argument("Can't register a null system bundle");
+  }
+
+  countLock->Lock();
+  info->id = ++id;
+  assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+  countLock->Unlock();
+
+  systemBundle->Init(coreCtx, info);
+
+  MutexLock lock(*modulesLock);
+  modules.insert(std::make_pair(info->name, systemBundle));
+}
+
+void ModuleRegistry::UnRegister(const ModuleInfo* info)
+{
+  // TODO: fix once the system bundle id is set to 0
   if (info->id > 1)
   {
     MutexLock lock(*modulesLock);
-    curr = modules[info->name];
-    assert(curr != 0);
+    modules.erase(info->name);
   }
-  return curr;
 }
 
 Module* ModuleRegistry::GetModule(long id)
@@ -134,23 +166,6 @@ std::vector<Module*> ModuleRegistry::GetModules()
   }
   return result;
 }
-
-//std::vector<Module*> ModuleRegistry::GetLoadedModules()
-//{
-//  MutexLock lock(*modulesLock);
-//
-//  std::vector<Module*> result;
-//  ModuleMap::const_iterator iter = modules.begin();
-//  ModuleMap::const_iterator iterEnd = modules.end();
-//  for (; iter != iterEnd; ++iter)
-//  {
-//    if (iter->second->IsLoaded())
-//    {
-//      result.push_back(iter->second);
-//    }
-//  }
-//  return result;
-//}
 
 US_END_NAMESPACE
 

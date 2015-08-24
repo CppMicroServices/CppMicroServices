@@ -32,6 +32,7 @@
 #include <usServiceListenerHook.h>
 #include <usSharedLibrary.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
@@ -240,20 +241,7 @@ void TestEventListenerHook(Framework* framework)
   US_TEST_CONDITION(serviceListener1.events.empty(), "service event of service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener");
 
-  Module* module = 0;
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    module = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
-#else
-    module = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");  
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  Module* module = InstallTestBundle(context, "TestModuleA");
 
   module->Start();
 
@@ -367,20 +355,7 @@ void TestFindHook(Framework* framework)
   TestServiceListener serviceListener;
   context->AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 
-  Module* module = 0;
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    module = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
-#else
-    module = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  Module* module = InstallTestBundle(context, "TestModuleA");
 
   module->Start();
 

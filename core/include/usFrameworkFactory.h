@@ -28,22 +28,28 @@
 
 US_BEGIN_NAMESPACE
 
+/**
+ * \ingroup MicroServices
+ *
+ * A factory for creating Framework instances.
+ *
+ * @remarks This class is thread-safe.
+ */
 class US_Core_EXPORT FrameworkFactory
 {
 public:
-    FrameworkFactory(void) {}
-    ~FrameworkFactory(void) {}
+    FrameworkFactory(void);
+    virtual ~FrameworkFactory(void);
 
     /**
      * Create a new Framework instance.
      * 
-     * \param configuration The framework properties to configure the new framework instance. If framework properties
+     * @param configuration The framework properties to configure the new framework instance. If framework properties
      * are not provided by the configuration argument, the created framework instance must use some reasonable
-     * default configuration. The specified configuration argument may be null. The created framework instance must 
-     * copy any information needed from the specified configuration argument since the configuration argument can 
-     * be changed after the framework instance has been created.
+     * default configuration. The created framework instance must copy any information needed from the specified 
+     * configuration argument since the configuration argument can be changed after the framework instance has been created.
      *
-     * \return A new, configured Framework instance. The framework instance must be in the INSTALLED state.
+     * @return A new, configured Framework instance.
      */
     Framework* newFramework(std::map<std::string, std::string> configuration);
 

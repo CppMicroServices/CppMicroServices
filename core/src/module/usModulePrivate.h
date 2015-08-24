@@ -26,14 +26,14 @@
 #include <map>
 #include <list>
 
-#include "usModuleRegistry.h"
+#include "usModuleRegistry_p.h"
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
 #include "usModuleManifest_p.h"
 #include "usModuleResourceContainer_p.h"
 #include "usSharedLibrary.h"
 
-#include "usAtomicInt_p.h"
+#include "usWaitCondition_p.h"
 
 US_BEGIN_NAMESPACE
 
@@ -44,7 +44,7 @@ struct ModuleActivator;
 /**
  * \ingroup MicroServices
  */
-class ModulePrivate {
+class ModulePrivate : public MultiThreaded<> {
 
 public:
 
@@ -82,8 +82,10 @@ public:
 
   Module* const q;
 
-  // responsible for platform specific loading and unloading
-  // of the bundle's physical form.
+  /** 
+   * Responsible for platform specific loading and unloading
+   * of the bundle's physical form.
+   */
   SharedLibrary lib;
 
 private:

@@ -22,6 +22,7 @@
 
 #include <usFrameworkFactory.h>
 
+#include <usTestUtils.h>
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
@@ -124,39 +125,10 @@ void TestFilterString(us::ModuleContext* context)
 
 void TestServiceTracker(us::ModuleContext* context)
 {
-
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-  static const std::string DIR_SEP = "\\";
-  static const std::string LIB_PREFIX = "";
-  static const std::string LIB_EXT = ".dll";
-#else
-#if defined US_PLATFORM_APPLE
-  static const std::string LIB_EXT = ".dylib";
-#else
-  static const std::string LIB_EXT = ".so";
-#endif
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-  static const std::string LIB_PREFIX = "lib";
-  static const std::string DIR_SEP = "/";
-#endif
-
   ModuleContext* mc = context;
 
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleS" + LIB_EXT + "/TestModuleS");
-#else
-    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleS");      
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleS")
-    module->Start();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  Module* module = InstallTestBundle(mc, "TestModuleS");
+  module->Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 

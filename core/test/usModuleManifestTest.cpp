@@ -26,9 +26,9 @@
 #include <usModuleEvent.h>
 #include <usServiceEvent.h>
 #include <usModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
@@ -47,19 +47,7 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
   framework->init();
   framework->Start();
 
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleM" + LIB_EXT + "/TestModuleM");
-#else
-    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleM");
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleM")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(framework->GetModuleContext(), "TestModuleM");
 
   Module* moduleM = framework->GetModuleContext()->GetModule("TestModuleM");
   US_TEST_CONDITION_REQUIRED(moduleM != 0, "Test for existing module TestModuleM")

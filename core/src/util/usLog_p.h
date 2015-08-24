@@ -72,9 +72,17 @@ private:
 class Logger {
 public:
     static Logger& instance()
-    { // NOTE: This is only thread safe if compiling with a
-      //  C++11 compiler which implements §6.7.4
-      // TODO: make thread-safe.
+    { 
+      /* 
+      IMPORTANT: This is only thread safe if compiling with a C++11 compiler
+        which implements C++11 standard section 6.7.4:
+       "If control enters the declaration concurrently while the variable is being initialized, 
+        the concurrent execution shall wait for completion of the initialization."
+
+        However, even if a C++11 supported compiler isn't used, thread safe initialization
+        of function local statics isn't a concern at the moment becasue this Logger
+        is used internally by the Framework and not instantiated in a concurrent fashion.
+       */
       static Logger inst;
       return inst;
     }
@@ -104,6 +112,12 @@ public:
       return logLevel;
     }
 
+protected:
+    Logger(void) : logLevel(DebugMsg), 
+                   levelLock() 
+    {}
+    ~Logger() {}
+
 private:
     MsgType logLevel;
     Mutex levelLock;
@@ -111,10 +125,6 @@ private:
     // disable copy/assignment
     Logger(const Logger&);
     Logger& operator=(const Logger&);
-
-protected:
-    Logger(void) {}
-    ~Logger() {}
 };
 
 US_END_NAMESPACE

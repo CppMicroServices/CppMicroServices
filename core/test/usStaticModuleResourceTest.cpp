@@ -24,12 +24,12 @@
 
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 #include <usSharedLibrary.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
@@ -115,19 +115,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   assert(framework->GetModuleContext());
 
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleB");
-#else
-    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleB");
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleB")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(framework->GetModuleContext(), "TestModuleB");
 
   try
   {

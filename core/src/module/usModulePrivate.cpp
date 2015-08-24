@@ -98,18 +98,18 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   moduleManifest.SetValue(Module::PROP_ID(), propId.str());
   moduleManifest.SetValue(Module::PROP_LOCATION(), this->info.location);
   
-  // Handle a transistional state where modules are moving to declaring their module names directly
-  // in the manifest file, instead of through a global static object.
-  // TODO: remove transistional code
-  if(moduleManifest.GetValue(Module::PROP_NAME()).Empty())
+  if (!moduleManifest.Contains(Module::PROP_NAME()))
   {
-    moduleManifest.SetValue(Module::PROP_NAME(), this->info.name);
+    throw std::runtime_error(Module::PROP_NAME() + " is not defined in the bundle manifest.");
   }
-  else
+
+  Any bundleName(moduleManifest.GetValue(Module::PROP_NAME()));
+  if (bundleName.Empty())
   {
-    info->name = moduleManifest.GetValue(Module::PROP_NAME()).ToString();
-    this->info.name = moduleManifest.GetValue(Module::PROP_NAME()).ToString();
+    throw std::runtime_error(Module::PROP_NAME() + " is empty in the bundle manifest.");
   }
+
+  this->info.name = bundleName.ToString();
 
   if (moduleManifest.Contains(Module::PROP_AUTOLOAD_DIR()))
   {

@@ -121,7 +121,7 @@ bool Module::IsLoaded() const
 
 void Module::Start()
 {
-
+  MutexLockingStrategy::Lock(this->d);
   if (d->moduleContext)
   {
     US_WARN << "Module " << d->info.name << " already started.";
@@ -149,7 +149,7 @@ void Module::Start()
 
   if (setBundleContext)
   {
-      setBundleContext(d->moduleContext);
+    setBundleContext(d->moduleContext);
   }
 
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
@@ -181,40 +181,12 @@ void Module::Start()
     d->moduleActivator->Load(d->moduleContext);
   }
 
-// TODO: What are the requirements of the auto install feature now that we've moved
-//       to the OSGi life cycle? Does auto installing bundles mean that those bundles
-//       are auto started as well on bundle start?
-//#ifdef US_ENABLE_AUTOLOADING_SUPPORT
-//  if (d->coreCtx->settings.IsAutoLoadingEnabled())
-//  {
-//    Any loadedModules = d->moduleManifest.GetValue(Module::PROP_AUTOLOADED_MODULES());
-//    if(!loadedModules.Empty())
-//    {
-//        std::vector<std::string> loadedModulesVec = any_cast<std::vector<std::string> >(loadedModules);
-//    
-//        for(std::vector<std::string>::const_iterator moduleIterator = loadedModulesVec.begin();
-//            moduleIterator != loadedModulesVec.end();
-//            ++moduleIterator)
-//        {
-//            Module* module = ModuleRegistry::GetModule((*moduleIterator));
-//            if(module)
-//            {
-//                module->Start();
-//            }
-//            else
-//            {
-//                US_WARN << "Module " << (*moduleIterator) << " is not installed. Cannot start module.";
-//            }
-//        }
-//    }
-//  }
-//#endif
-
   d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::LOADED, this));
 }
 
 void Module::Stop()
 {
+  MutexLockingStrategy::Lock(this->d);
   if (d->moduleContext == 0)
   {
     US_WARN << "Module " << d->info.name << " already stopped.";
@@ -250,6 +222,7 @@ void Module::Uninstall()
 {
     Stop();
     d->coreCtx->bundleRegistry.UnRegister(&d->info);
+    d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNINSTALLED, this));
 }
 
 ModuleContext* Module::GetModuleContext() const
@@ -279,18 +252,20 @@ ModuleVersion Module::GetVersion() const
 
 Any Module::GetProperty(const std::string& key) const
 {
-  // clients must be able to query both a bundle's properties
+  Any property(d->moduleManifest.GetValue(key));
+
+  // Clients must be able to query both a bundle's properties
   // and the framework's properties through any Bundle's
   // GetProperty function.
-  // Further, access must be provided to all Bundles to search
-  // for "org.osgi.*" properties.
-  Any property(d->moduleManifest.GetValue(key));
+  // The Framework's properties include both the launch properties
+  // used to initialize the Framwork with and all relevant 
+  // "org.osgi.*" properties.
   if (property.Empty())
   {
-    std::map<std::string, std::string>::iterator launchProp = d->coreCtx->launchProperties.find(key);
-    if (launchProp != d->coreCtx->launchProperties.end())
+    std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
+    if (props != d->coreCtx->frameworkProperties.end())
     {
-      property = (*launchProp).second;
+      property = (*props).second;
     }
   }
   return property;

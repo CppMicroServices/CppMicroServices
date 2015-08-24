@@ -22,152 +22,15 @@
 
 #include <usFrameworkFactory.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-US_USE_NAMESPACE
-
-#ifdef US_PLATFORM_APPLE
-#include <mach/mach_time.h>
-#elif defined(US_PLATFORM_POSIX)
-#include <time.h>
-#include <unistd.h>
-#ifndef _POSIX_MONOTONIC_CLOCK
-#error Monotonic clock support missing on this POSIX platform
-#endif
-#elif defined(US_PLATFORM_WINDOWS)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
-#endif
-#include <windows.h>
-#else
-#error High precision timer support nod available on this platform
-#endif
-
 #include <vector>
 
-class HighPrecisionTimer
-{
-
-public:
-
-  inline HighPrecisionTimer();
-
-  inline void Start();
-
-  inline long long ElapsedMilli();
-
-  inline long long ElapsedMicro();
-
-private:
-
-#ifdef US_PLATFORM_APPLE
-  static double timeConvert;
-  uint64_t startTime;
-#elif defined(US_PLATFORM_POSIX)
-  timespec startTime;
-#elif defined(US_PLATFORM_WINDOWS)
-  LARGE_INTEGER timerFrequency;
-  LARGE_INTEGER startTime;
-#endif
-};
-
-#ifdef US_PLATFORM_APPLE
-
-double HighPrecisionTimer::timeConvert = 0.0;
-
-inline HighPrecisionTimer::HighPrecisionTimer()
-: startTime(0)
-{
-  if (timeConvert == 0)
-  {
-    mach_timebase_info_data_t timeBase;
-    mach_timebase_info(&timeBase);
-    timeConvert = static_cast<double>(timeBase.numer) / static_cast<double>(timeBase.denom) / 1000.0;
-  }
-}
-
-inline void HighPrecisionTimer::Start()
-{
-  startTime = mach_absolute_time();
-}
-
-inline long long HighPrecisionTimer::ElapsedMilli()
-{
-  uint64_t current = mach_absolute_time();
-  return static_cast<double>(current - startTime) * timeConvert / 1000.0;
-}
-
-inline long long HighPrecisionTimer::ElapsedMicro()
-{
-  uint64_t current = mach_absolute_time();
-  return static_cast<double>(current - startTime) * timeConvert;
-}
-
-#elif defined(US_PLATFORM_POSIX)
-
-inline HighPrecisionTimer::HighPrecisionTimer()
-{
-  startTime.tv_nsec = 0;
-  startTime.tv_sec = 0;
-}
-
-inline void HighPrecisionTimer::Start()
-{
-  clock_gettime(CLOCK_MONOTONIC, &startTime);
-}
-
-inline long long HighPrecisionTimer::ElapsedMilli()
-{
-  timespec current;
-  clock_gettime(CLOCK_MONOTONIC, &current);
-  return (static_cast<long long>(current.tv_sec)*1000 + current.tv_nsec/1000/1000) -
-      (static_cast<long long>(startTime.tv_sec)*1000 + startTime.tv_nsec/1000/1000);
-}
-
-inline long long HighPrecisionTimer::ElapsedMicro()
-{
-  timespec current;
-  clock_gettime(CLOCK_MONOTONIC, &current);
-  return (static_cast<long long>(current.tv_sec)*1000*1000 + current.tv_nsec/1000) -
-      (static_cast<long long>(startTime.tv_sec)*1000*1000 + startTime.tv_nsec/1000);
-}
-
-#elif defined(US_PLATFORM_WINDOWS)
-
-inline HighPrecisionTimer::HighPrecisionTimer()
-{
-  if (!QueryPerformanceFrequency(&timerFrequency))
-    throw std::runtime_error("QueryPerformanceFrequency() failed");
-}
-
-inline void HighPrecisionTimer::Start()
-{
-  //DWORD_PTR oldmask = SetThreadAffinityMask(GetCurrentThread(), 0);
-  QueryPerformanceCounter(&startTime);
-  //SetThreadAffinityMask(GetCurrentThread(), oldmask);
-}
-
-inline long long HighPrecisionTimer::ElapsedMilli()
-{
-  LARGE_INTEGER current;
-  QueryPerformanceCounter(&current);
-  return (current.QuadPart - startTime.QuadPart) / (timerFrequency.QuadPart / 1000);
-}
-
-inline long long HighPrecisionTimer::ElapsedMicro()
-{
-  LARGE_INTEGER current;
-  QueryPerformanceCounter(&current);
-  return (current.QuadPart - startTime.QuadPart) / (timerFrequency.QuadPart / (1000*1000));
-}
-
-#endif
+US_USE_NAMESPACE
 
 class MyServiceListener;
 
@@ -432,6 +295,7 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
   perfTest.TestUnregisterServices();
   perfTest.CleanupTestCase();
 
+  framework->Stop();
   delete framework;
 
   US_TEST_END()

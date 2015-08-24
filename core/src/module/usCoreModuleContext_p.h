@@ -28,7 +28,7 @@
 #include "usServiceRegistry_p.h"
 #include "usModuleHooks_p.h"
 #include "usServiceHooks_p.h"
-#include "usModuleRegistry.h"
+#include "usModuleRegistry_p.h"
 #include "usModuleSettings.h"
 
 US_BEGIN_NAMESPACE
@@ -71,9 +71,11 @@ public:
   ModuleSettings settings;
 
   /*
-   * Framework launch properties
+   * Framework properties, which contain both the
+   * launch properties and the system properties.
+   * See OSGi spec revision 6, section 4.2.2
    */
-  std::map<std::string, std::string> launchProperties;
+  std::map<std::string, std::string> frameworkProperties;
 
   /**
    * Contruct a core context

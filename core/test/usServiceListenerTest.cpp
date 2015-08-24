@@ -22,6 +22,7 @@
 
 #include <usFrameworkFactory.h>
 
+#include <usTestUtils.h>
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
@@ -303,17 +304,8 @@ void frameSL02a(Framework* framework)
                         << " : frameSL02a:FAIL" );
   }
 
-  Module* module = 0;
-  try
-  {
-    module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
-    module->Start();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL02a:FAIL")
-  }
+  Module* module = InstallTestBundle(mc, "TestModuleA");
+  module->Start();
 
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
@@ -332,17 +324,8 @@ void frameSL05a(Framework* framework)
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  Module* module = 0;
-
-  try
-  {
-    module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL05a:FAIL")
-  }
+  
+  Module* module = InstallTestBundle(framework->GetModuleContext(), "TestModuleA");
 
   bool testStatus = runLoadUnloadTest("FrameSL05a", 1, *module, framework->GetModuleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
@@ -353,17 +336,8 @@ void frameSL10a(Framework* framework)
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  Module* module = 0;
-
-  try
-  {
-    module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA2" + LIB_EXT + "/TestModuleA2");
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA2")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL10a:FAIL")
-  }
+  
+  Module* module = InstallTestBundle(framework->GetModuleContext(), "TestModuleA2");
 
   bool testStatus = runLoadUnloadTest("FrameSL10a", 1, *module, framework->GetModuleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
@@ -384,38 +358,9 @@ void frameSL25a(Framework* framework)
     throw;
   }
 
-  Module* libSL1;
-  try
-  {
-    libSL1 = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleSL1" + LIB_EXT + "/TestModuleSL1");
-    US_TEST_CONDITION_REQUIRED(libSL1 != NULL, "Test installation of module TestModuleSL1")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL25a:FAIL")
-  }
-
-  Module* libSL3;
-  try
-  {
-    libSL3 = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleSL3" + LIB_EXT + "/TestModuleSL3");
-    US_TEST_CONDITION_REQUIRED(libSL3 != NULL, "Test installation of module TestModuleSL3")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL25a:FAIL")
-  }
-
-  Module* libSL4;
-  try
-  {
-    libSL4 = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleSL4" + LIB_EXT + "/TestModuleSL4");
-    US_TEST_CONDITION_REQUIRED(libSL4 != NULL, "Test installation of module TestModuleSL4")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frameSL25a:FAIL")
-  }
+  Module* libSL1 = InstallTestBundle(mc, "TestModuleSL1");
+  Module* libSL3 = InstallTestBundle(mc, "TestModuleSL3");
+  Module* libSL4 = InstallTestBundle(mc, "TestModuleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 

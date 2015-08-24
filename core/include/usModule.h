@@ -56,13 +56,15 @@ typedef ServiceReference<void> ServiceReferenceU;
  * framework. This identity does not change during the lifecycle of a module.
  *
  * <p>
- * A module can be in one of two states:
+ * A module can be in one of four states:
  * <ul>
+ * <li>INSTALLED
  * <li>LOADED
  * <li>UNLOADED
+ * <li>UNINSTALLED
  * </ul>
  * <p>
- * You can determine the current state by using IsLoaded().
+ * You can determine whether a bundle is loaded or not by using IsLoaded().
  *
  * <p>
  * A module can only execute code when its state is <code>LOADED</code>.
@@ -153,7 +155,6 @@ public:
    */
   static const std::string& PROP_AUTOLOADED_MODULES();
 
-  Module();
   virtual ~Module();
 
   /**
@@ -163,7 +164,7 @@ public:
    * A module can be in only one state at any time.
    *
    * @return <code>true</code> if the module is <code>LOADED</code>
-   *         <code>false</code> if it is <code>UNLOADED</code>
+   *         <code>false</code> if it is in any other state.
    */
   virtual bool IsLoaded() const;
 
@@ -334,43 +335,63 @@ public:
    */
   virtual std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 
+  /**
+   * Start this bundle.
+   * 
+   * The following steps are required to start this bundle:
+   * -# If this bundle is in the process of being activated or deactivated then this method must wait for
+   *    activation or deactivation to complete before continuing. If this does not occur in a reasonable
+   *    time, a std::runtime_error exception is thrown to indicate this bundle was unable to be started.
+   * -# If this bundle was already started, then this method returns immediately.
+   * -# A bundle event of type BundleEvent::STARTING is fired.
+   * -# The BundleActivator::Start(BundleContext) method of this bundle's BundleActivator, if one is
+   *    specified, is called. If the BundleActivator is invalid or throws an exception then:
+   *    - A bundle event of type BundleEvent::STOPPING is fired.
+   *    - %Any services registered by this bundle must be unregistered.
+   *    - %Any services used by this bundle must be released.
+   *    - %Any listeners registered by this bundle must be removed.
+   *    - A bundle event of type BundleEvent::STOPPED is fired.
+   *    - A std::runtime_error exception is then thrown.
+   * -# A bundle event of type BundleEvent::STARTED is fired.
+   *
+   * @throws std::runtime_error If this bundle could not be started.
+   */
   virtual void Start();
+
+  /**
+   * Stop this bundle.
+   *
+   * The following steps are required to stop a bundle:
+   * -# If this bundle is in the process of being activated or deactivated then this method must wait for
+   *    activation or deactivation to complete before continuing. If this does not occur in a reasonable
+   *    time, a std::runtime_error exception is thrown to indicate this bundle was unable to be stopped.
+   * -# If this bundle was already stopped, then this method returns immediately.
+   * -# A bundle event of type BundleEvent::STOPPING is fired.
+   * -# The BundleActivator::Stop(BundleContext) method of this bundle's BundleActivator, if one is specified,
+   *    is called. If that method throws an exception, this method must continue to stop this bundle
+   *    and a std::runtime_error exception must be thrown after completion of the remaining steps.
+   * -# %Any services registered by this bundle must be unregistered.
+   * -# %Any services used by this bundle must be released.
+   * -# %Any listeners registered by this bundle must be removed.
+   * -# A bundle event of type BundleEvent::STOPPED is fired.
+   *
+   * @throws std::runtime_error If the bundle failed to stop.
+   */
   virtual void Stop();
 
   /**
    * Uninstalls this bundle.
    * 
    * This method causes the Framework to notify other bundles that this bundle is being uninstalled,
-   * and then puts this bundle into the UNINSTALLED state. The Framework must remove any resources
-   * related to this bundle that it is able to remove.
-   * If this bundle has exported any packages, the Framework must continue to make these packages
-   * available to their importing bundles until the FrameworkWiring.refreshBundles method has been
-   * called or the Framework is relaunched.
+   * and then uninstalls this bundle. The Framework must remove any resources related to this bundle 
+   * that it is able to remove.
+   *
    * The following steps are required to uninstall a bundle:
-   * 1. If this bundle's state is UNINSTALLED then an IllegalStateException is thrown.
-   * 2. If this bundle's state is ACTIVE, STARTING or STOPPING, this bundle is stopped as described
-   * in the Bundle.stop method. If Bundle.stop throws an exception, a Framework event of type
-   * FrameworkEvent.ERROR is fired containing the exception.
-   * 3. This bundle's state is set to UNINSTALLED.
-   * 4. A bundle event of type BundleEvent.UNINSTALLED is fired.
-   * 5. This bundle and any persistent storage area provided for this bundle by the Framework are removed.
+   * -# This bundle is stopped as described in the Bundle.Stop method.
+   * -# A bundle event of BundleEvent::UNINSTALLED is fired.
+   * -# This bundle and any persistent storage area provided for this bundle by the Framework are removed.
    *
-   * Preconditions
-   * - getState() not in { UNINSTALLED }.
-   *
-   * Postconditions, no exceptions thrown
-   * - getState() in { UNINSTALLED }.
-   * - This bundle has been uninstalled.
-   *
-   * Postconditions, when an exception is thrown
-   * - getState() not in { UNINSTALLED }.
-   * - This Bundle has not been uninstalled.
-   *
-   * @throw BundleException If the uninstall failed. This can occur if another thread is attempting to change
-   * this bundle's state and does not complete in a timely manner. BundleException types thrown by this
-   * method include: BundleException.STATECHANGE_ERROR
-   * @throw IllegalStateException  If this bundle has been uninstalled or this bundle tries to change its own
-   * state.   *
+   * @throws std::runtime_error If the bundle could not be uninstalled.   *
    */
   virtual void Uninstall();
 
@@ -382,6 +403,8 @@ private:
   friend class Framework;
 
   ModulePrivate* d;
+
+  Module();
 
   void Init(CoreModuleContext* coreCtx, ModuleInfo* info);
   void Uninit();

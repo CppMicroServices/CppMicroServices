@@ -37,7 +37,7 @@
  * \brief Creates initialization code for a module.
  *
  * Each module which wants to register itself with the CppMicroServices library
- * has to put a call to this macro in one of its source files. Further, the modules
+ * has to put a call to this macro in one of its source files. Further, the module's
  * source files must be compiled with the \c US_MODULE_NAME pre-processor definition
  * set to a module-unique identifier.
  *

@@ -29,28 +29,13 @@
 #include <usGetModuleContext.h>
 #include <usSharedLibrary.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
 US_USE_NAMESPACE
 
 namespace {
-
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-  static const std::string DIR_SEP = "\\";
-  static const std::string LIB_PREFIX = "";
-  static const std::string LIB_EXT = ".dll";
-#else
-#if defined US_PLATFORM_APPLE
-  static const std::string LIB_EXT = ".dylib";
-#else
-  static const std::string LIB_EXT = ".so";
-#endif
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-  static const std::string LIB_PREFIX = "lib";
-  static const std::string DIR_SEP = "/";
-#endif
 
 class TestModuleListener
 {
@@ -100,19 +85,7 @@ public:
 
 void TestFindHook(Framework* framework)
 {
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
-#else
-    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(framework->GetModuleContext(), "TestModuleA");
 
   Module* moduleA = framework->GetModuleContext()->GetModule("TestModuleA");
   US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
@@ -153,26 +126,14 @@ void TestEventHook(Framework* framework)
   TestModuleListener moduleListener;
   framework->GetModuleContext()->AddModuleListener(&moduleListener, &TestModuleListener::ModuleChanged);
 
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = framework->GetModuleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleA" + LIB_EXT + "/TestModuleA");
-#else
-    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleA");
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleA")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(framework->GetModuleContext(), "TestModuleA");
 
   Module* moduleA = framework->GetModuleContext()->GetModule("TestModuleA");
   moduleA->Start();
-  US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 2, "Test for received load module events")
+  US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 3, "Test for received load module events")
 
   moduleA->Stop();
-  US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 4, "Test for received unload module events")
+  US_TEST_CONDITION_REQUIRED(moduleListener.events.size() == 5, "Test for received unload module events")
 
   TestModuleEventHook eventHook;
   ServiceRegistration<ModuleEventHook> eventHookReg = framework->GetModuleContext()->RegisterService<ModuleEventHook>(&eventHook);

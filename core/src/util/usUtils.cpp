@@ -29,7 +29,7 @@
 #include "usModule.h"
 #include "usModuleContext.h"
 #include "usModuleSettings.h"
-#include "usModuleRegistry.h"
+#include "usModuleRegistry_p.h"
 
 #include "miniz.h"
 

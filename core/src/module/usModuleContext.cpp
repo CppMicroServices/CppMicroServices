@@ -23,7 +23,7 @@
 #include "usModuleContext.h"
 
 #include "usModule.h"
-#include "usModuleRegistry.h"
+#include "usModuleRegistry_p.h"
 #include "usModulePrivate.h"
 #include "usModuleSettings.h"
 #include "usCoreModuleContext_p.h"
@@ -179,8 +179,8 @@ std::string ModuleContext::GetDataFile(const std::string &filename) const
 #endif
   
   std::string baseStoragePath;
-  std::map<std::string, std::string>::iterator prop = d->module->coreCtx->launchProperties.find("org.osgi.framework.storage");
-  if(prop != d->module->coreCtx->launchProperties.end())
+  std::map<std::string, std::string>::iterator prop = d->module->coreCtx->frameworkProperties.find("org.osgi.framework.storage");
+  if(prop != d->module->coreCtx->frameworkProperties.end())
   { 
     baseStoragePath = (*prop).second;
   }
@@ -206,7 +206,11 @@ Module* ModuleContext::InstallBundle(const std::string& location)
     ModuleInfo* moduleInfo = new ModuleInfo(GetBundleNameFromLocation(location));
     moduleInfo->location = GetBundleLocation(location);
 
-    return d->module->coreCtx->bundleRegistry.Register(moduleInfo);
+    Module* module = d->module->coreCtx->bundleRegistry.Register(moduleInfo);
+
+    d->module->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::INSTALLED, module));
+
+    return module;
 }
 
 

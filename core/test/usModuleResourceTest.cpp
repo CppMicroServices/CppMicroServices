@@ -24,14 +24,13 @@
 
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 #include <usSharedLibrary.h>
 
 #include <usTestingConfig.h>
-
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 
 #include <cassert>
@@ -400,19 +399,7 @@ void testResourceFromExecutable(Module* module)
 
 void testResourcesFrom(const std::string& moduleName, ModuleContext* mc)
 {
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + moduleName + LIB_EXT + "/" + moduleName);
-#else
-    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + moduleName);
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module " + moduleName)
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(mc, moduleName);
 
   Module* moduleR = mc->GetModule(moduleName);
   US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module")
@@ -438,19 +425,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   ModuleContext* mc = framework->GetModuleContext();
   assert(mc);
 
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleR" + LIB_EXT + "/TestModuleR");
-#else
-    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleR");   
-#endif
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleR")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
+  InstallTestBundle(mc, "TestModuleR");
 
   Module* moduleR = mc->GetModule("TestModuleR");
   US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module TestModuleR")

@@ -57,7 +57,7 @@ static inline BundleContext* GetBundleContext()
   BundleContext*(*getCallersBundleContext)() = &GetBundleContext;
   void* GetThisBundleContext = NULL;
   std::memcpy(&GetThisBundleContext, &getCallersBundleContext, sizeof(void*));
-  std::string libPath(BundleUtils::GetLibraryPath(GetBundleContext));
+  std::string libPath(BundleUtils::GetLibraryPath(GetThisBundleContext));
 
   BundleInfo info(US_STR(US_BUNDLE_NAME));
   info.location = libPath;

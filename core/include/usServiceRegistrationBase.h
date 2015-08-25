@@ -30,7 +30,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4396)
 
 US_BEGIN_NAMESPACE
 
-class ModulePrivate;
+class BundlePrivate;
 class ServiceRegistrationBasePrivate;
 class ServicePropertiesImpl;
 
@@ -41,9 +41,9 @@ class ServicePropertiesImpl;
  *
  * <p>
  * The framework returns a <code>ServiceRegistrationBase</code> object when a
- * <code>ModuleContext#RegisterService()</code> method invocation is successful.
+ * <code>BundleContext#RegisterService()</code> method invocation is successful.
  * The <code>ServiceRegistrationBase</code> object is for the private use of the
- * registering module and should not be shared with other modules.
+ * registering bundle and should not be shared with other bundles.
  * <p>
  * The <code>ServiceRegistrationBase</code> object may be used to update the
  * properties of the service or to unregister the service.
@@ -51,7 +51,7 @@ class ServicePropertiesImpl;
  * \note This class is provided as public API for low-level service management only.
  *       In almost all cases you should use the template ServiceRegistration instead.
  *
- * @see ModuleContext#RegisterService()
+ * @see BundleContext#RegisterService()
  * @remarks This class is thread safe.
  */
 class US_Core_EXPORT ServiceRegistrationBase
@@ -93,7 +93,7 @@ public:
    * registered.
    * <p>
    * The <code>ServiceReference</code> object may be shared with other
-   * modules.
+   * bundles.
    *
    * @throws std::logic_error If this
    *         <code>ServiceRegistrationBase</code> object has already been
@@ -142,22 +142,22 @@ public:
    * <li>The service is removed from the framework service registry so that
    * it can no longer be obtained.
    * <li>A service event of type ServiceEvent#UNREGISTERING is fired
-   * so that modules using this service can release their use of the service.
+   * so that bundles using this service can release their use of the service.
    * Once delivery of the service event is complete, the
    * <code>ServiceRegistrationBase</code> objects for the service may no longer be
    * used to get a service object for the service.
-   * <li>For each module whose use count for this service is greater than
+   * <li>For each bundle whose use count for this service is greater than
    * zero: <br>
-   * The module's use count for this service is set to zero. <br>
+   * The bundle's use count for this service is set to zero. <br>
    * If the service was registered with a ServiceFactory object, the
    * <code>ServiceFactory#UngetService</code> method is called to release
-   * the service object for the module.
+   * the service object for the bundle.
    * </ol>
    *
    * @throws std::logic_error If this
    *         <code>ServiceRegistrationBase</code> object has already been
    *         unregistered or if it is invalid.
-   * @see ModuleContext#UngetService
+   * @see BundleContext#UngetService
    * @see ServiceFactory#UngetService
    */
   void Unregister();
@@ -198,7 +198,7 @@ private:
 
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
-  ServiceRegistrationBase(ModulePrivate* module, const InterfaceMap& service,
+  ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
                           const ServicePropertiesImpl& props);
 
   ServiceRegistrationBasePrivate* d;

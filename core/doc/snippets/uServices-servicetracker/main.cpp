@@ -1,5 +1,5 @@
 #include <usServiceTracker.h>
-#include <usGetModuleContext.h>
+#include <usGetBundleContext.h>
 
 US_USE_NAMESPACE
 
@@ -84,14 +84,14 @@ int main(int /*argc*/, char* /*argv*/[])
   {
 //! [tracker]
 MyTrackingCustomizer myCustomizer;
-ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetModuleContext(), &myCustomizer);
+ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetBundleContext(), &myCustomizer);
 //! [tracker]
   }
 
   {
 //! [tracker2]
 MyTrackingPointerCustomizer myCustomizer;
-ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetModuleContext(), &myCustomizer);
+ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetBundleContext(), &myCustomizer);
 //! [tracker2]
   }
 
@@ -99,8 +99,8 @@ ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tra
   MyTrackingCustomizerVoid myCustomizer2;
   try
   {
-    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetModuleContext(), &myCustomizer2);
-    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetModuleContext());
+    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetBundleContext(), &myCustomizer2);
+    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetBundleContext());
   }
   catch (const us::ServiceException&)
   {}

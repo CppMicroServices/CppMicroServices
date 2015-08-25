@@ -5,17 +5,17 @@
 
 #include <string>
 
-#ifdef MODULE_EXPORTS
-  #define MODULE_EXPORT US_ABI_EXPORT
+#ifdef BUNDLE_EXPORTS
+  #define BUNDLE_EXPORT US_ABI_EXPORT
 #else
-  #define MODULE_EXPORT US_ABI_IMPORT
+  #define BUNDLE_EXPORT US_ABI_IMPORT
 #endif
 
 /**
  * A simple service interface that defines a dictionary service.
  * A dictionary service simply verifies the existence of a word.
  **/
-struct MODULE_EXPORT IDictionaryService
+struct BUNDLE_EXPORT IDictionaryService
 {
   virtual ~IDictionaryService();
 

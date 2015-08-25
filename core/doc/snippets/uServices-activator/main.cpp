@@ -1,23 +1,23 @@
-#include <usModuleActivator.h>
+#include <usBundleActivator.h>
 
 US_USE_NAMESPACE
 
 //! [0]
-class MyActivator : public ModuleActivator
+class MyActivator : public BundleActivator
 {
 
 public:
 
-  void Load(ModuleContext* /*context*/)
+  void Start(BundleContext* /*context*/)
   { /* register stuff */ }
 
 
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   { /* cleanup */ }
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(MyActivator)
+US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 //![0]
 
 int main(int /*argc*/, char* /*argv*/[])

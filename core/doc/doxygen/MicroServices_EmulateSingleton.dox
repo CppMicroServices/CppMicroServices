@@ -53,7 +53,7 @@ are discussed in detail below.
 
  - In the implementation above, the class SingletonOneService provides the implementation as well as the interface.
  - Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance()
-   method to the module activator.
+   method to the bundle activator.
 
 Let's have a look at the modified GetInstance() and ~SingletonOneService() methods.
 
@@ -64,22 +64,22 @@ of a reference as in the classic singleton. This is necessary since we can no lo
 always exists. Clients of the GetInstance() method must check for null pointers and react appropriately.
 
 \warning Newly created "singletons" should not expose a GetInstance() method. They should be handled as proper
-services and hence should be retrieved by clients using the ModuleContext or ServiceTracker API. The
+services and hence should be retrieved by clients using the BundleContext or ServiceTracker API. The
 GetInstance() method is for migration purposes only.
 
 \snippet uServices-singleton/SingletonOne.cpp ss1d
 
 The SingletonTwoService::GetInstance() method is implemented exactly as in SingletonOneService. Because we know
-that the module activator guarantees that a SingletonTwoService instance will always be available during the
+that the bundle activator guarantees that a SingletonTwoService instance will always be available during the
 life-time of a SingletonOneService instance (see below), we can assert a non-null pointer. Otherwise, we would
 have to handle the null-pointer case.
 
 The order of construction/registration and destruction/unregistration of our singletons (or any other services) is
-defined in the Load() and Unload() methods of the module activator.
+defined in the Start() and Stop() methods of the bundle activator.
 
 \snippet uServices-singleton/main.cpp 0
 
-The Unload() method is defined as:
+The Stop() method is defined as:
 
 \snippet uServices-singleton/main.cpp 1
 

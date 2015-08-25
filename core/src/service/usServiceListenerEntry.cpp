@@ -32,7 +32,7 @@ class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
 {
 public:
 
-  ServiceListenerEntryData(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& l,
+  ServiceListenerEntryData(BundleContext* mc, const ServiceListenerEntry::ServiceListener& l,
                            void* data, const std::string& filter)
     : ServiceListenerHook::ListenerInfoData(mc, l, data, filter)
     , ldap()
@@ -106,7 +106,7 @@ void ServiceListenerEntry::SetRemoved(bool removed) const
   d->bRemoved = removed;
 }
 
-ServiceListenerEntry::ServiceListenerEntry(ModuleContext* mc, const ServiceListener& l,
+ServiceListenerEntry::ServiceListenerEntry(BundleContext* mc, const ServiceListener& l,
                                            void* data, const std::string& filter)
   : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(mc, l, data, filter))
 {
@@ -140,7 +140,7 @@ std::size_t ServiceListenerEntry::Hash() const
   if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0)
   {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
-        ((US_HASH_FUNCTION(ModuleContext*, d->mc) ^ (US_HASH_FUNCTION(void*, d->data) << 1)) >> 1) ^
+        ((US_HASH_FUNCTION(BundleContext*, d->mc) ^ (US_HASH_FUNCTION(void*, d->data) << 1)) >> 1) ^
         (US_HASH_FUNCTION(US_SERVICE_LISTENER_FUNCTOR, d->listener) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;

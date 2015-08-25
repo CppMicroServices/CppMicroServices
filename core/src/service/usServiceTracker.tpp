@@ -24,7 +24,7 @@
 #include "usServiceTrackerPrivate.h"
 #include "usTrackedService_p.h"
 #include "usServiceException.h"
-#include "usModuleContext.h"
+#include "usBundleContext.h"
 
 #include <string>
 #include <stdexcept>
@@ -45,7 +45,7 @@ ServiceTracker<S,TTT>::~ServiceTracker()
 #endif
 
 template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(ModuleContext* context,
+ServiceTracker<S,TTT>::ServiceTracker(BundleContext* context,
                                       const ServiceReferenceType& reference,
                                       _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, reference, customizer))
@@ -53,21 +53,21 @@ ServiceTracker<S,TTT>::ServiceTracker(ModuleContext* context,
 }
 
 template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(ModuleContext* context, const std::string& clazz,
+ServiceTracker<S,TTT>::ServiceTracker(BundleContext* context, const std::string& clazz,
                                       _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, clazz, customizer))
 {
 }
 
 template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(ModuleContext* context, const LDAPFilter& filter,
+ServiceTracker<S,TTT>::ServiceTracker(BundleContext* context, const LDAPFilter& filter,
                                       _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
 {
 }
 
 template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(ModuleContext *context, _ServiceTrackerCustomizer* customizer)
+ServiceTracker<S,TTT>::ServiceTracker(BundleContext *context, _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
 {
   std::string clazz = us_service_interface_iid<S>();
@@ -103,7 +103,7 @@ void ServiceTracker<S,TTT>::Open()
         }
         else
         {
-          if (d->trackReference.GetModule() != 0)
+          if (d->trackReference.GetBundle() != 0)
           {
             references.push_back(d->trackReference);
           }
@@ -167,7 +167,7 @@ void ServiceTracker<S,TTT>::Close()
   if (d->DEBUG_OUTPUT)
   {
     US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
-    if ((d->cachedReference.GetModule() == 0) && !TTT::IsValid(d->cachedService))
+    if ((d->cachedReference.GetBundle() == 0) && !TTT::IsValid(d->cachedService))
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                        << d->filter;
@@ -228,7 +228,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
     US_UNUSED(typename _ServiceTrackerPrivate::Lock(d));
     reference = d->cachedReference;
   }
-  if (reference.GetModule() != 0)
+  if (reference.GetBundle() != 0)
   {
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
                          << d->filter;
@@ -361,7 +361,7 @@ ServiceTracker<S,TTT>::GetService() const
   try
   {
     ServiceReferenceType reference = GetServiceReference();
-    if (reference.GetModule() == 0)
+    if (reference.GetBundle() == 0)
     {
       return TTT::DefaultValue();
     }

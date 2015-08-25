@@ -22,12 +22,12 @@
 
 #include "usFramework.h"
 
-#include "usCoreModuleContext_p.h"
+#include "usCoreBundleContext_p.h"
 #include "usFrameworkPrivate_p.h"
-#include "usModuleInfo.h"
-#include "usModuleInitialization.h"
-#include "usModuleSettings.h"
-#include "usModuleUtils_p.h"
+#include "usBundleInfo.h"
+#include "usBundleInitialization.h"
+#include "usBundleSettings.h"
+#include "usBundleUtils_p.h"
 #include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
@@ -56,16 +56,16 @@ void Framework::init(void)
     return;
   }
 
-  ModuleInfo* moduleInfo = new ModuleInfo(US_CORE_FRAMEWORK_NAME);
+  BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
 
   void(Framework::*initFncPtr)(void) = &Framework::init;
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
-  moduleInfo->location = ModuleUtils::GetLibraryPath(frameworkInit);
+  bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
 
-  f->coreModuleContext->bundleRegistry.RegisterSystemBundle(this, moduleInfo);
+  f->coreBundleContext->bundleRegistry.RegisterSystemBundle(this, bundleInfo);
 
-  Module::Start();
+  Bundle::Start();
   f->initialized = true;
 }
 
@@ -79,9 +79,9 @@ void Framework::Start()
 
 void Framework::Stop() 
 { 
-  std::vector<Module*> modules(GetModuleContext()->GetModules());
-  for (std::vector<Module*>::const_iterator iter = modules.begin(); 
-      iter != modules.end(); 
+  std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
+  for (std::vector<Bundle*>::const_iterator iter = bundles.begin(); 
+      iter != bundles.end(); 
       ++iter)
   {
     if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
@@ -90,7 +90,7 @@ void Framework::Stop()
     }
   }
 
-  Module::Stop();
+  Bundle::Stop();
 
   MutexLock lock(*f->initLock);
   f->initialized = false;
@@ -110,7 +110,7 @@ std::string Framework::GetLocation() const
 
 void Framework::SetAutoLoadingEnabled(bool enable)
 {
-  f->coreModuleContext->settings.SetAutoLoadingEnabled(enable);
+  f->coreBundleContext->settings.SetAutoLoadingEnabled(enable);
 }
 
 US_END_NAMESPACE

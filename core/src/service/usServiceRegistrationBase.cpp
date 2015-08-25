@@ -26,8 +26,8 @@
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
 
-#include "usModulePrivate.h"
-#include "usCoreModuleContext_p.h"
+#include "usBundlePrivate.h"
+#include "usCoreBundleContext_p.h"
 
 #include <stdexcept>
 
@@ -51,9 +51,9 @@ ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate*
   if (d) d->ref.Ref();
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(ModulePrivate* module, const InterfaceMap& service,
+ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
                                                  const ServicePropertiesImpl& props)
-  : d(new ServiceRegistrationBasePrivate(module, service, props))
+  : d(new ServiceRegistrationBasePrivate(bundle, service, props))
 {
 
 }
@@ -102,7 +102,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
   ServiceListeners::ServiceListenerEntries before;
   // TBD, optimize the locking of services
   {
-    //MutexLock lock2(d->module->coreCtx->globalFwLock);
+    //MutexLock lock2(d->bundle->coreCtx->globalFwLock);
 
     if (d->available)
     {
@@ -119,7 +119,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
           if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
         }
 
-        d->module->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before, false);
+        d->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before, false);
         classes = ref_any_cast<std::vector<std::string> >(d->properties.Value(ServiceConstants::OBJECTCLASS()));
         long int sid = any_cast<long int>(d->properties.Value(ServiceConstants::SERVICE_ID()));
         d->properties = ServiceRegistry::CreateServiceProperties(props, classes, false, false, sid);
@@ -132,7 +132,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
       if (old_rank != new_rank)
       {
-        d->module->coreCtx->services.UpdateServiceRegistrationOrder(*this, classes);
+        d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(*this, classes);
       }
     }
     else
@@ -142,12 +142,12 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
   }
   ServiceEvent modifiedEvent(ServiceEvent::MODIFIED, d->reference);
   ServiceListeners::ServiceListenerEntries matchingListeners;
-  d->module->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
-  d->module->coreCtx->listeners.ServiceChanged(matchingListeners,
+  d->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
+  d->bundle->coreCtx->listeners.ServiceChanged(matchingListeners,
                                                modifiedEvent,
                                                before);
 
-  d->module->coreCtx->listeners.ServiceChanged(before,
+  d->bundle->coreCtx->listeners.ServiceChanged(before,
                                                modifiedEndMatchEvent);
 }
 
@@ -163,9 +163,9 @@ void ServiceRegistrationBase::Unregister()
 
     if (d->available)
     {
-      if (d->module)
+      if (d->bundle)
       {
-        d->module->coreCtx->services.RemoveServiceRegistration(*this);
+        d->bundle->coreCtx->services.RemoveServiceRegistration(*this);
       }
     }
     else
@@ -174,12 +174,12 @@ void ServiceRegistrationBase::Unregister()
     }
   }
 
-  if (d->module)
+  if (d->bundle)
   {
     ServiceListeners::ServiceListenerEntries listeners;
     ServiceEvent unregisteringEvent(ServiceEvent::UNREGISTERING, d->reference);
-    d->module->coreCtx->listeners.GetMatchingServiceListeners(unregisteringEvent, listeners);
-    d->module->coreCtx->listeners.ServiceChanged(
+    d->bundle->coreCtx->listeners.GetMatchingServiceListeners(unregisteringEvent, listeners);
+    d->bundle->coreCtx->listeners.ServiceChanged(
           listeners,
           unregisteringEvent);
   }
@@ -190,13 +190,13 @@ void ServiceRegistrationBase::Unregister()
       MutexLock lock2(d->propsLock);
       d->available = false;
       InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
-      if (d->module && factoryIter != d->service.end())
+      if (d->bundle && factoryIter != d->service.end())
       {
         ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
-        ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator end = d->prototypeServiceInstances.end();
+        ServiceRegistrationBasePrivate::BundleToServicesMap::const_iterator end = d->prototypeServiceInstances.end();
 
         // unget all prototype services
-        for (ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator i = d->prototypeServiceInstances.begin();
+        for (ServiceRegistrationBasePrivate::BundleToServicesMap::const_iterator i = d->prototypeServiceInstances.begin();
              i != end; ++i)
         {
           for (std::list<InterfaceMap>::const_iterator listIter = i->second.begin();
@@ -215,10 +215,10 @@ void ServiceRegistrationBase::Unregister()
           }
         }
 
-        // unget module scope services
-        ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator moduleEnd = d->moduleServiceInstance.end();
-        for (ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator i = d->moduleServiceInstance.begin();
-             i != moduleEnd; ++i)
+        // unget bundle scope services
+        ServiceRegistrationBasePrivate::BundleToServiceMap::const_iterator bundleEnd = d->bundleServiceInstance.end();
+        for (ServiceRegistrationBasePrivate::BundleToServiceMap::const_iterator i = d->bundleServiceInstance.begin();
+             i != bundleEnd; ++i)
         {
           try
           {
@@ -231,11 +231,11 @@ void ServiceRegistrationBase::Unregister()
           }
         }
       }
-      d->module = 0;
+      d->bundle = 0;
       d->dependents.clear();
       d->service.clear();
       d->prototypeServiceInstances.clear();
-      d->moduleServiceInstance.clear();
+      d->bundleServiceInstance.clear();
       // increment the reference count, since "d->reference" was used originally
       // to keep d alive.
       d->ref.Ref();

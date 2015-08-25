@@ -88,7 +88,7 @@ public:
     }
 
     /**
-    * Set the logging level for log messages from CppMicroServices modules.
+    * Set the logging level for log messages from CppMicroServices bundles.
     *
     * Higher logging levels will discard messages with lower priority.
     * E.g. a logging level of WarningMsg will discard all messages of

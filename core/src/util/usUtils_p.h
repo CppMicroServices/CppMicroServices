@@ -42,15 +42,15 @@ std::string GetBundleLocation(const std::string& location);
 US_END_NAMESPACE
 
 //-------------------------------------------------------------------
-// Module auto-loading
+// Bundle auto-loading
 //-------------------------------------------------------------------
 
 US_BEGIN_NAMESPACE
 
-struct ModuleInfo;
-class CoreModuleContext;
+struct BundleInfo;
+class CoreBundleContext;
 
-std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModuleContext* coreCtx);
+std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
 
 US_END_NAMESPACE
 

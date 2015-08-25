@@ -1,0 +1,4 @@
+{
+  "bundle.name" : "TestBundleAL2",
+  "bundle.autoload_dir" : "autoload_al2"
+}

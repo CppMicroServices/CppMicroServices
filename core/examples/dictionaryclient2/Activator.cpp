@@ -23,26 +23,26 @@
 //! [Activator]
 #include "IDictionaryService.h"
 
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 
 US_USE_NAMESPACE
 
 namespace {
 
 /**
- * This class implements a module activator that uses a dictionary service to check for
+ * This class implements a bundle activator that uses a dictionary service to check for
  * the proper spelling of a word by checking for its existence in the
- * dictionary. This module is more complex than the module in Example 3 because
+ * dictionary. This bundle is more complex than the bundle in Example 3 because
  * it monitors the dynamic availability of the dictionary services. In other
  * words, if the service it is using departs, then it stops using it gracefully,
  * or if it needs a service and one arrives, then it starts using it
- * automatically. As before, the module uses the first service that it finds and
- * uses the calling thread of the Load() method to read words from standard
+ * automatically. As before, the bundle uses the first service that it finds and
+ * uses the calling thread of the Start() method to read words from standard
  * input. You can stop checking words by entering an empty line, but to start
- * checking words again you must unload and then load the module again.
+ * checking words again you must stop and then start the bundle again.
  */
-class US_ABI_LOCAL Activator : public ModuleActivator
+class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
@@ -53,7 +53,7 @@ public:
   {}
 
   /**
-   * Implements ModuleActivator::Load(). Adds itself as a listener for service
+   * Implements BundleActivator::Start(). Adds itself as a listener for service
    * events, then queries for available dictionary services. If any
    * dictionaries are found it gets a reference to the first one available and
    * then starts its "word checking loop". If no dictionaries are found, then
@@ -68,9 +68,9 @@ public:
    *       lengthy process like this; this is only done for the purpose of
    *       the tutorial.
    *
-   * @param context the module context for this module.
+   * @param context the bundle context for this bundle.
    */
-  void Load(ModuleContext *context)
+  void Start(BundleContext *context)
   {
     m_context = context;
 
@@ -136,11 +136,11 @@ public:
   }
 
   /**
-   * Implements ModuleActivator::Unload(). Does nothing since
+   * Implements BundleActivator::Stop(). Does nothing since
    * the C++ Micro Services library will automatically unget any used services.
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   {
     // NOTE: The service is automatically released.
   }
@@ -154,7 +154,7 @@ public:
   void ServiceChanged(const ServiceEvent event)
   {
     // Use your favorite thread library to synchronize this
-    // method with the Load() method.
+    // method with the Start() method.
     // MutexLocker lock(&m_mutex);
 
     // If a dictionary service was registered, see if we
@@ -203,8 +203,8 @@ public:
 
 private:
 
-  // Module context
-  ModuleContext* m_context;
+  // Bundle context
+  BundleContext* m_context;
 
   // The service reference being used
   ServiceReference<IDictionaryService> m_ref;
@@ -215,5 +215,5 @@ private:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Activator)
+US_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //![Activator]

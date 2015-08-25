@@ -28,10 +28,10 @@
 #include "usServiceRegistry_p.h"
 #include "usServiceRegistrationBasePrivate.h"
 
-#include "usModule.h"
-#include "usModulePrivate.h"
+#include "usBundle.h"
+#include "usBundlePrivate.h"
 
-#include <usCoreModuleContext_p.h>
+#include <usCoreBundleContext_p.h>
 
 #include <cassert>
 
@@ -53,15 +53,15 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
     delete registration;
 }
 
-InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
+InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
                                                                 ServiceFactory* factory,
-                                                                bool isModuleScope)
+                                                                bool isBundleScope)
 {
   assert(factory && "Factory service pointer is NULL");
   InterfaceMap s;
   try
   {
-    InterfaceMap smap = factory->GetService(module,
+    InterfaceMap smap = factory->GetService(bundle,
                                             ServiceRegistrationBase(registration));
     if (smap.empty())
     {
@@ -83,13 +83,13 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
     }
     s = smap;
 
-    if (isModuleScope)
+    if (isBundleScope)
     {
-      registration->moduleServiceInstance.insert(std::make_pair(module, smap));
+      registration->bundleServiceInstance.insert(std::make_pair(bundle, smap));
     }
     else
     {
-      registration->prototypeServiceInstances[module].push_back(smap);
+      registration->prototypeServiceInstances[bundle].push_back(smap);
     }
   }
   catch (...)
@@ -100,7 +100,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
   return s;
 }
 
-InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
+InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bundle)
 {
   InterfaceMap s;
   {
@@ -109,13 +109,13 @@ InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
     {
       ServiceFactory* factory = reinterpret_cast<ServiceFactory*>(
             registration->GetService("org.cppmicroservices.factory"));
-      s = GetServiceFromFactory(module, factory, false);
+      s = GetServiceFromFactory(bundle, factory, false);
     }
   }
   return s;
 }
 
-void* ServiceReferenceBasePrivate::GetService(Module* module)
+void* ServiceReferenceBasePrivate::GetService(Bundle* bundle)
 {
   void* s = NULL;
   {
@@ -125,12 +125,12 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
       ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
             registration->GetService("org.cppmicroservices.factory"));
 
-      const int count = registration->dependents[module];
+      const int count = registration->dependents[bundle];
       if (count == 0)
       {
         if (serviceFactory)
         {
-          const InterfaceMap im = GetServiceFromFactory(module, serviceFactory, true);
+          const InterfaceMap im = GetServiceFromFactory(bundle, serviceFactory, true);
           s = im.find(interfaceId)->second;
         }
         else
@@ -143,7 +143,7 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
         if (serviceFactory)
         {
           // return the already produced instance
-          s = registration->moduleServiceInstance[module][interfaceId];
+          s = registration->bundleServiceInstance[bundle][interfaceId];
         }
         else
         {
@@ -153,14 +153,14 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
 
       if (s)
       {
-        registration->dependents[module] = count + 1;
+        registration->dependents[bundle] = count + 1;
       }
     }
   }
   return s;
 }
 
-InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
+InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
 {
   InterfaceMap s;
   {
@@ -170,12 +170,12 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
       ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
             registration->GetService("org.cppmicroservices.factory"));
 
-      const int count = registration->dependents[module];
+      const int count = registration->dependents[bundle];
       if (count == 0)
       {
         if (serviceFactory)
         {
-          s = GetServiceFromFactory(module, serviceFactory, true);
+          s = GetServiceFromFactory(bundle, serviceFactory, true);
         }
         else
         {
@@ -187,7 +187,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
         if (serviceFactory)
         {
           // return the already produced instance
-          s = registration->moduleServiceInstance[module];
+          s = registration->bundleServiceInstance[bundle];
         }
         else
         {
@@ -197,19 +197,19 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
 
       if (!s.empty())
       {
-        registration->dependents[module] = count + 1;
+        registration->dependents[bundle] = count + 1;
       }
     }
   }
   return s;
 }
 
-bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const InterfaceMap& service)
+bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const InterfaceMap& service)
 {
   MutexLock lock(registration->propsLock);
 
-  ServiceRegistrationBasePrivate::ModuleToServicesMap::iterator iter =
-      registration->prototypeServiceInstances.find(module);
+  ServiceRegistrationBasePrivate::BundleToServicesMap::iterator iter =
+      registration->prototypeServiceInstances.find(bundle);
   if (iter == registration->prototypeServiceInstances.end())
   {
     return false;
@@ -226,7 +226,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const In
       {
         ServiceFactory* sf = reinterpret_cast<ServiceFactory*>(
                                registration->GetService("org.cppmicroservices.factory"));
-        sf->UngetService(module, ServiceRegistrationBase(registration), service);
+        sf->UngetService(bundle, ServiceRegistrationBase(registration), service);
       }
       catch (const std::exception& /*e*/)
       {
@@ -244,13 +244,13 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const In
   return false;
 }
 
-bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCounter)
+bool ServiceReferenceBasePrivate::UngetService(Bundle* bundle, bool checkRefCounter)
 {
   MutexLock lock(registration->propsLock);
   bool hadReferences = false;
   bool removeService = false;
 
-  int count= registration->dependents[module];
+  int count= registration->dependents[bundle];
   if (count > 0)
   {
     hadReferences = true;
@@ -260,7 +260,7 @@ bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCoun
   {
     if (count > 1)
     {
-      registration->dependents[module] = count - 1;
+      registration->dependents[bundle] = count - 1;
     }
     else if(count == 1)
     {
@@ -274,22 +274,22 @@ bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCoun
 
   if (removeService)
   {
-    InterfaceMap sfi = registration->moduleServiceInstance[module];
-    registration->moduleServiceInstance.erase(module);
+    InterfaceMap sfi = registration->bundleServiceInstance[bundle];
+    registration->bundleServiceInstance.erase(bundle);
     if (!sfi.empty())
     {
       try
       {
         ServiceFactory* sf = reinterpret_cast<ServiceFactory*>(
                                registration->GetService("org.cppmicroservices.factory"));
-        sf->UngetService(module, ServiceRegistrationBase(registration), sfi);
+        sf->UngetService(bundle, ServiceRegistrationBase(registration), sfi);
       }
       catch (const std::exception& /*e*/)
       {
         US_WARN << "ServiceFactory threw an exception";
       }
     }
-    registration->dependents.erase(module);
+    registration->dependents.erase(bundle);
   }
 
   return hadReferences && removeService;

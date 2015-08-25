@@ -31,7 +31,7 @@
 
 US_BEGIN_NAMESPACE
 
-class ModuleContext;
+class BundleContext;
 class ServiceListenerEntry;
 
 /**
@@ -40,7 +40,7 @@ class ServiceListenerEntry;
  * Service Listener Hook Service.
  *
  * <p>
- * Modules registering this service will be called during service listener
+ * Bundles registering this service will be called during service listener
  * addition and removal.
  *
  * @remarks Implementations of this interface are required to be thread-safe.
@@ -51,7 +51,7 @@ struct US_Core_EXPORT ServiceListenerHook
   class ListenerInfoData;
 
   /**
-   * Information about a Service Listener. This class describes the module
+   * Information about a Service Listener. This class describes the bundle
    * which added the Service Listener and the filter with which it was added.
    *
    * @remark This class is not intended to be implemented by clients.
@@ -76,11 +76,11 @@ struct US_Core_EXPORT ServiceListenerHook
     bool IsNull() const;
 
     /**
-     * Return the context of the module which added the listener.
+     * Return the context of the bundle which added the listener.
      *
-     * @return The context of the module which added the listener.
+     * @return The context of the bundle which added the listener.
      */
-    ModuleContext* GetModuleContext() const;
+    BundleContext* GetBundleContext() const;
 
     /**
      * Return the filter string with which the listener was added.

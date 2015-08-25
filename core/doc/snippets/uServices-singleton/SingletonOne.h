@@ -45,7 +45,7 @@ public:
 
 private:
 
-  // Only our module activator class should be able to instantiate
+  // Only our bundle activator class should be able to instantiate
   // a SingletonOneService object.
   friend class MyActivator;
 

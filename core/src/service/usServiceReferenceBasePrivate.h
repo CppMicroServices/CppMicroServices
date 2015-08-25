@@ -33,7 +33,7 @@
 US_BEGIN_NAMESPACE
 
 class Any;
-class Module;
+class Bundle;
 class ServicePropertiesImpl;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
@@ -53,43 +53,43 @@ public:
   /**
     * Get the service object.
     *
-    * @param module requester of service.
+    * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  void* GetService(Module* module);
+  void* GetService(Bundle* bundle);
 
-  InterfaceMap GetServiceInterfaceMap(Module* module);
+  InterfaceMap GetServiceInterfaceMap(Bundle* bundle);
 
   /**
     * Get new service instance.
     *
-    * @param module requester of service.
+    * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  InterfaceMap GetPrototypeService(Module* module);
+  InterfaceMap GetPrototypeService(Bundle* bundle);
 
   /**
    * Unget the service object.
    *
-   * @param module Module who wants remove service.
+   * @param bundle Bundle who wants remove service.
    * @param checkRefCounter If true decrement refence counter and remove service
    *                        if we reach zero. If false remove service without
    *                        checking refence counter.
    * @return True if service was removed or false if only reference counter was
    *         decremented.
    */
-  bool UngetService(Module* module, bool checkRefCounter);
+  bool UngetService(Bundle* bundle, bool checkRefCounter);
 
   /**
    * Unget prototype scope service objects.
    *
-   * @param module Module who wants to remove a prototype scope service.
+   * @param bundle Bundle who wants to remove a prototype scope service.
    * @param service The prototype scope service pointer.
    * @return \c true if the service was removed, \c false otherwise.
    */
-  bool UngetPrototypeService(Module* module, void* service);
+  bool UngetPrototypeService(Bundle* bundle, void* service);
 
-  bool UngetPrototypeService(Module* module, const InterfaceMap& service);
+  bool UngetPrototypeService(Bundle* bundle, const InterfaceMap& service);
 
   /**
    * Get all properties registered with this service.
@@ -140,8 +140,8 @@ public:
 
 private:
 
-  InterfaceMap GetServiceFromFactory(Module* module, ServiceFactory* factory,
-                                     bool isModuleScope);
+  InterfaceMap GetServiceFromFactory(Bundle* bundle, ServiceFactory* factory,
+                                     bool isBundleScope);
 
   // purposely not implemented
   ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&);

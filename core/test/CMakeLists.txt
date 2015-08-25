@@ -19,13 +19,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/usTestingConfig.h.in" "${PROJECT_BIN
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 #-----------------------------------------------------------------------------
-# Create test modules
+# Create test bundles
 #-----------------------------------------------------------------------------
 
-include(usFunctionCreateTestModule)
+include(usFunctionCreateTestBundle)
 
-set(_us_test_module_libs "" CACHE INTERNAL "" FORCE)
-add_subdirectory(modules)
+set(_us_test_bundle_libs "" CACHE INTERNAL "" FORCE)
+add_subdirectory(bundles)
 
 #-----------------------------------------------------------------------------
 # Add unit tests
@@ -38,18 +38,18 @@ set(_tests
   usFrameworkFactoryTest
   usLDAPFilterTest
   usLogTest
-  usModuleHooksTest
-  usModuleManifestTest
-  usModuleTest
-  usModuleResourceTest
+  usBundleHooksTest
+  usBundleManifestTest
+  usBundleTest
+  usBundleResourceTest
   usServiceFactoryTest
   usServiceHooksTest
   usServiceRegistryPerformanceTest
   usServiceRegistryTest
   usServiceTemplateTest
   usServiceTrackerTest
-  usStaticModuleResourceTest
-  usStaticModuleTest
+  usStaticBundleResourceTest
+  usStaticBundleTest
 )
 
 if(US_BUILD_SHARED_LIBS)
@@ -58,14 +58,14 @@ if(US_BUILD_SHARED_LIBS)
        usSharedLibraryTest
       )
   if(US_ENABLE_AUTOLOADING_SUPPORT)
-    list(APPEND _tests usModuleAutoLoadTest)
+    list(APPEND _tests usBundleAutoLoadTest)
   endif()
 endif()
 
 set(_additional_srcs
   usTestDriverActivator.cpp
   usTestManager.cpp
-  usTestUtilModuleListener.cpp
+  usTestUtilBundleListener.cpp
   usTestUtils.cpp
 )
 
@@ -73,16 +73,16 @@ set(_test_driver us${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
-# Generate a custom "module init" file for the test driver executable
-usFunctionGenerateModuleInit(_srcs)
+# Generate a custom "bundle init" file for the test driver executable
+usFunctionGenerateBundleInit(_srcs)
 
 usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
-set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
-set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
+set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
+set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)
-  set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
-  target_link_libraries(${_test_driver} ${_us_test_module_libs})
+  set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_BUNDLE)
+  target_link_libraries(${_test_driver} ${_us_test_bundle_libs})
 endif()
 
 target_link_libraries(${_test_driver} ${Core_TARGET})
@@ -94,7 +94,7 @@ endif()
 # Add resources
 usFunctionEmbedResources(TARGET ${_test_driver}
                          FILES usTestResource.txt manifest.json
-                         ZIP_ARCHIVES ${Core_TARGET} ${_us_test_module_libs})
+                         ZIP_ARCHIVES ${Core_TARGET} ${_us_test_bundle_libs})
 
 # Register tests
 foreach(_test ${_tests})
@@ -110,7 +110,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(US_BUILD_SHARED_LIBS)
-  foreach(_test_module ${_us_test_module_libs})
-    add_dependencies(${_test_driver} ${_test_module})
+  foreach(_test_bundle ${_us_test_bundle_libs})
+    add_dependencies(${_test_driver} ${_test_bundle})
   endforeach()
 endif()

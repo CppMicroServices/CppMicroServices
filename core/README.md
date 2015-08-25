@@ -8,7 +8,7 @@ C++ Micro Services
 Introduction
 ------------
 
-The C++ Micro Services library provides a dynamic service registry and module system,
+The C++ Micro Services library provides a dynamic service registry and bundle system,
 partially based the OSGi Core Release 5 specifications. It enables developers to create
 a service oriented and dynamic software stack.
 
@@ -48,19 +48,19 @@ Quick Start
 -----------
 
 Essentially, the C++ Micro Services library provides you with a powerful dynamic service registry.
-Each shared or static library has an associated `ModuleContext` object, through which the service
+Each shared or static library has an associated `BundleContext` object, through which the service
 registry is accessed.
 
 To query the registry for a service object implementing one or more specific interfaces, the code
 would look like this:
 
 ```cpp
-#include <usModuleContext.h>
+#include <usBundleContext.h>
 #include <someInterface.h>
 
 using namespace us;
 
-void UseService(ModuleContext* context)
+void UseService(BundleContext* context)
 {
   ServiceReference serviceRef = context->GetServiceReference<SomeInterface>();
   if (serviceRef)
@@ -74,12 +74,12 @@ void UseService(ModuleContext* context)
 Registering a service object against a certain interface looks like this:
 
 ```cpp
-#include <usModuleContext.h>
+#include <usBundleContext.h>
 #include <someInterface.h>
 
 using namespace us;
 
-void RegisterSomeService(ModuleContext* context, SomeInterface* service)
+void RegisterSomeService(BundleContext* context, SomeInterface* service)
 {
   context->RegisterService<SomeInterface>(service);
 }

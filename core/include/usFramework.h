@@ -24,7 +24,7 @@
 #define USFRAMEWORK_H
 
 #include <usCoreConfig.h>
-#include "usModule.h"
+#include "usBundle.h"
 
 #include <map>
 #include <string>
@@ -57,7 +57,7 @@ class FrameworkPrivate;
  *
  * @see FrameworkFactory::newFramework(std::map<std::string, std::string> configuration) 
  */
-class US_Core_EXPORT Framework : public Module
+class US_Core_EXPORT Framework : public Bundle
 {
 public:
     virtual ~Framework(void);

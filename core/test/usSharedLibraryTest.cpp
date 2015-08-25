@@ -46,15 +46,15 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
 
 #endif
 
-  const std::string libAFilePath = LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + "TestModuleA" + LIB_SUFFIX;
+  const std::string libAFilePath = LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + "TestBundleA" + LIB_SUFFIX;
   SharedLibrary lib1(libAFilePath);
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "Absolute file path")
   US_TEST_CONDITION(lib1.GetLibraryPath() == LIB_PATH, "Library path")
-  US_TEST_CONDITION(lib1.GetName() == "TestModuleA", "Name")
+  US_TEST_CONDITION(lib1.GetName() == "TestBundleA", "Name")
   US_TEST_CONDITION(lib1.GetPrefix() == LIB_PREFIX, "Prefix")
   US_TEST_CONDITION(lib1.GetSuffix() == LIB_SUFFIX, "Suffix")
   lib1.SetName("bla");
-  US_TEST_CONDITION(lib1.GetName() == "TestModuleA", "Name after SetName()")
+  US_TEST_CONDITION(lib1.GetName() == "TestBundleA", "Name after SetName()")
   lib1.SetLibraryPath("bla");
   US_TEST_CONDITION(lib1.GetLibraryPath() == LIB_PATH, "Library path after SetLibraryPath()")
   lib1.SetPrefix("bla");
@@ -85,11 +85,11 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
   lib1.Unload();
 
 
-  SharedLibrary lib2(LIB_PATH, "TestModuleA");
+  SharedLibrary lib2(LIB_PATH, "TestBundleA");
   US_TEST_CONDITION(lib2.GetFilePath() == libAFilePath, "File path")
   lib2.SetPrefix("");
   US_TEST_CONDITION(lib2.GetPrefix().empty(), "Lib prefix")
-  US_TEST_CONDITION(lib2.GetFilePath() == LIB_PATH + PATH_SEPARATOR + "TestModuleA" + LIB_SUFFIX, "File path")
+  US_TEST_CONDITION(lib2.GetFilePath() == LIB_PATH + PATH_SEPARATOR + "TestBundleA" + LIB_SUFFIX, "File path")
 
   SharedLibrary lib3 = lib2;
   US_TEST_CONDITION(lib3.GetFilePath() == lib2.GetFilePath(), "Compare file path")

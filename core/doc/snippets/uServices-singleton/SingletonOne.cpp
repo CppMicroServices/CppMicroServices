@@ -5,8 +5,8 @@
 #include <iostream>
 #include <cassert>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
 
 US_USE_NAMESPACE
 
@@ -33,7 +33,7 @@ SingletonOne::~SingletonOne()
 SingletonOneService* SingletonOneService::GetInstance()
 {
   static ServiceReference<SingletonOneService> serviceRef;
-  static ModuleContext* context = GetModuleContext();
+  static BundleContext* context = GetBundleContext();
 
   if (!serviceRef)
   {
@@ -72,7 +72,7 @@ SingletonOneService::~SingletonOneService()
 {
   SingletonTwoService* singletonTwoService = SingletonTwoService::GetInstance();
 
-  // The module activator must ensure that a SingletonTwoService instance is
+  // The bundle activator must ensure that a SingletonTwoService instance is
   // available during destruction of a SingletonOneService instance.
   assert(singletonTwoService != 0);
   std::cout << "SingletonTwoService::b = " << singletonTwoService->b << std::endl;

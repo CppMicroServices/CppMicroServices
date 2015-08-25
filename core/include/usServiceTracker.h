@@ -34,7 +34,7 @@ US_BEGIN_NAMESPACE
 
 template<class S, class T> class TrackedService;
 template<class S, class T> class ServiceTrackerPrivate;
-class ModuleContext;
+class BundleContext;
 
 /**
  * \ingroup MicroServices
@@ -146,7 +146,7 @@ struct TrackedTypeTraits<S,S*>
 /*
  * This specialization is "special" because the tracked type is not
  * void* (as specified in the second template parameter) but InterfaceMap.
- * This is in line with the ModuleContext::GetService(...) overloads to
+ * This is in line with the BundleContext::GetService(...) overloads to
  * return either S* or InterfaceMap dependening on the template parameter.
  */
 template<>
@@ -252,7 +252,7 @@ public:
    * The service referenced by the specified <code>ServiceReference</code>
    * will be tracked by this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * @param context The <code>BundleContext</code> against which the tracking
    *        is done.
    * @param reference The <code>ServiceReference</code> for the service to be
    *        tracked.
@@ -264,7 +264,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context,
+  ServiceTracker(BundleContext* context,
                  const ServiceReferenceType& reference,
                  ServiceTrackerCustomizer<S,T>* customizer = 0);
 
@@ -275,7 +275,7 @@ public:
    * Services registered under the specified class name will be tracked by
    * this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * @param context The <code>BundleContext</code> against which the tracking
    *        is done.
    * @param clazz The class name of the services to be tracked.
    * @param customizer The customizer object to call when services are added,
@@ -286,7 +286,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, const std::string& clazz,
+  ServiceTracker(BundleContext* context, const std::string& clazz,
                  ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
@@ -297,7 +297,7 @@ public:
    * Services which match the specified <code>LDAPFilter</code> object will be
    * tracked by this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * @param context The <code>BundleContext</code> against which the tracking
    *        is done.
    * @param filter The <code>LDAPFilter</code> to select the services to be
    *        tracked.
@@ -308,7 +308,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, const LDAPFilter& filter,
+  ServiceTracker(BundleContext* context, const LDAPFilter& filter,
                  ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
@@ -319,7 +319,7 @@ public:
    * Services registered under the interface name of the class template
    * argument S will be tracked by this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * @param context The <code>BundleContext</code> against which the tracking
    *        is done.
    * @param customizer The customizer object to call when services are added,
    *        modified, or removed in this <code>ServiceTracker</code>. If
@@ -328,7 +328,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = 0);
+  ServiceTracker(BundleContext* context, ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -338,7 +338,7 @@ public:
    * <code>ServiceTracker</code> was created are now tracked by this
    * <code>ServiceTracker</code>.
    *
-   * @throws std::logic_error If the <code>ModuleContext</code>
+   * @throws std::logic_error If the <code>BundleContext</code>
    *         with which this <code>ServiceTracker</code> was created is no
    *         longer valid.
    */
@@ -364,8 +364,8 @@ public:
    *
    * <p>
    * It is strongly recommended that <code>WaitForService</code> is not used
-   * during the calling of the <code>ModuleActivator</code> methods.
-   * <code>ModuleActivator</code> methods are expected to complete in a short
+   * during the calling of the <code>BundleActivator</code> methods.
+   * <code>BundleActivator</code> methods are expected to complete in a short
    * period of time.
    *
    * <p>
@@ -394,7 +394,7 @@ public:
    * returned. If there is a tie in ranking, the service with the lowest
    * service ID (as specified in its <code>service.id</code> property); that
    * is, the service that was registered first is returned. This is the same
-   * algorithm used by <code>ModuleContext::GetServiceReference()</code>.
+   * algorithm used by <code>BundleContext::GetServiceReference()</code>.
    *
    * <p>
    * This implementation calls GetServiceReferences() to get the list
@@ -520,7 +520,7 @@ protected:
    *
    * <p>
    * This implementation returns the result of calling <code>GetService</code>
-   * on the <code>ModuleContext</code> with which this
+   * on the <code>BundleContext</code> with which this
    * <code>ServiceTracker</code> was created passing the specified
    * <code>ServiceReference</code>.
    * <p>
@@ -565,7 +565,7 @@ protected:
    *
    * <p>
    * This implementation calls <code>UngetService</code>, on the
-   * <code>ModuleContext</code> with which this <code>ServiceTracker</code>
+   * <code>BundleContext</code> with which this <code>ServiceTracker</code>
    * was created, passing the specified <code>ServiceReference</code>.
    * <p>
    * This method can be overridden in a subclass. If the default

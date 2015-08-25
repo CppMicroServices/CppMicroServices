@@ -30,9 +30,9 @@
 US_BEGIN_NAMESPACE
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-  ModulePrivate* module, const InterfaceMap& service,
+  BundlePrivate* bundle, const InterfaceMap& service,
   const ServicePropertiesImpl& props)
-  : ref(0), service(service), module(module), reference(this),
+  : ref(0), service(service), bundle(bundle), reference(this),
     properties(props), available(true), unregistering(false)
 {
   // The reference counter is initialized to 0 because it will be
@@ -44,7 +44,7 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 
 }
 
-bool ServiceRegistrationBasePrivate::IsUsedByModule(Module* p) const
+bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const
 {
   return (dependents.find(p) != dependents.end()) ||
       (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());

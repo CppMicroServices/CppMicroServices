@@ -45,7 +45,7 @@ US_BEGIN_NAMESPACE
  * <code>ServiceEvent</code> being received by a <code>ServiceTracker</code>.
  * Since <code>ServiceEvent</code>s are synchronously delivered,
  * it is highly recommended that implementations of these methods do
- * not register (<code>ModuleContext::RegisterService</code>), modify (
+ * not register (<code>BundleContext::RegisterService</code>), modify (
  * <code>ServiceRegistration::SetProperties</code>) or unregister (
  * <code>ServiceRegistration::Unregister</code>) a service while being
  * synchronized on any object.

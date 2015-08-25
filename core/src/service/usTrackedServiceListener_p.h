@@ -30,7 +30,7 @@ US_BEGIN_NAMESPACE
 
 /**
  * This class is not intended to be used directly. It is exported to support
- * the CppMicroServices module system.
+ * the CppMicroServices bundle system.
  */
 struct TrackedServiceListener
 {

@@ -54,7 +54,7 @@ class ServiceEventData;
  * An event from the Micro Services framework describing a service lifecycle change.
  * <p>
  * <code>ServiceEvent</code> objects are delivered to
- * listeners connected via ModuleContext::AddServiceListener() when a
+ * listeners connected via BundleContext::AddServiceListener() when a
  * change occurs in this service's lifecycle. A type code is used to identify
  * the event type for future extendability.
  */
@@ -73,7 +73,7 @@ public:
      * This event is delivered <strong>after</strong> the service
      * has been registered with the framework.
      *
-     * @see ModuleContext#RegisterService()
+     * @see BundleContext#RegisterService()
      */
     REGISTERED = 0x00000001,
 
@@ -94,14 +94,14 @@ public:
      * has completed unregistering.
      *
      * <p>
-     * If a module is using a service that is <code>UNREGISTERING</code>, the
-     * module should release its use of the service when it receives this event.
-     * If the module does not release its use of the service when it receives
-     * this event, the framework will automatically release the module's use of
+     * If a bundle is using a service that is <code>UNREGISTERING</code>, the
+     * bundle should release its use of the service when it receives this event.
+     * If the bundle does not release its use of the service when it receives
+     * this event, the framework will automatically release the bundle's use of
      * the service while completing the service unregistration operation.
      *
      * @see ServiceRegistration#Unregister
-     * @see ModuleContext#UngetService
+     * @see BundleContext#UngetService
      */
     UNREGISTERING = 0x00000004,
 

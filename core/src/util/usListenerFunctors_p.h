@@ -24,7 +24,7 @@
 #define USLISTENERFUNCTORS_P_H
 
 #include <usServiceEvent.h>
-#include <usModuleEvent.h>
+#include <usBundleEvent.h>
 
 #include <algorithm>
 #include <cstring>
@@ -41,22 +41,22 @@
   #define US_FUNCTION_TYPE std::tr1::function
 #endif
 
-#define US_MODULE_LISTENER_FUNCTOR US_FUNCTION_TYPE<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>
+#define US_BUNDLE_LISTENER_FUNCTOR US_FUNCTION_TYPE<void(const US_PREPEND_NAMESPACE(BundleEvent)&)>
 #define US_SERVICE_LISTENER_FUNCTOR US_FUNCTION_TYPE<void(const US_PREPEND_NAMESPACE(ServiceEvent)&)>
 
 US_BEGIN_NAMESPACE
   template<class X>
-  US_MODULE_LISTENER_FUNCTOR ModuleListenerMemberFunctor(X* x, void (X::*memFn)(const US_PREPEND_NAMESPACE(ModuleEvent)))
+  US_BUNDLE_LISTENER_FUNCTOR BundleListenerMemberFunctor(X* x, void (X::*memFn)(const US_PREPEND_NAMESPACE(BundleEvent)))
   { return std::bind1st(std::mem_fun(memFn), x); }
 
-  struct ModuleListenerCompare : std::binary_function<std::pair<US_MODULE_LISTENER_FUNCTOR, void*>,
-                                                      std::pair<US_MODULE_LISTENER_FUNCTOR, void*>, bool>
+  struct BundleListenerCompare : std::binary_function<std::pair<US_BUNDLE_LISTENER_FUNCTOR, void*>,
+                                                      std::pair<US_BUNDLE_LISTENER_FUNCTOR, void*>, bool>
   {
-    bool operator()(const std::pair<US_MODULE_LISTENER_FUNCTOR, void*>& p1,
-                    const std::pair<US_MODULE_LISTENER_FUNCTOR, void*>& p2) const
+    bool operator()(const std::pair<US_BUNDLE_LISTENER_FUNCTOR, void*>& p1,
+                    const std::pair<US_BUNDLE_LISTENER_FUNCTOR, void*>& p2) const
     {
       return p1.second == p2.second &&
-             p1.first.target<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>() == p2.first.target<void(const US_PREPEND_NAMESPACE(ModuleEvent)&)>();
+             p1.first.target<void(const US_PREPEND_NAMESPACE(BundleEvent)&)>() == p2.first.target<void(const US_PREPEND_NAMESPACE(BundleEvent)&)>();
     }
   };
 

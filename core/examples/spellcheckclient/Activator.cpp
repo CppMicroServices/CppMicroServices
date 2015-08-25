@@ -23,8 +23,8 @@
 //! [Activator]
 #include "ISpellCheckService.h"
 
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 #include <usServiceTracker.h>
 
 #include <iostream>
@@ -35,17 +35,17 @@ US_USE_NAMESPACE
 namespace {
 
 /**
- * This class implements a module that uses a spell checker
- * service to check the spelling of a passage. This module
+ * This class implements a bundle that uses a spell checker
+ * service to check the spelling of a passage. This bundle
  * is essentially identical to Example 5, in that it uses the
  * Service Tracker to monitor the dynamic availability of the
- * spell checker service. When loading this module, the thread
- * calling the Load() method is used to read passages from
+ * spell checker service. When loading this bundle, the thread
+ * calling the Start() method is used to read passages from
  * standard input. You can stop spell checking passages by
  * entering an empty line, but to start spell checking again
- * you must un-load and then load the module again.
+ * you must stop and then start the bundle again.
 **/
-class US_ABI_LOCAL Activator : public ModuleActivator
+class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
@@ -56,7 +56,7 @@ public:
   {}
 
   /**
-   * Implements ModuleActivator::Load(). Creates a service
+   * Implements BundleActivator::Start(). Creates a service
    * tracker object to monitor spell checker services. Enters
    * a spell check loop where it reads passages from standard
    * input and checks their spelling using the spell checker service.
@@ -65,9 +65,9 @@ public:
    *       lengthy process like this; this is only done for the purpose of
    *       the tutorial.
    *
-   * @param context the module context for this module.
+   * @param context the bundle context for this bundle.
    */
-  void Load(ModuleContext *context)
+  void Start(BundleContext *context)
   {
     m_context = context;
 
@@ -125,18 +125,18 @@ public:
   }
 
   /**
-   * Implements ModuleActivator::Unload(). Does nothing since
+   * Implements BundleActivator::Stop(). Does nothing since
    * the C++ Micro Services library will automatically unget any used services.
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   {
   }
 
 private:
 
-  // Module context
-  ModuleContext* m_context;
+  // Bundle context
+  BundleContext* m_context;
 
   // The service tracker
   ServiceTracker<ISpellCheckService>* m_tracker;
@@ -144,5 +144,5 @@ private:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Activator)
+US_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //![Activator]

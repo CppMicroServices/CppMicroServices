@@ -1,5 +1,5 @@
 set(_srcs Activator.cpp)
 
-usFunctionGenerateModuleInit(_srcs)
+usFunctionGenerateBundleInit(_srcs)
 
 CreateExample(eventlistener ${_srcs})

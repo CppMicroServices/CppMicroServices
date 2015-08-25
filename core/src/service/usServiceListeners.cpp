@@ -25,9 +25,9 @@
 #include "usServiceListeners_p.h"
 #include "usServiceReferenceBasePrivate.h"
 
-#include "usCoreModuleContext_p.h"
-#include "usModule.h"
-#include "usModuleContext.h"
+#include "usCoreBundleContext_p.h"
+#include "usBundle.h"
+#include "usBundleContext.h"
 
 
 US_BEGIN_NAMESPACE
@@ -35,14 +35,14 @@ US_BEGIN_NAMESPACE
 const int ServiceListeners::OBJECTCLASS_IX = 0;
 const int ServiceListeners::SERVICE_ID_IX = 1;
 
-ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
+ServiceListeners::ServiceListeners(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
 {
   hashedServiceKeys.push_back(ServiceConstants::OBJECTCLASS());
   hashedServiceKeys.push_back(ServiceConstants::SERVICE_ID());
 }
 
-void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+void ServiceListeners::AddServiceListener(BundleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
   US_UNUSED(Lock(this));
@@ -55,7 +55,7 @@ void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListen
   CheckSimple(sle);
 }
 
-void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+void ServiceListeners::RemoveServiceListener(BundleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
                                              void* data)
 {
   ServiceListenerEntry entryToRemove(mc, listener, data);
@@ -76,31 +76,31 @@ void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry
   }
 }
 
-void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
+void ServiceListeners::AddBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
 {
-  MutexLock lock(moduleListenerMapMutex);
-  ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap[mc];
-  if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
+  MutexLock lock(bundleListenerMapMutex);
+  BundleListenerMap::value_type::second_type& listeners = bundleListenerMap[mc];
+  if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(BundleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
   {
     listeners.push_back(std::make_pair(listener, data));
   }
 }
 
-void ServiceListeners::RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
+void ServiceListeners::RemoveBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
 {
-  MutexLock lock(moduleListenerMapMutex);
-  moduleListenerMap[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
+  MutexLock lock(bundleListenerMapMutex);
+  bundleListenerMap[mc].remove_if(std::bind1st(BundleListenerCompare(), std::make_pair(listener, data)));
 }
 
-void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
+void ServiceListeners::BundleChanged(const BundleEvent& evt)
 {
-  ModuleListenerMap filteredModuleListeners;
-  coreCtx->moduleHooks.FilterModuleEventReceivers(evt, filteredModuleListeners);
+  BundleListenerMap filteredBundleListeners;
+  coreCtx->bundleHooks.FilterBundleEventReceivers(evt, filteredBundleListeners);
 
-  for(ModuleListenerMap::iterator iter = filteredModuleListeners.begin(), end = filteredModuleListeners.end();
+  for(BundleListenerMap::iterator iter = filteredBundleListeners.begin(), end = filteredBundleListeners.end();
       iter != end; ++iter)
   {
-    for (ModuleListenerMap::mapped_type::iterator iter2 = iter->second.begin(), end2 = iter->second.end();
+    for (BundleListenerMap::mapped_type::iterator iter2 = iter->second.begin(), end2 = iter->second.end();
          iter2 != end2; ++iter2)
     {
       try
@@ -109,13 +109,13 @@ void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
       }
       catch (const std::exception& e)
       {
-        US_WARN << "Module listener threw an exception: " << e.what();
+        US_WARN << "Bundle listener threw an exception: " << e.what();
       }
     }
   }
 }
 
-void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
+void ServiceListeners::RemoveAllListeners(BundleContext* mc)
 {
   {
     US_UNUSED(Lock(this));
@@ -123,7 +123,7 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
          it != serviceSet.end(); )
     {
 
-      if (it->GetModuleContext() == mc)
+      if (it->GetBundleContext() == mc)
       {
         RemoveFromCache(*it);
         serviceSet.erase(it++);
@@ -136,19 +136,19 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
   }
 
   {
-    MutexLock lock(moduleListenerMapMutex);
-    moduleListenerMap.erase(mc);
+    MutexLock lock(bundleListenerMapMutex);
+    bundleListenerMap.erase(mc);
   }
 }
 
-void ServiceListeners::HooksModuleStopped(ModuleContext* mc)
+void ServiceListeners::HooksBundleStopped(BundleContext* mc)
 {
   US_UNUSED(Lock(this));
   std::vector<ServiceListenerEntry> entries;
   for (ServiceListenerEntries::iterator it = serviceSet.begin();
        it != serviceSet.end(); )
   {
-    if (it->GetModuleContext() == mc)
+    if (it->GetBundleContext() == mc)
     {
       entries.push_back(*it);
     }
@@ -191,7 +191,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       catch (...)
       {
         US_WARN << "Service listener"
-                << " in " << l->GetModuleContext()->GetModule()->GetName()
+                << " in " << l->GetBundleContext()->GetBundle()->GetName()
                 << " threw an exception!";
       }
     }

@@ -36,9 +36,9 @@ endforeach()
 
 function(CreateExample _name)
   add_library(Example-${_name} ${ARGN})
-  set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_name})
+  set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_name})
   if(NOT US_BUILD_SHARED_LIBS)
-    set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
+    set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_BUNDLE)
   endif()
 
   if(${_name}_DEPENDS)

@@ -34,27 +34,27 @@ US_BEGIN_NAMESPACE
  * The factory can provide multiple, unique service objects.
  *
  * When registering a service, a PrototypeServiceFactory object can be used
- * instead of a service object, so that the module developer can create a
+ * instead of a service object, so that the bundle developer can create a
  * unique service object for each caller that is using the service.
  * When a caller uses a ServiceObjects to request a service instance, the
  * framework calls the GetService method to return a service object specifically
  * for the requesting caller. The caller can release the returned service object
  * and the framework will call the UngetService method with the service object.
- * When a module uses the ModuleContext::GetService(const ServiceReferenceBase&)
+ * When a bundle uses the BundleContext::GetService(const ServiceReferenceBase&)
  * method to obtain a service object, the framework acts as if the service
- * has module scope. That is, the framework will call the GetService method to
- * obtain a module-scoped instance which will be cached and have a use count.
+ * has bundle scope. That is, the framework will call the GetService method to
+ * obtain a bundle-scoped instance which will be cached and have a use count.
  * See ServiceFactory.
  *
- * A module can use both ServiceObjects and ModuleContext::GetService(const ServiceReferenceBase&)
+ * A bundle can use both ServiceObjects and BundleContext::GetService(const ServiceReferenceBase&)
  * to obtain a service object for a service. ServiceObjects::GetService() will always
- * return an instance provided by a call to GetService(Module*, const ServiceRegistrationBase&)
- * and ModuleContext::GetService(const ServiceReferenceBase&) will always
- * return the module-scoped instance.
+ * return an instance provided by a call to GetService(Bundle*, const ServiceRegistrationBase&)
+ * and BundleContext::GetService(const ServiceReferenceBase&) will always
+ * return the bundle-scoped instance.
  * PrototypeServiceFactory objects are only used by the framework and are not made
- * available to other modules. The framework may concurrently call a PrototypeServiceFactory.
+ * available to other bundles. The framework may concurrently call a PrototypeServiceFactory.
  *
- * @see ModuleContext::GetServiceObjects()
+ * @see BundleContext::GetServiceObjects()
  * @see ServiceObjects
  */
 struct PrototypeServiceFactory : public ServiceFactory
@@ -70,7 +70,7 @@ struct PrototypeServiceFactory : public ServiceFactory
    * was registered, a warning is issued and NULL is returned to the caller. If this
    * method throws an exception, a warning is issued and NULL is returned to the caller.
    *
-   * @param module The module requesting the service.
+   * @param bundle The bundle requesting the service.
    * @param registration The ServiceRegistrationBase object for the requested service.
    * @return A service object that must contain entries for all the interfaces named when
    *         the service was registered.
@@ -78,22 +78,22 @@ struct PrototypeServiceFactory : public ServiceFactory
    * @see ServiceObjects#GetService()
    * @see InterfaceMap
    */
-  virtual InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMap GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object created for a caller.
    *
-   * The framework invokes this method when a service has been released by a modules such as
+   * The framework invokes this method when a service has been released by a bundles such as
    * by calling ServiceObjects::UngetService(). The service object may then be destroyed.
    * If this method throws an exception, a warning is issued.
    *
-   * @param module The module releasing the service.
+   * @param bundle The bundle releasing the service.
    * @param registration The ServiceRegistrationBase object for the service being released.
    * @param service The service object returned by a previous call to the GetService method.
    *
    * @see ServiceObjects::UngetService()
    */
-  virtual void UngetService(Module* module, const ServiceRegistrationBase& registration,
+  virtual void UngetService(Bundle* bundle, const ServiceRegistrationBase& registration,
                             const InterfaceMap& service) = 0;
 
 };

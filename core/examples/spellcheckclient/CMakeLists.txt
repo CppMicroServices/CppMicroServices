@@ -1,6 +1,6 @@
 set(_srcs Activator.cpp)
 
-usFunctionGenerateModuleInit(_srcs)
+usFunctionGenerateBundleInit(_srcs)
 
 set(spellcheckclient_DEPENDS spellcheckservice)
 CreateExample(spellcheckclient ${_srcs})

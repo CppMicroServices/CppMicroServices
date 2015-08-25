@@ -24,8 +24,8 @@
 #include "IDictionaryService.h"
 #include "ISpellCheckService.h"
 
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 #include <usServiceProperties.h>
 #include <usServiceTracker.h>
 #include <usServiceTrackerCustomizer.h>
@@ -39,10 +39,10 @@ US_USE_NAMESPACE
 namespace {
 
 /**
- * This class implements a module that implements a spell
+ * This class implements a bundle that implements a spell
  * checker service. The spell checker service uses all available
  * dictionary services to check for the existence of words in
- * a given sentence. This module uses a ServiceTracker to
+ * a given sentence. This bundle uses a ServiceTracker to
  * monitors the dynamic availability of dictionary services,
  * and to aggregate all available dictionary services as they
  * arrive and depart. The spell checker service is only registered
@@ -50,7 +50,7 @@ namespace {
  * checker service will appear and disappear as dictionary
  * services appear and disappear, respectively.
 **/
-class US_ABI_LOCAL Activator : public ModuleActivator, public ServiceTrackerCustomizer<IDictionaryService>
+class US_ABI_LOCAL Activator : public BundleActivator, public ServiceTrackerCustomizer<IDictionaryService>
 {
 
 private:
@@ -182,7 +182,7 @@ private:
   std::auto_ptr<SpellCheckImpl> m_spellCheckService;
   ServiceRegistration<ISpellCheckService> m_spellCheckReg;
 
-  ModuleContext* m_context;
+  BundleContext* m_context;
   std::auto_ptr<ServiceTracker<IDictionaryService> > m_tracker;
 
 public:
@@ -192,14 +192,14 @@ public:
   {}
 
   /**
-   * Implements ModuleActivator::Load(). Registers an
-   * instance of a dictionary service using the module context;
+   * Implements BundleActivator::Start(). Registers an
+   * instance of a dictionary service using the bundle context;
    * attaches properties to the service that can be queried
    * when performing a service look-up.
    *
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Load(ModuleContext* context)
+  void Start(BundleContext* context)
   {
     m_context = context;
 
@@ -209,13 +209,13 @@ public:
   }
 
   /**
-   * Implements ModuleActivator::Unload(). Does nothing since
+   * Implements BundleActivator::Stop(). Does nothing since
    * the C++ Micro Services library will automatically unregister any registered services
    * and release any used services.
    *
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   {
     // NOTE: The service is automatically unregistered
 
@@ -226,5 +226,5 @@ public:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Activator)
+US_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //![Activator]

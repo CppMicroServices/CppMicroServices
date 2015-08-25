@@ -21,42 +21,42 @@
 =============================================================================*/
 
 //! [Activator]
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 
 US_USE_NAMESPACE
 
 namespace {
 
 /**
- * This class implements a simple module that utilizes the CppMicroServices's
+ * This class implements a simple bundle that utilizes the CppMicroServices's
  * event mechanism to listen for service events. Upon receiving a service event,
  * it prints out the event's details.
  */
-class Activator : public ModuleActivator
+class Activator : public BundleActivator
 {
 
 private:
 
   /**
-   * Implements ModuleActivator::Load(). Prints a message and adds a member
-   * function to the module context as a service listener.
+   * Implements BundleActivator::Start(). Prints a message and adds a member
+   * function to the bundle context as a service listener.
    *
-   * @param context the framework context for the module.
+   * @param context the framework context for the bundle.
    */
-  void Load(ModuleContext* context)
+  void Start(BundleContext* context)
   {
     std::cout << "Starting to listen for service events." << std::endl;
     context->AddServiceListener(this, &Activator::ServiceChanged);
   }
 
   /**
-   * Implements ModuleActivator::Unload(). Prints a message and removes the
-   * member function from the module context as a service listener.
+   * Implements BundleActivator::Stop(). Prints a message and removes the
+   * member function from the bundle context as a service listener.
    *
-   * @param context the framework context for the module.
+   * @param context the framework context for the bundle.
    */
-  void Unload(ModuleContext* context)
+  void Stop(BundleContext* context)
   {
     context->RemoveServiceListener(this, &Activator::ServiceChanged);
     std::cout << "Stopped listening for service events." << std::endl;
@@ -91,5 +91,5 @@ private:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Activator)
+US_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //! [Activator]

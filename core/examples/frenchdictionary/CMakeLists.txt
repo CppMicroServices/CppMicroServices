@@ -1,6 +1,6 @@
 set(_srcs Activator.cpp)
 
-usFunctionGenerateModuleInit(_srcs)
+usFunctionGenerateBundleInit(_srcs)
 
 set(frenchdictionary_DEPENDS dictionaryservice)
 CreateExample(frenchdictionary ${_srcs})

@@ -1,22 +1,22 @@
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usModuleResource.h>
-#include <usModule.h>
-#include <usModuleResourceStream.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
+#include <usBundleResource.h>
+#include <usBundle.h>
+#include <usBundleResourceStream.h>
 
 US_USE_NAMESPACE
 
 void resourceExample()
 {
   //! [1]
-  // Get this module's Module object
-  Module* module = GetModuleContext()->GetModule();
+  // Get this bundle's Bundle object
+  Bundle* bundle = GetBundleContext()->GetBundle();
 
-  ModuleResource resource = module->GetResource("config.properties");
+  BundleResource resource = bundle->GetResource("config.properties");
   if (resource.IsValid())
   {
-    // Create a ModuleResourceStream object
-    ModuleResourceStream resourceStream(resource);
+    // Create a BundleResourceStream object
+    BundleResourceStream resourceStream(resource);
 
     // Read the contents line by line
     std::string line;
@@ -37,27 +37,27 @@ void parseComponentDefinition(std::istream&)
 {
 }
 
-void extenderPattern(ModuleContext* moduleCtx)
+void extenderPattern(BundleContext* bundleCtx)
 {
   //! [2]
-  // Get all loaded modules
-  std::vector<Module*> modules = moduleCtx->GetModules();
+  // Get all loaded bundles
+  std::vector<Bundle*> bundles = bundleCtx->GetBundles();
 
-  // Check if a module defines a "service-component" property
+  // Check if a bundle defines a "service-component" property
   // and use its value to retrieve an embedded resource containing
   // a component description.
-  for(std::size_t i = 0; i < modules.size(); ++i)
+  for(std::size_t i = 0; i < bundles.size(); ++i)
   {
-    Module* const module = modules[i];
-    std::string componentPath = module->GetProperty("service-component").ToString();
+    Bundle* const bundle = bundles[i];
+    std::string componentPath = bundle->GetProperty("service-component").ToString();
     if (!componentPath.empty())
     {
-      ModuleResource componentResource = module->GetResource(componentPath);
+      BundleResource componentResource = bundle->GetResource(componentPath);
       if (!componentResource.IsValid() || componentResource.IsDir()) continue;
 
       // Create a std::istream compatible object and parse the
       // component description.
-      ModuleResourceStream resStream(componentResource);
+      BundleResourceStream resStream(componentResource);
       parseComponentDefinition(resStream);
     }
   }
@@ -67,14 +67,14 @@ void extenderPattern(ModuleContext* moduleCtx)
 int main(int /*argc*/, char* /*argv*/[])
 {
   //! [0]
-  ModuleContext* moduleContext = GetModuleContext();
-  Module* module = moduleContext->GetModule();
+  BundleContext* bundleContext = GetBundleContext();
+  Bundle* bundle = bundleContext->GetBundle();
 
   // List all XML files in the config directory
-  std::vector<ModuleResource> xmlFiles = module->FindResources("config", "*.xml", false);
+  std::vector<BundleResource> xmlFiles = bundle->FindResources("config", "*.xml", false);
 
   // Find the resource named vertex_shader.txt starting at the root directory
-  std::vector<ModuleResource> shaders = module->FindResources("", "vertex_shader.txt", true);
+  std::vector<BundleResource> shaders = bundle->FindResources("", "vertex_shader.txt", true);
   //! [0]
 
   return 0;

@@ -42,16 +42,16 @@ public:
   typedef typename TTT::TrackedType T;
 
   ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
-                        ModuleContext* context,
+                        BundleContext* context,
                         const ServiceReference<S>& reference,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
-                        ModuleContext* context, const std::string& clazz,
+                        BundleContext* context, const std::string& clazz,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
-                        ModuleContext* context, const LDAPFilter& filter,
+                        BundleContext* context, const LDAPFilter& filter,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
   ~ServiceTrackerPrivate();
@@ -77,9 +77,9 @@ public:
   static const bool DEBUG_OUTPUT; // = false;
 
   /**
-   * The Module Context used by this <code>ServiceTracker</code>.
+   * The Bundle Context used by this <code>ServiceTracker</code>.
    */
-  ModuleContext* const context;
+  BundleContext* const context;
 
   /**
    * The filter used by this <code>ServiceTracker</code> which specifies the

@@ -1,4 +1,4 @@
-Example 5 - Service Tracker Dictionary Client Module   {#MicroServices_Example5}
+Example 5 - Service Tracker Dictionary Client Bundle   {#MicroServices_Example5}
 ====================================================
 
 In \ref MicroServices_Example4 "Example 4", we created a more robust client bundle
@@ -10,24 +10,24 @@ uses the `ServiceTracker` class to monitor the dynamic availability of the dicti
 service, resulting in an even more robust client.
 
 The functionality of the new dictionary client is essentially the same as the one
-from Example 4. Our module uses its module context to create a `ServiceTracker`
+from Example 4. Our bundle uses its bundle context to create a `ServiceTracker`
 instance to track the dynamic availability of the dictionary service on our behalf.
 Our client uses the dictionary service returned by the `ServiceTracker`, which is
 selected based on a ranking algorithm defined by the C++ Micro Services library.
-The source code for our modules is as follows in a file called
+The source code for our bundles is as follows in a file called
 `dictionaryclient3/Activator.cpp`:
 
 \snippet dictionaryclient3/Activator.cpp Activator
 
 Since this client uses the `ServiceTracker` utility class, it will automatically
 monitor the dynamic availability of the dictionary service. Again, we must link
-our module to the `dictionaryservice` module:
+our bundle to the `dictionaryservice` bundle:
 
 \include dictionaryclient3/CMakeLists.txt
 
 After running the `usCoreExamplesDriver` executable, and loading the event
-listener module, we can use the `l dictionaryclient3` command to load
-our robust dictionary client module:
+listener bundle, we can use the `l dictionaryclient3` command to load
+our robust dictionary client bundle:
 
 \verbatim
 CppMicroServices-debug> bin/usCoreExamplesDriver
@@ -39,12 +39,12 @@ Enter a blank line to exit.
 Enter word:
 \endverbatim
 
-The above command loads the module and its dependencies (the `dictionaryservice`
-module) in a single step. When we load the module, it will use the main thread to
+The above command loads the bundle and its dependencies (the `dictionaryservice`
+bundle) in a single step. When we load the bundle, it will use the main thread to
 prompt us for words. Enter one word at a time to check the words and enter a
-blank line to stop checking words. To reload the module, we must use the `s`
-command to get the module identifier number for the module and first use the
-`u <id>` command to unload the module, then the `l <id>` command to re-load it.
+blank line to stop checking words. To reload the bundle, we must use the `s`
+command to get the bundle identifier number for the bundle and first use the
+`u <id>` command to stop the bundle, then the `l <id>` command to re-load it.
 To test the dictionary service, enter any of the words in the dictionary
 (e.g., "welcome", "to", "the", "micro", "services", "tutorial") or any word not
 in the dictionary.

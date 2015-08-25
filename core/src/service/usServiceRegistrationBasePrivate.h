@@ -31,7 +31,7 @@
 
 US_BEGIN_NAMESPACE
 
-class ModulePrivate;
+class BundlePrivate;
 class ServiceRegistrationBase;
 
 /**
@@ -63,30 +63,30 @@ protected:
 
 public:
 
-  typedef US_UNORDERED_MAP_TYPE<Module*,int> ModuleToRefsMap;
-  typedef US_UNORDERED_MAP_TYPE<Module*, InterfaceMap> ModuleToServiceMap;
-  typedef US_UNORDERED_MAP_TYPE<Module*, std::list<InterfaceMap> > ModuleToServicesMap;
+  typedef US_UNORDERED_MAP_TYPE<Bundle*,int> BundleToRefsMap;
+  typedef US_UNORDERED_MAP_TYPE<Bundle*, InterfaceMap> BundleToServiceMap;
+  typedef US_UNORDERED_MAP_TYPE<Bundle*, std::list<InterfaceMap> > BundleToServicesMap;
 
   /**
-   * Modules dependent on this service. Integer is used as
+   * Bundles dependent on this service. Integer is used as
    * reference counter, counting number of unbalanced getService().
    */
-  ModuleToRefsMap dependents;
+  BundleToRefsMap dependents;
 
   /**
    * Object instances that a prototype factory has produced.
    */
-  ModuleToServicesMap prototypeServiceInstances;
+  BundleToServicesMap prototypeServiceInstances;
 
   /**
-   * Object instance with module scope that a factory may have produced.
+   * Object instance with bundle scope that a factory may have produced.
    */
-  ModuleToServiceMap moduleServiceInstance;
+  BundleToServiceMap bundleServiceInstance;
 
   /**
-   * Module registering this service.
+   * Bundle registering this service.
    */
-  ModulePrivate* module;
+  BundlePrivate* bundle;
 
   /**
    * Reference object to this service registration.
@@ -119,18 +119,18 @@ public:
   // needs to be recursive
   Mutex propsLock;
 
-  ServiceRegistrationBasePrivate(ModulePrivate* module, const InterfaceMap& service,
+  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMap& service,
                                  const ServicePropertiesImpl& props);
 
   ~ServiceRegistrationBasePrivate();
 
   /**
-   * Check if a module uses this service
+   * Check if a bundle uses this service
    *
-   * @param p Module to check
-   * @return true if module uses this service
+   * @param p Bundle to check
+   * @return true if bundle uses this service
    */
-  bool IsUsedByModule(Module* m) const;
+  bool IsUsedByBundle(Bundle* m) const;
 
   const InterfaceMap& GetInterfaces() const;
 

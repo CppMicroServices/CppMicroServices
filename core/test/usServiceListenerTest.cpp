@@ -26,12 +26,12 @@
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
+#include <usBundle.h>
+#include <usBundleContext.h>
+#include <usGetBundleContext.h>
 #include <usSharedLibrary.h>
 
-#include <usModulePropsInterface.h>
+#include <usBundlePropsInterface.h>
 
 US_USE_NAMESPACE
 
@@ -40,21 +40,21 @@ class TestServiceListener
 
 private:
 
-  friend bool runLoadUnloadTest(const std::string&, int cnt, Module&,
-                                ModuleContext* mc,
+  friend bool runStartStopTest(const std::string&, int cnt, Bundle&,
+                                BundleContext* mc,
                                 const std::vector<ServiceEvent::Type>&);
 
-  const bool checkUsingModules;
+  const bool checkUsingBundles;
   std::vector<ServiceEvent> events;
 
   bool teststatus;
 
-  ModuleContext* mc;
+  BundleContext* mc;
 
 public:
 
-  TestServiceListener(ModuleContext* mc, bool checkUsingModules = true)
-    : checkUsingModules(checkUsingModules), events(), teststatus(true), mc(mc)
+  TestServiceListener(BundleContext* mc, bool checkUsingBundles = true)
+    : checkUsingBundles(checkUsingBundles), events(), teststatus(true), mc(mc)
   {}
 
   bool getTestStatus() const
@@ -94,18 +94,18 @@ public:
     {
       ServiceReferenceU sr = evt.GetServiceReference();
 
-      // Validate that no module is marked as using the service
-      std::vector<Module*> usingModules;
-      sr.GetUsingModules(usingModules);
-      if (checkUsingModules && !usingModules.empty())
+      // Validate that no bundle is marked as using the service
+      std::vector<Bundle*> usingBundles;
+      sr.GetUsingBundles(usingBundles);
+      if (checkUsingBundles && !usingBundles.empty())
       {
         teststatus = false;
-        printUsingModules(sr, "*** Using modules (unreg) should be empty but is: ");
+        printUsingBundles(sr, "*** Using bundles (unreg) should be empty but is: ");
       }
 
       // Check if the service can be fetched
       InterfaceMap service = mc->GetService(sr);
-      sr.GetUsingModules(usingModules);
+      sr.GetUsingBundles(usingBundles);
       // if (UNREGISTERSERVICE_VALID_DURING_UNREGISTERING) {
       // In this mode the service shall be obtainable during
       // unregistration.
@@ -116,15 +116,15 @@ public:
                           << "while handling unregistering event." );
       }
       US_TEST_OUTPUT( << "Service (unreg): " << service.begin()->first << " -> " << service.begin()->second );
-      if (checkUsingModules && usingModules.size() != 1)
+      if (checkUsingBundles && usingBundles.size() != 1)
       {
         teststatus = false;
-        printUsingModules(sr, "*** One using module expected "
+        printUsingBundles(sr, "*** One using bundle expected "
                           "(unreg, after getService), found: ");
       }
       else
       {
-        printUsingModules(sr, "Using modules (unreg, after getService): ");
+        printUsingBundles(sr, "Using bundles (unreg, after getService): ");
       }
       //    } else {
       //      // In this mode the service shall NOT be obtainable during
@@ -182,16 +182,16 @@ public:
     }
   }
 
-  void printUsingModules(const ServiceReferenceU& sr, const std::string& caption)
+  void printUsingBundles(const ServiceReferenceU& sr, const std::string& caption)
   {
-    std::vector<Module*> usingModules;
-    sr.GetUsingModules(usingModules);
+    std::vector<Bundle*> usingBundles;
+    sr.GetUsingBundles(usingBundles);
 
-    US_TEST_OUTPUT( << (caption.empty() ? "Using modules: " : caption) );
-    for(std::vector<Module*>::const_iterator module = usingModules.begin();
-        module != usingModules.end(); ++module)
+    US_TEST_OUTPUT( << (caption.empty() ? "Using bundles: " : caption) );
+    for(std::vector<Bundle*>::const_iterator bundle = usingBundles.begin();
+        bundle != usingBundles.end(); ++bundle)
     {
-      US_TEST_OUTPUT( << "  -" << (*module) );
+      US_TEST_OUTPUT( << "  -" << (*bundle) );
     }
   }
 
@@ -216,8 +216,8 @@ public:
 
 }; // end of class ServiceListener
 
-bool runLoadUnloadTest(const std::string& name, int cnt, Module& module,
-                       ModuleContext* mc,
+bool runStartStopTest(const std::string& name, int cnt, Bundle& bundle,
+                       BundleContext* mc,
                        const std::vector<ServiceEvent::Type>& events)
 {
   bool teststatus = true;
@@ -240,24 +240,24 @@ bool runLoadUnloadTest(const std::string& name, int cnt, Module& module,
     // Start the test target to get a service published.
     try
     {
-      module.Start();
+      bundle.Start();
     }
     catch (const std::exception& e)
     {
       teststatus  = false;
-      US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
+      US_TEST_FAILED_MSG( << "Failed to start bundle, got exception: "
                           << e.what() << " + in " << name << ":FAIL" );
     }
 
     // Stop the test target to get a service unpublished.
     try
     {
-      module.Stop();
+      bundle.Stop();
     }
     catch (const std::exception& e)
     {
       teststatus  = false;
-      US_TEST_FAILED_MSG( << "Failed to unload module, got exception: "
+      US_TEST_FAILED_MSG( << "Failed to unload bundle, got exception: "
                           << e.what() << " + in " << name << ":FAIL" );
     }
 
@@ -286,7 +286,7 @@ bool runLoadUnloadTest(const std::string& name, int cnt, Module& module,
 
 void frameSL02a(Framework* framework)
 {
-  ModuleContext* mc = framework->GetModuleContext();
+  BundleContext* mc = framework->GetBundleContext();
 
   TestServiceListener listener1(mc);
   TestServiceListener listener2(mc);
@@ -304,8 +304,8 @@ void frameSL02a(Framework* framework)
                         << " : frameSL02a:FAIL" );
   }
 
-  Module* module = InstallTestBundle(mc, "TestModuleA");
-  module->Start();
+  Bundle* bundle = InstallTestBundle(mc, "TestBundleA");
+  bundle->Start();
 
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
@@ -316,7 +316,7 @@ void frameSL02a(Framework* framework)
   mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
   mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
 
-  module->Stop();
+  bundle->Stop();
 }
 
 void frameSL05a(Framework* framework)
@@ -324,10 +324,10 @@ void frameSL05a(Framework* framework)
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  
-  Module* module = InstallTestBundle(framework->GetModuleContext(), "TestModuleA");
 
-  bool testStatus = runLoadUnloadTest("FrameSL05a", 1, *module, framework->GetModuleContext(), events);
+  Bundle* bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
+
+  bool testStatus = runStartStopTest("FrameSL05a", 1, *bundle, framework->GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
 
@@ -336,16 +336,16 @@ void frameSL10a(Framework* framework)
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  
-  Module* module = InstallTestBundle(framework->GetModuleContext(), "TestModuleA2");
 
-  bool testStatus = runLoadUnloadTest("FrameSL10a", 1, *module, framework->GetModuleContext(), events);
+  Bundle* bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA2");
+
+  bool testStatus = runStartStopTest("FrameSL10a", 1, *bundle, framework->GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
 
 void frameSL25a(Framework* framework)
 {
-  ModuleContext* mc = framework->GetModuleContext();
+  BundleContext* mc = framework->GetBundleContext();
 
   TestServiceListener sListen(mc, false);
   try
@@ -358,9 +358,9 @@ void frameSL25a(Framework* framework)
     throw;
   }
 
-  Module* libSL1 = InstallTestBundle(mc, "TestModuleSL1");
-  Module* libSL3 = InstallTestBundle(mc, "TestModuleSL3");
-  Module* libSL4 = InstallTestBundle(mc, "TestModuleSL4");
+  Bundle* libSL1 = InstallTestBundle(mc, "TestBundleSL1");
+  Bundle* libSL3 = InstallTestBundle(mc, "TestBundleSL3");
+  Bundle* libSL4 = InstallTestBundle(mc, "TestBundleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
@@ -378,40 +378,40 @@ void frameSL25a(Framework* framework)
   expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // at stop of libSL3
 #endif
 
-  // Start libModuleTestSL1 to ensure that the Service interface is available.
+  // Start libBundleTestSL1 to ensure that the Service interface is available.
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL1: " << libSL1->GetLocation() );
+    US_TEST_OUTPUT( << "Starting libBundleTestSL1: " << libSL1->GetLocation() );
     libSL1->Start();
   }
   catch (const std::exception& e)
   {
-    US_TEST_OUTPUT( << "Failed to load module, got exception: " << e.what() );
+    US_TEST_OUTPUT( << "Failed to start bundle, got exception: " << e.what() );
     throw;
   }
 
-  // Start libModuleTestSL4 that will require the serivce interface and publish
+  // Start libBundleTestSL4 that will require the serivce interface and publish
   // us::FooService
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL4: " << libSL4->GetLocation() );
+    US_TEST_OUTPUT( << "Starting libBundleTestSL4: " << libSL4->GetLocation() );
     libSL4->Start();
   }
   catch (const std::exception& e)
   {
-    US_TEST_OUTPUT( << "Failed to load module, got exception: " << e.what() );
+    US_TEST_OUTPUT( << "Failed to start bundle, got exception: " << e.what() );
     throw;
   }
 
-  // Start libModuleTestSL3 that will require the serivce interface and get the service
+  // Start libBundleTestSL3 that will require the serivce interface and get the service
   try
   {
-    US_TEST_OUTPUT( << "Starting libModuleTestSL3: " << libSL3->GetLocation() );
+    US_TEST_OUTPUT( << "Starting libBundleTestSL3: " << libSL3->GetLocation() );
     libSL3->Start();
   }
   catch (const std::exception& e)
   {
-    US_TEST_OUTPUT( << "Failed to load module, got exception: " << e.what() );
+    US_TEST_OUTPUT( << "Failed to start bundle, got exception: " << e.what() );
     throw;
   }
 
@@ -423,11 +423,11 @@ void frameSL25a(Framework* framework)
     InterfaceMap libSL3Activator = mc->GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(!libSL3Activator.empty(), "ActivatorSL3 service != 0");
 
-    ServiceReference<ModulePropsInterface> libSL3PropsI(libSL3SR);
-    ModulePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
-    US_TEST_CONDITION_REQUIRED(propsInterface, "ModulePropsInterface != 0");
+    ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
+    BundlePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
+    US_TEST_CONDITION_REQUIRED(propsInterface, "BundlePropsInterface != 0");
 
-    ModulePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
+    BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
     US_TEST_CONDITION_REQUIRED(i != propsInterface->GetProperties().end(), "Property serviceAdded");
     Any serviceAddedField3 = i->second;
     US_TEST_CONDITION_REQUIRED(!serviceAddedField3.Empty() && any_cast<bool>(serviceAddedField3),
@@ -447,11 +447,11 @@ void frameSL25a(Framework* framework)
     InterfaceMap libSL1Activator = mc->GetService(libSL1SR);
     US_TEST_CONDITION_REQUIRED(!libSL1Activator.empty(), "ActivatorSL1 service != 0");
 
-    ServiceReference<ModulePropsInterface> libSL1PropsI(libSL1SR);
-    ModulePropsInterface* propsInterface = mc->GetService(libSL1PropsI);
-    US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to ModulePropsInterface");
+    ServiceReference<BundlePropsInterface> libSL1PropsI(libSL1SR);
+    BundlePropsInterface* propsInterface = mc->GetService(libSL1PropsI);
+    US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to BundlePropsInterface");
 
-    ModulePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
+    BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
     US_TEST_CONDITION_REQUIRED(i != propsInterface->GetProperties().end(), "Property serviceAdded");
     Any serviceAddedField1 = i->second;
     US_TEST_CONDITION_REQUIRED(!serviceAddedField1.Empty() && any_cast<bool>(serviceAddedField1),
@@ -471,7 +471,7 @@ void frameSL25a(Framework* framework)
   }
   catch (const std::exception& e)
   {
-    US_TEST_OUTPUT( << "Failed to unload module, got exception:" << e.what() );
+    US_TEST_OUTPUT( << "Failed to unload bundle, got exception:" << e.what() );
     throw;
   }
 
@@ -483,11 +483,11 @@ void frameSL25a(Framework* framework)
     InterfaceMap libSL3Activator = mc->GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(!libSL3Activator.empty(), "ActivatorSL3 service != 0");
 
-    ServiceReference<ModulePropsInterface> libSL3PropsI(libSL3SR);
-    ModulePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
-    US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to ModulePropsInterface");
+    ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
+    BundlePropsInterface* propsInterface = mc->GetService(libSL3PropsI);
+    US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to BundlePropsInterface");
 
-    ModulePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceRemoved");
+    BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceRemoved");
     US_TEST_CONDITION_REQUIRED(i != propsInterface->GetProperties().end(), "Property serviceRemoved");
 
     Any serviceRemovedField3 = i->second;
@@ -508,7 +508,7 @@ void frameSL25a(Framework* framework)
   }
   catch (const std::exception& e)
   {
-    US_TEST_OUTPUT( << "Failed to unload module got exception" << e.what() );
+    US_TEST_OUTPUT( << "Failed to unload bundle got exception" << e.what() );
     throw;
   }
 
@@ -520,7 +520,7 @@ void frameSL25a(Framework* framework)
   }
   catch (const std::exception& e)
   {
-    US_TEST_OUTPUT( << "Failed to unload module got exception" << e.what() );
+    US_TEST_OUTPUT( << "Failed to unload bundle got exception" << e.what() );
     throw;
   }
 

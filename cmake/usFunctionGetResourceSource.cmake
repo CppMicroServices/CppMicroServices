@@ -2,16 +2,16 @@
 #! \brief Get a source file name for handling resource dependencies
 #!
 #! This CMake function retrieves the name of a generated file which has to be added
-#! to a modules source file list to set-up resource file dependencies. This ensures
-#! that changed resource files will automatically be re-added to the module.
+#! to a bundles source file list to set-up resource file dependencies. This ensures
+#! that changed resource files will automatically be re-added to the bundle.
 #!
 #! Example usage:
 #! \code{.cmake}
-#! set(module_srcs mylib.cpp)
+#! set(bundle_srcs mylib.cpp)
 #! usFunctionGetResourceSource(TARGET mylib
-#!                             OUT module_srcs
+#!                             OUT bundle_srcs
 #!                            )
-#! add_library(mylib ${module_srcs})
+#! add_library(mylib ${bundle_srcs})
 #! \endcode
 #!
 #! \param TARGET (required) The name of the target to which the resource files are added.

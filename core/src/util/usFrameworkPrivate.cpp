@@ -22,14 +22,14 @@ limitations under the License.
 
 #include "usFrameworkPrivate_p.h"
 
-#include "usCoreModuleContext_p.h"
+#include "usCoreBundleContext_p.h"
 #include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 
 FrameworkPrivate::FrameworkPrivate(void) :
     initLock(new Mutex()),
-    coreModuleContext(new CoreModuleContext()),
+    coreBundleContext(new CoreBundleContext()),
     initialized(false)
 {
 
@@ -37,17 +37,17 @@ FrameworkPrivate::FrameworkPrivate(void) :
 
 FrameworkPrivate::FrameworkPrivate(std::map<std::string, std::string>& configuration) :
     initLock(new Mutex()),
-    coreModuleContext(new CoreModuleContext()),
+    coreBundleContext(new CoreBundleContext()),
     initialized(false)
 {
-  coreModuleContext->frameworkProperties = configuration;
+  coreBundleContext->frameworkProperties = configuration;
 }
 
 FrameworkPrivate::~FrameworkPrivate()
 {
-  if (coreModuleContext)
+  if (coreBundleContext)
   {
-    delete coreModuleContext;
+    delete coreBundleContext;
   }
 
   if (initLock)

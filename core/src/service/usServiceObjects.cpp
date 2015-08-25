@@ -35,7 +35,7 @@ public:
 
   AtomicInt ref;
 
-  ModuleContext* m_context;
+  BundleContext* m_context;
   ServiceReferenceBase m_reference;
 
   // This is used by all ServiceObjects<S> instances with S != void
@@ -43,7 +43,7 @@ public:
   // This is used by ServiceObjects<void>
   std::set<InterfaceMap> m_serviceInterfaceMaps;
 
-  ServiceObjectsBasePrivate(ModuleContext* context, const ServiceReferenceBase& reference)
+  ServiceObjectsBasePrivate(BundleContext* context, const ServiceReferenceBase& reference)
     : m_context(context)
     , m_reference(reference)
   {}
@@ -57,18 +57,18 @@ public:
 
     if (isPrototypeScope)
     {
-      result = m_reference.d->GetPrototypeService(m_context->GetModule());
+      result = m_reference.d->GetPrototypeService(m_context->GetBundle());
     }
     else
     {
-      result = m_reference.d->GetServiceInterfaceMap(m_context->GetModule());
+      result = m_reference.d->GetServiceInterfaceMap(m_context->GetBundle());
     }
 
     return result;
   }
 };
 
-ServiceObjectsBase::ServiceObjectsBase(ModuleContext* context, const ServiceReferenceBase& reference)
+ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference)
   : d(new ServiceObjectsBasePrivate(context, reference))
 {
   if (!reference)
@@ -126,7 +126,7 @@ void ServiceObjectsBase::UngetService(void* service)
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
   }
 
-  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetModule(), serviceIter->second))
+  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetBundle(), serviceIter->second))
   {
     US_WARN << "Ungetting service unsuccessful";
   }
@@ -149,7 +149,7 @@ void ServiceObjectsBase::UngetService(const InterfaceMap& interfaceMap)
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
   }
 
-  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetModule(), interfaceMap))
+  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetBundle(), interfaceMap))
   {
     US_WARN << "Ungetting service unsuccessful";
   }
@@ -205,7 +205,7 @@ ServiceReferenceU ServiceObjects<void>::GetServiceReference() const
   return this->ServiceObjectsBase::GetReference();
 }
 
-ServiceObjects<void>::ServiceObjects(ModuleContext* context, const ServiceReferenceU& reference)
+ServiceObjects<void>::ServiceObjects(BundleContext* context, const ServiceReferenceU& reference)
   : ServiceObjectsBase(context, reference)
 {}
 

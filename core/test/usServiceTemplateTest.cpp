@@ -22,9 +22,9 @@
 
 #include <usFrameworkFactory.h>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usModule.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
+#include <usBundle.h>
 #include <usServiceFactory.h>
 
 #include "usTestingMacros.h"
@@ -46,17 +46,17 @@ struct MyFactory1 : public us::ServiceFactory
 {
   std::map<long, MyService1*> m_idToServiceMap;
 
-  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMap GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     MyService1* s = new MyService1;
-    m_idToServiceMap.insert(std::make_pair(module->GetModuleId(), s));
+    m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1>(s);
   }
 
-  virtual void UngetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMap& service)
   {
-    std::map<long, MyService1*>::iterator iter = m_idToServiceMap.find(module->GetModuleId());
+    std::map<long, MyService1*>::iterator iter = m_idToServiceMap.find(bundle->GetBundleId());
     if (iter != m_idToServiceMap.end())
     {
       US_TEST_CONDITION(static_cast<Interface1*>(iter->second) == us::ExtractInterface<Interface1>(service), "Compare service pointer")
@@ -70,17 +70,17 @@ struct MyFactory2 : public us::ServiceFactory
 {
   std::map<long, MyService2*> m_idToServiceMap;
 
-  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMap GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     MyService2* s = new MyService2;
-    m_idToServiceMap.insert(std::make_pair(module->GetModuleId(), s));
+    m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1,Interface2>(s);
   }
 
-  virtual void UngetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMap& service)
   {
-    std::map<long, MyService2*>::iterator iter = m_idToServiceMap.find(module->GetModuleId());
+    std::map<long, MyService2*>::iterator iter = m_idToServiceMap.find(bundle->GetBundleId());
     if (iter != m_idToServiceMap.end())
     {
       US_TEST_CONDITION(static_cast<Interface2*>(iter->second) == us::ExtractInterface<Interface2>(service), "Compare service pointer")
@@ -94,17 +94,17 @@ struct MyFactory3 : public us::ServiceFactory
 {
   std::map<long, MyService3*> m_idToServiceMap;
 
-  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMap GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     MyService3* s = new MyService3;
-    m_idToServiceMap.insert(std::make_pair(module->GetModuleId(), s));
+    m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1,Interface2,Interface3>(s);
   }
 
-  virtual void UngetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMap& service)
   {
-    std::map<long, MyService3*>::iterator iter = m_idToServiceMap.find(module->GetModuleId());
+    std::map<long, MyService3*>::iterator iter = m_idToServiceMap.find(bundle->GetBundleId());
     if (iter != m_idToServiceMap.end())
     {
       US_TEST_CONDITION(static_cast<Interface3*>(iter->second) == us::ExtractInterface<Interface3>(service), "Compare service pointer")
@@ -126,7 +126,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   framework->init();
   framework->Start();
 
-  ModuleContext* mc = framework->GetModuleContext();
+  BundleContext* mc = framework->GetBundleContext();
 
   // Register compile tests
   MyService1 s1;
@@ -147,7 +147,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   us::ServiceRegistration<Interface1,Interface2,Interface3> sfr3 = mc->RegisterService<Interface1,Interface2,Interface3>(static_cast<ServiceFactory*>(&f3));
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_CONDITION(mc->GetModule()->GetRegisteredServices().size() == 6, "# of reg services")
+  US_TEST_CONDITION(mc->GetBundle()->GetRegisteredServices().size() == 6, "# of reg services")
 #endif
 
   std::vector<us::ServiceReference<Interface1> > s1refs = mc->GetServiceReferences<Interface1>();
@@ -162,7 +162,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sr1.GetReference()), "unget interface1 ptr")
   i1 = mc->GetService(sfr1.GetReference());
-  US_TEST_CONDITION(i1 == static_cast<Interface1*>(f1.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface1 factory ptr")
+  US_TEST_CONDITION(i1 == static_cast<Interface1*>(f1.m_idToServiceMap[mc->GetBundle()->GetBundleId()]), "interface1 factory ptr")
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr1.GetReference()), "unget interface1 factory ptr")
 
@@ -171,7 +171,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sr2.GetReference(InterfaceType<Interface1>())), "unget interface1 ptr")
   i1 = mc->GetService(sfr2.GetReference(InterfaceType<Interface1>()));
-  US_TEST_CONDITION(i1 == static_cast<Interface1*>(f2.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface1 factory ptr")
+  US_TEST_CONDITION(i1 == static_cast<Interface1*>(f2.m_idToServiceMap[mc->GetBundle()->GetBundleId()]), "interface1 factory ptr")
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr2.GetReference(InterfaceType<Interface1>())), "unget interface1 factory ptr")
   Interface2* i2 = mc->GetService(sr2.GetReference(InterfaceType<Interface2>()));
@@ -179,7 +179,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i2 = NULL;
   US_TEST_CONDITION(mc->UngetService(sr2.GetReference(InterfaceType<Interface2>())), "unget interface2 ptr")
   i2 = mc->GetService(sfr2.GetReference(InterfaceType<Interface2>()));
-  US_TEST_CONDITION(i2 == static_cast<Interface2*>(f2.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface2 factory ptr")
+  US_TEST_CONDITION(i2 == static_cast<Interface2*>(f2.m_idToServiceMap[mc->GetBundle()->GetBundleId()]), "interface2 factory ptr")
   i2 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr2.GetReference(InterfaceType<Interface2>())), "unget interface2 factory ptr")
 
@@ -188,7 +188,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sr3.GetReference(InterfaceType<Interface1>())), "unget interface1 ptr")
   i1 = mc->GetService(sfr3.GetReference(InterfaceType<Interface1>()));
-  US_TEST_CONDITION(i1 == static_cast<Interface1*>(f3.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface1 factory ptr")
+  US_TEST_CONDITION(i1 == static_cast<Interface1*>(f3.m_idToServiceMap[mc->GetBundle()->GetBundleId()]), "interface1 factory ptr")
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr3.GetReference(InterfaceType<Interface1>())), "unget interface1 factory ptr")
   i2 = mc->GetService(sr3.GetReference(InterfaceType<Interface2>()));
@@ -196,7 +196,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i2 = NULL;
   US_TEST_CONDITION(mc->UngetService(sr3.GetReference(InterfaceType<Interface2>())), "unget interface2 ptr")
   i2 = mc->GetService(sfr3.GetReference(InterfaceType<Interface2>()));
-  US_TEST_CONDITION(i2 == static_cast<Interface2*>(f3.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface2 factory ptr")
+  US_TEST_CONDITION(i2 == static_cast<Interface2*>(f3.m_idToServiceMap[mc->GetBundle()->GetBundleId()]), "interface2 factory ptr")
   i2 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr3.GetReference(InterfaceType<Interface2>())), "unget interface2 factory ptr")
   Interface3* i3 = mc->GetService(sr3.GetReference(InterfaceType<Interface3>()));
@@ -204,7 +204,7 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i3 = NULL;
   US_TEST_CONDITION(mc->UngetService(sr3.GetReference(InterfaceType<Interface3>())), "unget interface3 ptr")
   i3 = mc->GetService(sfr3.GetReference(InterfaceType<Interface3>()));
-  US_TEST_CONDITION(i3 == static_cast<Interface3*>(f3.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface3 factory ptr")
+  US_TEST_CONDITION(i3 == static_cast<Interface3*>(f3.m_idToServiceMap[mc->GetBundle()->GetBundleId()]), "interface3 factory ptr")
   i3 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr3.GetReference(InterfaceType<Interface3>())), "unget interface3 factory ptr")
 

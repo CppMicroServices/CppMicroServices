@@ -30,7 +30,7 @@ limitations under the License.
 
 US_BEGIN_NAMESPACE
 
-class CoreModuleContext;
+class CoreBundleContext;
 class Mutex;
 
 class FrameworkPrivate
@@ -45,7 +45,7 @@ public:
      */
     Mutex* initLock;
 
-    CoreModuleContext* coreModuleContext;
+    CoreBundleContext* coreBundleContext;
 
     bool initialized;
 };

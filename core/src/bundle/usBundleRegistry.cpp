@@ -69,8 +69,8 @@ Bundle* BundleRegistry::Register(BundleInfo* info)
   {
     bundle = new Bundle();
     countLock->Lock();
-    info->id = ++id;
-    assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+    info->id = id++;
+    assert(info->id == 0 ? info->name == "CppMicroServices" : true);
     countLock->Unlock();
     bundle->Init(coreCtx, info);
 
@@ -105,8 +105,8 @@ void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleI
   }
 
   countLock->Lock();
-  info->id = ++id;
-  assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+  info->id = id++;
+  assert(info->id == 0 ? info->name == "CppMicroServices" : true);
   countLock->Unlock();
 
   systemBundle->Init(coreCtx, info);
@@ -117,8 +117,9 @@ void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleI
 
 void BundleRegistry::UnRegister(const BundleInfo* info)
 {
-  // TODO: fix once the system bundle id is set to 0
-  if (info->id > 1)
+  // There is no use checking for >= 0 as the System Bundle's ID is 0 
+  // and it can't be uninstalled.
+  if (info->id >= 1)
   {
     MutexLock lock(*bundlesLock);
     bundles.erase(info->name);

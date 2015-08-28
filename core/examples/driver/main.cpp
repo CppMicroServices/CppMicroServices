@@ -188,11 +188,10 @@ int main(int /*argc*/, char** /*argv*/)
 
       long int id = -1;
       ss >> id;
-      // TODO: the "system bundle" is 0 in the OSGi spec. Change this once CppMicroServices is
-      //    inline with the spec.
-      if (id == 1)
+
+      if (id < 0)
       {
-        std::cout << "Info: Stopping not possible" << std::endl;
+        std::cout << "Info: Invalid bundle Id. Stopping is not possible." << std::endl;
       }
       else
       {

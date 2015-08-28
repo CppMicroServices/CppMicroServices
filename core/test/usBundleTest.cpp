@@ -109,10 +109,10 @@ void frame005a(BundleContext* mc)
   Bundle* m = mc->GetBundle();
 
   // check expected headers
-
+  long bundleId = 0;
   US_TEST_CONDITION("main" == m->GetName(), "Test bundle name")
   US_TEST_CONDITION(BundleVersion(0,1,0) == m->GetVersion(), "Test test driver bundle version")
-  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == mc->GetBundle(1)->GetVersion(), "Test CppMicroServices version")
+  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == mc->GetBundle(bundleId)->GetVersion(), "Test CppMicroServices version")
 }
 
 // Get context id, location, persistent storage and status of the bundle

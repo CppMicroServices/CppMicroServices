@@ -21,6 +21,7 @@ limitations under the License.
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 
 #include "usTestUtils.h"
 #include "usTestUtilModuleListener.h"
@@ -35,7 +36,7 @@ namespace
     {
         FrameworkFactory factory;
 
-        Framework* f = factory.newFramework(std::map<std::string, std::string>());
+        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
         US_TEST_CONDITION(f, "Test Framework instantiation")
 
         // TODO: When a reasonable default configuration is determined, test for it here...
@@ -54,11 +55,10 @@ namespace
 
         FrameworkFactory factory;
 
-        Framework* f = factory.newFramework(configuration);
+        Framework* f = factory.NewFramework(configuration);
         US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration")
 
-        f->init();
-
+        f->Start();
         US_TEST_CONDITION("osgi" == f->GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties")
         US_TEST_CONDITION("0" == f->GetProperty("org.osgi.framework.startlevel.beginning").ToString(), "Test Framework custom launch properties")
         US_TEST_CONDITION("single" == f->GetProperty("org.osgi.framework.bsnversion").ToString(), "Test Framework custom launch properties")
@@ -72,10 +72,8 @@ namespace
     {
         FrameworkFactory factory;
 
-        Framework* f = factory.newFramework(std::map<std::string, std::string>());
-
-        f->init();
-
+        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+        f->Start();
         US_TEST_CONDITION(f->GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f->GetName() == US_CORE_FRAMEWORK_NAME, "Test Framework Bundle Name");
         // TODO: fix once the system bundle id is set to 0
@@ -88,19 +86,17 @@ namespace
     {
         TestModuleListener listener;
         FrameworkFactory factory;
-
-        Framework* f = factory.newFramework(std::map<std::string, std::string>());
-
         std::vector<ModuleEvent> pEvts;
 
+        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+        f->Start();
+        
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
 
-        f->init();
         US_TEST_CONDITION(f->IsLoaded(), "Check framework is in the Start state")
 
         f->GetModuleContext()->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
 
-        f->Start();
         f->Stop();
         US_TEST_CONDITION(!f->IsLoaded(), "Check framework is in the Stop state")
 
@@ -123,25 +119,9 @@ namespace
             US_TEST_FAILED_MSG(<< "Failed to throw correct exception type")
         }
 
-        // Test that calling "Start" without calling "init" is valid and produces the same
-        // result as first calling "init", then "Start".
-        f->Start();
-        US_TEST_CONDITION(f->IsLoaded(), "Check framework is in the Start state")
-
-        f->GetModuleContext()->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
-        f->Stop();
-
-        US_TEST_CONDITION(!f->IsLoaded(), "Check framework is in the Stop state")
-
-        pEvts.clear();
-        pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, f));
-
-        US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
-
         // Test that all bundles in the Start state are stopped when the framework is stopped.
-        f->init();
-        InstallTestBundle(f->GetModuleContext(), "TestModuleA");
         f->Start();
+        InstallTestBundle(f->GetModuleContext(), "TestModuleA");
 
         Module* moduleA = f->GetModuleContext()->GetModule("TestModuleA");
         moduleA->Start();
@@ -163,9 +143,8 @@ namespace
         std::vector<ModuleEvent> pStopEvts;
         FrameworkFactory factory;
 
-        Framework* f = factory.newFramework(std::map<std::string, std::string>());
+        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
 
-        f->init();
         f->Start();
 
         ModuleContext* fmc = f->GetModuleContext();

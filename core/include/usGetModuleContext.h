@@ -28,8 +28,6 @@
 #error Missing preprocessor define US_MODULE_NAME
 #endif
 
-#include <usGlobalConfig.h>
-#include <usModule.h>
 #include <usModuleInfo.h>
 #include <usModuleUtils_p.h>
 

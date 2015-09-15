@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 #include <usModuleContext.h>
 #include <usModuleEvent.h>
 #include <usGetModuleContext.h>
@@ -160,8 +161,7 @@ int usModuleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ModuleLoaderTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   framework->SetAutoLoadingEnabled(false);
@@ -170,8 +170,7 @@ int usModuleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   framework->Stop();
   delete framework;
 
-  framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   framework->SetAutoLoadingEnabled(true);

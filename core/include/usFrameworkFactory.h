@@ -23,10 +23,12 @@
 #ifndef USFRAMEWORKFACTORY_H
 #define USFRAMEWORKFACTORY_H
 
-#include "usGlobalConfig.h"
-#include "usFramework.h"
+#include <usCoreConfig.h>
+#include <map>
 
 US_BEGIN_NAMESPACE
+
+class Framework;
 
 /**
  * \ingroup MicroServices
@@ -45,17 +47,26 @@ public:
      * Create a new Framework instance.
      * 
      * @param configuration The framework properties to configure the new framework instance. If framework properties
-     * are not provided by the configuration argument, the created framework instance must use some reasonable
-     * default configuration. The created framework instance must copy any information needed from the specified 
-     * configuration argument since the configuration argument can be changed after the framework instance has been created.
+     * are not provided by the configuration argument, the created framework instance will use a reasonable
+     * default configuration.
      *
      * @return A new, configured Framework instance.
      */
-    Framework* newFramework(std::map<std::string, std::string> configuration);
+    Framework* NewFramework(std::map<std::string, std::string> configuration);
+
+    /**
+    * Create a new Framework instance.
+    *
+    * @remarks The created framework instance will use a reasonable default configuration.
+    *
+    * @return A new, configured Framework instance.
+    */
+    Framework* NewFramework(void);
 
 private:
     FrameworkFactory(const FrameworkFactory& );
     FrameworkFactory& operator=(const FrameworkFactory& );
+
 };
 
 US_END_NAMESPACE

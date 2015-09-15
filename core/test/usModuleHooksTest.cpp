@@ -21,13 +21,13 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usModuleFindHook.h>
 #include <usModuleEventHook.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usSharedLibrary.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
@@ -159,8 +159,7 @@ int usModuleHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ModuleHooksTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   TestFindHook(framework);

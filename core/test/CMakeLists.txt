@@ -81,7 +81,6 @@ add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)
-  set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()
 

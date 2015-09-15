@@ -21,7 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
-
+#include <usFramework.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usModuleContext.h>
@@ -30,7 +30,6 @@
 #include <usServiceFindHook.h>
 #include <usServiceEventListenerHook.h>
 #include <usServiceListenerHook.h>
-#include <usSharedLibrary.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
@@ -393,8 +392,7 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceHooksTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   try

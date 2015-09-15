@@ -23,7 +23,7 @@
 #include "usFramework.h"
 
 #include "usCoreModuleContext_p.h"
-#include "usFrameworkPrivate_p.h"
+#include "usFrameworkPrivate.h"
 #include "usModuleInfo.h"
 #include "usModuleInitialization.h"
 #include "usModuleSettings.h"
@@ -32,13 +32,13 @@
 
 US_BEGIN_NAMESPACE
 
-Framework::Framework(void) : f(new FrameworkPrivate())
+Framework::Framework(void) : d(new FrameworkPrivate())
 {
 
 }
 
 Framework::Framework(std::map<std::string, std::string>& configuration) :
-    f(new FrameworkPrivate(configuration))
+    d(new FrameworkPrivate(configuration))
 {
   
 }
@@ -48,39 +48,37 @@ Framework::~Framework(void)
 
 }
 
-void Framework::init(void)
+void Framework::Initialize(void)
 {
-  MutexLock lock(*f->initLock);
-  if (f->initialized)
+  MutexLock lock(d->initLock);
+  if (d->initialized)
   {
     return;
   }
 
   ModuleInfo* moduleInfo = new ModuleInfo(US_CORE_FRAMEWORK_NAME);
 
-  void(Framework::*initFncPtr)(void) = &Framework::init;
+  void(Framework::*initFncPtr)(void) = &Framework::Initialize;
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
   moduleInfo->location = ModuleUtils::GetLibraryPath(frameworkInit);
 
-  f->coreModuleContext->bundleRegistry.RegisterSystemBundle(this, moduleInfo);
+  d->coreModuleContext.bundleRegistry.RegisterSystemBundle(this, moduleInfo);
 
-  Module::Start();
-  f->initialized = true;
+  d->initialized = true;
 }
 
 void Framework::Start() 
 { 
-  if(!f->initialized)
-  {
-    init();
-  }
+  Initialize();
+  Module::Start();
 }
 
 void Framework::Stop() 
-{ 
+{
+  MutexLock lock(d->initLock);
   std::vector<Module*> modules(GetModuleContext()->GetModules());
-  for (std::vector<Module*>::const_iterator iter = modules.begin(); 
+  for (std::vector<Module*>::const_iterator iter = modules.begin();
       iter != modules.end(); 
       ++iter)
   {
@@ -91,9 +89,6 @@ void Framework::Stop()
   }
 
   Module::Stop();
-
-  MutexLock lock(*f->initLock);
-  f->initialized = false;
 }
 
 void Framework::Uninstall() 
@@ -110,7 +105,7 @@ std::string Framework::GetLocation() const
 
 void Framework::SetAutoLoadingEnabled(bool enable)
 {
-  f->coreModuleContext->settings.SetAutoLoadingEnabled(enable);
+  d->coreModuleContext.settings.SetAutoLoadingEnabled(enable);
 }
 
 US_END_NAMESPACE

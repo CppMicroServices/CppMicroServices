@@ -16,7 +16,9 @@ void RetrieveModuleContext()
 //! [GetModuleContext]
 
 //! [InitializeModule]
+#include <usModuleInitialization.h>
 
+US_INITIALIZE_MODULE
 //! [InitializeModule]
 
 int main(int /*argc*/, char* /*argv*/[])

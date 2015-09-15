@@ -110,14 +110,6 @@ SharedLibrary& SharedLibrary::operator =(const SharedLibrary& other)
   return *this;
 }
 
-bool SharedLibrary::IsSharedLibrary()
-{ // Testing for file extension isn't the most robust way to test
-  // for file type. Furthermore, the existence of this function
-  // is out of place; why test for a shared library if this class
-  // is supposed to represent a shared library?
-  return (GetFilePath().find(d->m_Suffix) != std::string::npos);
-}
-
 void SharedLibrary::Load(int flags)
 {
   if (d->m_Handle) throw std::logic_error(std::string("Library already loaded: ") + GetFilePath());

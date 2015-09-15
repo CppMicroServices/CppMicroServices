@@ -121,7 +121,7 @@ bool Module::IsLoaded() const
 
 void Module::Start()
 {
-  MutexLockingStrategy::Lock(this->d);
+  MutexLock(this->d->stateChangeGuard);
   if (d->moduleContext)
   {
     US_WARN << "Module " << d->info.name << " already started.";
@@ -130,7 +130,7 @@ void Module::Start()
 
   // loading a library isn't necessary if it isn't supported
 #ifdef US_BUILD_SHARED_LIBS
-  if(d->lib.IsSharedLibrary() && !d->lib.IsLoaded())
+  if(IsSharedLibrary(d->lib.GetFilePath()) && !d->lib.IsLoaded())
   {
     d->lib.Load();
   }
@@ -186,7 +186,7 @@ void Module::Start()
 
 void Module::Stop()
 {
-  MutexLockingStrategy::Lock(this->d);
+  MutexLock(this->d->stateChangeGuard);
   if (d->moduleContext == 0)
   {
     US_WARN << "Module " << d->info.name << " already stopped.";

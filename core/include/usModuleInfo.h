@@ -27,7 +27,6 @@
 #include <usCoreConfig.h>
 
 #include <string>
-#include <map>
 
 #ifdef _MSC_VER
 # pragma warning(push)

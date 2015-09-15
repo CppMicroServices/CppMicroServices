@@ -21,6 +21,7 @@ limitations under the License.
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 
 #include "usTestUtils.h"
 #include "usTestingConfig.h"
@@ -119,8 +120,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_BEGIN("BundleRegistryPerformanceTest")
 
     FrameworkFactory factory;
-    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-    framework->init();
+    Framework* framework = factory.NewFramework();
     framework->Start();
 
     // auto-installing will skew the benchmark results.

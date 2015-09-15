@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
@@ -43,8 +44,7 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ModuleManifestTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   InstallTestBundle(framework->GetModuleContext(), "TestModuleM");

@@ -28,8 +28,6 @@
 #include "usModuleInfo.h"
 #include "usModule.h"
 #include "usModuleContext.h"
-#include "usModuleSettings.h"
-#include "usModuleRegistry_p.h"
 
 #include "miniz.h"
 
@@ -54,7 +52,6 @@
 #endif
 
 namespace {
-#if !defined(US_PLATFORM_LINUX)
 std::string library_suffix()
 {
 #ifdef US_PLATFORM_WINDOWS
@@ -65,7 +62,6 @@ std::string library_suffix()
   return ".so";
 #endif
 }
-#endif
 
 #ifdef US_PLATFORM_POSIX
 
@@ -92,6 +88,12 @@ std::string GetBundleNameFromLocation(const std::string& location)
 std::string GetBundleLocation(const std::string& location)
 {
     return location.substr(0, location.find_last_of('/'));
+}
+
+bool IsSharedLibrary(const std::string& location)
+{ // Testing for file extension isn't the most robust way to test
+    // for file type. 
+    return (location.find(library_suffix()) != std::string::npos);
 }
 
 //-------------------------------------------------------------------

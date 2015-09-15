@@ -35,7 +35,12 @@ endforeach()
 
 
 function(CreateExample _name)
-  add_library(Example-${_name} ${ARGN})
+  set(_srcs ${ARGN})
+
+  usFunctionGetResourceSource(TARGET Example-${_name} OUT _srcs)
+  usFunctionGenerateModuleInit(_srcs)
+  
+  add_library(Example-${_name} ${_srcs})
   set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_name})
   if(NOT US_BUILD_SHARED_LIBS)
     set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
@@ -52,6 +57,10 @@ function(CreateExample _name)
     LABELS Examples
     OUTPUT_NAME ${_name}
   )
+  
+  usFunctionAddResources(TARGET Example-${_name} MODULE_NAME ${_name} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/${_name}/resources FILES manifest.json)
+  usFunctionEmbedResources(TARGET Example-${_name})
+  
 endfunction()
 
 add_subdirectory(eventlistener)

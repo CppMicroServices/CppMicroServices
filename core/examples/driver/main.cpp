@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleImport.h>
@@ -49,16 +50,19 @@
 
 US_USE_NAMESPACE
 
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#if !defined (US_BUILD_SHARED_LIBS)
+static const std::string BUNDLE_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
 #else
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#ifdef US_PLATFORM_WINDOWS
+static const std::string BUNDLE_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+static const std::string BUNDLE_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
 #endif
+#endif  // US_BUILD_SHARED_LIBS
 
 std::vector<std::string> GetExampleModules()
 {
   std::vector<std::string> names;
-#ifdef US_BUILD_SHARED_LIBS
   names.push_back("eventlistener");
   names.push_back("dictionaryservice");
   names.push_back("frenchdictionary");
@@ -67,7 +71,6 @@ std::vector<std::string> GetExampleModules()
   names.push_back("dictionaryclient3");
   names.push_back("spellcheckservice");
   names.push_back("spellcheckclient");
-#endif
   return names;
 }
 
@@ -76,8 +79,7 @@ int main(int /*argc*/, char** /*argv*/)
   char cmd[256];
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
   ModuleContext* frameworkContext = framework->GetModuleContext();
 
@@ -87,7 +89,11 @@ int main(int /*argc*/, char** /*argv*/)
   for (std::vector<std::string>::const_iterator iter = availableModules.begin();
       iter != availableModules.end(); ++iter)
   {
-      frameworkContext->InstallBundle(LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
+#if defined (US_BUILD_SHARED_LIBS)
+      frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
+#else
+      frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
+#endif
   }
 
   std::cout << "> ";
@@ -146,11 +152,13 @@ int main(int /*argc*/, char** /*argv*/)
         {
           try
           {
-            /* It is possible to install a bundle based on its name, if its
-                physical form is named the same. Installing a bundle can't
-                be done by id since that is a framework generated piece of
-                information. */
-              module = frameworkContext->InstallBundle(LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
+              /* Installing a bundle can't be done by id since that is a
+                    framework generated piece of information. */
+#if defined (US_BUILD_SHARED_LIBS)
+              module = frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
+#else
+              module = frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
+#endif
           }
           catch (const std::exception& e)
           {
@@ -258,5 +266,10 @@ int main(int /*argc*/, char** /*argv*/)
 US_IMPORT_MODULE(CppMicroServices)
 US_IMPORT_MODULE(eventlistener)
 US_IMPORT_MODULE(dictionaryservice)
+US_IMPORT_MODULE(spellcheckservice)
+US_IMPORT_MODULE(frenchdictionary)
 US_IMPORT_MODULE(dictionaryclient)
+US_IMPORT_MODULE(dictionaryclient2)
+US_IMPORT_MODULE(dictionaryclient3)
+US_IMPORT_MODULE(spellcheckclient)
 #endif

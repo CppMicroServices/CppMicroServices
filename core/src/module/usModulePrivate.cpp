@@ -49,6 +49,7 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   , moduleActivator(0)
   , q(qq)
   , lib(info->location)
+  , stateChangeGuard()
 {
   // Check if the module provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())

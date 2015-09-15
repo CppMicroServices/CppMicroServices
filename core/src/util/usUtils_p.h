@@ -39,6 +39,8 @@ std::string GetBundleNameFromLocation(const std::string& location);
 
 std::string GetBundleLocation(const std::string& location);
 
+bool IsSharedLibrary(const std::string& location);
+
 US_END_NAMESPACE
 
 //-------------------------------------------------------------------

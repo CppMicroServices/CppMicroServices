@@ -21,7 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
-
+#include <usFramework.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usServiceEvent.h>
@@ -191,8 +191,7 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticModuleTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   ModuleContext* mc = framework->GetModuleContext();

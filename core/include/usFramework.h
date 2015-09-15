@@ -55,7 +55,7 @@ class FrameworkPrivate;
  *
  * @remarks This class is thread-safe.
  *
- * @see FrameworkFactory::newFramework(std::map<std::string, std::string> configuration) 
+ * @see FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration)
  */
 class US_Core_EXPORT Framework : public Module
 {
@@ -63,18 +63,11 @@ public:
     virtual ~Framework(void);
 
     /**
-     * Initialize this Framework.
-     *
-     * @throw std::runtime_error If this Framework could not be initialized.
-     */
-    void init(void);
-
-    /**
      * Start this Framework.
      *
      * <p>
      * The following steps are taken to start this Framework:
-     * -# If this Framework is not in the STARTING state, initialize this Framework.
+     * -# If this Framework is not in the STARTING state, start this Framework.
      * -# This Framework's state is set to ACTIVE.
      *
      * @throws std::runtime_error If this Framework could not be started.
@@ -91,7 +84,7 @@ public:
      * -# Event handling is disabled.
      * -# All resources held by this Framework are released. This includes threads, open files, etc.
      *
-     * After being stopped, this Framework may be discarded, initialized or started.
+     * After being stopped, this Framework may be discarded or started.
      *
      * @throws std::runtime_error If stopping this Framework could not be initiated.
      */
@@ -123,7 +116,7 @@ public:
      * @param enable If \c true, enable auto-install support, disable it otherwise.
      *
      * @remarks Calling this method will have no effect if support for
-     * auto-loading has not been configured into the CppMicroServices library of it
+     * auto-loading has not been configured into the CppMicroServices library or if
      * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
      *
      * @deprecated This method remains for legacy clients and will be removed in a 
@@ -146,7 +139,10 @@ private:
     Framework(const Framework&);
     Framework operator=(const Framework&);
 
-    FrameworkPrivate* f;
+    // Helper function used to initialize the framework instance
+    void Initialize(void);
+
+    FrameworkPrivate* d;
 
 };
 

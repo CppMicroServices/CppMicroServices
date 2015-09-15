@@ -21,7 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
-
+#include <usFramework.h>
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usModule.h>
@@ -196,8 +196,7 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceFactoryTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   TestServiceFactoryModuleScope(framework->GetModuleContext());

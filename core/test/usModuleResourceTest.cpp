@@ -21,13 +21,12 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
-
+#include <usFramework.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
-#include <usSharedLibrary.h>
 
 #include <usTestingConfig.h>
 #include "usTestUtils.h"
@@ -418,8 +417,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ModuleResourceTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   ModuleContext* mc = framework->GetModuleContext();

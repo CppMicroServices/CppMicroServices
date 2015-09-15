@@ -166,7 +166,7 @@ public:
    * @return <code>true</code> if the module is <code>LOADED</code>
    *         <code>false</code> if it is in any other state.
    */
-  virtual bool IsLoaded() const;
+  bool IsLoaded() const;
 
   /**
    * Returns this module's {@link ModuleContext}. The returned
@@ -183,7 +183,7 @@ public:
    *         <code>0</code> if this module has no valid
    *         <code>ModuleContext</code>.
    */
-  virtual ModuleContext* GetModuleContext() const;
+  ModuleContext* GetModuleContext() const;
 
   /**
    * Returns this module's unique identifier. This module is assigned a unique
@@ -206,7 +206,7 @@ public:
    *
    * @return The unique identifier of this module.
    */
-  virtual long GetModuleId() const;
+  long GetModuleId() const;
 
   /**
    * Returns this module's location.
@@ -231,7 +231,7 @@ public:
    *
    * @return The name of this module.
    */
-  virtual std::string GetName() const;
+  std::string GetName() const;
 
   /**
    * Returns the version of this module as specified by the
@@ -244,7 +244,7 @@ public:
    *
    * @return The version of this module.
    */
-  virtual ModuleVersion GetVersion() const;
+  ModuleVersion GetVersion() const;
 
   /**
    * Returns the value of the specified property for this module.
@@ -258,7 +258,7 @@ public:
    * @sa GetPropertyKeys()
    * @sa \ref MicroServices_ModuleProperties
    */
-  virtual Any GetProperty(const std::string& key) const;
+  Any GetProperty(const std::string& key) const;
 
   /**
    * Returns a list of top-level property keys for this module.
@@ -267,7 +267,7 @@ public:
    *
    * @sa \ref MicroServices_ModuleProperties
    */
-  virtual std::vector<std::string> GetPropertyKeys() const;
+  std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns this module's ServiceReference list for all services it
@@ -281,7 +281,7 @@ public:
    * @return A list of ServiceReference objects for services this
    * module has registered.
    */
-  virtual std::vector<ServiceReferenceU> GetRegisteredServices() const;
+  std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
   /**
    * Returns this module's ServiceReference list for all services it is
@@ -296,7 +296,7 @@ public:
    * @return A list of ServiceReference objects for all services this
    * module is using.
    */
-  virtual std::vector<ServiceReferenceU> GetServicesInUse() const;
+  std::vector<ServiceReferenceU> GetServicesInUse() const;
 
   /**
    * Returns the resource at the specified \c path in this module.
@@ -308,7 +308,7 @@ public:
    * be found in this module or the module's state is \c UNLOADED, an invalid
    * ModuleResource object is returned.
    */
-  virtual ModuleResource GetResource(const std::string& path) const;
+  ModuleResource GetResource(const std::string& path) const;
 
   /**
    * Returns resources in this module.
@@ -333,7 +333,7 @@ public:
    * from the specified path.
    * @return A vector of ModuleResource objects for each matching entry.
    */
-  virtual std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
+  std::vector<ModuleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 
   /**
    * Start this bundle.
@@ -409,7 +409,6 @@ private:
   void Init(CoreModuleContext* coreCtx, ModuleInfo* info);
   void Uninit();
 
-protected:
   // purposely not implemented
   Module(const Module &);
   Module& operator=(const Module&);

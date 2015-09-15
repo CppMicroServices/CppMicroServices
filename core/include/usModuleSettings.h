@@ -45,7 +45,7 @@ struct ModuleSettingsPrivate;
  * - \e US_AUTOLOAD_PATHS A ':' (Unix) or ';' (Windows) separated list of paths
  *   from which modules should be auto-loaded.
  *
- * \deprecated Use FrameworkFactory::newFramework(std::map<std::string, std::string> configuration) to configure the framework.
+ * \deprecated Use FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration) to configure the framework.
  *
  * \remarks This class is thread safe.
  */

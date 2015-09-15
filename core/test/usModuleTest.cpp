@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include <usFrameworkFactory.h>
+#include <usFramework.h>
 
 #include <usModule.h>
 #include <usModuleEvent.h>
@@ -291,8 +292,7 @@ void TestModuleStates()
     std::vector<ModuleEvent> bundleEvents;
     FrameworkFactory factory;
 
-    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-    framework->init();
+    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
     framework->Start();
 
     ModuleContext* frameworkCtx = framework->GetModuleContext();
@@ -364,8 +364,7 @@ void TestForInstallFailure()
 {
     FrameworkFactory factory;
 
-    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-    framework->init();
+    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
     framework->Start();
 
     ModuleContext* frameworkCtx = framework->GetModuleContext();
@@ -409,8 +408,7 @@ void TestDuplicateInstall()
 {
     FrameworkFactory factory;
 
-    Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-    framework->init();
+    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
     framework->Start();
 
     ModuleContext* frameworkCtx = framework->GetModuleContext();
@@ -434,8 +432,7 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ModuleTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.newFramework(std::map<std::string, std::string>());
-  framework->init();
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   std::vector<Module*> modules = framework->GetModuleContext()->GetModules();
@@ -489,8 +486,7 @@ int usModuleTest(int /*argc*/, char* /*argv*/[])
   // test a non-default framework instance using a different persistent storage location.
   std::map<std::string, std::string> frameworkConfig;
   frameworkConfig.insert(std::pair<std::string, std::string>("org.osgi.framework.storage", "/tmp"));
-  framework = factory.newFramework(frameworkConfig);
-  framework->init();
+  framework = factory.NewFramework(frameworkConfig);
   framework->Start();
 
   frame02a(framework->GetModuleContext());

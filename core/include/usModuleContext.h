@@ -838,7 +838,14 @@ public:
    *    fails, a std::runtime_error is thrown.
    * -# A bundle event of type <code>BundleEvent::INSTALLED</code> is fired.   * -# The Bundle object for the newly or previously installed bundle is returned.
    *
-   * @param location The location identifier of the bundle to install. Typically a URL.
+   * @remarks A location identifier is defined as an absolute path to a shared library or executable file
+   * followed by a slash (/) and the bundle's name.
+   * 
+   * For example: 
+   * -# <code>InstallBundle("/path/to/bundle/foo.so/foo");</code>
+   * -# <code>InstallBundle("/path/to/bundle/foo.so/my_static_bundle");</code>
+   *
+   * @param location The location identifier of the bundle to install.
    * @return The Bundle object of the installed bundle.
    * @throws std::runtime_error If the installation failed.
    */

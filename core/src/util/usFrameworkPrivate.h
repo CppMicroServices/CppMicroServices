@@ -24,28 +24,33 @@ limitations under the License.
 #define USFRAMEWORKPRIVATE_P_H
 
 #include <usCoreConfig.h>
+#include <usCoreModuleContext_p.h>
+#include <usThreads_p.h>
 
 #include <map>
 #include <string>
 
 US_BEGIN_NAMESPACE
 
-class CoreModuleContext;
-class Mutex;
-
+/**
+ * The implementation of the Framework class.
+ *
+ * This class exists to hide and decouple the implementation of the 
+ * Framework class from client code.
+ */
 class FrameworkPrivate
 {
 public:
     FrameworkPrivate(void);
-    FrameworkPrivate(std::map<std::string, std::string>& configuration);
+    FrameworkPrivate(const std::map<std::string, std::string>& configuration);
     virtual ~FrameworkPrivate();
 
     /**
      * Make the initialization of the Framework thread-safe.
      */
-    Mutex* initLock;
+    Mutex initLock;
 
-    CoreModuleContext* coreModuleContext;
+    CoreModuleContext coreModuleContext;
 
     bool initialized;
 };

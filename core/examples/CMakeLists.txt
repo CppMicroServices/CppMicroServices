@@ -42,9 +42,6 @@ function(CreateExample _name)
   
   add_library(Example-${_name} ${_srcs})
   set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_name})
-  if(NOT US_BUILD_SHARED_LIBS)
-    set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
-  endif()
 
   if(${_name}_DEPENDS)
     foreach(_dep ${${_name}_DEPENDS})
@@ -120,7 +117,7 @@ if(US_BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND}
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                       -D BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
+                       -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                        -G ${CMAKE_GENERATOR}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                        "${CMAKE_CURRENT_LIST_DIR}")
@@ -142,7 +139,7 @@ if(US_BUILD_TESTING)
                      -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                     -D BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
+                     -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                      -G ${CMAKE_GENERATOR}
                      "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                      "${CMAKE_CURRENT_LIST_DIR}")

@@ -38,8 +38,9 @@ When building the C++ Micro Services library, you have a few configuration optio
   for detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
   Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives)
-  to make the API thread-safe. If your application is not multi-threaded, turn this option OFF
-  to get maximum performance.
+  to make the API thread-safe. All documented guarantees of thread-safety are valid if and only if
+  this option is turned ON. If your application is not multi-threaded, turn this option OFF to get
+  maximum performance.
 
 ### Customizing naming conventions
 

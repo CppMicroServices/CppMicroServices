@@ -22,12 +22,14 @@
 
 #include "usModuleContext.h"
 
-#include "usModuleRegistry.h"
+#include "usModule.h"
+#include "usModuleRegistry_p.h"
 #include "usModulePrivate.h"
 #include "usModuleSettings.h"
 #include "usCoreModuleContext_p.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
+#include "usUtils_p.h"
 
 #include <stdio.h>
 
@@ -61,17 +63,17 @@ Module* ModuleContext::GetModule() const
 
 Module* ModuleContext::GetModule(long id) const
 {
-  return d->module->coreCtx->moduleHooks.FilterModule(this, ModuleRegistry::GetModule(id));
+  return d->module->coreCtx->moduleHooks.FilterModule(this, d->module->coreCtx->bundleRegistry.GetModule(id));
 }
 
 Module* ModuleContext::GetModule(const std::string& name)
 {
-  return ModuleRegistry::GetModule(name);
+  return d->module->coreCtx->bundleRegistry.GetModule(name);
 }
 
 std::vector<Module*> ModuleContext::GetModules() const
 {
-  std::vector<Module*> modules = ModuleRegistry::GetModules();
+  std::vector<Module*> modules = d->module->coreCtx->bundleRegistry.GetModules();
   d->module->coreCtx->moduleHooks.FilterModules(this, modules);
   return modules;
 }
@@ -175,8 +177,14 @@ std::string ModuleContext::GetDataFile(const std::string &filename) const
 #else
     static const char separator = '/';
 #endif
-
-  std::string baseStoragePath = ModuleSettings::GetStoragePath();
+  
+  std::string baseStoragePath;
+  std::map<std::string, std::string>::iterator prop = d->module->coreCtx->frameworkProperties.find("org.osgi.framework.storage");
+  if(prop != d->module->coreCtx->frameworkProperties.end())
+  { 
+    baseStoragePath = (*prop).second;
+  }
+  
   if (baseStoragePath.empty()) return std::string();
   if (baseStoragePath != d->module->baseStoragePath)
   {
@@ -191,6 +199,18 @@ std::string ModuleContext::GetDataFile(const std::string &filename) const
     d->module->storagePath = baseStoragePath + separator + buf + "_" + d->module->info.name + separator;
   }
   return d->module->storagePath + filename;
+}
+
+Module* ModuleContext::InstallBundle(const std::string& location)
+{
+    ModuleInfo* moduleInfo = new ModuleInfo(GetBundleNameFromLocation(location));
+    moduleInfo->location = GetBundleLocation(location);
+
+    Module* module = d->module->coreCtx->bundleRegistry.Register(moduleInfo);
+
+    d->module->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::INSTALLED, module));
+
+    return module;
 }
 
 

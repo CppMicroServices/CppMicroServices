@@ -25,7 +25,6 @@
 #include <stdexcept>
 
 #include <usUtils_p.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
 
 

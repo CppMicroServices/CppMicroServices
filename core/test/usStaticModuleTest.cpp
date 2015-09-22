@@ -20,15 +20,16 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+#include <usFramework.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usServiceEvent.h>
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
-#include <usSharedLibrary.h>
 
+#include "usTestUtils.h"
 #include "usTestUtilModuleListener.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
@@ -37,39 +38,37 @@ US_USE_NAMESPACE
 
 namespace {
 
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#else
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#endif
-
-// Load libTestModuleB and check that it exists and that the service it registers exists,
+// Install and start libTestModuleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(ModuleContext* mc, TestModuleListener& listener,
-#ifdef US_BUILD_SHARED_LIBS
-               SharedLibrary& libB)
+void frame020a(ModuleContext* mc, TestModuleListener& listener)
 {
+  InstallTestBundle(mc, "TestModuleB");
+
+  Module* moduleB = mc->GetModule("TestModuleB");
+  US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
+
   try
   {
-    libB.Load();
+#if defined (US_BUILD_SHARED_LIBS)
+    Module* module = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestModuleB" + LIB_EXT + "/TestModuleImportedByB");
+#else
+    Module* module = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestModuleImportedByB");
+#endif
+    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module TestModuleImportedByB")
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frame020a:FAIL")
   }
-#else
-               SharedLibrary& /*libB*/)
-{
-#endif
 
-  Module* moduleB = ModuleRegistry::GetModule("TestModuleB");
-  US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
-
-  Module* moduleImportedByB = ModuleRegistry::GetModule("TestModuleImportedByB");
+  Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
   US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for existing module TestModuleImportedByB")
 
   US_TEST_CONDITION(moduleB->GetName() == "TestModuleB", "Test module name")
+  US_TEST_CONDITION(moduleImportedByB->GetName() == "TestModuleImportedByB", "Test module name")
 
+  moduleB->Start();
+  moduleImportedByB->Start();
   // Check if libB registered the expected service
   try
   {
@@ -94,18 +93,16 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
 
     // check the listeners for events
     std::vector<ModuleEvent> pEvts;
-#ifdef US_BUILD_SHARED_LIBS
+    pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleB));
+    pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, moduleImportedByB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleImportedByB));
     pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleImportedByB));
-#endif
 
     std::vector<ServiceEvent> seEvts;
-#ifdef US_BUILD_SHARED_LIBS
     seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, refs.back()));
     seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, refs.front()));
-#endif
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 
@@ -115,19 +112,17 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
     US_TEST_FAILED_MSG(<< "test module, expected service not found");
   }
 
-#ifdef US_BUILD_SHARED_LIBS
   US_TEST_CONDITION(moduleB->IsLoaded() == true, "Test if loaded correctly");
-#endif
 }
 
 
-// Unload libB and check for correct events
-void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& libB)
+// Stop libB and check for correct events
+void frame030b(ModuleContext* mc, TestModuleListener& listener)
 {
-  Module* moduleB = ModuleRegistry::GetModule("TestModuleB");
+  Module* moduleB = mc->GetModule("TestModuleB");
   US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
 
-  Module* moduleImportedByB = ModuleRegistry::GetModule("TestModuleImportedByB");
+  Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
   US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
 
   std::vector<ServiceReferenceU> refs
@@ -137,31 +132,56 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener, SharedLibrary& l
 
   try
   {
-    libB.Unload();
-#ifdef US_BUILD_SHARED_LIBS
+    moduleB->Stop();
     US_TEST_CONDITION(moduleB->IsLoaded() == false, "Test for unloaded state")
-#endif
   }
   catch (const std::exception& e)
   {
-    US_TEST_FAILED_MSG(<< "UnLoad module exception: " << e.what())
+    US_TEST_FAILED_MSG(<< "Stop module exception: " << e.what())
+  }
+
+  try
+  {
+    moduleImportedByB->Stop();
+    US_TEST_CONDITION(moduleImportedByB->IsLoaded() == false, "Test for unloaded state")
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG(<< "Stop module exception: " << e.what())
   }
 
   std::vector<ModuleEvent> pEvts;
-#ifdef US_BUILD_SHARED_LIBS
-  pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, moduleImportedByB));
-  pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, moduleImportedByB));
   pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, moduleB));
   pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, moduleB));
-#endif
+  pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, moduleImportedByB));
+  pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, moduleImportedByB));
 
   std::vector<ServiceEvent> seEvts;
-#ifdef US_BUILD_SHARED_LIBS
-  seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.front()));
   seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.back()));
-#endif
+  seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.front()));
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
+}
+
+// Uninstall libB and check for correct events
+void frame040c(ModuleContext* mc, TestModuleListener& listener)
+{
+    Module* moduleB = mc->GetModule("TestModuleB");
+    US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
+
+    Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
+    US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
+
+    moduleB->Uninstall();
+    US_TEST_CONDITION(mc->GetModules().size() == 2, "Test for uninstall of TestModuleB")
+    moduleImportedByB->Uninstall();
+    US_TEST_CONDITION(mc->GetModules().size() == 1, "Test for uninstall of TestModuleImportedByB")
+
+    std::vector<ModuleEvent> pEvts;
+    pEvts.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, moduleB));
+    pEvts.push_back(ModuleEvent(ModuleEvent::UNINSTALLED, moduleImportedByB));
+
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 }
 
 } // end unnamed namespace
@@ -170,15 +190,27 @@ int usStaticModuleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("StaticModuleTest");
 
-  ModuleContext* mc = GetModuleContext();
-  TestModuleListener listener;
+  FrameworkFactory factory;
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  framework->Start();
 
-  ModuleListenerRegistrationHelper<TestModuleListener> ml(mc, &listener, &TestModuleListener::ModuleChanged);
-  ServiceListenerRegistrationHelper<TestModuleListener> sl(mc, &listener, &TestModuleListener::ServiceChanged);
+  ModuleContext* mc = framework->GetModuleContext();
 
-  SharedLibrary libB(LIB_PATH, "TestModuleB");
-  frame020a(mc, listener, libB);
-  frame030b(mc, listener, libB);
+  { // scope the use of the listener so its destructor is
+    // called before we destroy the framework's bundle context.
+    // The TestModuleListener needs to remove its listeners while
+    // the framework is still active.
+    TestModuleListener listener;
+
+    ModuleListenerRegistrationHelper<TestModuleListener> ml(mc, &listener, &TestModuleListener::ModuleChanged);
+    ServiceListenerRegistrationHelper<TestModuleListener> sl(mc, &listener, &TestModuleListener::ServiceChanged);
+
+    frame020a(mc, listener);
+    frame030b(mc, listener);
+    frame040c(mc, listener);
+  }
+
+  delete framework;
 
   US_TEST_END()
 }

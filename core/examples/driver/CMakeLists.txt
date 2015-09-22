@@ -12,8 +12,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/us${PROJECT_NAME}DriverConfig.h.in
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(us${PROJECT_NAME}Driver main.cpp)
-if(NOT US_BUILD_SHARED_LIBS)
-  target_link_libraries(us${PROJECT_NAME}Driver Example-eventlistener Example-dictionaryservice Example-dictionaryclient)
+if(NOT US_BUILD_SHARED_LIBS) 
+  # Using static modules requires that they be linked into an EXE or shared library and that
+  # any resources inside the static modules are merged into that EXE or shared library.
+  
+  # _target_zip_archives contains the list of static modules and is used to both link with the executable
+  # and merge their resources into the executable.
+  set(_target_zip_archives Example-dictionaryclient Example-dictionaryclient2 Example-dictionaryclient3 Example-dictionaryservice Example-frenchdictionary Example-eventlistener Example-spellcheckclient Example-spellcheckservice ${CppMicroServices_LIBRARIES})
+  
+  set(_srcs main.cpp)
+  usFunctionGetResourceSource(TARGET us${PROJECT_NAME}Driver OUT _srcs)
+  
+  add_executable(us${PROJECT_NAME}Driver ${_srcs})
+  target_link_libraries(us${PROJECT_NAME}Driver ${_target_zip_archives})
+  
+  # Merge all resources from the static modules and embed them into the executable.
+  usFunctionAddResources(TARGET us${PROJECT_NAME}Driver
+                        MODULE_NAME main
+                        ZIP_ARCHIVES ${_target_zip_archives})
+  usFunctionEmbedResources(TARGET us${PROJECT_NAME}Driver)
+else()
+  add_executable(us${PROJECT_NAME}Driver main.cpp)
+  target_link_libraries(us${PROJECT_NAME}Driver ${CppMicroServices_LIBRARIES})
 endif()
-target_link_libraries(us${PROJECT_NAME}Driver ${CppMicroServices_LIBRARIES})

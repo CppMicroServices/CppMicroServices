@@ -21,7 +21,8 @@
 =============================================================================*/
 
 #include <usModuleActivator.h>
-#include <usModuleInitialization.h>
+
+#include <iostream>
 
 US_USE_NAMESPACE
 
@@ -37,4 +38,3 @@ struct MyStaticModuleActivator : public ModuleActivator
 
 US_EXPORT_MODULE_ACTIVATOR(MyStaticModuleActivator)
 
-US_INITIALIZE_MODULE

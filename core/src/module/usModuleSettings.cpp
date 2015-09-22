@@ -22,7 +22,7 @@
 
 #include "usModuleSettings.h"
 #include "usThreads_p.h"
-#include "usStaticInit_p.h"
+#include "usWaitCondition_p.h"
 
 #include <string>
 #include <sstream>
@@ -68,7 +68,6 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
     , autoLoadingEnabled(false)
   #endif
     , autoLoadingDisabled(false)
-    , logLevel(DebugMsg)
   {
     autoLoadPaths.insert(ModuleSettings::CURRENT_MODULE_PATH());
 
@@ -102,11 +101,21 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
   std::set<std::string> extraPaths;
   bool autoLoadingEnabled;
   bool autoLoadingDisabled;
-  std::string storagePath;
-  MsgType logLevel;
 };
 
-US_GLOBAL_STATIC(ModuleSettingsPrivate, moduleSettingsPrivate)
+ModuleSettings::ModuleSettings() :
+    pimpl(new ModuleSettingsPrivate())
+{
+
+}
+ 
+ModuleSettings::~ModuleSettings()
+{
+  if(pimpl)
+  {
+    delete pimpl;
+  }
+}
 
 bool ModuleSettings::IsThreadingSupportEnabled()
 {
@@ -119,10 +128,10 @@ bool ModuleSettings::IsThreadingSupportEnabled()
 
 bool ModuleSettings::IsAutoLoadingEnabled()
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
+  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  return !moduleSettingsPrivate()->autoLoadingDisabled &&
-      moduleSettingsPrivate()->autoLoadingEnabled;
+  return !pimpl->autoLoadingDisabled &&
+      pimpl->autoLoadingEnabled;
 #else
   return false;
 #endif
@@ -130,17 +139,17 @@ bool ModuleSettings::IsAutoLoadingEnabled()
 
 void ModuleSettings::SetAutoLoadingEnabled(bool enable)
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  moduleSettingsPrivate()->autoLoadingEnabled = enable;
+  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  pimpl->autoLoadingEnabled = enable;
 }
 
 ModuleSettings::PathList ModuleSettings::GetAutoLoadPaths()
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  ModuleSettings::PathList paths(moduleSettingsPrivate()->autoLoadPaths.begin(),
-                                 moduleSettingsPrivate()->autoLoadPaths.end());
-  paths.insert(paths.end(), moduleSettingsPrivate()->extraPaths.begin(),
-               moduleSettingsPrivate()->extraPaths.end());
+  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  ModuleSettings::PathList paths(pimpl->autoLoadPaths.begin(),
+                                 pimpl->autoLoadPaths.end());
+  paths.insert(paths.end(), pimpl->extraPaths.begin(),
+               pimpl->extraPaths.end());
   std::sort(paths.begin(), paths.end());
   paths.erase(std::unique(paths.begin(), paths.end()), paths.end());
   return paths;
@@ -152,39 +161,15 @@ void ModuleSettings::SetAutoLoadPaths(const PathList& paths)
   normalizedPaths.resize(paths.size());
   std::transform(paths.begin(), paths.end(), normalizedPaths.begin(), RemoveTrailingPathSeparator);
 
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  moduleSettingsPrivate()->autoLoadPaths.clear();
-  moduleSettingsPrivate()->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
+  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  pimpl->autoLoadPaths.clear();
+  pimpl->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
 }
 
 void ModuleSettings::AddAutoLoadPath(const std::string& path)
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  moduleSettingsPrivate()->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
-}
-
-void ModuleSettings::SetStoragePath(const std::string &path)
-{
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  moduleSettingsPrivate()->storagePath = RemoveTrailingPathSeparator(path);
-}
-
-std::string ModuleSettings::GetStoragePath()
-{
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  return moduleSettingsPrivate()->storagePath;
-}
-
-void ModuleSettings::SetLogLevel(MsgType level)
-{
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  moduleSettingsPrivate()->logLevel = level;
-}
-
-MsgType ModuleSettings::GetLogLevel()
-{
-  US_UNUSED(ModuleSettingsPrivate::Lock(moduleSettingsPrivate()));
-  return moduleSettingsPrivate()->logLevel;
+  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  pimpl->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
 }
 
 US_END_NAMESPACE

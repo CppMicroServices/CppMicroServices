@@ -40,8 +40,6 @@
 
 US_BEGIN_NAMESPACE
 
-AtomicInt ModulePrivate::idCounter;
-
 ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
   : coreCtx(coreCtx)
@@ -50,6 +48,8 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   , moduleContext(0)
   , moduleActivator(0)
   , q(qq)
+  , lib(info->location)
+  , stateChangeGuard()
 {
   // Check if the module provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())
@@ -98,7 +98,19 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   propId << this->info.id;
   moduleManifest.SetValue(Module::PROP_ID(), propId.str());
   moduleManifest.SetValue(Module::PROP_LOCATION(), this->info.location);
-  moduleManifest.SetValue(Module::PROP_NAME(), this->info.name);
+  
+  if (!moduleManifest.Contains(Module::PROP_NAME()))
+  {
+    throw std::runtime_error(Module::PROP_NAME() + " is not defined in the bundle manifest.");
+  }
+
+  Any bundleName(moduleManifest.GetValue(Module::PROP_NAME()));
+  if (bundleName.Empty())
+  {
+    throw std::runtime_error(Module::PROP_NAME() + " is empty in the bundle manifest.");
+  }
+
+  this->info.name = bundleName.ToString();
 
   if (moduleManifest.Contains(Module::PROP_AUTOLOAD_DIR()))
   {
@@ -109,6 +121,17 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
     this->info.autoLoadDir = this->info.name;
     moduleManifest.SetValue(Module::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
   }
+
+#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+  if (coreCtx->settings.IsAutoLoadingEnabled())
+  {
+    const std::vector<std::string> loadedModuleNames = AutoLoadModules(this->info, this->coreCtx);
+    if (!loadedModuleNames.empty())
+    {
+      moduleManifest.SetValue(Module::PROP_AUTOLOADED_MODULES(), Any(loadedModuleNames));
+    }
+  }
+#endif
 }
 
 ModulePrivate::~ModulePrivate()

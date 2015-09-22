@@ -23,20 +23,18 @@
 #ifndef USMODULEPRIVATE_H
 #define USMODULEPRIVATE_H
 
-#include <map>
-#include <list>
-
-#include "usModuleRegistry.h"
 #include "usModuleVersion.h"
 #include "usModuleInfo.h"
 #include "usModuleManifest_p.h"
 #include "usModuleResourceContainer_p.h"
+#include "usSharedLibrary.h"
 
-#include "usAtomicInt_p.h"
+#include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 
 class CoreModuleContext;
+class Module;
 class ModuleContext;
 struct ModuleActivator;
 
@@ -81,11 +79,21 @@ public:
 
   Module* const q;
 
+  /** 
+   * Responsible for platform specific loading and unloading
+   * of the bundle's physical form.
+   */
+  SharedLibrary lib;
+
+  /**
+   * This mutex ensures that the Start() and Stop() of a Module instance
+   * is thread-safe.
+   */
+  Mutex stateChangeGuard;
+
 private:
 
   void InitializeResources();
-
-  static AtomicInt idCounter;
 
   // purposely not implemented
   ModulePrivate(const ModulePrivate&);

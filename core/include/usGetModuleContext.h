@@ -28,10 +28,10 @@
 #error Missing preprocessor define US_MODULE_NAME
 #endif
 
-#include <usGlobalConfig.h>
-#include <usModuleRegistry.h>
-#include <usModule.h>
+#include <usModuleInfo.h>
 #include <usModuleUtils_p.h>
+
+#include <cstring>
 
 US_BEGIN_NAMESPACE
 
@@ -49,7 +49,26 @@ class ModuleContext;
  */
 static inline ModuleContext* GetModuleContext()
 {
-  return ModuleRegistry::GetModule(US_STR(US_MODULE_NAME))->GetModuleContext();
+  typedef ModuleContext*(*GetBundleContext)(void);
+  GetBundleContext getBundleContext = NULL;
+
+  ModuleContext*(*getModuleContext)() = &GetModuleContext;
+  void* GetModuleContext = NULL;
+  std::memcpy(&GetModuleContext, &getModuleContext, sizeof(void*));
+  std::string libPath(ModuleUtils::GetLibraryPath(GetModuleContext));
+
+  ModuleInfo info(US_STR(US_MODULE_NAME));
+  info.location = libPath;
+  std::string get_bundle_context_func("_us_get_bundle_context_instance_" US_STR(US_MODULE_NAME));
+  void* getBundleContextSym = ModuleUtils::GetSymbol(info, get_bundle_context_func.c_str());
+  std::memcpy(&getBundleContext, &getBundleContextSym, sizeof(void*));
+
+  if (getBundleContext)
+  {
+      return getBundleContext();
+  }
+
+  return 0;
 }
 
 US_END_NAMESPACE

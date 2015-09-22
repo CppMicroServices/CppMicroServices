@@ -20,14 +20,16 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+#include <usFramework.h>
+#include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleEvent.h>
 #include <usServiceEvent.h>
 #include <usModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usModuleActivator.h>
-#include <usSharedLibrary.h>
 
+#include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
@@ -35,33 +37,19 @@ US_USE_NAMESPACE
 
 namespace {
 
-#ifdef US_PLATFORM_WINDOWS
-  static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#else
-  static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#endif
-
 } // end unnamed namespace
 
 int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ModuleManifestTest");
 
-  SharedLibrary target(LIB_PATH, "TestModuleM");
+  FrameworkFactory factory;
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  framework->Start();
 
-#ifdef US_BUILD_SHARED_LIBS
-  try
-  {
-    target.Load();
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
-                        << e.what() << " + in frameSL02a:FAIL" );
-  }
-#endif
+  InstallTestBundle(framework->GetModuleContext(), "TestModuleM");
 
-  Module* moduleM = ModuleRegistry::GetModule("TestModuleM");
+  Module* moduleM = framework->GetModuleContext()->GetModule("TestModuleM");
   US_TEST_CONDITION_REQUIRED(moduleM != 0, "Test for existing module TestModuleM")
 
   US_TEST_CONDITION(moduleM->GetProperty(Module::PROP_NAME()).ToString() == "TestModuleM", "Module name")
@@ -91,7 +79,7 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(m["list"].Type() == typeid(std::vector<Any>), "map 2 type")
   US_TEST_CONDITION_REQUIRED(any_cast<std::vector<Any> >(m["list"]).size() == 2, "map 2 value size")
 
-  target.Unload();
+  delete framework;
 
   US_TEST_END()
 }

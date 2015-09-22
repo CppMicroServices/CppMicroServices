@@ -20,28 +20,33 @@
 
 =============================================================================*/
 
-#ifndef USMODULEREGISTRY_H
-#define USMODULEREGISTRY_H
+#ifndef USMODULEREGISTRY_P_H
+#define USMODULEREGISTRY_P_H
 
 #include <vector>
 #include <string>
 
 #include <usCoreConfig.h>
+#include <usThreads_p.h>
 
 US_BEGIN_NAMESPACE
 
+class CoreModuleContext;
+class Framework;
 class Module;
 struct ModuleInfo;
 struct ModuleActivator;
 
 /**
- * \ingroup MicroServices
- *
  * Here we handle all the modules that are loaded in the framework.
+ * @remarks This class is thread-safe.
  */
 class US_Core_EXPORT ModuleRegistry {
 
 public:
+  
+  ModuleRegistry(CoreModuleContext* coreCtx);
+  virtual ~ModuleRegistry(void);
 
   /**
    * Get the module that has the specified module identifier.
@@ -50,7 +55,7 @@ public:
    * @return Module or null
    *         if the module was not found.
    */
-  static Module* GetModule(long id);
+  Module* GetModule(long id);
 
   /**
    * Get the module that has specified module name.
@@ -58,34 +63,72 @@ public:
    * @param name The name of the module to get.
    * @return Module or null.
    */
-  static Module* GetModule(const std::string& name);
+  Module* GetModule(const std::string& name);
 
   /**
    * Get all known modules.
    *
    * @return A list which is filled with all known modules.
    */
-  static std::vector<Module*> GetModules();
+  std::vector<Module*> GetModules();
 
   /**
-   * Get all modules currently in module state <code>LOADED</code>.
+   * Register a bundle with the Framework
    *
-   * @return A list which is filled with all modules in
-   *         state <code>LOADED</code>
+   * @return The registered bundle.
    */
-  static std::vector<Module*> GetLoadedModules();
+  Module* Register(ModuleInfo* info);
+  
+  /**
+   * Register the system bundle.
+   *
+   * A helper function to help bootstrap the Framework.
+   *
+   * @param systemBundle The system bundle to register.
+   */
+  void RegisterSystemBundle(Framework* const systemBundle, ModuleInfo* info);
 
-  static void Register(ModuleInfo* info);
-
-  static void UnRegister(const ModuleInfo* info);
+  /**
+   * Remove a bundle from the Framework.
+   *
+   * Register(ModuleInfo* info) must be called to re-install the bundle. 
+   * Upon which, the bundle will receive a new unique bundle id.
+   *
+   */
+  void UnRegister(const ModuleInfo* info);
 
 private:
+  // don't allow copying the ModuleRegistry.
+  ModuleRegistry(const ModuleRegistry& );
+  ModuleRegistry& operator=(const ModuleRegistry& );
 
-  // disabled
-  ModuleRegistry();
+  CoreModuleContext* coreCtx;
+
+  typedef US_UNORDERED_MAP_TYPE<std::string, Module*> ModuleMap;
+
+  /**
+   * Table of all installed modules in this framework.
+   * Key is the module name.
+   */
+  ModuleMap modules;
+
+  /**
+   * Lock for protecting the modules object
+   */
+  Mutex* modulesLock;
+
+  /**
+   * Lock for protecting the register count
+   */
+  Mutex* countLock;
+
+  /**
+   * Stores the next Bundle ID.
+   */
+  long id;
 
 };
 
 US_END_NAMESPACE
 
-#endif // USMODULEREGISTRY_H
+#endif // USMODULEREGISTRY_P_H

@@ -2,6 +2,7 @@
 
 US_BEGIN_NAMESPACE
 struct ModuleActivator;
+class ModuleContext;
 US_END_NAMESPACE
 
 US_USE_NAMESPACE
@@ -11,6 +12,12 @@ extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule1() { re
 extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule2() { return 0; }
 extern "C" void _us_import_module_initializer_MyStaticModule1() {}
 extern "C" void _us_import_module_initializer_MyStaticModule2() {}
+extern "C" ModuleContext* _us_get_bundle_context_instance_MyStaticModule1() { return 0; }
+extern "C" ModuleContext* _us_set_bundle_context_instance_MyStaticModule1() { return 0; }
+extern "C" ModuleContext* _us_get_bundle_context_instance_MyStaticModule2() { return 0; }
+extern "C" ModuleContext* _us_set_bundle_context_instance_MyStaticModule2() { return 0; }
+extern "C" ModuleContext* _us_get_bundle_context_instance_main() { return 0; }
+extern "C" ModuleContext* _us_set_bundle_context_instance_main() { return 0; }
 
 //! [ImportStaticModuleIntoMain]
 #include <usModuleImport.h>
@@ -32,8 +39,3 @@ int main(int /*argc*/, char* /*argv*/[])
 {
   return 0;
 }
-
-//! [InitializeExecutable]
-#include <usModuleInitialization.h>
-US_INITIALIZE_MODULE
-//! [InitializeExecutable]

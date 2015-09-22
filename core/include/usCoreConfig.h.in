@@ -20,9 +20,14 @@
 #define US_CORE_VERSION @Core_VERSION@
 #define US_CORE_VERSION_STR "@Core_VERSION@"
 
+//-------------------------------------------------------------------
+// Framework Information
+//-------------------------------------------------------------------
+
+#define US_CORE_FRAMEWORK_NAME "@CMAKE_PROJECT_NAME@"
 
 //-------------------------------------------------------------------
-// Debuging & Logging
+// Debugging & Logging
 //-------------------------------------------------------------------
 
 #cmakedefine US_ENABLE_DEBUG_OUTPUT

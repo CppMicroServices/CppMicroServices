@@ -20,16 +20,16 @@
 
 =============================================================================*/
 
-#include "usModuleRegistry.h"
+#include "usModuleRegistry_p.h"
 
+#include "usFramework.h"
 #include "usModule.h"
 #include "usModuleInfo.h"
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
-#include "usModuleInitialization.h"
+#include "usModulePrivate.h"
 #include "usCoreModuleContext_p.h"
 #include "usGetModuleContext.h"
-#include "usStaticInit_p.h"
 
 #include <cassert>
 #include <map>
@@ -37,118 +37,100 @@
 
 US_BEGIN_NAMESPACE
 
-typedef US_UNORDERED_MAP_TYPE<std::string, Module*> ModuleMap;
-
-US_GLOBAL_STATIC(CoreModuleContext, coreModuleContext)
-
-template<typename T>
-struct ModuleDeleter
+ModuleRegistry::ModuleRegistry(CoreModuleContext* coreCtx) :
+    coreCtx(coreCtx),
+    modulesLock(new Mutex()),
+    countLock(new Mutex()),
+    id(0)
 {
-  void operator()(GlobalStatic<T>& globalStatic) const
-  {
-    ModuleMap* moduleMap = globalStatic.pointer;
-    for (ModuleMap::const_iterator i = moduleMap->begin();
-         i != moduleMap->end(); ++i)
-    {
-      delete i->second;
-    }
-    DefaultGlobalStaticDeleter<T> defaultDeleter;
-    defaultDeleter(globalStatic);
-  }
-};
 
-/**
- * Table of all installed modules in this framework.
- * Key is the module id.
- */
-US_GLOBAL_STATIC_WITH_DELETER(ModuleMap, modules, ModuleDeleter)
+}
 
-/**
- * Lock for protecting the modules object
- */
-US_GLOBAL_STATIC(Mutex, modulesLock)
-
-/**
- * Lock for protecting the register count
- */
-US_GLOBAL_STATIC(Mutex, countLock)
-
-void ModuleRegistry::Register(ModuleInfo* info)
+ModuleRegistry::~ModuleRegistry(void)
 {
-  static long regCount = 0;
-  if (info->id > 0)
+    if (modulesLock)
+    {
+        delete modulesLock;
+    }
+
+    if (countLock)
+    {
+        delete countLock;
+    }
+
+    id = 0;
+}
+
+Module* ModuleRegistry::Register(ModuleInfo* info)
+{
+  Module* module = GetModule(info->name);
+
+  if (!module)
   {
-    // The module was already registered
-    Module* module = 0;
+    module = new Module();
+    countLock->Lock();
+    info->id = ++id;
+    assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+    countLock->Unlock();
+    module->Init(coreCtx, info);
+
+    MutexLock lock(*modulesLock);
+    std::pair<ModuleMap::iterator, bool> return_pair(modules.insert(std::make_pair(info->name, module)));
+
+    // A race condition exists when creating a new bundle instance. To resolve
+    // this requires either scoping the mutex to the entire function or adding
+    // additional logic to check for duplicates on insert into the bundle registry.
+    // Otherwise, an "orphan" bundle instance could be returned to the caller,
+    // which isn't actually contained within the bundle registry.
+    //
+    // Based on the bundle registry performance unit test, deleting the
+    // orphaned bundle instance is faster than increasing the scope of the
+    // mutex.
+    if (!return_pair.second)
     {
-      MutexLock lock(*modulesLock());
-      module = modules()->operator[](info->name);
-      assert(module != 0);
-    }
-    module->Start();
+      ModuleMap::iterator iter(return_pair.first);
+      delete module;
+      module = (*iter).second;
+    }    
   }
-  else
+
+  return module;
+}
+
+void ModuleRegistry::RegisterSystemBundle(Framework* const systemBundle, ModuleInfo* info)
+{
+  if (!systemBundle)
   {
-    Module* module = 0;
-    // check if the module is reloaded
-    {
-      MutexLock lock(*modulesLock());
-      ModuleMap* map = modules();
-      for (ModuleMap::const_iterator i = map->begin();
-           i != map->end(); ++i)
-      {
-        if (i->second->GetLocation() == info->location &&
-            i->second->GetName() == info->name)
-        {
-          module = i->second;
-          info->id = module->GetModuleId();
-        }
-      }
-    }
-
-    if (!module)
-    {
-      module = new Module();
-      countLock()->Lock();
-      info->id = ++regCount;
-      assert(info->id == 1 ? info->name == "CppMicroServices" : true);
-      countLock()->Unlock();
-
-      module->Init(coreModuleContext(), info);
-
-      MutexLock lock(*modulesLock());
-      ModuleMap* map = modules();
-      map->insert(std::make_pair(info->name, module));
-    }
-    else
-    {
-      module->Init(coreModuleContext(), info);
-    }
-
-    module->Start();
+    throw std::invalid_argument("Can't register a null system bundle");
   }
+
+  countLock->Lock();
+  info->id = ++id;
+  assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+  countLock->Unlock();
+
+  systemBundle->Init(coreCtx, info);
+
+  MutexLock lock(*modulesLock);
+  modules.insert(std::make_pair(info->name, systemBundle));
 }
 
 void ModuleRegistry::UnRegister(const ModuleInfo* info)
 {
+  // TODO: fix once the system bundle id is set to 0
   if (info->id > 1)
   {
-    Module* curr = 0;
-    {
-      MutexLock lock(*modulesLock());
-      curr = modules()->operator[](info->name);
-      assert(curr != 0);
-    }
-    curr->Stop();
+    MutexLock lock(*modulesLock);
+    modules.erase(info->name);
   }
 }
 
 Module* ModuleRegistry::GetModule(long id)
 {
-  MutexLock lock(*modulesLock());
+  MutexLock lock(*modulesLock);
 
-  ModuleMap::const_iterator iter = modules()->begin();
-  ModuleMap::const_iterator iterEnd = modules()->end();
+  ModuleMap::const_iterator iter = modules.begin();
+  ModuleMap::const_iterator iterEnd = modules.end();
   for (; iter != iterEnd; ++iter)
   {
     if (iter->second->GetModuleId() == id)
@@ -161,10 +143,10 @@ Module* ModuleRegistry::GetModule(long id)
 
 Module* ModuleRegistry::GetModule(const std::string& name)
 {
-  MutexLock lock(*modulesLock());
+  MutexLock lock(*modulesLock);
 
-  ModuleMap::const_iterator iter = modules()->find(name);
-  if (iter != modules()->end())
+  ModuleMap::const_iterator iter = modules.find(name);
+  if (iter != modules.end())
   {
     return iter->second;
   }
@@ -173,12 +155,11 @@ Module* ModuleRegistry::GetModule(const std::string& name)
 
 std::vector<Module*> ModuleRegistry::GetModules()
 {
-  MutexLock lock(*modulesLock());
+  MutexLock lock(*modulesLock);
 
   std::vector<Module*> result;
-  ModuleMap* map = modules();
-  ModuleMap::const_iterator iter = map->begin();
-  ModuleMap::const_iterator iterEnd = map->end();
+  ModuleMap::const_iterator iter = modules.begin();
+  ModuleMap::const_iterator iterEnd = modules.end();
   for (; iter != iterEnd; ++iter)
   {
     result.push_back(iter->second);
@@ -186,40 +167,5 @@ std::vector<Module*> ModuleRegistry::GetModules()
   return result;
 }
 
-std::vector<Module*> ModuleRegistry::GetLoadedModules()
-{
-  MutexLock lock(*modulesLock());
-
-  std::vector<Module*> result;
-  ModuleMap::const_iterator iter = modules()->begin();
-  ModuleMap::const_iterator iterEnd = modules()->end();
-  for (; iter != iterEnd; ++iter)
-  {
-    if (iter->second->IsLoaded())
-    {
-      result.push_back(iter->second);
-    }
-  }
-  return result;
-}
-
-// Control the static initialization order for several core objects
-struct StaticInitializationOrder
-{
-  StaticInitializationOrder()
-  {
-    ModuleSettings::GetLogLevel();
-    modulesLock();
-    countLock();
-    modules();
-    coreModuleContext();
-  }
-};
-
-static StaticInitializationOrder _staticInitializationOrder;
-
 US_END_NAMESPACE
 
-// We initialize the CppMicroService module after making sure
-// that all other global statics have been initialized above
-US_INITIALIZE_MODULE

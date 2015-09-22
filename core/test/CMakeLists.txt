@@ -3,6 +3,17 @@
 # Configure files, include dirs, etc.
 #-----------------------------------------------------------------------------
 
+# Make sure that the correct paths separators are used on each platform
+if(WIN32)
+  set(DIR_SEP "\\\\")
+  string(REPLACE "/" "\\\\" CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  string(REPLACE "/" "\\\\" CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(DIR_SEP "/")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/usTestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/usTestingConfig.h")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -22,6 +33,9 @@ add_subdirectory(modules)
 
 set(_tests
   usAnyTest
+  usBundleRegistryPerformanceTest
+  usFrameworkTest
+  usFrameworkFactoryTest
   usLDAPFilterTest
   usLogTest
   usModuleHooksTest
@@ -52,6 +66,7 @@ set(_additional_srcs
   usTestDriverActivator.cpp
   usTestManager.cpp
   usTestUtilModuleListener.cpp
+  usTestUtils.cpp
 )
 
 set(_test_driver us${PROJECT_NAME}TestDriver)
@@ -66,7 +81,6 @@ add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)
-  set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()
 

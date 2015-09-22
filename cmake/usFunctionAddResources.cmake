@@ -31,7 +31,7 @@
 #! \param COMPRESSION_LEVEL (optional) The zip compression level (0-9). Defaults to the default zip
 #!        level. Level 0 disables compression.
 #! \param WORKING_DIRECTORY (optional) The root path for all resource files listed after the
-#!        FILES argument. If no or a relative path is given, it is considered relativ to the
+#!        FILES argument. If no or a relative path is given, it is considered relative to the
 #!        current CMake source directory.
 #! \param FILES (optional) A list of resource files (paths to external files in the file system)
 #!        relative to the current working directory.

@@ -13,8 +13,7 @@ redistribution of the application.
 # Creating Static Modules
 
 Static modules are written just like shared modules - there are no differences in the usage of the
-CppMicroServices API or the provided preprocessor macros. The only thing you need to make sure is that
-the `US_STATIC_MODULE` preprocessor macro is defined when building a module statically.
+CppMicroServices API or the provided preprocessor macros.
 
 # Using Static Modules
 

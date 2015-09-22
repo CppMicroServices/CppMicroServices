@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <usFrameworkFactory.h>
+#include <usFramework.h>
 #include <usLDAPFilter.h>
 
 #include "usTestingMacros.h"
@@ -43,13 +45,13 @@ void TestServiceInterfaceId()
   US_TEST_CONDITION(us_service_interface_iid<ITestServiceA>() == "ITestServiceA", "Service interface id ITestServiceA")
 }
 
-void TestMultipleServiceRegistrations()
+void TestMultipleServiceRegistrations(ModuleContext* mc)
 {
   struct TestServiceA : public ITestServiceA
   {
   };
 
-  ModuleContext* context = GetModuleContext();
+  ModuleContext* context = mc;
 
   TestServiceA s1;
   TestServiceA s2;
@@ -72,13 +74,13 @@ void TestMultipleServiceRegistrations()
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
-void TestServicePropertiesUpdate()
+void TestServicePropertiesUpdate(ModuleContext* mc)
 {
   struct TestServiceA : public ITestServiceA
   {
   };
 
-  ModuleContext* context = GetModuleContext();
+  ModuleContext* context = mc;
 
   TestServiceA s1;
   ServiceProperties props;
@@ -133,9 +135,17 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryTest");
 
+  FrameworkFactory factory;
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  framework->Start();
+
+  ModuleContext* mc = framework->GetModuleContext();
+
   TestServiceInterfaceId();
-  TestMultipleServiceRegistrations();
-  TestServicePropertiesUpdate();
+  TestMultipleServiceRegistrations(mc);
+  TestServicePropertiesUpdate(mc);
+
+  delete framework;
 
   US_TEST_END()
 }

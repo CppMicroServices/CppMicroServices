@@ -31,6 +31,8 @@
 
 US_BEGIN_NAMESPACE
 
+struct ModuleSettingsPrivate;
+
 /**
  * \ingroup MicroServices
  *
@@ -43,11 +45,15 @@ US_BEGIN_NAMESPACE
  * - \e US_AUTOLOAD_PATHS A ':' (Unix) or ';' (Windows) separated list of paths
  *   from which modules should be auto-loaded.
  *
+ * \deprecated Use FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration) to configure the framework.
+ *
  * \remarks This class is thread safe.
  */
 class US_Core_EXPORT ModuleSettings
 {
 public:
+  ModuleSettings();
+  ~ModuleSettings();
 
   typedef std::vector<std::string> PathList;
 
@@ -75,7 +81,7 @@ public:
    * \return \c true if threading support has been configured into the
    * CppMicroServices library, \c false otherwise.
    */
-  static bool IsThreadingSupportEnabled();
+  bool IsThreadingSupportEnabled();
 
   /**
    * \return \c true if support for module auto-loading is enabled,
@@ -85,7 +91,7 @@ public:
    * has not been configured into the CppMicroServices library or if it has been
    * disabled by defining the US_DISABLE_AUTOLOADING environment variable.
    */
-  static bool IsAutoLoadingEnabled();
+  bool IsAutoLoadingEnabled();
 
   /**
    * Enable or disable auto-loading support.
@@ -96,20 +102,20 @@ public:
    * auto-loading has not been configured into the CppMicroServices library of it
    * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
    */
-  static void SetAutoLoadingEnabled(bool enable);
+  void SetAutoLoadingEnabled(bool enable);
 
   /**
    * \return A list of paths in the file-system from which modules will be
    * auto-loaded.
    */
-  static PathList GetAutoLoadPaths();
+  PathList GetAutoLoadPaths();
 
   /**
    * Set a list of paths in the file-system from which modules should be
    * auto-loaded.
    * @param paths A list of absolute file-system paths.
    */
-  static void SetAutoLoadPaths(const PathList& paths);
+  void SetAutoLoadPaths(const PathList& paths);
 
   /**
    * Add a path in the file-system to the list of paths from which modules
@@ -117,52 +123,12 @@ public:
    *
    * @param path The additional absolute auto-load path in the file-system.
    */
-  static void AddAutoLoadPath(const std::string& path);
-
-  /**
-   * Set a local storage path for persistend module data.
-   *
-   * This path is used as a base directory for providing modules
-   * with a storage path for writing persistent data. The callee
-   * must ensure that the provided path exists and is writable.
-   *
-   * @see ModuleContext::GetDataFile(const std::string&)
-   *
-   * @param path An absolute path for writing persistent data.
-   */
-  static void SetStoragePath(const std::string& path);
-
-  /**
-   * Get the absolute path for persistent data. The returned path
-   * might be empty. If the path is non-empty, it is safe to assume
-   * that the path exists and is writable.
-   *
-   * @return The absolute path to the persistent storage path.
-   */
-  static std::string GetStoragePath();
-
-  /**
-   * Set the logging level for log messages from CppMicroServices modules.
-   *
-   * Higher logging levels will discard messages with lower priority.
-   * E.g. a logging level of WarningMsg will discard all messages of
-   * type DebugMsg and InfoMsg.
-   *
-   * @param level The new logging level.
-   */
-  static void SetLogLevel(MsgType level);
-
-  /**
-   * Get the current logging level.
-   *
-   * @return The currently used logging level.
-   */
-  static MsgType GetLogLevel();
+  void AddAutoLoadPath(const std::string& path);
 
 private:
+  ModuleSettingsPrivate* pimpl;
 
   // purposely not implemented
-  ModuleSettings();
   ModuleSettings(const ModuleSettings&);
   ModuleSettings& operator=(const ModuleSettings&);
 };

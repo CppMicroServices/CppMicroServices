@@ -4,7 +4,7 @@ set(resource_files
   manifest.json
 )
 
-configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt @COPYONLY)
+configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt COPYONLY)
 
 usFunctionCreateTestModuleWithResources(TestModuleRA
   RESOURCES ${resource_files}

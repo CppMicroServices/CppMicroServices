@@ -7,7 +7,7 @@
 #!
 #! \note To set-up correct file dependencies from your module target to your resource
 #!       files, you have to add a special source file to the source list of the target.
-#!       The source file name can be retrieved by using usFunctionGetResourceSoruce.
+#!       The source file name can be retrieved by using #usFunctionGetResourceSource.
 #!       This ensures that changed resource files will automatically be re-added to the
 #!       module.
 #!

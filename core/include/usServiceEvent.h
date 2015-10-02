@@ -161,7 +161,7 @@ public:
   ServiceReferenceU GetServiceReference() const;
 
   template<class S>
-  ServiceReference<S> GetServiceReference(InterfaceType<S>) const
+  ServiceReference<S> GetServiceReference() const
   {
     return GetServiceReference();
   }

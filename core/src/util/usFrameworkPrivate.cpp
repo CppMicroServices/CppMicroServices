@@ -28,7 +28,6 @@ limitations under the License.
 US_BEGIN_NAMESPACE
 
 FrameworkPrivate::FrameworkPrivate(void) :
-    initLock(),
     coreModuleContext(),
     initialized(false)
 {
@@ -36,7 +35,6 @@ FrameworkPrivate::FrameworkPrivate(void) :
 }
 
 FrameworkPrivate::FrameworkPrivate(const std::map<std::string, std::string>& configuration) :
-    initLock(),
     coreModuleContext(),
     initialized(false)
 {

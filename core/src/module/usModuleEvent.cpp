@@ -30,6 +30,8 @@ class ModuleEventData : public SharedData
 {
 public:
 
+  ModuleEventData& operator=(const ModuleEventData&) = delete;
+
   ModuleEventData(ModuleEvent::Type type, Module* module)
     : type(type), module(module)
   {
@@ -45,10 +47,6 @@ public:
   const ModuleEvent::Type type;
   Module* const module;
 
-private:
-
-  // purposely not implemented
-  ModuleEventData& operator=(const ModuleEventData&);
 };
 
 ModuleEvent::ModuleEvent()

@@ -138,13 +138,13 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   us::ServiceRegistration<Interface1,Interface2,Interface3> sr3 = mc->RegisterService<Interface1,Interface2,Interface3>(&s3);
 
   MyFactory1 f1;
-  us::ServiceRegistration<Interface1> sfr1 = mc->RegisterService<Interface1>(&f1);
+  us::ServiceRegistration<Interface1> sfr1 = mc->RegisterService<Interface1>(ToFactory(f1));
 
   MyFactory2 f2;
-  us::ServiceRegistration<Interface1,Interface2> sfr2 = mc->RegisterService<Interface1,Interface2>(static_cast<ServiceFactory*>(&f2));
+  us::ServiceRegistration<Interface1,Interface2> sfr2 = mc->RegisterService<Interface1,Interface2>(ToFactory(f2));
 
   MyFactory3 f3;
-  us::ServiceRegistration<Interface1,Interface2,Interface3> sfr3 = mc->RegisterService<Interface1,Interface2,Interface3>(static_cast<ServiceFactory*>(&f3));
+  us::ServiceRegistration<Interface1,Interface2,Interface3> sfr3 = mc->RegisterService<Interface1,Interface2,Interface3>(ToFactory(f3));
 
 #ifdef US_BUILD_SHARED_LIBS
   US_TEST_CONDITION(mc->GetModule()->GetRegisteredServices().size() == 6, "# of reg services")
@@ -166,47 +166,47 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   i1 = NULL;
   US_TEST_CONDITION(mc->UngetService(sfr1.GetReference()), "unget interface1 factory ptr")
 
-  i1 = mc->GetService(sr2.GetReference(InterfaceType<Interface1>()));
+  i1 = mc->GetService(sr2.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == static_cast<Interface1*>(&s2), "interface1 ptr")
   i1 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sr2.GetReference(InterfaceType<Interface1>())), "unget interface1 ptr")
-  i1 = mc->GetService(sfr2.GetReference(InterfaceType<Interface1>()));
+  US_TEST_CONDITION(mc->UngetService(sr2.GetReference<Interface1>()), "unget interface1 ptr")
+  i1 = mc->GetService(sfr2.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == static_cast<Interface1*>(f2.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface1 factory ptr")
   i1 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sfr2.GetReference(InterfaceType<Interface1>())), "unget interface1 factory ptr")
-  Interface2* i2 = mc->GetService(sr2.GetReference(InterfaceType<Interface2>()));
+  US_TEST_CONDITION(mc->UngetService(sfr2.GetReference<Interface1>()), "unget interface1 factory ptr")
+  Interface2* i2 = mc->GetService(sr2.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == static_cast<Interface2*>(&s2), "interface2 ptr")
   i2 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sr2.GetReference(InterfaceType<Interface2>())), "unget interface2 ptr")
-  i2 = mc->GetService(sfr2.GetReference(InterfaceType<Interface2>()));
+  US_TEST_CONDITION(mc->UngetService(sr2.GetReference<Interface2>()), "unget interface2 ptr")
+  i2 = mc->GetService(sfr2.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == static_cast<Interface2*>(f2.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface2 factory ptr")
   i2 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sfr2.GetReference(InterfaceType<Interface2>())), "unget interface2 factory ptr")
+  US_TEST_CONDITION(mc->UngetService(sfr2.GetReference<Interface2>()), "unget interface2 factory ptr")
 
-  i1 = mc->GetService(sr3.GetReference(InterfaceType<Interface1>()));
+  i1 = mc->GetService(sr3.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == static_cast<Interface1*>(&s3), "interface1 ptr")
   i1 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sr3.GetReference(InterfaceType<Interface1>())), "unget interface1 ptr")
-  i1 = mc->GetService(sfr3.GetReference(InterfaceType<Interface1>()));
+  US_TEST_CONDITION(mc->UngetService(sr3.GetReference<Interface1>()), "unget interface1 ptr")
+  i1 = mc->GetService(sfr3.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == static_cast<Interface1*>(f3.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface1 factory ptr")
   i1 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference(InterfaceType<Interface1>())), "unget interface1 factory ptr")
-  i2 = mc->GetService(sr3.GetReference(InterfaceType<Interface2>()));
+  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference<Interface1>()), "unget interface1 factory ptr")
+  i2 = mc->GetService(sr3.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == static_cast<Interface2*>(&s3), "interface2 ptr")
   i2 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sr3.GetReference(InterfaceType<Interface2>())), "unget interface2 ptr")
-  i2 = mc->GetService(sfr3.GetReference(InterfaceType<Interface2>()));
+  US_TEST_CONDITION(mc->UngetService(sr3.GetReference<Interface2>()), "unget interface2 ptr")
+  i2 = mc->GetService(sfr3.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == static_cast<Interface2*>(f3.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface2 factory ptr")
   i2 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference(InterfaceType<Interface2>())), "unget interface2 factory ptr")
-  Interface3* i3 = mc->GetService(sr3.GetReference(InterfaceType<Interface3>()));
+  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference<Interface2>()), "unget interface2 factory ptr")
+  Interface3* i3 = mc->GetService(sr3.GetReference<Interface3>());
   US_TEST_CONDITION(i3 == static_cast<Interface3*>(&s3), "interface3 ptr")
   i3 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sr3.GetReference(InterfaceType<Interface3>())), "unget interface3 ptr")
-  i3 = mc->GetService(sfr3.GetReference(InterfaceType<Interface3>()));
+  US_TEST_CONDITION(mc->UngetService(sr3.GetReference<Interface3>()), "unget interface3 ptr")
+  i3 = mc->GetService(sfr3.GetReference<Interface3>());
   US_TEST_CONDITION(i3 == static_cast<Interface3*>(f3.m_idToServiceMap[mc->GetModule()->GetModuleId()]), "interface3 factory ptr")
   i3 = NULL;
-  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference(InterfaceType<Interface3>())), "unget interface3 factory ptr")
+  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference<Interface3>()), "unget interface3 factory ptr")
 
   sr1.Unregister();
   sr2.Unregister();

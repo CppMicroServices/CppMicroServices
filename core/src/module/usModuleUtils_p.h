@@ -28,11 +28,6 @@
 
 #include <string>
 
-#define US_STR_(x) #x
-#define US_STR(x) US_STR_(x)
-#define US_CONCAT_(x,y) x ## y
-#define US_CONCAT(x,y) US_CONCAT_(x,y)
-
 US_BEGIN_NAMESPACE
 
 struct ModuleInfo;

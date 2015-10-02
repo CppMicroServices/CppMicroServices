@@ -23,20 +23,14 @@
 #ifndef USMODULECONTEXT_H_
 #define USMODULECONTEXT_H_
 
-// TODO: Replace includes with forward directives!
-
-#include "usListenerFunctors_p.h"
+#include "usListenerFunctors.h"
 #include "usServiceInterface.h"
-#include "usServiceEvent.h"
 #include "usServiceRegistration.h"
-#include "usServiceException.h"
-#include "usModuleEvent.h"
+
 
 US_BEGIN_NAMESPACE
 
-typedef US_SERVICE_LISTENER_FUNCTOR ServiceListener;
-typedef US_MODULE_LISTENER_FUNCTOR ModuleListener;
-
+class Module;
 class ModuleContextPrivate;
 class ServiceFactory;
 
@@ -94,6 +88,9 @@ class US_Core_EXPORT ModuleContext
 {
 
 public:
+
+  ModuleContext(const ModuleContext&) = delete;
+  ModuleContext& operator=(const ModuleContext&) = delete;
 
   ~ModuleContext();
 
@@ -206,40 +203,7 @@ public:
 
   /**
    * Registers the specified service object with the specified properties
-   * using the specified template argument with the framework.
-   *
-   * <p>
-   * This method is provided as a convenience when <code>service</code> will only be registered under
-   * a single class name whose type is available to the caller. It is otherwise identical to
-   * RegisterService(const InterfaceMap&, const ServiceProperties&) but should be preferred
-   * since it avoids errors in the string literal identifying the class name or interface identifier.
-   *
-   * Example usage:
-   * \snippet uServices-registration/main.cpp 1-1
-   * \snippet uServices-registration/main.cpp 1-2
-   *
-   * @tparam S The type under which the service can be located.
-   * @param service The service object or a ServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
-   *         registering the service to update the service's properties or to
-   *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
-   *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
-   */
-  template<class S>
-  ServiceRegistration<S> RegisterService(S* service, const ServiceProperties& properties = ServiceProperties())
-  {
-    InterfaceMap servicePointers = MakeInterfaceMap<S>(service);
-    return RegisterService(servicePointers, properties);
-  }
-
-  /**
-   * Registers the specified service object with the specified properties
-   * using the specified template argument with the framework.
+   * using the specified interfaces types with the framework.
    *
    * <p>
    * This method is provided as a convenience when registering a service under
@@ -252,8 +216,8 @@ public:
    * \snippet uServices-registration/main.cpp 2-2
    *
    * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @param impl The service object or a ServiceFactory object.
+   * @tparam Interfaces Additional interface types under which the service can be located.
+   * @param impl The service object
    * @param properties The properties for this service.
    * @return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
@@ -264,39 +228,10 @@ public:
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  template<class I1, class I2, class Impl>
-  ServiceRegistration<I1,I2> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
+  template<class I1, class ...Interfaces, class Impl>
+  ServiceRegistration<I1, Interfaces...> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
   {
-    InterfaceMap servicePointers = MakeInterfaceMap<I1, I2>(impl);
-    return RegisterService(servicePointers, properties);
-  }
-
-  /**
-   * Registers the specified service object with the specified properties
-   * using the specified template argument with the framework.
-   *
-   * <p>
-   * This method is identical to the RegisterService<I1,I2,Impl>(Impl*, const ServiceProperties&)
-   * method except that it supports three service interface types.
-   *
-   * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @tparam I3 The third interface type under which the service can be located.
-   * @param impl The service object or a ServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
-   *         registering the service to update the service's properties or to
-   *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
-   *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
-   */
-  template<class I1, class I2, class I3, class Impl>
-  ServiceRegistration<I1,I2,I3> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
-  {
-    InterfaceMap servicePointers = MakeInterfaceMap<I1, I2, I3>(impl);
+    InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(impl);
     return RegisterService(servicePointers, properties);
   }
 
@@ -311,42 +246,11 @@ public:
    * since it avoids errors in the string literal identifying the class name or interface identifier.
    *
    * Example usage:
-   * \snippet uServices-registration/main.cpp 1-1
-   * \snippet uServices-registration/main.cpp f1
-   *
-   * @tparam S The type under which the service can be located.
-   * @param factory The ServiceFactory or PrototypeServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
-   *         registering the service to update the service's properties or to
-   *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
-   *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
-   */
-  template<class S>
-  ServiceRegistration<S> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
-  {
-    InterfaceMap servicePointers = MakeInterfaceMap<S>(factory);
-    return RegisterService(servicePointers, properties);
-  }
-
-  /**
-   * Registers the specified service factory as a service with the specified properties
-   * using the specified template argument as service interface type with the framework.
-   *
-   * <p>
-   * This method is identical to the RegisterService<S>(ServiceFactory*, const ServiceProperties&)
-   * method except that it supports two service interface types.
-   *
-   * Example usage:
    * \snippet uServices-registration/main.cpp 2-1
    * \snippet uServices-registration/main.cpp f2
    *
    * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
+   * @tparam Interfaces Additional interface types under which the service can be located.
    * @param factory The ServiceFactory or PrototypeServiceFactory object.
    * @param properties The properties for this service.
    * @return A ServiceRegistration object for use by the module
@@ -358,39 +262,10 @@ public:
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  template<class I1, class I2>
-  ServiceRegistration<I1,I2> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
+  template<class I1, class ...Interfaces>
+  ServiceRegistration<I1, Interfaces...> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
   {
-    InterfaceMap servicePointers = MakeInterfaceMap<I1,I2>(factory);
-    return RegisterService(servicePointers, properties);
-  }
-
-  /**
-   * Registers the specified service factory as a service with the specified properties
-   * using the specified template argument as service interface type with the framework.
-   *
-   * <p>
-   * This method is identical to the RegisterService<S>(ServiceFactory*, const ServiceProperties&)
-   * method except that it supports three service interface types.
-   *
-   * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @tparam I3 The third interface type under which the service can be located.
-   * @param factory The ServiceFactory or PrototypeServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
-   *         registering the service to update the service's properties or to
-   *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
-   *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
-   */
-  template<class I1, class I2, class I3>
-  ServiceRegistration<I1,I2,I3> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
-  {
-    InterfaceMap servicePointers = MakeInterfaceMap<I1,I2,I3>(factory);
+    InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(factory);
     return RegisterService(servicePointers, properties);
   }
 
@@ -465,7 +340,7 @@ public:
    * @see GetServiceReferences(const std::string&, const std::string&)
    */
   template<class S>
-  std::vector<ServiceReference<S> > GetServiceReferences(const std::string& filter = std::string())
+  std::vector<ServiceReference<S>> GetServiceReferences(const std::string& filter = std::string())
   {
     std::string clazz = us_service_interface_iid<S>();
     if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
@@ -738,7 +613,7 @@ public:
    * @see RemoveServiceListener()
    */
   template<class R>
-  void AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent),
+  void AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&),
                           const std::string& filter = std::string())
   {
     AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
@@ -761,7 +636,7 @@ public:
    * @see AddServiceListener()
    */
   template<class R>
-  void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent))
+  void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&))
   {
     RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback),
                           static_cast<void*>(receiver));
@@ -785,7 +660,7 @@ public:
    * @see ModuleEvent
    */
   template<class R>
-  void AddModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
+  void AddModuleListener(R* receiver, void(R::*callback)(const ModuleEvent&))
   {
     AddModuleListener(ModuleListenerMemberFunctor(receiver, callback),
                       static_cast<void*>(receiver));
@@ -807,7 +682,7 @@ public:
    * @see AddModuleListener()
    */
   template<class R>
-  void RemoveModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
+  void RemoveModuleListener(R* receiver, void(R::*callback)(const ModuleEvent&))
   {
     RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback),
                          static_cast<void*>(receiver));
@@ -836,7 +711,8 @@ public:
    * -# The bundle's associated resources are allocated. The associated resources minimally consist of a
    *    unique identifier and a persistent storage area if the platform has file system support. If this step
    *    fails, a std::runtime_error is thrown.
-   * -# A bundle event of type <code>BundleEvent::INSTALLED</code> is fired.   * -# The Bundle object for the newly or previously installed bundle is returned.
+   * -# A bundle event of type <code>BundleEvent::INSTALLED</code> is fired.
+   * -# The Bundle object for the newly or previously installed bundle is returned.
    *
    * @remarks A location identifier is defined as an absolute path to a shared library or executable file
    * followed by a slash (/) and the bundle's name.
@@ -857,10 +733,6 @@ private:
   friend class ModulePrivate;
 
   ModuleContext(ModulePrivate* module);
-
-  // purposely not implemented
-  ModuleContext(const ModuleContext&);
-  ModuleContext& operator=(const ModuleContext&);
 
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);

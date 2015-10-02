@@ -42,13 +42,13 @@ ServiceRegistrationBase::ServiceRegistrationBase()
 ServiceRegistrationBase::ServiceRegistrationBase(const ServiceRegistrationBase& reg)
   : d(reg.d)
 {
-  if (d) d->ref.Ref();
+  if (d) ++d->ref;
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate)
   : d(registrationPrivate)
 {
-  if (d) d->ref.Ref();
+  if (d) ++d->ref;
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(ModulePrivate* module, const InterfaceMap& service,
@@ -63,22 +63,19 @@ ServiceRegistrationBase::operator bool_type() const
   return d != NULL ? &ServiceRegistrationBase::d : NULL;
 }
 
-ServiceRegistrationBase& ServiceRegistrationBase::operator=(int null)
+ServiceRegistrationBase& ServiceRegistrationBase::operator=(std::nullptr_t)
 {
-  if (null == 0)
+  if (d && !--d->ref)
   {
-    if (d && !d->ref.Deref())
-    {
-      delete d;
-    }
-    d = 0;
+    delete d;
   }
+  d = nullptr;
   return *this;
 }
 
 ServiceRegistrationBase::~ServiceRegistrationBase()
 {
-  if (d && !d->ref.Deref())
+  if (d && !--d->ref)
     delete d;
 }
 
@@ -96,7 +93,8 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 {
   if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
 
-  MutexLock lock(d->eventLock);
+  typedef decltype(d->eventLock) T; // gcc 4.6 workaround
+  T::Lock(d->eventLock);
 
   ServiceEvent modifiedEndMatchEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference);
   ServiceListeners::ServiceListenerEntries before;
@@ -112,7 +110,8 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
       std::vector<std::string> classes;
       {
-        MutexLock lock3(d->propsLock);
+        typedef decltype(d->propsLock) T; // gcc 4.6 workaround
+        T::Lock(d->propsLock);
 
         {
           const Any& any = d->properties.Value(ServiceConstants::SERVICE_RANKING());
@@ -157,7 +156,8 @@ void ServiceRegistrationBase::Unregister()
 
   if (d->unregistering) return; // Silently ignore redundant unregistration.
   {
-    MutexLock lock(d->eventLock);
+    typedef decltype(d->eventLock) T; // gcc 4.6 workaround
+    T::Lock(d->eventLock);
     if (d->unregistering) return;
     d->unregistering = true;
 
@@ -185,9 +185,11 @@ void ServiceRegistrationBase::Unregister()
   }
 
   {
-    MutexLock lock(d->eventLock);
+    typedef decltype(d->eventLock) T; // gcc 4.6 workaround
+    T::Lock(d->eventLock);
     {
-      MutexLock lock2(d->propsLock);
+      typedef decltype(d->propsLock) P; // gcc 4.6 workaround
+      P::Lock(d->propsLock);
       d->available = false;
       InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
       if (d->module && factoryIter != d->service.end())
@@ -231,15 +233,15 @@ void ServiceRegistrationBase::Unregister()
           }
         }
       }
-      d->module = 0;
+      d->module = nullptr;
       d->dependents.clear();
       d->service.clear();
       d->prototypeServiceInstances.clear();
       d->moduleServiceInstance.clear();
       // increment the reference count, since "d->reference" was used originally
       // to keep d alive.
-      d->ref.Ref();
-      d->reference = 0;
+      ++d->ref;
+      d->reference = nullptr;
       d->unregistering = false;
     }
   }
@@ -261,9 +263,9 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(const ServiceRegistr
 {
   ServiceRegistrationBasePrivate* curr_d = d;
   d = registration.d;
-  if (d) d->ref.Ref();
+  if (d) ++d->ref;
 
-  if (curr_d && !curr_d->ref.Deref())
+  if (curr_d && !--curr_d->ref)
     delete curr_d;
 
   return *this;

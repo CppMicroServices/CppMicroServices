@@ -34,7 +34,7 @@
 
 #include <cassert>
 
-#include <set>
+#include <unordered_set>
 
 US_USE_NAMESPACE
 
@@ -373,7 +373,7 @@ void testResourceOperators(Module* module)
   US_TEST_CONDITION(resources.size() == 2, "Check operator< with set")
 
   // check hash function specialization
-  US_UNORDERED_SET_TYPE<ModuleResource> resources2;
+  std::unordered_set<ModuleResource> resources2;
   resources2.insert(foo);
   resources2.insert(foo);
   resources2.insert(xml);
@@ -432,7 +432,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   testInvalidResource(moduleR);
 
-  Module* executableBundle = 0;
+  Module* executableBundle = nullptr;
   try
   {
     executableBundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");

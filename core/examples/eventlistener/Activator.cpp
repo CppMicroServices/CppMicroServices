@@ -21,8 +21,10 @@
 =============================================================================*/
 
 //! [Activator]
+#include <iostream>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include <usServiceEvent.h>
 
 US_USE_NAMESPACE
 
@@ -70,7 +72,7 @@ private:
    *
    * @param event the fired service event.
    */
-  void ServiceChanged(const ServiceEvent event)
+  void ServiceChanged(const ServiceEvent& event)
   {
     std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(ServiceConstants::OBJECTCLASS())).front();
 

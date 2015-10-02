@@ -1,6 +1,7 @@
 #include <usModuleActivator.h>
 
 //! [GetModuleContext]
+#include <iostream>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>

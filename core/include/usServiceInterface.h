@@ -30,10 +30,36 @@
 #include <map>
 #include <string>
 #include <typeinfo>
+#include <tuple>
 
 US_BEGIN_NAMESPACE
-US_Core_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
-US_END_NAMESPACE
+
+class ServiceFactory;
+
+/**
+ * @ingroup MicroServices
+ *
+ * A map containing interfaces ids and their corresponding service object
+ * pointers. InterfaceMap instances represent a complete service object
+ * which implementes one or more service interfaces. For each implemented
+ * service interface, there is an entry in the map with the key being
+ * the service interface id and the value a pointer to the service
+ * interface implementation.
+ *
+ * To create InterfaceMap instances, use the MakeInterfaceMap helper class.
+ *
+ * @note This is a low-level type and should only rarely be used.
+ *
+ * @see MakeInterfaceMap
+ */
+typedef std::map<std::string, void*> InterfaceMap;
+
+/// \cond
+namespace detail
+{
+  US_Core_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
+}
+/// \endcond
 
 /**
  * \ingroup MicroServices
@@ -50,12 +76,66 @@ US_END_NAMESPACE
  */
 template<class T> std::string us_service_interface_iid()
 {
-  return US_PREPEND_NAMESPACE(GetDemangledName)(typeid(T));
+  return US_PREPEND_NAMESPACE(detail::GetDemangledName)(typeid(T));
 }
 
 /// \cond
 template<> inline std::string us_service_interface_iid<void>() { return std::string(); }
 /// \endcond
+
+/// \cond
+namespace detail
+{
+
+  template <class Interfaces, size_t size>
+  struct InsertInterfaceHelper
+  {
+      static void insert(InterfaceMap& im, const Interfaces& interfaces)
+      {
+          im.insert(std::make_pair(std::string(us_service_interface_iid<typename std::remove_pointer<typename std::tuple_element<size-1, Interfaces>::type>::type>()),
+                                   static_cast<void*>(std::get<size-1>(interfaces))));
+          InsertInterfaceHelper<Interfaces,size-1>::insert(im, interfaces);
+      }
+  };
+
+  template<class T>
+  struct InsertInterfaceHelper<T,0>
+  {
+      static void insert(InterfaceMap&, const T&) {}
+  };
+
+  template<class Interfaces>
+  void InsertInterfaceTypes(InterfaceMap& im, const Interfaces& interfaces)
+  {
+      InsertInterfaceHelper<Interfaces, std::tuple_size<Interfaces>::value>::insert(im, interfaces);
+  }
+
+  template<template<class...> class List, class ...Args>
+  struct InterfacesTuple {
+      typedef List<typename std::add_pointer<Args>::type...> type;
+
+      template<class Impl>
+      static type create(Impl* impl) { return type(static_cast<typename std::add_pointer<Args>::type>(impl)...); }
+  };
+
+  template<class T, class... List>
+  struct Contains : std::true_type {};
+
+  template<class T, class Head, class... Rest>
+  struct Contains<T, Head, Rest...>
+    : std::conditional< std::is_same<T, Head>::value,
+          std::true_type,
+          Contains<T, Rest...>
+          >::type
+  {};
+
+  template<class T>
+  struct Contains<T> : std::false_type {};
+
+}
+/// \endcond
+
+US_END_NAMESPACE
 
 
 /**
@@ -109,56 +189,6 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
 
 US_BEGIN_NAMESPACE
 
-class ServiceFactory;
-
-/**
- * @ingroup MicroServices
- *
- * A helper type used in several methods to get proper
- * method overload resolutions.
- */
-template<class Interface>
-struct InterfaceType {};
-
-/**
- * @ingroup MicroServices
- *
- * A map containing interfaces ids and their corresponding service object
- * pointers. InterfaceMap instances represent a complete service object
- * which implementes one or more service interfaces. For each implemented
- * service interface, there is an entry in the map with the key being
- * the service interface id and the value a pointer to the service
- * interface implementation.
- *
- * To create InterfaceMap instances, use the MakeInterfaceMap helper class.
- *
- * @note This is a low-level type and should only rarely be used.
- *
- * @see MakeInterfaceMap
- */
-typedef std::map<std::string, void*> InterfaceMap;
-
-
-template<class I>
-bool InsertInterfaceType(InterfaceMap& im, I* i)
-{
-  if (us_service_interface_iid<I>().empty())
-  {
-    throw ServiceException(std::string("The interface class ") + typeid(I).name() +
-                                " uses an invalid id in its US_DECLARE_SERVICE_INTERFACE macro call.");
-  }
-  im.insert(std::make_pair(std::string(us_service_interface_iid<I>()),
-                           static_cast<void*>(static_cast<I*>(i))));
-  return true;
-}
-
-template<>
-inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
-{
-  return false;
-}
-
-
 /**
  * @ingroup MicroServices
  *
@@ -171,18 +201,14 @@ inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
  * InterfaceMap im = MakeInterfaceMap<I1,I2>(&service);
  * \endcode
  *
- * The MakeInterfaceMap supports service implementations with
- * up to three service interfaces.
- *
  * @see InterfaceMap
  */
-template<class I1, class I2 = void, class I3 = void>
+template<class ...Interfaces>
 struct MakeInterfaceMap
 {
   ServiceFactory* m_factory;
-  I1* m_interface1;
-  I2* m_interface2;
-  I3* m_interface3;
+
+  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
 
   /**
    * Constructor taking a service implementation pointer.
@@ -192,10 +218,8 @@ struct MakeInterfaceMap
    */
   template<class Impl>
   MakeInterfaceMap(Impl* impl)
-    : m_factory(NULL)
-    , m_interface1(static_cast<I1*>(impl))
-    , m_interface2(static_cast<I2*>(impl))
-    , m_interface3(static_cast<I3*>(impl))
+    : m_factory(nullptr)
+    , m_interfaces(detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
   {}
 
   /**
@@ -205,11 +229,8 @@ struct MakeInterfaceMap
    */
   MakeInterfaceMap(ServiceFactory* factory)
     : m_factory(factory)
-    , m_interface1(NULL)
-    , m_interface2(NULL)
-    , m_interface3(NULL)
   {
-    if (factory == NULL)
+    if (factory == nullptr)
     {
       throw ServiceException("The service factory argument must not be NULL.");
     }
@@ -218,9 +239,7 @@ struct MakeInterfaceMap
   operator InterfaceMap ()
   {
     InterfaceMap sim;
-    InsertInterfaceType(sim, m_interface1);
-    InsertInterfaceType(sim, m_interface2);
-    InsertInterfaceType(sim, m_interface3);
+    detail::InsertInterfaceTypes(sim, m_interfaces);
 
     if (m_factory)
     {
@@ -231,89 +250,6 @@ struct MakeInterfaceMap
     return sim;
   }
 };
-
-/// \cond
-template<class I1, class I2>
-struct MakeInterfaceMap<I1,I2,void>
-{
-  ServiceFactory* m_factory;
-  I1* m_interface1;
-  I2* m_interface2;
-
-  template<class Impl>
-  MakeInterfaceMap(Impl* impl)
-    : m_factory(NULL)
-    , m_interface1(static_cast<I1*>(impl))
-    , m_interface2(static_cast<I2*>(impl))
-  {}
-
-  MakeInterfaceMap(ServiceFactory* factory)
-    : m_factory(factory)
-    , m_interface1(NULL)
-    , m_interface2(NULL)
-  {
-    if (factory == NULL)
-    {
-      throw ServiceException("The service factory argument must not be NULL.");
-    }
-  }
-
-  operator InterfaceMap ()
-  {
-    InterfaceMap sim;
-    InsertInterfaceType(sim, m_interface1);
-    InsertInterfaceType(sim, m_interface2);
-
-    if (m_factory)
-    {
-      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
-                                static_cast<void*>(m_factory)));
-    }
-
-    return sim;
-  }
-};
-
-template<class I1>
-struct MakeInterfaceMap<I1,void,void>
-{
-  ServiceFactory* m_factory;
-  I1* m_interface1;
-
-  template<class Impl>
-  MakeInterfaceMap(Impl* impl)
-    : m_factory(NULL)
-    , m_interface1(static_cast<I1*>(impl))
-  {}
-
-  MakeInterfaceMap(ServiceFactory* factory)
-    : m_factory(factory)
-    , m_interface1(NULL)
-  {
-    if (factory == NULL)
-    {
-      throw ServiceException("The service factory argument must not be NULL.");
-    }
-  }
-
-  operator InterfaceMap ()
-  {
-    InterfaceMap sim;
-    InsertInterfaceType(sim, m_interface1);
-
-    if (m_factory)
-    {
-      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
-                                static_cast<void*>(m_factory)));
-    }
-
-    return sim;
-  }
-};
-
-template<>
-struct MakeInterfaceMap<void,void,void>;
-/// \endcond
 
 /**
  * @ingroup MicroServices
@@ -327,16 +263,50 @@ struct MakeInterfaceMap<void,void,void>;
  *
  * @see MakeInterfaceMap
  */
-template<class I1>
-I1* ExtractInterface(const InterfaceMap& map)
+template<class Interface>
+Interface* ExtractInterface(const InterfaceMap& map)
 {
-  InterfaceMap::const_iterator iter = map.find(us_service_interface_iid<I1>());
+  InterfaceMap::const_iterator iter = map.find(us_service_interface_iid<Interface>());
   if (iter != map.end())
   {
-    return reinterpret_cast<I1*>(iter->second);
+    return reinterpret_cast<Interface*>(iter->second);
   }
-  return NULL;
+  return nullptr;
 }
+
+///@{
+/**
+ * @ingroup MicroServices
+ *
+ * Cast the argument to a \c ServiceFactory pointer. Useful when calling
+ * \c ModuleContext::RegisterService with a service factory, for example:
+ *
+ * \code
+ * MyServiceFactory* factory;
+ * context->RegisterService<ISomeInterface>(ToFactory(factory));
+ * \endcode
+ *
+ * @param factory The service factory. May be a pointer or reference type.
+ * @return A \c ServiceFactory pointer to the passed \c factory instance.
+ *
+ * @see ModuleContext::RegisterService(ServiceFactory* factory, const ServiceProperties& properties)
+ */
+template<class T>
+ServiceFactory* ToFactory(
+        T& factory,
+        typename std::enable_if<std::is_class <T>::value, T>::type* = nullptr)
+{
+    return static_cast<ServiceFactory*>(&factory);
+}
+
+template<class T>
+ServiceFactory* ToFactory(
+        T factory,
+        typename std::enable_if<std::is_pointer<T>::value && std::is_class<typename std::remove_pointer<T>::type>::value>::type* = nullptr)
+{
+    return static_cast<ServiceFactory*>(factory);
+}
+///@}
 
 US_END_NAMESPACE
 

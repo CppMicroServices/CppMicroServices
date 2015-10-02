@@ -25,6 +25,7 @@
 #define USSERVICETRACKER_H
 
 #include <map>
+#include <chrono>
 
 #include "usServiceReference.h"
 #include "usServiceTrackerCustomizer.h"
@@ -110,7 +111,7 @@ struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTrai
 
   static void Dispose(TrackedType& t)
   {
-    t = 0;
+    t = nullptr;
   }
 };
 
@@ -132,7 +133,7 @@ struct TrackedTypeTraits<S,S*>
 
   static void Dispose(TrackedType& t)
   {
-    t = 0;
+    t = nullptr;
   }
 
   static TrackedType ConvertToTrackedType(S* s)
@@ -266,7 +267,7 @@ public:
    */
   ServiceTracker(ModuleContext* context,
                  const ServiceReferenceType& reference,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified class name.
@@ -287,7 +288,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context, const std::string& clazz,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -309,7 +310,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context, const LDAPFilter& filter,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the class template
@@ -328,7 +329,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = 0);
+  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -374,7 +375,8 @@ public:
    *
    * @return Returns the result of GetService().
    */
-  virtual T WaitForService(unsigned long timeoutMillis = 0);
+  template<class Rep, class Period>
+  T WaitForService(const std::chrono::duration<Rep, Period>& rel_time);
 
   /**
    * Return a list of <code>ServiceReference</code>s for all services being

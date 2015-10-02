@@ -175,15 +175,15 @@ private:
     if (m_spellCheckService->RemoveDictionary(reference) < 2 && m_spellCheckReg)
     {
       m_spellCheckReg.Unregister();
-      m_spellCheckReg = 0;
+      m_spellCheckReg = nullptr;
     }
   }
 
-  std::auto_ptr<SpellCheckImpl> m_spellCheckService;
+  std::unique_ptr<SpellCheckImpl> m_spellCheckService;
   ServiceRegistration<ISpellCheckService> m_spellCheckReg;
 
   ModuleContext* m_context;
-  std::auto_ptr<ServiceTracker<IDictionaryService> > m_tracker;
+  std::unique_ptr<ServiceTracker<IDictionaryService> > m_tracker;
 
 public:
 

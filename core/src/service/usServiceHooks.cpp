@@ -28,6 +28,7 @@
 #include "usServiceFindHook.h"
 #include "usServiceListenerHook.h"
 #include "usServiceReferenceBasePrivate.h"
+#include "usListenerFunctors.h"
 
 US_BEGIN_NAMESPACE
 

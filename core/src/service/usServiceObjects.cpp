@@ -26,6 +26,7 @@
 #include "usLog_p.h"
 
 #include <set>
+#include <atomic>
 
 US_BEGIN_NAMESPACE
 
@@ -33,7 +34,7 @@ class ServiceObjectsBasePrivate
 {
 public:
 
-  AtomicInt ref;
+  std::atomic<int> ref;
 
   ModuleContext* m_context;
   ServiceReferenceBase m_reference;
@@ -76,7 +77,7 @@ ServiceObjectsBase::ServiceObjectsBase(ModuleContext* context, const ServiceRefe
     delete d;
     throw std::invalid_argument("The service reference is invalid");
   }
-  d->ref.Ref();
+  ++d->ref;
 }
 
 void* ServiceObjectsBase::GetService() const
@@ -167,12 +168,12 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
 ServiceObjectsBase::ServiceObjectsBase(const ServiceObjectsBase& other)
   : d(other.d)
 {
-  d->ref.Ref();
+  ++d->ref;
 }
 
 ServiceObjectsBase::~ServiceObjectsBase()
 {
-  if (!d->ref.Deref())
+  if (!--d->ref)
   {
     delete d;
   }
@@ -182,9 +183,9 @@ ServiceObjectsBase& ServiceObjectsBase::operator =(const ServiceObjectsBase& oth
 {
   ServiceObjectsBasePrivate* curr_d = d;
   d = other.d;
-  d->ref.Ref();
+  ++d->ref;
 
-  if (!curr_d->ref.Deref())
+  if (!--curr_d->ref)
     delete curr_d;
 
   return *this;

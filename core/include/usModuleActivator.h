@@ -27,8 +27,9 @@
 #error Missing US_MODULE_NAME preprocessor define
 #endif
 
+#include <memory>
+
 #include <usGlobalConfig.h>
-#include <usModuleUtils_p.h>
 
 US_BEGIN_NAMESPACE
 
@@ -117,19 +118,12 @@ US_END_NAMESPACE
  * Example:
  * \snippet uServices-activator/main.cpp 0
  */
-#define US_EXPORT_MODULE_ACTIVATOR(_activator_type)                                       \
+#define US_EXPORT_MODULE_ACTIVATOR(_activator_type)                             \
   extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* US_CONCAT(_us_module_activator_instance_, US_MODULE_NAME) () \
-  {                                                                                       \
-    struct ScopedPointer                                                                  \
-    {                                                                                     \
-      ScopedPointer(US_PREPEND_NAMESPACE(ModuleActivator)* activator = 0) : m_Activator(activator) {} \
-      ~ScopedPointer() { delete m_Activator; }                                            \
-      US_PREPEND_NAMESPACE(ModuleActivator)* m_Activator;                                 \
-    };                                                                                    \
-                                                                                          \
-    static ScopedPointer activatorPtr;                                                    \
-    if (activatorPtr.m_Activator == 0) activatorPtr.m_Activator = new _activator_type;    \
-    return activatorPtr.m_Activator;                                                      \
+  {                                                                             \
+    static std::unique_ptr<US_PREPEND_NAMESPACE(ModuleActivator)> activatorPtr; \
+    if (activatorPtr == nullptr) activatorPtr.reset(new _activator_type);       \
+    return activatorPtr.get();                                                  \
   }
 
 #endif /* USMODULEACTIVATOR_H_ */

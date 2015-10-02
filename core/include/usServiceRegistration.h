@@ -45,7 +45,7 @@ US_BEGIN_NAMESPACE
  * @see ModuleContext#RegisterService()
  * @remarks This class is thread safe.
  */
-template<class I1, class I2 = void, class I3 = void>
+template<class I1, class ...Interfaces>
 class ServiceRegistration : public ServiceRegistrationBase
 {
 
@@ -60,7 +60,6 @@ public:
   {
   }
 
-  ///@{
   /**
    * Returns a <code>ServiceReference</code> object for a service being
    * registered.
@@ -73,22 +72,32 @@ public:
    *         unregistered or if it is invalid.
    * @return <code>ServiceReference</code> object.
    */
-  ServiceReference<I1> GetReference(InterfaceType<I1>) const
+  template<class Interface>
+  ServiceReference<Interface> GetReference() const
+  {
+    static_assert(detail::Contains<Interface, I1, Interfaces...>::value, "Requested interface type not available");
+    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<Interface>());
+  }
+
+  /**
+   * Returns a <code>ServiceReference</code> object for a service being
+   * registered.
+   * <p>
+   * The <code>ServiceReference</code> object refers to the first interface
+   * type and may be shared with other modules.
+   *
+   * @throws std::logic_error If this
+   *         <code>ServiceRegistration</code> object has already been
+   *         unregistered or if it is invalid.
+   * @return <code>ServiceReference</code> object.
+   */
+  ServiceReference<I1> GetReference() const
   {
     return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>());
   }
-  ServiceReference<I2> GetReference(InterfaceType<I2>) const
-  {
-    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>());
-  }
-  ServiceReference<I3> GetReference(InterfaceType<I3>) const
-  {
-    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I3>());
-  }
-  ///@}
+
 
   using ServiceRegistrationBase::operator=;
-
 
 private:
 
@@ -102,80 +111,14 @@ private:
 };
 
 /// \cond
-template<class I1, class I2>
-class ServiceRegistration<I1, I2, void> : public ServiceRegistrationBase
-{
-
-public:
-
-  ServiceRegistration() : ServiceRegistrationBase()
-  {
-  }
-
-  ServiceReference<I1> GetReference(InterfaceType<I1>) const
-  {
-    return ServiceReference<I1>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>()));
-  }
-
-  ServiceReference<I2> GetReference(InterfaceType<I2>) const
-  {
-    return ServiceReference<I2>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I2>()));
-  }
-
-  using ServiceRegistrationBase::operator=;
-
-
-private:
-
-  friend class ModuleContext;
-
-  ServiceRegistration(const ServiceRegistrationBase& base)
-    : ServiceRegistrationBase(base)
-  {
-  }
-
-};
-
-template<class I1>
-class ServiceRegistration<I1, void, void> : public ServiceRegistrationBase
-{
-
-public:
-
-  ServiceRegistration() : ServiceRegistrationBase()
-  {
-  }
-
-  ServiceReference<I1> GetReference() const
-  {
-    return this->GetReference(InterfaceType<I1>());
-  }
-
-  ServiceReference<I1> GetReference(InterfaceType<I1>) const
-  {
-    return ServiceReference<I1>(this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>()));
-  }
-
-  using ServiceRegistrationBase::operator=;
-
-private:
-
-  friend class ModuleContext;
-
-  ServiceRegistration(const ServiceRegistrationBase& base)
-    : ServiceRegistrationBase(base)
-  {
-  }
-
-};
 
 template<>
-class ServiceRegistration<void, void, void> : public ServiceRegistrationBase
+class ServiceRegistration<void> : public ServiceRegistrationBase
 {
 public:
 
   /**
-   * Creates an invalid ServiceReference object. You can use
+   * Creates an invalid ServiceRegistration object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */

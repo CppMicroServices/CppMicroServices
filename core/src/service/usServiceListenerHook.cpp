@@ -30,7 +30,7 @@ ServiceListenerHook::~ServiceListenerHook()
 }
 
 ServiceListenerHook::ListenerInfoData::ListenerInfoData(
-    ModuleContext* mc, const ServiceListenerEntry::ServiceListener& l,
+    ModuleContext* mc, const ServiceListener& l,
     void* data, const std::string& filter)
   : mc(mc)
   , listener(l)

@@ -84,7 +84,7 @@ public:
    *
    * \return This ServiceRegistrationBase object.
    */
-  ServiceRegistrationBase& operator=(int null);
+  ServiceRegistrationBase& operator=(std::nullptr_t);
 
   ~ServiceRegistrationBase();
 
@@ -185,9 +185,9 @@ private:
   friend class ServiceRegistry;
   friend class ServiceReferenceBasePrivate;
 
-  template<class I1, class I2, class I3> friend class ServiceRegistration;
+  template<class I1, class ...Interfaces> friend class ServiceRegistration;
 
-  US_HASH_FUNCTION_FRIEND(ServiceRegistrationBase);
+  friend class ::std::hash<ServiceRegistrationBase>;
 
   /**
    * Creates an invalid ServiceRegistrationBase object. You can use
@@ -209,11 +209,9 @@ US_END_NAMESPACE
 
 US_MSVC_POP_WARNING
 
-US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceRegistrationBase))
-  return US_HASH_FUNCTION(US_PREPEND_NAMESPACE(ServiceRegistrationBasePrivate)*, arg.d);
+  return std::hash<US_PREPEND_NAMESPACE(ServiceRegistrationBasePrivate)*>()(arg.d);
 US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
 
 
 inline std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceRegistrationBase)& /*reg*/)

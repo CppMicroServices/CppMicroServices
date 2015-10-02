@@ -24,11 +24,10 @@
 #ifndef USSERVICEREFERENCEBASEPRIVATE_H
 #define USSERVICEREFERENCEBASEPRIVATE_H
 
-#include "usAtomicInt_p.h"
-
 #include "usServiceInterface.h"
 
 #include <string>
+#include <atomic>
 
 US_BEGIN_NAMESPACE
 
@@ -45,6 +44,9 @@ class ServiceReferenceBasePrivate;
 class ServiceReferenceBasePrivate
 {
 public:
+
+  ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&) = delete;
+  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) = delete;
 
   ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
 
@@ -126,7 +128,7 @@ public:
   /**
    * Reference count for implicitly shared private implementation.
    */
-  AtomicInt ref;
+  std::atomic<int> ref;
 
   /**
    * Link to registration object for this reference.
@@ -143,9 +145,6 @@ private:
   InterfaceMap GetServiceFromFactory(Module* module, ServiceFactory* factory,
                                      bool isModuleScope);
 
-  // purposely not implemented
-  ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&);
-  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&);
 };
 
 US_END_NAMESPACE

@@ -53,7 +53,7 @@ public:
    *
    * @param event <code>ServiceEvent</code> object from the framework.
    */
-  void ServiceChanged(const ServiceEvent event);
+  void ServiceChanged(const ServiceEvent& event);
 
 private:
 

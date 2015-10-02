@@ -5,9 +5,84 @@ set(${PROJECT_NAME}_MINOR_VERSION 99)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(VERSION 2.8)
-cmake_policy(SET CMP0017 NEW)
+cmake_minimum_required(VERSION 2.8.7) # CMake version in Ubuntu 14.04
+cmake_policy(VERSION 2.8.7)
+
+list(APPEND policies_new
+  CMP0017 # Prefer files from the CMake module directory when including from there
+  CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
+  )
+foreach(policy ${policies_new})
+  if(POLICY ${policy})
+    cmake_policy(SET ${policy} NEW)
+  endif()
+endforeach()
+
+#-----------------------------------------------------------------------------
+# Check minimum required compiler versions
+#------------------------------------------------------------------------------
+
+# We make use of the following C++11 language and library features:
+#
+# Language feature                 GCC   Clang   AppleClang   VisualStudio
+# ------------------------------------------------------------------------
+# Rvalue references                4.3   2.9     ??           2012
+# Variadic templates               4.3   2.9     ??           2013*
+# Initializer lists                4.4   3.1     ??           2013
+# Static assertions                4.3   2.9     ??           2010
+# auto                             4.4   2.9     ??           2010
+# Lambdas                          4.5   3.1     ??           2012
+# decltype                         4.3   2.9     ??           2012
+# Right angle brackets             4.3   2.9     ??           2010
+# Null pointer constant            4.6   3.0     ??           2010
+# Defaulted functions              4.4   3.0     ??           2013*
+# Deleted functions                4.4   2.9     ??           2013*
+# Range-based for                  4.6   3.0     ??           2012
+# Atomic operations                4.4   3.1     ??           2012
+#
+# Library features used
+# ---------------------
+# function
+# unique_ptr
+# shared_ptr
+# unordered_map
+# unordered_set
+# atomic
+# mutex
+# wait_condition
+
+set(US_COMPILER_GNU_MINIMUM_VERSION           4.6          )
+set(US_COMPILER_CLANG_MINIMUM_VERSION         3.3          ) # this could probably be 3.1, but we only tested with 3.3
+set(US_COMPILER_APPLE_CLANG_MINIMUM_VERSION   5.0          ) # ??
+set(US_COMPILER_MSVC_MINIMUM_VERSION          18.00.31101 )
+
+set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT "Visual Studio 2013 Update 4")
+
+# CMAKE_CXX_COMPILER_VERSION is only available in CMake >= 2.8.10
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_GNU_MINIMUM_VERSION})
+    message(FATAL_ERROR "GCC version ${US_COMPILER_GNU_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
+  endif()
+  set(US_COMPILER_GNU 1)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_CLANG_MINIMUM_VERSION})
+    message(FATAL_ERROR "Clang version ${US_COMPILER_CLANG_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
+  endif()
+  set(US_COMPILER_CLANG 1)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_APPLE_CLANG_MINIMUM_VERSION})
+    message(FATAL_ERROR "Apple Clang version ${US_COMPILER_APPLE_CLANG_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
+  endif()
+  set(US_COMPILER_APPLE_CLANG 1)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_MSVC_MINIMUM_VERSION})
+    message(FATAL_ERROR "${US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT} or newer required (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION} or higher, you are using version ${CMAKE_CXX_COMPILER_VERSION})")
+  endif()
+  set(US_COMPILER_MSVC 1)
+else()
+  message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
+endif()
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -32,7 +107,6 @@ include(usFunctionEmbedResources)
 include(usFunctionGetResourceSource)
 include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
-include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
 include(usMacroCreateModule)
 
@@ -167,57 +241,45 @@ if(US_IS_EMBEDDED)
   set(CMAKE_LINK_FLAGS_DEBUG)
 endif()
 
-# Set C++ compiler flags
-if(NOT MSVC)
+set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
+set(US_CXX11_FLAGS )
+set(US_CXX11_LINK_FLAGS )
+
+if(MSVC)
+  set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
+else()
+  # C++11 support
+  set(US_CXX11_FLAGS -std=c++11)
+  usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
+  if(_have_cxx11)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+  else()
+    set(US_CXX11_FLAGS -std=c++0x)
+    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
+    if(_have_cxx0x)
+      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+    else()
+      set(US_CXX11_FLAGS )
+    endif()
+  endif()
+
+  if(US_COMPILER_APPLE_CLANG)
+    set(US_CXX11_FLAGS "${US_CXX11_FLAGS} -stdlib=libc++")
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
+  endif()
+
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option)
+                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
+                    -Wno-mismatched-tags
+                    -fstack-protector-all)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
-endif()
 
-set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
-usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
-if(_have_visibility)
-  set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-
-  usFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-  if(${GCC_VERSION} VERSION_LESS "4.0.0")
-    message(FATAL_ERROR "gcc version ${GCC_VERSION} not supported. Please use gcc >= 4.")
-  endif()
-
-  # With older versions of gcc the flag -fstack-protector-all requires an extra dependency to libssp.so.
-  # If the gcc version is lower than 4.4.0 and the build type is Release let's not include the flag.
-  if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    usFunctionCheckCompilerFlags("-fstack-protector-all" US_CXX_FLAGS)
-  endif()
-
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
-    # we need to define a Windows version
-    set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
-  else()
-    # Enable visibility support (only for gcc >= 4.5)
-    # We only support hidden visibility with gcc for now.
-    #
-    # Clang has troubles with correctly marking template declarations and explicit template
-    # instantiations as exported across shared library boundaries. Specifically, comparing
-    # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
-    # which could be related to the default visibility of STL types declared in libstdc++ and/or libc++
-    # but also to using RTLD_LOCAL or RTLD_GLOBAL when loading shared libraries via dlopen().
-    #
-    # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
-    # and http://llvm.org/bugs/show_bug.cgi?id=10113
-    #
-    if(_have_visibility AND NOT ${GCC_VERSION} VERSION_LESS "4.5")
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
-    else()
-      set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
-    endif()
+  usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+  if(_have_visibility)
+    set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
@@ -226,14 +288,17 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 endif()
 
-if(MSVC)
-  set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
+if(MINGW)
+  # suppress warnings about auto imported symbols
+  set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
+  # we need to define a Windows version
+  set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
-set(CMAKE_C_FLAGS_REALEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 
 #-----------------------------------------------------------------------------
 # US Link Flags
@@ -260,100 +325,12 @@ include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
-CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
-CHECK_INCLUDE_FILE_CXX(tr1/unordered_map US_HAVE_TR1_UNORDERED_MAP_H)
-CHECK_INCLUDE_FILE_CXX(tr1/unordered_set US_HAVE_TR1_UNORDERED_SET_H)
-CHECK_INCLUDE_FILE_CXX(tr1/functional US_HAVE_TR1_FUNCTIONAL_H)
-CHECK_INCLUDE_FILE_CXX(unordered_map US_HAVE_UNORDERED_MAP_H)
-CHECK_INCLUDE_FILE_CXX(unordered_set US_HAVE_UNORDERED_SET_H)
-CHECK_INCLUDE_FILE_CXX(functional US_HAVE_FUNCTIONAL_H)
+#CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
 
-if(US_HAVE_UNORDERED_MAP_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_TR1_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_STD_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
-                            US_HAVE_TR1_HASH)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::hash<int>(); return 0; }"
-                            US_HAVE_STD_HASH)
-  if(US_HAVE_STD_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_CLASS)
-  elseif(US_HAVE_TR1_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_CLASS)
-  endif()
-elseif(US_HAVE_TR1_UNORDERED_MAP_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_TR1_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_STD_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
-                            US_HAVE_TR1_HASH)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::hash<int>(); return 0; }"
-                            US_HAVE_STD_HASH)
-  if(US_HAVE_STD_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_CLASS)
-  elseif(US_HAVE_TR1_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_CLASS)
-  endif()
-else()
-  message(SEND_ERROR "The header file \"unordered_map\" is not available.")
-endif()
-if(NOT (US_HAVE_TR1_UNORDERED_MAP OR US_HAVE_STD_UNORDERED_MAP))
-  message(SEND_ERROR "The \"unordered_map\" type is not available.")
-endif()
-
-if(US_HAVE_UNORDERED_SET_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
-                            US_HAVE_TR1_UNORDERED_SET)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
-                            US_HAVE_STD_UNORDERED_SET)
-elseif(US_HAVE_TR1_UNORDERED_SET_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
-                            US_HAVE_TR1_UNORDERED_SET)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
-                            US_HAVE_STD_UNORDERED_SET)
-else()
-  message(SEND_ERROR "The header file \"unordered_set\" is not available.")
-endif()
-if(NOT (US_HAVE_TR1_UNORDERED_SET OR US_HAVE_STD_UNORDERED_SET))
-  message(SEND_ERROR "The \"unordered_set\" type is not available.")
-endif()
-
-if(NOT (US_HAVE_FUNCTIONAL_H OR US_HAVE_TR1_FUNCTIONAL_H))
-  message(SEND_ERROR "The header file \"functional\" is not available.")
-endif()
-
-if(US_HAVE_FUNCTIONAL_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
-                            US_HAVE_TR1_FUNCTION)
-  CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::function<int(void)> f(main); return 0; }"
-                            US_HAVE_STD_FUNCTION)
-endif()
-if((NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION)) AND US_HAVE_TR1_FUNCTIONAL_H)
-  unset(US_HAVE_TR1_FUNCTION CACHE)
-  unset(US_HAVE_STD_FUNCTION CACHE)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
-                            US_HAVE_TR1_FUNCTION)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::function<int(void)> f(main); return 0; }"
-                            US_HAVE_STD_FUNCTION)
-endif()
-
-if(NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION))
-  message(SEND_ERROR "The \"function\" type is not available.")
-endif()
+CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
+                          US_HAVE_STD_HASH_STRUCT)
+CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
+                          US_HAVE_STD_HASH_CLASS)
 
 #-----------------------------------------------------------------------------
 # Source directory
@@ -414,7 +391,6 @@ if(NOT US_NO_INSTALL)
   set(_install_cmake_scripts
     ${US_MODULE_INIT_TEMPLATE}
     ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-    ${US_CMAKE_DIR}/CMakeParseArguments.cmake
     ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
     ${US_CMAKE_DIR}/FindPackageMessage.cmake
     ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake

@@ -39,14 +39,10 @@ class ServicePropertiesImpl;
 /**
  * Here we handle all the CppMicroServices services that are registered.
  */
-class ServiceRegistry
+class ServiceRegistry : private MultiThreaded<>
 {
 
 public:
-
-  typedef Mutex MutexType;
-
-  mutable MutexType mutex;
 
   /**
    * Creates a new ServiceProperties object containing <code>in</code>
@@ -61,8 +57,8 @@ public:
                                                        const std::vector<std::string>& classes = std::vector<std::string>(),
                                                        bool isFactory = false, bool isPrototypeFactory = false, long sid = -1);
 
-  typedef US_UNORDERED_MAP_TYPE<ServiceRegistrationBase, std::vector<std::string> > MapServiceClasses;
-  typedef US_UNORDERED_MAP_TYPE<std::string, std::vector<ServiceRegistrationBase> > MapClassServices;
+  typedef std::unordered_map<ServiceRegistrationBase, std::vector<std::string> > MapServiceClasses;
+  typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase> > MapClassServices;
 
   /**
    * All registered services in the current framework.
@@ -81,6 +77,9 @@ public:
   MapClassServices classServices;
 
   CoreModuleContext* core;
+
+  ServiceRegistry(const ServiceRegistry&) = delete;
+  ServiceRegistry& operator=(const ServiceRegistry&) = delete;
 
   ServiceRegistry(CoreModuleContext* coreCtx);
 
@@ -178,10 +177,6 @@ private:
 
   void Get_unlocked(const std::string& clazz, const std::string& filter,
                     ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
-
-  // purposely not implemented
-  ServiceRegistry(const ServiceRegistry&);
-  ServiceRegistry& operator=(const ServiceRegistry&);
 
 };
 

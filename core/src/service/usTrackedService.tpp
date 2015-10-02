@@ -31,7 +31,7 @@ TrackedService<S,TTT>::TrackedService(ServiceTracker<S,TTT>* serviceTracker,
 }
 
 template<class S, class TTT>
-void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent event)
+void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
 {
   /*
    * Check if we had a delayed call (which could happen when we
@@ -42,7 +42,7 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent event)
     return;
   }
 
-  ServiceReference<S> reference = event.GetServiceReference(InterfaceType<S>());
+  ServiceReference<S> reference = event.GetServiceReference<S>();
   US_DEBUG(serviceTracker->d->DEBUG_OUTPUT) << "TrackedService::ServiceChanged["
                                             << event.GetType() << "]: " << reference;
   if (!reference)

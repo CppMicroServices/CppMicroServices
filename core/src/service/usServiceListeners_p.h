@@ -31,8 +31,10 @@
 #include <usGlobalConfig.h>
 
 #include "usServiceListenerEntry_p.h"
+#include "usThreads_p.h"
 
-#include "usWaitCondition_p.h"
+#include <unordered_map>
+#include <unordered_set>
 
 US_BEGIN_NAMESPACE
 
@@ -48,13 +50,13 @@ class ServiceListeners : private MultiThreaded<>
 
 public:
 
-  typedef US_MODULE_LISTENER_FUNCTOR ModuleListener;
-  typedef US_UNORDERED_MAP_TYPE<ModuleContext*, std::list<std::pair<ModuleListener,void*> > > ModuleListenerMap;
-  ModuleListenerMap moduleListenerMap;
-  Mutex moduleListenerMapMutex;
+  typedef std::unordered_map<ModuleContext*, std::list<std::pair<ModuleListener,void*> > > ModuleListenerMap;
+  struct : public MultiThreaded<> {
+    ModuleListenerMap value;
+  } moduleListenerMap;
 
-  typedef US_UNORDERED_MAP_TYPE<std::string, std::list<ServiceListenerEntry> > CacheType;
-  typedef US_UNORDERED_SET_TYPE<ServiceListenerEntry> ServiceListenerEntries;
+  typedef std::unordered_map<std::string, std::list<ServiceListenerEntry> > CacheType;
+  typedef std::unordered_set<ServiceListenerEntry> ServiceListenerEntries;
 
 private:
 
@@ -87,7 +89,7 @@ public:
    * @exception org.osgi.framework.InvalidSyntaxException
    * If the filter is not a correct LDAP expression.
    */
-  void AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+  void AddServiceListener(ModuleContext* mc, const ServiceListener& listener,
                           void* data, const std::string& filter);
 
   /**
@@ -99,7 +101,7 @@ public:
    * @param listener Object to remove.
    * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+  void RemoveServiceListener(ModuleContext* mc, const ServiceListener& listener,
                              void* data);
 
   /**

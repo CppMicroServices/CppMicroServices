@@ -1,6 +1,6 @@
 #include <usServiceListenerHook.h>
 
-#include <map>
+#include <unordered_map>
 
 US_USE_NAMESPACE
 
@@ -14,7 +14,7 @@ private:
     // Do some work during construction and destruction
   };
 
-  US_UNORDERED_MAP_TYPE<ListenerInfo, Tracked> tracked;
+  std::unordered_map<ListenerInfo, Tracked> tracked;
 
 public:
 

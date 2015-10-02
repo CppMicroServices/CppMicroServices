@@ -22,8 +22,7 @@
 
 #include "usModuleResourceBuffer_p.h"
 
-#include "us_stdint.h"
-
+#include <cstdint>
 #include <limits>
 #include <cassert>
 #include <stdlib.h>

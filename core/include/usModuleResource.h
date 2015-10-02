@@ -285,7 +285,7 @@ private:
   friend class ModuleResourceContainer;
   friend class ModuleResourceStream;
 
-  US_HASH_FUNCTION_FRIEND(ModuleResource);
+  friend class ::std::hash<ModuleResource>;
 
   std::size_t Hash() const;
 
@@ -304,10 +304,8 @@ US_MSVC_POP_WARNING
  */
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ModuleResource)& resource);
 
-US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ModuleResource))
   return arg.Hash();
 US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
 
 #endif // USMODULERESOURCE_H

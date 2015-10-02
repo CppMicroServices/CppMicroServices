@@ -23,12 +23,12 @@
 
 #include "usModuleResource.h"
 
-#include "usAtomicInt_p.h"
 #include "usModuleResourceContainer_p.h"
 #include "usModuleInfo.h"
 #include "usLog_p.h"
 
 #include <string>
+#include <atomic>
 
 US_BEGIN_NAMESPACE
 
@@ -57,7 +57,7 @@ public:
   /**
    * Reference count for implicitly shared private implementation.
    */
-  AtomicInt ref;
+  std::atomic<int> ref;
 };
 
 void ModuleResourcePrivate::InitFilePath(const std::string& file)
@@ -109,7 +109,7 @@ ModuleResource::ModuleResource()
 ModuleResource::ModuleResource(const ModuleResource &resource)
   : d(resource.d)
 {
-  d->ref.Ref();
+  ++d->ref;
 }
 
 ModuleResource::ModuleResource(const std::string& file, const ModuleResourceContainer& resourceContainer)
@@ -131,7 +131,7 @@ ModuleResource::ModuleResource(int index, const ModuleResourceContainer& resourc
 
 ModuleResource::~ModuleResource()
 {
-  if (!d->ref.Deref())
+  if (!--d->ref)
     delete d;
 }
 
@@ -139,9 +139,9 @@ ModuleResource& ModuleResource::operator =(const ModuleResource& resource)
 {
   ModuleResourcePrivate* curr_d = d;
   d = resource.d;
-  d->ref.Ref();
+  ++d->ref;
 
-  if (!curr_d->ref.Deref())
+  if (!--curr_d->ref)
     delete curr_d;
 
   return *this;
@@ -264,8 +264,8 @@ time_t ModuleResource::GetLastModified() const
 
 std::size_t ModuleResource::Hash() const
 {
-  using namespace US_HASH_FUNCTION_NAMESPACE;
-  return US_HASH_FUNCTION(std::string, d->resourceContainer->GetModuleInfo()->name + this->GetResourcePath());
+  using namespace std;
+  return hash<std::string>()(d->resourceContainer->GetModuleInfo()->name + this->GetResourcePath());
 }
 
 void* ModuleResource::GetData() const

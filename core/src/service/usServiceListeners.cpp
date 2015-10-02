@@ -35,6 +35,17 @@ US_BEGIN_NAMESPACE
 const int ServiceListeners::OBJECTCLASS_IX = 0;
 const int ServiceListeners::SERVICE_ID_IX = 1;
 
+struct ModuleListenerCompare : std::binary_function<std::pair<ModuleListener, void*>,
+                                                    std::pair<ModuleListener, void*>, bool>
+{
+  bool operator()(const std::pair<ModuleListener, void*>& p1,
+                  const std::pair<ModuleListener, void*>& p2) const
+  {
+    return p1.second == p2.second &&
+           p1.first.target<void(const ModuleEvent&)>() == p2.first.target<void(const ModuleEvent&)>();
+  }
+};
+
 ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
   : coreCtx(coreCtx)
 {
@@ -42,7 +53,7 @@ ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
   hashedServiceKeys.push_back(ServiceConstants::SERVICE_ID());
 }
 
-void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
   US_UNUSED(Lock(this));
@@ -55,7 +66,7 @@ void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListen
   CheckSimple(sle);
 }
 
-void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListener& listener,
                                              void* data)
 {
   ServiceListenerEntry entryToRemove(mc, listener, data);
@@ -78,8 +89,8 @@ void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry
 
 void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
-  MutexLock lock(moduleListenerMapMutex);
-  ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap[mc];
+  Lock{moduleListenerMap};
+  ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap.value[mc];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
   {
     listeners.push_back(std::make_pair(listener, data));
@@ -88,8 +99,8 @@ void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener
 
 void ServiceListeners::RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
-  MutexLock lock(moduleListenerMapMutex);
-  moduleListenerMap[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
+  Lock{moduleListenerMap};
+  moduleListenerMap.value[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
 }
 
 void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
@@ -136,8 +147,8 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
   }
 
   {
-    MutexLock lock(moduleListenerMapMutex);
-    moduleListenerMap.erase(mc);
+    Lock{moduleListenerMap};
+    moduleListenerMap.value.erase(mc);
   }
 }
 

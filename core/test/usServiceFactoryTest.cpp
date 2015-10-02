@@ -57,7 +57,7 @@ void TestServiceFactoryModuleScope(ModuleContext* mc)
   InstallTestBundle(mc, "TestModuleH");
 
   Module* moduleH = mc->GetModule("TestModuleH");
-  US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+  US_TEST_CONDITION_REQUIRED(moduleH != nullptr, "Test for existing module TestModuleH")
 
   moduleH->Start();
 
@@ -103,7 +103,7 @@ void TestServiceFactoryPrototypeScope(ModuleContext* mc)
   InstallTestBundle(mc, "TestModuleH");
 
   Module* moduleH = mc->GetModule("TestModuleH");
-  US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+  US_TEST_CONDITION_REQUIRED(moduleH != nullptr, "Test for existing module TestModuleH")
 
   moduleH->Start();
 

@@ -83,7 +83,7 @@ void frame02a(ModuleContext* mc)
   InstallTestBundle(mc, "TestModuleA");
 
   Module* moduleA = mc->GetModule("TestModuleA");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
+  US_TEST_CONDITION_REQUIRED(moduleA != nullptr, "Test for existing module TestModuleA")
 
   moduleA->Start();
 
@@ -162,7 +162,7 @@ void frame020a(Framework* framework, TestModuleListener& listener)
   ModuleContext* mc = framework->GetModuleContext();
 
   Module* moduleA = mc->GetModule("TestModuleA");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
+  US_TEST_CONDITION_REQUIRED(moduleA != nullptr, "Test for existing module TestModuleA")
 
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
 
@@ -212,7 +212,7 @@ void frame02b(Framework* framework)
   US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
 
   Module* moduleA = mc->GetModule("TestModuleA");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
+  US_TEST_CONDITION_REQUIRED(moduleA != nullptr, "Test for existing module TestModuleA")
   // launching properties should be accessible through any bundle
   US_TEST_CONDITION(moduleA->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
@@ -234,7 +234,7 @@ void frame02b(Framework* framework)
 void frame030b(ModuleContext* mc, TestModuleListener& listener)
 {
   Module* moduleA = mc->GetModule("TestModuleA");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for non-null module")
+  US_TEST_CONDITION_REQUIRED(moduleA != nullptr, "Test for non-null module")
 
   ServiceReferenceU sr1
       = mc->GetServiceReference("us::TestModuleAService");
@@ -262,7 +262,7 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener)
 
 
 struct LocalListener {
-  void ServiceChanged(const ServiceEvent) {}
+  void ServiceChanged(const ServiceEvent&) {}
 };
 
 // Add a service listener with a broken LDAP filter to Get an exception
@@ -298,7 +298,7 @@ void TestModuleStates()
     ModuleContext* frameworkCtx = framework->GetModuleContext();
     frameworkCtx->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
 
-    Module* module = 0;
+    Module* module = nullptr;
 
     // Test install -> uninstall
     // expect 2 event (INSTALLED, UNINSTALLED)

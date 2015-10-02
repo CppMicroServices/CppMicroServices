@@ -31,10 +31,6 @@ limitations under the License.
 #include <usModuleContext.h>
 
 #include <vector>
-
-// this test requires C++11
-#if __cplusplus >= 201103L
-
 #include <thread>
 
 US_USE_NAMESPACE
@@ -90,6 +86,7 @@ namespace
         US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to start 12 bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
     }
 
+#ifdef US_ENABLE_THREADING_SUPPORT
     void TestConcurrent(Framework* f)
     {
         // This is by no means a "real world" example. At best it is a simulation to test
@@ -112,6 +109,7 @@ namespace
         for (auto& th : threads) th.join();
         US_TEST_CONDITION(numTestBundles == f->GetModuleContext()->GetModules().size(), "Test for correct number of installed bundles")
     }
+#endif
 
 }   // end anonymous namespace
 
@@ -146,12 +144,3 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 
     US_TEST_END()
 }
-
-#else
-int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
-{
-    US_TEST_BEGIN("BundleRegistryPerformanceTest")
-    US_TEST_END()
-}
-
-#endif // __cplusplus

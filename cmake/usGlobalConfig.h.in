@@ -8,7 +8,6 @@
 
 #cmakedefine US_BUILD_SHARED_LIBS
 #cmakedefine US_ENABLE_THREADING_SUPPORT
-#cmakedefine US_GCC_RTTI_WORKAROUND_NEEDED
 #cmakedefine US_HAVE_VISIBILITY_ATTRIBUTE
 
 //-------------------------------------------------------------------
@@ -16,27 +15,6 @@
 //-------------------------------------------------------------------
 
 #cmakedefine US_HAVE_CXXABI_H
-#cmakedefine US_HAVE_STDINT_H
-#cmakedefine US_HAVE_TR1_UNORDERED_MAP_H
-#cmakedefine US_HAVE_TR1_UNORDERED_SET_H
-#cmakedefine US_HAVE_TR1_FUNCTIONAL_H
-#cmakedefine US_HAVE_UNORDERED_MAP_H
-#cmakedefine US_HAVE_UNORDERED_SET_H
-#cmakedefine US_HAVE_FUNCTIONAL_H
-
-#cmakedefine US_HAVE_TR1_UNORDERED_MAP
-#cmakedefine US_HAVE_TR1_UNORDERED_SET
-#cmakedefine US_HAVE_TR1_FUNCTION
-#cmakedefine US_HAVE_STD_UNORDERED_MAP
-#cmakedefine US_HAVE_STD_UNORDERED_SET
-#cmakedefine US_HAVE_STD_FUNCTION
-
-#cmakedefine US_HAVE_TR1_HASH
-#cmakedefine US_HAVE_TR1_HASH_STRUCT
-#cmakedefine US_HAVE_TR1_HASH_CLASS
-#cmakedefine US_HAVE_STD_HASH
-#cmakedefine US_HAVE_STD_HASH_STRUCT
-#cmakedefine US_HAVE_STD_HASH_CLASS
 
 ///-------------------------------------------------------------------
 // Version information
@@ -66,8 +44,6 @@
   # define US_USE_NAMESPACE
   # define US_BEGIN_NAMESPACE
   # define US_END_NAMESPACE
-  # define US_FORWARD_DECLARE_CLASS(name) class name;
-  # define US_FORWARD_DECLARE_STRUCT(name) struct name;
 
 #else /* user namespace */
 
@@ -75,13 +51,6 @@
   # define US_USE_NAMESPACE using namespace ::US_NAMESPACE;
   # define US_BEGIN_NAMESPACE namespace US_NAMESPACE {
   # define US_END_NAMESPACE }
-  # define US_FORWARD_DECLARE_CLASS(name) \
-    US_BEGIN_NAMESPACE class name; US_END_NAMESPACE
-
-  # define US_FORWARD_DECLARE_STRUCT(name) \
-    US_BEGIN_NAMESPACE struct name; US_END_NAMESPACE
-
-  namespace US_NAMESPACE {}
 
 #endif /* user namespace */
 
@@ -150,57 +119,22 @@ US_MSVC_DISABLE_WARNING(4996)
 // Hash Container
 //-------------------------------------------------------------------
 
-#ifdef US_HAVE_UNORDERED_MAP_H
-  #include <unordered_map>
-#elif defined(US_HAVE_TR1_UNORDERED_MAP_H)
-  #include <tr1/unordered_map>
-#endif
-
-#ifdef US_HAVE_UNORDERED_SET_H
-  #include <unordered_set>
-#elif defined(US_HAVE_TR1_UNORDERED_SET_H)
-  #include <tr1/unordered_set>
-#endif
-
-#ifdef US_HAVE_STD_UNORDERED_MAP
-  #define US_UNORDERED_MAP_TYPE ::std::unordered_map
-#elif defined(US_HAVE_TR1_UNORDERED_MAP)
-  #define US_UNORDERED_MAP_TYPE ::std::tr1::unordered_map
-#endif
-
-#ifdef US_HAVE_STD_UNORDERED_SET
-  #define US_UNORDERED_SET_TYPE ::std::unordered_set
-#elif defined(US_HAVE_TR1_UNORDERED_SET)
-  #define US_UNORDERED_SET_TYPE ::std::tr1::unordered_set
-#endif
-
-#ifdef US_HAVE_STD_HASH
-  #define US_HASH_FUNCTION_NAMESPACE ::std
-  #ifdef US_HAVE_STD_HASH_STRUCT
-    #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::hash<type>
-  #elif defined(US_HAVE_STD_HASH_CLASS)
-    #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::hash<type>
-  #endif
-  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std {
-  #define US_HASH_FUNCTION_NAMESPACE_END }
-#elif defined(US_HAVE_TR1_HASH)
-  #define US_HASH_FUNCTION_NAMESPACE ::std::tr1
-  #ifdef US_HAVE_TR1_HASH_STRUCT
-    #define US_HASH_FUNCTION_FRIEND(type) friend struct ::std::tr1::hash<type>
-  #elif defined(US_HAVE_TR1_HASH_CLASS)
-    #define US_HASH_FUNCTION_FRIEND(type) friend class ::std::tr1::hash<type>
-  #endif
-  #define US_HASH_FUNCTION_NAMESPACE_BEGIN namespace std { namespace tr1 {
-  #define US_HASH_FUNCTION_NAMESPACE_END }}
-#endif
-
-#define US_HASH_FUNCTION_BEGIN(type) \
-template<> \
+#define US_HASH_FUNCTION_BEGIN(type)                         \
+namespace std {                                              \
+template<>                                                   \
 struct hash<type> : std::unary_function<type, std::size_t> { \
 std::size_t operator()(const type& arg) const {
 
-#define US_HASH_FUNCTION_END } };
+#define US_HASH_FUNCTION_END } }; }
 
-#define US_HASH_FUNCTION(type, arg) hash<type>()(arg)
+
+//-------------------------------------------------------------------
+// Utility macros
+//-------------------------------------------------------------------
+
+#define US_STR_(x) #x
+#define US_STR(x) US_STR_(x)
+#define US_CONCAT_(x,y) x ## y
+#define US_CONCAT(x,y) US_CONCAT_(x,y)
 
 #endif // USGLOBALCONFIG_H

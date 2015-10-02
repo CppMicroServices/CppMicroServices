@@ -68,7 +68,7 @@ class MyServiceFactory : public ServiceFactory
 };
 
 MyServiceFactory* myServiceFactory = new MyServiceFactory;
-context->RegisterService<InterfaceA>(myServiceFactory);
+context->RegisterService<InterfaceA>(ToFactory(myServiceFactory));
 //! [f1]
   }
 
@@ -91,7 +91,7 @@ class MyServiceFactory : public ServiceFactory
 };
 
 MyServiceFactory* myServiceFactory = new MyServiceFactory;
-context->RegisterService<InterfaceA,InterfaceB>(static_cast<ServiceFactory*>(myServiceFactory));
+context->RegisterService<InterfaceA,InterfaceB>(ToFactory(myServiceFactory));
 //! [f2]
 // In the RegisterService call above, we could remove the static_cast because local types
 // are not considered in template argument type deduction and hence the compiler choose

@@ -83,7 +83,7 @@ private:
     }
   };
 
-  std::auto_ptr<DictionaryImpl> m_dictionaryService;
+  std::unique_ptr<DictionaryImpl> m_dictionaryService;
 
 
 public:

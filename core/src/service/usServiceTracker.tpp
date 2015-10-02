@@ -179,8 +179,9 @@ void ServiceTracker<S,TTT>::Close()
 }
 
 template<class S, class TTT>
+template<class Rep, class Period>
 typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::WaitForService(unsigned long timeoutMillis)
+ServiceTracker<S,TTT>::WaitForService(const std::chrono::duration<Rep, Period>& rel_time)
 {
   T object = GetService();
   while (!TTT::IsValid(object))
@@ -191,10 +192,10 @@ ServiceTracker<S,TTT>::WaitForService(unsigned long timeoutMillis)
       return TTT::DefaultValue();
     }
     {
-      US_UNUSED(typename _TrackedService::Lock(t));
+      typename _TrackedService::Lock l(t);
       if (t->Size() == 0)
       {
-        t->Wait(timeoutMillis);
+        t->WaitFor(l, rel_time);
       }
     }
     object = GetService();

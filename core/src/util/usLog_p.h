@@ -69,7 +69,7 @@ private:
   std::stringstream buffer;
 };
 
-class Logger {
+class Logger : MultiThreaded<> {
 public:
     static Logger& instance()
     { 
@@ -98,7 +98,7 @@ public:
     */
     void SetLogLevel(const MsgType level)
     {
-      MutexLock lock(levelLock);
+      Lock(this);
       logLevel = level;
     }
 
@@ -109,18 +109,16 @@ public:
     */
     MsgType GetLogLevel()
     {
+      Lock(this);
       return logLevel;
     }
 
 protected:
-    Logger(void) : logLevel(DebugMsg), 
-                   levelLock() 
-    {}
+    Logger(void) : logLevel(DebugMsg) {}
     ~Logger() {}
 
 private:
     MsgType logLevel;
-    Mutex levelLock;
 
     // disable copy/assignment
     Logger(const Logger&);

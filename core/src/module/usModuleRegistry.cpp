@@ -38,27 +38,13 @@
 US_BEGIN_NAMESPACE
 
 ModuleRegistry::ModuleRegistry(CoreModuleContext* coreCtx) :
-    coreCtx(coreCtx),
-    modulesLock(new Mutex()),
-    countLock(new Mutex()),
-    id(0)
+  coreCtx(coreCtx)
 {
-
+  id.value = 0;
 }
 
 ModuleRegistry::~ModuleRegistry(void)
 {
-    if (modulesLock)
-    {
-        delete modulesLock;
-    }
-
-    if (countLock)
-    {
-        delete countLock;
-    }
-
-    id = 0;
 }
 
 Module* ModuleRegistry::Register(ModuleInfo* info)
@@ -68,13 +54,14 @@ Module* ModuleRegistry::Register(ModuleInfo* info)
   if (!module)
   {
     module = new Module();
-    countLock->Lock();
-    info->id = ++id;
-    assert(info->id == 1 ? info->name == "CppMicroServices" : true);
-    countLock->Unlock();
+    {
+      Lock{id};
+      info->id = ++id.value;
+      assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+    }
     module->Init(coreCtx, info);
 
-    MutexLock lock(*modulesLock);
+    Lock(this);
     std::pair<ModuleMap::iterator, bool> return_pair(modules.insert(std::make_pair(info->name, module)));
 
     // A race condition exists when creating a new bundle instance. To resolve
@@ -104,14 +91,15 @@ void ModuleRegistry::RegisterSystemBundle(Framework* const systemBundle, ModuleI
     throw std::invalid_argument("Can't register a null system bundle");
   }
 
-  countLock->Lock();
-  info->id = ++id;
-  assert(info->id == 1 ? info->name == "CppMicroServices" : true);
-  countLock->Unlock();
+  {
+    Lock{id};
+    info->id = ++id.value;
+    assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+  }
 
   systemBundle->Init(coreCtx, info);
 
-  MutexLock lock(*modulesLock);
+  Lock(this);
   modules.insert(std::make_pair(info->name, systemBundle));
 }
 
@@ -120,32 +108,30 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   // TODO: fix once the system bundle id is set to 0
   if (info->id > 1)
   {
-    MutexLock lock(*modulesLock);
+    Lock(this);
     modules.erase(info->name);
   }
 }
 
-Module* ModuleRegistry::GetModule(long id)
+Module* ModuleRegistry::GetModule(long id) const
 {
-  MutexLock lock(*modulesLock);
+  Lock(this);
 
-  ModuleMap::const_iterator iter = modules.begin();
-  ModuleMap::const_iterator iterEnd = modules.end();
-  for (; iter != iterEnd; ++iter)
+  for (auto& m : modules)
   {
-    if (iter->second->GetModuleId() == id)
+    if (m.second->GetModuleId() == id)
     {
-      return iter->second;
+      return m.second;
     }
   }
   return 0;
 }
 
-Module* ModuleRegistry::GetModule(const std::string& name)
+Module* ModuleRegistry::GetModule(const std::string& name) const
 {
-  MutexLock lock(*modulesLock);
+  Lock(this);
 
-  ModuleMap::const_iterator iter = modules.find(name);
+  auto iter = modules.find(name);
   if (iter != modules.end())
   {
     return iter->second;
@@ -153,16 +139,14 @@ Module* ModuleRegistry::GetModule(const std::string& name)
   return 0;
 }
 
-std::vector<Module*> ModuleRegistry::GetModules()
+std::vector<Module*> ModuleRegistry::GetModules() const
 {
-  MutexLock lock(*modulesLock);
+  Lock(this);
 
   std::vector<Module*> result;
-  ModuleMap::const_iterator iter = modules.begin();
-  ModuleMap::const_iterator iterEnd = modules.end();
-  for (; iter != iterEnd; ++iter)
+  for (auto& m : modules)
   {
-    result.push_back(iter->second);
+    result.push_back(m.second);
   }
   return result;
 }

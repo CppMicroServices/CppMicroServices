@@ -30,10 +30,11 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 #ifndef USSHAREDDATA_H
 #define USSHAREDDATA_H
 
-#include "usAtomicInt_p.h"
-
 #include <algorithm>
 #include <utility>
+#include <atomic>
+
+#include "usGlobalConfig.h"
 
 US_BEGIN_NAMESPACE
 
@@ -43,7 +44,7 @@ US_BEGIN_NAMESPACE
 class SharedData
 {
 public:
-  mutable AtomicInt ref;
+  mutable std::atomic<int> ref;
 
   inline SharedData() : ref(0) { }
   inline SharedData(const SharedData&) : ref(0) { }
@@ -78,20 +79,20 @@ public:
   inline bool operator!=(const SharedDataPointer<T>& other) const { return d != other.d; }
 
   inline SharedDataPointer() : d(0) { }
-  inline ~SharedDataPointer() { if (d && !d->ref.Deref()) delete d; }
+  inline ~SharedDataPointer() { if (d && !--d->ref) delete d; }
 
   explicit SharedDataPointer(T* data);
-  inline SharedDataPointer(const SharedDataPointer<T>& o) : d(o.d) { if (d) d->ref.Ref(); }
+  inline SharedDataPointer(const SharedDataPointer<T>& o) : d(o.d) { if (d) ++d->ref; }
 
   inline SharedDataPointer<T> & operator=(const SharedDataPointer<T>& o)
   {
     if (o.d != d)
     {
       if (o.d)
-        o.d->ref.Ref();
+        ++o.d->ref;
       T *old = d;
       d = o.d;
-      if (old && !old->ref.Deref())
+      if (old && !--old->ref)
         delete old;
     }
     return *this;
@@ -102,10 +103,10 @@ public:
     if (o != d)
     {
       if (o)
-        o->ref.Ref();
+        ++o->ref;
       T *old = d;
       d = o;
-      if (old && !old->ref.Deref())
+      if (old && !--old->ref)
         delete old;
     }
     return *this;
@@ -147,32 +148,32 @@ public:
 
   inline void Reset()
   {
-    if(d && !d->ref.Deref())
+    if(d && !--d->ref)
       delete d;
 
-    d = 0;
+    d = nullptr;
   }
 
-  inline operator bool () const { return d != 0; }
+  inline operator bool () const { return d != nullptr; }
 
   inline bool operator==(const ExplicitlySharedDataPointer<T>& other) const { return d == other.d; }
   inline bool operator!=(const ExplicitlySharedDataPointer<T>& other) const { return d != other.d; }
   inline bool operator==(const T* ptr) const { return d == ptr; }
   inline bool operator!=(const T* ptr) const { return d != ptr; }
 
-  inline ExplicitlySharedDataPointer() { d = 0; }
-  inline ~ExplicitlySharedDataPointer() { if (d && !d->ref.Deref()) delete d; }
+  inline ExplicitlySharedDataPointer() { d = nullptr; }
+  inline ~ExplicitlySharedDataPointer() { if (d && !--d->ref) delete d; }
 
   explicit ExplicitlySharedDataPointer(T* data);
   inline ExplicitlySharedDataPointer(const ExplicitlySharedDataPointer<T> &o)
-    : d(o.d) { if (d) d->ref.Ref(); }
+    : d(o.d) { if (d) ++d->ref; }
 
   template<class X>
   inline ExplicitlySharedDataPointer(const ExplicitlySharedDataPointer<X>& o)
     : d(static_cast<T*>(o.Data()))
   {
     if(d)
-      d->ref.Ref();
+      ++d->ref;
   }
 
   inline ExplicitlySharedDataPointer<T>& operator=(const ExplicitlySharedDataPointer<T>& o)
@@ -180,10 +181,10 @@ public:
     if (o.d != d)
     {
       if (o.d)
-        o.d->ref.Ref();
+       ++o.d->ref;
       T *old = d;
       d = o.d;
-      if (old && !old->ref.Deref())
+      if (old && !--old->ref)
         delete old;
     }
     return *this;
@@ -194,10 +195,10 @@ public:
     if (o != d)
     {
       if (o)
-        o->ref.Ref();
+        ++o->ref;
       T *old = d;
       d = o;
-      if (old && !old->ref.Deref())
+      if (old && !--old->ref)
         delete old;
     }
     return *this;
@@ -223,7 +224,7 @@ private:
 
 template <class T>
 SharedDataPointer<T>::SharedDataPointer(T* adata) : d(adata)
-{ if (d) d->ref.Ref(); }
+{ if (d) ++d->ref; }
 
 template <class T>
 T* SharedDataPointer<T>::Clone()
@@ -235,8 +236,8 @@ template <class T>
 void SharedDataPointer<T>::Detach_helper()
 {
   T *x = Clone();
-  x->ref.Ref();
-  if (!d->ref.Deref())
+  ++x->ref;
+  if (!--d->ref)
     delete d;
   d = x;
 }
@@ -251,8 +252,8 @@ template <class T>
 void ExplicitlySharedDataPointer<T>::Detach_helper()
 {
   T *x = Clone();
-    x->ref.Ref();
-  if (!d->ref.Deref())
+    ++x->ref;
+  if (!--d->ref)
     delete d;
   d = x;
 }
@@ -260,7 +261,7 @@ void ExplicitlySharedDataPointer<T>::Detach_helper()
 template <class T>
 ExplicitlySharedDataPointer<T>::ExplicitlySharedDataPointer(T* adata)
   : d(adata)
-{ if (d) d->ref.Ref(); }
+{ if (d) ++d->ref; }
 
 template <class T>
 void swap(US_PREPEND_NAMESPACE(SharedDataPointer<T)>& p1, US_PREPEND_NAMESPACE(SharedDataPointer<T)>& p2)

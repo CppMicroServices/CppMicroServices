@@ -31,6 +31,7 @@
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 #include <usSharedLibrary.h>
+#include <usServiceEvent.h>
 
 #include <usModulePropsInterface.h>
 
@@ -87,7 +88,7 @@ public:
     return true;
   }
 
-  void serviceChanged(const ServiceEvent evt)
+  void serviceChanged(const ServiceEvent& evt)
   {
     events.push_back(evt);
     US_TEST_OUTPUT( << "ServiceEvent: " << evt );

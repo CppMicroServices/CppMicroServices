@@ -21,10 +21,13 @@
 =============================================================================*/
 
 //! [Activator]
+#include <iostream>
+
 #include "IDictionaryService.h"
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include <usServiceEvent.h>
 
 US_USE_NAMESPACE
 
@@ -151,7 +154,7 @@ public:
    *
    * @param event the fired service event.
    */
-  void ServiceChanged(const ServiceEvent event)
+  void ServiceChanged(const ServiceEvent& event)
   {
     // Use your favorite thread library to synchronize this
     // method with the Load() method.
@@ -177,7 +180,7 @@ public:
       {
         // Unget service object and null references.
         m_context->UngetService(m_ref);
-        m_ref = 0;
+        m_ref = nullptr;
         m_dictionary = NULL;
 
         // Query to see if we can get another service.

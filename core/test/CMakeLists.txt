@@ -69,6 +69,14 @@ set(_additional_srcs
   usTestUtils.cpp
 )
 
+#-----------------------------------------------------------------------------
+# Build the main test driver executable
+#-----------------------------------------------------------------------------
+
+if(US_ENABLE_THREADING_SUPPORT)
+  find_package(Threads REQUIRED)
+endif()
+
 set(_test_driver us${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
@@ -84,7 +92,7 @@ if(NOT US_BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
 endif()
 
-target_link_libraries(${_test_driver} ${Core_TARGET})
+target_link_libraries(${_test_driver} ${Core_TARGET} ${CMAKE_THREAD_LIBS_INIT})
 
 if(UNIX AND NOT APPLE)
   target_link_libraries(${_test_driver} rt)

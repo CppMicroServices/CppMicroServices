@@ -83,6 +83,9 @@ class US_Core_EXPORT Module
 
 public:
 
+  Module(const Module &) = delete;
+  Module& operator=(const Module&) = delete;
+
   /**
    * Returns the property key for looking up this module's id.
    * The property value is of type \c long.
@@ -391,7 +394,7 @@ public:
    * -# A bundle event of BundleEvent::UNINSTALLED is fired.
    * -# This bundle and any persistent storage area provided for this bundle by the Framework are removed.
    *
-   * @throws std::runtime_error If the bundle could not be uninstalled.   *
+   * @throws std::runtime_error If the bundle could not be uninstalled.   *
    */
   virtual void Uninstall();
 
@@ -408,10 +411,6 @@ private:
 
   void Init(CoreModuleContext* coreCtx, ModuleInfo* info);
   void Uninit();
-
-  // purposely not implemented
-  Module(const Module &);
-  Module& operator=(const Module&);
 
 };
 

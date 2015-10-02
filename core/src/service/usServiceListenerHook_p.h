@@ -32,13 +32,13 @@ US_BEGIN_NAMESPACE
 class ServiceListenerHook::ListenerInfoData : public SharedData
 {
 public:
-  ListenerInfoData(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& l,
+  ListenerInfoData(ModuleContext* mc, const ServiceListener& l,
                    void* data, const std::string& filter);
 
   virtual ~ListenerInfoData();
 
   ModuleContext* const mc;
-  ServiceListenerEntry::ServiceListener listener;
+  ServiceListener listener;
   void* data;
   std::string filter;
   bool bRemoved;

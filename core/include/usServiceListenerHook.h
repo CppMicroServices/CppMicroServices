@@ -129,7 +129,7 @@ struct US_Core_EXPORT ServiceListenerHook
 
     friend class ServiceListenerEntry;
 
-    US_HASH_FUNCTION_FRIEND(ServiceListenerHook::ListenerInfo);
+    friend class ::std::hash<ServiceListenerHook::ListenerInfo>;
 
     ListenerInfo(ListenerInfoData* data);
 
@@ -166,10 +166,8 @@ struct US_Core_EXPORT ServiceListenerHook
 
 US_END_NAMESPACE
 
-US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListenerHook::ListenerInfo))
-  return US_HASH_FUNCTION(const US_PREPEND_NAMESPACE(ServiceListenerHook::ListenerInfoData)*, arg.d.Data());
+  return hash<const US_PREPEND_NAMESPACE(ServiceListenerHook::ListenerInfoData)*>()(arg.d.Data());
 US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
 
 #endif // USSERVICELISTENERHOOK_H

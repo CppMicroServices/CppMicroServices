@@ -24,7 +24,9 @@
 #define USFRAMEWORKFACTORY_H
 
 #include <usCoreConfig.h>
+
 #include <map>
+#include <string>
 
 US_BEGIN_NAMESPACE
 

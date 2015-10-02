@@ -28,6 +28,7 @@
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
+#include <usServiceEvent.h>
 
 #include <vector>
 
@@ -102,7 +103,7 @@ public:
   {
   }
 
-  void ServiceChanged(const ServiceEvent ev)
+  void ServiceChanged(const ServiceEvent& ev)
   {
     switch(ev.GetType())
     {

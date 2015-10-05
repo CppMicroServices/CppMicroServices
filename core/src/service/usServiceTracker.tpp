@@ -247,7 +247,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
   { /* if more than one service, select highest ranking */
     std::vector<int> rankings(length);
     int count = 0;
-    int maxRanking = std::numeric_limits<int>::min();
+    int maxRanking = (std::numeric_limits<int>::min)();
     typename std::vector<ServiceReferenceType>::const_iterator refIter = references.begin();
     for (std::size_t i = 0; i < length; i++)
     {
@@ -276,7 +276,7 @@ ServiceTracker<S,TTT>::GetServiceReference() const
     }
     if (count > 1)
     { /* if still more than one service, select lowest id */
-      long int minId = std::numeric_limits<long int>::max();
+      long int minId = (std::numeric_limits<long int>::max)();
       refIter = references.begin();
       for (std::size_t i = 0; i < length; i++)
       {

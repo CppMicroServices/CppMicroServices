@@ -48,7 +48,8 @@ US_BEGIN_NAMESPACE
 US_END_NAMESPACE
 
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListener))
-  void(*targetFunc)(const US_PREPEND_NAMESPACE(ServiceEvent)&) = arg.target<void(const US_PREPEND_NAMESPACE(ServiceEvent)&)>();
+  typedef void(*TargetType)(const US_PREPEND_NAMESPACE(ServiceEvent)&);
+  const TargetType* targetFunc = arg.target<TargetType>();
   void* targetPtr = NULL;
   std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
   return hash<void*>()(targetPtr);

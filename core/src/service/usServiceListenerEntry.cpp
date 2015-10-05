@@ -20,6 +20,9 @@
 
 =============================================================================*/
 
+#include "usGlobalConfig.h"
+
+US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
 #include "usServiceListenerEntry_p.h"
 #include "usServiceListenerHook_p.h"
@@ -154,3 +157,5 @@ std::size_t ServiceListenerEntry::Hash() const
 }
 
 US_END_NAMESPACE
+
+US_MSVC_POP_WARNING

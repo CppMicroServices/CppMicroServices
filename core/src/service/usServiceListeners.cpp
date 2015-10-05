@@ -20,6 +20,10 @@
 
 =============================================================================*/
 
+#include "usGlobalConfig.h"
+
+US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
+
 #include "usUtils_p.h"
 
 #include "usServiceListeners_p.h"
@@ -344,3 +348,5 @@ void ServiceListeners::AddToSet(ServiceListenerEntries& set,
 }
 
 US_END_NAMESPACE
+
+US_MSVC_POP_WARNING

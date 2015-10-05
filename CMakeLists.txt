@@ -11,6 +11,7 @@ cmake_policy(VERSION 2.8.7)
 list(APPEND policies_new
   CMP0017 # Prefer files from the CMake module directory when including from there
   CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
+  CMP0054 # Only interpret if() arguments as variables or keywords when unquoted
   )
 foreach(policy ${policies_new})
   if(POLICY ${policy})
@@ -246,7 +247,13 @@ set(US_CXX11_FLAGS )
 set(US_CXX11_LINK_FLAGS )
 
 if(MSVC)
-  set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
+  set(disabled_warnings
+    4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+  )
+  foreach(wd ${disabled_warnings})
+    set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")
+  endforeach()
+  set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
   # C++11 support
   set(US_CXX11_FLAGS -std=c++11)
@@ -322,15 +329,8 @@ usFunctionCheckResourceLinking()
 #-----------------------------------------------------------------------------
 
 include(CheckIncludeFileCXX)
-include(CheckCXXSourceCompiles)
 
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
-#CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
-
-CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                          US_HAVE_STD_HASH_STRUCT)
-CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                          US_HAVE_STD_HASH_CLASS)
 
 #-----------------------------------------------------------------------------
 # Source directory

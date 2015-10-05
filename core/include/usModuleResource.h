@@ -29,7 +29,7 @@
 #include <ostream>
 #include <vector>
 
-US_MSVC_PUSH_DISABLE_WARNING(4396)
+US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
 US_BEGIN_NAMESPACE
 

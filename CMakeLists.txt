@@ -53,7 +53,7 @@ endforeach()
 # wait_condition
 
 set(US_COMPILER_GNU_MINIMUM_VERSION           4.6          )
-set(US_COMPILER_CLANG_MINIMUM_VERSION         3.3          ) # this could probably be 3.1, but we only tested with 3.3
+set(US_COMPILER_CLANG_MINIMUM_VERSION         3.1          )
 set(US_COMPILER_APPLE_CLANG_MINIMUM_VERSION   5.0          ) # ??
 set(US_COMPILER_MSVC_MINIMUM_VERSION          18.00.31101 )
 

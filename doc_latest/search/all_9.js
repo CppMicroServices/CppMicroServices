@@ -5,7 +5,7 @@ var searchData=
   ['listenerinfo',['ListenerInfo',['../structServiceListenerHook_1_1ListenerInfo.html#ab370958f3ad15ba7c261eb270199b36c',1,'ServiceListenerHook::ListenerInfo::ListenerInfo()'],['../structServiceListenerHook_1_1ListenerInfo.html#a3225eb55f734eab1e489b01a65644ec6',1,'ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo &amp;other)']]],
   ['listenerinfo',['ListenerInfo',['../structServiceListenerHook_1_1ListenerInfo.html',1,'ServiceListenerHook']]],
   ['load',['Load',['../structModuleActivator.html#a1db3f85c15a814a5918eb22725229967',1,'ModuleActivator::Load()'],['../classSharedLibrary.html#a958cffbd963cd476b69a3ce6034e9ba6',1,'SharedLibrary::Load()'],['../classSharedLibrary.html#a1c7ae22d86de8c8b80af9cd40cb5f033',1,'SharedLibrary::Load(int flags)']]],
-  ['loaded',['LOADED',['../classModuleEvent.html#a1606cbd5a80d1e6c1167191fa15f15dda6fe6d620f5fe0941f632acc1d48ebfa4',1,'ModuleEvent']]],
-  ['loading',['LOADING',['../classModuleEvent.html#a1606cbd5a80d1e6c1167191fa15f15ddaa89d7f56fa94eb5b82e08f0119ca884d',1,'ModuleEvent']]],
+  ['loaded',['LOADED',['../group__MicroServices.html#gga1606cbd5a80d1e6c1167191fa15f15dda6fe6d620f5fe0941f632acc1d48ebfa4',1,'ModuleEvent']]],
+  ['loading',['LOADING',['../group__MicroServices.html#gga1606cbd5a80d1e6c1167191fa15f15ddaa89d7f56fa94eb5b82e08f0119ca884d',1,'ModuleEvent']]],
   ['lower_5fbound',['lower_bound',['../classShrinkableMap.html#a8272ebbb3ac62f760dc47705e2658a85',1,'ShrinkableMap::lower_bound(const Key &amp;key)'],['../classShrinkableMap.html#ac8a94cd0966caea2ee06adf63b440404',1,'ShrinkableMap::lower_bound(const Key &amp;key) const ']]]
 ];

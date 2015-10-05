@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['module_20properties',['Module Properties',['../MicroServices_ModuleProperties.html',1,'MicroServices_UserDocs']]]
+  ['getting_20started',['Getting Started',['../MicroServices_GettingStarted.html',1,'MicroServices_UserDocs']]]
 ];

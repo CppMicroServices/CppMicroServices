@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['interfacetype',['InterfaceType',['../structInterfaceType.html',1,'']]]
+  ['framework',['Framework',['../classFramework.html',1,'']]],
+  ['frameworkfactory',['FrameworkFactory',['../classFrameworkFactory.html',1,'']]]
 ];

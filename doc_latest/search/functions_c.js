@@ -1,11 +1,13 @@
 var searchData=
 [
-  ['register',['Register',['../classModuleRegistry.html#a56f699d9e845677024aed929ae2b86bf',1,'ModuleRegistry']]],
-  ['registerservice',['RegisterService',['../classModuleContext.html#aa68596c589b57246927067742517ce47',1,'ModuleContext::RegisterService(const InterfaceMap &amp;service, const ServiceProperties &amp;properties=ServiceProperties())'],['../classModuleContext.html#a013068749e6a54ad7aaa73ec691fa3e5',1,'ModuleContext::RegisterService(S *service, const ServiceProperties &amp;properties=ServiceProperties())'],['../classModuleContext.html#a9b6d9800318464a9896ffb7c61a1fb34',1,'ModuleContext::RegisterService(Impl *impl, const ServiceProperties &amp;properties=ServiceProperties())'],['../classModuleContext.html#a76ef7a4df92f91a62c50df4ca9100c70',1,'ModuleContext::RegisterService(Impl *impl, const ServiceProperties &amp;properties=ServiceProperties())'],['../classModuleContext.html#abf2b7d86b1eab471f61270a0139edbcd',1,'ModuleContext::RegisterService(ServiceFactory *factory, const ServiceProperties &amp;properties=ServiceProperties())'],['../classModuleContext.html#a0ea9afc250bf838ad37659ca37d7bbe7',1,'ModuleContext::RegisterService(ServiceFactory *factory, const ServiceProperties &amp;properties=ServiceProperties())'],['../classModuleContext.html#a92b6070bc41fada9ec208b73ddab0f64',1,'ModuleContext::RegisterService(ServiceFactory *factory, const ServiceProperties &amp;properties=ServiceProperties())']]],
-  ['remove',['Remove',['../classServiceTracker.html#a91c549a647fd02bb9f5a2b44591fe82a',1,'ServiceTracker']]],
-  ['removed',['Removed',['../structServiceListenerHook.html#a63ef53442bf35de50790e0c628d57077',1,'ServiceListenerHook']]],
-  ['removedservice',['RemovedService',['../classServiceTracker.html#a94b5c2e8fdce14be03b36f5983463bb6',1,'ServiceTracker::RemovedService()'],['../structServiceTrackerCustomizer.html#a15ad851d60fceb25b979a874f620179f',1,'ServiceTrackerCustomizer::RemovedService()']]],
-  ['removemodulelistener',['RemoveModuleListener',['../classModuleContext.html#a76a2b8df55782e13155b456cb36054f8',1,'ModuleContext::RemoveModuleListener(const ModuleListener &amp;delegate)'],['../classModuleContext.html#a83e370982ef6be2003c7cad780229219',1,'ModuleContext::RemoveModuleListener(R *receiver, void(R::*callback)(const ModuleEvent))']]],
-  ['removeservicelistener',['RemoveServiceListener',['../classModuleContext.html#ae59a924bd2d3bf4d8c77abe4a0f61bd8',1,'ModuleContext::RemoveServiceListener(const ServiceListener &amp;delegate)'],['../classModuleContext.html#a3ceb1d79f61232619c53f2e7f26812ae',1,'ModuleContext::RemoveServiceListener(R *receiver, void(R::*callback)(const ServiceEvent))']]],
-  ['reset',['Reset',['../classExplicitlySharedDataPointer.html#a187fa99c132711dd63f60b86d73827d6',1,'ExplicitlySharedDataPointer']]]
+  ['parseversion',['ParseVersion',['../classModuleVersion.html#a19b19e15939f9ee3c430eb98f3bf3756',1,'ModuleVersion']]],
+  ['pop_5fback',['pop_back',['../classShrinkableVector.html#acb6b22cede4fb79bb539aa2abb0eb3f5',1,'ShrinkableVector']]],
+  ['prop_5fautoload_5fdir',['PROP_AUTOLOAD_DIR',['../classModule.html#ae9986bc0261acc8b4a8321c561215a69',1,'Module']]],
+  ['prop_5fautoloaded_5fmodules',['PROP_AUTOLOADED_MODULES',['../classModule.html#a536db5f209276917b8e02ca310dc1f34',1,'Module']]],
+  ['prop_5fdescription',['PROP_DESCRIPTION',['../classModule.html#a036bca9543c13741b0eee9656550041c',1,'Module']]],
+  ['prop_5fid',['PROP_ID',['../classModule.html#ad6bd8ff9e1efe6f883d939481a030fbc',1,'Module']]],
+  ['prop_5flocation',['PROP_LOCATION',['../classModule.html#a0e41a7671443f5e0ff345950b9949b81',1,'Module']]],
+  ['prop_5fname',['PROP_NAME',['../classModule.html#ab605045d336e05ee0c8a7925fbe3234b',1,'Module']]],
+  ['prop_5fvendor',['PROP_VENDOR',['../classModule.html#abdf1aac88e946fff1ae72895698496ce',1,'Module']]],
+  ['prop_5fversion',['PROP_VERSION',['../classModule.html#aad616f286d832d168958541f316e2a81',1,'Module']]]
 ];

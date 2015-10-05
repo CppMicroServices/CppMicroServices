@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['serviceproperties',['ServiceProperties',['../group__MicroServices.html#ga7c543446fd5f54de926acacfd64e76d6',1,'usServiceProperties.h']]],
+  ['serviceproperties',['ServiceProperties',['../group__MicroServices.html#gaf8a24ce4efc225528de1094c52ea3765',1,'usServiceProperties.h']]],
   ['servicereferencetype',['ServiceReferenceType',['../classServiceTracker.html#a15f1f3226c0be0a14472b3e001848bb9',1,'ServiceTracker::ServiceReferenceType()'],['../structServiceTrackerCustomizer.html#abfb62a8e008a03d1f625470b92c10cd3',1,'ServiceTrackerCustomizer::ServiceReferenceType()']]],
   ['servicereferenceu',['ServiceReferenceU',['../group__MicroServices.html#gaeb1c95fc8d955f6057269eb4f348caba',1,'usServiceReference.h']]],
   ['serviceregistrationu',['ServiceRegistrationU',['../group__MicroServices.html#ga7be3a427a87d460600d4aa9f36a039e4',1,'usServiceRegistration.h']]],

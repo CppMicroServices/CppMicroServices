@@ -22,15 +22,15 @@ if(NOT US_IS_EMBEDDED AND NOT US_NO_DOCUMENTATION)
 
     if(US_DOCUMENTATION_FOR_WEBPAGE)
       configure_file(doxygen/header.html
-                     ${CMAKE_CURRENT_BINARY_DIR}/header.html COPY_ONLY)
+                     ${CMAKE_CURRENT_BINARY_DIR}/header.html COPYONLY)
       set(US_DOXYGEN_HEADER header.html)
 
       configure_file(doxygen/footer.html
-                     ${CMAKE_CURRENT_BINARY_DIR}/footer.html COPY_ONLY)
+                     ${CMAKE_CURRENT_BINARY_DIR}/footer.html COPYONLY)
       set(US_DOXYGEN_FOOTER footer.html)
 
       configure_file(doxygen/doxygen_extra.css
-                     ${CMAKE_CURRENT_BINARY_DIR}/doxygen_extra.css COPY_ONLY)
+                     ${CMAKE_CURRENT_BINARY_DIR}/doxygen_extra.css COPYONLY)
       set(US_DOXYGEN_EXTRA_CSS doxygen_extra.css)
 
       set(US_DOXYGEN_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/gh-pages)

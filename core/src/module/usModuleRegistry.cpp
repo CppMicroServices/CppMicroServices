@@ -55,13 +55,13 @@ Module* ModuleRegistry::Register(ModuleInfo* info)
   {
     module = new Module();
     {
-      Lock{id};
+      Lock l(id);
       info->id = ++id.value;
       assert(info->id == 1 ? info->name == "CppMicroServices" : true);
     }
     module->Init(coreCtx, info);
 
-    Lock(this);
+    Lock l(this);
     std::pair<ModuleMap::iterator, bool> return_pair(modules.insert(std::make_pair(info->name, module)));
 
     // A race condition exists when creating a new bundle instance. To resolve
@@ -92,14 +92,14 @@ void ModuleRegistry::RegisterSystemBundle(Framework* const systemBundle, ModuleI
   }
 
   {
-    Lock{id};
+    Lock l(id);
     info->id = ++id.value;
     assert(info->id == 1 ? info->name == "CppMicroServices" : true);
   }
 
   systemBundle->Init(coreCtx, info);
 
-  Lock(this);
+  Lock l(this);
   modules.insert(std::make_pair(info->name, systemBundle));
 }
 
@@ -108,14 +108,14 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   // TODO: fix once the system bundle id is set to 0
   if (info->id > 1)
   {
-    Lock(this);
+    Lock l(this);
     modules.erase(info->name);
   }
 }
 
 Module* ModuleRegistry::GetModule(long id) const
 {
-  Lock(this);
+  Lock l(this);
 
   for (auto& m : modules)
   {
@@ -129,7 +129,7 @@ Module* ModuleRegistry::GetModule(long id) const
 
 Module* ModuleRegistry::GetModule(const std::string& name) const
 {
-  Lock(this);
+  Lock l(this);
 
   auto iter = modules.find(name);
   if (iter != modules.end())
@@ -141,7 +141,7 @@ Module* ModuleRegistry::GetModule(const std::string& name) const
 
 std::vector<Module*> ModuleRegistry::GetModules() const
 {
-  Lock(this);
+  Lock l(this);
 
   std::vector<Module*> result;
   for (auto& m : modules)

@@ -94,7 +94,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
   if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
 
   typedef decltype(d->eventLock) T; // gcc 4.6 workaround
-  T::Lock(d->eventLock);
+  T::Lock l(d->eventLock);
 
   ServiceEvent modifiedEndMatchEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference);
   ServiceListeners::ServiceListenerEntries before;
@@ -111,7 +111,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       std::vector<std::string> classes;
       {
         typedef decltype(d->propsLock) T; // gcc 4.6 workaround
-        T::Lock(d->propsLock);
+        T::Lock l2(d->propsLock);
 
         {
           const Any& any = d->properties.Value(ServiceConstants::SERVICE_RANKING());
@@ -157,7 +157,7 @@ void ServiceRegistrationBase::Unregister()
   if (d->unregistering) return; // Silently ignore redundant unregistration.
   {
     typedef decltype(d->eventLock) T; // gcc 4.6 workaround
-    T::Lock(d->eventLock);
+    T::Lock l(d->eventLock);
     if (d->unregistering) return;
     d->unregistering = true;
 
@@ -186,10 +186,10 @@ void ServiceRegistrationBase::Unregister()
 
   {
     typedef decltype(d->eventLock) T; // gcc 4.6 workaround
-    T::Lock(d->eventLock);
+    T::Lock l(d->eventLock);
     {
       typedef decltype(d->propsLock) P; // gcc 4.6 workaround
-      P::Lock(d->propsLock);
+      P::Lock l2(d->propsLock);
       d->available = false;
       InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
       if (d->module && factoryIter != d->service.end())

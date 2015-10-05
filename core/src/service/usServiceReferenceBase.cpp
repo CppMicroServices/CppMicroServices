@@ -81,7 +81,7 @@ ServiceReferenceBase::~ServiceReferenceBase()
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
   typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock {d->registration->propsLock};
+  T::Lock l(d->registration->propsLock);
 
   return d->registration->properties.Value(key);
 }
@@ -89,7 +89,7 @@ Any ServiceReferenceBase::GetProperty(const std::string& key) const
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
   typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock(d->registration->propsLock);
+  T::Lock l(d->registration->propsLock);
 
   const std::vector<std::string>& ks = d->registration->properties.Keys();
   keys.assign(ks.begin(), ks.end());
@@ -108,7 +108,7 @@ Module* ServiceReferenceBase::GetModule() const
 void ServiceReferenceBase::GetUsingModules(std::vector<Module*>& modules) const
 {
   typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock(d->registration->propsLock);
+  T::Lock l(d->registration->propsLock);
 
   ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator end = d->registration->dependents.end();
   for (ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator iter = d->registration->dependents.begin();

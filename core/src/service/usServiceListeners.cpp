@@ -60,7 +60,7 @@ ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
 void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
 
   ServiceListenerEntry sle(mc, listener, data, filter);
   RemoveServiceListener_unlocked(sle);
@@ -75,7 +75,7 @@ void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceLis
 {
   ServiceListenerEntry entryToRemove(mc, listener, data);
 
-  US_UNUSED(Lock(this));
+  Lock l(this);
   RemoveServiceListener_unlocked(entryToRemove);
 }
 
@@ -133,7 +133,7 @@ void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
 void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
 {
   {
-    US_UNUSED(Lock(this));
+    Lock l(this);
     for (ServiceListenerEntries::iterator it = serviceSet.begin();
          it != serviceSet.end(); )
     {
@@ -158,7 +158,7 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
 
 void ServiceListeners::HooksModuleStopped(ModuleContext* mc)
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
   std::vector<ServiceListenerEntry> entries;
   for (ServiceListenerEntries::iterator it = serviceSet.begin();
        it != serviceSet.end(); )
@@ -218,7 +218,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
 void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set,
                                                    bool lockProps)
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
 
   // Filter the original set of listeners
   ServiceListenerEntries receivers = serviceSet;
@@ -257,7 +257,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
 
 std::vector<ServiceListenerHook::ListenerInfo> ServiceListeners::GetListenerInfoCollection() const
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
   std::vector<ServiceListenerHook::ListenerInfo> result;
   result.reserve(serviceSet.size());
   for (ServiceListenerEntries::const_iterator iter = serviceSet.begin(),

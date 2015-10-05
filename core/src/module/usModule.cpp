@@ -123,7 +123,7 @@ bool Module::IsLoaded() const
 
 void Module::Start()
 {
-  ModulePrivate::Lock(this->d);
+  ModulePrivate::Lock l(this->d);
   if (d->moduleContext)
   {
     US_WARN << "Module " << d->info.name << " already started.";
@@ -188,7 +188,7 @@ void Module::Start()
 
 void Module::Stop()
 {
-  ModulePrivate::Lock(this->d);
+  ModulePrivate::Lock l(this->d);
   if (d->moduleContext == nullptr)
   {
     US_WARN << "Module " << d->info.name << " already stopped.";

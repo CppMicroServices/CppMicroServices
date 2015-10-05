@@ -98,7 +98,7 @@ public:
     */
     void SetLogLevel(const MsgType level)
     {
-      Lock(this);
+      Lock l(this);
       logLevel = level;
     }
 
@@ -109,7 +109,7 @@ public:
     */
     MsgType GetLogLevel()
     {
-      Lock(this);
+      Lock l(this);
       return logLevel;
     }
 

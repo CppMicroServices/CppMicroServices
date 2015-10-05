@@ -105,7 +105,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
   InterfaceMap s;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
-    T::Lock(registration->propsLock);
+    T::Lock l(registration->propsLock);
     if (registration->available)
     {
       ServiceFactory* factory = reinterpret_cast<ServiceFactory*>(
@@ -121,7 +121,7 @@ void* ServiceReferenceBasePrivate::GetService(Module* module)
   void* s = NULL;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
-    T::Lock(registration->propsLock);
+    T::Lock l(registration->propsLock);
     if (registration->available)
     {
       ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
@@ -167,7 +167,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
   InterfaceMap s;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
-    T::Lock(registration->propsLock);
+    T::Lock l(registration->propsLock);
     if (registration->available)
     {
       ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
@@ -210,7 +210,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Module* module)
 bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const InterfaceMap& service)
 {
   typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock(registration->propsLock);
+  T::Lock l(registration->propsLock);
 
   ServiceRegistrationBasePrivate::ModuleToServicesMap::iterator iter =
       registration->prototypeServiceInstances.find(module);
@@ -251,7 +251,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Module* module, const In
 bool ServiceReferenceBasePrivate::UngetService(Module* module, bool checkRefCounter)
 {
   typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock(registration->propsLock);
+  T::Lock l(registration->propsLock);
   bool hadReferences = false;
   bool removeService = false;
 
@@ -310,7 +310,7 @@ Any ServiceReferenceBasePrivate::GetProperty(const std::string& key, bool lock) 
   if (lock)
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
-    T::Lock(registration->propsLock);
+    T::Lock l(registration->propsLock);
     return registration->properties.Value(key);
   }
   else

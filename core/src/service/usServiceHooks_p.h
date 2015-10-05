@@ -39,7 +39,7 @@ private:
   CoreModuleContext* coreCtx;
   ServiceTracker<ServiceListenerHook>* listenerHookTracker;
 
-  bool bOpen;
+  std::atomic<bool> bOpen;
 
   virtual TrackedType AddingService(const ServiceReferenceType& reference);
   virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service);

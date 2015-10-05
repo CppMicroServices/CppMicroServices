@@ -46,6 +46,9 @@ class US_Core_EXPORT ModuleResourceStream : private ModuleResourceBuffer, public
 
 public:
 
+  ModuleResourceStream(const ModuleResourceStream&) = delete;
+  ModuleResourceStream& operator=(const ModuleResourceStream&) = delete;
+
   /**
    * Construct a %ModuleResourceStream object.
    *
@@ -59,11 +62,6 @@ public:
   ModuleResourceStream(const ModuleResource& resource,
                        std::ios_base::openmode mode = std::ios_base::in);
 
-private:
-
-  // purposely not implemented
-  ModuleResourceStream(const ModuleResourceStream&);
-  ModuleResourceStream& operator=(const ModuleResourceStream&);
 };
 
 US_END_NAMESPACE

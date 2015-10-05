@@ -97,8 +97,10 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
   coreCtx->services.Get(us_service_interface_iid<ModuleEventHook>(), eventHooks);
 
   {
-    MutexLock lock(coreCtx->listeners.moduleListenerMapMutex);
-    moduleListeners = coreCtx->listeners.moduleListenerMap;
+    //typedef decltype(coreCtx->listeners.moduleListenerMap) T;
+    typedef MultiThreaded<> T; // gcc 4.6 workaround; the above line leads to a segfault with gcc 4.6
+    T::Lock{coreCtx->listeners.moduleListenerMap};
+    moduleListeners = coreCtx->listeners.moduleListenerMap.value;
   }
 
   if(!eventHooks.empty())

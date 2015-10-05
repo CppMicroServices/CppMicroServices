@@ -24,10 +24,12 @@
 #ifndef USSERVICEREGISTRATIONBASEPRIVATE_H
 #define USSERVICEREGISTRATIONBASEPRIVATE_H
 
+#include <atomic>
+
 #include "usServiceInterface.h"
 #include "usServiceReference.h"
 #include "usServicePropertiesImpl_p.h"
-#include "usAtomicInt_p.h"
+#include "usThreads_p.h"
 
 US_BEGIN_NAMESPACE
 
@@ -54,7 +56,7 @@ protected:
   /**
    * Reference count for implicitly shared private implementation.
    */
-  AtomicInt ref;
+  std::atomic<int> ref;
 
   /**
    * Service or ServiceFactory object.
@@ -63,9 +65,12 @@ protected:
 
 public:
 
-  typedef US_UNORDERED_MAP_TYPE<Module*,int> ModuleToRefsMap;
-  typedef US_UNORDERED_MAP_TYPE<Module*, InterfaceMap> ModuleToServiceMap;
-  typedef US_UNORDERED_MAP_TYPE<Module*, std::list<InterfaceMap> > ModuleToServicesMap;
+  typedef std::unordered_map<Module*,int> ModuleToRefsMap;
+  typedef std::unordered_map<Module*, InterfaceMap> ModuleToServiceMap;
+  typedef std::unordered_map<Module*, std::list<InterfaceMap> > ModuleToServicesMap;
+
+  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
+  ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
 
   /**
    * Modules dependent on this service. Integer is used as
@@ -114,10 +119,10 @@ public:
   /**
    * Lock object for synchronous event delivery.
    */
-  Mutex eventLock;
+  MultiThreaded<> eventLock;
 
   // needs to be recursive
-  Mutex propsLock;
+  MultiThreaded<MutexLockingStrategy<std::recursive_mutex>> propsLock;
 
   ServiceRegistrationBasePrivate(ModulePrivate* module, const InterfaceMap& service,
                                  const ServicePropertiesImpl& props);
@@ -135,12 +140,6 @@ public:
   const InterfaceMap& GetInterfaces() const;
 
   void* GetService(const std::string& interfaceId) const;
-
-private:
-
-  // purposely not implemented
-  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&);
-  ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&);
 
 };
 

@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include <usCoreConfig.h>
 #include <usThreads_p.h>
@@ -41,7 +42,7 @@ struct ModuleActivator;
  * Here we handle all the modules that are loaded in the framework.
  * @remarks This class is thread-safe.
  */
-class US_Core_EXPORT ModuleRegistry {
+class US_Core_EXPORT ModuleRegistry : private MultiThreaded<> {
 
 public:
   
@@ -55,7 +56,7 @@ public:
    * @return Module or null
    *         if the module was not found.
    */
-  Module* GetModule(long id);
+  Module* GetModule(long id) const;
 
   /**
    * Get the module that has specified module name.
@@ -63,14 +64,14 @@ public:
    * @param name The name of the module to get.
    * @return Module or null.
    */
-  Module* GetModule(const std::string& name);
+  Module* GetModule(const std::string& name) const;
 
   /**
    * Get all known modules.
    *
    * @return A list which is filled with all known modules.
    */
-  std::vector<Module*> GetModules();
+  std::vector<Module*> GetModules() const;
 
   /**
    * Register a bundle with the Framework
@@ -104,28 +105,22 @@ private:
 
   CoreModuleContext* coreCtx;
 
-  typedef US_UNORDERED_MAP_TYPE<std::string, Module*> ModuleMap;
+  typedef std::unordered_map<std::string, Module*> ModuleMap;
 
   /**
    * Table of all installed modules in this framework.
    * Key is the module name.
+   *
+   * @GuardedBy this
    */
   ModuleMap modules;
 
   /**
-   * Lock for protecting the modules object
-   */
-  Mutex* modulesLock;
-
-  /**
-   * Lock for protecting the register count
-   */
-  Mutex* countLock;
-
-  /**
    * Stores the next Bundle ID.
    */
-  long id;
+  struct : public MultiThreaded<> {
+    long value;
+  } id;
 
 };
 

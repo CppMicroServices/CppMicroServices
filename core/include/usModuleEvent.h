@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+#include "usCoreExport.h"
 #include "usSharedData.h"
 
 #ifdef _MSC_VER

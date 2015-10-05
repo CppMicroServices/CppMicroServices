@@ -25,19 +25,31 @@ and more.
 Requirements
 ------------
 
-This is a pure C++ implementation of the OSGi service model and does not have any third-party
-library dependencies.
+This is a pure C++ implementation of the OSGi service model and a native version of
+OSGi bundles. It does not have any third-party library dependencies.
 
 Supported Platforms
 -------------------
 
-The library should compile on many different platforms. Below is a list of tested compiler/OS combinations:
+The library makes use of some C++11 features and compiles on many different platforms.
 
-  - GCC 4.6 (Ubuntu 12.04)
-  - GCC 4.8 (Ubuntu 13.10)
-  - Clang 3.2 (Ubuntu 13.10)
-  - Clang (MacOS X 10.8 and 10.9)
-  - Visual Studio 2008 SP1, 2010, 2012, 2013 (Windows 7)
+Minimum required compiler versions:
+
+  - GCC 4.6
+  - Clang 3.1
+  - Visual Studio 2013
+
+Below is a list of tested compiler/OS combinations:
+
+  - GCC 4.6.3 (Ubuntu 14.10)
+  - GCC 4.9.2 (Ubuntu 15.04)
+  - GCC 5.1.1 (Fedora 22)
+  - Clang 3.6.0 (Ubuntu 15.04)
+  - Visual Studio 2013 Update 5 (Windows 8.1)
+  - Visual Studio 2015 (Windows 8.1)
+
+Note: MacOS was supported in the past but cannot be tested currently due to the lack
+of Apple hardware and software.
 
 Legal
 -----

@@ -28,8 +28,10 @@
 #define USMODULEINITIALIZATION_H
 
 #include <usGlobalConfig.h>
-#include <usModuleContext.h>
-#include <usModuleUtils_p.h>
+
+US_BEGIN_NAMESPACE
+class ModuleContext;
+US_END_NAMESPACE
 
 /**
  * \ingroup MicroServices

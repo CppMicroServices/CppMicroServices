@@ -26,7 +26,7 @@
 
 #include <usUtils_p.h>
 #include <usServiceListenerHook.h>
-#include <usListenerFunctors_p.h>
+#include <usListenerFunctors.h>
 
 #include "usLDAPExpr_p.h"
 
@@ -44,8 +44,6 @@ class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
 {
 
 public:
-
-  typedef US_SERVICE_LISTENER_FUNCTOR ServiceListener;
 
   ServiceListenerEntry(const ServiceListenerEntry& other);
   ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info);
@@ -71,10 +69,8 @@ public:
 
 US_END_NAMESPACE
 
-US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListenerEntry))
   return arg.Hash();
 US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
 
 #endif // USSERVICELISTENERENTRY_H

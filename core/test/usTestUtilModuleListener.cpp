@@ -31,13 +31,13 @@ TestModuleListener::TestModuleListener()
   : serviceEvents(), moduleEvents()
 {}
 
-void TestModuleListener::ModuleChanged(const ModuleEvent event)
+void TestModuleListener::ModuleChanged(const ModuleEvent& event)
 {
   moduleEvents.push_back(event);
   US_DEBUG << "ModuleEvent:" << event;
 }
 
-void TestModuleListener::ServiceChanged(const ServiceEvent event)
+void TestModuleListener::ServiceChanged(const ServiceEvent& event)
 {
   serviceEvents.push_back(event);
   US_DEBUG << "ServiceEvent:" << event;

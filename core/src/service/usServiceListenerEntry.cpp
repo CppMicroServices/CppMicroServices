@@ -20,6 +20,9 @@
 
 =============================================================================*/
 
+#include "usGlobalConfig.h"
+
+US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
 #include "usServiceListenerEntry_p.h"
 #include "usServiceListenerHook_p.h"
@@ -28,11 +31,23 @@
 
 US_BEGIN_NAMESPACE
 
+struct ServiceListenerCompare : std::binary_function<ServiceListener, ServiceListener, bool>
+{
+  bool operator()(const ServiceListener& f1,
+                  const ServiceListener& f2) const
+  {
+    return f1.target<void(const ServiceEvent&)>() == f2.target<void(const ServiceEvent&)>();
+  }
+};
+
 class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
 {
 public:
 
-  ServiceListenerEntryData(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& l,
+  ServiceListenerEntryData(const ServiceListenerEntryData&) = delete;
+  ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
+
+  ServiceListenerEntryData(ModuleContext* mc, const ServiceListener& l,
                            void* data, const std::string& filter)
     : ServiceListenerHook::ListenerInfoData(mc, l, data, filter)
     , ldap()
@@ -73,11 +88,6 @@ public:
 
   std::size_t hashValue;
 
-private:
-
-  // purposely not implemented
-  ServiceListenerEntryData(const ServiceListenerEntryData&);
-  ServiceListenerEntryData& operator=(const ServiceListenerEntryData&);
 };
 
 ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
@@ -135,15 +145,17 @@ bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 
 std::size_t ServiceListenerEntry::Hash() const
 {
-  using namespace US_HASH_FUNCTION_NAMESPACE;
+  using namespace std;
 
   if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0)
   {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
-        ((US_HASH_FUNCTION(ModuleContext*, d->mc) ^ (US_HASH_FUNCTION(void*, d->data) << 1)) >> 1) ^
-        (US_HASH_FUNCTION(US_SERVICE_LISTENER_FUNCTOR, d->listener) << 1);
+        ((hash<ModuleContext*>()(d->mc) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
+        (hash<ServiceListener>()(d->listener) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
 }
 
 US_END_NAMESPACE
+
+US_MSVC_POP_WARNING

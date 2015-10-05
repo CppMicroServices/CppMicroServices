@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 US_BEGIN_NAMESPACE
 
@@ -57,7 +58,7 @@ public:
   typedef char Byte;
   typedef std::vector<std::string> StringList;
   typedef std::vector<StringList> LocalCache;
-  typedef US_UNORDERED_SET_TYPE<std::string> ObjectClassSet;
+  typedef std::unordered_set<std::string> ObjectClassSet;
 
 
   /**

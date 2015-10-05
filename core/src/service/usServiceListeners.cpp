@@ -20,6 +20,10 @@
 
 =============================================================================*/
 
+#include "usGlobalConfig.h"
+
+US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
+
 #include "usUtils_p.h"
 
 #include "usServiceListeners_p.h"
@@ -35,6 +39,17 @@ US_BEGIN_NAMESPACE
 const int ServiceListeners::OBJECTCLASS_IX = 0;
 const int ServiceListeners::SERVICE_ID_IX = 1;
 
+struct ModuleListenerCompare : std::binary_function<std::pair<ModuleListener, void*>,
+                                                    std::pair<ModuleListener, void*>, bool>
+{
+  bool operator()(const std::pair<ModuleListener, void*>& p1,
+                  const std::pair<ModuleListener, void*>& p2) const
+  {
+    return p1.second == p2.second &&
+           p1.first.target<void(const ModuleEvent&)>() == p2.first.target<void(const ModuleEvent&)>();
+  }
+};
+
 ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
   : coreCtx(coreCtx)
 {
@@ -42,10 +57,10 @@ ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
   hashedServiceKeys.push_back(ServiceConstants::SERVICE_ID());
 }
 
-void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
 
   ServiceListenerEntry sle(mc, listener, data, filter);
   RemoveServiceListener_unlocked(sle);
@@ -55,12 +70,12 @@ void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListen
   CheckSimple(sle);
 }
 
-void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
+void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListener& listener,
                                              void* data)
 {
   ServiceListenerEntry entryToRemove(mc, listener, data);
 
-  US_UNUSED(Lock(this));
+  Lock l(this);
   RemoveServiceListener_unlocked(entryToRemove);
 }
 
@@ -78,8 +93,8 @@ void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry
 
 void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
-  MutexLock lock(moduleListenerMapMutex);
-  ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap[mc];
+  Lock{moduleListenerMap};
+  ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap.value[mc];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
   {
     listeners.push_back(std::make_pair(listener, data));
@@ -88,8 +103,8 @@ void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener
 
 void ServiceListeners::RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
-  MutexLock lock(moduleListenerMapMutex);
-  moduleListenerMap[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
+  Lock{moduleListenerMap};
+  moduleListenerMap.value[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
 }
 
 void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
@@ -118,7 +133,7 @@ void ServiceListeners::ModuleChanged(const ModuleEvent& evt)
 void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
 {
   {
-    US_UNUSED(Lock(this));
+    Lock l(this);
     for (ServiceListenerEntries::iterator it = serviceSet.begin();
          it != serviceSet.end(); )
     {
@@ -136,14 +151,14 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
   }
 
   {
-    MutexLock lock(moduleListenerMapMutex);
-    moduleListenerMap.erase(mc);
+    Lock{moduleListenerMap};
+    moduleListenerMap.value.erase(mc);
   }
 }
 
 void ServiceListeners::HooksModuleStopped(ModuleContext* mc)
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
   std::vector<ServiceListenerEntry> entries;
   for (ServiceListenerEntries::iterator it = serviceSet.begin();
        it != serviceSet.end(); )
@@ -203,7 +218,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
 void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set,
                                                    bool lockProps)
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
 
   // Filter the original set of listeners
   ServiceListenerEntries receivers = serviceSet;
@@ -242,7 +257,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
 
 std::vector<ServiceListenerHook::ListenerInfo> ServiceListeners::GetListenerInfoCollection() const
 {
-  US_UNUSED(Lock(this));
+  Lock l(this);
   std::vector<ServiceListenerHook::ListenerInfo> result;
   result.reserve(serviceSet.size());
   for (ServiceListenerEntries::const_iterator iter = serviceSet.begin(),
@@ -333,3 +348,5 @@ void ServiceListeners::AddToSet(ServiceListenerEntries& set,
 }
 
 US_END_NAMESPACE
+
+US_MSVC_POP_WARNING

@@ -25,9 +25,10 @@
 #define USMODULEABSTRACTTRACKED_H
 
 #include <vector>
+#include <atomic>
 
-#include "usAtomicInt_p.h"
 #include "usAny.h"
+#include "usThreads_p.h"
 #include "usWaitCondition_p.h"
 
 US_BEGIN_NAMESPACE
@@ -49,7 +50,7 @@ US_BEGIN_NAMESPACE
  * @ThreadSafe
  */
 template<class S, class TTT, class R>
-class ModuleAbstractTracked : public MultiThreaded<MutexLockingStrategy,WaitCondition>
+class ModuleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>,WaitCondition>
 {
 
 public:
@@ -279,10 +280,8 @@ private:
   /**
    * Modification count. This field is initialized to zero and incremented by
    * modified.
-   *
-   * @GuardedBy this
    */
-  AtomicInt trackingCount;
+  std::atomic<int> trackingCount;
 
   bool CustomizerAddingFinal(S item, const T& custom);
 

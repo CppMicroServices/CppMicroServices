@@ -100,7 +100,7 @@
 #  License text for the above reference.)
 
 include(${CMAKE_CURRENT_LIST_DIR}/FindPackageMessage.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/CMakeParseArguments.cmake)
+include(CMakeParseArguments)
 
 # internal helper macro
 macro(_FPHSA_FAILURE_MESSAGE _msg)

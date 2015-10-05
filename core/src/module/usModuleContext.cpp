@@ -23,6 +23,7 @@
 #include "usModuleContext.h"
 
 #include "usModule.h"
+#include "usModuleEvent.h"
 #include "usModuleRegistry_p.h"
 #include "usModulePrivate.h"
 #include "usModuleSettings.h"

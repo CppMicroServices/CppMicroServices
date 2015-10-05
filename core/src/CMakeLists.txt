@@ -59,9 +59,7 @@ set(_srcs
 )
 
 set(_private_headers
-  util/usAtomicInt_p.h
   util/usFrameworkPrivate.h
-  util/usListenerFunctors_p.h
   util/usLog_p.h
   util/usThreads_p.h
   util/usUtils_p.h

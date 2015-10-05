@@ -36,6 +36,9 @@ class US_Core_EXPORT ModuleResourceBuffer: public std::streambuf
 
 public:
 
+  ModuleResourceBuffer(const ModuleResourceBuffer&) = delete;
+  ModuleResourceBuffer& operator=(const ModuleResourceBuffer&) = delete;
+
   explicit ModuleResourceBuffer(void* data, std::size_t size,
                                 std::ios_base::openmode mode);
 
@@ -53,10 +56,6 @@ private:
 
   pos_type seekoff (off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
   pos_type seekpos (pos_type sp, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
-
-  // purposely not implemented
-  ModuleResourceBuffer(const ModuleResourceBuffer&);
-  ModuleResourceBuffer& operator=(const ModuleResourceBuffer&);
 
 private:
 

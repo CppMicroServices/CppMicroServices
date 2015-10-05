@@ -45,7 +45,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
   InstallTestBundle(mc, "TestModuleB");
 
   Module* moduleB = mc->GetModule("TestModuleB");
-  US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for existing module TestModuleB")
+  US_TEST_CONDITION_REQUIRED(moduleB != nullptr, "Test for existing module TestModuleB")
 
   try
   {
@@ -62,7 +62,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
   }
 
   Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
-  US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for existing module TestModuleImportedByB")
+  US_TEST_CONDITION_REQUIRED(moduleImportedByB != nullptr, "Test for existing module TestModuleImportedByB")
 
   US_TEST_CONDITION(moduleB->GetName() == "TestModuleB", "Test module name")
   US_TEST_CONDITION(moduleImportedByB->GetName() == "TestModuleImportedByB", "Test module name")
@@ -120,10 +120,10 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener)
 void frame030b(ModuleContext* mc, TestModuleListener& listener)
 {
   Module* moduleB = mc->GetModule("TestModuleB");
-  US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
+  US_TEST_CONDITION_REQUIRED(moduleB != nullptr, "Test for non-null module")
 
   Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
-  US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
+  US_TEST_CONDITION_REQUIRED(moduleImportedByB != nullptr, "Test for non-null module")
 
   std::vector<ServiceReferenceU> refs
       = mc->GetServiceReferences("us::TestModuleBService");
@@ -167,10 +167,10 @@ void frame030b(ModuleContext* mc, TestModuleListener& listener)
 void frame040c(ModuleContext* mc, TestModuleListener& listener)
 {
     Module* moduleB = mc->GetModule("TestModuleB");
-    US_TEST_CONDITION_REQUIRED(moduleB != 0, "Test for non-null module")
+    US_TEST_CONDITION_REQUIRED(moduleB != nullptr, "Test for non-null module")
 
     Module* moduleImportedByB = mc->GetModule("TestModuleImportedByB");
-    US_TEST_CONDITION_REQUIRED(moduleImportedByB != 0, "Test for non-null module")
+    US_TEST_CONDITION_REQUIRED(moduleImportedByB != nullptr, "Test for non-null module")
 
     moduleB->Uninstall();
     US_TEST_CONDITION(mc->GetModules().size() == 2, "Test for uninstall of TestModuleB")

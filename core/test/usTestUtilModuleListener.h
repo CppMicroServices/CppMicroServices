@@ -39,9 +39,9 @@ public:
 
   TestModuleListener();
 
-  void ModuleChanged(const ModuleEvent event);
+  void ModuleChanged(const ModuleEvent& event);
 
-  void ServiceChanged(const ServiceEvent event);
+  void ServiceChanged(const ServiceEvent& event);
 
   ModuleEvent GetModuleEvent() const;
 
@@ -71,7 +71,7 @@ class ModuleListenerRegistrationHelper
 
 public:
 
-  typedef void(Receiver::*CallbackType)(const ModuleEvent);
+  typedef void(Receiver::*CallbackType)(const ModuleEvent&);
 
   ModuleListenerRegistrationHelper(ModuleContext* context, Receiver* receiver, CallbackType callback)
     : context(context)
@@ -107,7 +107,7 @@ class ServiceListenerRegistrationHelper
 
 public:
 
-  typedef void(Receiver::*CallbackType)(const ServiceEvent);
+  typedef void(Receiver::*CallbackType)(const ServiceEvent&);
 
   ServiceListenerRegistrationHelper(ModuleContext* context, Receiver* receiver, CallbackType callback)
     : context(context)

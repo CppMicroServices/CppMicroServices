@@ -38,17 +38,12 @@ US_BEGIN_NAMESPACE
  * This class exists to hide and decouple the implementation of the 
  * Framework class from client code.
  */
-class FrameworkPrivate
+class FrameworkPrivate : public MultiThreaded<>
 {
 public:
     FrameworkPrivate(void);
     FrameworkPrivate(const std::map<std::string, std::string>& configuration);
     virtual ~FrameworkPrivate();
-
-    /**
-     * Make the initialization of the Framework thread-safe.
-     */
-    Mutex initLock;
 
     CoreModuleContext coreModuleContext;
 

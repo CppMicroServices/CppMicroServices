@@ -30,6 +30,8 @@ class ServiceEventData : public SharedData
 {
 public:
 
+  ServiceEventData& operator=(const ServiceEventData&) = delete;
+
   ServiceEventData(const ServiceEvent::Type& type, const ServiceReferenceBase& reference)
     : type(type), reference(reference)
   {
@@ -45,10 +47,6 @@ public:
   const ServiceEvent::Type type;
   const ServiceReferenceBase reference;
 
-private:
-
-  // purposely not implemented
-  ServiceEventData& operator=(const ServiceEventData&);
 };
 
 ServiceEvent::ServiceEvent()

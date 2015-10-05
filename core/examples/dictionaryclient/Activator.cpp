@@ -21,6 +21,8 @@
 =============================================================================*/
 
 //! [Activator]
+#include <iostream>
+
 #include "IDictionaryService.h"
 
 #include <usModuleActivator.h>

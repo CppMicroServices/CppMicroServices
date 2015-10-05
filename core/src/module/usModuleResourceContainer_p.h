@@ -24,8 +24,8 @@
 #define USMODULERESOURCECONTAINER_P_H
 
 #include "usGlobalConfig.h"
-#include "us_stdint.h"
 
+#include <cstdint>
 #include <ctime>
 #include <string>
 #include <vector>

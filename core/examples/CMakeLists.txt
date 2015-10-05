@@ -10,14 +10,14 @@ include_directories(${CppMicroServices_INCLUDE_DIRS})
 # Set C/CXX flags
 #-----------------------------------------------------------------------------
 
-#if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CppMicroServices_CXX_FLAGS}")
-#  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CppMicroServices_CXX_FLAGS_RELEASE}")
-#  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CppMicroServices_CXX_FLAGS_DEBUG}")
-#  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CppMicroServices_C_FLAGS}")
-#  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${CppMicroServices_C_FLAGS_RELEASE}")
-#  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${CppMicroServices_C_FLAGS_DEBUG}")
-#endif()
+if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${US_CXX_FLAGS_DEBUG}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${US_C_FLAGS_DEBUG}")
+endif()
 
 #-----------------------------------------------------------------------------
 # Init output directories

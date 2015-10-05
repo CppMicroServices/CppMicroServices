@@ -41,7 +41,7 @@ class TestModuleListener
 {
 public:
 
-  void ModuleChanged(const ModuleEvent moduleEvent)
+  void ModuleChanged(const ModuleEvent& moduleEvent)
   {
     this->events.push_back(moduleEvent);
   }
@@ -88,7 +88,7 @@ void TestFindHook(Framework* framework)
   InstallTestBundle(framework->GetModuleContext(), "TestModuleA");
 
   Module* moduleA = framework->GetModuleContext()->GetModule("TestModuleA");
-  US_TEST_CONDITION_REQUIRED(moduleA != 0, "Test for existing module TestModuleA")
+  US_TEST_CONDITION_REQUIRED(moduleA != nullptr, "Test for existing module TestModuleA")
 
   US_TEST_CONDITION(moduleA->GetName() == "TestModuleA", "Test module name")
 

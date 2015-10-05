@@ -82,7 +82,7 @@ public:
         {
           ServiceRegistrationU sr1 = servregs[offset];
           sr1.Unregister();
-          servregs[offset] = 0;
+          servregs[offset] = nullptr;
         }
       }
     }

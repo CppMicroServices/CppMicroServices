@@ -41,9 +41,12 @@ struct ModuleActivator;
 /**
  * \ingroup MicroServices
  */
-class ModulePrivate {
+class ModulePrivate : public MultiThreaded<> {
 
 public:
+
+  ModulePrivate(const ModulePrivate&) = delete;
+  ModulePrivate& operator=(const ModulePrivate&) = delete;
 
   /**
    * Construct a new module based on a ModuleInfo object.
@@ -85,19 +88,9 @@ public:
    */
   SharedLibrary lib;
 
-  /**
-   * This mutex ensures that the Start() and Stop() of a Module instance
-   * is thread-safe.
-   */
-  Mutex stateChangeGuard;
-
 private:
 
   void InitializeResources();
-
-  // purposely not implemented
-  ModulePrivate(const ModulePrivate&);
-  ModulePrivate& operator=(const ModulePrivate&);
 
 };
 

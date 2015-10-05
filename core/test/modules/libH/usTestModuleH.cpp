@@ -109,8 +109,8 @@ public:
   {
     std::cout << "start in H" << std::endl;
     this->mc = mc;
-    factoryService = mc->RegisterService<TestModuleH>(this);
-    prototypeFactoryService = mc->RegisterService<TestModuleH,TestModuleH2>(static_cast<ServiceFactory*>(&prototypeFactory));
+    factoryService = mc->RegisterService<TestModuleH>(ToFactory(this));
+    prototypeFactoryService = mc->RegisterService<TestModuleH,TestModuleH2>(ToFactory(prototypeFactory));
   }
 
   void Unload(ModuleContext* /*mc*/)

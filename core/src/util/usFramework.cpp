@@ -50,7 +50,7 @@ Framework::~Framework(void)
 
 void Framework::Initialize(void)
 {
-  MutexLock lock(d->initLock);
+  FrameworkPrivate::Lock{d};
   if (d->initialized)
   {
     return;
@@ -76,7 +76,7 @@ void Framework::Start()
 
 void Framework::Stop() 
 {
-  MutexLock lock(d->initLock);
+  FrameworkPrivate::Lock lock(d);
   std::vector<Module*> modules(GetModuleContext()->GetModules());
   for (std::vector<Module*>::const_iterator iter = modules.begin();
       iter != modules.end(); 

@@ -50,7 +50,7 @@ int usModuleManifestTest(int /*argc*/, char* /*argv*/[])
   InstallTestBundle(framework->GetModuleContext(), "TestModuleM");
 
   Module* moduleM = framework->GetModuleContext()->GetModule("TestModuleM");
-  US_TEST_CONDITION_REQUIRED(moduleM != 0, "Test for existing module TestModuleM")
+  US_TEST_CONDITION_REQUIRED(moduleM != nullptr, "Test for existing module TestModuleM")
 
   US_TEST_CONDITION(moduleM->GetProperty(Module::PROP_NAME()).ToString() == "TestModuleM", "Module name")
   US_TEST_CONDITION(moduleM->GetName() == "TestModuleM", "Module name 2")

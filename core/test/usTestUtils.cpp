@@ -122,7 +122,7 @@ long long HighPrecisionTimer::ElapsedMicro()
 
 Module* InstallTestBundle(ModuleContext* frameworkCtx, const std::string& bundleName)
 {
-    Module* module = 0;
+    Module* module = nullptr;
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)

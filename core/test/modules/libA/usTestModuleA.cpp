@@ -43,7 +43,7 @@ struct TestModuleA : public TestModuleAService
     if (sr)
     {
       sr.Unregister();
-      sr = 0;
+      sr = nullptr;
     }
   }
 

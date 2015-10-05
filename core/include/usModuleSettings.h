@@ -55,6 +55,9 @@ public:
   ModuleSettings();
   ~ModuleSettings();
 
+  ModuleSettings(const ModuleSettings&) = delete;
+  ModuleSettings& operator=(const ModuleSettings&) = delete;
+
   typedef std::vector<std::string> PathList;
 
   /**
@@ -128,9 +131,6 @@ public:
 private:
   ModuleSettingsPrivate* pimpl;
 
-  // purposely not implemented
-  ModuleSettings(const ModuleSettings&);
-  ModuleSettings& operator=(const ModuleSettings&);
 };
 
 US_END_NAMESPACE

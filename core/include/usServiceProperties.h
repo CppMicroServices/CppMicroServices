@@ -28,6 +28,7 @@
 #include <usCoreConfig.h>
 
 #include <cctype>
+#include <unordered_map>
 
 #include "usAny.h"
 
@@ -40,7 +41,7 @@ US_BEGIN_NAMESPACE
  * type. It is typically used for passing service properties to
  * ModuleContext::RegisterService.
  */
-typedef US_UNORDERED_MAP_TYPE<std::string, Any> ServiceProperties;
+typedef std::unordered_map<std::string, Any> ServiceProperties;
 
 /**
  * \ingroup MicroServices

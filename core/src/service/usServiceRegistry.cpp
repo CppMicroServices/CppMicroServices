@@ -82,7 +82,7 @@ void ServiceRegistry::Clear()
   services.clear();
   serviceRegistrations.clear();
   classServices.clear();
-  core = 0;
+  core = nullptr;
 }
 
 ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
@@ -113,7 +113,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
   ServiceRegistrationBase res(module, service,
                               CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
   {
-    MutexLock lock(mutex);
+    Lock l(this);
     services.insert(std::make_pair(res, classes));
     serviceRegistrations.push_back(res);
     for (std::vector<std::string>::const_iterator i = classes.begin();
@@ -138,7 +138,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
 void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistrationBase& sr,
                                                      const std::vector<std::string>& classes)
 {
-  MutexLock lock(mutex);
+  Lock l(this);
   for (std::vector<std::string>::const_iterator i = classes.begin();
        i != classes.end(); ++i)
   {
@@ -151,7 +151,7 @@ void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistrationBa
 void ServiceRegistry::Get(const std::string& clazz,
                           std::vector<ServiceRegistrationBase>& serviceRegs) const
 {
-  MutexLock lock(mutex);
+  Lock l(this);
   Get_unlocked(clazz, serviceRegs);
 }
 
@@ -167,7 +167,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
 
 ServiceReferenceBase ServiceRegistry::Get(ModulePrivate* module, const std::string& clazz) const
 {
-  MutexLock lock(mutex);
+  Lock l(this);
   try
   {
     std::vector<ServiceReferenceBase> srs;
@@ -189,7 +189,7 @@ ServiceReferenceBase ServiceRegistry::Get(ModulePrivate* module, const std::stri
 void ServiceRegistry::Get(const std::string& clazz, const std::string& filter,
                           ModulePrivate* module, std::vector<ServiceReferenceBase>& res) const
 {
-  MutexLock lock(mutex);
+  Lock l(this);
   Get_unlocked(clazz, filter, module, res);
 }
 
@@ -283,7 +283,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
 
 void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& sr)
 {
-  MutexLock lock(mutex);
+  Lock l(this);
 
   assert(sr.d->properties.Value(ServiceConstants::OBJECTCLASS()).Type() == typeid(std::vector<std::string>));
   const std::vector<std::string>& classes = ref_any_cast<std::vector<std::string> >(
@@ -309,7 +309,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& s
 void ServiceRegistry::GetRegisteredByModule(ModulePrivate* p,
                                             std::vector<ServiceRegistrationBase>& res) const
 {
-  MutexLock lock(mutex);
+  Lock l(this);
 
   for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
@@ -324,7 +324,7 @@ void ServiceRegistry::GetRegisteredByModule(ModulePrivate* p,
 void ServiceRegistry::GetUsedByModule(Module* p,
                                       std::vector<ServiceRegistrationBase>& res) const
 {
-  MutexLock lock(mutex);
+  Lock l(this);
 
   for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)

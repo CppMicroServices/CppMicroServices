@@ -61,7 +61,7 @@ private:
     }
   };
 
-  std::auto_ptr<DictionaryImpl> m_DictionaryService;
+  std::unique_ptr<DictionaryImpl> m_DictionaryService;
 
 
 public:

@@ -25,7 +25,7 @@
 
 #include <usAny.h>
 
-US_MSVC_PUSH_DISABLE_WARNING(4396)
+US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
 US_BEGIN_NAMESPACE
 
@@ -63,7 +63,7 @@ public:
    * Releases any resources held or locked by this
    * <code>ServiceReferenceBase</code> and renders it invalid.
    */
-  ServiceReferenceBase& operator=(int null);
+  ServiceReferenceBase& operator=(std::nullptr_t);
 
   ~ServiceReferenceBase();
 
@@ -198,7 +198,7 @@ private:
 
   template<class S> friend class ServiceReference;
 
-  US_HASH_FUNCTION_FRIEND(ServiceReferenceBase);
+  friend class ::std::hash<ServiceReferenceBase>;
 
   std::size_t Hash() const;
 
@@ -226,10 +226,8 @@ US_MSVC_POP_WARNING
  */
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceReferenceBase)& serviceRef);
 
-US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceReferenceBase))
   return arg.Hash();
 US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
 
 #endif // USSERVICEREFERENCEBASE_H

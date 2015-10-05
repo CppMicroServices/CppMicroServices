@@ -40,7 +40,7 @@ ServiceReferenceBase::ServiceReferenceBase()
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : d(ref.d)
 {
-  d->ref.Ref();
+  ++d->ref;
 }
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
@@ -53,7 +53,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
   if (d->ref > 1)
   {
     // detach
-    d->ref.Deref();
+    --d->ref;
     d = new ServiceReferenceBasePrivate(d->registration);
   }
   d->interfaceId = interfaceId;
@@ -61,36 +61,35 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool_type() const
 {
-  return GetModule() != 0 ? &ServiceReferenceBase::d : NULL;
+  return GetModule() != nullptr ? &ServiceReferenceBase::d : NULL;
 }
 
-ServiceReferenceBase& ServiceReferenceBase::operator=(int null)
+ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 {
-  if (null == 0)
-  {
-    if (!d->ref.Deref())
-      delete d;
-    d = new ServiceReferenceBasePrivate(0);
-  }
+  if (!--d->ref)
+    delete d;
+  d = new ServiceReferenceBasePrivate(0);
   return *this;
 }
 
 ServiceReferenceBase::~ServiceReferenceBase()
 {
-  if (!d->ref.Deref())
+  if (!--d->ref)
     delete d;
 }
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
-  MutexLock lock(d->registration->propsLock);
+  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
+  T::Lock l(d->registration->propsLock);
 
   return d->registration->properties.Value(key);
 }
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
-  MutexLock lock(d->registration->propsLock);
+  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
+  T::Lock l(d->registration->propsLock);
 
   const std::vector<std::string>& ks = d->registration->properties.Keys();
   keys.assign(ks.begin(), ks.end());
@@ -98,7 +97,7 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 
 Module* ServiceReferenceBase::GetModule() const
 {
-  if (d->registration == 0 || d->registration->module == 0)
+  if (d->registration == nullptr || d->registration->module == nullptr)
   {
     return 0;
   }
@@ -108,7 +107,8 @@ Module* ServiceReferenceBase::GetModule() const
 
 void ServiceReferenceBase::GetUsingModules(std::vector<Module*>& modules) const
 {
-  MutexLock lock(d->registration->propsLock);
+  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
+  T::Lock l(d->registration->propsLock);
 
   ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator end = d->registration->dependents.end();
   for (ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator iter = d->registration->dependents.begin();
@@ -166,9 +166,9 @@ ServiceReferenceBase& ServiceReferenceBase::operator=(const ServiceReferenceBase
 {
   ServiceReferenceBasePrivate* curr_d = d;
   d = reference.d;
-  d->ref.Ref();
+  ++d->ref;
 
-  if (!curr_d->ref.Deref())
+  if (!--curr_d->ref)
     delete curr_d;
 
   return *this;
@@ -186,8 +186,8 @@ std::string ServiceReferenceBase::GetInterfaceId() const
 
 std::size_t ServiceReferenceBase::Hash() const
 {
-  using namespace US_HASH_FUNCTION_NAMESPACE;
-  return US_HASH_FUNCTION(ServiceRegistrationBasePrivate*, this->d->registration);
+  using namespace std;
+  return hash<ServiceRegistrationBasePrivate*>()(this->d->registration);
 }
 
 US_END_NAMESPACE

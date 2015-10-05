@@ -25,7 +25,7 @@
 
 US_BEGIN_NAMESPACE
 
-TestDriverActivator* TestDriverActivator::m_Instance = 0;
+TestDriverActivator* TestDriverActivator::m_Instance = nullptr;
 
 TestDriverActivator::TestDriverActivator()
   : m_LoadCalled(false)
@@ -45,7 +45,7 @@ void TestDriverActivator::Load(ModuleContext*)
 
 void TestDriverActivator::Unload(ModuleContext*)
 {
-  this->m_Instance = 0;
+  this->m_Instance = nullptr;
 }
 
 US_END_NAMESPACE

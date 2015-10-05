@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usServiceReference.h>

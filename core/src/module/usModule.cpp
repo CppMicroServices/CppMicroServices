@@ -23,11 +23,13 @@
 
 #include "usModule.h"
 
+#include "usModuleEvent.h"
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usModulePrivate.h"
 #include "usModuleResource.h"
 #include "usModuleSettings.h"
+#include "usModuleUtils_p.h"
 #include "usCoreModuleContext_p.h"
 
 #include "usCoreConfig.h"
@@ -107,21 +109,21 @@ void Module::Uninit()
     //d->coreCtx->listeners.HooksModuleStopped(d->moduleContext);
     d->RemoveModuleResources();
     delete d->moduleContext;
-    d->moduleContext = 0;
+    d->moduleContext = nullptr;
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
 
-    d->moduleActivator = 0;
+    d->moduleActivator = nullptr;
   }
 }
 
 bool Module::IsLoaded() const
 {
-  return d->moduleContext != 0;
+  return d->moduleContext != nullptr;
 }
 
 void Module::Start()
 {
-  MutexLock(this->d->stateChangeGuard);
+  ModulePrivate::Lock l(this->d);
   if (d->moduleContext)
   {
     US_WARN << "Module " << d->info.name << " already started.";
@@ -186,8 +188,8 @@ void Module::Start()
 
 void Module::Stop()
 {
-  MutexLock(this->d->stateChangeGuard);
-  if (d->moduleContext == 0)
+  ModulePrivate::Lock l(this->d);
+  if (d->moduleContext == nullptr)
   {
     US_WARN << "Module " << d->info.name << " already stopped.";
     return;

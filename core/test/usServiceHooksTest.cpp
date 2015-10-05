@@ -28,12 +28,15 @@
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>
 #include <usServiceFindHook.h>
+#include <usServiceEvent.h>
 #include <usServiceEventListenerHook.h>
 #include <usServiceListenerHook.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
+
+#include <unordered_set>
 
 US_USE_NAMESPACE
 
@@ -43,7 +46,7 @@ class TestServiceListener
 {
 public:
 
-  void ServiceChanged(const ServiceEvent serviceEvent)
+  void ServiceChanged(const ServiceEvent& serviceEvent)
   {
     this->events.push_back(serviceEvent);
   }
@@ -202,7 +205,7 @@ public:
 
   static std::vector<int> ordering;
 
-  US_UNORDERED_SET_TYPE<ListenerInfo> listenerInfos;
+  std::unordered_set<ListenerInfo> listenerInfos;
   ListenerInfo lastAdded;
   ListenerInfo lastRemoved;
 };

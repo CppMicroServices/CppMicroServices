@@ -211,7 +211,7 @@ void* malloc_or_abort(size_t size)
   if (!p)
   {
     // try to print an error message; this might very well fail
-    fprintf(stderr, "Could not allocate enough memory (%ld bytes)\n", size);
+    fprintf(stderr, "Could not allocate enough memory (%zd bytes)\n", size);
     abort();
   }
   return p;
@@ -278,7 +278,7 @@ static int us_archived_names_append(us_archived_names* archivedNames, const char
     archivedNames->names = realloc(archivedNames->names, newCapacity * sizeof(char*));
     if (archivedNames->names == NULL)
     {
-      fprintf(stderr, "Could not realloc enough memory (%ld bytes)\n", newCapacity);
+      fprintf(stderr, "Could not realloc enough memory (%zd bytes)\n", newCapacity);
       abort();
     }
     memset(archivedNames->names + archivedNames->capacity, 0, sizeof(char*) * (newCapacity - archivedNames->capacity));
@@ -309,7 +309,7 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
   if (sizeof dirName < length - 1)
   {
     // This should be impossible
-    fprintf(stderr, "Archive file name '%s' too long (%ld > %ld)", pArchive_name, length-1, sizeof dirName);
+    fprintf(stderr, "Archive file name '%s' too long (%zd > %zd)", pArchive_name, length-1, sizeof dirName);
     exit(EXIT_FAILURE);
   }
 

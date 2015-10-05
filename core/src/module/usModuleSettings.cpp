@@ -128,7 +128,7 @@ bool ModuleSettings::IsThreadingSupportEnabled()
 
 bool ModuleSettings::IsAutoLoadingEnabled()
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  ModuleSettingsPrivate::Lock l(pimpl);
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
   return !pimpl->autoLoadingDisabled &&
       pimpl->autoLoadingEnabled;
@@ -139,13 +139,13 @@ bool ModuleSettings::IsAutoLoadingEnabled()
 
 void ModuleSettings::SetAutoLoadingEnabled(bool enable)
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  ModuleSettingsPrivate::Lock l(pimpl);
   pimpl->autoLoadingEnabled = enable;
 }
 
 ModuleSettings::PathList ModuleSettings::GetAutoLoadPaths()
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  ModuleSettingsPrivate::Lock l(pimpl);
   ModuleSettings::PathList paths(pimpl->autoLoadPaths.begin(),
                                  pimpl->autoLoadPaths.end());
   paths.insert(paths.end(), pimpl->extraPaths.begin(),
@@ -161,14 +161,14 @@ void ModuleSettings::SetAutoLoadPaths(const PathList& paths)
   normalizedPaths.resize(paths.size());
   std::transform(paths.begin(), paths.end(), normalizedPaths.begin(), RemoveTrailingPathSeparator);
 
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  ModuleSettingsPrivate::Lock l(pimpl);
   pimpl->autoLoadPaths.clear();
   pimpl->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
 }
 
 void ModuleSettings::AddAutoLoadPath(const std::string& path)
 {
-  US_UNUSED(ModuleSettingsPrivate::Lock(pimpl));
+  ModuleSettingsPrivate::Lock l(pimpl);
   pimpl->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
 }
 

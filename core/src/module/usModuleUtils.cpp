@@ -64,7 +64,7 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
   // Clear the last error message
   dlerror();
 
-  void* selfHandle = 0;
+  void* selfHandle = nullptr;
   if (!sharedLibMode || moduleInfo.name == "main")
   {
     // Get the handle of the executable
@@ -102,7 +102,7 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
 
 std::string GetLibraryPath_impl(void *symbol)
 {
-  HMODULE handle = 0;
+  HMODULE handle = nullptr;
   BOOL handleError = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                                        static_cast<LPCTSTR>(symbol), &handle);
   if (!handleError)

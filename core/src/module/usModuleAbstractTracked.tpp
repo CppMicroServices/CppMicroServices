@@ -21,6 +21,8 @@
 =============================================================================*/
 
 #include <usUtils_p.h>
+#include <usLog_p.h>
+
 #include <iterator>
 
 US_BEGIN_NAMESPACE
@@ -236,7 +238,7 @@ void ModuleAbstractTracked<S,TTT,R>::GetTracked(std::vector<S>& items) const
 template<class S, class TTT, class R>
 void ModuleAbstractTracked<S,TTT,R>::Modified()
 {
-  trackingCount.Ref();
+  ++trackingCount;
 }
 
 template<class S, class TTT, class R>

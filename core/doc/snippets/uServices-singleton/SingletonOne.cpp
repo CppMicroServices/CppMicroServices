@@ -63,7 +63,7 @@ SingletonOneService::SingletonOneService()
   : a(1)
 {
   SingletonTwoService* singletonTwoService = SingletonTwoService::GetInstance();
-  assert(singletonTwoService != 0);
+  assert(singletonTwoService != nullptr);
   std::cout << "SingletonTwoService::b = " << singletonTwoService->b << std::endl;
 }
 
@@ -74,7 +74,7 @@ SingletonOneService::~SingletonOneService()
 
   // The module activator must ensure that a SingletonTwoService instance is
   // available during destruction of a SingletonOneService instance.
-  assert(singletonTwoService != 0);
+  assert(singletonTwoService != nullptr);
   std::cout << "SingletonTwoService::b = " << singletonTwoService->b << std::endl;
 }
 //![ss1d]

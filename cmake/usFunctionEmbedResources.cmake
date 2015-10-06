@@ -23,9 +23,9 @@
 #! \code{.cmake}
 #! set(module_srcs )
 #! usFunctionEmbedResources(TARGET mylib
-#!                        MODULE_NAME org_me_mylib
-#!                        FILES config.properties logo.png
-#!                       )
+#!                          MODULE_NAME org_me_mylib
+#!                          FILES config.properties logo.png
+#!                         )
 #! \endcode
 #!
 #! \param TARGET (required) The target to which the resource files are added.

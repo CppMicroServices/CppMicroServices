@@ -24,10 +24,10 @@
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usServiceRegistration.h>
+#include <usLog.h>
 
 #include <usFooService.h>
 
-#include "usLog_p.h"
 
 US_BEGIN_NAMESPACE
 

@@ -24,7 +24,7 @@
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include "usLog_p.h"
+#include <usLog.h>
 
 US_BEGIN_NAMESPACE
 

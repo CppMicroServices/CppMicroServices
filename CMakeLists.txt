@@ -333,6 +333,18 @@ include(CheckIncludeFileCXX)
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 
 #-----------------------------------------------------------------------------
+# System Information
+#-----------------------------------------------------------------------------
+
+include(TestBigEndian)
+
+test_big_endian(US_BIG_ENDIAN)
+
+if(NOT US_BIG_ENDIAN)
+  set(US_LITTLE_ENDIAN 1)
+endif()
+
+#-----------------------------------------------------------------------------
 # Source directory
 #-----------------------------------------------------------------------------
 
@@ -358,9 +370,12 @@ configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
-add_subdirectory(tools)
+add_subdirectory(tools/rc)
 
 add_subdirectory(core)
+add_subdirectory(shell_service)
+
+add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation

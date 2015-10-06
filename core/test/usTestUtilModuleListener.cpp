@@ -22,8 +22,9 @@
 
 #include "usTestUtilModuleListener.h"
 
+#include <usLog.h>
+
 #include "usUtils_p.h"
-#include "usLog_p.h"
 
 US_BEGIN_NAMESPACE
 

@@ -13,6 +13,7 @@ set(_public_headers
 )
 
 set(_resources
+  manifest.json
   usShellProcedures.scm
 )
 

@@ -19,18 +19,35 @@
 
 =============================================================================*/
 
-#include "usModuleInitialization.h"
+#include "usFrameworkFactory.h"
+#include "usFramework.h"
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
+#include "usModule.h"
 #include "usAny.h"
 
 #include "usShellService.h"
 
 #include "linenoise.h"
+#include "optionparser.h"
 
 #include <iostream>
 
 US_USE_NAMESPACE
+
+#define US_SHELL_PROG_NAME "usShell"
+
+enum  OptionIndex { UNKNOWN, HELP, LOAD_BUNDLE };
+const option::Descriptor usage[] =
+{
+  {UNKNOWN,      0, "" , ""    , option::Arg::None, "USAGE: " US_SHELL_PROG_NAME " [options]\n\n"
+                                                    "Options:" },
+  {HELP,         0, "h" , "help",option::Arg::None, "  --help, -h  \tPrint usage and exit." },
+  {LOAD_BUNDLE,  0, "l", "load", option::Arg::Optional, "  --load, -l  \tLoad bundle." },
+  {UNKNOWN,      0, "" ,  ""   , option::Arg::None, "\nExamples:\n"
+                                                    "  " US_SHELL_PROG_NAME " --load /home/user/libmybundle.so\n" },
+  {0,0,0,0,0,0}
+ };
 
 static ShellService* g_ShellService = NULL;
 
@@ -47,11 +64,48 @@ void shellCompletion(const char* buf, linenoiseCompletions* lc)
   }
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char** argv)
 {
+  argc -= (argc > 0);
+  argv += (argc > 0); // skip program name argv[0] if present
+  option::Stats stats(usage, argc, argv);
+  option::Option options[stats.options_max], buffer[stats.buffer_max];
+  option::Parser parse(usage, argc, argv, options, buffer);
+
+  if (parse.error()) return 1;
+
+  if (options[HELP])
+  {
+    option::printUsage(std::cout, usage);
+    return 0;
+  }
+
   linenoiseSetCompletionCallback(shellCompletion);
 
-  ModuleContext* context = GetModuleContext();
+  FrameworkFactory factory;
+  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  framework->Start();
+  ModuleContext* context = framework->GetModuleContext();
+
+  try
+  {
+    std::vector<Module*> bundles;
+    for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next())
+    {
+      std::cout << "Installing " << opt->arg << std::endl;
+      bundles.push_back(context->InstallBundle(opt->arg));
+    }
+    for (auto bundle : bundles)
+    {
+      bundle->Start();
+    }
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
+
   ShellService* shellService = NULL;
   ServiceReference<ShellService> ref = context->GetServiceReference<ShellService>();
   if (ref)
@@ -81,5 +135,3 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << std::endl;
   }
 }
-
-US_INITIALIZE_MODULE

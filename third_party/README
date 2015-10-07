@@ -39,15 +39,6 @@ Patches
  * Support for zip files with prepended binary blobs.
  * Write to C file streams.
 
-TinyThread++
-------------
-
-zlib/libpng License
-
-http://tinythreadpp.bitsnbites.eu/
-e21187cb0469964f9b1d8ba784517a2a0d99a796
-
-
 us_stdint_vc
 ------------
 
@@ -92,3 +83,17 @@ Patches
  * Don't depend on utf8.h because it is not supported
    on Windows.
  * Disable Windows warnings C4244 and C4267.
+
+The Lean Mean C++ Option Parser
+-------------------------------
+
+MIT License
+
+http://sourceforge.net/projects/optionparser
+1.3
+
+Patches
+
+ * Added virtual destructors
+ * Converted old-style casts to C++ casts
+

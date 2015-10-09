@@ -1,0 +1,39 @@
+<table class="tight striped sortable" cellspacing="0" celpadding="0">
+<thead><tr>
+  <th>Id</th>
+</tr></thead>
+<tbody class="template">
+<tr>
+<td class="service-id"><a href="${pluginRoot}/interface/"></a></td>
+</tr>
+</tbody>
+</table>
+
+<script>
+
+var request = $.getJSON("${pluginRoot}");
+
+request.done(function(data) {
+  var directive = {
+    'tr':{
+      'id<-ids':{
+        'a':'id',
+        'a@href+':'id'
+      }
+    }
+  };
+  $('tbody.template').render(data, directive);
+
+  // fix row classes
+  var rows = $('table.sortable').find('tbody tr');
+  rows.removeClass('alt first last');
+  var table = $('table.sortable');
+  table.find('tr:even').addClass('alt');
+  table.find('tr:first').addClass('first');
+  table.find('tr:last').addClass('last');
+});
+
+request.fail(function(jqXHR, textStatus, errorThrown) {
+  alert(textStatus + errorThrown);
+});
+</script>

@@ -69,8 +69,9 @@ int main(int argc, char** argv)
   argc -= (argc > 0);
   argv += (argc > 0); // skip program name argv[0] if present
   option::Stats stats(usage, argc, argv);
-  option::Option options[stats.options_max], buffer[stats.buffer_max];
-  option::Parser parse(usage, argc, argv, options, buffer);
+  std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
+  std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
+  option::Parser parse(usage, argc, argv, options.get(), buffer.get());
 
   if (parse.error()) return 1;
 

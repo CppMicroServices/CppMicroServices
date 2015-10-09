@@ -370,9 +370,9 @@ include_directories(${US_INCLUDE_DIRS})
 add_subdirectory(tools/rc)
 
 add_subdirectory(core)
-add_subdirectory(http_service)
+add_subdirectory(httpservice)
 add_subdirectory(webconsole)
-add_subdirectory(shell_service)
+add_subdirectory(shellservice)
 
 add_subdirectory(tools/shell)
 

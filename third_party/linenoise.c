@@ -111,7 +111,9 @@
 #else
 /* Microsoft headers don't like old POSIX names */
 #define strdup _strdup
+#if _MSC_VER < 1900
 #define snprintf _snprintf
+#endif
 #endif
 #pragma warning( disable : 4244 4267 )
 #else

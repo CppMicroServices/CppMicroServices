@@ -140,6 +140,17 @@ HttpServletResponse::~HttpServletResponse()
 {
 }
 
+HttpServletResponse::HttpServletResponse(const HttpServletResponse& o)
+  : d(o.d)
+{
+}
+
+HttpServletResponse& HttpServletResponse::operator=(const HttpServletResponse& o)
+{
+  d = o.d;
+  return *this;
+}
+
 void HttpServletResponse::FlushBuffer()
 {
   if (d->m_HttpOutputStream)
@@ -291,6 +302,12 @@ void HttpServletResponse::SetHeader(const std::string& name, const std::string& 
   d->m_Headers[name] = value;
 }
 
+#ifdef US_PLATFORM_WINDOWS
+#ifndef snprintf
+#define snprintf _snprintf
+#endif
+#endif
+
 void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
 {
   // Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
@@ -299,7 +316,11 @@ void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
   const char* days[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
   std::time_t timeep = date / 1000;
   std::tm t;
+#ifdef US_PLATFORM_WINDOWS
+  if (gmtime_s(&t, &timeep) != NULL)
+#else
   if (gmtime_r(&timeep, &t) != NULL)
+#endif
   {
     char dataStr[30];
     int n = snprintf(dataStr, 30, "%s, %02d %s %d %02d:%02d:%02d GMT", days[t.tm_wday], t.tm_mday, months[t.tm_mon], (1900 + t.tm_year), t.tm_hour, t.tm_min, t.tm_sec);
@@ -427,11 +448,6 @@ void HttpServletResponse::SetOutputStreamBuffer(std::streambuf* sb)
 {
   delete d->m_StreamBuf;
   d->m_StreamBuf = sb;
-}
-
-HttpServletResponse::HttpServletResponse(const HttpServletResponse& other)
-  : d(other.d)
-{
 }
 
 HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)

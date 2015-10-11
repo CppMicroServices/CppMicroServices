@@ -39,13 +39,6 @@ Patches
  * Support for zip files with prepended binary blobs.
  * Write to C file streams.
 
-us_stdint_vc
-------------
-
-Public Domain
-
-Search the Net for "stdint.h Danny Smith"
-
 libtelnet
 ---------
 
@@ -66,6 +59,7 @@ Patches
 
  * Added header for missing off_t declaration.
  * Disable Windows warnings C4244 and C4267.
+ * Do not use dllexport/dllimport specs on Windows
 
 Linenoise
 ---------
@@ -83,6 +77,7 @@ Patches
  * Don't depend on utf8.h because it is not supported
    on Windows.
  * Disable Windows warnings C4244 and C4267.
+ * Do not define snprintf for MSC_VER 1900 or higher
 
 The Lean Mean C++ Option Parser
 -------------------------------

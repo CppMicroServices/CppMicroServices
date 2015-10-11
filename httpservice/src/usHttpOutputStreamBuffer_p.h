@@ -29,7 +29,7 @@
 
 US_BEGIN_NAMESPACE
 
-class HttpServletResponsePrivate;
+struct HttpServletResponsePrivate;
 
 class HttpOutputStreamBuffer : public std::streambuf
 {

@@ -25,6 +25,8 @@
 #include "usHttpServiceExport.h"
 #include "usSharedData.h"
 
+#include <string>
+
 US_BEGIN_NAMESPACE
 
 class ServletContext;

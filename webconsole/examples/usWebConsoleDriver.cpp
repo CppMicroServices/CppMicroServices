@@ -44,8 +44,10 @@ void signalHandler(int /*num*/)
 int main(int /*argc*/, const char* /*argv*/[])
 {
   std::signal(SIGTERM, signalHandler);
-  std::signal(SIGQUIT, signalHandler);
   std::signal(SIGINT, signalHandler);
+#ifndef WIN32
+  std::signal(SIGQUIT, signalHandler);
+#endif
 
   us::ServletContainer servletContainer("us");
   servletContainer.Start();

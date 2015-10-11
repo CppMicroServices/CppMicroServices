@@ -40,6 +40,9 @@ public:
 
   ~HttpServletRequest();
 
+  HttpServletRequest(const HttpServletRequest& o);
+  HttpServletRequest& operator=(const HttpServletRequest& o);
+
   ServletContext* GetServletContext() const;
 
   Any GetAttribute(const std::string& name) const;

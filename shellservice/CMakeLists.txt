@@ -5,6 +5,13 @@ set(_srcs
   ../third_party/tinyscheme/scheme.c
 )
 
+if(MSVC)
+  set_property(
+    SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
+    PROPERTY COMPILE_FLAGS " /wd4311 /wd4312 /wd4996"
+	)
+endif()
+
 set(_private_headers
 )
 

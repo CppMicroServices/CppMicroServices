@@ -28,6 +28,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <functional>
 
 US_BEGIN_NAMESPACE
 
@@ -49,7 +50,7 @@ protected:
 
   std::streamsize xsputn(const char* /*s*/, std::streamsize n)
   {
-    m_ContentLength += n;
+    m_ContentLength += static_cast<std::size_t>(n);
     return n;
   }
 
@@ -62,7 +63,7 @@ private:
       assert(std::less_equal<char*>()(pptr(), epptr()));
       ++m_ContentLength;
       // discard the character
-      pbump(pbase() - pptr());
+	  pbump(static_cast<int>(pbase() - pptr()));
       return ch;
     }
     return traits_type::eof();
@@ -204,7 +205,7 @@ void HttpServlet::Service(HttpServletRequest& request, HttpServletResponse& resp
   }
   else if (method == METHOD_HEAD)
   {
-    long lastModified = GetLastModified(request);
+    long long lastModified = GetLastModified(request);
     MaybeSetLastModified(response, lastModified);
     DoHead(request, response);
   }

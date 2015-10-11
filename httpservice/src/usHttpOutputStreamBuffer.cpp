@@ -26,6 +26,7 @@
 #include "civetweb/civetweb.h"
 
 #include <cassert>
+#include <functional>
 
 US_BEGIN_NAMESPACE
 
@@ -49,7 +50,7 @@ HttpOutputStreamBuffer::~HttpOutputStreamBuffer()
   if (!m_Response->m_IsCommited &&
       m_Response->m_Headers.find("Content-Length") != m_Response->m_Headers.end())
   {
-    m_Response->m_Headers["Content-Length"] = m_Response->LexicalCast(pptr() - pbase());
+	m_Response->m_Headers["Content-Length"] = m_Response->LexicalCast(static_cast<long>(pptr() - pbase()));
   }
   sync();
   if (m_ChunkedCoding)
@@ -102,12 +103,12 @@ bool HttpOutputStreamBuffer::sendBuffer()
 
   // write the buffer contents
   std::ptrdiff_t n = pptr() - pbase();
-  pbump(-n);
+  pbump(static_cast<int>(-n));
   int bytesSend = 0;
   if (m_ChunkedCoding)
   {
     // send chunk size
-    std::string chunkSize = m_Response->LexicalCastHex(n) + "\r\n";
+    std::string chunkSize = m_Response->LexicalCastHex(static_cast<long>(n)) + "\r\n";
     bytesSend += mg_write(m_Response->m_Connection, &chunkSize[0], chunkSize.size());
   }
   bytesSend += mg_write(m_Response->m_Connection, pbase(), n);

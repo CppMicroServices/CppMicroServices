@@ -13,6 +13,13 @@ set(_srcs
   src/usServletContainer.cpp
 )
 
+if(MSVC)
+  set_property(
+    SOURCE src/civetweb/civetweb.c APPEND_STRING
+    PROPERTY COMPILE_FLAGS " /wd4267 /wd4311 /wd4312 /wd4996"
+	)
+endif()
+
 set(_private_headers
   src/usHttpOutputStreamBuffer_p.h
   src/usHttpServlet_p.h

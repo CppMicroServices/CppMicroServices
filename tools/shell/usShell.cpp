@@ -93,6 +93,7 @@ int main(int argc, char** argv)
     std::vector<Module*> bundles;
     for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next())
     {
+      if (opt->arg == nullptr) continue;
       std::cout << "Installing " << opt->arg << std::endl;
       bundles.push_back(context->InstallBundle(opt->arg));
     }

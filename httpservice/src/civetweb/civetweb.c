@@ -197,7 +197,7 @@ typedef DWORD clockid_t;
 #define CLOCK_REALTIME  (2)
 #endif
 
-#ifndef _TIMESPEC_DEFINED
+#if !defined(_TIMESPEC_DEFINED) && (!defined(_MSC_VER) || _MSC_VER < 1900)
 struct timespec {
     time_t   tv_sec;        /* seconds */
     long     tv_nsec;       /* nanoseconds */

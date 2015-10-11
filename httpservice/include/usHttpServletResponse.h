@@ -278,6 +278,9 @@ public:
 
   virtual ~HttpServletResponse();
 
+  HttpServletResponse(const HttpServletResponse& o);
+  HttpServletResponse& operator=(const HttpServletResponse& o);
+
   void FlushBuffer();
 
   bool IsCommitted() const;
@@ -332,8 +335,6 @@ protected:
   virtual std::streambuf* GetOutputStreamBuffer();
 
   void SetOutputStreamBuffer(std::streambuf* sb);
-
-  HttpServletResponse(const HttpServletResponse& other);
 
   HttpServletResponse(HttpServletResponsePrivate* d);
 

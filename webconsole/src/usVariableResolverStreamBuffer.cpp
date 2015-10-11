@@ -24,6 +24,7 @@
 #include "usWebConsoleDefaultVariableResolver.h"
 
 #include <cassert>
+#include <functional>
 
 US_BEGIN_NAMESPACE
 

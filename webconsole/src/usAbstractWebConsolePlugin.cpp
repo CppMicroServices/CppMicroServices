@@ -225,7 +225,7 @@ std::string AbstractWebConsolePlugin::ReadTemplateFile(const std::string& templa
 
   us::ModuleResourceStream resStream(res, std::ios::binary);
   resStream.seekg(0, std::ios::end);
-  result.resize(resStream.tellg());
+  result.resize(static_cast<std::size_t>(resStream.tellg()));
   resStream.seekg(0, std::ios::beg);
   resStream.read(&result[0], result.size());
   return result;

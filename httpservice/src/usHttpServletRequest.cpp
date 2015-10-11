@@ -32,6 +32,24 @@
 
 US_BEGIN_NAMESPACE
 
+void putenv(const char* key, const char* val)
+{
+#ifdef US_PLATFORM_WINDOWS
+	_putenv_s(key, val);
+#else
+	setenv(key, val, 1);
+#endif
+}
+
+void unsetenv(const char* key)
+{
+#ifdef US_PLATFORM_WINDOWS
+	_putenv_s(key, "");
+#else
+	unsetenv(key);
+#endif
+}
+
 HttpServletRequestPrivate::HttpServletRequestPrivate(ServletContext* servletContext,
                                        CivetServer* server, mg_connection* conn)
   : m_ServletContext(servletContext)
@@ -93,6 +111,16 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(ServletContext* servletCont
 
 HttpServletRequest::~HttpServletRequest()
 {
+}
+HttpServletRequest::HttpServletRequest(const HttpServletRequest& o)
+  : d(o.d)
+{
+}
+
+HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest& o)
+{
+  d = o.d;
+  return *this;
 }
 
 ServletContext*HttpServletRequest::GetServletContext() const
@@ -240,14 +268,18 @@ long long HttpServletRequest::GetDateHeader(const std::string& name) const
   {
     tz = strdup(tz);
   }
-  setenv("TZ", "", 1);
+  unsetenv("TZ");
   tzset();
   ret = mktime(&tm);
-  if (tz) {
-    setenv("TZ", tz, 1);
+  if (tz)
+  {
+    putenv("TZ", tz);
     free(tz);
-  } else
+  }
+  else
+  {
     unsetenv("TZ");
+  }
   tzset();
   return ret * 1000;
 }

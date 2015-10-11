@@ -43,7 +43,7 @@ public:
 
 private:
 
-  friend class ServletContainerPrivate;
+  friend struct ServletContainerPrivate;
 
   ServletContext(ServletContainer* container);
   ServletContainer* m_Container;

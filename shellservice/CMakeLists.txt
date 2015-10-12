@@ -9,8 +9,17 @@ if(MSVC)
   set_property(
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " /wd4311 /wd4312 /wd4996"
-	)
+  )
 endif()
+
+usFunctionCheckCompilerFlags(-Wno-switch _no_switch_flag)
+if(_no_switch_flag)
+  set_property(
+    SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
+    PROPERTY COMPILE_FLAGS " ${_no_switch_flag}"
+  )
+endif()
+
 
 set(_private_headers
 )

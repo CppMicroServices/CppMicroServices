@@ -27,7 +27,7 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Module;
 class ServiceRegistrationBasePrivate;
@@ -217,16 +217,16 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceReferenceBase)& serviceRef);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::ServiceReferenceBase& serviceRef);
 
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceReferenceBase))
+US_HASH_FUNCTION_BEGIN(us::ServiceReferenceBase)
   return arg.Hash();
 US_HASH_FUNCTION_END
 

@@ -30,13 +30,13 @@
 
 #include "usTestManager.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
   /** \brief Indicate a failed test. */
   class TestFailedException : public std::exception {
     public:
       TestFailedException() {}
   };
-US_END_NAMESPACE
+}
 
 /**
  *
@@ -54,31 +54,31 @@ US_END_NAMESPACE
      main test function. */
 #define US_TEST_BEGIN(testName)                                                               \
   std::string usTestName(#testName);                                                          \
-  US_PREPEND_NAMESPACE(TestManager)::GetInstance().Initialize();                              \
+  us::TestManager::GetInstance().Initialize();                              \
   try {
 
 /** \brief Fail and finish test with message MSG */
 #define US_TEST_FAILED_MSG(MSG)                                                               \
   US_TEST_OUTPUT(MSG)                                                                         \
-  throw US_PREPEND_NAMESPACE(TestFailedException)();
+  throw us::TestFailedException();
 
 /** \brief Must be called last in the main test function. */
 #define US_TEST_END()                                                                         \
-  } catch (const US_PREPEND_NAMESPACE(TestFailedException)&) {                                \
+  } catch (const us::TestFailedException&) {                                \
     US_TEST_OUTPUT(<< "Further test execution skipped.")                                      \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
+    us::TestManager::GetInstance().TestFailed();                            \
   } catch (const std::exception& ex) {                                                        \
     US_TEST_OUTPUT(<< "Exception occured " << ex.what())                                      \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
+    us::TestManager::GetInstance().TestFailed();                            \
   }                                                                                           \
-  if (US_PREPEND_NAMESPACE(TestManager)::GetInstance().NumberOfFailedTests() > 0) {           \
+  if (us::TestManager::GetInstance().NumberOfFailedTests() > 0) {           \
     US_TEST_OUTPUT(<< usTestName << ": [DONE FAILED] , subtests passed: " <<                  \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().NumberOfPassedTests() << " failed: " <<  \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().NumberOfFailedTests() )                  \
+    us::TestManager::GetInstance().NumberOfPassedTests() << " failed: " <<  \
+    us::TestManager::GetInstance().NumberOfFailedTests() )                  \
     return EXIT_FAILURE;                                                                      \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< usTestName << ": "                                                      \
-                   << US_PREPEND_NAMESPACE(TestManager)::GetInstance().NumberOfPassedTests()  \
+                   << us::TestManager::GetInstance().NumberOfPassedTests()  \
                    << " tests [DONE PASSED]")                                                 \
     return EXIT_SUCCESS;                                                                      \
   }
@@ -86,13 +86,13 @@ US_END_NAMESPACE
 #define US_TEST_CONDITION(COND,MSG)                                                           \
   US_TEST_OUTPUT_NO_ENDL(<< MSG)                                                              \
   if ( ! (COND) ) {                                                                           \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
+    us::TestManager::GetInstance().TestFailed();                            \
     US_TEST_OUTPUT(<< " [FAILED]\n" << "In " << __FILE__                                      \
                    << ", line " << __LINE__                                                   \
                    << ":  " #COND " : [FAILED]")                                              \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< " [PASSED]")                                                            \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestPassed();                            \
+    us::TestManager::GetInstance().TestPassed();                            \
  }
 
 #define US_TEST_CONDITION_REQUIRED(COND,MSG)                                                  \
@@ -103,7 +103,7 @@ US_END_NAMESPACE
                        << ", expression is false: \"" #COND "\"")                             \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< " [PASSED]")                                                            \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestPassed();                            \
+    us::TestManager::GetInstance().TestPassed();                            \
  }
 
 /**
@@ -117,13 +117,13 @@ US_END_NAMESPACE
   try {
 
 #define US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)                                             \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
+    us::TestManager::GetInstance().TestFailed();                            \
     US_TEST_OUTPUT( << "Expected an '" << #EXCEPTIONCLASS << "' exception. [FAILED]")         \
   }                                                                                           \
   catch (EXCEPTIONCLASS) {                                                                    \
     US_TEST_OUTPUT(<< "Caught an expected '" << #EXCEPTIONCLASS                               \
                    << "' exception. [PASSED]")                                                \
-    US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestPassed();                            \
+    us::TestManager::GetInstance().TestPassed();                            \
   }
 
 

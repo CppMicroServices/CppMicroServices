@@ -25,7 +25,7 @@
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class TestManager
 {
@@ -53,6 +53,6 @@ protected:
   int m_PassedTests;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // US_TESTMANAGER_H_INCLUDED

@@ -27,7 +27,7 @@
 
 #include <fstream>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResource;
 
@@ -64,6 +64,6 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULERESOURCESTREAM_H

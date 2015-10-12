@@ -27,7 +27,7 @@
 // 'this' used in base member initializer list
 US_MSVC_PUSH_DISABLE_WARNING(4355)
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModuleResourceStream::ModuleResourceStream(const ModuleResource& resource, std::ios_base::openmode mode)
   : ModuleResourceBuffer(resource.GetData(), resource.GetSize(), mode | std::ios_base::in)
@@ -35,6 +35,6 @@ ModuleResourceStream::ModuleResourceStream(const ModuleResource& resource, std::
 {
 }
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING

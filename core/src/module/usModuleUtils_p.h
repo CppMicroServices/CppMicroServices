@@ -28,7 +28,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleInfo;
 
@@ -43,6 +43,6 @@ struct US_Core_EXPORT ModuleUtils
   static void* GetSymbol(const ModuleInfo& module, const char* symbol);
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEUTILS_H

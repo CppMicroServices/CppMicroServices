@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServletContext;
 struct HttpServletRequestPrivate;
@@ -105,6 +105,6 @@ private:
   ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPREQUEST_H

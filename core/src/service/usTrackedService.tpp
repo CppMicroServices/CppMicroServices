@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class S, class TTT>
 TrackedService<S,TTT>::TrackedService(ServiceTracker<S,TTT>* serviceTracker,
@@ -126,4 +126,4 @@ void TrackedService<S,TTT>::CustomizerRemoved(ServiceReference<S> item,
   customizer->RemovedService(item, object);
 }
 
-US_END_NAMESPACE
+}

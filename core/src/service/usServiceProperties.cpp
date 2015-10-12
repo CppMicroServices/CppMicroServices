@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 const std::string& ServiceConstants::OBJECTCLASS()
 {
@@ -68,9 +68,9 @@ const std::string& ServiceConstants::SCOPE_PROTOTYPE()
   return s;
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 // make sure all static locals get constructed, so that they
 // can be used in destructors of global statics.

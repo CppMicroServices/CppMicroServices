@@ -32,11 +32,11 @@
 
 #cmakedefine US_ENABLE_DEBUG_OUTPUT
 
-US_BEGIN_NAMESPACE
+namespace us {
   enum MsgType { DebugMsg = 0, InfoMsg = 1, WarningMsg = 2, ErrorMsg = 3 };
   typedef void (*MsgHandler)(MsgType, const char *);
   US_Core_EXPORT MsgHandler installMsgHandler(MsgHandler);
-US_END_NAMESPACE
+}
 
 
 ///-------------------------------------------------------------------

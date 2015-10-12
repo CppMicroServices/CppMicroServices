@@ -26,7 +26,7 @@
 #include <vector>
 #include <memory>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResource;
 
@@ -52,4 +52,4 @@ private:
   std::unique_ptr<Impl> d;
 };
 
-US_END_NAMESPACE
+}

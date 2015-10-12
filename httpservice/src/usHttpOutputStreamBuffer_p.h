@@ -27,7 +27,7 @@
 #include <streambuf>
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct HttpServletResponsePrivate;
 
@@ -59,6 +59,6 @@ private:
   bool m_ChunkedCoding;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPOUTPUTSTREAMBUFFER_H

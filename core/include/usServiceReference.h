@@ -26,7 +26,7 @@
 #include <usServiceInterface.h>
 #include <usServiceReferenceBase.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -138,6 +138,6 @@ public:
  */
 typedef ServiceReference<void> ServiceReferenceU;
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEREFERENCE_H

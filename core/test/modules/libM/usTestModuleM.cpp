@@ -23,7 +23,7 @@
 
 #include <usModuleActivator.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class TestModuleMActivator : public ModuleActivator
 {
@@ -39,6 +39,6 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(TestModuleMActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::TestModuleMActivator)

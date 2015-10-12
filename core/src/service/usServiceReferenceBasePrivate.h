@@ -29,7 +29,7 @@
 #include <string>
 #include <atomic>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Any;
 class Module;
@@ -147,6 +147,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEREFERENCEBASEPRIVATE_H

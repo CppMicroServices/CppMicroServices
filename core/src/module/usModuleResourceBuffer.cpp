@@ -35,7 +35,7 @@
 #define REMOVE_LAST_NEWLINE_IN_TEXT_MODE 1
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResourceBufferPrivate
 {
@@ -284,4 +284,4 @@ std::streambuf::pos_type ModuleResourceBuffer::seekpos(std::streambuf::pos_type 
   return this->seekoff(sp, std::ios_base::beg);
 }
 
-US_END_NAMESPACE
+}

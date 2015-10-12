@@ -26,7 +26,7 @@
 
 #include <usWebConsoleExport.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * WebConsoleConstants provides some common constants that are used by plugin
@@ -167,6 +167,6 @@ struct US_WebConsole_EXPORT WebConsoleConstants
   static std::string ATTR_LANG_MAP(); // = "org.cppmicroservices.webconsole.langMap"
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USWEBCONSOLECONSTANTS_H

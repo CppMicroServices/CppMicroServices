@@ -27,7 +27,7 @@
 #include "usServiceListeners_p.h"
 #include "usWaitCondition_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ServiceListenerHook;
 
@@ -70,6 +70,6 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEHOOKS_P_H

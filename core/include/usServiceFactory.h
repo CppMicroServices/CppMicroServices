@@ -26,7 +26,7 @@
 #include "usServiceInterface.h"
 #include "usServiceRegistration.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -115,6 +115,6 @@ public:
                             const InterfaceMap& service) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEFACTORY_H

@@ -24,7 +24,7 @@
 
 #include "usShellService.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ShellActivator : public ModuleActivator
 {
@@ -46,6 +46,6 @@ private:
   std::unique_ptr<ShellService> m_ShellService;
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(ShellActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::ShellActivator)

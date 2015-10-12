@@ -26,7 +26,7 @@
 
 #include "usServiceEvent.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -47,6 +47,6 @@ struct TrackedServiceListener
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USTRACKEDSERVICELISTENER_H

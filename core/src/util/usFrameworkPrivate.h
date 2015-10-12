@@ -30,7 +30,7 @@ limitations under the License.
 #include <map>
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * The implementation of the Framework class.
@@ -50,6 +50,6 @@ public:
     bool initialized;
 };
 
-US_END_NAMESPACE
+}
 
 #endif

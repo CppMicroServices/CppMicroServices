@@ -26,7 +26,7 @@
 #include <usModuleContext.h>
 #include <usLog.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct TestModuleImportedByB : public TestModuleBService
 {
@@ -60,6 +60,6 @@ private:
   TestModuleImportedByB* s;
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(TestModuleImportedByBActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::TestModuleImportedByBActivator)

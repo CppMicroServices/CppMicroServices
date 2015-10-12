@@ -32,7 +32,7 @@
 # pragma warning(disable: 4251)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -250,7 +250,7 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 # pragma warning(pop)
@@ -259,6 +259,6 @@ US_END_NAMESPACE
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ModuleVersion)& v);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::ModuleVersion& v);
 
 #endif // USMODULEVERSION_H

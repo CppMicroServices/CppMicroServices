@@ -28,7 +28,7 @@
 
 #include <stdexcept>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class S, class TTT>
 const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = true;
@@ -71,7 +71,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
         cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
-  this->listenerFilter = std::string("(") + US_PREPEND_NAMESPACE(ServiceConstants)::OBJECTCLASS() + "="
+  this->listenerFilter = std::string("(") + us::ServiceConstants::OBJECTCLASS() + "="
                         + clazz + ")";
   try
   {
@@ -153,4 +153,4 @@ void ServiceTrackerPrivate<S,TTT>::Modified()
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 
-US_END_NAMESPACE
+}

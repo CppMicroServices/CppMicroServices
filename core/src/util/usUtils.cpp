@@ -74,7 +74,7 @@ const char DIR_SEP = '\\';
 #endif
 }
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 //-------------------------------------------------------------------
 // Bundle name and location parsing
@@ -248,13 +248,13 @@ std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModul
   return loadedModules;
 }
 
-US_END_NAMESPACE
+}
 
 //-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 std::string GetLastErrorStr()
 {
@@ -372,4 +372,4 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   return result;
 }
 
-US_END_NAMESPACE
+}

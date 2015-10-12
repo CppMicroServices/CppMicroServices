@@ -30,7 +30,7 @@
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 static std::string LABEL()
 {
@@ -103,4 +103,4 @@ cpptempl::data_map& SettingsPlugin::getData()
 }
 */
 
-US_END_NAMESPACE
+}

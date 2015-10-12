@@ -34,7 +34,7 @@
 #include <cstring>
 #include <memory>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

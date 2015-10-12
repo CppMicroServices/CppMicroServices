@@ -29,7 +29,7 @@
 
 #include <cassert>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceReferenceBase::ServiceReferenceBase()
   : d(new ServiceReferenceBasePrivate(0))
@@ -190,9 +190,9 @@ std::size_t ServiceReferenceBase::Hash() const
   return hash<ServiceRegistrationBasePrivate*>()(this->d->registration);
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef)
 {

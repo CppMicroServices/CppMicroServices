@@ -33,7 +33,7 @@
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

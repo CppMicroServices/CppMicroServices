@@ -31,7 +31,7 @@
 #pragma warning(disable:4251)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /// \cond
 class US_Core_EXPORT LDAPPropExpr
@@ -205,7 +205,7 @@ private:
   std::string m_property;
 };
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 #pragma warning(pop)

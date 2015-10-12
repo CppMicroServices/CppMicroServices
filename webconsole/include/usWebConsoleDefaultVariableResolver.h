@@ -26,7 +26,7 @@
 
 #include <map>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class WebConsoleDefaultVariableResolver : public std::map<std::string,std::string>, public WebConsoleVariableResolver
 {
@@ -36,6 +36,6 @@ public:
   virtual std::string Resolve(const std::string &variable) const;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USWEBCONSOLEDEFAULTVARIABLERESOLVER_H

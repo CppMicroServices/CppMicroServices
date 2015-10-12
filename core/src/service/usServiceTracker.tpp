@@ -30,7 +30,7 @@
 #include <stdexcept>
 #include <limits>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class S, class TTT>
 ServiceTracker<S,TTT>::~ServiceTracker()
@@ -463,4 +463,4 @@ void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceType& reference
   d->context->UngetService(reference);
 }
 
-US_END_NAMESPACE
+}

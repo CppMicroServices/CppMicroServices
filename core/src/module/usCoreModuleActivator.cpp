@@ -26,7 +26,7 @@
 #include "usModulePrivate.h"
 #include "usCoreModuleContext_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class CoreModuleActivator : public ModuleActivator
 {
@@ -43,6 +43,6 @@ class CoreModuleActivator : public ModuleActivator
 
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(CoreModuleActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::CoreModuleActivator)

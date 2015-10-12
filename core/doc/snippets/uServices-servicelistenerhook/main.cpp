@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-US_USE_NAMESPACE
+using namespace us;
 
 //! [1]
 class MyServiceListenerHook : public ServiceListenerHook

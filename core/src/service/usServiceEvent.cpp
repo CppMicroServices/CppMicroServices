@@ -24,7 +24,7 @@
 
 #include "usServiceProperties.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServiceEventData : public SharedData
 {
@@ -126,4 +126,4 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
   return os;
 }
 
-US_END_NAMESPACE
+}

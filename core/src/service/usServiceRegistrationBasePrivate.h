@@ -31,7 +31,7 @@
 #include "usServicePropertiesImpl_p.h"
 #include "usThreads_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModulePrivate;
 class ServiceRegistrationBase;
@@ -143,7 +143,7 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
 
 #endif // USSERVICEREGISTRATIONBASEPRIVATE_H

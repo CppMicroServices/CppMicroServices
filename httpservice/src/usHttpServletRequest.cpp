@@ -30,7 +30,7 @@
 #include <ctime>
 #include <cstring>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 void putenv(const char* key, const char* val)
 {
@@ -335,4 +335,4 @@ HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate* d)
 {
 }
 
-US_END_NAMESPACE
+}

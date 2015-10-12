@@ -28,7 +28,7 @@
 #include <map>
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Framework;
 
@@ -71,6 +71,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif

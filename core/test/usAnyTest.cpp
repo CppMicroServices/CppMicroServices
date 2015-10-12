@@ -26,7 +26,7 @@
 
 #include <limits>
 
-US_USE_NAMESPACE
+using namespace us;
 
 int usAnyTest(int /*argc*/, char* /*argv*/[])
 {

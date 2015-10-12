@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 class Module;
@@ -213,6 +213,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USABSTRACTWEBCONSOLEPLUGIN_H

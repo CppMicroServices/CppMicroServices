@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <memory>
 
-US_USE_NAMESPACE
+using namespace us;
 
 /**
  * This class implements a module activator that uses the module

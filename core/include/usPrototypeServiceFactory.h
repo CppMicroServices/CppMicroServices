@@ -25,7 +25,7 @@
 
 #include <usServiceFactory.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * @ingroup MicroServices
@@ -98,6 +98,6 @@ struct PrototypeServiceFactory : public ServiceFactory
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USPROTOTYPESERVICEFACTORY_H

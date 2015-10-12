@@ -37,7 +37,7 @@
 
 #include <memory>
 
-US_USE_NAMESPACE
+using namespace us;
 
 bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
                          std::vector<std::string>::const_iterator idBegin,

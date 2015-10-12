@@ -34,7 +34,7 @@
 #include <cstdlib>
 #include <cmath>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 namespace LDAPExprConstants {
 
@@ -849,4 +849,4 @@ void LDAPExpr::ParseState::error( const std::string &m ) const
   throw std::invalid_argument(errorStr);
 }
 
-US_END_NAMESPACE
+}

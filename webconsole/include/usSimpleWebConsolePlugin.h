@@ -27,7 +27,7 @@
 #include <usWebConsoleExport.h>
 #include <usServiceRegistration.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * SimpleWebConsolePlugin is a utility class that provides a default
@@ -130,6 +130,6 @@ private:
   ModuleContext* m_Context;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSIMPLEWEBCONSOLEPLUGIN_H

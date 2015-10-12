@@ -36,7 +36,7 @@
 
 #include "usSharedLibrary.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 const std::string& Module::PROP_ID()
 {
@@ -335,9 +335,9 @@ std::vector<ModuleResource> Module::FindResources(const std::string& path, const
   return result;
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const Module& module)
 {

@@ -30,7 +30,7 @@
 
 #include "usLDAPExpr_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Module;
 class ServiceListenerEntryData;
@@ -67,9 +67,9 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListenerEntry))
+US_HASH_FUNCTION_BEGIN(us::ServiceListenerEntry)
   return arg.Hash();
 US_HASH_FUNCTION_END
 

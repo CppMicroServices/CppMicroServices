@@ -23,7 +23,7 @@
 #include "usFrameworkFactory.h"
 #include "usFramework.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 FrameworkFactory::FrameworkFactory(void) 
 {
@@ -43,4 +43,4 @@ Framework* FrameworkFactory::NewFramework(void)
     return NewFramework(std::map<std::string, std::string>());
 }
 
-US_END_NAMESPACE
+}

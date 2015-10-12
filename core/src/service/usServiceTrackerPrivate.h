@@ -28,7 +28,7 @@
 #include "usLDAPFilter.h"
 #include "usThreads_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -166,7 +166,7 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #include "usServiceTrackerPrivate.tpp"
 

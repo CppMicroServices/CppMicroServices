@@ -34,7 +34,7 @@
 
 #include <stdio.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContextPrivate {
 
@@ -215,4 +215,4 @@ Module* ModuleContext::InstallBundle(const std::string& location)
 }
 
 
-US_END_NAMESPACE
+}

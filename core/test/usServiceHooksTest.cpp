@@ -38,7 +38,7 @@
 
 #include <unordered_set>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

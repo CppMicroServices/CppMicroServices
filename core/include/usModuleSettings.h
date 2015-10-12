@@ -29,7 +29,7 @@
 #include <vector>
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleSettingsPrivate;
 
@@ -133,6 +133,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULESETTINGS_H

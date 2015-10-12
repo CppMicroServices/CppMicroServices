@@ -33,7 +33,7 @@
 #pragma warning(disable:4251)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class SharedLibraryPrivate;
 
@@ -215,7 +215,7 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 #pragma warning(pop)

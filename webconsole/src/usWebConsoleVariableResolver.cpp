@@ -21,10 +21,10 @@
 
 #include "usWebConsoleVariableResolver.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 WebConsoleVariableResolver::~WebConsoleVariableResolver()
 {
 }
 
-US_END_NAMESPACE
+}

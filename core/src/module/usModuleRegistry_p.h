@@ -30,7 +30,7 @@
 #include <usCoreConfig.h>
 #include <usThreads_p.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class CoreModuleContext;
 class Framework;
@@ -124,6 +124,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEREGISTRY_P_H

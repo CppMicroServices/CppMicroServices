@@ -30,7 +30,7 @@
 class CivetServer;
 struct mg_connection;
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Any;
 class ServletContext;
@@ -57,6 +57,6 @@ struct HttpServletRequestPrivate : public SharedData
   AttributeMapType m_Attributes;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPSERVLETREQUEST_P_H

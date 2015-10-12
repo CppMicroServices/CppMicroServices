@@ -28,7 +28,7 @@
 
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Any;
 class CoreModuleContext;
@@ -414,15 +414,15 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(Module)& module);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::Module& module);
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, US_PREPEND_NAMESPACE(Module) const * module);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, us::Module const * module);
 
 #endif // USMODULE_H

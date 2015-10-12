@@ -116,7 +116,7 @@ struct MyFactory3 : public us::ServiceFactory
 };
 
 
-US_USE_NAMESPACE
+using namespace us;
 
 int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
 {

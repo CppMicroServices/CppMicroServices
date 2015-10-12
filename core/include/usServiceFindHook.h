@@ -28,7 +28,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Module;
 class ModuleContext;
@@ -70,6 +70,6 @@ struct US_Core_EXPORT ServiceFindHook
                     const std::string& filter, ShrinkableVector<ServiceReferenceBase>& references) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEFINDHOOK_H

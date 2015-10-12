@@ -1,6 +1,6 @@
 #include <usModuleActivator.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 //! [0]
 class MyActivator : public ModuleActivator

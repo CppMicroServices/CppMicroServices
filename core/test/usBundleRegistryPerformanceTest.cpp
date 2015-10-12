@@ -33,7 +33,7 @@ limitations under the License.
 #include <vector>
 #include <thread>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace
 {

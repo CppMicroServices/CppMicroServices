@@ -36,7 +36,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class CoreModuleContext;
 class ModuleContext;
@@ -181,6 +181,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICELISTENERS_H

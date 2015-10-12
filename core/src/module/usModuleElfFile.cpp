@@ -30,7 +30,7 @@
 
 #include <sys/stat.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct InvalidElfException : public InvalidObjFileException
 {
@@ -296,4 +296,4 @@ ModuleObjFile* CreateModuleElfFile(const char* selfName, const std::string& file
   }
 }
 
-US_END_NAMESPACE
+}

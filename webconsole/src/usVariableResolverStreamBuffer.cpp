@@ -26,7 +26,7 @@
 #include <cassert>
 #include <functional>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 VariableResolverStreamBuffer::VariableResolverStreamBuffer(std::ostream* out, WebConsoleVariableResolver* variables)
   : m_State(STATE_NULL)
@@ -143,4 +143,4 @@ std::string VariableResolverStreamBuffer::translate()
   return value;
 }
 
-US_END_NAMESPACE
+}

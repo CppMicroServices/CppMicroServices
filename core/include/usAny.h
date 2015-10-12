@@ -43,7 +43,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <usCoreConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Any;
 
@@ -352,8 +352,8 @@ public:
   virtual const char * what() const throw()
   {
     if (_msg.empty())
-      return "US_PREPEND_NAMESPACE(BadAnyCastException): "
-             "failed conversion using US_PREPEND_NAMESPACE(any_cast)";
+      return "us::BadAnyCastException: "
+             "failed conversion using us::any_cast";
     else
       return _msg.c_str();
   }
@@ -572,6 +572,6 @@ std::string any_value_to_json(const std::map<K, V>& m)
   return ss.str();
 }
 
-US_END_NAMESPACE
+}
 
 #endif // US_ANY_H

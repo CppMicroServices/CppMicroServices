@@ -29,7 +29,7 @@
 
 #include "usFooService.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ActivatorSL1 :
     public ModuleActivator, public ModulePropsInterface,
@@ -102,6 +102,6 @@ private:
 
 }; // ActivatorSL1
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(ActivatorSL1))
+US_EXPORT_MODULE_ACTIVATOR(us::ActivatorSL1)

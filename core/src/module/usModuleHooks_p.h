@@ -27,7 +27,7 @@
 
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class CoreModuleContext;
 class Module;
@@ -54,6 +54,6 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEHOOKS_P_H

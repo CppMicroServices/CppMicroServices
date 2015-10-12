@@ -28,7 +28,7 @@
 
 #include <mutex>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class MutexHost>
 class WaitCondition;
@@ -108,7 +108,7 @@ class MultiThreaded
     , public WaitConditionStrategy<LockingStrategy>
 {};
 
-US_END_NAMESPACE
+}
 
 
 #endif // USTHREADINGMODEL_H

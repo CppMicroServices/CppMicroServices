@@ -28,7 +28,7 @@
 
 #include <sys/stat.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct InvalidPEException : public InvalidObjFileException
 {
@@ -277,4 +277,4 @@ ModuleObjFile* CreateModulePEFile(const char* /*selfName*/, const std::string& f
 
 }
 
-US_END_NAMESPACE
+}

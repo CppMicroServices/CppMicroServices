@@ -32,7 +32,7 @@
 #include <stdexcept>
 #include <time.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 HttpServletResponsePrivate::HttpServletResponsePrivate(HttpServletRequest* request, CivetServer* server, mg_connection* conn)
   : m_Request(request)
@@ -455,4 +455,4 @@ HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
 {
 }
 
-US_END_NAMESPACE
+}

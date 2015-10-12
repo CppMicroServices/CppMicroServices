@@ -27,7 +27,7 @@
 #include <usWebConsoleServlet_p.h>
 #include <usModuleContext.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class WebConsoleActivator : public ModuleActivator
 {
@@ -68,4 +68,4 @@ void WebConsoleActivator::Unload(us::ModuleContext* /*context*/)
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(WebConsoleActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::WebConsoleActivator)

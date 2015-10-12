@@ -26,7 +26,7 @@
 
 #include "usHttpServiceExport.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct US_HttpService_EXPORT HttpConstants
 {
@@ -40,6 +40,6 @@ struct US_HttpService_EXPORT HttpConstants
   static std::string HTTP_WHITEBOARD_TARGET(); // "org.cppmicroservices.http.whiteboard.target"
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPCONSTANTS_H

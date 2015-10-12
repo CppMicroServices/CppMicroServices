@@ -32,7 +32,7 @@
 #include <string>
 #include <unordered_set>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Any;
 class LDAPExprData;
@@ -175,6 +175,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USLDAPEXPR_H

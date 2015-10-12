@@ -32,7 +32,7 @@
 
 #include <iostream>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class FilteringResponseWrapper : public HttpServletResponse
 {
@@ -252,4 +252,4 @@ AbstractWebConsolePlugin* WebConsoleServlet::GetConsolePlugin(const std::string&
   return m_PluginTracker.GetPlugin(label);
 }
 
-US_END_NAMESPACE
+}

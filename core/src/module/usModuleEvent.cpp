@@ -24,7 +24,7 @@
 
 #include "usModule.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleEventData : public SharedData
 {
@@ -117,4 +117,4 @@ std::ostream& operator<<(std::ostream& os, const ModuleEvent& event)
   return os;
 }
 
-US_END_NAMESPACE
+}

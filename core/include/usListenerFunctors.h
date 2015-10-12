@@ -28,7 +28,7 @@
 
 #include "usGlobalConfig.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
   class ServiceEvent;
   class ModuleEvent;
@@ -45,10 +45,10 @@ US_BEGIN_NAMESPACE
   { return std::bind(memFn, x, std::placeholders::_1); }
 
 
-US_END_NAMESPACE
+}
 
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListener))
-  typedef void(*TargetType)(const US_PREPEND_NAMESPACE(ServiceEvent)&);
+US_HASH_FUNCTION_BEGIN(us::ServiceListener)
+  typedef void(*TargetType)(const us::ServiceEvent&);
   const TargetType* targetFunc = arg.target<TargetType>();
   void* targetPtr = NULL;
   std::memcpy(&targetPtr, &targetFunc, sizeof(void*));

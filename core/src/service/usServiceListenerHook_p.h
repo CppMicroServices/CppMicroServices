@@ -27,7 +27,7 @@
 #include "usServiceListenerEntry_p.h"
 #include "usSharedData.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServiceListenerHook::ListenerInfoData : public SharedData
 {
@@ -44,6 +44,6 @@ public:
   bool bRemoved;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICELISTENERHOOK_P_H

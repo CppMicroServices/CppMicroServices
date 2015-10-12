@@ -3,7 +3,7 @@
 #include <usServiceFactory.h>
 #include <usServiceInterface.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 
 struct InterfaceA { virtual ~InterfaceA() {} };

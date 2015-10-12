@@ -27,7 +27,7 @@
 #include <streambuf>
 #include <sstream>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct WebConsoleVariableResolver;
 
@@ -114,6 +114,6 @@ private:
   std::stringstream m_LineBuffer;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USVARIABLERESOLVERSTREAMBUFFER_H

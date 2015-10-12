@@ -33,7 +33,7 @@
 #include "usCoreModuleContext_p.h"
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
                                                                const std::vector<std::string>& classes,
@@ -336,4 +336,4 @@ void ServiceRegistry::GetUsedByModule(Module* p,
   }
 }
 
-US_END_NAMESPACE
+}

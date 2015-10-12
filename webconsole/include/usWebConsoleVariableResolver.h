@@ -26,7 +26,7 @@
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * The <code>VariableResolver</code> interface defines the API for an object
@@ -66,6 +66,6 @@ struct WebConsoleVariableResolver
   virtual std::string Resolve(const std::string& variable) const = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USWEBCONSOLEVARIABLERESOLVER_H

@@ -22,10 +22,10 @@
 
 #include "usModuleEventHook.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModuleEventHook::~ModuleEventHook()
 {
 }
 
-US_END_NAMESPACE
+}

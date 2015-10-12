@@ -33,7 +33,7 @@
 #pragma warning(disable:4275)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -111,7 +111,7 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -121,7 +121,7 @@ US_END_NAMESPACE
  * \ingroup MicroServices
  * @{
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceException)& exc);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::ServiceException& exc);
 /** @}*/
 
 #endif // USSERVICEEXCEPTION_H

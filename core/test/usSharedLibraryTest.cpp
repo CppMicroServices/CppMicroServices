@@ -28,7 +28,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-US_USE_NAMESPACE
+using namespace us;
 
 int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
 {

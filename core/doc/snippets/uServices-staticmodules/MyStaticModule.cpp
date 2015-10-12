@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-US_USE_NAMESPACE
+using namespace us;
 
 struct MyStaticModuleActivator : public ModuleActivator
 {

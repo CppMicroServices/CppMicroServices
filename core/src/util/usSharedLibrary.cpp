@@ -41,7 +41,7 @@
 #endif
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 #ifdef US_PLATFORM_POSIX
 static const char PATH_SEPARATOR = '/';
@@ -266,4 +266,4 @@ bool SharedLibrary::IsLoaded() const
   return d->m_Handle != NULL;
 }
 
-US_END_NAMESPACE
+}

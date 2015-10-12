@@ -42,14 +42,6 @@ When building the C++ Micro Services library, you have a few configuration optio
   this option is turned ON. If your application is not multi-threaded, turn this option OFF to get
   maximum performance.
 
-### Customizing naming conventions
-
-- **US_NAMESPACE**
-  The default namespace is `us` but you may override this at will.
-- **US_HEADER_PREFIX**
-  By default, all public headers have a "us" prefix. You may specify an arbitrary prefix to match your
-  naming conventions.
-
 The above options are mainly useful when embedding the C++ Micro Services source code in your own library and
 you want to make it look like native source code.
 

@@ -27,7 +27,7 @@
 
 class CivetServer;
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 
@@ -64,6 +64,6 @@ private:
   virtual void RemovedService(const ServiceReferenceType& reference, TrackedType handler);
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVLETCONTAINER_P_H

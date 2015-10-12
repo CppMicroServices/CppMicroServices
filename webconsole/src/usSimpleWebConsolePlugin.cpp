@@ -28,7 +28,7 @@
 #include <usModule.h>
 #include <usModuleResource.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 SimpleWebConsolePlugin::SimpleWebConsolePlugin(const std::string& label, const std::string& title,
                                                const std::string& category, const std::vector<std::string>& css)
@@ -108,4 +108,4 @@ ModuleResource SimpleWebConsolePlugin::GetResource(const std::string& path) cons
         ModuleResource();
 }
 
-US_END_NAMESPACE
+}

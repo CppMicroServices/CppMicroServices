@@ -27,7 +27,7 @@
 #include <usModuleInfo.h>
 #include <usUtils_p.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 namespace {
 #ifdef US_BUILD_SHARED_LIBS
@@ -169,4 +169,4 @@ void* ModuleUtils::GetSymbol(const ModuleInfo& module, const char* symbol)
   return GetSymbol_impl(module, symbol);
 }
 
-US_END_NAMESPACE
+}

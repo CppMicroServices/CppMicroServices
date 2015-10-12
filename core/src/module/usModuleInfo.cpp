@@ -23,7 +23,7 @@
 
 #include "usModuleInfo.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModuleInfo::ModuleInfo(const std::string& name)
   : name(name)
@@ -31,4 +31,4 @@ ModuleInfo::ModuleInfo(const std::string& name)
 {
 }
 
-US_END_NAMESPACE
+}

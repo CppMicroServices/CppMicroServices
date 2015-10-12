@@ -28,7 +28,7 @@
 #include "usModuleAbstractTracked_p.h"
 #include "usServiceEvent.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -104,7 +104,7 @@ private:
                          const ServiceEvent& related, T object) ;
 };
 
-US_END_NAMESPACE
+}
 
 #include "usTrackedService.tpp"
 

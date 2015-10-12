@@ -28,7 +28,7 @@
 #include <cassert>
 #include <functional>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 HttpOutputStreamBuffer::HttpOutputStreamBuffer(HttpServletResponsePrivate* response, std::size_t bufferSize)
   : m_Buffer(bufferSize+1)
@@ -119,4 +119,4 @@ bool HttpOutputStreamBuffer::sendBuffer()
   return bytesSend > 0;
 }
 
-US_END_NAMESPACE
+}

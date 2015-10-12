@@ -28,7 +28,7 @@
 #include <string>
 #include <ctime>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct HttpServletResponsePrivate;
 
@@ -341,6 +341,6 @@ protected:
   ExplicitlySharedDataPointer<HttpServletResponsePrivate> d;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPSERVLETRESPONSE_H

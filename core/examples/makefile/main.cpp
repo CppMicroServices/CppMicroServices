@@ -6,7 +6,7 @@
 
 #include "IDictionaryService.h"
 
-US_USE_NAMESPACE
+using namespace us;
 
 int main(int /*argc*/, char* /*argv*/[])
 {

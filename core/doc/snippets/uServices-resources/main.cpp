@@ -6,7 +6,7 @@
 #include <usModule.h>
 #include <usModuleResourceStream.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 void resourceExample()
 {

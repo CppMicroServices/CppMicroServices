@@ -29,7 +29,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ServiceControlInterface
 {
@@ -39,6 +39,6 @@ struct ServiceControlInterface
   virtual void ServiceControl(int service, const std::string& operation, int ranking) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICECONTROLINTERFACE_H

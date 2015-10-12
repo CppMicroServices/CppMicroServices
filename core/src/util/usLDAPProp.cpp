@@ -24,7 +24,7 @@
 
 #include <stdexcept>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 LDAPPropExpr::LDAPPropExpr(const std::string& expr)
   : m_ldapExpr(expr)
@@ -120,7 +120,7 @@ LDAPPropExpr LDAPProp::Approx(const us::Any& any) const
   return Approx(any.ToString());
 }
 
-US_END_NAMESPACE
+}
 
 us::LDAPPropExpr operator&&(const us::LDAPPropExpr& left, const us::LDAPPropExpr& right)
 {

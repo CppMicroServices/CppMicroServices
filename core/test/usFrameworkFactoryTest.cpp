@@ -29,7 +29,7 @@ limitations under the License.
 #include <string>
 #include <map>
 
-US_USE_NAMESPACE
+using namespace us;
 
 int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 {

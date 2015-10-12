@@ -1,6 +1,6 @@
 set(_srcs
-  src/civetweb/civetweb.c
-  src/civetweb/CivetServer.cpp
+  ../third_party/civetweb/civetweb.c
+  ../third_party/civetweb/CivetServer.cpp
 
   src/usHttpConstants.cpp
   src/usHttpServlet.cpp
@@ -15,7 +15,7 @@ set(_srcs
 
 if(MSVC)
   set_property(
-    SOURCE src/civetweb/civetweb.c APPEND_STRING
+    SOURCE ../third_party/civetweb/civetweb.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " /wd4267 /wd4311 /wd4312 /wd4996"
 	)
 endif()

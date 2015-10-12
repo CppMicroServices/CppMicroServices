@@ -92,3 +92,10 @@ Patches
  * Added virtual destructors
  * Converted old-style casts to C++ casts
 
+Civetweb
+--------
+
+MIT License
+
+https://github.com/civetweb/civetweb
+1.6

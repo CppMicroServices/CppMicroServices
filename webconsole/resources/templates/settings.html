@@ -1,0 +1,32 @@
+<div class="col_6">
+<h5>MITK</h5>
+<div class="column-content">
+<table class="tight fit-firstcolumn">
+<tbody>
+<tr><td>Version</td><td>${bla}</td></tr>
+<tr><td>Git hash</td><td>{$mitk-githash}</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="col_6">
+<h5>CppMicroServices</h5>
+<div class="column-content">
+<table class="tight fit-firstcolumn">
+<tbody>
+<tr><td>Thread support</td><td>{% if us-thread == "true" %}<i class="icon-check"></i>{% endif %}{% if us-thread == "false" %}<i class="icon-check-empty"></i>{% endif %}</td></tr>
+<tr><td>Auto-load support</td><td>{% if us-autoload == "true" %}<i class="icon-check"></i>{% endif %}{% if us-autoload == "false" %}<i class="icon-check-empty"></i>{% endif %}</td></tr>
+<tr><td>Auto-load paths</td>
+<td>
+<ul>
+  {% for path in us-autoload-paths %}
+  <li>{$path}</li>
+  {% endfor %}
+</ul>
+</td>
+<tr><td>Storage path</td><td>{$us-storagepath}</td>
+</tbody>
+</table>
+</div>
+</div>

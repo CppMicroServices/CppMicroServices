@@ -25,7 +25,7 @@
 
 #include "usModuleResourceContainer_p.h"
 #include "usModuleInfo.h"
-#include "usLog_p.h"
+#include "usLog.h"
 
 #include <string>
 #include <atomic>

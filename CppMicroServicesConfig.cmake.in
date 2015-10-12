@@ -123,9 +123,12 @@ set(US_COMPILE_DEFINITIONS_RELEASE )
 set(US_COMPILE_DEFINITIONS_DEBUG )
 
 # Components support
-set(US_MODULES Core) # ConfigAdmin EventAdmin ...
+set(US_MODULES Core HttpService WebConsole ShellService) # ConfigAdmin EventAdmin ...
 
 set(US_Core_MODULE_DEPS )
+set(US_HttpService_MODULE_DEPS Core)
+set(US_WebConsole_MODULE_DEPS ${US_HttpService_MODULE_DEPS} HttpService)
+set(US_ShellService_MODULE_DEPS Core)
 
 if(NOT @PROJECT_NAME@_FIND_COMPONENTS)
   set(@PROJECT_NAME@_FIND_COMPONENTS Core)

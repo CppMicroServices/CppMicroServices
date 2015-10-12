@@ -6,8 +6,8 @@ project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
   "SKIP_EXAMPLES;SKIP_INIT"
-  "VERSION;TARGET"
-  "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
+  "VERSION;TARGET;AUTOLOAD_WITH"
+  "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;INTERNAL_LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
 )
 
@@ -75,6 +75,11 @@ endif()
 # Create library
 #-----------------------------------------------------------------------------
 
+# Set a custom library output directory if requested
+if(${PROJECT_NAME}_AUTOLOAD_WITH)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${${PROJECT_NAME}_AUTOLOAD_WITH}")
+endif()
+
 # Generate the module init file
 if(NOT ${PROJECT_NAME}_SKIP_INIT)
   usFunctionGenerateModuleInit(${PROJECT_NAME}_SOURCES)
@@ -106,15 +111,26 @@ set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
 )
 
 # Link additional libraries
-if(${PROJECT_NAME}_LINK_LIBRARIES OR US_LIBRARIES)
-  target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES})
+if(${PROJECT_NAME}_LINK_LIBRARIES OR ${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES OR US_LIBRARIES)
+  target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES}
+                        ${${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES})
+endif()
+
+if(${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES)
+  set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
+    INTERFACE_LINK_LIBRARIES ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES}
+  )
 endif()
 
 # Embed module resources
 
 if(${PROJECT_NAME}_RESOURCES OR US_LIBRARIES)
+  set(_wd ${CMAKE_CURRENT_SOURCE_DIR})
+  if(${PROJECT_NAME}_RESOURCES)
+    set(_wd ${CMAKE_CURRENT_SOURCE_DIR}/resources)
+  endif()
   usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
-                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources
+                         WORKING_DIRECTORY ${_wd}
                          FILES ${${PROJECT_NAME}_RESOURCES}
                          ZIP_ARCHIVES ${US_LIBRARIES}
                         )

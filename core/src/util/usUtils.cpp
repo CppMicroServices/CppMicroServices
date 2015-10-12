@@ -24,7 +24,7 @@
 
 #include "usCoreModuleContext_p.h"
 #include "usGetModuleContext.h"
-#include "usLog_p.h"
+#include "usLog.h"
 #include "usModuleInfo.h"
 #include "usModule.h"
 #include "usModuleContext.h"

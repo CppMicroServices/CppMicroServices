@@ -5,11 +5,10 @@ set(${PROJECT_NAME}_MINOR_VERSION 99)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
-cmake_minimum_required(VERSION 2.8.7) # CMake version in Ubuntu 14.04
-cmake_policy(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.12)
+cmake_policy(VERSION 2.8.12)
 
 list(APPEND policies_new
-  CMP0017 # Prefer files from the CMake module directory when including from there
   CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
   CMP0054 # Only interpret if() arguments as variables or keywords when unquoted
   )
@@ -58,8 +57,6 @@ set(US_COMPILER_APPLE_CLANG_MINIMUM_VERSION   5.0          ) # ??
 set(US_COMPILER_MSVC_MINIMUM_VERSION          18.00.31101 )
 
 set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT "Visual Studio 2013 Update 4")
-
-# CMAKE_CXX_COMPILER_VERSION is only available in CMake >= 2.8.10
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_GNU_MINIMUM_VERSION})
@@ -333,6 +330,18 @@ include(CheckIncludeFileCXX)
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 
 #-----------------------------------------------------------------------------
+# System Information
+#-----------------------------------------------------------------------------
+
+include(TestBigEndian)
+
+test_big_endian(US_BIG_ENDIAN)
+
+if(NOT US_BIG_ENDIAN)
+  set(US_LITTLE_ENDIAN 1)
+endif()
+
+#-----------------------------------------------------------------------------
 # Source directory
 #-----------------------------------------------------------------------------
 
@@ -358,9 +367,14 @@ configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
-add_subdirectory(tools)
+add_subdirectory(tools/rc)
 
 add_subdirectory(core)
+add_subdirectory(httpservice)
+add_subdirectory(webconsole)
+add_subdirectory(shellservice)
+
+add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -391,8 +405,6 @@ if(NOT US_NO_INSTALL)
   set(_install_cmake_scripts
     ${US_MODULE_INIT_TEMPLATE}
     ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-    ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
-    ${US_CMAKE_DIR}/FindPackageMessage.cmake
     ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
     ${US_CMAKE_DIR}/usFunctionAddResources.cmake
     ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake

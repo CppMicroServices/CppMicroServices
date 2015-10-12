@@ -39,10 +39,63 @@ Patches
  * Support for zip files with prepended binary blobs.
  * Write to C file streams.
 
-us_stdint_vc
-------------
+libtelnet
+---------
 
 Public Domain
 
-Search the Net for "stdint.h Danny Smith"
+https://github.com/seanmiddleditch/libtelnet
+574eef9fd7f373fb2812939456fc5a4c3e975b44
 
+tinyscheme
+----------
+
+BSD-style license
+
+http://tinyscheme.sourceforge.net/home.html
+1.41
+
+Patches
+
+ * Added header for missing off_t declaration.
+ * Disable Windows warnings C4244 and C4267.
+ * Do not use dllexport/dllimport specs on Windows
+
+Linenoise
+---------
+
+BSD license
+
+https://github.com/msteveb/linenoise
+0f2343d2bc763b735b6242b5831be611703965a1
+
+This is a fork of the original antirez/linenoise project
+which contains Windows support and a few additional features.
+
+Patches
+
+ * Don't depend on utf8.h because it is not supported
+   on Windows.
+ * Disable Windows warnings C4244 and C4267.
+ * Do not define snprintf for MSC_VER 1900 or higher
+
+The Lean Mean C++ Option Parser
+-------------------------------
+
+MIT License
+
+http://sourceforge.net/projects/optionparser
+1.3
+
+Patches
+
+ * Added virtual destructors
+ * Converted old-style casts to C++ casts
+
+Civetweb
+--------
+
+MIT License
+
+https://github.com/civetweb/civetweb
+1.6

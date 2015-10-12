@@ -1,0 +1,63 @@
+
+
+<h3>Module Overview</h3>
+<table class="tight striped sortable" cellspacing="0" celpadding="0">
+<thead><tr>
+  <th>Id</th>
+  <th>Module</th>
+  <th>Version</th>
+  <th>Vendor</th>
+  <th>Loaded</th>
+</tr></thead>
+<tbody class="template">
+<tr>
+<td class="module-id"></td>
+<td class="module-name"><a href="/Console/modules/" class="module-name"></a></td>
+<td class="module-version"></td>
+<td class="module-vendor"></td>
+<td class="module-loaded"></td>
+</tr>
+</tbody>
+</table>
+
+<script>
+var getCheckBox = function(data) {
+  if (data.item.loaded) return "<i class='icon-check'></i>";
+  else return "<i class='icon-check-empty'></i>";
+};
+
+var request = $.getJSON("modules");
+
+request.done(function(data) {
+  var directive = {
+    'tr':{
+      'module<-modules':{
+        'td.module-id':'module.id',
+        'td.module-id@value':'module.id',
+        'a.module-name':'module.name',
+        'a.module-name@href+':'module.id',
+        'td.module-name@value':'module.name',
+        'td.module-version':'module.version',
+        'td.module-version@value':'module.version',
+        'td.module-vendor':'module.vendor',
+        'td.module-vendor@value':'module.vendor',
+        'td.module-loaded':getCheckBox,
+        'td.module-loaded@value':'module.loaded'
+      }
+    }
+  };
+  $('tbody.template').render(data, directive);
+
+  // fix row classes
+  var rows = $('table.sortable').find('tbody tr');
+  rows.removeClass('alt first last');
+  var table = $('table.sortable');
+  table.find('tr:even').addClass('alt');
+  table.find('tr:first').addClass('first');
+  table.find('tr:last').addClass('last');
+});
+
+request.fail(function(jqXHR, textStatus, errorThrown) {
+  alert(textStatus + errorThrown);
+});
+</script>

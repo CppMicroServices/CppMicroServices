@@ -25,7 +25,7 @@
 #include "usModuleInfo.h"
 #include "usModuleUtils_p.h"
 #include "usModuleResource.h"
-#include "usLog_p.h"
+#include "usLog.h"
 
 #include "miniz.h"
 

@@ -24,7 +24,7 @@
 
 #include <ostream>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceException::ServiceException(const std::string& msg, const Type& type)
   : std::runtime_error(msg), type(type)
@@ -50,9 +50,9 @@ ServiceException::Type ServiceException::GetType() const
   return type;
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const ServiceException& exc)
 {

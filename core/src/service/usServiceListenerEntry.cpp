@@ -29,7 +29,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 
 #include <cassert>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ServiceListenerCompare : std::binary_function<ServiceListener, ServiceListener, bool>
 {
@@ -156,6 +156,6 @@ std::size_t ServiceListenerEntry::Hash() const
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
 }
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING

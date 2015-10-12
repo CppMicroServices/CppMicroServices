@@ -31,7 +31,7 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 class ServiceListenerEntry;
@@ -166,12 +166,12 @@ struct US_Core_EXPORT ServiceListenerHook
 
 };
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING
 
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceListenerHook::ListenerInfo))
-  return hash<const US_PREPEND_NAMESPACE(ServiceListenerHook::ListenerInfoData)*>()(arg.d.Data());
+US_HASH_FUNCTION_BEGIN(us::ServiceListenerHook::ListenerInfo)
+  return hash<const us::ServiceListenerHook::ListenerInfoData*>()(arg.d.Data());
 US_HASH_FUNCTION_END
 
 #endif // USSERVICELISTENERHOOK_H

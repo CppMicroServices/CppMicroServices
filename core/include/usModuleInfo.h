@@ -33,7 +33,7 @@
 # pragma warning(disable: 4251)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleActivator;
 
@@ -51,7 +51,7 @@ struct US_Core_EXPORT ModuleInfo
   long id;
 };
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 # pragma warning(pop)

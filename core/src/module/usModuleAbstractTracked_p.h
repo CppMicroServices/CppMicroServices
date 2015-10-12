@@ -31,7 +31,7 @@
 #include "usThreads_p.h"
 #include "usWaitCondition_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -287,7 +287,7 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #include "usModuleAbstractTracked.tpp"
 

@@ -31,7 +31,7 @@
 #include <algorithm>
 #include <memory>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

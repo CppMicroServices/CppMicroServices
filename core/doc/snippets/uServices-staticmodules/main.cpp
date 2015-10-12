@@ -1,11 +1,11 @@
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 struct ModuleActivator;
 class ModuleContext;
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 // This is just for illustration purposes in code snippets
 extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule1() { return 0; }

@@ -34,7 +34,7 @@
 
 #include "usGlobalConfig.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 static const uint32_t PE_SIGNATURE = 0x00004550; // { 'P', 'E', '\0', '\0' }
 static const uint16_t DOS_SIGNATURE = 0x5A4D; // { 'M', 'Z' }
@@ -233,6 +233,6 @@ struct IMAGE_IMPORT_DESCRIPTOR
   uint32_t AddressOfImportAddressTable;
 };
 
-US_END_NAMESPACE
+}
 
 #endif /* US_PE_H_ */

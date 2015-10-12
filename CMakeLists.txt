@@ -215,8 +215,6 @@ us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative i
 us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
-us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services symbols")
-
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
 set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")

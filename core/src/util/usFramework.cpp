@@ -30,7 +30,7 @@
 #include "usModuleUtils_p.h"
 #include "usThreads_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 Framework::Framework(void) : d(new FrameworkPrivate())
 {
@@ -108,4 +108,4 @@ void Framework::SetAutoLoadingEnabled(bool enable)
   d->coreModuleContext.settings.SetAutoLoadingEnabled(enable);
 }
 
-US_END_NAMESPACE
+}

@@ -27,7 +27,7 @@
 #include <usServiceInterface.h>
 #include <usServiceProperties.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModulePropsInterface
 {
@@ -38,6 +38,6 @@ struct ModulePropsInterface
   virtual const Properties& GetProperties() const = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEPROPSINTERFACE_H

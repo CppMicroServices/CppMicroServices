@@ -28,7 +28,7 @@
 #include <chrono>
 #include <condition_variable>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class MutexHost>
 class WaitCondition
@@ -70,6 +70,6 @@ private:
 #endif
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USWAITCONDITION_P_H

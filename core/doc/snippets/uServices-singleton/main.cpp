@@ -4,7 +4,7 @@
 #include "SingletonOne.h"
 #include "SingletonTwo.h"
 
-US_USE_NAMESPACE
+using namespace us;
 
 class MyActivator : public ModuleActivator
 {

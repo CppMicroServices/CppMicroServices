@@ -23,7 +23,7 @@
 #include "usTestDriverActivator.h"
 #include "usModuleImport.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 TestDriverActivator* TestDriverActivator::m_Instance = nullptr;
 
@@ -48,7 +48,7 @@ void TestDriverActivator::Unload(ModuleContext*)
   this->m_Instance = nullptr;
 }
 
-US_END_NAMESPACE
+}
 
 US_EXPORT_MODULE_ACTIVATOR(us::TestDriverActivator)
 

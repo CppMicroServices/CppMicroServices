@@ -35,7 +35,7 @@
 #include <map>
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModuleRegistry::ModuleRegistry(CoreModuleContext* coreCtx) :
   coreCtx(coreCtx)
@@ -151,5 +151,5 @@ std::vector<Module*> ModuleRegistry::GetModules() const
   return result;
 }
 
-US_END_NAMESPACE
+}
 

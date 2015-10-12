@@ -26,7 +26,7 @@
 
 #include <usServiceInterface.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct FooService
 {
@@ -34,6 +34,6 @@ struct FooService
   virtual void foo() = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USFOOSERVICE_H

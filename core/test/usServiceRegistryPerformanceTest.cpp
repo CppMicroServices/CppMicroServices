@@ -32,7 +32,7 @@
 
 #include <vector>
 
-US_USE_NAMESPACE
+using namespace us;
 
 class MyServiceListener;
 

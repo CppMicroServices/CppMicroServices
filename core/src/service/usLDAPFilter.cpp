@@ -28,7 +28,7 @@
 
 #include <stdexcept>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class LDAPFilterData : public SharedData
 {
@@ -112,9 +112,9 @@ LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
   return *this;
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {

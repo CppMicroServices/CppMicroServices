@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleInfo;
 class ModuleResource;
@@ -84,6 +84,6 @@ private:
 };
 
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULERESOURCECONTAINER_P_H

@@ -29,7 +29,7 @@
 #include <usFooService.h>
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ActivatorSL4 :
   public ModuleActivator, public FooService
@@ -62,6 +62,6 @@ private:
   ServiceRegistration<FooService> sr;
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(ActivatorSL4))
+US_EXPORT_MODULE_ACTIVATOR(us::ActivatorSL4)

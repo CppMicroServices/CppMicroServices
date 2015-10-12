@@ -22,7 +22,7 @@
 #include "usServletConfig.h"
 #include "usServletConfig_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServletConfig::~ServletConfig()
 {
@@ -64,4 +64,4 @@ ServletConfig&ServletConfig::operator=(const ServletConfig& other)
   return *this;
 }
 
-US_END_NAMESPACE
+}

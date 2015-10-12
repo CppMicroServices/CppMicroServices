@@ -27,7 +27,7 @@
 
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServicesUtils
@@ -160,6 +160,6 @@ private:
 template<class E>
 std::vector<E> ShrinkableVector<E>::emptyVector;
 
-US_END_NAMESPACE
+}
 
 #endif // USSHRINKABLEVECTOR_H

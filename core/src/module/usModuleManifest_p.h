@@ -25,7 +25,7 @@
 
 #include "usAny.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleManifest
 {
@@ -50,6 +50,6 @@ private:
   AnyMap m_Properties;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEMANIFEST_P_H

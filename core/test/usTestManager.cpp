@@ -23,7 +23,7 @@
 #include "usTestManager.h"
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 TestManager& TestManager::GetInstance()
 {
@@ -57,4 +57,4 @@ void TestManager::TestPassed()
   m_PassedTests++;
 }
 
-US_END_NAMESPACE
+}

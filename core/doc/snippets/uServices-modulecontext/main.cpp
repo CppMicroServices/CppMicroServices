@@ -6,7 +6,7 @@
 #include <usModule.h>
 #include <usModuleContext.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 void RetrieveModuleContext()
 {

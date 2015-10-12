@@ -25,7 +25,7 @@
 
 #include "usServiceProperties.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServicePropertiesImpl
 {
@@ -51,6 +51,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEPROPERTIESIMPL_P_H

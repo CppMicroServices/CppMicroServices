@@ -24,7 +24,7 @@
 
 #include "usTestingMacros.h"
 
-US_USE_NAMESPACE
+using namespace us;
 
 static int lastMsgType = -1;
 static std::string lastMsg;

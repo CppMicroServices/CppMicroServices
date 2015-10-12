@@ -33,7 +33,7 @@
 
 #include <iostream>
 
-US_USE_NAMESPACE
+using namespace us;
 
 #define US_SHELL_PROG_NAME "usShell"
 

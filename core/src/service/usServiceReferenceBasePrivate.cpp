@@ -39,7 +39,7 @@
 #pragma warning(disable:4503) // decorated name length exceeded, name was truncated
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)
   : ref(1), registration(reg)
@@ -324,4 +324,4 @@ bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId
   return registration ? registration->service.find(interfaceId) != registration->service.end() : false;
 }
 
-US_END_NAMESPACE
+}

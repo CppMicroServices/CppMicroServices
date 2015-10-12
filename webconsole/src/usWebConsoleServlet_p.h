@@ -26,7 +26,7 @@
 
 #include <usServiceTracker.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class HttpServletRequest;
 class HttpServletResponse;
@@ -82,6 +82,6 @@ private:
   WebConsolePluginTracker m_PluginTracker;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USWEBCONSOLESERVLET_H

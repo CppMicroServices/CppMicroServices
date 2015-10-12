@@ -24,7 +24,7 @@
 
 #include "usSimpleWebConsolePlugin.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResourceStream;
 
@@ -47,6 +47,6 @@ private:
   ModuleResourceStream* m_TemplateSI;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICESPLUGIN_H

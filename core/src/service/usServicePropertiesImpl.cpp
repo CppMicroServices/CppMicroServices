@@ -32,7 +32,7 @@
 #define ci_compare strncasecmp
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 Any ServicePropertiesImpl::emptyAny;
 
@@ -103,4 +103,4 @@ const std::vector<std::string>& ServicePropertiesImpl::Keys() const
   return keys;
 }
 
-US_END_NAMESPACE
+}

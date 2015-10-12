@@ -26,7 +26,7 @@
 #include "usServiceInterface.h"
 #include "usShrinkableVector.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 class ModuleEvent;
@@ -66,6 +66,6 @@ struct US_Core_EXPORT ModuleEventHook
   virtual void Event(const ModuleEvent& event, ShrinkableVector<ModuleContext*>& contexts) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEEVENTHOOK_H

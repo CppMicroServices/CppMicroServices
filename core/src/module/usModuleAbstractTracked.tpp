@@ -25,7 +25,7 @@
 
 #include <iterator>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class S, class TTT, class R>
 const bool ModuleAbstractTracked<S,TTT,R>::DEBUG_OUTPUT = false;
@@ -316,4 +316,4 @@ void ModuleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
   }
 }
 
-US_END_NAMESPACE
+}

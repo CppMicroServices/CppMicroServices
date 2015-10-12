@@ -25,7 +25,7 @@
 
 #include "usServiceRegistrationBase.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -142,6 +142,6 @@ public:
  */
 typedef ServiceRegistration<void> ServiceRegistrationU;
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEREGISTRATION_H

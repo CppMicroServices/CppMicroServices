@@ -26,7 +26,7 @@
 
 #include "usServiceReference.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -114,6 +114,6 @@ struct ServiceTrackerCustomizer {
   virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICETRACKERCUSTOMIZER_H

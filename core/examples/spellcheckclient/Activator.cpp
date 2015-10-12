@@ -30,7 +30,7 @@
 #include <iostream>
 #include <cstring>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

@@ -32,7 +32,7 @@
 #include <usModuleActivator.h>
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class TestModuleS : public ServiceControlInterface,
                     public TestModuleSService0,
@@ -138,6 +138,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(TestModuleSActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::TestModuleSActivator)

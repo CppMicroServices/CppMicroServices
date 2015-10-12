@@ -29,7 +29,7 @@
 
 #include <sys/stat.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct InvalidMachOException : public InvalidObjFileException
 {
@@ -317,4 +317,4 @@ ModuleObjFile* CreateModuleMachOFile(const char* /*selfName*/, const std::string
   }
 }
 
-US_END_NAMESPACE
+}

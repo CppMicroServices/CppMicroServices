@@ -29,9 +29,9 @@
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 class ModuleContext;
-US_END_NAMESPACE
+}
 
 /**
  * \ingroup MicroServices
@@ -53,14 +53,14 @@ US_END_NAMESPACE
  * <code>usFunctionGenerateModuleInit()</code>.
  */
 #define US_INITIALIZE_MODULE                                                                                                   \
-  US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = 0;                            \
+  us::ModuleContext* US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = 0;                            \
                                                                                                                                \
-  extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleContext)* US_CONCAT(_us_get_bundle_context_instance_, US_MODULE_NAME) () \
+  extern "C" US_ABI_EXPORT us::ModuleContext* US_CONCAT(_us_get_bundle_context_instance_, US_MODULE_NAME) () \
   {                                                                                                                            \
     return US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME);                                                            \
   }                                                                                                                            \
                                                                                                                                \
-  extern "C" US_ABI_EXPORT void US_CONCAT(_us_set_bundle_context_instance_, US_MODULE_NAME) (US_PREPEND_NAMESPACE(ModuleContext)* ctx) \
+  extern "C" US_ABI_EXPORT void US_CONCAT(_us_set_bundle_context_instance_, US_MODULE_NAME) (us::ModuleContext* ctx) \
   {                                                                                                                                    \
     US_CONCAT(_us_bundle_context_instance_, US_MODULE_NAME) = ctx;                                                                     \
   }

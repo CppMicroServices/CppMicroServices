@@ -30,7 +30,7 @@
 #include "usServiceReferenceBasePrivate.h"
 #include "usListenerFunctors.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceHooks::ServiceHooks(CoreModuleContext* coreCtx)
   : coreCtx(coreCtx)
@@ -285,4 +285,4 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
   }
 }
 
-US_END_NAMESPACE
+}

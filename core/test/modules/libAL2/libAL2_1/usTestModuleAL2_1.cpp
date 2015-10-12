@@ -22,10 +22,10 @@
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct US_ABI_EXPORT TestModuleAL2_1_Dummy
 {
 };
 
-US_END_NAMESPACE
+}

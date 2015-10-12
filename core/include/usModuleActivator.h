@@ -31,7 +31,7 @@
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 
@@ -102,7 +102,7 @@ struct ModuleActivator
 
 };
 
-US_END_NAMESPACE
+}
 
 
 /**
@@ -119,9 +119,9 @@ US_END_NAMESPACE
  * \snippet uServices-activator/main.cpp 0
  */
 #define US_EXPORT_MODULE_ACTIVATOR(_activator_type)                             \
-  extern "C" US_ABI_EXPORT US_PREPEND_NAMESPACE(ModuleActivator)* US_CONCAT(_us_module_activator_instance_, US_MODULE_NAME) () \
+  extern "C" US_ABI_EXPORT us::ModuleActivator* US_CONCAT(_us_module_activator_instance_, US_MODULE_NAME) () \
   {                                                                             \
-    static std::unique_ptr<US_PREPEND_NAMESPACE(ModuleActivator)> activatorPtr; \
+    static std::unique_ptr<us::ModuleActivator> activatorPtr; \
     if (activatorPtr == nullptr) activatorPtr.reset(new _activator_type);       \
     return activatorPtr.get();                                                  \
   }

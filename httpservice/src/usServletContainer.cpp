@@ -39,7 +39,7 @@
 
 #include <cassert>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServletHandler : public CivetHandler
 {
@@ -279,4 +279,4 @@ std::string ServletContainer::GetContextPath(const ServletContext* /*context*/) 
   return d->m_ContextPath;
 }
 
-US_END_NAMESPACE
+}

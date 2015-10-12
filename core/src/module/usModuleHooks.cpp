@@ -29,7 +29,7 @@
 #include "usModuleContext.h"
 #include "usServiceReferenceBasePrivate.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModuleHooks::ModuleHooks(CoreModuleContext* ctx)
   : coreCtx(ctx)
@@ -170,4 +170,4 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
   }
 }
 
-US_END_NAMESPACE
+}

@@ -27,7 +27,7 @@
 #include <usGlobalConfig.h>
 #include <usLog.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct TestModuleA : public TestModuleAService
 {
@@ -74,6 +74,6 @@ private:
   TestModuleA* s;
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(TestModuleAActivator))
+US_EXPORT_MODULE_ACTIVATOR(us::TestModuleAActivator)

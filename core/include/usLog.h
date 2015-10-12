@@ -29,7 +29,7 @@
 #include <iostream>
 #include <sstream>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 US_Core_EXPORT void message_output(MsgType, const char* buf);
 
@@ -125,26 +125,26 @@ private:
     Logger& operator=(const Logger&);
 };
 
-US_END_NAMESPACE
+}
 
 #if defined(US_ENABLE_DEBUG_OUTPUT)
-#define US_DEBUG (US_PREPEND_NAMESPACE(Logger)::instance().GetLogLevel() > US_PREPEND_NAMESPACE(DebugMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(DebugMsg), __FILE__, __LINE__, __FUNCTION__))
+#define US_DEBUG (us::Logger::instance().GetLogLevel() > us::DebugMsg ? us::LogMsg() : us::LogMsg(us::DebugMsg, __FILE__, __LINE__, __FUNCTION__))
 #else
-  #define US_DEBUG US_PREPEND_NAMESPACE(LogMsg)()
+  #define US_DEBUG us::LogMsg()
 #endif
 
 #if !defined(US_NO_INFO_OUTPUT)
-#define US_INFO (US_PREPEND_NAMESPACE(Logger)::instance().GetLogLevel() > US_PREPEND_NAMESPACE(InfoMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(InfoMsg), __FILE__, __LINE__, __FUNCTION__))
+#define US_INFO (us::Logger::instance().GetLogLevel() > us::InfoMsg ? us::LogMsg() : us::LogMsg(us::InfoMsg, __FILE__, __LINE__, __FUNCTION__))
 #else
-  #define US_INFO US_PREPEND_NAMESPACE(LogMsg)()
+  #define US_INFO us::LogMsg()
 #endif
 
 #if !defined(US_NO_WARNING_OUTPUT)
-#define US_WARN (US_PREPEND_NAMESPACE(Logger)::instance().GetLogLevel() > US_PREPEND_NAMESPACE(WarningMsg) ? US_PREPEND_NAMESPACE(LogMsg)() : US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(WarningMsg), __FILE__, __LINE__, __FUNCTION__))
+#define US_WARN (us::Logger::instance().GetLogLevel() > us::WarningMsg ? us::LogMsg() : us::LogMsg(us::WarningMsg, __FILE__, __LINE__, __FUNCTION__))
 #else
-  #define US_WARN US_PREPEND_NAMESPACE(LogMsg)()
+  #define US_WARN us::LogMsg()
 #endif
 
-#define US_ERROR US_PREPEND_NAMESPACE(LogMsg)(US_PREPEND_NAMESPACE(ErrorMsg), __FILE__, __LINE__, __FUNCTION__)
+#define US_ERROR us::LogMsg(us::ErrorMsg, __FILE__, __LINE__, __FUNCTION__)
 
 #endif // USLOG_P_H

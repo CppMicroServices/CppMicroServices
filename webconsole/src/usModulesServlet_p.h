@@ -24,7 +24,7 @@
 
 #include "usSimpleWebConsolePlugin.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModulesServlet : public SimpleWebConsolePlugin
 {
@@ -257,6 +257,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULESSERVLET_P_H

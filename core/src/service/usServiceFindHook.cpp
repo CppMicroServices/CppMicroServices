@@ -22,10 +22,10 @@
 
 #include "usServiceFindHook.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceFindHook::~ServiceFindHook()
 {
 }
 
-US_END_NAMESPACE
+}

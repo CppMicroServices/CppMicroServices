@@ -32,7 +32,7 @@
 #pragma warning(disable:4251)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class LDAPFilterData;
 class ServiceReferenceBase;
@@ -167,7 +167,7 @@ protected:
 
 };
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -176,6 +176,6 @@ US_END_NAMESPACE
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(LDAPFilter)& filter);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::LDAPFilter& filter);
 
 #endif // USLDAPFILTER_H

@@ -8,7 +8,7 @@
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 //![s1]
 SingletonOne& SingletonOne::GetInstance()

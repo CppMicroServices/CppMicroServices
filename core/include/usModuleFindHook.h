@@ -26,7 +26,7 @@
 #include "usServiceInterface.h"
 #include "usShrinkableVector.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Module;
 class ModuleContext;
@@ -67,6 +67,6 @@ struct US_Core_EXPORT ModuleFindHook
   virtual void Find(const ModuleContext* context, ShrinkableVector<Module*>& modules) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEFINDHOOK_H

@@ -23,7 +23,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 WebConsoleDefaultVariableResolver::WebConsoleDefaultVariableResolver()
 {
@@ -39,4 +39,4 @@ std::string WebConsoleDefaultVariableResolver::Resolve(const std::string& variab
   return std::string();
 }
 
-US_END_NAMESPACE
+}

@@ -29,7 +29,7 @@
 
 #include "usTestingMacros.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 
@@ -137,6 +137,6 @@ private:
   CallbackType callback;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USTESTUTILMODULELISTENER_H

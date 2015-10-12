@@ -30,7 +30,7 @@
 #include <string>
 #include <atomic>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResourcePrivate
 {
@@ -281,9 +281,9 @@ void* ModuleResource::GetData() const
   return data;
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const ModuleResource& resource)
 {

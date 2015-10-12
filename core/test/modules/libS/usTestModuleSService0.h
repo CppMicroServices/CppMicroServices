@@ -26,13 +26,13 @@
 
 #include <usServiceInterface.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct TestModuleSService0
 {
   virtual ~TestModuleSService0() {}
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USTESTMODULESSERVICE0_H

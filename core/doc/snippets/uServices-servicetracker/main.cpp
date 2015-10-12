@@ -1,7 +1,7 @@
 #include <usServiceTracker.h>
 #include <usGetModuleContext.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 struct IFooService {};
 

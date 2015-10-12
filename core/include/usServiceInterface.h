@@ -32,7 +32,7 @@
 #include <typeinfo>
 #include <tuple>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServiceFactory;
 
@@ -76,7 +76,7 @@ namespace detail
  */
 template<class T> std::string us_service_interface_iid()
 {
-  return US_PREPEND_NAMESPACE(detail::GetDemangledName)(typeid(T));
+  return us::detail::GetDemangledName(typeid(T));
 }
 
 /// \cond
@@ -135,7 +135,7 @@ namespace detail
 }
 /// \endcond
 
-US_END_NAMESPACE
+}
 
 
 /**
@@ -187,7 +187,7 @@ US_END_NAMESPACE
   { return _service_interface_id; }                                                                \
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * @ingroup MicroServices
@@ -308,7 +308,7 @@ ServiceFactory* ToFactory(
 }
 ///@}
 
-US_END_NAMESPACE
+}
 
 
 #endif // USSERVICEINTERFACE_H

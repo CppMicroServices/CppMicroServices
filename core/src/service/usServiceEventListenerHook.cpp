@@ -22,10 +22,10 @@
 
 #include "usServiceEventListenerHook.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceEventListenerHook::~ServiceEventListenerHook()
 {
 }
 
-US_END_NAMESPACE
+}

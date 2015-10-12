@@ -36,7 +36,7 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 
 #include "usGlobalConfig.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServicesUtils
@@ -264,13 +264,13 @@ ExplicitlySharedDataPointer<T>::ExplicitlySharedDataPointer(T* adata)
 { if (d) ++d->ref; }
 
 template <class T>
-void swap(US_PREPEND_NAMESPACE(SharedDataPointer<T)>& p1, US_PREPEND_NAMESPACE(SharedDataPointer<T)>& p2)
+void swap(us::SharedDataPointer<T>& p1, us::SharedDataPointer<T>& p2)
 { p1.Swap(p2); }
 
 template <class T>
-void swap(US_PREPEND_NAMESPACE(ExplicitlySharedDataPointer<T)>& p1, US_PREPEND_NAMESPACE(ExplicitlySharedDataPointer<T)>& p2)
+void swap(us::ExplicitlySharedDataPointer<T>& p1, us::ExplicitlySharedDataPointer<T>& p2)
 { p1.Swap(p2); }
 
-US_END_NAMESPACE
+}
 
 #endif // USSHAREDDATA_H

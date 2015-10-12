@@ -48,7 +48,7 @@ limitations under the License.
 #error High precision timer support not available on this platform
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class HighPrecisionTimer
 {
@@ -82,6 +82,6 @@ private:
 // and logical bundle name (e.g. TestModuleA.dll/TestModuleA).
 Module* InstallTestBundle(ModuleContext* frameworkCtx, const std::string& bundleName);
 
-US_END_NAMESPACE
+}
 
 #endif  // USTESTUTILS_H

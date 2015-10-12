@@ -48,7 +48,7 @@
 #include <stdexcept>
 #include <algorithm>
 
-US_USE_NAMESPACE
+using namespace us;
 
 #if !defined (US_BUILD_SHARED_LIBS)
 static const std::string BUNDLE_PATH = US_RUNTIME_OUTPUT_DIRECTORY;

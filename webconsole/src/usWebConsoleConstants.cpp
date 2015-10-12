@@ -23,7 +23,7 @@
 
 #include "usHttpServlet.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 std::string WebConsoleConstants::SERVICE_NAME()
 {
@@ -84,4 +84,4 @@ std::string WebConsoleConstants::ATTR_LANG_MAP()
   return s;
 }
 
-US_END_NAMESPACE
+}

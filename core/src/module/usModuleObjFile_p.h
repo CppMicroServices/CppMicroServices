@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct InvalidObjFileException : public std::exception
 {
@@ -55,6 +55,6 @@ protected:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULEOBJFILE_P_H

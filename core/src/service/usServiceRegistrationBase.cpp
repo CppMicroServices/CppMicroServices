@@ -31,7 +31,7 @@
 
 #include <stdexcept>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceRegistrationBase::ServiceRegistrationBase()
   : d(0)
@@ -271,4 +271,4 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(const ServiceRegistr
   return *this;
 }
 
-US_END_NAMESPACE
+}

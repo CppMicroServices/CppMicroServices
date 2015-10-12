@@ -30,7 +30,7 @@
 class CivetServer;
 struct mg_connection;
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class HttpServletRequest;
 
@@ -58,6 +58,6 @@ struct HttpServletResponsePrivate : public SharedData
   std::string m_Charset;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPSERVLETRESPONSE_P_H

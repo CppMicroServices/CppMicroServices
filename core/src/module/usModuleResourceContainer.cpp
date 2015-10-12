@@ -34,7 +34,7 @@
 #include <climits>
 #include <cassert>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleResourceContainerPrivate
 {
@@ -226,4 +226,4 @@ bool ModuleResourceContainer::Matches(const std::string& name, const std::string
   return true;
 }
 
-US_END_NAMESPACE
+}

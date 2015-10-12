@@ -34,7 +34,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 #include "usModuleContext.h"
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 const int ServiceListeners::OBJECTCLASS_IX = 0;
 const int ServiceListeners::SERVICE_ID_IX = 1;
@@ -347,6 +347,6 @@ void ServiceListeners::AddToSet(ServiceListenerEntries& set,
   }
 }
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING

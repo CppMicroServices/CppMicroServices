@@ -22,10 +22,10 @@
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct TestModuleAL2_Dummy
 {
 };
 
-US_END_NAMESPACE
+}

@@ -28,7 +28,7 @@
 #include "usServiceRegistration.h"
 
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class Module;
 class ModuleContextPrivate;
@@ -744,6 +744,6 @@ private:
   ModuleContextPrivate * const d;
 };
 
-US_END_NAMESPACE
+}
 
 #endif /* USMODULECONTEXT_H_ */

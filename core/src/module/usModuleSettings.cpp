@@ -30,7 +30,7 @@
 #include <algorithm>
 #include <cctype>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 namespace {
 
@@ -172,4 +172,4 @@ void ModuleSettings::AddAutoLoadPath(const std::string& path)
   pimpl->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
 }
 
-US_END_NAMESPACE
+}

@@ -29,7 +29,7 @@
 
 #include "usThreads_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class CoreModuleContext;
 class ModulePrivate;
@@ -180,6 +180,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEREGISTRY_H

@@ -31,9 +31,9 @@
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
-US_USE_NAMESPACE
+using namespace us;
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct TestModuleH
 {
@@ -45,7 +45,7 @@ struct TestModuleH2
   virtual ~TestModuleH2() {}
 };
 
-US_END_NAMESPACE
+}
 
 
 void TestServiceFactoryModuleScope(ModuleContext* mc)

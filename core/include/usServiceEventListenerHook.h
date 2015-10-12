@@ -28,7 +28,7 @@
 #include "usShrinkableVector.h"
 #include "usShrinkableMap.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 class ServiceEvent;
@@ -66,6 +66,6 @@ struct US_Core_EXPORT ServiceEventListenerHook
   virtual void Event(const ServiceEvent& event, ShrinkableMapType& listeners) = 0;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEEVENTLISTENERHOOK_H

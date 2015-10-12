@@ -25,7 +25,7 @@
 #include "usHttpServiceExport.h"
 #include <usServiceInterface.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class HttpServletRequest;
 class HttpServletResponse;
@@ -138,6 +138,6 @@ private:
   HttpServletPrivate* d;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPSERVLET_H

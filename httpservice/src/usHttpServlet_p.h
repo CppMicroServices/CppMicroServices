@@ -24,13 +24,13 @@
 
 #include <usServletConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct HttpServletPrivate
 {
   ServletConfig m_Config;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USHTTPSERVLET_P_H

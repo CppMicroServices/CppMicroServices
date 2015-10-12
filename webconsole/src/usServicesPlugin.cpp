@@ -32,7 +32,7 @@
 
 #include <set>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 static std::string LABEL()
 {
@@ -202,4 +202,4 @@ std::string ServicesPlugin::GetInterface_JSON(const std::string& iid) const
   return json.str();
 }
 
-US_END_NAMESPACE
+}

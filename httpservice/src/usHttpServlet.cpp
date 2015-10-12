@@ -30,7 +30,7 @@
 #include <iostream>
 #include <functional>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class NoBodyOutputStreamBuffer : public HttpOutputStreamBuffer
 {
@@ -337,4 +337,4 @@ void HttpServlet::DoTrace(HttpServletRequest& request, HttpServletResponse& resp
   return;
 }
 
-US_END_NAMESPACE
+}

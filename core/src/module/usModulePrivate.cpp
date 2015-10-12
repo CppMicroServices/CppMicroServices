@@ -38,7 +38,7 @@
 #include <cassert>
 #include <cstring>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
                              ModuleInfo* info)
@@ -168,4 +168,4 @@ void ModulePrivate::RemoveModuleResources()
   }
 }
 
-US_END_NAMESPACE
+}

@@ -25,7 +25,7 @@
 
 #include <usModuleActivator.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class TestDriverActivator : public ModuleActivator
 {
@@ -45,6 +45,6 @@ private:
   bool m_LoadCalled;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USTESTDRIVERACTIVATOR_H

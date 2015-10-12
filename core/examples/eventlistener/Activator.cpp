@@ -26,7 +26,7 @@
 #include <usModuleContext.h>
 #include <usServiceEvent.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

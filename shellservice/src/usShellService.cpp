@@ -42,7 +42,7 @@
 
 #include <malloc.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 #define sc_int(sc, ival) (sc->vptr->mk_integer(sc, ival))
 #define sc_string(sc, sval) (sc->vptr->mk_string(sc, sval))
@@ -271,7 +271,7 @@ pointer us_module_stop(scheme* sc, pointer args)
 
 }
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ShellService::Impl
 {
@@ -429,4 +429,4 @@ void ShellService::LoadSchemeResource(const ModuleResource& res)
   delete[] resBuf;
 }
 
-US_END_NAMESPACE
+}

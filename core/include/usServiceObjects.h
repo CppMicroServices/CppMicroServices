@@ -30,7 +30,7 @@
 #include <usServiceReference.h>
 #include <usServiceProperties.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServiceObjectsBasePrivate;
 
@@ -255,6 +255,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVICEOBJECTS_H

@@ -34,7 +34,7 @@
 #include "usServletContext.h"
 #include "usWebConsoleDefaultVariableResolver.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct AbstractWebConsolePluginPrivate
 {
@@ -292,4 +292,4 @@ bool AbstractWebConsolePlugin::SpoolResource(HttpServletRequest& request, HttpSe
   return true;
 }
 
-US_END_NAMESPACE
+}

@@ -27,7 +27,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServletContext;
 struct ServletConfigPrivate;
@@ -83,6 +83,6 @@ private:
   ExplicitlySharedDataPointer<ServletConfigPrivate> d;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVLETCONFIG_H

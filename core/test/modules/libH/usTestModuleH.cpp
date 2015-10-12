@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct TestModuleH
 {
@@ -136,6 +136,6 @@ public:
 };
 
 
-US_END_NAMESPACE
+}
 
 US_EXPORT_MODULE_ACTIVATOR(us::TestModuleHActivator)

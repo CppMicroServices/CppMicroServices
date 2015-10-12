@@ -26,7 +26,7 @@
 #include <usServiceTrackerCustomizer.h>
 #include <usFooService.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ActivatorSL3 :
     public ModuleActivator, public ModulePropsInterface,
@@ -95,6 +95,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
-US_EXPORT_MODULE_ACTIVATOR(US_PREPEND_NAMESPACE(ActivatorSL3))
+US_EXPORT_MODULE_ACTIVATOR(us::ActivatorSL3)

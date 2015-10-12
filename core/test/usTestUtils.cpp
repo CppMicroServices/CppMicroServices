@@ -26,7 +26,7 @@ limitations under the License.
 
 #include <usGlobalConfig.h>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 #if defined(US_PLATFORM_APPLE)
 
@@ -139,4 +139,4 @@ Module* InstallTestBundle(ModuleContext* frameworkCtx, const std::string& bundle
     return module;
 }
 
-US_END_NAMESPACE
+}

@@ -22,7 +22,7 @@
 
 #include "usAny.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 std::string any_value_to_string(const Any& any)
 {
@@ -44,4 +44,4 @@ std::string any_value_to_json(bool val)
   return val ? "true" : "false";
 }
 
-US_END_NAMESPACE
+}

@@ -28,7 +28,7 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModulePrivate;
 class ServiceRegistrationBasePrivate;
@@ -205,18 +205,18 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING
 
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ServiceRegistrationBase))
-  return std::hash<US_PREPEND_NAMESPACE(ServiceRegistrationBasePrivate)*>()(arg.d);
+US_HASH_FUNCTION_BEGIN(us::ServiceRegistrationBase)
+  return std::hash<us::ServiceRegistrationBasePrivate*>()(arg.d);
 US_HASH_FUNCTION_END
 
 
-inline std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ServiceRegistrationBase)& /*reg*/)
+inline std::ostream& operator<<(std::ostream& os, const us::ServiceRegistrationBase& /*reg*/)
 {
-  return os << "US_PREPEND_NAMESPACE(ServiceRegistrationBase) object";
+  return os << "us::ServiceRegistrationBase object";
 }
 
 #endif // USSERVICEREGISTRATIONBASE_H

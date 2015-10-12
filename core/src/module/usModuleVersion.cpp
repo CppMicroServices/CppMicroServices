@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <cctype>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 const char ModuleVersion::SEPARATOR = '.';
 
@@ -266,9 +266,9 @@ int ModuleVersion::Compare(const ModuleVersion& other) const
   return 1;
 }
 
-US_END_NAMESPACE
+}
 
-US_USE_NAMESPACE
+using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const ModuleVersion& v)
 {

@@ -23,7 +23,7 @@
 #include "usServiceListenerHook.h"
 #include "usServiceListenerHook_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceListenerHook::~ServiceListenerHook()
 {
@@ -94,4 +94,4 @@ bool ServiceListenerHook::ListenerInfo::operator==(const ListenerInfo& other) co
   return d == other.d;
 }
 
-US_END_NAMESPACE
+}

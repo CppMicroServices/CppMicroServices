@@ -27,12 +27,12 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleActivator;
 class ModuleContext;
 
-US_END_NAMESPACE
+}
 
 /**
  * \ingroup MicroServices
@@ -52,8 +52,8 @@ US_END_NAMESPACE
  * \sa \ref MicroServices_StaticModules
  */
 #define US_INITIALIZE_STATIC_MODULE(_module_name)                          \
-  extern "C" US_PREPEND_NAMESPACE(ModuleContext)* _us_get_bundle_context_instance_ ## _module_name (); \
-  extern "C" US_PREPEND_NAMESPACE(ModuleContext)* _us_set_bundle_context_instance_ ## _module_name (); \
+  extern "C" us::ModuleContext* _us_get_bundle_context_instance_ ## _module_name (); \
+  extern "C" us::ModuleContext* _us_set_bundle_context_instance_ ## _module_name (); \
   void _dummy_reference_to_ ## _module_name ## _bundle_context()           \
   {                                                                        \
     _us_get_bundle_context_instance_ ## _module_name();                    \
@@ -84,7 +84,7 @@ US_END_NAMESPACE
  */
 #define US_IMPORT_MODULE(_module_name)                                     \
   US_INITIALIZE_STATIC_MODULE(_module_name)                                \
-  extern "C" US_PREPEND_NAMESPACE(ModuleActivator)* _us_module_activator_instance_ ## _module_name (); \
+  extern "C" us::ModuleActivator* _us_module_activator_instance_ ## _module_name (); \
   void _dummy_reference_to_ ## _module_name ## _activator()                \
   {                                                                        \
     _us_module_activator_instance_ ## _module_name();                      \

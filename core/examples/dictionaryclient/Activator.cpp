@@ -28,7 +28,7 @@
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-US_USE_NAMESPACE
+using namespace us;
 
 namespace {
 

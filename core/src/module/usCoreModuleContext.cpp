@@ -27,7 +27,7 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include "usCoreModuleContext_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 CoreModuleContext::CoreModuleContext()
   : listeners(this)
@@ -53,4 +53,4 @@ void CoreModuleContext::Uninit()
   serviceHooks.Close();
 }
 
-US_END_NAMESPACE
+}

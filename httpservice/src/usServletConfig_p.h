@@ -24,7 +24,7 @@
 
 #include "usSharedData.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServletContext;
 
@@ -38,6 +38,6 @@ struct ServletConfigPrivate : public SharedData
   ServletContext* m_Context;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVLETCONFIG_P_H

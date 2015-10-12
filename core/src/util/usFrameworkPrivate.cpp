@@ -25,7 +25,7 @@ limitations under the License.
 #include "usCoreModuleContext_p.h"
 #include "usThreads_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 FrameworkPrivate::FrameworkPrivate(void) :
     coreModuleContext(),
@@ -46,4 +46,4 @@ FrameworkPrivate::~FrameworkPrivate()
   initialized = false;
 }
 
-US_END_NAMESPACE
+}

@@ -27,7 +27,7 @@
 
 #include <streambuf>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResourceBufferPrivate;
 
@@ -63,6 +63,6 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USMODULERESOURCEBUFFER_P_H

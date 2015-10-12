@@ -31,7 +31,7 @@
 #include "usServiceTrackerCustomizer.h"
 #include "usLDAPFilter.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 template<class S, class T> class TrackedService;
 template<class S, class T> class ServiceTrackerPrivate;
@@ -593,7 +593,7 @@ private:
   _ServiceTrackerPrivate* const d;
 };
 
-US_END_NAMESPACE
+}
 
 #include "usServiceTracker.tpp"
 

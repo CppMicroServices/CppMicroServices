@@ -22,10 +22,10 @@
 
 #include "usModuleFindHook.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ModuleFindHook::~ModuleFindHook()
 {
 }
 
-US_END_NAMESPACE
+}

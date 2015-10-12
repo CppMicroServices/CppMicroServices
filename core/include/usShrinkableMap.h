@@ -27,7 +27,7 @@
 
 #include <map>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServicesUtils
@@ -177,6 +177,6 @@ private:
 template<class Key, class T>
 std::map<Key,T> ShrinkableMap<Key,T>::emptyContainer;
 
-US_END_NAMESPACE
+}
 
 #endif // USSHRINKABLEMAP_H

@@ -23,7 +23,7 @@
 
 #include <cstring>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 InvalidObjFileException::InvalidObjFileException(const std::string& what, int errorNumber)
   : m_What(what)
@@ -51,4 +51,4 @@ bool ModuleObjFile::ExtractModuleName(const std::string& name, std::string& out)
   return false;
 }
 
-US_END_NAMESPACE
+}

@@ -23,7 +23,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 std::string HttpConstants::HTTP_SERVICE_ENDPOINT_ATTRIBUTE()
 {
@@ -73,4 +73,4 @@ std::string HttpConstants::HTTP_WHITEBOARD_TARGET()
   return s;
 }
 
-US_END_NAMESPACE
+}

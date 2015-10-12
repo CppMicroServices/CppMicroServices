@@ -31,7 +31,7 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleResourcePrivate;
 class ModuleResourceContainer;
@@ -295,16 +295,16 @@ private:
 
 };
 
-US_END_NAMESPACE
+}
 
 US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const US_PREPEND_NAMESPACE(ModuleResource)& resource);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::ModuleResource& resource);
 
-US_HASH_FUNCTION_BEGIN(US_PREPEND_NAMESPACE(ModuleResource))
+US_HASH_FUNCTION_BEGIN(us::ModuleResource)
   return arg.Hash();
 US_HASH_FUNCTION_END
 

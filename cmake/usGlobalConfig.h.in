@@ -33,28 +33,6 @@
 #define US_VERSION_STR "@CppMicroServices_VERSION@"
 
 //-------------------------------------------------------------------
-// Namespace customization
-//-------------------------------------------------------------------
-
-#define US_NAMESPACE @US_NAMESPACE@
-
-#ifndef US_NAMESPACE /* user namespace */
-
-  # define US_PREPEND_NAMESPACE(name) ::name
-  # define US_USE_NAMESPACE
-  # define US_BEGIN_NAMESPACE
-  # define US_END_NAMESPACE
-
-#else /* user namespace */
-
-  # define US_PREPEND_NAMESPACE(name) ::US_NAMESPACE::name
-  # define US_USE_NAMESPACE using namespace ::US_NAMESPACE;
-  # define US_BEGIN_NAMESPACE namespace US_NAMESPACE {
-  # define US_END_NAMESPACE }
-
-#endif /* user namespace */
-
-//-------------------------------------------------------------------
 // Platform defines
 //-------------------------------------------------------------------
 

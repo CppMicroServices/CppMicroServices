@@ -26,7 +26,7 @@
 
 #include "usUtils_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 TestModuleListener::TestModuleListener()
   : serviceEvents(), moduleEvents()
@@ -160,4 +160,4 @@ bool TestModuleListener::CheckListenerEvents(
   return CheckListenerEvents(seEvts);
 }
 
-US_END_NAMESPACE
+}

@@ -33,7 +33,7 @@
 // Bundle name and location parsing
 //-------------------------------------------------------------------
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 std::string GetBundleNameFromLocation(const std::string& location);
 
@@ -41,29 +41,29 @@ std::string GetBundleLocation(const std::string& location);
 
 bool IsSharedLibrary(const std::string& location);
 
-US_END_NAMESPACE
+}
 
 //-------------------------------------------------------------------
 // Module auto-loading
 //-------------------------------------------------------------------
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ModuleInfo;
 class CoreModuleContext;
 
 std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModuleContext* coreCtx);
 
-US_END_NAMESPACE
+}
 
 //-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 US_Core_EXPORT std::string GetLastErrorStr();
 
-US_END_NAMESPACE
+}
 
 #endif // USUTILS_H

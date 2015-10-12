@@ -32,7 +32,7 @@
 
 #include "usAny.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * \ingroup MicroServices
@@ -135,6 +135,6 @@ US_Core_EXPORT const std::string& SCOPE_PROTOTYPE(); // = "prototype"
 
 }
 
-US_END_NAMESPACE
+}
 
 #endif // US_SERVICE_PROPERTIES_H

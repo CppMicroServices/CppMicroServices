@@ -26,7 +26,7 @@
 
 #include <stdexcept>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 namespace {
 
@@ -152,4 +152,4 @@ void ModuleManifest::SetValue(const std::string& key, const Any& value)
   m_Properties[key] = value;
 }
 
-US_END_NAMESPACE
+}

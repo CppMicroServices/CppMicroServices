@@ -31,7 +31,7 @@
 #include "usModuleRegistry_p.h"
 #include "usModuleSettings.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 /**
  * This class is not part of the public API.
@@ -91,6 +91,6 @@ public:
 
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USCOREMODULECONTEXT_H

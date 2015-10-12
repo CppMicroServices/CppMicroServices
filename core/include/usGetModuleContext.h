@@ -33,7 +33,7 @@
 
 #include <cstring>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ModuleContext;
 
@@ -71,6 +71,6 @@ static inline ModuleContext* GetModuleContext()
   return 0;
 }
 
-US_END_NAMESPACE
+}
 
 #endif // USGETMODULECONTEXT_H

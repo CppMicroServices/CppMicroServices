@@ -27,7 +27,7 @@
 #pragma warning(disable:4355)
 #endif
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
   ModulePrivate* module, const InterfaceMap& service,
@@ -70,7 +70,7 @@ void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId)
   return NULL;
 }
 
-US_END_NAMESPACE
+}
 
 #ifdef _MSC_VER
 #pragma warning(pop)

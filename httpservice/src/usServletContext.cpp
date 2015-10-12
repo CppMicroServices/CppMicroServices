@@ -23,7 +23,7 @@
 #include "usServletContainer.h"
 #include "usServletContainer_p.h"
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 ServletContext::ServletContext(ServletContainer* container)
   : m_Container(container)
@@ -45,4 +45,4 @@ std::string ServletContext::GetMimeType(const std::string& file) const
   return m_Container->d->GetMimeType(this, file);
 }
 
-US_END_NAMESPACE
+}

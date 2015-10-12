@@ -28,7 +28,7 @@
 #include <set>
 #include <atomic>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServiceObjectsBasePrivate
 {
@@ -210,4 +210,4 @@ ServiceObjects<void>::ServiceObjects(ModuleContext* context, const ServiceRefere
   : ServiceObjectsBase(context, reference)
 {}
 
-US_END_NAMESPACE
+}

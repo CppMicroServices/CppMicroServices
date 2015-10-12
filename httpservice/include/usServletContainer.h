@@ -26,7 +26,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 struct ServletContainerPrivate;
 class ServletContext;
@@ -53,6 +53,6 @@ private:
   ServletContainerPrivate* d;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVLETCONTAINER_H

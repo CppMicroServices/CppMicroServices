@@ -27,7 +27,7 @@
 
 #include <string>
 
-US_BEGIN_NAMESPACE
+namespace us {
 
 class ServletContainer;
 
@@ -49,6 +49,6 @@ private:
   ServletContainer* m_Container;
 };
 
-US_END_NAMESPACE
+}
 
 #endif // USSERVLETCONTEXT_H

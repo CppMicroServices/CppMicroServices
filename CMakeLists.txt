@@ -83,7 +83,7 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
-# Update CMake bundle path
+# Update CMake module path
 #------------------------------------------------------------------------------
 
 set(US_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)

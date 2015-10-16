@@ -1,9 +1,9 @@
 include(${CMAKE_CURRENT_LIST_DIR}/CMakeLists_example.txt)
 
-set_target_properties(mymodule PROPERTIES
+set_target_properties(mybundle PROPERTIES
   LABELS Documentation
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/snippets"
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/snippets"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/snippets"
-  OUTPUT_NAME Snippet-mymodule
+  OUTPUT_NAME Snippet-mybundle
 )

@@ -26,8 +26,8 @@
 
 #include "usTestingMacros.h"
 #include <usServiceInterface.h>
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
 
 #include <stdexcept>
 
@@ -45,13 +45,13 @@ void TestServiceInterfaceId()
   US_TEST_CONDITION(us_service_interface_iid<ITestServiceA>() == "ITestServiceA", "Service interface id ITestServiceA")
 }
 
-void TestMultipleServiceRegistrations(ModuleContext* mc)
+void TestMultipleServiceRegistrations(BundleContext* mc)
 {
   struct TestServiceA : public ITestServiceA
   {
   };
 
-  ModuleContext* context = mc;
+  BundleContext* context = mc;
 
   TestServiceA s1;
   TestServiceA s2;
@@ -74,13 +74,13 @@ void TestMultipleServiceRegistrations(ModuleContext* mc)
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
-void TestServicePropertiesUpdate(ModuleContext* mc)
+void TestServicePropertiesUpdate(BundleContext* mc)
 {
   struct TestServiceA : public ITestServiceA
   {
   };
 
-  ModuleContext* context = mc;
+  BundleContext* context = mc;
 
   TestServiceA s1;
   ServiceProperties props;
@@ -139,7 +139,7 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
-  ModuleContext* mc = framework->GetModuleContext();
+  BundleContext* mc = framework->GetBundleContext();
 
   TestServiceInterfaceId();
   TestMultipleServiceRegistrations(mc);

@@ -5,46 +5,46 @@ The CppMicroServices library implements the Service Hook Service Specification V
 OSGi Core Release 5 for C++. Below is a summary of the concept - consult the OSGi specifications
 for more details.
 
-Service hooks provide mechanisms for module writers to closely interact with the CppMicroServices
-service registry. These mechanisms are not intended for use by application modules but rather
-by modules in need of *hooking* into the service registry and modifying the behaviour of
-application modules.
+Service hooks provide mechanisms for bundle writers to closely interact with the CppMicroServices
+service registry. These mechanisms are not intended for use by application bundles but rather
+by bundles in need of *hooking* into the service registry and modifying the behaviour of
+application bundles.
 
 Specific use case for service hooks include proxying of existing services by hiding the original
 service and registering a *proxy service* with the same properties or providing services
-*on demand* based on registered service listeners from external modules.
+*on demand* based on registered service listeners from external bundles.
 
 ## Event Listener Hook
 
-A module can intercept events being delivered to other modules by registering a ServiceEventListenerHook
+A bundle can intercept events being delivered to other bundles by registering a ServiceEventListenerHook
 object as a service. The CppMicroServices library will send all service events to all the registered
 hooks using the reversed ordering of their ServiceReference objects. Note that event listener hooks
 are called *after* the event was created but *before* it is filtered by the optional filter expression
 of the service listeners. Hence an event listener hook receives all \link ServiceEvent::REGISTERED
 REGISTERED\endlink, \link ServiceEvent::MODIFIED MODIFIED\endlink, \link ServiceEvent::UNREGISTERING
 UNREGISTERING\endlink, and \link ServiceEvent::MODIFIED_ENDMATCH MODIFIED_ENDMATCH\endlink events
-regardelss of the presence of a service listener filter. It may then remove modules or specific
+regardelss of the presence of a service listener filter. It may then remove bundles or specific
 service listeners from the ServiceEventListenerHook::ShrinkableMapType object passed to the
 ServiceEventListenerHook::Event method to hide
 service events.
 
-Implementers of the Event Listener Hook must ensure that modules continue to see a consistent set of
+Implementers of the Event Listener Hook must ensure that bundles continue to see a consistent set of
 service events.
 
 ## Find Hook
 
-Find Hook objects registered using the ServiceFindHook interface will be called when modules look up
-service references via the ModuleContext::GetServiceReference or ModuleContext::GetServiceReferences
+Find Hook objects registered using the ServiceFindHook interface will be called when bundles look up
+service references via the BundleContext::GetServiceReference or BundleContext::GetServiceReferences
 methods. The order in which the CppMicroServices library calls the find hooks is the reverse `operator<`
 ordering of their ServiceReference objects. The hooks may remove service references from the
-ShrinkableVector object passed to the ServiceFindHook::Find method to hide services from specific modules.
+ShrinkableVector object passed to the ServiceFindHook::Find method to hide services from specific bundles.
 
 ## Listener Hook
 
 The CppMicroServices API provides information about the registration, unregistration, and modification
-of services. However, it does not directly allow the introspection of modules to get information about
-what services a module is waiting for. Waiting for a service to arrive (via a registered service listener)
-before performing its function is a common pattern for modules. Listener Hooks provide a mechanism to
+of services. However, it does not directly allow the introspection of bundles to get information about
+what services a bundle is waiting for. Waiting for a service to arrive (via a registered service listener)
+before performing its function is a common pattern for bundles. Listener Hooks provide a mechanism to
 get informed about all existing, newly registerd, and removed service listeners.
 
 A Listener Hook object registered using the ServiceListenerHook interface will be notified about service
@@ -68,7 +68,7 @@ corresponding added events and ignore added events where the ListenerInfo object
 ### Ordinary Services
 
 All service hooks are treated as ordinary services. If the CppMicroServices library uses them, their
-Service References will show that the CppMicroServices modules is using them, and if a hook is a
+Service References will show that the CppMicroServices bundles is using them, and if a hook is a
 Service Factory, then the actual instance will be properly created.
 
 The only speciality of the service hooks is that the CppMicroServices library does not use them for
@@ -78,10 +78,9 @@ services from the CppMicroServices library.
 ### Ordering
 
 The hooks are very sensitive to ordering because they interact directly with the service registry.
-In general, implementers of the hooks must be aware that other modules can be loaded before or after
-the module which provides the hooks. To ensure early registration of the hooks, they should be registered
-within the ModuleActivator::Load method of the program executable or a module being auto-loaded with
-the executable.
+In general, implementers of the hooks must be aware that other bundles can be started before or after
+the bundle which provides the hooks. To ensure early registration of the hooks, they should be registered
+within the BundleActivator::Start method of the program executable.
 
 ### Multi Threading
 

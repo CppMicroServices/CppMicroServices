@@ -24,11 +24,11 @@
 #include "usHttpServletRequest.h"
 #include "usHttpServletResponse.h"
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModule.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include "usGetBundleContext.h"
+#include "usBundleContext.h"
+#include "usBundle.h"
+#include "usBundleResource.h"
+#include "usBundleResourceStream.h"
 
 namespace us {
 
@@ -65,18 +65,18 @@ void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& res
 {
   if (m_TemplateRS == NULL)
   {
-    ModuleResource res = GetModuleContext()->GetModule()->GetResource("/templates/settings.html");
-    m_TemplateRS = new ModuleResourceStream(res, std::ios_base::binary);
+    BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/settings.html");
+    m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
   }
   m_TemplateRS->seekg(0, std::ios_base::beg);
   response.GetOutputStream() << m_TemplateRS->rdbuf();
 }
 
-ModuleResource SettingsPlugin::GetResource(const std::string& path) const
+BundleResource SettingsPlugin::GetResource(const std::string& path) const
 {
   return (this->GetContext() != NULL) ?
-        this->GetContext()->GetModule()->GetResource(path) :
-        ModuleResource();
+        this->GetContext()->GetBundle()->GetResource(path) :
+        BundleResource();
 }
 
 /*
@@ -86,13 +86,13 @@ cpptempl::data_map& SettingsPlugin::getData()
   m_Data["mitk-version"] = cpptempl::make_data(MITK_VERSION_STRING);
   m_Data["mitk-githash"] = cpptempl::make_data(MITK_REVISION);
 
-  m_Data["us-thread"] = cpptempl::make_data(us::ModuleSettings::IsThreadingSupportEnabled() ? "true" : "false");
-  m_Data["us-autoload"] = cpptempl::make_data(us::ModuleSettings::IsAutoLoadingEnabled() ? "true" : "false");
-  m_Data["us-storagepath"] = cpptempl::make_data(us::ModuleSettings::GetStoragePath());
+  m_Data["us-thread"] = cpptempl::make_data(us::BundleSettings::IsThreadingSupportEnabled() ? "true" : "false");
+  m_Data["us-autoload"] = cpptempl::make_data(us::BundleSettings::IsAutoLoadingEnabled() ? "true" : "false");
+  m_Data["us-storagepath"] = cpptempl::make_data(us::BundleSettings::GetStoragePath());
 
   cpptempl::data_list autoLoadPaths;
-  us::ModuleSettings::PathList pathList = us::ModuleSettings::GetAutoLoadPaths();
-  for (us::ModuleSettings::PathList::iterator iter = pathList.begin(),
+  us::BundleSettings::PathList pathList = us::BundleSettings::GetAutoLoadPaths();
+  for (us::BundleSettings::PathList::iterator iter = pathList.begin(),
        endIter = pathList.end(); iter != endIter; ++iter)
   {
     autoLoadPaths.push_back(cpptempl::make_data(*iter));

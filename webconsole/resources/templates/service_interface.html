@@ -1,10 +1,10 @@
 <table class="tight striped sortable" cellspacing="0" celpadding="0">
 <thead><tr>
-  <th>Module</th><th>Id</th><th>Ranking</th><th>Scope</th><th>Classes</th><th>Properties</th>
+  <th>Bundle</th><th>Id</th><th>Ranking</th><th>Scope</th><th>Classes</th><th>Properties</th>
 </tr></thead>
 <tbody class="template">
 <tr>
-<td class="module-name"><a href="${appRoot}/modules/id/"></a></td>
+<td class="bundle-name"><a href="${appRoot}/bundles/id/"></a></td>
 <td class="service-id"></td>
 <td class="service-ranking"></td>
 <td class="service-scope"></td>
@@ -35,7 +35,7 @@ request.done(function(data) {
   var directive = {
     'tr':{
       'service<-services':{
-        'td.module-name':'service.module',
+        'td.bundle-name':'service.bundle',
         'td.service-id':'service.id',
         'td.service-ranking':'service.ranking',
         'td.service-scope':'service.scope',

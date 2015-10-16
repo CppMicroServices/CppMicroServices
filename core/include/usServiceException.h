@@ -75,7 +75,7 @@ public:
     REMOTE = 5,
     /**
      * The service factory resulted in a recursive call to itself for the
-     * requesting module.
+     * requesting bundle.
      */
     FACTORY_RECURSION = 6
   };

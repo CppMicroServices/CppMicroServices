@@ -30,7 +30,7 @@
 
 namespace us {
 
-class ModuleContext;
+class BundleContext;
 class ServiceEvent;
 
 /**
@@ -39,26 +39,26 @@ class ServiceEvent;
  * Service Event Listener Hook Service.
  *
  * <p>
- * Modules registering this service will be called during service
+ * Bundles registering this service will be called during service
  * (register, modify, and unregister service) operations.
  *
  * @remarks Implementations of this interface are required to be thread-safe.
  */
 struct US_Core_EXPORT ServiceEventListenerHook
 {
-  typedef ShrinkableMap<ModuleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > ShrinkableMapType;
+  typedef ShrinkableMap<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > ShrinkableMapType;
 
   virtual ~ServiceEventListenerHook();
 
   /**
    * Event listener hook method. This method is called prior to service event
-   * delivery when a publishing module registers, modifies or unregisters a
+   * delivery when a publishing bundle registers, modifies or unregisters a
    * service. This method can filter the listeners which receive the event.
    *
    * @param event The service event to be delivered.
-   * @param listeners A map of Module Contexts to a list of Listener
-   *        Infos for the module's listeners to which the specified event will
-   *        be delivered. The implementation of this method may remove module
+   * @param listeners A map of Bundle Contexts to a list of Listener
+   *        Infos for the bundle's listeners to which the specified event will
+   *        be delivered. The implementation of this method may remove bundle
    *        contexts from the map and listener infos from the list
    *        values to prevent the event from being delivered to the associated
    *        listeners.

@@ -279,7 +279,7 @@ Interface* ExtractInterface(const InterfaceMap& map)
  * @ingroup MicroServices
  *
  * Cast the argument to a \c ServiceFactory pointer. Useful when calling
- * \c ModuleContext::RegisterService with a service factory, for example:
+ * \c BundleContext::RegisterService with a service factory, for example:
  *
  * \code
  * MyServiceFactory* factory;
@@ -289,7 +289,7 @@ Interface* ExtractInterface(const InterfaceMap& map)
  * @param factory The service factory. May be a pointer or reference type.
  * @return A \c ServiceFactory pointer to the passed \c factory instance.
  *
- * @see ModuleContext::RegisterService(ServiceFactory* factory, const ServiceProperties& properties)
+ * @see BundleContext::RegisterService(ServiceFactory* factory, const ServiceProperties& properties)
  */
 template<class T>
 ServiceFactory* ToFactory(

@@ -38,11 +38,11 @@
 
 namespace us {
 
-class CoreModuleContext;
-class ModuleContext;
+class CoreBundleContext;
+class BundleContext;
 
 /**
- * Here we handle all listeners that modules have registered.
+ * Here we handle all listeners that bundles have registered.
  *
  */
 class ServiceListeners : private MultiThreaded<>
@@ -50,10 +50,10 @@ class ServiceListeners : private MultiThreaded<>
 
 public:
 
-  typedef std::unordered_map<ModuleContext*, std::list<std::pair<ModuleListener,void*> > > ModuleListenerMap;
+  typedef std::unordered_map<BundleContext*, std::list<std::pair<BundleListener,void*> > > BundleListenerMap;
   struct : public MultiThreaded<> {
-    ModuleListenerMap value;
-  } moduleListenerMap;
+    BundleListenerMap value;
+  } bundleListenerMap;
 
   typedef std::unordered_map<std::string, std::list<ServiceListenerEntry> > CacheType;
   typedef std::unordered_set<ServiceListenerEntry> ServiceListenerEntries;
@@ -72,24 +72,24 @@ private:
 
   ServiceListenerEntries serviceSet;
 
-  CoreModuleContext* coreCtx;
+  CoreBundleContext* coreCtx;
 
 public:
 
-  ServiceListeners(CoreModuleContext* coreCtx);
+  ServiceListeners(CoreBundleContext* coreCtx);
 
   /**
    * Add a new service listener. If an old one exists, and it has the
-   * same owning module, the old listener is removed first.
+   * same owning bundle, the old listener is removed first.
    *
-   * @param mc The module context adding this listener.
+   * @param mc The bundle context adding this listener.
    * @param listener The service listener to add.
    * @param data Additional data to distinguish ServiceListener objects.
    * @param filter An LDAP filter string to check when a service is modified.
    * @exception org.osgi.framework.InvalidSyntaxException
    * If the filter is not a correct LDAP expression.
    */
-  void AddServiceListener(ModuleContext* mc, const ServiceListener& listener,
+  void AddServiceListener(BundleContext* mc, const ServiceListener& listener,
                           void* data, const std::string& filter);
 
   /**
@@ -97,47 +97,47 @@ public:
    * if listener doesn't exist. If listener is registered more than
    * once remove all instances.
    *
-   * @param mc The module context who wants to remove listener.
+   * @param mc The bundle context who wants to remove listener.
    * @param listener Object to remove.
    * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(ModuleContext* mc, const ServiceListener& listener,
+  void RemoveServiceListener(BundleContext* mc, const ServiceListener& listener,
                              void* data);
 
   /**
-   * Add a new module listener.
+   * Add a new bundle listener.
    *
-   * @param mc The module context adding this listener.
-   * @param listener The module listener to add.
-   * @param data Additional data to distinguish ModuleListener objects.
+   * @param mc The bundle context adding this listener.
+   * @param listener The bundle listener to add.
+   * @param data Additional data to distinguish BundleListener objects.
    */
-  void AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data);
+  void AddBundleListener(BundleContext* mc, const BundleListener& listener, void* data);
 
   /**
-   * Remove module listener from current framework. Silently ignore
+   * Remove bundle listener from current framework. Silently ignore
    * if listener doesn't exist.
    *
-   * @param mc The module context who wants to remove listener.
+   * @param mc The bundle context who wants to remove listener.
    * @param listener Object to remove.
-   * @param data Additional data to distinguish ModuleListener objects.
+   * @param data Additional data to distinguish BundleListener objects.
    */
-  void RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data);
+  void RemoveBundleListener(BundleContext* mc, const BundleListener& listener, void* data);
 
-  void ModuleChanged(const ModuleEvent& evt);
-
-  /**
-   * Remove all listener registered by a module in the current framework.
-   *
-   * @param mc Module context which listeners we want to remove.
-   */
-  void RemoveAllListeners(ModuleContext* mc);
+  void BundleChanged(const BundleEvent& evt);
 
   /**
-   * Notify hooks that a module is about to be stopped
+   * Remove all listener registered by a bundle in the current framework.
    *
-   * @param mc Module context which listeners are about to be removed.
+   * @param mc Bundle context which listeners we want to remove.
    */
-  void HooksModuleStopped(ModuleContext* mc);
+  void RemoveAllListeners(BundleContext* mc);
+
+  /**
+   * Notify hooks that a bundle is about to be stopped
+   *
+   * @param mc Bundle context which listeners are about to be removed.
+   */
+  void HooksBundleStopped(BundleContext* mc);
 
   /**
    * Receive notification that a service has had a change occur in its lifecycle.

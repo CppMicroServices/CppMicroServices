@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 #include <usUtils_p.h>
-#include <usModuleActivator.h>
+#include <usBundleActivator.h>
 
 
 #if defined(US_PLATFORM_POSIX)

@@ -1,7 +1,7 @@
-Example 4 - Robust Dictionary Client Module   {#MicroServices_Example4}
+Example 4 - Robust Dictionary Client Bundle   {#MicroServices_Example4}
 ===========================================
 
-In \ref MicroServices_Example3 "Example 3", we create a simple client module
+In \ref MicroServices_Example3 "Example 3", we create a simple client bundle
 for our dictionary service. The problem with that client was that it did not
 monitor the dynamic availability of the dictionary service, thus an error
 would occur if the dictionary service disappeared while the client was using it.
@@ -11,28 +11,28 @@ client.
 
 The functionality of the new dictionary client is essentially the same as the
 old client, it reads words from standard input and checks for their existence
-in the dictionary service. Our module uses its module context to register itself
-as a service event listener; monitoring service events allows the module to
+in the dictionary service. Our bundle uses its bundle context to register itself
+as a service event listener; monitoring service events allows the bundle to
 monitor the dynamic availability of the dictionary service. Our client uses the
-first dictionary service it finds. The source code for our module is as follows
+first dictionary service it finds. The source code for our bundle is as follows
 in a file called `Activator.cpp`:
 
 \snippet dictionaryclient2/Activator.cpp Activator
 
 The client listens for service events indicating the arrival or departure of
-dictionary services. If a new dictionary service arrives, the module will start
+dictionary services. If a new dictionary service arrives, the bundle will start
 using that service if and only if it currently does not have a dictionary service.
-If an existing dictionary service disappears, the module will check to see if the
+If an existing dictionary service disappears, the bundle will check to see if the
 disappearing service is the one it is using; if it is it stops using it and tries
 to query for another dictionary service, otherwise it ignores the event.
 
-As in Example 3, we must link our module to the `dictionaryservice` module:
+As in Example 3, we must link our bundle to the `dictionaryservice` bundle:
 
 \include dictionaryclient2/CMakeLists.txt
 
-After running the `usCoreExamplesDriver` executable, and loading the event
-listener module, we can use the `l dictionaryclient2` command to load
-our robust dictionary client module:
+After running the `usCoreExamplesDriver` executable, and starting the event
+listener bundle, we can use the `l dictionaryclient2` command to start
+our robust dictionary client bundle:
 
 \verbatim
 CppMicroServices-debug> bin/usCoreExamplesDriver
@@ -44,12 +44,12 @@ Enter a blank line to exit.
 Enter word:
 \endverbatim
 
-The above command loads the module and its dependencies (the `dictionaryservice`
-module) in a single step. When we load the module, it will use the main thread to
+The above command loads the bundle and its dependencies (the `dictionaryservice`
+bundle) in a single step. When we load the bundle, it will use the main thread to
 prompt us for words. Enter one word at a time to check the words and enter a
-blank line to stop checking words. To reload the module, we must use the `s`
-command to get the module identifier number for the module and first use the
-`u <id>` command to unload the module, then the `l <id>` command to re-load it.
+blank line to stop checking words. To reload the bundle, we must use the `s`
+command to get the bundle identifier number for the bundle and first use the
+`u <id>` command to unload the bundle, then the `l <id>` command to re-load it.
 To test the dictionary service, enter any of the words in the dictionary
 (e.g., "welcome", "to", "the", "micro", "services", "tutorial") or any word not
 in the dictionary.

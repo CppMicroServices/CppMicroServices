@@ -3,8 +3,8 @@
 #include "SingletonOne.h"
 #include <iostream>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
 
 using namespace us;
 
@@ -28,7 +28,7 @@ SingletonTwo::~SingletonTwo()
 SingletonTwoService* SingletonTwoService::GetInstance()
 {
   static ServiceReference<SingletonTwoService> serviceRef;
-  static ModuleContext* context = GetModuleContext();
+  static BundleContext* context = GetBundleContext();
 
   if (!serviceRef)
   {

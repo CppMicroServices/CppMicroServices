@@ -25,10 +25,10 @@
 
 #include "usWebConsoleConstants.h"
 
-#include "usModule.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include "usBundle.h"
+#include "usBundleContext.h"
+#include "usBundleResource.h"
+#include "usBundleResourceStream.h"
 #include "usHttpServletResponse.h"
 #include "usHttpServletRequest.h"
 #include "usServletContext.h"
@@ -206,24 +206,24 @@ std::vector<std::string> AbstractWebConsolePlugin::GetCssReferences() const
   return std::vector<std::string>();
 }
 
-std::string AbstractWebConsolePlugin::ReadTemplateFile(const std::string& templateFile, us::ModuleContext* context) const
+std::string AbstractWebConsolePlugin::ReadTemplateFile(const std::string& templateFile, us::BundleContext* context) const
 {
   std::string result;
 
   if (context == NULL)
   {
-    context = us::GetModuleContext();
+    context = us::GetBundleContext();
   }
 
-  us::ModuleResource res = context->GetModule()->GetResource(templateFile);
+  us::BundleResource res = context->GetBundle()->GetResource(templateFile);
   if (!res)
   {
-    std::cout << "Resource file '" << templateFile << "' not found in module '"
-              << context->GetModule()->GetName() << "'" << std::endl;
+    std::cout << "Resource file '" << templateFile << "' not found in bundle '"
+              << context->GetBundle()->GetName() << "'" << std::endl;
     return result;
   }
 
-  us::ModuleResourceStream resStream(res, std::ios::binary);
+  us::BundleResourceStream resStream(res, std::ios::binary);
   resStream.seekg(0, std::ios::end);
   result.resize(static_cast<std::size_t>(resStream.tellg()));
   resStream.seekg(0, std::ios::beg);
@@ -251,15 +251,15 @@ std::string AbstractWebConsolePlugin::GetFooter() const
   return FOOTER;
 }
 
-ModuleResource AbstractWebConsolePlugin::GetResource(const std::string& /*path*/) const
+BundleResource AbstractWebConsolePlugin::GetResource(const std::string& /*path*/) const
 {
-  return ModuleResource();
+  return BundleResource();
 }
 
 bool AbstractWebConsolePlugin::SpoolResource(HttpServletRequest& request, HttpServletResponse& response) const
 {
   std::string pi = request.GetPathInfo();
-  us::ModuleResource res = this->GetResource(pi);
+  us::BundleResource res = this->GetResource(pi);
   if (!res)
   {
     return false;
@@ -279,7 +279,7 @@ bool AbstractWebConsolePlugin::SpoolResource(HttpServletRequest& request, HttpSe
     response.SetDateHeader("Last-Modified", lastModified);
   }
 
-  us::ModuleResourceStream resStream(res, std::ios::binary);
+  us::BundleResourceStream resStream(res, std::ios::binary);
 
   // describe the contents
   response.SetContentType(GetServletContext()->GetMimeType(pi));

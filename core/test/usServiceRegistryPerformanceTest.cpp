@@ -26,8 +26,8 @@
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
 #include <usServiceEvent.h>
 
 #include <vector>
@@ -49,7 +49,7 @@ private:
 
   friend class MyServiceListener;
 
-  ModuleContext* mc;
+  BundleContext* mc;
 
   int nListeners;
   int nServices;
@@ -64,7 +64,7 @@ private:
 
 public:
 
-  ServiceRegistryPerformanceTest(ModuleContext* context);
+  ServiceRegistryPerformanceTest(BundleContext* context);
 
   void InitTestCase();
   void CleanupTestCase();
@@ -123,7 +123,7 @@ public:
 };
 
 
-ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(ModuleContext* context)
+ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(BundleContext* context)
   : mc(context)
   , nListeners(100)
   , nServices(1000)
@@ -288,7 +288,7 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
   Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
-  ServiceRegistryPerformanceTest perfTest(framework->GetModuleContext());
+  ServiceRegistryPerformanceTest perfTest(framework->GetBundleContext());
   perfTest.InitTestCase();
   perfTest.TestAddListeners();
   perfTest.TestRegisterServices();

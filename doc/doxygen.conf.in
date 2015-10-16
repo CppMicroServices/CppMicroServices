@@ -762,7 +762,7 @@ WARN_LOGFILE           =
 INPUT                  = "@PROJECT_SOURCE_DIR@" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionAddResources.cmake" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateModuleInit.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateBundleInit.cmake" \
                          "@PROJECT_SOURCE_DIR@/cmake/usFunctionGetResourceSource.cmake" \
                          "@PROJECT_BINARY_DIR@/include/usGlobalConfig.h" \
                          "@PROJECT_BINARY_DIR@/core/include"
@@ -840,7 +840,7 @@ EXCLUDE_PATTERNS       = */test/* \
 
 EXCLUDE_SYMBOLS        = us \
                          *Private* \
-                         ModuleInfo \
+                         BundleInfo \
                          ServiceObjectsBase* \
                          TrackedService*
 
@@ -1909,10 +1909,10 @@ DOCBOOK_PROGRAMLISTING = NO
 GENERATE_AUTOGEN_DEF   = NO
 
 #---------------------------------------------------------------------------
-# Configuration options related to the Perl module output
+# Configuration options related to the Perl bundle output
 #---------------------------------------------------------------------------
 
-# If the GENERATE_PERLMOD tag is set to YES, doxygen will generate a Perl module
+# If the GENERATE_PERLMOD tag is set to YES, doxygen will generate a Perl bundle
 # file that captures the structure of the code including all documentation.
 #
 # Note that this feature is still experimental and incomplete at the moment.
@@ -1922,16 +1922,16 @@ GENERATE_PERLMOD       = NO
 
 # If the PERLMOD_LATEX tag is set to YES, doxygen will generate the necessary
 # Makefile rules, Perl scripts and LaTeX code to be able to generate PDF and DVI
-# output from the Perl module output.
+# output from the Perl bundle output.
 # The default value is: NO.
 # This tag requires that the tag GENERATE_PERLMOD is set to YES.
 
 PERLMOD_LATEX          = NO
 
-# If the PERLMOD_PRETTY tag is set to YES, the Perl module output will be nicely
+# If the PERLMOD_PRETTY tag is set to YES, the Perl bundle output will be nicely
 # formatted so it can be parsed by a human reader. This is useful if you want to
 # understand what is going on. On the other hand, if this tag is set to NO, the
-# size of the Perl module output will be much smaller and Perl will parse it
+# size of the Perl bundle output will be much smaller and Perl will parse it
 # just the same.
 # The default value is: YES.
 # This tag requires that the tag GENERATE_PERLMOD is set to YES.
@@ -2059,7 +2059,7 @@ GENERATE_TAGFILE       =
 ALLEXTERNALS           = NO
 
 # If the EXTERNAL_GROUPS tag is set to YES, all external groups will be listed
-# in the modules index. If set to NO, only the current project's groups will be
+# in the bundles index. If set to NO, only the current project's groups will be
 # listed.
 # The default value is: YES.
 

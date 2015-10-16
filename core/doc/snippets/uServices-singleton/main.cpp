@@ -1,12 +1,12 @@
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 
 #include "SingletonOne.h"
 #include "SingletonTwo.h"
 
 using namespace us;
 
-class MyActivator : public ModuleActivator
+class MyActivator : public BundleActivator
 {
 
 public:
@@ -17,9 +17,9 @@ public:
   {}
 
   //![0]
-  void Load(ModuleContext* context)
+  void Start(BundleContext* context)
   {
-    // The Load() method of the module activator is called during static
+    // The Start() method of the bundle activator is called during static
     // initialization time of the shared library.
 
     // First create and register a SingletonTwoService instance.
@@ -34,10 +34,10 @@ public:
   //![0]
 
   //![1]
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   {
     // Services are automatically unregistered during unloading of
-    // the shared library after the call to Unload(ModuleContext*)
+    // the shared library after the call to Stop(BundleContext*)
     // has returned.
 
     // Since SingletonOneService needs a non-null SingletonTwoService
@@ -66,7 +66,7 @@ private:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(MyActivator)
+US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 int main()
 {

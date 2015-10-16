@@ -35,10 +35,10 @@ namespace us {
  *
  * <p>
  * The framework returns <code>ServiceReference</code> objects from the
- * <code>ModuleContext::GetServiceReference</code> and
- * <code>ModuleContext::GetServiceReferences</code> methods.
+ * <code>BundleContext::GetServiceReference</code> and
+ * <code>BundleContext::GetServiceReferences</code> methods.
  * <p>
- * A <code>ServiceReference</code> object may be shared between modules and
+ * A <code>ServiceReference</code> object may be shared between bundles and
  * can be used to examine the properties of the service and to get the service
  * object.
  * <p>
@@ -55,9 +55,9 @@ namespace us {
  * <code>ServiceRegistration</code> objects are not equal.
  *
  * @tparam S The class type of the service interface
- * @see ModuleContext::GetServiceReference
- * @see ModuleContext::GetServiceReferences
- * @see ModuleContext::GetService
+ * @see BundleContext::GetServiceReference
+ * @see BundleContext::GetServiceReferences
+ * @see BundleContext::GetService
  * @remarks This class is thread safe.
  */
 template<class S>

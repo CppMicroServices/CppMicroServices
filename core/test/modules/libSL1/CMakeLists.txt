@@ -1,2 +1,0 @@
-
-usFunctionCreateTestModuleWithResources(TestModuleSL1 SOURCES usActivatorSL1.cpp RESOURCES manifest.json)

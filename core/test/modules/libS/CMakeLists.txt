@@ -1,2 +1,0 @@
-
-usFunctionCreateTestModuleWithResources(TestModuleS SOURCES usTestModuleS.cpp RESOURCES manifest.json)

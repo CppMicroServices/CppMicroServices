@@ -33,7 +33,7 @@
 
 namespace us {
 
-class ModulePrivate;
+class BundlePrivate;
 class ServiceRegistrationBase;
 
 /**
@@ -65,33 +65,33 @@ protected:
 
 public:
 
-  typedef std::unordered_map<Module*,int> ModuleToRefsMap;
-  typedef std::unordered_map<Module*, InterfaceMap> ModuleToServiceMap;
-  typedef std::unordered_map<Module*, std::list<InterfaceMap> > ModuleToServicesMap;
+  typedef std::unordered_map<Bundle*,int> BundleToRefsMap;
+  typedef std::unordered_map<Bundle*, InterfaceMap> BundleToServiceMap;
+  typedef std::unordered_map<Bundle*, std::list<InterfaceMap> > BundleToServicesMap;
 
   ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
   ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
 
   /**
-   * Modules dependent on this service. Integer is used as
+   * Bundles dependent on this service. Integer is used as
    * reference counter, counting number of unbalanced getService().
    */
-  ModuleToRefsMap dependents;
+  BundleToRefsMap dependents;
 
   /**
    * Object instances that a prototype factory has produced.
    */
-  ModuleToServicesMap prototypeServiceInstances;
+  BundleToServicesMap prototypeServiceInstances;
 
   /**
-   * Object instance with module scope that a factory may have produced.
+   * Object instance with bundle scope that a factory may have produced.
    */
-  ModuleToServiceMap moduleServiceInstance;
+  BundleToServiceMap bundleServiceInstance;
 
   /**
-   * Module registering this service.
+   * Bundle registering this service.
    */
-  ModulePrivate* module;
+  BundlePrivate* bundle;
 
   /**
    * Reference object to this service registration.
@@ -124,18 +124,18 @@ public:
   // needs to be recursive
   MultiThreaded<MutexLockingStrategy<std::recursive_mutex>> propsLock;
 
-  ServiceRegistrationBasePrivate(ModulePrivate* module, const InterfaceMap& service,
+  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMap& service,
                                  const ServicePropertiesImpl& props);
 
   ~ServiceRegistrationBasePrivate();
 
   /**
-   * Check if a module uses this service
+   * Check if a bundle uses this service
    *
-   * @param p Module to check
-   * @return true if module uses this service
+   * @param p Bundle to check
+   * @return true if bundle uses this service
    */
-  bool IsUsedByModule(Module* m) const;
+  bool IsUsedByBundle(Bundle* m) const;
 
   const InterfaceMap& GetInterfaces() const;
 

@@ -1,5 +1,5 @@
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 #include <usServiceFactory.h>
 #include <usServiceInterface.h>
 
@@ -20,12 +20,12 @@ class MyService2 : public InterfaceA, public InterfaceB
 {};
 //! [2-1]
 
-class MyActivator : public ModuleActivator
+class MyActivator : public BundleActivator
 {
 
 public:
 
-  void Load(ModuleContext* context)
+  void Start(BundleContext* context)
   {
     Register1(context);
     Register2(context);
@@ -33,7 +33,7 @@ public:
     RegisterFactory2(context);
   }
 
-  void Register1(ModuleContext* context)
+  void Register1(BundleContext* context)
   {
 //! [1-2]
 MyService* myService = new MyService;
@@ -41,7 +41,7 @@ context->RegisterService<InterfaceA>(myService);
 //! [1-2]
   }
 
-  void Register2(ModuleContext* context)
+  void Register2(BundleContext* context)
   {
 //! [2-2]
 MyService2* myService = new MyService2;
@@ -49,18 +49,18 @@ context->RegisterService<InterfaceA, InterfaceB>(myService);
 //! [2-2]
   }
 
-  void RegisterFactory1(ModuleContext* context)
+  void RegisterFactory1(BundleContext* context)
   {
 //! [f1]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMap GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
     MyService* myService = new MyService;
     return MakeInterfaceMap<InterfaceA>(myService);
   }
 
-  virtual void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/,
                             const InterfaceMap& service)
   {
     delete ExtractInterface<InterfaceA>(service);
@@ -72,18 +72,18 @@ context->RegisterService<InterfaceA>(ToFactory(myServiceFactory));
 //! [f1]
   }
 
-  void RegisterFactory2(ModuleContext* context)
+  void RegisterFactory2(BundleContext* context)
   {
 //! [f2]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMap GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
     MyService2* myService = new MyService2;
     return MakeInterfaceMap<InterfaceA,InterfaceB>(myService);
   }
 
-  virtual void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/,
                             const InterfaceMap& service)
   {
     delete ExtractInterface<InterfaceA>(service);
@@ -101,12 +101,12 @@ context->RegisterService<InterfaceA,InterfaceB>(ToFactory(myServiceFactory));
   }
 
 
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   { /* cleanup */ }
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(MyActivator)
+US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 int main(int /*argc*/, char* /*argv*/[])
 {

@@ -22,12 +22,12 @@
 
 #include "usUtils_p.h"
 
-#include "usCoreModuleContext_p.h"
-#include "usGetModuleContext.h"
+#include "usCoreBundleContext_p.h"
+#include "usGetBundleContext.h"
 #include "usLog.h"
-#include "usModuleInfo.h"
-#include "usModule.h"
-#include "usModuleContext.h"
+#include "usBundleInfo.h"
+#include "usBundle.h"
+#include "usBundleContext.h"
 
 #include "miniz.h"
 
@@ -92,18 +92,18 @@ std::string GetBundleLocation(const std::string& location)
 
 bool IsSharedLibrary(const std::string& location)
 { // Testing for file extension isn't the most robust way to test
-    // for file type. 
+    // for file type.
     return (location.find(library_suffix()) != std::string::npos);
 }
 
 //-------------------------------------------------------------------
-// Module auto-loading
+// Bundle auto-loading
 //-------------------------------------------------------------------
 
 
-std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
+std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
 {
-  std::vector<std::string> loadedModules;
+  std::vector<std::string> installedBundles;
 
   std::string loadPath = absoluteBasePath + DIR_SEP + subDir;
 
@@ -164,18 +164,18 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
         libPath += DIR_SEP;
       }
       libPath += entryFileName;
-      US_DEBUG << "Auto-installing module " << libPath;
+      US_DEBUG << "Auto-installing bundle " << libPath;
 
       mz_zip_archive zipArchive;
       memset(&zipArchive, 0, sizeof(mz_zip_archive));
       if(MZ_FALSE == mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0)) continue;
 
       // the usResourceCompiler will place resources into sub directories,
-      // one for each module, named after the module's name. The module's
+      // one for each bundle, named after the bundle's name. The bundle's
       // manifest is stored in a file called manifest.json in the root of
       // its sub-directory (analogous to OSGi's META-INF/MANIFEST.MF file).
-      // We use this convention to glean the module name and use that to
-      // install the module.
+      // We use this convention to glean the bundle name and use that to
+      // install the bundle.
       mz_uint numFiles = mz_zip_reader_get_num_files(&zipArchive);
       for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex)
       {
@@ -185,20 +185,20 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
         std::string::size_type pos = file.find("/manifest.json");
         if(std::string::npos != pos)
         {
-          std::string moduleName(file.substr(0, pos));
-          std::string location(libPath + "/" + moduleName);
+          std::string bundleName(file.substr(0, pos));
+          std::string location(libPath + "/" + bundleName);
 
           // location will be in the form:
-          //  <path to module plugin>\<module-name>.<lib-extension>/<module-name>
-          Module* installedModule = GetModuleContext()->InstallBundle(location);
+          //  <path to bundle plugin>\<bundle-name>.<lib-extension>/<bundle-name>
+          Bundle* installedBundle = GetBundleContext()->InstallBundle(location);
 
-          if (!installedModule)
+          if (!installedBundle)
           {
-            US_WARN << "Auto-installing of module " << libPath << " failed.";
+            US_WARN << "Auto-installing of bundle " << libPath << " failed.";
           }
           else
           {
-            loadedModules.push_back(installedModule->GetName());
+            installedBundles.push_back(installedBundle->GetName());
           }
         }
       }
@@ -207,45 +207,45 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
     }
     closedir(dir);
   }
-  return loadedModules;
+  return installedBundles;
 }
 
-std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModuleContext* coreCtx)
+std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx)
 {
-  std::vector<std::string> loadedModules;
+  std::vector<std::string> installedBundles;
 
-  if (moduleInfo.autoLoadDir.empty())
+  if (bundleInfo.autoLoadDir.empty())
   {
-    return loadedModules;
+    return installedBundles;
   }
 
-  ModuleSettings::PathList autoLoadPaths = coreCtx->settings.GetAutoLoadPaths();
+  BundleSettings::PathList autoLoadPaths = coreCtx->settings.GetAutoLoadPaths();
 
-  std::size_t indexOfLastSeparator = moduleInfo.location.find_last_of(DIR_SEP);
-  std::string moduleBasePath = moduleInfo.location.substr(0, indexOfLastSeparator);
+  std::size_t indexOfLastSeparator = bundleInfo.location.find_last_of(DIR_SEP);
+  std::string bundleBasePath = bundleInfo.location.substr(0, indexOfLastSeparator);
 
-  for (ModuleSettings::PathList::iterator i = autoLoadPaths.begin();
+  for (BundleSettings::PathList::iterator i = autoLoadPaths.begin();
        i != autoLoadPaths.end(); ++i)
   {
-    if (*i == ModuleSettings::CURRENT_MODULE_PATH())
+    if (*i == BundleSettings::CURRENT_BUNDLE_PATH())
     {
-      // Load all modules from a directory located relative to this modules location
-      // and named after this modules library name.
-      *i = moduleBasePath;
+      // Load all bundles from a directory located relative to this bundles location
+      // and named after this bundles library name.
+      *i = bundleBasePath;
     }
   }
 
   // We could have introduced a duplicate above, so remove it.
   std::sort(autoLoadPaths.begin(), autoLoadPaths.end());
   autoLoadPaths.erase(std::unique(autoLoadPaths.begin(), autoLoadPaths.end()), autoLoadPaths.end());
-  for (ModuleSettings::PathList::iterator i = autoLoadPaths.begin();
+  for (BundleSettings::PathList::iterator i = autoLoadPaths.begin();
        i != autoLoadPaths.end(); ++i)
   {
     if (i->empty()) continue;
-    std::vector<std::string> paths = AutoLoadModulesFromPath(*i, moduleInfo.autoLoadDir);
-    loadedModules.insert(loadedModules.end(), paths.begin(), paths.end());
+    std::vector<std::string> paths = AutoLoadBundlesFromPath(*i, bundleInfo.autoLoadDir);
+    installedBundles.insert(installedBundles.end(), paths.begin(), paths.end());
   }
-  return loadedModules;
+  return installedBundles;
 }
 
 }

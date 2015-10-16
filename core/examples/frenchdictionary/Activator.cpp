@@ -23,8 +23,8 @@
 //! [Activator]
 #include "IDictionaryService.h"
 
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 #include <usServiceProperties.h>
 
 #include <set>
@@ -36,15 +36,15 @@ using namespace us;
 namespace {
 
 /**
- * This class implements a module activator that uses the module
+ * This class implements a bundle activator that uses the bundle
  * context to register a French language dictionary service
  * with the C++ Micro Services registry during static initialization
- * of the module. The dictionary service interface is
+ * of the bundle. The dictionary service interface is
  * defined in Example 2 (dictionaryservice) and is implemented by a
  * nested class. This class is identical to the class in Example 2,
  * except that the dictionary contains French words.
  */
-class US_ABI_LOCAL Activator : public ModuleActivator
+class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 private:
@@ -91,13 +91,13 @@ private:
 public:
 
   /**
-   * Implements ModuleActivator::Load(). Registers an
-   * instance of a dictionary service using the module context;
+   * Implements BundleActivator::Start(). Registers an
+   * instance of a dictionary service using the bundle context;
    * attaches properties to the service that can be queried
    * when performing a service look-up.
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Load(ModuleContext* context)
+  void Start(BundleContext* context)
   {
     m_dictionaryService.reset(new DictionaryImpl);
     ServiceProperties props;
@@ -106,11 +106,11 @@ public:
   }
 
   /**
-   * Implements ModuleActivator::Unload(). Does nothing since
+   * Implements BundleActivator::Stop(). Does nothing since
    * the C++ Micro Services library will automatically unregister any registered services.
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   {
     // NOTE: The service is automatically unregistered
   }
@@ -119,5 +119,5 @@ public:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Activator)
+US_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //![Activator]

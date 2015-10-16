@@ -37,20 +37,20 @@ public:
       return false;
     }
 
-    us::Module* module = us::ModuleRegistry::GetModule(resourceData.first);
-    if (module == NULL)
+    us::Bundle* bundle = us::BundleRegistry::GetBundle(resourceData.first);
+    if (bundle == NULL)
     {
       return false;
     }
 
-    us::ModuleResource resource = module->GetResource(resourceData.second);
+    us::BundleResource resource = bundle->GetResource(resourceData.second);
     if (!resource)
     {
       MBI_INFO << "Resource " << resourceData.second << " not found";
       return false;
     }
 
-    us::ModuleResourceStream resourceStream(resource, std::ios::binary);
+    us::BundleResourceStream resourceStream(resource, std::ios::binary);
     std::string result;
     resourceStream.seekg(0, std::ios::end);
     result.resize(resourceStream.tellg());

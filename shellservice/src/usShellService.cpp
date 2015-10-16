@@ -21,12 +21,12 @@
 
 #include "usShellService.h"
 
-#include "usModuleRegistry_p.h"
-#include "usModule.h"
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include "usBundleRegistry_p.h"
+#include "usBundle.h"
+#include "usBundleContext.h"
+#include "usGetBundleContext.h"
+#include "usBundleResource.h"
+#include "usBundleResourceStream.h"
 #include "usLog.h"
 
 #include "scheme.h"
@@ -40,8 +40,6 @@
 #include <iostream>
 #include <iomanip>
 
-#include <malloc.h>
-
 using namespace us;
 
 #define sc_int(sc, ival) (sc->vptr->mk_integer(sc, ival))
@@ -53,14 +51,14 @@ extern "C" {
 static const int numFields = 5;
 static const int fieldWidth[numFields] = { 4, 26, 10, 12, 40 };
 
-pointer us_module_ids(scheme* sc, pointer /*args*/)
+pointer us_bundle_ids(scheme* sc, pointer /*args*/)
 {
-  std::vector<Module*> modules = GetModuleContext()->GetModules();
+  std::vector<Bundle*> bundles = GetBundleContext()->GetBundles();
   std::set<long> ids;
-  for (std::vector<Module*>::iterator iter = modules.begin(),
-       iterEnd = modules.end(); iter != iterEnd; ++iter)
+  for (std::vector<Bundle*>::iterator iter = bundles.begin(),
+       iterEnd = bundles.end(); iter != iterEnd; ++iter)
   {
-    ids.insert((*iter)->GetModuleId());
+    ids.insert((*iter)->GetBundleId());
   }
   pointer result = sc->NIL;
   for (std::set<long>::reverse_iterator iter = ids.rbegin(),
@@ -71,7 +69,7 @@ pointer us_module_ids(scheme* sc, pointer /*args*/)
   return result;
 }
 
-pointer us_module_info(scheme* sc, pointer args)
+pointer us_bundle_info(scheme* sc, pointer args)
 {
   if(args == sc->NIL)
   {
@@ -89,7 +87,7 @@ pointer us_module_info(scheme* sc, pointer args)
   memset(delim, delimChar, 50);
 
   pointer arg = pair_car(args);
-  Module* module = NULL;
+  Bundle* bundle = NULL;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -115,30 +113,30 @@ pointer us_module_info(scheme* sc, pointer args)
     }
     else
     {
-      module = GetModuleContext()->GetModule(name);
+      bundle = GetBundleContext()->GetBundle(name);
     }
   }
   else if (is_integer(arg))
   {
-    module = GetModuleContext()->GetModule(ivalue(arg));
+    bundle = GetBundleContext()->GetBundle(ivalue(arg));
   }
   else
   {
     return sc->NIL;
   }
 
-  if (module == NULL)
+  if (bundle == NULL)
   {
     return sc->NIL;
   }
 
-  pointer id = sc_int(sc, module->GetModuleId());
-  pointer name = sc_string(sc, module->GetName().c_str());
-  pointer location = sc_string(sc, module->GetLocation().c_str());
-  pointer version = sc_string(sc, module->GetVersion().ToString().c_str());
+  pointer id = sc_int(sc, bundle->GetBundleId());
+  pointer name = sc_string(sc, bundle->GetName().c_str());
+  pointer location = sc_string(sc, bundle->GetLocation().c_str());
+  pointer version = sc_string(sc, bundle->GetVersion().ToString().c_str());
   std::string strState;
-  //std::stringstream(strState) << module->GetState();
-  strState = module->IsLoaded() ? "Loaded" : "Unloaded";
+  //std::stringstream(strState) << bundle->GetState();
+  strState = bundle->IsStarted() ? "Active" : "Resolved";
   pointer state = sc_string(sc, strState.c_str());
 
 
@@ -153,7 +151,7 @@ pointer us_module_info(scheme* sc, pointer args)
   return result;
 }
 
-pointer us_display_module_info(scheme* sc, pointer args)
+pointer us_display_bundle_info(scheme* sc, pointer args)
 {
   if(!sc->vptr->is_list(sc, args) || args == sc->NIL)
   {
@@ -193,7 +191,7 @@ pointer us_display_module_info(scheme* sc, pointer args)
   return sc->T;
 }
 
-pointer us_module_start(scheme* sc, pointer args)
+pointer us_bundle_start(scheme* sc, pointer args)
 {
   if(args == sc->NIL)
   {
@@ -208,30 +206,30 @@ pointer us_module_start(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  Module* module = NULL;
+  Bundle* bundle = NULL;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
-    module = GetModuleContext()->GetModule(name);
+    bundle = GetBundleContext()->GetBundle(name);
   }
   else if (is_integer(arg))
   {
-    module = GetModuleContext()->GetModule(ivalue(arg));
+    bundle = GetBundleContext()->GetBundle(ivalue(arg));
   }
   else
   {
     return sc->F;
   }
 
-  if (module)
+  if (bundle)
   {
-    std::cout << "Starting module..." << std::endl;
+    std::cout << "Starting bundle..." << std::endl;
     return sc->T;
   }
   return sc->F;
 }
 
-pointer us_module_stop(scheme* sc, pointer args)
+pointer us_bundle_stop(scheme* sc, pointer args)
 {
   if(args == sc->NIL)
   {
@@ -246,24 +244,24 @@ pointer us_module_stop(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  Module* module = NULL;
+  Bundle* bundle = NULL;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
-    module = GetModuleContext()->GetModule(name);
+    bundle = GetBundleContext()->GetBundle(name);
   }
   else if (is_integer(arg))
   {
-    module = GetModuleContext()->GetModule(ivalue(arg));
+    bundle = GetBundleContext()->GetBundle(ivalue(arg));
   }
   else
   {
     return sc->F;
   }
 
-  if (module)
+  if (bundle)
   {
-    std::cout << "Stopping module..." << std::endl;
+    std::cout << "Stopping bundle..." << std::endl;
     return sc->T;
   }
   return sc->F;
@@ -327,7 +325,7 @@ ShellService::ShellService()
   }
   scheme_set_output_port_file(d->m_Scheme, stdout);
 
-  ModuleResource schemeInitRes = GetModuleContext()->GetModule()->GetResource("tinyscheme/init.scm");
+  BundleResource schemeInitRes = GetBundleContext()->GetBundle()->GetResource("tinyscheme/init.scm");
   if (schemeInitRes)
   {
     this->LoadSchemeResource(schemeInitRes);
@@ -337,8 +335,8 @@ ShellService::ShellService()
     US_WARN << "Scheme file init.scm not found";
   }
 
-  std::vector<ModuleResource> schemeResources = GetModuleContext()->GetModule()->FindResources("/", "*.scm", false);
-  for (std::vector<ModuleResource>::iterator iter = schemeResources.begin(),
+  std::vector<BundleResource> schemeResources = GetBundleContext()->GetBundle()->FindResources("/", "*.scm", false);
+  for (std::vector<BundleResource>::iterator iter = schemeResources.begin(),
        iterEnd = schemeResources.end(); iter != iterEnd; ++iter)
   {
     if (*iter)
@@ -347,11 +345,11 @@ ShellService::ShellService()
     }
   }
 
-  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-ids"), mk_foreign_func(d->m_Scheme, us_module_ids));
-  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-info"), mk_foreign_func(d->m_Scheme, us_module_info));
-  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-display-module-info"), mk_foreign_func(d->m_Scheme, us_display_module_info));
-  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-start"), mk_foreign_func(d->m_Scheme, us_module_start));
-  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-module-stop"), mk_foreign_func(d->m_Scheme, us_module_stop));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-ids"), mk_foreign_func(d->m_Scheme, us_bundle_ids));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-info"), mk_foreign_func(d->m_Scheme, us_bundle_info));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-display-bundle-info"), mk_foreign_func(d->m_Scheme, us_display_bundle_info));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-start"), mk_foreign_func(d->m_Scheme, us_bundle_start));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-stop"), mk_foreign_func(d->m_Scheme, us_bundle_stop));
 }
 
 ShellService::~ShellService()
@@ -410,10 +408,10 @@ std::vector<std::string> ShellService::GetCompletions(const std::string& in)
   return result;
 }
 
-void ShellService::LoadSchemeResource(const ModuleResource& res)
+void ShellService::LoadSchemeResource(const BundleResource& res)
 {
   US_INFO << "Reading " << res.GetResourcePath();
-  ModuleResourceStream resStream(res);
+  BundleResourceStream resStream(res);
   int resBufLen = res.GetSize() + 1;
   char* resBuf = new char[resBufLen];
   resStream.read(resBuf, resBufLen);

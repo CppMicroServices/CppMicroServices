@@ -23,8 +23,8 @@
 //! [Activator]
 #include "IDictionaryService.h"
 
-#include <usModuleActivator.h>
-#include <usModuleContext.h>
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
 #include <usServiceTracker.h>
 
 using namespace us;
@@ -32,21 +32,21 @@ using namespace us;
 namespace {
 
 /**
- * This class implements a module activator that uses a dictionary
+ * This class implements a bundle activator that uses a dictionary
  * service to check for the proper spelling of a word by
- * checking for its existence in the dictionary. This module
+ * checking for its existence in the dictionary. This bundle
  * uses a service tracker to dynamically monitor the availability
  * of a dictionary service, instead of providing a custom service
- * listener as in Example 4. The module uses the service returned
+ * listener as in Example 4. The bundle uses the service returned
  * by the service tracker, which is selected based on a ranking
  * algorithm defined by the C++ Micro Services library.
- * Again, the calling thread of the Load() method is used to read
+ * Again, the calling thread of the Start() method is used to read
  * words from standard input, checking its existence in the dictionary.
  * You can stop checking words by entering an empty line, but
  * to start checking words again you must unload and then load
- * the module again.
+ * the bundle again.
  */
-class US_ABI_LOCAL Activator : public ModuleActivator
+class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
@@ -57,7 +57,7 @@ public:
   {}
 
   /**
-   * Implements ModuleActivator::Load(). Creates a service
+   * Implements BundleActivator::Start(). Creates a service
    * tracker to monitor dictionary services and starts its "word
    * checking loop". It will not be able to check any words until
    * the service tracker finds a dictionary service; any discovered
@@ -69,9 +69,9 @@ public:
    *       lengthy process like this; this is only done for the purpose of
    *       the tutorial.
    *
-   * @param context the module context for this module.
+   * @param context the bundle context for this bundle.
    */
-  void Load(ModuleContext *context)
+  void Start(BundleContext *context)
   {
     m_context = context;
 
@@ -124,18 +124,18 @@ public:
   }
 
   /**
-   * Implements ModuleActivator::Unload(). Does nothing since
+   * Implements BundleActivator::Stop(). Does nothing since
    * the C++ Micro Services library will automatically unget any used services.
-   * @param context the context for the module.
+   * @param context the context for the bundle.
    */
-  void Unload(ModuleContext* /*context*/)
+  void Stop(BundleContext* /*context*/)
   {
   }
 
 private:
 
-  // Module context
-  ModuleContext* m_context;
+  // Bundle context
+  BundleContext* m_context;
 
   // The service tracker
   ServiceTracker<IDictionaryService>* m_tracker;
@@ -143,5 +143,5 @@ private:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Activator)
+US_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //![Activator]

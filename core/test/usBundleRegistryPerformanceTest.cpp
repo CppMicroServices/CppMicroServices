@@ -27,8 +27,8 @@ limitations under the License.
 #include "usTestingConfig.h"
 #include "usTestingMacros.h"
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
 
 #include <vector>
 #include <thread>
@@ -39,7 +39,7 @@ namespace
 {
     // Attempt to get as close an approximation as to how long it takes to install a bundle
     // without having the extra machinery of error handling in the way.
-    inline void InstallTestBundleNoErrorHandling(ModuleContext* frameworkCtx, const std::string& bundleName)
+    inline void InstallTestBundleNoErrorHandling(BundleContext* frameworkCtx, const std::string& bundleName)
     {
 #if defined (US_BUILD_SHARED_LIBS)
         frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "/" + bundleName);
@@ -53,30 +53,30 @@ namespace
         // Installing such a small set of bundles doesn't yield significant
         // data about performance. Consider increasing the number of bundles
         // used.
-        ModuleContext* fmc = f->GetModuleContext();
+        BundleContext* fmc = f->GetBundleContext();
 
         HighPrecisionTimer timer;
         timer.Start();
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleA");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleA2");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleB");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleH");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleM");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleR");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleRA");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleRL");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleS");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleSL1");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleSL3");
-        InstallTestBundleNoErrorHandling(fmc, "TestModuleSL4");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleA");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleA2");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleB");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleH");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleM");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleR");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleRA");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleRL");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleS");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleSL1");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleSL3");
+        InstallTestBundleNoErrorHandling(fmc, "TestBundleSL4");
 
         long long elapsedTimeInMilliSeconds = timer.ElapsedMilli();
         US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to install 12 new bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
 
         elapsedTimeInMilliSeconds = 0;
 
-        std::vector<Module*> modules(f->GetModuleContext()->GetModules());
-        for (auto bundle : modules)
+        std::vector<Bundle*> bundles(f->GetBundleContext()->GetBundles());
+        for (auto bundle : bundles)
         {
             timer.Start();
             bundle->Start();
@@ -102,12 +102,12 @@ namespace
             threads.push_back(std::thread(TestSerial, f));
             threads.push_back(std::thread([f]() -> void 
                                             {
-                                                f->GetModuleContext()->GetModules();
+                                                f->GetBundleContext()->GetBundles();
                                             }));
         }
 
         for (auto& th : threads) th.join();
-        US_TEST_CONDITION(numTestBundles == f->GetModuleContext()->GetModules().size(), "Test for correct number of installed bundles")
+        US_TEST_CONDITION(numTestBundles == f->GetBundleContext()->GetBundles().size(), "Test for correct number of installed bundles")
     }
 #endif
 
@@ -127,11 +127,11 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
     TestSerial(framework);
 
-    for (auto module : framework->GetModuleContext()->GetModules())
+    for (auto bundle : framework->GetBundleContext()->GetBundles())
     {
-        if (module->GetModuleId() != 1)
+        if (bundle->GetBundleId() != 1)
         {
-            module->Uninstall();
+            bundle->Uninstall();
         }
     }
 #ifdef US_ENABLE_THREADING_SUPPORT

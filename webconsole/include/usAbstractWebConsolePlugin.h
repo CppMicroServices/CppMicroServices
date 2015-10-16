@@ -23,7 +23,7 @@
 #define USABSTRACTWEBCONSOLEPLUGIN_H
 
 #include <usHttpServlet.h>
-#include <usGetModuleContext.h>
+#include <usGetBundleContext.h>
 #include <usWebConsoleExport.h>
 
 #include <string>
@@ -31,9 +31,9 @@
 
 namespace us {
 
-class ModuleContext;
-class Module;
-class ModuleResource;
+class BundleContext;
+class Bundle;
+class BundleResource;
 
 class HttpServletRequest;
 class HttpServletResponse;
@@ -48,7 +48,7 @@ struct AbstractWebConsolePluginPrivate;
  * of the page. The respective service is called a Web Console Plugin or a plugin
  * for short.
  *
- * To help rendering the response the Web Console module provides two
+ * To help rendering the response the Web Console bundle provides two
  * options. One of the options is to extend the AbstractWebConsolePlugin overwriting
  * the RenderContent(HttpServletRequest&, HttpServletResponse&) method.
  */
@@ -180,14 +180,14 @@ protected:
 
 protected:
 
-  std::string ReadTemplateFile(const std::string& templateFile, us::ModuleContext* context = us::GetModuleContext()) const;
+  std::string ReadTemplateFile(const std::string& templateFile, us::BundleContext* context = us::GetBundleContext()) const;
 
 private:
 
   std::string GetHeader() const;
   std::string GetFooter() const;
 
-  virtual ModuleResource GetResource(const std::string& path) const;
+  virtual BundleResource GetResource(const std::string& path) const;
 
   /**
    * If the request addresses a resource which may be served by the

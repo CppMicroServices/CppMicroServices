@@ -25,18 +25,18 @@
 #define USTRACKEDSERVICE_H
 
 #include "usTrackedServiceListener_p.h"
-#include "usModuleAbstractTracked_p.h"
+#include "usBundleAbstractTracked_p.h"
 #include "usServiceEvent.h"
 
 namespace us {
 
 /**
  * This class is not intended to be used directly. It is exported to support
- * the CppMicroServices module system.
+ * the CppMicroServices bundle system.
  */
 template<class S, class TTT>
 class TrackedService : public TrackedServiceListener,
-    public ModuleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
+    public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
 {
 
 public:
@@ -57,7 +57,7 @@ public:
 
 private:
 
-  typedef ModuleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent> Superclass;
+  typedef BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent> Superclass;
 
   ServiceTracker<S,TTT>* serviceTracker;
   ServiceTrackerCustomizer<S,T>* customizer;

@@ -1,7 +1,7 @@
 set(srcs usWebConsoleDriver.cpp)
 
-add_definitions(-DUS_MODULE_NAME=main)
+add_definitions(-DUS_BUNDLE_NAME=main)
 
-usFunctionGenerateModuleInit(srcs)
+usFunctionGenerateBundleInit(srcs)
 add_executable(us${PROJECT_NAME}Driver ${srcs})
 target_link_libraries(us${PROJECT_NAME}Driver usHttpService)

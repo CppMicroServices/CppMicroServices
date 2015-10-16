@@ -147,7 +147,7 @@ public:
 
 private:
 
-  friend class ModuleHooks;
+  friend class BundleHooks;
   friend class ServiceHooks;
 
   ShrinkableVector(container_type& container)

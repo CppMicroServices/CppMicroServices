@@ -19,22 +19,22 @@
 
 =============================================================================*/
 
-#include <usModuleActivator.h>
+#include <usBundleActivator.h>
 
 #include "usSettingsPlugin_p.h"
 #include "usServicesPlugin_p.h"
 
 #include <usWebConsoleServlet_p.h>
-#include <usModuleContext.h>
+#include <usBundleContext.h>
 
 namespace us {
 
-class WebConsoleActivator : public ModuleActivator
+class WebConsoleActivator : public BundleActivator
 {
 public:
 
-  void Load(us::ModuleContext* context);
-  void Unload(us::ModuleContext* context);
+  void Start(us::BundleContext* context);
+  void Stop(us::BundleContext* context);
 
 private:
 
@@ -44,7 +44,7 @@ private:
   ServicesPlugin m_ServicesPlugin;
 };
 
-void WebConsoleActivator::Load(us::ModuleContext* context)
+void WebConsoleActivator::Start(us::BundleContext* context)
 {
   m_WebConsoleServlet = new WebConsoleServlet();
   us::ServiceProperties props;
@@ -56,16 +56,16 @@ void WebConsoleActivator::Load(us::ModuleContext* context)
   m_SettingsPlugin.Register();
   m_ServicesPlugin.Register();
 
-//  server->addHandler("/Console/modules/", new ModulesHtml(context));
+//  server->addHandler("/Console/bundles/", new BundlesHtml(context));
 //  server->addHandler("/Console/resources/", new ResourcesHtml(context));
 //  server->addHandler("/Console/", new ConsoleHtmlHandler(context));
 //  server->addHandler("/", new DefaultHandler(context));
 }
 
-void WebConsoleActivator::Unload(us::ModuleContext* /*context*/)
+void WebConsoleActivator::Stop(us::BundleContext* /*context*/)
 {
 }
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(us::WebConsoleActivator)
+US_EXPORT_BUNDLE_ACTIVATOR(us::WebConsoleActivator)

@@ -56,9 +56,9 @@ const std::string& ServiceConstants::SCOPE_SINGLETON()
   return s;
 }
 
-const std::string& ServiceConstants::SCOPE_MODULE()
+const std::string& ServiceConstants::SCOPE_BUNDLE()
 {
-  static const std::string s("module");
+  static const std::string s("bundle");
   return s;
 }
 
@@ -79,5 +79,5 @@ std::string tmp2 = ServiceConstants::SERVICE_ID();
 std::string tmp3 = ServiceConstants::SERVICE_RANKING();
 std::string tmp4 = ServiceConstants::SERVICE_SCOPE();
 std::string tmp5 = ServiceConstants::SCOPE_SINGLETON();
-std::string tmp6 = ServiceConstants::SCOPE_MODULE();
+std::string tmp6 = ServiceConstants::SCOPE_BUNDLE();
 std::string tmp7 = ServiceConstants::SCOPE_PROTOTYPE();

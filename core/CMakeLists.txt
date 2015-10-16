@@ -23,14 +23,14 @@ if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
 
-# Configure the modules manifest.json file
+# Configure the bundles manifest.json file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
                ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
-usMacroCreateModule(Core
+usMacroCreateBundle(Core
   VERSION "2.99.0"
   TARGET CppMicroServices
-  INTERNAL_INCLUDE_DIRS src/util src/service src/module
+  INTERNAL_INCLUDE_DIRS src/util src/service src/bundle
   LINK_LIBRARIES ${_link_libraries}
   SOURCES ${_core_srcs}
   PUBLIC_HEADERS ${_core_public_headers}

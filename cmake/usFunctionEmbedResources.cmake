@@ -5,34 +5,34 @@
 #! containing data from external resources such as text files or images or other ZIP
 #! archives. The created archive file is appended or embedded as a binary blob to the target file.
 #!
-#! \note To set-up correct file dependencies from your module target to your resource
+#! \note To set-up correct file dependencies from your bundle target to your resource
 #!       files, you have to add a special source file to the source list of the target.
 #!       The source file name can be retrieved by using #usFunctionGetResourceSource.
 #!       This ensures that changed resource files will automatically be re-added to the
-#!       module.
+#!       bundle.
 #!
 #! There are two differend modes for including resources: APPEND and LINK. In APPEND mode,
 #! the generated zip file is appended at the end of the target file. In LINK mode, the
 #! zip file is compiled / linked into the target using platform specific techniques. LINK
 #! mode is necessary if certain tools make additional assumptions about the object layout
-#! of the target file (e.g. codesign on MacOS). LINK mode may result in slower module
+#! of the target file (e.g. codesign on MacOS). LINK mode may result in slower bundle
 #! initialization and bigger object files. The default mode is LINK mode on MacOS and
 #! APPEND mode on all other platforms.
 #!
 #! Example usage:
 #! \code{.cmake}
-#! set(module_srcs )
+#! set(bundle_srcs )
 #! usFunctionEmbedResources(TARGET mylib
-#!                          MODULE_NAME org_me_mylib
+#!                          BUNDLE_NAME org_me_mylib
 #!                          FILES config.properties logo.png
 #!                         )
 #! \endcode
 #!
 #! \param TARGET (required) The target to which the resource files are added.
-#! \param MODULE_NAME (required/optional) The module name of the target, as specified in
-#!        the \c US_MODULE_NAME pre-processor definition of that target. This parameter
-#!        is optional if a target property with the name US_MODULE_NAME exists, containing
-#!        the required module name.
+#! \param BUNDLE_NAME (required/optional) The bundle name of the target, as specified in
+#!        the \c US_BUNDLE_NAME pre-processor definition of that target. This parameter
+#!        is optional if a target property with the name US_BUNDLE_NAME exists, containing
+#!        the required bundle name.
 #! \param APPEND Append the resources zip file to the target file.
 #! \param LINK Link (embed) the resources zip file if possible.
 #!
@@ -45,7 +45,7 @@
 #!
 function(usFunctionEmbedResources)
 
-  cmake_parse_arguments(US_RESOURCE "APPEND;LINK" "TARGET;MODULE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
+  cmake_parse_arguments(US_RESOURCE "APPEND;LINK" "TARGET;BUNDLE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
 
   if(NOT US_RESOURCE_TARGET)
     message(SEND_ERROR "TARGET argument not specified.")
@@ -53,7 +53,7 @@ function(usFunctionEmbedResources)
 
   if(US_RESOURCE_FILES OR US_RESOURCE_ZIP_ARCHIVES)
     usFunctionAddResources(TARGET ${US_RESOURCE_TARGET}
-      MODULE_NAME ${US_RESOURCE_MODULE_NAME}
+      BUNDLE_NAME ${US_RESOURCE_BUNDLE_NAME}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMPRESSION_LEVEL ${US_RESOURCE_COMPRESSION_LEVEL}
       FILES ${US_RESOURCE_FILES}
@@ -184,7 +184,7 @@ function(usFunctionEmbedResources)
     add_custom_command(
       TARGET ${US_RESOURCE_TARGET}
       POST_BUILD
-      COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} ${_zip_archive}
+      COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_BUNDLE_NAME} ${_zip_archive}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM

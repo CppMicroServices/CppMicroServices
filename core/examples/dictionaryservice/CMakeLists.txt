@@ -1,4 +1,4 @@
-# The library name for the module
+# The library name for the bundle
 set(_lib_name dictionaryservice)
 
 # A list of source code files
@@ -8,20 +8,20 @@ set(_srcs
 )
 
 # Add a special source file to the _srcs variable that
-# will enable dependency checking on module resources.
+# will enable dependency checking on bundle resources.
 usFunctionGetResourceSource(TARGET Example-${_lib_name} OUT _srcs)
 
-# Generate module initialization code
-usFunctionGenerateModuleInit(_srcs)
+# Generate bundle initialization code
+usFunctionGenerateBundleInit(_srcs)
 
 # Create the library
 add_library(Example-${_lib_name} ${_srcs})
 
-# Add the US_MODULE_NAME target property
-set_property(TARGET Example-${_lib_name} APPEND PROPERTY US_MODULE_NAME ${_lib_name})
+# Add the US_BUNDLE_NAME target property
+set_property(TARGET Example-${_lib_name} APPEND PROPERTY US_BUNDLE_NAME ${_lib_name})
 
 # Add the required compile definition
-set_property(TARGET Example-${_lib_name} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_lib_name})
+set_property(TARGET Example-${_lib_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_lib_name})
 
 # Embed the manifest file
 usFunctionEmbedResources(TARGET Example-${_lib_name} WORKING_DIRECTORY resources FILES manifest.json)

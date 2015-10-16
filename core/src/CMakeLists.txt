@@ -33,30 +33,30 @@ set(_srcs
   service/usServiceRegistry.cpp
   service/usServiceRegistry_p.h
 
-  module/usCoreModuleActivator.cpp
-  module/usCoreModuleContext_p.h
-  module/usCoreModuleContext.cpp
-  module/usModuleContext.cpp
-  module/usModule.cpp
-  module/usModuleElfFile.cpp
-  module/usModuleEvent.cpp
-  module/usModuleEventHook.cpp
-  module/usModuleFindHook.cpp
-  module/usModuleHooks.cpp
-  module/usModuleInfo.cpp
-  module/usModuleMachOFile.cpp
-  module/usModuleManifest.cpp
-  module/usModuleObjFile.cpp
-  module/usModulePEFile.cpp
-  module/usModulePrivate.cpp
-  module/usModuleRegistry.cpp
-  module/usModuleResource.cpp
-  module/usModuleResourceBuffer.cpp
-  module/usModuleResourceContainer.cpp
-  module/usModuleResourceStream.cpp
-  module/usModuleSettings.cpp
-  module/usModuleUtils.cpp
-  module/usModuleVersion.cpp
+  bundle/usCoreBundleActivator.cpp
+  bundle/usCoreBundleContext_p.h
+  bundle/usCoreBundleContext.cpp
+  bundle/usBundleContext.cpp
+  bundle/usBundle.cpp
+  bundle/usModuleElfFile.cpp
+  bundle/usBundleEvent.cpp
+  bundle/usBundleEventHook.cpp
+  bundle/usBundleFindHook.cpp
+  bundle/usBundleHooks.cpp
+  bundle/usBundleInfo.cpp
+  bundle/usModuleMachOFile.cpp
+  bundle/usBundleManifest.cpp
+  bundle/usModuleObjFile.cpp
+  bundle/usModulePEFile.cpp
+  bundle/usBundlePrivate.cpp
+  bundle/usBundleRegistry.cpp
+  bundle/usBundleResource.cpp
+  bundle/usBundleResourceBuffer.cpp
+  bundle/usBundleResourceContainer.cpp
+  bundle/usBundleResourceStream.cpp
+  bundle/usBundleSettings.cpp
+  bundle/usBundleUtils.cpp
+  bundle/usBundleVersion.cpp
 
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
@@ -78,14 +78,13 @@ set(_private_headers
   service/usTrackedServiceListener_p.h
   service/usTrackedService.tpp
 
-  module/usModuleAbstractTracked_p.h
-  module/usModuleAbstractTracked.tpp
-  module/usModuleHooks_p.h
-  module/usModuleObjFile_p.h
-  module/usModulePrivate.h
-  module/usModuleRegistry_p.h
-  module/usModuleResourceBuffer_p.h
-  module/usModuleResourceContainer_p.h
-  module/usModuleUtils_p.h
+  bundle/usBundleAbstractTracked_p.h
+  bundle/usBundleAbstractTracked.tpp
+  bundle/usBundleHooks_p.h
+  bundle/usModuleObjFile_p.h
+  bundle/usBundlePrivate.h
+  bundle/usBundleRegistry_p.h
+  bundle/usBundleResourceBuffer_p.h
+  bundle/usBundleResourceContainer_p.h
+  bundle/usBundleUtils_p.h
 )
-

@@ -24,7 +24,7 @@ limitations under the License.
 #include <usFramework.h>
 
 #include "usTestUtils.h"
-#include "usTestUtilModuleListener.h"
+#include "usTestUtilBundleListener.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
@@ -77,30 +77,30 @@ namespace
         US_TEST_CONDITION(f->GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f->GetName() == US_CORE_FRAMEWORK_NAME, "Test Framework Bundle Name");
         // TODO: fix once the system bundle id is set to 0
-        US_TEST_CONDITION(f->GetModuleId() == 1, "Test Framework Bundle Id");
+        US_TEST_CONDITION(f->GetBundleId() == 1, "Test Framework Bundle Id");
 
         delete f;
     }
 
     void TestLifeCycle()
     {
-        TestModuleListener listener;
+        TestBundleListener listener;
         FrameworkFactory factory;
-        std::vector<ModuleEvent> pEvts;
+        std::vector<BundleEvent> pEvts;
 
         Framework* f = factory.NewFramework(std::map<std::string, std::string>());
         f->Start();
-        
+
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
 
-        US_TEST_CONDITION(f->IsLoaded(), "Check framework is in the Start state")
+        US_TEST_CONDITION(f->IsStarted(), "Check framework is in the Start state")
 
-        f->GetModuleContext()->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
+        f->GetBundleContext()->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
         f->Stop();
-        US_TEST_CONDITION(!f->IsLoaded(), "Check framework is in the Stop state")
+        US_TEST_CONDITION(!f->IsStarted(), "Check framework is in the Stop state")
 
-        pEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, f));
+        pEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
 
@@ -121,16 +121,16 @@ namespace
 
         // Test that all bundles in the Start state are stopped when the framework is stopped.
         f->Start();
-        InstallTestBundle(f->GetModuleContext(), "TestModuleA");
+        InstallTestBundle(f->GetBundleContext(), "TestBundleA");
 
-        Module* moduleA = f->GetModuleContext()->GetModule("TestModuleA");
-        moduleA->Start();
+        Bundle* bundleA = f->GetBundleContext()->GetBundle("TestBundleA");
+        bundleA->Start();
 
         // Stopping the framework stops all active bundles.
         f->Stop();
 
-        US_TEST_CONDITION(!moduleA->IsLoaded(), "Check that TestModuleA is in the Stop state")
-        US_TEST_CONDITION(!f->IsLoaded(), "Check framework is in the Stop state")
+        US_TEST_CONDITION(!bundleA->IsStarted(), "Check that TestBundleA is in the Stop state")
+        US_TEST_CONDITION(!f->IsStarted(), "Check framework is in the Stop state")
 
         delete f;
 
@@ -138,74 +138,74 @@ namespace
 
     void TestEvents()
     {
-        TestModuleListener listener;
-        std::vector<ModuleEvent> pEvts;
-        std::vector<ModuleEvent> pStopEvts;
+        TestBundleListener listener;
+        std::vector<BundleEvent> pEvts;
+        std::vector<BundleEvent> pStopEvts;
         FrameworkFactory factory;
 
         Framework* f = factory.NewFramework(std::map<std::string, std::string>());
 
         f->Start();
 
-        ModuleContext* fmc = f->GetModuleContext();
-        fmc->AddModuleListener(&listener, &TestModuleListener::ModuleChanged);
+        BundleContext* fmc = f->GetBundleContext();
+        fmc->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
         // The bundles used to test bundle events when stopping the framework
-        Module* module = InstallTestBundle(fmc, "TestModuleA");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleA2");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleB");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleH");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleM");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleR");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleRA");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleRL");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleS");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleSL1");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleSL3");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
-        module = InstallTestBundle(fmc, "TestModuleSL4");
-        pEvts.push_back(ModuleEvent(ModuleEvent::INSTALLED, module));
+        Bundle* bundle = InstallTestBundle(fmc, "TestBundleA");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleA2");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleB");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleH");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleM");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleR");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleRA");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleRL");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleS");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleSL1");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleSL3");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        bundle = InstallTestBundle(fmc, "TestBundleSL4");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
 
-        std::vector<Module*> modules(fmc->GetModules());
-        for (std::vector<Module*>::iterator iter = modules.begin();
-            iter != modules.end(); ++iter)
+        std::vector<Bundle*> bundles(fmc->GetBundles());
+        for (std::vector<Bundle*>::iterator iter = bundles.begin();
+            iter != bundles.end(); ++iter)
         {
             (*iter)->Start();
             // no events will be fired for the framework, its already active at this point
             if ((*iter) != f)
             {
-                pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, (*iter)));
-                pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, (*iter)));
+                pEvts.push_back(BundleEvent(BundleEvent::STARTING, (*iter)));
+                pEvts.push_back(BundleEvent(BundleEvent::STARTED, (*iter)));
 
                 // bundles will be stopped in the same order in which they were started.
-                // It is easier to maintain this test if the stop events are setup in the 
-                // right order here, while the bundles are starting, instead of hard coding 
+                // It is easier to maintain this test if the stop events are setup in the
+                // right order here, while the bundles are starting, instead of hard coding
                 // the order of events somewhere else.
-                // Doing it this way also tests the order in which starting and stopping 
+                // Doing it this way also tests the order in which starting and stopping
                 // bundles occurs and when their events are fired.
-                pStopEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, (*iter)));
-                pStopEvts.push_back(ModuleEvent(ModuleEvent::UNLOADED, (*iter)));
+                pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, (*iter)));
+                pStopEvts.push_back(BundleEvent(BundleEvent::STOPPED, (*iter)));
             }
         }
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check for bundle start events")
 
         // Remember, the framework is stopped last, after all bundles are stopped.
-        pStopEvts.push_back(ModuleEvent(ModuleEvent::UNLOADING, f));
+        pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
 
         // Stopping the framework stops all active bundles.
         f->Stop();
-        
+
         US_TEST_CONDITION(listener.CheckListenerEvents(pStopEvts), "Check for bundle stop events")
 
         delete f;

@@ -24,8 +24,8 @@
 #include "usServiceReferenceBasePrivate.h"
 #include "usServiceRegistrationBasePrivate.h"
 
-#include "usModule.h"
-#include "usModulePrivate.h"
+#include "usBundle.h"
+#include "usBundlePrivate.h"
 
 #include <cassert>
 
@@ -61,7 +61,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool_type() const
 {
-  return GetModule() != nullptr ? &ServiceReferenceBase::d : NULL;
+  return GetBundle() != nullptr ? &ServiceReferenceBase::d : NULL;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
@@ -95,26 +95,26 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
   keys.assign(ks.begin(), ks.end());
 }
 
-Module* ServiceReferenceBase::GetModule() const
+Bundle* ServiceReferenceBase::GetBundle() const
 {
-  if (d->registration == nullptr || d->registration->module == nullptr)
+  if (d->registration == nullptr || d->registration->bundle == nullptr)
   {
     return 0;
   }
 
-  return d->registration->module->q;
+  return d->registration->bundle->q;
 }
 
-void ServiceReferenceBase::GetUsingModules(std::vector<Module*>& modules) const
+void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
 {
   typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
   T::Lock l(d->registration->propsLock);
 
-  ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator end = d->registration->dependents.end();
-  for (ServiceRegistrationBasePrivate::ModuleToRefsMap::const_iterator iter = d->registration->dependents.begin();
+  ServiceRegistrationBasePrivate::BundleToRefsMap::const_iterator end = d->registration->dependents.end();
+  for (ServiceRegistrationBasePrivate::BundleToRefsMap::const_iterator iter = d->registration->dependents.begin();
        iter != end; ++iter)
   {
-    modules.push_back(iter->first);
+    bundles.push_back(iter->first);
   }
 }
 
@@ -198,10 +198,10 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
 {
   if (serviceRef)
   {
-    assert(serviceRef.GetModule() != NULL);
+    assert(serviceRef.GetBundle() != NULL);
 
     os << "Reference for service object registered from "
-       << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()
+       << serviceRef.GetBundle()->GetName() << " " << serviceRef.GetBundle()->GetVersion()
        << " (";
     std::vector<std::string> keys;
     serviceRef.GetPropertyKeys(keys);

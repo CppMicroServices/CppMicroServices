@@ -24,11 +24,11 @@
 #include "usHttpServletRequest.h"
 #include "usHttpServletResponse.h"
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModule.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include "usGetBundleContext.h"
+#include "usBundleContext.h"
+#include "usBundle.h"
+#include "usBundleResource.h"
+#include "usBundleResourceStream.h"
 
 #include <set>
 
@@ -97,8 +97,8 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     {
       if (m_TemplateRS == NULL)
       {
-        ModuleResource res = GetModuleContext()->GetModule()->GetResource("/templates/services.html");
-        m_TemplateRS = new ModuleResourceStream(res, std::ios_base::binary);
+        BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/services.html");
+        m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
       }
       m_TemplateRS->seekg(0, std::ios_base::beg);
       response.GetOutputStream() << m_TemplateRS->rdbuf();
@@ -116,8 +116,8 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     {
       if (m_TemplateSI == NULL)
       {
-        ModuleResource res = GetModuleContext()->GetModule()->GetResource("/templates/service_interface.html");
-        m_TemplateSI = new ModuleResourceStream(res, std::ios_base::binary);
+        BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/service_interface.html");
+        m_TemplateSI = new BundleResourceStream(res, std::ios_base::binary);
       }
       m_TemplateSI->seekg(0, std::ios_base::beg);
       response.GetOutputStream() << m_TemplateSI->rdbuf();
@@ -190,7 +190,7 @@ std::string ServicesPlugin::GetInterface_JSON(const std::string& iid) const
     {
       json << ",";
     }
-    json << "{ \"module\":\"" << iter->GetModule()->GetName() << "\","
+    json << "{ \"bundle\":\"" << iter->GetBundle()->GetName() << "\","
          << "  \"id\":" << iter->GetProperty(ServiceConstants::SERVICE_ID()).ToJSON() << ","
          << "  \"ranking\":" << iter->GetProperty(ServiceConstants::SERVICE_RANKING()).ToJSON() << ","
          << "  \"scope\":" << iter->GetProperty(ServiceConstants::SERVICE_SCOPE()).ToJSON() << ","

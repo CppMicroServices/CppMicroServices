@@ -32,18 +32,18 @@ set(_public_headers
   usServiceTracker.h
   usServiceTrackerCustomizer.h
 
-  usGetModuleContext.h
-  usModule.h
-  usModuleActivator.h
-  usModuleContext.h
-  usModuleEvent.h
-  usModuleEventHook.h
-  usModuleFindHook.h
-  usModuleImport.h
-  usModuleInfo.h
-  usModuleInitialization.h
-  usModuleResource.h
-  usModuleResourceStream.h
-  usModuleSettings.h
-  usModuleVersion.h
+  usGetBundleContext.h
+  usBundle.h
+  usBundleActivator.h
+  usBundleContext.h
+  usBundleEvent.h
+  usBundleEventHook.h
+  usBundleFindHook.h
+  usBundleImport.h
+  usBundleInfo.h
+  usBundleInitialization.h
+  usBundleResource.h
+  usBundleResourceStream.h
+  usBundleSettings.h
+  usBundleVersion.h
 )

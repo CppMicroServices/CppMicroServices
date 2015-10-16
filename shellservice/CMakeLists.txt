@@ -38,7 +38,7 @@ add_definitions(-DSTANDALONE=0 -DUSE_INTERFACE=1)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../third_party/tinyscheme/init.scm
   ${CMAKE_CURRENT_BINARY_DIR}/resources/tinyscheme/init.scm COPYONLY)
 
-usMacroCreateModule(ShellService
+usMacroCreateBundle(ShellService
   VERSION "0.1.0"
   DEPENDS Core
   PUBLIC_HEADERS ${_public_headers}

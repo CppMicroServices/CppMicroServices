@@ -29,12 +29,12 @@ When building the C++ Micro Services library, you have a few configuration optio
 - **CMAKE_INSTALL_PREFIX**
   The installation path.
 - **US_BUILD_SHARED_LIBS**
-  Specify if the library should be build shared or static. See \ref MicroServices_StaticModules
-  for detailed information about static CppMicroServices modules.
+  Specify if the library should be build shared or static. See \ref MicroServices_StaticBundles
+  for detailed information about static CppMicroServices bundles.
 - **US_BUILD_TESTING**
   Build unit tests and code snippets.
 - **US_ENABLE_AUTOLOADING_SUPPORT**
-  Enable auto-loading of modules located in special sub-directories. See \ref MicroServices_AutoLoading
+  Enable auto-loading of bundles located in special sub-directories. See \ref MicroServices_AutoLoading
   for detailed information about this feature.
 - **US_ENABLE_THREADING_SUPPORT**
   Enable the use of synchronization primitives (atomics and pthread mutexes or Windows primitives)

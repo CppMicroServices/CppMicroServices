@@ -31,17 +31,17 @@
 namespace us {
 
   class ServiceEvent;
-  class ModuleEvent;
+  class BundleEvent;
 
   typedef std::function<void(const ServiceEvent&)> ServiceListener;
-  typedef std::function<void(const ModuleEvent&)> ModuleListener;
+  typedef std::function<void(const BundleEvent&)> BundleListener;
 
   template<class X>
   ServiceListener ServiceListenerMemberFunctor(X* x, void (X::*memFn)(const ServiceEvent&))
   { return std::bind(memFn, x, std::placeholders::_1); }
 
   template<class X>
-  ModuleListener ModuleListenerMemberFunctor(X* x, void (X::*memFn)(const ModuleEvent&))
+  BundleListener BundleListenerMemberFunctor(X* x, void (X::*memFn)(const BundleEvent&))
   { return std::bind(memFn, x, std::placeholders::_1); }
 
 

@@ -34,15 +34,15 @@ namespace us {
  *
  * <p>
  * The framework returns a <code>ServiceRegistration</code> object when a
- * <code>ModuleContext#RegisterService()</code> method invocation is successful.
+ * <code>BundleContext#RegisterService()</code> method invocation is successful.
  * The <code>ServiceRegistration</code> object is for the private use of the
- * registering module and should not be shared with other modules.
+ * registering bundle and should not be shared with other bundles.
  * <p>
  * The <code>ServiceRegistration</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
  * @tparam S Class tyoe of the service interface
- * @see ModuleContext#RegisterService()
+ * @see BundleContext#RegisterService()
  * @remarks This class is thread safe.
  */
 template<class I1, class ...Interfaces>
@@ -65,7 +65,7 @@ public:
    * registered.
    * <p>
    * The <code>ServiceReference</code> object may be shared with other
-   * modules.
+   * bundles.
    *
    * @throws std::logic_error If this
    *         <code>ServiceRegistration</code> object has already been
@@ -84,7 +84,7 @@ public:
    * registered.
    * <p>
    * The <code>ServiceReference</code> object refers to the first interface
-   * type and may be shared with other modules.
+   * type and may be shared with other bundles.
    *
    * @throws std::logic_error If this
    *         <code>ServiceRegistration</code> object has already been
@@ -101,7 +101,7 @@ public:
 
 private:
 
-  friend class ModuleContext;
+  friend class BundleContext;
 
   ServiceRegistration(const ServiceRegistrationBase& base)
     : ServiceRegistrationBase(base)

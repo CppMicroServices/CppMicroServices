@@ -82,7 +82,7 @@ public:
    * @param bc the bundle context used for service registration.
    * @return self
    */
-  SimpleWebConsolePlugin* Register(ModuleContext* context = GetModuleContext());
+  SimpleWebConsolePlugin* Register(BundleContext* context = GetBundleContext());
 
 
   /**
@@ -98,7 +98,7 @@ protected:
    */
   std::vector<std::string> GetCssReferences() const;
 
-  ModuleContext* GetContext() const;
+  BundleContext* GetContext() const;
 
 private:
 
@@ -115,7 +115,7 @@ private:
    * @param path the path to read.
    * @return the URL of the resource or <code>null</code> if not found.
    */
-  ModuleResource GetResource(const std::string& path) const;
+  BundleResource GetResource(const std::string& path) const;
 
   // used for standard AbstractWebConsolePlugin implementation
   std::string m_Label;
@@ -127,7 +127,7 @@ private:
 
   // used for service registration
   ServiceRegistration<HttpServlet> m_Reg;
-  ModuleContext* m_Context;
+  BundleContext* m_Context;
 };
 
 }

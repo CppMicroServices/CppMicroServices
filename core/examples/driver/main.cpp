@@ -81,7 +81,6 @@ int main(int /*argc*/, char** /*argv*/)
   FrameworkFactory factory;
   Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
-  BundleContext* frameworkContext = framework->GetBundleContext();
 
   std::vector<std::string> availableBundles = GetExampleBundles();
 
@@ -90,15 +89,24 @@ int main(int /*argc*/, char** /*argv*/)
       iter != availableBundles.end(); ++iter)
   {
 #if defined (US_BUILD_SHARED_LIBS)
-      frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
+    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
 #else
-      frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
+    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
 #endif
   }
 
   std::cout << "> ";
   while(std::cin.getline(cmd, sizeof(cmd)))
   {
+    /*
+     The user can stop the framework so make sure that we start it again
+     otherwise this tool will crash.
+    */
+    if (!framework->IsStarted())
+    {
+      framework->Start();
+    }
+
     std::string strCmd(cmd);
     if (strCmd == "q")
     {
@@ -122,7 +130,7 @@ int main(int /*argc*/, char** /*argv*/)
       ss >> id;
       if (id > 0)
       {
-        Bundle* bundle = frameworkContext->GetBundle(id);
+        Bundle* bundle = framework->GetBundleContext()->GetBundle(id);
         if (!bundle)
         {
           std::cout << "Error: unknown id" << std::endl;
@@ -147,7 +155,7 @@ int main(int /*argc*/, char** /*argv*/)
       }
       else
       {
-        Bundle* bundle = frameworkContext->GetBundle(idOrName);
+        Bundle* bundle = framework->GetBundleContext()->GetBundle(idOrName);
         if (!bundle)
         {
           try
@@ -155,9 +163,9 @@ int main(int /*argc*/, char** /*argv*/)
               /* Installing a bundle can't be done by id since that is a
                     framework generated piece of information. */
 #if defined (US_BUILD_SHARED_LIBS)
-              bundle = frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
+            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
 #else
-              bundle = frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
+            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
 #endif
           }
           catch (const std::exception& e)
@@ -196,41 +204,33 @@ int main(int /*argc*/, char** /*argv*/)
 
       long int id = -1;
       ss >> id;
-      // TODO: the "system bundle" is 0 in the OSGi spec. Change this once CppMicroServices is
-      //    inline with the spec.
-      if (id == 1)
+
+      Bundle* const bundle = framework->GetBundleContext()->GetBundle(id);
+      if (bundle)
       {
-        std::cout << "Info: Stopping not possible" << std::endl;
+        try
+        {
+          bundle->Stop();
+
+          // Check if it has really been stopped
+          if (bundle->IsStarted())
+          {
+            std::cout << "Info: The bundle is still referenced by another active bundle. It will be stopped when all dependent bundles are stopped." << std::endl;
+          }
+        }
+        catch (const std::exception& e)
+        {
+          std::cout << e.what() << std::endl;
+        }
       }
       else
       {
-        Bundle* const bundle = frameworkContext->GetBundle(id);
-        if (bundle)
-        {
-          try
-          {
-            bundle->Stop();
-
-            // Check if it has really been stopped
-            if (bundle->IsStarted())
-            {
-              std::cout << "Info: The bundle is still referenced by another active bundle. It will be stopped when all dependent bundles are stopped." << std::endl;
-            }
-          }
-          catch (const std::exception& e)
-          {
-            std::cout << e.what() << std::endl;
-          }
-        }
-        else
-        {
-          std::cout << "Error: unknown id" << std::endl;
-        }
+        std::cout << "Error: unknown id" << std::endl;
       }
     }
     else if (strCmd == "s")
     {
-      std::vector<Bundle*> bundles = frameworkContext->GetBundles();
+      std::vector<Bundle*> bundles = framework->GetBundleContext()->GetBundles();
 
       std::cout << std::left;
 

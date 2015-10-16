@@ -129,7 +129,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 
     for (auto bundle : framework->GetBundleContext()->GetBundles())
     {
-        if (bundle->GetBundleId() != 1)
+        if (bundle->GetBundleId() != 0)
         {
             bundle->Uninstall();
         }

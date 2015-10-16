@@ -56,8 +56,8 @@ Bundle* BundleRegistry::Register(BundleInfo* info)
     bundle = new Bundle();
     {
       Lock l(id);
-      info->id = ++id.value;
-      assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+      info->id = id.value++;
+      assert(info->id == 0 ? info->name == "CppMicroServices" : true);
     }
     bundle->Init(coreCtx, info);
 
@@ -78,7 +78,7 @@ Bundle* BundleRegistry::Register(BundleInfo* info)
       BundleMap::iterator iter(return_pair.first);
       delete bundle;
       bundle = (*iter).second;
-    }    
+    }
   }
 
   return bundle;
@@ -93,8 +93,8 @@ void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleI
 
   {
     Lock l(id);
-    info->id = ++id.value;
-    assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+    info->id = id.value++;
+    assert(info->id == 0 ? info->name == "CppMicroServices" : true);
   }
 
   systemBundle->Init(coreCtx, info);
@@ -105,8 +105,8 @@ void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleI
 
 void BundleRegistry::UnRegister(const BundleInfo* info)
 {
-  // TODO: fix once the system bundle id is set to 0
-  if (info->id > 1)
+  // The system bundle cannot be uninstalled.
+  if (info->id >= 1)
   {
     Lock l(this);
     bundles.erase(info->name);
@@ -152,4 +152,3 @@ std::vector<Bundle*> BundleRegistry::GetBundles() const
 }
 
 }
-

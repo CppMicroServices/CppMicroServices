@@ -76,8 +76,7 @@ namespace
         f->Start();
         US_TEST_CONDITION(f->GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f->GetName() == US_CORE_FRAMEWORK_NAME, "Test Framework Bundle Name");
-        // TODO: fix once the system bundle id is set to 0
-        US_TEST_CONDITION(f->GetBundleId() == 1, "Test Framework Bundle Id");
+        US_TEST_CONDITION(f->GetBundleId() == 0, "Test Framework Bundle Id");
 
         delete f;
     }

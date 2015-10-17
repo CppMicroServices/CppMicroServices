@@ -35,7 +35,7 @@ namespace us {
 /**
  * The implementation of the Framework class.
  *
- * This class exists to hide and decouple the implementation of the 
+ * This class exists to hide and decouple the implementation of the
  * Framework class from client code.
  */
 class FrameworkPrivate : public MultiThreaded<>

@@ -139,7 +139,7 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->mc == NULL || other.d->mc == NULL) || d->mc == other.d->mc) &&
+  return ((d->mc == nullptr || other.d->mc == nullptr) || d->mc == other.d->mc) &&
       (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
 }
 

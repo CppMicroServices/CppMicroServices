@@ -75,8 +75,8 @@ namespace
 
         elapsedTimeInMilliSeconds = 0;
 
-        std::vector<Bundle*> bundles(f->GetBundleContext()->GetBundles());
-        for (auto bundle : bundles)
+        auto bundles = f->GetBundleContext()->GetBundles();
+        for (auto& bundle : bundles)
         {
             timer.Start();
             bundle->Start();
@@ -118,7 +118,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_BEGIN("BundleRegistryPerformanceTest")
 
     FrameworkFactory factory;
-    Framework* framework = factory.NewFramework();
+    auto framework = factory.NewFramework();
     framework->Start();
 
     // auto-installing will skew the benchmark results.

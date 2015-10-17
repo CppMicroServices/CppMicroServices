@@ -41,8 +41,8 @@ public:
 
   FilteringResponseWrapper(HttpServletRequest& request, HttpServletResponse& response, AbstractWebConsolePlugin* plugin)
    : HttpServletResponse(response)
-   //, m_Stream(NULL)
-   , m_StreamBuf(NULL)
+   //, m_Stream(nullptr)
+   , m_StreamBuf(nullptr)
    , m_Plugin(plugin)
    , m_Request(request)
   {}
@@ -58,7 +58,7 @@ private:
     std::string contentType = this->GetContentType();
     if (contentType.size() >= 9 && contentType.compare(0, 9, "text/html") == 0)
     {
-      if (m_StreamBuf == NULL)
+      if (m_StreamBuf == nullptr)
       {
         WebConsoleVariableResolver* resolver = m_Plugin->GetVariableResolver(m_Request);
         m_StreamBuf = new VariableResolverStreamBuffer(
@@ -105,8 +105,8 @@ void WebConsolePluginTracker::AddPlugin(const std::string& label, AbstractWebCon
 WebConsolePluginTracker::WebConsolePluginTracker()
   : ServiceTracker<HttpServlet>(GetBundleContext())
   , m_LabelMapAny(std::map<std::string, Any>())
-  , m_Labels(NULL)
-  , m_ServletContext(NULL)
+  , m_Labels(nullptr)
+  , m_ServletContext(nullptr)
 {
   ref_any_cast<std::map<std::string, Any> >(m_LabelMapAny)["menuItems"] = std::vector<Any>();
   m_Labels = &ref_any_cast<std::vector<Any> >(ref_any_cast<std::map<std::string, Any> >(m_LabelMapAny)["menuItems"]);
@@ -121,7 +121,7 @@ void WebConsolePluginTracker::Open(ServletContext* context)
 AbstractWebConsolePlugin* WebConsolePluginTracker::GetPlugin(const std::string& label) const
 {
   PluginMapType::const_iterator iter = m_Plugins.find(label);
-  if (iter == m_Plugins.end()) return NULL;
+  if (iter == m_Plugins.end()) return nullptr;
   return iter->second;
 }
 
@@ -140,7 +140,7 @@ HttpServlet* WebConsolePluginTracker::AddingService(const ServiceReferenceType& 
   std::string label = this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL());
   if (label.empty())
   {
-    return NULL;
+    return nullptr;
   }
   HttpServlet* servlet = Superclass::AddingService(reference);
   AbstractWebConsolePlugin* plugin = dynamic_cast<AbstractWebConsolePlugin*>(servlet);
@@ -218,7 +218,7 @@ void WebConsoleServlet::Service(HttpServletRequest& request, HttpServletResponse
   }
 
   AbstractWebConsolePlugin* plugin = GetConsolePlugin(label);
-  if (plugin != NULL)
+  if (plugin != nullptr)
   {
     //final Map labelMap = holder.getLocalizedLabelMap( resourceBundleManager, locale, this.defaultCategory );
     //final Object flatLabelMap = labelMap.remove( WebConsoleConstants.ATTR_LABEL_MAP );

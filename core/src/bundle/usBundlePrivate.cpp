@@ -45,8 +45,8 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
   : coreCtx(coreCtx)
   , info(*info)
   , resourceContainer(info)
-  , bundleContext(0)
-  , bundleActivator(0)
+  , bundleContext(nullptr)
+  , bundleActivator(nullptr)
   , q(qq)
   , lib(info->location)
 {

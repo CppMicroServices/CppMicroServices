@@ -109,7 +109,7 @@ bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat) const
 {
   if (IsValid())
   {
-    int fileIndex = mz_zip_reader_locate_file(&d->m_ZipArchive, stat.filePath.c_str(), NULL, 0);
+    int fileIndex = mz_zip_reader_locate_file(&d->m_ZipArchive, stat.filePath.c_str(), nullptr, 0);
     if (fileIndex >= 0)
     {
       return GetStat(fileIndex, stat);
@@ -147,10 +147,10 @@ bool BundleResourceContainer::GetStat(int index, BundleResourceContainer::Stat& 
 
 void* BundleResourceContainer::GetData(int index) const
 {
-  return mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, NULL, 0);
+  return mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, nullptr, 0);
 }
 
-const BundleInfo*BundleResourceContainer::GetBundleInfo() const
+const BundleInfo* BundleResourceContainer::GetBundleInfo() const
 {
   return d->m_BundleInfo;
 }

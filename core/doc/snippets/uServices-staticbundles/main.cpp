@@ -12,12 +12,12 @@ extern "C" BundleActivator* _us_bundle_activator_instance_MyStaticBundle1() { re
 extern "C" BundleActivator* _us_bundle_activator_instance_MyStaticBundle2() { return 0; }
 extern "C" void _us_import_bundle_initializer_MyStaticBundle1() {}
 extern "C" void _us_import_bundle_initializer_MyStaticBundle2() {}
-extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle1() { return 0; }
-extern "C" BundleContext* _us_set_bundle_context_instance_MyStaticBundle1() { return 0; }
-extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle2() { return 0; }
-extern "C" BundleContext* _us_set_bundle_context_instance_MyStaticBundle2() { return 0; }
-extern "C" BundleContext* _us_get_bundle_context_instance_main() { return 0; }
-extern "C" BundleContext* _us_set_bundle_context_instance_main() { return 0; }
+extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle1() { return nullptr; }
+extern "C" BundleContext* _us_set_bundle_context_instance_MyStaticBundle1() { return nullptr; }
+extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle2() { return nullptr; }
+extern "C" BundleContext* _us_set_bundle_context_instance_MyStaticBundle2() { return nullptr; }
+extern "C" BundleContext* _us_get_bundle_context_instance_main() { return nullptr; }
+extern "C" BundleContext* _us_set_bundle_context_instance_main() { return nullptr; }
 
 //! [ImportStaticBundleIntoMain]
 #include <usBundleImport.h>

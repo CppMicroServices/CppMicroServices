@@ -82,7 +82,7 @@ public:
 
   Bundle* const q;
 
-  /** 
+  /**
    * Responsible for platform specific loading and unloading
    * of the bundle's physical form.
    */

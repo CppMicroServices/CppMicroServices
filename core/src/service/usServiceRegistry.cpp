@@ -96,18 +96,17 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
 
   // Check if we got a service factory
   bool isFactory = service.count("org.cppmicroservices.factory") > 0;
-  bool isPrototypeFactory = (isFactory ? dynamic_cast<PrototypeServiceFactory*>(reinterpret_cast<ServiceFactory*>(service.find("org.cppmicroservices.factory")->second)) != NULL : false);
+  bool isPrototypeFactory = (isFactory ? dynamic_cast<PrototypeServiceFactory*>(reinterpret_cast<ServiceFactory*>(service.find("org.cppmicroservices.factory")->second)) != nullptr : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
-  for (InterfaceMap::const_iterator i = service.begin();
-       i != service.end(); ++i)
+  for (auto i : service)
   {
-    if (i->first.empty() || (!isFactory && i->second == NULL))
+    if (i.first.empty() || (!isFactory && i.second == nullptr))
     {
       throw std::invalid_argument("Can't register as null class");
     }
-    classes.push_back(i->first);
+    classes.push_back(i.first);
   }
 
   ServiceRegistrationBase res(bundle, service,
@@ -116,10 +115,9 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
     Lock l(this);
     services.insert(std::make_pair(res, classes));
     serviceRegistrations.push_back(res);
-    for (std::vector<std::string>::const_iterator i = classes.begin();
-         i != classes.end(); ++i)
+    for (auto clazz : classes)
     {
-      std::vector<ServiceRegistrationBase>& s = classServices[*i];
+      std::vector<ServiceRegistrationBase>& s = classServices[clazz];
       std::vector<ServiceRegistrationBase>::iterator ip =
           std::lower_bound(s.begin(), s.end(), res);
       s.insert(ip, res);
@@ -139,10 +137,9 @@ void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistrationBa
                                                      const std::vector<std::string>& classes)
 {
   Lock l(this);
-  for (std::vector<std::string>::const_iterator i = classes.begin();
-       i != classes.end(); ++i)
+  for (auto& clazz : classes)
   {
-    std::vector<ServiceRegistrationBase>& s = classServices[*i];
+    std::vector<ServiceRegistrationBase>& s = classServices[clazz];
     s.erase(std::remove(s.begin(), s.end(), sr), s.end());
     s.insert(std::lower_bound(s.begin(), s.end(), sr), sr);
   }
@@ -209,10 +206,9 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
       if (ldap.GetMatchedObjectClasses(matched))
       {
         v.clear();
-        for(LDAPExpr::ObjectClassSet::const_iterator className = matched.begin();
-            className != matched.end(); ++className)
+        for(auto className : matched)
         {
-          MapClassServices::const_iterator i = classServices.find(*className);
+          auto i = classServices.find(className);
           if (i != classServices.end())
           {
             std::copy(i->second.begin(), i->second.end(), std::back_inserter(v));
@@ -270,13 +266,13 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
 
   if (!res.empty())
   {
-    if (bundle != NULL)
+    if (bundle != nullptr)
     {
       core->serviceHooks.FilterServiceReferences(bundle->bundleContext, clazz, filter, res);
     }
     else
     {
-      core->serviceHooks.FilterServiceReferences(NULL, clazz, filter, res);
+      core->serviceHooks.FilterServiceReferences(nullptr, clazz, filter, res);
     }
   }
 }
@@ -291,17 +287,16 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& s
   services.erase(sr);
   serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
                              serviceRegistrations.end());
-  for (std::vector<std::string>::const_iterator i = classes.begin();
-       i != classes.end(); ++i)
+  for (auto& clazz : classes)
   {
-    std::vector<ServiceRegistrationBase>& s = classServices[*i];
+    std::vector<ServiceRegistrationBase>& s = classServices[clazz];
     if (s.size() > 1)
     {
       s.erase(std::remove(s.begin(), s.end(), sr), s.end());
     }
     else
     {
-      classServices.erase(*i);
+      classServices.erase(clazz);
     }
   }
 }
@@ -311,12 +306,11 @@ void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
 {
   Lock l(this);
 
-  for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
-       i != serviceRegistrations.end(); ++i)
+  for (auto& sr : serviceRegistrations)
   {
-    if (i->d->bundle == p)
+    if (sr.d->bundle == p)
     {
-      res.push_back(*i);
+      res.push_back(sr);
     }
   }
 }
@@ -326,12 +320,11 @@ void ServiceRegistry::GetUsedByBundle(Bundle* p,
 {
   Lock l(this);
 
-  for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
-       i != serviceRegistrations.end(); ++i)
+  for (auto& sr : serviceRegistrations)
   {
-    if (i->d->IsUsedByBundle(p))
+    if (sr.d->IsUsedByBundle(p))
     {
-      res.push_back(*i);
+      res.push_back(sr);
     }
   }
 }

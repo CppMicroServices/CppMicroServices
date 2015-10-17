@@ -102,7 +102,7 @@ public:
 
   TestBundleHActivator()
     : thisServiceName(us_service_interface_iid<TestBundleH>())
-    , mc(NULL)
+    , mc(nullptr)
   {}
 
   void Start(BundleContext* mc)

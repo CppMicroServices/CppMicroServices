@@ -111,7 +111,7 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
   DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
   // Try intermediate output directories
-  if (dir == NULL)
+  if (dir == nullptr)
   {
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
     if (indexOfLastSeparator != std::string::npos)
@@ -134,10 +134,10 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
   }
 #endif
 
-  if (dir != NULL)
+  if (dir != nullptr)
   {
-    struct dirent *ent = NULL;
-    while ((ent = readdir(dir)) != NULL)
+    struct dirent *ent = nullptr;
+    while ((ent = readdir(dir)) != nullptr)
     {
       bool loadFile = true;
 #ifdef _DIRENT_HAVE_D_TYPE
@@ -346,7 +346,7 @@ void message_output(MsgType msgType, const char *buf)
 
   if (msgType == ErrorMsg)
   {
-#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
+  #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
     // get the current report mode
     int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
     _CrtSetReportMode(_CRT_ERROR, reportMode);
@@ -355,13 +355,13 @@ void message_output(MsgType msgType, const char *buf)
       return; // ignore
     else if (ret == 1)
       _CrtDbgBreak();
-#endif
+  #endif
 
-#ifdef US_PLATFORM_POSIX
-  abort(); // trap; generates core dump
-#else
-  exit(1); // goodbye cruel world
-#endif
+  #ifdef US_PLATFORM_POSIX
+    abort(); // trap; generates core dump
+  #else
+    exit(1); // goodbye cruel world
+  #endif
   }
 }
 
@@ -382,7 +382,7 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   }
 #elif defined(US_PLATFORM_WINDOWS)
   const char* demangled = typeInfo.name();
-  if (demangled != NULL)
+  if (demangled != nullptr)
   {
     result = demangled;
     // remove "struct" qualifiers

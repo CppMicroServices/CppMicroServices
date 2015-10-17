@@ -127,7 +127,7 @@ void TestServiceTracker(us::BundleContext* context)
 {
   BundleContext* mc = context;
 
-  Bundle* bundle = InstallTestBundle(mc, "TestBundleS");
+  auto bundle = InstallTestBundle(mc, "TestBundleS");
   bundle->Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
@@ -135,10 +135,10 @@ void TestServiceTracker(us::BundleContext* context)
   std::string s1("us::TestBundleSService");
   ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
 
-  US_TEST_CONDITION_REQUIRED(servref != nullptr, "Test if registered service of id us::TestBundleSService0");
+  US_TEST_CONDITION_REQUIRED(servref, "Test if registered service of id us::TestBundleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
-  US_TEST_CONDITION_REQUIRED(servCtrlRef != nullptr, "Test if constrol service was registered");
+  US_TEST_CONDITION_REQUIRED(servCtrlRef, "Test if constrol service was registered");
 
   ServiceControlInterface* serviceController = mc->GetService(servCtrlRef);
   US_TEST_CONDITION_REQUIRED(serviceController != nullptr, "Test valid service controller");
@@ -264,7 +264,7 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceTrackerTest")
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   TestFilterString(framework->GetBundleContext());

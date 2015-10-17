@@ -47,8 +47,8 @@ void frame01(BundleContext* mc)
 {
   try
   {
-    Bundle* bundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
-    US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle main")
+    auto bundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle main")
 
     bundle->Start();
   }
@@ -82,7 +82,7 @@ void frame02a(BundleContext* mc)
 
   InstallTestBundle(mc, "TestBundleA");
 
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  auto bundleA = mc->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
 
   bundleA->Start();
@@ -107,7 +107,7 @@ void frame02a(BundleContext* mc)
 // Verify information from the BundleInfo struct
 void frame005a(BundleContext* mc)
 {
-  Bundle* m = mc->GetBundle();
+  auto m = mc->GetBundle();
   long systemId = 0;
   // check expected meta-data
   US_TEST_CONDITION("main" == m->GetName(), "Test bundle name")
@@ -118,7 +118,7 @@ void frame005a(BundleContext* mc)
 // Get context id, location, persistent storage and status of the bundle
 void frame010a(Framework* framework, BundleContext* mc)
 {
-  Bundle* m = mc->GetBundle();
+  auto m = mc->GetBundle();
 
   long int contextid = m->GetBundleId();
   US_DEBUG << "CONTEXT ID:" << contextid;
@@ -166,7 +166,7 @@ void frame020a(Framework* framework, TestBundleListener& listener)
 {
   BundleContext* mc = framework->GetBundleContext();
 
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  auto bundleA = mc->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
 
   US_TEST_CONDITION(bundleA->GetName() == "TestBundleA", "Test bundle name")
@@ -216,7 +216,7 @@ void frame02b(Framework* framework)
 
   US_TEST_CONDITION(framework->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/tmp", "Test for valid base storage path")
 
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  auto bundleA = mc->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
   // launching properties should be accessible through any bundle
   US_TEST_CONDITION(bundleA->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/tmp", "Test for valid base storage path")
@@ -238,7 +238,7 @@ void frame02b(Framework* framework)
 // Stop libA and check for correct events
 void frame030b(BundleContext* mc, TestBundleListener& listener)
 {
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  auto bundleA = mc->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for non-null bundle")
 
   ServiceReferenceU sr1
@@ -297,7 +297,7 @@ void TestBundleStates()
     std::vector<BundleEvent> bundleEvents;
     FrameworkFactory factory;
 
-    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+    auto framework = factory.NewFramework();
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
@@ -369,7 +369,7 @@ void TestForInstallFailure()
 {
     FrameworkFactory factory;
 
-    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+    auto framework = factory.NewFramework();
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
@@ -413,15 +413,15 @@ void TestDuplicateInstall()
 {
     FrameworkFactory factory;
 
-    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+    auto framework = factory.NewFramework();
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
 
     // Test installing the same bundle (i.e. a bundle with the same location) twice.
     // The exact same bundle should be returned on the second install.
-    Bundle* bundle = InstallTestBundle(frameworkCtx, "TestBundleA");
-    Bundle* bundleDuplicate = InstallTestBundle(frameworkCtx, "TestBundleA");
+    auto bundle = InstallTestBundle(frameworkCtx, "TestBundleA");
+    auto bundleDuplicate = InstallTestBundle(frameworkCtx, "TestBundleA");
 
     US_TEST_CONDITION(bundle == bundleDuplicate, "Test for the same bundle instance");
     US_TEST_CONDITION(bundle->GetBundleId() == bundleDuplicate->GetBundleId(), "Test for the same bundle id");
@@ -437,14 +437,13 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
-  std::vector<Bundle*> bundles = framework->GetBundleContext()->GetBundles();
-  for (std::vector<Bundle*>::iterator iter = bundles.begin(), iterEnd = bundles.end();
-       iter != iterEnd; ++iter)
+  auto bundles = framework->GetBundleContext()->GetBundles();
+  for (auto& bundle : bundles)
   {
-    std::cout << "----- " << (*iter)->GetName() << std::endl;
+    std::cout << "----- " << bundle->GetName() << std::endl;
   }
 
   BundleContext* mc = framework->GetBundleContext();

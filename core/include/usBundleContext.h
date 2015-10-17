@@ -118,7 +118,7 @@ public:
    * Get the bundle with the specified bundle name.
    *
    * @param name The name of the bundle to get.
-   * @return The requested \c Bundle or \c NULL.
+   * @return The requested \c Bundle or \c nullptr.
    */
   Bundle* GetBundle(const std::string& name);
 
@@ -224,7 +224,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this BundleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
+   *         \c service object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -258,7 +258,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this BundleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
+   *         \c service factory object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */

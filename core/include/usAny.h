@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <list>
 #include <set>
 #include <map>
+#include <memory>
 
 #include <usCoreConfig.h>
 
@@ -167,8 +168,8 @@ public:
   /**
    * Creates an empty any type.
    */
-  Any(): _content(0)
-  { }
+  Any()
+  {}
 
   /**
    * Creates an Any which stores the init parameter inside.
@@ -184,7 +185,7 @@ public:
   template <typename ValueType>
   Any(const ValueType& value)
     : _content(new Holder<ValueType>(value))
-  { }
+  {}
 
   /**
    * Copy constructor, works with empty Anys and initialized Any values.
@@ -193,12 +194,11 @@ public:
    */
   Any(const Any& other)
     : _content(other._content ? other._content->Clone() : 0)
-  { }
+  {}
 
-  ~Any()
-  {
-    delete _content;
-  }
+  Any(Any&& other)
+    : _content(std::move(other._content))
+  {}
 
   /**
    * Swaps the content of the two Anys.
@@ -237,6 +237,12 @@ public:
   Any& operator = (const Any& rhs)
   {
     Any(rhs).Swap(*this);
+    return *this;
+  }
+
+  Any& operator=(Any&& rhs)
+  {
+    _content = std::move(rhs._content);
     return *this;
   }
 
@@ -292,7 +298,7 @@ private:
     virtual std::string ToJSON() const = 0;
 
     virtual const std::type_info& Type() const = 0;
-    virtual Placeholder* Clone() const = 0;
+    virtual std::unique_ptr<Placeholder> Clone() const = 0;
   };
 
   template <typename ValueType>
@@ -318,9 +324,9 @@ private:
       return typeid(ValueType);
     }
 
-    virtual Placeholder* Clone() const
+    virtual std::unique_ptr<Placeholder> Clone() const
     {
-      return new Holder(_held);
+      return std::unique_ptr<Placeholder>(new Holder(_held));
     }
 
     ValueType _held;
@@ -336,7 +342,7 @@ private:
     template <typename ValueType>
     friend ValueType* unsafe_any_cast(Any*);
 
-    Placeholder* _content;
+    std::unique_ptr<Placeholder> _content;
 };
 
 class BadAnyCastException : public std::bad_cast
@@ -371,13 +377,13 @@ private:
  * \code
  * MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 ValueType* any_cast(Any* operand)
 {
   return operand && operand->Type() == typeid(ValueType)
-      ? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
+      ? &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held
       : 0;
 }
 
@@ -389,7 +395,7 @@ ValueType* any_cast(Any* operand)
  * \code
  * const MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 const ValueType* any_cast(const Any* operand)

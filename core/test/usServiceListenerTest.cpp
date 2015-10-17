@@ -306,7 +306,7 @@ void frameSL02a(Framework* framework)
                         << " : frameSL02a:FAIL" );
   }
 
-  Bundle* bundle = InstallTestBundle(mc, "TestBundleA");
+  auto bundle = InstallTestBundle(mc, "TestBundleA");
   bundle->Start();
 
   std::vector<ServiceEvent::Type> events;
@@ -327,7 +327,7 @@ void frameSL05a(Framework* framework)
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
 
-  Bundle* bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
+  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
 
   bool testStatus = runStartStopTest("FrameSL05a", 1, *bundle, framework->GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
@@ -339,7 +339,7 @@ void frameSL10a(Framework* framework)
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
 
-  Bundle* bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA2");
+  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA2");
 
   bool testStatus = runStartStopTest("FrameSL10a", 1, *bundle, framework->GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
@@ -551,7 +551,7 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceListenerTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   frameSL02a(framework);

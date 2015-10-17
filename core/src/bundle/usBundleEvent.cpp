@@ -50,7 +50,7 @@ public:
 };
 
 BundleEvent::BundleEvent()
-  : d(0)
+  : d(nullptr)
 {
 
 }
@@ -112,7 +112,7 @@ std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
 {
   if (event.IsNull()) return os << "NONE";
 
-  Bundle* m = event.GetBundle();
+  auto m = event.GetBundle();
   os << event.GetType() << " #" << m->GetBundleId() << " (" << m->GetLocation() << ")";
   return os;
 }

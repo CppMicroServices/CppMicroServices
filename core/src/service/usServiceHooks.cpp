@@ -113,12 +113,11 @@ void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string&
     ShrinkableVector<ServiceReferenceBase> filtered(refs);
 
     std::sort(srl.begin(), srl.end());
-    for (std::vector<ServiceRegistrationBase>::reverse_iterator fhrIter = srl.rbegin(), fhrEnd = srl.rend();
-         fhrIter != fhrEnd; ++fhrIter)
+    for (auto fhrIter = srl.rbegin(), fhrEnd = srl.rend(); fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
       ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
-      if (fh != NULL)
+      if (fh != nullptr)
       {
         try
         {
@@ -148,27 +147,24 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
   {
     std::sort(eventListenerHooks.begin(), eventListenerHooks.end());
     std::map<BundleContext*, std::vector<ServiceListenerHook::ListenerInfo> > listeners;
-    for (ServiceListeners::ServiceListenerEntries::iterator sleIter = receivers.begin(),
-         sleEnd = receivers.end(); sleIter != sleEnd; ++sleIter)
+    for (auto& sle : receivers)
     {
-      listeners[sleIter->GetBundleContext()].push_back(*sleIter);
+      listeners[sle.GetBundleContext()].push_back(sle);
     }
 
     std::map<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > shrinkableListeners;
-    for (std::map<BundleContext*, std::vector<ServiceListenerHook::ListenerInfo> >::iterator iter = listeners.begin(),
-         iterEnd = listeners.end(); iter != iterEnd; ++iter)
+    for (auto& l : listeners)
     {
-      shrinkableListeners.insert(std::make_pair(iter->first, ShrinkableVector<ServiceListenerHook::ListenerInfo>(iter->second)));
+      shrinkableListeners.insert(std::make_pair(l.first, ShrinkableVector<ServiceListenerHook::ListenerInfo>(l.second)));
     }
 
     ShrinkableMap<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > filtered(shrinkableListeners);
 
-    for(std::vector<ServiceRegistrationBase>::reverse_iterator sriIter = eventListenerHooks.rbegin(),
-        sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
+    for(auto sriIter = eventListenerHooks.rbegin(), sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
       ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
-      if(elh != NULL)
+      if(elh != nullptr)
       {
         try
         {
@@ -187,10 +183,9 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
       }
     }
     receivers.clear();
-    for(std::map<BundleContext*, std::vector<ServiceListenerHook::ListenerInfo> >::iterator iter = listeners.begin(),
-        iterEnd = listeners.end(); iter != iterEnd; ++iter)
+    for(auto l : listeners)
     {
-      receivers.insert(iter->second.begin(), iter->second.end());
+      receivers.insert(l.second.begin(), l.second.end());
     }
   }
 }
@@ -202,17 +197,14 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
     return;
   }
 
-  std::vector<ServiceReference<ServiceListenerHook> > srl
-      = listenerHookTracker->GetServiceReferences();
-
+  auto srl = listenerHookTracker->GetServiceReferences();
   if (!srl.empty())
   {
     std::sort(srl.begin(), srl.end());
 
     std::vector<ServiceListenerHook::ListenerInfo> set;
     set.push_back(sle);
-    for (std::vector<ServiceReference<ServiceListenerHook> >::reverse_iterator srIter = srl.rbegin(),
-         srEnd = srl.rend(); srIter != srEnd; ++srIter)
+    for (auto srIter = srl.rbegin(), srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
       ServiceListenerHook* lh = listenerHookTracker->GetService(*srIter);
       try
@@ -250,21 +242,17 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
     return;
   }
 
-  std::vector<ServiceReference<ServiceListenerHook> > srl
-      = listenerHookTracker->GetServiceReferences();
-
+  auto srl = listenerHookTracker->GetServiceReferences();
   if (!srl.empty())
   {
     std::vector<ServiceListenerHook::ListenerInfo> lis;
-    for (std::vector<ServiceListenerEntry>::const_iterator sleIter = set.begin(),
-         sleEnd = set.end(); sleIter != sleEnd; ++sleIter)
+    for (auto& sle : set)
     {
-      lis.push_back(*sleIter);
+      lis.push_back(sle);
     }
 
     std::sort(srl.begin(), srl.end());
-    for (std::vector<ServiceReference<ServiceListenerHook> >::reverse_iterator srIter = srl.rbegin(),
-         srEnd = srl.rend(); srIter != srEnd; ++srIter)
+    for (auto srIter = srl.rbegin(), srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
       ServiceListenerHook* const lh = listenerHookTracker->GetService(*srIter);
       try

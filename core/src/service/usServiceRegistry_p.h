@@ -151,7 +151,7 @@ public:
    *
    * @param sr The ServiceRegistration object that is registered.
    */
-  void RemoveServiceRegistration(const ServiceRegistrationBase& sr) ;
+  void RemoveServiceRegistration(const ServiceRegistrationBase& sr);
 
   /**
    * Get all services that a bundle has registered.

@@ -52,11 +52,11 @@ const option::Descriptor usage[] =
   {0,0,0,0,0,0}
  };
 
-static ShellService* g_ShellService = NULL;
+static ShellService* g_ShellService = nullptr;
 
 void shellCompletion(const char* buf, linenoiseCompletions* lc)
 {
-  if (g_ShellService == NULL || buf == NULL) return;
+  if (g_ShellService == nullptr || buf == nullptr) return;
 
   g_ShellService->GetCompletions(buf);
   std::vector<std::string> completions = g_ShellService->GetCompletions(buf);
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
   linenoiseSetCompletionCallback(shellCompletion);
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
   BundleContext* context = framework->GetBundleContext();
 
@@ -111,14 +111,14 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  ShellService* shellService = NULL;
+  ShellService* shellService = nullptr;
   ServiceReference<ShellService> ref = context->GetServiceReference<ShellService>();
   if (ref)
   {
     shellService = context->GetService(ref);
   }
 
-  if (shellService == NULL)
+  if (shellService == nullptr)
   {
     std::cerr << "Shell service not available" << std::endl;
     return EXIT_FAILURE;
@@ -126,8 +126,8 @@ int main(int argc, char** argv)
 
   g_ShellService = shellService;
 
-  char* line = NULL;
-  while((line = linenoise("us> ")) != NULL)
+  char* line = nullptr;
+  while((line = linenoise("us> ")) != nullptr)
   {
     /* Do something with the string. */
     if (line[0] != '\0' && line[0] != '/')

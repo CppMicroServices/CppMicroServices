@@ -57,7 +57,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
                                                                 ServiceFactory* factory,
                                                                 bool isBundleScope)
 {
-  assert(factory && "Factory service pointer is NULL");
+  assert(factory && "Factory service pointer is nullptr");
   InterfaceMap s;
   try
   {
@@ -70,13 +70,12 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
     }
     const std::vector<std::string>& classes =
         ref_any_cast<std::vector<std::string> >(registration->properties.Value(ServiceConstants::OBJECTCLASS()));
-    for (std::vector<std::string>::const_iterator i = classes.begin();
-         i != classes.end(); ++i)
+    for (auto clazz : classes)
     {
-      if (smap.find(*i) == smap.end() && *i != "org.cppmicroservices.factory")
+      if (smap.find(clazz) == smap.end() && clazz != "org.cppmicroservices.factory")
       {
         US_WARN << "ServiceFactory produced an object "
-                   "that did not implement: " << (*i);
+                   "that did not implement: " << clazz;
         smap.clear();
         return smap;
       }
@@ -118,7 +117,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bundle)
 
 void* ServiceReferenceBasePrivate::GetService(Bundle* bundle)
 {
-  void* s = NULL;
+  void* s = nullptr;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
     T::Lock l(registration->propsLock);

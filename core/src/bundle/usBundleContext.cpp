@@ -132,22 +132,22 @@ bool BundleContext::UngetService(const ServiceReferenceBase& reference)
 void BundleContext::AddServiceListener(const ServiceListener& delegate,
                                        const std::string& filter)
 {
-  d->bundle->coreCtx->listeners.AddServiceListener(this, delegate, NULL, filter);
+  d->bundle->coreCtx->listeners.AddServiceListener(this, delegate, nullptr, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
-  d->bundle->coreCtx->listeners.RemoveServiceListener(this, delegate, NULL);
+  d->bundle->coreCtx->listeners.RemoveServiceListener(this, delegate, nullptr);
 }
 
 void BundleContext::AddBundleListener(const BundleListener& delegate)
 {
-  d->bundle->coreCtx->listeners.AddBundleListener(this, delegate, NULL);
+  d->bundle->coreCtx->listeners.AddBundleListener(this, delegate, nullptr);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate)
 {
-  d->bundle->coreCtx->listeners.RemoveBundleListener(this, delegate, NULL);
+  d->bundle->coreCtx->listeners.RemoveBundleListener(this, delegate, nullptr);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
@@ -181,7 +181,7 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 #endif
   
   std::string baseStoragePath;
-  std::map<std::string, std::string>::iterator prop = d->bundle->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
+  auto prop = d->bundle->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
   if(prop != d->bundle->coreCtx->frameworkProperties.end())
   { 
     baseStoragePath = (*prop).second;

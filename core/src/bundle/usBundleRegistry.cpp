@@ -124,7 +124,7 @@ Bundle* BundleRegistry::GetBundle(long id) const
       return m.second;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 Bundle* BundleRegistry::GetBundle(const std::string& name) const
@@ -136,7 +136,7 @@ Bundle* BundleRegistry::GetBundle(const std::string& name) const
   {
     return iter->second;
   }
-  return 0;
+  return nullptr;
 }
 
 std::vector<Bundle*> BundleRegistry::GetBundles() const

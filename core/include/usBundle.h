@@ -172,7 +172,7 @@ public:
    * <p>
    * If this bundle is not in the <code>STARTED</code> state, then this
    * bundle has no valid <code>BundleContext</code>. This method will
-   * return <code>0</code> if this bundle has no valid
+   * return <code>nullptr</code> if this bundle has no valid
    * <code>BundleContext</code>.
    *
    * @return A <code>BundleContext</code> for this bundle or
@@ -407,15 +407,15 @@ private:
 
 };
 
-}
+/**
+ * \ingroup MicroServices
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const Bundle& bundle);
+/**
+ * \ingroup MicroServices
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, Bundle const * bundle);
 
-/**
- * \ingroup MicroServices
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::Bundle& bundle);
-/**
- * \ingroup MicroServices
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, us::Bundle const * bundle);
+}
 
 #endif // USBUNDLE_H

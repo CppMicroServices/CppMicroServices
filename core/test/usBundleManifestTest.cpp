@@ -44,12 +44,12 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleManifestTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   InstallTestBundle(framework->GetBundleContext(), "TestBundleM");
 
-  Bundle* bundleM = framework->GetBundleContext()->GetBundle("TestBundleM");
+  auto bundleM = framework->GetBundleContext()->GetBundle("TestBundleM");
   US_TEST_CONDITION_REQUIRED(bundleM != nullptr, "Test for existing bundle TestBundleM")
 
   US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_NAME).ToString() == "TestBundleM", "Bundle name")

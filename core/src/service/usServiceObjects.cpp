@@ -84,7 +84,7 @@ void* ServiceObjectsBase::GetService() const
 {
   if (!d->m_reference)
   {
-    return NULL;
+    return nullptr;
   }
 
   InterfaceMap im = d->GetServiceInterfaceMap();
@@ -116,7 +116,7 @@ InterfaceMap ServiceObjectsBase::GetServiceInterfaceMap() const
 
 void ServiceObjectsBase::UngetService(void* service)
 {
-  if (service == NULL)
+  if (service == nullptr)
   {
     return;
   }

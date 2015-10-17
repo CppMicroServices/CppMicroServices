@@ -61,8 +61,8 @@ public:
 private:
 
   std::vector<std::string> hashedServiceKeys;
-  static const int OBJECTCLASS_IX; // = 0;
-  static const int SERVICE_ID_IX; // = 1;
+  static const int OBJECTCLASS_IX = 0;
+  static const int SERVICE_ID_IX = 1;
 
   /* Service listeners with complicated or empty filters */
   std::list<ServiceListenerEntry> complicatedListeners;

@@ -32,8 +32,8 @@ const bool BundleAbstractTracked<S,TTT,R>::DEBUG_OUTPUT = false;
 
 template<class S, class TTT, class R>
 BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked()
+  : closed(false)
 {
-  closed = false;
 }
 
 template<class S, class TTT, class R>
@@ -228,10 +228,9 @@ BundleAbstractTracked<S,TTT,R>::GetCustomizedObject(S item) const
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::GetTracked(std::vector<S>& items) const
 {
-  for (typename TrackingMap::const_iterator i = tracked.begin();
-       i != tracked.end(); ++i)
+  for (auto& i : tracked)
   {
-    items.push_back(i->first);
+    items.push_back(i.first);
   }
 }
 

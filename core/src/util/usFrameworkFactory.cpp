@@ -25,11 +25,11 @@
 
 namespace us {
 
-FrameworkFactory::FrameworkFactory(void) 
+FrameworkFactory::FrameworkFactory(void)
 {
 }
 
-FrameworkFactory::~FrameworkFactory(void) 
+FrameworkFactory::~FrameworkFactory(void)
 {
 }
 

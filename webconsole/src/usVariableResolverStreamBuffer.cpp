@@ -33,7 +33,7 @@ VariableResolverStreamBuffer::VariableResolverStreamBuffer(std::ostream* out, We
   , m_Out(out)
   , m_Variables(variables)
 {
-  if (m_Variables == NULL)
+  if (m_Variables == nullptr)
   {
     m_Variables = new WebConsoleDefaultVariableResolver();
   }

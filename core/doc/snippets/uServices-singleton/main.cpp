@@ -12,8 +12,8 @@ class MyActivator : public BundleActivator
 public:
 
   MyActivator()
-    : m_SingletonOne(NULL)
-    , m_SingletonTwo(NULL)
+    : m_SingletonOne(nullptr)
+    , m_SingletonTwo(nullptr)
   {}
 
   //![0]

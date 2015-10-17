@@ -232,7 +232,7 @@ struct MakeInterfaceMap
   {
     if (factory == nullptr)
     {
-      throw ServiceException("The service factory argument must not be NULL.");
+      throw ServiceException("The service factory argument must not be nullptr.");
     }
   }
 
@@ -258,7 +258,7 @@ struct MakeInterfaceMap
  *
  * @param map a InterfaceMap instance.
  * @return The service interface pointer for the service interface id of the
- *         \c I1 interface type or NULL if \c map does not contain an entry
+ *         \c I1 interface type or nullptr if \c map does not contain an entry
  *         for the given type.
  *
  * @see MakeInterfaceMap

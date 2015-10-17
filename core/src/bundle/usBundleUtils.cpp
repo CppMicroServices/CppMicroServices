@@ -93,7 +93,7 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   {
     US_DEBUG << "GetSymbol_impl() dlopen() failed: " << dlerror();
   }
-  return 0;
+  return nullptr;
 }
 
 #elif _WIN32
@@ -124,10 +124,10 @@ std::string GetLibraryPath_impl(void *symbol)
 
 void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
 {
-  HMODULE handle = NULL;
+  HMODULE handle = nullptr;
   if (!sharedLibMode || bundleInfo.name == "main")
   {
-    handle = GetModuleHandle(NULL);
+    handle = GetModuleHandle(nullptr);
   }
   else
   {
@@ -137,7 +137,7 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   if (!handle)
   {
     US_DEBUG << "GetSymbol_impl():GetBundleHandle() " << GetLastErrorStr();
-    return 0;
+    return nullptr;
   }
 
   void* addr = (void*)GetProcAddress(handle, symbol);
@@ -155,7 +155,7 @@ std::string GetLibraryPath_impl(void*)
 
 void* GetSymbol_impl(const BundleInfo&, const char* symbol)
 {
-  return 0;
+  return nullptr;
 }
 #endif
 

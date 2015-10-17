@@ -12,7 +12,7 @@ void resourceExample()
 {
   //! [1]
   // Get this bundle's Bundle object
-  Bundle* bundle = GetBundleContext()->GetBundle();
+  auto bundle = GetBundleContext()->GetBundle();
 
   BundleResource resource = bundle->GetResource("config.properties");
   if (resource.IsValid())
@@ -43,14 +43,14 @@ void extenderPattern(BundleContext* bundleCtx)
 {
   //! [2]
   // Get all installed bundles
-  std::vector<Bundle*> bundles = bundleCtx->GetBundles();
+  auto bundles = bundleCtx->GetBundles();
 
   // Check if a bundle defines a "service-component" property
   // and use its value to retrieve an embedded resource containing
   // a component description.
   for(std::size_t i = 0; i < bundles.size(); ++i)
   {
-    Bundle* const bundle = bundles[i];
+    auto const bundle = bundles[i];
     std::string componentPath = bundle->GetProperty("service-component").ToString();
     if (!componentPath.empty())
     {
@@ -70,7 +70,7 @@ int main(int /*argc*/, char* /*argv*/[])
 {
   //! [0]
   BundleContext* bundleContext = GetBundleContext();
-  Bundle* bundle = bundleContext->GetBundle();
+  auto bundle = bundleContext->GetBundle();
 
   // List all XML files in the config directory
   std::vector<BundleResource> xmlFiles = bundle->FindResources("config", "*.xml", false);

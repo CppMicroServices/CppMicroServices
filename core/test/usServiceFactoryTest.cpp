@@ -56,7 +56,7 @@ void TestServiceFactoryBundleScope(BundleContext* mc)
 
   InstallTestBundle(mc, "TestBundleH");
 
-  Bundle* bundleH = mc->GetBundle("TestBundleH");
+  auto bundleH = mc->GetBundle("TestBundleH");
   US_TEST_CONDITION_REQUIRED(bundleH != nullptr, "Test for existing bundle TestBundleH")
 
   bundleH->Start();
@@ -75,7 +75,7 @@ void TestServiceFactoryBundleScope(BundleContext* mc)
   US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
   InterfaceMap::const_iterator serviceIter = service.find("us::TestBundleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
-  US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
+  US_TEST_CONDITION_REQUIRED(serviceIter->second != nullptr, "GetService()")
 
   InterfaceMap service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")
@@ -102,7 +102,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
 
   InstallTestBundle(mc, "TestBundleH");
 
-  Bundle* bundleH = mc->GetBundle("TestBundleH");
+  auto bundleH = mc->GetBundle("TestBundleH");
   US_TEST_CONDITION_REQUIRED(bundleH != nullptr, "Test for existing bundle TestBundleH")
 
   bundleH->Start();
@@ -196,7 +196,7 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceFactoryTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   TestServiceFactoryBundleScope(framework->GetBundleContext());

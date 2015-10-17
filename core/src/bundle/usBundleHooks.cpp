@@ -38,9 +38,9 @@ BundleHooks::BundleHooks(CoreBundleContext* ctx)
 
 Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
 {
-  if(bundle == NULL)
+  if(bundle == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   std::vector<ServiceRegistrationBase> srl;
@@ -54,7 +54,7 @@ Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
     std::vector<Bundle*> ml;
     ml.push_back(bundle);
     this->FilterBundles(mc, ml);
-    return ml.empty() ? NULL : bundle;
+    return ml.empty() ? nullptr : bundle;
   }
 }
 
@@ -65,12 +65,11 @@ void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<Bundle*>& b
   ShrinkableVector<Bundle*> filtered(bundles);
 
   std::sort(srl.begin(), srl.end());
-  for (std::vector<ServiceRegistrationBase>::reverse_iterator srBaseIter = srl.rbegin(), srBaseEnd = srl.rend();
-       srBaseIter != srBaseEnd; ++srBaseIter)
+  for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
     BundleFindHook* const fh = reinterpret_cast<BundleFindHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
-    if (fh != NULL)
+    if (fh != nullptr)
     {
       try
       {
@@ -106,10 +105,9 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
   if(!eventHooks.empty())
   {
     std::vector<BundleContext*> bundleContexts;
-    for (ServiceListeners::BundleListenerMap::iterator le = bundleListeners.begin(),
-         leEnd = bundleListeners.end(); le != leEnd; ++le)
+    for (auto& le : bundleListeners)
     {
-      bundleContexts.push_back(le->first);
+      bundleContexts.push_back(le.first);
     }
     std::sort(bundleContexts.begin(), bundleContexts.end());
     bundleContexts.erase(std::unique(bundleContexts.begin(), bundleContexts.end()), bundleContexts.end());
@@ -118,8 +116,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
     ShrinkableVector<BundleContext*> filtered(bundleContexts);
 
     std::sort(eventHooks.begin(), eventHooks.end());
-    for (std::vector<ServiceRegistrationBase>::reverse_iterator iter = eventHooks.rbegin(),
-         iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
+    for (auto iter = eventHooks.rbegin(), iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
     {
       ServiceReference<BundleEventHook> sr;
       try
@@ -133,7 +130,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
       }
 
       BundleEventHook* eh = reinterpret_cast<BundleEventHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
-      if (eh != NULL)
+      if (eh != nullptr)
       {
         try
         {

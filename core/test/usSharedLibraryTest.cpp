@@ -72,12 +72,12 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_FOR_EXCEPTION(std::runtime_error, lib1.Load())
   US_TEST_CONDITION(lib1.IsLoaded() == false, "Is loaded")
-  US_TEST_CONDITION(lib1.GetHandle() == NULL, "Handle")
+  US_TEST_CONDITION(lib1.GetHandle() == nullptr, "Handle")
 
   lib1.SetFilePath(libAFilePath);
   lib1.Load();
   US_TEST_CONDITION(lib1.IsLoaded() == true, "Is loaded")
-  US_TEST_CONDITION(lib1.GetHandle() != NULL, "Handle")
+  US_TEST_CONDITION(lib1.GetHandle() != nullptr, "Handle")
   US_TEST_FOR_EXCEPTION(std::logic_error, lib1.Load())
 
   lib1.SetFilePath("bla");

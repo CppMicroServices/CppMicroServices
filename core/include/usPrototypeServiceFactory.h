@@ -67,8 +67,8 @@ struct PrototypeServiceFactory : public ServiceFactory
    * ServiceObjects::GetService(). The factory can then return a specific service object for the caller.
    * The framework checks that the returned service object is valid. If the returned service
    * object is empty or does not contain entries for all the interfaces named when the service
-   * was registered, a warning is issued and NULL is returned to the caller. If this
-   * method throws an exception, a warning is issued and NULL is returned to the caller.
+   * was registered, a warning is issued and nullptr is returned to the caller. If this
+   * method throws an exception, a warning is issued and nullptr is returned to the caller.
    *
    * @param bundle The bundle requesting the service.
    * @param registration The ServiceRegistrationBase object for the requested service.

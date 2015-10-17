@@ -283,9 +283,9 @@ void ServiceRegistryPerformanceTest::UnregisterServices()
 int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
-  
+
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   ServiceRegistryPerformanceTest perfTest(framework->GetBundleContext());

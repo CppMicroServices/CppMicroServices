@@ -59,16 +59,16 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
   d->interfaceId = interfaceId;
 }
 
-ServiceReferenceBase::operator bool_type() const
+ServiceReferenceBase::operator bool() const
 {
-  return GetBundle() != nullptr ? &ServiceReferenceBase::d : NULL;
+  return GetBundle() != nullptr;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 {
   if (!--d->ref)
     delete d;
-  d = new ServiceReferenceBasePrivate(0);
+  d = new ServiceReferenceBasePrivate(nullptr);
   return *this;
 }
 
@@ -109,12 +109,9 @@ void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
 {
   typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
   T::Lock l(d->registration->propsLock);
-
-  ServiceRegistrationBasePrivate::BundleToRefsMap::const_iterator end = d->registration->dependents.end();
-  for (ServiceRegistrationBasePrivate::BundleToRefsMap::const_iterator iter = d->registration->dependents.begin();
-       iter != end; ++iter)
+  for (auto& iter : d->registration->dependents)
   {
-    bundles.push_back(iter->first);
+    bundles.push_back(iter.first);
   }
 }
 
@@ -190,15 +187,11 @@ std::size_t ServiceReferenceBase::Hash() const
   return hash<ServiceRegistrationBasePrivate*>()(this->d->registration);
 }
 
-}
-
-using namespace us;
-
 std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef)
 {
   if (serviceRef)
   {
-    assert(serviceRef.GetBundle() != NULL);
+    assert(serviceRef.GetBundle() != nullptr);
 
     os << "Reference for service object registered from "
        << serviceRef.GetBundle()->GetName() << " " << serviceRef.GetBundle()->GetVersion()
@@ -219,4 +212,6 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
   }
 
   return os;
+}
+
 }

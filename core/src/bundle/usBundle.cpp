@@ -59,7 +59,7 @@ Bundle::~Bundle()
 }
 
 void Bundle::Init(CoreBundleContext* coreCtx,
-                    BundleInfo* info)
+                  BundleInfo* info)
 {
   BundlePrivate* mp = new BundlePrivate(this, coreCtx, info);
   std::swap(mp, d);
@@ -168,16 +168,16 @@ void Bundle::Stop()
       d->bundleActivator->Stop(d->bundleContext);
     }
   }
+  catch (const std::exception& e)
+  {
+    US_WARN << "Calling the module activator Unload() method of " << d->info.name << " failed: " << e.what();
+    try { this->Uninit(); } catch (...) {}
+    throw;
+  }
   catch (...)
   {
     US_WARN << "Calling the bundle activator Stop() method of " << d->info.name << " failed!";
-
-    try
-    {
-      this->Uninit();
-    }
-    catch (...) {}
-
+    try { this->Uninit(); } catch (...) {}
     throw;
   }
 
@@ -186,9 +186,9 @@ void Bundle::Stop()
 
 void Bundle::Uninstall()
 {
-  Stop();
-  d->coreCtx->bundleRegistry.UnRegister(&d->info);
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
+    Stop();
+    d->coreCtx->bundleRegistry.UnRegister(&d->info);
+    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
 }
 
 BundleContext* Bundle::GetBundleContext() const
@@ -228,7 +228,7 @@ Any Bundle::GetProperty(const std::string& key) const
   // "org.cppmicroservices.*" properties.
   if (property.Empty())
   {
-    std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
+    auto props = d->coreCtx->frameworkProperties.find(key);
     if (props != d->coreCtx->frameworkProperties.end())
     {
       property = (*props).second;
@@ -248,7 +248,7 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetRegisteredByBundle(d, sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-        i != sr.end(); ++i)
+       i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -261,7 +261,7 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetUsedByBundle(const_cast<Bundle*>(this), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-        i != sr.end(); ++i)
+       i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -280,7 +280,7 @@ BundleResource Bundle::GetResource(const std::string& path) const
 }
 
 std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
-                                                    bool recurse) const
+                                                  bool recurse) const
 {
   std::vector<BundleResource> result;
   if (!d->resourceContainer.IsValid())
@@ -294,14 +294,10 @@ std::vector<BundleResource> Bundle::FindResources(const std::string& path, const
   if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
   if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
   d->resourceContainer.FindNodes(d->info.name + normalizedPath,
-                                    filePattern.empty() ? "*" : filePattern,
-                                    recurse, result);
+                                 filePattern.empty() ? "*" : filePattern,
+                                 recurse, result);
   return result;
 }
-
-}
-
-using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 {
@@ -314,4 +310,6 @@ std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 std::ostream& operator<<(std::ostream& os, Bundle const * bundle)
 {
   return operator<<(os, *bundle);
+}
+
 }

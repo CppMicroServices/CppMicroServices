@@ -123,7 +123,7 @@ public:
 
 ServletContainerPrivate::ServletContainerPrivate(ServletContainer* q)
     : m_Context(GetBundleContext())
-    , m_Server(NULL)
+    , m_Server(nullptr)
     , m_ServletTracker(m_Context, this)
     , q(q)
   {}
@@ -132,13 +132,13 @@ void ServletContainerPrivate::Start()
 {
   if (m_Server) return;
 
-  m_Server = new CivetServer(NULL);
+  m_Server = new CivetServer(nullptr);
   const mg_context* serverContext = m_Server->getContext();
-  if (serverContext == NULL)
+  if (serverContext == nullptr)
   {
     std::cout << "Servlet Container could not be started." << std::endl;
     delete m_Server;
-    m_Server = NULL;
+    m_Server = nullptr;
     return;
   }
   int port, sslPort;
@@ -162,13 +162,13 @@ void ServletContainerPrivate::Stop()
   m_Handler.clear();
 
   delete m_Server;
-  m_Server = NULL;
+  m_Server = nullptr;
 }
 
 std::string ServletContainerPrivate::GetMimeType(const ServletContext* /*context*/, const std::string& file) const
 {
   const char* mimeType = mg_get_builtin_mime_type(file.c_str());
-  if (mimeType == NULL) return std::string();
+  if (mimeType == nullptr) return std::string();
   return mimeType;
 }
 
@@ -178,14 +178,14 @@ ServletContainerPrivate::TrackedType ServletContainerPrivate::AddingService(cons
   if (contextRoot.Empty())
   {
     std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is missing the context root property." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   HttpServlet* servlet = m_Context->GetService(reference);
-  if (servlet == NULL)
+  if (servlet == nullptr)
   {
-    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is NULL." << std::endl;
-    return NULL;
+    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is nullptr." << std::endl;
+    return nullptr;
   }
   ServletContext* servletContext = new ServletContext(q);
   servlet->Init(ServletConfigImpl(servletContext));
@@ -270,7 +270,7 @@ void ServletContainer::Stop()
 ServletContext* ServletContainer::GetContext(const std::string& uripath) const
 {
   std::map<std::string, ServletContext*>::iterator iter = d->m_ServletContextMap.find(uripath);
-  if (iter == d->m_ServletContextMap.end()) return NULL;
+  if (iter == d->m_ServletContextMap.end()) return nullptr;
   return iter->second;
 }
 

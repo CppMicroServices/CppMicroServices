@@ -37,6 +37,7 @@ endforeach()
 # decltype                         4.3   2.9     ??           2012
 # Right angle brackets             4.3   2.9     ??           2010
 # Null pointer constant            4.6   3.0     ??           2010
+# Explicit conversion operators    4.5   3.0     ??           2013
 # Defaulted functions              4.4   3.0     ??           2013*
 # Deleted functions                4.4   2.9     ??           2013*
 # Range-based for                  4.6   3.0     ??           2012

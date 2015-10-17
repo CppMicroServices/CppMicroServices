@@ -45,9 +45,9 @@ namespace us {
  * implementation of the Tracker class.
  *
  * @tparam S The tracked item. It is the key.
- * @tparam T The value mapped to the tracked item.
+ * @tparam TTT Type traits with TTT::TrackedType representing the value type mapped to the tracked item.
  * @tparam R The reason the tracked item is  being tracked or untracked.
- * @ThreadSafe
+ * @remarks This class is thread safe.
  */
 template<class S, class TTT, class R>
 class BundleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>,WaitCondition>

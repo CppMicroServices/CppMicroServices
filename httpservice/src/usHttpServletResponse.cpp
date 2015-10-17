@@ -39,9 +39,9 @@ HttpServletResponsePrivate::HttpServletResponsePrivate(HttpServletRequest* reque
   , m_Server(server)
   , m_Connection(conn)
   , m_StatusCode(HttpServletResponse::SC_NOT_FOUND)
-  , m_StreamBuf(NULL)
-  , m_HttpOutputStreamBuf(NULL)
-  , m_HttpOutputStream(NULL)
+  , m_StreamBuf(nullptr)
+  , m_HttpOutputStreamBuf(nullptr)
+  , m_HttpOutputStream(nullptr)
   , m_IsCommited(false)
   , m_BufferSize(1024)
 {
@@ -210,8 +210,8 @@ void HttpServletResponse::ResetBuffer()
   {
     delete d->m_HttpOutputStream;
     delete d->m_StreamBuf;
-    d->m_HttpOutputStream = NULL;
-    d->m_StreamBuf = NULL;
+    d->m_HttpOutputStream = nullptr;
+    d->m_StreamBuf = nullptr;
   }
 }
 
@@ -226,7 +226,7 @@ void HttpServletResponse::SetBufferSize(std::size_t size)
 
 void HttpServletResponse::SetCharacterEncoding(const std::string& charset)
 {
-  if (this->IsCommitted() || d->m_HttpOutputStream != NULL)
+  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr)
   {
     return;
   }
@@ -256,7 +256,7 @@ void HttpServletResponse::SetContentLength(std::size_t size)
 
 void HttpServletResponse::SetContentType(const std::string& type)
 {
-  if (this->IsCommitted() || d->m_HttpOutputStream != NULL)
+  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr)
   {
     return;
   }
@@ -317,9 +317,9 @@ void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
   std::time_t timeep = date / 1000;
   std::tm t;
 #ifdef US_PLATFORM_WINDOWS
-  if (gmtime_s(&t, &timeep) != NULL)
+  if (gmtime_s(&t, &timeep) != nullptr)
 #else
-  if (gmtime_r(&timeep, &t) != NULL)
+  if (gmtime_r(&timeep, &t) != nullptr)
 #endif
   {
     char dataStr[30];
@@ -437,7 +437,7 @@ void HttpServletResponse::SendRedirect(const std::string& location)
 
 std::streambuf*HttpServletResponse::GetOutputStreamBuffer()
 {
-  if (d->m_HttpOutputStreamBuf == NULL)
+  if (d->m_HttpOutputStreamBuf == nullptr)
   {
     d->m_HttpOutputStreamBuf = new HttpOutputStreamBuffer(d.Data(), this->GetBufferSize());
   }

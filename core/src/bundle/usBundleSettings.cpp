@@ -72,7 +72,7 @@ struct BundleSettingsPrivate : public MultiThreaded<>
     autoLoadPaths.insert(BundleSettings::CURRENT_BUNDLE_PATH());
 
     char* envPaths = getenv("US_AUTOLOAD_PATHS");
-    if (envPaths != NULL)
+    if (envPaths != nullptr)
     {
       std::stringstream ss(envPaths);
       std::string envPath;
@@ -108,7 +108,7 @@ BundleSettings::BundleSettings() :
 {
 
 }
- 
+
 BundleSettings::~BundleSettings()
 {
   if(pimpl)

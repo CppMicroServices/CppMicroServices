@@ -87,7 +87,7 @@ void TestFindHook(Framework* framework)
 {
   InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
 
-  Bundle* bundleA = framework->GetBundleContext()->GetBundle("TestBundleA");
+  auto bundleA = framework->GetBundleContext()->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
 
   US_TEST_CONDITION(bundleA->GetName() == "TestBundleA", "Test bundle name")
@@ -99,18 +99,17 @@ void TestFindHook(Framework* framework)
   long bundleAId = bundleA->GetBundleId();
   US_TEST_CONDITION_REQUIRED(bundleAId > 0, "Test for valid bundle id")
 
-  US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) != NULL, "Test for non-filtered GetBundle(long) result")
+  US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) != nullptr, "Test for non-filtered GetBundle(long) result")
 
   TestBundleFindHook findHook;
   ServiceRegistration<BundleFindHook> findHookReg = framework->GetBundleContext()->RegisterService<BundleFindHook>(&findHook);
 
-  US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) == NULL, "Test for filtered GetBundle(long) result")
+  US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) == nullptr, "Test for filtered GetBundle(long) result")
 
-  std::vector<Bundle*> bundles = framework->GetBundleContext()->GetBundles();
-  for (std::vector<Bundle*>::iterator i = bundles.begin();
-       i != bundles.end(); ++i)
+  auto bundles = framework->GetBundleContext()->GetBundles();
+  for (auto& i : bundles)
   {
-    if((*i)->GetName() == "TestBundleA")
+    if (i->GetName() == "TestBundleA")
     {
       US_TEST_FAILED_MSG(<< "TestBundleA not filtered from GetBundles()")
     }
@@ -128,7 +127,7 @@ void TestEventHook(Framework* framework)
 
   InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
 
-  Bundle* bundleA = framework->GetBundleContext()->GetBundle("TestBundleA");
+  auto bundleA = framework->GetBundleContext()->GetBundle("TestBundleA");
   bundleA->Start();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 3, "Test for received load bundle events")
 
@@ -159,7 +158,7 @@ int usBundleHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleHooksTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   TestFindHook(framework);

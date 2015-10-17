@@ -31,7 +31,7 @@ class ServletContext;
 struct ServletConfigPrivate : public SharedData
 {
   ServletConfigPrivate()
-    : m_Context(NULL)
+    : m_Context(nullptr)
   {}
 
   std::string m_Name;

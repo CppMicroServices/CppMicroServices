@@ -52,7 +52,7 @@ static inline BundleContext* GetBundleContext()
   typedef BundleContext*(*GetBundleContextFunc)(void);
   GetBundleContextFunc getBundleContext = &GetBundleContext;
 
-  void* GetBundleContextPtr = NULL;
+  void* GetBundleContextPtr = nullptr;
   std::memcpy(&GetBundleContextPtr, &getBundleContext, sizeof(void*));
   std::string libPath(BundleUtils::GetLibraryPath(GetBundleContextPtr));
 
@@ -67,7 +67,7 @@ static inline BundleContext* GetBundleContext()
       return getBundleContext();
   }
 
-  return 0;
+  return nullptr;
 }
 
 }

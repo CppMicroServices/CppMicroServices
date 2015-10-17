@@ -34,9 +34,8 @@
 namespace us {
 
 ServiceRegistrationBase::ServiceRegistrationBase()
-  : d(0)
+  : d(nullptr)
 {
-
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(const ServiceRegistrationBase& reg)
@@ -58,9 +57,9 @@ ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const In
 
 }
 
-ServiceRegistrationBase::operator bool_type() const
+ServiceRegistrationBase::operator bool() const
 {
-  return d != NULL ? &ServiceRegistrationBase::d : NULL;
+  return d != nullptr;
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(std::nullptr_t)

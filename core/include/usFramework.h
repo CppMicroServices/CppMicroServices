@@ -47,7 +47,7 @@ class FrameworkPrivate;
  *   must behave as follows:
  *   - Start - Does nothing because the system bundle is already started.
  *   - Stop - Stops all installed bundles.
- *   - Uninstall - The Framework must throw a std::runtime_error exception indicating that the 
+ *   - Uninstall - The Framework must throw a std::runtime_error exception indicating that the
  *     system bundle cannot be uninstalled.
  *
  * Framework instances are created using a FrameworkFactory. The methods of this class can be
@@ -94,7 +94,7 @@ public:
      * The Framework cannot be uninstalled.
      *
      * This method always throws a std::runtime_error exception.
-     * 
+     *
      * @throws std::runtime_error This Framework cannot be uninstalled.
      */
     void Uninstall();
@@ -103,7 +103,7 @@ public:
     * Returns this Framework's location.
     *
     * <p>
-    * This Framework is assigned the unique location "System Bundle" 
+    * This Framework is assigned the unique location "System Bundle"
     * since this Framework is also a System Bundle.
     *
     * @return The string "System Bundle".
@@ -119,10 +119,10 @@ public:
      * auto-loading has not been configured into the CppMicroServices library or if
      * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
      *
-     * @deprecated This method remains for legacy clients and will be removed in a 
+     * @deprecated This method remains for legacy clients and will be removed in a
      * future release. Auto-loading support will be moved into a seprate service,
      * at which point, this method will be permanently removed.
-     * 
+     *
      */
     void SetAutoLoadingEnabled(bool enable);
 
@@ -158,10 +158,10 @@ public:
 private:
     // Framework instances are exclusively constructed by the FrameworkFactory class
     friend class FrameworkFactory;
-    
+
     // Allow the framework to be constructed with configuration properties
     // provided by a FrameworkFactory object.
-    Framework(std::map<std::string, std::string>& configuration);
+    Framework(const std::map<std::string, Any>& configuration);
     Framework(void);
 
     // This class is not copy-able

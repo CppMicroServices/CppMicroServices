@@ -101,12 +101,12 @@ struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTrai
 
   static bool IsValid(const TrackedType& t)
   {
-    return t != NULL;
+    return t != nullptr;
   }
 
   static TrackedType DefaultValue()
   {
-    return NULL;
+    return nullptr;
   }
 
   static void Dispose(TrackedType& t)
@@ -123,12 +123,12 @@ struct TrackedTypeTraits<S,S*>
 
   static bool IsValid(const TrackedType& t)
   {
-    return t != NULL;
+    return t != nullptr;
   }
 
   static TrackedType DefaultValue()
   {
-    return NULL;
+    return nullptr;
   }
 
   static void Dispose(TrackedType& t)

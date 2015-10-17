@@ -39,7 +39,7 @@ namespace us {
 struct AbstractWebConsolePluginPrivate
 {
   AbstractWebConsolePluginPrivate()
-    : m_VariableResolver(NULL)
+    : m_VariableResolver(nullptr)
   {}
 
   ~AbstractWebConsolePluginPrivate()
@@ -101,7 +101,7 @@ void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request, HttpServletRes
 
 WebConsoleVariableResolver* AbstractWebConsolePlugin::GetVariableResolver(const HttpServletRequest& request) const
 {
-  if (d->m_VariableResolver == NULL)
+  if (d->m_VariableResolver == nullptr)
   {
     WebConsoleDefaultVariableResolver* resolver = new WebConsoleDefaultVariableResolver();
     (*resolver)["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT()).ToString();
@@ -210,7 +210,7 @@ std::string AbstractWebConsolePlugin::ReadTemplateFile(const std::string& templa
 {
   std::string result;
 
-  if (context == NULL)
+  if (context == nullptr)
   {
     context = us::GetBundleContext();
   }

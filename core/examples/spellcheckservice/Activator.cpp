@@ -122,7 +122,7 @@ private:
             errorList.push_back(word);
           }
 
-          pch = std::strtok(NULL, delimiters);
+          pch = std::strtok(nullptr, delimiters);
         }
       }
 
@@ -188,7 +188,7 @@ private:
 public:
 
   Activator()
-    : m_context(NULL)
+    : m_context(nullptr)
   {}
 
   /**

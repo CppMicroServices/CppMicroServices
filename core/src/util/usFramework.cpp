@@ -63,7 +63,7 @@ void Framework::Initialize(void)
   BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
 
   void(Framework::*initFncPtr)(void) = &Framework::Initialize;
-  void* frameworkInit = NULL;
+  void* frameworkInit = nullptr;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
   bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
 
@@ -81,14 +81,12 @@ void Framework::Start()
 void Framework::Stop() 
 {
   FrameworkPrivate::Lock lock(d);
-  std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
-  for (std::vector<Bundle*>::const_iterator iter = bundles.begin(); 
-      iter != bundles.end(); 
-      ++iter)
+  auto bundles = GetBundleContext()->GetBundles();
+  for (auto bundle : bundles)
   {
-    if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
+    if (bundle->GetName() != US_CORE_FRAMEWORK_NAME)
     {
-      (*iter)->Stop();
+      bundle->Stop();
     }
   }
 

@@ -37,11 +37,11 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 
     FrameworkFactory factory;
 
-    Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+    auto f = factory.NewFramework();
 
     US_TEST_CONDITION(f, "Test Framework instantiation");
 
-    Framework* f1 = factory.NewFramework(std::map<std::string, std::string>());
+    auto f1 = factory.NewFramework();
 
     US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
 
@@ -52,7 +52,7 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
     configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom1", "foo"));
     configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom2", "bar"));
 
-    Framework* f2 = factory.NewFramework(configuration);
+    auto f2 = factory.NewFramework(configuration);
 
     US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
 

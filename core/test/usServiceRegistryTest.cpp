@@ -136,7 +136,7 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceRegistryTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   BundleContext* mc = framework->GetBundleContext();

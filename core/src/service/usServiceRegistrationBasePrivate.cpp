@@ -41,7 +41,6 @@ ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
 
 ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 {
-
 }
 
 bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const

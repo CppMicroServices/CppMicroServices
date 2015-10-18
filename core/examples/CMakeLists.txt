@@ -1,8 +1,9 @@
 project(CoreExamples)
 
-cmake_minimum_required(VERSION 2.8)
-
 find_package(CppMicroServices NO_MODULE REQUIRED)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 include_directories(${CppMicroServices_INCLUDE_DIRS})
 

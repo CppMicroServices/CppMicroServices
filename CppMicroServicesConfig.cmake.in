@@ -73,6 +73,11 @@
 
 @PACKAGE_INIT@
 
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION @US_CMAKE_MINIMUM_REQUIRED_VERSION@)
+set(US_ENABLE_THREADING_SUPPORT @US_ENABLE_THREADING_SUPPORT@)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+
 list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
 set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
@@ -88,12 +93,8 @@ mark_as_advanced(US_RCC_EXECUTABLE)
 
 # Include helper macros
 include(CMakeParseArguments)
-if(CMAKE_VERSION VERSION_LESS "2.8.8")
-  # We need the HANDLE_COMPONENTS argument
-  include("@PACKAGE_CONFIG_CMAKE_DIR@/FindPackageHandleStandardArgs.cmake")
-elseif(NOT COMMAND find_package_handle_standard_args)
-  include(FindPackageHandleStandardArgs)
-endif()
+include(FindPackageHandleStandardArgs)
+
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateBundleInit.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionAddResources.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckCompilerFlags.cmake")
@@ -102,6 +103,13 @@ include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckResourceLinking.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGetResourceSource.cmake")
 
 usFunctionCheckResourceLinking()
+
+# Required packages
+
+if(US_ENABLE_THREADING_SUPPORT AND NOT TARGET Threads::Threads)
+  set(THREADS_PREFER_PTHREAD_FLAG 1)
+  find_package(Threads REQUIRED)
+endif()
 
 # Global include directory
 set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")

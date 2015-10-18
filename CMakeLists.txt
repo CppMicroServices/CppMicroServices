@@ -5,8 +5,10 @@ set(${PROJECT_NAME}_MINOR_VERSION 99)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
-cmake_minimum_required(VERSION 2.8.12)
-cmake_policy(VERSION 2.8.12)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 2.8.12)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 list(APPEND policies_new
   CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
@@ -273,10 +275,14 @@ else()
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
                     -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
-                    -Wno-mismatched-tags
                     -fstack-protector-all)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
+
+  if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+    # The check does not work reliably for gcc
+    usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
+  endif()
 
   usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   if(_have_visibility)
@@ -295,6 +301,11 @@ if(MINGW)
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
   # we need to define a Windows version
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
+endif()
+
+if(US_ENABLE_THREADING_SUPPORT)
+  set(THREADS_PREFER_PTHREAD_FLAG 1)
+  find_package(Threads REQUIRED)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")

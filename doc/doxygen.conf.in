@@ -804,6 +804,10 @@ RECURSIVE              = YES
 
 EXCLUDE                = "@PROJECT_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@PROJECT_SOURCE_DIR@/README.md" \
+                         "@PROJECT_SOURCE_DIR@/httpservice" \
+                         "@PROJECT_SOURCE_DIR@/webconsole" \
+                         "@PROJECT_SOURCE_DIR@/shellservice" \
+                         "@PROJECT_SOURCE_DIR@/tools/shell" \
                          "@PROJECT_SOURCE_DIR@/gh-pages/" \
                          "@PROJECT_SOURCE_DIR@/third_party/" \
                          "@PROJECT_SOURCE_DIR@/.git/"
@@ -838,8 +842,7 @@ EXCLUDE_PATTERNS       = */test/* \
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = us \
-                         *Private* \
+EXCLUDE_SYMBOLS        = *Private* \
                          BundleInfo \
                          ServiceObjectsBase* \
                          TrackedService*
@@ -2005,6 +2008,7 @@ INCLUDE_FILE_PATTERNS  = *.h
 
 PREDEFINED             = US_Core_EXPORT= \
                          US_ABI_LOCAL= \
+                         US_MSVC_PUSH_DISABLE_WARNING= \
                          US_MSVC_POP_WARNING=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

@@ -30,9 +30,9 @@ files of your bundle:
 ### Getting a BundleContext
 
 To retrieve the bundle specific BundleContext object from anywhere in your bundle, use the
-`#GetBundleContext` function:
+`#us::GetBundleContext` function:
 
 \snippet uServices-bundlecontext/main.cpp GetBundleContext
 
-Please note that trying to use `#GetBundleContext` without proper initialization code
+Please note that trying to use `#us::GetBundleContext` without proper initialization code
 in the using shared library while either lead to compile or rumtime errors.

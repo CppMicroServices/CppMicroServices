@@ -48,7 +48,6 @@ class BundleContext;
  * the static bundle to the importing executable or shared library.
  *
  * \sa US_IMPORT_BUNDLE
- * \sa US_IMPORT_BUNDLE_RESOURCES
  * \sa \ref MicroServices_StaticBundles
  */
 #define US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                          \
@@ -79,7 +78,6 @@ class BundleContext;
  * \snippet uServices-staticbundles/main.cpp ImportStaticBundleIntoMain
  *
  * \sa US_INITIALIZE_STATIC_BUNDLE
- * \sa US_IMPORT_BUNDLE_RESOURCES
  * \sa \ref MicroServices_StaticBundles
  */
 #define US_IMPORT_BUNDLE(_bundle_name)                                     \

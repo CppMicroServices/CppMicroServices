@@ -24,9 +24,9 @@
 #include "usWebConsoleConstants.h"
 
 #include <usServiceProperties.h>
-#include <usModuleContext.h>
-#include <usModule.h>
-#include <usModuleResource.h>
+#include <usBundleContext.h>
+#include <usBundle.h>
+#include <usBundleResource.h>
 
 namespace us {
 
@@ -66,7 +66,7 @@ std::string SimpleWebConsolePlugin::GetCategory() const
   return m_Category;
 }
 
-SimpleWebConsolePlugin* SimpleWebConsolePlugin::Register(ModuleContext* context)
+SimpleWebConsolePlugin* SimpleWebConsolePlugin::Register(BundleContext* context)
 {
   ServiceProperties props;
   props[WebConsoleConstants::PLUGIN_LABEL()] = GetLabel();
@@ -95,17 +95,17 @@ std::vector<std::string> SimpleWebConsolePlugin::GetCssReferences() const
   return m_Css;
 }
 
-ModuleContext* SimpleWebConsolePlugin::GetContext() const
+BundleContext* SimpleWebConsolePlugin::GetContext() const
 {
   return m_Context;
 }
 
-ModuleResource SimpleWebConsolePlugin::GetResource(const std::string& path) const
+BundleResource SimpleWebConsolePlugin::GetResource(const std::string& path) const
 {
   return (m_Context != NULL && path.size() > m_LabelRes.size() &&
                        path.compare(0, m_LabelRes.size(), m_LabelRes) == 0) ?
-        m_Context->GetModule()->GetResource(path.substr(m_LabelResLen)) :
-        ModuleResource();
+        m_Context->GetBundle()->GetResource(path.substr(m_LabelResLen)) :
+        BundleResource();
 }
 
 }

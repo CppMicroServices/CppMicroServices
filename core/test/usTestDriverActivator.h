@@ -23,26 +23,26 @@
 #ifndef USTESTDRIVERACTIVATOR_H
 #define USTESTDRIVERACTIVATOR_H
 
-#include <usModuleActivator.h>
+#include <usBundleActivator.h>
 
 namespace us {
 
-class TestDriverActivator : public ModuleActivator
+class TestDriverActivator : public BundleActivator
 {
 public:
 
   TestDriverActivator();
 
-  static bool LoadCalled();
+  static bool StartCalled();
 
-  void Load(ModuleContext*);
+  void Start(BundleContext*);
 
-  void Unload(ModuleContext* );
+  void Stop(BundleContext* );
 
 private:
 
   static TestDriverActivator* m_Instance;
-  bool m_LoadCalled;
+  bool m_StartCalled;
 };
 
 }

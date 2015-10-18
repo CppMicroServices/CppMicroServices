@@ -105,8 +105,8 @@ include(usFunctionEmbedResources)
 include(usFunctionGetResourceSource)
 include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
-include(usFunctionGenerateModuleInit)
-include(usMacroCreateModule)
+include(usFunctionGenerateBundleInit)
+include(usMacroCreateBundle)
 
 if(US_BUILD_TESTING)
   include(usFunctionCompileSnippets)
@@ -183,7 +183,7 @@ elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
 
-us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
+us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable bundle auto-loading support")
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
@@ -217,7 +217,7 @@ set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
-set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
+set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/usBundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/us_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 
@@ -401,9 +401,9 @@ if(NOT US_NO_INSTALL)
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   set(_install_cmake_scripts
-    ${US_MODULE_INIT_TEMPLATE}
+    ${US_BUNDLE_INIT_TEMPLATE}
     ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-    ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
+    ${US_CMAKE_DIR}/usFunctionGenerateBundleInit.cmake
     ${US_CMAKE_DIR}/usFunctionAddResources.cmake
     ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
     ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake

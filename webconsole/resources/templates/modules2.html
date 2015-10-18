@@ -1,21 +1,21 @@
 
 
-<h3>Module Overview</h3>
+<h3>Bundle Overview</h3>
 <table class="tight striped sortable" cellspacing="0" celpadding="0">
 <thead><tr>
   <th>Id</th>
-  <th>Module</th>
+  <th>Bundle</th>
   <th>Version</th>
   <th>Vendor</th>
   <th>Loaded</th>
 </tr></thead>
 <tbody class="template">
 <tr>
-<td class="module-id"></td>
-<td class="module-name"></td>
-<td class="module-version"></td>
-<td class="module-vendor"></td>
-<td class="module-loaded"></td>
+<td class="bundle-id"></td>
+<td class="bundle-name"></td>
+<td class="bundle-version"></td>
+<td class="bundle-vendor"></td>
+<td class="bundle-loaded"></td>
 </tr>
 </tbody>
 </table>
@@ -26,22 +26,22 @@ var getCheckBox = function(data) {
   else return "<i class='icon-check-empty'></i>";
 };
 
-var request = $.getJSON("modules");
+var request = $.getJSON("bundles");
 
 request.done(function(data) {
   var directive = {
     'tr':{
-      'module<-modules':{
-        'td.module-id':'module.id',
-        'td.module-id@value':'module.id',
-        'td.module-name':'module.name',
-        'td.module-name@value':'module.name',
-        'td.module-version':'module.version',
-        'td.module-version@value':'module.version',
-        'td.module-vendor':'module.vendor',
-        'td.module-vendor@value':'module.vendor',
-        'td.module-loaded':getCheckBox,
-        'td.module-loaded@value':'module.loaded'
+      'bundle<-bundles':{
+        'td.bundle-id':'bundle.id',
+        'td.bundle-id@value':'bundle.id',
+        'td.bundle-name':'bundle.name',
+        'td.bundle-name@value':'bundle.name',
+        'td.bundle-version':'bundle.version',
+        'td.bundle-version@value':'bundle.version',
+        'td.bundle-vendor':'bundle.vendor',
+        'td.bundle-vendor@value':'bundle.vendor',
+        'td.bundle-loaded':getCheckBox,
+        'td.bundle-loaded@value':'bundle.loaded'
       }
     }
   };

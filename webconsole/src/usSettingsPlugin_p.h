@@ -26,7 +26,7 @@
 
 namespace us {
 
-class ModuleResourceStream;
+class BundleResourceStream;
 
 class SettingsPlugin : public SimpleWebConsolePlugin
 {
@@ -42,9 +42,9 @@ private:
 
   // WORKAROUND Remove this overload after the HttpService supports
   // registering resources
-  ModuleResource GetResource(const std::string& path) const;
+  BundleResource GetResource(const std::string& path) const;
 
-  ModuleResourceStream* m_TemplateRS;
+  BundleResourceStream* m_TemplateRS;
 };
 
 }

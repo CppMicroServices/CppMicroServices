@@ -29,7 +29,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now se
 
 namespace us {
 
-class Module;
+class Bundle;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
 
@@ -101,7 +101,7 @@ public:
   void GetPropertyKeys(std::vector<std::string>& keys) const;
 
   /**
-   * Returns the module that registered the service referenced by this
+   * Returns the bundle that registered the service referenced by this
    * <code>ServiceReferenceBase</code> object.
    *
    * <p>
@@ -109,23 +109,23 @@ public:
    * unregistered. This can be used to determine if the service has been
    * unregistered.
    *
-   * @return The module that registered the service referenced by this
+   * @return The bundle that registered the service referenced by this
    *         <code>ServiceReferenceBase</code> object; <code>0</code> if that
    *         service has already been unregistered.
-   * @see ModuleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * @see BundleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  Module* GetModule() const;
+  Bundle* GetBundle() const;
 
   /**
-   * Returns the modules that are using the service referenced by this
+   * Returns the bundles that are using the service referenced by this
    * <code>ServiceReferenceBase</code> object. Specifically, this method returns
-   * the modules whose usage count for that service is greater than zero.
+   * the bundles whose usage count for that service is greater than zero.
    *
-   * @param modules A list of modules whose usage count for the service referenced
+   * @param bundles A list of bundles whose usage count for the service referenced
    *         by this <code>ServiceReferenceBase</code> object is greater than
    *         zero.
    */
-  void GetUsingModules(std::vector<Module*>& modules) const;
+  void GetUsingBundles(std::vector<Bundle*>& bundles) const;
 
   /**
    * Returns the interface identifier this ServiceReferenceBase object
@@ -184,9 +184,9 @@ public:
 
 private:
 
-  friend class ModulePrivate;
-  friend class ModuleContext;
-  friend class ModuleHooks;
+  friend class BundlePrivate;
+  friend class BundleContext;
+  friend class BundleHooks;
   friend class ServiceHooks;
   friend class ServiceObjectsBase;
   friend class ServiceObjectsBasePrivate;

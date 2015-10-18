@@ -22,23 +22,23 @@ limitations under the License.
 
 #include "usFrameworkPrivate.h"
 
-#include "usCoreModuleContext_p.h"
+#include "usCoreBundleContext_p.h"
 #include "usThreads_p.h"
 
 namespace us {
 
 FrameworkPrivate::FrameworkPrivate(void) :
-    coreModuleContext(),
+    coreBundleContext(),
     initialized(false)
 {
 
 }
 
 FrameworkPrivate::FrameworkPrivate(const std::map<std::string, std::string>& configuration) :
-    coreModuleContext(),
+    coreBundleContext(),
     initialized(false)
 {
-  coreModuleContext.frameworkProperties = configuration;
+  coreBundleContext.frameworkProperties = configuration;
 }
 
 FrameworkPrivate::~FrameworkPrivate()

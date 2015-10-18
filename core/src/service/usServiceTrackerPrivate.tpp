@@ -23,7 +23,7 @@
 
 #include "usTrackedService_p.h"
 
-#include "usModuleContext.h"
+#include "usBundleContext.h"
 #include "usLDAPFilter.h"
 
 #include <stdexcept>
@@ -35,7 +35,7 @@ const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = true;
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st, ModuleContext* context,
+    ServiceTracker<S,TTT>* st, BundleContext* context,
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
@@ -64,7 +64,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,TTT>* st,
-    ModuleContext* context, const std::string& clazz,
+    BundleContext* context, const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
         trackReference(), trackedService(0), cachedReference(),
@@ -92,7 +92,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,TTT>* st,
-    ModuleContext* context, const LDAPFilter& filter,
+    BundleContext* context, const LDAPFilter& filter,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
         listenerFilter(filter.ToString()), trackReference(),
@@ -101,7 +101,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
   this->customizer = customizer ? customizer : q_func();
   if (context == 0)
   {
-    throw std::invalid_argument("The module context cannot be null.");
+    throw std::invalid_argument("The bundle context cannot be null.");
   }
 }
 

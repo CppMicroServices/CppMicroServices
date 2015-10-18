@@ -30,8 +30,8 @@
 
 namespace us {
 
-class Module;
-class ModuleContext;
+class Bundle;
+class BundleContext;
 class ServiceReferenceBase;
 
 /**
@@ -40,7 +40,7 @@ class ServiceReferenceBase;
  * Service Find Hook Service.
  *
  * <p>
- * Modules registering this service will be called during service find
+ * Bundles registering this service will be called during service find
  * (get service references) operations.
  *
  * @remarks Implementations of this interface are required to be thread-safe.
@@ -52,10 +52,10 @@ struct US_Core_EXPORT ServiceFindHook
 
   /**
    * Find hook method. This method is called during the service find operation
-   * (for example, ModuleContext::GetServiceReferences<S>()). This method can
+   * (for example, BundleContext::GetServiceReferences<S>()). This method can
    * filter the result of the find operation.
    *
-   * @param context The module context of the module performing the find
+   * @param context The bundle context of the bundle performing the find
    *        operation.
    * @param name The class name of the services to find or an empty string to
    *        find all services.
@@ -64,9 +64,9 @@ struct US_Core_EXPORT ServiceFindHook
    * @param references A list of Service References to be returned as a result of the
    *        find operation. The implementation of this method may remove
    *        service references from the list to prevent the references from being
-   *        returned to the module performing the find operation.
+   *        returned to the bundle performing the find operation.
    */
-  virtual void Find(const ModuleContext* context, const std::string& name,
+  virtual void Find(const BundleContext* context, const std::string& name,
                     const std::string& filter, ShrinkableVector<ServiceReferenceBase>& references) = 0;
 };
 

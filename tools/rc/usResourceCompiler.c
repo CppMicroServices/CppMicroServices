@@ -392,8 +392,8 @@ int main(int argc, char** argv)
 
   int mergeFlag = 0;
   const char* zipFile = NULL;
-  const char* moduleName = NULL;
-  size_t moduleNameLength = 0;
+  const char* bundleName = NULL;
+  size_t bundleNameLength = 0;
 
   FILE* zipfileStream = NULL;
   mz_zip_archive writeArchive;
@@ -454,14 +454,14 @@ int main(int argc, char** argv)
 
   if (bPrintHelp)
   {
-    printf("A resource compiler for C++ Micro Services modules\n\n");
-    printf("Usage: usResourceCompiler [-#] zipfile modulename [[-a] file...] [-m archive...]\n");
+    printf("A resource compiler for C++ Micro Services bundles\n\n");
+    printf("Usage: usResourceCompiler [-#] zipfile bundlename [[-a] file...] [-m archive...]\n");
     printf("Usage: usResourceCompiler --append outfile zipfile\n\n");
     printf("Add entries to zipfile and merge archives.\n\n");
     printf("  -# (-0, -1, -2, -3, -4, -5, -6, -7, -8, -9)\n");
     printf("             The Zip compression level. The default compression level is -6.\n");
     printf("  zipfile    The absolute path of the zip file.\n");
-    printf("  modulename The module name as specified in the MODULE_NAME compile definition.\n");
+    printf("  bundlename The bundle name as specified in the BUNDLE_NAME compile definition.\n");
     printf("  file       Path to a resource file, relative to the current working directory.\n");
     printf("  archive    Path to a zip archive for merging into zipfile.\n");
     exit(EXIT_SUCCESS);
@@ -470,7 +470,7 @@ int main(int argc, char** argv)
   if (bAppendMode)
   {
     // Special "append" mode. Just append zipfile to outfile as a binary blob.
-    // Open the module file for appending the temporary zip archive
+    // Open the bundle file for appending the temporary zip archive
     dbg_print("Opening outfile '%s' as ab... ", argv[2]);
     if (NULL == (appendStream = US_FOPEN(argv[2], "ab")))
     {
@@ -519,8 +519,8 @@ int main(int argc, char** argv)
   // ---------------------------------------------------------------------------------
 
   zipFile = argv[++argIndex];
-  moduleName = argv[++argIndex];
-  moduleNameLength = strlen(moduleName);
+  bundleName = argv[++argIndex];
+  bundleNameLength = strlen(bundleName);
 
   memset(&writeArchive, 0, sizeof(writeArchive));
   memset(&archivedNames, 0, sizeof archivedNames);
@@ -574,13 +574,13 @@ int main(int argc, char** argv)
       continue;
     }
 
-    if (fileNameLength + 1 + moduleNameLength > MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE - 1)
+    if (fileNameLength + 1 + bundleNameLength > MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE - 1)
     {
-      exit_printf(&writeArchive, "Resource filename too long: %s\n", moduleName);
+      exit_printf(&writeArchive, "Resource filename too long: %s\n", bundleName);
     }
-    US_STRCPY(archiveName, sizeof archiveName, moduleName);
-    archiveName[moduleNameLength] = '/';
-    US_STRCPY(archiveName + moduleNameLength + 1, (sizeof archiveName) - (moduleNameLength + 1), fileName);
+    US_STRCPY(archiveName, sizeof archiveName, bundleName);
+    archiveName[bundleNameLength] = '/';
+    US_STRCPY(archiveName + bundleNameLength + 1, (sizeof archiveName) - (bundleNameLength + 1), fileName);
 
     printf("  adding: %s\n", archiveName);
 

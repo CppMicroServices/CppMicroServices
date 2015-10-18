@@ -23,8 +23,8 @@ limitations under the License.
 #ifndef USTESTUTILS_H
 #define USTESTUTILS_H
 
-#include "usModule.h"
-#include "usModuleContext.h"
+#include "usBundle.h"
+#include "usBundleContext.h"
 
 #include <string>
 
@@ -79,8 +79,8 @@ private:
 // Helper function to install bundles, given a framework's bundle context and the name of the bundle.
 // Assumes that test bundles are within the same directory during unit testing.
 // Currently limited to only installing bundles with the same physical filename
-// and logical bundle name (e.g. TestModuleA.dll/TestModuleA).
-Module* InstallTestBundle(ModuleContext* frameworkCtx, const std::string& bundleName);
+// and logical bundle name (e.g. TestBundleA.dll/TestBundleA).
+Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
 
 }
 

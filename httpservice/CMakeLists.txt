@@ -58,7 +58,7 @@ set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
 usFunctionCheckCompilerFlags(-pthread CMAKE_CXX_FLAGS)
 
 
-usMacroCreateModule(HttpService
+usMacroCreateBundle(HttpService
   VERSION "0.99.0"
   DEPENDS Core
   INTERNAL_INCLUDE_DIRS src

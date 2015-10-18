@@ -22,9 +22,9 @@
 
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usModuleImport.h>
+#include <usBundle.h>
+#include <usBundleContext.h>
+#include <usBundleImport.h>
 
 #include "usCoreExamplesDriverConfig.h"
 
@@ -60,7 +60,7 @@ static const std::string BUNDLE_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
 #endif
 #endif  // US_BUILD_SHARED_LIBS
 
-std::vector<std::string> GetExampleModules()
+std::vector<std::string> GetExampleBundles()
 {
   std::vector<std::string> names;
   names.push_back("eventlistener");
@@ -81,24 +81,32 @@ int main(int /*argc*/, char** /*argv*/)
   FrameworkFactory factory;
   Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
-  ModuleContext* frameworkContext = framework->GetModuleContext();
 
-  std::vector<std::string> availableModules = GetExampleModules();
+  std::vector<std::string> availableBundles = GetExampleBundles();
 
   /* install all available bundles for this example */
-  for (std::vector<std::string>::const_iterator iter = availableModules.begin();
-      iter != availableModules.end(); ++iter)
+  for (std::vector<std::string>::const_iterator iter = availableBundles.begin();
+      iter != availableBundles.end(); ++iter)
   {
 #if defined (US_BUILD_SHARED_LIBS)
-      frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
+    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
 #else
-      frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
+    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
 #endif
   }
 
   std::cout << "> ";
   while(std::cin.getline(cmd, sizeof(cmd)))
   {
+    /*
+     The user can stop the framework so make sure that we start it again
+     otherwise this tool will crash.
+    */
+    if (!framework->IsStarted())
+    {
+      framework->Start();
+    }
+
     std::string strCmd(cmd);
     if (strCmd == "q")
     {
@@ -122,22 +130,22 @@ int main(int /*argc*/, char** /*argv*/)
       ss >> id;
       if (id > 0)
       {
-        Module* module = frameworkContext->GetModule(id);
-        if (!module)
+        Bundle* bundle = framework->GetBundleContext()->GetBundle(id);
+        if (!bundle)
         {
           std::cout << "Error: unknown id" << std::endl;
         }
-        else 
+        else
         {
           try
           {
             /* starting an already started bundle does nothing.
                 There is no harm in doing it. */
-            if (module->IsLoaded())
+            if (bundle->IsStarted())
             {
-              std::cout << "Info: module already started" << std::endl;
+              std::cout << "Info: bundle already started" << std::endl;
             }
-            module->Start();
+            bundle->Start();
           }
           catch (const std::exception& e)
           {
@@ -147,17 +155,17 @@ int main(int /*argc*/, char** /*argv*/)
       }
       else
       {
-        Module* module = frameworkContext->GetModule(idOrName);
-        if (!module)
+        Bundle* bundle = framework->GetBundleContext()->GetBundle(idOrName);
+        if (!bundle)
         {
           try
           {
               /* Installing a bundle can't be done by id since that is a
                     framework generated piece of information. */
 #if defined (US_BUILD_SHARED_LIBS)
-              module = frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
+            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
 #else
-              module = frameworkContext->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
+            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
 #endif
           }
           catch (const std::exception& e)
@@ -165,18 +173,18 @@ int main(int /*argc*/, char** /*argv*/)
             std::cout << e.what() << std::endl;
           }
         }
-        
-        if (module)
+
+        if (bundle)
         {
           try
           {
             /* starting an already started bundle does nothing.
             There is no harm in doing it. */
-            if (module->IsLoaded())
+            if (bundle->IsStarted())
             {
-              std::cout << "Info: module already started" << std::endl;
+              std::cout << "Info: bundle already started" << std::endl;
             }
-            module->Start();
+            bundle->Start();
           }
           catch (const std::exception& e)
           {
@@ -185,7 +193,7 @@ int main(int /*argc*/, char** /*argv*/)
         }
         else
         {
-          std::cout << "Info: Unable to install module " << idOrName << std::endl;
+          std::cout << "Info: Unable to install bundle " << idOrName << std::endl;
         }
       }
     }
@@ -196,59 +204,51 @@ int main(int /*argc*/, char** /*argv*/)
 
       long int id = -1;
       ss >> id;
-      // TODO: the "system bundle" is 0 in the OSGi spec. Change this once CppMicroServices is
-      //    inline with the spec.
-      if (id == 1)
+
+      Bundle* const bundle = framework->GetBundleContext()->GetBundle(id);
+      if (bundle)
       {
-        std::cout << "Info: Unloading not possible" << std::endl;
+        try
+        {
+          bundle->Stop();
+
+          // Check if it has really been stopped
+          if (bundle->IsStarted())
+          {
+            std::cout << "Info: The bundle is still referenced by another active bundle. It will be stopped when all dependent bundles are stopped." << std::endl;
+          }
+        }
+        catch (const std::exception& e)
+        {
+          std::cout << e.what() << std::endl;
+        }
       }
       else
       {
-        Module* const module = frameworkContext->GetModule(id);
-        if (module)
-        {
-          try
-          {
-            module->Stop();
-
-            // Check if it has really been unloaded
-            if (module->IsLoaded())
-            {
-              std::cout << "Info: The bundle is still referenced by another active bundle. It will be stopped when all dependent bundles are stopped." << std::endl;
-            }
-          }
-          catch (const std::exception& e)
-          {
-            std::cout << e.what() << std::endl;
-          }
-        }
-        else
-        {
-          std::cout << "Error: unknown id" << std::endl;
-        }
+        std::cout << "Error: unknown id" << std::endl;
       }
     }
     else if (strCmd == "s")
     {
-      std::vector<Module*> modules = frameworkContext->GetModules();
+      std::vector<Bundle*> bundles = framework->GetBundleContext()->GetBundles();
 
       std::cout << std::left;
 
       std::cout << "Id | " << std::setw(20) << "Name" << " | " << std::setw(9) << "Status" << std::endl;
       std::cout << "-----------------------------------\n";
 
-      for (std::vector<std::string>::const_iterator nameIter = availableModules.begin();
-           nameIter != availableModules.end(); ++nameIter)
+      for (std::vector<std::string>::const_iterator nameIter = availableBundles.begin();
+           nameIter != availableBundles.end(); ++nameIter)
       {
         std::cout << " - | " << std::setw(20) << *nameIter << " | " << std::setw(9) << "-" << std::endl;
       }
 
-      for (std::vector<Module*>::const_iterator moduleIter = modules.begin();
-           moduleIter != modules.end(); ++moduleIter)
+      for (std::vector<Bundle*>::const_iterator bundleIter = bundles.begin();
+           bundleIter != bundles.end(); ++bundleIter)
       {
-        std::cout << std::right << std::setw(2) << (*moduleIter)->GetModuleId() << std::left << " | ";
-        std::cout << std::setw(20) << (*moduleIter)->GetName() << " | ";
-        std::cout << std::setw(9) << ((*moduleIter)->IsLoaded() ? "ACTIVE" : "RESOLVED");
+        std::cout << std::right << std::setw(2) << (*bundleIter)->GetBundleId() << std::left << " | ";
+        std::cout << std::setw(20) << (*bundleIter)->GetName() << " | ";
+        std::cout << std::setw(9) << ((*bundleIter)->IsStarted() ? "ACTIVE" : "RESOLVED");
         std::cout << std::endl;
       }
     }
@@ -263,13 +263,13 @@ int main(int /*argc*/, char** /*argv*/)
 }
 
 #ifndef US_BUILD_SHARED_LIBS
-US_IMPORT_MODULE(CppMicroServices)
-US_IMPORT_MODULE(eventlistener)
-US_IMPORT_MODULE(dictionaryservice)
-US_IMPORT_MODULE(spellcheckservice)
-US_IMPORT_MODULE(frenchdictionary)
-US_IMPORT_MODULE(dictionaryclient)
-US_IMPORT_MODULE(dictionaryclient2)
-US_IMPORT_MODULE(dictionaryclient3)
-US_IMPORT_MODULE(spellcheckclient)
+US_IMPORT_BUNDLE(CppMicroServices)
+US_IMPORT_BUNDLE(eventlistener)
+US_IMPORT_BUNDLE(dictionaryservice)
+US_IMPORT_BUNDLE(spellcheckservice)
+US_IMPORT_BUNDLE(frenchdictionary)
+US_IMPORT_BUNDLE(dictionaryclient)
+US_IMPORT_BUNDLE(dictionaryclient2)
+US_IMPORT_BUNDLE(dictionaryclient3)
+US_IMPORT_BUNDLE(spellcheckclient)
 #endif

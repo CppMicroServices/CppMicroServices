@@ -103,7 +103,7 @@ void WebConsolePluginTracker::AddPlugin(const std::string& label, AbstractWebCon
 }
 
 WebConsolePluginTracker::WebConsolePluginTracker()
-  : ServiceTracker<HttpServlet>(GetModuleContext())
+  : ServiceTracker<HttpServlet>(GetBundleContext())
   , m_LabelMapAny(std::map<std::string, Any>())
   , m_Labels(NULL)
   , m_ServletContext(NULL)

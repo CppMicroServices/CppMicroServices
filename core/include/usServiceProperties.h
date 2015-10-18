@@ -39,7 +39,7 @@ namespace us {
  *
  * A hash table with std::string as the key type and Any as the value
  * type. It is typically used for passing service properties to
- * ModuleContext::RegisterService.
+ * BundleContext::RegisterService.
  */
 typedef std::unordered_map<std::string, Any> ServiceProperties;
 
@@ -76,14 +76,14 @@ US_Core_EXPORT const std::string& SERVICE_ID(); // = "service.id"
  * <p>
  * This property may be supplied in the
  * <code>ServiceProperties</code> object passed to the
- * <code>ModuleContext::RegisterService</code> method. The value of this
+ * <code>BundleContext::RegisterService</code> method. The value of this
  * property must be of type <code>int</code>.
  *
  * <p>
  * The service ranking is used by the framework to determine the <i>natural
  * order</i> of services, see ServiceReference::operator<(const ServiceReference&),
  * and the <i>default</i> service to be returned from a call to the
- * {@link ModuleContext::GetServiceReference} method.
+ * {@link BundleContext::GetServiceReference} method.
  *
  * <p>
  * The default ranking is zero (0). A service with a ranking of
@@ -103,13 +103,13 @@ US_Core_EXPORT const std::string& SERVICE_RANKING(); // = "service.ranking"
  * registered object implements PrototypeServiceFactory, then the value of this
  * service property will be SCOPE_PROTOTYPE(). Otherwise, if the registered
  * object implements ServiceFactory, then the value of this service property will
- * be SCOPE_MODULE(). Otherwise, the value of this service property will be
+ * be SCOPE_BUNDLE(). Otherwise, the value of this service property will be
  * SCOPE_SINGLETON().
  */
 US_Core_EXPORT const std::string& SERVICE_SCOPE(); // = "service.scope"
 
 /**
- * Service scope is singleton. All modules using the service receive the same
+ * Service scope is singleton. All bundles using the service receive the same
  * service object.
  *
  * @see SERVICE_SCOPE()
@@ -117,15 +117,15 @@ US_Core_EXPORT const std::string& SERVICE_SCOPE(); // = "service.scope"
 US_Core_EXPORT const std::string& SCOPE_SINGLETON(); // = "singleton"
 
 /**
- * Service scope is module. Each module using the service receives a distinct
+ * Service scope is bundle. Each bundle using the service receives a distinct
  * service object.
  *
  * @see SERVICE_SCOPE()
  */
-US_Core_EXPORT const std::string& SCOPE_MODULE(); // = "module"
+US_Core_EXPORT const std::string& SCOPE_BUNDLE(); // = "bundle"
 
 /**
- * Service scope is prototype. Each module using the service receives either
+ * Service scope is prototype. Each bundle using the service receives either
  * a distinct service object or can request multiple distinct service objects
  * via ServiceObjects.
  *

@@ -25,7 +25,7 @@
 
 #include <usCoreExport.h>
 
-#include <usModuleContext.h>
+#include <usBundleContext.h>
 #include <usPrototypeServiceFactory.h>
 #include <usServiceReference.h>
 #include <usServiceProperties.h>
@@ -43,7 +43,7 @@ private:
 
 protected:
 
-  ServiceObjectsBase(ModuleContext* context, const ServiceReferenceBase& reference);
+  ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference);
 
   ServiceObjectsBase(const ServiceObjectsBase& other);
 
@@ -75,10 +75,10 @@ protected:
  * For services with \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink scope,
  * multiple service objects for the service can be obtained. For services with
  * \link ServiceConstants::SCOPE_SINGLETON singleton\endlink or
- * \link ServiceConstants::SCOPE_MODULE module \endlink scope, only one, use-counted
+ * \link ServiceConstants::SCOPE_BUNDLE bundle \endlink scope, only one, use-counted
  * service object is available. Any unreleased service objects obtained from this
- * ServiceObjects object are automatically released by the framework when the modules
- * associated with the ModuleContext used to create this ServiceObjects object is
+ * ServiceObjects object are automatically released by the framework when the bundles
+ * associated with the BundleContext used to create this ServiceObjects object is
  * stopped.
  *
  * @tparam S Type of Service.
@@ -95,8 +95,8 @@ public:
    * This ServiceObjects object can be used to obtain multiple service objects for
    * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
    * scope. If the referenced service has \link ServiceConstants::SCOPE_SINGLETON singleton\endlink
-   * or \link ServiceConstants::SCOPE_MODULE module\endlink scope, this method
-   * behaves the same as calling the ModuleContext::GetService(const ServiceReferenceBase&)
+   * or \link ServiceConstants::SCOPE_BUNDLE bundle\endlink scope, this method
+   * behaves the same as calling the BundleContext::GetService(const ServiceReferenceBase&)
    * method for the referenced service. That is, only one, use-counted service object
    * is available from this ServiceObjects object.
    *
@@ -106,7 +106,7 @@ public:
    *
    * <ol>
    *   <li>If the referenced service has been unregistered, \c NULL is returned.</li>
-   *   <li>The PrototypeServiceFactory::GetService(Module*, const ServiceRegistrationBase&)
+   *   <li>The PrototypeServiceFactory::GetService(Bundle*, const ServiceRegistrationBase&)
    *       method is called to create a service object for the caller.</li>
    *   <li>If the service object (an instance of InterfaceMap) returned by the
    *       PrototypeServiceFactory object is empty, does not contain all the interfaces
@@ -120,7 +120,7 @@ public:
    *         all the classes under which it was registered or the ServiceFactory threw an
    *         exception.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects object
+   * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
    *        is no longer valid.
    *
    * @see UngetService()
@@ -136,8 +136,8 @@ public:
    * This ServiceObjects object can be used to obtain multiple service objects for
    * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
    * scope. If the referenced service has \link ServiceConstants::SCOPE_SINGLETON singleton\endlink
-   * or \link ServiceConstants::SCOPE_MODULE module\endlink scope, this method
-   * behaves the same as calling the ModuleContext::UngetService(const ServiceReferenceBase&)
+   * or \link ServiceConstants::SCOPE_BUNDLE bundle\endlink scope, this method
+   * behaves the same as calling the BundleContext::UngetService(const ServiceReferenceBase&)
    * method for the referenced service. That is, only one, use-counted service object
    * is available from this ServiceObjects object.
    *
@@ -146,7 +146,7 @@ public:
    * <ol>
    *   <li>If the referenced service has been unregistered, this method returns without
    *       doing anything.</li>
-   *   <li>The PrototypeServiceFactory::UngetService(Module*, const ServiceRegistrationBase&, const InterfaceMap&)
+   *   <li>The PrototypeServiceFactory::UngetService(Bundle*, const ServiceRegistrationBase&, const InterfaceMap&)
    *       method is called to release the specified service object.</li>
    *   <li>The specified service object must no longer be used and all references to it
    *       should be destroyed after calling this method.</li>
@@ -154,7 +154,7 @@ public:
    *
    * @param service A service object previously provided by this ServiceObjects object.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects
+   * @throw std::logic_error If the BundleContext used to create this ServiceObjects
    *        object is no longer valid.
    * @throw std::invalid_argument If the specified service was not provided by this
    *        ServiceObjects object.
@@ -178,9 +178,9 @@ public:
 
 private:
 
-  friend class ModuleContext;
+  friend class BundleContext;
 
-  ServiceObjects(ModuleContext* context, const ServiceReference<S>& reference)
+  ServiceObjects(BundleContext* context, const ServiceReference<S>& reference)
     : ServiceObjectsBase(context, reference)
   {}
 
@@ -214,7 +214,7 @@ public:
    *         does not contain all the classes under which the service object was
    *         registered or the ServiceFactory threw an exception.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects object
+   * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
    *        is no longer valid.
    *
    * @see ServiceObjects<S>::GetService()
@@ -230,7 +230,7 @@ public:
    *
    * @param service An InterfaceMap object previously provided by this ServiceObjects object.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects
+   * @throw std::logic_error If the BundleContext used to create this ServiceObjects
    *        object is no longer valid.
    * @throw std::invalid_argument If the specified service was not provided by this
    *        ServiceObjects object.
@@ -249,9 +249,9 @@ public:
 
 private:
 
-  friend class ModuleContext;
+  friend class BundleContext;
 
-  ServiceObjects(ModuleContext* context, const ServiceReferenceU& reference);
+  ServiceObjects(BundleContext* context, const ServiceReferenceU& reference);
 
 };
 

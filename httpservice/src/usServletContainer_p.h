@@ -29,7 +29,7 @@ class CivetServer;
 
 namespace us {
 
-class ModuleContext;
+class BundleContext;
 
 class HttpServlet;
 class ServletContainer;
@@ -47,7 +47,7 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
 
   std::string GetMimeType(const ServletContext* context, const std::string& file) const;
 
-  ModuleContext* m_Context;
+  BundleContext* m_Context;
   CivetServer* m_Server;
   ServiceTracker<HttpServlet, TrackedTypeTraits<HttpServlet, ServletHandler*> > m_ServletTracker;
 

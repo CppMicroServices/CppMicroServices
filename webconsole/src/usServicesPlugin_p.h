@@ -26,7 +26,7 @@
 
 namespace us {
 
-class ModuleResourceStream;
+class BundleResourceStream;
 
 class ServicesPlugin : public SimpleWebConsolePlugin
 {
@@ -43,8 +43,8 @@ private:
   std::string GetIds_JSON() const;
   std::string GetInterface_JSON(const std::string& iid) const;
 
-  ModuleResourceStream* m_TemplateRS;
-  ModuleResourceStream* m_TemplateSI;
+  BundleResourceStream* m_TemplateRS;
+  BundleResourceStream* m_TemplateSI;
 };
 
 }

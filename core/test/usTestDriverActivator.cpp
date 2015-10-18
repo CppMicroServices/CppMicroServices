@@ -21,50 +21,50 @@
 =============================================================================*/
 
 #include "usTestDriverActivator.h"
-#include "usModuleImport.h"
+#include "usBundleImport.h"
 
 namespace us {
 
 TestDriverActivator* TestDriverActivator::m_Instance = nullptr;
 
 TestDriverActivator::TestDriverActivator()
-  : m_LoadCalled(false)
+  : m_StartCalled(false)
 {
 }
 
-bool TestDriverActivator::LoadCalled()
+bool TestDriverActivator::StartCalled()
 {
-  return m_Instance ? m_Instance->m_LoadCalled : false;
+  return m_Instance ? m_Instance->m_StartCalled : false;
 }
 
-void TestDriverActivator::Load(ModuleContext*)
+void TestDriverActivator::Start(BundleContext*)
 {
   this->m_Instance = this;
-  this->m_LoadCalled = true;
+  this->m_StartCalled = true;
 }
 
-void TestDriverActivator::Unload(ModuleContext*)
+void TestDriverActivator::Stop(BundleContext*)
 {
   this->m_Instance = nullptr;
 }
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(us::TestDriverActivator)
+US_EXPORT_BUNDLE_ACTIVATOR(us::TestDriverActivator)
 
 #ifndef US_BUILD_SHARED_LIBS
-US_IMPORT_MODULE(CppMicroServices)
-US_IMPORT_MODULE(TestModuleA)
-US_IMPORT_MODULE(TestModuleA2)
-US_IMPORT_MODULE(TestModuleB)
-US_IMPORT_MODULE(TestModuleH)
-US_IMPORT_MODULE(TestModuleM)
-US_INITIALIZE_STATIC_MODULE(TestModuleR)
-US_INITIALIZE_STATIC_MODULE(TestModuleRL)
-US_INITIALIZE_STATIC_MODULE(TestModuleRA)
-US_IMPORT_MODULE(TestModuleS)
-US_IMPORT_MODULE(TestModuleSL1)
-US_IMPORT_MODULE(TestModuleSL3)
-US_IMPORT_MODULE(TestModuleSL4)
-US_IMPORT_MODULE(main)
+US_IMPORT_BUNDLE(CppMicroServices)
+US_IMPORT_BUNDLE(TestBundleA)
+US_IMPORT_BUNDLE(TestBundleA2)
+US_IMPORT_BUNDLE(TestBundleB)
+US_IMPORT_BUNDLE(TestBundleH)
+US_IMPORT_BUNDLE(TestBundleM)
+US_INITIALIZE_STATIC_BUNDLE(TestBundleR)
+US_INITIALIZE_STATIC_BUNDLE(TestBundleRL)
+US_INITIALIZE_STATIC_BUNDLE(TestBundleRA)
+US_IMPORT_BUNDLE(TestBundleS)
+US_IMPORT_BUNDLE(TestBundleSL1)
+US_IMPORT_BUNDLE(TestBundleSL3)
+US_IMPORT_BUNDLE(TestBundleSL4)
+US_IMPORT_BUNDLE(main)
 #endif

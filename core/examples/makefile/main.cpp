@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <usGetBundleContext.h>
+#include <usBundleContext.h>
 #include <usServiceReference.h>
 
 #include "IDictionaryService.h"
@@ -11,10 +11,10 @@ using namespace us;
 int main(int /*argc*/, char* /*argv*/[])
 {
   ServiceReference<IDictionaryService> dictionaryServiceRef =
-    GetModuleContext()->GetServiceReference<IDictionaryService>();
+    GetBundleContext()->GetServiceReference<IDictionaryService>();
   if (dictionaryServiceRef)
   {
-    IDictionaryService* dictionaryService = GetModuleContext()->GetService(dictionaryServiceRef);
+    IDictionaryService* dictionaryService = GetBundleContext()->GetService(dictionaryServiceRef);
     if (dictionaryService)
     {
       std::cout << "Dictionary contains 'Tutorial': " << dictionaryService->CheckWord("Tutorial") << std::endl;
@@ -22,6 +22,6 @@ int main(int /*argc*/, char* /*argv*/[])
   }
 }
 
-#include <usModuleInitialization.h>
+#include <usBundleInitialization.h>
 
-US_INITIALIZE_MODULE
+US_INITIALIZE_BUNDLE

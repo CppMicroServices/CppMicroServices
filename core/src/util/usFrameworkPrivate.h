@@ -24,7 +24,7 @@ limitations under the License.
 #define USFRAMEWORKPRIVATE_P_H
 
 #include <usCoreConfig.h>
-#include <usCoreModuleContext_p.h>
+#include <usCoreBundleContext_p.h>
 #include <usThreads_p.h>
 
 #include <map>
@@ -45,7 +45,7 @@ public:
     FrameworkPrivate(const std::map<std::string, std::string>& configuration);
     virtual ~FrameworkPrivate();
 
-    CoreModuleContext coreModuleContext;
+    CoreBundleContext coreBundleContext;
 
     bool initialized;
 };

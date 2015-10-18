@@ -44,15 +44,15 @@ bool IsSharedLibrary(const std::string& location);
 }
 
 //-------------------------------------------------------------------
-// Module auto-loading
+// Bundle auto-loading
 //-------------------------------------------------------------------
 
 namespace us {
 
-struct ModuleInfo;
-class CoreModuleContext;
+struct BundleInfo;
+class CoreBundleContext;
 
-std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo, CoreModuleContext* coreCtx);
+std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
 
 }
 

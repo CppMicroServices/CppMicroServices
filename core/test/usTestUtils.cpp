@@ -120,23 +120,23 @@ long long HighPrecisionTimer::ElapsedMicro()
 
 #endif
 
-Module* InstallTestBundle(ModuleContext* frameworkCtx, const std::string& bundleName)
+Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName)
 {
-    Module* module = nullptr;
+    Bundle* bundle = nullptr;
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        module = frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "/" + bundleName);
+        bundle = frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "/" + bundleName);
 #else
-        module = frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + bundleName);
+        bundle = frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + bundleName);
 #endif
-        US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module " << bundleName)
+        US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle " << bundleName)
     }
     catch (const std::exception& e)
     {
         US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
     }
-    return module;
+    return bundle;
 }
 
 }

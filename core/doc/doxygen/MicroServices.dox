@@ -25,8 +25,8 @@ as specified in the OSGi R4.2 specifications.
 \brief This category includes CMake utility functions for external projects.
 
 External projects can include the CMake scripts provided by the CppMicroServices
-library to automatically generate module initialization code and to embed external resources
-into a modules shared library.
+library to automatically generate bundle initialization code and to embed external resources
+into a bundles shared library.
 
 */
 
@@ -34,7 +34,7 @@ into a modules shared library.
 
 \page MicroServices_Tutorials Tutorial
 
-This tutorial creates successively more complex modules to illustrate
+This tutorial creates successively more complex bundles to illustrate
 most of the features and functionality offered by the C++ Micro Services library.
 It is heavily base on the Apache Felix OSGi Tutorial.
 
@@ -60,12 +60,12 @@ Micro Services library:
 - \subpage BuildInstructions
 - \subpage MicroServices_GettingStarted
 \endif
-- \subpage MicroServices_TheModuleContext
+- \subpage MicroServices_TheBundleContext
 - \subpage MicroServices_Resources
-- \subpage MicroServices_ModuleProperties
+- \subpage MicroServices_BundleProperties
 - \subpage MicroServices_AutoLoading
 - \subpage MicroServices_ServiceHooks
-- \subpage MicroServices_StaticModules
+- \subpage MicroServices_StaticBundles
 - \subpage MicroServices_EmulateSingleton
 
 */
@@ -92,7 +92,7 @@ Here is a list of \ref MicroServices_Tutorials "tutorial examples"
 \else
 Here is a list of \subpage MicroServices_Tutorials "tutorial examples"
 \endif
-which create successively more complex modules to illustrate most of the features and
+which create successively more complex bundles to illustrate most of the features and
 functionality offered by the C++ Micro Services library:
 
 - \ref MicroServices_Example1
@@ -117,12 +117,12 @@ The links in the following list point to important
 - \ref BuildInstructions
 - \ref MicroServices_GettingStarted
 \endif
-- \ref MicroServices_TheModuleContext
+- \ref MicroServices_TheBundleContext
 - \ref MicroServices_Resources
-- \ref MicroServices_ModuleProperties
+- \ref MicroServices_BundleProperties
 - \ref MicroServices_AutoLoading
 - \ref MicroServices_ServiceHooks
-- \ref MicroServices_StaticModules
+- \ref MicroServices_StaticBundles
 - \ref MicroServices_EmulateSingleton
 
 */

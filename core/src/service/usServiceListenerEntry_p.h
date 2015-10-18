@@ -32,7 +32,7 @@
 
 namespace us {
 
-class Module;
+class Bundle;
 class ServiceListenerEntryData;
 
 /**
@@ -53,7 +53,7 @@ public:
 
   void SetRemoved(bool removed) const;
 
-  ServiceListenerEntry(ModuleContext* mc, const ServiceListener& l, void* data, const std::string& filter = "");
+  ServiceListenerEntry(BundleContext* mc, const ServiceListener& l, void* data, const std::string& filter = "");
 
   const LDAPExpr& GetLDAPExpr() const;
 

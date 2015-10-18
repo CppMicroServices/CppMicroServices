@@ -32,8 +32,8 @@ set(_resources
   templates/main_footer.html
   templates/main_header.html
   templates/settings.html
-  #templates/modules.html
-  #templates/module.html
+  #templates/bundles.html
+  #templates/bundle.html
   templates/services.html
   templates/service_interface.html
 
@@ -71,7 +71,7 @@ set(_resources
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/main")
 
-usMacroCreateModule(WebConsole
+usMacroCreateBundle(WebConsole
   VERSION "0.99.0"
   DEPENDS HttpService
   INTERNAL_INCLUDE_DIRS src

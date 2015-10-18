@@ -27,9 +27,9 @@
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
 
-#include <usModule.h>
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
+#include <usBundle.h>
+#include <usBundleContext.h>
+#include <usGetBundleContext.h>
 #include <usServiceInterface.h>
 #include <usServiceTracker.h>
 
@@ -76,7 +76,7 @@ class MyCustomizer : public us::ServiceTrackerCustomizer<MyInterfaceOne>
 
 public:
 
-  MyCustomizer(us::ModuleContext* context)
+  MyCustomizer(us::BundleContext* context)
     : m_context(context)
   {}
 
@@ -100,10 +100,10 @@ public:
 
 private:
 
-  us::ModuleContext* m_context;
+  us::BundleContext* m_context;
 };
 
-void TestFilterString(us::ModuleContext* context)
+void TestFilterString(us::BundleContext* context)
 {
   MyCustomizer customizer(context);
 
@@ -123,19 +123,19 @@ void TestFilterString(us::ModuleContext* context)
   US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
 }
 
-void TestServiceTracker(us::ModuleContext* context)
+void TestServiceTracker(us::BundleContext* context)
 {
-  ModuleContext* mc = context;
+  BundleContext* mc = context;
 
-  Module* module = InstallTestBundle(mc, "TestModuleS");
-  module->Start();
+  Bundle* bundle = InstallTestBundle(mc, "TestBundleS");
+  bundle->Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
-  std::string s1("us::TestModuleSService");
+  std::string s1("us::TestBundleSService");
   ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
 
-  US_TEST_CONDITION_REQUIRED(servref != nullptr, "Test if registered service of id us::TestModuleSService0");
+  US_TEST_CONDITION_REQUIRED(servref != nullptr, "Test if registered service of id us::TestBundleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
   US_TEST_CONDITION_REQUIRED(servCtrlRef != nullptr, "Test if constrol service was registered");
@@ -151,7 +151,7 @@ void TestServiceTracker(us::ModuleContext* context)
 
   // 3. Open the service tracker and see what it finds,
   // expect to find one instance of the implementation,
-  // "org.cppmicroservices.TestModuleSService0"
+  // "org.cppmicroservices.TestBundleSService0"
 
   st1->Open();
   std::vector<ServiceReferenceU> sa2 = st1->GetServiceReferences();
@@ -178,7 +178,7 @@ void TestServiceTracker(us::ModuleContext* context)
 
   // 9. Open the service tracker and see what it finds,
   // expect to find two instances of references to
-  // "org.cppmicroservices.TestModuleSService*"
+  // "org.cppmicroservices.TestBundleSService*"
   // i.e. they refer to the same piece of code
 
   std::vector<std::string> ids;
@@ -193,7 +193,7 @@ void TestServiceTracker(us::ModuleContext* context)
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.begin(), ids.begin()+2), "Check for expected interface id [0]");
   US_TEST_CONDITION_REQUIRED(sa2[1].IsConvertibleTo(s1 + "1"), "Check for expected interface id [1]");
 
-  // 10. Get libTestModuleS to register one more service and see if it appears
+  // 10. Get libTestBundleS to register one more service and see if it appears
   serviceController->ServiceControl(2, "register", 1);
   sa2 = st1->GetServiceReferences();
 
@@ -201,13 +201,13 @@ void TestServiceTracker(us::ModuleContext* context)
 
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.begin(), ids.begin()+3), "Check for expected interface id [2]");
 
-  // 11. Get libTestModuleS to register one more service and see if it appears
+  // 11. Get libTestBundleS to register one more service and see if it appears
   serviceController->ServiceControl(3, "register", 2);
   sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 4, "Checking service reference count");
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.begin(), ids.end()), "Check for expected interface id [3]");
 
-  // 12. Get libTestModuleS to unregister one service and see if it disappears
+  // 12. Get libTestBundleS to unregister one service and see if it disappears
   serviceController->ServiceControl(3, "unregister", 0);
   sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 3, "Checking service reference count");
@@ -267,8 +267,8 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
-  TestFilterString(framework->GetModuleContext());
-  TestServiceTracker(framework->GetModuleContext());
+  TestFilterString(framework->GetBundleContext());
+  TestServiceTracker(framework->GetBundleContext());
 
   delete framework;
 

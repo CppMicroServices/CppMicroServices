@@ -19,24 +19,24 @@
 
 =============================================================================*/
 
-#include "usModuleActivator.h"
-#include "usModuleContext.h"
+#include "usBundleActivator.h"
+#include "usBundleContext.h"
 
 #include "usShellService.h"
 
 namespace us {
 
-class ShellActivator : public ModuleActivator
+class ShellActivator : public BundleActivator
 {
 public:
 
-  void Load(ModuleContext* context)
+  void Start(BundleContext* context)
   {
     m_ShellService.reset(new ShellService());
     context->RegisterService<ShellService>(m_ShellService.get());
   }
 
-  void Unload(ModuleContext*)
+  void Stop(BundleContext*)
   {
 
   }
@@ -48,4 +48,4 @@ private:
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(us::ShellActivator)
+US_EXPORT_BUNDLE_ACTIVATOR(us::ShellActivator)

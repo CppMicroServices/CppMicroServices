@@ -21,9 +21,9 @@
 
 #include "usFrameworkFactory.h"
 #include "usFramework.h"
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModule.h"
+#include "usGetBundleContext.h"
+#include "usBundleContext.h"
+#include "usBundle.h"
 #include "usAny.h"
 
 #include "usShellService.h"
@@ -86,11 +86,11 @@ int main(int argc, char** argv)
   FrameworkFactory factory;
   Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
-  ModuleContext* context = framework->GetModuleContext();
+  BundleContext* context = framework->GetBundleContext();
 
   try
   {
-    std::vector<Module*> bundles;
+    std::vector<Bundle*> bundles;
     for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next())
     {
       if (opt->arg == nullptr) continue;

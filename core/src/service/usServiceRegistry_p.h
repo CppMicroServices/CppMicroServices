@@ -31,8 +31,8 @@
 
 namespace us {
 
-class CoreModuleContext;
-class ModulePrivate;
+class CoreBundleContext;
+class BundlePrivate;
 class ServicePropertiesImpl;
 
 
@@ -50,7 +50,7 @@ public:
    *
    * @param classes A list of class names which will be added to the
    *        created ServiceProperties object under the key
-   *        ModuleConstants::OBJECTCLASS.
+   *        BundleConstants::OBJECTCLASS.
    * @param sid A service id which will be used instead of a default one.
    */
   static ServicePropertiesImpl CreateServiceProperties(const ServiceProperties& in,
@@ -76,12 +76,12 @@ public:
    */
   MapClassServices classServices;
 
-  CoreModuleContext* core;
+  CoreBundleContext* core;
 
   ServiceRegistry(const ServiceRegistry&) = delete;
   ServiceRegistry& operator=(const ServiceRegistry&) = delete;
 
-  ServiceRegistry(CoreModuleContext* coreCtx);
+  ServiceRegistry(CoreBundleContext* coreCtx);
 
   ~ServiceRegistry();
 
@@ -90,7 +90,7 @@ public:
   /**
    * Register a service in the framework wide register.
    *
-   * @param module The module registering the service.
+   * @param bundle The bundle registering the service.
    * @param classes The class names under which the service can be located.
    * @param service The service object.
    * @param properties The properties for this service.
@@ -102,7 +102,7 @@ public:
    * instance of all the named classes in the classes parameter.</li>
    * </ul>
    */
-  ServiceRegistrationBase RegisterService(ModulePrivate* module,
+  ServiceRegistrationBase RegisterService(BundlePrivate* bundle,
                                           const InterfaceMap& service,
                                           const ServiceProperties& properties);
 
@@ -128,11 +128,11 @@ public:
   /**
    * Get a service implementing a certain class.
    *
-   * @param module The module requesting reference
+   * @param bundle The bundle requesting reference
    * @param clazz The class name of the requested service.
    * @return A {@link ServiceReference} object.
    */
-  ServiceReferenceBase Get(ModulePrivate* module, const std::string& clazz) const;
+  ServiceReferenceBase Get(BundlePrivate* bundle, const std::string& clazz) const;
 
   /**
    * Get all services implementing a certain class and then
@@ -140,11 +140,11 @@ public:
    *
    * @param clazz The class name of requested service.
    * @param filter The property filter.
-   * @param module The module requesting reference.
+   * @param bundle The bundle requesting reference.
    * @return A list of {@link ServiceReference} object.
    */
   void Get(const std::string& clazz, const std::string& filter,
-           ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
+           BundlePrivate* bundle, std::vector<ServiceReferenceBase>& serviceRefs) const;
 
   /**
    * Remove a registered service.
@@ -154,20 +154,20 @@ public:
   void RemoveServiceRegistration(const ServiceRegistrationBase& sr) ;
 
   /**
-   * Get all services that a module has registered.
+   * Get all services that a bundle has registered.
    *
-   * @param p The module
+   * @param p The bundle
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetRegisteredByModule(ModulePrivate* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void GetRegisteredByBundle(BundlePrivate* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
-   * Get all services that a module uses.
+   * Get all services that a bundle uses.
    *
-   * @param p The module
+   * @param p The bundle
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetUsedByModule(Module* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void GetUsedByBundle(Bundle* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
 private:
 
@@ -176,7 +176,7 @@ private:
   void Get_unlocked(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   void Get_unlocked(const std::string& clazz, const std::string& filter,
-                    ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
+                    BundlePrivate* bundle, std::vector<ServiceReferenceBase>& serviceRefs) const;
 
 };
 

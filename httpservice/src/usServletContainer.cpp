@@ -31,9 +31,9 @@
 #include "usServletContext.h"
 #include "usServletConfig_p.h"
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModule.h"
+#include "usGetBundleContext.h"
+#include "usBundleContext.h"
+#include "usBundle.h"
 
 #include "civetweb/CivetServer.h"
 
@@ -122,7 +122,7 @@ public:
 };
 
 ServletContainerPrivate::ServletContainerPrivate(ServletContainer* q)
-    : m_Context(GetModuleContext())
+    : m_Context(GetBundleContext())
     , m_Server(NULL)
     , m_ServletTracker(m_Context, this)
     , q(q)
@@ -177,14 +177,14 @@ ServletContainerPrivate::TrackedType ServletContainerPrivate::AddingService(cons
   Any contextRoot = reference.GetProperty(HttpServlet::PROP_CONTEXT_ROOT());
   if (contextRoot.Empty())
   {
-    std::cout << "HttpServlet from " << reference.GetModule()->GetName() << " is missing the context root property." << std::endl;
+    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is missing the context root property." << std::endl;
     return NULL;
   }
 
   HttpServlet* servlet = m_Context->GetService(reference);
   if (servlet == NULL)
   {
-    std::cout << "HttpServlet from " << reference.GetModule()->GetName() << " is NULL." << std::endl;
+    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is NULL." << std::endl;
     return NULL;
   }
   ServletContext* servletContext = new ServletContext(q);

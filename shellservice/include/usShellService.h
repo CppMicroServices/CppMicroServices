@@ -28,7 +28,7 @@
 
 namespace us {
 
-class ModuleResource;
+class BundleResource;
 
 class US_ShellService_EXPORT ShellService
 {
@@ -46,7 +46,7 @@ private:
   ShellService(const ShellService&);
   ShellService& operator=(const ShellService&);
 
-  void LoadSchemeResource(const ModuleResource& res);
+  void LoadSchemeResource(const BundleResource& res);
 
   struct Impl;
   std::unique_ptr<Impl> d;

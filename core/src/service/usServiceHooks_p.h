@@ -36,7 +36,7 @@ class ServiceHooks : private MultiThreaded<>, private ServiceTrackerCustomizer<S
 
 private:
 
-  CoreModuleContext* coreCtx;
+  CoreBundleContext* coreCtx;
   ServiceTracker<ServiceListenerHook>* listenerHookTracker;
 
   std::atomic<bool> bOpen;
@@ -47,7 +47,7 @@ private:
 
 public:
 
-  ServiceHooks(CoreModuleContext* coreCtx);
+  ServiceHooks(CoreBundleContext* coreCtx);
   ~ServiceHooks();
 
   void Open();
@@ -56,7 +56,7 @@ public:
 
   bool IsOpen() const;
 
-  void FilterServiceReferences(ModuleContext* mc, const std::string& service,
+  void FilterServiceReferences(BundleContext* mc, const std::string& service,
                                const std::string& filter, std::vector<ServiceReferenceBase>& refs);
 
   void FilterServiceEventReceivers(const ServiceEvent& evt,

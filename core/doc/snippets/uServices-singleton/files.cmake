@@ -5,4 +5,4 @@ set(snippet_src_files
   SingletonTwo.cpp
 )
 
-usFunctionGenerateModuleInit(snippet_src_files)
+usFunctionGenerateBundleInit(snippet_src_files)

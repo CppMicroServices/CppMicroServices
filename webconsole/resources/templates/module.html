@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="/js/jqtree.css">
 
 
-<h3 class="module-name"><span class="tooltip" title="Overview"><a href="/Console/modules"><i class="icon-chevron-left" style="margin-right:10px;"></i></a></span></h3>
+<h3 class="bundle-name"><span class="tooltip" title="Overview"><a href="/Console/bundles"><i class="icon-chevron-left" style="margin-right:10px;"></i></a></span></h3>
 
 <ul class="tabs left">
 <li><a href="#tab-props">Properties</a></li>
@@ -34,14 +34,14 @@
 <div id="tab-usedservices" class="tab-content"></div>
 
 <script>
-var moduleId = window.location.pathname.split('/').pop();
+var bundleId = window.location.pathname.split('/').pop();
 
-var request = $.getJSON(moduleId);
+var request = $.getJSON(bundleId);
 
 request.done(function(data) {
 
   var titleDirective = {
-    'h3.module-name+':'name'
+    'h3.bundle-name+':'name'
   };
   $('div.grid').render(data, titleDirective);
 

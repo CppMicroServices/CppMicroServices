@@ -22,10 +22,10 @@
 
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
-#include <usModule.h>
-#include <usModuleEvent.h>
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
+#include <usBundle.h>
+#include <usBundleEvent.h>
+#include <usBundleContext.h>
+#include <usGetBundleContext.h>
 #include <usLDAPProp.h>
 #include <usServiceFindHook.h>
 #include <usServiceEvent.h>
@@ -59,22 +59,22 @@ class TestServiceEventListenerHook : public ServiceEventListenerHook
 private:
 
   int id;
-  ModuleContext* moduleCtx;
+  BundleContext* bundleCtx;
 
 public:
 
-  TestServiceEventListenerHook(int id, ModuleContext* mc)
+  TestServiceEventListenerHook(int id, BundleContext* mc)
   : id(id),
-    moduleCtx(mc)
+    bundleCtx(mc)
   {
   }
 
-  typedef ShrinkableMap<ModuleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > MapType;
+  typedef ShrinkableMap<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > MapType;
 
   void Event(const ServiceEvent& /*event*/, MapType& listeners)
   {
-    US_TEST_CONDITION_REQUIRED(listeners.size() > 0 && listeners.find(moduleCtx) != listeners.end(), "Check listener content");
-    ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos = listeners[moduleCtx];
+    US_TEST_CONDITION_REQUIRED(listeners.size() > 0 && listeners.find(bundleCtx) != listeners.end(), "Check listener content");
+    ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos = listeners[bundleCtx];
 
     // listener count should be 2 because the event listener hooks are called with
     // the list of listeners before filtering them according to ther LDAP filter
@@ -142,20 +142,20 @@ class TestServiceFindHook : public ServiceFindHook
 {
 private:
   int id;
-  ModuleContext* moduleCtx;
+  BundleContext* bundleCtx;
 
 public:
 
-  TestServiceFindHook(int id, ModuleContext* mc)
+  TestServiceFindHook(int id, BundleContext* mc)
     : id(id),
-      moduleCtx(mc)
+      bundleCtx(mc)
   {
   }
 
-  void Find(const ModuleContext* context, const std::string& /*name*/,
+  void Find(const BundleContext* context, const std::string& /*name*/,
             const std::string& /*filter*/, ShrinkableVector<ServiceReferenceBase>& references)
   {
-    US_TEST_CONDITION(context == moduleCtx, "Module context");
+    US_TEST_CONDITION(context == bundleCtx, "Bundle context");
 
     references.clear();
     ordering.push_back(id);
@@ -170,13 +170,13 @@ class TestServiceListenerHook : public ServiceListenerHook
 {
 private:
   int id;
-  ModuleContext* moduleCtx;
+  BundleContext* bundleCtx;
 
 public:
 
-  TestServiceListenerHook(int id,ModuleContext* mc)
+  TestServiceListenerHook(int id,BundleContext* mc)
     : id(id),
-      moduleCtx(mc)
+      bundleCtx(mc)
   {
   }
 
@@ -185,7 +185,7 @@ public:
     for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin();
          iter != listeners.end(); ++iter)
     {
-      if (iter->IsRemoved() || iter->GetModuleContext() != moduleCtx) continue;
+      if (iter->IsRemoved() || iter->GetBundleContext() != bundleCtx) continue;
       listenerInfos.insert(*iter);
       lastAdded = listeners.back();
       ordering.push_back(id);
@@ -215,7 +215,7 @@ std::vector<int> TestServiceListenerHook::ordering;
 
 void TestEventListenerHook(Framework* framework)
 {
-  ModuleContext* context = framework->GetModuleContext()->GetModule("main")->GetModuleContext();
+  BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
@@ -243,15 +243,15 @@ void TestEventListenerHook(Framework* framework)
   US_TEST_CONDITION(serviceListener1.events.empty(), "service event of service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener");
 
-  Module* module = InstallTestBundle(context, "TestModuleA");
+  Bundle* bundle = InstallTestBundle(context, "TestBundleA");
 
-  module->Start();
+  bundle->Start();
 
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(2);
   US_TEST_CONDITION(serviceEventListenerHook1.ordering == expectedOrdering, "Event listener hook call order");
 
-  module->Stop();
+  bundle->Stop();
 
   US_TEST_CONDITION(serviceListener1.events.empty(), "no service event due to service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener due to service event listener hook");
@@ -265,7 +265,7 @@ void TestEventListenerHook(Framework* framework)
 
 void TestListenerHook(Framework* framework)
 {
-  ModuleContext* context = framework->GetModuleContext()->GetModule("main")->GetModuleContext();
+  BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
@@ -337,7 +337,7 @@ void TestListenerHook(Framework* framework)
 
 void TestFindHook(Framework* framework)
 {
-  ModuleContext* context = framework->GetModuleContext()->GetModule("main")->GetModuleContext();
+  BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
   TestServiceFindHook serviceFindHook1(1, context);
   ServiceProperties hookProps1;
@@ -357,15 +357,15 @@ void TestFindHook(Framework* framework)
   TestServiceListener serviceListener;
   context->AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 
-  Module* module = InstallTestBundle(context, "TestModuleA");
+  Bundle* bundle = InstallTestBundle(context, "TestBundleA");
 
-  module->Start();
+  bundle->Start();
 
   US_TEST_CONDITION(serviceListener.events.size() == 1, "Service registered");
 
-  std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestModuleAService");
+  std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestBundleAService");
   US_TEST_CONDITION(refs.empty(), "Empty references");
-  ServiceReferenceU ref = context->GetServiceReference("us::TestModuleAService");
+  ServiceReferenceU ref = context->GetServiceReference("us::TestBundleAService");
   US_TEST_CONDITION(!ref, "Invalid reference (filtered out)");
 
   expectedOrdering.push_back(2);
@@ -378,12 +378,12 @@ void TestFindHook(Framework* framework)
   findHookReg2.Unregister();
   findHookReg1.Unregister();
 
-  refs = context->GetServiceReferences("us::TestModuleAService");
+  refs = context->GetServiceReferences("us::TestBundleAService");
   US_TEST_CONDITION(!refs.empty(), "Non-empty references");
-  ref = context->GetServiceReference("us::TestModuleAService");
+  ref = context->GetServiceReference("us::TestBundleAService");
   US_TEST_CONDITION(ref, "Valid reference");
 
-  module->Stop();
+  bundle->Stop();
 
   context->RemoveServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 }
@@ -400,9 +400,9 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    Module* module = framework->GetModuleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
-    US_TEST_CONDITION_REQUIRED(module != NULL, "Test installation of module main")
-    module->Start();
+    Bundle* bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle main")
+    bundle->Start();
   }
   catch (const std::exception& e)
   {

@@ -29,8 +29,8 @@
 #include "usPrototypeServiceFactory.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceRegistrationBasePrivate.h"
-#include "usModulePrivate.h"
-#include "usCoreModuleContext_p.h"
+#include "usBundlePrivate.h"
+#include "usCoreBundleContext_p.h"
 
 
 namespace us {
@@ -56,7 +56,7 @@ ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProp
   }
   else if (isFactory)
   {
-    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_MODULE()));
+    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_BUNDLE()));
   }
   else
   {
@@ -66,7 +66,7 @@ ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProp
   return ServicePropertiesImpl(props);
 }
 
-ServiceRegistry::ServiceRegistry(CoreModuleContext* coreCtx)
+ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
   : core(coreCtx)
 {
 
@@ -85,7 +85,7 @@ void ServiceRegistry::Clear()
   core = nullptr;
 }
 
-ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
+ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
                                                      const InterfaceMap& service,
                                                      const ServiceProperties& properties)
 {
@@ -110,7 +110,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
     classes.push_back(i->first);
   }
 
-  ServiceRegistrationBase res(module, service,
+  ServiceRegistrationBase res(bundle, service,
                               CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
   {
     Lock l(this);
@@ -129,8 +129,8 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
   ServiceReferenceBase r = res.GetReference(std::string());
   ServiceListeners::ServiceListenerEntries listeners;
   ServiceEvent registeredEvent(ServiceEvent::REGISTERED, r);
-  module->coreCtx->listeners.GetMatchingServiceListeners(registeredEvent, listeners);
-  module->coreCtx->listeners.ServiceChanged(listeners,
+  bundle->coreCtx->listeners.GetMatchingServiceListeners(registeredEvent, listeners);
+  bundle->coreCtx->listeners.ServiceChanged(listeners,
                                             registeredEvent);
   return res;
 }
@@ -165,15 +165,15 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
   }
 }
 
-ServiceReferenceBase ServiceRegistry::Get(ModulePrivate* module, const std::string& clazz) const
+ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle, const std::string& clazz) const
 {
   Lock l(this);
   try
   {
     std::vector<ServiceReferenceBase> srs;
-    Get_unlocked(clazz, "", module, srs);
-    US_DEBUG << "get service ref " << clazz << " for module "
-             << module->info.name << " = " << srs.size() << " refs";
+    Get_unlocked(clazz, "", bundle, srs);
+    US_DEBUG << "get service ref " << clazz << " for bundle "
+             << bundle->info.name << " = " << srs.size() << " refs";
 
     if (!srs.empty())
     {
@@ -187,14 +187,14 @@ ServiceReferenceBase ServiceRegistry::Get(ModulePrivate* module, const std::stri
 }
 
 void ServiceRegistry::Get(const std::string& clazz, const std::string& filter,
-                          ModulePrivate* module, std::vector<ServiceReferenceBase>& res) const
+                          BundlePrivate* bundle, std::vector<ServiceReferenceBase>& res) const
 {
   Lock l(this);
-  Get_unlocked(clazz, filter, module, res);
+  Get_unlocked(clazz, filter, bundle, res);
 }
 
 void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& filter,
-                          ModulePrivate* module, std::vector<ServiceReferenceBase>& res) const
+                          BundlePrivate* bundle, std::vector<ServiceReferenceBase>& res) const
 {
   std::vector<ServiceRegistrationBase>::const_iterator s;
   std::vector<ServiceRegistrationBase>::const_iterator send;
@@ -270,9 +270,9 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
 
   if (!res.empty())
   {
-    if (module != NULL)
+    if (bundle != NULL)
     {
-      core->serviceHooks.FilterServiceReferences(module->moduleContext, clazz, filter, res);
+      core->serviceHooks.FilterServiceReferences(bundle->bundleContext, clazz, filter, res);
     }
     else
     {
@@ -306,7 +306,7 @@ void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& s
   }
 }
 
-void ServiceRegistry::GetRegisteredByModule(ModulePrivate* p,
+void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
                                             std::vector<ServiceRegistrationBase>& res) const
 {
   Lock l(this);
@@ -314,14 +314,14 @@ void ServiceRegistry::GetRegisteredByModule(ModulePrivate* p,
   for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
   {
-    if (i->d->module == p)
+    if (i->d->bundle == p)
     {
       res.push_back(*i);
     }
   }
 }
 
-void ServiceRegistry::GetUsedByModule(Module* p,
+void ServiceRegistry::GetUsedByBundle(Bundle* p,
                                       std::vector<ServiceRegistrationBase>& res) const
 {
   Lock l(this);
@@ -329,7 +329,7 @@ void ServiceRegistry::GetUsedByModule(Module* p,
   for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
   {
-    if (i->d->IsUsedByModule(p))
+    if (i->d->IsUsedByBundle(p))
     {
       res.push_back(*i);
     }

@@ -22,12 +22,12 @@
 
 #include "usFramework.h"
 
-#include "usCoreModuleContext_p.h"
+#include "usCoreBundleContext_p.h"
 #include "usFrameworkPrivate.h"
-#include "usModuleInfo.h"
-#include "usModuleInitialization.h"
-#include "usModuleSettings.h"
-#include "usModuleUtils_p.h"
+#include "usBundleInfo.h"
+#include "usBundleInitialization.h"
+#include "usBundleSettings.h"
+#include "usBundleUtils_p.h"
 #include "usThreads_p.h"
 
 namespace us {
@@ -56,14 +56,14 @@ void Framework::Initialize(void)
     return;
   }
 
-  ModuleInfo* moduleInfo = new ModuleInfo(US_CORE_FRAMEWORK_NAME);
+  BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
 
   void(Framework::*initFncPtr)(void) = &Framework::Initialize;
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
-  moduleInfo->location = ModuleUtils::GetLibraryPath(frameworkInit);
+  bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
 
-  d->coreModuleContext.bundleRegistry.RegisterSystemBundle(this, moduleInfo);
+  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(this, bundleInfo);
 
   d->initialized = true;
 }
@@ -71,15 +71,15 @@ void Framework::Initialize(void)
 void Framework::Start() 
 { 
   Initialize();
-  Module::Start();
+  Bundle::Start();
 }
 
 void Framework::Stop() 
 {
   FrameworkPrivate::Lock lock(d);
-  std::vector<Module*> modules(GetModuleContext()->GetModules());
-  for (std::vector<Module*>::const_iterator iter = modules.begin();
-      iter != modules.end(); 
+  std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
+  for (std::vector<Bundle*>::const_iterator iter = bundles.begin();
+      iter != bundles.end(); 
       ++iter)
   {
     if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
@@ -88,7 +88,7 @@ void Framework::Stop()
     }
   }
 
-  Module::Stop();
+  Bundle::Stop();
 }
 
 void Framework::Uninstall() 
@@ -105,7 +105,7 @@ std::string Framework::GetLocation() const
 
 void Framework::SetAutoLoadingEnabled(bool enable)
 {
-  d->coreModuleContext.settings.SetAutoLoadingEnabled(enable);
+  d->coreBundleContext.settings.SetAutoLoadingEnabled(enable);
 }
 
 }

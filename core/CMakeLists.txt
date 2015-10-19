@@ -22,6 +22,9 @@ set(_link_libraries )
 if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
+if(TARGET Threads::Threads)
+  list(APPEND _link_libraries Threads::Threads)
+endif()
 
 # Configure the bundles manifest.json file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in

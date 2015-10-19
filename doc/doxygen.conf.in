@@ -2009,7 +2009,9 @@ INCLUDE_FILE_PATTERNS  = *.h
 PREDEFINED             = US_Core_EXPORT= \
                          US_ABI_LOCAL= \
                          US_MSVC_PUSH_DISABLE_WARNING= \
-                         US_MSVC_POP_WARNING=
+                         US_MSVC_POP_WARNING= \
+                         US_GCC_PUSH_DISABLE_WARNING= \
+                         US_GCC_POP_WARNING=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

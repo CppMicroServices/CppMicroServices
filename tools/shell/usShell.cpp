@@ -29,7 +29,10 @@
 #include "usShellService.h"
 
 #include "linenoise.h"
+
+US_GCC_PUSH_DISABLE_WARNING(array-bounds)
 #include "optionparser.h"
+US_GCC_POP_WARNING
 
 #include <iostream>
 

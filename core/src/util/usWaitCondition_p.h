@@ -36,7 +36,7 @@ class WaitCondition
 public:
 
   template<class Rep, class Period>
-  std::cv_status WaitFor(typename MutexHost::Lock& lock, const std::chrono::duration<Rep, Period>& rel_time)
+  std::cv_status WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time)
   {
 #ifdef US_ENABLE_THREADING_SUPPORT
     return m_CondVar.wait_for(lock.m_Lock, rel_time);

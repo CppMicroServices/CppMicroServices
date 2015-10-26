@@ -80,35 +80,27 @@ ServiceReferenceBase::~ServiceReferenceBase()
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
-  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock l(d->registration->propsLock);
-
-  return d->registration->properties.Value(key);
+  auto l = d->registration->properties.Lock();
+  return d->registration->properties.Value_unlocked(key);
 }
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
-  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock l(d->registration->propsLock);
-
-  const std::vector<std::string>& ks = d->registration->properties.Keys();
-  keys.assign(ks.begin(), ks.end());
+  auto l = d->registration->properties.Lock();
+  keys = d->registration->properties.Keys_unlocked();
 }
 
 Bundle* ServiceReferenceBase::GetBundle() const
 {
-  if (d->registration == nullptr || d->registration->bundle == nullptr)
-  {
-    return 0;
-  }
-
+  if (d->registration == nullptr) return nullptr;
+  auto l = d->registration->Lock();
+  if (d->registration->bundle == nullptr) return nullptr;
   return d->registration->bundle->q;
 }
 
 void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
 {
-  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock l(d->registration->propsLock);
+  auto l = d->registration->Lock();
   for (auto& iter : d->registration->dependents)
   {
     bundles.push_back(iter.first);
@@ -117,6 +109,8 @@ void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
 
 bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) const
 {
+  if (d == reference.d) return false;
+
   if (!(*this))
   {
     return true;
@@ -127,10 +121,32 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
     return false;
   }
 
-  const Any anyR1 = GetProperty(ServiceConstants::SERVICE_RANKING());
-  const Any anyR2 = reference.GetProperty(ServiceConstants::SERVICE_RANKING());
-  assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-  assert(anyR2.Empty() || anyR2.Type() == typeid(int));
+  if (d->registration == reference.d->registration)
+  {
+    return false;
+  }
+
+
+  Any anyR1;
+  Any anyId1;
+  {
+    auto l = d->registration->properties.Lock();
+    anyR1 = d->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+    assert(anyR1.Empty() || anyR1.Type() == typeid(int));
+    anyId1 = d->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
+    assert(anyId1.Type() == typeid(long int));
+  }
+
+  Any anyR2;
+  Any anyId2;
+  {
+    auto l = reference.d->registration->properties.Lock();
+    anyR2 = reference.d->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+    assert(anyR2.Empty() || anyR2.Type() == typeid(int));
+    anyId2 = reference.d->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
+    assert(anyId2.Type() == typeid(long int));
+  }
+
   const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
   const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
 
@@ -141,10 +157,6 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   }
   else
   {
-    const Any anyId1 = GetProperty(ServiceConstants::SERVICE_ID());
-    const Any anyId2 = reference.GetProperty(ServiceConstants::SERVICE_ID());
-    assert(anyId1.Type() == typeid(long int));
-    assert(anyId2.Type() == typeid(long int));
     const long int id1 = *any_cast<long int>(&anyId1);
     const long int id2 = *any_cast<long int>(&anyId2);
 

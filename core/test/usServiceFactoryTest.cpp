@@ -165,7 +165,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
 #endif
 
-  ServiceObjects<TestBundleH2> svcObjects2 = svcObjects;
+  ServiceObjects<TestBundleH2> svcObjects2 = std::move(svcObjects);
   ServiceObjects<TestBundleH2> svcObjects3 = mc->GetServiceObjects(sr1);
   try
   {

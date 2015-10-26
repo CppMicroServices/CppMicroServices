@@ -29,13 +29,14 @@ US_MSVC_DISABLE_WARNING(4355)
 
 namespace us {
 
-CoreBundleContext::CoreBundleContext()
+CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props)
   : listeners(this)
   , services(this)
   , serviceHooks(this)
   , bundleHooks(this)
   , bundleRegistry(this)
   , settings()
+  , frameworkProperties(props)
 {
 }
 

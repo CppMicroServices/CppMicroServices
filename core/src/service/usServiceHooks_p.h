@@ -37,7 +37,7 @@ class ServiceHooks : private MultiThreaded<>, private ServiceTrackerCustomizer<S
 private:
 
   CoreBundleContext* coreCtx;
-  ServiceTracker<ServiceListenerHook>* listenerHookTracker;
+  std::unique_ptr<ServiceTracker<ServiceListenerHook>> listenerHookTracker;
 
   std::atomic<bool> bOpen;
 

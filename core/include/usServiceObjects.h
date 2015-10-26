@@ -39,17 +39,22 @@ class US_Core_EXPORT ServiceObjectsBase
 
 private:
 
-  ServiceObjectsBasePrivate* d;
+  std::unique_ptr<ServiceObjectsBasePrivate> d;
+
+public:
+
+  ServiceObjectsBase(const ServiceObjectsBase& other) = delete;
+  ServiceObjectsBase& operator=(const ServiceObjectsBase& other) = delete;
+
+  ServiceObjectsBase(ServiceObjectsBase&& other);
+  ServiceObjectsBase& operator=(ServiceObjectsBase&& other);
 
 protected:
 
   ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference);
 
-  ServiceObjectsBase(const ServiceObjectsBase& other);
-
   ~ServiceObjectsBase();
 
-  ServiceObjectsBase& operator=(const ServiceObjectsBase& other);
 
   // Called by ServiceObjects<S> with S != void
   void* GetService() const;

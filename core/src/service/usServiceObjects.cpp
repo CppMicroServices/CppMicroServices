@@ -26,15 +26,12 @@
 #include "usLog.h"
 
 #include <set>
-#include <atomic>
 
 namespace us {
 
 class ServiceObjectsBasePrivate
 {
 public:
-
-  std::atomic<int> ref;
 
   BundleContext* m_context;
   ServiceReferenceBase m_reference;
@@ -74,10 +71,8 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
 {
   if (!reference)
   {
-    delete d;
     throw std::invalid_argument("The service reference is invalid");
   }
-  ++d->ref;
 }
 
 void* ServiceObjectsBase::GetService() const
@@ -165,29 +160,18 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
   return d->m_reference;
 }
 
-ServiceObjectsBase::ServiceObjectsBase(const ServiceObjectsBase& other)
-  : d(other.d)
+ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other)
+  : d(std::move(other.d))
 {
-  ++d->ref;
 }
 
 ServiceObjectsBase::~ServiceObjectsBase()
 {
-  if (!--d->ref)
-  {
-    delete d;
-  }
 }
 
-ServiceObjectsBase& ServiceObjectsBase::operator =(const ServiceObjectsBase& other)
+ServiceObjectsBase& ServiceObjectsBase::operator =(ServiceObjectsBase&& other)
 {
-  ServiceObjectsBasePrivate* curr_d = d;
-  d = other.d;
-  ++d->ref;
-
-  if (!--curr_d->ref)
-    delete curr_d;
-
+  d = std::move(other.d);
   return *this;
 }
 

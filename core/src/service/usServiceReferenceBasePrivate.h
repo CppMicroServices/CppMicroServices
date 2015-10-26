@@ -33,7 +33,7 @@ namespace us {
 
 class Any;
 class Bundle;
-class ServicePropertiesImpl;
+class ServicePropertiesHandle;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
 
@@ -94,34 +94,11 @@ public:
   bool UngetPrototypeService(Bundle* bundle, const InterfaceMap& service);
 
   /**
-   * Get all properties registered with this service.
+   * Get a handle to the locked service properties.
    *
-   * @return A ServiceProperties object containing properties or being empty
-   *         if service has been removed.
+   * @return A locked ServicePropertiesImpl handle object.
    */
-  const ServicePropertiesImpl& GetProperties() const;
-
-  /**
-   * Returns the property value to which the specified property key is mapped
-   * in the properties <code>ServiceProperties</code> object of the service
-   * referenced by this <code>ServiceReference</code> object.
-   *
-   * <p>
-   * Property keys are case-insensitive.
-   *
-   * <p>
-   * This method must continue to return property values after the service has
-   * been unregistered. This is so references to unregistered services can
-   * still be interrogated.
-   *
-   * @param key The property key.
-   * @param lock If <code>true</code>, access of the properties of the service
-   * referenced by this <code>ServiceReference</code> object will be
-   * synchronized.
-   * @return The property value to which the key is mapped; an invalid Any
-   * if there is no property named after the key.
-   */
-  Any GetProperty(const std::string& key, bool lock) const;
+  ServicePropertiesHandle GetProperties() const;
 
   bool IsConvertibleTo(const std::string& interfaceId) const;
 
@@ -142,8 +119,7 @@ public:
 
 private:
 
-  InterfaceMap GetServiceFromFactory(Bundle* bundle, ServiceFactory* factory,
-                                     bool isBundleScope);
+  InterfaceMap GetServiceFromFactory(Bundle* bundle, ServiceFactory* factory);
 
 };
 

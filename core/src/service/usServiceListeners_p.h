@@ -155,29 +155,28 @@ public:
    *
    *
    */
-  void GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& listeners,
-                                   bool lockProps = true);
+  void GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& listeners);
 
 
   std::vector<ServiceListenerHook::ListenerInfo> GetListenerInfoCollection() const;
 
 private:
 
-  void RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove);
+  void RemoveServiceListener(const ServiceListenerEntry& entryToRemove);
 
   /**
    * Remove all references to a service listener from the service listener
    * cache.
    */
-  void RemoveFromCache(const ServiceListenerEntry& sle);
+  void RemoveFromCache_unlocked(const ServiceListenerEntry& sle);
 
   /**
    * Checks if the specified service listener's filter is simple enough
    * to cache.
    */
-  void CheckSimple(const ServiceListenerEntry& sle);
+  void CheckSimple_unlocked(const ServiceListenerEntry& sle);
 
-  void AddToSet(ServiceListenerEntries& set, const ServiceListenerEntries& receivers, int cache_ix, const std::string& val);
+  void AddToSet_unlocked(ServiceListenerEntries& set, const ServiceListenerEntries& receivers, int cache_ix, const std::string& val);
 
 };
 

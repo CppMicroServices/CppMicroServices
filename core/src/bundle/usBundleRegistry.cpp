@@ -37,32 +37,30 @@
 
 namespace us {
 
-BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx) :
-  coreCtx(coreCtx)
+BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
+  : coreCtx(coreCtx)
+  , id(0)
 {
-  id.value = 0;
 }
 
 BundleRegistry::~BundleRegistry(void)
 {
 }
 
-Bundle* BundleRegistry::Register(BundleInfo* info)
+Bundle* BundleRegistry::Register(BundleInfo info)
 {
-  Bundle* bundle = GetBundle(info->name);
+  Bundle* bundle = GetBundle(info.name);
 
   if (!bundle)
   {
     bundle = new Bundle();
-    {
-      Lock l(id);
-      info->id = id.value++;
-      assert(info->id == 0 ? info->name == "CppMicroServices" : true);
-    }
-    bundle->Init(coreCtx, info);
+    info.id = id++;
+    assert(info.id == 0 ? info.name == "CppMicroServices" : true);
 
-    Lock l(this);
-    std::pair<BundleMap::iterator, bool> return_pair(bundles.insert(std::make_pair(info->name, bundle)));
+    bundle->Init_unlocked(coreCtx, info);
+
+    auto l = this->Lock();
+    std::pair<BundleMap::iterator, bool> return_pair(bundles.insert(std::make_pair(info.name, bundle)));
 
     // A race condition exists when creating a new bundle instance. To resolve
     // this requires either scoping the mutex to the entire function or adding
@@ -84,38 +82,33 @@ Bundle* BundleRegistry::Register(BundleInfo* info)
   return bundle;
 }
 
-void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleInfo* info)
+void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleInfo info)
 {
   if (!systemBundle)
   {
     throw std::invalid_argument("Can't register a null system bundle");
   }
 
-  {
-    Lock l(id);
-    info->id = id.value++;
-    assert(info->id == 0 ? info->name == "CppMicroServices" : true);
-  }
+  info.id = id++;
+  assert(info.id == 0 ? info.name == "CppMicroServices" : true);
 
-  systemBundle->Init(coreCtx, info);
+  systemBundle->Init_unlocked(coreCtx, info);
 
-  Lock l(this);
-  bundles.insert(std::make_pair(info->name, systemBundle));
+  this->Lock(), bundles.insert(std::make_pair(info.name, systemBundle));
 }
 
-void BundleRegistry::UnRegister(const BundleInfo* info)
+void BundleRegistry::UnRegister(const BundleInfo& info)
 {
   // The system bundle cannot be uninstalled.
-  if (info->id >= 1)
+  if (info.id >= 1)
   {
-    Lock l(this);
-    bundles.erase(info->name);
+    this->Lock(), bundles.erase(info.name);
   }
 }
 
 Bundle* BundleRegistry::GetBundle(long id) const
 {
-  Lock l(this);
+  auto l = this->Lock();
 
   for (auto& m : bundles)
   {
@@ -129,7 +122,7 @@ Bundle* BundleRegistry::GetBundle(long id) const
 
 Bundle* BundleRegistry::GetBundle(const std::string& name) const
 {
-  Lock l(this);
+  auto l = this->Lock();
 
   auto iter = bundles.find(name);
   if (iter != bundles.end())
@@ -141,7 +134,7 @@ Bundle* BundleRegistry::GetBundle(const std::string& name) const
 
 std::vector<Bundle*> BundleRegistry::GetBundles() const
 {
-  Lock l(this);
+  auto l = this->Lock();
 
   std::vector<Bundle*> result;
   for (auto& m : bundles)
@@ -152,3 +145,4 @@ std::vector<Bundle*> BundleRegistry::GetBundles() const
 }
 
 }
+

@@ -51,7 +51,7 @@ public:
   /**
    * Construct a new bundle based on a BundleInfo object.
    */
-  BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx, BundleInfo* info);
+  BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx, const BundleInfo& info);
 
   virtual ~BundlePrivate();
 
@@ -62,8 +62,10 @@ public:
   /**
    * Bundle version
    */
+  // Does not need to be locked by "this" when accessed.
   BundleVersion version;
 
+  // Does not need to be locked by "this" when accessed.
   BundleInfo info;
 
   BundleResourceContainer resourceContainer;
@@ -71,10 +73,15 @@ public:
   /**
    * BundleContext for the bundle
    */
-  BundleContext* bundleContext;
+  std::atomic<BundleContext*> bundleContext;
+
+  // TODO use proper state handling
+  std::atomic<bool> starting;
+  std::atomic<bool> stopping;
 
   BundleActivator* bundleActivator;
 
+  // Does not need to be locked by "this" when accessed.
   BundleManifest bundleManifest;
 
   std::string baseStoragePath;

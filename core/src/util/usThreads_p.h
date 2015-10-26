@@ -49,30 +49,45 @@ public:
 #endif
   {}
 
-  friend class Lock;
+  friend class UniqueLock;
 
-  class Lock
+  class UniqueLock
   {
   public:
 
-    Lock(const Lock&) = delete;
-    Lock& operator=(const Lock&) = delete;
+    UniqueLock()
+    {}
+
+    UniqueLock(const UniqueLock&) = delete;
+    UniqueLock& operator=(const UniqueLock&) = delete;
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 
+    UniqueLock(UniqueLock&& o)
+      : m_Lock(std::move(o.m_Lock))
+    {}
+
+    UniqueLock& operator=(UniqueLock&& o)
+    {
+      m_Lock = std::move(o.m_Lock);
+      return *this;
+    }
+
     // Lock object
-    explicit Lock(const MutexLockingStrategy& host)
+    explicit UniqueLock(const MutexLockingStrategy& host)
       : m_Lock(host.m_Mtx)
     {}
 
     // Lock object
-    explicit Lock(const MutexLockingStrategy* host)
+    explicit UniqueLock(const MutexLockingStrategy* host)
       : m_Lock(host->m_Mtx)
     {}
 
 #else
-    explicit Lock(const MutexLockingStrategy&) {}
-    explicit Lock(const MutexLockingStrategy*) {}
+    UniqueLock(UniqueLock&&) {}
+    UniqueLock& operator=(UniqueLock&&) {}
+    explicit UniqueLock(const MutexLockingStrategy&) {}
+    explicit UniqueLock(const MutexLockingStrategy*) {}
 #endif
 
   private:
@@ -84,6 +99,11 @@ public:
 #endif
   };
 
+  UniqueLock Lock() const
+  {
+    return UniqueLock(this);
+  }
+
 protected:
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -93,7 +113,7 @@ protected:
 
 class NoLockingStrategy {
 public:
-    typedef void Lock;
+    typedef void UniqueLock;
 };
 
 template<class MutexHost>

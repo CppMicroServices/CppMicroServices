@@ -61,21 +61,21 @@ namespace
 
     void TestCustomConfig()
     {
-        std::map < std::string, std::string > configuration;
-        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.security", "osgi"));
-        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.startlevel.beginning", "0"));
-        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.bsnversion", "single"));
-        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom1", "foo"));
-        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom2", "bar"));
-        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, "/foo"));
-        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_LOG_LEVEL, "0"));
+        std::map < std::string, Any > configuration;
+        configuration["org.osgi.framework.security"] = std::string("osgi");
+        configuration["org.osgi.framework.startlevel.beginning"] = 0;
+        configuration["org.osgi.framework.bsnversion"] = std::string("single");
+        configuration["org.osgi.framework.custom1"] = std::string("foo");
+        configuration["org.osgi.framework.custom2"] = std::string("bar");
+        configuration[Framework::PROP_STORAGE_LOCATION] = std::string("/foo");
+        configuration[Framework::PROP_LOG_LEVEL] = 0;
 
         // the threading model framework property is set at compile time and read-only at runtime. Test that this
         // is always the case.
 #ifdef US_ENABLE_THREADING_SUPPORT
-        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "single"));
+        configuration[Framework::PROP_THREADING_SUPPORT] = std::string("single");
 #else
-        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "multi"));
+        configuration[Framework::PROP_THREADING_SUPPORT] = std::string("multi");
 #endif
 
         FrameworkFactory factory;
@@ -84,13 +84,13 @@ namespace
         US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration")
 
         f->Start();
-        US_TEST_CONDITION("osgi" == f->GetProperty("org.cppmicroservices.framework.security").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("0" == f->GetProperty("org.cppmicroservices.framework.startlevel.beginning").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("single" == f->GetProperty("org.cppmicroservices.framework.bsnversion").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("foo" == f->GetProperty("org.cppmicroservices.framework.custom1").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("bar" == f->GetProperty("org.cppmicroservices.framework.custom2").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION("osgi" == f->GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION(0 == any_cast<int>(f->GetProperty("org.osgi.framework.startlevel.beginning")), "Test Framework custom launch properties")
+        US_TEST_CONDITION("single" == any_cast<std::string>(f->GetProperty("org.osgi.framework.bsnversion")), "Test Framework custom launch properties")
+        US_TEST_CONDITION("foo" == any_cast<std::string>(f->GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties")
+        US_TEST_CONDITION("bar" == any_cast<std::string>(f->GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties")
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/foo", "Test for custom base storage path")
-        US_TEST_CONDITION(f->GetProperty(Framework::PROP_LOG_LEVEL).ToString() == "0", "Test for custom logging level")
+        US_TEST_CONDITION(any_cast<int>(f->GetProperty(Framework::PROP_LOG_LEVEL)) == 0, "Test for custom logging level")
 
         US_TEST_CONDITION(Logger::instance().GetLogLevel() == DebugMsg, "Test custom log level")
 

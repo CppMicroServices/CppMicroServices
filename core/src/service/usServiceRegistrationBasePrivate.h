@@ -39,7 +39,7 @@ class ServiceRegistrationBase;
 /**
  * \ingroup MicroServices
  */
-class ServiceRegistrationBasePrivate
+class ServiceRegistrationBasePrivate : public MultiThreaded<>
 {
 
 protected:
@@ -107,25 +107,18 @@ public:
    * Is service available. I.e., if <code>true</code> then holders
    * of a ServiceReference for the service are allowed to get it.
    */
-  volatile bool available;
+  std::atomic<bool> available;
 
   /**
    * Avoid recursive unregistrations. I.e., if <code>true</code> then
    * unregistration of this service has started but is not yet
    * finished.
    */
-  volatile bool unregistering;
+  std::atomic<bool> unregistering;
 
-  /**
-   * Lock object for synchronous event delivery.
-   */
-  MultiThreaded<> eventLock;
-
-  // needs to be recursive
-  MultiThreaded<MutexLockingStrategy<std::recursive_mutex>> propsLock;
 
   ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMap& service,
-                                 const ServicePropertiesImpl& props);
+                                 ServicePropertiesImpl&& props);
 
   ~ServiceRegistrationBasePrivate();
 
@@ -137,9 +130,11 @@ public:
    */
   bool IsUsedByBundle(Bundle* m) const;
 
-  const InterfaceMap& GetInterfaces() const;
+  InterfaceMap GetInterfaces() const;
 
   void* GetService(const std::string& interfaceId) const;
+
+  void* GetService_unlocked(const std::string& interfaceId) const;
 
 };
 

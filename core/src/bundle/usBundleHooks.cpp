@@ -96,9 +96,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
   coreCtx->services.Get(us_service_interface_iid<BundleEventHook>(), eventHooks);
 
   {
-    //typedef decltype(coreCtx->listeners.bundleListenerMap) T;
-    typedef MultiThreaded<> T; // gcc 4.6 workaround; the above line leads to a segfault with gcc 4.6
-    T::Lock{coreCtx->listeners.bundleListenerMap};
+    auto l = coreCtx->listeners.bundleListenerMap.Lock();
     bundleListeners = coreCtx->listeners.bundleListenerMap.value;
   }
 

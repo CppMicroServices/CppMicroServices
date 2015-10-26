@@ -120,7 +120,7 @@ public:
    *
    * @GuardedBy this
    */
-  std::size_t Size() const;
+  std::size_t Size_unlocked() const;
 
   /**
    * Returns if the tracker is empty.
@@ -129,7 +129,7 @@ public:
    *
    * @GuardedBy this
    */
-  bool IsEmpty() const;
+  bool IsEmpty_unlocked() const;
 
   /**
    * Return the customized object for the specified item
@@ -139,7 +139,7 @@ public:
    *
    * @GuardedBy this
    */
-  T GetCustomizedObject(S item) const;
+  T GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.
@@ -147,7 +147,7 @@ public:
    * @return The tracked items.
    * @GuardedBy this
    */
-  void GetTracked(std::vector<S>& items) const;
+  void GetTracked_unlocked(std::vector<S>& items) const;
 
   /**
    * Increment the modification count. If this method is overridden, the
@@ -178,7 +178,7 @@ public:
    * @return The specified map.
    * @GuardedBy this
    */
-  void CopyEntries(TrackingMap& map) const;
+  void CopyEntries_unlocked(TrackingMap& map) const;
 
   /**
    * Call the specific customizer adding method. This method must not be
@@ -231,11 +231,8 @@ public:
 
   /**
    * true if the tracked object is closed.
-   *
-   * This field is volatile because it is set by one thread and read by
-   * another.
    */
-  volatile bool closed;
+  std::atomic<bool> closed;
 
   /**
    * Initial list of items for the tracker. This is used to correctly process

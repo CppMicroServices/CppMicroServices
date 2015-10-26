@@ -34,7 +34,7 @@ namespace us {
 
 ServiceHooks::ServiceHooks(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
-  , listenerHookTracker(NULL)
+  , listenerHookTracker()
   , bOpen(false)
 {
 }
@@ -77,8 +77,8 @@ void ServiceHooks::RemovedService(const ServiceReferenceType& reference, Tracked
 void ServiceHooks::Open()
 {
   {
-    Lock l(this);
-    listenerHookTracker = new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this);
+    auto l = this->Lock();
+    listenerHookTracker.reset(new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this));
   }
   listenerHookTracker->Open();
 
@@ -87,12 +87,11 @@ void ServiceHooks::Open()
 
 void ServiceHooks::Close()
 {
-  Lock l(this);
+  auto l = this->Lock();
   if (listenerHookTracker)
   {
     listenerHookTracker->Close();
-    delete listenerHookTracker;
-    listenerHookTracker = NULL;
+    listenerHookTracker.reset();
   }
 
   bOpen = false;
@@ -142,7 +141,7 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
                                                ServiceListeners::ServiceListenerEntries& receivers)
 {
   std::vector<ServiceRegistrationBase> eventListenerHooks;
-  coreCtx->services.Get_unlocked(us_service_interface_iid<ServiceEventListenerHook>(), eventListenerHooks);
+  coreCtx->services.Get(us_service_interface_iid<ServiceEventListenerHook>(), eventListenerHooks);
   if (!eventListenerHooks.empty())
   {
     std::sort(eventListenerHooks.begin(), eventListenerHooks.end());

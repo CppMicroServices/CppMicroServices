@@ -87,12 +87,12 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 
 bool LDAPFilter::Match(const ServiceProperties& dictionary) const
 {
-  return d->ldapExpr.Evaluate(ServicePropertiesImpl(dictionary), false);
+  return d->ldapExpr.Evaluate(ServicePropertiesHandle(ServicePropertiesImpl(dictionary), false), false);
 }
 
 bool LDAPFilter::MatchCase(const ServiceProperties& dictionary) const
 {
-  return d->ldapExpr.Evaluate(ServicePropertiesImpl(dictionary), true);
+  return d->ldapExpr.Evaluate(ServicePropertiesHandle(ServicePropertiesImpl(dictionary), false), true);
 }
 
 std::string LDAPFilter::ToString() const

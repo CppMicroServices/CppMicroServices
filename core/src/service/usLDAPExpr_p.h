@@ -36,7 +36,7 @@ namespace us {
 
 class Any;
 class LDAPExprData;
-class ServicePropertiesImpl;
+class ServicePropertiesHandle;
 
 /**
  * This class is not part of the public API.
@@ -122,10 +122,10 @@ public:
   bool IsNull() const;
 
   //!
-  static bool Query(const std::string& filter, const ServicePropertiesImpl& pd);
+  static bool Query(const std::string& filter, const ServicePropertiesHandle& pd);
 
   //! Evaluate this LDAP filter.
-  bool Evaluate(const ServicePropertiesImpl& p, bool matchCase) const;
+  bool Evaluate(const ServicePropertiesHandle& p, bool matchCase) const;
 
   //!
   const std::string ToString() const;

@@ -53,8 +53,7 @@ namespace us {
     */
     void Logger::SetLogLevel(const MsgType level)
     {
-        Lock l(this);
-        logLevel = level;
+        this->Lock(), logLevel = level;
     }
 
     /**
@@ -64,8 +63,7 @@ namespace us {
     */
     MsgType Logger::GetLogLevel()
     {
-        Lock l(this);
-        return logLevel;
+        return (this->Lock(), logLevel);
     }
 
 }

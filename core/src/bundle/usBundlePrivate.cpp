@@ -41,14 +41,16 @@
 namespace us {
 
 BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
-                             BundleInfo* info)
+                             const BundleInfo& info)
   : coreCtx(coreCtx)
-  , info(*info)
-  , resourceContainer(info)
+  , info(info)
+  , resourceContainer(&this->info)
   , bundleContext(nullptr)
+  , starting(false)
+  , stopping(false)
   , bundleActivator(nullptr)
   , q(qq)
-  , lib(info->location)
+  , lib(info.location)
 {
   // Check if the bundle provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())
@@ -63,7 +65,7 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
       }
       catch (const std::exception& e)
       {
-        US_ERROR << "Parsing of manifest.json for bundle " << info->location << " failed: " << e.what();
+        US_ERROR << "Parsing of manifest.json for bundle " << info.location << " failed: " << e.what();
       }
     }
   }
@@ -89,7 +91,7 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
     if (!errMsg.empty())
     {
       throw std::invalid_argument(std::string("The Json value for ") + Bundle::PROP_VERSION + " for bundle " +
-                                  info->location + " is not valid: " + errMsg);
+                                  info.location + " is not valid: " + errMsg);
     }
   }
 

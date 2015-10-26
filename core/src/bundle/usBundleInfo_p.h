@@ -20,29 +20,26 @@
 
 =============================================================================*/
 
-#include "usBundleActivator.h"
 
-#include "usBundle.h"
-#include "usBundlePrivate.h"
-#include "usCoreBundleContext_p.h"
+#ifndef USBUNDLEINFO_P_H
+#define USBUNDLEINFO_P_H
+
+#include <string>
 
 namespace us {
 
-class CoreBundleActivator : public BundleActivator
+struct BundleActivator;
+
+struct BundleInfo
 {
+  BundleInfo(const std::string& name);
 
-  void Start(BundleContext* mc)
-  {
-    mc->GetBundle()->d->coreCtx->Init();
-  }
-
-  void Stop(BundleContext* mc)
-  {
-    mc->GetBundle()->d->coreCtx->Uninit();
-  }
-
+  std::string name;
+  std::string location;
+  std::string autoLoadDir;
+  long id;
 };
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(us::CoreBundleActivator)
+#endif // USBUNDLEINFO_H

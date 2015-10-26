@@ -107,7 +107,6 @@ public:
 
   void Start(BundleContext* mc)
   {
-    std::cout << "start in H" << std::endl;
     this->mc = mc;
     factoryService = mc->RegisterService<TestBundleH>(ToFactory(this));
     prototypeFactoryService = mc->RegisterService<TestBundleH,TestBundleH2>(ToFactory(prototypeFactory));
@@ -120,7 +119,6 @@ public:
 
   InterfaceMap GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
   {
-    std::cout << "GetService in H" << std::endl;
     TestProduct* product = new TestProduct(caller);
     fcbind.insert(std::make_pair(caller->GetBundleId(), product));
     return MakeInterfaceMap<TestBundleH>(product);

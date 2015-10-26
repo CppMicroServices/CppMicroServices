@@ -52,7 +52,6 @@ class ServicePropertiesImpl;
  *       In almost all cases you should use the template ServiceRegistration instead.
  *
  * @see BundleContext#RegisterService()
- * @remarks This class is thread safe.
  */
 class US_Core_EXPORT ServiceRegistrationBase
 {
@@ -195,7 +194,7 @@ private:
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
   ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
-                          const ServicePropertiesImpl& props);
+                          ServicePropertiesImpl&& props);
 
   ServiceRegistrationBasePrivate* d;
 

@@ -179,14 +179,14 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 #else
     static const char separator = '/';
 #endif
-  
+
   std::string baseStoragePath;
   auto prop = d->bundle->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
   if(prop != d->bundle->coreCtx->frameworkProperties.end())
-  { 
-    baseStoragePath = (*prop).second;
+  {
+    baseStoragePath = ref_any_cast<std::string>((*prop).second);
   }
-  
+
   if (baseStoragePath.empty()) return std::string();
   if (baseStoragePath != d->bundle->baseStoragePath)
   {
@@ -205,8 +205,8 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 
 Bundle* BundleContext::InstallBundle(const std::string& location)
 {
-    BundleInfo* bundleInfo = new BundleInfo(GetBundleNameFromLocation(location));
-    bundleInfo->location = GetBundleLocation(location);
+    BundleInfo bundleInfo(GetBundleNameFromLocation(location));
+    bundleInfo.location = GetBundleLocation(location);
 
     Bundle* bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
 

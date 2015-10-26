@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <atomic>
 
 #include <usCoreConfig.h>
 #include <usThreads_p.h>
@@ -78,7 +79,7 @@ public:
    *
    * @return The registered bundle.
    */
-  Bundle* Register(BundleInfo* info);
+  Bundle* Register(BundleInfo info);
 
   /**
    * Register the system bundle.
@@ -87,7 +88,7 @@ public:
    *
    * @param systemBundle The system bundle to register.
    */
-  void RegisterSystemBundle(Framework* const systemBundle, BundleInfo* info);
+  void RegisterSystemBundle(Framework* const systemBundle, BundleInfo info);
 
   /**
    * Remove a bundle from the Framework.
@@ -96,7 +97,7 @@ public:
    * Upon which, the bundle will receive a new unique bundle id.
    *
    */
-  void UnRegister(const BundleInfo* info);
+  void UnRegister(const BundleInfo& info);
 
 private:
   // don't allow copying the BundleRegistry.
@@ -118,9 +119,7 @@ private:
   /**
    * Stores the next Bundle ID.
    */
-  struct : public MultiThreaded<> {
-    long value;
-  } id;
+  std::atomic<long> id;
 
 };
 

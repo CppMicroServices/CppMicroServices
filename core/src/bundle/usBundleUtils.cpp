@@ -20,11 +20,11 @@
 
 =============================================================================*/
 
-
+#include "usBundleUtils.h"
 #include "usBundleUtils_p.h"
 
 #include <usLog.h>
-#include <usBundleInfo.h>
+#include <usBundleInfo_p.h>
 #include <usUtils_p.h>
 
 namespace us {
@@ -44,6 +44,9 @@ namespace {
 #endif
 
 #include <dlfcn.h>
+
+namespace BundleUtils
+{
 
 std::string GetLibraryPath_impl(void* symbol)
 {
@@ -96,9 +99,14 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   return nullptr;
 }
 
+}
+
 #elif _WIN32
 
 #include <windows.h>
+
+namespace BundleUtils
+{
 
 std::string GetLibraryPath_impl(void *symbol)
 {
@@ -157,16 +165,31 @@ void* GetSymbol_impl(const BundleInfo&, const char* symbol)
 {
   return nullptr;
 }
+
+}
+
 #endif
 
-std::string BundleUtils::GetLibraryPath(void* symbol)
+namespace BundleUtils
+{
+
+std::string GetLibraryPath(void* symbol)
 {
   return GetLibraryPath_impl(symbol);
 }
 
-void* BundleUtils::GetSymbol(const BundleInfo& bundle, const char* symbol)
+void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol)
+{
+  BundleInfo info(bundleName);
+  info.location = libLocation;
+  return GetSymbol(info, symbol);
+}
+
+void* GetSymbol(const BundleInfo& bundle, const char* symbol)
 {
   return GetSymbol_impl(bundle, symbol);
+}
+
 }
 
 }

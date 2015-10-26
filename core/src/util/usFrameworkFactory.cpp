@@ -22,6 +22,7 @@
 
 #include "usFrameworkFactory.h"
 #include "usFramework.h"
+#include "usAny.h"
 
 namespace us {
 
@@ -33,14 +34,14 @@ FrameworkFactory::~FrameworkFactory(void)
 {
 }
 
-Framework* FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration)
+Framework* FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration)
 {
   return new Framework(configuration);
 }
 
 Framework* FrameworkFactory::NewFramework(void)
 {
-    return NewFramework(std::map<std::string, std::string>());
+    return NewFramework(std::map<std::string, Any>());
 }
 
 }

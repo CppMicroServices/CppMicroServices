@@ -488,8 +488,8 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   delete framework;
 
   // test a non-default framework instance using a different persistent storage location.
-  std::map<std::string, std::string> frameworkConfig;
-  frameworkConfig.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, "/tmp"));
+  std::map<std::string, Any> frameworkConfig;
+  frameworkConfig[Framework::PROP_STORAGE_LOCATION] = std::string("/tmp");
   framework = factory.NewFramework(frameworkConfig);
   framework->Start();
 

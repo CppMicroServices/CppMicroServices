@@ -46,35 +46,48 @@ ServicePropertiesImpl::ServicePropertiesImpl(const ServiceProperties& p)
   keys.reserve(p.size());
   values.reserve(p.size());
 
-  for (ServiceProperties::const_iterator iter = p.begin();
-       iter != p.end(); ++iter)
+  for (auto& iter : p)
   {
-    if (Find(iter->first) > -1)
+    if (Find_unlocked(iter.first) > -1)
     {
       std::string msg = "ServiceProperties object contains case variants of the key: ";
-      msg += iter->first;
+      msg += iter.first;
       throw std::runtime_error(msg.c_str());
     }
-    keys.push_back(iter->first);
-    values.push_back(iter->second);
+    keys.push_back(iter.first);
+    values.push_back(iter.second);
   }
 }
 
-const Any& ServicePropertiesImpl::Value(const std::string& key) const
+
+ServicePropertiesImpl::ServicePropertiesImpl(ServicePropertiesImpl&& o)
+  : keys(std::move(o.keys))
+  , values(std::move(o.values))
 {
-  int i = Find(key);
+}
+
+ServicePropertiesImpl& ServicePropertiesImpl::operator=(ServicePropertiesImpl&& o)
+{
+  keys = std::move(o.keys);
+  values = std::move(o.values);
+  return *this;
+}
+
+Any ServicePropertiesImpl::Value_unlocked(const std::string& key) const
+{
+  int i = Find_unlocked(key);
   if (i < 0) return emptyAny;
   return values[i];
 }
 
-const Any& ServicePropertiesImpl::Value(int index) const
+Any ServicePropertiesImpl::Value_unlocked(int index) const
 {
   if (index < 0 || static_cast<std::size_t>(index) >= values.size())
     return emptyAny;
   return values[static_cast<std::size_t>(index)];
 }
 
-int ServicePropertiesImpl::Find(const std::string& key) const
+int ServicePropertiesImpl::Find_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i)
   {
@@ -86,7 +99,7 @@ int ServicePropertiesImpl::Find(const std::string& key) const
   return -1;
 }
 
-int ServicePropertiesImpl::FindCaseSensitive(const std::string& key) const
+int ServicePropertiesImpl::FindCaseSensitive_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i)
   {
@@ -98,7 +111,7 @@ int ServicePropertiesImpl::FindCaseSensitive(const std::string& key) const
   return -1;
 }
 
-const std::vector<std::string>& ServicePropertiesImpl::Keys() const
+std::vector<std::string> ServicePropertiesImpl::Keys_unlocked() const
 {
   return keys;
 }

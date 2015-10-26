@@ -590,7 +590,7 @@ private:
   friend class TrackedService<S,TTT>;
   friend class ServiceTrackerPrivate<S,TTT>;
 
-  _ServiceTrackerPrivate* const d;
+  std::unique_ptr<_ServiceTrackerPrivate> d;
 };
 
 }

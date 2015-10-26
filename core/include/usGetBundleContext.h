@@ -28,8 +28,7 @@
 #error Missing preprocessor define US_BUNDLE_NAME
 #endif
 
-#include <usBundleInfo.h>
-#include <usBundleUtils_p.h>
+#include <usBundleUtils.h>
 
 #include <cstring>
 
@@ -56,10 +55,8 @@ static inline BundleContext* GetBundleContext()
   std::memcpy(&GetBundleContextPtr, &getBundleContext, sizeof(void*));
   std::string libPath(BundleUtils::GetLibraryPath(GetBundleContextPtr));
 
-  BundleInfo info(US_STR(US_BUNDLE_NAME));
-  info.location = libPath;
   std::string get_bundle_context_func("_us_get_bundle_context_instance_" US_STR(US_BUNDLE_NAME));
-  void* getBundleContextSym = BundleUtils::GetSymbol(info, get_bundle_context_func.c_str());
+  void* getBundleContextSym = BundleUtils::GetSymbol(US_STR(US_BUNDLE_NAME), libPath, get_bundle_context_func.c_str());
   std::memcpy(&getBundleContext, &getBundleContextSym, sizeof(void*));
 
   if (getBundleContext)

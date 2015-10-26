@@ -274,6 +274,33 @@ Interface* ExtractInterface(const InterfaceMap& map)
   return nullptr;
 }
 
+/**
+ * @ingroup MicroServices
+ *
+ * Extract a service interface pointer from a given InterfaceMap instance.
+ *
+ * @param map a InterfaceMap instance.
+ * @param interfaceId The interface id string.
+ * @return The service interface pointer for the service interface id or
+ *         \c nullptr if \c map does not contain an entry for the given type.
+ *
+ * @see ExtractInterface(const InterfaceMap&)
+ */
+inline void* ExtractInterface(const InterfaceMap& map, const std::string& interfaceId)
+{
+  if (interfaceId.empty() && !map.empty())
+  {
+    return map.begin()->second;
+  }
+
+  auto iter = map.find(interfaceId);
+  if (iter != map.end())
+  {
+    return iter->second;
+  }
+  return nullptr;
+}
+
 ///@{
 /**
  * @ingroup MicroServices

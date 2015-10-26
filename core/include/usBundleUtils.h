@@ -20,29 +20,40 @@
 
 =============================================================================*/
 
-#include "usBundleActivator.h"
 
-#include "usBundle.h"
-#include "usBundlePrivate.h"
-#include "usCoreBundleContext_p.h"
+#ifndef USBUNDLEUTILS_H
+#define USBUNDLEUTILS_H
+
+#include <usCoreExport.h>
+
+#include <string>
 
 namespace us {
 
-class CoreBundleActivator : public BundleActivator
+struct BundleInfo;
+
+namespace BundleUtils
 {
+  /**
+   * Get the absolute file path of the shared library or executable that
+   * provides a definition of the given symbol.
+   *
+   * @param symbol The symbol to look for.
+   * @return The absolute file path of the library or executable containing a definition of
+   *         \c symbol. An empty string if not found.
+   */
+  US_Core_EXPORT std::string GetLibraryPath(void* symbol);
 
-  void Start(BundleContext* mc)
-  {
-    mc->GetBundle()->d->coreCtx->Init();
-  }
-
-  void Stop(BundleContext* mc)
-  {
-    mc->GetBundle()->d->coreCtx->Uninit();
-  }
-
-};
+  /**
+   * Get the address for a symbol.
+   *
+   * @param bundleName The name of the bundle defining the symbol.
+   * @param libLocation The absolute file location of the bundle defining the symbol.
+   * @param symbol The symbol name to look for.
+   */
+  US_Core_EXPORT void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol);
+}
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(us::CoreBundleActivator)
+#endif // USBUNDLEUTILS_H

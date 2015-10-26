@@ -28,7 +28,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 
 #include "usServiceListeners_p.h"
 #include "usServiceReferenceBasePrivate.h"
-
+#include "usServicePropertiesImpl_p.h"
 #include "usCoreBundleContext_p.h"
 #include "usBundle.h"
 #include "usBundleContext.h"
@@ -57,40 +57,46 @@ ServiceListeners::ServiceListeners(CoreBundleContext* coreCtx)
 void ServiceListeners::AddServiceListener(BundleContext* mc, const ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
-  Lock l(this);
-
   ServiceListenerEntry sle(mc, listener, data, filter);
-  RemoveServiceListener_unlocked(sle);
-
-  serviceSet.insert(sle);
+  RemoveServiceListener(sle);
+  {
+    auto l = this->Lock();
+    serviceSet.insert(sle);
+    CheckSimple_unlocked(sle);
+  }
   coreCtx->serviceHooks.HandleServiceListenerReg(sle);
-  CheckSimple(sle);
 }
 
 void ServiceListeners::RemoveServiceListener(BundleContext* mc, const ServiceListener& listener,
                                              void* data)
 {
   ServiceListenerEntry entryToRemove(mc, listener, data);
-
-  Lock l(this);
-  RemoveServiceListener_unlocked(entryToRemove);
+  RemoveServiceListener(entryToRemove);
 }
 
-void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove)
+void ServiceListeners::RemoveServiceListener(const ServiceListenerEntry& entryToRemove)
 {
-  auto it = serviceSet.find(entryToRemove);
-  if (it != serviceSet.end())
+  ServiceListenerEntry sle;
   {
-    it->SetRemoved(true);
-    coreCtx->serviceHooks.HandleServiceListenerUnreg(*it);
-    RemoveFromCache(*it);
-    serviceSet.erase(it);
+    auto l = this->Lock();
+    auto it = serviceSet.find(entryToRemove);
+    if (it != serviceSet.end())
+    {
+      sle = *it;
+      it->SetRemoved(true);
+      RemoveFromCache_unlocked(*it);
+      serviceSet.erase(it);
+    }
+  }
+  if (!sle.IsNull())
+  {
+    coreCtx->serviceHooks.HandleServiceListenerUnreg(sle);
   }
 }
 
 void ServiceListeners::AddBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
 {
-  Lock{bundleListenerMap};
+  auto l = bundleListenerMap.Lock();
   auto& listeners = bundleListenerMap.value[mc];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
@@ -100,7 +106,7 @@ void ServiceListeners::AddBundleListener(BundleContext* mc, const BundleListener
 
 void ServiceListeners::RemoveBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
 {
-  Lock{bundleListenerMap};
+  auto l = bundleListenerMap.Lock();
   bundleListenerMap.value[mc].remove_if(std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
 }
 
@@ -128,14 +134,14 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
 void ServiceListeners::RemoveAllListeners(BundleContext* mc)
 {
   {
-    Lock l(this);
+    auto l = this->Lock();
     for (ServiceListenerEntries::iterator it = serviceSet.begin();
          it != serviceSet.end(); )
     {
 
       if (it->GetBundleContext() == mc)
       {
-        RemoveFromCache(*it);
+        RemoveFromCache_unlocked(*it);
         serviceSet.erase(it++);
       }
       else
@@ -146,14 +152,14 @@ void ServiceListeners::RemoveAllListeners(BundleContext* mc)
   }
 
   {
-    Lock{bundleListenerMap};
+    auto l = bundleListenerMap.Lock();
     bundleListenerMap.value.erase(mc);
   }
 }
 
 void ServiceListeners::HooksBundleStopped(BundleContext* mc)
 {
-  Lock l(this);
+  auto l = this->Lock();
   std::vector<ServiceListenerEntry> entries;
   for (auto& sle : serviceSet)
   {
@@ -207,45 +213,47 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
   //US_DEBUG << "Notified " << n << " listeners";
 }
 
-void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set,
-                                                   bool lockProps)
+void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set)
 {
-  Lock l(this);
-
   // Filter the original set of listeners
-  ServiceListenerEntries receivers = serviceSet;
+  ServiceListenerEntries receivers = (this->Lock(), serviceSet);
+  // This must not be called with any locks held
   coreCtx->serviceHooks.FilterServiceEventReceivers(evt, receivers);
 
-  // Check complicated or empty listener filters
-  for (auto& sse : complicatedListeners)
+  auto props = evt.GetServiceReference().d->GetProperties();
+
   {
-    if (receivers.count(sse) == 0) continue;
-    const LDAPExpr& ldapExpr = sse.GetLDAPExpr();
-    if (ldapExpr.IsNull() ||
-        ldapExpr.Evaluate(evt.GetServiceReference().d->GetProperties(), false))
+    auto l = this->Lock();
+    // Check complicated or empty listener filters
+    for (auto& sse : complicatedListeners)
     {
-      set.insert(sse);
+      if (receivers.count(sse) == 0) continue;
+      const LDAPExpr& ldapExpr = sse.GetLDAPExpr();
+      if (ldapExpr.IsNull() ||
+          ldapExpr.Evaluate(props, false))
+      {
+        set.insert(sse);
+      }
     }
+
+    //US_DEBUG << "Added " << set.size() << " out of " << n
+    //         << " listeners with complicated filters";
+
+    // Check the cache
+    const auto c = any_cast<std::vector<std::string>>(props->Value_unlocked(ServiceConstants::OBJECTCLASS()));
+    for (auto& objClass : c)
+    {
+      AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);
+    }
+
+    long service_id = any_cast<long>(props->Value_unlocked(ServiceConstants::SERVICE_ID()));
+    AddToSet_unlocked(set, receivers, SERVICE_ID_IX, std::to_string((service_id)));
   }
-
-  //US_DEBUG << "Added " << set.size() << " out of " << n
-  //         << " listeners with complicated filters";
-
-  // Check the cache
-  const auto c(any_cast<std::vector<std::string> >
-               (evt.GetServiceReference().d->GetProperty(ServiceConstants::OBJECTCLASS(), lockProps)));
-  for (auto& objClass : c)
-  {
-    AddToSet(set, receivers, OBJECTCLASS_IX, objClass);
-  }
-
-  long service_id = any_cast<long>(evt.GetServiceReference().d->GetProperty(ServiceConstants::SERVICE_ID(), lockProps));
-  AddToSet(set, receivers, SERVICE_ID_IX, std::to_string((service_id)));
 }
 
 std::vector<ServiceListenerHook::ListenerInfo> ServiceListeners::GetListenerInfoCollection() const
 {
-  Lock l(this);
+  auto l = this->Lock();
   std::vector<ServiceListenerHook::ListenerInfo> result;
   result.reserve(serviceSet.size());
   for (auto info : serviceSet)
@@ -255,7 +263,7 @@ std::vector<ServiceListenerHook::ListenerInfo> ServiceListeners::GetListenerInfo
   return result;
 }
 
-void ServiceListeners::RemoveFromCache(const ServiceListenerEntry& sle)
+void ServiceListeners::RemoveFromCache_unlocked(const ServiceListenerEntry& sle)
 {
   if (!sle.GetLocalCache().empty())
   {
@@ -281,7 +289,7 @@ void ServiceListeners::RemoveFromCache(const ServiceListenerEntry& sle)
   }
 }
 
-void ServiceListeners::CheckSimple(const ServiceListenerEntry& sle)
+void ServiceListeners::CheckSimple_unlocked(const ServiceListenerEntry& sle)
 {
   if (sle.GetLDAPExpr().IsNull())
   {
@@ -311,9 +319,9 @@ void ServiceListeners::CheckSimple(const ServiceListenerEntry& sle)
   }
 }
 
-void ServiceListeners::AddToSet(ServiceListenerEntries& set,
-                                const ServiceListenerEntries& receivers,
-                                int cache_ix, const std::string& val)
+void ServiceListeners::AddToSet_unlocked(ServiceListenerEntries& set,
+                                         const ServiceListenerEntries& receivers,
+                                         int cache_ix, const std::string& val)
 {
   std::list<ServiceListenerEntry>& l = cache[cache_ix][val];
   if (!l.empty())

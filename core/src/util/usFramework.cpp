@@ -22,12 +22,13 @@
 
 #include "usFramework.h"
 
-#include "usCoreBundleContext_p.h"
-#include "usFrameworkPrivate.h"
 #include "usBundleInfo.h"
 #include "usBundleInitialization.h"
 #include "usBundleSettings.h"
-#include "usBundleUtils_p.h"
+#include "usBundleUtils.h"
+
+#include "usFrameworkPrivate.h"
+#include "usCoreBundleContext_p.h"
 #include "usThreads_p.h"
 
 namespace us {
@@ -41,10 +42,10 @@ Framework::Framework(void) : d(new FrameworkPrivate())
 
 }
 
-Framework::Framework(std::map<std::string, std::string>& configuration) :
+Framework::Framework(const std::map<std::string, Any>& configuration) :
     d(new FrameworkPrivate(configuration))
 {
-  
+
 }
 
 Framework::~Framework(void)
@@ -54,18 +55,18 @@ Framework::~Framework(void)
 
 void Framework::Initialize(void)
 {
-  FrameworkPrivate::Lock{d};
+  auto l = d->Lock();
   if (d->initialized)
   {
     return;
   }
 
-  BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
+  BundleInfo bundleInfo(US_CORE_FRAMEWORK_NAME);
 
   void(Framework::*initFncPtr)(void) = &Framework::Initialize;
   void* frameworkInit = nullptr;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
-  bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
+  bundleInfo.location = BundleUtils::GetLibraryPath(frameworkInit);
 
   d->coreBundleContext.bundleRegistry.RegisterSystemBundle(this, bundleInfo);
 
@@ -80,7 +81,7 @@ void Framework::Start()
 
 void Framework::Stop() 
 {
-  FrameworkPrivate::Lock lock(d);
+  auto l = d->Lock();
   auto bundles = GetBundleContext()->GetBundles();
   for (auto bundle : bundles)
   {

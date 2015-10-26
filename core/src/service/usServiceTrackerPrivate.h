@@ -115,7 +115,7 @@ public:
    * Tracked services: <code>ServiceReference</code> -> customized Object and
    * <code>ServiceListenerEntry</code> object
    */
-  TrackedService<S,TTT>* trackedService;
+  std::unique_ptr<TrackedService<S,TTT>> trackedService;
 
   /**
    * Accessor method for the current TrackedService object. This method is only

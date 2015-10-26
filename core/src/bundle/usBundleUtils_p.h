@@ -21,28 +21,18 @@
 =============================================================================*/
 
 
-#ifndef USBUNDLEUTILS_H
-#define USBUNDLEUTILS_H
-
-#include <usCoreExport.h>
-
-#include <string>
+#ifndef USBUNDLEUTILS_P_H
+#define USBUNDLEUTILS_P_H
 
 namespace us {
 
 struct BundleInfo;
 
-/**
- * This class is not intended to be used directly. It is exported to support
- * the CppMicroServices bundle system.
- */
-struct US_Core_EXPORT BundleUtils
+namespace BundleUtils
 {
-  static std::string GetLibraryPath(void* symbol);
-
-  static void* GetSymbol(const BundleInfo& bundle, const char* symbol);
-};
+  void* GetSymbol(const BundleInfo& bundle, const char* symbol);
+}
 
 }
 
-#endif // USBUNDLEUTILS_H
+#endif // USBUNDLEUTILS_P_H

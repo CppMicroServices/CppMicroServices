@@ -30,6 +30,8 @@
 
 namespace us {
 
+class Any;
+
 class Framework;
 
 /**
@@ -47,14 +49,14 @@ public:
 
     /**
      * Create a new Framework instance.
-     * 
+     *
      * @param configuration The framework properties to configure the new framework instance. If framework properties
      * are not provided by the configuration argument, the created framework instance will use a reasonable
      * default configuration.
      *
      * @return A new, configured Framework instance.
      */
-    Framework* NewFramework(std::map<std::string, std::string> configuration);
+    Framework* NewFramework(const std::map<std::string, Any>& configuration);
 
     /**
     * Create a new Framework instance.

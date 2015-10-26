@@ -27,6 +27,7 @@
 #include "usBundleVersion.h"
 
 #include <vector>
+#include <memory>
 
 namespace us {
 
@@ -398,12 +399,12 @@ private:
   friend class ServiceReferencePrivate;
   friend class Framework;
 
-  BundlePrivate* d;
+  std::unique_ptr<BundlePrivate> d;
 
   Bundle();
 
-  void Init(CoreBundleContext* coreCtx, BundleInfo* info);
-  void Uninit();
+  void Init_unlocked(CoreBundleContext* coreCtx, const BundleInfo& info);
+  void Uninit_unlocked();
 
 };
 

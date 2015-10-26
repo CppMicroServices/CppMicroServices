@@ -45,6 +45,7 @@ class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
 
 public:
 
+  ServiceListenerEntry();
   ServiceListenerEntry(const ServiceListenerEntry& other);
   ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info);
 

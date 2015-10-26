@@ -90,6 +90,10 @@ public:
 
 };
 
+ServiceListenerEntry::ServiceListenerEntry()
+{
+}
+
 ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
   : ServiceListenerHook::ListenerInfo(other)
 {

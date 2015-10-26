@@ -75,13 +75,13 @@ public:
    * launch properties and the system properties.
    * See OSGi spec revision 6, section 4.2.2
    */
-  std::map<std::string, std::string> frameworkProperties;
+  const std::map<std::string, Any> frameworkProperties;
 
   /**
    * Contruct a core context
    *
    */
-  CoreBundleContext();
+  CoreBundleContext(const std::map<std::string, Any>& props = std::map<std::string, Any>());
 
   ~CoreBundleContext();
 

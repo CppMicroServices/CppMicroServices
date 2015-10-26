@@ -42,7 +42,7 @@ class FrameworkPrivate : public MultiThreaded<>
 {
 public:
     FrameworkPrivate(void);
-    FrameworkPrivate(const std::map<std::string, std::string>& configuration);
+    FrameworkPrivate(const std::map<std::string, Any>& configuration);
     virtual ~FrameworkPrivate();
 
     CoreBundleContext coreBundleContext;

@@ -70,7 +70,7 @@ struct BundleResourceContainerPrivate
     }
   }
 
-  const BundleInfo* m_BundleInfo;
+  const BundleInfo* const m_BundleInfo;
   bool m_IsValid;
 
   mz_zip_archive m_ZipArchive;

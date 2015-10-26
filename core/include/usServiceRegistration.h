@@ -43,7 +43,6 @@ namespace us {
  *
  * @tparam S Class tyoe of the service interface
  * @see BundleContext#RegisterService()
- * @remarks This class is thread safe.
  */
 template<class I1, class ...Interfaces>
 class ServiceRegistration : public ServiceRegistrationBase

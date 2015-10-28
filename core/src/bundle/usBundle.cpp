@@ -38,302 +38,266 @@
 
 namespace us {
 
-const std::string& Bundle::PROP_ID()
-{
-  static const std::string s("bundle.id");
-  return s;
-}
-const std::string& Bundle::PROP_NAME()
-{
-  static const std::string s("bundle.name");
-  return s;
-}
-const std::string& Bundle::PROP_LOCATION()
-{
-  static const std::string s("bundle.location");
-  return s;
-}
-const std::string& Bundle::PROP_VERSION()
-{
-  static const std::string s("bundle.version");
-  return s;
-}
+    const std::string Bundle::PROP_ID{ "bundle.id" };
+    const std::string Bundle::PROP_NAME{ "bundle.name" };
+    const std::string Bundle::PROP_LOCATION{ "bundle.location" };
+    const std::string Bundle::PROP_VERSION{ "bundle.version" };
+    const std::string Bundle::PROP_VENDOR{ "bundle.vendor" };
+    const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
+    const std::string Bundle::PROP_AUTOLOAD_DIR{ "bundle.autoload_dir" };
+    const std::string Bundle::PROP_AUTOINSTALLED_BUNDLES{ "bundle.autoinstalled_bundles" };
 
-const std::string&Bundle::PROP_VENDOR()
-{
-  static const std::string s("bundle.vendor");
-  return s;
-}
+    Bundle::Bundle()
+    : d(0)
+    {
 
-const std::string&Bundle::PROP_DESCRIPTION()
-{
-  static const std::string s("bundle.description");
-  return s;
-}
+    }
 
-const std::string&Bundle::PROP_AUTOLOAD_DIR()
-{
-  static const std::string s("bundle.autoload_dir");
-  return s;
-}
+    Bundle::~Bundle()
+    {
+      delete d;
+    }
 
-const std::string&Bundle::PROP_AUTOINSTALLED_BUNDLES()
-{
-  static const std::string s("bundle.autoinstalled_bundles");
-  return s;
-}
+    void Bundle::Init(CoreBundleContext* coreCtx,
+                      BundleInfo* info)
+    {
+      BundlePrivate* mp = new BundlePrivate(this, coreCtx, info);
+      std::swap(mp, d);
+      delete mp;
+    }
 
-Bundle::Bundle()
-: d(0)
-{
+    void Bundle::Uninit()
+    {
+      if (d->bundleContext != NULL)
+      {
+        //d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
+        d->RemoveBundleResources();
+        delete d->bundleContext;
+        d->bundleContext = nullptr;
+        d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this));
 
-}
+        d->bundleActivator = nullptr;
+      }
+    }
 
-Bundle::~Bundle()
-{
-  delete d;
-}
+    bool Bundle::IsStarted() const
+    {
+      return d->bundleContext != nullptr;
+    }
 
-void Bundle::Init(CoreBundleContext* coreCtx,
-                  BundleInfo* info)
-{
-  BundlePrivate* mp = new BundlePrivate(this, coreCtx, info);
-  std::swap(mp, d);
-  delete mp;
-}
+    void Bundle::Start()
+    {
+      BundlePrivate::Lock l(this->d);
+      if (d->bundleContext)
+      {
+        US_WARN << "Bundle " << d->info.name << " already started.";
+        return;
+      }
 
-void Bundle::Uninit()
-{
-  if (d->bundleContext != NULL)
-  {
-    //d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
-    d->RemoveBundleResources();
-    delete d->bundleContext;
-    d->bundleContext = nullptr;
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this));
-
-    d->bundleActivator = nullptr;
-  }
-}
-
-bool Bundle::IsStarted() const
-{
-  return d->bundleContext != nullptr;
-}
-
-void Bundle::Start()
-{
-  BundlePrivate::Lock l(this->d);
-  if (d->bundleContext)
-  {
-    US_WARN << "Bundle " << d->info.name << " already started.";
-    return;
-  }
-
-  // loading a library isn't necessary if it isn't supported
+      // loading a library isn't necessary if it isn't supported
 #ifdef US_BUILD_SHARED_LIBS
-  if(IsSharedLibrary(d->lib.GetFilePath()) && !d->lib.IsLoaded())
-  {
-    d->lib.Load();
-  }
+      if(IsSharedLibrary(d->lib.GetFilePath()) && !d->lib.IsLoaded())
+      {
+        d->lib.Load();
+      }
 #endif
 
-  d->bundleContext = new BundleContext(this->d);
+      d->bundleContext = new BundleContext(this->d);
 
-  // save this bundle's context so that it can be accessible anywhere
-  // from within this bundle's code.
-  typedef void(*SetBundleContext)(BundleContext*);
-  SetBundleContext setBundleContext = NULL;
+      // save this bundle's context so that it can be accessible anywhere
+      // from within this bundle's code.
+      typedef void(*SetBundleContext)(BundleContext*);
+      SetBundleContext setBundleContext = NULL;
 
-  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-  void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+      std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
+      void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
+      std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
 
-  if (setBundleContext)
-  {
-    setBundleContext(d->bundleContext);
-  }
+      if (setBundleContext)
+      {
+        setBundleContext(d->bundleContext);
+      }
 
-  typedef BundleActivator*(*BundleActivatorHook)(void);
-  BundleActivatorHook activatorHook = NULL;
+      typedef BundleActivator*(*BundleActivatorHook)(void);
+      BundleActivatorHook activatorHook = NULL;
 
-  std::string activator_func = "_us_bundle_activator_instance_" + d->info.name;
-  void* activatorHookSym = BundleUtils::GetSymbol(d->info, activator_func.c_str());
-  std::memcpy(&activatorHook, &activatorHookSym, sizeof(void*));
+      std::string activator_func = "_us_bundle_activator_instance_" + d->info.name;
+      void* activatorHookSym = BundleUtils::GetSymbol(d->info, activator_func.c_str());
+      std::memcpy(&activatorHook, &activatorHookSym, sizeof(void*));
 
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, this));
-  // try to get a BundleActivator instance
+      d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, this));
+      // try to get a BundleActivator instance
 
-  if (activatorHook)
-  {
-    try
-    {
-      d->bundleActivator = activatorHook();
+      if (activatorHook)
+      {
+        try
+        {
+          d->bundleActivator = activatorHook();
+        }
+        catch (...)
+        {
+          US_ERROR << "Creating the bundle activator of " << d->info.name << " failed";
+          throw;
+        }
+
+        // This method should be "noexcept" and by not catching exceptions
+        // here we semantically treat it that way since any exception during
+        // static initialization will either terminate the program or cause
+        // the dynamic loader to report an error.
+        d->bundleActivator->Start(d->bundleContext);
+      }
+
+      d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, this));
     }
-    catch (...)
+
+    void Bundle::Stop()
     {
-      US_ERROR << "Creating the bundle activator of " << d->info.name << " failed";
-      throw;
-    }
+      BundlePrivate::Lock l(this->d);
+      if (d->bundleContext == nullptr)
+      {
+        US_WARN << "Bundle " << d->info.name << " already stopped.";
+        return;
+      }
 
-    // This method should be "noexcept" and by not catching exceptions
-    // here we semantically treat it that way since any exception during
-    // static initialization will either terminate the program or cause
-    // the dynamic loader to report an error.
-    d->bundleActivator->Start(d->bundleContext);
-  }
+      try
+      {
+        d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, this));
 
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, this));
-}
+        if (d->bundleActivator)
+        {
+          d->bundleActivator->Stop(d->bundleContext);
+        }
+      }
+      catch (...)
+      {
+        US_WARN << "Calling the bundle activator Stop() method of " << d->info.name << " failed!";
 
-void Bundle::Stop()
-{
-  BundlePrivate::Lock l(this->d);
-  if (d->bundleContext == nullptr)
-  {
-    US_WARN << "Bundle " << d->info.name << " already stopped.";
-    return;
-  }
+        try
+        {
+          this->Uninit();
+        }
+        catch (...) {}
 
-  try
-  {
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, this));
+        throw;
+      }
 
-    if (d->bundleActivator)
-    {
-      d->bundleActivator->Stop(d->bundleContext);
-    }
-  }
-  catch (...)
-  {
-    US_WARN << "Calling the bundle activator Stop() method of " << d->info.name << " failed!";
-
-    try
-    {
       this->Uninit();
     }
-    catch (...) {}
 
-    throw;
-  }
-
-  this->Uninit();
-}
-
-void Bundle::Uninstall()
-{
-    Stop();
-    d->coreCtx->bundleRegistry.UnRegister(&d->info);
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
-}
-
-BundleContext* Bundle::GetBundleContext() const
-{
-  return d->bundleContext;
-}
-
-long Bundle::GetBundleId() const
-{
-  return d->info.id;
-}
-
-std::string Bundle::GetLocation() const
-{
-  return d->info.location;
-}
-
-std::string Bundle::GetName() const
-{
-  return d->info.name;
-}
-
-BundleVersion Bundle::GetVersion() const
-{
-  return d->version;
-}
-
-Any Bundle::GetProperty(const std::string& key) const
-{
-  Any property(d->bundleManifest.GetValue(key));
-
-  // Clients must be able to query both a bundle's properties
-  // and the framework's properties through any Bundle's
-  // GetProperty function.
-  // The Framework's properties include both the launch properties
-  // used to initialize the Framwork with and all relevant
-  // "org.cppmicroservices.*" properties.
-  if (property.Empty())
-  {
-    std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
-    if (props != d->coreCtx->frameworkProperties.end())
+    void Bundle::Uninstall()
     {
-      property = (*props).second;
+        Stop();
+        d->coreCtx->bundleRegistry.UnRegister(&d->info);
+        d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
     }
-  }
-  return property;
-}
 
-std::vector<std::string> Bundle::GetPropertyKeys() const
-{
-  return d->bundleManifest.GetKeys();
-}
+    BundleContext* Bundle::GetBundleContext() const
+    {
+      return d->bundleContext;
+    }
 
-std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
-{
-  std::vector<ServiceRegistrationBase> sr;
-  std::vector<ServiceReferenceU> res;
-  d->coreCtx->services.GetRegisteredByBundle(d, sr);
-  for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
-  {
-    res.push_back(i->GetReference());
-  }
-  return res;
-}
+    long Bundle::GetBundleId() const
+    {
+      return d->info.id;
+    }
 
-std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
-{
-  std::vector<ServiceRegistrationBase> sr;
-  std::vector<ServiceReferenceU> res;
-  d->coreCtx->services.GetUsedByBundle(const_cast<Bundle*>(this), sr);
-  for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
-  {
-    res.push_back(i->GetReference());
-  }
-  return res;
-}
+    std::string Bundle::GetLocation() const
+    {
+      return d->info.location;
+    }
 
-BundleResource Bundle::GetResource(const std::string& path) const
-{
-  if (!d->resourceContainer.IsValid())
-  {
-    return BundleResource();
-  }
-  BundleResource result(path, d->resourceContainer);
-  if (result) return result;
-  return BundleResource();
-}
+    std::string Bundle::GetName() const
+    {
+      return d->info.name;
+    }
 
-std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
-                                                  bool recurse) const
-{
-  std::vector<BundleResource> result;
-  if (!d->resourceContainer.IsValid())
-  {
-    return result;
-  }
+    BundleVersion Bundle::GetVersion() const
+    {
+      return d->version;
+    }
 
-  std::string normalizedPath = path;
-  // add a leading and trailing slash
-  if (normalizedPath.empty()) normalizedPath.push_back('/');
-  if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
-  if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
-  d->resourceContainer.FindNodes(d->info.name + normalizedPath,
-                                 filePattern.empty() ? "*" : filePattern,
-                                 recurse, result);
-  return result;
-}
+    Any Bundle::GetProperty(const std::string& key) const
+    {
+      Any property(d->bundleManifest.GetValue(key));
+
+      // Clients must be able to query both a bundle's properties
+      // and the framework's properties through any Bundle's
+      // GetProperty function.
+      // The Framework's properties include both the launch properties
+      // used to initialize the Framwork with and all relevant
+      // "org.cppmicroservices.*" properties.
+      if (property.Empty())
+      {
+        std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
+        if (props != d->coreCtx->frameworkProperties.end())
+        {
+          property = (*props).second;
+        }
+      }
+      return property;
+    }
+
+    std::vector<std::string> Bundle::GetPropertyKeys() const
+    {
+      return d->bundleManifest.GetKeys();
+    }
+
+    std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
+    {
+      std::vector<ServiceRegistrationBase> sr;
+      std::vector<ServiceReferenceU> res;
+      d->coreCtx->services.GetRegisteredByBundle(d, sr);
+      for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
+           i != sr.end(); ++i)
+      {
+        res.push_back(i->GetReference());
+      }
+      return res;
+    }
+
+    std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
+    {
+      std::vector<ServiceRegistrationBase> sr;
+      std::vector<ServiceReferenceU> res;
+      d->coreCtx->services.GetUsedByBundle(const_cast<Bundle*>(this), sr);
+      for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
+           i != sr.end(); ++i)
+      {
+        res.push_back(i->GetReference());
+      }
+      return res;
+    }
+
+    BundleResource Bundle::GetResource(const std::string& path) const
+    {
+      if (!d->resourceContainer.IsValid())
+      {
+        return BundleResource();
+      }
+      BundleResource result(path, d->resourceContainer);
+      if (result) return result;
+      return BundleResource();
+    }
+
+    std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
+                                                      bool recurse) const
+    {
+      std::vector<BundleResource> result;
+      if (!d->resourceContainer.IsValid())
+      {
+        return result;
+      }
+
+      std::string normalizedPath = path;
+      // add a leading and trailing slash
+      if (normalizedPath.empty()) normalizedPath.push_back('/');
+      if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
+      if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
+      d->resourceContainer.FindNodes(d->info.name + normalizedPath,
+                                     filePattern.empty() ? "*" : filePattern,
+                                     recurse, result);
+      return result;
+    }
 
 }
 

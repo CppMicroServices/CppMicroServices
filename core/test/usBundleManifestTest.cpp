@@ -52,11 +52,11 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   Bundle* bundleM = framework->GetBundleContext()->GetBundle("TestBundleM");
   US_TEST_CONDITION_REQUIRED(bundleM != nullptr, "Test for existing bundle TestBundleM")
 
-  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_NAME()).ToString() == "TestBundleM", "Bundle name")
+  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_NAME).ToString() == "TestBundleM", "Bundle name")
   US_TEST_CONDITION(bundleM->GetName() == "TestBundleM", "Bundle name 2")
-  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_DESCRIPTION()).ToString() == "My Bundle description", "Bundle description")
-  US_TEST_CONDITION(bundleM->GetLocation() == bundleM->GetProperty(Bundle::PROP_LOCATION()).ToString(), "Bundle location")
-  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_VERSION()).ToString() == "1.0.0", "Bundle version")
+  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_DESCRIPTION).ToString() == "My Bundle description", "Bundle description")
+  US_TEST_CONDITION(bundleM->GetLocation() == bundleM->GetProperty(Bundle::PROP_LOCATION).ToString(), "Bundle location")
+  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_VERSION).ToString() == "1.0.0", "Bundle version")
   US_TEST_CONDITION(bundleM->GetVersion() == BundleVersion(1,0,0), "Bundle version 2")
 
   Any anyVector = bundleM->GetProperty("vector");

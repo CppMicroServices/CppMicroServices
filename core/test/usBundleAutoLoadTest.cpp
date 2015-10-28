@@ -56,7 +56,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
 
   bundleAL->Start();
 
-  Any installedBundles = bundleAL->GetProperty(Bundle::PROP_AUTOINSTALLED_BUNDLES());
+  Any installedBundles = bundleAL->GetProperty(Bundle::PROP_AUTOINSTALLED_BUNDLES);
   Bundle* bundleAL_1 = mc->GetBundle("TestBundleAL_1");
 
   // check the listeners for events

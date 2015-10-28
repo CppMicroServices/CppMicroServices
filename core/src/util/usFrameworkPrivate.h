@@ -48,6 +48,9 @@ public:
     CoreBundleContext coreBundleContext;
 
     bool initialized;
+
+private:
+    void Init();
 };
 
 }

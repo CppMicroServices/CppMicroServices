@@ -32,80 +32,84 @@
 
 namespace us {
 
-Framework::Framework(void) : d(new FrameworkPrivate())
-{
+    const std::string Framework::PROP_STORAGE_LOCATION{ "org.cppmicroservices.framework.storage" };
+    const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.framework.threading.support" };
+    const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
 
-}
-
-Framework::Framework(std::map<std::string, std::string>& configuration) :
-    d(new FrameworkPrivate(configuration))
-{
-  
-}
-
-Framework::~Framework(void)
-{
-
-}
-
-void Framework::Initialize(void)
-{
-  FrameworkPrivate::Lock{d};
-  if (d->initialized)
-  {
-    return;
-  }
-
-  BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
-
-  void(Framework::*initFncPtr)(void) = &Framework::Initialize;
-  void* frameworkInit = NULL;
-  std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
-  bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
-
-  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(this, bundleInfo);
-
-  d->initialized = true;
-}
-
-void Framework::Start() 
-{ 
-  Initialize();
-  Bundle::Start();
-}
-
-void Framework::Stop() 
-{
-  FrameworkPrivate::Lock lock(d);
-  std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
-  for (std::vector<Bundle*>::const_iterator iter = bundles.begin();
-      iter != bundles.end(); 
-      ++iter)
-  {
-    if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
+    Framework::Framework(void) : d(new FrameworkPrivate())
     {
-      (*iter)->Stop();
+
     }
-  }
 
-  Bundle::Stop();
-}
+    Framework::Framework(std::map<std::string, std::string>& configuration) :
+        d(new FrameworkPrivate(configuration))
+    {
+  
+    }
 
-void Framework::Uninstall() 
-{
-  throw std::runtime_error("Cannot uninstall a system bundle."); 
-}
+    Framework::~Framework(void)
+    {
 
-std::string Framework::GetLocation() const
-{
-  // OSGi Core release 6, section 4.6:
-  //  The system bundle GetLocation method returns the string: "System Bundle"
-  return std::string("System Bundle");
-}
+    }
 
-void Framework::SetAutoLoadingEnabled(bool enable)
-{
-  d->coreBundleContext.settings.SetAutoLoadingEnabled(enable);
-}
+    void Framework::Initialize(void)
+    {
+      FrameworkPrivate::Lock{d};
+      if (d->initialized)
+      {
+        return;
+      }
+
+      BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
+
+      void(Framework::*initFncPtr)(void) = &Framework::Initialize;
+      void* frameworkInit = NULL;
+      std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
+      bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
+
+      d->coreBundleContext.bundleRegistry.RegisterSystemBundle(this, bundleInfo);
+
+      d->initialized = true;
+    }
+
+    void Framework::Start() 
+    { 
+      Initialize();
+      Bundle::Start();
+    }
+
+    void Framework::Stop() 
+    {
+      FrameworkPrivate::Lock lock(d);
+      std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
+      for (std::vector<Bundle*>::const_iterator iter = bundles.begin();
+          iter != bundles.end(); 
+          ++iter)
+      {
+        if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
+        {
+          (*iter)->Stop();
+        }
+      }
+
+      Bundle::Stop();
+    }
+
+    void Framework::Uninstall() 
+    {
+      throw std::runtime_error("Cannot uninstall a system bundle."); 
+    }
+
+    std::string Framework::GetLocation() const
+    {
+      // OSGi Core release 6, section 4.6:
+      //  The system bundle GetLocation method returns the string: "System Bundle"
+      return std::string("System Bundle");
+    }
+
+    void Framework::SetAutoLoadingEnabled(bool enable)
+    {
+      d->coreBundleContext.settings.SetAutoLoadingEnabled(enable);
+    }
 
 }

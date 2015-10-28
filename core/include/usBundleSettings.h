@@ -81,12 +81,6 @@ public:
   static std::string CURRENT_BUNDLE_PATH();
 
   /**
-   * \return \c true if threading support has been configured into the
-   * CppMicroServices library, \c false otherwise.
-   */
-  bool IsThreadingSupportEnabled();
-
-  /**
    * \return \c true if support for bundle auto-loading is enabled,
    * \c false otherwise.
    *

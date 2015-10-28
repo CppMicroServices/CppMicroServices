@@ -29,6 +29,7 @@
 #include <iostream>
 #include <sstream>
 
+
 namespace us {
 
 US_Core_EXPORT void message_output(MsgType, const char* buf);
@@ -69,23 +70,9 @@ private:
   std::stringstream buffer;
 };
 
-class Logger : MultiThreaded<> {
+class US_Core_EXPORT Logger : MultiThreaded<> {
 public:
-    static Logger& instance()
-    { 
-      /* 
-      IMPORTANT: This is only thread safe if compiling with a C++11 compiler
-        which implements C++11 standard section 6.7.4:
-       "If control enters the declaration concurrently while the variable is being initialized, 
-        the concurrent execution shall wait for completion of the initialization."
-
-        However, even if a C++11 supported compiler isn't used, thread safe initialization
-        of function local statics isn't a concern at the moment becasue this Logger
-        is used internally by the Framework and not instantiated in a concurrent fashion.
-       */
-      static Logger inst;
-      return inst;
-    }
+    static Logger& instance();
 
     /**
     * Set the logging level for log messages from CppMicroServices bundles.
@@ -96,33 +83,24 @@ public:
     *
     * @param level The new logging level.
     */
-    void SetLogLevel(const MsgType level)
-    {
-      Lock l(this);
-      logLevel = level;
-    }
+    void SetLogLevel(const MsgType level);
 
     /**
     * Get the current logging level.
     *
     * @return The currently used logging level.
     */
-    MsgType GetLogLevel()
-    {
-      Lock l(this);
-      return logLevel;
-    }
-
-protected:
-    Logger(void) : logLevel(DebugMsg) {}
-    ~Logger() {}
+    MsgType GetLogLevel();
 
 private:
+    Logger(void);
+    ~Logger();
+
     MsgType logLevel;
 
     // disable copy/assignment
-    Logger(const Logger&);
-    Logger& operator=(const Logger&);
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
 };
 
 }

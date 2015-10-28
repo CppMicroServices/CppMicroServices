@@ -117,15 +117,6 @@ BundleSettings::~BundleSettings()
   }
 }
 
-bool BundleSettings::IsThreadingSupportEnabled()
-{
-#ifdef US_ENABLE_THREADING_SUPPORT
-  return true;
-#else
-  return false;
-#endif
-}
-
 bool BundleSettings::IsAutoLoadingEnabled()
 {
   BundleSettingsPrivate::Lock l(pimpl);

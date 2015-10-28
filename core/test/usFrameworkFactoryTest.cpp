@@ -46,11 +46,11 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
     US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
 
     std::map < std::string, std::string > configuration;
-    configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.security","osgi"));
-    configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.startlevel.beginning", "0"));
-    configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.bsnversion", "single"));
-    configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.custom1", "foo"));
-    configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.custom2", "bar"));
+    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.security","osgi"));
+    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.startlevel.beginning", "0"));
+    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.bsnversion", "single"));
+    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom1", "foo"));
+    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom2", "bar"));
 
     Framework* f2 = factory.NewFramework(configuration);
 

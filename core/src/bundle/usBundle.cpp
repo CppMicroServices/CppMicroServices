@@ -261,7 +261,7 @@ Any Bundle::GetProperty(const std::string& key) const
   // GetProperty function.
   // The Framework's properties include both the launch properties
   // used to initialize the Framwork with and all relevant
-  // "org.osgi.*" properties.
+  // "org.cppmicroservices.*" properties.
   if (property.Empty())
   {
     std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);

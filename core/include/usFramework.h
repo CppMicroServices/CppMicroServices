@@ -126,6 +126,35 @@ public:
      */
     void SetAutoLoadingEnabled(bool enable);
 
+    /**
+     * The framework's persistent storage base path property key name.
+     * This property's default value is the current working directory.
+     *
+     */
+    static const std::string PROP_STORAGE_LOCATION;
+
+    /**
+     * The framework's threading support property key name.
+     * This property's default value is "single".
+     * Valid key values are:
+     * - "single" - The framework APIs are not thread-safe.
+     * - "multi" - The framework APIs are thread-safe.
+     *
+     * @remarks This is a read-only property and cannot be altered at run-time.
+     * The key's value is set at compile time by the US_ENABLE_THREADING_SUPPORT option.
+     *
+     * @see \ref BuildInstructions
+     */
+    static const std::string PROP_THREADING_SUPPORT;
+
+    /**
+     * The framework's log level property key name.
+     * This property's default value is "3" (Only errors are logged).
+     *
+     * @see MsgType
+     */
+    static const std::string PROP_LOG_LEVEL;
+
 private:
     // Framework instances are exclusively constructed by the FrameworkFactory class
     friend class FrameworkFactory;

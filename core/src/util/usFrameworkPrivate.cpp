@@ -21,29 +21,48 @@ limitations under the License.
 =============================================================================*/
 
 #include "usFrameworkPrivate.h"
-
-#include "usCoreBundleContext_p.h"
-#include "usThreads_p.h"
+#include "usFramework.h"
+#include "usLog.h"
+#include "usUtils_p.h"
 
 namespace us {
 
-FrameworkPrivate::FrameworkPrivate(void) :
-    coreBundleContext(),
-    initialized(false)
-{
+    FrameworkPrivate::FrameworkPrivate(void) :
+        coreBundleContext(),
+        initialized(false)
+    {
+        Init();
+    }
 
-}
+    FrameworkPrivate::FrameworkPrivate(const std::map<std::string, std::string>& configuration) :
+        coreBundleContext(),
+        initialized(false)
+    {
+        coreBundleContext.frameworkProperties = configuration;
+        Init();
+    }
 
-FrameworkPrivate::FrameworkPrivate(const std::map<std::string, std::string>& configuration) :
-    coreBundleContext(),
-    initialized(false)
-{
-  coreBundleContext.frameworkProperties = configuration;
-}
+    FrameworkPrivate::~FrameworkPrivate()
+    {
+        initialized = false;
+    }
 
-FrameworkPrivate::~FrameworkPrivate()
-{
-  initialized = false;
-}
+    void FrameworkPrivate::Init()
+    {
+        // emplace cannot be used until the minimum GCC compiler is >= 4.8
+        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, GetCurrentWorkingDirectory()));
+        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_LOG_LEVEL, "3"));
+
+        // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
+        // Run-time modification of the property should be ignored as it is irrelevant.
+        coreBundleContext.frameworkProperties.erase(Framework::PROP_THREADING_SUPPORT);
+#ifdef US_ENABLE_THREADING_SUPPORT
+        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "multi"));
+#else
+        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "single"));
+#endif
+
+        Logger::instance().SetLogLevel(static_cast<us::MsgType>(std::stoul(coreBundleContext.frameworkProperties.find(Framework::PROP_LOG_LEVEL)->second)));
+    }
 
 }

@@ -8,6 +8,7 @@ set(_srcs
   util/usFrameworkFactory.cpp
   util/usFrameworkPrivate.cpp
   util/usLDAPProp.cpp
+  util/usLog.cpp
   util/usSharedLibrary.cpp
   util/usUtils.cpp
 

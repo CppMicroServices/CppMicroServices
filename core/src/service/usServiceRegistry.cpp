@@ -95,8 +95,8 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
   }
 
   // Check if we got a service factory
-    bool isFactory = service.count("org.cppmicroservices.factory") > 0;
-    bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(std::static_pointer_cast<ServiceFactory>(service.find("org.cppmicroservices.factory")->second))) : false);
+  bool isFactory = service.count("org.cppmicroservices.factory") > 0;
+  bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(std::static_pointer_cast<ServiceFactory>(service.find("org.cppmicroservices.factory")->second))) : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.

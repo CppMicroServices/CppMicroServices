@@ -58,7 +58,7 @@ public:
     * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-    std::shared_ptr<void> GetService(Bundle* bundle);
+  std::shared_ptr<void> GetService(Bundle* bundle);
 
   InterfaceMap GetServiceInterfaceMap(Bundle* bundle);
 
@@ -141,8 +141,9 @@ public:
   std::string interfaceId;
 
 private:
-    InterfaceMap GetServiceFromFactory(Bundle* bundle, std::shared_ptr<ServiceFactory> factory,
-                                       bool isModuleScope);
+  InterfaceMap GetServiceFromFactory(Bundle* bundle, 
+                                     std::shared_ptr<ServiceFactory> factory,
+                                     bool isModuleScope);
 };
 
 }

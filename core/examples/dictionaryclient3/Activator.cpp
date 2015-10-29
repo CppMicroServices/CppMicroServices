@@ -95,7 +95,7 @@ public:
       std::getline(std::cin, word);
 
       // Get the selected dictionary, if available.
-        std::shared_ptr<IDictionaryService> dictionary = m_tracker->GetService();
+      std::shared_ptr<IDictionaryService> dictionary = m_tracker->GetService();
 
       // If the user entered a blank line, then
       // exit the loop.

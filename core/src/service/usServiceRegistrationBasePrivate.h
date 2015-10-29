@@ -138,7 +138,7 @@ public:
   bool IsUsedByBundle(Bundle* m) const;
 
   const InterfaceMap& GetInterfaces() const;
-    std::shared_ptr<void> GetService(const std::string& interfaceId) const;
+  std::shared_ptr<void> GetService(const std::string& interfaceId) const;
 
 };
 

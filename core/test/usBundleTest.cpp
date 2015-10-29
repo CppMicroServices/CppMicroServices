@@ -116,7 +116,7 @@ void frame005a(BundleContext* mc)
 }
 
 // Get context id, location, persistent storage and status of the bundle
-void frame010a(Framework* framework, BundleContext* mc)
+void frame010a(std::shared_ptr<Framework> framework, BundleContext* mc)
 {
   Bundle* m = mc->GetBundle();
 
@@ -162,7 +162,7 @@ void frame018a(BundleContext* mc)
 
 // Start libA and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(Framework* framework, TestBundleListener& listener)
+void frame020a(std::shared_ptr<Framework> framework, TestBundleListener& listener)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -210,7 +210,7 @@ void frame020a(Framework* framework, TestBundleListener& listener)
 
 
 // Start libA and check that it exists and that the storage paths are correct
-void frame02b(Framework* framework)
+void frame02b(std::shared_ptr<Framework> framework)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -297,7 +297,7 @@ void TestBundleStates()
     std::vector<BundleEvent> bundleEvents;
     FrameworkFactory factory;
 
-    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+    std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
@@ -362,14 +362,13 @@ void TestBundleStates()
     bundleEvents.clear();
 
     framework->Stop();
-    delete framework;
 }
 
 void TestForInstallFailure()
 {
     FrameworkFactory factory;
 
-    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+    std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
@@ -406,14 +405,13 @@ void TestForInstallFailure()
     US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
 
     framework->Stop();
-    delete framework;
 }
 
 void TestDuplicateInstall()
 {
     FrameworkFactory factory;
 
-    Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+    std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
@@ -427,7 +425,6 @@ void TestDuplicateInstall()
     US_TEST_CONDITION(bundle->GetBundleId() == bundleDuplicate->GetBundleId(), "Test for the same bundle id");
 
     framework->Stop();
-    delete framework;
 }
 
 } // end unnamed namespace
@@ -437,7 +434,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   std::vector<Bundle*> bundles = framework->GetBundleContext()->GetBundles();
@@ -486,7 +483,6 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   mc->RemoveServiceListener(&listener, &TestBundleListener::ServiceChanged);
 
   framework->Stop();
-  delete framework;
 
   // test a non-default framework instance using a different persistent storage location.
   std::map<std::string, std::string> frameworkConfig;
@@ -496,8 +492,6 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
 
   frame02a(framework->GetBundleContext());
   frame02b(framework);
-
-  delete framework;
 
   TestBundleStates();
   TestForInstallFailure();

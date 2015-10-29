@@ -181,15 +181,16 @@ ServletContainerPrivate::TrackedType ServletContainerPrivate::AddingService(cons
     return NULL;
   }
 
-  HttpServlet* servlet = m_Context->GetService(reference);
-  if (servlet == NULL)
+  std::shared_ptr<HttpServlet> servlet = m_Context->GetService(reference);
+  if (servlet)
   {
     std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is NULL." << std::endl;
     return NULL;
   }
   ServletContext* servletContext = new ServletContext(q);
   servlet->Init(ServletConfigImpl(servletContext));
-  ServletHandler* handler = new ServletHandler(servlet, contextRoot.ToString());
+  // TODO: short term workaround, extracting the raw ptr from smart ptr may not be safe
+  ServletHandler* handler = new ServletHandler(servlet.get(), contextRoot.ToString());
   m_Handler.push_back(handler);
   m_ServletContextMap[contextRoot.ToString()] = servletContext;
 

@@ -181,7 +181,7 @@ public:
         // Unget service object and null references.
         m_context->UngetService(m_ref);
         m_ref = nullptr;
-        m_dictionary = NULL;
+        m_dictionary.reset();
 
         // Query to see if we can get another service.
         std::vector<ServiceReference<IDictionaryService> > refs;
@@ -213,7 +213,7 @@ private:
   ServiceReference<IDictionaryService> m_ref;
 
   // The service object being used
-  IDictionaryService* m_dictionary;
+  std::shared_ptr<IDictionaryService> m_dictionary;
 };
 
 }

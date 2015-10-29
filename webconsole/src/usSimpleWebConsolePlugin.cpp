@@ -75,7 +75,7 @@ SimpleWebConsolePlugin* SimpleWebConsolePlugin::Register(BundleContext* context)
   {
     props[WebConsoleConstants::PLUGIN_CATEGORY()] = GetCategory();
   }
-  m_Reg = context->RegisterService<HttpServlet>(this, props);
+    m_Reg = context->RegisterService<HttpServlet>(shared_from_this(), props);
   m_Context = context;
   return this;
 }

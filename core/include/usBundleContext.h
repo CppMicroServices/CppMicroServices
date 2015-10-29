@@ -229,7 +229,7 @@ public:
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class ...Interfaces, class Impl>
-  ServiceRegistration<I1, Interfaces...> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<I1, Interfaces...> RegisterService(std::shared_ptr<Impl> impl, const ServiceProperties& properties = ServiceProperties())
   {
     InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(impl);
     return RegisterService(servicePointers, properties);
@@ -263,7 +263,7 @@ public:
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class ...Interfaces>
-  ServiceRegistration<I1, Interfaces...> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<I1, Interfaces...> RegisterService(std::shared_ptr<ServiceFactory> factory, const ServiceProperties& properties = ServiceProperties())
   {
     InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(factory);
     return RegisterService(servicePointers, properties);
@@ -461,7 +461,7 @@ public:
    * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
-  void* GetService(const ServiceReferenceBase& reference);
+  std::shared_ptr<void> GetService(const ServiceReferenceBase& reference);
 
   InterfaceMap GetService(const ServiceReferenceU& reference);
 
@@ -486,10 +486,10 @@ public:
    * @see ServiceFactory
    */
   template<class S>
-  S* GetService(const ServiceReference<S>& reference)
+  std::shared_ptr<S> GetService(const ServiceReference<S>& reference)
   {
     const ServiceReferenceBase& baseRef = reference;
-    return reinterpret_cast<S*>(GetService(baseRef));
+    return std::static_pointer_cast<S>(GetService(baseRef));
   }
 
   /**

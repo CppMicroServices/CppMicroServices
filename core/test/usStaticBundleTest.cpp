@@ -191,7 +191,7 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   BundleContext* mc = framework->GetBundleContext();
@@ -209,8 +209,6 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
     frame030b(mc, listener);
     frame040c(mc, listener);
   }
-
-  delete framework;
 
   US_TEST_END()
 }

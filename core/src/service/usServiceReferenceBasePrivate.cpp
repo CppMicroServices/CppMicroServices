@@ -54,7 +54,7 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 }
 
 InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
-                                                                ServiceFactory* factory,
+                                                                std::shared_ptr<ServiceFactory> factory,
                                                                 bool isBundleScope)
 {
   assert(factory && "Factory service pointer is NULL");
@@ -108,24 +108,24 @@ InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bundle)
     T::Lock l(registration->propsLock);
     if (registration->available)
     {
-      ServiceFactory* factory = reinterpret_cast<ServiceFactory*>(
-            registration->GetService("org.cppmicroservices.factory"));
+      std::shared_ptr<ServiceFactory> factory = std::static_pointer_cast<ServiceFactory>(
+                                                  registration->GetService("org.cppmicroservices.factory"));
       s = GetServiceFromFactory(bundle, factory, false);
     }
   }
   return s;
 }
 
-void* ServiceReferenceBasePrivate::GetService(Bundle* bundle)
+std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(Bundle* bundle)
 {
-  void* s = NULL;
+  std::shared_ptr<void> s;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
     T::Lock l(registration->propsLock);
     if (registration->available)
     {
-      ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
-            registration->GetService("org.cppmicroservices.factory"));
+      std::shared_ptr<ServiceFactory> serviceFactory = std::static_pointer_cast<ServiceFactory>(
+                                                         registration->GetService("org.cppmicroservices.factory"));
 
       const int count = registration->dependents[bundle];
       if (count == 0)
@@ -170,8 +170,8 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
     T::Lock l(registration->propsLock);
     if (registration->available)
     {
-      ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(
-            registration->GetService("org.cppmicroservices.factory"));
+      std::shared_ptr<ServiceFactory> serviceFactory = std::static_pointer_cast<ServiceFactory>(
+                                                         registration->GetService("org.cppmicroservices.factory"));
 
       const int count = registration->dependents[bundle];
       if (count == 0)
@@ -228,8 +228,8 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
     {
       try
       {
-        ServiceFactory* sf = reinterpret_cast<ServiceFactory*>(
-                               registration->GetService("org.cppmicroservices.factory"));
+          std::shared_ptr<ServiceFactory> sf = std::static_pointer_cast<ServiceFactory>(
+                                                 registration->GetService("org.cppmicroservices.factory"));
         sf->UngetService(bundle, ServiceRegistrationBase(registration), service);
       }
       catch (const std::exception& /*e*/)
@@ -285,8 +285,8 @@ bool ServiceReferenceBasePrivate::UngetService(Bundle* bundle, bool checkRefCoun
     {
       try
       {
-        ServiceFactory* sf = reinterpret_cast<ServiceFactory*>(
-                               registration->GetService("org.cppmicroservices.factory"));
+          std::shared_ptr<ServiceFactory> sf = std::static_pointer_cast<ServiceFactory>(
+                                                 registration->GetService("org.cppmicroservices.factory"));
         sf->UngetService(bundle, ServiceRegistrationBase(registration), sfi);
       }
       catch (const std::exception& /*e*/)

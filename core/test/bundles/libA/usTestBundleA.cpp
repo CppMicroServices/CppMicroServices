@@ -32,24 +32,8 @@ namespace us {
 struct TestBundleA : public TestBundleAService
 {
 
-  TestBundleA(BundleContext* mc)
-  {
-    US_INFO << "Registering TestBundleAService";
-    sr = mc->RegisterService<TestBundleAService>(this);
-  }
-
-  void Unregister()
-  {
-    if (sr)
-    {
-      sr.Unregister();
-      sr = nullptr;
-    }
-  }
-
-private:
-
-  ServiceRegistration<TestBundleAService> sr;
+  TestBundleA() {}
+  virtual ~TestBundleA() {}
 
 };
 
@@ -58,20 +42,24 @@ class TestBundleAActivator : public BundleActivator
 public:
 
   TestBundleAActivator() : s(0) {}
-  ~TestBundleAActivator() { delete s; }
+  ~TestBundleAActivator() { }
 
   void Start(BundleContext* context)
   {
-    s = new TestBundleA(context);
+      s = std::make_shared<TestBundleA>();
+      US_INFO << "Registering TestBundleAService";
+      sr = context->RegisterService<TestBundleAService>(s);
   }
 
   void Stop(BundleContext*)
   {
+      sr.Unregister();
   }
 
 private:
 
-  TestBundleA* s;
+    std::shared_ptr<TestBundleA> s;
+    ServiceRegistration<TestBundleAService> sr;
 };
 
 }

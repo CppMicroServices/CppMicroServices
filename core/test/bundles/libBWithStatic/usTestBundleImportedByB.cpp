@@ -31,11 +31,8 @@ namespace us {
 struct TestBundleImportedByB : public TestBundleBService
 {
 
-  TestBundleImportedByB(BundleContext* mc)
-  {
-    US_INFO << "Registering TestBundleImportedByB";
-    mc->RegisterService<TestBundleBService>(this);
-  }
+  TestBundleImportedByB() {}
+  virtual ~TestBundleImportedByB() {}
 
 };
 
@@ -44,20 +41,23 @@ class TestBundleImportedByBActivator : public BundleActivator
 public:
 
   TestBundleImportedByBActivator() : s(0) {}
-  ~TestBundleImportedByBActivator() { delete s; }
+  ~TestBundleImportedByBActivator() { }
 
   void Start(BundleContext* context)
   {
-    s = new TestBundleImportedByB(context);
+    s = std::make_shared<TestBundleImportedByB>();
+    US_INFO << "Registering TestBundleImportedByB";
+    sr = context->RegisterService<TestBundleBService>(s);
   }
 
   void Stop(BundleContext*)
   {
+    sr.Unregister();
   }
 
 private:
-
-  TestBundleImportedByB* s;
+  std::shared_ptr<TestBundleImportedByB> s;
+  ServiceRegistration<TestBundleImportedByB> sr;
 };
 
 }

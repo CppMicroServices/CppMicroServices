@@ -30,7 +30,7 @@ SingletonOne::~SingletonOne()
 //![s1d]
 
 //![ss1gi]
-SingletonOneService* SingletonOneService::GetInstance()
+std::shared_ptr<SingletonOneService> SingletonOneService::GetInstance()
 {
   static ServiceReference<SingletonOneService> serviceRef;
   static BundleContext* context = GetBundleContext();
@@ -62,7 +62,7 @@ SingletonOneService* SingletonOneService::GetInstance()
 SingletonOneService::SingletonOneService()
   : a(1)
 {
-  SingletonTwoService* singletonTwoService = SingletonTwoService::GetInstance();
+  std::shared_ptr<SingletonTwoService> singletonTwoService = SingletonTwoService::GetInstance();
   assert(singletonTwoService != nullptr);
   std::cout << "SingletonTwoService::b = " << singletonTwoService->b << std::endl;
 }
@@ -70,7 +70,7 @@ SingletonOneService::SingletonOneService()
 //![ss1d]
 SingletonOneService::~SingletonOneService()
 {
-  SingletonTwoService* singletonTwoService = SingletonTwoService::GetInstance();
+  std::shared_ptr<SingletonTwoService> singletonTwoService = SingletonTwoService::GetInstance();
 
   // The bundle activator must ensure that a SingletonTwoService instance is
   // available during destruction of a SingletonOneService instance.

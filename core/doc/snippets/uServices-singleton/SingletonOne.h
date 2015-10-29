@@ -39,7 +39,7 @@ public:
   // time and returned a non-null value (which is usually the instance
   // which was registered first). A null-pointer is returned if no
   // instance was registered yet.
-  static SingletonOneService* GetInstance();
+  static std::shared_ptr<SingletonOneService> GetInstance();
 
   int a;
 

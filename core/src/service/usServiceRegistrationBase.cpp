@@ -194,7 +194,7 @@ void ServiceRegistrationBase::Unregister()
       InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
       if (d->bundle && factoryIter != d->service.end())
       {
-        ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
+        std::shared_ptr<ServiceFactory> serviceFactory = std::static_pointer_cast<ServiceFactory>(factoryIter->second);
         ServiceRegistrationBasePrivate::BundleToServicesMap::const_iterator end = d->prototypeServiceInstances.end();
 
         // unget all prototype services

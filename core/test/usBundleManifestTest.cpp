@@ -44,7 +44,7 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleManifestTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   InstallTestBundle(framework->GetBundleContext(), "TestBundleM");
@@ -78,8 +78,6 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(any_cast<int>(m["number"]) == 4, "map 1 value")
   US_TEST_CONDITION_REQUIRED(m["list"].Type() == typeid(std::vector<Any>), "map 2 type")
   US_TEST_CONDITION_REQUIRED(any_cast<std::vector<Any> >(m["list"]).size() == 2, "map 2 value size")
-
-  delete framework;
 
   US_TEST_END()
 }

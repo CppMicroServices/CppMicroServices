@@ -52,13 +52,13 @@ protected:
   ServiceObjectsBase& operator=(const ServiceObjectsBase& other);
 
   // Called by ServiceObjects<S> with S != void
-  void* GetService() const;
+  std::shared_ptr<void> GetService() const;
 
   // Called by the ServiceObjects<void> specialization
   InterfaceMap GetServiceInterfaceMap() const;
 
   // Called by ServiceObjects<S> with S != void
-  void UngetService(void* service);
+  void UngetService(std::shared_ptr<void> service);
 
   // Called by the ServiceObjects<void> specialization
   void UngetService(const InterfaceMap& interfaceMap);
@@ -125,9 +125,9 @@ public:
    *
    * @see UngetService()
    */
-  S* GetService() const
+  std::shared_ptr<S> GetService() const
   {
-    return reinterpret_cast<S*>(this->ServiceObjectsBase::GetService());
+    return std::static_pointer_cast<S>(this->ServiceObjectsBase::GetService());
   }
 
   /**
@@ -161,9 +161,9 @@ public:
    *
    * @see GetService()
    */
-  void UngetService(S* service)
+  void UngetService(std::shared_ptr<S> service)
   {
-    this->ServiceObjectsBase::UngetService(service);
+    this->ServiceObjectsBase::UngetService(std::static_pointer_cast<void>(service));
   }
 
   /**

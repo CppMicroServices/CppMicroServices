@@ -105,7 +105,7 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
   return d->bundle->coreCtx->services.Get(d->bundle, clazz);
 }
 
-void* BundleContext::GetService(const ServiceReferenceBase& reference)
+std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& reference)
 {
   if (!reference)
   {

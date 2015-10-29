@@ -62,7 +62,7 @@ void testResourceOperators(Bundle* bundle)
   US_TEST_CONDITION_REQUIRED(resources.size() == 1, "Check resource count")
 }
 
-void testResourcesWithStaticImport(Framework* framework, Bundle* bundle)
+void testResourcesWithStaticImport(std::shared_ptr<Framework> framework, Bundle* bundle)
 {
   BundleResource resource = bundle->GetResource("res.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid res.txt resource")
@@ -109,7 +109,7 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleResourceTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   assert(framework->GetBundleContext());
@@ -143,8 +143,6 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   bundle->Stop();
   US_TEST_CONDITION_REQUIRED(resource.IsValid() == true, "Check still valid static.txt resource")
-
-  delete framework;
 
   US_TEST_END()
 }

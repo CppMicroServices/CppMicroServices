@@ -40,7 +40,7 @@ public:
   ServiceReferenceBase m_reference;
 
   // This is used by all ServiceObjects<S> instances with S != void
-  std::map<void*, InterfaceMap> m_serviceInstances;
+  std::map<std::shared_ptr<void>, InterfaceMap> m_serviceInstances;
   // This is used by ServiceObjects<void>
   std::set<InterfaceMap> m_serviceInterfaceMaps;
 
@@ -80,7 +80,7 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
   ++d->ref;
 }
 
-void* ServiceObjectsBase::GetService() const
+std::shared_ptr<void> ServiceObjectsBase::GetService() const
 {
   if (!d->m_reference)
   {
@@ -88,7 +88,7 @@ void* ServiceObjectsBase::GetService() const
   }
 
   InterfaceMap im = d->GetServiceInterfaceMap();
-  void* result = im.find(d->m_reference.GetInterfaceId())->second;
+  std::shared_ptr<void> result = im.find(d->m_reference.GetInterfaceId())->second;
 
   if (result)
   {
@@ -114,14 +114,14 @@ InterfaceMap ServiceObjectsBase::GetServiceInterfaceMap() const
   return result;
 }
 
-void ServiceObjectsBase::UngetService(void* service)
+void ServiceObjectsBase::UngetService(std::shared_ptr<void> service)
 {
   if (service == NULL)
   {
     return;
   }
 
-  std::map<void*,InterfaceMap>::iterator serviceIter = d->m_serviceInstances.find(service);
+  std::map<std::shared_ptr<void>,InterfaceMap>::iterator serviceIter = d->m_serviceInstances.find(service);
   if (serviceIter == d->m_serviceInstances.end())
   {
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");

@@ -76,6 +76,13 @@ struct TrackedTypeTraitsBase
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
     //return TTT::DefaultValue();
   }
+  
+  // Needed for S != void
+  static TrackedType ConvertToTrackedType(std::shared_ptr<void> /*s*/)
+  {
+    throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+    //return TTT::DefaultValue();
+  }
 };
 
 /// \cond
@@ -117,26 +124,26 @@ struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTrai
 
 /// \cond
 template<class S>
-struct TrackedTypeTraits<S,S*>
+struct TrackedTypeTraits<S, std::shared_ptr<S>>
 {
-  typedef S* TrackedType;
+  typedef std::shared_ptr<S> TrackedType;
 
   static bool IsValid(const TrackedType& t)
   {
-    return t != NULL;
+    return t.get() != nullptr;
   }
 
   static TrackedType DefaultValue()
   {
-    return NULL;
+    return TrackedType();
   }
 
   static void Dispose(TrackedType& t)
   {
-    t = nullptr;
+    t.reset();
   }
 
-  static TrackedType ConvertToTrackedType(S* s)
+  static TrackedType ConvertToTrackedType(std::shared_ptr<S> s)
   {
     return s;
   }
@@ -151,7 +158,7 @@ struct TrackedTypeTraits<S,S*>
  * return either S* or InterfaceMap dependening on the template parameter.
  */
 template<>
-struct TrackedTypeTraits<void,void*>
+struct TrackedTypeTraits<void, std::shared_ptr<void> >
 {
   typedef InterfaceMap TrackedType;
 
@@ -229,7 +236,7 @@ struct TrackedTypeTraits<void,void*>
  *
  * @remarks This class is thread safe.
  */
-template<class S, class TTT = TrackedTypeTraits<S,S*> >
+template<class S, class TTT = TrackedTypeTraits<S, std::shared_ptr<S> > >
 class ServiceTracker : protected ServiceTrackerCustomizer<S,typename TTT::TrackedType>
 {
 public:
@@ -241,7 +248,7 @@ public:
 
   typedef ServiceReference<S> ServiceReferenceType;
 
-  typedef std::map<ServiceReference<S>,T> TrackingMap;
+  typedef std::map<ServiceReferenceType,T> TrackingMap;
 
   ~ServiceTracker();
 

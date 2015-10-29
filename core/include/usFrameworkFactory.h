@@ -27,6 +27,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 
 namespace us {
 
@@ -54,7 +55,7 @@ public:
      *
      * @return A new, configured Framework instance.
      */
-    Framework* NewFramework(std::map<std::string, std::string> configuration);
+    std::shared_ptr<Framework> NewFramework(std::map<std::string, std::string> configuration);
 
     /**
     * Create a new Framework instance.
@@ -63,7 +64,7 @@ public:
     *
     * @return A new, configured Framework instance.
     */
-    Framework* NewFramework(void);
+    std::shared_ptr<Framework> NewFramework(void);
 
 private:
     FrameworkFactory(const FrameworkFactory& );

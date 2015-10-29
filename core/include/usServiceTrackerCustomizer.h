@@ -60,7 +60,7 @@ namespace us {
  * \tparam T The type of the tracked object.
  * \remarks This class is thread safe.
  */
-template<class S, class T = S*>
+template<class S, class T = std::shared_ptr<S>>
 struct ServiceTrackerCustomizer {
 
   typedef S ServiceType;

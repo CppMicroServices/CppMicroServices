@@ -48,7 +48,7 @@ namespace
 #endif
     }
 
-    void TestSerial(Framework* f)
+    void TestSerial(std::shared_ptr<Framework> f)
     {
         // Installing such a small set of bundles doesn't yield significant
         // data about performance. Consider increasing the number of bundles
@@ -87,7 +87,7 @@ namespace
     }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-    void TestConcurrent(Framework* f)
+    void TestConcurrent(std::shared_ptr<Framework> f)
     {
         // This is by no means a "real world" example. At best it is a simulation to test
         // the performance of concurrent access to the bundle registry.
@@ -118,7 +118,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_BEGIN("BundleRegistryPerformanceTest")
 
     FrameworkFactory factory;
-    Framework* framework = factory.NewFramework();
+    std::shared_ptr<Framework> framework = factory.NewFramework();
     framework->Start();
 
     // auto-installing will skew the benchmark results.
@@ -140,7 +140,6 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 #endif
 
     framework->Stop();
-    delete framework;
 
     US_TEST_END()
 }

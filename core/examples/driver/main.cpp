@@ -79,7 +79,7 @@ int main(int /*argc*/, char** /*argv*/)
   char cmd[256];
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   std::vector<std::string> availableBundles = GetExampleBundles();

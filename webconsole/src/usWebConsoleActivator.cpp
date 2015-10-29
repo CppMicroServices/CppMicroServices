@@ -38,23 +38,25 @@ public:
 
 private:
 
-  HttpServlet* m_WebConsoleServlet;
+  std::shared_ptr<HttpServlet> m_WebConsoleServlet;
 
-  SettingsPlugin m_SettingsPlugin;
-  ServicesPlugin m_ServicesPlugin;
+  std::shared_ptr<SettingsPlugin> m_SettingsPlugin;
+  std::shared_ptr<ServicesPlugin> m_ServicesPlugin;
 };
 
 void WebConsoleActivator::Start(us::BundleContext* context)
 {
-  m_WebConsoleServlet = new WebConsoleServlet();
+  m_SettingsPlugin.reset(new SettingsPlugin);
+  m_ServicesPlugin.reset(new ServicesPlugin);
+  m_WebConsoleServlet.reset(new WebConsoleServlet());
   us::ServiceProperties props;
   props[HttpServlet::PROP_CONTEXT_ROOT()] = std::string("/console");
   context->RegisterService<HttpServlet>(m_WebConsoleServlet, props);
 
   std::cout << "****** Registering WebConsoleServlet at /console" << std::endl;
 
-  m_SettingsPlugin.Register();
-  m_ServicesPlugin.Register();
+  m_SettingsPlugin->Register();
+  m_ServicesPlugin->Register();
 
 //  server->addHandler("/Console/bundles/", new BundlesHtml(context));
 //  server->addHandler("/Console/resources/", new ResourcesHtml(context));

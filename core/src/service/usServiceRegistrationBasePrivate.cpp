@@ -55,7 +55,7 @@ const InterfaceMap& ServiceRegistrationBasePrivate::GetInterfaces() const
   return service;
 }
 
-void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
 {
   if (interfaceId.empty() && service.size() > 0)
   {

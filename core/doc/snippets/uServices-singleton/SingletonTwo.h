@@ -27,7 +27,7 @@ class SingletonTwoService
 {
 public:
 
-  static SingletonTwoService* GetInstance();
+  static std::shared_ptr<SingletonTwoService> GetInstance();
 
   int b;
 

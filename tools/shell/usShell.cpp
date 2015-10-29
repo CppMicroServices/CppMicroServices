@@ -52,7 +52,7 @@ const option::Descriptor usage[] =
   {0,0,0,0,0,0}
  };
 
-static ShellService* g_ShellService = NULL;
+static std::shared_ptr<ShellService> g_ShellService;
 
 void shellCompletion(const char* buf, linenoiseCompletions* lc)
 {
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
   linenoiseSetCompletionCallback(shellCompletion);
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
   BundleContext* context = framework->GetBundleContext();
 
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  ShellService* shellService = NULL;
+  std::shared_ptr<ShellService> shellService;
   ServiceReference<ShellService> ref = context->GetServiceReference<ShellService>();
   if (ref)
   {

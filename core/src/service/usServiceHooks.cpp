@@ -46,7 +46,7 @@ ServiceHooks::~ServiceHooks()
 
 ServiceHooks::TrackedType ServiceHooks::AddingService(const ServiceReferenceType& reference)
 {
-  ServiceListenerHook* lh = GetBundleContext()->GetService(reference);
+  std::shared_ptr<ServiceListenerHook> lh = GetBundleContext()->GetService(reference);
   try
   {
     lh->Added(coreCtx->listeners.GetListenerInfoCollection());
@@ -117,7 +117,7 @@ void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string&
          fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-      ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
+      std::shared_ptr<ServiceFindHook> fh = std::static_pointer_cast<ServiceFindHook>(sr.d->GetService(GetBundleContext()->GetBundle()));
       if (fh != NULL)
       {
         try
@@ -167,7 +167,7 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
         sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
-      ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
+      std::shared_ptr<ServiceEventListenerHook> elh = std::static_pointer_cast<ServiceEventListenerHook>(sr.d->GetService(GetBundleContext()->GetBundle()));
       if(elh != NULL)
       {
         try
@@ -214,7 +214,7 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
     for (std::vector<ServiceReference<ServiceListenerHook> >::reverse_iterator srIter = srl.rbegin(),
          srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
-      ServiceListenerHook* lh = listenerHookTracker->GetService(*srIter);
+      std::shared_ptr<ServiceListenerHook> lh = listenerHookTracker->GetService(*srIter);
       try
       {
         lh->Added(set);
@@ -266,7 +266,7 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
     for (std::vector<ServiceReference<ServiceListenerHook> >::reverse_iterator srIter = srl.rbegin(),
          srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
-      ServiceListenerHook* const lh = listenerHookTracker->GetService(*srIter);
+      std::shared_ptr<ServiceListenerHook> lh = listenerHookTracker->GetService(*srIter);
       try
       {
         lh->Removed(lis);

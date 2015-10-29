@@ -89,7 +89,7 @@ void ServiceTracker<S,TTT>::Open()
       return;
     }
 
-    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->filter;
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->listenerFilter;
 
     t = new _TrackedService(this, d->customizer);
     {

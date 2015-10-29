@@ -113,7 +113,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
   US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
 
   ServiceObjects<TestBundleH2> svcObjects = mc->GetServiceObjects(sr1);
-  TestBundleH2* prototypeServiceH2 = svcObjects.GetService();
+  std::shared_ptr<TestBundleH2> prototypeServiceH2 = svcObjects.GetService();
 
   const ServiceReferenceU sr1void = mc->GetServiceReference(us_service_interface_iid<TestBundleH2>());
   ServiceObjects<void> svcObjectsVoid = mc->GetServiceObjects(sr1void);
@@ -126,7 +126,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
   US_TEST_CONDITION_REQUIRED(mc->GetBundle()->GetServicesInUse().size() == 1, "services in use")
 #endif
 
-  TestBundleH2* bundleScopeService = mc->GetService(sr1);
+  std::shared_ptr<TestBundleH2> bundleScopeService = mc->GetService(sr1);
   US_TEST_CONDITION_REQUIRED(bundleScopeService && bundleScopeService != prototypeServiceH2, "GetService()")
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2 != prototypeServiceH2Void.find(us_service_interface_iid<TestBundleH2>())->second,
@@ -134,7 +134,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
 
   svcObjectsVoid.UngetService(prototypeServiceH2Void);
 
-  TestBundleH2* bundleScopeService2 = mc->GetService(sr1);
+  std::shared_ptr<TestBundleH2> bundleScopeService2 = mc->GetService(sr1);
   US_TEST_CONDITION(bundleScopeService == bundleScopeService2, "Same service pointer")
 
 #ifdef US_BUILD_SHARED_LIBS
@@ -179,7 +179,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
 
   svcObjects2.UngetService(prototypeServiceH2);
   prototypeServiceH2 = svcObjects2.GetService();
-  TestBundleH2* prototypeServiceH2_2 = svcObjects3.GetService();
+  std::shared_ptr<TestBundleH2> prototypeServiceH2_2 = svcObjects3.GetService();
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2_2 && prototypeServiceH2_2 != prototypeServiceH2, "prototype service")
 
@@ -196,13 +196,11 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceFactoryTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   TestServiceFactoryBundleScope(framework->GetBundleContext());
   TestServiceFactoryPrototypeScope(framework->GetBundleContext());
-
-  delete framework;
 
   US_TEST_END()
 }

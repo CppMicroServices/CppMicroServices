@@ -51,7 +51,7 @@ private:
 
   void Open();
 
-  HttpServlet* AddingService(const ServiceReferenceType& reference);
+  std::shared_ptr<HttpServlet> AddingService(const ServiceReferenceType& reference);
 
   void AddPlugin(const std::string& label, AbstractWebConsolePlugin* plugin);
 

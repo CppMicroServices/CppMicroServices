@@ -53,50 +53,51 @@ limitations under the License.
 
 namespace us {
 
-    class HighPrecisionTimer
-    {
+class HighPrecisionTimer
+{
 
-    public:
+public:
 
-        HighPrecisionTimer();
+    HighPrecisionTimer();
 
-        void Start();
+    void Start();
 
-        long long ElapsedMilli();
+    long long ElapsedMilli();
 
-        long long ElapsedMicro();
+    long long ElapsedMicro();
 
-    private:
+private:
 
 #ifdef US_PLATFORM_APPLE
-        static double timeConvert;
-        uint64_t startTime;
+    static double timeConvert;
+    uint64_t startTime;
 #elif defined(US_PLATFORM_POSIX)
-        timespec startTime;
+    timespec startTime;
 #elif defined(US_PLATFORM_WINDOWS)
-        LARGE_INTEGER timerFrequency;
-        LARGE_INTEGER startTime;
+    LARGE_INTEGER timerFrequency;
+    LARGE_INTEGER startTime;
 #endif
-    };
+};
 
-    // Helper function to install bundles, given a framework's bundle context and the name of the bundle.
-    // Assumes that test bundles are within the same directory during unit testing.
-    // Currently limited to only installing bundles with the same physical filename
-    // and logical bundle name (e.g. TestBundleA.dll/TestBundleA).
-    Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
+// Helper function to install bundles, given a framework's bundle context and the name of the bundle.
+// Assumes that test bundles are within the same directory during unit testing.
+// Currently limited to only installing bundles with the same physical filename
+// and logical bundle name (e.g. TestBundleA.dll/TestBundleA).
+Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
 
-    // Copied from usUtils_p.h/usUtils.cpp
-    // Place in a different namespace to avoid duplicate symbol errors.
-    namespace testing {
+// Copied from usUtils_p.h/usUtils.cpp
+// Place in a different namespace to avoid duplicate symbol errors.
+namespace testing {
 
-        // A convenient way to construct a shared_ptr holding an array
-        template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
-        {
-            return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
-        }
+// A convenient way to construct a shared_ptr holding an array
+template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
+{
+  return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
+}
 
-        std::string GetCurrentWorkingDirectory();
-    }
+std::string GetCurrentWorkingDirectory();
+}
+
 }
 
 #endif  // USTESTUTILS_H

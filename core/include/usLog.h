@@ -72,35 +72,35 @@ private:
 
 class US_Core_EXPORT Logger : MultiThreaded<> {
 public:
-    static Logger& instance();
+  static Logger& instance();
 
-    /**
-    * Set the logging level for log messages from CppMicroServices bundles.
-    *
-    * Higher logging levels will discard messages with lower priority.
-    * E.g. a logging level of WarningMsg will discard all messages of
-    * type DebugMsg and InfoMsg.
-    *
-    * @param level The new logging level.
-    */
-    void SetLogLevel(const MsgType level);
+  /**
+   * Set the logging level for log messages from CppMicroServices bundles.
+   *
+   * Higher logging levels will discard messages with lower priority.
+   * E.g. a logging level of WarningMsg will discard all messages of
+   * type DebugMsg and InfoMsg.
+   *
+   * @param level The new logging level.
+   */
+  void SetLogLevel(const MsgType level);
 
-    /**
-    * Get the current logging level.
-    *
-    * @return The currently used logging level.
-    */
-    MsgType GetLogLevel();
+  /**
+   * Get the current logging level.
+   *
+   * @return The currently used logging level.
+   */
+  MsgType GetLogLevel();
 
 private:
-    Logger(void);
-    ~Logger();
+  Logger(void);
+  ~Logger();
 
-    MsgType logLevel;
+  MsgType logLevel;
 
-    // disable copy/assignment
-    Logger(const Logger&) = delete;
-    Logger& operator=(const Logger&) = delete;
+  // disable copy/assignment
+  Logger(const Logger&) = delete;
+  Logger& operator=(const Logger&) = delete;
 };
 
 }

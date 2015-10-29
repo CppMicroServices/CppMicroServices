@@ -140,30 +140,32 @@ Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundle
 }
 
 namespace testing {
-    std::string GetCurrentWorkingDirectory()
-    {
+
+std::string GetCurrentWorkingDirectory()
+{
 #ifdef US_PLATFORM_WINDOWS
-        DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
-        if (bufSize == 0) bufSize = 1;
-        std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-        if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
-        {
-            return std::string(buf.get());
-        }
+  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
+  if (bufSize == 0) bufSize = 1;
+  std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
+  if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
+  {
+    return std::string(buf.get());
+  }
 #else
-        std::size_t bufSize = PATH_MAX;
-        for (;; bufSize *= 2)
-        {
-            std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-            errno = 0;
-            if (getcwd(buf.get(), bufSize) != 0 && errno != ERANGE)
-            {
-                return std::string(buf.get());
-            }
-        }
-#endif
-        return std::string();
+  std::size_t bufSize = PATH_MAX;
+  for (;; bufSize *= 2)
+  {
+    std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
+    errno = 0;
+    if (getcwd(buf.get(), bufSize) != 0 && errno != ERANGE)
+    {
+      return std::string(buf.get());
     }
+  }
+#endif
+  return std::string();
+}
+
 }
 
 }

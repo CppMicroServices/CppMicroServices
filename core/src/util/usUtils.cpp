@@ -257,149 +257,149 @@ std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundl
 
 namespace us {
 
-    std::string GetCurrentWorkingDirectory()
-    {
+std::string GetCurrentWorkingDirectory()
+{
 #ifdef US_PLATFORM_WINDOWS
-        DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
-        if (bufSize == 0) bufSize = 1;
-        std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-        if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
-        {
-          return std::string(buf.get());
-        }
+  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
+  if (bufSize == 0) bufSize = 1;
+  std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
+  if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
+  {
+    return std::string(buf.get());
+  }
 #else
-        std::size_t bufSize = PATH_MAX;
-        for(;; bufSize *= 2)
-        {
-            std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-            errno = 0;
-            if (getcwd(buf.get(), bufSize) != 0 && errno != ERANGE)
-            {
-              return std::string(buf.get());
-            }
-        }
-#endif
-        return std::string();
+  std::size_t bufSize = PATH_MAX;
+  for(;; bufSize *= 2)
+  {
+    std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
+    errno = 0;
+    if (getcwd(buf.get(), bufSize) != 0 && errno != ERANGE)
+    {
+      return std::string(buf.get());
     }
+  }
+#endif
+  return std::string();
+}
 
 //-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------
 
-    std::string GetLastErrorStr()
-    {
+std::string GetLastErrorStr()
+{
 #ifdef US_PLATFORM_POSIX
-      return std::string(strerror(errno));
+  return std::string(strerror(errno));
 #else
-      // Retrieve the system error message for the last-error code
-      LPVOID lpMsgBuf;
-      DWORD dw = GetLastError();
+  // Retrieve the system error message for the last-error code
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError();
 
-      FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dw,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &lpMsgBuf,
-        0, NULL );
+  FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
+    FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    dw,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPTSTR) &lpMsgBuf,
+    0, NULL );
 
-      std::string errMsg((LPCTSTR)lpMsgBuf);
+  std::string errMsg((LPCTSTR)lpMsgBuf);
 
-      LocalFree(lpMsgBuf);
+  LocalFree(lpMsgBuf);
 
-      return errMsg;
+  return errMsg;
 #endif
-    }
+}
 
-    static MsgHandler handler = 0;
+static MsgHandler handler = 0;
 
-    MsgHandler installMsgHandler(MsgHandler h)
-    {
-      MsgHandler old = handler;
-      handler = h;
-      return old;
-    }
+MsgHandler installMsgHandler(MsgHandler h)
+{
+  MsgHandler old = handler;
+  handler = h;
+  return old;
+}
 
-    void message_output(MsgType msgType, const char *buf)
-    {
-      if (handler)
-      {
-        (*handler)(msgType, buf);
-      }
-      else
-      {
-        fprintf(stderr, "%s\n", buf);
-        fflush(stderr);
-      }
+void message_output(MsgType msgType, const char *buf)
+{
+  if (handler)
+  {
+    (*handler)(msgType, buf);
+  }
+  else
+  {
+    fprintf(stderr, "%s\n", buf);
+    fflush(stderr);
+  }
 
-      if (msgType == ErrorMsg)
-      {
+  if (msgType == ErrorMsg)
+  {
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
-        // get the current report mode
-        int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
-        _CrtSetReportMode(_CRT_ERROR, reportMode);
-        int ret = _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, CppMicroServices_VERSION_STR, buf);
-        if (ret == 0  && reportMode & _CRTDBG_MODE_WNDW)
-          return; // ignore
-        else if (ret == 1)
-          _CrtDbgBreak();
+    // get the current report mode
+    int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
+    _CrtSetReportMode(_CRT_ERROR, reportMode);
+    int ret = _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, CppMicroServices_VERSION_STR, buf);
+    if (ret == 0  && reportMode & _CRTDBG_MODE_WNDW)
+      return; // ignore
+    else if (ret == 1)
+      _CrtDbgBreak();
 #endif
 
 #ifdef US_PLATFORM_POSIX
-        abort(); // trap; generates core dump
+  abort(); // trap; generates core dump
 #else
-        exit(1); // goodbye cruel world
+  exit(1); // goodbye cruel world
 #endif
-      }
-    }
+  }
+}
 
 #ifdef US_HAVE_CXXABI_H
 #include <cxxabi.h>
 #endif
 
-    US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& typeInfo)
-    {
-      ::std::string result;
+US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& typeInfo)
+{
+  ::std::string result;
 #ifdef US_HAVE_CXXABI_H
-      int status = 0;
-      char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);
-      if (demangled && status == 0)
-      {
-        result = demangled;
-        free(demangled);
-      }
+  int status = 0;
+  char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);
+  if (demangled && status == 0)
+  {
+    result = demangled;
+    free(demangled);
+  }
 #elif defined(US_PLATFORM_WINDOWS)
-      const char* demangled = typeInfo.name();
-      if (demangled != NULL)
+  const char* demangled = typeInfo.name();
+  if (demangled != NULL)
+  {
+    result = demangled;
+    // remove "struct" qualifiers
+    std::size_t pos = 0;
+    while (pos != std::string::npos)
+    {
+      if ((pos = result.find("struct ", pos)) != std::string::npos)
       {
-        result = demangled;
-        // remove "struct" qualifiers
-        std::size_t pos = 0;
-        while (pos != std::string::npos)
-        {
-          if ((pos = result.find("struct ", pos)) != std::string::npos)
-          {
-            result = result.substr(0, pos) + result.substr(pos + 7);
-            pos += 8;
-          }
-        }
-        // remove "class" qualifiers
-        pos = 0;
-        while (pos != std::string::npos)
-        {
-          if ((pos = result.find("class ", pos)) != std::string::npos)
-          {
-            result = result.substr(0, pos) + result.substr(pos + 6);
-            pos += 7;
-          }
-        }
+        result = result.substr(0, pos) + result.substr(pos + 7);
+        pos += 8;
       }
-#else
-      (void)typeInfo;
-#endif
-      return result;
     }
+    // remove "class" qualifiers
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+      if ((pos = result.find("class ", pos)) != std::string::npos)
+      {
+        result = result.substr(0, pos) + result.substr(pos + 6);
+        pos += 7;
+      }
+    }
+  }
+#else
+  (void)typeInfo;
+#endif
+  return result;
+}
 
 }

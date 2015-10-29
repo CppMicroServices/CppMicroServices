@@ -27,42 +27,42 @@ limitations under the License.
 
 namespace us {
 
-    FrameworkPrivate::FrameworkPrivate(void) :
-        coreBundleContext(),
-        initialized(false)
-    {
-        Init();
-    }
+FrameworkPrivate::FrameworkPrivate(void) :
+    coreBundleContext(),
+    initialized(false)
+{
+  Init();
+}
 
-    FrameworkPrivate::FrameworkPrivate(const std::map<std::string, std::string>& configuration) :
-        coreBundleContext(),
-        initialized(false)
-    {
-        coreBundleContext.frameworkProperties = configuration;
-        Init();
-    }
+FrameworkPrivate::FrameworkPrivate(const std::map<std::string, std::string>& configuration) :
+    coreBundleContext(),
+    initialized(false)
+{
+  coreBundleContext.frameworkProperties = configuration;
+  Init();
+}
 
-    FrameworkPrivate::~FrameworkPrivate()
-    {
-        initialized = false;
-    }
+FrameworkPrivate::~FrameworkPrivate()
+{
+  initialized = false;
+}
 
-    void FrameworkPrivate::Init()
-    {
-        // emplace cannot be used until the minimum GCC compiler is >= 4.8
-        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, GetCurrentWorkingDirectory()));
-        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_LOG_LEVEL, "3"));
+void FrameworkPrivate::Init()
+{
+    // emplace cannot be used until the minimum GCC compiler is >= 4.8
+    coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, GetCurrentWorkingDirectory()));
+    coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_LOG_LEVEL, "3"));
 
-        // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
-        // Run-time modification of the property should be ignored as it is irrelevant.
-        coreBundleContext.frameworkProperties.erase(Framework::PROP_THREADING_SUPPORT);
+    // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
+    // Run-time modification of the property should be ignored as it is irrelevant.
+    coreBundleContext.frameworkProperties.erase(Framework::PROP_THREADING_SUPPORT);
 #ifdef US_ENABLE_THREADING_SUPPORT
-        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "multi"));
+    coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "multi"));
 #else
-        coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "single"));
+    coreBundleContext.frameworkProperties.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "single"));
 #endif
 
-        Logger::instance().SetLogLevel(static_cast<us::MsgType>(std::stoul(coreBundleContext.frameworkProperties.find(Framework::PROP_LOG_LEVEL)->second)));
-    }
+    Logger::instance().SetLogLevel(static_cast<us::MsgType>(std::stoul(coreBundleContext.frameworkProperties.find(Framework::PROP_LOG_LEVEL)->second)));
+}
 
 }

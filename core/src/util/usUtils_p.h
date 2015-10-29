@@ -36,11 +36,11 @@
 
 namespace us {
 
-    std::string GetBundleNameFromLocation(const std::string& location);
+std::string GetBundleNameFromLocation(const std::string& location);
 
-    std::string GetBundleLocation(const std::string& location);
+std::string GetBundleLocation(const std::string& location);
 
-    bool IsSharedLibrary(const std::string& location);
+bool IsSharedLibrary(const std::string& location);
 
 }
 
@@ -50,10 +50,10 @@ namespace us {
 
 namespace us {
 
-    struct BundleInfo;
-    class CoreBundleContext;
+struct BundleInfo;
+class CoreBundleContext;
 
-    std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
+std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
 
 }
 
@@ -62,15 +62,16 @@ namespace us {
 //-------------------------------------------------------------------
 
 namespace us {
-    // A convenient way to construct a shared_ptr holding an array
-    template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
-    {
-        return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
-    }
 
-    // Platform agnostic way to get the current working directory.
-    // Supports Linux, Mac, and Windows.
-    std::string GetCurrentWorkingDirectory();
+// A convenient way to construct a shared_ptr holding an array
+template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
+{
+  return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
+}
+
+// Platform agnostic way to get the current working directory.
+// Supports Linux, Mac, and Windows.
+std::string GetCurrentWorkingDirectory();
 
 }
 
@@ -80,7 +81,7 @@ namespace us {
 
 namespace us {
 
-    US_Core_EXPORT std::string GetLastErrorStr();
+US_Core_EXPORT std::string GetLastErrorStr();
 
 }
 

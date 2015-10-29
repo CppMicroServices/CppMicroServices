@@ -295,15 +295,25 @@ std::string GetLastErrorStr()
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
 
-  FormatMessage(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER |
-    FORMAT_MESSAGE_FROM_SYSTEM |
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    dw,
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-    (LPTSTR) &lpMsgBuf,
-    0, NULL );
+  DWORD rc = FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                dw,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR) &lpMsgBuf,
+                0, NULL );
+
+  // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
+  // it means that the size of the error message exceeds an internal
+  // buffer limit (128 kb according to MSDN) and lpMsgBuf will be 
+  // uninitialized.
+  // Inform the caller that the error message couldn't be retrieved.
+  if (rc == 0)
+  {
+    return std::string("Failed to retrieve error message.");
+  }
 
   std::string errMsg((LPCTSTR)lpMsgBuf);
 

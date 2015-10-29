@@ -69,9 +69,9 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
   }
 
   // Check if we got version information and validate the version identifier
-  if (bundleManifest.Contains(Bundle::PROP_VERSION()))
+  if (bundleManifest.Contains(Bundle::PROP_VERSION))
   {
-    Any versionAny = bundleManifest.GetValue(Bundle::PROP_VERSION());
+    Any versionAny = bundleManifest.GetValue(Bundle::PROP_VERSION);
     std::string errMsg;
     if (versionAny.Type() != typeid(std::string))
     {
@@ -88,37 +88,37 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
 
     if (!errMsg.empty())
     {
-      throw std::invalid_argument(std::string("The Json value for ") + Bundle::PROP_VERSION() + " for bundle " +
+      throw std::invalid_argument(std::string("The Json value for ") + Bundle::PROP_VERSION + " for bundle " +
                                   info->location + " is not valid: " + errMsg);
     }
   }
 
   std::stringstream propId;
   propId << this->info.id;
-  bundleManifest.SetValue(Bundle::PROP_ID(), propId.str());
-  bundleManifest.SetValue(Bundle::PROP_LOCATION(), this->info.location);
+  bundleManifest.SetValue(Bundle::PROP_ID, propId.str());
+  bundleManifest.SetValue(Bundle::PROP_LOCATION, this->info.location);
 
-  if (!bundleManifest.Contains(Bundle::PROP_NAME()))
+  if (!bundleManifest.Contains(Bundle::PROP_NAME))
   {
-    throw std::runtime_error(Bundle::PROP_NAME() + " is not defined in the bundle manifest.");
+    throw std::runtime_error(Bundle::PROP_NAME + " is not defined in the bundle manifest.");
   }
 
-  Any bundleName(bundleManifest.GetValue(Bundle::PROP_NAME()));
+  Any bundleName(bundleManifest.GetValue(Bundle::PROP_NAME));
   if (bundleName.Empty())
   {
-    throw std::runtime_error(Bundle::PROP_NAME() + " is empty in the bundle manifest.");
+    throw std::runtime_error(Bundle::PROP_NAME + " is empty in the bundle manifest.");
   }
 
   this->info.name = bundleName.ToString();
 
-  if (bundleManifest.Contains(Bundle::PROP_AUTOLOAD_DIR()))
+  if (bundleManifest.Contains(Bundle::PROP_AUTOLOAD_DIR))
   {
-    this->info.autoLoadDir = bundleManifest.GetValue(Bundle::PROP_AUTOLOAD_DIR()).ToString();
+    this->info.autoLoadDir = bundleManifest.GetValue(Bundle::PROP_AUTOLOAD_DIR).ToString();
   }
   else
   {
     this->info.autoLoadDir = this->info.name;
-    bundleManifest.SetValue(Bundle::PROP_AUTOLOAD_DIR(), Any(this->info.autoLoadDir));
+    bundleManifest.SetValue(Bundle::PROP_AUTOLOAD_DIR, Any(this->info.autoLoadDir));
   }
 
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
@@ -127,7 +127,7 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
     const std::vector<std::string> installedBundleNames = AutoLoadBundles(this->info, this->coreCtx);
     if (!installedBundleNames.empty())
     {
-      bundleManifest.SetValue(Bundle::PROP_AUTOINSTALLED_BUNDLES(), Any(installedBundleNames));
+      bundleManifest.SetValue(Bundle::PROP_AUTOINSTALLED_BUNDLES, Any(installedBundleNames));
     }
   }
 #endif

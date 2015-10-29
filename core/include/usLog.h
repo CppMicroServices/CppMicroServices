@@ -29,6 +29,7 @@
 #include <iostream>
 #include <sstream>
 
+
 namespace us {
 
 US_Core_EXPORT void message_output(MsgType, const char* buf);
@@ -69,60 +70,37 @@ private:
   std::stringstream buffer;
 };
 
-class Logger : MultiThreaded<> {
+class US_Core_EXPORT Logger : MultiThreaded<> {
 public:
-    static Logger& instance()
-    { 
-      /* 
-      IMPORTANT: This is only thread safe if compiling with a C++11 compiler
-        which implements C++11 standard section 6.7.4:
-       "If control enters the declaration concurrently while the variable is being initialized, 
-        the concurrent execution shall wait for completion of the initialization."
+  static Logger& instance();
 
-        However, even if a C++11 supported compiler isn't used, thread safe initialization
-        of function local statics isn't a concern at the moment becasue this Logger
-        is used internally by the Framework and not instantiated in a concurrent fashion.
-       */
-      static Logger inst;
-      return inst;
-    }
+  /**
+   * Set the logging level for log messages from CppMicroServices bundles.
+   *
+   * Higher logging levels will discard messages with lower priority.
+   * E.g. a logging level of WarningMsg will discard all messages of
+   * type DebugMsg and InfoMsg.
+   *
+   * @param level The new logging level.
+   */
+  void SetLogLevel(const MsgType level);
 
-    /**
-    * Set the logging level for log messages from CppMicroServices bundles.
-    *
-    * Higher logging levels will discard messages with lower priority.
-    * E.g. a logging level of WarningMsg will discard all messages of
-    * type DebugMsg and InfoMsg.
-    *
-    * @param level The new logging level.
-    */
-    void SetLogLevel(const MsgType level)
-    {
-      Lock l(this);
-      logLevel = level;
-    }
-
-    /**
-    * Get the current logging level.
-    *
-    * @return The currently used logging level.
-    */
-    MsgType GetLogLevel()
-    {
-      Lock l(this);
-      return logLevel;
-    }
-
-protected:
-    Logger(void) : logLevel(DebugMsg) {}
-    ~Logger() {}
+  /**
+   * Get the current logging level.
+   *
+   * @return The currently used logging level.
+   */
+  MsgType GetLogLevel();
 
 private:
-    MsgType logLevel;
+  Logger(void);
+  ~Logger();
 
-    // disable copy/assignment
-    Logger(const Logger&);
-    Logger& operator=(const Logger&);
+  MsgType logLevel;
+
+  // disable copy/assignment
+  Logger(const Logger&) = delete;
+  Logger& operator=(const Logger&) = delete;
 };
 
 }

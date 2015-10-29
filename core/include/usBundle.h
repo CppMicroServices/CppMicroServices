@@ -87,76 +87,69 @@ public:
   Bundle& operator=(const Bundle&) = delete;
 
   /**
-   * Returns the property key for looking up this bundle's id.
+   * The property key for looking up this bundle's id.
    * The property value is of type \c long.
    *
-   * @return The id property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_ID();
+  static const std::string PROP_ID;
 
   /**
-   * Returns the property key for looking up this bundle's name.
+   * The property key for looking up this bundle's name.
    * The property value is of type \c std::string.
    *
-   * @return The name property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_NAME();
+  static const std::string PROP_NAME;
 
   /**
-   * Returns the property key for looking up this bundle's
-   * location in the file system.
+   * The property key for looking up this bundle's location in the file system.
    * The property value is of type \c std::string.
    *
-   * @return The location property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_LOCATION();
+  static const std::string PROP_LOCATION;
 
   /**
-   * Returns the property key with a value of \c bundle.version for looking
-   * up this bundle's version identifier.
+   * The property key for looking up this bundle's version identifier.
    * The property value is of type \c std::string.
    *
-   * @return The version property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_VERSION();
+  static const std::string PROP_VERSION;
 
   /**
-   * Returns the property key with a value of \c bundle.vendor for looking
-   * up this bundle's vendor information.
+   * The property key for looking up this bundle's vendor information.
    * The property value is of type \c std::string.
    *
-   * @return The vendor property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_VENDOR();
+  static const std::string PROP_VENDOR;
 
   /**
-   * Returns the property key with a value of \c bundle.description for looking
-   * up this bundle's description.
+   * The property key for looking up this bundle's description.
    * The property value is of type \c std::string.
    *
-   * @return The description property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_DESCRIPTION();
+  static const std::string PROP_DESCRIPTION;
 
   /**
-   * Returns the property key with a value of \c bundle.autoload_dir for looking
-   * up this bundle's auto-load directory.
+   * The property key for looking up this bundle's auto-load directory.
    * The property value is of type \c std::string.
    *
-   * @return The auto-load directory property key.
+   * @see \ref MicroServices_BundleProperties
    */
-  static const std::string& PROP_AUTOLOAD_DIR();
+  static const std::string PROP_AUTOLOAD_DIR;
 
   /**
-   * Returns the property key with a value of \c bundle.autoinstalled_bundles for
-   * looking up this bundle's auto-insall bundles.
+   * The property key for looking up this bundle's auto-insall bundles.
    * The property value is of type \c std::vector<std::string> and contains
    * the file system locations for the auto-installed bundles triggered by this
    * bundle.
    *
-   * @return The auto-installed bundles property key.
    */
-  static const std::string& PROP_AUTOINSTALLED_BUNDLES();
+  static const std::string PROP_AUTOINSTALLED_BUNDLES;
 
   virtual ~Bundle();
 
@@ -394,7 +387,7 @@ public:
    * -# A bundle event of BundleEvent::UNINSTALLED is fired.
    * -# This bundle and any persistent storage area provided for this bundle by the Framework are removed.
    *
-   * @throws std::runtime_error If the bundle could not be uninstalled.   *
+   * @throws std::runtime_error If the bundle could not be uninstalled.
    */
   virtual void Uninstall();
 

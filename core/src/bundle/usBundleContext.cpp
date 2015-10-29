@@ -28,6 +28,7 @@
 #include "usBundlePrivate.h"
 #include "usBundleSettings.h"
 #include "usCoreBundleContext_p.h"
+#include "usFramework.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
 #include "usUtils_p.h"
@@ -180,7 +181,7 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 #endif
   
   std::string baseStoragePath;
-  std::map<std::string, std::string>::iterator prop = d->bundle->coreCtx->frameworkProperties.find("org.osgi.framework.storage");
+  std::map<std::string, std::string>::iterator prop = d->bundle->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
   if(prop != d->bundle->coreCtx->frameworkProperties.end())
   { 
     baseStoragePath = (*prop).second;

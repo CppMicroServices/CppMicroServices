@@ -27,10 +27,13 @@ limitations under the License.
 #include "usBundleContext.h"
 
 #include <string>
+#include <memory>
 
 #ifdef US_PLATFORM_APPLE
 #include <mach/mach_time.h>
+#include <unistd.h>
 #elif defined(US_PLATFORM_POSIX)
+#include <limits.h>
 #include <time.h>
 #include <unistd.h>
 #ifndef _POSIX_MONOTONIC_CLOCK
@@ -81,6 +84,19 @@ private:
 // Currently limited to only installing bundles with the same physical filename
 // and logical bundle name (e.g. TestBundleA.dll/TestBundleA).
 Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
+
+// Copied from usUtils_p.h/usUtils.cpp
+// Place in a different namespace to avoid duplicate symbol errors.
+namespace testing {
+
+// A convenient way to construct a shared_ptr holding an array
+template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
+{
+  return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
+}
+
+std::string GetCurrentWorkingDirectory();
+}
 
 }
 

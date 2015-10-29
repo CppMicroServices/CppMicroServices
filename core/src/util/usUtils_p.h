@@ -28,6 +28,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 //-------------------------------------------------------------------
 // Bundle name and location parsing
@@ -53,6 +54,24 @@ struct BundleInfo;
 class CoreBundleContext;
 
 std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
+
+}
+
+//-------------------------------------------------------------------
+// Generic utility functions
+//-------------------------------------------------------------------
+
+namespace us {
+
+// A convenient way to construct a shared_ptr holding an array
+template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
+{
+  return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
+}
+
+// Platform agnostic way to get the current working directory.
+// Supports Linux, Mac, and Windows.
+std::string GetCurrentWorkingDirectory();
 
 }
 

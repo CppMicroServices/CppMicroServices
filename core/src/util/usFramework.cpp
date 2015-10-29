@@ -32,6 +32,10 @@
 
 namespace us {
 
+const std::string Framework::PROP_STORAGE_LOCATION{ "org.cppmicroservices.framework.storage" };
+const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.framework.threading.support" };
+const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
+
 Framework::Framework(void) : d(new FrameworkPrivate())
 {
 
@@ -78,7 +82,7 @@ void Framework::Stop()
 {
   FrameworkPrivate::Lock lock(d);
   std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
-  for (std::vector<Bundle*>::const_iterator iter = bundles.begin();
+  for (std::vector<Bundle*>::const_iterator iter = bundles.begin(); 
       iter != bundles.end(); 
       ++iter)
   {

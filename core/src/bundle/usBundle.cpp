@@ -38,50 +38,14 @@
 
 namespace us {
 
-const std::string& Bundle::PROP_ID()
-{
-  static const std::string s("bundle.id");
-  return s;
-}
-const std::string& Bundle::PROP_NAME()
-{
-  static const std::string s("bundle.name");
-  return s;
-}
-const std::string& Bundle::PROP_LOCATION()
-{
-  static const std::string s("bundle.location");
-  return s;
-}
-const std::string& Bundle::PROP_VERSION()
-{
-  static const std::string s("bundle.version");
-  return s;
-}
-
-const std::string&Bundle::PROP_VENDOR()
-{
-  static const std::string s("bundle.vendor");
-  return s;
-}
-
-const std::string&Bundle::PROP_DESCRIPTION()
-{
-  static const std::string s("bundle.description");
-  return s;
-}
-
-const std::string&Bundle::PROP_AUTOLOAD_DIR()
-{
-  static const std::string s("bundle.autoload_dir");
-  return s;
-}
-
-const std::string&Bundle::PROP_AUTOINSTALLED_BUNDLES()
-{
-  static const std::string s("bundle.autoinstalled_bundles");
-  return s;
-}
+const std::string Bundle::PROP_ID{ "bundle.id" };
+const std::string Bundle::PROP_NAME{ "bundle.name" };
+const std::string Bundle::PROP_LOCATION{ "bundle.location" };
+const std::string Bundle::PROP_VERSION{ "bundle.version" };
+const std::string Bundle::PROP_VENDOR{ "bundle.vendor" };
+const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
+const std::string Bundle::PROP_AUTOLOAD_DIR{ "bundle.autoload_dir" };
+const std::string Bundle::PROP_AUTOINSTALLED_BUNDLES{ "bundle.autoinstalled_bundles" };
 
 Bundle::Bundle()
 : d(0)
@@ -95,7 +59,7 @@ Bundle::~Bundle()
 }
 
 void Bundle::Init(CoreBundleContext* coreCtx,
-                  BundleInfo* info)
+                    BundleInfo* info)
 {
   BundlePrivate* mp = new BundlePrivate(this, coreCtx, info);
   std::swap(mp, d);
@@ -222,9 +186,9 @@ void Bundle::Stop()
 
 void Bundle::Uninstall()
 {
-    Stop();
-    d->coreCtx->bundleRegistry.UnRegister(&d->info);
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
+  Stop();
+  d->coreCtx->bundleRegistry.UnRegister(&d->info);
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
 }
 
 BundleContext* Bundle::GetBundleContext() const
@@ -260,8 +224,8 @@ Any Bundle::GetProperty(const std::string& key) const
   // and the framework's properties through any Bundle's
   // GetProperty function.
   // The Framework's properties include both the launch properties
-  // used to initialize the Framwork with and all relevant
-  // "org.osgi.*" properties.
+  // used to initialize the Framework and all relevant
+  // "org.cppmicroservices.*" properties.
   if (property.Empty())
   {
     std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
@@ -284,7 +248,7 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetRegisteredByBundle(d, sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
+        i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -297,7 +261,7 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetUsedByBundle(const_cast<Bundle*>(this), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
+        i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -316,7 +280,7 @@ BundleResource Bundle::GetResource(const std::string& path) const
 }
 
 std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
-                                                  bool recurse) const
+                                                    bool recurse) const
 {
   std::vector<BundleResource> result;
   if (!d->resourceContainer.IsValid())
@@ -330,8 +294,8 @@ std::vector<BundleResource> Bundle::FindResources(const std::string& path, const
   if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
   if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
   d->resourceContainer.FindNodes(d->info.name + normalizedPath,
-                                 filePattern.empty() ? "*" : filePattern,
-                                 recurse, result);
+                                    filePattern.empty() ? "*" : filePattern,
+                                    recurse, result);
   return result;
 }
 

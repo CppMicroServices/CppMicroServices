@@ -42,6 +42,7 @@
   #include <string.h>
   #include <dlfcn.h>
   #include <dirent.h>
+  #include <unistd.h>   // getcwd
 #else
   #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
@@ -251,10 +252,39 @@ std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundl
 }
 
 //-------------------------------------------------------------------
-// Error handling
+// Generic utility functions
 //-------------------------------------------------------------------
 
 namespace us {
+
+std::string GetCurrentWorkingDirectory()
+{
+#ifdef US_PLATFORM_WINDOWS
+  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
+  if (bufSize == 0) bufSize = 1;
+  std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
+  if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
+  {
+    return std::string(buf.get());
+  }
+#else
+  std::size_t bufSize = PATH_MAX;
+  for(;; bufSize *= 2)
+  {
+    std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
+    errno = 0;
+    if (getcwd(buf.get(), bufSize) != 0 && errno != ERANGE)
+    {
+      return std::string(buf.get());
+    }
+  }
+#endif
+  return std::string();
+}
+
+//-------------------------------------------------------------------
+// Error handling
+//-------------------------------------------------------------------
 
 std::string GetLastErrorStr()
 {
@@ -306,7 +336,7 @@ void message_output(MsgType msgType, const char *buf)
 
   if (msgType == ErrorMsg)
   {
-  #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
+#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
     // get the current report mode
     int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
     _CrtSetReportMode(_CRT_ERROR, reportMode);
@@ -315,13 +345,13 @@ void message_output(MsgType msgType, const char *buf)
       return; // ignore
     else if (ret == 1)
       _CrtDbgBreak();
-  #endif
+#endif
 
-  #ifdef US_PLATFORM_POSIX
-    abort(); // trap; generates core dump
-  #else
-    exit(1); // goodbye cruel world
-  #endif
+#ifdef US_PLATFORM_POSIX
+  abort(); // trap; generates core dump
+#else
+  exit(1); // goodbye cruel world
+#endif
   }
 }
 

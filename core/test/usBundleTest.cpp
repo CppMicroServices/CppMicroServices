@@ -130,10 +130,16 @@ void frame010a(Framework* framework, BundleContext* mc)
   US_TEST_CONDITION(m->IsStarted(), "Test for started flag")
 
   // launching properties should be accessible through any bundle
-  US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").Empty(), "Test for empty base storage path")
-  US_TEST_CONDITION(m->GetProperty("org.osgi.framework.storage").Empty(), "Test for empty base storage path")
-  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("").empty(), "Test for empty data path")
-  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("bla").empty(), "Test for empty data file path")
+  US_TEST_CONDITION(framework->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
+  US_TEST_CONDITION(m->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
+
+  std::cout << m->GetBundleContext()->GetDataFile("") << std::endl;
+  std::stringstream ss;
+  ss << contextid;
+  const std::string storagePath = testing::GetCurrentWorkingDirectory() + DIR_SEP + ss.str() + "_" + m->GetName() + DIR_SEP;
+
+  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("") == storagePath, "Test for valid data path")
+  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("bla") == storagePath + "bla", "Test for valid data file path")
 }
 
 //----------------------------------------------------------------------------
@@ -208,12 +214,12 @@ void frame02b(Framework* framework)
 {
   BundleContext* mc = framework->GetBundleContext();
 
-  US_TEST_CONDITION(framework->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
+  US_TEST_CONDITION(framework->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/tmp", "Test for valid base storage path")
 
   Bundle* bundleA = mc->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
   // launching properties should be accessible through any bundle
-  US_TEST_CONDITION(bundleA->GetProperty("org.osgi.framework.storage").ToString() == "/tmp", "Test for valid base storage path")
+  US_TEST_CONDITION(bundleA->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/tmp", "Test for valid base storage path")
   US_TEST_CONDITION(bundleA->GetName() == "TestBundleA", "Test bundle name")
 
   bundleA->Start();
@@ -221,7 +227,7 @@ void frame02b(Framework* framework)
   std::cout << bundleA->GetBundleContext()->GetDataFile("") << std::endl;
   std::stringstream ss;
   ss << bundleA->GetBundleId();
-  const std::string baseStoragePath = std::string("/tmp") + DIR_SEP + ss.str() + "_TestBundleA" + DIR_SEP;
+  const std::string baseStoragePath = "/tmp" + DIR_SEP + ss.str() + "_" + bundleA->GetName() + DIR_SEP;
   US_TEST_CONDITION(bundleA->GetBundleContext()->GetDataFile("") == baseStoragePath, "Test for valid data path")
   US_TEST_CONDITION(bundleA->GetBundleContext()->GetDataFile("bla") == baseStoragePath + "bla", "Test for valid data file path")
 
@@ -484,7 +490,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
 
   // test a non-default framework instance using a different persistent storage location.
   std::map<std::string, std::string> frameworkConfig;
-  frameworkConfig.insert(std::pair<std::string, std::string>("org.osgi.framework.storage", "/tmp"));
+  frameworkConfig.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, "/tmp"));
   framework = factory.NewFramework(frameworkConfig);
   framework->Start();
 

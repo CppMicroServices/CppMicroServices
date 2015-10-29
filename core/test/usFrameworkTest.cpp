@@ -22,6 +22,7 @@ limitations under the License.
 
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
+#include <usLog.h>
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
@@ -39,7 +40,21 @@ namespace
         Framework* f = factory.NewFramework(std::map<std::string, std::string>());
         US_TEST_CONDITION(f, "Test Framework instantiation")
 
-        // TODO: When a reasonable default configuration is determined, test for it here...
+        f->Start();
+
+        // Default framework properties:
+        //  - threading model: single
+        //  - storage location: The current working directory
+        //  - log level: 3 (us::ErrorMsg)
+#ifdef US_ENABLE_THREADING_SUPPORT
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "multi", "Test for default threading option")
+#else
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "single", "Test for default threading option")
+#endif
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_LOG_LEVEL).ToString() == "3", "Test for default logging level")
+
+        US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
 
         delete f;
     }
@@ -47,11 +62,21 @@ namespace
     void TestCustomConfig()
     {
         std::map < std::string, std::string > configuration;
-        configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.security", "osgi"));
-        configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.startlevel.beginning", "0"));
-        configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.bsnversion", "single"));
-        configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.custom1", "foo"));
-        configuration.insert(std::pair<std::string, std::string>("org.osgi.framework.custom2", "bar"));
+        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.security", "osgi"));
+        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.startlevel.beginning", "0"));
+        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.bsnversion", "single"));
+        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom1", "foo"));
+        configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom2", "bar"));
+        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_STORAGE_LOCATION, "/foo"));
+        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_LOG_LEVEL, "0"));
+
+        // the threading model framework property is set at compile time and read-only at runtime. Test that this
+        // is always the case.
+#ifdef US_ENABLE_THREADING_SUPPORT
+        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "single"));
+#else
+        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "multi"));
+#endif
 
         FrameworkFactory factory;
 
@@ -59,11 +84,21 @@ namespace
         US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration")
 
         f->Start();
-        US_TEST_CONDITION("osgi" == f->GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("0" == f->GetProperty("org.osgi.framework.startlevel.beginning").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("single" == f->GetProperty("org.osgi.framework.bsnversion").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("foo" == f->GetProperty("org.osgi.framework.custom1").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION("bar" == f->GetProperty("org.osgi.framework.custom2").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION("osgi" == f->GetProperty("org.cppmicroservices.framework.security").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION("0" == f->GetProperty("org.cppmicroservices.framework.startlevel.beginning").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION("single" == f->GetProperty("org.cppmicroservices.framework.bsnversion").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION("foo" == f->GetProperty("org.cppmicroservices.framework.custom1").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION("bar" == f->GetProperty("org.cppmicroservices.framework.custom2").ToString(), "Test Framework custom launch properties")
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/foo", "Test for custom base storage path")
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_LOG_LEVEL).ToString() == "0", "Test for custom logging level")
+
+        US_TEST_CONDITION(Logger::instance().GetLogLevel() == DebugMsg, "Test custom log level")
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
+#else
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
+#endif
 
         delete f;
     }

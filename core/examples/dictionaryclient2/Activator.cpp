@@ -179,7 +179,6 @@ public:
       if (event.GetServiceReference() == m_ref)
       {
         // Unget service object and null references.
-        m_context->UngetService(m_ref);
         m_ref = nullptr;
         m_dictionary.reset();
 

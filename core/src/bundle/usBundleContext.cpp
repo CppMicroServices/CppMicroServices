@@ -111,7 +111,16 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  return reference.d->GetService(d->bundle->q);
+  struct ServiceHolder
+  {
+	  BundleContext* bc;
+	  ServiceReferenceBase sref;
+	  std::shared_ptr<void> service;
+	  ~ServiceHolder() { bc->UngetService(sref); }
+  };
+  std::shared_ptr<ServiceHolder> h(new ServiceHolder{ this, reference, reference.d->GetService(d->bundle->q) });
+  //std::shared_ptr<void> retVal(h, h->service.get());
+  return std::shared_ptr<void>(h, h->service.get());
 }
 
 InterfaceMap BundleContext::GetService(const ServiceReferenceU& reference)
@@ -121,6 +130,12 @@ InterfaceMap BundleContext::GetService(const ServiceReferenceU& reference)
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
   return reference.d->GetServiceInterfaceMap(d->bundle->q);
+}
+
+bool BundleContext::UngetService(const ServiceReferenceU& reference)
+{
+	ServiceReferenceBase ref = reference;
+	return UngetService(ref);
 }
 
 bool BundleContext::UngetService(const ServiceReferenceBase& reference)

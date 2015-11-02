@@ -69,9 +69,10 @@ void ServiceHooks::ModifiedService(const ServiceReferenceType& /*reference*/, Tr
   // noop
 }
 
-void ServiceHooks::RemovedService(const ServiceReferenceType& reference, TrackedType /*service*/)
+void ServiceHooks::RemovedService(const ServiceReferenceType& /*reference*/, TrackedType /*service*/)
 {
-  GetBundleContext()->UngetService(reference);
+  // TODO: call UngetService if T is InterfaceMap
+  // else no-op since we use shared_ptr for service objects
 }
 
 void ServiceHooks::Open()

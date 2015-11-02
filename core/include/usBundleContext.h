@@ -553,7 +553,7 @@ public:
    * @see #GetService
    * @see ServiceFactory
    */
-  bool UngetService(const ServiceReferenceBase& reference);
+  bool UngetService(const ServiceReferenceU& reference);
 
   void AddServiceListener(const ServiceListener& delegate,
                           const std::string& filter = std::string());
@@ -733,6 +733,8 @@ private:
   friend class BundlePrivate;
 
   BundleContext(BundlePrivate* bundle);
+
+  bool UngetService(const ServiceReferenceBase& reference);
 
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);

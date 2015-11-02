@@ -94,7 +94,16 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
   {
     d->m_serviceInstances.insert(std::make_pair(result, im));
   }
-  return result;
+
+  struct ServiceHolder
+  {
+	  ServiceObjectsBase* sObj;
+	  std::shared_ptr<void> service;
+	  ~ServiceHolder() { sObj->UngetService(service); }
+  };
+  std::shared_ptr<ServiceHolder> h(new ServiceHolder{ const_cast<ServiceObjectsBase*>(this), result });
+  
+  return std::shared_ptr<void>(h, h->service.get());
 }
 
 InterfaceMap ServiceObjectsBase::GetServiceInterfaceMap() const

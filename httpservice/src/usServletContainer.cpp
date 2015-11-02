@@ -203,7 +203,7 @@ void ServletContainerPrivate::ModifiedService(const ServiceReferenceType& /*refe
   // no-op
 }
 
-void ServletContainerPrivate::RemovedService(const ServiceReferenceType& reference, TrackedType handler)
+void ServletContainerPrivate::RemovedService(const ServiceReferenceType& /*reference*/, TrackedType handler)
 {
   std::string contextPath = handler->GetServletContext()->GetContextPath();
   m_Server->removeHandler(contextPath);
@@ -213,8 +213,6 @@ void ServletContainerPrivate::RemovedService(const ServiceReferenceType& referen
 
   delete handler->GetServletContext();
   delete handler;
-
-  m_Context->UngetService(reference);
 }
 
 

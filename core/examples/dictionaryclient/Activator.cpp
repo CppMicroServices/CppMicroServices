@@ -95,9 +95,6 @@ public:
         {
           std::cout << "Incorrect." << std::endl;
         }
-
-        // Unget the dictionary service.
-        context->UngetService(refs.front());
       }
     }
     else

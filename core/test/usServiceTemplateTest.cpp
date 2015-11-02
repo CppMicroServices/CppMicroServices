@@ -157,53 +157,50 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   std::shared_ptr<Interface1> i1 = mc->GetService(sr1.GetReference());
   US_TEST_CONDITION(i1 == s1, "interface1 ptr")
   i1.reset();
-  US_TEST_CONDITION(mc->UngetService(sr1.GetReference()), "unget interface1 ptr")
+  
   i1 = mc->GetService(sfr1.GetReference());
   US_TEST_CONDITION(i1 == f1->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface1 factory ptr")
   i1.reset();
-  US_TEST_CONDITION(mc->UngetService(sfr1.GetReference()), "unget interface1 factory ptr")
 
   i1 = mc->GetService(sr2.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == s2, "interface1 ptr")
   i1.reset();
-  US_TEST_CONDITION(mc->UngetService(sr2.GetReference<Interface1>()), "unget interface1 ptr")
+  
   i1 = mc->GetService(sfr2.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == f2->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface1 factory ptr")
   i1.reset();
-  US_TEST_CONDITION(mc->UngetService(sfr2.GetReference<Interface1>()), "unget interface1 factory ptr")
+  
   std::shared_ptr<Interface2> i2 = mc->GetService(sr2.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == s2, "interface2 ptr")
   i2.reset();
-  US_TEST_CONDITION(mc->UngetService(sr2.GetReference<Interface2>()), "unget interface2 ptr")
+  
   i2 = mc->GetService(sfr2.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == f2->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface2 factory ptr")
   i2.reset();
-  US_TEST_CONDITION(mc->UngetService(sfr2.GetReference<Interface2>()), "unget interface2 factory ptr")
 
   i1 = mc->GetService(sr3.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == s3, "interface1 ptr")
   i1.reset();
-  US_TEST_CONDITION(mc->UngetService(sr3.GetReference<Interface1>()), "unget interface1 ptr")
+  
   i1 = mc->GetService(sfr3.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == f3->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface1 factory ptr")
   i1.reset();
-  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference<Interface1>()), "unget interface1 factory ptr")
+  
   i2 = mc->GetService(sr3.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == s3, "interface2 ptr")
   i2.reset();
-  US_TEST_CONDITION(mc->UngetService(sr3.GetReference<Interface2>()), "unget interface2 ptr")
+  
   i2 = mc->GetService(sfr3.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == f3->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface2 factory ptr")
   i2.reset();
-  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference<Interface2>()), "unget interface2 factory ptr")
+
     std::shared_ptr<Interface3> i3 = mc->GetService(sr3.GetReference<Interface3>());
   US_TEST_CONDITION(i3 == s3, "interface3 ptr")
   i3.reset();
-  US_TEST_CONDITION(mc->UngetService(sr3.GetReference<Interface3>()), "unget interface3 ptr")
+
   i3 = mc->GetService(sfr3.GetReference<Interface3>());
   US_TEST_CONDITION(i3 == f3->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface3 factory ptr")
   i3.reset();
-  US_TEST_CONDITION(mc->UngetService(sfr3.GetReference<Interface3>()), "unget interface3 factory ptr")
 
   sr1.Unregister();
   sr2.Unregister();

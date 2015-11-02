@@ -149,16 +149,6 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
   US_TEST_CONDITION(sr2.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
   US_TEST_CONDITION(any_cast<long>(sr2.GetProperty(ServiceConstants::SERVICE_ID())) == any_cast<long>(sr1.GetProperty(ServiceConstants::SERVICE_ID())), "same service id")
 
-  try
-  {
-    svcObjects.UngetService(bundleScopeService2);
-    US_TEST_FAILED_MSG(<< "std::invalid_argument exception expected")
-  }
-  catch (const std::invalid_argument&)
-  {
-    // this is expected
-  }
-
 #ifdef US_BUILD_SHARED_LIBS
   // There should still be only one service in use
   usedRefs = mc->GetBundle()->GetServicesInUse();
@@ -167,26 +157,11 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
 
   ServiceObjects<TestBundleH2> svcObjects2 = svcObjects;
   ServiceObjects<TestBundleH2> svcObjects3 = mc->GetServiceObjects(sr1);
-  try
-  {
-    svcObjects3.UngetService(prototypeServiceH2);
-    US_TEST_FAILED_MSG(<< "std::invalid_argument exception expected")
-  }
-  catch (const std::invalid_argument&)
-  {
-    // this is expected
-  }
 
-  svcObjects2.UngetService(prototypeServiceH2);
   prototypeServiceH2 = svcObjects2.GetService();
   std::shared_ptr<TestBundleH2> prototypeServiceH2_2 = svcObjects3.GetService();
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2_2 && prototypeServiceH2_2 != prototypeServiceH2, "prototype service")
-
-  svcObjects2.UngetService(prototypeServiceH2);
-  svcObjects3.UngetService(prototypeServiceH2_2);
-  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
-  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
 
   bundleH->Stop();
 }

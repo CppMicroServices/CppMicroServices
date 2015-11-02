@@ -131,6 +131,18 @@ public:
   }
 
   /**
+  * Returns the ServiceReference for this ServiceObjects object.
+  *
+  * @return The ServiceReference for this ServiceObjects object.
+  */
+  ServiceReference<S> GetServiceReference() const
+  {
+	  return this->ServiceObjectsBase::GetReference();
+  }
+
+private:
+
+  /**
    * Releases a service object for the referenced service.
    *
    * This ServiceObjects object can be used to obtain multiple service objects for
@@ -165,18 +177,6 @@ public:
   {
     this->ServiceObjectsBase::UngetService(std::static_pointer_cast<void>(service));
   }
-
-  /**
-   * Returns the ServiceReference for this ServiceObjects object.
-   *
-   * @return The ServiceReference for this ServiceObjects object.
-   */
-  ServiceReference<S> GetServiceReference() const
-  {
-    return this->ServiceObjectsBase::GetReference();
-  }
-
-private:
 
   friend class BundleContext;
 

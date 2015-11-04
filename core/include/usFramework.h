@@ -161,7 +161,7 @@ private:
     
     // Allow the framework to be constructed with configuration properties
     // provided by a FrameworkFactory object.
-    Framework(std::map<std::string, std::string>& configuration);
+    Framework(const std::map<std::string, std::string>& configuration);
     Framework(void);
 
     // This class is not copy-able

@@ -41,10 +41,10 @@ class ServiceFactory;
  * @ingroup MicroServices
  *
  * A map containing interfaces ids and their corresponding service object
- * pointers. InterfaceMap instances represent a complete service object
+ * smart pointers. InterfaceMap instances represent a complete service object
  * which implementes one or more service interfaces. For each implemented
  * service interface, there is an entry in the map with the key being
- * the service interface id and the value a pointer to the service
+ * the service interface id and the value a smart pointer to the service
  * interface implementation.
  *
  * To create InterfaceMap instances, use the MakeInterfaceMap helper class.
@@ -54,6 +54,8 @@ class ServiceFactory;
  * @see MakeInterfaceMap
  */
 typedef std::map<std::string, std::shared_ptr<void>> InterfaceMap;
+
+
 /// \cond
 namespace detail
 {
@@ -114,9 +116,10 @@ namespace detail
   template<template<class...> class List, class ...Args>
   struct InterfacesTuple {
       typedef List<std::shared_ptr<Args>...> type;
+
       template<class Impl>
-      static type create(std::shared_ptr<Impl> impl) {
-          return type(std::dynamic_pointer_cast<Args>(impl)...);
+      static type create(const std::shared_ptr<Impl>& impl) {
+          return type(std::static_pointer_cast<Args>(impl)...);
       }
   };
 
@@ -219,7 +222,7 @@ struct MakeInterfaceMap
    *        be castable to a all specified service interfaces.
    */
   template<class Impl>
-  MakeInterfaceMap(std::shared_ptr<Impl> impl)
+  MakeInterfaceMap(const std::shared_ptr<Impl>& impl)
     : m_interfaces(detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
   {}
 
@@ -228,7 +231,7 @@ struct MakeInterfaceMap
    *
    * @param factory A service factory.
    */
-  MakeInterfaceMap(std::shared_ptr<ServiceFactory> factory)
+  MakeInterfaceMap(const std::shared_ptr<ServiceFactory>& factory)
     : m_factory(factory)
   {
     if (!m_factory)
@@ -258,9 +261,8 @@ struct MakeInterfaceMap
  * Extract a service interface pointer from a given InterfaceMap instance.
  *
  * @param map a InterfaceMap instance.
- * @return The service interface pointer for the service interface id of the
- *         \c I1 interface type or NULL if \c map does not contain an entry
- *         for the given type.
+ * @return A shared pointer object of type \c Interface. The returned object is
+ *         empty if the map does not contain an entry for the given type
  *
  * @see MakeInterfaceMap
  */
@@ -279,23 +281,21 @@ std::shared_ptr<Interface> ExtractInterface(const InterfaceMap& map)
 /**
  * @ingroup MicroServices
  *
- * Cast the argument to a \c ServiceFactory pointer. Useful when calling
- * \c BundleContext::RegisterService with a service factory, for example:
+ * Cast the argument to a shared pointer of type \c ServiceFactory. Useful when
+ * calling \c BundleContext::RegisterService with a service factory, for example:
  *
  * \code
- * MyServiceFactory* factory;
+ * std::shared_ptr<MyServiceFactory> factory = std::make_shared<MyServiceFactory>();
  * context->RegisterService<ISomeInterface>(ToFactory(factory));
  * \endcode
  *
- * @param factory The service factory. May be a pointer or reference type.
- * @return A \c ServiceFactory pointer to the passed \c factory instance.
+ * @param factory The service factory shared_ptr object
+ * @return A \c shared_ptr object of type \c ServiceFactory
  *
  * @see BundleContext::RegisterService(ServiceFactory* factory, const ServiceProperties& properties)
  */
 template<class T>
-std::shared_ptr<ServiceFactory> ToFactory(
-        std::shared_ptr<T> factory,
-        typename std::enable_if<std::is_class <T>::value, T>::type* = nullptr)
+std::shared_ptr<ServiceFactory> ToFactory(const std::shared_ptr<T>& factory)
 {
     return std::static_pointer_cast<ServiceFactory>(factory);
 }

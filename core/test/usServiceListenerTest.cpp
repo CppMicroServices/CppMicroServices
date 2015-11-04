@@ -106,18 +106,18 @@ public:
       }
 
       // Check if the service can be fetched
-      InterfaceMap service = mc->GetService(sr);
+      std::shared_ptr<InterfaceMap> service = mc->GetService(sr);
       sr.GetUsingBundles(usingBundles);
       // if (UNREGISTERSERVICE_VALID_DURING_UNREGISTERING) {
       // In this mode the service shall be obtainable during
       // unregistration.
-      if (service.empty())
+      if (service->empty())
       {
         teststatus = false;
         US_TEST_OUTPUT( << "*** Service should be available to ServiceListener "
                           << "while handling unregistering event." );
       }
-      US_TEST_OUTPUT( << "Service (unreg): " << service.begin()->first << " -> " << service.begin()->second );
+      US_TEST_OUTPUT( << "Service (unreg): " << service->begin()->first << " -> " << service->begin()->second );
       if (checkUsingBundles && usingBundles.size() != 1)
       {
         teststatus = false;
@@ -146,7 +146,8 @@ public:
       //                          "Using bundles (unreg, after getService): null");
       //      }
       //    }
-      mc->UngetService(sr);
+      //mc->UngetService(sr);
+      service.reset(); // results in UngetService
 
       // Check that the UNREGISTERING service can not be looked up
       // using the service registry.
@@ -422,8 +423,8 @@ void frameSL25a(std::shared_ptr<Framework> framework)
   try
   {
     ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    InterfaceMap libSL3Activator = mc->GetService(libSL3SR);
-    US_TEST_CONDITION_REQUIRED(!libSL3Activator.empty(), "ActivatorSL3 service != 0");
+    std::shared_ptr<InterfaceMap> libSL3Activator = mc->GetService(libSL3SR);
+    US_TEST_CONDITION_REQUIRED(!libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
     std::shared_ptr<BundlePropsInterface> propsInterface = mc->GetService(libSL3PropsI);
@@ -434,7 +435,6 @@ void frameSL25a(std::shared_ptr<Framework> framework)
     Any serviceAddedField3 = i->second;
     US_TEST_CONDITION_REQUIRED(!serviceAddedField3.Empty() && any_cast<bool>(serviceAddedField3),
                                  "libSL3 notified about presence of FooService");
-    mc->UngetService(libSL3SR);
   }
   catch (const ServiceException& se)
   {
@@ -446,8 +446,8 @@ void frameSL25a(std::shared_ptr<Framework> framework)
   try
   {
     ServiceReferenceU libSL1SR = mc->GetServiceReference("ActivatorSL1");
-    InterfaceMap libSL1Activator = mc->GetService(libSL1SR);
-    US_TEST_CONDITION_REQUIRED(!libSL1Activator.empty(), "ActivatorSL1 service != 0");
+    std::shared_ptr<InterfaceMap> libSL1Activator = mc->GetService(libSL1SR);
+    US_TEST_CONDITION_REQUIRED(!libSL1Activator->empty(), "ActivatorSL1 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL1PropsI(libSL1SR);
     std::shared_ptr<BundlePropsInterface> propsInterface = mc->GetService(libSL1PropsI);
@@ -458,7 +458,6 @@ void frameSL25a(std::shared_ptr<Framework> framework)
     Any serviceAddedField1 = i->second;
     US_TEST_CONDITION_REQUIRED(!serviceAddedField1.Empty() && any_cast<bool>(serviceAddedField1),
                                  "libSL1 notified about presence of FooService");
-    mc->UngetService(libSL1SR);
   }
   catch (const ServiceException& se)
   {
@@ -482,8 +481,8 @@ void frameSL25a(std::shared_ptr<Framework> framework)
   try
   {
     ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    InterfaceMap libSL3Activator = mc->GetService(libSL3SR);
-    US_TEST_CONDITION_REQUIRED(!libSL3Activator.empty(), "ActivatorSL3 service != 0");
+    std::shared_ptr<InterfaceMap> libSL3Activator = mc->GetService(libSL3SR);
+    US_TEST_CONDITION_REQUIRED(!libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
     std::shared_ptr<BundlePropsInterface> propsInterface = mc->GetService(libSL3PropsI);
@@ -495,7 +494,6 @@ void frameSL25a(std::shared_ptr<Framework> framework)
     Any serviceRemovedField3 = i->second;
     US_TEST_CONDITION(!serviceRemovedField3.Empty() && any_cast<bool>(serviceRemovedField3),
                         "libSL3 notified about removal of FooService");
-    mc->UngetService(libSL3SR);
   }
   catch (const ServiceException& se)
   {

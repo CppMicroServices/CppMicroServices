@@ -115,10 +115,10 @@ public:
    *   <li>The service object is returned.</li>
    * </ol>
    *
-   * @return A service object for the referenced service or \c NULL if the service is not
-   *         registered, the service object returned by a ServiceFactory does not contain
-   *         all the classes under which it was registered or the ServiceFactory threw an
-   *         exception.
+   * @return A \c shared_ptr object containing the referenced service.The returned \c shared_ptr
+   *         is empty if the service is not registered, the service object returned by a
+   *         ServiceFactory does not contain all the classes under which it was registered 
+   *         or the ServiceFactory threw an exception.
    *
    * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
    *        is no longer valid.

@@ -41,7 +41,7 @@ Framework::Framework(void) : d(new FrameworkPrivate())
 
 }
 
-Framework::Framework(std::map<std::string, std::string>& configuration) :
+Framework::Framework(const std::map<std::string, std::string>& configuration) :
     d(new FrameworkPrivate(configuration))
 {
   

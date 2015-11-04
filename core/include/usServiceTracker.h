@@ -64,7 +64,7 @@ struct TrackedTypeTraitsBase
   typedef T TrackedType;
 
   // Needed for S == void
-  static TrackedType ConvertToTrackedType(const InterfaceMap&)
+  static TrackedType ConvertToTrackedType(const std::shared_ptr<InterfaceMap>&)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
     //return TTT::DefaultValue();
@@ -143,7 +143,7 @@ struct TrackedTypeTraits<S, std::shared_ptr<S>>
     t.reset();
   }
 
-  static TrackedType ConvertToTrackedType(std::shared_ptr<S> s)
+  static TrackedType ConvertToTrackedType(const std::shared_ptr<S>& s)
   {
     return s;
   }
@@ -160,11 +160,11 @@ struct TrackedTypeTraits<S, std::shared_ptr<S>>
 template<>
 struct TrackedTypeTraits<void, std::shared_ptr<void> >
 {
-  typedef InterfaceMap TrackedType;
+  typedef std::shared_ptr<InterfaceMap> TrackedType;
 
   static bool IsValid(const TrackedType& t)
   {
-    return !t.empty();
+    return (t.get() != nullptr && !t->empty());
   }
 
   static TrackedType DefaultValue()
@@ -174,10 +174,10 @@ struct TrackedTypeTraits<void, std::shared_ptr<void> >
 
   static void Dispose(TrackedType& t)
   {
-    t.clear();
+    t.reset();
   }
 
-  static TrackedType ConvertToTrackedType(const InterfaceMap& im)
+  static TrackedType ConvertToTrackedType(const TrackedType& im)
   {
     return im;
   }

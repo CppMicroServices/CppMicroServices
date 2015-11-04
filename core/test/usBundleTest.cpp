@@ -177,17 +177,8 @@ void frame020a(std::shared_ptr<Framework> framework, TestBundleListener& listene
   try
   {
     ServiceReferenceU sr1 = mc->GetServiceReference("us::TestBundleAService");
-    InterfaceMap o1 = mc->GetService(sr1);
-    US_TEST_CONDITION(!o1.empty(), "Test if service object found");
-
-    try
-    {
-      US_TEST_CONDITION(mc->UngetService(sr1), "Test if Service UnGet returns true");
-    }
-    catch (const std::logic_error le)
-    {
-      US_TEST_FAILED_MSG(<< "UnGetService exception: " << le.what())
-    }
+    std::shared_ptr<InterfaceMap> o1 = mc->GetService(sr1);
+    US_TEST_CONDITION(!o1->empty(), "Test if service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;

@@ -32,6 +32,7 @@
 namespace us {
 
 class Framework;
+typedef std::map<std::string, std::string> FrameworkProperties;
 
 /**
  * \ingroup MicroServices
@@ -55,16 +56,7 @@ public:
      *
      * @return A new, configured Framework instance.
      */
-    std::shared_ptr<Framework> NewFramework(std::map<std::string, std::string> configuration);
-
-    /**
-    * Create a new Framework instance.
-    *
-    * @remarks The created framework instance will use a reasonable default configuration.
-    *
-    * @return A new, configured Framework instance.
-    */
-    std::shared_ptr<Framework> NewFramework(void);
+    std::shared_ptr<Framework> NewFramework(const FrameworkProperties& configuration = FrameworkProperties());
 
 private:
     FrameworkFactory(const FrameworkFactory& );

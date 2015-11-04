@@ -229,7 +229,7 @@ public:
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class ...Interfaces, class Impl>
-  ServiceRegistration<I1, Interfaces...> RegisterService(std::shared_ptr<Impl> impl, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<I1, Interfaces...> RegisterService(const std::shared_ptr<Impl>& impl, const ServiceProperties& properties = ServiceProperties())
   {
     InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(impl);
     return RegisterService(servicePointers, properties);
@@ -263,7 +263,7 @@ public:
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class ...Interfaces>
-  ServiceRegistration<I1, Interfaces...> RegisterService(std::shared_ptr<ServiceFactory> factory, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<I1, Interfaces...> RegisterService(const std::shared_ptr<ServiceFactory>& factory, const ServiceProperties& properties = ServiceProperties())
   {
     InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(factory);
     return RegisterService(servicePointers, properties);
@@ -463,7 +463,7 @@ public:
    */
   std::shared_ptr<void> GetService(const ServiceReferenceBase& reference);
 
-  InterfaceMap GetService(const ServiceReferenceU& reference);
+  std::shared_ptr<InterfaceMap> GetService(const ServiceReferenceU& reference);
 
   /**
    * Returns the service object referenced by the specified
@@ -553,7 +553,7 @@ public:
    * @see #GetService
    * @see ServiceFactory
    */
-  bool UngetService(const ServiceReferenceU& reference);
+  //bool UngetService(const ServiceReferenceU& reference);
 
   void AddServiceListener(const ServiceListener& delegate,
                           const std::string& filter = std::string());

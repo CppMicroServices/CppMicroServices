@@ -71,25 +71,21 @@ void TestServiceFactoryBundleScope(BundleContext* mc)
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
   US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_BUNDLE(), "service scope")
 
-  InterfaceMap service = mc->GetService(sr1);
-  US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
-  InterfaceMap::const_iterator serviceIter = service.find("us::TestBundleH");
-  US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
-  US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
+  std::shared_ptr<InterfaceMap> service = mc->GetService(sr1);
+  US_TEST_CONDITION_REQUIRED(service->size() >= 1, "GetService()")
+  InterfaceMap::const_iterator serviceIter = service->find("us::TestBundleH");
+  US_TEST_CONDITION_REQUIRED(serviceIter != service->end(), "GetService()")
+  US_TEST_CONDITION_REQUIRED(serviceIter->second, "GetService()")
 
-  InterfaceMap service2 = mc->GetService(sr1);
-  US_TEST_CONDITION(service == service2, "Same service pointer")
+  std::shared_ptr<InterfaceMap> service2 = mc->GetService(sr1);
+  US_TEST_CONDITION(*(service.get()) == *(service2.get()), "Same service interface maps")
 
   std::vector<ServiceReferenceU> usedRefs = mc->GetBundle()->GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
 
-  InterfaceMap service3 = bundleH->GetBundleContext()->GetService(sr1);
-  US_TEST_CONDITION(service != service3, "Different service pointer")
-  US_TEST_CONDITION(bundleH->GetBundleContext()->UngetService(sr1), "UngetService()")
-
-  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
-  US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
+  std::shared_ptr<InterfaceMap> service3 = bundleH->GetBundleContext()->GetService(sr1);
+  US_TEST_CONDITION(service.get() != service3.get(), "Different service pointer")
 
   bundleH->Stop();
 }

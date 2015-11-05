@@ -48,11 +48,16 @@ namespace us {
 
 class Any;
 
+US_Core_EXPORT bool operator==(const Any& a1, const Any& a2);
+
 US_Core_EXPORT std::string any_value_to_string(const Any& any);
 
 US_Core_EXPORT std::string any_value_to_json(const Any& val);
 US_Core_EXPORT std::string any_value_to_json(const std::string& val);
 US_Core_EXPORT std::string any_value_to_json(bool val);
+
+template <typename ValueType>
+ValueType* any_cast(Any* operand);
 
 template<class T>
 std::string any_value_to_string(const T& val)
@@ -209,6 +214,27 @@ public:
   {
     std::swap(_content, rhs._content);
     return *this;
+  }
+
+  /**
+   * Compares this Any with another value.
+   * If the internal type of this any and of \c val do not
+   * match, the comparison always returns false.
+   *
+   * \param val The value to compare to.
+   * \returns \c true if this Any contains value \c val, \c false otherwise.
+   */
+  template <typename ValueType>
+  bool operator==(const ValueType& val)
+  {
+    if (Type() != typeid(ValueType)) return false;
+    return *any_cast<ValueType>(this) == val;
+  }
+
+  template <typename ValueType>
+  bool operator!=(const ValueType& val)
+  {
+    return !operator==(val);
   }
 
   /**

@@ -13,3 +13,7 @@ add_subdirectory(libSL4)
 add_subdirectory(libRWithResources)
 add_subdirectory(libRWithAppendedResources)
 add_subdirectory(libRWithLinkedResources)
+
+if(US_ENABLE_THREADING_SUPPORT)
+  add_subdirectory(libC1)
+endif()

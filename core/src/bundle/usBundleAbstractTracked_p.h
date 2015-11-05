@@ -55,12 +55,14 @@ class BundleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>,WaitCo
 
 public:
 
-  typedef typename TTT::TrackedType T;
+  typedef typename TTT::TrackedType TrackedType;
+  typedef typename TTT::TrackedArgType TrackedArgType;
+  typedef typename TTT::TrackedReturnType TrackedReturnType;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
 
-  typedef std::map<S,T> TrackingMap;
+  typedef std::map<S,TrackedReturnType> TrackingMap;
 
   /**
    * BundleAbstractTracked constructor.
@@ -139,7 +141,7 @@ public:
    *
    * @GuardedBy this
    */
-  T GetCustomizedObject_unlocked(S item) const;
+  TrackedReturnType GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.
@@ -189,7 +191,7 @@ public:
    * @return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
-  virtual T CustomizerAdding(S item, const R& related) = 0;
+  virtual TrackedReturnType CustomizerAdding(S item, const R& related) = 0;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -200,7 +202,7 @@ public:
    * @param object Customized object for the tracked item.
    */
   virtual void CustomizerModified(S item, const R& related,
-                                  T object) = 0;
+                                  TrackedArgType object) = 0;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -211,7 +213,7 @@ public:
    * @param object Customized object for the tracked item.
    */
   virtual void CustomizerRemoved(S item, const R& related,
-                                 T object) = 0;
+                                 TrackedArgType object) = 0;
 
   /**
    * List of items in the process of being added. This is used to deal with
@@ -280,7 +282,7 @@ private:
    */
   std::atomic<int> trackingCount;
 
-  bool CustomizerAddingFinal(S item, const T& custom);
+  bool CustomizerAddingFinal(S item, TrackedArgType custom);
 
 };
 

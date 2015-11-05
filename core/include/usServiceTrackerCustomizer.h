@@ -28,6 +28,28 @@
 
 namespace us {
 
+///cond
+template<class S, class T = S*, class Enable = void>
+struct ServiceTrackerCustomizer {
+};
+
+namespace detail {
+
+template<class S>
+struct ServiceArg
+{
+  typedef S* type;
+};
+
+template<>
+struct ServiceArg<void>
+{
+  typedef const InterfaceMap& type;
+};
+
+}
+///endcond
+
 /**
  * \ingroup MicroServices
  *
@@ -60,12 +82,43 @@ namespace us {
  * \tparam T The type of the tracked object.
  * \remarks This class is thread safe.
  */
-template<class S, class T = S*>
-struct ServiceTrackerCustomizer {
+template<class S, class T>
+struct ServiceTrackerCustomizer<S, T, typename std::enable_if<std::is_pointer<T>::value && !std::is_same<S*,T>::value>::type>
+{
 
-  typedef S ServiceType;
-  typedef T TrackedType;
-  typedef ServiceReference<ServiceType> ServiceReferenceType;
+  struct TypeTraits {
+    typedef S ServiceType;
+    typedef T TrackedType;
+    typedef T TrackedReturnType;
+    typedef T TrackedArgType;
+    typedef ServiceReference<ServiceType> ServiceReferenceType;
+
+    static bool IsValid(typename std::remove_pointer<TrackedType>::type const* t)
+    {
+      return t != nullptr;
+    }
+
+    static TrackedReturnType DefaultValue()
+    {
+      return nullptr;
+    }
+
+    static void Dispose(TrackedType& t)
+    {
+      t = nullptr;
+    }
+
+    static TrackedReturnType ConvertToTrackedType(typename detail::ServiceArg<ServiceType>::type)
+    {
+      throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+    }
+  };
+
+  typedef typename TypeTraits::ServiceType ServiceType;
+  typedef typename TypeTraits::TrackedType TrackedType;
+  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
+  typedef typename TypeTraits::TrackedArgType TrackedArgType;
+  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
 
   virtual ~ServiceTrackerCustomizer() {}
 
@@ -87,7 +140,7 @@ struct ServiceTrackerCustomizer {
    *         service or <code>0</code> if the specified referenced service
    *         should not be tracked.
    */
-  virtual TrackedType AddingService(const ServiceReferenceType& reference) = 0;
+  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been modified.
@@ -99,7 +152,7 @@ struct ServiceTrackerCustomizer {
    * @param reference The reference to the service that has been modified.
    * @param service The service object for the specified referenced service.
    */
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service) = 0;
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been removed.
@@ -111,7 +164,139 @@ struct ServiceTrackerCustomizer {
    * @param reference The reference to the service that has been removed.
    * @param service The service object for the specified referenced service.
    */
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) = 0;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+};
+
+template<class S>
+struct ServiceTrackerCustomizer<S, S*, void>
+{
+
+  struct TypeTraits {
+    typedef S ServiceType;
+    typedef S* TrackedType;
+    typedef S* TrackedReturnType;
+    typedef S* TrackedArgType;
+    typedef ServiceReference<ServiceType> ServiceReferenceType;
+
+    static bool IsValid(const TrackedType t)
+    {
+      return t != nullptr;
+    }
+
+    static TrackedReturnType DefaultValue()
+    {
+      return nullptr;
+    }
+
+    static void Dispose(TrackedType& t)
+    {
+      t = nullptr;
+    }
+
+    static TrackedReturnType ConvertToTrackedType(TrackedReturnType s)
+    {
+      return s;
+    }
+  };
+
+  typedef typename TypeTraits::ServiceType ServiceType;
+  typedef typename TypeTraits::TrackedType TrackedType;
+  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
+  typedef typename TypeTraits::TrackedArgType TrackedArgType;
+  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+
+  virtual ~ServiceTrackerCustomizer() {}
+  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+};
+
+template<class S, class T>
+struct ServiceTrackerCustomizer<S, T, typename std::enable_if<!std::is_pointer<T>::value && std::is_constructible<T>::value &&
+    (std::is_convertible<T,bool>::value || std::is_constructible<bool,T>::value)>::type>
+{
+
+  struct TypeTraits {
+    typedef S ServiceType;
+    typedef T TrackedType;
+    typedef T TrackedReturnType;
+    typedef T& TrackedArgType;
+    typedef ServiceReference<ServiceType> ServiceReferenceType;
+
+    static bool IsValid(const TrackedType& t)
+    {
+      return static_cast<bool>(t);
+    }
+
+    static TrackedReturnType DefaultValue()
+    {
+      return TrackedReturnType();
+    }
+
+    static void Dispose(TrackedArgType)
+    {
+    }
+
+    static TrackedReturnType ConvertToTrackedType(typename detail::ServiceArg<ServiceType>::type)
+    {
+      throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+    }
+  };
+
+  typedef typename TypeTraits::ServiceType ServiceType;
+  typedef typename TypeTraits::TrackedType TrackedType;
+  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
+  typedef typename TypeTraits::TrackedArgType TrackedArgType;
+  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+
+  virtual ~ServiceTrackerCustomizer() {}
+  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+};
+
+template<>
+struct ServiceTrackerCustomizer<void, void*, void>
+{
+
+  struct TypeTraits {
+    typedef void ServiceType;
+    typedef void* TrackedType;
+    typedef InterfaceMap TrackedReturnType;
+    typedef const InterfaceMap& TrackedArgType;
+    typedef ServiceReference<ServiceType> ServiceReferenceType;
+
+    static bool IsValid(TrackedArgType t)
+    {
+      return !t.empty();
+    }
+
+    static TrackedReturnType DefaultValue()
+    {
+      return TrackedReturnType();
+    }
+
+    static void Dispose(InterfaceMap& t)
+    {
+      t.clear();
+    }
+
+    static TrackedReturnType ConvertToTrackedType(TrackedArgType im)
+    {
+      return im;
+    }
+  };
+
+  typedef typename TypeTraits::ServiceType ServiceType;
+  typedef typename TypeTraits::TrackedType TrackedType;
+  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
+  typedef typename TypeTraits::TrackedArgType TrackedArgType;
+  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+
+  virtual ~ServiceTrackerCustomizer() {}
+  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
 };
 
 }

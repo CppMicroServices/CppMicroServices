@@ -38,8 +38,6 @@ class ServletHandler;
 
 struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler*>
 {
-  typedef ServiceTrackerCustomizer<HttpServlet, ServletHandler*>::TrackedType TrackerType;
-
   ServletContainerPrivate(ServletContainer* q);
 
   void Start();
@@ -49,7 +47,7 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
 
   BundleContext* m_Context;
   CivetServer* m_Server;
-  ServiceTracker<HttpServlet, TrackedTypeTraits<HttpServlet, ServletHandler*> > m_ServletTracker;
+  ServiceTracker<HttpServlet, ServletHandler*> m_ServletTracker;
 
   std::map<std::string, ServletContext*> m_ServletContextMap;
   std::string m_ContextPath;

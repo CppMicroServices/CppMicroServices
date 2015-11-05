@@ -115,7 +115,7 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 {
   if (closed) return;
 
-  T object = TTT::DefaultValue();
+  TrackedReturnType object = TTT::DefaultValue();
   {
     auto l = this->Lock();
     if (closed)
@@ -158,7 +158,7 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 {
-  T object = TTT::DefaultValue();
+  TrackedReturnType object = TTT::DefaultValue();
   {
     auto l = this->Lock();
     std::size_t initialSize = initial.size();
@@ -219,12 +219,12 @@ bool BundleAbstractTracked<S,TTT,R>::IsEmpty_unlocked() const
 }
 
 template<class S, class TTT, class R>
-typename BundleAbstractTracked<S,TTT,R>::T
+typename BundleAbstractTracked<S,TTT,R>::TrackedReturnType
 BundleAbstractTracked<S,TTT,R>::GetCustomizedObject_unlocked(S item) const
 {
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end()) return i->second;
-  return T();
+  return TTT::DefaultValue();
 }
 
 template<class S, class TTT, class R>
@@ -257,7 +257,7 @@ void BundleAbstractTracked<S,TTT,R>::CopyEntries_unlocked(TrackingMap& map) cons
 }
 
 template<class S, class TTT, class R>
-bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const T& custom)
+bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, TrackedArgType custom)
 {
   auto l = this->Lock();
   std::size_t addingSize = adding.size();
@@ -286,7 +286,7 @@ template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
 {
   US_DEBUG(DEBUG_OUTPUT) << "BundleAbstractTracked::trackAdding:" << item;
-  T object = TTT::DefaultValue();
+  TrackedReturnType object = TTT::DefaultValue();
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
   try

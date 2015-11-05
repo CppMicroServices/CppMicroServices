@@ -35,6 +35,26 @@ class WaitCondition
 {
 public:
 
+  void Wait(typename MutexHost::UniqueLock& lock)
+  {
+#ifdef US_ENABLE_THREADING_SUPPORT
+    m_CondVar.wait(lock.m_Lock);
+#else
+    US_UNUSED(lock);
+#endif
+  }
+
+  template<class Predicate>
+  void Wait(typename MutexHost::UniqueLock& lock, Predicate pred)
+  {
+#ifdef US_ENABLE_THREADING_SUPPORT
+    m_CondVar.wait(lock.m_Lock, pred);
+#else
+    US_UNUSED(lock);
+    US_UNUSED(pred);
+#endif
+  }
+
   template<class Rep, class Period>
   std::cv_status WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time)
   {
@@ -44,6 +64,19 @@ public:
     US_UNUSED(lock);
     US_UNUSED(rel_time);
     return std::cv_status::no_timeout;
+#endif
+  }
+
+  template<class Rep, class Period, class Predicate>
+  bool WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time, Predicate pred)
+  {
+#ifdef US_ENABLE_THREADING_SUPPORT
+    return m_CondVar.wait_for(lock.m_Lock, rel_time, pred);
+#else
+    US_UNUSED(lock);
+    US_UNUSED(rel_time);
+    US_UNUSED(pred);
+    return pred();
 #endif
   }
 

@@ -35,7 +35,7 @@ const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = true;
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st, BundleContext* context,
+    ServiceTracker<S,T>* st, BundleContext* context,
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
@@ -63,7 +63,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st,
+    ServiceTracker<S,T>* st,
     BundleContext* context, const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
@@ -91,7 +91,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st,
+    ServiceTracker<S,T>* st,
     BundleContext* context, const LDAPFilter& filter,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
@@ -148,7 +148,7 @@ TrackedService<S,TTT>* ServiceTrackerPrivate<S,TTT>::Tracked() const
 template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::Modified()
 {
-  cachedReference = 0; /* clear cached value */
+  cachedReference = nullptr; /* clear cached value */
   TTT::Dispose(cachedService); /* clear cached value */
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }

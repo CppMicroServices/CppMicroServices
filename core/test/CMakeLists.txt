@@ -36,12 +36,14 @@ set(_tests
   usBundleRegistryPerformanceTest
   usFrameworkTest
   usFrameworkFactoryTest
+  usHelgrindTest
   usLDAPFilterTest
   usLogTest
   usBundleHooksTest
   usBundleManifestTest
   usBundleTest
   usBundleResourceTest
+  usMemcheckTest
   usServiceFactoryTest
   usServiceHooksTest
   usServiceRegistryPerformanceTest
@@ -104,12 +106,13 @@ usFunctionEmbedResources(TARGET ${_test_driver}
                          ZIP_ARCHIVES ${Core_TARGET} ${_us_test_bundle_libs})
 
 # Register tests
-foreach(_test ${_tests})
-  add_test(NAME ${_test} COMMAND ${_test_driver} ${_test})
-endforeach()
+us_add_tests(${_test_driver} ${_tests})
 
-if(US_TEST_LABELS)
-  set_tests_properties(${_tests} PROPERTIES LABELS "${US_TEST_LABELS}")
+if(US_MEMCHECK_COMMAND)
+  set_tests_properties(memcheck_usMemcheckTest PROPERTIES WILL_FAIL 1)
+  if(US_ENABLE_THREADING_SUPPORT)
+    set_tests_properties(helgrind_usHelgrindTest PROPERTIES WILL_FAIL 1)
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

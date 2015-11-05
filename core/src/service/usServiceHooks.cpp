@@ -115,7 +115,7 @@ void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string&
     for (auto fhrIter = srl.rbegin(), fhrEnd = srl.rend(); fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-      ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
+      ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
       if (fh != nullptr)
       {
         try
@@ -162,7 +162,7 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
     for(auto sriIter = eventListenerHooks.rbegin(), sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
-      ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
+      ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
       if(elh != nullptr)
       {
         try

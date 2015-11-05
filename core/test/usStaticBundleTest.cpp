@@ -210,7 +210,5 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
     frame040c(mc, listener);
   }
 
-  delete framework;
-
   US_TEST_END()
 }

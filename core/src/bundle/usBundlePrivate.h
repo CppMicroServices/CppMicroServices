@@ -51,13 +51,15 @@ public:
   /**
    * Construct a new bundle based on a BundleInfo object.
    */
-  BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx, const BundleInfo& info);
+  BundlePrivate(Bundle* qq, const BundleInfo& info);
+
+  void Init(CoreBundleContext* coreCtx);
 
   virtual ~BundlePrivate();
 
   void RemoveBundleResources();
 
-  CoreBundleContext* const coreCtx;
+  CoreBundleContext* coreCtx;
 
   /**
    * Bundle version
@@ -74,6 +76,8 @@ public:
    * BundleContext for the bundle
    */
   std::atomic<BundleContext*> bundleContext;
+
+  std::vector<std::unique_ptr<BundleContext>> bundleContextOrphans;
 
   // TODO use proper state handling
   std::atomic<bool> starting;

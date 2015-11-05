@@ -57,9 +57,5 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 
     US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
 
-    delete f;
-    delete f1;
-    delete f2;
-
     US_TEST_END()
 }

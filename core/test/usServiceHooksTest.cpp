@@ -409,11 +409,9 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
     US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
 
-  TestListenerHook(framework);
-  TestFindHook(framework);
-  TestEventListenerHook(framework);
-
-  delete framework;
+  TestListenerHook(framework.get());
+  TestFindHook(framework.get());
+  TestEventListenerHook(framework.get());
 
   US_TEST_END()
 }

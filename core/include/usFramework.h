@@ -60,6 +60,11 @@ class FrameworkPrivate;
 class US_Core_EXPORT Framework : public Bundle
 {
 public:
+
+    // This class is not copy-able
+    Framework(const Framework&) = delete;
+    Framework operator=(const Framework&) = delete;
+
     virtual ~Framework(void);
 
     /**
@@ -161,17 +166,7 @@ private:
 
     // Allow the framework to be constructed with configuration properties
     // provided by a FrameworkFactory object.
-    Framework(const std::map<std::string, Any>& configuration);
-    Framework(void);
-
-    // This class is not copy-able
-    Framework(const Framework&);
-    Framework operator=(const Framework&);
-
-    // Helper function used to initialize the framework instance
-    void Initialize(void);
-
-    FrameworkPrivate* d;
+    Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration);
 
 };
 

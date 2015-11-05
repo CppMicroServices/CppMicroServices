@@ -129,7 +129,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     framework->SetAutoLoadingEnabled(false);
 
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
-    TestSerial(framework);
+    TestSerial(framework.get());
 
     for (auto bundle : framework->GetBundleContext()->GetBundles())
     {
@@ -140,11 +140,10 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     }
 #ifdef US_ENABLE_THREADING_SUPPORT
     US_TEST_OUTPUT(<< "Testing concurrent installation of bundles");
-    TestConcurrent(framework);
+    TestConcurrent(framework.get());
 #endif
 
     framework->Stop();
-    delete framework;
 
     US_TEST_END()
 }

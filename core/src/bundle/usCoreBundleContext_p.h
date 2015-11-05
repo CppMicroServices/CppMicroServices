@@ -77,11 +77,13 @@ public:
    */
   const std::map<std::string, Any> frameworkProperties;
 
+  Bundle* const systemBundle;
+
   /**
    * Contruct a core context
    *
    */
-  CoreBundleContext(const std::map<std::string, Any>& props = std::map<std::string, Any>());
+  CoreBundleContext(Bundle* systemBundle, const std::map<std::string, Any>& props = std::map<std::string, Any>());
 
   ~CoreBundleContext();
 

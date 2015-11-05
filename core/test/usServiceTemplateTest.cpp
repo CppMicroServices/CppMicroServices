@@ -212,7 +212,5 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   sr2.Unregister();
   sr3.Unregister();
 
-  delete framework;
-
   US_TEST_END()
 }

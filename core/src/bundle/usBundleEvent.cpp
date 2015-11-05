@@ -32,7 +32,7 @@ public:
 
   BundleEventData& operator=(const BundleEventData&) = delete;
 
-  BundleEventData(BundleEvent::Type type, Bundle* bundle)
+  BundleEventData(BundleEvent::Type type, const std::shared_ptr<Bundle>& bundle)
     : type(type), bundle(bundle)
   {
 
@@ -45,7 +45,7 @@ public:
   }
 
   const BundleEvent::Type type;
-  Bundle* const bundle;
+  std::shared_ptr<Bundle> const bundle;
 
 };
 
@@ -65,7 +65,7 @@ bool BundleEvent::IsNull() const
   return !d;
 }
 
-BundleEvent::BundleEvent(Type type, Bundle* bundle)
+BundleEvent::BundleEvent(Type type, const std::shared_ptr<Bundle>& bundle)
   : d(new BundleEventData(type, bundle))
 {
 
@@ -83,7 +83,7 @@ BundleEvent& BundleEvent::operator=(const BundleEvent& other)
   return *this;
 }
 
-Bundle* BundleEvent::GetBundle() const
+std::shared_ptr<Bundle> BundleEvent::GetBundle() const
 {
   return d->bundle;
 }

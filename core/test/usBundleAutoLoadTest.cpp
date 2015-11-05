@@ -165,21 +165,15 @@ int usBundleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   framework->Start();
 
   framework->SetAutoLoadingEnabled(false);
-  testDefaultAutoLoadPath(false, framework);
-
-  framework->Stop();
-  delete framework;
+  testDefaultAutoLoadPath(false, framework.get());
 
   framework = factory.NewFramework();
   framework->Start();
 
   framework->SetAutoLoadingEnabled(true);
 
-  testDefaultAutoLoadPath(true, framework);
-  testCustomAutoLoadPath(framework);
-
-  framework->Stop();
-  delete framework;
+  testDefaultAutoLoadPath(true, framework.get());
+  testCustomAutoLoadPath(framework.get());
 
   US_TEST_END()
 }

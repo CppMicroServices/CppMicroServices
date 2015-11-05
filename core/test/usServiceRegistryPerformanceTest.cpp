@@ -60,7 +60,7 @@ private:
 
   std::vector<ServiceRegistration<IPerfTestService> > regs;
   std::vector<MyServiceListener*> listeners;
-  std::vector<IPerfTestService*> services;
+  std::vector<std::unique_ptr<IPerfTestService>> services;
 
 public:
 
@@ -218,10 +218,9 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
     props["service.pid"] = ss.str();
     props["perf.service.value"] = i+1;
 
-    PerfTestService* service = new PerfTestService();
-    services.push_back(service);
+    services.emplace_back(std::unique_ptr<IPerfTestService>(new PerfTestService()));
     ServiceRegistration<IPerfTestService> reg =
-        mc->RegisterService<IPerfTestService>(service, props);
+        mc->RegisterService<IPerfTestService>(services.back().get(), props);
     regs.push_back(reg);
   }
 }
@@ -295,9 +294,6 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
   perfTest.TestModifyServices();
   perfTest.TestUnregisterServices();
   perfTest.CleanupTestCase();
-
-  framework->Stop();
-  delete framework;
 
   US_TEST_END()
 }

@@ -55,8 +55,6 @@ namespace
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_LOG_LEVEL).ToString() == "3", "Test for default logging level")
 
         US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
-
-        delete f;
     }
 
     void TestCustomConfig()
@@ -99,8 +97,6 @@ namespace
 #else
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
 #endif
-
-        delete f;
     }
 
     void TestProperties()
@@ -112,8 +108,6 @@ namespace
         US_TEST_CONDITION(f->GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f->GetName() == US_CORE_FRAMEWORK_NAME, "Test Framework Bundle Name");
         US_TEST_CONDITION(f->GetBundleId() == 0, "Test Framework Bundle Id");
-
-        delete f;
     }
 
     void TestLifeCycle()
@@ -165,9 +159,6 @@ namespace
 
         US_TEST_CONDITION(!bundleA->IsStarted(), "Check that TestBundleA is in the Stop state")
         US_TEST_CONDITION(!f->IsStarted(), "Check framework is in the Stop state")
-
-        delete f;
-
     }
 
     void TestEvents()
@@ -240,8 +231,6 @@ namespace
         f->Stop();
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pStopEvts), "Check for bundle stop events")
-
-        delete f;
     }
 }
 

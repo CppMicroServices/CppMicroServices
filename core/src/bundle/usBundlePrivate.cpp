@@ -40,9 +40,8 @@
 
 namespace us {
 
-BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
-                             const BundleInfo& info)
-  : coreCtx(coreCtx)
+BundlePrivate::BundlePrivate(Bundle* qq, const BundleInfo& info)
+  : coreCtx(nullptr)
   , info(info)
   , resourceContainer(&this->info)
   , bundleContext(nullptr)
@@ -52,6 +51,12 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
   , q(qq)
   , lib(info.location)
 {
+}
+
+void BundlePrivate::Init(CoreBundleContext* coreCtx)
+{
+  this->coreCtx = coreCtx;
+
   // Check if the bundle provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())
   {
@@ -137,7 +142,6 @@ BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
 
 BundlePrivate::~BundlePrivate()
 {
-  delete bundleContext;
 }
 
 void BundlePrivate::RemoveBundleResources()
@@ -166,7 +170,7 @@ void BundlePrivate::RemoveBundleResources()
   for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin();
        i != srs.end(); ++i)
   {
-    i->GetReference(std::string()).d->UngetService(q, false);
+    i->GetReference(std::string()).d.load()->UngetService(q, false);
   }
 }
 

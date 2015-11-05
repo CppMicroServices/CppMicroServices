@@ -191,7 +191,7 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
 
           // location will be in the form:
           //  <path to bundle plugin>\<bundle-name>.<lib-extension>/<bundle-name>
-          Bundle* installedBundle = GetBundleContext()->InstallBundle(location);
+          auto installedBundle = GetBundleContext()->InstallBundle(location);
 
           if (!installedBundle)
           {

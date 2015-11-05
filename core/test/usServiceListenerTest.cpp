@@ -360,9 +360,9 @@ void frameSL25a(Framework* framework)
     throw;
   }
 
-  Bundle* libSL1 = InstallTestBundle(mc, "TestBundleSL1");
-  Bundle* libSL3 = InstallTestBundle(mc, "TestBundleSL3");
-  Bundle* libSL4 = InstallTestBundle(mc, "TestBundleSL4");
+  auto libSL1 = InstallTestBundle(mc, "TestBundleSL1");
+  auto libSL3 = InstallTestBundle(mc, "TestBundleSL3");
+  auto libSL4 = InstallTestBundle(mc, "TestBundleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
@@ -554,12 +554,10 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
   auto framework = factory.NewFramework();
   framework->Start();
 
-  frameSL02a(framework);
-  frameSL05a(framework);
-  frameSL10a(framework);
-  frameSL25a(framework);
-
-  delete framework;
+  frameSL02a(framework.get());
+  frameSL05a(framework.get());
+  frameSL10a(framework.get());
+  frameSL25a(framework.get());
 
   US_TEST_END()
 }

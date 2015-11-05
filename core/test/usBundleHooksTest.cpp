@@ -53,9 +53,9 @@ class TestBundleFindHook : public BundleFindHook
 {
 public:
 
-  void Find(const BundleContext* /*context*/, ShrinkableVector<Bundle*>& bundles)
+  void Find(const BundleContext* /*context*/, ShrinkableVector<std::shared_ptr<Bundle>>& bundles)
   {
-    for (ShrinkableVector<Bundle*>::iterator i = bundles.begin();
+    for (ShrinkableVector<std::shared_ptr<Bundle>>::iterator i = bundles.begin();
          i != bundles.end();)
     {
       if ((*i)->GetName() == "TestBundleA")
@@ -161,10 +161,8 @@ int usBundleHooksTest(int /*argc*/, char* /*argv*/[])
   auto framework = factory.NewFramework();
   framework->Start();
 
-  TestFindHook(framework);
-  TestEventHook(framework);
-
-  delete framework;
+  TestFindHook(framework.get());
+  TestEventHook(framework.get());
 
   US_TEST_END()
 }

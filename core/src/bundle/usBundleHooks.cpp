@@ -36,11 +36,11 @@ BundleHooks::BundleHooks(CoreBundleContext* ctx)
 {
 }
 
-Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
+std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* mc, const std::shared_ptr<Bundle>& bundle) const
 {
   if(bundle == nullptr)
   {
-    return nullptr;
+    return bundle;
   }
 
   std::vector<ServiceRegistrationBase> srl;
@@ -51,24 +51,24 @@ Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
   }
   else
   {
-    std::vector<Bundle*> ml;
+    std::vector<std::shared_ptr<Bundle>> ml;
     ml.push_back(bundle);
     this->FilterBundles(mc, ml);
     return ml.empty() ? nullptr : bundle;
   }
 }
 
-void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<Bundle*>& bundles) const
+void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<std::shared_ptr<Bundle>>& bundles) const
 {
   std::vector<ServiceRegistrationBase> srl;
   coreCtx->services.Get(us_service_interface_iid<BundleFindHook>(), srl);
-  ShrinkableVector<Bundle*> filtered(bundles);
+  ShrinkableVector<std::shared_ptr<Bundle>> filtered(bundles);
 
   std::sort(srl.begin(), srl.end());
   for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
-    BundleFindHook* const fh = reinterpret_cast<BundleFindHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
+    BundleFindHook* const fh = reinterpret_cast<BundleFindHook*>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
     if (fh != nullptr)
     {
       try
@@ -127,7 +127,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
         continue;
       }
 
-      BundleEventHook* eh = reinterpret_cast<BundleEventHook*>(sr.d->GetService(GetBundleContext()->GetBundle()));
+      BundleEventHook* eh = reinterpret_cast<BundleEventHook*>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
       if (eh != nullptr)
       {
         try

@@ -120,9 +120,9 @@ long long HighPrecisionTimer::ElapsedMicro()
 
 #endif
 
-Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName)
+std::shared_ptr<Bundle> InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName)
 {
-    Bundle* bundle = nullptr;
+    std::shared_ptr<Bundle> bundle = nullptr;
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)

@@ -50,7 +50,7 @@ public:
   bool CheckListenerEvents(
       bool pexp, BundleEvent::Type ptype,
       bool sexp, ServiceEvent::Type stype,
-      Bundle* bundleX, ServiceReferenceU* servX);
+      const std::shared_ptr<Bundle>& bundleX, ServiceReferenceU* servX);
 
   bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts);
 

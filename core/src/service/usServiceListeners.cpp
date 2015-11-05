@@ -159,13 +159,15 @@ void ServiceListeners::RemoveAllListeners(BundleContext* mc)
 
 void ServiceListeners::HooksBundleStopped(BundleContext* mc)
 {
-  auto l = this->Lock();
   std::vector<ServiceListenerEntry> entries;
-  for (auto& sle : serviceSet)
   {
-    if (sle.GetBundleContext() == mc)
+    auto l = this->Lock();
+    for (auto& sle : serviceSet)
     {
-      entries.push_back(sle);
+      if (sle.GetBundleContext() == mc)
+      {
+        entries.push_back(sle);
+      }
     }
   }
   coreCtx->serviceHooks.HandleServiceListenerUnreg(entries);
@@ -220,7 +222,10 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
   // This must not be called with any locks held
   coreCtx->serviceHooks.FilterServiceEventReceivers(evt, receivers);
 
-  auto props = evt.GetServiceReference().d->GetProperties();
+  // Get a copy of the service reference and keep it until we are
+  // done with its properties.
+  auto ref = evt.GetServiceReference();
+  auto props = ref.d.load()->GetProperties();
 
   {
     auto l = this->Lock();

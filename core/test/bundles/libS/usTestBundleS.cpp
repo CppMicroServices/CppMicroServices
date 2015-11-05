@@ -117,12 +117,12 @@ class TestBundleSActivator : public BundleActivator
 
 public:
 
-  TestBundleSActivator() : s(0) {}
-  ~TestBundleSActivator() { delete s; }
+  TestBundleSActivator() {}
+  ~TestBundleSActivator() {}
 
   void Start(BundleContext* context)
   {
-    s = new TestBundleS(context);
+    s.reset(new TestBundleS(context));
   }
 
   void Stop(BundleContext* /*context*/)
@@ -134,7 +134,7 @@ public:
 
 private:
 
-  TestBundleS* s;
+  std::unique_ptr<TestBundleS> s;
 
 };
 

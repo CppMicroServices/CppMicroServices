@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 
   try
   {
-    std::vector<Bundle*> bundles;
+    std::vector<std::shared_ptr<Bundle>> bundles;
     for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next())
     {
       if (opt->arg == nullptr) continue;

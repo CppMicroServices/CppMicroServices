@@ -20,39 +20,22 @@
 
 =============================================================================*/
 
+#include "usBundleContextPrivate.h"
 
-#include <usGlobalConfig.h>
-
-US_MSVC_DISABLE_WARNING(4355)
-
-#include "usCoreBundleContext_p.h"
 
 namespace us {
 
-CoreBundleContext::CoreBundleContext(Bundle* systemBundle, const std::map<std::string, Any>& props)
-  : listeners(this)
-  , services(this)
-  , serviceHooks(this)
-  , bundleHooks(this)
-  , bundleRegistry(this)
-  , settings()
-  , frameworkProperties(props)
-  , systemBundle(systemBundle)
-{
-}
+BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle)
+  : bundle(bundle)
+{}
 
-CoreBundleContext::~CoreBundleContext()
+void BundleContextPrivate::IsValid_unlocked() const
 {
-}
-
-void CoreBundleContext::Init()
-{
-  serviceHooks.Open();
-}
-
-void CoreBundleContext::Uninit()
-{
-  serviceHooks.Close();
+  // TODO check for valid states ACTIVE, STARTING, STOPPING
+  if (bundle == nullptr)
+  {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 }
 
 }

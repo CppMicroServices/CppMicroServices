@@ -303,7 +303,7 @@ void TestBundleStates()
     BundleContext* frameworkCtx = framework->GetBundleContext();
     frameworkCtx->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
-    Bundle* bundle = nullptr;
+    std::shared_ptr<Bundle> bundle = nullptr;
 
     // Test install -> uninstall
     // expect 2 event (INSTALLED, UNINSTALLED)
@@ -360,9 +360,6 @@ void TestBundleStates()
     bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
     bundleEvents.clear();
-
-    framework->Stop();
-    delete framework;
 }
 
 void TestForInstallFailure()
@@ -404,9 +401,6 @@ void TestForInstallFailure()
     }
 
     US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
-
-    framework->Stop();
-    delete framework;
 }
 
 void TestDuplicateInstall()
@@ -425,9 +419,6 @@ void TestDuplicateInstall()
 
     US_TEST_CONDITION(bundle == bundleDuplicate, "Test for the same bundle instance");
     US_TEST_CONDITION(bundle->GetBundleId() == bundleDuplicate->GetBundleId(), "Test for the same bundle id");
-
-    framework->Stop();
-    delete framework;
 }
 
 } // end unnamed namespace
@@ -473,10 +464,10 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   }
 
   frame005a(mc->GetBundle("main")->GetBundleContext());
-  frame010a(framework, mc);
+  frame010a(framework.get(), mc);
   frame018a(mc);
 
-  frame020a(framework, listener);
+  frame020a(framework.get(), listener);
   frame030b(mc, listener);
 
   frame045a(mc);
@@ -485,7 +476,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   mc->RemoveServiceListener(&listener, &TestBundleListener::ServiceChanged);
 
   framework->Stop();
-  delete framework;
+  framework.reset();
 
   // test a non-default framework instance using a different persistent storage location.
   std::map<std::string, Any> frameworkConfig;
@@ -494,9 +485,9 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   framework->Start();
 
   frame02a(framework->GetBundleContext());
-  frame02b(framework);
+  frame02b(framework.get());
 
-  delete framework;
+  framework.reset();
 
   TestBundleStates();
   TestForInstallFailure();

@@ -270,7 +270,5 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
   TestFilterString(framework->GetBundleContext());
   TestServiceTracker(framework->GetBundleContext());
 
-  delete framework;
-
   US_TEST_END()
 }

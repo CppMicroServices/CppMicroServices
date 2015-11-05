@@ -23,6 +23,8 @@
 #ifndef USSERVICEREFERENCEBASE_H
 #define USSERVICEREFERENCEBASE_H
 
+#include <atomic>
+
 #include <usAny.h>
 
 US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
@@ -210,7 +212,9 @@ private:
 
   void SetInterfaceId(const std::string& interfaceId);
 
-  ServiceReferenceBasePrivate* d;
+  // This class is not thread-safe, but we support thread-safe
+  // copying and assignment.
+  std::atomic<ServiceReferenceBasePrivate*> d;
 
 };
 

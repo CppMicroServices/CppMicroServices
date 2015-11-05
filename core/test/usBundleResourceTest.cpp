@@ -35,6 +35,7 @@
 #include <cassert>
 
 #include <unordered_set>
+#include <memory>
 
 using namespace us;
 
@@ -430,9 +431,9 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_CONDITION(bundleR->GetName() == "TestBundleR", "Test bundle name")
 
-  testInvalidResource(bundleR);
+  testInvalidResource(bundleR.get());
 
-  Bundle* executableBundle = nullptr;
+  std::shared_ptr<Bundle> executableBundle = nullptr;
   try
   {
     executableBundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
@@ -443,27 +444,25 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
 
-  testResourceFromExecutable(executableBundle);
+  testResourceFromExecutable(executableBundle.get());
 
-  testResourceTree(bundleR);
+  testResourceTree(bundleR.get());
 
-  testResourceOperators(bundleR);
+  testResourceOperators(bundleR.get());
 
-  testTextResource(bundleR);
-  testTextResourceAsBinary(bundleR);
-  testSpecialCharacters(bundleR);
+  testTextResource(bundleR.get());
+  testTextResourceAsBinary(bundleR.get());
+  testSpecialCharacters(bundleR.get());
 
-  testBinaryResource(bundleR);
+  testBinaryResource(bundleR.get());
 
-  testCompressedResource(bundleR);
+  testCompressedResource(bundleR.get());
 
   BundleResource foo = bundleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
 
   testResourcesFrom("TestBundleRL", framework->GetBundleContext());
   testResourcesFrom("TestBundleRA", framework->GetBundleContext());
-
-  delete framework;
 
   US_TEST_END()
 }

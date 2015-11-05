@@ -37,8 +37,9 @@ set(_srcs
   bundle/usCoreBundleActivator.cpp
   bundle/usCoreBundleContext_p.h
   bundle/usCoreBundleContext.cpp
-  bundle/usBundleContext.cpp
   bundle/usBundle.cpp
+  bundle/usBundleContext.cpp
+  bundle/usBundleContextPrivate.cpp
   bundle/usModuleElfFile.cpp
   bundle/usBundleEvent.cpp
   bundle/usBundleEventHook.cpp
@@ -81,6 +82,7 @@ set(_private_headers
 
   bundle/usBundleAbstractTracked_p.h
   bundle/usBundleAbstractTracked.tpp
+  bundle/usBundleContextPrivate.h
   bundle/usBundleHooks_p.h
   bundle/usModuleObjFile_p.h
   bundle/usBundlePrivate.h

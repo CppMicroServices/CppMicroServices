@@ -55,11 +55,11 @@ public:
 
     if (isPrototypeScope)
     {
-      result = m_reference.d->GetPrototypeService(m_context->GetBundle());
+      result = m_reference.d.load()->GetPrototypeService(m_context->GetBundle().get());
     }
     else
     {
-      result = m_reference.d->GetServiceInterfaceMap(m_context->GetBundle());
+      result = m_reference.d.load()->GetServiceInterfaceMap(m_context->GetBundle().get());
     }
 
     return result;
@@ -122,7 +122,7 @@ void ServiceObjectsBase::UngetService(void* service)
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
   }
 
-  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetBundle(), serviceIter->second))
+  if (!d->m_reference.d.load()->UngetPrototypeService(d->m_context->GetBundle().get(), serviceIter->second))
   {
     US_WARN << "Ungetting service unsuccessful";
   }
@@ -145,7 +145,7 @@ void ServiceObjectsBase::UngetService(const InterfaceMap& interfaceMap)
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
   }
 
-  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetBundle(), interfaceMap))
+  if (!d->m_reference.d.load()->UngetPrototypeService(d->m_context->GetBundle().get(), interfaceMap))
   {
     US_WARN << "Ungetting service unsuccessful";
   }

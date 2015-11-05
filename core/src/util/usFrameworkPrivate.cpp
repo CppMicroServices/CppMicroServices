@@ -24,10 +24,11 @@ limitations under the License.
 
 #include "usFramework.h"
 #include "usLog.h"
-#include "usCoreBundleContext_p.h"
-#include "usThreads_p.h"
+
+#include "usCoreConfig.h"
 
 namespace us {
+
 
 std::map<std::string, Any> InitProperties(std::map<std::string, Any> configuration)
 {
@@ -47,25 +48,9 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
     return std::move(configuration);
 }
 
-FrameworkPrivate::FrameworkPrivate(void)
-  : coreBundleContext(InitProperties(std::map<std::string, Any>()))
-  , initialized(false)
-{
-  Init();
-}
-
-FrameworkPrivate::FrameworkPrivate(const std::map<std::string, Any>& configuration)
-  : coreBundleContext(InitProperties(configuration))
-  , initialized(false)
-{
-  Init();
-}
-
-FrameworkPrivate::~FrameworkPrivate()
-{
-}
-
-void FrameworkPrivate::Init()
+FrameworkPrivate::FrameworkPrivate(Framework* qq, const BundleInfo& info, const std::map<std::string, Any>& configuration)
+  : BundlePrivate(qq, info)
+  , coreBundleContext(qq, InitProperties(configuration))
 {
   Logger::instance().SetLogLevel(static_cast<us::MsgType>(any_cast<int>(coreBundleContext.frameworkProperties.find(Framework::PROP_LOG_LEVEL)->second)));
 }

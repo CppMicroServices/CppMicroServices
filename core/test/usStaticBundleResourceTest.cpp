@@ -134,8 +134,8 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for existing bundle TestBundleB")
   US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
 
-  testResourceOperators(bundle);
-  testResourcesWithStaticImport(framework, bundle);
+  testResourceOperators(bundle.get());
+  testResourcesWithStaticImport(framework.get(), bundle.get());
 
   BundleResource resource = framework->GetBundleContext()->GetBundle("TestBundleImportedByB")->GetResource("static.txt");
   bundle->Start();
@@ -143,8 +143,6 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   bundle->Stop();
   US_TEST_CONDITION_REQUIRED(resource.IsValid() == true, "Check still valid static.txt resource")
-
-  delete framework;
 
   US_TEST_END()
 }

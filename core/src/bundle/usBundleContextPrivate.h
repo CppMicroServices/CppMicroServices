@@ -20,39 +20,28 @@
 
 =============================================================================*/
 
+#ifndef USBUNDLECONTEXTPRIVATE_H_
+#define USBUNDLECONTEXTPRIVATE_H_
 
-#include <usGlobalConfig.h>
+#include "usThreads_p.h"
 
-US_MSVC_DISABLE_WARNING(4355)
-
-#include "usCoreBundleContext_p.h"
 
 namespace us {
 
-CoreBundleContext::CoreBundleContext(Bundle* systemBundle, const std::map<std::string, Any>& props)
-  : listeners(this)
-  , services(this)
-  , serviceHooks(this)
-  , bundleHooks(this)
-  , bundleRegistry(this)
-  , settings()
-  , frameworkProperties(props)
-  , systemBundle(systemBundle)
-{
-}
+class BundlePrivate;
 
-CoreBundleContext::~CoreBundleContext()
+class BundleContextPrivate : public MultiThreaded<>
 {
-}
 
-void CoreBundleContext::Init()
-{
-  serviceHooks.Open();
-}
+public:
 
-void CoreBundleContext::Uninit()
-{
-  serviceHooks.Close();
-}
+  BundleContextPrivate(BundlePrivate* bundle);
+
+  void IsValid_unlocked() const;
+
+  BundlePrivate* bundle;
+};
 
 }
+
+#endif

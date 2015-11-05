@@ -79,7 +79,7 @@ typedef ServiceReference<void> ServiceReferenceU;
  *
  * @remarks This class is thread safe.
  */
-class US_Core_EXPORT Bundle
+class US_Core_EXPORT Bundle : public std::enable_shared_from_this<Bundle>
 {
 
 public:
@@ -392,18 +392,20 @@ public:
    */
   virtual void Uninstall();
 
+protected:
+
+  Bundle(std::unique_ptr<BundlePrivate> d);
+
+  std::unique_ptr<BundlePrivate> d;
+
 private:
 
   friend class CoreBundleActivator;
   friend class BundleRegistry;
   friend class ServiceReferencePrivate;
-  friend class Framework;
 
-  std::unique_ptr<BundlePrivate> d;
+  Bundle(CoreBundleContext* coreCtx, const BundleInfo& info);
 
-  Bundle();
-
-  void Init_unlocked(CoreBundleContext* coreCtx, const BundleInfo& info);
   void Uninit_unlocked();
 
 };

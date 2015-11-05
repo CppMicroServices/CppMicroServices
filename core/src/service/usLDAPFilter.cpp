@@ -82,7 +82,7 @@ LDAPFilter::operator bool_type() const
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return d->ldapExpr.Evaluate(reference.d->GetProperties(), true);
+  return d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), true);
 }
 
 bool LDAPFilter::Match(const ServiceProperties& dictionary) const

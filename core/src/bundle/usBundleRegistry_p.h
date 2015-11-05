@@ -27,6 +27,7 @@
 #include <string>
 #include <unordered_map>
 #include <atomic>
+#include <memory>
 
 #include <usCoreConfig.h>
 #include <usThreads_p.h>
@@ -57,7 +58,7 @@ public:
    * @return Bundle or null
    *         if the bundle was not found.
    */
-  Bundle* GetBundle(long id) const;
+  std::shared_ptr<Bundle> GetBundle(long id) const;
 
   /**
    * Get the bundle that has specified bundle name.
@@ -65,30 +66,21 @@ public:
    * @param name The name of the bundle to get.
    * @return Bundle or null.
    */
-  Bundle* GetBundle(const std::string& name) const;
+  std::shared_ptr<Bundle> GetBundle(const std::string& name) const;
 
   /**
    * Get all known bundles.
    *
    * @return A list which is filled with all known bundles.
    */
-  std::vector<Bundle*> GetBundles() const;
+  std::vector<std::shared_ptr<Bundle>> GetBundles() const;
 
   /**
    * Register a bundle with the Framework
    *
    * @return The registered bundle.
    */
-  Bundle* Register(BundleInfo info);
-
-  /**
-   * Register the system bundle.
-   *
-   * A helper function to help bootstrap the Framework.
-   *
-   * @param systemBundle The system bundle to register.
-   */
-  void RegisterSystemBundle(Framework* const systemBundle, BundleInfo info);
+  std::shared_ptr<Bundle> Register(BundleInfo info);
 
   /**
    * Remove a bundle from the Framework.
@@ -106,7 +98,7 @@ private:
 
   CoreBundleContext* coreCtx;
 
-  typedef std::unordered_map<std::string, Bundle*> BundleMap;
+  typedef std::unordered_map<std::string, std::shared_ptr<Bundle>> BundleMap;
 
   /**
    * Table of all installed bundles in this framework.

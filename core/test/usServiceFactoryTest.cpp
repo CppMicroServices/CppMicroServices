@@ -202,7 +202,5 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   TestServiceFactoryBundleScope(framework->GetBundleContext());
   TestServiceFactoryPrototypeScope(framework->GetBundleContext());
 
-  delete framework;
-
   US_TEST_END()
 }

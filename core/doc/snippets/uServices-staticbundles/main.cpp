@@ -8,8 +8,8 @@ class BundleContext;
 using namespace us;
 
 // This is just for illustration purposes in code snippets
-extern "C" BundleActivator* _us_bundle_activator_instance_MyStaticBundle1() { return 0; }
-extern "C" BundleActivator* _us_bundle_activator_instance_MyStaticBundle2() { return 0; }
+extern "C" BundleActivator* _us_create_activator_MyStaticBundle1() { return nullptr; }
+extern "C" BundleActivator* _us_create_activator_MyStaticBundle2() { return nullptr; }
 extern "C" void _us_import_bundle_initializer_MyStaticBundle1() {}
 extern "C" void _us_import_bundle_initializer_MyStaticBundle2() {}
 extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle1() { return nullptr; }

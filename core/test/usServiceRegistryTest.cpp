@@ -145,7 +145,5 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   TestMultipleServiceRegistrations(mc);
   TestServicePropertiesUpdate(mc);
 
-  delete framework;
-
   US_TEST_END()
 }

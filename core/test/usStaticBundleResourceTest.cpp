@@ -62,7 +62,7 @@ void testResourceOperators(Bundle* bundle)
   US_TEST_CONDITION_REQUIRED(resources.size() == 1, "Check resource count")
 }
 
-void testResourcesWithStaticImport(std::shared_ptr<Framework> framework, Bundle* bundle)
+void testResourcesWithStaticImport(const std::shared_ptr<Framework>& framework, Bundle* bundle)
 {
   BundleResource resource = bundle->GetResource("res.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid res.txt resource")

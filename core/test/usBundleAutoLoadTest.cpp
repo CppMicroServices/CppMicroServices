@@ -39,7 +39,7 @@ using namespace us;
 
 namespace {
 
-void testDefaultAutoLoadPath(bool autoLoadEnabled, std::shared_ptr<Framework> framework)
+void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
   assert(mc);
@@ -98,7 +98,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, std::shared_ptr<Framework> fr
   bundleAL->Stop();
 }
 
-void testCustomAutoLoadPath(std::shared_ptr<Framework> framework)
+void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
   assert(mc);

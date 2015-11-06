@@ -54,14 +54,13 @@ context->RegisterService<InterfaceA, InterfaceB>(myService);
 //! [f1]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMapConstPtr GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
-    std::shared_ptr<MyService> myService = std::make_shared<MyService>();
-    return MakeInterfaceMap<InterfaceA>(myService);
+    return MakeInterfaceMap<InterfaceA>(std::make_shared<MyService>());;
   }
 
   virtual void UngetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/,
-                            const InterfaceMap& /*service*/)
+                            const InterfaceMapConstPtr& /*service*/)
   {
     
   }
@@ -77,14 +76,13 @@ context->RegisterService<InterfaceA>(ToFactory(myServiceFactory));
 //! [f2]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMapConstPtr GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
-    std::shared_ptr<MyService2> myService = std::make_shared<MyService2>();
-    return MakeInterfaceMap<InterfaceA,InterfaceB>(myService);
+    return MakeInterfaceMap<InterfaceA,InterfaceB>(std::make_shared<MyService2>());
   }
 
   virtual void UngetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/,
-                            const InterfaceMap& /*service*/)
+                            const InterfaceMapConstPtr& /*service*/)
   {
     
   }

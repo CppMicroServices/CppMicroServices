@@ -60,7 +60,7 @@ public:
     */
   std::shared_ptr<void> GetService(Bundle* bundle);
 
-  InterfaceMap GetServiceInterfaceMap(Bundle* bundle);
+  InterfaceMapConstPtr GetServiceInterfaceMap(Bundle* bundle);
 
   /**
     * Get new service instance.
@@ -68,7 +68,7 @@ public:
     * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  InterfaceMap GetPrototypeService(Bundle* bundle);
+  InterfaceMapConstPtr GetPrototypeService(Bundle* bundle);
 
   /**
    * Unget the service object.
@@ -91,7 +91,7 @@ public:
    */
   bool UngetPrototypeService(Bundle* bundle, void* service);
 
-  bool UngetPrototypeService(Bundle* bundle, const InterfaceMap& service);
+  bool UngetPrototypeService(Bundle* bundle, const InterfaceMapConstPtr& service);
 
   /**
    * Get all properties registered with this service.
@@ -141,9 +141,9 @@ public:
   std::string interfaceId;
 
 private:
-  InterfaceMap GetServiceFromFactory(Bundle* bundle, 
+  InterfaceMapConstPtr GetServiceFromFactory(Bundle* bundle,
                                      std::shared_ptr<ServiceFactory> factory,
-                                     bool isModuleScope);
+                                     bool isBundleScope);
 };
 
 }

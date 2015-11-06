@@ -83,7 +83,7 @@ public:
   }
 };
 
-void TestFindHook(std::shared_ptr<Framework> framework)
+void TestFindHook(const std::shared_ptr<Framework>& framework)
 {
   InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
 

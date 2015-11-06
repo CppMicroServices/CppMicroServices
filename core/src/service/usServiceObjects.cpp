@@ -40,18 +40,18 @@ public:
   ServiceReferenceBase m_reference;
 
   // This is used by all ServiceObjects<S> instances with S != void
-  std::map<std::shared_ptr<void>, InterfaceMap> m_serviceInstances;
+  std::map<std::shared_ptr<void>, InterfaceMapConstPtr> m_serviceInstances;
   // This is used by ServiceObjects<void>
-  std::set<InterfaceMap> m_serviceInterfaceMaps;
+  std::set<InterfaceMapConstPtr> m_serviceInterfaceMaps;
 
   ServiceObjectsBasePrivate(BundleContext* context, const ServiceReferenceBase& reference)
     : m_context(context)
     , m_reference(reference)
   {}
 
-  InterfaceMap GetServiceInterfaceMap()
+  InterfaceMapConstPtr GetServiceInterfaceMap()
   {
-    InterfaceMap result;
+    InterfaceMapConstPtr result;
 
     bool isPrototypeScope = m_reference.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
                             ServiceConstants::SCOPE_PROTOTYPE();
@@ -80,6 +80,24 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
   ++d->ref;
 }
 
+template <class S>
+struct UngetHelper
+{
+  ServiceObjectsBase* sObj;
+  std::shared_ptr<S> service;
+  ~UngetHelper()
+  {
+    try
+    {
+      sObj->UngetService(service);
+    }
+    catch (std::exception& ex)
+    {
+      US_WARN << "UngetService threw an exception - " << ex.what();
+    }
+  }
+};
+
 std::shared_ptr<void> ServiceObjectsBase::GetService() const
 {
   if (!d->m_reference)
@@ -87,40 +105,35 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
     return NULL;
   }
 
-  InterfaceMap im = d->GetServiceInterfaceMap();
-  std::shared_ptr<void> result = im.find(d->m_reference.GetInterfaceId())->second;
+  InterfaceMapConstPtr im = d->GetServiceInterfaceMap();
+  std::shared_ptr<void> result = im->find(d->m_reference.GetInterfaceId())->second;
 
   if (result)
   {
     d->m_serviceInstances.insert(std::make_pair(result, im));
   }
-
-  struct ServiceHolder
-  {
-	  ServiceObjectsBase* sObj;
-	  std::shared_ptr<void> service;
-	  ~ServiceHolder() { sObj->UngetService(service); }
-  };
-  std::shared_ptr<ServiceHolder> h(new ServiceHolder{ const_cast<ServiceObjectsBase*>(this), result });
   
+  std::shared_ptr<UngetHelper<void>> h(new UngetHelper<void>{ const_cast<ServiceObjectsBase*>(this), result });
   return std::shared_ptr<void>(h, h->service.get());
 }
 
-InterfaceMap ServiceObjectsBase::GetServiceInterfaceMap() const
+InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
 {
-  InterfaceMap result;
+  InterfaceMapConstPtr result;
   if (!d->m_reference)
   {
     return result;
   }
+  // copy construct a new map to be handed out to consumers
+  result = std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
 
-  result = d->GetServiceInterfaceMap();
-
-  if (!result.empty())
+  if (result && !result->empty())
   {
     d->m_serviceInterfaceMaps.insert(result);
   }
-  return result;
+  
+  std::shared_ptr<UngetHelper<const InterfaceMap>> h(new UngetHelper<const InterfaceMap>{ const_cast<ServiceObjectsBase*>(this), result });
+  return InterfaceMapConstPtr(h, h->service.get());
 }
 
 void ServiceObjectsBase::UngetService(std::shared_ptr<void> service)
@@ -130,7 +143,7 @@ void ServiceObjectsBase::UngetService(std::shared_ptr<void> service)
     return;
   }
 
-  std::map<std::shared_ptr<void>,InterfaceMap>::iterator serviceIter = d->m_serviceInstances.find(service);
+  std::map<std::shared_ptr<void>,InterfaceMapConstPtr>::iterator serviceIter = d->m_serviceInstances.find(service);
   if (serviceIter == d->m_serviceInstances.end())
   {
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
@@ -146,14 +159,14 @@ void ServiceObjectsBase::UngetService(std::shared_ptr<void> service)
   }
 }
 
-void ServiceObjectsBase::UngetService(const InterfaceMap& interfaceMap)
+void ServiceObjectsBase::UngetService(const InterfaceMapConstPtr& interfaceMap)
 {
-  if (interfaceMap.empty())
+  if (!interfaceMap || interfaceMap->empty())
   {
     return;
   }
 
-  std::set<InterfaceMap>::iterator serviceIter = d->m_serviceInterfaceMaps.find(interfaceMap);
+  std::set<InterfaceMapConstPtr>::iterator serviceIter = d->m_serviceInterfaceMaps.find(interfaceMap);
   if (serviceIter == d->m_serviceInterfaceMaps.end())
   {
     throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
@@ -200,14 +213,9 @@ ServiceObjectsBase& ServiceObjectsBase::operator =(const ServiceObjectsBase& oth
   return *this;
 }
 
-InterfaceMap ServiceObjects<void>::GetService() const
+InterfaceMapConstPtr ServiceObjects<void>::GetService() const
 {
   return this->ServiceObjectsBase::GetServiceInterfaceMap();
-}
-
-void ServiceObjects<void>::UngetService(const InterfaceMap& service)
-{
-  this->ServiceObjectsBase::UngetService(service);
 }
 
 ServiceReferenceU ServiceObjects<void>::GetServiceReference() const

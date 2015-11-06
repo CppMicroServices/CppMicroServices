@@ -53,17 +53,17 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
     delete registration;
 }
 
-InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
-                                                                std::shared_ptr<ServiceFactory> factory,
-                                                                bool isBundleScope)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
+                                                                        std::shared_ptr<ServiceFactory> factory,
+                                                                        bool isBundleScope)
 {
   assert(factory && "Factory service pointer is NULL");
-  InterfaceMap s;
+  InterfaceMapConstPtr s;
   try
   {
-    InterfaceMap smap = factory->GetService(bundle,
-                                            ServiceRegistrationBase(registration));
-    if (smap.empty())
+    InterfaceMapConstPtr smap = factory->GetService(bundle,
+                                                    ServiceRegistrationBase(registration));
+    if (!smap || smap->empty())
     {
       US_WARN << "ServiceFactory produced null";
       return smap;
@@ -73,12 +73,11 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
     for (std::vector<std::string>::const_iterator i = classes.begin();
          i != classes.end(); ++i)
     {
-      if (smap.find(*i) == smap.end() && *i != "org.cppmicroservices.factory")
+      if (smap->find(*i) == smap->end() && *i != "org.cppmicroservices.factory")
       {
         US_WARN << "ServiceFactory produced an object "
                    "that did not implement: " << (*i);
-        smap.clear();
-        return smap;
+        return nullptr;
       }
     }
     s = smap;
@@ -95,14 +94,14 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
   catch (...)
   {
     US_WARN << "ServiceFactory threw an exception";
-    s.clear();
+    s.reset();
   }
   return s;
 }
 
-InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bundle)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bundle)
 {
-  InterfaceMap s;
+  InterfaceMapConstPtr s;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
     T::Lock l(registration->propsLock);
@@ -132,8 +131,8 @@ std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(Bundle* bundle)
       {
         if (serviceFactory)
         {
-          const InterfaceMap im = GetServiceFromFactory(bundle, serviceFactory, true);
-          s = im.find(interfaceId)->second;
+          const InterfaceMapConstPtr im = GetServiceFromFactory(bundle, serviceFactory, true);
+          s = im->find(interfaceId)->second;
         }
         else
         {
@@ -145,7 +144,7 @@ std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(Bundle* bundle)
         if (serviceFactory)
         {
           // return the already produced instance
-          s = registration->bundleServiceInstance[bundle][interfaceId];
+          s = registration->bundleServiceInstance[bundle]->at(interfaceId);
         }
         else
         {
@@ -162,9 +161,9 @@ std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(Bundle* bundle)
   return s;
 }
 
-InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
 {
-  InterfaceMap s;
+  InterfaceMapConstPtr s;
   {
     typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
     T::Lock l(registration->propsLock);
@@ -198,7 +197,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
         }
       }
 
-      if (!s.empty())
+      if (!s->empty())
       {
         registration->dependents[bundle] = count + 1;
       }
@@ -207,7 +206,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
   return s;
 }
 
-bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const InterfaceMap& service)
+bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const InterfaceMapConstPtr& service)
 {
   typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
   T::Lock l(registration->propsLock);
@@ -219,9 +218,9 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
     return false;
   }
 
-  std::list<InterfaceMap>& prototypeServiceMaps = iter->second;
+  std::list<InterfaceMapConstPtr>& prototypeServiceMaps = iter->second;
 
-  for (std::list<InterfaceMap>::iterator imIter = prototypeServiceMaps.begin();
+  for (std::list<InterfaceMapConstPtr>::iterator imIter = prototypeServiceMaps.begin();
        imIter != prototypeServiceMaps.end(); ++imIter)
   {
     if (service == *imIter)
@@ -279,14 +278,14 @@ bool ServiceReferenceBasePrivate::UngetService(Bundle* bundle, bool checkRefCoun
 
   if (removeService)
   {
-    InterfaceMap sfi = registration->bundleServiceInstance[bundle];
+    InterfaceMapConstPtr sfi = registration->bundleServiceInstance[bundle];
     registration->bundleServiceInstance.erase(bundle);
-    if (!sfi.empty())
+    if (sfi && !sfi->empty())
     {
       try
       {
-          std::shared_ptr<ServiceFactory> sf = std::static_pointer_cast<ServiceFactory>(
-                                                 registration->GetService("org.cppmicroservices.factory"));
+        std::shared_ptr<ServiceFactory> sf = std::static_pointer_cast<ServiceFactory>(
+                                               registration->GetService("org.cppmicroservices.factory"));
         sf->UngetService(bundle, ServiceRegistrationBase(registration), sfi);
       }
       catch (const std::exception& /*e*/)
@@ -321,7 +320,7 @@ Any ServiceReferenceBasePrivate::GetProperty(const std::string& key, bool lock) 
 
 bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId) const
 {
-  return registration ? registration->service.find(interfaceId) != registration->service.end() : false;
+  return registration ? registration->service->find(interfaceId) != registration->service->end() : false;
 }
 
 }

@@ -42,7 +42,7 @@ class ServiceFactory;
  *
  * A map containing interfaces ids and their corresponding service object
  * smart pointers. InterfaceMap instances represent a complete service object
- * which implementes one or more service interfaces. For each implemented
+ * which implements one or more service interfaces. For each implemented
  * service interface, there is an entry in the map with the key being
  * the service interface id and the value a smart pointer to the service
  * interface implementation.
@@ -54,7 +54,8 @@ class ServiceFactory;
  * @see MakeInterfaceMap
  */
 typedef std::map<std::string, std::shared_ptr<void>> InterfaceMap;
-
+typedef std::shared_ptr<InterfaceMap> InterfaceMapPtr;
+typedef std::shared_ptr<const InterfaceMap> InterfaceMapConstPtr;
 
 /// \cond
 namespace detail
@@ -92,11 +93,11 @@ namespace detail
   template <class Interfaces, size_t size>
   struct InsertInterfaceHelper
   {
-      static void insert(InterfaceMap& im, const Interfaces& interfaces)
+      static void insert(InterfaceMapPtr& im, const Interfaces& interfaces)
       {
           std::pair<std::string, std::shared_ptr<void>> aPair= std::make_pair(std::string(us_service_interface_iid<typename std::tuple_element<size-1, Interfaces>::type::element_type>()),
                                            std::static_pointer_cast<void>(std::get<size-1>(interfaces)));
-          im.insert(aPair);
+          im->insert(aPair);
           InsertInterfaceHelper<Interfaces,size-1>::insert(im, interfaces);
       }
   };
@@ -104,11 +105,11 @@ namespace detail
   template<class T>
   struct InsertInterfaceHelper<T,0>
   {
-      static void insert(InterfaceMap&, const T&) {}
+      static void insert(InterfaceMapPtr&, const T&) {}
   };
 
   template<class Interfaces>
-  void InsertInterfaceTypes(InterfaceMap& im, const Interfaces& interfaces)
+  void InsertInterfaceTypes(InterfaceMapPtr& im, const Interfaces& interfaces)
   {
       InsertInterfaceHelper<Interfaces, std::tuple_size<Interfaces>::value>::insert(im, interfaces);
   }
@@ -118,7 +119,8 @@ namespace detail
       typedef List<std::shared_ptr<Args>...> type;
 
       template<class Impl>
-      static type create(const std::shared_ptr<Impl>& impl) {
+      static type create(const std::shared_ptr<Impl>& impl)
+      {
           return type(std::static_pointer_cast<Args>(impl)...);
       }
   };
@@ -209,12 +211,10 @@ namespace us {
  * @see InterfaceMap
  */
 template<class ...Interfaces>
-struct MakeInterfaceMap
+class MakeInterfaceMap
 {
-  std::shared_ptr<ServiceFactory> m_factory;
-
-  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
-
+  
+public:
   /**
    * Constructor taking a service implementation pointer.
    *
@@ -239,20 +239,37 @@ struct MakeInterfaceMap
       throw ServiceException("The service factory argument must not be NULL.");
     }
   }
-
-  operator InterfaceMap ()
+  
+  operator InterfaceMapPtr ()
   {
-    InterfaceMap sim;
+    return getInterfaceMap();
+  }
+  
+  // overload for the const version of the map
+  operator InterfaceMapConstPtr()
+  {
+    return InterfaceMapConstPtr(getInterfaceMap());
+  }
+  
+private:
+  
+  InterfaceMapPtr getInterfaceMap()
+  {
+    InterfaceMapPtr sim = std::make_shared<InterfaceMap>();
     detail::InsertInterfaceTypes(sim, m_interfaces);
-
+    
     if (m_factory)
     {
-      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
-                                m_factory));
+      sim->insert(std::make_pair(std::string("org.cppmicroservices.factory"),
+                                 m_factory));
     }
-
+    
     return sim;
   }
+
+  std::shared_ptr<ServiceFactory> m_factory;
+  
+  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
 };
 
 /**
@@ -267,10 +284,10 @@ struct MakeInterfaceMap
  * @see MakeInterfaceMap
  */
 template<class Interface>
-std::shared_ptr<Interface> ExtractInterface(const InterfaceMap& map)
+std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
 {
-  InterfaceMap::const_iterator iter = map.find(us_service_interface_iid<Interface>());
-  if (iter != map.end())
+  InterfaceMap::const_iterator iter = map->find(us_service_interface_iid<Interface>());
+  if (iter != map->end())
   {
     return std::static_pointer_cast<Interface>(iter->second);
   }

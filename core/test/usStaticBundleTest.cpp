@@ -75,11 +75,11 @@ void frame020a(BundleContext* mc, TestBundleListener& listener)
     std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("us::TestBundleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
-    std::shared_ptr<InterfaceMap> o1 = mc->GetService(refs.front());
-    US_TEST_CONDITION(!o1->empty(), "Test if first service object found");
+    InterfaceMapConstPtr o1 = mc->GetService(refs.front());
+    US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
 
-    std::shared_ptr<InterfaceMap> o2 = mc->GetService(refs.back());
-    US_TEST_CONDITION(!o2->empty(), "Test if second service object found");
+    InterfaceMapConstPtr o2 = mc->GetService(refs.back());
+    US_TEST_CONDITION(o1 && !o2->empty(), "Test if second service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;

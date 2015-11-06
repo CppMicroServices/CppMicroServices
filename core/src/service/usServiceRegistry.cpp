@@ -86,22 +86,22 @@ void ServiceRegistry::Clear()
 }
 
 ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
-                                                     const InterfaceMap& service,
+                                                     const InterfaceMapConstPtr& service,
                                                      const ServiceProperties& properties)
 {
-  if (service.empty())
+  if (!service || service->empty())
   {
     throw std::invalid_argument("Can't register empty InterfaceMap as a service");
   }
 
   // Check if we got a service factory
-  bool isFactory = service.count("org.cppmicroservices.factory") > 0;
-  bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(std::static_pointer_cast<ServiceFactory>(service.find("org.cppmicroservices.factory")->second))) : false);
+  bool isFactory = service->count("org.cppmicroservices.factory") > 0;
+  bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(std::static_pointer_cast<ServiceFactory>(service->find("org.cppmicroservices.factory")->second))) : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
-  for (InterfaceMap::const_iterator i = service.begin();
-       i != service.end(); ++i)
+  for (InterfaceMap::const_iterator i = service->begin();
+       i != service->end(); ++i)
   {
     if (i->first.empty() || (!isFactory && i->second == NULL))
     {

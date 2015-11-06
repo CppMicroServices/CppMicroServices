@@ -198,7 +198,7 @@ private:
 
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
-  ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
+  ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
                           const ServicePropertiesImpl& props);
 
   ServiceRegistrationBasePrivate* d;

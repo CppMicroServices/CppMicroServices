@@ -55,7 +55,7 @@ To test the dictionary service, enter any of the words in the dictionary
 in the dictionary.
 
 Since this client monitors the dynamic availability of the dictionary service,
-it is robust in the face of sudden departures of the the dictionary service.
+it is robust in the face of sudden departures of the dictionary service.
 Further, when a dictionary service arrives, it automatically gets the service if
 it needs it and continues to function. These capabilities are a little difficult
 to demonstrate since we are using a simple single-threaded approach, but in a

@@ -54,7 +54,7 @@ std::shared_ptr<SingletonOneService> SingletonOneService::GetInstance()
   else
   {
     // No SingletonOneService instance was registered yet.
-    return 0;
+    return nullptr;
   }
 }
 //![ss1gi]

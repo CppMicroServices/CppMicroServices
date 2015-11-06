@@ -80,7 +80,7 @@ std::vector<Bundle*> BundleContext::GetBundles() const
   return bundles;
 }
 
-ServiceRegistrationU BundleContext::RegisterService(const InterfaceMap& service,
+ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& service,
                                                     const ServiceProperties& properties)
 {
   return d->bundle->coreCtx->services.RegisterService(d->bundle, service, properties);
@@ -105,50 +105,55 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
   return d->bundle->coreCtx->services.Get(d->bundle, clazz);
 }
 
+// private class used to call UngetService
+template <class S>
+struct ServiceHolder
+{
+  BundleContext* bc;
+  ServiceReferenceBase sref;
+  std::shared_ptr<S> service;
+  ~ServiceHolder()
+  {
+    try
+    {
+      bc->UngetService(sref);
+    }
+    catch (std::exception& exp)
+    {
+      US_WARN << "UngetService threw an exception - " << exp.what();
+    }
+  }
+};
+
 std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& reference)
 {
   if (!reference)
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  struct ServiceHolder
-  {
-	  BundleContext* bc;
-	  ServiceReferenceBase sref;
-	  std::shared_ptr<void> service;
-	  ~ServiceHolder() { bc->UngetService(sref); }
-  };
-  std::shared_ptr<ServiceHolder> h(new ServiceHolder{ this, reference, reference.d->GetService(d->bundle->q) });
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>{ this, reference, reference.d->GetService(d->bundle->q) });
   return std::shared_ptr<void>(h, h->service.get());
 }
 
-std::shared_ptr<InterfaceMap> BundleContext::GetService(const ServiceReferenceU& reference)
+InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& reference)
 {
   if (!reference)
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  struct ServiceHolder
-  {
-    BundleContext* bc;
-    ServiceReferenceBase sref;
-    std::shared_ptr<InterfaceMap> imap;
-    ~ServiceHolder() {
-      // service reference could becoe invalid if the bundle is stopped
-      if(sref.GetBundle() != NULL)
-      {
-        bc->UngetService(sref);
-      }
-    }
-  };
-  std::shared_ptr<ServiceHolder> h(new ServiceHolder{ this, reference, std::make_shared<InterfaceMap>(reference.d->GetServiceInterfaceMap(d->bundle->q)) });
-  return std::shared_ptr<InterfaceMap>(h, h->imap.get());
+
+  // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
+  // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
+  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d->GetServiceInterfaceMap(d->bundle->q).get()));
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>{this, reference, imap_copy});
+  return InterfaceMapConstPtr(h, h->service.get());
 }
 
 bool BundleContext::UngetService(const ServiceReferenceBase& reference)
 {
   ServiceReferenceBase ref = reference;
-  return ref.d->UngetService(d->bundle->q, true);
+  // Due to smart pointers it is possible this method is called after the bundle is stopped.
+  return (d->bundle) ? ref.d->UngetService(d->bundle->q, true) : false;
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate,

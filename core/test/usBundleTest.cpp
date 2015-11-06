@@ -116,7 +116,7 @@ void frame005a(BundleContext* mc)
 }
 
 // Get context id, location, persistent storage and status of the bundle
-void frame010a(std::shared_ptr<Framework> framework, BundleContext* mc)
+void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* mc)
 {
   Bundle* m = mc->GetBundle();
 
@@ -162,7 +162,7 @@ void frame018a(BundleContext* mc)
 
 // Start libA and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(std::shared_ptr<Framework> framework, TestBundleListener& listener)
+void frame020a(const std::shared_ptr<Framework>& framework, TestBundleListener& listener)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -177,8 +177,8 @@ void frame020a(std::shared_ptr<Framework> framework, TestBundleListener& listene
   try
   {
     ServiceReferenceU sr1 = mc->GetServiceReference("us::TestBundleAService");
-    std::shared_ptr<InterfaceMap> o1 = mc->GetService(sr1);
-    US_TEST_CONDITION(!o1->empty(), "Test if service object found");
+    InterfaceMapConstPtr o1 = mc->GetService(sr1);
+    US_TEST_CONDITION(o1 && !o1->empty(), "Test if service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
@@ -201,7 +201,7 @@ void frame020a(std::shared_ptr<Framework> framework, TestBundleListener& listene
 
 
 // Start libA and check that it exists and that the storage paths are correct
-void frame02b(std::shared_ptr<Framework> framework)
+void frame02b(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
 

@@ -92,9 +92,9 @@ public:
    * @return A service object that <strong>must</strong> contain entries for all
    *         the interfaces named when the service was registered.
    * @see BundleContext#GetService
-   * @see InterfaceMap
+   * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMap GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMapConstPtr GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object.
@@ -109,10 +109,10 @@ public:
    * @param service The service object returned by a previous call to the
    *        <code>ServiceFactory::GetService</code> method.
    * @see BundleContext#UngetService
-   * @see InterfaceMap
+   * @see InterfaceMapConstPtr
    */
   virtual void UngetService(Bundle* bundle, const ServiceRegistrationBase& registration,
-                            const InterfaceMap& service) = 0;
+                            const InterfaceMapConstPtr& service) = 0;
 };
 
 }

@@ -68,8 +68,8 @@ public:
         {
           std::stringstream servicename;
           servicename << SERVICE << offset;
-          InterfaceMap ifm;
-          ifm.insert(std::make_pair(servicename.str(), shared_from_this()));
+          InterfaceMapPtr ifm = std::make_shared<InterfaceMap>();
+          ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
           ServiceProperties props;
           props.insert(std::make_pair(ServiceConstants::SERVICE_RANKING(), Any(ranking)));
           servregs[offset] = mc->RegisterService(ifm, props);
@@ -102,8 +102,8 @@ class TestBundleSActivator : public BundleActivator
 
 public:
 
-  TestBundleSActivator() : s(0) {}
-  ~TestBundleSActivator() { s.reset(); }
+  TestBundleSActivator() {}
+  ~TestBundleSActivator() {}
 
   void Start(BundleContext* context)
   {

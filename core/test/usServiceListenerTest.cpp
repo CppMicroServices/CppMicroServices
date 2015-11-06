@@ -106,12 +106,12 @@ public:
       }
 
       // Check if the service can be fetched
-      std::shared_ptr<InterfaceMap> service = mc->GetService(sr);
+      InterfaceMapConstPtr service = mc->GetService(sr);
       sr.GetUsingBundles(usingBundles);
       // if (UNREGISTERSERVICE_VALID_DURING_UNREGISTERING) {
       // In this mode the service shall be obtainable during
       // unregistration.
-      if (service->empty())
+      if (!service || service->empty())
       {
         teststatus = false;
         US_TEST_OUTPUT( << "*** Service should be available to ServiceListener "
@@ -287,7 +287,7 @@ bool runStartStopTest(const std::string& name, int cnt, Bundle& bundle,
   return teststatus;
 }
 
-void frameSL02a(std::shared_ptr<Framework> framework)
+void frameSL02a(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -322,7 +322,7 @@ void frameSL02a(std::shared_ptr<Framework> framework)
   bundle->Stop();
 }
 
-void frameSL05a(std::shared_ptr<Framework> framework)
+void frameSL05a(const std::shared_ptr<Framework>& framework)
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
@@ -334,7 +334,7 @@ void frameSL05a(std::shared_ptr<Framework> framework)
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
 
-void frameSL10a(std::shared_ptr<Framework> framework)
+void frameSL10a(const std::shared_ptr<Framework>& framework)
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
@@ -346,7 +346,7 @@ void frameSL10a(std::shared_ptr<Framework> framework)
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
 
-void frameSL25a(std::shared_ptr<Framework> framework)
+void frameSL25a(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -423,8 +423,8 @@ void frameSL25a(std::shared_ptr<Framework> framework)
   try
   {
     ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    std::shared_ptr<InterfaceMap> libSL3Activator = mc->GetService(libSL3SR);
-    US_TEST_CONDITION_REQUIRED(!libSL3Activator->empty(), "ActivatorSL3 service != 0");
+    InterfaceMapConstPtr libSL3Activator = mc->GetService(libSL3SR);
+    US_TEST_CONDITION_REQUIRED(libSL3Activator && !libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
     std::shared_ptr<BundlePropsInterface> propsInterface = mc->GetService(libSL3PropsI);
@@ -446,8 +446,8 @@ void frameSL25a(std::shared_ptr<Framework> framework)
   try
   {
     ServiceReferenceU libSL1SR = mc->GetServiceReference("ActivatorSL1");
-    std::shared_ptr<InterfaceMap> libSL1Activator = mc->GetService(libSL1SR);
-    US_TEST_CONDITION_REQUIRED(!libSL1Activator->empty(), "ActivatorSL1 service != 0");
+    InterfaceMapConstPtr libSL1Activator = mc->GetService(libSL1SR);
+    US_TEST_CONDITION_REQUIRED(libSL1Activator && !libSL1Activator->empty(), "ActivatorSL1 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL1PropsI(libSL1SR);
     std::shared_ptr<BundlePropsInterface> propsInterface = mc->GetService(libSL1PropsI);
@@ -481,8 +481,8 @@ void frameSL25a(std::shared_ptr<Framework> framework)
   try
   {
     ServiceReferenceU libSL3SR = mc->GetServiceReference("ActivatorSL3");
-    std::shared_ptr<InterfaceMap> libSL3Activator = mc->GetService(libSL3SR);
-    US_TEST_CONDITION_REQUIRED(!libSL3Activator->empty(), "ActivatorSL3 service != 0");
+    InterfaceMapConstPtr libSL3Activator = mc->GetService(libSL3SR);
+    US_TEST_CONDITION_REQUIRED(libSL3Activator && !libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
     std::shared_ptr<BundlePropsInterface> propsInterface = mc->GetService(libSL3PropsI);

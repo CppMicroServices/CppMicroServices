@@ -213,7 +213,7 @@ public:
 std::vector<int> TestServiceListenerHook::ordering;
 
 
-void TestEventListenerHook(std::shared_ptr<Framework> framework)
+void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
@@ -263,7 +263,7 @@ void TestEventListenerHook(std::shared_ptr<Framework> framework)
   context->RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 }
 
-void TestListenerHook(std::shared_ptr<Framework> framework)
+void TestListenerHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
@@ -335,7 +335,7 @@ void TestListenerHook(std::shared_ptr<Framework> framework)
   listenerHookReg1.Unregister();
 }
 
-void TestFindHook(std::shared_ptr<Framework> framework)
+void TestFindHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 

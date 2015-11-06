@@ -219,22 +219,22 @@ void TestServiceTracker(us::BundleContext* context)
 
   // 14. Get the service of the highest ranked service reference
 
-  std::shared_ptr<InterfaceMap> o1 = st1->GetService(h1);
+  InterfaceMapConstPtr o1 = st1->GetService(h1);
   US_TEST_CONDITION_REQUIRED(o1.get() != nullptr && !o1->empty(), "Check for non-null service");
 
   // 14a Get the highest ranked service, directly this time
-  std::shared_ptr<InterfaceMap> o3 = st1->GetService();
+  InterfaceMapConstPtr o3 = st1->GetService();
   US_TEST_CONDITION_REQUIRED(o1.get() != nullptr && !o3->empty(), "Check for non-null service");
   US_TEST_CONDITION_REQUIRED(o1 == o3, "Check for equal service instances");
 
   // 15. Now release the tracking of that service and then try to get it
   //     from the servicetracker, which should yield a null object
   serviceController->ServiceControl(1, "unregister", 7);
-  std::shared_ptr<InterfaceMap> o2 = st1->GetService(h1);
-  US_TEST_CONDITION_REQUIRED(!o2.get(), "Check that service is null");
+  InterfaceMapConstPtr o2 = st1->GetService(h1);
+  US_TEST_CONDITION_REQUIRED(!o2 || !o2.get(), "Check that service is null");
 
   // 16. Get all service objects this tracker tracks, it should be 2
-  std::vector<std::shared_ptr<InterfaceMap>> ts1 = st1->GetServices();
+  std::vector<InterfaceMapConstPtr> ts1 = st1->GetServices();
   US_TEST_CONDITION_REQUIRED(ts1.size() == 2, "Check service count");
 
   // 17. Test the remove method.
@@ -255,7 +255,7 @@ void TestServiceTracker(us::BundleContext* context)
 
 
   // 20. Test the waitForService method
-  std::shared_ptr<InterfaceMap> o9 = st1->WaitForService(std::chrono::milliseconds(50));
+  InterfaceMapConstPtr o9 = st1->WaitForService(std::chrono::milliseconds(50));
   US_TEST_CONDITION_REQUIRED(o9 && !o9->empty(), "Checking WaitForService method");
 }
 

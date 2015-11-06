@@ -41,8 +41,8 @@ class TestBundleBActivator : public BundleActivator
 {
 public:
 
-  TestBundleBActivator() : s(0) {}
-  ~TestBundleBActivator() { s.reset(); }
+  TestBundleBActivator() {}
+  ~TestBundleBActivator() {}
 
   void Start(BundleContext* context)
   {

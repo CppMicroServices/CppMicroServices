@@ -97,8 +97,8 @@ public:
   {
     this->context = context;
     bundlePropsService = std::make_shared<SL3BundlePropsImpl>();
-    InterfaceMap im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
-    im.insert(std::make_pair(std::string("ActivatorSL3"), bundlePropsService));
+    InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
+    im->insert(std::make_pair(std::string("ActivatorSL3"), bundlePropsService));
     sr = context->RegisterService(im);
     delete tracker;
     tracker = new FooTracker(context, new SL3ServiceTrackerCustomizer(bundlePropsService, context));

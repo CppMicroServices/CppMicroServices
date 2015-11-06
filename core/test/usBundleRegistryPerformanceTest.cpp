@@ -87,7 +87,7 @@ namespace
     }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-    void TestConcurrent(std::shared_ptr<Framework> f)
+    void TestConcurrent(const std::shared_ptr<Framework>& f)
     {
         // This is by no means a "real world" example. At best it is a simulation to test
         // the performance of concurrent access to the bundle registry.

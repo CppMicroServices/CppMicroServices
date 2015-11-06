@@ -103,7 +103,7 @@ public:
    * </ul>
    */
   ServiceRegistrationBase RegisterService(BundlePrivate* bundle,
-                                          const InterfaceMap& service,
+                                          const InterfaceMapConstPtr& service,
                                           const ServiceProperties& properties);
 
   /**

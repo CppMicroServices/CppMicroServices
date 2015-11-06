@@ -102,8 +102,8 @@ public:
   {
     this->context = context;
 
-    InterfaceMap im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
-    im.insert(std::make_pair(std::string("ActivatorSL1"), bundlePropsService));
+    InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
+    im->insert(std::make_pair(std::string("ActivatorSL1"), bundlePropsService));
     sr = context->RegisterService(im);
 
     delete tracker;

@@ -38,9 +38,9 @@ class TestBundleA2Activator : public BundleActivator
 {
 public:
 
-  TestBundleA2Activator() : s(0) {}
+  TestBundleA2Activator() {}
 
-  ~TestBundleA2Activator() { }
+  ~TestBundleA2Activator() {}
 
   void Start(BundleContext* context)
   {

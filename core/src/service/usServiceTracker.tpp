@@ -460,8 +460,7 @@ void ServiceTracker<S,TTT>::ModifiedService(const ServiceReferenceType& /*refere
 template<class S, class TTT>
 void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceType& /*reference*/, T /*service*/)
 {
-  // TODO: call UngetService if T is InterfaceMap
-  // else no-op since we use shared_ptr for service objects
+  /* do nothing */
 }
 
 }

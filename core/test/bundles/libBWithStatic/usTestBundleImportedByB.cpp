@@ -40,8 +40,8 @@ class TestBundleImportedByBActivator : public BundleActivator
 {
 public:
 
-  TestBundleImportedByBActivator() : s(0) {}
-  ~TestBundleImportedByBActivator() { }
+  TestBundleImportedByBActivator() {}
+  ~TestBundleImportedByBActivator() {}
 
   void Start(BundleContext* context)
   {

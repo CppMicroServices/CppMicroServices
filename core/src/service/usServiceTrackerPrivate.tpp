@@ -31,7 +31,7 @@
 namespace us {
 
 template<class S, class TTT>
-const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = true;
+const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = false;
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(

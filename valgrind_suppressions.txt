@@ -202,41 +202,17 @@
 }
 
 {
-   <shared_ptr>
+   <thread_impl>
    Helgrind:Race
-   fun:_ZNSt6thread5_ImplISt12_Bind_simpleIFZN12*
-   fun:_ZN9__gnu_cxx13new_allocatorINSt6thread5_ImplISt12_Bind_simpleIFZN12*
-   fun:_ZNSt16allocator_traitsISaINSt6thread5_ImplISt12_Bind_simpleIFZN12*
-   fun:_ZNSt16allocator_traitsISaINSt6thread5_ImplISt12_Bind_simpleIFZN12*
-   fun:_ZNSt23_Sp_counted_ptr_inplaceINSt6thread5_ImplISt12_Bind_simpleIFZN12*
-   fun:_ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE10_M_releaseEv
-   fun:_ZNSt14__shared_countILN9__gnu_cxx12_Lock_policyE2EED1Ev
-   fun:_ZNSt12__shared_ptrINSt6thread10_Impl_baseELN9__gnu_cxx12_Lock_policyE2EED1Ev
-   fun:_ZNSt10shared_ptrINSt6thread10_Impl_baseEED1Ev
+   fun:_ZNSt6thread5_ImplISt12_Bind_simple*
    ...
 }
 
-{
-   <thread-impl>
-   Helgrind:Race
-   fun:_ZNSt6thread5_ImplISt12_Bind_simpleIFPFvPN2us9FrameworkEES4_EEED1Ev
-   fun:_ZN9__gnu_cxx13new_allocatorINSt6thread5_ImplISt12_Bind_simpleIFPFvPN2us9FrameworkEES6_EEEEE7destroyISB_EEvPT_
-   fun:_ZNSt16allocator_traitsISaINSt6thread5_ImplISt12_Bind_simpleIFPFvPN2us9FrameworkEES5_EEEEEE10_S_destroyISA_EENSt9enable_ifIXsrSt6__and_IINSC_16__destroy_helperIT_E4typeEEE5valueEvE4typeERSB_PSH_
-   fun:_ZNSt16allocator_traitsISaINSt6thread5_ImplISt12_Bind_simpleIFPFvPN2us9FrameworkEES5_EEEEEE7destroyISA_EEvRSB_PT_
-   fun:_ZNSt23_Sp_counted_ptr_inplaceINSt6thread5_ImplISt12_Bind_simpleIFPFvPN2us9FrameworkEES5_EEEESaISA_ELN9__gnu_cxx12_Lock_policyE2EE10_M_disposeEv
-   fun:_ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE10_M_releaseEv
-   fun:_ZNSt14__shared_countILN9__gnu_cxx12_Lock_policyE2EED1Ev
-   fun:_ZNSt12__shared_ptrINSt6thread10_Impl_baseELN9__gnu_cxx12_Lock_policyE2EED1Ev
-   fun:_ZNSt10shared_ptrINSt6thread10_Impl_baseEED1Ev
-   fun:_ZNSt6threadC1IRFvPN2us9FrameworkEEIRS3_EEEOT_DpOT0_
-   fun:_ZN9__gnu_cxx13new_allocatorISt6threadE9constructIS1_IRFvPN2us9FrameworkEERS6_EEEvPT_DpOT0_
-   fun:_ZNSt16allocator_traitsISaISt6threadEE12_S_constructIS0_IRFvPN2us9FrameworkEERS6_EEENSt9enable_ifIXsrSt6__and_IINS2_18__construct_helperIT_IDpT0_EE4typeEEE5valueEvE4typeERS1_PSD_DpOSE_
-}
 
 {
-   <future-impl>
+   <thread_impl>
    Helgrind:Race
-   fun:_ZNSt6thread5_ImplISt12_Bind_simpleIFZNSt13__future_base17_Async_state_impl*
+   fun:_ZNSt6thread5_ImplISt12_Bind_result*
    ...
 }
 

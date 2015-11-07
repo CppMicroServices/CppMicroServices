@@ -51,7 +51,7 @@ const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
 const std::string Bundle::PROP_AUTOLOAD_DIR{ "bundle.autoload_dir" };
 const std::string Bundle::PROP_AUTOINSTALLED_BUNDLES{ "bundle.autoinstalled_bundles" };
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ < 7
+#if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
   typedef std::chrono::monotonic_clock Clock;
 #else
   typedef std::chrono::steady_clock Clock;

@@ -67,7 +67,7 @@ ServiceReferenceBase::operator bool() const
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 {
   if (!--d.load()->ref)
-    delete d;
+    delete d.load();
   d = new ServiceReferenceBasePrivate(nullptr);
   return *this;
 }
@@ -75,7 +75,7 @@ ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 ServiceReferenceBase::~ServiceReferenceBase()
 {
   if (!--d.load()->ref)
-    delete d;
+    delete d.load();
 }
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const

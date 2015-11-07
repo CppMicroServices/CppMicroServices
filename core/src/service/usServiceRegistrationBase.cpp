@@ -31,6 +31,8 @@
 
 #include <stdexcept>
 
+US_MSVC_DISABLE_WARNING(4503) // decorated name length exceeded, name was truncated
+
 namespace us {
 
 ServiceRegistrationBase::ServiceRegistrationBase()

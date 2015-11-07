@@ -27,6 +27,16 @@
 #include <usBundleInfo_p.h>
 #include <usUtils_p.h>
 
+#ifdef __GNUC__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <dlfcn.h>
+#elif _WIN32
+#include <windows.h>
+#endif
+
+
 namespace us {
 
 namespace {
@@ -37,16 +47,10 @@ namespace {
 #endif
 }
 
-#ifdef __GNUC__
-
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
-#include <dlfcn.h>
-
 namespace BundleUtils
 {
+
+#ifdef __GNUC__
 
 std::string GetLibraryPath_impl(void* symbol)
 {
@@ -99,14 +103,7 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   return nullptr;
 }
 
-}
-
 #elif _WIN32
-
-#include <windows.h>
-
-namespace BundleUtils
-{
 
 std::string GetLibraryPath_impl(void *symbol)
 {
@@ -155,7 +152,9 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   }
   return addr;
 }
+
 #else
+
 std::string GetLibraryPath_impl(void*)
 {
   return "";
@@ -166,12 +165,7 @@ void* GetSymbol_impl(const BundleInfo&, const char* symbol)
   return nullptr;
 }
 
-}
-
 #endif
-
-namespace BundleUtils
-{
 
 std::string GetLibraryPath(void* symbol)
 {
@@ -190,6 +184,6 @@ void* GetSymbol(const BundleInfo& bundle, const char* symbol)
   return GetSymbol_impl(bundle, symbol);
 }
 
-}
+} // namespace BundleUtils
 
-}
+} // namespace us

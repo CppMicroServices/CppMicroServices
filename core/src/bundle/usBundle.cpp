@@ -83,7 +83,7 @@ Bundle::~Bundle()
 bool Bundle::IsStarted() const
 {
   // TODO use proper states
-  return d->bundleContext != nullptr;
+  return d->bundleContext.load() != nullptr;
 }
 
 void Bundle::Start()
@@ -163,7 +163,7 @@ void Bundle::Start()
 
 void Bundle::Stop()
 {
-  if (d->bundleContext == nullptr) return;
+  if (d->bundleContext.load() == nullptr) return;
   if (d->stopping.exchange(true)) return;
 
   StateReset reset([this]{

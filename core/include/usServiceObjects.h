@@ -94,6 +94,12 @@ class ServiceObjects : private ServiceObjectsBase
 
 public:
 
+  ServiceObjects(const ServiceObjects& other) = delete;
+  ServiceObjects& operator=(const ServiceObjects& other) = delete;
+
+  ServiceObjects(ServiceObjects&& other) : ServiceObjectsBase(std::move(other)) {}
+  ServiceObjects& operator=(ServiceObjects&& other) { ServiceObjectsBase::operator=(std::move(other)); return *this; }
+
   /**
    * Returns a service object for the referenced service.
    *
@@ -206,6 +212,12 @@ class US_Core_EXPORT ServiceObjects<void> : private ServiceObjectsBase
 {
 
 public:
+
+  ServiceObjects(const ServiceObjects& other) = delete;
+  ServiceObjects& operator=(const ServiceObjects& other) = delete;
+
+  ServiceObjects(ServiceObjects&& other);
+  ServiceObjects& operator=(ServiceObjects&& other);
 
   /**
    * Returns a service object as a InterfaceMap instance for the referenced service.

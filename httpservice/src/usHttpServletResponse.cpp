@@ -317,7 +317,7 @@ void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
   std::time_t timeep = date / 1000;
   std::tm t;
 #ifdef US_PLATFORM_WINDOWS
-  if (gmtime_s(&t, &timeep) != nullptr)
+  if (gmtime_s(&t, &timeep) != 0)
 #else
   if (gmtime_r(&timeep, &t) != nullptr)
 #endif

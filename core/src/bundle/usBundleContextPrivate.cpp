@@ -22,6 +22,7 @@
 
 #include "usBundleContextPrivate.h"
 
+#include <stdexcept>
 
 namespace us {
 

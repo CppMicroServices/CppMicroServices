@@ -175,6 +175,16 @@ ServiceObjectsBase& ServiceObjectsBase::operator =(ServiceObjectsBase&& other)
   return *this;
 }
 
+ServiceObjects<void>::ServiceObjects(ServiceObjects&& other)
+	: ServiceObjectsBase(std::move(other))
+{}
+
+ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other)
+{
+  ServiceObjectsBase::operator=(std::move(other));
+  return *this;
+}
+
 InterfaceMap ServiceObjects<void>::GetService() const
 {
   return this->ServiceObjectsBase::GetServiceInterfaceMap();

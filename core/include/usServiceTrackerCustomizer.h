@@ -287,11 +287,11 @@ struct ServiceTrackerCustomizer<void, void*, void>
     }
   };
 
-  typedef typename TypeTraits::ServiceType ServiceType;
-  typedef typename TypeTraits::TrackedType TrackedType;
-  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
-  typedef typename TypeTraits::TrackedArgType TrackedArgType;
-  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+  typedef TypeTraits::ServiceType ServiceType;
+  typedef TypeTraits::TrackedType TrackedType;
+  typedef TypeTraits::TrackedReturnType TrackedReturnType;
+  typedef TypeTraits::TrackedArgType TrackedArgType;
+  typedef TypeTraits::ServiceReferenceType ServiceReferenceType;
 
   virtual ~ServiceTrackerCustomizer() {}
   virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;

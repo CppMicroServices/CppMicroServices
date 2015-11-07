@@ -35,9 +35,7 @@
 
 #include <cassert>
 
-#ifdef _MSC_VER
-#pragma warning(disable:4503) // decorated name length exceeded, name was truncated
-#endif
+US_MSVC_DISABLE_WARNING(4503) // decorated name length exceeded, name was truncated
 
 namespace us {
 

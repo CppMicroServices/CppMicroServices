@@ -133,7 +133,7 @@ void BundleSettings::SetAutoLoadingEnabled(bool enable)
 
 BundleSettings::PathList BundleSettings::GetAutoLoadPaths()
 {
-  auto l = pimpl->Lock();
+  auto l = pimpl->Lock(); US_UNUSED(l);
   BundleSettings::PathList paths(pimpl->autoLoadPaths.begin(),
                                  pimpl->autoLoadPaths.end());
   paths.insert(paths.end(), pimpl->extraPaths.begin(),
@@ -149,7 +149,7 @@ void BundleSettings::SetAutoLoadPaths(const PathList& paths)
   normalizedPaths.resize(paths.size());
   std::transform(paths.begin(), paths.end(), normalizedPaths.begin(), RemoveTrailingPathSeparator);
 
-  auto l = pimpl->Lock();
+  auto l = pimpl->Lock(); US_UNUSED(l);
   pimpl->autoLoadPaths.clear();
   pimpl->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
 }

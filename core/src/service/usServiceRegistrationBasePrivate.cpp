@@ -52,14 +52,14 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 
 bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   return (dependents.find(p) != dependents.end()) ||
       (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());
 }
 
 InterfaceMap ServiceRegistrationBasePrivate::GetInterfaces() const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   return service;
 }
 

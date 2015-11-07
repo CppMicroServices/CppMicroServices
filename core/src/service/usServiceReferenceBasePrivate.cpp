@@ -123,7 +123,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
   int count = 0;
 
   {
-    auto l = registration->Lock();
+    auto l = registration->Lock(); US_UNUSED(l);
     if (!registration->available) return s;
     serviceFactory = reinterpret_cast<ServiceFactory*>(
           registration->GetService_unlocked("org.cppmicroservices.factory"));
@@ -132,7 +132,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
 
   if (serviceFactory == nullptr)
   {
-    auto l = registration->Lock();
+    auto l = registration->Lock(); US_UNUSED(l);
     s = registration->service;
     if (!s.empty()) ++registration->dependents[bundle];
   }
@@ -142,7 +142,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
     {
       s = GetServiceFromFactory(bundle, serviceFactory);
 
-      auto l = registration->Lock();
+      auto l = registration->Lock(); US_UNUSED(l);
       if (registration->dependents[bundle] == 0)
       {
         registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
@@ -158,7 +158,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
     }
     else
     {
-      auto l = registration->Lock();
+      auto l = registration->Lock(); US_UNUSED(l);
       // return the already produced instance
       s = registration->bundleServiceInstance[bundle];
       if (!s.empty()) ++registration->dependents[bundle];
@@ -173,7 +173,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
   ServiceFactory* sf = nullptr;
 
   {
-    auto l = registration->Lock();
+    auto l = registration->Lock(); US_UNUSED(l);
     auto iter = registration->prototypeServiceInstances.find(bundle);
     if (iter == registration->prototypeServiceInstances.end())
     {
@@ -200,7 +200,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
         US_WARN << "ServiceFactory threw an exception";
       }
 
-      auto l = registration->Lock();
+      auto l = registration->Lock(); US_UNUSED(l);
       auto iter = registration->prototypeServiceInstances.find(bundle);
       if (iter == registration->prototypeServiceInstances.end()) return true;
 
@@ -225,7 +225,7 @@ bool ServiceReferenceBasePrivate::UngetService(Bundle* bundle, bool checkRefCoun
   ServiceFactory* sf = nullptr;
 
   {
-    auto l = registration->Lock();
+    auto l = registration->Lock(); US_UNUSED(l);
     int count= registration->dependents[bundle];
     if (count > 0)
     {

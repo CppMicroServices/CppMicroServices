@@ -82,7 +82,7 @@ ServiceReferenceBase ServiceRegistrationBase::GetReference(const std::string& in
   if (!d) throw std::logic_error("ServiceRegistrationBase object invalid");
   if (!d->available) throw std::logic_error("Service is unregistered");
 
-  auto l = d->Lock();
+  auto l = d->Lock(); US_UNUSED(l);
   ServiceReferenceBase ref = d->reference;
   ref.SetInterfaceId(interfaceId);
   return ref;
@@ -100,7 +100,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
   if (d->available)
   {
     {
-      auto l = d->Lock();
+      auto l = d->Lock(); US_UNUSED(l);
       if (!d->available) throw std::logic_error("Service is unregistered");
       modifiedEndMatchEvent = ServiceEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference);
       modifiedEvent = ServiceEvent(ServiceEvent::MODIFIED, d->reference);
@@ -113,11 +113,11 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
     int new_rank = 0;
     std::vector<std::string> classes;
     {
-      auto l = d->Lock();
+      auto l = d->Lock(); US_UNUSED(l);
       if (!d->available) throw std::logic_error("Service is unregistered");
 
       {
-        auto l2 = d->properties.Lock();
+        auto l2 = d->properties.Lock(); US_UNUSED(l2);
 
         Any any = d->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
         if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
@@ -163,8 +163,8 @@ void ServiceRegistrationBase::Unregister()
   if (d->available)
   {
     // Lock the service registry first
-    auto l1 = d->bundle->coreCtx->services.Lock();
-    auto l2 = d->Lock();
+    auto l1 = d->bundle->coreCtx->services.Lock(); US_UNUSED(l1);
+    auto l2 = d->Lock(); US_UNUSED(l2);
     if (d->unregistering) return;
     d->unregistering = true;
 
@@ -192,7 +192,7 @@ void ServiceRegistrationBase::Unregister()
   ServiceRegistrationBasePrivate::BundleToServiceMap bundleServiceInstance;
 
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     d->available = false;
     InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
     if (d->bundle && factoryIter != d->service.end())
@@ -239,7 +239,7 @@ void ServiceRegistrationBase::Unregister()
   }
 
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
 
     d->bundle = nullptr;
     d->dependents.clear();

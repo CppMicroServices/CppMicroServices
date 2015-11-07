@@ -80,13 +80,13 @@ ServiceReferenceBase::~ServiceReferenceBase()
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
-  auto l = d.load()->registration->properties.Lock();
+  auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
   return d.load()->registration->properties.Value_unlocked(key);
 }
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
-  auto l = d.load()->registration->properties.Lock();
+  auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
   keys = d.load()->registration->properties.Keys_unlocked();
 }
 
@@ -95,14 +95,14 @@ Bundle* ServiceReferenceBase::GetBundle() const
   auto p = d.load();
   if (p->registration == nullptr) return nullptr;
 
-  auto l = p->registration->Lock();
+  auto l = p->registration->Lock(); US_UNUSED(l);
   if (p->registration->bundle == nullptr) return nullptr;
   return p->registration->bundle->q;
 }
 
 void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
 {
-  auto l = d.load()->registration->Lock();
+  auto l = d.load()->registration->Lock(); US_UNUSED(l);
   for (auto& iter : d.load()->registration->dependents)
   {
     bundles.push_back(iter.first);
@@ -132,7 +132,7 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   Any anyR1;
   Any anyId1;
   {
-    auto l = d.load()->registration->properties.Lock();
+    auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
     anyR1 = d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
     assert(anyR1.Empty() || anyR1.Type() == typeid(int));
     anyId1 = d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
@@ -142,7 +142,7 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   Any anyR2;
   Any anyId2;
   {
-    auto l = reference.d.load()->registration->properties.Lock();
+    auto l = reference.d.load()->registration->properties.Lock(); US_UNUSED(l);
     anyR2 = reference.d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
     assert(anyR2.Empty() || anyR2.Type() == typeid(int));
     anyId2 = reference.d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());

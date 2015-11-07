@@ -64,7 +64,7 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
   {
     S item;
     {
-      auto l = this->Lock();
+      auto l = this->Lock(); US_UNUSED(l);
       if (closed || (initial.size() == 0))
       {
         /*
@@ -117,7 +117,7 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 
   TrackedReturnType object = TTT::DefaultValue();
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     if (closed)
     {
       return;
@@ -160,7 +160,7 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 {
   TrackedReturnType object = TTT::DefaultValue();
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     std::size_t initialSize = initial.size();
     initial.remove(item);
     if (initialSize != initial.size())
@@ -259,7 +259,7 @@ void BundleAbstractTracked<S,TTT,R>::CopyEntries_unlocked(TrackingMap& map) cons
 template<class S, class TTT, class R>
 bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, TrackedArgType custom)
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   std::size_t addingSize = adding.size();
   adding.remove(item);
   if (addingSize != adding.size() && !closed)

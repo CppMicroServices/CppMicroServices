@@ -90,7 +90,7 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
 {
   if (id == 0) return coreCtx->systemBundle->shared_from_this();
 
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
 
   for (auto& m : bundles)
   {
@@ -106,7 +106,7 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
 {
   if (coreCtx->systemBundle->d->info.name == name) return coreCtx->systemBundle->shared_from_this();
 
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
 
   auto iter = bundles.find(name);
   if (iter != bundles.end())
@@ -118,7 +118,7 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
 
 std::vector<std::shared_ptr<Bundle>> BundleRegistry::GetBundles() const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
 
   std::vector<std::shared_ptr<Bundle>> result;
   result.push_back(coreCtx->systemBundle->shared_from_this());

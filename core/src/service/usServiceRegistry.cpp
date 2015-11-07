@@ -99,7 +99,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
   ServiceRegistrationBase res(bundle, service,
                               CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     services.insert(std::make_pair(res, classes));
     serviceRegistrations.push_back(res);
     for (auto clazz : classes)
@@ -123,7 +123,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
 void ServiceRegistry::UpdateServiceRegistrationOrder(const ServiceRegistrationBase& sr,
                                                      const std::vector<std::string>& classes)
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   for (auto& clazz : classes)
   {
     std::vector<ServiceRegistrationBase>& s = classServices[clazz];
@@ -150,7 +150,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
 
 ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle, const std::string& clazz) const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   try
   {
     std::vector<ServiceReferenceBase> srs;
@@ -264,7 +264,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
 
 void ServiceRegistry::RemoveServiceRegistration(const ServiceRegistrationBase& sr)
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   RemoveServiceRegistration_unlocked(sr);
 }
 
@@ -272,7 +272,7 @@ void ServiceRegistry::RemoveServiceRegistration_unlocked(const ServiceRegistrati
 {
   std::vector<std::string> classes;
   {
-    auto l2 = sr.d->properties.Lock();
+    auto l2 = sr.d->properties.Lock(); US_UNUSED(l2);
     assert(sr.d->properties.Value_unlocked(ServiceConstants::OBJECTCLASS()).Type() == typeid(std::vector<std::string>));
     classes = ref_any_cast<std::vector<std::string> >(
           sr.d->properties.Value_unlocked(ServiceConstants::OBJECTCLASS()));
@@ -297,7 +297,7 @@ void ServiceRegistry::RemoveServiceRegistration_unlocked(const ServiceRegistrati
 void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
                                             std::vector<ServiceRegistrationBase>& res) const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
 
   for (auto& sr : serviceRegistrations)
   {
@@ -311,7 +311,7 @@ void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
 void ServiceRegistry::GetUsedByBundle(Bundle* p,
                                       std::vector<ServiceRegistrationBase>& res) const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
 
   for (auto& sr : serviceRegistrations)
   {

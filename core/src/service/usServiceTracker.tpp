@@ -82,7 +82,7 @@ void ServiceTracker<S,T>::Open()
 {
   std::unique_ptr<_TrackedService> t;
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     if (d->trackedService)
     {
       return;
@@ -132,7 +132,7 @@ void ServiceTracker<S,T>::Close()
   std::unique_ptr<_TrackedService> outgoing;
   std::vector<ServiceReferenceType> references;
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     outgoing = std::move(d->trackedService);
     d->trackedService.reset();
     if (outgoing == nullptr)
@@ -163,7 +163,7 @@ void ServiceTracker<S,T>::Close()
 
   if (d->DEBUG_OUTPUT)
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     if ((d->cachedReference.GetBundle() == nullptr) && !TypeTraits::IsValid(d->cachedService))
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
@@ -232,7 +232,7 @@ ServiceTracker<S,T>::GetServiceReferences() const
     return refs;
   }
   {
-    auto l = t->Lock();
+    auto l = t->Lock(); US_UNUSED(l);
     d->GetServiceReferences_unlocked(refs, t);
   }
   return refs;
@@ -244,7 +244,7 @@ ServiceTracker<S,T>::GetServiceReference() const
 {
   ServiceReferenceType reference;
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     reference = d->cachedReference;
   }
   if (reference.GetBundle() != nullptr)
@@ -318,7 +318,7 @@ ServiceTracker<S,T>::GetServiceReference() const
   }
 
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     d->cachedReference = *selectedRef;
     return d->cachedReference;
   }
@@ -346,7 +346,7 @@ std::vector<typename ServiceTracker<S,T>::TrackedReturnType> ServiceTracker<S,T>
     return services;
   }
   {
-    auto l = t->Lock();
+    auto l = t->Lock(); US_UNUSED(l);
     std::vector<ServiceReferenceType> references;
     d->GetServiceReferences_unlocked(references, t);
     for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
@@ -363,7 +363,7 @@ typename ServiceTracker<S,T>::TrackedReturnType
 ServiceTracker<S,T>::GetService() const
 {
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     const TrackedReturnType& service = d->cachedService;
     if (TypeTraits::IsValid(service))
     {

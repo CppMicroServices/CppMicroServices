@@ -96,7 +96,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
   coreCtx->services.Get(us_service_interface_iid<BundleEventHook>(), eventHooks);
 
   {
-    auto l = coreCtx->listeners.bundleListenerMap.Lock();
+    auto l = coreCtx->listeners.bundleListenerMap.Lock(); US_UNUSED(l);
     bundleListeners = coreCtx->listeners.bundleListenerMap.value;
   }
 

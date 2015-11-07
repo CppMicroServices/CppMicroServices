@@ -77,7 +77,7 @@ void ServiceHooks::RemovedService(const ServiceReferenceType& reference, Tracked
 void ServiceHooks::Open()
 {
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     listenerHookTracker.reset(new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this));
   }
   listenerHookTracker->Open();
@@ -87,7 +87,7 @@ void ServiceHooks::Open()
 
 void ServiceHooks::Close()
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   if (listenerHookTracker)
   {
     listenerHookTracker->Close();

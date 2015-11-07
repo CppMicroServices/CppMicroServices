@@ -109,7 +109,7 @@ void Bundle::Start()
   CreateActivatorHook createActivatorHook = nullptr;
 
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
 
     // loading a library isn't necessary if it isn't supported
 #ifdef US_BUILD_SHARED_LIBS
@@ -169,7 +169,7 @@ void Bundle::Stop()
   StateReset reset([this]{
     try
     {
-      auto l = d->Lock();
+      auto l = d->Lock(); US_UNUSED(l);
       d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
       d->RemoveBundleResources();
       d->bundleContext.load()->d->Lock(), d->bundleContextOrphans.emplace_back(d->bundleContext), (d->bundleContext.load()->d->bundle = nullptr);

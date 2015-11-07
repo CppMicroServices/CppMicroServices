@@ -60,7 +60,7 @@ void ServiceListeners::AddServiceListener(BundleContext* mc, const ServiceListen
   ServiceListenerEntry sle(mc, listener, data, filter);
   RemoveServiceListener(sle);
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     serviceSet.insert(sle);
     CheckSimple_unlocked(sle);
   }
@@ -78,7 +78,7 @@ void ServiceListeners::RemoveServiceListener(const ServiceListenerEntry& entryTo
 {
   ServiceListenerEntry sle;
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     auto it = serviceSet.find(entryToRemove);
     if (it != serviceSet.end())
     {
@@ -96,7 +96,7 @@ void ServiceListeners::RemoveServiceListener(const ServiceListenerEntry& entryTo
 
 void ServiceListeners::AddBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
 {
-  auto l = bundleListenerMap.Lock();
+  auto l = bundleListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = bundleListenerMap.value[mc];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
@@ -106,7 +106,7 @@ void ServiceListeners::AddBundleListener(BundleContext* mc, const BundleListener
 
 void ServiceListeners::RemoveBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
 {
-  auto l = bundleListenerMap.Lock();
+  auto l = bundleListenerMap.Lock(); US_UNUSED(l);
   bundleListenerMap.value[mc].remove_if(std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
 }
 
@@ -134,7 +134,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
 void ServiceListeners::RemoveAllListeners(BundleContext* mc)
 {
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     for (ServiceListenerEntries::iterator it = serviceSet.begin();
          it != serviceSet.end(); )
     {
@@ -152,7 +152,7 @@ void ServiceListeners::RemoveAllListeners(BundleContext* mc)
   }
 
   {
-    auto l = bundleListenerMap.Lock();
+    auto l = bundleListenerMap.Lock(); US_UNUSED(l);
     bundleListenerMap.value.erase(mc);
   }
 }
@@ -161,7 +161,7 @@ void ServiceListeners::HooksBundleStopped(BundleContext* mc)
 {
   std::vector<ServiceListenerEntry> entries;
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     for (auto& sle : serviceSet)
     {
       if (sle.GetBundleContext() == mc)
@@ -228,7 +228,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
   auto props = ref.d.load()->GetProperties();
 
   {
-    auto l = this->Lock();
+    auto l = this->Lock(); US_UNUSED(l);
     // Check complicated or empty listener filters
     for (auto& sse : complicatedListeners)
     {
@@ -258,7 +258,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
 
 std::vector<ServiceListenerHook::ListenerInfo> ServiceListeners::GetListenerInfoCollection() const
 {
-  auto l = this->Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   std::vector<ServiceListenerHook::ListenerInfo> result;
   result.reserve(serviceSet.size());
   for (auto info : serviceSet)

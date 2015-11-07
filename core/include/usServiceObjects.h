@@ -118,7 +118,7 @@ public:
    *   <li>The service object is returned.</li>
    * </ol>
    *
-   * @return A \c shared_ptr object containing the referenced service.The returned \c shared_ptr
+   * @return A \c shared_ptr to the service object.The returned \c shared_ptr
    *         is empty if the service is not registered, the service object returned by a
    *         ServiceFactory does not contain all the classes under which it was registered 
    *         or the ServiceFactory threw an exception.
@@ -140,7 +140,7 @@ public:
   */
   ServiceReference<S> GetServiceReference() const
   {
-	  return this->ServiceObjectsBase::GetReference();
+    return this->ServiceObjectsBase::GetReference();
   }
 
 private:

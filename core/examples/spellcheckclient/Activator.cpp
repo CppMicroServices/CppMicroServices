@@ -75,7 +75,7 @@ public:
     m_tracker = new ServiceTracker<ISpellCheckService>(m_context);
     m_tracker->Open();
 
-    std::cout << "Tracker count is :" << m_tracker->GetTrackingCount() << std::endl;
+    //std::cout << "Tracker count is :" << m_tracker->GetTrackingCount() << std::endl;
     std::cout << "Enter a blank line to exit." << std::endl;
 
     // Loop endlessly until the user enters a blank line

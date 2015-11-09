@@ -91,9 +91,9 @@ struct UngetHelper
     {
       sObj->UngetService(service);
     }
-    catch (std::exception& ex)
+    catch (const std::exception& ex)
     {
-      US_WARN << "UngetService threw an exception - " << ex.what();
+      US_INFO << "UngetService threw an exception - " << ex.what();
     }
   }
 };
@@ -138,7 +138,7 @@ InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
 
 void ServiceObjectsBase::UngetService(std::shared_ptr<void> service)
 {
-  if (service == NULL)
+  if (!service)
   {
     return;
   }
@@ -161,7 +161,7 @@ void ServiceObjectsBase::UngetService(std::shared_ptr<void> service)
 
 void ServiceObjectsBase::UngetService(const InterfaceMapConstPtr& interfaceMap)
 {
-  if (!interfaceMap || interfaceMap->empty())
+  if (!interfaceMap)
   {
     return;
   }

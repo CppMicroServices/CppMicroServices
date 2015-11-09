@@ -118,9 +118,9 @@ struct ServiceHolder
     {
       bc->UngetService(sref);
     }
-    catch (std::exception& exp)
+    catch (const std::exception& exp)
     {
-      US_WARN << "UngetService threw an exception - " << exp.what();
+      US_INFO << "UngetService threw an exception - " << exp.what();
     }
   }
 };
@@ -152,8 +152,7 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 bool BundleContext::UngetService(const ServiceReferenceBase& reference)
 {
   ServiceReferenceBase ref = reference;
-  // Due to smart pointers it is possible this method is called after the bundle is stopped.
-  return (d->bundle) ? ref.d->UngetService(d->bundle->q, true) : false;
+  return ref.d->UngetService(d->bundle->q, true);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate,

@@ -87,33 +87,31 @@ public:
 
   ActivatorSL1()
     : bundlePropsService(std::make_shared<SL1BundlePropsImpl>())
-    , tracker(0)
-    , context(0)
-  {
-
-  }
+    , trackerCustomizer(nullptr)
+    , tracker(nullptr)
+    , context(nullptr)
+  {}
 
   ~ActivatorSL1()
-  {
-    delete tracker;
-  }
+  {}
 
   void Start(BundleContext* context)
   {
     this->context = context;
-
     InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
     im->insert(std::make_pair(std::string("ActivatorSL1"), bundlePropsService));
     sr = context->RegisterService(im);
-
-    delete tracker;
-    tracker = new FooTracker(context, new SL1ServiceTrackerCustomizer(bundlePropsService, context));
+    trackerCustomizer.reset(new SL1ServiceTrackerCustomizer(bundlePropsService, context));
+    tracker.reset(new FooTracker(context, trackerCustomizer.get()));
     tracker->Open();
   }
 
   void Stop(BundleContext* /*context*/)
   {
     tracker->Close();
+    tracker.reset();
+    trackerCustomizer.reset();
+    this->context = nullptr;
   }
 
 private:
@@ -123,8 +121,8 @@ private:
   ServiceRegistrationU sr;
 
   typedef ServiceTracker<FooService> FooTracker;
-
-  FooTracker* tracker;
+  std::unique_ptr<SL1ServiceTrackerCustomizer> trackerCustomizer;
+  std::unique_ptr<FooTracker> tracker;
   BundleContext* context;
 
 }; // ActivatorSL1

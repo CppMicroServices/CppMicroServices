@@ -12,16 +12,13 @@ class MyActivator : public BundleActivator
 public:
 
   MyActivator()
-    : m_SingletonOne(NULL)
-    , m_SingletonTwo(NULL)
+    : m_SingletonOne(nullptr)
+    , m_SingletonTwo(nullptr)
   {}
 
   //![0]
   void Start(BundleContext* context)
   {
-    // The Start() method of the bundle activator is called during static
-    // initialization time of the shared library.
-
     // First create and register a SingletonTwoService instance.
     m_SingletonTwo.reset(new SingletonTwoService, [](SingletonTwoService* ptr){ delete ptr; });
     m_SingletonTwoReg = context->RegisterService<SingletonTwoService>(m_SingletonTwo);
@@ -45,12 +42,14 @@ public:
     // SingletonOneService instance here. This way, the SingletonOneService
     // destructor will still get a valid SingletonTwoService instance.
     m_SingletonOneReg.Unregister();
+    m_SingletonOne.reset();
 
     // For singletonTwoService, we could rely on the automatic unregistering
     // by the service registry and on automatic deletion if you used
     // smart pointer reference counting. You must not delete service instances
     // in this method without unregistering them first.
     m_SingletonTwoReg.Unregister();
+    m_SingletonTwo.reset();
   }
   //![1]
 

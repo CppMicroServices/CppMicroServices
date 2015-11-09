@@ -416,8 +416,8 @@ public:
    * <p>
    * A bundle's use of a service is tracked by the bundle's use count of that
    * service. Each call to {@link #GetService(const ServiceReference<S>&)} increments 
-   * the context bundle's use count by one. When the returned shared_ptr object goes 
-   * out of scope the context bundle's use count for that service is decremented by one.
+   * the context bundle's use count by one. The deleter function of the returned shared_ptr
+   * object is responsible for decrementing the context bundle's use count.
    * <p>
    * When a bundle's use count for a service drops to zero, the bundle should
    * no longer use that service.
@@ -689,9 +689,44 @@ private:
   friend class BundlePrivate;
 
   BundleContext(BundlePrivate* bundle);
-
+  
+  /**
+   * Releases the service object referenced by the specified
+   * <code>ServiceReference</code> object. If the context bundle's use count
+   * for the service is zero, this method returns <code>false</code>.
+   * Otherwise, the context bundles's use count for the service is decremented
+   * by one.
+   *
+   * <p>
+   * The service's service object should no longer be used and all references
+   * to it should be destroyed when a bundle's use count for the service drops
+   * to zero.
+   *
+   * <p>
+   * The following steps are taken to unget the service object:
+   * <ol>
+   * <li>If the context bundle's use count for the service is zero or the
+   * service has been unregistered, <code>false</code> is returned.
+   * <li>The context bundle's use count for this service is decremented by
+   * one.
+   * <li>If the context bundle's use count for the service is currently zero
+   * and the service was registered with a <code>ServiceFactory</code> object,
+   * the ServiceFactory#UngetService
+   * method is called to release the service object for the context bundle.
+   * <li><code>true</code> is returned.
+   * </ol>
+   *
+   * @param reference A reference to the service to be released.
+   * @return <code>false</code> if the context bundle's use count for the
+   *         service is zero or if the service has been unregistered;
+   *         <code>true</code> otherwise.
+   * @throws std::logic_error If this BundleContext is no
+   *         longer valid.
+   * @see #GetService
+   * @see ServiceFactory
+   */
   bool UngetService(const ServiceReferenceBase& reference);
-
+  
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);
   void RemoveServiceListener(const ServiceListener& delegate, void* data);

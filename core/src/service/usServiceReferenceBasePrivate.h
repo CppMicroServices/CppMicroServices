@@ -142,7 +142,7 @@ public:
 
 private:
   InterfaceMapConstPtr GetServiceFromFactory(Bundle* bundle,
-                                     std::shared_ptr<ServiceFactory> factory,
+                                     const std::shared_ptr<ServiceFactory>& factory,
                                      bool isBundleScope);
 };
 

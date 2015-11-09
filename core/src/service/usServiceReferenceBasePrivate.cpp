@@ -54,7 +54,7 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 }
 
 InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
-                                                                        std::shared_ptr<ServiceFactory> factory,
+                                                                        const std::shared_ptr<ServiceFactory>& factory,
                                                                         bool isBundleScope)
 {
   assert(factory && "Factory service pointer is NULL");
@@ -208,6 +208,11 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle*
 
 bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const InterfaceMapConstPtr& service)
 {
+  if (!service)
+  {
+    return false;
+  }
+  
   typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
   T::Lock l(registration->propsLock);
 
@@ -223,13 +228,13 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
   for (std::list<InterfaceMapConstPtr>::iterator imIter = prototypeServiceMaps.begin();
        imIter != prototypeServiceMaps.end(); ++imIter)
   {
-    if (service == *imIter)
+    if (service.get() == (*imIter).get())
     {
       try
       {
-          std::shared_ptr<ServiceFactory> sf = std::static_pointer_cast<ServiceFactory>(
-                                                 registration->GetService("org.cppmicroservices.factory"));
-        sf->UngetService(bundle, ServiceRegistrationBase(registration), service);
+        std::shared_ptr<ServiceFactory> sf = std::static_pointer_cast<ServiceFactory>(
+                                               registration->GetService("org.cppmicroservices.factory"));
+        sf->UngetService(bundle, ServiceRegistrationBase(registration), *imIter);
       }
       catch (const std::exception& /*e*/)
       {

@@ -182,7 +182,7 @@ ServletContainerPrivate::TrackedType ServletContainerPrivate::AddingService(cons
   }
 
   std::shared_ptr<HttpServlet> servlet = m_Context->GetService(reference);
-  if (servlet)
+  if (!servlet)
   {
     std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is NULL." << std::endl;
     return NULL;

@@ -88,10 +88,10 @@ class ActivatorSL3 :
 
 public:
 
-  ActivatorSL3() : tracker(0), context(0) {}
+  ActivatorSL3() : trackerCustomizer(nullptr), tracker(nullptr), context(nullptr) {}
 
   ~ActivatorSL3()
-  { delete tracker; }
+  {}
 
   void Start(BundleContext* context)
   {
@@ -100,21 +100,25 @@ public:
     InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
     im->insert(std::make_pair(std::string("ActivatorSL3"), bundlePropsService));
     sr = context->RegisterService(im);
-    delete tracker;
-    tracker = new FooTracker(context, new SL3ServiceTrackerCustomizer(bundlePropsService, context));
+    trackerCustomizer.reset(new SL3ServiceTrackerCustomizer(bundlePropsService, context));
+    tracker.reset(new FooTracker(context, trackerCustomizer.get()));
     tracker->Open();
   }
 
   void Stop(BundleContext* /*context*/)
   {
     tracker->Close();
+    tracker.reset();
+    trackerCustomizer.reset();
+    this->context = nullptr;
   }
 
 private:
 
   std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
   typedef ServiceTracker<FooService> FooTracker;
-  FooTracker* tracker;
+  std::unique_ptr<SL3ServiceTrackerCustomizer> trackerCustomizer;
+  std::unique_ptr<FooTracker> tracker;
   BundleContext* context;
 
   ServiceRegistrationU sr;

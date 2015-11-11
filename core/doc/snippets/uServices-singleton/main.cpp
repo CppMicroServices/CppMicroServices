@@ -20,12 +20,13 @@ public:
   void Start(BundleContext* context)
   {
     // First create and register a SingletonTwoService instance.
-    m_SingletonTwo.reset(new SingletonTwoService, [](SingletonTwoService* ptr){ delete ptr; });
+    m_SingletonTwo = std::make_shared<SingletonTwoService>();
     m_SingletonTwoReg = context->RegisterService<SingletonTwoService>(m_SingletonTwo);
+    // Framework service registry has shared ownership of the SingletonTwoService instance
 
     // Now the SingletonOneService constructor will get a valid
     // SingletonTwoService instance.
-    m_SingletonOne.reset(new SingletonOneService, [](SingletonOneService* ptr){ delete ptr; });
+    m_SingletonOne = std::make_shared<SingletonOneService>();
     m_SingletonOneReg = context->RegisterService<SingletonOneService>(m_SingletonOne);
   }
   //![0]
@@ -43,13 +44,14 @@ public:
     // destructor will still get a valid SingletonTwoService instance.
     m_SingletonOneReg.Unregister();
     m_SingletonOne.reset();
+    // Deletion of the SingletonTwoService instance is handled by the smart pointer
 
     // For singletonTwoService, we could rely on the automatic unregistering
-    // by the service registry and on automatic deletion if you used
-    // smart pointer reference counting. You must not delete service instances
-    // in this method without unregistering them first.
+    // by the service registry and on automatic deletion of service
+    // instances through smart pointers.
     m_SingletonTwoReg.Unregister();
     m_SingletonTwo.reset();
+    // Deletion of the SingletonOneService instance is handled by the smart pointer
   }
   //![1]
 

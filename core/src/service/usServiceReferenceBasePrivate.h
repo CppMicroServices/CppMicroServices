@@ -89,8 +89,6 @@ public:
    * @param service The prototype scope service pointer.
    * @return \c true if the service was removed, \c false otherwise.
    */
-  bool UngetPrototypeService(Bundle* bundle, void* service);
-
   bool UngetPrototypeService(Bundle* bundle, const InterfaceMapConstPtr& service);
 
   /**

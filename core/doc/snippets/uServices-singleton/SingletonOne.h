@@ -37,21 +37,19 @@ public:
   // This will return a SingletonOneService instance with the
   // lowest service id at the time this method was called the first
   // time and returned a non-null value (which is usually the instance
-  // which was registered first). A null-pointer is returned if no
+  // which was registered first). An empty object is returned if no
   // instance was registered yet.
+  //
+  // Note: This is a helper method to migrate traditional singletons to
+  // services. Do not create a method like this in real world applications.
   static std::shared_ptr<SingletonOneService> GetInstance();
 
   int a;
-
-private:
-
-  // Only our bundle activator class should be able to instantiate
-  // a SingletonOneService object.
-  friend class MyActivator;
-
+  
   SingletonOneService();
   ~SingletonOneService();
 
+private:
   // Disable copy constructor and assignment operator.
   SingletonOneService(const SingletonOneService&);
   SingletonOneService& operator=(const SingletonOneService&);

@@ -228,6 +228,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
   for (std::list<InterfaceMapConstPtr>::iterator imIter = prototypeServiceMaps.begin();
        imIter != prototypeServiceMaps.end(); ++imIter)
   {
+    // compare the contents of the map
     if (service.get() == (*imIter).get())
     {
       try

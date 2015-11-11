@@ -33,7 +33,6 @@
 namespace us {
 
 class ServiceObjectsBasePrivate;
-template<class S> class UngetHelper;
 
 class US_Core_EXPORT ServiceObjectsBase
 {
@@ -41,14 +40,6 @@ class US_Core_EXPORT ServiceObjectsBase
 private:
 
   ServiceObjectsBasePrivate* d;
-  
-  template<class S> friend class UngetHelper;
-  
-  // Called by ServiceObjects<S> with S != void
-  void UngetService(std::shared_ptr<void> service);
-  
-  // Called by the ServiceObjects<void> specialization
-  void UngetService(const InterfaceMapConstPtr& interfaceMap);
 
 protected:
 
@@ -188,24 +179,6 @@ public:
    * @see UngetService()
    */
   InterfaceMapConstPtr GetService() const;
-
-  /**
-   * Releases a service object for the referenced service.
-   *
-   * This method is the same as ServiceObjects<S>::UngetService() except for the
-   * parameter type.
-   *
-   * @param service An InterfaceMapConstPtr object previously provided by this ServiceObjects object.
-   *
-   * @throw std::logic_error If the BundleContext used to create this ServiceObjects
-   *        object is no longer valid.
-   * @throw std::invalid_argument If the specified service was not provided by this
-   *        ServiceObjects object.
-   *
-   * @see ServiceObjects<S>::UngetService()
-   * @see GetService()
-   */
-  void UngetService(const InterfaceMapConstPtr& service);
 
   /**
    * Returns the ServiceReference for this ServiceObjects object.

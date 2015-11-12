@@ -101,14 +101,13 @@ public:
    *
    * <p>
    * The framework invokes this method when a service has been released by a
-   * bundle. The service object may then be destroyed.
+   * bundle.
    *
    * @param bundle The Bundle releasing the service.
    * @param registration The <code>ServiceRegistration</code> object for the
    *        service.
    * @param service The service object returned by a previous call to the
    *        <code>ServiceFactory::GetService</code> method.
-   * @see BundleContext#UngetService
    * @see InterfaceMapConstPtr
    */
   virtual void UngetService(Bundle* bundle, const ServiceRegistrationBase& registration,

@@ -572,11 +572,6 @@ protected:
    * This method is only called when this <code>ServiceTracker</code> has been
    * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
    *
-   * <p>
-   * This implementation calls <code>UngetService</code>, on the
-   * <code>BundleContext</code> with which this <code>ServiceTracker</code>
-   * was created, passing the specified <code>ServiceReference</code>.
-   * <p>
    * This method can be overridden in a subclass. If the default
    * implementation of \link AddingService(const ServiceReferenceType&) AddingService\endlink
    * method was used, this method must unget the service.

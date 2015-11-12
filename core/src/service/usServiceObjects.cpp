@@ -75,6 +75,15 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
   ++d->ref;
 }
 
+/* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
+ *        in ServiceObjectsBase::GetService & ServiceObjectsBase::GetServiceInterfaceMap 
+ *        methods. The aliasing constructor helps automate the call to UngetService method.
+ *
+ *        Service consumers can simply call GetService to obtain a shared_ptr to the
+ *        service object and not worry about calling UngetService when they are done.
+ *        The UngetService is called when all instances of the returned shared_ptr object
+ *        go out of scope.
+ */
 struct UngetHelper
 {
   InterfaceMapConstPtr interfaceMap;

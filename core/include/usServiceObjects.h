@@ -117,7 +117,6 @@ public:
    * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
    *        is no longer valid.
    *
-   * @see UngetService()
    */
   std::shared_ptr<S> GetService() const
   {
@@ -176,7 +175,6 @@ public:
    *        is no longer valid.
    *
    * @see ServiceObjects<S>::GetService()
-   * @see UngetService()
    */
   InterfaceMapConstPtr GetService() const;
 

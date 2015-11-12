@@ -189,7 +189,7 @@ private:
   friend class BundleHooks;
   friend class ServiceHooks;
   friend class ServiceObjectsBase;
-  friend class UngetHelper;
+  friend struct UngetHelper;
   friend class ServiceObjectsBasePrivate;
   friend class ServiceRegistrationBase;
   friend class ServiceRegistrationBasePrivate;

@@ -133,8 +133,6 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2 != prototypeServiceH2Void->find(us_service_interface_iid<TestBundleH2>())->second,
                              "GetService()")
 
-  //svcObjectsVoid.UngetService(prototypeServiceH2Void);
-
   std::shared_ptr<TestBundleH2> bundleScopeService2 = mc->GetService(sr1);
   US_TEST_CONDITION(bundleScopeService == bundleScopeService2, "Same service pointer")
 

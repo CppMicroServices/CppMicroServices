@@ -35,7 +35,7 @@ class BundleContextPrivate;
 class ServiceFactory;
 
 template<class S> class ServiceObjects;
-template<class S> class ServiceHolder;
+template<class S> struct ServiceHolder;
 /**
  * \ingroup MicroServices
  *
@@ -736,7 +736,7 @@ private:
 
   BundleContextPrivate * const d;
   
-  template<class S> friend class ServiceHolder;
+  template<class S> friend struct ServiceHolder;
 };
 
 }

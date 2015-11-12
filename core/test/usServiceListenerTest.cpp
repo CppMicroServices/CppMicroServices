@@ -146,7 +146,6 @@ public:
       //                          "Using bundles (unreg, after getService): null");
       //      }
       //    }
-      //mc->UngetService(sr);
       service.reset(); // results in UngetService
 
       // Check that the UNREGISTERING service can not be looked up

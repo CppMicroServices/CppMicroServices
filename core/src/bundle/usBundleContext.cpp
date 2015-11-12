@@ -105,7 +105,15 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
   return d->bundle->coreCtx->services.Get(d->bundle, clazz);
 }
 
-// private class used to call UngetService
+/* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
+ *        in BundleContext::GetService method. The aliasing constructor helps automate 
+ *        the call to UngetService method.
+ *
+ *        Service consumers can simply call GetService to obtain a shared_ptr to the 
+ *        service object and not worry about calling UngetService when they are done. 
+ *        The UngetService is called when all instances of the returned shared_ptr object 
+ *        go out of scope.
+ */
 template <class S>
 struct ServiceHolder
 {

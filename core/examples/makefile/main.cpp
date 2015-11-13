@@ -14,7 +14,7 @@ int main(int /*argc*/, char* /*argv*/[])
     GetBundleContext()->GetServiceReference<IDictionaryService>();
   if (dictionaryServiceRef)
   {
-    IDictionaryService* dictionaryService = GetBundleContext()->GetService(dictionaryServiceRef);
+    auto dictionaryService = GetBundleContext()->GetService(dictionaryServiceRef);
     if (dictionaryService)
     {
       std::cout << "Dictionary contains 'Tutorial': " << dictionaryService->CheckWord("Tutorial") << std::endl;

@@ -305,9 +305,10 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 
   std::string baseStoragePath;
   auto prop = b->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
-  if(prop != b->coreCtx->frameworkProperties.end())
+  if(prop != b->coreCtx->frameworkProperties.end() &&
+     prop->second.Type() == typeid(std::string))
   {
-    baseStoragePath = ref_any_cast<std::string>((*prop).second);
+    baseStoragePath = ref_any_cast<std::string>(prop->second);
   }
 
   if (baseStoragePath.empty()) return std::string();

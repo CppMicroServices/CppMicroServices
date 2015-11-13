@@ -335,14 +335,14 @@ std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location
   // the result is the same as if the calling thread had
   // won the race condition.
 
-    BundleInfo bundleInfo(GetBundleNameFromLocation(location));
-    bundleInfo.location = GetBundleLocation(location);
+  BundleInfo bundleInfo(GetBundleNameFromLocation(location));
+  bundleInfo.location = GetBundleLocation(location);
 
   auto bundle = b->coreCtx->bundleRegistry.Register(bundleInfo);
 
   b->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
 
-    return bundle;
+  return bundle;
 }
 
 

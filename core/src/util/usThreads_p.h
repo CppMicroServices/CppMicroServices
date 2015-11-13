@@ -99,6 +99,19 @@ public:
 #endif
   };
 
+  /**
+   * @brief Lock this object.
+   *
+   * Call this method to lock this object and obtain a lock object
+   * which automatically releases the acquired lock when it goes out
+   * of scope. E.g.
+   *
+   * \code
+   * auto lock = object->Lock();
+   * \endcode
+   *
+   * @return A lock object.
+   */
   UniqueLock Lock() const
   {
     return UniqueLock(this);

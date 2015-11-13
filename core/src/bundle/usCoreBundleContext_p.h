@@ -80,7 +80,7 @@ public:
   Bundle* const systemBundle;
 
   /**
-   * Contruct a core context
+   * Construct a core context
    *
    */
   CoreBundleContext(Bundle* systemBundle, const std::map<std::string, Any>& props = std::map<std::string, Any>());

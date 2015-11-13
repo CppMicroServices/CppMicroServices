@@ -195,12 +195,12 @@ void Bundle::Stop()
 
   if (d->bundleActivator)
   {
-  try
+    try
     {
       d->bundleActivator->Stop(d->bundleContext);
-  }
-  catch (const std::exception& e)
-  {
+    }
+    catch (const std::exception& e)
+    {
       throw std::runtime_error("Stopping bundle " + d->info.name + " failed: " + e.what());
     }
 

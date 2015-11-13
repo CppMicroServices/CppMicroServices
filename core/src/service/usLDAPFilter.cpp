@@ -75,9 +75,9 @@ LDAPFilter::~LDAPFilter()
 {
 }
 
-LDAPFilter::operator bool_type() const
+LDAPFilter::operator bool() const
 {
-  return d.ConstData() != nullptr ? &LDAPFilter::d : nullptr;
+  return d;
 }
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
@@ -112,11 +112,9 @@ LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
   return *this;
 }
 
-}
-
-using namespace us;
-
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {
   return os << filter.ToString();
+}
+
 }

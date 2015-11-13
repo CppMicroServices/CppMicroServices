@@ -113,8 +113,6 @@ void BundleAbstractTracked<S,TTT,R>::Close()
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 {
-  if (closed) return;
-
   TrackedReturnType object = TTT::DefaultValue();
   {
     auto l = this->Lock(); US_UNUSED(l);

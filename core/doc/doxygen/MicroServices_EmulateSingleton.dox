@@ -51,16 +51,15 @@ are discussed in detail below.
 \snippet uServices-singleton/SingletonOne.h ss1
 
  - In the implementation above, the class SingletonOneService provides the implementation as well as the interface.
- - Friend activator: We move the responsibility of constructing instances of SingletonOneService from the GetInstance()
-   method to the bundle activator.
+ - SingletonOneService class looks like a plain C++ class, no need for hiding constructors and destructor
 
 Let's have a look at the modified GetInstance() and ~SingletonOneService() methods.
 
 \snippet uServices-singleton/SingletonOne.cpp ss1gi
 
-The inline comments should explain the details. Note that we now had to change the return type to a pointer, instead
+The inline comments should explain the details. Note that we now had to change the return type to a shared pointer, instead
 of a reference as in the classic singleton. This is necessary since we can no longer guarantee that an instance
-always exists. Clients of the GetInstance() method must check for null pointers and react appropriately.
+always exists. Clients of the GetInstance() method must check if the returned object is empty and react appropriately.
 
 \warning Newly created "singletons" should not expose a GetInstance() method. They should be handled as proper
 services and hence should be retrieved by clients using the BundleContext or ServiceTracker API. The

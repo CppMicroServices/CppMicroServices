@@ -35,10 +35,14 @@ class HttpServlet;
 class ServletContainer;
 class ServletContext;
 class ServletHandler;
+    
+// TODO: Although the servicetracker works for now, this syntax is wierd. Investigate alternatives.
+  //typedef std::shared_ptr<ServletHandler> ServletHandlerPtr;
+typedef ServletHandler* ServletHandlerPtr;
 
-struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler*>
+struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandlerPtr>
 {
-  typedef ServiceTrackerCustomizer<HttpServlet, ServletHandler*>::TrackedType TrackerType;
+  typedef ServiceTrackerCustomizer<HttpServlet, ServletHandlerPtr>::TrackedType TrackerType;
 
   ServletContainerPrivate(ServletContainer* q);
 
@@ -49,7 +53,7 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
 
   BundleContext* m_Context;
   CivetServer* m_Server;
-  ServiceTracker<HttpServlet, TrackedTypeTraits<HttpServlet, ServletHandler*> > m_ServletTracker;
+  ServiceTracker<HttpServlet, TrackedTypeTraits<HttpServlet, ServletHandlerPtr> > m_ServletTracker;
 
   std::map<std::string, ServletContext*> m_ServletContextMap;
   std::string m_ContextPath;
@@ -57,7 +61,7 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
 private:
 
   ServletContainer* const q;
-  std::list<ServletHandler*> m_Handler;
+  std::list<ServletHandlerPtr> m_Handler;
 
   virtual TrackedType AddingService(const ServiceReferenceType& reference);
   virtual void ModifiedService(const ServiceReferenceType& /*reference*/, TrackedType /*service*/);

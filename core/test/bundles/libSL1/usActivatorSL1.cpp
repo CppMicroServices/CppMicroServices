@@ -31,73 +31,98 @@
 
 namespace us {
 
+class SL1BundlePropsImpl : public BundlePropsInterface
+{
+  
+public:
+  
+  const Properties& GetProperties() const
+  {
+    return props;
+  }
+  
+  void SetProperty(std::string propertyKey, bool propertyValue)
+  {
+    props[propertyKey] = propertyValue;
+  }
+  
+private:
+  BundlePropsInterface::Properties props;
+  
+};
+
+class SL1ServiceTrackerCustomizer : public ServiceTrackerCustomizer<FooService>
+{
+private:
+  std::shared_ptr<SL1BundlePropsImpl> bundlePropsService;
+  BundleContext* context;
+public:
+  SL1ServiceTrackerCustomizer(std::shared_ptr<SL1BundlePropsImpl> propService, BundleContext* bc) : bundlePropsService(propService), context(bc) {}
+  virtual ~SL1ServiceTrackerCustomizer() { context = NULL; }
+  
+  std::shared_ptr<FooService> AddingService(const ServiceReferenceType& reference)
+  {
+    bundlePropsService->SetProperty("serviceAdded", true);
+    
+    std::shared_ptr<FooService> fooService = context->GetService<FooService>(reference);
+    fooService->foo();
+    return fooService;
+  }
+  
+  void ModifiedService(const ServiceReferenceType& /*reference*/, std::shared_ptr<FooService> /*service*/)
+  {}
+  
+  void RemovedService(const ServiceReferenceType& /*reference*/, std::shared_ptr<FooService> /*service*/)
+  {
+    bundlePropsService->SetProperty("serviceRemoved", true);
+  }
+  
+};
+
 class ActivatorSL1 :
-    public BundleActivator, public BundlePropsInterface,
-    public ServiceTrackerCustomizer<FooService>
+    public BundleActivator
 {
 
 public:
 
   ActivatorSL1()
-    : tracker(0), context(0)
-  {
-
-  }
+    : bundlePropsService(std::make_shared<SL1BundlePropsImpl>())
+    , trackerCustomizer(nullptr)
+    , tracker(nullptr)
+    , context(nullptr)
+  {}
 
   ~ActivatorSL1()
-  {
-    delete tracker;
-  }
+  {}
 
   void Start(BundleContext* context)
   {
     this->context = context;
-
-    InterfaceMap im = MakeInterfaceMap<BundlePropsInterface>(this);
-    im.insert(std::make_pair(std::string("ActivatorSL1"), this));
+    InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
+    im->insert(std::make_pair(std::string("ActivatorSL1"), bundlePropsService));
     sr = context->RegisterService(im);
-
-    delete tracker;
-    tracker = new FooTracker(context, this);
+    trackerCustomizer.reset(new SL1ServiceTrackerCustomizer(bundlePropsService, context));
+    tracker.reset(new FooTracker(context, trackerCustomizer.get()));
     tracker->Open();
   }
 
   void Stop(BundleContext* /*context*/)
   {
     tracker->Close();
-  }
-
-  const Properties& GetProperties() const
-  {
-    return props;
-  }
-
-  FooService* AddingService(const ServiceReferenceType& reference)
-  {
-    props["serviceAdded"] = true;
-
-    FooService* fooService = context->GetService<FooService>(reference);
-    fooService->foo();
-    return fooService;
-  }
-
-  void ModifiedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
-  {}
-
-  void RemovedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
-  {
-    props["serviceRemoved"] = true;
+    tracker.reset();
+    trackerCustomizer.reset();
+    this->context = nullptr;
   }
 
 private:
 
-  BundlePropsInterface::Properties props;
+  std::shared_ptr<SL1BundlePropsImpl> bundlePropsService;
 
   ServiceRegistrationU sr;
 
   typedef ServiceTracker<FooService> FooTracker;
-
-  FooTracker* tracker;
+  std::unique_ptr<SL1ServiceTrackerCustomizer> trackerCustomizer;
+  std::unique_ptr<FooTracker> tracker;
   BundleContext* context;
 
 }; // ActivatorSL1

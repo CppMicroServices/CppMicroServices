@@ -39,19 +39,14 @@ public:
   BundleContext* m_context;
   ServiceReferenceBase m_reference;
 
-  // This is used by all ServiceObjects<S> instances with S != void
-  std::map<void*, InterfaceMap> m_serviceInstances;
-  // This is used by ServiceObjects<void>
-  std::set<InterfaceMap> m_serviceInterfaceMaps;
-
   ServiceObjectsBasePrivate(BundleContext* context, const ServiceReferenceBase& reference)
     : m_context(context)
     , m_reference(reference)
   {}
 
-  InterfaceMap GetServiceInterfaceMap()
+  InterfaceMapConstPtr GetServiceInterfaceMap()
   {
-    InterfaceMap result;
+    InterfaceMapConstPtr result;
 
     bool isPrototypeScope = m_reference.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
                             ServiceConstants::SCOPE_PROTOTYPE();
@@ -80,84 +75,68 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
   ++d->ref;
 }
 
-void* ServiceObjectsBase::GetService() const
+/* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
+ *        in ServiceObjectsBase::GetService & ServiceObjectsBase::GetServiceInterfaceMap 
+ *        methods. The aliasing constructor helps automate the call to UngetService method.
+ *
+ *        Service consumers can simply call GetService to obtain a shared_ptr to the
+ *        service object and not worry about calling UngetService when they are done.
+ *        The UngetService is called when all instances of the returned shared_ptr object
+ *        go out of scope.
+ */
+struct UngetHelper
+{
+  InterfaceMapConstPtr interfaceMap;
+  ServiceReferenceBase sref;
+  BundleContext* bc;
+  ~UngetHelper()
+  {
+    try
+    {
+      if(sref && bc->GetBundle() != nullptr)
+      {
+        bool isPrototypeScope = sref.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
+        ServiceConstants::SCOPE_PROTOTYPE();
+        
+        if (isPrototypeScope)
+        {
+          sref.d->UngetPrototypeService(bc->GetBundle(), interfaceMap);
+        }
+        else
+        {
+          sref.d->UngetService(bc->GetBundle(), true);
+        }
+      }
+    }
+    catch (const std::exception& ex)
+    {
+      US_INFO << "UngetService threw an exception - " << ex.what();
+    }
+  }
+};
+
+std::shared_ptr<void> ServiceObjectsBase::GetService() const
 {
   if (!d->m_reference)
   {
-    return NULL;
+    return nullptr;
   }
 
-  InterfaceMap im = d->GetServiceInterfaceMap();
-  void* result = im.find(d->m_reference.GetInterfaceId())->second;
-
-  if (result)
-  {
-    d->m_serviceInstances.insert(std::make_pair(result, im));
-  }
-  return result;
+  std::shared_ptr<UngetHelper> h(new UngetHelper{ d->GetServiceInterfaceMap(), d->m_reference, d->m_context });
+  return std::shared_ptr<void>(h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
 }
 
-InterfaceMap ServiceObjectsBase::GetServiceInterfaceMap() const
+InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
 {
-  InterfaceMap result;
+  InterfaceMapConstPtr result;
   if (!d->m_reference)
   {
     return result;
   }
-
-  result = d->GetServiceInterfaceMap();
-
-  if (!result.empty())
-  {
-    d->m_serviceInterfaceMaps.insert(result);
-  }
-  return result;
-}
-
-void ServiceObjectsBase::UngetService(void* service)
-{
-  if (service == NULL)
-  {
-    return;
-  }
-
-  std::map<void*,InterfaceMap>::iterator serviceIter = d->m_serviceInstances.find(service);
-  if (serviceIter == d->m_serviceInstances.end())
-  {
-    throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
-  }
-
-  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetBundle(), serviceIter->second))
-  {
-    US_WARN << "Ungetting service unsuccessful";
-  }
-  else
-  {
-    d->m_serviceInstances.erase(serviceIter);
-  }
-}
-
-void ServiceObjectsBase::UngetService(const InterfaceMap& interfaceMap)
-{
-  if (interfaceMap.empty())
-  {
-    return;
-  }
-
-  std::set<InterfaceMap>::iterator serviceIter = d->m_serviceInterfaceMaps.find(interfaceMap);
-  if (serviceIter == d->m_serviceInterfaceMaps.end())
-  {
-    throw std::invalid_argument("The provided service has not been retrieved via this ServiceObjects instance");
-  }
-
-  if (!d->m_reference.d->UngetPrototypeService(d->m_context->GetBundle(), interfaceMap))
-  {
-    US_WARN << "Ungetting service unsuccessful";
-  }
-  else
-  {
-    d->m_serviceInterfaceMaps.erase(serviceIter);
-  }
+  // copy construct a new map to be handed out to consumers
+  result = std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
+  std::shared_ptr<UngetHelper> h(new UngetHelper{ result, d->m_reference, d->m_context });
+  return InterfaceMapConstPtr(h, h->interfaceMap.get());
 }
 
 ServiceReferenceBase ServiceObjectsBase::GetReference() const
@@ -191,14 +170,9 @@ ServiceObjectsBase& ServiceObjectsBase::operator =(const ServiceObjectsBase& oth
   return *this;
 }
 
-InterfaceMap ServiceObjects<void>::GetService() const
+InterfaceMapConstPtr ServiceObjects<void>::GetService() const
 {
   return this->ServiceObjectsBase::GetServiceInterfaceMap();
-}
-
-void ServiceObjects<void>::UngetService(const InterfaceMap& service)
-{
-  this->ServiceObjectsBase::UngetService(service);
 }
 
 ServiceReferenceU ServiceObjects<void>::GetServiceReference() const

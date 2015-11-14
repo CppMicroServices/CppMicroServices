@@ -135,18 +135,18 @@ void WebConsolePluginTracker::Open()
   Superclass::Open();
 }
 
-HttpServlet* WebConsolePluginTracker::AddingService(const ServiceReferenceType& reference)
+std::shared_ptr<HttpServlet>  WebConsolePluginTracker::AddingService(const ServiceReferenceType& reference)
 {
   std::string label = this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL());
   if (label.empty())
   {
     return NULL;
   }
-  HttpServlet* servlet = Superclass::AddingService(reference);
-  AbstractWebConsolePlugin* plugin = dynamic_cast<AbstractWebConsolePlugin*>(servlet);
+  std::shared_ptr<HttpServlet> servlet = Superclass::AddingService(reference);
+  std::shared_ptr<AbstractWebConsolePlugin> plugin = std::dynamic_pointer_cast<AbstractWebConsolePlugin>(servlet);
   if (plugin)
   {
-    this->AddPlugin(label, plugin);
+    this->AddPlugin(label, plugin.get());
   }
   return plugin;
 }

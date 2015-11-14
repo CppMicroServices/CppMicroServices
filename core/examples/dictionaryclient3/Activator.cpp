@@ -95,7 +95,7 @@ public:
       std::getline(std::cin, word);
 
       // Get the selected dictionary, if available.
-      IDictionaryService* dictionary = m_tracker->GetService();
+      std::shared_ptr<IDictionaryService> dictionary = m_tracker->GetService();
 
       // If the user entered a blank line, then
       // exit the loop.
@@ -104,7 +104,7 @@ public:
         break;
       }
       // If there is no dictionary, then say so.
-      else if (dictionary == NULL)
+      else if (!dictionary)
       {
         std::cout << "No dictionary available." << std::endl;
       }

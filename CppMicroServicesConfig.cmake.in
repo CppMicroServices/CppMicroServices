@@ -106,7 +106,7 @@ usFunctionCheckResourceLinking()
 
 # Required packages
 
-if(US_ENABLE_THREADING_SUPPORT AND NOT TARGET Threads::Threads)
+if(US_ENABLE_THREADING_SUPPORT AND NOT CMAKE_THREAD_LIBS_INIT)
   set(THREADS_PREFER_PTHREAD_FLAG 1)
   find_package(Threads REQUIRED)
 endif()

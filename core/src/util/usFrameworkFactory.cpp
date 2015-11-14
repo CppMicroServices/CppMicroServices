@@ -33,14 +33,14 @@ FrameworkFactory::~FrameworkFactory(void)
 {
 }
 
-Framework* FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration)
+std::shared_ptr<Framework> FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration)
 {
-  return new Framework(configuration);
+  return std::shared_ptr<Framework>(new Framework(configuration));
 }
 
-Framework* FrameworkFactory::NewFramework(void)
+std::shared_ptr<Framework> FrameworkFactory::NewFramework(void)
 {
-    return NewFramework(std::map<std::string, std::string>());
+  return NewFramework(std::map<std::string, std::string>());
 }
 
 }

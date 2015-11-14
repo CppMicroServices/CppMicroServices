@@ -39,7 +39,7 @@ using namespace us;
 
 namespace {
 
-void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
+void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
   assert(mc);
@@ -98,7 +98,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
   bundleAL->Stop();
 }
 
-void testCustomAutoLoadPath(Framework* framework)
+void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
   assert(mc);
@@ -161,15 +161,14 @@ int usBundleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleLoaderTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   framework->SetAutoLoadingEnabled(false);
   testDefaultAutoLoadPath(false, framework);
 
   framework->Stop();
-  delete framework;
-
+  framework.reset();
   framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
@@ -179,7 +178,6 @@ int usBundleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   testCustomAutoLoadPath(framework);
 
   framework->Stop();
-  delete framework;
 
   US_TEST_END()
 }

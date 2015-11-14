@@ -60,7 +60,7 @@ private:
 
   std::vector<ServiceRegistration<IPerfTestService> > regs;
   std::vector<MyServiceListener*> listeners;
-  std::vector<IPerfTestService*> services;
+  std::vector<std::shared_ptr<IPerfTestService>> services;
 
 public:
 
@@ -218,7 +218,7 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
     props["service.pid"] = ss.str();
     props["perf.service.value"] = i+1;
 
-    PerfTestService* service = new PerfTestService();
+    std::shared_ptr<PerfTestService> service = std::make_shared<PerfTestService>();
     services.push_back(service);
     ServiceRegistration<IPerfTestService> reg =
         mc->RegisterService<IPerfTestService>(service, props);
@@ -285,7 +285,7 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
   
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   ServiceRegistryPerformanceTest perfTest(framework->GetBundleContext());
@@ -297,7 +297,6 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
   perfTest.CleanupTestCase();
 
   framework->Stop();
-  delete framework;
 
   US_TEST_END()
 }

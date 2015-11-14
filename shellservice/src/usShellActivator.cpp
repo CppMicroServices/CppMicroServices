@@ -33,7 +33,7 @@ public:
   void Start(BundleContext* context)
   {
     m_ShellService.reset(new ShellService());
-    context->RegisterService<ShellService>(m_ShellService.get());
+    context->RegisterService<ShellService>(m_ShellService);
   }
 
   void Stop(BundleContext*)
@@ -42,8 +42,7 @@ public:
   }
 
 private:
-
-  std::unique_ptr<ShellService> m_ShellService;
+  std::shared_ptr<ShellService> m_ShellService;
 };
 
 }

@@ -64,7 +64,7 @@ struct TrackedTypeTraitsBase
   typedef T TrackedType;
 
   // Needed for S == void
-  static TrackedType ConvertToTrackedType(const InterfaceMap&)
+  static TrackedType ConvertToTrackedType(const InterfaceMapConstPtr&)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
     //return TTT::DefaultValue();
@@ -72,6 +72,13 @@ struct TrackedTypeTraitsBase
 
   // Needed for S != void
   static TrackedType ConvertToTrackedType(void*)
+  {
+    throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+    //return TTT::DefaultValue();
+  }
+  
+  // Needed for S != void
+  static TrackedType ConvertToTrackedType(const std::shared_ptr<void>& /*s*/)
   {
     throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
     //return TTT::DefaultValue();
@@ -117,26 +124,26 @@ struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTrai
 
 /// \cond
 template<class S>
-struct TrackedTypeTraits<S,S*>
+struct TrackedTypeTraits<S, std::shared_ptr<S>>
 {
-  typedef S* TrackedType;
+  typedef std::shared_ptr<S> TrackedType;
 
   static bool IsValid(const TrackedType& t)
   {
-    return t != NULL;
+    return t.get() != nullptr;
   }
 
   static TrackedType DefaultValue()
   {
-    return NULL;
+    return TrackedType();
   }
 
   static void Dispose(TrackedType& t)
   {
-    t = nullptr;
+    t.reset();
   }
 
-  static TrackedType ConvertToTrackedType(S* s)
+  static TrackedType ConvertToTrackedType(const std::shared_ptr<S>& s)
   {
     return s;
   }
@@ -151,13 +158,13 @@ struct TrackedTypeTraits<S,S*>
  * return either S* or InterfaceMap dependening on the template parameter.
  */
 template<>
-struct TrackedTypeTraits<void,void*>
+struct TrackedTypeTraits<void, std::shared_ptr<void> >
 {
-  typedef InterfaceMap TrackedType;
+  typedef InterfaceMapConstPtr TrackedType;
 
   static bool IsValid(const TrackedType& t)
   {
-    return !t.empty();
+    return (t && !t->empty());
   }
 
   static TrackedType DefaultValue()
@@ -167,10 +174,10 @@ struct TrackedTypeTraits<void,void*>
 
   static void Dispose(TrackedType& t)
   {
-    t.clear();
+    t.reset();
   }
 
-  static TrackedType ConvertToTrackedType(const InterfaceMap& im)
+  static TrackedType ConvertToTrackedType(const TrackedType& im)
   {
     return im;
   }
@@ -229,7 +236,7 @@ struct TrackedTypeTraits<void,void*>
  *
  * @remarks This class is thread safe.
  */
-template<class S, class TTT = TrackedTypeTraits<S,S*> >
+template<class S, class TTT = TrackedTypeTraits<S, std::shared_ptr<S> > >
 class ServiceTracker : protected ServiceTrackerCustomizer<S,typename TTT::TrackedType>
 {
 public:
@@ -241,7 +248,7 @@ public:
 
   typedef ServiceReference<S> ServiceReferenceType;
 
-  typedef std::map<ServiceReference<S>,T> TrackingMap;
+  typedef std::map<ServiceReferenceType,T> TrackingMap;
 
   ~ServiceTracker();
 
@@ -565,11 +572,6 @@ protected:
    * This method is only called when this <code>ServiceTracker</code> has been
    * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
    *
-   * <p>
-   * This implementation calls <code>UngetService</code>, on the
-   * <code>BundleContext</code> with which this <code>ServiceTracker</code>
-   * was created, passing the specified <code>ServiceReference</code>.
-   * <p>
    * This method can be overridden in a subclass. If the default
    * implementation of \link AddingService(const ServiceReferenceType&) AddingService\endlink
    * method was used, this method must unget the service.

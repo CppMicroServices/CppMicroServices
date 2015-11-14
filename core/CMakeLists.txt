@@ -22,8 +22,8 @@ set(_link_libraries )
 if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
-if(TARGET Threads::Threads)
-  list(APPEND _link_libraries Threads::Threads)
+if(CMAKE_THREAD_LIBS_INIT)
+  list(APPEND _link_libraries ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 # Configure the bundles manifest.json file

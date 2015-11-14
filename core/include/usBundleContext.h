@@ -35,7 +35,7 @@ class BundleContextPrivate;
 class ServiceFactory;
 
 template<class S> class ServiceObjects;
-
+template<class S> struct ServiceHolder;
 /**
  * \ingroup MicroServices
  *
@@ -173,8 +173,7 @@ public:
    * @note This is a low-level method and should normally not be used directly.
    *       Use one of the templated RegisterService methods instead.
    *
-   * @param service The service object, which is a map of interface identifiers
-   *        to raw service pointers.
+   * @param service A shared_ptr to a map of interface identifiers to service objects.
    * @param properties The properties for this service. The keys in the
    *        properties object must all be <code>std::string</code> objects. See
    *        {@link ServiceConstants} for a list of standard service property keys.
@@ -198,7 +197,7 @@ public:
    * @see ServiceFactory
    * @see PrototypeServiceFactory
    */
-  ServiceRegistrationU RegisterService(const InterfaceMap& service,
+  ServiceRegistrationU RegisterService(const InterfaceMapConstPtr& service,
                                        const ServiceProperties& properties = ServiceProperties());
 
   /**
@@ -217,7 +216,7 @@ public:
    *
    * @tparam I1 The first interface type under which the service can be located.
    * @tparam Interfaces Additional interface types under which the service can be located.
-   * @param impl The service object
+   * @param impl A \c shared_ptr to the service object
    * @param properties The properties for this service.
    * @return A ServiceRegistration object for use by the bundle
    *         registering the service to update the service's properties or to
@@ -229,9 +228,9 @@ public:
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class ...Interfaces, class Impl>
-  ServiceRegistration<I1, Interfaces...> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<I1, Interfaces...> RegisterService(const std::shared_ptr<Impl>& impl, const ServiceProperties& properties = ServiceProperties())
   {
-    InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(impl);
+    InterfaceMapConstPtr servicePointers = MakeInterfaceMap<I1, Interfaces...>(impl);
     return RegisterService(servicePointers, properties);
   }
 
@@ -251,7 +250,7 @@ public:
    *
    * @tparam I1 The first interface type under which the service can be located.
    * @tparam Interfaces Additional interface types under which the service can be located.
-   * @param factory The ServiceFactory or PrototypeServiceFactory object.
+   * @param factory A \c shared_ptr to the ServiceFactory object.
    * @param properties The properties for this service.
    * @return A ServiceRegistration object for use by the bundle
    *         registering the service to update the service's properties or to
@@ -263,9 +262,9 @@ public:
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class ...Interfaces>
-  ServiceRegistration<I1, Interfaces...> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
+  ServiceRegistration<I1, Interfaces...> RegisterService(const std::shared_ptr<ServiceFactory>& factory, const ServiceProperties& properties = ServiceProperties())
   {
-    InterfaceMap servicePointers = MakeInterfaceMap<I1, Interfaces...>(factory);
+    InterfaceMapConstPtr servicePointers = MakeInterfaceMap<I1, Interfaces...>(factory);
     return RegisterService(servicePointers, properties);
   }
 
@@ -416,23 +415,21 @@ public:
    * <code>ServiceReferenceBase</code> object.
    * <p>
    * A bundle's use of a service is tracked by the bundle's use count of that
-   * service. Each time a service's service object is returned by
-   * {@link #GetService(const ServiceReference<S>&)} the context bundle's use count for
-   * that service is incremented by one. Each time the service is released by
-   * {@link #UngetService(const ServiceReferenceBase&)} the context bundle's use count
-   * for that service is decremented by one.
+   * service. Each call to {@link #GetService(const ServiceReference<S>&)} increments 
+   * the context bundle's use count by one. The deleter function of the returned shared_ptr
+   * object is responsible for decrementing the context bundle's use count.
    * <p>
    * When a bundle's use count for a service drops to zero, the bundle should
    * no longer use that service.
    *
    * <p>
-   * This method will always return <code>0</code> when the service
+   * This method will always return an empty object when the service
    * associated with this <code>reference</code> has been unregistered.
    *
    * <p>
    * The following steps are taken to get the service object:
    * <ol>
-   * <li>If the service has been unregistered, <code>0</code> is returned.
+   * <li>If the service has been unregistered, empty object is returned.
    * <li>The context bundle's use count for this service is incremented by
    * one.
    * <li>If the context bundle's use count for the service is currently one
@@ -445,25 +442,22 @@ public:
    * services's service object for the context bundle will return the cached
    * service object. <br>
    * If the <code>ServiceFactory</code> object throws an
-   * exception, <code>0</code> is returned and a warning is logged.
-   * <li>The service object for the service is returned.
+   * exception, empty object is returned and a warning is logged.
+   * <li>A shared_ptr to the service object is returned.
    * </ol>
    *
    * @param reference A reference to the service.
-   * @return A service object for the service associated with
-   *         <code>reference</code> or <code>0</code> if the service is not
-   *         registered or the <code>ServiceFactory</code> threw
-   *         an exception.
-   * @throws std::logic_error If this BundleContext is no
-   *         longer valid.
+   * @return A shared_ptr to the service object associated with <code>reference</code>.
+   *         An empty shared_ptr is returned if the service is not registered or the
+   *         <code>ServiceFactory</code> threw an exception
+   * @throws std::logic_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
-   * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
-  void* GetService(const ServiceReferenceBase& reference);
+  std::shared_ptr<void> GetService(const ServiceReferenceBase& reference);
 
-  InterfaceMap GetService(const ServiceReferenceU& reference);
+  InterfaceMapConstPtr GetService(const ServiceReferenceU& reference);
 
   /**
    * Returns the service object referenced by the specified
@@ -473,23 +467,22 @@ public:
    * except that it casts the service object to the supplied template argument type
    *
    * @tparam S The type the service object will be cast to.
-   * @return A service object for the service associated with
-   *         <code>reference</code> or <code>0</code> if the service is not
-   *         registered, the <code>ServiceFactory</code> threw
-   *         an exception or the service could not be casted to the desired type.
+   * @return A shared_ptr to the service object associated with <code>reference</code>.
+   *         An empty object is returned if the service is not registered, the
+   *         <code>ServiceFactory</code> threw an exception or the service could not be 
+   *         cast to the desired type.
    * @throws std::logic_error If this BundleContext is no
    *         longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
    * @see #GetService(const ServiceReferenceBase&)
-   * @see #UngetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
   template<class S>
-  S* GetService(const ServiceReference<S>& reference)
+  std::shared_ptr<S> GetService(const ServiceReference<S>& reference)
   {
     const ServiceReferenceBase& baseRef = reference;
-    return reinterpret_cast<S*>(GetService(baseRef));
+    return std::static_pointer_cast<S>(GetService(baseRef));
   }
 
   /**
@@ -517,43 +510,6 @@ public:
   {
     return ServiceObjects<S>(this, reference);
   }
-
-  /**
-   * Releases the service object referenced by the specified
-   * <code>ServiceReference</code> object. If the context bundle's use count
-   * for the service is zero, this method returns <code>false</code>.
-   * Otherwise, the context bundles's use count for the service is decremented
-   * by one.
-   *
-   * <p>
-   * The service's service object should no longer be used and all references
-   * to it should be destroyed when a bundle's use count for the service drops
-   * to zero.
-   *
-   * <p>
-   * The following steps are taken to unget the service object:
-   * <ol>
-   * <li>If the context bundle's use count for the service is zero or the
-   * service has been unregistered, <code>false</code> is returned.
-   * <li>The context bundle's use count for this service is decremented by
-   * one.
-   * <li>If the context bundle's use count for the service is currently zero
-   * and the service was registered with a <code>ServiceFactory</code> object,
-   * the ServiceFactory#UngetService
-   * method is called to release the service object for the context bundle.
-   * <li><code>true</code> is returned.
-   * </ol>
-   *
-   * @param reference A reference to the service to be released.
-   * @return <code>false</code> if the context bundle's use count for the
-   *         service is zero or if the service has been unregistered;
-   *         <code>true</code> otherwise.
-   * @throws std::logic_error If this BundleContext is no
-   *         longer valid.
-   * @see #GetService
-   * @see ServiceFactory
-   */
-  bool UngetService(const ServiceReferenceBase& reference);
 
   void AddServiceListener(const ServiceListener& delegate,
                           const std::string& filter = std::string());
@@ -733,7 +689,44 @@ private:
   friend class BundlePrivate;
 
   BundleContext(BundlePrivate* bundle);
-
+  
+  /**
+   * Releases the service object referenced by the specified
+   * <code>ServiceReference</code> object. If the context bundle's use count
+   * for the service is zero, this method returns <code>false</code>.
+   * Otherwise, the context bundles's use count for the service is decremented
+   * by one.
+   *
+   * <p>
+   * The service's service object should no longer be used and all references
+   * to it should be destroyed when a bundle's use count for the service drops
+   * to zero.
+   *
+   * <p>
+   * The following steps are taken to unget the service object:
+   * <ol>
+   * <li>If the context bundle's use count for the service is zero or the
+   * service has been unregistered, <code>false</code> is returned.
+   * <li>The context bundle's use count for this service is decremented by
+   * one.
+   * <li>If the context bundle's use count for the service is currently zero
+   * and the service was registered with a <code>ServiceFactory</code> object,
+   * the ServiceFactory#UngetService
+   * method is called to release the service object for the context bundle.
+   * <li><code>true</code> is returned.
+   * </ol>
+   *
+   * @param reference A reference to the service to be released.
+   * @return <code>false</code> if the context bundle's use count for the
+   *         service is zero or if the service has been unregistered;
+   *         <code>true</code> otherwise.
+   * @throws std::logic_error If this BundleContext is no
+   *         longer valid.
+   * @see #GetService
+   * @see ServiceFactory
+   */
+  bool UngetService(const ServiceReferenceBase& reference);
+  
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);
   void RemoveServiceListener(const ServiceListener& delegate, void* data);
@@ -742,6 +735,8 @@ private:
   void RemoveBundleListener(const BundleListener& delegate, void* data);
 
   BundleContextPrivate * const d;
+  
+  template<class S> friend struct ServiceHolder;
 };
 
 }

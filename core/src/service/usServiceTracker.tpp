@@ -89,7 +89,7 @@ void ServiceTracker<S,TTT>::Open()
       return;
     }
 
-    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->filter;
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->listenerFilter;
 
     t = new _TrackedService(this, d->customizer);
     {
@@ -458,9 +458,9 @@ void ServiceTracker<S,TTT>::ModifiedService(const ServiceReferenceType& /*refere
 }
 
 template<class S, class TTT>
-void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceType& reference, T /*service*/)
+void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceType& /*reference*/, T /*service*/)
 {
-  d->context->UngetService(reference);
+  /* do nothing */
 }
 
 }

@@ -61,13 +61,13 @@ protected:
   /**
    * Service or ServiceFactory object.
    */
-  InterfaceMap service;
+  InterfaceMapConstPtr service;
 
 public:
 
   typedef std::unordered_map<Bundle*,int> BundleToRefsMap;
-  typedef std::unordered_map<Bundle*, InterfaceMap> BundleToServiceMap;
-  typedef std::unordered_map<Bundle*, std::list<InterfaceMap> > BundleToServicesMap;
+  typedef std::unordered_map<Bundle*, InterfaceMapConstPtr> BundleToServiceMap;
+  typedef std::unordered_map<Bundle*, std::list<InterfaceMapConstPtr> > BundleToServicesMap;
 
   ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
   ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
@@ -124,7 +124,7 @@ public:
   // needs to be recursive
   MultiThreaded<MutexLockingStrategy<std::recursive_mutex>> propsLock;
 
-  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMap& service,
+  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
                                  const ServicePropertiesImpl& props);
 
   ~ServiceRegistrationBasePrivate();
@@ -137,9 +137,8 @@ public:
    */
   bool IsUsedByBundle(Bundle* m) const;
 
-  const InterfaceMap& GetInterfaces() const;
-
-  void* GetService(const std::string& interfaceId) const;
+  const InterfaceMapConstPtr& GetInterfaces() const;
+  std::shared_ptr<void> GetService(const std::string& interfaceId) const;
 
 };
 

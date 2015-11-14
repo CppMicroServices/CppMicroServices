@@ -417,7 +417,7 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleResourceTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   BundleContext* mc = framework->GetBundleContext();
@@ -462,8 +462,6 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   testResourcesFrom("TestBundleRL", framework->GetBundleContext());
   testResourcesFrom("TestBundleRA", framework->GetBundleContext());
-
-  delete framework;
 
   US_TEST_END()
 }

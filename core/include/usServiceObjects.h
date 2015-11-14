@@ -52,16 +52,10 @@ protected:
   ServiceObjectsBase& operator=(const ServiceObjectsBase& other);
 
   // Called by ServiceObjects<S> with S != void
-  void* GetService() const;
+  std::shared_ptr<void> GetService() const;
 
   // Called by the ServiceObjects<void> specialization
-  InterfaceMap GetServiceInterfaceMap() const;
-
-  // Called by ServiceObjects<S> with S != void
-  void UngetService(void* service);
-
-  // Called by the ServiceObjects<void> specialization
-  void UngetService(const InterfaceMap& interfaceMap);
+  InterfaceMapConstPtr GetServiceInterfaceMap() const;
 
   ServiceReferenceBase GetReference() const;
 
@@ -115,62 +109,25 @@ public:
    *   <li>The service object is returned.</li>
    * </ol>
    *
-   * @return A service object for the referenced service or \c NULL if the service is not
-   *         registered, the service object returned by a ServiceFactory does not contain
-   *         all the classes under which it was registered or the ServiceFactory threw an
-   *         exception.
+   * @return A \c shared_ptr to the service object.The returned \c shared_ptr
+   *         is empty if the service is not registered, the service object returned by a
+   *         ServiceFactory does not contain all the classes under which it was registered 
+   *         or the ServiceFactory threw an exception.
    *
    * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
    *        is no longer valid.
    *
-   * @see UngetService()
    */
-  S* GetService() const
+  std::shared_ptr<S> GetService() const
   {
-    return reinterpret_cast<S*>(this->ServiceObjectsBase::GetService());
+    return std::static_pointer_cast<S>(this->ServiceObjectsBase::GetService());
   }
 
   /**
-   * Releases a service object for the referenced service.
-   *
-   * This ServiceObjects object can be used to obtain multiple service objects for
-   * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
-   * scope. If the referenced service has \link ServiceConstants::SCOPE_SINGLETON singleton\endlink
-   * or \link ServiceConstants::SCOPE_BUNDLE bundle\endlink scope, this method
-   * behaves the same as calling the BundleContext::UngetService(const ServiceReferenceBase&)
-   * method for the referenced service. That is, only one, use-counted service object
-   * is available from this ServiceObjects object.
-   *
-   * For a prototype scope service, the following steps are take to release the service object:
-   *
-   * <ol>
-   *   <li>If the referenced service has been unregistered, this method returns without
-   *       doing anything.</li>
-   *   <li>The PrototypeServiceFactory::UngetService(Bundle*, const ServiceRegistrationBase&, const InterfaceMap&)
-   *       method is called to release the specified service object.</li>
-   *   <li>The specified service object must no longer be used and all references to it
-   *       should be destroyed after calling this method.</li>
-   * </ol>
-   *
-   * @param service A service object previously provided by this ServiceObjects object.
-   *
-   * @throw std::logic_error If the BundleContext used to create this ServiceObjects
-   *        object is no longer valid.
-   * @throw std::invalid_argument If the specified service was not provided by this
-   *        ServiceObjects object.
-   *
-   * @see GetService()
-   */
-  void UngetService(S* service)
-  {
-    this->ServiceObjectsBase::UngetService(service);
-  }
-
-  /**
-   * Returns the ServiceReference for this ServiceObjects object.
-   *
-   * @return The ServiceReference for this ServiceObjects object.
-   */
+  * Returns the ServiceReference for this ServiceObjects object.
+  *
+  * @return The ServiceReference for this ServiceObjects object.
+  */
   ServiceReference<S> GetServiceReference() const
   {
     return this->ServiceObjectsBase::GetReference();
@@ -209,8 +166,8 @@ public:
    * return type. Further, this method will always return an empty InterfaeMap
    * object when the referenced service has been unregistered.
    *
-   * @return A InterfaceMap object for the referenced service, which is empty if the
-   *         service is not registered, the InterfaceMap returned by a ServiceFactory
+   * @return A InterfaceMapConstPtr object for the referenced service, which is empty if
+   *         the service is not registered, the InterfaceMap returned by a ServiceFactory
    *         does not contain all the classes under which the service object was
    *         registered or the ServiceFactory threw an exception.
    *
@@ -218,27 +175,8 @@ public:
    *        is no longer valid.
    *
    * @see ServiceObjects<S>::GetService()
-   * @see UngetService()
    */
-  InterfaceMap GetService() const;
-
-  /**
-   * Releases a service object for the referenced service.
-   *
-   * This method is the same as ServiceObjects<S>::UngetService() except for the
-   * parameter type.
-   *
-   * @param service An InterfaceMap object previously provided by this ServiceObjects object.
-   *
-   * @throw std::logic_error If the BundleContext used to create this ServiceObjects
-   *        object is no longer valid.
-   * @throw std::invalid_argument If the specified service was not provided by this
-   *        ServiceObjects object.
-   *
-   * @see ServiceObjects<S>::UngetService()
-   * @see GetService()
-   */
-  void UngetService(const InterfaceMap& service);
+  InterfaceMapConstPtr GetService() const;
 
   /**
    * Returns the ServiceReference for this ServiceObjects object.

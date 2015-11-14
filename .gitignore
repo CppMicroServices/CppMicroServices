@@ -29,3 +29,7 @@ core/examples/makefile/main
 *.exp
 *.bin
 *.user
+._*
+*.dylib
+*.xcconfig
+*.pbxproj

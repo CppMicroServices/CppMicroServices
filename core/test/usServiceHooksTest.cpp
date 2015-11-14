@@ -213,7 +213,7 @@ public:
 std::vector<int> TestServiceListenerHook::ordering;
 
 
-void TestEventListenerHook(Framework* framework)
+void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
@@ -222,23 +222,23 @@ void TestEventListenerHook(Framework* framework)
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
   context->AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "bla");
 
-  TestServiceEventListenerHook serviceEventListenerHook1(1, context);
+  std::shared_ptr<TestServiceEventListenerHook> serviceEventListenerHook1 = std::make_shared<TestServiceEventListenerHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[ServiceConstants::SERVICE_RANKING()] = 10;
   ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg1 =
-      context->RegisterService<ServiceEventListenerHook>(&serviceEventListenerHook1, hookProps1);
+      context->RegisterService<ServiceEventListenerHook>(serviceEventListenerHook1, hookProps1);
 
-  TestServiceEventListenerHook serviceEventListenerHook2(2, context);
+  std::shared_ptr<TestServiceEventListenerHook> serviceEventListenerHook2 = std::make_shared<TestServiceEventListenerHook>(2, context);
   ServiceProperties hookProps2;
   hookProps2[ServiceConstants::SERVICE_RANKING()] = 0;
   ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg2 =
-      context->RegisterService<ServiceEventListenerHook>(&serviceEventListenerHook2, hookProps2);
+      context->RegisterService<ServiceEventListenerHook>(serviceEventListenerHook2, hookProps2);
 
   std::vector<int> expectedOrdering;
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(2);
-  US_TEST_CONDITION(serviceEventListenerHook1.ordering == expectedOrdering, "Event listener hook call order");
+  US_TEST_CONDITION(serviceEventListenerHook1->ordering == expectedOrdering, "Event listener hook call order");
 
   US_TEST_CONDITION(serviceListener1.events.empty(), "service event of service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener");
@@ -249,7 +249,7 @@ void TestEventListenerHook(Framework* framework)
 
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(2);
-  US_TEST_CONDITION(serviceEventListenerHook1.ordering == expectedOrdering, "Event listener hook call order");
+  US_TEST_CONDITION(serviceEventListenerHook1->ordering == expectedOrdering, "Event listener hook call order");
 
   bundle->Stop();
 
@@ -263,7 +263,7 @@ void TestEventListenerHook(Framework* framework)
   context->RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 }
 
-void TestListenerHook(Framework* framework)
+void TestListenerHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
@@ -272,26 +272,26 @@ void TestListenerHook(Framework* framework)
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
   context->AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "bla");
 
-  TestServiceListenerHook serviceListenerHook1(1, context);
+  std::shared_ptr<TestServiceListenerHook> serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[ServiceConstants::SERVICE_RANKING()] = 0;
   ServiceRegistration<ServiceListenerHook> listenerHookReg1 =
-      context->RegisterService<ServiceListenerHook>(&serviceListenerHook1, hookProps1);
+      context->RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
 
-  TestServiceListenerHook serviceListenerHook2(2, context);
+  std::shared_ptr<TestServiceListenerHook> serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(2, context);
   ServiceProperties hookProps2;
   hookProps2[ServiceConstants::SERVICE_RANKING()] = 10;
   ServiceRegistration<ServiceListenerHook> listenerHookReg2 =
-      context->RegisterService<ServiceListenerHook>(&serviceListenerHook2, hookProps2);
+      context->RegisterService<ServiceListenerHook>(serviceListenerHook2, hookProps2);
 
 #ifdef US_BUILD_SHARED_LIBS
   // check if hooks got notified about the existing listeners
-  US_TEST_CONDITION_REQUIRED(serviceListenerHook1.listenerInfos.size() == 2, "Notification about existing listeners")
+  US_TEST_CONDITION_REQUIRED(serviceListenerHook1->listenerInfos.size() == 2, "Notification about existing listeners")
 #endif
-  const std::size_t listenerInfoSizeOld = serviceListenerHook1.listenerInfos.size() - 2;
+  const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfos.size() - 2;
 
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-  ServiceListenerHook::ListenerInfo lastAdded = serviceListenerHook1.lastAdded;
+  ServiceListenerHook::ListenerInfo lastAdded = serviceListenerHook1->lastAdded;
 
 #ifdef US_BUILD_SHARED_LIBS
   std::vector<int> expectedOrdering;
@@ -303,19 +303,19 @@ void TestListenerHook(Framework* framework)
   expectedOrdering.push_back(10);
   expectedOrdering.push_back(2);
   expectedOrdering.push_back(1);
-  US_TEST_CONDITION(serviceListenerHook1.ordering == expectedOrdering, "Listener hook call order");
+  US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering, "Listener hook call order");
 #endif
 
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "blub");
-  US_TEST_CONDITION(lastAdded == serviceListenerHook1.lastRemoved, "Same ListenerInfo object)");
-  US_TEST_CONDITION(!(lastAdded == serviceListenerHook1.lastAdded), "New ListenerInfo object)");
+  US_TEST_CONDITION(lastAdded == serviceListenerHook1->lastRemoved, "Same ListenerInfo object)");
+  US_TEST_CONDITION(!(lastAdded == serviceListenerHook1->lastAdded), "New ListenerInfo object)");
 
 #ifdef US_BUILD_SHARED_LIBS
   expectedOrdering.push_back(20);
   expectedOrdering.push_back(10);
   expectedOrdering.push_back(2);
   expectedOrdering.push_back(1);
-  US_TEST_CONDITION(serviceListenerHook1.ordering == expectedOrdering, "Listener hook call order");
+  US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering, "Listener hook call order");
 #endif
 
   context->RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
@@ -326,33 +326,33 @@ void TestListenerHook(Framework* framework)
   expectedOrdering.push_back(10);
   expectedOrdering.push_back(20);
   expectedOrdering.push_back(10);
-  US_TEST_CONDITION(serviceListenerHook1.ordering == expectedOrdering, "Listener hook call order");
+  US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering, "Listener hook call order");
 #endif
 
-  US_TEST_CONDITION_REQUIRED(serviceListenerHook1.listenerInfos.size() == listenerInfoSizeOld, "Removed listener infos")
+  US_TEST_CONDITION_REQUIRED(serviceListenerHook1->listenerInfos.size() == listenerInfoSizeOld, "Removed listener infos")
 
   listenerHookReg2.Unregister();
   listenerHookReg1.Unregister();
 }
 
-void TestFindHook(Framework* framework)
+void TestFindHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
-  TestServiceFindHook serviceFindHook1(1, context);
+  std::shared_ptr<TestServiceFindHook> serviceFindHook1= std::make_shared<TestServiceFindHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[ServiceConstants::SERVICE_RANKING()] = 0;
   ServiceRegistration<ServiceFindHook> findHookReg1 =
-      context->RegisterService<ServiceFindHook>(&serviceFindHook1, hookProps1);
+      context->RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
 
-  TestServiceFindHook serviceFindHook2(2, context);
+  std::shared_ptr<TestServiceFindHook> serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
   ServiceProperties hookProps2;
   hookProps2[ServiceConstants::SERVICE_RANKING()] = 10;
   ServiceRegistration<ServiceFindHook> findHookReg2 =
-      context->RegisterService<ServiceFindHook>(&serviceFindHook2, hookProps2);
+      context->RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
 
   std::vector<int> expectedOrdering;
-  US_TEST_CONDITION(serviceFindHook1.ordering == expectedOrdering, "Find hook call order");
+  US_TEST_CONDITION(serviceFindHook1->ordering == expectedOrdering, "Find hook call order");
 
   TestServiceListener serviceListener;
   context->AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
@@ -373,7 +373,7 @@ void TestFindHook(Framework* framework)
   expectedOrdering.push_back(2);
   expectedOrdering.push_back(1);
 
-  US_TEST_CONDITION(serviceFindHook1.ordering == expectedOrdering, "Find hook call order");
+  US_TEST_CONDITION(serviceFindHook1->ordering == expectedOrdering, "Find hook call order");
 
   findHookReg2.Unregister();
   findHookReg1.Unregister();
@@ -395,7 +395,7 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceHooksTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   try
@@ -412,8 +412,6 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
   TestListenerHook(framework);
   TestFindHook(framework);
   TestEventListenerHook(framework);
-
-  delete framework;
 
   US_TEST_END()
 }

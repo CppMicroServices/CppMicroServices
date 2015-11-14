@@ -66,37 +66,55 @@ public:
 
 class TestBundleHPrototypeServiceFactory : public PrototypeServiceFactory
 {
-  std::map<long, std::list<TestProduct2*> > fcbind;   // Map calling bundle with implementation
+  std::map<long, std::list<std::shared_ptr<TestProduct2>> > fcbind;   // Map calling bundle with implementation
 
 public:
 
-  InterfaceMap GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
+  InterfaceMapConstPtr GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
   {
     std::cout << "GetService (prototype) in H" << std::endl;
-    TestProduct2* product = new TestProduct2(caller);
+    std::shared_ptr<TestProduct2> product = std::make_shared<TestProduct2>(caller);
     fcbind[caller->GetBundleId()].push_back(product);
     return MakeInterfaceMap<TestBundleH,TestBundleH2>(product);
   }
 
-  void UngetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service)
+  void UngetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
-    TestProduct2* product = dynamic_cast<TestProduct2*>(ExtractInterface<TestBundleH>(service));
-    delete product;
+    std::shared_ptr<TestProduct2> product = std::dynamic_pointer_cast<TestProduct2>(ExtractInterface<TestBundleH>(service));
     fcbind[caller->GetBundleId()].remove(product);
   }
 
 };
 
+class TestBundleHServiceFactory : public ServiceFactory
+{
+  std::map<long, std::shared_ptr<TestProduct>> fcbind;   // Map calling bundle with implementation
+public:
+  
+  InterfaceMapConstPtr GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
+  {
+    std::cout << "GetService in H" << std::endl;
+    std::shared_ptr<TestProduct> product = std::make_shared<TestProduct>(caller);
+    fcbind.insert(std::make_pair(caller->GetBundleId(), product));
+    return MakeInterfaceMap<TestBundleH>(product);
+  }
+  
+  void UngetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
+  {
+    std::shared_ptr<TestBundleH> product = ExtractInterface<TestBundleH>(service);
+    fcbind.erase(caller->GetBundleId());
+  }
+  
+};
 
-class TestBundleHActivator : public BundleActivator, public ServiceFactory
+class TestBundleHActivator : public BundleActivator
 {
   std::string thisServiceName;
   ServiceRegistration<TestBundleH> factoryService;
   ServiceRegistration<TestBundleH,TestBundleH2> prototypeFactoryService;
   BundleContext* mc;
-
-  std::map<long, TestProduct*> fcbind;   // Map calling bundle with implementation
-  TestBundleHPrototypeServiceFactory prototypeFactory;
+  std::shared_ptr<ServiceFactory> factoryObj;
+  std::shared_ptr<TestBundleHPrototypeServiceFactory> prototypeFactoryObj;
 
 public:
 
@@ -109,28 +127,15 @@ public:
   {
     std::cout << "start in H" << std::endl;
     this->mc = mc;
-    factoryService = mc->RegisterService<TestBundleH>(ToFactory(this));
-    prototypeFactoryService = mc->RegisterService<TestBundleH,TestBundleH2>(ToFactory(prototypeFactory));
+    factoryObj = std::make_shared<TestBundleHServiceFactory>();
+    factoryService = mc->RegisterService<TestBundleH>(ToFactory(factoryObj));
+    prototypeFactoryObj = std::make_shared<TestBundleHPrototypeServiceFactory>();
+    prototypeFactoryService = mc->RegisterService<TestBundleH,TestBundleH2>(ToFactory(prototypeFactoryObj));
   }
 
   void Stop(BundleContext* /*mc*/)
   {
     factoryService.Unregister();
-  }
-
-  InterfaceMap GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
-  {
-    std::cout << "GetService in H" << std::endl;
-    TestProduct* product = new TestProduct(caller);
-    fcbind.insert(std::make_pair(caller->GetBundleId(), product));
-    return MakeInterfaceMap<TestBundleH>(product);
-  }
-
-  void UngetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service)
-  {
-    TestBundleH* product = ExtractInterface<TestBundleH>(service);
-    delete product;
-    fcbind.erase(caller->GetBundleId());
   }
 
 };

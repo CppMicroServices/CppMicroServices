@@ -37,7 +37,7 @@ namespace
     {
         FrameworkFactory factory;
 
-        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+        std::shared_ptr<Framework> f = factory.NewFramework(std::map<std::string, std::string>());
         US_TEST_CONDITION(f, "Test Framework instantiation")
 
         f->Start();
@@ -56,7 +56,6 @@ namespace
 
         US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
 
-        delete f;
     }
 
     void TestCustomConfig()
@@ -80,7 +79,7 @@ namespace
 
         FrameworkFactory factory;
 
-        Framework* f = factory.NewFramework(configuration);
+        std::shared_ptr<Framework> f = factory.NewFramework(configuration);
         US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration")
 
         f->Start();
@@ -99,21 +98,18 @@ namespace
 #else
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
 #endif
-
-        delete f;
     }
 
     void TestProperties()
     {
         FrameworkFactory factory;
 
-        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+        std::shared_ptr<Framework> f = factory.NewFramework(std::map<std::string, std::string>());
         f->Start();
         US_TEST_CONDITION(f->GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f->GetName() == US_CORE_FRAMEWORK_NAME, "Test Framework Bundle Name");
         US_TEST_CONDITION(f->GetBundleId() == 0, "Test Framework Bundle Id");
 
-        delete f;
     }
 
     void TestLifeCycle()
@@ -122,7 +118,7 @@ namespace
         FrameworkFactory factory;
         std::vector<BundleEvent> pEvts;
 
-        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+        std::shared_ptr<Framework> f = factory.NewFramework(std::map<std::string, std::string>());
         f->Start();
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
@@ -134,7 +130,7 @@ namespace
         f->Stop();
         US_TEST_CONDITION(!f->IsStarted(), "Check framework is in the Stop state")
 
-        pEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
+        pEvts.push_back(BundleEvent(BundleEvent::STOPPING, f.get()));
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
 
@@ -166,8 +162,6 @@ namespace
         US_TEST_CONDITION(!bundleA->IsStarted(), "Check that TestBundleA is in the Stop state")
         US_TEST_CONDITION(!f->IsStarted(), "Check framework is in the Stop state")
 
-        delete f;
-
     }
 
     void TestEvents()
@@ -177,7 +171,7 @@ namespace
         std::vector<BundleEvent> pStopEvts;
         FrameworkFactory factory;
 
-        Framework* f = factory.NewFramework(std::map<std::string, std::string>());
+        std::shared_ptr<Framework> f = factory.NewFramework(std::map<std::string, std::string>());
 
         f->Start();
 
@@ -216,7 +210,7 @@ namespace
         {
             (*iter)->Start();
             // no events will be fired for the framework, its already active at this point
-            if ((*iter) != f)
+            if ((*iter) != f.get())
             {
                 pEvts.push_back(BundleEvent(BundleEvent::STARTING, (*iter)));
                 pEvts.push_back(BundleEvent(BundleEvent::STARTED, (*iter)));
@@ -235,14 +229,12 @@ namespace
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check for bundle start events")
 
         // Remember, the framework is stopped last, after all bundles are stopped.
-        pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
+        pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, f.get()));
 
         // Stopping the framework stops all active bundles.
         f->Stop();
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pStopEvts), "Check for bundle stop events")
-
-        delete f;
     }
 }
 

@@ -157,8 +157,6 @@ public:
    * @throws std::logic_error If this
    *         <code>ServiceRegistrationBase</code> object has already been
    *         unregistered or if it is invalid.
-   * @see BundleContext#UngetService
-   * @see ServiceFactory#UngetService
    */
   void Unregister();
 
@@ -198,7 +196,7 @@ private:
 
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
-  ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
+  ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
                           const ServicePropertiesImpl& props);
 
   ServiceRegistrationBasePrivate* d;

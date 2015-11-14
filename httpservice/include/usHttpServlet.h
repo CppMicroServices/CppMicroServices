@@ -34,7 +34,7 @@ class ServletConfig;
 
 struct HttpServletPrivate;
 
-class US_HttpService_EXPORT HttpServlet
+class US_HttpService_EXPORT HttpServlet : public std::enable_shared_from_this<HttpServlet>
 {
 public:
 

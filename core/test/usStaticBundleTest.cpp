@@ -75,21 +75,11 @@ void frame020a(BundleContext* mc, TestBundleListener& listener)
     std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("us::TestBundleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
-    InterfaceMap o1 = mc->GetService(refs.front());
-    US_TEST_CONDITION(!o1.empty(), "Test if first service object found");
+    InterfaceMapConstPtr o1 = mc->GetService(refs.front());
+    US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
 
-    InterfaceMap o2 = mc->GetService(refs.back());
-    US_TEST_CONDITION(!o2.empty(), "Test if second service object found");
-
-    try
-    {
-      US_TEST_CONDITION(mc->UngetService(refs.front()), "Test if Service UnGet for first service returns true");
-      US_TEST_CONDITION(mc->UngetService(refs.back()), "Test if Service UnGet for second service returns true");
-    }
-    catch (const std::logic_error le)
-    {
-      US_TEST_FAILED_MSG(<< "UnGetService exception: " << le.what())
-    }
+    InterfaceMapConstPtr o2 = mc->GetService(refs.back());
+    US_TEST_CONDITION(o1 && !o2->empty(), "Test if second service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
@@ -191,7 +181,7 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleTest");
 
   FrameworkFactory factory;
-  Framework* framework = factory.NewFramework(std::map<std::string, std::string>());
+  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
   BundleContext* mc = framework->GetBundleContext();
@@ -209,8 +199,6 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
     frame030b(mc, listener);
     frame040c(mc, listener);
   }
-
-  delete framework;
 
   US_TEST_END()
 }

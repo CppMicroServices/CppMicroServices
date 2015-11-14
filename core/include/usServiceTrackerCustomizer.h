@@ -57,10 +57,10 @@ namespace us {
  * thread-safe.
  *
  * \tparam S The type of the service being tracked
- * \tparam T The type of the tracked object.
+ * \tparam T The type of the tracked object. The default is \c shared_ptr<S>.
  * \remarks This class is thread safe.
  */
-template<class S, class T = S*>
+template<class S, class T = std::shared_ptr<S> >
 struct ServiceTrackerCustomizer {
 
   typedef S ServiceType;

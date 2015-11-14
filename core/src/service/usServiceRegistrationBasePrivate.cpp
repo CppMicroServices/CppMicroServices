@@ -30,7 +30,7 @@
 namespace us {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-  BundlePrivate* bundle, const InterfaceMap& service,
+  BundlePrivate* bundle, const InterfaceMapConstPtr& service,
   const ServicePropertiesImpl& props)
   : ref(0), service(service), bundle(bundle), reference(this),
     properties(props), available(true), unregistering(false)
@@ -50,20 +50,20 @@ bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const
       (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());
 }
 
-const InterfaceMap& ServiceRegistrationBasePrivate::GetInterfaces() const
+const InterfaceMapConstPtr& ServiceRegistrationBasePrivate::GetInterfaces() const
 {
   return service;
 }
 
-void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
 {
-  if (interfaceId.empty() && service.size() > 0)
+  if (interfaceId.empty() && service->size() > 0)
   {
-    return service.begin()->second;
+    return service->begin()->second;
   }
 
-  InterfaceMap::const_iterator iter = service.find(interfaceId);
-  if (iter != service.end())
+  InterfaceMap::const_iterator iter = service->find(interfaceId);
+  if (iter != service->end())
   {
     return iter->second;
   }

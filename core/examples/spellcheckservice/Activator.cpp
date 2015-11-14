@@ -64,7 +64,7 @@ private:
 
   private:
 
-    typedef std::map<ServiceReference<IDictionaryService>, IDictionaryService*> RefToServiceType;
+    typedef std::map<ServiceReference<IDictionaryService>, std::shared_ptr<IDictionaryService>> RefToServiceType;
     RefToServiceType m_refToSvcMap;
 
   public:
@@ -107,7 +107,7 @@ private:
           for (RefToServiceType::const_iterator i = m_refToSvcMap.begin();
                (!correct) && (i != m_refToSvcMap.end()); ++i)
           {
-            IDictionaryService* dictionary = i->second;
+            std::shared_ptr<IDictionaryService> dictionary = i->second;
 
             if (dictionary->CheckWord(word))
             {
@@ -131,7 +131,7 @@ private:
       return errorList;
     }
 
-    std::size_t AddDictionary(const ServiceReference<IDictionaryService>& ref, IDictionaryService* dictionary)
+    std::size_t AddDictionary(const ServiceReference<IDictionaryService>& ref, std::shared_ptr<IDictionaryService> dictionary)
     {
       // Lock the m_refToSvcMap member using your favorite thread library here...
       // MutexLocker lock(&m_refToSvcMapMutex)
@@ -152,25 +152,25 @@ private:
     }
   };
 
-  virtual IDictionaryService* AddingService(const ServiceReference<IDictionaryService>& reference)
+  virtual std::shared_ptr<IDictionaryService> AddingService(const ServiceReference<IDictionaryService>& reference)
   {
-    IDictionaryService* dictionary = m_context->GetService(reference);
+    std::shared_ptr<IDictionaryService> dictionary = m_context->GetService(reference);
     std::size_t count = m_spellCheckService->AddDictionary(reference, dictionary);
     if (!m_spellCheckReg && count > 1)
     {
-      m_spellCheckReg = m_context->RegisterService<ISpellCheckService>(m_spellCheckService.get());
+      m_spellCheckReg = m_context->RegisterService<ISpellCheckService>(m_spellCheckService);
     }
     return dictionary;
   }
 
   virtual void ModifiedService(const ServiceReference<IDictionaryService>& /*reference*/,
-                               IDictionaryService* /*service*/)
+                               std::shared_ptr<IDictionaryService> /*service*/)
   {
     // do nothing
   }
 
   virtual void RemovedService(const ServiceReference<IDictionaryService>& reference,
-                              IDictionaryService* /*service*/)
+                              std::shared_ptr<IDictionaryService> /*service*/)
   {
     if (m_spellCheckService->RemoveDictionary(reference) < 2 && m_spellCheckReg)
     {
@@ -179,7 +179,7 @@ private:
     }
   }
 
-  std::unique_ptr<SpellCheckImpl> m_spellCheckService;
+  std::shared_ptr<SpellCheckImpl> m_spellCheckService;
   ServiceRegistration<ISpellCheckService> m_spellCheckReg;
 
   BundleContext* m_context;

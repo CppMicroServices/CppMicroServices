@@ -51,7 +51,7 @@ ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate*
   if (d) ++d->ref;
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
+ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
                                                  const ServicePropertiesImpl& props)
   : d(new ServiceRegistrationBasePrivate(bundle, service, props))
 {
@@ -191,20 +191,20 @@ void ServiceRegistrationBase::Unregister()
       typedef decltype(d->propsLock) P; // gcc 4.6 workaround
       P::Lock l2(d->propsLock);
       d->available = false;
-      InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
-      if (d->bundle && factoryIter != d->service.end())
+      InterfaceMap::const_iterator factoryIter = d->service->find("org.cppmicroservices.factory");
+      if (d->bundle && factoryIter != d->service->end())
       {
-        ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
+        std::shared_ptr<ServiceFactory> serviceFactory = std::static_pointer_cast<ServiceFactory>(factoryIter->second);
         ServiceRegistrationBasePrivate::BundleToServicesMap::const_iterator end = d->prototypeServiceInstances.end();
 
         // unget all prototype services
         for (ServiceRegistrationBasePrivate::BundleToServicesMap::const_iterator i = d->prototypeServiceInstances.begin();
              i != end; ++i)
         {
-          for (std::list<InterfaceMap>::const_iterator listIter = i->second.begin();
+          for (std::list<InterfaceMapConstPtr>::const_iterator listIter = i->second.begin();
                listIter != i->second.end(); ++listIter)
           {
-            const InterfaceMap& service = *listIter;
+            const InterfaceMapConstPtr& service = *listIter;
             try
             {
               // NYI, don't call inside lock
@@ -235,7 +235,7 @@ void ServiceRegistrationBase::Unregister()
       }
       d->bundle = nullptr;
       d->dependents.clear();
-      d->service.clear();
+      d->service.reset();
       d->prototypeServiceInstances.clear();
       d->bundleServiceInstance.clear();
       // increment the reference count, since "d->reference" was used originally

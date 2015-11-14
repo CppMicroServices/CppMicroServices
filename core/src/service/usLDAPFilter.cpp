@@ -77,7 +77,7 @@ LDAPFilter::~LDAPFilter()
 
 LDAPFilter::operator bool() const
 {
-  return d;
+  return d != nullptr;
 }
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const

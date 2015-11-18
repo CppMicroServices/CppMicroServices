@@ -49,15 +49,15 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framewo
 
   InstallTestBundle(mc, "TestBundleAL");
 
-  Bundle* bundleAL = mc->GetBundle("TestBundleAL");
-  US_TEST_CONDITION_REQUIRED(bundleAL != NULL, "Test for existing bundle TestBundleAL")
+  auto bundleAL = mc->GetBundle("TestBundleAL");
+  US_TEST_CONDITION_REQUIRED(bundleAL != nullptr, "Test for existing bundle TestBundleAL")
 
   US_TEST_CONDITION(bundleAL->GetName() == "TestBundleAL", "Test bundle name")
 
   bundleAL->Start();
 
   Any installedBundles = bundleAL->GetProperty(Bundle::PROP_AUTOINSTALLED_BUNDLES);
-  Bundle* bundleAL_1 = mc->GetBundle("TestBundleAL_1");
+  auto bundleAL_1 = mc->GetBundle("TestBundleAL_1");
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
@@ -71,7 +71,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framewo
 
   if (autoLoadEnabled)
   {
-    US_TEST_CONDITION_REQUIRED(bundleAL_1 != NULL, "Test for existing auto-installed bundle TestBundleAL_1")
+    US_TEST_CONDITION_REQUIRED(bundleAL_1 != nullptr, "Test for existing auto-installed bundle TestBundleAL_1")
     US_TEST_CONDITION(bundleAL_1->GetName() == "TestBundleAL_1", "Test bundle name")
     US_TEST_CONDITION_REQUIRED(!installedBundles.Empty(), "Test for PROP_AUTOINSTALLED_BUNDLES property")
     US_TEST_CONDITION_REQUIRED(installedBundles.Type() == typeid(std::vector<std::string>), "Test for PROP_AUTOINSTALLED_BUNDLES property type")
@@ -87,7 +87,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framewo
   }
   else
   {
-    US_TEST_CONDITION_REQUIRED(bundleAL_1 == NULL, "Test for non-existing auto-installed bundle TestBundleAL_1")
+    US_TEST_CONDITION_REQUIRED(bundleAL_1 == nullptr, "Test for non-existing auto-installed bundle TestBundleAL_1")
     US_TEST_CONDITION_REQUIRED(installedBundles.Empty(), "Test for empty PROP_AUTOINSTALLED_BUNDLES property")
   }
 
@@ -116,14 +116,14 @@ void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
 
   InstallTestBundle(mc, "TestBundleAL2");
 
-  Bundle* bundleAL2 = mc->GetBundle("TestBundleAL2");
-  US_TEST_CONDITION_REQUIRED(bundleAL2 != NULL, "Test for existing bundle TestBundleAL2")
+  auto bundleAL2 = mc->GetBundle("TestBundleAL2");
+  US_TEST_CONDITION_REQUIRED(bundleAL2 != nullptr, "Test for existing bundle TestBundleAL2")
 
   US_TEST_CONDITION(bundleAL2->GetName() == "TestBundleAL2", "Test bundle name")
 
   bundleAL2->Start();
 
-  Bundle* bundleAL2_1 = mc->GetBundle("TestBundleAL2_1");
+  auto bundleAL2_1 = mc->GetBundle("TestBundleAL2_1");
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
@@ -135,7 +135,7 @@ void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
   pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleAL2));
 
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  US_TEST_CONDITION_REQUIRED(bundleAL2_1 != NULL, "Test for existing auto-installed bundle TestBundleAL2_1")
+  US_TEST_CONDITION_REQUIRED(bundleAL2_1 != nullptr, "Test for existing auto-installed bundle TestBundleAL2_1")
   US_TEST_CONDITION(bundleAL2_1->GetName() == "TestBundleAL2_1", "Test bundle name")
 
   bundleAL2_1->Start();
@@ -143,7 +143,7 @@ void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
   pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleAL2_1));
 
 #else
-  US_TEST_CONDITION_REQUIRED(bundleAL2_1 == NULL, "Test for non-existing auto-installed bundle TestBundleAL2_1")
+  US_TEST_CONDITION_REQUIRED(bundleAL2_1 == nullptr, "Test for non-existing auto-installed bundle TestBundleAL2_1")
 #endif
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");

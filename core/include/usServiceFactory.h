@@ -94,7 +94,8 @@ public:
    * @see BundleContext#GetService
    * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMapConstPtr GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& bundle, 
+                                            const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object.
@@ -110,7 +111,8 @@ public:
    *        <code>ServiceFactory::GetService</code> method.
    * @see InterfaceMapConstPtr
    */
-  virtual void UngetService(Bundle* bundle, const ServiceRegistrationBase& registration,
+  virtual void UngetService(const std::shared_ptr<Bundle>& bundle, 
+                            const ServiceRegistrationBase& registration,
                             const InterfaceMapConstPtr& service) = 0;
 };
 

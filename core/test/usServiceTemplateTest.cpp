@@ -47,14 +47,14 @@ struct MyFactory1 : public us::ServiceFactory
 {
   std::map<long, std::shared_ptr<MyService1>> m_idToServiceMap;
 
-  virtual us::InterfaceMapConstPtr GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMapConstPtr GetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     std::shared_ptr<MyService1> s = std::make_shared<MyService1>();
     m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1>(s);
   }
 
-  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMapConstPtr& service)
   {
     std::map<long, std::shared_ptr<MyService1>>::iterator iter = m_idToServiceMap.find(bundle->GetBundleId());
@@ -70,14 +70,14 @@ struct MyFactory2 : public us::ServiceFactory
 {
   std::map<long, std::shared_ptr<MyService2>> m_idToServiceMap;
 
-  virtual us::InterfaceMapConstPtr GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMapConstPtr GetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     std::shared_ptr<MyService2> s = std::make_shared<MyService2>();
     m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1,Interface2>(s);
   }
 
-  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMapConstPtr& service)
   {
     std::map<long, std::shared_ptr<MyService2>>::iterator iter = m_idToServiceMap.find(bundle->GetBundleId());
@@ -93,14 +93,14 @@ struct MyFactory3 : public us::ServiceFactory
 {
   std::map<long, std::shared_ptr<MyService3>> m_idToServiceMap;
 
-  virtual us::InterfaceMapConstPtr GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMapConstPtr GetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     std::shared_ptr<MyService3> s = std::make_shared<MyService3>();
     m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1,Interface2,Interface3>(s);
   }
 
-  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMapConstPtr& service)
   {
     std::map<long, std::shared_ptr<MyService3>>::iterator iter = m_idToServiceMap.find(bundle->GetBundleId());

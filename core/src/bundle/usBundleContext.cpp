@@ -58,24 +58,24 @@ BundleContext::~BundleContext()
   delete d;
 }
 
-Bundle* BundleContext::GetBundle() const
+std::shared_ptr<Bundle> BundleContext::GetBundle() const
 {
   return d->bundle->q;
 }
 
-Bundle* BundleContext::GetBundle(long id) const
+std::shared_ptr<Bundle> BundleContext::GetBundle(long id) const
 {
   return d->bundle->coreCtx->bundleHooks.FilterBundle(this, d->bundle->coreCtx->bundleRegistry.GetBundle(id));
 }
 
-Bundle* BundleContext::GetBundle(const std::string& name)
+std::shared_ptr<Bundle> BundleContext::GetBundle(const std::string& name)
 {
   return d->bundle->coreCtx->bundleRegistry.GetBundle(name);
 }
 
-std::vector<Bundle*> BundleContext::GetBundles() const
+std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const
 {
-  std::vector<Bundle*> bundles = d->bundle->coreCtx->bundleRegistry.GetBundles();
+  std::vector<std::shared_ptr<Bundle>> bundles = d->bundle->coreCtx->bundleRegistry.GetBundles();
   d->bundle->coreCtx->bundleHooks.FilterBundles(this, bundles);
   return bundles;
 }
@@ -237,12 +237,12 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
   return d->bundle->storagePath + filename;
 }
 
-Bundle* BundleContext::InstallBundle(const std::string& location)
+std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location)
 {
     BundleInfo* bundleInfo = new BundleInfo(GetBundleNameFromLocation(location));
     bundleInfo->location = GetBundleLocation(location);
 
-    Bundle* bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
+    auto bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
 
     d->bundle->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
 

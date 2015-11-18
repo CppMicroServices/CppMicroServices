@@ -56,13 +56,13 @@ struct ResourceComparator {
   }
 };
 
-void testResourceOperators(Bundle* bundle)
+void testResourceOperators(const std::shared_ptr<Bundle>& bundle)
 {
   std::vector<BundleResource> resources = bundle->FindResources("", "res.txt", false);
   US_TEST_CONDITION_REQUIRED(resources.size() == 1, "Check resource count")
 }
 
-void testResourcesWithStaticImport(const std::shared_ptr<Framework>& framework, Bundle* bundle)
+void testResourcesWithStaticImport(const std::shared_ptr<Framework>& framework, const std::shared_ptr<Bundle>& bundle)
 {
   BundleResource resource = bundle->GetResource("res.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid res.txt resource")
@@ -77,8 +77,8 @@ void testResourcesWithStaticImport(const std::shared_ptr<Framework>& framework, 
   resource = bundle->GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(!resource.IsValid(), "Check in-valid static.txt resource")
 
-  Bundle* importedByBBundle = framework->GetBundleContext()->GetBundle("TestBundleImportedByB");
-  US_TEST_CONDITION_REQUIRED(importedByBBundle != NULL, "Check valid static bundle")
+  auto importedByBBundle = framework->GetBundleContext()->GetBundle("TestBundleImportedByB");
+  US_TEST_CONDITION_REQUIRED(importedByBBundle != nullptr, "Check valid static bundle")
   resource = importedByBBundle->GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
   line = GetResourceContent(resource);
@@ -119,19 +119,19 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    Bundle* bundle = framework->GetBundleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
+    auto bundle = framework->GetBundleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
 #else
-    Bundle* bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
+    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
 #endif
-    US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle TestBundleImportedByB")
+    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
   }
   catch (const std::exception& e)
   {
     US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
 
-  Bundle* bundle = framework->GetBundleContext()->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test for existing bundle TestBundleB")
+  auto bundle = framework->GetBundleContext()->GetBundle("TestBundleB");
+  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for existing bundle TestBundleB")
   US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
 
   testResourceOperators(bundle);

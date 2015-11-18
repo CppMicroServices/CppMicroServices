@@ -65,7 +65,7 @@ ServiceEvent TestBundleListener::GetServiceEvent() const
 bool TestBundleListener::CheckListenerEvents(
     bool pexp, BundleEvent::Type ptype,
     bool sexp, ServiceEvent::Type stype,
-    Bundle* bundleX, ServiceReferenceU* servX)
+    std::shared_ptr<Bundle> bundleX, ServiceReferenceU* servX)
 {
   std::vector<BundleEvent> pEvts;
   std::vector<ServiceEvent> seEvts;

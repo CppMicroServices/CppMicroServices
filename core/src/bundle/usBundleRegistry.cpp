@@ -47,13 +47,13 @@ BundleRegistry::~BundleRegistry(void)
 {
 }
 
-Bundle* BundleRegistry::Register(BundleInfo* info)
+std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
 {
-  Bundle* bundle = GetBundle(info->name);
+  std::shared_ptr<Bundle> bundle(GetBundle(info->name));
 
   if (!bundle)
   {
-    bundle = new Bundle();
+    bundle = std::shared_ptr<Bundle>(new Bundle());
     {
       Lock l(id);
       info->id = id.value++;
@@ -75,16 +75,14 @@ Bundle* BundleRegistry::Register(BundleInfo* info)
     // mutex.
     if (!return_pair.second)
     {
-      BundleMap::iterator iter(return_pair.first);
-      delete bundle;
-      bundle = (*iter).second;
+      bundle = return_pair.first->second;
     }
   }
 
   return bundle;
 }
 
-void BundleRegistry::RegisterSystemBundle(Framework* const systemBundle, BundleInfo* info)
+void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundle, BundleInfo* info)
 {
   if (!systemBundle)
   {
@@ -113,21 +111,21 @@ void BundleRegistry::UnRegister(const BundleInfo* info)
   }
 }
 
-Bundle* BundleRegistry::GetBundle(long id) const
+std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
 {
   Lock l(this);
 
-  for (auto& m : bundles)
+  for (auto const& m : bundles)
   {
     if (m.second->GetBundleId() == id)
     {
       return m.second;
     }
   }
-  return 0;
+  return nullptr;
 }
 
-Bundle* BundleRegistry::GetBundle(const std::string& name) const
+std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
 {
   Lock l(this);
 
@@ -136,14 +134,14 @@ Bundle* BundleRegistry::GetBundle(const std::string& name) const
   {
     return iter->second;
   }
-  return 0;
+  return nullptr;
 }
 
-std::vector<Bundle*> BundleRegistry::GetBundles() const
+std::vector<std::shared_ptr<Bundle>> BundleRegistry::GetBundles() const
 {
   Lock l(this);
 
-  std::vector<Bundle*> result;
+  std::vector<std::shared_ptr<Bundle>> result;
   for (auto& m : bundles)
   {
     result.push_back(m.second);

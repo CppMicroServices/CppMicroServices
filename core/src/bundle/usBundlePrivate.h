@@ -31,6 +31,8 @@
 
 #include "usThreads_p.h"
 
+#include <memory>
+
 namespace us {
 
 class CoreBundleContext;
@@ -51,7 +53,7 @@ public:
   /**
    * Construct a new bundle based on a BundleInfo object.
    */
-  BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx, BundleInfo* info);
+  BundlePrivate(std::shared_ptr<Bundle> qq, CoreBundleContext* coreCtx, BundleInfo* info);
 
   virtual ~BundlePrivate();
 
@@ -80,7 +82,7 @@ public:
   std::string baseStoragePath;
   std::string storagePath;
 
-  Bundle* const q;
+  const std::shared_ptr<Bundle> q;
 
   /** 
    * Responsible for platform specific loading and unloading

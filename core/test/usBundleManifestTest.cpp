@@ -49,7 +49,7 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
 
   InstallTestBundle(framework->GetBundleContext(), "TestBundleM");
 
-  Bundle* bundleM = framework->GetBundleContext()->GetBundle("TestBundleM");
+  auto bundleM = framework->GetBundleContext()->GetBundle("TestBundleM");
   US_TEST_CONDITION_REQUIRED(bundleM != nullptr, "Test for existing bundle TestBundleM")
 
   US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_NAME).ToString() == "TestBundleM", "Bundle name")

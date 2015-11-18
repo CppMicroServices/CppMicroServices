@@ -53,9 +53,9 @@ static const int fieldWidth[numFields] = { 4, 26, 10, 12, 40 };
 
 pointer us_bundle_ids(scheme* sc, pointer /*args*/)
 {
-  std::vector<Bundle*> bundles = GetBundleContext()->GetBundles();
+  std::vector<std::shared_ptr<Bundle>> bundles = GetBundleContext()->GetBundles();
   std::set<long> ids;
-  for (std::vector<Bundle*>::iterator iter = bundles.begin(),
+  for (std::vector<std::shared_ptr<Bundle>>::iterator iter = bundles.begin(),
        iterEnd = bundles.end(); iter != iterEnd; ++iter)
   {
     ids.insert((*iter)->GetBundleId());
@@ -87,7 +87,7 @@ pointer us_bundle_info(scheme* sc, pointer args)
   memset(delim, delimChar, 50);
 
   pointer arg = pair_car(args);
-  Bundle* bundle = NULL;
+  auto bundle = std::shared_ptr<Bundle>();
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -206,7 +206,7 @@ pointer us_bundle_start(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  Bundle* bundle = NULL;
+  auto bundle = std::shared_ptr<Bundle>();
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -244,7 +244,7 @@ pointer us_bundle_stop(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  Bundle* bundle = NULL;
+  auto bundle = std::shared_ptr<Bundle>();
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);

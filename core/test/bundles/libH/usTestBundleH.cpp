@@ -44,11 +44,11 @@ struct TestBundleH2
 
 class TestProduct : public TestBundleH
 {
-  // Bundle* caller;
+  // std::shared_ptr<Bundle> caller;
 
 public:
 
-  TestProduct(Bundle* /*caller*/)
+  TestProduct(const std::shared_ptr<Bundle>& /*caller*/)
     //: caller(caller)
   {}
 
@@ -58,7 +58,7 @@ class TestProduct2 : public TestProduct, public TestBundleH2
 {
 public:
 
-  TestProduct2(Bundle* caller)
+  TestProduct2(const std::shared_ptr<Bundle>& caller)
     : TestProduct(caller)
   {}
 
@@ -70,7 +70,7 @@ class TestBundleHPrototypeServiceFactory : public PrototypeServiceFactory
 
 public:
 
-  InterfaceMapConstPtr GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
+  InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/)
   {
     std::cout << "GetService (prototype) in H" << std::endl;
     std::shared_ptr<TestProduct2> product = std::make_shared<TestProduct2>(caller);
@@ -78,7 +78,7 @@ public:
     return MakeInterfaceMap<TestBundleH,TestBundleH2>(product);
   }
 
-  void UngetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
+  void UngetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
     std::shared_ptr<TestProduct2> product = std::dynamic_pointer_cast<TestProduct2>(ExtractInterface<TestBundleH>(service));
     fcbind[caller->GetBundleId()].remove(product);
@@ -91,7 +91,7 @@ class TestBundleHServiceFactory : public ServiceFactory
   std::map<long, std::shared_ptr<TestProduct>> fcbind;   // Map calling bundle with implementation
 public:
   
-  InterfaceMapConstPtr GetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/)
+  InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/)
   {
     std::cout << "GetService in H" << std::endl;
     std::shared_ptr<TestProduct> product = std::make_shared<TestProduct>(caller);
@@ -99,7 +99,7 @@ public:
     return MakeInterfaceMap<TestBundleH>(product);
   }
   
-  void UngetService(Bundle* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
+  void UngetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
     std::shared_ptr<TestBundleH> product = ExtractInterface<TestBundleH>(service);
     fcbind.erase(caller->GetBundleId());

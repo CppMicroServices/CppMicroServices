@@ -61,7 +61,7 @@ Bundle::~Bundle()
 void Bundle::Init(CoreBundleContext* coreCtx,
                     BundleInfo* info)
 {
-  BundlePrivate* mp = new BundlePrivate(this, coreCtx, info);
+  BundlePrivate* mp = new BundlePrivate(this->shared_from_this(), coreCtx, info);
   std::swap(mp, d);
   delete mp;
 }
@@ -74,7 +74,7 @@ void Bundle::Uninit()
     d->RemoveBundleResources();
     delete d->bundleContext;
     d->bundleContext = nullptr;
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this));
+    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this->shared_from_this()));
 
     d->bundleActivator = nullptr;
   }
@@ -125,7 +125,7 @@ void Bundle::Start()
   void* activatorHookSym = BundleUtils::GetSymbol(d->info, activator_func.c_str());
   std::memcpy(&activatorHook, &activatorHookSym, sizeof(void*));
 
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, this));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, this->shared_from_this()));
   // try to get a BundleActivator instance
 
   if (activatorHook)
@@ -147,7 +147,7 @@ void Bundle::Start()
     d->bundleActivator->Start(d->bundleContext);
   }
 
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, this));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, this->shared_from_this()));
 }
 
 void Bundle::Stop()
@@ -161,7 +161,7 @@ void Bundle::Stop()
 
   try
   {
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, this));
+    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, this->shared_from_this()));
 
     if (d->bundleActivator)
     {
@@ -188,7 +188,7 @@ void Bundle::Uninstall()
 {
   Stop();
   d->coreCtx->bundleRegistry.UnRegister(&d->info);
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this->shared_from_this()));
 }
 
 BundleContext* Bundle::GetBundleContext() const
@@ -259,7 +259,7 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 {
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
-  d->coreCtx->services.GetUsedByBundle(const_cast<Bundle*>(this), sr);
+  d->coreCtx->services.GetUsedByBundle(std::const_pointer_cast<Bundle>(this->shared_from_this()), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
         i != sr.end(); ++i)
   {

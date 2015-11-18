@@ -56,7 +56,7 @@ void TestServiceFactoryBundleScope(BundleContext* mc)
 
   InstallTestBundle(mc, "TestBundleH");
 
-  Bundle* bundleH = mc->GetBundle("TestBundleH");
+  auto bundleH = mc->GetBundle("TestBundleH");
   US_TEST_CONDITION_REQUIRED(bundleH != nullptr, "Test for existing bundle TestBundleH")
 
   bundleH->Start();
@@ -103,7 +103,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* mc)
 
   InstallTestBundle(mc, "TestBundleH");
 
-  Bundle* bundleH = mc->GetBundle("TestBundleH");
+  auto bundleH = mc->GetBundle("TestBundleH");
   US_TEST_CONDITION_REQUIRED(bundleH != nullptr, "Test for existing bundle TestBundleH")
 
   bundleH->Start();

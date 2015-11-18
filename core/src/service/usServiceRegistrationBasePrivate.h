@@ -65,9 +65,9 @@ protected:
 
 public:
 
-  typedef std::unordered_map<Bundle*,int> BundleToRefsMap;
-  typedef std::unordered_map<Bundle*, InterfaceMapConstPtr> BundleToServiceMap;
-  typedef std::unordered_map<Bundle*, std::list<InterfaceMapConstPtr> > BundleToServicesMap;
+  typedef std::unordered_map<std::shared_ptr<Bundle>, int> BundleToRefsMap;
+  typedef std::unordered_map<std::shared_ptr<Bundle>, InterfaceMapConstPtr> BundleToServiceMap;
+  typedef std::unordered_map<std::shared_ptr<Bundle>, std::list<InterfaceMapConstPtr> > BundleToServicesMap;
 
   ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
   ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
@@ -132,10 +132,10 @@ public:
   /**
    * Check if a bundle uses this service
    *
-   * @param p Bundle to check
+   * @param bundle Bundle to check
    * @return true if bundle uses this service
    */
-  bool IsUsedByBundle(Bundle* m) const;
+  bool IsUsedByBundle(const std::shared_ptr<Bundle>& bundle) const;
 
   const InterfaceMapConstPtr& GetInterfaces() const;
   std::shared_ptr<void> GetService(const std::string& interfaceId) const;

@@ -36,11 +36,11 @@ BundleHooks::BundleHooks(CoreBundleContext* ctx)
 {
 }
 
-Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
+std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* mc, const std::shared_ptr<Bundle>& bundle) const
 {
-  if(bundle == NULL)
+  if(bundle == nullptr)
   {
-    return NULL;
+    return bundle;
   }
 
   std::vector<ServiceRegistrationBase> srl;
@@ -51,18 +51,18 @@ Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
   }
   else
   {
-    std::vector<Bundle*> ml;
+    std::vector<std::shared_ptr<Bundle>> ml;
     ml.push_back(bundle);
     this->FilterBundles(mc, ml);
-    return ml.empty() ? NULL : bundle;
+    return ml.empty() ? nullptr : bundle;
   }
 }
 
-void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<Bundle*>& bundles) const
+void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<std::shared_ptr<Bundle>>& bundles) const
 {
   std::vector<ServiceRegistrationBase> srl;
   coreCtx->services.Get(us_service_interface_iid<BundleFindHook>(), srl);
-  ShrinkableVector<Bundle*> filtered(bundles);
+  ShrinkableVector<std::shared_ptr<Bundle>> filtered(bundles);
 
   std::sort(srl.begin(), srl.end());
   for (std::vector<ServiceRegistrationBase>::reverse_iterator srBaseIter = srl.rbegin(), srBaseEnd = srl.rend();

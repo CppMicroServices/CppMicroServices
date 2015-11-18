@@ -64,7 +64,7 @@ struct US_Core_EXPORT BundleFindHook
    *        bundles from the list to prevent the bundles from being
    *        returned to the bundle performing the find operation.
    */
-  virtual void Find(const BundleContext* context, ShrinkableVector<Bundle*>& bundles) = 0;
+  virtual void Find(const BundleContext* context, ShrinkableVector<std::shared_ptr<Bundle>>& bundles) = 0;
 };
 
 }

@@ -58,9 +58,9 @@ public:
     * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  std::shared_ptr<void> GetService(Bundle* bundle);
+  std::shared_ptr<void> GetService(const std::shared_ptr<Bundle>& bundle);
 
-  InterfaceMapConstPtr GetServiceInterfaceMap(Bundle* bundle);
+  InterfaceMapConstPtr GetServiceInterfaceMap(const std::shared_ptr<Bundle>& bundle);
 
   /**
     * Get new service instance.
@@ -68,7 +68,7 @@ public:
     * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  InterfaceMapConstPtr GetPrototypeService(Bundle* bundle);
+  InterfaceMapConstPtr GetPrototypeService(const std::shared_ptr<Bundle>& bundle);
 
   /**
    * Unget the service object.
@@ -80,7 +80,7 @@ public:
    * @return True if service was removed or false if only reference counter was
    *         decremented.
    */
-  bool UngetService(Bundle* bundle, bool checkRefCounter);
+  bool UngetService(const std::shared_ptr<Bundle>& bundle, bool checkRefCounter);
 
   /**
    * Unget prototype scope service objects.
@@ -89,7 +89,7 @@ public:
    * @param service The prototype scope service pointer.
    * @return \c true if the service was removed, \c false otherwise.
    */
-  bool UngetPrototypeService(Bundle* bundle, const InterfaceMapConstPtr& service);
+  bool UngetPrototypeService(const std::shared_ptr<Bundle>& bundle, const InterfaceMapConstPtr& service);
 
   /**
    * Get all properties registered with this service.
@@ -139,9 +139,9 @@ public:
   std::string interfaceId;
 
 private:
-  InterfaceMapConstPtr GetServiceFromFactory(Bundle* bundle,
-                                     const std::shared_ptr<ServiceFactory>& factory,
-                                     bool isBundleScope);
+  InterfaceMapConstPtr GetServiceFromFactory(std::shared_ptr<Bundle> bundle,
+                                                const std::shared_ptr<ServiceFactory>& factory,
+                                                bool isBundleScope);
 };
 
 }

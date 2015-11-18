@@ -32,7 +32,7 @@ public:
 
   BundleEventData& operator=(const BundleEventData&) = delete;
 
-  BundleEventData(BundleEvent::Type type, Bundle* bundle)
+  BundleEventData(BundleEvent::Type type, std::shared_ptr<Bundle> bundle)
     : type(type), bundle(bundle)
   {
 
@@ -45,12 +45,12 @@ public:
   }
 
   const BundleEvent::Type type;
-  Bundle* const bundle;
+  const std::shared_ptr<Bundle> bundle;
 
 };
 
 BundleEvent::BundleEvent()
-  : d(0)
+  : d(nullptr)
 {
 
 }
@@ -65,7 +65,7 @@ bool BundleEvent::IsNull() const
   return !d;
 }
 
-BundleEvent::BundleEvent(Type type, Bundle* bundle)
+BundleEvent::BundleEvent(Type type, std::shared_ptr<Bundle> bundle)
   : d(new BundleEventData(type, bundle))
 {
 
@@ -83,7 +83,7 @@ BundleEvent& BundleEvent::operator=(const BundleEvent& other)
   return *this;
 }
 
-Bundle* BundleEvent::GetBundle() const
+std::shared_ptr<Bundle> BundleEvent::GetBundle() const
 {
   return d->bundle;
 }
@@ -112,7 +112,7 @@ std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
 {
   if (event.IsNull()) return os << "NONE";
 
-  Bundle* m = event.GetBundle();
+  auto m = event.GetBundle();
   os << event.GetType() << " #" << m->GetBundleId() << " (" << m->GetLocation() << ")";
   return os;
 }

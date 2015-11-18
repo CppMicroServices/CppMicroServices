@@ -42,7 +42,7 @@ class TestServiceListener
 
 private:
 
-  friend bool runStartStopTest(const std::string&, int cnt, Bundle&,
+  friend bool runStartStopTest(const std::string&, int cnt, const std::shared_ptr<Bundle>&,
                                 BundleContext* context,
                                 const std::vector<ServiceEvent::Type>&);
 
@@ -97,7 +97,7 @@ public:
       ServiceReferenceU sr = evt.GetServiceReference();
 
       // Validate that no bundle is marked as using the service
-      std::vector<Bundle*> usingBundles;
+      std::vector<std::shared_ptr<Bundle>> usingBundles;
       sr.GetUsingBundles(usingBundles);
       if (checkUsingBundles && !usingBundles.empty())
       {
@@ -186,11 +186,11 @@ public:
 
   void printUsingBundles(const ServiceReferenceU& sr, const std::string& caption)
   {
-    std::vector<Bundle*> usingBundles;
+    std::vector<std::shared_ptr<Bundle>> usingBundles;
     sr.GetUsingBundles(usingBundles);
 
     US_TEST_OUTPUT( << (caption.empty() ? "Using bundles: " : caption) );
-    for(std::vector<Bundle*>::const_iterator bundle = usingBundles.begin();
+    for (std::vector<std::shared_ptr<Bundle>>::const_iterator bundle = usingBundles.begin();
         bundle != usingBundles.end(); ++bundle)
     {
       US_TEST_OUTPUT( << "  -" << (*bundle) );
@@ -218,7 +218,8 @@ public:
 
 }; // end of class ServiceListener
 
-bool runStartStopTest(const std::string& name, int cnt, Bundle& bundle,
+
+bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bundle>& bundle,
                        BundleContext* context,
                        const std::vector<ServiceEvent::Type>& events)
 {
@@ -242,7 +243,7 @@ bool runStartStopTest(const std::string& name, int cnt, Bundle& bundle,
     // Start the test target to get a service published.
     try
     {
-      bundle.Start();
+      bundle->Start();
     }
     catch (const std::exception& e)
     {
@@ -254,7 +255,7 @@ bool runStartStopTest(const std::string& name, int cnt, Bundle& bundle,
     // Stop the test target to get a service unpublished.
     try
     {
-      bundle.Stop();
+      bundle->Stop();
     }
     catch (const std::exception& e)
     {
@@ -306,7 +307,7 @@ void frameSL02a(const std::shared_ptr<Framework>& framework)
                         << " : frameSL02a:FAIL" );
   }
 
-  Bundle* bundle = InstallTestBundle(context, "TestBundleA");
+  auto bundle = InstallTestBundle(context, "TestBundleA");
   bundle->Start();
 
   std::vector<ServiceEvent::Type> events;
@@ -327,9 +328,9 @@ void frameSL05a(const std::shared_ptr<Framework>& framework)
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
 
-  Bundle* bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
+  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
 
-  bool testStatus = runStartStopTest("FrameSL05a", 1, *bundle, framework->GetBundleContext(), events);
+  bool testStatus = runStartStopTest("FrameSL05a", 1, bundle, framework->GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
 
@@ -339,9 +340,9 @@ void frameSL10a(const std::shared_ptr<Framework>& framework)
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
 
-  Bundle* bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA2");
+  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA2");
 
-  bool testStatus = runStartStopTest("FrameSL10a", 1, *bundle, framework->GetBundleContext(), events);
+  bool testStatus = runStartStopTest("FrameSL10a", 1, bundle, framework->GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
 
@@ -360,9 +361,9 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
     throw;
   }
 
-  Bundle* libSL1 = InstallTestBundle(context, "TestBundleSL1");
-  Bundle* libSL3 = InstallTestBundle(context, "TestBundleSL3");
-  Bundle* libSL4 = InstallTestBundle(context, "TestBundleSL4");
+  auto libSL1 = InstallTestBundle(context, "TestBundleSL1");
+  auto libSL3 = InstallTestBundle(context, "TestBundleSL3");
+  auto libSL4 = InstallTestBundle(context, "TestBundleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 

@@ -53,7 +53,7 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
     delete registration;
 }
 
-InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* bundle,
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(std::shared_ptr<Bundle> bundle,
                                                                         const std::shared_ptr<ServiceFactory>& factory,
                                                                         bool isBundleScope)
 {
@@ -99,7 +99,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(Bundle* 
   return s;
 }
 
-InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bundle)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(const std::shared_ptr<Bundle>& bundle)
 {
   InterfaceMapConstPtr s;
   {
@@ -115,7 +115,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(Bundle* bu
   return s;
 }
 
-std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(Bundle* bundle)
+std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(const std::shared_ptr<Bundle>& bundle)
 {
   std::shared_ptr<void> s;
   {
@@ -161,7 +161,7 @@ std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(Bundle* bundle)
   return s;
 }
 
-InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle* bundle)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(const std::shared_ptr<Bundle>& bundle)
 {
   InterfaceMapConstPtr s;
   {
@@ -206,7 +206,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(Bundle*
   return s;
 }
 
-bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const InterfaceMapConstPtr& service)
+bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bundle>& bundle, const InterfaceMapConstPtr& service)
 {
   if (!service)
   {
@@ -253,7 +253,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(Bundle* bundle, const In
   return false;
 }
 
-bool ServiceReferenceBasePrivate::UngetService(Bundle* bundle, bool checkRefCounter)
+bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<Bundle>& bundle, bool checkRefCounter)
 {
   typedef decltype(registration->propsLock) T; // gcc 4.6 workaround
   T::Lock l(registration->propsLock);

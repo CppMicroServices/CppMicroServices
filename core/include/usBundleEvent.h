@@ -24,6 +24,7 @@
 #define USBUNDLEEVENT_H
 
 #include <iostream>
+#include <memory>
 
 #include "usCoreExport.h"
 #include "usSharedData.h"
@@ -133,7 +134,7 @@ public:
    * @param type The event type.
    * @param bundle The bundle which had a lifecycle change.
    */
-  BundleEvent(Type type, Bundle* bundle);
+  BundleEvent(Type type, std::shared_ptr<Bundle> bundle);
 
   BundleEvent(const BundleEvent& other);
 
@@ -144,7 +145,7 @@ public:
    *
    * @return The bundle that had a change occur in its lifecycle.
    */
-  Bundle* GetBundle() const;
+  std::shared_ptr<Bundle> GetBundle() const;
 
   /**
    * Returns the type of lifecyle event. The type values are:

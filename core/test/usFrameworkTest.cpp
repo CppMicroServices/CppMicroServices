@@ -130,7 +130,7 @@ namespace
         f->Stop();
         US_TEST_CONDITION(!f->IsStarted(), "Check framework is in the Stop state")
 
-        pEvts.push_back(BundleEvent(BundleEvent::STOPPING, f.get()));
+        pEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
 
@@ -153,7 +153,7 @@ namespace
         f->Start();
         InstallTestBundle(f->GetBundleContext(), "TestBundleA");
 
-        Bundle* bundleA = f->GetBundleContext()->GetBundle("TestBundleA");
+        auto bundleA = f->GetBundleContext()->GetBundle("TestBundleA");
         bundleA->Start();
 
         // Stopping the framework stops all active bundles.
@@ -179,7 +179,7 @@ namespace
         fmc->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
         // The bundles used to test bundle events when stopping the framework
-        Bundle* bundle = InstallTestBundle(fmc, "TestBundleA");
+        auto bundle = InstallTestBundle(fmc, "TestBundleA");
         pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
         bundle = InstallTestBundle(fmc, "TestBundleA2");
         pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
@@ -204,16 +204,15 @@ namespace
         bundle = InstallTestBundle(fmc, "TestBundleSL4");
         pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
 
-        std::vector<Bundle*> bundles(fmc->GetBundles());
-        for (std::vector<Bundle*>::iterator iter = bundles.begin();
-            iter != bundles.end(); ++iter)
+        auto bundles(fmc->GetBundles());
+        for (auto& bundle : bundles)
         {
-            (*iter)->Start();
+            bundle->Start();
             // no events will be fired for the framework, its already active at this point
-            if ((*iter) != f.get())
+            if (bundle != f)
             {
-                pEvts.push_back(BundleEvent(BundleEvent::STARTING, (*iter)));
-                pEvts.push_back(BundleEvent(BundleEvent::STARTED, (*iter)));
+                pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundle));
+                pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundle));
 
                 // bundles will be stopped in the same order in which they were started.
                 // It is easier to maintain this test if the stop events are setup in the
@@ -221,15 +220,15 @@ namespace
                 // the order of events somewhere else.
                 // Doing it this way also tests the order in which starting and stopping
                 // bundles occurs and when their events are fired.
-                pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, (*iter)));
-                pStopEvts.push_back(BundleEvent(BundleEvent::STOPPED, (*iter)));
+                pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, bundle));
+                pStopEvts.push_back(BundleEvent(BundleEvent::STOPPED, bundle));
             }
         }
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check for bundle start events")
 
         // Remember, the framework is stopped last, after all bundles are stopped.
-        pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, f.get()));
+        pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
 
         // Stopping the framework stops all active bundles.
         f->Stop();

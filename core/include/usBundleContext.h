@@ -103,24 +103,24 @@ public:
    * @throws std::logic_error If this BundleContext is no
    *         longer valid.
    */
-  Bundle* GetBundle() const;
+  std::shared_ptr<Bundle> GetBundle() const;
 
   /**
    * Returns the bundle with the specified identifier.
    *
    * @param id The identifier of the bundle to retrieve.
-   * @return A <code>Bundle</code> object or <code>0</code> if the
+   * @return A <code>Bundle</code> object or <code>nullptr</code> if the
    *         identifier does not match any previously installed bundle.
    */
-  Bundle* GetBundle(long id) const;
+  std::shared_ptr<Bundle> GetBundle(long id) const;
 
   /**
    * Get the bundle with the specified bundle name.
    *
    * @param name The name of the bundle to get.
-   * @return The requested \c Bundle or \c NULL.
+   * @return The requested \c Bundle or \c nullptr.
    */
-  Bundle* GetBundle(const std::string& name);
+  std::shared_ptr<Bundle> GetBundle(const std::string& name);
 
   /**
    * Returns a list of all known bundles.
@@ -132,7 +132,7 @@ public:
    * @return A std::vector of <code>Bundle</code> objects which
    *         will hold one object per known bundle.
    */
-  std::vector<Bundle*> GetBundles() const;
+  std::vector<std::shared_ptr<Bundle>> GetBundles() const;
 
   /**
    * Registers the specified service object with the specified properties
@@ -681,7 +681,7 @@ public:
    * @return The Bundle object of the installed bundle.
    * @throws std::runtime_error If the installation failed.
    */
-  Bundle* InstallBundle(const std::string& location);
+  std::shared_ptr<Bundle> InstallBundle(const std::string& location);
 
 private:
 

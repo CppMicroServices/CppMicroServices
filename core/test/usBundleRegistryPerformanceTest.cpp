@@ -75,8 +75,8 @@ namespace
 
         elapsedTimeInMilliSeconds = 0;
 
-        std::vector<Bundle*> bundles(f->GetBundleContext()->GetBundles());
-        for (auto bundle : bundles)
+        auto bundles = f->GetBundleContext()->GetBundles();
+        for (auto const& bundle : bundles)
         {
             timer.Start();
             bundle->Start();
@@ -127,7 +127,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
     TestSerial(framework);
 
-    for (auto bundle : framework->GetBundleContext()->GetBundles())
+    for (auto& bundle : framework->GetBundleContext()->GetBundles())
     {
         if (bundle->GetBundleId() != 0)
         {

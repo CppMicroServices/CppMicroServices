@@ -182,9 +182,9 @@ namespace detail
  * @param _service_interface_type The service interface type.
  * @param _service_interface_id A string literal representing a globally unique identifier.
  */
-#define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)               \
-    template<> inline std::string us::us_service_interface_iid<_service_interface_type>()          \
-    { return _service_interface_id; }                                                              \
+#define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)             \
+  template<> inline std::string us::us_service_interface_iid<_service_interface_type>()          \
+  { return _service_interface_id; }                                                              \
 
 
 namespace us {

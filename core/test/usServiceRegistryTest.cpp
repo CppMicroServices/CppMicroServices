@@ -42,6 +42,7 @@ struct ITestServiceB
 {
   virtual ~ITestServiceB() {};
 };
+// Test the optional macro to provide custom name for a service interface class
 US_DECLARE_SERVICE_INTERFACE(ITestServiceB, "com.mycompany.ITestService/1.0");
 
 void TestServiceInterfaceId()

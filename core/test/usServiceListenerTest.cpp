@@ -218,7 +218,6 @@ public:
 
 }; // end of class ServiceListener
 
-
 bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bundle>& bundle,
                        BundleContext* context,
                        const std::vector<ServiceEvent::Type>& events)

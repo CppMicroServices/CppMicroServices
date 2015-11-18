@@ -82,7 +82,11 @@ public:
   std::string baseStoragePath;
   std::string storagePath;
 
+<<<<<<< HEAD
   const std::weak_ptr<Bundle> q;
+=======
+  const std::shared_ptr<Bundle> q;
+>>>>>>> Convert to shared_ptr<Bundle>
 
   /** 
    * Responsible for platform specific loading and unloading

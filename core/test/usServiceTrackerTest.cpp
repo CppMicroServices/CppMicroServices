@@ -125,7 +125,7 @@ void TestFilterString(us::BundleContext* context)
 
 void TestServiceTracker(us::BundleContext* context)
 {
-  Bundle* bundle = InstallTestBundle(context, "TestBundleS");
+  auto bundle = InstallTestBundle(context, "TestBundleS");
   bundle->Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null

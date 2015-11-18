@@ -83,7 +83,7 @@ private:
 // Assumes that test bundles are within the same directory during unit testing.
 // Currently limited to only installing bundles with the same physical filename
 // and logical bundle name (e.g. TestBundleA.dll/TestBundleA).
-Bundle* InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
+std::shared_ptr<Bundle> InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
 
 // Copied from usUtils_p.h/usUtils.cpp
 // Place in a different namespace to avoid duplicate symbol errors.

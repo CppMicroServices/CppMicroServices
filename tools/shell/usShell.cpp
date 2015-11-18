@@ -93,14 +93,14 @@ int main(int argc, char** argv)
 
   try
   {
-    std::vector<Bundle*> bundles;
+    std::vector<std::shared_ptr<Bundle>> bundles;
     for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next())
     {
       if (opt->arg == nullptr) continue;
       std::cout << "Installing " << opt->arg << std::endl;
       bundles.push_back(context->InstallBundle(opt->arg));
     }
-    for (auto bundle : bundles)
+    for (auto& bundle : bundles)
     {
       bundle->Start();
     }

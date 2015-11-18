@@ -40,7 +40,7 @@
 
 namespace us {
 
-BundlePrivate::BundlePrivate(Bundle* qq, CoreBundleContext* coreCtx,
+BundlePrivate::BundlePrivate(std::shared_ptr<Bundle> qq, CoreBundleContext* coreCtx,
                              BundleInfo* info)
   : coreCtx(coreCtx)
   , info(*info)

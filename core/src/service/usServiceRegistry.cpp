@@ -323,7 +323,7 @@ void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
   }
 }
 
-void ServiceRegistry::GetUsedByBundle(Bundle* p,
+void ServiceRegistry::GetUsedByBundle(const std::shared_ptr<Bundle>& bundle,
                                       std::vector<ServiceRegistrationBase>& res) const
 {
   Lock l(this);
@@ -331,7 +331,7 @@ void ServiceRegistry::GetUsedByBundle(Bundle* p,
   for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
   {
-    if (i->d->IsUsedByBundle(p))
+    if (i->d->IsUsedByBundle(bundle))
     {
       res.push_back(*i);
     }

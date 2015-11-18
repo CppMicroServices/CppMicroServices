@@ -26,6 +26,7 @@
 #include "usServiceListeners_p.h"
 
 #include <vector>
+#include <memory>
 
 namespace us {
 
@@ -45,9 +46,9 @@ public:
 
   BundleHooks(CoreBundleContext* ctx);
 
-  Bundle* FilterBundle(const BundleContext* context, Bundle* bundle) const;
+  std::shared_ptr<Bundle> FilterBundle(const BundleContext* context, const std::shared_ptr<Bundle>& bundle) const;
 
-  void FilterBundles(const BundleContext* context, std::vector<Bundle*>& bundles) const;
+  void FilterBundles(const BundleContext* context, std::vector<std::shared_ptr<Bundle>>& bundles) const;
 
   void FilterBundleEventReceivers(const BundleEvent& evt,
                                   ServiceListeners::BundleListenerMap& bundleListeners);

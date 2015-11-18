@@ -40,7 +40,7 @@ struct ITestServiceA
 
 struct ITestServiceB
 {
-	virtual ~ITestServiceB() {};
+  virtual ~ITestServiceB() {};
 };
 US_DECLARE_SERVICE_INTERFACE(ITestServiceB, "com.mycompany.ITestService/1.0");
 

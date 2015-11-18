@@ -38,11 +38,18 @@ struct ITestServiceA
   virtual ~ITestServiceA() {}
 };
 
+struct ITestServiceB
+{
+  virtual ~ITestServiceB() {};
+};
+// Test the optional macro to provide custom name for a service interface class
+US_DECLARE_SERVICE_INTERFACE(ITestServiceB, "com.mycompany.ITestService/1.0");
 
 void TestServiceInterfaceId()
 {
   US_TEST_CONDITION(us_service_interface_iid<int>() == "int", "Service interface id int")
   US_TEST_CONDITION(us_service_interface_iid<ITestServiceA>() == "ITestServiceA", "Service interface id ITestServiceA")
+  US_TEST_CONDITION(us_service_interface_iid<ITestServiceB>() == "com.mycompany.ITestService/1.0", "Service interface id com.mycompany.ITestService/1.0")
 }
 
 void TestMultipleServiceRegistrations(BundleContext* mc)

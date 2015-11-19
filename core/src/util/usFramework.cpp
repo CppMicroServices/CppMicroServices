@@ -67,7 +67,7 @@ void Framework::Initialize(void)
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
   bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
   
-  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(std::static_pointer_cast<Framework>(this->shared_from_this()), bundleInfo);
+  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(std::static_pointer_cast<Framework>(shared_from_this()), bundleInfo);
 
   d->initialized = true;
 }

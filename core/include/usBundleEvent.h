@@ -134,7 +134,7 @@ public:
    * @param type The event type.
    * @param bundle The bundle which had a lifecycle change.
    */
-  BundleEvent(Type type, std::shared_ptr<Bundle> bundle);
+  BundleEvent(Type type, const std::shared_ptr<Bundle>& bundle);
 
   BundleEvent(const BundleEvent& other);
 

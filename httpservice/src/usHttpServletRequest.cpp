@@ -35,22 +35,22 @@ namespace us {
 void putenv(const char* key, const char* val)
 {
 #ifdef US_PLATFORM_WINDOWS
-	_putenv_s(key, val);
+  _putenv_s(key, val);
 #else
-	setenv(key, val, 1);
+  setenv(key, val, 1);
 #endif
 }
 
 void unsetenv(const char* key)
 {
 #ifdef US_PLATFORM_WINDOWS
-	_putenv_s(key, "");
+  _putenv_s(key, "");
 #else
-	unsetenv(key);
+  unsetenv(key);
 #endif
 }
 
-HttpServletRequestPrivate::HttpServletRequestPrivate(ServletContext* servletContext,
+HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
                                        CivetServer* server, mg_connection* conn)
   : m_ServletContext(servletContext)
   , m_Server(server)
@@ -123,7 +123,7 @@ HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest& o)
   return *this;
 }
 
-ServletContext*HttpServletRequest::GetServletContext() const
+std::shared_ptr<ServletContext> HttpServletRequest::GetServletContext() const
 {
   return d->m_ServletContext;
 }

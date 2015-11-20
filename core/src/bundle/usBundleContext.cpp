@@ -96,7 +96,7 @@ std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const
   return bundles;
 }
 
-ServiceRegistrationU BundleContext::RegisterService(const InterfaceMap& service,
+ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& service,
                                                     const ServiceProperties& properties)
 {
   auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
@@ -142,7 +142,35 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
   return b->coreCtx->services.Get(d->bundle, clazz);
 }
 
-void* BundleContext::GetService(const ServiceReferenceBase& reference)
+/* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
+ *        in BundleContext::GetService method. The aliasing constructor helps automate
+ *        the call to UngetService method.
+ *
+ *        Service consumers can simply call GetService to obtain a shared_ptr to the
+ *        service object and not worry about calling UngetService when they are done.
+ *        The UngetService is called when all instances of the returned shared_ptr object
+ *        go out of scope.
+ */
+template <class S>
+struct ServiceHolder
+{
+  BundleContext* bc;
+  ServiceReferenceBase sref;
+  std::shared_ptr<S> service;
+  ~ServiceHolder()
+  {
+    try
+    {
+      bc->UngetService(sref);
+    }
+    catch (const std::exception& exp)
+    {
+      US_INFO << "UngetService threw an exception - " << exp.what();
+    }
+  }
+};
+
+std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& reference)
 {
   if (!reference)
   {
@@ -156,10 +184,12 @@ void* BundleContext::GetService(const ServiceReferenceBase& reference)
   // the result is the same as if the calling thread had
   // won the race condition.
 
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>{ this, reference, reference.d.load()->GetService(b->q) });
+  return std::shared_ptr<void>(h, h->service.get());
   return reference.d.load()->GetService(b->q);
 }
 
-InterfaceMap BundleContext::GetService(const ServiceReferenceU& reference)
+InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& reference)
 {
   if (!reference)
   {
@@ -173,20 +203,11 @@ InterfaceMap BundleContext::GetService(const ServiceReferenceU& reference)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return reference.d.load()->GetServiceInterfaceMap(b->q);
-}
-
-bool BundleContext::UngetService(const ServiceReferenceBase& reference)
-{
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
-
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-
-  ServiceReferenceBase ref = reference;
-  return ref.d.load()->UngetService(b->q, true);
+  // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
+  // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
+  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d.load()->GetServiceInterfaceMap(b->q).get()));
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>{this, reference, imap_copy});
+  return InterfaceMapConstPtr(h, h->service.get());
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate,
@@ -236,6 +257,19 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
   // won the race condition.
 
   b->coreCtx->listeners.RemoveBundleListener(this, delegate, nullptr);
+}
+
+bool BundleContext::UngetService(const ServiceReferenceBase& reference)
+{
+  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  ServiceReferenceBase ref = reference;
+  return ref.d.load()->UngetService(b->q, true);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
@@ -343,7 +377,7 @@ std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location
 
   b->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
 
-  return bundle;
+    return bundle;
 }
 
 

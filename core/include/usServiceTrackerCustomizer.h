@@ -28,28 +28,6 @@
 
 namespace us {
 
-///cond
-template<class S, class T = S*, class Enable = void>
-struct ServiceTrackerCustomizer {
-};
-
-namespace detail {
-
-template<class S>
-struct ServiceArg
-{
-  typedef S* type;
-};
-
-template<>
-struct ServiceArg<void>
-{
-  typedef const InterfaceMap& type;
-};
-
-}
-///endcond
-
 /**
  * \ingroup MicroServices
  *
@@ -79,46 +57,25 @@ struct ServiceArg<void>
  * thread-safe.
  *
  * \tparam S The type of the service being tracked
- * \tparam T The type of the tracked object.
+ * \tparam T The type of the tracked object. The default is \c S.
  * \remarks This class is thread safe.
  */
-template<class S, class T>
-struct ServiceTrackerCustomizer<S, T, typename std::enable_if<std::is_pointer<T>::value && !std::is_same<S*,T>::value>::type>
+template<class S, class T = S>
+struct ServiceTrackerCustomizer
 {
 
   struct TypeTraits {
     typedef S ServiceType;
     typedef T TrackedType;
-    typedef T TrackedReturnType;
-    typedef T TrackedArgType;
-    typedef ServiceReference<ServiceType> ServiceReferenceType;
+    typedef T TrackedParmType;
 
-    static bool IsValid(typename std::remove_pointer<TrackedType>::type const* t)
-    {
-      return t != nullptr;
-    }
-
-    static TrackedReturnType DefaultValue()
-    {
-      return nullptr;
-    }
-
-    static void Dispose(TrackedType& t)
-    {
-      t = nullptr;
-    }
-
-    static TrackedReturnType ConvertToTrackedType(typename detail::ServiceArg<ServiceType>::type)
+    static std::shared_ptr<TrackedType> ConvertToTrackedType(const std::shared_ptr<S>&)
     {
       throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
     }
   };
 
-  typedef typename TypeTraits::ServiceType ServiceType;
-  typedef typename TypeTraits::TrackedType TrackedType;
-  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
-  typedef typename TypeTraits::TrackedArgType TrackedArgType;
-  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+  typedef typename TypeTraits::TrackedParmType TrackedParmType;
 
   virtual ~ServiceTrackerCustomizer() {}
 
@@ -140,7 +97,7 @@ struct ServiceTrackerCustomizer<S, T, typename std::enable_if<std::is_pointer<T>
    *         service or <code>0</code> if the specified referenced service
    *         should not be tracked.
    */
-  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been modified.
@@ -152,7 +109,7 @@ struct ServiceTrackerCustomizer<S, T, typename std::enable_if<std::is_pointer<T>
    * @param reference The reference to the service that has been modified.
    * @param service The service object for the specified referenced service.
    */
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been removed.
@@ -164,139 +121,80 @@ struct ServiceTrackerCustomizer<S, T, typename std::enable_if<std::is_pointer<T>
    * @param reference The reference to the service that has been removed.
    * @param service The service object for the specified referenced service.
    */
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
 template<class S>
-struct ServiceTrackerCustomizer<S, S*, void>
+struct ServiceTrackerCustomizer<S,S>
 {
 
   struct TypeTraits {
     typedef S ServiceType;
-    typedef S* TrackedType;
-    typedef S* TrackedReturnType;
-    typedef S* TrackedArgType;
-    typedef ServiceReference<ServiceType> ServiceReferenceType;
+    typedef S TrackedType;
+    typedef S TrackedParmType;
 
-    static bool IsValid(const TrackedType t)
+    static std::shared_ptr<S> ConvertToTrackedType(const std::shared_ptr<S>& t)
     {
-      return t != nullptr;
-    }
-
-    static TrackedReturnType DefaultValue()
-    {
-      return nullptr;
-    }
-
-    static void Dispose(TrackedType& t)
-    {
-      t = nullptr;
-    }
-
-    static TrackedReturnType ConvertToTrackedType(TrackedReturnType s)
-    {
-      return s;
+      return t;
     }
   };
 
-  typedef typename TypeTraits::ServiceType ServiceType;
-  typedef typename TypeTraits::TrackedType TrackedType;
-  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
-  typedef typename TypeTraits::TrackedArgType TrackedArgType;
-  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+  typedef typename TypeTraits::TrackedParmType TrackedParmType;
 
   virtual ~ServiceTrackerCustomizer() {}
-  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+
+  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
+  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
-template<class S, class T>
-struct ServiceTrackerCustomizer<S, T, typename std::enable_if<!std::is_pointer<T>::value && std::is_constructible<T>::value &&
-    (std::is_convertible<T,bool>::value || std::is_constructible<bool,T>::value)>::type>
+template<class T>
+struct ServiceTrackerCustomizer<void, T>
 {
 
   struct TypeTraits {
-    typedef S ServiceType;
+    typedef void ServiceType;
     typedef T TrackedType;
-    typedef T TrackedReturnType;
-    typedef T& TrackedArgType;
-    typedef ServiceReference<ServiceType> ServiceReferenceType;
+    typedef T TrackedParmType;
 
-    static bool IsValid(const TrackedType& t)
-    {
-      return static_cast<bool>(t);
-    }
-
-    static TrackedReturnType DefaultValue()
-    {
-      return TrackedReturnType();
-    }
-
-    static void Dispose(TrackedArgType)
-    {
-    }
-
-    static TrackedReturnType ConvertToTrackedType(typename detail::ServiceArg<ServiceType>::type)
+    static std::shared_ptr<T> ConvertToTrackedType(const InterfaceMapConstPtr&)
     {
       throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
     }
   };
 
-  typedef typename TypeTraits::ServiceType ServiceType;
-  typedef typename TypeTraits::TrackedType TrackedType;
-  typedef typename TypeTraits::TrackedReturnType TrackedReturnType;
-  typedef typename TypeTraits::TrackedArgType TrackedArgType;
-  typedef typename TypeTraits::ServiceReferenceType ServiceReferenceType;
+  typedef void S;
+  typedef typename TypeTraits::TrackedParmType TrackedParmType;
 
   virtual ~ServiceTrackerCustomizer() {}
-  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
+  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
 template<>
-struct ServiceTrackerCustomizer<void, void*, void>
+struct ServiceTrackerCustomizer<void, void>
 {
 
   struct TypeTraits {
     typedef void ServiceType;
-    typedef void* TrackedType;
-    typedef InterfaceMap TrackedReturnType;
-    typedef const InterfaceMap& TrackedArgType;
-    typedef ServiceReference<ServiceType> ServiceReferenceType;
+    typedef void TrackedType;
+    typedef const InterfaceMap TrackedParmType;
 
-    static bool IsValid(TrackedArgType t)
+    static std::shared_ptr<TrackedParmType> ConvertToTrackedType(const std::shared_ptr<TrackedParmType>& t)
     {
-      return !t.empty();
-    }
-
-    static TrackedReturnType DefaultValue()
-    {
-      return TrackedReturnType();
-    }
-
-    static void Dispose(InterfaceMap& t)
-    {
-      t.clear();
-    }
-
-    static TrackedReturnType ConvertToTrackedType(TrackedArgType im)
-    {
-      return im;
+      return t;
     }
   };
 
-  typedef TypeTraits::ServiceType ServiceType;
-  typedef TypeTraits::TrackedType TrackedType;
-  typedef TypeTraits::TrackedReturnType TrackedReturnType;
-  typedef TypeTraits::TrackedArgType TrackedArgType;
-  typedef TypeTraits::ServiceReferenceType ServiceReferenceType;
+  typedef void S;
+  typedef void T;
+  typedef TypeTraits::TrackedParmType TrackedParmType;
 
   virtual ~ServiceTrackerCustomizer() {}
-  virtual TrackedReturnType AddingService(const ServiceReferenceType& reference) = 0;
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedArgType service) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
+  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
 }

@@ -26,6 +26,7 @@
 #include <usGlobalConfig.h>
 
 #include <string>
+#include <memory>
 
 namespace us {
 
@@ -37,7 +38,7 @@ public:
 
   std::string GetContextPath() const;
 
-  ServletContext* GetContext(const std::string& uripath);
+  std::shared_ptr<ServletContext> GetContext(const std::string& uripath);
 
   std::string GetMimeType(const std::string& file) const;
 

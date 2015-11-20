@@ -32,11 +32,8 @@ namespace us {
 struct TestBundleB : public TestBundleBService
 {
 
-  TestBundleB(BundleContext* mc)
-  {
-    US_INFO << "Registering TestBundleBService";
-    mc->RegisterService<TestBundleBService>(this);
-  }
+  TestBundleB() {}
+  virtual ~TestBundleB() {}
 
 };
 
@@ -49,16 +46,20 @@ public:
 
   void Start(BundleContext* context)
   {
-    s.reset(new TestBundleB(context));
+    s = std::make_shared<TestBundleB>();
+    US_INFO << "Registering TestBundleBService";
+    sr = context->RegisterService<TestBundleBService>(s);
   }
 
   void Stop(BundleContext*)
   {
+    sr.Unregister();
   }
 
 private:
 
-  std::unique_ptr<TestBundleB> s;
+  std::shared_ptr<TestBundleB> s;
+  ServiceRegistration<TestBundleBService> sr;
 };
 
 }

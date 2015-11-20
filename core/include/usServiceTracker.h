@@ -79,21 +79,15 @@ class BundleContext;
  *
  * @remarks This class is thread safe.
  */
-template<class S, class T = S*>
+template<class S, class T = S>
 class ServiceTracker : protected ServiceTrackerCustomizer<S,T>
 {
 public:
 
-  /// The type of the service being tracked
-  typedef typename ServiceTrackerCustomizer<S,T>::ServiceType ServiceType;
   /// The type of the tracked object
-  typedef typename ServiceTrackerCustomizer<S,T>::TrackedType TrackedType;
-  typedef typename ServiceTrackerCustomizer<S,T>::TrackedReturnType TrackedReturnType;
-  typedef typename ServiceTrackerCustomizer<S,T>::TrackedArgType TrackedArgType;
+  typedef typename ServiceTrackerCustomizer<S,T>::TrackedParmType TrackedParmType;
 
-  typedef typename ServiceTrackerCustomizer<S,T>::ServiceReferenceType ServiceReferenceType;
-
-  typedef std::map<ServiceReference<S>,TrackedReturnType> TrackingMap;
+  typedef std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>> TrackingMap;
 
   ~ServiceTracker();
 
@@ -118,7 +112,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(BundleContext* context,
-                 const ServiceReferenceType& reference,
+                 const ServiceReference<S>& reference,
                  ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
@@ -227,7 +221,7 @@ public:
    *
    * @return Returns the result of GetService().
    */
-  TrackedReturnType WaitForService();
+  std::shared_ptr<TrackedParmType> WaitForService();
 
   /**
    * Wait for at least one service to be tracked by this
@@ -248,7 +242,7 @@ public:
    * @return Returns the result of GetService().
    */
   template<class Rep, class Period>
-  TrackedReturnType WaitForService(const std::chrono::duration<Rep, Period>& rel_time);
+  std::shared_ptr<TrackedParmType> WaitForService(const std::chrono::duration<Rep, Period>& rel_time);
 
   /**
    * Return a list of <code>ServiceReference</code>s for all services being
@@ -256,7 +250,7 @@ public:
    *
    * @return List of <code>ServiceReference</code>s.
    */
-  virtual std::vector<ServiceReferenceType> GetServiceReferences() const;
+  virtual std::vector<ServiceReference<S>> GetServiceReferences() const;
 
   /**
    * Returns a <code>ServiceReference</code> for one of the services being
@@ -277,7 +271,7 @@ public:
    * @return A <code>ServiceReference</code> for a tracked service.
    * @throws ServiceException if no services are being tracked.
    */
-  virtual ServiceReferenceType GetServiceReference() const;
+  virtual ServiceReference<S> GetServiceReference() const;
 
   /**
    * Returns the service object for the specified
@@ -289,7 +283,7 @@ public:
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
-  virtual TrackedReturnType GetService(const ServiceReferenceType& reference) const;
+  virtual std::shared_ptr<TrackedParmType> GetService(const ServiceReference<S>& reference) const;
 
   /**
    * Return a list of service objects for all services being tracked by this
@@ -304,7 +298,7 @@ public:
    * @return A list of service objects or an empty list if no services
    *         are being tracked.
    */
-  virtual std::vector<TrackedReturnType> GetServices() const;
+  virtual std::vector<std::shared_ptr<TrackedParmType>> GetServices() const;
 
   /**
    * Returns a service object for one of the services being tracked by this
@@ -317,7 +311,7 @@ public:
    * @return A service object or <code>null</code> if no services are being
    *         tracked.
    */
-  virtual TrackedReturnType GetService() const;
+  virtual std::shared_ptr<TrackedParmType> GetService() const;
 
   /**
    * Remove a service from this <code>ServiceTracker</code>.
@@ -329,7 +323,7 @@ public:
    *
    * @param reference The reference to the service to be removed.
    */
-  virtual void Remove(const ServiceReferenceType& reference);
+  virtual void Remove(const ServiceReference<S>& reference);
 
   /**
    * Return the number of services being tracked by this
@@ -410,7 +404,7 @@ protected:
    *         <code>ServiceTracker</code>.
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  TrackedReturnType AddingService(const ServiceReferenceType& reference);
+  std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference);
 
   /**
    * Default implementation of the
@@ -427,7 +421,7 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
    */
-  void ModifiedService(const ServiceReferenceType& reference, TrackedArgType service);
+  void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service);
 
   /**
    * Default implementation of the
@@ -437,11 +431,6 @@ protected:
    * This method is only called when this <code>ServiceTracker</code> has been
    * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
    *
-   * <p>
-   * This implementation calls <code>UngetService</code>, on the
-   * <code>BundleContext</code> with which this <code>ServiceTracker</code>
-   * was created, passing the specified <code>ServiceReference</code>.
-   * <p>
    * This method can be overridden in a subclass. If the default
    * implementation of \link AddingService(const ServiceReferenceType&) AddingService\endlink
    * method was used, this method must unget the service.
@@ -450,7 +439,7 @@ protected:
    * @param service The service object for the removed service.
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
    */
-  void RemovedService(const ServiceReferenceType& reference, TrackedArgType service);
+  void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service);
 
 private:
 

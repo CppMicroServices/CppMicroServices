@@ -36,7 +36,7 @@ class ServletContainer;
 class ServletContext;
 class ServletHandler;
 
-struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler*>
+struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler>
 {
   ServletContainerPrivate(ServletContainer* q);
 
@@ -47,19 +47,19 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
 
   BundleContext* m_Context;
   CivetServer* m_Server;
-  ServiceTracker<HttpServlet, ServletHandler*> m_ServletTracker;
+  ServiceTracker<HttpServlet, ServletHandler> m_ServletTracker;
 
-  std::map<std::string, ServletContext*> m_ServletContextMap;
+  std::map<std::string, std::shared_ptr<ServletContext>> m_ServletContextMap;
   std::string m_ContextPath;
 
 private:
 
   ServletContainer* const q;
-  std::list<ServletHandler*> m_Handler;
+  std::list<std::shared_ptr<ServletHandler>> m_Handler;
 
-  virtual TrackedType AddingService(const ServiceReferenceType& reference);
-  virtual void ModifiedService(const ServiceReferenceType& /*reference*/, TrackedType /*service*/);
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType handler);
+  virtual std::shared_ptr<ServletHandler> AddingService(const ServiceReference<HttpServlet>& reference);
+  virtual void ModifiedService(const ServiceReference<HttpServlet>& /*reference*/, const std::shared_ptr<ServletHandler>& /*service*/);
+  virtual void RemovedService(const ServiceReference<HttpServlet>& reference, const std::shared_ptr<ServletHandler>& handler);
 };
 
 }

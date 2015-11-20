@@ -24,6 +24,8 @@
 
 #include "usSharedData.h"
 
+#include <memory>
+
 namespace us {
 
 class ServletContext;
@@ -31,11 +33,10 @@ class ServletContext;
 struct ServletConfigPrivate : public SharedData
 {
   ServletConfigPrivate()
-    : m_Context(nullptr)
   {}
 
   std::string m_Name;
-  ServletContext* m_Context;
+  std::shared_ptr<ServletContext> m_Context;
 };
 
 }

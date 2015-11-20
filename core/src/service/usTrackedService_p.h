@@ -42,8 +42,7 @@ class TrackedService : public TrackedServiceListener,
 public:
 
   typedef typename TTT::TrackedType T;
-  typedef typename TTT::TrackedReturnType TrackedReturnType;
-  typedef typename TTT::TrackedArgType TrackedArgType;
+  typedef typename TTT::TrackedParmType TrackedParmType;
 
   TrackedService(ServiceTracker<S,T>* serviceTracker,
                  ServiceTrackerCustomizer<S,T>* customizer);
@@ -81,7 +80,7 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  TrackedReturnType CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related);
+  std::shared_ptr<TrackedParmType> CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related);
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -92,7 +91,7 @@ private:
    * @param object Customized object for the tracked item.
    */
   void CustomizerModified(ServiceReference<S> item,
-                          const ServiceEvent& related, TrackedArgType object) ;
+                          const ServiceEvent& related, const std::shared_ptr<TrackedParmType>& object) ;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -103,7 +102,7 @@ private:
    * @param object Customized object for the tracked item.
    */
   void CustomizerRemoved(ServiceReference<S> item,
-                         const ServiceEvent& related, TrackedArgType object) ;
+                         const ServiceEvent& related, const std::shared_ptr<TrackedParmType>& object) ;
 };
 
 }

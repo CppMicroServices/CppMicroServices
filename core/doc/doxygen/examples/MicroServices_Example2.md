@@ -62,7 +62,7 @@ Id | Name                 | Status
 > l eventlistener
 Starting to listen for service events.
 > l dictionaryservice
-Ex1: Service of type IDictionaryService/1.0 registered.
+Ex1: Service of type IDictionaryService registered.
 > s
 Id | Name                 | Status
 -----------------------------------

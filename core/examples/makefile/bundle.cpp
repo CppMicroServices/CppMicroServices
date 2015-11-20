@@ -61,8 +61,6 @@ private:
     }
   };
 
-  std::unique_ptr<DictionaryImpl> m_DictionaryService;
-
 
 public:
 
@@ -76,10 +74,10 @@ public:
    */
   void Start(BundleContext* context)
   {
-    m_DictionaryService.reset(new DictionaryImpl);
+    auto dictionaryService = std::make_shared<DictionaryImpl>();
     ServiceProperties props;
     props["Language"] = std::string("English");
-    context->RegisterService<IDictionaryService>(m_DictionaryService.get(), props);
+    context->RegisterService<IDictionaryService>(dictionaryService, props);
   }
 
   /**

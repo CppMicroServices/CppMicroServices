@@ -61,13 +61,13 @@ protected:
   /**
    * Service or ServiceFactory object.
    */
-  InterfaceMap service;
+  InterfaceMapConstPtr service;
 
 public:
 
   typedef std::unordered_map<Bundle*,int> BundleToRefsMap;
-  typedef std::unordered_map<Bundle*, InterfaceMap> BundleToServiceMap;
-  typedef std::unordered_map<Bundle*, std::list<InterfaceMap> > BundleToServicesMap;
+  typedef std::unordered_map<Bundle*, InterfaceMapConstPtr> BundleToServiceMap;
+  typedef std::unordered_map<Bundle*, std::list<InterfaceMapConstPtr> > BundleToServicesMap;
 
   ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
   ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
@@ -117,7 +117,7 @@ public:
   std::atomic<bool> unregistering;
 
 
-  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMap& service,
+  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
                                  ServicePropertiesImpl&& props);
 
   ~ServiceRegistrationBasePrivate();
@@ -130,11 +130,11 @@ public:
    */
   bool IsUsedByBundle(Bundle* m) const;
 
-  InterfaceMap GetInterfaces() const;
+  InterfaceMapConstPtr GetInterfaces() const;
 
-  void* GetService(const std::string& interfaceId) const;
+  std::shared_ptr<void> GetService(const std::string& interfaceId) const;
 
-  void* GetService_unlocked(const std::string& interfaceId) const;
+  std::shared_ptr<void> GetService_unlocked(const std::string& interfaceId) const;
 
 };
 

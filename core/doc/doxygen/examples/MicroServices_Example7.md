@@ -56,7 +56,7 @@ Enter passage:
 \endverbatim
 
 When we start the bundle, it will use the main thread to prompt us for passages; a
-passage is a collection or words separate by spaces, commas, periods, exclamation
+passage is a collection of words separated by spaces, commas, periods, exclamation
 points, question marks, colons, or semi-colons. Enter a passage and press the enter
 key to spell check the passage or enter a blank line to stop spell checking passages.
 To restart the bundle, we must use the command `s` command to get the bundle identifier

@@ -85,7 +85,7 @@ void WebConsolePluginTracker::AddPlugin(const std::string& label, AbstractWebCon
 
   struct PluginConfig : public ServletConfig
   {
-    PluginConfig(ServletContext* context)
+    PluginConfig(const std::shared_ptr<ServletContext>& context)
     {
       ServletConfig::SetServletContext(context);
     }
@@ -112,7 +112,7 @@ WebConsolePluginTracker::WebConsolePluginTracker()
   m_Labels = &ref_any_cast<std::vector<Any> >(ref_any_cast<std::map<std::string, Any> >(m_LabelMapAny)["menuItems"]);
 }
 
-void WebConsolePluginTracker::Open(ServletContext* context)
+void WebConsolePluginTracker::Open(const std::shared_ptr<ServletContext>& context)
 {
   this->m_ServletContext = context;
   Superclass::Open();
@@ -135,23 +135,23 @@ void WebConsolePluginTracker::Open()
   Superclass::Open();
 }
 
-HttpServlet* WebConsolePluginTracker::AddingService(const ServiceReferenceType& reference)
+std::shared_ptr<HttpServlet>  WebConsolePluginTracker::AddingService(const ServiceReference<HttpServlet>& reference)
 {
   std::string label = this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL());
   if (label.empty())
   {
     return nullptr;
   }
-  HttpServlet* servlet = Superclass::AddingService(reference);
-  AbstractWebConsolePlugin* plugin = dynamic_cast<AbstractWebConsolePlugin*>(servlet);
+  std::shared_ptr<HttpServlet> servlet = Superclass::AddingService(reference);
+  std::shared_ptr<AbstractWebConsolePlugin> plugin = std::dynamic_pointer_cast<AbstractWebConsolePlugin>(servlet);
   if (plugin)
   {
-    this->AddPlugin(label, plugin);
+    this->AddPlugin(label, plugin.get());
   }
   return plugin;
 }
 
-std::string WebConsolePluginTracker::GetProperty(const ServiceTracker::ServiceReferenceType& reference, const std::string& property) const
+std::string WebConsolePluginTracker::GetProperty(const ServiceReference<HttpServlet>& reference, const std::string& property) const
 {
   us::Any labelProp = reference.GetProperty(property);
   if (labelProp.Empty() || labelProp.Type() != typeid(std::string))

@@ -96,6 +96,16 @@
 {
    <TestBundleC1-atomic>
    Helgrind:Race
+   fun:store
+   fun:_ZNSt13__atomic_baseIbEaSEb
+   fun:_ZNSt6atomicIbEaSEb
+   fun:_ZN2us21TestBundleC1Activator4StopEPNS_13BundleContextE
+   ...
+}
+
+{
+   <TestBundleC1-atomic>
+   Helgrind:Race
    fun:load
    fun:_ZNKSt6atomicIbE4loadESt12memory_order
    fun:_ZN2us21TestBundleC1Activator10UnRegisterEv
@@ -217,13 +227,13 @@
 }
 
 {
-   <condition_variable-notify>
+   <condition_variable-notifyall>
    Helgrind:Misc
    obj:/usr/*/valgrind/vgpreload_helgrind*
    fun:pthread_cond_broadcast@*
    fun:_ZNSt18condition_variable10notify_allEv
    fun:_ZN2us13WaitConditionINS_20MutexLockingStrategyISt5mutexEEE9NotifyAllEv
-   fun:_ZN2us14ServiceTrackerIvPvE5CloseEv
+   fun:_ZN2us14ServiceTrackerIvvE5CloseEv
    ...
 }
 

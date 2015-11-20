@@ -41,9 +41,9 @@ private:
 
   std::atomic<bool> bOpen;
 
-  virtual TrackedType AddingService(const ServiceReferenceType& reference);
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service);
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service);
+  virtual std::shared_ptr<ServiceListenerHook> AddingService(const ServiceReference<ServiceListenerHook>& reference);
+  virtual void ModifiedService(const ServiceReference<ServiceListenerHook>& reference, const std::shared_ptr<ServiceListenerHook>& service);
+  virtual void RemovedService(const ServiceReference<ServiceListenerHook>& reference, const std::shared_ptr<ServiceListenerHook>& service);
 
 public:
 

@@ -31,6 +31,7 @@
 #include <string>
 #include <typeinfo>
 #include <tuple>
+#include <memory>
 
 namespace us {
 
@@ -40,10 +41,10 @@ class ServiceFactory;
  * @ingroup MicroServices
  *
  * A map containing interfaces ids and their corresponding service object
- * pointers. InterfaceMap instances represent a complete service object
- * which implementes one or more service interfaces. For each implemented
+ * smart pointers. InterfaceMap instances represent a complete service object
+ * which implements one or more service interfaces. For each implemented
  * service interface, there is an entry in the map with the key being
- * the service interface id and the value a pointer to the service
+ * the service interface id and the value a smart pointer to the service
  * interface implementation.
  *
  * To create InterfaceMap instances, use the MakeInterfaceMap helper class.
@@ -52,7 +53,9 @@ class ServiceFactory;
  *
  * @see MakeInterfaceMap
  */
-typedef std::map<std::string, void*> InterfaceMap;
+typedef std::map<std::string, std::shared_ptr<void>> InterfaceMap;
+typedef std::shared_ptr<InterfaceMap> InterfaceMapPtr;
+typedef std::shared_ptr<const InterfaceMap> InterfaceMapConstPtr;
 
 /// \cond
 namespace detail
@@ -90,10 +93,11 @@ namespace detail
   template <class Interfaces, size_t size>
   struct InsertInterfaceHelper
   {
-      static void insert(InterfaceMap& im, const Interfaces& interfaces)
+      static void insert(InterfaceMapPtr& im, const Interfaces& interfaces)
       {
-          im.insert(std::make_pair(std::string(us_service_interface_iid<typename std::remove_pointer<typename std::tuple_element<size-1, Interfaces>::type>::type>()),
-                                   static_cast<void*>(std::get<size-1>(interfaces))));
+          std::pair<std::string, std::shared_ptr<void>> aPair= std::make_pair(std::string(us_service_interface_iid<typename std::tuple_element<size-1, Interfaces>::type::element_type>()),
+                                           std::static_pointer_cast<void>(std::get<size-1>(interfaces)));
+          im->insert(aPair);
           InsertInterfaceHelper<Interfaces,size-1>::insert(im, interfaces);
       }
   };
@@ -101,21 +105,24 @@ namespace detail
   template<class T>
   struct InsertInterfaceHelper<T,0>
   {
-      static void insert(InterfaceMap&, const T&) {}
+      static void insert(InterfaceMapPtr&, const T&) {}
   };
 
   template<class Interfaces>
-  void InsertInterfaceTypes(InterfaceMap& im, const Interfaces& interfaces)
+  void InsertInterfaceTypes(InterfaceMapPtr& im, const Interfaces& interfaces)
   {
       InsertInterfaceHelper<Interfaces, std::tuple_size<Interfaces>::value>::insert(im, interfaces);
   }
 
   template<template<class...> class List, class ...Args>
   struct InterfacesTuple {
-      typedef List<typename std::add_pointer<Args>::type...> type;
+      typedef List<std::shared_ptr<Args>...> type;
 
       template<class Impl>
-      static type create(Impl* impl) { return type(static_cast<typename std::add_pointer<Args>::type>(impl)...); }
+      static type create(const std::shared_ptr<Impl>& impl)
+      {
+          return type(std::static_pointer_cast<Args>(impl)...);
+      }
   };
 
   template<class T, class... List>
@@ -204,12 +211,10 @@ namespace us {
  * @see InterfaceMap
  */
 template<class ...Interfaces>
-struct MakeInterfaceMap
+class MakeInterfaceMap
 {
-  ServiceFactory* m_factory;
 
-  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
-
+public:
   /**
    * Constructor taking a service implementation pointer.
    *
@@ -217,9 +222,8 @@ struct MakeInterfaceMap
    *        be castable to a all specified service interfaces.
    */
   template<class Impl>
-  MakeInterfaceMap(Impl* impl)
-    : m_factory(nullptr)
-    , m_interfaces(detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
+  MakeInterfaceMap(const std::shared_ptr<Impl>& impl)
+    : m_interfaces(detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
   {}
 
   /**
@@ -227,28 +231,45 @@ struct MakeInterfaceMap
    *
    * @param factory A service factory.
    */
-  MakeInterfaceMap(ServiceFactory* factory)
+  MakeInterfaceMap(const std::shared_ptr<ServiceFactory>& factory)
     : m_factory(factory)
   {
-    if (factory == nullptr)
+    if (!m_factory)
     {
       throw ServiceException("The service factory argument must not be nullptr.");
     }
   }
 
-  operator InterfaceMap ()
+  operator InterfaceMapPtr ()
   {
-    InterfaceMap sim;
+    return getInterfaceMap();
+  }
+
+  // overload for the const version of the map
+  operator InterfaceMapConstPtr()
+  {
+    return InterfaceMapConstPtr(getInterfaceMap());
+  }
+
+private:
+
+  InterfaceMapPtr getInterfaceMap()
+  {
+    InterfaceMapPtr sim = std::make_shared<InterfaceMap>();
     detail::InsertInterfaceTypes(sim, m_interfaces);
 
     if (m_factory)
     {
-      sim.insert(std::make_pair(std::string("org.cppmicroservices.factory"),
-                                static_cast<void*>(m_factory)));
+      sim->insert(std::make_pair(std::string("org.cppmicroservices.factory"),
+                                 m_factory));
     }
 
     return sim;
   }
+
+  std::shared_ptr<ServiceFactory> m_factory;
+
+  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
 };
 
 /**
@@ -257,22 +278,22 @@ struct MakeInterfaceMap
  * Extract a service interface pointer from a given InterfaceMap instance.
  *
  * @param map a InterfaceMap instance.
- * @return The service interface pointer for the service interface id of the
- *         \c I1 interface type or nullptr if \c map does not contain an entry
- *         for the given type.
+ * @return A shared pointer object of type \c Interface. The returned object is
+ *         empty if the map does not contain an entry for the given type
  *
  * @see MakeInterfaceMap
  */
 template<class Interface>
-Interface* ExtractInterface(const InterfaceMap& map)
+std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
 {
-  InterfaceMap::const_iterator iter = map.find(us_service_interface_iid<Interface>());
-  if (iter != map.end())
+  InterfaceMap::const_iterator iter = map->find(us_service_interface_iid<Interface>());
+  if (iter != map->end())
   {
-    return reinterpret_cast<Interface*>(iter->second);
+    return std::static_pointer_cast<Interface>(iter->second);
   }
   return nullptr;
 }
+
 
 /**
  * @ingroup MicroServices
@@ -286,15 +307,15 @@ Interface* ExtractInterface(const InterfaceMap& map)
  *
  * @see ExtractInterface(const InterfaceMap&)
  */
-inline void* ExtractInterface(const InterfaceMap& map, const std::string& interfaceId)
+inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, const std::string& interfaceId)
 {
-  if (interfaceId.empty() && !map.empty())
+  if (interfaceId.empty() && map && !map->empty())
   {
-    return map.begin()->second;
+    return map->begin()->second;
   }
 
-  auto iter = map.find(interfaceId);
-  if (iter != map.end())
+  auto iter = map->find(interfaceId);
+  if (iter != map->end())
   {
     return iter->second;
   }
@@ -305,34 +326,25 @@ inline void* ExtractInterface(const InterfaceMap& map, const std::string& interf
 /**
  * @ingroup MicroServices
  *
- * Cast the argument to a \c ServiceFactory pointer. Useful when calling
- * \c BundleContext::RegisterService with a service factory, for example:
+ * Cast the argument to a shared pointer of type \c ServiceFactory. Useful when
+ * calling \c BundleContext::RegisterService with a service factory, for example:
  *
  * \code
- * MyServiceFactory* factory;
+ * std::shared_ptr<MyServiceFactory> factory = std::make_shared<MyServiceFactory>();
  * context->RegisterService<ISomeInterface>(ToFactory(factory));
  * \endcode
  *
- * @param factory The service factory. May be a pointer or reference type.
- * @return A \c ServiceFactory pointer to the passed \c factory instance.
+ * @param factory The service factory shared_ptr object
+ * @return A \c shared_ptr object of type \c ServiceFactory
  *
  * @see BundleContext::RegisterService(ServiceFactory* factory, const ServiceProperties& properties)
  */
 template<class T>
-ServiceFactory* ToFactory(
-        T& factory,
-        typename std::enable_if<std::is_class <T>::value, T>::type* = nullptr)
+std::shared_ptr<ServiceFactory> ToFactory(const std::shared_ptr<T>& factory)
 {
-    return static_cast<ServiceFactory*>(&factory);
+    return std::static_pointer_cast<ServiceFactory>(factory);
 }
 
-template<class T>
-ServiceFactory* ToFactory(
-        T factory,
-        typename std::enable_if<std::is_pointer<T>::value && std::is_class<typename std::remove_pointer<T>::type>::value>::type* = nullptr)
-{
-    return static_cast<ServiceFactory*>(factory);
-}
 ///@}
 
 }

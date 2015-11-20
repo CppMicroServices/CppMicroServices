@@ -83,7 +83,7 @@ public:
   }
 };
 
-void TestFindHook(Framework* framework)
+void TestFindHook(const std::shared_ptr<Framework>& framework)
 {
   InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
 
@@ -101,8 +101,7 @@ void TestFindHook(Framework* framework)
 
   US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) != nullptr, "Test for non-filtered GetBundle(long) result")
 
-  TestBundleFindHook findHook;
-  ServiceRegistration<BundleFindHook> findHookReg = framework->GetBundleContext()->RegisterService<BundleFindHook>(&findHook);
+  auto findHookReg = framework->GetBundleContext()->RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
 
   US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) == nullptr, "Test for filtered GetBundle(long) result")
 
@@ -120,7 +119,7 @@ void TestFindHook(Framework* framework)
   bundleA->Stop();
 }
 
-void TestEventHook(Framework* framework)
+void TestEventHook(const std::shared_ptr<Framework>& framework)
 {
   TestBundleListener bundleListener;
   framework->GetBundleContext()->AddBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
@@ -134,8 +133,7 @@ void TestEventHook(Framework* framework)
   bundleA->Stop();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 5, "Test for received unload bundle events")
 
-  TestBundleEventHook eventHook;
-  ServiceRegistration<BundleEventHook> eventHookReg = framework->GetBundleContext()->RegisterService<BundleEventHook>(&eventHook);
+  auto eventHookReg = framework->GetBundleContext()->RegisterService<BundleEventHook>(std::make_shared<TestBundleEventHook>());
 
   bundleListener.events.clear();
 
@@ -161,8 +159,8 @@ int usBundleHooksTest(int /*argc*/, char* /*argv*/[])
   auto framework = factory.NewFramework();
   framework->Start();
 
-  TestFindHook(framework.get());
-  TestEventHook(framework.get());
+  TestFindHook(framework);
+  TestEventHook(framework);
 
   US_TEST_END()
 }

@@ -15,50 +15,34 @@ struct MyTrackedClass {
 //! [customizer]
 struct MyTrackingCustomizer : public ServiceTrackerCustomizer<IFooService, MyTrackedClass>
 {
-  virtual MyTrackedClass AddingService(const ServiceReferenceType&)
+  virtual std::shared_ptr<MyTrackedClass> AddingService(const ServiceReference<IFooService>&)
   {
-    return MyTrackedClass();
+    return std::shared_ptr<MyTrackedClass>();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass&)
+  virtual void ModifiedService(const ServiceReference<IFooService>&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass&)
+  virtual void RemovedService(const ServiceReference<IFooService>&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 };
 //! [customizer]
 
-struct MyTrackingPointerCustomizer : public ServiceTrackerCustomizer<IFooService, MyTrackedClass*>
-{
-  virtual MyTrackedClass* AddingService(const ServiceReferenceType&)
-  {
-    return new MyTrackedClass();
-  }
-
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass*)
-  {
-  }
-
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass*)
-  {
-  }
-};
-
 // For compilation test purposes only
 struct MyTrackingCustomizerVoid : public ServiceTrackerCustomizer<void, MyTrackedClass>
 {
-  virtual MyTrackedClass AddingService(const ServiceReferenceType&)
+  virtual std::shared_ptr<MyTrackedClass> AddingService(const ServiceReferenceU&)
   {
-    return MyTrackedClass();
+    return std::shared_ptr<MyTrackedClass>();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass&)
+  virtual void ModifiedService(const ServiceReferenceU&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass&)
+  virtual void RemovedService(const ServiceReferenceU&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 };
@@ -72,19 +56,11 @@ ServiceTracker<IFooService, MyTrackedClass> tracker(GetBundleContext(), &myCusto
 //! [tracker]
   }
 
-  {
-//! [tracker2]
-MyTrackingPointerCustomizer myCustomizer;
-ServiceTracker<IFooService, MyTrackedClass*> tracker(GetBundleContext(), &myCustomizer);
-//! [tracker2]
-  }
-
   // For compilation test purposes only
   MyTrackingCustomizerVoid myCustomizer2;
   try
   {
     ServiceTracker<void, MyTrackedClass> tracker2(GetBundleContext(), &myCustomizer2);
-    ServiceTracker<void, MyTrackedClass*> tracker3(GetBundleContext());
   }
   catch (const us::ServiceException&)
   {}

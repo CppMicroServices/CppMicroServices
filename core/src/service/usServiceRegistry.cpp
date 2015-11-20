@@ -73,21 +73,21 @@ ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
 }
 
 ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
-                                                     const InterfaceMap& service,
+                                                     const InterfaceMapConstPtr& service,
                                                      const ServiceProperties& properties)
 {
-  if (service.empty())
+  if (!service || service->empty())
   {
     throw std::invalid_argument("Can't register empty InterfaceMap as a service");
   }
 
   // Check if we got a service factory
-  bool isFactory = service.count("org.cppmicroservices.factory") > 0;
-  bool isPrototypeFactory = (isFactory ? dynamic_cast<PrototypeServiceFactory*>(reinterpret_cast<ServiceFactory*>(service.find("org.cppmicroservices.factory")->second)) != nullptr : false);
+  bool isFactory = service->count("org.cppmicroservices.factory") > 0;
+  bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(std::static_pointer_cast<ServiceFactory>(service->find("org.cppmicroservices.factory")->second))) : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
-  for (auto i : service)
+  for (auto i : *service)
   {
     if (i.first.empty() || (!isFactory && i.second == nullptr))
     {
@@ -102,7 +102,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
     auto l = this->Lock(); US_UNUSED(l);
     services.insert(std::make_pair(res, classes));
     serviceRegistrations.push_back(res);
-    for (auto clazz : classes)
+    for (auto& clazz : classes)
     {
       std::vector<ServiceRegistrationBase>& s = classServices[clazz];
       std::vector<ServiceRegistrationBase>::iterator ip =
@@ -155,7 +155,7 @@ ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle, const std::stri
   {
     std::vector<ServiceReferenceBase> srs;
     Get_unlocked(clazz, "", bundle, srs);
-    US_DEBUG << "get service ref " << clazz << " for module "
+    US_DEBUG << "get service ref " << clazz << " for bundle "
              << bundle->info.name << " = " << srs.size() << " refs";
 
     if (!srs.empty())
@@ -191,7 +191,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
       if (ldap.GetMatchedObjectClasses(matched))
       {
         v.clear();
-        for(auto className : matched)
+        for(auto& className : matched)
         {
           auto i = classServices.find(className);
           if (i != classServices.end())
@@ -313,11 +313,12 @@ void ServiceRegistry::GetUsedByBundle(Bundle* p,
 {
   auto l = this->Lock(); US_UNUSED(l);
 
-  for (auto& sr : serviceRegistrations)
+  for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
+       i != serviceRegistrations.end(); ++i)
   {
-    if (sr.d->IsUsedByBundle(p))
+    if (i->d->IsUsedByBundle(p))
     {
-      res.push_back(sr);
+      res.push_back(*i);
     }
   }
 }

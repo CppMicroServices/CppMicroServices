@@ -52,7 +52,7 @@ ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate*
   if (d) ++d->ref;
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMap& service,
+ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
                                                  ServicePropertiesImpl&& props)
   : d(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
 {
@@ -189,17 +189,17 @@ void ServiceRegistrationBase::Unregister()
           unregisteringEvent);
   }
 
-  ServiceFactory* serviceFactory = nullptr;
+  std::shared_ptr<ServiceFactory> serviceFactory;
   ServiceRegistrationBasePrivate::BundleToServicesMap prototypeServiceInstances;
   ServiceRegistrationBasePrivate::BundleToServiceMap bundleServiceInstance;
 
   {
     auto l = d->Lock(); US_UNUSED(l);
     d->available = false;
-    InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
-    if (d->bundle && factoryIter != d->service.end())
+    InterfaceMap::const_iterator factoryIter = d->service->find("org.cppmicroservices.factory");
+    if (d->bundle && factoryIter != d->service->end())
     {
-      serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
+      serviceFactory = std::static_pointer_cast<ServiceFactory>(factoryIter->second);
     }
     if (serviceFactory)
     {
@@ -245,7 +245,7 @@ void ServiceRegistrationBase::Unregister()
 
     d->bundle = nullptr;
     d->dependents.clear();
-    d->service.clear();
+    d->service.reset();
     d->prototypeServiceInstances.clear();
     d->bundleServiceInstance.clear();
     // increment the reference count, since "d->reference" was used originally

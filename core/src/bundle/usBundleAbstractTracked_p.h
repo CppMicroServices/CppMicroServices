@@ -55,14 +55,13 @@ class BundleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>,WaitCo
 
 public:
 
-  typedef typename TTT::TrackedType TrackedType;
-  typedef typename TTT::TrackedArgType TrackedArgType;
-  typedef typename TTT::TrackedReturnType TrackedReturnType;
+  typedef typename TTT::TrackedType T;
+  typedef typename TTT::TrackedParmType TrackedParmType;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
 
-  typedef std::map<S,TrackedReturnType> TrackingMap;
+  typedef std::map<S,std::shared_ptr<TrackedParmType>> TrackingMap;
 
   /**
    * BundleAbstractTracked constructor.
@@ -141,7 +140,7 @@ public:
    *
    * @GuardedBy this
    */
-  TrackedReturnType GetCustomizedObject_unlocked(S item) const;
+  std::shared_ptr<TrackedParmType> GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.
@@ -191,7 +190,7 @@ public:
    * @return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
-  virtual TrackedReturnType CustomizerAdding(S item, const R& related) = 0;
+  virtual std::shared_ptr<TrackedParmType> CustomizerAdding(S item, const R& related) = 0;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -202,7 +201,7 @@ public:
    * @param object Customized object for the tracked item.
    */
   virtual void CustomizerModified(S item, const R& related,
-                                  TrackedArgType object) = 0;
+                                  const std::shared_ptr<TrackedParmType>& object) = 0;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -213,7 +212,7 @@ public:
    * @param object Customized object for the tracked item.
    */
   virtual void CustomizerRemoved(S item, const R& related,
-                                 TrackedArgType object) = 0;
+                                 const std::shared_ptr<TrackedParmType>& object) = 0;
 
   /**
    * List of items in the process of being added. This is used to deal with
@@ -282,7 +281,7 @@ private:
    */
   std::atomic<int> trackingCount;
 
-  bool CustomizerAddingFinal(S item, TrackedArgType custom);
+  bool CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParmType>& custom);
 
 };
 

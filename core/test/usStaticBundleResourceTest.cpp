@@ -56,13 +56,13 @@ struct ResourceComparator {
   }
 };
 
-void testResourceOperators(Bundle* bundle)
+void testResourceOperators(const std::shared_ptr<Bundle>& bundle)
 {
   std::vector<BundleResource> resources = bundle->FindResources("", "res.txt", false);
   US_TEST_CONDITION_REQUIRED(resources.size() == 1, "Check resource count")
 }
 
-void testResourcesWithStaticImport(Framework* framework, Bundle* bundle)
+void testResourcesWithStaticImport(const std::shared_ptr<Framework>& framework, const std::shared_ptr<Bundle>& bundle)
 {
   BundleResource resource = bundle->GetResource("res.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid res.txt resource")
@@ -131,11 +131,11 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   }
 
   auto bundle = framework->GetBundleContext()->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for existing bundle TestBundleB")
+  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleB")
   US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
 
-  testResourceOperators(bundle.get());
-  testResourcesWithStaticImport(framework.get(), bundle.get());
+  testResourceOperators(bundle);
+  testResourcesWithStaticImport(framework, bundle);
 
   BundleResource resource = framework->GetBundleContext()->GetBundle("TestBundleImportedByB")->GetResource("static.txt");
   bundle->Start();

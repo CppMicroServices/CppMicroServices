@@ -36,7 +36,7 @@ public:
   void Register1(BundleContext* context)
   {
 //! [1-2]
-MyService* myService = new MyService;
+std::shared_ptr<MyService> myService = std::make_shared<MyService>();
 context->RegisterService<InterfaceA>(myService);
 //! [1-2]
   }
@@ -44,7 +44,7 @@ context->RegisterService<InterfaceA>(myService);
   void Register2(BundleContext* context)
   {
 //! [2-2]
-MyService2* myService = new MyService2;
+std::shared_ptr<MyService2> myService = std::make_shared<MyService2>();
 context->RegisterService<InterfaceA, InterfaceB>(myService);
 //! [2-2]
   }
@@ -54,20 +54,19 @@ context->RegisterService<InterfaceA, InterfaceB>(myService);
 //! [f1]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMapConstPtr GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
-    MyService* myService = new MyService;
-    return MakeInterfaceMap<InterfaceA>(myService);
+    return MakeInterfaceMap<InterfaceA>(std::make_shared<MyService>());;
   }
 
   virtual void UngetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/,
-                            const InterfaceMap& service)
+                            const InterfaceMapConstPtr& /*service*/)
   {
-    delete ExtractInterface<InterfaceA>(service);
+    
   }
 };
 
-MyServiceFactory* myServiceFactory = new MyServiceFactory;
+std::shared_ptr<MyServiceFactory> myServiceFactory = std::make_shared<MyServiceFactory>();
 context->RegisterService<InterfaceA>(ToFactory(myServiceFactory));
 //! [f1]
   }
@@ -77,20 +76,19 @@ context->RegisterService<InterfaceA>(ToFactory(myServiceFactory));
 //! [f2]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMapConstPtr GetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
-    MyService2* myService = new MyService2;
-    return MakeInterfaceMap<InterfaceA,InterfaceB>(myService);
+    return MakeInterfaceMap<InterfaceA,InterfaceB>(std::make_shared<MyService2>());
   }
 
   virtual void UngetService(Bundle* /*bundle*/, const ServiceRegistrationBase& /*registration*/,
-                            const InterfaceMap& service)
+                            const InterfaceMapConstPtr& /*service*/)
   {
-    delete ExtractInterface<InterfaceA>(service);
+    
   }
 };
 
-MyServiceFactory* myServiceFactory = new MyServiceFactory;
+std::shared_ptr<MyServiceFactory> myServiceFactory = std::make_shared<MyServiceFactory>();
 context->RegisterService<InterfaceA,InterfaceB>(ToFactory(myServiceFactory));
 //! [f2]
 // In the RegisterService call above, we could remove the static_cast because local types

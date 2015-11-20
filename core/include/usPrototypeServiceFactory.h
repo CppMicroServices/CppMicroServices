@@ -76,9 +76,9 @@ struct PrototypeServiceFactory : public ServiceFactory
    *         the service was registered.
    *
    * @see ServiceObjects#GetService()
-   * @see InterfaceMap
+   * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMap GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMapConstPtr GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object created for a caller.
@@ -94,7 +94,7 @@ struct PrototypeServiceFactory : public ServiceFactory
    * @see ServiceObjects::UngetService()
    */
   virtual void UngetService(Bundle* bundle, const ServiceRegistrationBase& registration,
-                            const InterfaceMap& service) = 0;
+                            const InterfaceMapConstPtr& service) = 0;
 
 };
 

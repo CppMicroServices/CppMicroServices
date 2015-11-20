@@ -55,7 +55,7 @@ namespace
 #endif
     }
 
-    void TestSerial(Framework* f)
+    void TestSerial(const std::shared_ptr<Framework>& f)
     {
         // Installing such a small set of bundles doesn't yield significant
         // data about performance. Consider increasing the number of bundles
@@ -89,12 +89,12 @@ namespace
             bundle->Start();
             elapsedTimeInMilliSeconds += timer.ElapsedMilli();
         }
-
+        
         io_lock(), US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to start 12 bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
     }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-    void TestConcurrent(Framework* f)
+    void TestConcurrent(const std::shared_ptr<Framework>& f)
     {
         // This is by no means a "real world" example. At best it is a simulation to test
         // the performance of concurrent access to the bundle registry.
@@ -129,7 +129,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     framework->SetAutoLoadingEnabled(false);
 
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
-    TestSerial(framework.get());
+    TestSerial(framework);
 
     for (auto bundle : framework->GetBundleContext()->GetBundles())
     {
@@ -140,7 +140,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     }
 #ifdef US_ENABLE_THREADING_SUPPORT
     US_TEST_OUTPUT(<< "Testing concurrent installation of bundles");
-    TestConcurrent(framework.get());
+    TestConcurrent(framework);
 #endif
 
     framework->Stop();

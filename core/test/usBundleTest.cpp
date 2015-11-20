@@ -48,7 +48,7 @@ void frame01(BundleContext* mc)
   try
   {
     auto bundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
-    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle main")
+    US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle main")
 
     bundle->Start();
   }
@@ -116,7 +116,7 @@ void frame005a(BundleContext* mc)
 }
 
 // Get context id, location, persistent storage and status of the bundle
-void frame010a(Framework* framework, BundleContext* mc)
+void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* mc)
 {
   auto m = mc->GetBundle();
 
@@ -162,7 +162,7 @@ void frame018a(BundleContext* mc)
 
 // Start libA and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(Framework* framework, TestBundleListener& listener)
+void frame020a(const std::shared_ptr<Framework>& framework, TestBundleListener& listener)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -177,17 +177,8 @@ void frame020a(Framework* framework, TestBundleListener& listener)
   try
   {
     ServiceReferenceU sr1 = mc->GetServiceReference("us::TestBundleAService");
-    InterfaceMap o1 = mc->GetService(sr1);
-    US_TEST_CONDITION(!o1.empty(), "Test if service object found");
-
-    try
-    {
-      US_TEST_CONDITION(mc->UngetService(sr1), "Test if Service UnGet returns true");
-    }
-    catch (const std::logic_error le)
-    {
-      US_TEST_FAILED_MSG(<< "UnGetService exception: " << le.what())
-    }
+    InterfaceMapConstPtr o1 = mc->GetService(sr1);
+    US_TEST_CONDITION(o1 && !o1->empty(), "Test if service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
@@ -210,7 +201,7 @@ void frame020a(Framework* framework, TestBundleListener& listener)
 
 
 // Start libA and check that it exists and that the storage paths are correct
-void frame02b(Framework* framework)
+void frame02b(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
 
@@ -464,10 +455,10 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   }
 
   frame005a(mc->GetBundle("main")->GetBundleContext());
-  frame010a(framework.get(), mc);
+  frame010a(framework, mc);
   frame018a(mc);
 
-  frame020a(framework.get(), listener);
+  frame020a(framework, listener);
   frame030b(mc, listener);
 
   frame045a(mc);
@@ -485,7 +476,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   framework->Start();
 
   frame02a(framework->GetBundleContext());
-  frame02b(framework.get());
+  frame02b(framework);
 
   framework.reset();
 

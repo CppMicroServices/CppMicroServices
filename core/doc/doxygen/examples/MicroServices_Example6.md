@@ -105,8 +105,8 @@ when our new bundle registers its spell checker service:
 \verbatim
 CppMicroServices-build> bin/usCoreExamplesDriver
 > l frenchdictionary
-Ex1: Service of type IDictionaryService/1.0 registered.
-Ex1: Service of type ISpellCheckService/1.0 registered.
+Ex1: Service of type IDictionaryService registered.
+Ex1: Service of type ISpellCheckService registered.
 >
 \endverbatim
 

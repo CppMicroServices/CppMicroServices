@@ -31,7 +31,7 @@ namespace us {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
     BundlePrivate* bundle,
-    const InterfaceMap& service,
+    const InterfaceMapConstPtr& service,
     ServicePropertiesImpl&& props
     )
   : ref(0)
@@ -57,18 +57,18 @@ bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const
       (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());
 }
 
-InterfaceMap ServiceRegistrationBasePrivate::GetInterfaces() const
+InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
 {
   auto l = this->Lock(); US_UNUSED(l);
   return service;
 }
 
-void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
 {
   return this->Lock(), GetService_unlocked(interfaceId);
 }
 
-void* ServiceRegistrationBasePrivate::GetService_unlocked(const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(const std::string& interfaceId) const
 {
   return ExtractInterface(service, interfaceId);
 }

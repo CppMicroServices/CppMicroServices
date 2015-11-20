@@ -94,10 +94,10 @@ public:
     {
       // Register a service ten times with different properties
       InterfaceMap im;
-      im[std::string("org.cppmicroservices.c1.") + std::to_string(c)] = reinterpret_cast<void*>(1);
+      im[std::string("org.cppmicroservices.c1.") + std::to_string(c)] = std::make_shared<int>(1);
       ServiceProperties props;
       props["i"] = i;
-      auto reg = context->RegisterService(im, props);
+      auto reg = context->RegisterService(std::make_shared<const InterfaceMap>(im), props);
       regs.Lock(), regs.v.push_back(reg);
       count++;
       if (i % 5 == 0) regs.NotifyAll();
@@ -138,7 +138,7 @@ public:
 
   // -------------------- Service Tracker Customizer -------------------------
 
-  InterfaceMap AddingService(const ServiceReferenceType& reference)
+  InterfaceMapConstPtr AddingService(const ServiceReferenceU& reference)
   {
     if (reference.GetProperty("i") == 5)
     {
@@ -146,21 +146,21 @@ public:
       if (!additionalReg.v)
       {
         InterfaceMap im;
-        im[std::string("org.cppmicroservices.c1.additional")] = reinterpret_cast<void*>(2);
-        additionalReg.v = context->RegisterService(im);
+        im[std::string("org.cppmicroservices.c1.additional")] = std::make_shared<int>(2);
+        additionalReg.v = context->RegisterService(std::make_shared<const InterfaceMap>(im));
       }
-      return InterfaceMap();
+      return InterfaceMapConstPtr();
     }
     return context->GetService(reference);
   }
 
-  void ModifiedService(const ServiceReferenceType& reference, const InterfaceMap& /*service*/)
+  void ModifiedService(const ServiceReferenceU& reference, const InterfaceMapConstPtr& /*service*/)
   {
     if (reference.GetProperty("i") != 5) throw std::logic_error("modified end match: wrong property");
     context->GetService(reference);
   }
 
-  void RemovedService(const ServiceReferenceType& /*reference*/, const InterfaceMap& /*service*/)
+  void RemovedService(const ServiceReferenceU& /*reference*/, const InterfaceMapConstPtr& /*service*/)
   {
     auto l = additionalReg.Lock();
     if (additionalReg.v) additionalReg.v.Unregister();

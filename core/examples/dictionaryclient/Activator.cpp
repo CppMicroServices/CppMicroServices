@@ -86,7 +86,7 @@ public:
 
         // First, get a dictionary service and then check
         // if the word is correct.
-        IDictionaryService* dictionary = context->GetService<IDictionaryService>(refs.front());
+        std::shared_ptr<IDictionaryService> dictionary = context->GetService<IDictionaryService>(refs.front());
         if ( dictionary->CheckWord( word ) )
         {
           std::cout << "Correct." << std::endl;
@@ -95,9 +95,6 @@ public:
         {
           std::cout << "Incorrect." << std::endl;
         }
-
-        // Unget the dictionary service.
-        context->UngetService(refs.front());
       }
     }
     else

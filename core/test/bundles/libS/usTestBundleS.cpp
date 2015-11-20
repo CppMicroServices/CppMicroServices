@@ -38,7 +38,8 @@ class TestBundleS : public ServiceControlInterface,
                     public TestBundleSService0,
                     public TestBundleSService1,
                     public TestBundleSService2,
-                    public TestBundleSService3
+                    public TestBundleSService3,
+                    public std::enable_shared_from_this<TestBundleS>
 {
 
 public:
@@ -50,8 +51,6 @@ public:
     {
       servregs.push_back(ServiceRegistrationU());
     }
-    sreg = mc->RegisterService<TestBundleSService0>(this);
-    sciReg = mc->RegisterService<ServiceControlInterface>(this);
   }
 
   virtual const char* GetNameOfClass() const
@@ -69,8 +68,8 @@ public:
         {
           std::stringstream servicename;
           servicename << SERVICE << offset;
-          InterfaceMap ifm;
-          ifm.insert(std::make_pair(servicename.str(), static_cast<void*>(this)));
+          InterfaceMapPtr ifm = std::make_shared<InterfaceMap>();
+          ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
           ServiceProperties props;
           props.insert(std::make_pair(ServiceConstants::SERVICE_RANKING(), Any(ranking)));
           servregs[offset] = mc->RegisterService(ifm, props);
@@ -88,26 +87,12 @@ public:
     }
   }
 
-  void Unregister()
-  {
-    if (sreg)
-    {
-      sreg.Unregister();
-    }
-    if (sciReg)
-    {
-      sciReg.Unregister();
-    }
-  }
-
 private:
 
   static const std::string SERVICE; // = "us::TestBundleSService"
 
   BundleContext* mc;
   std::vector<ServiceRegistrationU> servregs;
-  ServiceRegistration<TestBundleSService0> sreg;
-  ServiceRegistration<ServiceControlInterface> sciReg;
 };
 
 const std::string TestBundleS::SERVICE = "us::TestBundleSService";
@@ -122,20 +107,28 @@ public:
 
   void Start(BundleContext* context)
   {
-    s.reset(new TestBundleS(context));
+    s = std::make_shared<TestBundleS>(context);
+    sreg = context->RegisterService<TestBundleSService0>(s);
+    sciReg = context->RegisterService<ServiceControlInterface>(s);
   }
 
   void Stop(BundleContext* /*context*/)
   {
-  #ifndef US_BUILD_SHARED_LIBS
-    s->Unregister();
-  #endif
+    if(sreg)
+    {
+      sreg.Unregister();
+    }
+    if(sciReg)
+    {
+      sciReg.Unregister();
+    }
   }
 
 private:
 
-  std::unique_ptr<TestBundleS> s;
-
+  std::shared_ptr<TestBundleS> s;
+  ServiceRegistration<TestBundleSService0> sreg;
+  ServiceRegistration<ServiceControlInterface> sciReg;
 };
 
 }

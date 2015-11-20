@@ -80,19 +80,19 @@ public:
     : m_context(context)
   {}
 
-  virtual MyInterfaceOne* AddingService(const ServiceReferenceType& reference)
+  virtual std::shared_ptr<MyInterfaceOne> AddingService(const ServiceReference<MyInterfaceOne>& reference)
   {
     US_TEST_CONDITION_REQUIRED(reference, "AddingService() valid reference")
     return m_context->GetService(reference);
   }
 
-  virtual void ModifiedService(const ServiceReferenceType& reference, MyInterfaceOne* service)
+  virtual void ModifiedService(const ServiceReference<MyInterfaceOne>& reference, const std::shared_ptr<MyInterfaceOne>& service)
   {
     US_TEST_CONDITION(reference, "ModifiedService() valid reference")
     US_TEST_CONDITION(service, "ModifiedService() valid service")
   }
 
-  virtual void RemovedService(const ServiceReferenceType& reference, MyInterfaceOne* service)
+  virtual void RemovedService(const ServiceReference<MyInterfaceOne>& reference, const std::shared_ptr<MyInterfaceOne>& service)
   {
     US_TEST_CONDITION(reference, "RemovedService() valid reference")
     US_TEST_CONDITION(service, "RemovedService() valid service")
@@ -114,11 +114,11 @@ void TestFilterString(us::BundleContext* context)
   struct MyServiceOne : public MyInterfaceOne {};
   struct MyServiceTwo : public MyInterfaceTwo {};
 
-  MyServiceOne serviceOne;
-  MyServiceTwo serviceTwo;
+  auto serviceOne = std::make_shared<MyServiceOne>();
+  auto serviceTwo = std::make_shared<MyServiceTwo>();
 
-  context->RegisterService<MyInterfaceOne>(&serviceOne);
-  context->RegisterService<MyInterfaceTwo>(&serviceTwo);
+  context->RegisterService<MyInterfaceOne>(serviceOne);
+  context->RegisterService<MyInterfaceTwo>(serviceTwo);
 
   US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
 }
@@ -140,8 +140,8 @@ void TestServiceTracker(us::BundleContext* context)
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
   US_TEST_CONDITION_REQUIRED(servCtrlRef, "Test if constrol service was registered");
 
-  ServiceControlInterface* serviceController = mc->GetService(servCtrlRef);
-  US_TEST_CONDITION_REQUIRED(serviceController != nullptr, "Test valid service controller");
+  auto serviceController = mc->GetService(servCtrlRef);
+  US_TEST_CONDITION_REQUIRED(serviceController, "Test valid service controller");
 
   std::unique_ptr<ServiceTracker<void> > st1(new ServiceTracker<void>(mc, servref));
 
@@ -219,29 +219,29 @@ void TestServiceTracker(us::BundleContext* context)
 
   // 14. Get the service of the highest ranked service reference
 
-  InterfaceMap o1 = st1->GetService(h1);
-  US_TEST_CONDITION_REQUIRED(!o1.empty(), "Check for non-null service");
+  auto o1 = st1->GetService(h1);
+  US_TEST_CONDITION_REQUIRED(o1.get() != nullptr && !o1->empty(), "Check for non-null service");
 
   // 14a Get the highest ranked service, directly this time
-  InterfaceMap o3 = st1->GetService();
-  US_TEST_CONDITION_REQUIRED(!o3.empty(), "Check for non-null service");
+  auto o3 = st1->GetService();
+  US_TEST_CONDITION_REQUIRED(o1.get() != nullptr && !o3->empty(), "Check for non-null service");
   US_TEST_CONDITION_REQUIRED(o1 == o3, "Check for equal service instances");
 
   // 15. Now release the tracking of that service and then try to get it
   //     from the servicetracker, which should yield a null object
   serviceController->ServiceControl(1, "unregister", 7);
-  InterfaceMap o2 = st1->GetService(h1);
-  US_TEST_CONDITION_REQUIRED(o2.empty(), "Checkt that service is null");
+  auto o2 = st1->GetService(h1);
+  US_TEST_CONDITION_REQUIRED(!o2 || !o2.get(), "Check that service is null");
 
   // 16. Get all service objects this tracker tracks, it should be 2
-  std::vector<InterfaceMap> ts1 = st1->GetServices();
+  auto ts1 = st1->GetServices();
   US_TEST_CONDITION_REQUIRED(ts1.size() == 2, "Check service count");
 
   // 17. Test the remove method.
   //     First register another service, then remove it being tracked
   serviceController->ServiceControl(1, "register", 7);
   h1 = st1->GetServiceReference();
-  std::vector<ServiceReferenceU> sa3 = st1->GetServiceReferences();
+  auto sa3 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa3.size() == 3, "Check service reference count");
   US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa3, ids.begin(), ids.begin()+3), "Check for expected interface id [0]");
 
@@ -255,8 +255,8 @@ void TestServiceTracker(us::BundleContext* context)
 
 
   // 20. Test the waitForService method
-  InterfaceMap o9 = st1->WaitForService(std::chrono::milliseconds(50));
-  US_TEST_CONDITION_REQUIRED(!o9.empty(), "Checking WaitForService method");
+  auto o9 = st1->WaitForService(std::chrono::milliseconds(50));
+  US_TEST_CONDITION_REQUIRED(o9 && !o9->empty(), "Checking WaitForService method");
 }
 
 int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])

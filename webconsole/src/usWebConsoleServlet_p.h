@@ -39,7 +39,7 @@ public:
 
   WebConsolePluginTracker();
 
-  void Open(ServletContext* servlet);
+  void Open(const std::shared_ptr<ServletContext>& servlet);
 
   AbstractWebConsolePlugin* GetPlugin(const std::string& label) const;
 
@@ -51,18 +51,18 @@ private:
 
   void Open();
 
-  HttpServlet* AddingService(const ServiceReferenceType& reference);
+  std::shared_ptr<HttpServlet> AddingService(const ServiceReference<HttpServlet>& reference);
 
   void AddPlugin(const std::string& label, AbstractWebConsolePlugin* plugin);
 
-  std::string GetProperty(const ServiceReferenceType& reference, const std::string& property) const;
+  std::string GetProperty(const ServiceReference<HttpServlet>& reference, const std::string& property) const;
 
   typedef std::map<std::string, AbstractWebConsolePlugin*> PluginMapType;
   PluginMapType m_Plugins;
   Any m_LabelMapAny;
   std::vector<Any>* m_Labels;
 
-  ServletContext* m_ServletContext;
+  std::shared_ptr<ServletContext> m_ServletContext;
 };
 
 class WebConsoleServlet : public HttpServlet

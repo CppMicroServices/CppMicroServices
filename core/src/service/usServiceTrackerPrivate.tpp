@@ -31,7 +31,7 @@
 namespace us {
 
 template<class S, class TTT>
-const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = true;
+const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = false;
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
@@ -39,7 +39,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
-    trackedService(), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
+    trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   std::stringstream ss;
@@ -68,7 +68,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
         trackReference(), trackedService(), cachedReference(),
-        cachedService(TTT::DefaultValue()), q_ptr(st)
+        cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   this->listenerFilter = std::string("(") + us::ServiceConstants::OBJECTCLASS() + "="
@@ -96,7 +96,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
         listenerFilter(filter.ToString()), trackReference(),
-        trackedService(), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
+        trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   if (context == nullptr)
@@ -149,7 +149,7 @@ template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::Modified()
 {
   cachedReference = nullptr; /* clear cached value */
-  TTT::Dispose(cachedService); /* clear cached value */
+  cachedService = nullptr; /* clear cached value */
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 

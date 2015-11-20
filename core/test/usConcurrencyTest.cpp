@@ -92,7 +92,7 @@ int usConcurrencyTest(int /*argc*/, char* /*argv*/[])
 
     tracker.WaitForService();
     auto im = tracker.GetService();
-    US_TEST_CONDITION_REQUIRED(ExtractInterface(im, "org.cppmicroservices.c1.additional") == reinterpret_cast<void*>(2), "Wait for service")
+    US_TEST_CONDITION_REQUIRED(*std::static_pointer_cast<int>(ExtractInterface(im, "org.cppmicroservices.c1.additional")) == 2, "Wait for service")
 
     bundle->Stop();
 

@@ -26,18 +26,16 @@ private:
 class SingletonTwoService
 {
 public:
-
-  static SingletonTwoService* GetInstance();
+  // Note: This is a helper method to migrate traditional singletons to
+  // services. Do not create this method in real world applications.
+  static std::shared_ptr<SingletonTwoService> GetInstance();
 
   int b;
-
-private:
-
-  friend class MyActivator;
-
+  
   SingletonTwoService();
   ~SingletonTwoService();
 
+private:
   // Disable copy constructor and assignment operator.
   SingletonTwoService(const SingletonTwoService&);
   SingletonTwoService& operator=(const SingletonTwoService&);

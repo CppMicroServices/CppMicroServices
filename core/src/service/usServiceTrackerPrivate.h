@@ -40,7 +40,7 @@ class ServiceTrackerPrivate : MultiThreaded<>
 public:
 
   typedef typename TTT::TrackedType T;
-  typedef typename TTT::TrackedReturnType TrackedReturnType;
+  typedef typename TTT::TrackedParmType TrackedParmType;
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         BundleContext* context,
@@ -146,7 +146,7 @@ public:
   /**
    * Cached service object for GetService.
    */
-  mutable TrackedReturnType cachedService;
+  mutable std::shared_ptr<TrackedParmType> cachedService;
 
 
 private:

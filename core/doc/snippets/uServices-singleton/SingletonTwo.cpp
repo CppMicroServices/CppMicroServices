@@ -25,7 +25,7 @@ SingletonTwo::~SingletonTwo()
   std::cout << "SingletonOne::a = " << SingletonOne::GetInstance().a << std::endl;
 }
 
-SingletonTwoService* SingletonTwoService::GetInstance()
+std::shared_ptr<SingletonTwoService> SingletonTwoService::GetInstance()
 {
   static ServiceReference<SingletonTwoService> serviceRef;
   static BundleContext* context = GetBundleContext();
@@ -49,7 +49,7 @@ SingletonTwoService* SingletonTwoService::GetInstance()
   else
   {
     // No SingletonTwoService instance was registered yet.
-    return 0;
+    return nullptr;
   }
 }
 

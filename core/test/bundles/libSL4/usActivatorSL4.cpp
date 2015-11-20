@@ -31,25 +31,30 @@
 
 namespace us {
 
-class ActivatorSL4 :
-  public BundleActivator, public FooService
+class FooServiceImpl : public FooService
 {
 
 public:
-
-  ~ActivatorSL4()
-  {
-
-  }
-
   void foo()
   {
     US_INFO << "TestBundleSL4: Doing foo";
   }
+};
+
+class ActivatorSL4 :
+public BundleActivator
+{
+  
+public:
+  
+  ~ActivatorSL4()
+  {
+    
+  }
 
   void Start(BundleContext* context)
   {
-    sr = context->RegisterService<FooService>(this);
+    sr = context->RegisterService<FooService>(std::make_shared<FooServiceImpl>());
     US_INFO << "TestBundleSL4: Registered " << sr;
   }
 

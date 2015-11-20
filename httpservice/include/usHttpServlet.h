@@ -34,7 +34,7 @@ class ServletConfig;
 
 struct HttpServletPrivate;
 
-class US_HttpService_EXPORT HttpServlet
+class US_HttpService_EXPORT HttpServlet : public std::enable_shared_from_this<HttpServlet>
 {
 public:
 
@@ -114,7 +114,7 @@ public:
 
   virtual void Service(HttpServletRequest& request, HttpServletResponse& response);
 
-  ServletContext* GetServletContext() const;
+  std::shared_ptr<ServletContext> GetServletContext() const;
 
   virtual ~HttpServlet();
 

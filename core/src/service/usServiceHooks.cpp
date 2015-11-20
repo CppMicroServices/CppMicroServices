@@ -44,9 +44,9 @@ ServiceHooks::~ServiceHooks()
   this->Close();
 }
 
-ServiceHooks::TrackedType ServiceHooks::AddingService(const ServiceReferenceType& reference)
+std::shared_ptr<ServiceListenerHook> ServiceHooks::AddingService(const ServiceReference<ServiceListenerHook>& reference)
 {
-  ServiceListenerHook* lh = GetBundleContext()->GetService(reference);
+  auto lh = GetBundleContext()->GetService(reference);
   try
   {
     lh->Added(coreCtx->listeners.GetListenerInfoCollection());
@@ -64,14 +64,14 @@ ServiceHooks::TrackedType ServiceHooks::AddingService(const ServiceReferenceType
   return lh;
 }
 
-void ServiceHooks::ModifiedService(const ServiceReferenceType& /*reference*/, TrackedType /*service*/)
+void ServiceHooks::ModifiedService(const ServiceReference<ServiceListenerHook>& /*reference*/, const std::shared_ptr<ServiceListenerHook>& /*service*/)
 {
   // noop
 }
 
-void ServiceHooks::RemovedService(const ServiceReferenceType& reference, TrackedType /*service*/)
+void ServiceHooks::RemovedService(const ServiceReference<ServiceListenerHook>& /*reference*/, const std::shared_ptr<ServiceListenerHook>& /*service*/)
 {
-  GetBundleContext()->UngetService(reference);
+  // noop
 }
 
 void ServiceHooks::Open()
@@ -115,8 +115,8 @@ void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string&
     for (auto fhrIter = srl.rbegin(), fhrEnd = srl.rend(); fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-      ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
-      if (fh != nullptr)
+      auto fh = std::static_pointer_cast<ServiceFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
+      if (fh)
       {
         try
         {
@@ -162,8 +162,8 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
     for(auto sriIter = eventListenerHooks.rbegin(), sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
-      ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
-      if(elh != nullptr)
+      auto elh = std::static_pointer_cast<ServiceEventListenerHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
+      if(elh)
       {
         try
         {
@@ -205,7 +205,7 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
     set.push_back(sle);
     for (auto srIter = srl.rbegin(), srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
-      ServiceListenerHook* lh = listenerHookTracker->GetService(*srIter);
+      auto lh = listenerHookTracker->GetService(*srIter);
       try
       {
         lh->Added(set);
@@ -253,7 +253,7 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
     std::sort(srl.begin(), srl.end());
     for (auto srIter = srl.rbegin(), srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
-      ServiceListenerHook* const lh = listenerHookTracker->GetService(*srIter);
+      auto lh = listenerHookTracker->GetService(*srIter);
       try
       {
         lh->Removed(lis);

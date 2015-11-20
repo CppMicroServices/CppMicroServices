@@ -39,7 +39,7 @@ using namespace us;
 
 namespace {
 
-void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
+void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
   assert(mc);
@@ -98,7 +98,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, Framework* framework)
   bundleAL->Stop();
 }
 
-void testCustomAutoLoadPath(Framework* framework)
+void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* mc = framework->GetBundleContext();
   assert(mc);
@@ -165,15 +165,15 @@ int usBundleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   framework->Start();
 
   framework->SetAutoLoadingEnabled(false);
-  testDefaultAutoLoadPath(false, framework.get());
+  testDefaultAutoLoadPath(false, framework);
 
   framework = factory.NewFramework();
   framework->Start();
 
   framework->SetAutoLoadingEnabled(true);
 
-  testDefaultAutoLoadPath(true, framework.get());
-  testCustomAutoLoadPath(framework.get());
+  testDefaultAutoLoadPath(true, framework);
+  testCustomAutoLoadPath(framework);
 
   US_TEST_END()
 }

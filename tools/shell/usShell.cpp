@@ -52,7 +52,7 @@ const option::Descriptor usage[] =
   {0,0,0,0,0,0}
  };
 
-static ShellService* g_ShellService = nullptr;
+static std::shared_ptr<ShellService> g_ShellService;
 
 void shellCompletion(const char* buf, linenoiseCompletions* lc)
 {
@@ -111,14 +111,14 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  ShellService* shellService = nullptr;
+  std::shared_ptr<ShellService> shellService;
   ServiceReference<ShellService> ref = context->GetServiceReference<ShellService>();
   if (ref)
   {
     shellService = context->GetService(ref);
   }
 
-  if (shellService == nullptr)
+  if (!shellService)
   {
     std::cerr << "Shell service not available" << std::endl;
     return EXIT_FAILURE;

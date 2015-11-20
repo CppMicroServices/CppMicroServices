@@ -48,6 +48,7 @@ ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
 
 ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 {
+  properties.Lock(), properties.Clear_unlocked();
 }
 
 bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const

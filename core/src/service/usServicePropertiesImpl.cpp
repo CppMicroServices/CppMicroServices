@@ -116,4 +116,10 @@ std::vector<std::string> ServicePropertiesImpl::Keys_unlocked() const
   return keys;
 }
 
+void ServicePropertiesImpl::Clear_unlocked()
+{
+  keys.clear();
+  values.clear();
+}
+
 }

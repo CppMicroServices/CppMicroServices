@@ -46,6 +46,8 @@ public:
 
   std::vector<std::string> Keys_unlocked() const;
 
+  void Clear_unlocked();
+
 private:
 
   std::vector<std::string> keys;

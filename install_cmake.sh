@@ -11,6 +11,8 @@ if [ ! -f "$HOME/cache/bin/ctest" ]; then
   tar -xzvf /tmp/cmake.tar.gz -C /tmp;
   mv /tmp/cmake-2.8.12.2-Linux-i386/* $HOME/cache/;
 else
+  echo "Using cached bin dir: $HOME/cache/bin";
   ls -la $HOME/cache/bin;
-  echo 'Using cached CMake installation.';
+  echo "Using cached CMake installation:";
+  cmake -version;
 fi

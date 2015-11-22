@@ -1,5 +1,10 @@
 sudo: false
 
+addons:
+  apt:
+    packages:
+    - valgrind
+
 cache:
   directories:
     - $HOME/cache
@@ -8,6 +13,7 @@ language: cpp
 compiler:
   - gcc
   - clang
+
 env:
   global:
   - PATH=$HOME/cache/bin/:$PATH

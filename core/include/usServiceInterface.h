@@ -33,6 +33,21 @@
 #include <tuple>
 #include <memory>
 
+/**
+ * \ingroup MicroServices
+ *
+ * Returns a unique id for a given type. By default, the
+ * demangled name of \c T is returned.
+ *
+ * This template method may be specialized directly or be
+ * using the macro #US_DECLARE_SERVICE_INTERFACE to return
+ * a custom id for each service interface.
+ *
+ * @tparam T The service interface type.
+ * @return A unique id for the service interface type T.
+ */
+template<class T> std::string us_service_interface_iid();
+
 namespace us {
 
 class ServiceFactory;
@@ -61,34 +76,6 @@ typedef std::shared_ptr<const InterfaceMap> InterfaceMapConstPtr;
 namespace detail
 {
   US_Core_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
-}
-/// \endcond
-
-/**
- * \ingroup MicroServices
- *
- * Returns a unique id for a given type. By default, the
- * demangled name of \c T is returned.
- *
- * This template method may be specialized directly or be
- * using the macro #US_DECLARE_SERVICE_INTERFACE to return
- * a custom id for each service interface.
- *
- * @tparam T The service interface type.
- * @return A unique id for the service interface type T.
- */
-template<class T> std::string us_service_interface_iid()
-{
-  return us::detail::GetDemangledName(typeid(T));
-}
-
-/// \cond
-template<> inline std::string us_service_interface_iid<void>() { return std::string(); }
-/// \endcond
-
-/// \cond
-namespace detail
-{
 
   template <class Interfaces, size_t size>
   struct InsertInterfaceHelper
@@ -144,6 +131,15 @@ namespace detail
 
 }
 
+/// \cond
+template<class T> std::string us_service_interface_iid()
+{
+  return us::detail::GetDemangledName(typeid(T));
+}
+
+template<> inline std::string us_service_interface_iid<void>() { return std::string(); }
+/// \endcond
+
 
 /**
  * \ingroup MicroServices
@@ -190,7 +186,7 @@ namespace detail
  * @param _service_interface_id A string literal representing a globally unique identifier.
  */
 #define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)             \
-  template<> inline std::string us::us_service_interface_iid<_service_interface_type>()          \
+  template<> inline std::string us_service_interface_iid<_service_interface_type>()          \
   { return _service_interface_id; }                                                              \
 
 
@@ -213,7 +209,7 @@ namespace us {
 template<class ...Interfaces>
 class MakeInterfaceMap
 {
-  
+
 public:
   /**
    * Constructor taking a service implementation pointer.
@@ -239,36 +235,36 @@ public:
       throw ServiceException("The service factory argument must not be NULL.");
     }
   }
-  
+
   operator InterfaceMapPtr ()
   {
     return getInterfaceMap();
   }
-  
+
   // overload for the const version of the map
   operator InterfaceMapConstPtr()
   {
     return InterfaceMapConstPtr(getInterfaceMap());
   }
-  
+
 private:
-  
+
   InterfaceMapPtr getInterfaceMap()
   {
     InterfaceMapPtr sim = std::make_shared<InterfaceMap>();
     detail::InsertInterfaceTypes(sim, m_interfaces);
-    
+
     if (m_factory)
     {
       sim->insert(std::make_pair(std::string("org.cppmicroservices.factory"),
                                  m_factory));
     }
-    
+
     return sim;
   }
 
   std::shared_ptr<ServiceFactory> m_factory;
-  
+
   typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
 };
 

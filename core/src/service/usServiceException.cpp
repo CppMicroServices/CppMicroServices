@@ -26,7 +26,7 @@
 
 namespace us {
 
-ServiceException::~ServiceException()
+ServiceException::~ServiceException() throw()
 {
 }
 

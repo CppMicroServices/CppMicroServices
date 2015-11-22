@@ -92,7 +92,7 @@ public:
   ServiceException(const ServiceException& o);
   ServiceException& operator=(const ServiceException& o);
 
-  ~ServiceException();
+  ~ServiceException() throw();
 
   /**
    * Returns the type for this exception or <code>UNSPECIFIED</code> if the

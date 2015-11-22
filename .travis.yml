@@ -28,9 +28,7 @@ branches:
 before_install:
   - bash install_cmake.sh
 
-before_script:
-  - export PATH=$PATH:$HOME/cache/bin/
-
 script:
+  - export PATH=$PATH:$HOME/cache/bin/
   - ctest -VV -S ./cmake/usCTestScript_travis.cmake
 

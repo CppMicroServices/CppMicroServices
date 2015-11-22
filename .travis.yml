@@ -1,3 +1,9 @@
+sudo: false
+
+cache:
+  directories:
+    - $HOME/cache
+
 language: cpp
 compiler:
   - gcc
@@ -13,15 +19,18 @@ env:
   - BUILD_CONFIGURATION=6
   - BUILD_CONFIGURATION=7
 
-install:
-  - wget -qO- https://cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz | tar xvz
-
 branches:
   only:
     - master
     - development
     - /^release-.*$/
 
+before_install:
+  - bash install_cmake.sh
+
+before_script:
+  - export PATH=$PATH:$HOME/cache/bin/
+
 script:
-  - ./cmake-2.8.12.2-Linux-i386/bin/ctest -VV -S ./cmake/usCTestScript_travis.cmake
+  - ctest -VV -S ./cmake/usCTestScript_travis.cmake
 

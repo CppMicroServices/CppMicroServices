@@ -9,6 +9,8 @@ compiler:
   - gcc
   - clang
 env:
+  global:
+  - PATH=$HOME/cache/bin/:$PATH
   matrix:
   - BUILD_CONFIGURATION=0
   - BUILD_CONFIGURATION=1
@@ -29,6 +31,5 @@ before_install:
   - bash install_cmake.sh
 
 script:
-  - export PATH=$PATH:$HOME/cache/bin/
   - ctest -VV -S ./cmake/usCTestScript_travis.cmake
 

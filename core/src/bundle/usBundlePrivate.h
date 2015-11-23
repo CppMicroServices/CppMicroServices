@@ -53,7 +53,7 @@ public:
   /**
    * Construct a new bundle based on a BundleInfo object.
    */
-  BundlePrivate(std::shared_ptr<Bundle> qq, CoreBundleContext* coreCtx, BundleInfo* info);
+  BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContext* coreCtx, BundleInfo* info);
 
   virtual ~BundlePrivate();
 
@@ -82,7 +82,7 @@ public:
   std::string baseStoragePath;
   std::string storagePath;
 
-  const std::shared_ptr<Bundle> q;
+  const std::weak_ptr<Bundle> q;
 
   /** 
    * Responsible for platform specific loading and unloading

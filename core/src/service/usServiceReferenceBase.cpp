@@ -102,7 +102,7 @@ std::shared_ptr<Bundle> ServiceReferenceBase::GetBundle() const
     return nullptr;
   }
 
-  return d->registration->bundle->q;
+  return d->registration->bundle->q.lock();
 }
 
 void ServiceReferenceBase::GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const

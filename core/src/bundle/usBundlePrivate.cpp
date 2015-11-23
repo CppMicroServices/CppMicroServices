@@ -40,7 +40,7 @@
 
 namespace us {
 
-BundlePrivate::BundlePrivate(std::shared_ptr<Bundle> qq, CoreBundleContext* coreCtx,
+BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContext* coreCtx,
                              BundleInfo* info)
   : coreCtx(coreCtx)
   , info(*info)
@@ -160,11 +160,11 @@ void BundlePrivate::RemoveBundleResources()
   }
 
   srs.clear();
-  coreCtx->services.GetUsedByBundle(q, srs);
+  coreCtx->services.GetUsedByBundle(q.lock(), srs);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin();
        i != srs.end(); ++i)
   {
-    i->GetReference(std::string()).d->UngetService(q, false);
+    i->GetReference(std::string()).d->UngetService(q.lock(), false);
   }
 }
 

@@ -76,7 +76,7 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
 }
 
 /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
- *        in ServiceObjectsBase::GetService & ServiceObjectsBase::GetServiceInterfaceMap 
+ *        in ServiceObjectsBase::GetService & ServiceObjectsBase::GetServiceInterfaceMap
  *        methods. The aliasing constructor helps automate the call to UngetService method.
  *
  *        Service consumers can simply call GetService to obtain a shared_ptr to the
@@ -86,9 +86,15 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
  */
 struct UngetHelper
 {
-  InterfaceMapConstPtr interfaceMap;
-  ServiceReferenceBase sref;
-  BundleContext* bc;
+  const InterfaceMapConstPtr interfaceMap;
+  const ServiceReferenceBase sref;
+  BundleContext* const bc;
+
+  UngetHelper(const InterfaceMapConstPtr& im, const ServiceReferenceBase& sr, BundleContext* bc)
+    : interfaceMap(im)
+    , sref(sr)
+    , bc(bc)
+  {}
   ~UngetHelper()
   {
     try
@@ -97,7 +103,7 @@ struct UngetHelper
       {
         bool isPrototypeScope = sref.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
         ServiceConstants::SCOPE_PROTOTYPE();
-        
+
         if (isPrototypeScope)
         {
           sref.d->UngetPrototypeService(bc->GetBundle(), interfaceMap);
@@ -122,7 +128,7 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
     return nullptr;
   }
 
-  std::shared_ptr<UngetHelper> h(new UngetHelper{ d->GetServiceInterfaceMap(), d->m_reference, d->m_context });
+  std::shared_ptr<UngetHelper> h(new UngetHelper(d->GetServiceInterfaceMap(), d->m_reference, d->m_context));
   return std::shared_ptr<void>(h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
 }
 

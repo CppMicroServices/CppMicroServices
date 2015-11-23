@@ -106,20 +106,27 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
 }
 
 /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
- *        in BundleContext::GetService method. The aliasing constructor helps automate 
+ *        in BundleContext::GetService method. The aliasing constructor helps automate
  *        the call to UngetService method.
  *
- *        Service consumers can simply call GetService to obtain a shared_ptr to the 
- *        service object and not worry about calling UngetService when they are done. 
- *        The UngetService is called when all instances of the returned shared_ptr object 
+ *        Service consumers can simply call GetService to obtain a shared_ptr to the
+ *        service object and not worry about calling UngetService when they are done.
+ *        The UngetService is called when all instances of the returned shared_ptr object
  *        go out of scope.
  */
 template <class S>
 struct ServiceHolder
 {
-  BundleContext* bc;
-  ServiceReferenceBase sref;
-  std::shared_ptr<S> service;
+  BundleContext* const bc;
+  const ServiceReferenceBase sref;
+  const std::shared_ptr<S> service;
+
+  ServiceHolder(BundleContext* bc, const ServiceReferenceBase& sr, const std::shared_ptr<S>& s)
+    : bc(bc)
+    , sref(sr)
+    , service(s)
+  {}
+
   ~ServiceHolder()
   {
     try
@@ -139,7 +146,7 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>{ this, reference, reference.d->GetService(d->bundle->q) });
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d->GetService(d->bundle->q)));
   return std::shared_ptr<void>(h, h->service.get());
 }
 
@@ -153,7 +160,7 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
   InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d->GetServiceInterfaceMap(d->bundle->q).get()));
-  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>{this, reference, imap_copy});
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(this, reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
@@ -213,14 +220,14 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 #else
     static const char separator = '/';
 #endif
-  
+
   std::string baseStoragePath;
   std::map<std::string, std::string>::iterator prop = d->bundle->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
   if(prop != d->bundle->coreCtx->frameworkProperties.end())
-  { 
+  {
     baseStoragePath = (*prop).second;
   }
-  
+
   if (baseStoragePath.empty()) return std::string();
   if (baseStoragePath != d->bundle->baseStoragePath)
   {

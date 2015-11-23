@@ -146,7 +146,7 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>{ this, reference, reference.d->GetService(d->bundle->q.lock()) });
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d->GetService(d->bundle->q.lock())));
   return std::shared_ptr<void>(h, h->service.get());
 }
 
@@ -160,7 +160,7 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
   InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d->GetServiceInterfaceMap(d->bundle->q.lock()).get()));
-  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>{this, reference, imap_copy});
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(this, reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 

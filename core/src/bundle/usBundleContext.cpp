@@ -146,7 +146,7 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>( this, reference, reference.d->GetService(d->bundle->q.lock()) ));
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d->GetService(d->bundle->q.lock())));
   return std::shared_ptr<void>(h, h->service.get());
 }
 

@@ -12,7 +12,7 @@ cache:
 language: cpp
 compiler:
   - gcc
-  - clang
+#  - clang
 
 env:
   global:

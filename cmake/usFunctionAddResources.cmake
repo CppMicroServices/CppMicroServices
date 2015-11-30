@@ -71,7 +71,7 @@ function(usFunctionAddResources)
   endif()
 
   if(US_RESOURCE_COMPRESSION_LEVEL)
-    set(cmd_line_args -${US_RESOURCE_COMPRESSION_LEVEL})
+    set(cmd_line_args -c ${US_RESOURCE_COMPRESSION_LEVEL})
   endif()
 
   set(resource_compiler ${US_RCC_EXECUTABLE})
@@ -115,10 +115,22 @@ function(usFunctionAddResources)
   endif()
 
   if(US_RESOURCE_FILES)
-    set(_file_args -a ${US_RESOURCE_FILES})
+    set(_file_args )
+    foreach(_file ${US_RESOURCE_FILES})
+      list(APPEND _file_args -r)
+      list(APPEND _file_args ${_file})
+    endforeach()
   endif()
   if(_zip_args)
-    set(_zip_args -m ${_zip_args})
+    set(_us_zip_args )
+    foreach(_file ${_zip_args})
+      list(APPEND _us_zip_args -m)
+      list(APPEND _us_zip_args ${_file})
+    endforeach()
+  endif()
+  
+  if(US_RESOURCE_BUNDLE_NAME)
+    set(_bundle_args -b ${US_RESOURCE_BUNDLE_NAME})
   endif()
 
   get_target_property(_counter ${US_RESOURCE_TARGET} _us_resource_counter)
@@ -133,7 +145,7 @@ function(usFunctionAddResources)
   add_custom_command(
     OUTPUT ${_res_zip}
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}"
-    COMMAND ${resource_compiler} ${cmd_line_args} ${_res_zip} ${US_RESOURCE_BUNDLE_NAME} ${_file_args} ${_zip_args}
+    COMMAND ${resource_compiler} ${cmd_line_args} -o ${_res_zip} ${_bundle_args} ${_file_args} ${_us_zip_args}
     WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
     DEPENDS ${_cmd_deps} ${resource_compiler}
     COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"

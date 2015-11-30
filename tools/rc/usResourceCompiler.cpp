@@ -26,6 +26,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <memory>
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+
+#include "optionparser.h"
 
 #define US_STR_(x) #x
 #define US_STR(x) US_STR_(x)
@@ -63,14 +69,6 @@ static void exit_printf(mz_zip_archive* writeArchive, const char* format, ...)
   exit(EXIT_FAILURE);
 }
 
-static void exit_perror(mz_zip_archive* writeArchive, const char* desc)
-{
-  cleanup_archive(writeArchive);
-  fprintf(stderr, "error: ");
-  perror(desc);
-  exit(EXIT_FAILURE);
-}
-
 // ---------------------------------------------------------------------------------
 // --------------------------    PLATFORM SPECIFIC CODE    -------------------------
 // ---------------------------------------------------------------------------------
@@ -92,7 +90,7 @@ static char* get_error_str()
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
 
-  FormatMessage(
+  FormatMessageA(
     FORMAT_MESSAGE_ALLOCATE_BUFFER |
     FORMAT_MESSAGE_FROM_SYSTEM |
     FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -102,7 +100,7 @@ static char* get_error_str()
     (LPTSTR) &lpMsgBuf,
     0, NULL );
 
-  return lpMsgBuf;
+  return reinterpret_cast<char*>(lpMsgBuf);
 }
 
 static void free_error_str(char* buf)
@@ -137,6 +135,17 @@ static FILE* us_fopen(const char* filename, const char* mode)
   return file;
 }
 
+std::string us_tempfile()
+{
+  char szTempFileName[MAX_PATH];
+  if (GetTempFileNameA(".", "ZIP", 1, szTempFileName) == 0)
+  {
+    char* err_str = get_error_str();
+    exit_printf(NULL, NULL, err_str);
+  }
+  return std::string(szTempFileName);
+}
+
 #define US_CWD(b, s) _getcwd(b, s)
 
 #define US_CLOSE _close
@@ -159,18 +168,25 @@ static char* get_error_str()
   return strerror(errno);
 }
 
-static void free_error_str(char* buf)
-{
-}
-
-static char* us_strcpy(char* dest, size_t dest_size, const char* src)
+static char* us_strcpy(char* dest, size_t /*dest_size*/, const char* src)
 {
   return strcpy(dest, src);
 }
 
-static char* us_strncpy(char* dest, size_t dest_size, const char* src, size_t count)
+static char* us_strncpy(char* dest, size_t /*dest_size*/, const char* src, size_t count)
 {
   return strncpy(dest, src, count);
+}
+
+std::string us_tempfile()
+{
+  char temppath[] = "./ZIP_XXXXXX";
+  if(mkstemp(temppath) == -1)
+  {
+    char* err_str = get_error_str();
+    exit_printf(NULL, NULL, err_str);
+  }
+  return std::string(temppath);
 }
 
 #define US_CLOSE close
@@ -184,19 +200,6 @@ static char* us_strncpy(char* dest, size_t dest_size, const char* src, size_t co
 
 #define US_SSCANF sscanf
 
-#endif
-
-// ---------------------------------------------------------------------------------
-// -----------------------------    DEBUGGING STUFF    -----------------------------
-// ---------------------------------------------------------------------------------
-
-//#define DEBUG_TRACE
-
-#ifdef DEBUG_TRACE
-#define dbg_print printf
-#else
-static int void_printf(const char* format, ...) { return 0; }
-#define dbg_print void_printf
 #endif
 
 // ---------------------------------------------------------------------------------
@@ -217,16 +220,17 @@ void* malloc_or_abort(size_t size)
   return p;
 }
 
+/*
 static int cmpzipindex(const void *i1, const void *i2)
 {
-  mz_uint index1 = *(const mz_uint*)i1;
-  mz_uint index2 = *(const mz_uint*)i2;
+  mz_uint index1 = *(reinterpret_cast<const mz_uint*>(i1));
+  mz_uint index2 = *(reinterpret_cast<const mz_uint*>(i2));
   return index1 == index2 ? 0 : (index1 < index2 ? -1 : 1);
 }
-
+*/
 static int cmpstringp(const void *p1, const void *p2)
 {
-  return US_STRCASECMP(* (char * const *) p1, * (char * const *) p2);
+  return US_STRCASECMP(reinterpret_cast<const char*>(p1), reinterpret_cast<const char*>(p2));
 }
 
 typedef struct us_archived_names_tag
@@ -275,19 +279,19 @@ static int us_archived_names_append(us_archived_names* archivedNames, const char
   if (archivedNames->size >= archivedNames->capacity)
   {
     size_t newCapacity = archivedNames->size > archivedNames->capacity + 100 ? archivedNames->size + 1 : archivedNames->capacity + 100;
-    archivedNames->names = realloc(archivedNames->names, newCapacity * sizeof(char*));
+    archivedNames->names = reinterpret_cast<char**>(realloc(archivedNames->names, newCapacity * sizeof(char*)));
     if (archivedNames->names == NULL)
     {
-      fprintf(stderr, "Could not realloc enough memory (%zd bytes)\n", newCapacity);
+      std::cerr << "Could not realloc enough memory " << newCapacity << std::endl;
       abort();
     }
     memset(archivedNames->names + archivedNames->capacity, 0, sizeof(char*) * (newCapacity - archivedNames->capacity));
-    archivedNames->capacity = (mz_uint)newCapacity;
+    archivedNames->capacity = static_cast<mz_uint>(newCapacity);
   }
 
   if (archivedNames->names[archivedNames->size] == NULL)
   {
-    archivedNames->names[archivedNames->size] = malloc_or_abort(MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE * sizeof(char));
+    archivedNames->names[archivedNames->size] = reinterpret_cast<char*>(malloc_or_abort(MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE * sizeof(char)));
   }
   US_STRCPY(archivedNames->names[archivedNames->size], MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE, archiveName);
   ++archivedNames->size;
@@ -325,11 +329,11 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
       //}
       if (us_archived_names_append(archived_dirs, dirName) == US_OK)
       {
-        dbg_print("-- found new dir entry %s\n", dirName);
+        std::clog << "-- found new dir entry " << dirName << std::endl;
         // The directory entry does not yet exist, so add it
         if (!mz_zip_writer_add_mem(pZip, dirName, NULL, 0, MZ_NO_COMPRESSION))
         {
-          dbg_print("-- zip add_mem error\n");
+          std::cerr << "-- zip add_mem error" << std::endl;
           return US_MZ_ERROR_ADD_FILE;
         }
         us_archived_names_sort(archived_dirs);
@@ -377,6 +381,60 @@ static int us_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archiv
   return us_zip_writer_add_dir_entries(pZip, archiveName, archived_dirs);
 }
 
+struct Custom_Arg : public option::Arg
+{
+  static void printError(const char* msg1, const option::Option& opt, const char* msg2)
+  {
+    std::cerr << "ERROR: " << msg1 << opt.name << msg2 << std::endl;
+  }
+  
+  static option::ArgStatus NonEmpty(const option::Option& option, bool msg)
+  {
+    if (option.arg != 0 && option.arg[0] != 0)
+      return option::ARG_OK;
+    
+    if (msg) printError("Option '", option, "' requires a non-empty argument\n");
+    return option::ARG_ILLEGAL;
+  }
+  
+  static option::ArgStatus Numeric(const option::Option& option, bool msg)
+  {
+    char* endptr = 0;
+    if (option.arg != 0 && strtol(option.arg, &endptr, 10)){};
+    if (endptr != option.arg && *endptr == 0)
+      return option::ARG_OK;
+    
+    if (msg) printError("Option '", option, "' requires a numeric argument\n");
+    return option::ARG_ILLEGAL;
+  }
+};
+
+#define US_PROG_NAME "usResourceCompiler"
+
+enum  OptionIndex { UNKNOWN, HELP, VERBOSE, BUNDLENAME, COMPRESSIONLEVEL, OUTFILE, RESFILE, MERGEZIP, APPENDBINARY };
+const option::Descriptor usage[] =
+{
+  {UNKNOWN,      0, "" , ""    , Custom_Arg::None, "\nUSAGE: " US_PROG_NAME " [options]\n\n"
+    "Options:" },
+  {HELP,         0, "h" , "help",Custom_Arg::None, " --help, -h  \tPrint usage and exit." },
+  {VERBOSE,         0, "v" , "verbose",Custom_Arg::None, " --verbose, -v  \tRun in verbose mode." },
+  {BUNDLENAME,    0, "b", "bundle-name", Custom_Arg::NonEmpty, " --bundle-name, -b \tThe bundle name as specified in the BUNDLE_NAME compile definition."},
+  {COMPRESSIONLEVEL,  0, "c", "compression-level", Custom_Arg::Numeric, " --compression-level, -c  \tCompression level used for zip . Value range is 0 to 9. Default value is 6." },
+  {OUTFILE, 0, "o", "out-file", Custom_Arg::NonEmpty, " --out-file, -o \tPath to output zip file. If the file exists it will be overwritten. If this option is not provided, a temporary zip fie will be created."},
+  {RESFILE, 0, "r", "res-file", Custom_Arg::NonEmpty, " --res-file, -r \tPath to a resource file, relative to the current working directory."},
+  {MERGEZIP, 0, "m", "merge-zip-file", Custom_Arg::NonEmpty, " --merge-zip-file, -m \tPath to a zip archive for merging into output zip file. "},
+  {APPENDBINARY, 0, "a", "append-binary", Custom_Arg::NonEmpty, " --append-binary, -a \tPath to the bundle binary. The resources zip file will be appended to this binary. "},
+  {UNKNOWN,      0, "" ,  ""   , Custom_Arg::None, "\nExamples:\n\nCreate a zip file with resources\n"
+    "  " US_PROG_NAME " --compression-level 9 --verbose --bundle-name mybundle --out-file Example.zip --res-file manifest.json --merge filetomerge.zip\n" },
+  {UNKNOWN,      0, "" ,  ""   , Custom_Arg::None, "\nAppend a bundle with resources\n"
+    "  " US_PROG_NAME " -v -b mybundle -a mybundle.dylib -r manifest.json -m archivetomerge.zip\n" },
+  {UNKNOWN,      0, "" ,  ""   , Custom_Arg::None, "\nAppend a bundle binary with existing zip file\n"
+    "  " US_PROG_NAME " -a mybundle.dll -m archivetoembed.zip\n" },
+  {0,0,0,0,0,0}
+};
+
+
+
 // ---------------------------------------------------------------------------------
 // -----------------------------    MAIN ENTRY POINT    ----------------------------
 // ---------------------------------------------------------------------------------
@@ -384,144 +442,95 @@ static int us_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archiv
 int main(int argc, char** argv)
 {
   int compressionLevel = 6;
-  int argIndex = 0;
-  int bPrintHelp = 0;
-  int bAppendMode = 0;
+  int errCode = US_OK, return_code = EXIT_SUCCESS;
+  std::string zipFile;
+  std::string bundleName;
+  std::string archiveName;
 
-  int errCode = US_OK;
-
-  int mergeFlag = 0;
-  const char* zipFile = NULL;
-  const char* bundleName = NULL;
-  size_t bundleNameLength = 0;
-
-  FILE* zipfileStream = NULL;
-  mz_zip_archive writeArchive;
-
-  us_archived_names archivedNames;
-  us_archived_names archivedDirs;
-
-  FILE* appendStream = NULL;
-
-  char archiveName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
-
-  int numZipArgs = 0;
-  int* zipArgIndices = NULL;
-
-  mz_zip_archive currFileArchive;
-
-  int zipArgIndex = 0;
-
-  char readBuffer[1024];
-  mz_uint numRead = 0;
-
-
-  // ---------------------------------------------------------------------------------
-  //      COMMAND LINE VALIDATION
-  // ---------------------------------------------------------------------------------
-
-  if (argc < 4)
+  argc -= (argc > 0);
+  argv += (argc > 0); // skip program name argv[0] if present
+  option::Stats stats(usage, argc, argv);
+  std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
+  std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
+  option::Parser parse(usage, argc, argv, options.get(), buffer.get());
+  
+  if (parse.error())
   {
-    bPrintHelp = 1;
-  }
-  else if (argv[1][0] == '-')
-  {
-    if (strlen(argv[1]) == 2)
-    {
-      if (US_SSCANF(argv[1], "-%1d", &compressionLevel) != 1)
-      {
-        bPrintHelp = 1;
-      }
-      else
-      {
-        argIndex = 1;
-        if (argc < 5 || compressionLevel < 0 || compressionLevel > 9) bPrintHelp = 1;
-      }
-    }
-    else if (strcmp(argv[1], "--append") == 0)
-    {
-      if (argc > 4)
-      {
-        bPrintHelp = 1;
-      }
-      bAppendMode = 1;
-    }
-    else
-    {
-      bPrintHelp = 1;
-    }
+    std::cerr << "Parsing command line arguments failed. " << std::endl;
+    return_code = EXIT_FAILURE;
   }
 
-  if (bPrintHelp)
+  if (parse.nonOptionsCount())
   {
-    printf("A resource compiler for C++ Micro Services bundles\n\n");
-    printf("Usage: usResourceCompiler [-#] zipfile bundlename [[-a] file...] [-m archive...]\n");
-    printf("Usage: usResourceCompiler --append outfile zipfile\n\n");
-    printf("Add entries to zipfile and merge archives.\n\n");
-    printf("  -# (-0, -1, -2, -3, -4, -5, -6, -7, -8, -9)\n");
-    printf("             The Zip compression level. The default compression level is -6.\n");
-    printf("  zipfile    The absolute path of the zip file.\n");
-    printf("  bundlename The bundle name as specified in the BUNDLE_NAME compile definition.\n");
-    printf("  file       Path to a resource file, relative to the current working directory.\n");
-    printf("  archive    Path to a zip archive for merging into zipfile.\n");
-    exit(EXIT_SUCCESS);
+	  std::clog << "The following options are ignored. " << std::endl;
+	  for (int i = 0; i < parse.nonOptionsCount(); ++i)
+	  {
+		  std::cout << "\t" << parse.nonOption(i) << std::endl;
+	  }
   }
-
-  if (bAppendMode)
+  
+  option::Option* appendbinaryopt = options[APPENDBINARY];
+  if (appendbinaryopt && appendbinaryopt->count() > 1 ) 
   {
-    // Special "append" mode. Just append zipfile to outfile as a binary blob.
-    // Open the bundle file for appending the temporary zip archive
-    dbg_print("Opening outfile '%s' as ab... ", argv[2]);
-    if (NULL == (appendStream = US_FOPEN(argv[2], "ab")))
-    {
-      dbg_print("failure\n");
-      exit_perror(NULL, "fopen");
-    }
-    else
-    {
-      dbg_print("success\n");
-    }
-
-    dbg_print("Opening zipfile '%s' as rb... ", argv[3]);
-    if (NULL == (zipfileStream = US_FOPEN(argv[3], "rb")))
-    {
-      dbg_print("failure\n");
-      exit_perror(NULL, "fopen");
-    }
-    else
-    {
-      dbg_print("success\n");
-    }
-
-    dbg_print("Appending zipfile to outfile\n");
-    do
-    {
-      numRead = US_READ(US_FILENO(zipfileStream), readBuffer, sizeof(readBuffer));
-      if (numRead == -1)
-      {
-        exit_perror(NULL, "read");
-      }
-      fwrite(readBuffer, numRead, 1, appendStream);
-      if (ferror(appendStream))
-      {
-        exit_printf(&writeArchive, "Appending zipfile failed\n");
-      }
-    } while (numRead != 0);
-
-    fclose(zipfileStream);
-    fclose(appendStream);
-    exit(EXIT_SUCCESS);
+    std::cerr << "(--append-binary | -a) appear multiple times in the arguments. Check usage." << std::endl;
+    return_code = EXIT_FAILURE;
   }
-
+  
+  option::Option* outfileopt = options[OUTFILE];
+  if (outfileopt && outfileopt->count() > 1 ) 
+  {
+    std::cerr << "(--out-file | -o) appear multiple times in the arguments. Check usage." << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+  
+  if (!appendbinaryopt && !outfileopt)
+  {
+    std::cerr << "Atleast one of the options (--apend-binary | --out-file) is required." << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+  
+  if (argc == 0 || options[HELP] || return_code == EXIT_FAILURE)
+  {
+    option::printUsage(std::clog, usage);
+    return return_code;
+  }
+  
+  if (options[BUNDLENAME])
+  {
+    bundleName = options[BUNDLENAME].arg;
+  }
+  
+  
+  if (!options[VERBOSE])
+  {
+    // if not in verbose mode, supress the clog stream
+    std::clog.setstate(std::ios_base::failbit);
+  }
+  
+  if (options[COMPRESSIONLEVEL])
+  {
+    char* endptr = 0;
+    compressionLevel = strtol(options[COMPRESSIONLEVEL].arg, &endptr, 10);
+  }
+  std::clog << "using compression level " << compressionLevel << std::endl;
+  
+  std::string outfile;
+  if (outfileopt)
+  {
+    outfile = outfileopt->arg;
+  }
+  else
+  {
+    outfile = us_tempfile();
+  }
 
   // ---------------------------------------------------------------------------------
   //      OPEN OR CREATE ZIP FILE
   // ---------------------------------------------------------------------------------
 
-  zipFile = argv[++argIndex];
-  bundleName = argv[++argIndex];
-  bundleNameLength = strlen(bundleName);
-
+  mz_zip_archive writeArchive;
+  us_archived_names archivedNames;
+  us_archived_names archivedDirs;
   memset(&writeArchive, 0, sizeof(writeArchive));
   memset(&archivedNames, 0, sizeof archivedNames);
   memset(&archivedDirs, 0, sizeof archivedDirs);
@@ -532,107 +541,74 @@ int main(int argc, char** argv)
   // ---------------------------------------------------------------------------------
 
   // Create a new zip archive which will be copied to zipfile later
-  dbg_print("Creating zip archive\n");
-  remove(zipFile);
+  std::clog << "Creating zip archive " << outfile.c_str() << std::endl;
+  remove(outfile.c_str());
 
-  if (!mz_zip_writer_init_file(&writeArchive, zipFile, 0))
+  if (!mz_zip_writer_init_file(&writeArchive, outfile.c_str(), 0))
   {
     exit_printf(&writeArchive, "Internal error, could not init new zip archive\n");
   }
-  dbg_print("Initialized zip archive\n");
+  std::clog << "Initialized zip archive" << std::endl;
 
-  // Add current files to the zip archive
-  zipArgIndices = malloc_or_abort(argc * sizeof *zipArgIndices);
-  while(++argIndex < argc)
+  // Add resource files to the zip archive
+  for (option::Option* opt = options[RESFILE]; opt; opt = opt->next())
   {
-    const char* fileName = argv[argIndex];
-    const size_t fileNameLength = strlen(fileName);
-
-    // determine the argument type
-    if (strcmp(argv[argIndex], "-a") == 0)
-    {
-      mergeFlag = 0;
-      continue;
+    if (!bundleName.size()) {
+      std::cerr << "No bundle name specified ... cannot add resource files to zip archive" << std::endl;
+      return EXIT_FAILURE;
     }
-    else if (strcmp(argv[argIndex], "-m") == 0)
-    {
-      mergeFlag = 1;
-      continue;
-    }
-
-    if (mergeFlag)
-    {
-      // check if the current file is a valid zip archive
-      memset(&currFileArchive, 0, sizeof(currFileArchive));
-      if (mz_zip_reader_init_file(&currFileArchive, fileName, 0))
-      {
-        dbg_print("Input is a valid zip archive: %s\n", fileName);
-        zipArgIndices[numZipArgs++] = argIndex;
-        mz_zip_reader_end(&currFileArchive);
-      }
-      // silently ignore files which are not zip archives
-      continue;
-    }
-
-    if (fileNameLength + 1 + bundleNameLength > MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE - 1)
-    {
-      exit_printf(&writeArchive, "Resource filename too long: %s\n", bundleName);
-    }
-    US_STRCPY(archiveName, sizeof archiveName, bundleName);
-    archiveName[bundleNameLength] = '/';
-    US_STRCPY(archiveName + bundleNameLength + 1, (sizeof archiveName) - (bundleNameLength + 1), fileName);
-
-    printf("  adding: %s\n", archiveName);
-
+    std::string resArchiveName = opt->arg;
+    resArchiveName.insert(0, "/");
+    resArchiveName.insert(0, bundleName);
+    
+    std::clog << "  adding: " << resArchiveName.c_str() << std::endl;
+    
     // add the current file to the new archive
-    if ((errCode = us_zip_writer_add_file(&writeArchive, archiveName, fileName, NULL, 0, compressionLevel,
-                                         &archivedNames, &archivedDirs)))
+    if ((errCode = us_zip_writer_add_file(&writeArchive, resArchiveName.c_str(), opt->arg, NULL, 0, compressionLevel,
+                                          &archivedNames, &archivedDirs)))
     {
-      dbg_print("Adding %s failed\n", archiveName);
-      exit_printf(&writeArchive, us_error_msg[errCode], archiveName, fileName);
+      std::clog << "Adding " << resArchiveName.c_str() << " failed" << std::endl;
+      exit_printf(&writeArchive, us_error_msg[errCode], resArchiveName.c_str(), opt->arg);
     }
   }
-
+  std::clog << "Finished adding resource files to zip archive" << std::endl;
   us_archived_names_sort(&archivedNames);
-
-  dbg_print("Added cmd line files to zip archive\n");
-
+  
   // ---------------------------------------------------------------------------------
   //      MERGE ZIPFILE ENTRIES (into temporary archive)
   // ---------------------------------------------------------------------------------
-
-  for (zipArgIndex = 0; zipArgIndex < numZipArgs; ++zipArgIndex)
+  for (option::Option* opt = options[MERGEZIP]; opt; opt = opt->next())
   {
     mz_zip_archive currZipArchive;
-    const char* currArchiveFileName = NULL;
     mz_uint currZipIndex = 0;
     mz_uint numZipIndices = 0;
-
     memset(&currZipArchive, 0, sizeof(mz_zip_archive));
-    currArchiveFileName = argv[zipArgIndices[zipArgIndex]];
-    if (!mz_zip_reader_init_file(&currZipArchive, currArchiveFileName, 0))
+    std::string currArchiveFileName = opt->arg;
+    std::clog << "Merging zip file " << currArchiveFileName.c_str() << std::endl;
+    if (!mz_zip_reader_init_file(&currZipArchive, currArchiveFileName.c_str(), 0))
     {
-      exit_printf(&writeArchive, "Could not initialize zip archive %s\n", currArchiveFileName);
+      exit_printf(&writeArchive, "Could not initialize zip archive %s\n", currArchiveFileName.c_str());
     }
-
+    char archiveName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
     numZipIndices = mz_zip_reader_get_num_files(&currZipArchive);
     for (currZipIndex = 0; currZipIndex < numZipIndices; ++currZipIndex)
     {
       errCode = us_zip_writer_add_from_zip_reader(&writeArchive, &currZipArchive, currZipIndex, &archivedNames,
                                                   &archivedDirs, archiveName, sizeof archiveName);
-      printf(" merging: %s (from %s)\n", archiveName, currArchiveFileName);
+      std::clog << " merging: " << archiveName << "(from " << currArchiveFileName.c_str() << ") "<< std::endl;
       if (errCode == US_ARCHIVED_NAMES_ERROR_DUPLICATE)
       {
-        printf(" warning: Merge failed: ");
-        printf(us_error_msg[errCode], archiveName, currArchiveFileName);
+        std::clog << " warning: Merge failed: " << std::endl;
+        printf(us_error_msg[errCode], archiveName, currArchiveFileName.c_str());
       }
       else if (errCode != US_OK)
       {
         mz_zip_reader_end(&currZipArchive);
-        exit_printf(&writeArchive, us_error_msg[errCode], archiveName, currArchiveFileName);
+        exit_printf(&writeArchive, us_error_msg[errCode], archiveName, currArchiveFileName.c_str());
       }
     }
-
+    std::clog << "Finished merging zip files" << std::endl;
+    
     mz_zip_reader_end(&currZipArchive);
     us_archived_names_sort(&archivedNames);
   }
@@ -643,22 +619,46 @@ int main(int argc, char** argv)
     exit_printf(&writeArchive, "Could not finalize zip archive\n");
   }
 
-  dbg_print("Finalized zip archive\n");
-
-
+  std::clog << "Finalized zip archive" << std::endl;
+  
   // ---------------------------------------------------------------------------------
   //      CLEANUP
   // ---------------------------------------------------------------------------------
 
-  free(zipArgIndices);
   us_archived_names_free(&archivedNames);
   us_archived_names_free(&archivedDirs);
 
   if (cleanup_archive(&writeArchive) == -1)
   {
-    fprintf(stderr, "Internal error finalizing zip archive\n");
+    std::cerr << "Internal error finalizing zip archive" << std::endl;
     return EXIT_FAILURE;
   }
+  
+  // ---------------------------------------------------------------------------------
+  //      APPEND ZIP to BINARY if append-binary is specified
+  // ---------------------------------------------------------------------------------
+  
+  if (appendbinaryopt)
+  {
+    std::string bundleBinaryFile(appendbinaryopt->arg);
+    std::ofstream outFileStream(bundleBinaryFile.c_str(), std::ios::ate | std::ios::binary | std::ios::app);
+    std::ifstream zipFileStream(outfile.c_str(), std::ios_base::binary);
+    std::clog << "Appending file " << bundleBinaryFile.c_str() << " with contents of resources zip file at " << outfile.c_str() << std::endl;
+    outFileStream.seekp(0, std::ios_base::end);
+    std::clog << "  Initial file size : " << outFileStream.tellp() << std::endl;
+    outFileStream << zipFileStream.rdbuf();
+    std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
+  }
+  
 
-  return EXIT_SUCCESS;
+  if (appendbinaryopt && !outfileopt)
+  {
+    if(std::remove(outfile.c_str()))
+      std::cerr << "Error removing temporary zip archive "  << outfile.c_str() << std:: endl;
+    else
+      std::clog << "Removed temporary zip archive " << outfile.c_str() << std:: endl;
+  }
+
+  return return_code;
 }
+

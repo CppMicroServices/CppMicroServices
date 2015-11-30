@@ -115,9 +115,16 @@ function(usFunctionEmbedResources)
     set(_zip_archive ${_res_zips})
   else()
     set(_zip_archive ${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}/res.zip)
+    if(_res_zips)
+      set(_zip_args )
+      foreach(_file ${_res_zips})
+        list(APPEND _zip_args -m)
+        list(APPEND _zip_args ${_file})
+      endforeach()
+    endif()
     add_custom_command(
       OUTPUT ${_zip_archive}
-      COMMAND ${resource_compiler} ${_zip_archive} dummy -m ${_res_zips}
+      COMMAND ${resource_compiler} -o ${_zip_archive} -b dummy ${_zip_args}
       DEPENDS ${_res_zips} ${resource_compiler}
       COMMENT "Creating resources zip file for ${US_RESOURCE_TARGET}"
       VERBATIM
@@ -184,7 +191,7 @@ function(usFunctionEmbedResources)
     add_custom_command(
       TARGET ${US_RESOURCE_TARGET}
       POST_BUILD
-      COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_BUNDLE_NAME} ${_zip_archive}
+      COMMAND ${resource_compiler} --append-binary $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_BUNDLE_NAME} -m ${_zip_archive}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM

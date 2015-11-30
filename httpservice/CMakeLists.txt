@@ -43,7 +43,6 @@ if(WIN32)
   list(APPEND compile_definitions WIN32)
 elseif(LINUX)
   list(APPEND compile_definitions LINUX)
-
 elseif(APPLE)
   list(APPEND compile_definitions DARWIN)
 endif()
@@ -55,8 +54,12 @@ set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
 set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
   APPEND PROPERTY COMPILE_DEFINITIONS_RELEASE NDEBUG)
 
-usFunctionCheckCompilerFlags(-pthread CMAKE_CXX_FLAGS)
-
+# Apple Clang complains that -pthread is unused. To silence this linker error,
+# don't add it when building for Mac.
+# Another option would be to use "-Wno-error=unused-command-line-argument" instead.
+if(NOT APPLE)
+  usFunctionCheckCompilerFlags(-pthread CMAKE_CXX_FLAGS)
+endif()
 
 usMacroCreateBundle(HttpService
   VERSION "0.99.0"

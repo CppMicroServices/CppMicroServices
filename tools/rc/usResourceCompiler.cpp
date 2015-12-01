@@ -220,14 +220,6 @@ void* malloc_or_abort(size_t size)
   return p;
 }
 
-/*
-static int cmpzipindex(const void *i1, const void *i2)
-{
-  mz_uint index1 = *(reinterpret_cast<const mz_uint*>(i1));
-  mz_uint index2 = *(reinterpret_cast<const mz_uint*>(i2));
-  return index1 == index2 ? 0 : (index1 < index2 ? -1 : 1);
-}
-*/
 static int cmpstringp(const void *p1, const void *p2)
 {
   return US_STRCASECMP(reinterpret_cast<const char*>(p1), reinterpret_cast<const char*>(p2));
@@ -432,8 +424,6 @@ const option::Descriptor usage[] =
     "  " US_PROG_NAME " -a mybundle.dll -m archivetoembed.zip\n" },
   {0,0,0,0,0,0}
 };
-
-
 
 // ---------------------------------------------------------------------------------
 // -----------------------------    MAIN ENTRY POINT    ----------------------------

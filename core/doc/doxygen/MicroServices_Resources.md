@@ -44,6 +44,10 @@ call for that shared bundle or executable.
 Here is a full example creating a bundle and embedding resource data:
 \include uServices-resources-cmake/CMakeLists_example.txt
 
+If you are not using CMake, you can run the resource compiler from the terminal.
+
+run <code>usResourceCompiler --help</code> for full list of options and usage
+
 Accessing Resources at Runtime
 ------------------------------
 

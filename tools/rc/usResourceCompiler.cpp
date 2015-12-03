@@ -461,12 +461,13 @@ int main(int argc, char** argv)
     bundleName = options[BUNDLENAME].arg;
   }
   
-  
+  /*
   if (!options[VERBOSE])
   {
     // if not in verbose mode, supress the clog stream
     std::clog.setstate(std::ios_base::failbit);
   }
+   */
   
   if (options[COMPRESSIONLEVEL])
   {
@@ -560,7 +561,7 @@ int main(int argc, char** argv)
     {
       errCode = us_zip_writer_add_from_zip_reader(&writeArchive, &currZipArchive, currZipIndex, &archivedNames,
                                                   &archivedDirs, archiveName, sizeof archiveName);
-      std::clog << " merging: " << archiveName << "(from " << currArchiveFileName << ") "<< std::endl;
+      std::clog << " merging: " << archiveName << " (from " << currArchiveFileName << ") "<< std::endl;
       if (errCode == US_ARCHIVED_NAMES_ERROR_DUPLICATE)
       {
         std::clog << " warning: Merge failed: " << std::endl;

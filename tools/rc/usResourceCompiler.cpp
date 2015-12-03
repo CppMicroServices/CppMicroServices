@@ -1,24 +1,24 @@
 /*=============================================================================
-
-  Library: CppMicroServices
-
-  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
-  file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-=============================================================================*/
+ 
+ Library: CppMicroServices
+ 
+ Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+ file at the top-level directory of this distribution and at
+ https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ 
+ =============================================================================*/
 
 #include "miniz.h"
 
@@ -88,18 +88,18 @@ static std::string get_error_str()
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
   std::string errMsg;
-  DWORD rc = FormatMessageA(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER |
-    FORMAT_MESSAGE_FROM_SYSTEM |
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    dw,
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-    (LPTSTR) &lpMsgBuf,
-    0, NULL );
+  DWORD rc = FormatMessageA((FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                            FORMAT_MESSAGE_FROM_SYSTEM |
+                            FORMAT_MESSAGE_IGNORE_INSERTS),
+                            NULL,
+                            dw,
+                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                            (LPTSTR) &lpMsgBuf,
+                            0,
+                            NULL );
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
   // it means that the size of the error message exceeds an internal
-  // buffer limit (128 kb according to MSDN) and lpMsgBuf will be 
+  // buffer limit (128 kb according to MSDN) and lpMsgBuf will be
   // uninitialized.
   // Inform the caller that the error message couldn't be retrieved.
   if (rc == 0)
@@ -237,7 +237,7 @@ static int us_archived_names_append(us_archived_names* archivedNames, const char
   {
     return US_ARCHIVED_NAMES_ERROR_DUPLICATE;
   }
-
+  
   if (archivedNames->size >= archivedNames->capacity)
   {
     size_t newCapacity = archivedNames->size > archivedNames->capacity + 100 ? archivedNames->size + 1 : archivedNames->capacity + 100;
@@ -250,14 +250,14 @@ static int us_archived_names_append(us_archived_names* archivedNames, const char
     memset(archivedNames->names + archivedNames->capacity, 0, sizeof(char*) * (newCapacity - archivedNames->capacity));
     archivedNames->capacity = static_cast<mz_uint>(newCapacity);
   }
-
+  
   if (archivedNames->names[archivedNames->size] == NULL)
   {
     archivedNames->names[archivedNames->size] = reinterpret_cast<char*>(malloc_or_abort(MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE * sizeof(char)));
   }
   US_STRNCPY(archivedNames->names[archivedNames->size], MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE, archiveName, strlen(archiveName));
   ++archivedNames->size;
-
+  
   return US_OK;
 }
 
@@ -278,7 +278,7 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
     fprintf(stderr, "Archive file name '%s' too long (%zd > %zd)", pArchive_name, length-1, sizeof dirName);
     exit(EXIT_FAILURE);
   }
-
+  
   // split the archive name into directory tokens
   for (end = 0; end < length; ++end)
   {
@@ -287,7 +287,7 @@ static int us_zip_writer_add_dir_entries(mz_zip_archive* pZip, const char* pArch
       US_STRNCPY(dirName, sizeof dirName, pArchive_name, end + 1);
       //if (end < length-1)
       //{
-        dirName[end+1] = '\0';
+      dirName[end+1] = '\0';
       //}
       if (us_archived_names_append(archived_dirs, dirName) == US_OK)
       {
@@ -313,7 +313,7 @@ static int us_zip_writer_add_file(mz_zip_archive *pZip, const char *pArchive_nam
 {
   int retCode = us_archived_names_append(archived_names, pArchive_name);
   if (US_OK != retCode) return retCode;
-
+  
   if (!mz_zip_writer_add_file(pZip, pArchive_name, pSrc_filename, pComment,
                               comment_size, level_and_flags))
   {
@@ -328,13 +328,13 @@ static int us_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archiv
                                              char* archiveName, mz_uint archiveNameSize)
 {
   int retCode = 0;
-
+  
   mz_uint numBytes = mz_zip_reader_get_filename(pSource_zip, file_index, archiveName, archiveNameSize);
   if (numBytes > 1 && archiveName[numBytes-2] != '/')
   {
     retCode = us_archived_names_append(archived_names, archiveName);
     if (US_OK != retCode) return retCode;
-
+    
     if (!mz_zip_writer_add_from_zip_reader(pZip, pSource_zip, file_index))
     {
       return US_MZ_ERROR_ADD_FILE;
@@ -406,7 +406,7 @@ int main(int argc, char** argv)
   std::string zipFile;
   std::string bundleName;
   std::string archiveName;
-
+  
   argc -= (argc > 0);
   argv += (argc > 0); // skip program name argv[0]
   option::Stats stats(usage, argc, argv);
@@ -419,26 +419,26 @@ int main(int argc, char** argv)
     std::cerr << "Parsing command line arguments failed. " << std::endl;
     return_code = EXIT_FAILURE;
   }
-
+  
   if (parse.nonOptionsCount())
   {
-	  std::clog << "unrecognized options ..." << std::endl;
-	  for (int i = 0; i < parse.nonOptionsCount(); ++i)
-	  {
-		  std::cout << "\t" << parse.nonOption(i) << std::endl;
-	  }
-	  return_code = EXIT_FAILURE;
+    std::clog << "unrecognized options ..." << std::endl;
+    for (int i = 0; i < parse.nonOptionsCount(); ++i)
+    {
+      std::cout << "\t" << parse.nonOption(i) << std::endl;
+    }
+    return_code = EXIT_FAILURE;
   }
   
   option::Option* appendbinaryopt = options[APPENDBINARY];
-  if (appendbinaryopt && appendbinaryopt->count() > 1 ) 
+  if (appendbinaryopt && appendbinaryopt->count() > 1 )
   {
     std::cerr << "(--append-binary | -a) appear multiple times in the arguments. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
   
   option::Option* outfileopt = options[OUTFILE];
-  if (outfileopt && outfileopt->count() > 1 ) 
+  if (outfileopt && outfileopt->count() > 1 )
   {
     std::cerr << "(--out-file | -o) appear multiple times in the arguments. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
@@ -484,41 +484,41 @@ int main(int argc, char** argv)
   {
     outfile = us_tempfile();
   }
-
+  
   // ---------------------------------------------------------------------------------
   //      OPEN OR CREATE ZIP FILE
   // ---------------------------------------------------------------------------------
-
+  
   mz_zip_archive writeArchive;
   us_archived_names archivedNames;
   us_archived_names archivedDirs;
   memset(&writeArchive, 0, sizeof(writeArchive));
   memset(&archivedNames, 0, sizeof archivedNames);
   memset(&archivedDirs, 0, sizeof archivedDirs);
-
-
+  
+  
   // ---------------------------------------------------------------------------------
   //      ZIP ARCHIVE WRITING (temporary archive)
   // ---------------------------------------------------------------------------------
-
+  
   // Create a new zip archive which will be copied to zipfile later
   std::clog << "Creating zip archive " << outfile << std::endl;
   // clear the contents of a outfile if it exists
   std::ofstream ofile(outfile, std::ofstream::trunc);
   ofile.close();
-
+  
   if (!mz_zip_writer_init_file(&writeArchive, outfile.c_str(), 0))
   {
     exit_printf(&writeArchive, "Internal error, could not init new zip archive\n");
   }
   std::clog << "Initialized zip archive" << std::endl;
-
+  
   // check if resources can be added
   option::Option* resopt = options[RESFILE];
   if (resopt && !bundleName.size())
   {
-	  std::cerr << "No bundle name specified ... cannot add resource files to zip archive" << std::endl;
-	  return EXIT_FAILURE;
+    std::cerr << "No bundle name specified ... cannot add resource files to zip archive" << std::endl;
+    return EXIT_FAILURE;
   }
   // Add resource files to the zip archive
   for (; resopt; resopt = resopt->next())
@@ -577,22 +577,22 @@ int main(int argc, char** argv)
     mz_zip_reader_end(&currZipArchive);
     us_archived_names_sort(&archivedNames);
   }
-
+  
   // We are finished, finalize the zip archive
   if (!mz_zip_writer_finalize_archive(&writeArchive))
   {
     exit_printf(&writeArchive, "Could not finalize zip archive\n");
   }
-
+  
   std::clog << "Finalized zip archive" << std::endl;
   
   // ---------------------------------------------------------------------------------
   //      CLEANUP
   // ---------------------------------------------------------------------------------
-
+  
   us_archived_names_free(&archivedNames);
   us_archived_names_free(&archivedDirs);
-
+  
   if (cleanup_archive(&writeArchive) == -1)
   {
     std::cerr << "Internal error finalizing zip archive" << std::endl;
@@ -615,7 +615,7 @@ int main(int argc, char** argv)
     std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
   }
   
-
+  
   if (appendbinaryopt && !outfileopt)
   {
     if(std::remove(outfile.c_str()))
@@ -623,7 +623,7 @@ int main(int argc, char** argv)
     else
       std::clog << "Removed temporary zip archive " << outfile << std:: endl;
   }
-
+  
   return return_code;
 }
 

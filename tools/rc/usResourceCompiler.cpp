@@ -461,13 +461,13 @@ int main(int argc, char** argv)
     bundleName = options[BUNDLENAME].arg;
   }
   
-  /*
+  
   if (!options[VERBOSE])
   {
     // if not in verbose mode, supress the clog stream
     std::clog.setstate(std::ios_base::failbit);
   }
-   */
+  
   
   if (options[COMPRESSIONLEVEL])
   {

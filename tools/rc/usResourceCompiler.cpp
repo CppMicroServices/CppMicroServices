@@ -380,7 +380,7 @@ const option::Descriptor usage[] =
     "Options:" },
   {HELP,         0, "h" , "help",Custom_Arg::None, " --help, -h  \tPrint usage and exit." },
   {VERBOSE,         0, "v" , "verbose",Custom_Arg::None, " --verbose, -v  \tRun in verbose mode." },
-  {BUNDLENAME,    0, "b", "bundle-name", Custom_Arg::NonEmpty, " --bundle-name, -b \tThe bundle name as specified in the BUNDLE_NAME compile definition."},
+  {BUNDLENAME,    0, "b", "bundle-name", Custom_Arg::NonEmpty, " --bundle-name, -b \tThe bundle name as specified in the US_BUNDLE_NAME compile definition."},
   {COMPRESSIONLEVEL,  0, "c", "compression-level", Custom_Arg::Numeric, " --compression-level, -c  \tCompression level used for zip . Value range is 0 to 9. Default value is 6." },
   {OUTFILE, 0, "o", "out-file", Custom_Arg::NonEmpty, " --out-file, -o \tPath to output zip file. If the file exists it will be overwritten. If this option is not provided, a temporary zip fie will be created."},
   {RESFILE, 0, "r", "res-file", Custom_Arg::NonEmpty, " --res-file, -r \tPath to a resource file, relative to the current working directory."},
@@ -446,7 +446,7 @@ int main(int argc, char** argv)
   
   if (!appendbinaryopt && !outfileopt)
   {
-    std::cerr << "At least one of the options (--apend-binary | --out-file) is required." << std::endl;
+    std::cerr << "At least one of the options (--append-binary | --out-file) is required." << std::endl;
     return_code = EXIT_FAILURE;
   }
   

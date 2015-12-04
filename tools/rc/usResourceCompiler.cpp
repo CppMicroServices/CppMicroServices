@@ -461,13 +461,11 @@ int main(int argc, char** argv)
     bundleName = options[BUNDLENAME].arg;
   }
   
-  
   if (!options[VERBOSE])
   {
     // if not in verbose mode, supress the clog stream
     std::clog.setstate(std::ios_base::failbit);
   }
-  
   
   if (options[COMPRESSIONLEVEL])
   {
@@ -624,7 +622,12 @@ int main(int argc, char** argv)
     else
       std::clog << "Removed temporary zip archive " << outfile << std:: endl;
   }
-  std::clog.clear();
+  
+  // clear the failbit set by us
+  if (!options[VERBOSE])
+  {
+    std::clog.clear();
+  }
   
   return return_code;
 }

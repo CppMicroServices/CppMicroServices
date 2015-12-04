@@ -624,6 +624,7 @@ int main(int argc, char** argv)
     else
       std::clog << "Removed temporary zip archive " << outfile << std:: endl;
   }
+  std::clog.clear();
   
   return return_code;
 }

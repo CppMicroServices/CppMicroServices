@@ -82,14 +82,14 @@ public:
    * Add a new service listener. If an old one exists, and it has the
    * same owning bundle, the old listener is removed first.
    *
-   * @param mc The bundle context adding this listener.
+   * @param context The bundle context adding this listener.
    * @param listener The service listener to add.
    * @param data Additional data to distinguish ServiceListener objects.
    * @param filter An LDAP filter string to check when a service is modified.
    * @exception org.osgi.framework.InvalidSyntaxException
    * If the filter is not a correct LDAP expression.
    */
-  void AddServiceListener(BundleContext* mc, const ServiceListener& listener,
+  void AddServiceListener(BundleContext* context, const ServiceListener& listener,
                           void* data, const std::string& filter);
 
   /**
@@ -97,47 +97,47 @@ public:
    * if listener doesn't exist. If listener is registered more than
    * once remove all instances.
    *
-   * @param mc The bundle context who wants to remove listener.
+   * @param context The bundle context who wants to remove listener.
    * @param listener Object to remove.
    * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(BundleContext* mc, const ServiceListener& listener,
+  void RemoveServiceListener(BundleContext* context, const ServiceListener& listener,
                              void* data);
 
   /**
    * Add a new bundle listener.
    *
-   * @param mc The bundle context adding this listener.
+   * @param context The bundle context adding this listener.
    * @param listener The bundle listener to add.
    * @param data Additional data to distinguish BundleListener objects.
    */
-  void AddBundleListener(BundleContext* mc, const BundleListener& listener, void* data);
+  void AddBundleListener(BundleContext* context, const BundleListener& listener, void* data);
 
   /**
    * Remove bundle listener from current framework. Silently ignore
    * if listener doesn't exist.
    *
-   * @param mc The bundle context who wants to remove listener.
+   * @param context The bundle context who wants to remove listener.
    * @param listener Object to remove.
    * @param data Additional data to distinguish BundleListener objects.
    */
-  void RemoveBundleListener(BundleContext* mc, const BundleListener& listener, void* data);
+  void RemoveBundleListener(BundleContext* context, const BundleListener& listener, void* data);
 
   void BundleChanged(const BundleEvent& evt);
 
   /**
    * Remove all listener registered by a bundle in the current framework.
    *
-   * @param mc Bundle context which listeners we want to remove.
+   * @param context Bundle context which listeners we want to remove.
    */
-  void RemoveAllListeners(BundleContext* mc);
+  void RemoveAllListeners(BundleContext* context);
 
   /**
    * Notify hooks that a bundle is about to be stopped
    *
-   * @param mc Bundle context which listeners are about to be removed.
+   * @param context Bundle context which listeners are about to be removed.
    */
-  void HooksBundleStopped(BundleContext* mc);
+  void HooksBundleStopped(BundleContext* context);
 
   /**
    * Receive notification that a service has had a change occur in its lifecycle.

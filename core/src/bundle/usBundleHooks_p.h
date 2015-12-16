@@ -45,9 +45,9 @@ public:
 
   BundleHooks(CoreBundleContext* ctx);
 
-  Bundle* FilterBundle(const BundleContext* mc, Bundle* bundle) const;
+  Bundle* FilterBundle(const BundleContext* context, Bundle* bundle) const;
 
-  void FilterBundles(const BundleContext* mc, std::vector<Bundle*>& bundles) const;
+  void FilterBundles(const BundleContext* context, std::vector<Bundle*>& bundles) const;
 
   void FilterBundleEventReceivers(const BundleEvent& evt,
                                   ServiceListeners::BundleListenerMap& bundleListeners);

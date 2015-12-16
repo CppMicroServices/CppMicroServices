@@ -47,9 +47,9 @@ public:
   ServiceListenerEntryData(const ServiceListenerEntryData&) = delete;
   ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
 
-  ServiceListenerEntryData(BundleContext* mc, const ServiceListener& l,
+  ServiceListenerEntryData(BundleContext* context, const ServiceListener& l,
                            void* data, const std::string& filter)
-    : ServiceListenerHook::ListenerInfoData(mc, l, data, filter)
+    : ServiceListenerHook::ListenerInfoData(context, l, data, filter)
     , ldap()
     , hashValue(0)
   {
@@ -116,9 +116,9 @@ void ServiceListenerEntry::SetRemoved(bool removed) const
   d->bRemoved = removed;
 }
 
-ServiceListenerEntry::ServiceListenerEntry(BundleContext* mc, const ServiceListener& l,
+ServiceListenerEntry::ServiceListenerEntry(BundleContext* context, const ServiceListener& l,
                                            void* data, const std::string& filter)
-  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(mc, l, data, filter))
+  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, filter))
 {
 }
 
@@ -139,7 +139,7 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->mc == NULL || other.d->mc == NULL) || d->mc == other.d->mc) &&
+  return ((d->context == NULL || other.d->context == NULL) || d->context == other.d->context) &&
       (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
 }
 
@@ -150,7 +150,7 @@ std::size_t ServiceListenerEntry::Hash() const
   if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0)
   {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
-        ((hash<BundleContext*>()(d->mc) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
+        ((hash<BundleContext*>()(d->context) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
         (hash<ServiceListener>()(d->listener) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;

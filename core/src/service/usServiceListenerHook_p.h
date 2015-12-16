@@ -32,12 +32,12 @@ namespace us {
 class ServiceListenerHook::ListenerInfoData : public SharedData
 {
 public:
-  ListenerInfoData(BundleContext* mc, const ServiceListener& l,
+  ListenerInfoData(BundleContext* context, const ServiceListener& l,
                    void* data, const std::string& filter);
 
   virtual ~ListenerInfoData();
 
-  BundleContext* const mc;
+  BundleContext* const context;
   ServiceListener listener;
   void* data;
   std::string filter;

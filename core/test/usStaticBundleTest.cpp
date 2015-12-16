@@ -40,19 +40,19 @@ namespace {
 
 // Install and start libTestBundleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(BundleContext* mc, TestBundleListener& listener)
+void frame020a(BundleContext* context, TestBundleListener& listener)
 {
-  InstallTestBundle(mc, "TestBundleB");
+  InstallTestBundle(context, "TestBundleB");
 
-  Bundle* bundleB = mc->GetBundle("TestBundleB");
+  Bundle* bundleB = context->GetBundle("TestBundleB");
   US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for existing bundle TestBundleB")
 
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    Bundle* bundle = mc->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
+    Bundle* bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
 #else
-    Bundle* bundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
+    Bundle* bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
 #endif
     US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle TestBundleImportedByB")
   }
@@ -61,7 +61,7 @@ void frame020a(BundleContext* mc, TestBundleListener& listener)
     US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frame020a:FAIL")
   }
 
-  Bundle* bundleImportedByB = mc->GetBundle("TestBundleImportedByB");
+  Bundle* bundleImportedByB = context->GetBundle("TestBundleImportedByB");
   US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for existing bundle TestBundleImportedByB")
 
   US_TEST_CONDITION(bundleB->GetName() == "TestBundleB", "Test bundle name")
@@ -72,13 +72,13 @@ void frame020a(BundleContext* mc, TestBundleListener& listener)
   // Check if libB registered the expected service
   try
   {
-    std::vector<ServiceReferenceU> refs = mc->GetServiceReferences("us::TestBundleBService");
+    std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestBundleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
-    InterfaceMapConstPtr o1 = mc->GetService(refs.front());
+    InterfaceMapConstPtr o1 = context->GetService(refs.front());
     US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
 
-    InterfaceMapConstPtr o2 = mc->GetService(refs.back());
+    InterfaceMapConstPtr o2 = context->GetService(refs.back());
     US_TEST_CONDITION(o1 && !o2->empty(), "Test if second service object found");
 
     // check the listeners for events
@@ -107,16 +107,16 @@ void frame020a(BundleContext* mc, TestBundleListener& listener)
 
 
 // Stop libB and check for correct events
-void frame030b(BundleContext* mc, TestBundleListener& listener)
+void frame030b(BundleContext* context, TestBundleListener& listener)
 {
-  Bundle* bundleB = mc->GetBundle("TestBundleB");
+  Bundle* bundleB = context->GetBundle("TestBundleB");
   US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
 
-  Bundle* bundleImportedByB = mc->GetBundle("TestBundleImportedByB");
+  Bundle* bundleImportedByB = context->GetBundle("TestBundleImportedByB");
   US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
 
   std::vector<ServiceReferenceU> refs
-      = mc->GetServiceReferences("us::TestBundleBService");
+      = context->GetServiceReferences("us::TestBundleBService");
   US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
   US_TEST_CONDITION(refs.back(), "Test for second valid service reference")
 
@@ -154,18 +154,18 @@ void frame030b(BundleContext* mc, TestBundleListener& listener)
 }
 
 // Uninstall libB and check for correct events
-void frame040c(BundleContext* mc, TestBundleListener& listener)
+void frame040c(BundleContext* context, TestBundleListener& listener)
 {
-    Bundle* bundleB = mc->GetBundle("TestBundleB");
+    Bundle* bundleB = context->GetBundle("TestBundleB");
     US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
 
-    Bundle* bundleImportedByB = mc->GetBundle("TestBundleImportedByB");
+    Bundle* bundleImportedByB = context->GetBundle("TestBundleImportedByB");
     US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
 
     bundleB->Uninstall();
-    US_TEST_CONDITION(mc->GetBundles().size() == 2, "Test for uninstall of TestBundleB")
+    US_TEST_CONDITION(context->GetBundles().size() == 2, "Test for uninstall of TestBundleB")
     bundleImportedByB->Uninstall();
-    US_TEST_CONDITION(mc->GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
+    US_TEST_CONDITION(context->GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
 
     std::vector<BundleEvent> pEvts;
     pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
@@ -184,7 +184,7 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
   std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
-  BundleContext* mc = framework->GetBundleContext();
+  BundleContext* context = framework->GetBundleContext();
 
   { // scope the use of the listener so its destructor is
     // called before we destroy the framework's bundle context.
@@ -192,12 +192,12 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
     // the framework is still active.
     TestBundleListener listener;
 
-    BundleListenerRegistrationHelper<TestBundleListener> ml(mc, &listener, &TestBundleListener::BundleChanged);
-    ServiceListenerRegistrationHelper<TestBundleListener> sl(mc, &listener, &TestBundleListener::ServiceChanged);
+    BundleListenerRegistrationHelper<TestBundleListener> ml(context, &listener, &TestBundleListener::BundleChanged);
+    ServiceListenerRegistrationHelper<TestBundleListener> sl(context, &listener, &TestBundleListener::ServiceChanged);
 
-    frame020a(mc, listener);
-    frame030b(mc, listener);
-    frame040c(mc, listener);
+    frame020a(context, listener);
+    frame030b(context, listener);
+    frame040c(context, listener);
   }
 
   US_TEST_END()

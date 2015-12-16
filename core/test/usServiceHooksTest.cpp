@@ -63,9 +63,9 @@ private:
 
 public:
 
-  TestServiceEventListenerHook(int id, BundleContext* mc)
+  TestServiceEventListenerHook(int id, BundleContext* context)
   : id(id),
-    bundleCtx(mc)
+    bundleCtx(context)
   {
   }
 
@@ -146,9 +146,9 @@ private:
 
 public:
 
-  TestServiceFindHook(int id, BundleContext* mc)
+  TestServiceFindHook(int id, BundleContext* context)
     : id(id),
-      bundleCtx(mc)
+      bundleCtx(context)
   {
   }
 
@@ -174,9 +174,9 @@ private:
 
 public:
 
-  TestServiceListenerHook(int id,BundleContext* mc)
+  TestServiceListenerHook(int id,BundleContext* context)
     : id(id),
-      bundleCtx(mc)
+      bundleCtx(context)
   {
   }
 

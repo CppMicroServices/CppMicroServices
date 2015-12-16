@@ -57,12 +57,12 @@ ServiceListeners::ServiceListeners(CoreBundleContext* coreCtx)
   hashedServiceKeys.push_back(ServiceConstants::SERVICE_ID());
 }
 
-void ServiceListeners::AddServiceListener(BundleContext* mc, const ServiceListener& listener,
+void ServiceListeners::AddServiceListener(BundleContext* context, const ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
   Lock l(this);
 
-  ServiceListenerEntry sle(mc, listener, data, filter);
+  ServiceListenerEntry sle(context, listener, data, filter);
   RemoveServiceListener_unlocked(sle);
 
   serviceSet.insert(sle);
@@ -70,10 +70,10 @@ void ServiceListeners::AddServiceListener(BundleContext* mc, const ServiceListen
   CheckSimple(sle);
 }
 
-void ServiceListeners::RemoveServiceListener(BundleContext* mc, const ServiceListener& listener,
+void ServiceListeners::RemoveServiceListener(BundleContext* context, const ServiceListener& listener,
                                              void* data)
 {
-  ServiceListenerEntry entryToRemove(mc, listener, data);
+  ServiceListenerEntry entryToRemove(context, listener, data);
 
   Lock l(this);
   RemoveServiceListener_unlocked(entryToRemove);
@@ -91,20 +91,20 @@ void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry
   }
 }
 
-void ServiceListeners::AddBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
+void ServiceListeners::AddBundleListener(BundleContext* context, const BundleListener& listener, void* data)
 {
   Lock{bundleListenerMap};
-  BundleListenerMap::value_type::second_type& listeners = bundleListenerMap.value[mc];
+  BundleListenerMap::value_type::second_type& listeners = bundleListenerMap.value[context];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(BundleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
   {
     listeners.push_back(std::make_pair(listener, data));
   }
 }
 
-void ServiceListeners::RemoveBundleListener(BundleContext* mc, const BundleListener& listener, void* data)
+void ServiceListeners::RemoveBundleListener(BundleContext* context, const BundleListener& listener, void* data)
 {
   Lock{bundleListenerMap};
-  bundleListenerMap.value[mc].remove_if(std::bind1st(BundleListenerCompare(), std::make_pair(listener, data)));
+  bundleListenerMap.value[context].remove_if(std::bind1st(BundleListenerCompare(), std::make_pair(listener, data)));
 }
 
 void ServiceListeners::BundleChanged(const BundleEvent& evt)
@@ -130,7 +130,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
   }
 }
 
-void ServiceListeners::RemoveAllListeners(BundleContext* mc)
+void ServiceListeners::RemoveAllListeners(BundleContext* context)
 {
   {
     Lock l(this);
@@ -138,7 +138,7 @@ void ServiceListeners::RemoveAllListeners(BundleContext* mc)
          it != serviceSet.end(); )
     {
 
-      if (it->GetBundleContext() == mc)
+      if (it->GetBundleContext() == context)
       {
         RemoveFromCache(*it);
         serviceSet.erase(it++);
@@ -152,18 +152,18 @@ void ServiceListeners::RemoveAllListeners(BundleContext* mc)
 
   {
     Lock{bundleListenerMap};
-    bundleListenerMap.value.erase(mc);
+    bundleListenerMap.value.erase(context);
   }
 }
 
-void ServiceListeners::HooksBundleStopped(BundleContext* mc)
+void ServiceListeners::HooksBundleStopped(BundleContext* context)
 {
   Lock l(this);
   std::vector<ServiceListenerEntry> entries;
   for (ServiceListenerEntries::iterator it = serviceSet.begin();
        it != serviceSet.end(); )
   {
-    if (it->GetBundleContext() == mc)
+    if (it->GetBundleContext() == context)
     {
       entries.push_back(*it);
     }

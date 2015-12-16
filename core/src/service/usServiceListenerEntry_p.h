@@ -53,7 +53,7 @@ public:
 
   void SetRemoved(bool removed) const;
 
-  ServiceListenerEntry(BundleContext* mc, const ServiceListener& l, void* data, const std::string& filter = "");
+  ServiceListenerEntry(BundleContext* context, const ServiceListener& l, void* data, const std::string& filter = "");
 
   const LDAPExpr& GetLDAPExpr() const;
 

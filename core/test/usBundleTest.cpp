@@ -43,11 +43,11 @@ using namespace us;
 namespace {
 
 // Check that the executable's activator was started and called
-void frame01(BundleContext* mc)
+void frame01(BundleContext* context)
 {
   try
   {
-    Bundle* bundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    Bundle* bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
     US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle main")
 
     bundle->Start();
@@ -62,17 +62,17 @@ void frame01(BundleContext* mc)
 
 // Verify that the same member function pointers registered as listeners
 // with different receivers works.
-void frame02a(BundleContext* mc)
+void frame02a(BundleContext* context)
 {
   TestBundleListener listener1;
   TestBundleListener listener2;
 
   try
   {
-    mc->RemoveBundleListener(&listener1, &TestBundleListener::BundleChanged);
-    mc->AddBundleListener(&listener1, &TestBundleListener::BundleChanged);
-    mc->RemoveBundleListener(&listener2, &TestBundleListener::BundleChanged);
-    mc->AddBundleListener(&listener2, &TestBundleListener::BundleChanged);
+    context->RemoveBundleListener(&listener1, &TestBundleListener::BundleChanged);
+    context->AddBundleListener(&listener1, &TestBundleListener::BundleChanged);
+    context->RemoveBundleListener(&listener2, &TestBundleListener::BundleChanged);
+    context->AddBundleListener(&listener2, &TestBundleListener::BundleChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -80,9 +80,9 @@ void frame02a(BundleContext* mc)
                         << " : frameSL02a:FAIL" );
   }
 
-  InstallTestBundle(mc, "TestBundleA");
+  InstallTestBundle(context, "TestBundleA");
 
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  Bundle* bundleA = context->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
 
   bundleA->Start();
@@ -97,28 +97,28 @@ void frame02a(BundleContext* mc)
   US_TEST_CONDITION(listener1.CheckListenerEvents(pEvts, seEvts), "Check first bundle listener")
   US_TEST_CONDITION(listener2.CheckListenerEvents(pEvts, seEvts), "Check second bundle listener")
 
-  mc->RemoveBundleListener(&listener1, &TestBundleListener::BundleChanged);
-  mc->RemoveBundleListener(&listener2, &TestBundleListener::BundleChanged);
+  context->RemoveBundleListener(&listener1, &TestBundleListener::BundleChanged);
+  context->RemoveBundleListener(&listener2, &TestBundleListener::BundleChanged);
 
   bundleA->Stop();
 
 }
 
 // Verify information from the BundleInfo struct
-void frame005a(BundleContext* mc)
+void frame005a(BundleContext* context)
 {
-  Bundle* m = mc->GetBundle();
+  Bundle* m = context->GetBundle();
   long systemId = 0;
   // check expected meta-data
   US_TEST_CONDITION("main" == m->GetName(), "Test bundle name")
   US_TEST_CONDITION(BundleVersion(0,1,0) == m->GetVersion(), "Test test driver bundle version")
-  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == mc->GetBundle(systemId)->GetVersion(), "Test CppMicroServices version")
+  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == context->GetBundle(systemId)->GetVersion(), "Test CppMicroServices version")
 }
 
 // Get context id, location, persistent storage and status of the bundle
-void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* mc)
+void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* context)
 {
-  Bundle* m = mc->GetBundle();
+  Bundle* m = context->GetBundle();
 
   long int contextid = m->GetBundleId();
   US_DEBUG << "CONTEXT ID:" << contextid;
@@ -144,11 +144,11 @@ void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* mc)
 
 //----------------------------------------------------------------------------
 //Test result of GetService(ServiceReference()). Should throw std::invalid_argument
-void frame018a(BundleContext* mc)
+void frame018a(BundleContext* context)
 {
   try
   {
-    mc->GetService(ServiceReferenceU());
+    context->GetService(ServiceReferenceU());
     US_DEBUG << "Got service object, expected std::invalid_argument exception";
     US_TEST_FAILED_MSG(<< "Got service object, excpected std::invalid_argument exception")
   }
@@ -164,9 +164,9 @@ void frame018a(BundleContext* mc)
 // also check that the expected events occur
 void frame020a(const std::shared_ptr<Framework>& framework, TestBundleListener& listener)
 {
-  BundleContext* mc = framework->GetBundleContext();
+  BundleContext* context = framework->GetBundleContext();
 
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  Bundle* bundleA = context->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
 
   US_TEST_CONDITION(bundleA->GetName() == "TestBundleA", "Test bundle name")
@@ -176,8 +176,8 @@ void frame020a(const std::shared_ptr<Framework>& framework, TestBundleListener& 
   // Check if libA registered the expected service
   try
   {
-    ServiceReferenceU sr1 = mc->GetServiceReference("us::TestBundleAService");
-    InterfaceMapConstPtr o1 = mc->GetService(sr1);
+    ServiceReferenceU sr1 = context->GetServiceReference("us::TestBundleAService");
+    InterfaceMapConstPtr o1 = context->GetService(sr1);
     US_TEST_CONDITION(o1 && !o1->empty(), "Test if service object found");
 
     // check the listeners for events
@@ -203,11 +203,11 @@ void frame020a(const std::shared_ptr<Framework>& framework, TestBundleListener& 
 // Start libA and check that it exists and that the storage paths are correct
 void frame02b(const std::shared_ptr<Framework>& framework)
 {
-  BundleContext* mc = framework->GetBundleContext();
+  BundleContext* context = framework->GetBundleContext();
 
   US_TEST_CONDITION(framework->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/tmp", "Test for valid base storage path")
 
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  Bundle* bundleA = context->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
   // launching properties should be accessible through any bundle
   US_TEST_CONDITION(bundleA->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/tmp", "Test for valid base storage path")
@@ -227,13 +227,13 @@ void frame02b(const std::shared_ptr<Framework>& framework)
 
 
 // Stop libA and check for correct events
-void frame030b(BundleContext* mc, TestBundleListener& listener)
+void frame030b(BundleContext* context, TestBundleListener& listener)
 {
-  Bundle* bundleA = mc->GetBundle("TestBundleA");
+  Bundle* bundleA = context->GetBundle("TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for non-null bundle")
 
   ServiceReferenceU sr1
-      = mc->GetServiceReference("us::TestBundleAService");
+      = context->GetServiceReference("us::TestBundleAService");
   US_TEST_CONDITION(sr1, "Test for valid service reference")
 
   try
@@ -262,14 +262,14 @@ struct LocalListener {
 };
 
 // Add a service listener with a broken LDAP filter to Get an exception
-void frame045a(BundleContext* mc)
+void frame045a(BundleContext* context)
 {
   LocalListener sListen1;
   std::string brokenFilter = "A broken LDAP filter";
 
   try
   {
-    mc->AddServiceListener(&sListen1, &LocalListener::ServiceChanged, brokenFilter);
+    context->AddServiceListener(&sListen1, &LocalListener::ServiceChanged, brokenFilter);
     US_TEST_FAILED_MSG(<< "test bundle, no exception on broken LDAP filter:");
   }
   catch (const std::invalid_argument& /*ia*/)
@@ -435,15 +435,15 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
     std::cout << "----- " << (*iter)->GetName() << std::endl;
   }
 
-  BundleContext* mc = framework->GetBundleContext();
+  BundleContext* context = framework->GetBundleContext();
   TestBundleListener listener;
 
-  frame01(mc);
-  frame02a(mc);
+  frame01(context);
+  frame02a(context);
 
   try
   {
-    mc->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
+    context->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -453,7 +453,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    mc->AddServiceListener(&listener, &TestBundleListener::ServiceChanged);
+    context->AddServiceListener(&listener, &TestBundleListener::ServiceChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -461,17 +461,17 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
     throw;
   }
 
-  frame005a(mc->GetBundle("main")->GetBundleContext());
-  frame010a(framework, mc);
-  frame018a(mc);
+  frame005a(context->GetBundle("main")->GetBundleContext());
+  frame010a(framework, context);
+  frame018a(context);
 
   frame020a(framework, listener);
-  frame030b(mc, listener);
+  frame030b(context, listener);
 
-  frame045a(mc);
+  frame045a(context);
 
-  mc->RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
-  mc->RemoveServiceListener(&listener, &TestBundleListener::ServiceChanged);
+  context->RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
+  context->RemoveServiceListener(&listener, &TestBundleListener::ServiceChanged);
 
   framework->Stop();
 

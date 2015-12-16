@@ -44,8 +44,8 @@ class TestBundleS : public ServiceControlInterface,
 
 public:
 
-  TestBundleS(BundleContext* mc)
-    : mc(mc)
+  TestBundleS(BundleContext* context)
+    : context(context)
   {
     for(int i = 0; i <= 3; ++i)
     {
@@ -72,7 +72,7 @@ public:
           ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
           ServiceProperties props;
           props.insert(std::make_pair(ServiceConstants::SERVICE_RANKING(), Any(ranking)));
-          servregs[offset] = mc->RegisterService(ifm, props);
+          servregs[offset] = context->RegisterService(ifm, props);
         }
       }
       if (operation == "unregister")
@@ -91,7 +91,7 @@ private:
 
   static const std::string SERVICE; // = "us::TestBundleSService"
 
-  BundleContext* mc;
+  BundleContext* context;
   std::vector<ServiceRegistrationU> servregs;
 };
 

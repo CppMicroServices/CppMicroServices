@@ -103,7 +103,7 @@ bool ServiceHooks::IsOpen() const
   return bOpen;
 }
 
-void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string& service,
+void ServiceHooks::FilterServiceReferences(BundleContext* context, const std::string& service,
                                            const std::string& filter, std::vector<ServiceReferenceBase>& refs)
 {
   std::vector<ServiceRegistrationBase> srl;
@@ -122,7 +122,7 @@ void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string&
       {
         try
         {
-          fh->Find(mc, service, filter, filtered);
+          fh->Find(context, service, filter, filtered);
         }
         catch (const std::exception& e)
         {

@@ -30,9 +30,9 @@ ServiceListenerHook::~ServiceListenerHook()
 }
 
 ServiceListenerHook::ListenerInfoData::ListenerInfoData(
-    BundleContext* mc, const ServiceListener& l,
+    BundleContext* context, const ServiceListener& l,
     void* data, const std::string& filter)
-  : mc(mc)
+  : context(context)
   , listener(l)
   , data(data)
   , filter(filter)
@@ -76,7 +76,7 @@ bool ServiceListenerHook::ListenerInfo::IsNull() const
 
 BundleContext* ServiceListenerHook::ListenerInfo::GetBundleContext() const
 {
-  return d->mc;
+  return d->context;
 }
 
 std::string ServiceListenerHook::ListenerInfo::GetFilter() const

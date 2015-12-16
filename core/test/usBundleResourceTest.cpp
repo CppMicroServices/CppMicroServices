@@ -396,11 +396,11 @@ void testResourceFromExecutable(Bundle* bundle)
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
 
-void testResourcesFrom(const std::string& bundleName, BundleContext* mc)
+void testResourcesFrom(const std::string& bundleName, BundleContext* context)
 {
-  InstallTestBundle(mc, bundleName);
+  InstallTestBundle(context, bundleName);
 
-  Bundle* bundleR = mc->GetBundle(bundleName);
+  Bundle* bundleR = context->GetBundle(bundleName);
   US_TEST_CONDITION_REQUIRED(bundleR != NULL, "Test for existing bundle")
 
   US_TEST_CONDITION(bundleR->GetName() == bundleName, "Test bundle name")
@@ -420,12 +420,12 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
   std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
-  BundleContext* mc = framework->GetBundleContext();
-  assert(mc);
+  BundleContext* context = framework->GetBundleContext();
+  assert(context);
 
-  InstallTestBundle(mc, "TestBundleR");
+  InstallTestBundle(context, "TestBundleR");
 
-  Bundle* bundleR = mc->GetBundle("TestBundleR");
+  Bundle* bundleR = context->GetBundle("TestBundleR");
   US_TEST_CONDITION_REQUIRED(bundleR != NULL, "Test for existing bundle TestBundleR")
 
   US_TEST_CONDITION(bundleR->GetName() == "TestBundleR", "Test bundle name")
@@ -435,7 +435,7 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
   Bundle* executableBundle = nullptr;
   try
   {
-    executableBundle = mc->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    executableBundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
     US_TEST_CONDITION_REQUIRED(executableBundle != NULL, "Test installation of bundle main")
   }
   catch (const std::exception& e)

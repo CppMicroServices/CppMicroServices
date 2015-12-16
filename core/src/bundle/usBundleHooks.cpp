@@ -36,7 +36,7 @@ BundleHooks::BundleHooks(CoreBundleContext* ctx)
 {
 }
 
-Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
+Bundle* BundleHooks::FilterBundle(const BundleContext* context, Bundle* bundle) const
 {
   if(bundle == NULL)
   {
@@ -53,12 +53,12 @@ Bundle* BundleHooks::FilterBundle(const BundleContext* mc, Bundle* bundle) const
   {
     std::vector<Bundle*> ml;
     ml.push_back(bundle);
-    this->FilterBundles(mc, ml);
+    this->FilterBundles(context, ml);
     return ml.empty() ? NULL : bundle;
   }
 }
 
-void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<Bundle*>& bundles) const
+void BundleHooks::FilterBundles(const BundleContext* context, std::vector<Bundle*>& bundles) const
 {
   std::vector<ServiceRegistrationBase> srl;
   coreCtx->services.Get(us_service_interface_iid<BundleFindHook>(), srl);
@@ -74,7 +74,7 @@ void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<Bundle*>& b
     {
       try
       {
-        fh->Find(mc, filtered);
+        fh->Find(context, filtered);
       }
       catch (const std::exception& e)
       {

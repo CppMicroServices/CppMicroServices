@@ -52,13 +52,11 @@ void TestServiceInterfaceId()
   US_TEST_CONDITION(us_service_interface_iid<ITestServiceB>() == "com.mycompany.ITestService/1.0", "Service interface id com.mycompany.ITestService/1.0")
 }
 
-void TestMultipleServiceRegistrations(BundleContext* mc)
+void TestMultipleServiceRegistrations(BundleContext* context)
 {
   struct TestServiceA : public ITestServiceA
   {
   };
-
-  BundleContext* context = mc;
 
   std::shared_ptr<TestServiceA> s1 = std::make_shared<TestServiceA>();
   std::shared_ptr<TestServiceA> s2 = std::make_shared<TestServiceA>();
@@ -81,13 +79,11 @@ void TestMultipleServiceRegistrations(BundleContext* mc)
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
-void TestServicePropertiesUpdate(BundleContext* mc)
+void TestServicePropertiesUpdate(BundleContext* context)
 {
   struct TestServiceA : public ITestServiceA
   {
   };
-
-  BundleContext* context = mc;
 
   std::shared_ptr<TestServiceA> s1 = std::make_shared<TestServiceA>();
   ServiceProperties props;
@@ -146,11 +142,11 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
   framework->Start();
 
-  BundleContext* mc = framework->GetBundleContext();
+  BundleContext* context = framework->GetBundleContext();
 
   TestServiceInterfaceId();
-  TestMultipleServiceRegistrations(mc);
-  TestServicePropertiesUpdate(mc);
+  TestMultipleServiceRegistrations(context);
+  TestServicePropertiesUpdate(context);
 
   US_TEST_END()
 }

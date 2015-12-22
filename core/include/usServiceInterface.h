@@ -200,7 +200,7 @@ namespace us {
  *
  * Example usage:
  * \code
- * MyService service; // implementes I1 and I2
+ * MyService service; // implements I1 and I2
  * InterfaceMap im = MakeInterfaceMap<I1,I2>(&service);
  * \endcode
  *
@@ -215,7 +215,7 @@ public:
    * Constructor taking a service implementation pointer.
    *
    * @param impl A service implementation pointer, which must
-   *        be castable to a all specified service interfaces.
+   *        be castable to all specified service interfaces.
    */
   template<class Impl>
   MakeInterfaceMap(const std::shared_ptr<Impl>& impl)

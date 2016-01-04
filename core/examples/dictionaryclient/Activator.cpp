@@ -21,12 +21,13 @@
 =============================================================================*/
 
 //! [Activator]
-#include <iostream>
 
 #include "IDictionaryService.h"
 
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
+
+#include <iostream>
 
 using namespace us;
 

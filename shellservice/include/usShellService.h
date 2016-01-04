@@ -19,6 +19,9 @@
 
 =============================================================================*/
 
+#ifndef USSHELLSERVICE_H
+#define USSHELLSERVICE_H
+
 #include <usGlobalConfig.h>
 
 #include <usShellServiceExport.h>
@@ -53,3 +56,5 @@ private:
 };
 
 }
+
+#endif // USSHELLSERVICE_H

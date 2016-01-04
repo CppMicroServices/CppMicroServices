@@ -19,8 +19,6 @@
 
 =============================================================================*/
 
-#include <iostream>
-
 #include "usAbstractWebConsolePlugin.h"
 
 #include "usWebConsoleConstants.h"
@@ -33,6 +31,9 @@
 #include "usHttpServletRequest.h"
 #include "usServletContext.h"
 #include "usWebConsoleDefaultVariableResolver.h"
+
+#include <iostream>
+
 
 namespace us {
 

@@ -24,6 +24,8 @@
 
 #include "usSharedData.h"
 
+#include <string>
+
 namespace us {
 
 class ServletContext;

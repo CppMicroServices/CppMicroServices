@@ -66,8 +66,8 @@ void Framework::Initialize(void)
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
   bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
-
-  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(this, bundleInfo);
+  
+  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(std::static_pointer_cast<Framework>(shared_from_this()), bundleInfo);
 
   d->initialized = true;
 }
@@ -81,14 +81,12 @@ void Framework::Start()
 void Framework::Stop() 
 {
   FrameworkPrivate::Lock lock(d);
-  std::vector<Bundle*> bundles(GetBundleContext()->GetBundles());
-  for (std::vector<Bundle*>::const_iterator iter = bundles.begin(); 
-      iter != bundles.end(); 
-      ++iter)
+  std::vector<std::shared_ptr<Bundle>> bundles(GetBundleContext()->GetBundles());
+  for (auto& bundle : bundles)
   {
-    if ((*iter)->GetName() != US_CORE_FRAMEWORK_NAME)
+    if (bundle->GetBundleId() > 0)
     {
-      (*iter)->Stop();
+      bundle->Stop();
     }
   }
 

@@ -44,10 +44,10 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 
 }
 
-bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const
+bool ServiceRegistrationBasePrivate::IsUsedByBundle(const std::shared_ptr<Bundle>& bundle) const
 {
-  return (dependents.find(p) != dependents.end()) ||
-      (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());
+  return (dependents.find(bundle) != dependents.end()) ||
+    (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
 }
 
 const InterfaceMapConstPtr& ServiceRegistrationBasePrivate::GetInterfaces() const

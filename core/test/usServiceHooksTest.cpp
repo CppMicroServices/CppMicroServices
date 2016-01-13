@@ -243,7 +243,7 @@ void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION(serviceListener1.events.empty(), "service event of service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener");
 
-  Bundle* bundle = InstallTestBundle(context, "TestBundleA");
+  auto bundle = InstallTestBundle(context, "TestBundleA");
 
   bundle->Start();
 
@@ -357,7 +357,7 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
   TestServiceListener serviceListener;
   context->AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 
-  Bundle* bundle = InstallTestBundle(context, "TestBundleA");
+  auto bundle = InstallTestBundle(context, "TestBundleA");
 
   bundle->Start();
 
@@ -400,8 +400,8 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    Bundle* bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
-    US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle main")
+    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle main")
     bundle->Start();
   }
   catch (const std::exception& e)

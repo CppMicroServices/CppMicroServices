@@ -100,7 +100,7 @@ public:
    *
    * <ol>
    *   <li>If the referenced service has been unregistered, \c NULL is returned.</li>
-   *   <li>The PrototypeServiceFactory::GetService(Bundle*, const ServiceRegistrationBase&)
+   *   <li>The PrototypeServiceFactory::GetService(const std::shared_ptr<Bundle>&, const ServiceRegistrationBase&)
    *       method is called to create a service object for the caller.</li>
    *   <li>If the service object (an instance of InterfaceMap) returned by the
    *       PrototypeServiceFactory object is empty, does not contain all the interfaces

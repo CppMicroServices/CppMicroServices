@@ -58,24 +58,24 @@ BundleContext::~BundleContext()
   delete d;
 }
 
-Bundle* BundleContext::GetBundle() const
+std::shared_ptr<Bundle> BundleContext::GetBundle() const
 {
-  return d->bundle->q;
+  return d->bundle->q.lock();
 }
 
-Bundle* BundleContext::GetBundle(long id) const
+std::shared_ptr<Bundle> BundleContext::GetBundle(long id) const
 {
   return d->bundle->coreCtx->bundleHooks.FilterBundle(this, d->bundle->coreCtx->bundleRegistry.GetBundle(id));
 }
 
-Bundle* BundleContext::GetBundle(const std::string& name)
+std::shared_ptr<Bundle> BundleContext::GetBundle(const std::string& name)
 {
   return d->bundle->coreCtx->bundleRegistry.GetBundle(name);
 }
 
-std::vector<Bundle*> BundleContext::GetBundles() const
+std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const
 {
-  std::vector<Bundle*> bundles = d->bundle->coreCtx->bundleRegistry.GetBundles();
+  std::vector<std::shared_ptr<Bundle>> bundles = d->bundle->coreCtx->bundleRegistry.GetBundles();
   d->bundle->coreCtx->bundleHooks.FilterBundles(this, bundles);
   return bundles;
 }
@@ -146,7 +146,7 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   {
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d->GetService(d->bundle->q)));
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d->GetService(d->bundle->q.lock())));
   return std::shared_ptr<void>(h, h->service.get());
 }
 
@@ -159,7 +159,7 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
-  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d->GetServiceInterfaceMap(d->bundle->q).get()));
+  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d->GetServiceInterfaceMap(d->bundle->q.lock()).get()));
   std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(this, reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
@@ -167,7 +167,7 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 bool BundleContext::UngetService(const ServiceReferenceBase& reference)
 {
   ServiceReferenceBase ref = reference;
-  return ref.d->UngetService(d->bundle->q, true);
+  return ref.d->UngetService(d->bundle->q.lock(), true);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate,
@@ -244,12 +244,12 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
   return d->bundle->storagePath + filename;
 }
 
-Bundle* BundleContext::InstallBundle(const std::string& location)
+std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location)
 {
     BundleInfo* bundleInfo = new BundleInfo(GetBundleNameFromLocation(location));
     bundleInfo->location = GetBundleLocation(location);
 
-    Bundle* bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
+    auto bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
 
     d->bundle->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
 

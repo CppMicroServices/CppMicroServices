@@ -27,6 +27,7 @@
 #include "usBundleVersion.h"
 
 #include <vector>
+#include <memory>
 
 namespace us {
 
@@ -78,7 +79,7 @@ typedef ServiceReference<void> ServiceReferenceU;
  *
  * @remarks This class is thread safe.
  */
-class US_Core_EXPORT Bundle
+class US_Core_EXPORT Bundle : public std::enable_shared_from_this<Bundle>
 {
 
 public:

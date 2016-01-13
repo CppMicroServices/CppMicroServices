@@ -44,24 +44,24 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 {
   InstallTestBundle(context, "TestBundleB");
 
-  Bundle* bundleB = context->GetBundle("TestBundleB");
+  auto bundleB = context->GetBundle("TestBundleB");
   US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for existing bundle TestBundleB")
 
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    Bundle* bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
+    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
 #else
-    Bundle* bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
+    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
 #endif
-    US_TEST_CONDITION_REQUIRED(bundle != NULL, "Test installation of bundle TestBundleImportedByB")
+    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
   }
   catch (const std::exception& e)
   {
     US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frame020a:FAIL")
   }
 
-  Bundle* bundleImportedByB = context->GetBundle("TestBundleImportedByB");
+  auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
   US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for existing bundle TestBundleImportedByB")
 
   US_TEST_CONDITION(bundleB->GetName() == "TestBundleB", "Test bundle name")
@@ -109,10 +109,10 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 // Stop libB and check for correct events
 void frame030b(BundleContext* context, TestBundleListener& listener)
 {
-  Bundle* bundleB = context->GetBundle("TestBundleB");
+  auto bundleB = context->GetBundle("TestBundleB");
   US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
 
-  Bundle* bundleImportedByB = context->GetBundle("TestBundleImportedByB");
+  auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
   US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
 
   std::vector<ServiceReferenceU> refs
@@ -156,10 +156,10 @@ void frame030b(BundleContext* context, TestBundleListener& listener)
 // Uninstall libB and check for correct events
 void frame040c(BundleContext* context, TestBundleListener& listener)
 {
-    Bundle* bundleB = context->GetBundle("TestBundleB");
+    auto bundleB = context->GetBundle("TestBundleB");
     US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
 
-    Bundle* bundleImportedByB = context->GetBundle("TestBundleImportedByB");
+    auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
     US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
 
     bundleB->Uninstall();

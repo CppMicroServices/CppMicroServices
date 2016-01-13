@@ -95,17 +95,17 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
   keys.assign(ks.begin(), ks.end());
 }
 
-Bundle* ServiceReferenceBase::GetBundle() const
+std::shared_ptr<Bundle> ServiceReferenceBase::GetBundle() const
 {
   if (d->registration == nullptr || d->registration->bundle == nullptr)
   {
-    return 0;
+    return nullptr;
   }
 
-  return d->registration->bundle->q;
+  return d->registration->bundle->q.lock();
 }
 
-void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
+void ServiceReferenceBase::GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const
 {
   typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
   T::Lock l(d->registration->propsLock);

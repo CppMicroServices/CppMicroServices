@@ -21,10 +21,11 @@
 =============================================================================*/
 
 //! [Activator]
-#include <iostream>
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
 #include <usServiceEvent.h>
+
+#include <iostream>
 
 using namespace us;
 

@@ -53,7 +53,7 @@ std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* context, 
   {
     std::vector<std::shared_ptr<Bundle>> ml;
     ml.push_back(bundle);
-    this->FilterBundles(mc, ml);
+    this->FilterBundles(context, ml);
     return ml.empty() ? nullptr : bundle;
   }
 }

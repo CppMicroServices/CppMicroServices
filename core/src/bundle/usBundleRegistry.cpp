@@ -30,7 +30,7 @@
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
 #include "usGetBundleContext.h"
-
+#include "usBundleEvent.h"
 #include <cassert>
 #include <map>
 
@@ -49,6 +49,21 @@ BundleRegistry::~BundleRegistry(void)
 
 std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
 {
+  std::vector<std::string> embeddedBundles; // statically-linked bundles in the binary
+  if (info->name.empty() || info->name == US_CORE_FRAMEWORK_NAME)
+  {
+    embeddedBundles = GetBundleNamesFromLibrary(info->location);
+  }
+  if(!embeddedBundles.empty())
+  {
+    if(info->name.empty())
+      info->name = embeddedBundles.at(0);
+    // remove the bundle name from the embedded list.
+    std::vector<std::string>::iterator it = std::find(embeddedBundles.begin(), embeddedBundles.end(), info->name);
+    embeddedBundles.erase(it);
+  }
+  
+  
   std::string bundleKey = info->location + "/" + info->name;
   std::shared_ptr<Bundle> bundle = GetBundle(bundleKey);
 
@@ -79,7 +94,14 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
       bundle = return_pair.first->second;
     }
   }
-
+  
+  // register all the statically-linked bundles
+  for (auto childBundleName : embeddedBundles)
+  {
+    Register(new BundleInfo(info->location, childBundleName));
+  }
+  
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
   return bundle;
 }
 

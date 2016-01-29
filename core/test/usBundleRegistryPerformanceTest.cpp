@@ -41,7 +41,6 @@ namespace
     // without having the extra machinery of error handling in the way.
     inline void InstallTestBundleNoErrorHandling(BundleContext* frameworkCtx, const std::string& bundleName)
     {
-      bundleName.empty();
 #if defined (US_BUILD_SHARED_LIBS)
         frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "|" + bundleName);
 #else
@@ -97,7 +96,7 @@ namespace
         // At any point in which real customer usage in a concurrent way becomes known,
         // it would be ideal to model it as a test.
 #ifdef US_DISABLE_TESTING_LINKED_RESOURCES // FIXME: TestBundleRL uses linker to embed manifest.json on Windows
-		const std::size_t numTestBundles = 12;  // 11 test bundles + the system bundle 
+        const std::size_t numTestBundles = 12;  // 11 test bundles + the system bundle 
 #else
         const std::size_t numTestBundles = 13;  // 12 test bundles + the system bundle 
 #endif

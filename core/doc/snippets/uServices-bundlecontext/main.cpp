@@ -1,11 +1,10 @@
 #include <usBundleActivator.h>
 
 //! [GetBundleContext]
+#include <iostream>
 #include <usGetBundleContext.h>
 #include <usBundle.h>
 #include <usBundleContext.h>
-
-#include <iostream>
 
 using namespace us;
 

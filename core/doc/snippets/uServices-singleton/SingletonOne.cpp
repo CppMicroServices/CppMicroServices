@@ -2,12 +2,11 @@
 
 #include "SingletonTwo.h"
 
+#include <iostream>
+#include <cassert>
 
 #include <usGetBundleContext.h>
 #include <usBundleContext.h>
-
-#include <iostream>
-#include <cassert>
 
 using namespace us;
 

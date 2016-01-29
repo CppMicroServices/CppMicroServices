@@ -36,7 +36,6 @@ namespace us {
 const std::string Framework::PROP_STORAGE_LOCATION{ "org.cppmicroservices.framework.storage" };
 const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.framework.threading.support" };
 const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
-const std::string Framework::PROP_AUTO_INSTALL{ "org.cppmicroservices.framework.autoinstall" };
 const std::string Framework::PROP_AUTO_INSTALL_PATHS{ "org.cppmicroservices.framework.autoinstall.paths" };
 
 Framework::Framework(void) : d(new FrameworkPrivate())

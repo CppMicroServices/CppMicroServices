@@ -485,6 +485,6 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   TestBundleStates();
   TestForInstallFailure();
   TestDuplicateInstall();
-  
+
   US_TEST_END()
 }

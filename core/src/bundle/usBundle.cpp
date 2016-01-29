@@ -68,7 +68,7 @@ void Bundle::Init(CoreBundleContext* coreCtx,
 
 void Bundle::Uninit()
 {
-  if (d->bundleContext != NULL)
+  if (d->bundleContext != nullptr)
   {
     //d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
     d->RemoveBundleResources();

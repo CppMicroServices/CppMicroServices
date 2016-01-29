@@ -54,9 +54,9 @@ namespace
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_LOG_LEVEL).ToString() == "3", "Test for default logging level")
 
-			US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
+        US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
 #if defined (US_BUILD_SHARED_LIBS)
-			US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() == 1, "Unexpected number of bundles")
+		US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() == 1, "Unexpected number of bundles")
 #endif
 		f->Stop();
 
@@ -102,16 +102,16 @@ namespace
 
         US_TEST_CONDITION(Logger::instance().GetLogLevel() == DebugMsg, "Test custom log level")
 
-			US_TEST_CONDITION(f->GetProperty(Framework::PROP_AUTO_INSTALL_PATHS).ToString() == installPaths, "Test auto-install config setting")
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_AUTO_INSTALL_PATHS).ToString() == installPaths, "Test auto-install config setting")
 #ifdef US_ENABLE_THREADING_SUPPORT
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
 #else
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
 #endif
 #if defined (US_BUILD_SHARED_LIBS)
-			US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() > 1, "Unexpected number of bundles")
+        US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() > 1, "Unexpected number of bundles")
 #endif
-			f->Stop();
+        f->Stop();
     }
 
     void TestProperties()

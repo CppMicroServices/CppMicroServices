@@ -27,7 +27,7 @@
 #include <usCoreConfig.h>
 
 #include <string>
-#include <vector>
+
 #ifdef _MSC_VER
 # pragma warning(push)
 # pragma warning(disable: 4251)
@@ -45,10 +45,9 @@ struct US_Core_EXPORT BundleInfo
 {
   BundleInfo(const std::string& location, const std::string& name = std::string());
   
-  std::string location;
   std::string name;
+  std::string location;
   std::string autoLoadDir;
-  std::vector<std::string> embeddedBundles;
   long id;
 };
 

@@ -20,6 +20,9 @@
 
 =============================================================================*/
 
+#include <iterator>
+#include <stdexcept>
+#include <cassert>
 
 #include "usServiceRegistry_p.h"
 
@@ -29,10 +32,6 @@
 #include "usServiceRegistrationBasePrivate.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
-
-#include <iterator>
-#include <stdexcept>
-#include <cassert>
 
 
 namespace us {

@@ -93,21 +93,20 @@ std::string GetBundleLocation(const std::string& location)
 
 void ExtractBundleNameAndLocation(const std::string& locationName, std::string& outLocation, std::string& outName)
 {
-	if (locationName.empty())
-	{
-		return;
-	}
-	size_t pos = locationName.find_last_of('|');
-	if (pos != std::string::npos)
-	{
-		outName = locationName.substr(pos+1);
-		outLocation = locationName.substr(0, pos);
-	}
-	else
-	{
-		outLocation = locationName;
-	}
-	
+  if (locationName.empty())
+  {
+    return;
+  }
+  size_t pos = locationName.find_last_of('|');
+  if (pos != std::string::npos)
+  {
+    outName = locationName.substr(pos+1);
+    outLocation = locationName.substr(0, pos);
+  }
+  else
+  {
+    outLocation = locationName;
+  }
 }
 
 bool IsSharedLibrary(const std::string& location)
@@ -126,7 +125,7 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
   std::vector<std::string> installedBundles;
 
   std::string loadPath = subDir.empty() ? absoluteBasePath : absoluteBasePath + DIR_SEP + subDir;
-
+  
   DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
   // Try intermediate output directories
@@ -184,23 +183,23 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
         libPath += DIR_SEP;
       }
       libPath += entryFileName;
-      //US_DEBUG << "Auto-installing bundle " << libPath;
-	  try
-	  {
-		  std::shared_ptr<Bundle> installedBundle = GetBundleContext()->InstallBundle(libPath);
-		  if (!installedBundle)
-		  {
-			  US_WARN << "Auto-installing of bundle " << libPath << " failed.";
-		  }
-		  else
-		  {
-			  installedBundles.push_back(installedBundle->GetName());
-		  }
-	  }
-	  catch (const std::runtime_error& exp)
-	  {
-		  US_WARN << "Auto-installing of bundle " << libPath << " failed - " << exp.what();
-	  }
+      US_DEBUG << "Auto-installing bundle " << libPath;
+      try
+      {
+        std::shared_ptr<Bundle> installedBundle = GetBundleContext()->InstallBundle(libPath);
+        if (!installedBundle)
+        {
+          US_WARN << "Auto-installing of bundle " << libPath << " failed.";
+        }
+        else
+        {
+          installedBundles.push_back(installedBundle->GetName());
+        }
+      }
+      catch (const std::runtime_error& exp)
+      {
+        US_WARN << "Auto-installing of bundle " << libPath << " failed - " << exp.what();
+      }
     }
     closedir(dir);
   }

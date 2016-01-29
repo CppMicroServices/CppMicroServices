@@ -91,6 +91,25 @@ std::string GetBundleLocation(const std::string& location)
     return location.substr(0, location.find_last_of('/'));
 }
 
+void ExtractBundleNameAndLocation(const std::string& locationName, std::string& outLocation, std::string& outName)
+{
+	if (locationName.empty())
+	{
+		return;
+	}
+	size_t pos = locationName.find_last_of('|');
+	if (pos != std::string::npos)
+	{
+		outName = locationName.substr(pos+1);
+		outLocation = locationName.substr(0, pos);
+	}
+	else
+	{
+		outLocation = locationName;
+	}
+	
+}
+
 bool IsSharedLibrary(const std::string& location)
 { // Testing for file extension isn't the most robust way to test
     // for file type.
@@ -102,11 +121,11 @@ bool IsSharedLibrary(const std::string& location)
 //-------------------------------------------------------------------
 
 
-std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
+std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteBasePath, const std::string& subDir)
 {
   std::vector<std::string> installedBundles;
 
-  std::string loadPath = absoluteBasePath + DIR_SEP + subDir;
+  std::string loadPath = subDir.empty() ? absoluteBasePath : absoluteBasePath + DIR_SEP + subDir;
 
   DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
@@ -165,53 +184,63 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
         libPath += DIR_SEP;
       }
       libPath += entryFileName;
-      US_DEBUG << "Auto-installing bundle " << libPath;
-
-      mz_zip_archive zipArchive;
-      memset(&zipArchive, 0, sizeof(mz_zip_archive));
-      if(MZ_FALSE == mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0)) continue;
-
-      // the usResourceCompiler will place resources into sub directories,
-      // one for each bundle, named after the bundle's name. The bundle's
-      // manifest is stored in a file called manifest.json in the root of
-      // its sub-directory (analogous to OSGi's META-INF/MANIFEST.MF file).
-      // We use this convention to glean the bundle name and use that to
-      // install the bundle.
-      mz_uint numFiles = mz_zip_reader_get_num_files(&zipArchive);
-      for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex)
-      {
-        char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
-        mz_zip_reader_get_filename(&zipArchive, fileIndex, fileName, MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE);
-        std::string file(fileName);
-        std::string::size_type pos = file.find("/manifest.json");
-        if(std::string::npos != pos)
-        {
-          std::string bundleName(file.substr(0, pos));
-          std::string location(libPath + "/" + bundleName);
-
-          // location will be in the form:
-          //  <path to bundle plugin>\<bundle-name>.<lib-extension>/<bundle-name>
-          std::shared_ptr<Bundle> installedBundle = GetBundleContext()->InstallBundle(location);
-
-          if (!installedBundle)
-          {
-            US_WARN << "Auto-installing of bundle " << libPath << " failed.";
-          }
-          else
-          {
-            installedBundles.push_back(installedBundle->GetName());
-          }
-        }
-      }
-
-      mz_zip_reader_end(&zipArchive);
+      //US_DEBUG << "Auto-installing bundle " << libPath;
+	  try
+	  {
+		  std::shared_ptr<Bundle> installedBundle = GetBundleContext()->InstallBundle(libPath);
+		  if (!installedBundle)
+		  {
+			  US_WARN << "Auto-installing of bundle " << libPath << " failed.";
+		  }
+		  else
+		  {
+			  installedBundles.push_back(installedBundle->GetName());
+		  }
+	  }
+	  catch (const std::runtime_error& exp)
+	  {
+		  US_WARN << "Auto-installing of bundle " << libPath << " failed - " << exp.what();
+	  }
     }
     closedir(dir);
   }
   return installedBundles;
 }
+  
+  std::vector<std::string> GetBundleNamesFromLibrary(const std::string& libPath)
+  {
+    std::vector<std::string> bundleNames;
+    mz_zip_archive zipArchive;
+    memset(&zipArchive, 0, sizeof(mz_zip_archive));
+    if(MZ_FALSE != mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0))
+    {
+    
+    // the usResourceCompiler will place resources into sub directories,
+    // one for each bundle, named after the bundle's name. The bundle's
+    // manifest is stored in a file called manifest.json in the root of
+    // its sub-directory (analogous to OSGi's META-INF/MANIFEST.MF file).
+    // We use this convention to glean the bundle name and use that to
+    // install the bundle.
+    mz_uint numFiles = mz_zip_reader_get_num_files(&zipArchive);
+    for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex)
+    {
+      char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+      mz_zip_reader_get_filename(&zipArchive, fileIndex, fileName, MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE);
+      std::string file(fileName);
+      std::string::size_type pos = file.find("/manifest.json");
+      if(std::string::npos != pos)
+      {
+        bundleNames.push_back(file.substr(0, pos));
+      }
+    }
+    }
+    mz_zip_reader_end(&zipArchive);
+    return bundleNames;
+  }
+  
+  
 
-std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx)
+std::vector<std::string> AutoInstallBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx)
 {
   std::vector<std::string> installedBundles;
 
@@ -243,7 +272,7 @@ std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundl
        i != autoLoadPaths.end(); ++i)
   {
     if (i->empty()) continue;
-    std::vector<std::string> paths = AutoLoadBundlesFromPath(*i, bundleInfo.autoLoadDir);
+    std::vector<std::string> paths = AutoInstallBundlesFromPath(*i, bundleInfo.autoLoadDir);
     installedBundles.insert(installedBundles.end(), paths.begin(), paths.end());
   }
   return installedBundles;

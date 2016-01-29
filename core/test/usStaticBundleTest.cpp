@@ -50,9 +50,9 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
+    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "|TestBundleImportedByB");
 #else
-    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
+    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
 #endif
     US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
   }
@@ -156,16 +156,17 @@ void frame030b(BundleContext* context, TestBundleListener& listener)
 // Uninstall libB and check for correct events
 void frame040c(BundleContext* context, TestBundleListener& listener)
 {
-    auto bundleB = context->GetBundle("TestBundleB");
+	std::string bundleBName("TestBundleB"), bundleImportedByBName("TestBundleImportedByB");
+    auto bundleB = context->GetBundle(bundleBName);
     US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
 
-    auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
+    auto bundleImportedByB = context->GetBundle(bundleImportedByBName);
     US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
 
     bundleB->Uninstall();
-    US_TEST_CONDITION(context->GetBundles().size() == 2, "Test for uninstall of TestBundleB")
+    US_TEST_CONDITION(context->GetBundle(bundleBName) == nullptr, "Test for uninstall of TestBundleB")
     bundleImportedByB->Uninstall();
-    US_TEST_CONDITION(context->GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
+    US_TEST_CONDITION(context->GetBundle(bundleImportedByBName) == nullptr, "Test for uninstall of TestBundleImportedByB")
 
     std::vector<BundleEvent> pEvts;
     pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));

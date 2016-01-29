@@ -119,9 +119,9 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = framework->GetBundleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
+    auto bundle = framework->GetBundleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "|TestBundleImportedByB");
 #else
-    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
+    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
 #endif
     US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
   }

@@ -400,7 +400,7 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|main");
     US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle main")
     bundle->Start();
   }

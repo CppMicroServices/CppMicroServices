@@ -126,9 +126,9 @@ std::shared_ptr<Bundle> InstallTestBundle(BundleContext* frameworkCtx, const std
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        bundle = frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "/" + bundleName);
+        bundle = frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "|" + bundleName);
 #else
-        bundle = frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + bundleName);
+        bundle = frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|" + bundleName);
 #endif
         US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle " << bundleName)
     }

@@ -113,7 +113,7 @@ std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
   if (event.IsNull()) return os << "NONE";
 
   auto m = event.GetBundle();
-  os << event.GetType() << " #" << m->GetBundleId() << " (" << m->GetLocation() << ")";
+  os << event.GetType() << " #" << m->GetBundleId() << " (" << m->GetLocation()+"/"+m->GetName() << ")";
   return os;
 }
 

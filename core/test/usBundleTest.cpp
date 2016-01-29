@@ -47,9 +47,8 @@ void frame01(BundleContext* context)
 {
   try
   {
-    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|main");
     US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle main")
-
     bundle->Start();
   }
   catch (const std::exception& e)
@@ -390,9 +389,11 @@ void TestForInstallFailure()
     {
         US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
     }
-
+#ifdef US_BUILD_SHARED_LIBS 
     US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
-
+#else
+	US_TEST_CONDITION(frameworkCtx->GetBundles().size() > 1, "Test # of installed bundles")
+#endif
     framework->Stop();
 }
 
@@ -484,6 +485,6 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   TestBundleStates();
   TestForInstallFailure();
   TestDuplicateInstall();
-
+  
   US_TEST_END()
 }

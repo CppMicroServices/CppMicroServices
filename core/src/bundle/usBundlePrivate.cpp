@@ -32,7 +32,7 @@
 #include "usCoreBundleContext_p.h"
 #include "usServiceRegistration.h"
 #include "usServiceReferenceBasePrivate.h"
-
+#include "usGetBundleContext.h"
 #include <algorithm>
 #include <iterator>
 #include <cassert>
@@ -40,7 +40,9 @@
 
 namespace us {
 
-BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContext* coreCtx,
+
+BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, 
+	                         CoreBundleContext* coreCtx,
                              BundleInfo* info)
   : coreCtx(coreCtx)
   , info(*info)
@@ -121,16 +123,34 @@ BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContex
     bundleManifest.SetValue(Bundle::PROP_AUTOLOAD_DIR, Any(this->info.autoLoadDir));
   }
 
-#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+  std::vector<std::string> installedBundleNames;
+#if defined(US_ENABLE_AUTOLOADING_SUPPORT) && defined(US_BUILD_SHARED_LIBS)
   if (coreCtx->settings.IsAutoLoadingEnabled())
   {
-    const std::vector<std::string> installedBundleNames = AutoLoadBundles(this->info, this->coreCtx);
-    if (!installedBundleNames.empty())
-    {
-      bundleManifest.SetValue(Bundle::PROP_AUTOINSTALLED_BUNDLES, Any(installedBundleNames));
-    }
+    installedBundleNames = AutoInstallBundles(this->info, this->coreCtx);
   }
 #endif
+  
+  for (auto childBundleName : info->embeddedBundles)
+  {
+    BundleInfo* childBundleInfo = new BundleInfo(info->location, childBundleName);
+	if (GetBundleContext() != NULL)
+	{
+		GetBundleContext()->InstallBundle(childBundleInfo);
+	}
+	else
+	{
+		// framework hasn't been started yet, so not posting install events
+		this->coreCtx->bundleRegistry.Register(childBundleInfo);
+	}
+    
+    installedBundleNames.push_back(childBundleName);
+  }
+  
+  if (!installedBundleNames.empty())
+  {
+    bundleManifest.SetValue(Bundle::PROP_AUTOINSTALLED_BUNDLES, Any(installedBundleNames));
+  }
 }
 
 BundlePrivate::~BundlePrivate()

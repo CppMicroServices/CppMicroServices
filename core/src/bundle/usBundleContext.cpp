@@ -70,7 +70,7 @@ std::shared_ptr<Bundle> BundleContext::GetBundle(long id) const
 
 std::shared_ptr<Bundle> BundleContext::GetBundle(const std::string& name)
 {
-  return d->bundle->coreCtx->bundleRegistry.GetBundle(name);
+  return d->bundle->coreCtx->bundleRegistry.GetBundleByName(name);
 }
 
 std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const
@@ -246,14 +246,22 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
 
 std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location)
 {
-    BundleInfo* bundleInfo = new BundleInfo(GetBundleNameFromLocation(location));
-    bundleInfo->location = GetBundleLocation(location);
+  // TODO: Remove the optional bundlename in the location input param
+  // The workaround is to support unittests only.
+  std::string bundleLocation, bundleName;
+  ExtractBundleNameAndLocation(location, bundleLocation, bundleName);
+  return InstallBundle(new BundleInfo(bundleLocation, bundleName));
+}
 
-    auto bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
-
+std::shared_ptr<Bundle> BundleContext::InstallBundle(BundleInfo* bundleInfo)
+{
+  auto bundle = d->bundle->coreCtx->bundleRegistry.Register(bundleInfo);
+  if (bundle)
+  {
+    // FIXME: Do we raise the event event if the bundle is already registered ?
     d->bundle->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
-
-    return bundle;
+  }
+  return bundle;
 }
 
 

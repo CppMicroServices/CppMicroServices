@@ -167,6 +167,19 @@ void Bundle::Stop()
     {
       d->bundleActivator->Stop(d->bundleContext);
     }
+	// remove the cached bundle context. TODO : This block can be moved
+	// to a setter method in BundlePrivate class.
+	typedef void(*SetBundleContext)(BundleContext*);
+	SetBundleContext setBundleContext = NULL;
+
+	std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
+	void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
+	std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+
+	if (setBundleContext)
+	{
+		setBundleContext(NULL);
+	}
   }
   catch (...)
   {

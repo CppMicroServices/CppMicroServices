@@ -29,12 +29,15 @@
 #include "usBundleSettings.h"
 #include "usBundleUtils_p.h"
 #include "usThreads_p.h"
+#include "usUtils_p.h"
 
 namespace us {
 
 const std::string Framework::PROP_STORAGE_LOCATION{ "org.cppmicroservices.framework.storage" };
 const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.framework.threading.support" };
 const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
+const std::string Framework::PROP_AUTO_INSTALL{ "org.cppmicroservices.framework.autoinstall" };
+const std::string Framework::PROP_AUTO_INSTALL_PATHS{ "org.cppmicroservices.framework.autoinstall.paths" };
 
 Framework::Framework(void) : d(new FrameworkPrivate())
 {
@@ -60,12 +63,11 @@ void Framework::Initialize(void)
     return;
   }
 
-  BundleInfo* bundleInfo = new BundleInfo(US_CORE_FRAMEWORK_NAME);
-
   void(Framework::*initFncPtr)(void) = &Framework::Initialize;
   void* frameworkInit = NULL;
   std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
-  bundleInfo->location = BundleUtils::GetLibraryPath(frameworkInit);
+
+  auto bundleInfo = new BundleInfo(BundleUtils::GetLibraryPath(frameworkInit), US_CORE_FRAMEWORK_NAME);
   
   d->coreBundleContext.bundleRegistry.RegisterSystemBundle(std::static_pointer_cast<Framework>(shared_from_this()), bundleInfo);
 
@@ -76,6 +78,15 @@ void Framework::Start()
 { 
   Initialize();
   Bundle::Start();
+  // Install all bundles from the Auto-Install configuration property
+  std::string paths = d->coreBundleContext.frameworkProperties[Framework::PROP_AUTO_INSTALL_PATHS];
+  std::vector<std::string> pathVec;
+  std::stringstream ss(paths);
+  std::string path;
+  while (std::getline(ss, path, ';')) 
+  {
+ 	  AutoInstallBundlesFromPath(path);
+  }
 }
 
 void Framework::Stop() 

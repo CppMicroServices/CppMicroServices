@@ -436,7 +436,7 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
   std::shared_ptr<Bundle> executableBundle = nullptr;
   try
   {
-    executableBundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
+    executableBundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|main");
     US_TEST_CONDITION_REQUIRED(executableBundle != nullptr, "Test installation of bundle main")
   }
   catch (const std::exception& e)
@@ -460,8 +460,9 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   BundleResource foo = bundleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
-
+#ifndef US_DISABLE_TESTING_LINKED_RESOURCES // FIXME: TestBundleRL uses linker to embed manifest.json on Windows
   testResourcesFrom("TestBundleRL", framework->GetBundleContext());
+#endif
   testResourcesFrom("TestBundleRA", framework->GetBundleContext());
 
   US_TEST_END()

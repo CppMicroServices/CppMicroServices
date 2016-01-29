@@ -154,6 +154,10 @@ public:
      * @see MsgType
      */
     static const std::string PROP_LOG_LEVEL;
+  
+  static const std::string PROP_AUTO_INSTALL;
+  
+  static const std::string PROP_AUTO_INSTALL_PATHS;
 
 private:
     // Framework instances are exclusively constructed by the FrameworkFactory class

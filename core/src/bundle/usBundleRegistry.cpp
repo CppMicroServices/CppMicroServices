@@ -49,7 +49,8 @@ BundleRegistry::~BundleRegistry(void)
 
 std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
 {
-  std::shared_ptr<Bundle> bundle(GetBundle(info->name));
+  std::string bundleKey = info->location + "/" + info->name;
+  std::shared_ptr<Bundle> bundle = GetBundle(bundleKey);
 
   if (!bundle)
   {
@@ -62,7 +63,7 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
     bundle->Init(coreCtx, info);
 
     Lock l(this);
-    std::pair<BundleMap::iterator, bool> return_pair(bundles.insert(std::make_pair(info->name, bundle)));
+    std::pair<BundleMap::iterator, bool> return_pair(bundles.insert(std::make_pair(bundleKey, bundle)));
 
     // A race condition exists when creating a new bundle instance. To resolve
     // this requires either scoping the mutex to the entire function or adding
@@ -96,9 +97,10 @@ void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundl
   }
 
   systemBundle->Init(coreCtx, info);
-
-  Lock l(this);
-  bundles.insert(std::make_pair(info->name, systemBundle));
+  {
+	  Lock l(this);
+	  bundles.insert(std::make_pair(info->location + "/" + info->name, systemBundle));
+  }
 }
 
 void BundleRegistry::UnRegister(const BundleInfo* info)
@@ -107,7 +109,7 @@ void BundleRegistry::UnRegister(const BundleInfo* info)
   if (info->id >= 1)
   {
     Lock l(this);
-    bundles.erase(info->name);
+    bundles.erase(info->location + "/" + info->name);
   }
 }
 
@@ -125,16 +127,31 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
   return nullptr;
 }
 
-std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
+
+std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& location) const
 {
   Lock l(this);
 
-  auto iter = bundles.find(name);
+  auto iter = bundles.find(location);
   if (iter != bundles.end())
   {
     return iter->second;
   }
   return nullptr;
+}
+  
+std::shared_ptr<Bundle> BundleRegistry::GetBundleByName(const std::string& name) const
+{
+  Lock l(this);
+  
+  for (auto& m : bundles)
+  {
+    if (m.second->GetName() == name)
+    {
+      return m.second;
+    }
+  }
+  return 0;
 }
 
 std::vector<std::shared_ptr<Bundle>> BundleRegistry::GetBundles() const

@@ -60,6 +60,7 @@ static inline BundleContext* GetBundleContext()
   info.location = libPath;
   std::string get_bundle_context_func("_us_get_bundle_context_instance_" US_STR(US_BUNDLE_NAME));
   void* getBundleContextSym = BundleUtils::GetSymbol(info, get_bundle_context_func.c_str());
+  
   std::memcpy(&getBundleContext, &getBundleContextSym, sizeof(void*));
 
   if (getBundleContext)

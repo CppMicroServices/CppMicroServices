@@ -59,13 +59,25 @@ public:
    */
   std::shared_ptr<Bundle> GetBundle(long id) const;
 
+
+  /**
+   * Get the bundle that has specified location
+   *
+   * @param location The path of the bundle to get.
+   * @return Bundle or null.
+   */
+
+  std::shared_ptr<Bundle> GetBundle(const std::string& location) const;
+  
   /**
    * Get the bundle that has specified bundle name.
    *
    * @param name The name of the bundle to get.
    * @return Bundle or null.
    */
-  std::shared_ptr<Bundle> GetBundle(const std::string& name) const;
+
+  std::shared_ptr<Bundle> GetBundleByName(const std::string& name) const;
+
 
   /**
    * Get all known bundles.

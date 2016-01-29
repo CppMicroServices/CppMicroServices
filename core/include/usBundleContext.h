@@ -32,6 +32,7 @@ namespace us {
 
 class Bundle;
 class BundleContextPrivate;
+struct BundleInfo;
 class ServiceFactory;
 
 template<class S> class ServiceObjects;
@@ -733,6 +734,8 @@ private:
 
   void AddBundleListener(const BundleListener& delegate, void* data);
   void RemoveBundleListener(const BundleListener& delegate, void* data);
+  
+  std::shared_ptr<Bundle> InstallBundle(BundleInfo* bundleInfo);
 
   BundleContextPrivate * const d;
   

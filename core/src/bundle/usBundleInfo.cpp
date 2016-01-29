@@ -22,13 +22,53 @@
 
 
 #include "usBundleInfo.h"
+#include "usUtils_p.h"
 
+#include <stdlib.h>
 namespace us {
 
-BundleInfo::BundleInfo(const std::string& name)
+  BundleInfo::BundleInfo(const std::string& location, const std::string& name)
   : name(name)
   , id(0)
 {
+#if _WIN32
+	this->location = location;
+#else
+  // resolve any symlinks. 
+  char filePath[PATH_MAX];
+  char* resultPath = ::realpath(location.c_str(), filePath);
+  if (resultPath) {
+    this->location = std::string(filePath);
+  }
+#endif
+  if (name.empty())
+  {
+    embeddedBundles = GetBundleNamesFromLibrary(location);
+    if (embeddedBundles.size())
+    {
+      this->name = embeddedBundles.at(0);
+      // remove the top most element which is the current bundle name
+      embeddedBundles.erase(embeddedBundles.begin());
+    }
+  }
+  else if(name == US_CORE_FRAMEWORK_NAME)
+  {
+    // This is a special case where we know the location contains the framework
+    // check for other bundles embedded in the same binary
+    embeddedBundles = GetBundleNamesFromLibrary(location);
+    std::vector<std::string>::iterator it = embeddedBundles.begin();
+    while (it != embeddedBundles.end())
+    {
+      if (*it == US_CORE_FRAMEWORK_NAME)
+      {
+        it = embeddedBundles.erase(it);
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
 }
 
 }

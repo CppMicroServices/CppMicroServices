@@ -122,8 +122,8 @@ void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundl
 
   systemBundle->Init(coreCtx, info);
   {
-	  Lock l(this);
-	  bundles.insert(std::make_pair(info->location + "/" + info->name, systemBundle));
+    Lock l(this);
+    bundles.insert(std::make_pair(info->location + "/" + info->name, systemBundle));
   }
 }
 

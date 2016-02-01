@@ -292,13 +292,16 @@ void TestBundleStates()
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
     frameworkCtx->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
-
+    size_t preInstallBundleCount = frameworkCtx->GetBundles().size();
     // Test install -> uninstall
     // expect 2 event (INSTALLED, UNINSTALLED)
+    bool bundleAlreadyInstalled = frameworkCtx->GetBundle("TestBundleA") != nullptr;
     auto bundle = InstallTestBundle(frameworkCtx, "TestBundleA");
     bundle->Uninstall();
+    size_t postUninstallExpectedCount = bundleAlreadyInstalled ? preInstallBundleCount - 1 : preInstallBundleCount;
     US_TEST_CONDITION(0 == frameworkCtx->GetBundle("TestBundleA"), "Test bundle install -> uninstall")
-    US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
+    US_TEST_CONDITION(postUninstallExpectedCount == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
+    
     bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
@@ -306,11 +309,14 @@ void TestBundleStates()
 
     // Test install -> start -> uninstall
     // expect 6 events (INSTALLED, STARTING, STARTED, STOPPING, STOPPED, UNINSTALLED)
+    preInstallBundleCount = frameworkCtx->GetBundles().size();
+    bundleAlreadyInstalled = frameworkCtx->GetBundle("TestBundleA") != nullptr;
     bundle = InstallTestBundle(frameworkCtx, "TestBundleA");
     bundle->Start();
     bundle->Uninstall();
     US_TEST_CONDITION(0 == frameworkCtx->GetBundle("TestBundleA"), "Test bundle install -> start -> uninstall")
-    US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
+    postUninstallExpectedCount = bundleAlreadyInstalled ? preInstallBundleCount - 1 : preInstallBundleCount;
+    US_TEST_CONDITION(postUninstallExpectedCount == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
     bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::STARTING, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::STARTED, bundle));
@@ -322,11 +328,14 @@ void TestBundleStates()
 
     // Test install -> stop -> uninstall
     // expect 2 event (INSTALLED, UNINSTALLED)
+    preInstallBundleCount = frameworkCtx->GetBundles().size();
+    bundleAlreadyInstalled = frameworkCtx->GetBundle("TestBundleA") != nullptr;
     bundle = InstallTestBundle(frameworkCtx, "TestBundleA");
     bundle->Stop();
     bundle->Uninstall();
     US_TEST_CONDITION(0 == frameworkCtx->GetBundle("TestBundleA"), "Test bundle install -> stop -> uninstall")
-    US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
+    postUninstallExpectedCount = bundleAlreadyInstalled ? preInstallBundleCount - 1 : preInstallBundleCount;
+    US_TEST_CONDITION(postUninstallExpectedCount == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
     bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
@@ -334,12 +343,15 @@ void TestBundleStates()
 
     // Test install -> start -> stop -> uninstall
     // expect 6 events (INSTALLED, STARTING, STARTED, STOPPING, STOPPED, UNINSTALLED)
+    bundleAlreadyInstalled = frameworkCtx->GetBundle("TestBundleA") != nullptr;
+    preInstallBundleCount = frameworkCtx->GetBundles().size();
     bundle = InstallTestBundle(frameworkCtx, "TestBundleA");
     bundle->Start();
     bundle->Stop();
     bundle->Uninstall();
+    postUninstallExpectedCount = bundleAlreadyInstalled ? preInstallBundleCount - 1 : preInstallBundleCount;
     US_TEST_CONDITION(0 == frameworkCtx->GetBundle("TestBundleA"), "Test bundle install -> start -> stop -> uninstall")
-    US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
+    US_TEST_CONDITION(postUninstallExpectedCount == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
     bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::STARTING, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::STARTED, bundle));
@@ -360,7 +372,7 @@ void TestForInstallFailure()
     framework->Start();
 
     BundleContext* frameworkCtx = framework->GetBundleContext();
-
+    size_t preInstallBundleCount = frameworkCtx->GetBundles().size();
     // Test that bogus bundle installs throw the appropriate exception
     try
     {
@@ -389,11 +401,7 @@ void TestForInstallFailure()
     {
         US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
     }
-#ifdef US_BUILD_SHARED_LIBS 
-    US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
-#else
-    US_TEST_CONDITION(frameworkCtx->GetBundles().size() > 1, "Test # of installed bundles")
-#endif
+    US_TEST_CONDITION(preInstallBundleCount == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
     framework->Stop();
 }
 

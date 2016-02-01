@@ -121,7 +121,7 @@ BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContex
     bundleManifest.SetValue(Bundle::PROP_AUTOLOAD_DIR, Any(this->info.autoLoadDir));
   }
 
-#if defined(US_ENABLE_AUTOLOADING_SUPPORT) // && defined(US_BUILD_SHARED_LIBS)
+#if defined(US_ENABLE_AUTOLOADING_SUPPORT)
   if (coreCtx->settings.IsAutoLoadingEnabled())
   {
     const std::vector<std::string> installedBundleNames = AutoInstallBundles(this->info, this->coreCtx);
@@ -174,7 +174,7 @@ void BundlePrivate::SetBundleContext(BundleContext* context)
   // save this bundle's context so that it can be accessible anywhere
   // from within this bundle's code.
   typedef void(*SetBundleContext)(BundleContext*);
-  SetBundleContext setBundleContext = NULL;
+  SetBundleContext setBundleContext = nullptr;
   
   std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + info.name;
   void* setBundleContextSym = BundleUtils::GetSymbol(info, set_bundle_context_func.c_str());

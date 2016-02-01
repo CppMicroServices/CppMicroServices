@@ -50,21 +50,16 @@ BundleRegistry::~BundleRegistry(void)
 std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
 {
   std::vector<std::string> embeddedBundles; // statically-linked bundles in the binary
-  if (info->name.empty() || info->name == US_CORE_FRAMEWORK_NAME)
+  if (info->name.empty())
   {
     embeddedBundles = GetBundleNamesFromLibrary(info->location);
   }
   if(!embeddedBundles.empty())
   {
-    if(info->name.empty())
-    {
-      info->name = embeddedBundles.at(0);
-    }
+    info->name = embeddedBundles.at(0);
     // remove this bundle name from the list to avoid an extra call to Register
-    std::vector<std::string>::iterator it = std::find(embeddedBundles.begin(), embeddedBundles.end(), info->name);
-    embeddedBundles.erase(it);
+    embeddedBundles.erase(embeddedBundles.begin());
   }
-  
   
   std::string bundleKey = info->location + "/" + info->name;
   std::shared_ptr<Bundle> bundle = GetBundle(bundleKey);
@@ -75,7 +70,7 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
     {
       Lock l(id);
       info->id = id.value++;
-      assert(info->id == 0 ? info->name == "CppMicroServices" : true);
+      assert(info->id != 0 && info->name != US_CORE_FRAMEWORK_NAME && !bundles.empty());
     }
     bundle->Init(coreCtx, info);
 
@@ -109,21 +104,37 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
 
 void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundle, BundleInfo* info)
 {
+  assert (info->name == US_CORE_FRAMEWORK_NAME);
   if (!systemBundle)
   {
     throw std::invalid_argument("Can't register a null system bundle");
+  }
+  
+  // detect statically-linked bundles in the binary
+  std::vector<std::string> embeddedBundles = GetBundleNamesFromLibrary(info->location);
+  if(!embeddedBundles.empty())
+  {
+    // remove this bundle name from the list to avoid an extra call to Register
+    std::vector<std::string>::iterator it = std::find(embeddedBundles.begin(), embeddedBundles.end(), info->name);
+    embeddedBundles.erase(it);
   }
 
   {
     Lock l(id);
     info->id = id.value++;
-    assert(info->id == 0 ? info->name == "CppMicroServices" : true);
+    assert(info->id == 0 && bundles.empty());
   }
 
   systemBundle->Init(coreCtx, info);
   {
     Lock l(this);
     bundles.insert(std::make_pair(info->location + "/" + info->name, systemBundle));
+  }
+  
+  // register all the statically-linked bundles
+  for (auto childBundleName : embeddedBundles)
+  {
+    Register(new BundleInfo(info->location, childBundleName));
   }
 }
 

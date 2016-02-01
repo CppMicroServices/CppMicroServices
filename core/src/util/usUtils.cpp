@@ -176,7 +176,7 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
       US_DEBUG << "Auto-installing bundle " << libPath;
       try
       {
-        std::shared_ptr<Bundle> installedBundle = GetBundleContext()->InstallBundle(libPath);
+        std::shared_ptr<Bundle> installedBundle = GetBundleContext() != nullptr ? GetBundleContext()->InstallBundle(libPath) : nullptr;
         if (!installedBundle)
         {
           US_WARN << "Auto-installing of bundle " << libPath << " failed.";

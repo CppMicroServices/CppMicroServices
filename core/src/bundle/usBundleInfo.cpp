@@ -31,14 +31,23 @@ BundleInfo::BundleInfo(const std::string& location, const std::string& name)
 : name(name)
 , id(0)
 {
+  if (location.empty())
+  {
+    throw std::runtime_error("Empty bundle path");
+  }
 #if defined(US_PLATFORM_WINDOWS)
   this->location = location;
 #else
   // resolve any symlinks. 
   char filePath[PATH_MAX];
   char* resultPath = ::realpath(location.c_str(), filePath);
-  if (resultPath) {
+  if (resultPath)
+  {
     this->location = std::string(filePath);
+  }
+  else
+  {
+    throw std::runtime_error("Invalid bundle path");
   }
 #endif
 }

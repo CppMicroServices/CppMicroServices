@@ -42,19 +42,19 @@ namespace {
 // also check that the expected events occur
 void frame020a(BundleContext* context, TestBundleListener& listener)
 {
-  InstallTestBundle(context, "TestBundleB");
-
-  auto bundleB = context->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for existing bundle TestBundleB")
-
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "|TestBundleImportedByB");
+    // Since TestBundleImportedByB is statically linked into TestBundlB, InstallBundle
+    // on libTestBundleB will install both TestBundleB and TestBundleImportedByB
+    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT);
 #else
     auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
-#endif
     US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
+    bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleB");
+    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleB")
+#endif
+    
   }
   catch (const std::exception& e)
   {
@@ -63,7 +63,7 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 
   auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
   US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for existing bundle TestBundleImportedByB")
-
+  auto bundleB = context->GetBundle("TestBundleB");
   US_TEST_CONDITION(bundleB->GetName() == "TestBundleB", "Test bundle name")
   US_TEST_CONDITION(bundleImportedByB->GetName() == "TestBundleImportedByB", "Test bundle name")
 
@@ -83,8 +83,8 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
-    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleImportedByB));

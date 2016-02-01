@@ -32,7 +32,6 @@ namespace us {
 
 class Bundle;
 class BundleContextPrivate;
-struct BundleInfo;
 class ServiceFactory;
 
 template<class S> class ServiceObjects;

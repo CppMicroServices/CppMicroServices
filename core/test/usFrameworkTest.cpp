@@ -56,7 +56,7 @@ namespace
 
         US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
 #if defined (US_BUILD_SHARED_LIBS)
-		US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() == 1, "Unexpected number of bundles")
+        US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() == 1, "Unexpected number of bundles")
 #endif
 		f->Stop();
 
@@ -80,11 +80,11 @@ namespace
 #else
         configuration.insert(std::pair<std::string, std::string>(Framework::PROP_THREADING_SUPPORT, "multi"));
 #endif
-		std::string installPaths;
+        std::string installPaths;
 #if defined (US_BUILD_SHARED_LIBS)
-		installPaths = LIB_PATH + ";" + LIB_PATH + "/dummydir";
+        installPaths = LIB_PATH + ";" + LIB_PATH + "/dummydir";
 #endif
-		configuration.insert(std::pair<std::string, std::string>(Framework::PROP_AUTO_INSTALL_PATHS, installPaths));
+        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_AUTO_INSTALL_PATHS, installPaths));
 
         FrameworkFactory factory;
 
@@ -123,7 +123,7 @@ namespace
         US_TEST_CONDITION(f->GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f->GetName() == US_CORE_FRAMEWORK_NAME, "Test Framework Bundle Name");
         US_TEST_CONDITION(f->GetBundleId() == 0, "Test Framework Bundle Id");
-		f->Stop();
+        f->Stop();
     }
 
     void TestLifeCycle()

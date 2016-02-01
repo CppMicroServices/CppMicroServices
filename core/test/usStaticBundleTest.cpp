@@ -156,23 +156,23 @@ void frame030b(BundleContext* context, TestBundleListener& listener)
 // Uninstall libB and check for correct events
 void frame040c(BundleContext* context, TestBundleListener& listener)
 {
-	std::string bundleBName("TestBundleB"), bundleImportedByBName("TestBundleImportedByB");
-    auto bundleB = context->GetBundle(bundleBName);
-    US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
-
-    auto bundleImportedByB = context->GetBundle(bundleImportedByBName);
-    US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
-
-    bundleB->Uninstall();
-    US_TEST_CONDITION(context->GetBundle(bundleBName) == nullptr, "Test for uninstall of TestBundleB")
-    bundleImportedByB->Uninstall();
-    US_TEST_CONDITION(context->GetBundle(bundleImportedByBName) == nullptr, "Test for uninstall of TestBundleImportedByB")
-
-    std::vector<BundleEvent> pEvts;
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
-
-    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+  std::string bundleBName("TestBundleB"), bundleImportedByBName("TestBundleImportedByB");
+  auto bundleB = context->GetBundle(bundleBName);
+  US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
+  
+  auto bundleImportedByB = context->GetBundle(bundleImportedByBName);
+  US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
+  
+  bundleB->Uninstall();
+  US_TEST_CONDITION(context->GetBundle(bundleBName) == nullptr, "Test for uninstall of TestBundleB")
+  bundleImportedByB->Uninstall();
+  US_TEST_CONDITION(context->GetBundle(bundleImportedByBName) == nullptr, "Test for uninstall of TestBundleImportedByB")
+  
+  std::vector<BundleEvent> pEvts;
+  pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
+  
+  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 }
 
 } // end unnamed namespace

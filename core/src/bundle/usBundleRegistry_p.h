@@ -59,7 +59,6 @@ public:
    */
   std::shared_ptr<Bundle> GetBundle(long id) const;
 
-
   /**
    * Get the bundle that has specified location
    *
@@ -77,7 +76,6 @@ public:
    */
 
   std::shared_ptr<Bundle> GetBundleByName(const std::string& name) const;
-
 
   /**
    * Get all known bundles.

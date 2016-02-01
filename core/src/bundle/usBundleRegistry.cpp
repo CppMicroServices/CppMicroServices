@@ -60,7 +60,7 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
     {
       info->name = embeddedBundles.at(0);
     }
-    // remove the bundle name from the embedded list.
+    // remove this bundle name from the list to avoid an extra call to Register
     std::vector<std::string>::iterator it = std::find(embeddedBundles.begin(), embeddedBundles.end(), info->name);
     embeddedBundles.erase(it);
   }
@@ -150,7 +150,6 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
   }
   return nullptr;
 }
-
 
 std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& location) const
 {

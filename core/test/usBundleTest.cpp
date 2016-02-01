@@ -392,7 +392,7 @@ void TestForInstallFailure()
 #ifdef US_BUILD_SHARED_LIBS 
     US_TEST_CONDITION(1 == frameworkCtx->GetBundles().size(), "Test # of installed bundles")
 #else
-	US_TEST_CONDITION(frameworkCtx->GetBundles().size() > 1, "Test # of installed bundles")
+    US_TEST_CONDITION(frameworkCtx->GetBundles().size() > 1, "Test # of installed bundles")
 #endif
     framework->Stop();
 }

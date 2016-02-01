@@ -84,7 +84,7 @@ void Framework::Start()
   std::string path;
   while (std::getline(ss, path, ';')) 
   {
- 	  AutoInstallBundlesFromPath(path);
+    AutoInstallBundlesFromPath(path);
   }
 }
 

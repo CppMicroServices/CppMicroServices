@@ -196,13 +196,13 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
   return installedBundles;
 }
   
-  std::vector<std::string> GetBundleNamesFromLibrary(const std::string& libPath)
+std::vector<std::string> GetBundleNamesFromLibrary(const std::string& libPath)
+{
+  std::vector<std::string> bundleNames;
+  mz_zip_archive zipArchive;
+  memset(&zipArchive, 0, sizeof(mz_zip_archive));
+  if(MZ_FALSE != mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0))
   {
-    std::vector<std::string> bundleNames;
-    mz_zip_archive zipArchive;
-    memset(&zipArchive, 0, sizeof(mz_zip_archive));
-    if(MZ_FALSE != mz_zip_reader_init_file(&zipArchive, libPath.c_str(), 0))
-    {
     
     // the usResourceCompiler will place resources into sub directories,
     // one for each bundle, named after the bundle's name. The bundle's
@@ -222,10 +222,10 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
         bundleNames.push_back(file.substr(0, pos));
       }
     }
-    }
-    mz_zip_reader_end(&zipArchive);
-    return bundleNames;
   }
+  mz_zip_reader_end(&zipArchive);
+  return bundleNames;
+}
   
   
 

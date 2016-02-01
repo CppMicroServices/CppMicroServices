@@ -57,7 +57,9 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
   if(!embeddedBundles.empty())
   {
     if(info->name.empty())
+    {
       info->name = embeddedBundles.at(0);
+    }
     // remove the bundle name from the embedded list.
     std::vector<std::string>::iterator it = std::find(embeddedBundles.begin(), embeddedBundles.end(), info->name);
     embeddedBundles.erase(it);

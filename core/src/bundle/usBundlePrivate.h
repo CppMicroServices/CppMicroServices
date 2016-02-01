@@ -58,6 +58,12 @@ public:
   virtual ~BundlePrivate();
 
   void RemoveBundleResources();
+  
+  /**
+   * Set the bundleContext member and update the cached instance in bundle code 
+   * See US_INITIALIZE_BUNDLE
+   */
+  void SetBundleContext(BundleContext* context);
 
   CoreBundleContext* const coreCtx;
 

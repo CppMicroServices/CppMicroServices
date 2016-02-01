@@ -73,7 +73,8 @@ void Bundle::Uninit()
     //d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
     d->RemoveBundleResources();
     delete d->bundleContext;
-    d->bundleContext = nullptr;
+    // Reset the cached instance inside the bundle code
+    d->SetBundleContext(nullptr);
     d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, shared_from_this()));
 
     d->bundleActivator = nullptr;
@@ -102,21 +103,7 @@ void Bundle::Start()
   }
 #endif
 
-  d->bundleContext = new BundleContext(this->d);
-
-  // save this bundle's context so that it can be accessible anywhere
-  // from within this bundle's code.
-  typedef void(*SetBundleContext)(BundleContext*);
-  SetBundleContext setBundleContext = NULL;
-
-  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-  void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
-
-  if (setBundleContext)
-  {
-    setBundleContext(d->bundleContext);
-  }
+  d->SetBundleContext(new BundleContext(this->d));
 
   typedef BundleActivator*(*BundleActivatorHook)(void);
   BundleActivatorHook activatorHook = NULL;
@@ -167,19 +154,6 @@ void Bundle::Stop()
     {
       d->bundleActivator->Stop(d->bundleContext);
     }
-	// remove the cached bundle context. TODO : This block can be moved
-	// to a setter method in BundlePrivate class.
-	typedef void(*SetBundleContext)(BundleContext*);
-	SetBundleContext setBundleContext = NULL;
-
-	std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-	void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-	std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
-
-	if (setBundleContext)
-	{
-		setBundleContext(NULL);
-	}
   }
   catch (...)
   {

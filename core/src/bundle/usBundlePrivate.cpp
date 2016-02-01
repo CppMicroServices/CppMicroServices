@@ -167,5 +167,23 @@ void BundlePrivate::RemoveBundleResources()
     i->GetReference(std::string()).d->UngetService(q.lock(), false);
   }
 }
+  
+void SetBundleContext(BundleContext* context)
+{
+  bundleContext = context;
+  // save this bundle's context so that it can be accessible anywhere
+  // from within this bundle's code.
+  typedef void(*SetBundleContext)(BundleContext*);
+  SetBundleContext setBundleContext = NULL;
+  
+  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + info.name;
+  void* setBundleContextSym = BundleUtils::GetSymbol(info, set_bundle_context_func.c_str());
+  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+  
+  if (setBundleContext)
+  {
+    setBundleContext(bundleContext);
+  }
+}
 
 }

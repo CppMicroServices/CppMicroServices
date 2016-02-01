@@ -31,7 +31,7 @@ BundleInfo::BundleInfo(const std::string& location, const std::string& name)
 : name(name)
 , id(0)
 {
-#if _WIN32
+#if defined(US_PLATFORM_WINDOWS)
   this->location = location;
 #else
   // resolve any symlinks. 

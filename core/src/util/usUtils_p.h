@@ -36,9 +36,6 @@
 
 namespace us {
 
-std::string GetBundleNameFromLocation(const std::string& location);
-
-std::string GetBundleLocation(const std::string& location);
 void ExtractBundleNameAndLocation(const std::string& locationName, std::string& oLocation, std::string& oName);
 bool IsSharedLibrary(const std::string& location);
 

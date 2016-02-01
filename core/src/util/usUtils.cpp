@@ -81,16 +81,6 @@ namespace us {
 // Bundle name and location parsing
 //-------------------------------------------------------------------
 
-std::string GetBundleNameFromLocation(const std::string& location)
-{
-    return location.substr(location.find_last_of('/') + 1);
-}
-
-std::string GetBundleLocation(const std::string& location)
-{
-    return location.substr(0, location.find_last_of('/'));
-}
-
 void ExtractBundleNameAndLocation(const std::string& locationName, std::string& outLocation, std::string& outName)
 {
   if (locationName.empty())

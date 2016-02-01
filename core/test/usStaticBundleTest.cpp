@@ -45,7 +45,7 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    // Since TestBundleImportedByB is statically linked into TestBundlB, InstallBundle
+    // Since TestBundleImportedByB is statically linked into TestBundleB, InstallBundle
     // on libTestBundleB will install both TestBundleB and TestBundleImportedByB
     auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT);
 #else
@@ -83,6 +83,8 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
+    // Install event for Statically linked bundleImportedByB is fired before 
+    // the install event for bundleB.
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleB));

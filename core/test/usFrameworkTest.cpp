@@ -58,7 +58,7 @@ namespace
 #if defined (US_BUILD_SHARED_LIBS)
         US_TEST_CONDITION(f->GetBundleContext()->GetBundles().size() == 1, "Unexpected number of bundles")
 #endif
-		f->Stop();
+        f->Stop();
 
     }
 

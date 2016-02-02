@@ -74,7 +74,6 @@ public:
    * @param name The name of the bundle to get.
    * @return Bundle or null.
    */
-
   std::shared_ptr<Bundle> GetBundleByName(const std::string& name) const;
 
   /**

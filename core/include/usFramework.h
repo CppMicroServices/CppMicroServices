@@ -156,11 +156,11 @@ public:
   static const std::string PROP_LOG_LEVEL;
   
   /**
-   * The framework's auto-install configuration property key name.
+   * The framework's install paths configuration property key name.
    * This property's value is a string with a list of paths delimited by ';' character.
    * Bundles from the provided paths are installed at framework startup
    */
-  static const std::string PROP_AUTO_INSTALL_PATHS;
+  static const std::string PROP_INSTALL_PATHS;
   
 private:
   // Framework instances are exclusively constructed by the FrameworkFactory class

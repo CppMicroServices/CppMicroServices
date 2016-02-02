@@ -84,7 +84,7 @@ namespace
 #if defined (US_BUILD_SHARED_LIBS)
         installPaths = LIB_PATH + ";" + LIB_PATH + "/dummydir";
 #endif
-        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_AUTO_INSTALL_PATHS, installPaths));
+        configuration.insert(std::pair<std::string, std::string>(Framework::PROP_INSTALL_PATHS, installPaths));
 
         FrameworkFactory factory;
 
@@ -102,7 +102,7 @@ namespace
 
         US_TEST_CONDITION(Logger::instance().GetLogLevel() == DebugMsg, "Test custom log level")
 
-        US_TEST_CONDITION(f->GetProperty(Framework::PROP_AUTO_INSTALL_PATHS).ToString() == installPaths, "Test auto-install config setting")
+        US_TEST_CONDITION(f->GetProperty(Framework::PROP_INSTALL_PATHS).ToString() == installPaths, "Test auto-install config setting")
 #ifdef US_ENABLE_THREADING_SUPPORT
         US_TEST_CONDITION(f->GetProperty(Framework::PROP_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
 #else

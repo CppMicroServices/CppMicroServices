@@ -22,9 +22,10 @@
 
 
 #include "usBundleInfo.h"
-#include "usUtils_p.h"
 
-#include <stdlib.h>
+#include <stdexcept> // std::runtime_error
+#include <limits.h>  // PATH_MAX
+#include <stdlib.h>  // realpath
 namespace us {
 
 BundleInfo::BundleInfo(const std::string& location, const std::string& name)

@@ -46,6 +46,7 @@ const std::string Bundle::PROP_VENDOR{ "bundle.vendor" };
 const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
 const std::string Bundle::PROP_AUTOLOAD_DIR{ "bundle.autoload_dir" };
 const std::string Bundle::PROP_AUTOINSTALLED_BUNDLES{ "bundle.autoinstalled_bundles" };
+const std::string Bundle::PROP_STATIC_LINKED_BUNDLES{ "bundle.static_linked_bundles" };
 
 Bundle::Bundle()
 : d(0)

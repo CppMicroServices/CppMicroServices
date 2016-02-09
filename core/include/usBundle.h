@@ -152,6 +152,14 @@ public:
    */
   static const std::string PROP_AUTOINSTALLED_BUNDLES;
 
+ /**
+  * The property key to retrieve the list of bundles that were statically 
+  * linked into the bundle binary.
+  * The property value is of type \c std::vector<std::string> and contains
+  * the bundle names.
+  */
+  static const std::string PROP_STATIC_LINKED_BUNDLES;
+
   virtual ~Bundle();
 
   /**

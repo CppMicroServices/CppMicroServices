@@ -42,19 +42,24 @@ namespace {
 // also check that the expected events occur
 void frame020a(BundleContext* context, TestBundleListener& listener)
 {
+  auto bundle = InstallTestBundle(context, "TestBundleB");
+  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for installed bundle TestBundleB")
+
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
     // Since TestBundleImportedByB is statically linked into TestBundleB, InstallBundle
     // on libTestBundleB will install both TestBundleB and TestBundleImportedByB
-    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT);
+    us::Any staticLinkedBundles = bundle->GetProperty(Bundle::PROP_STATIC_LINKED_BUNDLES);
+    US_TEST_CONDITION_REQUIRED(!staticLinkedBundles.Empty(), "Test for PROP_STATIC_LINKED_BUNDLES property")
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundles.Type() == typeid(std::vector<std::string>), "Test for PROP_STATIC_LINKED_BUNDLES property type")
+    std::vector<std::string> staticLinkedBundlesVec = any_cast<std::vector<std::string> >(staticLinkedBundles);
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundlesVec.size() == 1, "Test for PROP_STATIC_LINKED_BUNDLES vector size")
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundlesVec.at(0) == "TestBundleImportedByB", "Test for static linked bundle name")
 #else
     auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
     US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
-    bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleB");
-    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleB")
 #endif
-    
   }
   catch (const std::exception& e)
   {
@@ -83,10 +88,15 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
+#if defined(US_BUILD_SHARED_LIBS)
     // Install event for Statically linked bundleImportedByB is fired before 
     // the install event for bundleB.
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
+#else
+    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
+#endif
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleImportedByB));

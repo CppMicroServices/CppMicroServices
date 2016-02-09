@@ -114,25 +114,27 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   assert(framework->GetBundleContext());
 
-  InstallTestBundle(framework->GetBundleContext(), "TestBundleB");
-
+  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleB");
+  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for installed bundle TestBundleB")
+  US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = framework->GetBundleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "|TestBundleImportedByB");
+    us::Any staticLinkedBundles = bundle->GetProperty(Bundle::PROP_STATIC_LINKED_BUNDLES);
+    US_TEST_CONDITION_REQUIRED(!staticLinkedBundles.Empty(), "Test for PROP_STATIC_LINKED_BUNDLES property")
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundles.Type() == typeid(std::vector<std::string>), "Test for PROP_STATIC_LINKED_BUNDLES property type")
+    std::vector<std::string> staticLinkedBundlesVec = any_cast<std::vector<std::string> >(staticLinkedBundles);
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundlesVec.size() == 1, "Test for PROP_STATIC_LINKED_BUNDLES vector size")
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundlesVec.at(0) == "TestBundleImportedByB", "Test for static linked bundle name")
 #else
-    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
+    auto bundle_1 = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
+    US_TEST_CONDITION_REQUIRED(bundle_1 != nullptr, "Test installation of bundle TestBundleImportedByB")
 #endif
-    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
   }
   catch (const std::exception& e)
   {
     US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
   }
-
-  auto bundle = framework->GetBundleContext()->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for existing bundle TestBundleB")
-  US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
 
   testResourceOperators(bundle);
   testResourcesWithStaticImport(framework, bundle);

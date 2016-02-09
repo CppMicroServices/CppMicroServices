@@ -91,13 +91,15 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
       bundle = return_pair.first->second;
     }
   }
-  
-  // register all the statically-linked bundles
-  for (auto childBundleName : embeddedBundles)
+  if (!embeddedBundles.empty())
   {
-    Register(new BundleInfo(info->location, childBundleName));
+    // register all the statically-linked bundles
+    for (auto childBundleName : embeddedBundles)
+    {
+      Register(new BundleInfo(info->location, childBundleName));
+    }
+    bundle->d->bundleManifest.SetValue(Bundle::PROP_STATIC_LINKED_BUNDLES, Any(embeddedBundles));
   }
-  
   coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
   return bundle;
 }
@@ -130,11 +132,15 @@ void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundl
     Lock l(this);
     bundles.insert(std::make_pair(info->location + "/" + info->name, systemBundle));
   }
-  
-  // register all the statically-linked bundles
-  for (auto childBundleName : embeddedBundles)
+  if (!embeddedBundles.empty())
   {
-    Register(new BundleInfo(info->location, childBundleName));
+    // register all the statically-linked bundles
+    for (auto childBundleName : embeddedBundles)
+    {
+      Register(new BundleInfo(info->location, childBundleName));
+    }
+    std::shared_ptr<Bundle> bundle = systemBundle;
+    bundle->d->bundleManifest.SetValue(Bundle::PROP_STATIC_LINKED_BUNDLES, Any(embeddedBundles));
   }
 }
 

@@ -198,7 +198,16 @@ namespace
         bundle = InstallTestBundle(fmc, "TestBundleA2");
         pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
         bundle = InstallTestBundle(fmc, "TestBundleB");
+#if defined (US_BUILD_SHARED_LIBS)
+        // static-linked bundles are auto-installed
+        auto bundleImportedByB = fmc->GetBundle("TestBundleImportedByB");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
         pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+#else
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+        auto bundleImportedByB = InstallTestBundle(fmc, "TestBundleImportedByB");
+        pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
+#endif
         bundle = InstallTestBundle(fmc, "TestBundleH");
         pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
         bundle = InstallTestBundle(fmc, "TestBundleM");

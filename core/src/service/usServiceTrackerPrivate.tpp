@@ -148,8 +148,8 @@ TrackedService<S,TTT>* ServiceTrackerPrivate<S,TTT>::Tracked() const
 template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::Modified()
 {
-  cachedReference = nullptr; /* clear cached value */
-  cachedService = nullptr; /* clear cached value */
+  cachedReference.Store(ServiceReference<S>()); /* clear cached value */
+  std::atomic_store(&cachedService, decltype(cachedService)()); /* clear cached value */
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 

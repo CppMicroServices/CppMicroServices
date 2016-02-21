@@ -141,6 +141,33 @@ class MultiThreaded
     , public WaitConditionStrategy<LockingStrategy>
 {};
 
+template<class T>
+class Atomic : private MultiThreaded<>
+{
+  T m_t;
+
+public:
+
+  T Load() const
+  {
+    return Lock(), m_t;
+  }
+
+  void Store(const T& t)
+  {
+    Lock(), m_t = t;
+  }
+
+  T Exchange(const T& t)
+  {
+    auto l = Lock(); US_UNUSED(l);
+    auto o = m_t;
+    m_t = t;
+    return o;
+  }
+
+};
+
 }
 
 

@@ -141,7 +141,7 @@ public:
   /**
    * Cached ServiceReference for getServiceReference.
    */
-  mutable ServiceReference<S> cachedReference;
+  mutable Atomic<ServiceReference<S>> cachedReference;
 
   /**
    * Cached service object for GetService.

@@ -152,10 +152,7 @@ void ServiceTracker<S,T>::Close()
     }
   }
   d->Modified(); /* clear the cache */
-  {
-    //auto l = outgoing->Lock();
-    outgoing->NotifyAll(); /* wake up any waiters */
-  }
+  outgoing->NotifyAll(); /* wake up any waiters */
   for(auto& ref : references)
   {
     outgoing->Untrack(ref, ServiceEvent());
@@ -163,8 +160,8 @@ void ServiceTracker<S,T>::Close()
 
   if (d->DEBUG_OUTPUT)
   {
-    auto l = d->Lock(); US_UNUSED(l);
-    if ((d->cachedReference.GetBundle() == nullptr) && !d->cachedService)
+    if (d->cachedReference.Load().GetBundle() == nullptr &&
+        std::atomic_load(&d->cachedService) == nullptr)
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                        << d->filter;
@@ -242,11 +239,7 @@ template<class S, class T>
 ServiceReference<S>
 ServiceTracker<S,T>::GetServiceReference() const
 {
-  ServiceReference<S> reference;
-  {
-    auto l = d->Lock(); US_UNUSED(l);
-    reference = d->cachedReference;
-  }
+  ServiceReference<S> reference = d->cachedReference.Load();
   if (reference.GetBundle() != nullptr)
   {
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
@@ -317,11 +310,8 @@ ServiceTracker<S,T>::GetServiceReference() const
     }
   }
 
-  {
-    auto l = d->Lock(); US_UNUSED(l);
-    d->cachedReference = *selectedRef;
-    return d->cachedReference;
-  }
+  d->cachedReference.Store(*selectedRef);
+  return *selectedRef;
 }
 
 template<class S, class T>
@@ -361,15 +351,12 @@ template<class S, class T>
 std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
 ServiceTracker<S,T>::GetService() const
 {
+  auto service = std::atomic_load(&d->cachedService);
+  if (service)
   {
-    auto l = d->Lock(); US_UNUSED(l);
-    auto service = d->cachedService;
-    if (service)
-    {
-      US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService[cached]:"
-                                << d->filter;
-      return service;
-    }
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService[cached]:"
+                              << d->filter;
+    return service;
   }
   US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService:" << d->filter;
 
@@ -380,7 +367,9 @@ ServiceTracker<S,T>::GetService() const
     {
       return std::shared_ptr<TrackedParmType>();
     }
-    return (d->Lock(), d->cachedService = GetService(reference));
+    service = GetService(reference);
+    std::atomic_store(&d->cachedService, service);
+    return service;
   }
   catch (const ServiceException&)
   {

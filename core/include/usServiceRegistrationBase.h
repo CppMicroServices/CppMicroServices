@@ -60,6 +60,8 @@ public:
 
   ServiceRegistrationBase(const ServiceRegistrationBase& reg);
 
+  ServiceRegistrationBase(ServiceRegistrationBase&& reg);
+
   /**
    * A boolean conversion operator converting this ServiceRegistrationBase object
    * to \c true if it is valid and to \c false otherwise. A SeriveRegistration
@@ -171,6 +173,7 @@ public:
   bool operator==(const ServiceRegistrationBase& registration) const;
 
   ServiceRegistrationBase& operator=(const ServiceRegistrationBase& registration);
+  ServiceRegistrationBase& operator=(ServiceRegistrationBase&& registration);
 
 
 private:

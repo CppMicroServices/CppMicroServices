@@ -45,7 +45,7 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
     configuration.insert(std::pair<std::string, Any>(Framework::PROP_THREADING_SUPPORT, std::string("single")));
 #endif
 
-    return std::move(configuration);
+    return configuration;
 }
 
 FrameworkPrivate::FrameworkPrivate(Framework* qq, const BundleInfo& info, const std::map<std::string, Any>& configuration)

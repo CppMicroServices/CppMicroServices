@@ -46,7 +46,7 @@ void unsetenv(const char* key)
 #ifdef US_PLATFORM_WINDOWS
   _putenv_s(key, "");
 #else
-  unsetenv(key);
+  ::unsetenv(key);
 #endif
 }
 

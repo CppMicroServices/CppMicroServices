@@ -32,7 +32,7 @@
 namespace us {
 
 ServiceReferenceBase::ServiceReferenceBase()
-  : d(new ServiceReferenceBasePrivate(0))
+  : d(new ServiceReferenceBasePrivate(nullptr))
 {
 
 }

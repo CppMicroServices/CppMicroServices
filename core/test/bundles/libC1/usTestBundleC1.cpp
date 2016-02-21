@@ -98,7 +98,7 @@ public:
       ServiceProperties props;
       props["i"] = i;
       auto reg = context->RegisterService(std::make_shared<const InterfaceMap>(im), props);
-      regs.Lock(), regs.v.push_back(reg);
+      regs.Lock(), regs.v.emplace_back(std::move(reg));
       count++;
       if (i % 5 == 0) regs.NotifyAll();
     }

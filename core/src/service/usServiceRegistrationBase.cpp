@@ -46,6 +46,12 @@ ServiceRegistrationBase::ServiceRegistrationBase(const ServiceRegistrationBase& 
   if (d) ++d->ref;
 }
 
+ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg)
+  : d(nullptr)
+{
+  std::swap(d, reg.d);
+}
+
 ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate)
   : d(registrationPrivate)
 {
@@ -286,6 +292,15 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(const ServiceRegistr
   if (curr_d && !--curr_d->ref)
     delete curr_d;
 
+  return *this;
+}
+
+ServiceRegistrationBase& ServiceRegistrationBase::operator=(ServiceRegistrationBase&& registration)
+{
+  if (d && !--d->ref)
+    delete d;
+  d = nullptr;
+  std::swap(d, registration.d);
   return *this;
 }
 

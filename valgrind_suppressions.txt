@@ -152,6 +152,14 @@
 }
 
 {
+   <Bundle-atomic>
+   Helgrind:Race
+   fun:load
+   fun:_ZNKSt6atomicIPN2us13BundleContextEE4loadESt12memory_order
+   ...
+}
+
+{
    <ServiceReg-atomic>
    Helgrind:Race
    fun:load

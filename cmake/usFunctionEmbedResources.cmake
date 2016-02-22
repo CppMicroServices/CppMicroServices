@@ -118,13 +118,13 @@ function(usFunctionEmbedResources)
     if(_res_zips)
       set(_zip_args )
       foreach(_file ${_res_zips})
-        list(APPEND _zip_args -m)
+        list(APPEND _zip_args -z)
         list(APPEND _zip_args ${_file})
       endforeach()
     endif()
     add_custom_command(
       OUTPUT ${_zip_archive}
-      COMMAND ${resource_compiler} -o ${_zip_archive} -b dummy ${_zip_args}
+      COMMAND ${resource_compiler} -o ${_zip_archive} -n dummy ${_zip_args}
       DEPENDS ${_res_zips} ${resource_compiler}
       COMMENT "Creating resources zip file for ${US_RESOURCE_TARGET}"
       VERBATIM
@@ -191,7 +191,7 @@ function(usFunctionEmbedResources)
     add_custom_command(
       TARGET ${US_RESOURCE_TARGET}
       POST_BUILD
-      COMMAND ${resource_compiler} --append-binary $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_BUNDLE_NAME} -m ${_zip_archive}
+      COMMAND ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_BUNDLE_NAME} -z ${_zip_archive}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM

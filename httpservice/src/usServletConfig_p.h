@@ -25,6 +25,7 @@
 #include "usSharedData.h"
 
 #include <memory>
+#include <string>
 
 namespace us {
 

@@ -55,7 +55,7 @@ pointer us_bundle_ids(scheme* sc, pointer /*args*/)
 {
   auto bundles = GetBundleContext()->GetBundles();
   std::set<long> ids;
-  for (auto& iter : bundles)
+  for (auto const& iter : bundles)
   {
     ids.insert(iter->GetBundleId());
   }
@@ -85,7 +85,7 @@ pointer us_bundle_info(scheme* sc, pointer args)
   memset(delim, delimChar, 50);
 
   pointer arg = pair_car(args);
-  std::shared_ptr<Bundle> bundle = nullptr;
+  std::shared_ptr<Bundle> bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -204,7 +204,7 @@ pointer us_bundle_start(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  std::shared_ptr<Bundle> bundle = nullptr;
+  std::shared_ptr<Bundle> bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -242,7 +242,7 @@ pointer us_bundle_stop(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  std::shared_ptr<Bundle> bundle = nullptr;
+  std::shared_ptr<Bundle> bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);

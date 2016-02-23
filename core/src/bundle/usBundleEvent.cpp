@@ -45,7 +45,7 @@ public:
   }
 
   const BundleEvent::Type type;
-  std::shared_ptr<Bundle> const bundle;
+  const std::shared_ptr<Bundle> bundle;
 
 };
 

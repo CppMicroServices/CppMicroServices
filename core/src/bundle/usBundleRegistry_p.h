@@ -23,14 +23,14 @@
 #ifndef USBUNDLEREGISTRY_P_H
 #define USBUNDLEREGISTRY_P_H
 
+#include <usCoreConfig.h>
+#include <usThreads_p.h>
+
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <atomic>
 #include <memory>
-
-#include <usCoreConfig.h>
-#include <usThreads_p.h>
 
 namespace us {
 

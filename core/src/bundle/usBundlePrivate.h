@@ -31,6 +31,8 @@
 
 #include "usThreads_p.h"
 
+#include <memory>
+
 namespace us {
 
 class CoreBundleContext;

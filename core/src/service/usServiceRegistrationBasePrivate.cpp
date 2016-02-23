@@ -51,17 +51,16 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
   properties.Lock(), properties.Clear_unlocked();
 }
 
-bool ServiceRegistrationBasePrivate::IsUsedByBundle(Bundle* p) const
+bool ServiceRegistrationBasePrivate::IsUsedByBundle(const std::shared_ptr<Bundle>& bundle) const
 {
   auto l = this->Lock(); US_UNUSED(l);
-  return (dependents.find(p) != dependents.end()) ||
-      (prototypeServiceInstances.find(p) != prototypeServiceInstances.end());
+  return (dependents.find(bundle) != dependents.end()) ||
+      (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
 }
 
 InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
 {
-  auto l = this->Lock(); US_UNUSED(l);
-  return service;
+  return (this->Lock(), service);
 }
 
 std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const

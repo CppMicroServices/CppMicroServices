@@ -55,8 +55,7 @@ public:
 
   void Find(const BundleContext* /*context*/, ShrinkableVector<std::shared_ptr<Bundle>>& bundles)
   {
-    for (ShrinkableVector<std::shared_ptr<Bundle>>::iterator i = bundles.begin();
-         i != bundles.end();)
+    for (auto i = bundles.begin(); i != bundles.end();)
     {
       if ((*i)->GetName() == "TestBundleA")
       {
@@ -106,7 +105,7 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) == nullptr, "Test for filtered GetBundle(long) result")
 
   auto bundles = framework->GetBundleContext()->GetBundles();
-  for (auto& i : bundles)
+  for (auto const& i : bundles)
   {
     if (i->GetName() == "TestBundleA")
     {

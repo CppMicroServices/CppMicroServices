@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/saschazelzer/CppMicroServices.png)](http://travis-ci.org/saschazelzer/CppMicroServices)
+[![Build Status](https://secure.travis-ci.org/CppMicroServices/CppMicroServices.png)](http://travis-ci.org/CppMicroServices/CppMicroServices)
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/1329/badge.svg)](https://scan.coverity.com/projects/1329)
 

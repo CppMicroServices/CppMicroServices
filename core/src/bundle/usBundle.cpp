@@ -143,7 +143,6 @@ void Bundle::Start()
   // try to get a BundleActivator instance
   if (createActivatorHook)
   {
-
     try
     {
       d->bundleActivator = createActivatorHook();
@@ -155,10 +154,9 @@ void Bundle::Start()
       this->Stop();
       throw std::runtime_error(std::string("Starting bundle " + d->info.name + " failed: " + e.what()));
     }
-
   }
 
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, this->shared_from_this()));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, shared_from_this()));
 }
 
 void Bundle::Stop()
@@ -168,7 +166,7 @@ void Bundle::Stop()
 
   StateReset reset([this]{
     try
-    {
+  {
       auto l = d->Lock(); US_UNUSED(l);
       d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
       d->RemoveBundleResources();
@@ -177,7 +175,7 @@ void Bundle::Stop()
       d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this->shared_from_this()));
 
       d->bundleActivator = nullptr;
-    }
+  }
     catch (...) {}
     this->d->stopping = false;
   });
@@ -191,7 +189,7 @@ void Bundle::Stop()
     if (duration.count() > 2000) throw std::runtime_error("Timeout while waiting to stop bundle " + d->info.name);
   }
 
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, this->shared_from_this()));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, shared_from_this()));
 
   if (d->bundleActivator)
   {
@@ -202,7 +200,7 @@ void Bundle::Stop()
     catch (const std::exception& e)
     {
       throw std::runtime_error("Stopping bundle " + d->info.name + " failed: " + e.what());
-    }
+  }
 
     // delete the activator
     typedef void(*DestroyActivatorHook)(BundleActivator*);
@@ -219,9 +217,9 @@ void Bundle::Stop()
 
 void Bundle::Uninstall()
 {
-    Stop();
-    d->coreCtx->bundleRegistry.UnRegister(d->info);
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, this->shared_from_this()));
+  Stop();
+  d->coreCtx->bundleRegistry.UnRegister(d->info);
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, shared_from_this()));
 }
 
 BundleContext* Bundle::GetBundleContext() const
@@ -281,7 +279,7 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetRegisteredByBundle(d.get(), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
+        i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -292,9 +290,9 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 {
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
-  d->coreCtx->services.GetUsedByBundle(const_cast<Bundle*>(this), sr);
+  d->coreCtx->services.GetUsedByBundle(std::const_pointer_cast<Bundle>(shared_from_this()), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
+        i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -313,7 +311,7 @@ BundleResource Bundle::GetResource(const std::string& path) const
 }
 
 std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
-                                                  bool recurse) const
+                                                    bool recurse) const
 {
   std::vector<BundleResource> result;
   if (!d->resourceContainer.IsValid())
@@ -327,8 +325,8 @@ std::vector<BundleResource> Bundle::FindResources(const std::string& path, const
   if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
   if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
   d->resourceContainer.FindNodes(d->info.name + normalizedPath,
-                                 filePattern.empty() ? "*" : filePattern,
-                                 recurse, result);
+                                    filePattern.empty() ? "*" : filePattern,
+                                    recurse, result);
   return result;
 }
 

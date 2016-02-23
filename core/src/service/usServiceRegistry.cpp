@@ -20,17 +20,19 @@
 
 =============================================================================*/
 
-#include <iterator>
-#include <stdexcept>
-#include <cassert>
 
 #include "usServiceRegistry_p.h"
+
 #include "usServiceFactory.h"
 #include "usPrototypeServiceFactory.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceRegistrationBasePrivate.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
+
+#include <iterator>
+#include <stdexcept>
+#include <cassert>
 
 
 namespace us {
@@ -308,7 +310,7 @@ void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
   }
 }
 
-void ServiceRegistry::GetUsedByBundle(Bundle* p,
+void ServiceRegistry::GetUsedByBundle(const std::shared_ptr<Bundle>& bundle,
                                       std::vector<ServiceRegistrationBase>& res) const
 {
   auto l = this->Lock(); US_UNUSED(l);
@@ -316,7 +318,7 @@ void ServiceRegistry::GetUsedByBundle(Bundle* p,
   for (std::vector<ServiceRegistrationBase>::const_iterator i = serviceRegistrations.begin();
        i != serviceRegistrations.end(); ++i)
   {
-    if (i->d->IsUsedByBundle(p))
+    if (i->d->IsUsedByBundle(bundle))
     {
       res.push_back(*i);
     }

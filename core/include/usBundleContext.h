@@ -111,7 +111,7 @@ public:
    * Returns the bundle with the specified identifier.
    *
    * @param id The identifier of the bundle to retrieve.
-   * @return A <code>Bundle</code> object or <code>0</code> if the
+   * @return A <code>Bundle</code> object or <code>nullptr</code> if the
    *         identifier does not match any previously installed bundle.
    */
   std::shared_ptr<Bundle> GetBundle(long id) const;

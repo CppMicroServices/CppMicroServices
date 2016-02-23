@@ -83,7 +83,7 @@ namespace
         elapsedTimeInMilliSeconds = 0;
 
         auto bundles = f->GetBundleContext()->GetBundles();
-        for (auto& bundle : bundles)
+        for (auto const& bundle : bundles)
         {
             timer.Start();
             bundle->Start();

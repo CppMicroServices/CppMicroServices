@@ -47,14 +47,14 @@ struct MyFactory1 : public us::ServiceFactory
 {
   std::map<long, std::shared_ptr<MyService1>> m_idToServiceMap;
 
-  virtual us::InterfaceMapConstPtr GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMapConstPtr GetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     auto s = std::make_shared<MyService1>();
     m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1>(s);
   }
 
-  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMapConstPtr& service)
   {
     auto iter = m_idToServiceMap.find(bundle->GetBundleId());
@@ -70,14 +70,14 @@ struct MyFactory2 : public us::ServiceFactory
 {
   std::map<long, std::shared_ptr<MyService2>> m_idToServiceMap;
 
-  virtual us::InterfaceMapConstPtr GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMapConstPtr GetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     auto s = std::make_shared<MyService2>();
     m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1,Interface2>(s);
   }
 
-  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMapConstPtr& service)
   {
     auto iter = m_idToServiceMap.find(bundle->GetBundleId());
@@ -93,14 +93,14 @@ struct MyFactory3 : public us::ServiceFactory
 {
   std::map<long, std::shared_ptr<MyService3>> m_idToServiceMap;
 
-  virtual us::InterfaceMapConstPtr GetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMapConstPtr GetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/)
   {
     auto s = std::make_shared<MyService3>();
     m_idToServiceMap.insert(std::make_pair(bundle->GetBundleId(), s));
     return us::MakeInterfaceMap<Interface1,Interface2,Interface3>(s);
   }
 
-  virtual void UngetService(us::Bundle* bundle, const us::ServiceRegistrationBase& /*registration*/,
+  virtual void UngetService(const std::shared_ptr<us::Bundle>& bundle, const us::ServiceRegistrationBase& /*registration*/,
                             const us::InterfaceMapConstPtr& service)
   {
     auto iter = m_idToServiceMap.find(bundle->GetBundleId());
@@ -123,83 +123,83 @@ int usServiceTemplateTest(int /*argc*/, char* /*argv*/[])
   auto framework = factory.NewFramework();
   framework->Start();
 
-  BundleContext* mc = framework->GetBundleContext();
+  BundleContext* context = framework->GetBundleContext();
 
   // Register compile tests
   auto s1 = std::make_shared<MyService1>();
   auto s2 = std::make_shared<MyService2>();
   auto s3 = std::make_shared<MyService3>();
 
-  auto sr1 = mc->RegisterService<Interface1>(s1);
-  auto sr2 = mc->RegisterService<Interface1,Interface2>(s2);
-  auto sr3 = mc->RegisterService<Interface1,Interface2,Interface3>(s3);
+  auto sr1 = context->RegisterService<Interface1>(s1);
+  auto sr2 = context->RegisterService<Interface1,Interface2>(s2);
+  auto sr3 = context->RegisterService<Interface1,Interface2,Interface3>(s3);
 
   auto f1 = std::make_shared<MyFactory1>();
-  us::ServiceRegistration<Interface1> sfr1 = mc->RegisterService<Interface1>(ToFactory(f1));
+  auto sfr1 = context->RegisterService<Interface1>(ToFactory(f1));
 
   auto f2 = std::make_shared<MyFactory2>();
-  us::ServiceRegistration<Interface1,Interface2> sfr2 = mc->RegisterService<Interface1,Interface2>(ToFactory(f2));
+  auto sfr2 = context->RegisterService<Interface1,Interface2>(ToFactory(f2));
 
   auto f3 = std::make_shared<MyFactory3>();
-  us::ServiceRegistration<Interface1,Interface2,Interface3> sfr3 = mc->RegisterService<Interface1,Interface2,Interface3>(ToFactory(f3));
+  auto sfr3 = context->RegisterService<Interface1,Interface2,Interface3>(ToFactory(f3));
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_CONDITION(mc->GetBundle()->GetRegisteredServices().size() == 6, "# of reg services")
+  US_TEST_CONDITION(context->GetBundle()->GetRegisteredServices().size() == 6, "# of reg services")
 #endif
 
-  std::vector<us::ServiceReference<Interface1> > s1refs = mc->GetServiceReferences<Interface1>();
+  auto s1refs = context->GetServiceReferences<Interface1>();
   US_TEST_CONDITION(s1refs.size() == 6, "# of interface1 regs")
-  std::vector<us::ServiceReference<Interface2> > s2refs = mc->GetServiceReferences<Interface2>();
+  auto s2refs = context->GetServiceReferences<Interface2>();
   US_TEST_CONDITION(s2refs.size() == 4, "# of interface2 regs")
-  std::vector<us::ServiceReference<Interface3> > s3refs = mc->GetServiceReferences<Interface3>();
+  auto s3refs = context->GetServiceReferences<Interface3>();
   US_TEST_CONDITION(s3refs.size() == 2, "# of interface3 regs")
 
-  auto i1 = mc->GetService(sr1.GetReference());
+  auto i1 = context->GetService(sr1.GetReference());
   US_TEST_CONDITION(i1 == s1, "interface1 ptr")
   i1.reset();
-  
-  i1 = mc->GetService(sfr1.GetReference());
-  US_TEST_CONDITION(i1 == f1->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface1 factory ptr")
+
+  i1 = context->GetService(sfr1.GetReference());
+  US_TEST_CONDITION(i1 == f1->m_idToServiceMap[context->GetBundle()->GetBundleId()], "interface1 factory ptr")
   i1.reset();
 
-  i1 = mc->GetService(sr2.GetReference<Interface1>());
+  i1 = context->GetService(sr2.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == s2, "interface1 ptr")
   i1.reset();
-  
-  i1 = mc->GetService(sfr2.GetReference<Interface1>());
-  US_TEST_CONDITION(i1 == f2->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface1 factory ptr")
+
+  i1 = context->GetService(sfr2.GetReference<Interface1>());
+  US_TEST_CONDITION(i1 == f2->m_idToServiceMap[context->GetBundle()->GetBundleId()], "interface1 factory ptr")
   i1.reset();
-  
-  auto i2 = mc->GetService(sr2.GetReference<Interface2>());
+
+  auto i2 = context->GetService(sr2.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == s2, "interface2 ptr")
   i2.reset();
-  
-  i2 = mc->GetService(sfr2.GetReference<Interface2>());
-  US_TEST_CONDITION(i2 == f2->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface2 factory ptr")
+
+  i2 = context->GetService(sfr2.GetReference<Interface2>());
+  US_TEST_CONDITION(i2 == f2->m_idToServiceMap[context->GetBundle()->GetBundleId()], "interface2 factory ptr")
   i2.reset();
 
-  i1 = mc->GetService(sr3.GetReference<Interface1>());
+  i1 = context->GetService(sr3.GetReference<Interface1>());
   US_TEST_CONDITION(i1 == s3, "interface1 ptr")
   i1.reset();
-  
-  i1 = mc->GetService(sfr3.GetReference<Interface1>());
-  US_TEST_CONDITION(i1 == f3->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface1 factory ptr")
+
+  i1 = context->GetService(sfr3.GetReference<Interface1>());
+  US_TEST_CONDITION(i1 == f3->m_idToServiceMap[context->GetBundle()->GetBundleId()], "interface1 factory ptr")
   i1.reset();
-  
-  i2 = mc->GetService(sr3.GetReference<Interface2>());
+
+  i2 = context->GetService(sr3.GetReference<Interface2>());
   US_TEST_CONDITION(i2 == s3, "interface2 ptr")
   i2.reset();
-  
-  i2 = mc->GetService(sfr3.GetReference<Interface2>());
-  US_TEST_CONDITION(i2 == f3->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface2 factory ptr")
+
+  i2 = context->GetService(sfr3.GetReference<Interface2>());
+  US_TEST_CONDITION(i2 == f3->m_idToServiceMap[context->GetBundle()->GetBundleId()], "interface2 factory ptr")
   i2.reset();
 
-  auto i3 = mc->GetService(sr3.GetReference<Interface3>());
+  auto i3 = context->GetService(sr3.GetReference<Interface3>());
   US_TEST_CONDITION(i3 == s3, "interface3 ptr")
   i3.reset();
 
-  i3 = mc->GetService(sfr3.GetReference<Interface3>());
-  US_TEST_CONDITION(i3 == f3->m_idToServiceMap[mc->GetBundle()->GetBundleId()], "interface3 factory ptr")
+  i3 = context->GetService(sfr3.GetReference<Interface3>());
+  US_TEST_CONDITION(i3 == f3->m_idToServiceMap[context->GetBundle()->GetBundleId()], "interface3 factory ptr")
   i3.reset();
 
   sr1.Unregister();

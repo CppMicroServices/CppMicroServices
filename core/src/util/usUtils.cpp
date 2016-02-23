@@ -346,7 +346,7 @@ void message_output(MsgType msgType, const char *buf)
 
   if (msgType == ErrorMsg)
   {
-  #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
+#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
     // get the current report mode
     int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
     _CrtSetReportMode(_CRT_ERROR, reportMode);
@@ -355,13 +355,13 @@ void message_output(MsgType msgType, const char *buf)
       return; // ignore
     else if (ret == 1)
       _CrtDbgBreak();
-  #endif
+#endif
 
-  #ifdef US_PLATFORM_POSIX
-    abort(); // trap; generates core dump
-  #else
-    exit(1); // goodbye cruel world
-  #endif
+#ifdef US_PLATFORM_POSIX
+  abort(); // trap; generates core dump
+#else
+  exit(1); // goodbye cruel world
+#endif
   }
 }
 

@@ -154,9 +154,16 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
 template <class S>
 struct ServiceHolder
 {
-  BundleContext* bc;
-  ServiceReferenceBase sref;
-  std::shared_ptr<S> service;
+  BundleContext* const bc;
+  const ServiceReferenceBase sref;
+  const std::shared_ptr<S> service;
+
+  ServiceHolder(BundleContext* bc, const ServiceReferenceBase& sr, const std::shared_ptr<S>& s)
+    : bc(bc)
+    , sref(sr)
+    , service(s)
+  {}
+
   ~ServiceHolder()
   {
     try
@@ -184,9 +191,8 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>{ this, reference, reference.d.load()->GetService(b->q) });
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d.load()->GetService(b->q->shared_from_this())));
   return std::shared_ptr<void>(h, h->service.get());
-  return reference.d.load()->GetService(b->q);
 }
 
 InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& reference)
@@ -205,8 +211,10 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
-  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(*(reference.d.load()->GetServiceInterfaceMap(b->q).get()));
-  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>{this, reference, imap_copy});
+  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(
+        *(reference.d.load()->GetServiceInterfaceMap(b->q->shared_from_this()))
+        );
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(this, reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
@@ -269,7 +277,7 @@ bool BundleContext::UngetService(const ServiceReferenceBase& reference)
   // won the race condition.
 
   ServiceReferenceBase ref = reference;
-  return ref.d.load()->UngetService(b->q, true);
+  return ref.d.load()->UngetService(b->q->shared_from_this(), true);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
@@ -377,7 +385,7 @@ std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location
 
   b->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
 
-    return bundle;
+  return bundle;
 }
 
 

@@ -50,11 +50,11 @@ public:
 
     if (isPrototypeScope)
     {
-      result = m_reference.d.load()->GetPrototypeService(m_context->GetBundle().get());
+      result = m_reference.d.load()->GetPrototypeService(m_context->GetBundle());
     }
     else
     {
-      result = m_reference.d.load()->GetServiceInterfaceMap(m_context->GetBundle().get());
+      result = m_reference.d.load()->GetServiceInterfaceMap(m_context->GetBundle());
     }
 
     return result;
@@ -81,9 +81,15 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
  */
 struct UngetHelper
 {
-  InterfaceMapConstPtr interfaceMap;
-  ServiceReferenceBase sref;
-  BundleContext* bc;
+  const InterfaceMapConstPtr interfaceMap;
+  const ServiceReferenceBase sref;
+  BundleContext* const bc;
+
+  UngetHelper(const InterfaceMapConstPtr& im, const ServiceReferenceBase& sr, BundleContext* bc)
+    : interfaceMap(im)
+    , sref(sr)
+    , bc(bc)
+  {}
   ~UngetHelper()
   {
     try
@@ -95,11 +101,11 @@ struct UngetHelper
 
         if (isPrototypeScope)
         {
-          sref.d.load()->UngetPrototypeService(bc->GetBundle().get(), interfaceMap);
+          sref.d.load()->UngetPrototypeService(bc->GetBundle(), interfaceMap);
         }
         else
         {
-          sref.d.load()->UngetService(bc->GetBundle().get(), true);
+          sref.d.load()->UngetService(bc->GetBundle(), true);
         }
       }
     }
@@ -117,7 +123,7 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
     return nullptr;
   }
 
-  std::shared_ptr<UngetHelper> h(new UngetHelper{ d->GetServiceInterfaceMap(), d->m_reference, d->m_context });
+  std::shared_ptr<UngetHelper> h(new UngetHelper(d->GetServiceInterfaceMap(), d->m_reference, d->m_context));
   return std::shared_ptr<void>(h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
 }
 

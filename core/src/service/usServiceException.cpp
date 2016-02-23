@@ -26,6 +26,10 @@
 
 namespace us {
 
+ServiceException::~ServiceException() throw()
+{
+}
+
 ServiceException::ServiceException(const std::string& msg, const Type& type)
   : std::runtime_error(msg), type(type)
 {

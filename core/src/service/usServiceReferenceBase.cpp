@@ -90,17 +90,17 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
   keys = d.load()->registration->properties.Keys_unlocked();
 }
 
-Bundle* ServiceReferenceBase::GetBundle() const
+std::shared_ptr<Bundle> ServiceReferenceBase::GetBundle() const
 {
   auto p = d.load();
   if (p->registration == nullptr) return nullptr;
 
   auto l = p->registration->Lock(); US_UNUSED(l);
   if (p->registration->bundle == nullptr) return nullptr;
-  return p->registration->bundle->q;
+  return p->registration->bundle->q->shared_from_this();
 }
 
-void ServiceReferenceBase::GetUsingBundles(std::vector<Bundle*>& bundles) const
+void ServiceReferenceBase::GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const
 {
   auto l = d.load()->registration->Lock(); US_UNUSED(l);
   for (auto& iter : d.load()->registration->dependents)

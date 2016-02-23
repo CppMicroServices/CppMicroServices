@@ -27,6 +27,8 @@
 
 #include <usAny.h>
 
+#include <memory>
+
 US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
 namespace us {
@@ -104,16 +106,16 @@ public:
    * <code>ServiceReferenceBase</code> object.
    *
    * <p>
-   * This method must return <code>0</code> when the service has been
+   * This method must return <code>nullptr</code> when the service has been
    * unregistered. This can be used to determine if the service has been
    * unregistered.
    *
    * @return The bundle that registered the service referenced by this
-   *         <code>ServiceReferenceBase</code> object; <code>0</code> if that
+   *         <code>ServiceReferenceBase</code> object; <code>nullptr</code> if that
    *         service has already been unregistered.
    * @see BundleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  Bundle* GetBundle() const;
+  std::shared_ptr<Bundle> GetBundle() const;
 
   /**
    * Returns the bundles that are using the service referenced by this
@@ -124,7 +126,7 @@ public:
    *         by this <code>ServiceReferenceBase</code> object is greater than
    *         zero.
    */
-  void GetUsingBundles(std::vector<Bundle*>& bundles) const;
+  void GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const;
 
   /**
    * Returns the interface identifier this ServiceReferenceBase object

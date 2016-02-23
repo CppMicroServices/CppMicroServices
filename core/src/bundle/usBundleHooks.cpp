@@ -36,7 +36,7 @@ BundleHooks::BundleHooks(CoreBundleContext* ctx)
 {
 }
 
-std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* mc, const std::shared_ptr<Bundle>& bundle) const
+std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* context, const std::shared_ptr<Bundle>& bundle) const
 {
   if(bundle == nullptr)
   {
@@ -53,12 +53,12 @@ std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* mc, const
   {
     std::vector<std::shared_ptr<Bundle>> ml;
     ml.push_back(bundle);
-    this->FilterBundles(mc, ml);
+    this->FilterBundles(context, ml);
     return ml.empty() ? nullptr : bundle;
   }
 }
 
-void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<std::shared_ptr<Bundle>>& bundles) const
+void BundleHooks::FilterBundles(const BundleContext* context, std::vector<std::shared_ptr<Bundle>>& bundles) const
 {
   std::vector<ServiceRegistrationBase> srl;
   coreCtx->services.Get(us_service_interface_iid<BundleFindHook>(), srl);
@@ -68,12 +68,12 @@ void BundleHooks::FilterBundles(const BundleContext* mc, std::vector<std::shared
   for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
-    std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
+    std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
     if (fh)
     {
       try
       {
-        fh->Find(mc, filtered);
+        fh->Find(context, filtered);
       }
       catch (const std::exception& e)
       {
@@ -127,7 +127,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
         continue;
       }
 
-      std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
+      std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
       if (eh)
       {
         try

@@ -102,7 +102,7 @@ bool ServiceHooks::IsOpen() const
   return bOpen;
 }
 
-void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string& service,
+void ServiceHooks::FilterServiceReferences(BundleContext* context, const std::string& service,
                                            const std::string& filter, std::vector<ServiceReferenceBase>& refs)
 {
   std::vector<ServiceRegistrationBase> srl;
@@ -115,12 +115,12 @@ void ServiceHooks::FilterServiceReferences(BundleContext* mc, const std::string&
     for (auto fhrIter = srl.rbegin(), fhrEnd = srl.rend(); fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-      auto fh = std::static_pointer_cast<ServiceFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
+      auto fh = std::static_pointer_cast<ServiceFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
       if (fh)
       {
         try
         {
-          fh->Find(mc, service, filter, filtered);
+          fh->Find(context, service, filter, filtered);
         }
         catch (const std::exception& e)
         {
@@ -162,7 +162,7 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
     for(auto sriIter = eventListenerHooks.rbegin(), sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
-      auto elh = std::static_pointer_cast<ServiceEventListenerHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle().get()));
+      auto elh = std::static_pointer_cast<ServiceEventListenerHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
       if(elh)
       {
         try

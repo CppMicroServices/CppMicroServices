@@ -166,11 +166,11 @@ void BundlePrivate::RemoveBundleResources()
   }
 
   srs.clear();
-  coreCtx->services.GetUsedByBundle(q, srs);
+  coreCtx->services.GetUsedByBundle(q->shared_from_this(), srs);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin();
        i != srs.end(); ++i)
   {
-    i->GetReference(std::string()).d.load()->UngetService(q, false);
+    i->GetReference(std::string()).d.load()->UngetService(q->shared_from_this(), false);
   }
 }
 

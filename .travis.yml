@@ -1,8 +1,22 @@
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - valgrind
+
+cache:
+  directories:
+    - $HOME/cache
+
 language: cpp
 compiler:
   - gcc
-  - clang
+#  - clang
+
 env:
+  global:
+  - PATH=$HOME/cache/bin/:$PATH
   matrix:
   - BUILD_CONFIGURATION=0
   - BUILD_CONFIGURATION=1
@@ -18,6 +32,9 @@ branches:
     - master
     - development
     - /^release-.*$/
+
+before_install:
+  - bash install_cmake.sh
 
 script:
   - ctest -VV -S ./cmake/usCTestScript_travis.cmake

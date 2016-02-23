@@ -100,7 +100,7 @@ int main(int argc, char** argv)
       std::cout << "Installing " << opt->arg << std::endl;
       bundles.push_back(context->InstallBundle(opt->arg));
     }
-    for (auto bundle : bundles)
+    for (auto& bundle : bundles)
     {
       bundle->Start();
     }

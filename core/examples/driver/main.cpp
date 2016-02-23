@@ -243,11 +243,11 @@ int main(int /*argc*/, char** /*argv*/)
         std::cout << " - | " << std::setw(20) << *nameIter << " | " << std::setw(9) << "-" << std::endl;
       }
 
-      for (auto& bundleIter : bundles)
+      for (auto& bundle : bundles)
       {
-        std::cout << std::right << std::setw(2) << bundleIter->GetBundleId() << std::left << " | ";
-        std::cout << std::setw(20) << bundleIter->GetName() << " | ";
-        std::cout << std::setw(9) << (bundleIter->IsStarted() ? "ACTIVE" : "RESOLVED");
+        std::cout << std::right << std::setw(2) << bundle->GetBundleId() << std::left << " | ";
+        std::cout << std::setw(20) << bundle->GetName() << " | ";
+        std::cout << std::setw(9) << (bundle->IsStarted() ? "ACTIVE" : "RESOLVED");
         std::cout << std::endl;
       }
     }

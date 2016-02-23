@@ -31,14 +31,14 @@ namespace us {
 class CoreBundleActivator : public BundleActivator
 {
 
-  void Start(BundleContext* mc)
+  void Start(BundleContext* context)
   {
-    mc->GetBundle()->d->coreCtx->Init();
+    context->GetBundle()->d->coreCtx->Init();
   }
 
-  void Stop(BundleContext* mc)
+  void Stop(BundleContext* context)
   {
-    mc->GetBundle()->d->coreCtx->Uninit();
+    context->GetBundle()->d->coreCtx->Uninit();
   }
 
 };

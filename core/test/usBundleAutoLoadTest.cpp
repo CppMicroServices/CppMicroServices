@@ -41,15 +41,15 @@ namespace {
 
 void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framework>& framework)
 {
-  BundleContext* mc = framework->GetBundleContext();
-  assert(mc);
+  BundleContext* context = framework->GetBundleContext();
+  assert(context);
   TestBundleListener listener;
 
-  BundleListenerRegistrationHelper<TestBundleListener> listenerReg(mc, &listener, &TestBundleListener::BundleChanged);
+  BundleListenerRegistrationHelper<TestBundleListener> listenerReg(context, &listener, &TestBundleListener::BundleChanged);
 
-  InstallTestBundle(mc, "TestBundleAL");
+  InstallTestBundle(context, "TestBundleAL");
 
-  auto bundleAL = mc->GetBundle("TestBundleAL");
+  auto bundleAL = context->GetBundle("TestBundleAL");
   US_TEST_CONDITION_REQUIRED(bundleAL != nullptr, "Test for existing bundle TestBundleAL")
 
   US_TEST_CONDITION(bundleAL->GetName() == "TestBundleAL", "Test bundle name")
@@ -57,7 +57,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framewo
   bundleAL->Start();
 
   Any installedBundles = bundleAL->GetProperty(Bundle::PROP_AUTOINSTALLED_BUNDLES);
-  auto bundleAL_1 = mc->GetBundle("TestBundleAL_1");
+  auto bundleAL_1 = context->GetBundle("TestBundleAL_1");
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
@@ -93,20 +93,20 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled, const std::shared_ptr<Framewo
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 
-  mc->RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
+  context->RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
 
   bundleAL->Stop();
 }
 
 void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
 {
-  BundleContext* mc = framework->GetBundleContext();
-  assert(mc);
+  BundleContext* context = framework->GetBundleContext();
+  assert(context);
   TestBundleListener listener;
 
   try
   {
-    mc->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
+    context->AddBundleListener(&listener, &TestBundleListener::BundleChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -114,16 +114,16 @@ void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
     throw;
   }
 
-  InstallTestBundle(mc, "TestBundleAL2");
+  InstallTestBundle(context, "TestBundleAL2");
 
-  auto bundleAL2 = mc->GetBundle("TestBundleAL2");
+  auto bundleAL2 = context->GetBundle("TestBundleAL2");
   US_TEST_CONDITION_REQUIRED(bundleAL2 != nullptr, "Test for existing bundle TestBundleAL2")
 
   US_TEST_CONDITION(bundleAL2->GetName() == "TestBundleAL2", "Test bundle name")
 
   bundleAL2->Start();
 
-  auto bundleAL2_1 = mc->GetBundle("TestBundleAL2_1");
+  auto bundleAL2_1 = context->GetBundle("TestBundleAL2_1");
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
@@ -148,7 +148,7 @@ void testCustomAutoLoadPath(const std::shared_ptr<Framework>& framework)
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 
-  mc->RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
+  context->RemoveBundleListener(&listener, &TestBundleListener::BundleChanged);
 
   bundleAL2->Stop();
 }

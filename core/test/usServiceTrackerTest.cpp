@@ -125,25 +125,23 @@ void TestFilterString(us::BundleContext* context)
 
 void TestServiceTracker(us::BundleContext* context)
 {
-  BundleContext* mc = context;
-
-  auto bundle = InstallTestBundle(mc, "TestBundleS");
+  auto bundle = InstallTestBundle(context, "TestBundleS");
   bundle->Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
   std::string s1("us::TestBundleSService");
-  ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
+  ServiceReferenceU servref = context->GetServiceReference(s1 + "0");
 
   US_TEST_CONDITION_REQUIRED(servref, "Test if registered service of id us::TestBundleSService0");
 
-  ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
+  ServiceReference<ServiceControlInterface> servCtrlRef = context->GetServiceReference<ServiceControlInterface>();
   US_TEST_CONDITION_REQUIRED(servCtrlRef, "Test if constrol service was registered");
 
-  auto serviceController = mc->GetService(servCtrlRef);
+  auto serviceController = context->GetService(servCtrlRef);
   US_TEST_CONDITION_REQUIRED(serviceController, "Test valid service controller");
 
-  std::unique_ptr<ServiceTracker<void> > st1(new ServiceTracker<void>(mc, servref));
+  std::unique_ptr<ServiceTracker<void> > st1(new ServiceTracker<void>(context, servref));
 
   // 2. Check the size method with an unopened service tracker
 
@@ -172,7 +170,7 @@ void TestServiceTracker(us::BundleContext* context)
   // 8. A new Servicetracker, this time with a filter for the object
   std::string fs = std::string("(") + ServiceConstants::OBJECTCLASS() + "=" + s1 + "*" + ")";
   LDAPFilter f1(fs);
-  st1.reset(new ServiceTracker<void>(mc, f1));
+  st1.reset(new ServiceTracker<void>(context, f1));
   // add a service
   serviceController->ServiceControl(1, "register", 7);
 

@@ -49,7 +49,7 @@ private:
 
   friend class MyServiceListener;
 
-  BundleContext* mc;
+  BundleContext* context;
 
   int nListeners;
   int nServices;
@@ -124,7 +124,7 @@ public:
 
 
 ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(BundleContext* context)
-  : mc(context)
+  : context(context)
   , nListeners(100)
   , nServices(1000)
   , nRegistered(0)
@@ -151,7 +151,7 @@ void ServiceRegistryPerformanceTest::CleanupTestCase()
     try
     {
       MyServiceListener* l = listeners[i];
-      mc->RemoveServiceListener(l, &MyServiceListener::ServiceChanged);
+      context->RemoveServiceListener(l, &MyServiceListener::ServiceChanged);
       delete l;
     }
     catch (const std::exception& e)
@@ -176,7 +176,7 @@ void ServiceRegistryPerformanceTest::AddListeners(int n)
     try
     {
       listeners.push_back(l);
-      mc->AddServiceListener(l, &MyServiceListener::ServiceChanged, "(perf.service.value>=0)");
+      context->AddServiceListener(l, &MyServiceListener::ServiceChanged, "(perf.service.value>=0)");
     }
     catch (const std::exception& e)
     {
@@ -220,7 +220,7 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
 
     services.emplace_back(std::make_shared<PerfTestService>());
     ServiceRegistration<IPerfTestService> reg =
-        mc->RegisterService<IPerfTestService>(services.back(), props);
+        context->RegisterService<IPerfTestService>(services.back(), props);
     regs.push_back(reg);
   }
 }
@@ -282,7 +282,7 @@ void ServiceRegistryPerformanceTest::UnregisterServices()
 int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
-  
+
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
   framework->Start();

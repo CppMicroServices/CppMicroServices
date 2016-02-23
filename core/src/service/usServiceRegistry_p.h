@@ -160,10 +160,10 @@ public:
   /**
    * Get all services that a bundle uses.
    *
-   * @param p The bundle
+   * @param bundle The bundle
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetUsedByBundle(Bundle* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void GetUsedByBundle(const std::shared_ptr<Bundle>& bundle, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
 private:
 

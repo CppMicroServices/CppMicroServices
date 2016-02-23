@@ -48,7 +48,7 @@ namespace us {
  *
  * A bundle can use both ServiceObjects and BundleContext::GetService(const ServiceReferenceBase&)
  * to obtain a service object for a service. ServiceObjects::GetService() will always
- * return an instance provided by a call to GetService(Bundle*, const ServiceRegistrationBase&)
+ * return an instance provided by a call to GetService(const std::shared_ptr<Bundle>&, const ServiceRegistrationBase&)
  * and BundleContext::GetService(const ServiceReferenceBase&) will always
  * return the bundle-scoped instance.
  * PrototypeServiceFactory objects are only used by the framework and are not made
@@ -78,7 +78,8 @@ struct PrototypeServiceFactory : public ServiceFactory
    * @see ServiceObjects#GetService()
    * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMapConstPtr GetService(Bundle* bundle, const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& bundle, 
+                                            const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object created for a caller.
@@ -93,7 +94,7 @@ struct PrototypeServiceFactory : public ServiceFactory
    *
    * @see ServiceObjects::UngetService()
    */
-  virtual void UngetService(Bundle* bundle, const ServiceRegistrationBase& registration,
+  virtual void UngetService(const std::shared_ptr<Bundle>& bundle, const ServiceRegistrationBase& registration,
                             const InterfaceMapConstPtr& service) = 0;
 
 };

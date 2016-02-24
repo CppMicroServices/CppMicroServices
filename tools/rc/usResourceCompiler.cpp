@@ -114,7 +114,7 @@ std::string us_tempfile()
  */
 class ZipArchive {
 public:
-  ZipArchive(std::string& archiveFileName,
+  ZipArchive(const std::string& archiveFileName,
              int compressionLevel,
              const std::string& bundleName);
   virtual ~ZipArchive();
@@ -122,7 +122,7 @@ public:
    * @brief Add a file to this zip archive
    * @throw std::runtime exception if failed to add the resource file
    * @param resFileName is the path to the resource to be added
-   *        isManifest indicates if the file is the bundle's manifest
+   * @param isManifest indicates if the file is the bundle's manifest
    */
   void AddResourceFile(const std::string& resFileName, bool isManifest = false);
   
@@ -133,11 +133,12 @@ public:
    */
   void AddResourcesFromArchive(const std::string& archiveFileName);
   
-  /*
-   * @brief Finalize the zip archive. File is written to disk
-   * @return true on success
-   */
-  bool Finalize();
+  // Remove copy constructor and assignment
+  ZipArchive(const ZipArchive&) = delete;
+  void operator=(const ZipArchive&) = delete;
+  // Remove move constructor and assignment
+  ZipArchive(ZipArchive&&) = delete;
+  ZipArchive& operator=(ZipArchive&&) = delete;
   
 private:
   /*
@@ -145,6 +146,7 @@ private:
    * @throw std::runtime exception if failed to add the entry
    */
   void AddDirectory(const std::string& dirName);
+  
   std::string fileName;
   int compressionLevel;
   std::string bundleName;
@@ -153,7 +155,7 @@ private:
   std::set<std::string> archivedDirs;           // list of all directory entries
 };
 
-ZipArchive::ZipArchive(std::string& archiveFileName,
+ZipArchive::ZipArchive(const std::string& archiveFileName,
                        int compressionLevel,
                        const std::string& bName)
 : fileName(archiveFileName)
@@ -221,7 +223,19 @@ void ZipArchive::AddDirectory(const std::string& dirName)
 
 ZipArchive::~ZipArchive()
 {
-  if (writeArchive && writeArchive->m_zip_mode != MZ_ZIP_MODE_INVALID)
+  assert(writeArchive->m_zip_mode != MZ_ZIP_MODE_INVALID);
+  std::clog << "Finalizing the zip archive ..." << std::endl;
+  std::clog << "Archive has the following files" << std::endl;
+  for (auto fileNameEntry : archivedNames)
+  {
+    std::clog << "\t " << fileNameEntry << std::endl;
+  }
+  std::clog << "and directory entries" << std::endl;
+  for (auto dirEntry : archivedDirs)
+  {
+    std::clog << "\t " << dirEntry << std::endl;
+  }
+  if (mz_zip_writer_finalize_archive(writeArchive.get()) == 0)
   {
     assert(writeArchive->m_zip_mode == MZ_ZIP_MODE_WRITING_HAS_BEEN_FINALIZED);
     if (!mz_zip_writer_end(writeArchive.get()))
@@ -277,22 +291,6 @@ void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
   }
   std::clog << "Finished merging files from " << archiveFileName << std::endl;
   mz_zip_reader_end(&currZipArchive);
-}
-
-bool ZipArchive::Finalize()
-{
-  std::clog << "Archive has the following files" << std::endl;
-  for (auto fileNameEntry : archivedNames)
-  {
-    std::clog << "\t " << fileNameEntry << std::endl;
-  }
-  std::clog << "and directory entries" << std::endl;
-  for (auto dirEntry : archivedDirs)
-  {
-    std::clog << "\t " << dirEntry << std::endl;
-  }
-  std::clog << "Finalizing the zip archive ..." << std::endl;
-  return mz_zip_writer_finalize_archive(writeArchive.get()) == 0;
 }
 
 struct Custom_Arg : public option::Arg
@@ -469,7 +467,7 @@ int main(int argc, char** argv)
     }
     else
     {
-      std::shared_ptr<ZipArchive> zipArchive = std::make_shared<ZipArchive>(outFile, compressionLevel, bundleName);
+      std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(outFile, compressionLevel, bundleName));
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])
       {
@@ -485,7 +483,6 @@ int main(int argc, char** argv)
       {
         zipArchive->AddResourcesFromArchive(opt->arg);
       }
-      zipArchive->Finalize();
     }
     // ---------------------------------------------------------------------------------
     //      APPEND ZIP to BINARY if bundle-file is specified

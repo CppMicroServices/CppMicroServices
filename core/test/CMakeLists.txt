@@ -110,7 +110,9 @@ us_add_tests(${_test_driver} ${_tests})
 
 if(US_MEMCHECK_COMMAND)
   set_tests_properties(memcheck_usMemcheckTest PROPERTIES WILL_FAIL 1)
-  set_tests_properties(helgrind_usHelgrindTest PROPERTIES WILL_FAIL 1)
+  if(US_ENABLE_HELGRIND)
+    set_tests_properties(helgrind_usHelgrindTest PROPERTIES WILL_FAIL 1)
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

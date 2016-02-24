@@ -233,9 +233,13 @@ function(us_add_tests test_driver)
     add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_property(TEST memcheck_${test} PROPERTY LABELS valgrind memcheck)
-    add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
+    if(US_ENABLE_HELGRIND)
+      # By default, these tests are not active until the concurrent bundle
+      # start / stop mechanism has been properly implemented (GitHub Issue #25)
+      add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
+    endif()
   endif()
   endforeach()
 endfunction()

@@ -146,7 +146,7 @@ public:
   /**
    * Cached service object for GetService.
    */
-  mutable std::shared_ptr<TrackedParmType> cachedService;
+  mutable Atomic<std::shared_ptr<TrackedParmType>> cachedService;
 
 
 private:

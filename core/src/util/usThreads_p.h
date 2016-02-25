@@ -27,6 +27,7 @@
 #include <usCoreConfig.h>
 
 #include <mutex>
+#include <memory>
 
 namespace us {
 
@@ -167,6 +168,39 @@ public:
   }
 
 };
+
+#if !defined(__GNUC__) || __GNUC__ > 4
+// The std::atomic_load() et.al. overloads for std::shared_ptr are only available
+// in libstdc++ since GCC 5.0. Visual Studio 2013 has it, but the Clang version
+// is unknown so far.
+
+// Specialize us::Atomic for std::shared_ptr to use the standard library atomic
+// functions:
+template<class T>
+class Atomic<std::shared_ptr<T>>
+{
+
+  std::shared_ptr<T> m_t;
+
+public:
+
+  std::shared_ptr<T> Load() const
+  {
+    return std::atomic_load(&m_t);
+  }
+
+  void Store(const std::shared_ptr<T>& t)
+  {
+    std::atomic_store(&m_t, t);
+  }
+
+  std::shared_ptr<T> Exchange(const std::shared_ptr<T>& t)
+  {
+    return std::atomic_exchange(&m_t, t);
+  }
+
+};
+#endif
 
 }
 

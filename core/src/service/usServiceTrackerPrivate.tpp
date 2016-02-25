@@ -149,7 +149,7 @@ template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::Modified()
 {
   cachedReference.Store(ServiceReference<S>()); /* clear cached value */
-  std::atomic_store(&cachedService, decltype(cachedService)()); /* clear cached value */
+  cachedService.Store(std::shared_ptr<TrackedParmType>()); /* clear cached value */
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 

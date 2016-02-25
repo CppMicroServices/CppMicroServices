@@ -161,7 +161,7 @@ void ServiceTracker<S,T>::Close()
   if (d->DEBUG_OUTPUT)
   {
     if (d->cachedReference.Load().GetBundle() == nullptr &&
-        std::atomic_load(&d->cachedService) == nullptr)
+        d->cachedService.Load() == nullptr)
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                        << d->filter;
@@ -351,7 +351,7 @@ template<class S, class T>
 std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
 ServiceTracker<S,T>::GetService() const
 {
-  auto service = std::atomic_load(&d->cachedService);
+  auto service = d->cachedService.Load();
   if (service)
   {
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService[cached]:"
@@ -368,7 +368,7 @@ ServiceTracker<S,T>::GetService() const
       return std::shared_ptr<TrackedParmType>();
     }
     service = GetService(reference);
-    std::atomic_store(&d->cachedService, service);
+    d->cachedService.Store(service);
     return service;
   }
   catch (const ServiceException&)

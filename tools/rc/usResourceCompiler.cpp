@@ -87,12 +87,6 @@ std::string us_tempfile()
   return std::string(szTempFileName);
 }
 
-bool IsAbsolutePath(const std::string& filePath)
-{
-  return ((filePath.at(1) == ':' && filePath.at(2) == '\\') ||
-          (filePath.at(0) == '\\' && filePath.at(1) == '\\'));
-}
-
 #else
 
 #include <unistd.h>
@@ -111,11 +105,6 @@ std::string us_tempfile()
     exit(EXIT_FAILURE);
   }
   return std::string(temppath);
-}
-
-bool IsAbsolutePath(const std::string& filePath)
-{
-  return (filePath.at(0) == '/');
 }
 
 #endif
@@ -197,11 +186,6 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   if (isManifest && resFileName.find_last_of(PATH_SEPARATOR) != std::string::npos)
   {
     archiveName = resFileName.substr(resFileName.find_last_of(PATH_SEPARATOR)+1);
-  }
-  
-  if(IsAbsolutePath(archiveName))
-  {
-    throw std::runtime_error("Absolute paths cannot be used for adding resource files");
   }
   
   std::string archiveEntry = bundleName + "/" + archiveName;

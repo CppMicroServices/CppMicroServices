@@ -87,6 +87,12 @@ std::string us_tempfile()
   return std::string(szTempFileName);
 }
 
+bool IsAbsolutePath(const std::string& filePath)
+{
+  return ((filePath.at(1) == ':' && filePath.at(2) == '\\') ||
+          (filePath.at(0) == '\\' && filePath.at(1) == '\\'));
+}
+
 #else
 
 #include <unistd.h>
@@ -105,6 +111,11 @@ std::string us_tempfile()
     exit(EXIT_FAILURE);
   }
   return std::string(temppath);
+}
+
+bool IsAbsolutePath(const std::string& filePath)
+{
+  return (filePath.at(0) == '/');
 }
 
 #endif
@@ -182,11 +193,17 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
 {
   std::string archiveName = resFileName;
   // if it is a manifest file, we ignore the parent directory path
-  // manifest file is always placed at the root of teh bundle name directory
+  // manifest file is always placed at the root of the bundle name directory
   if (isManifest && resFileName.find_last_of(PATH_SEPARATOR) != std::string::npos)
   {
     archiveName = resFileName.substr(resFileName.find_last_of(PATH_SEPARATOR)+1);
   }
+  
+  if(IsAbsolutePath(archiveName))
+  {
+    throw std::runtime_error("Absolute paths cannot be used for adding resource files");
+  }
+  
   std::string archiveEntry = bundleName + "/" + archiveName;
   std::clog << "Adding file " << archiveEntry << " ..." << std::endl;
   // add the current file to the new archive
@@ -200,10 +217,12 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   {
     throw std::runtime_error("Error writing file to archive");
   }
-  // add a directory entry for the file if needed.
-  if(archiveEntry.find_last_of("/") != std::string::npos)
+  // add a directory entries for the file path
+  size_t lastPathSeparatorPos = archiveEntry.find("/", 0);
+  while(lastPathSeparatorPos != std::string::npos)
   {
-    AddDirectory(archiveEntry.substr(0,archiveEntry.find_last_of("/")+1));
+    AddDirectory(archiveEntry.substr(0,lastPathSeparatorPos+1));
+    lastPathSeparatorPos = archiveEntry.find("/", lastPathSeparatorPos+1);
   }
 }
 
@@ -405,7 +424,7 @@ int main(int argc, char** argv)
   option::Option* bundleFileOpt = options[BUNDLEFILE];
   if (bundleFileOpt && bundleFileOpt->count() > 1 )
   {
-    std::cerr << "(--append-binary | -a) appear multiple times in the arguments. Check usage." << std::endl;
+    std::cerr << "(--bundle-file | -b) appear multiple times in the arguments. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
   
@@ -460,6 +479,7 @@ int main(int argc, char** argv)
   
   try
   {
+    // Append mode only works with one zip-add argument. A bundle can only contain one zip blob. 
     if (!options[RESADD] && !options[MANIFESTADD] && options[ZIPADD].count() == 1 && options[BUNDLEFILE])
     {
       // jump to append part.

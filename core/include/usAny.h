@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 #include <list>
 #include <set>
 #include <map>
+#include <memory>
 
 #include <usCoreConfig.h>
 
@@ -47,11 +48,16 @@ namespace us {
 
 class Any;
 
+US_Core_EXPORT bool operator==(const Any& a1, const Any& a2);
+
 US_Core_EXPORT std::string any_value_to_string(const Any& any);
 
 US_Core_EXPORT std::string any_value_to_json(const Any& val);
 US_Core_EXPORT std::string any_value_to_json(const std::string& val);
 US_Core_EXPORT std::string any_value_to_json(bool val);
+
+template <typename ValueType>
+ValueType* any_cast(Any* operand);
 
 template<class T>
 std::string any_value_to_string(const T& val)
@@ -167,8 +173,8 @@ public:
   /**
    * Creates an empty any type.
    */
-  Any(): _content(0)
-  { }
+  Any()
+  {}
 
   /**
    * Creates an Any which stores the init parameter inside.
@@ -184,7 +190,7 @@ public:
   template <typename ValueType>
   Any(const ValueType& value)
     : _content(new Holder<ValueType>(value))
-  { }
+  {}
 
   /**
    * Copy constructor, works with empty Anys and initialized Any values.
@@ -193,12 +199,11 @@ public:
    */
   Any(const Any& other)
     : _content(other._content ? other._content->Clone() : 0)
-  { }
+  {}
 
-  ~Any()
-  {
-    delete _content;
-  }
+  Any(Any&& other)
+    : _content(std::move(other._content))
+  {}
 
   /**
    * Swaps the content of the two Anys.
@@ -209,6 +214,27 @@ public:
   {
     std::swap(_content, rhs._content);
     return *this;
+  }
+
+  /**
+   * Compares this Any with another value.
+   * If the internal type of this any and of \c val do not
+   * match, the comparison always returns false.
+   *
+   * \param val The value to compare to.
+   * \returns \c true if this Any contains value \c val, \c false otherwise.
+   */
+  template <typename ValueType>
+  bool operator==(const ValueType& val)
+  {
+    if (Type() != typeid(ValueType)) return false;
+    return *any_cast<ValueType>(this) == val;
+  }
+
+  template <typename ValueType>
+  bool operator!=(const ValueType& val)
+  {
+    return !operator==(val);
   }
 
   /**
@@ -237,6 +263,12 @@ public:
   Any& operator = (const Any& rhs)
   {
     Any(rhs).Swap(*this);
+    return *this;
+  }
+
+  Any& operator=(Any&& rhs)
+  {
+    _content = std::move(rhs._content);
     return *this;
   }
 
@@ -292,7 +324,7 @@ private:
     virtual std::string ToJSON() const = 0;
 
     virtual const std::type_info& Type() const = 0;
-    virtual Placeholder* Clone() const = 0;
+    virtual std::unique_ptr<Placeholder> Clone() const = 0;
   };
 
   template <typename ValueType>
@@ -318,9 +350,9 @@ private:
       return typeid(ValueType);
     }
 
-    virtual Placeholder* Clone() const
+    virtual std::unique_ptr<Placeholder> Clone() const
     {
-      return new Holder(_held);
+      return std::unique_ptr<Placeholder>(new Holder(_held));
     }
 
     ValueType _held;
@@ -336,7 +368,7 @@ private:
     template <typename ValueType>
     friend ValueType* unsafe_any_cast(Any*);
 
-    Placeholder* _content;
+    std::unique_ptr<Placeholder> _content;
 };
 
 class BadAnyCastException : public std::bad_cast
@@ -371,13 +403,13 @@ private:
  * \code
  * MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 ValueType* any_cast(Any* operand)
 {
   return operand && operand->Type() == typeid(ValueType)
-      ? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
+      ? &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held
       : 0;
 }
 
@@ -389,7 +421,7 @@ ValueType* any_cast(Any* operand)
  * \code
  * const MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 const ValueType* any_cast(const Any* operand)

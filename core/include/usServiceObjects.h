@@ -39,17 +39,21 @@ class US_Core_EXPORT ServiceObjectsBase
 
 private:
 
-  ServiceObjectsBasePrivate* d;
+  std::unique_ptr<ServiceObjectsBasePrivate> d;
+
+public:
+
+  ServiceObjectsBase(const ServiceObjectsBase& other) = delete;
+  ServiceObjectsBase& operator=(const ServiceObjectsBase& other) = delete;
+
+  ServiceObjectsBase(ServiceObjectsBase&& other);
+  ServiceObjectsBase& operator=(ServiceObjectsBase&& other);
 
 protected:
 
   ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference);
 
-  ServiceObjectsBase(const ServiceObjectsBase& other);
-
   ~ServiceObjectsBase();
-
-  ServiceObjectsBase& operator=(const ServiceObjectsBase& other);
 
   // Called by ServiceObjects<S> with S != void
   std::shared_ptr<void> GetService() const;
@@ -83,6 +87,12 @@ class ServiceObjects : private ServiceObjectsBase
 
 public:
 
+  ServiceObjects(const ServiceObjects& other) = delete;
+  ServiceObjects& operator=(const ServiceObjects& other) = delete;
+
+  ServiceObjects(ServiceObjects&& other) : ServiceObjectsBase(std::move(other)) {}
+  ServiceObjects& operator=(ServiceObjects&& other) { ServiceObjectsBase::operator=(std::move(other)); return *this; }
+
   /**
    * Returns a service object for the referenced service.
    *
@@ -94,29 +104,28 @@ public:
    * method for the referenced service. That is, only one, use-counted service object
    * is available from this ServiceObjects object.
    *
-   * This method will always return \c NULL when the referenced service has been unregistered.
+   * This method will always return \c nullptr when the referenced service has been unregistered.
    *
    * For a prototype scope service, the following steps are taken to get the service object:
    *
    * <ol>
-   *   <li>If the referenced service has been unregistered, \c NULL is returned.</li>
+   *   <li>If the referenced service has been unregistered, \c nullptr is returned.</li>
    *   <li>The PrototypeServiceFactory::GetService(const std::shared_ptr<Bundle>&, const ServiceRegistrationBase&)
    *       method is called to create a service object for the caller.</li>
    *   <li>If the service object (an instance of InterfaceMap) returned by the
    *       PrototypeServiceFactory object is empty, does not contain all the interfaces
    *       named when the service was registered or the PrototypeServiceFactory object
-   *       throws an exception, \c NULL is returned and a warning message is issued.</li>
+   *       throws an exception, \c nullptr is returned and a warning message is issued.</li>
    *   <li>The service object is returned.</li>
    * </ol>
    *
-   * @return A \c shared_ptr to the service object.The returned \c shared_ptr
+   * @return A \c shared_ptr to the service object. The returned \c shared_ptr
    *         is empty if the service is not registered, the service object returned by a
    *         ServiceFactory does not contain all the classes under which it was registered 
    *         or the ServiceFactory threw an exception.
    *
    * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
    *        is no longer valid.
-   *
    */
   std::shared_ptr<S> GetService() const
   {
@@ -158,6 +167,12 @@ class US_Core_EXPORT ServiceObjects<void> : private ServiceObjectsBase
 {
 
 public:
+
+  ServiceObjects(const ServiceObjects& other) = delete;
+  ServiceObjects& operator=(const ServiceObjects& other) = delete;
+
+  ServiceObjects(ServiceObjects&& other);
+  ServiceObjects& operator=(ServiceObjects&& other);
 
   /**
    * Returns a service object as a InterfaceMap instance for the referenced service.

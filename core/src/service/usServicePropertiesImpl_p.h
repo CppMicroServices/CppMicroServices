@@ -24,23 +24,29 @@
 #define USSERVICEPROPERTIESIMPL_P_H
 
 #include "usServiceProperties.h"
+#include "usThreads_p.h"
 
 namespace us {
 
-class ServicePropertiesImpl
+class ServicePropertiesImpl : public MultiThreaded<>
 {
 
 public:
 
   explicit ServicePropertiesImpl(const ServiceProperties& props);
 
-  const Any& Value(const std::string& key) const;
-  const Any& Value(int index) const;
+  ServicePropertiesImpl(ServicePropertiesImpl&& o);
+  ServicePropertiesImpl& operator=(ServicePropertiesImpl&& o);
 
-  int Find(const std::string& key) const;
-  int FindCaseSensitive(const std::string& key) const;
+  Any Value_unlocked(const std::string& key) const;
+  Any Value_unlocked(int index) const;
 
-  const std::vector<std::string>& Keys() const;
+  int Find_unlocked(const std::string& key) const;
+  int FindCaseSensitive_unlocked(const std::string& key) const;
+
+  std::vector<std::string> Keys_unlocked() const;
+
+  void Clear_unlocked();
 
 private:
 
@@ -49,6 +55,27 @@ private:
 
   static Any emptyAny;
 
+};
+
+class ServicePropertiesHandle
+{
+public:
+  ServicePropertiesHandle(const ServicePropertiesImpl& props, bool lock)
+    : props(props)
+    , l(lock ? props.Lock() : ServicePropertiesImpl::UniqueLock())
+  {}
+
+  ServicePropertiesHandle(ServicePropertiesHandle&& o)
+    : props(o.props)
+    , l(std::move(o.l))
+  {}
+
+  const ServicePropertiesImpl* operator-> () const { return &props; }
+
+private:
+
+  const ServicePropertiesImpl& props;
+  ServicePropertiesImpl::UniqueLock l;
 };
 
 }

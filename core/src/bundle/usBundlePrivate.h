@@ -53,19 +53,23 @@ public:
   /**
    * Construct a new bundle based on a BundleInfo object.
    */
-  BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContext* coreCtx, BundleInfo* info);
+  BundlePrivate(Bundle* qq, const BundleInfo& info);
+
+  void Init(CoreBundleContext* coreCtx);
 
   virtual ~BundlePrivate();
 
   void RemoveBundleResources();
 
-  CoreBundleContext* const coreCtx;
+  CoreBundleContext* coreCtx;
 
   /**
    * Bundle version
    */
+  // Does not need to be locked by "this" when accessed.
   BundleVersion version;
 
+  // Does not need to be locked by "this" when accessed.
   BundleInfo info;
 
   BundleResourceContainer resourceContainer;
@@ -73,18 +77,25 @@ public:
   /**
    * BundleContext for the bundle
    */
-  BundleContext* bundleContext;
+  std::atomic<BundleContext*> bundleContext;
+
+  std::vector<std::unique_ptr<BundleContext>> bundleContextOrphans;
+
+  // TODO use proper state handling
+  std::atomic<bool> starting;
+  std::atomic<bool> stopping;
 
   BundleActivator* bundleActivator;
 
+  // Does not need to be locked by "this" when accessed.
   BundleManifest bundleManifest;
 
   std::string baseStoragePath;
   std::string storagePath;
 
-  const std::weak_ptr<Bundle> q;
+  Bundle* const q;
 
-  /** 
+  /**
    * Responsible for platform specific loading and unloading
    * of the bundle's physical form.
    */

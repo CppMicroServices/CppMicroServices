@@ -75,24 +75,24 @@ LDAPFilter::~LDAPFilter()
 {
 }
 
-LDAPFilter::operator bool_type() const
+LDAPFilter::operator bool() const
 {
-  return d.ConstData() != nullptr ? &LDAPFilter::d : NULL;
+  return d != nullptr;
 }
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return d->ldapExpr.Evaluate(reference.d->GetProperties(), true);
+  return d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), true);
 }
 
 bool LDAPFilter::Match(const ServiceProperties& dictionary) const
 {
-  return d->ldapExpr.Evaluate(ServicePropertiesImpl(dictionary), false);
+  return d->ldapExpr.Evaluate(ServicePropertiesHandle(ServicePropertiesImpl(dictionary), false), false);
 }
 
 bool LDAPFilter::MatchCase(const ServiceProperties& dictionary) const
 {
-  return d->ldapExpr.Evaluate(ServicePropertiesImpl(dictionary), true);
+  return d->ldapExpr.Evaluate(ServicePropertiesHandle(ServicePropertiesImpl(dictionary), false), true);
 }
 
 std::string LDAPFilter::ToString() const
@@ -112,11 +112,9 @@ LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
   return *this;
 }
 
-}
-
-using namespace us;
-
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {
   return os << filter.ToString();
+}
+
 }

@@ -37,6 +37,7 @@ endforeach()
 # decltype                         4.3   2.9     ??           2012
 # Right angle brackets             4.3   2.9     ??           2010
 # Null pointer constant            4.6   3.0     ??           2010
+# Explicit conversion operators    4.5   3.0     ??           2013
 # Defaulted functions              4.4   3.0     ??           2013*
 # Deleted functions                4.4   2.9     ??           2013*
 # Range-based for                  4.6   3.0     ??           2012
@@ -192,10 +193,6 @@ us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 
-if(US_BUILD_TESTING)
-  enable_testing()
-endif()
-
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir bin/)
@@ -222,6 +219,43 @@ set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/usBundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/us_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+
+#-----------------------------------------------------------------------------
+# Testing configuration
+#-----------------------------------------------------------------------------
+
+function(us_add_tests test_driver)
+  foreach(test ${ARGN})
+    add_test(NAME ${test} COMMAND ${test_driver} ${test}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_property(TEST ${test} PROPERTY LABELS regular)
+  if(US_MEMCHECK_COMMAND)
+    add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_property(TEST memcheck_${test} PROPERTY LABELS valgrind memcheck)
+    if(US_ENABLE_HELGRIND)
+      # By default, these tests are not active until the concurrent bundle
+      # start / stop mechanism has been properly implemented (GitHub Issue #25)
+      add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
+    endif()
+  endif()
+  endforeach()
+endfunction()
+
+# Valgrind rc file
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/valgrindrc
+  ${CMAKE_BINARY_DIR}/.valgrindrc
+  @ONLY
+  )
+
+if(US_BUILD_TESTING)
+  enable_testing()
+  find_program(US_MEMCHECK_COMMAND valgrind)
+  mark_as_advanced(US_MEMCHECK_COMMAND)
+endif()
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags

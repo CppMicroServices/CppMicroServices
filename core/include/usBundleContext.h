@@ -27,6 +27,7 @@
 #include "usServiceInterface.h"
 #include "usServiceRegistration.h"
 
+#include <memory>
 
 namespace us {
 
@@ -36,6 +37,7 @@ class ServiceFactory;
 
 template<class S> class ServiceObjects;
 template<class S> struct ServiceHolder;
+
 /**
  * \ingroup MicroServices
  *
@@ -223,7 +225,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this BundleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
+   *         \c service object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -257,7 +259,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this BundleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
+   *         \c service factory object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -687,6 +689,7 @@ private:
 
   friend class Bundle;
   friend class BundlePrivate;
+  template<class S> friend struct ServiceHolder;
 
   BundleContext(BundlePrivate* bundle);
   
@@ -726,7 +729,7 @@ private:
    * @see ServiceFactory
    */
   bool UngetService(const ServiceReferenceBase& reference);
-  
+
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);
   void RemoveServiceListener(const ServiceListener& delegate, void* data);
@@ -734,9 +737,7 @@ private:
   void AddBundleListener(const BundleListener& delegate, void* data);
   void RemoveBundleListener(const BundleListener& delegate, void* data);
 
-  BundleContextPrivate * const d;
-  
-  template<class S> friend struct ServiceHolder;
+  std::unique_ptr<BundleContextPrivate> const d;
 };
 
 }

@@ -117,7 +117,7 @@ private:
     if (id < 0) return false;
 
     us::Bundle* bundle = us::BundleRegistry::GetBundle(id);
-    if (bundle == NULL) return false;
+    if (bundle == nullptr) return false;
 
     // ----------------- Get bundle properties ---------------------
 

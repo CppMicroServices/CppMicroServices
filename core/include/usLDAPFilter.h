@@ -96,7 +96,7 @@ public:
 
   ~LDAPFilter();
 
-  operator bool_type() const;
+  explicit operator bool() const;
 
   /**
    * Filter using a service's properties.
@@ -167,15 +167,15 @@ protected:
 
 };
 
+/**
+ * \ingroup MicroServices
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter);
+
 }
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
-/**
- * \ingroup MicroServices
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::LDAPFilter& filter);
 
 #endif // USLDAPFILTER_H

@@ -45,5 +45,6 @@ set(_public_headers
   usBundleResource.h
   usBundleResourceStream.h
   usBundleSettings.h
+  usBundleUtils.h
   usBundleVersion.h
 )

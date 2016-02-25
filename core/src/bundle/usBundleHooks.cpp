@@ -65,12 +65,11 @@ void BundleHooks::FilterBundles(const BundleContext* context, std::vector<std::s
   ShrinkableVector<std::shared_ptr<Bundle>> filtered(bundles);
 
   std::sort(srl.begin(), srl.end());
-  for (std::vector<ServiceRegistrationBase>::reverse_iterator srBaseIter = srl.rbegin(), srBaseEnd = srl.rend();
-       srBaseIter != srBaseEnd; ++srBaseIter)
+  for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
-    std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(sr.d->GetService(GetBundleContext()->GetBundle()));
-    if (fh != NULL)
+    std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
+    if (fh)
     {
       try
       {
@@ -97,19 +96,16 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
   coreCtx->services.Get(us_service_interface_iid<BundleEventHook>(), eventHooks);
 
   {
-    //typedef decltype(coreCtx->listeners.bundleListenerMap) T;
-    typedef MultiThreaded<> T; // gcc 4.6 workaround; the above line leads to a segfault with gcc 4.6
-    T::Lock{coreCtx->listeners.bundleListenerMap};
+    auto l = coreCtx->listeners.bundleListenerMap.Lock(); US_UNUSED(l);
     bundleListeners = coreCtx->listeners.bundleListenerMap.value;
   }
 
   if(!eventHooks.empty())
   {
     std::vector<BundleContext*> bundleContexts;
-    for (ServiceListeners::BundleListenerMap::iterator le = bundleListeners.begin(),
-         leEnd = bundleListeners.end(); le != leEnd; ++le)
+    for (auto& le : bundleListeners)
     {
-      bundleContexts.push_back(le->first);
+      bundleContexts.push_back(le.first);
     }
     std::sort(bundleContexts.begin(), bundleContexts.end());
     bundleContexts.erase(std::unique(bundleContexts.begin(), bundleContexts.end()), bundleContexts.end());
@@ -118,8 +114,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
     ShrinkableVector<BundleContext*> filtered(bundleContexts);
 
     std::sort(eventHooks.begin(), eventHooks.end());
-    for (std::vector<ServiceRegistrationBase>::reverse_iterator iter = eventHooks.rbegin(),
-         iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
+    for (auto iter = eventHooks.rbegin(), iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
     {
       ServiceReference<BundleEventHook> sr;
       try
@@ -132,8 +127,8 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
         continue;
       }
 
-      std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(sr.d->GetService(GetBundleContext()->GetBundle()));
-      if (eh != NULL)
+      std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
+      if (eh)
       {
         try
         {

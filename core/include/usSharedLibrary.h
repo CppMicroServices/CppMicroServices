@@ -197,7 +197,7 @@ public:
   /**
    * Gets the internal handle of this SharedLibrary object.
    *
-   * @return \c NULL if the shared library is not loaded, the operating
+   * @return \c nullptr if the shared library is not loaded, the operating
    * system specific handle otherwise.
    */
   void* GetHandle() const;

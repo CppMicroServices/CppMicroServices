@@ -26,6 +26,7 @@
 #include "usSharedData.h"
 
 #include <string>
+#include <memory>
 
 namespace us {
 
@@ -71,12 +72,12 @@ public:
    * @see  ServletContext
    *
    */
-  ServletContext* GetServletContext() const;
+  std::shared_ptr<ServletContext> GetServletContext() const;
 
 protected:
 
   void SetServletName(const std::string& name);
-  void SetServletContext(ServletContext* context);
+  void SetServletContext(const std::shared_ptr<ServletContext>& context);
 
 private:
 

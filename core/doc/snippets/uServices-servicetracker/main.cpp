@@ -6,75 +6,43 @@ using namespace us;
 struct IFooService {};
 
 ///! [tt]
-struct MyTrackedClass { /* ... */ };
-//! [tt]
-
-//! [ttt]
-struct MyTrackedClassTraits : public TrackedTypeTraitsBase<MyTrackedClass, MyTrackedClassTraits>
-{
-  static bool IsValid(const TrackedType&)
-  {
-    // Dummy implementation
-    return true;
-  }
-
-  static void Dispose(TrackedType&)
-  {}
-
-  static TrackedType DefaultValue()
-  {
-    return TrackedType();
-  }
+struct MyTrackedClass {
+  explicit operator bool() const { return true; }
+  /* ... */
 };
-//! [ttt]
+//! [tt]
 
 //! [customizer]
 struct MyTrackingCustomizer : public ServiceTrackerCustomizer<IFooService, MyTrackedClass>
 {
-  virtual MyTrackedClass AddingService(const ServiceReferenceType&)
+  virtual std::shared_ptr<MyTrackedClass> AddingService(const ServiceReference<IFooService>&)
   {
-    return MyTrackedClass();
+    return std::shared_ptr<MyTrackedClass>();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void ModifiedService(const ServiceReference<IFooService>&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void RemovedService(const ServiceReference<IFooService>&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 };
 //! [customizer]
 
-struct MyTrackingPointerCustomizer : public ServiceTrackerCustomizer<IFooService, MyTrackedClass*>
-{
-  virtual MyTrackedClass* AddingService(const ServiceReferenceType&)
-  {
-    return new MyTrackedClass();
-  }
-
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass*)
-  {
-  }
-
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass*)
-  {
-  }
-};
-
 // For compilation test purposes only
 struct MyTrackingCustomizerVoid : public ServiceTrackerCustomizer<void, MyTrackedClass>
 {
-  virtual MyTrackedClass AddingService(const ServiceReferenceType&)
+  virtual std::shared_ptr<MyTrackedClass> AddingService(const ServiceReferenceU&)
   {
-    return MyTrackedClass();
+    return std::shared_ptr<MyTrackedClass>();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void ModifiedService(const ServiceReferenceU&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void RemovedService(const ServiceReferenceU&, const std::shared_ptr<MyTrackedClass>&)
   {
   }
 };
@@ -84,23 +52,15 @@ int main(int /*argc*/, char* /*argv*/[])
   {
 //! [tracker]
 MyTrackingCustomizer myCustomizer;
-ServiceTracker<IFooService, MyTrackedClassTraits> tracker(GetBundleContext(), &myCustomizer);
+ServiceTracker<IFooService, MyTrackedClass> tracker(GetBundleContext(), &myCustomizer);
 //! [tracker]
-  }
-
-  {
-//! [tracker2]
-MyTrackingPointerCustomizer myCustomizer;
-ServiceTracker<IFooService, TrackedTypeTraits<IFooService,MyTrackedClass*> > tracker(GetBundleContext(), &myCustomizer);
-//! [tracker2]
   }
 
   // For compilation test purposes only
   MyTrackingCustomizerVoid myCustomizer2;
   try
   {
-    ServiceTracker<void, MyTrackedClassTraits> tracker2(GetBundleContext(), &myCustomizer2);
-    ServiceTracker<void, TrackedTypeTraits<void,MyTrackedClass*> > tracker3(GetBundleContext());
+    ServiceTracker<void, MyTrackedClass> tracker2(GetBundleContext(), &myCustomizer2);
   }
   catch (const us::ServiceException&)
   {}

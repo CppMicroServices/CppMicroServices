@@ -252,7 +252,7 @@ template <class T>
 void ExplicitlySharedDataPointer<T>::Detach_helper()
 {
   T *x = Clone();
-    ++x->ref;
+  ++x->ref;
   if (!--d->ref)
     delete d;
   d = x;

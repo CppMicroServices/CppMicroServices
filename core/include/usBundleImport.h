@@ -80,12 +80,12 @@ class BundleContext;
  * \sa US_INITIALIZE_STATIC_BUNDLE
  * \sa \ref MicroServices_StaticBundles
  */
-#define US_IMPORT_BUNDLE(_bundle_name)                                     \
-  US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                \
-  extern "C" us::BundleActivator* _us_bundle_activator_instance_ ## _bundle_name (); \
-  void _dummy_reference_to_ ## _bundle_name ## _activator()                \
-  {                                                                        \
-    _us_bundle_activator_instance_ ## _bundle_name();                      \
+#define US_IMPORT_BUNDLE(_bundle_name)                                      \
+  US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                 \
+  extern "C" us::BundleActivator* _us_create_activator_ ## _bundle_name (); \
+  void _dummy_reference_to_ ## _bundle_name ## _activator()                 \
+  {                                                                         \
+    _us_create_activator_ ## _bundle_name();                                \
   }
 
 #endif // USBUNDLEREGISTRY_H

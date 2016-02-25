@@ -32,15 +32,15 @@
 namespace us {
 
 ServiceReferenceBase::ServiceReferenceBase()
-  : d(new ServiceReferenceBasePrivate(0))
+  : d(new ServiceReferenceBasePrivate(nullptr))
 {
 
 }
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
-  : d(ref.d)
+  : d(ref.d.load())
 {
-  ++d->ref;
+  ++d.load()->ref;
 }
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
@@ -50,76 +50,69 @@ ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 {
-  if (d->ref > 1)
+  if (d.load()->ref > 1)
   {
     // detach
-    --d->ref;
-    d = new ServiceReferenceBasePrivate(d->registration);
+    --d.load()->ref;
+    d = new ServiceReferenceBasePrivate(d.load()->registration);
   }
-  d->interfaceId = interfaceId;
+  d.load()->interfaceId = interfaceId;
 }
 
-ServiceReferenceBase::operator bool_type() const
+ServiceReferenceBase::operator bool() const
 {
-  return GetBundle() != nullptr ? &ServiceReferenceBase::d : NULL;
+  return GetBundle() != nullptr;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 {
-  if (!--d->ref)
-    delete d;
-  d = new ServiceReferenceBasePrivate(0);
+  if (!--d.load()->ref)
+    delete d.load();
+  d = new ServiceReferenceBasePrivate(nullptr);
   return *this;
 }
 
 ServiceReferenceBase::~ServiceReferenceBase()
 {
-  if (!--d->ref)
-    delete d;
+  if (!--d.load()->ref)
+    delete d.load();
 }
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
-  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock l(d->registration->propsLock);
-
-  return d->registration->properties.Value(key);
+  auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
+  return d.load()->registration->properties.Value_unlocked(key);
 }
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
-  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock l(d->registration->propsLock);
-
-  const std::vector<std::string>& ks = d->registration->properties.Keys();
-  keys.assign(ks.begin(), ks.end());
+  auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
+  keys = d.load()->registration->properties.Keys_unlocked();
 }
 
 std::shared_ptr<Bundle> ServiceReferenceBase::GetBundle() const
 {
-  if (d->registration == nullptr || d->registration->bundle == nullptr)
-  {
-    return nullptr;
-  }
+  auto p = d.load();
+  if (p->registration == nullptr) return nullptr;
 
-  return d->registration->bundle->q.lock();
+  auto l = p->registration->Lock(); US_UNUSED(l);
+  if (p->registration->bundle == nullptr) return nullptr;
+  return p->registration->bundle->q->shared_from_this();
 }
 
 void ServiceReferenceBase::GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const
 {
-  typedef decltype(d->registration->propsLock) T; // gcc 4.6 workaround
-  T::Lock l(d->registration->propsLock);
-
-  ServiceRegistrationBasePrivate::BundleToRefsMap::const_iterator end = d->registration->dependents.end();
-  for (ServiceRegistrationBasePrivate::BundleToRefsMap::const_iterator iter = d->registration->dependents.begin();
-       iter != end; ++iter)
+  auto l = d.load()->registration->Lock(); US_UNUSED(l);
+  for (auto& iter : d.load()->registration->dependents)
   {
-    bundles.push_back(iter->first);
+    bundles.push_back(iter.first);
   }
 }
 
 bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) const
 {
+  if (d.load() == reference.d.load()) return false;
+
   if (!(*this))
   {
     return true;
@@ -130,10 +123,32 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
     return false;
   }
 
-  const Any anyR1 = GetProperty(ServiceConstants::SERVICE_RANKING());
-  const Any anyR2 = reference.GetProperty(ServiceConstants::SERVICE_RANKING());
-  assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-  assert(anyR2.Empty() || anyR2.Type() == typeid(int));
+  if (d.load()->registration == reference.d.load()->registration)
+  {
+    return false;
+  }
+
+
+  Any anyR1;
+  Any anyId1;
+  {
+    auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
+    anyR1 = d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+    assert(anyR1.Empty() || anyR1.Type() == typeid(int));
+    anyId1 = d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
+    assert(anyId1.Type() == typeid(long int));
+  }
+
+  Any anyR2;
+  Any anyId2;
+  {
+    auto l = reference.d.load()->registration->properties.Lock(); US_UNUSED(l);
+    anyR2 = reference.d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+    assert(anyR2.Empty() || anyR2.Type() == typeid(int));
+    anyId2 = reference.d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
+    assert(anyId2.Type() == typeid(long int));
+  }
+
   const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
   const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
 
@@ -144,10 +159,6 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   }
   else
   {
-    const Any anyId1 = GetProperty(ServiceConstants::SERVICE_ID());
-    const Any anyId2 = reference.GetProperty(ServiceConstants::SERVICE_ID());
-    assert(anyId1.Type() == typeid(long int));
-    assert(anyId2.Type() == typeid(long int));
     const long int id1 = *any_cast<long int>(&anyId1);
     const long int id2 = *any_cast<long int>(&anyId2);
 
@@ -159,46 +170,45 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
 
 bool ServiceReferenceBase::operator==(const ServiceReferenceBase& reference) const
 {
-  return d->registration == reference.d->registration;
+  return d.load()->registration == reference.d.load()->registration;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(const ServiceReferenceBase& reference)
 {
-  ServiceReferenceBasePrivate* curr_d = d;
-  d = reference.d;
-  ++d->ref;
+  if (d == reference.d.load()) return *this;
 
-  if (!--curr_d->ref)
-    delete curr_d;
+  ServiceReferenceBasePrivate* old_d = d;
+  ServiceReferenceBasePrivate* new_d = reference.d;
+  ++new_d->ref;
+  d = new_d;
+
+  if (!--old_d->ref)
+    delete old_d;
 
   return *this;
 }
 
 bool ServiceReferenceBase::IsConvertibleTo(const std::string& interfaceId) const
 {
-  return d->IsConvertibleTo(interfaceId);
+  return d.load()->IsConvertibleTo(interfaceId);
 }
 
 std::string ServiceReferenceBase::GetInterfaceId() const
 {
-  return d->interfaceId;
+  return d.load()->interfaceId;
 }
 
 std::size_t ServiceReferenceBase::Hash() const
 {
   using namespace std;
-  return hash<ServiceRegistrationBasePrivate*>()(this->d->registration);
+  return hash<ServiceRegistrationBasePrivate*>()(this->d.load()->registration);
 }
-
-}
-
-using namespace us;
 
 std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef)
 {
   if (serviceRef)
   {
-    assert(serviceRef.GetBundle() != NULL);
+    assert(serviceRef.GetBundle() != nullptr);
 
     os << "Reference for service object registered from "
        << serviceRef.GetBundle()->GetName() << " " << serviceRef.GetBundle()->GetVersion()
@@ -219,4 +229,6 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
   }
 
   return os;
+}
+
 }

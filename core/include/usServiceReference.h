@@ -58,7 +58,6 @@ namespace us {
  * @see BundleContext::GetServiceReference
  * @see BundleContext::GetServiceReferences
  * @see BundleContext::GetService
- * @remarks This class is thread safe.
  */
 template<class S>
 class ServiceReference : public ServiceReferenceBase {

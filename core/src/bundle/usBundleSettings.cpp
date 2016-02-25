@@ -72,7 +72,7 @@ struct BundleSettingsPrivate : public MultiThreaded<>
     autoLoadPaths.insert(BundleSettings::CURRENT_BUNDLE_PATH());
 
     char* envPaths = getenv("US_AUTOLOAD_PATHS");
-    if (envPaths != NULL)
+    if (envPaths != nullptr)
     {
       std::stringstream ss(envPaths);
       std::string envPath;
@@ -108,7 +108,7 @@ BundleSettings::BundleSettings() :
 {
 
 }
- 
+
 BundleSettings::~BundleSettings()
 {
   if(pimpl)
@@ -119,10 +119,8 @@ BundleSettings::~BundleSettings()
 
 bool BundleSettings::IsAutoLoadingEnabled()
 {
-  BundleSettingsPrivate::Lock l(pimpl);
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  return !pimpl->autoLoadingDisabled &&
-      pimpl->autoLoadingEnabled;
+  return (pimpl->Lock(), !pimpl->autoLoadingDisabled && pimpl->autoLoadingEnabled);
 #else
   return false;
 #endif
@@ -130,13 +128,12 @@ bool BundleSettings::IsAutoLoadingEnabled()
 
 void BundleSettings::SetAutoLoadingEnabled(bool enable)
 {
-  BundleSettingsPrivate::Lock l(pimpl);
-  pimpl->autoLoadingEnabled = enable;
+  pimpl->Lock(), pimpl->autoLoadingEnabled = enable;
 }
 
 BundleSettings::PathList BundleSettings::GetAutoLoadPaths()
 {
-  BundleSettingsPrivate::Lock l(pimpl);
+  auto l = pimpl->Lock(); US_UNUSED(l);
   BundleSettings::PathList paths(pimpl->autoLoadPaths.begin(),
                                  pimpl->autoLoadPaths.end());
   paths.insert(paths.end(), pimpl->extraPaths.begin(),
@@ -152,15 +149,14 @@ void BundleSettings::SetAutoLoadPaths(const PathList& paths)
   normalizedPaths.resize(paths.size());
   std::transform(paths.begin(), paths.end(), normalizedPaths.begin(), RemoveTrailingPathSeparator);
 
-  BundleSettingsPrivate::Lock l(pimpl);
+  auto l = pimpl->Lock(); US_UNUSED(l);
   pimpl->autoLoadPaths.clear();
   pimpl->autoLoadPaths.insert(normalizedPaths.begin(), normalizedPaths.end());
 }
 
 void BundleSettings::AddAutoLoadPath(const std::string& path)
 {
-  BundleSettingsPrivate::Lock l(pimpl);
-  pimpl->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
+  pimpl->Lock(), pimpl->autoLoadPaths.insert(RemoveTrailingPathSeparator(path));
 }
 
 }

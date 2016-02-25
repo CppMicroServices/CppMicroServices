@@ -222,13 +222,13 @@ void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
   context->AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "bla");
 
-  std::shared_ptr<TestServiceEventListenerHook> serviceEventListenerHook1 = std::make_shared<TestServiceEventListenerHook>(1, context);
+  auto serviceEventListenerHook1 = std::make_shared<TestServiceEventListenerHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[ServiceConstants::SERVICE_RANKING()] = 10;
   ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg1 =
       context->RegisterService<ServiceEventListenerHook>(serviceEventListenerHook1, hookProps1);
 
-  std::shared_ptr<TestServiceEventListenerHook> serviceEventListenerHook2 = std::make_shared<TestServiceEventListenerHook>(2, context);
+  auto serviceEventListenerHook2 = std::make_shared<TestServiceEventListenerHook>(2, context);
   ServiceProperties hookProps2;
   hookProps2[ServiceConstants::SERVICE_RANKING()] = 0;
   ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg2 =
@@ -272,13 +272,13 @@ void TestListenerHook(const std::shared_ptr<Framework>& framework)
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
   context->AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "bla");
 
-  std::shared_ptr<TestServiceListenerHook> serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context);
+  auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[ServiceConstants::SERVICE_RANKING()] = 0;
   ServiceRegistration<ServiceListenerHook> listenerHookReg1 =
       context->RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
 
-  std::shared_ptr<TestServiceListenerHook> serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(2, context);
+  auto serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(2, context);
   ServiceProperties hookProps2;
   hookProps2[ServiceConstants::SERVICE_RANKING()] = 10;
   ServiceRegistration<ServiceListenerHook> listenerHookReg2 =
@@ -291,7 +291,7 @@ void TestListenerHook(const std::shared_ptr<Framework>& framework)
   const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfos.size() - 2;
 
   context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-  ServiceListenerHook::ListenerInfo lastAdded = serviceListenerHook1->lastAdded;
+  auto lastAdded = serviceListenerHook1->lastAdded;
 
 #ifdef US_BUILD_SHARED_LIBS
   std::vector<int> expectedOrdering;
@@ -339,13 +339,13 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
 {
   BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
 
-  std::shared_ptr<TestServiceFindHook> serviceFindHook1= std::make_shared<TestServiceFindHook>(1, context);
+  auto serviceFindHook1= std::make_shared<TestServiceFindHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[ServiceConstants::SERVICE_RANKING()] = 0;
   ServiceRegistration<ServiceFindHook> findHookReg1 =
       context->RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
 
-  std::shared_ptr<TestServiceFindHook> serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
+  auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
   ServiceProperties hookProps2;
   hookProps2[ServiceConstants::SERVICE_RANKING()] = 10;
   ServiceRegistration<ServiceFindHook> findHookReg2 =
@@ -395,7 +395,7 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceHooksTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   try

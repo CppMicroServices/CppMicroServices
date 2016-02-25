@@ -25,6 +25,7 @@
 
 #include "usBundleEvent.h"
 #include "usBundleContext.h"
+#include "usBundleContextPrivate.h"
 #include "usBundleActivator.h"
 #include "usBundlePrivate.h"
 #include "usBundleResource.h"
@@ -35,6 +36,9 @@
 #include "usCoreConfig.h"
 
 #include "usSharedLibrary.h"
+
+#include <thread>
+#include <chrono>
 
 namespace us {
 
@@ -47,104 +51,109 @@ const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
 const std::string Bundle::PROP_AUTOLOAD_DIR{ "bundle.autoload_dir" };
 const std::string Bundle::PROP_AUTOINSTALLED_BUNDLES{ "bundle.autoinstalled_bundles" };
 
-Bundle::Bundle()
-: d(0)
-{
+#if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
+  typedef std::chrono::monotonic_clock Clock;
+#else
+  typedef std::chrono::steady_clock Clock;
+#endif
 
+// TODO needs to be replaced with proper state handling
+struct StateReset
+{
+  std::function<void()> f;
+  StateReset(const std::function<void()>& f) : f(f) {}
+  ~StateReset() { f(); }
+};
+
+Bundle::Bundle(CoreBundleContext* coreCtx, const BundleInfo& info)
+  : d(new BundlePrivate(this, info))
+{
+  d->Init(coreCtx);
+}
+
+Bundle::Bundle(std::unique_ptr<BundlePrivate> d)
+  : d(std::move(d))
+{
 }
 
 Bundle::~Bundle()
 {
-  delete d;
-}
-
-void Bundle::Init(CoreBundleContext* coreCtx,
-                    BundleInfo* info)
-{
-  BundlePrivate* mp = new BundlePrivate(shared_from_this(), coreCtx, info);
-  std::swap(mp, d);
-  delete mp;
-}
-
-void Bundle::Uninit()
-{
-  if (d->bundleContext != NULL)
-  {
-    //d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
-    d->RemoveBundleResources();
-    delete d->bundleContext;
-    d->bundleContext = nullptr;
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, shared_from_this()));
-
-    d->bundleActivator = nullptr;
-  }
 }
 
 bool Bundle::IsStarted() const
 {
-  return d->bundleContext != nullptr;
+  // TODO use proper states
+  return d->bundleContext.load() != nullptr;
 }
 
 void Bundle::Start()
 {
-  BundlePrivate::Lock l(this->d);
-  if (d->bundleContext)
+  // TODO Use proper locks for state changes
+  if (IsStarted()) return;
+  if (d->starting.exchange(true)) return;
+
+  StateReset reset([this]{ this->d->starting = false; });
+
+  /// TODO replace with proper state handling
+  auto tp = Clock::now();
+  while (d->stopping)
   {
-    US_WARN << "Bundle " << d->info.name << " already started.";
-    return;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - tp);
+    if (duration.count() > 2000) throw std::runtime_error("Timeout while waiting to start bundle " + d->info.name);
   }
 
-  // loading a library isn't necessary if it isn't supported
-#ifdef US_BUILD_SHARED_LIBS
-  if(IsSharedLibrary(d->lib.GetFilePath()) && !d->lib.IsLoaded())
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, this->shared_from_this()));
+
+  typedef BundleActivator*(*CreateActivatorHook)(void);
+  CreateActivatorHook createActivatorHook = nullptr;
+
   {
-    d->lib.Load();
-  }
+    auto l = d->Lock(); US_UNUSED(l);
+
+    // loading a library isn't necessary if it isn't supported
+#ifdef US_BUILD_SHARED_LIBS
+    if(IsSharedLibrary(d->lib.GetFilePath()) && !d->lib.IsLoaded())
+    {
+      d->lib.Load();
+    }
 #endif
 
-  d->bundleContext = new BundleContext(this->d);
+    d->bundleContext = new BundleContext(this->d.get());
 
-  // save this bundle's context so that it can be accessible anywhere
-  // from within this bundle's code.
-  typedef void(*SetBundleContext)(BundleContext*);
-  SetBundleContext setBundleContext = NULL;
+    // save this bundle's context so that it can be accessible anywhere
+    // from within this bundle's code.
+    typedef void(*SetBundleContext)(BundleContext*);
+    SetBundleContext setBundleContext = nullptr;
 
-  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-  void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
+    void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
+    std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
 
-  if (setBundleContext)
-  {
-    setBundleContext(d->bundleContext);
+    if (setBundleContext)
+    {
+      setBundleContext(d->bundleContext);
+    }
+
+    std::string create_activator_func = "_us_create_activator_" + d->info.name;
+    void* createActivatorHookSym = BundleUtils::GetSymbol(d->info, create_activator_func.c_str());
+    std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
   }
 
-  typedef BundleActivator*(*BundleActivatorHook)(void);
-  BundleActivatorHook activatorHook = NULL;
-
-  std::string activator_func = "_us_bundle_activator_instance_" + d->info.name;
-  void* activatorHookSym = BundleUtils::GetSymbol(d->info, activator_func.c_str());
-  std::memcpy(&activatorHook, &activatorHookSym, sizeof(void*));
-
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, shared_from_this()));
   // try to get a BundleActivator instance
-
-  if (activatorHook)
+  if (createActivatorHook)
   {
     try
     {
-      d->bundleActivator = activatorHook();
+      d->bundleActivator = createActivatorHook();
+      d->bundleActivator->Start(d->bundleContext);
     }
-    catch (...)
+    catch (const std::exception& e)
     {
-      US_ERROR << "Creating the bundle activator of " << d->info.name << " failed";
-      throw;
+      d->bundleActivator = nullptr;
+      this->Stop();
+      throw std::runtime_error(std::string("Starting bundle " + d->info.name + " failed: " + e.what()));
     }
-
-    // This method should be "noexcept" and by not catching exceptions
-    // here we semantically treat it that way since any exception during
-    // static initialization will either terminate the program or cause
-    // the dynamic loader to report an error.
-    d->bundleActivator->Start(d->bundleContext);
   }
 
   d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, shared_from_this()));
@@ -152,42 +161,64 @@ void Bundle::Start()
 
 void Bundle::Stop()
 {
-  BundlePrivate::Lock l(this->d);
-  if (d->bundleContext == nullptr)
+  if (d->bundleContext.load() == nullptr) return;
+  if (d->stopping.exchange(true)) return;
+
+  StateReset reset([this]{
+    try
   {
-    US_WARN << "Bundle " << d->info.name << " already stopped.";
-    return;
+      auto l = d->Lock(); US_UNUSED(l);
+      d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
+      d->RemoveBundleResources();
+      d->bundleContext.load()->d->Lock(), d->bundleContextOrphans.emplace_back(d->bundleContext), (d->bundleContext.load()->d->bundle = nullptr);
+      d->bundleContext = nullptr;
+      d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this->shared_from_this()));
+
+      d->bundleActivator = nullptr;
+  }
+    catch (...) {}
+    this->d->stopping = false;
+  });
+
+  // TODO replace with proper state handling
+  auto tp = Clock::now();
+  while (d->starting)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - tp);
+    if (duration.count() > 2000) throw std::runtime_error("Timeout while waiting to stop bundle " + d->info.name);
   }
 
-  try
-  {
-    d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, shared_from_this()));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, shared_from_this()));
 
-    if (d->bundleActivator)
+  if (d->bundleActivator)
+  {
+    try
     {
       d->bundleActivator->Stop(d->bundleContext);
     }
-  }
-  catch (...)
-  {
-    US_WARN << "Calling the bundle activator Stop() method of " << d->info.name << " failed!";
-
-    try
+    catch (const std::exception& e)
     {
-      this->Uninit();
-    }
-    catch (...) {}
-
-    throw;
+      throw std::runtime_error("Stopping bundle " + d->info.name + " failed: " + e.what());
   }
 
-  this->Uninit();
+    // delete the activator
+    typedef void(*DestroyActivatorHook)(BundleActivator*);
+    DestroyActivatorHook destroyActivatorHook = nullptr;
+    std::string destroy_activator_func = "_us_destroy_activator_" + d->info.name;
+    void* destroyActivatorHookSym = BundleUtils::GetSymbol(d->info, destroy_activator_func.c_str());
+    std::memcpy(&destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
+    if (destroyActivatorHook)
+    {
+      destroyActivatorHook(d->bundleActivator);
+    }
+  }
 }
 
 void Bundle::Uninstall()
 {
   Stop();
-  d->coreCtx->bundleRegistry.UnRegister(&d->info);
+  d->coreCtx->bundleRegistry.UnRegister(d->info);
   d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, shared_from_this()));
 }
 
@@ -228,7 +259,7 @@ Any Bundle::GetProperty(const std::string& key) const
   // "org.cppmicroservices.*" properties.
   if (property.Empty())
   {
-    std::map<std::string, std::string>::iterator props = d->coreCtx->frameworkProperties.find(key);
+    auto props = d->coreCtx->frameworkProperties.find(key);
     if (props != d->coreCtx->frameworkProperties.end())
     {
       property = (*props).second;
@@ -246,7 +277,7 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
 {
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
-  d->coreCtx->services.GetRegisteredByBundle(d, sr);
+  d->coreCtx->services.GetRegisteredByBundle(d.get(), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
         i != sr.end(); ++i)
   {
@@ -299,10 +330,6 @@ std::vector<BundleResource> Bundle::FindResources(const std::string& path, const
   return result;
 }
 
-}
-
-using namespace us;
-
 std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 {
   os << "Bundle[" << "id=" << bundle.GetBundleId() <<
@@ -314,4 +341,6 @@ std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 std::ostream& operator<<(std::ostream& os, Bundle const * bundle)
 {
   return operator<<(os, *bundle);
+}
+
 }

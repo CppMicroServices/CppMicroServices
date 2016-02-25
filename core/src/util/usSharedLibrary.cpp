@@ -54,7 +54,7 @@ class SharedLibraryPrivate : public SharedData
 public:
 
   SharedLibraryPrivate()
-    : m_Handle(NULL)
+    : m_Handle(nullptr)
   #ifdef US_PLATFORM_WINDOWS
     , m_Suffix(".dll")
   #elif defined(US_PLATFORM_APPLE)
@@ -263,7 +263,7 @@ void* SharedLibrary::GetHandle() const
 
 bool SharedLibrary::IsLoaded() const
 {
-  return d->m_Handle != NULL;
+  return d->m_Handle != nullptr;
 }
 
 }

@@ -83,10 +83,6 @@ public:
 
   ServiceRegistry(CoreBundleContext* coreCtx);
 
-  ~ServiceRegistry();
-
-  void Clear();
-
   /**
    * Register a service in the framework wide register.
    *
@@ -151,7 +147,7 @@ public:
    *
    * @param sr The ServiceRegistration object that is registered.
    */
-  void RemoveServiceRegistration(const ServiceRegistrationBase& sr) ;
+  void RemoveServiceRegistration(const ServiceRegistrationBase& sr);
 
   /**
    * Get all services that a bundle has registered.
@@ -172,6 +168,9 @@ public:
 private:
 
   friend class ServiceHooks;
+  friend class ServiceRegistrationBase;
+
+  void RemoveServiceRegistration_unlocked(const ServiceRegistrationBase& sr);
 
   void Get_unlocked(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 

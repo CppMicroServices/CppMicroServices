@@ -330,19 +330,19 @@ bool LDAPExpr::IsNull() const
   return !d;
 }
 
-bool LDAPExpr::Query( const std::string& filter, const ServicePropertiesImpl& pd)
+bool LDAPExpr::Query( const std::string& filter, const ServicePropertiesHandle& pd)
 {
   return LDAPExpr(filter).Evaluate(pd, false);
 }
 
-bool LDAPExpr::Evaluate( const ServicePropertiesImpl& p, bool matchCase ) const
+bool LDAPExpr::Evaluate( const ServicePropertiesHandle& p, bool matchCase ) const
 {
   if ((d->m_operator & SIMPLE) != 0)
   {
     // try case sensitive match first
-    int index = p.FindCaseSensitive(d->m_attrName);
-    if (index < 0 && !matchCase) index = p.Find(d->m_attrName);
-    return index < 0 ? false : Compare(p.Value(index), d->m_operator, d->m_attrValue);
+    int index = p->FindCaseSensitive_unlocked(d->m_attrName);
+    if (index < 0 && !matchCase) index = p->Find_unlocked(d->m_attrName);
+    return index < 0 ? false : Compare(p->Value_unlocked(index), d->m_operator, d->m_attrValue);
   }
   else
   { // (d->m_operator & COMPLEX) != 0

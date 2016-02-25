@@ -52,8 +52,8 @@ class US_ABI_LOCAL Activator : public BundleActivator
 public:
 
   Activator()
-   : m_context(NULL)
-   , m_tracker(NULL)
+   : m_context(nullptr)
+   , m_tracker(nullptr)
   {}
 
   /**

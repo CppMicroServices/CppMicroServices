@@ -266,11 +266,9 @@ int BundleVersion::Compare(const BundleVersion& other) const
   return 1;
 }
 
-}
-
-using namespace us;
-
 std::ostream& operator<<(std::ostream& os, const BundleVersion& v)
 {
   return os << v.ToString();
+}
+
 }

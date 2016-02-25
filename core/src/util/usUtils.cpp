@@ -111,7 +111,7 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
   DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
   // Try intermediate output directories
-  if (dir == NULL)
+  if (dir == nullptr)
   {
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
     if (indexOfLastSeparator != std::string::npos)
@@ -134,10 +134,10 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
   }
 #endif
 
-  if (dir != NULL)
+  if (dir != nullptr)
   {
-    struct dirent *ent = NULL;
-    while ((ent = readdir(dir)) != NULL)
+    struct dirent *ent = nullptr;
+    while ((ent = readdir(dir)) != nullptr)
     {
       bool loadFile = true;
 #ifdef _DIRENT_HAVE_D_TYPE
@@ -191,7 +191,7 @@ std::vector<std::string> AutoLoadBundlesFromPath(const std::string& absoluteBase
 
           // location will be in the form:
           //  <path to bundle plugin>\<bundle-name>.<lib-extension>/<bundle-name>
-          std::shared_ptr<Bundle> installedBundle = GetBundleContext()->InstallBundle(location);
+          auto installedBundle = GetBundleContext()->InstallBundle(location);
 
           if (!installedBundle)
           {
@@ -382,7 +382,7 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   }
 #elif defined(US_PLATFORM_WINDOWS)
   const char* demangled = typeInfo.name();
-  if (demangled != NULL)
+  if (demangled != nullptr)
   {
     result = demangled;
     // remove "struct" qualifiers

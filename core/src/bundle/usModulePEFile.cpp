@@ -58,7 +58,7 @@ public:
 
   BundlePEFile(std::ifstream& fs, const COFFHeader& coffHeader)
     : m_CoffHeader(coffHeader)
-    , m_SectionHeaders(NULL)
+    , m_SectionHeaders(nullptr)
   {
     fs.read(reinterpret_cast<char*>(&m_OptionalHeader), sizeof m_OptionalHeader);
 
@@ -148,7 +148,7 @@ private:
   std::size_t GetOffset(uint32_t rva)
   {
     SectionHeader* psh = this->FindSectionHeader(rva);
-    if (psh == NULL)
+    if (psh == nullptr)
     {
       throw InvalidPEException("Invalid relative virtual address");
     }
@@ -172,7 +172,7 @@ private:
     }
     if (i > m_CoffHeader.NumberOfSections)
     {
-      return NULL;
+      return nullptr;
     }
     return psh;
   }
@@ -181,7 +181,7 @@ private:
   {
     if (dataDirIndex >= m_OptionalHeader.NumberOfRvaAndSizes)
     {
-      return NULL;
+      return nullptr;
     }
 
     uint32_t dataDirVA = m_OptionalHeader.DataDirectories[dataDirIndex].VirtualAddress;

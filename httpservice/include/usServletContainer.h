@@ -25,6 +25,7 @@
 #include "usHttpServiceExport.h"
 
 #include <string>
+#include <memory>
 
 namespace us {
 
@@ -43,7 +44,7 @@ public:
   void Start();
   void Stop();
 
-  ServletContext* GetContext(const std::string& uripath) const;
+  std::shared_ptr<ServletContext> GetContext(const std::string& uripath) const;
   std::string GetContextPath(const ServletContext* context) const;
 
 private:

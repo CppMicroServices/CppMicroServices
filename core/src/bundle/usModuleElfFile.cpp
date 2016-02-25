@@ -93,7 +93,7 @@ public:
   typedef typename ElfType::Off Off;
 
   BundleElfFile(std::ifstream& fs, std::size_t fileSize)
-    : m_SectionHeaders(NULL)
+    : m_SectionHeaders(nullptr)
   {
     if (fileSize < sizeof(Ehdr))
     {
@@ -122,7 +122,7 @@ public:
 
     // parse the .dynamic section
     Shdr* dynamicHdr = this->FindSectionHeader(SHT_DYNAMIC);
-    if (dynamicHdr == NULL)
+    if (dynamicHdr == nullptr)
     {
       throw InvalidElfException("ELF .dynamic section header missing");
     }
@@ -145,7 +145,7 @@ public:
 
     // parse the .dynsym section
     Shdr* dynsymHdr = this->FindSectionHeader(SHT_DYNSYM);
-    if (dynsymHdr == NULL)
+    if (dynsymHdr == nullptr)
     {
       throw InvalidElfException("ELF .dynsym section header missing");
     }
@@ -216,7 +216,7 @@ private:
         return shdr;
       }
     }
-    return NULL;
+    return nullptr;
   }
 
   char* GetStringTable(std::ifstream& fs, Shdr* shdr)
@@ -225,7 +225,7 @@ private:
         shdr->sh_type != SHT_SYMTAB &&
         shdr->sh_type != SHT_DYNSYM)
     {
-      return NULL;
+      return nullptr;
     }
 
     Word strTblHdrIdx = shdr->sh_link;

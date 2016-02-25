@@ -44,7 +44,7 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleManifestTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   InstallTestBundle(framework->GetBundleContext(), "TestBundleM");

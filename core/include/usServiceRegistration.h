@@ -41,9 +41,8 @@ namespace us {
  * The <code>ServiceRegistration</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * @tparam S Class tyoe of the service interface
+ * @tparam S Class type of the service interface
  * @see BundleContext#RegisterService()
- * @remarks This class is thread safe.
  */
 template<class I1, class ...Interfaces>
 class ServiceRegistration : public ServiceRegistrationBase

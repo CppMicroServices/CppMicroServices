@@ -26,15 +26,12 @@
 #include "usLog.h"
 
 #include <set>
-#include <atomic>
 
 namespace us {
 
 class ServiceObjectsBasePrivate
 {
 public:
-
-  std::atomic<int> ref;
 
   BundleContext* m_context;
   ServiceReferenceBase m_reference;
@@ -53,11 +50,11 @@ public:
 
     if (isPrototypeScope)
     {
-      result = m_reference.d->GetPrototypeService(m_context->GetBundle());
+      result = m_reference.d.load()->GetPrototypeService(m_context->GetBundle());
     }
     else
     {
-      result = m_reference.d->GetServiceInterfaceMap(m_context->GetBundle());
+      result = m_reference.d.load()->GetServiceInterfaceMap(m_context->GetBundle());
     }
 
     return result;
@@ -69,10 +66,8 @@ ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceRefe
 {
   if (!reference)
   {
-    delete d;
     throw std::invalid_argument("The service reference is invalid");
   }
-  ++d->ref;
 }
 
 /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
@@ -98,7 +93,7 @@ struct UngetHelper
   ~UngetHelper()
   {
     try
-    {
+  {
       if(sref && bc->GetBundle() != nullptr)
       {
         bool isPrototypeScope = sref.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
@@ -106,11 +101,11 @@ struct UngetHelper
 
         if (isPrototypeScope)
         {
-          sref.d->UngetPrototypeService(bc->GetBundle(), interfaceMap);
+          sref.d.load()->UngetPrototypeService(bc->GetBundle(), interfaceMap);
         }
         else
         {
-          sref.d->UngetService(bc->GetBundle(), true);
+          sref.d.load()->UngetService(bc->GetBundle(), true);
         }
       }
     }
@@ -150,29 +145,28 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
   return d->m_reference;
 }
 
-ServiceObjectsBase::ServiceObjectsBase(const ServiceObjectsBase& other)
-  : d(other.d)
+ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other)
+  : d(std::move(other.d))
 {
-  ++d->ref;
 }
 
 ServiceObjectsBase::~ServiceObjectsBase()
 {
-  if (!--d->ref)
-  {
-    delete d;
-  }
 }
 
-ServiceObjectsBase& ServiceObjectsBase::operator =(const ServiceObjectsBase& other)
+ServiceObjectsBase& ServiceObjectsBase::operator =(ServiceObjectsBase&& other)
 {
-  ServiceObjectsBasePrivate* curr_d = d;
-  d = other.d;
-  ++d->ref;
+  d = std::move(other.d);
+  return *this;
+}
 
-  if (!--curr_d->ref)
-    delete curr_d;
+ServiceObjects<void>::ServiceObjects(ServiceObjects&& other)
+  : ServiceObjectsBase(std::move(other))
+{}
 
+ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other)
+{
+  ServiceObjectsBase::operator=(std::move(other));
   return *this;
 }
 

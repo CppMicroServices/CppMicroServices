@@ -54,8 +54,8 @@ static std::string CATEGORY()
 
 ServicesPlugin::ServicesPlugin()
   : SimpleWebConsolePlugin(LABEL(), TITLE(), CATEGORY())
-  , m_TemplateRS(NULL)
-  , m_TemplateSI(NULL)
+  , m_TemplateRS(nullptr)
+  , m_TemplateSI(nullptr)
 {
 }
 
@@ -95,7 +95,7 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     }
     else
     {
-      if (m_TemplateRS == NULL)
+      if (m_TemplateRS == nullptr)
       {
         BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/services.html");
         m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
@@ -114,7 +114,7 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     }
     else
     {
-      if (m_TemplateSI == NULL)
+      if (m_TemplateSI == nullptr)
       {
         BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/service_interface.html");
         m_TemplateSI = new BundleResourceStream(res, std::ios_base::binary);

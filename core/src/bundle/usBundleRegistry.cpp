@@ -37,32 +37,27 @@
 
 namespace us {
 
-BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx) :
-  coreCtx(coreCtx)
+BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
+  : coreCtx(coreCtx)
+  , id(1)
 {
-  id.value = 0;
 }
 
 BundleRegistry::~BundleRegistry(void)
 {
 }
 
-std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
+std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo info)
 {
-  std::shared_ptr<Bundle> bundle(GetBundle(info->name));
+  std::shared_ptr<Bundle> bundle(GetBundle(info.name));
 
   if (!bundle)
   {
-    bundle = std::shared_ptr<Bundle>(new Bundle());
-    {
-      Lock l(id);
-      info->id = id.value++;
-      assert(info->id == 0 ? info->name == "CppMicroServices" : true);
-    }
-    bundle->Init(coreCtx, info);
+    info.id = id++;
+    assert(info.id > 0);
+    bundle.reset(new Bundle(coreCtx, info));
 
-    Lock l(this);
-    std::pair<BundleMap::iterator, bool> return_pair(bundles.insert(std::make_pair(info->name, bundle)));
+    auto return_pair = (this->Lock(), bundles.insert(std::make_pair(info.name, bundle)));
 
     // A race condition exists when creating a new bundle instance. To resolve
     // this requires either scoping the mutex to the entire function or adding
@@ -82,40 +77,22 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
   return bundle;
 }
 
-void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundle, BundleInfo* info)
-{
-  if (!systemBundle)
-  {
-    throw std::invalid_argument("Can't register a null system bundle");
-  }
-
-  {
-    Lock l(id);
-    info->id = id.value++;
-    assert(info->id == 0 ? info->name == "CppMicroServices" : true);
-  }
-
-  systemBundle->Init(coreCtx, info);
-
-  Lock l(this);
-  bundles.insert(std::make_pair(info->name, systemBundle));
-}
-
-void BundleRegistry::UnRegister(const BundleInfo* info)
+void BundleRegistry::UnRegister(const BundleInfo& info)
 {
   // The system bundle cannot be uninstalled.
-  if (info->id >= 1)
+  if (info.id > 0)
   {
-    Lock l(this);
-    bundles.erase(info->name);
+    this->Lock(), bundles.erase(info.name);
   }
 }
 
 std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
 {
-  Lock l(this);
+  if (id == 0) return coreCtx->systemBundle->shared_from_this();
 
-  for (auto const& m : bundles)
+  auto l = this->Lock(); US_UNUSED(l);
+
+  for (auto& m : bundles)
   {
     if (m.second->GetBundleId() == id)
     {
@@ -127,7 +104,9 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
 
 std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
 {
-  Lock l(this);
+  if (coreCtx->systemBundle->d->info.name == name) return coreCtx->systemBundle->shared_from_this();
+
+  auto l = this->Lock(); US_UNUSED(l);
 
   auto iter = bundles.find(name);
   if (iter != bundles.end())
@@ -139,9 +118,10 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
 
 std::vector<std::shared_ptr<Bundle>> BundleRegistry::GetBundles() const
 {
-  Lock l(this);
+  auto l = this->Lock(); US_UNUSED(l);
 
   std::vector<std::shared_ptr<Bundle>> result;
+  result.push_back(coreCtx->systemBundle->shared_from_this());
   for (auto& m : bundles)
   {
     result.push_back(m.second);

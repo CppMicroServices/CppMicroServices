@@ -418,7 +418,7 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleResourceTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   BundleContext* context = framework->GetBundleContext();
@@ -433,7 +433,7 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   testInvalidResource(bundleR);
 
-  std::shared_ptr<Bundle> executableBundle = nullptr;
+  std::shared_ptr<Bundle> executableBundle;
   try
   {
     executableBundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");

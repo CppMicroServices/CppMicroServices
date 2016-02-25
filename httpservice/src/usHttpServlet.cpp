@@ -63,7 +63,7 @@ private:
       assert(std::less_equal<char*>()(pptr(), epptr()));
       ++m_ContentLength;
       // discard the character
-	  pbump(static_cast<int>(pbase() - pptr()));
+    pbump(static_cast<int>(pbase() - pptr()));
       return ch;
     }
     return traits_type::eof();
@@ -165,7 +165,7 @@ ServletConfig HttpServlet::GetServletConfig() const
   return d->m_Config;
 }
 
-ServletContext* HttpServlet::GetServletContext() const
+std::shared_ptr<ServletContext> HttpServlet::GetServletContext() const
 {
   return d->m_Config.GetServletContext();
 }

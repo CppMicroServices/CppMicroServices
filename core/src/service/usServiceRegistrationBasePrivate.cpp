@@ -30,10 +30,17 @@
 namespace us {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-  BundlePrivate* bundle, const InterfaceMapConstPtr& service,
-  const ServicePropertiesImpl& props)
-  : ref(0), service(service), bundle(bundle), reference(this),
-    properties(props), available(true), unregistering(false)
+    BundlePrivate* bundle,
+    const InterfaceMapConstPtr& service,
+    ServicePropertiesImpl&& props
+    )
+  : ref(0)
+  , service(service)
+  , bundle(bundle)
+  , reference(this)
+  , properties(std::move(props))
+  , available(true)
+  , unregistering(false)
 {
   // The reference counter is initialized to 0 because it will be
   // incremented by the "reference" member.
@@ -41,33 +48,29 @@ ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
 
 ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 {
-
+  properties.Lock(), properties.Clear_unlocked();
 }
 
 bool ServiceRegistrationBasePrivate::IsUsedByBundle(const std::shared_ptr<Bundle>& bundle) const
 {
+  auto l = this->Lock(); US_UNUSED(l);
   return (dependents.find(bundle) != dependents.end()) ||
-    (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
+      (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
 }
 
-const InterfaceMapConstPtr& ServiceRegistrationBasePrivate::GetInterfaces() const
+InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
 {
-  return service;
+  return (this->Lock(), service);
 }
 
 std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
 {
-  if (interfaceId.empty() && service->size() > 0)
-  {
-    return service->begin()->second;
-  }
+  return this->Lock(), GetService_unlocked(interfaceId);
+}
 
-  InterfaceMap::const_iterator iter = service->find(interfaceId);
-  if (iter != service->end())
-  {
-    return iter->second;
-  }
-  return NULL;
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(const std::string& interfaceId) const
+{
+  return ExtractInterface(service, interfaceId);
 }
 
 }

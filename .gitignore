@@ -33,3 +33,4 @@ core/examples/makefile/main
 *.dylib
 *.xcconfig
 *.pbxproj
+*.DS_Store

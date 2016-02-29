@@ -27,10 +27,10 @@
 
 #include <usCoreConfig.h>
 
+#include "usAny.h"
+
 #include <cctype>
 #include <unordered_map>
-
-#include "usAny.h"
 
 namespace us {
 

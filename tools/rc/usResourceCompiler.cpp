@@ -22,15 +22,15 @@
 
 #include "miniz.h"
 
-#include <errno.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <cstdio>
 #include <set>
 #include <stdexcept>
-#include <cassert>
 
 #include "optionparser.h"
 

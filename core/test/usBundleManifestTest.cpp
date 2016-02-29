@@ -20,24 +20,17 @@
 
 =============================================================================*/
 
+#include <usAny.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
-#include <usGetBundleContext.h>
 #include <usBundle.h>
-#include <usBundleEvent.h>
-#include <usServiceEvent.h>
-#include <usBundleContext.h>
-#include <usBundleActivator.h>
+#include "usBundleContext.h"
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
 using namespace us;
-
-namespace {
-
-} // end unnamed namespace
 
 int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
 {
@@ -69,7 +62,7 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(any_cast<int>(vec[1]) == 2, "vector 1 value")
 
   Any anyMap = bundleM->GetProperty("map");
-  US_TEST_CONDITION_REQUIRED(anyMap.Type() == typeid(std::map<std::string,Any>), "map type")
+  US_TEST_CONDITION_REQUIRED(anyMap.Type() == typeid(std::map<std::string, Any>), "map type")
   std::map<std::string, Any>& m = ref_any_cast<std::map<std::string, Any> >(anyMap);
   US_TEST_CONDITION_REQUIRED(m.size() == 3, "map size")
   US_TEST_CONDITION_REQUIRED(m["string"].Type() == typeid(std::string), "map 0 type")

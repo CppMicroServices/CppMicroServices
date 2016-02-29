@@ -30,6 +30,10 @@
 #include "usServiceHooks_p.h"
 #include "usBundleRegistry_p.h"
 #include "usBundleSettings.h"
+#include "usAny.h"
+
+#include <string>
+#include <map>
 
 namespace us {
 

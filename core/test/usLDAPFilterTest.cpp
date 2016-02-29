@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include <usAny.h>
 #include <usLDAPFilter.h>
 #include <usLDAPProp.h>
 
@@ -63,7 +64,6 @@ int TestParsing()
 
   return EXIT_SUCCESS;
 }
-
 
 int TestEvaluate()
 {

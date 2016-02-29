@@ -378,9 +378,7 @@ int main(int argc, char** argv)
 {
   int compressionLevel = 6;
   int return_code = EXIT_SUCCESS;
-  std::string zipFile;
   std::string bundleName;
-  std::string archiveName;
   
   argc -= (argc > 0);
   argv += (argc > 0); // skip program name argv[0]

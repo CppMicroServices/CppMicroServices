@@ -59,9 +59,6 @@ if(US_BUILD_SHARED_LIBS)
        usServiceListenerTest
        usSharedLibraryTest
       )
-  if(US_ENABLE_AUTOLOADING_SUPPORT)
-    list(APPEND _tests usBundleAutoLoadTest)
-  endif()
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)

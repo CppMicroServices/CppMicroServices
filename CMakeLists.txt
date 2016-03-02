@@ -186,7 +186,6 @@ elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
 
-us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable bundle auto-loading support")
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
 us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")

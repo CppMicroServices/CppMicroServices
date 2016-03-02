@@ -16,8 +16,6 @@
 #! \param src_var (required) The name of a list variable to which the path of the generated
 #!        source file will be appended.
 #!
-#! \see \ref MicroServices_AutoLoading
-#!
 function(usFunctionGenerateBundleInit src_var)
 
   set(bundle_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/us_init.cpp")

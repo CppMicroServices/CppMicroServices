@@ -77,9 +77,4 @@ std::string Framework::GetLocation() const
   return std::string("System Bundle");
 }
 
-void Framework::SetAutoLoadingEnabled(bool enable)
-{
-  static_cast<FrameworkPrivate*>(d.get())->coreBundleContext.settings.SetAutoLoadingEnabled(enable);
-}
-
 }

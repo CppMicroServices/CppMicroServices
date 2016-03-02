@@ -135,23 +135,6 @@ public:
    */
   static const std::string PROP_DESCRIPTION;
 
-  /**
-   * The property key for looking up this bundle's auto-load directory.
-   * The property value is of type \c std::string.
-   *
-   * @see \ref MicroServices_BundleProperties
-   */
-  static const std::string PROP_AUTOLOAD_DIR;
-
-  /**
-   * The property key for looking up this bundle's auto-insall bundles.
-   * The property value is of type \c std::vector<std::string> and contains
-   * the file system locations for the auto-installed bundles triggered by this
-   * bundle.
-   *
-   */
-  static const std::string PROP_AUTOINSTALLED_BUNDLES;
-
   virtual ~Bundle();
 
   /**

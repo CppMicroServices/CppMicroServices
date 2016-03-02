@@ -27,7 +27,6 @@
 #include "usBundleEvent.h"
 #include "usBundleRegistry_p.h"
 #include "usBundlePrivate.h"
-#include "usBundleSettings.h"
 #include "usCoreBundleContext_p.h"
 #include "usFramework.h"
 #include "usServiceRegistry_p.h"

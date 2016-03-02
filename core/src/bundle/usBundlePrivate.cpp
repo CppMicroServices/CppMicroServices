@@ -26,7 +26,6 @@
 #include "usBundleContext.h"
 #include "usBundleActivator.h"
 #include "usBundleUtils_p.h"
-#include "usBundleSettings.h"
 #include "usBundleResource.h"
 #include "usBundleResourceStream.h"
 #include "usCoreBundleContext_p.h"
@@ -117,27 +116,6 @@ void BundlePrivate::Init(CoreBundleContext* coreCtx)
   }
 
   this->info.name = bundleName.ToString();
-
-  if (bundleManifest.Contains(Bundle::PROP_AUTOLOAD_DIR))
-  {
-    this->info.autoLoadDir = bundleManifest.GetValue(Bundle::PROP_AUTOLOAD_DIR).ToString();
-  }
-  else
-  {
-    this->info.autoLoadDir = this->info.name;
-    bundleManifest.SetValue(Bundle::PROP_AUTOLOAD_DIR, Any(this->info.autoLoadDir));
-  }
-
-#ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  if (coreCtx->settings.IsAutoLoadingEnabled())
-  {
-    const std::vector<std::string> installedBundleNames = AutoLoadBundles(this->info, this->coreCtx);
-    if (!installedBundleNames.empty())
-    {
-      bundleManifest.SetValue(Bundle::PROP_AUTOINSTALLED_BUNDLES, Any(installedBundleNames));
-    }
-  }
-#endif
 }
 
 BundlePrivate::~BundlePrivate()

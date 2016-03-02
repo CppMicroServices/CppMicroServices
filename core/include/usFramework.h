@@ -116,22 +116,6 @@ public:
     std::string GetLocation() const;
 
     /**
-     * Enable or disable auto-install support.
-     *
-     * @param enable If \c true, enable auto-install support, disable it otherwise.
-     *
-     * @remarks Calling this method will have no effect if support for
-     * auto-loading has not been configured into the CppMicroServices library or if
-     * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
-     *
-     * @deprecated This method remains for legacy clients and will be removed in a
-     * future release. Auto-loading support will be moved into a seprate service,
-     * at which point, this method will be permanently removed.
-     *
-     */
-    void SetAutoLoadingEnabled(bool enable);
-
-    /**
      * The framework's persistent storage base path property key name.
      * This property's default value is the current working directory.
      *

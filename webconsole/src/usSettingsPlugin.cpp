@@ -79,28 +79,4 @@ BundleResource SettingsPlugin::GetResource(const std::string& path) const
         BundleResource();
 }
 
-/*
-cpptempl::data_map& SettingsPlugin::getData()
-{
-  m_Data.clear();
-  m_Data["mitk-version"] = cpptempl::make_data(MITK_VERSION_STRING);
-  m_Data["mitk-githash"] = cpptempl::make_data(MITK_REVISION);
-
-  m_Data["us-thread"] = cpptempl::make_data(us::BundleSettings::IsThreadingSupportEnabled() ? "true" : "false");
-  m_Data["us-autoload"] = cpptempl::make_data(us::BundleSettings::IsAutoLoadingEnabled() ? "true" : "false");
-  m_Data["us-storagepath"] = cpptempl::make_data(us::BundleSettings::GetStoragePath());
-
-  cpptempl::data_list autoLoadPaths;
-  us::BundleSettings::PathList pathList = us::BundleSettings::GetAutoLoadPaths();
-  for (us::BundleSettings::PathList::iterator iter = pathList.begin(),
-       endIter = pathList.end(); iter != endIter; ++iter)
-  {
-    autoLoadPaths.push_back(cpptempl::make_data(*iter));
-  }
-  m_Data["us-autoload-paths"] = cpptempl::make_data(autoLoadPaths);
-
-  return m_Data;
-}
-*/
-
 }

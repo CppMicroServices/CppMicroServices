@@ -35,7 +35,6 @@ CoreBundleContext::CoreBundleContext(Bundle* systemBundle, const std::map<std::s
   , serviceHooks(this)
   , bundleHooks(this)
   , bundleRegistry(this)
-  , settings()
   , frameworkProperties(props)
   , systemBundle(systemBundle)
 {

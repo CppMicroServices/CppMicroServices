@@ -56,10 +56,8 @@ set(_srcs
   bundle/usBundleResourceBuffer.cpp
   bundle/usBundleResourceContainer.cpp
   bundle/usBundleResourceStream.cpp
-  bundle/usBundleSettings.cpp
   bundle/usBundleUtils.cpp
   bundle/usBundleVersion.cpp
-
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )

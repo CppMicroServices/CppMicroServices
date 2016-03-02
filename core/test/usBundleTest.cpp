@@ -29,7 +29,6 @@
 #include <usBundleContext.h>
 #include <usGetBundleContext.h>
 #include <usBundleActivator.h>
-#include <usBundleSettings.h>
 #include <usLog.h>
 
 #include "usTestUtils.h"

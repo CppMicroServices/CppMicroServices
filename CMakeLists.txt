@@ -322,7 +322,8 @@ else()
   # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting all
   # symbols only export the typeinfo symbols by default. See
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
-  if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  # to understand what -fvisibility-ms-compat does.
+  if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
     usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)

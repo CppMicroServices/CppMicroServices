@@ -20,38 +20,49 @@
 
 =============================================================================*/
 
-#ifndef USBUNDLEMANIFEST_P_H
-#define USBUNDLEMANIFEST_P_H
+#include "usTestBundleLQService.h"
 
-#include "usAny.h"
+#include <usBundleActivator.h>
+#include <usBundleContext.h>
+#include <usGlobalConfig.h>
+#include <usLog.h>
 
 namespace us {
 
-class BundleManifest
+struct TestBundleLQ : public TestBundleLQService
 {
-  typedef std::map<std::string, Any> AnyMap;
+  TestBundleLQ() {}
+  virtual ~TestBundleLQ() {}
+};
 
+class TestBundleLQActivator : public BundleActivator
+{
 public:
-
-  BundleManifest();
-
-  void Parse(std::istream& is);
-
-  bool Contains(const std::string& key) const;
-
-  Any GetValue(const std::string& key) const;
-
-  std::vector<std::string> GetKeys() const;
-
-  void SetValue(const std::string& key, const Any& value);
     
-  AnyMap GetProperties() const;
+  TestBundleLQActivator() {}
+  ~TestBundleLQActivator() {}
 
+  void Start(BundleContext* context)
+  {
+      s = std::make_shared<TestBundleLQ>();
+      
+      ServiceProperties props;
+      props["service.testproperty"] = std::string("YES");
+      
+      US_INFO << "Registering TestBundleLQService";
+      sr = context->RegisterService<TestBundleLQService>(s, props);
+  }
+    
+  void Stop(BundleContext*)
+  {
+      sr.Unregister();
+  }
 private:
 
-  AnyMap m_Properties;
+  std::shared_ptr<TestBundleLQ> s;
+  ServiceRegistration<TestBundleLQService> sr;
 };
 
 }
 
-#endif // USBUNDLEMANIFEST_P_H
+US_EXPORT_BUNDLE_ACTIVATOR(us::TestBundleLQActivator)

@@ -37,10 +37,10 @@
 
 namespace us {
 
-ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
-                                                               const std::vector<std::string>& classes,
-                                                               bool isFactory, bool isPrototypeFactory,
-                                                               long sid)
+Properties ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
+                                                    const std::vector<std::string>& classes,
+                                                    bool isFactory, bool isPrototypeFactory,
+                                                    long sid)
 {
   static std::atomic<long> nextServiceID(1);
   ServiceProperties props(in);
@@ -65,7 +65,7 @@ ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProp
     props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_SINGLETON()));
   }
 
-  return ServicePropertiesImpl(props);
+  return Properties(props);
 }
 
 ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
@@ -245,7 +245,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
   {
     ServiceReferenceBase sri = s->GetReference(clazz);
 
-    if (filter.empty() || ldap.Evaluate(ServicePropertiesHandle(s->d->properties, true), false))
+    if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true), false))
     {
       res.push_back(sri);
     }

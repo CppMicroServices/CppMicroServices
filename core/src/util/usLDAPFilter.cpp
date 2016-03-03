@@ -22,9 +22,10 @@
 
 #include "usLDAPFilter.h"
 #include "usLDAPExpr_p.h"
-#include "usServicePropertiesImpl_p.h"
+#include "usProperties_p.h"
 #include "usServiceReference.h"
 #include "usServiceReferenceBasePrivate.h"
+#include "usBundle.h"
 
 #include <stdexcept>
 
@@ -82,17 +83,22 @@ LDAPFilter::operator bool() const
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), true);
+  return d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false);
+}
+    
+bool LDAPFilter::Match(const Bundle& bundle) const
+{
+  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(bundle.GetProperties()), false), false);
 }
 
 bool LDAPFilter::Match(const ServiceProperties& dictionary) const
 {
-  return d->ldapExpr.Evaluate(ServicePropertiesHandle(ServicePropertiesImpl(dictionary), false), false);
+  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), false);
 }
 
 bool LDAPFilter::MatchCase(const ServiceProperties& dictionary) const
 {
-  return d->ldapExpr.Evaluate(ServicePropertiesHandle(ServicePropertiesImpl(dictionary), false), true);
+  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), true);
 }
 
 std::string LDAPFilter::ToString() const

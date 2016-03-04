@@ -318,7 +318,18 @@ else()
     usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
-  usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+  # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
+  # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting only
+  # symbols and associated typeinfo symbols which have explicit "default" visibility,
+  # export all typeinfo symbols by default and maintain hidden symbol visibility for all other
+  # symbols (unless explicitly overriden). See
+  # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
+  # to understand what -fvisibility-ms-compat does.
+  if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
+    usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
+  else()
+    usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+  endif()
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")

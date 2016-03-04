@@ -319,8 +319,10 @@ else()
   endif()
 
   # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
-  # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting all
-  # symbols only export the typeinfo symbols by default. See
+  # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting only
+  # symbols and associated typeinfo symbols which have explicit "default" visibility,
+  # export all typeinfo symbols by default and maintain hidden symbol visibility for all other
+  # symbols (unless explicitly overriden). See
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
   # to understand what -fvisibility-ms-compat does.
   if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))

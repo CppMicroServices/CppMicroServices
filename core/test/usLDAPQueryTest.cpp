@@ -25,17 +25,14 @@
 
 #include <usBundle.h>
 #include <usLDAPFilter.h>
-#include <usLog.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
-#include "usProperties_p.h"
-#include "usServiceReferenceBasePrivate.h"
 
 
 using namespace us;
 
-void TestLDAPFilterMatchBundle(const std::shared_ptr<Bundle> bundle)
+void TestLDAPFilterMatchBundle(const std::shared_ptr<Bundle>& bundle)
 {
   LDAPFilter ldapMatchCase( "(bundle.testproperty=YES)" );
   LDAPFilter ldapKeyMismatchCase( "(bundle.TestProperty=YES)" );
@@ -51,7 +48,7 @@ void TestLDAPFilterMatchBundle(const std::shared_ptr<Bundle> bundle)
   US_TEST_CONDITION(!ldapValueMismatchCase.Match(*bundle), " Evaluating LDAP expr: " + ldapValueMismatchCase.ToString());
 }
 
-void TestLDAPFilterMatchServiceReferenceBase(std::shared_ptr<Bundle> bundle)
+void TestLDAPFilterMatchServiceReferenceBase(const std::shared_ptr<Bundle>& bundle)
 {
   LDAPFilter ldapMatchCase( "(service.testproperty=YES)" );
   LDAPFilter ldapKeyMismatchCase( "(service.TestProperty=YES)" );
@@ -75,6 +72,10 @@ void TestLDAPFilterMatchServiceReferenceBase(std::shared_ptr<Bundle> bundle)
   US_TEST_CONDITION(!ldapValueMismatchCase.Match(sr), " Evaluating LDAP expr: " + ldapValueMismatchCase.ToString());
 
   bundle->Stop();
+
+  // Testing the behavior after the bundle has stopped (service properties
+  // should still be available for queries according to OSGi spec 5.2.1).
+  US_TEST_CONDITION(ldapMatchCase.Match(sr), " Evaluating LDAP expr: " + ldapMatchCase.ToString());
 }
 
 int usLDAPQueryTest(int /*argc*/, char* /*argv*/[])
@@ -82,13 +83,10 @@ int usLDAPQueryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("LDAPQueryTest");
     
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework();
+  auto framework = factory.NewFramework();
   framework->Start();
-    
-  BundleContext* frameworkCtx = framework->GetBundleContext();
-    
-  InstallTestBundle(frameworkCtx, "TestBundleLQ");
-  const auto& bundle = frameworkCtx->GetBundle("TestBundleLQ");
+
+  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleLQ");
 
   US_TEST_OUTPUT(<< "Testing LDAP query of bundle properties:")
   TestLDAPFilterMatchBundle(bundle);

@@ -44,6 +44,18 @@ call for that shared bundle or executable.
 Here is a full example creating a bundle and embedding resource data:
 \include uServices-resources-cmake/CMakeLists_example.txt
 
+If you are not using CMake, you can run the resource compiler from the terminal.
+
+Example usage of resource compiler:    
+1. To create a zip file with resources    
+    <code>usResourceCompiler --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --res-add icon.png</code>    
+2. To include a resource file into a bundle    
+    <code>usResourceCompiler --bundle-name mybundle --bundle-file mybundle.so --manifest-add manifest.json</code>    
+3. To include the contents of zip file into a bundle    
+    <code>usResourceCompiler --bundle-file mybundle.so --zip-add archivetomerge.zip</code>
+
+run <code>usResourceCompiler --help</code> for full list of options and usage
+
 Accessing Resources at Runtime
 ------------------------------
 

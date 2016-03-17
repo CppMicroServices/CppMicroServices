@@ -38,6 +38,7 @@ set(_tests
   usFrameworkFactoryTest
   usHelgrindTest
   usLDAPFilterTest
+  usLDAPQueryTest
   usLogTest
   usBundleHooksTest
   usBundleManifestTest

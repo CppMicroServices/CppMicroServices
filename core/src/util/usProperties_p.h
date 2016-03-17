@@ -20,23 +20,29 @@
 
 =============================================================================*/
 
-#ifndef USSERVICEPROPERTIESIMPL_P_H
-#define USSERVICEPROPERTIESIMPL_P_H
+#ifndef USPROPERTIES_P_H
+#define USPROPERTIES_P_H
 
+#include <vector>
+#include <map>
+#include <string>
+
+#include "usAny.h"
 #include "usServiceProperties.h"
 #include "usThreads_p.h"
 
 namespace us {
 
-class ServicePropertiesImpl : public MultiThreaded<>
+class Properties : public MultiThreaded<>
 {
 
 public:
 
-  explicit ServicePropertiesImpl(const ServiceProperties& props);
+  explicit Properties(const ServiceProperties& props);
+  Properties(const std::map<std::string, Any>& p);
 
-  ServicePropertiesImpl(ServicePropertiesImpl&& o);
-  ServicePropertiesImpl& operator=(ServicePropertiesImpl&& o);
+  Properties(Properties&& o);
+  Properties& operator=(Properties&& o);
 
   Any Value_unlocked(const std::string& key) const;
   Any Value_unlocked(int index) const;
@@ -53,31 +59,34 @@ private:
   std::vector<std::string> keys;
   std::vector<Any> values;
 
-  static Any emptyAny;
+  static const Any emptyAny;
+
+  template <typename T>
+  void ConstructProperties(const T& p);
 
 };
 
-class ServicePropertiesHandle
+class PropertiesHandle
 {
 public:
-  ServicePropertiesHandle(const ServicePropertiesImpl& props, bool lock)
+  PropertiesHandle(const Properties& props, bool lock)
     : props(props)
-    , l(lock ? props.Lock() : ServicePropertiesImpl::UniqueLock())
+    , l(lock ? props.Lock() : Properties::UniqueLock())
   {}
 
-  ServicePropertiesHandle(ServicePropertiesHandle&& o)
+  PropertiesHandle(PropertiesHandle&& o)
     : props(o.props)
     , l(std::move(o.l))
   {}
 
-  const ServicePropertiesImpl* operator-> () const { return &props; }
+  const Properties* operator-> () const { return &props; }
 
 private:
 
-  const ServicePropertiesImpl& props;
-  ServicePropertiesImpl::UniqueLock l;
+  const Properties& props;
+  Properties::UniqueLock l;
 };
 
 }
 
-#endif // USSERVICEPROPERTIESIMPL_P_H
+#endif // USPROPERTIES_P_H

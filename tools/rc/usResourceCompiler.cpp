@@ -449,19 +449,10 @@ int main(int argc, char** argv)
   
   std::string outFile;
   bool deleteTempFile = false;
-  if (outFileOpt)
-  {
-    outFile = outFileOpt->arg;
-  }
-  else
-  {
-    outFile = us_tempfile();
-    deleteTempFile = true;
-  }
   
   try
   {
-    // Append mode only works with one zip-add argument. A bundle can only contain one zip blob. 
+    // Append mode only works with one zip-add argument. A bundle can only contain one zip blob.
     if (!options[RESADD] && !options[MANIFESTADD] && options[ZIPADD].count() == 1 && options[BUNDLEFILE])
     {
       // jump to append part.
@@ -469,6 +460,16 @@ int main(int argc, char** argv)
     }
     else
     {
+      if (outFileOpt)
+      {
+        outFile = outFileOpt->arg;
+      }
+      else
+      {
+        outFile = us_tempfile();
+        deleteTempFile = true;
+      }
+      
       std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(outFile, compressionLevel, bundleName));
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])

@@ -32,7 +32,9 @@
 #include "usBundleRegistry_p.h"
 #include "usDebug_p.h"
 #include "usAny.h"
+#include "usLog.h"
 
+#include <ostream>
 #include <string>
 #include <map>
 
@@ -151,6 +153,8 @@ public:
   void Uninit0();
 
   void Uninit1();
+
+  std::shared_ptr<LogSink> sink;
 
   /**
    * Get private bundle data storage file handle.

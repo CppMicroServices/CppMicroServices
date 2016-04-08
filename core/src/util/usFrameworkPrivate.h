@@ -27,6 +27,7 @@ limitations under the License.
 #include <usBundlePrivate.h>
 #include <usFrameworkEvent.h>
 
+#include <ostream>
 #include <map>
 #include <string>
 

@@ -25,9 +25,10 @@
 
 #include <usCoreConfig.h>
 
+#include <iostream>
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 
 namespace us {
 
@@ -45,8 +46,11 @@ class Framework;
 class US_Core_EXPORT FrameworkFactory
 {
 public:
-    FrameworkFactory(void);
-    virtual ~FrameworkFactory(void);
+    FrameworkFactory(void) = default;
+    virtual ~FrameworkFactory(void) = default;
+
+	FrameworkFactory(const FrameworkFactory&) = delete;
+	FrameworkFactory& operator=(const FrameworkFactory&) = delete;
 
     /**
      * Create a new Framework instance.
@@ -54,23 +58,11 @@ public:
      * @param configuration The framework properties to configure the new framework instance. If framework properties
      * are not provided by the configuration argument, the created framework instance will use a reasonable
      * default configuration.
+	 * @param logger Any ostream object which will receieve redirected debug log output.
      *
      * @return A new, configured Framework instance.
      */
-    Framework NewFramework(const std::map<std::string, Any>& configuration);
-
-    /**
-    * Create a new Framework instance.
-    *
-    * @remarks The created framework instance will use a reasonable default configuration.
-    *
-    * @return A new, configured Framework instance.
-    */
-    Framework NewFramework(void);
-
-private:
-    FrameworkFactory(const FrameworkFactory& );
-    FrameworkFactory& operator=(const FrameworkFactory& );
+    Framework NewFramework(const std::map<std::string, Any>& configuration = std::map<std::string, Any>(), std::ostream* logger = nullptr);
 
 };
 

@@ -37,7 +37,8 @@ namespace
 {
     void TestDefaultConfig()
     {
-        FrameworkFactory factory;
+        auto f = FrameworkFactory().NewFramework();
+		US_TEST_CONDITION(f, "Test Framework instantiation");
 
         auto f = factory.NewFramework();
         US_TEST_CONDITION(f, "Test Framework instantiation")
@@ -47,7 +48,8 @@ namespace
         // Default framework properties:
         //  - threading model: single
         //  - storage location: The current working directory
-        //  - log level: 3 (us::ErrorMsg)
+        //  - diagnostic logging: off
+        //  - diagnostic logger: std::clog
 #ifdef US_ENABLE_THREADING_SUPPORT
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for default threading option")
 #else
@@ -55,8 +57,7 @@ namespace
 #endif
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_STORAGE).Empty(), "Test for empty default base storage property")
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_LOG_LEVEL).ToString() == "3", "Test for default logging level")
-
-        US_TEST_CONDITION(Logger::instance().GetLogLevel() == ErrorMsg, "Test default log level")
+		US_TEST_CONDITION(any_cast<bool>(f->GetProperty(Framework::PROP_LOG)) == false, "Test for default diagnostic logging");
     }
 
     void TestCustomConfig()
@@ -68,6 +69,7 @@ namespace
         configuration["org.osgi.framework.custom1"] = std::string("foo");
         configuration["org.osgi.framework.custom2"] = std::string("bar");
         configuration[Constants::FRAMEWORK_LOG_LEVEL] = 0;
+        configuration[Framework::PROP_STORAGE_LOCATION] = std::string("/foo");
 
         // the threading model framework property is set at compile time and read-only at runtime. Test that this
         // is always the case.
@@ -77,10 +79,11 @@ namespace
         configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("multi");
 #endif
 
-        FrameworkFactory factory;
+		// turn on diagnostic logging
+		configuration[Framework::PROP_LOG] = true;
 
-        auto f = factory.NewFramework(configuration);
-        US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration")
+        auto f = FrameworkFactory().NewFramework(configuration);
+		US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration");
 
         f.Start();
         US_TEST_CONDITION("osgi" == f.GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties")
@@ -89,8 +92,7 @@ namespace
         US_TEST_CONDITION("foo" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties")
         US_TEST_CONDITION("bar" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties")
         US_TEST_CONDITION(any_cast<int>(f.GetProperty(Constants::FRAMEWORK_LOG_LEVEL)) == 0, "Test for custom logging level")
-
-        US_TEST_CONDITION(Logger::instance().GetLogLevel() == DebugMsg, "Test custom log level")
+		US_TEST_CONDITION(f->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/foo", "Test for custom base storage path");
 
 #ifdef US_ENABLE_THREADING_SUPPORT
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
@@ -98,6 +100,21 @@ namespace
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
 #endif
     }
+
+	void TestCustomLogSink()
+	{
+		std::map<std::string, Any> configuration;
+		// turn on diagnostic logging
+		configuration[Framework::PROP_LOG] = true;
+
+		std::ostream custom_log_sink(std::cerr.rdbuf());
+
+		auto f = FrameworkFactory().NewFramework(configuration, &custom_log_sink);
+		US_TEST_CONDITION(f, "Test Framework instantiation with custom diagnostic logger");
+
+		f->Start();
+		f->Stop();
+	}
 
     void TestProperties()
     {
@@ -113,7 +130,6 @@ namespace
     void TestLifeCycle()
     {
         TestBundleListener listener;
-        FrameworkFactory factory;
         std::vector<BundleEvent> pEvts;
 
         std::map < std::string, Any > configuration;
@@ -271,6 +287,7 @@ int usFrameworkTest(int /*argc*/, char* /*argv*/[])
 
     TestDefaultConfig();
     TestCustomConfig();
+	TestCustomLogSink();
     TestProperties();
     TestLifeCycle();
     TestEvents();

@@ -53,6 +53,7 @@ endforeach()
 # atomic
 # mutex
 # wait_condition
+# exception_ptr
 
 set(US_COMPILER_GNU_MINIMUM_VERSION           4.6          )
 set(US_COMPILER_CLANG_MINIMUM_VERSION         3.1          )
@@ -188,7 +189,6 @@ endif()
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
-us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
@@ -406,6 +406,27 @@ usFunctionCheckResourceLinking()
 include(CheckIncludeFileCXX)
 
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
+
+#-----------------------------------------------------------------------------
+# C++ library support
+#-----------------------------------------------------------------------------
+
+# c++11 regular expressions are used in the unit tests.
+# Currently the default C++ library for gcc < 4.9 doesn't
+# fully support c++11 regex.
+# Generelize the detection of regex and make its availability
+# conditional of wether the compiler's C++ library supports it
+# or not.
+# This can be removed once the minimum supported gcc version is 4.9
+CHECK_CXX_SOURCE_COMPILES(
+"
+#include <regex>
+int main() {
+auto regex_iter_end = std::sregex_iterator();
+(void)regex_iter_end;
+return 0;
+}
+" US_HAVE_REGEX)
 
 #-----------------------------------------------------------------------------
 # System Information

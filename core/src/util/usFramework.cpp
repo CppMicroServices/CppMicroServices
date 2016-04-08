@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "usFramework.h"
+#include "usFrameworkEvent.h"
 #include "usFrameworkPrivate.h"
 #include "usBundleStorage_p.h"
 

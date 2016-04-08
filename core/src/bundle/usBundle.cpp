@@ -32,6 +32,7 @@
 #include "usBundleThread_p.h"
 #include "usBundleUtils_p.h"
 #include "usCoreBundleContext_p.h"
+#include "usFrameworkEvent.h"
 #include "usResolver_p.h"
 
 #include "usCoreConfig.h"

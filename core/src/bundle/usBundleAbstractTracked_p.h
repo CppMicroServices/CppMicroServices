@@ -58,15 +58,12 @@ public:
   typedef typename TTT::TrackedType T;
   typedef typename TTT::TrackedParmType TrackedParmType;
 
-  /* set this to true to compile in debug messages */
-  static const bool DEBUG_OUTPUT; // = false;
-
   typedef std::map<S,std::shared_ptr<TrackedParmType>> TrackingMap;
 
   /**
    * BundleAbstractTracked constructor.
    */
-  BundleAbstractTracked();
+  BundleAbstractTracked(BundleContext* bc);
 
   virtual ~BundleAbstractTracked();
 
@@ -280,6 +277,8 @@ private:
    * modified.
    */
   std::atomic<int> trackingCount;
+
+  BundleContext* bc;
 
   bool CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParmType>& custom);
 

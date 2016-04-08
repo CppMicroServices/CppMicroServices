@@ -24,15 +24,15 @@
 #ifndef USSERVICELISTENERS_H
 #define USSERVICELISTENERS_H
 
-#include <list>
-#include <string>
-#include <set>
-
 #include <usGlobalConfig.h>
 
 #include "usServiceListenerEntry_p.h"
 #include "usThreads_p.h"
 
+#include <list>
+#include <mutex>
+#include <string>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -59,6 +59,10 @@ public:
   typedef std::unordered_set<ServiceListenerEntry> ServiceListenerEntries;
 
 private:
+
+  std::mutex frameworkListenerMapMutex;
+  typedef std::map<BundleContext*, std::vector<std::pair<FrameworkListener, void*> > > FrameworkListeners;
+  FrameworkListeners FrameworkListenerMap;
 
   std::vector<std::string> hashedServiceKeys;
   static const int OBJECTCLASS_IX = 0;
@@ -124,6 +128,27 @@ public:
    * @param data Additional data to distinguish BundleListener objects.
    */
   void RemoveBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data);
+
+  /**
+  * Add a new framework listener.
+  *
+  * @param context The bundle context adding this listener.
+  * @param listener The framework listener to add.
+  * @param data Additional data to distinguish FrameworkListener objects.
+  */
+  void AddFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data);
+
+  /**
+  * Remove framework listener from current framework. Silently ignore
+  * if listener doesn't exist.
+  *
+  * @param context The bundle context who wants to remove listener.
+  * @param listener Object to remove.
+  * @param data Additional data to distinguish FrameworkListener objects.
+  */
+  void RemoveFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data);
+
+  void SendFrameworkEvent(const FrameworkEvent& evt);
 
   void BundleChanged(const BundleEvent& evt);
 

@@ -26,6 +26,7 @@
 #include <usCoreConfig.h>
 #include "usBundle.h"
 
+#include <ostream>
 #include <map>
 #include <string>
 #include <chrono>
@@ -219,6 +220,7 @@ public:
 
 private:
 
+    // Framework instances are exclusively constructed by the FrameworkFactory class
     friend class FrameworkFactory;
 
     Framework(const std::shared_ptr<FrameworkPrivate>& d);

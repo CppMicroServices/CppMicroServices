@@ -27,7 +27,6 @@
 #include "usBundleContext.h"
 #include "usBundleContextPrivate.h"
 #include "usBundleActivator.h"
-#include "usBundleUtils_p.h"
 #include "usBundleResource.h"
 #include "usBundleResourceContainer_p.h"
 #include "usBundleResourceStream.h"
@@ -704,7 +703,7 @@ BundlePrivate::BundlePrivate(
       }
       catch (const std::exception& e)
       {
-        US_ERROR << "Parsing of manifest.json for bundle " << symbolicName << " at " << location << " failed: " << e.what();
+        throw std::runtime_error(std::string("Parsing of manifest.json for bundle ") + symbolicName + " at " + location + " failed: " + e.what());
       }
     }
   }

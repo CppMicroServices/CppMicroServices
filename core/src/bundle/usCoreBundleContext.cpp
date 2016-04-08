@@ -69,6 +69,7 @@ CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props)
   , firstInit(true)
   , initCount(0)
   , frameworkProperties(InitProperties(props))
+  , sink(std::make_shared<LogSink>(logger, any_cast<bool>(props.at(Framework::PROP_LOG))))
 {
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
   US_INFO << "created";

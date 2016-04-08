@@ -35,6 +35,7 @@ class Bundle;
 class BundleContext;
 class BundleContextPrivate;
 class ServiceFactory;
+class LogSink;
 
 template<class S> class ServiceObjects;
 template<class S> struct ServiceHolder;
@@ -585,6 +586,9 @@ public:
   void AddBundleListener(const BundleListener& delegate);
   void RemoveBundleListener(const BundleListener& delegate);
 
+  void AddFrameworkListener(const FrameworkListener& listener);
+  void RemoveFrameworkListener(const FrameworkListener& listener);
+
   /**
    * Adds the specified <code>callback</code> with the
    * specified <code>filter</code> to the context bundles's list of listeners.
@@ -712,6 +716,47 @@ public:
   }
 
   /**
+   * Adds the specified <code>callback</code> to the context bundles's list
+   * of framework listeners. Listeners are notified of framework events.
+   *
+   * <p>
+   * If the context bundle's list of listeners already contains a pair <code>(r,c)</code>
+   * of <code>receiver</code> and <code>callback</code> such that
+   * <code>(r == receiver && c == callback)</code>, then this method does nothing.
+   *
+   * @tparam R The type of the receiver (containing the member function to be called)
+   * @param receiver The object to connect to.
+   * @param callback The member function pointer to call.
+   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @see FrameworkEvent
+   */
+  template<class R>
+  void AddFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  {
+    AddFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
+  }
+
+  /**
+   * Removes the specified <code>callback</code> from the context bundle's
+   * list of framework listeners.
+   *
+   * <p>
+   * If the <code>(receiver,callback)</code> pair is not contained in this
+   * context bundle's list of listeners, this method does nothing.
+   *
+   * @tparam R The type of the receiver (containing the member function to be removed)
+   * @param receiver The object from which to disconnect.
+   * @param callback The member function pointer to remove.
+   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @see AddFrameworkListener()
+   */
+  template<class R>
+  void RemoveFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  {
+    RemoveFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
+  }
+
+  /**
    * Get the absolute path for a file or directory in the persistent
    * storage area provided for the bundle.
    *
@@ -754,6 +799,15 @@ private:
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
   BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
+  // allow templated code to use the internal logger
+  template<class S, class TTT, class R> friend class BundleAbstractTracked;
+  template<class S, class T> friend class ServiceTracker;
+  template<class S, class TTT> friend class ServiceTrackerPrivate;
+  template<class S, class TTT> friend class TrackedService;
+  // Not for use by clients of the Framework.
+  // Provides access to the Framework's log sink to allow templated code
+  // to log diagnostic information. 
+  std::shared_ptr<LogSink> GetLogSink();
 
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);

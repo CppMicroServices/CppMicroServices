@@ -20,12 +20,14 @@
 
 =============================================================================*/
 
+#include "usFrameworkEvent.h"
 #include "usServiceRegistrationBase.h"
 #include "usServiceRegistrationBasePrivate.h"
 #include "usServiceListenerEntry_p.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceFactory.h"
 
+#include "usBundle.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
 
@@ -226,9 +228,10 @@ void ServiceRegistrationBase::Unregister()
         {
           serviceFactory->UngetService(MakeBundle(i.first->shared_from_this()), *this, service);
         }
-        catch (const std::exception& /*ue*/)
+        catch (const std::exception& )
         {
-          US_WARN << "ServiceFactory UngetService implementation threw an exception";
+          std::string message("ServiceFactory UngetService implementation threw an exception");
+          d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, d->bundle->q->shared_from_this(), message, std::current_exception()));
         }
       }
     }
@@ -240,9 +243,10 @@ void ServiceRegistrationBase::Unregister()
       {
         serviceFactory->UngetService(MakeBundle(i.first->shared_from_this()), *this, i.second);
       }
-      catch (const std::exception& /*ue*/)
+      catch (const std::exception& )
       {
-        US_WARN << "ServiceFactory UngetService implementation threw an exception";
+        std::string message("ServiceFactory UngetService implementation threw an exception");
+        d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, d->bundle->q->shared_from_this(), message, std::current_exception()));
       }
     }
   }

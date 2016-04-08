@@ -75,9 +75,6 @@ public:
 
   void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs, TrackedService<S,TTT>* t) const;
 
-  /* set this to true to compile in debug messages */
-  static const bool DEBUG_OUTPUT; // = false;
-
   /**
    * The Bundle Context used by this <code>ServiceTracker</code>.
    */

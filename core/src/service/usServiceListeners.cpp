@@ -24,9 +24,9 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
-
+#include "usFrameworkEvent.h"
 #include "usServiceListeners_p.h"
-
+#include "usListenerFunctors.h"
 #include "usUtils_p.h"
 
 #include "usServiceReferenceBasePrivate.h"
@@ -45,6 +45,17 @@ struct BundleListenerCompare : std::binary_function<std::pair<BundleListener, vo
   {
     return p1.second == p2.second &&
            p1.first.target<void(const BundleEvent&)>() == p2.first.target<void(const BundleEvent&)>();
+  }
+};
+
+struct FrameworkListenerCompare : std::binary_function<std::pair<FrameworkListener, void*>,
+                                                       std::pair<FrameworkListener, void*>, bool>
+{
+  bool operator()(const std::pair<FrameworkListener, void*>& p1,
+                  const std::pair<FrameworkListener, void*>& p2) const
+  {
+	return p1.second == p2.second &&
+            p1.first.target<void(const FrameworkEvent&)>() == p2.first.target<void(const FrameworkEvent&)>();
   }
 };
 
@@ -124,6 +135,53 @@ void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextP
   bundleListenerMap.value[context].remove_if(std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
 }
 
+void ServiceListeners::AddFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data)
+{
+  std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
+  auto& listeners = FrameworkListenerMap[context];
+  if (std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
+  {
+	listeners.push_back(std::make_pair(listener, data));
+  }
+}
+
+void ServiceListeners::RemoveFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data)
+{
+  std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
+  auto& listeners = FrameworkListenerMap[context];
+  FrameworkListenerMap[context].erase(std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)));
+}
+
+void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
+{
+  // avoid deadlocks, race conditions and other undefined behavior
+  // by using a local snapshot of all listeners.
+  // A lock shouldn't be held while calling into user code (e.g. callbacks).
+  FrameworkListeners listener_snapshot;
+  {
+    std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
+    listener_snapshot = FrameworkListenerMap;
+  }
+
+  for (auto& listeners : listener_snapshot)
+  {
+	for (auto& listener : listeners.second)
+	{
+	  try
+	  {
+        (listener.first)(evt);
+	  }
+	  catch (const std::exception& e)
+	  {
+		// do not send a FrameworkEvent as that could cause a deadlock or an inifinite loop.
+		// Instead, log to the internal logger
+        // @todo send this to the LogService instead when its supported.
+        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << e.what() << "\n";
+	  }
+	}
+  }
+}
+
 void ServiceListeners::BundleChanged(const BundleEvent& evt)
 {
   BundleListenerMap filteredBundleListeners;
@@ -137,9 +195,14 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
       {
         (bundleListener.first)(evt);
       }
-      catch (const std::exception& e)
+      catch (const std::exception& )
       {
-        US_WARN << "Bundle listener threw an exception: " << e.what();
+        std::string message("Bundle listener threw an exception");
+        SendFrameworkEvent(FrameworkEvent(
+            FrameworkEvent::Type::ERROR, 
+            coreCtx->systemBundle->shared_from_this(), 
+            message,
+            std::current_exception()));
       }
     }
   }
@@ -168,6 +231,11 @@ void ServiceListeners::RemoveAllListeners(const std::shared_ptr<BundleContextPri
   {
     auto l = bundleListenerMap.Lock(); US_UNUSED(l);
     bundleListenerMap.value.erase(context);
+  }
+
+  {
+    std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
+	FrameworkListenerMap.erase(context);
   }
 }
 
@@ -219,14 +287,16 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       }
       catch (...)
       {
-        US_WARN << "Service listener"
-                << " in " << l.GetBundleContext().GetBundle().GetSymbolicName()
-                << " threw an exception!";
+        std::string message("Service listener in " + l.GetBundleContext()->GetBundle()->GetName() + " threw an exception!");
+        SendFrameworkEvent(FrameworkEvent(
+            FrameworkEvent::Type::ERROR, 
+            coreCtx->systemBundle->shared_from_this(), 
+            message,
+            std::current_exception()));
       }
     }
   }
 
-  //US_DEBUG << "Notified " << n << " listeners";
 }
 
 void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set)
@@ -254,9 +324,6 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
         set.insert(sse);
       }
     }
-
-    //US_DEBUG << "Added " << set.size() << " out of " << n
-    //         << " listeners with complicated filters";
 
   // Check the cache
     const auto c = any_cast<std::vector<std::string>>(props->Value_unlocked(Constants::OBJECTCLASS));
@@ -332,7 +399,6 @@ void ServiceListeners::CheckSimple_unlocked(const ServiceListenerEntry& sle)
      }
      else
      {
-       //US_DEBUG << "Too complicated filter: " << sle.GetFilter();
        complicatedListeners.push_back(sle);
      }
    }
@@ -345,7 +411,6 @@ void ServiceListeners::AddToSet_unlocked(ServiceListenerEntries& set,
   std::list<ServiceListenerEntry>& l = cache[cache_ix][val];
   if (!l.empty())
   {
-    //US_DEBUG << hashedServiceKeys[cache_ix] << " matches " << l.size();
 
     for (std::list<ServiceListenerEntry>::const_iterator entry = l.begin();
          entry != l.end(); ++entry)
@@ -355,10 +420,6 @@ void ServiceListeners::AddToSet_unlocked(ServiceListenerEntries& set,
         set.insert(*entry);
       }
     }
-  }
-  else
-  {
-    //US_DEBUG << hashedServiceKeys[cache_ix] << " matches none";
   }
 }
 

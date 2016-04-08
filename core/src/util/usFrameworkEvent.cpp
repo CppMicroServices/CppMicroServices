@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@
 
 #include "usBundle.h"
 
-#include <iostream>
-#include <stdexcept>
-
 namespace us {
 
 class FrameworkEventData : public SharedData
@@ -35,26 +32,22 @@ public:
 
   FrameworkEventData& operator=(const FrameworkEventData&) = delete;
 
-  FrameworkEventData(FrameworkEvent::Type type, const Bundle& bundle,
-                     const std::exception_ptr& e)
-    : type(type), bundle(bundle), exc(e)
+  FrameworkEventData(FrameworkEvent::Type type, const std::shared_ptr<Bundle>& bundle, const std::string& message, const std::exception_ptr exception)
+    : type(type), bundle(bundle), message(message), exception(exception)
   {
-    if (!bundle) throw std::invalid_argument("invalid bundle");
+
   }
 
   FrameworkEventData(const FrameworkEventData& other)
-    : SharedData(other), type(other.type), bundle(other.bundle), exc(other.exc)
+    : SharedData(other), type(other.type), bundle(other.bundle), message(other.message), exception(other.exception)
   {
+
   }
 
-  // Type of event
   const FrameworkEvent::Type type;
-
-  // Bundle related to the event.
-  Bundle bundle;
-
-  // Exception related to the event
-  std::exception_ptr exc;
+  const std::shared_ptr<Bundle> bundle;
+  const std::string message;
+  const std::exception_ptr exception;
 
 };
 
@@ -69,11 +62,11 @@ FrameworkEvent::~FrameworkEvent()
 
 }
 
-bool FrameworkEvent::IsNull() const
+FrameworkEvent::FrameworkEvent(Type type, const std::shared_ptr<Bundle>& bundle, const std::string& message, const std::exception_ptr exception)
+  : d(new FrameworkEventData(type, bundle, message, exception))
 {
-  return !d;
-}
 
+}
 
 FrameworkEvent::FrameworkEvent(const FrameworkEvent& other)
   : d(other.d)
@@ -81,32 +74,39 @@ FrameworkEvent::FrameworkEvent(const FrameworkEvent& other)
 
 }
 
-FrameworkEvent::FrameworkEvent(Type type, const Bundle& bundle, const std::exception_ptr& e)
-  : d(new FrameworkEventData(type, bundle, e))
-{
-
-}
-
-
 FrameworkEvent& FrameworkEvent::operator=(const FrameworkEvent& other)
 {
   d = other.d;
   return *this;
 }
 
-Bundle FrameworkEvent::GetBundle() const
+std::shared_ptr<Bundle> FrameworkEvent::GetBundle() const
 {
+  if (!d) return nullptr;
   return d->bundle;
 }
 
 FrameworkEvent::Type FrameworkEvent::GetType() const
 {
+  if (!d) return Type::STARTING;
   return d->type;
 }
 
-std::exception_ptr FrameworkEvent::GetException() const
+std::string FrameworkEvent::GetMessage() const
 {
-  return d->exc;
+  if (!d) return std::string();
+  return d->message;
+}
+
+std::exception_ptr FrameworkEvent::GetThrowable() const
+{
+  if (!d) return nullptr;
+  return d->exception;
+}
+
+bool FrameworkEvent::operator!() const
+{
+  return !d;
 }
 
 std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType)
@@ -121,16 +121,37 @@ std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType)
   case FrameworkEvent::FRAMEWORK_STOPPED_UPDATE: return os << "STOPPED_UPDATE";
   case FrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT:  return os << "WAIT_TIMEDOUT";
 
-  default: return os << "Unknown framework event type (" << static_cast<int>(eventType) << ")";
+  default: return os << "Unknown bundle event type (" << static_cast<unsigned int>(eventType) << ")";
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const FrameworkEvent& event)
+std::ostream& operator<<(std::ostream& os, const std::exception_ptr ex)
 {
-  if (event.IsNull()) return os << "NONE";
+  if (!ex) return os << "NONE";
 
-  auto m = event.GetBundle();
-  os << event.GetType() << " #" << m.GetBundleId() << " (" << m.GetLocation() << ")";
+  try
+  {
+    std::rethrow_exception(ex);
+  }
+  catch(const std::exception& e)
+  {
+    os << e.what();
+  }
+  catch (...)
+  {
+    os << "unknown exception";
+  }
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt)
+{
+  if (!evt) return os << "NONE";
+
+  os << evt.GetType() << "\n " 
+      << evt.GetMessage() << "\n " 
+      << evt.GetBundle() << "\n Exception: " 
+      << evt.GetThrowable();
   return os;
 }
 

@@ -11,7 +11,6 @@ set(_srcs
   util/usLDAPExpr.cpp
   util/usLDAPFilter.cpp
   util/usLDAPProp.cpp
-  util/usLog.cpp
   util/usProperties.cpp
   util/usSharedLibrary.cpp
   util/usUtils.cpp
@@ -65,6 +64,7 @@ set(_srcs
 set(_private_headers
   util/usFrameworkPrivate.h
   util/usLDAPExpr_p.h
+  util/usLog.h
   util/usProperties_p.h
   util/usThreads_p.h
   util/usUtils_p.h

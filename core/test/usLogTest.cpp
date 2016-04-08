@@ -24,155 +24,190 @@
 
 #include "usTestingMacros.h"
 
+#include <algorithm>
+#include <iostream>
+#include <ostream>
+#include <fstream>
+#include <regex>
+#include <thread>
+#include <vector>
+
 using namespace us;
 
-static int lastMsgType = -1;
-static std::string lastMsg;
-
-void handleMessages(MsgType type, const char* msg)
+void testDefaultLogMessages()
 {
-  lastMsgType = type;
-  lastMsg.assign(msg);
+  std::stringstream temp_buf;
+  auto clog_buf = std::clog.rdbuf();
+  std::clog.rdbuf(temp_buf.rdbuf());
+  LogSink sink(&std::clog, true);
+  DIAG_LOG(sink) << "Testing " << 1 << 2 << 3 << ", Testing " << std::scientific << 1.0 << static_cast<void*>(nullptr) << 2.0 << 3.0 << "\n";
+  sink.Log(std::string("blaaaaaaaaaaaaaaaaaah\n"));
+
+  std::clog.rdbuf(clog_buf);
+
+  US_TEST_CONDITION_REQUIRED(std::string::npos != temp_buf.str().find(std::string("blaaaaaaaaaaaaaaaaaah\n")), "Test default log sink");
+  US_TEST_CONDITION_REQUIRED(std::string::npos != temp_buf.str().find(std::string(__FUNCTION__)), "Test default log sink macro");
+  US_TEST_CONDITION_REQUIRED(std::string::npos != temp_buf.str().find(std::string(__FILE__)), "Test default log sink macro");
 }
 
-void resetLastMsg()
+void testLogDisabled()
 {
-  lastMsgType = -1;
-  lastMsg.clear();
+  // A null (i.e. disabled logger) shouldn't throw when used.
+  LogSink sink_null(nullptr);
+  try
+  {
+	sink_null.Log(std::string("Don't log me"));
+	DIAG_LOG(sink_null) << "Shouldn't see this...";
+  }
+  catch (...)
+  {
+	US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
+  }
+  
+  std::ostringstream empty_stream;
+  LogSink sink_disabled(&empty_stream);
+  DIAG_LOG(sink_disabled) << "Now you see me...";
+  sink_disabled.Log(std::string("Now you don't"));
+  US_TEST_CONDITION_REQUIRED(empty_stream.str().empty(), "Test disabled log sink.");
 }
 
-void logMsg(MsgType msgType, int logLevel)
+void testLogRedirection()
 {
-  resetLastMsg();
-  std::string logMsg;
-  switch (msgType)
+  std::ofstream filestream("foo.txt", std::ofstream::trunc);
+  std::ostringstream stringstream;
+  std::stringstream test_log_output;
+  test_log_output << "Testing..." << 1 << " " << 2 << " " << 12 << "\n";
+
+  LogSink sink_stringstream(&stringstream, true);
+  DIAG_LOG(sink_stringstream) << test_log_output.str();
+  US_TEST_CONDITION_REQUIRED(!stringstream.str().empty(), "Test redirected stringstream log sink.");
+  US_TEST_CONDITION_REQUIRED(std::string::npos != stringstream.str().find(test_log_output.str()), "Test redirected stringstream log sink.");
+
+  LogSink sink_file(&filestream, true);
+  DIAG_LOG(sink_file) << test_log_output.str();
+  filestream.flush();
+  std::ifstream test_file("foo.txt");
+  std::stringstream test_output_stream;
+  test_file >> test_output_stream.rdbuf();
+  
+  US_TEST_CONDITION_REQUIRED(!test_output_stream.str().empty(), "Test redirected filestream log sink.");
+  US_TEST_CONDITION_REQUIRED(std::string::npos != test_output_stream.str().find(test_log_output.str()), "Test redirected filestream log sink.");
+
+  test_file.close();
+  std::remove("foo.txt");
+
+  // A null (i.e. disabled logger) shouldn't throw when used.
+  LogSink sink_null(nullptr, true);
+  try
   {
-  case DebugMsg:
-  {
-    logMsg = "Debug msg";
-    US_DEBUG << logMsg;
-#if !defined(US_ENABLE_DEBUG_OUTPUT)
-    if (logLevel == DebugMsg) logLevel = InfoMsg;
-#endif
-    break;
+	DIAG_LOG(sink_null) << test_log_output.str();
   }
-  case InfoMsg:
+  catch (...)
   {
-    logMsg = "Info msg";
-    US_INFO << logMsg;
-    break;
-  }
-  case WarningMsg:
-  {
-    logMsg = "Warning msg";
-    US_WARN << logMsg;
-    break;
-  }
-  case ErrorMsg:
-  {
-    // Skip error messages
-    logLevel = 100;
-    break;
-  }
+	US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
   }
 
-  if (msgType >= logLevel)
-  {
-    US_TEST_CONDITION(lastMsgType == msgType && lastMsg.find(logMsg) != std::string::npos, "Testing for logged message")
-  }
-  else
-  {
-    US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing for skipped log message")
-  }
+
+  // redirect cerr instead of cout since cout is used by the US_TEST*
+  // macros to output test information.
+  // cout could be used as long as one remembers to restore the cout
+  // streambuf before using the US_TEST_CONDITION_REQUIRED marcos.
+  std::ostringstream local_cerr_buffer;
+  auto cerr_buffer = std::cerr.rdbuf();
+  std::cerr.rdbuf(local_cerr_buffer.rdbuf());
+  
+  LogSink sink_redirected_cerr(&std::cerr, true);
+  DIAG_LOG(sink_redirected_cerr) << test_log_output.str();
+  std::cerr.rdbuf(cerr_buffer);
+  US_TEST_CONDITION_REQUIRED(!local_cerr_buffer.str().empty(), "Test redirected std::cerr log sink.");
+  US_TEST_CONDITION_REQUIRED(std::string::npos != local_cerr_buffer.str().find(test_log_output.str()), "Test redirected std::cerr log sink.");
 }
 
-void testLogMessages()
+// hammer the logger from multiple threads. A failure in
+// thread safety will most likely manifest as either a crash 
+// or the output validation will see splicing of log lines.
+void testLogMultiThreaded()
 {
-  // Use the default message handler
-  installMsgHandler(0);
-  {
-    US_DEBUG << "Msg";
-    US_DEBUG(false) << "Msg";
-    US_INFO << "Msg";
-    US_INFO(false) << "Msg";
-    US_WARN << "Msg";
-    US_WARN(false) << "Msg";
-  }
-  US_TEST_CONDITION(lastMsg.empty(), "Testing default message handler");
+  std::stringstream stringstream;
+  LogSink sink(&stringstream, true);
 
-  resetLastMsg();
-
-  installMsgHandler(handleMessages);
+  std::size_t num_threads(100);
+  std::vector<std::thread> threads;
+  for (std::size_t i = 0; i < num_threads; ++i)
   {
-    US_DEBUG << "Msg";
+    threads.push_back(std::thread([&sink, &num_threads]()
+	{
+		for (std::size_t i = 0; i < num_threads; ++i)
+		{
+		  DIAG_LOG(sink) << "MACRO: START foo\n";
+		  sink.Log(std::string("foo bar boo baz\n"));
+		  DIAG_LOG(sink) << "MACRO: END foo\n";
+		}
+	}));
   }
-#if !defined(US_ENABLE_DEBUG_OUTPUT)
-  US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing suppressed debug message")
+
+  for (auto& t : threads) t.join();
+
+  // instead of testing for all three log lines in one regular expressions, test for each line
+  // as logging a single line is expected to be thread safe. It is NOT guaranteed that all three
+  // log lines will appear in the correct order.
+  std::ptrdiff_t expected_num_matches(num_threads * num_threads);
+#if defined (US_HAVE_REGEX)
+  std::string func_name(__FUNCTION__);
+  std::string file_name = std::regex_replace(std::string(__FILE__), std::regex("\\\\"), std::string("\\\\"));
+  std::string logpreamble("In (" + func_name + "::<lambda(\\w+)>::)*operator(\\s)?\\(\\) at " + file_name + ":(\\d+) :");
+  std::regex reg_expr_start(logpreamble + std::string(" MACRO: START foo\n"));
+  std::regex reg_expr_middle("foo bar boo baz\n");
+  std::regex reg_expr_end(logpreamble + std::string(" MACRO: END foo\n"));
+
+  const std::string stream(stringstream.str());
+  auto regex_iter_end = std::sregex_iterator();
+
+  auto regex_iter_begin = std::sregex_iterator(stream.begin(), stream.end(), reg_expr_start);
+  std::ptrdiff_t num_found = std::distance(regex_iter_begin, regex_iter_end);
+  US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches, "Test for expected number of matches");
+
+  regex_iter_begin = std::sregex_iterator(stream.begin(), stream.end(), reg_expr_middle);
+  num_found = std::distance(regex_iter_begin, regex_iter_end);
+  US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches, "Test for expected number of matches");
+
+  regex_iter_begin = std::sregex_iterator(stream.begin(), stream.end(), reg_expr_end);
+  num_found = std::distance(regex_iter_begin, regex_iter_end);
+  US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches, "Test for expected number of matches");
+
 #else
-  US_TEST_CONDITION(lastMsgType == 0 && lastMsg.find("Msg") != std::string::npos, "Testing debug message")
+  // support compilers w/o c++11 regex support...
+  // the regex approach is more strict in checking there is no 
+  // log splicing however this suboptimal approach will do for now.
+  using count_type = std::vector<std::string>::iterator::difference_type;
+  std::ptrdiff_t total_expected_matches = expected_num_matches * 3;
+  std::vector<std::string> log_lines;
+  std::string line;
+  while (std::getline(stringstream, line, '\n'))
+  {
+    log_lines.push_back(line);
+  }
+  US_TEST_CONDITION_REQUIRED(static_cast<std::ptrdiff_t>(log_lines.size()) == total_expected_matches, "Test for expected number of matches");
+
+  count_type count = std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) { return (std::string::npos != s.find(std::string("MACRO: START foo"))); });
+  US_TEST_CONDITION_REQUIRED(count == expected_num_matches, "Test for expected number of matches");
+
+  count = std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) { return (std::string::npos != s.find(std::string("MACRO: END foo"))); });
+  US_TEST_CONDITION_REQUIRED(count == expected_num_matches, "Test for expected number of matches");
+
+  count = std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) { return (s == std::string("foo bar boo baz")); });
+  US_TEST_CONDITION_REQUIRED(count == expected_num_matches, "Test for expected number of matches");
 #endif
-  resetLastMsg();
-
-  {
-    US_DEBUG(false) << "No msg";
-  }
-  US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing disabled debug message")
-  resetLastMsg();
-
-  {
-    US_INFO << "Info msg";
-  }
-  US_TEST_CONDITION(lastMsgType == 1 && lastMsg.find("Info msg") != std::string::npos, "Testing informational message")
-  resetLastMsg();
-
-  {
-    US_WARN << "Warn msg";
-  }
-  US_TEST_CONDITION(lastMsgType == 2 && lastMsg.find("Warn msg") != std::string::npos, "Testing warning message")
-  resetLastMsg();
-
-  // We cannot test US_ERROR since it will call abort().
-
-  installMsgHandler(0);
-
-  {
-    US_INFO << "Info msg";
-  }
-  US_TEST_CONDITION(lastMsgType == -1 && lastMsg.empty(), "Testing message handler reset")
-  resetLastMsg();
-}
-
-void testLogLevels()
-{
-  installMsgHandler(handleMessages);
-
-  MsgType logLevel = Logger::instance().GetLogLevel();
-  US_TEST_CONDITION_REQUIRED(logLevel == DebugMsg, "Default log level")
-
-  logMsg(DebugMsg, logLevel);
-  logMsg(InfoMsg, logLevel);
-  logMsg(WarningMsg, logLevel);
-  logMsg(ErrorMsg, logLevel);
-
-  for (int level = ErrorMsg; level >= 0; --level)
-  {
-    Logger::instance().SetLogLevel(static_cast<MsgType>(level));
-    logMsg(DebugMsg, level);
-    logMsg(InfoMsg, level);
-    logMsg(WarningMsg, level);
-    logMsg(ErrorMsg, level);
-  }
-
-  installMsgHandler(0);
-  resetLastMsg();
 }
 
 int usLogTest(int /*argc*/, char* /*argv*/[])
 {
-  US_TEST_BEGIN("DebugOutputTest");
+  US_TEST_BEGIN("usLogTest");
 
-  testLogMessages();
-  testLogLevels();
+  testDefaultLogMessages();
+  testLogDisabled();
+  testLogRedirection();
+  testLogMultiThreaded();
 
   US_TEST_END()
 }

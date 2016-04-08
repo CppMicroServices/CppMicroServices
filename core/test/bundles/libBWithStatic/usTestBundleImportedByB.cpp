@@ -46,7 +46,7 @@ public:
   void Start(BundleContext context)
   {
     s = std::make_shared<TestBundleImportedByB>();
-    US_INFO << "Registering TestBundleImportedByB";
+    std::cout << "Registering TestBundleImportedByB";
     sr = context.RegisterService<TestBundleBService>(s);
   }
 

@@ -116,6 +116,51 @@ public:
   }
 
 
+  context->RemoveBundleListener(&listener1, &TestBundleListener::BundleChanged);
+  context->RemoveBundleListener(&listener2, &TestBundleListener::BundleChanged);
+
+  bundleA->Stop();
+
+}
+
+// Verify information from the BundleInfo struct
+void frame005a(BundleContext* context)
+{
+  auto m = context->GetBundle();
+  long systemId = 0;
+  // check expected meta-data
+  US_TEST_CONDITION("main" == m->GetName(), "Test bundle name")
+  US_TEST_CONDITION(BundleVersion(0,1,0) == m->GetVersion(), "Test test driver bundle version")
+  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == context->GetBundle(systemId)->GetVersion(), "Test CppMicroServices version")
+}
+
+// Get context id, location, persistent storage and status of the bundle
+void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* context)
+{
+  auto m = context->GetBundle();
+
+  long int contextid = m->GetBundleId();
+  std::cout << "CONTEXT ID:" << contextid;
+
+  std::string location = m->GetLocation();
+  std::cout << "LOCATION:" << location;
+  US_TEST_CONDITION(!location.empty(), "Test for non-empty bundle location")
+
+  US_TEST_CONDITION(m->IsStarted(), "Test for started flag")
+
+  // launching properties should be accessible through any bundle
+  US_TEST_CONDITION(framework->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
+  US_TEST_CONDITION(m->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
+
+  std::cout << m->GetBundleContext()->GetDataFile("") << std::endl;
+  std::stringstream ss;
+  ss << contextid;
+  const std::string storagePath = testing::GetCurrentWorkingDirectory() + DIR_SEP + ss.str() + "_" + m->GetName() + DIR_SEP;
+
+  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("") == storagePath, "Test for valid data path")
+  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("bla") == storagePath + "bla", "Test for valid data file path")
+}
+
 //----------------------------------------------------------------------------
 //Test result of GetService(ServiceReference()). Should throw std::invalid_argument
 void frame018a()
@@ -123,8 +168,7 @@ void frame018a()
   try
   {
     bc.GetService(ServiceReferenceU());
-    US_DEBUG << "Got service object, expected std::invalid_argument exception";
-    US_TEST_FAILED_MSG(<< "Got service object, excpected std::invalid_argument exception")
+    US_TEST_FAILED_MSG(<< "Got service object, expected std::invalid_argument exception")
   }
   catch (const std::invalid_argument& )
   {}

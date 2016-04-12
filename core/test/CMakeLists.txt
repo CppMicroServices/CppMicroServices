@@ -36,6 +36,7 @@ set(_tests
   usBundleRegistryPerformanceTest
   usFrameworkTest
   usFrameworkFactoryTest
+  usExecutableBundleTest
   usHelgrindTest
   usLDAPFilterTest
   usLDAPQueryTest

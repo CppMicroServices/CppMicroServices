@@ -32,23 +32,27 @@
 #define _GNU_SOURCE
 #endif
 #include <dlfcn.h>
+#include <sys/stat.h>
+#if defined(__APPLE__)
+#include <sys/param.h>
+#include <stdlib.h>
+#include <mach-o/dyld.h>
+#else
+#include <limits.h>
+#include <unistd.h>
+#endif
 #elif _WIN32
 #include <windows.h>
 #endif
 
 
-namespace us {
 
-namespace {
-#ifdef US_BUILD_SHARED_LIBS
-  const bool sharedLibMode = true;
-#else
-  const bool sharedLibMode = false;
-#endif
-}
+namespace us {
 
 namespace BundleUtils
 {
+
+bool IsCurrentExecutable(const std::string& filepath); // forward declaration.
 
 #ifdef __GNUC__
 
@@ -72,7 +76,8 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   dlerror();
 
   void* selfHandle = nullptr;
-  if (!sharedLibMode || bundleInfo.name == "main")
+  
+  if (IsCurrentExecutable(bundleInfo.location))
   {
     // Get the handle of the executable
     selfHandle = dlopen(0, RTLD_LAZY);
@@ -102,7 +107,71 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   }
   return nullptr;
 }
+  
 
+#if defined(__APPLE__)
+  
+std::string GetExecutablePath()
+{
+  unsigned int bufSize = MAXPATHLEN;
+  char pathBuf[bufSize];
+  if (_NSGetExecutablePath(pathBuf, &bufSize) != 0)
+  {
+    US_DEBUG << "GetExecutablePath() - _NSGetExecutablePath failed";
+    pathBuf[0] = '\0';
+  }
+  // the returned path may not be an absolute path
+  return std::string(pathBuf);
+}
+  
+#else
+
+std::string GetExecutablePath()
+{
+  char pathBuf[PATH_MAX];
+  ssize_t len = readlink("/proc/self/exe", pathBuf, sizeof(pathBuf));
+  if (len < 0)
+  {
+    US_DEBUG << "GetExecutablePath() " << GetLastErrorStr();
+    pathBuf[0] = '\0';
+  }
+  else
+  {
+    pathBuf[len] = '\0';
+  }
+  return std::string(pathBuf);
+}
+  
+#endif
+  
+struct FileInfo
+{
+  std::string path;
+  ino_t stat_ino;
+  dev_t stat_dev;
+  
+  FileInfo() : path(""), stat_ino(0), stat_dev(0) {}
+  
+  explicit FileInfo(const std::string& inPath) : path(inPath), stat_ino(0), stat_dev(0)
+  {
+    if(!path.empty())
+    {
+      struct stat pathStat;
+      if(stat(path.c_str(), &pathStat) == 0)
+      {
+        stat_ino = pathStat.st_ino;
+        stat_dev = pathStat.st_dev;
+      }
+    }
+  }
+} execInfo(GetExecutablePath());
+
+inline bool operator==(const FileInfo& lhs, const FileInfo& rhs)
+{
+  return (lhs.stat_dev == rhs.stat_dev &&
+          lhs.stat_ino == rhs.stat_ino);
+}
+  
 #elif _WIN32
 
 std::string GetLibraryPath_impl(void *symbol)
@@ -118,7 +187,7 @@ std::string GetLibraryPath_impl(void *symbol)
   }
 
   char bundlePath[512];
-  if (GetModuleFileName(handle, bundlePath, 512))
+  if (GetModuleFileNameA(handle, bundlePath, 512))
   {
     return bundlePath;
   }
@@ -127,24 +196,82 @@ std::string GetLibraryPath_impl(void *symbol)
   return "";
 }
 
+std::string GetExecutablePath()
+{
+  char pathBuf[1024];	// assuming this is a large enough buffer.
+  if (GetModuleFileNameA(nullptr, pathBuf, sizeof(pathBuf)) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+  {
+    US_DEBUG << "GetModuleFileName failed" << GetLastErrorStr();
+    pathBuf[0] = '\0';
+  }
+  return std::string(pathBuf);
+}
+  
+struct FileInfo {
+  std::string path;
+  DWORD dwVolumeSerialNumber;
+  DWORD nFileIndexHigh;
+  DWORD nFileIndexLow;
+  
+  FileInfo() : path(""), dwVolumeSerialNumber(0), nFileIndexHigh(0), nFileIndexLow(0) {}
+  
+  explicit FileInfo(const std::string& inPath) : path(inPath), dwVolumeSerialNumber(0), nFileIndexHigh(0), nFileIndexLow(0)
+  {
+    if(!path.empty())
+    {
+      HANDLE hFile = CreateFileA(path.c_str(),
+                                 0,
+                                 0,
+                                 NULL,
+                                 OPEN_EXISTING,
+                                 FILE_ATTRIBUTE_NORMAL,
+                                 NULL);
+      if(hFile != INVALID_HANDLE_VALUE)
+      {
+        BY_HANDLE_FILE_INFORMATION fileinfo;
+        ZeroMemory(&fileinfo, sizeof(BY_HANDLE_FILE_INFORMATION));
+        if(GetFileInformationByHandle(hFile, &fileinfo))
+        {
+          dwVolumeSerialNumber = fileinfo.dwVolumeSerialNumber;
+          nFileIndexHigh = fileinfo.nFileIndexHigh;
+          nFileIndexLow = fileinfo.nFileIndexLow;
+        }
+        CloseHandle(hFile);
+      }
+      else
+      {
+        US_DEBUG << "CreateFile() - failed" << GetLastErrorStr();
+      }
+    }
+  }
+} execInfo(GetExecutablePath());
+
+inline bool operator==(const FileInfo& lhs, const FileInfo& rhs)
+{
+  return (lhs.dwVolumeSerialNumber == rhs.dwVolumeSerialNumber &&
+          lhs.nFileIndexHigh == rhs.nFileIndexHigh &&
+          lhs.nFileIndexLow == rhs.nFileIndexLow);
+}
+
 void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
 {
   HMODULE handle = nullptr;
-  if (!sharedLibMode || bundleInfo.name == "main")
+  
+  if (IsCurrentExecutable(bundleInfo.location))
   {
-    handle = GetModuleHandle(nullptr);
+    handle = GetModuleHandleA(nullptr);
   }
   else
   {
-    handle = GetModuleHandle(bundleInfo.location.c_str());
+    handle = GetModuleHandleA(bundleInfo.location.c_str());
   }
-
+  
   if (!handle)
   {
-    US_DEBUG << "GetSymbol_impl():GetBundleHandle() " << GetLastErrorStr();
+    US_DEBUG << "GetSymbol_impl():GetModuleHandle() " << GetLastErrorStr();
     return nullptr;
   }
-
+  
   void* addr = (void*)GetProcAddress(handle, symbol);
   if (!addr)
   {
@@ -182,6 +309,11 @@ void* GetSymbol(const std::string& bundleName, const std::string& libLocation, c
 void* GetSymbol(const BundleInfo& bundle, const char* symbol)
 {
   return GetSymbol_impl(bundle, symbol);
+}
+  
+bool IsCurrentExecutable(const std::string& filepath)
+{
+  return execInfo.path == filepath || execInfo == FileInfo(filepath); // Avoid constructing the FileInfo object if paths match
 }
 
 } // namespace BundleUtils

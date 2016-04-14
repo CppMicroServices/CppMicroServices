@@ -244,6 +244,11 @@ BundleVersion Bundle::GetVersion() const
   return d->version;
 }
 
+std::map<std::string, Any> Bundle::GetProperties() const
+{
+  return d->bundleManifest.GetProperties();
+}
+
 Any Bundle::GetProperty(const std::string& key) const
 {
   Any property(d->bundleManifest.GetValue(key));

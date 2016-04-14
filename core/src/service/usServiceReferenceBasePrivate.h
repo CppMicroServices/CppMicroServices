@@ -33,7 +33,7 @@ namespace us {
 
 class Any;
 class Bundle;
-class ServicePropertiesHandle;
+class PropertiesHandle;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
 
@@ -96,7 +96,7 @@ public:
    *
    * @return A locked ServicePropertiesImpl handle object.
    */
-  ServicePropertiesHandle GetProperties() const;
+  PropertiesHandle GetProperties() const;
 
   bool IsConvertibleTo(const std::string& interfaceId) const;
 

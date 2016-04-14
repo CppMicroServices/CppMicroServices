@@ -20,38 +20,20 @@
 
 =============================================================================*/
 
-#ifndef USBUNDLEMANIFEST_P_H
-#define USBUNDLEMANIFEST_P_H
 
-#include "usAny.h"
+#ifndef USTESTBUNDLELQSERVICE_H
+#define USTESTBUNDLELQSERVICE_H
+
+#include <usGlobalConfig.h>
+#include <usServiceInterface.h>
 
 namespace us {
 
-class BundleManifest
+struct TestBundleLQService
 {
-  typedef std::map<std::string, Any> AnyMap;
-
-public:
-
-  BundleManifest();
-
-  void Parse(std::istream& is);
-
-  bool Contains(const std::string& key) const;
-
-  Any GetValue(const std::string& key) const;
-
-  std::vector<std::string> GetKeys() const;
-
-  void SetValue(const std::string& key, const Any& value);
-    
-  AnyMap GetProperties() const;
-
-private:
-
-  AnyMap m_Properties;
+  virtual ~TestBundleLQService() {}
 };
 
 }
 
-#endif // USBUNDLEMANIFEST_P_H
+#endif // USTESTBUNDLELQSERVICE_H

@@ -70,6 +70,7 @@ int TestEvaluate()
   // EVALUATE
   try
   {
+    // Make sure Match's key look-up is case-insensitive
     LDAPFilter ldap( "(Cn=Babs Jensen)" );
     ServiceProperties props;
     bool eval = false;

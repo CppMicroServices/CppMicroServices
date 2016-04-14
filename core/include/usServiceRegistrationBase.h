@@ -32,7 +32,7 @@ namespace us {
 
 class BundlePrivate;
 class ServiceRegistrationBasePrivate;
-class ServicePropertiesImpl;
+class Properties;
 
 /**
  * \ingroup MicroServices
@@ -195,7 +195,7 @@ private:
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
   ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
-                          ServicePropertiesImpl&& props);
+                          Properties&& props);
 
   ServiceRegistrationBasePrivate* d;
 

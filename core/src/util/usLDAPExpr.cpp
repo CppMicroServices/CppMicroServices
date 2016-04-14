@@ -23,7 +23,7 @@
 #include "usLDAPExpr_p.h"
 
 #include "usAny.h"
-#include "usServicePropertiesImpl_p.h"
+#include "usProperties_p.h"
 
 #include <limits>
 #include <iterator>
@@ -330,12 +330,12 @@ bool LDAPExpr::IsNull() const
   return !d;
 }
 
-bool LDAPExpr::Query( const std::string& filter, const ServicePropertiesHandle& pd)
+bool LDAPExpr::Query( const std::string& filter, const PropertiesHandle& pd)
 {
   return LDAPExpr(filter).Evaluate(pd, false);
 }
 
-bool LDAPExpr::Evaluate( const ServicePropertiesHandle& p, bool matchCase ) const
+bool LDAPExpr::Evaluate( const PropertiesHandle& p, bool matchCase ) const
 {
   if ((d->m_operator & SIMPLE) != 0)
   {

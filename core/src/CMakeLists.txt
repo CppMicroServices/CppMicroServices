@@ -7,49 +7,39 @@ set(_srcs
   util/usFramework.cpp
   util/usFrameworkFactory.cpp
   util/usFrameworkPrivate.cpp
+  util/usLDAPExpr.cpp
+  util/usLDAPFilter.cpp
   util/usLDAPProp.cpp
   util/usLog.cpp
+  util/usProperties.cpp
   util/usSharedLibrary.cpp
   util/usUtils.cpp
 
-  service/usLDAPExpr.cpp
-  service/usLDAPFilter.cpp
   service/usServiceException.cpp
   service/usServiceEvent.cpp
   service/usServiceEventListenerHook.cpp
   service/usServiceFindHook.cpp
   service/usServiceHooks.cpp
   service/usServiceListenerEntry.cpp
-  service/usServiceListenerEntry_p.h
   service/usServiceListenerHook.cpp
   service/usServiceListeners.cpp
-  service/usServiceListeners_p.h
   service/usServiceObjects.cpp
   service/usServiceProperties.cpp
-  service/usServicePropertiesImpl.cpp
   service/usServiceReferenceBase.cpp
   service/usServiceReferenceBasePrivate.cpp
   service/usServiceRegistrationBase.cpp
   service/usServiceRegistrationBasePrivate.cpp
   service/usServiceRegistry.cpp
-  service/usServiceRegistry_p.h
 
-  bundle/usCoreBundleActivator.cpp
-  bundle/usCoreBundleContext_p.h
-  bundle/usCoreBundleContext.cpp
   bundle/usBundle.cpp
   bundle/usBundleContext.cpp
   bundle/usBundleContextPrivate.cpp
-  bundle/usModuleElfFile.cpp
   bundle/usBundleEvent.cpp
   bundle/usBundleEventHook.cpp
   bundle/usBundleFindHook.cpp
   bundle/usBundleHooks.cpp
   bundle/usBundleInfo.cpp
-  bundle/usModuleMachOFile.cpp
   bundle/usBundleManifest.cpp
-  bundle/usModuleObjFile.cpp
-  bundle/usModulePEFile.cpp
   bundle/usBundlePrivate.cpp
   bundle/usBundleRegistry.cpp
   bundle/usBundleResource.cpp
@@ -58,19 +48,31 @@ set(_srcs
   bundle/usBundleResourceStream.cpp
   bundle/usBundleUtils.cpp
   bundle/usBundleVersion.cpp
+  bundle/usCoreBundleActivator.cpp
+  bundle/usCoreBundleContext.cpp
+  bundle/usModuleElfFile.cpp
+  bundle/usModuleMachOFile.cpp
+  bundle/usModuleObjFile.cpp
+  bundle/usModulePEFile.cpp
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
 
 set(_private_headers
   util/usFrameworkPrivate.h
+  util/usLDAPExpr_p.h
+  util/usProperties_p.h
   util/usThreads_p.h
   util/usUtils_p.h
   util/usWaitCondition_p.h
 
   service/usServiceHooks_p.h
+  service/usServiceListenerEntry_p.h
   service/usServiceListenerHook_p.h
-  service/usServicePropertiesImpl_p.h
+  service/usServiceListeners_p.h
+  service/usServiceReferenceBasePrivate.h
+  service/usServiceRegistrationBasePrivate.h
+  service/usServiceRegistry_p.h
   service/usServiceTracker.tpp
   service/usServiceTrackerPrivate.h
   service/usServiceTrackerPrivate.tpp
@@ -82,10 +84,13 @@ set(_private_headers
   bundle/usBundleAbstractTracked.tpp
   bundle/usBundleContextPrivate.h
   bundle/usBundleHooks_p.h
-  bundle/usModuleObjFile_p.h
+  bundle/usBundleInfo_p.h
+  bundle/usBundleManifest_p.h
   bundle/usBundlePrivate.h
   bundle/usBundleRegistry_p.h
   bundle/usBundleResourceBuffer_p.h
   bundle/usBundleResourceContainer_p.h
   bundle/usBundleUtils_p.h
+  bundle/usCoreBundleContext_p.h
+  bundle/usModuleObjFile_p.h
 )

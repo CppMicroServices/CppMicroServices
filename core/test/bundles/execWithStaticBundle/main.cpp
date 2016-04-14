@@ -17,7 +17,7 @@ using namespace us;
 /**
  * Test point to ensure the statically linked bundle is installed properly.
  */
-int main(int ac, char **av)
+int main(int , char **)
 {
   auto framework = FrameworkFactory().NewFramework();
   framework->Start();
@@ -25,10 +25,10 @@ int main(int ac, char **av)
   auto bundle = frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usTestExecutableWithStaticBundle" + EXE_EXT + "/TestStaticBundle");
   try 
   {
-	  if (bundle == nullptr)
-		  throw std::runtime_error("Static bundle not found in the executable");
-	  if (bundle->GetName() != "TestStaticBundle")
-		  throw std::runtime_error("Check bundle name failed - " + bundle->GetName());
+    if (bundle == nullptr)
+      throw std::runtime_error("Static bundle not found in the executable");
+    if (bundle->GetName() != "TestStaticBundle")
+      throw std::runtime_error("Check bundle name failed - " + bundle->GetName());
     bundle->Start();
     // Make sure the activator is called
     auto service = bundle->GetBundleContext()->GetServiceReference<TestBundleService>();
@@ -39,12 +39,10 @@ int main(int ac, char **av)
   }
   catch (const std::exception& ex)
   {
-	  std::cerr << ex.what() << std::endl;
-	  return -1;
+    std::cerr << ex.what() << std::endl;
+    return -1;
   }
   framework->Stop();
-  (void)ac;
-  (void)av;
   return 0;
 }
 

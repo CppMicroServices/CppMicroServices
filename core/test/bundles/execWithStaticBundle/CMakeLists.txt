@@ -15,7 +15,6 @@ set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
 add_executable(usTestExecutableWithStaticBundle main.cpp)
 
-#MESSAGE( STATUS "CppMicroServices_LIBRARIES:         " ${Core_TARGET})
 target_link_libraries(usTestExecutableWithStaticBundle ${Core_TARGET} TestStaticBundle)
 
 

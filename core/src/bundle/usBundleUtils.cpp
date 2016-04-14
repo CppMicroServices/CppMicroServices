@@ -113,15 +113,20 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   
 std::string GetExecutablePath()
 {
-  unsigned int bufSize = MAXPATHLEN;
-  char pathBuf[bufSize];
-  if (_NSGetExecutablePath(pathBuf, &bufSize) != 0)
+  uint32_t bufsize = MAXPATHLEN;
+  std::unique_ptr<char[]> buf(new char[bufsize]);
+  int status = _NSGetExecutablePath (buf.get(), &bufsize);
+  if (status == -1)
   {
-    US_DEBUG << "GetExecutablePath() - _NSGetExecutablePath failed";
-    pathBuf[0] = '\0';
+    buf.reset(new char[bufsize]);
+    status = _NSGetExecutablePath (buf.get(), &bufsize);
+  }
+  if (status != 0)
+  {
+    US_DEBUG << "_NSGetExecutablePath() failed";
   }
   // the returned path may not be an absolute path
-  return std::string(pathBuf);
+  return buf.get();
 }
   
 #else
@@ -150,7 +155,7 @@ struct FileInfo
   ino_t stat_ino;
   dev_t stat_dev;
   
-  FileInfo() : path(""), stat_ino(0), stat_dev(0) {}
+  FileInfo() = delete;  // remove default constructor
   
   explicit FileInfo(const std::string& inPath) : path(inPath), stat_ino(0), stat_dev(0)
   {
@@ -198,7 +203,7 @@ std::string GetLibraryPath_impl(void *symbol)
 
 std::string GetExecutablePath()
 {
-  char pathBuf[1024];	// assuming this is a large enough buffer.
+  char pathBuf[1024]; // assuming this is a large enough buffer.
   if (GetModuleFileNameA(nullptr, pathBuf, sizeof(pathBuf)) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
     US_DEBUG << "GetModuleFileName failed" << GetLastErrorStr();
@@ -213,7 +218,7 @@ struct FileInfo {
   DWORD nFileIndexHigh;
   DWORD nFileIndexLow;
   
-  FileInfo() : path(""), dwVolumeSerialNumber(0), nFileIndexHigh(0), nFileIndexLow(0) {}
+  FileInfo() = delete; // remove default constructor
   
   explicit FileInfo(const std::string& inPath) : path(inPath), dwVolumeSerialNumber(0), nFileIndexHigh(0), nFileIndexLow(0)
   {
@@ -313,7 +318,12 @@ void* GetSymbol(const BundleInfo& bundle, const char* symbol)
   
 bool IsCurrentExecutable(const std::string& filepath)
 {
-  return execInfo.path == filepath || execInfo == FileInfo(filepath); // Avoid constructing the FileInfo object if paths match
+  // If two path strings are equal they both refer to the same file. Even if the
+  // path strings are not equal, they may refer to the same file due to simlinks,
+  // relative paths etc. Hence we use the FileInfo object to compare the file
+  // identifiers
+  // Optimization: Avoid constructing the FileInfo object if strings match
+  return execInfo.path == filepath || execInfo == FileInfo(filepath);
 }
 
 } // namespace BundleUtils

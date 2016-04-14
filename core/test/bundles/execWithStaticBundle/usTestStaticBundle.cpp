@@ -57,7 +57,7 @@ public:
 
 private:
   std::shared_ptr<TestBundleImportedByExec> s;
-  ServiceRegistration<TestBundleImportedByExec> sr;
+  ServiceRegistration<TestBundleService> sr;
 };
 
 }

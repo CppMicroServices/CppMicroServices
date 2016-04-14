@@ -10,6 +10,7 @@
 
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
+#include "usTestBundleService.h"
 
 using namespace us;
 
@@ -28,6 +29,13 @@ int main(int ac, char **av)
 		  throw std::runtime_error("Static bundle not found in the executable");
 	  if (bundle->GetName() != "TestStaticBundle")
 		  throw std::runtime_error("Check bundle name failed - " + bundle->GetName());
+    bundle->Start();
+    // Make sure the activator is called
+    auto service = bundle->GetBundleContext()->GetServiceReference<TestBundleService>();
+    if (!service)
+    {
+      throw std::runtime_error("Could not find service from the statically linked bundle");
+    }
   }
   catch (const std::exception& ex)
   {

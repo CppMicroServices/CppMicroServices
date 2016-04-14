@@ -47,7 +47,7 @@ public:
   {
     s = std::make_shared<TestBundleImportedByExec>();
     US_INFO << "Registering TestBundleImportedByExec";
-    sr = context->RegisterService<TestBundleImportedByExec>(s);
+    sr = context->RegisterService<TestBundleService>(s);
   }
 
   void Stop(BundleContext*)

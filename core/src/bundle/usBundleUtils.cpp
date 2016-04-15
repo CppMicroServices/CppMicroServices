@@ -192,7 +192,7 @@ std::string GetLibraryPath_impl(void *symbol)
   }
 
   char bundlePath[512];
-  if (GetModuleFileNameA(handle, bundlePath, 512))
+  if (GetModuleFileName(handle, bundlePath, 512))
   {
     return bundlePath;
   }
@@ -204,7 +204,7 @@ std::string GetLibraryPath_impl(void *symbol)
 std::string GetExecutablePath()
 {
   char pathBuf[1024]; // assuming this is a large enough buffer.
-  if (GetModuleFileNameA(nullptr, pathBuf, sizeof(pathBuf)) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+  if (GetModuleFileName(nullptr, pathBuf, sizeof(pathBuf)) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
     US_DEBUG << "GetModuleFileName failed" << GetLastErrorStr();
     pathBuf[0] = '\0';
@@ -224,7 +224,7 @@ struct FileInfo {
   {
     if(!path.empty())
     {
-      HANDLE hFile = CreateFileA(path.c_str(),
+      HANDLE hFile = CreateFile(path.c_str(),
                                  0,
                                  0,
                                  NULL,
@@ -264,11 +264,11 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   
   if (IsCurrentExecutable(bundleInfo.location))
   {
-    handle = GetModuleHandleA(nullptr);
+    handle = GetModuleHandle(nullptr);
   }
   else
   {
-    handle = GetModuleHandleA(bundleInfo.location.c_str());
+    handle = GetModuleHandle(bundleInfo.location.c_str());
   }
   
   if (!handle)

@@ -18,3 +18,5 @@ add_subdirectory(libRWithLinkedResources)
 if(US_ENABLE_THREADING_SUPPORT)
   add_subdirectory(libC1)
 endif()
+
+add_subdirectory(execWithStaticBundle)

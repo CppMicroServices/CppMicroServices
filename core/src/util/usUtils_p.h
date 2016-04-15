@@ -53,7 +53,6 @@ namespace us {
 struct BundleInfo;
 class CoreBundleContext;
 
-std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
 
 }
 

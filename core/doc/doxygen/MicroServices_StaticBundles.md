@@ -2,8 +2,7 @@ Static Bundles    {#MicroServices_StaticBundles}
 ==============
 
 The normal and most flexible way to include a CppMicroServices bundle in an application is to compile
-it into a shared library that is either linked by another library (or executable) or
-\ref MicroServices_AutoLoading "auto-installed" during runtime.
+it into a shared library that is linked by another shared library (or executable).
 
 However, bundles can be linked statically to your application or shared library. This makes the deployment
 of your application less error-prone and in the case of a complete static build also minimizes its binary

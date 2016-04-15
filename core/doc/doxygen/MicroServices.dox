@@ -63,7 +63,6 @@ Micro Services library:
 - \subpage MicroServices_TheBundleContext
 - \subpage MicroServices_Resources
 - \subpage MicroServices_BundleProperties
-- \subpage MicroServices_AutoLoading
 - \subpage MicroServices_ServiceHooks
 - \subpage MicroServices_StaticBundles
 - \subpage MicroServices_EmulateSingleton
@@ -120,7 +119,6 @@ The links in the following list point to important
 - \ref MicroServices_TheBundleContext
 - \ref MicroServices_Resources
 - \ref MicroServices_BundleProperties
-- \ref MicroServices_AutoLoading
 - \ref MicroServices_ServiceHooks
 - \ref MicroServices_StaticBundles
 - \ref MicroServices_EmulateSingleton

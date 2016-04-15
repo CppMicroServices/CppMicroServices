@@ -43,13 +43,12 @@ macro(build_and_test)
 
 endmacro()
 
-function(create_initial_cache var _shared _threading _autoload)
+function(create_initial_cache var _shared _threading)
 
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON
       US_BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
-      US_ENABLE_AUTOLOADING_SUPPORT:BOOL=${_autoload}
       ")
   if(_shared)
     set(_initial_cache "${_initial_cache} US_BUILD_EXAMPLES:BOOL=ON
@@ -67,9 +66,6 @@ function(create_initial_cache var _shared _threading _autoload)
   if(_threading)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
   endif()
-  if(_autoload)
-    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-autoloading")
-  endif()
 
   set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME} (${_generator})" PARENT_SCOPE)
 
@@ -84,16 +80,12 @@ if(NOT CTEST_PARALLEL_LEVEL)
 endif()
 
 
-#            SHARED THREADING AUTOLOAD
+#            SHARED THREADING
 
-set(config0     0       0      0     )
-set(config1     0       0      1     )
-set(config2     0       1      0     )
-set(config3     0       1      1     )
-set(config4     1       0      0     )
-set(config5     1       0      1     )
-set(config6     1       1      0     )
-set(config7     1       1      1     )
+set(config0     0       0     )
+set(config1     0       1     )
+set(config2     1       0     )
+set(config3     1       1     )
 
 if(NOT US_CMAKE_GENERATOR)
   set(US_CMAKE_GENERATOR "Unix Makefiles")

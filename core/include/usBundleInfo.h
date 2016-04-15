@@ -47,7 +47,6 @@ struct US_Core_EXPORT BundleInfo
 
   std::string name;
   std::string location;
-  std::string autoLoadDir;
   long id;
 };
 

@@ -125,9 +125,6 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     auto framework = factory.NewFramework();
     framework->Start();
 
-    // auto-installing will skew the benchmark results.
-    framework->SetAutoLoadingEnabled(false);
-
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
     TestSerial(framework);
 

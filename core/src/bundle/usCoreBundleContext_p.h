@@ -29,7 +29,6 @@
 #include "usBundleHooks_p.h"
 #include "usServiceHooks_p.h"
 #include "usBundleRegistry_p.h"
-#include "usBundleSettings.h"
 #include "usAny.h"
 
 #include <string>
@@ -68,11 +67,6 @@ public:
    * All installed bundles.
    */
   BundleRegistry bundleRegistry;
-
-  /**
-   * This framework instance's settings
-   */
-  BundleSettings settings;
 
   /*
    * Framework properties, which contain both the

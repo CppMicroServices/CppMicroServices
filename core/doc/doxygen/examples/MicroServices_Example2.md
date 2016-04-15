@@ -39,7 +39,7 @@ have a link-time dependency on the shared library providing the service interfac
 (because of the out-of-line destructor) but not on any bundles containing
 service implementations. This often leads to bundles which do not export
 any symbols at all and hence need to be loaded into the running process
-manually or by using the \ref MicroServices_AutoLoading "auto-installing mechanism".
+manually.
 
 For an introduction how to compile our source code, see \ref MicroServices_Example1.
 

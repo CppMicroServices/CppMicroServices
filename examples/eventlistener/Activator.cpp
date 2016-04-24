@@ -69,7 +69,7 @@ private:
    */
   void ServiceChanged(const ServiceEvent event)
   {
-    std::string objectClass = ref_any_cast<std::list<std::string> >(event.GetServiceReference().GetProperty(ServiceConstants::OBJECTCLASS())).front();
+    std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(ServiceConstants::OBJECTCLASS())).front();
 
     if (event.GetType() == ServiceEvent::REGISTERED)
     {

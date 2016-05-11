@@ -179,7 +179,6 @@ void testLogMultiThreaded()
   // support compilers w/o c++11 regex support...
   // the regex approach is more strict in checking there is no 
   // log splicing however this suboptimal approach will do for now.
-  using count_type = std::vector<std::string>::iterator::difference_type;
   std::ptrdiff_t total_expected_matches = expected_num_matches * 3;
   std::vector<std::string> log_lines;
   std::string line;
@@ -189,7 +188,7 @@ void testLogMultiThreaded()
   }
   US_TEST_CONDITION_REQUIRED(static_cast<std::ptrdiff_t>(log_lines.size()) == total_expected_matches, "Test for expected number of matches");
 
-  count_type count = std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) { return (std::string::npos != s.find(std::string("MACRO: START foo"))); });
+  std::ptrdiff_t count = std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) { return (std::string::npos != s.find(std::string("MACRO: START foo"))); });
   US_TEST_CONDITION_REQUIRED(count == expected_num_matches, "Test for expected number of matches");
 
   count = std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) { return (std::string::npos != s.find(std::string("MACRO: END foo"))); });

@@ -44,7 +44,7 @@ class TestFrameworkListener
 {
 public:
   TestFrameworkListener() : _events() {}
-  virtual ~TestFrameworkListener() = default;
+  virtual ~TestFrameworkListener() {};
 
   std::size_t events_received() const { return _events.size(); }
 

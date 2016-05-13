@@ -56,7 +56,7 @@ public:
 
   bool IsOpen() const;
 
-  void FilterServiceReferences(BundleContext* context, const std::string& service,
+  void FilterServiceReferences(BundleContextPrivate* context, const std::string& service,
                                const std::string& filter, std::vector<ServiceReferenceBase>& refs);
 
   void FilterServiceEventReceivers(const ServiceEvent& evt,

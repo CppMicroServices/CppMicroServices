@@ -43,12 +43,6 @@
 
 namespace us {
 
-#ifdef US_PLATFORM_POSIX
-static const char PATH_SEPARATOR = '/';
-#else
-static const char PATH_SEPARATOR = '\\';
-#endif
-
 class SharedLibraryPrivate : public SharedData
 {
 public:
@@ -180,7 +174,7 @@ std::string SharedLibrary::GetName() const
 std::string SharedLibrary::GetFilePath(const std::string& name) const
 {
   if (!d->m_FilePath.empty()) return d->m_FilePath;
-  return GetLibraryPath() + PATH_SEPARATOR + GetPrefix() + name + GetSuffix();
+  return GetLibraryPath() + DIR_SEP + GetPrefix() + name + GetSuffix();
 }
 
 void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
@@ -191,7 +185,7 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
   d->m_FilePath = absoluteFilePath;
 
   std::string name = d->m_FilePath;
-  std::size_t pos = d->m_FilePath.find_last_of(PATH_SEPARATOR);
+  std::size_t pos = d->m_FilePath.find_last_of(DIR_SEP);
   if (pos != std::string::npos)
   {
     d->m_Path = d->m_FilePath.substr(0, pos);

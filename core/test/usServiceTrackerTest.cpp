@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 
@@ -29,7 +30,6 @@
 
 #include <usBundle.h>
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
 #include <usServiceInterface.h>
 #include <usServiceTracker.h>
 
@@ -76,14 +76,14 @@ class MyCustomizer : public us::ServiceTrackerCustomizer<MyInterfaceOne>
 
 public:
 
-  MyCustomizer(us::BundleContext* context)
+  MyCustomizer(const BundleContext& context)
     : m_context(context)
   {}
 
   virtual std::shared_ptr<MyInterfaceOne> AddingService(const ServiceReference<MyInterfaceOne>& reference)
   {
     US_TEST_CONDITION_REQUIRED(reference, "AddingService() valid reference")
-    return m_context->GetService(reference);
+    return m_context.GetService(reference);
   }
 
   virtual void ModifiedService(const ServiceReference<MyInterfaceOne>& reference, const std::shared_ptr<MyInterfaceOne>& service)
@@ -100,14 +100,14 @@ public:
 
 private:
 
-  us::BundleContext* m_context;
+  BundleContext m_context;
 };
 
-void TestFilterString(us::BundleContext* context)
+void TestFilterString(BundleContext context)
 {
   MyCustomizer customizer(context);
 
-  us::LDAPFilter filter("(" + us::ServiceConstants::SERVICE_ID() + ">=0)");
+  us::LDAPFilter filter("(" + us::Constants::SERVICE_ID + ">=0)");
   us::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
   tracker.Open();
 
@@ -117,28 +117,28 @@ void TestFilterString(us::BundleContext* context)
   auto serviceOne = std::make_shared<MyServiceOne>();
   auto serviceTwo = std::make_shared<MyServiceTwo>();
 
-  context->RegisterService<MyInterfaceOne>(serviceOne);
-  context->RegisterService<MyInterfaceTwo>(serviceTwo);
+  context.RegisterService<MyInterfaceOne>(serviceOne);
+  context.RegisterService<MyInterfaceTwo>(serviceTwo);
 
   US_TEST_CONDITION(tracker.GetServiceReferences().size() == 1, "tracking count")
 }
 
-void TestServiceTracker(us::BundleContext* context)
+void TestServiceTracker(BundleContext context)
 {
-  auto bundle = InstallTestBundle(context, "TestBundleS");
-  bundle->Start();
+  auto bundle = testing::InstallLib(context, "TestBundleS");
+  bundle.Start();
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
   std::string s1("us::TestBundleSService");
-  ServiceReferenceU servref = context->GetServiceReference(s1 + "0");
+  ServiceReferenceU servref = context.GetServiceReference(s1 + "0");
 
   US_TEST_CONDITION_REQUIRED(servref, "Test if registered service of id us::TestBundleSService0");
 
-  ServiceReference<ServiceControlInterface> servCtrlRef = context->GetServiceReference<ServiceControlInterface>();
+  ServiceReference<ServiceControlInterface> servCtrlRef = context.GetServiceReference<ServiceControlInterface>();
   US_TEST_CONDITION_REQUIRED(servCtrlRef, "Test if constrol service was registered");
 
-  auto serviceController = context->GetService(servCtrlRef);
+  auto serviceController = context.GetService(servCtrlRef);
   US_TEST_CONDITION_REQUIRED(serviceController, "Test valid service controller");
 
   std::unique_ptr<ServiceTracker<void> > st1(new ServiceTracker<void>(context, servref));
@@ -168,7 +168,7 @@ void TestServiceTracker(us::BundleContext* context)
   US_TEST_CONDITION_REQUIRED(sa2.empty(), "Checking ServiceTracker size");
 
   // 8. A new Servicetracker, this time with a filter for the object
-  std::string fs = std::string("(") + ServiceConstants::OBJECTCLASS() + "=" + s1 + "*" + ")";
+  std::string fs = std::string("(") + Constants::OBJECTCLASS + "=" + s1 + "*" + ")";
   LDAPFilter f1(fs);
   st1.reset(new ServiceTracker<void>(context, f1));
   // add a service
@@ -212,7 +212,7 @@ void TestServiceTracker(us::BundleContext* context)
 
   // 13. Get the highest ranking service reference, it should have ranking 7
   ServiceReferenceU h1 = st1->GetServiceReference();
-  int rank = any_cast<int>(h1.GetProperty(ServiceConstants::SERVICE_RANKING()));
+  int rank = any_cast<int>(h1.GetProperty(Constants::SERVICE_RANKING));
   US_TEST_CONDITION_REQUIRED(rank == 7, "Check service rank");
 
   // 14. Get the service of the highest ranked service reference
@@ -263,10 +263,10 @@ int usServiceTrackerTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  TestFilterString(framework->GetBundleContext());
-  TestServiceTracker(framework->GetBundleContext());
+  TestFilterString(framework.GetBundleContext());
+  TestServiceTracker(framework.GetBundleContext());
 
   US_TEST_END()
 }

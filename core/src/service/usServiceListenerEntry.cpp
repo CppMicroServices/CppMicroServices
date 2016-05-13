@@ -47,7 +47,7 @@ public:
   ServiceListenerEntryData(const ServiceListenerEntryData&) = delete;
   ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
 
-  ServiceListenerEntryData(BundleContext* context, const ServiceListener& l,
+  ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
                            void* data, const std::string& filter)
     : ServiceListenerHook::ListenerInfoData(context, l, data, filter)
     , ldap()
@@ -120,8 +120,11 @@ void ServiceListenerEntry::SetRemoved(bool removed) const
   d->bRemoved = removed;
 }
 
-ServiceListenerEntry::ServiceListenerEntry(BundleContext* context, const ServiceListener& l,
-                                           void* data, const std::string& filter)
+ServiceListenerEntry::ServiceListenerEntry(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const ServiceListener& l,
+    void* data,
+    const std::string& filter)
   : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, filter))
 {
 }
@@ -154,7 +157,7 @@ std::size_t ServiceListenerEntry::Hash() const
   if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0)
   {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
-        ((hash<BundleContext*>()(d->context) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
+        ((hash<BundleContextPrivate*>()(d->context.get()) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
         (hash<ServiceListener>()(d->listener) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;

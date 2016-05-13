@@ -108,7 +108,32 @@ public:
      * <p>
      * The bundle has been removed from the Framework.
      */
-    UNINSTALLED
+    UNINSTALLED,
+
+    /**
+     * The bundle has been resolved.
+     *
+     * @see Bundle#RESOLVED
+     */
+    RESOLVED,
+
+    /**
+     * The bundle has been unresolved.
+     *
+     * @see Bundle#INSTALLED
+     */
+    UNRESOLVED,
+
+    /**
+     * The bundle will be lazily activated.
+     * <p>
+     * The bundle has a {@link Constants#ACTIVATION_LAZY lazy activation policy}
+     * and is waiting to be activated. It is now in the {@link Bundle#STARTING
+     * STARTING} state and has a valid {@code BundleContext}. This event is only
+     * delivered to {@link SynchronousBundleListener}s. It is not delivered to
+     * {@code BundleListener}s.
+     */
+    LAZY_ACTIVATION
 
   };
 
@@ -132,9 +157,21 @@ public:
    * Creates a bundle event of the specified type.
    *
    * @param type The event type.
-   * @param bundle The bundle which had a lifecycle change.
+   * @param bundle The bundle which had a lifecycle change. This bundle is
+   *        used as the origin of the event.
    */
-  BundleEvent(Type type, const std::shared_ptr<Bundle>& bundle);
+  BundleEvent(Type type, const Bundle& bundle);
+
+  /**
+   * Creates a bundle event of the specified type.
+   *
+   * @param type The event type.
+   * @param bundle The bundle which had a lifecycle change.
+   * @param origin The bundle which is the origin of the event. For the event
+   *        type {@link #INSTALLED}, this is the bundle whose context was used
+   *        to install the bundle. Otherwise it is the bundle itself.
+   */
+  BundleEvent(Type type, const Bundle& bundle, const Bundle& origin);
 
   BundleEvent(const BundleEvent& other);
 
@@ -145,22 +182,36 @@ public:
    *
    * @return The bundle that had a change occur in its lifecycle.
    */
-  std::shared_ptr<Bundle> GetBundle() const;
+  Bundle GetBundle() const;
 
   /**
    * Returns the type of lifecyle event. The type values are:
    * <ul>
    * <li>{@link #INSTALLED}
+   * <li>{@link #RESOLVED}
+   * <li>{@link #LAZY_ACTIVATION}
    * <li>{@link #STARTING}
    * <li>{@link #STARTED}
    * <li>{@link #STOPPING}
    * <li>{@link #STOPPED}
+   * <li>{@link #UNRESOLVED}
    * <li>{@link #UNINSTALLED}
    * </ul>
    *
    * @return The type of lifecycle event.
    */
   Type GetType() const;
+
+  /**
+   * Returns the bundle that was the origin of the event.
+   *
+   * <p>
+   * For the event type {@link #INSTALLED}, this is the bundle whose context
+   * was used to install the bundle. Otherwise it is the bundle itself.
+   *
+   * @return The bundle that was the origin of the event.
+   */
+  Bundle GetOrigin() const;
 
 };
 

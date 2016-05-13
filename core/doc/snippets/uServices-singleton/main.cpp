@@ -17,22 +17,22 @@ public:
   {}
 
   //![0]
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     // First create and register a SingletonTwoService instance.
     m_SingletonTwo = std::make_shared<SingletonTwoService>();
-    m_SingletonTwoReg = context->RegisterService<SingletonTwoService>(m_SingletonTwo);
+    m_SingletonTwoReg = context.RegisterService<SingletonTwoService>(m_SingletonTwo);
     // Framework service registry has shared ownership of the SingletonTwoService instance
 
     // Now the SingletonOneService constructor will get a valid
     // SingletonTwoService instance.
     m_SingletonOne = std::make_shared<SingletonOneService>();
-    m_SingletonOneReg = context->RegisterService<SingletonOneService>(m_SingletonOne);
+    m_SingletonOneReg = context.RegisterService<SingletonOneService>(m_SingletonOne);
   }
   //![0]
 
   //![1]
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     // Services are automatically unregistered during unloading of
     // the shared library after the call to Stop(BundleContext*)

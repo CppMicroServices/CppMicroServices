@@ -29,25 +29,31 @@ std::string any_value_to_string(const Any& any)
   return any.ToString();
 }
 
+std::ostream& any_value_to_string(std::ostream& os, const Any& any)
+{
+  os << any.ToString();
+  return os;
+}
+
 std::string any_value_to_json(const Any& val)
 {
   return val.ToJSON();
 }
 
-std::string any_value_to_json(const std::string& val)
+std::ostream& any_value_to_json(std::ostream& os, const Any& val)
 {
-  return '"' + val + '"';
+  os << val.ToJSON();
+  return os;
 }
 
-std::string any_value_to_json(bool val)
+std::ostream& any_value_to_json(std::ostream& os, const std::string& val)
 {
-  return val ? "true" : "false";
+  return os << '"' << val << '"';
 }
 
-bool operator==(const Any& a1, const Any& a2)
+std::ostream& any_value_to_json(std::ostream& os, bool val)
 {
-  if (a1.Type() != a2.Type()) return false;
-  return a1.ToString() == a2.ToString();
+  return os << (val ? "true" : "false");
 }
 
 }

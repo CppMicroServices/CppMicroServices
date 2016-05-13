@@ -19,10 +19,10 @@
 
 =============================================================================*/
 
+#include "usAbstractWebConsolePlugin.h"
 #include "usWebConsoleServlet_p.h"
 
 #include "usWebConsoleConstants.h"
-#include "usAbstractWebConsolePlugin.h"
 #include "usWebConsoleVariableResolver.h"
 #include "usVariableResolverStreamBuffer_p.h"
 

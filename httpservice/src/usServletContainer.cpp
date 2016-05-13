@@ -19,6 +19,8 @@
 
 =============================================================================*/
 
+#include "usGetBundleContext.h"
+
 #include "usServletContainer.h"
 #include "usServletContainer_p.h"
 
@@ -31,7 +33,6 @@
 #include "usServletContext.h"
 #include "usServletConfig_p.h"
 
-#include "usGetBundleContext.h"
 #include "usBundleContext.h"
 #include "usBundle.h"
 
@@ -175,14 +176,14 @@ std::shared_ptr<ServletHandler> ServletContainerPrivate::AddingService(const Ser
   Any contextRoot = reference.GetProperty(HttpServlet::PROP_CONTEXT_ROOT());
   if (contextRoot.Empty())
   {
-    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is missing the context root property." << std::endl;
+    std::cout << "HttpServlet from " << reference.GetBundle().GetSymbolicName() << " is missing the context root property." << std::endl;
     return nullptr;
   }
 
-  auto servlet = m_Context->GetService(reference);
+  auto servlet = m_Context.GetService(reference);
   if (!servlet)
   {
-    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is nullptr." << std::endl;
+    std::cout << "HttpServlet from " << reference.GetBundle().GetSymbolicName() << " is nullptr." << std::endl;
     return nullptr;
   }
   std::shared_ptr<ServletContext> servletContext(new ServletContext(q));

@@ -29,8 +29,10 @@
 
 #include <usGlobalConfig.h>
 
+#include <atomic>
+
 namespace us {
-class BundleContext;
+class BundleContextPrivate;
 }
 
 /**
@@ -52,17 +54,17 @@ class BundleContext;
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateBundleInit()</code>.
  */
-#define US_INITIALIZE_BUNDLE                                                                                                   \
-  us::BundleContext* US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME) = 0;                            \
-                                                                                                                               \
-  extern "C" US_ABI_EXPORT us::BundleContext* US_CONCAT(_us_get_bundle_context_instance_, US_BUNDLE_NAME) () \
-  {                                                                                                                            \
-    return US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME);                                                            \
-  }                                                                                                                            \
-                                                                                                                               \
-  extern "C" US_ABI_EXPORT void US_CONCAT(_us_set_bundle_context_instance_, US_BUNDLE_NAME) (us::BundleContext* ctx) \
-  {                                                                                                                                    \
-    US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME) = ctx;                                                                     \
+#define US_INITIALIZE_BUNDLE                                                                                         \
+  std::atomic<us::BundleContextPrivate*> US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME) {};                 \
+                                                                                                                     \
+  extern "C" US_ABI_EXPORT us::BundleContextPrivate* US_CONCAT(_us_get_bundle_context_instance_, US_BUNDLE_NAME) ()  \
+  {                                                                                                                  \
+    return US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME).load();                                           \
+  }                                                                                                                  \
+                                                                                                                     \
+  extern "C" US_ABI_EXPORT void US_CONCAT(_us_set_bundle_context_instance_, US_BUNDLE_NAME) (us::BundleContextPrivate* ctx) \
+  {                                                                                                                  \
+    US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME).store(ctx);                                              \
   }
 
 

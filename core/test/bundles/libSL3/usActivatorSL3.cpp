@@ -53,14 +53,21 @@ class SL3ServiceTrackerCustomizer : public ServiceTrackerCustomizer<FooService>
 
 public:
 
-  SL3ServiceTrackerCustomizer(std::shared_ptr<SL3BundlePropsImpl> propService, BundleContext* bc) : bundlePropsService(propService), context(bc) {}
-  virtual ~SL3ServiceTrackerCustomizer() { context = NULL; }
+  SL3ServiceTrackerCustomizer(
+      const std::shared_ptr<SL3BundlePropsImpl>& propService,
+      const BundleContext& bc
+      )
+    : bundlePropsService(propService)
+    , context(bc)
+  {}
+
+  virtual ~SL3ServiceTrackerCustomizer() { context = nullptr; }
 
   std::shared_ptr<FooService> AddingService(const ServiceReference<FooService>& reference)
   {
     bundlePropsService->SetProperty("serviceAdded", true);
 
-    std::shared_ptr<FooService> fooService = context->GetService<FooService>(reference);
+    std::shared_ptr<FooService> fooService = context.GetService<FooService>(reference);
     fooService->foo();
     return fooService;
   }
@@ -78,7 +85,7 @@ public:
 private:
 
   std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
-  BundleContext* context;
+  BundleContext context;
 
 };
 
@@ -88,24 +95,24 @@ class ActivatorSL3 :
 
 public:
 
-  ActivatorSL3() : trackerCustomizer(nullptr), tracker(nullptr), context(nullptr) {}
+  ActivatorSL3() : trackerCustomizer(nullptr), tracker(nullptr), context() {}
 
   ~ActivatorSL3()
   {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     this->context = context;
     bundlePropsService = std::make_shared<SL3BundlePropsImpl>();
     InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
     im->insert(std::make_pair(std::string("ActivatorSL3"), bundlePropsService));
-    sr = context->RegisterService(im);
+    sr = context.RegisterService(im);
     trackerCustomizer.reset(new SL3ServiceTrackerCustomizer(bundlePropsService, context));
     tracker.reset(new FooTracker(context, trackerCustomizer.get()));
     tracker->Open();
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     tracker->Close();
     tracker.reset();
@@ -119,7 +126,7 @@ private:
   typedef ServiceTracker<FooService> FooTracker;
   std::unique_ptr<SL3ServiceTrackerCustomizer> trackerCustomizer;
   std::unique_ptr<FooTracker> tracker;
-  BundleContext* context;
+  BundleContext context;
 
   ServiceRegistrationU sr;
 

@@ -59,11 +59,11 @@ public:
    *
    * @param context the bundle context for this bundle.
    */
-  void Start(BundleContext *context)
+  void Start(BundleContext context)
   {
     // Query for all service references matching any language.
     std::vector<ServiceReference<IDictionaryService> > refs =
-        context->GetServiceReferences<IDictionaryService>("(Language=*)");
+        context.GetServiceReferences<IDictionaryService>("(Language=*)");
 
     if (!refs.empty())
     {
@@ -87,7 +87,7 @@ public:
 
         // First, get a dictionary service and then check
         // if the word is correct.
-        std::shared_ptr<IDictionaryService> dictionary = context->GetService<IDictionaryService>(refs.front());
+        std::shared_ptr<IDictionaryService> dictionary = context.GetService<IDictionaryService>(refs.front());
         if ( dictionary->CheckWord( word ) )
         {
           std::cout << "Correct." << std::endl;
@@ -109,7 +109,7 @@ public:
    * the C++ Micro Services library will automatically unget any used services.
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     // NOTE: The service is automatically released.
   }

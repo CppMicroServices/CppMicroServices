@@ -128,15 +128,15 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       {
         auto l2 = d->properties.Lock(); US_UNUSED(l2);
 
-        Any any = d->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+        Any any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
 
-        classes = ref_any_cast<std::vector<std::string> >(d->properties.Value_unlocked(ServiceConstants::OBJECTCLASS()));
+        classes = ref_any_cast<std::vector<std::string> >(d->properties.Value_unlocked(Constants::OBJECTCLASS));
 
-        long int sid = any_cast<long int>(d->properties.Value_unlocked(ServiceConstants::SERVICE_ID()));
+        long int sid = any_cast<long int>(d->properties.Value_unlocked(Constants::SERVICE_ID));
         d->properties = ServiceRegistry::CreateServiceProperties(props, classes, false, false, sid);
 
-        any = d->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+        any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int)) new_rank = any_cast<int>(any);
       }
     }
@@ -224,7 +224,7 @@ void ServiceRegistrationBase::Unregister()
       {
         try
         {
-          serviceFactory->UngetService(i.first, *this, service);
+          serviceFactory->UngetService(MakeBundle(i.first->shared_from_this()), *this, service);
         }
         catch (const std::exception& /*ue*/)
         {
@@ -238,7 +238,7 @@ void ServiceRegistrationBase::Unregister()
     {
       try
       {
-        serviceFactory->UngetService(i.first, *this, i.second);
+        serviceFactory->UngetService(MakeBundle(i.first->shared_from_this()), *this, i.second);
       }
       catch (const std::exception& /*ue*/)
       {

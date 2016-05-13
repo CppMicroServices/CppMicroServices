@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 
@@ -29,7 +30,7 @@
 
 #include <usBundle.h>
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
+#include <usConstants.h>
 #include <usSharedLibrary.h>
 #include <usServiceEvent.h>
 
@@ -42,20 +43,20 @@ class TestServiceListener
 
 private:
 
-  friend bool runStartStopTest(const std::string&, int cnt, const std::shared_ptr<Bundle>&,
-                                BundleContext* context,
-                                const std::vector<ServiceEvent::Type>&);
+  friend bool runStartStopTest(const std::string&, int cnt, const Bundle&,
+                               const BundleContext& context,
+                               const std::vector<ServiceEvent::Type>&);
 
   const bool checkUsingBundles;
   std::vector<ServiceEvent> events;
 
   bool teststatus;
 
-  BundleContext* context;
+  BundleContext context;
 
 public:
 
-  TestServiceListener(BundleContext* context, bool checkUsingBundles = true)
+  TestServiceListener(const BundleContext& context, bool checkUsingBundles = true)
     : checkUsingBundles(checkUsingBundles), events(), teststatus(true), context(context)
   {}
 
@@ -97,8 +98,7 @@ public:
       ServiceReferenceU sr = evt.GetServiceReference();
 
       // Validate that no bundle is marked as using the service
-      std::vector<std::shared_ptr<Bundle>> usingBundles;
-      sr.GetUsingBundles(usingBundles);
+      std::vector<Bundle> usingBundles = sr.GetUsingBundles();
       if (checkUsingBundles && !usingBundles.empty())
       {
         teststatus = false;
@@ -106,8 +106,8 @@ public:
       }
 
       // Check if the service can be fetched
-      InterfaceMapConstPtr service = context->GetService(sr);
-      sr.GetUsingBundles(usingBundles);
+      InterfaceMapConstPtr service = context.GetService(sr);
+      usingBundles = sr.GetUsingBundles();
       // if (UNREGISTERSERVICE_VALID_DURING_UNREGISTERING) {
       // In this mode the service shall be obtainable during
       // unregistration.
@@ -152,10 +152,10 @@ public:
       // using the service registry.
       try
       {
-        long sid = any_cast<long>(sr.GetProperty(ServiceConstants::SERVICE_ID()));
+        long sid = any_cast<long>(sr.GetProperty(Constants::SERVICE_ID));
         std::stringstream ss;
-        ss << "(" << ServiceConstants::SERVICE_ID() << "=" << sid << ")";
-        std::vector<ServiceReferenceU> srs = context->GetServiceReferences("", ss.str());
+        ss << "(" << Constants::SERVICE_ID << "=" << sid << ")";
+        std::vector<ServiceReferenceU> srs = context.GetServiceReferences("", ss.str());
         if (srs.empty())
         {
           US_TEST_OUTPUT( << "ServiceReference for UNREGISTERING service is not"
@@ -186,13 +186,12 @@ public:
 
   void printUsingBundles(const ServiceReferenceU& sr, const std::string& caption)
   {
-    std::vector<std::shared_ptr<Bundle>> usingBundles;
-    sr.GetUsingBundles(usingBundles);
+    std::vector<Bundle> usingBundles = sr.GetUsingBundles();
 
     US_TEST_OUTPUT( << (caption.empty() ? "Using bundles: " : caption) );
     for (auto const& bundle : usingBundles)
     {
-      US_TEST_OUTPUT( << "  -" << (*bundle) );
+      US_TEST_OUTPUT( << "  -" << bundle );
     }
   }
 
@@ -217,9 +216,9 @@ public:
 
 }; // end of class ServiceListener
 
-bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bundle>& bundle,
-                       BundleContext* context,
-                       const std::vector<ServiceEvent::Type>& events)
+bool runStartStopTest(const std::string& name, int cnt, Bundle& bundle,
+                      BundleContext context,
+                      const std::vector<ServiceEvent::Type>& events)
 {
   bool teststatus = true;
 
@@ -228,8 +227,8 @@ bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bu
     TestServiceListener sListen(context);
     try
     {
-      context->AddServiceListener(&sListen, &TestServiceListener::serviceChanged);
-      //context->AddServiceListener(MessageDelegate1<ServiceListener, const ServiceEvent&>(&sListen, &ServiceListener::serviceChanged));
+      context.AddServiceListener(&sListen, &TestServiceListener::serviceChanged);
+      //context.AddServiceListener(MessageDelegate1<ServiceListener, const ServiceEvent&>(&sListen, &ServiceListener::serviceChanged));
     }
     catch (const std::logic_error& ise)
     {
@@ -241,7 +240,7 @@ bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bu
     // Start the test target to get a service published.
     try
     {
-      bundle->Start();
+      bundle.Start();
     }
     catch (const std::exception& e)
     {
@@ -253,7 +252,7 @@ bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bu
     // Stop the test target to get a service unpublished.
     try
     {
-      bundle->Stop();
+      bundle.Stop();
     }
     catch (const std::exception& e)
     {
@@ -271,8 +270,8 @@ bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bu
 
     try
     {
-      context->RemoveServiceListener(&sListen, &TestServiceListener::serviceChanged);
-      teststatus &= sListen.teststatus;
+      context.RemoveServiceListener(&sListen, &TestServiceListener::serviceChanged);
+      teststatus &= sListen.getTestStatus();
       sListen.clearEvents();
     }
     catch (const std::logic_error& ise)
@@ -285,19 +284,19 @@ bool runStartStopTest(const std::string& name, int cnt, const std::shared_ptr<Bu
   return teststatus;
 }
 
-void frameSL02a(const std::shared_ptr<Framework>& framework)
+void frameSL02a(const Framework& framework)
 {
-  BundleContext* context = framework->GetBundleContext();
+  auto context = framework.GetBundleContext();
 
   TestServiceListener listener1(context);
   TestServiceListener listener2(context);
 
   try
   {
-    context->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
-    context->AddServiceListener(&listener1, &TestServiceListener::serviceChanged);
-    context->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
-    context->AddServiceListener(&listener2, &TestServiceListener::serviceChanged);
+    context.RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
+    context.AddServiceListener(&listener1, &TestServiceListener::serviceChanged);
+    context.RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+    context.AddServiceListener(&listener2, &TestServiceListener::serviceChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -305,8 +304,8 @@ void frameSL02a(const std::shared_ptr<Framework>& framework)
                         << " : frameSL02a:FAIL" );
   }
 
-  auto bundle = InstallTestBundle(context, "TestBundleA");
-  bundle->Start();
+  auto bundle = testing::InstallLib(context, "TestBundleA");
+  bundle.Start();
 
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
@@ -314,44 +313,44 @@ void frameSL02a(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION(listener1.checkEvents(events), "Check first service listener")
   US_TEST_CONDITION(listener2.checkEvents(events), "Check second service listener")
 
-  context->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
-  context->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+  context.RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
+  context.RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
 
-  bundle->Stop();
+  bundle.Stop();
 }
 
-void frameSL05a(const std::shared_ptr<Framework>& framework)
+void frameSL05a(const Framework& framework)
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
 
-  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
+  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
 
-  bool testStatus = runStartStopTest("FrameSL05a", 1, bundle, framework->GetBundleContext(), events);
+  bool testStatus = runStartStopTest("FrameSL05a", 1, bundle, framework.GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
 
-void frameSL10a(const std::shared_ptr<Framework>& framework)
+void frameSL10a(const Framework& framework)
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
 
-  auto bundle = InstallTestBundle(framework->GetBundleContext(), "TestBundleA2");
+  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleA2");
 
-  bool testStatus = runStartStopTest("FrameSL10a", 1, bundle, framework->GetBundleContext(), events);
+  bool testStatus = runStartStopTest("FrameSL10a", 1, bundle, framework.GetBundleContext(), events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
 
-void frameSL25a(const std::shared_ptr<Framework>& framework)
+void frameSL25a(const Framework& framework)
 {
-  BundleContext* context = framework->GetBundleContext();
+  auto context = framework.GetBundleContext();
 
   TestServiceListener sListen(context, false);
   try
   {
-    context->AddServiceListener(&sListen, &TestServiceListener::serviceChanged);
+    context.AddServiceListener(&sListen, &TestServiceListener::serviceChanged);
   }
   catch (const std::logic_error& ise)
   {
@@ -359,9 +358,9 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
     throw;
   }
 
-  auto libSL1 = InstallTestBundle(context, "TestBundleSL1");
-  auto libSL3 = InstallTestBundle(context, "TestBundleSL3");
-  auto libSL4 = InstallTestBundle(context, "TestBundleSL4");
+  auto libSL1 = testing::InstallLib(context, "TestBundleSL1");
+  auto libSL3 = testing::InstallLib(context, "TestBundleSL3");
+  auto libSL4 = testing::InstallLib(context, "TestBundleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
@@ -382,8 +381,8 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   // Start libBundleTestSL1 to ensure that the Service interface is available.
   try
   {
-    US_TEST_OUTPUT( << "Starting libBundleTestSL1: " << libSL1->GetLocation() );
-    libSL1->Start();
+    US_TEST_OUTPUT( << "Starting libBundleTestSL1: " << libSL1.GetLocation() );
+    libSL1.Start();
   }
   catch (const std::exception& e)
   {
@@ -395,8 +394,8 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   // us::FooService
   try
   {
-    US_TEST_OUTPUT( << "Starting libBundleTestSL4: " << libSL4->GetLocation() );
-    libSL4->Start();
+    US_TEST_OUTPUT( << "Starting libBundleTestSL4: " << libSL4.GetLocation() );
+    libSL4.Start();
   }
   catch (const std::exception& e)
   {
@@ -407,8 +406,8 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   // Start libBundleTestSL3 that will require the serivce interface and get the service
   try
   {
-    US_TEST_OUTPUT( << "Starting libBundleTestSL3: " << libSL3->GetLocation() );
-    libSL3->Start();
+    US_TEST_OUTPUT( << "Starting libBundleTestSL3: " << libSL3.GetLocation() );
+    libSL3.Start();
   }
   catch (const std::exception& e)
   {
@@ -420,12 +419,12 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   US_TEST_OUTPUT( << "Check that FooService is added to service tracker in libSL3" );
   try
   {
-    ServiceReferenceU libSL3SR = context->GetServiceReference("ActivatorSL3");
-    InterfaceMapConstPtr libSL3Activator = context->GetService(libSL3SR);
+    ServiceReferenceU libSL3SR = context.GetServiceReference("ActivatorSL3");
+    InterfaceMapConstPtr libSL3Activator = context.GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(libSL3Activator && !libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
-    auto propsInterface = context->GetService(libSL3PropsI);
+    auto propsInterface = context.GetService(libSL3PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "BundlePropsInterface != 0");
 
     BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
@@ -443,12 +442,12 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   US_TEST_OUTPUT( << "Check that FooService is added to service tracker in libSL1" );
   try
   {
-    ServiceReferenceU libSL1SR = context->GetServiceReference("ActivatorSL1");
-    auto libSL1Activator = context->GetService(libSL1SR);
+    ServiceReferenceU libSL1SR = context.GetServiceReference("ActivatorSL1");
+    auto libSL1Activator = context.GetService(libSL1SR);
     US_TEST_CONDITION_REQUIRED(libSL1Activator && !libSL1Activator->empty(), "ActivatorSL1 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL1PropsI(libSL1SR);
-    auto propsInterface = context->GetService(libSL1PropsI);
+    auto propsInterface = context.GetService(libSL1PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to BundlePropsInterface");
 
     BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
@@ -465,8 +464,8 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   // Stop the service provider: libSL4
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL4: " << libSL4->GetLocation() );
-    libSL4->Stop();
+    US_TEST_OUTPUT( << "Stop libSL4: " << libSL4.GetLocation() );
+    libSL4.Stop();
   }
   catch (const std::exception& e)
   {
@@ -478,12 +477,12 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   US_TEST_OUTPUT( << "Check that FooService is removed from service tracker in libSL3" );
   try
   {
-    ServiceReferenceU libSL3SR = context->GetServiceReference("ActivatorSL3");
-    auto libSL3Activator = context->GetService(libSL3SR);
+    ServiceReferenceU libSL3SR = context.GetServiceReference("ActivatorSL3");
+    auto libSL3Activator = context.GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(libSL3Activator && !libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
-    auto propsInterface = context->GetService(libSL3PropsI);
+    auto propsInterface = context.GetService(libSL3PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to BundlePropsInterface");
 
     BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceRemoved");
@@ -501,8 +500,8 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   // Stop libSL1
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL1:" << libSL1->GetLocation() );
-    libSL1->Stop();
+    US_TEST_OUTPUT( << "Stop libSL1:" << libSL1.GetLocation() );
+    libSL1.Stop();
   }
   catch (const std::exception& e)
   {
@@ -513,8 +512,8 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   // Stop pSL3
   try
   {
-    US_TEST_OUTPUT( << "Stop libSL3:" << libSL3->GetLocation() );
-    libSL3->Stop();
+    US_TEST_OUTPUT( << "Stop libSL3:" << libSL3.GetLocation() );
+    libSL3.Stop();
   }
   catch (const std::exception& e)
   {
@@ -532,7 +531,7 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION_REQUIRED(sListen.getTestStatus(), "Service listener checks");
   try
   {
-    context->RemoveServiceListener(&sListen, &TestServiceListener::serviceChanged);
+    context.RemoveServiceListener(&sListen, &TestServiceListener::serviceChanged);
     sListen.clearEvents();
   }
   catch (const std::logic_error& ise)
@@ -548,7 +547,7 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
   frameSL02a(framework);
   frameSL05a(framework);

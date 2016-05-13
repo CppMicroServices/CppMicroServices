@@ -52,7 +52,7 @@ class US_ABI_LOCAL Activator : public BundleActivator
 public:
 
   Activator()
-   : m_context(nullptr)
+   : m_context()
    , m_tracker(nullptr)
   {}
 
@@ -71,13 +71,13 @@ public:
    *
    * @param context the bundle context for this bundle.
    */
-  void Start(BundleContext *context)
+  void Start(BundleContext context)
   {
     m_context = context;
 
     // Create a service tracker to monitor dictionary services.
     m_tracker = new ServiceTracker<IDictionaryService>(
-                  m_context, LDAPFilter(std::string("(&(") + ServiceConstants::OBJECTCLASS() + "=" +
+                  m_context, LDAPFilter(std::string("(&(") + Constants::OBJECTCLASS + "=" +
                                         us_service_interface_iid<IDictionaryService>() + ")" +
                                         "(Language=*))")
                   );
@@ -128,14 +128,14 @@ public:
    * the C++ Micro Services library will automatically unget any used services.
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
   }
 
 private:
 
   // Bundle context
-  BundleContext* m_context;
+  BundleContext m_context;
 
   // The service tracker
   ServiceTracker<IDictionaryService>* m_tracker;

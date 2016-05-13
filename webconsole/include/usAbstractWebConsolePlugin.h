@@ -180,7 +180,8 @@ protected:
 
 protected:
 
-  std::string ReadTemplateFile(const std::string& templateFile, us::BundleContext* context = us::GetBundleContext()) const;
+  std::string ReadTemplateFile(const std::string& templateFile,
+                               us::BundleContext context = us::GetBundleContext()) const;
 
 private:
 

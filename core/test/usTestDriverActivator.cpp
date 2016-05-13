@@ -37,13 +37,13 @@ bool TestDriverActivator::StartCalled()
   return m_Instance ? m_Instance->m_StartCalled : false;
 }
 
-void TestDriverActivator::Start(BundleContext*)
+void TestDriverActivator::Start(BundleContext)
 {
   this->m_Instance = this;
   this->m_StartCalled = true;
 }
 
-void TestDriverActivator::Stop(BundleContext*)
+void TestDriverActivator::Stop(BundleContext)
 {
   this->m_Instance = nullptr;
 }

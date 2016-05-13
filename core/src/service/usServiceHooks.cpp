@@ -20,10 +20,11 @@
 
 =============================================================================*/
 
-#include "usServiceHooks_p.h"
-
 #include "usGetBundleContext.h"
+#include "usServiceHooks_p.h"
+#include "usBundle.h"
 #include "usCoreBundleContext_p.h"
+#include "usBundleContextPrivate.h"
 #include "usServiceEventListenerHook.h"
 #include "usServiceFindHook.h"
 #include "usServiceListenerHook.h"
@@ -46,19 +47,19 @@ ServiceHooks::~ServiceHooks()
 
 std::shared_ptr<ServiceListenerHook> ServiceHooks::AddingService(const ServiceReference<ServiceListenerHook>& reference)
 {
-  auto lh = GetBundleContext()->GetService(reference);
+  auto lh = GetBundleContext().GetService(reference);
   try
   {
     lh->Added(coreCtx->listeners.GetListenerInfoCollection());
   }
   catch (const std::exception& e)
   {
-    US_WARN << "Failed to call listener hook  #" << reference.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+    US_WARN << "Failed to call listener hook  #" << reference.GetProperty(Constants::SERVICE_ID).ToString()
                << ": " << e.what();
   }
   catch (...)
   {
-    US_WARN << "Failed to call listener hook  #" << reference.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+    US_WARN << "Failed to call listener hook  #" << reference.GetProperty(Constants::SERVICE_ID).ToString()
                << ": unknown exception type";
   }
   return lh;
@@ -102,7 +103,7 @@ bool ServiceHooks::IsOpen() const
   return bOpen;
 }
 
-void ServiceHooks::FilterServiceReferences(BundleContext* context, const std::string& service,
+void ServiceHooks::FilterServiceReferences(BundleContextPrivate* context, const std::string& service,
                                            const std::string& filter, std::vector<ServiceReferenceBase>& refs)
 {
   std::vector<ServiceRegistrationBase> srl;
@@ -111,25 +112,26 @@ void ServiceHooks::FilterServiceReferences(BundleContext* context, const std::st
   {
     ShrinkableVector<ServiceReferenceBase> filtered(refs);
 
+    auto selfBundle = GetBundleContext().GetBundle();
     std::sort(srl.begin(), srl.end());
     for (auto fhrIter = srl.rbegin(), fhrEnd = srl.rend(); fhrIter != fhrEnd; ++fhrIter)
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-      auto fh = std::static_pointer_cast<ServiceFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
+      auto fh = std::static_pointer_cast<ServiceFindHook>(sr.d.load()->GetService(GetPrivate(selfBundle).get()));
       if (fh)
       {
         try
         {
-          fh->Find(context, service, filter, filtered);
+          fh->Find(MakeBundleContext(context->shared_from_this()), service, filter, filtered);
         }
         catch (const std::exception& e)
         {
-          US_WARN << "Failed to call find hook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+          US_WARN << "Failed to call find hook  #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                   << ": " << e.what();
         }
         catch (...)
         {
-          US_WARN << "Failed to call find hook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+          US_WARN << "Failed to call find hook  #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                   << ": unknown exception type";
         }
       }
@@ -145,24 +147,27 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
   if (!eventListenerHooks.empty())
   {
     std::sort(eventListenerHooks.begin(), eventListenerHooks.end());
-    std::map<BundleContext*, std::vector<ServiceListenerHook::ListenerInfo> > listeners;
+    std::map<BundleContext, std::vector<ServiceListenerHook::ListenerInfo> > listeners;
     for (auto& sle : receivers)
     {
       listeners[sle.GetBundleContext()].push_back(sle);
     }
 
-    std::map<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > shrinkableListeners;
+    std::map<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo> > shrinkableListeners;
     for (auto& l : listeners)
     {
-      shrinkableListeners.insert(std::make_pair(l.first, ShrinkableVector<ServiceListenerHook::ListenerInfo>(l.second)));
+      shrinkableListeners.insert(std::make_pair(
+                                   l.first,
+                                   ShrinkableVector<ServiceListenerHook::ListenerInfo>(l.second)));
     }
 
-    ShrinkableMap<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > filtered(shrinkableListeners);
+    ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo> > filtered(shrinkableListeners);
 
+    auto selfBundle = GetBundleContext().GetBundle();
     for(auto sriIter = eventListenerHooks.rbegin(), sriEnd = eventListenerHooks.rend(); sriIter != sriEnd; ++sriIter)
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
-      auto elh = std::static_pointer_cast<ServiceEventListenerHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
+      auto elh = std::static_pointer_cast<ServiceEventListenerHook>(sr.d.load()->GetService(GetPrivate(selfBundle).get()));
       if(elh)
       {
         try
@@ -171,12 +176,12 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
         }
         catch(const std::exception& e)
         {
-          US_WARN << "Failed to call event hook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+          US_WARN << "Failed to call event hook  #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                   << ": " << e.what();
         }
         catch(...)
         {
-          US_WARN << "Failed to call event hook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+          US_WARN << "Failed to call event hook  #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                   << ": unknown exception type";
         }
       }
@@ -212,12 +217,12 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
       }
       catch (const std::exception& e)
       {
-        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(Constants::SERVICE_ID).ToString()
                 << ": " << e.what();
       }
       catch (...)
       {
-        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(Constants::SERVICE_ID).ToString()
                 << ": unknown exception";
       }
     }
@@ -260,12 +265,12 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
       }
       catch (const std::exception& e)
       {
-        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(Constants::SERVICE_ID).ToString()
                 << ": " << e.what();
       }
       catch (...)
       {
-        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+        US_WARN << "Failed to call listener hook #" << srIter->GetProperty(Constants::SERVICE_ID).ToString()
                 << ": unknown exception type";
       }
     }

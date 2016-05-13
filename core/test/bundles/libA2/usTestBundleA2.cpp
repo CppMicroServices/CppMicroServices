@@ -42,13 +42,13 @@ public:
 
   ~TestBundleA2Activator() {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     s = std::make_shared<TestBundleA2>();
-    sr = context->RegisterService<TestBundleA2Service>(s);
+    sr = context.RegisterService<TestBundleA2Service>(s);
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     sr.Unregister();
     s.reset();

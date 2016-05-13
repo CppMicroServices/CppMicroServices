@@ -22,6 +22,10 @@
 
 #include "usServiceObjects.h"
 
+#include "usBundle.h"
+#include "usBundlePrivate.h"
+#include "usBundleContextPrivate.h"
+#include "usConstants.h"
 #include "usServiceReferenceBasePrivate.h"
 #include "usLog.h"
 
@@ -33,10 +37,10 @@ class ServiceObjectsBasePrivate
 {
 public:
 
-  BundleContext* m_context;
+  std::shared_ptr<BundleContextPrivate> m_context;
   ServiceReferenceBase m_reference;
 
-  ServiceObjectsBasePrivate(BundleContext* context, const ServiceReferenceBase& reference)
+  ServiceObjectsBasePrivate(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference)
     : m_context(context)
     , m_reference(reference)
   {}
@@ -45,23 +49,23 @@ public:
   {
     InterfaceMapConstPtr result;
 
-    bool isPrototypeScope = m_reference.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
-                            ServiceConstants::SCOPE_PROTOTYPE();
+    bool isPrototypeScope = m_reference.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
+                            Constants::SCOPE_PROTOTYPE;
 
     if (isPrototypeScope)
     {
-      result = m_reference.d.load()->GetPrototypeService(m_context->GetBundle());
+      result = m_reference.d.load()->GetPrototypeService(MakeBundleContext(m_context).GetBundle());
     }
     else
     {
-      result = m_reference.d.load()->GetServiceInterfaceMap(m_context->GetBundle());
+      result = m_reference.d.load()->GetServiceInterfaceMap(GetPrivate(MakeBundleContext(m_context).GetBundle()).get());
     }
 
     return result;
   }
 };
 
-ServiceObjectsBase::ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference)
+ServiceObjectsBase::ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference)
   : d(new ServiceObjectsBasePrivate(context, reference))
 {
   if (!reference)
@@ -83,29 +87,30 @@ struct UngetHelper
 {
   const InterfaceMapConstPtr interfaceMap;
   const ServiceReferenceBase sref;
-  BundleContext* const bc;
+  const std::weak_ptr<BundlePrivate> b;
 
-  UngetHelper(const InterfaceMapConstPtr& im, const ServiceReferenceBase& sr, BundleContext* bc)
+  UngetHelper(const InterfaceMapConstPtr& im, const ServiceReferenceBase& sr, const std::shared_ptr<BundlePrivate>& b)
     : interfaceMap(im)
     , sref(sr)
-    , bc(bc)
+    , b(b)
   {}
   ~UngetHelper()
   {
     try
-  {
-      if(sref && bc->GetBundle() != nullptr)
+    {
+      auto bundle = b.lock();
+      if(sref)
       {
-        bool isPrototypeScope = sref.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() ==
-        ServiceConstants::SCOPE_PROTOTYPE();
+        bool isPrototypeScope = sref.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
+            Constants::SCOPE_PROTOTYPE;
 
         if (isPrototypeScope)
         {
-          sref.d.load()->UngetPrototypeService(bc->GetBundle(), interfaceMap);
+          sref.d.load()->UngetPrototypeService(bundle, interfaceMap);
         }
         else
         {
-          sref.d.load()->UngetService(bc->GetBundle(), true);
+          sref.d.load()->UngetService(bundle, true);
         }
       }
     }
@@ -123,7 +128,7 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
     return nullptr;
   }
 
-  std::shared_ptr<UngetHelper> h(new UngetHelper(d->GetServiceInterfaceMap(), d->m_reference, d->m_context));
+  std::shared_ptr<UngetHelper> h(new UngetHelper(d->GetServiceInterfaceMap(), d->m_reference, d->m_context->bundle->shared_from_this()));
   return std::shared_ptr<void>(h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
 }
 
@@ -136,7 +141,7 @@ InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
   }
   // copy construct a new map to be handed out to consumers
   result = std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
-  std::shared_ptr<UngetHelper> h(new UngetHelper{ result, d->m_reference, d->m_context });
+  std::shared_ptr<UngetHelper> h(new UngetHelper{ result, d->m_reference, d->m_context->bundle->shared_from_this() });
   return InterfaceMapConstPtr(h, h->interfaceMap.get());
 }
 
@@ -180,7 +185,7 @@ ServiceReferenceU ServiceObjects<void>::GetServiceReference() const
   return this->ServiceObjectsBase::GetReference();
 }
 
-ServiceObjects<void>::ServiceObjects(BundleContext* context, const ServiceReferenceU& reference)
+ServiceObjects<void>::ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceU& reference)
   : ServiceObjectsBase(context, reference)
 {}
 

@@ -32,8 +32,8 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 #include "usServiceReferenceBasePrivate.h"
 #include "usProperties_p.h"
 #include "usCoreBundleContext_p.h"
-#include "usBundle.h"
-#include "usBundleContext.h"
+#include "usBundlePrivate.h"
+#include "usBundleContextPrivate.h"
 
 namespace us {
 
@@ -51,11 +51,24 @@ struct BundleListenerCompare : std::binary_function<std::pair<BundleListener, vo
 ServiceListeners::ServiceListeners(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
 {
-  hashedServiceKeys.push_back(ServiceConstants::OBJECTCLASS());
-  hashedServiceKeys.push_back(ServiceConstants::SERVICE_ID());
+  hashedServiceKeys.push_back(Constants::OBJECTCLASS);
+  hashedServiceKeys.push_back(Constants::SERVICE_ID);
 }
 
-void ServiceListeners::AddServiceListener(BundleContext* context, const ServiceListener& listener,
+void ServiceListeners::Clear()
+{
+  bundleListenerMap.Lock(), bundleListenerMap.value.clear();
+  {
+    auto l = this->Lock(); US_UNUSED(l);
+    serviceSet.clear();
+    hashedServiceKeys.clear();
+    complicatedListeners.clear();
+    cache[0].clear();
+    cache[1].clear();
+  }
+}
+
+void ServiceListeners::AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
   ServiceListenerEntry sle(context, listener, data, filter);
@@ -68,7 +81,7 @@ void ServiceListeners::AddServiceListener(BundleContext* context, const ServiceL
   coreCtx->serviceHooks.HandleServiceListenerReg(sle);
 }
 
-void ServiceListeners::RemoveServiceListener(BundleContext* context, const ServiceListener& listener,
+void ServiceListeners::RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
                                              void* data)
 {
   ServiceListenerEntry entryToRemove(context, listener, data);
@@ -95,7 +108,7 @@ void ServiceListeners::RemoveServiceListener(const ServiceListenerEntry& entryTo
   }
 }
 
-void ServiceListeners::AddBundleListener(BundleContext* context, const BundleListener& listener, void* data)
+void ServiceListeners::AddBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data)
 {
   auto l = bundleListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = bundleListenerMap.value[context];
@@ -105,7 +118,7 @@ void ServiceListeners::AddBundleListener(BundleContext* context, const BundleLis
   }
 }
 
-void ServiceListeners::RemoveBundleListener(BundleContext* context, const BundleListener& listener, void* data)
+void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data)
 {
   auto l = bundleListenerMap.Lock(); US_UNUSED(l);
   bundleListenerMap.value[context].remove_if(std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
@@ -132,7 +145,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
   }
 }
 
-void ServiceListeners::RemoveAllListeners(BundleContext* context)
+void ServiceListeners::RemoveAllListeners(const std::shared_ptr<BundleContextPrivate>& context)
 {
   {
     auto l = this->Lock(); US_UNUSED(l);
@@ -140,7 +153,7 @@ void ServiceListeners::RemoveAllListeners(BundleContext* context)
          it != serviceSet.end(); )
     {
 
-      if (it->GetBundleContext() == context)
+      if (GetPrivate(it->GetBundleContext()) == context)
       {
         RemoveFromCache_unlocked(*it);
         serviceSet.erase(it++);
@@ -158,14 +171,14 @@ void ServiceListeners::RemoveAllListeners(BundleContext* context)
   }
 }
 
-void ServiceListeners::HooksBundleStopped(BundleContext* context)
+void ServiceListeners::HooksBundleStopped(const std::shared_ptr<BundleContextPrivate>& context)
 {
   std::vector<ServiceListenerEntry> entries;
   {
     auto l = this->Lock(); US_UNUSED(l);
     for (auto& sle : serviceSet)
     {
-      if (sle.GetBundleContext() == context)
+      if (sle.GetBundleContext() == MakeBundleContext(context))
       {
         entries.push_back(sle);
       }
@@ -207,7 +220,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       catch (...)
       {
         US_WARN << "Service listener"
-                << " in " << l.GetBundleContext()->GetBundle()->GetName()
+                << " in " << l.GetBundleContext().GetBundle().GetSymbolicName()
                 << " threw an exception!";
       }
     }
@@ -246,13 +259,13 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
     //         << " listeners with complicated filters";
 
   // Check the cache
-    const auto c = any_cast<std::vector<std::string>>(props->Value_unlocked(ServiceConstants::OBJECTCLASS()));
+    const auto c = any_cast<std::vector<std::string>>(props->Value_unlocked(Constants::OBJECTCLASS));
     for (auto& objClass : c)
     {
       AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);
     }
 
-    long service_id = any_cast<long>(props->Value_unlocked(ServiceConstants::SERVICE_ID()));
+    long service_id = any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID));
     AddToSet_unlocked(set, receivers, SERVICE_ID_IX, std::to_string((service_id)));
   }
 }

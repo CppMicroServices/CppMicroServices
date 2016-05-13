@@ -22,6 +22,8 @@
 
 #include "usServiceListenerHook.h"
 #include "usServiceListenerHook_p.h"
+#include "usBundleContext.h"
+#include "usBundleContextPrivate.h"
 
 namespace us {
 
@@ -30,8 +32,10 @@ ServiceListenerHook::~ServiceListenerHook()
 }
 
 ServiceListenerHook::ListenerInfoData::ListenerInfoData(
-    BundleContext* context, const ServiceListener& l,
-    void* data, const std::string& filter)
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const ServiceListener& l,
+    void* data,
+    const std::string& filter)
   : context(context)
   , listener(l)
   , data(data)
@@ -74,9 +78,9 @@ bool ServiceListenerHook::ListenerInfo::IsNull() const
   return !d;
 }
 
-BundleContext* ServiceListenerHook::ListenerInfo::GetBundleContext() const
+BundleContext ServiceListenerHook::ListenerInfo::GetBundleContext() const
 {
-  return d->context;
+  return MakeBundleContext(d->context);
 }
 
 std::string ServiceListenerHook::ListenerInfo::GetFilter() const

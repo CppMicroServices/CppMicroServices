@@ -51,7 +51,7 @@ public:
 
 protected:
 
-  ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference);
+  ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference);
 
   ~ServiceObjectsBase();
 
@@ -110,7 +110,7 @@ public:
    *
    * <ol>
    *   <li>If the referenced service has been unregistered, \c nullptr is returned.</li>
-   *   <li>The PrototypeServiceFactory::GetService(const std::shared_ptr<Bundle>&, const ServiceRegistrationBase&)
+   *   <li>The PrototypeServiceFactory::GetService(const Bundle&, const ServiceRegistrationBase&)
    *       method is called to create a service object for the caller.</li>
    *   <li>If the service object (an instance of InterfaceMap) returned by the
    *       PrototypeServiceFactory object is empty, does not contain all the interfaces
@@ -121,7 +121,7 @@ public:
    *
    * @return A \c shared_ptr to the service object. The returned \c shared_ptr
    *         is empty if the service is not registered, the service object returned by a
-   *         ServiceFactory does not contain all the classes under which it was registered 
+   *         ServiceFactory does not contain all the classes under which it was registered
    *         or the ServiceFactory threw an exception.
    *
    * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
@@ -146,7 +146,7 @@ private:
 
   friend class BundleContext;
 
-  ServiceObjects(BundleContext* context, const ServiceReference<S>& reference)
+  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReference<S>& reference)
     : ServiceObjectsBase(context, reference)
   {}
 
@@ -204,7 +204,7 @@ private:
 
   friend class BundleContext;
 
-  ServiceObjects(BundleContext* context, const ServiceReferenceU& reference);
+  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceU& reference);
 
 };
 

@@ -25,6 +25,7 @@
 #include "usTrackedService_p.h"
 #include "usServiceException.h"
 #include "usBundleContext.h"
+#include "usBundle.h"
 
 #include <string>
 #include <stdexcept>
@@ -44,7 +45,7 @@ ServiceTracker<S,T>::~ServiceTracker()
 #endif
 
 template<class S, class T>
-ServiceTracker<S,T>::ServiceTracker(BundleContext* context,
+ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
                                     const ServiceReference<S>& reference,
                                     _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, reference, customizer))
@@ -52,21 +53,24 @@ ServiceTracker<S,T>::ServiceTracker(BundleContext* context,
 }
 
 template<class S, class T>
-ServiceTracker<S,T>::ServiceTracker(BundleContext* context, const std::string& clazz,
+ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
+                                    const std::string& clazz,
                                     _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, clazz, customizer))
 {
 }
 
 template<class S, class T>
-ServiceTracker<S,T>::ServiceTracker(BundleContext* context, const LDAPFilter& filter,
+ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
+                                    const LDAPFilter& filter,
                                     _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
 {
 }
 
 template<class S, class T>
-ServiceTracker<S,T>::ServiceTracker(BundleContext *context, _ServiceTrackerCustomizer* customizer)
+ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
+                                    _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
 {
   std::string clazz = us_service_interface_iid<S>();
@@ -93,7 +97,7 @@ void ServiceTracker<S,T>::Open()
     t.reset(new _TrackedService(this, d->customizer));
     try
     {
-      d->context->AddServiceListener(t.get(), &_TrackedService::ServiceChanged, d->listenerFilter);
+      d->context.AddServiceListener(t.get(), &_TrackedService::ServiceChanged, d->listenerFilter);
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty())
       {
@@ -101,7 +105,7 @@ void ServiceTracker<S,T>::Open()
       }
       else
       {
-        if (d->trackReference.GetBundle() != nullptr)
+        if (d->trackReference.GetBundle())
         {
           references.push_back(d->trackReference);
         }
@@ -116,7 +120,7 @@ void ServiceTracker<S,T>::Open()
     }
     catch (const std::invalid_argument& e)
     {
-      d->context->RemoveServiceListener(t.get(), &_TrackedService::ServiceChanged);
+      d->context.RemoveServiceListener(t.get(), &_TrackedService::ServiceChanged);
       throw std::runtime_error(std::string("unexpected std::invalid_argument exception: ")
                                + e.what());
     }
@@ -144,7 +148,7 @@ void ServiceTracker<S,T>::Close()
     references = GetServiceReferences();
     try
     {
-      d->context->RemoveServiceListener(outgoing.get(), &_TrackedService::ServiceChanged);
+      d->context.RemoveServiceListener(outgoing.get(), &_TrackedService::ServiceChanged);
     }
     catch (const std::logic_error& /*e*/)
     {
@@ -160,7 +164,7 @@ void ServiceTracker<S,T>::Close()
 
   if (d->DEBUG_OUTPUT)
   {
-    if (d->cachedReference.Load().GetBundle() == nullptr &&
+    if (!d->cachedReference.Load().GetBundle() &&
         d->cachedService.Load() == nullptr)
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
@@ -240,7 +244,7 @@ ServiceReference<S>
 ServiceTracker<S,T>::GetServiceReference() const
 {
   ServiceReference<S> reference = d->cachedReference.Load();
-  if (reference.GetBundle() != nullptr)
+  if (reference.GetBundle())
   {
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
                          << d->filter;
@@ -262,7 +266,7 @@ ServiceTracker<S,T>::GetServiceReference() const
     auto refIter = references.begin();
     for (std::size_t i = 0; i < length; i++)
     {
-      Any rankingAny = refIter->GetProperty(ServiceConstants::SERVICE_RANKING());
+      Any rankingAny = refIter->GetProperty(Constants::SERVICE_RANKING);
       int ranking = 0;
       if (rankingAny.Type() == typeid(int))
       {
@@ -293,7 +297,7 @@ ServiceTracker<S,T>::GetServiceReference() const
       {
         if (rankings[i] == maxRanking)
         {
-          Any idAny = refIter->GetProperty(ServiceConstants::SERVICE_ID());
+          Any idAny = refIter->GetProperty(Constants::SERVICE_ID);
           long int id = 0;
           if (idAny.Type() == typeid(long int))
           {
@@ -363,7 +367,7 @@ ServiceTracker<S,T>::GetService() const
   try
   {
     auto reference = GetServiceReference();
-    if (reference.GetBundle() == nullptr)
+    if (!reference.GetBundle())
     {
       return std::shared_ptr<TrackedParmType>();
     }
@@ -436,7 +440,7 @@ template<class S, class T>
 std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
 ServiceTracker<S,T>::AddingService(const ServiceReference<S>& reference)
 {
-  return TypeTraits::ConvertToTrackedType(d->context->GetService(reference));
+  return TypeTraits::ConvertToTrackedType(d->context.GetService(reference));
 }
 
 template<class S, class T>

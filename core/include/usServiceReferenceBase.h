@@ -115,18 +115,18 @@ public:
    *         service has already been unregistered.
    * @see BundleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  std::shared_ptr<Bundle> GetBundle() const;
+  Bundle GetBundle() const;
 
   /**
    * Returns the bundles that are using the service referenced by this
    * <code>ServiceReferenceBase</code> object. Specifically, this method returns
    * the bundles whose usage count for that service is greater than zero.
    *
-   * @param bundles A list of bundles whose usage count for the service referenced
+   * @return A list of bundles whose usage count for the service referenced
    *         by this <code>ServiceReferenceBase</code> object is greater than
    *         zero.
    */
-  void GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const;
+  std::vector<Bundle> GetUsingBundles() const;
 
   /**
    * Returns the interface identifier this ServiceReferenceBase object
@@ -160,7 +160,7 @@ public:
    *
    * <p>
    * If this <code>ServiceReferenceBase</code> and the specified
-   * <code>ServiceReferenceBase</code> have the same \link ServiceConstants::SERVICE_ID()
+   * <code>ServiceReferenceBase</code> have the same \link Constants::SERVICE_ID
    * service id\endlink they are equal. This <code>ServiceReferenceBase</code> is less
    * than the specified <code>ServiceReferenceBase</code> if it has a lower
    * {@link ServiceConstants::SERVICE_RANKING service ranking} and greater if it has a
@@ -198,6 +198,7 @@ private:
   friend class ServiceRegistry;
   friend class LDAPFilter;
 
+  template<class S> friend class ServiceHolder;
   template<class S> friend class ServiceReference;
 
   friend class ::std::hash<ServiceReferenceBase>;

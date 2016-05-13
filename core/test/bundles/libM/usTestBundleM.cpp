@@ -29,11 +29,11 @@ class TestBundleMActivator : public BundleActivator
 {
 public:
 
-  void Start(BundleContext*)
+  void Start(BundleContext)
   {
   }
 
-  void Stop(BundleContext*)
+  void Stop(BundleContext)
   {
   }
 

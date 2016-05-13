@@ -26,9 +26,11 @@
 
 #include "usServiceListeners_p.h"
 #include "usServiceRegistry_p.h"
+#include "usResolver_p.h"
 #include "usBundleHooks_p.h"
 #include "usServiceHooks_p.h"
 #include "usBundleRegistry_p.h"
+#include "usDebug_p.h"
 #include "usAny.h"
 
 #include <string>
@@ -36,12 +38,59 @@
 
 namespace us {
 
+class ResolverHooks
+{
+  // dummy implementation
+public:
+  void CheckResolveBlocked() {}
+  void BeginResolve(BundlePrivate*) {}
+  void EndResolve(BundlePrivate*) {}
+};
+
+class BundleStorage;
+class BundleThread;
+class FrameworkPrivate;
+
 /**
  * This class is not part of the public API.
  */
-class CoreBundleContext
+class CoreBundleContext : public std::enable_shared_from_this<CoreBundleContext>
 {
 public:
+
+  /**
+   * Framework id.
+   */
+  int id;
+
+  /**
+   * Id to use for next instance of the framework.
+   */
+  static std::atomic<int> globalId;
+
+  /**
+   * Debug handle.
+   */
+  Debug debug;
+
+  /**
+   * Threads for running listeners and activators
+   */
+  struct : MultiThreaded<>
+  {
+    std::list<std::shared_ptr<BundleThread>> value;
+    std::list<std::shared_ptr<BundleThread>> zombies;
+  } bundleThreads;
+
+  /**
+   * Bundle Storage
+   */
+  std::unique_ptr<BundleStorage> storage;
+
+  /**
+   * Private Bundle Data Storage
+   */
+  std::string dataStorage;
 
   /**
    * All listeners in this framework.
@@ -64,30 +113,61 @@ public:
   BundleHooks bundleHooks;
 
   /**
+   * All resolver hooks.
+   */
+  ResolverHooks resolverHooks;
+
+  /**
+   * All capabilities, exported and imported packages in this framework.
+   */
+  Resolver resolver;
+
+  /**
    * All installed bundles.
    */
   BundleRegistry bundleRegistry;
+
+  bool firstInit;
+
+  /**
+   * Framework init count.
+   */
+  int initCount;
 
   /*
    * Framework properties, which contain both the
    * launch properties and the system properties.
    * See OSGi spec revision 6, section 4.2.2
    */
-  const std::map<std::string, Any> frameworkProperties;
+  std::map<std::string, Any> frameworkProperties;
 
-  Bundle* const systemBundle;
-
-  /**
-   * Construct a core context
-   *
-   */
-  CoreBundleContext(Bundle* systemBundle, const std::map<std::string, Any>& props = std::map<std::string, Any>());
+  std::shared_ptr<FrameworkPrivate> systemBundle;
 
   ~CoreBundleContext();
 
   void Init();
 
-  void Uninit();
+  // must be called without any locks held
+  void Uninit0();
+
+  void Uninit1();
+
+  /**
+   * Get private bundle data storage file handle.
+   *
+   */
+  std::string GetDataStorage(long id) const;
+
+private:
+
+  // The core context is exclusively constructed by the FrameworkFactory class
+  friend class FrameworkFactory;
+
+  /**
+   * Construct a core context
+   *
+   */
+  CoreBundleContext(const std::map<std::string, Any>& props);
 
 };
 

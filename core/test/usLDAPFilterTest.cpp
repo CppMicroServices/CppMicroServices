@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include <usAny.h>
+#include <usConstants.h>
 #include <usLDAPFilter.h>
 #include <usLDAPProp.h>
 
@@ -39,8 +40,8 @@ int TestParsing()
     LDAPFilter ldap( "(cn=Babs Jensen)" );
     US_TEST_OUTPUT(<< "Parsing (!(cn=Tim Howes))")
     ldap = LDAPFilter( "(!(cn=Tim Howes))" );
-    US_TEST_OUTPUT(<< "Parsing " << std::string("(&(") + ServiceConstants::OBJECTCLASS() + "=Person)(|(sn=Jensen)(cn=Babs J*)))")
-    ldap = LDAPFilter( std::string("(&(") + ServiceConstants::OBJECTCLASS() + "=Person)(|(sn=Jensen)(cn=Babs J*)))" );
+    US_TEST_OUTPUT(<< "Parsing " << std::string("(&(") + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))")
+    ldap = LDAPFilter( std::string("(&(") + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))" );
     US_TEST_OUTPUT(<< "Parsing (o=univ*of*mich*)")
     ldap = LDAPFilter( "(o=univ*of*mich*)" );
   }

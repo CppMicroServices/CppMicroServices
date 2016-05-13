@@ -79,15 +79,13 @@ private:
 #endif
 };
 
-// Helper function to install bundles, given a framework's bundle context and the name of the bundle.
-// Assumes that test bundles are within the same directory during unit testing.
-// Currently limited to only installing bundles with the same physical filename
-// and logical bundle name (e.g. TestBundleA.dll/TestBundleA).
-std::shared_ptr<Bundle> InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName);
-
 // Copied from usUtils_p.h/usUtils.cpp
 // Place in a different namespace to avoid duplicate symbol errors.
 namespace testing {
+
+// Helper function to install bundles, given a framework's bundle context and the name of the library.
+// Assumes that test bundles are within the same directory during unit testing.
+Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName);
 
 // A convenient way to construct a shared_ptr holding an array
 template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
@@ -96,6 +94,12 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
 }
 
 std::string GetCurrentWorkingDirectory();
+
+Bundle GetBundle(
+    const std::string& bsn,
+    BundleContext context = BundleContext()
+    );
+
 }
 
 }

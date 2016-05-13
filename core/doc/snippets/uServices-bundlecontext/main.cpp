@@ -11,9 +11,9 @@ using namespace us;
 
 void RetrieveBundleContext()
 {
-  BundleContext* context = GetBundleContext();
-  auto bundle = context->GetBundle();
-  std::cout << "Bundle name: " << bundle->GetName() << " [id: " << bundle->GetBundleId() << "]\n";
+  auto context = GetBundleContext();
+  auto bundle = context.GetBundle();
+  std::cout << "Bundle name: " << bundle.GetSymbolicName() << " [id: " << bundle.GetBundleId() << "]\n";
 }
 //! [GetBundleContext]
 

@@ -44,6 +44,8 @@ class ServiceRegistry : private MultiThreaded<>
 
 public:
 
+  void Clear();
+
   /**
    * Creates a new ServiceProperties object containing <code>in</code>
    * with the keys converted to lower case.
@@ -163,7 +165,7 @@ public:
    * @param bundle The bundle
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetUsedByBundle(const std::shared_ptr<Bundle>& bundle, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void GetUsedByBundle(BundlePrivate* bundle, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
 private:
 

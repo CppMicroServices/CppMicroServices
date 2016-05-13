@@ -39,7 +39,7 @@
 namespace us {
 
 class CoreBundleContext;
-class BundleContext;
+class BundleContextPrivate;
 
 /**
  * Here we handle all listeners that bundles have registered.
@@ -50,7 +50,7 @@ class ServiceListeners : private MultiThreaded<>
 
 public:
 
-  typedef std::unordered_map<BundleContext*, std::list<std::pair<BundleListener,void*> > > BundleListenerMap;
+  typedef std::unordered_map<std::shared_ptr<BundleContextPrivate>, std::list<std::pair<BundleListener,void*> > > BundleListenerMap;
   struct : public MultiThreaded<> {
     BundleListenerMap value;
   } bundleListenerMap;
@@ -78,6 +78,8 @@ public:
 
   ServiceListeners(CoreBundleContext* coreCtx);
 
+  void Clear();
+
   /**
    * Add a new service listener. If an old one exists, and it has the
    * same owning bundle, the old listener is removed first.
@@ -89,7 +91,7 @@ public:
    * @exception org.osgi.framework.InvalidSyntaxException
    * If the filter is not a correct LDAP expression.
    */
-  void AddServiceListener(BundleContext* context, const ServiceListener& listener,
+  void AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
                           void* data, const std::string& filter);
 
   /**
@@ -101,7 +103,7 @@ public:
    * @param listener Object to remove.
    * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(BundleContext* context, const ServiceListener& listener,
+  void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
                              void* data);
 
   /**
@@ -111,7 +113,7 @@ public:
    * @param listener The bundle listener to add.
    * @param data Additional data to distinguish BundleListener objects.
    */
-  void AddBundleListener(BundleContext* context, const BundleListener& listener, void* data);
+  void AddBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data);
 
   /**
    * Remove bundle listener from current framework. Silently ignore
@@ -121,7 +123,7 @@ public:
    * @param listener Object to remove.
    * @param data Additional data to distinguish BundleListener objects.
    */
-  void RemoveBundleListener(BundleContext* context, const BundleListener& listener, void* data);
+  void RemoveBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data);
 
   void BundleChanged(const BundleEvent& evt);
 
@@ -130,14 +132,14 @@ public:
    *
    * @param context Bundle context which listeners we want to remove.
    */
-  void RemoveAllListeners(BundleContext* context);
+  void RemoveAllListeners(const std::shared_ptr<BundleContextPrivate>& context);
 
   /**
    * Notify hooks that a bundle is about to be stopped
    *
    * @param context Bundle context which listeners are about to be removed.
    */
-  void HooksBundleStopped(BundleContext* context);
+  void HooksBundleStopped(const std::shared_ptr<BundleContextPrivate>& context);
 
   /**
    * Receive notification that a service has had a change occur in its lifecycle.

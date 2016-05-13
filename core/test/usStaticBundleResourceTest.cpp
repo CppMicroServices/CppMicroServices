@@ -20,11 +20,11 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
 #include <usBundle.h>
 #include <usBundleResource.h>
 #include <usBundleResourceStream.h>
@@ -56,37 +56,37 @@ struct ResourceComparator {
   }
 };
 
-void testResourceOperators(const std::shared_ptr<Bundle>& bundle)
+void testResourceOperators(const Bundle& bundle)
 {
-  std::vector<BundleResource> resources = bundle->FindResources("", "res.txt", false);
+  std::vector<BundleResource> resources = bundle.FindResources("", "res.txt", false);
   US_TEST_CONDITION_REQUIRED(resources.size() == 1, "Check resource count")
 }
 
-void testResourcesWithStaticImport(const std::shared_ptr<Framework>& framework, const std::shared_ptr<Bundle>& bundle)
+void testResourcesWithStaticImport(const Framework& framework, const Bundle& bundle)
 {
-  BundleResource resource = bundle->GetResource("res.txt");
+  BundleResource resource = bundle.GetResource("res.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid res.txt resource")
   std::string line = GetResourceContent(resource);
   US_TEST_CONDITION(line == "dynamic resource", "Check dynamic resource content")
 
-  resource = bundle->GetResource("dynamic.txt");
+  resource = bundle.GetResource("dynamic.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid dynamic.txt resource")
   line = GetResourceContent(resource);
   US_TEST_CONDITION(line == "dynamic", "Check dynamic resource content")
 
-  resource = bundle->GetResource("static.txt");
+  resource = bundle.GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(!resource.IsValid(), "Check in-valid static.txt resource")
 
-  auto importedByBBundle = framework->GetBundleContext()->GetBundle("TestBundleImportedByB");
-  US_TEST_CONDITION_REQUIRED(importedByBBundle != nullptr, "Check valid static bundle")
-  resource = importedByBBundle->GetResource("static.txt");
+  auto importedByBBundle = testing::GetBundle("TestBundleImportedByB", framework.GetBundleContext());
+  US_TEST_CONDITION_REQUIRED(importedByBBundle, "Check valid static bundle")
+  resource = importedByBBundle.GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
   line = GetResourceContent(resource);
   US_TEST_CONDITION(line == "static", "Check static resource content")
 
-  std::vector<BundleResource> resources = bundle->FindResources("", "*.txt", false);
+  std::vector<BundleResource> resources = bundle.FindResources("", "*.txt", false);
   std::stable_sort(resources.begin(), resources.end(), ResourceComparator());
-  std::vector<BundleResource> importedResources = importedByBBundle->FindResources("", "*.txt", false);
+  std::vector<BundleResource> importedResources = importedByBBundle.FindResources("", "*.txt", false);
   std::stable_sort(importedResources.begin(), importedResources.end(), ResourceComparator());
 
   US_TEST_CONDITION(resources.size() == 2, "Check resource count")
@@ -110,38 +110,26 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  assert(framework->GetBundleContext());
+  assert(framework.GetBundleContext());
 
-  InstallTestBundle(framework->GetBundleContext(), "TestBundleB");
-
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = framework->GetBundleContext()->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
-#else
-    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
-#endif
-    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
-
-  auto bundle = framework->GetBundleContext()->GetBundle("TestBundleB");
+  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleB");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleB")
-  US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
+  US_TEST_CONDITION(bundle.GetSymbolicName() == "TestBundleB", "Test bundle name")
+
+  auto importedBundle = testing::GetBundle("TestBundleImportedByB", framework.GetBundleContext());
+  US_TEST_CONDITION_REQUIRED(importedBundle, "Test installation of bundle TestBundleImportedByB")
+
 
   testResourceOperators(bundle);
   testResourcesWithStaticImport(framework, bundle);
 
-  BundleResource resource = framework->GetBundleContext()->GetBundle("TestBundleImportedByB")->GetResource("static.txt");
-  bundle->Start();
+  BundleResource resource = importedBundle.GetResource("static.txt");
+  bundle.Start();
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
 
-  bundle->Stop();
+  bundle.Stop();
   US_TEST_CONDITION_REQUIRED(resource.IsValid() == true, "Check still valid static.txt resource")
 
   US_TEST_END()

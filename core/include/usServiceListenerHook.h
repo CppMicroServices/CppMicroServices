@@ -82,7 +82,7 @@ struct US_Core_EXPORT ServiceListenerHook
      *
      * @return The context of the bundle which added the listener.
      */
-    BundleContext* GetBundleContext() const;
+    BundleContext GetBundleContext() const;
 
     /**
      * Return the filter string with which the listener was added.

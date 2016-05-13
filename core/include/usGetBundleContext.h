@@ -28,13 +28,14 @@
 #error Missing preprocessor define US_BUNDLE_NAME
 #endif
 
+#include <usBundleContext.h>
+#include <usBundleContextPrivate.h>
 #include <usBundleUtils.h>
 
+#include <memory>
 #include <cstring>
 
 namespace us {
-
-class BundleContext;
 
 /**
  * \ingroup MicroServices
@@ -46,25 +47,26 @@ class BundleContext;
  *
  * \return The BundleContext of the calling bundle.
  */
-static inline BundleContext* GetBundleContext()
+static inline BundleContext GetBundleContext()
 {
-  typedef BundleContext*(*GetBundleContextFunc)(void);
-  GetBundleContextFunc getBundleContext = &GetBundleContext;
+  BundleContext(*getBundleContext)(void) = &GetBundleContext;
 
   void* GetBundleContextPtr = nullptr;
   std::memcpy(&GetBundleContextPtr, &getBundleContext, sizeof(void*));
   std::string libPath(BundleUtils::GetLibraryPath(GetBundleContextPtr));
 
-  std::string get_bundle_context_func("_us_get_bundle_context_instance_" US_STR(US_BUNDLE_NAME));
-  void* getBundleContextSym = BundleUtils::GetSymbol(US_STR(US_BUNDLE_NAME), libPath, get_bundle_context_func.c_str());
-  std::memcpy(&getBundleContext, &getBundleContextSym, sizeof(void*));
+  BundleContextPrivate*(*getBundleContextInst)(void) = nullptr;
+  std::string get_bundle_context_inst("_us_get_bundle_context_instance_" US_STR(US_BUNDLE_NAME));
+  void* getBundleContextInstSym = BundleUtils::GetSymbol(US_STR(US_BUNDLE_NAME), libPath, get_bundle_context_inst.c_str());
+  std::memcpy(&getBundleContextInst, &getBundleContextInstSym, sizeof(void*));
 
-  if (getBundleContext)
+  if (getBundleContextInst)
   {
-      return getBundleContext();
+    BundleContextPrivate* ctx = getBundleContextInst();
+    return ctx ? MakeBundleContext(ctx->shared_from_this()) : BundleContext{};
   }
 
-  return nullptr;
+  return {};
 }
 
 }

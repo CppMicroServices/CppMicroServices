@@ -12,9 +12,9 @@ void resourceExample()
 {
   //! [1]
   // Get this bundle's Bundle object
-  auto bundle = GetBundleContext()->GetBundle();
+  auto bundle = GetBundleContext().GetBundle();
 
-  BundleResource resource = bundle->GetResource("config.properties");
+  BundleResource resource = bundle.GetResource("config.properties");
   if (resource.IsValid())
   {
     // Create a BundleResourceStream object
@@ -39,22 +39,19 @@ void parseComponentDefinition(std::istream&)
 {
 }
 
-void extenderPattern(BundleContext* bundleCtx)
+void extenderPattern(const BundleContext& bundleCtx)
 {
   //! [2]
-  // Get all installed bundles
-  auto bundles = bundleCtx->GetBundles();
-
   // Check if a bundle defines a "service-component" property
   // and use its value to retrieve an embedded resource containing
   // a component description.
-  for(std::size_t i = 0; i < bundles.size(); ++i)
+  for(auto const bundle : bundleCtx.GetBundles())
   {
-    auto const bundle = bundles[i];
-    std::string componentPath = bundle->GetProperty("service-component").ToString();
+    if (bundle.GetState() == Bundle::STATE_UNINSTALLED) continue;
+    std::string componentPath = bundle.GetProperty("service-component").ToString();
     if (!componentPath.empty())
     {
-      BundleResource componentResource = bundle->GetResource(componentPath);
+      BundleResource componentResource = bundle.GetResource(componentPath);
       if (!componentResource.IsValid() || componentResource.IsDir()) continue;
 
       // Create a std::istream compatible object and parse the
@@ -69,14 +66,14 @@ void extenderPattern(BundleContext* bundleCtx)
 int main(int /*argc*/, char* /*argv*/[])
 {
   //! [0]
-  BundleContext* bundleContext = GetBundleContext();
-  auto bundle = bundleContext->GetBundle();
+  auto bundleContext = GetBundleContext();
+  auto bundle = bundleContext.GetBundle();
 
   // List all XML files in the config directory
-  std::vector<BundleResource> xmlFiles = bundle->FindResources("config", "*.xml", false);
+  std::vector<BundleResource> xmlFiles = bundle.FindResources("config", "*.xml", false);
 
   // Find the resource named vertex_shader.txt starting at the root directory
-  std::vector<BundleResource> shaders = bundle->FindResources("", "vertex_shader.txt", true);
+  std::vector<BundleResource> shaders = bundle.FindResources("", "vertex_shader.txt", true);
   //! [0]
 
   return 0;

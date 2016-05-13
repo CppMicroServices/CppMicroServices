@@ -45,7 +45,7 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
 
   std::string GetMimeType(const ServletContext* context, const std::string& file) const;
 
-  BundleContext* m_Context;
+  BundleContext m_Context;
   CivetServer* m_Server;
   ServiceTracker<HttpServlet, ServletHandler> m_ServletTracker;
 

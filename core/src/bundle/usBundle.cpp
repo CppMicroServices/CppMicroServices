@@ -24,13 +24,15 @@
 #include "usBundle.h"
 
 #include "usBundleEvent.h"
-#include "usBundleContext.h"
 #include "usBundleContextPrivate.h"
 #include "usBundleActivator.h"
+#include "usBundleArchive_p.h"
 #include "usBundlePrivate.h"
 #include "usBundleResource.h"
+#include "usBundleThread_p.h"
 #include "usBundleUtils_p.h"
 #include "usCoreBundleContext_p.h"
+#include "usResolver_p.h"
 
 #include "usCoreConfig.h"
 
@@ -41,35 +43,45 @@
 
 namespace us {
 
-const std::string Bundle::PROP_ID{ "bundle.id" };
-const std::string Bundle::PROP_NAME{ "bundle.name" };
-const std::string Bundle::PROP_LOCATION{ "bundle.location" };
-const std::string Bundle::PROP_VERSION{ "bundle.version" };
-const std::string Bundle::PROP_VENDOR{ "bundle.vendor" };
-const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
-
-#if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
-  typedef std::chrono::monotonic_clock Clock;
-#else
-  typedef std::chrono::steady_clock Clock;
-#endif
-
-// TODO needs to be replaced with proper state handling
-struct StateReset
+Bundle::Bundle()
 {
-  std::function<void()> f;
-  StateReset(const std::function<void()>& f) : f(f) {}
-  ~StateReset() { f(); }
-};
-
-Bundle::Bundle(CoreBundleContext* coreCtx, const BundleInfo& info)
-  : d(new BundlePrivate(this, info))
-{
-  d->Init(coreCtx);
 }
 
-Bundle::Bundle(std::unique_ptr<BundlePrivate> d)
-  : d(std::move(d))
+bool Bundle::operator==(const Bundle& rhs) const
+{
+  return IsValid() ? (rhs.IsValid() ? d->coreCtx->id == rhs.d->coreCtx->id && d->id == rhs.d->id : false) : !rhs.IsValid();
+}
+
+bool Bundle::operator!=(const Bundle& rhs) const
+{
+  return !(*this == rhs);
+}
+
+bool Bundle::operator<(const Bundle& rhs) const
+{
+  return IsValid() ? (rhs.IsValid() ? (d->coreCtx->id == rhs.d->coreCtx->id ? d->id < rhs.d->id : d->coreCtx->id < rhs.d->coreCtx->id) : true) : false;
+}
+
+bool Bundle::IsValid() const
+{
+  return d != nullptr;
+}
+
+Bundle::operator bool() const
+{
+  return IsValid();
+}
+
+Bundle& Bundle::operator=(std::nullptr_t)
+{
+  d = nullptr;
+  c = nullptr;
+  return *this;
+}
+
+Bundle::Bundle(const std::shared_ptr<BundlePrivate>& d)
+  : d(d)
+  , c(d ? d->coreCtx->shared_from_this() : nullptr)
 {
 }
 
@@ -77,166 +89,161 @@ Bundle::~Bundle()
 {
 }
 
-bool Bundle::IsStarted() const
+Bundle::State Bundle::GetState() const
 {
-  // TODO use proper states
-  return d->bundleContext.load() != nullptr;
+  return static_cast<State>(d->state.load());
 }
 
 void Bundle::Start()
 {
-  // TODO Use proper locks for state changes
-  if (IsStarted()) return;
-  if (d->starting.exchange(true)) return;
+  d->Start(0);
+}
 
-  StateReset reset([this]{ this->d->starting = false; });
-
-  /// TODO replace with proper state handling
-  auto tp = Clock::now();
-  while (d->stopping)
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - tp);
-    if (duration.count() > 2000) throw std::runtime_error("Timeout while waiting to start bundle " + d->info.name);
-  }
-
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, this->shared_from_this()));
-
-  typedef BundleActivator*(*CreateActivatorHook)(void);
-  CreateActivatorHook createActivatorHook = nullptr;
-
-  {
-    auto l = d->Lock(); US_UNUSED(l);
-
-    // loading a library isn't necessary if it isn't supported
-#ifdef US_BUILD_SHARED_LIBS
-    if(IsSharedLibrary(d->lib.GetFilePath()) && !d->lib.IsLoaded())
-    {
-      d->lib.Load();
-    }
-#endif
-
-    d->bundleContext = new BundleContext(this->d.get());
-
-    // save this bundle's context so that it can be accessible anywhere
-    // from within this bundle's code.
-    typedef void(*SetBundleContext)(BundleContext*);
-    SetBundleContext setBundleContext = nullptr;
-
-    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-    void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-    std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
-
-    if (setBundleContext)
-    {
-      setBundleContext(d->bundleContext);
-    }
-
-    std::string create_activator_func = "_us_create_activator_" + d->info.name;
-    void* createActivatorHookSym = BundleUtils::GetSymbol(d->info, create_activator_func.c_str());
-    std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
-  }
-
-  // try to get a BundleActivator instance
-  if (createActivatorHook)
-  {
-    try
-    {
-      d->bundleActivator = createActivatorHook();
-      d->bundleActivator->Start(d->bundleContext);
-    }
-    catch (const std::exception& e)
-    {
-      d->bundleActivator = nullptr;
-      this->Stop();
-      throw std::runtime_error(std::string("Starting bundle " + d->info.name + " failed: " + e.what()));
-    }
-  }
-
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, shared_from_this()));
+void Bundle::Start(uint32_t options)
+{
+  d->Start(options);
 }
 
 void Bundle::Stop()
 {
-  if (d->bundleContext.load() == nullptr) return;
-  if (d->stopping.exchange(true)) return;
+  Stop(0);
+}
 
-  StateReset reset([this]{
-    try
-  {
-      auto l = d->Lock(); US_UNUSED(l);
-      d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
-      d->RemoveBundleResources();
-      d->bundleContext.load()->d->Lock(), d->bundleContextOrphans.emplace_back(d->bundleContext), (d->bundleContext.load()->d->bundle = nullptr);
-      d->bundleContext = nullptr;
-      d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this->shared_from_this()));
-
-      d->bundleActivator = nullptr;
-  }
-    catch (...) {}
-    this->d->stopping = false;
-  });
-
-  // TODO replace with proper state handling
-  auto tp = Clock::now();
-  while (d->starting)
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - tp);
-    if (duration.count() > 2000) throw std::runtime_error("Timeout while waiting to stop bundle " + d->info.name);
-  }
-
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, shared_from_this()));
-
-  if (d->bundleActivator)
-  {
-    try
-    {
-      d->bundleActivator->Stop(d->bundleContext);
-    }
-    catch (const std::exception& e)
-    {
-      throw std::runtime_error("Stopping bundle " + d->info.name + " failed: " + e.what());
-  }
-
-    // delete the activator
-    typedef void(*DestroyActivatorHook)(BundleActivator*);
-    DestroyActivatorHook destroyActivatorHook = nullptr;
-    std::string destroy_activator_func = "_us_destroy_activator_" + d->info.name;
-    void* destroyActivatorHookSym = BundleUtils::GetSymbol(d->info, destroy_activator_func.c_str());
-    std::memcpy(&destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
-    if (destroyActivatorHook)
-    {
-      destroyActivatorHook(d->bundleActivator);
-    }
-  }
+void Bundle::Stop(uint32_t options)
+{
+  d->Stop(options);
 }
 
 void Bundle::Uninstall()
 {
-  Stop();
-  d->coreCtx->bundleRegistry.UnRegister(d->info);
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, shared_from_this()));
+  {
+    auto l = d->coreCtx->resolver.Lock(); US_UNUSED(l);
+    //BundleGeneration current = current();
+
+    switch (static_cast<Bundle::State>(d->state.load()))
+    {
+    case STATE_UNINSTALLED:
+      throw std::logic_error("Bundle is in UNINSTALLED state");
+    case STATE_STARTING: // Lazy start
+    case STATE_ACTIVE:
+    case STATE_STOPPING:
+    {
+      std::exception_ptr exception;
+      try
+      {
+        d->WaitOnOperation(d->coreCtx->resolver, l, "Bundle::Uninstall", true);
+        exception = (d->state & (STATE_ACTIVE | STATE_STARTING)) != 0 ? d->Stop0(l) : nullptr;
+      }
+      catch (...)
+      {
+        // Force to install
+        d->SetStateInstalled(false, l);
+        d->coreCtx->resolver.NotifyAll();
+        exception = std::current_exception();
+      }
+      d->operation = BundlePrivate::OP_UNINSTALLING;
+      if (exception != nullptr)
+      {
+        try { std::rethrow_exception(exception); }
+        catch (const std::exception& e)
+        {
+          // $TODO framework event
+          //coreCtx->FrameworkError(this, exception);
+          US_WARN << e.what();
+        }
+      }
+      // Fall through
+    }
+    case STATE_RESOLVED:
+    case STATE_INSTALLED:
+    {
+      d->coreCtx->bundleRegistry.Remove(d->location, d->id);
+      if (d->operation != BundlePrivate::OP_UNINSTALLING)
+      {
+        try
+        {
+          d->WaitOnOperation(d->coreCtx->resolver, l, "Bundle::Uninstall", true);
+          d->operation = BundlePrivate::OP_UNINSTALLING;
+        }
+        catch (const std::exception& e)
+        {
+          // Make sure that bundleContext is invalid
+          std::shared_ptr<BundleContextPrivate> ctx;
+          if ((ctx = d->bundleContext.Exchange(ctx)))
+          {
+            ctx->Invalidate();
+          }
+          d->operation = BundlePrivate::OP_UNINSTALLING;
+          // $TODO framework error
+          //d->coreCtx->FrameworkError(this, e);
+        }
+      }
+      if (d->state == STATE_UNINSTALLED)
+      {
+        d->operation = BundlePrivate::OP_IDLE;
+        throw std::logic_error("Bundle is in UNINSTALLED state");
+      }
+
+      d->state = STATE_INSTALLED;
+      d->GetBundleThread()->BundleChanged(
+            BundleEvent(
+              BundleEvent::UNRESOLVED,
+              Bundle(d)
+              ),
+            l);
+      d->bactivator = nullptr;
+      d->state = STATE_UNINSTALLED;
+      // Purge old archive
+      //BundleGeneration oldGen = current;
+      //generations.set(0, new BundleGeneration(oldGen));
+      //oldGen.purge(false);
+      d->Purge();
+      d->operation = BundlePrivate::OP_IDLE;
+      if (!d->bundleDir.empty())
+      {
+        try
+        {
+          if (fs::Exists(d->bundleDir)) fs::RemoveDirectory(d->bundleDir);
+        }
+        catch (const std::exception& e)
+        {
+          // $TODO framework error
+          // d->coreCtx->FrameworkError(this,
+          //                     "Failed to delete bundle data" + e.what());
+          US_WARN << "Failed to delete bundle data" << e.what();
+        }
+        d->bundleDir.clear();
+      }
+      // id, location and headers survives after uninstall.
+
+      // There might be bundle threads that are running start or stop
+      // operation. This will wake them and give them an chance to terminate.
+      d->coreCtx->resolver.NotifyAll();
+      break;
+    }
+    }
+  }
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, Bundle(d)));
 }
 
-BundleContext* Bundle::GetBundleContext() const
+BundleContext Bundle::GetBundleContext() const
 {
-  return d->bundleContext;
+  return MakeBundleContext(d->bundleContext.Load()->shared_from_this());
 }
 
 long Bundle::GetBundleId() const
 {
-  return d->info.id;
+  return d->id;
 }
 
 std::string Bundle::GetLocation() const
 {
-  return d->info.location;
+  return d->location;
 }
 
-std::string Bundle::GetName() const
+std::string Bundle::GetSymbolicName() const
 {
-  return d->info.name;
+  return d->symbolicName;
 }
 
 BundleVersion Bundle::GetVersion() const
@@ -277,11 +284,12 @@ std::vector<std::string> Bundle::GetPropertyKeys() const
 
 std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
 {
+  d->CheckUninstalled();
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetRegisteredByBundle(d.get(), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-        i != sr.end(); ++i)
+       i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -290,11 +298,12 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
 
 std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 {
+  d->CheckUninstalled();
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
-  d->coreCtx->services.GetUsedByBundle(std::const_pointer_cast<Bundle>(shared_from_this()), sr);
+  d->coreCtx->services.GetUsedByBundle(d.get(), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-        i != sr.end(); ++i)
+       i != sr.end(); ++i)
   {
     res.push_back(i->GetReference());
   }
@@ -303,40 +312,41 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 
 BundleResource Bundle::GetResource(const std::string& path) const
 {
-  if (!d->resourceContainer.IsValid())
-  {
-    return BundleResource();
-  }
-  BundleResource result(path, d->resourceContainer);
-  if (result) return result;
-  return BundleResource();
+  d->CheckUninstalled();
+  return d->barchive->GetResource(path);
 }
 
 std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
-                                                    bool recurse) const
+                                                  bool recurse) const
 {
-  std::vector<BundleResource> result;
-  if (!d->resourceContainer.IsValid())
-  {
-    return result;
-  }
+  d->CheckUninstalled();
+  return d->barchive->FindResources(path, filePattern, recurse);
+}
 
-  std::string normalizedPath = path;
-  // add a leading and trailing slash
-  if (normalizedPath.empty()) normalizedPath.push_back('/');
-  if (*normalizedPath.begin() != '/') normalizedPath = '/' + normalizedPath;
-  if (*normalizedPath.rbegin() != '/') normalizedPath.push_back('/');
-  d->resourceContainer.FindNodes(d->info.name + normalizedPath,
-                                    filePattern.empty() ? "*" : filePattern,
-                                    recurse, result);
-  return result;
+Bundle::TimeStamp Bundle::GetLastModified() const
+{
+  return d->timeStamp;
+}
+
+std::ostream& operator<<(std::ostream& os, Bundle::State state)
+{
+  switch (state)
+  {
+  case Bundle::STATE_UNINSTALLED: return os << "UNINSTALLED";
+  case Bundle::STATE_INSTALLED: return os << "INSTALLED";
+  case Bundle::STATE_RESOLVED: return os << "RESOLVED";
+  case Bundle::STATE_STARTING: return os << "STARTING";
+  case Bundle::STATE_ACTIVE: return os << "ACTIVE";
+  case Bundle::STATE_STOPPING: return os << "STOPPING";
+  }
+  return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 {
   os << "Bundle[" << "id=" << bundle.GetBundleId() <<
         ", loc=" << bundle.GetLocation() <<
-        ", name=" << bundle.GetName() << "]";
+        ", name=" << bundle.GetSymbolicName() << "]";
   return os;
 }
 

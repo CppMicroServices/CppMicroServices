@@ -27,9 +27,11 @@
 #error Missing US_BUNDLE_NAME preprocessor define
 #endif
 
+#include "usBundleContext.h"
+#include <usGlobalConfig.h>
+
 #include <memory>
 
-#include <usGlobalConfig.h>
 
 namespace us {
 
@@ -81,7 +83,7 @@ struct BundleActivator
    *         bundle's listeners, unregister all services registered by this
    *         bundle, and release all services used by this bundle.
    */
-  virtual void Start(BundleContext* context) = 0;
+  virtual void Start(BundleContext context) = 0;
 
   /**
    * Called when this bundle is stopped. In general, this
@@ -98,7 +100,7 @@ struct BundleActivator
    *         the bundle's listeners, unregister all services registered by the
    *         bundle, and release all services used by the bundle.
    */
-  virtual void Stop(BundleContext* context) = 0;
+  virtual void Stop(BundleContext context) = 0;
 
 };
 

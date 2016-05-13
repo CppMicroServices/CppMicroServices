@@ -20,13 +20,13 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
 
-#include <usGetBundleContext.h>
 #include <usBundleContext.h>
 #include <usServiceEvent.h>
 
@@ -49,7 +49,7 @@ private:
 
   friend class MyServiceListener;
 
-  BundleContext* context;
+  BundleContext context;
 
   int nListeners;
   int nServices;
@@ -64,7 +64,7 @@ private:
 
 public:
 
-  ServiceRegistryPerformanceTest(BundleContext* context);
+  ServiceRegistryPerformanceTest(const BundleContext& context);
 
   void InitTestCase();
   void CleanupTestCase();
@@ -123,7 +123,7 @@ public:
 };
 
 
-ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(BundleContext* context)
+ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(const BundleContext& context)
   : context(context)
   , nListeners(100)
   , nServices(1000)
@@ -151,7 +151,7 @@ void ServiceRegistryPerformanceTest::CleanupTestCase()
     try
     {
       MyServiceListener* l = listeners[i];
-      context->RemoveServiceListener(l, &MyServiceListener::ServiceChanged);
+      context.RemoveServiceListener(l, &MyServiceListener::ServiceChanged);
       delete l;
     }
     catch (const std::exception& e)
@@ -176,7 +176,7 @@ void ServiceRegistryPerformanceTest::AddListeners(int n)
     try
     {
       listeners.push_back(l);
-      context->AddServiceListener(l, &MyServiceListener::ServiceChanged, "(perf.service.value>=0)");
+      context.AddServiceListener(l, &MyServiceListener::ServiceChanged, "(perf.service.value>=0)");
     }
     catch (const std::exception& e)
     {
@@ -220,7 +220,7 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
 
     services.emplace_back(std::make_shared<PerfTestService>());
     ServiceRegistration<IPerfTestService> reg =
-        context->RegisterService<IPerfTestService>(services.back(), props);
+        context.RegisterService<IPerfTestService>(services.back(), props);
     regs.push_back(reg);
   }
 }
@@ -285,9 +285,9 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  ServiceRegistryPerformanceTest perfTest(framework->GetBundleContext());
+  ServiceRegistryPerformanceTest perfTest(framework.GetBundleContext());
   perfTest.InitTestCase();
   perfTest.TestAddListeners();
   perfTest.TestRegisterServices();

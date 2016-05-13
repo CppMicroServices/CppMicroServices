@@ -22,6 +22,7 @@
 
 #include "usServiceEvent.h"
 
+#include "usConstants.h"
 #include "usServiceProperties.h"
 
 namespace us {
@@ -116,10 +117,10 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
   if (sr)
   {
     // Some events will not have a service reference
-    long int sid = any_cast<long int>(sr.GetProperty(ServiceConstants::SERVICE_ID()));
+    long int sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
     os << " " << sid;
 
-    Any classes = sr.GetProperty(ServiceConstants::OBJECTCLASS());
+    Any classes = sr.GetProperty(Constants::OBJECTCLASS);
     os << " objectClass=" << classes.ToString() << ")";
   }
 

@@ -28,12 +28,12 @@ using namespace us;
 
 struct MyStaticBundleActivator : public BundleActivator
 {
-  void Start(BundleContext* /*context*/)
+  void Start(BundleContext /*context*/)
   {
     std::cout << "Hello from a static bundle." << std::endl;
   }
 
-  void Stop(BundleContext* /*context*/) {}
+  void Stop(BundleContext /*context*/) {}
 };
 
 US_EXPORT_BUNDLE_ACTIVATOR(MyStaticBundleActivator)

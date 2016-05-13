@@ -20,12 +20,13 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 #include <usBundle.h>
 #include <usBundleEvent.h>
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
+#include <usConstants.h>
 #include <usLDAPProp.h>
 #include <usServiceFindHook.h>
 #include <usServiceEvent.h>
@@ -59,17 +60,17 @@ class TestServiceEventListenerHook : public ServiceEventListenerHook
 private:
 
   int id;
-  BundleContext* bundleCtx;
+  BundleContext bundleCtx;
 
 public:
 
-  TestServiceEventListenerHook(int id, BundleContext* context)
+  TestServiceEventListenerHook(int id, const BundleContext& context)
   : id(id),
     bundleCtx(context)
   {
   }
 
-  typedef ShrinkableMap<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > MapType;
+  typedef ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo> > MapType;
 
   void Event(const ServiceEvent& /*event*/, MapType& listeners)
   {
@@ -142,17 +143,17 @@ class TestServiceFindHook : public ServiceFindHook
 {
 private:
   int id;
-  BundleContext* bundleCtx;
+  BundleContext bundleCtx;
 
 public:
 
-  TestServiceFindHook(int id, BundleContext* context)
+  TestServiceFindHook(int id, const BundleContext& context)
     : id(id),
       bundleCtx(context)
   {
   }
 
-  void Find(const BundleContext* context, const std::string& /*name*/,
+  void Find(const BundleContext& context, const std::string& /*name*/,
             const std::string& /*filter*/, ShrinkableVector<ServiceReferenceBase>& references)
   {
     US_TEST_CONDITION(context == bundleCtx, "Bundle context");
@@ -170,11 +171,11 @@ class TestServiceListenerHook : public ServiceListenerHook
 {
 private:
   int id;
-  BundleContext* bundleCtx;
+  BundleContext bundleCtx;
 
 public:
 
-  TestServiceListenerHook(int id,BundleContext* context)
+  TestServiceListenerHook(int id, const BundleContext& context)
     : id(id),
       bundleCtx(context)
   {
@@ -185,7 +186,7 @@ public:
     for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin();
          iter != listeners.end(); ++iter)
     {
-      if (iter->IsRemoved() || iter->GetBundleContext() != bundleCtx) continue;
+      if (iter->IsRemoved() || iter->GetBundleContext().GetBundle() != bundleCtx.GetBundle()) continue;
       listenerInfos.insert(*iter);
       lastAdded = listeners.back();
       ordering.push_back(id);
@@ -213,26 +214,26 @@ public:
 std::vector<int> TestServiceListenerHook::ordering;
 
 
-void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
+void TestEventListenerHook(const Framework& framework)
 {
-  BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
+  auto context = testing::GetBundle("main", framework.GetBundleContext()).GetBundleContext();
 
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
-  context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-  context->AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "bla");
+  context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+  context.AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(Constants::OBJECTCLASS) == "bla");
 
   auto serviceEventListenerHook1 = std::make_shared<TestServiceEventListenerHook>(1, context);
   ServiceProperties hookProps1;
-  hookProps1[ServiceConstants::SERVICE_RANKING()] = 10;
+  hookProps1[Constants::SERVICE_RANKING] = 10;
   ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg1 =
-      context->RegisterService<ServiceEventListenerHook>(serviceEventListenerHook1, hookProps1);
+      context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook1, hookProps1);
 
   auto serviceEventListenerHook2 = std::make_shared<TestServiceEventListenerHook>(2, context);
   ServiceProperties hookProps2;
-  hookProps2[ServiceConstants::SERVICE_RANKING()] = 0;
+  hookProps2[Constants::SERVICE_RANKING] = 0;
   ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg2 =
-      context->RegisterService<ServiceEventListenerHook>(serviceEventListenerHook2, hookProps2);
+      context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook2, hookProps2);
 
   std::vector<int> expectedOrdering;
   expectedOrdering.push_back(1);
@@ -243,15 +244,15 @@ void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION(serviceListener1.events.empty(), "service event of service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener");
 
-  auto bundle = InstallTestBundle(context, "TestBundleA");
-
-  bundle->Start();
+  auto bundle = testing::InstallLib(context, "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
+  bundle.Start();
 
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(2);
   US_TEST_CONDITION(serviceEventListenerHook1->ordering == expectedOrdering, "Event listener hook call order");
 
-  bundle->Stop();
+  bundle.Stop();
 
   US_TEST_CONDITION(serviceListener1.events.empty(), "no service event due to service event listener hook");
   US_TEST_CONDITION(serviceListener2.events.empty(), "no service event for filtered listener due to service event listener hook");
@@ -259,30 +260,30 @@ void TestEventListenerHook(const std::shared_ptr<Framework>& framework)
   eventListenerHookReg2.Unregister();
   eventListenerHookReg1.Unregister();
 
-  context->RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-  context->RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
+  context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+  context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 }
 
-void TestListenerHook(const std::shared_ptr<Framework>& framework)
+void TestListenerHook(const Framework& framework)
 {
-  BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
+  auto context = testing::GetBundle("main", framework.GetBundleContext()).GetBundleContext();
 
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
-  context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-  context->AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "bla");
+  context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+  context.AddServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged, LDAPProp(Constants::OBJECTCLASS) == "bla");
 
   auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context);
   ServiceProperties hookProps1;
-  hookProps1[ServiceConstants::SERVICE_RANKING()] = 0;
+  hookProps1[Constants::SERVICE_RANKING] = 0;
   ServiceRegistration<ServiceListenerHook> listenerHookReg1 =
-      context->RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
+      context.RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
 
   auto serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(2, context);
   ServiceProperties hookProps2;
-  hookProps2[ServiceConstants::SERVICE_RANKING()] = 10;
+  hookProps2[Constants::SERVICE_RANKING] = 10;
   ServiceRegistration<ServiceListenerHook> listenerHookReg2 =
-      context->RegisterService<ServiceListenerHook>(serviceListenerHook2, hookProps2);
+      context.RegisterService<ServiceListenerHook>(serviceListenerHook2, hookProps2);
 
 #ifdef US_BUILD_SHARED_LIBS
   // check if hooks got notified about the existing listeners
@@ -290,7 +291,7 @@ void TestListenerHook(const std::shared_ptr<Framework>& framework)
 #endif
   const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfos.size() - 2;
 
-  context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+  context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
   auto lastAdded = serviceListenerHook1->lastAdded;
 
 #ifdef US_BUILD_SHARED_LIBS
@@ -306,7 +307,7 @@ void TestListenerHook(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering, "Listener hook call order");
 #endif
 
-  context->AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged, LDAPProp(ServiceConstants::OBJECTCLASS()) == "blub");
+  context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged, LDAPProp(Constants::OBJECTCLASS) == "blub");
   US_TEST_CONDITION(lastAdded == serviceListenerHook1->lastRemoved, "Same ListenerInfo object)");
   US_TEST_CONDITION(!(lastAdded == serviceListenerHook1->lastAdded), "New ListenerInfo object)");
 
@@ -318,8 +319,8 @@ void TestListenerHook(const std::shared_ptr<Framework>& framework)
   US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering, "Listener hook call order");
 #endif
 
-  context->RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-  context->RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
+  context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+  context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 
 #ifdef US_BUILD_SHARED_LIBS
   expectedOrdering.push_back(20);
@@ -335,37 +336,38 @@ void TestListenerHook(const std::shared_ptr<Framework>& framework)
   listenerHookReg1.Unregister();
 }
 
-void TestFindHook(const std::shared_ptr<Framework>& framework)
+void TestFindHook(const Framework& framework)
 {
-  BundleContext* context = framework->GetBundleContext()->GetBundle("main")->GetBundleContext();
+  auto context = testing::GetBundle("main", framework.GetBundleContext()).GetBundleContext();
 
   auto serviceFindHook1= std::make_shared<TestServiceFindHook>(1, context);
   ServiceProperties hookProps1;
-  hookProps1[ServiceConstants::SERVICE_RANKING()] = 0;
+  hookProps1[Constants::SERVICE_RANKING] = 0;
   ServiceRegistration<ServiceFindHook> findHookReg1 =
-      context->RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
+      context.RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
 
   auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
   ServiceProperties hookProps2;
-  hookProps2[ServiceConstants::SERVICE_RANKING()] = 10;
+  hookProps2[Constants::SERVICE_RANKING] = 10;
   ServiceRegistration<ServiceFindHook> findHookReg2 =
-      context->RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
+      context.RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
 
   std::vector<int> expectedOrdering;
   US_TEST_CONDITION(serviceFindHook1->ordering == expectedOrdering, "Find hook call order");
 
   TestServiceListener serviceListener;
-  context->AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
+  context.AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 
-  auto bundle = InstallTestBundle(context, "TestBundleA");
+  auto bundle = testing::InstallLib(context, "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
 
-  bundle->Start();
+  bundle.Start();
 
   US_TEST_CONDITION(serviceListener.events.size() == 1, "Service registered");
 
-  std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestBundleAService");
+  std::vector<ServiceReferenceU> refs = context.GetServiceReferences("us::TestBundleAService");
   US_TEST_CONDITION(refs.empty(), "Empty references");
-  ServiceReferenceU ref = context->GetServiceReference("us::TestBundleAService");
+  ServiceReferenceU ref = context.GetServiceReference("us::TestBundleAService");
   US_TEST_CONDITION(!ref, "Invalid reference (filtered out)");
 
   expectedOrdering.push_back(2);
@@ -378,14 +380,14 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
   findHookReg2.Unregister();
   findHookReg1.Unregister();
 
-  refs = context->GetServiceReferences("us::TestBundleAService");
+  refs = context.GetServiceReferences("us::TestBundleAService");
   US_TEST_CONDITION(!refs.empty(), "Non-empty references");
-  ref = context->GetServiceReference("us::TestBundleAService");
+  ref = context.GetServiceReference("us::TestBundleAService");
   US_TEST_CONDITION(ref, "Valid reference");
 
-  bundle->Stop();
+  bundle.Stop();
 
-  context->RemoveServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
+  context.RemoveServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 }
 
 } // end unnamed namespace
@@ -396,13 +398,20 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
   try
   {
-    auto bundle = framework->GetBundleContext()->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
-    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle main")
-    bundle->Start();
+    auto bundles = framework.GetBundleContext().InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+    US_TEST_CONDITION_REQUIRED(!bundles.empty(), "Test installation of bundle main")
+    for (auto& b : bundles)
+    {
+      if (b.GetSymbolicName() == "main")
+      {
+        b.Start();
+        break;
+      }
+    }
   }
   catch (const std::exception& e)
   {

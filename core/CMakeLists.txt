@@ -33,6 +33,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
 usMacroCreateBundle(Core
   VERSION "2.99.0"
   TARGET CppMicroServices
+  SYMBOLIC_NAME system_bundle
+  SKIP_INIT # we do it manually
   INTERNAL_INCLUDE_DIRS src/util src/service src/bundle
   LINK_LIBRARIES ${_link_libraries}
   SOURCES ${_core_srcs}

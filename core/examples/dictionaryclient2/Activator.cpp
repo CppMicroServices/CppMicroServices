@@ -26,6 +26,7 @@
 
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
+#include <usConstants.h>
 #include <usServiceEvent.h>
 
 #include <iostream>
@@ -52,7 +53,7 @@ class US_ABI_LOCAL Activator : public BundleActivator
 public:
 
   Activator()
-   : m_context(nullptr)
+   : m_context()
    , m_dictionary(nullptr)
   {}
 
@@ -74,7 +75,7 @@ public:
    *
    * @param context the bundle context for this bundle.
    */
-  void Start(BundleContext *context)
+  void Start(BundleContext context)
   {
     m_context = context;
 
@@ -88,20 +89,20 @@ public:
       // MutexLocker lock(&m_mutex);
 
       // Listen for events pertaining to dictionary services.
-      m_context->AddServiceListener(this, &Activator::ServiceChanged,
-                                    std::string("(&(") + ServiceConstants::OBJECTCLASS() + "=" +
-                                    us_service_interface_iid<IDictionaryService>() + ")" + "(Language=*))");
+      m_context.AddServiceListener(this, &Activator::ServiceChanged,
+                                   std::string("(&(") + Constants::OBJECTCLASS + "=" +
+                                   us_service_interface_iid<IDictionaryService>() + ")" + "(Language=*))");
 
       // Query for any service references matching any language.
       std::vector<ServiceReference<IDictionaryService> > refs =
-          context->GetServiceReferences<IDictionaryService>("(Language=*)");
+          context.GetServiceReferences<IDictionaryService>("(Language=*)");
 
       // If we found any dictionary services, then just get
       // a reference to the first one so we can use it.
       if (!refs.empty())
       {
         m_ref = refs.front();
-        m_dictionary = m_context->GetService(m_ref);
+        m_dictionary = m_context.GetService(m_ref);
       }
     }
 
@@ -144,7 +145,7 @@ public:
    * the C++ Micro Services library will automatically unget any used services.
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     // NOTE: The service is automatically released.
   }
@@ -169,7 +170,7 @@ public:
       {
         // Get a reference to the service object.
         m_ref = event.GetServiceReference();
-        m_dictionary = m_context->GetService(m_ref);
+        m_dictionary = m_context.GetService(m_ref);
       }
     }
     // If a dictionary service was unregistered, see if it
@@ -187,7 +188,7 @@ public:
         std::vector<ServiceReference<IDictionaryService> > refs;
         try
         {
-          refs = m_context->GetServiceReferences<IDictionaryService>("(Language=*)");
+          refs = m_context.GetServiceReferences<IDictionaryService>("(Language=*)");
         }
         catch (const std::invalid_argument& e)
         {
@@ -198,7 +199,7 @@ public:
         {
           // Get a reference to the first service object.
           m_ref = refs.front();
-          m_dictionary = m_context->GetService(m_ref);
+          m_dictionary = m_context.GetService(m_ref);
         }
       }
     }
@@ -207,7 +208,7 @@ public:
 private:
 
   // Bundle context
-  BundleContext* m_context;
+  BundleContext m_context;
 
   // The service reference being used
   ServiceReference<IDictionaryService> m_ref;

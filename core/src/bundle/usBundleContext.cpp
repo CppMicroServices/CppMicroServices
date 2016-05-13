@@ -37,68 +37,116 @@
 
 namespace us {
 
-BundleContext::BundleContext(BundlePrivate* bundle)
-  : d(new BundleContextPrivate(bundle))
+BundleContext::BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx)
+  : d(ctx)
 {}
 
-BundleContext::~BundleContext()
+BundleContext::BundleContext()
 {
 }
 
-std::shared_ptr<Bundle> BundleContext::GetBundle() const
+bool BundleContext::operator==(const BundleContext& rhs) const
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  return IsValid() ? (rhs.IsValid() ? d == rhs.d : false) : !rhs.IsValid();
+}
+
+bool BundleContext::operator!=(const BundleContext& rhs) const
+{
+  return !(*this == rhs);
+}
+
+bool BundleContext::operator<(const BundleContext& rhs) const
+{
+  return IsValid() ? (rhs.IsValid() ? (d < rhs.d) : true) : false;
+}
+
+bool BundleContext::IsValid() const
+{
+  return d != nullptr;
+}
+
+BundleContext::operator bool() const
+{
+  return IsValid();
+}
+
+BundleContext& BundleContext::operator=(std::nullptr_t)
+{
+  d = nullptr;
+  return *this;
+}
+
+
+Bundle BundleContext::GetBundle() const
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return b->q->shared_from_this();
+  return MakeBundle(b->shared_from_this());
 }
 
-std::shared_ptr<Bundle> BundleContext::GetBundle(long id) const
+Bundle BundleContext::GetBundle(long id) const
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return b->coreCtx->bundleHooks.FilterBundle(this, b->coreCtx->bundleRegistry.GetBundle(id));
+  return b->coreCtx->bundleHooks.FilterBundle(
+        *this,
+        MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
 }
 
-std::shared_ptr<Bundle> BundleContext::GetBundle(const std::string& name)
+std::vector<Bundle> BundleContext::GetBundles(const std::string& location) const
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return b->coreCtx->bundleRegistry.GetBundle(name);
+  std::vector<Bundle> res;
+  for (auto bu : b->coreCtx->bundleRegistry.GetBundles(location))
+  {
+    res.emplace_back(MakeBundle(bu));
+  }
+  return res;
 }
 
-std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const
+std::vector<Bundle> BundleContext::GetBundles() const
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  auto bundles = b->coreCtx->bundleRegistry.GetBundles();
-  b->coreCtx->bundleHooks.FilterBundles(this, bundles);
-  return bundles;
+  std::vector<Bundle> bus;
+  for (auto bu : b->coreCtx->bundleRegistry.GetBundles())
+  {
+    bus.emplace_back(MakeBundle(bu));
+  }
+  b->coreCtx->bundleHooks.FilterBundles(*this, bus);
+  return bus;
 }
 
 ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& service,
                                                     const ServiceProperties& properties)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
@@ -111,7 +159,8 @@ ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& 
 std::vector<ServiceReferenceU > BundleContext::GetServiceReferences(const std::string& clazz,
                                                                     const std::string& filter)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
@@ -131,7 +180,8 @@ std::vector<ServiceReferenceU > BundleContext::GetServiceReferences(const std::s
 
 ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
@@ -153,12 +203,12 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
 template <class S>
 struct ServiceHolder
 {
-  BundleContext* const bc;
+  const std::weak_ptr<BundlePrivate> b;
   const ServiceReferenceBase sref;
   const std::shared_ptr<S> service;
 
-  ServiceHolder(BundleContext* bc, const ServiceReferenceBase& sr, const std::shared_ptr<S>& s)
-    : bc(bc)
+  ServiceHolder(const std::shared_ptr<BundlePrivate>& b, const ServiceReferenceBase& sr, const std::shared_ptr<S>& s)
+    : b(b)
     , sref(sr)
     , service(s)
   {}
@@ -167,7 +217,7 @@ struct ServiceHolder
   {
     try
     {
-      bc->UngetService(sref);
+      sref.d.load()->UngetService(b.lock(), true);
     }
     catch (const std::exception& exp)
     {
@@ -183,14 +233,15 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
 
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(this, reference, reference.d.load()->GetService(b->q->shared_from_this())));
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(b->shared_from_this(), reference, reference.d.load()->GetService(b)));
   return std::shared_ptr<void>(h, h->service.get());
 }
 
@@ -201,7 +252,8 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
     throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
   }
 
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
@@ -211,180 +263,151 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
   InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(
-        *(reference.d.load()->GetServiceInterfaceMap(b->q->shared_from_this()))
+        *(reference.d.load()->GetServiceInterfaceMap(b))
         );
-  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(this, reference, imap_copy));
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(b->shared_from_this(), reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate,
                                        const std::string& filter)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddServiceListener(this, delegate, nullptr, filter);
+  b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(this, delegate, nullptr);
+  b->coreCtx->listeners.RemoveServiceListener(d, delegate, nullptr);
 }
 
 void BundleContext::AddBundleListener(const BundleListener& delegate)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddBundleListener(this, delegate, nullptr);
+  b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveBundleListener(this, delegate, nullptr);
-}
-
-bool BundleContext::UngetService(const ServiceReferenceBase& reference)
-{
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
-
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-
-  ServiceReferenceBase ref = reference;
-  return ref.d.load()->UngetService(b->q->shared_from_this(), true);
+  b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
                                        const std::string &filter)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddServiceListener(this, delegate, data, filter);
+  b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void* data)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(this, delegate, data);
+  b->coreCtx->listeners.RemoveServiceListener(d, delegate, data);
 }
 
 void BundleContext::AddBundleListener(const BundleListener& delegate, void* data)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddBundleListener(this, delegate, data);
+  b->coreCtx->listeners.AddBundleListener(d, delegate, data);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* data)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveBundleListener(this, delegate, data);
+  b->coreCtx->listeners.RemoveBundleListener(d, delegate, data);
 }
 
 std::string BundleContext::GetDataFile(const std::string &filename) const
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  // compute the bundle storage path
-#ifdef US_PLATFORM_WINDOWS
-    static const char separator = '\\';
-#else
-    static const char separator = '/';
-#endif
-
-  std::string baseStoragePath;
-  auto prop = b->coreCtx->frameworkProperties.find(Framework::PROP_STORAGE_LOCATION);
-  if(prop != b->coreCtx->frameworkProperties.end() &&
-     prop->second.Type() == typeid(std::string))
+  std::string dataRoot = b->bundleDir;
+  if (!dataRoot.empty())
   {
-    baseStoragePath = ref_any_cast<std::string>(prop->second);
+    if (!fs::Exists(dataRoot))
+    {
+      fs::MakePath(dataRoot);
+    }
+    return dataRoot + DIR_SEP + filename;
   }
-
-  if (baseStoragePath.empty()) return std::string();
-  if (baseStoragePath != b->baseStoragePath)
-  {
-    b->baseStoragePath = baseStoragePath;
-    b->storagePath.clear();
-  }
-
-  if (b->storagePath.empty())
-  {
-    char buf[50];
-    sprintf(buf, "%ld", b->info.id);
-    b->storagePath = baseStoragePath + separator + buf + "_" + b->info.name + separator;
-  }
-  return b->storagePath + filename;
+  return std::string();
 }
 
-std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location)
+std::vector<Bundle> BundleContext::InstallBundles(const std::string& location)
 {
-  auto b = (d->Lock(), d->IsValid_unlocked(), d->bundle);
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
 
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  BundleInfo bundleInfo(GetBundleNameFromLocation(location));
-  bundleInfo.location = GetBundleLocation(location);
-
-  auto bundle = b->coreCtx->bundleRegistry.Register(bundleInfo);
-
-  b->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
-
-  return bundle;
+  return b->coreCtx->bundleRegistry.Install(location, b);
 }
 
 

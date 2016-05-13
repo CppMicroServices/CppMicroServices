@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef USBUNDLECONTEXT_H_
-#define USBUNDLECONTEXT_H_
+#ifndef USBUNDLECONTEXT_H
+#define USBUNDLECONTEXT_H
 
 #include "usListenerFunctors.h"
 #include "usServiceInterface.h"
@@ -32,6 +32,7 @@
 namespace us {
 
 class Bundle;
+class BundleContext;
 class BundleContextPrivate;
 class ServiceFactory;
 
@@ -91,10 +92,66 @@ class US_Core_EXPORT BundleContext
 
 public:
 
-  BundleContext(const BundleContext&) = delete;
-  BundleContext& operator=(const BundleContext&) = delete;
+  BundleContext();
 
-  ~BundleContext();
+  /**
+   * Compares this \c BundleContext object with the specified
+   * bundle context.
+   *
+   * Valid \c BundleContext objects compare equal if and only if
+   * they represent the same context. Invalid \c BundleContext
+   * objects are always considered to be equal.
+   *
+   * @param rhs The \c BundleContext object to compare this object with.
+   * @return \c true if this \c BundleContext object is equal to \c rhs,
+   *         \c false otherwise.
+   */
+  bool operator==(const BundleContext& rhs) const;
+
+  /**
+   * Compares this \c BundleContext object with the specified bundle
+   * context for inequality.
+   *
+   * @param rhs The \c BundleContext object to compare this object with.
+   * @return Returns the result of <code>!(*this == rhs)</code>.
+   */
+  bool operator!=(const BundleContext& rhs) const;
+
+  /**
+   * Compares this \c BundleContext with the specified bundle
+   * context for order.
+   *
+   * How valid %BundleContext objects are ordered is an implementation
+   * detail and must not be relied on. Invalid \c BundleContext objects
+   * will always compare greater then valid \c BundleContext objects.
+   *
+   * @param rhs The \c BundleContext object to compare this object with.
+   * @return \c
+   */
+  bool operator<(const BundleContext& rhs) const;
+
+  /**
+   * Tests this %BundleContext object for validity.
+   *
+   * Invalid \c BundleContext objects are created by the default constructor or
+   * can be returned by certain framework methods if the context bundle has been
+   * uninstalled.
+   *
+   * @return \c true if this %BundleContext object is valid and can safely be used,
+   *         \c false otherwise.
+   */
+  bool IsValid() const;
+
+  /**
+   * Boolean conversion operator using IsValid().
+   */
+  explicit operator bool() const;
+
+  /**
+   * Releases any resources held or locked by this
+   * \c BundleContext and renders it invalid.
+   */
+  BundleContext& operator=(std::nullptr_t);
 
   /**
    * Returns the <code>Bundle</code> object associated with this
@@ -105,7 +162,7 @@ public:
    * @throws std::logic_error If this BundleContext is no
    *         longer valid.
    */
-  std::shared_ptr<Bundle> GetBundle() const;
+  Bundle GetBundle() const;
 
   /**
    * Returns the bundle with the specified identifier.
@@ -114,15 +171,15 @@ public:
    * @return A <code>Bundle</code> object or <code>nullptr</code> if the
    *         identifier does not match any previously installed bundle.
    */
-  std::shared_ptr<Bundle> GetBundle(long id) const;
+  Bundle GetBundle(long id) const;
 
   /**
-   * Get the bundle with the specified bundle name.
+   * Get the bundles with the specified bundle location.
    *
-   * @param name The name of the bundle to get.
-   * @return The requested \c Bundle or \c nullptr.
+   * @param name The location of the bundles to get.
+   * @return The requested {\c Bundle}s or an empty list.
    */
-  std::shared_ptr<Bundle> GetBundle(const std::string& name);
+  std::vector<Bundle> GetBundles(const std::string& location) const;
 
   /**
    * Returns a list of all known bundles.
@@ -134,7 +191,7 @@ public:
    * @return A std::vector of <code>Bundle</code> objects which
    *         will hold one object per known bundle.
    */
-  std::vector<std::shared_ptr<Bundle>> GetBundles() const;
+  std::vector<Bundle> GetBundles() const;
 
   /**
    * Registers the specified service object with the specified properties
@@ -157,11 +214,11 @@ public:
    * <li>The framework adds the following service properties to the service
    * properties from the specified <code>ServiceProperties</code> (which may be
    * omitted): <br/>
-   * A property named ServiceConstants#SERVICE_ID() identifying the
+   * A property named Constants#SERVICE_ID identifying the
    * registration number of the service <br/>
-   * A property named ServiceConstants#OBJECTCLASS() containing all the
+   * A property named Constants#OBJECTCLASS containing all the
    * specified classes. <br/>
-   * A property named ServiceConstants#SERVICE_SCOPE() identifying the scope
+   * A property named Constants#SERVICE_SCOPE identifying the scope
    * of the service. <br/>
    * Properties with these names in the specified <code>ServiceProperties</code> will
    * be ignored.
@@ -299,7 +356,7 @@ public:
    * empty, the service must have been registered with the
    * specified class name. The complete list of class names with which a
    * service was registered is available from the service's
-   * {@link ServiceConstants#OBJECTCLASS() objectClass} property.
+   * {@link Constants#OBJECTCLASS objectClass} property.
    * <li>If the specified <code>filter</code> is not empty, the
    * filter expression must match the service.
    * </ul>
@@ -372,10 +429,10 @@ public:
    * specified class.
    * <p>
    * If multiple such services exist, the service with the highest ranking (as
-   * specified in its ServiceConstants::SERVICE_RANKING() property) is returned.
+   * specified in its Constants::SERVICE_RANKING property) is returned.
    * <p>
    * If there is a tie in ranking, the service with the lowest service ID (as
-   * specified in its ServiceConstants::SERVICE_ID() property); that is, the
+   * specified in its Constants::SERVICE_ID property); that is, the
    * service that was registered first is returned.
    *
    * @param clazz The class name with which the service was registered.
@@ -417,7 +474,7 @@ public:
    * <code>ServiceReferenceBase</code> object.
    * <p>
    * A bundle's use of a service is tracked by the bundle's use count of that
-   * service. Each call to {@link #GetService(const ServiceReference<S>&)} increments 
+   * service. Each call to {@link #GetService(const ServiceReference<S>&)} increments
    * the context bundle's use count by one. The deleter function of the returned shared_ptr
    * object is responsible for decrementing the context bundle's use count.
    * <p>
@@ -471,7 +528,7 @@ public:
    * @tparam S The type the service object will be cast to.
    * @return A shared_ptr to the service object associated with <code>reference</code>.
    *         An empty object is returned if the service is not registered, the
-   *         <code>ServiceFactory</code> threw an exception or the service could not be 
+   *         <code>ServiceFactory</code> threw an exception or the service could not be
    *         cast to the desired type.
    * @throws std::logic_error If this BundleContext is no
    *         longer valid.
@@ -510,7 +567,7 @@ public:
   template<class S>
   ServiceObjects<S> GetServiceObjects(const ServiceReference<S>& reference)
   {
-    return ServiceObjects<S>(this, reference);
+    return ServiceObjects<S>(d, reference);
   }
 
   void AddServiceListener(const ServiceListener& delegate,
@@ -542,7 +599,7 @@ public:
    * <p>
    * The callback is called if the filter criteria is met. To filter based
    * upon the class of the service, the filter should reference the
-   * ServiceConstants#OBJECTCLASS() property. If <code>filter</code> is
+   * Constants#OBJECTCLASS property. If <code>filter</code> is
    * empty, all services are considered to match the filter.
    *
    * <p>
@@ -648,23 +705,24 @@ public:
 
   /**
    * Get the absolute path for a file or directory in the persistent
-   * storage area provided for the bundle. The returned path
-   * might be empty if no storage path has been set previously.
-   * If the path is non-empty, it is safe to assume that the path is writable.
+   * storage area provided for the bundle.
    *
-   * @see Framework::Framework(std::map<std::string, std::string>& configuration)
+   * The absolute path for the base directory of the persistent storage
+   * area provided for the context bundle by the Framework can be obtained by
+   * calling this method with an empty string as \c filename.
    *
    * @param filename A relative name to the file or directory to be accessed.
    * @return The absolute path to the persistent storage area for the given file name.
+   * @throws std::logic_error If this BundleContext is no
+   *         longer valid.
    */
   std::string GetDataFile(const std::string& filename) const;
 
-
   /**
-   * Installs a bundle from the specified location.
+   * Installs all bundles from the bundle library at the specified location.
    *
    * The following steps are required to install a bundle:
-   * -# If a bundle containing the same location identifier is already installed, the Bundle object for that
+   * -# If a bundle containing the same install location is already installed, the Bundle object for that
    *    bundle is returned.
    * -# The bundle's associated resources are allocated. The associated resources minimally consist of a
    *    unique identifier and a persistent storage area if the platform has file system support. If this step
@@ -672,63 +730,21 @@ public:
    * -# A bundle event of type <code>BundleEvent::INSTALLED</code> is fired.
    * -# The Bundle object for the newly or previously installed bundle is returned.
    *
-   * @remarks A location identifier is defined as an absolute path to a shared library or executable file
-   * followed by a slash (/) and the bundle's name.
+   * @remarks An install location is an absolute path to a shared library or executable file
+   * which may contain several bundles, i. e. acts as a bundle library.
    *
-   * For example:
-   * -# <code>InstallBundle("/path/to/bundle/foo.so/foo");</code>
-   * -# <code>InstallBundle("/path/to/bundle/foo.so/my_static_bundle");</code>
-   *
-   * @param location The location identifier of the bundle to install.
-   * @return The Bundle object of the installed bundle.
+   * @param location The location of the bundle library to install.
+   * @return The Bundle objects of the installed bundle library.
    * @throws std::runtime_error If the installation failed.
    */
-  std::shared_ptr<Bundle> InstallBundle(const std::string& location);
+  std::vector<Bundle> InstallBundles(const std::string& location);
 
 private:
 
-  friend class Bundle;
-  friend class BundlePrivate;
-  template<class S> friend struct ServiceHolder;
+  friend BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
+  friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
-  BundleContext(BundlePrivate* bundle);
-  
-  /**
-   * Releases the service object referenced by the specified
-   * <code>ServiceReference</code> object. If the context bundle's use count
-   * for the service is zero, this method returns <code>false</code>.
-   * Otherwise, the context bundles's use count for the service is decremented
-   * by one.
-   *
-   * <p>
-   * The service's service object should no longer be used and all references
-   * to it should be destroyed when a bundle's use count for the service drops
-   * to zero.
-   *
-   * <p>
-   * The following steps are taken to unget the service object:
-   * <ol>
-   * <li>If the context bundle's use count for the service is zero or the
-   * service has been unregistered, <code>false</code> is returned.
-   * <li>The context bundle's use count for this service is decremented by
-   * one.
-   * <li>If the context bundle's use count for the service is currently zero
-   * and the service was registered with a <code>ServiceFactory</code> object,
-   * the ServiceFactory#UngetService
-   * method is called to release the service object for the context bundle.
-   * <li><code>true</code> is returned.
-   * </ol>
-   *
-   * @param reference A reference to the service to be released.
-   * @return <code>false</code> if the context bundle's use count for the
-   *         service is zero or if the service has been unregistered;
-   *         <code>true</code> otherwise.
-   * @throws std::logic_error If this BundleContext is no
-   *         longer valid.
-   * @see #GetService
-   * @see ServiceFactory
-   */
-  bool UngetService(const ServiceReferenceBase& reference);
+  BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
 
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);
@@ -737,9 +753,9 @@ private:
   void AddBundleListener(const BundleListener& delegate, void* data);
   void RemoveBundleListener(const BundleListener& delegate, void* data);
 
-  std::unique_ptr<BundleContextPrivate> const d;
+  std::shared_ptr<BundleContextPrivate> d;
 };
 
 }
 
-#endif /* USBUNDLECONTEXT_H_ */
+#endif /* USBUNDLECONTEXT_H */

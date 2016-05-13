@@ -23,6 +23,7 @@
 //! [Activator]
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
+#include <usConstants.h>
 #include <usServiceEvent.h>
 
 #include <iostream>
@@ -47,10 +48,10 @@ private:
    *
    * @param context the framework context for the bundle.
    */
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     std::cout << "Starting to listen for service events." << std::endl;
-    context->AddServiceListener(this, &Activator::ServiceChanged);
+    context.AddServiceListener(this, &Activator::ServiceChanged);
   }
 
   /**
@@ -59,9 +60,9 @@ private:
    *
    * @param context the framework context for the bundle.
    */
-  void Stop(BundleContext* context)
+  void Stop(BundleContext context)
   {
-    context->RemoveServiceListener(this, &Activator::ServiceChanged);
+    context.RemoveServiceListener(this, &Activator::ServiceChanged);
     std::cout << "Stopped listening for service events." << std::endl;
 
     // Note: It is not required that we remove the listener here,
@@ -75,7 +76,7 @@ private:
    */
   void ServiceChanged(const ServiceEvent& event)
   {
-    std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(ServiceConstants::OBJECTCLASS())).front();
+    std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(Constants::OBJECTCLASS)).front();
 
     if (event.GetType() == ServiceEvent::REGISTERED)
     {

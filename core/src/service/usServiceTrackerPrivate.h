@@ -24,6 +24,7 @@
 #ifndef USSERVICETRACKERPRIVATE_H
 #define USSERVICETRACKERPRIVATE_H
 
+#include "usBundleContext.h"
 #include "usServiceReference.h"
 #include "usLDAPFilter.h"
 #include "usThreads_p.h"
@@ -43,16 +44,16 @@ public:
   typedef typename TTT::TrackedParmType TrackedParmType;
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
-                        BundleContext* context,
+                        const BundleContext& context,
                         const ServiceReference<S>& reference,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
-                        BundleContext* context, const std::string& clazz,
+                        const BundleContext& context, const std::string& clazz,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S,T>* st,
-                        BundleContext* context, const LDAPFilter& filter,
+                        const BundleContext& context, const LDAPFilter& filter,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
   ~ServiceTrackerPrivate();
@@ -80,7 +81,7 @@ public:
   /**
    * The Bundle Context used by this <code>ServiceTracker</code>.
    */
-  BundleContext* const context;
+  BundleContext context;
 
   /**
    * The filter used by this <code>ServiceTracker</code> which specifies the

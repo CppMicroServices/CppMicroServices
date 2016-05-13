@@ -54,7 +54,7 @@ namespace us {
      main test function. */
 #define US_TEST_BEGIN(testName)                                                               \
   std::string usTestName(#testName);                                                          \
-  us::TestManager::GetInstance().Initialize();                              \
+  us::TestManager::GetInstance().Initialize();                                                \
   try {
 
 /** \brief Fail and finish test with message MSG */
@@ -64,21 +64,21 @@ namespace us {
 
 /** \brief Must be called last in the main test function. */
 #define US_TEST_END()                                                                         \
-  } catch (const us::TestFailedException&) {                                \
+  } catch (const us::TestFailedException&) {                                                  \
     US_TEST_OUTPUT(<< "Further test execution skipped.")                                      \
-    us::TestManager::GetInstance().TestFailed();                            \
+    us::TestManager::GetInstance().TestFailed();                                              \
   } catch (const std::exception& ex) {                                                        \
-    US_TEST_OUTPUT(<< "Exception occured " << ex.what())                                      \
-    us::TestManager::GetInstance().TestFailed();                            \
+    US_TEST_OUTPUT(<< "Exception occured: " << ex.what())                                     \
+    us::TestManager::GetInstance().TestFailed();                                              \
   }                                                                                           \
-  if (us::TestManager::GetInstance().NumberOfFailedTests() > 0) {           \
+  if (us::TestManager::GetInstance().NumberOfFailedTests() > 0) {                             \
     US_TEST_OUTPUT(<< usTestName << ": [DONE FAILED] , subtests passed: " <<                  \
-    us::TestManager::GetInstance().NumberOfPassedTests() << " failed: " <<  \
-    us::TestManager::GetInstance().NumberOfFailedTests() )                  \
+    us::TestManager::GetInstance().NumberOfPassedTests() << " failed: " <<                    \
+    us::TestManager::GetInstance().NumberOfFailedTests() )                                    \
     return EXIT_FAILURE;                                                                      \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< usTestName << ": "                                                      \
-                   << us::TestManager::GetInstance().NumberOfPassedTests()  \
+                   << us::TestManager::GetInstance().NumberOfPassedTests()                    \
                    << " tests [DONE PASSED]")                                                 \
     return EXIT_SUCCESS;                                                                      \
   }

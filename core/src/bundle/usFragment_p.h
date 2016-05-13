@@ -21,14 +21,55 @@
 =============================================================================*/
 
 
-#include "usBundleInfo.h"
+#ifndef USFRAGMENT_P_H
+#define USFRAGMENT_P_H
+
+#include <vector>
 
 namespace us {
 
-BundleInfo::BundleInfo(const std::string& name)
-  : name(name)
-  , id(0)
+class BundlePrivate;
+
+/**
+ * \ingroup MicroServices
+ */
+class Fragment
 {
-}
+
+public:
+
+  std::vector<BundlePrivate*> Targets() const
+  {
+    // TODO
+    return std::vector<BundlePrivate*>();
+  }
+
+  bool IsHost(BundlePrivate*) const
+  {
+    return false;
+  }
+
+  bool HasHosts() const
+  {
+    return !hosts.empty();
+  }
+
+  void RemoveHost(BundlePrivate* host)
+  {
+    if (host == nullptr)
+    {
+      hosts.clear();
+    }
+    else
+    {
+      hosts.erase(std::find(hosts.begin(), hosts.end(), host));
+    }
+  }
+
+  std::vector<BundlePrivate*> hosts;
+
+};
 
 }
+
+#endif // USFRAGMENT_P_H

@@ -20,29 +20,16 @@
 
 =============================================================================*/
 
-#include "usBundleActivator.h"
-
-#include "usBundle.h"
-#include "usBundlePrivate.h"
-#include "usCoreBundleContext_p.h"
+#include "usDebug_p.h"
 
 namespace us {
 
-class CoreBundleActivator : public BundleActivator
+Debug::Debug()
+  : lazyActivation(false)
 {
-
-  void Start(BundleContext* context)
-  {
-    context->GetBundle()->d->coreCtx->Init();
-  }
-
-  void Stop(BundleContext* context)
-  {
-    context->GetBundle()->d->coreCtx->Uninit();
-  }
-
-};
-
+#ifdef _DEBUG
+  lazyActivation = true;
+#endif
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(us::CoreBundleActivator)
+}

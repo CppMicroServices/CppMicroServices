@@ -207,20 +207,23 @@ std::vector<std::string> AbstractWebConsolePlugin::GetCssReferences() const
   return std::vector<std::string>();
 }
 
-std::string AbstractWebConsolePlugin::ReadTemplateFile(const std::string& templateFile, us::BundleContext* context) const
+std::string AbstractWebConsolePlugin::ReadTemplateFile(
+    const std::string& templateFile,
+    us::BundleContext context
+    ) const
 {
   std::string result;
 
-  if (context == nullptr)
+  if (!context)
   {
     context = us::GetBundleContext();
   }
 
-  us::BundleResource res = context->GetBundle()->GetResource(templateFile);
+  us::BundleResource res = context.GetBundle().GetResource(templateFile);
   if (!res)
   {
     std::cout << "Resource file '" << templateFile << "' not found in bundle '"
-              << context->GetBundle()->GetName() << "'" << std::endl;
+              << context.GetBundle().GetSymbolicName() << "'" << std::endl;
     return result;
   }
 

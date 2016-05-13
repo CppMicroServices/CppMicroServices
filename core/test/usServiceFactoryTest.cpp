@@ -25,6 +25,7 @@
 #include <usGetBundleContext.h>
 #include <usBundleContext.h>
 #include <usBundle.h>
+#include <usConstants.h>
 #include <usServiceObjects.h>
 
 #include "usTestUtils.h"
@@ -48,43 +49,43 @@ struct TestBundleH2
 }
 
 
-void TestServiceFactoryBundleScope(BundleContext* context)
+void TestServiceFactoryBundleScope(BundleContext context)
 {
 
   // Install and start test bundle H, a service factory and test that the methods
   // in that interface works.
 
-  InstallTestBundle(context, "TestBundleH");
+  testing::InstallLib(context, "TestBundleH");
 
-  auto bundleH = context->GetBundle("TestBundleH");
-  US_TEST_CONDITION_REQUIRED(bundleH != nullptr, "Test for existing bundle TestBundleH")
+  auto bundleH = testing::GetBundle("TestBundleH", context);
+  US_TEST_CONDITION_REQUIRED(bundleH, "Test for existing bundle TestBundleH")
 
-  bundleH->Start();
+  bundleH.Start();
 
-  std::vector<ServiceReferenceU> registeredRefs = bundleH->GetRegisteredServices();
+  std::vector<ServiceReferenceU> registeredRefs = bundleH.GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
-  US_TEST_CONDITION(registeredRefs[0].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_BUNDLE(), "service scope")
-  US_TEST_CONDITION(registeredRefs[1].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
+  US_TEST_CONDITION(registeredRefs[0].GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_BUNDLE, "service scope")
+  US_TEST_CONDITION(registeredRefs[1].GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_PROTOTYPE, "service scope")
 
   // Check that a service reference exist
-  const ServiceReferenceU sr1 = context->GetServiceReference("us::TestBundleH");
+  const ServiceReferenceU sr1 = context.GetServiceReference("us::TestBundleH");
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
-  US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_BUNDLE(), "service scope")
+  US_TEST_CONDITION(sr1.GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_BUNDLE, "service scope")
 
-  InterfaceMapConstPtr service = context->GetService(sr1);
+  InterfaceMapConstPtr service = context.GetService(sr1);
   US_TEST_CONDITION_REQUIRED(service->size() >= 1, "GetService()")
   InterfaceMap::const_iterator serviceIter = service->find("us::TestBundleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service->end(), "GetService()")
   US_TEST_CONDITION_REQUIRED(serviceIter->second != nullptr, "GetService()")
 
-  InterfaceMapConstPtr service2 = context->GetService(sr1);
+  InterfaceMapConstPtr service2 = context.GetService(sr1);
   US_TEST_CONDITION(*(service.get()) == *(service2.get()), "Same service interface maps")
 
-  std::vector<ServiceReferenceU> usedRefs = context->GetBundle()->GetServicesInUse();
+  std::vector<ServiceReferenceU> usedRefs = context.GetBundle().GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
 
-  InterfaceMapConstPtr service3 = bundleH->GetBundleContext()->GetService(sr1);
+  InterfaceMapConstPtr service3 = bundleH.GetBundleContext().GetService(sr1);
   US_TEST_CONDITION(service.get() != service3.get(), "Different service pointer")
 
   // release any service objects before stopping the bundle
@@ -92,77 +93,77 @@ void TestServiceFactoryBundleScope(BundleContext* context)
   service2.reset();
   service3.reset();
 
-  bundleH->Stop();
+  bundleH.Stop();
 }
 
-void TestServiceFactoryPrototypeScope(BundleContext* context)
+void TestServiceFactoryPrototypeScope(BundleContext context)
 {
 
   // Install and start test bundle H, a service factory and test that the methods
   // in that interface works.
 
-  InstallTestBundle(context, "TestBundleH");
+  testing::InstallLib(context, "TestBundleH");
 
-  auto bundleH = context->GetBundle("TestBundleH");
-  US_TEST_CONDITION_REQUIRED(bundleH != nullptr, "Test for existing bundle TestBundleH")
+  auto bundleH = testing::GetBundle("TestBundleH", context);
+  US_TEST_CONDITION_REQUIRED(bundleH, "Test for existing bundle TestBundleH")
 
-  bundleH->Start();
+  bundleH.Start();
 
   // Check that a service reference exist
-  const ServiceReference<TestBundleH2> sr1 = context->GetServiceReference<TestBundleH2>();
+  const ServiceReference<TestBundleH2> sr1 = context.GetServiceReference<TestBundleH2>();
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
-  US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
+  US_TEST_CONDITION(sr1.GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_PROTOTYPE, "service scope")
 
-  ServiceObjects<TestBundleH2> svcObjects = context->GetServiceObjects(sr1);
+  ServiceObjects<TestBundleH2> svcObjects = context.GetServiceObjects(sr1);
   auto prototypeServiceH2 = svcObjects.GetService();
 
-  const ServiceReferenceU sr1void = context->GetServiceReference(us_service_interface_iid<TestBundleH2>());
-  ServiceObjects<void> svcObjectsVoid = context->GetServiceObjects(sr1void);
+  const ServiceReferenceU sr1void = context.GetServiceReference(us_service_interface_iid<TestBundleH2>());
+  ServiceObjects<void> svcObjectsVoid = context.GetServiceObjects(sr1void);
   InterfaceMapConstPtr prototypeServiceH2Void = svcObjectsVoid.GetService();
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2Void->find(us_service_interface_iid<TestBundleH2>()) != prototypeServiceH2Void->end(),
                              "ServiceObjects<void>::GetService()")
 
 #ifdef US_BUILD_SHARED_LIBS
   // There should be only one service in use
-  US_TEST_CONDITION_REQUIRED(context->GetBundle()->GetServicesInUse().size() == 1, "services in use")
+  US_TEST_CONDITION_REQUIRED(context.GetBundle().GetServicesInUse().size() == 1, "services in use")
 #endif
 
-  auto bundleScopeService = context->GetService(sr1);
+  auto bundleScopeService = context.GetService(sr1);
   US_TEST_CONDITION_REQUIRED(bundleScopeService && bundleScopeService != prototypeServiceH2, "GetService()")
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2 != prototypeServiceH2Void->find(us_service_interface_iid<TestBundleH2>())->second,
                              "GetService()")
 
-  auto bundleScopeService2 = context->GetService(sr1);
+  auto bundleScopeService2 = context.GetService(sr1);
   US_TEST_CONDITION(bundleScopeService == bundleScopeService2, "Same service pointer")
 
 #ifdef US_BUILD_SHARED_LIBS
-  std::vector<ServiceReferenceU> usedRefs = context->GetBundle()->GetServicesInUse();
+  std::vector<ServiceReferenceU> usedRefs = context.GetBundle().GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
 #endif
 
-  std::string filter = "(" + ServiceConstants::SERVICE_ID() + "=" + sr1.GetProperty(ServiceConstants::SERVICE_ID()).ToString() + ")";
-  const ServiceReference<TestBundleH> sr2 = context->GetServiceReferences<TestBundleH>(filter).front();
+  std::string filter = "(" + Constants::SERVICE_ID + "=" + sr1.GetProperty(Constants::SERVICE_ID).ToString() + ")";
+  const ServiceReference<TestBundleH> sr2 = context.GetServiceReferences<TestBundleH>(filter).front();
   US_TEST_CONDITION_REQUIRED(sr2, "Service shall be present.")
-  US_TEST_CONDITION(sr2.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
-  US_TEST_CONDITION(any_cast<long>(sr2.GetProperty(ServiceConstants::SERVICE_ID())) == any_cast<long>(sr1.GetProperty(ServiceConstants::SERVICE_ID())), "same service id")
+  US_TEST_CONDITION(sr2.GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_PROTOTYPE, "service scope")
+  US_TEST_CONDITION(any_cast<long>(sr2.GetProperty(Constants::SERVICE_ID)) == any_cast<long>(sr1.GetProperty(Constants::SERVICE_ID)), "same service id")
 
 #ifdef US_BUILD_SHARED_LIBS
   // There should still be only one service in use
-  usedRefs = context->GetBundle()->GetServicesInUse();
+  usedRefs = context.GetBundle().GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
 #endif
 
   ServiceObjects<TestBundleH2> svcObjects2 = std::move(svcObjects);
-  ServiceObjects<TestBundleH2> svcObjects3 = context->GetServiceObjects(sr1);
+  ServiceObjects<TestBundleH2> svcObjects3 = context.GetServiceObjects(sr1);
 
   prototypeServiceH2 = svcObjects2.GetService();
   auto prototypeServiceH2_2 = svcObjects3.GetService();
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2_2 && prototypeServiceH2_2 != prototypeServiceH2, "prototype service")
 
-  bundleH->Stop();
+  bundleH.Stop();
 }
 
 int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
@@ -171,10 +172,10 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  TestServiceFactoryBundleScope(framework->GetBundleContext());
-  TestServiceFactoryPrototypeScope(framework->GetBundleContext());
+  TestServiceFactoryBundleScope(framework.GetBundleContext());
+  TestServiceFactoryPrototypeScope(framework.GetBundleContext());
 
   US_TEST_END()
 }

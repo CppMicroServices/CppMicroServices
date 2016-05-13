@@ -23,6 +23,9 @@
 #include "usBundleEvent.h"
 
 #include "usBundle.h"
+#include "usBundlePrivate.h"
+
+#include <stdexcept>
 
 namespace us {
 
@@ -32,21 +35,29 @@ public:
 
   BundleEventData& operator=(const BundleEventData&) = delete;
 
-  BundleEventData(BundleEvent::Type type, const std::shared_ptr<Bundle>& bundle)
-    : type(type), bundle(bundle)
+  BundleEventData(BundleEvent::Type type, const Bundle& bundle,
+                   const Bundle& origin)
+    : type(type), bundle(GetPrivate(bundle)), origin(GetPrivate(origin))
   {
-
+    if (!bundle) throw std::invalid_argument("invalid bundle");
+    if (!origin) throw std::invalid_argument("invalid origin");
   }
 
   BundleEventData(const BundleEventData& other)
-    : SharedData(other), type(other.type), bundle(other.bundle)
+    : SharedData(other), type(other.type), bundle(other.bundle), origin(other.origin)
   {
 
   }
 
   const BundleEvent::Type type;
-  const std::shared_ptr<Bundle> bundle;
 
+  // Bundle that had a change occur in its lifecycle.
+  std::shared_ptr<BundlePrivate> bundle;
+
+  // Bundle that was the origin of the event. For install event type, this is
+  // the bundle whose context was used to install the bundle. Otherwise it is
+  // the bundle itself.
+  std::shared_ptr<BundlePrivate> origin;
 };
 
 BundleEvent::BundleEvent()
@@ -65,8 +76,14 @@ bool BundleEvent::IsNull() const
   return !d;
 }
 
-BundleEvent::BundleEvent(Type type, const std::shared_ptr<Bundle>& bundle)
-  : d(new BundleEventData(type, bundle))
+BundleEvent::BundleEvent(Type type, const Bundle& bundle)
+  : d(new BundleEventData(type, bundle, bundle))
+{
+
+}
+
+BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
+  : d(new BundleEventData(type, bundle, origin))
 {
 
 }
@@ -83,9 +100,9 @@ BundleEvent& BundleEvent::operator=(const BundleEvent& other)
   return *this;
 }
 
-std::shared_ptr<Bundle> BundleEvent::GetBundle() const
+Bundle BundleEvent::GetBundle() const
 {
-  return d->bundle;
+  return MakeBundle(d->bundle);
 }
 
 BundleEvent::Type BundleEvent::GetType() const
@@ -97,12 +114,15 @@ std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 {
   switch (eventType)
   {
-  case BundleEvent::STARTED:        return os << "STARTED";
-  case BundleEvent::STOPPED:        return os << "STOPPED";
-  case BundleEvent::STARTING:       return os << "STARTING";
-  case BundleEvent::STOPPING:       return os << "STOPPING";
-  case BundleEvent::INSTALLED:      return os << "INSTALLED";
-  case BundleEvent::UNINSTALLED:    return os << "UNINSTALLED";
+  case BundleEvent::STARTED:         return os << "STARTED";
+  case BundleEvent::STOPPED:         return os << "STOPPED";
+  case BundleEvent::STARTING:        return os << "STARTING";
+  case BundleEvent::STOPPING:        return os << "STOPPING";
+  case BundleEvent::INSTALLED:       return os << "INSTALLED";
+  case BundleEvent::UNINSTALLED:     return os << "UNINSTALLED";
+  case BundleEvent::RESOLVED:        return os << "RESOLVED";
+  case BundleEvent::UNRESOLVED:      return os << "UNRESOLVED";
+  case BundleEvent::LAZY_ACTIVATION: return os << "LAZY_ACTIVATION";
 
   default: return os << "Unknown bundle event type (" << static_cast<int>(eventType) << ")";
   }
@@ -113,7 +133,7 @@ std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
   if (event.IsNull()) return os << "NONE";
 
   auto m = event.GetBundle();
-  os << event.GetType() << " #" << m->GetBundleId() << " (" << m->GetLocation() << ")";
+  os << event.GetType() << " #" << m.GetBundleId() << " (" << m.GetLocation() << ")";
   return os;
 }
 

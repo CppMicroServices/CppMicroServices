@@ -44,11 +44,11 @@ struct TestBundleH2
 
 class TestProduct : public TestBundleH
 {
-  // std::shared_ptr<Bundle> caller;
+  // Bundle caller;
 
 public:
 
-  TestProduct(const std::shared_ptr<Bundle>& /*caller*/)
+  TestProduct(const Bundle& /*caller*/)
     //: caller(caller)
   {}
 
@@ -58,7 +58,7 @@ class TestProduct2 : public TestProduct, public TestBundleH2
 {
 public:
 
-  TestProduct2(const std::shared_ptr<Bundle>& caller)
+  TestProduct2(const Bundle& caller)
     : TestProduct(caller)
   {}
 
@@ -70,18 +70,18 @@ class TestBundleHPrototypeServiceFactory : public PrototypeServiceFactory
 
 public:
 
-  InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/)
+  InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
   {
     std::cout << "GetService (prototype) in H" << std::endl;
     std::shared_ptr<TestProduct2> product = std::make_shared<TestProduct2>(caller);
-    fcbind[caller->GetBundleId()].push_back(product);
+    fcbind[caller.GetBundleId()].push_back(product);
     return MakeInterfaceMap<TestBundleH,TestBundleH2>(product);
   }
 
-  void UngetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
+  void UngetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
     std::shared_ptr<TestProduct2> product = std::dynamic_pointer_cast<TestProduct2>(ExtractInterface<TestBundleH>(service));
-    fcbind[caller->GetBundleId()].remove(product);
+    fcbind[caller.GetBundleId()].remove(product);
   }
 
 };
@@ -90,21 +90,21 @@ class TestBundleHServiceFactory : public ServiceFactory
 {
   std::map<long, std::shared_ptr<TestProduct>> fcbind;   // Map calling bundle with implementation
 public:
-  
-  InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/)
+
+  InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
   {
     std::cout << "GetService in H" << std::endl;
     std::shared_ptr<TestProduct> product = std::make_shared<TestProduct>(caller);
-    fcbind.insert(std::make_pair(caller->GetBundleId(), product));
+    fcbind.insert(std::make_pair(caller.GetBundleId(), product));
     return MakeInterfaceMap<TestBundleH>(product);
   }
-  
-  void UngetService(const std::shared_ptr<Bundle>& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
+
+  void UngetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
     std::shared_ptr<TestBundleH> product = ExtractInterface<TestBundleH>(service);
-    fcbind.erase(caller->GetBundleId());
+    fcbind.erase(caller.GetBundleId());
   }
-  
+
 };
 
 class TestBundleHActivator : public BundleActivator
@@ -112,7 +112,7 @@ class TestBundleHActivator : public BundleActivator
   std::string thisServiceName;
   ServiceRegistration<TestBundleH> factoryService;
   ServiceRegistration<TestBundleH,TestBundleH2> prototypeFactoryService;
-  BundleContext* context;
+  BundleContext context;
   std::shared_ptr<ServiceFactory> factoryObj;
   std::shared_ptr<TestBundleHPrototypeServiceFactory> prototypeFactoryObj;
 
@@ -120,19 +120,19 @@ public:
 
   TestBundleHActivator()
     : thisServiceName(us_service_interface_iid<TestBundleH>())
-    , context(nullptr)
+    , context()
   {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     this->context = context;
     factoryObj = std::make_shared<TestBundleHServiceFactory>();
-    factoryService = context->RegisterService<TestBundleH>(ToFactory(factoryObj));
+    factoryService = context.RegisterService<TestBundleH>(ToFactory(factoryObj));
     prototypeFactoryObj = std::make_shared<TestBundleHPrototypeServiceFactory>();
-    prototypeFactoryService = context->RegisterService<TestBundleH,TestBundleH2>(ToFactory(prototypeFactoryObj));
+    prototypeFactoryService = context.RegisterService<TestBundleH,TestBundleH2>(ToFactory(prototypeFactoryObj));
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     factoryService.Unregister();
   }

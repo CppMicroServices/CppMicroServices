@@ -50,7 +50,7 @@ public:
   bool CheckListenerEvents(
       bool pexp, BundleEvent::Type ptype,
       bool sexp, ServiceEvent::Type stype,
-      const std::shared_ptr<Bundle>& bundleX, ServiceReferenceU* servX);
+      const Bundle& bundleX, ServiceReferenceU* servX);
 
   bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts);
 
@@ -73,14 +73,14 @@ public:
 
   typedef void(Receiver::*CallbackType)(const BundleEvent&);
 
-  BundleListenerRegistrationHelper(BundleContext* context, Receiver* receiver, CallbackType callback)
+  BundleListenerRegistrationHelper(const BundleContext& context, Receiver* receiver, CallbackType callback)
     : context(context)
     , receiver(receiver)
     , callback(callback)
   {
     try
     {
-      context->AddBundleListener(receiver, callback);
+      this->context.AddBundleListener(receiver, callback);
     }
     catch (const std::logic_error& ise)
     {
@@ -91,12 +91,12 @@ public:
 
   ~BundleListenerRegistrationHelper()
   {
-    context->RemoveBundleListener(receiver, callback);
+    context.RemoveBundleListener(receiver, callback);
   }
 
 private:
 
-  BundleContext* context;
+  BundleContext context;
   Receiver* receiver;
   CallbackType callback;
 };
@@ -109,14 +109,14 @@ public:
 
   typedef void(Receiver::*CallbackType)(const ServiceEvent&);
 
-  ServiceListenerRegistrationHelper(BundleContext* context, Receiver* receiver, CallbackType callback)
+  ServiceListenerRegistrationHelper(const BundleContext& context, Receiver* receiver, CallbackType callback)
     : context(context)
     , receiver(receiver)
     , callback(callback)
   {
     try
     {
-      context->AddServiceListener(receiver, callback);
+      this->context.AddServiceListener(receiver, callback);
     }
     catch (const std::logic_error& ise)
     {
@@ -127,12 +127,12 @@ public:
 
   ~ServiceListenerRegistrationHelper()
   {
-    context->RemoveServiceListener(receiver, callback);
+    context.RemoveServiceListener(receiver, callback);
   }
 
 private:
 
-  BundleContext* context;
+  BundleContext context;
   Receiver* receiver;
   CallbackType callback;
 };

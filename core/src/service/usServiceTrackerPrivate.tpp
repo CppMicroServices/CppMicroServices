@@ -24,6 +24,7 @@
 #include "usTrackedService_p.h"
 
 #include "usBundleContext.h"
+#include "usConstants.h"
 #include "usLDAPFilter.h"
 
 #include <stdexcept>
@@ -35,16 +36,18 @@ const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = false;
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,T>* st, BundleContext* context,
+    ServiceTracker<S,T>* st,
+    const BundleContext& context,
     const ServiceReference<S>& reference,
-    ServiceTrackerCustomizer<S,T>* customizer)
+    ServiceTrackerCustomizer<S,T>* customizer
+    )
   : context(context), customizer(customizer), trackReference(reference),
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   std::stringstream ss;
-  ss << "(" << ServiceConstants::SERVICE_ID() << "="
-     << any_cast<long>(reference.GetProperty(ServiceConstants::SERVICE_ID())) << ")";
+  ss << "(" << Constants::SERVICE_ID << "="
+     << any_cast<long>(reference.GetProperty(Constants::SERVICE_ID)) << ")";
   this->listenerFilter = ss.str();
   try
   {
@@ -64,14 +67,16 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
-    BundleContext* context, const std::string& clazz,
-    ServiceTrackerCustomizer<S,T>* customizer)
-      : context(context), customizer(customizer), trackClass(clazz),
-        trackReference(), trackedService(), cachedReference(),
-        cachedService(), q_ptr(st)
+    const BundleContext& context,
+    const std::string& clazz,
+    ServiceTrackerCustomizer<S,T>* customizer
+    )
+  : context(context), customizer(customizer), trackClass(clazz),
+    trackReference(), trackedService(), cachedReference(),
+    cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
-  this->listenerFilter = std::string("(") + us::ServiceConstants::OBJECTCLASS() + "="
+  this->listenerFilter = std::string("(") + us::Constants::OBJECTCLASS + "="
                         + clazz + ")";
   try
   {
@@ -92,14 +97,16 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
-    BundleContext* context, const LDAPFilter& filter,
-    ServiceTrackerCustomizer<S,T>* customizer)
-      : context(context), filter(filter), customizer(customizer),
-        listenerFilter(filter.ToString()), trackReference(),
-        trackedService(), cachedReference(), cachedService(), q_ptr(st)
+    const BundleContext& context,
+    const LDAPFilter& filter,
+    ServiceTrackerCustomizer<S,T>* customizer
+    )
+  : context(context), filter(filter), customizer(customizer),
+    listenerFilter(filter.ToString()), trackReference(),
+    trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
-  if (context == nullptr)
+  if (!context)
   {
     throw std::invalid_argument("The bundle context cannot be null.");
   }
@@ -116,7 +123,7 @@ std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,TTT>::GetInitialRefere
   const std::string& className, const std::string& filterString)
 {
   std::vector<ServiceReference<S> > result;
-  std::vector<ServiceReferenceU> refs = context->GetServiceReferences(className, filterString);
+  std::vector<ServiceReferenceU> refs = context.GetServiceReferences(className, filterString);
   for(std::vector<ServiceReferenceU>::const_iterator iter = refs.begin();
       iter != refs.end(); ++iter)
   {

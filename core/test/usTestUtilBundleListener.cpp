@@ -24,6 +24,7 @@
 
 #include <usLog.h>
 
+#include "usBundle.h"
 #include "usUtils_p.h"
 
 namespace us {
@@ -65,7 +66,7 @@ ServiceEvent TestBundleListener::GetServiceEvent() const
 bool TestBundleListener::CheckListenerEvents(
     bool pexp, BundleEvent::Type ptype,
     bool sexp, ServiceEvent::Type stype,
-    const std::shared_ptr<Bundle>& bundleX, ServiceReferenceU* servX)
+    const Bundle& bundleX, ServiceReferenceU* servX)
 {
   std::vector<BundleEvent> pEvts;
   std::vector<ServiceEvent> seEvts;

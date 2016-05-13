@@ -28,6 +28,7 @@
 #include <usServiceInterface.h>
 #include <usGetBundleContext.h>
 #include <usBundleContext.h>
+#include <usConstants.h>
 
 #include <stdexcept>
 
@@ -52,7 +53,7 @@ void TestServiceInterfaceId()
   US_TEST_CONDITION(us_service_interface_iid<ITestServiceB>() == "com.mycompany.ITestService/1.0", "Service interface id com.mycompany.ITestService/1.0")
 }
 
-void TestMultipleServiceRegistrations(BundleContext* context)
+void TestMultipleServiceRegistrations(BundleContext context)
 {
   struct TestServiceA : public ITestServiceA
   {
@@ -61,25 +62,25 @@ void TestMultipleServiceRegistrations(BundleContext* context)
   auto s1 = std::make_shared<TestServiceA>();
   auto s2 = std::make_shared<TestServiceA>();
 
-  ServiceRegistration<ITestServiceA> reg1 = context->RegisterService<ITestServiceA>(s1);
-  ServiceRegistration<ITestServiceA> reg2 = context->RegisterService<ITestServiceA>(s2);
+  ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<ITestServiceA>(s1);
+  ServiceRegistration<ITestServiceA> reg2 = context.RegisterService<ITestServiceA>(s2);
 
-  std::vector<ServiceReference<ITestServiceA> > refs = context->GetServiceReferences<ITestServiceA>();
+  std::vector<ServiceReference<ITestServiceA> > refs = context.GetServiceReferences<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Testing for two registered ITestServiceA services")
 
   reg2.Unregister();
-  refs = context->GetServiceReferences<ITestServiceA>();
+  refs = context.GetServiceReferences<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(refs.size() == 1, "Testing for one registered ITestServiceA services")
 
   reg1.Unregister();
-  refs = context->GetServiceReferences<ITestServiceA>();
+  refs = context.GetServiceReferences<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(refs.empty(), "Testing for no ITestServiceA services")
 
-  ServiceReference<ITestServiceA> ref = context->GetServiceReference<ITestServiceA>();
+  ServiceReference<ITestServiceA> ref = context.GetServiceReference<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
-void TestServicePropertiesUpdate(BundleContext* context)
+void TestServicePropertiesUpdate(BundleContext context)
 {
   struct TestServiceA : public ITestServiceA
   {
@@ -92,45 +93,45 @@ void TestServicePropertiesUpdate(BundleContext* context)
   const char* str = "A const char*";
   props["const char*"] = str;
 
-  ServiceRegistration<ITestServiceA> reg1 = context->RegisterService<ITestServiceA>(s1, props);
-  ServiceReference<ITestServiceA> ref1 = context->GetServiceReference<ITestServiceA>();
+  ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<ITestServiceA>(s1, props);
+  ServiceReference<ITestServiceA> ref1 = context.GetServiceReference<ITestServiceA>();
 
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().size() == 1, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context.GetServiceReferences<ITestServiceA>().size() == 1, "Testing service count")
   US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == false, "Testing bool property")
 
   // register second service with higher rank
   auto s2 = std::make_shared<TestServiceA>();
   ServiceProperties props2;
-  props2[ServiceConstants::SERVICE_RANKING()] = 50;
+  props2[Constants::SERVICE_RANKING] = 50;
 
-  ServiceRegistration<ITestServiceA> reg2 = context->RegisterService<ITestServiceA>(s2, props2);
+  ServiceRegistration<ITestServiceA> reg2 = context.RegisterService<ITestServiceA>(s2, props2);
 
   // Get the service with the highest rank, this should be s2.
-  ServiceReference<ITestServiceA> ref2 = context->GetServiceReference<ITestServiceA>();
-  auto service = std::dynamic_pointer_cast<TestServiceA>(context->GetService(ref2));
+  ServiceReference<ITestServiceA> ref2 = context.GetServiceReference<ITestServiceA>();
+  auto service = std::dynamic_pointer_cast<TestServiceA>(context.GetService(ref2));
   US_TEST_CONDITION_REQUIRED(service == s2, "Testing highest service rank")
 
   props["bool"] = true;
   // change the service ranking
-  props[ServiceConstants::SERVICE_RANKING()] = 100;
+  props[Constants::SERVICE_RANKING] = 100;
   reg1.SetProperties(props);
 
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().size() == 2, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context.GetServiceReferences<ITestServiceA>().size() == 2, "Testing service count")
   US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == true, "Testing bool property")
-  US_TEST_CONDITION_REQUIRED(any_cast<int>(ref1.GetProperty(ServiceConstants::SERVICE_RANKING())) == 100, "Testing updated ranking")
+  US_TEST_CONDITION_REQUIRED(any_cast<int>(ref1.GetProperty(Constants::SERVICE_RANKING)) == 100, "Testing updated ranking")
 
   // Service with the highest ranking should now be s1
-  service = std::dynamic_pointer_cast<TestServiceA>(context->GetService<ITestServiceA>(ref1));
+  service = std::dynamic_pointer_cast<TestServiceA>(context.GetService<ITestServiceA>(ref1));
   US_TEST_CONDITION_REQUIRED(service == s1, "Testing highest service rank")
 
   reg1.Unregister();
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>("").size() == 1, "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context.GetServiceReferences<ITestServiceA>("").size() == 1, "Testing service count")
 
-  service = std::dynamic_pointer_cast<TestServiceA>(context->GetService<ITestServiceA>(ref2));
+  service = std::dynamic_pointer_cast<TestServiceA>(context.GetService<ITestServiceA>(ref2));
   US_TEST_CONDITION_REQUIRED(service == s2, "Testing highest service rank")
 
   reg2.Unregister();
-  US_TEST_CONDITION_REQUIRED(context->GetServiceReferences<ITestServiceA>().empty(), "Testing service count")
+  US_TEST_CONDITION_REQUIRED(context.GetServiceReferences<ITestServiceA>().empty(), "Testing service count")
 }
 
 
@@ -140,9 +141,9 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  BundleContext* context = framework->GetBundleContext();
+  auto context = framework.GetBundleContext();
 
   TestServiceInterfaceId();
   TestMultipleServiceRegistrations(context);

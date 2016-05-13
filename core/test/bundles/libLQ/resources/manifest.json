@@ -1,4 +1,4 @@
 {
-  "bundle.name" : "TestBundleLQ",
+  "bundle.symbolic_name" : "TestBundleLQ",
   "bundle.testproperty" : "YES"
 }

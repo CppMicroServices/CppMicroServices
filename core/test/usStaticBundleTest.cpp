@@ -20,14 +20,15 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 #include <usBundle.h>
 #include <usBundleEvent.h>
 #include <usServiceEvent.h>
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
 #include <usBundleActivator.h>
+#include <usConstants.h>
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
@@ -40,53 +41,40 @@ namespace {
 
 // Install and start libTestBundleB and check that it exists and that the service it registers exists,
 // also check that the expected events occur
-void frame020a(BundleContext* context, TestBundleListener& listener)
+void frame020a(BundleContext context, TestBundleListener& listener)
 {
-  InstallTestBundle(context, "TestBundleB");
+  auto bundleB = testing::InstallLib(context, "TestBundleB");
 
-  auto bundleB = context->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for existing bundle TestBundleB")
+  US_TEST_CONDITION_REQUIRED(bundleB, "Test for existing bundle TestBundleB")
 
-  try
-  {
-#if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
-#else
-    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
-#endif
-    US_TEST_CONDITION_REQUIRED(bundle, "Test installation of bundle TestBundleImportedByB")
-  }
-  catch (const std::exception& e)
-  {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what() << " + in frame020a:FAIL")
-  }
+  auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
+  US_TEST_CONDITION_REQUIRED(bundleImportedByB, "Test for existing bundle TestBundleImportedByB")
 
-  auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
-  US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for existing bundle TestBundleImportedByB")
+  US_TEST_CONDITION(bundleB.GetSymbolicName() == "TestBundleB", "Test bundle name")
+  US_TEST_CONDITION(bundleImportedByB.GetSymbolicName() == "TestBundleImportedByB", "Test bundle name")
 
-  US_TEST_CONDITION(bundleB->GetName() == "TestBundleB", "Test bundle name")
-  US_TEST_CONDITION(bundleImportedByB->GetName() == "TestBundleImportedByB", "Test bundle name")
-
-  bundleB->Start();
-  bundleImportedByB->Start();
+  bundleB.Start();
+  bundleImportedByB.Start();
   // Check if libB registered the expected service
   try
   {
-    std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestBundleBService");
+    std::vector<ServiceReferenceU> refs = context.GetServiceReferences("us::TestBundleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
-    auto o1 = context->GetService(refs.front());
+    auto o1 = context.GetService(refs.front());
     US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
 
-    auto o2 = context->GetService(refs.back());
+    auto o2 = context.GetService(refs.back());
     US_TEST_CONDITION(o1 && !o2->empty(), "Test if second service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, bundleImportedByB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleImportedByB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleImportedByB));
 
@@ -102,28 +90,28 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
     US_TEST_FAILED_MSG(<< "test bundle, expected service not found");
   }
 
-  US_TEST_CONDITION(bundleB->IsStarted() == true, "Test if started correctly");
+  US_TEST_CONDITION(bundleB.GetState() == Bundle::STATE_ACTIVE, "Test if started correctly");
 }
 
 
 // Stop libB and check for correct events
-void frame030b(BundleContext* context, TestBundleListener& listener)
+void frame030b(BundleContext context, TestBundleListener& listener)
 {
-  auto bundleB = context->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
+  auto bundleB = testing::GetBundle("TestBundleB", context);
+  US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
 
-  auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
-  US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
+  auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
+  US_TEST_CONDITION_REQUIRED(bundleImportedByB, "Test for non-null bundle")
 
   std::vector<ServiceReferenceU> refs
-      = context->GetServiceReferences("us::TestBundleBService");
+      = context.GetServiceReferences("us::TestBundleBService");
   US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
   US_TEST_CONDITION(refs.back(), "Test for second valid service reference")
 
   try
   {
-    bundleB->Stop();
-    US_TEST_CONDITION(bundleB->IsStarted() == false, "Test for stopped state")
+    bundleB.Stop();
+    US_TEST_CONDITION(bundleB.GetState() == Bundle::STATE_RESOLVED, "Test for stopped state")
   }
   catch (const std::exception& e)
   {
@@ -132,8 +120,8 @@ void frame030b(BundleContext* context, TestBundleListener& listener)
 
   try
   {
-    bundleImportedByB->Stop();
-    US_TEST_CONDITION(bundleImportedByB->IsStarted() == false, "Test for stopped state")
+    bundleImportedByB.Stop();
+    US_TEST_CONDITION(bundleImportedByB.GetState() == Bundle::STATE_RESOLVED, "Test for stopped state")
   }
   catch (const std::exception& e)
   {
@@ -154,21 +142,44 @@ void frame030b(BundleContext* context, TestBundleListener& listener)
 }
 
 // Uninstall libB and check for correct events
-void frame040c(BundleContext* context, TestBundleListener& listener)
+void frame040c(BundleContext context, TestBundleListener& listener)
 {
-    auto bundleB = context->GetBundle("TestBundleB");
-    US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
+    auto bundleB = testing::GetBundle("TestBundleB", context);
+    US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
 
-    auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
-    US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
+    auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
+    US_TEST_CONDITION_REQUIRED(bundleImportedByB, "Test for non-null bundle")
 
-    bundleB->Uninstall();
-    US_TEST_CONDITION(context->GetBundles().size() == 2, "Test for uninstall of TestBundleB")
-    bundleImportedByB->Uninstall();
-    US_TEST_CONDITION(context->GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
+    bundleB.Uninstall();
+    US_TEST_CONDITION(context.GetBundles().size() == 2, "Test for uninstall of TestBundleB")
 
     std::vector<BundleEvent> pEvts;
+    pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
+
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+
+    // Install the same lib again, we should get TestBundleB again
+    auto bundles = context.InstallBundles(bundleImportedByB.GetLocation());
+    US_TEST_CONDITION(bundles.size() == 2, "Test for re-install of TestBundleB")
+
+    long oldId = bundleB.GetBundleId();
+    bundleB = testing::GetBundle("TestBundleB", context);
+    US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
+    US_TEST_CONDITION(oldId != bundleB.GetBundleId(), "Test for new bundle id")
+
+    pEvts.clear();
+    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+
+    bundleB.Uninstall();
+    bundleImportedByB.Uninstall();
+    US_TEST_CONDITION(context.GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
+
+    pEvts.clear();
+    pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleImportedByB));
     pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
@@ -181,10 +192,12 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleTest");
 
   FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework->Start();
+  std::map<std::string, Any> frameworkConfig;
+  //frameworkConfig[Constants::FRAMEWORK_LOG_LEVEL] = 0;
+  auto framework = factory.NewFramework(frameworkConfig);
+  framework.Start();
 
-  BundleContext* context = framework->GetBundleContext();
+  auto context = framework.GetBundleContext();
 
   { // scope the use of the listener so its destructor is
     // called before we destroy the framework's bundle context.

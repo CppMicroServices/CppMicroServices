@@ -51,7 +51,7 @@ class US_ABI_LOCAL Activator : public BundleActivator
 public:
 
   Activator()
-   : m_context(nullptr)
+   : m_context()
    , m_tracker(nullptr)
   {}
 
@@ -67,7 +67,7 @@ public:
    *
    * @param context the bundle context for this bundle.
    */
-  void Start(BundleContext *context)
+  void Start(BundleContext context)
   {
     m_context = context;
 
@@ -130,14 +130,14 @@ public:
    * the C++ Micro Services library will automatically unget any used services.
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
   }
 
 private:
 
   // Bundle context
-  BundleContext* m_context;
+  BundleContext m_context;
 
   // The service tracker
   ServiceTracker<ISpellCheckService>* m_tracker;

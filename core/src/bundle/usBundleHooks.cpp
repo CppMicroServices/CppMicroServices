@@ -20,13 +20,14 @@
 
 =============================================================================*/
 
+#include "usGetBundleContext.h"
 #include "usBundleHooks_p.h"
 
+#include "usBundle.h"
 #include "usBundleEventHook.h"
 #include "usBundleFindHook.h"
 #include "usCoreBundleContext_p.h"
-#include "usGetBundleContext.h"
-#include "usBundleContext.h"
+#include "usBundleContextPrivate.h"
 #include "usServiceReferenceBasePrivate.h"
 
 namespace us {
@@ -36,9 +37,12 @@ BundleHooks::BundleHooks(CoreBundleContext* ctx)
 {
 }
 
-std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* context, const std::shared_ptr<Bundle>& bundle) const
+Bundle BundleHooks::FilterBundle(
+    const BundleContext& context,
+    const Bundle& bundle
+    ) const
 {
-  if(bundle == nullptr)
+  if(!bundle)
   {
     return bundle;
   }
@@ -51,24 +55,28 @@ std::shared_ptr<Bundle> BundleHooks::FilterBundle(const BundleContext* context, 
   }
   else
   {
-    std::vector<std::shared_ptr<Bundle>> ml;
+    std::vector<Bundle> ml;
     ml.push_back(bundle);
     this->FilterBundles(context, ml);
-    return ml.empty() ? nullptr : bundle;
+    return ml.empty() ? Bundle() : bundle;
   }
 }
 
-void BundleHooks::FilterBundles(const BundleContext* context, std::vector<std::shared_ptr<Bundle>>& bundles) const
+void BundleHooks::FilterBundles(
+    const BundleContext& context,
+    std::vector<Bundle>& bundles
+    ) const
 {
   std::vector<ServiceRegistrationBase> srl;
   coreCtx->services.Get(us_service_interface_iid<BundleFindHook>(), srl);
-  ShrinkableVector<std::shared_ptr<Bundle>> filtered(bundles);
+  ShrinkableVector<Bundle> filtered(bundles);
 
+  auto selfBundle = GetBundleContext().GetBundle();
   std::sort(srl.begin(), srl.end());
   for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
   {
     ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
-    std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
+    std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(sr.d.load()->GetService(GetPrivate(selfBundle).get()));
     if (fh)
     {
       try
@@ -77,12 +85,12 @@ void BundleHooks::FilterBundles(const BundleContext* context, std::vector<std::s
       }
       catch (const std::exception& e)
       {
-        US_WARN << "Failed to call Bundle FindHook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+        US_WARN << "Failed to call Bundle FindHook  #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                 << ": " << e.what();
       }
       catch (...)
       {
-        US_WARN << "Failed to call Bundle FindHook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+        US_WARN << "Failed to call Bundle FindHook  #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                 << ": unknown exception type";
       }
     }
@@ -102,16 +110,16 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
 
   if(!eventHooks.empty())
   {
-    std::vector<BundleContext*> bundleContexts;
+    std::vector<BundleContext> bundleContexts;
     for (auto& le : bundleListeners)
     {
-      bundleContexts.push_back(le.first);
+      bundleContexts.push_back(MakeBundleContext(le.first->shared_from_this()));
     }
     std::sort(bundleContexts.begin(), bundleContexts.end());
     bundleContexts.erase(std::unique(bundleContexts.begin(), bundleContexts.end()), bundleContexts.end());
 
     const std::size_t unfilteredSize = bundleContexts.size();
-    ShrinkableVector<BundleContext*> filtered(bundleContexts);
+    ShrinkableVector<BundleContext> filtered(bundleContexts);
 
     std::sort(eventHooks.begin(), eventHooks.end());
     for (auto iter = eventHooks.rbegin(), iterEnd = eventHooks.rend(); iter != iterEnd; ++iter)
@@ -127,7 +135,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
         continue;
       }
 
-      std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(sr.d.load()->GetService(GetBundleContext()->GetBundle()));
+      std::shared_ptr<BundleEventHook> eh = std::static_pointer_cast<BundleEventHook>(sr.d.load()->GetService(GetPrivate(GetBundleContext().GetBundle()).get()));
       if (eh)
       {
         try
@@ -136,12 +144,12 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
         }
         catch (const std::exception& e)
         {
-          US_WARN << "Failed to call Bundle EventHook #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+          US_WARN << "Failed to call Bundle EventHook #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                   << ": " << e.what();
         }
         catch (...)
         {
-          US_WARN << "Failed to call Bundle EventHook #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
+          US_WARN << "Failed to call Bundle EventHook #" << sr.GetProperty(Constants::SERVICE_ID).ToString()
                   << ": unknown exception type";
         }
       }
@@ -152,7 +160,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
       for (ServiceListeners::BundleListenerMap::iterator le = bundleListeners.begin();
            le != bundleListeners.end();)
       {
-        if(std::find(bundleContexts.begin(), bundleContexts.end(), le->first) == bundleContexts.end())
+        if(std::find_if(bundleContexts.begin(), bundleContexts.end(), [&le](const BundleContext& bc) { return GetPrivate(bc) == le->first;}) == bundleContexts.end())
         {
           bundleListeners.erase(le++);
         }

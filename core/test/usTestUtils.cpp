@@ -20,6 +20,8 @@ limitations under the License.
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
+
 #include "usTestUtils.h"
 #include "usTestingConfig.h"
 #include "usTestingMacros.h"
@@ -120,26 +122,31 @@ long long HighPrecisionTimer::ElapsedMicro()
 
 #endif
 
-std::shared_ptr<Bundle> InstallTestBundle(BundleContext* frameworkCtx, const std::string& bundleName)
+
+namespace testing {
+
+Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
 {
-    std::shared_ptr<Bundle> bundle = nullptr;
+    std::vector<Bundle> bundles;
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        bundle = frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "/" + bundleName);
+        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + libName + LIB_EXT);
 #else
-        bundle = frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + bundleName);
+        bundles = frameworkCtx.InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
 #endif
-        US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle " << bundleName)
+        US_TEST_CONDITION_REQUIRED(!bundles.empty(), "Test installation of library " << libName)
     }
     catch (const std::exception& e)
     {
         US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
     }
-    return bundle;
+    for (auto b : bundles)
+    {
+      if (b.GetSymbolicName() == libName) return b;
+    }
+    return {};
 }
-
-namespace testing {
 
 std::string GetCurrentWorkingDirectory()
 {
@@ -164,6 +171,16 @@ std::string GetCurrentWorkingDirectory()
   }
 #endif
   return std::string();
+}
+
+Bundle GetBundle(const std::string& bsn, BundleContext context)
+{
+  if (!context) context = us::GetBundleContext();
+  for (auto b : context.GetBundles())
+  {
+    if (b.GetSymbolicName() == bsn) return b;
+  }
+  return {};
 }
 
 }

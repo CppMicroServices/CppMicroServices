@@ -23,13 +23,11 @@
 #ifndef USBUNDLEREGISTRY_P_H
 #define USBUNDLEREGISTRY_P_H
 
-#include <usCoreConfig.h>
 #include <usThreads_p.h>
 
 #include <vector>
 #include <string>
-#include <unordered_map>
-#include <atomic>
+#include <map>
 #include <memory>
 
 namespace us {
@@ -37,19 +35,42 @@ namespace us {
 class CoreBundleContext;
 class Framework;
 class Bundle;
-struct BundleInfo;
+class BundlePrivate;
 struct BundleActivator;
 
 /**
  * Here we handle all the bundles that are known to the framework.
  * @remarks This class is thread-safe.
  */
-class US_Core_EXPORT BundleRegistry : private MultiThreaded<> {
+class BundleRegistry : private MultiThreaded<> {
 
 public:
 
   BundleRegistry(CoreBundleContext* coreCtx);
   virtual ~BundleRegistry(void);
+
+  void Init();
+
+  void Clear();
+
+  /**
+   * Install a new bundle library.
+   *
+   * @param location The location to be installed
+   */
+  std::vector<Bundle> Install(const std::string& location, BundlePrivate* caller);
+
+  std::vector<Bundle> Install0(
+      const std::string& location,
+      const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
+      BundlePrivate* caller);
+
+  /**
+   * Remove bundle registration.
+   *
+   * @param location The location to be removed
+   */
+  void Remove(const std::string& location, long id);
 
   /**
    * Get the bundle that has the specified bundle identifier.
@@ -58,60 +79,58 @@ public:
    * @return Bundle or null
    *         if the bundle was not found.
    */
-  std::shared_ptr<Bundle> GetBundle(long id) const;
+  std::shared_ptr<BundlePrivate> GetBundle(long id) const;
 
   /**
-   * Get the bundle that has specified bundle name.
+   * Get the bundles that have the specified bundle location.
    *
-   * @param name The name of the bundle to get.
-   * @return Bundle or null.
+   * @param location The location of the bundles to get.
+   * @return A list of Bundle instances.
    */
-  std::shared_ptr<Bundle> GetBundle(const std::string& name) const;
+  std::vector<std::shared_ptr<BundlePrivate>> GetBundles(const std::string& location) const;
 
   /**
    * Get all known bundles.
    *
    * @return A list which is filled with all known bundles.
    */
-  std::vector<std::shared_ptr<Bundle>> GetBundles() const;
+  std::vector<std::shared_ptr<BundlePrivate>> GetBundles() const;
 
   /**
-   * Register a bundle with the Framework
+   * Get all bundles currently in bundle state ACTIVE.
    *
-   * @return The registered bundle.
+   * @return A List of Bundle's.
    */
-  std::shared_ptr<Bundle> Register(BundleInfo info);
+  std::vector<std::shared_ptr<BundlePrivate>> GetActiveBundles() const;
 
   /**
-   * Remove a bundle from the Framework.
-   *
-   * Register(BundleInfo* info) must be called to re-install the bundle.
-   * Upon which, the bundle will receive a new unique bundle id.
+   * Try to load any saved framework state.
+   * This is done by installing all saved bundles from the local archive
+   * copy, and restoring the saved state for each bundle. This is only
+   * intended to be executed during the start of the framework.
    *
    */
-  void UnRegister(const BundleInfo& info);
+  void Load();
 
 private:
+
   // don't allow copying the BundleRegistry.
   BundleRegistry(const BundleRegistry& );
   BundleRegistry& operator=(const BundleRegistry& );
 
+  void CheckIllegalState() const;
+
   CoreBundleContext* coreCtx;
 
-  typedef std::unordered_map<std::string, std::shared_ptr<Bundle>> BundleMap;
+  typedef std::multimap<std::string, std::shared_ptr<BundlePrivate>> BundleMap;
 
   /**
    * Table of all installed bundles in this framework.
-   * Key is the bundle name.
+   * Key is the bundle location.
    *
    * @GuardedBy this
    */
   BundleMap bundles;
-
-  /**
-   * Stores the next Bundle ID.
-   */
-  std::atomic<long> id;
 
 };
 

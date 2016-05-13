@@ -37,6 +37,14 @@
 
 namespace us {
 
+void ServiceRegistry::Clear()
+{
+  auto l = this->Lock(); US_UNUSED(l);
+  services.clear();
+  classServices.clear();
+  serviceRegistrations.clear();
+}
+
 Properties ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
                                                     const std::vector<std::string>& classes,
                                                     bool isFactory, bool isPrototypeFactory,
@@ -47,22 +55,22 @@ Properties ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
 
   if (!classes.empty())
   {
-    props.insert(std::make_pair(ServiceConstants::OBJECTCLASS(), classes));
+    props.insert(std::make_pair(Constants::OBJECTCLASS, classes));
   }
 
-  props.insert(std::make_pair(ServiceConstants::SERVICE_ID(), sid != -1 ? sid : nextServiceID++));
+  props.insert(std::make_pair(Constants::SERVICE_ID, sid != -1 ? sid : nextServiceID++));
 
   if (isPrototypeFactory)
   {
-    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_PROTOTYPE()));
+    props.insert(std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_PROTOTYPE));
   }
   else if (isFactory)
   {
-    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_BUNDLE()));
+    props.insert(std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_BUNDLE));
   }
   else
   {
-    props.insert(std::make_pair(ServiceConstants::SERVICE_SCOPE(), ServiceConstants::SCOPE_SINGLETON()));
+    props.insert(std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_SINGLETON));
   }
 
   return Properties(props);
@@ -158,7 +166,7 @@ ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle, const std::stri
     std::vector<ServiceReferenceBase> srs;
     Get_unlocked(clazz, "", bundle, srs);
     US_DEBUG << "get service ref " << clazz << " for bundle "
-             << bundle->info.name << " = " << srs.size() << " refs";
+             << bundle->symbolicName << " = " << srs.size() << " refs";
 
     if (!srs.empty())
     {
@@ -255,7 +263,8 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
   {
     if (bundle != nullptr)
     {
-      core->serviceHooks.FilterServiceReferences(bundle->bundleContext, clazz, filter, res);
+      auto ctx = bundle->bundleContext.Load();
+      core->serviceHooks.FilterServiceReferences(ctx.get(), clazz, filter, res);
     }
     else
     {
@@ -275,9 +284,9 @@ void ServiceRegistry::RemoveServiceRegistration_unlocked(const ServiceRegistrati
   std::vector<std::string> classes;
   {
     auto l2 = sr.d->properties.Lock(); US_UNUSED(l2);
-    assert(sr.d->properties.Value_unlocked(ServiceConstants::OBJECTCLASS()).Type() == typeid(std::vector<std::string>));
+    assert(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).Type() == typeid(std::vector<std::string>));
     classes = ref_any_cast<std::vector<std::string> >(
-          sr.d->properties.Value_unlocked(ServiceConstants::OBJECTCLASS()));
+          sr.d->properties.Value_unlocked(Constants::OBJECTCLASS));
   }
   services.erase(sr);
   serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
@@ -310,7 +319,7 @@ void ServiceRegistry::GetRegisteredByBundle(BundlePrivate* p,
   }
 }
 
-void ServiceRegistry::GetUsedByBundle(const std::shared_ptr<Bundle>& bundle,
+void ServiceRegistry::GetUsedByBundle(BundlePrivate* bundle,
                                       std::vector<ServiceRegistrationBase>& res) const
 {
   auto l = this->Lock(); US_UNUSED(l);

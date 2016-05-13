@@ -25,11 +25,9 @@
 #define US_SERVICE_PROPERTIES_H
 
 
-#include <usCoreConfig.h>
-
 #include "usAny.h"
 
-#include <cctype>
+#include <string>
 #include <unordered_map>
 
 namespace us {
@@ -43,97 +41,6 @@ namespace us {
  */
 typedef std::unordered_map<std::string, Any> ServiceProperties;
 
-/**
- * \ingroup MicroServices
- */
-namespace ServiceConstants {
-
-/**
- * Service property identifying all of the class names under which a service
- * was registered in the framework. The value of this property must be of
- * type <code>std::vector&lt;std::string&gt;</code>.
- *
- * <p>
- * This property is set by the framework when a service is registered.
- */
-US_Core_EXPORT const std::string& OBJECTCLASS(); // = "objectclass"
-
-/**
- * Service property identifying a service's registration number. The value
- * of this property must be of type <code>long int</code>.
- *
- * <p>
- * The value of this property is assigned by the framework when a service is
- * registered. The framework assigns a unique value that is larger than all
- * previously assigned values since the framework was started. These values
- * are NOT persistent across restarts of the framework.
- */
-US_Core_EXPORT const std::string& SERVICE_ID(); // = "service.id"
-
-/**
- * Service property identifying a service's ranking number.
- *
- * <p>
- * This property may be supplied in the
- * <code>ServiceProperties</code> object passed to the
- * <code>BundleContext::RegisterService</code> method. The value of this
- * property must be of type <code>int</code>.
- *
- * <p>
- * The service ranking is used by the framework to determine the <i>natural
- * order</i> of services, see ServiceReference::operator<(const ServiceReference&),
- * and the <i>default</i> service to be returned from a call to the
- * {@link BundleContext::GetServiceReference} method.
- *
- * <p>
- * The default ranking is zero (0). A service with a ranking of
- * <code>std::numeric_limits<int>::max()</code> is very likely to be returned as the
- * default service, whereas a service with a ranking of
- * <code>std::numeric_limits<int>::min()</code> is very unlikely to be returned.
- *
- * <p>
- * If the supplied property value is not of type <code>int</code>, it is
- * deemed to have a ranking value of zero.
- */
-US_Core_EXPORT const std::string& SERVICE_RANKING(); // = "service.ranking"
-
-/**
- * Service property identifying a service's scope.
- * This property is set by the framework when a service is registered. If the
- * registered object implements PrototypeServiceFactory, then the value of this
- * service property will be SCOPE_PROTOTYPE(). Otherwise, if the registered
- * object implements ServiceFactory, then the value of this service property will
- * be SCOPE_BUNDLE(). Otherwise, the value of this service property will be
- * SCOPE_SINGLETON().
- */
-US_Core_EXPORT const std::string& SERVICE_SCOPE(); // = "service.scope"
-
-/**
- * Service scope is singleton. All bundles using the service receive the same
- * service object.
- *
- * @see SERVICE_SCOPE()
- */
-US_Core_EXPORT const std::string& SCOPE_SINGLETON(); // = "singleton"
-
-/**
- * Service scope is bundle. Each bundle using the service receives a distinct
- * service object.
- *
- * @see SERVICE_SCOPE()
- */
-US_Core_EXPORT const std::string& SCOPE_BUNDLE(); // = "bundle"
-
-/**
- * Service scope is prototype. Each bundle using the service receives either
- * a distinct service object or can request multiple distinct service objects
- * via ServiceObjects.
- *
- * @see SERVICE_SCOPE()
- */
-US_Core_EXPORT const std::string& SCOPE_PROTOTYPE(); // = "prototype"
-
-}
 
 }
 

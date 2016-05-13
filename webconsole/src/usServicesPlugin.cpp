@@ -29,6 +29,7 @@
 #include "usBundle.h"
 #include "usBundleResource.h"
 #include "usBundleResourceStream.h"
+#include "usConstants.h"
 
 #include <set>
 
@@ -97,7 +98,7 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     {
       if (m_TemplateRS == nullptr)
       {
-        BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/services.html");
+        BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
         m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
       }
       m_TemplateRS->seekg(0, std::ios_base::beg);
@@ -116,7 +117,7 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     {
       if (m_TemplateSI == nullptr)
       {
-        BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/service_interface.html");
+        BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
         m_TemplateSI = new BundleResourceStream(res, std::ios_base::binary);
       }
       m_TemplateSI->seekg(0, std::ios_base::beg);
@@ -132,11 +133,11 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
 std::string ServicesPlugin::GetIds_JSON() const
 {
   std::set<std::string> ids;
-  std::vector<ServiceReferenceU> refs = GetContext()->GetServiceReferences("");
+  std::vector<ServiceReferenceU> refs = GetContext().GetServiceReferences("");
   for (std::vector<ServiceReferenceU>::const_iterator iter = refs.begin(), endIter = refs.end();
        iter != endIter; ++iter)
   {
-    Any objectClass = iter->GetProperty(ServiceConstants::OBJECTCLASS());
+    Any objectClass = iter->GetProperty(Constants::OBJECTCLASS);
     std::vector<std::string>& oc = ref_any_cast<std::vector<std::string> >(objectClass);
     for (std::vector<std::string>::const_iterator ocIter = oc.begin(), ocEndIter = oc.end();
          ocIter != ocEndIter; ++ocIter)
@@ -164,7 +165,7 @@ std::string ServicesPlugin::GetIds_JSON() const
 
 std::string ServicesPlugin::GetInterface_JSON(const std::string& iid) const
 {
-  std::vector<ServiceReferenceU> refs = GetContext()->GetServiceReferences(iid);
+  std::vector<ServiceReferenceU> refs = GetContext().GetServiceReferences(iid);
   std::stringstream json;
   json << "{ \"services\" : [";
   for (std::vector<ServiceReferenceU>::const_iterator iter = refs.begin(), endIter = refs.end();
@@ -177,10 +178,10 @@ std::string ServicesPlugin::GetInterface_JSON(const std::string& iid) const
     for (std::vector<std::string>::const_iterator keyIter = keys.begin(), keyEndIter = keys.end();
          keyIter != keyEndIter; ++keyIter)
     {
-      if (*keyIter != ServiceConstants::SERVICE_ID() &&
-          *keyIter != ServiceConstants::SERVICE_RANKING() &&
-          *keyIter != ServiceConstants::OBJECTCLASS() &&
-          *keyIter != ServiceConstants::SERVICE_SCOPE())
+      if (*keyIter != Constants::SERVICE_ID &&
+          *keyIter != Constants::SERVICE_RANKING &&
+          *keyIter != Constants::OBJECTCLASS &&
+          *keyIter != Constants::SERVICE_SCOPE)
       {
         props.insert(std::make_pair(*keyIter, iter->GetProperty(*keyIter)));
       }
@@ -190,11 +191,11 @@ std::string ServicesPlugin::GetInterface_JSON(const std::string& iid) const
     {
       json << ",";
     }
-    json << "{ \"bundle\":\"" << iter->GetBundle()->GetName() << "\","
-         << "  \"id\":" << iter->GetProperty(ServiceConstants::SERVICE_ID()).ToJSON() << ","
-         << "  \"ranking\":" << iter->GetProperty(ServiceConstants::SERVICE_RANKING()).ToJSON() << ","
-         << "  \"scope\":" << iter->GetProperty(ServiceConstants::SERVICE_SCOPE()).ToJSON() << ","
-         << "  \"classes\":" << iter->GetProperty(ServiceConstants::OBJECTCLASS()).ToJSON() << ","
+    json << "{ \"bundle\":\"" << iter->GetBundle().GetSymbolicName() << "\","
+         << "  \"id\":" << iter->GetProperty(Constants::SERVICE_ID).ToJSON() << ","
+         << "  \"ranking\":" << iter->GetProperty(Constants::SERVICE_RANKING).ToJSON() << ","
+         << "  \"scope\":" << iter->GetProperty(Constants::SERVICE_SCOPE).ToJSON() << ","
+         << "  \"classes\":" << iter->GetProperty(Constants::OBJECTCLASS).ToJSON() << ","
          << "  \"props\":" << propsAny.ToJSON()
          << "}";
   }

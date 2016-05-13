@@ -4,7 +4,9 @@
 
 set(_public_headers
   usAny.h
+  usChrono.h
   usFramework.h
+  usFrameworkEvent.h
   usFrameworkFactory.h
   usLDAPProp.h
   usListenerFunctors.h
@@ -40,10 +42,10 @@ set(_public_headers
   usBundleEventHook.h
   usBundleFindHook.h
   usBundleImport.h
-  usBundleInfo.h
   usBundleInitialization.h
   usBundleResource.h
   usBundleResourceStream.h
   usBundleUtils.h
   usBundleVersion.h
+  usConstants.h
 )

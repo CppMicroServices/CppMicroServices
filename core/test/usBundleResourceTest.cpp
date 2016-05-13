@@ -20,10 +20,10 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
 #include <usBundle.h>
 #include <usBundleResource.h>
 #include <usBundleResourceStream.h>
@@ -62,9 +62,9 @@ void checkResourceInfo(const BundleResource& res, const std::string& path,
   US_TEST_CONDITION(res.GetCompleteSuffix() == completeSuffix, "Complete suffix")
 }
 
-void testTextResource(const std::shared_ptr<Bundle>& bundle)
+void testTextResource(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("foo.txt");
+  BundleResource res = bundle.GetResource("foo.txt");
 #ifdef US_PLATFORM_WINDOWS
   checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 16, false);
   const std::streampos ssize(13);
@@ -110,9 +110,9 @@ void testTextResource(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(lines[1] == "bar", "Check second line")
 }
 
-void testTextResourceAsBinary(const std::shared_ptr<Bundle>& bundle)
+void testTextResourceAsBinary(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("foo.txt");
+  BundleResource res = bundle.GetResource("foo.txt");
 
 #ifdef US_PLATFORM_WINDOWS
   checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 16, false);
@@ -144,9 +144,9 @@ void testTextResourceAsBinary(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(content == fileData, "Resource content");
 }
 
-void testInvalidResource(const std::shared_ptr<Bundle>& bundle)
+void testInvalidResource(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("invalid");
+  BundleResource res = bundle.GetResource("invalid");
   US_TEST_CONDITION_REQUIRED(res.IsValid() == false, "Check invalid resource")
   US_TEST_CONDITION(res.GetName().empty(), "Check empty name")
   US_TEST_CONDITION(res.GetPath().empty(), "Check empty path")
@@ -165,9 +165,9 @@ void testInvalidResource(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(rs.eof() == true, "Check invalid resource stream")
 }
 
-void testSpecialCharacters(const std::shared_ptr<Bundle>& bundle)
+void testSpecialCharacters(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("special_chars.dummy.txt");
+  BundleResource res = bundle.GetResource("special_chars.dummy.txt");
 #ifdef US_PLATFORM_WINDOWS
   checkResourceInfo(res, "/", "special_chars", "special_chars.dummy", "txt", "dummy.txt", 56, false);
   const std::streampos ssize(54);
@@ -197,9 +197,9 @@ void testSpecialCharacters(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(content == fileData, "Resource content");
 }
 
-void testBinaryResource(const std::shared_ptr<Bundle>& bundle)
+void testBinaryResource(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("/icons/cppmicroservices.png");
+  BundleResource res = bundle.GetResource("/icons/cppmicroservices.png");
   checkResourceInfo(res, "/icons/", "cppmicroservices", "cppmicroservices", "png", "png", 2424, false);
 
   BundleResourceStream rs(res, std::ios_base::binary);
@@ -237,9 +237,9 @@ void testBinaryResource(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(png.eof(), "EOF check");
 }
 
-void testCompressedResource(const std::shared_ptr<Bundle>& bundle)
+void testCompressedResource(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("/icons/compressable.bmp");
+  BundleResource res = bundle.GetResource("/icons/compressable.bmp");
   checkResourceInfo(res, "/icons/", "compressable", "compressable", "bmp", "bmp", 300122, false);
 
   BundleResourceStream rs(res, std::ios_base::binary);
@@ -284,9 +284,9 @@ struct ResourceComparator {
   }
 };
 
-void testResourceTree(const std::shared_ptr<Bundle>& bundle)
+void testResourceTree(const Bundle& bundle)
 {
-  BundleResource res = bundle->GetResource("");
+  BundleResource res = bundle.GetResource("");
   US_TEST_CONDITION(res.GetResourcePath() == "/", "Check root file path")
   US_TEST_CONDITION(res.IsDir() == true, "Check type")
 
@@ -300,13 +300,13 @@ void testResourceTree(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(children[4] == "special_chars.dummy.txt", "Check child name")
   US_TEST_CONDITION(children[5] == "test.xml", "Check child name")
 
-  US_TEST_CONDITION(bundle->FindResources("!$noexist=?", std::string(), "true").empty(), "Check not existant path");
+  US_TEST_CONDITION(bundle.FindResources("!$noexist=?", std::string(), "true").empty(), "Check not existant path");
 
 
-  BundleResource readme = bundle->GetResource("/icons/readme.txt");
+  BundleResource readme = bundle.GetResource("/icons/readme.txt");
   US_TEST_CONDITION(readme.IsFile() && readme.GetChildren().empty(), "Check file resource")
 
-  BundleResource icons = bundle->GetResource("icons/");
+  BundleResource icons = bundle.GetResource("icons/");
   US_TEST_CONDITION(icons.IsDir() && !icons.IsFile() && !icons.GetChildren().empty(), "Check directory resource")
 
   children = icons.GetChildren();
@@ -319,14 +319,14 @@ void testResourceTree(const std::shared_ptr<Bundle>& bundle)
   ResourceComparator resourceComparator;
 
   // find all .txt files
-  std::vector<BundleResource> nodes = bundle->FindResources("", "*.txt", false);
+  std::vector<BundleResource> nodes = bundle.FindResources("", "*.txt", false);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
   US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
   US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt", "Check child name")
   US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo2.txt", "Check child name")
   US_TEST_CONDITION(nodes[2].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
 
-  nodes = bundle->FindResources("", "*.txt", true);
+  nodes = bundle.FindResources("", "*.txt", true);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
   US_TEST_CONDITION_REQUIRED(nodes.size() == 4, "Found child count")
   US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt", "Check child name")
@@ -335,33 +335,33 @@ void testResourceTree(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(nodes[3].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
 
   // find all resources
-  nodes = bundle->FindResources("", "", true);
+  nodes = bundle.FindResources("", "", true);
   US_TEST_CONDITION(nodes.size() == 9, "Total resource number")
-  nodes = bundle->FindResources("", "**", true);
+  nodes = bundle.FindResources("", "**", true);
   US_TEST_CONDITION(nodes.size() == 9, "Total resource number")
 
 
   // test pattern matching
   nodes.clear();
-  nodes = bundle->FindResources("/icons", "*micro*.png", false);
+  nodes = bundle.FindResources("/icons", "*micro*.png", false);
   US_TEST_CONDITION(nodes.size() == 1 && nodes[0].GetResourcePath() == "/icons/cppmicroservices.png", "Check file pattern matches")
 
   nodes.clear();
-  nodes = bundle->FindResources("", "*.txt", true);
+  nodes = bundle.FindResources("", "*.txt", true);
   US_TEST_CONDITION(nodes.size() == 4, "Check recursive pattern matches")
 }
 
-void testResourceOperators(const std::shared_ptr<Bundle>& bundle)
+void testResourceOperators(const Bundle& bundle)
 {
-  BundleResource invalid = bundle->GetResource("invalid");
-  BundleResource foo = bundle->GetResource("foo.txt");
+  BundleResource invalid = bundle.GetResource("invalid");
+  BundleResource foo = bundle.GetResource("foo.txt");
   US_TEST_CONDITION_REQUIRED(foo.IsValid() && foo, "Check valid resource")
   BundleResource foo2(foo);
   US_TEST_CONDITION(foo == foo, "Check equality operator")
   US_TEST_CONDITION(foo == foo2, "Check copy constructor and equality operator")
   US_TEST_CONDITION(foo != invalid, "Check inequality with invalid resource")
 
-  BundleResource xml = bundle->GetResource("/test.xml");
+  BundleResource xml = bundle.GetResource("/test.xml");
   US_TEST_CONDITION_REQUIRED(xml.IsValid() && xml, "Check valid resource")
   US_TEST_CONDITION(foo != xml, "Check inequality")
   US_TEST_CONDITION(foo < xml, "Check operator<")
@@ -386,9 +386,9 @@ void testResourceOperators(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(oss.str() == foo.GetResourcePath(), "Check operator<<")
 }
 
-void testResourceFromExecutable(const std::shared_ptr<Bundle>& bundle)
+void testResourceFromExecutable(const Bundle& bundle)
 {
-  BundleResource resource = bundle->GetResource("usTestResource.txt");
+  BundleResource resource = bundle.GetResource("usTestResource.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid executable resource")
 
   std::string line;
@@ -397,16 +397,14 @@ void testResourceFromExecutable(const std::shared_ptr<Bundle>& bundle)
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
 
-void testResourcesFrom(const std::string& bundleName, BundleContext* context)
+void testResourcesFrom(const std::string& bundleName, const BundleContext& context)
 {
-  InstallTestBundle(context, bundleName);
+  auto bundleR = testing::InstallLib(context, bundleName);
+  US_TEST_CONDITION_REQUIRED(bundleR, "Test for existing bundle")
 
-  auto bundleR = context->GetBundle(bundleName);
-  US_TEST_CONDITION_REQUIRED(bundleR != nullptr, "Test for existing bundle")
+  US_TEST_CONDITION(bundleR.GetSymbolicName() == bundleName, "Test bundle name")
 
-  US_TEST_CONDITION(bundleR->GetName() == bundleName, "Test bundle name")
-
-  US_TEST_CONDITION(bundleR->FindResources("", "*.txt", true).size() == 2, "Resource count")
+  US_TEST_CONDITION(bundleR.FindResources("", "*.txt", true).size() == 2, "Resource count")
 
 }
 
@@ -419,25 +417,22 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  BundleContext* context = framework->GetBundleContext();
+  auto context = framework.GetBundleContext();
   assert(context);
 
-  InstallTestBundle(context, "TestBundleR");
-
-  auto bundleR = context->GetBundle("TestBundleR");
-  US_TEST_CONDITION_REQUIRED(bundleR != nullptr, "Test for existing bundle TestBundleR")
-
-  US_TEST_CONDITION(bundleR->GetName() == "TestBundleR", "Test bundle name")
+  auto bundleR = testing::InstallLib(context, "TestBundleR");
+  US_TEST_CONDITION_REQUIRED(bundleR && bundleR.GetSymbolicName() == "TestBundleR", "Test for existing bundle TestBundleR")
 
   testInvalidResource(bundleR);
 
-  std::shared_ptr<Bundle> executableBundle;
+  Bundle executableBundle;
   try
   {
-    executableBundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/main");
-    US_TEST_CONDITION_REQUIRED(executableBundle != nullptr, "Test installation of bundle main")
+    context.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+    executableBundle = testing::GetBundle("main", context);
+    US_TEST_CONDITION_REQUIRED(executableBundle, "Test installation of bundle main")
   }
   catch (const std::exception& e)
   {
@@ -458,11 +453,11 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
 
   testCompressedResource(bundleR);
 
-  BundleResource foo = bundleR->GetResource("foo.txt");
+  BundleResource foo = bundleR.GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
 
-  testResourcesFrom("TestBundleRL", framework->GetBundleContext());
-  testResourcesFrom("TestBundleRA", framework->GetBundleContext());
+  testResourcesFrom("TestBundleRL", framework.GetBundleContext());
+  testResourcesFrom("TestBundleRA", framework.GetBundleContext());
 
   US_TEST_END()
 }

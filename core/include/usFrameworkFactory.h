@@ -50,14 +50,14 @@ public:
 
     /**
      * Create a new Framework instance.
-     * 
+     *
      * @param configuration The framework properties to configure the new framework instance. If framework properties
      * are not provided by the configuration argument, the created framework instance will use a reasonable
      * default configuration.
      *
      * @return A new, configured Framework instance.
      */
-    std::shared_ptr<Framework> NewFramework(const std::map<std::string, Any>& configuration);
+    Framework NewFramework(const std::map<std::string, Any>& configuration);
 
     /**
     * Create a new Framework instance.
@@ -66,7 +66,7 @@ public:
     *
     * @return A new, configured Framework instance.
     */
-    std::shared_ptr<Framework> NewFramework(void);
+    Framework NewFramework(void);
 
 private:
     FrameworkFactory(const FrameworkFactory& );

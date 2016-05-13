@@ -24,7 +24,6 @@
 #include "usBundleUtils_p.h"
 
 #include <usLog.h>
-#include <usBundleInfo_p.h>
 #include <usUtils_p.h>
 
 #ifdef __GNUC__
@@ -66,20 +65,20 @@ std::string GetLibraryPath_impl(void* symbol)
   return "";
 }
 
-void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
+void* GetSymbol_impl(const std::string& bundleName, const std::string& libLocation, const char* symbol)
 {
   // Clear the last error message
   dlerror();
 
   void* selfHandle = nullptr;
-  if (!sharedLibMode || bundleInfo.name == "main")
+  if (!sharedLibMode || bundleName == "main")
   {
     // Get the handle of the executable
     selfHandle = dlopen(0, RTLD_LAZY);
   }
   else
   {
-    selfHandle = dlopen(bundleInfo.location.c_str(), RTLD_LAZY);
+    selfHandle = dlopen(libLocation.c_str(), RTLD_LAZY);
   }
 
   if (selfHandle)
@@ -127,16 +126,16 @@ std::string GetLibraryPath_impl(void *symbol)
   return "";
 }
 
-void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
+void* GetSymbol_impl(const std::string& bundleName, const std::string& libLocation, const char* symbol)
 {
   HMODULE handle = nullptr;
-  if (!sharedLibMode || bundleInfo.name == "main")
+  if (!sharedLibMode || bundleName == "main")
   {
     handle = GetModuleHandle(nullptr);
   }
   else
   {
-    handle = GetModuleHandle(bundleInfo.location.c_str());
+    handle = GetModuleHandle(libLocation.c_str());
   }
 
   if (!handle)
@@ -160,7 +159,7 @@ std::string GetLibraryPath_impl(void*)
   return "";
 }
 
-void* GetSymbol_impl(const BundleInfo&, const char* symbol)
+void* GetSymbol_impl(const std::string&, const std::string&, const char*)
 {
   return nullptr;
 }
@@ -174,14 +173,7 @@ std::string GetLibraryPath(void* symbol)
 
 void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol)
 {
-  BundleInfo info(bundleName);
-  info.location = libLocation;
-  return GetSymbol(info, symbol);
-}
-
-void* GetSymbol(const BundleInfo& bundle, const char* symbol)
-{
-  return GetSymbol_impl(bundle, symbol);
+  return GetSymbol_impl(bundleName, libLocation, symbol);
 }
 
 } // namespace BundleUtils

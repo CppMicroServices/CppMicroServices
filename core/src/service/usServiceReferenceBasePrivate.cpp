@@ -52,14 +52,14 @@ ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 }
 
 InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
-      const std::shared_ptr<Bundle>& bundle,
+      BundlePrivate* bundle,
       const std::shared_ptr<ServiceFactory>& factory)
 {
   assert(factory && "Factory service pointer is nullptr");
   InterfaceMapConstPtr s;
   try
   {
-    InterfaceMapConstPtr smap = factory->GetService(bundle,
+    InterfaceMapConstPtr smap = factory->GetService(MakeBundle(bundle->shared_from_this()),
                                                     ServiceRegistrationBase(registration));
     if (!smap || smap->empty())
     {
@@ -67,7 +67,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       return smap;
     }
     std::vector<std::string> classes = (registration->properties.Lock(),
-                                        any_cast<std::vector<std::string>>(registration->properties.Value_unlocked(ServiceConstants::OBJECTCLASS())));
+                                        any_cast<std::vector<std::string>>(registration->properties.Value_unlocked(Constants::OBJECTCLASS)));
     for (auto clazz : classes)
     {
       if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
@@ -87,7 +87,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
   return s;
 }
 
-InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(const std::shared_ptr<Bundle>& bundle)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(const Bundle& bundle)
 {
   InterfaceMapConstPtr s;
   {
@@ -95,14 +95,14 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(const std:
     {
       auto factory = std::static_pointer_cast<ServiceFactory>(
                                                   registration->GetService("org.cppmicroservices.factory"));
-      s = GetServiceFromFactory(bundle, factory);
-      registration->Lock(), registration->prototypeServiceInstances[bundle].push_back(s);
+      s = GetServiceFromFactory(GetPrivate(bundle).get(), factory);
+      registration->Lock(), registration->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
     }
   }
   return s;
 }
 
-std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(const std::shared_ptr<Bundle>& bundle)
+std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(BundlePrivate* bundle)
 {
   auto s = ExtractInterface(GetServiceInterfaceMap(bundle), interfaceId);
   if (!s)
@@ -112,7 +112,7 @@ std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(const std::shared_
   return s;
 }
 
-InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(const std::shared_ptr<Bundle>& bundle)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundlePrivate* bundle)
 {
   InterfaceMapConstPtr s;
   if (!registration->available) return s;
@@ -165,14 +165,14 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(const s
   return s;
 }
 
-bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bundle>& bundle, const InterfaceMapConstPtr& service)
+bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<BundlePrivate>& bundle, const InterfaceMapConstPtr& service)
 {
   std::list<InterfaceMapConstPtr> prototypeServiceMaps;
   std::shared_ptr<ServiceFactory> sf;
 
   {
     auto l = registration->Lock(); US_UNUSED(l);
-    auto iter = registration->prototypeServiceInstances.find(bundle);
+    auto iter = registration->prototypeServiceInstances.find(bundle.get());
     if (iter == registration->prototypeServiceInstances.end())
     {
       return false;
@@ -192,7 +192,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bu
     {
       try
       {
-        sf->UngetService(bundle, ServiceRegistrationBase(registration), service);
+        sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration), service);
       }
       catch (const std::exception& /*e*/)
       {
@@ -200,7 +200,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bu
       }
 
       auto l = registration->Lock(); US_UNUSED(l);
-      auto iter = registration->prototypeServiceInstances.find(bundle);
+      auto iter = registration->prototypeServiceInstances.find(bundle.get());
       if (iter == registration->prototypeServiceInstances.end()) return true;
 
       auto serviceIter = std::find(iter->second.begin(), iter->second.end(), service);
@@ -216,7 +216,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bu
   return false;
 }
 
-bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<Bundle>& bundle, bool checkRefCounter)
+bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePrivate>& bundle, bool checkRefCounter)
 {
   bool hadReferences = false;
   bool removeService = false;
@@ -225,7 +225,7 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<Bundle>& bu
 
   {
     auto l = registration->Lock(); US_UNUSED(l);
-    int count= registration->dependents[bundle];
+    int count= registration->dependents[bundle.get()];
     if (count > 0)
     {
       hadReferences = true;
@@ -235,7 +235,7 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<Bundle>& bu
     {
       if (count > 1)
       {
-        registration->dependents[bundle] = count - 1;
+        registration->dependents[bundle.get()] = count - 1;
       }
       else if(count == 1)
       {
@@ -249,27 +249,27 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<Bundle>& bu
 
     if (removeService)
     {
-      sfi = registration->bundleServiceInstance[bundle];
+      sfi = registration->bundleServiceInstance[bundle.get()];
       if (sfi && !sfi->empty())
       {
         sf = std::static_pointer_cast<ServiceFactory>(
               registration->GetService_unlocked("org.cppmicroservices.factory"));
       }
-      registration->bundleServiceInstance.erase(bundle);
-      registration->dependents.erase(bundle);
+      registration->bundleServiceInstance.erase(bundle.get());
+      registration->dependents.erase(bundle.get());
     }
   }
 
   if (sf && sfi && !sfi->empty())
+  {
+    try
     {
-      try
-      {
-        sf->UngetService(bundle, ServiceRegistrationBase(registration), sfi);
-      }
-      catch (const std::exception& /*e*/)
-      {
-        US_WARN << "ServiceFactory threw an exception";
-      }
+      sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration), sfi);
+    }
+    catch (const std::exception& /*e*/)
+    {
+      US_WARN << "ServiceFactory threw an exception";
+    }
   }
 
   return hadReferences && removeService;

@@ -51,7 +51,7 @@ class Bundle;
  *
  *   - "(cn=Babs Jensen)"
  *   - "(!(cn=Tim Howes))"
- *   - "(&(" + ServiceConstants::OBJECTCLASS() + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
+ *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
  *   - "(o=univ*of*mich*)"
  *
  * \remarks This class is thread safe.

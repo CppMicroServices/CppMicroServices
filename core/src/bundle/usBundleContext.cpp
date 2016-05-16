@@ -79,7 +79,7 @@ std::shared_ptr<Bundle> BundleContext::GetBundle(const std::string& name)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return d->bundle->coreCtx->bundleRegistry.GetBundleByName(name);
+  return b->coreCtx->bundleRegistry.GetBundleByName(name);
 }
 
 std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const

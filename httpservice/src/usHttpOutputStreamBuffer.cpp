@@ -41,7 +41,7 @@ HttpOutputStreamBuffer::HttpOutputStreamBuffer(HttpServletResponsePrivate* respo
 
 HttpOutputStreamBuffer::~HttpOutputStreamBuffer()
 {
-  if (m_Response->m_Connection == NULL) return;
+  if (m_Response->m_Connection == nullptr) return;
 
   // if not committed yet and (i.e. the content completely fits
   // into the buffer and nobody synced the stream yet), then

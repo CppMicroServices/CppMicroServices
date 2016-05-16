@@ -45,17 +45,17 @@ class ServletHandler : public CivetHandler
 {
 public:
 
-  ServletHandler(HttpServlet* servlet, const std::string& servletPath)
+  ServletHandler(const std::shared_ptr<HttpServlet>& servlet, const std::string& servletPath)
     : m_Servlet(servlet)
     , m_ServletPath(servletPath)
   {}
 
-  ServletContext* GetServletContext() const
+  std::shared_ptr<ServletContext> GetServletContext() const
   {
     return m_Servlet->GetServletContext();
   }
 
-  HttpServlet* GetServlet() const
+  std::shared_ptr<HttpServlet> GetServlet() const
   {
     return m_Servlet;
   }
@@ -104,7 +104,7 @@ private:
 
 private:
 
-  HttpServlet* m_Servlet;
+  std::shared_ptr<HttpServlet> m_Servlet;
   std::string m_ServletPath;
 };
 
@@ -115,7 +115,7 @@ private:
 class ServletConfigImpl : public ServletConfig
 {
 public:
-  ServletConfigImpl(ServletContext* context)
+  ServletConfigImpl(const std::shared_ptr<ServletContext>& context)
   {
     ServletConfig::SetServletContext(context);
   }
@@ -123,7 +123,7 @@ public:
 
 ServletContainerPrivate::ServletContainerPrivate(ServletContainer* q)
     : m_Context(GetBundleContext())
-    , m_Server(NULL)
+    , m_Server(nullptr)
     , m_ServletTracker(m_Context, this)
     , q(q)
   {}
@@ -132,13 +132,13 @@ void ServletContainerPrivate::Start()
 {
   if (m_Server) return;
 
-  m_Server = new CivetServer(NULL);
+  m_Server = new CivetServer(nullptr);
   const mg_context* serverContext = m_Server->getContext();
-  if (serverContext == NULL)
+  if (serverContext == nullptr)
   {
     std::cout << "Servlet Container could not be started." << std::endl;
     delete m_Server;
-    m_Server = NULL;
+    m_Server = nullptr;
     return;
   }
   int port, sslPort;
@@ -152,67 +152,61 @@ void ServletContainerPrivate::Stop()
   m_ServletTracker.Close();
   if (m_Server)
   {
-    for (std::list<ServletHandler*>::iterator iter = m_Handler.begin(),
-         endIter = m_Handler.end(); iter != endIter; ++iter)
+    for (auto& handler : m_Handler)
     {
-      m_Server->removeHandler((*iter)->GetServletContext()->GetContextPath());
-      delete *iter;
+      m_Server->removeHandler(handler->GetServletContext()->GetContextPath());
     }
   }
   m_Handler.clear();
 
   delete m_Server;
-  m_Server = NULL;
+  m_Server = nullptr;
 }
 
 std::string ServletContainerPrivate::GetMimeType(const ServletContext* /*context*/, const std::string& file) const
 {
   const char* mimeType = mg_get_builtin_mime_type(file.c_str());
-  if (mimeType == NULL) return std::string();
+  if (mimeType == nullptr) return std::string();
   return mimeType;
 }
 
-ServletContainerPrivate::TrackedType ServletContainerPrivate::AddingService(const ServiceReferenceType& reference)
+std::shared_ptr<ServletHandler> ServletContainerPrivate::AddingService(const ServiceReference<HttpServlet>& reference)
 {
   Any contextRoot = reference.GetProperty(HttpServlet::PROP_CONTEXT_ROOT());
   if (contextRoot.Empty())
   {
     std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is missing the context root property." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
-  std::shared_ptr<HttpServlet> servlet = m_Context->GetService(reference);
+  auto servlet = m_Context->GetService(reference);
   if (!servlet)
   {
-    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is NULL." << std::endl;
-    return NULL;
+    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is nullptr." << std::endl;
+    return nullptr;
   }
-  ServletContext* servletContext = new ServletContext(q);
+  std::shared_ptr<ServletContext> servletContext(new ServletContext(q));
   servlet->Init(ServletConfigImpl(servletContext));
-  // TODO: short term workaround, extracting the raw ptr from smart ptr may not be safe
-  ServletHandler* handler = new ServletHandler(servlet.get(), contextRoot.ToString());
+  auto handler = std::make_shared<ServletHandler>(servlet, contextRoot.ToString());
   m_Handler.push_back(handler);
   m_ServletContextMap[contextRoot.ToString()] = servletContext;
 
-  m_Server->addHandler(m_ContextPath + contextRoot.ToString(), handler);
+  m_Server->addHandler(m_ContextPath + contextRoot.ToString(), handler.get());
   return handler;
 }
 
-void ServletContainerPrivate::ModifiedService(const ServiceReferenceType& /*reference*/, TrackedType /*service*/)
+void ServletContainerPrivate::ModifiedService(const ServiceReference<HttpServlet>& /*reference*/, const std::shared_ptr<ServletHandler>& /*service*/)
 {
   // no-op
 }
 
-void ServletContainerPrivate::RemovedService(const ServiceReferenceType& /*reference*/, TrackedType handler)
+void ServletContainerPrivate::RemovedService(const ServiceReference<HttpServlet>& /*reference*/, const std::shared_ptr<ServletHandler>& handler)
 {
   std::string contextPath = handler->GetServletContext()->GetContextPath();
   m_Server->removeHandler(contextPath);
   m_Handler.remove(handler);
   handler->GetServlet()->Destroy();
   m_ServletContextMap.erase(contextPath);
-
-  delete handler->GetServletContext();
-  delete handler;
 }
 
 
@@ -266,10 +260,10 @@ void ServletContainer::Stop()
   d->Stop();
 }
 
-ServletContext* ServletContainer::GetContext(const std::string& uripath) const
+std::shared_ptr<ServletContext> ServletContainer::GetContext(const std::string& uripath) const
 {
-  std::map<std::string, ServletContext*>::iterator iter = d->m_ServletContextMap.find(uripath);
-  if (iter == d->m_ServletContextMap.end()) return NULL;
+  auto iter = d->m_ServletContextMap.find(uripath);
+  if (iter == d->m_ServletContextMap.end()) return nullptr;
   return iter->second;
 }
 

@@ -23,9 +23,8 @@ limitations under the License.
 #ifndef USFRAMEWORKPRIVATE_P_H
 #define USFRAMEWORKPRIVATE_P_H
 
-#include <usCoreConfig.h>
 #include <usCoreBundleContext_p.h>
-#include <usThreads_p.h>
+#include <usBundlePrivate.h>
 
 #include <map>
 #include <string>
@@ -35,22 +34,16 @@ namespace us {
 /**
  * The implementation of the Framework class.
  *
- * This class exists to hide and decouple the implementation of the 
+ * This class exists to hide and decouple the implementation of the
  * Framework class from client code.
  */
-class FrameworkPrivate : public MultiThreaded<>
+class FrameworkPrivate : public BundlePrivate
 {
 public:
-    FrameworkPrivate(void);
-    FrameworkPrivate(const std::map<std::string, std::string>& configuration);
-    virtual ~FrameworkPrivate();
 
-    CoreBundleContext coreBundleContext;
+  FrameworkPrivate(Framework* qq, const BundleInfo& info, const std::map<std::string, Any>& configuration);
 
-    bool initialized;
-
-private:
-    void Init();
+  CoreBundleContext coreBundleContext;
 };
 
 }

@@ -56,7 +56,7 @@ struct US_Core_EXPORT ServiceListenerHook
    * Information about a Service Listener. This class describes the bundle
    * which added the Service Listener and the filter with which it was added.
    *
-   * @remark This class is not intended to be implemented by clients.
+   * @remarks This class is not intended to be implemented by clients.
    */
   struct US_Core_EXPORT ListenerInfo
   {

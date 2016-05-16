@@ -55,8 +55,7 @@ public:
 
   void Find(const BundleContext* /*context*/, ShrinkableVector<std::shared_ptr<Bundle>>& bundles)
   {
-    for (ShrinkableVector<std::shared_ptr<Bundle>>::iterator i = bundles.begin();
-         i != bundles.end();)
+    for (auto i = bundles.begin(); i != bundles.end();)
     {
       if ((*i)->GetName() == "TestBundleA")
       {
@@ -101,7 +100,7 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
 
   US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) != nullptr, "Test for non-filtered GetBundle(long) result")
 
-  ServiceRegistration<BundleFindHook> findHookReg = framework->GetBundleContext()->RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
+  auto findHookReg = framework->GetBundleContext()->RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
 
   US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) == nullptr, "Test for filtered GetBundle(long) result")
 
@@ -119,7 +118,7 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
   bundleA->Stop();
 }
 
-void TestEventHook(std::shared_ptr<Framework> framework)
+void TestEventHook(const std::shared_ptr<Framework>& framework)
 {
   TestBundleListener bundleListener;
   framework->GetBundleContext()->AddBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
@@ -133,7 +132,7 @@ void TestEventHook(std::shared_ptr<Framework> framework)
   bundleA->Stop();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 5, "Test for received unload bundle events")
 
-  ServiceRegistration<BundleEventHook> eventHookReg = framework->GetBundleContext()->RegisterService<BundleEventHook>(std::make_shared<TestBundleEventHook>());
+  auto eventHookReg = framework->GetBundleContext()->RegisterService<BundleEventHook>(std::make_shared<TestBundleEventHook>());
 
   bundleListener.events.clear();
 
@@ -156,7 +155,7 @@ int usBundleHooksTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleHooksTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   TestFindHook(framework);

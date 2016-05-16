@@ -36,7 +36,7 @@ SimpleWebConsolePlugin::SimpleWebConsolePlugin(const std::string& label, const s
   , m_Title(title)
   , m_Category(category)
   , m_Css(css)
-  , m_Context(NULL)
+  , m_Context(nullptr)
 {
   if (label.empty())
   {
@@ -75,7 +75,7 @@ SimpleWebConsolePlugin* SimpleWebConsolePlugin::Register(BundleContext* context)
   {
     props[WebConsoleConstants::PLUGIN_CATEGORY()] = GetCategory();
   }
-    m_Reg = context->RegisterService<HttpServlet>(shared_from_this(), props);
+  m_Reg = context->RegisterService<HttpServlet>(shared_from_this(), props);
   m_Context = context;
   return this;
 }
@@ -87,7 +87,7 @@ void SimpleWebConsolePlugin::Unregister()
     m_Reg.Unregister();
   }
   m_Reg = 0;
-  m_Context = NULL;
+  m_Context = nullptr;
 }
 
 std::vector<std::string> SimpleWebConsolePlugin::GetCssReferences() const
@@ -102,7 +102,7 @@ BundleContext* SimpleWebConsolePlugin::GetContext() const
 
 BundleResource SimpleWebConsolePlugin::GetResource(const std::string& path) const
 {
-  return (m_Context != NULL && path.size() > m_LabelRes.size() &&
+  return (m_Context != nullptr && path.size() > m_LabelRes.size() &&
                        path.compare(0, m_LabelRes.size(), m_LabelRes) == 0) ?
         m_Context->GetBundle()->GetResource(path.substr(m_LabelResLen)) :
         BundleResource();

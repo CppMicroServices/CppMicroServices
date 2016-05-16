@@ -27,6 +27,7 @@
 #include <usCoreConfig.h>
 
 #include <mutex>
+#include <memory>
 
 namespace us {
 
@@ -49,30 +50,45 @@ public:
 #endif
   {}
 
-  friend class Lock;
+  friend class UniqueLock;
 
-  class Lock
+  class UniqueLock
   {
   public:
 
-    Lock(const Lock&) = delete;
-    Lock& operator=(const Lock&) = delete;
+    UniqueLock()
+    {}
+
+    UniqueLock(const UniqueLock&) = delete;
+    UniqueLock& operator=(const UniqueLock&) = delete;
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 
+    UniqueLock(UniqueLock&& o)
+      : m_Lock(std::move(o.m_Lock))
+    {}
+
+    UniqueLock& operator=(UniqueLock&& o)
+    {
+      m_Lock = std::move(o.m_Lock);
+      return *this;
+    }
+
     // Lock object
-    explicit Lock(const MutexLockingStrategy& host)
+    explicit UniqueLock(const MutexLockingStrategy& host)
       : m_Lock(host.m_Mtx)
     {}
 
     // Lock object
-    explicit Lock(const MutexLockingStrategy* host)
+    explicit UniqueLock(const MutexLockingStrategy* host)
       : m_Lock(host->m_Mtx)
     {}
 
 #else
-    explicit Lock(const MutexLockingStrategy&) {}
-    explicit Lock(const MutexLockingStrategy*) {}
+    UniqueLock(UniqueLock&&) {}
+    UniqueLock& operator=(UniqueLock&&) {}
+    explicit UniqueLock(const MutexLockingStrategy&) {}
+    explicit UniqueLock(const MutexLockingStrategy*) {}
 #endif
 
   private:
@@ -84,6 +100,24 @@ public:
 #endif
   };
 
+  /**
+   * @brief Lock this object.
+   *
+   * Call this method to lock this object and obtain a lock object
+   * which automatically releases the acquired lock when it goes out
+   * of scope. E.g.
+   *
+   * \code
+   * auto lock = object->Lock();
+   * \endcode
+   *
+   * @return A lock object.
+   */
+  UniqueLock Lock() const
+  {
+    return UniqueLock(this);
+  }
+
 protected:
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -93,7 +127,7 @@ protected:
 
 class NoLockingStrategy {
 public:
-    typedef void Lock;
+    typedef void UniqueLock;
 };
 
 template<class MutexHost>
@@ -107,6 +141,66 @@ class MultiThreaded
     : public LockingStrategy
     , public WaitConditionStrategy<LockingStrategy>
 {};
+
+template<class T>
+class Atomic : private MultiThreaded<>
+{
+  T m_t;
+
+public:
+
+  T Load() const
+  {
+    return Lock(), m_t;
+  }
+
+  void Store(const T& t)
+  {
+    Lock(), m_t = t;
+  }
+
+  T Exchange(const T& t)
+  {
+    auto l = Lock(); US_UNUSED(l);
+    auto o = m_t;
+    m_t = t;
+    return o;
+  }
+
+};
+
+#if !defined(__GNUC__) || __GNUC__ > 4
+// The std::atomic_load() et.al. overloads for std::shared_ptr are only available
+// in libstdc++ since GCC 5.0. Visual Studio 2013 has it, but the Clang version
+// is unknown so far.
+
+// Specialize us::Atomic for std::shared_ptr to use the standard library atomic
+// functions:
+template<class T>
+class Atomic<std::shared_ptr<T>>
+{
+
+  std::shared_ptr<T> m_t;
+
+public:
+
+  std::shared_ptr<T> Load() const
+  {
+    return std::atomic_load(&m_t);
+  }
+
+  void Store(const std::shared_ptr<T>& t)
+  {
+    std::atomic_store(&m_t, t);
+  }
+
+  std::shared_ptr<T> Exchange(const std::shared_ptr<T>& t)
+  {
+    return std::atomic_exchange(&m_t, t);
+  }
+
+};
+#endif
 
 }
 

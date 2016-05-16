@@ -45,9 +45,9 @@ namespace us {
  * implementation of the Tracker class.
  *
  * @tparam S The tracked item. It is the key.
- * @tparam T The value mapped to the tracked item.
+ * @tparam TTT Type traits with TTT::TrackedType representing the value type mapped to the tracked item.
  * @tparam R The reason the tracked item is  being tracked or untracked.
- * @ThreadSafe
+ * @remarks This class is thread safe.
  */
 template<class S, class TTT, class R>
 class BundleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>,WaitCondition>
@@ -56,11 +56,12 @@ class BundleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>,WaitCo
 public:
 
   typedef typename TTT::TrackedType T;
+  typedef typename TTT::TrackedParmType TrackedParmType;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
 
-  typedef std::map<S,T> TrackingMap;
+  typedef std::map<S,std::shared_ptr<TrackedParmType>> TrackingMap;
 
   /**
    * BundleAbstractTracked constructor.
@@ -120,7 +121,7 @@ public:
    *
    * @GuardedBy this
    */
-  std::size_t Size() const;
+  std::size_t Size_unlocked() const;
 
   /**
    * Returns if the tracker is empty.
@@ -129,7 +130,7 @@ public:
    *
    * @GuardedBy this
    */
-  bool IsEmpty() const;
+  bool IsEmpty_unlocked() const;
 
   /**
    * Return the customized object for the specified item
@@ -139,7 +140,7 @@ public:
    *
    * @GuardedBy this
    */
-  T GetCustomizedObject(S item) const;
+  std::shared_ptr<TrackedParmType> GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.
@@ -147,7 +148,7 @@ public:
    * @return The tracked items.
    * @GuardedBy this
    */
-  void GetTracked(std::vector<S>& items) const;
+  void GetTracked_unlocked(std::vector<S>& items) const;
 
   /**
    * Increment the modification count. If this method is overridden, the
@@ -178,7 +179,7 @@ public:
    * @return The specified map.
    * @GuardedBy this
    */
-  void CopyEntries(TrackingMap& map) const;
+  void CopyEntries_unlocked(TrackingMap& map) const;
 
   /**
    * Call the specific customizer adding method. This method must not be
@@ -189,7 +190,7 @@ public:
    * @return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
-  virtual T CustomizerAdding(S item, const R& related) = 0;
+  virtual std::shared_ptr<TrackedParmType> CustomizerAdding(S item, const R& related) = 0;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -200,7 +201,7 @@ public:
    * @param object Customized object for the tracked item.
    */
   virtual void CustomizerModified(S item, const R& related,
-                                  T object) = 0;
+                                  const std::shared_ptr<TrackedParmType>& object) = 0;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -211,7 +212,7 @@ public:
    * @param object Customized object for the tracked item.
    */
   virtual void CustomizerRemoved(S item, const R& related,
-                                 T object) = 0;
+                                 const std::shared_ptr<TrackedParmType>& object) = 0;
 
   /**
    * List of items in the process of being added. This is used to deal with
@@ -231,11 +232,8 @@ public:
 
   /**
    * true if the tracked object is closed.
-   *
-   * This field is volatile because it is set by one thread and read by
-   * another.
    */
-  volatile bool closed;
+  std::atomic<bool> closed;
 
   /**
    * Initial list of items for the tracker. This is used to correctly process
@@ -283,7 +281,7 @@ private:
    */
   std::atomic<int> trackingCount;
 
-  bool CustomizerAddingFinal(S item, const T& custom);
+  bool CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParmType>& custom);
 
 };
 

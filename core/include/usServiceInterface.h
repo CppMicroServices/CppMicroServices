@@ -232,7 +232,7 @@ public:
   {
     if (!m_factory)
     {
-      throw ServiceException("The service factory argument must not be NULL.");
+      throw ServiceException("The service factory argument must not be nullptr.");
     }
   }
 
@@ -286,6 +286,34 @@ std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
   if (iter != map->end())
   {
     return std::static_pointer_cast<Interface>(iter->second);
+  }
+  return nullptr;
+}
+
+
+/**
+ * @ingroup MicroServices
+ *
+ * Extract a service interface pointer from a given InterfaceMap instance.
+ *
+ * @param map a InterfaceMap instance.
+ * @param interfaceId The interface id string.
+ * @return The service interface pointer for the service interface id or
+ *         \c nullptr if \c map does not contain an entry for the given type.
+ *
+ * @see ExtractInterface(const InterfaceMap&)
+ */
+inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, const std::string& interfaceId)
+{
+  if (interfaceId.empty() && map && !map->empty())
+  {
+    return map->begin()->second;
+  }
+
+  auto iter = map->find(interfaceId);
+  if (iter != map->end())
+  {
+    return iter->second;
   }
   return nullptr;
 }

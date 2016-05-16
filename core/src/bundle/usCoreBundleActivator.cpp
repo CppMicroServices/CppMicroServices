@@ -36,9 +36,9 @@ class CoreBundleActivator : public BundleActivator
     context->GetBundle()->d->coreCtx->Init();
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext* context)
   {
-    //context->GetBundle()->d->coreCtx->Uninit();
+    context->GetBundle()->d->coreCtx->Uninit();
   }
 
 };

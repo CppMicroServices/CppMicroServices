@@ -79,7 +79,7 @@ int main(int /*argc*/, char** /*argv*/)
   char cmd[256];
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   std::vector<std::string> availableBundles = GetExampleBundles();
@@ -230,7 +230,7 @@ int main(int /*argc*/, char** /*argv*/)
     }
     else if (strCmd == "s")
     {
-      std::vector<std::shared_ptr<Bundle>> bundles = framework->GetBundleContext()->GetBundles();
+      auto bundles = framework->GetBundleContext()->GetBundles();
 
       std::cout << std::left;
 
@@ -243,12 +243,11 @@ int main(int /*argc*/, char** /*argv*/)
         std::cout << " - | " << std::setw(20) << *nameIter << " | " << std::setw(9) << "-" << std::endl;
       }
 
-      for (std::vector<std::shared_ptr<Bundle>>::const_iterator bundleIter = bundles.begin();
-           bundleIter != bundles.end(); ++bundleIter)
+      for (auto& bundle : bundles)
       {
-        std::cout << std::right << std::setw(2) << (*bundleIter)->GetBundleId() << std::left << " | ";
-        std::cout << std::setw(20) << (*bundleIter)->GetName() << " | ";
-        std::cout << std::setw(9) << ((*bundleIter)->IsStarted() ? "ACTIVE" : "RESOLVED");
+        std::cout << std::right << std::setw(2) << bundle->GetBundleId() << std::left << " | ";
+        std::cout << std::setw(20) << bundle->GetName() << " | ";
+        std::cout << std::setw(9) << (bundle->IsStarted() ? "ACTIVE" : "RESOLVED");
         std::cout << std::endl;
       }
     }

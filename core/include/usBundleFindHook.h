@@ -26,6 +26,8 @@
 #include "usServiceInterface.h"
 #include "usShrinkableVector.h"
 
+#include <memory>
+
 namespace us {
 
 class Bundle;

@@ -20,37 +20,26 @@
 
 =============================================================================*/
 
-#ifndef USSERVICEPROPERTIESIMPL_P_H
-#define USSERVICEPROPERTIESIMPL_P_H
 
-#include "usServiceProperties.h"
+#ifndef USBUNDLEINFO_P_H
+#define USBUNDLEINFO_P_H
+
+#include <string>
 
 namespace us {
 
-class ServicePropertiesImpl
+struct BundleActivator;
+
+struct BundleInfo
 {
+  BundleInfo(const std::string& name);
 
-public:
-
-  explicit ServicePropertiesImpl(const ServiceProperties& props);
-
-  const Any& Value(const std::string& key) const;
-  const Any& Value(int index) const;
-
-  int Find(const std::string& key) const;
-  int FindCaseSensitive(const std::string& key) const;
-
-  const std::vector<std::string>& Keys() const;
-
-private:
-
-  std::vector<std::string> keys;
-  std::vector<Any> values;
-
-  static Any emptyAny;
-
+  std::string name;
+  std::string location;
+  std::string autoLoadDir;
+  long id;
 };
 
 }
 
-#endif // USSERVICEPROPERTIESIMPL_P_H
+#endif // USBUNDLEINFO_H

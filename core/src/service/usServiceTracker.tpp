@@ -32,11 +32,10 @@
 
 namespace us {
 
-template<class S, class TTT>
-ServiceTracker<S,TTT>::~ServiceTracker()
+template<class S, class T>
+ServiceTracker<S,T>::~ServiceTracker()
 {
   Close();
-  delete d;
 }
 
 #ifdef _MSC_VER
@@ -44,30 +43,30 @@ ServiceTracker<S,TTT>::~ServiceTracker()
 #pragma warning(disable:4355)
 #endif
 
-template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(BundleContext* context,
-                                      const ServiceReferenceType& reference,
-                                      _ServiceTrackerCustomizer* customizer)
+template<class S, class T>
+ServiceTracker<S,T>::ServiceTracker(BundleContext* context,
+                                    const ServiceReference<S>& reference,
+                                    _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, reference, customizer))
 {
 }
 
-template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(BundleContext* context, const std::string& clazz,
-                                      _ServiceTrackerCustomizer* customizer)
+template<class S, class T>
+ServiceTracker<S,T>::ServiceTracker(BundleContext* context, const std::string& clazz,
+                                    _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, clazz, customizer))
 {
 }
 
-template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(BundleContext* context, const LDAPFilter& filter,
-                                      _ServiceTrackerCustomizer* customizer)
+template<class S, class T>
+ServiceTracker<S,T>::ServiceTracker(BundleContext* context, const LDAPFilter& filter,
+                                    _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
 {
 }
 
-template<class S, class TTT>
-ServiceTracker<S,TTT>::ServiceTracker(BundleContext *context, _ServiceTrackerCustomizer* customizer)
+template<class S, class T>
+ServiceTracker<S,T>::ServiceTracker(BundleContext *context, _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
 {
   std::string clazz = us_service_interface_iid<S>();
@@ -78,75 +77,74 @@ ServiceTracker<S,TTT>::ServiceTracker(BundleContext *context, _ServiceTrackerCus
 #pragma warning(pop)
 #endif
 
-template<class S, class TTT>
-void ServiceTracker<S,TTT>::Open()
+template<class S, class T>
+void ServiceTracker<S,T>::Open()
 {
-  _TrackedService* t;
+  std::unique_ptr<_TrackedService> t;
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
+    auto l = d->Lock(); US_UNUSED(l);
     if (d->trackedService)
     {
       return;
     }
 
-    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->listenerFilter;
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->filter;
 
-    t = new _TrackedService(this, d->customizer);
+    t.reset(new _TrackedService(this, d->customizer));
+    try
     {
-      typename _TrackedService::Lock l(*t);
-      try {
-        d->context->AddServiceListener(t, &_TrackedService::ServiceChanged, d->listenerFilter);
-        std::vector<ServiceReferenceType> references;
-        if (!d->trackClass.empty())
+      d->context->AddServiceListener(t.get(), &_TrackedService::ServiceChanged, d->listenerFilter);
+      std::vector<ServiceReference<S>> references;
+      if (!d->trackClass.empty())
+      {
+        references = d->GetInitialReferences(d->trackClass, std::string());
+      }
+      else
+      {
+        if (d->trackReference.GetBundle() != nullptr)
         {
-          references = d->GetInitialReferences(d->trackClass, std::string());
+          references.push_back(d->trackReference);
         }
         else
-        {
-          if (d->trackReference.GetBundle() != 0)
-          {
-            references.push_back(d->trackReference);
-          }
-          else
-          { /* user supplied filter */
-            references = d->GetInitialReferences(std::string(),
-                                                 (d->listenerFilter.empty()) ? d->filter.ToString() : d->listenerFilter);
-          }
+        { /* user supplied filter */
+          references = d->GetInitialReferences(std::string(),
+                                               (d->listenerFilter.empty()) ? d->filter.ToString() : d->listenerFilter);
         }
-        /* set tracked with the initial references */
-        t->SetInitial(references);
       }
-      catch (const std::invalid_argument& e)
-      {
-        throw std::runtime_error(std::string("unexpected std::invalid_argument exception: ")
-            + e.what());
-      }
+      /* set tracked with the initial references */
+      t->SetInitial(references);
     }
-    d->trackedService = t;
+    catch (const std::invalid_argument& e)
+    {
+      d->context->RemoveServiceListener(t.get(), &_TrackedService::ServiceChanged);
+      throw std::runtime_error(std::string("unexpected std::invalid_argument exception: ")
+                               + e.what());
+    }
+    d->trackedService = std::move(t);
   }
   /* Call tracked outside of synchronized region */
-  t->TrackInitial(); /* process the initial references */
+  d->trackedService->TrackInitial(); /* process the initial references */
 }
 
-template<class S, class TTT>
-void ServiceTracker<S,TTT>::Close()
+template<class S, class T>
+void ServiceTracker<S,T>::Close()
 {
-  _TrackedService* outgoing;
-  std::vector<ServiceReferenceType> references;
+  std::unique_ptr<_TrackedService> outgoing;
+  std::vector<ServiceReference<S>> references;
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
-    outgoing = d->trackedService;
-    if (outgoing == 0)
+    auto l = d->Lock(); US_UNUSED(l);
+    outgoing = std::move(d->trackedService);
+    d->trackedService.reset();
+    if (outgoing == nullptr)
     {
       return;
     }
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::close:" << d->filter;
     outgoing->Close();
     references = GetServiceReferences();
-    d->trackedService = 0;
     try
     {
-      d->context->RemoveServiceListener(outgoing, &_TrackedService::ServiceChanged);
+      d->context->RemoveServiceListener(outgoing.get(), &_TrackedService::ServiceChanged);
     }
     catch (const std::logic_error& /*e*/)
     {
@@ -154,46 +152,63 @@ void ServiceTracker<S,TTT>::Close()
     }
   }
   d->Modified(); /* clear the cache */
+  outgoing->NotifyAll(); /* wake up any waiters */
+  for(auto& ref : references)
   {
-    typename _TrackedService::Lock l(outgoing);
-    outgoing->NotifyAll(); /* wake up any waiters */
-  }
-  for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
-      ref != references.end(); ++ref)
-  {
-    outgoing->Untrack(*ref, ServiceEvent());
+    outgoing->Untrack(ref, ServiceEvent());
   }
 
   if (d->DEBUG_OUTPUT)
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
-    if ((d->cachedReference.GetBundle() == 0) && !TTT::IsValid(d->cachedService))
+    if (d->cachedReference.Load().GetBundle() == nullptr &&
+        d->cachedService.Load() == nullptr)
     {
       US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                        << d->filter;
     }
   }
-
-  delete outgoing;
-  d->trackedService = 0;
 }
 
-template<class S, class TTT>
-template<class Rep, class Period>
-typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::WaitForService(const std::chrono::duration<Rep, Period>& rel_time)
+template<class S, class T>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+ServiceTracker<S,T>::WaitForService()
 {
-  T object = GetService();
-  while (!TTT::IsValid(object))
+  auto object = GetService();
+  if (!object)
   {
     _TrackedService* t = d->Tracked();
-    if (t == 0)
+    if (t == nullptr)
     { /* if ServiceTracker is not open */
-      return TTT::DefaultValue();
+      return object;
     }
     {
-      typename _TrackedService::Lock l(t);
-      if (t->Size() == 0)
+      auto l = t->Lock();
+      if (t->Size_unlocked() == 0)
+      {
+        t->Wait(l, [&t]{ return t->Size_unlocked(); });
+      }
+    }
+    object = GetService();
+  }
+  return object;
+}
+
+template<class S, class T>
+template<class Rep, class Period>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& rel_time)
+{
+  auto object = GetService();
+  while (!object)
+  {
+    _TrackedService* t = d->Tracked();
+    if (t == nullptr)
+    { /* if ServiceTracker is not open */
+      return std::shared_ptr<TrackedParmType>();
+    }
+    {
+      auto l = t->Lock();
+      if (t->Size_unlocked() == 0)
       {
         t->WaitFor(l, rel_time);
       }
@@ -203,52 +218,48 @@ ServiceTracker<S,TTT>::WaitForService(const std::chrono::duration<Rep, Period>& 
   return object;
 }
 
-template<class S, class TTT>
-std::vector<typename ServiceTracker<S,TTT>::ServiceReferenceType>
-ServiceTracker<S,TTT>::GetServiceReferences() const
+template<class S, class T>
+std::vector<ServiceReference<S>>
+ServiceTracker<S,T>::GetServiceReferences() const
 {
-  std::vector<ServiceReferenceType> refs;
+  std::vector<ServiceReference<S>> refs;
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return refs;
   }
   {
-    typename _TrackedService::Lock l(t);
+    auto l = t->Lock(); US_UNUSED(l);
     d->GetServiceReferences_unlocked(refs, t);
   }
   return refs;
 }
 
-template<class S, class TTT>
-typename ServiceTracker<S,TTT>::ServiceReferenceType
-ServiceTracker<S,TTT>::GetServiceReference() const
+template<class S, class T>
+ServiceReference<S>
+ServiceTracker<S,T>::GetServiceReference() const
 {
-  ServiceReferenceType reference;
-  {
-    typename _ServiceTrackerPrivate::Lock l(d);
-    reference = d->cachedReference;
-  }
-  if (reference.GetBundle() != 0)
+  ServiceReference<S> reference = d->cachedReference.Load();
+  if (reference.GetBundle() != nullptr)
   {
     US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
                          << d->filter;
     return reference;
   }
   US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
-  std::vector<ServiceReferenceType> references = GetServiceReferences();
+  auto references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0)
   { /* if no service is being tracked */
     throw ServiceException("No service is being tracked");
   }
-  typename std::vector<ServiceReferenceType>::const_iterator selectedRef = references.begin();
+  auto selectedRef = references.begin();
   if (length > 1)
   { /* if more than one service, select highest ranking */
     std::vector<int> rankings(length);
     int count = 0;
     int maxRanking = (std::numeric_limits<int>::min)();
-    typename std::vector<ServiceReferenceType>::const_iterator refIter = references.begin();
+    auto refIter = references.begin();
     for (std::size_t i = 0; i < length; i++)
     {
       Any rankingAny = refIter->GetProperty(ServiceConstants::SERVICE_RANKING());
@@ -299,166 +310,143 @@ ServiceTracker<S,TTT>::GetServiceReference() const
     }
   }
 
-  {
-    typename _ServiceTrackerPrivate::Lock l(d);
-    d->cachedReference = *selectedRef;
-    return d->cachedReference;
-  }
+  d->cachedReference.Store(*selectedRef);
+  return *selectedRef;
 }
 
-template<class S, class TTT>
-typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::GetService(const ServiceReferenceType& reference) const
+template<class S, class T>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+ServiceTracker<S,T>::GetService(const ServiceReference<S>& reference) const
 {
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
-    return TTT::DefaultValue();
+    return std::shared_ptr<TrackedParmType>();
   }
-  {
-    typename _TrackedService::Lock l(t);
-    return t->GetCustomizedObject(reference);
-  }
+  return (t->Lock(), t->GetCustomizedObject_unlocked(reference));
 }
 
-template<class S, class TTT>
-std::vector<typename ServiceTracker<S,TTT>::T> ServiceTracker<S,TTT>::GetServices() const
+template<class S, class T>
+std::vector<std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>> ServiceTracker<S,T>::GetServices() const
 {
-  std::vector<T> services;
+  std::vector<std::shared_ptr<TrackedParmType>> services;
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return services;
   }
   {
-    typename _TrackedService::Lock l(t);
-    std::vector<ServiceReferenceType> references;
+    auto l = t->Lock(); US_UNUSED(l);
+    std::vector<ServiceReference<S>> references;
     d->GetServiceReferences_unlocked(references, t);
-    for(typename std::vector<ServiceReferenceType>::const_iterator ref = references.begin();
-        ref != references.end(); ++ref)
+    for(auto& ref : references)
     {
-      services.push_back(t->GetCustomizedObject(*ref));
+      services.push_back(t->GetCustomizedObject_unlocked(ref));
     }
   }
   return services;
 }
 
-template<class S, class TTT>
-typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::GetService() const
+template<class S, class T>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+ServiceTracker<S,T>::GetService() const
 {
+  auto service = d->cachedService.Load();
+  if (service)
   {
-    typename _ServiceTrackerPrivate::Lock l(d);
-    const T& service = d->cachedService;
-    if (TTT::IsValid(service))
-    {
-      US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService[cached]:"
-                                << d->filter;
-      return service;
-    }
+    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService[cached]:"
+                              << d->filter;
+    return service;
   }
   US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService:" << d->filter;
 
   try
   {
-    ServiceReferenceType reference = GetServiceReference();
-    if (reference.GetBundle() == 0)
+    auto reference = GetServiceReference();
+    if (reference.GetBundle() == nullptr)
     {
-      return TTT::DefaultValue();
+      return std::shared_ptr<TrackedParmType>();
     }
-    {
-      typename _ServiceTrackerPrivate::Lock l(d);
-      return d->cachedService = GetService(reference);
-    }
+    service = GetService(reference);
+    d->cachedService.Store(service);
+    return service;
   }
   catch (const ServiceException&)
   {
-    return TTT::DefaultValue();
+    return std::shared_ptr<TrackedParmType>();
   }
 }
 
-template<class S, class TTT>
-void ServiceTracker<S,TTT>::Remove(const ServiceReferenceType& reference)
+template<class S, class T>
+void ServiceTracker<S,T>::Remove(const ServiceReference<S>& reference)
 {
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return;
   }
   t->Untrack(reference, ServiceEvent());
 }
 
-template<class S, class TTT>
-int ServiceTracker<S,TTT>::Size() const
+template<class S, class T>
+int ServiceTracker<S,T>::Size() const
 {
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return 0;
   }
-  {
-    typename _TrackedService::Lock l(t);
-    return static_cast<int>(t->Size());
-  }
+  return (t->Lock(), static_cast<int>(t->Size_unlocked()));
 }
 
-template<class S, class TTT>
-int ServiceTracker<S,TTT>::GetTrackingCount() const
+template<class S, class T>
+int ServiceTracker<S,T>::GetTrackingCount() const
 {
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return -1;
   }
-  {
-    typename _TrackedService::Lock l(t);
-    return t->GetTrackingCount();
-  }
+  return (t->Lock(), t->GetTrackingCount());
 }
 
-template<class S, class TTT>
-void ServiceTracker<S,TTT>::GetTracked(TrackingMap& map) const
+template<class S, class T>
+void ServiceTracker<S,T>::GetTracked(TrackingMap& map) const
 {
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return;
   }
-  {
-    typename _TrackedService::Lock l(t);
-    t->CopyEntries(map);
-  }
+  t->Lock(), t->CopyEntries_unlocked(map);
 }
 
-template<class S, class TTT>
-bool ServiceTracker<S,TTT>::IsEmpty() const
+template<class S, class T>
+bool ServiceTracker<S,T>::IsEmpty() const
 {
   _TrackedService* t = d->Tracked();
-  if (t == 0)
+  if (t == nullptr)
   { /* if ServiceTracker is not open */
     return true;
   }
-  {
-    typename _TrackedService::Lock l(t);
-    return t->IsEmpty();
-  }
+  return (t->Lock(), t->IsEmpty_unlocked());
 }
 
-template<class S, class TTT>
-typename ServiceTracker<S,TTT>::T
-ServiceTracker<S,TTT>::AddingService(const ServiceReferenceType& reference)
+template<class S, class T>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+ServiceTracker<S,T>::AddingService(const ServiceReference<S>& reference)
 {
-  return TTT::ConvertToTrackedType(d->context->GetService(reference));
+  return TypeTraits::ConvertToTrackedType(d->context->GetService(reference));
 }
 
-template<class S, class TTT>
-void ServiceTracker<S,TTT>::ModifiedService(const ServiceReferenceType& /*reference*/, T /*service*/)
+template<class S, class T>
+void ServiceTracker<S,T>::ModifiedService(const ServiceReference<S>& /*reference*/, const std::shared_ptr<TrackedParmType>& /*service*/)
 {
   /* do nothing */
 }
 
-template<class S, class TTT>
-void ServiceTracker<S,TTT>::RemovedService(const ServiceReferenceType& /*reference*/, T /*service*/)
+template<class S, class T>
+void ServiceTracker<S,T>::RemovedService(const ServiceReference<S>& /*reference*/, const std::shared_ptr<TrackedParmType>& /*service*/)
 {
   /* do nothing */
 }

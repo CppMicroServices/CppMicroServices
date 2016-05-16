@@ -44,4 +44,10 @@ std::string any_value_to_json(bool val)
   return val ? "true" : "false";
 }
 
+bool operator==(const Any& a1, const Any& a2)
+{
+  if (a1.Type() != a2.Type()) return false;
+  return a1.ToString() == a2.ToString();
+}
+
 }

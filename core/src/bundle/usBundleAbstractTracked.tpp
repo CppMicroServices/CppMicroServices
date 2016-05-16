@@ -32,8 +32,8 @@ const bool BundleAbstractTracked<S,TTT,R>::DEBUG_OUTPUT = false;
 
 template<class S, class TTT, class R>
 BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked()
+  : closed(false)
 {
-  closed = false;
 }
 
 template<class S, class TTT, class R>
@@ -64,7 +64,7 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
   {
     S item;
     {
-      US_UNUSED(Lock(this));
+      auto l = this->Lock(); US_UNUSED(l);
       if (closed || (initial.size() == 0))
       {
         /*
@@ -78,7 +78,7 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
        */
       item = initial.front();
       initial.pop_front();
-      if (TTT::IsValid(tracked[item]))
+      if (tracked[item])
       {
         /* if we are already tracking this item */
         US_DEBUG(DEBUG_OUTPUT) << "BundleAbstractTracked::trackInitial[already tracked]: " << item;
@@ -113,15 +113,15 @@ void BundleAbstractTracked<S,TTT,R>::Close()
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 {
-  T object = TTT::DefaultValue();
+  std::shared_ptr<TrackedParmType> object;
   {
-    US_UNUSED(Lock(this));
+    auto l = this->Lock(); US_UNUSED(l);
     if (closed)
     {
       return;
     }
     object = tracked[item];
-    if (!TTT::IsValid(object))
+    if (!object)
     { /* we are not tracking the item */
       if (std::find(adding.begin(), adding.end(),item) != adding.end())
       {
@@ -138,7 +138,7 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
     }
   }
 
-  if (!TTT::IsValid(object))
+  if (!object)
   { /* we are not tracking the item */
     TrackAdding(item, related);
   }
@@ -156,9 +156,9 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 {
-  T object = TTT::DefaultValue();
+  std::shared_ptr<TrackedParmType> object;
   {
-    US_UNUSED(Lock(this));
+    auto l = this->Lock(); US_UNUSED(l);
     std::size_t initialSize = initial.size();
     initial.remove(item);
     if (initialSize != initial.size())
@@ -189,7 +189,7 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
      * calling customizer callback
      */
     tracked.erase(item);
-    if (!TTT::IsValid(object))
+    if (!object)
     { /* are we actually tracking the item */
       return;
     }
@@ -205,58 +205,59 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 }
 
 template<class S, class TTT, class R>
-std::size_t BundleAbstractTracked<S,TTT,R>::Size() const
+std::size_t BundleAbstractTracked<S,TTT,R>::Size_unlocked() const
 {
   return tracked.size();
 }
 
 template<class S, class TTT, class R>
-bool BundleAbstractTracked<S,TTT,R>::IsEmpty() const
+bool BundleAbstractTracked<S,TTT,R>::IsEmpty_unlocked() const
 {
   return tracked.empty();
 }
 
 template<class S, class TTT, class R>
-typename BundleAbstractTracked<S,TTT,R>::T
-BundleAbstractTracked<S,TTT,R>::GetCustomizedObject(S item) const
+std::shared_ptr<typename BundleAbstractTracked<S,TTT,R>::TrackedParmType>
+BundleAbstractTracked<S,TTT,R>::GetCustomizedObject_unlocked(S item) const
 {
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end()) return i->second;
-  return T();
+  return std::shared_ptr<TrackedParmType>();
 }
 
 template<class S, class TTT, class R>
-void BundleAbstractTracked<S,TTT,R>::GetTracked(std::vector<S>& items) const
+void BundleAbstractTracked<S,TTT,R>::GetTracked_unlocked(std::vector<S>& items) const
 {
-  for (typename TrackingMap::const_iterator i = tracked.begin();
-       i != tracked.end(); ++i)
+  for (auto& i : tracked)
   {
-    items.push_back(i->first);
+    items.push_back(i.first);
   }
 }
 
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Modified()
 {
+  // atomic
   ++trackingCount;
 }
 
 template<class S, class TTT, class R>
 int BundleAbstractTracked<S,TTT,R>::GetTrackingCount() const
 {
+  // atomic
   return trackingCount;
 }
 
 template<class S, class TTT, class R>
-void BundleAbstractTracked<S,TTT,R>::CopyEntries(TrackingMap& map) const
+void BundleAbstractTracked<S,TTT,R>::CopyEntries_unlocked(TrackingMap& map) const
 {
   map.insert(tracked.begin(), tracked.end());
 }
 
 template<class S, class TTT, class R>
-bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const T& custom)
+bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParmType>& custom)
 {
-  US_UNUSED(Lock(this));
+  auto l = this->Lock(); US_UNUSED(l);
   std::size_t addingSize = adding.size();
   adding.remove(item);
   if (addingSize != adding.size() && !closed)
@@ -265,7 +266,7 @@ bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const T& cust
      * if the item was not untracked during the customizer
      * callback
      */
-    if (TTT::IsValid(custom))
+    if (custom)
     {
       tracked[item] = custom;
       Modified(); /* increment modification count */
@@ -283,7 +284,7 @@ template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
 {
   US_DEBUG(DEBUG_OUTPUT) << "BundleAbstractTracked::trackAdding:" << item;
-  T object = TTT::DefaultValue();
+  std::shared_ptr<TrackedParmType> object;
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
   try
@@ -304,7 +305,7 @@ void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
   /*
    * The item became untracked during the customizer callback.
    */
-  if (becameUntracked && TTT::IsValid(object))
+  if (becameUntracked && object)
   {
     US_DEBUG(DEBUG_OUTPUT) << "BundleAbstractTracked::trackAdding[removed]: " << item;
     /* Call customizer outside of synchronized region */

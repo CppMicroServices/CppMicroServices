@@ -26,6 +26,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 class CivetServer;
 struct mg_connection;
@@ -37,9 +38,9 @@ class ServletContext;
 
 struct HttpServletRequestPrivate : public SharedData
 {
-  HttpServletRequestPrivate(ServletContext* servletContext, CivetServer* server, mg_connection* conn);
+  HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext, CivetServer* server, mg_connection* conn);
 
-  ServletContext* const m_ServletContext;
+  const std::shared_ptr<ServletContext> m_ServletContext;
   CivetServer* const m_Server;
   struct mg_connection* const m_Connection;
 

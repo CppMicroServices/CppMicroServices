@@ -38,7 +38,7 @@ public:
     }
 
     us::Bundle* bundle = us::BundleRegistry::GetBundle(resourceData.first);
-    if (bundle == NULL)
+    if (bundle == nullptr)
     {
       return false;
     }

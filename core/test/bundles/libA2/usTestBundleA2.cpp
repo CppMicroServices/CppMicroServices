@@ -45,7 +45,6 @@ public:
   void Start(BundleContext* context)
   {
     s = std::make_shared<TestBundleA2>();
-    US_INFO << "Registering TestBundleA2Service";
     sr = context->RegisterService<TestBundleA2Service>(s);
   }
 

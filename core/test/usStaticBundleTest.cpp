@@ -54,7 +54,7 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 #else
     auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
 #endif
-    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
+    US_TEST_CONDITION_REQUIRED(bundle, "Test installation of bundle TestBundleImportedByB")
   }
   catch (const std::exception& e)
   {
@@ -75,10 +75,10 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
     std::vector<ServiceReferenceU> refs = context->GetServiceReferences("us::TestBundleBService");
     US_TEST_CONDITION_REQUIRED(refs.size() == 2, "Test that both the service from the shared and imported library are regsitered");
 
-    InterfaceMapConstPtr o1 = context->GetService(refs.front());
+    auto o1 = context->GetService(refs.front());
     US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
 
-    InterfaceMapConstPtr o2 = context->GetService(refs.back());
+    auto o2 = context->GetService(refs.back());
     US_TEST_CONDITION(o1 && !o2->empty(), "Test if second service object found");
 
     // check the listeners for events
@@ -181,7 +181,7 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   BundleContext* context = framework->GetBundleContext();

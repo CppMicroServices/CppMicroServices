@@ -35,11 +35,11 @@ const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = false;
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st, BundleContext* context,
+    ServiceTracker<S,T>* st, BundleContext* context,
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
-    trackedService(0), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
+    trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   std::stringstream ss;
@@ -63,12 +63,12 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st,
+    ServiceTracker<S,T>* st,
     BundleContext* context, const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
-        trackReference(), trackedService(0), cachedReference(),
-        cachedService(TTT::DefaultValue()), q_ptr(st)
+        trackReference(), trackedService(), cachedReference(),
+        cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   this->listenerFilter = std::string("(") + us::ServiceConstants::OBJECTCLASS() + "="
@@ -91,15 +91,15 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
-    ServiceTracker<S,TTT>* st,
+    ServiceTracker<S,T>* st,
     BundleContext* context, const LDAPFilter& filter,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
         listenerFilter(filter.ToString()), trackReference(),
-        trackedService(0), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
+        trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
-  if (context == 0)
+  if (context == nullptr)
   {
     throw std::invalid_argument("The bundle context cannot be null.");
   }
@@ -132,24 +132,24 @@ std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,TTT>::GetInitialRefere
 template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,TTT>* t) const
 {
-  if (t->Size() == 0)
+  if (t->Size_unlocked() == 0)
   {
     return;
   }
-  t->GetTracked(refs);
+  t->GetTracked_unlocked(refs);
 }
 
 template<class S, class TTT>
 TrackedService<S,TTT>* ServiceTrackerPrivate<S,TTT>::Tracked() const
 {
-  return trackedService;
+  return trackedService.get();
 }
 
 template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::Modified()
 {
-  cachedReference = 0; /* clear cached value */
-  TTT::Dispose(cachedService); /* clear cached value */
+  cachedReference.Store(ServiceReference<S>()); /* clear cached value */
+  cachedService.Store(std::shared_ptr<TrackedParmType>()); /* clear cached value */
   US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
 }
 

@@ -50,7 +50,7 @@ namespace us {
 US_HASH_FUNCTION_BEGIN(us::ServiceListener)
   typedef void(*TargetType)(const us::ServiceEvent&);
   const TargetType* targetFunc = arg.target<TargetType>();
-  void* targetPtr = NULL;
+  void* targetPtr = nullptr;
   std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
   return hash<void*>()(targetPtr);
 US_HASH_FUNCTION_END

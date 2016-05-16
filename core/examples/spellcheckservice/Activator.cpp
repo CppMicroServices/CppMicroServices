@@ -122,7 +122,7 @@ private:
             errorList.push_back(word);
           }
 
-          pch = std::strtok(NULL, delimiters);
+          pch = std::strtok(nullptr, delimiters);
         }
       }
 
@@ -164,13 +164,13 @@ private:
   }
 
   virtual void ModifiedService(const ServiceReference<IDictionaryService>& /*reference*/,
-                               std::shared_ptr<IDictionaryService> /*service*/)
+                               const std::shared_ptr<IDictionaryService>& /*service*/)
   {
     // do nothing
   }
 
   virtual void RemovedService(const ServiceReference<IDictionaryService>& reference,
-                              std::shared_ptr<IDictionaryService> /*service*/)
+                              const std::shared_ptr<IDictionaryService>& /*service*/)
   {
     if (m_spellCheckService->RemoveDictionary(reference) < 2 && m_spellCheckReg)
     {
@@ -188,7 +188,7 @@ private:
 public:
 
   Activator()
-    : m_context(NULL)
+    : m_context(nullptr)
   {}
 
   /**

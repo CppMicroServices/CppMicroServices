@@ -118,12 +118,14 @@ struct BundleActivator
  * Example:
  * \snippet uServices-activator/main.cpp 0
  */
-#define US_EXPORT_BUNDLE_ACTIVATOR(_activator_type)                             \
-  extern "C" US_ABI_EXPORT us::BundleActivator* US_CONCAT(_us_bundle_activator_instance_, US_BUNDLE_NAME) () \
-  {                                                                             \
-    static std::unique_ptr<us::BundleActivator> activatorPtr; \
-    if (activatorPtr == nullptr) activatorPtr.reset(new _activator_type);       \
-    return activatorPtr.get();                                                  \
+#define US_EXPORT_BUNDLE_ACTIVATOR(_activator_type)                                                                \
+  extern "C" US_ABI_EXPORT us::BundleActivator* US_CONCAT(_us_create_activator_, US_BUNDLE_NAME) ()                \
+  {                                                                                                                \
+    return new _activator_type();                                                                                  \
+  }                                                                                                                \
+  extern "C" US_ABI_EXPORT void US_CONCAT(_us_destroy_activator_, US_BUNDLE_NAME) (us::BundleActivator* activator) \
+  {                                                                                                                \
+    delete activator;                                                                                              \
   }
 
 #endif /* USBUNDLEACTIVATOR_H_ */

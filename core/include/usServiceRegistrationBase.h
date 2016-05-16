@@ -32,7 +32,7 @@ namespace us {
 
 class BundlePrivate;
 class ServiceRegistrationBasePrivate;
-class ServicePropertiesImpl;
+class Properties;
 
 /**
  * \ingroup MicroServices
@@ -52,18 +52,15 @@ class ServicePropertiesImpl;
  *       In almost all cases you should use the template ServiceRegistration instead.
  *
  * @see BundleContext#RegisterService()
- * @remarks This class is thread safe.
  */
 class US_Core_EXPORT ServiceRegistrationBase
 {
 
-private:
-
-  typedef ServiceRegistrationBasePrivate* ServiceRegistrationBase::*bool_type;
-
 public:
 
   ServiceRegistrationBase(const ServiceRegistrationBase& reg);
+
+  ServiceRegistrationBase(ServiceRegistrationBase&& reg);
 
   /**
    * A boolean conversion operator converting this ServiceRegistrationBase object
@@ -71,12 +68,12 @@ public:
    * object is invalid if it was default-constructed or was invalidated by
    * assigning 0 to it.
    *
-   * \see operator=(int)
+   * \see operator=(std::nullptr_t)
    *
    * \return \c true if this ServiceRegistrationBase object is valid, \c false
    *         otherwise.
    */
-  operator bool_type() const;
+  explicit operator bool() const;
 
   /**
    * Releases any resources held or locked by this
@@ -176,6 +173,7 @@ public:
   bool operator==(const ServiceRegistrationBase& registration) const;
 
   ServiceRegistrationBase& operator=(const ServiceRegistrationBase& registration);
+  ServiceRegistrationBase& operator=(ServiceRegistrationBase&& registration);
 
 
 private:
@@ -197,11 +195,16 @@ private:
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
   ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
-                          const ServicePropertiesImpl& props);
+                          Properties&& props);
 
   ServiceRegistrationBasePrivate* d;
 
 };
+
+inline std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase& /*reg*/)
+{
+  return os << "us::ServiceRegistrationBase object";
+}
 
 }
 
@@ -210,11 +213,5 @@ US_MSVC_POP_WARNING
 US_HASH_FUNCTION_BEGIN(us::ServiceRegistrationBase)
   return std::hash<us::ServiceRegistrationBasePrivate*>()(arg.d);
 US_HASH_FUNCTION_END
-
-
-inline std::ostream& operator<<(std::ostream& os, const us::ServiceRegistrationBase& /*reg*/)
-{
-  return os << "us::ServiceRegistrationBase object";
-}
 
 #endif // USSERVICEREGISTRATIONBASE_H

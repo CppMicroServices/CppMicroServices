@@ -109,7 +109,7 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleResourceTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   assert(framework->GetBundleContext());
@@ -131,7 +131,7 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   }
 
   auto bundle = framework->GetBundleContext()->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for existing bundle TestBundleB")
+  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleB")
   US_TEST_CONDITION(bundle->GetName() == "TestBundleB", "Test bundle name")
 
   testResourceOperators(bundle);

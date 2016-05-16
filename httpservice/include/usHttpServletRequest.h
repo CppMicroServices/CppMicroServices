@@ -43,7 +43,7 @@ public:
   HttpServletRequest(const HttpServletRequest& o);
   HttpServletRequest& operator=(const HttpServletRequest& o);
 
-  ServletContext* GetServletContext() const;
+  std::shared_ptr<ServletContext> GetServletContext() const;
 
   Any GetAttribute(const std::string& name) const;
 

@@ -33,7 +33,7 @@ namespace us {
 
 class Any;
 class Bundle;
-class ServicePropertiesImpl;
+class PropertiesHandle;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
 
@@ -92,34 +92,11 @@ public:
   bool UngetPrototypeService(const std::shared_ptr<Bundle>& bundle, const InterfaceMapConstPtr& service);
 
   /**
-   * Get all properties registered with this service.
+   * Get a handle to the locked service properties.
    *
-   * @return A ServiceProperties object containing properties or being empty
-   *         if service has been removed.
+   * @return A locked ServicePropertiesImpl handle object.
    */
-  const ServicePropertiesImpl& GetProperties() const;
-
-  /**
-   * Returns the property value to which the specified property key is mapped
-   * in the properties <code>ServiceProperties</code> object of the service
-   * referenced by this <code>ServiceReference</code> object.
-   *
-   * <p>
-   * Property keys are case-insensitive.
-   *
-   * <p>
-   * This method must continue to return property values after the service has
-   * been unregistered. This is so references to unregistered services can
-   * still be interrogated.
-   *
-   * @param key The property key.
-   * @param lock If <code>true</code>, access of the properties of the service
-   * referenced by this <code>ServiceReference</code> object will be
-   * synchronized.
-   * @return The property value to which the key is mapped; an invalid Any
-   * if there is no property named after the key.
-   */
-  Any GetProperty(const std::string& key, bool lock) const;
+  PropertiesHandle GetProperties() const;
 
   bool IsConvertibleTo(const std::string& interfaceId) const;
 
@@ -139,9 +116,10 @@ public:
   std::string interfaceId;
 
 private:
-  InterfaceMapConstPtr GetServiceFromFactory(std::shared_ptr<Bundle> bundle,
-                                                const std::shared_ptr<ServiceFactory>& factory,
-                                                bool isBundleScope);
+
+  InterfaceMapConstPtr GetServiceFromFactory(const std::shared_ptr<Bundle>& bundle,
+                                             const std::shared_ptr<ServiceFactory>& factory);
+
 };
 
 }

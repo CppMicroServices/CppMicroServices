@@ -102,7 +102,7 @@ void BundleResourcePrivate::InitFilePath(const std::string& file)
 }
 
 BundleResource::BundleResource()
-  : d(new BundleResourcePrivate(NULL))
+  : d(new BundleResourcePrivate(nullptr))
 {
 }
 
@@ -170,7 +170,7 @@ bool BundleResource::IsValid() const
 
 BundleResource::operator bool_type() const
 {
-  return IsValid() ? &BundleResource::d : NULL;
+  return IsValid() ? &BundleResource::d : nullptr;
 }
 
 std::string BundleResource::GetName() const
@@ -270,10 +270,10 @@ std::size_t BundleResource::Hash() const
 
 void* BundleResource::GetData() const
 {
-  if (!IsValid()) return NULL;
+  if (!IsValid()) return nullptr;
 
   void* data = d->resourceContainer->GetData(d->stat.index);
-  if (data == NULL)
+  if (data == nullptr)
   {
     US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from " 
             << d->resourceContainer->GetBundleInfo()->location;

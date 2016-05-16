@@ -40,16 +40,23 @@
 
 namespace us {
 
-BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContext* coreCtx,
-                             BundleInfo* info)
-  : coreCtx(coreCtx)
-  , info(*info)
-  , resourceContainer(info)
-  , bundleContext(0)
-  , bundleActivator(0)
+BundlePrivate::BundlePrivate(Bundle* qq, const BundleInfo& info)
+  : coreCtx(nullptr)
+  , info(info)
+  , resourceContainer(&this->info)
+  , bundleContext(nullptr)
+  , starting(false)
+  , stopping(false)
+  , bundleActivator(nullptr)
   , q(qq)
-  , lib(info->location)
+  , lib(info.location)
 {
+}
+
+void BundlePrivate::Init(CoreBundleContext* coreCtx)
+{
+  this->coreCtx = coreCtx;
+
   // Check if the bundle provides a manifest.json file and if yes, parse it.
   if (resourceContainer.IsValid())
   {
@@ -63,7 +70,7 @@ BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContex
       }
       catch (const std::exception& e)
       {
-        US_ERROR << "Parsing of manifest.json for bundle " << info->location << " failed: " << e.what();
+        US_ERROR << "Parsing of manifest.json for bundle " << info.location << " failed: " << e.what();
       }
     }
   }
@@ -89,7 +96,7 @@ BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContex
     if (!errMsg.empty())
     {
       throw std::invalid_argument(std::string("The Json value for ") + Bundle::PROP_VERSION + " for bundle " +
-                                  info->location + " is not valid: " + errMsg);
+                                  info.location + " is not valid: " + errMsg);
     }
   }
 
@@ -135,7 +142,6 @@ BundlePrivate::BundlePrivate(const std::shared_ptr<Bundle>& qq, CoreBundleContex
 
 BundlePrivate::~BundlePrivate()
 {
-  delete bundleContext;
 }
 
 void BundlePrivate::RemoveBundleResources()
@@ -160,11 +166,11 @@ void BundlePrivate::RemoveBundleResources()
   }
 
   srs.clear();
-  coreCtx->services.GetUsedByBundle(q.lock(), srs);
+  coreCtx->services.GetUsedByBundle(q->shared_from_this(), srs);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin();
        i != srs.end(); ++i)
   {
-    i->GetReference(std::string()).d->UngetService(q.lock(), false);
+    i->GetReference(std::string()).d.load()->UngetService(q->shared_from_this(), false);
   }
 }
   

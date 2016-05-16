@@ -36,6 +36,7 @@ namespace us {
 
 class LDAPFilterData;
 class ServiceReferenceBase;
+class Bundle;
 
 /**
  * \ingroup MicroServices
@@ -96,7 +97,7 @@ public:
 
   ~LDAPFilter();
 
-  operator bool_type() const;
+  explicit operator bool() const;
 
   /**
    * Filter using a service's properties.
@@ -111,7 +112,21 @@ public:
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    */
   bool Match(const ServiceReferenceBase& reference) const;
-
+    
+ /**
+   * Filter using a bundle's manifest properties.
+   * <p>
+   * This <code>LDAPFilter</code> is executed using the keys and values of the
+   * bundle's manifest properties. The keys are looked up in a case insensitive 
+   * manner.
+   *
+   * @param bundle The bundle whose properties are used
+   *        in the match.
+   * @return <code>true</code> if the bundle's properties match this
+   *         <code>LDAPFilter</code> <code>false</code> otherwise.
+   */
+  bool Match(const Bundle& bundle) const;
+  
   /**
    * Filter using a <code>ServiceProperties</code> object with case insensitive key lookup. This
    * <code>LDAPFilter</code> is executed using the specified <code>ServiceProperties</code>'s keys
@@ -167,15 +182,15 @@ protected:
 
 };
 
+/**
+ * \ingroup MicroServices
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter);
+
 }
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
-/**
- * \ingroup MicroServices
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::LDAPFilter& filter);
 
 #endif // USLDAPFILTER_H

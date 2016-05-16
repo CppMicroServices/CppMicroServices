@@ -20,12 +20,22 @@
 
 =============================================================================*/
 
-
+#include "usBundleUtils.h"
 #include "usBundleUtils_p.h"
 
 #include <usLog.h>
 #include <usBundleInfo.h>
 #include <usUtils_p.h>
+
+#ifdef __GNUC__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <dlfcn.h>
+#elif _WIN32
+#include <windows.h>
+#endif
+
 
 namespace us {
 
@@ -37,13 +47,10 @@ namespace {
 #endif
 }
 
+namespace BundleUtils
+{
+
 #ifdef __GNUC__
-
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
-#include <dlfcn.h>
 
 std::string GetLibraryPath_impl(void* symbol)
 {
@@ -93,12 +100,10 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   {
     US_DEBUG << "GetSymbol_impl() dlopen() failed: " << dlerror();
   }
-  return 0;
+  return nullptr;
 }
 
 #elif _WIN32
-
-#include <windows.h>
 
 std::string GetLibraryPath_impl(void *symbol)
 {
@@ -124,10 +129,10 @@ std::string GetLibraryPath_impl(void *symbol)
 
 void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
 {
-  HMODULE handle = NULL;
+  HMODULE handle = nullptr;
   if (!sharedLibMode || bundleInfo.name == "main")
   {
-    handle = GetModuleHandle(NULL);
+    handle = GetModuleHandle(nullptr);
   }
   else
   {
@@ -137,7 +142,7 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   if (!handle)
   {
     US_DEBUG << "GetSymbol_impl():GetBundleHandle() " << GetLastErrorStr();
-    return 0;
+    return nullptr;
   }
 
   void* addr = (void*)GetProcAddress(handle, symbol);
@@ -147,7 +152,9 @@ void* GetSymbol_impl(const BundleInfo& bundleInfo, const char* symbol)
   }
   return addr;
 }
+
 #else
+
 std::string GetLibraryPath_impl(void*)
 {
   return "";
@@ -155,18 +162,27 @@ std::string GetLibraryPath_impl(void*)
 
 void* GetSymbol_impl(const BundleInfo&, const char* symbol)
 {
-  return 0;
+  return nullptr;
 }
+
 #endif
 
-std::string BundleUtils::GetLibraryPath(void* symbol)
+std::string GetLibraryPath(void* symbol)
 {
   return GetLibraryPath_impl(symbol);
 }
 
-void* BundleUtils::GetSymbol(const BundleInfo& bundle, const char* symbol)
+void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol)
+{
+  BundleInfo info(libLocation, bundleName);
+  return GetSymbol(info, symbol);
+}
+
+void* GetSymbol(const BundleInfo& bundle, const char* symbol)
 {
   return GetSymbol_impl(bundle, symbol);
 }
 
-}
+} // namespace BundleUtils
+
+} // namespace us

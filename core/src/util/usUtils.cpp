@@ -119,7 +119,7 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
   DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
   // Try intermediate output directories
-  if (dir == NULL)
+  if (dir == nullptr)
   {
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
     if (indexOfLastSeparator != std::string::npos)
@@ -142,10 +142,10 @@ std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteB
   }
 #endif
 
-  if (dir != NULL)
+  if (dir != nullptr)
   {
-    struct dirent *ent = NULL;
-    while ((ent = readdir(dir)) != NULL)
+    struct dirent *ent = nullptr;
+    while ((ent = readdir(dir)) != nullptr)
     {
       bool loadFile = true;
 #ifdef _DIRENT_HAVE_D_TYPE
@@ -400,7 +400,7 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   }
 #elif defined(US_PLATFORM_WINDOWS)
   const char* demangled = typeInfo.name();
-  if (demangled != NULL)
+  if (demangled != nullptr)
   {
     result = demangled;
     // remove "struct" qualifiers

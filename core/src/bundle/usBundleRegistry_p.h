@@ -23,13 +23,14 @@
 #ifndef USBUNDLEREGISTRY_P_H
 #define USBUNDLEREGISTRY_P_H
 
-#include <memory>
+#include <usCoreConfig.h>
+#include <usThreads_p.h>
+
 #include <vector>
 #include <string>
 #include <unordered_map>
-
-#include <usCoreConfig.h>
-#include <usThreads_p.h>
+#include <atomic>
+#include <memory>
 
 namespace us {
 
@@ -88,16 +89,7 @@ public:
    *
    * @return The registered bundle.
    */
-  std::shared_ptr<Bundle> Register(BundleInfo* info);
-
-  /**
-   * Register the system bundle.
-   *
-   * A helper function to help bootstrap the Framework.
-   *
-   * @param systemBundle The system bundle to register.
-   */
-  void RegisterSystemBundle(std::shared_ptr<Framework> systemBundle, BundleInfo* info);
+  std::shared_ptr<Bundle> Register(BundleInfo info);
 
   /**
    * Remove a bundle from the Framework.
@@ -106,7 +98,7 @@ public:
    * Upon which, the bundle will receive a new unique bundle id.
    *
    */
-  void UnRegister(const BundleInfo* info);
+  void UnRegister(const BundleInfo& info);
 
 private:
   // don't allow copying the BundleRegistry.
@@ -128,9 +120,7 @@ private:
   /**
    * Stores the next Bundle ID.
    */
-  struct : public MultiThreaded<> {
-    long value;
-  } id;
+  std::atomic<long> id;
 
 };
 

@@ -218,10 +218,9 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
     props["service.pid"] = ss.str();
     props["perf.service.value"] = i+1;
 
-    std::shared_ptr<PerfTestService> service = std::make_shared<PerfTestService>();
-    services.push_back(service);
+    services.emplace_back(std::make_shared<PerfTestService>());
     ServiceRegistration<IPerfTestService> reg =
-        context->RegisterService<IPerfTestService>(service, props);
+        context->RegisterService<IPerfTestService>(services.back(), props);
     regs.push_back(reg);
   }
 }
@@ -283,9 +282,9 @@ void ServiceRegistryPerformanceTest::UnregisterServices()
 int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
-  
+
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   ServiceRegistryPerformanceTest perfTest(framework->GetBundleContext());
@@ -295,8 +294,6 @@ int usServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
   perfTest.TestModifyServices();
   perfTest.TestUnregisterServices();
   perfTest.CleanupTestCase();
-
-  framework->Stop();
 
   US_TEST_END()
 }

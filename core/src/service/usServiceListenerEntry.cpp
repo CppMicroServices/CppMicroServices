@@ -90,6 +90,10 @@ public:
 
 };
 
+ServiceListenerEntry::ServiceListenerEntry()
+{
+}
+
 ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
   : ServiceListenerHook::ListenerInfo(other)
 {
@@ -139,7 +143,7 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->context == NULL || other.d->context == NULL) || d->context == other.d->context) &&
+  return ((d->context == nullptr || other.d->context == nullptr) || d->context == other.d->context) &&
       (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
 }
 

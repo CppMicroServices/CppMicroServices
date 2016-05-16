@@ -75,7 +75,7 @@ void TestServiceFactoryBundleScope(BundleContext* context)
   US_TEST_CONDITION_REQUIRED(service->size() >= 1, "GetService()")
   InterfaceMap::const_iterator serviceIter = service->find("us::TestBundleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service->end(), "GetService()")
-  US_TEST_CONDITION_REQUIRED(serviceIter->second, "GetService()")
+  US_TEST_CONDITION_REQUIRED(serviceIter->second != nullptr, "GetService()")
 
   InterfaceMapConstPtr service2 = context->GetService(sr1);
   US_TEST_CONDITION(*(service.get()) == *(service2.get()), "Same service interface maps")
@@ -91,7 +91,7 @@ void TestServiceFactoryBundleScope(BundleContext* context)
   service.reset();
   service2.reset();
   service3.reset();
-  
+
   bundleH->Stop();
 }
 
@@ -114,7 +114,7 @@ void TestServiceFactoryPrototypeScope(BundleContext* context)
   US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
 
   ServiceObjects<TestBundleH2> svcObjects = context->GetServiceObjects(sr1);
-  std::shared_ptr<TestBundleH2> prototypeServiceH2 = svcObjects.GetService();
+  auto prototypeServiceH2 = svcObjects.GetService();
 
   const ServiceReferenceU sr1void = context->GetServiceReference(us_service_interface_iid<TestBundleH2>());
   ServiceObjects<void> svcObjectsVoid = context->GetServiceObjects(sr1void);
@@ -127,13 +127,13 @@ void TestServiceFactoryPrototypeScope(BundleContext* context)
   US_TEST_CONDITION_REQUIRED(context->GetBundle()->GetServicesInUse().size() == 1, "services in use")
 #endif
 
-  std::shared_ptr<TestBundleH2> bundleScopeService = context->GetService(sr1);
+  auto bundleScopeService = context->GetService(sr1);
   US_TEST_CONDITION_REQUIRED(bundleScopeService && bundleScopeService != prototypeServiceH2, "GetService()")
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2 != prototypeServiceH2Void->find(us_service_interface_iid<TestBundleH2>())->second,
                              "GetService()")
 
-  std::shared_ptr<TestBundleH2> bundleScopeService2 = context->GetService(sr1);
+  auto bundleScopeService2 = context->GetService(sr1);
   US_TEST_CONDITION(bundleScopeService == bundleScopeService2, "Same service pointer")
 
 #ifdef US_BUILD_SHARED_LIBS
@@ -154,11 +154,11 @@ void TestServiceFactoryPrototypeScope(BundleContext* context)
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
 #endif
 
-  ServiceObjects<TestBundleH2> svcObjects2 = svcObjects;
+  ServiceObjects<TestBundleH2> svcObjects2 = std::move(svcObjects);
   ServiceObjects<TestBundleH2> svcObjects3 = context->GetServiceObjects(sr1);
 
   prototypeServiceH2 = svcObjects2.GetService();
-  std::shared_ptr<TestBundleH2> prototypeServiceH2_2 = svcObjects3.GetService();
+  auto prototypeServiceH2_2 = svcObjects3.GetService();
 
   US_TEST_CONDITION_REQUIRED(prototypeServiceH2_2 && prototypeServiceH2_2 != prototypeServiceH2, "prototype service")
 
@@ -170,7 +170,7 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceFactoryTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   TestServiceFactoryBundleScope(framework->GetBundleContext());

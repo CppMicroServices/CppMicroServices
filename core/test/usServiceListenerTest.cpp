@@ -190,8 +190,7 @@ public:
     sr.GetUsingBundles(usingBundles);
 
     US_TEST_OUTPUT( << (caption.empty() ? "Using bundles: " : caption) );
-    for (std::vector<std::shared_ptr<Bundle>>::const_iterator bundle = usingBundles.begin();
-        bundle != usingBundles.end(); ++bundle)
+    for (auto const& bundle : usingBundles)
     {
       US_TEST_OUTPUT( << "  -" << (*bundle) );
     }
@@ -426,7 +425,7 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
     US_TEST_CONDITION_REQUIRED(libSL3Activator && !libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
-    std::shared_ptr<BundlePropsInterface> propsInterface = context->GetService(libSL3PropsI);
+    auto propsInterface = context->GetService(libSL3PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "BundlePropsInterface != 0");
 
     BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
@@ -445,11 +444,11 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   try
   {
     ServiceReferenceU libSL1SR = context->GetServiceReference("ActivatorSL1");
-    InterfaceMapConstPtr libSL1Activator = context->GetService(libSL1SR);
+    auto libSL1Activator = context->GetService(libSL1SR);
     US_TEST_CONDITION_REQUIRED(libSL1Activator && !libSL1Activator->empty(), "ActivatorSL1 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL1PropsI(libSL1SR);
-    std::shared_ptr<BundlePropsInterface> propsInterface = context->GetService(libSL1PropsI);
+    auto propsInterface = context->GetService(libSL1PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to BundlePropsInterface");
 
     BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceAdded");
@@ -480,11 +479,11 @@ void frameSL25a(const std::shared_ptr<Framework>& framework)
   try
   {
     ServiceReferenceU libSL3SR = context->GetServiceReference("ActivatorSL3");
-    InterfaceMapConstPtr libSL3Activator = context->GetService(libSL3SR);
+    auto libSL3Activator = context->GetService(libSL3SR);
     US_TEST_CONDITION_REQUIRED(libSL3Activator && !libSL3Activator->empty(), "ActivatorSL3 service != 0");
 
     ServiceReference<BundlePropsInterface> libSL3PropsI(libSL3SR);
-    std::shared_ptr<BundlePropsInterface> propsInterface = context->GetService(libSL3PropsI);
+    auto propsInterface = context->GetService(libSL3PropsI);
     US_TEST_CONDITION_REQUIRED(propsInterface, "Cast to BundlePropsInterface");
 
     BundlePropsInterface::Properties::const_iterator i = propsInterface->GetProperties().find("serviceRemoved");
@@ -548,7 +547,7 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceListenerTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   frameSL02a(framework);

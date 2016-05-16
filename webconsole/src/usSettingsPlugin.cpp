@@ -52,7 +52,7 @@ static std::string CATEGORY()
 
 SettingsPlugin::SettingsPlugin()
   : SimpleWebConsolePlugin(LABEL(), TITLE(), CATEGORY())
-  , m_TemplateRS(NULL)
+  , m_TemplateRS(nullptr)
 {
 }
 
@@ -63,7 +63,7 @@ SettingsPlugin::~SettingsPlugin()
 
 void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& response)
 {
-  if (m_TemplateRS == NULL)
+  if (m_TemplateRS == nullptr)
   {
     BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/settings.html");
     m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
@@ -74,7 +74,7 @@ void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& res
 
 BundleResource SettingsPlugin::GetResource(const std::string& path) const
 {
-  return (this->GetContext() != NULL) ?
+  return (this->GetContext() != nullptr) ?
         this->GetContext()->GetBundle()->GetResource(path) :
         BundleResource();
 }

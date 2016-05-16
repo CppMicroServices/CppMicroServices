@@ -23,7 +23,7 @@
 namespace us {
 
 template<class S, class TTT>
-TrackedService<S,TTT>::TrackedService(ServiceTracker<S,TTT>* serviceTracker,
+TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
                   ServiceTrackerCustomizer<S,T>* customizer)
   : serviceTracker(serviceTracker), customizer(customizer)
 {
@@ -103,7 +103,7 @@ void TrackedService<S,TTT>::Modified()
 }
 
 template<class S, class TTT>
-typename TrackedService<S,TTT>::T
+std::shared_ptr<typename TrackedService<S,TTT>::TrackedParmType>
 TrackedService<S,TTT>::CustomizerAdding(ServiceReference<S> item,
                                         const ServiceEvent& /*related*/)
 {
@@ -113,7 +113,7 @@ TrackedService<S,TTT>::CustomizerAdding(ServiceReference<S> item,
 template<class S, class TTT>
 void TrackedService<S,TTT>::CustomizerModified(ServiceReference<S> item,
                                                const ServiceEvent& /*related*/,
-                                               T object)
+                                               const std::shared_ptr<TrackedParmType>& object)
 {
   customizer->ModifiedService(item, object);
 }
@@ -121,7 +121,7 @@ void TrackedService<S,TTT>::CustomizerModified(ServiceReference<S> item,
 template<class S, class TTT>
 void TrackedService<S,TTT>::CustomizerRemoved(ServiceReference<S> item,
                                               const ServiceEvent& /*related*/,
-                                              T object)
+                                              const std::shared_ptr<TrackedParmType>& object)
 {
   customizer->RemovedService(item, object);
 }

@@ -250,15 +250,15 @@ public:
 
 };
 
+/**
+ * \ingroup MicroServices
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const BundleVersion& v);
+
 }
 
 #ifdef _MSC_VER
 # pragma warning(pop)
 #endif
-
-/**
- * \ingroup MicroServices
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::BundleVersion& v);
 
 #endif // USBUNDLEVERSION_H

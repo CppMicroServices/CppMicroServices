@@ -20,37 +20,23 @@
 
 =============================================================================*/
 
-#ifndef USSERVICEPROPERTIESIMPL_P_H
-#define USSERVICEPROPERTIESIMPL_P_H
+#include "usBundleContextPrivate.h"
 
-#include "usServiceProperties.h"
+#include <stdexcept>
 
 namespace us {
 
-class ServicePropertiesImpl
+BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle)
+  : bundle(bundle)
+{}
+
+void BundleContextPrivate::IsValid_unlocked() const
 {
-
-public:
-
-  explicit ServicePropertiesImpl(const ServiceProperties& props);
-
-  const Any& Value(const std::string& key) const;
-  const Any& Value(int index) const;
-
-  int Find(const std::string& key) const;
-  int FindCaseSensitive(const std::string& key) const;
-
-  const std::vector<std::string>& Keys() const;
-
-private:
-
-  std::vector<std::string> keys;
-  std::vector<Any> values;
-
-  static Any emptyAny;
-
-};
-
+  // TODO check for valid states ACTIVE, STARTING, STOPPING
+  if (bundle == nullptr)
+  {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 }
 
-#endif // USSERVICEPROPERTIESIMPL_P_H
+}

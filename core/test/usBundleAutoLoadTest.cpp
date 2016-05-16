@@ -161,23 +161,19 @@ int usBundleAutoLoadTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleLoaderTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   framework->SetAutoLoadingEnabled(false);
   testDefaultAutoLoadPath(false, framework);
 
-  framework->Stop();
-  framework.reset();
-  framework = factory.NewFramework(std::map<std::string, std::string>());
+  framework = factory.NewFramework();
   framework->Start();
 
   framework->SetAutoLoadingEnabled(true);
 
   testDefaultAutoLoadPath(true, framework);
   testCustomAutoLoadPath(framework);
-
-  framework->Stop();
 
   US_TEST_END()
 }

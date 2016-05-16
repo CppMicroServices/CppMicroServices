@@ -109,7 +109,7 @@ int usStaticBundleResourceTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleResourceTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   assert(framework->GetBundleContext());

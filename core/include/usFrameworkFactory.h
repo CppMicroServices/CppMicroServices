@@ -31,6 +31,8 @@
 
 namespace us {
 
+class Any;
+
 class Framework;
 
 /**
@@ -55,7 +57,7 @@ public:
      *
      * @return A new, configured Framework instance.
      */
-    std::shared_ptr<Framework> NewFramework(std::map<std::string, std::string> configuration);
+    std::shared_ptr<Framework> NewFramework(const std::map<std::string, Any>& configuration);
 
     /**
     * Create a new Framework instance.

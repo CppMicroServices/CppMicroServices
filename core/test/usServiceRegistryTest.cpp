@@ -58,8 +58,8 @@ void TestMultipleServiceRegistrations(BundleContext* context)
   {
   };
 
-  std::shared_ptr<TestServiceA> s1 = std::make_shared<TestServiceA>();
-  std::shared_ptr<TestServiceA> s2 = std::make_shared<TestServiceA>();
+  auto s1 = std::make_shared<TestServiceA>();
+  auto s2 = std::make_shared<TestServiceA>();
 
   ServiceRegistration<ITestServiceA> reg1 = context->RegisterService<ITestServiceA>(s1);
   ServiceRegistration<ITestServiceA> reg2 = context->RegisterService<ITestServiceA>(s2);
@@ -85,7 +85,7 @@ void TestServicePropertiesUpdate(BundleContext* context)
   {
   };
 
-  std::shared_ptr<TestServiceA> s1 = std::make_shared<TestServiceA>();
+  auto s1 = std::make_shared<TestServiceA>();
   ServiceProperties props;
   props["string"] = std::string("A std::string");
   props["bool"] = false;
@@ -99,7 +99,7 @@ void TestServicePropertiesUpdate(BundleContext* context)
   US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == false, "Testing bool property")
 
   // register second service with higher rank
-  std::shared_ptr<TestServiceA> s2 = std::make_shared<TestServiceA>();
+  auto s2 = std::make_shared<TestServiceA>();
   ServiceProperties props2;
   props2[ServiceConstants::SERVICE_RANKING()] = 50;
 
@@ -107,7 +107,7 @@ void TestServicePropertiesUpdate(BundleContext* context)
 
   // Get the service with the highest rank, this should be s2.
   ServiceReference<ITestServiceA> ref2 = context->GetServiceReference<ITestServiceA>();
-  std::shared_ptr<TestServiceA> service = std::dynamic_pointer_cast<TestServiceA>(context->GetService(ref2));
+  auto service = std::dynamic_pointer_cast<TestServiceA>(context->GetService(ref2));
   US_TEST_CONDITION_REQUIRED(service == s2, "Testing highest service rank")
 
   props["bool"] = true;
@@ -139,7 +139,7 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("ServiceRegistryTest");
 
   FrameworkFactory factory;
-  std::shared_ptr<Framework> framework = factory.NewFramework(std::map<std::string, std::string>());
+  auto framework = factory.NewFramework();
   framework->Start();
 
   BundleContext* context = framework->GetBundleContext();

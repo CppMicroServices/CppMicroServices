@@ -114,7 +114,7 @@ public:
 
   virtual void Service(HttpServletRequest& request, HttpServletResponse& response);
 
-  ServletContext* GetServletContext() const;
+  std::shared_ptr<ServletContext> GetServletContext() const;
 
   virtual ~HttpServlet();
 

@@ -176,8 +176,4 @@ if(US_BUILD_TESTING)
     endif()
   endif()
 
-  if(US_TEST_LABELS)
-    set_tests_properties(${_example_tests} PROPERTIES LABELS "${US_TEST_LABELS}")
-  endif()
-
 endif()

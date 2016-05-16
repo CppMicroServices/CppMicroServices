@@ -23,6 +23,8 @@
 #ifndef USSERVICEREFERENCEBASE_H
 #define USSERVICEREFERENCEBASE_H
 
+#include <atomic>
+
 #include <usAny.h>
 
 #include <memory>
@@ -43,11 +45,8 @@ class ServiceReferenceBasePrivate;
  * \note This class is provided as public API for low-level service queries only.
  *       In almost all cases you should use the template ServiceReference instead.
  */
-class US_Core_EXPORT ServiceReferenceBase {
-
-private:
-
-  typedef ServiceReferenceBasePrivate* ServiceReferenceBase::*bool_type;
+class US_Core_EXPORT ServiceReferenceBase
+{
 
 public:
 
@@ -59,7 +58,7 @@ public:
    * the service it references has been unregistered, the conversion
    * returns <code>false</code>, otherwise it returns <code>true</code>.
    */
-  operator bool_type() const;
+  explicit operator bool() const;
 
   /**
    * Releases any resources held or locked by this
@@ -216,18 +215,20 @@ private:
 
   void SetInterfaceId(const std::string& interfaceId);
 
-  ServiceReferenceBasePrivate* d;
+  // This class is not thread-safe, but we support thread-safe
+  // copying and assignment.
+  std::atomic<ServiceReferenceBasePrivate*> d;
 
 };
-
-}
-
-US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices
  */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::ServiceReferenceBase& serviceRef);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef);
+
+}
+
+US_MSVC_POP_WARNING
 
 US_HASH_FUNCTION_BEGIN(us::ServiceReferenceBase)
   return arg.Hash();

@@ -21,15 +21,7 @@
 =============================================================================*/
 
 #include "usFramework.h"
-
-#include "usCoreBundleContext_p.h"
 #include "usFrameworkPrivate.h"
-#include "usBundleInfo.h"
-#include "usBundleInitialization.h"
-#include "usBundleSettings.h"
-#include "usBundleUtils_p.h"
-#include "usThreads_p.h"
-#include "usUtils_p.h"
 
 namespace us {
 
@@ -38,61 +30,45 @@ const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.frame
 const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
 const std::string Framework::PROP_INSTALL_PATHS{ "org.cppmicroservices.framework.install.paths" };
 
-Framework::Framework(void) : d(new FrameworkPrivate())
+Framework::Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration)
+  : Bundle(std::unique_ptr<BundlePrivate>(new FrameworkPrivate(this, info, configuration)))
 {
-
-}
-
-Framework::Framework(std::map<std::string, std::string>& configuration) :
-    d(new FrameworkPrivate(configuration))
-{
-  
 }
 
 Framework::~Framework(void)
 {
-
+  // We are going down, make sure the code invoked by Stop()
+  // can still create shared_ptr instances from this while
+  // not deleting the Framework twice.
+  std::shared_ptr<Bundle> dummy(this, [](Bundle*){});
+  Stop();
 }
 
-void Framework::Initialize(void)
+void Framework::Start()
 {
-  FrameworkPrivate::Lock{d};
-  if (d->initialized)
-  {
-    return;
-  }
-
-  void(Framework::*initFncPtr)(void) = &Framework::Initialize;
-  void* frameworkInit = NULL;
-  std::memcpy(&frameworkInit, &initFncPtr, sizeof(void*));
-
-  auto bundleInfo = new BundleInfo(BundleUtils::GetLibraryPath(frameworkInit), US_CORE_FRAMEWORK_NAME);
-  
-  d->coreBundleContext.bundleRegistry.RegisterSystemBundle(std::static_pointer_cast<Framework>(shared_from_this()), bundleInfo);
-
-  d->initialized = true;
-}
-
-void Framework::Start() 
-{ 
-  Initialize();
+  // TODO framework states
   Bundle::Start();
   // Install all bundles from the Auto-Install configuration property
-  std::string paths = d->coreBundleContext.frameworkProperties[Framework::PROP_INSTALL_PATHS];
-  std::vector<std::string> pathVec;
-  std::stringstream ss(paths);
-  std::string path;
-  while (std::getline(ss, path, ';')) 
+  us::Any val = GetProperty(Framework::PROP_INSTALL_PATHS);
+  if (!val.Empty())
   {
-    AutoInstallBundlesFromPath(path);
+	  std::string paths = val.ToString();
+	  std::vector<std::string> pathVec;
+	  std::stringstream ss(paths);
+	  std::string path;
+	  while (std::getline(ss, path, ';'))
+	  {
+		  AutoInstallBundlesFromPath(path);
+	  }
   }
 }
 
-void Framework::Stop() 
+void Framework::Stop()
 {
-  FrameworkPrivate::Lock lock(d);
-  std::vector<std::shared_ptr<Bundle>> bundles(GetBundleContext()->GetBundles());
-  for (auto& bundle : bundles)
+  if (!this->IsStarted()) return;
+
+  auto bundles = GetBundleContext()->GetBundles();
+  for (auto bundle : bundles)
   {
     if (bundle->GetBundleId() > 0)
     {
@@ -103,9 +79,9 @@ void Framework::Stop()
   Bundle::Stop();
 }
 
-void Framework::Uninstall() 
+void Framework::Uninstall()
 {
-  throw std::runtime_error("Cannot uninstall a system bundle."); 
+  throw std::runtime_error("Cannot uninstall a system bundle.");
 }
 
 std::string Framework::GetLocation() const
@@ -117,7 +93,7 @@ std::string Framework::GetLocation() const
 
 void Framework::SetAutoLoadingEnabled(bool enable)
 {
-  d->coreBundleContext.settings.SetAutoLoadingEnabled(enable);
+  static_cast<FrameworkPrivate*>(d.get())->coreBundleContext.settings.SetAutoLoadingEnabled(enable);
 }
 
 }

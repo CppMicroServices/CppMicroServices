@@ -120,12 +120,11 @@ public:
 
   TestBundleHActivator()
     : thisServiceName(us_service_interface_iid<TestBundleH>())
-    , context(NULL)
+    , context(nullptr)
   {}
 
   void Start(BundleContext* context)
   {
-    std::cout << "start in H" << std::endl;
     this->context = context;
     factoryObj = std::make_shared<TestBundleHServiceFactory>();
     factoryService = context->RegisterService<TestBundleH>(ToFactory(factoryObj));

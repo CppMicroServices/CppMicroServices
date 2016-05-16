@@ -1,4 +1,3 @@
-
 #include <usGetBundleContext.h>
 #include <usBundleContext.h>
 #include <usBundleResource.h>
@@ -44,7 +43,7 @@ void extenderPattern(BundleContext* bundleCtx)
 {
   //! [2]
   // Get all installed bundles
-  std::vector<std::shared_ptr<Bundle>> bundles = bundleCtx->GetBundles();
+  auto bundles = bundleCtx->GetBundles();
 
   // Check if a bundle defines a "service-component" property
   // and use its value to retrieve an embedded resource containing

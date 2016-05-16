@@ -33,22 +33,22 @@ namespace us {
 
 class SL1BundlePropsImpl : public BundlePropsInterface
 {
-  
+
 public:
-  
+
   const Properties& GetProperties() const
   {
     return props;
   }
-  
+
   void SetProperty(std::string propertyKey, bool propertyValue)
   {
     props[propertyKey] = propertyValue;
   }
-  
+
 private:
   BundlePropsInterface::Properties props;
-  
+
 };
 
 class SL1ServiceTrackerCustomizer : public ServiceTrackerCustomizer<FooService>
@@ -59,24 +59,24 @@ private:
 public:
   SL1ServiceTrackerCustomizer(std::shared_ptr<SL1BundlePropsImpl> propService, BundleContext* bc) : bundlePropsService(propService), context(bc) {}
   virtual ~SL1ServiceTrackerCustomizer() { context = NULL; }
-  
-  std::shared_ptr<FooService> AddingService(const ServiceReferenceType& reference)
+
+  std::shared_ptr<FooService> AddingService(const ServiceReference<FooService>& reference)
   {
     bundlePropsService->SetProperty("serviceAdded", true);
-    
+
     std::shared_ptr<FooService> fooService = context->GetService<FooService>(reference);
     fooService->foo();
     return fooService;
   }
-  
-  void ModifiedService(const ServiceReferenceType& /*reference*/, std::shared_ptr<FooService> /*service*/)
+
+  void ModifiedService(const ServiceReference<FooService>& /*reference*/, const std::shared_ptr<FooService>& /*service*/)
   {}
-  
-  void RemovedService(const ServiceReferenceType& /*reference*/, std::shared_ptr<FooService> /*service*/)
+
+  void RemovedService(const ServiceReference<FooService>& /*reference*/, const std::shared_ptr<FooService>& /*service*/)
   {
     bundlePropsService->SetProperty("serviceRemoved", true);
   }
-  
+
 };
 
 class ActivatorSL1 :

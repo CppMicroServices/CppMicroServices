@@ -37,45 +37,40 @@
 
 namespace us {
 
-BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx) :
-  coreCtx(coreCtx)
+BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
+  : coreCtx(coreCtx)
+  , id(1)
 {
-  id.value = 0;
 }
 
 BundleRegistry::~BundleRegistry(void)
 {
 }
 
-std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
+std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo info)
 {
   std::vector<std::string> embeddedBundles; // statically-linked bundles in the binary
-  if (info->name.empty())
+  if (info.name.empty())
   {
-    embeddedBundles = GetBundleNamesFromLibrary(info->location);
+    embeddedBundles = GetBundleNamesFromLibrary(info.location);
   }
   if(!embeddedBundles.empty())
   {
-    info->name = embeddedBundles.at(0);
+    info.name = embeddedBundles.at(0);
     // remove this bundle name from the list to avoid an extra call to Register
     embeddedBundles.erase(embeddedBundles.begin());
   }
   
-  std::string bundleKey = info->location + "/" + info->name;
+  std::string bundleKey = info.location + "/" + info.name;
   std::shared_ptr<Bundle> bundle = GetBundle(bundleKey);
 
   if (!bundle)
   {
-    bundle = std::shared_ptr<Bundle>(new Bundle());
-    {
-      Lock l(id);
-      info->id = id.value++;
-      assert(info->id != 0 && info->name != US_CORE_FRAMEWORK_NAME && !bundles.empty());
-    }
-    bundle->Init(coreCtx, info);
+    info.id = id++;
+    assert(info.id > 0);
+    bundle.reset(new Bundle(coreCtx, info));
 
-    Lock l(this);
-    std::pair<BundleMap::iterator, bool> return_pair(bundles.insert(std::make_pair(bundleKey, bundle)));
+    auto return_pair = (this->Lock(), bundles.insert(std::make_pair(bundleKey, bundle)));
 
     // A race condition exists when creating a new bundle instance. To resolve
     // this requires either scoping the mutex to the entire function or adding
@@ -96,7 +91,7 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
     // register all the statically-linked bundles
     for (auto childBundleName : embeddedBundles)
     {
-      Register(new BundleInfo(info->location, childBundleName));
+      Register(BundleInfo(info.location, childBundleName));
     }
     bundle->d->bundleManifest.SetValue(Bundle::PROP_STATIC_LINKED_BUNDLES, Any(embeddedBundles));
   }
@@ -104,61 +99,22 @@ std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo* info)
   return bundle;
 }
 
-void BundleRegistry::RegisterSystemBundle(std::shared_ptr<Framework> systemBundle, BundleInfo* info)
-{
-  assert (info->name == US_CORE_FRAMEWORK_NAME);
-  if (!systemBundle)
-  {
-    throw std::invalid_argument("Can't register a null system bundle");
-  }
-  
-  // detect statically-linked bundles in the binary
-  std::vector<std::string> embeddedBundles = GetBundleNamesFromLibrary(info->location);
-  if(!embeddedBundles.empty())
-  {
-    // remove this bundle name from the list to avoid an extra call to Register
-    std::vector<std::string>::iterator it = std::find(embeddedBundles.begin(), embeddedBundles.end(), info->name);
-    embeddedBundles.erase(it);
-  }
-
-  {
-    Lock l(id);
-    info->id = id.value++;
-    assert(info->id == 0 && bundles.empty());
-  }
-
-  systemBundle->Init(coreCtx, info);
-  {
-    Lock l(this);
-    bundles.insert(std::make_pair(info->location + "/" + info->name, systemBundle));
-  }
-  if (!embeddedBundles.empty())
-  {
-    // register all the statically-linked bundles
-    for (auto childBundleName : embeddedBundles)
-    {
-      Register(new BundleInfo(info->location, childBundleName));
-    }
-    std::shared_ptr<Bundle> bundle = systemBundle;
-    bundle->d->bundleManifest.SetValue(Bundle::PROP_STATIC_LINKED_BUNDLES, Any(embeddedBundles));
-  }
-}
-
-void BundleRegistry::UnRegister(const BundleInfo* info)
+void BundleRegistry::UnRegister(const BundleInfo& info)
 {
   // The system bundle cannot be uninstalled.
-  if (info->id >= 1)
+  if (info.id > 0)
   {
-    Lock l(this);
-    bundles.erase(info->location + "/" + info->name);
+    this->Lock(), bundles.erase(info.location + "/" + info.name);
   }
 }
 
 std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
 {
-  Lock l(this);
+  if (id == 0) return coreCtx->systemBundle->shared_from_this();
 
-  for (auto const& m : bundles)
+  auto l = this->Lock(); US_UNUSED(l);
+
+  for (auto& m : bundles)
   {
     if (m.second->GetBundleId() == id)
     {
@@ -170,7 +126,9 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
 
 std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& location) const
 {
-  Lock l(this);
+  if (coreCtx->systemBundle->d->info.location == location) return coreCtx->systemBundle->shared_from_this();
+
+  auto l = this->Lock(); US_UNUSED(l);
 
   auto iter = bundles.find(location);
   if (iter != bundles.end())
@@ -182,7 +140,7 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& location) c
   
 std::shared_ptr<Bundle> BundleRegistry::GetBundleByName(const std::string& name) const
 {
-  Lock l(this);
+  auto l = this->Lock(); US_UNUSED(l);
   
   for (auto& m : bundles)
   {
@@ -196,9 +154,10 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundleByName(const std::string& name)
 
 std::vector<std::shared_ptr<Bundle>> BundleRegistry::GetBundles() const
 {
-  Lock l(this);
+  auto l = this->Lock(); US_UNUSED(l);
 
   std::vector<std::shared_ptr<Bundle>> result;
+  result.push_back(coreCtx->systemBundle->shared_from_this());
   for (auto& m : bundles)
   {
     result.push_back(m.second);

@@ -33,7 +33,7 @@ std::string ServletConfig::GetServletName() const
   return d->m_Name;
 }
 
-ServletContext*ServletConfig::GetServletContext() const
+std::shared_ptr<ServletContext> ServletConfig::GetServletContext() const
 {
   return d->m_Context;
 }
@@ -43,7 +43,7 @@ void ServletConfig::SetServletName(const std::string& name)
   d->m_Name = name;
 }
 
-void ServletConfig::SetServletContext(ServletContext* context)
+void ServletConfig::SetServletContext(const std::shared_ptr<ServletContext>& context)
 {
   d->m_Context = context;
 }

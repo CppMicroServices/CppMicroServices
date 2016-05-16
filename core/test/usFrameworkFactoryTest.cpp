@@ -22,6 +22,7 @@ limitations under the License.
 
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
+#include <usAny.h>
 
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
@@ -37,22 +38,22 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 
     FrameworkFactory factory;
 
-    std::shared_ptr<Framework> f = factory.NewFramework(std::map<std::string, std::string>());
+    auto f = factory.NewFramework();
 
     US_TEST_CONDITION(f, "Test Framework instantiation");
 
-    std::shared_ptr<Framework> f1 = factory.NewFramework(std::map<std::string, std::string>());
+    auto f1 = factory.NewFramework();
 
     US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
 
-    std::map < std::string, std::string > configuration;
-    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.security","osgi"));
-    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.startlevel.beginning", "0"));
-    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.bsnversion", "single"));
-    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom1", "foo"));
-    configuration.insert(std::pair<std::string, std::string>("org.cppmicroservices.framework.custom2", "bar"));
+    std::map < std::string, Any > configuration;
+    configuration["org.osgi.framework.security"] = std::string("osgi");
+    configuration["org.osgi.framework.startlevel.beginning"] = 0;
+    configuration["org.osgi.framework.bsnversion"] = std::string("single");
+    configuration["org.osgi.framework.custom1"] = std::string("foo");
+    configuration["org.osgi.framework.custom2"] = std::string("bar");
 
-    std::shared_ptr<Framework> f2 = factory.NewFramework(configuration);
+    auto f2 = factory.NewFramework(configuration);
 
     US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
 

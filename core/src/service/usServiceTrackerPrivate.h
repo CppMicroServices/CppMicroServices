@@ -40,17 +40,18 @@ class ServiceTrackerPrivate : MultiThreaded<>
 public:
 
   typedef typename TTT::TrackedType T;
+  typedef typename TTT::TrackedParmType TrackedParmType;
 
-  ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
+  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         BundleContext* context,
                         const ServiceReference<S>& reference,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
+  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         BundleContext* context, const std::string& clazz,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S,TTT>* st,
+  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
                         BundleContext* context, const LDAPFilter& filter,
                         ServiceTrackerCustomizer<S,T>* customizer);
 
@@ -71,7 +72,7 @@ public:
   std::vector<ServiceReference<S> > GetInitialReferences(const std::string& className,
                                                          const std::string& filterString);
 
-  void GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, TrackedService<S,TTT>* t) const;
+  void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs, TrackedService<S,TTT>* t) const;
 
   /* set this to true to compile in debug messages */
   static const bool DEBUG_OUTPUT; // = false;
@@ -115,7 +116,7 @@ public:
    * Tracked services: <code>ServiceReference</code> -> customized Object and
    * <code>ServiceListenerEntry</code> object
    */
-  TrackedService<S,TTT>* trackedService;
+  std::unique_ptr<TrackedService<S,TTT>> trackedService;
 
   /**
    * Accessor method for the current TrackedService object. This method is only
@@ -140,29 +141,29 @@ public:
   /**
    * Cached ServiceReference for getServiceReference.
    */
-  mutable ServiceReference<S> cachedReference;
+  mutable Atomic<ServiceReference<S>> cachedReference;
 
   /**
    * Cached service object for GetService.
    */
-  mutable T cachedService;
+  mutable Atomic<std::shared_ptr<TrackedParmType>> cachedService;
 
 
 private:
 
-  inline ServiceTracker<S,TTT>* q_func()
+  inline ServiceTracker<S,T>* q_func()
   {
-    return static_cast<ServiceTracker<S,TTT> *>(q_ptr);
+    return static_cast<ServiceTracker<S,T> *>(q_ptr);
   }
 
-  inline const ServiceTracker<S,TTT>* q_func() const
+  inline const ServiceTracker<S,T>* q_func() const
   {
-    return static_cast<const ServiceTracker<S,TTT> *>(q_ptr);
+    return static_cast<const ServiceTracker<S,T> *>(q_ptr);
   }
 
-  friend class ServiceTracker<S,TTT>;
+  friend class ServiceTracker<S,T>;
 
-  ServiceTracker<S,TTT> * const q_ptr;
+  ServiceTracker<S,T> * const q_ptr;
 
 };
 

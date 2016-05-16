@@ -53,16 +53,14 @@ static const int fieldWidth[numFields] = { 4, 26, 10, 12, 40 };
 
 pointer us_bundle_ids(scheme* sc, pointer /*args*/)
 {
-  std::vector<std::shared_ptr<Bundle>> bundles = GetBundleContext()->GetBundles();
+  auto bundles = GetBundleContext()->GetBundles();
   std::set<long> ids;
-  for (std::vector<std::shared_ptr<Bundle>>::iterator iter = bundles.begin(),
-       iterEnd = bundles.end(); iter != iterEnd; ++iter)
+  for (auto const& iter : bundles)
   {
-    ids.insert((*iter)->GetBundleId());
+    ids.insert(iter->GetBundleId());
   }
   pointer result = sc->NIL;
-  for (std::set<long>::reverse_iterator iter = ids.rbegin(),
-       iterEnd = ids.rend(); iter != iterEnd; ++iter)
+  for (auto iter = ids.rbegin(), iterEnd = ids.rend(); iter != iterEnd; ++iter)
   {
     result = cons(sc, sc_int(sc, *iter), result);
   }
@@ -87,7 +85,7 @@ pointer us_bundle_info(scheme* sc, pointer args)
   memset(delim, delimChar, 50);
 
   pointer arg = pair_car(args);
-  auto bundle = std::shared_ptr<Bundle>();
+  std::shared_ptr<Bundle> bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -125,7 +123,7 @@ pointer us_bundle_info(scheme* sc, pointer args)
     return sc->NIL;
   }
 
-  if (bundle == NULL)
+  if (bundle == nullptr)
   {
     return sc->NIL;
   }
@@ -206,7 +204,7 @@ pointer us_bundle_start(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  auto bundle = std::shared_ptr<Bundle>();
+  std::shared_ptr<Bundle> bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -244,7 +242,7 @@ pointer us_bundle_stop(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  auto bundle = std::shared_ptr<Bundle>();
+  std::shared_ptr<Bundle> bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -319,7 +317,7 @@ void ShellService::Impl::InitSymbols()
 ShellService::ShellService()
   : d(new Impl)
 {
-  if (d->m_Scheme == NULL)
+  if (d->m_Scheme == nullptr)
   {
     throw std::runtime_error("Could not initialize Scheme interpreter");
   }

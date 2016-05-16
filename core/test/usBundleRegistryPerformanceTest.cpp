@@ -32,11 +32,18 @@ limitations under the License.
 
 #include <vector>
 #include <thread>
+#include <mutex>
 
 using namespace us;
 
 namespace
 {
+    std::mutex mutex_io = {};
+    std::unique_lock<std::mutex> io_lock()
+    {
+      return std::unique_lock<std::mutex>(mutex_io);
+    }
+
     // Attempt to get as close an approximation as to how long it takes to install a bundle
     // without having the extra machinery of error handling in the way.
     inline void InstallTestBundleNoErrorHandling(BundleContext* frameworkCtx, const std::string& bundleName)
@@ -48,7 +55,7 @@ namespace
 #endif
     }
 
-    void TestSerial(std::shared_ptr<Framework> f)
+    void TestSerial(const std::shared_ptr<Framework>& f)
     {
         // Installing such a small set of bundles doesn't yield significant
         // data about performance. Consider increasing the number of bundles
@@ -73,7 +80,7 @@ namespace
         InstallTestBundleNoErrorHandling(fmc, "TestBundleSL4");
 
         long long elapsedTimeInMilliSeconds = timer.ElapsedMilli();
-        US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to install 12 new bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
+        io_lock(), US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to install 12 new bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
 
         elapsedTimeInMilliSeconds = 0;
 
@@ -85,7 +92,7 @@ namespace
             elapsedTimeInMilliSeconds += timer.ElapsedMilli();
         }
         
-        US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to start 12 bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
+        io_lock(), US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id() << "] Time elapsed to start 12 bundles: " << elapsedTimeInMilliSeconds << " milliseconds");
     }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -104,11 +111,8 @@ namespace
         std::vector<std::thread> threads;
         for (int i = 0; i < numTestThreads; ++i)
         {
-            threads.push_back(std::thread(TestSerial, f));
-            threads.push_back(std::thread([f]() -> void 
-                                            {
-                                                f->GetBundleContext()->GetBundles();
-                                            }));
+            threads.emplace_back(TestSerial, f);
+            threads.emplace_back([f]{ f->GetBundleContext()->GetBundles(); });
         }
 
         for (auto& th : threads) th.join();
@@ -123,7 +127,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_BEGIN("BundleRegistryPerformanceTest")
 
     FrameworkFactory factory;
-    std::shared_ptr<Framework> framework = factory.NewFramework();
+    auto framework = factory.NewFramework();
     framework->Start();
 
     // auto-installing will skew the benchmark results.
@@ -132,7 +136,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
     TestSerial(framework);
 
-    for (auto& bundle : framework->GetBundleContext()->GetBundles())
+    for (auto bundle : framework->GetBundleContext()->GetBundles())
     {
         if (bundle->GetBundleId() != 0)
         {

@@ -122,20 +122,6 @@ void Bundle::Start()
 
     d->SetBundleContext(new BundleContext(this->d.get()));
 
-    // save this bundle's context so that it can be accessible anywhere
-    // from within this bundle's code.
-    typedef void(*SetBundleContext)(BundleContext*);
-    SetBundleContext setBundleContext = nullptr;
-
-    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-    void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-    std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
-
-    if (setBundleContext)
-    {
-      setBundleContext(d->bundleContext);
-    }
-
     std::string create_activator_func = "_us_create_activator_" + d->info.name;
     void* createActivatorHookSym = BundleUtils::GetSymbol(d->info, create_activator_func.c_str());
     std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
@@ -172,7 +158,7 @@ void Bundle::Stop()
       d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
       d->RemoveBundleResources();
       d->bundleContext.load()->d->Lock(), d->bundleContextOrphans.emplace_back(d->bundleContext), (d->bundleContext.load()->d->bundle = nullptr);
-      d->bundleContext = nullptr;
+      d->SetBundleContext(nullptr);
       d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this->shared_from_this()));
 
       d->bundleActivator = nullptr;

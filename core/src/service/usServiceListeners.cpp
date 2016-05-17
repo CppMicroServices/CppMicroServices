@@ -30,10 +30,11 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 #include "usUtils_p.h"
 
 #include "usServiceReferenceBasePrivate.h"
-#include "usProperties_p.h"
+#include "usServicePropertiesImpl_p.h"
 #include "usCoreBundleContext_p.h"
 #include "usBundle.h"
 #include "usBundleContext.h"
+
 
 namespace us {
 

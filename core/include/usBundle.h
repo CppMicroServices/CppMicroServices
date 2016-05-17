@@ -28,7 +28,6 @@
 
 #include <vector>
 #include <memory>
-#include <map>
 
 namespace us {
 
@@ -244,16 +243,6 @@ public:
    */
   BundleVersion GetVersion() const;
 
-  /**
-   * Returns this bundle's Manifest properties as key/value pairs.
-   *
-   * @return A map containing this bundle's Manifest properties as 
-   *         key/value pairs.
-   *
-   * @sa \ref MicroServices_BundleProperties
-   */
-  std::map<std::string, Any> GetProperties() const;
-    
   /**
    * Returns the value of the specified property for this bundle.
    * If not found, the framework's properties are searched.

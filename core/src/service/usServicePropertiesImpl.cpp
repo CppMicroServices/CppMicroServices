@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "usProperties_p.h"
+#include "usServicePropertiesImpl_p.h"
 
 #include <limits>
 #include <stdexcept>
@@ -34,14 +34,13 @@
 
 namespace us {
 
-const Any Properties::emptyAny;
+Any ServicePropertiesImpl::emptyAny;
 
-template <typename T>
-void Properties::ConstructProperties(const T& p)
+ServicePropertiesImpl::ServicePropertiesImpl(const ServiceProperties& p)
 {
   if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
   {
-    throw std::runtime_error("Properties contain too many keys");
+    throw std::runtime_error("ServiceProperties object contains too many keys");
   }
 
   keys.reserve(p.size());
@@ -51,7 +50,7 @@ void Properties::ConstructProperties(const T& p)
   {
     if (Find_unlocked(iter.first) > -1)
     {
-      std::string msg("Properties contain case variants of the key: ");
+      std::string msg = "ServiceProperties object contains case variants of the key: ";
       msg += iter.first;
       throw std::runtime_error(msg.c_str());
     }
@@ -60,49 +59,35 @@ void Properties::ConstructProperties(const T& p)
   }
 }
 
-Properties::Properties(const ServiceProperties& p)
-{
-  ConstructProperties(p);
-}
-    
-Properties::Properties(const std::map<std::string, Any>& p)
-{
-  ConstructProperties(p);
-}
 
-Properties::Properties(Properties&& o)
+ServicePropertiesImpl::ServicePropertiesImpl(ServicePropertiesImpl&& o)
   : keys(std::move(o.keys))
   , values(std::move(o.values))
 {
 }
 
-Properties& Properties::operator=(Properties&& o)
+ServicePropertiesImpl& ServicePropertiesImpl::operator=(ServicePropertiesImpl&& o)
 {
   keys = std::move(o.keys);
   values = std::move(o.values);
   return *this;
 }
 
-Any Properties::Value_unlocked(const std::string& key) const
+Any ServicePropertiesImpl::Value_unlocked(const std::string& key) const
 {
   int i = Find_unlocked(key);
-  if (i < 0)
-  {
-    return emptyAny;
-  }
+  if (i < 0) return emptyAny;
   return values[i];
 }
 
-Any Properties::Value_unlocked(int index) const
+Any ServicePropertiesImpl::Value_unlocked(int index) const
 {
   if (index < 0 || static_cast<std::size_t>(index) >= values.size())
-  {
     return emptyAny;
-  }
   return values[static_cast<std::size_t>(index)];
 }
 
-int Properties::Find_unlocked(const std::string& key) const
+int ServicePropertiesImpl::Find_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i)
   {
@@ -114,7 +99,7 @@ int Properties::Find_unlocked(const std::string& key) const
   return -1;
 }
 
-int Properties::FindCaseSensitive_unlocked(const std::string& key) const
+int ServicePropertiesImpl::FindCaseSensitive_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i)
   {
@@ -126,12 +111,12 @@ int Properties::FindCaseSensitive_unlocked(const std::string& key) const
   return -1;
 }
 
-std::vector<std::string> Properties::Keys_unlocked() const
+std::vector<std::string> ServicePropertiesImpl::Keys_unlocked() const
 {
   return keys;
 }
 
-void Properties::Clear_unlocked()
+void ServicePropertiesImpl::Clear_unlocked()
 {
   keys.clear();
   values.clear();

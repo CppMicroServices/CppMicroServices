@@ -5,7 +5,7 @@ enable_language(C)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_NAME}\")
 
-set(srcs usResourceCompiler.cpp ../../third_party/miniz.c)
+set(srcs usResourceCompiler.c ../../third_party/miniz.c)
 
 add_executable(${US_RCC_EXECUTABLE_NAME} ${srcs})
 if(WIN32)

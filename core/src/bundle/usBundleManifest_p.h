@@ -29,8 +29,6 @@ namespace us {
 
 class BundleManifest
 {
-  typedef std::map<std::string, Any> AnyMap;
-
 public:
 
   BundleManifest();
@@ -44,10 +42,10 @@ public:
   std::vector<std::string> GetKeys() const;
 
   void SetValue(const std::string& key, const Any& value);
-    
-  AnyMap GetProperties() const;
 
 private:
+
+  typedef std::map<std::string, Any> AnyMap;
 
   AnyMap m_Properties;
 };

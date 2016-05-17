@@ -275,9 +275,9 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<Bundle>& bu
   return hadReferences && removeService;
 }
 
-PropertiesHandle ServiceReferenceBasePrivate::GetProperties() const
+ServicePropertiesHandle ServiceReferenceBasePrivate::GetProperties() const
 {
-  return PropertiesHandle(registration->properties, true);
+  return ServicePropertiesHandle(registration->properties, true);
 }
 
 bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId) const

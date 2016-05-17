@@ -31,7 +31,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
                ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
 usMacroCreateBundle(Core
-  VERSION "3.0.0"
+  VERSION "2.99.0"
   TARGET CppMicroServices
   INTERNAL_INCLUDE_DIRS src/util src/service src/bundle
   LINK_LIBRARIES ${_link_libraries}

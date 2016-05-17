@@ -1,4 +1,4 @@
-Source: https://github.com/CppMicroServices/CppMicroServices
+Source: https://github.com/saschazelzer/CppMicroServices
 
 Files: * (see the VCS history for detailed change information)
 Copyright: 2015 Sascha Zelzer <sascha.zelzer@gmail.com>

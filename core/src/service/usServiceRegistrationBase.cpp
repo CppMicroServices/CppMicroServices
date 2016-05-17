@@ -58,9 +58,8 @@ ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate*
   if (d) ++d->ref;
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
-                                                 const InterfaceMapConstPtr& service,
-                                                 Properties&& props)
+ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
+                                                 ServicePropertiesImpl&& props)
   : d(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
 {
 }

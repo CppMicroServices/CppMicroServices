@@ -151,10 +151,5 @@ void BundleManifest::SetValue(const std::string& key, const Any& value)
 {
   m_Properties[key] = value;
 }
-    
-AnyMap BundleManifest::GetProperties() const
-{
-  return m_Properties;
-}
 
 }

@@ -32,7 +32,7 @@ namespace us {
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
     BundlePrivate* bundle,
     const InterfaceMapConstPtr& service,
-    ServicePropertiesImpl&& props
+    Properties&& props
     )
   : ref(0)
   , service(service)

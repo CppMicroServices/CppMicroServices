@@ -28,7 +28,7 @@
 
 #include "usServiceInterface.h"
 #include "usServiceReference.h"
-#include "usServicePropertiesImpl_p.h"
+#include "usProperties_p.h"
 #include "usThreads_p.h"
 
 namespace us {
@@ -101,7 +101,7 @@ public:
   /**
    * Service properties.
    */
-  ServicePropertiesImpl properties;
+  Properties properties;
 
   /**
    * Is service available. I.e., if <code>true</code> then holders
@@ -118,7 +118,7 @@ public:
 
 
   ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
-                                 ServicePropertiesImpl&& props);
+                                 Properties&& props);
 
   ~ServiceRegistrationBasePrivate();
 

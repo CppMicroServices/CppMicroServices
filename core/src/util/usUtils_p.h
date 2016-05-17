@@ -36,10 +36,7 @@
 
 namespace us {
 
-std::string GetBundleNameFromLocation(const std::string& location);
-
-std::string GetBundleLocation(const std::string& location);
-
+void ExtractBundleNameAndLocation(const std::string& locationName, std::string& oLocation, std::string& oName);
 bool IsSharedLibrary(const std::string& location);
 
 }
@@ -52,9 +49,10 @@ namespace us {
 
 struct BundleInfo;
 class CoreBundleContext;
-
-std::vector<std::string> AutoLoadBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
-
+std::vector<std::string> GetBundleNamesFromLibrary(const std::string& libPath);
+std::vector<std::string> AutoInstallBundles(const BundleInfo& bundleInfo, CoreBundleContext* coreCtx);
+std::vector<std::string> AutoInstallBundlesFromPath(const std::string& absoluteBasePath, 
+	const std::string& subDir = std::string());
 }
 
 //-------------------------------------------------------------------

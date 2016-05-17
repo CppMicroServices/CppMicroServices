@@ -60,114 +60,118 @@ class FrameworkPrivate;
 class US_Core_EXPORT Framework : public Bundle
 {
 public:
-
-    // This class is not copy-able
-    Framework(const Framework&) = delete;
-    Framework operator=(const Framework&) = delete;
-
-    virtual ~Framework(void);
-
-    /**
-     * Start this Framework.
-     *
-     * <p>
-     * The following steps are taken to start this Framework:
-     * -# If this Framework is not in the STARTING state, start this Framework.
-     * -# This Framework's state is set to ACTIVE.
-     *
-     * @throws std::runtime_error If this Framework could not be started.
-     */
-    void Start();
-
-    /**
-     * Stop this Framework.
-     *
-     * The following steps are taken to stop this Framework:
-     * -# This Framework's state is set to STOPPING.
-     * -# All installed bundles must be stopped.
-     * -# Unregister all services registered by this Framework.
-     * -# Event handling is disabled.
-     * -# All resources held by this Framework are released. This includes threads, open files, etc.
-     *
-     * After being stopped, this Framework may be discarded or started.
-     *
-     * @throws std::runtime_error If stopping this Framework could not be initiated.
-     */
-    void Stop();
-
-    /**
-     * The Framework cannot be uninstalled.
-     *
-     * This method always throws a std::runtime_error exception.
-     *
-     * @throws std::runtime_error This Framework cannot be uninstalled.
-     */
-    void Uninstall();
-
-    /**
-    * Returns this Framework's location.
-    *
-    * <p>
-    * This Framework is assigned the unique location "System Bundle"
-    * since this Framework is also a System Bundle.
-    *
-    * @return The string "System Bundle".
-    */
-    std::string GetLocation() const;
-
-    /**
-     * Enable or disable auto-install support.
-     *
-     * @param enable If \c true, enable auto-install support, disable it otherwise.
-     *
-     * @remarks Calling this method will have no effect if support for
-     * auto-loading has not been configured into the CppMicroServices library or if
-     * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
-     *
-     * @deprecated This method remains for legacy clients and will be removed in a
-     * future release. Auto-loading support will be moved into a seprate service,
-     * at which point, this method will be permanently removed.
-     *
-     */
-    void SetAutoLoadingEnabled(bool enable);
-
-    /**
-     * The framework's persistent storage base path property key name.
-     * This property's default value is the current working directory.
-     *
-     */
-    static const std::string PROP_STORAGE_LOCATION;
-
-    /**
-     * The framework's threading support property key name.
-     * This property's default value is "single".
-     * Valid key values are:
-     * - "single" - The framework APIs are not thread-safe.
-     * - "multi" - The framework APIs are thread-safe.
-     *
-     * @remarks This is a read-only property and cannot be altered at run-time.
-     * The key's value is set at compile time by the US_ENABLE_THREADING_SUPPORT option.
-     *
-     * @see \ref BuildInstructions
-     */
-    static const std::string PROP_THREADING_SUPPORT;
-
-    /**
-     * The framework's log level property key name.
-     * This property's default value is "3" (Only errors are logged).
-     *
-     * @see MsgType
-     */
-    static const std::string PROP_LOG_LEVEL;
-
+  // This class is not copy-able
+  Framework(const Framework&) = delete;
+  Framework operator=(const Framework&) = delete;
+  
+  virtual ~Framework(void);
+  
+  /**
+   * Start this Framework.
+   *
+   * <p>
+   * The following steps are taken to start this Framework:
+   * -# If this Framework is not in the STARTING state, start this Framework.
+   * -# This Framework's state is set to ACTIVE.
+   *
+   * @throws std::runtime_error If this Framework could not be started.
+   */
+  void Start();
+  
+  /**
+   * Stop this Framework.
+   *
+   * The following steps are taken to stop this Framework:
+   * -# This Framework's state is set to STOPPING.
+   * -# All installed bundles must be stopped.
+   * -# Unregister all services registered by this Framework.
+   * -# Event handling is disabled.
+   * -# All resources held by this Framework are released. This includes threads, open files, etc.
+   *
+   * After being stopped, this Framework may be discarded or started.
+   *
+   * @throws std::runtime_error If stopping this Framework could not be initiated.
+   */
+  void Stop();
+  
+  /**
+   * The Framework cannot be uninstalled.
+   *
+   * This method always throws a std::runtime_error exception.
+   *
+   * @throws std::runtime_error This Framework cannot be uninstalled.
+   */
+  void Uninstall();
+  
+  /**
+   * Returns this Framework's location.
+   *
+   * <p>
+   * This Framework is assigned the unique location "System Bundle"
+   * since this Framework is also a System Bundle.
+   *
+   * @return The string "System Bundle".
+   */
+  std::string GetLocation() const;
+  
+  /**
+   * Enable or disable auto-install support.
+   *
+   * @param enable If \c true, enable auto-install support, disable it otherwise.
+   *
+   * @remarks Calling this method will have no effect if support for
+   * auto-loading has not been configured into the CppMicroServices library or if
+   * it has been disabled by defining the US_DISABLE_AUTOLOADING envrionment variable.
+   *
+   * @deprecated This method remains for legacy clients and will be removed in a
+   * future release. Auto-loading support will be moved into a seprate service,
+   * at which point, this method will be permanently removed.
+   *
+   */
+  void SetAutoLoadingEnabled(bool enable);
+  
+  /**
+   * The framework's persistent storage base path property key name.
+   * This property's default value is the current working directory.
+   *
+   */
+  static const std::string PROP_STORAGE_LOCATION;
+  
+  /**
+   * The framework's threading support property key name.
+   * This property's default value is "single".
+   * Valid key values are:
+   * - "single" - The framework APIs are not thread-safe.
+   * - "multi" - The framework APIs are thread-safe.
+   *
+   * @remarks This is a read-only property and cannot be altered at run-time.
+   * The key's value is set at compile time by the US_ENABLE_THREADING_SUPPORT option.
+   *
+   * @see \ref BuildInstructions
+   */
+  static const std::string PROP_THREADING_SUPPORT;
+  
+  /**
+   * The framework's log level property key name.
+   * This property's default value is "3" (Only errors are logged).
+   *
+   * @see MsgType
+   */
+  static const std::string PROP_LOG_LEVEL;
+  
+  /**
+   * The framework's install paths configuration property key name.
+   * This property's value is a string with a list of paths delimited by ';' character.
+   * Bundles from the provided paths are installed at framework startup
+   */
+  static const std::string PROP_INSTALL_PATHS;
 private:
-    // Framework instances are exclusively constructed by the FrameworkFactory class
-    friend class FrameworkFactory;
-
-    // Allow the framework to be constructed with configuration properties
-    // provided by a FrameworkFactory object.
-    Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration);
-
+  // Framework instances are exclusively constructed by the FrameworkFactory class
+  friend class FrameworkFactory;
+  
+  // Allow the framework to be constructed with configuration properties
+  // provided by a FrameworkFactory object.
+  Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration);
 };
 
 }

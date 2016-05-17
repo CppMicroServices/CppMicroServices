@@ -38,12 +38,12 @@ FrameworkFactory::~FrameworkFactory(void)
 
 std::shared_ptr<Framework> FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration)
 {
-  BundleInfo bundleInfo(US_CORE_FRAMEWORK_NAME);
+  
 
   std::shared_ptr<Framework>(FrameworkFactory::*newFWFncPtr)(const std::map<std::string, Any>&) = &FrameworkFactory::NewFramework;
   void* newFramework = nullptr;
   std::memcpy(&newFramework, &newFWFncPtr, sizeof(void*));
-  bundleInfo.location = BundleUtils::GetLibraryPath(newFramework);
+  BundleInfo bundleInfo(BundleUtils::GetLibraryPath(newFramework), US_CORE_FRAMEWORK_NAME);
   bundleInfo.id = 0;
 
   std::shared_ptr<Framework> fw(new Framework(bundleInfo, configuration));

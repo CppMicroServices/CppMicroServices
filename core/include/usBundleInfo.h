@@ -43,8 +43,8 @@ struct BundleActivator;
  */
 struct US_Core_EXPORT BundleInfo
 {
-  BundleInfo(const std::string& name);
-
+  BundleInfo(const std::string& location, const std::string& name = std::string());
+  
   std::string name;
   std::string location;
   std::string autoLoadDir;

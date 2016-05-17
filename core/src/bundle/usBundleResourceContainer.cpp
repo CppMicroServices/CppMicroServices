@@ -87,7 +87,7 @@ BundleResourceContainer::BundleResourceContainer(const BundleInfo* bundleInfo)
   }
   else
   {
-    US_DEBUG << "Could not init zip archive for bundle " << bundleInfo->name;
+    US_DEBUG << "Could not init zip archive for bundle " << bundleInfo->location;
   }
 }
 

@@ -128,10 +128,10 @@ void BundlePrivate::Init(CoreBundleContext* coreCtx)
     bundleManifest.SetValue(Bundle::PROP_AUTOLOAD_DIR, Any(this->info.autoLoadDir));
   }
 
-#ifdef US_ENABLE_AUTOLOADING_SUPPORT
+#if defined(US_ENABLE_AUTOLOADING_SUPPORT)
   if (coreCtx->settings.IsAutoLoadingEnabled())
   {
-    const std::vector<std::string> installedBundleNames = AutoLoadBundles(this->info, this->coreCtx);
+    const std::vector<std::string> installedBundleNames = AutoInstallBundles(this->info, this->coreCtx);
     if (!installedBundleNames.empty())
     {
       bundleManifest.SetValue(Bundle::PROP_AUTOINSTALLED_BUNDLES, Any(installedBundleNames));
@@ -171,6 +171,24 @@ void BundlePrivate::RemoveBundleResources()
        i != srs.end(); ++i)
   {
     i->GetReference(std::string()).d.load()->UngetService(q->shared_from_this(), false);
+  }
+}
+  
+void BundlePrivate::SetBundleContext(BundleContext* context)
+{
+  bundleContext = context;
+  // save this bundle's context so that it can be accessible anywhere
+  // from within this bundle's code.
+  typedef void(*SetBundleContext)(BundleContext*);
+  SetBundleContext setBundleContext = nullptr;
+  
+  std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + info.name;
+  void* setBundleContextSym = BundleUtils::GetSymbol(info, set_bundle_context_func.c_str());
+  std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
+  
+  if (setBundleContext)
+  {
+    setBundleContext(bundleContext);
   }
 }
 

@@ -105,7 +105,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
           || pE.GetBundle() != pR.GetBundle())
       {
         listenState = false;
-        US_DEBUG << "*** Wrong bundle event: " << pR << " expected " << pE;
+        US_DEBUG << "*** Wrong bundle event: " << "event#" << i  << " Received:" << pR << " Expected:" << pE;
       }
     }
   }

@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #include "usServiceRegistry_p.h"
 
 #include "usServiceFactory.h"
@@ -33,7 +32,6 @@
 #include <iterator>
 #include <stdexcept>
 #include <cassert>
-
 
 namespace us {
 

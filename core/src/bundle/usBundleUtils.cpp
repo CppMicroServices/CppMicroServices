@@ -24,7 +24,7 @@
 #include "usBundleUtils_p.h"
 
 #include <usLog.h>
-#include <usBundleInfo_p.h>
+#include <usBundleInfo.h>
 #include <usUtils_p.h>
 
 #ifdef __GNUC__
@@ -174,8 +174,7 @@ std::string GetLibraryPath(void* symbol)
 
 void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol)
 {
-  BundleInfo info(bundleName);
-  info.location = libLocation;
+  BundleInfo info(libLocation, bundleName);
   return GetSymbol(info, symbol);
 }
 

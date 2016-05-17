@@ -28,6 +28,7 @@ namespace us {
 const std::string Framework::PROP_STORAGE_LOCATION{ "org.cppmicroservices.framework.storage" };
 const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.framework.threading.support" };
 const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
+const std::string Framework::PROP_INSTALL_PATHS{ "org.cppmicroservices.framework.install.paths" };
 
 Framework::Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration)
   : Bundle(std::unique_ptr<BundlePrivate>(new FrameworkPrivate(this, info, configuration)))
@@ -47,6 +48,19 @@ void Framework::Start()
 {
   // TODO framework states
   Bundle::Start();
+  // Install all bundles from the Auto-Install configuration property
+  us::Any val = GetProperty(Framework::PROP_INSTALL_PATHS);
+  if (!val.Empty())
+  {
+	  std::string paths = val.ToString();
+	  std::vector<std::string> pathVec;
+	  std::stringstream ss(paths);
+	  std::string path;
+	  while (std::getline(ss, path, ';'))
+	  {
+		  AutoInstallBundlesFromPath(path);
+	  }
+  }
 }
 
 void Framework::Stop()

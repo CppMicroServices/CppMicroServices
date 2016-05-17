@@ -32,7 +32,7 @@ struct BundleActivator;
 
 struct BundleInfo
 {
-  BundleInfo(const std::string& name);
+	BundleInfo(const std::string& location, const std::string& name = std::string());
 
   std::string name;
   std::string location;

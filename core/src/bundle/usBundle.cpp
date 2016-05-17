@@ -50,6 +50,7 @@ const std::string Bundle::PROP_VENDOR{ "bundle.vendor" };
 const std::string Bundle::PROP_DESCRIPTION{ "bundle.description" };
 const std::string Bundle::PROP_AUTOLOAD_DIR{ "bundle.autoload_dir" };
 const std::string Bundle::PROP_AUTOINSTALLED_BUNDLES{ "bundle.autoinstalled_bundles" };
+const std::string Bundle::PROP_STATIC_LINKED_BUNDLES{ "bundle.static_linked_bundles" };
 
 #if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
   typedef std::chrono::monotonic_clock Clock;
@@ -119,21 +120,7 @@ void Bundle::Start()
     }
 #endif
 
-    d->bundleContext = new BundleContext(this->d.get());
-
-    // save this bundle's context so that it can be accessible anywhere
-    // from within this bundle's code.
-    typedef void(*SetBundleContext)(BundleContext*);
-    SetBundleContext setBundleContext = nullptr;
-
-    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + d->info.name;
-    void* setBundleContextSym = BundleUtils::GetSymbol(d->info, set_bundle_context_func.c_str());
-    std::memcpy(&setBundleContext, &setBundleContextSym, sizeof(void*));
-
-    if (setBundleContext)
-    {
-      setBundleContext(d->bundleContext);
-    }
+    d->SetBundleContext(new BundleContext(this->d.get()));
 
     std::string create_activator_func = "_us_create_activator_" + d->info.name;
     void* createActivatorHookSym = BundleUtils::GetSymbol(d->info, create_activator_func.c_str());
@@ -171,7 +158,7 @@ void Bundle::Stop()
       d->coreCtx->listeners.HooksBundleStopped(d->bundleContext);
       d->RemoveBundleResources();
       d->bundleContext.load()->d->Lock(), d->bundleContextOrphans.emplace_back(d->bundleContext), (d->bundleContext.load()->d->bundle = nullptr);
-      d->bundleContext = nullptr;
+      d->SetBundleContext(nullptr);
       d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, this->shared_from_this()));
 
       d->bundleActivator = nullptr;

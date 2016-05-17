@@ -9,6 +9,10 @@
 #define US_RUNTIME_OUTPUT_DIRECTORY "@CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE@"
 #endif
 
+// unable to detect bundle names from bundles with linked resources.
+// see issue#73
+#define US_DISABLE_TESTING_LINKED_RESOURCES
+
 #ifdef US_PLATFORM_WINDOWS
   static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
   static const std::string BIN_PATH = US_RUNTIME_OUTPUT_DIRECTORY;

@@ -42,19 +42,24 @@ namespace {
 // also check that the expected events occur
 void frame020a(BundleContext* context, TestBundleListener& listener)
 {
-  InstallTestBundle(context, "TestBundleB");
-
-  auto bundleB = context->GetBundle("TestBundleB");
-  US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for existing bundle TestBundleB")
+  auto bundle = InstallTestBundle(context, "TestBundleB");
+  US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test for installed bundle TestBundleB")
 
   try
   {
 #if defined (US_BUILD_SHARED_LIBS)
-    auto bundle = context->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + "TestBundleB" + LIB_EXT + "/TestBundleImportedByB");
+    // Since TestBundleImportedByB is statically linked into TestBundleB, InstallBundle
+    // on libTestBundleB will install both TestBundleB and TestBundleImportedByB
+    us::Any staticLinkedBundles = bundle->GetProperty(Bundle::PROP_STATIC_LINKED_BUNDLES);
+    US_TEST_CONDITION_REQUIRED(!staticLinkedBundles.Empty(), "Test for PROP_STATIC_LINKED_BUNDLES property")
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundles.Type() == typeid(std::vector<std::string>), "Test for PROP_STATIC_LINKED_BUNDLES property type")
+    std::vector<std::string> staticLinkedBundlesVec = any_cast<std::vector<std::string> >(staticLinkedBundles);
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundlesVec.size() == 1, "Test for PROP_STATIC_LINKED_BUNDLES vector size")
+    US_TEST_CONDITION_REQUIRED(staticLinkedBundlesVec.at(0) == "TestBundleImportedByB", "Test for static linked bundle name")
 #else
-    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/TestBundleImportedByB");
+    auto bundle = context->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|TestBundleImportedByB");
+    US_TEST_CONDITION_REQUIRED(bundle != nullptr, "Test installation of bundle TestBundleImportedByB")
 #endif
-    US_TEST_CONDITION_REQUIRED(bundle, "Test installation of bundle TestBundleImportedByB")
   }
   catch (const std::exception& e)
   {
@@ -63,7 +68,7 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 
   auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
   US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for existing bundle TestBundleImportedByB")
-
+  auto bundleB = context->GetBundle("TestBundleB");
   US_TEST_CONDITION(bundleB->GetName() == "TestBundleB", "Test bundle name")
   US_TEST_CONDITION(bundleImportedByB->GetName() == "TestBundleImportedByB", "Test bundle name")
 
@@ -83,8 +88,15 @@ void frame020a(BundleContext* context, TestBundleListener& listener)
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
+#if defined(US_BUILD_SHARED_LIBS)
+    // Install event for Statically linked bundleImportedByB is fired before 
+    // the install event for bundleB.
+    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
+#else
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
+#endif
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleImportedByB));
@@ -156,22 +168,23 @@ void frame030b(BundleContext* context, TestBundleListener& listener)
 // Uninstall libB and check for correct events
 void frame040c(BundleContext* context, TestBundleListener& listener)
 {
-    auto bundleB = context->GetBundle("TestBundleB");
-    US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
-
-    auto bundleImportedByB = context->GetBundle("TestBundleImportedByB");
-    US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
-
-    bundleB->Uninstall();
-    US_TEST_CONDITION(context->GetBundles().size() == 2, "Test for uninstall of TestBundleB")
-    bundleImportedByB->Uninstall();
-    US_TEST_CONDITION(context->GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
-
-    std::vector<BundleEvent> pEvts;
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
-
-    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+  std::string bundleBName("TestBundleB"), bundleImportedByBName("TestBundleImportedByB");
+  auto bundleB = context->GetBundle(bundleBName);
+  US_TEST_CONDITION_REQUIRED(bundleB != nullptr, "Test for non-null bundle")
+  
+  auto bundleImportedByB = context->GetBundle(bundleImportedByBName);
+  US_TEST_CONDITION_REQUIRED(bundleImportedByB != nullptr, "Test for non-null bundle")
+  
+  bundleB->Uninstall();
+  US_TEST_CONDITION(context->GetBundle(bundleBName) == nullptr, "Test for uninstall of TestBundleB")
+  bundleImportedByB->Uninstall();
+  US_TEST_CONDITION(context->GetBundle(bundleImportedByBName) == nullptr, "Test for uninstall of TestBundleImportedByB")
+  
+  std::vector<BundleEvent> pEvts;
+  pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
+  
+  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 }
 
 } // end unnamed namespace

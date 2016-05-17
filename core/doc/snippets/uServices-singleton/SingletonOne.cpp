@@ -1,7 +1,5 @@
 #include "SingletonOne.h"
-
 #include "SingletonTwo.h"
-
 
 #include <usGetBundleContext.h>
 #include <usBundleContext.h>

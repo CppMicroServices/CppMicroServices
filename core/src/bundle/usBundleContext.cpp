@@ -79,7 +79,7 @@ std::shared_ptr<Bundle> BundleContext::GetBundle(const std::string& name)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return b->coreCtx->bundleRegistry.GetBundle(name);
+  return b->coreCtx->bundleRegistry.GetBundleByName(name);
 }
 
 std::vector<std::shared_ptr<Bundle>> BundleContext::GetBundles() const
@@ -378,15 +378,14 @@ std::shared_ptr<Bundle> BundleContext::InstallBundle(const std::string& location
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  BundleInfo bundleInfo(GetBundleNameFromLocation(location));
-  bundleInfo.location = GetBundleLocation(location);
-
+  // TODO: Remove the optional bundlename in the location input param
+  // The workaround is to support unittests only.
+  std::string bundleLocation, bundleName;
+  ExtractBundleNameAndLocation(location, bundleLocation, bundleName);
+  BundleInfo bundleInfo(bundleLocation, bundleName);
   auto bundle = b->coreCtx->bundleRegistry.Register(bundleInfo);
-
-  b->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, bundle));
 
   return bundle;
 }
-
 
 }

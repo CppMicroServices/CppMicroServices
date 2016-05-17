@@ -84,16 +84,14 @@ int main(int /*argc*/, char** /*argv*/)
 
   std::vector<std::string> availableBundles = GetExampleBundles();
 
+#if defined (US_BUILD_SHARED_LIBS) // statically linked libraries are auto-installed
   /* install all available bundles for this example */
   for (std::vector<std::string>::const_iterator iter = availableBundles.begin();
       iter != availableBundles.end(); ++iter)
   {
-#if defined (US_BUILD_SHARED_LIBS)
-    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
-#else
-    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
-#endif
+    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT);
   }
+#endif
 
   std::cout << "> ";
   while(std::cin.getline(cmd, sizeof(cmd)))
@@ -163,9 +161,9 @@ int main(int /*argc*/, char** /*argv*/)
               /* Installing a bundle can't be done by id since that is a
                     framework generated piece of information. */
 #if defined (US_BUILD_SHARED_LIBS)
-            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
+            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT);
 #else
-            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
+            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "|" + idOrName);
 #endif
           }
           catch (const std::exception& e)

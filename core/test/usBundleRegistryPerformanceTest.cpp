@@ -49,9 +49,9 @@ namespace
     inline void InstallTestBundleNoErrorHandling(BundleContext* frameworkCtx, const std::string& bundleName)
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "/" + bundleName);
+        frameworkCtx->InstallBundle(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT + "|" + bundleName);
 #else
-        frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "/" + bundleName);
+        frameworkCtx->InstallBundle(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT + "|" + bundleName);
 #endif
     }
 
@@ -71,7 +71,9 @@ namespace
         InstallTestBundleNoErrorHandling(fmc, "TestBundleM");
         InstallTestBundleNoErrorHandling(fmc, "TestBundleR");
         InstallTestBundleNoErrorHandling(fmc, "TestBundleRA");
+#ifndef US_DISABLE_TESTING_LINKED_RESOURCES // FIXME: TestBundleRL uses linker to embed manifest.json on Windows
         InstallTestBundleNoErrorHandling(fmc, "TestBundleRL");
+#endif
         InstallTestBundleNoErrorHandling(fmc, "TestBundleS");
         InstallTestBundleNoErrorHandling(fmc, "TestBundleSL1");
         InstallTestBundleNoErrorHandling(fmc, "TestBundleSL3");
@@ -100,8 +102,11 @@ namespace
         // the performance of concurrent access to the bundle registry.
         // At any point in which real customer usage in a concurrent way becomes known,
         // it would be ideal to model it as a test.
-
-        const std::size_t numTestBundles = 13;  // 12 test bundles + the system bundle
+#ifdef US_DISABLE_TESTING_LINKED_RESOURCES // FIXME: TestBundleRL uses linker to embed manifest.json on Windows
+        const std::size_t numTestBundles = 12;  // 11 test bundles + the system bundle 
+#else
+        const std::size_t numTestBundles = 13;  // 12 test bundles + the system bundle 
+#endif
         const int numTestThreads = 100;
         std::vector<std::thread> threads;
         for (int i = 0; i < numTestThreads; ++i)

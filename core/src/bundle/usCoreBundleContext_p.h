@@ -47,7 +47,7 @@ public:
   void EndResolve(BundlePrivate*) {}
 };
 
-class BundleStorage;
+struct BundleStorage;
 class BundleThread;
 class FrameworkPrivate;
 

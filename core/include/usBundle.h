@@ -571,7 +571,7 @@ public:
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    */
-  void Start(uint32_t options);
+  virtual void Start(uint32_t options);
 
   /**
    * Starts this bundle with no options.
@@ -583,7 +583,7 @@ public:
    *         bundle tries to change its own state.
    * @see #Start(uint32_t)
    */
-  void Start();
+  virtual void Start();
 
   /**
    * Stops this bundle.
@@ -640,7 +640,7 @@ public:
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    */
-  void Stop(uint32_t options);
+  virtual void Stop(uint32_t options);
 
   /**
    * Stops this bundle with no options.
@@ -652,7 +652,7 @@ public:
    *         bundle tries to change its own state.
    * @see #Stop(uint32_t)
    */
-  void Stop();
+  virtual void Stop();
 
   /**
    * Uninstalls this bundle.
@@ -693,7 +693,7 @@ public:
    *         bundle tries to change its own state.
    * @see #Stop()
    */
-  void Uninstall();
+  virtual void Uninstall();
 
 protected:
 

@@ -37,6 +37,7 @@
 #include "usCoreConfig.h"
 
 #include "usSharedLibrary.h"
+#include "usUtils_p.h"
 
 #include <thread>
 #include <chrono>
@@ -165,7 +166,7 @@ void Bundle::Uninstall()
           d->WaitOnOperation(d->coreCtx->resolver, l, "Bundle::Uninstall", true);
           d->operation = BundlePrivate::OP_UNINSTALLING;
         }
-        catch (const std::exception& e)
+        catch (const std::exception& )
         {
           // Make sure that bundleContext is invalid
           std::shared_ptr<BundleContextPrivate> ctx;
@@ -203,7 +204,7 @@ void Bundle::Uninstall()
       {
         try
         {
-          if (fs::Exists(d->bundleDir)) fs::RemoveDirectory(d->bundleDir);
+          if (fs::Exists(d->bundleDir)) fs::RemoveDirectoryRecursive(d->bundleDir);
         }
         catch (const std::exception& e)
         {

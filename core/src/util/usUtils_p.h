@@ -50,7 +50,7 @@ namespace fs {
 // Platform agnostic way to get the current working directory.
 // Supports Linux, Mac, and Windows.
 std::string GetCurrentWorkingDirectory();
-
+bool not_found_error(int errval);
 bool Exists(const std::string& path);
 
 bool IsDirectory(const std::string& path);
@@ -61,7 +61,7 @@ std::string GetAbsolute(const std::string& path);
 
 void MakePath(const std::string& path);
 
-void RemoveDirectory(const std::string& path);
+US_Core_EXPORT void RemoveDirectoryRecursive(const std::string& path);
 
 }
 
@@ -98,9 +98,7 @@ std::string GetFrameworkDir(CoreBundleContext* ctx);
  *
  * @return A directory path or an empty string if no storage is available.
  */
-std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create);
-
-std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name);
+std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create = true);
 
 }
 

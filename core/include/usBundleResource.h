@@ -35,7 +35,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now se
 namespace us {
 
 class BundleResourcePrivate;
-class BundleArchive;
+struct BundleArchive;
 
 /**
  * \ingroup MicroServices

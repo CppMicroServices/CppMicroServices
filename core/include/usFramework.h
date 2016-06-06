@@ -153,7 +153,7 @@ public:
      * @throws std::runtime_error If this Framework could not be started.
      * @see #Start()
      */
-    void Start(int options);
+    void Start(uint32_t options);
 
     /**
      * Stop this Framework.
@@ -195,7 +195,7 @@ public:
      *         initiated.
      * @see #Stop()
      */
-    void stop(int options);
+    void Stop(uint32_t options);
 
     /**
      * The Framework cannot be uninstalled.

@@ -66,7 +66,7 @@ static inline BundleContext GetBundleContext()
     return ctx ? MakeBundleContext(ctx->shared_from_this()) : BundleContext{};
   }
 
-  return {};
+  return BundleContext{};
 }
 
 }

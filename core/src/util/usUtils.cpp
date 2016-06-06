@@ -22,7 +22,6 @@
 
 #include "usUtils_p.h"
 
-#include "usGetBundleContext.h"
 #include "usCoreBundleContext_p.h"
 #include "usFramework.h"
 #include "usLog.h"
@@ -52,7 +51,9 @@
     #define WIN32_LEAN_AND_MEAN
   #endif
   #include <windows.h>
+  #include <Shlwapi.h>
   #include <crtdbg.h>
+  #include <direct.h>
   #include "dirent_win32.h"
 
   #define US_STAT struct _stat
@@ -98,7 +99,7 @@ bool not_found_error(int errval)
       || errval == ERROR_INVALID_PARAMETER  // ":sys:stat.h"
       || errval == ERROR_BAD_PATHNAME       // "//nosuch" on Win64
       || errval == ERROR_BAD_NETPATH;       // "//nosuch" on Win32
-  }
+
 #else
   return errval == ENOENT || errval == ENOTDIR;
 #endif
@@ -153,10 +154,10 @@ bool Exists(const std::string& path)
     else throw std::invalid_argument(GetLastErrorStr());
   }
 #else
-  DWORD attr(::GetFileAttributesW(path.c_str()));
+  DWORD attr(::GetFileAttributes(path.c_str()));
   if (attr == INVALID_FILE_ATTRIBUTES)
   {
-    if (not_found_error(::GetLastError())) return false
+    if (not_found_error(::GetLastError())) return false;
     else throw std::invalid_argument(GetLastErrorStr());
   }
 #endif
@@ -189,7 +190,7 @@ bool IsRelative(const std::string& path)
 {
 #ifdef US_PLATFORM_WINDOWS
   if (path.size() > MAX_PATH) return false;
-  return ::PathIsRelative(path.c_str());
+  return (TRUE == ::PathIsRelative(path.c_str()))? true:false;
 #else
   return path.empty() || path[0] != DIR_SEP;
 #endif
@@ -219,7 +220,11 @@ void MakePath(const std::string& path)
   for (; iter != dirs.end(); ++iter)
   {
     subPath += *iter;
+#ifdef US_PLATFORM_WINDOWS
+    if (us_mkdir(subPath.c_str()))
+#else
     if (us_mkdir(subPath.c_str(), S_IRWXU))
+#endif
     {
       if (GetLastErrorNo() != EEXIST) throw std::invalid_argument(GetLastErrorStr());
     }
@@ -227,7 +232,7 @@ void MakePath(const std::string& path)
   }
 }
 
-void RemoveDirectory(const std::string& path)
+void RemoveDirectoryRecursive(const std::string& path)
 {
   int res = -1;
   DIR* dir = opendir(path.c_str());
@@ -252,7 +257,7 @@ void RemoveDirectory(const std::string& path)
           (IsDirectory(child))
 #endif
       {
-        RemoveDirectory(child);
+        RemoveDirectoryRecursive(child);
       }
       else
       {
@@ -339,12 +344,6 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
   }
   return dir;
 }
-
-std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name)
-{
-  return GetFileStorage(ctx, name, true);
-}
-
 
 //-------------------------------------------------------------------
 // Error handling

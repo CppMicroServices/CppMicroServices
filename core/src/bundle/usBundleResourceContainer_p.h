@@ -33,7 +33,7 @@
 
 namespace us {
 
-class BundleArchive;
+struct BundleArchive;
 class BundleResource;
 
 class BundleResourceContainer : public std::enable_shared_from_this<BundleResourceContainer>

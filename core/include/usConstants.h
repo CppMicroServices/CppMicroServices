@@ -46,13 +46,13 @@ namespace Constants {
  * Location identifier of the OSGi <i>system bundle </i>, which is defined
  * to be &quot;System Bundle&quot;.
  */
-extern const std::string SYSTEM_BUNDLE_LOCATION; // = "System Bundle";
+US_Core_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "System Bundle";
 
 /**
  * Alias for the symbolic name of the OSGi <i>system bundle </i>. It is
  * defined to be &quot;system.bundle&quot;.
  */
-extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
+US_Core_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
 
 /**
  * Manifest header identifying the bundle's category.
@@ -60,7 +60,7 @@ extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
+US_Core_EXPORT extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
 
 /**
  * Manifest header identifying the bundle's copyright information.
@@ -68,7 +68,7 @@ extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
+US_Core_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
 
 /**
  * Manifest header containing a brief description of the bundle's
@@ -77,7 +77,15 @@ extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
+US_Core_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
+
+/**
+ * Manifest header identifying the bundle's menifest version.
+ * <p>
+ * The header value may be retrieved via the {@code Bundle::GetProperty}
+ * method.
+ */
+US_Core_EXPORT extern const std::string BUNDLE_MANIFESTVERSION; // = "bundle.manifest_version";
 
 /**
  * Manifest header identifying the bundle's name.
@@ -85,7 +93,7 @@ extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_NAME; // = "bundle.name";
+US_Core_EXPORT extern const std::string BUNDLE_NAME; // = "bundle.name";
 
 /**
  * Manifest header identifying the bundle's vendor.
@@ -94,7 +102,7 @@ extern const std::string BUNDLE_NAME; // = "bundle.name";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
+US_Core_EXPORT extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
 
 /**
  * Manifest header identifying the bundle's version.
@@ -103,7 +111,7 @@ extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_VERSION; // = "bundle.version";
+US_Core_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.version";
 
 /**
  * Manifest header identifying the bundle's documentation URL, from which
@@ -113,7 +121,7 @@ extern const std::string BUNDLE_VERSION; // = "bundle.version";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
+US_Core_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
 
 /**
  * Manifest header identifying the contact address where problems with the
@@ -123,7 +131,7 @@ extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
+US_Core_EXPORT extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
 
 /**
  * Manifest header identifying the bundle's symbolic name.
@@ -132,7 +140,7 @@ extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
+US_Core_EXPORT extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
 
 /**
  * Manifest header identifying the bundle's activation policy.
@@ -142,7 +150,7 @@ extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
  *
  * @see #ACTIVATION_LAZY
  */
-extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bundle.activation_policy";
+US_Core_EXPORT extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bundle.activation_policy";
 
 /**
  * Bundle activation policy declaring the bundle must be activated when the
@@ -164,7 +172,7 @@ extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bundle.activation_policy
  * @see Bundle#Start(uint32_t)
  * @see Bundle#START_ACTIVATION_POLICY
  */
-extern const std::string ACTIVATION_LAZY; // = "lazy";
+US_Core_EXPORT extern const std::string ACTIVATION_LAZY; // = "lazy";
 
 /**
  * Framework environment property identifying the Framework version.
@@ -173,7 +181,7 @@ extern const std::string ACTIVATION_LAZY; // = "lazy";
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
+US_Core_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
 
 /**
  * Framework environment property identifying the Framework implementation
@@ -183,7 +191,7 @@ extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
+US_Core_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
 
 /**
  * Framework launching property specifying the persistent storage area used
@@ -197,7 +205,7 @@ extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.
  * If this property is not set, the framework uses the "fwdir" directory in
  * the current working directory for the persistent storage area.
  */
-extern const std::string FRAMEWORK_STORAGE; // = "org.cppmicroservices.framework.storage";
+US_Core_EXPORT extern const std::string FRAMEWORK_STORAGE; // = "org.cppmicroservices.framework.storage";
 
 /**
  * Framework launching property specifying if and when the persistent
@@ -206,7 +214,7 @@ extern const std::string FRAMEWORK_STORAGE; // = "org.cppmicroservices.framework
  *
  * @see #FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
  */
-extern const std::string FRAMEWORK_STORAGE_CLEAN; // = "org.cppmicroservices.framework.storage.clean";
+US_Core_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN; // = "org.cppmicroservices.framework.storage.clean";
 
 /**
  * Specifies that the framework storage area must be cleaned before the
@@ -214,7 +222,7 @@ extern const std::string FRAMEWORK_STORAGE_CLEAN; // = "org.cppmicroservices.fra
  * updates of the framework will not result in cleaning the framework
  * storage area.
  */
-extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // = "onFirstInit";
+US_Core_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // = "onFirstInit";
 
 /**
  * The framework's threading support property key name.
@@ -228,7 +236,7 @@ extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // = "onFirstInit"
  *
  * @see \ref BuildInstructions
  */
-extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
+US_Core_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
 
 /**
  * The framework's log level property key name.
@@ -236,7 +244,7 @@ extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices
  *
  * @see MsgType
  */
-extern const std::string FRAMEWORK_LOG_LEVEL; // = "org.cppmicroservices.framework.log.level";
+US_Core_EXPORT extern const std::string FRAMEWORK_LOG_LEVEL; // = "org.cppmicroservices.framework.log.level";
 
 /**
  * Framework environment property identifying the Framework's universally
@@ -250,7 +258,7 @@ extern const std::string FRAMEWORK_LOG_LEVEL; // = "org.cppmicroservices.framewo
  * The header value may be retrieved via the {@code Bundle::GetProperty}
  * method.
  */
-extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
+US_Core_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
 
 
 /*
@@ -265,7 +273,7 @@ extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uu
  * <p>
  * This property is set by the Framework when a service is registered.
  */
-extern const std::string OBJECTCLASS; // = "objectclass";
+US_Core_EXPORT extern const std::string OBJECTCLASS; // = "objectclass";
 
 /**
  * Service property identifying a service's registration number. The value
@@ -277,7 +285,7 @@ extern const std::string OBJECTCLASS; // = "objectclass";
  * previously assigned values since the Framework was started. These values
  * are NOT persistent across restarts of the Framework.
  */
-extern const std::string SERVICE_ID; // = "service.id";
+US_Core_EXPORT extern const std::string SERVICE_ID; // = "service.id";
 
 /**
  * Service property identifying a service's persistent identifier.
@@ -298,7 +306,7 @@ extern const std::string SERVICE_ID; // = "service.id";
  * by a dot (.). A bundle may use this as the prefix of the persistent
  * identifiers for the services it registers.
  */
-extern const std::string SERVICE_PID; // = "service.pid";
+US_Core_EXPORT extern const std::string SERVICE_PID; // = "service.pid";
 
 /**
  * Service property identifying a service's ranking number.
@@ -325,7 +333,7 @@ extern const std::string SERVICE_PID; // = "service.pid";
  * If the supplied property value is not of type <code>int</code>, it is
  * deemed to have a ranking value of zero.
  */
-extern const std::string SERVICE_RANKING; // = "service.ranking";
+US_Core_EXPORT extern const std::string SERVICE_RANKING; // = "service.ranking";
 
 /**
  * Service property identifying a service's vendor.
@@ -334,7 +342,7 @@ extern const std::string SERVICE_RANKING; // = "service.ranking";
  * This property may be supplied in the properties {@code ServiceProperties} object
  * passed to the {@code BundleContext#RegisterService} method.
  */
-extern const std::string SERVICE_VENDOR; //	= "service.vendor";
+US_Core_EXPORT extern const std::string SERVICE_VENDOR; //	= "service.vendor";
 
 /**
  * Service property identifying a service's description.
@@ -343,7 +351,7 @@ extern const std::string SERVICE_VENDOR; //	= "service.vendor";
  * This property may be supplied in the properties {@code ServiceProperties} object
  * passed to the {@code BundleContext#RegisterService} method.
  */
-extern const std::string SERVICE_DESCRIPTION; // = "service.description";
+US_Core_EXPORT extern const std::string SERVICE_DESCRIPTION; // = "service.description";
 
 /**
  * Service property identifying a service's scope.
@@ -354,7 +362,7 @@ extern const std::string SERVICE_DESCRIPTION; // = "service.description";
  * be SCOPE_BUNDLE. Otherwise, the value of this service property will be
  * SCOPE_SINGLETON.
  */
-extern const std::string SERVICE_SCOPE; // = "service.scope"
+US_Core_EXPORT extern const std::string SERVICE_SCOPE; // = "service.scope"
 
 /**
  * Service scope is singleton. All bundles using the service receive the same
@@ -362,7 +370,7 @@ extern const std::string SERVICE_SCOPE; // = "service.scope"
  *
  * @see SERVICE_SCOPE
  */
-extern const std::string SCOPE_SINGLETON; // = "singleton"
+US_Core_EXPORT extern const std::string SCOPE_SINGLETON; // = "singleton"
 
 /**
  * Service scope is bundle. Each bundle using the service receives a distinct
@@ -370,7 +378,7 @@ extern const std::string SCOPE_SINGLETON; // = "singleton"
  *
  * @see SERVICE_SCOPE
  */
-extern const std::string SCOPE_BUNDLE; // = "bundle"
+US_Core_EXPORT extern const std::string SCOPE_BUNDLE; // = "bundle"
 
 /**
  * Service scope is prototype. Each bundle using the service receives either
@@ -379,7 +387,7 @@ extern const std::string SCOPE_BUNDLE; // = "bundle"
  *
  * @see SERVICE_SCOPE
  */
-extern const std::string SCOPE_PROTOTYPE; // = "prototype"
+US_Core_EXPORT extern const std::string SCOPE_PROTOTYPE; // = "prototype"
 
 }
 

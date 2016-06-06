@@ -43,7 +43,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   struct Data
   {
-    int64_t bundleId;
+    long bundleId;
     int64_t lastModified;
     int32_t autostartSetting;
   };

@@ -741,7 +741,7 @@ public:
 
 private:
 
-  friend BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
+  friend US_Core_EXPORT BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
   BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);

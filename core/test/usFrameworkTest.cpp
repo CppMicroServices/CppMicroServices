@@ -31,6 +31,10 @@ limitations under the License.
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
 using namespace us;
 
 namespace

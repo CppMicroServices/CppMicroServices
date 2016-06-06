@@ -198,7 +198,7 @@ private:
   friend class ServiceRegistry;
   friend class LDAPFilter;
 
-  template<class S> friend class ServiceHolder;
+  template<class S> friend struct ServiceHolder;
   template<class S> friend class ServiceReference;
 
   friend class ::std::hash<ServiceReferenceBase>;

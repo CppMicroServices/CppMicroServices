@@ -50,6 +50,11 @@ FrameworkEvent Framework::WaitForStop(const std::chrono::milliseconds& timeout)
   return pimpl(d)->WaitForStop(timeout);
 }
 
+void Framework::Start(uint32_t )
+{
+  Start();
+}
+
 void Framework::Start()
 {
   std::vector<long> bundlesToStart;
@@ -108,6 +113,11 @@ void Framework::Start()
   d->NotifyAll();
   // $TODO
   // pimpl(d)->coreCtx->listeners.FrameworkEvent(FrameworkEvent(FrameworkEvent::STARTED, this->shared_from_this(), std::exception_ptr()));
+}
+
+void Framework::Stop(uint32_t )
+{
+  Stop();
 }
 
 void Framework::Stop()

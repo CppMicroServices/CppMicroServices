@@ -191,19 +191,19 @@ void frame025a()
 void frame020b()
 {
   buA = testing::InstallLib(bc, "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(buA, "Test for existing bundle TestBundleA")
+  US_TEST_CONDITION_REQUIRED(buA, "Test for existing bundle TestBundleA");
 
   buA.Start();
 
-  US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == "/tmp", "Test for valid base storage path")
+  US_TEST_CONDITION(bc.GetBundle().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   // launching properties should be accessible through any bundle
-  US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == "/tmp", "Test for valid base storage path")
+  US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
-  std::cout << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = "/tmp" + DIR_SEP + "data" + DIR_SEP + std::to_string(buA.GetBundleId()) + DIR_SEP;
-  US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path")
-  US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == baseStoragePath + "bla", "Test for valid data file path")
+  std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
+  const std::string baseStoragePath = testing::GetTempDirectory() + DIR_SEP + "data" + DIR_SEP + std::to_string(buA.GetBundleId()) + DIR_SEP;
+  US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
+  US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 
   US_TEST_CONDITION(buA.GetState() & Bundle::STATE_ACTIVE, "Test if started correctly");
 }
@@ -550,7 +550,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   {
     FrameworkFactory factory;
     std::map<std::string, Any> frameworkConfig;
-    frameworkConfig[Constants::FRAMEWORK_STORAGE] = std::string("/tmp");
+    frameworkConfig[Constants::FRAMEWORK_STORAGE] = testing::GetTempDirectory();
     auto framework = factory.NewFramework(frameworkConfig);
     framework.Start();
 

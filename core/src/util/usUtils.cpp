@@ -222,12 +222,15 @@ void MakePath(const std::string& path)
     subPath += *iter;
 #ifdef US_PLATFORM_WINDOWS
     if (us_mkdir(subPath.c_str()))
+    {
+      if (GetLastErrorNo() != ERROR_ALREADY_EXISTS) throw std::invalid_argument(GetLastErrorStr());
+    }
 #else
     if (us_mkdir(subPath.c_str(), S_IRWXU))
-#endif
     {
       if (GetLastErrorNo() != EEXIST) throw std::invalid_argument(GetLastErrorStr());
     }
+#endif
     subPath += DIR_SEP;
   }
 }

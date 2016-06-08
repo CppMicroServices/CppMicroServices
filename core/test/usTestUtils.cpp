@@ -28,6 +28,10 @@ limitations under the License.
 
 #include <usGlobalConfig.h>
 
+#if defined(US_PLATFORM_WINDOWS)
+#include <Shlobj.h> // SHGetKnownFolderPath
+#endif
+
 namespace us {
 
 #if defined(US_PLATFORM_APPLE)
@@ -146,6 +150,21 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
       if (b.GetSymbolicName() == libName) return b;
     }
     return {};
+}
+
+std::string GetTempDirectory() 
+{
+#if defined (US_PLATFORM_WINDOWS)
+  std::wstring temp_dir;
+  PWSTR buffer = nullptr;
+  HRESULT rc = SHGetKnownFolderPath(FOLDERID_ProgramData, KF_FLAG_DEFAULT, nullptr, &buffer);
+
+  if (SUCCEEDED(rc)) temp_dir = buffer;
+  if (buffer) CoTaskMemFree(static_cast<void*>(buffer));
+  return std::string(temp_dir.cbegin(), temp_dir.cend());
+#else
+  return std::string("/tmp");
+#endif
 }
 
 std::string GetCurrentWorkingDirectory()

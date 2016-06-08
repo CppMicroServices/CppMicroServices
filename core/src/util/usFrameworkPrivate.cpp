@@ -96,7 +96,8 @@ void FrameworkPrivate::InitSystemBundle()
 
 void FrameworkPrivate::UninitSystemBundle()
 {
-  bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>())->Invalidate();
+  auto bc = bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
+  if (bc) bc->Invalidate();
 }
 
 FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& timeout)

@@ -95,6 +95,11 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
 
 std::string GetCurrentWorkingDirectory();
 
+/**
+* Returns a platform appropriate location for use as temporary storage.
+*/
+std::string GetTempDirectory();
+
 Bundle GetBundle(
     const std::string& bsn,
     BundleContext context = BundleContext()

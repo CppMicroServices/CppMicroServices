@@ -158,7 +158,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
   Clock::time_point waitUntil = Clock::now() + left;
   do
   {
-    fwCtx->resolver.WaitFor(resolveLock, left);
+    fwCtx->resolver.WaitFor(resolveLock, std::chrono::milliseconds(1));
 
     // Abort start/stop operation if bundle has been uninstalled
     if ((op == OP_START || op == OP_STOP) && b->state == Bundle::STATE_UNINSTALLED)

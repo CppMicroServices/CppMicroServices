@@ -704,7 +704,7 @@ BundlePrivate::BundlePrivate(
       }
       catch (const std::exception& e)
       {
-        US_ERROR << "Parsing of manifest.json for bundle " << location << " failed: " << e.what();
+        US_ERROR << "Parsing of manifest.json for bundle " << symbolicName << " at " << location << " failed: " << e.what();
       }
     }
   }
@@ -730,19 +730,19 @@ BundlePrivate::BundlePrivate(
     if (!errMsg.empty())
     {
       throw std::invalid_argument(std::string("The Json value for ") + Constants::BUNDLE_VERSION + " for bundle " +
-                                  location + " is not valid: " + errMsg);
+                                  symbolicName + " is not valid: " + errMsg);
     }
   }
 
   if (!bundleManifest.Contains(Constants::BUNDLE_SYMBOLICNAME))
   {
-    throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is not defined in the bundle manifest.");
+    throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is not defined in the bundle manifest for bundle " + symbolicName + ".");
   }
 
   Any bsn(bundleManifest.GetValue(Constants::BUNDLE_SYMBOLICNAME));
   if (bsn.Empty())
   {
-    throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is empty in the bundle manifest.");
+    throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is empty in the bundle manifest for bundle " + symbolicName + ".");
   }
 
   // $TODO extensions

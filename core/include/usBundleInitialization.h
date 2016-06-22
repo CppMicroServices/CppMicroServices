@@ -46,10 +46,7 @@ class BundleContextPrivate;
  * set to a bundle-unique identifier.
  *
  * Calling the \c US_INITIALIZE_BUNDLE macro will initialize the bundle for use with
- * the CppMicroServices library, using a default auto-load directory named after the
- * \c US_BUNDLE_NAME definition.
- *
- * \sa MicroServices_AutoLoading
+ * the CppMicroServices library.
  *
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateBundleInit()</code>.

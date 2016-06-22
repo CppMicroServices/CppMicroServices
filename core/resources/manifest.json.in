@@ -1,1 +1,1 @@
-{ "bundle.name" : "@CMAKE_PROJECT_NAME@", "bundle.version" : "@CppMicroServices_VERSION@" }
+{ "bundle.symbolic_name" : "system_bundle", "bundle.version" : "@CppMicroServices_VERSION@" }

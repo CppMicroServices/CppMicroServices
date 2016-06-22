@@ -51,6 +51,7 @@ namespace
 #if defined (US_BUILD_SHARED_LIBS)
         frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT);
 #else
+        US_UNUSED(bundleName);
         frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
 #endif
     }

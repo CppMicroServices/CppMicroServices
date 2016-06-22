@@ -93,7 +93,7 @@ int main(int /*argc*/, char** /*argv*/)
     installedBundles.insert(installedBundles.end(), bundles.begin(), bundles.end());
   }
 #else
-  installedBundles = framework->GetBundleContext()->InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT);
+  installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT);
 #endif
 
   std::unordered_map<std::string, Bundle> symbolicNameToBundle;
@@ -259,7 +259,7 @@ int main(int /*argc*/, char** /*argv*/)
 }
 
 #ifndef US_BUILD_SHARED_LIBS
-US_IMPORT_BUNDLE(CppMicroServices)
+US_INITIALIZE_STATIC_BUNDLE(system_bundle)
 US_IMPORT_BUNDLE(eventlistener)
 US_IMPORT_BUNDLE(dictionaryservice)
 US_IMPORT_BUNDLE(spellcheckservice)

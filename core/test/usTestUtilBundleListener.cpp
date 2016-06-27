@@ -22,6 +22,8 @@
 
 #include "usTestUtilBundleListener.h"
 
+#include <usBundle.h>
+
 namespace us {
 
 TestBundleListener::TestBundleListener()

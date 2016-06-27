@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include <usConstants.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 #include <usFrameworkEvent.h>
@@ -97,39 +98,36 @@ private:
 void testStartStopFrameworkEvents() 
 {
   auto f = FrameworkFactory().NewFramework();
-  f->Start();
-
-  // @todo once Framework::init() is implemented, add the listener after the init()
-  // and before the Start().
+  
   TestFrameworkListener l;
-  f->GetBundleContext()->AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
-  f->Stop();
+  f.Init();
+  f.GetBundleContext().AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
+  f.Start();
+  f.Stop();
 
   std::vector<FrameworkEvent> events;
-  events.push_back(FrameworkEvent(FrameworkEvent::Type::STARTING, f->shared_from_this(), "Framework Starting"));
-  events.push_back(FrameworkEvent(FrameworkEvent::Type::STARTED, f->shared_from_this(), "Framework Started"));
-  events.push_back(FrameworkEvent(FrameworkEvent::Type::STOPPING, f->shared_from_this(), "Framework Stopping"));
-  events.push_back(FrameworkEvent(FrameworkEvent::Type::STOPPED, f->shared_from_this(), "Framework Stopped"));
+  events.push_back(FrameworkEvent(FrameworkEvent::Type::STARTED, f, "Framework Started"));
   US_TEST_CONDITION_REQUIRED(l.CheckEvents(events), "Test for the correct number and order of Framework start/stop events.");
 }
 
 void testAddRemoveFrameworkListener() 
 {
   auto f = FrameworkFactory().NewFramework();
-  f->Start();
+  f.Start();
+  BundleContext fCtx{ f.GetBundleContext() };
 
   // Test that the lambda is removed correctly if the lambda is referenced in a variable
   auto listener = [](const FrameworkEvent&) { US_TEST_FAILED_MSG(<< "Failed to remove framework listener"); };
-  f->GetBundleContext()->AddFrameworkListener(listener);
-  f->GetBundleContext()->RemoveFrameworkListener(listener);
+  fCtx.AddFrameworkListener(listener);
+  fCtx.RemoveFrameworkListener(listener);
 
   // test listener removal...
   TestFrameworkListener l;
-  f->GetBundleContext()->AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
-  f->GetBundleContext()->RemoveFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
+  fCtx.AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
+  fCtx.RemoveFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
 
-  f->Start();   // generate framework events
-  US_TEST_CONDITION_REQUIRED(l.CheckEvents(std::vector<FrameworkEvent>()), "Test removal of listener");
+  f.Start();   // generate framework event
+  US_TEST_CONDITION(l.CheckEvents(std::vector<FrameworkEvent>()), "Test removal of listener");
 
   int count1(0);
   int count2(0);
@@ -137,37 +135,38 @@ void testAddRemoveFrameworkListener()
   auto listener_callback_counter2 = [&count2](const FrameworkEvent&) { ++count2; std::cout << "listener_callback_counter2: call count " << count2 << std::endl; };
   auto listener_callback_throw = [](const FrameworkEvent&) { throw std::runtime_error("boo"); };
   // @fixme issue #95 ... can't add more than one lambda defined listener
-  f->GetBundleContext()->AddFrameworkListener(listener_callback_counter1);
-  f->GetBundleContext()->AddFrameworkListener(listener_callback_counter2);
-  f->GetBundleContext()->AddFrameworkListener(listener_callback_throw);
+  fCtx.AddFrameworkListener(listener_callback_counter1);
+  fCtx.AddFrameworkListener(listener_callback_counter2);
+  fCtx.AddFrameworkListener(listener_callback_throw);
 
-  // generate 2 framework events (starting, started)
-  f->Start();
-  US_TEST_CONDITION_REQUIRED(count1 == 2, "Test that multiple framework listeners were called");
-  US_TEST_CONDITION_REQUIRED(count2 == 2, "Test that multiple framework listeners were called");
+  f.Start();    // generate framework event (started)
+  US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were called");
+  US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were called");
 
-  f->GetBundleContext()->RemoveFrameworkListener(listener_callback_counter1);
-  f->GetBundleContext()->RemoveFrameworkListener(listener_callback_counter2);
-  f->GetBundleContext()->RemoveFrameworkListener(listener_callback_throw);
-  // generate 2 framework events (starting, started)
-  f->Start();
-  US_TEST_CONDITION_REQUIRED(count1 == 2, "Test that multiple framework listeners were NOT called after removal");
-  US_TEST_CONDITION_REQUIRED(count2 == 2, "Test that multiple framework listeners were NOT called after removal");
+  fCtx.RemoveFrameworkListener(listener_callback_counter1);
+  fCtx.RemoveFrameworkListener(listener_callback_counter2);
+  fCtx.RemoveFrameworkListener(listener_callback_throw);
+
+  f.Start();    // generate framework event (started)
+  US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were NOT called after removal");
+  US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were NOT called after removal");
 }
 
 void testFrameworkListenersAfterFrameworkStop() 
 {
   auto f = FrameworkFactory().NewFramework();
-  f->Start();
-  // OSGi section 10.2.2.13 (Framework::stop API) says that event handling must be "disabled".
-  // It does not say that existing framework listeners MUST be removed.
-  // @assumption Framework listeners are still registered across Framework start/stop.
+  f.Init();
+  // OSGi section 10.2.2.13 (Framework::stop API):
+  //    4. Event handling is disabled.
+  //    6. All resources held by this Framework are released.
+  // The assumption is that framework listeners are one such resource described in step #6.
   int events(0);
   auto listener = [&events](const FrameworkEvent& evt) { ++events; std::cout << evt << std::endl; };
-  f->GetBundleContext()->AddFrameworkListener(listener);
-  f->Stop();
-  f->Start();
-  US_TEST_CONDITION_REQUIRED(events == 4 , "Test that the existing listener was used again on Framework Start");
+  f.GetBundleContext().AddFrameworkListener(listener);
+  f.Start();    // generate framework event (started)
+  f.Stop();     // resources (such as framework listeners) are released
+  f.Start();    // generate framework event (started) with no listener to see it
+  US_TEST_CONDITION(events == 1 , "Test that listeners were released on Framework Stop");
 }
 
 void testFrameworkListenerThrowingInvariant() 
@@ -186,9 +185,8 @@ void testFrameworkListenerThrowingInvariant()
   // Use a redirected logger to verify that the framework listener logged an
   // error message when it encountered a FrameworkEvent::ERROR coming from
   // a framework listener.
-  std::map<std::string, us::Any> config{ {Framework::PROP_LOG, true} };
-  auto f = FrameworkFactory().NewFramework(config, &sink);
-  f->Start();
+  auto f = FrameworkFactory().NewFramework(std::map<std::string, us::Any>{ { Constants::FRAMEWORK_LOG, true } }, &sink);
+  f.Start();
   
   bool fwk_error_received(false);
   std::string exception_string("bad callback");
@@ -209,46 +207,42 @@ void testFrameworkListenerThrowingInvariant()
       }
     };
  
-  f->GetBundleContext()->AddFrameworkListener(listener);
+  f.GetBundleContext().AddFrameworkListener(listener);
 
   // test bundle event listener
-  f->GetBundleContext()->AddBundleListener([](const BundleEvent&) { throw std::runtime_error("bad callback"); });
-  f->Stop();
-  US_TEST_CONDITION_REQUIRED(fwk_error_received, "Test that a Framework ERROR event was received from a throwing bundle listener");
-  
-  f->Start();
-  // @todo fix this. framework listeners should persist across framework start/stop (OSGi section 10.2.2.13)
-  f->GetBundleContext()->AddFrameworkListener(listener);
+  auto bl = [](const BundleEvent&) { throw std::runtime_error("bad callback"); };
+  f.GetBundleContext().AddBundleListener(bl);
+  f.Start();    // generates a bundle event
+  US_TEST_CONDITION(fwk_error_received, "Test that a Framework ERROR event was received from a throwing bundle listener");
+  f.GetBundleContext().RemoveBundleListener(bl);
 
   // test service event listener
   fwk_error_received = false;
   exception_string = "you sunk my battleship";
-  f->GetBundleContext()->AddServiceListener([](const ServiceEvent&) { throw std::runtime_error("you sunk my battleship");  });
-  auto bundleA = InstallTestBundle(f->GetBundleContext(), "TestBundleA");
-  bundleA->Start();
-
-  US_TEST_CONDITION_REQUIRED(fwk_error_received, "Test that a Framework ERROR event was received from a throwing service listener");
+  auto sl = [](const ServiceEvent&) { throw std::runtime_error("you sunk my battleship");  };
+  f.GetBundleContext().AddServiceListener(sl);
+  auto bundleA = testing::InstallLib(f.GetBundleContext(), "TestBundleA");
+  bundleA.Start();  // generate a service event
+  US_TEST_CONDITION(fwk_error_received, "Test that a Framework ERROR event was received from a throwing service listener");
+  f.GetBundleContext().RemoveServiceListener(sl);
 
   // test framework event listener
   fwk_error_received = false;
   exception_string = "whoopsie!";
   // @fixme issue #95. can't add another framework listener as a lambda
-  f->GetBundleContext()->AddFrameworkListener([](const FrameworkEvent&) { throw std::runtime_error("whoopsie!"); });
+  f.GetBundleContext().AddFrameworkListener([](const FrameworkEvent&) { throw std::runtime_error("whoopsie!"); });
   // Minimally, an infinite loop will appear here if there is a problem.
-  f->Stop();
-  US_TEST_CONDITION_REQUIRED(false == fwk_error_received, "Test that a Framework ERROR event was NOT received from a throwing framework listener");
-  US_TEST_CONDITION_REQUIRED(std::string::npos != logstream.str().find("A Framework Listener threw an exception:"), "Test for internal log message from Framework event handler");
-  // @todo this will cause a crash due to the framework bundle context being destroyed on Stop().
-  //  fix this once Framework::init() is implemented. 
-  //  framework listeners should persist across framework start/stop (OSGi section 10.2.2.13)
-  //f->GetBundleContext()->RemoveFrameworkListener(listener);
+  f.Start();    // generates a framework event
+  US_TEST_CONDITION(false == fwk_error_received, "Test that a Framework ERROR event was NOT received from a throwing framework listener");
+  US_TEST_CONDITION(std::string::npos != logstream.str().find("A Framework Listener threw an exception:"), "Test for internal log message from Framework event handler");
+
 }
 
 void testDeadLock()
 {
   // test for deadlocks during Framework API re-entry from a Framework Listener callback
   auto f = FrameworkFactory().NewFramework();
-  f->Start();
+  f.Start();
 
   auto listener = [&f](const FrameworkEvent& evt)
   {
@@ -256,18 +250,19 @@ void testDeadLock()
     {
         // generate a framework event on another thread,
         // which will cause a deadlock if any mutexes are locked.
-        // Doing this on the same thread would either produce
+        // Doing this on the same thread would produce
         // undefined behavior (typically a deadlock or an exception)
-        std::thread t([&f]() {f->Start(); });
+        std::thread t([&f]() {try { f.Start(); } catch (...) {} });
         t.join();
     }
   };
 
-  f->GetBundleContext()->AddBundleListener([](const BundleEvent&) { throw std::runtime_error("bad bundle"); });
-  f->GetBundleContext()->AddFrameworkListener(listener);
-  auto bundleA = InstallTestBundle(f->GetBundleContext(), "TestBundleA"); // trigger the bundle listener to be called
+  f.GetBundleContext().AddBundleListener([](const BundleEvent&) { throw std::runtime_error("bad bundle"); });
+  f.GetBundleContext().AddFrameworkListener(listener);
+  auto bundleA = testing::InstallLib(f.GetBundleContext(), "TestBundleA"); // trigger the bundle listener to be called
 
-  f->Stop();
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds(0));
 }
 
 } // end anonymous namespace

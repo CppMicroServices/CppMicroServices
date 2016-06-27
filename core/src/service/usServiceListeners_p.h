@@ -61,7 +61,7 @@ public:
 private:
 
   std::mutex frameworkListenerMapMutex;
-  typedef std::map<BundleContext*, std::vector<std::pair<FrameworkListener, void*> > > FrameworkListeners;
+  typedef std::map<std::shared_ptr<BundleContextPrivate>, std::vector<std::pair<FrameworkListener, void*> > > FrameworkListeners;
   FrameworkListeners FrameworkListenerMap;
 
   std::vector<std::string> hashedServiceKeys;
@@ -136,7 +136,7 @@ public:
   * @param listener The framework listener to add.
   * @param data Additional data to distinguish FrameworkListener objects.
   */
-  void AddFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data);
+  void AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data);
 
   /**
   * Remove framework listener from current framework. Silently ignore
@@ -146,7 +146,7 @@ public:
   * @param listener Object to remove.
   * @param data Additional data to distinguish FrameworkListener objects.
   */
-  void RemoveFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data);
+  void RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data);
 
   void SendFrameworkEvent(const FrameworkEvent& evt);
 

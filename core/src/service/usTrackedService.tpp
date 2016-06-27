@@ -25,7 +25,7 @@ namespace us {
 template<class S, class TTT>
 TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
                   ServiceTrackerCustomizer<S,T>* customizer)
-  : Superclass(serviceTracker->d->context), serviceTracker(serviceTracker), customizer(customizer)
+  : Superclass(&serviceTracker->d->context), serviceTracker(serviceTracker), customizer(customizer)
 {
 
 }
@@ -44,8 +44,8 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
 
   ServiceReference<S> reference = event.GetServiceReference<S>();
 
-  DIAG_LOG(*serviceTracker->d->context->GetLogSink()) << "TrackedService::ServiceChanged["
-														<< event.GetType() << "]: " << reference;
+  DIAG_LOG(*serviceTracker->d->context.GetLogSink()) << "TrackedService::ServiceChanged["
+                                                    << event.GetType() << "]: " << reference;
   if (!reference)
   {
     return;

@@ -86,15 +86,10 @@ void BundleHooks::FilterBundles(
       {
         fh->Find(context, filtered);
       }
-      catch (const std::exception& )
-      {
-        std::string message("Failed to call Bundle FindHook  # " + sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString());
-        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, coreCtx->systemBundle->shared_from_this(), message, std::current_exception()));
-      }
       catch (...)
       {
-        std::string message("Failed to call Bundle FindHook  # " + sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString());
-        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, coreCtx->systemBundle->shared_from_this(), message, std::current_exception()));
+        std::string message("Failed to call Bundle FindHook  # " + sr.GetProperty(Constants::SERVICE_ID).ToString());
+        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, selfBundle, message, std::current_exception()));
       }
     }
   }
@@ -135,7 +130,7 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
       catch (const std::logic_error& )
       {
         std::string message("Failed to get event hook service reference");
-        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, coreCtx->systemBundle->shared_from_this(), message, std::current_exception()));
+        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
         continue;
       }
 
@@ -146,15 +141,10 @@ void BundleHooks::FilterBundleEventReceivers(const BundleEvent& evt,
         {
           eh->Event(evt, filtered);
         }
-        catch (const std::exception& )
-        {
-          std::string message("Failed to call Bundle EventHook # " + sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString());
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, coreCtx->systemBundle->shared_from_this(), message, std::current_exception()));
-        }
         catch (...)
         {
-          std::string message("Failed to call Bundle EventHook # " + sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString());
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, coreCtx->systemBundle->shared_from_this(), message, std::current_exception()));
+          std::string message("Failed to call Bundle EventHook # " + sr.GetProperty(Constants::SERVICE_ID).ToString());
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
         }
       }
     }

@@ -40,9 +40,6 @@ namespace
         auto f = FrameworkFactory().NewFramework();
 		US_TEST_CONDITION(f, "Test Framework instantiation");
 
-        auto f = factory.NewFramework();
-        US_TEST_CONDITION(f, "Test Framework instantiation")
-
         f.Start();
 
         // Default framework properties:
@@ -56,8 +53,8 @@ namespace
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "single", "Test for default threading option")
 #endif
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_STORAGE).Empty(), "Test for empty default base storage property")
-        US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_LOG_LEVEL).ToString() == "3", "Test for default logging level")
-		US_TEST_CONDITION(any_cast<bool>(f->GetProperty(Framework::PROP_LOG)) == false, "Test for default diagnostic logging");
+        US_TEST_CONDITION(any_cast<bool>(f.GetProperty(Constants::FRAMEWORK_LOG)) == false, "Test default diagnostic logging")
+
     }
 
     void TestCustomConfig()
@@ -68,8 +65,8 @@ namespace
         configuration["org.osgi.framework.bsnversion"] = std::string("single");
         configuration["org.osgi.framework.custom1"] = std::string("foo");
         configuration["org.osgi.framework.custom2"] = std::string("bar");
-        configuration[Constants::FRAMEWORK_LOG_LEVEL] = 0;
-        configuration[Framework::PROP_STORAGE_LOCATION] = std::string("/foo");
+        configuration[Constants::FRAMEWORK_LOG] = true;
+        configuration[Constants::FRAMEWORK_STORAGE] = testing::GetTempDirectory();
 
         // the threading model framework property is set at compile time and read-only at runtime. Test that this
         // is always the case.
@@ -79,20 +76,29 @@ namespace
         configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("multi");
 #endif
 
-		// turn on diagnostic logging
-		configuration[Framework::PROP_LOG] = true;
-
         auto f = FrameworkFactory().NewFramework(configuration);
 		US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration");
 
-        f.Start();
-        US_TEST_CONDITION("osgi" == f.GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties")
-        US_TEST_CONDITION(0 == any_cast<int>(f.GetProperty("org.osgi.framework.startlevel.beginning")), "Test Framework custom launch properties")
-        US_TEST_CONDITION("single" == any_cast<std::string>(f.GetProperty("org.osgi.framework.bsnversion")), "Test Framework custom launch properties")
-        US_TEST_CONDITION("foo" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties")
-        US_TEST_CONDITION("bar" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties")
-        US_TEST_CONDITION(any_cast<int>(f.GetProperty(Constants::FRAMEWORK_LOG_LEVEL)) == 0, "Test for custom logging level")
-		US_TEST_CONDITION(f->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == "/foo", "Test for custom base storage path");
+        try
+        {
+          f.Start();
+        }
+        catch (const std::exception& e)
+        {
+          US_TEST_FAILED_MSG(<< "Exception during framework start. " << e.what());
+        }
+        catch (...)
+        {
+          US_TEST_FAILED_MSG(<< "Unknown exception during framework start. ");
+        }
+
+        US_TEST_CONDITION("osgi" == f.GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties");
+        US_TEST_CONDITION(0 == any_cast<int>(f.GetProperty("org.osgi.framework.startlevel.beginning")), "Test Framework custom launch properties");
+        US_TEST_CONDITION("single" == any_cast<std::string>(f.GetProperty("org.osgi.framework.bsnversion")), "Test Framework custom launch properties");
+        US_TEST_CONDITION("foo" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties");
+        US_TEST_CONDITION("bar" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties");
+        US_TEST_CONDITION(any_cast<bool>(f.GetProperty(Constants::FRAMEWORK_LOG)) == true, "Test for enabled diagnostic logging");
+		US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for custom base storage path");
 
 #ifdef US_ENABLE_THREADING_SUPPORT
         US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
@@ -105,15 +111,15 @@ namespace
 	{
 		std::map<std::string, Any> configuration;
 		// turn on diagnostic logging
-		configuration[Framework::PROP_LOG] = true;
+		configuration[Constants::FRAMEWORK_LOG] = true;
 
 		std::ostream custom_log_sink(std::cerr.rdbuf());
 
 		auto f = FrameworkFactory().NewFramework(configuration, &custom_log_sink);
 		US_TEST_CONDITION(f, "Test Framework instantiation with custom diagnostic logger");
 
-		f->Start();
-		f->Stop();
+		f.Start();
+		f.Stop();
 	}
 
     void TestProperties()
@@ -132,15 +138,14 @@ namespace
         TestBundleListener listener;
         std::vector<BundleEvent> pEvts;
 
-        std::map < std::string, Any > configuration;
-        //configuration[Constants::FRAMEWORK_LOG_LEVEL] = 0;
-        auto f = factory.NewFramework(configuration);
+        auto f = FrameworkFactory().NewFramework();
 
         US_TEST_CONDITION(f.GetState() == Bundle::STATE_INSTALLED, "Check framework is installed")
 
         f.Init();
 
         US_TEST_CONDITION(f.GetState() == Bundle::STATE_STARTING, "Check framework is starting")
+        US_TEST_CONDITION(f.GetBundleContext().IsValid(), "Check for a valid bundle context");
 
         f.Start();
 
@@ -151,8 +156,11 @@ namespace
         f.GetBundleContext().AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
         f.Stop();
-        f.WaitForStop(std::chrono::milliseconds(0));
+        FrameworkEvent fStopEvent{ f.WaitForStop(std::chrono::milliseconds(0)) };
         US_TEST_CONDITION(!(f.GetState() & Bundle::STATE_ACTIVE), "Check framework is in the Stop state")
+        US_TEST_CONDITION(fStopEvent, "Check for valid framework event");
+        US_TEST_CONDITION(fStopEvent.GetType() == FrameworkEvent::Type::STOPPED, "Check for correct framework event type");
+        US_TEST_CONDITION(fStopEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
 
         pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, f));
 
@@ -176,17 +184,66 @@ namespace
         // Test that all bundles in the Start state are stopped when the framework is stopped.
         f.Start();
         auto bundle = testing::InstallLib(f.GetBundleContext(), "TestBundleA");
-        US_TEST_CONDITION_REQUIRED(bundle, "Non-null bundle")
+        US_TEST_CONDITION_REQUIRED(bundle, "Non-null bundle");
         bundle.Start();
 
         // Stopping the framework stops all active bundles.
         f.Stop();
-        auto ev = f.WaitForStop(std::chrono::seconds(30));
-        if (!ev.IsNull() && ev.GetType() == FrameworkEvent::FRAMEWORK_ERROR) std::rethrow_exception(ev.GetException());
-        US_TEST_CONDITION(ev.IsNull() || ev.GetType() == FrameworkEvent::FRAMEWORK_STOPPED, "Check framework stopped");
+        auto ev = f.WaitForStop(std::chrono::seconds(10));
+        US_TEST_CONDITION_REQUIRED(ev, "Test for valid framework event returned by Framework::WaitForStop()");
+        if (!ev && ev.GetType() == FrameworkEvent::Type::ERROR) std::rethrow_exception(ev.GetThrowable());
+        US_TEST_CONDITION(ev.GetType() == FrameworkEvent::Type::STOPPED, "Check that framework event is stopped");
 
-        US_TEST_CONDITION(bundle.GetState() != Bundle::STATE_ACTIVE, "Check that TestBundleA is in the Stop state")
-        US_TEST_CONDITION(f.GetState() != Bundle::STATE_ACTIVE, "Check framework is in the Stop state")
+        US_TEST_CONDITION(bundle.GetState() != Bundle::STATE_ACTIVE, "Check that TestBundleA is in the Stop state");
+        US_TEST_CONDITION(f.GetState() != Bundle::STATE_ACTIVE, "Check framework is in the Stop state");
+    }
+
+    void TestConcurrentFrameworkStart()
+    {
+      // test concurrent Framework starts.
+      auto f = FrameworkFactory().NewFramework();
+      size_t num_threads{ 100 };
+      std::vector<std::thread> threads;
+      for (size_t i = 0; i < num_threads; ++i)
+      {
+          threads.push_back(std::thread{ [&f]()
+          {
+              f.Start(); 
+          } });
+      }
+
+      for (auto& t : threads) t.join();
+
+      f.Stop();
+
+      auto fEvent = f.WaitForStop(std::chrono::milliseconds(0));
+      US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
+      US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::STOPPED, "Check that framework event is stopped");
+      US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+    }
+
+    void TestConcurrentFrameworkStop()
+    {
+        // test concurrent Framework stops.
+        auto f = FrameworkFactory().NewFramework();
+        f.Start();
+
+        size_t num_threads{ 100 };
+        std::vector<std::thread> threads;
+        for (size_t i = 0; i < num_threads; ++i)
+        {
+            threads.push_back(std::thread{ [&f]()
+            {
+                f.Stop();
+            } });
+        }
+
+        auto fEvent = f.WaitForStop(std::chrono::milliseconds(0));
+        US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
+        US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::STOPPED, "Check that framework event is stopped");
+        US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+
+        for (auto& t : threads) t.join();
     }
 
     void TestEvents()
@@ -194,11 +251,8 @@ namespace
         TestBundleListener listener;
         std::vector<BundleEvent> pEvts;
         std::vector<BundleEvent> pStopEvts;
-        FrameworkFactory factory;
 
-        std::map < std::string, Any > configuration;
-        //configuration[Constants::FRAMEWORK_LOG_LEVEL] = 0;
-        auto f = factory.NewFramework(configuration);
+        auto f = FrameworkFactory().NewFramework();
 
         f.Start();
 
@@ -291,6 +345,8 @@ int usFrameworkTest(int /*argc*/, char* /*argv*/[])
     TestProperties();
     TestLifeCycle();
     TestEvents();
+    TestConcurrentFrameworkStart();
+    TestConcurrentFrameworkStop();
 
     US_TEST_END()
 }

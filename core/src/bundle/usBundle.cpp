@@ -168,11 +168,11 @@ void Bundle::Uninstall()
       if (exception != nullptr)
       {
         try { std::rethrow_exception(exception); }
-        catch (const std::exception& e)
+        catch (const std::exception& )
         {
           // $TODO framework event
           //coreCtx->FrameworkError(this, exception);
-          US_WARN << e.what();
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, d->shared_from_this(), std::string(), std::current_exception()));
         }
       }
       // Fall through
@@ -229,12 +229,10 @@ void Bundle::Uninstall()
         {
           if (fs::Exists(d->bundleDir)) fs::RemoveDirectoryRecursive(d->bundleDir);
         }
-        catch (const std::exception& e)
+        catch (const std::exception& )
         {
           // $TODO framework error
-          // d->coreCtx->FrameworkError(this,
-          //                     "Failed to delete bundle data" + e.what());
-          US_WARN << "Failed to delete bundle data" << e.what();
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, d->shared_from_this(), std::string(), std::current_exception()));
         }
         d->bundleDir.clear();
       }

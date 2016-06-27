@@ -73,7 +73,7 @@ void Framework::Start()
       d->operation = BundlePrivate::OP_ACTIVATING;
       break;
     case STATE_ACTIVE:
-      return;
+      break;
     default:
       std::stringstream ss;
       ss << d->state;
@@ -100,9 +100,7 @@ void Framework::Start()
     }
     catch (...)
     {
-      // $TODO
-      //pimpl(d)->coreCtx->FrameworkError(b, std::current_exception());
-      try { throw; } catch (const std::exception& e) { US_ERROR << e.what(); }
+      pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::ERROR, MakeBundle(b->shared_from_this()), std::string(), std::current_exception()));
     }
   }
 
@@ -112,8 +110,7 @@ void Framework::Start()
     d->operation = BundlePrivate::OP_IDLE;
   }
   d->NotifyAll();
-  // $TODO
-  // pimpl(d)->coreCtx->listeners.FrameworkEvent(FrameworkEvent(FrameworkEvent::FRAMEWORK_STARTED, this->shared_from_this(), std::exception_ptr()));
+  pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::STARTED, MakeBundle(d->shared_from_this()), std::string()));
 }
 
 void Framework::Stop(uint32_t )

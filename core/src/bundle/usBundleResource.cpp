@@ -281,7 +281,7 @@ void* BundleResource::GetData() const
 {
   if (!IsValid()) return nullptr;
 
-  return d->resourceContainer->GetData(d->stat.index);
+  return d->archive->GetResourceContainer()->GetData(d->stat.index);
 }
 
 }

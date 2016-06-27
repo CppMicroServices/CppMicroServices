@@ -49,9 +49,8 @@ public:
   inline SharedData() : ref(0) { }
   inline SharedData(const SharedData&) : ref(0) { }
 
-private:
   // using the assignment operator would lead to corruption in the ref-counting
-  SharedData& operator=(const SharedData&);
+  SharedData& operator=(const SharedData&) = delete;
 };
 
 /**

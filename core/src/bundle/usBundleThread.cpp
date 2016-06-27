@@ -25,8 +25,9 @@
 #include "usBundleActivator.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
+#include "usFrameworkEvent.h"
 
-#include <future>
+//#include <future>
 
 namespace us {
 
@@ -43,6 +44,11 @@ BundleThread::BundleThread(CoreBundleContext* ctx)
   , doRun(true)
 {
   th.v = std::thread(&BundleThread::Run, this);
+}
+
+BundleThread::~BundleThread()
+{
+  Quit();
 }
 
 void BundleThread::Quit()
@@ -209,8 +215,8 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
     std::string reason = timeout ? "Time-out during bundle " + opType + "()"
                                  : "Bundle uninstalled during " + opType + "()";
 
-    US_INFO << "bundle thread aborted during " << opType
-            << " of bundle #" << b->id;
+    DIAG_LOG(*b->coreCtx->sink) << "bundle thread aborted during " << opType
+                                << " of bundle #" << b->id;
 
     if (timeout)
     {

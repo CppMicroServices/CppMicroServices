@@ -92,7 +92,7 @@ void ServiceTracker<S,T>::Open()
       return;
     }
 
-    DIAG_LOG(*d->context->GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter;
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter;
 
     t.reset(new _TrackedService(this, d->customizer));
     try
@@ -159,12 +159,12 @@ void ServiceTracker<S,T>::Close()
     outgoing->Untrack(ref, ServiceEvent());
   }
 
-  if (d->context->GetLogSink()->Enabled())
+  if (d->context.GetLogSink()->Enabled())
   {
     if (!d->cachedReference.Load().GetBundle() &&
         d->cachedService.Load() == nullptr)
     {
-      DIAG_LOG(*d->context->GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
+      DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
 										<< d->filter;
     }
   }
@@ -247,11 +247,11 @@ ServiceTracker<S,T>::GetServiceReference() const
   ServiceReference<S> reference = d->cachedReference.Load();
   if (reference.GetBundle())
   {
-    DIAG_LOG(*d->context->GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
 									<< d->filter;
     return reference;
   }
-  DIAG_LOG(*d->context->GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
   auto references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0)
@@ -359,11 +359,11 @@ ServiceTracker<S,T>::GetService() const
   auto service = d->cachedService.Load();
   if (service)
   {
-    DIAG_LOG(*d->context->GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
 									<< d->filter;
     return service;
   }
-  DIAG_LOG(*d->context->GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;
 
   try
   {

@@ -135,7 +135,7 @@ void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextP
   bundleListenerMap.value[context].remove_if(std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
 }
 
-void ServiceListeners::AddFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data)
+void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
   std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
   auto& listeners = FrameworkListenerMap[context];
@@ -145,11 +145,15 @@ void ServiceListeners::AddFrameworkListener(BundleContext* context, const Framew
   }
 }
 
-void ServiceListeners::RemoveFrameworkListener(BundleContext* context, const FrameworkListener& listener, void* data)
+void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
   std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
   auto& listeners = FrameworkListenerMap[context];
-  FrameworkListenerMap[context].erase(std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)));
+  auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
+  if (it != listeners.end())
+  {
+    FrameworkListenerMap[context].erase(it);
+  }
 }
 
 void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
@@ -178,6 +182,13 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
         // @todo send this to the LogService instead when its supported.
         DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << e.what() << "\n";
 	  }
+      catch (...)
+      {
+        // do not send a FrameworkEvent as that could cause a deadlock or an inifinite loop.
+        // Instead, log to the internal logger
+        // @todo send this to the LogService instead when its supported.
+        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an unknown exception\n";
+      }
 	}
   }
 }
@@ -197,11 +208,10 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
       }
       catch (const std::exception& )
       {
-        std::string message("Bundle listener threw an exception");
         SendFrameworkEvent(FrameworkEvent(
             FrameworkEvent::Type::ERROR, 
-            coreCtx->systemBundle->shared_from_this(), 
-            message,
+            MakeBundle(bundleListeners.first->bundle->shared_from_this()),
+            std::string("Bundle listener threw an exception"),
             std::current_exception()));
       }
     }
@@ -235,7 +245,7 @@ void ServiceListeners::RemoveAllListeners(const std::shared_ptr<BundleContextPri
 
   {
     std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
-	FrameworkListenerMap.erase(context);
+    FrameworkListenerMap.erase(context);
   }
 }
 
@@ -287,10 +297,10 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       }
       catch (...)
       {
-        std::string message("Service listener in " + l.GetBundleContext()->GetBundle()->GetName() + " threw an exception!");
+        std::string message("Service listener in " + l.GetBundleContext().GetBundle().GetSymbolicName() + " threw an exception!");
         SendFrameworkEvent(FrameworkEvent(
             FrameworkEvent::Type::ERROR, 
-            coreCtx->systemBundle->shared_from_this(), 
+            l.GetBundleContext().GetBundle(),
             message,
             std::current_exception()));
       }

@@ -68,11 +68,8 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::INFO == static_cast<FrameworkEvent::Type>(32), "Test assigned event type values");
   US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::WARNING == static_cast<FrameworkEvent::Type>(16), "Test assigned event type values");
   US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STOPPED == static_cast<FrameworkEvent::Type>(64), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STOPPED_UPDATE == static_cast<FrameworkEvent::Type>(128), "Test assigned event type values");
   US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::WAIT_TIMEDOUT == static_cast<FrameworkEvent::Type>(512), "Test assigned event type values");
-
-  // non-standard to OSGi
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STOPPING == static_cast<FrameworkEvent::Type>(65), "Test non-standard assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STARTING == static_cast<FrameworkEvent::Type>(0), "Test non-standard assigned event type values");
 
   // @todo mock the framework. We only need a Bundle object to construct a FrameworkEvent object.
   auto const f = FrameworkFactory().NewFramework();
@@ -81,8 +78,8 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkEvent invalid_event;
   US_TEST_CONDITION_REQUIRED((!invalid_event), "Test for invalid FrameworkEvent construction.");
-  US_TEST_CONDITION_REQUIRED(invalid_event.GetType() == FrameworkEvent::Type::STARTING, "invalid event GetType()");
-  US_TEST_CONDITION_REQUIRED(invalid_event.GetBundle() == nullptr, "invalid event GetBundle()");
+  US_TEST_CONDITION_REQUIRED(invalid_event.GetType() == FrameworkEvent::Type::ERROR, "invalid event GetType()");
+  US_TEST_CONDITION_REQUIRED(!invalid_event.GetBundle().IsValid(), "invalid event GetBundle()");
   US_TEST_CONDITION_REQUIRED((GetMessageFromStdExceptionPtr(invalid_event.GetThrowable()) == default_exception_message), "invalid event GetThrowable()");
   std::cout << invalid_event << std::endl;
 

@@ -105,7 +105,7 @@ public:
 	 * <p>
 	 * There was a warning associated with a bundle.
 	 */
-    WARNING = 16,
+    FRAMEWORK_WARNING = 16,
 
     /**
      * The Framework has been stopped.
@@ -156,7 +156,7 @@ public:
    * @param message The message associated with the event.
    * @param exception The exception associated with this event. Should be nullptr if there is no exception.
    */
-  FrameworkEvent(Type type, const std::shared_ptr<Bundle>& bundle, const std::string& message, const std::exception_ptr exception = nullptr);
+  FrameworkEvent(Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception = nullptr);
 
   FrameworkEvent(const FrameworkEvent& other);
 

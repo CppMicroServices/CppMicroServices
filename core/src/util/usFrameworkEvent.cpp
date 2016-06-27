@@ -23,6 +23,7 @@
 #include "usFrameworkEvent.h"
 
 #include "usBundle.h"
+#include "usBundlePrivate.h"
 
 namespace us {
 
@@ -32,8 +33,8 @@ public:
 
   FrameworkEventData& operator=(const FrameworkEventData&) = delete;
 
-  FrameworkEventData(FrameworkEvent::Type type, const std::shared_ptr<Bundle>& bundle, const std::string& message, const std::exception_ptr exception)
-    : type(type), bundle(bundle), message(message), exception(exception)
+  FrameworkEventData(FrameworkEvent::Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception)
+    : type(type), bundle(GetPrivate(bundle)), message(message), exception(exception)
   {
 
   }
@@ -45,7 +46,7 @@ public:
   }
 
   const FrameworkEvent::Type type;
-  const std::shared_ptr<Bundle> bundle;
+  const std::shared_ptr<BundlePrivate> bundle;
   const std::string message;
   const std::exception_ptr exception;
 
@@ -62,7 +63,7 @@ FrameworkEvent::~FrameworkEvent()
 
 }
 
-FrameworkEvent::FrameworkEvent(Type type, const std::shared_ptr<Bundle>& bundle, const std::string& message, const std::exception_ptr exception)
+FrameworkEvent::FrameworkEvent(Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception)
   : d(new FrameworkEventData(type, bundle, message, exception))
 {
 
@@ -80,15 +81,15 @@ FrameworkEvent& FrameworkEvent::operator=(const FrameworkEvent& other)
   return *this;
 }
 
-std::shared_ptr<Bundle> FrameworkEvent::GetBundle() const
+Bundle FrameworkEvent::GetBundle() const
 {
-  if (!d) return nullptr;
-  return d->bundle;
+  if (!d) return Bundle{};
+  return MakeBundle(d->bundle);
 }
 
 FrameworkEvent::Type FrameworkEvent::GetType() const
 {
-  if (!d) return Type::STARTING;
+  if (!d) return Type::ERROR;
   return d->type;
 }
 
@@ -154,5 +155,14 @@ std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt)
       << evt.GetThrowable();
   return os;
 }
+
+bool operator==(const FrameworkEvent& rhs, const FrameworkEvent& lhs)
+{
+  return (rhs.GetBundle() == lhs.GetBundle() &&
+    rhs.GetMessage() == lhs.GetMessage() &&
+    rhs.GetThrowable() == lhs.GetThrowable() &&
+    rhs.GetType() == lhs.GetType());
+}
+
 
 }

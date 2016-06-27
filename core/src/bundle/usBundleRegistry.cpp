@@ -32,6 +32,7 @@
 #include "usBundleStorage_p.h"
 #include "usCoreBundleContext_p.h"
 #include "usBundleResourceContainer_p.h"
+#include "usFrameworkEvent.h"
 
 #include <cassert>
 #include <map>
@@ -247,14 +248,11 @@ void BundleRegistry::Load()
       std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
       bundles.v.insert(std::make_pair(impl->location, impl));
     }
-    catch (const std::exception& e)
+    catch (const std::exception& )
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
-      US_WARN << "Error: Failed to load bundle "
-              << ba->GetBundleId()
-              << " (" << ba->GetBundleLocation() << ")"
-              << " uninstalled it! "
-              << " (" << e.what() << ")";
+      std::string msg("Failed to load bundle " + std::to_string(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, Bundle{}, msg, std::current_exception()));
     }
   }
 }

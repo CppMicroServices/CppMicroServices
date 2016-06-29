@@ -77,6 +77,9 @@ void ServiceListeners::Clear()
     cache[0].clear();
     cache[1].clear();
   }
+
+  std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
+  FrameworkListenerMap.clear();
 }
 
 void ServiceListeners::AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,

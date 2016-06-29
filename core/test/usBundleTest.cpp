@@ -115,32 +115,6 @@ public:
 
   }
 
-// Get context id, location, persistent storage and status of the bundle
-//void frame010a(const std::shared_ptr<Framework>& framework, BundleContext* context)
-//{
-//  auto m = context->GetBundle();
-//
-//  long int contextid = m->GetBundleId();
-//  std::cout << "CONTEXT ID:" << contextid;
-//
-//  std::string location = m->GetLocation();
-//  std::cout << "LOCATION:" << location;
-//  US_TEST_CONDITION(!location.empty(), "Test for non-empty bundle location")
-//
-//  US_TEST_CONDITION(m->IsStarted(), "Test for started flag")
-//
-//  // launching properties should be accessible through any bundle
-//  US_TEST_CONDITION(framework->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
-//  US_TEST_CONDITION(m->GetProperty(Framework::PROP_STORAGE_LOCATION).ToString() == testing::GetCurrentWorkingDirectory(), "Test for default base storage path")
-//
-//  std::cout << m->GetBundleContext()->GetDataFile("") << std::endl;
-//  std::stringstream ss;
-//  ss << contextid;
-//  const std::string storagePath = testing::GetCurrentWorkingDirectory() + DIR_SEP + ss.str() + "_" + m->GetName() + DIR_SEP;
-//
-//  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("") == storagePath, "Test for valid data path")
-//  US_TEST_CONDITION(m->GetBundleContext()->GetDataFile("bla") == storagePath + "bla", "Test for valid data file path")
-//}
 
 //----------------------------------------------------------------------------
 //Test result of GetService(ServiceReference()). Should throw std::invalid_argument

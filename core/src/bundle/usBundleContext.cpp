@@ -62,7 +62,7 @@ bool BundleContext::operator<(const BundleContext& rhs) const
 
 bool BundleContext::IsValid() const
 {
-  return d != nullptr;
+  return d != nullptr && d->IsValid();
 }
 
 BundleContext::operator bool() const

@@ -47,7 +47,7 @@ BundleContext::BundleContext()
 
 bool BundleContext::operator==(const BundleContext& rhs) const
 {
-  return IsValid() ? (rhs.IsValid() ? d == rhs.d : false) : !rhs.IsValid();
+  return *this ? (rhs ? d == rhs.d : false) : !rhs;
 }
 
 bool BundleContext::operator!=(const BundleContext& rhs) const
@@ -57,17 +57,12 @@ bool BundleContext::operator!=(const BundleContext& rhs) const
 
 bool BundleContext::operator<(const BundleContext& rhs) const
 {
-  return IsValid() ? (rhs.IsValid() ? (d < rhs.d) : true) : false;
-}
-
-bool BundleContext::IsValid() const
-{
-  return d != nullptr && d->IsValid();
+  return *this ? (rhs ? (d < rhs.d) : true) : false;
 }
 
 BundleContext::operator bool() const
 {
-  return IsValid();
+  return d != nullptr && d->IsValid();
 }
 
 BundleContext& BundleContext::operator=(std::nullptr_t)

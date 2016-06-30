@@ -140,11 +140,6 @@ public:
    * @return \c true if this %BundleContext object is valid and can safely be used,
    *         \c false otherwise.
    */
-  bool IsValid() const;
-
-  /**
-   * Boolean conversion operator using IsValid().
-   */
   explicit operator bool() const;
 
   /**

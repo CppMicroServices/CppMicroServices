@@ -184,7 +184,9 @@ namespace
         std::vector<BundleEvent> pStopEvts;
         FrameworkFactory factory;
 
-        auto f = factory.NewFramework();
+        std::map < std::string, Any > configuration;
+        //configuration[Constants::FRAMEWORK_LOG_LEVEL] = 0;
+        auto f = factory.NewFramework(configuration);
 
         f.Start();
 
@@ -195,19 +197,29 @@ namespace
         {
           auto bundle = testing::InstallLib(fmc, libName);
           pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+#ifdef US_BUILD_SHARED_LIBS
           if (bundle.GetSymbolicName() == "TestBundleB")
           {
             // This is an additional install event from the bundle
             // that is statically imported by TestBundleB.
             pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, testing::GetBundle("TestBundleImportedByB", fmc)));
           }
+#endif
         };
 
-        // The bundles used to test bundle events when stopping the framework
+        // The bundles used to test bundle events when stopping the framework.
+        // For static builds, the order of the "install" calls is imported.
         install("TestBundleA");
         install("TestBundleA2");
         install("TestBundleB");
+#ifdef US_ENABLE_THREADING_SUPPORT
+        install("TestBundleC1");
+#endif
         install("TestBundleH");
+#ifndef US_BUILD_SHARED_LIBS
+        install("TestBundleImportedByB");
+#endif
+        install("TestBundleLQ");
         install("TestBundleM");
         install("TestBundleR");
         install("TestBundleRA");
@@ -216,6 +228,10 @@ namespace
         install("TestBundleSL1");
         install("TestBundleSL3");
         install("TestBundleSL4");
+#ifndef US_BUILD_SHARED_LIBS
+        install("main");
+#endif
+
 
         auto bundles(fmc.GetBundles());
         for (auto& bundle : bundles)

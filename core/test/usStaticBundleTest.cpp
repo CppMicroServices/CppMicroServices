@@ -82,7 +82,11 @@ void frame020a(BundleContext context, TestBundleListener& listener)
     seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, refs.back()));
     seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, refs.front()));
 
-    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
+    bool relaxed = false;
+  #ifndef US_BUILD_SHARED_LIBS
+    relaxed = true;
+  #endif
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts, relaxed), "Test for unexpected events");
 
   }
   catch (const ServiceException& /*se*/)
@@ -138,30 +142,46 @@ void frame030b(BundleContext context, TestBundleListener& listener)
   seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.back()));
   seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, refs.front()));
 
-  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
+  bool relaxed = false;
+#ifndef US_BUILD_SHARED_LIBS
+  relaxed = true;
+#endif
+  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts, relaxed), "Test for unexpected events");
 }
 
 // Uninstall libB and check for correct events
 void frame040c(BundleContext context, TestBundleListener& listener)
 {
+  bool relaxed = false;
+#ifndef US_BUILD_SHARED_LIBS
+  relaxed = true;
+#endif
+
     auto bundleB = testing::GetBundle("TestBundleB", context);
     US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
 
     auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
     US_TEST_CONDITION_REQUIRED(bundleImportedByB, "Test for non-null bundle")
 
+    auto const bundleCount = context.GetBundles().size();
+    US_TEST_CONDITION_REQUIRED(bundleCount > 0, "Test for bundle count > 0")
     bundleB.Uninstall();
-    US_TEST_CONDITION(context.GetBundles().size() == 2, "Test for uninstall of TestBundleB")
+    US_TEST_CONDITION(context.GetBundles().size() == bundleCount - 1, "Test for uninstall of TestBundleB")
 
     std::vector<BundleEvent> pEvts;
     pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
 
-    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 
     // Install the same lib again, we should get TestBundleB again
     auto bundles = context.InstallBundles(bundleImportedByB.GetLocation());
-    US_TEST_CONDITION(bundles.size() == 2, "Test for re-install of TestBundleB")
+#ifdef US_BUILD_SHARED_LIBS
+    std::size_t installCount = 2;
+#else
+    std::size_t installCount = bundleCount - 1; // minus system_bundle
+#endif
+    US_TEST_CONDITION(bundles.size() == installCount, "Test for re-install of TestBundleB")
 
     long oldId = bundleB.GetBundleId();
     bundleB = testing::GetBundle("TestBundleB", context);
@@ -174,7 +194,7 @@ void frame040c(BundleContext context, TestBundleListener& listener)
 
     bundleB.Uninstall();
     bundleImportedByB.Uninstall();
-    US_TEST_CONDITION(context.GetBundles().size() == 1, "Test for uninstall of TestBundleImportedByB")
+    US_TEST_CONDITION(context.GetBundles().size() == bundleCount - 2, "Test for uninstall of TestBundleImportedByB")
 
     pEvts.clear();
     pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleB));
@@ -182,7 +202,7 @@ void frame040c(BundleContext context, TestBundleListener& listener)
     pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleImportedByB));
     pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
 
-    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 }
 
 } // end unnamed namespace

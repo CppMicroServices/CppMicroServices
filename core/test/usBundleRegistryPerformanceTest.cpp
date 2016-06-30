@@ -68,7 +68,11 @@ namespace
         InstallTestBundleNoErrorHandling(bc, "TestBundleA");
         InstallTestBundleNoErrorHandling(bc, "TestBundleA2");
         InstallTestBundleNoErrorHandling(bc, "TestBundleB");
+#ifdef US_ENABLE_THREADING_SUPPORT
+        InstallTestBundleNoErrorHandling(bc, "TestBundleC1");
+#endif
         InstallTestBundleNoErrorHandling(bc, "TestBundleH");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleLQ");
         InstallTestBundleNoErrorHandling(bc, "TestBundleM");
         InstallTestBundleNoErrorHandling(bc, "TestBundleR");
         InstallTestBundleNoErrorHandling(bc, "TestBundleRA");
@@ -110,7 +114,10 @@ namespace
         // At any point in which real customer usage in a concurrent way becomes known,
         // it would be ideal to model it as a test.
 
-        const std::size_t numTestBundles = 14;  // 12 test bundles + 1 statically linked bundle + the system bundle
+        std::size_t numTestBundles = 16;  // 14 test bundles + 1 statically linked bundle + the system bundle
+#ifndef US_BUILD_SHARED_LIBS
+        numTestBundles += 1; // main
+#endif
         const int numTestThreads = 100;
         std::vector<std::thread> threads;
         for (int i = 0; i < numTestThreads; ++i)

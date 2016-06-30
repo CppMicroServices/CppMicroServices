@@ -150,7 +150,11 @@ void frame020a()
   std::vector<BundleEvent> pEvts;
   pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, buA));
 
-  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
+  bool relaxed = false;
+#ifndef US_BUILD_SHARED_LIBS
+  relaxed = true;
+#endif
+  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 }
 
 // Start libA and check that it gets state ACTIVE
@@ -353,8 +357,12 @@ void TestListenerFunctors()
 
   std::vector<ServiceEvent> seEvts;
 
-  US_TEST_CONDITION(listener1.CheckListenerEvents(pEvts, seEvts), "Check first bundle listener")
-  US_TEST_CONDITION(listener2.CheckListenerEvents(pEvts, seEvts), "Check second bundle listener")
+  bool relaxed = false;
+#ifndef US_BUILD_SHARED_LIBS
+  relaxed = true;
+#endif
+  US_TEST_CONDITION(listener1.CheckListenerEvents(pEvts, seEvts, relaxed), "Check first bundle listener")
+  US_TEST_CONDITION(listener2.CheckListenerEvents(pEvts, seEvts, relaxed), "Check second bundle listener")
 
   bc.RemoveBundleListener(&listener1, &TestBundleListener::BundleChanged);
   bc.RemoveBundleListener(&listener2, &TestBundleListener::BundleChanged);
@@ -389,7 +397,12 @@ void TestBundleStates()
     bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
-    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
+
+    bool relaxed = false;
+  #ifndef US_BUILD_SHARED_LIBS
+    relaxed = true;
+  #endif
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, relaxed), "Test for unexpected events");
     bundleEvents.clear();
 
     // Test install -> start -> uninstall

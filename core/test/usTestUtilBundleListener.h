@@ -52,12 +52,13 @@ public:
       bool sexp, ServiceEvent::Type stype,
       const Bundle& bundleX, ServiceReferenceU* servX);
 
-  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts);
+  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts, bool relaxed = false);
 
   bool CheckListenerEvents(const std::vector<ServiceEvent>& seEvts);
 
   bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts,
-                           const std::vector<ServiceEvent>& seEvts);
+                           const std::vector<ServiceEvent>& seEvts,
+                           bool relaxed = false);
 
 private:
 

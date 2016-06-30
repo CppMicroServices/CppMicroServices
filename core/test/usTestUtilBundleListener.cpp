@@ -77,11 +77,11 @@ bool TestBundleListener::CheckListenerEvents(
   return CheckListenerEvents(pEvts, seEvts);
 }
 
-bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEvts)
+bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEvts, bool relaxed)
 {
   bool listenState = true; // assume everything will work
 
-  if (pEvts.size() != bundleEvents.size())
+  if (pEvts.size() != bundleEvents.size() && !relaxed)
   {
     listenState = false;
     US_DEBUG << "*** Bundle event mismatch: expected "
@@ -98,15 +98,32 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
   }
   else
   {
-    for (std::size_t i = 0; i < pEvts.size(); ++i)
+    if (relaxed)
     {
-      const BundleEvent& pE = pEvts[i];
-      const BundleEvent& pR = bundleEvents[i];
-      if (pE.GetType() != pR.GetType()
-          || pE.GetBundle() != pR.GetBundle())
+      // just check if the expected events are present
+      for (auto e : pEvts)
       {
-        listenState = false;
-        US_DEBUG << "*** Wrong bundle event: " << pR << " expected " << pE;
+        if (std::find(bundleEvents.begin(), bundleEvents.end(), e) == bundleEvents.end())
+        {
+          listenState = false;
+          US_DEBUG << "*** Expected event not found: " << e;
+          break;
+        }
+      }
+    }
+    else
+    {
+      // check that the expected events match the received events exactly
+      for (std::size_t i = 0; i < pEvts.size(); ++i)
+      {
+        const BundleEvent& pE = pEvts[i];
+        const BundleEvent& pR = bundleEvents[i];
+        if (pE.GetType() != pR.GetType()
+            || pE.GetBundle() != pR.GetBundle())
+        {
+          listenState = false;
+          US_DEBUG << "*** Wrong bundle event: " << pR << " expected " << pE;
+        }
       }
     }
   }
@@ -155,9 +172,10 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<ServiceEvent>& se
 
 bool TestBundleListener::CheckListenerEvents(
     const std::vector<BundleEvent>& pEvts,
-    const std::vector<ServiceEvent>& seEvts)
+    const std::vector<ServiceEvent>& seEvts,
+    bool relaxed)
 {
-  if (!CheckListenerEvents(pEvts)) return false;
+  if (!CheckListenerEvents(pEvts, relaxed)) return false;
   return CheckListenerEvents(seEvts);
 }
 

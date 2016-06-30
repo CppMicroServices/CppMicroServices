@@ -213,6 +213,16 @@ public:
    */
   Bundle GetOrigin() const;
 
+  /**
+   * Compares two bundle events for equality.
+   *
+   * @param evt The bundle event to compare this event with.
+   * @return \c true if both events originate from the same bundle, describe
+   *         a life-cycle change for the same bundle, and are of the same type.
+   *         \c false otherwise. Two invalid bundle events are considered to
+   *         be equal.
+   */
+  bool operator==(const BundleEvent& evt) const;
 };
 
 /**

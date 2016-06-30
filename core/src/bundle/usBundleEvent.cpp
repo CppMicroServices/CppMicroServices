@@ -110,6 +110,18 @@ BundleEvent::Type BundleEvent::GetType() const
   return d->type;
 }
 
+Bundle BundleEvent::GetOrigin() const
+{
+  return MakeBundle(d->origin);
+}
+
+bool BundleEvent::operator==(const BundleEvent& evt) const
+{
+  if (IsNull() && evt.IsNull()) return true;
+  if (IsNull() || evt.IsNull()) return false;
+  return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() && GetOrigin() == evt.GetOrigin();
+}
+
 std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 {
   switch (eventType)

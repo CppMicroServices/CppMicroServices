@@ -50,21 +50,21 @@ BundleRegistry::~BundleRegistry(void)
 
 void BundleRegistry::Init()
 {
-  bundles.insert(std::make_pair(coreCtx->systemBundle->location, coreCtx->systemBundle));
+  bundles.v.insert(std::make_pair(coreCtx->systemBundle->location, coreCtx->systemBundle));
 }
 
 void BundleRegistry::Clear()
 {
-  auto l = this->Lock();
-  bundles.clear();
+  auto l = this->Lock(); US_UNUSED(l);
+  bundles.v.clear();
 }
 
 std::vector<Bundle> BundleRegistry::Install(const std::string& location, BundlePrivate* caller)
 {
   CheckIllegalState();
 
-  auto l = this->Lock();
-  auto range = bundles.equal_range(location);
+  auto l = this->Lock(); US_UNUSED(l);
+  auto range = bundles.v.equal_range(location);
   if (range.first != range.second)
   {
     std::vector<Bundle> res;
@@ -122,7 +122,7 @@ std::vector<Bundle> BundleRegistry::Install0(
     {
       auto d = std::shared_ptr<BundlePrivate>(new BundlePrivate(coreCtx, std::move(ba)));
       res.emplace_back(MakeBundle(d));
-      bundles.insert(std::make_pair(location, d));
+      bundles.v.insert(std::make_pair(location, d));
       coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, res.back()));
     }
     return res;
@@ -139,12 +139,12 @@ std::vector<Bundle> BundleRegistry::Install0(
 
 void BundleRegistry::Remove(const std::string& location, long id)
 {
-  auto range = bundles.equal_range(location);
+  auto range = bundles.v.equal_range(location);
   for (auto iter = range.first; iter != range.second; ++iter)
   {
     if (iter->second->id == id)
     {
-      bundles.erase(iter);
+      bundles.v.erase(iter);
       return;
     }
   }
@@ -154,9 +154,9 @@ std::shared_ptr<BundlePrivate> BundleRegistry::GetBundle(long id) const
 {
   CheckIllegalState();
 
-  auto l = this->Lock(); US_UNUSED(l);
+  auto l = bundles.Lock(); US_UNUSED(l);
 
-  for (auto& m : bundles)
+  for (auto& m : bundles.v)
   {
     if (m.second->id == id)
     {
@@ -170,20 +170,40 @@ std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(const std
 {
   CheckIllegalState();
 
-  auto l = this->Lock(); US_UNUSED(l);
+  auto l = bundles.Lock(); US_UNUSED(l);
 
-  auto range = bundles.equal_range(location);
+  auto range = bundles.v.equal_range(location);
   std::vector<std::shared_ptr<BundlePrivate>> result;
   std::transform(range.first, range.second, std::back_inserter(result), [](const BundleMap::value_type& p){ return p.second; });
   return result;
 }
 
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(const std::string& name, const BundleVersion& version) const
+{
+  CheckIllegalState();
+
+  std::vector<std::shared_ptr<BundlePrivate>> res;
+
+  auto l = bundles.Lock(); US_UNUSED(l);
+
+  for (auto& p : bundles.v)
+  {
+    auto& b = p.second;
+    if (name == b->symbolicName && version == b->version)
+    {
+      res.push_back(b);
+    }
+  }
+
+  return res;
+}
+
 std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles() const
 {
-  auto l = this->Lock(); US_UNUSED(l);
+  auto l = bundles.Lock(); US_UNUSED(l);
 
   std::vector<std::shared_ptr<BundlePrivate>> result;
-  std::transform(bundles.begin(), bundles.end(), std::back_inserter(result), [](const BundleMap::value_type& p){ return p.second; });
+  std::transform(bundles.v.begin(), bundles.v.end(), std::back_inserter(result), [](const BundleMap::value_type& p){ return p.second; });
   return result;
 }
 
@@ -192,8 +212,8 @@ std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetActiveBundles() c
   CheckIllegalState();
   std::vector<std::shared_ptr<BundlePrivate>> result;
 
-  auto l = this->Lock(); US_UNUSED(l);
-  for (auto& b : bundles)
+  auto l = bundles.Lock(); US_UNUSED(l);
+  for (auto& b : bundles.v)
   {
     auto s = b.second->state.load();
     if (s == Bundle::STATE_ACTIVE || s == Bundle::STATE_STARTING)
@@ -206,14 +226,14 @@ std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetActiveBundles() c
 
 void BundleRegistry::Load()
 {
-  auto l = Lock();
+  auto l = this->Lock(); US_UNUSED(l);
   auto bas = coreCtx->storage->GetAllBundleArchives();
   for (auto const& ba : bas)
   {
     try
     {
       std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
-      bundles.insert(std::make_pair(impl->location, impl));
+      bundles.v.insert(std::make_pair(impl->location, impl));
     }
     catch (const std::exception& e)
     {

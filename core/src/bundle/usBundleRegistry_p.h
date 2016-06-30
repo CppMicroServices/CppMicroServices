@@ -36,6 +36,7 @@ class CoreBundleContext;
 class Framework;
 class Bundle;
 class BundlePrivate;
+class BundleVersion;
 struct BundleActivator;
 
 /**
@@ -90,6 +91,16 @@ public:
   std::vector<std::shared_ptr<BundlePrivate>> GetBundles(const std::string& location) const;
 
   /**
+   * Get all bundles that have the specified bundle symbolic
+   * name and version.
+   *
+   * @param name The symbolic name of bundle to get.
+   * @param version The bundle version of bundle to get.
+   * @return Collection of BundleImpls.
+   */
+  std::vector<std::shared_ptr<BundlePrivate>> GetBundles(const std::string& name, const BundleVersion& version) const;
+
+  /**
    * Get all known bundles.
    *
    * @return A list which is filled with all known bundles.
@@ -127,10 +138,8 @@ private:
   /**
    * Table of all installed bundles in this framework.
    * Key is the bundle location.
-   *
-   * @GuardedBy this
    */
-  BundleMap bundles;
+  struct : MultiThreaded<> { BundleMap v; } bundles;
 
 };
 

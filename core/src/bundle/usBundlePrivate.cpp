@@ -745,6 +745,15 @@ BundlePrivate::BundlePrivate(
     throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is empty in the bundle manifest for bundle " + symbolicName + ".");
   }
 
+  auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
+  if (!snbl.empty())
+  {
+    throw std::invalid_argument("Bundle#" + std::to_string(id) +
+                                ", a bundle with same symbolic name and version " +
+                                "is already installed (" + symbolicName + ", " +
+                                version.ToString() + ")");
+  }
+
   // $TODO extensions
   // Activate extension as soon as they are installed so that
   // they get added in bundle id order.

@@ -24,6 +24,7 @@
 
 #include "usBundleArchive_p.h"
 #include "usBundleResourceContainer_p.h"
+#include "usConstants.h"
 
 namespace us {
 
@@ -43,8 +44,16 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
     const std::vector<std::string>& topLevelEntries)
 {
   std::vector<std::shared_ptr<BundleArchive>> res;
+  auto l = archives.Lock(); US_UNUSED(l);
   for (auto const& prefix : topLevelEntries)
   {
+#ifndef US_BUILD_SHARED_LIBS
+    // The system bundle is already installed
+    if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
+    {
+      continue;
+    }
+#endif
     auto id = nextFreeId++;
     std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{id, 0, -1});
     auto p = archives.v.insert(std::make_pair(
@@ -82,6 +91,7 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::GetAllBundleArc
 std::vector<long> BundleStorageMemory::GetStartOnLaunchBundles() const
 {
   std::vector<long> res;
+  auto l = archives.Lock(); US_UNUSED(l);
   for (auto& v : archives.v)
   {
     if (v.second->GetAutostartSetting() != -1)
@@ -96,7 +106,7 @@ void BundleStorageMemory::Close()
 {
   std::map<long, std::shared_ptr<BundleArchive>> ar;
   {
-    archives.Lock();
+    auto l = archives.Lock(); US_UNUSED(l);
     ar = std::move(archives.v);
     archives.v.clear();
   }

@@ -238,7 +238,9 @@ public:
    * This implementation calls GetService() to determine if a service
    * is being tracked.
    *
-   * @param rel_time The relative time duration to wait for a service
+   * @param rel_time The relative time duration to wait for a service. If
+   *        zero, the method will wait indefinitely.
+   * @throws std::invalid_argument exception if \c rel_time is negative.
    * @return Returns the result of GetService().
    */
   template<class Rep, class Period>

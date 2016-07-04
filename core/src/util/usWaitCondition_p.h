@@ -59,7 +59,15 @@ public:
   std::cv_status WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time)
   {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    return m_CondVar.wait_for(lock.m_Lock, rel_time);
+    if (rel_time == std::chrono::duration<Rep, Period>::zero())
+    {
+      Wait(lock);
+      return std::cv_status::no_timeout;
+    }
+    else
+    {
+      return m_CondVar.wait_for(lock.m_Lock, rel_time);
+    }
 #else
     US_UNUSED(lock);
     US_UNUSED(rel_time);
@@ -71,7 +79,15 @@ public:
   bool WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time, Predicate pred)
   {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    return m_CondVar.wait_for(lock.m_Lock, rel_time, pred);
+    if (rel_time == std::chrono::duration<Rep, Period>::zero())
+    {
+      Wait(lock, pred);
+      return true;
+    }
+    else
+    {
+      return m_CondVar.wait_for(lock.m_Lock, rel_time, pred);
+    }
 #else
     US_UNUSED(lock);
     US_UNUSED(rel_time);

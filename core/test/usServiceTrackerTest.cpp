@@ -36,6 +36,7 @@
 #include "usServiceControlInterface.h"
 
 #include <memory>
+#include <future>
 
 using namespace us;
 
@@ -156,6 +157,28 @@ void TestServiceTracker(BundleContext context)
 
   US_TEST_CONDITION_REQUIRED(sa2.size() == 1, "Checking ServiceTracker size");
   US_TEST_CONDITION_REQUIRED(s1 + "0" == sa2[0].GetInterfaceId(), "Checking service implementation name");
+
+  // 4. Test notifications via closing the tracker
+  {
+    ServiceTracker<void> st2(context, "dummy");
+    st2.Open();
+
+    // wait indefinitely
+    auto fut1 = std::async(std::launch::async, [&st2]{ return st2.WaitForService(); });
+    // wait "long enough"
+    auto fut2 = std::async(std::launch::async, [&st2]{ return st2.WaitForService(std::chrono::minutes(1)); });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    US_TEST_CONDITION_REQUIRED(fut1.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout, "Waiter not notified yet");
+    US_TEST_CONDITION_REQUIRED(fut2.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout, "Waiter not notified yet");
+
+    st2.Close();
+
+    // Closing the tracker should notify the waiters
+    auto wait_until = Clock::now() + std::chrono::seconds(3);
+    US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == std::future_status::ready, "Closed service tracker notifies waiters");
+    US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == std::future_status::ready, "Closed service tracker notifies waiters");
+  }
 
   // 5. Close this service tracker
   st1->Close();

@@ -177,24 +177,7 @@ template<class S, class T>
 std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
 ServiceTracker<S,T>::WaitForService()
 {
-  auto object = GetService();
-  if (!object)
-  {
-    _TrackedService* t = d->Tracked();
-    if (t == nullptr)
-    { /* if ServiceTracker is not open */
-      return object;
-    }
-    {
-      auto l = t->Lock();
-      if (t->Size_unlocked() == 0)
-      {
-        t->Wait(l, [&t]{ return t->Size_unlocked(); });
-      }
-    }
-    object = GetService();
-  }
-  return object;
+  return WaitForService(std::chrono::milliseconds::zero());
 }
 
 template<class S, class T>
@@ -202,23 +185,43 @@ template<class Rep, class Period>
 std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
 ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& rel_time)
 {
+  if (rel_time.count() < 0)
+  {
+    throw std::invalid_argument("negative timeout");
+  }
+
   auto object = GetService();
-  while (!object)
+  if (object) return object;
+
+  using D = std::chrono::duration<Rep, Period>;
+
+  auto timeout = rel_time;
+  const Clock::time_point endTime = (rel_time == D::zero()) ? Clock::time_point() : (Clock::now() + rel_time);
+  do
   {
     _TrackedService* t = d->Tracked();
     if (t == nullptr)
     { /* if ServiceTracker is not open */
       return std::shared_ptr<TrackedParmType>();
     }
+
     {
       auto l = t->Lock();
       if (t->Size_unlocked() == 0)
       {
-        t->WaitFor(l, rel_time);
+        t->WaitFor(l, rel_time,  [&t]{ return t->Size_unlocked() > 0 || t->closed; });
       }
     }
     object = GetService();
-  }
+    // Adapt the timeout in case we "missed" the object after having
+    // been notified within the timeout.
+    if (!object && endTime > Clock::time_point())
+    {
+      timeout = std::chrono::duration_cast<D>(endTime - Clock::now());
+      if (timeout.count() <= 0) break; // timed out
+    }
+  } while (!object);
+
   return object;
 }
 

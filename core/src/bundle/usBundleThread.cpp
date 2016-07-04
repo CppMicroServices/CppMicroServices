@@ -70,7 +70,7 @@ void BundleThread::Run()
           break;
         }
         {
-          auto l2 = fwCtx->bundleThreads.Lock();
+          auto l2 = fwCtx->bundleThreads.Lock(); US_UNUSED(l2);
           auto iter = std::find(fwCtx->bundleThreads.value.begin(), fwCtx->bundleThreads.value.end(), this->shared_from_this());
           if (iter != fwCtx->bundleThreads.value.end())
           {
@@ -103,10 +103,21 @@ void BundleThread::Run()
       {
         US_ERROR << bundle.load()->symbolicName << ": " << e.what();
       }
+
       operation = OP_IDLE;
-      res.Set(tmpres);
+      if (tmpres)
+      {
+        pr.set_exception(tmpres);
+      }
+      else
+      {
+        pr.set_value(true);
+      }
+
     }
-    fwCtx->resolver.NotifyAll();
+
+    // lock the resolver in order to synchronize with StartAndWait
+    fwCtx->resolver.Lock(), fwCtx->resolver.NotifyAll();
   }
 }
 
@@ -137,55 +148,49 @@ std::exception_ptr BundleThread::CallStop1(BundlePrivate* b, UniqueLock& resolve
 
 std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLock& resolveLock)
 {
-  res.UnSet();
+  std::future<bool> res;
   {
     auto l = Lock();
+    pr = std::promise<bool>();
+    res = pr.get_future();
     bundle = b;
     operation = op;
   }
   NotifyAll();
 
   // timeout for waiting on op to finish can be set for start/stop
-  std::chrono::milliseconds left{0};
+  auto waitTime = std::chrono::milliseconds::zero();
   if (op == OP_START || op == OP_STOP)
   {
     b->aborted = static_cast<uint8_t>(BundlePrivate::Aborted::NO); // clear aborted status
-    left = startStopTimeout;
+    waitTime = startStopTimeout;
   }
   bool timeout = false;
   bool uninstall = false;
 
-  Clock::time_point waitUntil = Clock::now() + left;
-  do
+  fwCtx->resolver.WaitFor(resolveLock, waitTime, [&res]{
+    return res.valid() &&
+        res.wait_for(std::chrono::milliseconds::zero()) == std::future_status::ready;
+  });
+
+  // Abort start/stop operation if bundle has been uninstalled
+  if ((op == OP_START || op == OP_STOP) && b->state == Bundle::STATE_UNINSTALLED)
   {
-    fwCtx->resolver.WaitFor(resolveLock, std::max(std::chrono::milliseconds(1), left));
+    uninstall = true;
+  }
+  else if (waitTime.count() > 0 && // we were waiting with a timeout
+           ((op == OP_START && b->state == Bundle::STATE_STARTING)
+            || (op == OP_STOP && b->state == Bundle::STATE_STOPPING))
+           )
+  {
+    timeout = true;
+  }
 
-    // Abort start/stop operation if bundle has been uninstalled
-    if ((op == OP_START || op == OP_STOP) && b->state == Bundle::STATE_UNINSTALLED)
-    {
-      uninstall = true;
-      res.Set(nullptr);
-    }
-    else if (left.count() > 0)
-    { // we were waiting with a timeout
-      left = std::chrono::duration_cast<std::chrono::milliseconds>(waitUntil - Clock::now());
-
-      // check time-out for Bundle.start and .stop
-      if (left.count() <= 0 && ((op == OP_START && b->state == Bundle::STATE_STARTING)
-                       || (op == OP_STOP && b->state == Bundle::STATE_STOPPING)))
-      {
-        timeout = true;
-        res.Set(nullptr);
-      }
-    }
-
-  } while (!res.IsSet());
-
-  // if b.aborted is set, BundleThread has/will concluded start/stop
+  // if b->aborted is set, BundleThread has/will concluded start/stop
   if (b->aborted == static_cast<uint8_t>(BundlePrivate::Aborted::NONE) &&
       (timeout || uninstall))
   {
-    // BundleThreda is still in BundleActivator.start/.stop,
+    // BundleThread is still in BundleActivator::Start/::Stop,
 
     // signal to BundleThread that this
     // thread is acting on uninstall/time-out
@@ -217,14 +222,12 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
     }
 
     Quit();
-
-    res.Set(std::make_exception_ptr(
-              std::runtime_error("Bundle#" + std::to_string(b->id) + " " +
-                                 opType + " failed with reason: " + reason))
-            );
-
     b->ResetBundleThread();
-    return res.Get();
+
+    return std::make_exception_ptr(std::runtime_error(
+                                     "Bundle#" + std::to_string(b->id) + " " +
+                                     opType + " failed with reason: " + reason
+                                     ));
   }
   else
   {
@@ -236,7 +239,15 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
         // i.e. uninstall during operation?
       }
       b->ResetBundleThread();
-      return res.Get();
+      try
+      {
+        res.get();
+        return nullptr;
+      }
+      catch (...)
+      {
+        return std::current_exception();
+      }
     }
   }
 }

@@ -33,6 +33,8 @@
 #include "usThreads_p.h"
 #include "usWaitCondition_p.h"
 
+#include <future>
+
 namespace us {
 
 class BundlePrivate;
@@ -54,16 +56,7 @@ class BundleThread : public MultiThreaded<MutexLockingStrategy<>, WaitCondition>
   BundleEvent be;
   std::atomic<BundlePrivate*> bundle;
   std::atomic<int> operation;
-  struct R : private MultiThreaded<> {
-    R() : set(false) {}
-    void Set(const std::exception_ptr& ep) { Lock(), set = true, val = ep; }
-    std::exception_ptr Get() const { return (Lock(), val); }
-    void UnSet() { Lock(), set = false, val = 0; }
-    bool IsSet() const { return (Lock(), set); }
-  private:
-    bool set;
-    std::exception_ptr val;
-  } res;
+  std::promise<bool> pr;
   std::atomic<bool> doRun;
 
   struct : MultiThreaded<> { std::thread v; } th;

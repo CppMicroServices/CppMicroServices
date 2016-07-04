@@ -107,7 +107,7 @@ FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& ti
   if (((Bundle::STATE_INSTALLED | Bundle::STATE_RESOLVED) & state) == 0)
   {
     stopEvent = FrameworkEventInternal{ false, FrameworkEvent::ERROR, std::exception_ptr() };
-    if (timeout.count() == 0)
+    if (timeout == std::chrono::milliseconds::zero())
     {
       Wait(l, [&] { return stopEvent.valid; });
     }

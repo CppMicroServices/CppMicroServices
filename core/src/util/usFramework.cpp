@@ -106,7 +106,7 @@ void Framework::Start()
   }
 
   {
-    auto l = d->Lock();
+    auto l = d->Lock(); US_UNUSED(l);
     d->state = STATE_ACTIVE;
     d->operation = BundlePrivate::OP_IDLE;
   }

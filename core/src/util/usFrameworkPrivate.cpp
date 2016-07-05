@@ -187,7 +187,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
     }
     coreCtx->Uninit0();
     {
-      auto l = Lock();
+      auto l = Lock(); US_UNUSED(l);
       coreCtx->Uninit1();
       ShutdownDone_unlocked(restart);
     }
@@ -205,7 +205,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
   }
   catch (...)
   {
-    auto l = Lock();
+    auto l = Lock(); US_UNUSED(l);
     SystemShuttingdownDone_unlocked(
           FrameworkEventInternal{
             true,

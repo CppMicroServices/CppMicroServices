@@ -51,7 +51,7 @@ void BundleThread::Quit()
 {
   doRun = false;
   NotifyAll();
-  auto l = th.Lock();
+  auto l = th.Lock(); US_UNUSED(l);
   if (th.v.joinable()) th.v.join();
 }
 
@@ -123,7 +123,7 @@ void BundleThread::Run()
 
 void BundleThread::Join()
 {
-  auto l = th.Lock();
+  auto l = th.Lock(); US_UNUSED(l);
   if (th.v.joinable())
   {
     th.v.join();
@@ -150,7 +150,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
 {
   std::future<bool> res;
   {
-    auto l = Lock();
+    auto l = Lock(); US_UNUSED(l);
     pr = std::promise<bool>();
     res = pr.get_future();
     bundle = b;

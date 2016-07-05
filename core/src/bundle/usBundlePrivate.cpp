@@ -138,7 +138,7 @@ std::exception_ptr BundlePrivate::Stop1()
     // if stop was aborted (uninstall or timeout), make sure
     // FinalizeActivation() has finished before checking aborted/state
     {
-      auto l = coreCtx->resolver.Lock();
+      auto l = coreCtx->resolver.Lock(); US_UNUSED(l);
       std::string cause;
       if (aborted == static_cast<uint8_t>(Aborted::YES))
       {
@@ -452,7 +452,7 @@ void BundlePrivate::Start(uint32_t options)
   // Last step of lazy activation
   coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::LAZY_ACTIVATION, MakeBundle(this->shared_from_this())));
   {
-    auto l = coreCtx->resolver.Lock();
+    auto l = coreCtx->resolver.Lock(); US_UNUSED(l);
     operation = BundlePrivate::OP_IDLE;
     coreCtx->resolver.NotifyAll();
   }

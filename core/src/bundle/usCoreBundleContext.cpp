@@ -150,7 +150,7 @@ void CoreBundleContext::Uninit1()
   resolver.Clear();
 
   {
-    auto l = bundleThreads.Lock();
+    auto l = bundleThreads.Lock(); US_UNUSED(l);
     while (!bundleThreads.value.empty())
     {
       bundleThreads.value.front()->Quit();

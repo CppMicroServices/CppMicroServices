@@ -170,7 +170,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
 
   fwCtx->resolver.WaitFor(resolveLock, waitTime, [&res]{
     return res.valid() &&
-        res.wait_for(std::chrono::milliseconds::zero()) == std::future_status::ready;
+        res.wait_for(std::chrono::milliseconds::zero()) == US_FUTURE_READY;
   });
 
   // Abort start/stop operation if bundle has been uninstalled

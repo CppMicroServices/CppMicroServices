@@ -193,7 +193,7 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
   auto object = GetService();
   if (object) return object;
 
-  using D = std::chrono::duration<Rep, Period>;
+  typedef std::chrono::duration<Rep, Period> D;
 
   auto timeout = rel_time;
   const Clock::time_point endTime = (rel_time == D::zero()) ? Clock::time_point() : (Clock::now() + rel_time);

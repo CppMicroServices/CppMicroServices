@@ -169,15 +169,15 @@ void TestServiceTracker(BundleContext context)
     auto fut2 = std::async(std::launch::async, [&st2]{ return st2.WaitForService(std::chrono::minutes(1)); });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    US_TEST_CONDITION_REQUIRED(fut1.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout, "Waiter not notified yet");
-    US_TEST_CONDITION_REQUIRED(fut2.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout, "Waiter not notified yet");
+    US_TEST_CONDITION_REQUIRED(fut1.wait_for(std::chrono::milliseconds(1)) == US_FUTURE_TIMEOUT, "Waiter not notified yet");
+    US_TEST_CONDITION_REQUIRED(fut2.wait_for(std::chrono::milliseconds(1)) == US_FUTURE_TIMEOUT, "Waiter not notified yet");
 
     st2.Close();
 
     // Closing the tracker should notify the waiters
     auto wait_until = Clock::now() + std::chrono::seconds(3);
-    US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == std::future_status::ready, "Closed service tracker notifies waiters");
-    US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == std::future_status::ready, "Closed service tracker notifies waiters");
+    US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == US_FUTURE_READY, "Closed service tracker notifies waiters");
+    US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == US_FUTURE_READY, "Closed service tracker notifies waiters");
   }
 
   // 5. Close this service tracker

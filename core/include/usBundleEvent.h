@@ -28,10 +28,7 @@
 
 #include "usCoreExport.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
 namespace us {
 
@@ -245,8 +242,6 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const BundleEvent& eve
 
 }
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
 #endif // USBUNDLEEVENT_H

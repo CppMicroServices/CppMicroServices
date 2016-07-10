@@ -35,14 +35,9 @@
 #endif
 #endif
 
-#include "usSharedData.h"
-
 #include "usServiceReference.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
 namespace us {
 
@@ -61,7 +56,7 @@ class ServiceEventData;
 class US_Core_EXPORT ServiceEvent
 {
 
-  SharedDataPointer<ServiceEventData> d;
+  std::shared_ptr<ServiceEventData> d;
 
 public:
 
@@ -126,8 +121,6 @@ public:
    */
   ServiceEvent();
 
-  ~ServiceEvent();
-
   /**
    * Can be used to check if this ServiceEvent instance is valid,
    * or if it has been constructed using the default constructor.
@@ -135,7 +128,7 @@ public:
    * @return <code>true</code> if this event object is valid,
    *         <code>false</code> otherwise.
    */
-  bool IsNull() const;
+  explicit operator bool() const;
 
   /**
    * Creates a new service event object.
@@ -191,8 +184,6 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& ev
 
 }
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
 #endif // USSERVICEEVENT_H

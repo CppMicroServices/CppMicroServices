@@ -27,20 +27,12 @@
 
 namespace us {
 
-class ServiceEventData : public SharedData
+class ServiceEventData
 {
 public:
 
-  ServiceEventData& operator=(const ServiceEventData&) = delete;
-
   ServiceEventData(const ServiceEvent::Type& type, const ServiceReferenceBase& reference)
     : type(type), reference(reference)
-  {
-
-  }
-
-  ServiceEventData(const ServiceEventData& other)
-    : SharedData(other), type(other.type), reference(other.reference)
   {
 
   }
@@ -51,17 +43,12 @@ public:
 };
 
 ServiceEvent::ServiceEvent()
-  : d(0)
+  : d(nullptr)
 {
 
 }
 
-ServiceEvent::~ServiceEvent()
-{
-
-}
-
-bool ServiceEvent::IsNull() const
+ServiceEvent::operator bool() const
 {
   return !d;
 }
@@ -109,7 +96,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type)
 
 std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
 {
-  if (event.IsNull()) return os << "NONE";
+  if (!event) return os << "NONE";
 
   os << event.GetType();
 

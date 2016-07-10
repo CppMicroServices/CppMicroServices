@@ -82,10 +82,10 @@ endif()
 
 #            SHARED THREADING
 
-set(config0     0       0     )
+set(config0     1       1     )
 set(config1     0       1     )
 set(config2     1       0     )
-set(config3     1       1     )
+set(config3     0       0     )
 
 if(NOT US_CMAKE_GENERATOR)
   set(US_CMAKE_GENERATOR "Unix Makefiles")

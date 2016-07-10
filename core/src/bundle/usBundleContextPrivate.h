@@ -55,7 +55,8 @@ public:
 };
 
 // The following method is exported for the GetBundleContext() method
-US_Core_EXPORT BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d);
+US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
+BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d);
 std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c);
 
 }

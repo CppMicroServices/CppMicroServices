@@ -62,7 +62,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool() const
 {
-  return GetBundle().IsValid();
+  return static_cast<bool>(GetBundle());
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)

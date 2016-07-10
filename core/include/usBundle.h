@@ -52,7 +52,7 @@ typedef ServiceReference<void> ServiceReferenceU;
  *
  * A <code>%Bundle</code> object is the access point to define the lifecycle of an
  * installed bundle. Each bundle installed in the CppMicroServices environment has
- * an an associated <code>%Bundle</code> object.
+ * an associated <code>%Bundle</code> object.
  *
  * A bundle has a unique identity, a <code>long</code>, chosen by the
  * Framework. This identity does not change during the lifecycle of a bundle.
@@ -140,7 +140,7 @@ public:
     /**
      * The bundle is in the process of starting.
      *
-     * A bundle is in the {@code STATE_STARTING} state when its {@link #Start(int)
+     * A bundle is in the {@code STATE_STARTING} state when its {@link #Start(uint32_t)
      * Start} method is active. A bundle must be in this state when the bundle's
      * {@link BundleActivator#Start(const BundleContext&)} is called.
      * If the {@code BundleActivator#Start} method completes without exception, then
@@ -158,7 +158,7 @@ public:
     /**
      * The bundle is in the process of stopping.
      *
-     * A bundle is in the {@code STATE_STOPPING} state when its {@link #Stop(int)
+     * A bundle is in the {@code STATE_STOPPING} state when its {@link #Stop(uint32_t)
      * Stop} method is active. A bundle is in this state when the bundle's
      * {@link BundleActivator#Stop(const BundleContext&)} method
      * is called. When the {@code BundleActivator#Stop} method completes the bundle
@@ -191,6 +191,7 @@ public:
      * modified.
      *
      * @see #Start(uint32_t)
+     * @note This option is reserved for future use and not supported yet.
      */
     START_TRANSIENT = 0x00000001,
 
@@ -205,11 +206,12 @@ public:
      *
      * @see Constants#PLUGIN_ACTIVATIONPOLICY
      * @see #Start(uint32_t)
+     * @note This option is reserved for future use and not supported yet.
      */
     START_ACTIVATION_POLICY = 0x00000002
   };
 
-  enum StopOptions {
+  enum StopOptions : uint32_t {
 
     /**
      * The bundle stop is transient and the persistent autostart setting of the
@@ -221,19 +223,26 @@ public:
      * modified.
      *
      * @see #Stop(uint32_t)
+     * @note This option is reserved for future use and not supported yet.
      */
     STOP_TRANSIENT = 0x00000001
   };
 
-  // Bundle(const Bundle &) = default;
-  // Bundle(Bundle&&) = default;
-  // Bundle& operator=(const Bundle&) = default;
-  // Bundle& operator=(Bundle&&) = default;
+  Bundle(const Bundle &); // = default
+  Bundle(Bundle&&); // = default
+  Bundle& operator=(const Bundle&); // = default
+  Bundle& operator=(Bundle&&); // = default
 
   /**
-   * Constructs an invalid %Bundle object
+   * Constructs an invalid %Bundle object.
    *
-   * @see IsValid()
+   * Valid bundle objects can only be created by the framework in
+   * response to certain calls to a \c BundleContext object.
+   * A \c BundleContext object is supplied to a bundle via its
+   * \c BundleActivator or as a return value of the
+   * \c GetBundleContext() method.
+   *
+   * @see operator bool() const
    */
   Bundle();
 
@@ -285,11 +294,6 @@ public:
    * @return \c true if this %Bundle object is valid and can safely be used,
    *         \c false otherwise.
    */
-  bool IsValid() const;
-
-  /**
-   * Boolean conversion operator using IsValid().
-   */
   explicit operator bool() const;
 
   /**
@@ -315,13 +319,10 @@ public:
    * of this bundle.
    *
    * If this bundle is not in the <code>STATE_STARTED</code> state, then this
-   * bundle has no valid <code>BundleContext</code>. This method will
-   * return <code>nullptr</code> if this bundle has no valid
-   * <code>BundleContext</code>.
+   * bundle has no valid <code>BundleContext</code> and this method will
+   * return a default constructed \c BundleContext object.
    *
-   * @return A <code>BundleContext</code> for this bundle or
-   *         <code>nullptr</code> if this bundle has no valid
-   *         <code>BundleContext</code>.
+   * @return A valid or invalid <code>BundleContext</code> for this bundle or.
    */
   BundleContext GetBundleContext() const;
 
@@ -338,7 +339,7 @@ public:
    * - Does not change when a bundle is re-started.
    *
    * This method continues to return this bundle's unique identifier while
-   * this bundle is in the <code>STATE_STOPPED</code> state.
+   * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The unique identifier of this bundle.
    */
@@ -349,7 +350,7 @@ public:
    *
    * The location is the full path to the bundle's shared library.
    * This method continues to return this bundle's location
-   * while this bundle is in the <code>STATE_STOPPED</code> state.
+   * while this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The string representation of this bundle's location.
    */
@@ -361,7 +362,7 @@ public:
    * name together with a version must identify a unique bundle.
    *
    * This method continues to return this bundle's symbolic name while
-   * this bundle is in the <code>STATE_STOPPED</code> state.
+   * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The symbolic name of this bundle.
    */
@@ -373,7 +374,7 @@ public:
    * specified version then {@link BundleVersion::EmptyVersion} is returned.
    *
    * This method continues to return this bundle's version while
-   * this bundle is in the <code>STATE_STOPPED</code> state.
+   * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The version of this bundle.
    */
@@ -423,6 +424,8 @@ public:
    *
    * @return A list of ServiceReference objects for services this
    * bundle has registered.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
@@ -438,6 +441,8 @@ public:
    *
    * @return A list of ServiceReference objects for all services this
    * bundle is using.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   std::vector<ServiceReferenceU> GetServicesInUse() const;
 
@@ -448,8 +453,9 @@ public:
    *
    * @param path The path name of the resource.
    * @return A BundleResource object for the given \c path. If the \c path cannot
-   * be found in this bundle or the bundle's state is \c STATE_STOPPED, an invalid
-   * BundleResource object is returned.
+   * be found in this bundle an invalid BundleResource object is returned.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   BundleResource GetResource(const std::string& path) const;
 
@@ -475,6 +481,8 @@ public:
    * @param recurse If \c true, recurse into subdirectories. Otherwise only return resources
    * from the specified path.
    * @return A vector of BundleResource objects for each matching entry.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   std::vector<BundleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 

@@ -30,7 +30,7 @@ namespace us {
 /**
  * @ingroup MicroServices
  *
- * A factory for \link ServiceConstants::SCOPE_PROTOTYPE prototype scope\endlink services.
+ * A factory for \link Constants::SCOPE_PROTOTYPE prototype scope\endlink services.
  * The factory can provide multiple, unique service objects.
  *
  * When registering a service, a PrototypeServiceFactory object can be used

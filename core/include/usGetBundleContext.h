@@ -29,13 +29,14 @@
 #endif
 
 #include <usBundleContext.h>
-#include <usBundleContextPrivate.h>
 #include <usBundleUtils.h>
 
 #include <memory>
 #include <cstring>
 
 namespace us {
+
+US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
 
 /**
  * \ingroup MicroServices
@@ -63,7 +64,7 @@ static inline BundleContext GetBundleContext()
   if (getBundleContextInst)
   {
     BundleContextPrivate* ctx = getBundleContextInst();
-    return ctx ? MakeBundleContext(ctx->shared_from_this()) : BundleContext{};
+    return ctx ? MakeBundleContext(ctx) : BundleContext{};
   }
 
   return BundleContext{};

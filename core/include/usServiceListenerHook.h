@@ -29,8 +29,6 @@
 
 #include <string>
 
-US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
-
 namespace us {
 
 class BundleContext;
@@ -131,7 +129,7 @@ struct US_Core_EXPORT ServiceListenerHook
 
     friend class ServiceListenerEntry;
 
-    friend class ::std::hash<ServiceListenerHook::ListenerInfo>;
+    friend struct ::std::hash<ServiceListenerHook::ListenerInfo>;
 
     ListenerInfo(ListenerInfoData* data);
 
@@ -167,8 +165,6 @@ struct US_Core_EXPORT ServiceListenerHook
 };
 
 }
-
-US_MSVC_POP_WARNING
 
 US_HASH_FUNCTION_BEGIN(us::ServiceListenerHook::ListenerInfo)
   return hash<const us::ServiceListenerHook::ListenerInfoData*>()(arg.d.Data());

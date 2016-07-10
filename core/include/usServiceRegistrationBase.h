@@ -26,8 +26,6 @@
 #include "usServiceProperties.h"
 #include "usServiceReference.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
-
 namespace us {
 
 class BundlePrivate;
@@ -103,7 +101,7 @@ public:
    * Updates the properties associated with a service.
    *
    * <p>
-   * The ServiceConstants#OBJECTCLASS and ServiceConstants#SERVICE_ID keys
+   * The Constants#OBJECTCLASS and Constants#SERVICE_ID keys
    * cannot be modified by this method. These values are set by the framework
    * when the service is registered in the environment.
    *
@@ -183,7 +181,7 @@ private:
 
   template<class I1, class ...Interfaces> friend class ServiceRegistration;
 
-  friend class ::std::hash<ServiceRegistrationBase>;
+  friend struct ::std::hash<ServiceRegistrationBase>;
 
   /**
    * Creates an invalid ServiceRegistrationBase object. You can use
@@ -207,8 +205,6 @@ inline std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase&
 }
 
 }
-
-US_MSVC_POP_WARNING
 
 US_HASH_FUNCTION_BEGIN(us::ServiceRegistrationBase)
   return std::hash<us::ServiceRegistrationBasePrivate*>()(arg.d);

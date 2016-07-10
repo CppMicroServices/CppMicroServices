@@ -30,7 +30,12 @@
 
 namespace us {
 
-US_Core_EXPORT BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d)
+US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d)
+{
+  return BundleContext(d->shared_from_this());
+}
+
+BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d)
 {
   return BundleContext(d);
 }

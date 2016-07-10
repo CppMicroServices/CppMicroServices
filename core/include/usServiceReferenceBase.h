@@ -23,13 +23,10 @@
 #ifndef USSERVICEREFERENCEBASE_H
 #define USSERVICEREFERENCEBASE_H
 
-#include <atomic>
-
 #include <usAny.h>
 
+#include <atomic>
 #include <memory>
-
-US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
 
 namespace us {
 
@@ -163,13 +160,13 @@ public:
    * <code>ServiceReferenceBase</code> have the same \link Constants::SERVICE_ID
    * service id\endlink they are equal. This <code>ServiceReferenceBase</code> is less
    * than the specified <code>ServiceReferenceBase</code> if it has a lower
-   * {@link ServiceConstants::SERVICE_RANKING service ranking} and greater if it has a
+   * {@link Constants::SERVICE_RANKING service ranking} and greater if it has a
    * higher service ranking. Otherwise, if this <code>ServiceReferenceBase</code>
    * and the specified <code>ServiceReferenceBase</code> have the same
-   * {@link ServiceConstants::SERVICE_RANKING service ranking}, this
+   * {@link Constants::SERVICE_RANKING service ranking}, this
    * <code>ServiceReferenceBase</code> is less than the specified
    * <code>ServiceReferenceBase</code> if it has a higher
-   * {@link ServiceConstants::SERVICE_ID service id} and greater if it has a lower
+   * {@link Constants::SERVICE_ID service id} and greater if it has a lower
    * service id.
    *
    * @param reference The <code>ServiceReferenceBase</code> to be compared.
@@ -201,7 +198,7 @@ private:
   template<class S> friend struct ServiceHolder;
   template<class S> friend class ServiceReference;
 
-  friend class ::std::hash<ServiceReferenceBase>;
+  friend struct ::std::hash<ServiceReferenceBase>;
 
   std::size_t Hash() const;
 
@@ -228,8 +225,6 @@ private:
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef);
 
 }
-
-US_MSVC_POP_WARNING
 
 US_HASH_FUNCTION_BEGIN(us::ServiceReferenceBase)
   return arg.Hash();

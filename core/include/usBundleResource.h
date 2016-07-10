@@ -30,8 +30,6 @@
 #include <vector>
 #include <memory>
 
-US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
-
 namespace us {
 
 class BundleResourcePrivate;
@@ -290,7 +288,7 @@ private:
   friend class BundleResourceContainer;
   friend class BundleResourceStream;
 
-  friend class ::std::hash<BundleResource>;
+  friend struct ::std::hash<BundleResource>;
 
   std::size_t Hash() const;
 
@@ -301,8 +299,6 @@ private:
 };
 
 }
-
-US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices

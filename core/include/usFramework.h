@@ -90,7 +90,7 @@ public:
     /**
      * Wait until this Framework has completely stopped. The {@code Stop}
      * method on a Framework performs an asynchronous stop of the Framework
-     * if it was build with threading support.
+     * if it was built with threading support.
      *
      * This method can be used to wait until the asynchronous
      * stop of this Framework has completed. This method will only wait if

@@ -31,7 +31,7 @@ namespace us {
 /**
  * \ingroup MicroServices
  *
- * A factory for \link ServiceConstants::SCOPE_BUNDLE bundle scope\endlink services.
+ * A factory for \link Constants::SCOPE_BUNDLE bundle scope\endlink services.
  * The factory can provide service objects unique to each bundle.
  *
  * <p>

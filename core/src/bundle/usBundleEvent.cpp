@@ -29,11 +29,9 @@
 
 namespace us {
 
-class BundleEventData : public SharedData
+class BundleEventData
 {
 public:
-
-  BundleEventData& operator=(const BundleEventData&) = delete;
 
   BundleEventData(BundleEvent::Type type, const Bundle& bundle,
                    const Bundle& origin)
@@ -41,12 +39,6 @@ public:
   {
     if (!bundle) throw std::invalid_argument("invalid bundle");
     if (!origin) throw std::invalid_argument("invalid origin");
-  }
-
-  BundleEventData(const BundleEventData& other)
-    : SharedData(other), type(other.type), bundle(other.bundle), origin(other.origin)
-  {
-
   }
 
   const BundleEvent::Type type;
@@ -66,12 +58,7 @@ BundleEvent::BundleEvent()
 
 }
 
-BundleEvent::~BundleEvent()
-{
-
-}
-
-bool BundleEvent::IsNull() const
+BundleEvent::operator bool() const
 {
   return !d;
 }
@@ -86,18 +73,6 @@ BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
   : d(new BundleEventData(type, bundle, origin))
 {
 
-}
-
-BundleEvent::BundleEvent(const BundleEvent& other)
-  : d(other.d)
-{
-
-}
-
-BundleEvent& BundleEvent::operator=(const BundleEvent& other)
-{
-  d = other.d;
-  return *this;
 }
 
 Bundle BundleEvent::GetBundle() const
@@ -117,8 +92,8 @@ Bundle BundleEvent::GetOrigin() const
 
 bool BundleEvent::operator==(const BundleEvent& evt) const
 {
-  if (IsNull() && evt.IsNull()) return true;
-  if (IsNull() || evt.IsNull()) return false;
+  if (!(*this) && !evt) return true;
+  if (!(*this) || !evt) return false;
   return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() && GetOrigin() == evt.GetOrigin();
 }
 
@@ -142,7 +117,7 @@ std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 
 std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
 {
-  if (event.IsNull()) return os << "NONE";
+  if (!event) return os << "NONE";
 
   auto m = event.GetBundle();
   os << event.GetType() << " #" << m.GetBundleId() << " (" << m.GetSymbolicName() << " at " << m.GetLocation() << ")";

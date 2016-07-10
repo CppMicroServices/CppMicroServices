@@ -92,6 +92,15 @@ class US_Core_EXPORT BundleContext
 
 public:
 
+  /**
+   * Constructs an invalid %BundleContext object.
+   *
+   * Valid bundle context objects can only be created by the framework
+   * and are supplied to a bundle via its \c BundleActivator or as a
+   * return value of the \c GetBundleContext() method.
+   *
+   * @see operator bool() const
+   */
   BundleContext();
 
   /**
@@ -126,7 +135,8 @@ public:
    * will always compare greater then valid \c BundleContext objects.
    *
    * @param rhs The \c BundleContext object to compare this object with.
-   * @return \c
+   * @return \c true if this object is orderded before \c rhs, \c false
+   *         otherwise.
    */
   bool operator<(const BundleContext& rhs) const;
 
@@ -136,6 +146,9 @@ public:
    * Invalid \c BundleContext objects are created by the default constructor or
    * can be returned by certain framework methods if the context bundle has been
    * uninstalled.
+   *
+   * A \c BundleContext object can become invalid by assigning a \c nullptr to
+   * it or if the context bundle is stopped.
    *
    * @return \c true if this %BundleContext object is valid and can safely be used,
    *         \c false otherwise.
@@ -230,7 +243,7 @@ public:
    * @param service A shared_ptr to a map of interface identifiers to service objects.
    * @param properties The properties for this service. The keys in the
    *        properties object must all be <code>std::string</code> objects. See
-   *        {@link ServiceConstants} for a list of standard service property keys.
+   *        {@link Constants} for a list of standard service property keys.
    *        Changes should not be made to this object after calling this
    *        method. To update the service's properties the
    *        {@link ServiceRegistration::SetProperties} method must be called.
@@ -736,7 +749,8 @@ public:
 
 private:
 
-  friend US_Core_EXPORT BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
+  friend US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate*);
+  friend BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
   BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);

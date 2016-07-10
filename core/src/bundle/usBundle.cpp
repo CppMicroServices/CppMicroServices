@@ -44,13 +44,39 @@
 
 namespace us {
 
+Bundle::Bundle(const Bundle & b)
+  : d(b.d)
+  , c(b.c)
+{
+}
+
+Bundle::Bundle(Bundle&& b)
+  : d(std::move(b.d))
+  , c(std::move(b.c))
+{
+}
+
+Bundle& Bundle::operator=(const Bundle& b)
+{
+  this->d = b.d;
+  this->c = b.c;
+  return *this;
+}
+
+Bundle& Bundle::operator=(Bundle&& b)
+{
+  this->d = std::move(b.d);
+  this->c = std::move(b.c);
+  return *this;
+}
+
 Bundle::Bundle()
 {
 }
 
 bool Bundle::operator==(const Bundle& rhs) const
 {
-  return IsValid() ? (rhs.IsValid() ? d->coreCtx->id == rhs.d->coreCtx->id && d->id == rhs.d->id : false) : !rhs.IsValid();
+  return *this ? (rhs ? d->coreCtx->id == rhs.d->coreCtx->id && d->id == rhs.d->id : false) : !rhs;
 }
 
 bool Bundle::operator!=(const Bundle& rhs) const
@@ -60,17 +86,12 @@ bool Bundle::operator!=(const Bundle& rhs) const
 
 bool Bundle::operator<(const Bundle& rhs) const
 {
-  return IsValid() ? (rhs.IsValid() ? (d->coreCtx->id == rhs.d->coreCtx->id ? d->id < rhs.d->id : d->coreCtx->id < rhs.d->coreCtx->id) : true) : false;
-}
-
-bool Bundle::IsValid() const
-{
-  return d != nullptr;
+  return *this ? (rhs ? (d->coreCtx->id == rhs.d->coreCtx->id ? d->id < rhs.d->id : d->coreCtx->id < rhs.d->coreCtx->id) : true) : false;
 }
 
 Bundle::operator bool() const
 {
-  return IsValid();
+  return d != nullptr;
 }
 
 Bundle& Bundle::operator=(std::nullptr_t)
@@ -347,7 +368,8 @@ std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 {
   os << "Bundle[" << "id=" << bundle.GetBundleId() <<
         ", loc=" << bundle.GetLocation() <<
-        ", name=" << bundle.GetSymbolicName() << "]";
+        ", name=" << bundle.GetSymbolicName() <<
+        ", state=" << bundle.GetState() << "]";
   return os;
 }
 

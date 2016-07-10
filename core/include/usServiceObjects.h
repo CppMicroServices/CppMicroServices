@@ -70,10 +70,10 @@ protected:
  *
  * Allows multiple service objects for a service to be obtained.
  *
- * For services with \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink scope,
+ * For services with \link Constants::SCOPE_PROTOTYPE prototype\endlink scope,
  * multiple service objects for the service can be obtained. For services with
- * \link ServiceConstants::SCOPE_SINGLETON singleton\endlink or
- * \link ServiceConstants::SCOPE_BUNDLE bundle \endlink scope, only one, use-counted
+ * \link Constants::SCOPE_SINGLETON singleton\endlink or
+ * \link Constants::SCOPE_BUNDLE bundle \endlink scope, only one, use-counted
  * service object is available. Any unreleased service objects obtained from this
  * ServiceObjects object are automatically released by the framework when the bundles
  * associated with the BundleContext used to create this ServiceObjects object is
@@ -97,9 +97,9 @@ public:
    * Returns a service object for the referenced service.
    *
    * This ServiceObjects object can be used to obtain multiple service objects for
-   * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
-   * scope. If the referenced service has \link ServiceConstants::SCOPE_SINGLETON singleton\endlink
-   * or \link ServiceConstants::SCOPE_BUNDLE bundle\endlink scope, this method
+   * the referenced service if the service has \link Constants::SCOPE_PROTOTYPE prototype\endlink
+   * scope. If the referenced service has \link Constants::SCOPE_SINGLETON singleton\endlink
+   * or \link Constants::SCOPE_BUNDLE bundle\endlink scope, this method
    * behaves the same as calling the BundleContext::GetService(const ServiceReferenceBase&)
    * method for the referenced service. That is, only one, use-counted service object
    * is available from this ServiceObjects object.

@@ -685,7 +685,7 @@ BundlePrivate::BundlePrivate(
   , version()
   , fragment()
   , lazyActivation(false)
-  , timeStamp(Clock::now())
+  , timeStamp(ba->GetLastModified())
   , fragments()
   , bundleManifest()
   , lib(location)

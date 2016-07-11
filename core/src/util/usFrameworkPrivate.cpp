@@ -92,6 +92,7 @@ void FrameworkPrivate::InitSystemBundle()
       gen->SetWired();
       fwWiring = new FrameworkWiringImpl(coreCtx);
       */
+  timeStamp = Clock::now();
 }
 
 void FrameworkPrivate::UninitSystemBundle()

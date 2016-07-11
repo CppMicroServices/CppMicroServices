@@ -38,6 +38,8 @@
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
+#include <thread>
+
 using namespace us;
 
 class FrameworkTestSuite
@@ -142,6 +144,9 @@ void frame020a()
 
   US_TEST_CONDITION_REQUIRED(buA.GetState() == Bundle::STATE_INSTALLED, "Test bundle A in state installed")
 
+  US_TEST_CONDITION(buA.GetLastModified() > Clock::time_point(), "Test bundle A last modified")
+  US_TEST_CONDITION(buA.GetLastModified() <= Clock::now(), "Test bundle A last modified")
+
   // Check that no service reference exist yet.
   ServiceReferenceU sr1 = bc.GetServiceReference("us::TestBundleAService");
   US_TEST_CONDITION_REQUIRED(!sr1, "service from bundle A must not exist yet")
@@ -221,8 +226,10 @@ void frame030b()
 
   try
   {
+    auto lm = buA.GetLastModified();
     buA.Stop();
     US_TEST_CONDITION(!(buA.GetState() & Bundle::STATE_ACTIVE), "Test for stopped state")
+    US_TEST_CONDITION(lm == buA.GetLastModified(), "Unchanged last modified time after stop")
   }
   catch (const std::exception& e)
   {
@@ -443,14 +450,18 @@ void TestBundleStates()
     // Test install -> start -> stop -> uninstall
     // expect 6 events (INSTALLED, STARTING, STARTED, STOPPING, STOPPED, UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+    auto lm = bundle.GetLastModified();
     US_TEST_CONDITION(bundle, "Test non-empty bundle")
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
     bundle.Start();
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
     bundle.Stop();
     US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     bundle.Uninstall();
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
+    US_TEST_CONDITION(lm < bundle.GetLastModified(), "Last modified time changed after uninstall")
+    US_TEST_CONDITION(bundle.GetLastModified() <= Clock::now(), "Last modified time <= now")
     bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::RESOLVED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::STARTING, bundle));

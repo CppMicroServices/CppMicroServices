@@ -287,7 +287,7 @@ public:
    * Time when bundle was last modified.
    *
    */
-  const Bundle::TimeStamp timeStamp;
+  Bundle::TimeStamp timeStamp;
 
   /**
    * All fragment bundles this bundle hosts.

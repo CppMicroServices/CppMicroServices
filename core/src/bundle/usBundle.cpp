@@ -220,6 +220,7 @@ void Bundle::Uninstall()
       //generations.set(0, new BundleGeneration(oldGen));
       //oldGen.purge(false);
       d->Purge();
+      d->barchive->SetLastModified(Clock::now());
       d->operation = BundlePrivate::OP_IDLE;
       if (!d->bundleDir.empty())
       {
@@ -347,7 +348,7 @@ std::vector<BundleResource> Bundle::FindResources(const std::string& path, const
 
 Bundle::TimeStamp Bundle::GetLastModified() const
 {
-  return d->timeStamp;
+  return d->barchive ? d->barchive->GetLastModified() : d->timeStamp;
 }
 
 std::ostream& operator<<(std::ostream& os, Bundle::State state)

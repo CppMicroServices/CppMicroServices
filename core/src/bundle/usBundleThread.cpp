@@ -40,8 +40,6 @@ const std::chrono::milliseconds BundleThread::KEEP_ALIVE(1000);
 BundleThread::BundleThread(CoreBundleContext* ctx)
   : fwCtx(ctx)
   , startStopTimeout(0)
-  , bundle(nullptr)
-  , operation(OP_IDLE)
   , doRun(true)
 {
   th.v = std::thread(&BundleThread::Run, this);
@@ -50,7 +48,7 @@ BundleThread::BundleThread(CoreBundleContext* ctx)
 void BundleThread::Quit()
 {
   doRun = false;
-  NotifyAll();
+  op.NotifyAll();
   auto l = th.Lock(); US_UNUSED(l);
   if (th.v.joinable()) th.v.join();
 }
@@ -59,61 +57,72 @@ void BundleThread::Run()
 {
   while (doRun)
   {
+    std::promise<bool> pr;
+    int operation = OP_IDLE;
+    BundlePrivate* bundle = nullptr;
+    BundleEvent bev;
+
+    while (doRun)
     {
-      auto l = Lock();
-      while (doRun && operation == OP_IDLE)
+      auto l = op.Lock(); US_UNUSED(l);
+      if (doRun && op.operation == OP_IDLE)
       {
-        WaitFor(l, KEEP_ALIVE);
-        if (!doRun) return;
-        if (operation != OP_IDLE)
-        {
-          break;
-        }
-        {
-          auto l2 = fwCtx->bundleThreads.Lock(); US_UNUSED(l2);
-          auto iter = std::find(fwCtx->bundleThreads.value.begin(), fwCtx->bundleThreads.value.end(), this->shared_from_this());
-          if (iter != fwCtx->bundleThreads.value.end())
-          {
-            fwCtx->bundleThreads.zombies.push_back(*iter);
-            fwCtx->bundleThreads.value.erase(iter);
-            return;
-          }
-        }
+        op.WaitFor(l, KEEP_ALIVE);
       }
 
       if (!doRun) return;
-
-      std::exception_ptr tmpres;
-      try
+      if (op.operation != OP_IDLE)
       {
-        switch (operation.load())
+        pr = std::move(op.pr);
+        operation = op.operation;
+        bundle = op.bundle;
+        bev = be.Exchange(BundleEvent());
+        break;
+      }
+
+      {
+        auto l2 = fwCtx->bundleThreads.Lock(); US_UNUSED(l2);
+        auto iter = std::find(fwCtx->bundleThreads.value.begin(), fwCtx->bundleThreads.value.end(), this->shared_from_this());
+        if (iter != fwCtx->bundleThreads.value.end())
         {
-        case OP_BUNDLE_EVENT:
-          fwCtx->listeners.BundleChanged(be);
-          break;
-        case OP_START:
-          tmpres = bundle.load()->Start0();
-          break;
-        case OP_STOP:
-          tmpres = bundle.load()->Stop1();
-          break;
+          fwCtx->bundleThreads.zombies.push_back(*iter);
+          fwCtx->bundleThreads.value.erase(iter);
+          return;
         }
       }
-      catch (const std::exception& e)
-      {
-        US_ERROR << bundle.load()->symbolicName << ": " << e.what();
-      }
+    }
 
-      operation = OP_IDLE;
-      if (tmpres)
-      {
-        pr.set_exception(tmpres);
-      }
-      else
-      {
-        pr.set_value(true);
-      }
+    if (!doRun) return;
 
+    std::exception_ptr tmpres;
+    try
+    {
+      switch (operation)
+      {
+      case OP_BUNDLE_EVENT:
+        fwCtx->listeners.BundleChanged(bev);
+        break;
+      case OP_START:
+        tmpres = bundle->Start0();
+        break;
+      case OP_STOP:
+        tmpres = bundle->Stop1();
+        break;
+      }
+    }
+    catch (const std::exception& e)
+    {
+      US_ERROR << bundle->symbolicName << ": " << e.what();
+    }
+
+    op.operation = OP_IDLE;
+    if (tmpres)
+    {
+      pr.set_exception(tmpres);
+    }
+    else
+    {
+      pr.set_value(true);
     }
 
     // lock the resolver in order to synchronize with StartAndWait
@@ -132,7 +141,7 @@ void BundleThread::Join()
 
 void BundleThread::BundleChanged(const BundleEvent& be, UniqueLock& resolveLock)
 {
-  Lock(), this->be = be;
+  this->be.Store(be);
   StartAndWait(GetPrivate(be.GetBundle()).get(), OP_BUNDLE_EVENT, resolveLock);
 }
 
@@ -146,21 +155,21 @@ std::exception_ptr BundleThread::CallStop1(BundlePrivate* b, UniqueLock& resolve
   return StartAndWait(b, OP_STOP, resolveLock);
 }
 
-std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLock& resolveLock)
+std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, UniqueLock& resolveLock)
 {
   std::future<bool> res;
   {
-    auto l = Lock(); US_UNUSED(l);
-    pr = std::promise<bool>();
-    res = pr.get_future();
-    bundle = b;
-    operation = op;
+    auto l = op.Lock(); US_UNUSED(l);
+    op.pr = std::promise<bool>();
+    op.bundle = b;
+    op.operation = operation;
+    res = op.pr.get_future();
   }
-  NotifyAll();
+  op.NotifyAll();
 
   // timeout for waiting on op to finish can be set for start/stop
   auto waitTime = std::chrono::milliseconds::zero();
-  if (op == OP_START || op == OP_STOP)
+  if (operation == OP_START || operation == OP_STOP)
   {
     b->aborted = static_cast<uint8_t>(BundlePrivate::Aborted::NO); // clear aborted status
     waitTime = startStopTimeout;
@@ -174,13 +183,13 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
   });
 
   // Abort start/stop operation if bundle has been uninstalled
-  if ((op == OP_START || op == OP_STOP) && b->state == Bundle::STATE_UNINSTALLED)
+  if ((operation == OP_START || operation == OP_STOP) && b->state == Bundle::STATE_UNINSTALLED)
   {
     uninstall = true;
   }
   else if (waitTime.count() > 0 && // we were waiting with a timeout
-           ((op == OP_START && b->state == Bundle::STATE_STARTING)
-            || (op == OP_STOP && b->state == Bundle::STATE_STOPPING))
+           ((operation == OP_START && b->state == Bundle::STATE_STARTING)
+            || (operation == OP_STOP && b->state == Bundle::STATE_STOPPING))
            )
   {
     timeout = true;
@@ -196,7 +205,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
     // thread is acting on uninstall/time-out
     b->aborted = static_cast<uint8_t>(BundlePrivate::Aborted::YES);
 
-    std::string opType = op == OP_START ? "start" : "stop";
+    std::string opType = operation == OP_START ? "start" : "stop";
     std::string reason = timeout ? "Time-out during bundle " + opType + "()"
                                  : "Bundle uninstalled during " + opType + "()";
 
@@ -205,7 +214,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
 
     if (timeout)
     {
-      if (op == OP_START)
+      if (operation == OP_START)
       {
         // set state, send events, do clean-up like when Bundle::Start()
         // throws an exception
@@ -233,7 +242,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
   {
     {
       fwCtx->bundleThreads.Lock(), fwCtx->bundleThreads.value.push_front(this->shared_from_this());
-      if (op != operation)
+      if (operation != op.operation)
       {
         // TODO! Handle when operation has changed.
         // i.e. uninstall during operation?
@@ -254,7 +263,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int op, UniqueLo
 
 bool BundleThread::IsExecutingBundleChanged() const
 {
-  return operation == OP_BUNDLE_EVENT;
+  return op.operation == OP_BUNDLE_EVENT;
 }
 
 bool BundleThread::operator==(const std::thread::id& id) const

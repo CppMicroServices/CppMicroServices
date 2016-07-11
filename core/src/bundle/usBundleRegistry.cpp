@@ -55,7 +55,7 @@ void BundleRegistry::Init()
 
 void BundleRegistry::Clear()
 {
-  auto l = this->Lock(); US_UNUSED(l);
+  auto l = bundles.Lock(); US_UNUSED(l);
   bundles.v.clear();
 }
 
@@ -64,7 +64,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location, BundleP
   CheckIllegalState();
 
   auto l = this->Lock(); US_UNUSED(l);
-  auto range = bundles.v.equal_range(location);
+  auto range = (bundles.Lock(), bundles.v.equal_range(location));
   if (range.first != range.second)
   {
     std::vector<Bundle> res;
@@ -122,8 +122,19 @@ std::vector<Bundle> BundleRegistry::Install0(
     {
       auto d = std::shared_ptr<BundlePrivate>(new BundlePrivate(coreCtx, std::move(ba)));
       res.emplace_back(MakeBundle(d));
-      bundles.v.insert(std::make_pair(location, d));
-      coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, res.back()));
+    }
+
+    {
+      auto l = bundles.Lock(); US_UNUSED(l);
+      for (auto& b : res)
+      {
+        bundles.v.insert(std::make_pair(location, b.d));
+      }
+    }
+
+    for (auto& b : res)
+    {
+      coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, b));
     }
     return res;
   }
@@ -139,6 +150,7 @@ std::vector<Bundle> BundleRegistry::Install0(
 
 void BundleRegistry::Remove(const std::string& location, long id)
 {
+  auto l = bundles.Lock(); US_UNUSED(l);
   auto range = bundles.v.equal_range(location);
   for (auto iter = range.first; iter != range.second; ++iter)
   {

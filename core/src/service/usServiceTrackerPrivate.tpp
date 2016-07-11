@@ -147,9 +147,9 @@ void ServiceTrackerPrivate<S,TTT>::GetServiceReferences_unlocked(std::vector<Ser
 }
 
 template<class S, class TTT>
-TrackedService<S,TTT>* ServiceTrackerPrivate<S,TTT>::Tracked() const
+std::shared_ptr<TrackedService<S,TTT>> ServiceTrackerPrivate<S,TTT>::Tracked() const
 {
-  return trackedService.get();
+  return trackedService.Load();
 }
 
 template<class S, class TTT>

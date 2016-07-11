@@ -710,6 +710,7 @@ protected:
   std::shared_ptr<BundlePrivate> d;
   std::shared_ptr<CoreBundleContext> c;
 
+  friend class BundleRegistry;
   friend Bundle MakeBundle(const std::shared_ptr<BundlePrivate>&);
   friend std::shared_ptr<BundlePrivate> GetPrivate(const Bundle&);
 

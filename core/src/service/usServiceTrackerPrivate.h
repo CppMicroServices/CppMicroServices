@@ -117,7 +117,7 @@ public:
    * Tracked services: <code>ServiceReference</code> -> customized Object and
    * <code>ServiceListenerEntry</code> object
    */
-  std::unique_ptr<TrackedService<S,TTT>> trackedService;
+  us::Atomic<std::shared_ptr<TrackedService<S,TTT>>> trackedService;
 
   /**
    * Accessor method for the current TrackedService object. This method is only
@@ -126,7 +126,7 @@ public:
    *
    * @return The current Tracked object.
    */
-  TrackedService<S,TTT>* Tracked() const;
+  std::shared_ptr<TrackedService<S,TTT>> Tracked() const;
 
   /**
    * Called by the TrackedService object whenever the set of tracked services is

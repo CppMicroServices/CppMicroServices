@@ -40,8 +40,7 @@ namespace us {
 class BundlePrivate;
 class CoreBundleContext;
 
-class BundleThread : public MultiThreaded<MutexLockingStrategy<>, WaitCondition>
-    , public std::enable_shared_from_this<BundleThread>
+class BundleThread : public std::enable_shared_from_this<BundleThread>
 {
   const static int OP_IDLE;
   const static int OP_BUNDLE_EVENT;
@@ -53,15 +52,23 @@ class BundleThread : public MultiThreaded<MutexLockingStrategy<>, WaitCondition>
   CoreBundleContext* const fwCtx;
   std::chrono::milliseconds startStopTimeout;
 
-  BundleEvent be;
-  std::atomic<BundlePrivate*> bundle;
-  std::atomic<int> operation;
-  std::promise<bool> pr;
+  struct Op : us::MultiThreaded<MutexLockingStrategy<>, WaitCondition>
+  {
+    Op() : operation(OP_IDLE) {}
+
+    std::atomic<BundlePrivate*> bundle;
+    std::atomic<int> operation;
+    std::promise<bool> pr;
+  } op;
+
+  us::Atomic<BundleEvent> be;
   std::atomic<bool> doRun;
 
   struct : MultiThreaded<> { std::thread v; } th;
 
 public:
+
+  typedef Op::UniqueLock UniqueLock;
 
   BundleThread(CoreBundleContext* ctx);
 

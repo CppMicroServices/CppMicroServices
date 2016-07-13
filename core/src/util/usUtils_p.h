@@ -73,10 +73,6 @@ US_Core_EXPORT void RemoveDirectoryRecursive(const std::string& path);
 
 namespace us {
 
-std::string GetBundleNameFromLocation(const std::string& location);
-
-std::string GetBundleLocation(const std::string& location);
-
 bool IsSharedLibrary(const std::string& location);
 
 }

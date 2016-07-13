@@ -282,16 +282,6 @@ void RemoveDirectoryRecursive(const std::string& path)
 // Bundle name and location parsing
 //-------------------------------------------------------------------
 
-std::string GetBundleNameFromLocation(const std::string& location)
-{
-    return location.substr(location.find_last_of('/') + 1);
-}
-
-std::string GetBundleLocation(const std::string& location)
-{
-    return location.substr(0, location.find_last_of('/'));
-}
-
 bool IsSharedLibrary(const std::string& location)
 { // Testing for file extension isn't the most robust way to test
     // for file type.

@@ -24,6 +24,7 @@
 
 #include "usBundleResource.h"
 #include "usLog.h"
+#include "usUtils_p.h"
 
 #include <cstring>
 #include <climits>
@@ -35,6 +36,11 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
 {
+  if (!fs::Exists(location))
+  {
+    throw std::runtime_error("Location does not exist");
+  }
+
   if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0))
   {
     throw std::runtime_error("Could not init zip archive for bundle at " + m_Location);

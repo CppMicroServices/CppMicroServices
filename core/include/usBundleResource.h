@@ -284,7 +284,7 @@ private:
         const std::shared_ptr<const BundleArchive>& archive
         );
 
-  friend class BundleArchive;
+  friend struct BundleArchive;
   friend class BundleResourceContainer;
   friend class BundleResourceStream;
 

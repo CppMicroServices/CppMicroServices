@@ -118,7 +118,7 @@ pointer us_bundle_info(scheme* sc, pointer args)
       infoList = immutable_cons(sc, sc_string(sc, "Location"), infoList);
       infoList = immutable_cons(sc, sc_string(sc, "State"), infoList);
       infoList = immutable_cons(sc, sc_string(sc, "Version"), infoList);
-      infoList = immutable_cons(sc, sc_string(sc, "Name"), infoList);
+      infoList = immutable_cons(sc, sc_string(sc, "Symbolic Name"), infoList);
       infoList = immutable_cons(sc, sc_string(sc, "Id"), infoList);
       return immutable_cons(sc, infoList, result);
     }
@@ -145,9 +145,9 @@ pointer us_bundle_info(scheme* sc, pointer args)
   pointer name = sc_string(sc, bundle.GetSymbolicName().c_str());
   pointer location = sc_string(sc, bundle.GetLocation().c_str());
   pointer version = sc_string(sc, bundle.GetVersion().ToString().c_str());
-  std::string strState;
-  std::stringstream(strState) << bundle.GetState();
-  pointer state = sc_string(sc, strState.c_str());
+  std::stringstream strState;
+  strState << bundle.GetState();
+  pointer state = sc_string(sc, strState.str().c_str());
 
 
   pointer result = sc->NIL;
@@ -226,16 +226,20 @@ pointer us_bundle_start(scheme* sc, pointer args)
   {
     bundle = GetBundleContext().GetBundle(ivalue(arg));
   }
-  else
-  {
-    return sc->F;
-  }
 
   if (bundle)
   {
-    std::cout << "Starting bundle..." << std::endl;
-    return sc->T;
+    try
+    {
+      bundle.Start();
+      return sc->T;
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what();
+    }
   }
+
   return sc->F;
 }
 
@@ -264,16 +268,51 @@ pointer us_bundle_stop(scheme* sc, pointer args)
   {
     bundle = GetBundleContext().GetBundle(ivalue(arg));
   }
-  else
+
+  if (bundle)
+  {
+    try
+    {
+      bundle.Stop();
+      return sc->T;
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what();
+    }
+  }
+
+  return sc->F;
+}
+
+pointer us_install(scheme* sc, pointer args)
+{
+  if(args == sc->NIL)
+  {
+    std::cerr << "Empty argument list" << std::endl;
+    return sc->F;
+  }
+
+  if (sc->vptr->list_length(sc, args) != 1)
   {
     return sc->F;
   }
 
-  if (bundle)
+  pointer arg = pair_car(args);
+  if (is_string(arg))
   {
-    std::cout << "Stopping bundle..." << std::endl;
-    return sc->T;
+    std::string name = sc->vptr->string_value(arg);
+    try
+    {
+      GetBundleContext().InstallBundles(name);
+      return sc->T;
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what();
+    }
   }
+
   return sc->F;
 }
 
@@ -360,6 +399,7 @@ ShellService::ShellService()
   scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-display-bundle-info"), mk_foreign_func(d->m_Scheme, us_display_bundle_info));
   scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-start"), mk_foreign_func(d->m_Scheme, us_bundle_start));
   scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-stop"), mk_foreign_func(d->m_Scheme, us_bundle_stop));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-install"), mk_foreign_func(d->m_Scheme, us_install));
 }
 
 ShellService::~ShellService()

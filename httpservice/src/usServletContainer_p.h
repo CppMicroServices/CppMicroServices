@@ -38,7 +38,7 @@ class ServletHandler;
 
 struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler>
 {
-  ServletContainerPrivate(ServletContainer* q);
+  ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q);
 
   void Start();
   void Stop();

@@ -73,8 +73,8 @@ private:
     std::size_t pos = uri.find_first_of('?');
     uri = uri.substr(0, pos);
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-                                std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-                                std::cout << "Against uri: " << uri << std::endl;
+    std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if(uri.size() > pathPrefix.size())
@@ -122,8 +122,8 @@ public:
   }
 };
 
-ServletContainerPrivate::ServletContainerPrivate(ServletContainer* q)
-    : m_Context(GetBundleContext())
+ServletContainerPrivate::ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q)
+    : m_Context(std::move(bundleCtx))
     , m_Server(nullptr)
     , m_ServletTracker(m_Context, this)
     , q(q)
@@ -215,8 +215,8 @@ void ServletContainerPrivate::RemovedService(const ServiceReference<HttpServlet>
 //-----------            ServletContainer          ------------------
 //-------------------------------------------------------------------
 
-ServletContainer::ServletContainer(const std::string& contextPath)
-  : d(new ServletContainerPrivate(this))
+ServletContainer::ServletContainer(BundleContext bundleCtx, const std::string& contextPath)
+  : d(new ServletContainerPrivate(std::move(bundleCtx), this))
 {
   this->SetContextPath(contextPath);
 }

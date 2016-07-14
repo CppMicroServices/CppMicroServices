@@ -31,10 +31,6 @@ limitations under the License.
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
-#ifdef ERROR
-#undef ERROR
-#endif
-
 using namespace us;
 
 namespace
@@ -170,8 +166,8 @@ namespace
         // Stopping the framework stops all active bundles.
         f.Stop();
         auto ev = f.WaitForStop(std::chrono::seconds(30));
-        if (!ev.IsNull() && ev.GetType() == FrameworkEvent::ERROR) std::rethrow_exception(ev.GetException());
-        US_TEST_CONDITION(ev.IsNull() || ev.GetType() == FrameworkEvent::STOPPED, "Check framework stopped");
+        if (!ev.IsNull() && ev.GetType() == FrameworkEvent::FRAMEWORK_ERROR) std::rethrow_exception(ev.GetException());
+        US_TEST_CONDITION(ev.IsNull() || ev.GetType() == FrameworkEvent::FRAMEWORK_STOPPED, "Check framework stopped");
 
         US_TEST_CONDITION(bundle.GetState() != Bundle::STATE_ACTIVE, "Check that TestBundleA is in the Stop state")
         US_TEST_CONDITION(f.GetState() != Bundle::STATE_ACTIVE, "Check framework is in the Stop state")

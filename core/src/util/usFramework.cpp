@@ -112,7 +112,7 @@ void Framework::Start()
   }
   d->NotifyAll();
   // $TODO
-  // pimpl(d)->coreCtx->listeners.FrameworkEvent(FrameworkEvent(FrameworkEvent::STARTED, this->shared_from_this(), std::exception_ptr()));
+  // pimpl(d)->coreCtx->listeners.FrameworkEvent(FrameworkEvent(FrameworkEvent::FRAMEWORK_STARTED, this->shared_from_this(), std::exception_ptr()));
 }
 
 void Framework::Stop(uint32_t )

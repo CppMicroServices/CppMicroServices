@@ -67,7 +67,7 @@ public:
      * this event is the System Bundle.
      *
      */
-    STARTED	= 0x00000001,
+    FRAMEWORK_STARTED	= 0x00000001,
 
     /**
      * An error has occurred.
@@ -75,7 +75,7 @@ public:
      * <p>
      * There was an error associated with a bundle.
      */
-    ERROR	= 0x00000002,
+    FRAMEWORK_ERROR	= 0x00000002,
 
     /**
      * A warning has occurred.
@@ -84,7 +84,7 @@ public:
      * There was a warning associated with a bundle.
      *
      */
-    WARNING	= 0x00000010,
+    FRAMEWORK_WARNING	= 0x00000010,
 
     /**
      * An informational event has occurred.
@@ -92,7 +92,7 @@ public:
      * <p>
      * There was an informational event associated with a bundle.
      */
-    INFO = 0x00000020,
+    FRAMEWORK_INFO = 0x00000020,
 
     /**
      * The Framework has stopped.
@@ -102,7 +102,7 @@ public:
      * operation on the system bundle. The source of this event is the System
      * Bundle.
      */
-    STOPPED	= 0x00000040,
+    FRAMEWORK_STOPPED	= 0x00000040,
 
     /**
      * The Framework has stopped during update.
@@ -112,7 +112,7 @@ public:
      * update operation on the system bundle. The Framework will be restarted
      * after this event is fired. The source of this event is the System Bundle.
      */
-    STOPPED_UPDATE = 0x00000080,
+    FRAMEWORK_STOPPED_UPDATE = 0x00000080,
 
     /**
      * The Framework did not stop before the wait timeout expired.
@@ -121,7 +121,7 @@ public:
      * This event is fired when the Framework did not stop before the wait
      * timeout expired. The source of this event is the System Bundle.
      */
-    WAIT_TIMEDOUT	= 0x00000200
+    FRAMEWORK_WAIT_TIMEDOUT	= 0x00000200
 
   };
 
@@ -175,13 +175,13 @@ public:
    * <p>
    * The type values are:
    * <ul>
-   * <li>{@link #STARTED}
-   * <li>{@link #ERROR}
-   * <li>{@link #WARNING}
-   * <li>{@link #INFO}
-   * <li>{@link #STOPPED}
-   * <li>{@link #STOPPED_UPDATE}
-   * <li>{@link #WAIT_TIMEDOUT}
+   * <li>{@link #FRAMEWORK_STARTED}
+   * <li>{@link #FRAMEWORK_ERROR}
+   * <li>{@link #FRAMEWORK_WARNING}
+   * <li>{@link #FRAMEWORK_INFO}
+   * <li>{@link #FRAMEWORK_STOPPED}
+   * <li>{@link #FRAMEWORK_STOPPED_UPDATE}
+   * <li>{@link #FRAMEWORK_WAIT_TIMEDOUT}
    * </ul>
    *
    * @return The type of state change.

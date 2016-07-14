@@ -676,7 +676,7 @@ public:
    * -# If this bundle's state is \c STATE_ACTIVE, \c STATE_STARTING or
    *    \c STATE_STOPPING, this bundle is stopped as described in the
    *    \c Bundle#Stop method. If \c Bundle#Stop throws an exception, a
-   *    Framework event of type {@link FrameworkEvent#ERROR} is fired containing
+   *    Framework event of type {@link FrameworkEvent#FRAMEWORK_ERROR} is fired containing
    *    the exception.
    * -# This bundle's state is set to \c STATE_UNINSTALLED.
    * -# A bundle event of type {@link BundleEvent#STATE_UNINSTALLED} is fired.

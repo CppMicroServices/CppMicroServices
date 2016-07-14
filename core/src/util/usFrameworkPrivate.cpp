@@ -107,7 +107,7 @@ FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& ti
   // Already stopped?
   if (((Bundle::STATE_INSTALLED | Bundle::STATE_RESOLVED) & state) == 0)
   {
-    stopEvent = FrameworkEventInternal{ false, FrameworkEvent::ERROR, std::exception_ptr() };
+    stopEvent = FrameworkEventInternal{ false, FrameworkEvent::FRAMEWORK_ERROR, std::exception_ptr() };
     if (timeout == std::chrono::milliseconds::zero())
     {
       Wait(l, [&] { return stopEvent.valid; });
@@ -119,7 +119,7 @@ FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& ti
     if (!stopEvent.valid)
     {
       return FrameworkEvent(
-            FrameworkEvent::WAIT_TIMEDOUT,
+            FrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT,
             MakeBundle(this->shared_from_this()),
             std::exception_ptr()
             );
@@ -131,7 +131,7 @@ FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& ti
     // stopped.
     stopEvent = FrameworkEventInternal{
           true,
-          FrameworkEvent::STOPPED,
+          FrameworkEvent::FRAMEWORK_STOPPED,
           std::exception_ptr()};
   }
   if (shutdownThread.joinable()) shutdownThread.join();
@@ -210,7 +210,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
     SystemShuttingdownDone_unlocked(
           FrameworkEventInternal{
             true,
-            FrameworkEvent::ERROR,
+            FrameworkEvent::FRAMEWORK_ERROR,
             std::current_exception()
           }
           );
@@ -219,7 +219,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
 
 void FrameworkPrivate::ShutdownDone_unlocked(bool restart)
 {
-  auto t = restart ? FrameworkEvent::STOPPED_UPDATE : FrameworkEvent::STOPPED;
+  auto t = restart ? FrameworkEvent::FRAMEWORK_STOPPED_UPDATE : FrameworkEvent::FRAMEWORK_STOPPED;
   SystemShuttingdownDone_unlocked(
         FrameworkEventInternal{
           true,

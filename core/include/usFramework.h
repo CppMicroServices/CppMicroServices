@@ -106,15 +106,15 @@ public:
      *         following {@code FrameworkEvent} types may be returned by this
      *         method.
      *         <ul>
-     *         <li>{@link FrameworkEvent#STOPPED STOPPED} - This Framework has
+     *         <li>{@link FrameworkEvent#FRAMEWORK_STOPPED FRAMEWORK_STOPPED} - This Framework has
      *         been stopped. </li>
      *
      *
-     *         <li>{@link FrameworkEvent#ERROR ERROR} - The Framework
+     *         <li>{@link FrameworkEvent#FRAMEWORK_ERROR FRAMEWORK_ERROR} - The Framework
      *         encountered an error while shutting down or an error has occurred
      *         which forced the framework to shutdown. </li>
      *
-     *         <li> {@link FrameworkEvent#WAIT_TIMEDOUT WAIT_TIMEDOUT} - This
+     *         <li> {@link FrameworkEvent#FRAMEWORK_WAIT_TIMEDOUT FRAMEWORK_WAIT_TIMEDOUT} - This
      *         method has timed out and returned before this Framework has
      *         stopped.</li>
      *         </ul>
@@ -134,9 +134,9 @@ public:
      *    and some will be started with their <i>declared activation</i> policy.
      *    Any exceptions that occur during bundle starting are wrapped in a
      *    \c std::runtime_error and then published as a framework event of type
-     *    {@link FrameworkEvent#ERROR}
+     *    {@link FrameworkEvent#FRAMEWORK_ERROR}
      * -# This Framework's state is set to {@link #STATE_ACTIVE}.
-     * -# A framework event of type {@link FrameworkEvent#STARTED} is fired
+     * -# A framework event of type {@link FrameworkEvent#FRAMEWORK_STARTED} is fired
      *
      * @throws std::runtime_error If this Framework could not be started.
      */
@@ -166,7 +166,7 @@ public:
      * -# All installed bundles are stopped without changing each bundle's
      *    persistent <i>autostart setting</i>. Any exceptions that occur
      *    during bundle stopping are wrapped in a \c std::runtime_error and
-     *    then published as a framework event of type {@link FrameworkEvent#ERROR}
+     *    then published as a framework event of type {@link FrameworkEvent#FRAMEWORK_ERROR}
      * -# Unregister all services registered by this Framework.
      * -# Event handling is disabled.
      * -# This Framework's state is set to {@link #STATE_RESOLVED}.

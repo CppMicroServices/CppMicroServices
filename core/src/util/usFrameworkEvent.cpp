@@ -113,13 +113,13 @@ std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType)
 {
   switch (eventType)
   {
-  case FrameworkEvent::STARTED:        return os << "STARTED";
-  case FrameworkEvent::ERROR:          return os << "ERROR";
-  case FrameworkEvent::WARNING:        return os << "WARNING";
-  case FrameworkEvent::INFO:           return os << "INFO";
-  case FrameworkEvent::STOPPED:        return os << "STOPPED";
-  case FrameworkEvent::STOPPED_UPDATE: return os << "STOPPED_UPDATE";
-  case FrameworkEvent::WAIT_TIMEDOUT:  return os << "WAIT_TIMEDOUT";
+  case FrameworkEvent::FRAMEWORK_STARTED:        return os << "STARTED";
+  case FrameworkEvent::FRAMEWORK_ERROR:          return os << "ERROR";
+  case FrameworkEvent::FRAMEWORK_WARNING:        return os << "WARNING";
+  case FrameworkEvent::FRAMEWORK_INFO:           return os << "INFO";
+  case FrameworkEvent::FRAMEWORK_STOPPED:        return os << "STOPPED";
+  case FrameworkEvent::FRAMEWORK_STOPPED_UPDATE: return os << "STOPPED_UPDATE";
+  case FrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT:  return os << "WAIT_TIMEDOUT";
 
   default: return os << "Unknown framework event type (" << static_cast<int>(eventType) << ")";
   }

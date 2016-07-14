@@ -93,7 +93,7 @@ public:
   {
     events.push_back(evt);
     US_TEST_OUTPUT( << "ServiceEvent: " << evt );
-    if (ServiceEvent::UNREGISTERING == evt.GetType())
+    if (ServiceEvent::SERVICE_UNREGISTERING == evt.GetType())
     {
       ServiceReferenceU sr = evt.GetServiceReference();
 
@@ -148,7 +148,7 @@ public:
       //    }
       service.reset(); // results in UngetService
 
-      // Check that the UNREGISTERING service can not be looked up
+      // Check that the SERVICE_UNREGISTERING service can not be looked up
       // using the service registry.
       try
       {
@@ -158,13 +158,13 @@ public:
         std::vector<ServiceReferenceU> srs = context.GetServiceReferences("", ss.str());
         if (srs.empty())
         {
-          US_TEST_OUTPUT( << "ServiceReference for UNREGISTERING service is not"
+          US_TEST_OUTPUT( << "ServiceReference for SERVICE_UNREGISTERING service is not"
                             " found in the service registry; ok." );
         }
         else
         {
           teststatus = false;
-          US_TEST_OUTPUT( << "*** ServiceReference for UNREGISTERING service,"
+          US_TEST_OUTPUT( << "*** ServiceReference for SERVICE_UNREGISTERING service,"
                             << sr << ", not found in the service registry; fail." );
           US_TEST_OUTPUT( << "Found the following Service references:") ;
           for(std::vector<ServiceReferenceU>::const_iterator sr = srs.begin();
@@ -178,7 +178,7 @@ public:
       {
         teststatus = false;
         US_TEST_OUTPUT( << "*** Unexpected excpetion when trying to lookup a"
-                          " service while it is in state UNREGISTERING: "
+                          " service while it is in state SERVICE_UNREGISTERING: "
                           << e.what() );
       }
     }
@@ -308,7 +308,7 @@ void frameSL02a(const Framework& framework)
   bundle.Start();
 
   std::vector<ServiceEvent::Type> events;
-  events.push_back(ServiceEvent::REGISTERED);
+  events.push_back(ServiceEvent::SERVICE_REGISTERED);
 
   US_TEST_CONDITION(listener1.checkEvents(events), "Check first service listener")
   US_TEST_CONDITION(listener2.checkEvents(events), "Check second service listener")
@@ -322,8 +322,8 @@ void frameSL02a(const Framework& framework)
 void frameSL05a(const Framework& framework)
 {
   std::vector<ServiceEvent::Type> events;
-  events.push_back(ServiceEvent::REGISTERED);
-  events.push_back(ServiceEvent::UNREGISTERING);
+  events.push_back(ServiceEvent::SERVICE_REGISTERED);
+  events.push_back(ServiceEvent::SERVICE_UNREGISTERING);
 
   auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
 
@@ -334,8 +334,8 @@ void frameSL05a(const Framework& framework)
 void frameSL10a(const Framework& framework)
 {
   std::vector<ServiceEvent::Type> events;
-  events.push_back(ServiceEvent::REGISTERED);
-  events.push_back(ServiceEvent::UNREGISTERING);
+  events.push_back(ServiceEvent::SERVICE_REGISTERED);
+  events.push_back(ServiceEvent::SERVICE_UNREGISTERING);
 
   auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleA2");
 
@@ -365,17 +365,17 @@ void frameSL25a(const Framework& framework)
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
   // Startup
-  expectedServiceEventTypes.push_back(ServiceEvent::REGISTERED); // at start of libSL1
-  expectedServiceEventTypes.push_back(ServiceEvent::REGISTERED); // FooService at start of libSL4
-  expectedServiceEventTypes.push_back(ServiceEvent::REGISTERED); // at start of libSL3
+  expectedServiceEventTypes.push_back(ServiceEvent::SERVICE_REGISTERED); // at start of libSL1
+  expectedServiceEventTypes.push_back(ServiceEvent::SERVICE_REGISTERED); // FooService at start of libSL4
+  expectedServiceEventTypes.push_back(ServiceEvent::SERVICE_REGISTERED); // at start of libSL3
 
   // Stop libSL4
-  expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // FooService at first stop of libSL4
+  expectedServiceEventTypes.push_back(ServiceEvent::SERVICE_UNREGISTERING); // FooService at first stop of libSL4
 
 #ifdef US_BUILD_SHARED_LIBS
   // Shutdown
-  expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // at stop of libSL1
-  expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // at stop of libSL3
+  expectedServiceEventTypes.push_back(ServiceEvent::SERVICE_UNREGISTERING); // at stop of libSL1
+  expectedServiceEventTypes.push_back(ServiceEvent::SERVICE_UNREGISTERING); // at stop of libSL3
 #endif
 
   // Start libBundleTestSL1 to ensure that the Service interface is available.

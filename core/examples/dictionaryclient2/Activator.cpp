@@ -164,7 +164,7 @@ public:
 
     // If a dictionary service was registered, see if we
     // need one. If so, get a reference to it.
-    if (event.GetType() == ServiceEvent::REGISTERED)
+    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED)
     {
       if (!m_ref)
       {
@@ -176,7 +176,7 @@ public:
     // If a dictionary service was unregistered, see if it
     // was the one we were using. If so, unget the service
     // and try to query to get another one.
-    else if (event.GetType() == ServiceEvent::UNREGISTERING)
+    else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING)
     {
       if (event.GetServiceReference() == m_ref)
       {

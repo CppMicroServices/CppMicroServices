@@ -362,7 +362,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
       // finalization already in progress.
       return;
     }
-    // Lazy activation; fall through to RESOLVED.
+    // Lazy activation; fall through to STATE_RESOLVED.
   }
   case Bundle::STATE_RESOLVED:
   {

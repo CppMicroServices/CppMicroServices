@@ -111,8 +111,8 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
     {
       auto l = d->Lock(); US_UNUSED(l);
       if (!d->available) throw std::logic_error("Service is unregistered");
-      modifiedEndMatchEvent = ServiceEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference);
-      modifiedEvent = ServiceEvent(ServiceEvent::MODIFIED, d->reference);
+      modifiedEndMatchEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
+      modifiedEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
     }
 
     // This calls into service event listener hooks. We must not hold any looks here
@@ -189,7 +189,7 @@ void ServiceRegistrationBase::Unregister()
   {
     // Notify listeners. We must not hold any locks here.
     ServiceListeners::ServiceListenerEntries listeners;
-    ServiceEvent unregisteringEvent(ServiceEvent::UNREGISTERING, d->reference);
+    ServiceEvent unregisteringEvent(ServiceEvent::SERVICE_UNREGISTERING, d->reference);
     coreContext->listeners.GetMatchingServiceListeners(unregisteringEvent, listeners);
     coreContext->listeners.ServiceChanged(
           listeners,

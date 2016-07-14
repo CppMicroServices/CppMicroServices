@@ -185,7 +185,7 @@ void frame025a()
     pEvts.push_back(BundleEvent(BundleEvent::STARTED, buA));
 
     std::vector<ServiceEvent> seEvts;
-    seEvts.push_back(ServiceEvent(ServiceEvent::REGISTERED, sr1));
+    seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_REGISTERED, sr1));
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
   }
@@ -241,7 +241,7 @@ void frame030b()
   pEvts.push_back(BundleEvent(BundleEvent::STOPPED, buA));
 
   std::vector<ServiceEvent> seEvts;
-  seEvts.push_back(ServiceEvent(ServiceEvent::UNREGISTERING, sr1));
+  seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, sr1));
 
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts), "Test for unexpected events");
 }

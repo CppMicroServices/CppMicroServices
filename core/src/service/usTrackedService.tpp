@@ -52,8 +52,8 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
 
   switch (event.GetType())
   {
-  case ServiceEvent::REGISTERED :
-  case ServiceEvent::MODIFIED :
+  case ServiceEvent::SERVICE_REGISTERED :
+  case ServiceEvent::SERVICE_MODIFIED :
     {
       if (!serviceTracker->d->listenerFilter.empty())
       { // service listener added with filter
@@ -84,8 +84,8 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
       }
       break;
     }
-  case ServiceEvent::MODIFIED_ENDMATCH :
-  case ServiceEvent::UNREGISTERING :
+  case ServiceEvent::SERVICE_MODIFIED_ENDMATCH :
+  case ServiceEvent::SERVICE_UNREGISTERING :
     this->Untrack(reference, event);
     /*
      * If the customizer throws an unchecked exception, it is

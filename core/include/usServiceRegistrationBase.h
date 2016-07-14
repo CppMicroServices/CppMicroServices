@@ -109,7 +109,7 @@ public:
    * The following steps are taken to modify service properties:
    * <ol>
    * <li>The service's properties are replaced with the provided properties.
-   * <li>A service event of type ServiceEvent#MODIFIED is fired.
+   * <li>A service event of type ServiceEvent#SERVICE_MODIFIED is fired.
    * </ol>
    *
    * @param properties The properties for this service. See {@link ServiceProperties}
@@ -136,7 +136,7 @@ public:
    * <ol>
    * <li>The service is removed from the framework service registry so that
    * it can no longer be obtained.
-   * <li>A service event of type ServiceEvent#UNREGISTERING is fired
+   * <li>A service event of type ServiceEvent#SERVICE_UNREGISTERING is fired
    * so that bundles using this service can release their use of the service.
    * Once delivery of the service event is complete, the
    * <code>ServiceRegistrationBase</code> objects for the service may no longer be

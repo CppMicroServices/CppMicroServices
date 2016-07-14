@@ -85,10 +85,10 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type)
 {
   switch(type)
   {
-  case ServiceEvent::MODIFIED:          return os << "MODIFIED";
-  case ServiceEvent::MODIFIED_ENDMATCH: return os << "MODIFIED_ENDMATCH";
-  case ServiceEvent::REGISTERED:        return os << "REGISTERED";
-  case ServiceEvent::UNREGISTERING:     return os << "UNREGISTERING";
+  case ServiceEvent::SERVICE_MODIFIED:          return os << "MODIFIED";
+  case ServiceEvent::SERVICE_MODIFIED_ENDMATCH: return os << "MODIFIED_ENDMATCH";
+  case ServiceEvent::SERVICE_REGISTERED:        return os << "REGISTERED";
+  case ServiceEvent::SERVICE_UNREGISTERING:     return os << "UNREGISTERING";
 
   default: return os << "unknown service event type (" << static_cast<int>(type) << ")";
   }

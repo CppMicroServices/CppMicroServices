@@ -20,9 +20,9 @@ A bundle can intercept events being delivered to other bundles by registering a 
 object as a service. The CppMicroServices library will send all service events to all the registered
 hooks using the reversed ordering of their ServiceReference objects. Note that event listener hooks
 are called *after* the event was created but *before* it is filtered by the optional filter expression
-of the service listeners. Hence an event listener hook receives all \link us::ServiceEvent::REGISTERED
-REGISTERED\endlink, \link us::ServiceEvent::MODIFIED MODIFIED\endlink, \link us::ServiceEvent::UNREGISTERING
-UNREGISTERING\endlink, and \link us::ServiceEvent::MODIFIED_ENDMATCH MODIFIED_ENDMATCH\endlink events
+of the service listeners. Hence an event listener hook receives all \link us::ServiceEvent::SERVICE_REGISTERED
+SERVICE_REGISTERED\endlink, \link us::ServiceEvent::SERVICE_MODIFIED SERVICE_MODIFIED\endlink, \link us::ServiceEvent::SERVICE_UNREGISTERING
+SERVICE_UNREGISTERING\endlink, and \link us::ServiceEvent::SERVICE_MODIFIED_ENDMATCH SERVICE_MODIFIED_ENDMATCH\endlink events
 regardelss of the presence of a service listener filter. It may then remove bundles or specific
 service listeners from the ServiceEventListenerHook::ShrinkableMapType object passed to the
 ServiceEventListenerHook::Event method to hide

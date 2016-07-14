@@ -123,7 +123,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
 
   ServiceReferenceBase r = res.GetReference(std::string());
   ServiceListeners::ServiceListenerEntries listeners;
-  ServiceEvent registeredEvent(ServiceEvent::REGISTERED, r);
+  ServiceEvent registeredEvent(ServiceEvent::SERVICE_REGISTERED, r);
   bundle->coreCtx->listeners.GetMatchingServiceListeners(registeredEvent, listeners);
   bundle->coreCtx->listeners.ServiceChanged(listeners,
                                             registeredEvent);

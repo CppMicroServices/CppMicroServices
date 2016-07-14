@@ -232,7 +232,7 @@ public:
    * be ignored.
    * <li>The service is added to the framework service registry and may now be
    * used by other bundles.
-   * <li>A service event of type ServiceEvent#REGISTERED is fired.
+   * <li>A service event of type ServiceEvent#SERVICE_REGISTERED is fired.
    * <li>A <code>ServiceRegistration</code> object for this registration is
    * returned.
    * </ol>
@@ -620,9 +620,9 @@ public:
    * value <code>1</code>. Subsequently, when the service is modified
    * setting property <code>x</code> to the value <code>1</code>, the
    * filter will match and the callback will be called with a
-   * <code>ServiceEvent</code> of type <code>MODIFIED</code>. Thus, the
+   * <code>ServiceEvent</code> of type <code>SERVICE_MODIFIED</code>. Thus, the
    * callback will not be called with a <code>ServiceEvent</code> of type
-   * <code>REGISTERED</code>.
+   * <code>SERVICE_REGISTERED</code>.
    *
    * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.

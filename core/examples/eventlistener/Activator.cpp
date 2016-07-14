@@ -78,15 +78,15 @@ private:
   {
     std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(Constants::OBJECTCLASS)).front();
 
-    if (event.GetType() == ServiceEvent::REGISTERED)
+    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED)
     {
       std::cout << "Ex1: Service of type " << objectClass << " registered." << std::endl;
     }
-    else if (event.GetType() == ServiceEvent::UNREGISTERING)
+    else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING)
     {
       std::cout << "Ex1: Service of type " << objectClass << " unregistered." << std::endl;
     }
-    else if (event.GetType() == ServiceEvent::MODIFIED)
+    else if (event.GetType() == ServiceEvent::SERVICE_MODIFIED)
     {
       std::cout << "Ex1: Service of type " << objectClass << " modified." << std::endl;
     }

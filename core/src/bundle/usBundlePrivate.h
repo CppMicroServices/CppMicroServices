@@ -122,7 +122,7 @@ public:
   Bundle::State GetUpdatedState(BundlePrivate* trigger, LockType& l);
 
   /**
-   * Set state to INSTALLED.
+   * Set state to BUNDLE_INSTALLED.
    * We assume that the bundle is resolved when entering this method.
    */
   void SetStateInstalled(bool sendEvent, UniqueLock& resolveLock);

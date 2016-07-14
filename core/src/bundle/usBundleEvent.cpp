@@ -101,15 +101,15 @@ std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 {
   switch (eventType)
   {
-  case BundleEvent::STARTED:         return os << "STARTED";
-  case BundleEvent::STOPPED:         return os << "STOPPED";
-  case BundleEvent::STARTING:        return os << "STARTING";
-  case BundleEvent::STOPPING:        return os << "STOPPING";
-  case BundleEvent::INSTALLED:       return os << "INSTALLED";
-  case BundleEvent::UNINSTALLED:     return os << "UNINSTALLED";
-  case BundleEvent::RESOLVED:        return os << "RESOLVED";
-  case BundleEvent::UNRESOLVED:      return os << "UNRESOLVED";
-  case BundleEvent::LAZY_ACTIVATION: return os << "LAZY_ACTIVATION";
+  case BundleEvent::BUNDLE_STARTED:         return os << "STARTED";
+  case BundleEvent::BUNDLE_STOPPED:         return os << "BUNDLE_STOPPED";
+  case BundleEvent::BUNDLE_STARTING:        return os << "STARTING";
+  case BundleEvent::BUNDLE_STOPPING:        return os << "STOPPING";
+  case BundleEvent::BUNDLE_INSTALLED:       return os << "INSTALLED";
+  case BundleEvent::BUNDLE_UNINSTALLED:     return os << "UNINSTALLED";
+  case BundleEvent::BUNDLE_RESOLVED:        return os << "RESOLVED";
+  case BundleEvent::BUNDLE_UNRESOLVED:      return os << "UNRESOLVED";
+  case BundleEvent::BUNDLE_LAZY_ACTIVATION: return os << "LAZY_ACTIVATION";
 
   default: return os << "Unknown bundle event type (" << static_cast<int>(eventType) << ")";
   }

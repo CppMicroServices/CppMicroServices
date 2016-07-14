@@ -75,7 +75,7 @@ public:
 
   void Event(const BundleEvent& event, ShrinkableVector<BundleContext>& contexts)
   {
-    if (event.GetType() == BundleEvent::STARTING || event.GetType() == BundleEvent::STOPPING)
+    if (event.GetType() == BundleEvent::BUNDLE_STARTING || event.GetType() == BundleEvent::BUNDLE_STOPPING)
     {
       contexts.clear();//erase(std::remove(contexts.begin(), contexts.end(), GetBundleContext()), contexts.end());
     }
@@ -136,11 +136,11 @@ void TestEventHook(const Framework& framework)
 
   bundleA.Start();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 1, "Test for filtered load bundle events")
-  US_TEST_CONDITION_REQUIRED(bundleListener.events[0].GetType() == BundleEvent::STARTED, "Test for STARTED event")
+  US_TEST_CONDITION_REQUIRED(bundleListener.events[0].GetType() == BundleEvent::BUNDLE_STARTED, "Test for BUNDLE_STARTED event")
 
   bundleA.Stop();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 2, "Test for filtered unload bundle events")
-  US_TEST_CONDITION_REQUIRED(bundleListener.events[1].GetType() == BundleEvent::STOPPED, "Test for STOPPED event")
+  US_TEST_CONDITION_REQUIRED(bundleListener.events[1].GetType() == BundleEvent::BUNDLE_STOPPED, "Test for BUNDLE_STOPPED event")
 
   eventHookReg.Unregister();
   framework.GetBundleContext().RemoveBundleListener(&bundleListener, &TestBundleListener::BundleChanged);

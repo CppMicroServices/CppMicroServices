@@ -181,7 +181,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
       operation = OP_DEACTIVATING;
       state = Bundle::STATE_STOPPING;
     }
-    coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, MakeBundle(this->shared_from_this())));
+    coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
     if (wasActive)
     {
       StopAllBundles();
@@ -252,7 +252,7 @@ void FrameworkPrivate::StopAllBundles()
 
   auto allBundles = coreCtx->bundleRegistry.GetBundles();
 
-  // Set state to INSTALLED
+  // Set state to BUNDLE_INSTALLED
   for (auto b : allBundles)
   {
     if (b->id != 0)

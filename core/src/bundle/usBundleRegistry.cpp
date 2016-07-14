@@ -134,7 +134,7 @@ std::vector<Bundle> BundleRegistry::Install0(
 
     for (auto& b : res)
     {
-      coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::INSTALLED, b));
+      coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
     }
     return res;
   }

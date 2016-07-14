@@ -153,7 +153,7 @@ void frame020a()
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
-  pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, buA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, buA));
 
   bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS
@@ -180,9 +180,9 @@ void frame025a()
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
-    pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, buA));
-    pEvts.push_back(BundleEvent(BundleEvent::STARTING, buA));
-    pEvts.push_back(BundleEvent(BundleEvent::STARTED, buA));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, buA));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, buA));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, buA));
 
     std::vector<ServiceEvent> seEvts;
     seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_REGISTERED, sr1));
@@ -237,8 +237,8 @@ void frame030b()
   }
 
   std::vector<BundleEvent> pEvts;
-  pEvts.push_back(BundleEvent(BundleEvent::STOPPING, buA));
-  pEvts.push_back(BundleEvent(BundleEvent::STOPPED, buA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, buA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, buA));
 
   std::vector<ServiceEvent> seEvts;
   seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, sr1));
@@ -357,10 +357,10 @@ void TestListenerFunctors()
   bundleA.Start();
 
   std::vector<BundleEvent> pEvts;
-  pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleA));
-  pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, bundleA));
-  pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleA));
-  pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));
 
   std::vector<ServiceEvent> seEvts;
 
@@ -394,16 +394,16 @@ void TestBundleStates()
     Bundle bundle;
 
     // Test install -> uninstall
-    // expect 2 event (INSTALLED, UNINSTALLED)
+    // expect 2 event (BUNDLE_INSTALLED, BUNDLE_UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
     US_TEST_CONDITION(bundle, "Test non-empty bundle")
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
     bundle.Uninstall();
     US_TEST_CONDITION(!frameworkCtx.GetBundle(bundle.GetBundleId()), "Test bundle install -> uninstall")
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
-    bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
 
     bool relaxed = false;
   #ifndef US_BUILD_SHARED_LIBS
@@ -413,7 +413,7 @@ void TestBundleStates()
     bundleEvents.clear();
 
     // Test install -> start -> uninstall
-    // expect 6 events (INSTALLED, STARTING, STARTED, STOPPING, STOPPED, UNINSTALLED)
+    // expect 6 events (BUNDLE_INSTALLED, BUNDLE_STARTING, BUNDLE_STARTED, BUNDLE_STOPPING, BUNDLE_STOPPED, BUNDLE_UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
     US_TEST_CONDITION(bundle, "Test non-empty bundle")
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
@@ -421,19 +421,19 @@ void TestBundleStates()
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
     bundle.Uninstall();
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
-    bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::RESOLVED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STARTING, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STARTED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STOPPING, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STOPPED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
     bundleEvents.clear();
 
     // Test install -> stop -> uninstall
-    // expect 2 event (INSTALLED, UNINSTALLED)
+    // expect 2 event (BUNDLE_INSTALLED, BUNDLE_UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
     US_TEST_CONDITION(bundle, "Test non-empty bundle")
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
@@ -441,14 +441,14 @@ void TestBundleStates()
     US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
     bundle.Uninstall();
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
-    bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
     bundleEvents.clear();
 
     // Test install -> start -> stop -> uninstall
-    // expect 6 events (INSTALLED, STARTING, STARTED, STOPPING, STOPPED, UNINSTALLED)
+    // expect 6 events (BUNDLE_INSTALLED, BUNDLE_STARTING, BUNDLE_STARTED, BUNDLE_STOPPING, BUNDLE_STOPPED, BUNDLE_UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
     auto lm = bundle.GetLastModified();
     US_TEST_CONDITION(bundle, "Test non-empty bundle")
@@ -462,14 +462,14 @@ void TestBundleStates()
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
     US_TEST_CONDITION(lm < bundle.GetLastModified(), "Last modified time changed after uninstall")
     US_TEST_CONDITION(bundle.GetLastModified() <= Clock::now(), "Last modified time <= now")
-    bundleEvents.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::RESOLVED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STARTING, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STARTED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STOPPING, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::STOPPED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundle));
-    bundleEvents.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundle));
+    bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
     bundleEvents.clear();
 }

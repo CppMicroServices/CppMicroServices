@@ -42,11 +42,11 @@ void bundleListener(const BundleEvent& be)
 {
   auto b = be.GetBundle();
   auto type = be.GetType();
-  if (type == BundleEvent::STARTING || type == BundleEvent::STARTED)
+  if (type == BundleEvent::BUNDLE_STARTING || type == BundleEvent::BUNDLE_STARTED)
   {
     b.Stop();
   }
-  else if (type == BundleEvent::STOPPING || type == BundleEvent::STOPPED)
+  else if (type == BundleEvent::BUNDLE_STOPPING || type == BundleEvent::BUNDLE_STOPPED)
   {
     b.Start();
   }

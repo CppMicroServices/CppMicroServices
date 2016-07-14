@@ -63,7 +63,7 @@ public:
      *
      * @see BundleContext::InstallBundles(const std::string&)
      */
-    INSTALLED = 0x00000001,
+    BUNDLE_INSTALLED = 0x00000001,
 
     /**
      * The bundle has been started.
@@ -74,7 +74,7 @@ public:
      *
      * @see Bundle::Start()
      */
-    STARTED = 0x00000002,
+    BUNDLE_STARTED = 0x00000002,
 
     /**
      * The bundle has been stopped.
@@ -85,35 +85,35 @@ public:
      *
      * @see Bundle::Stop()
      */
-    STOPPED = 0x00000004,
+    BUNDLE_STOPPED = 0x00000004,
 
     /**
      * The bundle has been updated.
      *
      * @note This identifier is reserved for future use and not supported yet.
      */
-    UPDATED = 0x00000008,
+    BUNDLE_UPDATED = 0x00000008,
 
     /**
      * The bundle has been uninstalled.
      *
      * @see Bundle::Uninstall()
      */
-    UNINSTALLED = 0x00000010,
+    BUNDLE_UNINSTALLED = 0x00000010,
 
     /**
      * The bundle has been resolved.
      *
      * @see Bundle#STATE_RESOLVED
      */
-    RESOLVED = 0x00000020,
+    BUNDLE_RESOLVED = 0x00000020,
 
     /**
      * The bundle has been unresolved.
      *
-     * @see Bundle#INSTALLED
+     * @see Bundle#BUNDLE_INSTALLED
      */
-    UNRESOLVED = 0x00000040,
+    BUNDLE_UNRESOLVED = 0x00000040,
 
     /**
      * The bundle is about to be activated.
@@ -124,7 +124,7 @@ public:
      *
      * @see Bundle::Start()
      */
-    STARTING = 0x00000080,
+    BUNDLE_STARTING = 0x00000080,
 
     /**
      * The bundle is about to deactivated.
@@ -135,18 +135,18 @@ public:
      *
      * @see Bundle::Stop()
      */
-    STOPPING = 0x00000100,
+    BUNDLE_STOPPING = 0x00000100,
 
     /**
      * The bundle will be lazily activated.
      * <p>
      * The bundle has a \link Constants#ACTIVATION_LAZY lazy activation policy\endlink
      * and is waiting to be activated. It is now in the \link Bundle::STATE_STARTING
-     * STARTING\endlink state and has a valid \c BundleContext.
+     * BUNDLE_STARTING\endlink state and has a valid \c BundleContext.
      *
      * @note This identifier is reserved for future use and not supported yet.
      */
-    LAZY_ACTIVATION = 0x00000200
+    BUNDLE_LAZY_ACTIVATION = 0x00000200
 
   };
 
@@ -179,7 +179,7 @@ public:
    * @param type The event type.
    * @param bundle The bundle which had a lifecycle change.
    * @param origin The bundle which is the origin of the event. For the event
-   *        type {@link #INSTALLED}, this is the bundle whose context was used
+   *        type {@link #BUNDLE_INSTALLED}, this is the bundle whose context was used
    *        to install the bundle. Otherwise it is the bundle itself.
    */
   BundleEvent(Type type, const Bundle& bundle, const Bundle& origin);
@@ -194,15 +194,15 @@ public:
   /**
    * Returns the type of lifecyle event. The type values are:
    * <ul>
-   * <li>{@link #INSTALLED}
-   * <li>{@link #RESOLVED}
-   * <li>{@link #LAZY_ACTIVATION}
-   * <li>{@link #STARTING}
-   * <li>{@link #STARTED}
-   * <li>{@link #STOPPING}
-   * <li>{@link #STOPPED}
-   * <li>{@link #UNRESOLVED}
-   * <li>{@link #UNINSTALLED}
+   * <li>{@link #BUNDLE_INSTALLED}
+   * <li>{@link #BUNDLE_RESOLVED}
+   * <li>{@link #BUNDLE_LAZY_ACTIVATION}
+   * <li>{@link #BUNDLE_STARTING}
+   * <li>{@link #BUNDLE_STARTED}
+   * <li>{@link #BUNDLE_STOPPING}
+   * <li>{@link #BUNDLE_STOPPED}
+   * <li>{@link #BUNDLE_UNRESOLVED}
+   * <li>{@link #BUNDLE_UNINSTALLED}
    * </ul>
    *
    * @return The type of lifecycle event.
@@ -213,7 +213,7 @@ public:
    * Returns the bundle that was the origin of the event.
    *
    * <p>
-   * For the event type {@link #INSTALLED}, this is the bundle whose context
+   * For the event type {@link #BUNDLE_INSTALLED}, this is the bundle whose context
    * was used to install the bundle. Otherwise it is the bundle itself.
    *
    * @return The bundle that was the origin of the event.

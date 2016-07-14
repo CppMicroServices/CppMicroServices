@@ -735,7 +735,7 @@ public:
    * -# The bundle's associated resources are allocated. The associated resources minimally consist of a
    *    unique identifier and a persistent storage area if the platform has file system support. If this step
    *    fails, a std::runtime_error is thrown.
-   * -# A bundle event of type <code>BundleEvent::INSTALLED</code> is fired.
+   * -# A bundle event of type <code>BundleEvent::BUNDLE_INSTALLED</code> is fired.
    * -# The Bundle object for the newly or previously installed bundle is returned.
    *
    * @remarks An install location is an absolute path to a shared library or executable file

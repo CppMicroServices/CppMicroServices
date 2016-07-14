@@ -528,7 +528,7 @@ public:
    *    - If this bundle's state is {@code STATE_STARTING} then this method returns
    *      immediately.
    *    - This bundle's state is set to {@code STATE_STARTING}.
-   *    - A bundle event of type {@link BundleEvent#LAZY_ACTIVATION} is fired.
+   *    - A bundle event of type {@link BundleEvent#BUNDLE_LAZY_ACTIVATION} is fired.
    *    - This method returns immediately and the remaining steps will be
    *      followed when this bundle's activation is later triggered.
    * -# This bundle's state is set to {@code STATE_STARTING}.
@@ -544,13 +544,13 @@ public:
    *    - %Any services used by this bundle are released.
    *    - %Any listeners registered by this bundle are removed.
    *    - This bundle's state is set to {@code STATE_RESOLVED}.
-   *    - A bundle event of type {@link BundleEvent#STOPPED} is fired.
+   *    - A bundle event of type {@link BundleEvent#BUNDLE_STOPPED} is fired.
    *    - A \c std::runtime_error exception is then thrown.
    * -# If this bundle's state is {@code STATE_UNINSTALLED}, because this bundle
    *    was uninstalled while the {@code BundleActivator#Start} method was
    *    running, a {@code std::logic_error} is thrown.
    * -# This bundle's state is set to {@code STATE_ACTIVE}.
-   * -# A bundle event of type {@link BundleEvent#STARTED} is fired.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_STARTED} is fired.
    *
    *
    * <b>Preconditions</b>
@@ -625,7 +625,7 @@ public:
    *    was uninstalled while the \c BundleActivator#Stop method was
    *    running, a std::runtime_error is thrown.
    * -# This bundle's state is set to \c STATE_RESOLVED.
-   * -# A bundle event of type {@link BundleEvent#STOPPED} is fired.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_STOPPED} is fired.
    *
    * <b>Preconditions </b>
    * -# \c GetState() in { \c STATE_ACTIVE }.

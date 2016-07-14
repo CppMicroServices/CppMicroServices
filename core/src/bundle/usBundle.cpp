@@ -145,7 +145,7 @@ void Bundle::Uninstall()
     switch (static_cast<Bundle::State>(d->state.load()))
     {
     case STATE_UNINSTALLED:
-      throw std::logic_error("Bundle is in UNINSTALLED state");
+      throw std::logic_error("Bundle is in BUNDLE_UNINSTALLED state");
     case STATE_STARTING: // Lazy start
     case STATE_ACTIVE:
     case STATE_STOPPING:
@@ -203,13 +203,13 @@ void Bundle::Uninstall()
       if (d->state == STATE_UNINSTALLED)
       {
         d->operation = BundlePrivate::OP_IDLE;
-        throw std::logic_error("Bundle is in UNINSTALLED state");
+        throw std::logic_error("Bundle is in BUNDLE_UNINSTALLED state");
       }
 
       d->state = STATE_INSTALLED;
       d->GetBundleThread()->BundleChanged(
             BundleEvent(
-              BundleEvent::UNRESOLVED,
+              BundleEvent::BUNDLE_UNRESOLVED,
               Bundle(d)
               ),
             l);
@@ -246,7 +246,7 @@ void Bundle::Uninstall()
     }
     }
   }
-  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::UNINSTALLED, Bundle(d)));
+  d->coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, Bundle(d)));
 }
 
 BundleContext Bundle::GetBundleContext() const

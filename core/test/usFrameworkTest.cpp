@@ -142,7 +142,7 @@ namespace
         f.WaitForStop(std::chrono::milliseconds(0));
         US_TEST_CONDITION(!(f.GetState() & Bundle::STATE_ACTIVE), "Check framework is in the Stop state")
 
-        pEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
+        pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, f));
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
 
@@ -196,13 +196,13 @@ namespace
         auto install = [&pEvts, &fmc](const std::string& libName)
         {
           auto bundle = testing::InstallLib(fmc, libName);
-          pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundle));
+          pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
 #ifdef US_BUILD_SHARED_LIBS
           if (bundle.GetSymbolicName() == "TestBundleB")
           {
             // This is an additional install event from the bundle
             // that is statically imported by TestBundleB.
-            pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, testing::GetBundle("TestBundleImportedByB", fmc)));
+            pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, testing::GetBundle("TestBundleImportedByB", fmc)));
           }
 #endif
         };
@@ -240,9 +240,9 @@ namespace
           // no events will be fired for the framework, its already active at this point
           if (bundle != f)
           {
-            pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, bundle));
-            pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundle));
-            pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundle));
+            pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+            pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+            pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
 
             // bundles will be stopped in the reverse order in which they were started.
             // It is easier to maintain this test if the stop events are setup in the
@@ -250,12 +250,12 @@ namespace
             // the order of events somewhere else.
             // Doing it this way also tests the order in which starting and stopping
             // bundles occurs and when their events are fired.
-            pStopEvts.push_back(BundleEvent(BundleEvent::STOPPED, bundle));
-            pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, bundle));
+            pStopEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+            pStopEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
           }
         }
         // Remember, the framework is stopped first, before all bundles are stopped.
-        pStopEvts.push_back(BundleEvent(BundleEvent::STOPPING, f));
+        pStopEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, f));
         std::reverse(pStopEvts.begin(), pStopEvts.end());
 
 

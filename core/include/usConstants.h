@@ -158,7 +158,7 @@ US_Core_EXPORT extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bundle.ac
  * <p>
  * A bundle with the lazy activation policy that is started with the
  * {@link Bundle#START_ACTIVATION_POLICY START_ACTIVATION_POLICY} option
- * will wait in the {@link Bundle#STARTING STARTING} state until its
+ * will wait in the {@link Bundle#STATE_STARTING STATE_STARTING} state until its
  * library is loaded. The bundle will then be activated.
  * <p>
  * The activation policy value is specified as in the

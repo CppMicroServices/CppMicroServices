@@ -69,14 +69,14 @@ void frame020a(BundleContext context, TestBundleListener& listener)
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
-    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleImportedByB));
-    pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::RESOLVED, bundleImportedByB));
-    pEvts.push_back(BundleEvent(BundleEvent::STARTING, bundleImportedByB));
-    pEvts.push_back(BundleEvent(BundleEvent::STARTED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleImportedByB));
 
     std::vector<ServiceEvent> seEvts;
     seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
@@ -133,10 +133,10 @@ void frame030b(BundleContext context, TestBundleListener& listener)
   }
 
   std::vector<BundleEvent> pEvts;
-  pEvts.push_back(BundleEvent(BundleEvent::STOPPING, bundleB));
-  pEvts.push_back(BundleEvent(BundleEvent::STOPPED, bundleB));
-  pEvts.push_back(BundleEvent(BundleEvent::STOPPING, bundleImportedByB));
-  pEvts.push_back(BundleEvent(BundleEvent::STOPPED, bundleImportedByB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleImportedByB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleImportedByB));
 
   std::vector<ServiceEvent> seEvts;
   seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.back()));
@@ -169,8 +169,8 @@ void frame040c(BundleContext context, TestBundleListener& listener)
     US_TEST_CONDITION(context.GetBundles().size() == bundleCount - 1, "Test for uninstall of TestBundleB")
 
     std::vector<BundleEvent> pEvts;
-    pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleB));
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 
@@ -189,7 +189,7 @@ void frame040c(BundleContext context, TestBundleListener& listener)
     US_TEST_CONDITION(oldId != bundleB.GetBundleId(), "Test for new bundle id")
 
     pEvts.clear();
-    pEvts.push_back(BundleEvent(BundleEvent::INSTALLED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Test for unexpected events");
 
     bundleB.Uninstall();
@@ -197,10 +197,10 @@ void frame040c(BundleContext context, TestBundleListener& listener)
     US_TEST_CONDITION(context.GetBundles().size() == bundleCount - 2, "Test for uninstall of TestBundleImportedByB")
 
     pEvts.clear();
-    pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::UNRESOLVED, bundleImportedByB));
-    pEvts.push_back(BundleEvent(BundleEvent::UNINSTALLED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundleImportedByB));
+    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleImportedByB));
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 }

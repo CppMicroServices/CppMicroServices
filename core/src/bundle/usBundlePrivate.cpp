@@ -108,7 +108,7 @@ std::exception_ptr BundlePrivate::Stop0(UniqueLock& resolveLock)
   if (state != Bundle::STATE_UNINSTALLED)
   {
     state = Bundle::STATE_RESOLVED;
-    GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::STOPPED, MakeBundle(this->shared_from_this())), resolveLock);
+    GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())), resolveLock);
     coreCtx->resolver.NotifyAll();
     operation = OP_IDLE;
   }
@@ -120,7 +120,7 @@ std::exception_ptr BundlePrivate::Stop1()
   std::exception_ptr res;
 
   // 6:
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, MakeBundle(this->shared_from_this())));
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
 
   // 7:
   if (wasStarted && bactivator != nullptr)
@@ -269,7 +269,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
             // SetWired();
             state = Bundle::STATE_RESOLVED;
             operation = OP_RESOLVING;
-            GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::RESOLVED, MakeBundle(this->shared_from_this())), l);
+            GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this())), l);
             operation = OP_IDLE;
           }
         }
@@ -287,7 +287,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
             {
               f->GetUpdatedState(nullptr, l);
             }
-            GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::RESOLVED, MakeBundle(this->shared_from_this())), l);
+            GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this())), l);
             operation = OP_IDLE;
           }
           else
@@ -341,7 +341,7 @@ void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
   state = Bundle::STATE_INSTALLED;
   if (sendEvent) {
     operation = OP_UNRESOLVING;
-    GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::UNRESOLVED, MakeBundle(this->shared_from_this())), resolveLock);
+    GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(this->shared_from_this())), resolveLock);
   }
   operation = OP_IDLE;
 }
@@ -450,7 +450,7 @@ void BundlePrivate::Start(uint32_t options)
     }
   }
   // Last step of lazy activation
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::LAZY_ACTIVATION, MakeBundle(this->shared_from_this())));
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_LAZY_ACTIVATION, MakeBundle(this->shared_from_this())));
   {
     auto l = coreCtx->resolver.Lock(); US_UNUSED(l);
     operation = BundlePrivate::OP_IDLE;
@@ -464,7 +464,7 @@ std::exception_ptr BundlePrivate::Start0()
   // res is used to signal that start did not complete in a normal way
   std::exception_ptr res;
 
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTING, MakeBundle(this->shared_from_this())));
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, MakeBundle(this->shared_from_this())));
 
   try
   {
@@ -576,7 +576,7 @@ std::exception_ptr BundlePrivate::Start0()
   {
     // 10:
     state = Bundle::STATE_ACTIVE;
-    coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STARTED, MakeBundle(this->shared_from_this())));
+    coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
   }
   else if (operation == OP_ACTIVATING)
   {
@@ -590,11 +590,11 @@ void BundlePrivate::StartFailed()
 {
   // 8:
   state = Bundle::STATE_STOPPING;
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPING, MakeBundle(this->shared_from_this())));
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
   RemoveBundleResources();
   bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>())->Invalidate();
   state = Bundle::STATE_RESOLVED;
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::STOPPED, MakeBundle(this->shared_from_this())));
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
 }
 
 std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()

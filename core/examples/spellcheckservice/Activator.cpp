@@ -154,11 +154,11 @@ private:
 
   virtual std::shared_ptr<IDictionaryService> AddingService(const ServiceReference<IDictionaryService>& reference)
   {
-    std::shared_ptr<IDictionaryService> dictionary = m_context->GetService(reference);
+    std::shared_ptr<IDictionaryService> dictionary = m_context.GetService(reference);
     std::size_t count = m_spellCheckService->AddDictionary(reference, dictionary);
     if (!m_spellCheckReg && count > 1)
     {
-      m_spellCheckReg = m_context->RegisterService<ISpellCheckService>(m_spellCheckService);
+      m_spellCheckReg = m_context.RegisterService<ISpellCheckService>(m_spellCheckService);
     }
     return dictionary;
   }
@@ -182,13 +182,13 @@ private:
   std::shared_ptr<SpellCheckImpl> m_spellCheckService;
   ServiceRegistration<ISpellCheckService> m_spellCheckReg;
 
-  BundleContext* m_context;
+  BundleContext m_context;
   std::unique_ptr<ServiceTracker<IDictionaryService> > m_tracker;
 
 public:
 
   Activator()
-    : m_context(nullptr)
+    : m_context()
   {}
 
   /**
@@ -199,7 +199,7 @@ public:
    *
    * @param context the context for the bundle.
    */
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     m_context = context;
 
@@ -215,7 +215,7 @@ public:
    *
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     // NOTE: The service is automatically unregistered
 

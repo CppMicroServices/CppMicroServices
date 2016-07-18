@@ -176,4 +176,7 @@ if(US_BUILD_TESTING)
     endif()
   endif()
 
+  set_tests_properties(${_example_tests} PROPERTIES
+                       LABELS regular)
+
 endif()

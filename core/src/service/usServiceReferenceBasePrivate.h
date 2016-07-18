@@ -33,6 +33,7 @@ namespace us {
 
 class Any;
 class Bundle;
+class BundlePrivate;
 class PropertiesHandle;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
@@ -58,9 +59,9 @@ public:
     * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  std::shared_ptr<void> GetService(const std::shared_ptr<Bundle>& bundle);
+  std::shared_ptr<void> GetService(BundlePrivate* bundle);
 
-  InterfaceMapConstPtr GetServiceInterfaceMap(const std::shared_ptr<Bundle>& bundle);
+  InterfaceMapConstPtr GetServiceInterfaceMap(BundlePrivate* bundle);
 
   /**
     * Get new service instance.
@@ -68,7 +69,7 @@ public:
     * @param bundle requester of service.
     * @return Service requested or null in case of failure.
     */
-  InterfaceMapConstPtr GetPrototypeService(const std::shared_ptr<Bundle>& bundle);
+  InterfaceMapConstPtr GetPrototypeService(const Bundle& bundle);
 
   /**
    * Unget the service object.
@@ -80,7 +81,7 @@ public:
    * @return True if service was removed or false if only reference counter was
    *         decremented.
    */
-  bool UngetService(const std::shared_ptr<Bundle>& bundle, bool checkRefCounter);
+  bool UngetService(const std::shared_ptr<BundlePrivate>& bundle, bool checkRefCounter);
 
   /**
    * Unget prototype scope service objects.
@@ -89,7 +90,7 @@ public:
    * @param service The prototype scope service pointer.
    * @return \c true if the service was removed, \c false otherwise.
    */
-  bool UngetPrototypeService(const std::shared_ptr<Bundle>& bundle, const InterfaceMapConstPtr& service);
+  bool UngetPrototypeService(const std::shared_ptr<BundlePrivate>& bundle, const InterfaceMapConstPtr& service);
 
   /**
    * Get a handle to the locked service properties.
@@ -117,7 +118,7 @@ public:
 
 private:
 
-  InterfaceMapConstPtr GetServiceFromFactory(const std::shared_ptr<Bundle>& bundle,
+  InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,
                                              const std::shared_ptr<ServiceFactory>& factory);
 
 };

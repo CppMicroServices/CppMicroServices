@@ -23,8 +23,10 @@
 #include <usAny.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
+#include <usFrameworkEvent.h>
 #include <usBundle.h>
-#include "usBundleContext.h"
+#include <usBundleContext.h>
+#include <usConstants.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
@@ -38,21 +40,18 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
-  InstallTestBundle(framework->GetBundleContext(), "TestBundleM");
+  auto bundleM = testing::InstallLib(framework.GetBundleContext(), "TestBundleM");
+  US_TEST_CONDITION_REQUIRED(bundleM, "Test for existing bundle TestBundleM")
 
-  auto bundleM = framework->GetBundleContext()->GetBundle("TestBundleM");
-  US_TEST_CONDITION_REQUIRED(bundleM != nullptr, "Test for existing bundle TestBundleM")
+  US_TEST_CONDITION(bundleM.GetProperty(Constants::BUNDLE_SYMBOLICNAME).ToString() == "TestBundleM", "Bundle name")
+  US_TEST_CONDITION(bundleM.GetSymbolicName() == "TestBundleM", "Bundle name 2")
+  US_TEST_CONDITION(bundleM.GetProperty(Constants::BUNDLE_DESCRIPTION).ToString() == "My Bundle description", "Bundle description")
+  US_TEST_CONDITION(bundleM.GetProperty(Constants::BUNDLE_VERSION).ToString() == "1.0.0", "Bundle version")
+  US_TEST_CONDITION(bundleM.GetVersion() == BundleVersion(1,0,0), "Bundle version 2")
 
-  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_NAME).ToString() == "TestBundleM", "Bundle name")
-  US_TEST_CONDITION(bundleM->GetName() == "TestBundleM", "Bundle name 2")
-  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_DESCRIPTION).ToString() == "My Bundle description", "Bundle description")
-  US_TEST_CONDITION(bundleM->GetLocation() == bundleM->GetProperty(Bundle::PROP_LOCATION).ToString(), "Bundle location")
-  US_TEST_CONDITION(bundleM->GetProperty(Bundle::PROP_VERSION).ToString() == "1.0.0", "Bundle version")
-  US_TEST_CONDITION(bundleM->GetVersion() == BundleVersion(1,0,0), "Bundle version 2")
-
-  Any anyVector = bundleM->GetProperty("vector");
+  Any anyVector = bundleM.GetProperty("vector");
   US_TEST_CONDITION_REQUIRED(anyVector.Type() == typeid(std::vector<Any>), "vector type")
   std::vector<Any>& vec = ref_any_cast<std::vector<Any> >(anyVector);
   US_TEST_CONDITION_REQUIRED(vec.size() == 3, "vector size")
@@ -61,7 +60,7 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(vec[1].Type() == typeid(int), "vector 1 type")
   US_TEST_CONDITION_REQUIRED(any_cast<int>(vec[1]) == 2, "vector 1 value")
 
-  Any anyMap = bundleM->GetProperty("map");
+  Any anyMap = bundleM.GetProperty("map");
   US_TEST_CONDITION_REQUIRED(anyMap.Type() == typeid(std::map<std::string, Any>), "map type")
   std::map<std::string, Any>& m = ref_any_cast<std::map<std::string, Any> >(anyMap);
   US_TEST_CONDITION_REQUIRED(m.size() == 3, "map size")
@@ -71,6 +70,9 @@ int usBundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(any_cast<int>(m["number"]) == 4, "map 1 value")
   US_TEST_CONDITION_REQUIRED(m["list"].Type() == typeid(std::vector<Any>), "map 2 type")
   US_TEST_CONDITION_REQUIRED(any_cast<std::vector<Any> >(m["list"]).size() == 2, "map 2 value size")
+
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds(0));
 
   US_TEST_END()
 }

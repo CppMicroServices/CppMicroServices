@@ -5,6 +5,7 @@
 set(_srcs
   util/usAny.cpp
   util/usFramework.cpp
+  util/usFrameworkEvent.cpp
   util/usFrameworkFactory.cpp
   util/usFrameworkPrivate.cpp
   util/usLDAPExpr.cpp
@@ -24,7 +25,6 @@ set(_srcs
   service/usServiceListenerHook.cpp
   service/usServiceListeners.cpp
   service/usServiceObjects.cpp
-  service/usServiceProperties.cpp
   service/usServiceReferenceBase.cpp
   service/usServiceReferenceBasePrivate.cpp
   service/usServiceRegistrationBase.cpp
@@ -32,13 +32,13 @@ set(_srcs
   service/usServiceRegistry.cpp
 
   bundle/usBundle.cpp
+  bundle/usBundleArchive.cpp
   bundle/usBundleContext.cpp
   bundle/usBundleContextPrivate.cpp
   bundle/usBundleEvent.cpp
   bundle/usBundleEventHook.cpp
   bundle/usBundleFindHook.cpp
   bundle/usBundleHooks.cpp
-  bundle/usBundleInfo.cpp
   bundle/usBundleManifest.cpp
   bundle/usBundlePrivate.cpp
   bundle/usBundleRegistry.cpp
@@ -46,10 +46,14 @@ set(_srcs
   bundle/usBundleResourceBuffer.cpp
   bundle/usBundleResourceContainer.cpp
   bundle/usBundleResourceStream.cpp
+  bundle/usBundleStorageFile.cpp
+  bundle/usBundleStorageMemory.cpp
+  bundle/usBundleThread.cpp
   bundle/usBundleUtils.cpp
   bundle/usBundleVersion.cpp
-  bundle/usCoreBundleActivator.cpp
+  bundle/usConstants.cpp
   bundle/usCoreBundleContext.cpp
+  bundle/usDebug.cpp
   bundle/usModuleElfFile.cpp
   bundle/usModuleMachOFile.cpp
   bundle/usModuleObjFile.cpp
@@ -82,15 +86,22 @@ set(_private_headers
 
   bundle/usBundleAbstractTracked_p.h
   bundle/usBundleAbstractTracked.tpp
+  bundle/usBundleArchive_p.h
   bundle/usBundleContextPrivate.h
   bundle/usBundleHooks_p.h
-  bundle/usBundleInfo_p.h
   bundle/usBundleManifest_p.h
   bundle/usBundlePrivate.h
   bundle/usBundleRegistry_p.h
   bundle/usBundleResourceBuffer_p.h
   bundle/usBundleResourceContainer_p.h
+  bundle/usBundleStorage_p.h
+  bundle/usBundleStorageFile_p.h
+  bundle/usBundleStorageMemory_p.h
+  bundle/usBundleThread_p.h
   bundle/usBundleUtils_p.h
   bundle/usCoreBundleContext_p.h
+  bundle/usDebug_p.h
+  bundle/usFragment_p.h
   bundle/usModuleObjFile_p.h
+  bundle/usResolver_p.h
 )

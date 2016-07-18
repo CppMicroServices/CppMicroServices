@@ -26,8 +26,6 @@
 #include "usServiceProperties.h"
 #include "usServiceReference.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
-
 namespace us {
 
 class BundlePrivate;
@@ -103,7 +101,7 @@ public:
    * Updates the properties associated with a service.
    *
    * <p>
-   * The ServiceConstants#OBJECTCLASS and ServiceConstants#SERVICE_ID keys
+   * The Constants#OBJECTCLASS and Constants#SERVICE_ID keys
    * cannot be modified by this method. These values are set by the framework
    * when the service is registered in the environment.
    *
@@ -111,7 +109,7 @@ public:
    * The following steps are taken to modify service properties:
    * <ol>
    * <li>The service's properties are replaced with the provided properties.
-   * <li>A service event of type ServiceEvent#MODIFIED is fired.
+   * <li>A service event of type ServiceEvent#SERVICE_MODIFIED is fired.
    * </ol>
    *
    * @param properties The properties for this service. See {@link ServiceProperties}
@@ -138,7 +136,7 @@ public:
    * <ol>
    * <li>The service is removed from the framework service registry so that
    * it can no longer be obtained.
-   * <li>A service event of type ServiceEvent#UNREGISTERING is fired
+   * <li>A service event of type ServiceEvent#SERVICE_UNREGISTERING is fired
    * so that bundles using this service can release their use of the service.
    * Once delivery of the service event is complete, the
    * <code>ServiceRegistrationBase</code> objects for the service may no longer be
@@ -183,7 +181,7 @@ private:
 
   template<class I1, class ...Interfaces> friend class ServiceRegistration;
 
-  friend class ::std::hash<ServiceRegistrationBase>;
+  friend struct ::std::hash<ServiceRegistrationBase>;
 
   /**
    * Creates an invalid ServiceRegistrationBase object. You can use
@@ -207,8 +205,6 @@ inline std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase&
 }
 
 }
-
-US_MSVC_POP_WARNING
 
 US_HASH_FUNCTION_BEGIN(us::ServiceRegistrationBase)
   return std::hash<us::ServiceRegistrationBasePrivate*>()(arg.d);

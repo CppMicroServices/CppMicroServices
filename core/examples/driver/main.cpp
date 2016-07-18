@@ -80,19 +80,26 @@ int main(int /*argc*/, char** /*argv*/)
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
   std::vector<std::string> availableBundles = GetExampleBundles();
 
+  std::vector<Bundle>  installedBundles;
   /* install all available bundles for this example */
-  for (std::vector<std::string>::const_iterator iter = availableBundles.begin();
-      iter != availableBundles.end(); ++iter)
-  {
 #if defined (US_BUILD_SHARED_LIBS)
-    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + (*iter) + LIB_EXT + "/" + (*iter));
+  for (auto name : availableBundles)
+  {
+    auto bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + name + LIB_EXT);
+    installedBundles.insert(installedBundles.end(), bundles.begin(), bundles.end());
+  }
 #else
-    framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + (*iter));
+  installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT);
 #endif
+
+  std::unordered_map<std::string, Bundle> symbolicNameToBundle;
+  for (auto b : installedBundles)
+  {
+    symbolicNameToBundle.insert(std::make_pair(b.GetSymbolicName(), b));
   }
 
   std::cout << "> ";
@@ -102,9 +109,9 @@ int main(int /*argc*/, char** /*argv*/)
      The user can stop the framework so make sure that we start it again
      otherwise this tool will crash.
     */
-    if (!framework->IsStarted())
+    if (framework.GetState() != Bundle::STATE_ACTIVE)
     {
-      framework->Start();
+      framework.Start();
     }
 
     std::string strCmd(cmd);
@@ -130,7 +137,7 @@ int main(int /*argc*/, char** /*argv*/)
       ss >> id;
       if (id > 0)
       {
-        auto bundle = framework->GetBundleContext()->GetBundle(id);
+        auto bundle = framework.GetBundleContext().GetBundle(id);
         if (!bundle)
         {
           std::cout << "Error: unknown id" << std::endl;
@@ -141,11 +148,11 @@ int main(int /*argc*/, char** /*argv*/)
           {
             /* starting an already started bundle does nothing.
                 There is no harm in doing it. */
-            if (bundle->IsStarted())
+            if (bundle.GetState() == Bundle::STATE_ACTIVE)
             {
-              std::cout << "Info: bundle already started" << std::endl;
+              std::cout << "Info: bundle already active" << std::endl;
             }
-            bundle->Start();
+            bundle.Start();
           }
           catch (const std::exception& e)
           {
@@ -155,17 +162,17 @@ int main(int /*argc*/, char** /*argv*/)
       }
       else
       {
-        auto bundle = framework->GetBundleContext()->GetBundle(idOrName);
-        if (!bundle)
+        std::vector<Bundle> bundles;
+        if (symbolicNameToBundle.find(idOrName) == symbolicNameToBundle.end())
         {
           try
           {
               /* Installing a bundle can't be done by id since that is a
                     framework generated piece of information. */
 #if defined (US_BUILD_SHARED_LIBS)
-            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT + "/" + idOrName);
+            bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT);
 #else
-            bundle = framework->GetBundleContext()->InstallBundle(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT + "/" + idOrName);
+            bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usCoreExamplesDriver" + EXE_EXT);
 #endif
           }
           catch (const std::exception& e)
@@ -174,26 +181,22 @@ int main(int /*argc*/, char** /*argv*/)
           }
         }
 
-        if (bundle)
+        for (auto& bundle : bundles)
         {
           try
           {
             /* starting an already started bundle does nothing.
             There is no harm in doing it. */
-            if (bundle->IsStarted())
+            if (bundle.GetState() == Bundle::STATE_ACTIVE)
             {
-              std::cout << "Info: bundle already started" << std::endl;
+              std::cout << "Info: bundle " << bundle.GetBundleId() << " already active" << std::endl;
             }
-            bundle->Start();
+            bundle.Start();
           }
           catch (const std::exception& e)
           {
             std::cout << e.what() << std::endl;
           }
-        }
-        else
-        {
-          std::cout << "Info: Unable to install bundle " << idOrName << std::endl;
         }
       }
     }
@@ -205,18 +208,12 @@ int main(int /*argc*/, char** /*argv*/)
       long int id = -1;
       ss >> id;
 
-      auto const bundle = framework->GetBundleContext()->GetBundle(id);
+      auto bundle = framework.GetBundleContext().GetBundle(id);
       if (bundle)
       {
         try
         {
-          bundle->Stop();
-
-          // Check if it has really been stopped
-          if (bundle->IsStarted())
-          {
-            std::cout << "Info: The bundle is still referenced by another active bundle. It will be stopped when all dependent bundles are stopped." << std::endl;
-          }
+          bundle.Stop();
         }
         catch (const std::exception& e)
         {
@@ -230,7 +227,7 @@ int main(int /*argc*/, char** /*argv*/)
     }
     else if (strCmd == "s")
     {
-      auto bundles = framework->GetBundleContext()->GetBundles();
+      auto bundles = framework.GetBundleContext().GetBundles();
 
       std::cout << std::left;
 
@@ -245,9 +242,9 @@ int main(int /*argc*/, char** /*argv*/)
 
       for (auto& bundle : bundles)
       {
-        std::cout << std::right << std::setw(2) << bundle->GetBundleId() << std::left << " | ";
-        std::cout << std::setw(20) << bundle->GetName() << " | ";
-        std::cout << std::setw(9) << (bundle->IsStarted() ? "ACTIVE" : "RESOLVED");
+        std::cout << std::right << std::setw(2) << bundle.GetBundleId() << std::left << " | ";
+        std::cout << std::setw(20) << bundle.GetSymbolicName() << " | ";
+        std::cout << std::setw(9) << (bundle.GetState());
         std::cout << std::endl;
       }
     }
@@ -262,7 +259,7 @@ int main(int /*argc*/, char** /*argv*/)
 }
 
 #ifndef US_BUILD_SHARED_LIBS
-US_IMPORT_BUNDLE(CppMicroServices)
+US_INITIALIZE_STATIC_BUNDLE(system_bundle)
 US_IMPORT_BUNDLE(eventlistener)
 US_IMPORT_BUNDLE(dictionaryservice)
 US_IMPORT_BUNDLE(spellcheckservice)

@@ -48,114 +48,125 @@ namespace us {
 
 class Any;
 
-US_Core_EXPORT bool operator==(const Any& a1, const Any& a2);
-
 US_Core_EXPORT std::string any_value_to_string(const Any& any);
+US_Core_EXPORT std::ostream& any_value_to_string(std::ostream& os, const Any& any);
 
 US_Core_EXPORT std::string any_value_to_json(const Any& val);
-US_Core_EXPORT std::string any_value_to_json(const std::string& val);
-US_Core_EXPORT std::string any_value_to_json(bool val);
+US_Core_EXPORT std::ostream& any_value_to_json(std::ostream& os, const Any& val);
+US_Core_EXPORT std::ostream& any_value_to_json(std::ostream& os, const std::string& val);
+US_Core_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val);
 
 template <typename ValueType>
 ValueType* any_cast(Any* operand);
 
 template<class T>
-std::string any_value_to_string(const T& val)
+std::ostream& any_value_to_string(std::ostream& os, const T& val)
 {
-  std::stringstream ss;
-  ss << val;
-  return ss.str();
+  os << val;
+  return os;
 }
 
 template<class T>
-std::string any_value_to_json(const T& val)
+std::ostream& any_value_to_json(std::ostream& os, const T& val)
 {
-  return any_value_to_string(val);
+  return any_value_to_string(os, val);
 }
 
 /**
  * \internal
  */
 template<typename Iterator>
-std::string container_to_string(Iterator i1, Iterator i2)
+std::ostream& container_to_string(std::ostream& os, Iterator i1, Iterator i2)
 {
-  std::stringstream ss;
-  ss << "[";
+  os << "[";
   const Iterator begin = i1;
   for ( ; i1 != i2; ++i1)
   {
-    if (i1 == begin) ss << any_value_to_string(*i1);
-    else ss << "," << any_value_to_string(*i1);
+    if (i1 == begin)
+    {
+      any_value_to_string(os, *i1);
+    }
+    else
+    {
+      os << ",";
+      any_value_to_string(os, *i1);
+    }
   }
-  ss << "]";
-  return ss.str();
+  os << "]";
+  return os;
 }
 
 /**
  * \internal
  */
 template<typename Iterator>
-std::string container_to_json(Iterator i1, Iterator i2)
+std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2)
 {
-  std::stringstream ss;
-  ss << "[";
+  os << "[";
   const Iterator begin = i1;
   for ( ; i1 != i2; ++i1)
   {
-    if (i1 == begin) ss << any_value_to_json(*i1);
-    else ss << "," << any_value_to_json(*i1);
+    if (i1 == begin)
+    {
+      os << any_value_to_json(*i1);
+    }
+    else
+    {
+      os << ",";
+      any_value_to_json(os, *i1);
+    }
   }
-  ss << "]";
-  return ss.str();
+  os << "]";
+  return os;
 }
 
 template<class E>
-std::string any_value_to_string(const std::vector<E>& vec)
+std::ostream& any_value_to_string(std::ostream& os, const std::vector<E>& vec)
 {
-  return container_to_string(vec.begin(), vec.end());
+  return container_to_string(os, vec.begin(), vec.end());
 }
 
 template<class E>
-std::string any_value_to_json(const std::vector<E>& vec)
+std::ostream& any_value_to_json(std::ostream& os, const std::vector<E>& vec)
 {
-  return container_to_json(vec.begin(), vec.end());
+  return container_to_json(os, vec.begin(), vec.end());
 }
 
 template<class E>
-std::string any_value_to_string(const std::list<E>& l)
+std::ostream& any_value_to_string(std::ostream& os, const std::list<E>& l)
 {
-  return container_to_string(l.begin(), l.end());
+  return container_to_string(os, l.begin(), l.end());
 }
 
 template<class E>
-std::string any_value_to_json(const std::list<E>& l)
+std::ostream& any_value_to_json(std::ostream& os, const std::list<E>& l)
 {
-  return container_to_json(l.begin(), l.end());
+  return container_to_json(os, l.begin(), l.end());
 }
 
 template<class E>
-std::string any_value_to_string(const std::set<E>& s)
+std::ostream& any_value_to_string(std::ostream& os, const std::set<E>& s)
 {
-  return container_to_string(s.begin(), s.end());
+  return container_to_string(os, s.begin(), s.end());
 }
 
 template<class E>
-std::string any_value_to_json(const std::set<E>& s)
+std::ostream& any_value_to_json(std::ostream& os, const std::set<E>& s)
 {
-  return container_to_json(s.begin(), s.end());
+  return container_to_json(os, s.begin(), s.end());
 }
 
 template<class M>
-std::string any_value_to_string(const std::map<M, Any>& m);
+std::ostream& any_value_to_string(std::ostream& os, const std::map<M, Any>& m);
 
 template<class K, class V>
-std::string any_value_to_string(const std::map<K, V>& m);
+std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m);
 
 template<class M>
-std::string any_value_to_json(const std::map<M, Any>& m);
+std::ostream& any_value_to_json(std::ostream& os, const std::map<M, Any>& m);
 
 template<class K, class V>
-std::string any_value_to_json(const std::map<K, V>& m);
+std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
 
 
 /**
@@ -337,12 +348,16 @@ private:
 
     virtual std::string ToString() const
     {
-      return any_value_to_string(_held);
+      std::stringstream ss;
+      any_value_to_string(ss, _held);
+      return ss.str();
     }
 
     virtual std::string ToJSON() const
     {
-      return any_value_to_json(_held);
+      std::stringstream ss;
+      any_value_to_json(ss, _held);
+      return ss.str();
     }
 
     virtual const std::type_info& Type() const
@@ -533,75 +548,71 @@ const ValueType* unsafe_any_cast(const Any* operand)
 
 
 template<class K>
-std::string any_value_to_string(const std::map<K, Any>& m)
+std::ostream& any_value_to_string(std::ostream& os, const std::map<K, Any>& m)
 {
-  std::stringstream ss;
-  ss << "{";
+  os << "{";
   typedef typename std::map<K, Any>::const_iterator Iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for ( ; i1 != end; ++i1)
   {
-    if (i1 == begin) ss << i1->first << " : " << i1->second.ToString();
-    else ss << ", " << i1->first << " : " << i1->second.ToString();
+    if (i1 == begin) os << i1->first << " : " << i1->second.ToString();
+    else os << ", " << i1->first << " : " << i1->second.ToString();
   }
-  ss << "}";
-  return ss.str();
+  os << "}";
+  return os;
 }
 
 template<class K, class V>
-std::string any_value_to_string(const std::map<K, V>& m)
+std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m)
 {
-  std::stringstream ss;
-  ss << "{";
+  os << "{";
   typedef typename std::map<K, V>::const_iterator Iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for ( ; i1 != end; ++i1)
   {
-    if (i1 == begin) ss << i1->first << " : " << i1->second;
-    else ss << ", " << i1->first << " : " << i1->second;
+    if (i1 == begin) os << i1->first << " : " << i1->second;
+    else os << ", " << i1->first << " : " << i1->second;
   }
-  ss << "}";
-  return ss.str();
+  os << "}";
+  return os;
 }
 
 template<class K>
-std::string any_value_to_json(const std::map<K, Any>& m)
+std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m)
 {
-  std::stringstream ss;
-  ss << "{";
+  os << "{";
   typedef typename std::map<K, Any>::const_iterator Iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for ( ; i1 != end; ++i1)
   {
-    if (i1 == begin) ss << "\"" << i1->first << "\" : " << i1->second.ToJSON();
-    else ss << ", " << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    if (i1 == begin) os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    else os << ", " << "\"" << i1->first << "\" : " << i1->second.ToJSON();
   }
-  ss << "}";
-  return ss.str();
+  os << "}";
+  return os;
 }
 
 template<class K, class V>
-std::string any_value_to_json(const std::map<K, V>& m)
+std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
 {
-  std::stringstream ss;
-  ss << "{";
+  os << "{";
   typedef typename std::map<K, V>::const_iterator Iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for ( ; i1 != end; ++i1)
   {
-    if (i1 == begin) ss << "\"" << i1->first << "\" : " << i1->second;
-    else ss << ", " << "\"" << i1->first << "\" : " << i1->second;
+    if (i1 == begin) os << "\"" << i1->first << "\" : " << i1->second;
+    else os << ", " << "\"" << i1->first << "\" : " << i1->second;
   }
-  ss << "}";
-  return ss.str();
+  os << "}";
+  return os;
 }
 
 }

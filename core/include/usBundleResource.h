@@ -28,13 +28,12 @@
 
 #include <ostream>
 #include <vector>
-
-US_MSVC_PUSH_DISABLE_WARNING(4099) // type name first seen using 'struct' now seen using 'class'
+#include <memory>
 
 namespace us {
 
 class BundleResourcePrivate;
-class BundleResourceContainer;
+struct BundleArchive;
 
 /**
  * \ingroup MicroServices
@@ -56,14 +55,12 @@ class BundleResourceContainer;
 class US_Core_EXPORT BundleResource
 {
 
-private:
-
-  typedef BundleResourcePrivate* BundleResource::*bool_type;
-
 public:
 
   /**
    * Creates in invalid %BundleResource object.
+   *
+   * @see IsValid()
    */
   BundleResource();
   /**
@@ -124,7 +121,7 @@ public:
   /**
    * Boolean conversion operator using IsValid().
    */
-  operator bool_type() const;
+  explicit operator bool() const;
 
   /**
    * Returns the name of the resource, excluding the path.
@@ -277,15 +274,21 @@ public:
 
 private:
 
-  BundleResource(const std::string& file, const BundleResourceContainer& resourceContainer);
-  BundleResource(int index, const BundleResourceContainer& resourceContainer);
+  BundleResource(
+        const std::string& file,
+        const std::shared_ptr<const BundleArchive>& archive
+        );
 
-  friend class Bundle;
-  friend class BundlePrivate;
+  BundleResource(
+        int index,
+        const std::shared_ptr<const BundleArchive>& archive
+        );
+
+  friend struct BundleArchive;
   friend class BundleResourceContainer;
   friend class BundleResourceStream;
 
-  friend class ::std::hash<BundleResource>;
+  friend struct ::std::hash<BundleResource>;
 
   std::size_t Hash() const;
 
@@ -296,8 +299,6 @@ private:
 };
 
 }
-
-US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices

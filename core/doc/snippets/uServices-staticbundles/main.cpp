@@ -29,7 +29,7 @@ US_IMPORT_BUNDLE(MyStaticBundle1)
 #include <usBundleImport.h>
 
 #ifndef US_BUILD_SHARED_LIBS
-US_IMPORT_BUNDLE(CppMicroServices)
+US_INITIALIZE_STATIC_BUNDLE(system_bundle)
 US_IMPORT_BUNDLE(MyStaticBundle2)
 US_INITIALIZE_STATIC_BUNDLE(main)
 #endif

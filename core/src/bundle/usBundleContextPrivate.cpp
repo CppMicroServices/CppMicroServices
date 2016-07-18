@@ -22,21 +22,51 @@
 
 #include "usBundleContextPrivate.h"
 
+#include "usBundle.h"
+#include "usBundlePrivate.h"
+#include "usBundleContext.h"
+
 #include <stdexcept>
 
 namespace us {
 
+US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d)
+{
+  return BundleContext(d->shared_from_this());
+}
+
+BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d)
+{
+  return BundleContext(d);
+}
+
+std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c)
+{
+  return c.d;
+}
+
 BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle)
   : bundle(bundle)
+  , valid(true)
 {}
 
-void BundleContextPrivate::IsValid_unlocked() const
+bool BundleContextPrivate::IsValid() const
 {
-  // TODO check for valid states ACTIVE, STARTING, STOPPING
-  if (bundle == nullptr)
+  return valid;
+}
+
+void BundleContextPrivate::CheckValid() const
+{
+  if (!valid)
   {
     throw std::runtime_error("The bundle context is no longer valid");
   }
+}
+
+void BundleContextPrivate::Invalidate()
+{
+  valid = false;
+  if (bundle->SetBundleContext) bundle->SetBundleContext(nullptr);
 }
 
 }

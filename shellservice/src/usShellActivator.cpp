@@ -30,13 +30,13 @@ class ShellActivator : public BundleActivator
 {
 public:
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     m_ShellService.reset(new ShellService());
-    context->RegisterService<ShellService>(m_ShellService);
+    context.RegisterService<ShellService>(m_ShellService);
   }
 
-  void Stop(BundleContext*)
+  void Stop(BundleContext)
   {
 
   }

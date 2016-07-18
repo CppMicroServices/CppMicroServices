@@ -35,9 +35,9 @@ public:
 
   static bool StartCalled();
 
-  void Start(BundleContext*);
+  void Start(BundleContext);
 
-  void Stop(BundleContext* );
+  void Stop(BundleContext);
 
 private:
 

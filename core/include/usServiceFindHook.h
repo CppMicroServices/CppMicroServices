@@ -66,7 +66,7 @@ struct US_Core_EXPORT ServiceFindHook
    *        service references from the list to prevent the references from being
    *        returned to the bundle performing the find operation.
    */
-  virtual void Find(const BundleContext* context, const std::string& name,
+  virtual void Find(const BundleContext& context, const std::string& name,
                     const std::string& filter, ShrinkableVector<ServiceReferenceBase>& references) = 0;
 };
 

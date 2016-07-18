@@ -11,10 +11,10 @@ using namespace us;
 int main(int /*argc*/, char* /*argv*/[])
 {
   ServiceReference<IDictionaryService> dictionaryServiceRef =
-    GetBundleContext()->GetServiceReference<IDictionaryService>();
+    GetBundleContext().GetServiceReference<IDictionaryService>();
   if (dictionaryServiceRef)
   {
-    auto dictionaryService = GetBundleContext()->GetService(dictionaryServiceRef);
+    auto dictionaryService = GetBundleContext().GetService(dictionaryServiceRef);
     if (dictionaryService)
     {
       std::cout << "Dictionary contains 'Tutorial': " << dictionaryService->CheckWord("Tutorial") << std::endl;

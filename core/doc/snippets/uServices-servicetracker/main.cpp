@@ -1,5 +1,5 @@
-#include <usServiceTracker.h>
 #include <usGetBundleContext.h>
+#include <usServiceTracker.h>
 
 using namespace us;
 

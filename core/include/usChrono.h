@@ -21,39 +21,19 @@
 =============================================================================*/
 
 
-#ifndef USBUNDLEINFO_H
-#define USBUNDLEINFO_H
+#ifndef USCLOCK_H
+#define USCLOCK_H
 
-#include <usCoreConfig.h>
+#include <chrono>
 
-#include <string>
+namespace {
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4251)
+#if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
+typedef std::chrono::monotonic_clock Clock;
+#else
+typedef std::chrono::steady_clock Clock;
 #endif
-
-namespace us {
-
-struct BundleActivator;
-
-/**
- * This class is not intended to be used directly. It is exported to support
- * the CppMicroServices bundle system.
- */
-struct US_Core_EXPORT BundleInfo
-{
-  BundleInfo(const std::string& name);
-
-  std::string name;
-  std::string location;
-  long id;
-};
 
 }
 
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
-
-#endif // USBUNDLEINFO_H
+#endif // USCLOCK_H

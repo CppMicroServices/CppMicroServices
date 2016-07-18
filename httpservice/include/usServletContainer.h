@@ -31,11 +31,12 @@ namespace us {
 
 struct ServletContainerPrivate;
 class ServletContext;
+class BundleContext;
 
 class US_HttpService_EXPORT ServletContainer
 {
 public:
-  ServletContainer(const std::string& contextPath = std::string());
+  ServletContainer(BundleContext bundleCtx, const std::string& contextPath = std::string());
   ~ServletContainer();
 
   void SetContextPath(const std::string& contextPath);

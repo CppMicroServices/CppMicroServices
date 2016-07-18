@@ -34,6 +34,25 @@ namespace us {
   class BundleEvent;
 
   typedef std::function<void(const ServiceEvent&)> ServiceListener;
+
+  /**
+   * \ingroup MicroServices
+   *
+   * A \c BundleEvent listener. When a \c BundleEvent is fired, it is
+   * asynchronously (if threading support is enabled) delivered to a
+   * \c BundleListener. The Framework delivers \c BundleEvent objects to
+   * a \c BundleListener in order and does not concurrently call a
+   * \c BundleListener.
+   *
+   * A \c BundleListener can be any callable object and is registered
+   * with the Framework using the
+   * {@link BundleContext#AddBundleListener(BundleListener)} method.
+   * {\c BundleListener}s are called with a \c BundleEvent object when a
+   * bundle has been installed, resolved, started, stopped, updated, unresolved,
+   * or uninstalled.
+   *
+   * @see BundleEvent
+   */
   typedef std::function<void(const BundleEvent&)> BundleListener;
 
   template<class X>

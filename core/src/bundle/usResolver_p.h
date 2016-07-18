@@ -21,25 +21,23 @@
 =============================================================================*/
 
 
-#ifndef USBUNDLEINFO_P_H
-#define USBUNDLEINFO_P_H
+#ifndef USRESOLVER_P_H
+#define USRESOLVER_P_H
 
-#include <string>
+#include <usThreads_p.h>
+#include <usWaitCondition_p.h>
 
 namespace us {
 
-struct BundleActivator;
-
-struct BundleInfo
+/**
+ * This class is not part of the public API.
+ */
+class Resolver : public MultiThreaded<MutexLockingStrategy<>, WaitCondition>
 {
-  BundleInfo(const std::string& name);
-
-  std::string name;
-  std::string location;
-  std::string autoLoadDir;
-  long id;
+public:
+  void Clear() {}
 };
 
 }
 
-#endif // USBUNDLEINFO_H
+#endif // USRESOLVER_P_H

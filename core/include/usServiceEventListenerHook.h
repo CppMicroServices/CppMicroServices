@@ -46,7 +46,7 @@ class ServiceEvent;
  */
 struct US_Core_EXPORT ServiceEventListenerHook
 {
-  typedef ShrinkableMap<BundleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > ShrinkableMapType;
+  typedef ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo> > ShrinkableMapType;
 
   virtual ~ServiceEventListenerHook();
 

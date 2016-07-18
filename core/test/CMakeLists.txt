@@ -113,6 +113,10 @@ if(US_MEMCHECK_COMMAND)
   endif()
 endif()
 
+if(US_ENABLE_TSAN)
+  set_tests_properties(usHelgrindTest PROPERTIES WILL_FAIL 1)
+endif()
+
 #-----------------------------------------------------------------------------
 # Add dependencies for shared libraries
 #-----------------------------------------------------------------------------

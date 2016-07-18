@@ -130,4 +130,16 @@ std::size_t operator()(const type& arg) const {
 #define US_CONCAT_(x,y) x ## y
 #define US_CONCAT(x,y) US_CONCAT_(x,y)
 
+//-------------------------------------------------------------------
+// Backwards compatibility macros
+//-------------------------------------------------------------------
+
+#if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
+#define US_FUTURE_READY true
+#define US_FUTURE_TIMEOUT false
+#else
+#define US_FUTURE_READY std::future_status::ready
+#define US_FUTURE_TIMEOUT std::future_status::timeout
+#endif
+
 #endif // USGLOBALCONFIG_H

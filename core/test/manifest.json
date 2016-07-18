@@ -1,4 +1,4 @@
 {
-  "bundle.name" : "main",
+  "bundle.symbolic_name" : "main",
   "bundle.version" : "0.1.0"
 }

@@ -23,26 +23,9 @@
 #ifndef USSERVICEEVENT_H
 #define USSERVICEEVENT_H
 
-#ifdef REGISTERED
-#ifdef _WIN32
-#error The REGISTERED preprocessor define clashes with the ServiceEvent::REGISTERED\
- enum type. Try to reorder your includes, compile with WIN32_LEAN_AND_MEAN, or undef\
- the REGISTERED macro befor including this header.
-#else
-#error The REGISTERED preprocessor define clashes with the ServiceEvent::REGISTERED\
- enum type. Try to reorder your includes or undef the REGISTERED macro befor including\
- this header.
-#endif
-#endif
-
-#include "usSharedData.h"
-
 #include "usServiceReference.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
 namespace us {
 
@@ -61,7 +44,7 @@ class ServiceEventData;
 class US_Core_EXPORT ServiceEvent
 {
 
-  SharedDataPointer<ServiceEventData> d;
+  std::shared_ptr<ServiceEventData> d;
 
 public:
 
@@ -75,7 +58,7 @@ public:
      *
      * @see BundleContext#RegisterService()
      */
-    REGISTERED = 0x00000001,
+    SERVICE_REGISTERED = 0x00000001,
 
     /**
      * The properties of a registered service have been modified.
@@ -85,7 +68,7 @@ public:
      *
      * @see ServiceRegistration#SetProperties
      */
-    MODIFIED = 0x00000002,
+    SERVICE_MODIFIED = 0x00000002,
 
     /**
      * This service is in the process of being unregistered.
@@ -94,7 +77,7 @@ public:
      * has completed unregistering.
      *
      * <p>
-     * If a bundle is using a service that is <code>UNREGISTERING</code>, the
+     * If a bundle is using a service that is <code>SERVICE_UNREGISTERING</code>, the
      * bundle should release its use of the service when it receives this event.
      * If the bundle does not release its use of the service when it receives
      * this event, the framework will automatically release the bundle's use of
@@ -103,7 +86,7 @@ public:
      * @see ServiceRegistration#Unregister
      * @see BundleContext#UngetService
      */
-    UNREGISTERING = 0x00000004,
+    SERVICE_UNREGISTERING = 0x00000004,
 
     /**
      * The properties of a registered service have been modified and the new
@@ -117,7 +100,7 @@ public:
      *
      * @see ServiceRegistration#SetProperties
      */
-    MODIFIED_ENDMATCH = 0x00000008
+    SERVICE_MODIFIED_ENDMATCH = 0x00000008
 
   };
 
@@ -126,8 +109,6 @@ public:
    */
   ServiceEvent();
 
-  ~ServiceEvent();
-
   /**
    * Can be used to check if this ServiceEvent instance is valid,
    * or if it has been constructed using the default constructor.
@@ -135,7 +116,7 @@ public:
    * @return <code>true</code> if this event object is valid,
    *         <code>false</code> otherwise.
    */
-  bool IsNull() const;
+  explicit operator bool() const;
 
   /**
    * Creates a new service event object.
@@ -169,10 +150,10 @@ public:
   /**
    * Returns the type of event. The event type values are:
    * <ul>
-   * <li>{@link #REGISTERED} </li>
-   * <li>{@link #MODIFIED} </li>
-   * <li>{@link #MODIFIED_ENDMATCH} </li>
-   * <li>{@link #UNREGISTERING} </li>
+   * <li>{@link #SERVICE_REGISTERED} </li>
+   * <li>{@link #SERVICE_MODIFIED} </li>
+   * <li>{@link #SERVICE_MODIFIED_ENDMATCH} </li>
+   * <li>{@link #SERVICE_UNREGISTERING} </li>
    * </ul>
    *
    * @return Type of service lifecycle change.
@@ -191,8 +172,6 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& ev
 
 }
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
 #endif // USSERVICEEVENT_H

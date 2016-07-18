@@ -23,6 +23,7 @@
 #include "usLDAPExpr_p.h"
 
 #include "usAny.h"
+#include "usConstants.h"
 #include "usProperties_p.h"
 
 #include <limits>
@@ -216,8 +217,8 @@ bool LDAPExpr::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
 {
   if (d->m_operator == EQ)
   {
-    if (d->m_attrName.length() == ServiceConstants::OBJECTCLASS().length() &&
-        std::equal(d->m_attrName.begin(), d->m_attrName.end(), ServiceConstants::OBJECTCLASS().begin(), stricomp) &&
+    if (d->m_attrName.length() == Constants::OBJECTCLASS.length() &&
+        std::equal(d->m_attrName.begin(), d->m_attrName.end(), Constants::OBJECTCLASS.begin(), stricomp) &&
         d->m_attrValue.find(LDAPExprConstants::WILDCARD()) == std::string::npos)
     {
       objClasses.insert( d->m_attrValue );

@@ -27,6 +27,7 @@
 #include "usTestBundleSService2.h"
 #include "usTestBundleSService3.h"
 
+#include <usConstants.h>
 #include <usServiceRegistration.h>
 #include <usBundleContext.h>
 #include <usBundleActivator.h>
@@ -44,7 +45,7 @@ class TestBundleS : public ServiceControlInterface,
 
 public:
 
-  TestBundleS(BundleContext* context)
+  TestBundleS(const BundleContext& context)
     : context(context)
   {
     for(int i = 0; i <= 3; ++i)
@@ -71,8 +72,8 @@ public:
           InterfaceMapPtr ifm = std::make_shared<InterfaceMap>();
           ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
           ServiceProperties props;
-          props.insert(std::make_pair(ServiceConstants::SERVICE_RANKING(), Any(ranking)));
-          servregs[offset] = context->RegisterService(ifm, props);
+          props.insert(std::make_pair(Constants::SERVICE_RANKING, Any(ranking)));
+          servregs[offset] = context.RegisterService(ifm, props);
         }
       }
       if (operation == "unregister")
@@ -91,7 +92,7 @@ private:
 
   static const std::string SERVICE; // = "us::TestBundleSService"
 
-  BundleContext* context;
+  BundleContext context;
   std::vector<ServiceRegistrationU> servregs;
 };
 
@@ -105,14 +106,14 @@ public:
   TestBundleSActivator() {}
   ~TestBundleSActivator() {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     s = std::make_shared<TestBundleS>(context);
-    sreg = context->RegisterService<TestBundleSService0>(s);
-    sciReg = context->RegisterService<ServiceControlInterface>(s);
+    sreg = context.RegisterService<TestBundleSService0>(s);
+    sciReg = context.RegisterService<ServiceControlInterface>(s);
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     if(sreg)
     {

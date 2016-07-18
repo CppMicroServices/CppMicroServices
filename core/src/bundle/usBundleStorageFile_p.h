@@ -20,12 +20,36 @@
 
 =============================================================================*/
 
-#include <usGlobalConfig.h>
+#ifndef USBUNDLESTORAGEFILE_P_H
+#define USBUNDLESTORAGEFILE_P_H
+
+#include "usBundleStorage_p.h"
 
 namespace us {
 
-struct TestBundleAL2_Dummy
+class BundleStorageFile : public BundleStorage
 {
+
+public:
+
+  BundleStorageFile();
+
+  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(const std::string& location);
+
+  std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
+      const std::shared_ptr<const BundleResourceContainer>& resCont,
+      const std::vector<std::string>& topLevelEntries);
+
+  bool RemoveArchive(const BundleArchive* ba);
+
+  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const;
+
+  std::vector<long> GetStartOnLaunchBundles() const;
+
+  void Close();
+
 };
 
 }
+
+#endif // USBUNDLESTORAGEFILE_P_H

@@ -28,15 +28,17 @@
 
 #include <map>
 #include <string>
+#include <chrono>
 
 namespace us {
 
+class FrameworkEvent;
 class FrameworkPrivate;
 
 /**
  * \ingroup MicroServices
  *
- * The CppMicroServices Framework.
+ * A Framework instance.
  *
  * <p>
  * A Framework is itself a bundle and is known as the "System Bundle".
@@ -44,10 +46,10 @@ class FrameworkPrivate;
  * - The system bundle is always assigned a bundle identifier of zero (0).
  * - The system bundle <code>GetLocation</code> method returns the string: "System Bundle".
  * - The system bundle's life cycle cannot be managed like normal bundles. Its life cycle methods
- *   must behave as follows:
- *   - Start - Does nothing because the system bundle is already started.
+ *   behave as follows:
+ *   - Start - Initialize the framework and start installed bundles.
  *   - Stop - Stops all installed bundles.
- *   - Uninstall - The Framework must throw a std::runtime_error exception indicating that the
+ *   - Uninstall - The Framework throws a std::runtime_error exception indicating that the
  *     system bundle cannot be uninstalled.
  *
  * Framework instances are created using a FrameworkFactory. The methods of this class can be
@@ -55,45 +57,145 @@ class FrameworkPrivate;
  *
  * @remarks This class is thread-safe.
  *
- * @see FrameworkFactory::NewFramework(std::map<std::string, std::string> configuration)
+ * @see FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration)
  */
 class US_Core_EXPORT Framework : public Bundle
 {
 public:
 
-    // This class is not copy-able
-    Framework(const Framework&) = delete;
-    Framework operator=(const Framework&) = delete;
+    Framework() = delete;
 
-    virtual ~Framework(void);
+    /**
+     * Initialize this Framework. After calling this method, this Framework
+     * has:
+     * - Generated a new {@link Constants#FRAMEWORK_UUID framework UUID}.
+     * - Moved to the {@link #STATE_STARTING} state.
+     * - A valid Bundle Context.
+     * - Event handling enabled.
+     * - Reified Bundle objects for all installed bundles.
+     * - Registered any framework services.
+     *
+     * <p>
+     * This Framework will not actually be started until {@link #Start() Start}
+     * is called.
+     *
+     * <p>
+     * This method does nothing if called when this Framework is in the
+     * {@link #STATE_STARTING}, {@link #STATE_ACTIVE} or {@link #STATE_STOPPING} states.
+     *
+     * @throws std::runtime_error If this Framework could not be initialized.
+     */
+    void Init();
+
+    /**
+     * Wait until this Framework has completely stopped. The {@code Stop}
+     * method on a Framework performs an asynchronous stop of the Framework
+     * if it was built with threading support.
+     *
+     * This method can be used to wait until the asynchronous
+     * stop of this Framework has completed. This method will only wait if
+     * called when this Framework is in the {@link #STATE_STARTING}, {@link #STATE_ACTIVE},
+     * or {@link #STATE_STOPPING} states. Otherwise it will return immediately.
+     * <p>
+     * A Framework Event is returned to indicate why this Framework has stopped.
+     *
+     * @param timeout Maximum time duration to wait until this
+     *        Framework has completely stopped. A value of zero will wait
+     *        indefinitely.
+     * @return A Framework Event indicating the reason this method returned. The
+     *         following {@code FrameworkEvent} types may be returned by this
+     *         method.
+     *         <ul>
+     *         <li>{@link FrameworkEvent#FRAMEWORK_STOPPED FRAMEWORK_STOPPED} - This Framework has
+     *         been stopped. </li>
+     *
+     *
+     *         <li>{@link FrameworkEvent#FRAMEWORK_ERROR FRAMEWORK_ERROR} - The Framework
+     *         encountered an error while shutting down or an error has occurred
+     *         which forced the framework to shutdown. </li>
+     *
+     *         <li> {@link FrameworkEvent#FRAMEWORK_WAIT_TIMEDOUT FRAMEWORK_WAIT_TIMEDOUT} - This
+     *         method has timed out and returned before this Framework has
+     *         stopped.</li>
+     *         </ul>
+     */
+    FrameworkEvent WaitForStop(const std::chrono::milliseconds& timeout);
 
     /**
      * Start this Framework.
      *
      * <p>
      * The following steps are taken to start this Framework:
-     * -# If this Framework is not in the STARTING state, start this Framework.
-     * -# This Framework's state is set to ACTIVE.
+     * -# If this Framework is not in the {@link #STATE_STARTING} state,
+     *    {@link #Init() initialize} this Framework.
+     * -# All installed bundles must be started in accordance with each
+     *    bundle's persistent <i>autostart setting</i>. This means some bundles
+     *    will not be started, some will be started with <i>eager activation</i>
+     *    and some will be started with their <i>declared activation</i> policy.
+     *    Any exceptions that occur during bundle starting are wrapped in a
+     *    \c std::runtime_error and then published as a framework event of type
+     *    {@link FrameworkEvent#FRAMEWORK_ERROR}
+     * -# This Framework's state is set to {@link #STATE_ACTIVE}.
+     * -# A framework event of type {@link FrameworkEvent#FRAMEWORK_STARTED} is fired
      *
      * @throws std::runtime_error If this Framework could not be started.
      */
     void Start();
 
     /**
+     * Start this Framework.
+     *
+     * <p>
+     * Calling this method is the same as calling {@link #Start()}. There are no
+     * start options for the Framework.
+     *
+     * @param options Ignored. There are no start options for the Framework.
+     * @throws std::runtime_error If this Framework could not be started.
+     * @see #Start()
+     */
+    void Start(uint32_t options);
+
+    /**
      * Stop this Framework.
      *
-     * The following steps are taken to stop this Framework:
-     * -# This Framework's state is set to STOPPING.
-     * -# All installed bundles must be stopped.
+     * <p>
+     * The method returns immediately to the caller after initiating the
+     * following steps to be taken on another thread. If the Framework was not
+     * build with threading enabled, the steps are executed in the main thread.
+     * -# This Framework's state is set to {@link #STATE_STOPPING}.
+     * -# All installed bundles are stopped without changing each bundle's
+     *    persistent <i>autostart setting</i>. Any exceptions that occur
+     *    during bundle stopping are wrapped in a \c std::runtime_error and
+     *    then published as a framework event of type {@link FrameworkEvent#FRAMEWORK_ERROR}
      * -# Unregister all services registered by this Framework.
      * -# Event handling is disabled.
-     * -# All resources held by this Framework are released. This includes threads, open files, etc.
+     * -# This Framework's state is set to {@link #STATE_RESOLVED}.
+     * -# All resources held by this Framework are released. This includes
+     *    threads, open files, etc.
+     * -# Notify all threads that are waiting at {@link #WaitForStop(const std::chrono::milliseconds&)
+     *    WaitForStop} that the stop operation has completed.
      *
-     * After being stopped, this Framework may be discarded or started.
+     * <p>
+     * After being stopped, this Framework may be discarded, initialized or
+     * started.
      *
      * @throws std::runtime_error If stopping this Framework could not be initiated.
      */
     void Stop();
+
+    /**
+     * Stop this Framework.
+     *
+     * <p>
+     * Calling this method is the same as calling {@link #Stop()}. There are no
+     * stop options for the Framework.
+     *
+     * @param options Ignored. There are no stop options for the Framework.
+     * @throws std::runtime_error If stopping this Framework could not be
+     *         initiated.
+     * @see #Stop()
+     */
+    void Stop(uint32_t options);
 
     /**
      * The Framework cannot be uninstalled.
@@ -115,42 +217,11 @@ public:
     */
     std::string GetLocation() const;
 
-    /**
-     * The framework's persistent storage base path property key name.
-     * This property's default value is the current working directory.
-     *
-     */
-    static const std::string PROP_STORAGE_LOCATION;
-
-    /**
-     * The framework's threading support property key name.
-     * This property's default value is "single".
-     * Valid key values are:
-     * - "single" - The framework APIs are not thread-safe.
-     * - "multi" - The framework APIs are thread-safe.
-     *
-     * @remarks This is a read-only property and cannot be altered at run-time.
-     * The key's value is set at compile time by the US_ENABLE_THREADING_SUPPORT option.
-     *
-     * @see \ref BuildInstructions
-     */
-    static const std::string PROP_THREADING_SUPPORT;
-
-    /**
-     * The framework's log level property key name.
-     * This property's default value is "3" (Only errors are logged).
-     *
-     * @see MsgType
-     */
-    static const std::string PROP_LOG_LEVEL;
-
 private:
-    // Framework instances are exclusively constructed by the FrameworkFactory class
+
     friend class FrameworkFactory;
 
-    // Allow the framework to be constructed with configuration properties
-    // provided by a FrameworkFactory object.
-    Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration);
+    Framework(const std::shared_ptr<FrameworkPrivate>& d);
 
 };
 

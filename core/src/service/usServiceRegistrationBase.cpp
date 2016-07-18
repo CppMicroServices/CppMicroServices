@@ -111,8 +111,8 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
     {
       auto l = d->Lock(); US_UNUSED(l);
       if (!d->available) throw std::logic_error("Service is unregistered");
-      modifiedEndMatchEvent = ServiceEvent(ServiceEvent::MODIFIED_ENDMATCH, d->reference);
-      modifiedEvent = ServiceEvent(ServiceEvent::MODIFIED, d->reference);
+      modifiedEndMatchEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
+      modifiedEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
     }
 
     // This calls into service event listener hooks. We must not hold any looks here
@@ -128,15 +128,15 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       {
         auto l2 = d->properties.Lock(); US_UNUSED(l2);
 
-        Any any = d->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+        Any any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int)) old_rank = any_cast<int>(any);
 
-        classes = ref_any_cast<std::vector<std::string> >(d->properties.Value_unlocked(ServiceConstants::OBJECTCLASS()));
+        classes = ref_any_cast<std::vector<std::string> >(d->properties.Value_unlocked(Constants::OBJECTCLASS));
 
-        long int sid = any_cast<long int>(d->properties.Value_unlocked(ServiceConstants::SERVICE_ID()));
+        long int sid = any_cast<long int>(d->properties.Value_unlocked(Constants::SERVICE_ID));
         d->properties = ServiceRegistry::CreateServiceProperties(props, classes, false, false, sid);
 
-        any = d->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+        any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int)) new_rank = any_cast<int>(any);
       }
     }
@@ -189,7 +189,7 @@ void ServiceRegistrationBase::Unregister()
   {
     // Notify listeners. We must not hold any locks here.
     ServiceListeners::ServiceListenerEntries listeners;
-    ServiceEvent unregisteringEvent(ServiceEvent::UNREGISTERING, d->reference);
+    ServiceEvent unregisteringEvent(ServiceEvent::SERVICE_UNREGISTERING, d->reference);
     coreContext->listeners.GetMatchingServiceListeners(unregisteringEvent, listeners);
     coreContext->listeners.ServiceChanged(
           listeners,
@@ -224,7 +224,7 @@ void ServiceRegistrationBase::Unregister()
       {
         try
         {
-          serviceFactory->UngetService(i.first, *this, service);
+          serviceFactory->UngetService(MakeBundle(i.first->shared_from_this()), *this, service);
         }
         catch (const std::exception& /*ue*/)
         {
@@ -238,7 +238,7 @@ void ServiceRegistrationBase::Unregister()
     {
       try
       {
-        serviceFactory->UngetService(i.first, *this, i.second);
+        serviceFactory->UngetService(MakeBundle(i.first->shared_from_this()), *this, i.second);
       }
       catch (const std::exception& /*ue*/)
       {

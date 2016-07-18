@@ -55,16 +55,23 @@ class SL1ServiceTrackerCustomizer : public ServiceTrackerCustomizer<FooService>
 {
 private:
   std::shared_ptr<SL1BundlePropsImpl> bundlePropsService;
-  BundleContext* context;
+  BundleContext context;
 public:
-  SL1ServiceTrackerCustomizer(std::shared_ptr<SL1BundlePropsImpl> propService, BundleContext* bc) : bundlePropsService(propService), context(bc) {}
-  virtual ~SL1ServiceTrackerCustomizer() { context = NULL; }
+  SL1ServiceTrackerCustomizer(
+      std::shared_ptr<SL1BundlePropsImpl> propService,
+      const BundleContext& bc
+      )
+    : bundlePropsService(propService)
+    , context(bc)
+  {}
+
+  virtual ~SL1ServiceTrackerCustomizer() { context = nullptr; }
 
   std::shared_ptr<FooService> AddingService(const ServiceReference<FooService>& reference)
   {
     bundlePropsService->SetProperty("serviceAdded", true);
 
-    std::shared_ptr<FooService> fooService = context->GetService<FooService>(reference);
+    std::shared_ptr<FooService> fooService = context.GetService<FooService>(reference);
     fooService->foo();
     return fooService;
   }
@@ -89,24 +96,24 @@ public:
     : bundlePropsService(std::make_shared<SL1BundlePropsImpl>())
     , trackerCustomizer(nullptr)
     , tracker(nullptr)
-    , context(nullptr)
+    , context()
   {}
 
   ~ActivatorSL1()
   {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     this->context = context;
     InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
     im->insert(std::make_pair(std::string("ActivatorSL1"), bundlePropsService));
-    sr = context->RegisterService(im);
+    sr = context.RegisterService(im);
     trackerCustomizer.reset(new SL1ServiceTrackerCustomizer(bundlePropsService, context));
     tracker.reset(new FooTracker(context, trackerCustomizer.get()));
     tracker->Open();
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     tracker->Close();
     tracker.reset();
@@ -123,7 +130,7 @@ private:
   typedef ServiceTracker<FooService> FooTracker;
   std::unique_ptr<SL1ServiceTrackerCustomizer> trackerCustomizer;
   std::unique_ptr<FooTracker> tracker;
-  BundleContext* context;
+  BundleContext context;
 
 }; // ActivatorSL1
 

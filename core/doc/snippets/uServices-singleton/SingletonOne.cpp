@@ -34,13 +34,13 @@ SingletonOne::~SingletonOne()
 std::shared_ptr<SingletonOneService> SingletonOneService::GetInstance()
 {
   static ServiceReference<SingletonOneService> serviceRef;
-  static BundleContext* context = GetBundleContext();
+  static auto context = GetBundleContext();
 
   if (!serviceRef)
   {
     // This is either the first time GetInstance() was called,
     // or a SingletonOneService instance has not yet been registered.
-    serviceRef = context->GetServiceReference<SingletonOneService>();
+    serviceRef = context.GetServiceReference<SingletonOneService>();
   }
 
   if (serviceRef)
@@ -50,7 +50,7 @@ std::shared_ptr<SingletonOneService> SingletonOneService::GetInstance()
     // This still might return a null pointer, if all SingletonOneService
     // instances have been unregistered (during unloading of the library,
     // for example).
-    return context->GetService(serviceRef);
+    return context.GetService(serviceRef);
   }
   else
   {

@@ -44,14 +44,14 @@ public:
   TestBundleAActivator() {}
   ~TestBundleAActivator() {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
       s = std::make_shared<TestBundleA>();
       US_INFO << "Registering TestBundleAService";
-      sr = context->RegisterService<TestBundleAService>(s);
+      sr = context.RegisterService<TestBundleAService>(s);
   }
 
-  void Stop(BundleContext*)
+  void Stop(BundleContext)
   {
       sr.Unregister();
   }

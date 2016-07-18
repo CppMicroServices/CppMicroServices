@@ -22,6 +22,9 @@ set(_link_libraries )
 if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
+if(WIN32)
+  list(APPEND _link_libraries shlwapi.lib)
+endif()
 if(CMAKE_THREAD_LIBS_INIT)
   list(APPEND _link_libraries ${CMAKE_THREAD_LIBS_INIT})
 endif()
@@ -33,6 +36,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
 usMacroCreateBundle(Core
   VERSION "2.99.0"
   TARGET CppMicroServices
+  SYMBOLIC_NAME system_bundle
+  SKIP_INIT # we do it manually
   INTERNAL_INCLUDE_DIRS src/util src/service src/bundle
   LINK_LIBRARIES ${_link_libraries}
   SOURCES ${_core_srcs}

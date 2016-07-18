@@ -51,7 +51,7 @@ public:
 
 protected:
 
-  ServiceObjectsBase(BundleContext* context, const ServiceReferenceBase& reference);
+  ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference);
 
   ~ServiceObjectsBase();
 
@@ -70,10 +70,10 @@ protected:
  *
  * Allows multiple service objects for a service to be obtained.
  *
- * For services with \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink scope,
+ * For services with \link Constants::SCOPE_PROTOTYPE prototype\endlink scope,
  * multiple service objects for the service can be obtained. For services with
- * \link ServiceConstants::SCOPE_SINGLETON singleton\endlink or
- * \link ServiceConstants::SCOPE_BUNDLE bundle \endlink scope, only one, use-counted
+ * \link Constants::SCOPE_SINGLETON singleton\endlink or
+ * \link Constants::SCOPE_BUNDLE bundle \endlink scope, only one, use-counted
  * service object is available. Any unreleased service objects obtained from this
  * ServiceObjects object are automatically released by the framework when the bundles
  * associated with the BundleContext used to create this ServiceObjects object is
@@ -97,9 +97,9 @@ public:
    * Returns a service object for the referenced service.
    *
    * This ServiceObjects object can be used to obtain multiple service objects for
-   * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
-   * scope. If the referenced service has \link ServiceConstants::SCOPE_SINGLETON singleton\endlink
-   * or \link ServiceConstants::SCOPE_BUNDLE bundle\endlink scope, this method
+   * the referenced service if the service has \link Constants::SCOPE_PROTOTYPE prototype\endlink
+   * scope. If the referenced service has \link Constants::SCOPE_SINGLETON singleton\endlink
+   * or \link Constants::SCOPE_BUNDLE bundle\endlink scope, this method
    * behaves the same as calling the BundleContext::GetService(const ServiceReferenceBase&)
    * method for the referenced service. That is, only one, use-counted service object
    * is available from this ServiceObjects object.
@@ -110,7 +110,7 @@ public:
    *
    * <ol>
    *   <li>If the referenced service has been unregistered, \c nullptr is returned.</li>
-   *   <li>The PrototypeServiceFactory::GetService(const std::shared_ptr<Bundle>&, const ServiceRegistrationBase&)
+   *   <li>The PrototypeServiceFactory::GetService(const Bundle&, const ServiceRegistrationBase&)
    *       method is called to create a service object for the caller.</li>
    *   <li>If the service object (an instance of InterfaceMap) returned by the
    *       PrototypeServiceFactory object is empty, does not contain all the interfaces
@@ -121,7 +121,7 @@ public:
    *
    * @return A \c shared_ptr to the service object. The returned \c shared_ptr
    *         is empty if the service is not registered, the service object returned by a
-   *         ServiceFactory does not contain all the classes under which it was registered 
+   *         ServiceFactory does not contain all the classes under which it was registered
    *         or the ServiceFactory threw an exception.
    *
    * @throw std::logic_error If the BundleContext used to create this ServiceObjects object
@@ -146,7 +146,7 @@ private:
 
   friend class BundleContext;
 
-  ServiceObjects(BundleContext* context, const ServiceReference<S>& reference)
+  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReference<S>& reference)
     : ServiceObjectsBase(context, reference)
   {}
 
@@ -204,7 +204,7 @@ private:
 
   friend class BundleContext;
 
-  ServiceObjects(BundleContext* context, const ServiceReferenceU& reference);
+  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceU& reference);
 
 };
 

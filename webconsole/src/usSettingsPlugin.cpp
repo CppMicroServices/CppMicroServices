@@ -65,7 +65,7 @@ void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& res
 {
   if (m_TemplateRS == nullptr)
   {
-    BundleResource res = GetBundleContext()->GetBundle()->GetResource("/templates/settings.html");
+    BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/settings.html");
     m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
   }
   m_TemplateRS->seekg(0, std::ios_base::beg);
@@ -74,8 +74,8 @@ void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& res
 
 BundleResource SettingsPlugin::GetResource(const std::string& path) const
 {
-  return (this->GetContext() != nullptr) ?
-        this->GetContext()->GetBundle()->GetResource(path) :
+  return (this->GetContext()) ?
+        this->GetContext().GetBundle().GetResource(path) :
         BundleResource();
 }
 

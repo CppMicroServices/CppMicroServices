@@ -33,8 +33,8 @@ class WebConsoleActivator : public BundleActivator
 {
 public:
 
-  void Start(us::BundleContext* context);
-  void Stop(us::BundleContext* context);
+  void Start(BundleContext context);
+  void Stop(BundleContext context);
 
 private:
 
@@ -44,14 +44,14 @@ private:
   std::shared_ptr<ServicesPlugin> m_ServicesPlugin;
 };
 
-void WebConsoleActivator::Start(us::BundleContext* context)
+void WebConsoleActivator::Start(BundleContext context)
 {
   m_SettingsPlugin.reset(new SettingsPlugin);
   m_ServicesPlugin.reset(new ServicesPlugin);
   m_WebConsoleServlet.reset(new WebConsoleServlet());
   us::ServiceProperties props;
   props[HttpServlet::PROP_CONTEXT_ROOT()] = std::string("/console");
-  context->RegisterService<HttpServlet>(m_WebConsoleServlet, props);
+  context.RegisterService<HttpServlet>(m_WebConsoleServlet, props);
 
   std::cout << "****** Registering WebConsoleServlet at /console" << std::endl;
 
@@ -64,7 +64,7 @@ void WebConsoleActivator::Start(us::BundleContext* context)
 //  server->addHandler("/", new DefaultHandler(context));
 }
 
-void WebConsoleActivator::Stop(us::BundleContext* /*context*/)
+void WebConsoleActivator::Stop(BundleContext /*context*/)
 {
 }
 

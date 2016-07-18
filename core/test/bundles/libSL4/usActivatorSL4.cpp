@@ -44,21 +44,21 @@ public:
 class ActivatorSL4 :
 public BundleActivator
 {
-  
+
 public:
-  
+
   ~ActivatorSL4()
   {
-    
+
   }
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
-    sr = context->RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+    sr = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
     US_INFO << "TestBundleSL4: Registered " << sr;
   }
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
   }
 

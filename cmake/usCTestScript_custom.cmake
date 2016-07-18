@@ -23,16 +23,19 @@ set(US_TEST_STATIC 1)
 set(US_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../")
 
 set(US_BUILD_CONFIGURATION )
-foreach(i RANGE 3)
+foreach(i RANGE 1)
   list(APPEND US_BUILD_CONFIGURATION ${i})
 endforeach()
 
 if(WIN32 AND NOT MINGW)
   set(US_CMAKE_GENERATOR
-      "Visual Studio 9 2008"
-      "Visual Studio 10"
-      "Visual Studio 11"
-     )
+      "Visual Studio 12"
+      )
+  if (NOT ${CMAKE_VERSION} VERSION_LESS "3.1")
+    list(APPEND US_CMAKE_GENERATOR
+         "Visual Studio 14 2015"
+        )
+  endif()
 endif()
 
 include(${US_SOURCE_DIR}/cmake/usCTestScript.cmake)

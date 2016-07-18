@@ -20,12 +20,19 @@
 
 =============================================================================*/
 
-#include <usGlobalConfig.h>
+#ifndef USDEBUG_P_H
+#define USDEBUG_P_H
+
 
 namespace us {
 
-struct TestBundleAL_Dummy
+struct Debug
 {
+  Debug();
+
+  bool lazyActivation;
 };
 
 }
+
+#endif // USDEBUG_P_H

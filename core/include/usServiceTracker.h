@@ -111,7 +111,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(BundleContext* context,
+  ServiceTracker(const BundleContext& context,
                  const ServiceReference<S>& reference,
                  ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
@@ -133,7 +133,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(BundleContext* context, const std::string& clazz,
+  ServiceTracker(const BundleContext& context, const std::string& clazz,
                  ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
@@ -155,7 +155,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(BundleContext* context, const LDAPFilter& filter,
+  ServiceTracker(const BundleContext& context, const LDAPFilter& filter,
                  ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
@@ -175,7 +175,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(BundleContext* context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
+  ServiceTracker(const BundleContext& context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -238,7 +238,9 @@ public:
    * This implementation calls GetService() to determine if a service
    * is being tracked.
    *
-   * @param rel_time The relative time duration to wait for a service
+   * @param rel_time The relative time duration to wait for a service. If
+   *        zero, the method will wait indefinitely.
+   * @throws std::invalid_argument exception if \c rel_time is negative.
    * @return Returns the result of GetService().
    */
   template<class Rep, class Period>

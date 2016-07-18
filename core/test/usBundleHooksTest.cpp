@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include <usGetBundleContext.h>
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 #include <usBundle.h>
@@ -27,7 +28,6 @@
 #include <usBundleFindHook.h>
 #include <usBundleEventHook.h>
 #include <usBundleContext.h>
-#include <usGetBundleContext.h>
 
 #include "usTestUtils.h"
 #include "usTestingMacros.h"
@@ -53,11 +53,11 @@ class TestBundleFindHook : public BundleFindHook
 {
 public:
 
-  void Find(const BundleContext* /*context*/, ShrinkableVector<std::shared_ptr<Bundle>>& bundles)
+  void Find(const BundleContext& /*context*/, ShrinkableVector<Bundle>& bundles)
   {
     for (auto i = bundles.begin(); i != bundles.end();)
     {
-      if ((*i)->GetName() == "TestBundleA")
+      if (i->GetSymbolicName() == "TestBundleA")
       {
         i = bundles.erase(i);
       }
@@ -73,41 +73,39 @@ class TestBundleEventHook : public BundleEventHook
 {
 public:
 
-  void Event(const BundleEvent& event, ShrinkableVector<BundleContext*>& contexts)
+  void Event(const BundleEvent& event, ShrinkableVector<BundleContext>& contexts)
   {
-    if (event.GetType() == BundleEvent::STARTING || event.GetType() == BundleEvent::STOPPING)
+    if (event.GetType() == BundleEvent::BUNDLE_STARTING || event.GetType() == BundleEvent::BUNDLE_STOPPING)
     {
       contexts.clear();//erase(std::remove(contexts.begin(), contexts.end(), GetBundleContext()), contexts.end());
     }
   }
 };
 
-void TestFindHook(const std::shared_ptr<Framework>& framework)
+void TestFindHook(const Framework& framework)
 {
-  InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
+  auto bundleA = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundleA, "Test for existing bundle TestBundleA")
 
-  auto bundleA = framework->GetBundleContext()->GetBundle("TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundleA != nullptr, "Test for existing bundle TestBundleA")
+  US_TEST_CONDITION(bundleA.GetSymbolicName() == "TestBundleA", "Test bundle name")
 
-  US_TEST_CONDITION(bundleA->GetName() == "TestBundleA", "Test bundle name")
+  bundleA.Start();
 
-  bundleA->Start();
+  US_TEST_CONDITION(bundleA.GetState() & Bundle::STATE_ACTIVE, "Test if started correctly");
 
-  US_TEST_CONDITION(bundleA->IsStarted() == true, "Test if started correctly");
-
-  long bundleAId = bundleA->GetBundleId();
+  long bundleAId = bundleA.GetBundleId();
   US_TEST_CONDITION_REQUIRED(bundleAId > 0, "Test for valid bundle id")
 
-  US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) != nullptr, "Test for non-filtered GetBundle(long) result")
+  US_TEST_CONDITION_REQUIRED(framework.GetBundleContext().GetBundle(bundleAId), "Test for non-filtered GetBundle(long) result")
 
-  auto findHookReg = framework->GetBundleContext()->RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
+  auto findHookReg = framework.GetBundleContext().RegisterService<BundleFindHook>(std::make_shared<TestBundleFindHook>());
 
-  US_TEST_CONDITION_REQUIRED(framework->GetBundleContext()->GetBundle(bundleAId) == nullptr, "Test for filtered GetBundle(long) result")
+  US_TEST_CONDITION_REQUIRED(!framework.GetBundleContext().GetBundle(bundleAId), "Test for filtered GetBundle(long) result")
 
-  auto bundles = framework->GetBundleContext()->GetBundles();
+  auto bundles = framework.GetBundleContext().GetBundles();
   for (auto const& i : bundles)
   {
-    if (i->GetName() == "TestBundleA")
+    if (i.GetSymbolicName() == "TestBundleA")
     {
       US_TEST_FAILED_MSG(<< "TestBundleA not filtered from GetBundles()")
     }
@@ -115,37 +113,37 @@ void TestFindHook(const std::shared_ptr<Framework>& framework)
 
   findHookReg.Unregister();
 
-  bundleA->Stop();
+  bundleA.Stop();
 }
 
-void TestEventHook(const std::shared_ptr<Framework>& framework)
+void TestEventHook(const Framework& framework)
 {
   TestBundleListener bundleListener;
-  framework->GetBundleContext()->AddBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
+  framework.GetBundleContext().AddBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
 
-  InstallTestBundle(framework->GetBundleContext(), "TestBundleA");
+  auto bundleA = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundleA, "Non-null bundle")
 
-  auto bundleA = framework->GetBundleContext()->GetBundle("TestBundleA");
-  bundleA->Start();
-  US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 3, "Test for received load bundle events")
+  bundleA.Start();
+  US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 2, "Test for received load bundle events")
 
-  bundleA->Stop();
-  US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 5, "Test for received unload bundle events")
+  bundleA.Stop();
+  US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 4, "Test for received unload bundle events")
 
-  auto eventHookReg = framework->GetBundleContext()->RegisterService<BundleEventHook>(std::make_shared<TestBundleEventHook>());
+  auto eventHookReg = framework.GetBundleContext().RegisterService<BundleEventHook>(std::make_shared<TestBundleEventHook>());
 
   bundleListener.events.clear();
 
-  bundleA->Start();
+  bundleA.Start();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 1, "Test for filtered load bundle events")
-  US_TEST_CONDITION_REQUIRED(bundleListener.events[0].GetType() == BundleEvent::STARTED, "Test for STARTED event")
+  US_TEST_CONDITION_REQUIRED(bundleListener.events[0].GetType() == BundleEvent::BUNDLE_STARTED, "Test for BUNDLE_STARTED event")
 
-  bundleA->Stop();
+  bundleA.Stop();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 2, "Test for filtered unload bundle events")
-  US_TEST_CONDITION_REQUIRED(bundleListener.events[1].GetType() == BundleEvent::STOPPED, "Test for STOPPED event")
+  US_TEST_CONDITION_REQUIRED(bundleListener.events[1].GetType() == BundleEvent::BUNDLE_STOPPED, "Test for BUNDLE_STOPPED event")
 
   eventHookReg.Unregister();
-  framework->GetBundleContext()->RemoveBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
+  framework.GetBundleContext().RemoveBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
 }
 
 } // end unnamed namespace
@@ -156,7 +154,7 @@ int usBundleHooksTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
+  framework.Start();
 
   TestFindHook(framework);
   TestEventHook(framework);

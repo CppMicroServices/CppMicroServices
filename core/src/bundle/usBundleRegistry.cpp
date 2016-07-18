@@ -20,16 +20,18 @@
 
 =============================================================================*/
 
+#include "usGetBundleContext.h"
 #include "usBundleRegistry_p.h"
 
-#include "usFramework.h"
+#include "usFrameworkPrivate.h"
 #include "usBundle.h"
-#include "usBundleInfo.h"
-#include "usBundleContext.h"
+#include "usBundleContextPrivate.h"
 #include "usBundleActivator.h"
+#include "usBundleEvent.h"
 #include "usBundlePrivate.h"
+#include "usBundleStorage_p.h"
 #include "usCoreBundleContext_p.h"
-#include "usGetBundleContext.h"
+#include "usBundleResourceContainer_p.h"
 
 #include <cassert>
 #include <map>
@@ -39,7 +41,6 @@ namespace us {
 
 BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
-  , id(1)
 {
 }
 
@@ -47,54 +48,129 @@ BundleRegistry::~BundleRegistry(void)
 {
 }
 
-std::shared_ptr<Bundle> BundleRegistry::Register(BundleInfo info)
+void BundleRegistry::Init()
 {
-  std::shared_ptr<Bundle> bundle(GetBundle(info.name));
-
-  if (!bundle)
-  {
-    info.id = id++;
-    assert(info.id > 0);
-    bundle.reset(new Bundle(coreCtx, info));
-
-    auto return_pair = (this->Lock(), bundles.insert(std::make_pair(info.name, bundle)));
-
-    // A race condition exists when creating a new bundle instance. To resolve
-    // this requires either scoping the mutex to the entire function or adding
-    // additional logic to check for duplicates on insert into the bundle registry.
-    // Otherwise, an "orphan" bundle instance could be returned to the caller,
-    // which isn't actually contained within the bundle registry.
-    //
-    // Based on the bundle registry performance unit test, deleting the
-    // orphaned bundle instance is faster than increasing the scope of the
-    // mutex.
-    if (!return_pair.second)
-    {
-      bundle = return_pair.first->second;
-    }
-  }
-
-  return bundle;
+  bundles.v.insert(std::make_pair(coreCtx->systemBundle->location, coreCtx->systemBundle));
 }
 
-void BundleRegistry::UnRegister(const BundleInfo& info)
+void BundleRegistry::Clear()
 {
-  // The system bundle cannot be uninstalled.
-  if (info.id > 0)
-  {
-    this->Lock(), bundles.erase(info.name);
-  }
+  auto l = bundles.Lock(); US_UNUSED(l);
+  bundles.v.clear();
 }
 
-std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
+std::vector<Bundle> BundleRegistry::Install(const std::string& location, BundlePrivate* caller)
 {
-  if (id == 0) return coreCtx->systemBundle->shared_from_this();
+  CheckIllegalState();
 
   auto l = this->Lock(); US_UNUSED(l);
-
-  for (auto& m : bundles)
+  auto range = (bundles.Lock(), bundles.v.equal_range(location));
+  if (range.first != range.second)
   {
-    if (m.second->GetBundleId() == id)
+    std::vector<Bundle> res;
+    std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
+    while (range.first != range.second)
+    {
+      auto b = range.first->second;
+      alreadyInstalled.push_back(b);
+      auto bu = coreCtx->bundleHooks.FilterBundle(
+            MakeBundleContext(b->bundleContext.Load()),
+            MakeBundle(b));
+      if (bu) res.push_back(bu);
+      ++range.first;
+    }
+
+    auto newBundles = Install0(location, alreadyInstalled, caller);
+    res.insert(res.end(), newBundles.begin(), newBundles.end());
+    if(res.empty())
+    {
+      throw std::runtime_error("All bundles rejected by a bundle hook");
+    }
+    else
+    {
+      return res;
+    }
+  }
+  return Install0(location, {}, caller);
+}
+
+std::vector<Bundle> BundleRegistry::Install0(
+    const std::string& location,
+    const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
+    BundlePrivate* /*caller*/)
+{
+  std::vector<Bundle> res;
+  std::vector<std::shared_ptr<BundleArchive>> barchives;
+  try
+  {
+    if (exclude.empty())
+    {
+      barchives = coreCtx->storage->InsertBundleLib(location);
+    }
+    else
+    {
+      auto resCont = exclude.front()->GetBundleArchive()->GetResourceContainer();
+      auto entries = resCont->GetTopLevelDirs();
+      for (auto const& b : exclude)
+      {
+        entries.erase(std::find(entries.begin(), entries.end(), b->symbolicName));
+      }
+      barchives = coreCtx->storage->InsertArchives(resCont, entries);
+    }
+
+    for (auto& ba : barchives)
+    {
+      auto d = std::shared_ptr<BundlePrivate>(new BundlePrivate(coreCtx, std::move(ba)));
+      res.emplace_back(MakeBundle(d));
+    }
+
+    {
+      auto l = bundles.Lock(); US_UNUSED(l);
+      for (auto& b : res)
+      {
+        bundles.v.insert(std::make_pair(location, b.d));
+      }
+    }
+
+    for (auto& b : res)
+    {
+      coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
+    }
+    return res;
+  }
+  catch (const std::exception& e)
+  {
+    for (auto& ba : barchives)
+    {
+      ba->Purge();
+    }
+    throw std::runtime_error("Failed to install bundle library at " + location + ": " + e.what());
+  }
+}
+
+void BundleRegistry::Remove(const std::string& location, long id)
+{
+  auto l = bundles.Lock(); US_UNUSED(l);
+  auto range = bundles.v.equal_range(location);
+  for (auto iter = range.first; iter != range.second; ++iter)
+  {
+    if (iter->second->id == id)
+    {
+      bundles.v.erase(iter);
+      return;
+    }
+  }
+}
+
+std::shared_ptr<BundlePrivate> BundleRegistry::GetBundle(long id) const
+{
+  CheckIllegalState();
+
+  auto l = bundles.Lock(); US_UNUSED(l);
+
+  for (auto& m : bundles.v)
+  {
+    if (m.second->id == id)
     {
       return m.second;
     }
@@ -102,31 +178,93 @@ std::shared_ptr<Bundle> BundleRegistry::GetBundle(long id) const
   return nullptr;
 }
 
-std::shared_ptr<Bundle> BundleRegistry::GetBundle(const std::string& name) const
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(const std::string& location) const
 {
-  if (coreCtx->systemBundle->d->info.name == name) return coreCtx->systemBundle->shared_from_this();
+  CheckIllegalState();
 
-  auto l = this->Lock(); US_UNUSED(l);
+  auto l = bundles.Lock(); US_UNUSED(l);
 
-  auto iter = bundles.find(name);
-  if (iter != bundles.end())
-  {
-    return iter->second;
-  }
-  return nullptr;
+  auto range = bundles.v.equal_range(location);
+  std::vector<std::shared_ptr<BundlePrivate>> result;
+  std::transform(range.first, range.second, std::back_inserter(result), [](const BundleMap::value_type& p){ return p.second; });
+  return result;
 }
 
-std::vector<std::shared_ptr<Bundle>> BundleRegistry::GetBundles() const
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(const std::string& name, const BundleVersion& version) const
 {
-  auto l = this->Lock(); US_UNUSED(l);
+  CheckIllegalState();
 
-  std::vector<std::shared_ptr<Bundle>> result;
-  result.push_back(coreCtx->systemBundle->shared_from_this());
-  for (auto& m : bundles)
+  std::vector<std::shared_ptr<BundlePrivate>> res;
+
+  auto l = bundles.Lock(); US_UNUSED(l);
+
+  for (auto& p : bundles.v)
   {
-    result.push_back(m.second);
+    auto& b = p.second;
+    if (name == b->symbolicName && version == b->version)
+    {
+      res.push_back(b);
+    }
+  }
+
+  return res;
+}
+
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles() const
+{
+  auto l = bundles.Lock(); US_UNUSED(l);
+
+  std::vector<std::shared_ptr<BundlePrivate>> result;
+  std::transform(bundles.v.begin(), bundles.v.end(), std::back_inserter(result), [](const BundleMap::value_type& p){ return p.second; });
+  return result;
+}
+
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetActiveBundles() const
+{
+  CheckIllegalState();
+  std::vector<std::shared_ptr<BundlePrivate>> result;
+
+  auto l = bundles.Lock(); US_UNUSED(l);
+  for (auto& b : bundles.v)
+  {
+    auto s = b.second->state.load();
+    if (s == Bundle::STATE_ACTIVE || s == Bundle::STATE_STARTING)
+    {
+      result.push_back(b.second);
+    }
   }
   return result;
+}
+
+void BundleRegistry::Load()
+{
+  auto l = this->Lock(); US_UNUSED(l);
+  auto bas = coreCtx->storage->GetAllBundleArchives();
+  for (auto const& ba : bas)
+  {
+    try
+    {
+      std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
+      bundles.v.insert(std::make_pair(impl->location, impl));
+    }
+    catch (const std::exception& e)
+    {
+      ba->SetAutostartSetting(-1); // Do not start on launch
+      US_WARN << "Error: Failed to load bundle "
+              << ba->GetBundleId()
+              << " (" << ba->GetBundleLocation() << ")"
+              << " uninstalled it! "
+              << " (" << e.what() << ")";
+    }
+  }
+}
+
+void BundleRegistry::CheckIllegalState() const
+{
+  if (coreCtx == nullptr)
+  {
+    throw std::logic_error("This framework instance is not active.");
+  }
 }
 
 }

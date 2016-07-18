@@ -43,14 +43,14 @@ public:
   TestBundleImportedByBActivator() {}
   ~TestBundleImportedByBActivator() {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     s = std::make_shared<TestBundleImportedByB>();
     US_INFO << "Registering TestBundleImportedByB";
-    sr = context->RegisterService<TestBundleBService>(s);
+    sr = context.RegisterService<TestBundleBService>(s);
   }
 
-  void Stop(BundleContext*)
+  void Stop(BundleContext)
   {
     sr.Unregister();
   }

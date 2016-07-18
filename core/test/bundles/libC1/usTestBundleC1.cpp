@@ -41,18 +41,18 @@ class TestBundleC1Activator : public BundleActivator, public ServiceTrackerCusto
 public:
 
   TestBundleC1Activator()
-    : context(nullptr)
+    : context()
     , stop(false)
     , count(0)
   {}
 
   ~TestBundleC1Activator() {}
 
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     this->context = context;
 
-    us::LDAPFilter filter(us::LDAPProp(ServiceConstants::OBJECTCLASS()) == "org.cppmicroservices.c1.*" && us::LDAPProp("i") == 5);
+    us::LDAPFilter filter(us::LDAPProp(Constants::OBJECTCLASS) == "org.cppmicroservices.c1.*" && us::LDAPProp("i") == 5);
     tracker.reset(new ServiceTracker<void>(context, filter, this));
     tracker->Open();
 
@@ -71,7 +71,7 @@ public:
     p.set_value();
   }
 
-  void Stop(BundleContext*)
+  void Stop(BundleContext)
   {
     for (auto& th : threads)
     {
@@ -97,7 +97,7 @@ public:
       im[std::string("org.cppmicroservices.c1.") + std::to_string(c)] = std::make_shared<int>(1);
       ServiceProperties props;
       props["i"] = i;
-      auto reg = context->RegisterService(std::make_shared<const InterfaceMap>(im), props);
+      auto reg = context.RegisterService(std::make_shared<const InterfaceMap>(im), props);
       regs.Lock(), regs.v.emplace_back(std::move(reg));
       count++;
       if (i % 5 == 0) regs.NotifyAll();
@@ -147,17 +147,17 @@ public:
       {
         InterfaceMap im;
         im[std::string("org.cppmicroservices.c1.additional")] = std::make_shared<int>(2);
-        additionalReg.v = context->RegisterService(std::make_shared<const InterfaceMap>(im));
+        additionalReg.v = context.RegisterService(std::make_shared<const InterfaceMap>(im));
       }
       return InterfaceMapConstPtr();
     }
-    return context->GetService(reference);
+    return context.GetService(reference);
   }
 
   void ModifiedService(const ServiceReferenceU& reference, const InterfaceMapConstPtr& /*service*/)
   {
     if (reference.GetProperty("i") != 5) throw std::logic_error("modified end match: wrong property");
-    context->GetService(reference);
+    context.GetService(reference);
   }
 
   void RemovedService(const ServiceReferenceU& /*reference*/, const InterfaceMapConstPtr& /*service*/)
@@ -168,7 +168,7 @@ public:
 
 private:
 
-  BundleContext* context;
+  BundleContext context;
 
   std::unique_ptr<ServiceTracker<void>> tracker;
 

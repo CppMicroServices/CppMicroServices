@@ -28,6 +28,7 @@
 
 #include <mutex>
 #include <memory>
+#include <atomic>
 
 namespace us {
 
@@ -84,11 +85,38 @@ public:
       : m_Lock(host->m_Mtx)
     {}
 
+    UniqueLock(const MutexLockingStrategy& host, std::defer_lock_t d)
+      : m_Lock(host.m_Mtx, d)
+    {}
+
+    void Lock()
+    {
+      m_Lock.lock();
+    }
+
+    void UnLock()
+    {
+      m_Lock.unlock();
+    }
+
+    template<typename Rep, typename Period>
+    bool TryLockFor(const std::chrono::duration<Rep, Period>& duration)
+    {
+      return m_Lock.try_lock_for(duration);
+    }
+
 #else
     UniqueLock(UniqueLock&&) {}
     UniqueLock& operator=(UniqueLock&&) {}
     explicit UniqueLock(const MutexLockingStrategy&) {}
     explicit UniqueLock(const MutexLockingStrategy*) {}
+    void Lock() {}
+    void UnLock() {}
+    template<typename Rep, typename Period>
+    bool TryLockFor(const std::chrono::duration<Rep, Period>& duration)
+    {
+      return true;
+    }
 #endif
 
   private:
@@ -114,6 +142,11 @@ public:
    * @return A lock object.
    */
   UniqueLock Lock() const
+  {
+    return UniqueLock(this);
+  }
+
+  UniqueLock DeferLock() const
   {
     return UniqueLock(this);
   }
@@ -167,6 +200,18 @@ public:
     return o;
   }
 
+  bool CompareExchange(T& expected, const T& desired)
+  {
+    auto l = Lock(); US_UNUSED(l);
+    if (expected == m_t)
+    {
+      m_t = desired;
+      return true;
+    }
+    expected = m_t;
+    return false;
+  }
+
 };
 
 #if !defined(__GNUC__) || __GNUC__ > 4
@@ -199,10 +244,13 @@ public:
     return std::atomic_exchange(&m_t, t);
   }
 
+  bool CompareExchange(std::shared_ptr<T>& expected, const std::shared_ptr<T>& desired)
+  {
+    return std::atomic_compare_exchange_strong(&m_t, &expected, desired);
+  }
 };
 #endif
 
 }
-
 
 #endif // USTHREADINGMODEL_H

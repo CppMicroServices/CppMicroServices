@@ -26,11 +26,9 @@
 
 namespace us {
 
-struct BundleInfo;
-
 namespace BundleUtils
 {
-  void* GetSymbol(const BundleInfo& bundle, const char* symbol);
+  void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol);
 }
 
 }

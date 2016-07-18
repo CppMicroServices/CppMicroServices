@@ -72,12 +72,12 @@ public:
    *
    * @param context the context for the bundle.
    */
-  void Start(BundleContext* context)
+  void Start(BundleContext context)
   {
     auto dictionaryService = std::make_shared<DictionaryImpl>();
     ServiceProperties props;
     props["Language"] = std::string("English");
-    context->RegisterService<IDictionaryService>(dictionaryService, props);
+    context.RegisterService<IDictionaryService>(dictionaryService, props);
   }
 
   /**
@@ -86,7 +86,7 @@ public:
    *
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   {
     // NOTE: The service is automatically unregistered
   }

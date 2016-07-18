@@ -22,47 +22,107 @@
 
 #include "usFramework.h"
 #include "usFrameworkPrivate.h"
+#include "usBundleStorage_p.h"
 
 namespace us {
 
-const std::string Framework::PROP_STORAGE_LOCATION{ "org.cppmicroservices.framework.storage" };
-const std::string Framework::PROP_THREADING_SUPPORT{ "org.cppmicroservices.framework.threading.support" };
-const std::string Framework::PROP_LOG_LEVEL{ "org.cppmicroservices.framework.log.level" };
+namespace {
 
-Framework::Framework(const BundleInfo& info, const std::map<std::string, Any>& configuration)
-  : Bundle(std::unique_ptr<BundlePrivate>(new FrameworkPrivate(this, info, configuration)))
+FrameworkPrivate* pimpl(const std::shared_ptr<BundlePrivate>& p)
+{
+  return static_cast<FrameworkPrivate*>(p.get());
+}
+
+}
+
+Framework::Framework(const std::shared_ptr<FrameworkPrivate>& d)
+  : Bundle(d)
 {
 }
 
-Framework::~Framework(void)
+void Framework::Init()
 {
-  // We are going down, make sure the code invoked by Stop()
-  // can still create shared_ptr instances from this while
-  // not deleting the Framework twice.
-  std::shared_ptr<Bundle> dummy(this, [](Bundle*){});
-  Stop();
+  pimpl(d)->Init();
+}
+
+FrameworkEvent Framework::WaitForStop(const std::chrono::milliseconds& timeout)
+{
+  return pimpl(d)->WaitForStop(timeout);
+}
+
+void Framework::Start(uint32_t )
+{
+  Start();
 }
 
 void Framework::Start()
 {
-  // TODO framework states
-  Bundle::Start();
+  std::vector<long> bundlesToStart;
+  {
+    auto l = d->Lock();
+    d->WaitOnOperation(*d.get(), l, "Framework::Start", true);
+
+    switch (d->state.load())
+    {
+    case STATE_INSTALLED:
+    case STATE_RESOLVED:
+      pimpl(d)->DoInit();
+      // Fall through
+    case STATE_STARTING:
+      d->operation = BundlePrivate::OP_ACTIVATING;
+      break;
+    case STATE_ACTIVE:
+      return;
+    default:
+      std::stringstream ss;
+      ss << d->state;
+      throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
+    }
+    bundlesToStart = pimpl(d)->coreCtx->storage->GetStartOnLaunchBundles();
+  }
+
+  // Start bundles according to their autostart setting.
+  for (auto i : bundlesToStart)
+  {
+    auto b = d->coreCtx->bundleRegistry.GetBundle(i);
+    try
+    {
+      const int32_t autostartSetting = b->barchive->GetAutostartSetting();
+      // Launch must not change the autostart setting of a bundle
+      int option = Bundle::START_TRANSIENT;
+      if (Bundle::START_ACTIVATION_POLICY == autostartSetting)
+      {
+        // Transient start according to the bundles activation policy.
+        option |= Bundle::START_ACTIVATION_POLICY;
+      }
+      b->Start(option);
+    }
+    catch (...)
+    {
+      // $TODO
+      //pimpl(d)->coreCtx->FrameworkError(b, std::current_exception());
+      try { throw; } catch (const std::exception& e) { US_ERROR << e.what(); }
+    }
+  }
+
+  {
+    auto l = d->Lock(); US_UNUSED(l);
+    d->state = STATE_ACTIVE;
+    d->operation = BundlePrivate::OP_IDLE;
+  }
+  d->NotifyAll();
+  // $TODO
+  // pimpl(d)->coreCtx->listeners.FrameworkEvent(FrameworkEvent(FrameworkEvent::FRAMEWORK_STARTED, this->shared_from_this(), std::exception_ptr()));
+}
+
+void Framework::Stop(uint32_t )
+{
+  Stop();
 }
 
 void Framework::Stop()
 {
-  if (!this->IsStarted()) return;
-
-  auto bundles = GetBundleContext()->GetBundles();
-  for (auto bundle : bundles)
-  {
-    if (bundle->GetBundleId() > 0)
-    {
-      bundle->Stop();
-    }
-  }
-
-  Bundle::Stop();
+  pimpl(d)->Shutdown(false);
 }
 
 void Framework::Uninstall()

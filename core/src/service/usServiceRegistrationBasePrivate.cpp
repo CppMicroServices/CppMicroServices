@@ -51,7 +51,7 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
   properties.Lock(), properties.Clear_unlocked();
 }
 
-bool ServiceRegistrationBasePrivate::IsUsedByBundle(const std::shared_ptr<Bundle>& bundle) const
+bool ServiceRegistrationBasePrivate::IsUsedByBundle(BundlePrivate* bundle) const
 {
   auto l = this->Lock(); US_UNUSED(l);
   return (dependents.find(bundle) != dependents.end()) ||

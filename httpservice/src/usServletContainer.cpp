@@ -19,6 +19,8 @@
 
 =============================================================================*/
 
+#include "usGetBundleContext.h"
+
 #include "usServletContainer.h"
 #include "usServletContainer_p.h"
 
@@ -31,7 +33,6 @@
 #include "usServletContext.h"
 #include "usServletConfig_p.h"
 
-#include "usGetBundleContext.h"
 #include "usBundleContext.h"
 #include "usBundle.h"
 
@@ -72,8 +73,8 @@ private:
     std::size_t pos = uri.find_first_of('?');
     uri = uri.substr(0, pos);
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-                                std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-                                std::cout << "Against uri: " << uri << std::endl;
+    std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if(uri.size() > pathPrefix.size())
@@ -121,8 +122,8 @@ public:
   }
 };
 
-ServletContainerPrivate::ServletContainerPrivate(ServletContainer* q)
-    : m_Context(GetBundleContext())
+ServletContainerPrivate::ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q)
+    : m_Context(std::move(bundleCtx))
     , m_Server(nullptr)
     , m_ServletTracker(m_Context, this)
     , q(q)
@@ -175,14 +176,14 @@ std::shared_ptr<ServletHandler> ServletContainerPrivate::AddingService(const Ser
   Any contextRoot = reference.GetProperty(HttpServlet::PROP_CONTEXT_ROOT());
   if (contextRoot.Empty())
   {
-    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is missing the context root property." << std::endl;
+    std::cout << "HttpServlet from " << reference.GetBundle().GetSymbolicName() << " is missing the context root property." << std::endl;
     return nullptr;
   }
 
-  auto servlet = m_Context->GetService(reference);
+  auto servlet = m_Context.GetService(reference);
   if (!servlet)
   {
-    std::cout << "HttpServlet from " << reference.GetBundle()->GetName() << " is nullptr." << std::endl;
+    std::cout << "HttpServlet from " << reference.GetBundle().GetSymbolicName() << " is nullptr." << std::endl;
     return nullptr;
   }
   std::shared_ptr<ServletContext> servletContext(new ServletContext(q));
@@ -214,8 +215,8 @@ void ServletContainerPrivate::RemovedService(const ServiceReference<HttpServlet>
 //-----------            ServletContainer          ------------------
 //-------------------------------------------------------------------
 
-ServletContainer::ServletContainer(const std::string& contextPath)
-  : d(new ServletContainerPrivate(this))
+ServletContainer::ServletContainer(BundleContext bundleCtx, const std::string& contextPath)
+  : d(new ServletContainerPrivate(std::move(bundleCtx), this))
 {
   this->SetContextPath(contextPath);
 }

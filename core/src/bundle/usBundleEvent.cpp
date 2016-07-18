@@ -23,30 +23,33 @@
 #include "usBundleEvent.h"
 
 #include "usBundle.h"
+#include "usBundlePrivate.h"
+
+#include <stdexcept>
 
 namespace us {
 
-class BundleEventData : public SharedData
+class BundleEventData
 {
 public:
 
-  BundleEventData& operator=(const BundleEventData&) = delete;
-
-  BundleEventData(BundleEvent::Type type, const std::shared_ptr<Bundle>& bundle)
-    : type(type), bundle(bundle)
+  BundleEventData(BundleEvent::Type type, const Bundle& bundle,
+                   const Bundle& origin)
+    : type(type), bundle(GetPrivate(bundle)), origin(GetPrivate(origin))
   {
-
-  }
-
-  BundleEventData(const BundleEventData& other)
-    : SharedData(other), type(other.type), bundle(other.bundle)
-  {
-
+    if (!bundle) throw std::invalid_argument("invalid bundle");
+    if (!origin) throw std::invalid_argument("invalid origin");
   }
 
   const BundleEvent::Type type;
-  const std::shared_ptr<Bundle> bundle;
 
+  // Bundle that had a change occur in its lifecycle.
+  std::shared_ptr<BundlePrivate> bundle;
+
+  // Bundle that was the origin of the event. For install event type, this is
+  // the bundle whose context was used to install the bundle. Otherwise it is
+  // the bundle itself.
+  std::shared_ptr<BundlePrivate> origin;
 };
 
 BundleEvent::BundleEvent()
@@ -55,37 +58,26 @@ BundleEvent::BundleEvent()
 
 }
 
-BundleEvent::~BundleEvent()
-{
-
-}
-
-bool BundleEvent::IsNull() const
+BundleEvent::operator bool() const
 {
   return !d;
 }
 
-BundleEvent::BundleEvent(Type type, const std::shared_ptr<Bundle>& bundle)
-  : d(new BundleEventData(type, bundle))
+BundleEvent::BundleEvent(Type type, const Bundle& bundle)
+  : d(new BundleEventData(type, bundle, bundle))
 {
 
 }
 
-BundleEvent::BundleEvent(const BundleEvent& other)
-  : d(other.d)
+BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
+  : d(new BundleEventData(type, bundle, origin))
 {
 
 }
 
-BundleEvent& BundleEvent::operator=(const BundleEvent& other)
+Bundle BundleEvent::GetBundle() const
 {
-  d = other.d;
-  return *this;
-}
-
-std::shared_ptr<Bundle> BundleEvent::GetBundle() const
-{
-  return d->bundle;
+  return MakeBundle(d->bundle);
 }
 
 BundleEvent::Type BundleEvent::GetType() const
@@ -93,16 +85,31 @@ BundleEvent::Type BundleEvent::GetType() const
   return d->type;
 }
 
+Bundle BundleEvent::GetOrigin() const
+{
+  return MakeBundle(d->origin);
+}
+
+bool BundleEvent::operator==(const BundleEvent& evt) const
+{
+  if (!(*this) && !evt) return true;
+  if (!(*this) || !evt) return false;
+  return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() && GetOrigin() == evt.GetOrigin();
+}
+
 std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 {
   switch (eventType)
   {
-  case BundleEvent::STARTED:        return os << "STARTED";
-  case BundleEvent::STOPPED:        return os << "STOPPED";
-  case BundleEvent::STARTING:       return os << "STARTING";
-  case BundleEvent::STOPPING:       return os << "STOPPING";
-  case BundleEvent::INSTALLED:      return os << "INSTALLED";
-  case BundleEvent::UNINSTALLED:    return os << "UNINSTALLED";
+  case BundleEvent::BUNDLE_STARTED:         return os << "STARTED";
+  case BundleEvent::BUNDLE_STOPPED:         return os << "BUNDLE_STOPPED";
+  case BundleEvent::BUNDLE_STARTING:        return os << "STARTING";
+  case BundleEvent::BUNDLE_STOPPING:        return os << "STOPPING";
+  case BundleEvent::BUNDLE_INSTALLED:       return os << "INSTALLED";
+  case BundleEvent::BUNDLE_UNINSTALLED:     return os << "UNINSTALLED";
+  case BundleEvent::BUNDLE_RESOLVED:        return os << "RESOLVED";
+  case BundleEvent::BUNDLE_UNRESOLVED:      return os << "UNRESOLVED";
+  case BundleEvent::BUNDLE_LAZY_ACTIVATION: return os << "LAZY_ACTIVATION";
 
   default: return os << "Unknown bundle event type (" << static_cast<int>(eventType) << ")";
   }
@@ -110,10 +117,10 @@ std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 
 std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
 {
-  if (event.IsNull()) return os << "NONE";
+  if (!event) return os << "NONE";
 
   auto m = event.GetBundle();
-  os << event.GetType() << " #" << m->GetBundleId() << " (" << m->GetLocation() << ")";
+  os << event.GetType() << " #" << m.GetBundleId() << " (" << m.GetSymbolicName() << " at " << m.GetLocation() << ")";
   return os;
 }
 

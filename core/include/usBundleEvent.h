@@ -27,12 +27,8 @@
 #include <memory>
 
 #include "usCoreExport.h"
-#include "usSharedData.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
 namespace us {
 
@@ -54,61 +50,103 @@ class BundleEventData;
 class US_Core_EXPORT BundleEvent
 {
 
-  SharedDataPointer<BundleEventData> d;
+  std::shared_ptr<BundleEventData> d;
 
 public:
 
-  enum Type {
-
-    /**
-     * The bundle has been started.
-     * <p>
-     * The bundle's
-     * \link BundleActivator::Start(BundleContext*) BundleActivator Start\endlink method
-     * has been executed.
-     */
-    STARTED,
-
-    /**
-     * The bundle has been stopped.
-     * <p>
-     * The bundle's
-     * \link BundleActivator::Stop(BundleContext*) BundleActivator Stop\endlink method
-     * has been executed.
-     */
-    STOPPED,
-
-    /**
-     * The bundle is about to be started.
-     * <p>
-     * The bundle's
-     * \link BundleActivator::Start(BundleContext*) BundleActivator Start\endlink method
-     * is about to be called.
-     */
-    STARTING,
-
-    /**
-     * The bundle is about to be stopped.
-     * <p>
-     * The bundle's
-     * \link BundleActivator::Stop(BundleContext*) BundleActivator Stop\endlink method
-     * is about to be called.
-     */
-    STOPPING,
+  enum Type : uint32_t {
 
     /**
      * The bundle has been installed.
      * <p>
      * The bundle has been installed by the Framework.
+     *
+     * @see BundleContext::InstallBundles(const std::string&)
      */
-    INSTALLED,
+    BUNDLE_INSTALLED = 0x00000001,
+
+    /**
+     * The bundle has been started.
+     * <p>
+     * The bundle's
+     * \link BundleActivator::Start(BundleContext) BundleActivator Start\endlink method
+     * has been executed if the bundle has a bundle activator class.
+     *
+     * @see Bundle::Start()
+     */
+    BUNDLE_STARTED = 0x00000002,
+
+    /**
+     * The bundle has been stopped.
+     * <p>
+     * The bundle's
+     * \link BundleActivator::Stop(BundleContext) BundleActivator Stop\endlink method
+     * has been executed if the bundle has a bundle activator class.
+     *
+     * @see Bundle::Stop()
+     */
+    BUNDLE_STOPPED = 0x00000004,
+
+    /**
+     * The bundle has been updated.
+     *
+     * @note This identifier is reserved for future use and not supported yet.
+     */
+    BUNDLE_UPDATED = 0x00000008,
 
     /**
      * The bundle has been uninstalled.
-     * <p>
-     * The bundle has been removed from the Framework.
+     *
+     * @see Bundle::Uninstall()
      */
-    UNINSTALLED
+    BUNDLE_UNINSTALLED = 0x00000010,
+
+    /**
+     * The bundle has been resolved.
+     *
+     * @see Bundle#STATE_RESOLVED
+     */
+    BUNDLE_RESOLVED = 0x00000020,
+
+    /**
+     * The bundle has been unresolved.
+     *
+     * @see Bundle#BUNDLE_INSTALLED
+     */
+    BUNDLE_UNRESOLVED = 0x00000040,
+
+    /**
+     * The bundle is about to be activated.
+     *
+     * The bundle's \link BundleActivator::Start(BundleContext) BundleActivator
+     * start\endlink method is about to be called if the bundle has a bundle activator
+     * class.
+     *
+     * @see Bundle::Start()
+     */
+    BUNDLE_STARTING = 0x00000080,
+
+    /**
+     * The bundle is about to deactivated.
+     *
+     * The bundle's \link BundleActivator::Stop(BundleContext) BundleActivator
+     * stop\endlink method is about to be called if the bundle has a bundle activator
+     * class.
+     *
+     * @see Bundle::Stop()
+     */
+    BUNDLE_STOPPING = 0x00000100,
+
+    /**
+     * The bundle will be lazily activated.
+     * <p>
+     * The bundle has a \link Constants#ACTIVATION_LAZY lazy activation policy\endlink
+     * and is waiting to be activated. It is now in the \link Bundle::STATE_STARTING
+     * BUNDLE_STARTING\endlink state and has a valid \c BundleContext.
+     *
+     * @note This identifier is reserved for future use and not supported yet.
+     */
+    BUNDLE_LAZY_ACTIVATION = 0x00000200
 
   };
 
@@ -117,8 +155,6 @@ public:
    */
   BundleEvent();
 
-  ~BundleEvent();
-
   /**
    * Can be used to check if this BundleEvent instance is valid,
    * or if it has been constructed using the default constructor.
@@ -126,42 +162,74 @@ public:
    * @return <code>true</code> if this event object is valid,
    *         <code>false</code> otherwise.
    */
-  bool IsNull() const;
+  explicit operator bool() const;
+
+  /**
+   * Creates a bundle event of the specified type.
+   *
+   * @param type The event type.
+   * @param bundle The bundle which had a lifecycle change. This bundle is
+   *        used as the origin of the event.
+   */
+  BundleEvent(Type type, const Bundle& bundle);
 
   /**
    * Creates a bundle event of the specified type.
    *
    * @param type The event type.
    * @param bundle The bundle which had a lifecycle change.
+   * @param origin The bundle which is the origin of the event. For the event
+   *        type {@link #BUNDLE_INSTALLED}, this is the bundle whose context was used
+   *        to install the bundle. Otherwise it is the bundle itself.
    */
-  BundleEvent(Type type, const std::shared_ptr<Bundle>& bundle);
-
-  BundleEvent(const BundleEvent& other);
-
-  BundleEvent& operator=(const BundleEvent& other);
+  BundleEvent(Type type, const Bundle& bundle, const Bundle& origin);
 
   /**
    * Returns the bundle which had a lifecycle change.
    *
    * @return The bundle that had a change occur in its lifecycle.
    */
-  std::shared_ptr<Bundle> GetBundle() const;
+  Bundle GetBundle() const;
 
   /**
    * Returns the type of lifecyle event. The type values are:
    * <ul>
-   * <li>{@link #INSTALLED}
-   * <li>{@link #STARTING}
-   * <li>{@link #STARTED}
-   * <li>{@link #STOPPING}
-   * <li>{@link #STOPPED}
-   * <li>{@link #UNINSTALLED}
+   * <li>{@link #BUNDLE_INSTALLED}
+   * <li>{@link #BUNDLE_RESOLVED}
+   * <li>{@link #BUNDLE_LAZY_ACTIVATION}
+   * <li>{@link #BUNDLE_STARTING}
+   * <li>{@link #BUNDLE_STARTED}
+   * <li>{@link #BUNDLE_STOPPING}
+   * <li>{@link #BUNDLE_STOPPED}
+   * <li>{@link #BUNDLE_UNRESOLVED}
+   * <li>{@link #BUNDLE_UNINSTALLED}
    * </ul>
    *
    * @return The type of lifecycle event.
    */
   Type GetType() const;
 
+  /**
+   * Returns the bundle that was the origin of the event.
+   *
+   * <p>
+   * For the event type {@link #BUNDLE_INSTALLED}, this is the bundle whose context
+   * was used to install the bundle. Otherwise it is the bundle itself.
+   *
+   * @return The bundle that was the origin of the event.
+   */
+  Bundle GetOrigin() const;
+
+  /**
+   * Compares two bundle events for equality.
+   *
+   * @param evt The bundle event to compare this event with.
+   * @return \c true if both events originate from the same bundle, describe
+   *         a life-cycle change for the same bundle, and are of the same type.
+   *         \c false otherwise. Two invalid bundle events are considered to
+   *         be equal.
+   */
+  bool operator==(const BundleEvent& evt) const;
 };
 
 /**
@@ -174,8 +242,6 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const BundleEvent& eve
 
 }
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
 #endif // USBUNDLEEVENT_H

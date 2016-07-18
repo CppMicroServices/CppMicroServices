@@ -19,12 +19,12 @@
 
 =============================================================================*/
 
+#include "usGetBundleContext.h"
 #include "usShellService.h"
 
 #include "usBundleRegistry_p.h"
 #include "usBundle.h"
 #include "usBundleContext.h"
-#include "usGetBundleContext.h"
 #include "usBundleResource.h"
 #include "usBundleResourceStream.h"
 #include "usLog.h"
@@ -45,6 +45,19 @@ using namespace us;
 #define sc_int(sc, ival) (sc->vptr->mk_integer(sc, ival))
 #define sc_string(sc, sval) (sc->vptr->mk_string(sc, sval))
 
+namespace {
+
+Bundle get_bundle(const std::string& bsn)
+{
+  for (auto b : GetBundleContext().GetBundles())
+  {
+    if (b.GetSymbolicName() == bsn) return b;
+  }
+  return {};
+}
+
+}
+
 extern "C" {
 
 // id, name, version, state
@@ -53,11 +66,11 @@ static const int fieldWidth[numFields] = { 4, 26, 10, 12, 40 };
 
 pointer us_bundle_ids(scheme* sc, pointer /*args*/)
 {
-  auto bundles = GetBundleContext()->GetBundles();
+  auto bundles = GetBundleContext().GetBundles();
   std::set<long> ids;
-  for (auto const& iter : bundles)
+  for (auto const& b : bundles)
   {
-    ids.insert(iter->GetBundleId());
+    ids.insert(b.GetBundleId());
   }
   pointer result = sc->NIL;
   for (auto iter = ids.rbegin(), iterEnd = ids.rend(); iter != iterEnd; ++iter)
@@ -85,7 +98,7 @@ pointer us_bundle_info(scheme* sc, pointer args)
   memset(delim, delimChar, 50);
 
   pointer arg = pair_car(args);
-  std::shared_ptr<Bundle> bundle;
+  Bundle bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
@@ -105,37 +118,36 @@ pointer us_bundle_info(scheme* sc, pointer args)
       infoList = immutable_cons(sc, sc_string(sc, "Location"), infoList);
       infoList = immutable_cons(sc, sc_string(sc, "State"), infoList);
       infoList = immutable_cons(sc, sc_string(sc, "Version"), infoList);
-      infoList = immutable_cons(sc, sc_string(sc, "Name"), infoList);
+      infoList = immutable_cons(sc, sc_string(sc, "Symbolic Name"), infoList);
       infoList = immutable_cons(sc, sc_string(sc, "Id"), infoList);
       return immutable_cons(sc, infoList, result);
     }
     else
     {
-      bundle = GetBundleContext()->GetBundle(name);
+      bundle = get_bundle(name);
     }
   }
   else if (is_integer(arg))
   {
-    bundle = GetBundleContext()->GetBundle(ivalue(arg));
+    bundle = GetBundleContext().GetBundle(ivalue(arg));
   }
   else
   {
     return sc->NIL;
   }
 
-  if (bundle == nullptr)
+  if (!bundle)
   {
     return sc->NIL;
   }
 
-  pointer id = sc_int(sc, bundle->GetBundleId());
-  pointer name = sc_string(sc, bundle->GetName().c_str());
-  pointer location = sc_string(sc, bundle->GetLocation().c_str());
-  pointer version = sc_string(sc, bundle->GetVersion().ToString().c_str());
-  std::string strState;
-  //std::stringstream(strState) << bundle->GetState();
-  strState = bundle->IsStarted() ? "Active" : "Resolved";
-  pointer state = sc_string(sc, strState.c_str());
+  pointer id = sc_int(sc, bundle.GetBundleId());
+  pointer name = sc_string(sc, bundle.GetSymbolicName().c_str());
+  pointer location = sc_string(sc, bundle.GetLocation().c_str());
+  pointer version = sc_string(sc, bundle.GetVersion().ToString().c_str());
+  std::stringstream strState;
+  strState << bundle.GetState();
+  pointer state = sc_string(sc, strState.str().c_str());
 
 
   pointer result = sc->NIL;
@@ -204,26 +216,30 @@ pointer us_bundle_start(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  std::shared_ptr<Bundle> bundle;
+  Bundle bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
-    bundle = GetBundleContext()->GetBundle(name);
+    bundle = get_bundle(name);
   }
   else if (is_integer(arg))
   {
-    bundle = GetBundleContext()->GetBundle(ivalue(arg));
-  }
-  else
-  {
-    return sc->F;
+    bundle = GetBundleContext().GetBundle(ivalue(arg));
   }
 
   if (bundle)
   {
-    std::cout << "Starting bundle..." << std::endl;
-    return sc->T;
+    try
+    {
+      bundle.Start();
+      return sc->T;
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what();
+    }
   }
+
   return sc->F;
 }
 
@@ -242,26 +258,61 @@ pointer us_bundle_stop(scheme* sc, pointer args)
 
   pointer arg = pair_car(args);
 
-  std::shared_ptr<Bundle> bundle;
+  Bundle bundle;
   if (is_string(arg))
   {
     std::string name = sc->vptr->string_value(arg);
-    bundle = GetBundleContext()->GetBundle(name);
+    bundle = get_bundle(name);
   }
   else if (is_integer(arg))
   {
-    bundle = GetBundleContext()->GetBundle(ivalue(arg));
-  }
-  else
-  {
-    return sc->F;
+    bundle = GetBundleContext().GetBundle(ivalue(arg));
   }
 
   if (bundle)
   {
-    std::cout << "Stopping bundle..." << std::endl;
-    return sc->T;
+    try
+    {
+      bundle.Stop();
+      return sc->T;
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what();
+    }
   }
+
+  return sc->F;
+}
+
+pointer us_install(scheme* sc, pointer args)
+{
+  if(args == sc->NIL)
+  {
+    std::cerr << "Empty argument list" << std::endl;
+    return sc->F;
+  }
+
+  if (sc->vptr->list_length(sc, args) != 1)
+  {
+    return sc->F;
+  }
+
+  pointer arg = pair_car(args);
+  if (is_string(arg))
+  {
+    std::string name = sc->vptr->string_value(arg);
+    try
+    {
+      GetBundleContext().InstallBundles(name);
+      return sc->T;
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what();
+    }
+  }
+
   return sc->F;
 }
 
@@ -323,7 +374,7 @@ ShellService::ShellService()
   }
   scheme_set_output_port_file(d->m_Scheme, stdout);
 
-  BundleResource schemeInitRes = GetBundleContext()->GetBundle()->GetResource("tinyscheme/init.scm");
+  BundleResource schemeInitRes = GetBundleContext().GetBundle().GetResource("tinyscheme/init.scm");
   if (schemeInitRes)
   {
     this->LoadSchemeResource(schemeInitRes);
@@ -333,7 +384,7 @@ ShellService::ShellService()
     US_WARN << "Scheme file init.scm not found";
   }
 
-  std::vector<BundleResource> schemeResources = GetBundleContext()->GetBundle()->FindResources("/", "*.scm", false);
+  std::vector<BundleResource> schemeResources = GetBundleContext().GetBundle().FindResources("/", "*.scm", false);
   for (std::vector<BundleResource>::iterator iter = schemeResources.begin(),
        iterEnd = schemeResources.end(); iter != iterEnd; ++iter)
   {
@@ -348,6 +399,7 @@ ShellService::ShellService()
   scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-display-bundle-info"), mk_foreign_func(d->m_Scheme, us_display_bundle_info));
   scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-start"), mk_foreign_func(d->m_Scheme, us_bundle_start));
   scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-bundle-stop"), mk_foreign_func(d->m_Scheme, us_bundle_stop));
+  scheme_define(d->m_Scheme, d->m_Scheme->global_env, mk_symbol(d->m_Scheme, "us-install"), mk_foreign_func(d->m_Scheme, us_install));
 }
 
 ShellService::~ShellService()

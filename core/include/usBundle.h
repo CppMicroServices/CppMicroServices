@@ -25,6 +25,7 @@
 #define USBUNDLE_H
 
 #include "usBundleVersion.h"
+#include "usChrono.h"
 
 #include <vector>
 #include <memory>
@@ -47,143 +48,298 @@ typedef ServiceReference<void> ServiceReferenceU;
 /**
  * \ingroup MicroServices
  *
- * Represents a CppMicroServices bundle.
+ * An installed bundle in the Framework.
  *
- * <p>
- * A <code>%Bundle</code> object is the access point to a CppMicroServices bundle.
- * Each CppMicroServices bundle has an associated <code>%Bundle</code> object.
+ * A <code>%Bundle</code> object is the access point to define the lifecycle of an
+ * installed bundle. Each bundle installed in the CppMicroServices environment has
+ * an associated <code>%Bundle</code> object.
  *
- * <p>
- * A bundle has unique identity, a <code>long</code>, chosen by the
- * framework. This identity does not change during the lifecycle of a bundle.
+ * A bundle has a unique identity, a <code>long</code>, chosen by the
+ * Framework. This identity does not change during the lifecycle of a bundle.
+ * Uninstalling and then reinstalling the bundle creates a new unique identity.
  *
- * <p>
- * A bundle can be in one of four states:
- * <ul>
- * <li>INSTALLED
- * <li>STARTED
- * <li>STOPPED
- * <li>UNINSTALLED
- * </ul>
- * <p>
- * You can determine whether a bundle is started or not by using IsStarted().
+ * A bundle can be in one of six states:
+ * - STATE_UNINSTALLED
+ * - STATE_INSTALLED
+ * - STATE_RESOLVED
+ * - STATE_STARTING
+ * - STATE_STOPPING
+ * - STATE_ACTIVE
  *
- * <p>
- * A bundle can only execute code when its state is <code>STARTED</code>.
- * A <code>STOPPED</code> bundle is a
- * zombie and can only be reached because it was started before. However,
- * stopped bundles can be started again.
+ * Values assigned to these states have no specified ordering; they represent
+ * bit values that may be ORed together to determine if a bundle is in one of
+ * the valid states.
  *
- * <p>
+ * A bundle should only have active threads of execution when its state is one
+ * of {@code STATE_STARTING},{@code STATE_ACTIVE}, or {@code STATE_STOPPING}.
+ * A {@code STATE_UNINSTALLED} bundle can not be set to another state; it is a
+ * zombie and can only be reached because references are kept somewhere.
+ *
  * The framework is the only entity that is allowed to create
- * <code>%Bundle</code> objects.
+ * <code>%Bundle</code> objects, and these objects are only valid within the
+ * Framework that created them.
+ *
+ * Bundles have a natural ordering such that if two {@code Bundle}s have the
+ * same {@link #GetBundleId() bundle id} they are equal. A {@code Bundle} is
+ * less than another {@code Bundle} if it has a lower {@link #GetBundleId()
+ * bundle id} and is greater if it has a higher bundle id.
+ *
  *
  * @remarks This class is thread safe.
  */
-class US_Core_EXPORT Bundle : public std::enable_shared_from_this<Bundle>
+class US_Core_EXPORT Bundle
 {
 
 public:
 
-  Bundle(const Bundle &) = delete;
-  Bundle& operator=(const Bundle&) = delete;
+  typedef Clock::time_point TimeStamp;
+
+  enum State : uint32_t {
+
+    /**
+     * The bundle is uninstalled and may not be used.
+     *
+     * The {@code STATE_UNINSTALLED} state is only visible after a bundle is
+     * uninstalled; the bundle is in an unusable state but references to the
+     * {@code Bundle} object may still be available and used for introspection.
+     *
+     * The value of {@code STATE_UNINSTALLED} is 0x00000001.
+     */
+    STATE_UNINSTALLED = 0x00000001,
+
+    /**
+     * The bundle is installed but not yet resolved.
+     *
+     * A bundle is in the {@code STATE_INSTALLED} state when it has been installed in
+     * the Framework but is not or cannot be resolved.
+     *
+     * This state is visible if the bundle's code dependencies are not resolved.
+     * The Framework may attempt to resolve a {@code STATE_INSTALLED} bundle's code
+     * dependencies and move the bundle to the {@code STATE_RESOLVED} state.
+     *
+     * The value of {@code STATE_INSTALLED} is 0x00000002.
+     */
+    STATE_INSTALLED = 0x00000002,
+
+    /**
+     * The bundle is resolved and is able to be started.
+     *
+     * A bundle is in the {@code STATE_RESOLVED} state when the Framework has
+     * successfully resolved the bundle's code dependencies. These dependencies
+     * include:
+     * - None (this may change in future versions)
+     *
+     * Note that the bundle is not active yet. A bundle is put in the
+     * {@code STATE_RESOLVED} state before it can be started. The Framework may
+     * attempt to resolve a bundle at any time.
+     *
+     * The value of {@code STATE_RESOLVED} is 0x00000004.
+     */
+    STATE_RESOLVED = 0x00000004,
+
+    /**
+     * The bundle is in the process of starting.
+     *
+     * A bundle is in the {@code STATE_STARTING} state when its {@link #Start(uint32_t)
+     * Start} method is active. A bundle must be in this state when the bundle's
+     * {@link BundleActivator#Start(const BundleContext&)} is called.
+     * If the {@code BundleActivator#Start} method completes without exception, then
+     * the bundle has successfully started and moves to the {@code STATE_ACTIVE}
+     * state.
+     *
+     * If the bundle has a {@link Constants#ACTIVATION_LAZY lazy activation
+     * policy}, then the bundle may remain in this state for some time until the
+     * activation is triggered.
+     *
+     * The value of {@code STATE_STARTING} is 0x00000008.
+     */
+    STATE_STARTING = 0x00000008,
+
+    /**
+     * The bundle is in the process of stopping.
+     *
+     * A bundle is in the {@code STATE_STOPPING} state when its {@link #Stop(uint32_t)
+     * Stop} method is active. A bundle is in this state when the bundle's
+     * {@link BundleActivator#Stop(const BundleContext&)} method
+     * is called. When the {@code BundleActivator#Stop} method completes the bundle
+     * is stopped and moves to the {@code STATE_RESOLVED} state.
+     *
+     * The value of {@code STATE_STOPPING} is 0x00000010.
+     */
+    STATE_STOPPING = 0x00000010,
+
+    /**
+     * The bundle is now running.
+     *
+     * A bundle is in the {@code STATE_ACTIVE} state when it has been successfully
+     * started and activated.
+     *
+     * The value of {@code STATE_ACTIVE} is 0x00000020.
+     */
+    STATE_ACTIVE = 0x00000020
+  };
+
+  enum StartOptions : uint32_t {
+
+    /**
+     * The bundle start operation is transient and the persistent autostart
+     * setting of the bundle is not modified.
+     *
+     * This bit may be set when calling {@link #Start(uint32_t)} to notify the
+     * framework that the autostart setting of the bundle must not be modified.
+     * If this bit is not set, then the autostart setting of the bundle is
+     * modified.
+     *
+     * @see #Start(uint32_t)
+     * @note This option is reserved for future use and not supported yet.
+     */
+    START_TRANSIENT = 0x00000001,
+
+    /**
+     * The bundle start operation must activate the bundle according to the
+     * bundle's declared
+     * {@link Constants#PLUGIN_ACTIVATIONPOLICY activation policy}.
+     *
+     * This bit may be set when calling {@link #Start(uint32_t)} to notify the
+     * framework that the bundle must be activated using the bundle's declared
+     * activation policy.
+     *
+     * @see Constants#PLUGIN_ACTIVATIONPOLICY
+     * @see #Start(uint32_t)
+     * @note This option is reserved for future use and not supported yet.
+     */
+    START_ACTIVATION_POLICY = 0x00000002
+  };
+
+  enum StopOptions : uint32_t {
+
+    /**
+     * The bundle stop is transient and the persistent autostart setting of the
+     * bundle is not modified.
+     *
+     * This bit may be set when calling {@link #Stop(uint32_t)} to notify the
+     * framework that the autostart setting of the bundle must not be modified.
+     * If this bit is not set, then the autostart setting of the bundle is
+     * modified.
+     *
+     * @see #Stop(uint32_t)
+     * @note This option is reserved for future use and not supported yet.
+     */
+    STOP_TRANSIENT = 0x00000001
+  };
+
+  Bundle(const Bundle &); // = default
+  Bundle(Bundle&&); // = default
+  Bundle& operator=(const Bundle&); // = default
+  Bundle& operator=(Bundle&&); // = default
 
   /**
-   * The property key for looking up this bundle's id.
-   * The property value is of type \c long.
+   * Constructs an invalid %Bundle object.
    *
-   * @see \ref MicroServices_BundleProperties
-   */
-  static const std::string PROP_ID;
-
-  /**
-   * The property key for looking up this bundle's name.
-   * The property value is of type \c std::string.
+   * Valid bundle objects can only be created by the framework in
+   * response to certain calls to a \c BundleContext object.
+   * A \c BundleContext object is supplied to a bundle via its
+   * \c BundleActivator or as a return value of the
+   * \c GetBundleContext() method.
    *
-   * @see \ref MicroServices_BundleProperties
+   * @see operator bool() const
    */
-  static const std::string PROP_NAME;
-
-  /**
-   * The property key for looking up this bundle's location in the file system.
-   * The property value is of type \c std::string.
-   *
-   * @see \ref MicroServices_BundleProperties
-   */
-  static const std::string PROP_LOCATION;
-
-  /**
-   * The property key for looking up this bundle's version identifier.
-   * The property value is of type \c std::string.
-   *
-   * @see \ref MicroServices_BundleProperties
-   */
-  static const std::string PROP_VERSION;
-
-  /**
-   * The property key for looking up this bundle's vendor information.
-   * The property value is of type \c std::string.
-   *
-   * @see \ref MicroServices_BundleProperties
-   */
-  static const std::string PROP_VENDOR;
-
-  /**
-   * The property key for looking up this bundle's description.
-   * The property value is of type \c std::string.
-   *
-   * @see \ref MicroServices_BundleProperties
-   */
-  static const std::string PROP_DESCRIPTION;
+  Bundle();
 
   virtual ~Bundle();
 
   /**
+   * Compares this \c Bundle object with the specified bundle.
+   *
+   * Valid \c Bundle objects compare equal if and only if they
+   * are installed in the same framework instance and their
+   * bundle id is equal. Invalid \c Bundle objects are always
+   * considered to be equal.
+   *
+   * @param rhs The \c Bundle object to compare this object with.
+   * @return \c true if this \c Bundle object is equal to \c rhs,
+   *         \c false otherwise.
+   */
+  bool operator==(const Bundle& rhs) const;
+
+  /**
+   * Compares this \c Bundle object with the specified bundle
+   * for inequality.
+   *
+   * @param rhs The \c Bundle object to compare this object with.
+   * @return Returns the result of <code>!(*this == rhs)</code>.
+   */
+  bool operator!=(const Bundle& rhs) const;
+
+  /**
+   * Compares this \c Bundle with the specified bundle for order.
+   *
+   * %Bundle objects are ordered first by their framework id and
+   * then according to their bundle id.
+   * Invalid \c Bundle objects will always compare greater then
+   * valid \c Bundle objects.
+   *
+   * @param rhs The \c Bundle object to compare this object with.
+   * @return \c
+   */
+  bool operator<(const Bundle& rhs) const;
+
+  /**
+   * Tests this %Bundle object for validity.
+   *
+   * Invalid \c Bundle objects are created by the default constructor or
+   * can be returned by certain framework methods if the bundle has been
+   * uninstalled.
+   *
+   * @return \c true if this %Bundle object is valid and can safely be used,
+   *         \c false otherwise.
+   */
+  explicit operator bool() const;
+
+  /**
+   * Releases any resources held or locked by this
+   * \c Bundle and renders it invalid.
+   */
+  Bundle& operator=(std::nullptr_t);
+
+  /**
    * Returns this bundle's current state.
    *
-   * <p>
    * A bundle can be in only one state at any time.
    *
-   * @return <code>true</code> if the bundle is <code>STARTED</code>
-   *         <code>false</code> if it is in any other state.
+   * @return An element of {@code STATE_UNINSTALLED},{@code STATE_INSTALLED},
+   *         {@code STATE_RESOLVED}, {@code STATE_STARTING}, {@code STATE_STOPPING},
+   *         {@code STATE_ACTIVE}.
    */
-  bool IsStarted() const;
+  State GetState() const;
 
   /**
    * Returns this bundle's {@link BundleContext}. The returned
    * <code>BundleContext</code> can be used by the caller to act on behalf
    * of this bundle.
    *
-   * <p>
-   * If this bundle is not in the <code>STARTED</code> state, then this
-   * bundle has no valid <code>BundleContext</code>. This method will
-   * return <code>nullptr</code> if this bundle has no valid
-   * <code>BundleContext</code>.
+   * If this bundle is not in the <code>STATE_STARTED</code> state, then this
+   * bundle has no valid <code>BundleContext</code> and this method will
+   * return a default constructed \c BundleContext object.
    *
-   * @return A <code>BundleContext</code> for this bundle or
-   *         <code>0</code> if this bundle has no valid
-   *         <code>BundleContext</code>.
+   * @return A valid or invalid <code>BundleContext</code> for this bundle or.
    */
-  BundleContext* GetBundleContext() const;
+  BundleContext GetBundleContext() const;
 
   /**
    * Returns this bundle's unique identifier. This bundle is assigned a unique
    * identifier by the framework when it was installed.
    *
-   * <p>
    * A bundle's unique identifier has the following attributes:
-   * <ul>
-   * <li>Is unique.
-   * <li>Is a <code>long</code>.
-   * <li>Its value is not reused for another bundle, even after a bundle is
-   * uninstalled.
-   * <li>Does not change while a bundle remains installed.
-   * <li>Does not change when a bundle is re-started.
-   * </ul>
+   * - Is unique.
+   * - Is a <code>long</code>.
+   * - Its value is not reused for another bundle, even after a bundle is
+   *   uninstalled.
+   * - Does not change while a bundle remains installed.
+   * - Does not change when a bundle is re-started.
    *
-   * <p>
    * This method continues to return this bundle's unique identifier while
-   * this bundle is in the <code>STOPPED</code> state.
+   * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The unique identifier of this bundle.
    */
@@ -192,36 +348,33 @@ public:
   /**
    * Returns this bundle's location.
    *
-   * <p>
    * The location is the full path to the bundle's shared library.
    * This method continues to return this bundle's location
-   * while this bundle is in the <code>STOPPED</code> state.
+   * while this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The string representation of this bundle's location.
    */
   virtual std::string GetLocation() const;
 
   /**
-   * Returns the name of this bundle as specified by the
-   * US_CREATE_BUNDLE CMake macro. The bundle
+   * Returns the symbolic name of this bundle as specified by the
+   * US_BUNDLE_NAME preprocessor definition. The bundle symbolic
    * name together with a version must identify a unique bundle.
    *
-   * <p>
-   * This method continues to return this bundle's name while
-   * this bundle is in the <code>STOPPED</code> state.
+   * This method continues to return this bundle's symbolic name while
+   * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
-   * @return The name of this bundle.
+   * @return The symbolic name of this bundle.
    */
-  std::string GetName() const;
+  std::string GetSymbolicName() const;
 
   /**
-   * Returns the version of this bundle as specified by the
-   * US_INITIALIZE_BUNDLE CMake macro. If this bundle does not have a
+   * Returns the version of this bundle as specified in its
+   * <code>manifest.json</code> file. If this bundle does not have a
    * specified version then {@link BundleVersion::EmptyVersion} is returned.
    *
-   * <p>
    * This method continues to return this bundle's version while
-   * this bundle is in the <code>STOPPED</code> state.
+   * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The version of this bundle.
    */
@@ -230,13 +383,13 @@ public:
   /**
    * Returns this bundle's Manifest properties as key/value pairs.
    *
-   * @return A map containing this bundle's Manifest properties as 
+   * @return A map containing this bundle's Manifest properties as
    *         key/value pairs.
    *
    * @sa \ref MicroServices_BundleProperties
    */
   std::map<std::string, Any> GetProperties() const;
-    
+
   /**
    * Returns the value of the specified property for this bundle.
    * If not found, the framework's properties are searched.
@@ -271,6 +424,8 @@ public:
    *
    * @return A list of ServiceReference objects for services this
    * bundle has registered.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
@@ -286,6 +441,8 @@ public:
    *
    * @return A list of ServiceReference objects for all services this
    * bundle is using.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   std::vector<ServiceReferenceU> GetServicesInUse() const;
 
@@ -296,8 +453,9 @@ public:
    *
    * @param path The path name of the resource.
    * @return A BundleResource object for the given \c path. If the \c path cannot
-   * be found in this bundle or the bundle's state is \c STOPPED, an invalid
-   * BundleResource object is returned.
+   * be found in this bundle an invalid BundleResource object is returned.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   BundleResource GetResource(const std::string& path) const;
 
@@ -323,84 +481,238 @@ public:
    * @param recurse If \c true, recurse into subdirectories. Otherwise only return resources
    * from the specified path.
    * @return A vector of BundleResource objects for each matching entry.
+   *
+   * @throws std::logic_error If this bundle has been uninstalled.
    */
   std::vector<BundleResource> FindResources(const std::string& path, const std::string& filePattern, bool recurse) const;
 
   /**
-   * Start this bundle.
+   * Returns the time when this bundle was last modified. A bundle is
+   * considered to be modified when it is installed, updated or uninstalled.
    *
-   * The following steps are required to start this bundle:
-   * -# If this bundle is in the process of being activated or deactivated then this method must wait for
-   *    activation or deactivation to complete before continuing. If this does not occur in a reasonable
-   *    time, a std::runtime_error exception is thrown to indicate this bundle was unable to be started.
-   * -# If this bundle was already started, then this method returns immediately.
-   * -# A bundle event of type BundleEvent::STARTING is fired.
-   * -# The BundleActivator::Start(BundleContext) method of this bundle's BundleActivator, if one is
-   *    specified, is called. If the BundleActivator is invalid or throws an exception then:
-   *    - A bundle event of type BundleEvent::STOPPING is fired.
-   *    - %Any services registered by this bundle must be unregistered.
-   *    - %Any services used by this bundle must be released.
-   *    - %Any listeners registered by this bundle must be removed.
-   *    - A bundle event of type BundleEvent::STOPPED is fired.
-   *    - A std::runtime_error exception is then thrown.
-   * -# A bundle event of type BundleEvent::STARTED is fired.
+   * @return The time when this bundle was last modified.
+   */
+  TimeStamp GetLastModified() const;
+
+  /**
+   * Starts this bundle.
+   *
+   * If this bundle's state is {@code STATE_UNINSTALLED} then a
+   * {@code std::logic_error} is thrown.
+   *
+   * The Framework sets this bundle's persistent autostart
+   * setting to <em>Started with declared activation</em> if the
+   * {@link #START_ACTIVATION_POLICY} option is set or
+   * <em>Started with eager activation</em> if not set.
+   *
+   * The following steps are executed to start this bundle:
+   * -# If this bundle is in the process of being activated or deactivated
+   *    then this method waits for activation or deactivation to complete
+   *    before continuing. If this does not occur in a reasonable time, a
+   *    {@code std::runtime_error} is thrown to indicate this bundle was unable to
+   *    be started.
+   * -# If this bundle's state is {@code STATE_ACTIVE} then this method returns
+   *    immediately.
+   * -# If the {@link #START_TRANSIENT} option is not set then set this
+   *    bundle's autostart setting to <em>Started with declared activation</em>
+   *    if the {@link #START_ACTIVATION_POLICY} option is set or
+   *    <em>Started with eager activation</em> if not set. When the Framework is
+   *    restarted and this bundle's autostart setting is not <em>Stopped</em>,
+   *    this bundle must be automatically started.
+   * -# If this bundle's state is not {@code STATE_RESOLVED}, an attempt is made to
+   *    resolve this bundle. If the Framework cannot resolve this bundle, a
+   *    {@code std::runtime_error} is thrown.
+   * -# If the {@link #START_ACTIVATION_POLICY} option is set and this
+   *    bundle's declared activation policy is {@link Constants#ACTIVATION_LAZY
+   *    lazy} then:
+   *    - If this bundle's state is {@code STATE_STARTING} then this method returns
+   *      immediately.
+   *    - This bundle's state is set to {@code STATE_STARTING}.
+   *    - A bundle event of type {@link BundleEvent#BUNDLE_LAZY_ACTIVATION} is fired.
+   *    - This method returns immediately and the remaining steps will be
+   *      followed when this bundle's activation is later triggered.
+   * -# This bundle's state is set to {@code STATE_STARTING}.
+   * -# A bundle event of type {@link BundleEvent#STATE_STARTING} is fired.
+   * -# If the bundle is contained in a shared library, the library is loaded
+   *    and the {@link BundleActivator#Start(const BundleContext&)}
+   *    method of this bundle's {@code BundleActivator}, if one is specified, is
+   *    called. If the shared library could not be loaded, or the {@code BundleActivator}
+   *    is invalid or throws an exception then:
+   *    - This bundle's state is set to {@code STATE_STOPPING}.
+   *    - A bundle event of type {@link BundleEvent#STATE_STOPPING} is fired.
+   *    - %Any services registered by this bundle are unregistered.
+   *    - %Any services used by this bundle are released.
+   *    - %Any listeners registered by this bundle are removed.
+   *    - This bundle's state is set to {@code STATE_RESOLVED}.
+   *    - A bundle event of type {@link BundleEvent#BUNDLE_STOPPED} is fired.
+   *    - A \c std::runtime_error exception is then thrown.
+   * -# If this bundle's state is {@code STATE_UNINSTALLED}, because this bundle
+   *    was uninstalled while the {@code BundleActivator#Start} method was
+   *    running, a {@code std::logic_error} is thrown.
+   * -# This bundle's state is set to {@code STATE_ACTIVE}.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_STARTED} is fired.
+   *
+   *
+   * <b>Preconditions</b>
+   * -# {@code GetState()} in { \c STATE_INSTALLED, \c STATE_RESOLVED }
+   *    or { \c STATE_INSTALLED, \c STATE_RESOLVED, \c STATE_STARTING }
+   *    if this bundle has a lazy activation policy.
+   *
+   * <b>Postconditions, no exceptions thrown </b>
+   * -# Bundle autostart setting is modified unless the
+   *    {@link #START_TRANSIENT} option was set.
+   * -# \c GetState() in { \c STATE_ACTIVE } unless the
+   *    lazy activation policy was used.
+   * -# \c BundleActivator#Start() has been called and did not throw an
+   *    exception unless the lazy activation policy was used.
+   *
+   * <b>Postconditions, when an exception is thrown </b>
+   * -# Depending on when the exception occurred, bundle autostart setting is
+   *    modified unless the {@link #START_TRANSIENT} option was set.
+   * -# \c GetState() not in { \c STATE_STARTING, \c STATE_ACTIVE }.
+   *
+   *
+   * @param options The options for starting this bundle. See
+   *        {@link #START_TRANSIENT} and {@link #START_ACTIVATION_POLICY}. The
+   *        Framework ignores unrecognized options.
+   * @throws std::runtime_error If this bundle could not be started.
+   * @throws std::logic_error If this bundle has been uninstalled or this
+   *         bundle tries to change its own state.
+   */
+  virtual void Start(uint32_t options);
+
+  /**
+   * Starts this bundle with no options.
+   *
+   * This method performs the same function as calling {@code Start(0)}.
    *
    * @throws std::runtime_error If this bundle could not be started.
+   * @throws std::logic_error If this bundle has been uninstalled or this
+   *         bundle tries to change its own state.
+   * @see #Start(uint32_t)
    */
   virtual void Start();
 
   /**
-   * Stop this bundle.
+   * Stops this bundle.
    *
-   * The following steps are required to stop a bundle:
-   * -# If this bundle is in the process of being activated or deactivated then this method must wait for
-   *    activation or deactivation to complete before continuing. If this does not occur in a reasonable
-   *    time, a std::runtime_error exception is thrown to indicate this bundle was unable to be stopped.
-   * -# If this bundle was already stopped, then this method returns immediately.
-   * -# A bundle event of type BundleEvent::STOPPING is fired.
-   * -# The BundleActivator::Stop(BundleContext) method of this bundle's BundleActivator, if one is specified,
-   *    is called. If that method throws an exception, this method must continue to stop this bundle
-   *    and a std::runtime_error exception must be thrown after completion of the remaining steps.
-   * -# %Any services registered by this bundle must be unregistered.
-   * -# %Any services used by this bundle must be released.
-   * -# %Any listeners registered by this bundle must be removed.
-   * -# A bundle event of type BundleEvent::STOPPED is fired.
+   * The following steps are executed when stopping a bundle:
+   * -# If this bundle's state is \c STATE_UNINSTALLED then a
+   *    \c std::logic_error is thrown.
+   * -# If this bundle is in the process of being activated or deactivated
+   *    then this method waits for activation or deactivation to complete
+   *    before continuing. If this does not occur in a reasonable time, a
+   *    \c std::runtime_error is thrown to indicate this bundle was unable to
+   *    be stopped.
+   * -# If the {@link #STOP_TRANSIENT} option is not set then set this
+   *    bundle's persistent autostart setting to <em>Stopped</em>. When the
+   *    Framework is restarted and this bundle's autostart setting is
+   *    <em>Stopped</em>, this bundle will not be automatically started.
+   * -# If this bundle's state is not \c STATE_STARTING or \c STATE_ACTIVE then
+   *    this method returns immediately.
+   * -# This bundle's state is set to \c STATE_STOPPING.
+   * -# A bundle event of type {@link BundleEvent#STATE_STOPPING} is fired.
+   * -# If this bundle's state was \c STATE_ACTIVE prior to setting the state
+   *    to \c STATE_STOPPING, the {@link BundleActivator#Stop(const BundleContext&)}
+   *    method of this bundle's \c BundleActivator, if one is specified, is
+   *    called. If that method throws an exception, this method continues to
+   *    stop this bundle and a std::runtime_error is thrown after
+   *    completion of the remaining steps.
+   * -# %Any services registered by this bundle are unregistered.
+   * -# %Any services used by this bundle are released.
+   * -# %Any listeners registered by this bundle are removed.
+   * -# If this bundle's state is \c STATE_UNINSTALLED, because this bundle
+   *    was uninstalled while the \c BundleActivator#Stop method was
+   *    running, a std::runtime_error is thrown.
+   * -# This bundle's state is set to \c STATE_RESOLVED.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_STOPPED} is fired.
+   *
+   * <b>Preconditions </b>
+   * -# \c GetState() in { \c STATE_ACTIVE }.
+   *
+   * <b>Postconditions, no exceptions thrown </b>
+   * -# Bundle autostart setting is modified unless the
+   *    {@link #STOP_TRANSIENT} option was set.
+   * -# \c GetState() not in { \c STATE_ACTIVE, \c STATE_STOPPING }.
+   * -# \c BundleActivator#Stop has been called and did not throw an
+   *    exception.
+   *
+   * <b>Postconditions, when an exception is thrown </b>
+   * -# Bundle autostart setting is modified unless the
+   *    {@link #STOP_TRANSIENT} option was set.
+   *
+   * @param options The options for stopping this bundle. See
+   *        {@link #STOP_TRANSIENT}. The Framework ignores unrecognized
+   *        options.
+   * @throws std::runtime_error If the bundle failed to stop.
+   * @throws std::logic_error If this bundle has been uninstalled or this
+   *         bundle tries to change its own state.
+   */
+  virtual void Stop(uint32_t options);
+
+  /**
+   * Stops this bundle with no options.
+   *
+   * This method performs the same function as calling \c Stop(0).
    *
    * @throws std::runtime_error If the bundle failed to stop.
+   * @throws std::logic_error If this bundle has been uninstalled or this
+   *         bundle tries to change its own state.
+   * @see #Stop(uint32_t)
    */
   virtual void Stop();
 
   /**
    * Uninstalls this bundle.
    *
-   * This method causes the Framework to notify other bundles that this bundle is being uninstalled,
-   * and then uninstalls this bundle. The Framework must remove any resources related to this bundle
-   * that it is able to remove.
+   * This method causes the Framework to notify other bundles that this bundle
+   * is being uninstalled, and then puts this bundle into the
+   * \c STATE_UNINSTALLED state. The Framework removes any resources
+   * related to this bundle that it is able to remove.
    *
-   * The following steps are required to uninstall a bundle:
-   * -# This bundle is stopped as described in the Bundle.Stop method.
-   * -# A bundle event of BundleEvent::UNINSTALLED is fired.
-   * -# This bundle and any persistent storage area provided for this bundle by the Framework are removed.
+   * The following steps are executed to uninstall a bundle:
+   * -# If this bundle's state is \c STATE_UNINSTALLED} then a
+   *    std::logic_error is thrown.
+   * -# If this bundle's state is \c STATE_ACTIVE, \c STATE_STARTING or
+   *    \c STATE_STOPPING, this bundle is stopped as described in the
+   *    \c Bundle#Stop method. If \c Bundle#Stop throws an exception, a
+   *    Framework event of type {@link FrameworkEvent#FRAMEWORK_ERROR} is fired containing
+   *    the exception.
+   * -# This bundle's state is set to \c STATE_UNINSTALLED.
+   * -# A bundle event of type {@link BundleEvent#STATE_UNINSTALLED} is fired.
+   * -# This bundle and any persistent storage area provided for this bundle
+   *    by the Framework are removed.
    *
-   * @throws std::runtime_error If the bundle could not be uninstalled.
+   * <b>Preconditions </b>
+   * - \c GetState() not in { \c STATE_UNINSTALLED }.
+   *
+   * <b>Postconditions, no exceptions thrown </b>
+   * - \c GetState() in { \c STATE_UNINSTALLED }.
+   * - This bundle has been uninstalled.
+   *
+   * <b>Postconditions, when an exception is thrown </b>
+   * - \c GetState() not in { \c STATE_UNINSTALLED }.
+   * - This Bundle has not been uninstalled.
+   *
+   * @throws std::runtime_error If the uninstall failed. This can occur if
+   *         another thread is attempting to change this bundle's state and
+   *         does not complete in a timely manner.
+   * @throws std::logic_error If this bundle has been uninstalled or this
+   *         bundle tries to change its own state.
+   * @see #Stop()
    */
   virtual void Uninstall();
 
 protected:
 
-  Bundle(std::unique_ptr<BundlePrivate> d);
+  Bundle(const std::shared_ptr<BundlePrivate>& d);
 
-  std::unique_ptr<BundlePrivate> d;
+  std::shared_ptr<BundlePrivate> d;
+  std::shared_ptr<CoreBundleContext> c;
 
-private:
-
-  friend class CoreBundleActivator;
   friend class BundleRegistry;
-  friend class ServiceReferencePrivate;
-
-  Bundle(CoreBundleContext* coreCtx, const BundleInfo& info);
-
-  void Uninit_unlocked();
+  friend Bundle MakeBundle(const std::shared_ptr<BundlePrivate>&);
+  friend std::shared_ptr<BundlePrivate> GetPrivate(const Bundle&);
 
 };
 
@@ -412,6 +724,10 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const Bundle& bundle);
  * \ingroup MicroServices
  */
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, Bundle const * bundle);
+/**
+ * \ingroup MicroServices
+ */
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, Bundle::State state);
 
 }
 

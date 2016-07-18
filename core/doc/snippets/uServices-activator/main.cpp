@@ -8,11 +8,11 @@ class MyActivator : public BundleActivator
 
 public:
 
-  void Start(BundleContext* /*context*/)
+  void Start(BundleContext /*context*/)
   { /* register stuff */ }
 
 
-  void Stop(BundleContext* /*context*/)
+  void Stop(BundleContext /*context*/)
   { /* cleanup */ }
 
 };

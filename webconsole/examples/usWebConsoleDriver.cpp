@@ -22,6 +22,12 @@
 
 #include "usServletContainer.h"
 
+#include <usFrameworkFactory.h>
+#include <usFramework.h>
+#include <usBundleContext.h>
+#include <usBundle.h>
+
+#include <iostream>
 #include <cstdlib>
 #include <csignal>
 
@@ -41,7 +47,7 @@ void signalHandler(int /*num*/)
   std::exit(EXIT_SUCCESS);
 }
 
-int main(int /*argc*/, const char* /*argv*/[])
+int main(int argc, const char* argv[])
 {
   std::signal(SIGTERM, signalHandler);
   std::signal(SIGINT, signalHandler);
@@ -49,7 +55,31 @@ int main(int /*argc*/, const char* /*argv*/[])
   std::signal(SIGQUIT, signalHandler);
 #endif
 
-  us::ServletContainer servletContainer("us");
+  us::FrameworkFactory fwFactory;
+  auto fw = fwFactory.NewFramework();
+  fw.Start();
+
+  auto ctx = fw.GetBundleContext();
+
+  if (argc < 2)
+  {
+    std::cout << "No command line arguments given.\n"
+                 "Provide a space separated list of file paths pointing to bundles to load.\n"
+                 "The web console driver needs at least the httpservice and webconsole bundle.\n";
+    return 0;
+  }
+
+  for (int i = 1; i < argc; ++i)
+  {
+    ctx.InstallBundles(argv[i]);
+  }
+
+  for (auto& b : ctx.GetBundles())
+  {
+    b.Start();
+  }
+
+  us::ServletContainer servletContainer(ctx, "us");
   servletContainer.Start();
 
   while(true)

@@ -82,7 +82,7 @@ public:
    * @param bc the bundle context used for service registration.
    * @return self
    */
-  SimpleWebConsolePlugin* Register(BundleContext* context = GetBundleContext());
+  SimpleWebConsolePlugin* Register(const BundleContext& context = GetBundleContext());
 
 
   /**
@@ -98,7 +98,7 @@ protected:
    */
   std::vector<std::string> GetCssReferences() const;
 
-  BundleContext* GetContext() const;
+  BundleContext GetContext() const;
 
 private:
 
@@ -127,7 +127,7 @@ private:
 
   // used for service registration
   ServiceRegistration<HttpServlet> m_Reg;
-  BundleContext* m_Context;
+  BundleContext m_Context;
 };
 
 }

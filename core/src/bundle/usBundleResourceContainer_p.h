@@ -23,25 +23,25 @@
 #ifndef USBUNDLERESOURCECONTAINER_P_H
 #define USBUNDLERESOURCECONTAINER_P_H
 
-#include "usGlobalConfig.h"
+#include "miniz.h"
 
 #include <cstdint>
-#include <ctime>
 #include <string>
 #include <vector>
+#include <set>
+#include <memory>
 
 namespace us {
 
-struct BundleInfo;
+struct BundleArchive;
 class BundleResource;
-struct BundleResourceContainerPrivate;
 
-class BundleResourceContainer
+class BundleResourceContainer : public std::enable_shared_from_this<BundleResourceContainer>
 {
 
 public:
 
-  BundleResourceContainer(const BundleInfo* bundleInfo);
+  BundleResourceContainer(const std::string& location);
   ~BundleResourceContainer();
 
   struct Stat
@@ -60,29 +60,43 @@ public:
     bool isDir;
   };
 
-  bool IsValid() const;
+  std::string GetLocation() const;
+
+  std::vector<std::string> GetTopLevelDirs() const;
 
   bool GetStat(Stat& stat) const;
   bool GetStat(int index, Stat& stat) const;
 
   void* GetData(int index) const;
 
-  const BundleInfo* GetBundleInfo() const;
-
   void GetChildren(const std::string& resourcePath, bool relativePaths,
                    std::vector<std::string>& names, std::vector<uint32_t>& indices) const;
 
-  void FindNodes(const std::string& path, const std::string& filePattern,
+  void FindNodes(const std::shared_ptr<const BundleArchive>& archive, const std::string& path, const std::string& filePattern,
                  bool recurse, std::vector<BundleResource>& resources) const;
 
 private:
 
+  typedef std::pair<std::string, int> NameIndexPair;
+
+  struct PairComp
+  {
+    inline bool operator()(const NameIndexPair& p1, const NameIndexPair& p2) const
+    {
+      return p1.first < p2.first;
+    }
+  };
+
+  void InitSortedEntries();
+
   bool Matches(const std::string& name, const std::string& filePattern) const;
 
-  BundleResourceContainerPrivate* d;
+  const std::string m_Location;
+  mz_zip_archive m_ZipArchive;
 
+  std::set<NameIndexPair, PairComp> m_SortedEntries;
+  std::set<std::string> m_SortedToplevelDirs;
 };
-
 
 }
 

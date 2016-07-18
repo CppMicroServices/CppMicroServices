@@ -1,7 +1,5 @@
 add_subdirectory(libA)
 add_subdirectory(libA2)
-add_subdirectory(libAL)
-add_subdirectory(libAL2)
 add_subdirectory(libBWithStatic)
 add_subdirectory(libH)
 add_subdirectory(libLQ)

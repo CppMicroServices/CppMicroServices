@@ -24,23 +24,40 @@
 #define USBUNDLECONTEXTPRIVATE_H_
 
 #include "usThreads_p.h"
+#include <usCoreExport.h>
 
+#include <atomic>
 
 namespace us {
 
+class BundleContext;
 class BundlePrivate;
 
-class BundleContextPrivate : public MultiThreaded<>
+class BundleContextPrivate : public MultiThreaded<>, public std::enable_shared_from_this<BundleContextPrivate>
 {
 
 public:
 
   BundleContextPrivate(BundlePrivate* bundle);
 
-  void IsValid_unlocked() const;
+  bool IsValid() const;
+  void CheckValid() const;
+
+  void Invalidate();
 
   BundlePrivate* bundle;
+
+  /**
+   * Is bundle context valid.
+   */
+  std::atomic<bool> valid;
+
 };
+
+// The following method is exported for the GetBundleContext() method
+US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
+BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d);
+std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c);
 
 }
 

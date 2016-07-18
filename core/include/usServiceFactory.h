@@ -31,7 +31,7 @@ namespace us {
 /**
  * \ingroup MicroServices
  *
- * A factory for \link ServiceConstants::SCOPE_BUNDLE bundle scope\endlink services.
+ * A factory for \link Constants::SCOPE_BUNDLE bundle scope\endlink services.
  * The factory can provide service objects unique to each bundle.
  *
  * <p>
@@ -94,8 +94,8 @@ public:
    * @see BundleContext#GetService
    * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMapConstPtr GetService(const std::shared_ptr<Bundle>& bundle, 
-                                            const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMapConstPtr GetService(const Bundle& bundle,
+                                          const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object.
@@ -111,7 +111,7 @@ public:
    *        <code>ServiceFactory::GetService</code> method.
    * @see InterfaceMapConstPtr
    */
-  virtual void UngetService(const std::shared_ptr<Bundle>& bundle, 
+  virtual void UngetService(const Bundle& bundle,
                             const ServiceRegistrationBase& registration,
                             const InterfaceMapConstPtr& service) = 0;
 };

@@ -23,8 +23,8 @@
 
 #include "usBundleResource.h"
 
+#include "usBundleArchive_p.h"
 #include "usBundleResourceContainer_p.h"
-#include "usBundleInfo.h"
 #include "usLog.h"
 
 #include <string>
@@ -37,14 +37,14 @@ class BundleResourcePrivate
 
 public:
 
-  BundleResourcePrivate(const BundleResourceContainer* rc)
-    : resourceContainer(rc)
+  BundleResourcePrivate(const std::shared_ptr<const BundleArchive>& archive)
+    : archive(archive)
     , ref(1)
   {}
 
   void InitFilePath(const std::string& file);
 
-  const BundleResourceContainer* const resourceContainer;
+  const std::shared_ptr<const BundleArchive> archive;
 
   BundleResourceContainer::Stat stat;
 
@@ -112,21 +112,27 @@ BundleResource::BundleResource(const BundleResource &resource)
   ++d->ref;
 }
 
-BundleResource::BundleResource(const std::string& file, const BundleResourceContainer& resourceContainer)
-  : d(new BundleResourcePrivate(&resourceContainer))
+BundleResource::BundleResource(
+    const std::string& file,
+    const std::shared_ptr<const BundleArchive>& archive
+    )
+  : d(new BundleResourcePrivate(archive))
 {
   d->InitFilePath(file);
 
-  d->stat.filePath = d->resourceContainer->GetBundleInfo()->name + d->path + d->fileName;
+  d->stat.filePath = d->archive->GetResourcePrefix() + d->path + d->fileName;
 
-  d->resourceContainer->GetStat(d->stat);
+  d->archive->GetResourceContainer()->GetStat(d->stat);
 }
 
-BundleResource::BundleResource(int index, const BundleResourceContainer& resourceContainer)
-  : d(new BundleResourcePrivate(&resourceContainer))
+BundleResource::BundleResource(
+    int index,
+    const std::shared_ptr<const BundleArchive>& archive
+    )
+  : d(new BundleResourcePrivate(archive))
 {
-  d->resourceContainer->GetStat(index, d->stat);
-  d->InitFilePath(d->stat.filePath.substr(d->resourceContainer->GetBundleInfo()->name.size()));
+  d->archive->GetResourceContainer()->GetStat(index, d->stat);
+  d->InitFilePath(d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
 }
 
 BundleResource::~BundleResource()
@@ -154,7 +160,10 @@ bool BundleResource::operator <(const BundleResource& resource) const
 
 bool BundleResource::operator ==(const BundleResource& resource) const
 {
-  return d->resourceContainer == resource.d->resourceContainer &&
+  if (!this->IsValid()) return !resource.IsValid();
+  if (!resource.IsValid()) return false;
+  return d->archive->GetResourceContainer() == resource.d->archive->GetResourceContainer() &&
+      d->archive->GetResourcePrefix() == resource.d->archive->GetResourcePrefix() &&
       this->GetResourcePath() == resource.GetResourcePath();
 }
 
@@ -165,12 +174,12 @@ bool BundleResource::operator !=(const BundleResource &resource) const
 
 bool BundleResource::IsValid() const
 {
-  return d->resourceContainer && d->resourceContainer->IsValid() && d->stat.index > -1;
+  return d->archive && d->archive->IsValid() && d->stat.index > -1;
 }
 
-BundleResource::operator bool_type() const
+BundleResource::operator bool() const
 {
-  return IsValid() ? &BundleResource::d : nullptr;
+  return IsValid();
 }
 
 std::string BundleResource::GetName() const
@@ -226,8 +235,8 @@ std::vector<std::string> BundleResource::GetChildren() const
 
   if (d->children.empty())
   {
-    d->resourceContainer->GetChildren(d->stat.filePath, true,
-                                      d->children, d->childNodes);
+    d->archive->GetResourceContainer()->GetChildren(d->stat.filePath, true,
+                                                    d->children, d->childNodes);
   }
   return d->children;
 }
@@ -240,14 +249,14 @@ std::vector<BundleResource> BundleResource::GetChildResources() const
 
   if (d->childNodes.empty())
   {
-    d->resourceContainer->GetChildren(this->GetResourcePath(), true,
-                                      d->children, d->childNodes);
+    d->archive->GetResourceContainer()->GetChildren(this->GetResourcePath(), true,
+                                                    d->children, d->childNodes);
   }
 
   for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(),
        iterEnd = d->childNodes.end(); iter != iterEnd; ++iter)
   {
-    childResources.push_back(BundleResource(static_cast<int>(*iter), *d->resourceContainer));
+    childResources.push_back(BundleResource(static_cast<int>(*iter), d->archive));
   }
   return childResources;
 }
@@ -265,18 +274,18 @@ time_t BundleResource::GetLastModified() const
 std::size_t BundleResource::Hash() const
 {
   using namespace std;
-  return hash<std::string>()(d->resourceContainer->GetBundleInfo()->name + this->GetResourcePath());
+  return hash<std::string>()(d->archive->GetResourcePrefix() + this->GetResourcePath());
 }
 
 void* BundleResource::GetData() const
 {
   if (!IsValid()) return nullptr;
 
-  void* data = d->resourceContainer->GetData(d->stat.index);
+  void* data = d->archive->GetResourceContainer()->GetData(d->stat.index);
   if (data == nullptr)
   {
-    US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from " 
-            << d->resourceContainer->GetBundleInfo()->location;
+    US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
+            << d->archive->GetBundleLocation();
   }
   return data;
 }

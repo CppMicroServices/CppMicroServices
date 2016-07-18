@@ -1,5 +1,5 @@
 {
-  "bundle.name": "TestBundleM",
+  "bundle.symbolic_name": "TestBundleM",
   "bundle.description": "My Bundle description",
   "bundle.version": "1.0.0",
   "number": 5,

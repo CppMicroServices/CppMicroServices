@@ -26,6 +26,7 @@
 
 #include "usBundle.h"
 #include "usBundlePrivate.h"
+#include "usConstants.h"
 
 #include <cassert>
 
@@ -61,7 +62,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool() const
 {
-  return GetBundle() != nullptr;
+  return static_cast<bool>(GetBundle());
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
@@ -90,23 +91,25 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
   keys = d.load()->registration->properties.Keys_unlocked();
 }
 
-std::shared_ptr<Bundle> ServiceReferenceBase::GetBundle() const
+Bundle ServiceReferenceBase::GetBundle() const
 {
   auto p = d.load();
-  if (p->registration == nullptr) return nullptr;
+  if (p->registration == nullptr) return Bundle();
 
   auto l = p->registration->Lock(); US_UNUSED(l);
-  if (p->registration->bundle == nullptr) return nullptr;
-  return p->registration->bundle->q->shared_from_this();
+  if (p->registration->bundle == nullptr) return Bundle();
+  return MakeBundle(p->registration->bundle->shared_from_this());
 }
 
-void ServiceReferenceBase::GetUsingBundles(std::vector<std::shared_ptr<Bundle>>& bundles) const
+std::vector<Bundle> ServiceReferenceBase::GetUsingBundles() const
 {
+  std::vector<Bundle> bundles;
   auto l = d.load()->registration->Lock(); US_UNUSED(l);
   for (auto& iter : d.load()->registration->dependents)
   {
-    bundles.push_back(iter.first);
+    bundles.push_back(MakeBundle(iter.first->shared_from_this()));
   }
+  return bundles;
 }
 
 bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) const
@@ -133,9 +136,9 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   Any anyId1;
   {
     auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
-    anyR1 = d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+    anyR1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING);
     assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-    anyId1 = d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
+    anyId1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID);
     assert(anyId1.Type() == typeid(long int));
   }
 
@@ -143,9 +146,9 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   Any anyId2;
   {
     auto l = reference.d.load()->registration->properties.Lock(); US_UNUSED(l);
-    anyR2 = reference.d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_RANKING());
+    anyR2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING);
     assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-    anyId2 = reference.d.load()->registration->properties.Value_unlocked(ServiceConstants::SERVICE_ID());
+    anyId2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID);
     assert(anyId2.Type() == typeid(long int));
   }
 
@@ -208,10 +211,10 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
 {
   if (serviceRef)
   {
-    assert(serviceRef.GetBundle() != nullptr);
+    assert(serviceRef.GetBundle());
 
     os << "Reference for service object registered from "
-       << serviceRef.GetBundle()->GetName() << " " << serviceRef.GetBundle()->GetVersion()
+       << serviceRef.GetBundle().GetSymbolicName() << " " << serviceRef.GetBundle().GetVersion()
        << " (";
     std::vector<std::string> keys;
     serviceRef.GetPropertyKeys(keys);

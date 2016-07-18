@@ -88,21 +88,22 @@ int main(int argc, char** argv)
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework->Start();
-  BundleContext* context = framework->GetBundleContext();
+  framework.Start();
+  auto context = framework.GetBundleContext();
 
   try
   {
-    std::vector<std::shared_ptr<Bundle>> bundles;
+    std::vector<Bundle> bundles;
     for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next())
     {
       if (opt->arg == nullptr) continue;
       std::cout << "Installing " << opt->arg << std::endl;
-      bundles.push_back(context->InstallBundle(opt->arg));
+      auto installedBundles =context.InstallBundles(opt->arg);
+      bundles.insert(bundles.end(), installedBundles.begin(), installedBundles.end());
     }
     for (auto& bundle : bundles)
     {
-      bundle->Start();
+      bundle.Start();
     }
   }
   catch (const std::exception& e)
@@ -112,10 +113,10 @@ int main(int argc, char** argv)
   }
 
   std::shared_ptr<ShellService> shellService;
-  ServiceReference<ShellService> ref = context->GetServiceReference<ShellService>();
+  ServiceReference<ShellService> ref = context.GetServiceReference<ShellService>();
   if (ref)
   {
-    shellService = context->GetService(ref);
+    shellService = context.GetService(ref);
   }
 
   if (!shellService)

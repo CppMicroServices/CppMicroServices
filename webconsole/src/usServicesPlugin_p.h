@@ -26,13 +26,10 @@
 
 namespace us {
 
-class BundleResourceStream;
-
 class ServicesPlugin : public SimpleWebConsolePlugin
 {
 public:
   ServicesPlugin();
-  ~ServicesPlugin();
 
 private:
 
@@ -43,8 +40,6 @@ private:
   std::string GetIds_JSON() const;
   std::string GetInterface_JSON(const std::string& iid) const;
 
-  BundleResourceStream* m_TemplateRS;
-  BundleResourceStream* m_TemplateSI;
 };
 
 }

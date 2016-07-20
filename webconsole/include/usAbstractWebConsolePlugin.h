@@ -56,9 +56,6 @@ class US_WebConsole_EXPORT AbstractWebConsolePlugin : public HttpServlet
 {
 public:
 
-  AbstractWebConsolePlugin();
-  virtual ~AbstractWebConsolePlugin();
-
   /**
    * Retrieves the label. This is the last component in the servlet path.
    *
@@ -88,7 +85,9 @@ public:
    */
   virtual std::string GetCategory() const;
 
-  virtual WebConsoleVariableResolver* GetVariableResolver(const HttpServletRequest& request) const;
+  virtual std::shared_ptr<WebConsoleVariableResolver> GetVariableResolver(HttpServletRequest& request);
+
+  virtual void SetVariableResolver(HttpServletRequest& request, std::shared_ptr<WebConsoleVariableResolver> resolver);
 
 protected:
 
@@ -209,8 +208,6 @@ private:
    * @throws IOException If an error occurs accessing or spooling the resource.
    */
   bool SpoolResource(HttpServletRequest& request, HttpServletResponse& response) const;
-
-  AbstractWebConsolePluginPrivate* d;
 
 };
 

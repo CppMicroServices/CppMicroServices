@@ -2,8 +2,6 @@ find_package(CppMicroServices COMPONENTS ShellService REQUIRED)
 
 include_directories(${US_INCLUDE_DIRS})
 
-add_definitions(-DUS_BUNDLE_NAME=main)
-
 set(srcs
   usShell.cpp
   ../../third_party/linenoise.c

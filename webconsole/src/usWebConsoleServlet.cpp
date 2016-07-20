@@ -60,10 +60,10 @@ private:
     {
       if (m_StreamBuf == nullptr)
       {
-        WebConsoleVariableResolver* resolver = m_Plugin->GetVariableResolver(m_Request);
+        auto resolver = m_Plugin->GetVariableResolver(m_Request);
         m_StreamBuf = new VariableResolverStreamBuffer(
                         new std::ostream(HttpServletResponse::GetOutputStreamBuffer()),
-                        resolver);
+                        resolver.get());
       }
       return m_StreamBuf;
     }

@@ -32,24 +32,6 @@
 
 namespace us {
 
-void putenv(const char* key, const char* val)
-{
-#ifdef US_PLATFORM_WINDOWS
-  _putenv_s(key, val);
-#else
-  setenv(key, val, 1);
-#endif
-}
-
-void unsetenv(const char* key)
-{
-#ifdef US_PLATFORM_WINDOWS
-  _putenv_s(key, "");
-#else
-  ::unsetenv(key);
-#endif
-}
-
 HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
                                        CivetServer* server, mg_connection* conn)
   : m_ServletContext(servletContext)
@@ -233,55 +215,71 @@ long long HttpServletRequest::GetDateHeader(const std::string& name) const
   // Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
   // Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format
 
-  std::string data = this->GetHeader(name);
-  if (data.empty()) return -1;
+  std::string datetime = this->GetHeader(name);
+  if (datetime.empty()) return -1;
 
-  const char* months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+  const std::size_t num_months = 12;
+  const char* months[num_months] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-  char month[4];
-  std::tm tm;
-  int n = sscanf(data.c_str(), "%*[a-zA-Z], %d %3[a-zA-Z] %d %d:%d:%d GMT", &tm.tm_mday, month, &tm.tm_year, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
-  if (n != 6)
-  {
-    n = sscanf(data.c_str(), "%*[a-zA-Z], %d-%3[a-zA-Z]-%d %d:%d:%d GMT", &tm.tm_mday, month, &tm.tm_year, &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
-  }
-  if (n != 6)
-  {
-    n = sscanf(data.c_str(), "%*[a-zA-Z] %3[a-zA-Z] %d %d:%d:%d %d", month, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec, &tm.tm_year);
-  }
-  if (n != 6) return -1;
+  char month_str[32] = {0};
+  int second, minute, hour, day, month, year;
+  time_t result{};
+  struct tm tm;
 
-  for (int i = 0; i < 12; ++i)
-  {
-    if (std::strcmp(months[i], month) == 0)
+  if ((sscanf(datetime.c_str(),
+              "%d/%3s/%d %d:%d:%d",
+              &day,
+              month_str,
+              &year,
+              &hour,
+              &minute,
+              &second) == 6) || (sscanf(datetime.c_str(),
+                                        "%d %3s %d %d:%d:%d",
+                                        &day,
+                                        month_str,
+                                        &year,
+                                        &hour,
+                                        &minute,
+                                        &second) == 6)
+      || (sscanf(datetime.c_str(),
+                 "%*3s, %d %3s %d %d:%d:%d",
+                 &day,
+                 month_str,
+                 &year,
+                 &hour,
+                 &minute,
+                 &second) == 6) || (sscanf(datetime.c_str(),
+                                           "%d-%3s-%d %d:%d:%d",
+                                           &day,
+                                           month_str,
+                                           &year,
+                                           &hour,
+                                           &minute,
+                                           &second) == 6)) {
+
+    month = -1;
+    for (std::size_t i = 0; i < num_months; ++i)
     {
-      tm.tm_mon = i;
-      break;
+      if (std::strcmp(months[i], month_str) == 0)
+      {
+        month = i;
+        break;
+      }
+    }
+
+    if ((month >= 0) && (year >= 1970)) {
+      memset(&tm, 0, sizeof(tm));
+      tm.tm_year = year - 1900;
+      tm.tm_mon = month;
+      tm.tm_mday = day;
+      tm.tm_hour = hour;
+      tm.tm_min = minute;
+      tm.tm_sec = second;
+      result = timegm(&tm);
     }
   }
 
-  tm.tm_year -= 1900;
-
-  time_t ret;
-  char* tz = getenv("TZ");
-  if (tz)
-  {
-    tz = strdup(tz);
-  }
-  unsetenv("TZ");
-  tzset();
-  ret = mktime(&tm);
-  if (tz)
-  {
-    putenv("TZ", tz);
-    free(tz);
-  }
-  else
-  {
-    unsetenv("TZ");
-  }
-  tzset();
-  return ret * 1000;
+  return result * 1000;
 }
 
 std::vector<std::string> HttpServletRequest::GetHeaderNames() const

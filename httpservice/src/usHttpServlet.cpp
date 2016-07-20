@@ -157,7 +157,7 @@ void HttpServlet::Init(const ServletConfig& config)
 
 void HttpServlet::Destroy()
 {
-  d->m_Config = ServletConfig();
+  Lock(), d->m_Config = ServletConfig();
 }
 
 ServletConfig HttpServlet::GetServletConfig() const
@@ -167,7 +167,7 @@ ServletConfig HttpServlet::GetServletConfig() const
 
 std::shared_ptr<ServletContext> HttpServlet::GetServletContext() const
 {
-  return d->m_Config.GetServletContext();
+  return Lock(), d->m_Config.GetServletContext();
 }
 
 void HttpServlet::Service(HttpServletRequest& request, HttpServletResponse& response)
@@ -335,6 +335,11 @@ void HttpServlet::DoTrace(HttpServletRequest& request, HttpServletResponse& resp
   response.SetContentLength(responseString.size());
   response.GetOutputStream() << responseString << std::flush;
   return;
+}
+
+std::unique_lock<std::mutex> HttpServlet::Lock() const
+{
+  return std::unique_lock<std::mutex>(d->m_Mutex);
 }
 
 }

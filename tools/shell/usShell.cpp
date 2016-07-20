@@ -21,7 +21,6 @@
 
 #include "usFrameworkFactory.h"
 #include "usFramework.h"
-#include "usGetBundleContext.h"
 #include "usBundleContext.h"
 #include "usBundle.h"
 #include "usAny.h"

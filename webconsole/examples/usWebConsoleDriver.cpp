@@ -55,12 +55,6 @@ int main(int argc, const char* argv[])
   std::signal(SIGQUIT, signalHandler);
 #endif
 
-  us::FrameworkFactory fwFactory;
-  auto fw = fwFactory.NewFramework();
-  fw.Start();
-
-  auto ctx = fw.GetBundleContext();
-
   if (argc < 2)
   {
     std::cout << "No command line arguments given.\n"
@@ -68,6 +62,12 @@ int main(int argc, const char* argv[])
                  "The web console driver needs at least the httpservice and webconsole bundle.\n";
     return 0;
   }
+
+  us::FrameworkFactory fwFactory;
+  auto fw = fwFactory.NewFramework();
+  fw.Start();
+
+  auto ctx = fw.GetBundleContext();
 
   for (int i = 1; i < argc; ++i)
   {

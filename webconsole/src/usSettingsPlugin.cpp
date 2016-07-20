@@ -52,24 +52,17 @@ static std::string CATEGORY()
 
 SettingsPlugin::SettingsPlugin()
   : SimpleWebConsolePlugin(LABEL(), TITLE(), CATEGORY())
-  , m_TemplateRS(nullptr)
 {
-}
-
-SettingsPlugin::~SettingsPlugin()
-{
-  delete m_TemplateRS;
 }
 
 void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& response)
 {
-  if (m_TemplateRS == nullptr)
+  BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/settings.html");
+  if (res)
   {
-    BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/settings.html");
-    m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
+    BundleResourceStream rs(res, std::ios_base::binary);
+    response.GetOutputStream() << rs.rdbuf();
   }
-  m_TemplateRS->seekg(0, std::ios_base::beg);
-  response.GetOutputStream() << m_TemplateRS->rdbuf();
 }
 
 BundleResource SettingsPlugin::GetResource(const std::string& path) const

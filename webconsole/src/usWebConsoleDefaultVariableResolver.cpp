@@ -25,10 +25,6 @@
 
 namespace us {
 
-WebConsoleDefaultVariableResolver::WebConsoleDefaultVariableResolver()
-{
-}
-
 std::string WebConsoleDefaultVariableResolver::Resolve(const std::string& variable) const
 {
   const_iterator iter = find(variable);

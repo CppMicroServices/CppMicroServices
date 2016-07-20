@@ -55,15 +55,7 @@ static std::string CATEGORY()
 
 ServicesPlugin::ServicesPlugin()
   : SimpleWebConsolePlugin(LABEL(), TITLE(), CATEGORY())
-  , m_TemplateRS(nullptr)
-  , m_TemplateSI(nullptr)
 {
-}
-
-ServicesPlugin::~ServicesPlugin()
-{
-  delete m_TemplateRS;
-  delete m_TemplateSI;
 }
 
 bool ServicesPlugin::IsHtmlRequest(HttpServletRequest& request)
@@ -96,13 +88,12 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     }
     else
     {
-      if (m_TemplateRS == nullptr)
+      BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
+      if (res)
       {
-        BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
-        m_TemplateRS = new BundleResourceStream(res, std::ios_base::binary);
+        BundleResourceStream rs(res, std::ios_base::binary);
+        response.GetOutputStream() << rs.rdbuf();
       }
-      m_TemplateRS->seekg(0, std::ios_base::beg);
-      response.GetOutputStream() << m_TemplateRS->rdbuf();
     }
   }
   else if (pathInfo.size() > 20 && pathInfo.compare(0, 20, "/services/interface/") == 0)
@@ -115,13 +106,12 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     }
     else
     {
-      if (m_TemplateSI == nullptr)
+      BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
+      if (res)
       {
-        BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
-        m_TemplateSI = new BundleResourceStream(res, std::ios_base::binary);
+        BundleResourceStream rs(res, std::ios_base::binary);
+        response.GetOutputStream() << rs.rdbuf();
       }
-      m_TemplateSI->seekg(0, std::ios_base::beg);
-      response.GetOutputStream() << m_TemplateSI->rdbuf();
     }
   }
   else

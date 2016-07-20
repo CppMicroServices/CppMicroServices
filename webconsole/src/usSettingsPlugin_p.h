@@ -26,13 +26,10 @@
 
 namespace us {
 
-class BundleResourceStream;
-
 class SettingsPlugin : public SimpleWebConsolePlugin
 {
 public:
   SettingsPlugin();
-  ~SettingsPlugin();
 
   //cpptempl::data_map& getData();
 
@@ -44,7 +41,6 @@ private:
   // registering resources
   BundleResource GetResource(const std::string& path) const;
 
-  BundleResourceStream* m_TemplateRS;
 };
 
 }

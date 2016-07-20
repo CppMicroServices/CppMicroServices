@@ -17,7 +17,12 @@ if(MSVC)
   set_property(
     SOURCE ../third_party/civetweb/civetweb.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " /wd4267 /wd4311 /wd4312 /wd4996"
-	)
+  )
+else()
+  set_property(
+    SOURCE ../third_party/civetweb/CivetServer.cpp APPEND_STRING
+    PROPERTY COMPILE_FLAGS " -Wno-old-style-cast"
+  )
 endif()
 
 set(_private_headers
@@ -67,3 +72,9 @@ usMacroCreateBundle(HttpService
   SOURCES ${_srcs}
   RESOURCES manifest.json
 )
+
+# Needed for clock_gettime with glibc < 2.17
+if(UNIX AND NOT APPLE)
+  target_link_libraries(usHttpService rt)
+endif()
+

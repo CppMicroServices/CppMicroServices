@@ -28,6 +28,7 @@ namespace us {
 
 struct HttpServletPrivate
 {
+  mutable std::mutex m_Mutex;
   ServletConfig m_Config;
 };
 

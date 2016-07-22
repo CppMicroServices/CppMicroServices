@@ -63,13 +63,13 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
 
   // The OSGi spec assigns specific values to event types for future extensibility.
   // Ensure we don't deviate from those assigned values.
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STARTED == static_cast<FrameworkEvent::Type>(1), "Test assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::ERROR == static_cast<FrameworkEvent::Type>(2), "Test assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::INFO == static_cast<FrameworkEvent::Type>(32), "Test assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::WARNING == static_cast<FrameworkEvent::Type>(16), "Test assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STOPPED == static_cast<FrameworkEvent::Type>(64), "Test assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::STOPPED_UPDATE == static_cast<FrameworkEvent::Type>(128), "Test assigned event type values");
-  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::WAIT_TIMEDOUT == static_cast<FrameworkEvent::Type>(512), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_STARTED == static_cast<FrameworkEvent::Type>(1), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_ERROR == static_cast<FrameworkEvent::Type>(2), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_INFO == static_cast<FrameworkEvent::Type>(32), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_WARNING == static_cast<FrameworkEvent::Type>(16), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_STOPPED == static_cast<FrameworkEvent::Type>(64), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_STOPPED_UPDATE == static_cast<FrameworkEvent::Type>(128), "Test assigned event type values");
+  US_TEST_CONDITION_REQUIRED(FrameworkEvent::Type::FRAMEWORK_WAIT_TIMEDOUT == static_cast<FrameworkEvent::Type>(512), "Test assigned event type values");
 
   // @todo mock the framework. We only need a Bundle object to construct a FrameworkEvent object.
   auto const f = FrameworkFactory().NewFramework();
@@ -78,15 +78,15 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkEvent invalid_event;
   US_TEST_CONDITION_REQUIRED((!invalid_event), "Test for invalid FrameworkEvent construction.");
-  US_TEST_CONDITION_REQUIRED(invalid_event.GetType() == FrameworkEvent::Type::ERROR, "invalid event GetType()");
-  US_TEST_CONDITION_REQUIRED(!invalid_event.GetBundle().IsValid(), "invalid event GetBundle()");
+  US_TEST_CONDITION_REQUIRED(invalid_event.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR, "invalid event GetType()");
+  US_TEST_CONDITION_REQUIRED(!invalid_event.GetBundle(), "invalid event GetBundle()");
   US_TEST_CONDITION_REQUIRED((GetMessageFromStdExceptionPtr(invalid_event.GetThrowable()) == default_exception_message), "invalid event GetThrowable()");
   std::cout << invalid_event << std::endl;
 
 
-  FrameworkEvent error_event(FrameworkEvent::Type::ERROR, f, "test framework error event", std::make_exception_ptr(std::runtime_error("test exception")));
+  FrameworkEvent error_event(FrameworkEvent::Type::FRAMEWORK_ERROR, f, "test framework error event", std::make_exception_ptr(std::runtime_error("test exception")));
   US_TEST_CONDITION_REQUIRED((!error_event) == false, "FrameworkEvent construction - error type");
-  US_TEST_CONDITION_REQUIRED(error_event.GetType() == FrameworkEvent::Type::ERROR, "error event GetType()");
+  US_TEST_CONDITION_REQUIRED(error_event.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR, "error event GetType()");
   US_TEST_CONDITION_REQUIRED(error_event.GetBundle() == f, "error event GetBundle()");
   US_TEST_CONDITION_REQUIRED(GetMessageFromStdExceptionPtr(error_event.GetThrowable()) == std::string("test exception"), "error event GetThrowable");
   std::cout << error_event << std::endl;
@@ -100,21 +100,21 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
   {
     exception_caught = true;
 
-    US_TEST_CONDITION_REQUIRED(ex.what() == std::string("test exception"), "Test FrameworkEvent::Type::ERROR exception");
+    US_TEST_CONDITION_REQUIRED(ex.what() == std::string("test exception"), "Test FrameworkEvent::Type::FRAMEWORK_ERROR exception");
     US_TEST_CONDITION_REQUIRED(typeid(std::runtime_error).name() == typeid(ex).name(), "Test that the correct exception type was thrown");
   }
   US_TEST_CONDITION_REQUIRED(exception_caught, "Test throw/catch a FrameworkEvent exception");
 
-  FrameworkEvent info_event(FrameworkEvent::Type::INFO, f, "test info framework event");
+  FrameworkEvent info_event(FrameworkEvent::Type::FRAMEWORK_INFO, f, "test info framework event");
   US_TEST_CONDITION_REQUIRED((!info_event) == false, "FrameworkEvent construction - info type");
-  US_TEST_CONDITION_REQUIRED(info_event.GetType() == FrameworkEvent::Type::INFO, "info event GetType()");
+  US_TEST_CONDITION_REQUIRED(info_event.GetType() == FrameworkEvent::Type::FRAMEWORK_INFO, "info event GetType()");
   US_TEST_CONDITION_REQUIRED(info_event.GetBundle() == f, "info event GetBundle()");
   US_TEST_CONDITION_REQUIRED(GetMessageFromStdExceptionPtr(info_event.GetThrowable()) == default_exception_message, "info event GetThrowable()");
   std::cout << info_event << std::endl;
 
-  FrameworkEvent warn_event(FrameworkEvent::Type::WARNING, f, "test warning framework event");
+  FrameworkEvent warn_event(FrameworkEvent::Type::FRAMEWORK_WARNING, f, "test warning framework event");
   US_TEST_CONDITION_REQUIRED((!warn_event) == false, "FrameworkEvent construction - warning type");
-  US_TEST_CONDITION_REQUIRED(warn_event.GetType() == FrameworkEvent::Type::WARNING, "warning event GetType()");
+  US_TEST_CONDITION_REQUIRED(warn_event.GetType() == FrameworkEvent::Type::FRAMEWORK_WARNING, "warning event GetType()");
   US_TEST_CONDITION_REQUIRED(warn_event.GetBundle() == f, "warning event GetBundle()");
   US_TEST_CONDITION_REQUIRED(GetMessageFromStdExceptionPtr(warn_event.GetThrowable()) == default_exception_message, "wanring event GetThrowable()");
   std::cout << warn_event << std::endl;
@@ -134,7 +134,7 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
   dup_error_event = invalid_event;
   US_TEST_CONDITION_REQUIRED(!(dup_error_event == error_event), "Test copy assignment");
 
-  dup_error_event = std::move(FrameworkEvent(FrameworkEvent::Type::STARTED, f, ""));
+  dup_error_event = std::move(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, ""));
   US_TEST_CONDITION_REQUIRED(!(dup_error_event == error_event), "Test move");
 
   US_TEST_END()

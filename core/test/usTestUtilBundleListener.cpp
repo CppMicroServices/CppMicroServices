@@ -103,7 +103,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
         if (std::find(bundleEvents.begin(), bundleEvents.end(), e) == bundleEvents.end())
         {
           listenState = false;
-          US_DEBUG << "*** Expected event not found: " << e;
+          std::cerr << "*** Expected event not found: " << e;
           break;
         }
       }
@@ -119,7 +119,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
             || pE.GetBundle() != pR.GetBundle())
         {
           listenState = false;
-          US_DEBUG << "*** Wrong bundle event: " << pR << " expected " << pE;
+          std::cerr << "*** Wrong bundle event: " << pR << " expected " << pE;
         }
       }
     }

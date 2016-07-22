@@ -29,10 +29,8 @@
 #include "usCoreExport.h"
 #include "usSharedData.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+
 
 namespace us {
 
@@ -100,13 +98,6 @@ public:
      */
     FRAMEWORK_INFO = 0x00000020,
 
-	/**
-	 * A warning has occurred.
-	 * <p>
-	 * There was a warning associated with a bundle.
-	 */
-    FRAMEWORK_WARNING = 16,
-
     /**
      * The Framework has been stopped.
      * <p>
@@ -167,7 +158,7 @@ public:
    *
    * @return The bundle associated with the event.
    */
-  std::shared_ptr<Bundle> GetBundle() const;
+  Bundle GetBundle() const;
 
   /**
    * Returns the message associated with the event.
@@ -210,12 +201,11 @@ public:
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType);
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const std::exception_ptr ex);
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt);
+US_Core_EXPORT bool operator==(const FrameworkEvent& rhs, const FrameworkEvent& lhs);
 /** @}*/
 
 }
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
 #endif // USFRAMEWORKEVENT_H

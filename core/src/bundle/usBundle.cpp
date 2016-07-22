@@ -170,9 +170,7 @@ void Bundle::Uninstall()
         try { std::rethrow_exception(exception); }
         catch (const std::exception& )
         {
-          // $TODO framework event
-          //coreCtx->FrameworkError(this, exception);
-          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, d->shared_from_this(), std::string(), std::current_exception()));
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, d->shared_from_this(), std::string(), std::current_exception()));
         }
       }
       // Fall through
@@ -197,8 +195,10 @@ void Bundle::Uninstall()
             ctx->Invalidate();
           }
           d->operation = BundlePrivate::OP_UNINSTALLING;
-          // $TODO framework error
-          //d->coreCtx->FrameworkError(this, e);
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                    d->shared_from_this(),
+                                                    std::string(),
+                                                    std::current_exception()));
         }
       }
       if (d->state == STATE_UNINSTALLED)
@@ -231,8 +231,10 @@ void Bundle::Uninstall()
         }
         catch (const std::exception& )
         {
-          // $TODO framework error
-          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, d->shared_from_this(), std::string(), std::current_exception()));
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
+                                                    d->shared_from_this(), 
+                                                    std::string(), 
+                                                    std::current_exception()));
         }
         d->bundleDir.clear();
       }

@@ -43,8 +43,8 @@ namespace
         f.Start();
 
         // Default framework properties:
-        //  - threading model: single
-        //  - storage location: The current working directory
+        //  - threading model: multi
+        //  - persistent storage location: The current working directory
         //  - diagnostic logging: off
         //  - diagnostic logger: std::clog
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -124,10 +124,8 @@ namespace
 
     void TestProperties()
     {
-        FrameworkFactory factory;
-
-        auto f = factory.NewFramework();
-        f.Start();
+        auto f = FrameworkFactory().NewFramework();
+        f.Init();
         US_TEST_CONDITION(f.GetLocation() == "System Bundle", "Test Framework Bundle Location");
         US_TEST_CONDITION(f.GetSymbolicName() == Constants::SYSTEM_BUNDLE_SYMBOLICNAME, "Test Framework Bundle Name");
         US_TEST_CONDITION(f.GetBundleId() == 0, "Test Framework Bundle Id");
@@ -142,25 +140,37 @@ namespace
 
         US_TEST_CONDITION(f.GetState() == Bundle::STATE_INSTALLED, "Check framework is installed")
 
+        // make sure WaitForStop returns immediately when the Framework's state is "Installed"
+        auto fNoWaitEvent = f.WaitForStop(std::chrono::milliseconds::zero());
+        US_TEST_CONDITION(fNoWaitEvent, "Check for valid framework event");
+        US_TEST_CONDITION(fNoWaitEvent.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR, "Check for correct framework event type");
+        US_TEST_CONDITION(fNoWaitEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+
         f.Init();
 
-        US_TEST_CONDITION(f.GetState() == Bundle::STATE_STARTING, "Check framework is starting")
-        US_TEST_CONDITION(f.GetBundleContext().IsValid(), "Check for a valid bundle context");
+        US_TEST_CONDITION(f.GetState() == Bundle::STATE_STARTING, "Check framework is starting");
+        US_TEST_CONDITION(f.GetBundleContext(), "Check for a valid bundle context");
 
         f.Start();
 
-        US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener")
+        US_TEST_CONDITION(listener.CheckListenerEvents(pEvts), "Check framework bundle event listener");
 
-        US_TEST_CONDITION(f.GetState() == Bundle::STATE_ACTIVE, "Check framework is active")
+        US_TEST_CONDITION(f.GetState() == Bundle::STATE_ACTIVE, "Check framework is active");
 
         f.GetBundleContext().AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
+        // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
+        // is in a STARTING, ACTIVE, or STOPPING state.
+        std::thread waitForStopThread([&f]() {
+            auto fStopEvent = f.WaitForStop(std::chrono::milliseconds::zero());
+            US_TEST_CONDITION(!(f.GetState() & Bundle::STATE_ACTIVE), "Check framework is in the Stop state")
+            US_TEST_CONDITION(fStopEvent, "Check for valid framework event");
+            US_TEST_CONDITION(fStopEvent.GetType() == FrameworkEvent::Type::FRAMEWORK_STOPPED, "Check for correct framework event type");
+            US_TEST_CONDITION(fStopEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+        });
+
         f.Stop();
-        FrameworkEvent fStopEvent{ f.WaitForStop(std::chrono::milliseconds(0)) };
-        US_TEST_CONDITION(!(f.GetState() & Bundle::STATE_ACTIVE), "Check framework is in the Stop state")
-        US_TEST_CONDITION(fStopEvent, "Check for valid framework event");
-        US_TEST_CONDITION(fStopEvent.GetType() == FrameworkEvent::Type::STOPPED, "Check for correct framework event type");
-        US_TEST_CONDITION(fStopEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+        waitForStopThread.join();
 
         pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, f));
 
@@ -183,19 +193,29 @@ namespace
 
         // Test that all bundles in the Start state are stopped when the framework is stopped.
         f.Start();
+        US_TEST_CONDITION(f.GetState() == Bundle::STATE_ACTIVE, "Check framework is active");
+
         auto bundle = testing::InstallLib(f.GetBundleContext(), "TestBundleA");
         US_TEST_CONDITION_REQUIRED(bundle, "Non-null bundle");
+
         bundle.Start();
+        US_TEST_CONDITION(bundle.GetState() == Bundle::STATE_ACTIVE, "Check that TestBundleA is in an Active state");
+
+        // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
+        // is in a STARTING, ACTIVE, or STOPPING state.
+        waitForStopThread = std::thread([&f]() {
+            auto ev = f.WaitForStop(std::chrono::seconds(10));
+            US_TEST_CONDITION_REQUIRED(ev, "Test for valid framework event returned by Framework::WaitForStop()");
+            if (!ev && ev.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR) std::rethrow_exception(ev.GetThrowable());
+            US_TEST_CONDITION(ev.GetType() == FrameworkEvent::Type::FRAMEWORK_STOPPED, "Check that framework event is stopped");
+        });
 
         // Stopping the framework stops all active bundles.
         f.Stop();
-        auto ev = f.WaitForStop(std::chrono::seconds(10));
-        US_TEST_CONDITION_REQUIRED(ev, "Test for valid framework event returned by Framework::WaitForStop()");
-        if (!ev && ev.GetType() == FrameworkEvent::Type::ERROR) std::rethrow_exception(ev.GetThrowable());
-        US_TEST_CONDITION(ev.GetType() == FrameworkEvent::Type::STOPPED, "Check that framework event is stopped");
+        waitForStopThread.join();
 
-        US_TEST_CONDITION(bundle.GetState() != Bundle::STATE_ACTIVE, "Check that TestBundleA is in the Stop state");
-        US_TEST_CONDITION(f.GetState() != Bundle::STATE_ACTIVE, "Check framework is in the Stop state");
+        US_TEST_CONDITION(bundle.GetState() != Bundle::STATE_ACTIVE, "Check that TestBundleA is not active");
+        US_TEST_CONDITION(f.GetState() != Bundle::STATE_ACTIVE, "Check framework is not active");
     }
 
     void TestConcurrentFrameworkStart()
@@ -214,12 +234,17 @@ namespace
 
       for (auto& t : threads) t.join();
 
-      f.Stop();
+      // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
+      // is in a STARTING, ACTIVE, or STOPPING state.
+      std::thread waitForStopThread([&f]() {
+          auto fEvent = f.WaitForStop(std::chrono::milliseconds::zero());
+          US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
+          US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::FRAMEWORK_STOPPED, "Check that framework event is stopped");
+          US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+      });
 
-      auto fEvent = f.WaitForStop(std::chrono::milliseconds(0));
-      US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
-      US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::STOPPED, "Check that framework event is stopped");
-      US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+      f.Stop();
+      waitForStopThread.join();
     }
 
     void TestConcurrentFrameworkStop()
@@ -227,6 +252,15 @@ namespace
         // test concurrent Framework stops.
         auto f = FrameworkFactory().NewFramework();
         f.Start();
+
+        // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
+        // is in a STARTING, ACTIVE, or STOPPING state.
+        std::thread waitForStopThread([&f]() {
+            auto fEvent = f.WaitForStop(std::chrono::milliseconds::zero());
+            US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
+            US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::FRAMEWORK_STOPPED, "Check that framework event is stopped");
+            US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+        });
 
         size_t num_threads{ 100 };
         std::vector<std::thread> threads;
@@ -238,11 +272,33 @@ namespace
             } });
         }
 
-        auto fEvent = f.WaitForStop(std::chrono::milliseconds(0));
-        US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
-        US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::STOPPED, "Check that framework event is stopped");
-        US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+        for (auto& t : threads) t.join();
+        waitForStopThread.join();
+    }
 
+    void TestConcurrentFrameworkWaitForStop()
+    {
+        // test concurrent Framework stops.
+        auto f = FrameworkFactory().NewFramework();
+        f.Start();
+
+        std::mutex m;
+        size_t num_threads{ 100 };
+        std::vector<std::thread> threads;
+        for (size_t i = 0; i < num_threads; ++i)
+        {
+            // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
+            // is in a STARTING, ACTIVE, or STOPPING state.
+            threads.push_back(std::thread([&f, &m]() {
+                auto fEvent = f.WaitForStop(std::chrono::milliseconds::zero());
+                std::unique_lock<std::mutex> lock(m);
+                US_TEST_CONDITION_REQUIRED(fEvent, "Check for a valid framework event returned from WaitForStop");
+                US_TEST_CONDITION(fEvent.GetType() == FrameworkEvent::Type::FRAMEWORK_STOPPED, "Check that framework event is stopped");
+                US_TEST_CONDITION(fEvent.GetThrowable() == nullptr, "Check that no exception was thrown");
+            }));
+        }
+
+        f.Stop();
         for (auto& t : threads) t.join();
     }
 
@@ -329,7 +385,7 @@ namespace
 
         // Stopping the framework stops all active bundles.
         f.Stop();
-        f.WaitForStop(std::chrono::milliseconds(0));
+        f.WaitForStop(std::chrono::milliseconds::zero());
 
         US_TEST_CONDITION(listener.CheckListenerEvents(pStopEvts), "Check for bundle stop events")
     }
@@ -347,6 +403,7 @@ int usFrameworkTest(int /*argc*/, char* /*argv*/[])
     TestEvents();
     TestConcurrentFrameworkStart();
     TestConcurrentFrameworkStop();
+    TestConcurrentFrameworkWaitForStop();
 
     US_TEST_END()
 }

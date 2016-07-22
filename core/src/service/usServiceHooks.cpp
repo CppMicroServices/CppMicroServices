@@ -57,12 +57,12 @@ std::shared_ptr<ServiceListenerHook> ServiceHooks::AddingService(const ServiceRe
   catch (const std::exception& )
   {
 	  std::string message("Failed to call listener hook # " + reference.GetProperty(Constants::SERVICE_ID).ToString());
-	  coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+	  coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
   }
   catch (...)
   {
 	  std::string message("Failed to call listener hook # " + reference.GetProperty(Constants::SERVICE_ID).ToString());
-	  coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+	  coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
   }
   return lh;
 }
@@ -129,12 +129,12 @@ void ServiceHooks::FilterServiceReferences(BundleContextPrivate* context, const 
         catch (const std::exception& )
         {
           std::string message("Failed to call find hook # " + sr.GetProperty(Constants::SERVICE_ID).ToString());
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
         }
         catch (...)
         {
           std::string message("Failed to call find hook # " + sr.GetProperty(Constants::SERVICE_ID).ToString());
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
         }
       }
     }
@@ -179,12 +179,12 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
         catch(const std::exception& )
         {
           std::string message("Failed to call event hook # " + sr.GetProperty(Constants::SERVICE_ID).ToString());
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
         }
         catch(...)
         {
           std::string message("Failed to call event hook  # " + sr.GetProperty(Constants::SERVICE_ID).ToString());
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
         }
       }
     }
@@ -220,12 +220,12 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
       catch (const std::exception& )
       {
         std::string message("Failed to call listener hook # " + srIter->GetProperty(Constants::SERVICE_ID).ToString());
-        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
       }
       catch (...)
       {
         std::string message("Failed to call listener hook # " + srIter->GetProperty(Constants::SERVICE_ID).ToString());
-        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
       }
     }
   }
@@ -269,7 +269,7 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
       {
         std::string message("Failed to call listener hook # " + srIter->GetProperty(Constants::SERVICE_ID).ToString());
         coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::WARNING, 
+            FrameworkEvent::Type::FRAMEWORK_WARNING, 
             GetBundleContext().GetBundle(), 
             message, std::current_exception()));
       }
@@ -277,7 +277,7 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
       {
         std::string message("Failed to call listener hook # " + srIter->GetProperty(Constants::SERVICE_ID).ToString());
 		coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::WARNING, 
+            FrameworkEvent::Type::FRAMEWORK_WARNING, 
             GetBundleContext().GetBundle(), 
             message, std::current_exception()));
       }

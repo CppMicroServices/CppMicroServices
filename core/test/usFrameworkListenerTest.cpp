@@ -35,10 +35,6 @@
 
 using namespace us;
 
-#ifdef ERROR
-#undef ERROR
-#endif
-
 namespace {
 
 class TestFrameworkListener
@@ -111,7 +107,7 @@ void testStartStopFrameworkEvents()
   f.Stop();
 
   std::vector<FrameworkEvent> events;
-  events.push_back(FrameworkEvent(FrameworkEvent::Type::STARTED, f, "Framework Started"));
+  events.push_back(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started"));
   US_TEST_CONDITION_REQUIRED(l.CheckEvents(events), "Test for the correct number and order of Framework start/stop events.");
 }
 
@@ -136,7 +132,7 @@ void testAddRemoveFrameworkListener()
   US_TEST_CONDITION(l.CheckEvents(std::vector<FrameworkEvent>()), "Test listener removal");
   US_TEST_CONDITION(count == 0, "Test listener removal");
   f.Stop();
-  f.WaitForStop(std::chrono::milliseconds(0));
+  f.WaitForStop(std::chrono::milliseconds::zero());
 
   count = 0;
   f.Init();
@@ -150,10 +146,10 @@ void testAddRemoveFrameworkListener()
   fCtx.RemoveFrameworkListener(fl);
   fCtx.AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
   f.Start();
-  US_TEST_CONDITION(l.CheckEvents(std::vector<FrameworkEvent>{FrameworkEvent(FrameworkEvent::Type::STARTED, f, "Framework Started")}), "Test listener addition");
+  US_TEST_CONDITION(l.CheckEvents(std::vector<FrameworkEvent>{FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started")}), "Test listener addition");
   US_TEST_CONDITION(count == 1, "Test listener was succefully removed");
   f.Stop();
-  f.WaitForStop(std::chrono::milliseconds(0));
+  f.WaitForStop(std::chrono::milliseconds::zero());
 
   // @fixme issue #95 ... can't add more than one lambda defined listener
   // uncomment this block once issue #95 is fixed.
@@ -199,7 +195,7 @@ void testFrameworkListenersAfterFrameworkStop()
   // due to the asynchronous nature of Stop(), we must wait for the stop to complete
   // before starting the framework again. If this doesn't happen, the start may send
   // a framework event before the listener is disabled and cleaned up.
-  f.WaitForStop(std::chrono::milliseconds(0));
+  f.WaitForStop(std::chrono::milliseconds::zero());
   f.Start();    // generate framework event (started) with no listener to see it
   US_TEST_CONDITION(events == 1 , "Test that listeners were released on Framework Stop");
 }
@@ -233,7 +229,7 @@ void testFrameworkListenerThrowingInvariant()
       }
       catch (const std::exception& e)
       {
-        if (FrameworkEvent::Type::ERROR == evt.GetType() &&
+        if (FrameworkEvent::Type::FRAMEWORK_ERROR == evt.GetType() &&
             e.what() == exception_string &&
             typeid(e).name() == typeid(std::runtime_error).name())
         {
@@ -284,7 +280,7 @@ void testDeadLock()
 
   auto listener = [&f](const FrameworkEvent& evt)
   {
-    if (FrameworkEvent::Type::ERROR == evt.GetType())
+    if (FrameworkEvent::Type::FRAMEWORK_ERROR == evt.GetType())
     {
         // generate a framework event on another thread,
         // which will cause a deadlock if any mutexes are locked.
@@ -300,7 +296,7 @@ void testDeadLock()
   auto bundleA = testing::InstallLib(f.GetBundleContext(), "TestBundleA"); // trigger the bundle listener to be called
 
   f.Stop();
-  f.WaitForStop(std::chrono::milliseconds(0));
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 } // end anonymous namespace

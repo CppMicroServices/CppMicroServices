@@ -140,7 +140,7 @@ void ServiceTracker<S,T>::Close()
     return;
   }
 
-  US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::close:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
   outgoing->Close();
   references = GetServiceReferences();
   try

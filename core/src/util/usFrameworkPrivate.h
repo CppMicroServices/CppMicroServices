@@ -27,9 +27,6 @@ limitations under the License.
 #include <usBundlePrivate.h>
 #include <usFrameworkEvent.h>
 
-#include <atomic>
-#include <future>
-#include <ostream>
 #include <map>
 #include <string>
 
@@ -79,12 +76,12 @@ public:
    * </p>
    *
    */
-  FrameworkEvent Shutdown0(bool restart, bool wasActive);
+  void Shutdown0(bool restart, bool wasActive);
 
   /**
    * Tell system bundle shutdown finished.
    */
-  //void ShutdownDone_unlocked(bool restart);
+  void ShutdownDone_unlocked(bool restart);
 
   /**
    *  Stop and unresolve all bundles.
@@ -92,16 +89,26 @@ public:
   void StopAllBundles();
 
   /**
+   * The event to return to callers waiting in Framework.waitForStop() when the
+   * framework has been stopped.
+   */
+  struct FrameworkEventInternal {
+    bool valid;
+    FrameworkEvent::Type type;
+    std::string msg;
+    std::exception_ptr excPtr;
+  } stopEvent;
+
+  /**
    * Shutting down is done.
    */
-  void SystemShuttingdownDone_unlocked();
+  void SystemShuttingdownDone_unlocked(const FrameworkEventInternal& fe);
 
   /**
    * The thread that performs shutdown of this framework instance.
    */
   std::thread shutdownThread;
-  std::atomic_bool stopEvent;
-  //std::shared_future<FrameworkEvent> stop;
+
 };
 
 

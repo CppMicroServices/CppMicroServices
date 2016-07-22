@@ -231,7 +231,7 @@ void ServiceRegistrationBase::Unregister()
         catch (const std::exception& )
         {
           std::string message("ServiceFactory UngetService implementation threw an exception");
-          d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, MakeBundle(d->bundle->shared_from_this()), message, std::current_exception()));
+          d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(d->bundle->shared_from_this()), message, std::current_exception()));
         }
       }
     }
@@ -246,7 +246,7 @@ void ServiceRegistrationBase::Unregister()
       catch (const std::exception& )
       {
         std::string message("ServiceFactory UngetService implementation threw an exception");
-        d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, MakeBundle(d->bundle->shared_from_this()), message, std::current_exception()));
+        d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(d->bundle->shared_from_this()), message, std::current_exception()));
       }
     }
   }

@@ -110,7 +110,6 @@ public:
      *         <li>{@link FrameworkEvent#FRAMEWORK_STOPPED FRAMEWORK_STOPPED} - This Framework has
      *         been stopped. </li>
      *
-     *
      *         <li>{@link FrameworkEvent#FRAMEWORK_ERROR FRAMEWORK_ERROR} - The Framework
      *         encountered an error while shutting down or an error has occurred
      *         which forced the framework to shutdown. </li>
@@ -162,7 +161,7 @@ public:
      * <p>
      * The method returns immediately to the caller after initiating the
      * following steps to be taken on another thread. If the Framework was not
-     * build with threading enabled, the steps are executed in the main thread.
+     * built with threading enabled, the steps are executed in the main thread.
      * -# This Framework's state is set to {@link #STATE_STOPPING}.
      * -# All installed bundles are stopped without changing each bundle's
      *    persistent <i>autostart setting</i>. Any exceptions that occur

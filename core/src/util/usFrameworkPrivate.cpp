@@ -26,13 +26,12 @@ limitations under the License.
 #include "usBundleEvent.h"
 #include "usFramework.h"
 #include "usFrameworkEvent.h"
-#include "usLog.h"
 
 
 namespace us {
 
 FrameworkPrivate::FrameworkPrivate(CoreBundleContext* fwCtx)
-    : BundlePrivate(fwCtx), stopEvent(false)//stop()
+    : BundlePrivate(fwCtx), stopEvent{ true, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), nullptr }
 {
 }
 
@@ -103,39 +102,27 @@ void FrameworkPrivate::UninitSystemBundle()
 
 FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& timeout)
 {
-  auto l = Lock(); US_UNUSED(l);
-  /*if (timeout != std::chrono::milliseconds(0))
-  {
-    std::future_status status = stop.wait_for(timeout);
-    if (std::future_status::timeout == status)
-    {
-      return FrameworkEvent(
-          FrameworkEvent::Type::WAIT_TIMEDOUT,
-          MakeBundle(this->shared_from_this()),
-          std::string("Framework wait timed out"));
-    }
-  }
-  return stop.get();*/
-  
+  auto l = Lock();
   // Already stopped?
   if (((Bundle::STATE_INSTALLED | Bundle::STATE_RESOLVED) & state) == 0)
   {
-    stopEvent = FrameworkEventInternal{ false, FrameworkEvent::FRAMEWORK_ERROR, std::exception_ptr() };
+    stopEvent = FrameworkEventInternal{ false, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), std::exception_ptr() };
     if (timeout == std::chrono::milliseconds::zero())
     {
-      Wait(l, [&] { return stopEvent.load(); });
+      Wait(l, [&] { return stopEvent.valid; });
     }
     else
     {
-      WaitFor(l, timeout, [&] { return stopEvent.load(); });
+      WaitFor(l, timeout, [&] { return stopEvent.valid; });
     }
-
-    if (!stopEvent.exchange(false))
+    if (!stopEvent.valid)
     {
       return FrameworkEvent(
-            FrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT,
+            FrameworkEvent::Type::FRAMEWORK_WAIT_TIMEDOUT,
             MakeBundle(this->shared_from_this()),
-            std::string());
+            std::string(),
+            std::exception_ptr()
+            );
     }
   }
   else if (!stopEvent.valid)
@@ -144,24 +131,23 @@ FrameworkEvent FrameworkPrivate::WaitForStop(const std::chrono::milliseconds& ti
     // stopped.
     stopEvent = FrameworkEventInternal{
           true,
-          FrameworkEvent::FRAMEWORK_STOPPED,
+          FrameworkEvent::Type::FRAMEWORK_STOPPED,
+          std::string(),
           std::exception_ptr()};
   }
   if (shutdownThread.joinable()) shutdownThread.join();
-  return FrameworkEvent(FrameworkEvent::Type::STOPPED, MakeBundle(this->shared_from_this()), std::string());
+  return FrameworkEvent(stopEvent.type, MakeBundle(this->shared_from_this()), stopEvent.msg, stopEvent.excPtr);
 }
 
 void FrameworkPrivate::Shutdown(bool restart)
 {
   auto l = Lock(); US_UNUSED(l);
-  //stop = std::async(std::launch::async, [this, &restart]() {return this->Shutdown0(restart, true); });
-
   bool wasActive = false;
   switch (static_cast<Bundle::State>(state.load()))
   {
   case Bundle::STATE_INSTALLED:
   case Bundle::STATE_RESOLVED:
-    //ShutdownDone_unlocked(false);
+    ShutdownDone_unlocked(false);
     break;
   case Bundle::STATE_ACTIVE:
     wasActive = true;
@@ -183,10 +169,12 @@ void FrameworkPrivate::Shutdown(bool restart)
   case Bundle::STATE_STOPPING:
     // Shutdown already inprogress
     break;
+  default:
+      throw std::runtime_error("Framework in unknown state during stop.");
   }
 }
 
-FrameworkEvent FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
+void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
 {
   try
   {
@@ -205,9 +193,8 @@ FrameworkEvent FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
     {
       auto l = Lock(); US_UNUSED(l);
       coreCtx->Uninit1();
+      ShutdownDone_unlocked(restart);
     }
-    SystemShuttingdownDone_unlocked();
-
     if (restart)
     {
       if (wasActive)
@@ -222,34 +209,28 @@ FrameworkEvent FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
   }
   catch (...)
   {
-    auto l = Lock();
-    SystemShuttingdownDone_unlocked();
-    return FrameworkEvent{
-            FrameworkEvent::Type::ERROR,
-            MakeBundle(this->shared_from_this()),
+    auto l = Lock(); US_UNUSED(l);
+    SystemShuttingdownDone_unlocked(
+          FrameworkEventInternal{
+            true,
+            FrameworkEvent::Type::FRAMEWORK_ERROR,
             std::string(),
             std::current_exception()
-    };    
+          }
+          );
   }
-
-  return FrameworkEvent{ 
-      (restart ? FrameworkEvent::Type::STOPPED_UPDATE : FrameworkEvent::Type::STOPPED),
-      MakeBundle(this->shared_from_this()),
-      std::string() 
-  };
 }
 
-//void FrameworkPrivate::ShutdownDone_unlocked(bool restart)
-//{
-//  auto t = restart ? FrameworkEvent::Type::STOPPED_UPDATE : FrameworkEvent::Type::STOPPED;
-//  SystemShuttingdownDone_unlocked();
-//        FrameworkEvent{
-//          t,
-//          MakeBundle(this->shared_from_this()),
-//          std::string()
-//        }
-//  );
-//}
+void FrameworkPrivate::ShutdownDone_unlocked(bool restart)
+{
+  auto t = restart ? FrameworkEvent::Type::FRAMEWORK_STOPPED_UPDATE : FrameworkEvent::Type::FRAMEWORK_STOPPED;
+  SystemShuttingdownDone_unlocked(
+        FrameworkEventInternal{
+          true,
+          t,
+          std::string(),
+          std::exception_ptr()});
+}
 
 void FrameworkPrivate::StopAllBundles()
 {
@@ -268,7 +249,11 @@ void FrameworkPrivate::StopAllBundles()
     }
     catch (...)
     {
-      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::ERROR, MakeBundle(b), std::string(), std::current_exception()));
+        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                MakeBundle(b),
+                std::string(),
+                std::current_exception())));
     }
   }
 
@@ -285,15 +270,15 @@ void FrameworkPrivate::StopAllBundles()
   }
 }
 
-void FrameworkPrivate::SystemShuttingdownDone_unlocked()
+void FrameworkPrivate::SystemShuttingdownDone_unlocked(const FrameworkEventInternal& fe)
 {
   if (state != Bundle::STATE_INSTALLED)
   {
-    stopEvent.store(true);
     state = Bundle::STATE_RESOLVED;
     operation = OP_IDLE;
     NotifyAll();
   }
+  stopEvent = fe;
 }
 
 }

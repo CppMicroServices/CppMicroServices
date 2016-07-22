@@ -252,7 +252,7 @@ void BundleRegistry::Load()
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::string msg("Failed to load bundle " + std::to_string(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
-      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::WARNING, Bundle{}, msg, std::current_exception()));
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, Bundle{}, msg, std::current_exception()));
     }
   }
 }

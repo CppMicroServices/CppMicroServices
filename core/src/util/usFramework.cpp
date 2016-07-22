@@ -100,7 +100,7 @@ void Framework::Start()
     }
     catch (...)
     {
-      pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::ERROR, MakeBundle(b->shared_from_this()), std::string(), std::current_exception()));
+      pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(b->shared_from_this()), std::string(), std::current_exception()));
     }
   }
 
@@ -110,7 +110,7 @@ void Framework::Start()
     d->operation = BundlePrivate::OP_IDLE;
   }
   d->NotifyAll();
-  pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::STARTED, MakeBundle(d->shared_from_this()), std::string()));
+  pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, MakeBundle(d->shared_from_this()), std::string()));
 }
 
 void Framework::Stop(uint32_t )

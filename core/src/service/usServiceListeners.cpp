@@ -212,7 +212,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
       catch (const std::exception& )
       {
         SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::ERROR, 
+            FrameworkEvent::Type::FRAMEWORK_ERROR, 
             MakeBundle(bundleListeners.first->bundle->shared_from_this()),
             std::string("Bundle listener threw an exception"),
             std::current_exception()));
@@ -302,7 +302,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       {
         std::string message("Service listener in " + l.GetBundleContext().GetBundle().GetSymbolicName() + " threw an exception!");
         SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::ERROR, 
+            FrameworkEvent::Type::FRAMEWORK_ERROR, 
             l.GetBundleContext().GetBundle(),
             message,
             std::current_exception()));

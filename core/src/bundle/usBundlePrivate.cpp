@@ -307,7 +307,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
     catch (const std::exception& )
     {
       resolveFailException = std::current_exception();
-      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
 
       if (trigger != nullptr)
       {
@@ -318,7 +318,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
         catch (const std::exception& )
         {
           resolveFailException = std::current_exception();
-          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
         }
       }
     }

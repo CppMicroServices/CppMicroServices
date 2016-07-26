@@ -60,8 +60,8 @@ set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
 set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
   APPEND PROPERTY COMPILE_DEFINITIONS_RELEASE NDEBUG)
 
-usFunctionCheckCompilerFlags(-pthread CMAKE_CXX_FLAGS)
-
+set(THREADS_PREFER_PTHREAD_FLAG 1)
+find_package(Threads REQUIRED)
 
 usMacroCreateBundle(HttpService
   VERSION "0.99.0"
@@ -72,6 +72,10 @@ usMacroCreateBundle(HttpService
   SOURCES ${_srcs}
   RESOURCES manifest.json
 )
+
+if(CMAKE_THREAD_LIBS_INIT)
+  target_link_libraries(usHttpService ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

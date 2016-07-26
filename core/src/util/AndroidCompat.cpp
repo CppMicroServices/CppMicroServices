@@ -26,26 +26,24 @@
 
 #include "usAny.h"
 
-namespace
+namespace {
+template <typename T>
+std::string internal_to_string(T val)
 {
-    template <typename T>
-    std::string internal_to_string(T val)
-    {
-        return us::Any(val).ToString();
-    }
+  return us::Any(val).ToString();
+}
 }
 
-namespace detail_AndroidCompat
-{
-    std::string to_string(int val)               { return internal_to_string(val); }
-    std::string to_string(unsigned val)          { return internal_to_string(val); }
-    std::string to_string(long val)              { return internal_to_string(val); }
-    std::string to_string(unsigned long val)     { return internal_to_string(val); }
-    std::string to_string(long long val)         { return internal_to_string(val); }
-    std::string to_string(unsigned long long val){ return internal_to_string(val); }
-    std::string to_string(float val)             { return internal_to_string(val); }
-    std::string to_string(double val)            { return internal_to_string(val); }
-    std::string to_string(long double val)       { return internal_to_string(val); }
+namespace detail_AndroidCompat {
+std::string to_string(int val)               { return internal_to_string(val); }
+std::string to_string(unsigned val)          { return internal_to_string(val); }
+std::string to_string(long val)              { return internal_to_string(val); }
+std::string to_string(unsigned long val)     { return internal_to_string(val); }
+std::string to_string(long long val)         { return internal_to_string(val); }
+std::string to_string(unsigned long long val){ return internal_to_string(val); }
+std::string to_string(float val)             { return internal_to_string(val); }
+std::string to_string(double val)            { return internal_to_string(val); }
+std::string to_string(long double val)       { return internal_to_string(val); }
 }
 
 #endif // __ANDROID__

@@ -37,6 +37,7 @@
 #include "usFramework.h"
 #include "usServiceRegistration.h"
 #include "usServiceReferenceBasePrivate.h"
+#include "AndroidCompat.h" // std::to_string not available on Android
 
 #include <algorithm>
 #include <iterator>

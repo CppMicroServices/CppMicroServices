@@ -33,6 +33,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "usBundleStorageMemory_p.h"
 #include "usBundleInitialization.h"
 #include "usConstants.h"
+#include "AndroidCompat.h" // std::to_string not available on Android
 
 #include <iomanip>
 

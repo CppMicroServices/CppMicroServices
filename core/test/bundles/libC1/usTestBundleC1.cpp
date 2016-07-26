@@ -26,6 +26,7 @@
 #include <usServiceTracker.h>
 #include <usLog.h>
 #include <usLDAPProp.h>
+#include <AndroidCompat.h> // std::to_string not available on Android
 
 #include <usTestingMacros.h>
 

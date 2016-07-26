@@ -34,6 +34,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 #include "usCoreBundleContext_p.h"
 #include "usBundlePrivate.h"
 #include "usBundleContextPrivate.h"
+#include "AndroidCompat.h" // std::to_string not available on Android
 
 namespace us {
 

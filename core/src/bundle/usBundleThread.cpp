@@ -25,6 +25,7 @@
 #include "usBundleActivator.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
+#include "AndroidCompat.h" // std::to_string not available on Android
 
 #include <future>
 

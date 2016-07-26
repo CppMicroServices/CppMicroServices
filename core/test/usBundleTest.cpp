@@ -31,6 +31,7 @@
 #include <usConstants.h>
 #include <usBundleActivator.h>
 #include <usLog.h>
+#include <AndroidCompat.h> // std::to_string not available on Android
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"

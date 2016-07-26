@@ -67,7 +67,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
   
   if (!allowExecutable && !IsSharedLibrary(location))
   {
-    std::runtime_error("Installing bundle at "+ location + " not permitted");
+    throw std::runtime_error("Installing bundle at "+ location + " not permitted");
   }
   
   auto l = this->Lock(); US_UNUSED(l);

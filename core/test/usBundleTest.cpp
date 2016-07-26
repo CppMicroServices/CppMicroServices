@@ -535,6 +535,25 @@ void TestDuplicateInstall()
     US_TEST_CONDITION(bundle == bundleDuplicate, "Test for the same bundle instance");
     US_TEST_CONDITION(bundle.GetBundleId() == bundleDuplicate.GetBundleId(), "Test for the same bundle id");
 }
+  
+void TestAutoInstallEmbeddedBundles()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
+  frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+#ifdef US_BUILD_SHARED_LIBS
+  // 2 bundles - the framework(system_bundle) and the executable(main).
+  US_TEST_CONDITION(2 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#else
+  // There are atleast 2 bundles, maybe more depending on how the executable is created
+  US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#endif
+  f.Stop();
+}
 
 }
 
@@ -591,6 +610,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   TestBundleStates();
   TestForInstallFailure();
   TestDuplicateInstall();
+  TestAutoInstallEmbeddedBundles();
 
   US_TEST_END()
 }

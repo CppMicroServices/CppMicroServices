@@ -220,29 +220,29 @@ namespace
         install("TestBundleSL1");
         install("TestBundleSL3");
         install("TestBundleSL4");
-      auto bundles(fmc.GetBundles());
+        auto bundles(fmc.GetBundles());
 #else
-      // since all bundles are embedded in the main executable, all bundles are
-      // installed at framework start. simply check for start and stop events
-      std::vector<us::Bundle> bundles;
-      bundles.push_back(testing::GetBundle("TestBundleA", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleA2", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleB", fmc));
+        // since all bundles are embedded in the main executable, all bundles are
+        // installed at framework start. simply check for start and stop events
+        std::vector<us::Bundle> bundles;
+        bundles.push_back(testing::GetBundle("TestBundleA", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleA2", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleB", fmc));
 #ifdef US_ENABLE_THREADING_SUPPORT
-      bundles.push_back(testing::GetBundle("TestBundleC1", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleC1", fmc));
 #endif
-      bundles.push_back(testing::GetBundle("TestBundleH", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleImportedByB", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleLQ", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleM", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleR", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleRA", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleRL", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleS", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleSL1", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleSL3", fmc));
-      bundles.push_back(testing::GetBundle("TestBundleSL4", fmc));
-      bundles.push_back(testing::GetBundle("main", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleH", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleImportedByB", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleLQ", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleM", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleR", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleRA", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleRL", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleS", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleSL1", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleSL3", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleSL4", fmc));
+        bundles.push_back(testing::GetBundle("main", fmc));
 #endif
 
 
@@ -281,6 +281,8 @@ namespace
         US_TEST_CONDITION(listener.CheckListenerEvents(pStopEvts), "Check for bundle stop events")
     }
 }
+
+
 
 int usFrameworkTest(int /*argc*/, char* /*argv*/[])
 {

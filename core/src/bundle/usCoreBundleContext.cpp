@@ -33,6 +33,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "usBundleStorageMemory_p.h"
 #include "usBundleInitialization.h"
 #include "usConstants.h"
+#include "usBundleUtils_p.h"
 
 #include <iomanip>
 
@@ -120,6 +121,9 @@ void CoreBundleContext::Init()
 
   serviceHooks.Open();
   //resolverHooks.Open();
+  
+  // auto-install all embedded bundles inside the executable
+  std::vector<Bundle> bundles = bundleRegistry.Install(BundleUtils::GetExecutablePath(), systemBundle.get(), true);
 
   bundleRegistry.Load();
 

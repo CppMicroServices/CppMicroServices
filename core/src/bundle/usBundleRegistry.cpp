@@ -59,10 +59,17 @@ void BundleRegistry::Clear()
   bundles.v.clear();
 }
 
-std::vector<Bundle> BundleRegistry::Install(const std::string& location, BundlePrivate* caller)
+std::vector<Bundle> BundleRegistry::Install(const std::string& location,
+                                            BundlePrivate* caller,
+                                            bool allowExecutable)
 {
   CheckIllegalState();
-
+  
+  if (!allowExecutable && !IsSharedLibrary(location))
+  {
+    std::runtime_error("Installing bundle at "+ location + " not permitted");
+  }
+  
   auto l = this->Lock(); US_UNUSED(l);
   auto range = (bundles.Lock(), bundles.v.equal_range(location));
   if (range.first != range.second)

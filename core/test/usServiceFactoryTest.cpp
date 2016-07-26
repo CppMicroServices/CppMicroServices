@@ -55,7 +55,8 @@ void TestServiceFactoryBundleScope(BundleContext context)
   // Install and start test bundle H, a service factory and test that the methods
   // in that interface works.
 
-  testing::InstallLib(context, "TestBundleH");
+  auto bundle = testing::InstallLib(context, "TestBundleH");
+  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleH")
 
   auto bundleH = testing::GetBundle("TestBundleH", context);
   US_TEST_CONDITION_REQUIRED(bundleH, "Test for existing bundle TestBundleH")
@@ -101,8 +102,8 @@ void TestServiceFactoryPrototypeScope(BundleContext context)
 
   // Install and start test bundle H, a service factory and test that the methods
   // in that interface works.
-
-  testing::InstallLib(context, "TestBundleH");
+  auto bundle = testing::InstallLib(context, "TestBundleH");
+  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleH")
 
   auto bundleH = testing::GetBundle("TestBundleH", context);
   US_TEST_CONDITION_REQUIRED(bundleH, "Test for existing bundle TestBundleH")
@@ -174,8 +175,9 @@ int usServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   auto framework = factory.NewFramework();
   framework.Start();
 
-  TestServiceFactoryBundleScope(framework.GetBundleContext());
+  
   TestServiceFactoryPrototypeScope(framework.GetBundleContext());
+  TestServiceFactoryBundleScope(framework.GetBundleContext());
 
   US_TEST_END()
 }

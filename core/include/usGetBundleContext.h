@@ -29,10 +29,12 @@
 #endif
 
 #include <usBundleContext.h>
-#include <usBundleUtils.h>
 
-#include <memory>
-#include <cstring>
+#define GETBUNDLECONTEXT_FCNPREFIX _us_get_bundle_context_instance
+#define GETBUNDLECONTEXTINSTANCEFCN(Prefix, BundleName) GETBUNDLECONTEXTINSTANCEFCN_(Prefix, BundleName)
+#define GETBUNDLECONTEXTINSTANCEFCN_(Prefix, BundleName) Prefix##_##BundleName
+
+extern "C" us::BundleContextPrivate* GETBUNDLECONTEXTINSTANCEFCN(GETBUNDLECONTEXT_FCNPREFIX, US_BUNDLE_NAME)();
 
 namespace us {
 
@@ -50,16 +52,7 @@ US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
  */
 static inline BundleContext GetBundleContext()
 {
-  BundleContext(*getBundleContext)(void) = &GetBundleContext;
-
-  void* GetBundleContextPtr = nullptr;
-  std::memcpy(&GetBundleContextPtr, &getBundleContext, sizeof(void*));
-  std::string libPath(BundleUtils::GetLibraryPath(GetBundleContextPtr));
-
-  BundleContextPrivate*(*getBundleContextInst)(void) = nullptr;
-  std::string get_bundle_context_inst("_us_get_bundle_context_instance_" US_STR(US_BUNDLE_NAME));
-  void* getBundleContextInstSym = BundleUtils::GetSymbol(US_STR(US_BUNDLE_NAME), libPath, get_bundle_context_inst.c_str());
-  std::memcpy(&getBundleContextInst, &getBundleContextInstSym, sizeof(void*));
+  BundleContextPrivate*(*getBundleContextInst)(void) = &(GETBUNDLECONTEXTINSTANCEFCN(GETBUNDLECONTEXT_FCNPREFIX, US_BUNDLE_NAME));
 
   if (getBundleContextInst)
   {

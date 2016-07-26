@@ -471,20 +471,27 @@ std::exception_ptr BundlePrivate::Start0()
     typedef BundleActivator*(*CreateActivatorHook)(void);
     CreateActivatorHook createActivatorHook = nullptr;
 
-    // loading a library isn't necessary if it isn't supported
-#ifdef US_BUILD_SHARED_LIBS
-    if(IsSharedLibrary(lib.GetFilePath()) && !lib.IsLoaded())
+    void* libHandle = nullptr;
+    if(IsSharedLibrary(lib.GetFilePath()))
     {
-      lib.Load();
+      if (!lib.IsLoaded())
+      {
+        lib.Load();
+      }
+      libHandle = lib.GetHandle();
     }
-#endif
+    else
+    {
+      libHandle = BundleUtils::GetExecutableHandle();
+    }
+
 
     auto ctx = bundleContext.Load();
 
     // save this bundle's context so that it can be accessible anywhere
     // from within this bundle's code.
-    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + symbolicName;
-    void* setBundleContextSym = BundleUtils::GetSymbol(symbolicName, location, set_bundle_context_func.c_str());
+    std::string set_bundle_context_func = "SetBundleContext" + symbolicName;
+    void* setBundleContextSym = BundleUtils::GetSymbol(libHandle, set_bundle_context_func.c_str());
     std::memcpy(&SetBundleContext, &setBundleContextSym, sizeof(void*));
     if (SetBundleContext)
     {
@@ -493,11 +500,11 @@ std::exception_ptr BundlePrivate::Start0()
 
     // get the create/destroy activator callbacks
     std::string create_activator_func = "_us_create_activator_" + symbolicName;
-    void* createActivatorHookSym = BundleUtils::GetSymbol(symbolicName, location, create_activator_func.c_str());
+    void* createActivatorHookSym = BundleUtils::GetSymbol(libHandle, create_activator_func.c_str());
     std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
 
     std::string destroy_activator_func = "_us_destroy_activator_" + symbolicName;
-    void* destroyActivatorHookSym = BundleUtils::GetSymbol(symbolicName, location, destroy_activator_func.c_str());
+    void* destroyActivatorHookSym = BundleUtils::GetSymbol(libHandle, destroy_activator_func.c_str());
     std::memcpy(&destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
 
     // try to get a BundleActivator instance

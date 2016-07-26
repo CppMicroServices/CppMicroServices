@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-#include "usBundleUtils.h"
 #include "usBundleUtils_p.h"
 
 #include <usLog.h>
@@ -31,151 +30,103 @@
 #define _GNU_SOURCE
 #endif
 #include <dlfcn.h>
+#if defined(__APPLE__)
+#include <sys/param.h>
+#include <mach-o/dyld.h>
+#endif
+#include <unistd.h>
+#include <limits.h>
 #elif _WIN32
 #include <windows.h>
+
+#define RTLD_LAZY 0 // unused
+
+const char* dlerror(void)
+{
+  static std::string errStr;
+  errStr = us::GetLastErrorStr();
+  return errStr.c_str();
+}
+
+void* dlopen(const char * path, int mode)
+{
+  (void)mode; // ignored
+  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandle(nullptr) : LoadLibrary(path));
+}
+
+void* dlsym(void *handle, const char *symbol)
+{
+  return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(handle), symbol));
+}
+
 #endif
 
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
 
 namespace us {
 
-namespace {
-#ifdef US_BUILD_SHARED_LIBS
-  const bool sharedLibMode = true;
-#else
-  const bool sharedLibMode = false;
-#endif
-}
 
 namespace BundleUtils
 {
-
-#ifdef __GNUC__
-
-std::string GetLibraryPath_impl(void* symbol)
+  
+void* GetExecutableHandle()
 {
-  Dl_info info;
-  if (dladdr(symbol, &info))
-  {
-    return info.dli_fname;
-  }
-  else
-  {
-    US_DEBUG << "GetLibraryPath_impl() failed for address " << symbol;
-  }
-  return "";
+  return dlopen(0, RTLD_LAZY);;
 }
 
-void* GetSymbol_impl(const std::string& bundleName, const std::string& libLocation, const char* symbol)
+std::string GetExecutablePath()
 {
-  // Clear the last error message
-  dlerror();
-
-  void* selfHandle = nullptr;
-  if (!sharedLibMode || bundleName == "main")
+  std::string execPath;
+  uint32_t bufsize = MAXPATHLEN;
+  std::unique_ptr<char[]> buf(new char[bufsize]);
+#if _WIN32
+  if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
-    // Get the handle of the executable
-    selfHandle = dlopen(0, RTLD_LAZY);
+    US_DEBUG << "GetModuleFileName failed" << GetLastErrorStr();
+    buf[0] = '\0';
   }
-  else
+#elif defined(__APPLE__)
+  int status = _NSGetExecutablePath(buf.get(), &bufsize);
+  if (status == -1)
   {
-    selfHandle = dlopen(libLocation.c_str(), RTLD_LAZY);
+    buf.reset(new char[bufsize]);
+    status = _NSGetExecutablePath(buf.get(), &bufsize);
   }
-
-  if (selfHandle)
+  if (status != 0)
   {
-    void* addr = dlsym(selfHandle, symbol);
-    if (!addr)
-    {
-      const char* dlerrorMsg = dlerror();
-      if (dlerrorMsg)
-      {
-        US_DEBUG << "GetSymbol_impl() failed: " << dlerrorMsg;
-      }
-    }
-    dlclose(selfHandle);
-    return addr;
+    US_DEBUG << "_NSGetExecutablePath() failed";
   }
-  else
+  // the returned path may not be an absolute path
+#elif defined(__linux__)
+  ssize_t len = ::readlink("/proc/self/exe", buf.get(), bufsize);
+  if (len == -1 || len == bufsize)
   {
-    US_DEBUG << "GetSymbol_impl() dlopen() failed: " << dlerror();
+    len = 0;
   }
-  return nullptr;
+  buf[len] = '\0';
+#else
+  // 'dlsym' does not work with symbol name 'main'
+  US_DEBUG << "GetExecutablePath failed";
+#endif
+  return buf.get();
 }
 
-#elif _WIN32
-
-std::string GetLibraryPath_impl(void *symbol)
+void* GetSymbol(void* libHandle, const char* symbol)
 {
-  HMODULE handle = nullptr;
-  BOOL handleError = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                                       static_cast<LPCTSTR>(symbol), &handle);
-  if (!handleError)
-  {
-    // Test
-    US_DEBUG << "GetLibraryPath_impl():GetBundleHandle() " << GetLastErrorStr();
-    return "";
-  }
-
-  char bundlePath[512];
-  if (GetModuleFileName(handle, bundlePath, 512))
-  {
-    return bundlePath;
-  }
-
-  US_DEBUG << "GetLibraryPath_impl():GetBundleFileName() " << GetLastErrorStr();
-  return "";
-}
-
-void* GetSymbol_impl(const std::string& bundleName, const std::string& libLocation, const char* symbol)
-{
-  HMODULE handle = nullptr;
-  if (!sharedLibMode || bundleName == "main")
-  {
-    handle = GetModuleHandle(nullptr);
-  }
-  else
-  {
-    handle = GetModuleHandle(libLocation.c_str());
-  }
-
-  if (!handle)
-  {
-    US_DEBUG << "GetSymbol_impl():GetBundleHandle() " << GetLastErrorStr();
-    return nullptr;
-  }
-
-  void* addr = (void*)GetProcAddress(handle, symbol);
+  void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
   if (!addr)
   {
-    US_DEBUG << "GetSymbol_impl():GetProcAddress(handle," << symbol << ") " << GetLastErrorStr();
+    const char* dlerrorMsg = dlerror();
+    if (dlerrorMsg)
+    {
+      US_DEBUG << "GetSymbol() failed to find (" << symbol << ") with error "<< dlerrorMsg;
+    }
   }
   return addr;
 }
-
-#else
-
-std::string GetLibraryPath_impl(void*)
-{
-  return "";
-}
-
-void* GetSymbol_impl(const std::string&, const std::string&, const char*)
-{
-  return nullptr;
-}
-
-#endif
-
-std::string GetLibraryPath(void* symbol)
-{
-  return GetLibraryPath_impl(symbol);
-}
-
-void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol)
-{
-  return GetSymbol_impl(bundleName, libLocation, symbol);
-}
-
+  
 } // namespace BundleUtils
 
 } // namespace us

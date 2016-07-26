@@ -153,11 +153,11 @@ void frame020a()
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
+#ifdef US_BUILD_SHARED_LIBS // The bundle is installed at framework startup for static builds
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, buA));
-
   bool relaxed = false;
-#ifndef US_BUILD_SHARED_LIBS
-  relaxed = true;
+#else
+  bool relaxed = true;
 #endif
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 }
@@ -251,10 +251,8 @@ void frame035a()
 {
   try
   {
-    auto bundles = bc.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
-    US_TEST_CONDITION_REQUIRED(!bundles.empty() && bundles.front(), "Test installation of bundle main")
-
     buExec = testing::GetBundle("main", bc);
+    US_TEST_CONDITION_REQUIRED(buExec, "Bundle 'main' not found");
     buExec.Start();
   }
   catch (const std::exception& e)
@@ -511,8 +509,13 @@ void TestForInstallFailure()
     {
         US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
     }
-
-    US_TEST_CONDITION(1 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#ifdef US_BUILD_SHARED_LIBS
+    // 2 bundles - the framework(system_bundle) and the executable(main).
+    US_TEST_CONDITION(2 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#else
+    // There are atleast 2 bundles, maybe more depending on how the executable is created
+    US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#endif
 }
 
 void TestDuplicateInstall()

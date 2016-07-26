@@ -1,5 +1,8 @@
 #include <usGetBundleContext.h>
 #include <usServiceTracker.h>
+#include <usBundleInitialization.h>
+
+US_INITIALIZE_BUNDLE
 
 using namespace us;
 

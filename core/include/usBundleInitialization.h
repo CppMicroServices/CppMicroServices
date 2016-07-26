@@ -54,7 +54,7 @@ class BundleContextPrivate;
 #define US_INITIALIZE_BUNDLE                                                                                         \
   std::atomic<us::BundleContextPrivate*> US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME) {};                 \
                                                                                                                      \
-  extern "C" US_ABI_EXPORT us::BundleContextPrivate* US_CONCAT(_us_get_bundle_context_instance_, US_BUNDLE_NAME) ()  \
+  extern "C" us::BundleContextPrivate* US_CONCAT(_us_get_bundle_context_instance_, US_BUNDLE_NAME) ()  \
   {                                                                                                                  \
     return US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME).load();                                           \
   }                                                                                                                  \

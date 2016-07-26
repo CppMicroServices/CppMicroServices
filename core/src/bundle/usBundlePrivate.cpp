@@ -490,7 +490,7 @@ std::exception_ptr BundlePrivate::Start0()
 
     // save this bundle's context so that it can be accessible anywhere
     // from within this bundle's code.
-    std::string set_bundle_context_func = "SetBundleContext" + symbolicName;
+    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + symbolicName;
     void* setBundleContextSym = BundleUtils::GetSymbol(libHandle, set_bundle_context_func.c_str());
     std::memcpy(&SetBundleContext, &setBundleContextSym, sizeof(void*));
     if (SetBundleContext)

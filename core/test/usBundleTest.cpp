@@ -30,7 +30,6 @@
 #include <usBundleContext.h>
 #include <usConstants.h>
 #include <usBundleActivator.h>
-#include <usLog.h>
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"

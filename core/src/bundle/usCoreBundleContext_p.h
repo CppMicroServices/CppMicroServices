@@ -32,7 +32,7 @@
 #include "usBundleRegistry_p.h"
 #include "usDebug_p.h"
 #include "usAny.h"
-#include "usLog.h"
+#include "usLog_p.h"
 
 #include <ostream>
 #include <string>

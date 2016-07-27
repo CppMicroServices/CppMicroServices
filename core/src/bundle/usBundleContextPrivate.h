@@ -23,7 +23,7 @@
 #ifndef USBUNDLECONTEXTPRIVATE_H_
 #define USBUNDLECONTEXTPRIVATE_H_
 
-#include "usLog.h"
+#include "usLog_p.h"
 #include "usThreads_p.h"
 #include <usCoreExport.h>
 

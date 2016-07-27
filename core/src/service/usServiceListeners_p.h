@@ -60,9 +60,10 @@ public:
 
 private:
 
-  std::mutex frameworkListenerMapMutex;
   typedef std::map<std::shared_ptr<BundleContextPrivate>, std::vector<std::pair<FrameworkListener, void*> > > FrameworkListeners;
-  FrameworkListeners FrameworkListenerMap;
+  struct : public MultiThreaded<> {
+      FrameworkListeners value;
+  } frameworkListenerMap;
 
   std::vector<std::string> hashedServiceKeys;
   static const int OBJECTCLASS_IX = 0;

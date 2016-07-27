@@ -262,11 +262,11 @@ long long HttpServletRequest::GetDateHeader(const std::string& name) const
                                            &second) == 6)) {
 
     month = -1;
-    for (int i = 0; i < num_months; ++i)
+    for (std::size_t i = 0; i < num_months; ++i)
     {
       if (std::strcmp(months[i], month_str) == 0)
       {
-        month = i;
+        month = static_cast<int>(i);
         break;
       }
     }

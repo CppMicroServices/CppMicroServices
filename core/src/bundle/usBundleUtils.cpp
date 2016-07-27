@@ -23,7 +23,7 @@
 #include "usBundleUtils.h"
 #include "usBundleUtils_p.h"
 
-#include <usLog.h>
+#include <usLog_p.h>
 #include <usUtils_p.h>
 
 #ifdef __GNUC__

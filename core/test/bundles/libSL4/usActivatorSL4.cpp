@@ -24,10 +24,10 @@
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
 #include <usServiceRegistration.h>
-#include <usLog.h>
 
 #include <usFooService.h>
 
+#include <iostream>
 
 namespace us {
 

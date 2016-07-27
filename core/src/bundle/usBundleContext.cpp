@@ -29,7 +29,7 @@
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
 #include "usFramework.h"
-#include "usLog.h"
+#include "usLog_p.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
 #include "usUtils_p.h"

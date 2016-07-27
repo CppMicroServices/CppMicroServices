@@ -24,12 +24,14 @@ limitations under the License.
 #include <usFrameworkFactory.h>
 #include <usFramework.h>
 #include <usFrameworkEvent.h>
-#include <usLog.h>
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
+
+#include <mutex>
+#include <thread>
 
 using namespace us;
 
@@ -107,6 +109,34 @@ namespace
 #endif
     }
 
+    void TestDefaultLogSink()
+    {
+        std::map<std::string, Any> configuration;
+        // turn on diagnostic logging
+        configuration[Constants::FRAMEWORK_LOG] = true;
+
+        // Needs improvement to guarantee that log messages are generated,
+        // however for the moment do some operations using the framework
+        // which would create diagnostic log messages.
+        std::stringstream temp_buf;
+        auto clog_buf = std::clog.rdbuf();
+        std::clog.rdbuf(temp_buf.rdbuf());
+
+        auto f = FrameworkFactory().NewFramework(configuration);
+        US_TEST_CONDITION(f, "Test Framework instantiation with custom diagnostic logger");
+
+        f.Start();
+        testing::InstallLib(f.GetBundleContext(), "TestBundleA");
+
+        f.Stop();
+        f.WaitForStop(std::chrono::milliseconds::zero());
+
+        US_TEST_OUTPUT(<< "Diagnostic log messages: " << temp_buf.str());
+        US_TEST_CONDITION(!temp_buf.str().empty(), "Test that the default logger captured data.");
+
+        std::clog.rdbuf(clog_buf);
+    }
+
 	void TestCustomLogSink()
 	{
 		std::map<std::string, Any> configuration;
@@ -159,6 +189,7 @@ namespace
 
         f.GetBundleContext().AddBundleListener(&listener, &TestBundleListener::BundleChanged);
 
+#ifdef US_ENABLE_THREADING_SUPPORT
         // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
         // is in a STARTING, ACTIVE, or STOPPING state.
         std::thread waitForStopThread([&f]() {
@@ -171,6 +202,9 @@ namespace
 
         f.Stop();
         waitForStopThread.join();
+#else
+        f.Stop();
+#endif
 
         pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, f));
 
@@ -201,6 +235,7 @@ namespace
         bundle.Start();
         US_TEST_CONDITION(bundle.GetState() == Bundle::STATE_ACTIVE, "Check that TestBundleA is in an Active state");
 
+#ifdef US_ENABLE_THREADING_SUPPORT
         // To test that the correct FrameworkEvent is returned, we must guarantee that the Framework
         // is in a STARTING, ACTIVE, or STOPPING state.
         waitForStopThread = std::thread([&f]() {
@@ -213,15 +248,23 @@ namespace
         // Stopping the framework stops all active bundles.
         f.Stop();
         waitForStopThread.join();
-
+#else
+        f.Stop();
+#endif
         US_TEST_CONDITION(bundle.GetState() != Bundle::STATE_ACTIVE, "Check that TestBundleA is not active");
         US_TEST_CONDITION(f.GetState() != Bundle::STATE_ACTIVE, "Check framework is not active");
     }
+
+#ifdef US_ENABLE_THREADING_SUPPORT
 
     void TestConcurrentFrameworkStart()
     {
       // test concurrent Framework starts.
       auto f = FrameworkFactory().NewFramework();
+      f.Init();
+      int start_count{ 0 };
+      f.GetBundleContext().AddFrameworkListener([&start_count](const FrameworkEvent& ev) 
+                            { if (FrameworkEvent::Type::FRAMEWORK_STARTED == ev.GetType()) ++start_count; });
       size_t num_threads{ 100 };
       std::vector<std::thread> threads;
       for (size_t i = 0; i < num_threads; ++i)
@@ -245,6 +288,13 @@ namespace
 
       f.Stop();
       waitForStopThread.join();
+
+      // Its somewhat ambiguous in the OSGi spec whether or not multiple Framework STARTED events should be sent
+      // when repeated calls to Framework::Start() are made on the same Framework instance once its in the 
+      // ACTIVE bundle state.
+      // Felix and Knopflerfish OSGi implementations take two different stances.
+      // Lock down the behavior that only one Framework STARTED event is sent.
+      US_TEST_CONDITION_REQUIRED(1 == start_count, "Multiple Framework::Start() calls only produce one Framework STARTED event.");
     }
 
     void TestConcurrentFrameworkStop()
@@ -301,6 +351,8 @@ namespace
         f.Stop();
         for (auto& t : threads) t.join();
     }
+
+#endif
 
     void TestEvents()
     {
@@ -396,14 +448,16 @@ int usFrameworkTest(int /*argc*/, char* /*argv*/[])
     US_TEST_BEGIN("FrameworkTest");
 
     TestDefaultConfig();
+    TestDefaultLogSink();
     TestCustomConfig();
 	TestCustomLogSink();
     TestProperties();
     TestLifeCycle();
     TestEvents();
+#ifdef US_ENABLE_THREADING_SUPPORT
     TestConcurrentFrameworkStart();
     TestConcurrentFrameworkStop();
     TestConcurrentFrameworkWaitForStop();
-
+#endif
     US_TEST_END()
 }

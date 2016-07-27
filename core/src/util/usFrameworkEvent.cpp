@@ -27,12 +27,9 @@
 
 namespace us {
 
-class FrameworkEventData : public SharedData
+class FrameworkEventData
 {
 public:
-
-  FrameworkEventData& operator=(const FrameworkEventData&) = delete;
-
   FrameworkEventData(FrameworkEvent::Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception)
     : type(type), bundle(GetPrivate(bundle)), message(message), exception(exception)
   {
@@ -40,7 +37,7 @@ public:
   }
 
   FrameworkEventData(const FrameworkEventData& other)
-    : SharedData(other), type(other.type), bundle(other.bundle), message(other.message), exception(other.exception)
+    : type(other.type), bundle(other.bundle), message(other.message), exception(other.exception)
   {
 
   }
@@ -58,27 +55,10 @@ FrameworkEvent::FrameworkEvent()
 
 }
 
-FrameworkEvent::~FrameworkEvent()
-{
-
-}
-
 FrameworkEvent::FrameworkEvent(Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception)
   : d(new FrameworkEventData(type, bundle, message, exception))
 {
 
-}
-
-FrameworkEvent::FrameworkEvent(const FrameworkEvent& other)
-  : d(other.d)
-{
-
-}
-
-FrameworkEvent& FrameworkEvent::operator=(const FrameworkEvent& other)
-{
-  d = other.d;
-  return *this;
 }
 
 Bundle FrameworkEvent::GetBundle() const
@@ -105,9 +85,9 @@ std::exception_ptr FrameworkEvent::GetThrowable() const
   return d->exception;
 }
 
-bool FrameworkEvent::operator!() const
+FrameworkEvent::operator bool() const
 {
-  return !d;
+  return d.operator bool();
 }
 
 std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType)
@@ -126,33 +106,31 @@ std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType)
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const std::exception_ptr ex)
-{
-  if (!ex) return os << "NONE";
-
-  try
-  {
-    std::rethrow_exception(ex);
-  }
-  catch(const std::exception& e)
-  {
-    os << e.what();
-  }
-  catch (...)
-  {
-    os << "unknown exception";
-  }
-  return os;
-}
-
 std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt)
 {
   if (!evt) return os << "NONE";
 
+  std::string exceptionStr("NONE");
+  if (evt.GetThrowable())
+  {
+    try
+    {
+      std::rethrow_exception(evt.GetThrowable());
+    }
+    catch (const std::exception& e)
+    {
+      exceptionStr = e.what();
+    }
+    catch (...)
+    {
+      exceptionStr = "unknown exception";
+    }
+  }
+
   os << evt.GetType() << "\n " 
       << evt.GetMessage() << "\n " 
       << evt.GetBundle() << "\n Exception: " 
-      << evt.GetThrowable();
+      << exceptionStr;
   return os;
 }
 

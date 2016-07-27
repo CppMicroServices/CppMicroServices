@@ -804,6 +804,7 @@ private:
   template<class S, class T> friend class ServiceTracker;
   template<class S, class TTT> friend class ServiceTrackerPrivate;
   template<class S, class TTT> friend class TrackedService;
+  friend class BundleResource;
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code

@@ -24,6 +24,7 @@
 #define USLOG_P_H
 
 #include <usCoreConfig.h>
+#include <usThreads_p.h>
 
 #include <iostream>
 #include <sstream>
@@ -32,10 +33,10 @@
 
 namespace us {
 
-class LogSink : public std::enable_shared_from_this<LogSink> 
+class LogSink : public MultiThreaded<>, public std::enable_shared_from_this<LogSink> 
 {
 public:
-  explicit LogSink(std::ostream* sink, bool enable = false) : _enable(enable), _sink_lock(), _sink(sink) 
+  explicit LogSink(std::ostream* sink, bool enable = false) : _enable(enable), _sink(sink) 
   {
     if (_sink == nullptr) _enable = false;
   }
@@ -50,14 +51,13 @@ public:
   void Log(const std::string& msg)
   {
     if (!_enable) return;
-    std::lock_guard<std::mutex> lock(_sink_lock);
+    auto l = Lock(); US_UNUSED(1);
     *_sink << msg;
   }
 
 private:
   bool _enable;
-  std::mutex _sink_lock;
-  std::ostream* _sink;
+  std::ostream* const _sink;
 };
 
 struct LogMsg {

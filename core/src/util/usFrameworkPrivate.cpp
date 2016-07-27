@@ -31,8 +31,12 @@ limitations under the License.
 namespace us {
 
 FrameworkPrivate::FrameworkPrivate(CoreBundleContext* fwCtx)
-    : BundlePrivate(fwCtx), stopEvent{ true, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), nullptr }
+    : BundlePrivate(fwCtx)
 {
+    // default the internal framework event to what should be
+    // returned if a client calls WaitForStop while this
+    // framework is not in an active, starting or stopping state.
+    stopEvent = FrameworkEventInternal{ true, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), nullptr };
 }
 
 void FrameworkPrivate::DoInit()
@@ -169,8 +173,6 @@ void FrameworkPrivate::Shutdown(bool restart)
   case Bundle::STATE_STOPPING:
     // Shutdown already inprogress
     break;
-  default:
-      throw std::runtime_error("Framework in unknown state during stop.");
   }
 }
 

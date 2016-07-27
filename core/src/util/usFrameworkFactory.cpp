@@ -27,14 +27,6 @@
 
 namespace us {
 
-FrameworkFactory::FrameworkFactory(void)
-{
-}
-
-FrameworkFactory::~FrameworkFactory(void)
-{
-}
-
 Framework FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration, std::ostream* logger)
 {
   auto fwCtx = std::shared_ptr<CoreBundleContext>(new CoreBundleContext(configuration, logger));

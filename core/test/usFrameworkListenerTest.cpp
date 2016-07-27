@@ -144,10 +144,16 @@ void testAddRemoveFrameworkListener()
   US_TEST_CONDITION(count == 1, "Test listener addition");
   
   fCtx.RemoveFrameworkListener(fl);
+  // note: The Framework STARTED event is only sent once. Stop and Start the framework to generate another one.
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
+
+  f.Init();
+  fCtx = f.GetBundleContext();
   fCtx.AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
   f.Start();
   US_TEST_CONDITION(l.CheckEvents(std::vector<FrameworkEvent>{FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started")}), "Test listener addition");
-  US_TEST_CONDITION(count == 1, "Test listener was succefully removed");
+  US_TEST_CONDITION(count == 1, "Test listener was successfully removed");
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 
@@ -259,7 +265,12 @@ void testFrameworkListenerThrowingInvariant()
   US_TEST_CONDITION(fwk_error_received, "Test that a Framework ERROR event was received from a throwing service listener");
   f.GetBundleContext().RemoveServiceListener(sl);
 
+  // note: The Framework STARTED event is only sent once. Stop and Start the framework to generate another one.
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
+
   // Test #3 - test framework event listener
+  f.Init();
   fwk_error_received = false;
   exception_string = "whoopsie!";
   TestFrameworkListener l;
@@ -272,6 +283,7 @@ void testFrameworkListenerThrowingInvariant()
 
 }
 
+#ifdef US_ENABLE_THREADING_SUPPORT
 void testDeadLock()
 {
   // test for deadlocks during Framework API re-entry from a Framework Listener callback
@@ -298,6 +310,7 @@ void testDeadLock()
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
+#endif
 
 } // end anonymous namespace
 
@@ -314,7 +327,7 @@ int usFrameworkListenerTest(int /*argc*/, char* /*argv*/[])
   );
 
   /*
-    @note Framework events will be sent like bundle and service events; synchronously.
+    @note Framework events will be sent like service events; synchronously.
           Framework events SHOULD be delivered asynchronously (see OSGi spec), however that's not yet supported.
     @todo test asynchronous event delivery once its supported.
   */
@@ -323,7 +336,9 @@ int usFrameworkListenerTest(int /*argc*/, char* /*argv*/[])
   testAddRemoveFrameworkListener();
   testFrameworkListenersAfterFrameworkStop();
   testFrameworkListenerThrowingInvariant();
+#ifdef US_ENABLE_THREADING_SUPPORT
   testDeadLock();
+#endif
 
   US_TEST_END()
 }

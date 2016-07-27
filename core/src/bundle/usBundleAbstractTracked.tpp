@@ -21,7 +21,7 @@
 =============================================================================*/
 
 #include "usBundleContext.h"
-#include <usLog.h>
+#include <usLog_p.h>
 
 #include <iterator>
 

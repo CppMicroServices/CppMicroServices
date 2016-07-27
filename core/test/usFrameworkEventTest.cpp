@@ -33,10 +33,6 @@
 
 using namespace us;
 
-#ifdef ERROR
-#undef ERROR	//@todo well this is silly. fix this so it isn't required to compile.
-#endif
-
 namespace {
 
 std::string GetMessageFromStdExceptionPtr(const std::exception_ptr ptr)

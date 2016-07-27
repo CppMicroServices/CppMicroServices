@@ -26,8 +26,9 @@
 #include "usBundlePrivate.h"
 #include "usBundleContextPrivate.h"
 #include "usConstants.h"
+#include "usCoreBundleContext_p.h"
 #include "usServiceReferenceBasePrivate.h"
-#include "usLog.h"
+#include "usLog_p.h"
 
 #include <set>
 
@@ -114,8 +115,14 @@ struct UngetHelper
         }
       }
     }
-    catch (const std::exception& )
+    catch (const std::exception& ex)
     {
+      // Make sure that we don't crash if the shared_ptr service object outlives
+      // the BundlePrivate or CoreBundleContext objects.
+      if (!b.expired())
+      {
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetHelper threw an exception. " << ex.what();
+      }
       // don't throw exceptions from the destructor. For an explanation, see:
 	  // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
 	  // Following this rule means that a FrameworkEvent isn't an option here 

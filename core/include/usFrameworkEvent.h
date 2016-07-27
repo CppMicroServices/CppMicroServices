@@ -27,7 +27,6 @@
 #include <memory>
 
 #include "usCoreExport.h"
-#include "usSharedData.h"
 
 US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
@@ -52,14 +51,14 @@ class FrameworkEventData;
 class US_Core_EXPORT FrameworkEvent
 {
 
-  SharedDataPointer<FrameworkEventData> d;
+  std::shared_ptr<FrameworkEventData> d;
 
 public:
 
   /**
    * A type code used to identify the event type for future extendability.
    */
-  enum class Type : unsigned int {
+  enum Type : uint32_t {
 
     /**
      * The Framework has started.
@@ -70,7 +69,7 @@ public:
      * this event is the System Bundle.
      *
      */
-    FRAMEWORK_STARTED	= 0x00000001,
+    FRAMEWORK_STARTED = 0x00000001,
 
     /**
      * The Framework has been started.
@@ -88,7 +87,7 @@ public:
      * There was a warning associated with a bundle.
      *
      */
-    FRAMEWORK_WARNING	= 0x00000010,
+    FRAMEWORK_WARNING = 0x00000010,
 
     /**
      * An informational event has occurred.
@@ -101,26 +100,26 @@ public:
     /**
      * The Framework has been stopped.
      * <p>
-     * The Framework's
-     * \link BundleActivator::Stop(BundleContext*) BundleActivator Stop\endlink method
-     * has been executed.
+     * This event is fired when the Framework has been stopped because of a stop
+     * operation on the system bundle. The source of this event is the System
+     * Bundle.
      */
-    FRAMEWORK_STOPPED	= 0x00000040,
+    FRAMEWORK_STOPPED = 0x00000040,
 
     /**
      * The Framework is about to be stopped.
      * <p>
-     * The Framework's
-     * \link BundleActivator::Stop(BundleContext*) BundleActivator Stop\endlink method
-     * is about to be called.
+     * This event is fired when the Framework has been stopped because of an
+     * update operation on the system bundle. The Framework will be restarted
+     * after this event is fired. The source of this event is the System Bundle.
      */
     FRAMEWORK_STOPPED_UPDATE = 0x00000080,
 
     /**
      * The Framework did not stop before the wait timeout expired. 
-	 * <p>
-	 * This event is fired when the Framework did not stop before the wait timeout expired. 
-	 * The source of this event is the System Bundle.
+     * <p>
+     * This event is fired when the Framework did not stop before the wait timeout expired. 
+     * The source of this event is the System Bundle.
      */
     FRAMEWORK_WAIT_TIMEDOUT	= 0x00000200
 
@@ -131,13 +130,14 @@ public:
    */
   FrameworkEvent();
 
-  ~FrameworkEvent();
-
   /**
    * Returns <code>false</code> if the FrameworkEvent is empty (i.e invalid) and
    * <code>true</code> if the FrameworkEvent is not null and contains valid data.
+   *
+   * @return <code>true</code> if this event object is valid,
+   *         <code>false</code> otherwise.
    */
-  bool operator!() const;
+  explicit operator bool() const;
 
   /**
    * Creates a Framework event of the specified type.
@@ -148,10 +148,6 @@ public:
    * @param exception The exception associated with this event. Should be nullptr if there is no exception.
    */
   FrameworkEvent(Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception = nullptr);
-
-  FrameworkEvent(const FrameworkEvent& other);
-
-  FrameworkEvent& operator=(const FrameworkEvent& other);
 
   /**
    * Returns the bundle associated with the event.
@@ -177,7 +173,7 @@ public:
   std::exception_ptr GetThrowable() const;
 
   /**
-   * Returns the type of lifecyle event. The type values are:
+   * Returns the type of framework event. The type values are:
    * <ul>
    * <li>{@link #FRAMEWORK_STARTED}
    * <li>{@link #FRAMEWORK_ERROR}
@@ -199,7 +195,6 @@ public:
  * @{
  */
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType);
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const std::exception_ptr ex);
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt);
 US_Core_EXPORT bool operator==(const FrameworkEvent& rhs, const FrameworkEvent& lhs);
 /** @}*/

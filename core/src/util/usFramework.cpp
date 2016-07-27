@@ -73,7 +73,7 @@ void Framework::Start()
       d->operation = BundlePrivate::OP_ACTIVATING;
       break;
     case STATE_ACTIVE:
-      break;
+      return;
     default:
       std::stringstream ss;
       ss << d->state;

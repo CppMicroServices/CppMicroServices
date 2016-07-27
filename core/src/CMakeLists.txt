@@ -64,7 +64,7 @@ set(_srcs
 set(_private_headers
   util/usFrameworkPrivate.h
   util/usLDAPExpr_p.h
-  util/usLog.h
+  util/usLog_p.h
   util/usProperties_p.h
   util/usThreads_p.h
   util/usUtils_p.h

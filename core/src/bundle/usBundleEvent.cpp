@@ -60,7 +60,7 @@ BundleEvent::BundleEvent()
 
 BundleEvent::operator bool() const
 {
-  return !d;
+  return d.operator bool();
 }
 
 BundleEvent::BundleEvent(Type type, const Bundle& bundle)
@@ -77,16 +77,19 @@ BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
 
 Bundle BundleEvent::GetBundle() const
 {
+  if (!d) return Bundle{};
   return MakeBundle(d->bundle);
 }
 
 BundleEvent::Type BundleEvent::GetType() const
 {
+  if (!d) return BundleEvent::Type::BUNDLE_UNINSTALLED;
   return d->type;
 }
 
 Bundle BundleEvent::GetOrigin() const
 {
+  if (!d) return Bundle{};
   return MakeBundle(d->origin);
 }
 

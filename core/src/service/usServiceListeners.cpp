@@ -78,8 +78,7 @@ void ServiceListeners::Clear()
     cache[1].clear();
   }
 
-  std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
-  FrameworkListenerMap.clear();
+  frameworkListenerMap.Lock(), frameworkListenerMap.value.clear();
 }
 
 void ServiceListeners::AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
@@ -140,8 +139,8 @@ void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextP
 
 void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
-  std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
-  auto& listeners = FrameworkListenerMap[context];
+  auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+  auto& listeners = frameworkListenerMap.value[context];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
 	listeners.push_back(std::make_pair(listener, data));
@@ -150,12 +149,12 @@ void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextP
 
 void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
-  std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
-  auto& listeners = FrameworkListenerMap[context];
+  auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+  auto& listeners = frameworkListenerMap.value[context];
   auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
   if (it != listeners.end())
   {
-    FrameworkListenerMap[context].erase(it);
+    frameworkListenerMap.value[context].erase(it);
   }
 }
 
@@ -166,8 +165,8 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
   // A lock shouldn't be held while calling into user code (e.g. callbacks).
   FrameworkListeners listener_snapshot;
   {
-    std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
-    listener_snapshot = FrameworkListenerMap;
+    auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+    listener_snapshot = frameworkListenerMap.value;
   }
 
   for (auto& listeners : listener_snapshot)
@@ -247,8 +246,8 @@ void ServiceListeners::RemoveAllListeners(const std::shared_ptr<BundleContextPri
   }
 
   {
-    std::lock_guard<std::mutex> lock(frameworkListenerMapMutex);
-    FrameworkListenerMap.erase(context);
+    auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+    frameworkListenerMap.value.erase(context);
   }
 }
 

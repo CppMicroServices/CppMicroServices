@@ -25,7 +25,9 @@
 
 #include "usBundleArchive_p.h"
 #include "usBundleResourceContainer_p.h"
-#include "usLog.h"
+
+#include "usGetBundleContext.h"
+#include "usLog_p.h"
 
 #include <string>
 #include <atomic>
@@ -281,14 +283,21 @@ void* BundleResource::GetData() const
 {
   if (!IsValid()) return nullptr;
 
-  return d->archive->GetResourceContainer()->GetData(d->stat.index);
+  void* data = d->archive->GetResourceContainer()->GetData(d->stat.index);
+  if (data == nullptr)
+  {
+    auto sink = GetBundleContext().GetLogSink();
+    DIAG_LOG(*sink) << "Error uncompressing resource data for " 
+                    << this->GetResourcePath() << " from "
+                    << d->archive->GetBundleLocation();
+  }
+
+  return data;
 }
 
-}
-
-std::ostream& operator<<(std::ostream& os, const us::BundleResource& resource)
+std::ostream& operator<<(std::ostream& os, const BundleResource& resource)
 {
-	return os << resource.GetResourcePath();
+  return os << resource.GetResourcePath();
 }
 
-
+}

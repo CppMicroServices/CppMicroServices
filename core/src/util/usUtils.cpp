@@ -24,7 +24,7 @@
 
 #include "usCoreBundleContext_p.h"
 #include "usFramework.h"
-#include "usLog.h"
+#include "usLog_p.h"
 #include "usBundle.h"
 #include "usBundleContext.h"
 

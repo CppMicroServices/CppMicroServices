@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include <usLog.h>
+#include <usLog_p.h>
 
 #include "usTestingMacros.h"
 
@@ -123,6 +123,7 @@ void testLogRedirection()
   US_TEST_CONDITION_REQUIRED(std::string::npos != local_cerr_buffer.str().find(test_log_output.str()), "Test redirected std::cerr log sink.");
 }
 
+#ifdef US_ENABLE_THREADING_SUPPORT
 // hammer the logger from multiple threads. A failure in
 // thread safety will most likely manifest as either a crash 
 // or the output validation will see splicing of log lines.
@@ -198,6 +199,7 @@ void testLogMultiThreaded()
   US_TEST_CONDITION_REQUIRED(count == expected_num_matches, "Test for expected number of matches");
 #endif
 }
+#endif
 
 int usLogTest(int /*argc*/, char* /*argv*/[])
 {
@@ -206,7 +208,8 @@ int usLogTest(int /*argc*/, char* /*argv*/[])
   testDefaultLogMessages();
   testLogDisabled();
   testLogRedirection();
+#ifdef US_ENABLE_THREADING_SUPPORT
   testLogMultiThreaded();
-
+#endif
   US_TEST_END()
 }

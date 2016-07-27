@@ -42,6 +42,7 @@ set(_tests
   usLDAPFilterTest
   usLDAPQueryTest
   usLogTest
+  usBundleEventTest
   usBundleHooksTest
   usBundleManifestTest
   usBundleTest

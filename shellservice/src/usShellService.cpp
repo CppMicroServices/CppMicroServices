@@ -27,7 +27,6 @@
 #include "usBundleContext.h"
 #include "usBundleResource.h"
 #include "usBundleResourceStream.h"
-#include "usLog.h"
 
 #include "scheme.h"
 #include "scheme-private.h"

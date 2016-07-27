@@ -251,7 +251,7 @@ void Bundle::Uninstall()
 
 BundleContext Bundle::GetBundleContext() const
 {
-  return MakeBundleContext(d->bundleContext.Load()->shared_from_this());
+  return MakeBundleContext(d->bundleContext.Load());
 }
 
 long Bundle::GetBundleId() const

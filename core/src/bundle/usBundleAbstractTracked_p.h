@@ -278,7 +278,7 @@ private:
    */
   std::atomic<int> trackingCount;
 
-  BundleContext* bc;
+  BundleContext* const bc;
 
   bool CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParmType>& custom);
 

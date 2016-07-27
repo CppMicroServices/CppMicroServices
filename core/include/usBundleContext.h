@@ -809,7 +809,7 @@ private:
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code
   // to log diagnostic information. 
-  std::shared_ptr<LogSink> GetLogSink();
+  std::shared_ptr<LogSink> GetLogSink() const;
 
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);

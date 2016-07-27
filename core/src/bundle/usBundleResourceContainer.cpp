@@ -29,6 +29,7 @@
 #include <climits>
 #include <cassert>
 #include <sstream>
+#include <stdexcept>
 
 namespace us {
 

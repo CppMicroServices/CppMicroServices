@@ -375,6 +375,7 @@ void TestListenerFunctors()
   bundleA.Stop();
 }
 
+
 void TestBundleStates()
 {
     TestBundleListener listener;
@@ -388,9 +389,30 @@ void TestBundleStates()
 
     auto frameworkCtx = framework.GetBundleContext();
     frameworkCtx.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
-
+  
+    // Test Start -> Stop for auto-installed bundles
+    auto bundles = frameworkCtx.GetBundles();
+    for (auto& bundle : bundles)
+    {
+      if (bundle != framework)
+      {
+        US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
+        bundle.Start();
+        US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
+        bundle.Stop();
+        US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+      }
+    }
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");
+    bundleEvents.clear();
+  
+#ifdef US_BUILD_SHARED_LIBS    // following combination can be tested only for shared library builds
     Bundle bundle;
-
     // Test install -> uninstall
     // expect 2 event (BUNDLE_INSTALLED, BUNDLE_UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
@@ -403,11 +425,8 @@ void TestBundleStates()
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
 
-    bool relaxed = false;
-  #ifndef US_BUILD_SHARED_LIBS
-    relaxed = true;
-  #endif
-    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, relaxed), "Test for unexpected events");
+
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");
     bundleEvents.clear();
 
     // Test install -> start -> uninstall
@@ -470,6 +489,7 @@ void TestBundleStates()
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
     bundleEvents.clear();
+#endif
 }
 
 void TestForInstallFailure()
@@ -552,6 +572,10 @@ void TestAutoInstallEmbeddedBundles()
   // There are atleast 2 bundles, maybe more depending on how the executable is created
   US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #endif
+  auto bundle = frameworkCtx.GetBundles();
+  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
+  bundle[0].Uninstall();
+  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
   f.Stop();
 }
 

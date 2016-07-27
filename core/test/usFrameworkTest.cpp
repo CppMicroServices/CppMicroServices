@@ -159,7 +159,11 @@ namespace
 
         // Test that all bundles in the Start state are stopped when the framework is stopped.
         f.Start();
+#if defined(US_BUILD_SHARED_LIBS)
         auto bundle = testing::InstallLib(f.GetBundleContext(), "TestBundleA");
+#else
+        auto bundle = testing::GetBundle("TestBundleA", f.GetBundleContext());
+#endif
         US_TEST_CONDITION_REQUIRED(bundle, "Non-null bundle")
         bundle.Start();
 

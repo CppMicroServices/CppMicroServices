@@ -150,12 +150,10 @@ void frame030b(BundleContext context, TestBundleListener& listener)
 }
 
 // Uninstall libB and check for correct events
+#ifdef US_BUILD_SHARED_LIBS
 void frame040c(BundleContext context, TestBundleListener& listener)
 {
-  bool relaxed = false;
-#ifndef US_BUILD_SHARED_LIBS
-  relaxed = true;
-#endif
+    bool relaxed = false;
 
     auto bundleB = testing::GetBundle("TestBundleB", context);
     US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
@@ -176,11 +174,8 @@ void frame040c(BundleContext context, TestBundleListener& listener)
 
     // Install the same lib again, we should get TestBundleB again
     auto bundles = context.InstallBundles(bundleImportedByB.GetLocation());
-#ifdef US_BUILD_SHARED_LIBS
+
     std::size_t installCount = 2;
-#else
-    std::size_t installCount = bundleCount - 1; // minus system_bundle
-#endif
     US_TEST_CONDITION(bundles.size() == installCount, "Test for re-install of TestBundleB")
 
     long oldId = bundleB.GetBundleId();
@@ -204,6 +199,7 @@ void frame040c(BundleContext context, TestBundleListener& listener)
 
     US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 }
+#endif
 
 } // end unnamed namespace
 
@@ -230,7 +226,11 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
 
     frame020a(context, listener);
     frame030b(context, listener);
+#ifdef US_BUILD_SHARED_LIBS 
+    // bundles in the executable are auto-installed.
+    // install and uninstall on embedded bundles is not allowed.
     frame040c(context, listener);
+#endif
   }
 
   US_TEST_END()

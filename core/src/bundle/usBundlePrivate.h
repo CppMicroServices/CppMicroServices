@@ -32,6 +32,7 @@
 #include "usThreads_p.h"
 #include "usWaitCondition_p.h"
 
+#include <ostream>
 #include <thread>
 #include <memory>
 

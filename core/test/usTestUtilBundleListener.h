@@ -31,8 +31,6 @@
 
 namespace us {
 
-class BundleContext;
-
 class TestBundleListener {
 
 public:

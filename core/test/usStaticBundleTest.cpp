@@ -213,7 +213,6 @@ int usStaticBundleTest(int /*argc*/, char* /*argv*/[])
 
   FrameworkFactory factory;
   std::map<std::string, Any> frameworkConfig;
-  //frameworkConfig[Constants::FRAMEWORK_LOG_LEVEL] = 0;
   auto framework = factory.NewFramework(frameworkConfig);
   framework.Start();
 

@@ -165,7 +165,7 @@ ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle, const std::stri
   {
     std::vector<ServiceReferenceBase> srs;
     Get_unlocked(clazz, "", bundle, srs);
-    US_DEBUG << "get service ref " << clazz << " for bundle "
+    DIAG_LOG(*core->sink) << "get service ref " << clazz << " for bundle "
              << bundle->symbolicName << " = " << srs.size() << " refs";
 
     if (!srs.empty())

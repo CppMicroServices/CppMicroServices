@@ -50,7 +50,7 @@ ServiceEvent::ServiceEvent()
 
 ServiceEvent::operator bool() const
 {
-  return !d;
+  return d.operator bool();
 }
 
 ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)

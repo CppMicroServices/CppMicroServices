@@ -32,7 +32,9 @@
 #include "usBundleRegistry_p.h"
 #include "usDebug_p.h"
 #include "usAny.h"
+#include "usLog_p.h"
 
+#include <ostream>
 #include <string>
 #include <map>
 
@@ -67,6 +69,20 @@ public:
    * Id to use for next instance of the framework.
    */
   static std::atomic<int> globalId;
+
+  /*
+  * Framework properties, which contain both the
+  * launch properties and the system properties.
+  * See OSGi spec revision 6, section 4.2.2
+  */
+  std::map<std::string, Any> frameworkProperties;
+
+ /**
+  * The diagnostic logging sink
+  * For internal Framework use only. Do not expose
+  * to Framework clients.
+  */
+  std::shared_ptr<LogSink> sink;
 
   /**
    * Debug handle.
@@ -134,13 +150,6 @@ public:
    */
   int initCount;
 
-  /*
-   * Framework properties, which contain both the
-   * launch properties and the system properties.
-   * See OSGi spec revision 6, section 4.2.2
-   */
-  std::map<std::string, Any> frameworkProperties;
-
   std::shared_ptr<FrameworkPrivate> systemBundle;
 
   ~CoreBundleContext();
@@ -167,7 +176,7 @@ private:
    * Construct a core context
    *
    */
-  CoreBundleContext(const std::map<std::string, Any>& props);
+  CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger);
 
 };
 

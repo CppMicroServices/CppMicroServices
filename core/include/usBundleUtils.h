@@ -30,8 +30,6 @@
 
 namespace us {
 
-struct BundleInfo;
-
 namespace BundleUtils
 {
   /**
@@ -50,6 +48,8 @@ namespace BundleUtils
    * @param bundleName The name of the bundle defining the symbol.
    * @param libLocation The absolute file location of the bundle defining the symbol.
    * @param symbol The symbol name to look for.
+   * @return the address of the \c symbol. A <code>nullptr</code> if the symbol
+   *         wasn't found.
    */
   US_Core_EXPORT void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol);
 }

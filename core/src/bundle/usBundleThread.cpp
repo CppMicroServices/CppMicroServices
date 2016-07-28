@@ -25,6 +25,7 @@
 #include "usBundleActivator.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
+#include "usFrameworkEvent.h"
 
 #include <future>
 
@@ -43,6 +44,11 @@ BundleThread::BundleThread(CoreBundleContext* ctx)
   , doRun(true)
 {
   th.v = std::thread(&BundleThread::Run, this);
+}
+
+BundleThread::~BundleThread()
+{
+  Quit();
 }
 
 void BundleThread::Quit()
@@ -110,9 +116,12 @@ void BundleThread::Run()
         break;
       }
     }
-    catch (const std::exception& e)
+    catch (const std::exception& )
     {
-      US_ERROR << bundle->symbolicName << ": " << e.what();
+      fwCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, 
+                                                            MakeBundle(bundle->shared_from_this()), 
+                                                            bundle->symbolicName, 
+                                                            std::current_exception()));
     }
 
     op.operation = OP_IDLE;
@@ -200,7 +209,6 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
       (timeout || uninstall))
   {
     // BundleThread is still in BundleActivator::Start/::Stop,
-
     // signal to BundleThread that this
     // thread is acting on uninstall/time-out
     b->aborted = static_cast<uint8_t>(BundlePrivate::Aborted::YES);
@@ -209,8 +217,8 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
     std::string reason = timeout ? "Time-out during bundle " + opType + "()"
                                  : "Bundle uninstalled during " + opType + "()";
 
-    US_INFO << "bundle thread aborted during " << opType
-            << " of bundle #" << b->id;
+    DIAG_LOG(*b->coreCtx->sink) << "bundle thread aborted during " << opType
+                                << " of bundle #" << b->id;
 
     if (timeout)
     {

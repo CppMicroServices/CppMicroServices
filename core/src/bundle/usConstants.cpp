@@ -48,7 +48,7 @@ const std::string FRAMEWORK_STORAGE                   = "org.cppmicroservices.fr
 const std::string FRAMEWORK_STORAGE_CLEAN             = "org.cppmicroservices.framework.storage.clean";
 const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT = "onFirstInit";
 const std::string FRAMEWORK_THREADING_SUPPORT         = "org.cppmicroservices.framework.threading.support";
-const std::string FRAMEWORK_LOG_LEVEL                 = "org.cppmicroservices.framework.log.level";
+const std::string FRAMEWORK_LOG                       = "org.cppmicroservices.framework.log";
 const std::string FRAMEWORK_UUID                      = "org.cppmicroservices.framework.uuid";
 
 const std::string OBJECTCLASS                         = "objectclass";

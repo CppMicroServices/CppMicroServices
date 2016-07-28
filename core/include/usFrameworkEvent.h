@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,15 +23,13 @@
 #ifndef USFRAMEWORKEVENT_H
 #define USFRAMEWORKEVENT_H
 
-#include "usCoreExport.h"
-#include "usSharedData.h"
-
+#include <iostream>
 #include <memory>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
+#include "usCoreExport.h"
+
+US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+
 
 namespace us {
 
@@ -41,22 +39,26 @@ class FrameworkEventData;
 /**
  * \ingroup MicroServices
  *
- * A general event from the Framework.
- *
+ * An event from the Micro Services framework describing a Framework event.
  * <p>
- * FrameworkEvent objects are delivered to {@code FrameworkListener}s
- * when a general event occurs within the CppMicroServices environment.
+ * <code>FrameworkEvent</code> objects are delivered to listeners connected
+ * via BundleContext::AddFrameworkListener() when an event occurs within the
+ * Framework which a user would be interested in. A <code>Type</code> code 
+ * is used to identify the event type for future extendability.
  *
- * @see FrameworkListener
+ * @see BundleContext#AddFrameworkListener
  */
 class US_Core_EXPORT FrameworkEvent
 {
 
-  SharedDataPointer<FrameworkEventData> d;
+  std::shared_ptr<FrameworkEventData> d;
 
 public:
 
-  enum Type {
+  /**
+   * A type code used to identify the event type for future extendability.
+   */
+  enum Type : uint32_t {
 
     /**
      * The Framework has started.
@@ -67,13 +69,14 @@ public:
      * this event is the System Bundle.
      *
      */
-    FRAMEWORK_STARTED	= 0x00000001,
+    FRAMEWORK_STARTED = 0x00000001,
 
     /**
-     * An error has occurred.
-     *
+     * The Framework has been started.
      * <p>
-     * There was an error associated with a bundle.
+     * The Framework's
+     * \link BundleActivator::Start(BundleContext*) BundleActivator Start\endlink method
+     * has been executed.
      */
     FRAMEWORK_ERROR	= 0x00000002,
 
@@ -84,7 +87,7 @@ public:
      * There was a warning associated with a bundle.
      *
      */
-    FRAMEWORK_WARNING	= 0x00000010,
+    FRAMEWORK_WARNING = 0x00000010,
 
     /**
      * An informational event has occurred.
@@ -95,18 +98,16 @@ public:
     FRAMEWORK_INFO = 0x00000020,
 
     /**
-     * The Framework has stopped.
-     *
+     * The Framework has been stopped.
      * <p>
      * This event is fired when the Framework has been stopped because of a stop
      * operation on the system bundle. The source of this event is the System
      * Bundle.
      */
-    FRAMEWORK_STOPPED	= 0x00000040,
+    FRAMEWORK_STOPPED = 0x00000040,
 
     /**
-     * The Framework has stopped during update.
-     *
+     * The Framework is about to be stopped.
      * <p>
      * This event is fired when the Framework has been stopped because of an
      * update operation on the system bundle. The Framework will be restarted
@@ -115,11 +116,10 @@ public:
     FRAMEWORK_STOPPED_UPDATE = 0x00000080,
 
     /**
-     * The Framework did not stop before the wait timeout expired.
-     *
+     * The Framework did not stop before the wait timeout expired. 
      * <p>
-     * This event is fired when the Framework did not stop before the wait
-     * timeout expired. The source of this event is the System Bundle.
+     * This event is fired when the Framework did not stop before the wait timeout expired. 
+     * The source of this event is the System Bundle.
      */
     FRAMEWORK_WAIT_TIMEDOUT	= 0x00000200
 
@@ -130,50 +130,50 @@ public:
    */
   FrameworkEvent();
 
-  ~FrameworkEvent();
-
   /**
-   * Can be used to check if this FrameworkEvent instance is valid,
-   * or if it has been constructed using the default constructor.
+   * Returns <code>false</code> if the FrameworkEvent is empty (i.e invalid) and
+   * <code>true</code> if the FrameworkEvent is not null and contains valid data.
    *
    * @return <code>true</code> if this event object is valid,
    *         <code>false</code> otherwise.
    */
-  bool IsNull() const;
-
-  FrameworkEvent(const FrameworkEvent& other);
-
-  FrameworkEvent& operator=(const FrameworkEvent& other);
+  explicit operator bool() const;
 
   /**
-   * Creates a Framework event regarding the specified bundle.
+   * Creates a Framework event of the specified type.
    *
    * @param type The event type.
-   * @param bundle The event source.
-   * @param throwable The related exception. This argument may be {@code null}
-   *        if there is no related exception.
+   * @param bundle The bundle associated with the event. This bundle is also the source of the event.
+   * @param message The message associated with the event.
+   * @param exception The exception associated with this event. Should be nullptr if there is no exception.
    */
-  FrameworkEvent(Type type, const Bundle& bundle, const std::exception_ptr& e);
+  FrameworkEvent(Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception = nullptr);
 
   /**
-   * Returns the exception related to this event.
-   *
-   * @return The related exception or {@code null} if none.
-   */
-  std::exception_ptr GetException() const;
-
-  /**
-   * Returns the bundle associated with the event. This bundle is also the
-   * source of the event.
+   * Returns the bundle associated with the event.
    *
    * @return The bundle associated with the event.
    */
   Bundle GetBundle() const;
 
   /**
-   * Returns the type of framework event.
-   * <p>
-   * The type values are:
+   * Returns the message associated with the event.
+   *
+   *@return the message associated with the event.
+   */
+  std::string GetMessage() const;
+
+  /**
+   * Returns the exception associated with this event.
+   *
+   * @remarks Use <code>std::rethrow_exception</code> to throw the exception returned.
+   *
+   * @return The exception. May be <code>nullptr</code> if there is no related exception.
+   */
+  std::exception_ptr GetThrowable() const;
+
+  /**
+   * Returns the type of framework event. The type values are:
    * <ul>
    * <li>{@link #FRAMEWORK_STARTED}
    * <li>{@link #FRAMEWORK_ERROR}
@@ -184,7 +184,7 @@ public:
    * <li>{@link #FRAMEWORK_WAIT_TIMEDOUT}
    * </ul>
    *
-   * @return The type of state change.
+   * @return The type of Framework event.
    */
   Type GetType() const;
 
@@ -195,13 +195,12 @@ public:
  * @{
  */
 US_Core_EXPORT std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType);
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEvent& event);
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt);
+US_Core_EXPORT bool operator==(const FrameworkEvent& rhs, const FrameworkEvent& lhs);
 /** @}*/
 
 }
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+US_MSVC_POP_WARNING
 
 #endif // USFRAMEWORKEVENT_H

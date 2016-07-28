@@ -25,7 +25,8 @@
 #include <usBundleImport.h>
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
-#include <usLog.h>
+
+#include <iostream>
 
 namespace us {
 
@@ -47,7 +48,7 @@ public:
   void Start(BundleContext context)
   {
     s = std::make_shared<TestBundleB>();
-    US_INFO << "Registering TestBundleBService";
+    std::cout << "Registering TestBundleBService";
     sr = context.RegisterService<TestBundleBService>(s);
   }
 

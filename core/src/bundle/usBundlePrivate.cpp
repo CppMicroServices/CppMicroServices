@@ -27,14 +27,15 @@
 #include "usBundleContext.h"
 #include "usBundleContextPrivate.h"
 #include "usBundleActivator.h"
-#include "usBundleUtils_p.h"
 #include "usBundleResource.h"
 #include "usBundleResourceContainer_p.h"
 #include "usBundleResourceStream.h"
 #include "usBundleThread_p.h"
+#include "usBundleUtils.h"
 #include "usCoreBundleContext_p.h"
 #include "usFragment_p.h"
 #include "usFramework.h"
+#include "usFrameworkEvent.h"
 #include "usServiceRegistration.h"
 #include "usServiceReferenceBasePrivate.h"
 
@@ -303,20 +304,21 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
         }
       }
     }
-    catch (const std::exception& e)
+    catch (const std::exception& )
     {
       resolveFailException = std::current_exception();
-      US_ERROR << e.what();
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
+
       if (trigger != nullptr)
       {
         try
         {
           coreCtx->resolverHooks.EndResolve(trigger);
         }
-        catch (const std::exception& e2)
+        catch (const std::exception& )
         {
           resolveFailException = std::current_exception();
-          US_ERROR << e2.what();
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
         }
       }
     }
@@ -371,7 +373,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
     operation = OP_ACTIVATING;
     if (coreCtx->debug.lazyActivation)
     {
-      US_INFO << "activating #" << id;
+      DIAG_LOG(*coreCtx->sink) << "activating #" << id;
     }
     // 7:
     std::shared_ptr<BundleContextPrivate> null_expected;
@@ -569,7 +571,7 @@ std::exception_ptr BundlePrivate::Start0()
 
   if (coreCtx->debug.lazyActivation)
   {
-    US_INFO << "activating #" << id << " completed.";
+    DIAG_LOG(*coreCtx->sink) << "activating #" << id << " completed.";
   }
 
   if (res == nullptr)
@@ -704,7 +706,7 @@ BundlePrivate::BundlePrivate(
       }
       catch (const std::exception& e)
       {
-        US_ERROR << "Parsing of manifest.json for bundle " << symbolicName << " at " << location << " failed: " << e.what();
+        throw std::runtime_error(std::string("Parsing of manifest.json for bundle ") + symbolicName + " at " + location + " failed: " + e.what());
       }
     }
   }

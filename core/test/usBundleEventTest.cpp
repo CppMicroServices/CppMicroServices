@@ -73,8 +73,8 @@ int usBundleEventTest(int /*argc*/, char* /*argv*/[])
   dup_valid_event = invalid_event;
   US_TEST_CONDITION_REQUIRED((dup_valid_event == invalid_event), "Test BundleEvent copy assignment");
 
-  dup_valid_event = std::move(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, f));
-  US_TEST_CONDITION_REQUIRED(!(dup_valid_event == invalid_event), "Test BundleEvent std::move");
+  dup_valid_event = BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, f);
+  US_TEST_CONDITION_REQUIRED(!(dup_valid_event == invalid_event), "Test BundleEvent move");
 
   US_TEST_END()
 }

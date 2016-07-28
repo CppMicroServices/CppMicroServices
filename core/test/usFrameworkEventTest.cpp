@@ -130,7 +130,7 @@ int usFrameworkEventTest(int /*argc*/, char* /*argv*/[])
   dup_error_event = invalid_event;
   US_TEST_CONDITION_REQUIRED(!(dup_error_event == error_event), "Test copy assignment");
 
-  dup_error_event = std::move(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, ""));
+  dup_error_event = FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, "");
   US_TEST_CONDITION_REQUIRED(!(dup_error_event == error_event), "Test move");
 
   US_TEST_END()

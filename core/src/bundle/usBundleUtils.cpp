@@ -71,8 +71,7 @@ namespace us {
 // Private util function to return system bundle's log sink
 std::shared_ptr<LogSink> GetFrameworkLogSink()
 {
-  auto sink = GetBundleContext().GetLogSink();
-  return sink;
+  return GetBundleContext().GetLogSink();
 }
 
 namespace BundleUtils

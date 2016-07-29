@@ -251,7 +251,11 @@ void testFrameworkListenerThrowingInvariant()
   // Test #1 - test bundle event listener
   auto bl = [](const BundleEvent&) { throw std::runtime_error("bad callback"); };
   f.GetBundleContext().AddBundleListener(bl);
-  auto bundleA2 = testing::InstallLib(f.GetBundleContext(), "TestBundleA2");    // generate a bundle event
+  auto bundleA2 = testing::InstallLib(f.GetBundleContext(), "TestBundleA2");    // generate a bundle event for shared libs
+#ifndef US_BUILD_SHARED_LIBS
+  US_TEST_CONDITION(bundleA2, "TestBundleA2 bundle not found");
+  bundleA2.Start(); // since bundles are auto-installed, start the bundle to generate a bundle event
+#endif
   US_TEST_CONDITION(fwk_error_received, "Test that a Framework ERROR event was received from a throwing bundle listener");
   f.GetBundleContext().RemoveBundleListener(bl);
 

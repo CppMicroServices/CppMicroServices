@@ -31,7 +31,7 @@
 #include "usBundleResourceContainer_p.h"
 #include "usBundleResourceStream.h"
 #include "usBundleThread_p.h"
-#include "usBundleUtils.h"
+#include "usBundleUtils_p.h"
 #include "usCoreBundleContext_p.h"
 #include "usFragment_p.h"
 #include "usFramework.h"

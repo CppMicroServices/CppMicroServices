@@ -353,7 +353,9 @@ void TestListenerFunctors()
   bundleA.Start();
 
   std::vector<BundleEvent> pEvts;
+#ifdef US_BUILD_SHARED_LIBS
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleA));
+#endif
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleA));
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));

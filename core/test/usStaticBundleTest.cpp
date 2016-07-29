@@ -69,8 +69,10 @@ void frame020a(BundleContext context, TestBundleListener& listener)
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
+#ifdef US_BUILD_SHARED_LIBS
     pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleImportedByB));
+#endif
     pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleB));
     pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleB));

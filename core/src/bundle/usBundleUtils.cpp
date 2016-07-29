@@ -81,10 +81,11 @@ std::string GetExecutablePath()
   std::string execPath;
   uint32_t bufsize = MAXPATHLEN;
   std::unique_ptr<char[]> buf(new char[bufsize]);
+  LogSink sink(&std::cerr, true);
 #if _WIN32
   if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
-    US_DEBUG << "GetModuleFileName failed" << GetLastErrorStr();
+    DIAG_LOG(sink) << "GetModuleFileName failed" << GetLastErrorStr();
     buf[0] = '\0';
   }
 #elif defined(__APPLE__)
@@ -96,7 +97,7 @@ std::string GetExecutablePath()
   }
   if (status != 0)
   {
-    US_DEBUG << "_NSGetExecutablePath() failed";
+     DIAG_LOG(sink) << "_NSGetExecutablePath() failed";
   }
   // the returned path may not be an absolute path
 #elif defined(__linux__)
@@ -108,7 +109,7 @@ std::string GetExecutablePath()
   buf[len] = '\0';
 #else
   // 'dlsym' does not work with symbol name 'main'
-  US_DEBUG << "GetExecutablePath failed";
+  DIAG_LOG(sink) << "GetExecutablePath failed";
 #endif
   return buf.get();
 }
@@ -119,10 +120,8 @@ void* GetSymbol(void* libHandle, const char* symbol)
   if (!addr)
   {
     const char* dlerrorMsg = dlerror();
-    if (dlerrorMsg)
-    {
-      US_DEBUG << "GetSymbol() failed to find (" << symbol << ") with error "<< dlerrorMsg;
-    }
+    LogSink sink(&std::cerr, true);
+    DIAG_LOG(sink) << "GetSymbol() failed to find (" << symbol << ") with error : "<< (dlerrorMsg ? dlerrorMsg : "unknown");
   }
   return addr;
 }

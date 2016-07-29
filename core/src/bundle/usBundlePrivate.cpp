@@ -490,7 +490,7 @@ std::exception_ptr BundlePrivate::Start0()
 
     // save this bundle's context so that it can be accessible anywhere
     // from within this bundle's code.
-    std::string set_bundle_context_func = "_us_set_bundle_context_instance_" + symbolicName;
+    std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
     void* setBundleContextSym = BundleUtils::GetSymbol(libHandle, set_bundle_context_func.c_str());
     std::memcpy(&SetBundleContext, &setBundleContextSym, sizeof(void*));
     if (SetBundleContext)
@@ -499,11 +499,11 @@ std::exception_ptr BundlePrivate::Start0()
     }
 
     // get the create/destroy activator callbacks
-    std::string create_activator_func = "_us_create_activator_" + symbolicName;
+    std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
     void* createActivatorHookSym = BundleUtils::GetSymbol(libHandle, create_activator_func.c_str());
     std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
 
-    std::string destroy_activator_func = "_us_destroy_activator_" + symbolicName;
+    std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
     void* destroyActivatorHookSym = BundleUtils::GetSymbol(libHandle, destroy_activator_func.c_str());
     std::memcpy(&destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
 

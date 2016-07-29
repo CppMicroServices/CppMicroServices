@@ -29,12 +29,9 @@
 #endif
 
 #include <usBundleContext.h>
+#include <usBundleInitialization.h>
 
-#define GETBUNDLECONTEXT_FCNPREFIX _us_get_bundle_context_instance
-#define GETBUNDLECONTEXTINSTANCEFCN(Prefix, BundleName) GETBUNDLECONTEXTINSTANCEFCN_(Prefix, BundleName)
-#define GETBUNDLECONTEXTINSTANCEFCN_(Prefix, BundleName) Prefix##_##BundleName
-
-extern "C" us::BundleContextPrivate* GETBUNDLECONTEXTINSTANCEFCN(GETBUNDLECONTEXT_FCNPREFIX, US_BUNDLE_NAME)();
+extern "C" us::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)();
 
 namespace us {
 
@@ -52,15 +49,8 @@ US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
  */
 static inline BundleContext GetBundleContext()
 {
-  BundleContextPrivate*(*getBundleContextInst)(void) = &(GETBUNDLECONTEXTINSTANCEFCN(GETBUNDLECONTEXT_FCNPREFIX, US_BUNDLE_NAME));
-
-  if (getBundleContextInst)
-  {
-    BundleContextPrivate* ctx = getBundleContextInst();
-    return ctx ? MakeBundleContext(ctx) : BundleContext{};
-  }
-
-  return BundleContext{};
+  auto ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)();
+  return ctx ? MakeBundleContext(ctx) : BundleContext{};
 }
 
 }

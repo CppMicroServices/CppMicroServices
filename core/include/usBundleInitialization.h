@@ -51,17 +51,17 @@ class BundleContextPrivate;
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateBundleInit()</code>.
  */
-#define US_INITIALIZE_BUNDLE                                                                                         \
-  std::atomic<us::BundleContextPrivate*> US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME) {};                 \
-                                                                                                                     \
-  extern "C" us::BundleContextPrivate* US_CONCAT(_us_get_bundle_context_instance_, US_BUNDLE_NAME) ()  \
-  {                                                                                                                  \
-    return US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME).load();                                           \
-  }                                                                                                                  \
-                                                                                                                     \
-  extern "C" US_ABI_EXPORT void US_CONCAT(_us_set_bundle_context_instance_, US_BUNDLE_NAME) (us::BundleContextPrivate* ctx) \
-  {                                                                                                                  \
-    US_CONCAT(_us_bundle_context_instance_, US_BUNDLE_NAME).store(ctx);                                              \
+#define US_INITIALIZE_BUNDLE                                                                    \
+  std::atomic<us::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                         \
+                                                                                                \
+  extern "C" us::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME) ()                       \
+  {                                                                                             \
+    return US_CTX_INS(US_BUNDLE_NAME).load();                                                   \
+  }                                                                                             \
+                                                                                                \
+  extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME) (us::BundleContextPrivate* ctx) \
+  {                                                                                             \
+    US_CTX_INS(US_BUNDLE_NAME).store(ctx);                                                      \
   }
 
 

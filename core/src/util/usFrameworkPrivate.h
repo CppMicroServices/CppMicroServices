@@ -95,6 +95,7 @@ public:
   struct FrameworkEventInternal {
     bool valid;
     FrameworkEvent::Type type;
+    std::string msg;
     std::exception_ptr excPtr;
   } stopEvent;
 

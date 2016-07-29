@@ -8,8 +8,6 @@
 
 #include <usCoreExport.h>
 
-#cmakedefine US_ENABLE_AUTOLOADING_SUPPORT
-
 ///-------------------------------------------------------------------
 // Version information
 //-------------------------------------------------------------------
@@ -19,19 +17,6 @@
 #define US_CORE_PATCH_VERSION @Core_PATCH_VERSION@
 #define US_CORE_VERSION @Core_VERSION@
 #define US_CORE_VERSION_STR "@Core_VERSION@"
-
-
-//-------------------------------------------------------------------
-// Debugging & Logging
-//-------------------------------------------------------------------
-
-#cmakedefine US_ENABLE_DEBUG_OUTPUT
-
-namespace us {
-  enum MsgType { DebugMsg = 0, InfoMsg = 1, WarningMsg = 2, ErrorMsg = 3 };
-  typedef void (*MsgHandler)(MsgType, const char *);
-  US_Core_EXPORT MsgHandler installMsgHandler(MsgHandler);
-}
 
 
 ///-------------------------------------------------------------------

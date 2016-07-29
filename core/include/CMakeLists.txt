@@ -10,7 +10,6 @@ set(_public_headers
   usFrameworkFactory.h
   usLDAPProp.h
   usListenerFunctors.h
-  usLog.h
   usSharedData.h
   usSharedLibrary.h
   usShrinkableMap.h

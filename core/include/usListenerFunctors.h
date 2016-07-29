@@ -32,6 +32,7 @@ namespace us {
 
   class ServiceEvent;
   class BundleEvent;
+  class FrameworkEvent;
 
   typedef std::function<void(const ServiceEvent&)> ServiceListener;
 
@@ -54,6 +55,7 @@ namespace us {
    * @see BundleEvent
    */
   typedef std::function<void(const BundleEvent&)> BundleListener;
+  typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
 
   template<class X>
   ServiceListener ServiceListenerMemberFunctor(X* x, void (X::*memFn)(const ServiceEvent&))
@@ -63,6 +65,9 @@ namespace us {
   BundleListener BundleListenerMemberFunctor(X* x, void (X::*memFn)(const BundleEvent&))
   { return std::bind(memFn, x, std::placeholders::_1); }
 
+  template<class X>
+  FrameworkListener BindFrameworkListenerToFunctor(X* x, void (X::*Fnc)(const FrameworkEvent&))
+  { return std::bind(Fnc, x, std::placeholders::_1); }
 
 }
 

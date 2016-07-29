@@ -24,7 +24,6 @@
 
 #include <usBundleActivator.h>
 #include <usBundleContext.h>
-#include <usLog.h>
 
 namespace us {
 

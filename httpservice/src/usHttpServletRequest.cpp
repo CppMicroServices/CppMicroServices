@@ -30,6 +30,10 @@
 #include <ctime>
 #include <cstring>
 
+#ifdef US_PLATFORM_WINDOWS
+#define timegm(x) (_mkgmtime(x))
+#endif
+
 namespace us {
 
 HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
@@ -262,7 +266,7 @@ long long HttpServletRequest::GetDateHeader(const std::string& name) const
     {
       if (std::strcmp(months[i], month_str) == 0)
       {
-        month = i;
+        month = static_cast<int>(i);
         break;
       }
     }

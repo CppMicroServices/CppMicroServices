@@ -34,12 +34,15 @@ add_subdirectory(bundles)
 set(_tests
   usAnyTest
   usBundleRegistryPerformanceTest
+  usFrameworkEventTest
+  usFrameworkListenerTest
   usFrameworkTest
   usFrameworkFactoryTest
   usHelgrindTest
   usLDAPFilterTest
   usLDAPQueryTest
   usLogTest
+  usBundleEventTest
   usBundleHooksTest
   usBundleManifestTest
   usBundleTest

@@ -27,6 +27,7 @@ limitations under the License.
 #include "usTestingMacros.h"
 #include "usTestingConfig.h"
 
+#include <iostream>
 #include <string>
 #include <map>
 
@@ -36,13 +37,11 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 {
     US_TEST_BEGIN("FrameworkFactoryTest");
 
-    FrameworkFactory factory;
-
-    auto f = factory.NewFramework();
+    auto f = FrameworkFactory().NewFramework();
 
     US_TEST_CONDITION(f, "Test Framework instantiation");
 
-    auto f1 = factory.NewFramework();
+    auto f1 = FrameworkFactory().NewFramework();
 
     US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
 
@@ -53,9 +52,13 @@ int usFrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
     configuration["org.osgi.framework.custom1"] = std::string("foo");
     configuration["org.osgi.framework.custom2"] = std::string("bar");
 
-    auto f2 = factory.NewFramework(configuration);
+    auto f2 = FrameworkFactory().NewFramework(configuration);
 
     US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
+
+	auto f3 = FrameworkFactory().NewFramework(std::map<std::string, us::Any>(), &std::clog);
+
+	US_TEST_CONDITION(f3, "Test Framework instantiation with default configuration and custom logger");
 
     US_TEST_END()
 }

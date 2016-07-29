@@ -23,12 +23,13 @@
 #include "usBundleResourceContainer_p.h"
 
 #include "usBundleResource.h"
-#include "usLog.h"
 #include "usUtils_p.h"
 
 #include <cstring>
 #include <climits>
 #include <cassert>
+#include <sstream>
+#include <stdexcept>
 
 namespace us {
 

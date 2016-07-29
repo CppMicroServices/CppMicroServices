@@ -26,6 +26,7 @@
 
 #include <usCoreConfig.h>
 
+#include <exception>
 #include <string>
 #include <vector>
 #include <memory>
@@ -99,18 +100,6 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
 }
 
 //-------------------------------------------------------------------
-// Bundle auto-loading
-//-------------------------------------------------------------------
-
-namespace us {
-
-struct BundleInfo;
-class CoreBundleContext;
-
-
-}
-
-//-------------------------------------------------------------------
 // Generic utility functions
 //-------------------------------------------------------------------
 
@@ -121,6 +110,12 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
 {
   return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
 }
+
+// Platform agnostic way to get the current working directory.
+// Supports Linux, Mac, and Windows.
+std::string GetCurrentWorkingDirectory();
+
+void TerminateForDebug(const std::exception_ptr ex);
 
 }
 

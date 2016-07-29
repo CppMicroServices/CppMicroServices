@@ -22,10 +22,7 @@
 
 #include "usTestUtilBundleListener.h"
 
-#include <usLog.h>
-
-#include "usBundle.h"
-#include "usUtils_p.h"
+#include <usBundle.h>
 
 namespace us {
 
@@ -36,13 +33,13 @@ TestBundleListener::TestBundleListener()
 void TestBundleListener::BundleChanged(const BundleEvent& event)
 {
   bundleEvents.push_back(event);
-  US_DEBUG << "BundleEvent:" << event;
+  std::cout << "BundleEvent:" << event;
 }
 
 void TestBundleListener::ServiceChanged(const ServiceEvent& event)
 {
   serviceEvents.push_back(event);
-  US_DEBUG << "ServiceEvent:" << event;
+  std::cout << "ServiceEvent:" << event;
 }
 
 BundleEvent TestBundleListener::GetBundleEvent() const
@@ -84,7 +81,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
   if (pEvts.size() != bundleEvents.size() && !relaxed)
   {
     listenState = false;
-    US_DEBUG << "*** Bundle event mismatch: expected "
+    std::cerr << "*** Bundle event mismatch: expected "
              << pEvts.size() << " event(s), found "
              << bundleEvents.size() << " event(s).";
 
@@ -93,7 +90,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
     {
       const BundleEvent& pE = i < pEvts.size() ? pEvts[i] : BundleEvent();
       const BundleEvent& pR = i < bundleEvents.size() ? bundleEvents[i] : BundleEvent();
-      US_DEBUG << "    " << pE << " - " << pR;
+      std::cerr << "    " << pE << " - " << pR;
     }
   }
   else
@@ -106,7 +103,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
         if (std::find(bundleEvents.begin(), bundleEvents.end(), e) == bundleEvents.end())
         {
           listenState = false;
-          US_DEBUG << "*** Expected event not found: " << e;
+          std::cerr << "*** Expected event not found: " << e;
           break;
         }
       }
@@ -122,7 +119,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<BundleEvent>& pEv
             || pE.GetBundle() != pR.GetBundle())
         {
           listenState = false;
-          US_DEBUG << "*** Wrong bundle event: " << pR << " expected " << pE;
+          std::cerr << "*** Wrong bundle event: " << pR << " expected " << pE;
         }
       }
     }
@@ -139,7 +136,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<ServiceEvent>& se
   if (seEvts.size() != serviceEvents.size())
   {
     listenState = false;
-    US_DEBUG << "*** Service event mismatch: expected "
+    std::cerr << "*** Service event mismatch: expected "
              << seEvts.size() << " event(s), found "
              << serviceEvents.size() << " event(s).";
 
@@ -148,7 +145,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<ServiceEvent>& se
     {
       const ServiceEvent& seE = i < seEvts.size() ? seEvts[i] : ServiceEvent();
       const ServiceEvent& seR = i < serviceEvents.size() ? serviceEvents[i] : ServiceEvent();
-      US_DEBUG << "    " << seE << " - " << seR;
+      std::cerr << "    " << seE << " - " << seR;
     }
   }
   else
@@ -161,7 +158,7 @@ bool TestBundleListener::CheckListenerEvents(const std::vector<ServiceEvent>& se
           || (!(seE.GetServiceReference() == seR.GetServiceReference())))
       {
         listenState = false;
-        US_DEBUG << "*** Wrong service event: " << seR << " expected " << seE;
+        std::cerr << "*** Wrong service event: " << seR << " expected " << seE;
       }
     }
   }

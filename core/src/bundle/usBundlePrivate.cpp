@@ -37,7 +37,7 @@
 #include "usFramework.h"
 #include "usServiceRegistration.h"
 #include "usServiceReferenceBasePrivate.h"
-#include "AndroidCompat.h" // std::to_string not available on Android
+#include "usUtils_p.h" // us::ToString()
 
 #include <algorithm>
 #include <iterator>
@@ -59,7 +59,7 @@ void BundlePrivate::Stop(uint32_t options)
     auto l = coreCtx->resolver.Lock();
     if (IsFragment())
     {
-      throw std::runtime_error("Bundle#" + std::to_string(id) + ", can not stop a fragment");
+      throw std::runtime_error("Bundle#" + us::ToString(id) + ", can not stop a fragment");
     }
 
     // 1:
@@ -133,7 +133,7 @@ std::exception_ptr BundlePrivate::Stop1()
     catch (const std::exception& e)
     {
       res = std::make_exception_ptr(
-            std::runtime_error("Bundle#" + std::to_string(id) + ", BundleActivator::Stop() failed:" + e.what()));
+            std::runtime_error("Bundle#" + us::ToString(id) + ", BundleActivator::Stop() failed:" + e.what()));
     }
 
     // if stop was aborted (uninstall or timeout), make sure
@@ -227,7 +227,7 @@ void BundlePrivate::WaitOnOperation(WaitConditionType& wc, LockType& lock, const
       op = "update";
       break;
     }
-    throw std::runtime_error(src + " called during " + op + " of Bundle#" + std::to_string(id));
+    throw std::runtime_error(src + " called during " + op + " of Bundle#" + us::ToString(id));
   }
 }
 
@@ -294,7 +294,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
           else
           {
             // std::string reason = GetResolveFailReason();
-            //throw std::runtime_error("Bundle#" + std::to_string(info.id) + ", unable to resolve: "
+            //throw std::runtime_error("Bundle#" + us::ToString(info.id) + ", unable to resolve: "
             //                          + reason);
           }
         }
@@ -393,7 +393,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
     // This happens if call start from inside the BundleActivator.stop
     // method.
     // Don't allow it.
-    throw std::runtime_error("Bundle#" + std::to_string(id) +
+    throw std::runtime_error("Bundle#" + us::ToString(id) +
                              ", start called from BundleActivator::Stop");
   case Bundle::STATE_UNINSTALLED:
     throw std::logic_error("Bundle is in UNINSTALLED state");
@@ -520,7 +520,7 @@ std::exception_ptr BundlePrivate::Start0()
   }
   catch (const std::exception& e)
   {
-    res = std::make_exception_ptr(std::runtime_error("Bundle#" + std::to_string(id) + " start failed: " + e.what()));
+    res = std::make_exception_ptr(std::runtime_error("Bundle#" + us::ToString(id) + " start failed: " + e.what()));
   }
 
   // activator.start() done
@@ -564,7 +564,7 @@ std::exception_ptr BundlePrivate::Start0()
     }
     if (!cause.empty())
     {
-      res = std::make_exception_ptr("Bundle#" + std::to_string(id) + " start failed: " + cause);
+      res = std::make_exception_ptr("Bundle#" + us::ToString(id) + " start failed: " + cause);
     }
   }
 
@@ -749,7 +749,7 @@ BundlePrivate::BundlePrivate(
   auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
   if (!snbl.empty())
   {
-    throw std::invalid_argument("Bundle#" + std::to_string(id) +
+    throw std::invalid_argument("Bundle#" + us::ToString(id) +
                                 ", a bundle with same symbolic name and version " +
                                 "is already installed (" + symbolicName + ", " +
                                 version.ToString() + ")");

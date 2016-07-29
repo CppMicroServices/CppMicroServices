@@ -26,7 +26,6 @@
 #include <usServiceTracker.h>
 #include <usLog.h>
 #include <usLDAPProp.h>
-#include <AndroidCompat.h> // std::to_string not available on Android
 
 #include <usTestingMacros.h>
 
@@ -95,7 +94,13 @@ public:
     {
       // Register a service ten times with different properties
       InterfaceMap im;
-      im[std::string("org.cppmicroservices.c1.") + std::to_string(c)] = std::make_shared<int>(1);
+
+      // Workaround for doing std::to_string(buA.GetBundleId()), since "std::to_string" is currently
+      // not supported on Android
+      std::ostringstream os;
+      os << c;
+
+      im[std::string("org.cppmicroservices.c1.") + os.str()] = std::make_shared<int>(1);
       ServiceProperties props;
       props["i"] = i;
       auto reg = context.RegisterService(std::make_shared<const InterfaceMap>(im), props);

@@ -135,4 +135,28 @@ std::string GetLastErrorStr();
 
 }
 
+//-------------------------------------------------------------------
+// Android Compatibility functions
+//-------------------------------------------------------------------
+
+/**
+ * Compatibility functions to replace "std::to_string(...)" functions
+ * on Android, since the latest Android NDKs lack "std::to_string(...)"
+ * support.
+ */
+
+namespace us {
+
+std::string ToString(int val);
+std::string ToString(unsigned val);
+std::string ToString(long val);
+std::string ToString(unsigned long val);
+std::string ToString(long long val);
+std::string ToString(unsigned long long val);
+std::string ToString(float val);
+std::string ToString(double val);
+std::string ToString(long double val);
+
+}
+
 #endif // USUTILS_H

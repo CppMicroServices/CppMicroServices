@@ -31,7 +31,6 @@
 #include <usConstants.h>
 #include <usBundleActivator.h>
 #include <usLog.h>
-#include <AndroidCompat.h> // std::to_string not available on Android
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
@@ -211,7 +210,13 @@ void frame020b()
   US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetTempDirectory() + DIR_SEP + "data" + DIR_SEP + std::to_string(buA.GetBundleId()) + DIR_SEP;
+
+  // Workaround for doing std::to_string(buA.GetBundleId()), since "std::to_string" is currently
+  // not supported on Android
+  std::ostringstream os;
+  os << buA.GetBundleId();
+
+  const std::string baseStoragePath = testing::GetTempDirectory() + DIR_SEP + "data" + DIR_SEP + os.str() + DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 

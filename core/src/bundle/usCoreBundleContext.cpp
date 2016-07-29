@@ -33,7 +33,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "usBundleStorageMemory_p.h"
 #include "usBundleInitialization.h"
 #include "usConstants.h"
-#include "AndroidCompat.h" // std::to_string not available on Android
+#include "usUtils_p.h" // us::ToString()
 
 #include <iomanip>
 
@@ -172,7 +172,7 @@ std::string CoreBundleContext::GetDataStorage(long id) const
 {
   if (!dataStorage.empty())
   {
-    return dataStorage + DIR_SEP + std::to_string(id);
+    return dataStorage + DIR_SEP + us::ToString(id);
   }
   return std::string();
 }

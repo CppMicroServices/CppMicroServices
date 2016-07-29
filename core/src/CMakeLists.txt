@@ -3,7 +3,6 @@
 #-----------------------------------------------------------------------------
 
 set(_srcs
-  util/AndroidCompat.cpp
   util/usAny.cpp
   util/usFramework.cpp
   util/usFrameworkEvent.cpp
@@ -70,7 +69,6 @@ set(_private_headers
   util/usThreads_p.h
   util/usUtils_p.h
   util/usWaitCondition_p.h
-  util/AndroidCompat.h
 
   service/usServiceHooks_p.h
   service/usServiceListenerEntry_p.h

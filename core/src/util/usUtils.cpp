@@ -388,6 +388,38 @@ std::string GetLastErrorStr()
 #endif
 }
 
+//-------------------------------------------------------------------
+// Android Compatibility functions
+//-------------------------------------------------------------------
+
+namespace {
+
+template <typename T>
+std::string internal_to_string(T val)
+{
+#if defined(__ANDROID__)
+#include <sstream>
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
+}
+
+}
+
+std::string ToString(int val)               { return internal_to_string(val); }
+std::string ToString(unsigned val)          { return internal_to_string(val); }
+std::string ToString(long val)              { return internal_to_string(val); }
+std::string ToString(unsigned long val)     { return internal_to_string(val); }
+std::string ToString(long long val)         { return internal_to_string(val); }
+std::string ToString(unsigned long long val){ return internal_to_string(val); }
+std::string ToString(float val)             { return internal_to_string(val); }
+std::string ToString(double val)            { return internal_to_string(val); }
+std::string ToString(long double val)       { return internal_to_string(val); }
+
+
 static MsgHandler handler = 0;
 
 MsgHandler installMsgHandler(MsgHandler h)
@@ -477,4 +509,4 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   return result;
 }
 
-}
+} // namespace us

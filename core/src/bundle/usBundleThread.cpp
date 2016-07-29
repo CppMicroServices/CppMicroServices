@@ -25,7 +25,7 @@
 #include "usBundleActivator.h"
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
-#include "AndroidCompat.h" // std::to_string not available on Android
+#include "usUtils_p.h" // us::ToString()
 
 #include <future>
 
@@ -235,7 +235,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
     b->ResetBundleThread();
 
     return std::make_exception_ptr(std::runtime_error(
-                                     "Bundle#" + std::to_string(b->id) + " " +
+                                     "Bundle#" + us::ToString(b->id) + " " +
                                      opType + " failed with reason: " + reason
                                      ));
   }

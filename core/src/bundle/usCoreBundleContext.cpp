@@ -45,8 +45,8 @@ std::atomic<int> CoreBundleContext::globalId{0};
 
 std::map<std::string, Any> InitProperties(std::map<std::string, Any> configuration)
 {
-  // emplace cannot be used until the minimum GCC compiler is >= 4.8
-  configuration.insert(std::pair<std::string, Any>(Constants::FRAMEWORK_LOG_LEVEL, 3));
+  // Framework internal diagnostic logging is off by default
+  configuration.insert(std::pair<std::string, Any>(Constants::FRAMEWORK_LOG, false));
 
   // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
   // Run-time modification of the property should be ignored as it is irrelevant.
@@ -60,8 +60,9 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props)
+CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger)
   : id(globalId++)
+  , frameworkProperties(InitProperties(props))
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -69,10 +70,12 @@ CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props)
   , bundleRegistry(this)
   , firstInit(true)
   , initCount(0)
-  , frameworkProperties(InitProperties(props))
 {
+  bool enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
+  std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
+  sink = std::make_shared<LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
-  US_INFO << "created";
+  DIAG_LOG(*sink) << "created";
 }
 
 CoreBundleContext::~CoreBundleContext()
@@ -84,7 +87,7 @@ CoreBundleContext::~CoreBundleContext()
 
 void CoreBundleContext::Init()
 {
-  US_INFO("initializing");
+  DIAG_LOG(*sink) << "initializing";
   initCount++;
 
   auto storageCleanProp = frameworkProperties.find(Constants::FRAMEWORK_STORAGE_CLEAN);
@@ -124,21 +127,17 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
-  US_INFO << "inited";
-
-  US_INFO << "Installed bundles:";
+  DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
   for (auto b : bundleRegistry.GetBundles())
   {
-    US_INFO << " #" << b->id << " " << b->symbolicName << ":"
-            << b->version << " location:" << b->location;
+    DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":"
+                    << b->version << " location:" << b->location;
   }
 }
 
 void CoreBundleContext::Uninit0()
 {
-
-  US_INFO << "uninit";
-
+  DIAG_LOG(*sink) << "uninit";
   serviceHooks.Close();
   systemBundle->UninitSystemBundle();
 }

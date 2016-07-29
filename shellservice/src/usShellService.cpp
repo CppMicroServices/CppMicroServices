@@ -27,7 +27,6 @@
 #include "usBundleContext.h"
 #include "usBundleResource.h"
 #include "usBundleResourceStream.h"
-#include "usLog.h"
 
 #include "scheme.h"
 #include "scheme-private.h"
@@ -381,7 +380,7 @@ ShellService::ShellService()
   }
   else
   {
-    US_WARN << "Scheme file init.scm not found";
+    std::cerr << "Scheme file init.scm not found";
   }
 
   std::vector<BundleResource> schemeResources = GetBundleContext().GetBundle().FindResources("/", "*.scm", false);
@@ -460,7 +459,7 @@ std::vector<std::string> ShellService::GetCompletions(const std::string& in)
 
 void ShellService::LoadSchemeResource(const BundleResource& res)
 {
-  US_INFO << "Reading " << res.GetResourcePath();
+  std::cout << "Reading " << res.GetResourcePath();
   BundleResourceStream resStream(res);
   int resBufLen = res.GetSize() + 1;
   char* resBuf = new char[resBufLen];
@@ -472,7 +471,7 @@ void ShellService::LoadSchemeResource(const BundleResource& res)
   }
   else
   {
-    US_WARN << "Could not read " << res.GetResourcePath() << " file from resource";
+    std::cerr << "Could not read " << res.GetResourcePath() << " file from resource";
   }
   delete[] resBuf;
 }

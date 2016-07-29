@@ -32,6 +32,7 @@
 #include "usBundleThread_p.h"
 #include "usBundleUtils_p.h"
 #include "usCoreBundleContext_p.h"
+#include "usFrameworkEvent.h"
 #include "usResolver_p.h"
 
 #include "usCoreConfig.h"
@@ -167,11 +168,9 @@ void Bundle::Uninstall()
       if (exception != nullptr)
       {
         try { std::rethrow_exception(exception); }
-        catch (const std::exception& e)
+        catch (const std::exception& )
         {
-          // $TODO framework event
-          //coreCtx->FrameworkError(this, exception);
-          US_WARN << e.what();
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, d->shared_from_this(), std::string(), std::current_exception()));
         }
       }
       // Fall through
@@ -196,8 +195,10 @@ void Bundle::Uninstall()
             ctx->Invalidate();
           }
           d->operation = BundlePrivate::OP_UNINSTALLING;
-          // $TODO framework error
-          //d->coreCtx->FrameworkError(this, e);
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                    d->shared_from_this(),
+                                                    std::string(),
+                                                    std::current_exception()));
         }
       }
       if (d->state == STATE_UNINSTALLED)
@@ -228,12 +229,12 @@ void Bundle::Uninstall()
         {
           if (fs::Exists(d->bundleDir)) fs::RemoveDirectoryRecursive(d->bundleDir);
         }
-        catch (const std::exception& e)
+        catch (const std::exception& )
         {
-          // $TODO framework error
-          // d->coreCtx->FrameworkError(this,
-          //                     "Failed to delete bundle data" + e.what());
-          US_WARN << "Failed to delete bundle data" << e.what();
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
+                                                    d->shared_from_this(), 
+                                                    std::string(), 
+                                                    std::current_exception()));
         }
         d->bundleDir.clear();
       }
@@ -251,7 +252,7 @@ void Bundle::Uninstall()
 
 BundleContext Bundle::GetBundleContext() const
 {
-  return MakeBundleContext(d->bundleContext.Load()->shared_from_this());
+  return MakeBundleContext(d->bundleContext.Load());
 }
 
 long Bundle::GetBundleId() const

@@ -32,9 +32,6 @@
 namespace us {
 
 template<class S, class TTT>
-const bool ServiceTrackerPrivate<S,TTT>::DEBUG_OUTPUT = false;
-
-template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
     const BundleContext& context,
@@ -157,7 +154,7 @@ void ServiceTrackerPrivate<S,TTT>::Modified()
 {
   cachedReference.Store(ServiceReference<S>()); /* clear cached value */
   cachedService.Store(std::shared_ptr<TrackedParmType>()); /* clear cached value */
-  US_DEBUG(DEBUG_OUTPUT) << "ServiceTracker::Modified(): " << filter;
+  DIAG_LOG(*context.GetLogSink()) << "ServiceTracker::Modified(): " << filter;
 }
 
 }

@@ -29,10 +29,12 @@
 #include "usBundlePrivate.h"
 #include "usCoreBundleContext_p.h"
 #include "usFramework.h"
+#include "usLog_p.h"
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
 #include "usUtils_p.h"
 
+#include <memory>
 #include <stdio.h>
 
 namespace us {
@@ -71,6 +73,10 @@ BundleContext& BundleContext::operator=(std::nullptr_t)
   return *this;
 }
 
+std::shared_ptr<LogSink> BundleContext::GetLogSink() const
+{
+  return d->bundle->coreCtx->sink->shared_from_this();
+}
 
 Bundle BundleContext::GetBundle() const
 {
@@ -214,9 +220,18 @@ struct ServiceHolder
     {
       sref.d.load()->UngetService(b.lock(), true);
     }
-    catch (const std::exception& exp)
+    catch (const std::exception& ex)
     {
-      US_INFO << "UngetService threw an exception - " << exp.what();
+      // Make sure that we don't crash if the shared_ptr service object outlives
+      // the BundlePrivate or CoreBundleContext objects.
+      if (!b.expired())
+      {
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << ex.what();
+      }
+	  // don't throw exceptions from the destructor. For an explanation, see:
+	  // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
+	  // Following this rule means that a FrameworkEvent isn't an option here 
+	  // since it contains an exception object which clients could throw.
     }
   }
 };
@@ -315,6 +330,32 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
   // won the race condition.
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
+}
+
+void BundleContext::AddFrameworkListener(const FrameworkListener& listener)
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
+}
+
+void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  b->coreCtx->listeners.RemoveFrameworkListener(d, listener, nullptr);
 }
 
 void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,

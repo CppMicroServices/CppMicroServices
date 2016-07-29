@@ -30,7 +30,6 @@
 #include <usBundleContext.h>
 #include <usConstants.h>
 #include <usBundleActivator.h>
-#include <usLog.h>
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
@@ -123,8 +122,7 @@ void frame018a()
   try
   {
     bc.GetService(ServiceReferenceU());
-    US_DEBUG << "Got service object, expected std::invalid_argument exception";
-    US_TEST_FAILED_MSG(<< "Got service object, excpected std::invalid_argument exception")
+    US_TEST_FAILED_MSG(<< "Got service object, expected std::invalid_argument exception")
   }
   catch (const std::invalid_argument& )
   {}
@@ -282,7 +280,7 @@ void frame035a()
 void frame037a()
 {
   std::string location = buExec.GetLocation();
-  US_DEBUG << "LOCATION:" << location;
+  std::cout << "LOCATION:" << location;
   US_TEST_CONDITION(!location.empty(), "Test for non-empty bundle location")
 
   US_TEST_CONDITION(buExec.GetState() & Bundle::STATE_ACTIVE, "Test for started flag")
@@ -390,7 +388,6 @@ void TestBundleStates()
     FrameworkFactory factory;
 
     std::map<std::string, Any> frameworkConfig;
-    //frameworkConfig[Constants::FRAMEWORK_LOG_LEVEL] = 0;
     auto framework = factory.NewFramework(frameworkConfig);
     framework.Start();
 
@@ -546,10 +543,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("BundleTest");
 
   {
-    FrameworkFactory factory;
-    std::map<std::string, Any> frameworkConfig;
-    //frameworkConfig[Constants::FRAMEWORK_LOG_LEVEL] = 0;
-    auto framework = factory.NewFramework(frameworkConfig);
+    auto framework = FrameworkFactory().NewFramework();
     framework.Start();
 
     auto bundles = framework.GetBundleContext().GetBundles();
@@ -578,10 +572,9 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
 
   // test a non-default framework instance using a different persistent storage location.
   {
-    FrameworkFactory factory;
     std::map<std::string, Any> frameworkConfig;
     frameworkConfig[Constants::FRAMEWORK_STORAGE] = testing::GetTempDirectory();
-    auto framework = factory.NewFramework(frameworkConfig);
+    auto framework = FrameworkFactory().NewFramework(frameworkConfig);
     framework.Start();
 
     FrameworkTestSuite ts(framework.GetBundleContext());

@@ -37,31 +37,6 @@
 
 namespace us {
 
-struct AbstractWebConsolePluginPrivate
-{
-  AbstractWebConsolePluginPrivate()
-    : m_VariableResolver(nullptr)
-  {}
-
-  ~AbstractWebConsolePluginPrivate()
-  {
-    delete m_VariableResolver;
-  }
-
-  WebConsoleVariableResolver* m_VariableResolver;
-};
-
-AbstractWebConsolePlugin::AbstractWebConsolePlugin()
-  : d(new AbstractWebConsolePluginPrivate)
-{
-
-}
-
-AbstractWebConsolePlugin::~AbstractWebConsolePlugin()
-{
-  delete d;
-}
-
 std::string AbstractWebConsolePlugin::GetCategory() const
 {
   return std::string();
@@ -100,16 +75,25 @@ void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request, HttpServletRes
   }
 }
 
-WebConsoleVariableResolver* AbstractWebConsolePlugin::GetVariableResolver(const HttpServletRequest& request) const
+std::shared_ptr<WebConsoleVariableResolver> AbstractWebConsolePlugin::GetVariableResolver(HttpServletRequest& request)
 {
-  if (d->m_VariableResolver == nullptr)
+  Any resolverAny = request.GetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER());
+  if (!resolverAny.Empty() && resolverAny.Type() == typeid(std::shared_ptr<WebConsoleVariableResolver>))
   {
-    WebConsoleDefaultVariableResolver* resolver = new WebConsoleDefaultVariableResolver();
-    (*resolver)["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT()).ToString();
-    (*resolver)["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT()).ToString();
-    d->m_VariableResolver = resolver;
+    return any_cast<std::shared_ptr<WebConsoleVariableResolver>>(resolverAny);
   }
-  return d->m_VariableResolver;
+
+  auto resolver = std::make_shared<WebConsoleDefaultVariableResolver>();
+  (*resolver)["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT()).ToString();
+  (*resolver)["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT()).ToString();
+  SetVariableResolver(request, resolver);
+
+  return resolver;
+}
+
+void AbstractWebConsolePlugin::SetVariableResolver(HttpServletRequest& request, std::shared_ptr<WebConsoleVariableResolver> resolver)
+{
+  request.SetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER(), resolver);
 }
 
 std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& request, HttpServletResponse& response)
@@ -126,8 +110,8 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& reques
     title = "{$" + title.substr(1) + "}";
   }
 
-  WebConsoleVariableResolver* resolver = this->GetVariableResolver(request);
-  if (WebConsoleDefaultVariableResolver* r = dynamic_cast<WebConsoleDefaultVariableResolver*>(resolver))
+  auto resolver = this->GetVariableResolver(request);
+  if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
   {
     (*r)["labelMap"] = request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP()).ToString();
 

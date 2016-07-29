@@ -34,12 +34,15 @@ add_subdirectory(bundles)
 set(_tests
   usAnyTest
   usBundleRegistryPerformanceTest
+  usFrameworkEventTest
+  usFrameworkListenerTest
   usFrameworkTest
   usFrameworkFactoryTest
   usHelgrindTest
   usLDAPFilterTest
   usLDAPQueryTest
   usLogTest
+  usBundleEventTest
   usBundleHooksTest
   usBundleManifestTest
   usBundleTest
@@ -94,6 +97,7 @@ endif()
 
 target_link_libraries(${_test_driver} ${Core_TARGET})
 
+# Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
   target_link_libraries(${_test_driver} rt)
 endif()

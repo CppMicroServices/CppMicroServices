@@ -31,7 +31,6 @@ namespace us {
 class WebConsoleDefaultVariableResolver : public std::map<std::string,std::string>, public WebConsoleVariableResolver
 {
 public:
-  WebConsoleDefaultVariableResolver();
 
   virtual std::string Resolve(const std::string &variable) const;
 };

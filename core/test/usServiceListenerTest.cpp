@@ -545,6 +545,9 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceListenerTest");
 
+  ServiceEvent se;
+  US_TEST_CONDITION_REQUIRED(!se, "Test that the service event is invalid.");
+
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
   framework.Start();

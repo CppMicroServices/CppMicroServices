@@ -69,8 +69,6 @@ set(_resources
   res/KickStart/js/kickstart.js
 )
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/main")
-
 usMacroCreateBundle(WebConsole
   VERSION "0.99.0"
   DEPENDS HttpService

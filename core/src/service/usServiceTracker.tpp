@@ -92,7 +92,7 @@ void ServiceTracker<S,T>::Open()
       return;
     }
 
-    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::Open: " << d->filter;
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter;
 
     t.reset(new _TrackedService(this, d->customizer));
     try
@@ -140,7 +140,7 @@ void ServiceTracker<S,T>::Close()
     return;
   }
 
-  US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::close:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
   outgoing->Close();
   references = GetServiceReferences();
   try
@@ -159,13 +159,13 @@ void ServiceTracker<S,T>::Close()
     outgoing->Untrack(ref, ServiceEvent());
   }
 
-  if (d->DEBUG_OUTPUT)
+  if (d->context.GetLogSink()->Enabled())
   {
     if (!d->cachedReference.Load().GetBundle() &&
         d->cachedService.Load() == nullptr)
     {
-      US_DEBUG(true) << "ServiceTracker<S,TTT>::close[cached cleared]:"
-                       << d->filter;
+      DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
+										<< d->filter;
     }
   }
 
@@ -247,11 +247,11 @@ ServiceTracker<S,T>::GetServiceReference() const
   ServiceReference<S> reference = d->cachedReference.Load();
   if (reference.GetBundle())
   {
-    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
-                         << d->filter;
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
+									<< d->filter;
     return reference;
   }
-  US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
   auto references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0)
@@ -359,11 +359,11 @@ ServiceTracker<S,T>::GetService() const
   auto service = d->cachedService.Load();
   if (service)
   {
-    US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService[cached]:"
-                              << d->filter;
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
+									<< d->filter;
     return service;
   }
-  US_DEBUG(d->DEBUG_OUTPUT) << "ServiceTracker<S,TTT>::getService:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;
 
   try
   {

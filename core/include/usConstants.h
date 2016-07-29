@@ -239,12 +239,12 @@ US_Core_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // 
 US_Core_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
 
 /**
- * The framework's log level property key name.
- * This property's default value is "3" (Only errors are logged).
+ * The framework's log property key name.
+ * This property's default value is off (boolean 'false').
  *
- * @see MsgType
+ * @see DIAG_LOG
  */
-US_Core_EXPORT extern const std::string FRAMEWORK_LOG_LEVEL; // = "org.cppmicroservices.framework.log.level";
+US_Core_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicroservices.framework.log";
 
 /**
  * Framework environment property identifying the Framework's universally

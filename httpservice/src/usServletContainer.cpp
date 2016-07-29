@@ -42,6 +42,8 @@
 
 namespace us {
 
+typedef std::unique_lock<std::mutex> Lock;
+
 class ServletHandler : public CivetHandler
 {
 public:
@@ -65,13 +67,17 @@ private:
 
   virtual bool handleGet(CivetServer* server, mg_connection* conn)
   {
+    auto mg_req_info = mg_get_request_info(conn);
+    if (mg_req_info->local_uri == nullptr)
+    {
+      return true;
+    }
+
     HttpServletRequest request(new HttpServletRequestPrivate(m_Servlet->GetServletContext(), server, conn));
     request.d->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
     request.d->m_ServletPath = m_ServletPath;
 
-    std::string uri = mg_get_request_info(conn)->uri;
-    std::size_t pos = uri.find_first_of('?');
-    uri = uri.substr(0, pos);
+    std::string uri = mg_req_info->local_uri;
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
     std::cout << "Checking path prefix: " << pathPrefix << std::endl;
     std::cout << "Against uri: " << uri << std::endl;
@@ -131,19 +137,23 @@ ServletContainerPrivate::ServletContainerPrivate(BundleContext bundleCtx, Servle
 
 void ServletContainerPrivate::Start()
 {
-  if (m_Server) return;
-
-  m_Server = new CivetServer(nullptr);
-  const mg_context* serverContext = m_Server->getContext();
-  if (serverContext == nullptr)
+  int port = 0;
+  int sslPort = 0;
   {
-    std::cout << "Servlet Container could not be started." << std::endl;
-    delete m_Server;
-    m_Server = nullptr;
-    return;
+    Lock l(m_Mutex); US_UNUSED(l);
+    if (m_Server) return;
+
+    m_Server.reset(new CivetServer(nullptr));
+    const mg_context* serverContext = m_Server->getContext();
+    if (serverContext == nullptr)
+    {
+      std::cout << "Servlet Container could not be started." << std::endl;
+      m_Server.reset();
+      return;
+    }
+    mg_get_ports(serverContext, 1, &port, &sslPort);
   }
-  int port, sslPort;
-  mg_get_ports(serverContext, 1, &port, &sslPort);
+
   std::cout << "Servlet Container listening on http://localhost:" << port << std::endl;
   m_ServletTracker.Open();
 }
@@ -151,17 +161,22 @@ void ServletContainerPrivate::Start()
 void ServletContainerPrivate::Stop()
 {
   m_ServletTracker.Close();
-  if (m_Server)
+
+  std::unique_ptr<CivetServer> server;
+  std::list<std::shared_ptr<ServletHandler>> handler;
   {
-    for (auto& handler : m_Handler)
+    Lock l(m_Mutex); US_UNUSED(l);
+    server = std::move(m_Server);
+    handler = std::move(m_Handler);
+  }
+
+  if (server)
+  {
+    for (auto& h : handler)
     {
-      m_Server->removeHandler(handler->GetServletContext()->GetContextPath());
+      server->removeHandler(h->GetServletContext()->GetContextPath());
     }
   }
-  m_Handler.clear();
-
-  delete m_Server;
-  m_Server = nullptr;
 }
 
 std::string ServletContainerPrivate::GetMimeType(const ServletContext* /*context*/, const std::string& file) const
@@ -189,10 +204,16 @@ std::shared_ptr<ServletHandler> ServletContainerPrivate::AddingService(const Ser
   std::shared_ptr<ServletContext> servletContext(new ServletContext(q));
   servlet->Init(ServletConfigImpl(servletContext));
   auto handler = std::make_shared<ServletHandler>(servlet, contextRoot.ToString());
-  m_Handler.push_back(handler);
-  m_ServletContextMap[contextRoot.ToString()] = servletContext;
 
-  m_Server->addHandler(m_ContextPath + contextRoot.ToString(), handler.get());
+  std::string ctxPath;
+  {
+    Lock l(m_Mutex); US_UNUSED(l);
+    m_Handler.push_back(handler);
+    m_ServletContextMap[contextRoot.ToString()] = servletContext;
+    ctxPath = m_ContextPath + contextRoot.ToString();
+  }
+
+  m_Server->addHandler(ctxPath, handler.get());
   return handler;
 }
 
@@ -204,6 +225,8 @@ void ServletContainerPrivate::ModifiedService(const ServiceReference<HttpServlet
 void ServletContainerPrivate::RemovedService(const ServiceReference<HttpServlet>& /*reference*/, const std::shared_ptr<ServletHandler>& handler)
 {
   std::string contextPath = handler->GetServletContext()->GetContextPath();
+
+  Lock l(m_Mutex); US_UNUSED(l);
   m_Server->removeHandler(contextPath);
   m_Handler.remove(handler);
   handler->GetServlet()->Destroy();
@@ -229,6 +252,7 @@ ServletContainer::~ServletContainer()
 
 void ServletContainer::SetContextPath(const std::string& path)
 {
+  Lock l(d->m_Mutex); US_UNUSED(l);
   if (d->m_Server)
   {
     return;
@@ -248,7 +272,7 @@ void ServletContainer::SetContextPath(const std::string& path)
 
 std::string ServletContainer::GetContextPath() const
 {
-  return d->m_ContextPath;
+  return Lock(d->m_Mutex), d->m_ContextPath;
 }
 
 void ServletContainer::Start()
@@ -263,6 +287,7 @@ void ServletContainer::Stop()
 
 std::shared_ptr<ServletContext> ServletContainer::GetContext(const std::string& uripath) const
 {
+  Lock l(d->m_Mutex); US_UNUSED(l);
   auto iter = d->m_ServletContextMap.find(uripath);
   if (iter == d->m_ServletContextMap.end()) return nullptr;
   return iter->second;
@@ -270,7 +295,7 @@ std::shared_ptr<ServletContext> ServletContainer::GetContext(const std::string& 
 
 std::string ServletContainer::GetContextPath(const ServletContext* /*context*/) const
 {
-  return d->m_ContextPath;
+  return Lock(d->m_Mutex), d->m_ContextPath;
 }
 
 }

@@ -27,23 +27,10 @@
 
 namespace us {
 
-FrameworkFactory::FrameworkFactory(void)
+Framework FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration, std::ostream* logger)
 {
-}
-
-FrameworkFactory::~FrameworkFactory(void)
-{
-}
-
-Framework FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration)
-{
-  auto fwCtx = std::shared_ptr<CoreBundleContext>(new CoreBundleContext(configuration));
+  auto fwCtx = std::shared_ptr<CoreBundleContext>(new CoreBundleContext(configuration, logger));
   return Framework(fwCtx->systemBundle);
-}
-
-Framework FrameworkFactory::NewFramework(void)
-{
-  return NewFramework(std::map<std::string, Any>());
 }
 
 }

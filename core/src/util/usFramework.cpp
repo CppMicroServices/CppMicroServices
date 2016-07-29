@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "usFramework.h"
+#include "usFrameworkEvent.h"
 #include "usFrameworkPrivate.h"
 #include "usBundleStorage_p.h"
 
@@ -99,9 +100,7 @@ void Framework::Start()
     }
     catch (...)
     {
-      // $TODO
-      //pimpl(d)->coreCtx->FrameworkError(b, std::current_exception());
-      try { throw; } catch (const std::exception& e) { US_ERROR << e.what(); }
+      pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(b->shared_from_this()), std::string(), std::current_exception()));
     }
   }
 
@@ -111,8 +110,7 @@ void Framework::Start()
     d->operation = BundlePrivate::OP_IDLE;
   }
   d->NotifyAll();
-  // $TODO
-  // pimpl(d)->coreCtx->listeners.FrameworkEvent(FrameworkEvent(FrameworkEvent::FRAMEWORK_STARTED, this->shared_from_this(), std::exception_ptr()));
+  pimpl(d)->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, MakeBundle(d->shared_from_this()), std::string()));
 }
 
 void Framework::Stop(uint32_t )

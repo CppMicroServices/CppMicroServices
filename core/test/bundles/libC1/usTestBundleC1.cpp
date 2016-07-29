@@ -24,7 +24,6 @@
 #include <usBundleContext.h>
 #include <usServiceRegistration.h>
 #include <usServiceTracker.h>
-#include <usLog.h>
 #include <usLDAPProp.h>
 
 #include <usTestingMacros.h>

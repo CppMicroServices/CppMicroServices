@@ -71,6 +71,7 @@ public:
   typedef Op::UniqueLock UniqueLock;
 
   BundleThread(CoreBundleContext* ctx);
+  ~BundleThread();
 
   void Quit();
 

@@ -298,12 +298,12 @@ private:
 
 };
 
-}
-
 /**
- * \ingroup MicroServices
- */
-US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const us::BundleResource& resource);
+* \ingroup MicroServices
+*/
+US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const BundleResource& resource);
+
+}
 
 US_HASH_FUNCTION_BEGIN(us::BundleResource)
   return arg.Hash();

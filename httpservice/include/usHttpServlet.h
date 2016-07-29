@@ -25,6 +25,8 @@
 #include "usHttpServiceExport.h"
 #include <usServiceInterface.h>
 
+#include <mutex>
+
 namespace us {
 
 class HttpServletRequest;
@@ -132,6 +134,8 @@ protected:
   virtual void DoPut(HttpServletRequest& request, HttpServletResponse& response);
 
   virtual void DoTrace(HttpServletRequest& request, HttpServletResponse& response);
+
+  std::unique_lock<std::mutex> Lock() const;
 
 private:
 

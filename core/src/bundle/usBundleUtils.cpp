@@ -24,6 +24,7 @@
 
 #include <usLog_p.h>
 #include <usUtils_p.h>
+#include <usGetBundleContext.h>
 
 #ifdef __GNUC__
 #ifndef _GNU_SOURCE
@@ -67,6 +68,12 @@ void* dlsym(void *handle, const char *symbol)
 
 namespace us {
 
+// Private util function to return system bundle's log sink
+std::shared_ptr<LogSink> GetFrameworkLogSink()
+{
+  auto sink = GetBundleContext().GetLogSink();
+  return sink;
+}
 
 namespace BundleUtils
 {
@@ -81,11 +88,11 @@ std::string GetExecutablePath()
   std::string execPath;
   uint32_t bufsize = MAXPATHLEN;
   std::unique_ptr<char[]> buf(new char[bufsize]);
-  LogSink sink(&std::cerr, true);
+  
 #if _WIN32
   if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
-    DIAG_LOG(sink) << "GetModuleFileName failed" << GetLastErrorStr();
+    DIAG_LOG(*GetFrameworkLogSink()) << "GetModuleFileName failed" << GetLastErrorStr();
     buf[0] = '\0';
   }
 #elif defined(__APPLE__)
@@ -97,7 +104,7 @@ std::string GetExecutablePath()
   }
   if (status != 0)
   {
-     DIAG_LOG(sink) << "_NSGetExecutablePath() failed";
+     DIAG_LOG(*GetFrameworkLogSink()) << "_NSGetExecutablePath() failed";
   }
   // the returned path may not be an absolute path
 #elif defined(__linux__)
@@ -109,7 +116,7 @@ std::string GetExecutablePath()
   buf[len] = '\0';
 #else
   // 'dlsym' does not work with symbol name 'main'
-  DIAG_LOG(sink) << "GetExecutablePath failed";
+  DIAG_LOG(*GetFrameworkLogSink()) << "GetExecutablePath failed";
 #endif
   return buf.get();
 }
@@ -120,8 +127,7 @@ void* GetSymbol(void* libHandle, const char* symbol)
   if (!addr)
   {
     const char* dlerrorMsg = dlerror();
-    LogSink sink(&std::cerr, true);
-    DIAG_LOG(sink) << "GetSymbol() failed to find (" << symbol << ") with error : "<< (dlerrorMsg ? dlerrorMsg : "unknown");
+    DIAG_LOG(*GetFrameworkLogSink()) << "GetSymbol() failed to find (" << symbol << ") with error : "<< (dlerrorMsg ? dlerrorMsg : "unknown");
   }
   return addr;
 }

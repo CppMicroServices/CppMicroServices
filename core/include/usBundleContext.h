@@ -797,6 +797,7 @@ private:
   friend US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate*);
   friend BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
+  friend std::shared_ptr<LogSink> GetFrameworkLogSink();
 
   BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
   // allow templated code to use the internal logger

@@ -140,7 +140,7 @@ void Bundle::Uninstall()
 {
   if (!IsSharedLibrary(GetLocation()))
   {
-    throw std::runtime_error("Bundles embedded in the executable are not uninstallable");
+    throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
   }
   
   {

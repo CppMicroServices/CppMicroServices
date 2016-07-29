@@ -123,7 +123,7 @@ void CoreBundleContext::Init()
   //resolverHooks.Open();
   
   // auto-install all embedded bundles inside the executable
-  std::vector<Bundle> bundles = bundleRegistry.Install(BundleUtils::GetExecutablePath(), systemBundle.get(), true);
+  bundleRegistry.Install(BundleUtils::GetExecutablePath(), systemBundle.get(), true);
 
   bundleRegistry.Load();
 

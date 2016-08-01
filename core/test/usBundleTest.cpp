@@ -30,6 +30,7 @@
 #include <usBundleContext.h>
 #include <usConstants.h>
 #include <usBundleActivator.h>
+#include <usUtils_p.h> // us::ToString(...)
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
@@ -209,12 +210,7 @@ void frame020b()
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
 
-  // Workaround for doing std::to_string(buA.GetBundleId()), since "std::to_string" is currently
-  // not supported on Android
-  std::ostringstream os;
-  os << buA.GetBundleId();
-
-  const std::string baseStoragePath = testing::GetTempDirectory() + DIR_SEP + "data" + DIR_SEP + os.str() + DIR_SEP;
+  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + us::ToString(buA.GetBundleId()) + testing::DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 
@@ -255,7 +251,7 @@ void frame035a()
 {
   try
   {
-    auto bundles = bc.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+    auto bundles = bc.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
     US_TEST_CONDITION_REQUIRED(!bundles.empty() && bundles.front(), "Test installation of bundle main")
 
     buExec = testing::GetBundle("main", bc);

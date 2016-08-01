@@ -31,6 +31,10 @@
 #include <vector>
 #include <memory>
 
+#if defined(__ANDROID__)
+  #include <sstream>
+#endif
+
 //-------------------------------------------------------------------
 // File system functions
 //-------------------------------------------------------------------
@@ -64,25 +68,18 @@ void MakePath(const std::string& path);
 
 US_Core_EXPORT void RemoveDirectoryRecursive(const std::string& path);
 
-}
+} // namespace fs
 
-}
 
 //-------------------------------------------------------------------
 // Bundle name and location parsing
 //-------------------------------------------------------------------
 
-namespace us {
-
 bool IsSharedLibrary(const std::string& location);
-
-}
 
 //-------------------------------------------------------------------
 // Framework storage
 //-------------------------------------------------------------------
-
-namespace us {
 
 class CoreBundleContext;
 
@@ -97,13 +94,9 @@ std::string GetFrameworkDir(CoreBundleContext* ctx);
  */
 std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create = true);
 
-}
-
 //-------------------------------------------------------------------
 // Generic utility functions
 //-------------------------------------------------------------------
-
-namespace us {
 
 // A convenient way to construct a shared_ptr holding an array
 template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
@@ -117,18 +110,12 @@ std::string GetCurrentWorkingDirectory();
 
 void TerminateForDebug(const std::exception_ptr ex);
 
-}
-
 //-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------
 
-namespace us {
-
 int GetLastErrorNo();
 std::string GetLastErrorStr();
-
-}
 
 //-------------------------------------------------------------------
 // Android Compatibility functions
@@ -140,18 +127,19 @@ std::string GetLastErrorStr();
  * support.
  */
 
-namespace us {
-
-std::string ToString(int val);
-std::string ToString(unsigned val);
-std::string ToString(long val);
-std::string ToString(unsigned long val);
-std::string ToString(long long val);
-std::string ToString(unsigned long long val);
-std::string ToString(float val);
-std::string ToString(double val);
-std::string ToString(long double val);
-
+template <typename T>
+std::string ToString(T val)
+{
+#if defined(__ANDROID__)
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
 }
+
+
+} // namespace us
 
 #endif // USUTILS_H

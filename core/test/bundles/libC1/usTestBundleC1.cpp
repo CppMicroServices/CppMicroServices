@@ -25,6 +25,7 @@
 #include <usServiceRegistration.h>
 #include <usServiceTracker.h>
 #include <usLDAPProp.h>
+#include <usUtils_p.h> // us::ToString(...)
 
 #include <usTestingMacros.h>
 
@@ -94,12 +95,7 @@ public:
       // Register a service ten times with different properties
       InterfaceMap im;
 
-      // Workaround for doing std::to_string(buA.GetBundleId()), since "std::to_string" is currently
-      // not supported on Android
-      std::ostringstream os;
-      os << c;
-
-      im[std::string("org.cppmicroservices.c1.") + os.str()] = std::make_shared<int>(1);
+      im[std::string("org.cppmicroservices.c1.") + us::ToString(c)] = std::make_shared<int>(1);
       ServiceProperties props;
       props["i"] = i;
       auto reg = context.RegisterService(std::make_shared<const InterfaceMap>(im), props);

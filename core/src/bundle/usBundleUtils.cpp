@@ -25,6 +25,9 @@
 #include <usLog_p.h>
 #include <usUtils_p.h>
 #include <usGetBundleContext.h>
+#include <usBundleContextPrivate.h>
+#include <usBundlePrivate.h>
+#include <usCoreBundleContext_p.h>
 
 #ifdef __GNUC__
 #ifndef _GNU_SOURCE
@@ -71,7 +74,8 @@ namespace us {
 // Private util function to return system bundle's log sink
 std::shared_ptr<LogSink> GetFrameworkLogSink()
 {
-  return GetBundleContext().GetLogSink();
+  // The following is a hack, we need a cleaner solution in the future
+  return GetPrivate(GetBundleContext())->bundle->coreCtx->sink;
 }
 
 namespace BundleUtils

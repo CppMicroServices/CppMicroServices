@@ -23,12 +23,21 @@
 
 #ifndef USBUNDLEUTILS_P_H
 #define USBUNDLEUTILS_P_H
+#include <utility>
+#include <string>
 
 namespace us {
 
 namespace BundleUtils
 {
-  void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol);
+  // returns the handle to the current executable
+  void* GetExecutableHandle();
+  
+  // returns the file path of the current executable
+  std::string GetExecutablePath();
+  
+  // returns the address of the symbol in library libHandle
+  void* GetSymbol(void* libHandle, const char* symbol);
 }
 
 }

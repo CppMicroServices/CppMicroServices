@@ -50,13 +50,13 @@ class BundleContext;
  * \sa US_IMPORT_BUNDLE
  * \sa \ref MicroServices_StaticBundles
  */
-#define US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                          \
-  extern "C" us::BundleContext* _us_get_bundle_context_instance_ ## _bundle_name (); \
-  extern "C" us::BundleContext* _us_set_bundle_context_instance_ ## _bundle_name (); \
-  void _dummy_reference_to_ ## _bundle_name ## _bundle_context()           \
-  {                                                                        \
-    _us_get_bundle_context_instance_ ## _bundle_name();                    \
-    _us_set_bundle_context_instance_ ## _bundle_name();                    \
+#define US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                            \
+  extern "C" us::BundleContext* US_GET_CTX_FUNC(_bundle_name) ();            \
+  extern "C" void US_SET_CTX_FUNC(_bundle_name) (us::BundleContextPrivate*); \
+  void _dummy_reference_to_ ## _bundle_name ## _bundle_context()             \
+  {                                                                          \
+    US_GET_CTX_FUNC(_bundle_name) ();                                        \
+    US_SET_CTX_FUNC(_bundle_name) (nullptr);                                 \
   }
 
 /**
@@ -80,12 +80,14 @@ class BundleContext;
  * \sa US_INITIALIZE_STATIC_BUNDLE
  * \sa \ref MicroServices_StaticBundles
  */
-#define US_IMPORT_BUNDLE(_bundle_name)                                      \
-  US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                 \
-  extern "C" us::BundleActivator* _us_create_activator_ ## _bundle_name (); \
-  void _dummy_reference_to_ ## _bundle_name ## _activator()                 \
-  {                                                                         \
-    _us_create_activator_ ## _bundle_name();                                \
+#define US_IMPORT_BUNDLE(_bundle_name)                                            \
+  US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                       \
+  extern "C" us::BundleActivator* US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();      \
+  extern "C" void US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (us::BundleActivator*); \
+  void _dummy_reference_to_ ## _bundle_name ## _activator()                       \
+  {                                                                               \
+    US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();                                    \
+    US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (nullptr);                            \
   }
 
 #endif // USBUNDLEREGISTRY_H

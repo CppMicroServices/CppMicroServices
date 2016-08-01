@@ -3,21 +3,24 @@
 namespace us {
 struct BundleActivator;
 class BundleContext;
+class BundleContextPrivate;
 }
 
 using namespace us;
 
 // This is just for illustration purposes in code snippets
 extern "C" BundleActivator* _us_create_activator_MyStaticBundle1() { return nullptr; }
+extern "C" void _us_destroy_activator_MyStaticBundle1(BundleActivator*) {}
 extern "C" BundleActivator* _us_create_activator_MyStaticBundle2() { return nullptr; }
+extern "C" void _us_destroy_activator_MyStaticBundle2(BundleActivator*) {}
 extern "C" void _us_import_bundle_initializer_MyStaticBundle1() {}
 extern "C" void _us_import_bundle_initializer_MyStaticBundle2() {}
 extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle1() { return nullptr; }
-extern "C" BundleContext* _us_set_bundle_context_instance_MyStaticBundle1() { return nullptr; }
+extern "C" void _us_set_bundle_context_instance_MyStaticBundle1(BundleContextPrivate*) {}
 extern "C" BundleContext* _us_get_bundle_context_instance_MyStaticBundle2() { return nullptr; }
-extern "C" BundleContext* _us_set_bundle_context_instance_MyStaticBundle2() { return nullptr; }
+extern "C" void _us_set_bundle_context_instance_MyStaticBundle2(BundleContextPrivate*) {}
 extern "C" BundleContext* _us_get_bundle_context_instance_main() { return nullptr; }
-extern "C" BundleContext* _us_set_bundle_context_instance_main() { return nullptr; }
+extern "C" void _us_set_bundle_context_instance_main(BundleContextPrivate*) {}
 
 //! [ImportStaticBundleIntoMain]
 #include <usBundleImport.h>

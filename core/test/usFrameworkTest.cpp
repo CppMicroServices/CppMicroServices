@@ -227,11 +227,12 @@ namespace
 
         // Test that all bundles in the Start state are stopped when the framework is stopped.
         f.Start();
-        US_TEST_CONDITION(f.GetState() == Bundle::STATE_ACTIVE, "Check framework is active");
-
+#if defined(US_BUILD_SHARED_LIBS)
         auto bundle = testing::InstallLib(f.GetBundleContext(), "TestBundleA");
-        US_TEST_CONDITION_REQUIRED(bundle, "Non-null bundle");
-
+#else
+        auto bundle = testing::GetBundle("TestBundleA", f.GetBundleContext());
+#endif
+        US_TEST_CONDITION_REQUIRED(bundle, "Non-null bundle")
         bundle.Start();
         US_TEST_CONDITION(bundle.GetState() == Bundle::STATE_ACTIVE, "Check that TestBundleA is in an Active state");
 
@@ -366,23 +367,22 @@ namespace
 
         auto fmc = f.GetBundleContext();
         fmc.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
-
+#ifdef US_BUILD_SHARED_LIBS
         auto install = [&pEvts, &fmc](const std::string& libName)
         {
           auto bundle = testing::InstallLib(fmc, libName);
           pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
-#ifdef US_BUILD_SHARED_LIBS
           if (bundle.GetSymbolicName() == "TestBundleB")
           {
             // This is an additional install event from the bundle
             // that is statically imported by TestBundleB.
             pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, testing::GetBundle("TestBundleImportedByB", fmc)));
           }
-#endif
         };
 
         // The bundles used to test bundle events when stopping the framework.
         // For static builds, the order of the "install" calls is imported.
+
         install("TestBundleA");
         install("TestBundleA2");
         install("TestBundleB");
@@ -390,9 +390,6 @@ namespace
         install("TestBundleC1");
 #endif
         install("TestBundleH");
-#ifndef US_BUILD_SHARED_LIBS
-        install("TestBundleImportedByB");
-#endif
         install("TestBundleLQ");
         install("TestBundleM");
         install("TestBundleR");
@@ -402,12 +399,33 @@ namespace
         install("TestBundleSL1");
         install("TestBundleSL3");
         install("TestBundleSL4");
-#ifndef US_BUILD_SHARED_LIBS
-        install("main");
+        auto bundles(fmc.GetBundles());
+#else
+        // since all bundles are embedded in the main executable, all bundles are
+        // installed at framework start. simply check for start and stop events
+        std::vector<us::Bundle> bundles;
+        bundles.push_back(testing::GetBundle("TestBundleA", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleA2", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleB", fmc));
+#ifdef US_ENABLE_THREADING_SUPPORT
+        bundles.push_back(testing::GetBundle("TestBundleC1", fmc));
+#endif
+        bundles.push_back(testing::GetBundle("TestBundleH", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleImportedByB", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleLQ", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleM", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleR", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleRA", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleRL", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleS", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleSL1", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleSL3", fmc));
+        bundles.push_back(testing::GetBundle("TestBundleSL4", fmc));
+        bundles.push_back(testing::GetBundle("main", fmc));
 #endif
 
 
-        auto bundles(fmc.GetBundles());
+      
         for (auto& bundle : bundles)
         {
           bundle.Start();
@@ -442,6 +460,8 @@ namespace
         US_TEST_CONDITION(listener.CheckListenerEvents(pStopEvts), "Check for bundle stop events")
     }
 }
+
+
 
 int usFrameworkTest(int /*argc*/, char* /*argv*/[])
 {

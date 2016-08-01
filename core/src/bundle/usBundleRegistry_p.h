@@ -59,7 +59,10 @@ public:
    *
    * @param location The location to be installed
    */
-  std::vector<Bundle> Install(const std::string& location, BundlePrivate* caller);
+  std::vector<Bundle> Install(const std::string& location,
+                              BundlePrivate* caller,
+                              bool allowExecutable = false);
+
 
   std::vector<Bundle> Install0(
       const std::string& location,

@@ -136,6 +136,21 @@ std::size_t operator()(const type& arg) const {
 #define US_CONCAT_(x,y) x ## y
 #define US_CONCAT(x,y) US_CONCAT_(x,y)
 
+#define US_GET_CTX_PREFIX _us_get_bundle_context_instance_
+#define US_SET_CTX_PREFIX _us_set_bundle_context_instance_
+#define US_CTX_INS_PREFIX _us_bundle_context_instance_
+
+#define US_GET_CTX_FUNC(bsn) US_CONCAT(US_GET_CTX_PREFIX, bsn)
+#define US_SET_CTX_FUNC(bsn) US_CONCAT(US_SET_CTX_PREFIX, bsn)
+#define US_CTX_INS(bsn) US_CONCAT(US_CTX_INS_PREFIX, bsn)
+
+#define US_CREATE_ACTIVATOR_PREFIX _us_create_activator_
+#define US_DESTROY_ACTIVATOR_PREFIX _us_destroy_activator_
+
+#define US_CREATE_ACTIVATOR_FUNC(bsn) US_CONCAT(US_CREATE_ACTIVATOR_PREFIX, bsn)
+#define US_DESTROY_ACTIVATOR_FUNC(bsn) US_CONCAT(US_DESTROY_ACTIVATOR_PREFIX, bsn)
+
+
 //-------------------------------------------------------------------
 // Backwards compatibility macros
 //-------------------------------------------------------------------

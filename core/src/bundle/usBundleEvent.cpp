@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
   switch (eventType)
   {
   case BundleEvent::BUNDLE_STARTED:         return os << "STARTED";
-  case BundleEvent::BUNDLE_STOPPED:         return os << "BUNDLE_STOPPED";
+  case BundleEvent::BUNDLE_STOPPED:         return os << "STOPPED";
   case BundleEvent::BUNDLE_STARTING:        return os << "STARTING";
   case BundleEvent::BUNDLE_STOPPING:        return os << "STOPPING";
   case BundleEvent::BUNDLE_INSTALLED:       return os << "INSTALLED";

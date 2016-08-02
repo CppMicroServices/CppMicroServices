@@ -126,7 +126,11 @@ void CoreBundleContext::Init()
   //resolverHooks.Open();
   
   // auto-install all embedded bundles inside the executable
-  bundleRegistry.Install(BundleUtils::GetExecutablePath(), systemBundle.get(), true);
+  auto execPath = BundleUtils::GetExecutablePath();
+  if (IsBundleFile(execPath))
+  {
+    bundleRegistry.Install(execPath, systemBundle.get(), true);
+  }
 
   bundleRegistry.Load();
 

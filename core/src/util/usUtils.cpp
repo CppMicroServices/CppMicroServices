@@ -27,6 +27,7 @@
 #include "usLog_p.h"
 #include "usBundle.h"
 #include "usBundleContext.h"
+#include "usBundleResourceContainer_p.h"
 
 #include <string>
 #include <cstdio>
@@ -286,6 +287,21 @@ bool IsSharedLibrary(const std::string& location)
 { // Testing for file extension isn't the most robust way to test
     // for file type.
     return (location.find(library_suffix()) != std::string::npos);
+}
+
+bool IsBundleFile(const std::string& location)
+{
+  // Currently, we require a zip file with at least one top-level
+  // directory for a valid bundle file.
+  try
+  {
+    BundleResourceContainer resContainer(location);
+    return !resContainer.GetTopLevelDirs().empty();
+  }
+  catch (...)
+  {
+    return false;
+  }
 }
 
 

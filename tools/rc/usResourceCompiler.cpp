@@ -495,11 +495,27 @@ int main(int argc, char** argv)
       std::string bundleBinaryFile(bundleFileOpt->arg);
       std::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
       std::ifstream zipFileStream(outFile, std::ios_base::binary);
-      std::clog << "Appending file " << bundleBinaryFile << " with contents of zip file at " << outFile << std::endl;
-      outFileStream.seekp(0, std::ios_base::end);
-      std::clog << "  Initial file size : " << outFileStream.tellp() << std::endl;
-      outFileStream << zipFileStream.rdbuf();
-      std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
+      if(outFileStream.is_open() && zipFileStream.is_open())
+      {
+        std::clog << "Appending file " << bundleBinaryFile << " with contents of resources zip file at " << outFile << std::endl;
+        std::clog << "  Initial file size : " << outFileStream.tellp() << std::endl;
+        outFileStream << zipFileStream.rdbuf();
+        std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
+        // Depending on the ofstream destructor to close the file may result in a silent
+        // file write error. Hence the explicit call to close.
+        outFileStream.close();
+        if (outFileStream.rdstate() & std::ofstream::failbit)
+        {
+          std::cerr << "Failed to write file : " << bundleBinaryFile << std::endl;
+          return_code = EXIT_FAILURE;
+        }
+      }
+      else
+      {
+        std::cerr << "Opening file " << outFile << (outFileStream.is_open() ? " Succeeded" : " Failed") << std::endl;
+        std::cerr << "Opening file " << bundleBinaryFile << (zipFileStream.is_open() ? " Succeeded" : " Failed") << std::endl;
+        return_code = EXIT_FAILURE;
+      }
     }
   }
   catch (const std::exception& ex)

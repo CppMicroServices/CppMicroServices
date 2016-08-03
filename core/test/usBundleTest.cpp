@@ -564,7 +564,7 @@ void TestAutoInstallEmbeddedBundles()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
   US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+  frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
   US_TEST_FOR_EXCEPTION_END(std::runtime_error)
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).

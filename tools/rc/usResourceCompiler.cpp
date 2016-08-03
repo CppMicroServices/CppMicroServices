@@ -447,7 +447,7 @@ int main(int argc, char** argv)
   }
   std::clog << "using compression level " << compressionLevel << std::endl;
   
-  std::string outFile;
+  std::string zipFile;
   bool deleteTempFile = false;
   
   try
@@ -456,21 +456,21 @@ int main(int argc, char** argv)
     if (!options[RESADD] && !options[MANIFESTADD] && options[ZIPADD].count() == 1 && options[BUNDLEFILE])
     {
       // jump to append part.
-      outFile = options[ZIPADD].arg;
+      zipFile = options[ZIPADD].arg;
     }
     else
     {
       if (outFileOpt)
       {
-        outFile = outFileOpt->arg;
+        zipFile = outFileOpt->arg;
       }
       else
       {
-        outFile = us_tempfile();
+        zipFile = us_tempfile();
         deleteTempFile = true;
       }
       
-      std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(outFile, compressionLevel, bundleName));
+      std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])
       {
@@ -494,10 +494,10 @@ int main(int argc, char** argv)
     {
       std::string bundleBinaryFile(bundleFileOpt->arg);
       std::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
-      std::ifstream zipFileStream(outFile, std::ios_base::binary);
+      std::ifstream zipFileStream(zipFile, std::ios_base::binary);
       if(outFileStream.is_open() && zipFileStream.is_open())
       {
-        std::clog << "Appending file " << bundleBinaryFile << " with contents of resources zip file at " << outFile << std::endl;
+        std::clog << "Appending file " << bundleBinaryFile << " with contents of resources zip file at " << zipFile << std::endl;
         std::clog << "  Initial file size : " << outFileStream.tellp() << std::endl;
         outFileStream << zipFileStream.rdbuf();
         std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
@@ -512,8 +512,7 @@ int main(int argc, char** argv)
       }
       else
       {
-        std::cerr << "Opening file " << outFile << (outFileStream.is_open() ? " Succeeded" : " Failed") << std::endl;
-        std::cerr << "Opening file " << bundleBinaryFile << (zipFileStream.is_open() ? " Succeeded" : " Failed") << std::endl;
+        std::cerr << "Opening file " << (outFileStream.is_open() ? zipFile : bundleBinaryFile) <<  " failed" << std::endl;
         return_code = EXIT_FAILURE;
       }
     }
@@ -525,9 +524,9 @@ int main(int argc, char** argv)
   }
   
   // delete temporary file and report error on failure
-  if (deleteTempFile && (std::remove(outFile.c_str()) != 0))
+  if (deleteTempFile && (std::remove(zipFile.c_str()) != 0))
   {
-    std::cerr << "Error removing temporary zip archive "  << outFile << std:: endl;
+    std::cerr << "Error removing temporary zip archive "  << zipFile << std:: endl;
     return_code = EXIT_FAILURE;
   }
   

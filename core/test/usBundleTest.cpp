@@ -152,11 +152,11 @@ void frame020a()
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
+#ifdef US_BUILD_SHARED_LIBS // The bundle is installed at framework startup for static builds
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, buA));
-
   bool relaxed = false;
-#ifndef US_BUILD_SHARED_LIBS
-  relaxed = true;
+#else
+  bool relaxed = true;
 #endif
   US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed), "Test for unexpected events");
 }
@@ -251,10 +251,8 @@ void frame035a()
 {
   try
   {
-    auto bundles = bc.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
-    US_TEST_CONDITION_REQUIRED(!bundles.empty() && bundles.front(), "Test installation of bundle main")
-
     buExec = testing::GetBundle("main", bc);
+    US_TEST_CONDITION_REQUIRED(buExec, "Bundle 'main' not found");
     buExec.Start();
   }
   catch (const std::exception& e)
@@ -357,7 +355,9 @@ void TestListenerFunctors()
   bundleA.Start();
 
   std::vector<BundleEvent> pEvts;
+#ifdef US_BUILD_SHARED_LIBS
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleA));
+#endif
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleA));
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleA));
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleA));
@@ -377,6 +377,7 @@ void TestListenerFunctors()
   bundleA.Stop();
 }
 
+
 void TestBundleStates()
 {
     TestBundleListener listener;
@@ -389,9 +390,30 @@ void TestBundleStates()
 
     auto frameworkCtx = framework.GetBundleContext();
     frameworkCtx.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
-
+  
+    // Test Start -> Stop for auto-installed bundles
+    auto bundles = frameworkCtx.GetBundles();
+    for (auto& bundle : bundles)
+    {
+      if (bundle != framework)
+      {
+        US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
+        bundle.Start();
+        US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
+        bundle.Stop();
+        US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+      }
+    }
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");
+    bundleEvents.clear();
+  
+#ifdef US_BUILD_SHARED_LIBS    // following combination can be tested only for shared library builds
     Bundle bundle;
-
     // Test install -> uninstall
     // expect 2 event (BUNDLE_INSTALLED, BUNDLE_UNINSTALLED)
     bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
@@ -404,11 +426,8 @@ void TestBundleStates()
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
 
-    bool relaxed = false;
-  #ifndef US_BUILD_SHARED_LIBS
-    relaxed = true;
-  #endif
-    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, relaxed), "Test for unexpected events");
+
+    US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");
     bundleEvents.clear();
 
     // Test install -> start -> uninstall
@@ -471,6 +490,7 @@ void TestBundleStates()
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundle));
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents), "Test for unexpected events");
     bundleEvents.clear();
+#endif
 }
 
 void TestForInstallFailure()
@@ -510,8 +530,13 @@ void TestForInstallFailure()
     {
         US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
     }
-
-    US_TEST_CONDITION(1 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#ifdef US_BUILD_SHARED_LIBS
+    // 2 bundles - the framework(system_bundle) and the executable(main).
+    US_TEST_CONDITION(2 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#else
+    // There are atleast 2 bundles, maybe more depending on how the executable is created
+    US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#endif
 }
 
 void TestDuplicateInstall()
@@ -530,6 +555,29 @@ void TestDuplicateInstall()
 
     US_TEST_CONDITION(bundle == bundleDuplicate, "Test for the same bundle instance");
     US_TEST_CONDITION(bundle.GetBundleId() == bundleDuplicate.GetBundleId(), "Test for the same bundle id");
+}
+  
+void TestAutoInstallEmbeddedBundles()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
+  frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+#ifdef US_BUILD_SHARED_LIBS
+  // 2 bundles - the framework(system_bundle) and the executable(main).
+  US_TEST_CONDITION(2 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#else
+  // There are atleast 2 bundles, maybe more depending on how the executable is created
+  US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#endif
+  auto bundle = frameworkCtx.GetBundles();
+  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
+  bundle[0].Uninstall();
+  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+  f.Stop();
 }
 
 }
@@ -583,6 +631,7 @@ int usBundleTest(int /*argc*/, char* /*argv*/[])
   TestBundleStates();
   TestForInstallFailure();
   TestDuplicateInstall();
+  TestAutoInstallEmbeddedBundles();
 
   US_TEST_END()
 }

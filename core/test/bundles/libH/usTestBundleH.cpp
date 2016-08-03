@@ -112,7 +112,6 @@ class TestBundleHActivator : public BundleActivator
   std::string thisServiceName;
   ServiceRegistration<TestBundleH> factoryService;
   ServiceRegistration<TestBundleH,TestBundleH2> prototypeFactoryService;
-  BundleContext context;
   std::shared_ptr<ServiceFactory> factoryObj;
   std::shared_ptr<TestBundleHPrototypeServiceFactory> prototypeFactoryObj;
 
@@ -120,12 +119,10 @@ public:
 
   TestBundleHActivator()
     : thisServiceName(us_service_interface_iid<TestBundleH>())
-    , context()
   {}
 
   void Start(BundleContext context)
   {
-    this->context = context;
     factoryObj = std::make_shared<TestBundleHServiceFactory>();
     factoryService = context.RegisterService<TestBundleH>(ToFactory(factoryObj));
     prototypeFactoryObj = std::make_shared<TestBundleHPrototypeServiceFactory>();
@@ -135,6 +132,7 @@ public:
   void Stop(BundleContext /*context*/)
   {
     factoryService.Unregister();
+    prototypeFactoryService.Unregister();
   }
 
 };

@@ -430,7 +430,6 @@ int usBundleResourceTest(int /*argc*/, char* /*argv*/[])
   Bundle executableBundle;
   try
   {
-    context.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
     executableBundle = testing::GetBundle("main", context);
     US_TEST_CONDITION_REQUIRED(executableBundle, "Test installation of bundle main")
   }

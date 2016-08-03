@@ -44,7 +44,6 @@ set(_public_headers
   usBundleInitialization.h
   usBundleResource.h
   usBundleResourceStream.h
-  usBundleUtils.h
   usBundleVersion.h
   usConstants.h
 )

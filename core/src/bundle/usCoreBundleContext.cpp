@@ -33,6 +33,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "usBundleStorageMemory_p.h"
 #include "usBundleInitialization.h"
 #include "usConstants.h"
+#include "usBundleUtils_p.h"
 #include "usUtils_p.h" // us::ToString()
 
 #include <iomanip>
@@ -124,6 +125,13 @@ void CoreBundleContext::Init()
 
   serviceHooks.Open();
   //resolverHooks.Open();
+  
+  // auto-install all embedded bundles inside the executable
+  auto execPath = BundleUtils::GetExecutablePath();
+  if (IsBundleFile(execPath))
+  {
+    bundleRegistry.Install(execPath, systemBundle.get(), true);
+  }
 
   bundleRegistry.Load();
 

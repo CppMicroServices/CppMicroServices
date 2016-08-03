@@ -139,6 +139,11 @@ void Bundle::Stop(uint32_t options)
 
 void Bundle::Uninstall()
 {
+  if (!IsSharedLibrary(GetLocation()))
+  {
+    throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
+  }
+  
   {
     auto l = d->coreCtx->resolver.Lock(); US_UNUSED(l);
     //BundleGeneration current = current();

@@ -29,10 +29,9 @@
 #endif
 
 #include <usBundleContext.h>
-#include <usBundleUtils.h>
+#include <usBundleInitialization.h>
 
-#include <memory>
-#include <cstring>
+extern "C" us::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)();
 
 namespace us {
 
@@ -50,24 +49,8 @@ US_Core_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
  */
 static inline BundleContext GetBundleContext()
 {
-  BundleContext(*getBundleContext)(void) = &GetBundleContext;
-
-  void* GetBundleContextPtr = nullptr;
-  std::memcpy(&GetBundleContextPtr, &getBundleContext, sizeof(void*));
-  std::string libPath(BundleUtils::GetLibraryPath(GetBundleContextPtr));
-
-  BundleContextPrivate*(*getBundleContextInst)(void) = nullptr;
-  std::string get_bundle_context_inst("_us_get_bundle_context_instance_" US_STR(US_BUNDLE_NAME));
-  void* getBundleContextInstSym = BundleUtils::GetSymbol(US_STR(US_BUNDLE_NAME), libPath, get_bundle_context_inst.c_str());
-  std::memcpy(&getBundleContextInst, &getBundleContextInstSym, sizeof(void*));
-
-  if (getBundleContextInst)
-  {
-    BundleContextPrivate* ctx = getBundleContextInst();
-    return ctx ? MakeBundleContext(ctx) : BundleContext{};
-  }
-
-  return BundleContext{};
+  auto ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)();
+  return ctx ? MakeBundleContext(ctx) : BundleContext{};
 }
 
 }

@@ -36,6 +36,7 @@ limitations under the License.
 
 using namespace us;
 
+#ifdef US_BUILD_SHARED_LIBS
 namespace
 {
     std::mutex mutex_io = {};
@@ -115,9 +116,7 @@ namespace
         // it would be ideal to model it as a test.
 
         std::size_t numTestBundles = 16;  // 14 test bundles + 1 statically linked bundle + the system bundle
-#ifndef US_BUILD_SHARED_LIBS
         numTestBundles += 1; // main
-#endif
         const int numTestThreads = 100;
         std::vector<std::thread> threads;
         for (int i = 0; i < numTestThreads; ++i)
@@ -132,6 +131,7 @@ namespace
 #endif
 
 }   // end anonymous namespace
+#endif
 
 int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 {
@@ -140,13 +140,13 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     FrameworkFactory factory;
     auto framework = factory.NewFramework();
     framework.Start();
-
+#ifdef US_BUILD_SHARED_LIBS
     US_TEST_OUTPUT(<< "Testing serial installation of bundles");
     TestSerial(framework);
 
     for (auto bundle : framework.GetBundleContext().GetBundles())
     {
-        if (bundle.GetBundleId() != 0)
+        if (bundle.GetBundleId() != 0 && bundle.GetSymbolicName() != "main")
         {
             bundle.Uninstall();
         }
@@ -155,7 +155,7 @@ int usBundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
     US_TEST_OUTPUT(<< "Testing concurrent installation of bundles");
     TestConcurrent(framework);
 #endif
-
+#endif
     framework.Stop();
 
     US_TEST_END()

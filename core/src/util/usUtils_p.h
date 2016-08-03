@@ -72,10 +72,12 @@ US_Core_EXPORT void RemoveDirectoryRecursive(const std::string& path);
 
 
 //-------------------------------------------------------------------
-// Bundle name and location parsing
+// File type checking
 //-------------------------------------------------------------------
 
 bool IsSharedLibrary(const std::string& location);
+
+bool IsBundleFile(const std::string& location);
 
 //-------------------------------------------------------------------
 // Framework storage

@@ -402,7 +402,7 @@ int usServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    auto bundles = framework.GetBundleContext().InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
+    auto bundles = framework.GetBundleContext().GetBundles();
     US_TEST_CONDITION_REQUIRED(!bundles.empty(), "Test installation of bundle main")
     for (auto& b : bundles)
     {

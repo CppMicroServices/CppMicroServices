@@ -137,7 +137,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
 #if defined (US_BUILD_SHARED_LIBS)
         bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + libName + LIB_EXT);
 #else
-        bundles = frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+        bundles = frameworkCtx.GetBundles();
 #endif
         US_TEST_CONDITION_REQUIRED(!bundles.empty(), "Test installation of library " << libName)
     }

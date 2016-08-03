@@ -26,8 +26,9 @@
 
 using namespace us;
 
-struct MyStaticBundleActivator : public BundleActivator
+class MyStaticBundleActivator : public BundleActivator
 {
+public:
   void Start(BundleContext /*context*/)
   {
     std::cout << "Hello from a static bundle." << std::endl;

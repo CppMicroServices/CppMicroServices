@@ -20,194 +20,121 @@
 
 =============================================================================*/
 
-#include "usBundleUtils.h"
 #include "usBundleUtils_p.h"
 
 #include <usLog_p.h>
 #include <usUtils_p.h>
+#include <usGetBundleContext.h>
+#include <usBundleContextPrivate.h>
+#include <usBundlePrivate.h>
+#include <usCoreBundleContext_p.h>
 
 #ifdef __GNUC__
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 #include <dlfcn.h>
+#if defined(__APPLE__)
+#include <sys/param.h>
+#include <mach-o/dyld.h>
+#endif
+#include <unistd.h>
+#include <limits.h>
 #elif _WIN32
 #include <windows.h>
+
+#define RTLD_LAZY 0 // unused
+
+const char* dlerror(void)
+{
+  static std::string errStr;
+  errStr = us::GetLastErrorStr();
+  return errStr.c_str();
+}
+
+void* dlopen(const char * path, int mode)
+{
+  (void)mode; // ignored
+  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandle(nullptr) : LoadLibrary(path));
+}
+
+void* dlsym(void *handle, const char *symbol)
+{
+  return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(handle), symbol));
+}
+
+#endif
+
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
 #endif
 
 namespace us {
 
-/**
- * A helper class to capture error code information per function
- * call.
- * Internal use only.
- *
- * Functionally equivalent to the free standing BundleUtils
- * functions.
- *
- * Example usage
- * <code>
- * BundleUtilWrapper util;
- * std::string path(util.GetLibraryPath(symbol));
- * if(path.empty())
- * {  
- *   std::string err(util.LastError());
- *   // ... do something with error string ...
- * }
- * </code>
- */
-class BundleUtilWrapper
+// Private util function to return system bundle's log sink
+std::shared_ptr<LogSink> GetFrameworkLogSink()
 {
-public:
-  BundleUtilWrapper() : _lastError() {}
-  ~BundleUtilWrapper() = default;
-
-  BundleUtilWrapper(const BundleUtilWrapper&) = delete;
-  BundleUtilWrapper& operator=(const BundleUtilWrapper&) = delete;
-
-  BundleUtilWrapper(const BundleUtilWrapper&& other) : _lastError(std::move(other._lastError)) {}
-  BundleUtilWrapper& operator=(const BundleUtilWrapper&& other) = delete;
-	
-  std::string GetLibraryPath(void* symbol) 
-  {
-    std::string result(BundleUtils::GetLibraryPath(symbol));
-    _lastError = GetLastError();
-    return result; 
-  }
-
-  void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol) 
-  {
-    void* result(BundleUtils::GetSymbol(bundleName, libLocation, symbol));
-    _lastError = GetLastError();
-    return result; 
-  }
-
-  std::string LastError() { return _lastError; }
-
-private:
-  std::string GetLastError()
-  {
-#if defined(US_PLATFORM_POSIX)
-    const char* str = dlerror();
-    return std::string(((str == nullptr) ? "" : str));
-#else
-    return us::GetLastErrorStr();
-#endif
-  }
-
-  std::string _lastError;
-};
-
-namespace {
-#ifdef US_BUILD_SHARED_LIBS
-  const bool sharedLibMode = true;
-#else
-  const bool sharedLibMode = false;
-#endif
+  // The following is a hack, we need a cleaner solution in the future
+  return GetPrivate(GetBundleContext())->bundle->coreCtx->sink;
 }
 
 namespace BundleUtils
 {
-
-#ifdef __GNUC__
-
-std::string GetLibraryPath_impl(void* symbol)
-{
-  Dl_info info;
-  if (dladdr(symbol, &info))
-  {
-    return info.dli_fname;
-  }
   
-  return std::string();
-}
-
-void* GetSymbol_impl(const std::string& bundleName, const std::string& libLocation, const char* symbol)
+void* GetExecutableHandle()
 {
-  // Clear the last error message
-  dlerror();
-
-  void* selfHandle = nullptr;
-  if (!sharedLibMode || bundleName == "main")
-  {
-    // Get the handle of the executable
-    selfHandle = dlopen(0, RTLD_LAZY);
-  }
-  else
-  {
-    selfHandle = dlopen(libLocation.c_str(), RTLD_LAZY);
-  }
-
-  if (selfHandle)
-  {
-    void* addr = dlsym(selfHandle, symbol);
-
-    dlclose(selfHandle);
-    return addr;
-  }
-
-  return nullptr;
+  return dlopen(0, RTLD_LAZY);;
 }
 
-#elif _WIN32
-
-std::string GetLibraryPath_impl(void *symbol)
+std::string GetExecutablePath()
 {
-  HMODULE handle = nullptr;
-  BOOL handleError = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                                       static_cast<LPCTSTR>(symbol), &handle);
-  if (!handleError) return std::string();
-
-  char bundlePath[512];
-  if (GetModuleFileName(handle, bundlePath, 512))
+  std::string execPath;
+  uint32_t bufsize = MAXPATHLEN;
+  std::unique_ptr<char[]> buf(new char[bufsize]);
+  
+#if _WIN32
+  if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
-    return bundlePath;
+    DIAG_LOG(*GetFrameworkLogSink()) << "GetModuleFileName failed" << GetLastErrorStr();
+    buf[0] = '\0';
   }
-
-  return std::string();
-}
-
-void* GetSymbol_impl(const std::string& bundleName, const std::string& libLocation, const char* symbol)
-{
-  HMODULE handle = nullptr;
-  if (!sharedLibMode || bundleName == "main")
+#elif defined(__APPLE__)
+  int status = _NSGetExecutablePath(buf.get(), &bufsize);
+  if (status == -1)
   {
-    handle = GetModuleHandle(nullptr);
+    buf.reset(new char[bufsize]);
+    status = _NSGetExecutablePath(buf.get(), &bufsize);
   }
-  else
+  if (status != 0)
   {
-    handle = GetModuleHandle(libLocation.c_str());
+     DIAG_LOG(*GetFrameworkLogSink()) << "_NSGetExecutablePath() failed";
   }
-
-  if (!handle) return nullptr;
-
-  return (void*)GetProcAddress(handle, symbol);
-}
-
+  // the returned path may not be an absolute path
+#elif defined(__linux__)
+  ssize_t len = ::readlink("/proc/self/exe", buf.get(), bufsize);
+  if (len == -1 || len == bufsize)
+  {
+    len = 0;
+  }
+  buf[len] = '\0';
 #else
-
-std::string GetLibraryPath_impl(void*)
-{
-  return "";
-}
-
-void* GetSymbol_impl(const std::string&, const std::string&, const char*)
-{
-  return nullptr;
-}
-
+  // 'dlsym' does not work with symbol name 'main'
+  DIAG_LOG(*GetFrameworkLogSink()) << "GetExecutablePath failed";
 #endif
-
-std::string GetLibraryPath(void* symbol)
-{
-  return GetLibraryPath_impl(symbol);
+  return buf.get();
 }
 
-void* GetSymbol(const std::string& bundleName, const std::string& libLocation, const char* symbol)
+void* GetSymbol(void* libHandle, const char* symbol)
 {
-  return GetSymbol_impl(bundleName, libLocation, symbol);
+  void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
+  if (!addr)
+  {
+    const char* dlerrorMsg = dlerror();
+    DIAG_LOG(*GetFrameworkLogSink()) << "GetSymbol() failed to find (" << symbol << ") with error : "<< (dlerrorMsg ? dlerrorMsg : "unknown");
+  }
+  return addr;
 }
-
+  
 } // namespace BundleUtils
 
 } // namespace us

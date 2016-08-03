@@ -30,6 +30,7 @@
 #include <usBundleContext.h>
 #include <usConstants.h>
 #include <usBundleActivator.h>
+#include <usUtils_p.h> // us::ToString(...)
 
 #include "usTestUtils.h"
 #include "usTestUtilBundleListener.h"
@@ -208,7 +209,8 @@ void frame020b()
   US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetTempDirectory() + DIR_SEP + "data" + DIR_SEP + std::to_string(buA.GetBundleId()) + DIR_SEP;
+
+  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + us::ToString(buA.GetBundleId()) + testing::DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 
@@ -562,7 +564,7 @@ void TestAutoInstallEmbeddedBundles()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
   US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+  frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
   US_TEST_FOR_EXCEPTION_END(std::runtime_error)
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).

@@ -46,19 +46,19 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
 
 #endif
 
-  const std::string libAFilePath = LIB_PATH + PATH_SEPARATOR + LIB_PREFIX + "TestBundleA" + LIB_SUFFIX;
+  const std::string libAFilePath = testing::LIB_PATH + PATH_SEPARATOR + testing::LIB_PREFIX + "TestBundleA" + LIB_SUFFIX;
   SharedLibrary lib1(libAFilePath);
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "Absolute file path")
-  US_TEST_CONDITION(lib1.GetLibraryPath() == LIB_PATH, "Library path")
+  US_TEST_CONDITION(lib1.GetLibraryPath() == testing::LIB_PATH, "Library path")
   US_TEST_CONDITION(lib1.GetName() == "TestBundleA", "Name")
-  US_TEST_CONDITION(lib1.GetPrefix() == LIB_PREFIX, "Prefix")
+  US_TEST_CONDITION(lib1.GetPrefix() == testing::LIB_PREFIX, "Prefix")
   US_TEST_CONDITION(lib1.GetSuffix() == LIB_SUFFIX, "Suffix")
   lib1.SetName("bla");
   US_TEST_CONDITION(lib1.GetName() == "TestBundleA", "Name after SetName()")
   lib1.SetLibraryPath("bla");
-  US_TEST_CONDITION(lib1.GetLibraryPath() == LIB_PATH, "Library path after SetLibraryPath()")
+  US_TEST_CONDITION(lib1.GetLibraryPath() == testing::LIB_PATH, "Library path after SetLibraryPath()")
   lib1.SetPrefix("bla");
-  US_TEST_CONDITION(lib1.GetPrefix() == LIB_PREFIX, "Prefix after SetPrefix()")
+  US_TEST_CONDITION(lib1.GetPrefix() == testing::LIB_PREFIX, "Prefix after SetPrefix()")
   lib1.SetSuffix("bla");
   US_TEST_CONDITION(lib1.GetSuffix() == LIB_SUFFIX, "Suffix after SetSuffix()")
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "File path after setters")
@@ -67,7 +67,7 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(lib1.GetFilePath() == "bla", "Invalid file path")
   US_TEST_CONDITION(lib1.GetLibraryPath().empty(), "Empty lib path")
   US_TEST_CONDITION(lib1.GetName() == "bla", "Invalid file name")
-  US_TEST_CONDITION(lib1.GetPrefix() == LIB_PREFIX, "Invalid prefix")
+  US_TEST_CONDITION(lib1.GetPrefix() == testing::LIB_PREFIX, "Invalid prefix")
   US_TEST_CONDITION(lib1.GetSuffix() == LIB_SUFFIX, "Invalid suffix")
 
   US_TEST_FOR_EXCEPTION(std::runtime_error, lib1.Load())
@@ -85,22 +85,22 @@ int usSharedLibraryTest(int /*argc*/, char* /*argv*/[])
   lib1.Unload();
 
 
-  SharedLibrary lib2(LIB_PATH, "TestBundleA");
+  SharedLibrary lib2(testing::LIB_PATH, "TestBundleA");
   US_TEST_CONDITION(lib2.GetFilePath() == libAFilePath, "File path")
   lib2.SetPrefix("");
   US_TEST_CONDITION(lib2.GetPrefix().empty(), "Lib prefix")
-  US_TEST_CONDITION(lib2.GetFilePath() == LIB_PATH + PATH_SEPARATOR + "TestBundleA" + LIB_SUFFIX, "File path")
+  US_TEST_CONDITION(lib2.GetFilePath() == testing::LIB_PATH + PATH_SEPARATOR + "TestBundleA" + LIB_SUFFIX, "File path")
 
   SharedLibrary lib3 = lib2;
   US_TEST_CONDITION(lib3.GetFilePath() == lib2.GetFilePath(), "Compare file path")
-  lib3.SetPrefix(LIB_PREFIX);
+  lib3.SetPrefix(testing::LIB_PREFIX);
   US_TEST_CONDITION(lib3.GetFilePath() == libAFilePath, "Compare file path")
   lib3.Load();
   US_TEST_CONDITION(lib3.IsLoaded(), "lib3 loaded")
   US_TEST_CONDITION(!lib2.IsLoaded(), "lib2 not loaded")
   lib1 = lib3;
   US_TEST_FOR_EXCEPTION(std::logic_error, lib1.Load())
-  lib2.SetPrefix(LIB_PREFIX);
+  lib2.SetPrefix(testing::LIB_PREFIX);
   lib2.Load();
 
   lib3.Unload();

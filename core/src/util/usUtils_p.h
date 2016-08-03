@@ -31,6 +31,10 @@
 #include <vector>
 #include <memory>
 
+#if defined(__ANDROID__)
+  #include <sstream>
+#endif
+
 //-------------------------------------------------------------------
 // File system functions
 //-------------------------------------------------------------------
@@ -64,27 +68,20 @@ void MakePath(const std::string& path);
 
 US_Core_EXPORT void RemoveDirectoryRecursive(const std::string& path);
 
-}
+} // namespace fs
 
-}
 
 //-------------------------------------------------------------------
 // File type checking
 //-------------------------------------------------------------------
 
-namespace us {
-
 bool IsSharedLibrary(const std::string& location);
 
 bool IsBundleFile(const std::string& location);
 
-}
-
 //-------------------------------------------------------------------
 // Framework storage
 //-------------------------------------------------------------------
-
-namespace us {
 
 class CoreBundleContext;
 
@@ -99,13 +96,9 @@ std::string GetFrameworkDir(CoreBundleContext* ctx);
  */
 std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create = true);
 
-}
-
 //-------------------------------------------------------------------
 // Generic utility functions
 //-------------------------------------------------------------------
-
-namespace us {
 
 // A convenient way to construct a shared_ptr holding an array
 template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
@@ -119,17 +112,36 @@ std::string GetCurrentWorkingDirectory();
 
 void TerminateForDebug(const std::exception_ptr ex);
 
-}
-
 //-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------
 
-namespace us {
-
 int GetLastErrorNo();
 std::string GetLastErrorStr();
 
+//-------------------------------------------------------------------
+// Android Compatibility functions
+//-------------------------------------------------------------------
+
+/**
+ * Compatibility functions to replace "std::to_string(...)" functions
+ * on Android, since the latest Android NDKs lack "std::to_string(...)"
+ * support.
+ */
+
+template <typename T>
+std::string ToString(T val)
+{
+#if defined(__ANDROID__)
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
 }
+
+
+} // namespace us
 
 #endif // USUTILS_H

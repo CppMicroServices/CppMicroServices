@@ -404,6 +404,7 @@ std::string GetLastErrorStr()
 #endif
 }
 
+
 void TerminateForDebug(const std::exception_ptr ex)
 {
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
@@ -490,4 +491,4 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   return result;
 }
 
-}
+} // namespace us

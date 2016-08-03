@@ -50,10 +50,10 @@ namespace
     inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx, const std::string& bundleName)
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + bundleName + LIB_EXT);
+        frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + testing::LIB_PREFIX + bundleName + testing::LIB_EXT);
 #else
         US_UNUSED(bundleName);
-        frameworkCtx.InstallBundles(BIN_PATH + DIR_SEP + "usCoreTestDriver" + EXE_EXT);
+        frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usCoreTestDriver" + testing::EXE_EXT);
 #endif
     }
 

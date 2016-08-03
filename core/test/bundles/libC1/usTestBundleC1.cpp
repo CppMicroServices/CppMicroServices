@@ -25,6 +25,7 @@
 #include <usServiceRegistration.h>
 #include <usServiceTracker.h>
 #include <usLDAPProp.h>
+#include <usUtils_p.h> // us::ToString(...)
 
 #include <usTestingMacros.h>
 
@@ -93,7 +94,8 @@ public:
     {
       // Register a service ten times with different properties
       InterfaceMap im;
-      im[std::string("org.cppmicroservices.c1.") + std::to_string(c)] = std::make_shared<int>(1);
+
+      im[std::string("org.cppmicroservices.c1.") + us::ToString(c)] = std::make_shared<int>(1);
       ServiceProperties props;
       props["i"] = i;
       auto reg = context.RegisterService(std::make_shared<const InterfaceMap>(im), props);

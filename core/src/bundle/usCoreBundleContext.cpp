@@ -34,6 +34,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "usBundleInitialization.h"
 #include "usConstants.h"
 #include "usBundleUtils_p.h"
+#include "usUtils_p.h" // us::ToString()
 
 #include <iomanip>
 
@@ -178,7 +179,7 @@ std::string CoreBundleContext::GetDataStorage(long id) const
 {
   if (!dataStorage.empty())
   {
-    return dataStorage + DIR_SEP + std::to_string(id);
+    return dataStorage + DIR_SEP + us::ToString(id);
   }
   return std::string();
 }

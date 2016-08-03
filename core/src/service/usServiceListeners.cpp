@@ -345,7 +345,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
     }
 
     long service_id = any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID));
-    AddToSet_unlocked(set, receivers, SERVICE_ID_IX, std::to_string((service_id)));
+    AddToSet_unlocked(set, receivers, SERVICE_ID_IX, us::ToString((service_id)));
   }
 }
 

@@ -66,6 +66,11 @@ public:
 
     Framework() = delete;
 
+    Framework(const Framework& fw); // = default
+    Framework(Framework&& fw); // = default
+    Framework& operator=(const Framework& fw); // = default
+    Framework& operator=(Framework&& fw); // = default
+
     /**
      * Initialize this Framework. After calling this method, this Framework
      * has:

@@ -25,12 +25,12 @@
 #define TRACKEDSERVICE_H
 
 #include "cppmicroservices/ServiceEvent.h"
-#include "cppmicroservices/details/BundleAbstractTracked_p.h"
-#include "cppmicroservices/details/TrackedServiceListener_p.h"
+#include "cppmicroservices/detail/BundleAbstractTracked_p.h"
+#include "cppmicroservices/detail/TrackedServiceListener_p.h"
 
 namespace cppmicroservices {
   
-namespace details {
+namespace detail {
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -107,10 +107,10 @@ private:
                          const ServiceEvent& related, const std::shared_ptr<TrackedParmType>& object) ;
 };
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 
-#include "cppmicroservices/details/TrackedService.tpp"
+#include "cppmicroservices/detail/TrackedService.tpp"
 
 #endif // TRACKEDSERVICE_H

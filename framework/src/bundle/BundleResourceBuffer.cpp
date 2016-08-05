@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/details/BundleResourceBuffer_p.h"
+#include "cppmicroservices/detail/BundleResourceBuffer_p.h"
 
 #include <cassert>
 #include <cstdint>
@@ -37,7 +37,7 @@
 
 namespace cppmicroservices {
   
-  namespace details {
+  namespace detail {
 
 class BundleResourceBufferPrivate
 {
@@ -286,6 +286,6 @@ std::streambuf::pos_type BundleResourceBuffer::seekpos(std::streambuf::pos_type 
   return this->seekoff(sp, std::ios_base::beg);
 }
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices

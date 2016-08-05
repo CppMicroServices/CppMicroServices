@@ -25,7 +25,7 @@
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/ServiceProperties.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include <map>
 #include <string>
@@ -33,7 +33,7 @@
 
 namespace cppmicroservices {
 
-class Properties : public details::MultiThreaded<>
+class Properties : public detail::MultiThreaded<>
 {
 
 public:

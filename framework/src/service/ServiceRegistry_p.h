@@ -26,7 +26,7 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 namespace cppmicroservices {
 
@@ -38,7 +38,7 @@ class Properties;
 /**
  * Here we handle all the CppMicroServices services that are registered.
  */
-class ServiceRegistry : private details::MultiThreaded<>
+class ServiceRegistry : private detail::MultiThreaded<>
 {
 
 public:

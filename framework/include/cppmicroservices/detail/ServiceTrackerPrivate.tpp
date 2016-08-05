@@ -21,7 +21,7 @@
 =============================================================================*/
 
 
-#include "cppmicroservices/details/TrackedService_p.h"
+#include "cppmicroservices/detail/TrackedService_p.h"
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
@@ -31,7 +31,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
@@ -136,7 +136,7 @@ std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,TTT>::GetInitialRefere
 }
 
 template<class S, class TTT>
-void ServiceTrackerPrivate<S,TTT>::GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, details::TrackedService<S,TTT>* t) const
+void ServiceTrackerPrivate<S,TTT>::GetServiceReferences_unlocked(std::vector<ServiceReference<S> >& refs, detail::TrackedService<S,TTT>* t) const
 {
   if (t->Size_unlocked() == 0)
   {
@@ -146,7 +146,7 @@ void ServiceTrackerPrivate<S,TTT>::GetServiceReferences_unlocked(std::vector<Ser
 }
 
 template<class S, class TTT>
-std::shared_ptr<details::TrackedService<S,TTT>> ServiceTrackerPrivate<S,TTT>::Tracked() const
+std::shared_ptr<detail::TrackedService<S,TTT>> ServiceTrackerPrivate<S,TTT>::Tracked() const
 {
   return trackedService.Load();
 }
@@ -159,6 +159,6 @@ void ServiceTrackerPrivate<S,TTT>::Modified()
   DIAG_LOG(*context.GetLogSink()) << "ServiceTracker::Modified(): " << filter;
 }
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices

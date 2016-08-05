@@ -23,7 +23,7 @@
 #include "BundleUtils_p.h"
 
 #include "cppmicroservices/GetBundleContext.h"
-#include "cppmicroservices/details/Log_p.h"
+#include "cppmicroservices/detail/Log_p.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -73,7 +73,7 @@ void* dlsym(void *handle, const char *symbol)
 namespace cppmicroservices {
 
 // Private util function to return system bundle's log sink
-std::shared_ptr<details::LogSink> GetFrameworkLogSink()
+std::shared_ptr<detail::LogSink> GetFrameworkLogSink()
 {
   // The following is a hack, we need a cleaner solution in the future
   return GetPrivate(GetBundleContext())->bundle->coreCtx->sink;

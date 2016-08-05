@@ -22,7 +22,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 template<class S, class TTT>
 TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
@@ -129,6 +129,6 @@ void TrackedService<S,TTT>::CustomizerRemoved(ServiceReference<S> item,
   customizer->RemovedService(item, object);
 }
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices

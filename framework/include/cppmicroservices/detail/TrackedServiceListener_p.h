@@ -27,7 +27,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -48,7 +48,7 @@ struct TrackedServiceListener
 
 };
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 

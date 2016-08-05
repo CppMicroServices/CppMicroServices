@@ -24,8 +24,8 @@
 #define BUNDLECONTEXTPRIVATE_H_
 
 #include "cppmicroservices/FrameworkExport.h"
-#include "cppmicroservices/details/Log_p.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Log_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include <atomic>
 #include <memory>
@@ -35,7 +35,7 @@ namespace cppmicroservices {
 class BundleContext;
 class BundlePrivate;
 
-class BundleContextPrivate : public details::MultiThreaded<>, public std::enable_shared_from_this<BundleContextPrivate>
+class BundleContextPrivate : public detail::MultiThreaded<>, public std::enable_shared_from_this<BundleContextPrivate>
 {
 
 public:

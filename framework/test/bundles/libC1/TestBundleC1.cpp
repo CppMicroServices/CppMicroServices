@@ -175,11 +175,11 @@ private:
   std::vector<std::thread> threads;
   std::thread unregThread;
 
-  struct : details::MultiThreaded<details::MutexLockingStrategy<>, details::WaitCondition> {
+  struct : detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition> {
     std::vector<ServiceRegistrationU> v;
   } regs;
 
-  struct : details::MultiThreaded<> {
+  struct : detail::MultiThreaded<> {
     ServiceRegistrationU v;
   } additionalReg;
 

@@ -24,8 +24,8 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceException.h"
 
-#include "cppmicroservices/details/ServiceTrackerPrivate.h"
-#include "cppmicroservices/details/TrackedService_p.h"
+#include "cppmicroservices/detail/ServiceTrackerPrivate.h"
+#include "cppmicroservices/detail/TrackedService_p.h"
 
 #include <limits>
 #include <stdexcept>

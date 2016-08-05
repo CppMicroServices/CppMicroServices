@@ -24,15 +24,15 @@
 #ifndef RESOLVER_P_H
 #define RESOLVER_P_H
 
-#include "cppmicroservices/details/Threads_p.h"
-#include "cppmicroservices/details/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/WaitCondition_p.h"
 
 namespace cppmicroservices {
 
 /**
  * This class is not part of the public API.
  */
-class Resolver : public details::MultiThreaded<details::MutexLockingStrategy<>, details::WaitCondition>
+class Resolver : public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
 {
 public:
   void Clear() {}

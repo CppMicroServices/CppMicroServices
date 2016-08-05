@@ -26,11 +26,11 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 /**
  * \ingroup MicroServices
@@ -166,10 +166,10 @@ private:
 
 };
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 
-#include "cppmicroservices/details/ServiceTrackerPrivate.tpp"
+#include "cppmicroservices/detail/ServiceTrackerPrivate.tpp"
 
 #endif // USSERVICETRACKERPRIVATE_H

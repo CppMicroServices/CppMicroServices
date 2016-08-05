@@ -24,8 +24,8 @@
 #define BUNDLETHREAD_P_H
 
 #include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/details/Threads_p.h"
-#include "cppmicroservices/details/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/WaitCondition_p.h"
 
 #include <atomic>
 #include <chrono>
@@ -50,7 +50,7 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
   CoreBundleContext* const fwCtx;
   std::chrono::milliseconds startStopTimeout;
 
-  struct Op : details::MultiThreaded<details::MutexLockingStrategy<>, details::WaitCondition>
+  struct Op : detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
   {
     Op() : operation(OP_IDLE) {}
 
@@ -59,10 +59,10 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
     std::promise<bool> pr;
   } op;
 
-  details::Atomic<BundleEvent> be;
+  detail::Atomic<BundleEvent> be;
   std::atomic<bool> doRun;
 
-  struct : details::MultiThreaded<> { std::thread v; } th;
+  struct : detail::MultiThreaded<> { std::thread v; } th;
 
 public:
 

@@ -35,7 +35,7 @@ class Bundle;
 class BundleContext;
 class BundleContextPrivate;
 class ServiceFactory;
-namespace details {
+namespace detail {
 class LogSink;
 template<class S, class TTT, class R> class BundleAbstractTracked;
 template<class S, class TTT> class ServiceTrackerPrivate;
@@ -805,16 +805,16 @@ private:
 
   BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
   // allow templated code to use the internal logger
-  template<class S, class TTT, class R> friend class details::BundleAbstractTracked;
+  template<class S, class TTT, class R> friend class detail::BundleAbstractTracked;
   template<class S, class T> friend class ServiceTracker;
-  template<class S, class TTT> friend class details::ServiceTrackerPrivate;
-  template<class S, class TTT> friend class details::TrackedService;
+  template<class S, class TTT> friend class detail::ServiceTrackerPrivate;
+  template<class S, class TTT> friend class detail::TrackedService;
   friend class BundleResource;
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code
   // to log diagnostic information. 
-  std::shared_ptr<details::LogSink> GetLogSink() const;
+  std::shared_ptr<detail::LogSink> GetLogSink() const;
 
   void AddServiceListener(const ServiceListener& delegate, void* data,
                           const std::string& filter);

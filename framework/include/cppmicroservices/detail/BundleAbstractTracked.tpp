@@ -21,13 +21,13 @@
 =============================================================================*/
 
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/details/Log_p.h"
+#include "cppmicroservices/detail/Log_p.h"
 
 #include <iterator>
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 template<class S, class TTT, class R>
 BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked(BundleContext* bc)
@@ -316,6 +316,6 @@ void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
   }
 }
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices

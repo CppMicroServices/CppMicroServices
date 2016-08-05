@@ -25,7 +25,7 @@
 #define SERVICELISTENERS_H
 
 #include "cppmicroservices/GlobalConfig.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include "ServiceListenerEntry_p.h"
 
@@ -45,7 +45,7 @@ class BundleContextPrivate;
  * Here we handle all listeners that bundles have registered.
  *
  */
-class ServiceListeners : private details::MultiThreaded<>
+class ServiceListeners : private detail::MultiThreaded<>
 {
 
 public:

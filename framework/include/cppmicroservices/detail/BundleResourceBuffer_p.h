@@ -29,7 +29,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 class BundleResourceBufferPrivate;
 
@@ -65,7 +65,7 @@ private:
 
 };
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 

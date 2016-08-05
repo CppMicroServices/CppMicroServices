@@ -23,7 +23,7 @@
 #ifndef BUNDLEREGISTRY_P_H
 #define BUNDLEREGISTRY_P_H
 
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include <map>
 #include <memory>
@@ -43,7 +43,7 @@ struct BundleActivator;
  * Here we handle all the bundles that are known to the framework.
  * @remarks This class is thread-safe.
  */
-class BundleRegistry : private details::MultiThreaded<> {
+class BundleRegistry : private detail::MultiThreaded<> {
 
 public:
 

@@ -30,7 +30,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 template<class MutexHost>
 class WaitCondition
@@ -121,7 +121,7 @@ private:
 #endif
 };
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 

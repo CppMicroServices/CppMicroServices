@@ -26,8 +26,8 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/SharedLibrary.h"
-#include "cppmicroservices/details/Threads_p.h"
-#include "cppmicroservices/details/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/WaitCondition_p.h"
 
 #include "BundleArchive_p.h"
 #include "BundleManifest_p.h"
@@ -49,7 +49,7 @@ class Fragment;
  * \ingroup MicroServices
  */
 class BundlePrivate :
-    public details::MultiThreaded<details::MutexLockingStrategy<>, details::WaitCondition>,
+    public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>,
     public std::enable_shared_from_this<BundlePrivate>
 {
 
@@ -213,7 +213,7 @@ public:
   /**
    * BundleContext for the bundle
    */
-  details::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
+  detail::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
 
   typedef void(*DestroyActivatorHook)(BundleActivator*);
   DestroyActivatorHook destroyActivatorHook;

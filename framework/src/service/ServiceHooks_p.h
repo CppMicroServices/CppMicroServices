@@ -24,7 +24,7 @@
 #define SERVICEHOOKS_P_H
 
 #include "cppmicroservices/ServiceTracker.h"
-#include "cppmicroservices/details/WaitCondition_p.h"
+#include "cppmicroservices/detail/WaitCondition_p.h"
 
 #include "ServiceListeners_p.h"
 
@@ -32,7 +32,7 @@ namespace cppmicroservices {
 
 struct ServiceListenerHook;
 
-class ServiceHooks : private details::MultiThreaded<>, private ServiceTrackerCustomizer<ServiceListenerHook>
+class ServiceHooks : private detail::MultiThreaded<>, private ServiceTrackerCustomizer<ServiceListenerHook>
 {
 
 private:

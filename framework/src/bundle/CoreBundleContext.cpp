@@ -34,7 +34,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "BundleThread_p.h"
 #include "BundleUtils_p.h"
 #include "FrameworkPrivate.h"
-#include "Utils_p.h"
+#include "Utils_p.h" // cppmicroservices::ToString()
 
 #include <iomanip>
 
@@ -74,7 +74,7 @@ CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, st
 {
   bool enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
   std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
-  sink = std::make_shared<details::LogSink>(diagnosticLogger, enableDiagLog);
+  sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
   DIAG_LOG(*sink) << "created";
 }

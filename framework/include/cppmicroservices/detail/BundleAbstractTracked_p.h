@@ -24,15 +24,15 @@
 #define BUNDLEABSTRACTTRACKED_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/details/Threads_p.h"
-#include "cppmicroservices/details/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/WaitCondition_p.h"
 
 #include <atomic>
 #include <vector>
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 /**
  * This class is not intended to be used directly. It is exported to support
@@ -285,10 +285,10 @@ private:
 
 };
     
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 
-#include "cppmicroservices/details/BundleAbstractTracked.tpp"
+#include "cppmicroservices/detail/BundleAbstractTracked.tpp"
 
 #endif // BUNDLEABSTRACTTRACKED_H

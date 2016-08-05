@@ -73,7 +73,7 @@ would look like this:
 
 ```cpp
 #include "cppmicroservices/BundleContext.h"
-#include <someInterface.h>
+#include "someInterface.h"
 
 using namespace cppmicroservices;
 
@@ -92,7 +92,7 @@ Registering a service object against a certain interface looks like this:
 
 ```cpp
 #include "cppmicroservices/BundleContext.h"
-#include <someInterface.h>
+#include "someInterface.h"
 
 using namespace cppmicroservices;
 

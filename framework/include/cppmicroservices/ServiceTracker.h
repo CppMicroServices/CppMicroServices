@@ -33,7 +33,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 template<class S, class T> class TrackedService;
 template<class S, class T> class ServiceTrackerPrivate;
 }
@@ -451,18 +451,18 @@ private:
   typedef typename ServiceTrackerCustomizer<S,T>::TypeTraits TypeTraits;
 
   typedef ServiceTracker<S,T> _ServiceTracker;
-  typedef details::TrackedService<S,TypeTraits> _TrackedService;
-  typedef details::ServiceTrackerPrivate<S,TypeTraits> _ServiceTrackerPrivate;
+  typedef detail::TrackedService<S,TypeTraits> _TrackedService;
+  typedef detail::ServiceTrackerPrivate<S,TypeTraits> _ServiceTrackerPrivate;
   typedef ServiceTrackerCustomizer<S,T> _ServiceTrackerCustomizer;
 
-  friend class details::TrackedService<S,TypeTraits>;
-  friend class details::ServiceTrackerPrivate<S,TypeTraits>;
+  friend class detail::TrackedService<S,TypeTraits>;
+  friend class detail::ServiceTrackerPrivate<S,TypeTraits>;
 
   std::unique_ptr<_ServiceTrackerPrivate> d;
 };
 
 }
 
-#include "cppmicroservices/details/ServiceTracker.tpp"
+#include "cppmicroservices/detail/ServiceTracker.tpp"
 
 #endif // SERVICETRACKER_H

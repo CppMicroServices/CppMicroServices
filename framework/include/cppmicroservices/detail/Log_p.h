@@ -24,7 +24,7 @@
 #define LOG_P_H
 
 #include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include <iostream>
 #include <memory>
@@ -33,7 +33,7 @@
 
 namespace cppmicroservices {
 
-namespace details {
+namespace detail {
 
 class LogSink : public MultiThreaded<>, public std::enable_shared_from_this<LogSink> 
 {
@@ -94,12 +94,12 @@ private:
   LogSink& _sink;
 };
 
-} // namespace details
+} // namespace detail
 
 } // namespace cppmicroservices
 
 // Write a log line using a <code>LogSink</code> reference.
-#define DIAG_LOG(log_sink) cppmicroservices::details::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
+#define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
 
 
 #endif // LOG_P_H

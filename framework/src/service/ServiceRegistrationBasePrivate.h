@@ -26,7 +26,7 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include "Properties_p.h"
 
@@ -40,7 +40,7 @@ class ServiceRegistrationBase;
 /**
  * \ingroup MicroServices
  */
-class ServiceRegistrationBasePrivate : public details::MultiThreaded<>
+class ServiceRegistrationBasePrivate : public detail::MultiThreaded<>
 {
 
 protected:

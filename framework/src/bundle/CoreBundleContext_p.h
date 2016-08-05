@@ -25,7 +25,7 @@
 #define COREBUNDLECONTEXT_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/details/Log_p.h"
+#include "cppmicroservices/detail/Log_p.h"
 
 #include "BundleHooks_p.h"
 #include "BundleRegistry_p.h"
@@ -83,7 +83,7 @@ public:
   * For internal Framework use only. Do not expose
   * to Framework clients.
   */
-  std::shared_ptr<details::LogSink> sink;
+  std::shared_ptr<detail::LogSink> sink;
 
   /**
    * Debug handle.
@@ -93,7 +93,7 @@ public:
   /**
    * Threads for running listeners and activators
    */
-  struct : details::MultiThreaded<>
+  struct : detail::MultiThreaded<>
   {
     std::list<std::shared_ptr<BundleThread>> value;
     std::list<std::shared_ptr<BundleThread>> zombies;

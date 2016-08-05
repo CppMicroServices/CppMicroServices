@@ -23,7 +23,7 @@
 #ifndef BUNDLERESOURCESTREAM_H
 #define BUNDLERESOURCESTREAM_H
 
-#include "cppmicroservices/details/BundleResourceBuffer_p.h"
+#include "cppmicroservices/detail/BundleResourceBuffer_p.h"
 
 #include <fstream>
 
@@ -41,7 +41,7 @@ class BundleResource;
  *
  * \see BundleResource for an example how to use this class.
  */
-class US_Framework_EXPORT BundleResourceStream : private details::BundleResourceBuffer, public std::istream
+class US_Framework_EXPORT BundleResourceStream : private detail::BundleResourceBuffer, public std::istream
 {
 
 public:

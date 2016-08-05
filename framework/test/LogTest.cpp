@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/details/Log_p.h"
+#include "cppmicroservices/detail/Log_p.h"
 
 #include "TestingMacros.h"
 
@@ -39,7 +39,7 @@ void testDefaultLogMessages()
   std::stringstream temp_buf;
   auto clog_buf = std::clog.rdbuf();
   std::clog.rdbuf(temp_buf.rdbuf());
-  details::LogSink sink(&std::clog, true);
+  detail::LogSink sink(&std::clog, true);
   DIAG_LOG(sink) << "Testing " << 1 << 2 << 3 << ", Testing " << std::scientific << 1.0 << static_cast<void*>(nullptr) << 2.0 << 3.0 << "\n";
   sink.Log(std::string("blaaaaaaaaaaaaaaaaaah\n"));
 
@@ -53,7 +53,7 @@ void testDefaultLogMessages()
 void testLogDisabled()
 {
   // A null (i.e. disabled logger) shouldn't throw when used.
-  details::LogSink sink_null(nullptr);
+  detail::LogSink sink_null(nullptr);
   try
   {
 	sink_null.Log(std::string("Don't log me"));
@@ -65,7 +65,7 @@ void testLogDisabled()
   }
   
   std::ostringstream empty_stream;
-  details::LogSink sink_disabled(&empty_stream);
+  detail::LogSink sink_disabled(&empty_stream);
   DIAG_LOG(sink_disabled) << "Now you see me...";
   sink_disabled.Log(std::string("Now you don't"));
   US_TEST_CONDITION_REQUIRED(empty_stream.str().empty(), "Test disabled log sink.");
@@ -78,12 +78,12 @@ void testLogRedirection()
   std::stringstream test_log_output;
   test_log_output << "Testing..." << 1 << " " << 2 << " " << 12 << "\n";
 
-  details::LogSink sink_stringstream(&stringstream, true);
+  detail::LogSink sink_stringstream(&stringstream, true);
   DIAG_LOG(sink_stringstream) << test_log_output.str();
   US_TEST_CONDITION_REQUIRED(!stringstream.str().empty(), "Test redirected stringstream log sink.");
   US_TEST_CONDITION_REQUIRED(std::string::npos != stringstream.str().find(test_log_output.str()), "Test redirected stringstream log sink.");
 
-  details::LogSink sink_file(&filestream, true);
+  detail::LogSink sink_file(&filestream, true);
   DIAG_LOG(sink_file) << test_log_output.str();
   filestream.flush();
   std::ifstream test_file("foo.txt");
@@ -97,7 +97,7 @@ void testLogRedirection()
   std::remove("foo.txt");
 
   // A null (i.e. disabled logger) shouldn't throw when used.
-  details::LogSink sink_null(nullptr, true);
+  detail::LogSink sink_null(nullptr, true);
   try
   {
 	DIAG_LOG(sink_null) << test_log_output.str();
@@ -116,7 +116,7 @@ void testLogRedirection()
   auto cerr_buffer = std::cerr.rdbuf();
   std::cerr.rdbuf(local_cerr_buffer.rdbuf());
   
-  details::LogSink sink_redirected_cerr(&std::cerr, true);
+  detail::LogSink sink_redirected_cerr(&std::cerr, true);
   DIAG_LOG(sink_redirected_cerr) << test_log_output.str();
   std::cerr.rdbuf(cerr_buffer);
   US_TEST_CONDITION_REQUIRED(!local_cerr_buffer.str().empty(), "Test redirected std::cerr log sink.");
@@ -130,7 +130,7 @@ void testLogRedirection()
 void testLogMultiThreaded()
 {
   std::stringstream stringstream;
-  details::LogSink sink(&stringstream, true);
+  detail::LogSink sink(&stringstream, true);
 
   std::size_t num_threads(100);
   std::vector<std::thread> threads;

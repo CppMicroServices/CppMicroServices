@@ -23,7 +23,7 @@
 #ifndef BUNDLESTORAGEMEMORY_P_H
 #define BUNDLESTORAGEMEMORY_P_H
 
-#include "cppmicroservices/details/Threads_p.h"
+#include "cppmicroservices/detail/Threads_p.h"
 
 #include "BundleStorage_p.h"
 
@@ -63,7 +63,7 @@ private:
   /**
    * Bundle id sorted list of all active bundle archives.
    */
-  struct : details::MultiThreaded<> { std::map<long, std::shared_ptr<BundleArchive>> v; } archives;
+  struct : detail::MultiThreaded<> { std::map<long, std::shared_ptr<BundleArchive>> v; } archives;
 
 
 };

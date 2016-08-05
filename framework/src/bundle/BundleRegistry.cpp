@@ -34,6 +34,7 @@
 #include "BundleStorage_p.h"
 #include "CoreBundleContext_p.h"
 #include "FrameworkPrivate.h"
+#include "Utils_p.h" // cppmicroservices::ToString()
 
 #include <cassert>
 #include <map>
@@ -259,7 +260,7 @@ void BundleRegistry::Load()
     catch (const std::exception& )
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
-      std::string msg("Failed to load bundle " + std::to_string(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
+      std::string msg("Failed to load bundle " + cppmicroservices::ToString(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
       coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, Bundle{}, msg, std::current_exception()));
     }
   }

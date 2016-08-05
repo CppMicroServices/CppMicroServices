@@ -25,7 +25,7 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/details/Log_p.h"
+#include "cppmicroservices/detail/Log_p.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -74,7 +74,7 @@ BundleContext& BundleContext::operator=(std::nullptr_t)
   return *this;
 }
 
-std::shared_ptr<details::LogSink> BundleContext::GetLogSink() const
+std::shared_ptr<detail::LogSink> BundleContext::GetLogSink() const
 {
   return d->bundle->coreCtx->sink->shared_from_this();
 }

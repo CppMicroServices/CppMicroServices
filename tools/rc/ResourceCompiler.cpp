@@ -21,7 +21,6 @@
  =============================================================================*/
 
 #include "miniz.h"
-#include "optionparser.h"
 
 #include <cassert>
 #include <cstdio>
@@ -32,6 +31,8 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+
+#include "optionparser.h"
 
 // ---------------------------------------------------------------------------------
 // --------------------------    PLATFORM SPECIFIC CODE    -------------------------

@@ -95,6 +95,6 @@ public:
 
 US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
-#include <usBundleInitialization.h>
+#include "cppmicroservices/BundleInitialization.h"
 
 US_INITIALIZE_BUNDLE

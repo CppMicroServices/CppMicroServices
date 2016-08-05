@@ -33,6 +33,7 @@
 #include "usCoreBundleContext_p.h"
 #include "usBundleResourceContainer_p.h"
 #include "usFrameworkEvent.h"
+#include "usUtils_p.h"  // us::ToString()
 
 #include <cassert>
 #include <map>
@@ -258,7 +259,7 @@ void BundleRegistry::Load()
     catch (const std::exception& )
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
-      std::string msg("Failed to load bundle " + std::to_string(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
+      std::string msg("Failed to load bundle " + us::ToString(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
       coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, Bundle{}, msg, std::current_exception()));
     }
   }

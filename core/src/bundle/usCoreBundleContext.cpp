@@ -80,9 +80,16 @@ CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, st
 
 CoreBundleContext::~CoreBundleContext()
 {
-  std::shared_ptr<CoreBundleContext> dummy(this, [](CoreBundleContext*){});
-  systemBundle->Shutdown(false);
-  systemBundle->WaitForStop(std::chrono::milliseconds(0));
+}
+
+std::shared_ptr<CoreBundleContext> CoreBundleContext::shared_from_this() const
+{
+  return self.Lock(), self.v.lock();
+}
+
+void CoreBundleContext::SetThis(const std::shared_ptr<CoreBundleContext>& self)
+{
+  this->self.Lock(), this->self.v = self;
 }
 
 void CoreBundleContext::Init()
@@ -124,7 +131,7 @@ void CoreBundleContext::Init()
 
   serviceHooks.Open();
   //resolverHooks.Open();
-  
+
   // auto-install all embedded bundles inside the executable
   auto execPath = BundleUtils::GetExecutablePath();
   if (IsBundleFile(execPath))

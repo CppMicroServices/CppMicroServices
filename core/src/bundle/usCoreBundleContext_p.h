@@ -56,7 +56,7 @@ class FrameworkPrivate;
 /**
  * This class is not part of the public API.
  */
-class CoreBundleContext : public std::enable_shared_from_this<CoreBundleContext>
+class CoreBundleContext
 {
 public:
 
@@ -154,6 +154,10 @@ public:
 
   ~CoreBundleContext();
 
+  // thread-safe shared_from_this implementation
+  std::shared_ptr<CoreBundleContext> shared_from_this() const;
+  void SetThis(const std::shared_ptr<CoreBundleContext>& self);
+
   void Init();
 
   // must be called without any locks held
@@ -177,6 +181,8 @@ private:
    *
    */
   CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger);
+
+  struct : MultiThreaded<> { std::weak_ptr<CoreBundleContext> v; } self;
 
 };
 

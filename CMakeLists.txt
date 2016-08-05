@@ -104,16 +104,16 @@ set(CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
-include(usFunctionAddResources)
-include(usFunctionEmbedResources)
-include(usFunctionGetResourceSource)
-include(usFunctionCheckResourceLinking)
-include(usFunctionCheckCompilerFlags)
-include(usFunctionGenerateBundleInit)
-include(usMacroCreateBundle)
+include(FunctionAddResources)
+include(FunctionEmbedResources)
+include(FunctionGetResourceSource)
+include(FunctionCheckResourceLinking)
+include(FunctionCheckCompilerFlags)
+include(FunctionGenerateBundleInit)
+include(MacroCreateBundle)
 
 if(US_BUILD_TESTING)
-  include(usFunctionCompileSnippets)
+  include(FunctionCompileSnippets)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -200,11 +200,12 @@ if(WIN32 AND NOT CYGWIN)
   set(default_header_install_dir include/)
   set(default_auxiliary_install_dir share/)
 else()
+  string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
   set(default_runtime_install_dir bin/)
-  set(default_library_install_dir lib/${PROJECT_NAME})
-  set(default_archive_install_dir lib/${PROJECT_NAME})
-  set(default_header_install_dir include/${PROJECT_NAME})
-  set(default_auxiliary_install_dir share/${PROJECT_NAME})
+  set(default_library_install_dir lib/${PROJECT_NAME_LOWER})
+  set(default_archive_install_dir lib/${PROJECT_NAME_LOWER})
+  set(default_header_install_dir include)
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER})
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
@@ -216,9 +217,9 @@ set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
-set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/usBundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
-set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/us_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
-set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
+set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
+set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 
 #-----------------------------------------------------------------------------
 # Testing configuration
@@ -290,12 +291,12 @@ if(MSVC)
 else()
   # C++11 support
   set(US_CXX11_FLAGS -std=c++11)
-  usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
+  FunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
   if(_have_cxx11)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
   else()
     set(US_CXX11_FLAGS -std=c++0x)
-    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
+    FunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
     if(_have_cxx0x)
       set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
     else()
@@ -312,12 +313,12 @@ else()
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
                     -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
                     -fstack-protector-all)
-    usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
+    FunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
   if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     # The check does not work reliably for gcc
-    usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
+    FunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
   # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
@@ -328,23 +329,23 @@ else()
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
   # to understand what -fvisibility-ms-compat does.
   if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
-    usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
+    FunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
-    usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+    FunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
   endif()
 
-  usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
+  FunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
   if(_fortify_source_flag)
     set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
   endif()
 
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=thread")
-  usFunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
+  FunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
@@ -380,7 +381,7 @@ set(US_LINK_FLAGS )
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
-    usFunctionCheckCompilerFlags("${_linkflag}" _add_flag)
+    FunctionCheckCompilerFlags("${_linkflag}" _add_flag)
     if(_add_flag)
       set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
     endif()
@@ -397,7 +398,7 @@ if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
 endif()
 
-usFunctionCheckResourceLinking()
+FunctionCheckResourceLinking()
 
 #-----------------------------------------------------------------------------
 # US Header Checks
@@ -453,7 +454,7 @@ set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set(PACKAGE_CONFIG_CMAKE_DIR ${US_CMAKE_DIR})
 
-set(US_RCC_EXECUTABLE_NAME usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
+set(US_RCC_EXECUTABLE_NAME ResourceCompiler CACHE INTERNAL "The target name of the ResourceCompiler executable.")
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
@@ -461,14 +462,14 @@ configure_file(
   @ONLY
   )
 
-set(us_global_config_h_file "${PROJECT_BINARY_DIR}/include/usGlobalConfig.h")
-configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
+set(global_config_h_file "${PROJECT_BINARY_DIR}/include/cppmicroservices/GlobalConfig.h")
+configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
 add_subdirectory(tools/rc)
 
-add_subdirectory(core)
+add_subdirectory(framework)
 add_subdirectory(httpservice)
 add_subdirectory(webconsole)
 add_subdirectory(shellservice)
@@ -504,19 +505,19 @@ if(NOT US_NO_INSTALL)
   set(_install_cmake_scripts
     ${US_BUNDLE_INIT_TEMPLATE}
     ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-    ${US_CMAKE_DIR}/usFunctionGenerateBundleInit.cmake
-    ${US_CMAKE_DIR}/usFunctionAddResources.cmake
-    ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
-    ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
-    ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
-    ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
+    ${US_CMAKE_DIR}/FunctionGenerateBundleInit.cmake
+    ${US_CMAKE_DIR}/FunctionAddResources.cmake
+    ${US_CMAKE_DIR}/FunctionEmbedResources.cmake
+    ${US_CMAKE_DIR}/FunctionGetResourceSource.cmake
+    ${US_CMAKE_DIR}/FunctionCheckResourceLinking.cmake
+    ${US_CMAKE_DIR}/FunctionCheckCompilerFlags.cmake
     )
 
   install(FILES ${_install_cmake_scripts}
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
-  install(FILES ${us_global_config_h_file}
-          DESTINATION ${HEADER_INSTALL_DIR})
+  install(FILES ${global_config_h_file}
+          DESTINATION ${HEADER_INSTALL_DIR}/cppmicroservices)
 
   # Configure CppMicroServicesConfig.cmake for the install tree
   set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})

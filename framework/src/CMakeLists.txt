@@ -1,0 +1,95 @@
+#-----------------------------------------------------------------------------
+# Source files
+#-----------------------------------------------------------------------------
+
+set(_srcs
+  util/Any.cpp
+  util/Framework.cpp
+  util/FrameworkEvent.cpp
+  util/FrameworkFactory.cpp
+  util/FrameworkPrivate.cpp
+  util/LDAPExpr.cpp
+  util/LDAPFilter.cpp
+  util/LDAPProp.cpp
+  util/Properties.cpp
+  util/SharedLibrary.cpp
+  util/Utils.cpp
+
+  service/ServiceException.cpp
+  service/ServiceEvent.cpp
+  service/ServiceEventListenerHook.cpp
+  service/ServiceFindHook.cpp
+  service/ServiceHooks.cpp
+  service/ServiceListenerEntry.cpp
+  service/ServiceListenerHook.cpp
+  service/ServiceListeners.cpp
+  service/ServiceObjects.cpp
+  service/ServiceReferenceBase.cpp
+  service/ServiceReferenceBasePrivate.cpp
+  service/ServiceRegistrationBase.cpp
+  service/ServiceRegistrationBasePrivate.cpp
+  service/ServiceRegistry.cpp
+
+  bundle/Bundle.cpp
+  bundle/BundleArchive.cpp
+  bundle/BundleContext.cpp
+  bundle/BundleContextPrivate.cpp
+  bundle/BundleEvent.cpp
+  bundle/BundleEventHook.cpp
+  bundle/BundleFindHook.cpp
+  bundle/BundleHooks.cpp
+  bundle/BundleManifest.cpp
+  bundle/BundlePrivate.cpp
+  bundle/BundleRegistry.cpp
+  bundle/BundleResource.cpp
+  bundle/BundleResourceBuffer.cpp
+  bundle/BundleResourceContainer.cpp
+  bundle/BundleResourceStream.cpp
+  bundle/BundleStorageFile.cpp
+  bundle/BundleStorageMemory.cpp
+  bundle/BundleThread.cpp
+  bundle/BundleUtils.cpp
+  bundle/BundleVersion.cpp
+  bundle/Constants.cpp
+  bundle/CoreBundleContext.cpp
+  bundle/Debug.cpp
+  bundle/ModuleElfFile.cpp
+  bundle/ModuleMachOFile.cpp
+  bundle/ModuleObjFile.cpp
+  bundle/ModulePEFile.cpp
+  ../../third_party/jsoncpp.cpp
+  ../../third_party/miniz.c
+)
+
+set(_private_headers
+  util/FrameworkPrivate.h
+  util/LDAPExpr_p.h
+  util/Properties_p.h
+  util/Utils_p.h
+
+  service/ServiceHooks_p.h
+  service/ServiceListenerEntry_p.h
+  service/ServiceListenerHook_p.h
+  service/ServiceListeners_p.h
+  service/ServiceReferenceBasePrivate.h
+  service/ServiceRegistrationBasePrivate.h
+  service/ServiceRegistry_p.h
+
+  bundle/BundleArchive_p.h
+  bundle/BundleContextPrivate.h
+  bundle/BundleHooks_p.h
+  bundle/BundleManifest_p.h
+  bundle/BundlePrivate.h
+  bundle/BundleRegistry_p.h
+  bundle/BundleResourceContainer_p.h
+  bundle/BundleStorage_p.h
+  bundle/BundleStorageFile_p.h
+  bundle/BundleStorageMemory_p.h
+  bundle/BundleThread_p.h
+  bundle/BundleUtils_p.h
+  bundle/CoreBundleContext_p.h
+  bundle/Debug_p.h
+  bundle/Fragment_p.h
+  bundle/ModuleObjFile_p.h
+  bundle/Resolver_p.h
+)

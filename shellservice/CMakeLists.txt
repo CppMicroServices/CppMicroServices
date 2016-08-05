@@ -1,6 +1,6 @@
 set(_srcs
-  src/usShellActivator.cpp
-  src/usShellService.cpp
+  src/ShellActivator.cpp
+  src/ShellService.cpp
 
   ../third_party/tinyscheme/scheme.c
 )
@@ -12,7 +12,7 @@ if(MSVC)
   )
 endif()
 
-usFunctionCheckCompilerFlags(-Wno-switch _no_switch_flag)
+FunctionCheckCompilerFlags(-Wno-switch _no_switch_flag)
 if(_no_switch_flag)
   set_property(
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
@@ -25,12 +25,12 @@ set(_private_headers
 )
 
 set(_public_headers
-  include/usShellService.h
+  include/cppmicroservices/shellservice/ShellService.h
 )
 
 set(_resources
   manifest.json
-  usShellProcedures.scm
+  ShellProcedures.scm
 )
 
 add_definitions(-DSTANDALONE=0 -DUSE_INTERFACE=1)
@@ -38,9 +38,9 @@ add_definitions(-DSTANDALONE=0 -DUSE_INTERFACE=1)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../third_party/tinyscheme/init.scm
   ${CMAKE_CURRENT_BINARY_DIR}/resources/tinyscheme/init.scm COPYONLY)
 
-usMacroCreateBundle(ShellService
+MacroCreateBundle(ShellService
   VERSION "0.1.0"
-  DEPENDS Core
+  DEPENDS Framework
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_private_headers}
   INTERNAL_INCLUDE_DIRS ../third_party/tinyscheme

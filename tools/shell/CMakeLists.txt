@@ -3,7 +3,7 @@ find_package(CppMicroServices COMPONENTS ShellService REQUIRED)
 include_directories(${US_INCLUDE_DIRS})
 
 set(srcs
-  usShell.cpp
+  Shell.cpp
   ../../third_party/linenoise.c
 )
 
@@ -14,5 +14,5 @@ if(MSVC)
   )
 endif()
 
-add_executable(usShell ${srcs})
-target_link_libraries(usShell ${US_LIBRARIES})
+add_executable(Shell ${srcs})
+target_link_libraries(Shell ${US_LIBRARIES})

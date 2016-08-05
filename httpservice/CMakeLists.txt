@@ -2,15 +2,14 @@ set(_srcs
   ../third_party/civetweb/civetweb.c
   ../third_party/civetweb/CivetServer.cpp
 
-  src/usHttpConstants.cpp
-  src/usHttpServlet.cpp
-  src/usServletContainer.cpp
-  src/usServletContext.cpp
-  src/usHttpOutputStreamBuffer.cpp
-  src/usHttpServletRequest.cpp
-  src/usHttpServletResponse.cpp
-  src/usServletConfig.cpp
-  src/usServletContainer.cpp
+  src/HttpConstants.cpp
+  src/HttpServlet.cpp
+  src/ServletContainer.cpp
+  src/ServletContext.cpp
+  src/HttpOutputStreamBuffer.cpp
+  src/HttpServletRequest.cpp
+  src/HttpServletResponse.cpp
+  src/ServletConfig.cpp
 )
 
 if(MSVC)
@@ -26,21 +25,22 @@ else()
 endif()
 
 set(_private_headers
-  src/usHttpOutputStreamBuffer_p.h
-  src/usHttpServlet_p.h
-  src/usHttpServletRequest_p.h
-  src/usHttpServletResponse_p.h
-  src/usServletConfig_p.h
+  src/HttpOutputStreamBuffer_p.h
+  src/HttpServlet_p.h
+  src/HttpServletRequest_p.h
+  src/HttpServletResponse_p.h
+  src/ServletConfig_p.h
+  src/ServletContainer_p.h
 )
 
 set(_public_headers
-  include/usHttpConstants.h
-  include/usHttpServlet.h
-  include/usServletContext.h
-  include/usHttpServletRequest.h
-  include/usHttpServletResponse.h
-  include/usServletConfig.h
-  include/usServletContainer.h
+  include/cppmicroservices/httpservice/HttpConstants.h
+  include/cppmicroservices/httpservice/HttpServlet.h
+  include/cppmicroservices/httpservice/ServletContext.h
+  include/cppmicroservices/httpservice/HttpServletRequest.h
+  include/cppmicroservices/httpservice/HttpServletResponse.h
+  include/cppmicroservices/httpservice/ServletConfig.h
+  include/cppmicroservices/httpservice/ServletContainer.h
 )
 
 set(compile_definitions USE_WEBSOCKET)
@@ -63,9 +63,9 @@ set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
 set(THREADS_PREFER_PTHREAD_FLAG 1)
 find_package(Threads REQUIRED)
 
-usMacroCreateBundle(HttpService
+MacroCreateBundle(HttpService
   VERSION "0.99.0"
-  DEPENDS Core
+  DEPENDS Framework
   INTERNAL_INCLUDE_DIRS src
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_private_headers}
@@ -74,11 +74,11 @@ usMacroCreateBundle(HttpService
 )
 
 if(CMAKE_THREAD_LIBS_INIT)
-  target_link_libraries(usHttpService ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(HttpService ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
-  target_link_libraries(usHttpService rt)
+  target_link_libraries(HttpService rt)
 endif()
 

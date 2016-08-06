@@ -173,7 +173,7 @@ void Bundle::Uninstall()
       if (exception != nullptr)
       {
         try { std::rethrow_exception(exception); }
-        catch (const std::exception& )
+        catch (...)
         {
           d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, d->shared_from_this(), std::string(), std::current_exception()));
         }
@@ -191,7 +191,7 @@ void Bundle::Uninstall()
           d->WaitOnOperation(d->coreCtx->resolver, l, "Bundle::Uninstall", true);
           d->operation = BundlePrivate::OP_UNINSTALLING;
         }
-        catch (const std::exception& )
+        catch (...)
         {
           // Make sure that bundleContext is invalid
           std::shared_ptr<BundleContextPrivate> ctx;
@@ -234,7 +234,7 @@ void Bundle::Uninstall()
         {
           if (fs::Exists(d->bundleDir)) fs::RemoveDirectoryRecursive(d->bundleDir);
         }
-        catch (const std::exception& )
+        catch (...)
         {
           d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
                                                     d->shared_from_this(), 

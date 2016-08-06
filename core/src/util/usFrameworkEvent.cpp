@@ -24,6 +24,7 @@
 
 #include "usBundle.h"
 #include "usBundlePrivate.h"
+#include "usUtils_p.h"
 
 namespace us {
 
@@ -113,18 +114,7 @@ std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt)
   std::string exceptionStr("NONE");
   if (evt.GetThrowable())
   {
-    try
-    {
-      std::rethrow_exception(evt.GetThrowable());
-    }
-    catch (const std::exception& e)
-    {
-      exceptionStr = e.what();
-    }
-    catch (...)
-    {
-      exceptionStr = "unknown exception";
-    }
+    exceptionStr = GetExceptionStr(evt.GetThrowable());
   }
 
   os << evt.GetType() << "\n " 

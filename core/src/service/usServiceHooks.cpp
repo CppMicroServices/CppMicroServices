@@ -248,10 +248,10 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
       catch (...)
       {
         std::string message("Failed to call listener hook # " + srIter->GetProperty(Constants::SERVICE_ID).ToString());
-		coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::FRAMEWORK_WARNING, 
-            GetBundleContext().GetBundle(), 
-            message, std::current_exception()));
+        coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+                                                FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                GetBundleContext().GetBundle(),
+                                                message, std::current_exception()));
       }
     }
   }

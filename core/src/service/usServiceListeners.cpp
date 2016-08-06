@@ -165,33 +165,26 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
   // A lock shouldn't be held while calling into user code (e.g. callbacks).
   FrameworkListeners listener_snapshot;
   {
-    auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+    auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
     listener_snapshot = frameworkListenerMap.value;
   }
 
   for (auto& listeners : listener_snapshot)
   {
-	for (auto& listener : listeners.second)
-	{
-	  try
-	  {
+    for (auto& listener : listeners.second)
+    {
+      try
+      {
         (listener.first)(evt);
-	  }
-	  catch (const std::exception& e)
-	  {
-		// do not send a FrameworkEvent as that could cause a deadlock or an inifinite loop.
-		// Instead, log to the internal logger
-        // @todo send this to the LogService instead when its supported.
-        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << e.what() << "\n";
-	  }
+      }
       catch (...)
       {
         // do not send a FrameworkEvent as that could cause a deadlock or an inifinite loop.
         // Instead, log to the internal logger
         // @todo send this to the LogService instead when its supported.
-        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an unknown exception\n";
+        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << GetLastExceptionStr() << "\n";
       }
-	}
+    }
   }
 }
 
@@ -208,10 +201,10 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
       {
         (bundleListener.first)(evt);
       }
-      catch (const std::exception& )
+      catch (...)
       {
         SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::FRAMEWORK_ERROR, 
+            FrameworkEvent::Type::FRAMEWORK_ERROR,
             MakeBundle(bundleListeners.first->bundle->shared_from_this()),
             std::string("Bundle listener threw an exception"),
             std::current_exception()));

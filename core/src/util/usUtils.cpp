@@ -408,22 +408,7 @@ std::string GetLastErrorStr()
 void TerminateForDebug(const std::exception_ptr ex)
 {
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
-    std::string message;
-    if (ex)
-    {
-      try
-      {
-        std::rethrow_exception(ex);
-      }
-      catch (const std::exception& e)
-      {
-        message = e.what();
-      }
-      catch (...)
-      {
-        message = "unknown exception";
-      }
-    }
+    std::string message = GetLastExceptionStr();
 
     // get the current report mode
     int reportMode = _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_WNDW);
@@ -489,6 +474,32 @@ US_Core_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& ty
   (void)typeInfo;
 #endif
   return result;
+}
+
+std::string GetExceptionStr(const std::exception_ptr& exc)
+{
+  if (!exc)
+  {
+    return std::string();
+  }
+
+  try
+  {
+    std::rethrow_exception(exc);
+  }
+  catch (const std::exception& e)
+  {
+    return e.what();
+  }
+  catch (...)
+  {
+    return "unknown";
+  }
+}
+
+std::string GetLastExceptionStr()
+{
+  return GetExceptionStr(std::current_exception());
 }
 
 } // namespace us

@@ -220,18 +220,18 @@ struct ServiceHolder
     {
       sref.d.load()->UngetService(b.lock(), true);
     }
-    catch (const std::exception& ex)
+    catch (...)
     {
       // Make sure that we don't crash if the shared_ptr service object outlives
       // the BundlePrivate or CoreBundleContext objects.
       if (!b.expired())
       {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << ex.what();
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << GetLastExceptionStr();
       }
-	  // don't throw exceptions from the destructor. For an explanation, see:
-	  // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
-	  // Following this rule means that a FrameworkEvent isn't an option here 
-	  // since it contains an exception object which clients could throw.
+      // don't throw exceptions from the destructor. For an explanation, see:
+      // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
+      // Following this rule means that a FrameworkEvent isn't an option here
+      // since it contains an exception object which clients could throw.
     }
   }
 };

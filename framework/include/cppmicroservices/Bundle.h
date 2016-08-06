@@ -35,7 +35,6 @@ namespace cppmicroservices {
 
 class Any;
 class CoreBundleContext;
-struct BundleInfo;
 class BundleContext;
 class BundleResource;
 class BundlePrivate;

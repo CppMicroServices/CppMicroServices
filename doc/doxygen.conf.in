@@ -843,7 +843,6 @@ EXCLUDE_PATTERNS       = */test/* \
 # exclude all test directories use the pattern */test/*
 
 EXCLUDE_SYMBOLS        = *Private* \
-                         BundleInfo \
                          ServiceObjectsBase* \
                          TrackedService*
 

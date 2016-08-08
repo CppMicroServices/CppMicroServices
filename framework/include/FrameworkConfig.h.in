@@ -3,8 +3,8 @@
   This file is generated. Do not change!
 */
 
-#ifndef FRAMEWORKCONFIG_H
-#define FRAMEWORKCONFIG_H
+#ifndef CPPMICROSERVICES_FRAMEWORKCONFIG_H
+#define CPPMICROSERVICES_FRAMEWORKCONFIG_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
@@ -25,4 +25,4 @@
 
 #define US_FRAMEWORK_SOURCE_DIR "@PROJECT_SOURCE_DIR@"
 
-#endif // FRAMEWORKCONFIG_H
+#endif // CPPMICROSERVICES_FRAMEWORKCONFIG_H

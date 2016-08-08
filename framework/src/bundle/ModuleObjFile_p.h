@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef MODULEOBJFILE_P_H
-#define MODULEOBJFILE_P_H
+#ifndef CPPMICROSERVICES_MODULEOBJFILE_P_H
+#define CPPMICROSERVICES_MODULEOBJFILE_P_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -57,4 +57,4 @@ protected:
 
 }
 
-#endif // MODULEOBJFILE_P_H
+#endif // CPPMICROSERVICES_MODULEOBJFILE_P_H

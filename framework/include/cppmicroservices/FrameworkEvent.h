@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef FRAMEWORKEVENT_H
-#define FRAMEWORKEVENT_H
+#ifndef CPPMICROSERVICES_FRAMEWORKEVENT_H
+#define CPPMICROSERVICES_FRAMEWORKEVENT_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
@@ -203,4 +203,4 @@ US_Framework_EXPORT bool operator==(const FrameworkEvent& rhs, const FrameworkEv
 
 US_MSVC_POP_WARNING
 
-#endif // FRAMEWORKEVENT_H
+#endif // CPPMICROSERVICES_FRAMEWORKEVENT_H

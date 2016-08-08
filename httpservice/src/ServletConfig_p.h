@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef SERVLETCONFIG_P_H
-#define SERVLETCONFIG_P_H
+#ifndef CPPMICROSERVICES_SERVLETCONFIG_P_H
+#define CPPMICROSERVICES_SERVLETCONFIG_P_H
 
 #include "cppmicroservices/SharedData.h"
 
@@ -42,4 +42,4 @@ struct ServletConfigPrivate : public SharedData
 
 }
 
-#endif // SERVLETCONFIG_P_H
+#endif // CPPMICROSERVICES_SERVLETCONFIG_P_H

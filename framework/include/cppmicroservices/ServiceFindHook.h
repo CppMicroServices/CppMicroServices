@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEFINDHOOK_H
-#define SERVICEFINDHOOK_H
+#ifndef CPPMICROSERVICES_SERVICEFINDHOOK_H
+#define CPPMICROSERVICES_SERVICEFINDHOOK_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ShrinkableVector.h"
@@ -72,4 +72,4 @@ struct US_Framework_EXPORT ServiceFindHook
 
 }
 
-#endif // SERVICEFINDHOOK_H
+#endif // CPPMICROSERVICES_SERVICEFINDHOOK_H

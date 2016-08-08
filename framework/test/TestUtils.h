@@ -20,8 +20,8 @@ limitations under the License.
 
 =============================================================================*/
 
-#ifndef USTESTUTILS_H
-#define USTESTUTILS_H
+#ifndef CPPMICROSERVICES_TESTUTILS_H
+#define CPPMICROSERVICES_TESTUTILS_H
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
@@ -109,4 +109,4 @@ Bundle GetBundle(
 
 }
 
-#endif  // USTESTUTILS_H
+#endif  // CPPMICROSERVICES_TESTUTILS_H

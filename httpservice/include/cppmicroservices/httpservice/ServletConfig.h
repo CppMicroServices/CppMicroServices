@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef SERVLETCONFIG_H
-#define SERVLETCONFIG_H
+#ifndef CPPMICROSERVICES_SERVLETCONFIG_H
+#define CPPMICROSERVICES_SERVLETCONFIG_H
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/SharedData.h"

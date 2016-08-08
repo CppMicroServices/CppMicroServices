@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef SHELLSERVICE_H
-#define SHELLSERVICE_H
+#ifndef CPPMICROSERVICES_SHELLSERVICE_H
+#define CPPMICROSERVICES_SHELLSERVICE_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -57,4 +57,4 @@ private:
 
 }
 
-#endif // SHELLSERVICE_H
+#endif // CPPMICROSERVICES_SHELLSERVICE_H

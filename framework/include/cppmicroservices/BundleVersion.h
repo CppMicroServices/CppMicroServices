@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEVERSION_H
-#define BUNDLEVERSION_H
+#ifndef CPPMICROSERVICES_BUNDLEVERSION_H
+#define CPPMICROSERVICES_BUNDLEVERSION_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
@@ -261,4 +261,4 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleVersi
 # pragma warning(pop)
 #endif
 
-#endif // BUNDLEVERSION_H
+#endif // CPPMICROSERVICES_BUNDLEVERSION_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef LOG_P_H
-#define LOG_P_H
+#ifndef CPPMICROSERVICES_LOG_H
+#define CPPMICROSERVICES_LOG_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/detail/Threads.h"
@@ -102,4 +102,4 @@ private:
 #define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
 
 
-#endif // LOG_P_H
+#endif // CPPMICROSERVICES_LOG_H

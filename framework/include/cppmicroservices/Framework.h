@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef FRAMEWORK_H
-#define FRAMEWORK_H
+#ifndef CPPMICROSERVICES_FRAMEWORK_H
+#define CPPMICROSERVICES_FRAMEWORK_H
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkConfig.h"
@@ -228,4 +228,4 @@ private:
 
 }
 
-#endif // FRAMEWORK_H
+#endif // CPPMICROSERVICES_FRAMEWORK_H

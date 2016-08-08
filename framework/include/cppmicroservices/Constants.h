@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CPPMICROSERVICES_CONSTANTS_H
+#define CPPMICROSERVICES_CONSTANTS_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 
@@ -392,4 +392,4 @@ US_Framework_EXPORT extern const std::string SCOPE_PROTOTYPE; // = "prototype"
 
 }
 
-#endif // CONSTANTS_H
+#endif // CPPMICROSERVICES_CONSTANTS_H

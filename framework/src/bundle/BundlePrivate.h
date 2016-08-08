@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEPRIVATE_H
-#define BUNDLEPRIVATE_H
+#ifndef CPPMICROSERVICES_BUNDLEPRIVATE_H
+#define CPPMICROSERVICES_BUNDLEPRIVATE_H
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleVersion.h"
@@ -316,4 +316,4 @@ std::shared_ptr<BundlePrivate> GetPrivate(const Bundle& b);
 
 }
 
-#endif // BUNDLEPRIVATE_H
+#endif // CPPMICROSERVICES_BUNDLEPRIVATE_H

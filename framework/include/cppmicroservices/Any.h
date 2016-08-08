@@ -30,8 +30,8 @@ DEALINGS IN THE SOFTWARE.
 
 =========================================================================*/
 
-#ifndef ANY_H
-#define ANY_H
+#ifndef CPPMICROSERVICES_ANY_H
+#define CPPMICROSERVICES_ANY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 
@@ -617,4 +617,4 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
 
 }
 
-#endif // ANY_H
+#endif // CPPMICROSERVICES_ANY_H

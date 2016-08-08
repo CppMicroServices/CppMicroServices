@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef USTESTDRIVERACTIVATOR_H
-#define USTESTDRIVERACTIVATOR_H
+#ifndef CPPMICROSERVICES_TESTDRIVERACTIVATOR_H
+#define CPPMICROSERVICES_TESTDRIVERACTIVATOR_H
 
 #include "cppmicroservices/BundleActivator.h"
 
@@ -47,4 +47,4 @@ private:
 
 }
 
-#endif // USTESTDRIVERACTIVATOR_H
+#endif // CPPMICROSERVICES_TESTDRIVERACTIVATOR_H

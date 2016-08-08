@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef VARIABLERESOLVERSTREAMBUFFER_H
-#define VARIABLERESOLVERSTREAMBUFFER_H
+#ifndef CPPMICROSERVICES_VARIABLERESOLVERSTREAMBUFFER_P_H
+#define CPPMICROSERVICES_VARIABLERESOLVERSTREAMBUFFER_P_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -116,4 +116,4 @@ private:
 
 }
 
-#endif // VARIABLERESOLVERSTREAMBUFFER_H
+#endif // CPPMICROSERVICES_VARIABLERESOLVERSTREAMBUFFER_P_H

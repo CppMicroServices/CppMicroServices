@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLECONTEXT_H
-#define BUNDLECONTEXT_H
+#ifndef CPPMICROSERVICES_BUNDLECONTEXT_H
+#define CPPMICROSERVICES_BUNDLECONTEXT_H
 
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ServiceInterface.h"
@@ -828,4 +828,4 @@ private:
 
 } // namespace cppmicroservices
 
-#endif /* BUNDLECONTEXT_H */
+#endif /* CPPMICROSERVICES_BUNDLECONTEXT_H */

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICETRACKERPRIVATE_H
-#define SERVICETRACKERPRIVATE_H
+#ifndef CPPMICROSERVICES_SERVICETRACKERPRIVATE_H
+#define CPPMICROSERVICES_SERVICETRACKERPRIVATE_H
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/LDAPFilter.h"
@@ -172,4 +172,4 @@ private:
 
 #include "cppmicroservices/detail/ServiceTrackerPrivate.tpp"
 
-#endif // USSERVICETRACKERPRIVATE_H
+#endif // CPPMICROSERVICES_SERVICETRACKERPRIVATE_H

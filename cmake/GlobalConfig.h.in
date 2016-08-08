@@ -1,10 +1,10 @@
 /*
-  USCONFIG.h
+  GlobalConfig.h
   this file is generated. Do not change!
 */
 
-#ifndef GLOBALCONFIG_H
-#define GLOBALCONFIG_H
+#ifndef CPPMICROSERVICES_GLOBALCONFIG_H
+#define CPPMICROSERVICES_GLOBALCONFIG_H
 
 #cmakedefine US_BUILD_SHARED_LIBS
 #cmakedefine US_ENABLE_THREADING_SUPPORT
@@ -163,4 +163,4 @@ std::size_t operator()(const type& arg) const {
 #define US_FUTURE_TIMEOUT std::future_status::timeout
 #endif
 
-#endif // GLOBALCONFIG_H
+#endif // CPPMICROSERVICES_GLOBALCONFIG_H

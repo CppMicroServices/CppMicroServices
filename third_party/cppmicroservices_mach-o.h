@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  */
-#ifndef _MACHO_LOADER_H_
-#define _MACHO_LOADER_H_
+#ifndef CPPMICROSERVICES_MACHO_LOADER_H
+#define CPPMICROSERVICES_MACHO_LOADER_H
 
 /*
  * This file describes the format of mach object files.
@@ -707,4 +707,4 @@ struct nlist_64 {
 
 #endif /* _MACHO_LIST_H_ */
 
-#endif /* _MACHO_LOADER_H_ */
+#endif /* CPPMICROSERVICES_MACHO_LOADER_H */

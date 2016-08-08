@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef EXAMPLEDRIVERCONFIG_H
-#define EXAMPLEDRIVERCONFIG_H
+#ifndef CPPMICROSERVICES_FRAMEWORKEXAMPLESDRIVERCONFIG_H
+#define CPPMICROSERVICES_FRAMEWORKEXAMPLESDRIVERCONFIG_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -53,4 +53,4 @@ static const std::string EXE_EXT = "";
 #define US_RUNTIME_OUTPUT_DIRECTORY "@CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE@"
 #endif
 
-#endif // EXAMPLEDRIVERCONFIG_H
+#endif // CPPMICROSERVICES_FRAMEWORKEXAMPLESDRIVERCONFIG_H

@@ -27,8 +27,8 @@
 //
 // http://msdn.microsoft.com/en-us/windows/hardware/gg463119.aspx
 
-#ifndef US_PE_H_
-#define US_PE_H_
+#ifndef CPPMICROSERVICES_PE_H
+#define CPPMICROSERVICES_PE_H
 
 #include <cstdint>
 
@@ -235,4 +235,4 @@ struct IMAGE_IMPORT_DESCRIPTOR
 
 }
 
-#endif /* US_PE_H_ */
+#endif /* CPPMICROSERVICES_PE_H */

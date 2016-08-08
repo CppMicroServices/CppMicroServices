@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEMANIFEST_P_H
-#define BUNDLEMANIFEST_P_H
+#ifndef CPPMICROSERVICES_BUNDLEMANIFEST_P_H
+#define CPPMICROSERVICES_BUNDLEMANIFEST_P_H
 
 #include "cppmicroservices/Any.h"
 
@@ -54,4 +54,4 @@ private:
 
 }
 
-#endif // BUNDLEMANIFEST_P_H
+#endif // CPPMICROSERVICES_BUNDLEMANIFEST_P_H

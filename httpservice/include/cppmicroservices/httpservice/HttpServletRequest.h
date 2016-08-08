@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef HTTPSERVLETREQUEST_H
-#define HTTPSERVLETREQUEST_H
+#ifndef CPPMICROSERVICES_HTTPSERVLETREQUEST_H
+#define CPPMICROSERVICES_HTTPSERVLETREQUEST_H
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/Any.h"
@@ -107,4 +107,4 @@ private:
 
 }
 
-#endif // HTTPREQUEST_H
+#endif // CPPMICROSERVICES_HTTPREQUEST_H

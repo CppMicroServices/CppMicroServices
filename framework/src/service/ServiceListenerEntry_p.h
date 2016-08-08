@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICELISTENERENTRY_H
-#define SERVICELISTENERENTRY_H
+#ifndef CPPMICROSERVICES_SERVICELISTENERENTRY_P_H
+#define CPPMICROSERVICES_SERVICELISTENERENTRY_P_H
 
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ServiceListenerHook.h"
@@ -74,4 +74,4 @@ US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerEntry)
   return arg.Hash();
 US_HASH_FUNCTION_END
 
-#endif // SERVICELISTENERENTRY_H
+#endif // CPPMICROSERVICES_SERVICELISTENERENTRY_P_H

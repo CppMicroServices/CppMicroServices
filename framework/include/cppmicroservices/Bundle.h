@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef BUNDLE_H
-#define BUNDLE_H
+#ifndef CPPMICROSERVICES_BUNDLE_H
+#define CPPMICROSERVICES_BUNDLE_H
 
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/Chrono.h"
@@ -731,4 +731,4 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, Bundle::State sta
 
 }
 
-#endif // BUNDLE_H
+#endif // CPPMICROSERVICES_BUNDLE_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef PROPERTIES_P_H
-#define PROPERTIES_P_H
+#ifndef CPPMICROSERVICES_PROPERTIES_P_H
+#define CPPMICROSERVICES_PROPERTIES_P_H
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/ServiceProperties.h"
@@ -89,4 +89,4 @@ private:
 
 }
 
-#endif // PROPERTIES_P_H
+#endif // CPPMICROSERVICES_PROPERTIES_P_H

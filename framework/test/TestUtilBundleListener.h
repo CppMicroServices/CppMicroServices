@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef USTESTUTILBUNDLELISTENER_H
-#define USTESTUTILBUNDLELISTENER_H
+#ifndef CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H
+#define CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H
 
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ServiceEvent.h"
@@ -138,4 +138,4 @@ private:
 
 }
 
-#endif // USTESTUTILBUNDLELISTENER_H
+#endif // CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H

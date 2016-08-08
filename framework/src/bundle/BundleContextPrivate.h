@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLECONTEXTPRIVATE_H_
-#define BUNDLECONTEXTPRIVATE_H_
+#ifndef CPPMICROSERVICES_BUNDLECONTEXTPRIVATE_H
+#define CPPMICROSERVICES_BUNDLECONTEXTPRIVATE_H
 
 #include "cppmicroservices/FrameworkExport.h"
 #include "cppmicroservices/detail/Log.h"
@@ -63,4 +63,4 @@ std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c);
 
 }
 
-#endif // BUNDLECONTEXTPRIVATE_H_
+#endif // CPPMICROSERVICES_BUNDLECONTEXTPRIVATE_H

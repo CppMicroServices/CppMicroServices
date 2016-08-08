@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEOBJECTS_H
-#define SERVICEOBJECTS_H
+#ifndef CPPMICROSERVICES_SERVICEOBJECTS_H
+#define CPPMICROSERVICES_SERVICEOBJECTS_H
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/FrameworkExport.h"
@@ -209,4 +209,4 @@ private:
 
 }
 
-#endif // SERVICEOBJECTS_H
+#endif // CPPMICROSERVICES_SERVICEOBJECTS_H

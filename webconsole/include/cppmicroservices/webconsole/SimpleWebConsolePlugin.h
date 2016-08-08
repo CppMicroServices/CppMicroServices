@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef SIMPLEWEBCONSOLEPLUGIN_H
-#define SIMPLEWEBCONSOLEPLUGIN_H
+#ifndef CPPMICROSERVICES_SIMPLEWEBCONSOLEPLUGIN_H
+#define CPPMICROSERVICES_SIMPLEWEBCONSOLEPLUGIN_H
 
 #include "cppmicroservices/webconsole/AbstractWebConsolePlugin.h"
 
@@ -132,4 +132,4 @@ private:
 
 }
 
-#endif // SIMPLEWEBCONSOLEPLUGIN_H
+#endif // CPPMICROSERVICES_SIMPLEWEBCONSOLEPLUGIN_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef FRAGMENT_P_H
-#define FRAGMENT_P_H
+#ifndef CPPMICROSERVICES_FRAGMENT_P_H
+#define CPPMICROSERVICES_FRAGMENT_P_H
 
 #include <vector>
 
@@ -71,4 +71,4 @@ public:
 
 }
 
-#endif // FRAGMENT_P_H
+#endif // CPPMICROSERVICES_FRAGMENT_P_H

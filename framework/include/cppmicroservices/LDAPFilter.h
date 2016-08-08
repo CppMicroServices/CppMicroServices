@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef LDAPFILTER_H
-#define LDAPFILTER_H
+#ifndef CPPMICROSERVICES_LDAPFILTER_H
+#define CPPMICROSERVICES_LDAPFILTER_H
 
 #include "cppmicroservices/ServiceProperties.h"
 #include "cppmicroservices/SharedData.h"
@@ -192,4 +192,4 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const LDAPFilter&
 #pragma warning(pop)
 #endif
 
-#endif // LDAPFILTER_H
+#endif // CPPMICROSERVICES_LDAPFILTER_H

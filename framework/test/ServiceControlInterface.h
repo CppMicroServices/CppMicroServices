@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef USSERVICECONTROLINTERFACE_H
-#define USSERVICECONTROLINTERFACE_H
+#ifndef CPPMICROSERVICES_SERVICECONTROLINTERFACE_H
+#define CPPMICROSERVICES_SERVICECONTROLINTERFACE_H
 
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceInterface.h"
@@ -41,4 +41,4 @@ struct ServiceControlInterface
 
 }
 
-#endif // USSERVICECONTROLINTERFACE_H
+#endif // CPPMICROSERVICES_SERVICECONTROLINTERFACE_H

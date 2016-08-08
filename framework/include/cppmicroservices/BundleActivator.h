@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEACTIVATOR_H_
-#define BUNDLEACTIVATOR_H_
+#ifndef CPPMICROSERVICES_BUNDLEACTIVATOR_H
+#define CPPMICROSERVICES_BUNDLEACTIVATOR_H
 
 #ifndef US_BUNDLE_NAME
 #error Missing US_BUNDLE_NAME preprocessor define
@@ -126,4 +126,4 @@ struct BundleActivator
     delete activator;                                                                                      \
   }
 
-#endif /* BUNDLEACTIVATOR_H_ */
+#endif /* CPPMICROSERVICES_BUNDLEACTIVATOR_H */

@@ -28,8 +28,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#ifndef _ELF_H
-#define _ELF_H 1
+#ifndef CPPMICROSERVICES_ELF_H
+#define CPPMICROSERVICES_ELF_H 1
 
 /* Standard ELF types.  */
 

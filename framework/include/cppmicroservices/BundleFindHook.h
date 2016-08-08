@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEFINDHOOK_H
-#define BUNDLEFINDHOOK_H
+#ifndef CPPMICROSERVICES_BUNDLEFINDHOOK_H
+#define CPPMICROSERVICES_BUNDLEFINDHOOK_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ShrinkableVector.h"
@@ -74,4 +74,4 @@ struct US_Framework_EXPORT BundleFindHook
 
 }
 
-#endif // BUNDLEFINDHOOK_H
+#endif // CPPMICROSERVICES_BUNDLEFINDHOOK_H

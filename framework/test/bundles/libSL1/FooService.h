@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef USFOOSERVICE_H
-#define USFOOSERVICE_H
+#ifndef CPPMICROSERVICES_FOOSERVICE_H
+#define CPPMICROSERVICES_FOOSERVICE_H
 
 #include "cppmicroservices/ServiceInterface.h"
 
@@ -36,4 +36,4 @@ struct FooService
 
 }
 
-#endif // USFOOSERVICE_H
+#endif // CPPMICROSERVICES_FOOSERVICE_H

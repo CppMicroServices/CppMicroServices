@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef RESOLVER_P_H
-#define RESOLVER_P_H
+#ifndef CPPMICROSERVICES_RESOLVER_P_H
+#define CPPMICROSERVICES_RESOLVER_P_H
 
 #include "cppmicroservices/detail/Threads.h"
 #include "cppmicroservices/detail/WaitCondition.h"
@@ -40,4 +40,4 @@ public:
 
 }
 
-#endif // RESOLVER_P_H
+#endif // CPPMICROSERVICES_RESOLVER_P_H

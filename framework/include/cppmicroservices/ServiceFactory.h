@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEFACTORY_H
-#define SERVICEFACTORY_H
+#ifndef CPPMICROSERVICES_SERVICEFACTORY_H
+#define CPPMICROSERVICES_SERVICEFACTORY_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
@@ -118,4 +118,4 @@ public:
 
 }
 
-#endif // SERVICEFACTORY_H
+#endif // CPPMICROSERVICES_SERVICEFACTORY_H

@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef USTESTBUNDLEBSERVICE_H
-#define USTESTBUNDLEBSERVICE_H
+#ifndef CPPMICROSERVICES_TESTBUNDLEBSERVICE_H
+#define CPPMICROSERVICES_TESTBUNDLEBSERVICE_H
 
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceInterface.h"
@@ -36,4 +36,4 @@ struct TestBundleBService
 
 }
 
-#endif // USTESTBUNDLEASERVICE_H
+#endif // CPPMICROSERVICES_TESTBUNDLEASERVICE_H

@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef USBUNDLEPROPSINTERFACE_H
-#define USBUNDLEPROPSINTERFACE_H
+#ifndef CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H
+#define CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceProperties.h"
@@ -40,4 +40,4 @@ struct BundlePropsInterface
 
 }
 
-#endif // USBUNDLEPROPSINTERFACE_H
+#endif // CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H

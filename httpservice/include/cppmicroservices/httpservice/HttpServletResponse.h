@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef HTTPSERVLETRESPONSE_H
-#define HTTPSERVLETRESPONSE_H
+#ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
+#define CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/SharedData.h"
@@ -343,4 +343,4 @@ protected:
 
 } // namespace cppmicroservices
 
-#endif // HTTPSERVLETRESPONSE_H
+#endif // CPPMICROSERVICES_HTTPSERVLETRESPONSE_H

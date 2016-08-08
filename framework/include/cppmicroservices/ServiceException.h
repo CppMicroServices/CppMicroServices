@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICEEXCEPTION_H
-#define SERVICEEXCEPTION_H
+#ifndef CPPMICROSERVICES_SERVICEEXCEPTION_H
+#define CPPMICROSERVICES_SERVICEEXCEPTION_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 
@@ -124,4 +124,4 @@ private:
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const cppmicroservices::ServiceException& exc);
 /** @}*/
 
-#endif // SERVICEEXCEPTION_H
+#endif // CPPMICROSERVICES_SERVICEEXCEPTION_H

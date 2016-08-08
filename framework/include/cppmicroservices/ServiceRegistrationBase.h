@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEREGISTRATIONBASE_H
-#define SERVICEREGISTRATIONBASE_H
+#ifndef CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H
+#define CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H
 
 #include "cppmicroservices/ServiceProperties.h"
 #include "cppmicroservices/ServiceReference.h"
@@ -210,4 +210,4 @@ US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
   return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);
 US_HASH_FUNCTION_END
 
-#endif // SERVICEREGISTRATIONBASE_H
+#endif // CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H

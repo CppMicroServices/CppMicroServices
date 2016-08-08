@@ -20,8 +20,8 @@ limitations under the License.
 
 =============================================================================*/
 
-#ifndef FRAMEWORKPRIVATE_P_H
-#define FRAMEWORKPRIVATE_P_H
+#ifndef CPPMICROSERVICES_FRAMEWORKPRIVATE_H
+#define CPPMICROSERVICES_FRAMEWORKPRIVATE_H
 
 #include "cppmicroservices/FrameworkEvent.h"
 
@@ -116,4 +116,4 @@ public:
 
 }
 
-#endif // FRAMEWORKPRIVATE_P_H
+#endif // CPPMICROSERVICES_FRAMEWORKPRIVATE_H

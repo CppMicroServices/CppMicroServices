@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEABSTRACTTRACKED_H
-#define BUNDLEABSTRACTTRACKED_H
+#ifndef CPPMICROSERVICES_BUNDLEABSTRACTTRACKED_H
+#define CPPMICROSERVICES_BUNDLEABSTRACTTRACKED_H
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/detail/Threads.h"
@@ -291,4 +291,4 @@ private:
 
 #include "cppmicroservices/detail/BundleAbstractTracked.tpp"
 
-#endif // BUNDLEABSTRACTTRACKED_H
+#endif // CPPMICROSERVICES_BUNDLEABSTRACTTRACKED_H

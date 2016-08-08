@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEUTILS_P_H
-#define BUNDLEUTILS_P_H
+#ifndef CPPMICROSERVICES_BUNDLEUTILS_P_H
+#define CPPMICROSERVICES_BUNDLEUTILS_P_H
 
 #include <string>
 #include <utility>
@@ -42,4 +42,4 @@ namespace BundleUtils
 
 } // namespace cppmicroservices
 
-#endif // BUNDLEUTILS_P_H
+#endif // CPPMICROSERVICES_BUNDLEUTILS_P_H

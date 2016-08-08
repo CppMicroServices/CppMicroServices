@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef LISTENERFUNCTORS_P_H
-#define LISTENERFUNCTORS_P_H
+#ifndef CPPMICROSERVICES_LISTENERFUNCTORS_H
+#define CPPMICROSERVICES_LISTENERFUNCTORS_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -79,4 +79,4 @@ US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListener)
   return hash<void*>()(targetPtr);
 US_HASH_FUNCTION_END
 
-#endif // LISTENERFUNCTORS_P_H
+#endif // CPPMICROSERVICES_LISTENERFUNCTORS_H

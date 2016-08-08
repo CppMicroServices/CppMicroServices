@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef WAITCONDITION_P_H
-#define WAITCONDITION_P_H
+#ifndef CPPMICROSERVICES_WAITCONDITION_H
+#define CPPMICROSERVICES_WAITCONDITION_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -125,4 +125,4 @@ private:
 
 } // namespace cppmicroservices
 
-#endif // WAITCONDITION_P_H
+#endif // CPPMICROSERVICES_WAITCONDITION_H

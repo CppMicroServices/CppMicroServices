@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SHRINKABLEVECTOR_H
-#define SHRINKABLEVECTOR_H
+#ifndef CPPMICROSERVICES_SHRINKABLEVECTOR_H
+#define CPPMICROSERVICES_SHRINKABLEVECTOR_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -162,4 +162,4 @@ std::vector<E> ShrinkableVector<E>::emptyVector;
 
 }
 
-#endif // SHRINKABLEVECTOR_H
+#endif // CPPMICROSERVICES_SHRINKABLEVECTOR_H

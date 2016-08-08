@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICEREFERENCEBASEPRIVATE_H
-#define SERVICEREFERENCEBASEPRIVATE_H
+#ifndef CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
+#define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
 #include "cppmicroservices/ServiceInterface.h"
 
@@ -125,4 +125,4 @@ private:
 
 }
 
-#endif // SERVICEREFERENCEBASEPRIVATE_H
+#endif // CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H

@@ -27,8 +27,8 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 
 =========================================================================*/
 
-#ifndef SHAREDDATA_H
-#define SHAREDDATA_H
+#ifndef CPPMICROSERVICES_SHAREDDATA_H
+#define CPPMICROSERVICES_SHAREDDATA_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -272,4 +272,4 @@ void swap(cppmicroservices::ExplicitlySharedDataPointer<T>& p1, cppmicroservices
 
 }
 
-#endif // SHAREDDATA_H
+#endif // CPPMICROSERVICES_SHAREDDATA_H

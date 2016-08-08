@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SHAREDLIBRARY_H
-#define SHAREDLIBRARY_H
+#ifndef CPPMICROSERVICES_SHAREDLIBRARY_H
+#define CPPMICROSERVICES_SHAREDLIBRARY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/SharedData.h"
@@ -221,4 +221,4 @@ private:
 #pragma warning(pop)
 #endif
 
-#endif // TESTUTILSHAREDLIBRARY_H
+#endif // CPPMICROSERVICES_SHAREDLIBRARY_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICELISTENERHOOK_H
-#define SERVICELISTENERHOOK_H
+#ifndef CPPMICROSERVICES_SERVICELISTENERHOOK_H
+#define CPPMICROSERVICES_SERVICELISTENERHOOK_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/SharedData.h"
@@ -170,4 +170,4 @@ US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
   return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(arg.d.Data());
 US_HASH_FUNCTION_END
 
-#endif // SERVICELISTENERHOOK_H
+#endif // CPPMICROSERVICES_SERVICELISTENERHOOK_H

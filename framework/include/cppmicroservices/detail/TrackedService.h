@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef TRACKEDSERVICE_H
-#define TRACKEDSERVICE_H
+#ifndef CPPMICROSERVICES_TRACKEDSERVICE_H
+#define CPPMICROSERVICES_TRACKEDSERVICE_H
 
 #include "cppmicroservices/ServiceEvent.h"
 #include "cppmicroservices/detail/BundleAbstractTracked.h"
@@ -113,4 +113,4 @@ private:
 
 #include "cppmicroservices/detail/TrackedService.tpp"
 
-#endif // TRACKEDSERVICE_H
+#endif // CPPMICROSERVICES_TRACKEDSERVICE_H

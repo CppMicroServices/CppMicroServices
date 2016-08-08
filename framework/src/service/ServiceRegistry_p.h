@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICEREGISTRY_H
-#define SERVICEREGISTRY_H
+#ifndef CPPMICROSERVICES_SERVICEREGISTRY_P_H
+#define CPPMICROSERVICES_SERVICEREGISTRY_P_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
@@ -182,4 +182,4 @@ private:
 
 }
 
-#endif // SERVICEREGISTRY_H
+#endif // CPPMICROSERVICES_SERVICEREGISTRY_P_H

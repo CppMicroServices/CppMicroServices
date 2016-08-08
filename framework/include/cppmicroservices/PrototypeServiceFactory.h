@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef PROTOTYPESERVICEFACTORY_H
-#define PROTOTYPESERVICEFACTORY_H
+#ifndef CPPMICROSERVICES_PROTOTYPESERVICEFACTORY_H
+#define CPPMICROSERVICES_PROTOTYPESERVICEFACTORY_H
 
 #include "cppmicroservices/ServiceFactory.h"
 
@@ -101,4 +101,4 @@ struct PrototypeServiceFactory : public ServiceFactory
 
 }
 
-#endif // PROTOTYPESERVICEFACTORY_H
+#endif // CPPMICROSERVICES_PROTOTYPESERVICEFACTORY_H

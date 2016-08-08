@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEEVENT_H
-#define BUNDLEEVENT_H
+#ifndef CPPMICROSERVICES_BUNDLEEVENT_H
+#define CPPMICROSERVICES_BUNDLEEVENT_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
@@ -244,4 +244,4 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleEvent
 
 US_MSVC_POP_WARNING
 
-#endif // BUNDLEEVENT_H
+#endif // CPPMICROSERVICES_BUNDLEEVENT_H

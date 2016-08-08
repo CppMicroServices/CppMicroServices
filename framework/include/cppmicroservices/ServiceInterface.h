@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICEINTERFACE_H
-#define SERVICEINTERFACE_H
+#ifndef CPPMICROSERVICES_SERVICEINTERFACE_H
+#define CPPMICROSERVICES_SERVICEINTERFACE_H
 
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceException.h"
@@ -346,4 +346,4 @@ std::shared_ptr<ServiceFactory> ToFactory(const std::shared_ptr<T>& factory)
 }
 
 
-#endif // SERVICEINTERFACE_H
+#endif // CPPMICROSERVICES_SERVICEINTERFACE_H

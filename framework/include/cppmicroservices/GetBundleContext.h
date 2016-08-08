@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef GETBUNDLECONTEXT_H
-#define GETBUNDLECONTEXT_H
+#ifndef CPPMICROSERVICES_GETBUNDLECONTEXT_H
+#define CPPMICROSERVICES_GETBUNDLECONTEXT_H
 
 #ifndef US_BUNDLE_NAME
 #error Missing preprocessor define US_BUNDLE_NAME
@@ -55,4 +55,4 @@ static inline BundleContext GetBundleContext()
 
 }
 
-#endif // USGETBUNDLECONTEXT_H
+#endif // CPPMICROSERVICES_GETBUNDLECONTEXT_H

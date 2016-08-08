@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SHRINKABLEMAP_H
-#define SHRINKABLEMAP_H
+#ifndef CPPMICROSERVICES_SHRINKABLEMAP_H
+#define CPPMICROSERVICES_SHRINKABLEMAP_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -179,4 +179,4 @@ std::map<Key,T> ShrinkableMap<Key,T>::emptyContainer;
 
 }
 
-#endif // SHRINKABLEMAP_H
+#endif // CPPMICROSERVICES_SHRINKABLEMAP_H

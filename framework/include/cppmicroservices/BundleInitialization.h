@@ -24,8 +24,8 @@
 #error Missing US_BUNDLE_NAME preprocessor define
 #endif
 
-#ifndef BUNDLEINITIALIZATION_H
-#define BUNDLEINITIALIZATION_H
+#ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H
+#define CPPMICROSERVICES_BUNDLEINITIALIZATION_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -65,4 +65,4 @@ class BundleContextPrivate;
   }
 
 
-#endif // BUNDLEINITIALIZATION_H
+#endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H

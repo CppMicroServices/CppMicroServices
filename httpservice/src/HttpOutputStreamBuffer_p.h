@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef HTTPOUTPUTSTREAMBUFFER_H
-#define HTTPOUTPUTSTREAMBUFFER_H
+#ifndef CPPMICROSERVICES_HTTPOUTPUTSTREAMBUFFER_P_H
+#define CPPMICROSERVICES_HTTPOUTPUTSTREAMBUFFER_P_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -61,4 +61,4 @@ private:
 
 }
 
-#endif // HTTPOUTPUTSTREAMBUFFER_H
+#endif // CPPMICROSERVICES_HTTPOUTPUTSTREAMBUFFER_P_H

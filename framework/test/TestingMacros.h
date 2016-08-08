@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef USTESTINGMACROS_H_
-#define USTESTINGMACROS_H_
+#ifndef CPPMICROSERVICES_TESTINGMACROS_H
+#define CPPMICROSERVICES_TESTINGMACROS_H
 
 #include <exception>
 #include <string>
@@ -136,4 +136,4 @@ namespace cppmicroservices {
   STATEMENT ;                                                                                 \
   US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
 
-#endif // USTESTINGMACROS_H_
+#endif // CPPMICROSERVICES_TESTINGMACROS_H

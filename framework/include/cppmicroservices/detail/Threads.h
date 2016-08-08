@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef THREADINGMODEL_H
-#define THREADINGMODEL_H
+#ifndef CPPMICROSERVICES_THREADS_H
+#define CPPMICROSERVICES_THREADS_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 
@@ -256,4 +256,4 @@ public:
 
 } // namespace cppmicroservices
 
-#endif // THREADINGMODEL_H
+#endif // CPPMICROSERVICES_THREADS_H

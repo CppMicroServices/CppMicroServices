@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEREFERENCEBASE_H
-#define SERVICEREFERENCEBASE_H
+#ifndef CPPMICROSERVICES_SERVICEREFERENCEBASE_H
+#define CPPMICROSERVICES_SERVICEREFERENCEBASE_H
 
 #include "cppmicroservices/Any.h"
 
@@ -230,4 +230,4 @@ US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceReferenceBase)
   return arg.Hash();
 US_HASH_FUNCTION_END
 
-#endif // SERVICEREFERENCEBASE_H
+#endif // CPPMICROSERVICES_SERVICEREFERENCEBASE_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef US_TESTMANAGER_H_INCLUDED
-#define US_TESTMANAGER_H_INCLUDED
+#ifndef CPPMICROSERVICES_TESTMANAGER_H
+#define CPPMICROSERVICES_TESTMANAGER_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -55,4 +55,4 @@ protected:
 
 }
 
-#endif // US_TESTMANAGER_H_INCLUDED
+#endif // CPPMICROSERVICES_TESTMANAGER_H

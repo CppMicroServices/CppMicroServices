@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLERESOURCESTREAM_H
-#define BUNDLERESOURCESTREAM_H
+#ifndef CPPMICROSERVICES_BUNDLERESOURCESTREAM_H
+#define CPPMICROSERVICES_BUNDLERESOURCESTREAM_H
 
 #include "cppmicroservices/detail/BundleResourceBuffer.h"
 
@@ -66,4 +66,4 @@ public:
 
 }
 
-#endif // BUNDLERESOURCESTREAM_H
+#endif // CPPMICROSERVICES_BUNDLERESOURCESTREAM_H

@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICETRACKER_H
-#define SERVICETRACKER_H
+#ifndef CPPMICROSERVICES_SERVICETRACKER_H
+#define CPPMICROSERVICES_SERVICETRACKER_H
 
 #include <chrono>
 #include <map>
@@ -465,4 +465,4 @@ private:
 
 #include "cppmicroservices/detail/ServiceTracker.tpp"
 
-#endif // SERVICETRACKER_H
+#endif // CPPMICROSERVICES_SERVICETRACKER_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEREFERENCE_H
-#define SERVICEREFERENCE_H
+#ifndef CPPMICROSERVICES_SERVICEREFERENCE_H
+#define CPPMICROSERVICES_SERVICEREFERENCE_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReferenceBase.h"
@@ -139,4 +139,4 @@ typedef ServiceReference<void> ServiceReferenceU;
 
 }
 
-#endif // SERVICEREFERENCE_H
+#endif // CPPMICROSERVICES_SERVICEREFERENCE_H

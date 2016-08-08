@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICE_PROPERTIES_H
-#define SERVICE_PROPERTIES_H
+#ifndef CPPMICROSERVICES_SERVICEPROPERTIES_H
+#define CPPMICROSERVICES_SERVICEPROPERTIES_H
 
 #include "cppmicroservices/Any.h"
 
@@ -42,4 +42,4 @@ typedef std::unordered_map<std::string, Any> ServiceProperties;
 
 }
 
-#endif // SERVICE_PROPERTIES_H
+#endif // CPPMICROSERVICES_SERVICEPROPERTIES_H

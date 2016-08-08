@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef HTTPSERVLET_H
-#define HTTPSERVLET_H
+#ifndef CPPMICROSERVICES_HTTPSERVLET_H
+#define CPPMICROSERVICES_HTTPSERVLET_H
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/ServiceInterface.h"
@@ -144,4 +144,4 @@ private:
 
 }
 
-#endif // HTTPSERVLET_H
+#endif // CPPMICROSERVICES_HTTPSERVLET_H

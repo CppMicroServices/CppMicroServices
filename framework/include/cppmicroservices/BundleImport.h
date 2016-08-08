@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEIMPORT_H
-#define BUNDLEIMPORT_H
+#ifndef CPPMICROSERVICES_BUNDLEIMPORT_H
+#define CPPMICROSERVICES_BUNDLEIMPORT_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -90,4 +90,4 @@ class BundleContext;
     US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (nullptr);                            \
   }
 
-#endif // BUNDLEREGISTRY_H
+#endif // CPPMICROSERVICES_BUNDLEIMPORT_H

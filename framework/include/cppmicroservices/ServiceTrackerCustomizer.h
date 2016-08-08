@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef SERVICETRACKERCUSTOMIZER_H
-#define SERVICETRACKERCUSTOMIZER_H
+#ifndef CPPMICROSERVICES_SERVICETRACKERCUSTOMIZER_H
+#define CPPMICROSERVICES_SERVICETRACKERCUSTOMIZER_H
 
 #include "cppmicroservices/ServiceReference.h"
 
@@ -199,4 +199,4 @@ struct ServiceTrackerCustomizer<void, void>
 
 }
 
-#endif // SERVICETRACKERCUSTOMIZER_H
+#endif // CPPMICROSERVICES_SERVICETRACKERCUSTOMIZER_H

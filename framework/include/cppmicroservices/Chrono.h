@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CLOCK_H
-#define CLOCK_H
+#ifndef CPPMICROSERVICES_CHRONO_H
+#define CPPMICROSERVICES_CHRONO_H
 
 #include <chrono>
 
@@ -35,4 +35,4 @@ typedef std::chrono::steady_clock Clock;
 
 }
 
-#endif // CLOCK_H
+#endif // CPPMICROSERVICES_CHRONO_H

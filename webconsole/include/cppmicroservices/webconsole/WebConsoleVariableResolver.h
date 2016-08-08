@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef WEBCONSOLEVARIABLERESOLVER_H
-#define WEBCONSOLEVARIABLERESOLVER_H
+#ifndef CPPMICROSERVICES_WEBCONSOLEVARIABLERESOLVER_H
+#define CPPMICROSERVICES_WEBCONSOLEVARIABLERESOLVER_H
 
 #include <string>
 
@@ -68,4 +68,4 @@ struct WebConsoleVariableResolver
 
 }
 
-#endif // WEBCONSOLEVARIABLERESOLVER_H
+#endif // CPPMICROSERVICES_WEBCONSOLEVARIABLERESOLVER_H

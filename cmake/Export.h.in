@@ -2,8 +2,8 @@
 // Macros for import/export declarations
 //-------------------------------------------------------------------
 
-#ifndef @PROJECT_NAME@Export_H_
-#define @PROJECT_NAME@Export_H_
+#ifndef CPPMICROSERVICES_@PROJECT_NAME@EXPORT_H
+#define CPPMICROSERVICES_@PROJECT_NAME@EXPORT_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
@@ -21,4 +21,4 @@
   #define US_@PROJECT_NAME@_EXPORT US_ABI_EXPORT
 #endif
 
-#endif // @PROJECT_NAME@Export_H_
+#endif // CPPMICROSERVICES_@PROJECT_NAME@EXPORT_H

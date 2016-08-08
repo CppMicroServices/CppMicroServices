@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef ABSTRACTWEBCONSOLEPLUGIN_H
-#define ABSTRACTWEBCONSOLEPLUGIN_H
+#ifndef CPPMICROSERVICES_ABSTRACTWEBCONSOLEPLUGIN_H
+#define CPPMICROSERVICES_ABSTRACTWEBCONSOLEPLUGIN_H
 
 #include "cppmicroservices/httpservice/HttpServlet.h"
 #include "cppmicroservices/GetBundleContext.h"
@@ -213,4 +213,4 @@ private:
 
 }
 
-#endif // ABSTRACTWEBCONSOLEPLUGIN_H
+#endif // CPPMICROSERVICES_ABSTRACTWEBCONSOLEPLUGIN_H

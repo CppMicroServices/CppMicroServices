@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef WEBCONSOLECONSTANTS_H
-#define WEBCONSOLECONSTANTS_H
+#ifndef CPPMICROSERVICES_WEBCONSOLECONSTANTS_H
+#define CPPMICROSERVICES_WEBCONSOLECONSTANTS_H
 
 #include <string>
 
@@ -169,4 +169,4 @@ struct US_WebConsole_EXPORT WebConsoleConstants
 
 }
 
-#endif // WEBCONSOLECONSTANTS_H
+#endif // CPPMICROSERVICES_WEBCONSOLECONSTANTS_H

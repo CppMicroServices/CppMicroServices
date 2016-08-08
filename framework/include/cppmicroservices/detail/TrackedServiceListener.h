@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef TRACKEDSERVICELISTENER_H
-#define TRACKEDSERVICELISTENER_H
+#ifndef CPPMICROSERVICES_TRACKEDSERVICELISTENER_H
+#define CPPMICROSERVICES_TRACKEDSERVICELISTENER_H
 
 #include "cppmicroservices/ServiceEvent.h"
 
@@ -52,4 +52,4 @@ struct TrackedServiceListener
 
 } // namespace cppmicroservices
 
-#endif // TRACKEDSERVICELISTENER_H
+#endif // CPPMICROSERVICES_TRACKEDSERVICELISTENER_H

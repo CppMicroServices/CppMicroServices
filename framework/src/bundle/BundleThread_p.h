@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLETHREAD_P_H
-#define BUNDLETHREAD_P_H
+#ifndef CPPMICROSERVICES_BUNDLETHREAD_P_H
+#define CPPMICROSERVICES_BUNDLETHREAD_P_H
 
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/detail/Threads.h"
@@ -105,4 +105,4 @@ public:
 
 }
 
-#endif // BUNDLETHREAD_P_H
+#endif // CPPMICROSERVICES_BUNDLETHREAD_P_H

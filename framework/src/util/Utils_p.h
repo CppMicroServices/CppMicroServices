@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef CPPMICROSERVICES_UTILS_H
+#define CPPMICROSERVICES_UTILS_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 
@@ -144,4 +144,4 @@ std::string ToString(T val)
 
 } // namespace cppmicroservices
 
-#endif // UTILS_H
+#endif // CPPMICROSERVICES_UTILS_H

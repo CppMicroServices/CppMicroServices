@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEEVENT_H
-#define SERVICEEVENT_H
+#ifndef CPPMICROSERVICES_SERVICEEVENT_H
+#define CPPMICROSERVICES_SERVICEEVENT_H
 
 #include "cppmicroservices/ServiceReference.h"
 
@@ -174,4 +174,4 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEven
 
 US_MSVC_POP_WARNING
 
-#endif // SERVICEEVENT_H
+#endif // CPPMICROSERVICES_SERVICEEVENT_H

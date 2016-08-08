@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef SERVLETCONTAINER_H
-#define SERVLETCONTAINER_H
+#ifndef CPPMICROSERVICES_SERVLETCONTAINER_H
+#define CPPMICROSERVICES_SERVLETCONTAINER_H
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
@@ -57,4 +57,4 @@ private:
 
 }
 
-#endif // SERVLETCONTAINER_H
+#endif // CPPMICROSERVICES_SERVLETCONTAINER_H

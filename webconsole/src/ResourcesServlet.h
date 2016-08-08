@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef USRESOURCESSERVLET_H
-#define USRESOURCESSERVLET_H
+#ifndef CPPMICROSERVICES_RESOURCESSERVLET_H
+#define CPPMICROSERVICES_RESOURCESSERVLET_H
 
 class ResourcesServlet
 {
@@ -87,4 +87,4 @@ public:
   }
 };
 
-#endif // USRESOURCESSERVLET_H
+#endif // CPPMICROSERVICES_RESOURCESSERVLET_H

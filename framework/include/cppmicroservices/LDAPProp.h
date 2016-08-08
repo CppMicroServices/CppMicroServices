@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef LDAPPROP_H
-#define LDAPPROP_H
+#ifndef CPPMICROSERVICES_LDAPPROP_H
+#define CPPMICROSERVICES_LDAPPROP_H
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/FrameworkConfig.h"
@@ -233,4 +233,4 @@ US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(const cppmicroserv
  */
 US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator||(const cppmicroservices::LDAPPropExpr& left, const cppmicroservices::LDAPPropExpr& right);
 
-#endif // LDAPPROP_H
+#endif // CPPMICROSERVICES_LDAPPROP_H

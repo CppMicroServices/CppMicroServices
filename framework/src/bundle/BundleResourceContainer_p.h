@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLERESOURCECONTAINER_P_H
-#define BUNDLERESOURCECONTAINER_P_H
+#ifndef CPPMICROSERVICES_BUNDLERESOURCECONTAINER_P_H
+#define CPPMICROSERVICES_BUNDLERESOURCECONTAINER_P_H
 
 #include "miniz.h"
 
@@ -100,4 +100,4 @@ private:
 
 }
 
-#endif // BUNDLERESOURCECONTAINER_P_H
+#endif // CPPMICROSERVICES_BUNDLERESOURCECONTAINER_P_H

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLEEVENTHOOK_H
-#define BUNDLEEVENTHOOK_H
+#ifndef CPPMICROSERVICES_BUNDLEEVENTHOOK_H
+#define CPPMICROSERVICES_BUNDLEEVENTHOOK_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ShrinkableVector.h"
@@ -69,4 +69,4 @@ struct US_Framework_EXPORT BundleEventHook
 
 }
 
-#endif // BUNDLEEVENTHOOK_H
+#endif // CPPMICROSERVICES_BUNDLEEVENTHOOK_H

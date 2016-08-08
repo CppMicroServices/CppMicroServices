@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef BUNDLERESOURCEBUFFER_P_H
-#define BUNDLERESOURCEBUFFER_P_H
+#ifndef CPPMICROSERVICES_BUNDLERESOURCEBUFFER_H
+#define CPPMICROSERVICES_BUNDLERESOURCEBUFFER_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
@@ -69,4 +69,4 @@ private:
 
 } // namespace cppmicroservices
 
-#endif // BUNDLERESOURCEBUFFER_P_H
+#endif // CPPMICROSERVICES_BUNDLERESOURCEBUFFER_H

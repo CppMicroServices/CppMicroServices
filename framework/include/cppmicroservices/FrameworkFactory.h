@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef FRAMEWORKFACTORY_H
-#define FRAMEWORKFACTORY_H
+#ifndef CPPMICROSERVICES_FRAMEWORKFACTORY_H
+#define CPPMICROSERVICES_FRAMEWORKFACTORY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 
@@ -62,4 +62,4 @@ public:
 
 }
 
-#endif // FRAMEWORKFACTORY_H
+#endif // CPPMICROSERVICES_FRAMEWORKFACTORY_H

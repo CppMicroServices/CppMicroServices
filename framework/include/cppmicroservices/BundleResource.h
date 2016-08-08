@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef BUNDLERESOURCE_H
-#define BUNDLERESOURCE_H
+#ifndef CPPMICROSERVICES_BUNDLERESOURCE_H
+#define CPPMICROSERVICES_BUNDLERESOURCE_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
@@ -309,4 +309,4 @@ US_HASH_FUNCTION_BEGIN(cppmicroservices::BundleResource)
   return arg.Hash();
 US_HASH_FUNCTION_END
 
-#endif // BUNDLERESOURCE_H
+#endif // CPPMICROSERVICES_BUNDLERESOURCE_H

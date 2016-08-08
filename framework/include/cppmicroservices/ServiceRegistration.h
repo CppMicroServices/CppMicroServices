@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEREGISTRATION_H
-#define SERVICEREGISTRATION_H
+#ifndef CPPMICROSERVICES_SERVICEREGISTRATION_H
+#define CPPMICROSERVICES_SERVICEREGISTRATION_H
 
 #include "cppmicroservices/ServiceRegistrationBase.h"
 
@@ -143,4 +143,4 @@ typedef ServiceRegistration<void> ServiceRegistrationU;
 
 }
 
-#endif // SERVICEREGISTRATION_H
+#endif // CPPMICROSERVICES_SERVICEREGISTRATION_H

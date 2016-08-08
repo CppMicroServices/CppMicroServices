@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef HTTPCONSTANTS_H
-#define HTTPCONSTANTS_H
+#ifndef CPPMICROSERVICES_HTTPCONSTANTS_H
+#define CPPMICROSERVICES_HTTPCONSTANTS_H
 
 #include <string>
 
@@ -42,4 +42,4 @@ struct US_HttpService_EXPORT HttpConstants
 
 }
 
-#endif // HTTPCONSTANTS_H
+#endif // CPPMICROSERVICES_HTTPCONSTANTS_H

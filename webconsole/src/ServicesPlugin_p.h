@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICESPLUGIN_H
-#define SERVICESPLUGIN_H
+#ifndef CPPMICROSERVICES_SERVICESPLUGIN_P_H
+#define CPPMICROSERVICES_SERVICESPLUGIN_P_H
 
 #include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
 
@@ -44,4 +44,4 @@ private:
 
 }
 
-#endif // SERVICESPLUGIN_H
+#endif // CPPMICROSERVICES_SERVICESPLUGIN_P_H

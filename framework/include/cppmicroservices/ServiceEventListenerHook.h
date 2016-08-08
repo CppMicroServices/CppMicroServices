@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef SERVICEEVENTLISTENERHOOK_H
-#define SERVICEEVENTLISTENERHOOK_H
+#ifndef CPPMICROSERVICES_SERVICEEVENTLISTENERHOOK_H
+#define CPPMICROSERVICES_SERVICEEVENTLISTENERHOOK_H
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceListenerHook.h"
@@ -68,4 +68,4 @@ struct US_Framework_EXPORT ServiceEventListenerHook
 
 }
 
-#endif // SERVICEEVENTLISTENERHOOK_H
+#endif // CPPMICROSERVICES_SERVICEEVENTLISTENERHOOK_H

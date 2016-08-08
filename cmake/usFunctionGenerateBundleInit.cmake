@@ -8,7 +8,7 @@
 #!
 #! \code{.cmake}
 #! set(bundle_srcs )
-#! FunctionGenerateBundleInit(bundle_srcs)
+#! usFunctionGenerateBundleInit(bundle_srcs)
 #! add_library(mylib ${bundle_srcs})
 #! set_property(TARGET ${mylib} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=MyBundle)
 #! \endcode
@@ -16,7 +16,7 @@
 #! \param src_var (required) The name of a list variable to which the path of the generated
 #!        source file will be appended.
 #!
-function(FunctionGenerateBundleInit src_var)
+function(usFunctionGenerateBundleInit src_var)
 
   set(bundle_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/cppmicroservices_init.cpp")
   configure_file(${US_BUNDLE_INIT_TEMPLATE} ${bundle_init_src_file} @ONLY)

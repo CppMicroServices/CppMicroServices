@@ -38,8 +38,8 @@ endforeach()
 function(CreateExample _name)
   set(_srcs ${ARGN})
 
-  FunctionGetResourceSource(TARGET Example-${_name} OUT _srcs)
-  FunctionGenerateBundleInit(_srcs)
+  usFunctionGetResourceSource(TARGET Example-${_name} OUT _srcs)
+  usFunctionGenerateBundleInit(_srcs)
 
   add_library(Example-${_name} ${_srcs})
   set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_name})
@@ -56,8 +56,8 @@ function(CreateExample _name)
     OUTPUT_NAME ${_name}
   )
 
-  FunctionAddResources(TARGET Example-${_name} BUNDLE_NAME ${_name} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/${_name}/resources FILES manifest.json)
-  FunctionEmbedResources(TARGET Example-${_name})
+  usFunctionAddResources(TARGET Example-${_name} BUNDLE_NAME ${_name} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/${_name}/resources FILES manifest.json)
+  usFunctionEmbedResources(TARGET Example-${_name})
 
 endfunction()
 

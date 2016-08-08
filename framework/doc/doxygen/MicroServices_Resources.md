@@ -32,13 +32,13 @@ Embedding Resources in a %Bundle
 --------------------------------
 
 Resources are embedded into a bundle's shared or static library (or into an executable)
-by using the `ResourceCompiler` executable. It will create a ZIP archive of all input
+by using the `usResourceCompiler` executable. It will create a ZIP archive of all input
 files and can append it to the bundle file.
 
-If you are using CMake, consider using the provided `#FunctionEmbedResources` CMake macro which
-handles the invocation of the `ResourceCompiler` executable and sets up the correct file
+If you are using CMake, consider using the provided `#usFunctionEmbedResources` CMake macro which
+handles the invocation of the `usResourceCompiler` executable and sets up the correct file
 dependencies. Otherwise, you also need to make sure that the set of static bundles linked
-into a shared bundle or executable is also in the input file list of your `ResourceCompiler`
+into a shared bundle or executable is also in the input file list of your `usResourceCompiler`
 call for that shared bundle or executable.
 
 Here is a full example creating a bundle and embedding resource data:
@@ -48,13 +48,13 @@ If you are not using CMake, you can run the resource compiler from the terminal.
 
 Example usage of resource compiler:    
 1. To create a zip file with resources    
-    <code>ResourceCompiler --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --res-add icon.png</code>    
+    <code>usResourceCompiler --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --res-add icon.png</code>    
 2. To include a resource file into a bundle    
-    <code>ResourceCompiler --bundle-name mybundle --bundle-file mybundle.so --manifest-add manifest.json</code>    
+    <code>usResourceCompiler --bundle-name mybundle --bundle-file mybundle.so --manifest-add manifest.json</code>    
 3. To include the contents of zip file into a bundle    
-    <code>ResourceCompiler --bundle-file mybundle.so --zip-add archivetomerge.zip</code>
+    <code>usResourceCompiler --bundle-file mybundle.so --zip-add archivetomerge.zip</code>
 
-run <code>ResourceCompiler --help</code> for full list of options and usage
+run <code>usResourceCompiler --help</code> for full list of options and usage
 
 Accessing Resources at Runtime
 ------------------------------

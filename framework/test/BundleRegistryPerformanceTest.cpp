@@ -52,7 +52,7 @@ namespace
         frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + testing::LIB_PREFIX + bundleName + testing::LIB_EXT);
 #else
         US_UNUSED(bundleName);
-        frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "FrameworkTestDriver" + testing::EXE_EXT);
+        frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + testing::EXE_EXT);
 #endif
     }
 

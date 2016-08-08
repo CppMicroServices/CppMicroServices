@@ -94,7 +94,7 @@ int main(int /*argc*/, char** /*argv*/)
     installedBundles.insert(installedBundles.end(), bundles.begin(), bundles.end());
   }
 #else
-  installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "FrameworkExamplesDriver" + EXE_EXT);
+  installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usFrameworkExamplesDriver" + EXE_EXT);
 #endif
 
   std::unordered_map<std::string, Bundle> symbolicNameToBundle;
@@ -173,7 +173,7 @@ int main(int /*argc*/, char** /*argv*/)
 #if defined (US_BUILD_SHARED_LIBS)
             bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT);
 #else
-            bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "FrameworkExamplesDriver" + EXE_EXT);
+            bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usFrameworkExamplesDriver" + EXE_EXT);
 #endif
           }
           catch (const std::exception& e)

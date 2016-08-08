@@ -4,7 +4,7 @@
 #! This CMake function uses an external command line program to generate a ZIP archive
 #! containing data from external resources such as text files or images or other ZIP
 #! archives. The created archive file can be appended or linked into the target file
-#! using the FunctionEmbedResources macro.
+#! using the usFunctionEmbedResources macro.
 #!
 #! Each bundle can call this function to add resources and make them available at
 #! runtime through the Bundle class. Multiple calls to this function append the
@@ -17,7 +17,7 @@
 #! Example usage:
 #! \code{.cmake}
 #! set(bundle_srcs )
-#! FunctionAddResources(TARGET mylib
+#! usFunctionAddResources(TARGET mylib
 #!                        BUNDLE_NAME org_me_mylib
 #!                        FILES config.properties logo.png
 #!                       )
@@ -40,10 +40,10 @@
 #!        is a valid target name and that target is a static library, its absolute file path is
 #!        used instead.
 #!
-#! \sa FunctionEmbedResources
+#! \sa usFunctionEmbedResources
 #! \sa \ref MicroServices_Resources
 #!
-function(FunctionAddResources)
+function(usFunctionAddResources)
 
   cmake_parse_arguments(US_RESOURCE "" "TARGET;BUNDLE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
 

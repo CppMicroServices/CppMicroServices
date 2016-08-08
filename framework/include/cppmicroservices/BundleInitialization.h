@@ -49,7 +49,7 @@ class BundleContextPrivate;
  * the CppMicroServices library.
  *
  * \remarks If you are using CMake, consider using the provided CMake macro
- * <code>FunctionGenerateBundleInit()</code>.
+ * <code>usFunctionGenerateBundleInit()</code>.
  */
 #define US_INITIALIZE_BUNDLE                                                                    \
   std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                         \

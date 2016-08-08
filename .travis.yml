@@ -33,5 +33,5 @@ before_install:
   - bash install_cmake.sh
 
 script:
-  - ctest -VV -S ./cmake/CTestScript_travis.cmake
+  - ctest -VV -S ./cmake/usCTestScript_travis.cmake
 

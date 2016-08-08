@@ -1,4 +1,4 @@
-function(FunctionCompileSnippets snippet_path)
+function(usFunctionCompileSnippets snippet_path)
 
   # get all files called "main.cpp"
   file(GLOB_RECURSE main_cpp_list "${snippet_path}/main.cpp")

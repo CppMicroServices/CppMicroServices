@@ -8,12 +8,12 @@ BundleContext object, which is specific to each bundle.
 ### Creating a BundleContext
 
 To create a BundleContext object for a specific library, you have two options. If your project uses
-CMake as the build system, use the supplied `#FunctionGenerateBundleInit` CMake function to automatically
+CMake as the build system, use the supplied `#usFunctionGenerateBundleInit` CMake function to automatically
 create a source file and add it to your bundle's sources:
 
 ~~~{.cpp}
 set(bundle_srcs )
-FunctionGenerateBundleInit(bundle_srcs)
+usFunctionGenerateBundleInit(bundle_srcs)
 add_library(mylib ${bundle_srcs})
 set_property(TARGET ${mylib} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=mylib)
 ~~~

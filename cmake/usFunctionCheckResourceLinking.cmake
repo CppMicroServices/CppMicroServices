@@ -1,11 +1,11 @@
-function(FunctionCheckResourceLinking)
+function(usFunctionCheckResourceLinking)
   if(NOT DEFINED US_RESOURCE_LINKING_AVAILABLE)
     set(_suffix )
     # Check linking capability
     set(_linking_available 0)
     if(APPLE)
       set(_result )
-      FunctionCheckCompilerFlags("-Wl,-sectcreate,__TEXT,us_resources,CMakeLists.txt" _result)
+      usFunctionCheckCompilerFlags("-Wl,-sectcreate,__TEXT,us_resources,CMakeLists.txt" _result)
       if(_result)
         set(_linking_available 1)
       endif()

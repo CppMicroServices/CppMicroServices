@@ -66,7 +66,7 @@ at least two dictionary services.
 
 For an introduction how to compile our source code, see \ref MicroServices_Example1.
 
-After running the `FrameworkExamplesDriver` program we should make sure that the
+After running the `usFrameworkExamplesDriver` program we should make sure that the
 bundle from Example 1 is active. We can use the `s` shell command to get
 a list of all bundles, their state, and their bundle identifier number.
 If the Example 1 bundle is not active, we should start the bundle using the
@@ -76,7 +76,7 @@ entering the `l spellcheckservice` command which will also trigger the starting
 of the dictionaryservice bundle containing the english dictionary:
 
 \verbatim
-CppMicroServices-build> bin/FrameworkExamplesDriver
+CppMicroServices-build> bin/usFrameworkExamplesDriver
 > l eventlistener
 Starting to listen for service events.
 > l spellcheckservice
@@ -103,7 +103,7 @@ then we should see it print out the details of the service event it receives
 when our new bundle registers its spell checker service:
 
 \verbatim
-CppMicroServices-build> bin/FrameworkExamplesDriver
+CppMicroServices-build> bin/usFrameworkExamplesDriver
 > l frenchdictionary
 Ex1: Service of type IDictionaryService registered.
 Ex1: Service of type ISpellCheckService registered.
@@ -115,7 +115,7 @@ the french dictionary service; when the service is stopped,
 the eventlistener bundle will print that our bundle is no longer offering its
 spell checker service. Likewise, when the french dictionary service comes back, so will
 our spell checker service. We create a client for our spell checker service in
-\ref MicroServices_Example7 "Example 7". To exit the `FrameworkExamplesDriver` program, we
+\ref MicroServices_Example7 "Example 7". To exit the `usFrameworkExamplesDriver` program, we
 use the `q` command.
 
 Next: \ref MicroServices_Example7

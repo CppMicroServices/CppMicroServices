@@ -14,5 +14,5 @@ if(MSVC)
   )
 endif()
 
-add_executable(Shell ${srcs})
-target_link_libraries(Shell ${US_LIBRARIES})
+add_executable(usShell ${srcs})
+target_link_libraries(usShell ${US_LIBRARIES})

@@ -33,7 +33,7 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
                ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
-MacroCreateBundle(Framework
+usMacroCreateBundle(Framework
   VERSION "2.99.0"
   TARGET CppMicroServices
   SYMBOLIC_NAME system_bundle

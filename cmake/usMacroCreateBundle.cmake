@@ -1,6 +1,6 @@
 # For internal use only
 
-macro(MacroCreateBundle _project_name)
+macro(usMacroCreateBundle _project_name)
 
 project(${_project_name})
 
@@ -21,7 +21,7 @@ list(GET _version_numbers 1 ${PROJECT_NAME}_MINOR_VERSION)
 list(GET _version_numbers 2 ${PROJECT_NAME}_PATCH_VERSION)
 
 if(NOT ${PROJECT_NAME}_TARGET)
-  set(${PROJECT_NAME}_TARGET ${PROJECT_NAME})
+  set(${PROJECT_NAME}_TARGET us${PROJECT_NAME})
 endif()
 set(PROJECT_TARGET ${${PROJECT_NAME}_TARGET})
 
@@ -87,11 +87,11 @@ endif()
 
 # Generate the bundle init file
 if(NOT ${PROJECT_NAME}_SKIP_INIT)
-  FunctionGenerateBundleInit(${PROJECT_NAME}_SOURCES)
+  usFunctionGenerateBundleInit(${PROJECT_NAME}_SOURCES)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
-  FunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
+  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
 endif()
 
 # Create the bundle library
@@ -132,18 +132,18 @@ if(${PROJECT_NAME}_RESOURCES)
   if(${PROJECT_NAME}_RESOURCES)
     set(_wd ${CMAKE_CURRENT_SOURCE_DIR}/resources)
   endif()
-  FunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
-                       WORKING_DIRECTORY ${_wd}
-                       FILES ${${PROJECT_NAME}_RESOURCES}
-                      )
+  usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
+                         WORKING_DIRECTORY ${_wd}
+                         FILES ${${PROJECT_NAME}_RESOURCES}
+                        )
 endif()
 if(${PROJECT_NAME}_BINARY_RESOURCES)
-  FunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
-                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
-                       FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
-                      )
+  usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
+                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
+                         FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
+                        )
 endif()
-FunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
+usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
 
 #-----------------------------------------------------------------------------
 # Install support
@@ -151,7 +151,7 @@ FunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
 
 if(NOT US_NO_INSTALL)
   install(TARGETS ${${PROJECT_NAME}_TARGET}
-          EXPORT ${PROJECT_NAME}Targets
+          EXPORT us${PROJECT_NAME}Targets
           RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
           LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
           ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
@@ -183,16 +183,16 @@ endif()
 
 # Version information
 configure_file(
-  ${US_CMAKE_DIR}/BundleConfigVersion.cmake.in
-  ${CppMicroServices_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  ${US_CMAKE_DIR}/usBundleConfigVersion.cmake.in
+  ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
   @ONLY
   )
 
 export(TARGETS ${${PROJECT_NAME}_TARGET} ${US_LIBRARIES}
-       FILE ${CppMicroServices_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+       FILE ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}Targets.cmake)
 if(NOT US_NO_INSTALL)
-  install(EXPORT ${PROJECT_NAME}Targets
-          FILE ${PROJECT_NAME}Targets.cmake
+  install(EXPORT us${PROJECT_NAME}Targets
+          FILE us${PROJECT_NAME}Targets.cmake
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 endif()
 
@@ -204,8 +204,8 @@ set(PACKAGE_CONFIG_INCLUDE_DIR
 set(PACKAGE_CONFIG_RUNTIME_LIBRARY_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 configure_file(
-  ${US_CMAKE_DIR}/BundleConfig.cmake.in
-  ${CppMicroServices_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+  ${US_CMAKE_DIR}/usBundleConfig.cmake.in
+  ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}Config.cmake
   @ONLY
   )
 
@@ -216,16 +216,16 @@ if(NOT US_NO_INSTALL)
   set(CONFIG_RUNTIME_LIBRARY_DIR ${RUNTIME_INSTALL_DIR})
 
   configure_package_config_file(
-    ${US_CMAKE_DIR}/BundleConfig.cmake.in
-    ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+    ${US_CMAKE_DIR}/usBundleConfig.cmake.in
+    ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
     INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
     PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_LIBRARY_DIR
     NO_SET_AND_CHECK_MACRO
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
     )
 
-  install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-                ${CppMicroServices_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
+                ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
           ${US_SDK_INSTALL_COMPONENT})
 endif()

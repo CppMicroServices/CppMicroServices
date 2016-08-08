@@ -13,16 +13,16 @@ macro(_us_create_test_bundle_helper)
   target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} ${US_LINK_LIBRARIES})
 
   if(_res_files OR US_TEST_LINK_LIBRARIES)
-    FunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root}
-                         FILES ${_res_files}
-                         ZIP_ARCHIVES ${US_TEST_LINK_LIBRARIES})
+    usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root}
+                           FILES ${_res_files}
+                           ZIP_ARCHIVES ${US_TEST_LINK_LIBRARIES})
   endif()
   if(_bin_res_files)
-    FunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
-                         FILES ${_bin_res_files})
+    usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/resources
+                           FILES ${_bin_res_files})
   endif()
 
-  FunctionEmbedResources(TARGET ${name} ${_mode})
+  usFunctionEmbedResources(TARGET ${name} ${_mode})
 
   if(NOT US_TEST_SKIP_BUNDLE_LIST)
     set(_us_test_bundle_libs "${_us_test_bundle_libs};${name}" CACHE INTERNAL "" FORCE)
@@ -30,15 +30,15 @@ macro(_us_create_test_bundle_helper)
 
 endmacro()
 
-function(FunctionCreateTestBundle name)
+function(usFunctionCreateTestBundle name)
   set(_srcs ${ARGN})
   set(_res_files )
   set(_bin_res_files )
-  FunctionGenerateBundleInit(_srcs)
+  usFunctionGenerateBundleInit(_srcs)
   _us_create_test_bundle_helper()
 endfunction()
 
-function(FunctionCreateTestBundleWithResources name)
+function(usFunctionCreateTestBundleWithResources name)
   cmake_parse_arguments(US_TEST "SKIP_BUNDLE_LIST;LINK_RESOURCES;APPEND_RESOURCES" "RESOURCES_ROOT" "SOURCES;RESOURCES;BINARY_RESOURCES;LINK_LIBRARIES" "" ${ARGN})
 
   set(_mode )
@@ -49,7 +49,7 @@ function(FunctionCreateTestBundleWithResources name)
   endif()
 
   set(_srcs ${US_TEST_SOURCES})
-  FunctionGetResourceSource(TARGET ${name} OUT _srcs ${_mode})
+  usFunctionGetResourceSource(TARGET ${name} OUT _srcs ${_mode})
   set(_res_files ${US_TEST_RESOURCES})
   set(_bin_res_files ${US_TEST_BINARY_RESOURCES})
   if(US_TEST_RESOURCES_ROOT)
@@ -57,6 +57,6 @@ function(FunctionCreateTestBundleWithResources name)
   else()
     set(_res_root ${CMAKE_CURRENT_SOURCE_DIR}/resources)
   endif()
-  FunctionGenerateBundleInit(_srcs)
+  usFunctionGenerateBundleInit(_srcs)
   _us_create_test_bundle_helper()
 endfunction()

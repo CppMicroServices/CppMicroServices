@@ -8,7 +8,7 @@
 #! Example usage:
 #! \code{.cmake}
 #! set(bundle_srcs mylib.cpp)
-#! FunctionGetResourceSource(TARGET mylib
+#! usFunctionGetResourceSource(TARGET mylib
 #!                             OUT bundle_srcs
 #!                            )
 #! add_library(mylib ${bundle_srcs})
@@ -19,10 +19,10 @@
 #! \param LINK (optional) Generate a suitable source file for LINK mode.
 #! \param APPEND (optional) Generate a suitable source file for APPEND mode.
 #!
-#! \sa FunctionAddResources
-#! \sa FunctionEmbedResources
+#! \sa usFunctionAddResources
+#! \sa usFunctionEmbedResources
 #!
-function(FunctionGetResourceSource)
+function(usFunctionGetResourceSource)
   cmake_parse_arguments(_res "LINK;APPEND" "TARGET;OUT" "" "" ${ARGN})
   if(NOT _res_TARGET)
     message(SEND_ERROR "TARGET must not be empty")

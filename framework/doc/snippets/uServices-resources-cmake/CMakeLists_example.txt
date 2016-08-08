@@ -1,8 +1,8 @@
 set(bundle_name "org_me_mybundle")
 set(srcs mybundle.cpp)
 
-FunctionGenerateBundleInit(srcs)
-FunctionGetResourceSource(TARGET mybundle OUT srcs)
+usFunctionGenerateBundleInit(srcs)
+usFunctionGetResourceSource(TARGET mybundle OUT srcs)
 
 add_library(mybundle ${srcs})
 target_link_libraries(mybundle CppMicroServices)
@@ -10,6 +10,6 @@ target_link_libraries(mybundle CppMicroServices)
 set_property(TARGET mybundle APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${bundle_name})
 set_property(TARGET mybundle PROPERTY US_BUNDLE_NAME ${bundle_name})
 
-FunctionEmbedResources(TARGET mybundle
+usFunctionEmbedResources(TARGET mybundle
   FILES hello.txt
 )

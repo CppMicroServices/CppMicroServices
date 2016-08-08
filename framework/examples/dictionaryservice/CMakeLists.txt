@@ -9,10 +9,10 @@ set(_srcs
 
 # Add a special source file to the _srcs variable that
 # will enable dependency checking on bundle resources.
-FunctionGetResourceSource(TARGET Example-${_lib_name} OUT _srcs)
+usFunctionGetResourceSource(TARGET Example-${_lib_name} OUT _srcs)
 
 # Generate bundle initialization code
-FunctionGenerateBundleInit(_srcs)
+usFunctionGenerateBundleInit(_srcs)
 
 # Create the library
 add_library(Example-${_lib_name} ${_srcs})
@@ -24,7 +24,7 @@ set_property(TARGET Example-${_lib_name} APPEND PROPERTY US_BUNDLE_NAME ${_lib_n
 set_property(TARGET Example-${_lib_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_lib_name})
 
 # Embed the manifest file
-FunctionEmbedResources(TARGET Example-${_lib_name} WORKING_DIRECTORY resources FILES manifest.json)
+usFunctionEmbedResources(TARGET Example-${_lib_name} WORKING_DIRECTORY resources FILES manifest.json)
 
 # Link the CppMicroServices library
 target_link_libraries(Example-${_lib_name} ${CppMicroServices_LIBRARIES})

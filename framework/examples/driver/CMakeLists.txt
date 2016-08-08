@@ -21,17 +21,17 @@ if(NOT US_BUILD_SHARED_LIBS)
   set(_target_zip_archives Example-dictionaryclient Example-dictionaryclient2 Example-dictionaryclient3 Example-dictionaryservice Example-frenchdictionary Example-eventlistener Example-spellcheckclient Example-spellcheckservice ${CppMicroServices_LIBRARIES})
   
   set(_srcs main.cpp)
-  FunctionGetResourceSource(TARGET ${PROJECT_NAME}Driver OUT _srcs)
+  usFunctionGetResourceSource(TARGET us${PROJECT_NAME}Driver OUT _srcs)
   
-  add_executable(${PROJECT_NAME}Driver ${_srcs})
-  target_link_libraries(${PROJECT_NAME}Driver ${_target_zip_archives})
+  add_executable(us${PROJECT_NAME}Driver ${_srcs})
+  target_link_libraries(us${PROJECT_NAME}Driver ${_target_zip_archives})
   
   # Merge all resources from the static bundles and embed them into the executable.
-  FunctionAddResources(TARGET ${PROJECT_NAME}Driver
-                      BUNDLE_NAME main
-                      ZIP_ARCHIVES ${_target_zip_archives})
-  FunctionEmbedResources(TARGET ${PROJECT_NAME}Driver)
+  usFunctionAddResources(TARGET us${PROJECT_NAME}Driver
+                        BUNDLE_NAME main
+                        ZIP_ARCHIVES ${_target_zip_archives})
+  usFunctionEmbedResources(TARGET us${PROJECT_NAME}Driver)
 else()
-  add_executable(${PROJECT_NAME}Driver main.cpp)
-  target_link_libraries(${PROJECT_NAME}Driver ${CppMicroServices_LIBRARIES})
+  add_executable(us${PROJECT_NAME}Driver main.cpp)
+  target_link_libraries(us${PROJECT_NAME}Driver ${CppMicroServices_LIBRARIES})
 endif()

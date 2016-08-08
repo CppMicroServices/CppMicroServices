@@ -69,7 +69,7 @@ set(_resources
   res/KickStart/js/kickstart.js
 )
 
-MacroCreateBundle(WebConsole
+usMacroCreateBundle(WebConsole
   VERSION "0.99.0"
   DEPENDS HttpService
   INTERNAL_INCLUDE_DIRS src

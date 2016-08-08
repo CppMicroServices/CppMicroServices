@@ -1,2 +1,2 @@
 
-FunctionCreateTestBundleWithResources(TestBundleLQ SOURCES TestBundleLQ.cpp RESOURCES manifest.json)
+usFunctionCreateTestBundleWithResources(TestBundleLQ SOURCES TestBundleLQ.cpp RESOURCES manifest.json)

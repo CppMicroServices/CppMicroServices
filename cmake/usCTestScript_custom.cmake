@@ -38,4 +38,4 @@ if(WIN32 AND NOT MINGW)
   endif()
 endif()
 
-include(${US_SOURCE_DIR}/cmake/CTestScript.cmake)
+include(${US_SOURCE_DIR}/cmake/usCTestScript.cmake)

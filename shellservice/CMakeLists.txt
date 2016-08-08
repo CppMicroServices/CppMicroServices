@@ -12,7 +12,7 @@ if(MSVC)
   )
 endif()
 
-FunctionCheckCompilerFlags(-Wno-switch _no_switch_flag)
+usFunctionCheckCompilerFlags(-Wno-switch _no_switch_flag)
 if(_no_switch_flag)
   set_property(
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
@@ -38,7 +38,7 @@ add_definitions(-DSTANDALONE=0 -DUSE_INTERFACE=1)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../third_party/tinyscheme/init.scm
   ${CMAKE_CURRENT_BINARY_DIR}/resources/tinyscheme/init.scm COPYONLY)
 
-MacroCreateBundle(ShellService
+usMacroCreateBundle(ShellService
   VERSION "0.1.0"
   DEPENDS Framework
   PUBLIC_HEADERS ${_public_headers}

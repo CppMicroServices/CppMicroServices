@@ -760,10 +760,10 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "@PROJECT_SOURCE_DIR@" \
-                         "@PROJECT_SOURCE_DIR@/cmake/FunctionAddResources.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/FunctionEmbedResources.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/FunctionGenerateBundleInit.cmake" \
-                         "@PROJECT_SOURCE_DIR@/cmake/FunctionGetResourceSource.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionAddResources.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionEmbedResources.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGenerateBundleInit.cmake" \
+                         "@PROJECT_SOURCE_DIR@/cmake/usFunctionGetResourceSource.cmake" \
                          "@PROJECT_BINARY_DIR@/include/cppmicroservices/GlobalConfig.h" \
                          "@PROJECT_BINARY_DIR@/framework/include"
 

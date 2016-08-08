@@ -336,7 +336,7 @@ struct Custom_Arg : public option::Arg
   }
 };
 
-#define US_PROG_NAME "ResourceCompiler"
+#define US_PROG_NAME "usResourceCompiler"
 
 enum  OptionIndex
 {

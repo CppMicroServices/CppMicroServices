@@ -104,16 +104,16 @@ set(CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
-include(FunctionAddResources)
-include(FunctionEmbedResources)
-include(FunctionGetResourceSource)
-include(FunctionCheckResourceLinking)
-include(FunctionCheckCompilerFlags)
-include(FunctionGenerateBundleInit)
-include(MacroCreateBundle)
+include(usFunctionAddResources)
+include(usFunctionEmbedResources)
+include(usFunctionGetResourceSource)
+include(usFunctionCheckResourceLinking)
+include(usFunctionCheckCompilerFlags)
+include(usFunctionGenerateBundleInit)
+include(usMacroCreateBundle)
 
 if(US_BUILD_TESTING)
-  include(FunctionCompileSnippets)
+  include(usFunctionCompileSnippets)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -291,12 +291,12 @@ if(MSVC)
 else()
   # C++11 support
   set(US_CXX11_FLAGS -std=c++11)
-  FunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
+  usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
   if(_have_cxx11)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
   else()
     set(US_CXX11_FLAGS -std=c++0x)
-    FunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
+    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
     if(_have_cxx0x)
       set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
     else()
@@ -313,12 +313,12 @@ else()
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
                     -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
                     -fstack-protector-all)
-    FunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
+    usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
   if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     # The check does not work reliably for gcc
-    FunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
+    usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
   # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
@@ -329,23 +329,23 @@ else()
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
   # to understand what -fvisibility-ms-compat does.
   if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
-    FunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
+    usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
-    FunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+    usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
   endif()
 
-  FunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
+  usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
   if(_fortify_source_flag)
     set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
   endif()
 
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=thread")
-  FunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
+  usFunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
@@ -381,7 +381,7 @@ set(US_LINK_FLAGS )
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
-    FunctionCheckCompilerFlags("${_linkflag}" _add_flag)
+    usFunctionCheckCompilerFlags("${_linkflag}" _add_flag)
     if(_add_flag)
       set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
     endif()
@@ -398,7 +398,7 @@ if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
 endif()
 
-FunctionCheckResourceLinking()
+usFunctionCheckResourceLinking()
 
 #-----------------------------------------------------------------------------
 # US Header Checks
@@ -454,7 +454,7 @@ set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set(PACKAGE_CONFIG_CMAKE_DIR ${US_CMAKE_DIR})
 
-set(US_RCC_EXECUTABLE_NAME ResourceCompiler CACHE INTERNAL "The target name of the ResourceCompiler executable.")
+set(US_RCC_EXECUTABLE_NAME usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
@@ -505,12 +505,12 @@ if(NOT US_NO_INSTALL)
   set(_install_cmake_scripts
     ${US_BUNDLE_INIT_TEMPLATE}
     ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-    ${US_CMAKE_DIR}/FunctionGenerateBundleInit.cmake
-    ${US_CMAKE_DIR}/FunctionAddResources.cmake
-    ${US_CMAKE_DIR}/FunctionEmbedResources.cmake
-    ${US_CMAKE_DIR}/FunctionGetResourceSource.cmake
-    ${US_CMAKE_DIR}/FunctionCheckResourceLinking.cmake
-    ${US_CMAKE_DIR}/FunctionCheckCompilerFlags.cmake
+    ${US_CMAKE_DIR}/usFunctionGenerateBundleInit.cmake
+    ${US_CMAKE_DIR}/usFunctionAddResources.cmake
+    ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
+    ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
+    ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
+    ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
     )
 
   install(FILES ${_install_cmake_scripts}

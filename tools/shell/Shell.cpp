@@ -36,7 +36,7 @@ US_GCC_POP_WARNING
 
 using namespace cppmicroservices;
 
-#define US_SHELL_PROG_NAME "Shell"
+#define US_SHELL_PROG_NAME "usShell"
 
 enum  OptionIndex { UNKNOWN, HELP, LOAD_BUNDLE };
 const option::Descriptor usage[] =

@@ -45,7 +45,7 @@ and the CMakeLists.txt file in the eventlistener subdirectory is:
 
 \include eventlistener/CMakeLists.txt
 
-The call to `#FunctionGenerateBundleInit` is necessary to integrate the shared
+The call to `#usFunctionGenerateBundleInit` is necessary to integrate the shared
 library as a bundle within the C++ Micro Service library. If you are not using
 CMake, you have to place a macro call to `#US_INITIALIZE_BUNDLE` yourself into the
 bundle's source code, e.g. in `Activator.cpp`. Have a look at the
@@ -53,10 +53,10 @@ bundle's source code, e.g. in `Activator.cpp`. Have a look at the
 or other build systems (e.g. Makefiles) when writing bundles.
 
 To run the examples contained in the C++ Micro Services library, we use a small
-driver program called `FrameworkExamplesDriver`:
+driver program called `usFrameworkExamplesDriver`:
 
 \verbatim
-CppMicroServices-build> bin/FrameworkExamplesDriver
+CppMicroServices-build> bin/usFrameworkExamplesDriver
 > h
 h               This help text
 l <id | name>   Start the bundle with id <id> or name <name>
@@ -91,6 +91,6 @@ The above command started the eventlistener bundle (by loading its shared librar
 Keep in mind, that this bundle will not do much at this point since it only
 listens for service events and we are not registering any services. In the next
 example we will register a service that will generate an event for this bundle to
-receive. To exit the `FrameworkExamplesDriver`, use the `q` command.
+receive. To exit the `usFrameworkExamplesDriver`, use the `q` command.
 
 Next: \ref MicroServices_Example2

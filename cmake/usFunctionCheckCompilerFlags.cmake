@@ -5,16 +5,16 @@
 # If the flag(s) is/are supported, they will be appended to the string identified by RESULT_VAR
 #
 # Usage:
-#   FunctionCheckCompilerFlags(FLAGS_TO_CHECK VALID_FLAGS_VAR)
+#   usFunctionCheckCompilerFlags(FLAGS_TO_CHECK VALID_FLAGS_VAR)
 #
 # Example:
 #
 #   set(myflags)
-#   FunctionCheckCompilerFlags("-fprofile-arcs" myflags)
+#   usFunctionCheckCompilerFlags("-fprofile-arcs" myflags)
 #   message(1-myflags:${myflags})
-#   FunctionCheckCompilerFlags("-fauto-bugfix" myflags)
+#   usFunctionCheckCompilerFlags("-fauto-bugfix" myflags)
 #   message(2-myflags:${myflags})
-#   FunctionCheckCompilerFlags("-Wall" myflags)
+#   usFunctionCheckCompilerFlags("-Wall" myflags)
 #   message(1-myflags:${myflags})
 #
 #   The output will be:
@@ -24,7 +24,7 @@
 
 include(CheckCXXCompilerFlag)
 
-function(FunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
+function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
 
   if(FLAG_TO_TEST STREQUAL "")
     message(FATAL_ERROR "FLAG_TO_TEST shouldn't be empty")
@@ -51,7 +51,7 @@ function(FunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
   # the cost of compiling the test each time the project is configured, the variable set by
   # the macro is added to the cache so that following invocation of the macro with
   # the same variable name skip the compilation step.
-  # For that same reason, the FunctionCheckCompilerFlags function appends a unique suffix to
+  # For that same reason, the usFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_CXX_FLAG variable. This suffix is created using a 'clean version' of the
   # flag to test. The value of HAS_CXX_FLAG_${suffix} additonally needs to be a valid
   # pre-processor token because CHECK_CXX_COMPILER_FLAG adds it as a definition to the compiler

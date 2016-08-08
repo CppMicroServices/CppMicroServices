@@ -7,7 +7,7 @@
 #!
 #! \note To set-up correct file dependencies from your bundle target to your resource
 #!       files, you have to add a special source file to the source list of the target.
-#!       The source file name can be retrieved by using #FunctionGetResourceSource.
+#!       The source file name can be retrieved by using #usFunctionGetResourceSource.
 #!       This ensures that changed resource files will automatically be re-added to the
 #!       bundle.
 #!
@@ -22,10 +22,10 @@
 #! Example usage:
 #! \code{.cmake}
 #! set(bundle_srcs )
-#! FunctionEmbedResources(TARGET mylib
-#!                        BUNDLE_NAME org_me_mylib
-#!                        FILES config.properties logo.png
-#!                       )
+#! usFunctionEmbedResources(TARGET mylib
+#!                          BUNDLE_NAME org_me_mylib
+#!                          FILES config.properties logo.png
+#!                         )
 #! \endcode
 #!
 #! \param TARGET (required) The target to which the resource files are added.
@@ -37,13 +37,13 @@
 #! \param LINK Link (embed) the resources zip file if possible.
 #!
 #! For the WORKING_DIRECTORY, COMPRESSION_LEVEL, FILES, ZIP_ARCHIVES parameters see the
-#! documentation of the FunctionAddResources macro which is called with these parameters if set.
+#! documentation of the usFunctionAddResources macro which is called with these parameters if set.
 #!
-#! \sa FunctionAddResources
-#! \sa FunctionGetResourceSource
+#! \sa usFunctionAddResources
+#! \sa usFunctionGetResourceSource
 #! \sa \ref MicroServices_Resources
 #!
-function(FunctionEmbedResources)
+function(usFunctionEmbedResources)
 
   cmake_parse_arguments(US_RESOURCE "APPEND;LINK" "TARGET;BUNDLE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
 
@@ -52,7 +52,7 @@ function(FunctionEmbedResources)
   endif()
 
   if(US_RESOURCE_FILES OR US_RESOURCE_ZIP_ARCHIVES)
-    FunctionAddResources(TARGET ${US_RESOURCE_TARGET}
+    usFunctionAddResources(TARGET ${US_RESOURCE_TARGET}
       BUNDLE_NAME ${US_RESOURCE_BUNDLE_NAME}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMPRESSION_LEVEL ${US_RESOURCE_COMPRESSION_LEVEL}
@@ -93,7 +93,7 @@ function(FunctionEmbedResources)
   elseif(US_RESOURCE_APPEND)
     set(_mode APPEND)
   endif()
-  FunctionGetResourceSource(TARGET ${US_RESOURCE_TARGET} OUT _source_output ${_mode})
+  usFunctionGetResourceSource(TARGET ${US_RESOURCE_TARGET} OUT _source_output ${_mode})
 
   if(NOT US_RESOURCE_WORKING_DIRECTORY)
     set(US_RESOURCE_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

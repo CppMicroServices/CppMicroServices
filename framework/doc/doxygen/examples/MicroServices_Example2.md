@@ -43,7 +43,7 @@ manually.
 
 For an introduction how to compile our source code, see \ref MicroServices_Example1.
 
-After running the `FrameworkExamplesDriver` program we should make sure that the
+After running the `usFrameworkExamplesDriver` program we should make sure that the
 bundle from Example 1 is active. We can use the `s` shell command to get
 a list of all bundles, their state, and their bundle identifier number.
 If the Example 1 bundle is not active, we should start the bundle using the
@@ -52,7 +52,7 @@ by the `s` command. Now we can start our dictionary service bundle by typing
 the `l dictionaryservice` command:
 
 \verbatim
-CppMicroServices-build> bin/FrameworkExamplesDriver
+CppMicroServices-build> bin/usFrameworkExamplesDriver
 > s
 Id | Name                 | Status
 -----------------------------------
@@ -75,12 +75,12 @@ Id | Name                 | Status
 To stop the bundle, use the `u <id>` command. If the bundle from
 \ref MicroServices_Example1 "Example 1" is still active,
 then we should see it print out the details of the service event it receives
-when our new bundle registers its dictionary service. Using the `FrameworkExamplesDriver`
+when our new bundle registers its dictionary service. Using the `usFrameworkExamplesDriver`
 commands `u` and `l` we can stop and start it at will, respectively. Each
 time we start and stop our dictionary service bundle, we should see the details
 of the associated service event printed from the bundle from Example 1. In
 \ref MicroServices_Example3 "Example 3", we will create a client for our
-dictionary service. To exit `FrameworkExamplesDriver`, we use the `q` command.
+dictionary service. To exit `usFrameworkExamplesDriver`, we use the `q` command.
 
 Next: \ref MicroServices_Example2b
 

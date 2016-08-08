@@ -1,3 +1,3 @@
 
-FunctionCreateTestBundleWithResources(TestBundleH SOURCES TestBundleH.cpp RESOURCES manifest.json)
+usFunctionCreateTestBundleWithResources(TestBundleH SOURCES TestBundleH.cpp RESOURCES manifest.json)
 

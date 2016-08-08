@@ -63,7 +63,7 @@ set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
 set(THREADS_PREFER_PTHREAD_FLAG 1)
 find_package(Threads REQUIRED)
 
-MacroCreateBundle(HttpService
+usMacroCreateBundle(HttpService
   VERSION "0.99.0"
   DEPENDS Framework
   INTERNAL_INCLUDE_DIRS src

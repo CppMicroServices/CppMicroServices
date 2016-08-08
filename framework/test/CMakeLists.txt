@@ -22,7 +22,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Create test bundles
 #-----------------------------------------------------------------------------
 
-include(FunctionCreateTestBundle)
+include(usFunctionCreateTestBundle)
 
 set(_us_test_bundle_libs "" CACHE INTERNAL "" FORCE)
 add_subdirectory(bundles)
@@ -80,14 +80,14 @@ set(_additional_srcs
 # Build the main test driver executable
 #-----------------------------------------------------------------------------
 
-set(_test_driver ${PROJECT_NAME}TestDriver)
+set(_test_driver us${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 
 # Generate a custom "bundle init" file for the test driver executable
-FunctionGenerateBundleInit(_srcs)
+usFunctionGenerateBundleInit(_srcs)
 
-FunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
+usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
@@ -103,7 +103,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Add resources
-FunctionEmbedResources(TARGET ${_test_driver}
+usFunctionEmbedResources(TARGET ${_test_driver}
                        FILES TestResource.txt manifest.json
                        ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
 

@@ -30,12 +30,12 @@ As in Example 3, we must link our bundle to the `dictionaryservice` bundle:
 
 \include dictionaryclient2/CMakeLists.txt
 
-After running the `FrameworkExamplesDriver` executable, and starting the event
+After running the `usFrameworkExamplesDriver` executable, and starting the event
 listener bundle, we can use the `l dictionaryclient2` command to start
 our robust dictionary client bundle:
 
 \verbatim
-CppMicroServices-debug> bin/FrameworkExamplesDriver
+CppMicroServices-debug> bin/usFrameworkExamplesDriver
 > l eventlistener
 Starting to listen for service events.
 > l dictionaryclient2

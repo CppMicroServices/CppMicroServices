@@ -13,14 +13,14 @@ follows in a file called `spellcheckclient/Activator.cpp`:
 
 \snippet spellcheckclient/Activator.cpp Activator
 
-After running the `FrameworkExamplesDriver` program use the `s` command to make sure that
+After running the `usFrameworkExamplesDriver` program use the `s` command to make sure that
 only the bundles from Example 2, Example 2b, and Example 6 are started; use the
 start (`l`) and stop (`u`) commands as appropriate to start and stop the
 various tutorial bundles, respectively. Now we can start our spell checker client
 bundle by entering `l spellcheckclient`:
 
 \verbatim
-CppMicroServices-build> bin/FrameworkExamplesDriver
+CppMicroServices-build> bin/usFrameworkExamplesDriver
 > l
 Starting to listen for service events.
 > l spellcheckservice
@@ -47,7 +47,7 @@ then we should see it print out the details of the service event it receives
 when our new bundle registers its spell checker service:
 
 \verbatim
-CppMicroServices-build> bin/FrameworkExamplesDriver
+CppMicroServices-build> bin/usFrameworkExamplesDriver
 > l spellcheckservice
 > l frenchdictionary
 > l spellcheckclient

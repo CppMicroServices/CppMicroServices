@@ -29,7 +29,7 @@ directories. Building a shared library might then look like this:
 \dontinclude examples/dictionaryservice/CMakeLists.txt
 \until target_link
 
-The call to `#FunctionGenerateBundleInit` generates the proper bundle initialization
+The call to `#usFunctionGenerateBundleInit` generates the proper bundle initialization
 code and provides access to the bundle specific BundleContext instance. Further, the
 `set_property`command sets the `US_BUNDLE_NAME` definition.
 

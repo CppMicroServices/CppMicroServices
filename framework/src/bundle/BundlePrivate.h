@@ -26,8 +26,8 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/SharedLibrary.h"
-#include "cppmicroservices/detail/Threads_p.h"
-#include "cppmicroservices/detail/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads.h"
+#include "cppmicroservices/detail/WaitCondition.h"
 
 #include "BundleArchive_p.h"
 #include "BundleManifest_p.h"

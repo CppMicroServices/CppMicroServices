@@ -26,7 +26,7 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include "Properties_p.h"
 

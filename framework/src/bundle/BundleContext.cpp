@@ -25,7 +25,7 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/detail/Log_p.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"

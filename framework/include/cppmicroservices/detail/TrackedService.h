@@ -25,8 +25,8 @@
 #define TRACKEDSERVICE_H
 
 #include "cppmicroservices/ServiceEvent.h"
-#include "cppmicroservices/detail/BundleAbstractTracked_p.h"
-#include "cppmicroservices/detail/TrackedServiceListener_p.h"
+#include "cppmicroservices/detail/BundleAbstractTracked.h"
+#include "cppmicroservices/detail/TrackedServiceListener.h"
 
 namespace cppmicroservices {
   

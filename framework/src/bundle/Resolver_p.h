@@ -24,8 +24,8 @@
 #ifndef RESOLVER_P_H
 #define RESOLVER_P_H
 
-#include "cppmicroservices/detail/Threads_p.h"
-#include "cppmicroservices/detail/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads.h"
+#include "cppmicroservices/detail/WaitCondition.h"
 
 namespace cppmicroservices {
 

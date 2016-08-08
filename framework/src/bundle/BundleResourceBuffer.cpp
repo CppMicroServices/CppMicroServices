@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/detail/BundleResourceBuffer_p.h"
+#include "cppmicroservices/detail/BundleResourceBuffer.h"
 
 #include <cassert>
 #include <cstdint>

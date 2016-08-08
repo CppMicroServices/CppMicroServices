@@ -26,7 +26,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 namespace cppmicroservices {
 

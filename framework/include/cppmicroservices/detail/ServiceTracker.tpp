@@ -25,7 +25,7 @@
 #include "cppmicroservices/ServiceException.h"
 
 #include "cppmicroservices/detail/ServiceTrackerPrivate.h"
-#include "cppmicroservices/detail/TrackedService_p.h"
+#include "cppmicroservices/detail/TrackedService.h"
 
 #include <limits>
 #include <stdexcept>

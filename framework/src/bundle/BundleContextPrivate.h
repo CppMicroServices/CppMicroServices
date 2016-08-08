@@ -24,8 +24,8 @@
 #define BUNDLECONTEXTPRIVATE_H_
 
 #include "cppmicroservices/FrameworkExport.h"
-#include "cppmicroservices/detail/Log_p.h"
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Log.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include <atomic>
 #include <memory>

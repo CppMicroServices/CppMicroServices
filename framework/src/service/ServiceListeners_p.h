@@ -25,7 +25,7 @@
 #define SERVICELISTENERS_H
 
 #include "cppmicroservices/GlobalConfig.h"
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include "ServiceListenerEntry_p.h"
 

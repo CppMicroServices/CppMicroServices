@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/detail/Log_p.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include "TestingMacros.h"
 

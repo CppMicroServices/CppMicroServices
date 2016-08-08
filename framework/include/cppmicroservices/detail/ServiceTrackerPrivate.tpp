@@ -21,7 +21,7 @@
 =============================================================================*/
 
 
-#include "cppmicroservices/detail/TrackedService_p.h"
+#include "cppmicroservices/detail/TrackedService.h"
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"

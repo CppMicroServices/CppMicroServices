@@ -24,7 +24,7 @@
 #define LOG_P_H
 
 #include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include <iostream>
 #include <memory>

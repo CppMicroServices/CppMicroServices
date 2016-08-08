@@ -15,9 +15,9 @@ set(_public_headers
   cppmicroservices/SharedLibrary.h
   cppmicroservices/ShrinkableMap.h
   cppmicroservices/ShrinkableVector.h
-  cppmicroservices/detail/Log_p.h
-  cppmicroservices/detail/Threads_p.h
-  cppmicroservices/detail/WaitCondition_p.h
+  cppmicroservices/detail/Log.h
+  cppmicroservices/detail/Threads.h
+  cppmicroservices/detail/WaitCondition.h
 
   cppmicroservices/PrototypeServiceFactory.h
   cppmicroservices/ServiceEvent.h
@@ -38,9 +38,9 @@ set(_public_headers
   cppmicroservices/detail/ServiceTracker.tpp
   cppmicroservices/detail/ServiceTrackerPrivate.h
   cppmicroservices/detail/ServiceTrackerPrivate.tpp
-  cppmicroservices/detail/TrackedService_p.h
+  cppmicroservices/detail/TrackedService.h
   cppmicroservices/detail/TrackedService.tpp
-  cppmicroservices/detail/TrackedServiceListener_p.h
+  cppmicroservices/detail/TrackedServiceListener.h
 
   cppmicroservices/Bundle.h
   cppmicroservices/BundleActivator.h
@@ -55,7 +55,7 @@ set(_public_headers
   cppmicroservices/BundleVersion.h
   cppmicroservices/Constants.h
   cppmicroservices/GetBundleContext.h
-  cppmicroservices/detail/BundleAbstractTracked_p.h
+  cppmicroservices/detail/BundleAbstractTracked.h
   cppmicroservices/detail/BundleAbstractTracked.tpp
-  cppmicroservices/detail/BundleResourceBuffer_p.h
+  cppmicroservices/detail/BundleResourceBuffer.h
 )

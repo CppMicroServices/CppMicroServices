@@ -25,7 +25,7 @@
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/ServiceProperties.h"
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include <map>
 #include <string>

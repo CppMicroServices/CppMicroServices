@@ -23,7 +23,7 @@
 #ifndef BUNDLEREGISTRY_P_H
 #define BUNDLEREGISTRY_P_H
 
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include <map>
 #include <memory>

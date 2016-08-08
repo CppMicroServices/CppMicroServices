@@ -25,7 +25,7 @@
 #define COREBUNDLECONTEXT_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/detail/Log_p.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include "BundleHooks_p.h"
 #include "BundleRegistry_p.h"

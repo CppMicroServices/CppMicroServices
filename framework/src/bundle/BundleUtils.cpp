@@ -23,7 +23,7 @@
 #include "BundleUtils_p.h"
 
 #include "cppmicroservices/GetBundleContext.h"
-#include "cppmicroservices/detail/Log_p.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"

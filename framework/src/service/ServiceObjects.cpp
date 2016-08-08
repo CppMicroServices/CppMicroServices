@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/detail/Log_p.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"

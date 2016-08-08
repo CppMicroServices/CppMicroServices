@@ -24,7 +24,7 @@
 #define SERVICEHOOKS_P_H
 
 #include "cppmicroservices/ServiceTracker.h"
-#include "cppmicroservices/detail/WaitCondition_p.h"
+#include "cppmicroservices/detail/WaitCondition.h"
 
 #include "ServiceListeners_p.h"
 

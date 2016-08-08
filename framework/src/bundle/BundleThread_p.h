@@ -24,8 +24,8 @@
 #define BUNDLETHREAD_P_H
 
 #include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/detail/Threads_p.h"
-#include "cppmicroservices/detail/WaitCondition_p.h"
+#include "cppmicroservices/detail/Threads.h"
+#include "cppmicroservices/detail/WaitCondition.h"
 
 #include <atomic>
 #include <chrono>

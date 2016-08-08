@@ -23,7 +23,7 @@
 #ifndef BUNDLERESOURCESTREAM_H
 #define BUNDLERESOURCESTREAM_H
 
-#include "cppmicroservices/detail/BundleResourceBuffer_p.h"
+#include "cppmicroservices/detail/BundleResourceBuffer.h"
 
 #include <fstream>
 

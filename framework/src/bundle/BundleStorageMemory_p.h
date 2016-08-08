@@ -23,7 +23,7 @@
 #ifndef BUNDLESTORAGEMEMORY_P_H
 #define BUNDLESTORAGEMEMORY_P_H
 
-#include "cppmicroservices/detail/Threads_p.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include "BundleStorage_p.h"
 

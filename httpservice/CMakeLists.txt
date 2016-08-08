@@ -74,11 +74,11 @@ usMacroCreateBundle(HttpService
 )
 
 if(CMAKE_THREAD_LIBS_INIT)
-  target_link_libraries(HttpService ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(usHttpService ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
-  target_link_libraries(HttpService rt)
+  target_link_libraries(usHttpService rt)
 endif()
 

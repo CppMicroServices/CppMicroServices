@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "Properties_p.h"
+#include "Properties.h"
 
 #include <limits>
 #include <stdexcept>

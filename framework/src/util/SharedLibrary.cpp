@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/BundleActivator.h"
 
-#include "Utils_p.h"
+#include "Utils.h"
 
 #include <stdexcept>
 

@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "SettingsPlugin_p.h"
+#include "SettingsPlugin.h"
 
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"

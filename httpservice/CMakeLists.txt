@@ -25,12 +25,12 @@ else()
 endif()
 
 set(_private_headers
-  src/HttpOutputStreamBuffer_p.h
-  src/HttpServlet_p.h
-  src/HttpServletRequest_p.h
-  src/HttpServletResponse_p.h
-  src/ServletConfig_p.h
-  src/ServletContainer_p.h
+  src/HttpOutputStreamBuffer.h
+  src/HttpServlet.h
+  src/HttpServletRequest.h
+  src/HttpServletResponse.h
+  src/ServletConfig.h
+  src/ServletContainer.h
 )
 
 set(_public_headers

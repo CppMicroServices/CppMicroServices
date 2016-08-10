@@ -21,13 +21,13 @@
 =============================================================================*/
 
 
-#include "ServiceRegistry_p.h"
+#include "ServiceRegistry.h"
 
 #include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/PrototypeServiceFactory.h"
 
 #include "BundlePrivate.h"
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 #include "ServiceRegistrationBasePrivate.h"
 
 #include <cassert>

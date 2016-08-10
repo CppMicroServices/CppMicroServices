@@ -24,17 +24,17 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
-#include "ServiceListeners_p.h"
+#include "ServiceListeners.h"
 
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "CoreBundleContext_p.h"
-#include "Properties_p.h"
+#include "CoreBundleContext.h"
+#include "Properties.h"
 #include "ServiceReferenceBasePrivate.h"
-#include "Utils_p.h"
+#include "Utils.h"
 
 namespace cppmicroservices {
 

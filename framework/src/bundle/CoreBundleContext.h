@@ -27,13 +27,13 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/detail/Log.h"
 
-#include "BundleHooks_p.h"
-#include "BundleRegistry_p.h"
-#include "Debug_p.h"
-#include "Resolver_p.h"
-#include "ServiceHooks_p.h"
-#include "ServiceListeners_p.h"
-#include "ServiceRegistry_p.h"
+#include "BundleHooks.h"
+#include "BundleRegistry.h"
+#include "Debug.h"
+#include "Resolver.h"
+#include "ServiceHooks.h"
+#include "ServiceListeners.h"
+#include "ServiceRegistry.h"
 
 #include <map>
 #include <ostream>

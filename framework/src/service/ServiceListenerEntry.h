@@ -27,8 +27,8 @@
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ServiceListenerHook.h"
 
-#include "LDAPExpr_p.h"
-#include "Utils_p.h"
+#include "LDAPExpr.h"
+#include "Utils.h"
 
 namespace cppmicroservices {
 

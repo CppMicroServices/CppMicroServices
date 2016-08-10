@@ -19,9 +19,9 @@
 
 =============================================================================*/
 
-#include "HttpOutputStreamBuffer_p.h"
+#include "HttpOutputStreamBuffer.h"
 
-#include "HttpServletResponse_p.h"
+#include "HttpServletResponse.h"
 
 #include "civetweb/civetweb.h"
 

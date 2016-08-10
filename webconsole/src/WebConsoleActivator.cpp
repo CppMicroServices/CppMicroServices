@@ -21,10 +21,10 @@
 
 #include "cppmicroservices/BundleActivator.h"
 
-#include "SettingsPlugin_p.h"
-#include "ServicesPlugin_p.h"
+#include "SettingsPlugin.h"
+#include "ServicesPlugin.h"
 
-#include "WebConsoleServlet_p.h"
+#include "WebConsoleServlet.h"
 #include "cppmicroservices/BundleContext.h"
 
 namespace cppmicroservices {

@@ -28,9 +28,9 @@
 #include "cppmicroservices/ServiceFactory.h"
 
 #include "BundlePrivate.h"
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 #include "ServiceRegistrationBasePrivate.h"
-#include "ServiceRegistry_p.h"
+#include "ServiceRegistry.h"
 
 #include <cassert>
 

@@ -29,8 +29,8 @@
 #include "cppmicroservices/detail/Threads.h"
 #include "cppmicroservices/detail/WaitCondition.h"
 
-#include "BundleArchive_p.h"
-#include "BundleManifest_p.h"
+#include "BundleArchive.h"
+#include "BundleManifest.h"
 
 #include <memory>
 #include <ostream>

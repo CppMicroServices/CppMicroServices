@@ -20,9 +20,9 @@
 
 =============================================================================*/
 
-#include "BundleStorageFile_p.h"
+#include "BundleStorageFile.h"
 
-#include "BundleArchive_p.h"
+#include "BundleArchive.h"
 
 #include <stdexcept>
 

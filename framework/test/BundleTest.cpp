@@ -35,7 +35,7 @@
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
-#include "Utils_p.h" // cppmicroservices::ToString()
+#include "Utils.h" // cppmicroservices::ToString()
 
 #include <thread>
 

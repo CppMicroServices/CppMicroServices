@@ -28,7 +28,7 @@
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <set>

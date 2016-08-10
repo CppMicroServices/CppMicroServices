@@ -20,12 +20,12 @@
 
 =============================================================================*/
 
-#include "BundleArchive_p.h"
+#include "BundleArchive.h"
 
 #include "cppmicroservices/BundleResource.h"
 
-#include "BundleResourceContainer_p.h"
-#include "BundleStorage_p.h"
+#include "BundleResourceContainer.h"
+#include "BundleStorage.h"
 
 namespace cppmicroservices {
 

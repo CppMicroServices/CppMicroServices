@@ -79,7 +79,7 @@ private:
 #endif
 };
 
-// Copied from usUtils_p.h/usUtils.cpp
+// Copied from usUtils.h/usUtils.cpp
 // Place in a different namespace to avoid duplicate symbol errors.
 namespace testing {
 

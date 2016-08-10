@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "Debug_p.h"
+#include "Debug.h"
 
 namespace cppmicroservices {
 

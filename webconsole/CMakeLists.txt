@@ -12,10 +12,10 @@ set(_srcs
 )
 
 set(_private_headers
-  src/ServicesPlugin_p.h
-  src/SettingsPlugin_p.h
-  src/VariableResolverStreamBuffer_p.h
-  src/WebConsoleServlet_p.h
+  src/ServicesPlugin.h
+  src/SettingsPlugin.h
+  src/VariableResolverStreamBuffer.h
+  src/WebConsoleServlet.h
 )
 
 set(_public_headers

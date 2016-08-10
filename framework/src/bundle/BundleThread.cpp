@@ -20,14 +20,14 @@
 
 =============================================================================*/
 
-#include "BundleThread_p.h"
+#include "BundleThread.h"
 
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/FrameworkEvent.h"
 
 #include "BundlePrivate.h"
-#include "CoreBundleContext_p.h"
-#include "Utils_p.h" // cppmicroservices::ToString()
+#include "CoreBundleContext.h"
+#include "Utils.h" // cppmicroservices::ToString()
 
 #include <future>
 

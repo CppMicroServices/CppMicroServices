@@ -25,8 +25,8 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/ServiceReference.h"
 
-#include "LDAPExpr_p.h"
-#include "Properties_p.h"
+#include "LDAPExpr.h"
+#include "Properties.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <stdexcept>

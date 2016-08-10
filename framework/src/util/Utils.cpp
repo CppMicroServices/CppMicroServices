@@ -20,15 +20,15 @@
 
 =============================================================================*/
 
-#include "Utils_p.h"
+#include "Utils.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/detail/Log.h"
 
-#include "BundleResourceContainer_p.h"
-#include "CoreBundleContext_p.h"
+#include "BundleResourceContainer.h"
+#include "CoreBundleContext.h"
 
 #include <algorithm>
 #include <cstdio>

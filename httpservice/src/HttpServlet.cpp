@@ -20,11 +20,11 @@
 =============================================================================*/
 
 #include "cppmicroservices/httpservice/HttpServlet.h"
-#include "HttpServlet_p.h"
+#include "HttpServlet.h"
 
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "HttpOutputStreamBuffer_p.h"
+#include "HttpOutputStreamBuffer.h"
 
 #include <cassert>
 #include <iostream>

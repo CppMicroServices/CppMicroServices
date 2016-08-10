@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "BundleRegistry_p.h"
+#include "BundleRegistry.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
@@ -30,11 +30,11 @@
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "BundleResourceContainer_p.h"
-#include "BundleStorage_p.h"
-#include "CoreBundleContext_p.h"
+#include "BundleResourceContainer.h"
+#include "BundleStorage.h"
+#include "CoreBundleContext.h"
 #include "FrameworkPrivate.h"
-#include "Utils_p.h" // cppmicroservices::ToString()
+#include "Utils.h" // cppmicroservices::ToString()
 
 #include <cassert>
 #include <map>

@@ -23,7 +23,7 @@
 #ifndef CPPMICROSERVICES_BUNDLESTORAGEFILE_P_H
 #define CPPMICROSERVICES_BUNDLESTORAGEFILE_P_H
 
-#include "BundleStorage_p.h"
+#include "BundleStorage.h"
 
 namespace cppmicroservices {
 

@@ -26,7 +26,7 @@
 #include "cppmicroservices/ServiceListenerHook.h"
 #include "cppmicroservices/SharedData.h"
 
-#include "ServiceListenerEntry_p.h"
+#include "ServiceListenerEntry.h"
 
 namespace cppmicroservices {
 

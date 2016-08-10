@@ -26,7 +26,7 @@
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/detail/WaitCondition.h"
 
-#include "ServiceListeners_p.h"
+#include "ServiceListeners.h"
 
 namespace cppmicroservices {
 

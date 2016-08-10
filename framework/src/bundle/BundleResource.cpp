@@ -26,8 +26,8 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/detail/Log.h"
 
-#include "BundleArchive_p.h"
-#include "BundleResourceContainer_p.h"
+#include "BundleArchive.h"
+#include "BundleResourceContainer.h"
 
 #include <atomic>
 #include <string>

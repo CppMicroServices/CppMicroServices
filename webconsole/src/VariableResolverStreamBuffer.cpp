@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "VariableResolverStreamBuffer_p.h"
+#include "VariableResolverStreamBuffer.h"
 
 #include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
 

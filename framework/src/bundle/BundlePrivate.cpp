@@ -31,15 +31,15 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceRegistration.h"
 
-#include "BundleArchive_p.h"
+#include "BundleArchive.h"
 #include "BundleContextPrivate.h"
-#include "BundleResourceContainer_p.h"
-#include "BundleThread_p.h"
-#include "BundleUtils_p.h"
-#include "CoreBundleContext_p.h"
-#include "Fragment_p.h"
+#include "BundleResourceContainer.h"
+#include "BundleThread.h"
+#include "BundleUtils.h"
+#include "CoreBundleContext.h"
+#include "Fragment.h"
 #include "ServiceReferenceBasePrivate.h"
-#include "Utils_p.h" // cppmicroservices::ToString()
+#include "Utils.h" // cppmicroservices::ToString()
 
 #include <algorithm>
 #include <cassert>

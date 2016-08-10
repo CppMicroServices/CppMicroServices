@@ -20,12 +20,12 @@
 
 =============================================================================*/
 
-#include "LDAPExpr_p.h"
+#include "LDAPExpr.h"
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
 
-#include "Properties_p.h"
+#include "Properties.h"
 
 #include <cctype>
 #include <cerrno>

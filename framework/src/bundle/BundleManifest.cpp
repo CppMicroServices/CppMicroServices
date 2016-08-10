@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "BundleManifest_p.h"
+#include "BundleManifest.h"
 
 #include "jsoncpp.h"
 

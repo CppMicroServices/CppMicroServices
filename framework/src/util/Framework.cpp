@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/FrameworkEvent.h"
 
-#include "BundleStorage_p.h"
+#include "BundleStorage.h"
 #include "FrameworkPrivate.h"
 
 namespace cppmicroservices {

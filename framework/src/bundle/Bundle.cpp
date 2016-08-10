@@ -29,14 +29,14 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/SharedLibrary.h"
 
-#include "BundleArchive_p.h"
+#include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "BundleThread_p.h"
-#include "BundleUtils_p.h"
-#include "CoreBundleContext_p.h"
-#include "Resolver_p.h"
-#include "Utils_p.h"
+#include "BundleThread.h"
+#include "BundleUtils.h"
+#include "CoreBundleContext.h"
+#include "Resolver.h"
+#include "Utils.h"
 
 #include <chrono>
 #include <thread>
@@ -141,7 +141,7 @@ void Bundle::Uninstall()
   {
     throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
   }
-  
+
   {
     auto l = d->coreCtx->resolver.Lock(); US_UNUSED(l);
     //BundleGeneration current = current();
@@ -234,9 +234,9 @@ void Bundle::Uninstall()
         }
         catch (...)
         {
-          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
-                                                    d->shared_from_this(), 
-                                                    std::string(), 
+          d->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                    d->shared_from_this(),
+                                                    std::string(),
                                                     std::current_exception()));
         }
         d->bundleDir.clear();

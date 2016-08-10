@@ -26,7 +26,7 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 
 #include "BundlePrivate.h"
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 
 #include <map>
 #include <string>

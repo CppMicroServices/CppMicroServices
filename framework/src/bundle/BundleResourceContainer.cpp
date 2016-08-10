@@ -20,11 +20,11 @@
 
 =============================================================================*/
 
-#include "BundleResourceContainer_p.h"
+#include "BundleResourceContainer.h"
 
 #include "cppmicroservices/BundleResource.h"
 
-#include "Utils_p.h"
+#include "Utils.h"
 
 #include <cassert>
 #include <climits>

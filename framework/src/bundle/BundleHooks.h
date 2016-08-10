@@ -23,7 +23,7 @@
 #ifndef CPPMICROSERVICES_BUNDLEHOOKS_P_H
 #define CPPMICROSERVICES_BUNDLEHOOKS_P_H
 
-#include "ServiceListeners_p.h"
+#include "ServiceListeners.h"
 
 #include <memory>
 #include <vector>

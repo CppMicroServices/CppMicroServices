@@ -29,11 +29,11 @@
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "BundleRegistry_p.h"
-#include "CoreBundleContext_p.h"
+#include "BundleRegistry.h"
+#include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
-#include "ServiceRegistry_p.h"
-#include "Utils_p.h"
+#include "ServiceRegistry.h"
+#include "Utils.h"
 
 #include <memory>
 #include <stdio.h>

@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "BundleHooks_p.h"
+#include "BundleHooks.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
@@ -30,7 +30,7 @@
 #include "cppmicroservices/GetBundleContext.h"
 
 #include "BundleContextPrivate.h"
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 
 namespace cppmicroservices {

@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "ServiceHooks_p.h"
+#include "ServiceHooks.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkEvent.h"
@@ -31,7 +31,7 @@
 #include "cppmicroservices/ServiceListenerHook.h"
 
 #include "BundleContextPrivate.h"
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 
 namespace cppmicroservices {

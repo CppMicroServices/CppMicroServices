@@ -25,7 +25,7 @@
 
 #include "cppmicroservices/detail/Threads.h"
 
-#include "BundleStorage_p.h"
+#include "BundleStorage.h"
 
 #include <map>
 #include <memory>

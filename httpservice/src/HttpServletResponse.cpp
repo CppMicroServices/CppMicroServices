@@ -20,9 +20,9 @@
 =============================================================================*/
 
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
-#include "HttpServletResponse_p.h"
+#include "HttpServletResponse.h"
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "HttpOutputStreamBuffer_p.h"
+#include "HttpOutputStreamBuffer.h"
 #include "cppmicroservices/httpservice/ServletContext.h"
 
 #include "civetweb/civetweb.h"

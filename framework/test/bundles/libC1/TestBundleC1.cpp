@@ -27,7 +27,7 @@
 #include "cppmicroservices/ServiceTracker.h"
 
 #include "TestingMacros.h"
-#include "Utils_p.h"
+#include "Utils.h"
 
 #include <condition_variable>
 #include <future>

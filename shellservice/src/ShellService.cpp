@@ -22,7 +22,7 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/shellservice/ShellService.h"
 
-#include "BundleRegistry_p.h"
+#include "BundleRegistry.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleResource.h"

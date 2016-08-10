@@ -47,7 +47,7 @@ namespace cppmicroservices {
    *
    * A \c BundleListener can be any callable object and is registered
    * with the Framework using the
-   * {@link BundleContext#AddBundleListener(BundleListener)} method.
+   * {@link BundleContext#AddBundleListener(const BundleListener&)} method.
    * {\c BundleListener}s are called with a \c BundleEvent object when a
    * bundle has been installed, resolved, started, stopped, updated, unresolved,
    * or uninstalled.

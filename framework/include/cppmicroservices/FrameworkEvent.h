@@ -43,7 +43,7 @@ class FrameworkEventData;
  * <p>
  * <code>FrameworkEvent</code> objects are delivered to listeners connected
  * via BundleContext::AddFrameworkListener() when an event occurs within the
- * Framework which a user would be interested in. A <code>Type</code> code 
+ * Framework which a user would be interested in. A <code>Type</code> code
  * is used to identify the event type for future extendability.
  *
  * @see BundleContext#AddFrameworkListener
@@ -75,7 +75,7 @@ public:
      * The Framework has been started.
      * <p>
      * The Framework's
-     * \link BundleActivator::Start(BundleContext*) BundleActivator Start\endlink method
+     * \link BundleActivator::Start(BundleContext) BundleActivator Start\endlink method
      * has been executed.
      */
     FRAMEWORK_ERROR	= 0x00000002,
@@ -116,9 +116,9 @@ public:
     FRAMEWORK_STOPPED_UPDATE = 0x00000080,
 
     /**
-     * The Framework did not stop before the wait timeout expired. 
+     * The Framework did not stop before the wait timeout expired.
      * <p>
-     * This event is fired when the Framework did not stop before the wait timeout expired. 
+     * This event is fired when the Framework did not stop before the wait timeout expired.
      * The source of this event is the System Bundle.
      */
     FRAMEWORK_WAIT_TIMEDOUT	= 0x00000200

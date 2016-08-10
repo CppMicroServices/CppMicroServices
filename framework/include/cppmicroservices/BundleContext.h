@@ -190,7 +190,7 @@ public:
   /**
    * Get the bundles with the specified bundle location.
    *
-   * @param name The location of the bundles to get.
+   * @param location The location of the bundles to get.
    * @return The requested {\c Bundle}s or an empty list.
    */
   std::vector<Bundle> GetBundles(const std::string& location) const;
@@ -813,7 +813,7 @@ private:
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code
-  // to log diagnostic information. 
+  // to log diagnostic information.
   std::shared_ptr<detail::LogSink> GetLogSink() const;
 
   void AddServiceListener(const ServiceListener& delegate, void* data,

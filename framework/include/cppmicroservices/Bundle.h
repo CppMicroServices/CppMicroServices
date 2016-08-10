@@ -141,7 +141,7 @@ public:
      *
      * A bundle is in the {@code STATE_STARTING} state when its {@link #Start(uint32_t)
      * Start} method is active. A bundle must be in this state when the bundle's
-     * {@link BundleActivator#Start(const BundleContext&)} is called.
+     * {@link BundleActivator#Start(BundleContext)} is called.
      * If the {@code BundleActivator#Start} method completes without exception, then
      * the bundle has successfully started and moves to the {@code STATE_ACTIVE}
      * state.
@@ -159,7 +159,7 @@ public:
      *
      * A bundle is in the {@code STATE_STOPPING} state when its {@link #Stop(uint32_t)
      * Stop} method is active. A bundle is in this state when the bundle's
-     * {@link BundleActivator#Stop(const BundleContext&)} method
+     * {@link BundleActivator#Stop(BundleContext)} method
      * is called. When the {@code BundleActivator#Stop} method completes the bundle
      * is stopped and moves to the {@code STATE_RESOLVED} state.
      *
@@ -197,13 +197,13 @@ public:
     /**
      * The bundle start operation must activate the bundle according to the
      * bundle's declared
-     * {@link Constants#PLUGIN_ACTIVATIONPOLICY activation policy}.
+     * {@link Constants#BUNDLE_ACTIVATIONPOLICY activation policy}.
      *
      * This bit may be set when calling {@link #Start(uint32_t)} to notify the
      * framework that the bundle must be activated using the bundle's declared
      * activation policy.
      *
-     * @see Constants#PLUGIN_ACTIVATIONPOLICY
+     * @see Constants#BUNDLE_ACTIVATIONPOLICY
      * @see #Start(uint32_t)
      * @note This option is reserved for future use and not supported yet.
      */
@@ -531,14 +531,14 @@ public:
    *    - This method returns immediately and the remaining steps will be
    *      followed when this bundle's activation is later triggered.
    * -# This bundle's state is set to {@code STATE_STARTING}.
-   * -# A bundle event of type {@link BundleEvent#STATE_STARTING} is fired.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_STARTING} is fired.
    * -# If the bundle is contained in a shared library, the library is loaded
-   *    and the {@link BundleActivator#Start(const BundleContext&)}
+   *    and the {@link BundleActivator#Start(BundleContext)}
    *    method of this bundle's {@code BundleActivator}, if one is specified, is
    *    called. If the shared library could not be loaded, or the {@code BundleActivator}
    *    is invalid or throws an exception then:
    *    - This bundle's state is set to {@code STATE_STOPPING}.
-   *    - A bundle event of type {@link BundleEvent#STATE_STOPPING} is fired.
+   *    - A bundle event of type {@link BundleEvent#BUNDLE_STOPPING} is fired.
    *    - %Any services registered by this bundle are unregistered.
    *    - %Any services used by this bundle are released.
    *    - %Any listeners registered by this bundle are removed.
@@ -610,9 +610,9 @@ public:
    * -# If this bundle's state is not \c STATE_STARTING or \c STATE_ACTIVE then
    *    this method returns immediately.
    * -# This bundle's state is set to \c STATE_STOPPING.
-   * -# A bundle event of type {@link BundleEvent#STATE_STOPPING} is fired.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_STOPPING} is fired.
    * -# If this bundle's state was \c STATE_ACTIVE prior to setting the state
-   *    to \c STATE_STOPPING, the {@link BundleActivator#Stop(const BundleContext&)}
+   *    to \c STATE_STOPPING, the {@link BundleActivator#Stop(BundleContext)}
    *    method of this bundle's \c BundleActivator, if one is specified, is
    *    called. If that method throws an exception, this method continues to
    *    stop this bundle and a std::runtime_error is thrown after
@@ -678,7 +678,7 @@ public:
    *    Framework event of type {@link FrameworkEvent#FRAMEWORK_ERROR} is fired containing
    *    the exception.
    * -# This bundle's state is set to \c STATE_UNINSTALLED.
-   * -# A bundle event of type {@link BundleEvent#STATE_UNINSTALLED} is fired.
+   * -# A bundle event of type {@link BundleEvent#BUNDLE_UNINSTALLED} is fired.
    * -# This bundle and any persistent storage area provided for this bundle
    *    by the Framework are removed.
    *

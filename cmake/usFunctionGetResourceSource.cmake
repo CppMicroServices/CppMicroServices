@@ -34,7 +34,7 @@ function(usFunctionGetResourceSource)
     message(SEND_ERROR "Both LINK and APPEND options given.")
   endif()
 
-  set(_out "${CMAKE_CURRENT_BINARY_DIR}/us_${_res_TARGET}/us_resources")
+  set(_out "${CMAKE_CURRENT_BINARY_DIR}/${_res_TARGET}/cppmicroservices_resources")
   if(_res_LINK)
     set(_out "${_out}${US_RESOURCE_SOURCE_SUFFIX_LINK}")
   elseif(_res_APPEND)

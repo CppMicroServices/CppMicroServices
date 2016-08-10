@@ -65,4 +65,4 @@ private:
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleAActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleAActivator)

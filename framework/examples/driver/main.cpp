@@ -260,13 +260,13 @@ int main(int /*argc*/, char** /*argv*/)
 }
 
 #ifndef US_BUILD_SHARED_LIBS
-US_INITIALIZE_STATIC_BUNDLE(system_bundle)
-US_IMPORT_BUNDLE(eventlistener)
-US_IMPORT_BUNDLE(dictionaryservice)
-US_IMPORT_BUNDLE(spellcheckservice)
-US_IMPORT_BUNDLE(frenchdictionary)
-US_IMPORT_BUNDLE(dictionaryclient)
-US_IMPORT_BUNDLE(dictionaryclient2)
-US_IMPORT_BUNDLE(dictionaryclient3)
-US_IMPORT_BUNDLE(spellcheckclient)
+CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(system_bundle)
+CPPMICROSERVICES_IMPORT_BUNDLE(eventlistener)
+CPPMICROSERVICES_IMPORT_BUNDLE(dictionaryservice)
+CPPMICROSERVICES_IMPORT_BUNDLE(spellcheckservice)
+CPPMICROSERVICES_IMPORT_BUNDLE(frenchdictionary)
+CPPMICROSERVICES_IMPORT_BUNDLE(dictionaryclient)
+CPPMICROSERVICES_IMPORT_BUNDLE(dictionaryclient2)
+CPPMICROSERVICES_IMPORT_BUNDLE(dictionaryclient3)
+CPPMICROSERVICES_IMPORT_BUNDLE(spellcheckclient)
 #endif

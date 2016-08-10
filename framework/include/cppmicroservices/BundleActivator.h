@@ -116,7 +116,7 @@ struct BundleActivator
  * Example:
  * \snippet uServices-activator/main.cpp 0
  */
-#define US_EXPORT_BUNDLE_ACTIVATOR(_activator_type)                                                        \
+#define CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(_activator_type)                                                        \
   extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator* US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME) ()                \
   {                                                                                                        \
     return new _activator_type();                                                                          \

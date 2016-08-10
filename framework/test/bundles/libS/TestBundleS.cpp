@@ -133,4 +133,4 @@ private:
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleSActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleSActivator)

@@ -65,6 +65,6 @@ private:
 
 }
 
-US_IMPORT_BUNDLE(TestBundleImportedByB)
+CPPMICROSERVICES_IMPORT_BUNDLE(TestBundleImportedByB)
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleBActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleBActivator)

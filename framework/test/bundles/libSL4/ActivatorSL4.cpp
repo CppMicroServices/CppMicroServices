@@ -68,4 +68,4 @@ private:
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL4)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL4)

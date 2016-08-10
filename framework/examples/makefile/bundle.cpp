@@ -93,8 +93,8 @@ public:
 
 };
 
-US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 #include "cppmicroservices/BundleInitialization.h"
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE

@@ -136,4 +136,4 @@ private:
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL3)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL3)

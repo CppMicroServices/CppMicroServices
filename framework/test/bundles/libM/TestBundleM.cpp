@@ -41,4 +41,4 @@ public:
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleMActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleMActivator)

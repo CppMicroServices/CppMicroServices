@@ -45,13 +45,13 @@ class BundleContextPrivate;
  * source files must be compiled with the \c US_BUNDLE_NAME pre-processor definition
  * set to a bundle-unique identifier.
  *
- * Calling the \c US_INITIALIZE_BUNDLE macro will initialize the bundle for use with
+ * Calling the \c CPPMICROSERVICES_INITIALIZE_BUNDLE macro will initialize the bundle for use with
  * the CppMicroServices library.
  *
  * \remarks If you are using CMake, consider using the provided CMake macro
  * <code>usFunctionGenerateBundleInit()</code>.
  */
-#define US_INITIALIZE_BUNDLE                                                                    \
+#define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                    \
   std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                         \
                                                                                                 \
   extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME) ()                       \

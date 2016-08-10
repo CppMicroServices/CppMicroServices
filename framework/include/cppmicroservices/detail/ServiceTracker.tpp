@@ -74,7 +74,7 @@ ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
   : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
 {
   std::string clazz = us_service_interface_iid<S>();
-  if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
+  if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
 }
 
 #ifdef _MSC_VER

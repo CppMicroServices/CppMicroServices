@@ -2,7 +2,7 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 using namespace cppmicroservices;
 

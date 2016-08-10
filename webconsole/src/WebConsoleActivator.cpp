@@ -70,4 +70,4 @@ void WebConsoleActivator::Stop(BundleContext /*context*/)
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::WebConsoleActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::WebConsoleActivator)

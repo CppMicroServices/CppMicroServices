@@ -189,4 +189,4 @@ private:
 
 } // namespace cppmicroservices
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleC1Activator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleC1Activator)

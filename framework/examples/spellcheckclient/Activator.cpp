@@ -145,5 +145,5 @@ private:
 
 }
 
-US_EXPORT_BUNDLE_ACTIVATOR(Activator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //![Activator]

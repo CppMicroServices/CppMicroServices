@@ -22,4 +22,4 @@
 
 #include "cppmicroservices/BundleInitialization.h"
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE

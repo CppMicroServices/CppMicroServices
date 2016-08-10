@@ -43,14 +43,14 @@ class BundleContext;
  *
  * This macro initializes the static bundle named \c _bundle_name.
  *
- * If the bundle provides an activator, use the #US_IMPORT_BUNDLE macro instead,
+ * If the bundle provides an activator, use the #CPPMICROSERVICES_IMPORT_BUNDLE macro instead,
  * to ensure that the activator is called. Do not forget to actually link
  * the static bundle to the importing executable or shared library.
  *
- * \sa US_IMPORT_BUNDLE
+ * \sa CPPMICROSERVICES_IMPORT_BUNDLE
  * \sa \ref MicroServices_StaticBundles
  */
-#define US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                            \
+#define CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                            \
   extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(_bundle_name) ();            \
   extern "C" void US_SET_CTX_FUNC(_bundle_name) (cppmicroservices::BundleContextPrivate*); \
   void _dummy_reference_to_ ## _bundle_name ## _bundle_context()             \
@@ -71,17 +71,17 @@ class BundleContext;
  * Inserting this macro into your application's source code will allow you to make use of
  * a static bundle. It will initialize the static bundle and calls its
  * BundleActivator. If the bundle does not provide an activator, use the
- * #US_INITIALIZE_STATIC_BUNDLE macro instead. Do not forget to actually link
+ * #CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE macro instead. Do not forget to actually link
  * the static bundle to the importing executable or shared library.
  *
  * Example:
  * \snippet uServices-staticbundles/main.cpp ImportStaticBundleIntoMain
  *
- * \sa US_INITIALIZE_STATIC_BUNDLE
+ * \sa CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE
  * \sa \ref MicroServices_StaticBundles
  */
-#define US_IMPORT_BUNDLE(_bundle_name)                                            \
-  US_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                       \
+#define CPPMICROSERVICES_IMPORT_BUNDLE(_bundle_name)                                            \
+  CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                       \
   extern "C" cppmicroservices::BundleActivator* US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();      \
   extern "C" void US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (cppmicroservices::BundleActivator*); \
   void _dummy_reference_to_ ## _bundle_name ## _activator()                       \

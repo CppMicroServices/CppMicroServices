@@ -37,5 +37,5 @@ public:
   void Stop(BundleContext /*context*/) {}
 };
 
-US_EXPORT_BUNDLE_ACTIVATOR(MyStaticBundleActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyStaticBundleActivator)
 

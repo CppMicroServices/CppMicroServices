@@ -38,7 +38,7 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include <iomanip>
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 namespace cppmicroservices {
 

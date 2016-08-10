@@ -25,16 +25,16 @@ extern "C" void _us_set_bundle_context_instance_main(BundleContextPrivate*) {}
 //! [ImportStaticBundleIntoMain]
 #include "cppmicroservices/BundleImport.h"
 
-US_IMPORT_BUNDLE(MyStaticBundle1)
+CPPMICROSERVICES_IMPORT_BUNDLE(MyStaticBundle1)
 //! [ImportStaticBundleIntoMain]
 
 //! [ImportStaticBundleIntoMain2]
 #include "cppmicroservices/BundleImport.h"
 
 #ifndef US_BUILD_SHARED_LIBS
-US_INITIALIZE_STATIC_BUNDLE(system_bundle)
-US_IMPORT_BUNDLE(MyStaticBundle2)
-US_INITIALIZE_STATIC_BUNDLE(main)
+CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(system_bundle)
+CPPMICROSERVICES_IMPORT_BUNDLE(MyStaticBundle2)
+CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(main)
 #endif
 //! [ImportStaticBundleIntoMain2]
 

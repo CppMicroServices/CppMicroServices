@@ -25,7 +25,7 @@
 
 #include <chrono>
 
-namespace {
+namespace cppmicroservices {
 
 #if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 7
 typedef std::chrono::monotonic_clock Clock;

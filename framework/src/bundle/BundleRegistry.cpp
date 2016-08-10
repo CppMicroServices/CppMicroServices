@@ -148,13 +148,13 @@ std::vector<Bundle> BundleRegistry::Install0(
     }
     return res;
   }
-  catch (const std::exception& e)
+  catch (...)
   {
     for (auto& ba : barchives)
     {
       ba->Purge();
     }
-    throw std::runtime_error("Failed to install bundle library at " + location + ": " + e.what());
+    throw std::runtime_error("Failed to install bundle library at " + location + ": " + GetLastExceptionStr());
   }
 }
 
@@ -257,7 +257,7 @@ void BundleRegistry::Load()
       std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
       bundles.v.insert(std::make_pair(impl->location, impl));
     }
-    catch (const std::exception& )
+    catch (...)
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::string msg("Failed to load bundle " + cppmicroservices::ToString(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");

@@ -118,7 +118,7 @@ void BundleThread::Run()
         break;
       }
     }
-    catch (const std::exception& )
+    catch (...)
     {
       fwCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, 
                                                             MakeBundle(bundle->shared_from_this()), 

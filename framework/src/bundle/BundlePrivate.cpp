@@ -132,10 +132,10 @@ std::exception_ptr BundlePrivate::Stop1()
     {
       bactivator->Stop(MakeBundleContext(bundleContext.Load()));
     }
-    catch (const std::exception& e)
+    catch (...)
     {
       res = std::make_exception_ptr(
-            std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + ", BundleActivator::Stop() failed:" + e.what()));
+            std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + ", BundleActivator::Stop() failed: " + GetLastExceptionStr()));
     }
 
     // if stop was aborted (uninstall or timeout), make sure
@@ -306,7 +306,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
         }
       }
     }
-    catch (const std::exception& )
+    catch (...)
     {
       resolveFailException = std::current_exception();
       coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
@@ -317,7 +317,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
         {
           coreCtx->resolverHooks.EndResolve(trigger);
         }
-        catch (const std::exception& )
+        catch (...)
         {
           resolveFailException = std::current_exception();
           coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(this->shared_from_this()), std::string(), std::current_exception()));
@@ -528,9 +528,9 @@ std::exception_ptr BundlePrivate::Start0()
     }
 
   }
-  catch (const std::exception& e)
+  catch (...)
   {
-    res = std::make_exception_ptr(std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + " start failed: " + e.what()));
+    res = std::make_exception_ptr(std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + " start failed: " + GetLastExceptionStr()));
   }
 
   // activator.start() done
@@ -713,9 +713,9 @@ BundlePrivate::BundlePrivate(
       {
         bundleManifest.Parse(manifestStream);
       }
-      catch (const std::exception& e)
+      catch (...)
       {
-        throw std::runtime_error(std::string("Parsing of manifest.json for bundle ") + symbolicName + " at " + location + " failed: " + e.what());
+        throw std::runtime_error(std::string("Parsing of manifest.json for bundle ") + symbolicName + " at " + location + " failed: " + GetLastExceptionStr());
       }
     }
   }
@@ -733,9 +733,9 @@ BundlePrivate::BundlePrivate(
     {
       version = BundleVersion(versionAny.ToString());
     }
-    catch (const std::exception& e)
+    catch (...)
     {
-      errMsg = std::string("The version identifier is invalid: ") + e.what();
+      errMsg = std::string("The version identifier is invalid: ") + GetLastExceptionStr();
     }
 
     if (!errMsg.empty())

@@ -119,6 +119,9 @@ void TerminateForDebug(const std::exception_ptr ex);
 int GetLastErrorNo();
 std::string GetLastErrorStr();
 
+std::string GetExceptionStr(const std::exception_ptr& exc);
+std::string GetLastExceptionStr();
+
 //-------------------------------------------------------------------
 // Android Compatibility functions
 //-------------------------------------------------------------------

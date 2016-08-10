@@ -25,6 +25,7 @@
 #include "cppmicroservices/Bundle.h"
 
 #include "BundlePrivate.h"
+#include "Utils_p.h"
 
 namespace cppmicroservices {
 
@@ -114,23 +115,12 @@ std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt)
   std::string exceptionStr("NONE");
   if (evt.GetThrowable())
   {
-    try
-    {
-      std::rethrow_exception(evt.GetThrowable());
-    }
-    catch (const std::exception& e)
-    {
-      exceptionStr = e.what();
-    }
-    catch (...)
-    {
-      exceptionStr = "unknown exception";
-    }
+    exceptionStr = GetExceptionStr(evt.GetThrowable());
   }
 
-  os << evt.GetType() << "\n " 
-      << evt.GetMessage() << "\n " 
-      << evt.GetBundle() << "\n Exception: " 
+  os << evt.GetType() << "\n "
+      << evt.GetMessage() << "\n "
+      << evt.GetBundle() << "\n Exception: "
       << exceptionStr;
   return os;
 }

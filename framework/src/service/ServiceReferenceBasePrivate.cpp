@@ -193,7 +193,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bu
       {
         sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration), service);
       }
-      catch (const std::exception& )
+      catch (...)
       {
         std::string message("ServiceFactory threw an exception");
         registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), message, std::current_exception()));
@@ -266,11 +266,11 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
     {
       sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration), sfi);
     }
-      catch (const std::exception& )
-      {
-        std::string message("ServiceFactory threw an exception");
-        registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), message, std::current_exception()));
-      }
+    catch (...)
+    {
+      std::string message("ServiceFactory threw an exception");
+      registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), message, std::current_exception()));
+    }
   }
 
   return hadReferences && removeService;

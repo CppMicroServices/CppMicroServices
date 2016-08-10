@@ -5,6 +5,8 @@ set(${PROJECT_NAME}_MINOR_VERSION 99)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
 set(US_CMAKE_MINIMUM_REQUIRED_VERSION 2.8.12)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
@@ -200,11 +202,10 @@ if(WIN32 AND NOT CYGWIN)
   set(default_header_install_dir include/)
   set(default_auxiliary_install_dir share/)
 else()
-  string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
   set(default_runtime_install_dir bin/)
-  set(default_library_install_dir lib/${PROJECT_NAME_LOWER})
-  set(default_archive_install_dir lib/${PROJECT_NAME_LOWER})
-  set(default_header_install_dir include)
+  set(default_library_install_dir lib/)
+  set(default_archive_install_dir lib/)
+  set(default_header_install_dir include/)
   set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER})
 endif()
 
@@ -462,7 +463,7 @@ configure_file(
   @ONLY
   )
 
-set(global_config_h_file "${PROJECT_BINARY_DIR}/include/cppmicroservices/GlobalConfig.h")
+set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/GlobalConfig.h")
 configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
@@ -517,7 +518,7 @@ if(NOT US_NO_INSTALL)
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   install(FILES ${global_config_h_file}
-          DESTINATION ${HEADER_INSTALL_DIR}/cppmicroservices)
+          DESTINATION ${HEADER_INSTALL_DIR}/${PROJECT_NAME_LOWER})
 
   # Configure CppMicroServicesConfig.cmake for the install tree
   set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})

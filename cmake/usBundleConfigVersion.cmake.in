@@ -3,10 +3,10 @@
 # PACKAGE_VERSION_COMPATIBLE if the current version major number == requested version major number
 # and the current version minor number >= requested version minor number
 
-set(PACKAGE_VERSION_MAJOR @Core_MAJOR_VERSION@)
-set(PACKAGE_VERSION_MINOR @Core_MINOR_VERSION@)
-set(PACKAGE_VERSION_PATCH @Core_PATCH_VERSION@)
-set(PACKAGE_VERSION "@Core_VERSION@")
+set(PACKAGE_VERSION_MAJOR @Framework_MAJOR_VERSION@)
+set(PACKAGE_VERSION_MINOR @Framework_MINOR_VERSION@)
+set(PACKAGE_VERSION_PATCH @Framework_PATCH_VERSION@)
+set(PACKAGE_VERSION "@Framework_VERSION@")
 
 if(PACKAGE_VERSION VERSION_EQUAL PACKAGE_FIND_VERSION)
   set(PACKAGE_VERSION_EXACT TRUE)

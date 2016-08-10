@@ -200,11 +200,12 @@ if(WIN32 AND NOT CYGWIN)
   set(default_header_install_dir include/)
   set(default_auxiliary_install_dir share/)
 else()
+  string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
   set(default_runtime_install_dir bin/)
-  set(default_library_install_dir lib/${PROJECT_NAME})
-  set(default_archive_install_dir lib/${PROJECT_NAME})
-  set(default_header_install_dir include/${PROJECT_NAME})
-  set(default_auxiliary_install_dir share/${PROJECT_NAME})
+  set(default_library_install_dir lib/${PROJECT_NAME_LOWER})
+  set(default_archive_install_dir lib/${PROJECT_NAME_LOWER})
+  set(default_header_install_dir include)
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER})
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
@@ -216,9 +217,9 @@ set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
-set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/usBundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
-set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/us_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
-set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
+set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
+set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 
 #-----------------------------------------------------------------------------
 # Testing configuration
@@ -461,14 +462,14 @@ configure_file(
   @ONLY
   )
 
-set(us_global_config_h_file "${PROJECT_BINARY_DIR}/include/usGlobalConfig.h")
-configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
+set(global_config_h_file "${PROJECT_BINARY_DIR}/include/cppmicroservices/GlobalConfig.h")
+configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
 add_subdirectory(tools/rc)
 
-add_subdirectory(core)
+add_subdirectory(framework)
 add_subdirectory(httpservice)
 add_subdirectory(webconsole)
 add_subdirectory(shellservice)
@@ -515,8 +516,8 @@ if(NOT US_NO_INSTALL)
   install(FILES ${_install_cmake_scripts}
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
-  install(FILES ${us_global_config_h_file}
-          DESTINATION ${HEADER_INSTALL_DIR})
+  install(FILES ${global_config_h_file}
+          DESTINATION ${HEADER_INSTALL_DIR}/cppmicroservices)
 
   # Configure CppMicroServicesConfig.cmake for the install tree
   set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})

@@ -72,10 +72,10 @@ To query the registry for a service object implementing one or more specific int
 would look like this:
 
 ```cpp
-#include <usBundleContext.h>
-#include <someInterface.h>
+#include "cppmicroservices/BundleContext.h"
+#include "someInterface.h"
 
-using namespace us;
+using namespace cppmicroservices;
 
 void UseService(BundleContext* context)
 {
@@ -91,10 +91,10 @@ void UseService(BundleContext* context)
 Registering a service object against a certain interface looks like this:
 
 ```cpp
-#include <usBundleContext.h>
-#include <someInterface.h>
+#include "cppmicroservices/BundleContext.h"
+#include "someInterface.h"
 
-using namespace us;
+using namespace cppmicroservices;
 
 void RegisterSomeService(BundleContext* context, SomeInterface* service)
 {

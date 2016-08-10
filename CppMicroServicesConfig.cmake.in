@@ -81,9 +81,9 @@ cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
 set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
-set(US_BUNDLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usBundleInit.cpp")
-set(US_RESOURCE_RC_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/us_resources.rc.in")
-set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "@PACKAGE_CONFIG_CMAKE_DIR@/usCMakeResourceDependencies.cpp")
+set(US_BUNDLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/BundleInit.cpp")
+set(US_RESOURCE_RC_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/cppmicroservices_resources.rc.in")
+set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "@PACKAGE_CONFIG_CMAKE_DIR@/CMakeResourceDependencies.cpp")
 
 # The CppMicroServices resource compiler
 find_program(US_RCC_EXECUTABLE ${US_RCC_EXECUTABLE_NAME}
@@ -131,15 +131,15 @@ set(US_COMPILE_DEFINITIONS_RELEASE )
 set(US_COMPILE_DEFINITIONS_DEBUG )
 
 # Components support
-set(US_BUNDLES Core HttpService WebConsole ShellService) # ConfigAdmin EventAdmin ...
+set(US_BUNDLES Framework HttpService WebConsole ShellService) # ConfigAdmin EventAdmin ...
 
-set(US_Core_BUNDLE_DEPS )
-set(US_HttpService_BUNDLE_DEPS Core)
+set(US_Framework_BUNDLE_DEPS )
+set(US_HttpService_BUNDLE_DEPS Framework)
 set(US_WebConsole_BUNDLE_DEPS ${US_HttpService_BUNDLE_DEPS} HttpService)
-set(US_ShellService_BUNDLE_DEPS Core)
+set(US_ShellService_BUNDLE_DEPS Framework)
 
 if(NOT @PROJECT_NAME@_FIND_COMPONENTS)
-  set(@PROJECT_NAME@_FIND_COMPONENTS Core)
+  set(@PROJECT_NAME@_FIND_COMPONENTS Framework)
 endif()
 
 set(US_BUNDLES_NEEDED )

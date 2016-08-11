@@ -22,7 +22,7 @@ You also need to specify a unique bundle name by using the `US_BUNDLE_NAME` comp
 shown in the last line. The bundle name must be a valid C identifier and in the case of
 executables is required to be defined to `main`.
 
-If you do not use CMake, you have to add a call to the macro `#US_INITIALIZE_BUNDLE` in one of the source
+If you do not use CMake, you have to add a call to the macro `#CPPMICROSERVICES_INITIALIZE_BUNDLE` in one of the source
 files of your bundle:
 
 \snippet uServices-bundlecontext/main.cpp InitializeBundle

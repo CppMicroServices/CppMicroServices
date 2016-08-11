@@ -104,7 +104,7 @@ context.RegisterService<InterfaceA,InterfaceB>(ToFactory(myServiceFactory));
 
 };
 
-US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 int main(int /*argc*/, char* /*argv*/[])
 {

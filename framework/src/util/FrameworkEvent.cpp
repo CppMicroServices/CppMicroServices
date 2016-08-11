@@ -25,7 +25,7 @@
 #include "cppmicroservices/Bundle.h"
 
 #include "BundlePrivate.h"
-#include "Utils_p.h"
+#include "Utils.h"
 
 namespace cppmicroservices {
 

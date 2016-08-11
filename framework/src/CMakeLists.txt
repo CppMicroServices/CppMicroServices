@@ -34,11 +34,15 @@ set(_srcs
   bundle/BundleArchive.cpp
   bundle/BundleContext.cpp
   bundle/BundleContextPrivate.cpp
+  bundle/BundleElfFile.cpp
   bundle/BundleEvent.cpp
   bundle/BundleEventHook.cpp
   bundle/BundleFindHook.cpp
   bundle/BundleHooks.cpp
+  bundle/BundleMachOFile.cpp
   bundle/BundleManifest.cpp
+  bundle/BundleObjFile.cpp
+  bundle/BundlePEFile.cpp
   bundle/BundlePrivate.cpp
   bundle/BundleRegistry.cpp
   bundle/BundleResource.cpp
@@ -53,43 +57,39 @@ set(_srcs
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
   bundle/Debug.cpp
-  bundle/ModuleElfFile.cpp
-  bundle/ModuleMachOFile.cpp
-  bundle/ModuleObjFile.cpp
-  bundle/ModulePEFile.cpp
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
 
 set(_private_headers
   util/FrameworkPrivate.h
-  util/LDAPExpr_p.h
-  util/Properties_p.h
-  util/Utils_p.h
+  util/LDAPExpr.h
+  util/Properties.h
+  util/Utils.h
 
-  service/ServiceHooks_p.h
-  service/ServiceListenerEntry_p.h
-  service/ServiceListenerHook_p.h
-  service/ServiceListeners_p.h
+  service/ServiceHooks.h
+  service/ServiceListenerEntry.h
+  service/ServiceListenerHookPrivate.h
+  service/ServiceListeners.h
   service/ServiceReferenceBasePrivate.h
   service/ServiceRegistrationBasePrivate.h
-  service/ServiceRegistry_p.h
+  service/ServiceRegistry.h
 
-  bundle/BundleArchive_p.h
+  bundle/BundleArchive.h
   bundle/BundleContextPrivate.h
-  bundle/BundleHooks_p.h
-  bundle/BundleManifest_p.h
+  bundle/BundleHooks.h
+  bundle/BundleManifest.h
+  bundle/BundleObjFile.h
   bundle/BundlePrivate.h
-  bundle/BundleRegistry_p.h
-  bundle/BundleResourceContainer_p.h
-  bundle/BundleStorage_p.h
-  bundle/BundleStorageFile_p.h
-  bundle/BundleStorageMemory_p.h
-  bundle/BundleThread_p.h
-  bundle/BundleUtils_p.h
-  bundle/CoreBundleContext_p.h
-  bundle/Debug_p.h
-  bundle/Fragment_p.h
-  bundle/ModuleObjFile_p.h
-  bundle/Resolver_p.h
+  bundle/BundleRegistry.h
+  bundle/BundleResourceContainer.h
+  bundle/BundleStorage.h
+  bundle/BundleStorageFile.h
+  bundle/BundleStorageMemory.h
+  bundle/BundleThread.h
+  bundle/BundleUtils.h
+  bundle/CoreBundleContext.h
+  bundle/Debug.h
+  bundle/Fragment.h
+  bundle/Resolver.h
 )

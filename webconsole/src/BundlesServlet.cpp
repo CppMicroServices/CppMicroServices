@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "BundlesServlet_p.h"
+#include "BundlesServlet.h"
 
 BundlesServlet::BundlesServlet()
 {

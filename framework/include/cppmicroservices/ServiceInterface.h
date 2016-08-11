@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@
  * demangled name of \c T is returned.
  *
  * This template method may be specialized directly or be
- * using the macro #US_DECLARE_SERVICE_INTERFACE to return
+ * using the macro #CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE to return
  * a custom id for each service interface.
  *
  * @tparam T The service interface type.
@@ -154,7 +154,7 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
  *
  * struct ISomeInterace { ... };
  *
- * US_DECLARE_SERVICE_INTERFACE(ISomeInterface, "com.mycompany.service.ISomeInterface/1.0")
+ * CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(ISomeInterface, "com.mycompany.service.ISomeInterface/1.0")
  * \endcode
  *
  * The usage of this macro is optional and the service interface id which is automatically
@@ -167,8 +167,8 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
  * This macro is normally used right after the class definition for _service_interface_type,
  * in a header file.
  *
- * If you want to use #US_DECLARE_SERVICE_INTERFACE with interface classes declared in a
- * namespace then you have to make sure the #US_DECLARE_SERVICE_INTERFACE macro call is not
+ * If you want to use #CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE with interface classes declared in a
+ * namespace then you have to make sure the #CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro call is not
  * inside a namespace though. For example:
  *
  * \code
@@ -179,13 +179,13 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
  *   struct ISomeInterface { ... };
  * }
  *
- * US_DECLARE_SERVICE_INTERFACE(Foo::ISomeInterface, "com.mycompany.service.ISomeInterface/1.0")
+ * CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(Foo::ISomeInterface, "com.mycompany.service.ISomeInterface/1.0")
  * \endcode
  *
  * @param _service_interface_type The service interface type.
  * @param _service_interface_id A string literal representing a globally unique identifier.
  */
-#define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)             \
+#define CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)             \
   template<> inline std::string us_service_interface_iid<_service_interface_type>()          \
   { return _service_interface_id; }                                                              \
 

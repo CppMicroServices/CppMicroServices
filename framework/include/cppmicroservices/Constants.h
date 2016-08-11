@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace cppmicroservices {
  * service properties, and Manifest header attribute keys.
  *
  * <p>
- * The values associated with these keys are of type {@code std::string}, unless
+ * The values associated with these keys are of type \c std::string, unless
  * otherwise indicated.
  *
  * \ingroup MicroServices
@@ -43,7 +43,7 @@ namespace Constants {
 
 /**
  * Location identifier of the OSGi <i>system bundle </i>, which is defined
- * to be &quot;System Bundle&quot;.
+ * to be &quot;System %Bundle&quot;.
  */
 US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "System Bundle";
 
@@ -55,60 +55,51 @@ US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "s
 
 /**
  * Manifest header identifying the bundle's category.
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
 
 /**
  * Manifest header identifying the bundle's copyright information.
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
 
 /**
  * Manifest header containing a brief description of the bundle's
  * functionality.
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
 
 /**
  * Manifest header identifying the bundle's menifest version.
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_MANIFESTVERSION; // = "bundle.manifest_version";
 
 /**
  * Manifest header identifying the bundle's name.
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_NAME; // = "bundle.name";
 
 /**
  * Manifest header identifying the bundle's vendor.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
 
 /**
  * Manifest header identifying the bundle's version.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.version";
 
@@ -116,9 +107,7 @@ US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.versio
  * Manifest header identifying the bundle's documentation URL, from which
  * further information about the bundle may be obtained.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
 
@@ -126,26 +115,21 @@ US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url
  * Manifest header identifying the contact address where problems with the
  * bundle may be reported; for example, an email address.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
 
 /**
  * Manifest header identifying the bundle's symbolic name.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
 
 /**
  * Manifest header identifying the bundle's activation policy.
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  *
  * @see #ACTIVATION_LAZY
  */
@@ -154,12 +138,12 @@ US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bund
 /**
  * Bundle activation policy declaring the bundle must be activated when the
  * library containing it is loaded into memory.
- * <p>
+ *
  * A bundle with the lazy activation policy that is started with the
  * {@link Bundle#START_ACTIVATION_POLICY START_ACTIVATION_POLICY} option
  * will wait in the {@link Bundle#STATE_STARTING STATE_STARTING} state until its
  * library is loaded. The bundle will then be activated.
- * <p>
+ *
  * The activation policy value is specified as in the
  * bundle.activation_policy manifest header like:
  *
@@ -176,9 +160,7 @@ US_Framework_EXPORT extern const std::string ACTIVATION_LAZY; // = "lazy";
 /**
  * Framework environment property identifying the Framework version.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
 
@@ -186,9 +168,7 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmic
  * Framework environment property identifying the Framework implementation
  * vendor.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
 
@@ -200,7 +180,7 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicr
  * exists but is not a directory or if the framework fails to create the
  * storage directory, then framework initialization fails. This area can not
  * be shared with anything else.
- * <p>
+ *
  * If this property is not set, the framework uses the "fwdir" directory in
  * the current working directory for the persistent storage area.
  */
@@ -241,7 +221,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "
  * The framework's log property key name.
  * This property's default value is off (boolean 'false').
  *
- * @see DIAG_LOG
+ * @internal
+ * @see #DIAG_LOG
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicroservices.framework.log";
 
@@ -253,9 +234,7 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicrose
  * string representation specified in <a
  * href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>.
  *
- * <p>
- * The header value may be retrieved via the {@code Bundle::GetProperty}
- * method.
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
 
@@ -269,7 +248,6 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicros
  * was registered in the Framework. The value of this property must be of
  * type <code>std::vector&lt;std::string&gt;</code>.
  *
- * <p>
  * This property is set by the Framework when a service is registered.
  */
 US_Framework_EXPORT extern const std::string OBJECTCLASS; // = "objectclass";
@@ -278,7 +256,6 @@ US_Framework_EXPORT extern const std::string OBJECTCLASS; // = "objectclass";
  * Service property identifying a service's registration number. The value
  * of this property must be of type <code>long int</code>.
  *
- * <p>
  * The value of this property is assigned by the Framework when a service is
  * registered. The Framework assigns a unique value that is larger than all
  * previously assigned values since the Framework was started. These values
@@ -289,17 +266,13 @@ US_Framework_EXPORT extern const std::string SERVICE_ID; // = "service.id";
 /**
  * Service property identifying a service's persistent identifier.
  *
- * <p>
- * This property may be supplied in the {@code properties}
- * {@code ServiceProperties} object passed to the
- * {@code BundleContext#RegisterService} method. The value of this property
- * must be of type {@code std::string} or {@code std::vector<std::string>}.
+ * This property may be supplied in the \c properties \c ServiceProperties
+ * object passed to the \c BundleContext#RegisterService method. The value
+ * of this property must be of type \c std::string or \c std::vector<std::string>.
  *
- * <p>
  * A service's persistent identifier uniquely identifies the service and
  * persists across multiple Framework invocations.
  *
- * <p>
  * By convention, every bundle has its own unique namespace, starting with
  * the bundle's identifier (see {@link Bundle#GetBundleId()}) and followed
  * by a dot (.). A bundle may use this as the prefix of the persistent
@@ -310,25 +283,21 @@ US_Framework_EXPORT extern const std::string SERVICE_PID; // = "service.pid";
 /**
  * Service property identifying a service's ranking number.
  *
- * <p>
  * This property may be supplied in the
  * <code>ServiceProperties</code> object passed to the
  * <code>BundleContext::RegisterService</code> method. The value of this
  * property must be of type <code>int</code>.
  *
- * <p>
  * The service ranking is used by the framework to determine the <i>natural
  * order</i> of services, see ServiceReference::operator<(const ServiceReference&),
  * and the <i>default</i> service to be returned from a call to the
  * {@link BundleContext::GetServiceReference} method.
  *
- * <p>
  * The default ranking is zero (0). A service with a ranking of
  * <code>std::numeric_limits<int>::max()</code> is very likely to be returned as the
  * default service, whereas a service with a ranking of
  * <code>std::numeric_limits<int>::min()</code> is very unlikely to be returned.
  *
- * <p>
  * If the supplied property value is not of type <code>int</code>, it is
  * deemed to have a ranking value of zero.
  */
@@ -337,18 +306,16 @@ US_Framework_EXPORT extern const std::string SERVICE_RANKING; // = "service.rank
 /**
  * Service property identifying a service's vendor.
  *
- * <p>
- * This property may be supplied in the properties {@code ServiceProperties} object
- * passed to the {@code BundleContext#RegisterService} method.
+ * This property may be supplied in the properties \c ServiceProperties object
+ * passed to the \c BundleContext#RegisterService method.
  */
 US_Framework_EXPORT extern const std::string SERVICE_VENDOR; //	= "service.vendor";
 
 /**
  * Service property identifying a service's description.
  *
- * <p>
- * This property may be supplied in the properties {@code ServiceProperties} object
- * passed to the {@code BundleContext#RegisterService} method.
+ * This property may be supplied in the properties \c ServiceProperties object
+ * passed to the \c BundleContext#RegisterService method.
  */
 US_Framework_EXPORT extern const std::string SERVICE_DESCRIPTION; // = "service.description";
 

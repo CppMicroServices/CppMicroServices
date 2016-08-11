@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "ServicesPlugin_p.h"
+#include "ServicesPlugin.h"
 
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"

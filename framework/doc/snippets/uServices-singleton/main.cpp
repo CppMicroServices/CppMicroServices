@@ -65,7 +65,7 @@ private:
 
 };
 
-US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 int main()
 {

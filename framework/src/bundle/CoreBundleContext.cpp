@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,20 +25,20 @@
 
 US_MSVC_DISABLE_WARNING(4355)
 
-#include "CoreBundleContext_p.h"
+#include "CoreBundleContext.h"
 
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 
-#include "BundleStorageMemory_p.h"
-#include "BundleThread_p.h"
-#include "BundleUtils_p.h"
+#include "BundleStorageMemory.h"
+#include "BundleThread.h"
+#include "BundleUtils.h"
 #include "FrameworkPrivate.h"
-#include "Utils_p.h" // cppmicroservices::ToString()
+#include "Utils.h" // cppmicroservices::ToString()
 
 #include <iomanip>
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 namespace cppmicroservices {
 

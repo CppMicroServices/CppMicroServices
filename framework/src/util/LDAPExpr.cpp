@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@
 
 =============================================================================*/
 
-#include "LDAPExpr_p.h"
+#include "LDAPExpr.h"
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
 
-#include "Properties_p.h"
+#include "Properties.h"
 
 #include <cctype>
 #include <cerrno>

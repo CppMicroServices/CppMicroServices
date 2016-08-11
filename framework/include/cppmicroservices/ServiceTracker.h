@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -399,9 +399,8 @@ protected:
    * <p>
    * This method can be overridden in a subclass to customize the service
    * object to be tracked for the service being added. In that case, take care
-   * not to rely on the default implementation of
-   * \link RemovedService(const ServiceReferenceType&, T service) removedService\endlink
-   * to unget the service.
+   * not to rely on the default implementation of #RemovedService to unget the
+   * service.
    *
    * @param reference The reference to the service being added to this
    *        <code>ServiceTracker</code>.
@@ -437,7 +436,7 @@ protected:
    * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
    *
    * This method can be overridden in a subclass. If the default
-   * implementation of \link AddingService(const ServiceReferenceType&) AddingService\endlink
+   * implementation of the #AddingService
    * method was used, this method must unget the service.
    *
    * @param reference The reference to removed service.

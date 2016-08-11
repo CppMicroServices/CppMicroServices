@@ -8,7 +8,7 @@
 #include <iostream>
 
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 using namespace cppmicroservices;
 

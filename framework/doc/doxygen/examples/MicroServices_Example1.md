@@ -47,7 +47,7 @@ and the CMakeLists.txt file in the eventlistener subdirectory is:
 
 The call to `#usFunctionGenerateBundleInit` is necessary to integrate the shared
 library as a bundle within the C++ Micro Service library. If you are not using
-CMake, you have to place a macro call to `#US_INITIALIZE_BUNDLE` yourself into the
+CMake, you have to place a macro call to `#CPPMICROSERVICES_INITIALIZE_BUNDLE` yourself into the
 bundle's source code, e.g. in `Activator.cpp`. Have a look at the
 \ref MicroServices_GettingStarted documentation for more details about using CMake
 or other build systems (e.g. Makefiles) when writing bundles.

@@ -20,11 +20,11 @@
 =============================================================================*/
 
 #include "cppmicroservices/webconsole/AbstractWebConsolePlugin.h"
-#include "WebConsoleServlet_p.h"
+#include "WebConsoleServlet.h"
 
 #include "cppmicroservices/webconsole/WebConsoleConstants.h"
 #include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
-#include "VariableResolverStreamBuffer_p.h"
+#include "VariableResolverStreamBuffer.h"
 
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"

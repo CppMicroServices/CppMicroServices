@@ -15,7 +15,7 @@ A great way to contribute to the project is to send a detailed report when you
 encounter an issue. We always appreciate a well-written, thorough bug report,
 and will thank you for it!
 
-Check that the [issue database](https://github.com/saschazelzer/CppMicroServices/issues)
+Check that the [issue database](https://github.com/CppMicroServices/CppMicroServices/issues)
 doesn't already include that problem or suggestion before submitting an issue.
 If you find a match, add a quick "+1" or "I have this problem too." Doing this
 helps prioritize the most common problems and requests.

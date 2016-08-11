@@ -17,8 +17,8 @@ CppMicroServices API or the provided preprocessor macros.
 # Using Static Bundles
 
 Static bundles can be used (imported) in shared or other static libraries or in the executable itself.
-For every static bundle you would like to import, you need to put a call to `#US_IMPORT_BUNDLE` or
-to `#US_INITIALIZE_STATIC_BUNDLE` (if the bundle does not provide an activator) into the
+For every static bundle you would like to import, you need to put a call to `#CPPMICROSERVICES_IMPORT_BUNDLE` or
+to `#CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE` (if the bundle does not provide an activator) into the
 source code of the importing library.
 
 \note While you can link static bundles to other static bundles, you will still need to
@@ -46,7 +46,7 @@ In this usage scenario, every bundle will be statically build and linked to an e
 
 \snippet uServices-staticbundles/main.cpp ImportStaticBundleIntoMain2
 
-Note that the first `#US_IMPORT_BUNDLE` call imports the static CppMicroServices library.
+Note that the first `#CPPMICROSERVICES_IMPORT_BUNDLE` call imports the static CppMicroServices library.
 Then the `MyStaticBundle2` bundle is imported and finally, the
 executable itself is initialized (this is necessary if the executable itself is
 a C++ Micro Services bundle).
@@ -57,7 +57,7 @@ Although static linking reduces the number of shared libraries, the statically
 linked bundles are still represented internally by distinct Bundle and BundleContext
 objects. In a shared bundle scenario, the linker dependencies define the load order
 of bundles and hence the order of their initialization and BundleActivator::Start()
-invocations. In the static case, the order of the `#US_IMPORT_BUNDLE` macro calls
+invocations. In the static case, the order of the `#CPPMICROSERVICES_IMPORT_BUNDLE` macro calls
 defines the initialization and activation order. In case of a statically built
 CppMicroServices library, it is therefore important to always import the static
 CppMicroServices library into the executable first, and the executable itself

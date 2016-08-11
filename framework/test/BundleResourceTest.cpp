@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace {
 
   // Please confirm that a character count differing from the following targets is not due to
   // a misconfiguration of your versioning software (Correct line endings for your system)
-  // See issue #18 ( https://github.com/saschazelzer/CppMicroServices/issues/18 )
+  // See issue #18 ( https://github.com/CppMicroServices/CppMicroServices/issues/18 )
 void checkResourceInfo(const BundleResource& res, const std::string& path,
                        const std::string& baseName,
                        const std::string& completeBaseName, const std::string& suffix,

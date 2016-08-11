@@ -19,7 +19,7 @@ void RetrieveBundleContext()
 //! [InitializeBundle]
 #include "cppmicroservices/BundleInitialization.h"
 
-US_INITIALIZE_BUNDLE
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 //! [InitializeBundle]
 
 int main(int /*argc*/, char* /*argv*/[])

@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "BundleRegistry_p.h"
-#include "CoreBundleContext_p.h"
+#include "BundleRegistry.h"
+#include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
-#include "ServiceRegistry_p.h"
-#include "Utils_p.h"
+#include "ServiceRegistry.h"
+#include "Utils.h"
 
 #include <memory>
 #include <stdio.h>

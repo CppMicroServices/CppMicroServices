@@ -17,7 +17,7 @@ public:
 
 };
 
-US_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 //![0]
 
 int main(int /*argc*/, char* /*argv*/[])

@@ -22,16 +22,16 @@
 #include "cppmicroservices/GetBundleContext.h"
 
 #include "cppmicroservices/httpservice/ServletContainer.h"
-#include "ServletContainer_p.h"
+#include "ServletContainerPrivate.h"
 
 #include "cppmicroservices/httpservice/HttpServlet.h"
-#include "HttpServlet_p.h"
+#include "HttpServletPrivate.h"
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "HttpServletRequest_p.h"
+#include "HttpServletRequestPrivate.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
-#include "HttpServletResponse_p.h"
+#include "HttpServletResponsePrivate.h"
 #include "cppmicroservices/httpservice/ServletContext.h"
-#include "ServletConfig_p.h"
+#include "ServletConfigPrivate.h"
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"

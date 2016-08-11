@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ public:
   /**
    * Get the bundles with the specified bundle location.
    *
-   * @param name The location of the bundles to get.
+   * @param location The location of the bundles to get.
    * @return The requested {\c Bundle}s or an empty list.
    */
   std::vector<Bundle> GetBundles(const std::string& location) const;
@@ -415,7 +415,7 @@ public:
   std::vector<ServiceReference<S>> GetServiceReferences(const std::string& filter = std::string())
   {
     std::string clazz = us_service_interface_iid<S>();
-    if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
+    if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
     typedef std::vector<ServiceReferenceU> BaseVectorT;
     BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
     std::vector<ServiceReference<S> > result;
@@ -479,7 +479,7 @@ public:
   ServiceReference<S> GetServiceReference()
   {
     std::string clazz = us_service_interface_iid<S>();
-    if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
+    if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
     return ServiceReference<S>(GetServiceReference(clazz));
   }
 
@@ -813,7 +813,7 @@ private:
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code
-  // to log diagnostic information. 
+  // to log diagnostic information.
   std::shared_ptr<detail::LogSink> GetLogSink() const;
 
   void AddServiceListener(const ServiceListener& delegate, void* data,

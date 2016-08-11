@@ -4,7 +4,7 @@
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
-  https://github.com/saschazelzer/CppMicroServices/COPYRIGHT .
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include "cppmicroservices/ServiceTracker.h"
 
 #include "TestingMacros.h"
-#include "Utils_p.h"
+#include "Utils.h"
 
 #include <condition_variable>
 #include <future>
@@ -189,4 +189,4 @@ private:
 
 } // namespace cppmicroservices
 
-US_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleC1Activator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleC1Activator)

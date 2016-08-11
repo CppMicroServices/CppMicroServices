@@ -64,7 +64,15 @@ class US_Framework_EXPORT Framework : public Bundle
 {
 public:
 
-    Framework() = delete;
+    /**
+     * Convert a \c Bundle representing the system bundle to a
+     * \c Framework instance.
+     *
+     * @param b The system bundle
+     *
+     * @throws std::logic_error If the bundle \b is not the system bundle.
+     */
+    explicit Framework(Bundle b);
 
     /**
      * Initialize this Framework. After calling this method, this Framework
@@ -140,7 +148,9 @@ public:
      *
      * @throws std::runtime_error If this Framework could not be started.
      */
+#ifdef DOXYGEN_RUN
     void Start();
+#endif
 
     /**
      * Start this Framework.
@@ -153,7 +163,9 @@ public:
      * @throws std::runtime_error If this Framework could not be started.
      * @see #Start()
      */
+#ifdef DOXYGEN_RUN
     void Start(uint32_t options);
+#endif
 
     /**
      * Stop this Framework.
@@ -181,7 +193,9 @@ public:
      *
      * @throws std::runtime_error If stopping this Framework could not be initiated.
      */
+#ifdef DOXYGEN_RUN
     void Stop();
+#endif
 
     /**
      * Stop this Framework.
@@ -195,7 +209,9 @@ public:
      *         initiated.
      * @see #Stop()
      */
+#ifdef DOXYGEN_RUN
     void Stop(uint32_t options);
+#endif
 
     /**
      * The Framework cannot be uninstalled.
@@ -204,7 +220,9 @@ public:
      *
      * @throws std::runtime_error This Framework cannot be uninstalled.
      */
+#ifdef DOXYGEN_RUN
     void Uninstall();
+#endif
 
     /**
     * Returns this Framework's location.
@@ -215,7 +233,10 @@ public:
     *
     * @return The string "System Bundle".
     */
+#ifdef DOXYGEN_RUN
     std::string GetLocation() const;
+#endif
+
 
 private:
 

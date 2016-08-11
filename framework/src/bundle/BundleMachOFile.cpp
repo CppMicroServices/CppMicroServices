@@ -19,7 +19,7 @@
 
 =============================================================================*/
 
-#include "ModuleObjFile.h"
+#include "BundleObjFile.h"
 
 #include "cppmicroservices_mach-o.h"
 

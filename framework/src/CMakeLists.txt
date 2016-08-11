@@ -34,11 +34,15 @@ set(_srcs
   bundle/BundleArchive.cpp
   bundle/BundleContext.cpp
   bundle/BundleContextPrivate.cpp
+  bundle/BundleElfFile.cpp
   bundle/BundleEvent.cpp
   bundle/BundleEventHook.cpp
   bundle/BundleFindHook.cpp
   bundle/BundleHooks.cpp
+  bundle/BundleMachOFile.cpp
   bundle/BundleManifest.cpp
+  bundle/BundleObjFile.cpp
+  bundle/BundlePEFile.cpp
   bundle/BundlePrivate.cpp
   bundle/BundleRegistry.cpp
   bundle/BundleResource.cpp
@@ -53,10 +57,6 @@ set(_srcs
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
   bundle/Debug.cpp
-  bundle/ModuleElfFile.cpp
-  bundle/ModuleMachOFile.cpp
-  bundle/ModuleObjFile.cpp
-  bundle/ModulePEFile.cpp
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
@@ -79,6 +79,7 @@ set(_private_headers
   bundle/BundleContextPrivate.h
   bundle/BundleHooks.h
   bundle/BundleManifest.h
+  bundle/BundleObjFile.h
   bundle/BundlePrivate.h
   bundle/BundleRegistry.h
   bundle/BundleResourceContainer.h
@@ -90,6 +91,5 @@ set(_private_headers
   bundle/CoreBundleContext.h
   bundle/Debug.h
   bundle/Fragment.h
-  bundle/ModuleObjFile.h
   bundle/Resolver.h
 )

@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef CPPMICROSERVICES_COREBUNDLECONTEXT_P_H
-#define CPPMICROSERVICES_COREBUNDLECONTEXT_P_H
+#ifndef CPPMICROSERVICES_COREBUNDLECONTEXT_H
+#define CPPMICROSERVICES_COREBUNDLECONTEXT_H
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/detail/Log.h"
@@ -183,4 +183,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_COREBUNDLECONTEXT_P_H
+#endif // CPPMICROSERVICES_COREBUNDLECONTEXT_H

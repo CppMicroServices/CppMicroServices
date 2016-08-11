@@ -26,11 +26,11 @@ endif()
 
 set(_private_headers
   src/HttpOutputStreamBuffer.h
-  src/HttpServlet.h
-  src/HttpServletRequest.h
-  src/HttpServletResponse.h
-  src/ServletConfig.h
-  src/ServletContainer.h
+  src/HttpServletPrivate.h
+  src/HttpServletRequestPrivate.h
+  src/HttpServletResponsePrivate.h
+  src/ServletConfigPrivate.h
+  src/ServletContainerPrivate.h
 )
 
 set(_public_headers

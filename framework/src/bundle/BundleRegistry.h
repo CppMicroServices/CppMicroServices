@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEREGISTRY_P_H
-#define CPPMICROSERVICES_BUNDLEREGISTRY_P_H
+#ifndef CPPMICROSERVICES_BUNDLEREGISTRY_H
+#define CPPMICROSERVICES_BUNDLEREGISTRY_H
 
 #include "cppmicroservices/detail/Threads.h"
 
@@ -148,4 +148,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_BUNDLEREGISTRY_P_H
+#endif // CPPMICROSERVICES_BUNDLEREGISTRY_H

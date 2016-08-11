@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_WEBCONSOLESERVLET_P_H
-#define CPPMICROSERVICES_WEBCONSOLESERVLET_P_H
+#ifndef CPPMICROSERVICES_WEBCONSOLESERVLET_H
+#define CPPMICROSERVICES_WEBCONSOLESERVLET_H
 
 #include "cppmicroservices/httpservice/HttpServlet.h"
 
@@ -84,4 +84,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_WEBCONSOLESERVLET_P_H
+#endif // CPPMICROSERVICES_WEBCONSOLESERVLET_H

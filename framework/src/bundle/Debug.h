@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_DEBUG_P_H
-#define CPPMICROSERVICES_DEBUG_P_H
+#ifndef CPPMICROSERVICES_DEBUG_H
+#define CPPMICROSERVICES_DEBUG_H
 
 namespace cppmicroservices {
 
@@ -34,4 +34,4 @@ struct Debug
 
 }
 
-#endif // CPPMICROSERVICES_DEBUG_P_H
+#endif // CPPMICROSERVICES_DEBUG_H

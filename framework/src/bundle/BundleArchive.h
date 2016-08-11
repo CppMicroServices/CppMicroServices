@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEARCHIVE_P_H
-#define CPPMICROSERVICES_BUNDLEARCHIVE_P_H
+#ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
+#define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
 #include "cppmicroservices/Chrono.h"
 
@@ -168,4 +168,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_BUNDLEARCHIVE_P_H
+#endif // CPPMICROSERVICES_BUNDLEARCHIVE_H

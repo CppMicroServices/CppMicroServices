@@ -20,7 +20,7 @@
 =============================================================================*/
 
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "HttpServletRequest.h"
+#include "HttpServletRequestPrivate.h"
 
 #include "cppmicroservices/httpservice/ServletContext.h"
 

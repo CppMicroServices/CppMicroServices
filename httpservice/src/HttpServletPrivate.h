@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_HTTPSERVLET_P_H
-#define CPPMICROSERVICES_HTTPSERVLET_P_H
+#ifndef CPPMICROSERVICES_HTTPSERVLETPRIVATE_H
+#define CPPMICROSERVICES_HTTPSERVLETPRIVATE_H
 
 #include "cppmicroservices/httpservice/ServletConfig.h"
 
@@ -34,4 +34,4 @@ struct HttpServletPrivate
 
 }
 
-#endif // CPPMICROSERVICES_HTTPSERVLET_P_H
+#endif // CPPMICROSERVICES_HTTPSERVLETPRIVATE_H

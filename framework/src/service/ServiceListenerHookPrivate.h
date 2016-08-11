@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVICELISTENERHOOK_P_H
-#define CPPMICROSERVICES_SERVICELISTENERHOOK_P_H
+#ifndef CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
+#define CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
 
 #include "cppmicroservices/ServiceListenerHook.h"
 #include "cppmicroservices/SharedData.h"
@@ -47,4 +47,4 @@ public:
 
 }
 
-#endif // CPPMICROSERVICES_SERVICELISTENERHOOK_P_H
+#endif // CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H

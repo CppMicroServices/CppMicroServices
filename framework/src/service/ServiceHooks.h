@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVICEHOOKS_P_H
-#define CPPMICROSERVICES_SERVICEHOOKS_P_H
+#ifndef CPPMICROSERVICES_SERVICEHOOKS_H
+#define CPPMICROSERVICES_SERVICEHOOKS_H
 
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/detail/WaitCondition.h"
@@ -73,4 +73,4 @@ public:
 
 }
 
-#endif // CPPMICROSERVICES_SERVICEHOOKS_P_H
+#endif // CPPMICROSERVICES_SERVICEHOOKS_H

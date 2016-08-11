@@ -20,7 +20,7 @@
 =============================================================================*/
 
 #include "cppmicroservices/httpservice/ServletConfig.h"
-#include "ServletConfig.h"
+#include "ServletConfigPrivate.h"
 
 namespace cppmicroservices {
 

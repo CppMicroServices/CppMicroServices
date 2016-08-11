@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLESTORAGEFILE_P_H
-#define CPPMICROSERVICES_BUNDLESTORAGEFILE_P_H
+#ifndef CPPMICROSERVICES_BUNDLESTORAGEFILE_H
+#define CPPMICROSERVICES_BUNDLESTORAGEFILE_H
 
 #include "BundleStorage.h"
 
@@ -52,4 +52,4 @@ public:
 
 }
 
-#endif // CPPMICROSERVICES_BUNDLESTORAGEFILE_P_H
+#endif // CPPMICROSERVICES_BUNDLESTORAGEFILE_H

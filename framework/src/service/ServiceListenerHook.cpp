@@ -25,7 +25,7 @@
 #include "cppmicroservices/BundleContext.h"
 
 #include "BundleContextPrivate.h"
-#include "ServiceListenerHook.h"
+#include "ServiceListenerHookPrivate.h"
 
 namespace cppmicroservices {
 

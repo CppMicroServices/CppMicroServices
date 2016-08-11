@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_HTTPSERVLETREQUEST_P_H
-#define CPPMICROSERVICES_HTTPSERVLETREQUEST_P_H
+#ifndef CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H
+#define CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H
 
 #include "cppmicroservices/SharedData.h"
 
@@ -60,4 +60,4 @@ struct HttpServletRequestPrivate : public SharedData
 
 }
 
-#endif // CPPMICROSERVICES_HTTPSERVLETREQUEST_P_H
+#endif // CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H

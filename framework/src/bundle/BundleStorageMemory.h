@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLESTORAGEMEMORY_P_H
-#define CPPMICROSERVICES_BUNDLESTORAGEMEMORY_P_H
+#ifndef CPPMICROSERVICES_BUNDLESTORAGEMEMORY_H
+#define CPPMICROSERVICES_BUNDLESTORAGEMEMORY_H
 
 #include "cppmicroservices/detail/Threads.h"
 
@@ -70,4 +70,4 @@ private:
 
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_BUNDLESTORAGEMEMORY_P_H
+#endif // CPPMICROSERVICES_BUNDLESTORAGEMEMORY_H

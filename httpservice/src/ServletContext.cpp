@@ -21,7 +21,7 @@
 
 #include "cppmicroservices/httpservice/ServletContext.h"
 #include "cppmicroservices/httpservice/ServletContainer.h"
-#include "ServletContainer.h"
+#include "ServletContainerPrivate.h"
 
 namespace cppmicroservices {
 

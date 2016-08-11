@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEHOOKS_P_H
-#define CPPMICROSERVICES_BUNDLEHOOKS_P_H
+#ifndef CPPMICROSERVICES_BUNDLEHOOKS_H
+#define CPPMICROSERVICES_BUNDLEHOOKS_H
 
 #include "ServiceListeners.h"
 
@@ -63,4 +63,4 @@ public:
 
 }
 
-#endif // CPPMICROSERVICES_BUNDLEHOOKS_P_H
+#endif // CPPMICROSERVICES_BUNDLEHOOKS_H

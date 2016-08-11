@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVLETCONTAINER_P_H
-#define CPPMICROSERVICES_SERVLETCONTAINER_P_H
+#ifndef CPPMICROSERVICES_SERVLETCONTAINERPRIVATE_H
+#define CPPMICROSERVICES_SERVLETCONTAINERPRIVATE_H
 
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
@@ -66,4 +66,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_SERVLETCONTAINER_P_H
+#endif // CPPMICROSERVICES_SERVLETCONTAINERPRIVATE_H

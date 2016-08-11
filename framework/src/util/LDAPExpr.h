@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef CPPMICROSERVICES_LDAPEXPR_P_H
-#define CPPMICROSERVICES_LDAPEXPR_P_H
+#ifndef CPPMICROSERVICES_LDAPEXPR_H
+#define CPPMICROSERVICES_LDAPEXPR_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/SharedData.h"
@@ -176,4 +176,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_LDAPEXPR_P_H
+#endif // CPPMICROSERVICES_LDAPEXPR_H

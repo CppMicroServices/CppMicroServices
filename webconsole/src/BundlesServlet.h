@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLESSERVLET_P_H
-#define CPPMICROSERVICES_BUNDLESSERVLET_P_H
+#ifndef CPPMICROSERVICES_BUNDLESSERVLET_H
+#define CPPMICROSERVICES_BUNDLESSERVLET_H
 
 #include "SimpleWebConsolePlugin.h"
 
@@ -259,4 +259,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_BUNDLESSERVLET_P_H
+#endif // CPPMICROSERVICES_BUNDLESSERVLET_H

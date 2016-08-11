@@ -19,8 +19,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSE_P_H
-#define CPPMICROSERVICES_HTTPSERVLETRESPONSE_P_H
+#ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H
+#define CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H
 
 #include "cppmicroservices/SharedData.h"
 
@@ -60,4 +60,4 @@ struct HttpServletResponsePrivate : public SharedData
 
 }
 
-#endif // CPPMICROSERVICES_HTTPSERVLETRESPONSE_P_H
+#endif // CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H

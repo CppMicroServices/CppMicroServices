@@ -69,7 +69,7 @@ set(_private_headers
 
   service/ServiceHooks.h
   service/ServiceListenerEntry.h
-  service/ServiceListenerHook.h
+  service/ServiceListenerHookPrivate.h
   service/ServiceListeners.h
   service/ServiceReferenceBasePrivate.h
   service/ServiceRegistrationBasePrivate.h

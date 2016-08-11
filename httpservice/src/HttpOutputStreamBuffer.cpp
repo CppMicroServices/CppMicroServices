@@ -21,7 +21,7 @@
 
 #include "HttpOutputStreamBuffer.h"
 
-#include "HttpServletResponse.h"
+#include "HttpServletResponsePrivate.h"
 
 #include "civetweb/civetweb.h"
 
@@ -50,7 +50,7 @@ HttpOutputStreamBuffer::~HttpOutputStreamBuffer()
   if (!m_Response->m_IsCommited &&
       m_Response->m_Headers.find("Content-Length") != m_Response->m_Headers.end())
   {
-	m_Response->m_Headers["Content-Length"] = m_Response->LexicalCast(static_cast<long>(pptr() - pbase()));
+    m_Response->m_Headers["Content-Length"] = m_Response->LexicalCast(static_cast<long>(pptr() - pbase()));
   }
   sync();
   if (m_ChunkedCoding)

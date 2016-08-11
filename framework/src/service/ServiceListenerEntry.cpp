@@ -26,7 +26,7 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 
 #include "ServiceListenerEntry.h"
 
-#include "ServiceListenerHook.h"
+#include "ServiceListenerHookPrivate.h"
 
 #include <cassert>
 

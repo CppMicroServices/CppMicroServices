@@ -21,8 +21,8 @@
 =============================================================================*/
 
 
-#ifndef CPPMICROSERVICES_SERVICELISTENERS_P_H
-#define CPPMICROSERVICES_SERVICELISTENERS_P_H
+#ifndef CPPMICROSERVICES_SERVICELISTENERS_H
+#define CPPMICROSERVICES_SERVICELISTENERS_H
 
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/detail/Threads.h"
@@ -210,4 +210,4 @@ private:
 
 }
 
-#endif // CPPMICROSERVICES_SERVICELISTENERS_P_H
+#endif // CPPMICROSERVICES_SERVICELISTENERS_H

@@ -90,7 +90,7 @@ public:
 
   void RemoveBundleResources();
 
-  void Stop(uint32_t);
+  virtual void Stop(uint32_t);
 
   std::exception_ptr Stop0(UniqueLock& resolveLock);
 
@@ -157,7 +157,11 @@ public:
   // Performs the actual activation.
   void FinalizeActivation(LockType& l);
 
-  void Start(uint32_t options);
+  virtual void Uninstall();
+
+  virtual std::string GetLocation() const;
+
+  virtual void Start(uint32_t options);
 
   /**
    * Start code that is executed in the bundleThread without holding the

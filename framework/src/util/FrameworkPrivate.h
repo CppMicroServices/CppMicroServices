@@ -57,6 +57,11 @@ public:
 
   void Shutdown(bool restart);
 
+  virtual void Start(uint32_t) override;
+  virtual void Stop(uint32_t) override;
+
+  virtual void Uninstall() override;
+  virtual std::string GetLocation() const override;
 
   /**
    * Stop this FrameworkContext, suspending all started contexts. This method

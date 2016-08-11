@@ -461,6 +461,17 @@ namespace
     }
 }
 
+void TestIndirectFrameworkStop()
+{
+    auto f = FrameworkFactory().NewFramework();
+    f.Start();
+    auto bundle = f.GetBundleContext().GetBundle(0);
+    bundle.Stop();
+    Framework f2(bundle);
+    f2.WaitForStop(std::chrono::milliseconds::zero());
+    US_TEST_CONDITION(f.GetState() == Bundle::STATE_RESOLVED, "Framework stopped");
+}
+
 int FrameworkTest(int /*argc*/, char* /*argv*/[])
 {
     US_TEST_BEGIN("FrameworkTest");
@@ -468,8 +479,9 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
     TestDefaultConfig();
     TestDefaultLogSink();
     TestCustomConfig();
-	TestCustomLogSink();
+    TestCustomLogSink();
     TestProperties();
+    TestIndirectFrameworkStop();
     TestLifeCycle();
     TestEvents();
 #ifdef US_ENABLE_THREADING_SUPPORT

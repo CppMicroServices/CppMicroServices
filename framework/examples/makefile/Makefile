@@ -4,7 +4,7 @@ LDFLAGS = -Wl,-rpath="$(CppMicroServices_ROOT)/lib" -Wl,-rpath=.
 LDLIBS = -lCppMicroServices
 
 INCLUDEDIRS = -I"$(CppMicroServices_ROOT)/include"
-LIBDIRS = -L"$(CppMicroServices_ROOT)/lib/cppmicroservices" -L.
+LIBDIRS = -L"$(CppMicroServices_ROOT)/lib" -L.
 
 all : main libbundle.so
 

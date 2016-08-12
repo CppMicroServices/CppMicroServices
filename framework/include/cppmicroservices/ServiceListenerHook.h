@@ -113,7 +113,7 @@ struct US_Framework_EXPORT ServiceListenerHook
 
     /**
      * Compares this \c ListenerInfo to another \c ListenerInfo.
-     * Two {@code ListenerInfo}s are equal if they refer to the same
+     * Two \c ListenerInfos are equal if they refer to the same
      * listener for a given addition and removal life cycle. If the same
      * listener is added again, it will have a different
      * \c ListenerInfo which is not equal to this \c ListenerInfo.

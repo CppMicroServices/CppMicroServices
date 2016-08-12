@@ -70,17 +70,17 @@ typedef ServiceReference<void> ServiceReferenceU;
  * the valid states.
  *
  * A bundle should only have active threads of execution when its state is one
- * of {@code STATE_STARTING},{@code STATE_ACTIVE}, or {@code STATE_STOPPING}.
- * A {@code STATE_UNINSTALLED} bundle can not be set to another state; it is a
+ * of \c STATE_STARTING,\c STATE_ACTIVE, or \c STATE_STOPPING.
+ * A \c STATE_UNINSTALLED bundle can not be set to another state; it is a
  * zombie and can only be reached because references are kept somewhere.
  *
  * The framework is the only entity that is allowed to create
  * <code>%Bundle</code> objects, and these objects are only valid within the
  * Framework that created them.
  *
- * Bundles have a natural ordering such that if two {@code Bundle}s have the
- * same {@link #GetBundleId() bundle id} they are equal. A {@code Bundle} is
- * less than another {@code Bundle} if it has a lower {@link #GetBundleId()
+ * Bundles have a natural ordering such that if two \c Bundles have the
+ * same {@link #GetBundleId() bundle id} they are equal. A \c Bundle is
+ * less than another \c Bundle if it has a lower {@link #GetBundleId()
  * bundle id} and is greater if it has a higher bundle id.
  *
  *
@@ -98,82 +98,82 @@ public:
     /**
      * The bundle is uninstalled and may not be used.
      *
-     * The {@code STATE_UNINSTALLED} state is only visible after a bundle is
+     * The \c STATE_UNINSTALLED state is only visible after a bundle is
      * uninstalled; the bundle is in an unusable state but references to the
-     * {@code Bundle} object may still be available and used for introspection.
+     * \c Bundle object may still be available and used for introspection.
      *
-     * The value of {@code STATE_UNINSTALLED} is 0x00000001.
+     * The value of \c STATE_UNINSTALLED is 0x00000001.
      */
     STATE_UNINSTALLED = 0x00000001,
 
     /**
      * The bundle is installed but not yet resolved.
      *
-     * A bundle is in the {@code STATE_INSTALLED} state when it has been installed in
+     * A bundle is in the \c STATE_INSTALLED state when it has been installed in
      * the Framework but is not or cannot be resolved.
      *
      * This state is visible if the bundle's code dependencies are not resolved.
-     * The Framework may attempt to resolve a {@code STATE_INSTALLED} bundle's code
-     * dependencies and move the bundle to the {@code STATE_RESOLVED} state.
+     * The Framework may attempt to resolve a \c STATE_INSTALLED bundle's code
+     * dependencies and move the bundle to the \c STATE_RESOLVED state.
      *
-     * The value of {@code STATE_INSTALLED} is 0x00000002.
+     * The value of \c STATE_INSTALLED is 0x00000002.
      */
     STATE_INSTALLED = 0x00000002,
 
     /**
      * The bundle is resolved and is able to be started.
      *
-     * A bundle is in the {@code STATE_RESOLVED} state when the Framework has
+     * A bundle is in the \c STATE_RESOLVED state when the Framework has
      * successfully resolved the bundle's code dependencies. These dependencies
      * include:
      * - None (this may change in future versions)
      *
      * Note that the bundle is not active yet. A bundle is put in the
-     * {@code STATE_RESOLVED} state before it can be started. The Framework may
+     * \c STATE_RESOLVED state before it can be started. The Framework may
      * attempt to resolve a bundle at any time.
      *
-     * The value of {@code STATE_RESOLVED} is 0x00000004.
+     * The value of \c STATE_RESOLVED is 0x00000004.
      */
     STATE_RESOLVED = 0x00000004,
 
     /**
      * The bundle is in the process of starting.
      *
-     * A bundle is in the {@code STATE_STARTING} state when its {@link #Start(uint32_t)
+     * A bundle is in the \c STATE_STARTING state when its {@link #Start(uint32_t)
      * Start} method is active. A bundle must be in this state when the bundle's
      * {@link BundleActivator#Start(BundleContext)} is called.
-     * If the {@code BundleActivator#Start} method completes without exception, then
-     * the bundle has successfully started and moves to the {@code STATE_ACTIVE}
+     * If the \c BundleActivator#Start method completes without exception, then
+     * the bundle has successfully started and moves to the \c STATE_ACTIVE
      * state.
      *
      * If the bundle has a {@link Constants#ACTIVATION_LAZY lazy activation
      * policy}, then the bundle may remain in this state for some time until the
      * activation is triggered.
      *
-     * The value of {@code STATE_STARTING} is 0x00000008.
+     * The value of \c STATE_STARTING is 0x00000008.
      */
     STATE_STARTING = 0x00000008,
 
     /**
      * The bundle is in the process of stopping.
      *
-     * A bundle is in the {@code STATE_STOPPING} state when its {@link #Stop(uint32_t)
+     * A bundle is in the \c STATE_STOPPING state when its {@link #Stop(uint32_t)
      * Stop} method is active. A bundle is in this state when the bundle's
      * {@link BundleActivator#Stop(BundleContext)} method
-     * is called. When the {@code BundleActivator#Stop} method completes the bundle
-     * is stopped and moves to the {@code STATE_RESOLVED} state.
+     * is called. When the \c BundleActivator#Stop method completes the bundle
+     * is stopped and moves to the \c STATE_RESOLVED state.
      *
-     * The value of {@code STATE_STOPPING} is 0x00000010.
+     * The value of \c STATE_STOPPING is 0x00000010.
      */
     STATE_STOPPING = 0x00000010,
 
     /**
      * The bundle is now running.
      *
-     * A bundle is in the {@code STATE_ACTIVE} state when it has been successfully
+     * A bundle is in the \c STATE_ACTIVE state when it has been successfully
      * started and activated.
      *
-     * The value of {@code STATE_ACTIVE} is 0x00000020.
+     * The value of \c STATE_ACTIVE is 0x00000020.
      */
     STATE_ACTIVE = 0x00000020
   };
@@ -306,9 +306,9 @@ public:
    *
    * A bundle can be in only one state at any time.
    *
-   * @return An element of {@code STATE_UNINSTALLED},{@code STATE_INSTALLED},
-   *         {@code STATE_RESOLVED}, {@code STATE_STARTING}, {@code STATE_STOPPING},
-   *         {@code STATE_ACTIVE}.
+   * @return An element of \c STATE_UNINSTALLED,\c STATE_INSTALLED,
+   *         \c STATE_RESOLVED, \c STATE_STARTING, \c STATE_STOPPING,
+   *         \c STATE_ACTIVE.
    */
   State GetState() const;
 
@@ -496,8 +496,8 @@ public:
   /**
    * Starts this bundle.
    *
-   * If this bundle's state is {@code STATE_UNINSTALLED} then a
-   * {@code std::logic_error} is thrown.
+   * If this bundle's state is \c STATE_UNINSTALLED then a
+   * \c std::logic_error is thrown.
    *
    * The Framework sets this bundle's persistent autostart
    * setting to <em>Started with declared activation</em> if the
@@ -508,9 +508,9 @@ public:
    * -# If this bundle is in the process of being activated or deactivated
    *    then this method waits for activation or deactivation to complete
    *    before continuing. If this does not occur in a reasonable time, a
-   *    {@code std::runtime_error} is thrown to indicate this bundle was unable to
+   *    \c std::runtime_error is thrown to indicate this bundle was unable to
    *    be started.
-   * -# If this bundle's state is {@code STATE_ACTIVE} then this method returns
+   * -# If this bundle's state is \c STATE_ACTIVE then this method returns
    *    immediately.
    * -# If the {@link #START_TRANSIENT} option is not set then set this
    *    bundle's autostart setting to <em>Started with declared activation</em>
@@ -518,42 +518,42 @@ public:
    *    <em>Started with eager activation</em> if not set. When the Framework is
    *    restarted and this bundle's autostart setting is not <em>Stopped</em>,
    *    this bundle must be automatically started.
-   * -# If this bundle's state is not {@code STATE_RESOLVED}, an attempt is made to
+   * -# If this bundle's state is not \c STATE_RESOLVED, an attempt is made to
    *    resolve this bundle. If the Framework cannot resolve this bundle, a
-   *    {@code std::runtime_error} is thrown.
+   *    \c std::runtime_error is thrown.
    * -# If the {@link #START_ACTIVATION_POLICY} option is set and this
    *    bundle's declared activation policy is {@link Constants#ACTIVATION_LAZY
    *    lazy} then:
-   *    - If this bundle's state is {@code STATE_STARTING} then this method returns
+   *    - If this bundle's state is \c STATE_STARTING then this method returns
    *      immediately.
-   *    - This bundle's state is set to {@code STATE_STARTING}.
+   *    - This bundle's state is set to \c STATE_STARTING.
    *    - A bundle event of type {@link BundleEvent#BUNDLE_LAZY_ACTIVATION} is fired.
    *    - This method returns immediately and the remaining steps will be
    *      followed when this bundle's activation is later triggered.
-   * -# This bundle's state is set to {@code STATE_STARTING}.
+   * -# This bundle's state is set to \c STATE_STARTING.
    * -# A bundle event of type {@link BundleEvent#BUNDLE_STARTING} is fired.
    * -# If the bundle is contained in a shared library, the library is loaded
    *    and the {@link BundleActivator#Start(BundleContext)}
-   *    method of this bundle's {@code BundleActivator}, if one is specified, is
-   *    called. If the shared library could not be loaded, or the {@code BundleActivator}
+   *    method of this bundle's \c BundleActivator, if one is specified, is
+   *    called. If the shared library could not be loaded, or the \c BundleActivator
    *    is invalid or throws an exception then:
-   *    - This bundle's state is set to {@code STATE_STOPPING}.
+   *    - This bundle's state is set to \c STATE_STOPPING.
    *    - A bundle event of type {@link BundleEvent#BUNDLE_STOPPING} is fired.
    *    - %Any services registered by this bundle are unregistered.
    *    - %Any services used by this bundle are released.
    *    - %Any listeners registered by this bundle are removed.
-   *    - This bundle's state is set to {@code STATE_RESOLVED}.
+   *    - This bundle's state is set to \c STATE_RESOLVED.
    *    - A bundle event of type {@link BundleEvent#BUNDLE_STOPPED} is fired.
    *    - A \c std::runtime_error exception is then thrown.
-   * -# If this bundle's state is {@code STATE_UNINSTALLED}, because this bundle
-   *    was uninstalled while the {@code BundleActivator#Start} method was
-   *    running, a {@code std::logic_error} is thrown.
-   * -# This bundle's state is set to {@code STATE_ACTIVE}.
+   * -# If this bundle's state is \c STATE_UNINSTALLED, because this bundle
+   *    was uninstalled while the \c BundleActivator#Start method was
+   *    running, a \c std::logic_error is thrown.
+   * -# This bundle's state is set to \c STATE_ACTIVE.
    * -# A bundle event of type {@link BundleEvent#BUNDLE_STARTED} is fired.
    *
    *
    * <b>Preconditions</b>
-   * -# {@code GetState()} in { \c STATE_INSTALLED, \c STATE_RESOLVED }
+   * -# \c GetState() in { \c STATE_INSTALLED, \c STATE_RESOLVED }
    *    or { \c STATE_INSTALLED, \c STATE_RESOLVED, \c STATE_STARTING }
    *    if this bundle has a lazy activation policy.
    *
@@ -583,7 +583,7 @@ public:
   /**
    * Starts this bundle with no options.
    *
-   * This method performs the same function as calling {@code Start(0)}.
+   * This method performs the same function as calling \c Start(0).
    *
    * @throws std::runtime_error If this bundle could not be started.
    * @throws std::logic_error If this bundle has been uninstalled or this

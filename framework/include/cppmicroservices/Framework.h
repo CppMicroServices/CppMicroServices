@@ -89,7 +89,7 @@ public:
     void Init();
 
     /**
-     * Wait until this Framework has completely stopped. The {@code Stop}
+     * Wait until this Framework has completely stopped. The \c Stop
      * method on a Framework performs an asynchronous stop of the Framework
      * if it was built with threading support.
      *
@@ -104,7 +104,7 @@ public:
      *        Framework has completely stopped. A value of zero will wait
      *        indefinitely.
      * @return A Framework Event indicating the reason this method returned. The
-     *         following {@code FrameworkEvent} types may be returned by this
+     *         following \c FrameworkEvent types may be returned by this
      *         method.
      *         <ul>
      *         <li>{@link FrameworkEvent#FRAMEWORK_STOPPED FRAMEWORK_STOPPED} - This Framework has

@@ -353,7 +353,7 @@ public:
    *
    * @return The string representation of this bundle's location.
    */
-  virtual std::string GetLocation() const;
+  std::string GetLocation() const;
 
   /**
    * Returns the symbolic name of this bundle as specified by the
@@ -578,7 +578,7 @@ public:
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    */
-  virtual void Start(uint32_t options);
+  void Start(uint32_t options);
 
   /**
    * Starts this bundle with no options.
@@ -590,7 +590,7 @@ public:
    *         bundle tries to change its own state.
    * @see #Start(uint32_t)
    */
-  virtual void Start();
+  void Start();
 
   /**
    * Stops this bundle.
@@ -647,7 +647,7 @@ public:
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    */
-  virtual void Stop(uint32_t options);
+  void Stop(uint32_t options);
 
   /**
    * Stops this bundle with no options.
@@ -659,7 +659,7 @@ public:
    *         bundle tries to change its own state.
    * @see #Stop(uint32_t)
    */
-  virtual void Stop();
+  void Stop();
 
   /**
    * Uninstalls this bundle.
@@ -700,7 +700,7 @@ public:
    *         bundle tries to change its own state.
    * @see #Stop()
    */
-  virtual void Uninstall();
+  void Uninstall();
 
 protected:
 

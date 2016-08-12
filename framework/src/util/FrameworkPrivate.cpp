@@ -27,6 +27,7 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 
 #include "BundleContextPrivate.h"
+#include "BundleStorage.h"
 
 namespace cppmicroservices {
 
@@ -174,6 +175,80 @@ void FrameworkPrivate::Shutdown(bool restart)
     // Shutdown already inprogress
     break;
   }
+}
+
+void FrameworkPrivate::Start(uint32_t)
+{
+  std::vector<long> bundlesToStart;
+  {
+    auto l = Lock();
+    WaitOnOperation(*this, l, "Framework::Start", true);
+
+    switch (state.load())
+    {
+    case Bundle::STATE_INSTALLED:
+    case Bundle::STATE_RESOLVED:
+      DoInit();
+      // Fall through
+    case Bundle::STATE_STARTING:
+      operation = BundlePrivate::OP_ACTIVATING;
+      break;
+    case Bundle::STATE_ACTIVE:
+      return;
+    default:
+      std::stringstream ss;
+      ss << state;
+      throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
+    }
+    bundlesToStart = coreCtx->storage->GetStartOnLaunchBundles();
+  }
+
+  // Start bundles according to their autostart setting.
+  for (auto i : bundlesToStart)
+  {
+    auto b = coreCtx->bundleRegistry.GetBundle(i);
+    try
+    {
+      const int32_t autostartSetting = b->barchive->GetAutostartSetting();
+      // Launch must not change the autostart setting of a bundle
+      int option = Bundle::START_TRANSIENT;
+      if (Bundle::START_ACTIVATION_POLICY == autostartSetting)
+      {
+        // Transient start according to the bundles activation policy.
+        option |= Bundle::START_ACTIVATION_POLICY;
+      }
+      b->Start(option);
+    }
+    catch (...)
+    {
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(b->shared_from_this()), std::string(), std::current_exception()));
+    }
+  }
+
+  {
+    auto l = Lock(); US_UNUSED(l);
+    state = Bundle::STATE_ACTIVE;
+    operation = BundlePrivate::OP_IDLE;
+  }
+  NotifyAll();
+  coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, MakeBundle(shared_from_this()), std::string()));
+}
+
+void FrameworkPrivate::Stop(uint32_t)
+{
+  Shutdown(false);
+}
+
+void FrameworkPrivate::Uninstall()
+{
+  throw std::runtime_error("Cannot uninstall a system bundle.");
+}
+
+std::string FrameworkPrivate::GetLocation() const
+{
+  // OSGi Core release 6, section 4.6:
+  //  The system bundle GetLocation method returns the string: "System Bundle"
+  return std::string("System Bundle");
 }
 
 void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)

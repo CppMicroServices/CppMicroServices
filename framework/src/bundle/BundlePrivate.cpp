@@ -403,6 +403,129 @@ void BundlePrivate::FinalizeActivation(LockType& l)
   }
 }
 
+void BundlePrivate::Uninstall()
+{
+  if (!IsSharedLibrary(GetLocation()))
+  {
+    throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
+  }
+
+  {
+    auto l = coreCtx->resolver.Lock(); US_UNUSED(l);
+    //BundleGeneration current = current();
+
+    switch (static_cast<Bundle::State>(state.load()))
+    {
+    case Bundle::STATE_UNINSTALLED:
+      throw std::logic_error("Bundle is in BUNDLE_UNINSTALLED state");
+    case Bundle::STATE_STARTING: // Lazy start
+    case Bundle::STATE_ACTIVE:
+    case Bundle::STATE_STOPPING:
+    {
+      std::exception_ptr exception;
+      try
+      {
+        WaitOnOperation(coreCtx->resolver, l, "Bundle::Uninstall", true);
+        exception = (state & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) != 0 ? Stop0(l) : nullptr;
+      }
+      catch (...)
+      {
+        // Force to install
+        SetStateInstalled(false, l);
+        coreCtx->resolver.NotifyAll();
+        exception = std::current_exception();
+      }
+      operation = BundlePrivate::OP_UNINSTALLING;
+      if (exception != nullptr)
+      {
+        try { std::rethrow_exception(exception); }
+        catch (...)
+        {
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(shared_from_this()), std::string(), std::current_exception()));
+        }
+      }
+      // Fall through
+    }
+    case Bundle::STATE_RESOLVED:
+    case Bundle::STATE_INSTALLED:
+    {
+      coreCtx->bundleRegistry.Remove(location, id);
+      if (operation != BundlePrivate::OP_UNINSTALLING)
+      {
+        try
+        {
+          WaitOnOperation(coreCtx->resolver, l, "Bundle::Uninstall", true);
+          operation = BundlePrivate::OP_UNINSTALLING;
+        }
+        catch (...)
+        {
+          // Make sure that bundleContext is invalid
+          std::shared_ptr<BundleContextPrivate> ctx;
+          if ((ctx = bundleContext.Exchange(ctx)))
+          {
+            ctx->Invalidate();
+          }
+          operation = BundlePrivate::OP_UNINSTALLING;
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                               MakeBundle(shared_from_this()),
+                                                               std::string(),
+                                                               std::current_exception()));
+        }
+      }
+      if (state == Bundle::STATE_UNINSTALLED)
+      {
+        operation = BundlePrivate::OP_IDLE;
+        throw std::logic_error("Bundle is in BUNDLE_UNINSTALLED state");
+      }
+
+      state = Bundle::STATE_INSTALLED;
+      GetBundleThread()->BundleChanged(
+            BundleEvent(
+              BundleEvent::BUNDLE_UNRESOLVED,
+              MakeBundle(shared_from_this())
+              ),
+            l);
+      bactivator = nullptr;
+      state = Bundle::STATE_UNINSTALLED;
+      // Purge old archive
+      //BundleGeneration oldGen = current;
+      //generations.set(0, new BundleGeneration(oldGen));
+      //oldGen.purge(false);
+      Purge();
+      barchive->SetLastModified(Clock::now());
+      operation = BundlePrivate::OP_IDLE;
+      if (!bundleDir.empty())
+      {
+        try
+        {
+          if (fs::Exists(bundleDir)) fs::RemoveDirectoryRecursive(bundleDir);
+        }
+        catch (...)
+        {
+          coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                               MakeBundle(shared_from_this()),
+                                                               std::string(),
+                                                               std::current_exception()));
+        }
+        bundleDir.clear();
+      }
+      // id, location and headers survives after uninstall.
+
+      // There might be bundle threads that are running start or stop
+      // operation. This will wake them and give them an chance to terminate.
+      coreCtx->resolver.NotifyAll();
+      break;
+    }
+    }
+  }
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, MakeBundle(shared_from_this())));
+}
+
+std::string BundlePrivate::GetLocation() const
+{
+  return location;
+}
+
 void BundlePrivate::Start(uint32_t options)
 {
   {

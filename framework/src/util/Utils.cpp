@@ -476,6 +476,7 @@ US_Framework_EXPORT ::std::string detail::GetDemangledName(const ::std::type_inf
   return result;
 }
 
+US_MSVC_PUSH_DISABLE_WARNING(4715) // 'function' : not all control paths return a value
 std::string GetExceptionStr(const std::exception_ptr& exc)
 {
   if (!exc)
@@ -496,6 +497,7 @@ std::string GetExceptionStr(const std::exception_ptr& exc)
     return "unknown";
   }
 }
+US_MSVC_POP_WARNING
 
 std::string GetLastExceptionStr()
 {

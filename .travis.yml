@@ -24,10 +24,9 @@ env:
   #- BUILD_CONFIGURATION=3
 
 branches:
-  only:
-    - master
-    - development
-    - /^release-.*$/
+  except:
+    - coverity_scan
+    - gh_pages
 
 before_install:
   - bash install_cmake.sh

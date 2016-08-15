@@ -35,10 +35,10 @@ namespace cppmicroservices {
 
 namespace detail {
 
-class LogSink : public MultiThreaded<>, public std::enable_shared_from_this<LogSink> 
+class LogSink : public MultiThreaded<>, public std::enable_shared_from_this<LogSink>
 {
 public:
-  explicit LogSink(std::ostream* sink, bool enable = false) : _enable(enable), _sink(sink) 
+  explicit LogSink(std::ostream* sink, bool enable = false) : _enable(enable), _sink(sink)
   {
     if (_sink == nullptr) _enable = false;
   }
@@ -66,12 +66,12 @@ struct LogMsg {
 
   LogMsg(LogSink& sink, const char* file, int ln, const char* func)
     : enabled(false), buffer(), _sink(sink)
-  { 
-	enabled = _sink.Enabled();
-	if (enabled)
-	{
-	  buffer << "In " << func << " at " << file << ":" << ln << " : ";
-	}
+  {
+    enabled = _sink.Enabled();
+    if (enabled)
+    {
+      buffer << "In " << func << " at " << file << ":" << ln << " : ";
+    }
   }
 
   LogMsg(const LogMsg& other)
@@ -81,9 +81,9 @@ struct LogMsg {
   ~LogMsg() { if(enabled) _sink.Log(buffer.str()); }
 
   template<typename T>
-  LogMsg& operator<<(const T& t)
+  LogMsg& operator<<(T&& t)
   {
-    if (enabled) buffer << t;
+    if (enabled) buffer << std::forward<T>(t);
     return *this;
   }
 

@@ -1,4 +1,7 @@
-[![Build Status](https://secure.travis-ci.org/CppMicroServices/CppMicroServices.png)](http://travis-ci.org/CppMicroServices/CppMicroServices)
+Branch | Linux (Ubuntu 14.04) | Windows (VS 2013 & 2015)
+-------|----------------------|-------------------------
+master | [![Linux Build Status](https://secure.travis-ci.org/CppMicroServices/CppMicroServices.png)](http://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ieoylxs37tjui4sc?svg=true)](https://ci.appveyor.com/project/saschazelzer/cppmicroservices)
+development | [![Linux Build Status (development)](https://travis-ci.org/CppMicroServices/CppMicroServices.svg?branch=development)](https://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status (development)](https://ci.appveyor.com/api/projects/status/ieoylxs37tjui4sc/branch/development?svg=true)](https://ci.appveyor.com/project/saschazelzer/cppmicroservices/branch/development)
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/1329/badge.svg)](https://scan.coverity.com/projects/1329)
 

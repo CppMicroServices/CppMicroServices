@@ -81,9 +81,9 @@ struct LogMsg {
   ~LogMsg() { if(enabled) _sink.Log(buffer.str()); }
 
   template<typename T>
-  LogMsg& operator<<(const T& t)
+  LogMsg& operator<<(T&& t)
   {
-    if (enabled) buffer << t;
+    if (enabled) buffer << std::forward<T>(t);
     return *this;
   }
 

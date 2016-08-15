@@ -1,4 +1,4 @@
-Branch | Linux (Ubuntu 14.04) | Windows (VS 2013 & 2015)
+Branch | Linux (Ubuntu 12.04) | Windows (VS 2013 & 2015)
 -------|----------------------|-------------------------
 master | [![Linux Build Status](https://secure.travis-ci.org/CppMicroServices/CppMicroServices.png)](http://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ieoylxs37tjui4sc?svg=true)](https://ci.appveyor.com/project/saschazelzer/cppmicroservices)
 development | [![Linux Build Status (development)](https://travis-ci.org/CppMicroServices/CppMicroServices.svg?branch=development)](https://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status (development)](https://ci.appveyor.com/api/projects/status/ieoylxs37tjui4sc/branch/development?svg=true)](https://ci.appveyor.com/project/saschazelzer/cppmicroservices/branch/development)
@@ -12,7 +12,7 @@ Introduction
 ------------
 
 The C++ Micro Services library provides a dynamic service registry and bundle system,
-partially based the OSGi Core Release 5 specifications. It enables developers to create
+largely based the OSGi Core Release 5 specifications. It enables developers to create
 a service oriented and dynamic software stack.
 
 Proper usage of the C++ Micro Services library leads to
@@ -44,15 +44,12 @@ Minimum required compiler versions:
 
 Below is a list of tested compiler/OS combinations:
 
-  - GCC 4.6.3 (Ubuntu 14.10)
-  - GCC 4.9.2 (Ubuntu 15.04)
-  - GCC 5.1.1 (Fedora 22)
-  - Clang 3.6.0 (Ubuntu 15.04)
-  - Visual Studio 2013 Update 5 (Windows 8.1)
-  - Visual Studio 2015 (Windows 8.1)
-
-Note: MacOS was supported in the past but cannot be tested currently due to the lack
-of Apple hardware and software.
+  - GCC 4.6.3 (Ubuntu 12.04) via TravisCI
+  - GCC 6.1.1 (Fedora 24)
+  - Clang 3.8.0 (Fedora 24)
+  - Visual Studio 2013 via Appveyor
+  - Visual Studio 2015 via Appveyor
+  - OS X 10.10
 
 Legal
 -----
@@ -67,8 +64,9 @@ This project is licensed under the [Apache License v2.0][apache_license].
 Quick Start
 -----------
 
-Essentially, the C++ Micro Services library provides you with a powerful dynamic service registry.
-Each shared or static library has an associated `BundleContext` object, through which the service
+Essentially, the C++ Micro Services library provides you with a powerful dynamic service registry,
+on top of a managed lifecycle for so-called *bundles* that are contained in shared or static libraries.
+Each bundle within a library has an associated `BundleContext` object, through which the service
 registry is accessed.
 
 To query the registry for a service object implementing one or more specific interfaces, the code
@@ -76,16 +74,16 @@ would look like this:
 
 ```cpp
 #include "cppmicroservices/BundleContext.h"
-#include "someInterface.h"
+#include "SomeInterface.h"
 
 using namespace cppmicroservices;
 
-void UseService(BundleContext* context)
+void UseService(BundleContext context)
 {
-  ServiceReference serviceRef = context->GetServiceReference<SomeInterface>();
+  auto serviceRef = context.GetServiceReference<SomeInterface>();
   if (serviceRef)
   {
-    SomeInterface* service = context->GetService<SomeInterface>(serviceRef);
+    auto service = context.GetService(serviceRef);
     if (service) { /* do something */ }
   }
 }
@@ -95,13 +93,13 @@ Registering a service object against a certain interface looks like this:
 
 ```cpp
 #include "cppmicroservices/BundleContext.h"
-#include "someInterface.h"
+#include "SomeInterface.h"
 
 using namespace cppmicroservices;
 
-void RegisterSomeService(BundleContext* context, SomeInterface* service)
+void RegisterSomeService(BundleContext context, const std::shared_ptr<SomeInterface>& service)
 {
-  context->RegisterService<SomeInterface>(service);
+  context.RegisterService<SomeInterface>(service);
 }
 ```
 

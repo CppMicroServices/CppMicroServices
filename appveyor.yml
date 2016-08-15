@@ -18,7 +18,9 @@ platform:
 init:
 - cmd: >-
     cmake -version
+
     git config --global core.autocrlf true
+
 environment:
   matrix:
   - US_SHARED: 0
@@ -28,9 +30,13 @@ environment:
 before_build:
 - cmd: >-
     if "%platform%"=="Win32" if "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 12 2013" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
+
     if "%platform%"=="x64" if "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 12 2013 Win64" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
+
     if "%platform%"=="Win32" if NOT "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 14 2015" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
+
     if "%platform%"=="x64" if NOT "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 14 2015 Win64" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
+
 build:
   project: C:/projects/cppmicroservices/build/CppMicroServices.sln
   parallel: true
@@ -38,4 +44,6 @@ build:
 test_script:
 - cmd: >-
     cd %APPVEYOR_BUILD_FOLDER%/build
+
     ctest -j2 -C %CONFIGURATION% --output-on-failure
+

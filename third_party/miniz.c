@@ -190,10 +190,6 @@
 // functions (such as tdefl_compress_mem_to_heap() and tinfl_decompress_mem_to_heap()) won't work.
 //#define MINIZ_NO_MALLOC
 
-#ifndef MINIZ_NO_STDIO
-  #include <stdio.h>
-#endif
-
 #if defined(__TINYC__) && (defined(__linux) || defined(__linux__))
   // TODO: Work around "error: include file 'sys\utime.h' when compiling with tcc on Linux
   #define MINIZ_NO_TIME
@@ -633,7 +629,6 @@ mz_bool mz_zip_writer_init_heap(mz_zip_archive *pZip, size_t size_to_reserve_at_
 
 #ifndef MINIZ_NO_STDIO
 mz_bool mz_zip_writer_init_file(mz_zip_archive *pZip, const char *pFilename, mz_uint64 size_to_reserve_at_beginning);
-mz_bool mz_zip_writer_init_stream(mz_zip_archive *pZip, FILE* pFile, mz_uint64 size_to_reserve_at_beginning);
 #endif
 
 // Converts a ZIP archive reader object into a writer object, to allow efficient in-place file appends to occur on an existing archive.
@@ -3179,6 +3174,7 @@ static mz_bool mz_zip_reader_read_central_dir(mz_zip_archive *pZip, mz_uint32 fl
   const mz_uint8 *p;
   mz_uint32 buf_u32[4096 / sizeof(mz_uint32)]; mz_uint8 *pBuf = (mz_uint8 *)buf_u32;
   mz_bool sort_central_dir = ((flags & MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY) == 0);
+  mz_bool zip_signature_found = 0;
   // Basic sanity checks - reject files which are too small, and check the first 4 bytes of the file to make sure a local header is there.
   if (pZip->m_archive_size < MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE)
     return MZ_FALSE;
@@ -3190,23 +3186,30 @@ static mz_bool mz_zip_reader_read_central_dir(mz_zip_archive *pZip, mz_uint32 fl
     if (pZip->m_pRead(pZip->m_pIO_opaque, cur_file_ofs, pBuf, n) != (mz_uint)n)
       return MZ_FALSE;
     for (i = n - 4; i >= 0; --i)
+    {
       if (MZ_READ_LE32(pBuf + i) == MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIG)
+      {
+        // Read and verify the end of central directory record.
+        if (pZip->m_pRead(pZip->m_pIO_opaque, cur_file_ofs + i, pBuf, MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE)
+          continue;
+        if ((MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_SIG_OFS) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIG) ||
+        ((pZip->m_total_files = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_TOTAL_ENTRIES_OFS)) != MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_NUM_ENTRIES_ON_DISK_OFS)))
+          continue;
+        zip_signature_found = 1;
         break;
-    if (i >= 0)
+      }
+    }
+
+    if (zip_signature_found)
     {
       cur_file_ofs += i;
       break;
     }
-    if ((!cur_file_ofs) || ((pZip->m_archive_size - cur_file_ofs) >= (0xFFFF + MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE)))
+    if ((!cur_file_ofs) || (cur_file_ofs < MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE))
       return MZ_FALSE;
-    cur_file_ofs = MZ_MAX(cur_file_ofs - (sizeof(buf_u32) - 3), 0);
+
+    cur_file_ofs = MZ_MAX(cur_file_ofs - (mz_int64)(sizeof(buf_u32) - 3), 0);
   }
-  // Read and verify the end of central directory record.
-  if (pZip->m_pRead(pZip->m_pIO_opaque, cur_file_ofs, pBuf, MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE)
-    return MZ_FALSE;
-  if ((MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_SIG_OFS) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIG) ||
-      ((pZip->m_total_files = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_TOTAL_ENTRIES_OFS)) != MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_NUM_ENTRIES_ON_DISK_OFS)))
-    return MZ_FALSE;
 
   num_this_disk = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_NUM_THIS_DISK_OFS);
   cdir_disk_index = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_NUM_DISK_CDIR_OFS);
@@ -3222,9 +3225,7 @@ static mz_bool mz_zip_reader_read_central_dir(mz_zip_archive *pZip, mz_uint32 fl
 
   pZip->m_central_directory_file_ofs = cdir_ofs;
 
-  pZip->m_archive_file_ofs = pZip->m_archive_size -
-                             (MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_CDIR_OFS_OFS) + cdir_size +
-                              MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE + MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_COMMENT_SIZE_OFS));
+  pZip->m_archive_file_ofs = cdir_ofs - MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_CDIR_OFS_OFS);
   if (pZip->m_archive_file_ofs > pZip->m_archive_size)
     return MZ_FALSE;
 
@@ -4066,23 +4067,15 @@ static size_t mz_zip_file_write_func(void *pOpaque, mz_uint64 file_ofs, const vo
 mz_bool mz_zip_writer_init_file(mz_zip_archive *pZip, const char *pFilename, mz_uint64 size_to_reserve_at_beginning)
 {
   MZ_FILE *pFile;
-  if (NULL == (pFile = MZ_FOPEN(pFilename, "wb")))
-  {
-    return MZ_FALSE;
-  }
-  return mz_zip_writer_init_stream(pZip, pFile, size_to_reserve_at_beginning);
-}
-
-mz_bool mz_zip_writer_init_stream(mz_zip_archive *pZip, FILE *pFile, mz_uint64 size_to_reserve_at_beginning)
-{
-  if (NULL == pFile)
-  {
-    return MZ_FALSE;
-  }
   pZip->m_pWrite = mz_zip_file_write_func;
   pZip->m_pIO_opaque = pZip;
   if (!mz_zip_writer_init(pZip, size_to_reserve_at_beginning))
     return MZ_FALSE;
+  if (NULL == (pFile = MZ_FOPEN(pFilename, "wb")))
+  {
+    mz_zip_writer_end(pZip);
+    return MZ_FALSE;
+  }
   pZip->m_pState->m_pFile = pFile;
   if (size_to_reserve_at_beginning)
   {

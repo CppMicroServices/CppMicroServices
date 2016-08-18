@@ -57,7 +57,7 @@ function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
   # pre-processor token because CHECK_CXX_COMPILER_FLAG adds it as a definition to the compiler
   # arguments. An invalid token triggers compiler warnings, which in case of the "-Werror" flag
   # leads to false-negative checks.
-  string(REGEX REPLACE "[/-]" "_" suffix ${FLAG_TO_TEST})
+  string(REGEX REPLACE "[=/-]" "_" suffix ${FLAG_TO_TEST})
   string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${suffix})
   CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST} HAS_CXX_FLAG_${suffix})
 

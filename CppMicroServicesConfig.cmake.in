@@ -73,11 +73,17 @@
 
 @PACKAGE_INIT@
 
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION @US_CMAKE_MINIMUM_REQUIRED_VERSION@)
+set(US_ENABLE_THREADING_SUPPORT @US_ENABLE_THREADING_SUPPORT@)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+
 list(APPEND CMAKE_MODULE_PATH "@PACKAGE_CONFIG_CMAKE_DIR@")
 
 set(US_RCC_EXECUTABLE_NAME @US_RCC_EXECUTABLE_NAME@)
-set(US_MODULE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/usModuleInit.cpp")
-set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "@PACKAGE_CONFIG_CMAKE_DIR@/usCMakeResourceDependencies.cpp")
+set(US_BUNDLE_INIT_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/BundleInit.cpp")
+set(US_RESOURCE_RC_TEMPLATE "@PACKAGE_CONFIG_CMAKE_DIR@/cppmicroservices_resources.rc.in")
+set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "@PACKAGE_CONFIG_CMAKE_DIR@/CMakeResourceDependencies.cpp")
 
 # The CppMicroServices resource compiler
 find_program(US_RCC_EXECUTABLE ${US_RCC_EXECUTABLE_NAME}
@@ -87,14 +93,23 @@ mark_as_advanced(US_RCC_EXECUTABLE)
 
 # Include helper macros
 include(CMakeParseArguments)
-if(CMAKE_VERSION VERSION_LESS "2.8.8")
-  # We need the HANDLE_COMPONENTS argument
-  include("@PACKAGE_CONFIG_CMAKE_DIR@/FindPackageHandleStandardArgs.cmake")
-elseif(NOT COMMAND find_package_handle_standard_args)
-  include(FindPackageHandleStandardArgs)
-endif()
-include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateModuleInit.cmake")
+include(FindPackageHandleStandardArgs)
+
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateBundleInit.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionAddResources.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckCompilerFlags.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckResourceLinking.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGetResourceSource.cmake")
+
+usFunctionCheckResourceLinking()
+
+# Required packages
+
+if(US_ENABLE_THREADING_SUPPORT AND NOT CMAKE_THREAD_LIBS_INIT)
+  set(THREADS_PREFER_PTHREAD_FLAG 1)
+  find_package(Threads REQUIRED)
+endif()
 
 # Global include directory
 set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")
@@ -102,7 +117,7 @@ set(US_INCLUDE_DIRS "@PACKAGE_CONFIG_INCLUDE_DIR@")
 # Clear variables
 set(US_LIBRARIES )
 set(US_RUNTIME_LIBRARY_DIRS )
-set(US_CXX_FLAGS )
+set(US_CXX_FLAGS "@US_CXX11_FLAGS@")
 set(US_CXX_FLAGS_RELEASE )
 set(US_CXX_FLAGS_DEBUG )
 set(US_C_FLAGS )
@@ -116,22 +131,25 @@ set(US_COMPILE_DEFINITIONS_RELEASE )
 set(US_COMPILE_DEFINITIONS_DEBUG )
 
 # Components support
-set(US_MODULES Core) # ConfigAdmin EventAdmin ...
+set(US_BUNDLES Framework HttpService WebConsole ShellService) # ConfigAdmin EventAdmin ...
 
-set(US_Core_MODULE_DEPS )
+set(US_Framework_BUNDLE_DEPS )
+set(US_HttpService_BUNDLE_DEPS Framework)
+set(US_WebConsole_BUNDLE_DEPS ${US_HttpService_BUNDLE_DEPS} HttpService)
+set(US_ShellService_BUNDLE_DEPS Framework)
 
 if(NOT @PROJECT_NAME@_FIND_COMPONENTS)
-  set(@PROJECT_NAME@_FIND_COMPONENTS Core)
+  set(@PROJECT_NAME@_FIND_COMPONENTS Framework)
 endif()
 
-set(US_MODULES_NEEDED )
+set(US_BUNDLES_NEEDED )
 foreach(component ${@PROJECT_NAME@_FIND_COMPONENTS})
-  list(APPEND US_MODULES_NEEDED ${US_${component}_MODULE_DEPS} ${component})
+  list(APPEND US_BUNDLES_NEEDED ${US_${component}_BUNDLE_DEPS} ${component})
 endforeach()
-list(REMOVE_DUPLICATES US_MODULES_NEEDED)
+list(REMOVE_DUPLICATES US_BUNDLES_NEEDED)
 
 set(@PROJECT_NAME@_FOUND TRUE)
-foreach(component ${US_MODULES_NEEDED})
+foreach(component ${US_BUNDLES_NEEDED})
   if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/us${component}Config.cmake")
     set(US_${component}_FOUND 0)
     set(CppMicroServices_${component}_FOUND 0)

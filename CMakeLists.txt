@@ -5,9 +5,88 @@ set(${PROJECT_NAME}_MINOR_VERSION 99)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(VERSION 2.8)
-cmake_policy(SET CMP0017 NEW)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 2.8.12)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+
+list(APPEND policies_new
+  CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
+  CMP0054 # Only interpret if() arguments as variables or keywords when unquoted
+  )
+foreach(policy ${policies_new})
+  if(POLICY ${policy})
+    cmake_policy(SET ${policy} NEW)
+  endif()
+endforeach()
+
+#-----------------------------------------------------------------------------
+# Check minimum required compiler versions
+#------------------------------------------------------------------------------
+
+# We make use of the following C++11 language and library features:
+#
+# Language feature                 GCC   Clang   AppleClang   VisualStudio
+# ------------------------------------------------------------------------
+# Rvalue references                4.3   2.9     ??           2012
+# Variadic templates               4.3   2.9     ??           2013*
+# Initializer lists                4.4   3.1     ??           2013
+# Static assertions                4.3   2.9     ??           2010
+# auto                             4.4   2.9     ??           2010
+# Lambdas                          4.5   3.1     ??           2012
+# decltype                         4.3   2.9     ??           2012
+# Right angle brackets             4.3   2.9     ??           2010
+# Null pointer constant            4.6   3.0     ??           2010
+# Explicit conversion operators    4.5   3.0     ??           2013
+# Defaulted functions              4.4   3.0     ??           2013*
+# Deleted functions                4.4   2.9     ??           2013*
+# Range-based for                  4.6   3.0     ??           2012
+# Atomic operations                4.4   3.1     ??           2012
+#
+# Library features used
+# ---------------------
+# function
+# unique_ptr
+# shared_ptr
+# unordered_map
+# unordered_set
+# atomic
+# mutex
+# wait_condition
+# exception_ptr
+
+set(US_COMPILER_GNU_MINIMUM_VERSION           4.6          )
+set(US_COMPILER_CLANG_MINIMUM_VERSION         3.1          )
+set(US_COMPILER_APPLE_CLANG_MINIMUM_VERSION   5.0          ) # ??
+set(US_COMPILER_MSVC_MINIMUM_VERSION          18.00.31101 )
+
+set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT "Visual Studio 2013 Update 4")
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_GNU_MINIMUM_VERSION})
+    message(FATAL_ERROR "GCC version ${US_COMPILER_GNU_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
+  endif()
+  set(US_COMPILER_GNU 1)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_CLANG_MINIMUM_VERSION})
+    message(FATAL_ERROR "Clang version ${US_COMPILER_CLANG_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
+  endif()
+  set(US_COMPILER_CLANG 1)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_APPLE_CLANG_MINIMUM_VERSION})
+    message(FATAL_ERROR "Apple Clang version ${US_COMPILER_APPLE_CLANG_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
+  endif()
+  set(US_COMPILER_APPLE_CLANG 1)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_MSVC_MINIMUM_VERSION})
+    message(FATAL_ERROR "${US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT} or newer required (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION} or higher, you are using version ${CMAKE_CXX_COMPILER_VERSION})")
+  endif()
+  set(US_COMPILER_MSVC 1)
+else()
+  message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
+endif()
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -28,10 +107,12 @@ include(CMakeParseArguments)
 include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
 include(usFunctionAddResources)
+include(usFunctionEmbedResources)
+include(usFunctionGetResourceSource)
+include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
-include(usFunctionGetGccVersion)
-include(usFunctionGenerateModuleInit)
-include(usMacroCreateModule)
+include(usFunctionGenerateBundleInit)
+include(usMacroCreateBundle)
 
 if(US_BUILD_TESTING)
   include(usFunctionCompileSnippets)
@@ -108,16 +189,11 @@ elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
 
-us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
-us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
-us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
+us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
+us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
-
-if(US_BUILD_TESTING)
-  enable_testing()
-endif()
 
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
@@ -127,10 +203,10 @@ if(WIN32 AND NOT CYGWIN)
   set(default_auxiliary_install_dir share/)
 else()
   set(default_runtime_install_dir bin/)
-  set(default_library_install_dir lib/${PROJECT_NAME})
-  set(default_archive_install_dir lib/${PROJECT_NAME})
-  set(default_header_install_dir include/${PROJECT_NAME})
-  set(default_auxiliary_install_dir share/${PROJECT_NAME})
+  set(default_library_install_dir lib/)
+  set(default_archive_install_dir lib/)
+  set(default_header_install_dir include/)
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER})
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
@@ -140,12 +216,48 @@ us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative i
 us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
-us_cache_var(US_NAMESPACE "us" STRING "The namespace for the C++ Micro Services symbols")
-
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 
-set(US_MODULE_INIT_TEMPLATE "${US_CMAKE_DIR}/usModuleInit.cpp" CACHE INTERNAL "The module initialization template code")
-set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/usCMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
+set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
+set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+
+#-----------------------------------------------------------------------------
+# Testing configuration
+#-----------------------------------------------------------------------------
+
+function(us_add_tests test_driver)
+  foreach(test ${ARGN})
+    add_test(NAME ${test} COMMAND ${test_driver} ${test}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_property(TEST ${test} PROPERTY LABELS regular)
+  if(US_MEMCHECK_COMMAND)
+    add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_property(TEST memcheck_${test} PROPERTY LABELS valgrind memcheck)
+    if(US_ENABLE_HELGRIND)
+      # By default, these tests are not active until the concurrent bundle
+      # start / stop mechanism has been properly implemented (GitHub Issue #25)
+      add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
+    endif()
+  endif()
+  endforeach()
+endfunction()
+
+# Valgrind rc file
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/valgrindrc
+  ${CMAKE_BINARY_DIR}/.valgrindrc
+  @ONLY
+  )
+
+if(US_BUILD_TESTING)
+  enable_testing()
+  find_program(US_MEMCHECK_COMMAND valgrind)
+  mark_as_advanced(US_MEMCHECK_COMMAND)
+endif()
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -163,73 +275,104 @@ if(US_IS_EMBEDDED)
   set(CMAKE_LINK_FLAGS_DEBUG)
 endif()
 
-# Set C++ compiler flags
-if(NOT MSVC)
+set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
+set(US_CXX11_FLAGS )
+set(US_CXX11_LINK_FLAGS )
+set(US_CXX_TSAN_FLAGS )
+set(US_TSAN_LINK_FLAGS )
+
+if(MSVC)
+  set(disabled_warnings
+    4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+  )
+  foreach(wd ${disabled_warnings})
+    set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")
+  endforeach()
+  set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
+else()
+  # C++11 support
+  set(US_CXX11_FLAGS -std=c++11)
+  usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
+  if(_have_cxx11)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+  else()
+    set(US_CXX11_FLAGS -std=c++0x)
+    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
+    if(_have_cxx0x)
+      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+    else()
+      set(US_CXX11_FLAGS )
+    endif()
+  endif()
+
+  if(US_COMPILER_APPLE_CLANG)
+    set(US_CXX11_FLAGS "${US_CXX11_FLAGS} -stdlib=libc++")
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
+  endif()
+
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option)
+                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
+                    -fstack-protector-all)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
-endif()
 
-set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
-usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
-if(_have_visibility)
-  set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-
-  usFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-  if(${GCC_VERSION} VERSION_LESS "4.0.0")
-    message(FATAL_ERROR "gcc version ${GCC_VERSION} not supported. Please use gcc >= 4.")
+  if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+    # The check does not work reliably for gcc
+    usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
   endif()
 
-  # With older versions of gcc the flag -fstack-protector-all requires an extra dependency to libssp.so.
-  # If the gcc version is lower than 4.4.0 and the build type is Release let's not include the flag.
-  if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    usFunctionCheckCompilerFlags("-fstack-protector-all" US_CXX_FLAGS)
-  endif()
-
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
-    # we need to define a Windows version
-    set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
+  # Issue #56: Workaround a clang compiler issue (https://llvm.org/bugs/show_bug.cgi?id=26749).
+  # The typeinfo symbols do not have reliable symbol visibility. Instead of exporting only
+  # symbols and associated typeinfo symbols which have explicit "default" visibility,
+  # export all typeinfo symbols by default and maintain hidden symbol visibility for all other
+  # symbols (unless explicitly overriden). See
+  # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
+  # to understand what -fvisibility-ms-compat does.
+  if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
+    usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
-    # Enable visibility support (only for gcc >= 4.5)
-    # We only support hidden visibility with gcc for now.
-    #
-    # Clang has troubles with correctly marking template declarations and explicit template
-    # instantiations as exported across shared library boundaries. Specifically, comparing
-    # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
-    # which could be related to the default visibility of STL types declared in libstdc++ and/or libc++
-    # but also to using RTLD_LOCAL or RTLD_GLOBAL when loading shared libraries via dlopen().
-    #
-    # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
-    # and http://llvm.org/bugs/show_bug.cgi?id=10113
-    #
-    if(_have_visibility AND NOT ${GCC_VERSION} VERSION_LESS "4.5")
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
-    else()
-      set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
-    endif()
+    usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
+  endif()
+  if(_have_visibility)
+    set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
   if(_fortify_source_flag)
-    set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -D_FORTIFY_SOURCE=2")
+    set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2")
+  endif()
+
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=thread")
+  usFunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
+    message(WARNING "TSAN requested, but compiler does not recognize it")
   endif()
 endif()
 
-if(MSVC)
-  set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
+if(MINGW)
+  # suppress warnings about auto imported symbols
+  set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
+  # we need to define a Windows version
+  set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
+endif()
+
+if(US_ENABLE_THREADING_SUPPORT)
+  set(THREADS_PREFER_PTHREAD_FLAG 1)
+  find_package(Threads REQUIRED)
+
+  if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
+  endif()
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
-set(CMAKE_C_FLAGS_REALEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 
 #-----------------------------------------------------------------------------
 # US Link Flags
@@ -246,107 +389,57 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   endforeach()
 endif()
 
+if(NOT MSVC)
+  if (US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
+    set(US_TSAN_LINK_FLAGS "-fsanitize=thread")
+  endif()
+endif()
+
+if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
+  set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
+endif()
+
+usFunctionCheckResourceLinking()
+
 #-----------------------------------------------------------------------------
 # US Header Checks
 #-----------------------------------------------------------------------------
 
 include(CheckIncludeFileCXX)
-include(CheckCXXSourceCompiles)
 
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
-CHECK_INCLUDE_FILE_CXX(stdint.h US_HAVE_STDINT_H)
-CHECK_INCLUDE_FILE_CXX(tr1/unordered_map US_HAVE_TR1_UNORDERED_MAP_H)
-CHECK_INCLUDE_FILE_CXX(tr1/unordered_set US_HAVE_TR1_UNORDERED_SET_H)
-CHECK_INCLUDE_FILE_CXX(tr1/functional US_HAVE_TR1_FUNCTIONAL_H)
-CHECK_INCLUDE_FILE_CXX(unordered_map US_HAVE_UNORDERED_MAP_H)
-CHECK_INCLUDE_FILE_CXX(unordered_set US_HAVE_UNORDERED_SET_H)
-CHECK_INCLUDE_FILE_CXX(functional US_HAVE_FUNCTIONAL_H)
 
-if(US_HAVE_UNORDERED_MAP_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_TR1_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_STD_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
-                            US_HAVE_TR1_HASH)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nint main() { std::hash<int>(); return 0; }"
-                            US_HAVE_STD_HASH)
-  if(US_HAVE_STD_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_CLASS)
-  elseif(US_HAVE_TR1_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_CLASS)
-  endif()
-elseif(US_HAVE_TR1_UNORDERED_MAP_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_TR1_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::unordered_map<int,int> m; return 0; }"
-                            US_HAVE_STD_UNORDERED_MAP)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::tr1::hash<int>(); return 0; }"
-                            US_HAVE_TR1_HASH)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nint main() { std::hash<int>(); return 0; }"
-                            US_HAVE_STD_HASH)
-  if(US_HAVE_STD_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_STD_HASH_CLASS)
-  elseif(US_HAVE_TR1_HASH)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend struct std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_STRUCT)
-    CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_map>\nstruct A { friend class std::tr1::hash<int>; }; int main() { return 0; }"
-                              US_HAVE_TR1_HASH_CLASS)
-  endif()
-else()
-  message(SEND_ERROR "The header file \"unordered_map\" is not available.")
-endif()
-if(NOT (US_HAVE_TR1_UNORDERED_MAP OR US_HAVE_STD_UNORDERED_MAP))
-  message(SEND_ERROR "The \"unordered_map\" type is not available.")
-endif()
+#-----------------------------------------------------------------------------
+# C++ library support
+#-----------------------------------------------------------------------------
 
-if(US_HAVE_UNORDERED_SET_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
-                            US_HAVE_TR1_UNORDERED_SET)
-  CHECK_CXX_SOURCE_COMPILES("#include <unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
-                            US_HAVE_STD_UNORDERED_SET)
-elseif(US_HAVE_TR1_UNORDERED_SET_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::tr1::unordered_set<int> s; return 0; }"
-                            US_HAVE_TR1_UNORDERED_SET)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/unordered_set>\nint main() { std::unordered_set<int> s; return 0; }"
-                            US_HAVE_STD_UNORDERED_SET)
-else()
-  message(SEND_ERROR "The header file \"unordered_set\" is not available.")
-endif()
-if(NOT (US_HAVE_TR1_UNORDERED_SET OR US_HAVE_STD_UNORDERED_SET))
-  message(SEND_ERROR "The \"unordered_set\" type is not available.")
-endif()
+# c++11 regular expressions are used in the unit tests.
+# Currently the default C++ library for gcc < 4.9 doesn't
+# fully support c++11 regex.
+# Generelize the detection of regex and make its availability
+# conditional of wether the compiler's C++ library supports it
+# or not.
+# This can be removed once the minimum supported gcc version is 4.9
+CHECK_CXX_SOURCE_COMPILES(
+"
+#include <regex>
+int main() {
+auto regex_iter_end = std::sregex_iterator();
+(void)regex_iter_end;
+return 0;
+}
+" US_HAVE_REGEX)
 
-if(NOT (US_HAVE_FUNCTIONAL_H OR US_HAVE_TR1_FUNCTIONAL_H))
-  message(SEND_ERROR "The header file \"functional\" is not available.")
-endif()
+#-----------------------------------------------------------------------------
+# System Information
+#-----------------------------------------------------------------------------
 
-if(US_HAVE_FUNCTIONAL_H)
-  CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
-                            US_HAVE_TR1_FUNCTION)
-  CHECK_CXX_SOURCE_COMPILES("#include <functional>\nint main() { std::function<int(void)> f(main); return 0; }"
-                            US_HAVE_STD_FUNCTION)
-endif()
-if((NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION)) AND US_HAVE_TR1_FUNCTIONAL_H)
-  unset(US_HAVE_TR1_FUNCTION CACHE)
-  unset(US_HAVE_STD_FUNCTION CACHE)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::tr1::function<int(void)> f(main); return 0; }"
-                            US_HAVE_TR1_FUNCTION)
-  CHECK_CXX_SOURCE_COMPILES("#include <tr1/functional>\nint main() { std::function<int(void)> f(main); return 0; }"
-                            US_HAVE_STD_FUNCTION)
-endif()
+include(TestBigEndian)
 
-if(NOT (US_HAVE_STD_FUNCTION OR US_HAVE_TR1_FUNCTION))
-  message(SEND_ERROR "The \"function\" type is not available.")
+test_big_endian(US_BIG_ENDIAN)
+
+if(NOT US_BIG_ENDIAN)
+  set(US_LITTLE_ENDIAN 1)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -370,14 +463,19 @@ configure_file(
   @ONLY
   )
 
-set(us_global_config_h_file "${PROJECT_BINARY_DIR}/include/usGlobalConfig.h")
-configure_file(${US_CMAKE_DIR}/usGlobalConfig.h.in ${us_global_config_h_file})
+set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/GlobalConfig.h")
+configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
 include_directories(${US_INCLUDE_DIRS})
 
-add_subdirectory(tools)
+add_subdirectory(tools/rc)
 
-add_subdirectory(core)
+add_subdirectory(framework)
+add_subdirectory(httpservice)
+add_subdirectory(webconsole)
+add_subdirectory(shellservice)
+
+add_subdirectory(tools/shell)
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -389,42 +487,6 @@ add_subdirectory(doc)
 # Last configuration and install steps
 #-----------------------------------------------------------------------------
 
-
-export(TARGETS ${US_RCC_EXECUTABLE_NAME}
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
-install(EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
-
-set(_install_cmake_scripts
-  ${US_MODULE_INIT_TEMPLATE}
-  ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-  ${US_CMAKE_DIR}/CMakeParseArguments.cmake
-  ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
-  ${US_CMAKE_DIR}/FindPackageMessage.cmake
-  ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
-  ${US_CMAKE_DIR}/usFunctionAddResources.cmake
-  )
-
-install(FILES ${_install_cmake_scripts}
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
-
-install(FILES ${us_global_config_h_file}
-        DESTINATION ${HEADER_INSTALL_DIR})
-
-# Configure CppMicroServicesConfig.cmake for the install tree
-set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
-set(CONFIG_RUNTIME_DIR ${RUNTIME_INSTALL_DIR})
-set(CONFIG_CMAKE_DIR ${AUXILIARY_CMAKE_INSTALL_DIR})
-configure_package_config_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-  ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-  INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-  PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_DIR CONFIG_CMAKE_DIR
-  NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-  )
-
 # Version information
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
@@ -432,8 +494,49 @@ configure_file(
   @ONLY
   )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-        ${US_SDK_INSTALL_COMPONENT}
-  )
+export(TARGETS ${US_RCC_EXECUTABLE_NAME}
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
+if(NOT US_NO_INSTALL)
+
+  install(EXPORT ${PROJECT_NAME}Targets
+          FILE ${PROJECT_NAME}Targets.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+
+  set(_install_cmake_scripts
+    ${US_BUNDLE_INIT_TEMPLATE}
+    ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
+    ${US_CMAKE_DIR}/usFunctionGenerateBundleInit.cmake
+    ${US_CMAKE_DIR}/usFunctionAddResources.cmake
+    ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake
+    ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
+    ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
+    ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
+    )
+
+  install(FILES ${_install_cmake_scripts}
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+
+  install(FILES ${global_config_h_file}
+          DESTINATION ${HEADER_INSTALL_DIR}/${PROJECT_NAME_LOWER})
+
+  # Configure CppMicroServicesConfig.cmake for the install tree
+  set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
+  set(CONFIG_RUNTIME_DIR ${RUNTIME_INSTALL_DIR})
+  set(CONFIG_CMAKE_DIR ${AUXILIARY_CMAKE_INSTALL_DIR})
+  configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+    ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+    PATH_VARS CONFIG_INCLUDE_DIR CONFIG_RUNTIME_DIR CONFIG_CMAKE_DIR
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    )
+
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+          ${US_SDK_INSTALL_COMPONENT}
+    )
+
+endif()

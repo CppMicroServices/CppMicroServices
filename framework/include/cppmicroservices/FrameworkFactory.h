@@ -52,7 +52,7 @@ public:
      * @param configuration The framework properties to configure the new framework instance. If framework properties
      * are not provided by the configuration argument, the created framework instance will use a reasonable
      * default configuration.
-	 * @param logger Any ostream object which will receieve redirected debug log output.
+     * @param logger Any ostream object which will receieve redirected debug log output.
      *
      * @return A new, configured Framework instance.
      */

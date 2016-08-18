@@ -79,28 +79,38 @@ int main(int /*argc*/, char** /*argv*/)
 {
   char cmd[256];
 
+  std::unordered_map<std::string, Bundle> symbolicNameToBundle;
+  std::vector<std::string> availableBundles;
+
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
-  framework.Start();
-
-  std::vector<std::string> availableBundles = GetExampleBundles();
-
-  std::vector<Bundle>  installedBundles;
-  /* install all available bundles for this example */
-#if defined (US_BUILD_SHARED_LIBS)
-  for (auto name : availableBundles)
+  try
   {
-    auto bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + name + LIB_EXT);
-    installedBundles.insert(installedBundles.end(), bundles.begin(), bundles.end());
-  }
+    framework.Start();
+
+    availableBundles = GetExampleBundles();
+
+    std::vector<Bundle>  installedBundles;
+    /* install all available bundles for this example */
+#if defined (US_BUILD_SHARED_LIBS)
+    for (auto name : availableBundles)
+    {
+      auto bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + name + LIB_EXT);
+      installedBundles.insert(installedBundles.end(), bundles.begin(), bundles.end());
+    }
 #else
-  installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usFrameworkExamplesDriver" + EXE_EXT);
+    installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usFrameworkExamplesDriver" + EXE_EXT);
 #endif
 
-  std::unordered_map<std::string, Bundle> symbolicNameToBundle;
-  for (auto b : installedBundles)
+    for (auto b : installedBundles)
+    {
+      symbolicNameToBundle.insert(std::make_pair(b.GetSymbolicName(), b));
+    }
+  }
+  catch (const std::exception& e)
   {
-    symbolicNameToBundle.insert(std::make_pair(b.GetSymbolicName(), b));
+    std::cerr << e.what() << std::endl;
+    return 1;
   }
 
   std::cout << "> ";
@@ -112,7 +122,15 @@ int main(int /*argc*/, char** /*argv*/)
     */
     if (framework.GetState() != Bundle::STATE_ACTIVE)
     {
-      framework.Start();
+      try
+      {
+        framework.Start();
+      }
+      catch (const std::exception& e)
+      {
+        std::cerr << e.what() << std::endl;
+        return 1;
+      }
     }
 
     std::string strCmd(cmd);
@@ -141,7 +159,7 @@ int main(int /*argc*/, char** /*argv*/)
         auto bundle = framework.GetBundleContext().GetBundle(id);
         if (!bundle)
         {
-          std::cout << "Error: unknown id" << std::endl;
+          std::cerr << "Error: unknown id" << std::endl;
         }
         else
         {
@@ -157,7 +175,7 @@ int main(int /*argc*/, char** /*argv*/)
           }
           catch (const std::exception& e)
           {
-            std::cout << e.what() << std::endl;
+            std::cerr << e.what() << std::endl;
           }
         }
       }
@@ -178,7 +196,7 @@ int main(int /*argc*/, char** /*argv*/)
           }
           catch (const std::exception& e)
           {
-            std::cout << e.what() << std::endl;
+            std::cerr << e.what() << std::endl;
           }
         }
 
@@ -196,7 +214,7 @@ int main(int /*argc*/, char** /*argv*/)
           }
           catch (const std::exception& e)
           {
-            std::cout << e.what() << std::endl;
+            std::cerr << e.what() << std::endl;
           }
         }
       }
@@ -218,12 +236,12 @@ int main(int /*argc*/, char** /*argv*/)
         }
         catch (const std::exception& e)
         {
-          std::cout << e.what() << std::endl;
+          std::cerr << e.what() << std::endl;
         }
       }
       else
       {
-        std::cout << "Error: unknown id" << std::endl;
+        std::cerr << "Error: unknown id" << std::endl;
       }
     }
     else if (strCmd == "s")

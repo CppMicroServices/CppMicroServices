@@ -340,7 +340,7 @@ endif()
 
 # link libraries for the CppMicroServices lib
 set(US_LINK_LIBRARIES )
-if(UNIX)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   list(APPEND US_LINK_LIBRARIES dl)
 endif()
 

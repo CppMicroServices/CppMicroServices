@@ -1,9 +1,9 @@
 Branch | Linux (Ubuntu 12.04) | Windows (VS 2013 & 2015)
 -------|----------------------|-------------------------
-master | [![Linux Build Status](https://secure.travis-ci.org/CppMicroServices/CppMicroServices.png)](http://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status](https://ci.appveyor.com/api/projects/status/ieoylxs37tjui4sc/branch/master?svg=true)](https://ci.appveyor.com/project/saschazelzer/cppmicroservices/branch/master)
-development | [![Linux Build Status (development)](https://travis-ci.org/CppMicroServices/CppMicroServices.svg?branch=development)](https://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status (development)](https://ci.appveyor.com/api/projects/status/ieoylxs37tjui4sc/branch/development?svg=true)](https://ci.appveyor.com/project/saschazelzer/cppmicroservices/branch/development)
+master | [![Linux Build Status](https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux)](http://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status](https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows)](https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master)
+development | [![Linux Build Status (development)](https://img.shields.io/travis/CppMicroServices/CppMicroServices/development.svg?style=flat-square&label=Linux)](https://travis-ci.org/CppMicroService/CppMicroServices) | [![Windows Build status (development)](https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/development.svg?style=flat-square&label=Windows)](https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/development)
 
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/1329/badge.svg)](https://scan.coverity.com/projects/1329)
+[![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1329.svg?style=flat-square)](https://scan.coverity.com/projects/1329)
 
 C++ Micro Services
 ==================

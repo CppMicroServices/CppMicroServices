@@ -140,11 +140,11 @@ function(usFunctionAddResources)
     math(EXPR _counter "${_counter} + 1")
   endif()
 
-  set(_res_zip "${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}/res_${_counter}.zip")
+  set(_res_zip "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_TARGET}/res_${_counter}.zip")
 
   add_custom_command(
     OUTPUT ${_res_zip}
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/us_${US_RESOURCE_TARGET}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/${US_RESOURCE_TARGET}"
     COMMAND ${resource_compiler} ${cmd_line_args} -o ${_res_zip} ${_bundle_args} ${_file_args} ${_us_zip_args}
     WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
     DEPENDS ${_cmd_deps} ${resource_compiler}

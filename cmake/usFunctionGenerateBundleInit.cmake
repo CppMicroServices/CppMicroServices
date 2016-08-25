@@ -18,7 +18,7 @@
 #!
 function(usFunctionGenerateBundleInit src_var)
 
-  set(bundle_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/us_init.cpp")
+  set(bundle_init_src_file "${CMAKE_CURRENT_BINARY_DIR}/cppmicroservices_init.cpp")
   configure_file(${US_BUNDLE_INIT_TEMPLATE} ${bundle_init_src_file} @ONLY)
 
   set(_src ${bundle_init_src_file} ${${src_var}})

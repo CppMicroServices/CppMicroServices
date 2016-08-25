@@ -1,29 +1,29 @@
 set(_srcs
-  src/usAbstractWebConsolePlugin.cpp
-  src/usServicesPlugin.cpp
-  src/usSettingsPlugin.cpp
-  src/usSimpleWebConsolePlugin.cpp
-  src/usVariableResolverStreamBuffer.cpp
-  src/usWebConsoleActivator.cpp
-  src/usWebConsoleConstants.cpp
-  src/usWebConsoleServlet.cpp
-  src/usWebConsoleDefaultVariableResolver.cpp
-  src/usWebConsoleVariableResolver.cpp
+  src/AbstractWebConsolePlugin.cpp
+  src/ServicesPlugin.cpp
+  src/SettingsPlugin.cpp
+  src/SimpleWebConsolePlugin.cpp
+  src/VariableResolverStreamBuffer.cpp
+  src/WebConsoleActivator.cpp
+  src/WebConsoleConstants.cpp
+  src/WebConsoleServlet.cpp
+  src/WebConsoleDefaultVariableResolver.cpp
+  src/WebConsoleVariableResolver.cpp
 )
 
 set(_private_headers
-  src/usServicesPlugin_p.h
-  src/usSettingsPlugin_p.h
-  src/usVariableResolverStreamBuffer_p.h
-  src/usWebConsoleServlet_p.h
+  src/ServicesPlugin.h
+  src/SettingsPlugin.h
+  src/VariableResolverStreamBuffer.h
+  src/WebConsoleServlet.h
 )
 
 set(_public_headers
-  include/usAbstractWebConsolePlugin.h
-  include/usSimpleWebConsolePlugin.h
-  include/usWebConsoleConstants.h
-  include/usWebConsoleDefaultVariableResolver.h
-  include/usWebConsoleVariableResolver.h
+  include/cppmicroservices/webconsole/AbstractWebConsolePlugin.h
+  include/cppmicroservices/webconsole/SimpleWebConsolePlugin.h
+  include/cppmicroservices/webconsole/WebConsoleConstants.h
+  include/cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h
+  include/cppmicroservices/webconsole/WebConsoleVariableResolver.h
 )
 
 set(_resources

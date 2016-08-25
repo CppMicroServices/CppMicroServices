@@ -472,6 +472,50 @@ void TestIndirectFrameworkStop()
     US_TEST_CONDITION(f.GetState() == Bundle::STATE_RESOLVED, "Framework stopped");
 }
 
+void TestShutdownAndStart()
+{
+  int startCount = 0;
+
+  FrameworkEvent fwEvt;
+  {
+    auto f = FrameworkFactory().NewFramework();
+    f.Init();
+
+    auto ctx = f.GetBundleContext();
+
+    ctx.AddFrameworkListener([&startCount](const FrameworkEvent& fwEvt) {
+      if (fwEvt.GetType() == FrameworkEvent::FRAMEWORK_STARTED)
+      {
+        ++startCount;
+        auto bundle = fwEvt.GetBundle();
+        US_TEST_CONDITION_REQUIRED(bundle.GetBundleId() == 0, "Got framework bundle")
+        US_TEST_CONDITION_REQUIRED(bundle.GetState() == Bundle::STATE_ACTIVE, "Started framework");
+
+        // This stops the framework
+        bundle.Stop();
+      }
+    });
+
+    US_TEST_CONDITION_REQUIRED(f.GetState() == Framework::STATE_STARTING, "Starting framework")
+    f.Start();
+
+    // Wait for stop
+    fwEvt = f.WaitForStop(std::chrono::milliseconds::zero());
+  }
+
+  US_TEST_CONDITION_REQUIRED(fwEvt.GetType() == FrameworkEvent::FRAMEWORK_STOPPED, "Stopped framework event")
+
+  Bundle fwBundle = fwEvt.GetBundle();
+  US_TEST_CONDITION_REQUIRED(fwBundle.GetState() == Bundle::STATE_RESOLVED, "Resolved framework");
+
+  // Start the framework again
+  fwBundle.Start();
+
+  US_TEST_CONDITION_REQUIRED(fwBundle.GetState() == Bundle::STATE_ACTIVE, "Active framework");
+
+  US_TEST_CONDITION_REQUIRED(startCount == 1, "One framework start notification")
+}
+
 int FrameworkTest(int /*argc*/, char* /*argv*/[])
 {
     US_TEST_BEGIN("FrameworkTest");
@@ -482,6 +526,7 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
     TestCustomLogSink();
     TestProperties();
     TestIndirectFrameworkStop();
+    TestShutdownAndStart();
     TestLifeCycle();
     TestEvents();
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -489,5 +534,6 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
     TestConcurrentFrameworkStop();
     TestConcurrentFrameworkWaitForStop();
 #endif
+
     US_TEST_END()
 }

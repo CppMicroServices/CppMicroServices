@@ -68,7 +68,7 @@ void BundleThread::Run()
     std::promise<bool> pr;
     int operation = OP_IDLE;
     BundlePrivate* bundle = nullptr;
-    BundleEvent bev;
+    BundleEventInternal bev{ BundleEvent::BUNDLE_INSTALLED, nullptr };
 
     while (doRun)
     {
@@ -84,7 +84,7 @@ void BundleThread::Run()
         pr = std::move(op.pr);
         operation = op.operation;
         bundle = op.bundle;
-        bev = be.Exchange(BundleEvent());
+        bev = be.Exchange(BundleEventInternal{ BundleEvent::BUNDLE_INSTALLED, nullptr });
         break;
       }
 
@@ -108,7 +108,7 @@ void BundleThread::Run()
       switch (operation)
       {
       case OP_BUNDLE_EVENT:
-        fwCtx->listeners.BundleChanged(bev);
+        fwCtx->listeners.BundleChanged(MakeBundleEvent(bev));
         break;
       case OP_START:
         tmpres = bundle->Start0();
@@ -120,9 +120,9 @@ void BundleThread::Run()
     }
     catch (...)
     {
-      fwCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, 
-                                                            MakeBundle(bundle->shared_from_this()), 
-                                                            bundle->symbolicName, 
+      fwCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                            MakeBundle(bundle->shared_from_this()),
+                                                            bundle->symbolicName,
                                                             std::current_exception()));
     }
 
@@ -150,10 +150,10 @@ void BundleThread::Join()
   }
 }
 
-void BundleThread::BundleChanged(const BundleEvent& be, UniqueLock& resolveLock)
+void BundleThread::BundleChanged(const BundleEventInternal& be, UniqueLock& resolveLock)
 {
   this->be.Store(be);
-  StartAndWait(GetPrivate(be.GetBundle()).get(), OP_BUNDLE_EVENT, resolveLock);
+  StartAndWait(be.bundle.get(), OP_BUNDLE_EVENT, resolveLock);
 }
 
 std::exception_ptr BundleThread::CallStart0(BundlePrivate* b, UniqueLock& resolveLock)

@@ -23,7 +23,6 @@
 #include "cppmicroservices/Bundle.h"
 
 #include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/FrameworkEvent.h"

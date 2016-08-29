@@ -111,7 +111,7 @@ std::exception_ptr BundlePrivate::Stop0(UniqueLock& resolveLock)
   if (state != Bundle::STATE_UNINSTALLED)
   {
     state = Bundle::STATE_RESOLVED;
-    GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())), resolveLock);
+    GetBundleThread()->BundleChanged({BundleEvent::BUNDLE_STOPPED, shared_from_this()}, resolveLock);
     coreCtx->resolver.NotifyAll();
     operation = OP_IDLE;
   }
@@ -272,7 +272,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
             // SetWired();
             state = Bundle::STATE_RESOLVED;
             operation = OP_RESOLVING;
-            GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this())), l);
+            GetBundleThread()->BundleChanged({BundleEvent::BUNDLE_RESOLVED, this->shared_from_this()}, l);
             operation = OP_IDLE;
           }
         }
@@ -290,7 +290,7 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger, LockType& l
             {
               f->GetUpdatedState(nullptr, l);
             }
-            GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this())), l);
+            GetBundleThread()->BundleChanged({BundleEvent::BUNDLE_RESOLVED, this->shared_from_this()}, l);
             operation = OP_IDLE;
           }
           else
@@ -345,7 +345,7 @@ void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
   state = Bundle::STATE_INSTALLED;
   if (sendEvent) {
     operation = OP_UNRESOLVING;
-    GetBundleThread()->BundleChanged(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(this->shared_from_this())), resolveLock);
+    GetBundleThread()->BundleChanged({BundleEvent::BUNDLE_UNRESOLVED, this->shared_from_this()}, resolveLock);
   }
   operation = OP_IDLE;
 }
@@ -479,12 +479,7 @@ void BundlePrivate::Uninstall()
       }
 
       state = Bundle::STATE_INSTALLED;
-      GetBundleThread()->BundleChanged(
-            BundleEvent(
-              BundleEvent::BUNDLE_UNRESOLVED,
-              MakeBundle(shared_from_this())
-              ),
-            l);
+      GetBundleThread()->BundleChanged({BundleEvent::BUNDLE_UNRESOLVED, shared_from_this()}, l);
       bactivator = nullptr;
       state = Bundle::STATE_UNINSTALLED;
       // Purge old archive

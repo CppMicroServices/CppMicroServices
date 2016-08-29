@@ -27,6 +27,8 @@
 #include "cppmicroservices/detail/Threads.h"
 #include "cppmicroservices/detail/WaitCondition.h"
 
+#include "BundleEventInternal.h"
+
 #include <atomic>
 #include <chrono>
 #include <future>
@@ -59,7 +61,7 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
     std::promise<bool> pr;
   } op;
 
-  detail::Atomic<BundleEvent> be;
+  detail::Atomic<BundleEventInternal> be;
   std::atomic<bool> doRun;
 
   struct : detail::MultiThreaded<> { std::thread v; } th;
@@ -80,7 +82,7 @@ public:
   /**
    * Note! Must be called while holding packages lock.
    */
-  void BundleChanged(const BundleEvent& be, UniqueLock& resolveLock);
+  void BundleChanged(const BundleEventInternal& be, UniqueLock& resolveLock);
 
   /**
    * Note! Must be called while holding packages lock.

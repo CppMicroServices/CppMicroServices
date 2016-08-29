@@ -24,7 +24,6 @@
 
 #include "cppmicroservices/Bundle.h"
 
-#include "BundlePrivate.h"
 #include "Utils.h"
 
 namespace cppmicroservices {
@@ -33,7 +32,7 @@ class FrameworkEventData
 {
 public:
   FrameworkEventData(FrameworkEvent::Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception)
-    : type(type), bundle(GetPrivate(bundle)), message(message), exception(exception)
+    : type(type), bundle(bundle), message(message), exception(exception)
   {
 
   }
@@ -45,7 +44,7 @@ public:
   }
 
   const FrameworkEvent::Type type;
-  const std::shared_ptr<BundlePrivate> bundle;
+  const Bundle bundle;
   const std::string message;
   const std::exception_ptr exception;
 
@@ -66,7 +65,7 @@ FrameworkEvent::FrameworkEvent(Type type, const Bundle& bundle, const std::strin
 Bundle FrameworkEvent::GetBundle() const
 {
   if (!d) return Bundle{};
-  return MakeBundle(d->bundle);
+  return d->bundle;
 }
 
 FrameworkEvent::Type FrameworkEvent::GetType() const

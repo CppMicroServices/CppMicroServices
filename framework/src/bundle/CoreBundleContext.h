@@ -26,6 +26,7 @@
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/detail/Log.h"
+#include "cppmicroservices/detail/Threads.h"
 
 #include "BundleHooks.h"
 #include "BundleRegistry.h"
@@ -57,7 +58,7 @@ class FrameworkPrivate;
 /**
  * This class is not part of the public API.
  */
-class CoreBundleContext : public std::enable_shared_from_this<CoreBundleContext>
+class CoreBundleContext
 {
 public:
 
@@ -155,6 +156,10 @@ public:
 
   ~CoreBundleContext();
 
+  // thread-safe shared_from_this implementation
+  std::shared_ptr<CoreBundleContext> shared_from_this() const;
+  void SetThis(const std::shared_ptr<CoreBundleContext>& self);
+
   void Init();
 
   // must be called without any locks held
@@ -178,6 +183,8 @@ private:
    *
    */
   CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger);
+
+  struct : detail::MultiThreaded<> { std::weak_ptr<CoreBundleContext> v; } self;
 
 };
 

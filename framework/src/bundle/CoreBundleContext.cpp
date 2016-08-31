@@ -133,14 +133,15 @@ void CoreBundleContext::Init()
   serviceHooks.Open();
   //resolverHooks.Open();
 
-  // auto-install all embedded bundles inside the executable
-  auto execPath = BundleUtils::GetExecutablePath();
-  if (IsBundleFile(execPath))
+  bundleRegistry.Load();
+
+  auto const execPath = BundleUtils::GetExecutablePath();
+  if (bundleRegistry.GetBundles(execPath).empty() &&
+      IsBundleFile(execPath))
   {
+  // auto-install all embedded bundles inside the executable
     bundleRegistry.Install(execPath, systemBundle.get(), true);
   }
-
-  bundleRegistry.Load();
 
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
   for (auto b : bundleRegistry.GetBundles())

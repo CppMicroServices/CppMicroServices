@@ -10,7 +10,7 @@ env:
 matrix:
     include:
         - os: linux
-          addons: &valgrind
+          addons:
             apt:
               packages: valgrind
           compiler: gcc
@@ -22,14 +22,16 @@ matrix:
           compiler: gcc
           env: BUILD_CONFIGURATION=1
         - os: linux
-          addons: &valgrind
+          addons:
             apt:
+              sources: ubuntu-toolchain-r-test
               packages: valgrind
           compiler: clang
           env: BUILD_CONFIGURATION=0
         - os: linux
           addons:
             apt:
+              sources: ubuntu-toolchain-r-test
               packages: valgrind
           compiler: clang
           env: BUILD_CONFIGURATION=1 

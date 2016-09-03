@@ -21,6 +21,19 @@ matrix:
               packages: valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=1
+        - os: linux
+          addons: &valgrind
+            apt:
+              packages: valgrind
+          compiler: clang
+          env: BUILD_CONFIGURATION=0
+        - os: linux
+          addons:
+            apt:
+              packages: valgrind
+          compiler: clang
+          env: BUILD_CONFIGURATION=1 
+		  # latest compiler on OS X
         - os: osx
           osx_image: xcode7.3
           compiler: clang
@@ -29,6 +42,15 @@ matrix:
           osx_image: xcode7.3
           compiler: clang
           env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
+		  # minimum supported compiler on OS X
+        - os: osx
+          osx_image: xcode6.4
+          compiler: clang
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.10
+        - os: osx
+          osx_image: xcode6.4
+          compiler: clang
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.10
 
 cache:
   directories:

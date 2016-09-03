@@ -33,7 +33,7 @@ matrix:
               packages: valgrind
           compiler: clang
           env: BUILD_CONFIGURATION=1 
-		  # latest compiler on OS X
+        # latest compiler on OS X
         - os: osx
           osx_image: xcode7.3
           compiler: clang
@@ -42,7 +42,7 @@ matrix:
           osx_image: xcode7.3
           compiler: clang
           env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
-		  # minimum supported compiler on OS X
+        # minimum supported compiler on OS X
         - os: osx
           osx_image: xcode6.4
           compiler: clang

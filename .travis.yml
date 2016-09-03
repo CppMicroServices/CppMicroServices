@@ -21,20 +21,6 @@ matrix:
               packages: valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=1
-        - os: linux
-          addons:
-            apt:
-              sources: ubuntu-toolchain-r-test
-              packages: valgrind
-          compiler: clang
-          env: BUILD_CONFIGURATION=0
-        - os: linux
-          addons:
-            apt:
-              sources: ubuntu-toolchain-r-test
-              packages: valgrind
-          compiler: clang
-          env: BUILD_CONFIGURATION=1 
         # latest compiler on OS X
         - os: osx
           osx_image: xcode7.3

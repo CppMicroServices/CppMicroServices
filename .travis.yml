@@ -14,21 +14,21 @@ matrix:
             apt:
               packages: valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=0 PATH=$HOME/cache/bin/:$PATH
+          env: BUILD_CONFIGURATION=0
         - os: linux
           addons:
             apt:
               packages: valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=1 PATH=$HOME/cache/bin/:$PATH
+          env: BUILD_CONFIGURATION=1
         - os: osx
           osx_image: xcode7.3
           compiler: clang
-          env: BUILD_CONFIGURATION=0 PATH=$HOME/cache/bin/:$PATH
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.11
         - os: osx
           osx_image: xcode7.3
           compiler: clang
-          env: BUILD_CONFIGURATION=1 PATH=$HOME/cache/bin/:$PATH
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
 
 cache:
   directories:

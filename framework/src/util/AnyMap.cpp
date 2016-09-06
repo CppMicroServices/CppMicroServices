@@ -857,7 +857,7 @@ template<>
 std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m)
 {
   os << "{";
-  typedef typename AnyMap::const_iterator Iterator;
+  typedef AnyMap::const_iterator Iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();

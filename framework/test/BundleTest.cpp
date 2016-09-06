@@ -149,6 +149,11 @@ void frame020a()
   ServiceReferenceU sr1 = bc.GetServiceReference("cppmicroservices::TestBundleAService");
   US_TEST_CONDITION_REQUIRED(!sr1, "service from bundle A must not exist yet")
 
+  // Check manifest headers
+  auto headers = buA.GetHeaders();
+  US_TEST_CONDITION_REQUIRED(headers.size() == 1, "One manifest header")
+  US_TEST_CONDITION(headers.at("bundle.symbolic_name") == std::string("TestBundleA"), "BSN manifest header")
+
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
 #ifdef US_BUILD_SHARED_LIBS // The bundle is installed at framework startup for static builds
@@ -234,6 +239,12 @@ void frame030b()
     US_TEST_FAILED_MSG(<< "Stop bundle exception: " << e.what())
   }
 
+  // Check manifest headers in stopped state
+  auto headers = buA.GetHeaders();
+  US_TEST_CONDITION_REQUIRED(headers.size() == 1, "One manifest header")
+  US_TEST_CONDITION(headers.at("bundle.symbolic_name") == std::string("TestBundleA"), "BSN manifest header")
+
+
   std::vector<BundleEvent> pEvts;
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, buA));
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, buA));
@@ -268,7 +279,8 @@ void frame035a()
 }
 
 
-// Get location, persistent storage and status of the bundle
+// Get location, persistent storage and status of the bundle.
+// Test bundle context properties
 void frame037a()
 {
   std::string location = buExec.GetLocation();
@@ -287,6 +299,11 @@ void frame037a()
 
   US_TEST_CONDITION(buExec.GetBundleContext().GetDataFile("").substr(0, baseStoragePath.size()) == baseStoragePath, "Test for valid data path")
   US_TEST_CONDITION(buExec.GetBundleContext().GetDataFile("bla").substr(0, baseStoragePath.size()) == baseStoragePath, "Test for valid data file path")
+
+  US_TEST_CONDITION(buExec.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID).Empty() == false, "Test for non-empty framework uuid property")
+  auto props = buExec.GetBundleContext().GetProperties();
+  US_TEST_CONDITION_REQUIRED(props.empty() == false, "Test for non-empty bundle props")
+  US_TEST_CONDITION(props.count(Constants::FRAMEWORK_VERSION) > 0, "Test for existing framework version prop")
 }
 
 
@@ -388,7 +405,7 @@ void TestBundleStates()
 
     auto frameworkCtx = framework.GetBundleContext();
     frameworkCtx.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
-  
+
     // Test Start -> Stop for auto-installed bundles
     auto bundles = frameworkCtx.GetBundles();
     for (auto& bundle : bundles)
@@ -409,7 +426,7 @@ void TestBundleStates()
     }
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");
     bundleEvents.clear();
-  
+
 #ifdef US_BUILD_SHARED_LIBS    // following combination can be tested only for shared library builds
     Bundle bundle;
     // Test install -> uninstall
@@ -554,7 +571,7 @@ void TestDuplicateInstall()
     US_TEST_CONDITION(bundle == bundleDuplicate, "Test for the same bundle instance");
     US_TEST_CONDITION(bundle.GetBundleId() == bundleDuplicate.GetBundleId(), "Test for the same bundle id");
 }
-  
+
 void TestAutoInstallEmbeddedBundles()
 {
   FrameworkFactory factory;

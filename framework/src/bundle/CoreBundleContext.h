@@ -76,6 +76,9 @@ public:
   * Framework properties, which contain both the
   * launch properties and the system properties.
   * See OSGi spec revision 6, section 4.2.2
+  *
+  * Note: CppMicroServices currently has no concept
+  * of "system properties".
   */
   std::map<std::string, Any> frameworkProperties;
 

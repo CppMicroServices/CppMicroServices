@@ -4,6 +4,7 @@
 
 set(_srcs
   util/Any.cpp
+  util/AnyMap.cpp
   util/Framework.cpp
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp

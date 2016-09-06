@@ -129,7 +129,7 @@ private:
 
 public:
 
-  class ConstIterator : public IteratorBase
+  class US_Framework_EXPORT ConstIterator : public IteratorBase
   {
   private:
 
@@ -176,7 +176,7 @@ public:
     } iter;
   };
 
-  struct Iterator : public IteratorBase
+  struct US_Framework_EXPORT Iterator : public IteratorBase
   {
   private:
 

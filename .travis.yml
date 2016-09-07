@@ -10,15 +10,13 @@ env:
 matrix:
     include:
         - os: linux
-          addons:
+          addons: &valgrind
             apt:
               packages: valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=0
         - os: linux
-          addons:
-            apt:
-              packages: valgrind
+          addons: *valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=1
         # latest compiler on OS X

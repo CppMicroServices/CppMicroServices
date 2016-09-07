@@ -94,7 +94,7 @@ public:
 
 private:
 
-  class IteratorBase
+  class US_Framework_EXPORT IteratorBase
   {
     friend class AnyMap;
 

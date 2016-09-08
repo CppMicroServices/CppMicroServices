@@ -1,7 +1,7 @@
-Branch | Linux (Ubuntu 12.04) | Windows (VS 2013 & 2015)
+Branch | Linux (Ubuntu 12.04) and OS X (10.10 & 10.11) | Windows (VS 2013 & 2015)
 -------|----------------------|-------------------------
-master | [![Linux Build Status](https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux)](http://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status](https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows)](https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master)
-development | [![Linux Build Status (development)](https://img.shields.io/travis/CppMicroServices/CppMicroServices/development.svg?style=flat-square&label=Linux)](https://travis-ci.org/CppMicroService/CppMicroServices) | [![Windows Build status (development)](https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/development.svg?style=flat-square&label=Windows)](https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/development)
+master | [![Linux Build Status](https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux%20%26%20OS%20X)](http://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status](https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows)](https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master)
+development | [![Linux Build Status (development)](https://img.shields.io/travis/CppMicroServices/CppMicroServices/development.svg?style=flat-square&label=Linux%20%26%20OS%20X)](https://travis-ci.org/CppMicroServices/CppMicroServices) | [![Windows Build status (development)](https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/development.svg?style=flat-square&label=Windows)](https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/development)
 
 [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1329.svg?style=flat-square)](https://scan.coverity.com/projects/1329)
 
@@ -40,13 +40,16 @@ Minimum required compiler versions:
 
   - GCC 4.6
   - Clang 3.1
+  - Clang from XCode 6.4
   - Visual Studio 2013
 
 Below is a list of tested compiler/OS combinations:
 
-  - GCC 4.6.3 (Ubuntu 12.04) via TravisCI
+  - GCC 4.6.3 (Ubuntu 12.04) via Travis CI
   - GCC 6.1.1 (Fedora 24)
   - Clang 3.8.0 (Fedora 24)
+  - Clang XCode 6.4 (OS X 10.10) via Travis CI
+  - Clang XCode 7.3 (OS X 10.11) via Travis CI
   - Visual Studio 2013 via Appveyor
   - Visual Studio 2015 via Appveyor
   - OS X 10.10

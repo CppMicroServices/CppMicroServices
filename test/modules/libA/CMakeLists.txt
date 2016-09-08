@@ -1,2 +1,0 @@
-
-usFunctionCreateTestModule(TestModuleA usTestModuleA.cpp)

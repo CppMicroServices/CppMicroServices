@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head>
+<title>C++ Micro Services Management Console</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="" />
+<meta name="copyright" content="" />
+<script type="text/javascript" src="${appRoot}/res/js/jquery.min.js"></script>
+<script type="text/javascript" src="${appRoot}/res/js/pure.min.js"></script>
+<script type="text/javascript" src="${appRoot}/res/KickStart/js/kickstart.js"></script>                        <!-- KICKSTART -->
+<link rel="stylesheet" type="text/css" href="${appRoot}/res/KickStart/css/kickstart.css" media="all" />        <!-- KICKSTART -->
+<link rel="stylesheet" type="text/css" href="${appRoot}/res/css/main_style.css" media="all" />                          <!-- CUSTOM STYLES -->
+</head><body>
+
+<!-- Menu Horizontal -->
+<ul class="menu">
+<li class="current"><a href="${appRoot}/"></a></li>
+</ul>
+
+<script>
+var data = ${labelMap};
+var directive = {
+    'li':{
+      'menuItem<-menuItems':{
+        '@class':'menuItem.class',
+        'a':'menuItem.label',
+        'a@href+':'menuItem.href',
+      }
+    }
+  };
+  $('ul.menu').render(data, directive);
+</script>
+
+<div class="grid">

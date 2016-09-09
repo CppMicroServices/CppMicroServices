@@ -24,6 +24,7 @@
 #ifndef CPPMICROSERVICES_BUNDLE_H
 #define CPPMICROSERVICES_BUNDLE_H
 
+#include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/Chrono.h"
@@ -431,7 +432,7 @@ public:
    * @sa GetPropertyKeys()
    * @sa \ref MicroServices_BundleProperties
    */
-  Any GetProperty(const std::string& key) const;
+  US_DEPRECATED Any GetProperty(const std::string& key) const;
 
   /**
    * Returns a list of top-level property keys for this bundle.
@@ -443,7 +444,7 @@ public:
    *
    * @sa \ref MicroServices_BundleProperties
    */
-  std::vector<std::string> GetPropertyKeys() const;
+  US_DEPRECATED std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns this bundle's ServiceReference list for all services it

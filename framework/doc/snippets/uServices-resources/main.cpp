@@ -52,7 +52,9 @@ void extenderPattern(const BundleContext& bundleCtx)
   for(auto const bundle : bundleCtx.GetBundles())
   {
     if (bundle.GetState() == Bundle::STATE_UNINSTALLED) continue;
-    std::string componentPath = bundle.GetProperty("service-component").ToString();
+    auto headers = bundle.GetHeaders();
+    auto iter = headers.find("service-component");
+    std::string componentPath = (iter == headers.end()) ? std::string() : iter->second.ToString();
     if (!componentPath.empty())
     {
       BundleResource componentResource = bundle.GetResource(componentPath);

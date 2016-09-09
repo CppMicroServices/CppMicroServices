@@ -128,6 +128,24 @@ AnyMap::ConstIterator::ConstIterator(const iterator& it)
   }
 }
 
+AnyMap::ConstIterator::ConstIterator(const AnyMap::Iterator& it)
+ : IteratorBase(it.type)
+{
+  switch (type)
+  {
+  case ORDERED:
+    new (iter.o) OConstIter(it.o_it()); break;
+  case UNORDERED:
+    new (iter.uo) UOConstIter(it.uo_it()); break;
+  case UNORDERED_CI:
+    new (iter.uoci) UOCIConstIter(it.uoci_it()); break;
+  case NONE:
+    break;
+  default:
+    throw std::logic_error("invalid iterator type");
+  }
+}
+
 AnyMap::ConstIterator::~ConstIterator()
 {
   switch (type)

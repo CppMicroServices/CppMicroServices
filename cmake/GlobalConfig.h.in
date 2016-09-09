@@ -101,6 +101,15 @@ _Pragma ("GCC diagnostic pop")
 #define US_GCC_POP_WARNING
 #endif
 
+#if defined(__GNUC__)
+  #define US_DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+  #define US_DEPRECATED __declspec(deprecated)
+#else
+  #pragma message("WARNING: You need to implement US_DEPRECATED for your compiler!")
+  #define US_DEPRECATED
+#endif
+
 // Do not warn about the usage of deprecated unsafe functions
 US_MSVC_DISABLE_WARNING(4996)
 

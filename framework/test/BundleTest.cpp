@@ -207,10 +207,10 @@ void frame020b()
 
   buA.Start();
 
-  US_TEST_CONDITION(bc.GetBundle().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
+  US_TEST_CONDITION(bc.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   // launching properties should be accessible through any bundle
-  US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
+  US_TEST_CONDITION(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
   const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + cppmicroservices::ToString(buA.GetBundleId()) + testing::DIR_SEP;
@@ -290,8 +290,8 @@ void frame037a()
   US_TEST_CONDITION(buExec.GetState() & Bundle::STATE_ACTIVE, "Test for started flag")
 
   // launching properties should be accessible through any bundle
-  auto p1 = bc.GetBundle().GetProperty(Constants::FRAMEWORK_UUID);
-  auto p2 = buExec.GetProperty(Constants::FRAMEWORK_UUID);
+  auto p1 = bc.GetBundle().GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID);
+  auto p2 = buExec.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID);
   US_TEST_CONDITION(!p1.Empty() && p1.ToString() == p2.ToString(), "Test for uuid accesible from framework and bundle")
 
   std::cout << buExec.GetBundleContext().GetDataFile("") << std::endl;

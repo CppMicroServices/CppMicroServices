@@ -44,18 +44,20 @@ namespace
 
         f.Start();
 
+        auto ctx = f.GetBundleContext();
+
         // Default framework properties:
         //  - threading model: multi
         //  - persistent storage location: The current working directory
         //  - diagnostic logging: off
         //  - diagnostic logger: std::clog
 #ifdef US_ENABLE_THREADING_SUPPORT
-        US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for default threading option")
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for default threading option")
 #else
-        US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "single", "Test for default threading option")
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "single", "Test for default threading option")
 #endif
-        US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_STORAGE) == std::string("fwdir"), "Test for default base storage property")
-        US_TEST_CONDITION(any_cast<bool>(f.GetProperty(Constants::FRAMEWORK_LOG)) == false, "Test default diagnostic logging")
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_STORAGE) == std::string("fwdir"), "Test for default base storage property")
+        US_TEST_CONDITION(any_cast<bool>(ctx.GetProperty(Constants::FRAMEWORK_LOG)) == false, "Test default diagnostic logging")
 
     }
 
@@ -94,18 +96,20 @@ namespace
           US_TEST_FAILED_MSG(<< "Unknown exception during framework start. ");
         }
 
-        US_TEST_CONDITION("osgi" == f.GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties");
-        US_TEST_CONDITION(0 == any_cast<int>(f.GetProperty("org.osgi.framework.startlevel.beginning")), "Test Framework custom launch properties");
-        US_TEST_CONDITION("single" == any_cast<std::string>(f.GetProperty("org.osgi.framework.bsnversion")), "Test Framework custom launch properties");
-        US_TEST_CONDITION("foo" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties");
-        US_TEST_CONDITION("bar" == any_cast<std::string>(f.GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties");
-        US_TEST_CONDITION(any_cast<bool>(f.GetProperty(Constants::FRAMEWORK_LOG)) == true, "Test for enabled diagnostic logging");
-    US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for custom base storage path");
+        BundleContext ctx = f.GetBundleContext();
+
+        US_TEST_CONDITION("osgi" == ctx.GetProperty("org.osgi.framework.security").ToString(), "Test Framework custom launch properties");
+        US_TEST_CONDITION(0 == any_cast<int>(ctx.GetProperty("org.osgi.framework.startlevel.beginning")), "Test Framework custom launch properties");
+        US_TEST_CONDITION("single" == any_cast<std::string>(ctx.GetProperty("org.osgi.framework.bsnversion")), "Test Framework custom launch properties");
+        US_TEST_CONDITION("foo" == any_cast<std::string>(ctx.GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties");
+        US_TEST_CONDITION("bar" == any_cast<std::string>(ctx.GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties");
+        US_TEST_CONDITION(any_cast<bool>(ctx.GetProperty(Constants::FRAMEWORK_LOG)) == true, "Test for enabled diagnostic logging");
+    US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for custom base storage path");
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-        US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
 #else
-        US_TEST_CONDITION(f.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "single", "Test for attempt to change threading option")
 #endif
     }
 

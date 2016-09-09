@@ -129,6 +129,8 @@ private:
 
 public:
 
+  class Iterator;
+
   class US_Framework_EXPORT ConstIterator : public IteratorBase
   {
   private:
@@ -146,6 +148,7 @@ public:
 
     ConstIterator();
     ConstIterator(const iterator& it);
+    ConstIterator(const Iterator& it);
     ~ConstIterator();
 
     ConstIterator(OConstIter&& it);
@@ -208,6 +211,8 @@ public:
     bool operator!=(const iterator& x) const;
 
   private:
+
+    friend class ConstIterator;
 
     OIter const& o_it() const;
     OIter& o_it();

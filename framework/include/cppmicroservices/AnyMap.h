@@ -179,7 +179,7 @@ public:
     } iter;
   };
 
-  struct US_Framework_EXPORT Iterator : public IteratorBase
+  class US_Framework_EXPORT Iterator : public IteratorBase
   {
   private:
 

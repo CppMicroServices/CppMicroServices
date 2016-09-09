@@ -303,7 +303,7 @@ void frame037a()
   US_TEST_CONDITION(buExec.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID).Empty() == false, "Test for non-empty framework uuid property")
   auto props = buExec.GetBundleContext().GetProperties();
   US_TEST_CONDITION_REQUIRED(props.empty() == false, "Test for non-empty bundle props")
-  US_TEST_CONDITION(props.count(Constants::FRAMEWORK_VERSION) > 0, "Test for existing framework version prop")
+  US_TEST_CONDITION(props.count(Constants::FRAMEWORK_VERSION) == 1, "Test for existing framework version prop")
 }
 
 

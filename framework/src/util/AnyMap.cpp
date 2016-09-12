@@ -28,7 +28,7 @@ namespace cppmicroservices {
 
 namespace detail {
 
-std::size_t AnyMapCIHash::operator()(const std::string& key) const
+std::size_t any_map_cihash::operator()(const std::string& key) const
 {
   std::size_t h = 0;
   std::for_each(key.begin(), key.end(), [&h](char c )
@@ -38,7 +38,7 @@ std::size_t AnyMapCIHash::operator()(const std::string& key) const
   return h;
 }
 
-bool AnyMapCIEqual::operator()(const std::string& l, const std::string& r) const
+bool any_map_ciequal::operator()(const std::string& l, const std::string& r) const
 {
   return l.size() == r.size() &&
       std::equal(l.begin(), l.end(), r.begin(), []( char a , char b )
@@ -47,9 +47,9 @@ bool AnyMapCIEqual::operator()(const std::string& l, const std::string& r) const
   });
 }
 
-const Any& GetDotted(const std::vector<Any>& v, const AnyMap::key_type& key);
+const Any& AtCompoundKey(const std::vector<Any>& v, const AnyMap::key_type& key);
 
-const Any& GetDotted(const AnyMap& m, const AnyMap::key_type& key)
+const Any& AtCompoundKey(const AnyMap& m, const AnyMap::key_type& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos)
@@ -60,11 +60,11 @@ const Any& GetDotted(const AnyMap& m, const AnyMap::key_type& key)
     auto& h = m.at(head);
     if (h.Type() == typeid(AnyMap))
     {
-      return GetDotted(ref_any_cast<AnyMap>(h), tail);
+      return AtCompoundKey(ref_any_cast<AnyMap>(h), tail);
     }
     else if (h.Type() == typeid(std::vector<Any>))
     {
-      return GetDotted(ref_any_cast<std::vector<Any>>(h), tail);
+      return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail);
     }
     throw std::invalid_argument("Unsupported Any type at '" + head + "' for dotted get");
   }
@@ -74,7 +74,7 @@ const Any& GetDotted(const AnyMap& m, const AnyMap::key_type& key)
   }
 }
 
-const Any& GetDotted(const std::vector<Any>& v, const AnyMap::key_type& key)
+const Any& AtCompoundKey(const std::vector<Any>& v, const AnyMap::key_type& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos)
@@ -87,11 +87,11 @@ const Any& GetDotted(const std::vector<Any>& v, const AnyMap::key_type& key)
 
     if (h.Type() == typeid(AnyMap))
     {
-      return GetDotted(ref_any_cast<AnyMap>(h), tail);
+      return AtCompoundKey(ref_any_cast<AnyMap>(h), tail);
     }
     else if (h.Type() == typeid(std::vector<Any>))
     {
-      return GetDotted(ref_any_cast<std::vector<Any>>(h), tail);
+      return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail);
     }
     throw std::invalid_argument("Unsupported Any type at '" + head + "' for dotted get");
   }
@@ -105,22 +105,22 @@ const Any& GetDotted(const std::vector<Any>& v, const AnyMap::key_type& key)
 }
 
 // ----------------------------------------------------------------
-// -------------------  AnyMap::ConstIterator  --------------------
+// ------------------  any_map::const_iterator  -------------------
 
-AnyMap::ConstIterator::ConstIterator()
+any_map::const_iter::const_iter()
 {}
 
-AnyMap::ConstIterator::ConstIterator(const iterator& it)
-  : IteratorBase(it.type)
+any_map::const_iter::const_iter(const any_map::const_iter& it)
+  : iterator_base(it.type)
 {
   switch (type)
   {
   case ORDERED:
-    new (iter.o) OConstIter(it.o_it()); break;
+    new (this->it.o) ociter(it.o_it()); break;
   case UNORDERED:
-    new (iter.uo) UOConstIter(it.uo_it()); break;
+    new (this->it.uo) uociter(it.uo_it()); break;
   case UNORDERED_CI:
-    new (iter.uoci) UOCIConstIter(it.uoci_it()); break;
+    new (this->it.uoci) uocciiter(it.uoci_it()); break;
   case NONE:
     break;
   default:
@@ -128,17 +128,17 @@ AnyMap::ConstIterator::ConstIterator(const iterator& it)
   }
 }
 
-AnyMap::ConstIterator::ConstIterator(const AnyMap::Iterator& it)
- : IteratorBase(it.type)
+any_map::const_iter::const_iter(const any_map::iterator& it)
+ : iterator_base(it.type)
 {
   switch (type)
   {
   case ORDERED:
-    new (iter.o) OConstIter(it.o_it()); break;
+    new (this->it.o) ociter(it.o_it()); break;
   case UNORDERED:
-    new (iter.uo) UOConstIter(it.uo_it()); break;
+    new (this->it.uo) uociter(it.uo_it()); break;
   case UNORDERED_CI:
-    new (iter.uoci) UOCIConstIter(it.uoci_it()); break;
+    new (this->it.uoci) uocciiter(it.uoci_it()); break;
   case NONE:
     break;
   default:
@@ -146,42 +146,42 @@ AnyMap::ConstIterator::ConstIterator(const AnyMap::Iterator& it)
   }
 }
 
-AnyMap::ConstIterator::~ConstIterator()
+any_map::const_iter::~const_iter()
 {
   switch (type)
   {
   case ORDERED:
-    o_it().~OConstIter(); break;
+    o_it().~ociter(); break;
   case UNORDERED:
-    uo_it().~UOConstIter(); break;
+    uo_it().~uociter(); break;
   case UNORDERED_CI:
-    uoci_it().~UOCIConstIter(); break;
+    uoci_it().~uocciiter(); break;
   case NONE:
     break;
   }
 }
 
-AnyMap::ConstIterator::ConstIterator(OConstIter&& it)
-  : IteratorBase(ORDERED)
+any_map::const_iter::const_iter(ociter&& it)
+  : iterator_base(ORDERED)
 {
-  new (iter.o) OConstIter(std::move(it));
+  new (this->it.o) ociter(std::move(it));
 }
 
-AnyMap::ConstIterator::ConstIterator(UOConstIter&& it, IterType type)
-  : IteratorBase(type)
+any_map::const_iter::const_iter(uociter&& it, iter_type type)
+  : iterator_base(type)
 {
   switch (type)
   {
   case UNORDERED:
-    new (iter.uo) UOConstIter(std::move(it)); break;
+    new (this->it.uo) uociter(std::move(it)); break;
   case UNORDERED_CI:
-    new (iter.uoci) UOCIConstIter(std::move(it)); break;
+    new (this->it.uoci) uocciiter(std::move(it)); break;
   default:
     throw std::logic_error("type for unordered_map iterator not supported");
   }
 }
 
-AnyMap::ConstIterator::reference AnyMap::ConstIterator::operator* () const
+any_map::const_iter::reference any_map::const_iter::operator* () const
 {
   switch (type)
   {
@@ -198,7 +198,7 @@ AnyMap::ConstIterator::reference AnyMap::ConstIterator::operator* () const
   }
 }
 
-AnyMap::ConstIterator::pointer AnyMap::ConstIterator::operator-> () const
+any_map::const_iter::pointer any_map::const_iter::operator-> () const
 {
   switch (type)
   {
@@ -215,7 +215,7 @@ AnyMap::ConstIterator::pointer AnyMap::ConstIterator::operator-> () const
   }
 }
 
-AnyMap::ConstIterator::iterator& AnyMap::ConstIterator::operator++()
+any_map::const_iter::iterator& any_map::const_iter::operator++()
 {
   switch (type)
   {
@@ -234,7 +234,7 @@ AnyMap::ConstIterator::iterator& AnyMap::ConstIterator::operator++()
   return *this;
 }
 
-AnyMap::ConstIterator::iterator AnyMap::ConstIterator::operator++(int)
+any_map::const_iter::iterator any_map::const_iter::operator++(int)
 {
   iterator tmp = *this;
   switch (type)
@@ -253,7 +253,7 @@ AnyMap::ConstIterator::iterator AnyMap::ConstIterator::operator++(int)
   return tmp;
 }
 
-bool AnyMap::ConstIterator::operator==(const iterator& x) const
+bool any_map::const_iter::operator==(const iterator& x) const
 {
   switch (type)
   {
@@ -270,58 +270,58 @@ bool AnyMap::ConstIterator::operator==(const iterator& x) const
   }
 }
 
-bool AnyMap::ConstIterator::operator!=(const iterator& x) const
+bool any_map::const_iter::operator!=(const iterator& x) const
 {
   return !this->operator ==(x);
 }
 
-AnyMap::ConstIterator::OConstIter const& AnyMap::ConstIterator::o_it() const
+any_map::const_iter::ociter const& any_map::const_iter::o_it() const
 {
-  return *reinterpret_cast<OConstIter const*>(iter.o);
+  return *reinterpret_cast<ociter const*>(it.o);
 }
 
-AnyMap::ConstIterator::OConstIter& AnyMap::ConstIterator::o_it()
+any_map::const_iter::ociter& any_map::const_iter::o_it()
 {
-  return *reinterpret_cast<OConstIter*>(iter.o);
+  return *reinterpret_cast<ociter*>(it.o);
 }
 
-AnyMap::ConstIterator::UOConstIter const& AnyMap::ConstIterator::uo_it() const
+any_map::const_iter::uociter const& any_map::const_iter::uo_it() const
 {
-  return *reinterpret_cast<UOConstIter const*>(iter.uo);
+  return *reinterpret_cast<uociter const*>(it.uo);
 }
 
-AnyMap::ConstIterator::UOConstIter& AnyMap::ConstIterator::uo_it()
+any_map::const_iter::uociter& any_map::const_iter::uo_it()
 {
-  return *reinterpret_cast<UOConstIter*>(iter.uo);
+  return *reinterpret_cast<uociter*>(it.uo);
 }
 
-AnyMap::ConstIterator::UOCIConstIter const& AnyMap::ConstIterator::uoci_it() const
+any_map::const_iter::uocciiter const& any_map::const_iter::uoci_it() const
 {
-  return *reinterpret_cast<UOCIConstIter const*>(iter.uoci);
+  return *reinterpret_cast<uocciiter const*>(it.uoci);
 }
 
-AnyMap::ConstIterator::UOCIConstIter& AnyMap::ConstIterator::uoci_it()
+any_map::const_iter::uocciiter& any_map::const_iter::uoci_it()
 {
-  return *reinterpret_cast<UOCIConstIter*>(iter.uoci);
+  return *reinterpret_cast<uocciiter*>(it.uoci);
 }
 
 // ----------------------------------------------------------------
 // ---------------------  AnyMap::Iterator  -----------------------
 
-AnyMap::Iterator::Iterator()
+any_map::iter::iter()
 {}
 
-AnyMap::Iterator::Iterator(const iterator& it)
-  : IteratorBase(it.type)
+any_map::iter::iter(const iter& it)
+  : iterator_base(it.type)
 {
   switch (type)
   {
   case ORDERED:
-    new (iter.o) OIter(it.o_it()); break;
+    new (this->it.o) oiter(it.o_it()); break;
   case UNORDERED:
-    new (iter.uo) UOIter(it.uo_it()); break;
+    new (this->it.uo) uoiter(it.uo_it()); break;
   case UNORDERED_CI:
-    new (iter.uoci) UOCIIter(it.uoci_it()); break;
+    new (this->it.uoci) uociiter(it.uoci_it()); break;
   case NONE:
     break;
   default:
@@ -329,42 +329,42 @@ AnyMap::Iterator::Iterator(const iterator& it)
   }
 }
 
-AnyMap::Iterator::~Iterator()
+any_map::iter::~iter()
 {
   switch (type)
   {
   case ORDERED:
-    o_it().~OIter(); break;
+    o_it().~oiter(); break;
   case UNORDERED:
-    uo_it().~UOIter(); break;
+    uo_it().~uoiter(); break;
   case UNORDERED_CI:
-    uoci_it().~UOCIIter(); break;
+    uoci_it().~uociiter(); break;
   case NONE:
     break;
   }
 }
 
-AnyMap::Iterator::Iterator(OIter&& it)
-  : IteratorBase(ORDERED)
+any_map::iter::iter(oiter&& it)
+  : iterator_base(ORDERED)
 {
-  new (iter.o) OIter(std::move(it));
+  new (this->it.o) oiter(std::move(it));
 }
 
-AnyMap::Iterator::Iterator(UOIter&& it, IterType type)
-  : IteratorBase(type)
+any_map::iter::iter(uoiter&& it, iter_type type)
+  : iterator_base(type)
 {
   switch (type)
   {
   case UNORDERED:
-    new (iter.uo) UOIter(std::move(it)); break;
+    new (this->it.uo) uoiter(std::move(it)); break;
   case UNORDERED_CI:
-    new (iter.uoci) UOCIIter(std::move(it)); break;
+    new (this->it.uoci) uociiter(std::move(it)); break;
   default:
     throw std::logic_error("type for unordered_map iterator not supported");
   }
 }
 
-AnyMap::Iterator::reference AnyMap::Iterator::operator* () const
+any_map::iter::reference any_map::iter::operator* () const
 {
   switch (type)
   {
@@ -381,7 +381,7 @@ AnyMap::Iterator::reference AnyMap::Iterator::operator* () const
   }
 }
 
-AnyMap::Iterator::pointer AnyMap::Iterator::operator-> () const
+any_map::iter::pointer any_map::iter::operator-> () const
 {
   switch (type)
   {
@@ -398,7 +398,7 @@ AnyMap::Iterator::pointer AnyMap::Iterator::operator-> () const
   }
 }
 
-AnyMap::Iterator::iterator& AnyMap::Iterator::operator++()
+any_map::iter::iterator& any_map::iter::operator++()
 {
   switch (type)
   {
@@ -417,7 +417,7 @@ AnyMap::Iterator::iterator& AnyMap::Iterator::operator++()
   return *this;
 }
 
-AnyMap::Iterator::iterator AnyMap::Iterator::operator++(int)
+any_map::iter::iterator any_map::iter::operator++(int)
 {
   iterator tmp = *this;
   switch (type)
@@ -436,7 +436,7 @@ AnyMap::Iterator::iterator AnyMap::Iterator::operator++(int)
   return tmp;
 }
 
-bool AnyMap::Iterator::operator==(const iterator& x) const
+bool any_map::iter::operator==(const iterator& x) const
 {
   switch (type)
   {
@@ -453,360 +453,355 @@ bool AnyMap::Iterator::operator==(const iterator& x) const
   }
 }
 
-bool AnyMap::Iterator::operator!=(const iterator& x) const
+bool any_map::iter::operator!=(const iterator& x) const
 {
   return !this->operator ==(x);
 }
 
-AnyMap::Iterator::OIter const& AnyMap::Iterator::o_it() const
+any_map::iter::oiter const& any_map::iter::o_it() const
 {
-  return *reinterpret_cast<OIter const*>(iter.o);
+  return *reinterpret_cast<oiter const*>(this->it.o);
 }
 
-AnyMap::Iterator::OIter& AnyMap::Iterator::o_it()
+any_map::iter::oiter& any_map::iter::o_it()
 {
-  return *reinterpret_cast<OIter*>(iter.o);
+  return *reinterpret_cast<oiter*>(this->it.o);
 }
 
-AnyMap::Iterator::UOIter const& AnyMap::Iterator::uo_it() const
+any_map::iter::uoiter const& any_map::iter::uo_it() const
 {
-  return *reinterpret_cast<UOIter const*>(iter.uo);
+  return *reinterpret_cast<uoiter const*>(this->it.uo);
 }
 
-AnyMap::Iterator::UOIter& AnyMap::Iterator::uo_it()
+any_map::iter::uoiter& any_map::iter::uo_it()
 {
-  return *reinterpret_cast<UOIter*>(iter.uo);
+  return *reinterpret_cast<uoiter*>(this->it.uo);
 }
 
-AnyMap::Iterator::UOCIIter const& AnyMap::Iterator::uoci_it() const
+any_map::iter::uociiter const& any_map::iter::uoci_it() const
 {
-  return *reinterpret_cast<UOCIIter const*>(iter.uoci);
+  return *reinterpret_cast<uociiter const*>(this->it.uoci);
 }
 
-AnyMap::Iterator::UOCIIter& AnyMap::Iterator::uoci_it()
+any_map::iter::uociiter& any_map::iter::uoci_it()
 {
-  return *reinterpret_cast<UOCIIter*>(iter.uoci);
+  return *reinterpret_cast<uociiter*>(this->it.uoci);
 }
 
 // ----------------------------------------------------------
-// -------------------------  AnyMap  -----------------------
+// ------------------------  any_map  -----------------------
 
-AnyMap::AnyMap(Type type)
+any_map::any_map(map_type type)
   : type(type)
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
-    new (&map.o) OrderedMap();
+  case map_type::ORDERED_MAP:
+    new (&map.o) ordered_any_map();
     break;
-  case Type::UNORDERED_MAP:
-    new (&map.uo) UnorderedMap();
+  case map_type::UNORDERED_MAP:
+    new (&map.uo) unordered_any_map();
     break;
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    new (&map.uoci) UnorderedMapCaseInsensitiveKeys();
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+    new (&map.uoci) unordered_any_cimap();
     break;
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::AnyMap(const OrderedMap& m)
-  : type(Type::ORDERED_MAP)
+any_map::any_map(const ordered_any_map& m)
+  : type(map_type::ORDERED_MAP)
 {
-  new (&map.o) OrderedMap(m);
+  new (&map.o) ordered_any_map(m);
 }
 
-AnyMap::AnyMap(const UnorderedMap& m)
-  : type(Type::UNORDERED_MAP)
+any_map::any_map(const unordered_any_map& m)
+  : type(map_type::UNORDERED_MAP)
 {
-  new (&map.uo) UnorderedMap(m);
+  new (&map.uo) unordered_any_map(m);
 }
 
-AnyMap::AnyMap(const UnorderedMapCaseInsensitiveKeys& m)
-  : type(Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+any_map::any_map(const unordered_any_cimap& m)
+  : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
-  new (&map.uoci) UnorderedMapCaseInsensitiveKeys(m);
+  new (&map.uoci) unordered_any_cimap(m);
 }
 
-AnyMap::AnyMap(const AnyMap& m)
+any_map::any_map(const any_map& m)
   : type(m.type)
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
-    new (&map.o) OrderedMap(m.o_m());
+  case map_type::ORDERED_MAP:
+    new (&map.o) ordered_any_map(m.o_m());
     break;
-  case Type::UNORDERED_MAP:
-    new (&map.uo) UnorderedMap(m.uo_m());
+  case map_type::UNORDERED_MAP:
+    new (&map.uo) unordered_any_map(m.uo_m());
     break;
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    new (&map.uoci) UnorderedMapCaseInsensitiveKeys(m.uoci_m());
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+    new (&map.uoci) unordered_any_cimap(m.uoci_m());
     break;
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap& AnyMap::operator =(const AnyMap& m)
+any_map& any_map::operator =(const any_map& m)
 {
   if (this == &m)
     return *this;
 
   switch (type)
   {
-  case Type::ORDERED_MAP:
-    o_m().~OrderedMap();
+  case map_type::ORDERED_MAP:
+    o_m().~ordered_any_map();
     break;
-  case Type::UNORDERED_MAP:
-    uo_m().~UnorderedMap();
+  case map_type::UNORDERED_MAP:
+    uo_m().~unordered_any_map();
     break;
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    uoci_m().~UnorderedMapCaseInsensitiveKeys();
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+    uoci_m().~unordered_any_cimap();
     break;
   }
 
   switch (m.type)
   {
-  case Type::ORDERED_MAP:
-    new (&map.o) OrderedMap(m.o_m());
+  case map_type::ORDERED_MAP:
+    new (&map.o) ordered_any_map(m.o_m());
     break;
-  case Type::UNORDERED_MAP:
-    new (&map.uo) UnorderedMap(m.uo_m());
+  case map_type::UNORDERED_MAP:
+    new (&map.uo) unordered_any_map(m.uo_m());
     break;
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    new (&map.uoci) UnorderedMapCaseInsensitiveKeys(m.uoci_m());
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+    new (&map.uoci) unordered_any_cimap(m.uoci_m());
     break;
   }
 
   return *this;
 }
 
-AnyMap::~AnyMap()
+any_map::~any_map()
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
-    o_m().~OrderedMap();
+  case map_type::ORDERED_MAP:
+    o_m().~ordered_any_map();
     break;
-  case Type::UNORDERED_MAP:
-    uo_m().~UnorderedMap();
+  case map_type::UNORDERED_MAP:
+    uo_m().~unordered_any_map();
     break;
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    uoci_m().~UnorderedMapCaseInsensitiveKeys();
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+    uoci_m().~unordered_any_cimap();
     break;
   }
 }
 
-AnyMap::Type AnyMap::GetType() const
-{
-  return type;
-}
-
-AnyMap::iterator AnyMap::begin()
+any_map::iterator any_map::begin()
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return { o_m().begin() };
-  case Type::UNORDERED_MAP:
-    return { uo_m().begin(), iterator::UNORDERED };
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    return { uoci_m().begin(), iterator::UNORDERED_CI };
+  case map_type::UNORDERED_MAP:
+    return { uo_m().begin(), iter::UNORDERED };
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+    return { uoci_m().begin(), iter::UNORDERED_CI };
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::const_iterator AnyMap::begin() const
+any_map::const_iter any_map::begin() const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return { o_m().begin() };
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return { uo_m().begin(), const_iterator::UNORDERED };
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return { uoci_m().begin(), const_iterator::UNORDERED_CI };
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::const_iterator AnyMap::cbegin() const
+any_map::const_iterator any_map::cbegin() const
 {
   return begin();
 }
 
-AnyMap::iterator AnyMap::end()
+any_map::iterator any_map::end()
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return { o_m().end() };
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return { uo_m().end(), iterator::UNORDERED };
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return { uoci_m().end(), iterator::UNORDERED_CI };
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::const_iterator AnyMap::end() const
+any_map::const_iterator any_map::end() const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return { o_m().end() };
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return { uo_m().end(), const_iterator::UNORDERED };
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return { uoci_m().end(), const_iterator::UNORDERED_CI };
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::const_iterator AnyMap::cend() const
+any_map::const_iterator any_map::cend() const
 {
   return end();
 }
 
-bool AnyMap::empty() const
+bool any_map::empty() const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m().empty();
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m().empty();
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m().empty();
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::size_type AnyMap::size() const
+any_map::size_type any_map::size() const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m().size();
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m().size();
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m().size();
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::size_type AnyMap::count(const AnyMap::key_type& key) const
+any_map::size_type any_map::count(const any_map::key_type& key) const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m().count(key);
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m().count(key);
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m().count(key);
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-void AnyMap::clear()
+void any_map::clear()
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m().clear();
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m().clear();
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m().clear();
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::mapped_type& AnyMap::at(const key_type& key)
+any_map::mapped_type& any_map::at(const key_type& key)
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m().at(key);
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m().at(key);
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m().at(key);
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-const AnyMap::mapped_type& AnyMap::at(const AnyMap::key_type& key) const
+const any_map::mapped_type& any_map::at(const any_map::key_type& key) const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m().at(key);
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m().at(key);
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m().at(key);
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::mapped_type& AnyMap::operator[](const AnyMap::key_type& key)
+any_map::mapped_type& any_map::operator[](const any_map::key_type& key)
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m()[key];
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m()[key];
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m()[key];
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::mapped_type& AnyMap::operator[](AnyMap::key_type&& key)
+any_map::mapped_type& any_map::operator[](any_map::key_type&& key)
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return o_m()[std::move(key)];
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return uo_m()[std::move(key)];
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return uoci_m()[std::move(key)];
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-std::pair<AnyMap::iterator, bool> AnyMap::insert(const value_type& value)
+std::pair<any_map::iterator, bool> any_map::insert(const value_type& value)
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
   {
     auto p = o_m().insert(value);
     return { iterator(std::move(p.first)), p.second };
   }
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
   {
     auto p = uo_m().insert(value);
     return { iterator(std::move(p.first), iterator::UNORDERED), p.second };
   }
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
   {
     auto p = uoci_m().insert(value);
     return { iterator(std::move(p.first), iterator::UNORDERED_CI), p.second };
@@ -816,66 +811,96 @@ std::pair<AnyMap::iterator, bool> AnyMap::insert(const value_type& value)
   }
 }
 
-AnyMap::const_iterator AnyMap::find(const key_type& key) const
+any_map::const_iterator any_map::find(const key_type& key) const
 {
   switch (type)
   {
-  case Type::ORDERED_MAP:
+  case map_type::ORDERED_MAP:
     return { o_m().find(key) };
-  case Type::UNORDERED_MAP:
+  case map_type::UNORDERED_MAP:
     return { uo_m().find(key), const_iterator::UNORDERED };
-  case Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+  case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
     return { uoci_m().find(key), const_iterator::UNORDERED_CI };
   default:
     throw std::logic_error("invalid map type");
   }
 }
 
-AnyMap::mapped_type& AnyMap::GetDotted(const AnyMap::key_type& key)
+any_map::ordered_any_map const& any_map::o_m() const
 {
-  return const_cast<mapped_type&>(static_cast<const AnyMap*>(this)->GetDotted(key));
+  return *reinterpret_cast<ordered_any_map const*>(map.o);
 }
 
-const AnyMap::mapped_type& AnyMap::GetDotted(const AnyMap::key_type& key) const
+any_map::ordered_any_map& any_map::o_m()
 {
-  return detail::GetDotted(*this, key);
+  return *reinterpret_cast<ordered_any_map*>(map.o);
 }
 
-AnyMap::OrderedMap const& AnyMap::o_m() const
+any_map::unordered_any_map const& any_map::uo_m() const
 {
-  return *reinterpret_cast<OrderedMap const*>(map.o);
+  return *reinterpret_cast<unordered_any_map const*>(map.uo);
 }
 
-AnyMap::OrderedMap& AnyMap::o_m()
+any_map::unordered_any_map& any_map::uo_m()
 {
-  return *reinterpret_cast<OrderedMap*>(map.o);
+  return *reinterpret_cast<unordered_any_map*>(map.uo);
 }
 
-AnyMap::UnorderedMap const& AnyMap::uo_m() const
+any_map::unordered_any_cimap const& any_map::uoci_m() const
 {
-  return *reinterpret_cast<UnorderedMap const*>(map.uo);
+  return *reinterpret_cast<unordered_any_cimap const*>(map.uoci);
 }
 
-AnyMap::UnorderedMap& AnyMap::uo_m()
+any_map::unordered_any_cimap& any_map::uoci_m()
 {
-  return *reinterpret_cast<UnorderedMap*>(map.uo);
+  return *reinterpret_cast<unordered_any_cimap*>(map.uoci);
 }
 
-AnyMap::UnorderedMapCaseInsensitiveKeys const& AnyMap::uoci_m() const
+
+// ----------------------------------------------------------
+// ------------------------  AnyMap  ------------------------
+
+AnyMap::AnyMap(map_type type)
+  : any_map(type)
 {
-  return *reinterpret_cast<UnorderedMapCaseInsensitiveKeys const*>(map.uoci);
 }
 
-AnyMap::UnorderedMapCaseInsensitiveKeys& AnyMap::uoci_m()
+AnyMap::AnyMap(const ordered_any_map& m)
+  : any_map(m)
 {
-  return *reinterpret_cast<UnorderedMapCaseInsensitiveKeys*>(map.uoci);
 }
+
+AnyMap::AnyMap(const unordered_any_map& m)
+  : any_map(m)
+{
+}
+
+AnyMap::AnyMap(const unordered_any_cimap& m)
+  : any_map(m)
+{
+}
+
+AnyMap::map_type AnyMap::GetType() const
+{
+  return type;
+}
+
+AnyMap::mapped_type& AnyMap::AtCompoundKey(const key_type& key)
+{
+  return const_cast<mapped_type&>(static_cast<const AnyMap*>(this)->AtCompoundKey(key));
+}
+
+const AnyMap::mapped_type& AnyMap::AtCompoundKey(const key_type& key) const
+{
+  return detail::AtCompoundKey(*this, key);
+}
+
 
 template<>
 std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m)
 {
   os << "{";
-  typedef AnyMap::const_iterator Iterator;
+  typedef any_map::const_iterator Iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();

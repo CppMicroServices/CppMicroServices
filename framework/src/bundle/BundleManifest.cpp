@@ -43,7 +43,7 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
   {
     if (ci)
     {
-      Any any = AnyMap(AnyMap::Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+      Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
     }
@@ -132,7 +132,7 @@ void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector,
 }
 
 BundleManifest::BundleManifest()
-  : m_Headers(AnyMap::Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+  : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
 }
 

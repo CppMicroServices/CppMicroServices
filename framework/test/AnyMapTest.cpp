@@ -33,10 +33,10 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("AnyMapTest");
 
   US_TEST_FOR_EXCEPTION_BEGIN(std::logic_error)
-  AnyMap m(static_cast<AnyMap::Type>(100));
+  AnyMap m(static_cast<AnyMap::map_type>(100));
   US_TEST_FOR_EXCEPTION_END(std::logic_error)
 
-  AnyMap om(AnyMap::Type::ORDERED_MAP);
+  AnyMap om(AnyMap::ORDERED_MAP);
   US_TEST_CONDITION(om.size() == 0, "Empty ordered map")
   US_TEST_CONDITION(om.empty(), "Empty ordered map")
   US_TEST_CONDITION(om.count("key1") == 0, "No key1 key")
@@ -68,11 +68,11 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
    *
    */
 
-  AnyMap uoci(AnyMap::Type::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   uoci["FiRST"] = 1;
   uoci["SECOND"] = 2;
 
-  AnyMap uo(AnyMap::Type::UNORDERED_MAP);
+  AnyMap uo(AnyMap::UNORDERED_MAP);
   uo["hi"] = std::string("hi");
   uo["there"] = std::string("there");
 
@@ -82,11 +82,11 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   om["uoci"] = uoci;
   om["dot.key"] = 5;
 
-  US_TEST_CONDITION(om.GetDotted("key1") == std::string("val1"), "Get key1")
-  US_TEST_CONDITION(om.GetDotted("uoci.first") == 1, "Get uoci.first")
-  US_TEST_CONDITION(om.GetDotted("uoci.second") == 2, "Get uoci.SECOND")
-  US_TEST_CONDITION(om.GetDotted("uoci.Vec.0") == std::string("one"), "Get uoci.Vec.0")
-  US_TEST_CONDITION(om.GetDotted("uoci.Vec.2.there") == std::string("there"), "Get uoci.Vec.2.there")
+  US_TEST_CONDITION(om.AtCompoundKey("key1") == std::string("val1"), "Get key1")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.first") == 1, "Get uoci.first")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.second") == 2, "Get uoci.SECOND")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.0") == std::string("one"), "Get uoci.Vec.0")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.2.there") == std::string("there"), "Get uoci.Vec.2.there")
 
   std::set<std::string> keys;
   for (auto p : uoci)
@@ -104,15 +104,15 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   US_TEST_FOR_EXCEPTION_END(std::out_of_range)
 
   US_TEST_FOR_EXCEPTION_BEGIN(std::out_of_range)
-  om.GetDotted("dot.key");
+  om.AtCompoundKey("dot.key");
   US_TEST_FOR_EXCEPTION_END(std::out_of_range)
 
   US_TEST_FOR_EXCEPTION_BEGIN(std::invalid_argument)
-  uoci.GetDotted("Vec.bla");
+  uoci.AtCompoundKey("Vec.bla");
   US_TEST_FOR_EXCEPTION_END(std::invalid_argument)
 
   US_TEST_FOR_EXCEPTION_BEGIN(std::invalid_argument)
-  uoci.GetDotted("Vec.1.bla");
+  uoci.AtCompoundKey("Vec.1.bla");
   US_TEST_FOR_EXCEPTION_END(std::invalid_argument)
 
   US_TEST_END()

@@ -32,12 +32,12 @@ namespace cppmicroservices {
 
 namespace detail {
 
-struct AnyMapCIHash
+struct any_map_cihash
 {
   std::size_t operator()(const std::string& key) const;
 };
 
-struct AnyMapCIEqual
+struct any_map_ciequal
 {
   bool operator()(const std::string& l, const std::string& r) const;
 };
@@ -52,21 +52,18 @@ struct AnyMapCIEqual
  * This is a convenience class providing a STL associative container
  * interface for different underlying container types. Supported underlying
  * types are
- * - \c AnyMap::OrderedMap (a STL map)
- * - \c AnyMap::UnorderedMap (a STL unordered map)
- * - \c AnyMap::UnorderedMapCaseInsensitiveKeys (a STL unordered map with case insensitive key comparison)
+ * - \c any_map::ordered_any_map (a STL map)
+ * - \c any_map::unordered_any_map (a STL unordered map)
+ * - \c any_map::unordered_any_cimap (a STL unordered map with case insensitive key comparison)
  *
  * This class provides most of the STL functions for associated containers,
  * including forward iterators. It is typically not instantiated by clients
- * directly, but obtained via framework API calls.
+ * directly, but obtained via framework API calls, returning an \c AnyMap
+ * sub-class instance.
  *
- * The \c AnyMap is a recursive data structure, and its values can be
- * retrieved via standard map functions or by using a dotted key notation
- * specifying a compound key.
- *
- * @see GetDotted(const std::string&)
+ * @see AnyMap
  */
-class US_Framework_EXPORT AnyMap
+class US_Framework_EXPORT any_map
 {
 
 public:
@@ -81,11 +78,11 @@ public:
   typedef value_type* pointer;
   typedef value_type const* const_pointer;
 
-  typedef std::map<std::string, Any> OrderedMap;
-  typedef std::unordered_map<std::string, Any> UnorderedMap;
-  typedef std::unordered_map<std::string, Any, detail::AnyMapCIHash, detail::AnyMapCIEqual> UnorderedMapCaseInsensitiveKeys;
+  typedef std::map<std::string, Any> ordered_any_map;
+  typedef std::unordered_map<std::string, Any> unordered_any_map;
+  typedef std::unordered_map<std::string, Any, detail::any_map_cihash, detail::any_map_ciequal> unordered_any_cimap;
 
-  enum class Type
+  enum map_type : uint8_t
   {
     ORDERED_MAP,
     UNORDERED_MAP,
@@ -94,13 +91,13 @@ public:
 
 private:
 
-  class US_Framework_EXPORT IteratorBase
+  class US_Framework_EXPORT iterator_base
   {
-    friend class AnyMap;
+    friend class any_map;
 
   protected:
 
-    enum IterType
+    enum iter_type : uint8_t
     {
       NONE,
       ORDERED,
@@ -108,51 +105,51 @@ private:
       UNORDERED_CI
     };
 
-    IterType type;
+    iter_type type;
 
-    IteratorBase()
+    iterator_base()
       : type(NONE)
     {}
 
-    IteratorBase(IterType type)
+    iterator_base(iter_type type)
       : type(type)
     {}
 
   public:
 
-    typedef AnyMap::value_type value_type;
+    typedef any_map::value_type value_type;
 
     typedef std::forward_iterator_tag iterator_category;
-    typedef AnyMap::difference_type difference_type;
+    typedef any_map::difference_type difference_type;
 
   };
 
 public:
 
-  class Iterator;
+  class iter;
 
-  class US_Framework_EXPORT ConstIterator : public IteratorBase
+  class US_Framework_EXPORT const_iter : public iterator_base
   {
   private:
 
-    typedef OrderedMap::const_iterator OConstIter;
-    typedef UnorderedMap::const_iterator UOConstIter;
-    typedef UnorderedMapCaseInsensitiveKeys::const_iterator UOCIConstIter;
+    typedef ordered_any_map::const_iterator ociter;
+    typedef unordered_any_map::const_iterator uociter;
+    typedef unordered_any_cimap::const_iterator uocciiter;
 
   public:
 
-    typedef AnyMap::const_reference reference;
-    typedef AnyMap::const_pointer pointer;
+    typedef any_map::const_reference reference;
+    typedef any_map::const_pointer pointer;
 
-    typedef ConstIterator iterator;
+    typedef const_iter iterator;
 
-    ConstIterator();
-    ConstIterator(const iterator& it);
-    ConstIterator(const Iterator& it);
-    ~ConstIterator();
+    const_iter();
+    const_iter(const iterator& it);
+    const_iter(const iter& it);
+    ~const_iter();
 
-    ConstIterator(OConstIter&& it);
-    ConstIterator(UOConstIter&& it, IterType type);
+    const_iter(ociter&& it);
+    const_iter(uociter&& it, iter_type type);
 
     reference operator* () const;
     pointer operator-> () const;
@@ -165,41 +162,41 @@ public:
 
   private:
 
-    OConstIter const& o_it() const;
-    OConstIter& o_it();
-    UOConstIter const& uo_it() const;
-    UOConstIter& uo_it();
-    UOCIConstIter const& uoci_it() const;
-    UOCIConstIter& uoci_it();
+    ociter const& o_it() const;
+    ociter& o_it();
+    uociter const& uo_it() const;
+    uociter& uo_it();
+    uocciiter const& uoci_it() const;
+    uocciiter& uoci_it();
 
     union {
-      char o[sizeof(OConstIter)];
-      char uo[sizeof(UOConstIter)];
-      char uoci[sizeof(UOCIConstIter)];
-    } iter;
+      char o[sizeof(ociter)];
+      char uo[sizeof(uociter)];
+      char uoci[sizeof(uocciiter)];
+    } it;
   };
 
-  class US_Framework_EXPORT Iterator : public IteratorBase
+  class US_Framework_EXPORT iter : public iterator_base
   {
   private:
 
-    typedef OrderedMap::iterator OIter;
-    typedef UnorderedMap::iterator UOIter;
-    typedef UnorderedMapCaseInsensitiveKeys::iterator UOCIIter;
+    typedef ordered_any_map::iterator oiter;
+    typedef unordered_any_map::iterator uoiter;
+    typedef unordered_any_cimap::iterator uociiter;
 
   public:
 
-    typedef AnyMap::reference reference;
-    typedef AnyMap::pointer pointer;
+    typedef any_map::reference reference;
+    typedef any_map::pointer pointer;
 
-    typedef Iterator iterator;
+    typedef iter iterator;
 
-    Iterator();
-    Iterator(const iterator& it);
-    ~Iterator();
+    iter();
+    iter(const iter& it);
+    ~iter();
 
-    Iterator(OIter&& it);
-    Iterator(UOIter&& it, IterType type);
+    iter(oiter&& it);
+    iter(uoiter&& it, iter_type type);
 
     reference operator* () const;
     pointer operator-> () const;
@@ -212,44 +209,42 @@ public:
 
   private:
 
-    friend class ConstIterator;
+    friend class const_iter;
 
-    OIter const& o_it() const;
-    OIter& o_it();
-    UOIter const& uo_it() const;
-    UOIter& uo_it();
-    UOCIIter const& uoci_it() const;
-    UOCIIter& uoci_it();
+    oiter const& o_it() const;
+    oiter& o_it();
+    uoiter const& uo_it() const;
+    uoiter& uo_it();
+    uociiter const& uoci_it() const;
+    uociiter& uoci_it();
 
     union {
-      char o[sizeof(OIter)];
-      char uo[sizeof(UOIter)];
-      char uoci[sizeof(UOCIIter)];
-    } iter;
+      char o[sizeof(oiter)];
+      char uo[sizeof(uoiter)];
+      char uoci[sizeof(uociiter)];
+    } it;
 
   };
 
-  typedef Iterator iterator;
-  typedef ConstIterator const_iterator;
+  typedef iter iterator;
+  typedef const_iter const_iterator;
 
-  AnyMap(Type type);
-  AnyMap(const OrderedMap& m);
-  AnyMap(const UnorderedMap& m);
-  AnyMap(const UnorderedMapCaseInsensitiveKeys& m);
+  any_map(map_type type);
+  any_map(const ordered_any_map& m);
+  any_map(const unordered_any_map& m);
+  any_map(const unordered_any_cimap& m);
 
-  AnyMap(const AnyMap& m);
-  AnyMap& operator=(const AnyMap& m);
+  any_map(const any_map& m);
+  any_map& operator=(const any_map& m);
 
-  ~AnyMap();
+  ~any_map();
 
-  Type GetType() const;
-
-  iterator begin();
-  const_iterator begin() const;
-  const_iterator cbegin() const;
-  iterator end();
-  const_iterator end() const;
-  const_iterator cend() const;
+  iter begin();
+  const_iter begin() const;
+  const_iter cbegin() const;
+  iter end();
+  const_iter end() const;
+  const_iter cend() const;
 
   bool empty() const;
   size_type size() const;
@@ -264,6 +259,54 @@ public:
 
   std::pair<iterator, bool> insert(const value_type& value);
   const_iterator find(const key_type& key) const;
+
+protected:
+
+  map_type type;
+
+private:
+
+  ordered_any_map const& o_m() const;
+  ordered_any_map& o_m();
+  unordered_any_map const& uo_m() const;
+  unordered_any_map& uo_m();
+  unordered_any_cimap const& uoci_m() const;
+  unordered_any_cimap& uoci_m();
+
+  union {
+    char o[sizeof(ordered_any_map)];
+    char uo[sizeof(unordered_any_map)];
+    char uoci[sizeof(unordered_any_cimap)];
+  } map;
+};
+
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * A map data structure with support for compound keys.
+ *
+ * This class adds convenience functions on top of the \c any_map
+ * class. The \c any_map is a recursive data structure, and its values can be
+ * retrieved via standard map functions or by using a dotted key notation
+ * specifying a compound key.
+ *
+ * @see any_map
+ */
+class US_Framework_EXPORT AnyMap : public any_map
+{
+public:
+
+  AnyMap(map_type type);
+  AnyMap(const ordered_any_map& m);
+  AnyMap(const unordered_any_map& m);
+  AnyMap(const unordered_any_cimap& m);
+
+  /**
+   * Get the underlying STL container type.
+   *
+   * @return The STL container type holding the map data.
+   */
+  map_type GetType() const;
 
   /**
    * Get a key's value, using a compound key notation.
@@ -286,9 +329,9 @@ public:
    * \endcode
    * can be queried using the following notation:
    * \code
-   * map.GetDotted("one"); // returns Any(1)
-   * map.GetDotted("three.a"); // returns Any(std::string("anton"))
-   * map.GetDotted("three.b.1"); // returns Any(8)
+   * map.AtCompoundKey("one");       // returns Any(1)
+   * map.AtCompoundKey("three.a");   // returns Any(std::string("anton"))
+   * map.AtCompoundKey("three.b.1"); // returns Any(8)
    * \endcode
    *
    * @param key The key hierachy to query.
@@ -297,26 +340,9 @@ public:
    * @throws std::invalid_argument if the \c Any value for a given key is not of type \c AnyMap or \c std::vector<Any>.
    * std::out_of_range if the key is not found or a numerical index would fall out of the range of an \c int type.
    */
-  mapped_type& GetDotted(const key_type& key);
-  const mapped_type& GetDotted(const key_type& key) const;
+  mapped_type& AtCompoundKey(const key_type& key);
+  const mapped_type& AtCompoundKey(const key_type& key) const;
 
-
-private:
-
-  OrderedMap const& o_m() const;
-  OrderedMap& o_m();
-  UnorderedMap const& uo_m() const;
-  UnorderedMap& uo_m();
-  UnorderedMapCaseInsensitiveKeys const& uoci_m() const;
-  UnorderedMapCaseInsensitiveKeys& uoci_m();
-
-  Type type;
-
-  union {
-    char o[sizeof(OrderedMap)];
-    char uo[sizeof(UnorderedMap)];
-    char uoci[sizeof(UnorderedMapCaseInsensitiveKeys)];
-  } map;
 };
 
 template<>

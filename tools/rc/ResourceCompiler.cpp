@@ -504,14 +504,6 @@ int main(int argc, char** argv)
       std::string bundleBinaryFile(bundleFileOpt->arg);
       std::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
       std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
-      if (!zipFileStream.is_open())
-      {
-        std::cout << "failed to open zip file" << std::endl;
-      }
-      if (!outFileStream.is_open())
-      {
-        std::cout << "failed to open dll file" << std::endl;
-      }
       if (outFileStream.is_open() && zipFileStream.is_open())
       {
         std::clog << "Appending file " << bundleBinaryFile << " with contents of resources zip file at " << zipFile << std::endl;

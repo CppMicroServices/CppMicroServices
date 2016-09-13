@@ -116,7 +116,7 @@ namespace
 
         std::size_t numTestBundles = 16;  // 14 test bundles + 1 statically linked bundle + the system bundle
         numTestBundles += 1; // main
-        const int numTestThreads = 100;
+        const int numTestThreads = 50;
         std::vector<std::thread> threads;
         for (int i = 0; i < numTestThreads; ++i)
         {

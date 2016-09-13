@@ -79,7 +79,7 @@ US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copy
 US_Framework_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
 
 /**
- * Manifest header identifying the bundle's menifest version.
+ * Manifest header identifying the bundle's manifest version.
  *
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.

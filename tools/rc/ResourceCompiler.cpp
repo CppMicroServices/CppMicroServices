@@ -385,7 +385,7 @@ const option::Descriptor usage[] =
 
 int main(int argc, char** argv)
 {
-  int compressionLevel = 6;
+  int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
   int return_code = EXIT_SUCCESS;
   std::string bundleName;
   

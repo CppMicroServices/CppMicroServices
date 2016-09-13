@@ -116,11 +116,11 @@ any_map::const_iter::const_iter(const any_map::const_iter& it)
   switch (type)
   {
   case ORDERED:
-    new (this->it.o) ociter(it.o_it()); break;
+    this->it.o = new ociter(it.o_it()); break;
   case UNORDERED:
-    new (this->it.uo) uociter(it.uo_it()); break;
+    this->it.uo = new uociter(it.uo_it()); break;
   case UNORDERED_CI:
-    new (this->it.uoci) uocciiter(it.uoci_it()); break;
+    this->it.uoci = new uocciiter(it.uoci_it()); break;
   case NONE:
     break;
   default:
@@ -134,11 +134,11 @@ any_map::const_iter::const_iter(const any_map::iterator& it)
   switch (type)
   {
   case ORDERED:
-    new (this->it.o) ociter(it.o_it()); break;
+    this->it.o = new ociter(it.o_it()); break;
   case UNORDERED:
-    new (this->it.uo) uociter(it.uo_it()); break;
+    this->it.uo = new uociter(it.uo_it()); break;
   case UNORDERED_CI:
-    new (this->it.uoci) uocciiter(it.uoci_it()); break;
+    this->it.uoci = new uocciiter(it.uoci_it()); break;
   case NONE:
     break;
   default:
@@ -151,11 +151,11 @@ any_map::const_iter::~const_iter()
   switch (type)
   {
   case ORDERED:
-    o_it().~ociter(); break;
+    delete it.o; break;
   case UNORDERED:
-    uo_it().~uociter(); break;
+    delete it.uo; break;
   case UNORDERED_CI:
-    uoci_it().~uocciiter(); break;
+    delete it.uoci; break;
   case NONE:
     break;
   }
@@ -164,7 +164,7 @@ any_map::const_iter::~const_iter()
 any_map::const_iter::const_iter(ociter&& it)
   : iterator_base(ORDERED)
 {
-  new (this->it.o) ociter(std::move(it));
+  this->it.o = new ociter(std::move(it));
 }
 
 any_map::const_iter::const_iter(uociter&& it, iter_type type)
@@ -173,9 +173,9 @@ any_map::const_iter::const_iter(uociter&& it, iter_type type)
   switch (type)
   {
   case UNORDERED:
-    new (this->it.uo) uociter(std::move(it)); break;
+    this->it.uo = new uociter(std::move(it)); break;
   case UNORDERED_CI:
-    new (this->it.uoci) uocciiter(std::move(it)); break;
+    this->it.uoci = new uocciiter(std::move(it)); break;
   default:
     throw std::logic_error("type for unordered_map iterator not supported");
   }
@@ -277,36 +277,36 @@ bool any_map::const_iter::operator!=(const iterator& x) const
 
 any_map::const_iter::ociter const& any_map::const_iter::o_it() const
 {
-  return *reinterpret_cast<ociter const*>(it.o);
+  return *it.o;
 }
 
 any_map::const_iter::ociter& any_map::const_iter::o_it()
 {
-  return *reinterpret_cast<ociter*>(it.o);
+  return *it.o;
 }
 
 any_map::const_iter::uociter const& any_map::const_iter::uo_it() const
 {
-  return *reinterpret_cast<uociter const*>(it.uo);
+  return *it.uo;
 }
 
 any_map::const_iter::uociter& any_map::const_iter::uo_it()
 {
-  return *reinterpret_cast<uociter*>(it.uo);
+  return *it.uo;
 }
 
 any_map::const_iter::uocciiter const& any_map::const_iter::uoci_it() const
 {
-  return *reinterpret_cast<uocciiter const*>(it.uoci);
+  return *it.uoci;
 }
 
 any_map::const_iter::uocciiter& any_map::const_iter::uoci_it()
 {
-  return *reinterpret_cast<uocciiter*>(it.uoci);
+  return *it.uoci;
 }
 
 // ----------------------------------------------------------------
-// ---------------------  AnyMap::Iterator  -----------------------
+// ---------------------  AnyMap::iterator  -----------------------
 
 any_map::iter::iter()
 {}
@@ -317,11 +317,11 @@ any_map::iter::iter(const iter& it)
   switch (type)
   {
   case ORDERED:
-    new (this->it.o) oiter(it.o_it()); break;
+    this->it.o = new oiter(it.o_it()); break;
   case UNORDERED:
-    new (this->it.uo) uoiter(it.uo_it()); break;
+    this->it.uo = new uoiter(it.uo_it()); break;
   case UNORDERED_CI:
-    new (this->it.uoci) uociiter(it.uoci_it()); break;
+    this->it.uoci = new uociiter(it.uoci_it()); break;
   case NONE:
     break;
   default:
@@ -334,11 +334,11 @@ any_map::iter::~iter()
   switch (type)
   {
   case ORDERED:
-    o_it().~oiter(); break;
+    delete it.o; break;
   case UNORDERED:
-    uo_it().~uoiter(); break;
+    delete it.uo; break;
   case UNORDERED_CI:
-    uoci_it().~uociiter(); break;
+    delete it.uoci; break;
   case NONE:
     break;
   }
@@ -347,7 +347,7 @@ any_map::iter::~iter()
 any_map::iter::iter(oiter&& it)
   : iterator_base(ORDERED)
 {
-  new (this->it.o) oiter(std::move(it));
+  this->it.o = new oiter(std::move(it));
 }
 
 any_map::iter::iter(uoiter&& it, iter_type type)
@@ -356,9 +356,9 @@ any_map::iter::iter(uoiter&& it, iter_type type)
   switch (type)
   {
   case UNORDERED:
-    new (this->it.uo) uoiter(std::move(it)); break;
+    this->it.uo = new uoiter(std::move(it)); break;
   case UNORDERED_CI:
-    new (this->it.uoci) uociiter(std::move(it)); break;
+    this->it.uoci = new uociiter(std::move(it)); break;
   default:
     throw std::logic_error("type for unordered_map iterator not supported");
   }
@@ -460,32 +460,32 @@ bool any_map::iter::operator!=(const iterator& x) const
 
 any_map::iter::oiter const& any_map::iter::o_it() const
 {
-  return *reinterpret_cast<oiter const*>(this->it.o);
+  return *it.o;
 }
 
 any_map::iter::oiter& any_map::iter::o_it()
 {
-  return *reinterpret_cast<oiter*>(this->it.o);
+  return *it.o;
 }
 
 any_map::iter::uoiter const& any_map::iter::uo_it() const
 {
-  return *reinterpret_cast<uoiter const*>(this->it.uo);
+  return *it.uo;
 }
 
 any_map::iter::uoiter& any_map::iter::uo_it()
 {
-  return *reinterpret_cast<uoiter*>(this->it.uo);
+  return *it.uo;
 }
 
 any_map::iter::uociiter const& any_map::iter::uoci_it() const
 {
-  return *reinterpret_cast<uociiter const*>(this->it.uoci);
+  return *it.uoci;
 }
 
 any_map::iter::uociiter& any_map::iter::uoci_it()
 {
-  return *reinterpret_cast<uociiter*>(this->it.uoci);
+  return *it.uoci;
 }
 
 // ----------------------------------------------------------
@@ -497,13 +497,13 @@ any_map::any_map(map_type type)
   switch (type)
   {
   case map_type::ORDERED_MAP:
-    new (&map.o) ordered_any_map();
+    map.o = new ordered_any_map();
     break;
   case map_type::UNORDERED_MAP:
-    new (&map.uo) unordered_any_map();
+    map.uo = new unordered_any_map();
     break;
   case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    new (&map.uoci) unordered_any_cimap();
+    map.uoci = new unordered_any_cimap();
     break;
   default:
     throw std::logic_error("invalid map type");
@@ -513,19 +513,19 @@ any_map::any_map(map_type type)
 any_map::any_map(const ordered_any_map& m)
   : type(map_type::ORDERED_MAP)
 {
-  new (&map.o) ordered_any_map(m);
+  map.o = new ordered_any_map(m);
 }
 
 any_map::any_map(const unordered_any_map& m)
   : type(map_type::UNORDERED_MAP)
 {
-  new (&map.uo) unordered_any_map(m);
+  map.uo = new unordered_any_map(m);
 }
 
 any_map::any_map(const unordered_any_cimap& m)
   : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
-  new (&map.uoci) unordered_any_cimap(m);
+  map.uoci = new unordered_any_cimap(m);
 }
 
 any_map::any_map(const any_map& m)
@@ -534,13 +534,13 @@ any_map::any_map(const any_map& m)
   switch (type)
   {
   case map_type::ORDERED_MAP:
-    new (&map.o) ordered_any_map(m.o_m());
+    map.o = new ordered_any_map(m.o_m());
     break;
   case map_type::UNORDERED_MAP:
-    new (&map.uo) unordered_any_map(m.uo_m());
+    map.uo = new unordered_any_map(m.uo_m());
     break;
   case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    new (&map.uoci) unordered_any_cimap(m.uoci_m());
+    map.uoci = new unordered_any_cimap(m.uoci_m());
     break;
   default:
     throw std::logic_error("invalid map type");
@@ -555,26 +555,26 @@ any_map& any_map::operator =(const any_map& m)
   switch (type)
   {
   case map_type::ORDERED_MAP:
-    o_m().~ordered_any_map();
+    delete map.o;
     break;
   case map_type::UNORDERED_MAP:
-    uo_m().~unordered_any_map();
+    delete map.uo;
     break;
   case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    uoci_m().~unordered_any_cimap();
+    delete map.uoci;
     break;
   }
 
   switch (m.type)
   {
   case map_type::ORDERED_MAP:
-    new (&map.o) ordered_any_map(m.o_m());
+    map.o = new ordered_any_map(m.o_m());
     break;
   case map_type::UNORDERED_MAP:
-    new (&map.uo) unordered_any_map(m.uo_m());
+    map.uo = new unordered_any_map(m.uo_m());
     break;
   case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    new (&map.uoci) unordered_any_cimap(m.uoci_m());
+    map.uoci = new unordered_any_cimap(m.uoci_m());
     break;
   }
 
@@ -586,13 +586,13 @@ any_map::~any_map()
   switch (type)
   {
   case map_type::ORDERED_MAP:
-    o_m().~ordered_any_map();
+    delete map.o;
     break;
   case map_type::UNORDERED_MAP:
-    uo_m().~unordered_any_map();
+    delete map.uo;
     break;
   case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-    uoci_m().~unordered_any_cimap();
+    delete map.uoci;
     break;
   }
 }
@@ -828,32 +828,32 @@ any_map::const_iterator any_map::find(const key_type& key) const
 
 any_map::ordered_any_map const& any_map::o_m() const
 {
-  return *reinterpret_cast<ordered_any_map const*>(map.o);
+  return *map.o;
 }
 
 any_map::ordered_any_map& any_map::o_m()
 {
-  return *reinterpret_cast<ordered_any_map*>(map.o);
+  return *map.o;
 }
 
 any_map::unordered_any_map const& any_map::uo_m() const
 {
-  return *reinterpret_cast<unordered_any_map const*>(map.uo);
+  return *map.uo;
 }
 
 any_map::unordered_any_map& any_map::uo_m()
 {
-  return *reinterpret_cast<unordered_any_map*>(map.uo);
+  return *map.uo;
 }
 
 any_map::unordered_any_cimap const& any_map::uoci_m() const
 {
-  return *reinterpret_cast<unordered_any_cimap const*>(map.uoci);
+  return *map.uoci;
 }
 
 any_map::unordered_any_cimap& any_map::uoci_m()
 {
-  return *reinterpret_cast<unordered_any_cimap*>(map.uoci);
+  return *map.uoci;
 }
 
 

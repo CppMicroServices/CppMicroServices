@@ -170,9 +170,9 @@ public:
     uocciiter& uoci_it();
 
     union {
-      char o[sizeof(ociter)];
-      char uo[sizeof(uociter)];
-      char uoci[sizeof(uocciiter)];
+      ociter* o;
+      uociter* uo;
+      uocciiter* uoci;
     } it;
   };
 
@@ -219,9 +219,9 @@ public:
     uociiter& uoci_it();
 
     union {
-      char o[sizeof(oiter)];
-      char uo[sizeof(uoiter)];
-      char uoci[sizeof(uociiter)];
+      oiter* o;
+      uoiter* uo;
+      uociiter* uoci;
     } it;
 
   };
@@ -274,9 +274,9 @@ private:
   unordered_any_cimap& uoci_m();
 
   union {
-    char o[sizeof(ordered_any_map)];
-    char uo[sizeof(unordered_any_map)];
-    char uoci[sizeof(unordered_any_cimap)];
+    ordered_any_map* o;
+    unordered_any_map* uo;
+    unordered_any_cimap* uoci;
   } map;
 };
 

@@ -224,6 +224,12 @@ void ZipArchive::AddDirectory(const std::string& dirName)
   }
 }
 
+void PrintErrorAndExit(const std::string& errorMsg)
+{
+  std::cerr << errorMsg << std::endl;
+  exit(EXIT_FAILURE);
+}
+
 ZipArchive::~ZipArchive()
 {
   assert(writeArchive->m_zip_mode != MZ_ZIP_MODE_INVALID);
@@ -238,15 +244,18 @@ ZipArchive::~ZipArchive()
   {
     std::clog << "\t " << dirEntry << std::endl;
   }
-  if (mz_zip_writer_finalize_archive(writeArchive.get()) == 0)
+  if (mz_zip_writer_finalize_archive(writeArchive.get()) == MZ_FALSE)
   {
-    assert(writeArchive->m_zip_mode == MZ_ZIP_MODE_WRITING_HAS_BEEN_FINALIZED);
-    if (!mz_zip_writer_end(writeArchive.get()))
-    {
-      std::cerr << "Could not close zip archive writer" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    PrintErrorAndExit("Failed to finalize Zip archive");
   }
+  // check state after finalizing the archive.
+  assert(writeArchive->m_zip_mode == MZ_ZIP_MODE_WRITING_HAS_BEEN_FINALIZED);
+  if(mz_zip_writer_end(writeArchive.get()) == MZ_FALSE)
+  {
+    PrintErrorAndExit("Failed to close Zip archive");
+  }
+  // check state after closing the archive file.
+  assert(writeArchive->m_zip_mode == MZ_ZIP_MODE_INVALID);
 }
 
 void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
@@ -376,7 +385,7 @@ const option::Descriptor usage[] =
 
 int main(int argc, char** argv)
 {
-  int compressionLevel = 6;
+  int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
   int return_code = EXIT_SUCCESS;
   std::string bundleName;
   
@@ -447,7 +456,7 @@ int main(int argc, char** argv)
   }
   std::clog << "using compression level " << compressionLevel << std::endl;
   
-  std::string outFile;
+  std::string zipFile;
   bool deleteTempFile = false;
   
   try
@@ -456,21 +465,21 @@ int main(int argc, char** argv)
     if (!options[RESADD] && !options[MANIFESTADD] && options[ZIPADD].count() == 1 && options[BUNDLEFILE])
     {
       // jump to append part.
-      outFile = options[ZIPADD].arg;
+      zipFile = options[ZIPADD].arg;
     }
     else
     {
       if (outFileOpt)
       {
-        outFile = outFileOpt->arg;
+        zipFile = outFileOpt->arg;
       }
       else
       {
-        outFile = us_tempfile();
+        zipFile = us_tempfile();
         deleteTempFile = true;
       }
       
-      std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(outFile, compressionLevel, bundleName));
+      std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])
       {
@@ -494,12 +503,27 @@ int main(int argc, char** argv)
     {
       std::string bundleBinaryFile(bundleFileOpt->arg);
       std::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
-      std::ifstream zipFileStream(outFile, std::ios_base::binary);
-      std::clog << "Appending file " << bundleBinaryFile << " with contents of zip file at " << outFile << std::endl;
-      outFileStream.seekp(0, std::ios_base::end);
-      std::clog << "  Initial file size : " << outFileStream.tellp() << std::endl;
-      outFileStream << zipFileStream.rdbuf();
-      std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
+      std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
+      if (outFileStream.is_open() && zipFileStream.is_open())
+      {
+        std::clog << "Appending file " << bundleBinaryFile << " with contents of resources zip file at " << zipFile << std::endl;
+        std::clog << "  Initial file size : " << outFileStream.tellp() << std::endl;
+        outFileStream << zipFileStream.rdbuf();
+        std::clog << "  Final file size : " << outFileStream.tellp() << std::endl;
+        // Depending on the ofstream destructor to close the file may result in a silent
+        // file write error. Hence the explicit call to close.
+        outFileStream.close();
+        if (outFileStream.rdstate() & std::ofstream::failbit)
+        {
+          std::cerr << "Failed to write file : " << bundleBinaryFile << std::endl;
+          return_code = EXIT_FAILURE;
+        }
+      }
+      else
+      {
+        std::cerr << "Opening file " << (outFileStream.is_open() ? zipFile : bundleBinaryFile) << " failed" << std::endl;
+        return_code = EXIT_FAILURE;
+      }
     }
   }
   catch (const std::exception& ex)
@@ -509,9 +533,9 @@ int main(int argc, char** argv)
   }
   
   // delete temporary file and report error on failure
-  if (deleteTempFile && (std::remove(outFile.c_str()) != 0))
+  if (deleteTempFile && (std::remove(zipFile.c_str()) != 0))
   {
-    std::cerr << "Error removing temporary zip archive "  << outFile << std:: endl;
+    std::cerr << "Error removing temporary zip archive "  << zipFile << std:: endl;
     return_code = EXIT_FAILURE;
   }
   

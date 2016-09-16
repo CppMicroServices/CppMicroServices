@@ -26,7 +26,7 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 
 #ifdef US_BUILD_SHARED_LIBS
-#include "singletonframework\singletonframework.h"
+#include "singletonframework/singletonframework.h"
 #endif
 
 #include "TestingConfig.h"

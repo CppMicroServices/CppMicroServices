@@ -148,15 +148,19 @@ function(usFunctionEmbedResources)
       set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
     elseif(WIN32 AND CMAKE_RC_COMPILER)
       set(US_RESOURCE_ARCHIVE ${_zip_archive})
-      configure_file(${US_RESOURCE_RC_TEMPLATE} ${_source_output})
+      # If the file generated in "Configure" step is specified as the OUTPUT of add_custom_command, 
+      # "Clean" target will delete the file and subsequent build will fail. To avoid failures in 
+      # "ReBuild", generate the resource file in the "Configure" step and copy it in "Build" step
+      configure_file(${US_RESOURCE_RC_TEMPLATE} ${_source_output}_autogen)
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_COMMAND} -E touch ${_source_output}
+        COMMAND ${CMAKE_COMMAND} -E copy ${_source_output}_autogen ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
         VERBATIM
        )
+       set_source_files_properties(${_source_output} PROPERTIES GENERATED 1)
     elseif(UNIX)
       add_custom_command(
         OUTPUT ${_source_output}

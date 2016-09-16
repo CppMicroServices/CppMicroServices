@@ -184,7 +184,7 @@ class Atomic : private MultiThreaded<>
 public:
 
   Atomic()
-    : m_t{}
+    : m_t()
   {}
 
   T Load() const

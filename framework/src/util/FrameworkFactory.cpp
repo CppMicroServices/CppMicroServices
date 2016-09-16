@@ -40,6 +40,14 @@ struct CoreBundleContextHolder
   ~CoreBundleContextHolder()
   {
     auto const state = ctx->systemBundle->state.load();
+
+    // The framework may have already completed its stop. In this case,
+    // nothing needs to be done; the framework can be destroyed.
+    // Allowing a call to WaitForStop can cause a crash during static DLL
+    // destruction on Windows even if the framework was explicitly stopped
+    // prior to static destruction.
+    if (Bundle::STATE_INSTALLED == state || Bundle::STATE_RESOLVED == state) return;
+
     if (((Bundle::STATE_STARTING | Bundle::STATE_ACTIVE) & state) == 0)
     {
       // Call WaitForStop in case some did call Framework::Stop()

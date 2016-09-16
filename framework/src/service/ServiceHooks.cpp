@@ -45,7 +45,6 @@ ServiceHooks::ServiceHooks(CoreBundleContext* coreCtx)
 
 ServiceHooks::~ServiceHooks()
 {
-  this->Close();
 }
 
 std::shared_ptr<ServiceListenerHook> ServiceHooks::AddingService(const ServiceReference<ServiceListenerHook>& reference)

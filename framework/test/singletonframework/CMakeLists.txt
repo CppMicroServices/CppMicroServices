@@ -3,7 +3,7 @@
 #
 project(singletonframework)
 
-find_package(CppMicroServices
+find_package(CppMicroServices REQUIRED Framework QUIET
     HINTS ${CppMicroServices_BINARY_DIR}
     NO_DEFAULT_PATH
   )

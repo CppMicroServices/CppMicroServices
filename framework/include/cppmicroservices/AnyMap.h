@@ -72,19 +72,6 @@ typedef std::map<std::string, Any, ci_cmp> any_map;
 class US_Framework_EXPORT AnyMap : public any_map
 {
 public:
-#if 0
-  AnyMap(map_type type);
-  AnyMap(const ordered_any_map& m);
-  AnyMap(const unordered_any_map& m);
-  AnyMap(const unordered_any_cimap& m);
-
-  /**
-   * Get the underlying STL container type.
-   *
-   * @return The STL container type holding the map data.
-   */
-  map_type GetType() const;
-#endif
   /**
    * Get a key's value, using a compound key notation.
    *

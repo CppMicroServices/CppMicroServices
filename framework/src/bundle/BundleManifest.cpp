@@ -43,7 +43,7 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
   {
     if (ci)
     {
-      Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+      Any any = AnyMap();
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
     }
@@ -132,7 +132,7 @@ void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector,
 }
 
 BundleManifest::BundleManifest()
-  : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+  : m_Headers()
 {
 }
 
@@ -189,7 +189,7 @@ Any BundleManifest::GetValueDeprecated(const std::string& key) const
 std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
   std::vector<std::string> keys;
-  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.begin();
+  for (std::map<std::string, Any>::const_iterator iter = m_PropertiesDeprecated.begin();
        iter != m_PropertiesDeprecated.end(); ++iter)
   {
     keys.push_back(iter->first);

@@ -93,7 +93,7 @@ Any BundleContext::GetProperty(const std::string& key) const
         Any() : iter->second;
 }
 
-AnyMap BundleContext::GetProperties() const
+std::map<std::string, Any> BundleContext::GetProperties() const
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);

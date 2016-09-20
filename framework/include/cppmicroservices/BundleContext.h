@@ -183,7 +183,7 @@ public:
    *
    * @return A map of all framework properties.
    */
-  AnyMap GetProperties() const;
+  std::map<std::string, Any> GetProperties() const;
 
   /**
    * Returns the <code>Bundle</code> object associated with this

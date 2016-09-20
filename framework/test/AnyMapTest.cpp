@@ -32,11 +32,11 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("AnyMapTest");
 
-  US_TEST_FOR_EXCEPTION_BEGIN(std::logic_error)
-  AnyMap m(static_cast<AnyMap::map_type>(100));
-  US_TEST_FOR_EXCEPTION_END(std::logic_error)
+//  US_TEST_FOR_EXCEPTION_BEGIN(std::logic_error)
+//    AnyMap m{};
+//  US_TEST_FOR_EXCEPTION_END(std::logic_error)
 
-  AnyMap om(AnyMap::ORDERED_MAP);
+    AnyMap om{};
   US_TEST_CONDITION(om.size() == 0, "Empty ordered map")
   US_TEST_CONDITION(om.empty(), "Empty ordered map")
   US_TEST_CONDITION(om.count("key1") == 0, "No key1 key")
@@ -68,11 +68,11 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
    *
    */
 
-  AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap uoci{};
   uoci["FiRST"] = 1;
   uoci["SECOND"] = 2;
 
-  AnyMap uo(AnyMap::UNORDERED_MAP);
+  AnyMap uo{};
   uo["hi"] = std::string("hi");
   uo["there"] = std::string("there");
 
@@ -99,9 +99,10 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(*key++ == "SECOND", "Keys[1] == SECOND")
   US_TEST_CONDITION(*key++ == "vec", "Keys[2] == vec")
 
-  US_TEST_FOR_EXCEPTION_BEGIN(std::out_of_range)
-  om.at("Key1");
-  US_TEST_FOR_EXCEPTION_END(std::out_of_range)
+    US_TEST_CONDITION(om.AtCompoundKey("kEY1") == std::string("val1"), "Get key1")
+//  US_TEST_FOR_EXCEPTION_BEGIN(std::out_of_range)
+//  om.at("Key1");
+//  US_TEST_FOR_EXCEPTION_END(std::out_of_range)
 
   US_TEST_FOR_EXCEPTION_BEGIN(std::out_of_range)
   om.AtCompoundKey("dot.key");

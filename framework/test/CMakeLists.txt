@@ -31,7 +31,9 @@ add_subdirectory(bundles)
 # Create non-bundle test libraries
 #-----------------------------------------------------------------------------
 
-add_subdirectory(singletonframework)
+if(US_BUILD_SHARED_LIBS)
+  add_subdirectory(singletonframework)
+endif()
 
 #-----------------------------------------------------------------------------
 # Add unit tests
@@ -103,7 +105,9 @@ endif()
 
 target_link_libraries(${_test_driver} ${Framework_TARGET})
 
-target_link_libraries(${_test_driver} singletonframework)
+if(US_BUILD_SHARED_LIBS)
+  target_link_libraries(${_test_driver} singletonframework)
+endif()
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

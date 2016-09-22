@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [Unreleased 3.x]
+## [Unreleased 3.x](https://github.com/cppmicroservices/cppmicroservices/tree/development)
 
 ### Added
 ### Changed
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Full Changelog](https://github.com/cppmicroservices/cppmicroservices/compare/v2.1.1...development)
 
-See the [migration guide](https://github.com/CppMicroServices/CppMicroServices/wiki/API-changes-in-version-3.0.0)
+See the [migration guide](https://github.com/CppMicroServices/CppMicroServices/wiki/Migration-Guide-to-version-3.0)
 for moving from a 2.x release to 3.x.
 
 ### Added
@@ -29,7 +29,6 @@ for moving from a 2.x release to 3.x.
 - Added OS X to the continuous integration matrix [\#136](https://github.com/CppMicroServices/CppMicroServices/pull/136)
 - Building for Android is now supported [\#106](https://github.com/CppMicroServices/CppMicroServices/issues/106)
 - Enhanced the project structure to support sub-projects [\#14](https://github.com/CppMicroServices/CppMicroServices/issues/14)
-
 - The bundle life-cycle now supports all states as described by OSGi and is controllable by the user [\#25](https://github.com/CppMicroServices/CppMicroServices/issues/25)
 - Added support for framework listeners and improved logging [\#40](https://github.com/CppMicroServices/CppMicroServices/issues/40)
 - Implemented framework properties [\#42](https://github.com/CppMicroServices/CppMicroServices/issues/42)

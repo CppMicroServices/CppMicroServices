@@ -575,7 +575,6 @@ void TestAutoInstallEmbeddedBundles()
   US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
   bundle[0].Uninstall();
   US_TEST_FOR_EXCEPTION_END(std::runtime_error)
-  f.Stop();
 }
 
 }

@@ -562,5 +562,14 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
     TestConcurrentFrameworkWaitForStop();
 #endif
 
+    // try and catch a crash on Mac. Turn on the diagnostic logger to try and get
+    // an idea of what is going on.
+    auto framework = FrameworkFactory().NewFramework(std::map<std::string, Any>{ {cppmicroservices::Constants::FRAMEWORK_LOG, Any(true)} });
+    framework.Start();
+    // Give the framework the chance to completely start and enter the BUNDLE_ACTIVE state
+    // before attempting to trigger a crash.
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    framework.Stop();
+
     US_TEST_END()
 }

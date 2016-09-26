@@ -22,6 +22,7 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/LDAPFilter.h"
 
@@ -93,6 +94,7 @@ int LDAPQueryTest(int /*argc*/, char* /*argv*/[])
   TestLDAPFilterMatchServiceReferenceBase(bundle);
 
   framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 
   US_TEST_END()
 }

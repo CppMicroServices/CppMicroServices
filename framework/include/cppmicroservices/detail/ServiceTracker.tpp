@@ -92,7 +92,7 @@ void ServiceTracker<S,T>::Open()
       return;
     }
 
-    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter;
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter << "\n";
 
     t.reset(new _TrackedService(this, d->customizer));
     try
@@ -140,7 +140,7 @@ void ServiceTracker<S,T>::Close()
     return;
   }
 
-  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter << "\n";
   outgoing->Close();
   references = GetServiceReferences();
   try
@@ -165,7 +165,7 @@ void ServiceTracker<S,T>::Close()
         d->cachedService.Load() == nullptr)
     {
       DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
-										<< d->filter;
+										<< d->filter << "\n";
     }
   }
 
@@ -248,10 +248,10 @@ ServiceTracker<S,T>::GetServiceReference() const
   if (reference.GetBundle())
   {
     DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
-									<< d->filter;
+									<< d->filter << "\n";
     return reference;
   }
-  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter << "\n";
   auto references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0)
@@ -360,10 +360,10 @@ ServiceTracker<S,T>::GetService() const
   if (service)
   {
     DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
-									<< d->filter;
+									<< d->filter << "\n";
     return service;
   }
-  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter << "\n";
 
   try
   {

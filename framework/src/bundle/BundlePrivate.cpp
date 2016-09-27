@@ -375,7 +375,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
     operation = OP_ACTIVATING;
     if (coreCtx->debug.lazyActivation)
     {
-      DIAG_LOG(*coreCtx->sink) << "activating #" << id;
+      DIAG_LOG(*coreCtx->sink) << "activating #" << id << "\n";
     }
     // 7:
     std::shared_ptr<BundleContextPrivate> null_expected;
@@ -698,7 +698,7 @@ std::exception_ptr BundlePrivate::Start0()
 
   if (coreCtx->debug.lazyActivation)
   {
-    DIAG_LOG(*coreCtx->sink) << "activating #" << id << " completed.";
+    DIAG_LOG(*coreCtx->sink) << "activating #" << id << " completed.\n";
   }
 
   if (res == nullptr)

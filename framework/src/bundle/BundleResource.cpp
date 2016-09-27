@@ -289,7 +289,7 @@ void* BundleResource::GetData() const
     auto sink = GetBundleContext().GetLogSink();
     DIAG_LOG(*sink) << "Error uncompressing resource data for "
                     << this->GetResourcePath() << " from "
-                    << d->archive->GetBundleLocation();
+                    << d->archive->GetBundleLocation() << "\n";
   }
 
   return data;

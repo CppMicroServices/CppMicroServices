@@ -220,7 +220,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
                                  : "Bundle uninstalled during " + opType + "()";
 
     DIAG_LOG(*b->coreCtx->sink) << "bundle thread aborted during " << opType
-                                << " of bundle #" << b->id;
+                                << " of bundle #" << b->id << "\n";
 
     if (timeout)
     {

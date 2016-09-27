@@ -156,7 +156,7 @@ void ServiceTrackerPrivate<S,TTT>::Modified()
 {
   cachedReference.Store(ServiceReference<S>()); /* clear cached value */
   cachedService.Store(std::shared_ptr<TrackedParmType>()); /* clear cached value */
-  DIAG_LOG(*context.GetLogSink()) << "ServiceTracker::Modified(): " << filter;
+  DIAG_LOG(*context.GetLogSink()) << "ServiceTracker::Modified(): " << filter << "\n";
 }
 
 } // namespace detail

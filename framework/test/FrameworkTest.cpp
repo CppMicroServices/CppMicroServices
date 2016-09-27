@@ -34,6 +34,7 @@ limitations under the License.
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
 
+#include <exception>
 #include <mutex>
 #include <thread>
 
@@ -544,11 +545,24 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
 {
     US_TEST_BEGIN("FrameworkTest");
 
-    TestDefaultConfig();
-//    TestDefaultLogSink();
-    TestCustomConfig();
-    TestCustomLogSink();
-    TestProperties();
+    try {
+        TestDefaultConfig();
+        //    TestDefaultLogSink();
+        TestCustomConfig();
+        TestCustomLogSink();
+        TestProperties();
+    }
+    catch (...) {
+        try {
+            std::rethrow_exception(std::current_exception());
+        }
+        catch (const std::exception& e) {
+            std::cout << "Exception caught: " << e.what() << "\n";
+        }
+        catch (...) {
+            std::cout << "Unknown exception caught.\n";
+        }
+    }
 //    TestIndirectFrameworkStop();
 //    TestShutdownAndStart();
 //    TestLifeCycle();

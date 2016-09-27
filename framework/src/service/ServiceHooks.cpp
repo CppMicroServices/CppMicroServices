@@ -74,18 +74,24 @@ void ServiceHooks::RemovedService(const ServiceReference<ServiceListenerHook>& /
 
 void ServiceHooks::Open()
 {
+  DIAG_LOG(*coreCtx->sink) << "before Lock()\n";
   {
     auto l = this->Lock(); US_UNUSED(l);
     listenerHookTracker.reset(new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this));
+    DIAG_LOG(*coreCtx->sink) << "within Lock()\n";
   }
+  DIAG_LOG(*coreCtx->sink) << "release Lock()\n";
   listenerHookTracker->Open();
 
   bOpen = true;
+  DIAG_LOG(*coreCtx->sink) << "returning...\n";
 }
 
 void ServiceHooks::Close()
 {
+  DIAG_LOG(*coreCtx->sink) << "before Lock()\n";
   auto l = this->Lock(); US_UNUSED(l);
+  DIAG_LOG(*coreCtx->sink) << "within Lock()\n";
   if (listenerHookTracker)
   {
     listenerHookTracker->Close();
@@ -93,6 +99,7 @@ void ServiceHooks::Close()
   }
 
   bOpen = false;
+  DIAG_LOG(*coreCtx->sink) << "returning...\n";
 }
 
 bool ServiceHooks::IsOpen() const

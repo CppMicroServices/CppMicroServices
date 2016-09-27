@@ -164,6 +164,7 @@ void FrameworkPrivate::Shutdown(bool restart)
     if (!shutdownThread.joinable())
     {
       shutdownThread = std::thread(std::bind(&FrameworkPrivate::Shutdown0, this, restart, wa));
+      DIAG_LOG(*coreCtx->sink) << "New shutdown thread created with tid " << shutdownThread.get_id() << "\n";
     }
 #else
     Shutdown0(restart, wa);

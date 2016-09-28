@@ -55,7 +55,7 @@ struct CoreBundleContextHolder
       // but didn't wait for it. This joins with a potentially
       // running framework shut down thread.
       FrameworkEvent fe = ctx->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
-      DIAG_LOG(*ctx->sink) << "dtor waiting for framework stop... " << fe << "\n";
+      DIAG_LOG(*ctx->sink) << "dtor waiting for framework stop...\n" << fe << "\n";
       return;
     }
 
@@ -66,7 +66,7 @@ struct CoreBundleContextHolder
     holder->SetThis(holder);
     holder->systemBundle->Shutdown(false);
     FrameworkEvent fe = holder->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
-    DIAG_LOG(*fwCtx->sink) << "dtor fell through to Shutdown/WaitForStop... " << fe << "\n";
+    DIAG_LOG(*fwCtx->sink) << "dtor fell through to Shutdown/WaitForStop...\n" << fe << "\n";
   }
 
   std::unique_ptr<CoreBundleContext> ctx;

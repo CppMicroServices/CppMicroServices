@@ -71,6 +71,9 @@ namespace cppmicroservices {
     US_TEST_OUTPUT(<< "Exception occured: " << ex.what())                                     \
     cppmicroservices::TestManager::GetInstance().TestFailed();                                              \
   }                                                                                           \
+  catch(...) {                                                                                \
+    US_TEST_OUTPUT(<< "Unknown exception occured.\n");                                        \
+  }                                                                                           \
   if (cppmicroservices::TestManager::GetInstance().NumberOfFailedTests() > 0) {                             \
     US_TEST_OUTPUT(<< usTestName << ": [DONE FAILED] , subtests passed: " <<                  \
     cppmicroservices::TestManager::GetInstance().NumberOfPassedTests() << " failed: " <<                    \

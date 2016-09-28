@@ -541,6 +541,15 @@ namespace
 //}
 //#endif
 
+void TestMacOSXCrash()
+{
+    // try and catch a crash on Mac. Turn on the diagnostic logger to try and get
+    // an idea of what is going on.
+    auto framework = FrameworkFactory().NewFramework(std::map<std::string, Any>{ {cppmicroservices::Constants::FRAMEWORK_LOG, Any(true)} });
+    framework.Start();
+    framework.Stop();
+}
+
 int FrameworkTest(int /*argc*/, char* /*argv*/[])
 {
     US_TEST_BEGIN("FrameworkTest");
@@ -551,16 +560,19 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
         TestCustomConfig();
         TestCustomLogSink();
         TestProperties();
+
+        TestMacOSXCrash();
+        US_TEST_OUTPUT(<< "Returned from TestMacOSXCrash()\n");
     }
     catch (...) {
         try {
             std::rethrow_exception(std::current_exception());
         }
         catch (const std::exception& e) {
-            std::cout << "Exception caught: " << e.what() << "\n";
+            US_TEST_OUTPUT(<< "Exception caught: " << e.what() << "\n");
         }
         catch (...) {
-            std::cout << "Unknown exception caught.\n";
+            US_TEST_OUTPUT(<< "Unknown exception caught.\n");
         }
     }
 //    TestIndirectFrameworkStop();
@@ -575,12 +587,6 @@ int FrameworkTest(int /*argc*/, char* /*argv*/[])
 //    TestConcurrentFrameworkStop();
 //    TestConcurrentFrameworkWaitForStop();
 #endif
-
-    // try and catch a crash on Mac. Turn on the diagnostic logger to try and get
-    // an idea of what is going on.
-    auto framework = FrameworkFactory().NewFramework(std::map<std::string, Any>{ {cppmicroservices::Constants::FRAMEWORK_LOG, Any(true)} });
-    framework.Start();
-    framework.Stop();
 
     US_TEST_END()
 }

@@ -16,3 +16,10 @@ add_subdirectory(libRWithLinkedResources)
 if(US_ENABLE_THREADING_SUPPORT)
   add_subdirectory(libC1)
 endif()
+
+add_subdirectory(libBA_00)
+add_subdirectory(libBA_01)
+add_subdirectory(libBA_X1)
+add_subdirectory(libBA_10)
+
+

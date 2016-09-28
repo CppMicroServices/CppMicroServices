@@ -30,6 +30,7 @@ namespace Constants {
 const std::string SYSTEM_BUNDLE_LOCATION              = "System Bundle";
 const std::string SYSTEM_BUNDLE_SYMBOLICNAME          = "system_bundle";
 
+const std::string BUNDLE_ACTIVATOR                    = "bundle.activator";
 const std::string BUNDLE_CATEGORY                     = "bundle.category";
 const std::string BUNDLE_COPYRIGHT                    = "bundle.copyright";
 const std::string BUNDLE_DESCRIPTION                  = "bundle.description";

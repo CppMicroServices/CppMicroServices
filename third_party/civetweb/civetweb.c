@@ -129,8 +129,7 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 
 #ifdef __MACH__
 
-#define CLOCK_MONOTONIC (1)
-#define CLOCK_REALTIME (2)
+
 
 #include <sys/time.h>
 #include <mach/clock.h>
@@ -138,7 +137,9 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach_time.h>
 #include <assert.h>
 
-
+#if __DARWIN_C_LEVEL < 199309L
+#define CLOCK_MONOTONIC (1)
+#define CLOCK_REALTIME (2)
 /* clock_gettime is not implemented on OSX */
 int clock_gettime(int clk_id, struct timespec *t);
 
@@ -183,6 +184,7 @@ clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
+#endif // __DARWIN_C_LEVEL
 #endif
 
 

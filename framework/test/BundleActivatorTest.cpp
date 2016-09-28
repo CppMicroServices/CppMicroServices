@@ -34,7 +34,7 @@
 
 using namespace cppmicroservices;
 
-// bundle.activator property not specified in the manifest and bundle no activator class
+// bundle.activator property not specified in the manifest and bundle has no activator class
 void TestNoPropertyNoClass(Framework& framework)
 {
   auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleR");

@@ -40,42 +40,42 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(_tests
-#  AnyTest
-#  BundleRegistryPerformanceTest
-#  FrameworkEventTest
-#  FrameworkListenerTest
+  AnyTest
+  BundleRegistryPerformanceTest
+  FrameworkEventTest
+  FrameworkListenerTest
   FrameworkTest
-#  FrameworkFactoryTest
-#  HelgrindTest
-#  LDAPFilterTest
-#  LDAPQueryTest
-#  LogTest
-#  BundleEventTest
-#  BundleHooksTest
-#  BundleManifestTest
-#  BundleTest
-#  BundleResourceTest
-#  MemcheckTest
-#  ServiceFactoryTest
-#  ServiceHooksTest
-#  ServiceRegistryPerformanceTest
-#  ServiceRegistryTest
-#  ServiceTemplateTest
-#  ServiceTrackerTest
-#  StaticBundleResourceTest
-#  StaticBundleTest
+  FrameworkFactoryTest
+  HelgrindTest
+  LDAPFilterTest
+  LDAPQueryTest
+  LogTest
+  BundleEventTest
+  BundleHooksTest
+  BundleManifestTest
+  BundleTest
+  BundleResourceTest
+  MemcheckTest
+  ServiceFactoryTest
+  ServiceHooksTest
+  ServiceRegistryPerformanceTest
+  ServiceRegistryTest
+  ServiceTemplateTest
+  ServiceTrackerTest
+  StaticBundleResourceTest
+  StaticBundleTest
 )
 
-#if(US_BUILD_SHARED_LIBS)
-#  list(APPEND _tests
-#       ServiceListenerTest
-#       SharedLibraryTest
-#      )
-#endif()
+if(US_BUILD_SHARED_LIBS)
+  list(APPEND _tests
+       ServiceListenerTest
+       SharedLibraryTest
+      )
+endif()
 
-#if(US_ENABLE_THREADING_SUPPORT)
-#  list(APPEND _tests ConcurrencyTest)
-#endif()
+if(US_ENABLE_THREADING_SUPPORT)
+  list(APPEND _tests ConcurrencyTest)
+endif()
 
 set(_additional_srcs
   TestDriverActivator.cpp

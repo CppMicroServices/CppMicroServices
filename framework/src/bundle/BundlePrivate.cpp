@@ -588,7 +588,20 @@ std::exception_ptr BundlePrivate::Start0()
   coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
   
   Any bundleActivatorVal = thisBundle.GetProperty(Constants::BUNDLE_ACTIVATOR);
-  bool useActivator = bundleActivatorVal.Empty() ? false : any_cast<bool>(bundleActivatorVal);
+  bool useActivator = false;
+  
+  if(!bundleActivatorVal.Empty())
+  {
+    try
+    {
+      useActivator = any_cast<bool>(bundleActivatorVal);
+    }
+    catch (const BadAnyCastException& ex)
+    {
+      DIAG_LOG(*coreCtx->sink) << ex.what();
+      DIAG_LOG(*coreCtx->sink) << "Expected type : " << typeid(useActivator).name() << ", Found : " << bundleActivatorVal.Type().name();
+    }
+  }
   
   // Activator in the bundle is not called if 'bundle.activator' property
   // either does not exist or is set to false. If the property is set to true,

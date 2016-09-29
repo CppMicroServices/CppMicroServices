@@ -99,3 +99,8 @@ MIT License
 
 https://github.com/civetweb/civetweb
 1.8
+
+Patches
+
+ * Use system function clock_gettime on Mac OS X 10.12 and above
+

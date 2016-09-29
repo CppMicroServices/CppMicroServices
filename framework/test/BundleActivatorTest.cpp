@@ -20,7 +20,6 @@
  
  =============================================================================*/
 
-//#include "cppmicroservices/Any.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
@@ -35,17 +34,17 @@
 using namespace cppmicroservices;
 
 // bundle.activator property not specified in the manifest and bundle has no activator class
-void TestNoPropertyNoClass(Framework& framework)
+void TestNoPropertyNoClass(BundleContext& context)
 {
-  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleR");
+  auto bundle = testing::InstallLib(context, "TestBundleR");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleR");
   US_TEST_NO_EXCEPTION(bundle.Start());
 }
 
 // bundle.activator property not specified in the manifest and bundle has an activator class
-void TestNoPropertyWithClass(Framework& framework)
+void TestNoPropertyWithClass(BundleContext& context)
 {
-  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleBA_X1");
+  auto bundle = testing::InstallLib(context, "TestBundleBA_X1");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleBA_X1");
   US_TEST_NO_EXCEPTION(bundle.Start());
   // verify bundle activator was not called => service not registered
@@ -54,17 +53,17 @@ void TestNoPropertyWithClass(Framework& framework)
 }
 
 // bundle.activator property set to false in the manifest and bundle has no activator class
-void TestPropertyFalseWithoutClass(Framework& framework)
+void TestPropertyFalseWithoutClass(BundleContext& context)
 {
-  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleBA_00");
+  auto bundle = testing::InstallLib(context, "TestBundleBA_00");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleBA_00");
   US_TEST_NO_EXCEPTION(bundle.Start());
 }
 
 // bundle.activator property set to false in the manifest and bundle has an activator class
-void TestPropertyFalseWithClass(Framework& framework)
+void TestPropertyFalseWithClass(BundleContext& context)
 {
-  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleBA_01");
+  auto bundle = testing::InstallLib(context, "TestBundleBA_01");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleBA_01");
   US_TEST_NO_EXCEPTION(bundle.Start());
   // verify bundle activator was not called => service not registered
@@ -73,17 +72,17 @@ void TestPropertyFalseWithClass(Framework& framework)
 }
 
 // bundle.activator property set to true in the manifest and bundle has no activator class
-void TestPropertyTrueWithoutClass(Framework& framework)
+void TestPropertyTrueWithoutClass(BundleContext& context)
 {
-  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleBA_10");
+  auto bundle = testing::InstallLib(context, "TestBundleBA_10");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleBA_10");
-  US_TEST_FOR_EXCEPTION(std::runtime_error,bundle.Start());
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundle.Start());
 }
 
 // bundle.activator property set to true in the manifest and bundle has an activator class
-void TestPropertyTrueWithClass(Framework& framework)
+void TestPropertyTrueWithClass(BundleContext& context)
 {
-  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  auto bundle = testing::InstallLib(context, "TestBundleA");
   US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleA");
   US_TEST_NO_EXCEPTION(bundle.Start());
   // verify bundle activator was called => service is registered
@@ -94,21 +93,21 @@ void TestPropertyTrueWithClass(Framework& framework)
 int BundleActivatorTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleActivatorTest");
-  
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
+
+  auto framework = FrameworkFactory().NewFramework();
   framework.Start();
+  auto bc = framework.GetBundleContext();
   
   // Test points to validate Bundle behavior based on bundle.activator property
-  TestNoPropertyNoClass(framework);
-  TestNoPropertyWithClass(framework);
-  TestPropertyFalseWithoutClass(framework);
-  TestPropertyFalseWithClass(framework);
-  TestPropertyTrueWithoutClass(framework);
-  TestPropertyTrueWithClass(framework);
+  TestNoPropertyNoClass(bc);
+  TestNoPropertyWithClass(bc);
+  TestPropertyFalseWithoutClass(bc);
+  TestPropertyFalseWithClass(bc);
+  TestPropertyTrueWithoutClass(bc);
+  TestPropertyTrueWithClass(bc);
   
   framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds(0));
+  framework.WaitForStop(std::chrono::milliseconds::zero());
   
   US_TEST_END()
 }

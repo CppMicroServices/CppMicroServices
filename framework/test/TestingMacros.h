@@ -140,6 +140,10 @@ namespace cppmicroservices {
 #define US_TEST_FOR_NO_EXCEPTION_END()                                         \
 cppmicroservices::TestManager::GetInstance().TestPassed();                     \
 }                                                                              \
+catch (const std::exception& ex) {                                             \
+cppmicroservices::TestManager::GetInstance().TestFailed();                     \
+US_TEST_OUTPUT( << "Unexpected exception caught : " << ex.what() << "[FAILED]")\
+}                                                                              \
 catch (...) {                                                                  \
 cppmicroservices::TestManager::GetInstance().TestFailed();                     \
 US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                     \

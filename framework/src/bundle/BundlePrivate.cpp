@@ -584,11 +584,11 @@ std::exception_ptr BundlePrivate::Start0()
 {
   // res is used to signal that start did not complete in a normal way
   std::exception_ptr res;
-  auto thisBundle = MakeBundle(this->shared_from_this());
+  auto const thisBundle = MakeBundle(this->shared_from_this());
   coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
   
-  Any bundleActivateVal = thisBundle.GetProperty(Constants::BUNDLE_ACTIVATOR);
-  bool useActivator = bundleActivateVal.Empty() ? false : any_cast<bool>(bundleActivateVal);
+  Any bundleActivatorVal = thisBundle.GetProperty(Constants::BUNDLE_ACTIVATOR);
+  bool useActivator = bundleActivatorVal.Empty() ? false : any_cast<bool>(bundleActivatorVal);
   
   // Activator in the bundle is not called if 'bundle.activator' property
   // either does not exist or is set to false. If the property is set to true,

@@ -404,7 +404,7 @@ void TestBundleStates()
           bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
           bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
         }
-        catch (std::runtime_error& /*ex*/)
+        catch (const std::runtime_error& /*ex*/)
         {
           US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_RESOLVED, "Test bundle state if bundle start failed")
           bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));

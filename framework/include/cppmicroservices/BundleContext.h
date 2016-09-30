@@ -655,7 +655,7 @@ public:
     AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
                        static_cast<void*>(receiver), filter);
   }
-    
+  
   /**
    * Removes the specified <code>callback</code> from the context bundle's
    * list of listeners.

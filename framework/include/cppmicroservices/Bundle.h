@@ -580,8 +580,6 @@ public:
    * @throws std::runtime_error If this bundle could not be started.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
-   *
-   *
    */
   void Start(uint32_t options);
 

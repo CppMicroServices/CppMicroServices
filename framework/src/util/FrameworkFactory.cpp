@@ -45,24 +45,26 @@ struct CoreBundleContextHolder
     // Allowing a call to WaitForStop can cause a crash during static DLL
     // destruction on Windows even if the framework was explicitly stopped
     // prior to static destruction.
-    if (Bundle::STATE_INSTALLED == state || Bundle::STATE_RESOLVED == state) return;
-
-    if (((Bundle::STATE_STARTING | Bundle::STATE_ACTIVE) & state) == 0)
+    if (((Bundle::STATE_INSTALLED | Bundle::STATE_RESOLVED) & state) == 0)
     {
-      // Call WaitForStop in case some did call Framework::Stop()
-      // but didn't wait for it. This joins with a potentially
-      // running framework shut down thread.
-      ctx->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
-      return;
+      if (((Bundle::STATE_STARTING | Bundle::STATE_ACTIVE) & state) == 0)
+      {
+        // Call WaitForStop in case some did call Framework::Stop()
+        // but didn't wait for it. This joins with a potentially
+        // running framework shut down thread.
+        ctx->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
+      }
+      else
+      {
+        // Create a new CoreBundleContext holder, in case some event listener
+        // gets the system bundle and starts it again.
+        auto fwCtx = ctx.get();
+        std::shared_ptr<CoreBundleContext> holder(std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
+        holder->SetThis(holder);
+        holder->systemBundle->Shutdown(false);
+        holder->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
+      }
     }
-
-    // Create a new CoreBundleContext holder, in case some event listener
-    // gets the system bundle and starts it again.
-    auto fwCtx = ctx.get();
-    std::shared_ptr<CoreBundleContext> holder(std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
-    holder->SetThis(holder);
-    holder->systemBundle->Shutdown(false);
-    holder->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
   }
 
   std::unique_ptr<CoreBundleContext> ctx;

@@ -55,7 +55,7 @@ public:
   {
     if (!_enable) return;
     auto l = Lock(); US_UNUSED(1);
-    *_sink << msg;
+    *_sink << msg << "\n";
   }
 
 private:
@@ -100,6 +100,7 @@ private:
 } // namespace cppmicroservices
 
 // Write a log line using a <code>LogSink</code> reference.
+// All log lines will automatically end with a "\n"
 #define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, std::this_thread::get_id(), __FILE__, __LINE__, __FUNCTION__)
 
 

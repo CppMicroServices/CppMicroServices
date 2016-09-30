@@ -426,7 +426,6 @@ public:
    *
    * @throws std::logic_error If this bundle has been uninstalled, if 
    * the ServiceRegistrationBase object is invalid, or if the service is unregistered.
-   *
    */
   std::vector<ServiceReferenceU> GetRegisteredServices() const;
 

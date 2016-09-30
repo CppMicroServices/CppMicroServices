@@ -351,7 +351,7 @@ public:
    *
    * <p>
    * The list is valid at the time of the call to this method. However, since
-   * the Micro Services framework is a very dynamic environment, services can be modified or
+   * the framework is a very dynamic environment, services can be modified or
    * unregistered at any time.
    *
    * <p>

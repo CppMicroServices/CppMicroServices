@@ -571,9 +571,9 @@ void TestAutoInstallEmbeddedBundles()
   // There are atleast 2 bundles, maybe more depending on how the executable is created
   US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #endif
-  auto bundle = frameworkCtx.GetBundles();
+  auto bundles = frameworkCtx.GetBundles();
   US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  bundle[0].Uninstall();
+  bundles[0].Uninstall();
   US_TEST_FOR_EXCEPTION_END(std::runtime_error)
 }
 

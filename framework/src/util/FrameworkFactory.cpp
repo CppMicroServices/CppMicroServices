@@ -21,7 +21,6 @@
 =============================================================================*/
 
 #include "cppmicroservices/FrameworkFactory.h"
-
 #include "cppmicroservices/Framework.h"
 
 #include "FrameworkPrivate.h"
@@ -41,7 +40,6 @@ struct CoreBundleContextHolder
   {
     auto const state = ctx->systemBundle->state.load();
 
-    DIAG_LOG(*ctx->sink) << "Bundle state is  " << state << "\n";
     // The framework may have already completed its stop. In this case,
     // nothing needs to be done; the framework can be destroyed.
     // Allowing a call to WaitForStop can cause a crash during static DLL
@@ -54,8 +52,7 @@ struct CoreBundleContextHolder
       // Call WaitForStop in case some did call Framework::Stop()
       // but didn't wait for it. This joins with a potentially
       // running framework shut down thread.
-      FrameworkEvent fe = ctx->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
-      DIAG_LOG(*ctx->sink) << "dtor waiting for framework stop...\n" << fe << "\n";
+      ctx->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
       return;
     }
 
@@ -65,8 +62,7 @@ struct CoreBundleContextHolder
     std::shared_ptr<CoreBundleContext> holder(std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
     holder->SetThis(holder);
     holder->systemBundle->Shutdown(false);
-    FrameworkEvent fe = holder->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
-    DIAG_LOG(*fwCtx->sink) << "dtor fell through to Shutdown/WaitForStop...\n" << fe << "\n";
+    holder->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
   }
 
   std::unique_ptr<CoreBundleContext> ctx;

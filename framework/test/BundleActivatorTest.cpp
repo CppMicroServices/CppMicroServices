@@ -52,6 +52,36 @@ void TestNoPropertyWithClass(BundleContext& context)
   US_TEST_CONDITION(!ref, "Invalid reference");
 }
 
+// bundle.activator property set with wrong type in the manifest and bundle has an activator class
+void TestWrongPropertyTypeWithClass(BundleContext& context)
+{
+  auto bundle = testing::InstallLib(context, "TestBundleBA_S1");
+  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleBA_S1");
+  // Add a framework listener and verify the FrameworkEvent
+  bool receivedExpectedEvent = false;
+  const FrameworkListener fl = [&](const FrameworkEvent& evt) {
+    std::exception_ptr eptr = evt.GetThrowable();
+    if((evt.GetType() == FrameworkEvent::FRAMEWORK_WARNING) && (eptr != nullptr))
+    {
+      try
+      {
+        std::rethrow_exception(eptr);
+      }
+      catch (const BadAnyCastException& ex)
+      {
+        receivedExpectedEvent = true;
+      }
+    }
+  };
+  context.AddFrameworkListener(fl);
+  US_TEST_NO_EXCEPTION(bundle.Start());
+  US_TEST_CONDITION(receivedExpectedEvent == true, "Test for FrameworkEvent");
+  context.RemoveFrameworkListener(fl);
+  // verify bundle activator was not called => service not registered
+  ServiceReferenceU ref = bundle.GetBundleContext().GetServiceReference("cppmicroservices::TestBundleBA_S1Service");
+  US_TEST_CONDITION(!ref, "Invalid reference");
+}
+
 // bundle.activator property set to false in the manifest and bundle has no activator class
 void TestPropertyFalseWithoutClass(BundleContext& context)
 {
@@ -101,6 +131,7 @@ int BundleActivatorTest(int /*argc*/, char* /*argv*/[])
   // Test points to validate Bundle behavior based on bundle.activator property
   TestNoPropertyNoClass(bc);
   TestNoPropertyWithClass(bc);
+  TestWrongPropertyTypeWithClass(bc);
   TestPropertyFalseWithoutClass(bc);
   TestPropertyFalseWithClass(bc);
   TestPropertyTrueWithoutClass(bc);

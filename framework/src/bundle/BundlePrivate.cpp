@@ -598,8 +598,14 @@ std::exception_ptr BundlePrivate::Start0()
     }
     catch (const BadAnyCastException& ex)
     {
-      DIAG_LOG(*coreCtx->sink) << ex.what();
-      DIAG_LOG(*coreCtx->sink) << "Expected type : " << typeid(useActivator).name() << ", Found : " << bundleActivatorVal.Type().name();
+      std::string message("Failed to read 'bundle.activator' property. Expected type : ");
+      message += typeid(useActivator).name();
+      message += ", Found type : ";
+      message += bundleActivatorVal.Type().name();
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                           thisBundle,
+                                                           message,
+                                                           std::current_exception()));
     }
   }
   

@@ -67,7 +67,7 @@ void TestWrongPropertyTypeWithClass(BundleContext& context)
       {
         std::rethrow_exception(eptr);
       }
-      catch (const BadAnyCastException& ex)
+      catch (const BadAnyCastException& /*ex*/)
       {
         receivedExpectedEvent = true;
       }

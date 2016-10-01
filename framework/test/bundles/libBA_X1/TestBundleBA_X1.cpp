@@ -30,11 +30,11 @@
 
 namespace cppmicroservices {
 
-struct TestBundleA : public TestBundleBA_X1Service
+struct TestBundleBA_X1 : public TestBundleBA_X1Service
 {
 
-  TestBundleA() {}
-  virtual ~TestBundleA() {}
+  TestBundleBA_X1() {}
+  virtual ~TestBundleBA_X1() {}
 
 };
 
@@ -47,9 +47,8 @@ public:
 
   void Start(BundleContext context)
   {
-      s = std::make_shared<TestBundleA>();
       std::cout << "Registering TestBundleAService";
-      sr = context.RegisterService<TestBundleBA_X1Service>(s);
+      sr = context.RegisterService<TestBundleBA_X1Service>(std::make_shared<TestBundleBA_X1>());
   }
 
   void Stop(BundleContext)
@@ -59,7 +58,6 @@ public:
 
 private:
 
-    std::shared_ptr<TestBundleA> s;
     ServiceRegistration<TestBundleBA_X1Service> sr;
 };
 

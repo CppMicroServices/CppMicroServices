@@ -582,73 +582,96 @@ void BundlePrivate::Start(uint32_t options)
 
 std::exception_ptr BundlePrivate::Start0()
 {
-  bool bStarted = false;
   // res is used to signal that start did not complete in a normal way
   std::exception_ptr res;
-
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, MakeBundle(this->shared_from_this())));
-
-  try
+  auto const thisBundle = MakeBundle(this->shared_from_this());
+  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
+  
+  Any bundleActivatorVal = thisBundle.GetProperty(Constants::BUNDLE_ACTIVATOR);
+  bool useActivator = false;
+  
+  if(!bundleActivatorVal.Empty())
   {
-    typedef BundleActivator*(*CreateActivatorHook)(void);
-    CreateActivatorHook createActivatorHook = nullptr;
-
-    void* libHandle = nullptr;
-    if(IsSharedLibrary(lib.GetFilePath()))
+    try
     {
-      if (!lib.IsLoaded())
+      useActivator = any_cast<bool>(bundleActivatorVal);
+    }
+    catch (const BadAnyCastException& ex)
+    {
+      std::string message("Failed to read 'bundle.activator' property. Expected type : ");
+      message += typeid(useActivator).name();
+      message += ", Found type : ";
+      message += bundleActivatorVal.Type().name();
+      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                                           thisBundle,
+                                                           message,
+                                                           std::make_exception_ptr(ex)));
+    }
+  }
+  
+  // Activator in the bundle is not called if 'bundle.activator' property
+  // either does not exist or is set to false. If the property is set to true,
+  // the actiavtor inside the bundle is called.
+  if (useActivator)
+  {
+    try
+    {
+      typedef BundleActivator*(*CreateActivatorHook)(void);
+      CreateActivatorHook createActivatorHook = nullptr;
+      
+      void* libHandle = nullptr;
+      if(IsSharedLibrary(lib.GetFilePath()))
       {
-        lib.Load();
+        if (!lib.IsLoaded())
+        {
+          lib.Load();
+        }
+        libHandle = lib.GetHandle();
       }
-      libHandle = lib.GetHandle();
-    }
-    else
-    {
-      libHandle = BundleUtils::GetExecutableHandle();
-    }
+      else
+      {
+        libHandle = BundleUtils::GetExecutableHandle();
+      }
+      
+      
+      auto ctx = bundleContext.Load();
+      
+      // save this bundle's context so that it can be accessible anywhere
+      // from within this bundle's code.
+      std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
+      void* setBundleContextSym = BundleUtils::GetSymbol(libHandle, set_bundle_context_func.c_str());
+      std::memcpy(&SetBundleContext, &setBundleContextSym, sizeof(void*));
+      if (SetBundleContext)
+      {
+        SetBundleContext(ctx.get());
+      }
+      
+      // get the create/destroy activator callbacks
+      std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
+      void* createActivatorHookSym = BundleUtils::GetSymbol(libHandle, create_activator_func.c_str());
+      std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
+      
+      std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
+      void* destroyActivatorHookSym = BundleUtils::GetSymbol(libHandle, destroy_activator_func.c_str());
+      std::memcpy(&destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
+      
+      if (createActivatorHook == nullptr)
+      {
+        throw std::runtime_error("Bundle activator constructor not found");
+      }
+      if (destroyActivatorHook == nullptr)
+      {
+        throw std::runtime_error("Bundle activator destructor not found");
+      }
 
-
-    auto ctx = bundleContext.Load();
-
-    // save this bundle's context so that it can be accessible anywhere
-    // from within this bundle's code.
-    std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
-    void* setBundleContextSym = BundleUtils::GetSymbol(libHandle, set_bundle_context_func.c_str());
-    std::memcpy(&SetBundleContext, &setBundleContextSym, sizeof(void*));
-    if (SetBundleContext)
-    {
-      SetBundleContext(ctx.get());
-    }
-
-    // get the create/destroy activator callbacks
-    std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
-    void* createActivatorHookSym = BundleUtils::GetSymbol(libHandle, create_activator_func.c_str());
-    std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
-
-    std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-    void* destroyActivatorHookSym = BundleUtils::GetSymbol(libHandle, destroy_activator_func.c_str());
-    std::memcpy(&destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
-
-    // try to get a BundleActivator instance
-    if (createActivatorHook != nullptr && destroyActivatorHook != nullptr)
-    {
+      // get a BundleActivator instance
       bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
-      bStarted = true;
     }
-
-    if (!bStarted)
+    catch (...)
     {
-      // Even bundles without an activator are marked as
-      // ACTIVE.
-      // Should we possible log an information message to
-      // make sure users are aware of the missing activator?
+      res = std::make_exception_ptr(std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + " start failed: " + GetLastExceptionStr()));
     }
-
-  }
-  catch (...)
-  {
-    res = std::make_exception_ptr(std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + " start failed: " + GetLastExceptionStr()));
   }
 
   // activator.start() done

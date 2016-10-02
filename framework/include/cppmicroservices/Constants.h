@@ -52,6 +52,17 @@ US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "Syste
  * defined to be &quot;system.bundle&quot;.
  */
 US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
+  
+/**
+ * Manifest header identifying the bundle's activator.
+ * The value for this attribute is of type bool.
+ *   false - the bundle has no activator
+ *   true - the bundle has an activator
+ * The behavior if the attribute is not specified is the same as when it is set to 'false'.
+ *
+ * The header value may be retrieved via the \c Bundle::GetProperty method.
+ */
+US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATOR; // = "bundle.activator";
 
 /**
  * Manifest header identifying the bundle's category.

@@ -396,15 +396,30 @@ void TestBundleStates()
       if (bundle != framework)
       {
         US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
-        bundle.Start();
-        US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
-        bundle.Stop();
-        US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+        try
+        {
+          bundle.Start();
+          US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
+        }
+        catch (const std::runtime_error& /*ex*/)
+        {
+          US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_RESOLVED, "Test bundle state if bundle start failed")
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+        }
+        // stop the bundle if it is in active state
+        if(bundle.GetState() & Bundle::STATE_ACTIVE)
+        {
+          bundle.Stop();
+          US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+        }
       }
     }
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");

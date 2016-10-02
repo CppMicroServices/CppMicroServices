@@ -2,6 +2,7 @@
   "bundle.symbolic_name": "TestBundleM",
   "bundle.description": "My Bundle description",
   "bundle.version": "1.0.0",
+  "bundle.activator" : true,
   "number": 5,
   "vector": [
     "first",

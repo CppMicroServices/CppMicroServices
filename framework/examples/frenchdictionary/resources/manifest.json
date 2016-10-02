@@ -1,3 +1,4 @@
 {
-  "bundle.symbolic_name" : "frenchdictionary"
+  "bundle.symbolic_name" : "frenchdictionary",
+  "bundle.activator" : true
 }

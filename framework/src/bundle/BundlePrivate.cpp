@@ -605,7 +605,7 @@ std::exception_ptr BundlePrivate::Start0()
       coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
                                                            thisBundle,
                                                            message,
-                                                           std::current_exception()));
+                                                           std::make_exception_ptr(ex)));
     }
   }
   

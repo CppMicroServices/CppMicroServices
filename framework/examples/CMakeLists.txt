@@ -43,6 +43,7 @@ function(CreateExample _name)
 
   add_library(Example-${_name} ${_srcs})
   set_property(TARGET Example-${_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_name})
+  set_property(TARGET Example-${_name} PROPERTY DEBUG_POSTFIX "")
 
   if(${_name}_DEPENDS)
     foreach(_dep ${${_name}_DEPENDS})
@@ -171,7 +172,7 @@ if(US_BUILD_TESTING)
                COMMAND ${MAKE_COMMAND})
       set_tests_properties(MakefileExampleTest PROPERTIES
                            DEPENDS "MakefileExampleCleanTest;InstallTest"
-                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS}")
+                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS};US_DEBUG_POSTFIX=${CMAKE_DEBUG_POSTFIX}")
       list(APPEND _example_tests MakefileExampleCleanTest MakefileExampleTest)
     endif()
   endif()

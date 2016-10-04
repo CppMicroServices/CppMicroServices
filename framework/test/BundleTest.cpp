@@ -151,7 +151,7 @@ void frame020a()
 
   // Check manifest headers
   auto headers = buA.GetHeaders();
-  US_TEST_CONDITION_REQUIRED(headers.size() == 1, "One manifest header")
+  US_TEST_CONDITION_REQUIRED(headers.size() > 0, "One or more manifest header")
   US_TEST_CONDITION(headers.at("bundle.symbolic_name") == std::string("TestBundleA"), "BSN manifest header")
 
   // check the listeners for events
@@ -241,7 +241,7 @@ void frame030b()
 
   // Check manifest headers in stopped state
   auto headers = buA.GetHeaders();
-  US_TEST_CONDITION_REQUIRED(headers.size() == 1, "One manifest header")
+  US_TEST_CONDITION_REQUIRED(headers.size() > 0, "One ore more manifest header")
   US_TEST_CONDITION(headers.at("bundle.symbolic_name") == std::string("TestBundleA"), "BSN manifest header")
 
 

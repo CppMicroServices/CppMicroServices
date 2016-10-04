@@ -33,6 +33,7 @@ add_subdirectory(bundles)
 
 set(_tests
   AnyTest
+  AnyMapTest
   BundleRegistryPerformanceTest
   FrameworkEventTest
   FrameworkListenerTest

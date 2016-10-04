@@ -67,14 +67,16 @@ US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATOR; // = "bundle.acti
 /**
  * Manifest header identifying the bundle's category.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
 
 /**
  * Manifest header identifying the bundle's copyright information.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
 
@@ -82,35 +84,40 @@ US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copy
  * Manifest header containing a brief description of the bundle's
  * functionality.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
 
 /**
- * Manifest header identifying the bundle's menifest version.
+ * Manifest header identifying the bundle's manifest version.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_MANIFESTVERSION; // = "bundle.manifest_version";
 
 /**
  * Manifest header identifying the bundle's name.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_NAME; // = "bundle.name";
 
 /**
  * Manifest header identifying the bundle's vendor.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
 
 /**
  * Manifest header identifying the bundle's version.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.version";
 
@@ -118,7 +125,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.versio
  * Manifest header identifying the bundle's documentation URL, from which
  * further information about the bundle may be obtained.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
 
@@ -126,21 +134,42 @@ US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url
  * Manifest header identifying the contact address where problems with the
  * bundle may be reported; for example, an email address.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
 
 /**
  * Manifest header identifying the bundle's symbolic name.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  */
 US_Framework_EXPORT extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
 
 /**
+ * Manifest header identifying the base name of the bundle's localization
+ * entries.
+ *
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
+ *
+ * @see #BUNDLE_LOCALIZATION_DEFAULT_BASENAME
+ */
+US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION; // = "bundle.localization";
+
+/**
+ * Default value for the \c bundle.localization manifest header.
+ *
+ * @see #BUNDLE_LOCALIZATION
+ */
+US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION_DEFAULT_BASENAME; // = "US-INF/l10n/bundle";
+
+/**
  * Manifest header identifying the bundle's activation policy.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved from the \c AnyMap object
+ * returned by the \c Bundle::GetHeaders() method.
  *
  * @see #ACTIVATION_LAZY
  */
@@ -171,7 +200,7 @@ US_Framework_EXPORT extern const std::string ACTIVATION_LAZY; // = "lazy";
 /**
  * Framework environment property identifying the Framework version.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved via the \c BundleContext::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
 
@@ -179,7 +208,7 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmic
  * Framework environment property identifying the Framework implementation
  * vendor.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved via the \c BundleContext::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
 
@@ -245,7 +274,7 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicrose
  * string representation specified in <a
  * href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>.
  *
- * The header value may be retrieved via the \c Bundle::GetProperty method.
+ * The header value may be retrieved via the \c BundleContext::GetProperty method.
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
 

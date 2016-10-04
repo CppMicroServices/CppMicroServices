@@ -45,13 +45,15 @@ int BundleManifestTest(int /*argc*/, char* /*argv*/[])
   auto bundleM = testing::InstallLib(framework.GetBundleContext(), "TestBundleM");
   US_TEST_CONDITION_REQUIRED(bundleM, "Test for existing bundle TestBundleM")
 
-  US_TEST_CONDITION(bundleM.GetProperty(Constants::BUNDLE_SYMBOLICNAME).ToString() == "TestBundleM", "Bundle name")
+  auto headers = bundleM.GetHeaders();
+
+  US_TEST_CONDITION(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString() == "TestBundleM", "Bundle name")
   US_TEST_CONDITION(bundleM.GetSymbolicName() == "TestBundleM", "Bundle name 2")
-  US_TEST_CONDITION(bundleM.GetProperty(Constants::BUNDLE_DESCRIPTION).ToString() == "My Bundle description", "Bundle description")
-  US_TEST_CONDITION(bundleM.GetProperty(Constants::BUNDLE_VERSION).ToString() == "1.0.0", "Bundle version")
+  US_TEST_CONDITION(headers.at(Constants::BUNDLE_DESCRIPTION).ToString() == "My Bundle description", "Bundle description")
+  US_TEST_CONDITION(headers.at(Constants::BUNDLE_VERSION).ToString() == "1.0.0", "Bundle version")
   US_TEST_CONDITION(bundleM.GetVersion() == BundleVersion(1,0,0), "Bundle version 2")
 
-  Any anyVector = bundleM.GetProperty("vector");
+  Any anyVector = headers.at("vector");
   US_TEST_CONDITION_REQUIRED(anyVector.Type() == typeid(std::vector<Any>), "vector type")
   std::vector<Any>& vec = ref_any_cast<std::vector<Any> >(anyVector);
   US_TEST_CONDITION_REQUIRED(vec.size() == 3, "vector size")
@@ -60,9 +62,9 @@ int BundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(vec[1].Type() == typeid(int), "vector 1 type")
   US_TEST_CONDITION_REQUIRED(any_cast<int>(vec[1]) == 2, "vector 1 value")
 
-  Any anyMap = bundleM.GetProperty("map");
-  US_TEST_CONDITION_REQUIRED(anyMap.Type() == typeid(std::map<std::string, Any>), "map type")
-  std::map<std::string, Any>& m = ref_any_cast<std::map<std::string, Any> >(anyMap);
+  Any anyMap = headers.at("map");
+  US_TEST_CONDITION_REQUIRED(anyMap.Type() == typeid(AnyMap), "map type")
+  AnyMap& m = ref_any_cast<AnyMap>(anyMap);
   US_TEST_CONDITION_REQUIRED(m.size() == 3, "map size")
   US_TEST_CONDITION_REQUIRED(m["string"].Type() == typeid(std::string), "map 0 type")
   US_TEST_CONDITION_REQUIRED(m["string"].ToString() == "hi", "map 0 value")

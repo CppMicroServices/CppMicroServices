@@ -31,6 +31,7 @@
 
 namespace cppmicroservices {
 
+class AnyMap;
 class Bundle;
 class BundleContext;
 class BundleContextPrivate;
@@ -166,6 +167,23 @@ public:
    * \c BundleContext and renders it invalid.
    */
   BundleContext& operator=(std::nullptr_t);
+
+  /**
+   * Returns the value of the specified property. If the key is not found in
+   * the Framework properties, the method returns an empty \c Any.
+   *
+   * @param key The name of the requested property.
+   * @return The value of the requested property, or an empty \c Any if the
+   *         property is undefined.
+   */
+  Any GetProperty(const std::string& key) const;
+
+  /**
+   * Returns all known properties.
+   *
+   * @return A map of all framework properties.
+   */
+  AnyMap GetProperties() const;
 
   /**
    * Returns the <code>Bundle</code> object associated with this

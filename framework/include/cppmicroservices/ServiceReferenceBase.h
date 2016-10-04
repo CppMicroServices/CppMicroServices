@@ -94,9 +94,25 @@ public:
    * unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
+   * @deprecated Since 3.0, use GetPropertyKeys() instead.
+   *
    * @param keys A vector being filled with the property keys.
    */
   void GetPropertyKeys(std::vector<std::string>& keys) const;
+
+  /**
+   * Returns a list of the keys in the <code>ServiceProperties</code>
+   * object of the service referenced by this <code>ServiceReferenceBase</code>
+   * object.
+   *
+   * <p>
+   * This method will continue to return the keys after the service has been
+   * unregistered. This is so references to unregistered services can
+   * still be interrogated.
+   *
+   * @return A vector being filled with the property keys.
+   */
+  std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns the bundle that registered the service referenced by this

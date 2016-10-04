@@ -30,77 +30,109 @@ namespace cppmicroservices {
 
 namespace {
 
-  typedef std::map<std::string, Any> AnyMap;
-  typedef std::vector<Any> AnyVector;
+typedef std::map<std::string, Any> AnyOrderedMap;
+typedef std::vector<Any> AnyVector;
 
-  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
-  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector);
+void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
+void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap);
+void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci);
 
-  Any ParseJsonValue(const Json::Value& jsonValue)
+Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
+{
+  if (jsonValue.isObject())
   {
-    if (jsonValue.isObject())
+    if (ci)
     {
-      Any any = AnyMap();
+      Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
     }
-    else if (jsonValue.isArray())
+    else
     {
-      Any any = AnyVector();
-      ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any));
+      Any any = AnyOrderedMap();
+      ParseJsonObject(jsonValue, ref_any_cast<AnyOrderedMap>(any));
       return any;
     }
-    else if (jsonValue.isString())
-    {
-      return Any(jsonValue.asString());
-    }
-    else if (jsonValue.isBool())
-    {
-      return Any(jsonValue.asBool());
-    }
-    else if (jsonValue.isDouble())
-    {
-      return Any(jsonValue.asDouble());
-    }
-    else if (jsonValue.isIntegral())
-    {
-      return Any(jsonValue.asInt());
-    }
-
-    return Any();
   }
-
-  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
+  else if (jsonValue.isArray())
   {
-    for (Json::Value::const_iterator it = jsonObject.begin();
-         it != jsonObject.end(); ++it)
-    {
-      const Json::Value& jsonValue = *it;
-      Any anyValue = ParseJsonValue(jsonValue);
-      if (!anyValue.Empty())
-      {
-        anyMap.insert(std::make_pair(it.memberName(), anyValue));
-      }
-    }
+    Any any = AnyVector();
+    ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any), ci);
+    return any;
+  }
+  else if (jsonValue.isString())
+  {
+    // We do not support attribute localization yet, so we just
+    // always remove the leading '%' character.
+    std::string val = jsonValue.asString();
+    if (!val.empty() && val[0] == '%')
+      val = val.substr(1);
+
+    return Any(val);
+  }
+  else if (jsonValue.isBool())
+  {
+    return Any(jsonValue.asBool());
+  }
+  else if (jsonValue.isDouble())
+  {
+    return Any(jsonValue.asDouble());
+  }
+  else if (jsonValue.isIntegral())
+  {
+    return Any(jsonValue.asInt());
   }
 
-  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector)
+  return Any();
+}
+
+void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
+{
+  for (Json::Value::const_iterator it = jsonObject.begin();
+       it != jsonObject.end(); ++it)
   {
-    for (Json::Value::const_iterator it = jsonArray.begin();
-         it != jsonArray.end(); ++it)
+    const Json::Value& jsonValue = *it;
+    Any anyValue = ParseJsonValue(jsonValue, false);
+    if (!anyValue.Empty())
     {
-      const Json::Value& jsonValue = *it;
-      Any anyValue = ParseJsonValue(jsonValue);
-      if (!anyValue.Empty())
-      {
-        anyVector.push_back(anyValue);
-      }
+      anyMap.insert(std::make_pair(it.memberName(), anyValue));
     }
   }
+}
+
+void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
+{
+  for (Json::Value::const_iterator it = jsonObject.begin();
+       it != jsonObject.end(); ++it)
+  {
+    const Json::Value& jsonValue = *it;
+    Any anyValue = ParseJsonValue(jsonValue, true);
+    if (!anyValue.Empty())
+    {
+      anyMap.insert(std::make_pair(it.memberName(), anyValue));
+    }
+  }
+}
+
+void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector,
+                    bool ci)
+{
+  for (Json::Value::const_iterator it = jsonArray.begin();
+       it != jsonArray.end(); ++it)
+  {
+    const Json::Value& jsonValue = *it;
+    Any anyValue = ParseJsonValue(jsonValue, ci);
+    if (!anyValue.Empty())
+    {
+      anyVector.push_back(anyValue);
+    }
+  }
+}
 
 }
 
 BundleManifest::BundleManifest()
+  : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
 }
 
@@ -118,43 +150,56 @@ void BundleManifest::Parse(std::istream& is)
     throw std::runtime_error("The Json root element must be an object.");
   }
 
-  ParseJsonObject(root, m_Properties);
+  // This is deprecated in 3.0
+  ParseJsonObject(root, m_PropertiesDeprecated);
+
+  ParseJsonObject(root, m_Headers);
+}
+
+AnyMap BundleManifest::GetHeaders() const
+{
+  return m_Headers;
 }
 
 bool BundleManifest::Contains(const std::string& key) const
 {
-  return m_Properties.count(key) > 0;
+  return m_Headers.count(key) > 0;
 }
 
 Any BundleManifest::GetValue(const std::string& key) const
 {
-  AnyMap::const_iterator iter = m_Properties.find(key);
-  if (iter != m_Properties.end())
+  auto iter = m_Headers.find(key);
+  if (iter != m_Headers.end())
   {
     return iter->second;
   }
   return Any();
 }
 
-std::vector<std::string> BundleManifest::GetKeys() const
+Any BundleManifest::GetValueDeprecated(const std::string& key) const
+{
+  auto iter = m_PropertiesDeprecated.find(key);
+  if (iter != m_PropertiesDeprecated.end())
+  {
+    return iter->second;
+  }
+  return Any();
+}
+
+std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
   std::vector<std::string> keys;
-  for (AnyMap::const_iterator iter = m_Properties.begin();
-       iter != m_Properties.end(); ++iter)
+  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.begin();
+       iter != m_PropertiesDeprecated.end(); ++iter)
   {
     keys.push_back(iter->first);
   }
   return keys;
 }
 
-void BundleManifest::SetValue(const std::string& key, const Any& value)
+std::map<std::string, Any> BundleManifest::GetPropertiesDeprecated() const
 {
-  m_Properties[key] = value;
-}
-    
-AnyMap BundleManifest::GetProperties() const
-{
-  return m_Properties;
+  return m_PropertiesDeprecated;
 }
 
 }

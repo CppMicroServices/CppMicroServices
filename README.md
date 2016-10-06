@@ -52,7 +52,6 @@ Below is a list of tested compiler/OS combinations:
   - Clang XCode 7.3 (OS X 10.11) via Travis CI
   - Visual Studio 2013 via Appveyor
   - Visual Studio 2015 via Appveyor
-  - OS X 10.10
 
 Legal
 -----
@@ -111,6 +110,11 @@ properties during service look-ups. It also allows to track the life-cycle of se
 Please see the [Documentation](http://cppmicroservices.org/doc_latest/index.html) for more
 examples and tutorials and the API reference. There is also a blog post about
 [OSGi Lite for C++](http://blog.cppmicroservices.org/2012/04/15/osgi-lite-for-c++).
+
+Git Branch Conventions
+----------------------
+
+The Git repository contains two eternal branches, [master](https://github.com/CppMicroServices/CppMicroServices/tree/master/) and [development](https://github.com/CppMicroServices/CppMicroServices/tree/development/). The master branch contains production quality code and its HEAD points to the latest released version. The development branch is the default branch and contains the current state of development. Pull requests by default target the development branch. See [Contribution to C++ Micro Services](CONTRIBUTING.md) for details about the contribution process.`
 
 Build Instructions
 ------------------

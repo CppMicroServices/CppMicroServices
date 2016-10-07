@@ -138,7 +138,7 @@ function(usFunctionEmbedResources)
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} -isysroot ${CMAKE_OSX_SYSROOT} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_CXX_COMPILER} ${US_OSX_CXX_FLAGS} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
         COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}

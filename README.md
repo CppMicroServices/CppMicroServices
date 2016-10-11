@@ -61,6 +61,20 @@ directory for detailed copyright information.
 
 This project is licensed under the [Apache License v2.0][apache_license].
 
+Code of Conduct
+---------------
+
+CppMicroServices.org welcomes developers with different backgrounds and a broad range of 
+experience. A diverse and inclusive community will create more great ideas, provide more unique 
+perspectives, and produce more outstanding code. Our aim is to make the CppMicroServices community 
+welcoming to everyone.
+
+To provide clarity of what is expected of our members, CppMicroServices has adopted the code 
+of conduct defined by [contributor-covenant.org][contributor-covenant.org]. This document is used
+across many open source communities, and we believe it articulates our values well. 
+
+The full text is on [Code of Conduct](./CodeOfConduct.md).
+
 Quick Start
 -----------
 
@@ -116,3 +130,5 @@ Please visit the [Build Instructions][bi_master] page online.
 
 [bi_master]: http://cppmicroservices.org/doc_latest/BuildInstructions.html
 [apache_license]: http://www.apache.org/licenses/LICENSE-2.0
+[contributor-covenant.org]: http://contributor-covenant.org
+[code_of_conduct]: http://www.github.org/CppMicroServices/CppMicroServices/CodeOfConduct.md

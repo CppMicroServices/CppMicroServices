@@ -145,6 +145,6 @@ To provide clarity of what is expected of our members, CppMicroServices has adop
 of conduct defined by [contributor-covenant.org][contributor-covenant.org]. This document is used 
 across many open  source communities, and we believe it articulates our values well. 
 
-The full text is on [Code of Conduct](./CodeOfConduct.md).
+Please refer to the [Code of Conduct](./CodeOfConduct.md) for further details.
 
 [contributor-covenant.org]: http://contributor-covenant.org

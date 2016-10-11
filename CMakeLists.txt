@@ -338,6 +338,7 @@ else()
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
+  
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")

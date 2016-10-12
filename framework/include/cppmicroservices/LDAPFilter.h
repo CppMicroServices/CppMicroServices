@@ -23,7 +23,7 @@
 #ifndef CPPMICROSERVICES_LDAPFILTER_H
 #define CPPMICROSERVICES_LDAPFILTER_H
 
-#include "cppmicroservices/ServiceProperties.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/SharedData.h"
 
 #ifdef _MSC_VER
@@ -136,7 +136,7 @@ public:
    * @return <code>true</code> if the <code>ServiceProperties</code>'s values match this
    *         filter; <code>false</code> otherwise.
    */
-  bool Match(const ServiceProperties& dictionary) const;
+  bool Match(const AnyMap& dictionary) const;
 
   /**
    * Filter using a <code>ServiceProperties</code>. This <code>LDAPFilter</code> is executed using
@@ -148,7 +148,7 @@ public:
    * @return <code>true</code> if the <code>ServiceProperties</code>'s values match this
    *         filter; <code>false</code> otherwise.
    */
-  bool MatchCase(const ServiceProperties& dictionary) const;
+  bool MatchCase(const AnyMap& dictionary) const;
 
   /**
    * Returns this <code>LDAPFilter</code>'s filter string.

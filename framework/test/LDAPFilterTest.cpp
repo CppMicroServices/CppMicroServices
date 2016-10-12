@@ -24,6 +24,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
+#include "cppmicroservices/ServiceProperties.h"
 
 #include "TestingMacros.h"
 

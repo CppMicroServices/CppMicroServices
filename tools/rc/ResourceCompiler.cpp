@@ -1,23 +1,23 @@
 /*=============================================================================
- 
+
  Library: CppMicroServices
- 
+
  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
  file at the top-level directory of this distribution and at
  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
- 
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- 
+
  =============================================================================*/
 
 #include "miniz.h"
@@ -56,7 +56,7 @@ static std::string get_error_str()
                             NULL,
                             dw,
                             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                            (LPTSTR) &lpMsgBuf,
+                            reinterpret_cast<LPTSTR>(&lpMsgBuf),
                             0,
                             NULL );
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -125,28 +125,28 @@ public:
    * @param isManifest indicates if the file is the bundle's manifest
    */
   void AddResourceFile(const std::string& resFileName, bool isManifest = false);
-  
+
   /*
    * @brief Add all files from another zip archive to this zip archive
    * @throw std::runtime exception if failed to add any of the resources
    * @param archiveFileName is the path to the source archive
    */
   void AddResourcesFromArchive(const std::string& archiveFileName);
-  
+
   // Remove copy constructor and assignment
   ZipArchive(const ZipArchive&) = delete;
   void operator=(const ZipArchive&) = delete;
   // Remove move constructor and assignment
   ZipArchive(ZipArchive&&) = delete;
   ZipArchive& operator=(ZipArchive&&) = delete;
-  
+
 private:
   /*
    * @brief Add a directory entry to the zip archive
    * @throw std::runtime exception if failed to add the entry
    */
   void AddDirectory(const std::string& dirName);
-  
+
   std::string fileName;
   int compressionLevel;
   std::string bundleName;
@@ -187,7 +187,7 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   {
     archiveName = resFileName.substr(resFileName.find_last_of(PATH_SEPARATOR)+1);
   }
-  
+
   std::string archiveEntry = bundleName + "/" + archiveName;
   std::clog << "Adding file " << archiveEntry << " ..." << std::endl;
   // add the current file to the new archive
@@ -195,7 +195,7 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   {
     throw std::runtime_error("A file already exists with this name");
   }
-  
+
   if (!mz_zip_writer_add_file(writeArchive.get(), archiveEntry.c_str(), resFileName.c_str(), NULL,
                               0, compressionLevel))
   {
@@ -313,7 +313,7 @@ struct Custom_Arg : public option::Arg
   {
     std::cerr << "ERROR: " << msg1 << opt.name << msg2 << std::endl;
   }
-  
+
   static option::ArgStatus NonEmpty(const option::Option& option, bool msg)
   {
     if (option.arg != 0 && option.arg[0] != 0)
@@ -326,7 +326,7 @@ struct Custom_Arg : public option::Arg
     }
     return option::ARG_ILLEGAL;
   }
-  
+
   static option::ArgStatus Numeric(const option::Option& option, bool msg)
   {
     char* endptr = nullptr;
@@ -336,7 +336,7 @@ struct Custom_Arg : public option::Arg
       assert(endptr != nullptr);
       return option::ARG_OK;
     }
-    
+
     if (msg)
     {
       printError("Option '", option, "' requires a numeric argument\n");
@@ -388,20 +388,20 @@ int main(int argc, char** argv)
   int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
   int return_code = EXIT_SUCCESS;
   std::string bundleName;
-  
+
   argc -= (argc > 0);
   argv += (argc > 0); // skip program name argv[0]
   option::Stats stats(usage, argc, argv);
   std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
   std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
   option::Parser parse(usage, argc, argv, options.get(), buffer.get());
-  
+
   if (parse.error())
   {
     std::cerr << "Parsing command line arguments failed. " << std::endl;
     return_code = EXIT_FAILURE;
   }
-  
+
   if (parse.nonOptionsCount())
   {
     std::clog << "unrecognized options ..." << std::endl;
@@ -411,54 +411,54 @@ int main(int argc, char** argv)
     }
     return_code = EXIT_FAILURE;
   }
-  
+
   option::Option* bundleFileOpt = options[BUNDLEFILE];
   if (bundleFileOpt && bundleFileOpt->count() > 1 )
   {
     std::cerr << "(--bundle-file | -b) appear multiple times in the arguments. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
-  
+
   option::Option* outFileOpt = options[OUTFILE];
   if (outFileOpt && outFileOpt->count() > 1 )
   {
     std::cerr << "(--out-file | -o) appear multiple times in the arguments. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
-  
+
   if (!bundleFileOpt && !outFileOpt)
   {
     std::cerr << "At least one of the options (--bundle-file | --out-file) is required." << std::endl;
     return_code = EXIT_FAILURE;
   }
-  
+
   if (argc == 0 || options[HELP] || return_code == EXIT_FAILURE)
   {
     option::printUsage(std::clog, usage);
     return return_code;
   }
-  
+
   if (options[BUNDLENAME])
   {
     bundleName = options[BUNDLENAME].arg;
   }
-  
+
   if (!options[VERBOSE])
   {
     // if not in verbose mode, supress the clog stream
     std::clog.setstate(std::ios_base::failbit);
   }
-  
+
   if (options[COMPRESSIONLEVEL])
   {
     char* endptr = 0;
     compressionLevel = strtol(options[COMPRESSIONLEVEL].arg, &endptr, 10);
   }
   std::clog << "using compression level " << compressionLevel << std::endl;
-  
+
   std::string zipFile;
   bool deleteTempFile = false;
-  
+
   try
   {
     // Append mode only works with one zip-add argument. A bundle can only contain one zip blob.
@@ -478,7 +478,7 @@ int main(int argc, char** argv)
         zipFile = us_tempfile();
         deleteTempFile = true;
       }
-      
+
       std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])
@@ -531,20 +531,20 @@ int main(int argc, char** argv)
     std::cerr << "Error: " << ex.what() << std::endl;
     return_code = EXIT_FAILURE;
   }
-  
+
   // delete temporary file and report error on failure
   if (deleteTempFile && (std::remove(zipFile.c_str()) != 0))
   {
     std::cerr << "Error removing temporary zip archive "  << zipFile << std:: endl;
     return_code = EXIT_FAILURE;
   }
-  
+
   // clear the failbit set by us
   if (!options[VERBOSE])
   {
     std::clog.clear();
   }
-  
+
   return return_code;
 }
 

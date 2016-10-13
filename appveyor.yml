@@ -1,49 +1,157 @@
 version: 2.99.{build}
+os: Visual Studio 2015
+
 pull_requests:
   do_not_increment_build_number: true
+
 branches:
   except:
   - coverity_scan
   - gh_pages
-skip_tags: true
-image:
-- Visual Studio 2013
-- Visual Studio 2015
-configuration:
-- Debug
-- Release
-platform:
-- x64
-- Win32
-init:
-- cmd: >-
-    cmake -version
 
-    git config --global core.autocrlf true
+skip_tags: true
+
+matrix:
+  fast_finish: true
 
 environment:
   matrix:
-  - US_SHARED: 0
+  # ---------- Visual Studio 2013 ------------
+  #---- Win32
+  #- platform: Win32
+  #  configuration: Debug
+  #  gen: "Visual Studio 12 2013"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- platform: Win32
+  #  configuration: Debug
+  #  gen: "Visual Studio 12 2013"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  #- platform: Win32
+  #  configuration: Release
+  #  gen: "Visual Studio 12 2013"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- platform: Win32
+  #  configuration: Release
+  #  gen: "Visual Studio 12 2013"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  #---- Win64
+  #- platform: Win64
+  #  configuration: Debug
+  #  gen: "Visual Studio 12 2013 Win64"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- image: Visual Studio 2013
+  #  platform: x64
+  #  configuration: Debug
+  #  arch: "x64"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  #- image: Visual Studio 2013
+  #  platform: x64
+  #  configuration: Release
+  #  arch: "x64"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- image: Visual Studio 2013
+  #  platform: x64
+  #  configuration: Release
+  #  arch: "x64"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  # ---------- Visual Studio 2015 ------------
+  #---- Win32
+  #- platform: Win32
+  #  configuration: Debug
+  #  gen: "Visual Studio 14 2015"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- image: Visual Studio 2015
+  #  platform: x86
+  #  configuration: Debug
+  #  arch: "Win32"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  #- image: Visual Studio 2015
+  #  platform: x86
+  #  configuration: Release
+  #  arch: "Win32"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- image: Visual Studio 2015
+  #  platform: x86
+  #  configuration: Release
+  #  arch: "Win32"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  #---- Win64
+  #- image: Visual Studio 2015
+  #  platform: x64
+  #  configuration: Debug
+  #  arch: "x64"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- image: Visual Studio 2015
+  #  platform: x64
+  #  configuration: Debug
+  #  arch: "x64"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+  #- image: Visual Studio 2015
+  #  platform: x64
+  #  configuration: Release
+  #  arch: "x64"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- image: Visual Studio 2015
+  #  platform: x64
+  #  configuration: Release
+  #  arch: "x64"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
+    # ---------- MinGW-w64 (via MSYS2) ------------
+  - platform: mingw-w64
+    configuration: Debug
+    gen: "MinGW Makefiles"
+    US_SHARED: 0
     US_THREADED: 1
-  - US_SHARED: 1
+  - platform: mingw-w64
+    configuration: Debug
+    gen: "MinGW Makefiles"
+    US_SHARED: 1
     US_THREADED: 1
+  - platform: mingw-w64
+    configuration: Release
+    gen: "MinGW Makefiles"
+    US_SHARED: 0
+    US_THREADED: 1
+  - platform: mingw-w64
+    configuration: Release
+    gen: "MinGW Makefiles"
+    US_SHARED: 1
+    US_THREADED: 1
+
+init:
+- cmake -version
+- git config --global core.autocrlf true
+
 before_build:
-- cmd: >-
-    if "%platform%"=="Win32" if "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 12 2013" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
+- mkdir build & cd build
+- echo %PATH%
+- if "%platform%"=="mingw-w64" set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+- if "%platform%"=="mingw-w64" set PATH=C:\msys64\mingw64\bin;%PATH%
+- echo %PATH%
+- cmake .. -G"%gen%" -DCMAKE_BUILD_TYPE=%configuration% -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
 
-    if "%platform%"=="x64" if "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 12 2013 Win64" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
 
-    if "%platform%"=="Win32" if NOT "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 14 2015" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
+build_script:
+- if NOT "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build --config %configuration% -- /maxcpucount
+- if "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build -- -j2
 
-    if "%platform%"=="x64" if NOT "%VS140COMNTOOLS%"=="" mkdir build & cd build & cmake .. -G"Visual Studio 14 2015 Win64" -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_BUILD_TESTING:BOOL=1 2>&1
-
-build:
-  project: C:/projects/cppmicroservices/build/CppMicroServices.sln
-  parallel: true
-  verbosity: minimal
 test_script:
-- cmd: >-
-    cd %APPVEYOR_BUILD_FOLDER%/build
-
-    ctest -j2 -C %CONFIGURATION% --output-on-failure
+- cd %APPVEYOR_BUILD_FOLDER%/build
+- ctest -j2 -C %CONFIGURATION% --output-on-failure
 

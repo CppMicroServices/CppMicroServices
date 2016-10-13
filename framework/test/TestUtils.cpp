@@ -152,7 +152,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     return {};
 }
 
-std::string GetTempDirectory() 
+std::string GetTempDirectory()
 {
 #if defined (US_PLATFORM_WINDOWS)
   std::wstring temp_dir;

@@ -26,19 +26,19 @@
 
 #include "Utils.h"
 
-#include <stdexcept>
-
 #if defined(US_PLATFORM_POSIX)
   #include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
   #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
   #endif
-  #include <strsafe.h>
   #include <windows.h>
+  #include <strsafe.h>
 #else
   #error Unsupported platform
 #endif
+
+#include <stdexcept>
 
 namespace cppmicroservices {
 
@@ -115,6 +115,7 @@ void SharedLibrary::Load(int flags)
     throw std::runtime_error(err ? std::string(err) : (std::string("Error loading ") + libPath));
   }
 #else
+  US_UNUSED(flags);
   d->m_Handle = LoadLibrary(libPath.c_str());
   if (!d->m_Handle)
   {
@@ -146,7 +147,7 @@ void SharedLibrary::Unload()
       throw std::runtime_error(err ? std::string(err) : (std::string("Error unloading ") + GetLibraryPath()));
     }
 #else
-    if (!FreeLibrary((HMODULE)d->m_Handle))
+    if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle)))
     {
       std::string errMsg = "Unloading ";
       errMsg.append(GetLibraryPath()).append("failed with error: ").append(GetLastErrorStr());

@@ -183,7 +183,7 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
         // do not send a FrameworkEvent as that could cause a deadlock or an inifinite loop.
         // Instead, log to the internal logger
         // @todo send this to the LogService instead when its supported.
-        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << GetLastExceptionStr() << "\n";
+        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << GetLastExceptionStr();
       }
     }
   }

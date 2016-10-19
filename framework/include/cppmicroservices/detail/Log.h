@@ -65,13 +65,13 @@ private:
 
 struct LogMsg {
 
-  LogMsg(LogSink& sink, const std::thread::id tid, const char* file, int ln, const char* func)
+  LogMsg(LogSink& sink, const char* file, int ln, const char* func)
     : enabled(false), buffer(), _sink(sink)
   {
     enabled = _sink.Enabled();
     if (enabled)
     {
-      buffer << "[" << tid << "] " << "In " << func << " at " << file << ":" << ln << " : ";
+      buffer << "[" << std::this_thread::get_id() << "] " << "In " << func << " at " << file << ":" << ln << " : ";
     }
   }
 
@@ -101,7 +101,7 @@ private:
 
 // Write a log line using a <code>LogSink</code> reference.
 // All log lines will automatically end with a "\n"
-#define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, std::this_thread::get_id(), __FILE__, __LINE__, __FUNCTION__)
+#define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
 
 
 #endif // CPPMICROSERVICES_LOG_H

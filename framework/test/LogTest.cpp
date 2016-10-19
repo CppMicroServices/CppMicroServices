@@ -40,7 +40,7 @@ void testDefaultLogMessages()
   auto clog_buf = std::clog.rdbuf();
   std::clog.rdbuf(temp_buf.rdbuf());
   detail::LogSink sink(&std::clog, true);
-  DIAG_LOG(sink) << "Testing " << 1 << 2 << 3 << ", Testing " << std::scientific << 1.0 << static_cast<void*>(nullptr) << 2.0 << 3.0 << "\n";
+  DIAG_LOG(sink) << "Testing " << 1 << 2 << 3 << ", Testing " << std::scientific << 1.0 << static_cast<void*>(nullptr) << 2.0 << 3.0;
   sink.Log(std::string("blaaaaaaaaaaaaaaaaaah\n"));
 
   std::clog.rdbuf(clog_buf);

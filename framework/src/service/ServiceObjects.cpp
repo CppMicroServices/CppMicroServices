@@ -122,7 +122,7 @@ struct UngetHelper
       // the BundlePrivate or CoreBundleContext objects.
       if (!b.expired())
       {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetHelper threw an exception. " << GetLastExceptionStr() << "\n";
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetHelper threw an exception. " << GetLastExceptionStr();
       }
       // don't throw exceptions from the destructor. For an explanation, see:
       // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md

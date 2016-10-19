@@ -76,7 +76,7 @@ CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, st
   std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
-  DIAG_LOG(*sink) << "created\n";
+  DIAG_LOG(*sink) << "created";
 }
 
 CoreBundleContext::~CoreBundleContext()
@@ -95,7 +95,7 @@ void CoreBundleContext::SetThis(const std::shared_ptr<CoreBundleContext>& self)
 
 void CoreBundleContext::Init()
 {
-  DIAG_LOG(*sink) << "initializing\n";
+  DIAG_LOG(*sink) << "initializing";
   initCount++;
 
   auto storageCleanProp = frameworkProperties.find(Constants::FRAMEWORK_STORAGE_CLEAN);
@@ -143,17 +143,17 @@ void CoreBundleContext::Init()
     bundleRegistry.Install(execPath, systemBundle.get(), true);
   }
 
-  DIAG_LOG(*sink) << "inited\nInstalled bundles: \n";
+  DIAG_LOG(*sink) << "inited\nInstalled bundles:";
   for (auto b : bundleRegistry.GetBundles())
   {
     DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":"
-                    << b->version << " location:" << b->location << "\n";
+                    << b->version << " location:" << b->location;
   }
 }
 
 void CoreBundleContext::Uninit0()
 {
-  DIAG_LOG(*sink) << "uninit\n";
+  DIAG_LOG(*sink) << "uninit";
   serviceHooks.Close();
   systemBundle->UninitSystemBundle();
 }

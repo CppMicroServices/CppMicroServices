@@ -265,7 +265,8 @@ public:
    *         registering the service to update the service's properties or to
    *         unregister the service.
    *
-   * @throws std::runtime_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid, or if there are
+             case variants of the same key in the supplied properties map.
    * @throws std::invalid_argument If the InterfaceMap is empty, or
    *         if a service is registered as a null class.
    *

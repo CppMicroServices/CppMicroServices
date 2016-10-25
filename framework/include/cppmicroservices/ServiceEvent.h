@@ -56,7 +56,7 @@ public:
      * This event is delivered <strong>after</strong> the service
      * has been registered with the framework.
      *
-     * @see BundleContext#RegisterService()
+     * @see BundleContext#RegisterService
      */
     SERVICE_REGISTERED = 0x00000001,
 
@@ -84,7 +84,6 @@ public:
      * the service while completing the service unregistration operation.
      *
      * @see ServiceRegistration#Unregister
-     * @see BundleContext#UngetService
      */
     SERVICE_UNREGISTERING = 0x00000004,
 

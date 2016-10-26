@@ -296,12 +296,25 @@ bool IsSharedLibrary(const std::string& location)
 
 bool IsBundleFile(const std::string& location)
 {
-  // Currently, we require a zip file with at least one top-level
-  // directory for a valid bundle file.
+  // We require a zip file with at least one top-level directory
+  // containing a manifest.json file for a file to be a valid bundle.
   try
   {
+    // If this location is a bundle, a top level directory will
+    // contain a manifest.json file at its root. There is no need
+    // to recursively search nested directories.
     BundleResourceContainer resContainer(location);
-    return !resContainer.GetTopLevelDirs().empty();
+    auto topLevelDirs = resContainer.GetTopLevelDirs();
+    return std::any_of(topLevelDirs.begin(), topLevelDirs.end(), [&resContainer](const std::string& dir) -> bool {
+
+      std::vector<std::string> names;
+      std::vector<uint32_t> indices;
+
+      resContainer.GetChildren(dir + "/", true, names, indices);
+      return std::any_of(names.begin(), names.end(), [](const std::string& resourceName) -> bool { 
+        return resourceName == std::string("manifest.json");
+      });
+    });
   }
   catch (...)
   {

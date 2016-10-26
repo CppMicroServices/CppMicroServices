@@ -42,7 +42,7 @@ namespace cppmicroservices {
  * properties of the service or to unregister the service.
  *
  * @tparam I1 Class type of the first service interface
- * @tparam Interfaces Class types of the rest of the service interfaces
+ * @tparam Interfaces Template parameter pack containing zero or more service interfaces
  * @see BundleContext#RegisterService()
  */
 template<class I1, class ...Interfaces>

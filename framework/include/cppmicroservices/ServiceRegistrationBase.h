@@ -120,8 +120,9 @@ public:
    * @throws std::logic_error If this <code>ServiceRegistrationBase</code>
    *         object has already been unregistered or if it is invalid.
    * @throws std::invalid_argument If <code>properties</code> contains
-   *         case variants of the same key name or if <code>properties</code>
-   *         contains too many keys.
+   *         case variants of the same key name or if the number of the keys
+   *         of <code>properties</code> exceeds the value returned by
+   *         std::numeric_limits<int>::max().
    */
   void SetProperties(const ServiceProperties& properties);
 

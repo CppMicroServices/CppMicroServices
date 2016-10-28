@@ -147,9 +147,9 @@ void ServiceTracker<S,T>::Close()
   {
     d->context.RemoveServiceListener(outgoing.get(), &_TrackedService::ServiceChanged);
   }
-  catch (const std::logic_error& /*e*/)
+  catch (const std::runtime_error& /*e*/)
   {
-    /* In case the context was stopped. */
+    /* In case the context was stopped or invalid. */
   }
 
   d->Modified(); /* clear the cache */

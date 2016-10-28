@@ -221,6 +221,10 @@ set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+if(APPLE)
+  # Avoid RPATH warning in cmakegui
+  set(CMAKE_MACOSX_RPATH 1)
+endif()
 
 #-----------------------------------------------------------------------------
 # Testing configuration
@@ -334,6 +338,7 @@ else()
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
+  
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")

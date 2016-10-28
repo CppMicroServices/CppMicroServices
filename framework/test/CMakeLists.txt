@@ -33,6 +33,7 @@ add_subdirectory(bundles)
 
 set(_tests
   AnyTest
+  AnyMapTest
   BundleRegistryPerformanceTest
   FrameworkEventTest
   FrameworkListenerTest
@@ -42,6 +43,7 @@ set(_tests
   LDAPFilterTest
   LDAPQueryTest
   LogTest
+  BundleActivatorTest
   BundleEventTest
   BundleHooksTest
   BundleManifestTest

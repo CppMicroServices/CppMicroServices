@@ -1,3 +1,4 @@
 {
-  "bundle.name" : "eventlistener"
+  "bundle.symbolic_name" : "eventlistener",
+  "bundle.activator" : true
 }

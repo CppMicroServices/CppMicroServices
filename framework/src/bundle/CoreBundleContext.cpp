@@ -47,16 +47,20 @@ std::atomic<int> CoreBundleContext::globalId{0};
 std::map<std::string, Any> InitProperties(std::map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
-  configuration.insert(std::pair<std::string, Any>(Constants::FRAMEWORK_LOG, false));
+  configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
 
   // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
   // Run-time modification of the property should be ignored as it is irrelevant.
-  configuration.erase(Constants::FRAMEWORK_THREADING_SUPPORT);
 #ifdef US_ENABLE_THREADING_SUPPORT
-  configuration.insert(std::pair<std::string, Any>(Constants::FRAMEWORK_THREADING_SUPPORT, std::string("multi")));
+  configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("multi");
 #else
-  configuration.insert(std::pair<std::string, Any>(Constants::FRAMEWORK_THREADING_SUPPORT, std::string("single")));
+  configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
+
+  configuration.insert(std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
+
+  configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
+  configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
 
   return configuration;
 }
@@ -81,9 +85,16 @@ CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, st
 
 CoreBundleContext::~CoreBundleContext()
 {
-  std::shared_ptr<CoreBundleContext> dummy(this, [](CoreBundleContext*){});
-  systemBundle->Shutdown(false);
-  systemBundle->WaitForStop(std::chrono::milliseconds(0));
+}
+
+std::shared_ptr<CoreBundleContext> CoreBundleContext::shared_from_this() const
+{
+  return self.Lock(), self.v.lock();
+}
+
+void CoreBundleContext::SetThis(const std::shared_ptr<CoreBundleContext>& self)
+{
+  this->self.Lock(), this->self.v = self;
 }
 
 void CoreBundleContext::Init()
@@ -125,15 +136,16 @@ void CoreBundleContext::Init()
 
   serviceHooks.Open();
   //resolverHooks.Open();
-  
-  // auto-install all embedded bundles inside the executable
-  auto execPath = BundleUtils::GetExecutablePath();
-  if (IsBundleFile(execPath))
-  {
-    bundleRegistry.Install(execPath, systemBundle.get(), true);
-  }
 
   bundleRegistry.Load();
+
+  auto const execPath = BundleUtils::GetExecutablePath();
+  if (bundleRegistry.GetBundles(execPath).empty() &&
+      IsBundleFile(execPath))
+  {
+  // auto-install all embedded bundles inside the executable
+    bundleRegistry.Install(execPath, systemBundle.get(), true);
+  }
 
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
   for (auto b : bundleRegistry.GetBundles())

@@ -1,3 +1,4 @@
 {
-  "bundle.name" : "dictionaryservice"
+  "bundle.symbolic_name" : "dictionaryservice",
+  "bundle.activator" : true
 }

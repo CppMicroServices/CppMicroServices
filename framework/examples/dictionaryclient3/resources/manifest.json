@@ -1,3 +1,4 @@
 {
-  "bundle.name" : "dictionaryclient3"
+  "bundle.symbolic_name" : "dictionaryclient3",
+  "bundle.activator" : true
 }

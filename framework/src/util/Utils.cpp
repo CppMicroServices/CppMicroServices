@@ -65,6 +65,10 @@
   #define us_unlink _unlink
 #endif
 
+#ifdef US_HAVE_CXXABI_H
+#include <cxxabi.h>
+#endif
+
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -428,10 +432,6 @@ void TerminateForDebug(const std::exception_ptr ex)
   exit(1); // goodbye cruel world
 #endif
 }
-
-#ifdef US_HAVE_CXXABI_H
-#include <cxxabi.h>
-#endif
 
 US_Framework_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& typeInfo)
 {

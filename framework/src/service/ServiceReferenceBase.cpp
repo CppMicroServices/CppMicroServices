@@ -88,8 +88,13 @@ Any ServiceReferenceBase::GetProperty(const std::string& key) const
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 {
+  keys = GetPropertyKeys();
+}
+
+std::vector<std::string> ServiceReferenceBase::GetPropertyKeys() const
+{
   auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
-  keys = d.load()->registration->properties.Keys_unlocked();
+  return d.load()->registration->properties.Keys_unlocked();
 }
 
 Bundle ServiceReferenceBase::GetBundle() const
@@ -217,8 +222,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
     os << "Reference for service object registered from "
        << serviceRef.GetBundle().GetSymbolicName() << " " << serviceRef.GetBundle().GetVersion()
        << " (";
-    std::vector<std::string> keys;
-    serviceRef.GetPropertyKeys(keys);
+    std::vector<std::string> keys = serviceRef.GetPropertyKeys();
     size_t keySize = keys.size();
     for(size_t i = 0; i < keySize; ++i)
     {

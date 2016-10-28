@@ -300,7 +300,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
 
 void FrameworkPrivate::ShutdownDone_unlocked(bool restart)
 {
-  auto t = restart ? FrameworkEvent::Type::FRAMEWORK_STOPPED_UPDATE : FrameworkEvent::Type::FRAMEWORK_STOPPED;
+  auto t = restart ? FrameworkEvent::FRAMEWORK_STOPPED_UPDATE : FrameworkEvent::FRAMEWORK_STOPPED;
   SystemShuttingdownDone_unlocked(
         FrameworkEventInternal{
           true,

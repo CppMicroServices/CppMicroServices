@@ -37,6 +37,26 @@ FrameworkPrivate* pimpl(const std::shared_ptr<BundlePrivate>& p)
 
 }
 
+Framework::Framework(const Framework& fw)
+  : Bundle(fw)
+{}
+
+Framework::Framework(Framework&& fw)
+  : Bundle(std::move(fw))
+{}
+
+Framework& Framework::operator=(const Framework& fw)
+{
+  Bundle::operator =(fw);
+  return *this;
+}
+
+Framework& Framework::operator=(Framework&& fw)
+{
+  Bundle::operator =(std::move(fw));
+  return *this;
+}
+
 Framework::Framework(Bundle b)
   : Bundle(std::move(b))
 {

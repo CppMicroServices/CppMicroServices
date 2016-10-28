@@ -24,6 +24,8 @@
 #ifndef CPPMICROSERVICES_BUNDLE_H
 #define CPPMICROSERVICES_BUNDLE_H
 
+#include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/Chrono.h"
 
@@ -385,9 +387,35 @@ public:
    * @return A map containing this bundle's Manifest properties as
    *         key/value pairs.
    *
+   * @deprecated Since 3.0, use GetHeaders() instead.
+   *
    * @sa \ref MicroServices_BundleProperties
    */
   std::map<std::string, Any> GetProperties() const;
+
+  /**
+   * Returns this bundle's Manifest headers and values.
+   *
+   * Manifest header names are case-insensitive. The methods of the returned
+   * \c AnyMap object operate on header names in a case-insensitive
+   * manner.
+   *
+   * If a Manifest header value starts with &quot;%&quot;, it is
+   * localized according to the default locale. If no localization is found
+   * for a header value, the header value without the leading &quot;%&quot; is
+   * returned.
+   *
+   * \note Localization is not yet supported, hence the leading &quot;%&quot;
+   * is always removed.
+   *
+   * This method continues to return Manifest header information while
+   * this bundle is in the \c UNINSTALLED state.
+   *
+   * @return A map containing this bundle's Manifest headers and values.
+   *
+   * @see Constants#BUNDLE_LOCALIZATION
+   */
+  AnyMap GetHeaders() const;
 
   /**
    * Returns the value of the specified property for this bundle.
@@ -398,19 +426,25 @@ public:
    * @return The value of the requested property, or an empty string
    *         if the property is undefined.
    *
+   * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperty
+   * instead.
+   *
    * @sa GetPropertyKeys()
    * @sa \ref MicroServices_BundleProperties
    */
-  Any GetProperty(const std::string& key) const;
+  US_DEPRECATED Any GetProperty(const std::string& key) const;
 
   /**
    * Returns a list of top-level property keys for this bundle.
    *
    * @return A list of available property keys.
    *
+   * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperties()
+   * instead.
+   *
    * @sa \ref MicroServices_BundleProperties
    */
-  std::vector<std::string> GetPropertyKeys() const;
+  US_DEPRECATED std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns this bundle's ServiceReference list for all services it

@@ -183,6 +183,10 @@ class Atomic : private MultiThreaded<>
 
 public:
 
+  Atomic()
+    : m_t{}
+  {}
+
   T Load() const
   {
     return Lock(), m_t;

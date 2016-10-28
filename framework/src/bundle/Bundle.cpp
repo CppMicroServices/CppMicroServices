@@ -23,7 +23,6 @@
 #include "cppmicroservices/Bundle.h"
 
 #include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/FrameworkEvent.h"
@@ -167,12 +166,17 @@ BundleVersion Bundle::GetVersion() const
 
 std::map<std::string, Any> Bundle::GetProperties() const
 {
-  return d->bundleManifest.GetProperties();
+  return d->bundleManifest.GetPropertiesDeprecated();
+}
+
+AnyMap Bundle::GetHeaders() const
+{
+  return d->bundleManifest.GetHeaders();
 }
 
 Any Bundle::GetProperty(const std::string& key) const
 {
-  Any property(d->bundleManifest.GetValue(key));
+  Any property(d->bundleManifest.GetValueDeprecated(key));
 
   // Clients must be able to query both a bundle's properties
   // and the framework's properties through any Bundle's
@@ -193,7 +197,7 @@ Any Bundle::GetProperty(const std::string& key) const
 
 std::vector<std::string> Bundle::GetPropertyKeys() const
 {
-  return d->bundleManifest.GetKeys();
+  return d->bundleManifest.GetKeysDeprecated();
 }
 
 std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const

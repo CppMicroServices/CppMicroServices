@@ -67,12 +67,12 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
                                             bool allowExecutable)
 {
   CheckIllegalState();
-  
+
   if (!allowExecutable && !IsSharedLibrary(location))
   {
     throw std::runtime_error("Cannot install bundles from "+ location +" because it is not a shared library");
   }
-  
+
   auto l = this->Lock(); US_UNUSED(l);
   auto range = (bundles.Lock(), bundles.v.equal_range(location));
   if (range.first != range.second)
@@ -260,8 +260,11 @@ void BundleRegistry::Load()
     catch (...)
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
-      std::string msg("Failed to load bundle " + cppmicroservices::ToString(ba->GetBundleId()) + " (" + ba->GetBundleLocation() + ") ");
-      coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, Bundle{}, msg, std::current_exception()));
+      std::cerr << "Failed to load bundle "
+                << cppmicroservices::ToString(ba->GetBundleId())
+                << " (" + ba->GetBundleLocation() + ") uninstalled it!"
+                << " (execption: " << GetExceptionStr(std::current_exception()) << ")"
+                << std::endl;
     }
   }
 }

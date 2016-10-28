@@ -24,8 +24,6 @@
 
 #include "cppmicroservices/Bundle.h"
 
-#include "BundlePrivate.h"
-
 #include <stdexcept>
 
 namespace cppmicroservices {
@@ -36,7 +34,7 @@ public:
 
   BundleEventData(BundleEvent::Type type, const Bundle& bundle,
                    const Bundle& origin)
-    : type(type), bundle(GetPrivate(bundle)), origin(GetPrivate(origin))
+    : type(type), bundle(bundle), origin(origin)
   {
     if (!bundle) throw std::invalid_argument("invalid bundle");
     if (!origin) throw std::invalid_argument("invalid origin");
@@ -45,12 +43,12 @@ public:
   const BundleEvent::Type type;
 
   // Bundle that had a change occur in its lifecycle.
-  std::shared_ptr<BundlePrivate> bundle;
+  Bundle bundle;
 
   // Bundle that was the origin of the event. For install event type, this is
   // the bundle whose context was used to install the bundle. Otherwise it is
   // the bundle itself.
-  std::shared_ptr<BundlePrivate> origin;
+  Bundle origin;
 };
 
 BundleEvent::BundleEvent()
@@ -79,7 +77,7 @@ BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
 Bundle BundleEvent::GetBundle() const
 {
   if (!d) return Bundle{};
-  return MakeBundle(d->bundle);
+  return d->bundle;
 }
 
 BundleEvent::Type BundleEvent::GetType() const
@@ -91,7 +89,7 @@ BundleEvent::Type BundleEvent::GetType() const
 Bundle BundleEvent::GetOrigin() const
 {
   if (!d) return Bundle{};
-  return MakeBundle(d->origin);
+  return d->origin;
 }
 
 bool BundleEvent::operator==(const BundleEvent& evt) const

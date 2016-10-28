@@ -4,6 +4,7 @@
 
 set(_srcs
   util/Any.cpp
+  util/AnyMap.cpp
   util/Framework.cpp
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp
@@ -77,6 +78,7 @@ set(_private_headers
 
   bundle/BundleArchive.h
   bundle/BundleContextPrivate.h
+  bundle/BundleEventInternal.h
   bundle/BundleHooks.h
   bundle/BundleManifest.h
   bundle/BundleObjFile.h

@@ -136,4 +136,27 @@ namespace cppmicroservices {
   STATEMENT ;                                                                                 \
   US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
 
+
+#define US_TEST_FOR_NO_EXCEPTION_END()                                         \
+cppmicroservices::TestManager::GetInstance().TestPassed();                     \
+}                                                                              \
+catch (const std::exception& ex) {                                             \
+cppmicroservices::TestManager::GetInstance().TestFailed();                     \
+US_TEST_OUTPUT( << "Unexpected exception caught : " << ex.what() << "[FAILED]")\
+}                                                                              \
+catch (...) {                                                                  \
+cppmicroservices::TestManager::GetInstance().TestFailed();                     \
+US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                     \
+}
+
+
+
+/**
+ * \brief Use to verify that STATEMENT does not throw any exception
+ */
+#define US_TEST_NO_EXCEPTION(STATEMENT)                                       \
+US_TEST_FOR_EXCEPTION_BEGIN(...)                                              \
+STATEMENT ;                                                                   \
+US_TEST_FOR_NO_EXCEPTION_END()
+
 #endif // CPPMICROSERVICES_TESTINGMACROS_H

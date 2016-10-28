@@ -243,7 +243,7 @@ void TestServiceTracker(BundleContext context)
 
   // 14a Get the highest ranked service, directly this time
   auto o3 = st1->GetService();
-  US_TEST_CONDITION_REQUIRED(o1.get() != nullptr && !o3->empty(), "Check for non-null service");
+  US_TEST_CONDITION_REQUIRED(o3.get() != nullptr && !o3->empty(), "Check for non-null service");
   US_TEST_CONDITION_REQUIRED(o1 == o3, "Check for equal service instances");
 
   // 15. Now release the tracking of that service and then try to get it

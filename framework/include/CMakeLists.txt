@@ -4,6 +4,7 @@
 
 set(_public_headers
   cppmicroservices/Any.h
+  cppmicroservices/AnyMap.h
   cppmicroservices/Chrono.h
   cppmicroservices/Framework.h
   cppmicroservices/FrameworkEvent.h

@@ -135,10 +135,22 @@ function(usFunctionEmbedResources)
 
   if(US_RESOURCE_LINK)
     if(APPLE)
+      # Issue #151: Since we explicitly compile CMakeResourceDependencies.cpp, we cache the OSX specific compiler flags
+      set(US_OSX_CXX_FLAGS ) 
+      if(CMAKE_OSX_SYSROOT)
+        list(APPEND US_OSX_CXX_FLAGS -isysroot ${CMAKE_OSX_SYSROOT})
+      endif()
+      if(CMAKE_OSX_ARCHITECTURES)
+        list(APPEND US_OSX_CXX_FLAGS -arch ${CMAKE_OSX_ARCHITECTURES})
+      endif()
+      if(CMAKE_OSX_DEPLOYMENT_TARGET)
+        list(APPEND US_OSX_CXX_FLAGS -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET})
+      endif()
+      # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} -isysroot ${CMAKE_OSX_SYSROOT} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
-        COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT cppmicroservices_resources ${_zip_archive_name} stub.o -o ${_source_output}
+        COMMAND ${CMAKE_CXX_COMPILER} ${US_OSX_CXX_FLAGS} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
@@ -147,15 +159,19 @@ function(usFunctionEmbedResources)
       set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
     elseif(WIN32 AND CMAKE_RC_COMPILER)
       set(US_RESOURCE_ARCHIVE ${_zip_archive})
-      configure_file(${US_RESOURCE_RC_TEMPLATE} ${_source_output})
+      # If the file generated in "Configure" step is specified as the OUTPUT of add_custom_command, 
+      # "Clean" target will delete the file and subsequent build will fail. To avoid failures in 
+      # "ReBuild", generate the resource file in the "Configure" step and copy it in "Build" step
+      configure_file(${US_RESOURCE_RC_TEMPLATE} ${_source_output}_autogen)
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_COMMAND} -E touch ${_source_output}
+        COMMAND ${CMAKE_COMMAND} -E copy ${_source_output}_autogen ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
         VERBATIM
        )
+       set_source_files_properties(${_source_output} PROPERTIES GENERATED 1)
     elseif(UNIX)
       add_custom_command(
         OUTPUT ${_source_output}

@@ -144,7 +144,7 @@ void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextP
   auto& listeners = frameworkListenerMap.value[context];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
-	  listeners.push_back(std::make_pair(listener, data));
+    listeners.push_back(std::make_pair(listener, data));
   }
 }
 

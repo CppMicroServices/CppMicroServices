@@ -65,7 +65,7 @@ void frame020a(BundleContext context, TestBundleListener& listener)
     US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
 
     auto o2 = context.GetService(refs.back());
-    US_TEST_CONDITION(o1 && !o2->empty(), "Test if second service object found");
+    US_TEST_CONDITION(o2 && !o2->empty(), "Test if second service object found");
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;

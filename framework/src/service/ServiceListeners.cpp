@@ -144,7 +144,7 @@ void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextP
   auto& listeners = frameworkListenerMap.value[context];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
-	listeners.push_back(std::make_pair(listener, data));
+    listeners.push_back(std::make_pair(listener, data));
   }
 }
 
@@ -152,11 +152,10 @@ void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleConte
 {
   auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
   auto& listeners = frameworkListenerMap.value[context];
-  auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
-  if (it != listeners.end())
-  {
-    frameworkListenerMap.value[context].erase(it);
-  }
+  listeners.erase(std::remove_if(listeners.begin(),
+                                 listeners.end(),
+                                 std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)),
+                  listeners.end());
 }
 
 void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)

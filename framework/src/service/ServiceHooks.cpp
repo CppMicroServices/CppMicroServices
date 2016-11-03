@@ -45,7 +45,6 @@ ServiceHooks::ServiceHooks(CoreBundleContext* coreCtx)
 
 ServiceHooks::~ServiceHooks()
 {
-  this->Close();
 }
 
 std::shared_ptr<ServiceListenerHook> ServiceHooks::AddingService(const ServiceReference<ServiceListenerHook>& reference)
@@ -75,10 +74,8 @@ void ServiceHooks::RemovedService(const ServiceReference<ServiceListenerHook>& /
 
 void ServiceHooks::Open()
 {
-  {
-    auto l = this->Lock(); US_UNUSED(l);
-    listenerHookTracker.reset(new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this));
-  }
+  auto l = this->Lock(); US_UNUSED(l);
+  listenerHookTracker.reset(new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this));
   listenerHookTracker->Open();
 
   bOpen = true;

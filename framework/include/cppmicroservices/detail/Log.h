@@ -30,6 +30,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <thread>
 
 namespace cppmicroservices {
 
@@ -54,7 +55,7 @@ public:
   {
     if (!_enable) return;
     auto l = Lock(); US_UNUSED(1);
-    *_sink << msg;
+    *_sink << msg << "\n";
   }
 
 private:
@@ -70,7 +71,7 @@ struct LogMsg {
     enabled = _sink.Enabled();
     if (enabled)
     {
-      buffer << "In " << func << " at " << file << ":" << ln << " : ";
+      buffer << "[" << std::this_thread::get_id() << "] " << "In " << func << " at " << file << ":" << ln << " : ";
     }
   }
 
@@ -99,6 +100,7 @@ private:
 } // namespace cppmicroservices
 
 // Write a log line using a <code>LogSink</code> reference.
+// All log lines will automatically end with a "\n"
 #define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
 
 

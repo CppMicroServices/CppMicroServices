@@ -40,7 +40,7 @@ void testDefaultLogMessages()
   auto clog_buf = std::clog.rdbuf();
   std::clog.rdbuf(temp_buf.rdbuf());
   detail::LogSink sink(&std::clog, true);
-  DIAG_LOG(sink) << "Testing " << 1 << 2 << 3 << ", Testing " << std::scientific << 1.0 << static_cast<void*>(nullptr) << 2.0 << 3.0 << "\n";
+  DIAG_LOG(sink) << "Testing " << 1 << 2 << 3 << ", Testing " << std::scientific << 1.0 << static_cast<void*>(nullptr) << 2.0 << 3.0;
   sink.Log(std::string("blaaaaaaaaaaaaaaaaaah\n"));
 
   std::clog.rdbuf(clog_buf);
@@ -140,9 +140,9 @@ void testLogMultiThreaded()
 	{
 		for (std::size_t i = 0; i < num_threads; ++i)
 		{
-		  DIAG_LOG(sink) << "MACRO: START foo\n";
-		  sink.Log(std::string("foo bar boo baz\n"));
-		  DIAG_LOG(sink) << "MACRO: END foo\n";
+		  DIAG_LOG(sink) << "MACRO: START foo";
+		  sink.Log(std::string("foo bar boo baz"));
+		  DIAG_LOG(sink) << "MACRO: END foo";
 		}
 	}));
   }
@@ -154,6 +154,7 @@ void testLogMultiThreaded()
   // log lines will appear in the correct order.
   std::ptrdiff_t expected_num_matches(num_threads * num_threads);
 #if defined (US_HAVE_REGEX)
+  US_TEST_OUTPUT(<< "Using C++11 regex...\n");
   std::string func_name(__FUNCTION__);
   std::string file_name = std::regex_replace(std::string(__FILE__), std::regex("\\\\"), std::string("\\\\"));
   std::string logpreamble("In (" + func_name + "::<lambda(\\w+)>::)*operator(\\s)?\\(\\) at " + file_name + ":(\\d+) :");
@@ -177,9 +178,10 @@ void testLogMultiThreaded()
   US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches, "Test for expected number of matches");
 
 #else
+  US_TEST_OUTPUT(<< "Using simple string matching...\n");
   // support compilers w/o c++11 regex support...
-  // the regex approach is more strict in checking there is no 
-  // log splicing however this suboptimal approach will do for now.
+  // the regex approach is more strict in checking there is no
+  // log splicing however this will do for now.
   std::ptrdiff_t total_expected_matches = expected_num_matches * 3;
   std::vector<std::string> log_lines;
   std::string line;

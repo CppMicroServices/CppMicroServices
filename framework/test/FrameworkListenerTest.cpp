@@ -105,6 +105,7 @@ void testStartStopFrameworkEvents()
   f.GetBundleContext().AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
   f.Start();
   f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 
   std::vector<FrameworkEvent> events;
   events.push_back(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started"));

@@ -25,6 +25,10 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
+#ifdef US_BUILD_SHARED_LIBS
+#include "singletonframework/singletonframework.h"
+#endif
+
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
@@ -520,24 +524,47 @@ void TestShutdownAndStart()
   US_TEST_CONDITION_REQUIRED(startCount == 1, "One framework start notification")
 }
 
-int FrameworkTest(int /*argc*/, char* /*argv*/[])
+#ifdef US_BUILD_SHARED_LIBS
+void TestSharedLibraryStaticDestruction()
 {
-    US_TEST_BEGIN("FrameworkTest");
+  // If a framework object is held as a static within a DLL
+  // implicit destruction of the framework object will cause
+  // either a crash or a hang on Windows.
+  // This can be mitigated by explicitly stopping the framework
+  // object before static destruction occurs.
 
-    TestDefaultConfig();
-    TestDefaultLogSink();
-    TestCustomConfig();
-    TestCustomLogSink();
-    TestProperties();
-    TestIndirectFrameworkStop();
-    TestShutdownAndStart();
-    TestLifeCycle();
-    TestEvents();
-#ifdef US_ENABLE_THREADING_SUPPORT
-    TestConcurrentFrameworkStart();
-    TestConcurrentFrameworkStop();
-    TestConcurrentFrameworkWaitForStop();
+  // This test is meant to ensure explicitly stopping a static
+  // framework object does not crash or hang a process.
+
+  // NOTE: If this process crashes or hangs, this test has failed.
+
+  auto framework = singleton::testing::getFramework();
+  framework->Stop();
+  framework->WaitForStop(std::chrono::milliseconds::zero());
+}
 #endif
 
-    US_TEST_END()
+int FrameworkTest(int /*argc*/, char* /*argv*/[])
+{
+  US_TEST_BEGIN("FrameworkTest");
+
+  TestDefaultConfig();
+  TestDefaultLogSink();
+  TestCustomConfig();
+  TestCustomLogSink();
+  TestProperties();
+  TestIndirectFrameworkStop();
+  TestShutdownAndStart();
+  TestLifeCycle();
+  TestEvents();
+#ifdef US_BUILD_SHARED_LIBS
+  TestSharedLibraryStaticDestruction();
+#endif
+#ifdef US_ENABLE_THREADING_SUPPORT
+  TestConcurrentFrameworkStart();
+  TestConcurrentFrameworkStop();
+  TestConcurrentFrameworkWaitForStop();
+#endif
+
+  US_TEST_END()
 }

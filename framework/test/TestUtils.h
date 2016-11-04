@@ -47,6 +47,8 @@ limitations under the License.
 #define VC_EXTRA_LEAN
 #endif
 #include <windows.h>
+#include <direct.h>
+#include <Shlwapi.h>
 #else
 #error High precision timer support not available on this platform
 #endif
@@ -93,7 +95,32 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
   return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
 }
 
+// Return the current working directory
 std::string GetCurrentWorkingDirectory();
+
+// Change to destination directory specified by destdir
+void ChangeDirectory(const std::string &destdir);
+
+// Make directory specified by dir
+void MakeDirectory(const std::string &destdir);
+
+// Remove directory specified by dir
+void RemoveDirectory(const std::string &destdir);
+
+// Check if path is an absolute path.
+// Return true if so, otherwise return false.
+bool IsAbsolutePath(const std::string &path);
+
+// Return the path of the executable.
+std::string GetExecutablePath();
+
+/*
+* Given a string which represents a path, return the path upto the last
+* directory separator i.e.
+* given foo/bar/baz.txt, return "foo/bar/"
+* given C:\foo\bar\baz.txt, return "C:\foo\bar\"
+*/
+std::string getUptoLastDir(const std::string& binary_path);
 
 /**
 * Returns a platform appropriate location for use as temporary storage.

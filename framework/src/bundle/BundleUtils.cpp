@@ -87,12 +87,16 @@ void* GetExecutableHandle()
   return dlopen(0, RTLD_LAZY);;
 }
 
+/*
+* This function is duplicated in TestUtils::GetExecutablePath()
+* Any meaningful change should be ported over there too, if needed.
+*/
 std::string GetExecutablePath()
 {
   std::string execPath;
   uint32_t bufsize = MAXPATHLEN;
   std::unique_ptr<char[]> buf(new char[bufsize]);
-  
+
 #if _WIN32
   if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {

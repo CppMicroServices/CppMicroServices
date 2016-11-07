@@ -87,10 +87,6 @@ void* GetExecutableHandle()
   return dlopen(0, RTLD_LAZY);;
 }
 
-/*
-* This function is duplicated in TestUtils::GetExecutablePath()
-* Any meaningful change should be ported over there too, if needed.
-*/
 std::string GetExecutablePath()
 {
   std::string execPath;

@@ -373,9 +373,13 @@ const option::Descriptor usage[] =
   {ZIPADD,           0, "z", "zip-add"          , Custom_Arg::NonEmpty, " --zip-add, -z \tPath to a file containing a zip archive to be merged into the output zip file. "},
   {MANIFESTADD,      0, "m", "manifest-add"     , Custom_Arg::NonEmpty, " --manifest-add, -m \tPath to the bundle's manifest file. "},
   {BUNDLEFILE,       0, "b", "bundle-file"      , Custom_Arg::NonEmpty, " --bundle-file, -b \tPath to the bundle binary. The resources zip file will be appended to this binary. "},
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nExamples:\n\nCreate a zip file with resources\n" "  " US_PROG_NAME " --compression-level 9 --verbose --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --zip-add filetomerge.zip\n" },
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle with resources\n""  " US_PROG_NAME " -v -n mybundle -b mybundle.dylib -m manifest.json -z archivetomerge.zip\n" },
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle binary with existing zip file\n" "  " US_PROG_NAME ".exe -b mybundle.dll -z archivetoembed.zip\n" },
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n\nOptions --res-add and --zip-add can be specified multiple times."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nExamples:\n\nCreate a zip file with resources:\n" "  " US_PROG_NAME " --compression-level 9 --verbose --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --zip-add filetomerge.zip\n"
+  "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'filetomerge.zip' into it and write the resulting blob into 'Example.zip'\n."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle with resources\n""  " US_PROG_NAME " -v -n mybundle -b mybundle.dylib -m manifest.json -z archivetomerge.zip\n"
+  "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'archivetomerge.zip' into it and append the resulting zip blob to 'mybundle.dylib'\n"},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle binary with existing zip file\n" "  " US_PROG_NAME ".exe -b mybundle.dll -z archivetoembed.zip\n"
+  "Behavior: Append the contents of 'archivetoembed.zip' to 'mybundle.dll'\n"},
   {0,0,0,0,0,0}
 };
 
@@ -425,16 +429,21 @@ int main(int argc, char** argv)
     std::cerr << "(--out-file | -o) appear multiple times in the arguments. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
+
+  if (argc == 0 || options[HELP])
+  {
+    option::printUsage(std::clog, usage);
+    return return_code;
+  }
   
   if (!bundleFileOpt && !outFileOpt)
   {
-    std::cerr << "At least one of the options (--bundle-file | --out-file) is required." << std::endl;
+    std::cerr << "At least one of the options (--bundle-file | --out-file) is required. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
-  
-  if (argc == 0 || options[HELP] || return_code == EXIT_FAILURE)
+
+  if (return_code == EXIT_FAILURE)
   {
-    option::printUsage(std::clog, usage);
     return return_code;
   }
   

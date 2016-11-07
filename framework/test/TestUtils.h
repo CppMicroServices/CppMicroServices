@@ -28,14 +28,18 @@ limitations under the License.
 
 #include <string>
 #include <memory>
+#include <fstream>
 
 #ifdef US_PLATFORM_APPLE
 #include <mach/mach_time.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #elif defined(US_PLATFORM_POSIX)
 #include <limits.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #ifndef _POSIX_MONOTONIC_CLOCK
 #error Monotonic clock support missing on this POSIX platform
 #endif
@@ -49,6 +53,7 @@ limitations under the License.
 #include <windows.h>
 #include <direct.h>
 #include <Shlwapi.h>
+#include <sys/stat.h>
 #else
 #error High precision timer support not available on this platform
 #endif
@@ -98,34 +103,41 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
 // Return the current working directory
 std::string GetCurrentWorkingDirectory();
 
-// Change to destination directory specified by destdir
+/*
+* Change to destination directory specified by destdir
+* @throws std::runtime_error if the directory cannot be changed to
+*/
 void ChangeDirectory(const std::string &destdir);
 
-// Make directory specified by dir
+/*
+* Make directory specified by destdir
+* @throws std::runtime_error if the dir cannot be created
+*/
 void MakeDirectory(const std::string &destdir);
 
-// Remove directory specified by dir
-void RemoveDirectory(const std::string &destdir);
-
-// Check if path is an absolute path.
-// Return true if so, otherwise return false.
-bool IsAbsolutePath(const std::string &path);
-
-// Return the path of the executable.
-std::string GetExecutablePath();
-
 /*
-* Given a string which represents a path, return the path upto the last
-* directory separator i.e.
-* given foo/bar/baz.txt, return "foo/bar/"
-* given C:\foo\bar\baz.txt, return "C:\foo\bar\"
+* Remove directory specified by destdir
+* @throws std::runtime_error if the dir cannot be removed
 */
-std::string getUptoLastDir(const std::string& binary_path);
+void RemoveDirectory(const std::string &destdir);
 
 /**
 * Returns a platform appropriate location for use as temporary storage.
 */
 std::string GetTempDirectory();
+
+/*
+* Checks if a file exists and if so, removes the file
+* If the file doesn't exist, simply returns
+* @throws std::runtime_error if the file cannot be deleted
+*/
+void CheckFileAndRemove(std::string f);
+
+/*
+* Return true if the specified directory exists,
+* otherwise return false
+*/
+bool DirectoryExists(const std::string &destdir);
 
 Bundle GetBundle(
     const std::string& bsn,

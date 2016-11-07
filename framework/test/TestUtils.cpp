@@ -192,13 +192,14 @@ std::string GetCurrentWorkingDirectory()
   return std::string();
 }
 
+#ifdef US_PLATFORM_WINDOWS
+#define rmdir _rmdir
+#define chdir _chdir
+#endif
+
 void ChangeDirectory(const std::string& destdir)
 {
-#ifdef US_PLATFORM_WINDOWS
-  int ret = _chdir(destdir.c_str());
-#else
   int ret = chdir(destdir.c_str());
-#endif
   if (ret != 0)
   {
     std::string msg("Unable to change directory to ");
@@ -212,7 +213,8 @@ void MakeDirectory(const std::string& dirname)
 #ifdef US_PLATFORM_WINDOWS
   int ret = _mkdir(dirname.c_str());
 #else
-  int ret = mkdir(dirname.c_str());
+  // rws permissions for owner, group. rs permissions for others.
+  int ret = mkdir(dirname.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
   if (ret != 0)
   {
@@ -224,11 +226,7 @@ void MakeDirectory(const std::string& dirname)
 
 void RemoveDirectory(const std::string &dirname)
 {
-#ifdef US_PLATFORM_WINDOWS
-  int ret = _rmdir(dirname.c_str());
-#else
   int ret = rmdir(dirname.c_str());
-#endif
   if (ret != 0)
   {
     std::string msg("Unable to remove directory:");
@@ -237,86 +235,37 @@ void RemoveDirectory(const std::string &dirname)
   }
 }
 
-bool IsAbsolutePath(const std::string &path)
+void CheckFileAndRemove(std::string f)
 {
-#ifdef US_PLATFORM_WINDOWS
-  return !PathIsRelative(path.c_str());
-#else
-  return (path.front() == '/') ? true : false;
-#endif
+  std::ifstream fobj(f.c_str());
+  if (!fobj.good())
+  {
+    fobj.close();
+    return;
+  }
+  fobj.close();
+
+  if (remove(f.c_str()) != 0)
+  {
+    throw std::runtime_error("Could not remove file " + f);
+
+  }
 }
 
-std::string getUptoLastDir(const std::string& binary_path)
+bool DirectoryExists(const std::string &destdir)
 {
-  auto const last_fwd_idx = binary_path.find_last_of('/');
-  auto const last_bwd_idx = binary_path.find_last_of('\\');
-  if (last_fwd_idx == std::string::npos && last_bwd_idx == std::string::npos)
+  // stat() is cross-platform
+  struct stat dirinfo;
+  if (stat(destdir.c_str(), &dirinfo) != 0)
   {
-    std::string msg(binary_path);
-    msg += " does not appear to be a valid path";
-    throw std::runtime_error(msg.c_str());
+    return false;
   }
-  auto last_idx = std::string::npos;
-  if (last_fwd_idx == std::string::npos)
+  else if (dirinfo.st_mode & S_IFDIR)
   {
-    last_idx = last_bwd_idx;
+    return true;
   }
-  else if (last_bwd_idx == std::string::npos)
-  {
-    last_idx = last_fwd_idx;
-  }
-  else
-  {
-    auto const last_idx = max(last_fwd_idx, last_bwd_idx);
-  }
-  return binary_path.substr(0, last_idx + 1);
+  return false;
 }
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
-
-/*
-* This function is almost an exact copy of BundleUtils::GetExecutablePath()
-* Any meaningful change should be ported over there, if needed.
-*/
-std::string GetExecutablePath()
-{
-  std::string execPath;
-  uint32_t bufsize = MAXPATHLEN;
-  std::unique_ptr<char[]> buf(new char[bufsize]);
-
-#if _WIN32
-  if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-  {
-    throw std::runtime_error("GetModuleFileName failed");
-    buf[0] = '\0';
-  }
-#elif defined(__APPLE__)
-  int status = _NSGetExecutablePath(buf.get(), &bufsize);
-  if (status == -1)
-  {
-    buf.reset(new char[bufsize]);
-    status = _NSGetExecutablePath(buf.get(), &bufsize);
-  }
-  if (status != 0)
-  {
-    throw std::runtime_error("_NSGetExecutablePath failed");
-  }
-  // the returned path may not be an absolute path
-#elif defined(__linux__)
-  ssize_t len = ::readlink("/proc/self/exe", buf.get(), bufsize);
-  if (len == -1 || len == bufsize)
-  {
-    len = 0;
-  }
-  buf[len] = '\0';
-#else
-  throw std::runtime_error("GetExecutablePath failed");
-#endif
-  return buf.get();
-}
-
 
 Bundle GetBundle(const std::string& bsn, BundleContext context)
 {

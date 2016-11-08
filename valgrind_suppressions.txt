@@ -86,40 +86,9 @@
 {
    <TestBundleC1-atomic>
    Helgrind:Race
-   fun:store
-   fun:_ZNSt13__atomic_baseIbEaSEb
-   fun:_ZNSt6atomicIbEaSEb
-   fun:_ZN2us21TestBundleC1Activator5StartEPNS_13BundleContextE
-   ...
-}
-
-{
-   <TestBundleC1-atomic>
-   Helgrind:Race
-   fun:store
-   fun:_ZNSt13__atomic_baseIbEaSEb
-   fun:_ZNSt6atomicIbEaSEb
-   fun:_ZN2us21TestBundleC1Activator4StopEPNS_13BundleContextE
-   ...
-}
-
-{
-   <TestBundleC1-atomic>
-   Helgrind:Race
    fun:load
    fun:_ZNKSt6atomicIbE4loadESt12memory_order
    fun:_ZN2us21TestBundleC1Activator10UnRegisterEv
-   ...
-}
-
-{
-   <TestBundleC1-notifyall>
-   Helgrind:Misc
-   obj:/usr/lib64/valgrind/vgpreload_helgrind-amd64-linux.so
-   fun:pthread_cond_broadcast@*
-   fun:_ZNSt18condition_variable10notify_allEv
-   fun:_ZN2us13WaitConditionINS_20MutexLockingStrategyISt5mutexEEE9NotifyAllEv
-   fun:_ZN2us21TestBundleC1Activator16RegisterServicesESt13shared_futureIvEi
    ...
 }
 
@@ -147,7 +116,6 @@
    fun:store
    fun:_ZNSt13__atomic_baseIbEaSEb
    fun:_ZNSt6atomicIbEaSEb
-   fun:_ZZN2us6Bundle5StartEvENKUlvE_clEv
    ...
 }
 
@@ -201,6 +169,15 @@
 }
 
 {
+   <_us_create_activator>
+   Helgrind:Race
+   fun:load
+   fun:_ZNKSt6atomicIbE4loadESt12memory_order
+   ...
+}
+
+
+{
    <future>
    Helgrind:Race
    fun:_ZNKSt10unique_ptrINSt13__future_base12_Result_baseENS1_8_DeleterEE3getEv
@@ -235,14 +212,19 @@
 }
 
 {
-   <condition_variable-notifyall>
-   Helgrind:Misc
-   obj:/usr/*/valgrind/vgpreload_helgrind*
-   fun:pthread_cond_broadcast@*
-   fun:_ZNSt18condition_variable10notify_allEv
-   fun:_ZN2us13WaitConditionINS_20MutexLockingStrategyISt5mutexEEE9NotifyAllEv
-   fun:_ZN2us14ServiceTrackerIvvE5CloseEv
+   <thread_impl>
+   Helgrind:Race
+   fun:memset
+   fun:pthread_create*
+   fun:pthread_create_WRK
    ...
 }
 
 
+{
+   <condition_variable-notifyall>
+   Helgrind:Misc
+   obj:/usr/*/valgrind/vgpreload_helgrind*
+   fun:pthread_cond_broadcast*
+   ...
+}

@@ -53,7 +53,7 @@ public:
   void Log(const std::string& msg)
   {
     if (!_enable) return;
-    auto l = Lock(); US_UNUSED(1);
+    auto l = Lock(); US_UNUSED(l);
     *_sink << msg;
   }
 

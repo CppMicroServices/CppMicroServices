@@ -43,6 +43,8 @@ const std::chrono::milliseconds BundleThread::KEEP_ALIVE(1000);
 BundleThread::BundleThread(CoreBundleContext* ctx)
   : fwCtx(ctx)
   , startStopTimeout(0)
+  , op()
+  , be(BundleEvent::BUNDLE_INSTALLED, nullptr)
   , doRun(true)
 {
   th.v = std::thread(&BundleThread::Run, this);

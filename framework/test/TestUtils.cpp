@@ -135,7 +135,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + libName + LIB_EXT);
+        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + US_LIB_PREFIX + libName + US_LIB_EXT);
 #else
         bundles = frameworkCtx.GetBundles();
 #endif

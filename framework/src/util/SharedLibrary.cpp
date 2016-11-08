@@ -48,15 +48,8 @@ public:
 
   SharedLibraryPrivate()
     : m_Handle(nullptr)
-  #ifdef US_PLATFORM_WINDOWS
-    , m_Suffix(".dll")
-  #elif defined(US_PLATFORM_APPLE)
-    , m_Suffix(".dylib")
-    , m_Prefix("lib")
-  #else
-    , m_Suffix(".so")
-    , m_Prefix("lib")
-  #endif
+    , m_Suffix(US_LIB_EXT)
+    , m_Prefix(US_LIB_PREFIX)
   {}
 
   void* m_Handle;

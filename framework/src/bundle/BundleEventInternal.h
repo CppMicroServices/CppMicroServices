@@ -35,6 +35,11 @@ class BundlePrivate;
 
 struct BundleEventInternal
 {
+  BundleEventInternal(BundleEvent::Type t, std::shared_ptr<BundlePrivate> const& b)
+    : type(t)
+    , bundle(b)
+  {}
+
   BundleEvent::Type type;
   std::shared_ptr<BundlePrivate> bundle;
 };

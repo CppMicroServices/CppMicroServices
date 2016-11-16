@@ -51,7 +51,7 @@ template<class S> struct ServiceHolder;
  *
  * A bundle's execution context within the framework. The context is used to
  * grant access to other methods so that this bundle can interact with the
- * Micro Services Framework.
+ * framework.
  *
  * <p>
  * <code>BundleContext</code> methods allow a bundle to:
@@ -114,7 +114,7 @@ public:
    * Compares this \c BundleContext object with the specified
    * bundle context.
    *
-   * Valid \c BundleContext objects compare equal if and only if
+   * Valid \c BundleContext objects are equal if and only if
    * they represent the same context. Invalid \c BundleContext
    * objects are always considered to be equal.
    *
@@ -191,7 +191,7 @@ public:
    *
    * @return The <code>Bundle</code> object associated with this
    *         <code>BundleContext</code>.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    */
   Bundle GetBundle() const;
@@ -202,6 +202,9 @@ public:
    * @param id The identifier of the bundle to retrieve.
    * @return A <code>Bundle</code> object or <code>nullptr</code> if the
    *         identifier does not match any previously installed bundle.
+   * @throws std::logic_error If the framework instance is not active.
+   * @throws std::runtime_error If this BundleContext is no
+   *         longer valid.
    */
   Bundle GetBundle(long id) const;
 
@@ -210,6 +213,8 @@ public:
    *
    * @param location The location of the bundles to get.
    * @return The requested {\c Bundle}s or an empty list.
+   * @throws std::logic_error If the framework instance is not active.
+   * @throws std::runtime_error If the BundleContext is no longer valid.
    */
   std::vector<Bundle> GetBundles(const std::string& location) const;
 
@@ -222,6 +227,7 @@ public:
    *
    * @return A std::vector of <code>Bundle</code> objects which
    *         will hold one object per known bundle.
+   * @throws std::runtime_error If the BundleContext is no longer valid.
    */
   std::vector<Bundle> GetBundles() const;
 
@@ -277,12 +283,10 @@ public:
    *         registering the service to update the service's properties or to
    *         unregister the service.
    *
-   * @throws std::invalid_argument If one of the following is true:
-   *         <ul>
-   *         <li><code>service</code> is <code>0</code>.
-   *         <li><code>properties</code> contains case variants of the same key name.
-   *         </ul>
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid, or if there are
+             case variants of the same key in the supplied properties map.
+   * @throws std::invalid_argument If the InterfaceMap is empty, or
+   *         if a service is registered as a null class.
    *
    * @see ServiceRegistration
    * @see ServiceFactory
@@ -361,23 +365,22 @@ public:
 
   /**
    * Returns a list of <code>ServiceReference</code> objects. The returned
-   * list contains services that
-   * were registered under the specified class and match the specified filter
-   * expression.
+   * list contains services that were registered under the specified class
+   * and match the specified filter expression.
    *
    * <p>
-   * The list is valid at the time of the call to this method. However since
-   * the Micro Services framework is a very dynamic environment, services can be modified or
+   * The list is valid at the time of the call to this method. However, since
+   * the framework is a very dynamic environment, services can be modified or
    * unregistered at any time.
    *
    * <p>
    * The specified <code>filter</code> expression is used to select the
    * registered services whose service properties contain keys and values
-   * which satisfy the filter expression. See LDAPFilter for a description
+   * that satisfy the filter expression. See LDAPFilter for a description
    * of the filter syntax. If the specified <code>filter</code> is
    * empty, all registered services are considered to match the
    * filter. If the specified <code>filter</code> expression cannot be parsed,
-   * an <code>std::invalid_argument</code> will be thrown with a human readable
+   * an <code>std::invalid_argument</code> will be thrown with a human-readable
    * message where the filter became unparsable.
    *
    * <p>
@@ -398,11 +401,13 @@ public:
    * @param filter The filter expression or empty for all
    *        services.
    * @return A list of <code>ServiceReference</code> objects or
-   *         an empty list if no services are registered which satisfy the
+   *         an empty list if no services are registered that satisfy the
    *         search.
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
+   * @throws std:: logic_error If the ServiceRegistrationBase object is invalid, 
+   *         or if the service is unregistered.
    */
   std::vector<ServiceReferenceU> GetServiceReferences(const std::string& clazz, const std::string& filter = std::string());
 
@@ -470,7 +475,7 @@ public:
    * @param clazz The class name with which the service was registered.
    * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the named class.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws ServiceException If no service was registered under the given class name.
    *
    * @see #GetServiceReferences(const std::string&, const std::string&)
@@ -488,7 +493,7 @@ public:
    * @tparam S The type under which the requested service must have been registered.
    * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the type <code>S</code>.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws ServiceException It no service was registered under the given class name.
    * @see #GetServiceReference(const std::string&)
    * @see #GetServiceReferences(const std::string&)
@@ -541,7 +546,7 @@ public:
    * @return A shared_ptr to the service object associated with <code>reference</code>.
    *         An empty shared_ptr is returned if the service is not registered or the
    *         <code>ServiceFactory</code> threw an exception
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
    * @see ServiceFactory
@@ -562,7 +567,7 @@ public:
    *         An empty object is returned if the service is not registered, the
    *         <code>ServiceFactory</code> threw an exception or the service could not be
    *         cast to the desired type.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
@@ -590,7 +595,7 @@ public:
    * @param reference A reference to the service.
    * @return A ServiceObjects object for the service associated with the specified
    * reference or an invalid instance if the service is not registered.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified ServiceReference is invalid
    * (default constructed or the service has been unregistered)
    *
@@ -657,7 +662,7 @@ public:
    * @param filter The filter criteria.
    * @throws std::invalid_argument If <code>filter</code> contains an
    *         invalid filter string that cannot be parsed.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see ServiceEvent
    * @see RemoveServiceListener()
@@ -681,7 +686,7 @@ public:
    * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see AddServiceListener()
    */
@@ -750,7 +755,7 @@ public:
    * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @see FrameworkEvent
    */
   template<class R>
@@ -789,7 +794,7 @@ public:
    *
    * @param filename A relative name to the file or directory to be accessed.
    * @return The absolute path to the persistent storage area for the given file name.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    */
   std::string GetDataFile(const std::string& filename) const;
@@ -811,7 +816,8 @@ public:
    *
    * @param location The location of the bundle library to install.
    * @return The Bundle objects of the installed bundle library.
-   * @throws std::runtime_error If the installation failed.
+   * @throws std::runtime_error If the BundleContext is no longer valid, or if the installation failed.
+   * @throws std::logic_error If the framework instance is no longer active
    */
   std::vector<Bundle> InstallBundles(const std::string& location);
 

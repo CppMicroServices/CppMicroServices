@@ -60,6 +60,7 @@ for moving from a 2.x release to 3.x.
 - Headers with `_p.h` suffix do not get resolved in Xcode for automatic-tracking of counterparts [\#93](https://github.com/CppMicroServices/CppMicroServices/issues/93)
 - `usUtils.cpp` - Crash can occur if FormatMessage\(...\) fails [\#33](https://github.com/CppMicroServices/CppMicroServices/issues/33)
 - Using `US_DECLARE_SERVICE_INTERFACE` with Qt does not work [\#19](https://github.com/CppMicroServices/CppMicroServices/issues/19)
+- Fixed documentation of public headers.[\#165](https://github.com/CppMicroServices/CppMicroServices/issues/165)
 
 
 ## [v2.1.1](https://github.com/cppmicroservices/cppmicroservices/tree/v2.1.1) (2014-01-22)

@@ -73,7 +73,8 @@ void testLogDisabled()
 
 void testLogRedirection()
 {
-  std::ofstream filestream("foo.txt", std::ofstream::trunc);
+  const char* test_filename = "foo.txt";
+  std::ofstream filestream(test_filename, std::ofstream::trunc);
   std::ostringstream stringstream;
   std::stringstream test_log_output;
   test_log_output << "Testing..." << 1 << " " << 2 << " " << 12 << "\n";
@@ -86,7 +87,8 @@ void testLogRedirection()
   detail::LogSink sink_file(&filestream, true);
   DIAG_LOG(sink_file) << test_log_output.str();
   filestream.flush();
-  std::ifstream test_file("foo.txt");
+  
+  std::ifstream test_file(test_filename);
   std::stringstream test_output_stream;
   test_file >> test_output_stream.rdbuf();
   
@@ -94,17 +96,21 @@ void testLogRedirection()
   US_TEST_CONDITION_REQUIRED(std::string::npos != test_output_stream.str().find(test_log_output.str()), "Test redirected filestream log sink.");
 
   test_file.close();
-  std::remove("foo.txt");
-
+  
   // A null (i.e. disabled logger) shouldn't throw when used.
   detail::LogSink sink_null(nullptr, true);
+  
   try
   {
-	DIAG_LOG(sink_null) << test_log_output.str();
+    if(std::remove(test_filename) != 0)
+    {
+      DIAG_LOG(sink_null) << "Failed to remove" << test_filename;
+    }
+	  DIAG_LOG(sink_null) << test_log_output.str();
   }
   catch (...)
   {
-	US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
+	  US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
   }
 
 

@@ -96,21 +96,21 @@ void testLogRedirection()
   US_TEST_CONDITION_REQUIRED(std::string::npos != test_output_stream.str().find(test_log_output.str()), "Test redirected filestream log sink.");
 
   test_file.close();
+  if(std::remove(test_filename) != 0)
+  {
+    detail::LogSink sink_err(&std::cerr, true);
+    DIAG_LOG(sink_err) << "Failed to remove" << test_filename;
+  }
   
   // A null (i.e. disabled logger) shouldn't throw when used.
   detail::LogSink sink_null(nullptr, true);
-  
   try
   {
-    if(std::remove(test_filename) != 0)
-    {
-      DIAG_LOG(sink_null) << "Failed to remove" << test_filename;
-    }
-	  DIAG_LOG(sink_null) << test_log_output.str();
+    DIAG_LOG(sink_null) << test_log_output.str();
   }
   catch (...)
   {
-	  US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
+    US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
   }
 
 

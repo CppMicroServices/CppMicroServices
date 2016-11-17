@@ -119,14 +119,15 @@ public:
    * <code>ServiceReferenceBase</code> object.
    *
    * <p>
-   * This method must return <code>nullptr</code> when the service has been
+   * This method must return an invalid bundle when the service has been
    * unregistered. This can be used to determine if the service has been
    * unregistered.
    *
    * @return The bundle that registered the service referenced by this
-   *         <code>ServiceReferenceBase</code> object; <code>nullptr</code> if that
+   *         <code>ServiceReferenceBase</code> object; an invalid bundle if that
    *         service has already been unregistered.
    * @see BundleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * @see Bundle::operator bool() const
    */
   Bundle GetBundle() const;
 
@@ -154,7 +155,7 @@ public:
   std::string GetInterfaceId() const;
 
   /**
-   * Checks wether this ServiceReferenceBase object can be converted to
+   * Checks whether this ServiceReferenceBase object can be converted to
    * another ServiceReferenceBase object, which will be bound to the
    * given interface identifier.
    *

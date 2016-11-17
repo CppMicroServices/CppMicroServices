@@ -123,7 +123,7 @@ std::vector<Bundle> BundleRegistry::Install0(
       auto entries = resCont->GetTopLevelDirs();
       for (auto const& b : exclude)
       {
-        entries.erase(std::find(entries.begin(), entries.end(), b->symbolicName));
+        entries.erase(std::remove(entries.begin(), entries.end(), b->symbolicName), entries.end());
       }
       barchives = coreCtx->storage->InsertArchives(resCont, entries);
     }

@@ -474,9 +474,20 @@ configure_file(
 set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/GlobalConfig.h")
 configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
 include_directories(${US_INCLUDE_DIRS})
 
 add_subdirectory(tools/rc)
+
+export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
 
 add_subdirectory(framework)
 add_subdirectory(httpservice)
@@ -492,18 +503,8 @@ add_subdirectory(tools/shell)
 add_subdirectory(doc)
 
 #-----------------------------------------------------------------------------
-# Last configuration and install steps
+# Installation
 #-----------------------------------------------------------------------------
-
-# Version information
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-  @ONLY
-  )
-
-export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
 
 if(NOT US_NO_INSTALL)
 

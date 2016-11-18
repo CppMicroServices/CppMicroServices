@@ -18,28 +18,33 @@ environment:
   matrix:
   # ---------- Visual Studio 2013 ------------
   #---- Win32
-  #- platform: Win32
+  #- image: Visual Studio 2013
+  #  platform: Win32
   #  configuration: Debug
   #  gen: "Visual Studio 12 2013"
   #  US_SHARED: 0
   #  US_THREADED: 1
-  #- platform: Win32
+  #- image: Visual Studio 2013
+  #  platform: Win32
   #  configuration: Debug
   #  gen: "Visual Studio 12 2013"
   #  US_SHARED: 1
   #  US_THREADED: 1
-  #- platform: Win32
-  #  configuration: Release
-  #  gen: "Visual Studio 12 2013"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- platform: Win32
-  #  configuration: Release
-  #  gen: "Visual Studio 12 2013"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - image: Visual Studio 2013
+    platform: Win32
+    configuration: Release
+    gen: "Visual Studio 12 2013"
+    US_SHARED: 0
+    US_THREADED: 1
+  - image: Visual Studio 2013
+    platform: Win32
+    configuration: Release
+    gen: "Visual Studio 12 2013"
+    US_SHARED: 1
+    US_THREADED: 1
   #---- Win64
-  #- platform: Win64
+  #- image: Visual Studio 2013
+  #  platform: Win64
   #  configuration: Debug
   #  gen: "Visual Studio 12 2013 Win64"
   #  US_SHARED: 0
@@ -47,24 +52,25 @@ environment:
   #- image: Visual Studio 2013
   #  platform: x64
   #  configuration: Debug
-  #  arch: "x64"
+  #  gen: "Visual Studio 12 2013 Win64"
   #  US_SHARED: 1
   #  US_THREADED: 1
-  #- image: Visual Studio 2013
-  #  platform: x64
-  #  configuration: Release
-  #  arch: "x64"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- image: Visual Studio 2013
-  #  platform: x64
-  #  configuration: Release
-  #  arch: "x64"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - image: Visual Studio 2013
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 12 2013 Win64"
+    US_SHARED: 0
+    US_THREADED: 1
+  - image: Visual Studio 2013
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 12 2013 Win64"
+    US_SHARED: 1
+    US_THREADED: 1
   # ---------- Visual Studio 2015 ------------
   #---- Win32
-  #- platform: Win32
+  #- image: Visual Studio 2015
+  #  platform: Win32
   #  configuration: Debug
   #  gen: "Visual Studio 14 2015"
   #  US_SHARED: 0
@@ -72,57 +78,57 @@ environment:
   #- image: Visual Studio 2015
   #  platform: x86
   #  configuration: Debug
-  #  arch: "Win32"
+  #  gen: "Visual Studio 14 2015"
   #  US_SHARED: 1
   #  US_THREADED: 1
-  #- image: Visual Studio 2015
-  #  platform: x86
-  #  configuration: Release
-  #  arch: "Win32"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- image: Visual Studio 2015
-  #  platform: x86
-  #  configuration: Release
-  #  arch: "Win32"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - image: Visual Studio 2015
+    platform: x86
+    configuration: Release
+    gen: "Visual Studio 14 2015"
+    US_SHARED: 0
+    US_THREADED: 1
+  - image: Visual Studio 2015
+    platform: x86
+    configuration: Release
+    gen: "Visual Studio 14 2015"
+    US_SHARED: 1
+    US_THREADED: 1
   #---- Win64
   #- image: Visual Studio 2015
   #  platform: x64
   #  configuration: Debug
-  #  arch: "x64"
+  #  gen: "Visual Studio 14 2015 Win64"
   #  US_SHARED: 0
   #  US_THREADED: 1
   #- image: Visual Studio 2015
   #  platform: x64
   #  configuration: Debug
-  #  arch: "x64"
+  #  gen: "Visual Studio 14 2015 Win64"
   #  US_SHARED: 1
   #  US_THREADED: 1
-  #- image: Visual Studio 2015
-  #  platform: x64
-  #  configuration: Release
-  #  arch: "x64"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- image: Visual Studio 2015
-  #  platform: x64
-  #  configuration: Release
-  #  arch: "x64"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
-    # ---------- MinGW-w64 (via MSYS2) ------------
-  - platform: mingw-w64
-    configuration: Debug
-    gen: "MinGW Makefiles"
+  - image: Visual Studio 2015
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 14 2015 Win64"
     US_SHARED: 0
     US_THREADED: 1
-  - platform: mingw-w64
-    configuration: Debug
-    gen: "MinGW Makefiles"
+  - image: Visual Studio 2015
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 14 2015 Win64"
     US_SHARED: 1
     US_THREADED: 1
+  # ---------- MinGW-w64 (via MSYS2) ------------
+  #- platform: mingw-w64
+  #  configuration: Debug
+  #  gen: "MinGW Makefiles"
+  #  US_SHARED: 0
+  #  US_THREADED: 1
+  #- platform: mingw-w64
+  #  configuration: Debug
+  #  gen: "MinGW Makefiles"
+  #  US_SHARED: 1
+  #  US_THREADED: 1
   - platform: mingw-w64
     configuration: Release
     gen: "MinGW Makefiles"

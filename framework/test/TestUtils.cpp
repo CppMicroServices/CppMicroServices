@@ -224,7 +224,7 @@ void MakeDirectory(const std::string& dirname)
   }
 }
 
-void RemoveDirectory(const std::string &dirname)
+void RemoveDirectory(const std::string& dirname)
 {
   int ret = rmdir(dirname.c_str());
   if (ret != 0)
@@ -252,7 +252,7 @@ void CheckFileAndRemove(std::string f)
   }
 }
 
-bool DirectoryExists(const std::string &destdir)
+bool DirectoryExists(const std::string& destdir)
 {
   // stat() is cross-platform
   struct stat dirinfo;

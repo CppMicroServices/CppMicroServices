@@ -107,19 +107,19 @@ std::string GetCurrentWorkingDirectory();
 * Change to destination directory specified by destdir
 * @throws std::runtime_error if the directory cannot be changed to
 */
-void ChangeDirectory(const std::string &destdir);
+void ChangeDirectory(const std::string& destdir);
 
 /*
 * Make directory specified by destdir
 * @throws std::runtime_error if the dir cannot be created
 */
-void MakeDirectory(const std::string &destdir);
+void MakeDirectory(const std::string& destdir);
 
 /*
 * Remove directory specified by destdir
 * @throws std::runtime_error if the dir cannot be removed
 */
-void RemoveDirectory(const std::string &destdir);
+void RemoveDirectory(const std::string& destdir);
 
 /**
 * Returns a platform appropriate location for use as temporary storage.
@@ -137,7 +137,7 @@ void CheckFileAndRemove(std::string f);
 * Return true if the specified directory exists,
 * otherwise return false
 */
-bool DirectoryExists(const std::string &destdir);
+bool DirectoryExists(const std::string& destdir);
 
 Bundle GetBundle(
     const std::string& bsn,

@@ -95,7 +95,7 @@ static void createDirHierarchy(const std::string& tempdir)
 
   // Create 2 binary files filled with random numbers
   // to test bundle-file functionality.
-  auto create_mock_dll = [](const std::string &tempdir,
+  auto create_mock_dll = [](const std::string& tempdir,
                             const std::string& dllname,
                             const std::array<char, 5>& dat)
   {
@@ -115,9 +115,9 @@ static void createDirHierarchy(const std::string& tempdir)
 }
 
 /*
-* 1. Use resource compiler to create Example.zip with just manifest.json
+* Use resource compiler to create Example.zip with just manifest.json
 */
-static void testrc1(const std::string& rcbinpath, const std::string& tempdir)
+static void testManifestAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
@@ -133,10 +133,10 @@ static void testrc1(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
-* 2. Use resource compiler to create Example.zip with manifest.json and
+* Use resource compiler to create Example.zip with manifest.json and
 * one --res-add option
 */
-static void testrc2(const std::string& rcbinpath, const std::string& tempdir)
+static void testManifestResAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
@@ -159,9 +159,9 @@ static void testrc2(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
-* 3. Use resource compiler to create tomerge.zip with only --res-add option
+* Use resource compiler to create tomerge.zip with only --res-add option
 */
-static void testrc3(const std::string& rcbinpath, const std::string& tempdir)
+static void testResAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
@@ -182,11 +182,11 @@ static void testrc3(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
-* 4. Use resource compiler to create Example4.zip
+* Use resource compiler to create Example4.zip
 * add a manifest, add resource1/resource1.txt using --res-add
 * and merge tomerge.zip into Example4.zip using --zip-add
 */
-static void testrc4(const std::string& rcbinpath, const std::string& tempdir)
+static void testZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
@@ -213,11 +213,11 @@ static void testrc4(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
-* 5. Use resource compiler to append a zip-file (using --zip-add)
+* Use resource compiler to append a zip-file (using --zip-add)
 * to the bundle sample.dll using the -b option and also add a manifest
 * while doing so.
 */
-static void testrc5(const std::string& rcbinpath, const std::string& tempdir)
+static void testZipAddBundle(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
@@ -236,31 +236,12 @@ static void testrc5(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
-* 6. Write an empty zip file using just the -n argument
-* Legal but not useful.
+* Add two zip-add arguments to a bundle-file.
 */
-static void testrc6(const std::string& rcbinpath, const std::string& tempdir)
+static void testZipAddTwice(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
-  cmd << " --bundle-name mybundle ";
-  cmd << " --out-file " << tempdir << testing::DIR_SEP << "Example5.zip ";
-  std::system(cmd.str().c_str());
-
-  ZipFile zip(tempdir + testing::DIR_SEP + "Example5.zip");
-  US_TEST_CONDITION(zip.size() == 0, "Check number of entries of zip.")
-}
-
-/*
-* 7. Add two zip-add arguments to a bundle-file.
-* However, the following doesn't work without the --bundle-name argument.
-* i.e. sample1.dll is not generated
-*/
-static void testrc7(const std::string& rcbinpath, const std::string& tempdir)
-{
-  std::ostringstream cmd;
-  cmd << rcbinpath;
-  // cmd << " --bundle-name mybundle ";
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
@@ -277,28 +258,10 @@ static void testrc7(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
-* 8. Add two zip-add arguments to a bundle-file.
-* However, the --bundle-name argument is needed to complete the command successfully.
-* This shouldn't be the case and if bundle-name is provided, either manifest-add
-* or res-add has to be provided
-*/
-static void testrc8(const std::string& rcbinpath, const std::string& tempdir)
-{
-  std::ostringstream cmd;
-  cmd << rcbinpath;
-  cmd << " --bundle-name mybundle ";
-  cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
-  int ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION(ret != 0, "bundle-name arg should be illegal")
-}
-
-/*
-* 9. Add a manifest under bundle-name anotherbundle and add two zip blobs using the
+* Add a manifest under bundle-name anotherbundle and add two zip blobs using the
 * zip-add arguments to a bundle-file.
 */
-static void testrc9(const std::string& rcbinpath, const std::string& tempdir)
+static void testBundleManifestZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
   cmd << rcbinpath;
@@ -322,6 +285,18 @@ static void testrc9(const std::string& rcbinpath, const std::string& tempdir)
 }
 
 /*
+* --help returns exit code 0
+*/
+static void testHelpReturnsZero(const std::string& rcbinpath)
+{
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --help";
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION(ret == 0, "help option returns zero")
+}
+
+/*
 * Test the failure modes of ResourceCompiler command
 */
 static void testrcFailureModes(const std::string& rcbinpath, const std::string& tempdir)
@@ -331,7 +306,7 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd << " --bundle-file test1.dll ";
   cmd << " --bundle-file test2.dll ";
   int ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION_REQUIRED(ret != 0, "Failure mode: Multiple bundle-file args")
+  US_TEST_CONDITION(ret != 0, "Failure mode: Multiple bundle-file args")
 
   cmd.str("");
   cmd.clear();
@@ -339,7 +314,26 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd << " --out-file test1.zip ";
   cmd << " --out-file test2.zip ";
   ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION_REQUIRED(ret != 0, "Failure mode: Multiple out-file args")
+  US_TEST_CONDITION(ret != 0, "Failure mode: Multiple out-file args")
+
+  cmd.str("");
+  cmd.clear();
+  cmd << rcbinpath;
+  cmd << " --bundle-name foo ";
+  cmd << " --bundle-name bar ";
+  cmd << " --bundle-file bundlefile ";
+  ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION(ret != 0, "Failure mode: Multiple bundle-name args")
+
+  cmd.str("");
+  cmd.clear();
+  cmd << rcbinpath;
+  cmd << " --manifest-add m1.json ";
+  cmd << " --manifest-add m2.json ";
+  cmd << " --bundle-file bundlefile ";
+  cmd << " --bundle-name dummy ";
+  ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION(ret != 0, "Failure mode: Multiple manifest-add args")
 
   cmd.str("");
   cmd.clear();
@@ -347,14 +341,18 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd << " --manifest-file manifest.json ";
   cmd << " --bundle-name foobundle ";
   ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION_REQUIRED(ret != 0, "Failure mode: --bundle-file or --out-file required")
+  US_TEST_CONDITION(ret != 0, "Failure mode: --bundle-file or --out-file required")
 
   cmd.str("");
   cmd.clear();
   cmd << rcbinpath;
-  cmd << " --help";
+  cmd << " --bundle-name mybundle ";
+  cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
+  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
+  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
   ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION(ret == 0, "help option returns zero")
+  US_TEST_CONDITION(ret == 0, "Failure mode: "
+    "--bundle-name arg without either --manifest-add or --res-add is just a warning")
 
   // Example.zip already contains mybundle/manifest.json
   // Should get an error when we are trying to manifest-add
@@ -367,7 +365,7 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example.zip";
   cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json";
   ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION(ret != 0, "adding manifest.json again")
+  US_TEST_CONDITION(ret != 0, "Failure mode: duplicate manifest.json")
 }
 
 /*
@@ -408,14 +406,11 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ResourceCompilerTest");
 
-  auto rcbinpath = testing::BIN_PATH + testing::DIR_SEP + "usResourceCompiler";
+  auto rcbinpath = testing::BIN_PATH + testing::DIR_SEP + "usResourceCompiler" + testing::EXE_EXT;
   /*
   * If ResourceCompiler executable is not found, we can't run the tests, we
   * mark it as a failure and exit
   */
-#ifdef US_PLATFORM_WINDOWS
-  rcbinpath += ".exe";
-#endif
   std::ifstream binf(rcbinpath.c_str());
   if (!binf.good())
   {
@@ -425,31 +420,29 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
 
   auto tempdir = testing::GetTempDirectory();
 
-  US_TEST_NO_EXCEPTION_OTHERWISE_RETURN( makeCleanSlate(tempdir) );
+  US_TEST_NO_EXCEPTION_REQUIRED( makeCleanSlate(tempdir) );
 
-  US_TEST_NO_EXCEPTION_OTHERWISE_RETURN( createDirHierarchy(tempdir) );
+  US_TEST_NO_EXCEPTION_REQUIRED( createDirHierarchy(tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc1(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testManifestAdd(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc2(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testManifestResAdd(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc3(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testResAdd(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc4(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testZipAdd(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc5(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testZipAddBundle(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc6(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testZipAddTwice(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc7(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testBundleManifestZipAdd(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION( testrc8(rcbinpath, tempdir) );
-
-  US_TEST_NO_EXCEPTION( testrc9(rcbinpath, tempdir) );
+  US_TEST_NO_EXCEPTION( testHelpReturnsZero(rcbinpath) );
 
   US_TEST_NO_EXCEPTION( testrcFailureModes(rcbinpath, tempdir) );
 
-  US_TEST_NO_EXCEPTION_OTHERWISE_RETURN( makeCleanSlate(tempdir) );
+  US_TEST_NO_EXCEPTION_REQUIRED( makeCleanSlate(tempdir) );
 
   US_TEST_END()
 }

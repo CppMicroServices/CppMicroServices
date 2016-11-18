@@ -163,10 +163,6 @@ ZipArchive::ZipArchive(const std::string& archiveFileName,
 , bundleName(bName)
 , writeArchive(new mz_zip_archive())
 {
-  if (bundleName.empty())
-  {
-    throw std::runtime_error("No bundle name specified");
-  }
   std::clog << "Initializing zip archive "  << fileName << " ..." << std::endl;
   // clear the contents of a outFile if it exists
   std::ofstream ofile(fileName, std::ofstream::trunc);
@@ -373,9 +369,11 @@ const option::Descriptor usage[] =
   {ZIPADD,           0, "z", "zip-add"          , Custom_Arg::NonEmpty, " --zip-add, -z \tPath to a file containing a zip archive to be merged into the output zip file. "},
   {MANIFESTADD,      0, "m", "manifest-add"     , Custom_Arg::NonEmpty, " --manifest-add, -m \tPath to the bundle's manifest file. "},
   {BUNDLEFILE,       0, "b", "bundle-file"      , Custom_Arg::NonEmpty, " --bundle-file, -b \tPath to the bundle binary. The resources zip file will be appended to this binary. "},
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n\nOptions --res-add and --zip-add can be specified multiple times."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nNote:\n1. Only options --res-add and --zip-add can be specified multiple times."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n2. If option --manifest-add or --res-add is specified, option --bundle-name must be provided."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n3. At-least one of --bundle-file or --out-file options must be provided."},
   {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nExamples:\n\nCreate a zip file with resources:\n" "  " US_PROG_NAME " --compression-level 9 --verbose --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --zip-add filetomerge.zip\n"
-  "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'filetomerge.zip' into it and write the resulting blob into 'Example.zip'\n."},
+  "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'filetomerge.zip' into it and write the resulting blob into 'Example.zip'\n"},
   {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle with resources\n""  " US_PROG_NAME " -v -n mybundle -b mybundle.dylib -m manifest.json -z archivetomerge.zip\n"
   "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'archivetomerge.zip' into it and append the resulting zip blob to 'mybundle.dylib'\n"},
   {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle binary with existing zip file\n" "  " US_PROG_NAME ".exe -b mybundle.dll -z archivetoembed.zip\n"
@@ -415,20 +413,21 @@ int main(int argc, char** argv)
     }
     return_code = EXIT_FAILURE;
   }
-  
-  option::Option* bundleFileOpt = options[BUNDLEFILE];
-  if (bundleFileOpt && bundleFileOpt->count() > 1 )
+
+  // multiple specifications of the following args are illegal.
+  auto check_multiple_args = [&options, &return_code](OptionIndex optionidx, const std::string& arg)
   {
-    std::cerr << "(--bundle-file | -b) appear multiple times in the arguments. Check usage." << std::endl;
-    return_code = EXIT_FAILURE;
-  }
-  
-  option::Option* outFileOpt = options[OUTFILE];
-  if (outFileOpt && outFileOpt->count() > 1 )
-  {
-    std::cerr << "(--out-file | -o) appear multiple times in the arguments. Check usage." << std::endl;
-    return_code = EXIT_FAILURE;
-  }
+    option::Option* opt = options[optionidx];
+    if (opt && opt->count() > 1 )
+    {
+      std::cerr << arg << " appears multiple times in the arguments. Check usage." << std::endl;
+      return_code = EXIT_FAILURE;
+    }
+  };
+  check_multiple_args(BUNDLEFILE, "(--bundle-file | -b)");
+  check_multiple_args(OUTFILE, "(--out-file | -o)");
+  check_multiple_args(BUNDLENAME, "(--bundle-name | -n)");
+  check_multiple_args(MANIFESTADD, "(--manifest-add | -m)");
 
   if (argc == 0 || options[HELP])
   {
@@ -436,20 +435,32 @@ int main(int argc, char** argv)
     return return_code;
   }
   
+  option::Option* bundleFileOpt = options[BUNDLEFILE];
+  option::Option* outFileOpt = options[OUTFILE];
   if (!bundleFileOpt && !outFileOpt)
   {
     std::cerr << "At least one of the options (--bundle-file | --out-file) is required. Check usage." << std::endl;
     return_code = EXIT_FAILURE;
   }
 
-  if (return_code == EXIT_FAILURE)
+  if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
   {
-    return return_code;
+      std::cerr << "if either --manifest-add or --res-add option is provided, --bundle-name option must be provided." << std::endl;
+      return_code = EXIT_FAILURE;
   }
-  
+
   if (options[BUNDLENAME])
   {
     bundleName = options[BUNDLENAME].arg;
+    if (!options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
+    {
+      std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
+    }
+  }
+
+  if (return_code == EXIT_FAILURE)
+  {
+    return return_code;
   }
   
   if (!options[VERBOSE])
@@ -470,7 +481,7 @@ int main(int argc, char** argv)
   
   try
   {
-    // Append mode only works with one zip-add argument. A bundle can only contain one zip blob.
+    // Append mode only works with one zip-add argument.
     if (!options[RESADD] && !options[MANIFESTADD] && options[ZIPADD].count() == 1 && options[BUNDLEFILE])
     {
       // jump to append part.

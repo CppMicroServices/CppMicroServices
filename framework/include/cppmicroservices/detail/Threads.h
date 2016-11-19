@@ -183,8 +183,9 @@ class Atomic : private MultiThreaded<>
 
 public:
 
-  Atomic()
-    : m_t{}
+  template<class... Args>
+  Atomic(Args&&... args)
+    : m_t{std::forward<Args>(args)...}
   {}
 
   T Load() const

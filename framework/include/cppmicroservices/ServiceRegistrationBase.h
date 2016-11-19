@@ -62,7 +62,7 @@ public:
 
   /**
    * A boolean conversion operator converting this ServiceRegistrationBase object
-   * to \c true if it is valid and to \c false otherwise. A SeriveRegistration
+   * to \c true if it is valid and to \c false otherwise. A ServiceRegistrationBase
    * object is invalid if it was default-constructed or was invalidated by
    * assigning 0 to it.
    *
@@ -84,10 +84,10 @@ public:
   ~ServiceRegistrationBase();
 
   /**
-   * Returns a <code>ServiceReference</code> object for a service being
+   * Returns a <code>ServiceReferenceBase</code> object for a service being
    * registered.
    * <p>
-   * The <code>ServiceReference</code> object may be shared with other
+   * The <code>ServiceReferenceBase</code> object may be shared with other
    * bundles.
    *
    * @throws std::logic_error If this
@@ -120,7 +120,9 @@ public:
    * @throws std::logic_error If this <code>ServiceRegistrationBase</code>
    *         object has already been unregistered or if it is invalid.
    * @throws std::invalid_argument If <code>properties</code> contains
-   *         case variants of the same key name.
+   *         case variants of the same key name or if the number of the keys
+   *         of <code>properties</code> exceeds the value returned by
+   *         std::numeric_limits<int>::max().
    */
   void SetProperties(const ServiceProperties& properties);
 

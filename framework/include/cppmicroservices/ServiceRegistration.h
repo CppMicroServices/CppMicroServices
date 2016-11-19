@@ -41,7 +41,8 @@ namespace cppmicroservices {
  * The <code>ServiceRegistration</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * @tparam S Class type of the service interface
+ * @tparam I1 Class type of the first service interface
+ * @tparam Interfaces Template parameter pack containing zero or more service interfaces
  * @see BundleContext#RegisterService()
  */
 template<class I1, class ...Interfaces>

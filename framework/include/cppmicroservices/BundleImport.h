@@ -31,6 +31,7 @@ namespace cppmicroservices {
 
 struct BundleActivator;
 class BundleContext;
+class BundleContextPrivate;
 
 }
 

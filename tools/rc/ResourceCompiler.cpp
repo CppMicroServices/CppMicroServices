@@ -31,6 +31,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "optionparser.h"
 
@@ -381,29 +382,20 @@ const option::Descriptor usage[] =
   {0,0,0,0,0,0}
 };
 
-// ---------------------------------------------------------------------------------
-// -----------------------------    MAIN ENTRY POINT    ----------------------------
-// ---------------------------------------------------------------------------------
-
-int main(int argc, char** argv)
+// Check invalid invocations and errors
+static int checkSanity(option::Parser& parse,
+                       option::Option* options)
 {
-  int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
   int return_code = EXIT_SUCCESS;
-  std::string bundleName;
-  
-  argc -= (argc > 0);
-  argv += (argc > 0); // skip program name argv[0]
-  option::Stats stats(usage, argc, argv);
-  std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
-  std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
-  option::Parser parse(usage, argc, argv, options.get(), buffer.get());
-  
+
+  // Check if parsing command line resulted in a failure
   if (parse.error())
   {
     std::cerr << "Parsing command line arguments failed. " << std::endl;
     return_code = EXIT_FAILURE;
   }
   
+  // Check for unrecognized options
   if (parse.nonOptionsCount())
   {
     std::clog << "unrecognized options ..." << std::endl;
@@ -414,55 +406,79 @@ int main(int argc, char** argv)
     return_code = EXIT_FAILURE;
   }
 
-  // multiple specifications of the following args are illegal.
-  auto check_multiple_args = [&options, &return_code](OptionIndex optionidx, const std::string& arg)
+  // Multiple specifications of the following arguments are illegal
+  auto check_multiple_args = [&options, &return_code](std::initializer_list<OptionIndex> optionIndices)
   {
-    option::Option* opt = options[optionidx];
-    if (opt && opt->count() > 1 )
+    for (auto optionidx : optionIndices)
     {
-      std::cerr << arg << " appears multiple times in the arguments. Check usage." << std::endl;
-      return_code = EXIT_FAILURE;
+      option::Option* opt = options[optionidx];
+      if (opt && opt->count() > 1)
+      {
+        std::cerr << opt->name;
+        std::cerr << " appears multiple times in the arguments. Check usage." << std::endl;
+        return_code = EXIT_FAILURE;
+      }
     }
   };
-  check_multiple_args(BUNDLEFILE, "(--bundle-file | -b)");
-  check_multiple_args(OUTFILE, "(--out-file | -o)");
-  check_multiple_args(BUNDLENAME, "(--bundle-name | -n)");
-  check_multiple_args(MANIFESTADD, "(--manifest-add | -m)");
+  check_multiple_args({ BUNDLEFILE, OUTFILE, BUNDLENAME, MANIFESTADD });
+
+  // At-least one of --bundle-file or --out-file is required.
+  if (!options[BUNDLEFILE] && !options[OUTFILE])
+  {
+    std::cerr << "At least one of the options (--bundle-file | --out-file) is required. Check usage." << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+
+  // If either --manifest-add or --res-add is given, --bundle-name must also be given.
+  if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
+  {
+    std::cerr << "If either --manifest-add or --res-add is provided, --bundle-name must be provided." << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+
+  // Generate a warning that --bundle-name is not necessary in following invocation.
+  if (options[BUNDLENAME] && !options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
+  {
+      std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
+  }
+
+  return return_code;
+}
+
+// ---------------------------------------------------------------------------------
+// -----------------------------    MAIN ENTRY POINT    ----------------------------
+// ---------------------------------------------------------------------------------
+
+int main(int argc, char** argv)
+{
+  int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
+  int return_code = EXIT_SUCCESS;
+  std::string bundleName;
+
+  argc -= (argc > 0);
+  argv += (argc > 0); // skip program name argv[0]
+  option::Stats stats(usage, argc, argv);
+  std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
+  std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
+  option::Parser parse(usage, argc, argv, options.get(), buffer.get());
 
   if (argc == 0 || options[HELP])
   {
     option::printUsage(std::clog, usage);
     return return_code;
   }
-  
-  option::Option* bundleFileOpt = options[BUNDLEFILE];
-  option::Option* outFileOpt = options[OUTFILE];
-  if (!bundleFileOpt && !outFileOpt)
-  {
-    std::cerr << "At least one of the options (--bundle-file | --out-file) is required. Check usage." << std::endl;
-    return_code = EXIT_FAILURE;
-  }
 
-  if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
-  {
-      std::cerr << "if either --manifest-add or --res-add option is provided, --bundle-name option must be provided." << std::endl;
-      return_code = EXIT_FAILURE;
-  }
-
-  if (options[BUNDLENAME])
-  {
-    bundleName = options[BUNDLENAME].arg;
-    if (!options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
-    {
-      std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
-    }
-  }
-
+  return_code = checkSanity(parse, options.get());
   if (return_code == EXIT_FAILURE)
   {
     return return_code;
   }
   
+  if (options[BUNDLENAME])
+  {
+    bundleName = options[BUNDLENAME].arg;
+  }
+
   if (!options[VERBOSE])
   {
     // if not in verbose mode, supress the clog stream
@@ -478,6 +494,9 @@ int main(int argc, char** argv)
   
   std::string zipFile;
   bool deleteTempFile = false;
+
+  option::Option* bundleFileOpt = options[BUNDLEFILE];
+  option::Option* outFileOpt = options[OUTFILE];
   
   try
   {

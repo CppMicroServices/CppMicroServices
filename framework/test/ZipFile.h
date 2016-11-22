@@ -92,6 +92,19 @@ public:
     return entries[i];
   }
 
+  /*
+  * @brief: Returns the names of all entries in a std::vector
+  */
+  std::vector<std::string> getNames() const
+  {
+    std::vector<std::string> entryNames;
+    for (const auto& entry : entries)
+    {
+      entryNames.push_back(entry.name);
+    }
+    return entryNames;
+  }
+
 private:
   std::vector<EntryInfo> entries;
 };

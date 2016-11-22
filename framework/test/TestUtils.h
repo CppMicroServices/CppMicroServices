@@ -29,17 +29,16 @@ limitations under the License.
 #include <string>
 #include <memory>
 #include <fstream>
+#include <sys/stat.h>
 
 #ifdef US_PLATFORM_APPLE
 #include <mach/mach_time.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #elif defined(US_PLATFORM_POSIX)
 #include <limits.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/stat.h>
 #ifndef _POSIX_MONOTONIC_CLOCK
 #error Monotonic clock support missing on this POSIX platform
 #endif
@@ -53,7 +52,6 @@ limitations under the License.
 #include <windows.h>
 #include <direct.h>
 #include <Shlwapi.h>
-#include <sys/stat.h>
 #else
 #error High precision timer support not available on this platform
 #endif

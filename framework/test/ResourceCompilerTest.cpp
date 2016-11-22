@@ -30,12 +30,11 @@
 #include <cstdlib>
 #include <array>
 
-
 using namespace cppmicroservices;
 
 static const std::string manifest_json = R"({
 "bundle.symbolic_name" : "main",
-"bundle.version" : "0.1.0","
+"bundle.version" : "0.1.0",
 "bundle.activator" : true
 })";
 
@@ -95,9 +94,8 @@ static void createDirHierarchy(const std::string& tempdir)
 
   // Create 2 binary files filled with random numbers
   // to test bundle-file functionality.
-  auto create_mock_dll = [](const std::string& tempdir,
-                            const std::string& dllname,
-                            const std::array<char, 5>& dat)
+  auto create_mock_dll = [&tempdir](const std::string& dllname,
+                                    const std::array<char, 5>& dat)
   {
     std::string dll_path(tempdir + testing::DIR_SEP + dllname);
     std::ofstream dll(dll_path.c_str());
@@ -110,9 +108,17 @@ static void createDirHierarchy(const std::string& tempdir)
   };
   std::array<char, 5> data1 = { {2, 4, 6, 8, 10} };
   std::array<char, 5> data2 = { {1, 2, 3, 4, 5} };
-  create_mock_dll(tempdir, "sample.dll", data1);
-  create_mock_dll(tempdir, "sample1.dll", data2);
+  create_mock_dll("sample.dll", data1);
+  create_mock_dll("sample1.dll", data2);
 }
+
+static inline void testExists(const std::vector<std::string>& entryNames,
+                              const std::string& name)
+{
+  US_TEST_CONDITION(std::find(entryNames.begin(), entryNames.end(), name) != entryNames.end(),
+                    "Check existence of " + name)
+}
+
 
 /*
 * Use resource compiler to create Example.zip with just manifest.json
@@ -128,8 +134,10 @@ static void testManifestAdd(const std::string& rcbinpath, const std::string& tem
 
   ZipFile zip(tempdir + testing::DIR_SEP + "Example.zip");
   US_TEST_CONDITION(zip.size() == 2, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "mybundle/manifest.json", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "mybundle/", "Check name of entry 1.")
+
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "mybundle/manifest.json");
+  testExists(entryNames, "mybundle/");
 }
 
 /*
@@ -152,10 +160,12 @@ static void testManifestResAdd(const std::string& rcbinpath, const std::string& 
 
   ZipFile zip(tempdir + testing::DIR_SEP + "Example2.zip");
   US_TEST_CONDITION(zip.size() == 4, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "mybundle/manifest.json", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "mybundle/", "Check name of entry 1.")
-  US_TEST_CONDITION(zip[2].name == "mybundle/resource1/resource1.txt", "Check name of entry 2.")
-  US_TEST_CONDITION(zip[3].name == "mybundle/resource1/", "Check name of entry 3.")
+
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "mybundle/manifest.json");
+  testExists(entryNames, "mybundle/");
+  testExists(entryNames, "mybundle/resource1/resource1.txt");
+  testExists(entryNames, "mybundle/resource1/");
 }
 
 /*
@@ -176,9 +186,11 @@ static void testResAdd(const std::string& rcbinpath, const std::string& tempdir)
 
   ZipFile zip(tempdir + testing::DIR_SEP + "tomerge.zip");
   US_TEST_CONDITION(zip.size() == 3, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "mybundle/resource2/resource2.txt", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "mybundle/", "Check name of entry 1.")
-  US_TEST_CONDITION(zip[2].name == "mybundle/resource2/", "Check name of entry 2.")
+
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "mybundle/resource2/resource2.txt");
+  testExists(entryNames, "mybundle/");
+  testExists(entryNames, "mybundle/resource2/");
 }
 
 /*
@@ -203,13 +215,14 @@ static void testZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 
   ZipFile zip(tempdir + testing::DIR_SEP + "Example4.zip");
   US_TEST_CONDITION(zip.size() == 6, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "mybundle/manifest.json", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "mybundle/", "Check name of entry 1.")
-  US_TEST_CONDITION(zip[2].name == "mybundle/resource1/resource1.txt", "Check name of entry 2.")
-  US_TEST_CONDITION(zip[3].name == "mybundle/resource1/", "Check name of entry 3.")
-  US_TEST_CONDITION(zip[4].name == "mybundle/resource2/resource2.txt", "Check name of entry 4.")
-  US_TEST_CONDITION(zip[5].name == "mybundle/resource2/", "Check name of entry 5.")
 
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "mybundle/manifest.json");
+  testExists(entryNames, "mybundle/");
+  testExists(entryNames, "mybundle/resource1/resource1.txt");
+  testExists(entryNames, "mybundle/resource1/");
+  testExists(entryNames, "mybundle/resource2/resource2.txt");
+  testExists(entryNames, "mybundle/resource2/");
 }
 
 /*
@@ -229,10 +242,12 @@ static void testZipAddBundle(const std::string& rcbinpath, const std::string& te
 
   ZipFile zip(tempdir + testing::DIR_SEP + "sample.dll");
   US_TEST_CONDITION(zip.size() == 4, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "mybundle/manifest.json", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "mybundle/", "Check name of entry 1.")
-  US_TEST_CONDITION(zip[2].name == "mybundle/resource2/resource2.txt", "Check name of entry 2.")
-  US_TEST_CONDITION(zip[3].name == "mybundle/resource2/", "Check name of entry 3.")
+
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "mybundle/manifest.json");
+  testExists(entryNames, "mybundle/");
+  testExists(entryNames, "mybundle/resource2/resource2.txt");
+  testExists(entryNames, "mybundle/resource2/");
 }
 
 /*
@@ -249,12 +264,14 @@ static void testZipAddTwice(const std::string& rcbinpath, const std::string& tem
 
   ZipFile zip(tempdir + testing::DIR_SEP + "sample1.dll");
   US_TEST_CONDITION(zip.size() == 6, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "mybundle/resource2/resource2.txt", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "mybundle/", "Check name of entry 1.")
-  US_TEST_CONDITION(zip[2].name == "mybundle/resource2/", "Check name of entry 2.")
-  US_TEST_CONDITION(zip[3].name == "mybundle/manifest.json", "Check name of entry 3.")
-  US_TEST_CONDITION(zip[4].name == "mybundle/resource1/resource1.txt", "Check name of entry 4.")
-  US_TEST_CONDITION(zip[5].name == "mybundle/resource1/", "Check name of entry 5.")
+
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "mybundle/resource2/resource2.txt");
+  testExists(entryNames, "mybundle/");
+  testExists(entryNames, "mybundle/resource2/");
+  testExists(entryNames, "mybundle/manifest.json");
+  testExists(entryNames, "mybundle/resource1/resource1.txt");
+  testExists(entryNames, "mybundle/resource1/");
 }
 
 /*
@@ -274,14 +291,16 @@ static void testBundleManifestZipAdd(const std::string& rcbinpath, const std::st
 
   ZipFile zip(tempdir + testing::DIR_SEP + "sample1.dll");
   US_TEST_CONDITION(zip.size() == 8, "Check number of entries of zip.")
-  US_TEST_CONDITION(zip[0].name == "anotherbundle/manifest.json", "Check name of entry 0.")
-  US_TEST_CONDITION(zip[1].name == "anotherbundle/", "Check name of entry 1.")
-  US_TEST_CONDITION(zip[2].name == "mybundle/resource2/resource2.txt", "Check name of entry 2.")
-  US_TEST_CONDITION(zip[3].name == "mybundle/", "Check name of entry 3.")
-  US_TEST_CONDITION(zip[4].name == "mybundle/resource2/", "Check name of entry 4.")
-  US_TEST_CONDITION(zip[5].name == "mybundle/manifest.json", "Check name of entry 5.")
-  US_TEST_CONDITION(zip[6].name == "mybundle/resource1/resource1.txt", "Check name of entry 6.")
-  US_TEST_CONDITION(zip[7].name == "mybundle/resource1/", "Check name of entry 7.")
+
+  auto entryNames = zip.getNames();
+  testExists(entryNames, "anotherbundle/manifest.json");
+  testExists(entryNames, "anotherbundle/");
+  testExists(entryNames, "mybundle/resource2/resource2.txt");
+  testExists(entryNames, "mybundle/");
+  testExists(entryNames, "mybundle/resource2/");
+  testExists(entryNames, "mybundle/manifest.json");
+  testExists(entryNames, "mybundle/resource1/resource1.txt");
+  testExists(entryNames, "mybundle/resource1/");
 }
 
 /*
@@ -351,7 +370,7 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
   ret = std::system(cmd.str().c_str());
-  US_TEST_CONDITION(ret == 0, "Failure mode: "
+  US_TEST_CONDITION(ret == 0,
     "--bundle-name arg without either --manifest-add or --res-add is just a warning")
 
   // Example.zip already contains mybundle/manifest.json

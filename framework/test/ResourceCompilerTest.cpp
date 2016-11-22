@@ -119,7 +119,6 @@ static inline void testExists(const std::vector<std::string>& entryNames,
                     "Check existence of " + name)
 }
 
-
 /*
 * Use resource compiler to create Example.zip with just manifest.json
 */
@@ -130,7 +129,8 @@ static void testManifestAdd(const std::string& rcbinpath, const std::string& tem
   cmd << " --bundle-name " << "mybundle";
   cmd << " --out-file " << tempdir << testing::DIR_SEP << "Example.zip";
   cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json";
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testManifestAdd returns 0")
 
   ZipFile zip(tempdir + testing::DIR_SEP + "Example.zip");
   US_TEST_CONDITION(zip.size() == 2, "Check number of entries of zip.")
@@ -155,7 +155,8 @@ static void testManifestResAdd(const std::string& rcbinpath, const std::string& 
 
   auto cwdir = testing::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testManifestResAdd returns 0")
   testing::ChangeDirectory(cwdir);
 
   ZipFile zip(tempdir + testing::DIR_SEP + "Example2.zip");
@@ -181,7 +182,8 @@ static void testResAdd(const std::string& rcbinpath, const std::string& tempdir)
 
   auto cwdir = testing::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testResAdd returns 0")
   testing::ChangeDirectory(cwdir);
 
   ZipFile zip(tempdir + testing::DIR_SEP + "tomerge.zip");
@@ -210,7 +212,8 @@ static void testZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 
   auto cwdir = testing::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testZipAdd returns 0")
   testing::ChangeDirectory(cwdir);
 
   ZipFile zip(tempdir + testing::DIR_SEP + "Example4.zip");
@@ -238,7 +241,8 @@ static void testZipAddBundle(const std::string& rcbinpath, const std::string& te
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample.dll ";
   cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testZipAddBundle returns 0")
 
   ZipFile zip(tempdir + testing::DIR_SEP + "sample.dll");
   US_TEST_CONDITION(zip.size() == 4, "Check number of entries of zip.")
@@ -260,7 +264,8 @@ static void testZipAddTwice(const std::string& rcbinpath, const std::string& tem
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testZipAddTwice returns 0")
 
   ZipFile zip(tempdir + testing::DIR_SEP + "sample1.dll");
   US_TEST_CONDITION(zip.size() == 6, "Check number of entries of zip.")
@@ -287,7 +292,9 @@ static void testBundleManifestZipAdd(const std::string& rcbinpath, const std::st
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
-  std::system(cmd.str().c_str());
+  int ret = std::system(cmd.str().c_str());
+  US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testBundleManifestZipAdd "
+                                       "returns 0")
 
   ZipFile zip(tempdir + testing::DIR_SEP + "sample1.dll");
   US_TEST_CONDITION(zip.size() == 8, "Check number of entries of zip.")

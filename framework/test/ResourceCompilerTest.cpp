@@ -125,10 +125,10 @@ static inline void testExists(const std::vector<std::string>& entryNames,
 static void testManifestAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name " << "mybundle";
   cmd << " --out-file " << tempdir << testing::DIR_SEP << "Example.zip";
-  cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json";
+  cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json'";
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testManifestAdd returns 0")
 
@@ -147,11 +147,11 @@ static void testManifestAdd(const std::string& rcbinpath, const std::string& tem
 static void testManifestResAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --out-file Example2.zip ";
   cmd << " --manifest-add manifest.json ";
-  cmd << " --res-add resource1/resource1.txt";
+  cmd << " --res-add resource1/resource1.txt'";
 
   auto cwdir = testing::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
@@ -175,10 +175,10 @@ static void testManifestResAdd(const std::string& rcbinpath, const std::string& 
 static void testResAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --out-file tomerge.zip ";
-  cmd << " --res-add resource2/resource2.txt";
+  cmd << " --res-add resource2/resource2.txt'";
 
   auto cwdir = testing::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
@@ -203,12 +203,12 @@ static void testResAdd(const std::string& rcbinpath, const std::string& tempdir)
 static void testZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --manifest-add manifest.json ";
   cmd << " --out-file Example4.zip ";
   cmd << " --res-add resource1/resource1.txt ";
-  cmd << " --zip-add tomerge.zip ";
+  cmd << " --zip-add tomerge.zip'";
 
   auto cwdir = testing::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
@@ -236,11 +236,11 @@ static void testZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 static void testZipAddBundle(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample.dll ";
   cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
+  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip'";
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testZipAddBundle returns 0")
 
@@ -260,10 +260,10 @@ static void testZipAddBundle(const std::string& rcbinpath, const std::string& te
 static void testZipAddTwice(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
+  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip'";
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testZipAddTwice returns 0")
 
@@ -286,12 +286,12 @@ static void testZipAddTwice(const std::string& rcbinpath, const std::string& tem
 static void testBundleManifestZipAdd(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name anotherbundle ";
   cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json ";
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
+  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip'";
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testBundleManifestZipAdd "
                                        "returns 0")
@@ -316,8 +316,8 @@ static void testBundleManifestZipAdd(const std::string& rcbinpath, const std::st
 static void testHelpReturnsZero(const std::string& rcbinpath)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
-  cmd << " --help";
+  cmd << "'" << rcbinpath;
+  cmd << " --help'";
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret == 0, "help option returns zero")
 }
@@ -328,54 +328,54 @@ static void testHelpReturnsZero(const std::string& rcbinpath)
 static void testrcFailureModes(const std::string& rcbinpath, const std::string& tempdir)
 {
   std::ostringstream cmd;
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-file test1.dll ";
-  cmd << " --bundle-file test2.dll ";
+  cmd << " --bundle-file test2.dll'";
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: Multiple bundle-file args")
 
   cmd.str("");
   cmd.clear();
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --out-file test1.zip ";
-  cmd << " --out-file test2.zip ";
+  cmd << " --out-file test2.zip'";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: Multiple out-file args")
 
   cmd.str("");
   cmd.clear();
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name foo ";
   cmd << " --bundle-name bar ";
-  cmd << " --bundle-file bundlefile ";
+  cmd << " --bundle-file bundlefile'";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: Multiple bundle-name args")
 
   cmd.str("");
   cmd.clear();
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --manifest-add m1.json ";
   cmd << " --manifest-add m2.json ";
   cmd << " --bundle-file bundlefile ";
-  cmd << " --bundle-name dummy ";
+  cmd << " --bundle-name dummy'";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: Multiple manifest-add args")
 
   cmd.str("");
   cmd.clear();
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --manifest-file manifest.json ";
-  cmd << " --bundle-name foobundle ";
+  cmd << " --bundle-name foobundle'";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: --bundle-file or --out-file required")
 
   cmd.str("");
   cmd.clear();
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip ";
+  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip'";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret == 0,
     "--bundle-name arg without either --manifest-add or --res-add is just a warning")
@@ -385,11 +385,11 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   // mybundle/manifest.json
   cmd.str("");
   cmd.clear();
-  cmd << rcbinpath;
+  cmd << "'" << rcbinpath;
   cmd << " --bundle-name " << "mybundle";
   cmd << " --out-file " << tempdir << testing::DIR_SEP << "Example7.zip";
   cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example.zip";
-  cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json";
+  cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json'";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: duplicate manifest.json")
 }

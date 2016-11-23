@@ -125,16 +125,16 @@ static inline void testExists(const std::vector<std::string>& entryNames,
 
 /*
 * Transform the path specified in "path", which may contain a combination of spaces
-* and parenthesis, to a path with the spaces and parenthesis escaped with "\\".
+* and parenthesis, to a path with the spaces and parenthesis escaped with "\".
 * If this isn't escaped, test invocation (std::system) with this path results
 * in an error that the given file is not found.
 *
-* E.g. "/tmp/path (space)/rc" will result in "/tmp/path\\ \\(space\\)/rc"
+* E.g. "/tmp/path (space)/rc" will result in a raw "/tmp/path\ \(space\)/rc"
 */
 static inline void escapePath(std::string& path)
 {
   std::string delimiters("() ");
-  std::string insertstr("\\\\");
+  std::string insertstr("\\");
   size_t found = path.find_first_of(delimiters);
   while (found != std::string::npos)
   {
@@ -387,7 +387,7 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd << " --manifest-add m1.json ";
   cmd << " --manifest-add m2.json ";
   cmd << " --bundle-file bundlefile ";
-  cmd << " --bundle-name dummy\"";
+  cmd << " --bundle-name dummy";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: Multiple manifest-add args")
 
@@ -458,18 +458,29 @@ static void makeCleanSlate(const std::string& tempdir)
   }
 }
 
+// Test escapePath functionality
+static void testEscapePath()
+{
+  // Test escapePath function
+  std::string path1("/tmp/path (space)/rc");
+  escapePath(path1);
+  US_TEST_CONDITION(path1 == "/tmp/path\\ \\(space\\)/rc", "Test escapePath #1")
+
+  std::string path2("/tmp/foo/bar");
+  escapePath(path2);
+  US_TEST_CONDITION(path2 == "/tmp/foo/bar", "Test escapePath #2")
+
+  std::string path3("/home/travis/CppMicroServices/us builds (Unix make)/bin/usResourceCompiler");
+  escapePath(path3);
+  US_TEST_CONDITION(path3 == "/home/travis/CppMicroServices/us\\ builds\\ \\(Unix\\ make\\)/bin/usResourceCompiler",
+    "Test escapePath #3")
+}
+
 int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ResourceCompilerTest");
 
-  // Test escapePath function
-  std::string path1("/tmp/path (space)/rc");
-  escapePath(path1);
-  US_TEST_CONDITION(path1 == "/tmp/path\\\\ \\\\(space\\\\)/rc", "escapePath #1")
-
-  std::string path2("/tmp/foo/bar");
-  escapePath(path2);
-  US_TEST_CONDITION(path2 == "/tmp/foo/bar", "escapePath #2")
+  testEscapePath();
 
   auto rcbinpath = testing::BIN_PATH + testing::DIR_SEP + "usResourceCompiler" + testing::EXE_EXT;
   /*

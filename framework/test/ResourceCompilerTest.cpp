@@ -472,9 +472,6 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(path2 == "/tmp/foo/bar", "escapePath #2")
 
   auto rcbinpath = testing::BIN_PATH + testing::DIR_SEP + "usResourceCompiler" + testing::EXE_EXT;
-#ifndef US_PLATFORM_WINDOWS
-  escapePath(rcbinpath);
-#endif
   /*
   * If ResourceCompiler executable is not found, we can't run the tests, we
   * mark it as a failure and exit
@@ -482,7 +479,7 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
   std::ifstream binf(rcbinpath.c_str());
   if (!binf.good())
   {
-    US_TEST_FAILED_MSG(<< "Cannot find usResourceCompiler executable.");
+    US_TEST_FAILED_MSG(<< "Cannot find usResourceCompiler executable:" << rcbinpath);
     return EXIT_FAILURE;
   }
 
@@ -490,6 +487,7 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
   tempdir += testing::DIR_SEP;
 #ifndef US_PLATFORM_WINDOWS
   escapePath(tempdir);
+  escapePath(rcbinpath);
 #endif
 
   US_TEST_NO_EXCEPTION_REQUIRED( makeCleanSlate(tempdir) );

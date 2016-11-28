@@ -35,4 +35,4 @@ To retrieve the bundle specific BundleContext object from anywhere in your bundl
 \snippet uServices-bundlecontext/main.cpp GetBundleContext
 
 Please note that trying to use `#cppmicroservices::GetBundleContext` without proper initialization code
-in the using shared library while either lead to compile or rumtime errors.
+in the using shared library will either lead to compile or rumtime errors.

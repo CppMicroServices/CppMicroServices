@@ -92,7 +92,7 @@ std::string GetExecutablePath()
   std::string execPath;
   uint32_t bufsize = MAXPATHLEN;
   std::unique_ptr<char[]> buf(new char[bufsize]);
-  
+
 #if _WIN32
   if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {

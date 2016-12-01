@@ -53,6 +53,8 @@ set(_public_headers
   cppmicroservices/BundleInitialization.h
   cppmicroservices/BundleResource.h
   cppmicroservices/BundleResourceStream.h
+  cppmicroservices/BundleTracker.h
+  cppmicroservices/BundleTrackerCustomizer.h
   cppmicroservices/BundleVersion.h
   cppmicroservices/Constants.h
   cppmicroservices/GetBundleContext.h

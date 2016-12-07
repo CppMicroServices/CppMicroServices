@@ -36,6 +36,8 @@ namespace cppmicroservices {
  * A hash table with std::string as the key type and Any as the value
  * type. It is typically used for passing service properties to
  * BundleContext::RegisterService.
+ *
+ * Deprecated. Use AnyMap instead.
  */
 typedef std::unordered_map<std::string, Any> ServiceProperties;
 

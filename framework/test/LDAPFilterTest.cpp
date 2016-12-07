@@ -24,7 +24,6 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
-#include "cppmicroservices/ServiceProperties.h"
 
 #include "TestingMacros.h"
 
@@ -74,7 +73,7 @@ int TestEvaluate()
   {
     // Make sure Match's key look-up is case-insensitive
     LDAPFilter ldap( "(Cn=Babs Jensen)" );
-    ServiceProperties props;
+    AnyMap props(AnyMap::UNORDERED_MAP);
     bool eval = false;
 
     // Several values

@@ -34,13 +34,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("SharedLibraryTest");
 
-#ifdef US_PLATFORM_WINDOWS
-  const char PATH_SEPARATOR = '\\';
-#else
-  const char PATH_SEPARATOR = '/';
-#endif
-
-  const std::string libAFilePath = testing::LIB_PATH + PATH_SEPARATOR + US_LIB_PREFIX + "TestBundleA" + US_LIB_EXT;
+  const std::string libAFilePath = testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleA" + US_LIB_EXT;
   SharedLibrary lib1(libAFilePath);
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "Absolute file path")
   US_TEST_CONDITION(lib1.GetLibraryPath() == testing::LIB_PATH, "Library path")
@@ -83,7 +77,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(lib2.GetFilePath() == libAFilePath, "File path")
   lib2.SetPrefix("");
   US_TEST_CONDITION(lib2.GetPrefix().empty(), "Lib prefix")
-  US_TEST_CONDITION(lib2.GetFilePath() == testing::LIB_PATH + PATH_SEPARATOR + "TestBundleA" + US_LIB_EXT, "File path")
+  US_TEST_CONDITION(lib2.GetFilePath() == testing::LIB_PATH + testing::DIR_SEP + "TestBundleA" + US_LIB_EXT, "File path")
 
   SharedLibrary lib3 = lib2;
   US_TEST_CONDITION(lib3.GetFilePath() == lib2.GetFilePath(), "Compare file path")

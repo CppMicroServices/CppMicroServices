@@ -1,23 +1,23 @@
 /*=============================================================================
-
+ 
  Library: CppMicroServices
-
+ 
  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
  file at the top-level directory of this distribution and at
  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
-
+ 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
+ 
  http://www.apache.org/licenses/LICENSE-2.0
-
+ 
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-
+ 
  =============================================================================*/
 
 #include "miniz.h"
@@ -31,6 +31,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "optionparser.h"
 
@@ -125,28 +126,28 @@ public:
    * @param isManifest indicates if the file is the bundle's manifest
    */
   void AddResourceFile(const std::string& resFileName, bool isManifest = false);
-
+  
   /*
    * @brief Add all files from another zip archive to this zip archive
    * @throw std::runtime exception if failed to add any of the resources
    * @param archiveFileName is the path to the source archive
    */
   void AddResourcesFromArchive(const std::string& archiveFileName);
-
+  
   // Remove copy constructor and assignment
   ZipArchive(const ZipArchive&) = delete;
   void operator=(const ZipArchive&) = delete;
   // Remove move constructor and assignment
   ZipArchive(ZipArchive&&) = delete;
   ZipArchive& operator=(ZipArchive&&) = delete;
-
+  
 private:
   /*
    * @brief Add a directory entry to the zip archive
    * @throw std::runtime exception if failed to add the entry
    */
   void AddDirectory(const std::string& dirName);
-
+  
   std::string fileName;
   int compressionLevel;
   std::string bundleName;
@@ -163,10 +164,6 @@ ZipArchive::ZipArchive(const std::string& archiveFileName,
 , bundleName(bName)
 , writeArchive(new mz_zip_archive())
 {
-  if (bundleName.empty())
-  {
-    throw std::runtime_error("No bundle name specified");
-  }
   std::clog << "Initializing zip archive "  << fileName << " ..." << std::endl;
   // clear the contents of a outFile if it exists
   std::ofstream ofile(fileName, std::ofstream::trunc);
@@ -187,7 +184,7 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   {
     archiveName = resFileName.substr(resFileName.find_last_of(PATH_SEPARATOR)+1);
   }
-
+  
   std::string archiveEntry = bundleName + "/" + archiveName;
   std::clog << "Adding file " << archiveEntry << " ..." << std::endl;
   // add the current file to the new archive
@@ -195,7 +192,7 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   {
     throw std::runtime_error("A file already exists with this name");
   }
-
+  
   if (!mz_zip_writer_add_file(writeArchive.get(), archiveEntry.c_str(), resFileName.c_str(), NULL,
                               0, compressionLevel))
   {
@@ -313,7 +310,7 @@ struct Custom_Arg : public option::Arg
   {
     std::cerr << "ERROR: " << msg1 << opt.name << msg2 << std::endl;
   }
-
+  
   static option::ArgStatus NonEmpty(const option::Option& option, bool msg)
   {
     if (option.arg != 0 && option.arg[0] != 0)
@@ -326,7 +323,7 @@ struct Custom_Arg : public option::Arg
     }
     return option::ARG_ILLEGAL;
   }
-
+  
   static option::ArgStatus Numeric(const option::Option& option, bool msg)
   {
     char* endptr = nullptr;
@@ -336,7 +333,7 @@ struct Custom_Arg : public option::Arg
       assert(endptr != nullptr);
       return option::ARG_OK;
     }
-
+    
     if (msg)
     {
       printError("Option '", option, "' requires a numeric argument\n");
@@ -373,11 +370,80 @@ const option::Descriptor usage[] =
   {ZIPADD,           0, "z", "zip-add"          , Custom_Arg::NonEmpty, " --zip-add, -z \tPath to a file containing a zip archive to be merged into the output zip file. "},
   {MANIFESTADD,      0, "m", "manifest-add"     , Custom_Arg::NonEmpty, " --manifest-add, -m \tPath to the bundle's manifest file. "},
   {BUNDLEFILE,       0, "b", "bundle-file"      , Custom_Arg::NonEmpty, " --bundle-file, -b \tPath to the bundle binary. The resources zip file will be appended to this binary. "},
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nExamples:\n\nCreate a zip file with resources\n" "  " US_PROG_NAME " --compression-level 9 --verbose --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --zip-add filetomerge.zip\n" },
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle with resources\n""  " US_PROG_NAME " -v -n mybundle -b mybundle.dylib -m manifest.json -z archivetomerge.zip\n" },
-  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle binary with existing zip file\n" "  " US_PROG_NAME ".exe -b mybundle.dll -z archivetoembed.zip\n" },
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nNote:\n1. Only options --res-add and --zip-add can be specified multiple times."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n2. If option --manifest-add or --res-add is specified, option --bundle-name must be provided."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n3. At-least one of --bundle-file or --out-file options must be provided."},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nExamples:\n\nCreate a zip file with resources:\n" "  " US_PROG_NAME " --compression-level 9 --verbose --bundle-name mybundle --out-file Example.zip --manifest-add manifest.json --zip-add filetomerge.zip\n"
+  "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'filetomerge.zip' into it and write the resulting blob into 'Example.zip'\n"},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle with resources\n""  " US_PROG_NAME " -v -n mybundle -b mybundle.dylib -m manifest.json -z archivetomerge.zip\n"
+  "Behavior: Construct a zip blob with contents 'mybundle/manifest.json', merge the contents of zip file 'archivetomerge.zip' into it and append the resulting zip blob to 'mybundle.dylib'\n"},
+  {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nAppend a bundle binary with existing zip file\n" "  " US_PROG_NAME ".exe -b mybundle.dll -z archivetoembed.zip\n"
+  "Behavior: Append the contents of 'archivetoembed.zip' to 'mybundle.dll'\n"},
   {0,0,0,0,0,0}
 };
+
+// Check invalid invocations and errors
+static int checkSanity(option::Parser& parse,
+                       option::Option* options)
+{
+  int return_code = EXIT_SUCCESS;
+
+  // Check if parsing command line resulted in a failure
+  if (parse.error())
+  {
+    std::cerr << "Parsing command line arguments failed. " << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+  
+  // Check for unrecognized options
+  if (parse.nonOptionsCount())
+  {
+    std::clog << "unrecognized options ..." << std::endl;
+    for (int i = 0; i < parse.nonOptionsCount(); ++i)
+    {
+      std::cout << "\t" << parse.nonOption(i) << std::endl;
+    }
+    return_code = EXIT_FAILURE;
+  }
+
+  // Multiple specifications of the following arguments are illegal
+  auto check_multiple_args = [&options, &return_code](std::initializer_list<OptionIndex> optionIndices)
+  {
+    for (auto optionidx : optionIndices)
+    {
+      option::Option* opt = options[optionidx];
+      if (opt && opt->count() > 1)
+      {
+        std::cerr << opt->name;
+        std::cerr << " appears multiple times in the arguments. Check usage." << std::endl;
+        return_code = EXIT_FAILURE;
+      }
+    }
+  };
+  check_multiple_args({ BUNDLEFILE, OUTFILE, BUNDLENAME, MANIFESTADD });
+
+  // At-least one of --bundle-file or --out-file is required.
+  if (!options[BUNDLEFILE] && !options[OUTFILE])
+  {
+    std::cerr << "At least one of the options (--bundle-file | --out-file) is required. Check usage." << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+
+  // If either --manifest-add or --res-add is given, --bundle-name must also be given.
+  if ((options[MANIFESTADD] || options[RESADD]) && !options[BUNDLENAME])
+  {
+    std::cerr << "If either --manifest-add or --res-add is provided, --bundle-name must be provided." << std::endl;
+    return_code = EXIT_FAILURE;
+  }
+
+  // Generate a warning that --bundle-name is not necessary in following invocation.
+  if (options[BUNDLENAME] && !options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
+  {
+      std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
+  }
+
+  return return_code;
+}
 
 // ---------------------------------------------------------------------------------
 // -----------------------------    MAIN ENTRY POINT    ----------------------------
@@ -396,48 +462,18 @@ int main(int argc, char** argv)
   std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
   option::Parser parse(usage, argc, argv, options.get(), buffer.get());
 
-  if (parse.error())
-  {
-    std::cerr << "Parsing command line arguments failed. " << std::endl;
-    return_code = EXIT_FAILURE;
-  }
-
-  if (parse.nonOptionsCount())
-  {
-    std::clog << "unrecognized options ..." << std::endl;
-    for (int i = 0; i < parse.nonOptionsCount(); ++i)
-    {
-      std::cout << "\t" << parse.nonOption(i) << std::endl;
-    }
-    return_code = EXIT_FAILURE;
-  }
-
-  option::Option* bundleFileOpt = options[BUNDLEFILE];
-  if (bundleFileOpt && bundleFileOpt->count() > 1 )
-  {
-    std::cerr << "(--bundle-file | -b) appear multiple times in the arguments. Check usage." << std::endl;
-    return_code = EXIT_FAILURE;
-  }
-
-  option::Option* outFileOpt = options[OUTFILE];
-  if (outFileOpt && outFileOpt->count() > 1 )
-  {
-    std::cerr << "(--out-file | -o) appear multiple times in the arguments. Check usage." << std::endl;
-    return_code = EXIT_FAILURE;
-  }
-
-  if (!bundleFileOpt && !outFileOpt)
-  {
-    std::cerr << "At least one of the options (--bundle-file | --out-file) is required." << std::endl;
-    return_code = EXIT_FAILURE;
-  }
-
-  if (argc == 0 || options[HELP] || return_code == EXIT_FAILURE)
+  if (argc == 0 || options[HELP])
   {
     option::printUsage(std::clog, usage);
     return return_code;
   }
 
+  return_code = checkSanity(parse, options.get());
+  if (return_code == EXIT_FAILURE)
+  {
+    return return_code;
+  }
+  
   if (options[BUNDLENAME])
   {
     bundleName = options[BUNDLENAME].arg;
@@ -448,20 +484,23 @@ int main(int argc, char** argv)
     // if not in verbose mode, supress the clog stream
     std::clog.setstate(std::ios_base::failbit);
   }
-
+  
   if (options[COMPRESSIONLEVEL])
   {
     char* endptr = 0;
     compressionLevel = strtol(options[COMPRESSIONLEVEL].arg, &endptr, 10);
   }
   std::clog << "using compression level " << compressionLevel << std::endl;
-
+  
   std::string zipFile;
   bool deleteTempFile = false;
 
+  option::Option* bundleFileOpt = options[BUNDLEFILE];
+  option::Option* outFileOpt = options[OUTFILE];
+  
   try
   {
-    // Append mode only works with one zip-add argument. A bundle can only contain one zip blob.
+    // Append mode only works with one zip-add argument.
     if (!options[RESADD] && !options[MANIFESTADD] && options[ZIPADD].count() == 1 && options[BUNDLEFILE])
     {
       // jump to append part.
@@ -478,7 +517,7 @@ int main(int argc, char** argv)
         zipFile = us_tempfile();
         deleteTempFile = true;
       }
-
+      
       std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])
@@ -531,20 +570,20 @@ int main(int argc, char** argv)
     std::cerr << "Error: " << ex.what() << std::endl;
     return_code = EXIT_FAILURE;
   }
-
+  
   // delete temporary file and report error on failure
   if (deleteTempFile && (std::remove(zipFile.c_str()) != 0))
   {
     std::cerr << "Error removing temporary zip archive "  << zipFile << std:: endl;
     return_code = EXIT_FAILURE;
   }
-
+  
   // clear the failbit set by us
   if (!options[VERBOSE])
   {
     std::clog.clear();
   }
-
+  
   return return_code;
 }
 

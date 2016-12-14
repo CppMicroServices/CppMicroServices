@@ -31,6 +31,7 @@ namespace cppmicroservices {
 
 struct BundleActivator;
 class BundleContext;
+class BundleContextPrivate;
 
 }
 
@@ -86,8 +87,8 @@ class BundleContext;
   extern "C" void US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (cppmicroservices::BundleActivator*); \
   void _dummy_reference_to_ ## _bundle_name ## _activator()                       \
   {                                                                               \
-    US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();                                    \
-    US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (nullptr);                            \
+    auto dummyActivator = US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();              \
+    US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (dummyActivator);                     \
   }
 
 #endif // CPPMICROSERVICES_BUNDLEIMPORT_H

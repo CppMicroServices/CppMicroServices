@@ -138,15 +138,15 @@ namespace cppmicroservices {
 
 
 #define US_TEST_FOR_NO_EXCEPTION_END()                                         \
-cppmicroservices::TestManager::GetInstance().TestPassed();                     \
+  cppmicroservices::TestManager::GetInstance().TestPassed();                   \
 }                                                                              \
 catch (const std::exception& ex) {                                             \
-cppmicroservices::TestManager::GetInstance().TestFailed();                     \
-US_TEST_OUTPUT( << "Unexpected exception caught : " << ex.what() << "[FAILED]")\
+  cppmicroservices::TestManager::GetInstance().TestFailed();                   \
+  US_TEST_OUTPUT( << "Unexpected exception caught : " << ex.what() << " [FAILED]") \
 }                                                                              \
 catch (...) {                                                                  \
-cppmicroservices::TestManager::GetInstance().TestFailed();                     \
-US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                     \
+  cppmicroservices::TestManager::GetInstance().TestFailed();                   \
+  US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                   \
 }
 
 
@@ -158,5 +158,25 @@ US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                     \
 US_TEST_FOR_EXCEPTION_BEGIN(...)                                              \
 STATEMENT ;                                                                   \
 US_TEST_FOR_NO_EXCEPTION_END()
+
+#define US_TEST_FOR_NO_EXCEPTION_OTHERWISE_THROW()                              \
+  cppmicroservices::TestManager::GetInstance().TestPassed();                    \
+}                                                                               \
+catch (const std::exception& ex) {                                              \
+  US_TEST_FAILED_MSG( << "Unexpected exception caught: " << ex.what() << " [FAILED]"); \
+}                                                                               \
+catch (...) {                                                                   \
+  US_TEST_FAILED_MSG( << "Unexpected exception caught: [FAILED]");              \
+}
+
+/**
+ * \brief Use to verify that STATEMENT does not throw any exception
+ * \brief If there's an exception, return (exit the test) by throwing
+ * cppmicroservices::TestFailedException()
+ */
+#define US_TEST_NO_EXCEPTION_REQUIRED(STATEMENT)                      \
+US_TEST_FOR_EXCEPTION_BEGIN(...)                                              \
+STATEMENT ;                                                                   \
+US_TEST_FOR_NO_EXCEPTION_OTHERWISE_THROW()
 
 #endif // CPPMICROSERVICES_TESTINGMACROS_H

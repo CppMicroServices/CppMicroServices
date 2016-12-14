@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>C++ Micro Services</title>
+
+  <!-- CSS  -->
+  <link href="css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="navbar-fixed">
+  <nav class="blue-grey white-text" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">CppMicroServices</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#bundles">Bundles</a></li>
+        <li><a href="#docs">Docs</a></li>
+        <li><a href="#help">Help</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#">Navbar Link</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  </div>
+
+  <!-- Banner -->
+  <div class="section no-pad-bot blue-grey white-text" id="index-banner">
+    <div class="container">
+      <div class="chip large right red darken-1 white-text">
+        <i class="left-icon material-icons">whatshot</i>
+        Upcoming <a href="https://github.com/CppMicroServices/CppMicroServices/milestone/2">Release 3.0</a><i class="close material-icons">close</i>  
+      </div>
+          
+      <br><br>
+      <h1 class="header center thin">C++ Micro Services</h1>
+      <div class="row center">
+        <h5 class="header col s12 thin">Build modular and dynamic service-oriented C++ applications</h5>
+      </div>
+      <div class="row center">
+        <a href="http://doc.cppmicroservices.org" class="btn-large waves-effect waves-light orange">
+          <i class="material-icons left">school</i>Get Started
+        </a>
+        <a href="https://github.com/CppMicroServices/CppMicroServices/releases/latest" class="btn-large waves-effect waves-light orange">
+          <i class="material-icons left">file_download</i>Download
+        </a>
+        <a href="#doc" class="btn-large waves-effect waves-light orange">
+          <i class="fa fa-github left" aria-hidden="true"></i>GitHub</a>
+      </div>
+      <br><br>
+
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div id="overview" class="section scrollspy">
+    <div class="container">
+
+      <div class="row">
+        <div class="col s12">
+          <h3 class="center thin text-h3">Design, build and manage complex applications with reusable components and dynamic
+            services. Extend and configure deployed systems at runtime.
+          </h3>
+        </div>
+      </div>
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">apps</i></h2>
+            <h5 class="center">Modular</h5>
+
+            <p class="light">Compose your application by creating reusable components called bundles with clear API boundaries.
+              You can take full control over the life-cycle of your bundles and selectively enable specific
+              functionality.
+            </p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">group_work</i></h2>
+            <h5 class="center">Service-Oriented</h5>
+
+            <p class="light">Following best practices, you can publish and consume dynamic services from your
+              bundles. Services are great for specifying your public API and to loosely couple components.
+              Their dynamic nature makes it easy to create applications that adapt to the current environment.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">autorenew</i></h2>
+            <h5 class="center">Dynamic</h5>
+
+            <p class="light">Bundles as well as services are dynamic. They can come and go and you have full
+              control over the life-cycle of the services you publish. Bundles can be added at runtime and
+              activated or deactivated by a management agent in order to re-configure a deployed system.
+            </p>
+          </div>
+        </div>
+      </div>
+
+  
+    <div class="divider"></div>
+
+      
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">navigation</i></h2>
+            <h5 class="center">Based on OSGi</h5>
+
+            <p class="light">We leverage years of industry experience by building upon the
+               <a href="http://osgi.org">OSGi</a> specifications. Although written for the Java
+               Virtual Machine, most of its foundation is language agnostic and can be successfully
+               mapped to a native C/C++ environment.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">devices</i></h2>
+            <h5 class="center">Cross-Platform</h5>
+
+            <p class="light">Multiple platform support is a primary goal. The code base compiles out
+              of the box on many different operating systems, compilers, and architectures.</p>
+          </div>
+        </div>
+
+          <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">gavel</i></h2>
+            <h5 class="center">Apache 2.0 License</h5>
+
+            <p class="light">The software is open-source and licensed under the liberal and
+              commercially friendly <a href="https://github.com/CppMicroServices/CppMicroServices/blob/development/LICENSE">Apache 2.0 License</a>.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div> <!-- section end -->
+
+  <div id="bundles" class="section blue-grey lighten-5 scrollspy">
+    <div class="container">
+
+      <h3 class="header thin">Bundles and Tools</h3>
+
+      <p class="caption">We provide a couple of bundles (components providing specific functionality)
+        and tools to help you build and manage modular applications.
+        While this list is still small, we aim at publishing more bundles that are useful to a broader
+        audience. <a href="https://github.com/CppMicroServices/CppMicroServices/blob/development/CONTRIBUTING.md">Contributions</a> are welcome!</p>
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          
+          <div class="card teal">
+            <div class="card-stacked white-text">
+              <div class="card-content">
+                <span class="badge white-text teal lighten-1" data-badge-caption="(stable)">v2.1</span>
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">my_location</i>
+            Framework</span>
+                <p>The core framework, providing the main API to interact with bundles and services.
+                  It gives you a lot of power and control over the composition and runtime features of
+                  your application.
+                </p>
+              </div>
+              <div class="card-action">
+                <a href="#">Learn more</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col s12 m4">
+          
+          <div class="card teal">
+            <div class="card-stacked white-text">
+              <div class="card-content">
+                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">code</i>
+                Shell</span>
+                <p>The Shell is a command line tool for interacting with a C++ Micro Services applications
+                  using a textual user interface (TUI). It allows you to inspect services and manage bundles.</p>
+              </div>
+              <div class="card-action">
+                <a href="#">Learn more</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col s12 m4">
+          
+          <div class="card teal">
+            <div class="card-stacked white-text">
+              <div class="card-content">
+                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">public</i>
+            Web Console</span>
+                <p>The Web Console is a rich and extensible html management agent. Using this bundle adds
+                  a html frontend to your application, allowing to inspect and manage its configuration
+                  at runtime.
+                </p>
+              </div>
+              <div class="card-action">
+                <a href="#">Learn more</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col s12 m4 offset-m2">
+          
+          <div class="card teal">
+            <div class="card-stacked white-text">
+              <div class="card-content">
+                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">settings</i>
+                Shell Service</span>
+                <p>The shell service provided by this bundle evaluates shell commands and is the standard
+                  back-end for clients like the Shell TUI.</p>
+              </div>
+              <div class="card-action">
+                <a href="#">Learn more</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col s12 m4">
+          
+          <div class="card teal">
+            <div class="card-stacked white-text">
+              <div class="card-content">
+                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">http</i>
+            Http Service</span>
+                <p>This bundle provides a http servlet engine on top of an embedded web server. Use it
+                  to register servlets for particular URLs and provide custom html content.
+                </p>
+              </div>
+              <div class="card-action">
+                <a href="#">Learn more</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Docs -->
+  <div id="docs" class="section scrollspy">
+    <div class="container">
+
+      <h3 class="header thin">Documentation</h3>
+
+      <p class="caption">Our documentation helps you to get started quickly. It covers both high-level
+        concepts and a detailed API reference.
+      </p>
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m6">
+          <div class="card blue-grey lighten-2 white-text">
+            <div class="card-stacked">
+              <div class="card-content">
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">power_settings_new</i>Getting Started</span>
+                <p>Covers supported platforms, the build process, and a quick introduction to the basic features.</p>
+              </div>
+              <div class="card-action">
+                <a href="http://doc.cppmicroservices.org/README.html">Get started...</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col s12 m6">
+          <div class="card blue-grey lighten-2 white-text">
+            <div class="card-stacked">
+              <div class="card-content">
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">star_border</i>Concepts</span>
+                <p>Understanding the fundamental concepts in C++ Micro Services is important. Get an overview
+                  to know what is possible.
+                </p>
+              </div>
+              <div class="card-action">
+                <a href="http://doc.cppmicroservices.org/index.html">Grasp the Concepts...</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col s12 m6">
+          <div class="card blue-grey lighten-2 white-text">
+            <div class="card-stacked">
+              <div class="card-content">
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">bookmark_border</i>Best Practices</span>
+                <p>Read about best practices to see how to solve common problems using fundamental concepts and patterns.
+                </p>
+              </div>
+              <div class="card-action">
+                <a href="http://doc.cppmicroservices.org/index.html">Learn Best Practices...</a>
+              </div>
+            </div>
+          </div>
+        </div>
+     
+        <div class="col s12 m6">
+          <div class="card blue-grey lighten-2 white-text">
+            <div class="card-stacked">
+              <div class="card-content">
+                <span class="card-title valign-wrapper"><i class="material-icons card-icon">description</i>API Reference</span>
+                <p>A detailed API reference is available for looking up particular functions or just browsing
+                  the existing feature set.
+                </p>
+              </div>
+              <div class="card-action">
+                <a href="http://doc.cppmicroservices.org/index.html">Study the API Reference...</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Help -->
+  <div id="help" class="section blue-grey lighten-5 scrollspy">
+    <div class="container">
+
+      <h3 class="header thin">Community</h3>
+
+      <p class="caption">The community is here to help. If the documentation does not answer your questions,
+        have a look at our GitHub Wiki or engage in direct communication. 
+      </p>
+
+      <!--   Icon Section   -->
+      <div class="row">
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center teal-text">
+              <a href="https://github.com/CppMicroServices/CppMicroServices/blob/development/CONTRIBUTING.md"><i class="material-icons teal-text">group</i></a>
+            </h2>
+            <h5 class="center">Contributions</h5>
+
+            <p class="light">We love <a href="https://github.com/CppMicroServices/CppMicroServices/blob/development/CONTRIBUTING.md">contributions</a>
+            and actively encourage them.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center teal-text">
+              <a href="https://github.com/CppMicroServices/CppMicroservices/wiki"><i class="material-icons teal-text">import_contacts</i></a>
+            </h2>
+            <h5 class="center">Wiki</h5>
+
+            <p class="light">The <a href="https://github.com/CppMicroServices/CppMicroservices/wiki">GitHub Wiki</a>
+            contains useful tips and tricks, updated on demand.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center"><a href="http://forum.cppmicroservices.org"><i class="material-icons teal-text">forum</i></a></h2>
+            <h5 class="center">Forum</h5>
+
+            <p class="light">Ask questions in the <a href="http://forum.cppmicroservices.org">Forum</a> or browse
+            previous discussions.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m3">
+          <div class="icon-block">
+            <h2 class="center"><a href="https://github.com/CppMicroServices/CppMicroServices/issues"><i class="material-icons teal-text">feedback</i></a></h2>
+            <h5 class="center">Feedback</h5>
+
+            <p class="light">Post feedback, problem reports, or feature requests in our <a href="https://github.com/CppMicroServices/CppMicroServices/issues">Issue Tracker</a>.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="page-footer blue-grey darken-1">
+    <div class="container thin">
+      <div class="row">
+        <div class="col l3 m6 s12">
+          <h5 class="white-text thin">Main</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Get Started</a></li>
+            <li><a class="white-text" href="#!">GitHub Project</a></li>
+            <li><a class="white-text" href="#!">Download</a></li>
+            <li><a class="white-text" href="#!">Documentation</a></li>
+          </ul>
+        </div>
+        <div class="col l3 m6 s12">
+          <h5 class="white-text thin">Tools &amp; Bundles</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Shell</a></li>
+            <li><a class="white-text" href="#!">Web Console</a></li>
+            <li><a class="white-text" href="#!">Bundles</a></li>
+          </ul>
+        </div>
+        <div class="col l3 m6 s12">
+          <h5 class="white-text thin">Documentation</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Index</a></li>
+            <li><a class="white-text" href="#!">Getting Started</a></li>
+            <li><a class="white-text" href="#!">Concepts</a></li>
+            <li><a class="white-text" href="#!">Best Practices</a></li>
+            <li><a class="white-text" href="#!">API Reference</a></li>
+          </ul>
+        </div>
+        <div class="col l3 m6 s12">
+          <h5 class="white-text thin">Community</h5>
+          <ul>
+            <li><a class="white-text" href="#!">Contribute</a></li>
+            <li><a class="white-text" href="#!">Wiki</a></li>
+            <li><a class="white-text" href="#!">Forum</a></li>
+            <li><a class="white-text" href="#!">Feedback</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      © 2016 CppMicroServices <a class="orange-text text-lighten-2" href="https://github.com/CppMicroServices/CppMicroServices/graphs/contributors">
+      Contributors</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+  </body>
+</html>

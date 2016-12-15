@@ -36,8 +36,7 @@ namespace cppmicroservices {
 
 const Any Properties::emptyAny;
 
-template <typename T>
-void Properties::ConstructProperties(const T& p)
+Properties::Properties(const AnyMap& p)
 {
   if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
   {
@@ -58,16 +57,6 @@ void Properties::ConstructProperties(const T& p)
     keys.push_back(iter.first);
     values.push_back(iter.second);
   }
-}
-
-Properties::Properties(const ServiceProperties& p)
-{
-  ConstructProperties(p);
-}
-    
-Properties::Properties(const std::map<std::string, Any>& p)
-{
-  ConstructProperties(p);
 }
 
 Properties::Properties(Properties&& o)

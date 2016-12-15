@@ -90,15 +90,15 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
     
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(bundle.GetProperties()), false), false);
+  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(bundle.GetHeaders()), false), false);
 }
 
-bool LDAPFilter::Match(const ServiceProperties& dictionary) const
+bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
   return d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), false);
 }
 
-bool LDAPFilter::MatchCase(const ServiceProperties& dictionary) const
+bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
   return d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), true);
 }

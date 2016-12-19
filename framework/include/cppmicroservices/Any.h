@@ -292,14 +292,32 @@ public:
   }
 
   /**
-   * Returns a string representation for the content.
+   * Returns a string representation for the content if it is not empty.
+   *
+   * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
+   * function or specialize the any_value_to_string template function for meaningful output.
+   *
+   * \throws std::logic_error if the Any is empty.
+   */
+  std::string ToString() const
+  {
+    if (Empty())
+    {
+      throw std::logic_error("empty any");
+    }
+    return _content->ToString();
+  }
+
+  /**
+   * Returns a string representation for the content. If the Any is
+   * empty, an empty string is returned.
    *
    * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
    * function or specialize the any_value_to_string template function for meaningful output.
    */
-  std::string ToString() const
+  std::string ToStringNoExcept() const
   {
-    return _content->ToString();
+    return Empty() ? std::string() : _content->ToString();
   }
 
   /**

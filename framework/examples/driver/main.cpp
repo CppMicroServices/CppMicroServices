@@ -26,6 +26,7 @@
 #include "cppmicroservices/BundleImport.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/FrameworkEvent.h"
 
 #include "FrameworkExamplesDriverConfig.h"
 
@@ -79,32 +80,45 @@ int main(int /*argc*/, char** /*argv*/)
 {
   char cmd[256];
 
-  std::unordered_map<std::string, Bundle> symbolicNameToBundle;
-  std::vector<std::string> availableBundles;
+  std::unordered_map<std::string, long> symbolicNameToId;
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
+
+  auto get_bundle = [&framework,&symbolicNameToId](const std::string& str)
+  {
+    std::stringstream ss(str);
+
+    long int id = -1;
+    ss >> id;
+    if (!ss)
+    {
+      id = -1;
+      auto it = symbolicNameToId.find(str);
+      if (it != symbolicNameToId.end())
+      {
+        id = it->second;
+      }
+    }
+
+    return framework.GetBundleContext().GetBundle(id);
+  };
+
   try
   {
     framework.Start();
 
-    availableBundles = GetExampleBundles();
-
-    std::vector<Bundle>  installedBundles;
     /* install all available bundles for this example */
 #if defined (US_BUILD_SHARED_LIBS)
-    for (auto name : availableBundles)
+    for (auto name : GetExampleBundles())
     {
-      auto bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + name + LIB_EXT);
-      installedBundles.insert(installedBundles.end(), bundles.begin(), bundles.end());
+      framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + name + US_DEBUG_POSTFIX + LIB_EXT);
     }
-#else
-    installedBundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usFrameworkExamplesDriver" + EXE_EXT);
 #endif
 
-    for (auto b : installedBundles)
+    for (auto b : framework.GetBundleContext().GetBundles())
     {
-      symbolicNameToBundle.insert(std::make_pair(b.GetSymbolicName(), b));
+      symbolicNameToId[b.GetSymbolicName()] = b.GetBundleId();
     }
   }
   catch (const std::exception& e)
@@ -117,122 +131,41 @@ int main(int /*argc*/, char** /*argv*/)
   while(std::cin.getline(cmd, sizeof(cmd)))
   {
     /*
-     The user can stop the framework so make sure that we start it again
-     otherwise this tool will crash.
+     The user can stop the framework and we handle this like
+     a regular shutdown command.
     */
     if (framework.GetState() != Bundle::STATE_ACTIVE)
     {
-      try
-      {
-        framework.Start();
-      }
-      catch (const std::exception& e)
-      {
-        std::cerr << e.what() << std::endl;
-        return 1;
-      }
+      break;
     }
 
     std::string strCmd(cmd);
-    if (strCmd == "q")
+    if (strCmd == "shutdown")
     {
       break;
     }
     else if (strCmd == "h")
     {
-      std::cout << std::left << std::setw(15) << "h" << " This help text\n"
-                << std::setw(15) << "l <id | name>" << " Start the bundle with id <id> or name <name>\n"
-                << std::setw(15) << "u <id>" << " Stop the bundle with id <id>\n"
-                << std::setw(15) << "s" << " Print status information\n"
-                << std::setw(15) << "q" << " Quit\n" << std::flush;
+      std::cout << std::left << std::setw(20) << "h" << " This help text\n"
+                << std::setw(20) << "start <id | name>" << " Start the bundle with id <id> or name <name>\n"
+                << std::setw(20) << "stop <id | name>" << " Stop the bundle with id <id> or name <name>\n"
+                << std::setw(20) << "status" << " Print status information\n"
+                << std::setw(20) << "shutdown" << " Shut down the framework\n" << std::flush;
     }
-    else if (strCmd.find("l ") != std::string::npos)
+    else if (strCmd.find("start ") != std::string::npos)
     {
-      std::string idOrName;
-      idOrName.assign(strCmd.begin()+2, strCmd.end());
-      std::stringstream ss(idOrName);
-
-      long int id = -1;
-      ss >> id;
-      if (id > 0)
-      {
-        auto bundle = framework.GetBundleContext().GetBundle(id);
-        if (!bundle)
-        {
-          std::cerr << "Error: unknown id" << std::endl;
-        }
-        else
-        {
-          try
-          {
-            /* starting an already started bundle does nothing.
-                There is no harm in doing it. */
-            if (bundle.GetState() == Bundle::STATE_ACTIVE)
-            {
-              std::cout << "Info: bundle already active" << std::endl;
-            }
-            bundle.Start();
-          }
-          catch (const std::exception& e)
-          {
-            std::cerr << e.what() << std::endl;
-          }
-        }
-      }
-      else
-      {
-        std::vector<Bundle> bundles;
-        if (symbolicNameToBundle.find(idOrName) == symbolicNameToBundle.end())
-        {
-          try
-          {
-              /* Installing a bundle can't be done by id since that is a
-                    framework generated piece of information. */
-#if defined (US_BUILD_SHARED_LIBS)
-            bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + LIB_PREFIX + idOrName + LIB_EXT);
-#else
-            bundles = framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + "usFrameworkExamplesDriver" + EXE_EXT);
-#endif
-          }
-          catch (const std::exception& e)
-          {
-            std::cerr << e.what() << std::endl;
-          }
-        }
-
-        for (auto& bundle : bundles)
-        {
-          try
-          {
-            /* starting an already started bundle does nothing.
-            There is no harm in doing it. */
-            if (bundle.GetState() == Bundle::STATE_ACTIVE)
-            {
-              std::cout << "Info: bundle " << bundle.GetBundleId() << " already active" << std::endl;
-            }
-            bundle.Start();
-          }
-          catch (const std::exception& e)
-          {
-            std::cerr << e.what() << std::endl;
-          }
-        }
-      }
-    }
-    else if (strCmd.find("u ") != std::string::npos)
-    {
-      std::stringstream ss(strCmd);
-      ss.ignore(2);
-
-      long int id = -1;
-      ss >> id;
-
-      auto bundle = framework.GetBundleContext().GetBundle(id);
+      auto bundle = get_bundle(strCmd.substr(6));
       if (bundle)
       {
         try
         {
-          bundle.Stop();
+          /* starting an already started bundle does nothing.
+             There is no harm in doing it. */
+          if (bundle.GetState() == Bundle::STATE_ACTIVE)
+          {
+            std::cout << "Info: bundle already active" << std::endl;
+          }
+          bundle.Start();
         }
         catch (const std::exception& e)
         {
@@ -241,29 +174,50 @@ int main(int /*argc*/, char** /*argv*/)
       }
       else
       {
-        std::cerr << "Error: unknown id" << std::endl;
+        std::cerr << "Error: unknown id or symbolic name" << std::endl;
       }
     }
-    else if (strCmd == "s")
+    else if (strCmd.find("stop ") != std::string::npos)
     {
-      auto bundles = framework.GetBundleContext().GetBundles();
+      auto bundle = get_bundle(strCmd.substr(5));
+      if (bundle)
+      {
+        try
+        {
+          bundle.Stop();
+          if (bundle.GetBundleId() == 0)
+          {
+            break;
+          }
+        }
+        catch (const std::exception& e)
+        {
+          std::cerr << e.what() << std::endl;
+        }
+      }
+      else
+      {
+        std::cerr << "Error: unknown id or symbolic name" << std::endl;
+      }
+    }
+    else if (strCmd == "status")
+    {
+      std::map<long, Bundle> bundles;
+      for (auto& b : framework.GetBundleContext().GetBundles())
+      {
+        bundles.insert(std::make_pair(b.GetBundleId(), b));
+      }
 
       std::cout << std::left;
 
-      std::cout << "Id | " << std::setw(20) << "Name" << " | " << std::setw(9) << "Status" << std::endl;
+      std::cout << "Id | " << std::setw(20) << "Symbolic Name" << " | " << std::setw(9) << "State" << std::endl;
       std::cout << "-----------------------------------\n";
-
-      for (std::vector<std::string>::const_iterator nameIter = availableBundles.begin();
-           nameIter != availableBundles.end(); ++nameIter)
-      {
-        std::cout << " - | " << std::setw(20) << *nameIter << " | " << std::setw(9) << "-" << std::endl;
-      }
 
       for (auto& bundle : bundles)
       {
-        std::cout << std::right << std::setw(2) << bundle.GetBundleId() << std::left << " | ";
-        std::cout << std::setw(20) << bundle.GetSymbolicName() << " | ";
-        std::cout << std::setw(9) << (bundle.GetState());
+        std::cout << std::right << std::setw(2) << bundle.first << std::left << " | ";
+        std::cout << std::setw(20) << bundle.second.GetSymbolicName() << " | ";
+        std::cout << std::setw(9) << (bundle.second.GetState());
         std::cout << std::endl;
       }
     }
@@ -273,6 +227,9 @@ int main(int /*argc*/, char** /*argv*/)
     }
     std::cout << "> ";
   }
+
+  framework.Stop();
+  framework.WaitForStop(std::chrono::seconds(2));
 
   return 0;
 }

@@ -58,36 +58,37 @@ driver program called `usFrameworkExamplesDriver`:
 \verbatim
 CppMicroServices-build> bin/usFrameworkExamplesDriver
 > h
-h               This help text
-l <id | name>   Start the bundle with id <id> or name <name>
-u <id>          Stop the bundle with id <id>
-s               Print status information
-q               Quit
->
+h                    This help text
+start <id | name>    Start the bundle with id <id> or name <name>
+stop <id | name>     Stop the bundle with id <id> or name <name>
+status               Print status information
+shutdown             Shut down the framework
 \endverbatim
 
-Typing `s` at the command prompt lists the available, started, and stopped bundles.
-To start the eventlistener bundle, type `l eventlistener` at the command prompt:
+Typing `status` at the command prompt lists all installed bundles and their current
+state. Note that the driver program pre-installs the example bundles, so they will
+be listed initially with the `INSTALLED` state.
+To start the eventlistener bundle, type `start eventlistener` at the command prompt:
 
 \verbatim
-> s
-Id | Name                 | Status
+> status
+Id | Symbolic Name        | State
 -----------------------------------
- - | dictionaryclient     | -
- - | dictionaryclient2    | -
- - | dictionaryclient3    | -
- - | dictionaryservice    | -
- - | eventlistener        | -
- - | frenchdictionary     | -
- - | spellcheckclient     | -
- - | spellcheckservice    | -
- 1 | CppMicroServices     | ACTIVE
-> l eventlistener
+0 | system_bundle        | ACTIVE
+1 | eventlistener        | INSTALLED
+2 | dictionaryservice    | INSTALLED
+3 | frenchdictionary     | INSTALLED
+4 | dictionaryclient     | INSTALLED
+5 | dictionaryclient2    | INSTALLED
+6 | dictionaryclient3    | INSTALLED
+7 | spellcheckservice    | INSTALLED
+8 | spellcheckclient     | INSTALLED
+> start eventlistener
 Starting to listen for service events.
 >
 \endverbatim
 
-The above command started the eventlistener bundle (by loading its shared library).
+The above command started the eventlistener bundle (implicitly loading its shared library).
 Keep in mind, that this bundle will not do much at this point since it only
 listens for service events and we are not registering any services. In the next
 example we will register a service that will generate an event for this bundle to

@@ -22,6 +22,8 @@
 
 #include "cppmicroservices/Any.h"
 
+#include <stdexcept>
+
 namespace cppmicroservices {
 
 std::string any_value_to_string(const Any& any)
@@ -54,6 +56,20 @@ std::ostream& any_value_to_json(std::ostream& os, const std::string& val)
 std::ostream& any_value_to_json(std::ostream& os, bool val)
 {
   return os << (val ? "true" : "false");
+}
+
+std::string Any::ToString() const
+{
+  if (Empty())
+  {
+    throw std::logic_error("empty any");
+  }
+  return _content->ToString();
+}
+
+std::string Any::ToStringNoExcept() const
+{
+  return Empty() ? std::string() : _content->ToString();
 }
 
 }

@@ -25,6 +25,7 @@
 #include "TestingMacros.h"
 
 #include <limits>
+#include <stdexcept>
 
 using namespace cppmicroservices;
 

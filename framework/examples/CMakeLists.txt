@@ -61,15 +61,26 @@ function(CreateExample _name)
 
 endfunction()
 
-add_subdirectory(eventlistener)
-add_subdirectory(dictionaryservice)
-add_subdirectory(frenchdictionary)
-add_subdirectory(dictionaryclient)
-add_subdirectory(dictionaryclient2)
-add_subdirectory(dictionaryclient3)
-add_subdirectory(spellcheckservice)
-add_subdirectory(spellcheckclient)
+set (_example_names
+  eventlistener
+  dictionaryservice
+  frenchdictionary
+  dictionaryclient
+  dictionaryclient2
+  dictionaryclient3
+  spellcheckservice
+  spellcheckclient
+  )
+
+foreach(_example ${_example_names})
+  add_subdirectory(${_example})
+endforeach()
+
 add_subdirectory(driver)
+
+foreach(_example ${_example_names})
+  add_dependencies(us${PROJECT_NAME}Driver Example-${_example})
+endforeach()
 
 #-----------------------------------------------------------------------------
 # Test if examples compile against an install tree and if the

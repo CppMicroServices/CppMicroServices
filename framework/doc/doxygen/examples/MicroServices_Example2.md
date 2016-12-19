@@ -37,50 +37,60 @@ it is beneficial to provide the service interface and its implementation(s)
 in separate bundles. In such a scenario, clients of a service will only
 have a link-time dependency on the shared library providing the service interface
 (because of the out-of-line destructor) but not on any bundles containing
-service implementations. This often leads to bundles which do not export
-any symbols at all and hence need to be loaded into the running process
-manually.
+service implementations.
 
 For an introduction how to compile our source code, see \ref MicroServices_Example1.
 
 After running the `usFrameworkExamplesDriver` program we should make sure that the
-bundle from Example 1 is active. We can use the `s` shell command to get
+bundle from Example 1 is active. We can use the `status` shell command to get
 a list of all bundles, their state, and their bundle identifier number.
 If the Example 1 bundle is not active, we should start the bundle using the
-start command and the bundle's identifier number or name that is displayed
-by the `s` command. Now we can start our dictionary service bundle by typing
-the `l dictionaryservice` command:
+`start` command and the bundle's identifier number or symbolic name that is displayed
+by the `status` command. Now we can start our dictionary service bundle by typing
+the `start dictionaryservice` command:
 
 \verbatim
 CppMicroServices-build> bin/usFrameworkExamplesDriver
-> s
-Id | Name                 | Status
+> status
+Id | Symbolic Name        | State
 -----------------------------------
- - | dictionaryservice    | -
- - | eventlistener        | -
- 1 | CppMicroServices     | ACTIVE
-> l eventlistener
+ 0 | system_bundle        | ACTIVE
+ 1 | eventlistener        | INSTALLED
+ 2 | dictionaryservice    | INSTALLED
+ 3 | frenchdictionary     | INSTALLED
+ 4 | dictionaryclient     | INSTALLED
+ 5 | dictionaryclient2    | INSTALLED
+ 6 | dictionaryclient3    | INSTALLED
+ 7 | spellcheckservice    | INSTALLED
+ 8 | spellcheckclient     | INSTALLED
+> start eventlistener
 Starting to listen for service events.
-> l dictionaryservice
+> start dictionaryservice
 Ex1: Service of type IDictionaryService registered.
-> s
-Id | Name                 | Status
+> status
+Id | Symbolic Name        | State
 -----------------------------------
- 1 | CppMicroServices     | ACTIVE
- 2 | Event Listener       | ACTIVE
- 3 | Dictionary Service   | ACTIVE
+ 0 | system_bundle        | ACTIVE
+ 1 | eventlistener        | ACTIVE
+ 2 | dictionaryservice    | ACTIVE
+ 3 | frenchdictionary     | INSTALLED
+ 4 | dictionaryclient     | INSTALLED
+ 5 | dictionaryclient2    | INSTALLED
+ 6 | dictionaryclient3    | INSTALLED
+ 7 | spellcheckservice    | INSTALLED
+ 8 | spellcheckclient     | INSTALLED
 >
 \endverbatim
 
-To stop the bundle, use the `u <id>` command. If the bundle from
+To stop the bundle, use the `stop <id | name>` command. If the bundle from
 \ref MicroServices_Example1 "Example 1" is still active,
 then we should see it print out the details of the service event it receives
 when our new bundle registers its dictionary service. Using the `usFrameworkExamplesDriver`
-commands `u` and `l` we can stop and start it at will, respectively. Each
+commands `stop` and `start` we can stop and start it at will, respectively. Each
 time we start and stop our dictionary service bundle, we should see the details
 of the associated service event printed from the bundle from Example 1. In
 \ref MicroServices_Example3 "Example 3", we will create a client for our
-dictionary service. To exit `usFrameworkExamplesDriver`, we use the `q` command.
+dictionary service. To exit `usFrameworkExamplesDriver`, we use the `shutdown` command.
 
 Next: \ref MicroServices_Example2b
 

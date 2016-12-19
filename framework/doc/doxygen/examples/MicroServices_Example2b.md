@@ -25,51 +25,61 @@ need to make sure that the proper include paths and linker dependencies are set:
 \include frenchdictionary/CMakeLists.txt
 
 After running the `usFrameworkExamplesDriver` program we should make sure that the
-bundle from Example 1 is active. We can use the `s` shell command to get
+bundle from Example 1 is active. We can use the `status` shell command to get
 a list of all bundles, their state, and their bundle identifier number.
 If the Example 1 bundle is not active, we should start the bundle using the
 start command and the bundle's identifier number or name that is displayed
-by the `s` command. Now we can start our dictionary service bundle by typing
-the `l frenchdictionary` command:
+by the `status` command. Now we can start our dictionary service bundle by typing
+the `start frenchdictionary` command:
 
 \verbatim
 CppMicroServices-build> bin/usFrameworkExamplesDriver
-> s
-Id | Name                 | Status
+> status
+Id | Symbolic Name        | State
 -----------------------------------
- - | dictionaryservice    | -
- - | eventlistener        | -
- - | frenchdictionary     | -
- 1 | CppMicroServices     | ACTIVE
-> l eventlistener
+ 0 | system_bundle        | ACTIVE
+ 1 | eventlistener        | INSTALLED
+ 2 | dictionaryservice    | INSTALLED
+ 3 | frenchdictionary     | INSTALLED
+ 4 | dictionaryclient     | INSTALLED
+ 5 | dictionaryclient2    | INSTALLED
+ 6 | dictionaryclient3    | INSTALLED
+ 7 | spellcheckservice    | INSTALLED
+ 8 | spellcheckclient     | INSTALLED
+> start eventlistener
 Starting to listen for service events.
-> l frenchdictionary
+> start frenchdictionary
 Ex1: Service of type IDictionaryService registered.
-Ex1: Service of type IDictionaryService registered.
-> s
-Id | Name                 | Status
+> status
+Id | Symbolic Name        | State
 -----------------------------------
- 1 | CppMicroServices     | ACTIVE
- 2 | Event Listener       | ACTIVE
- 3 | Dictionary Service   | ACTIVE
- 4 | French Dictionary    | ACTIVE
+ 0 | system_bundle        | ACTIVE
+ 1 | eventlistener        | ACTIVE
+ 2 | dictionaryservice    | INSTALLED
+ 3 | frenchdictionary     | ACTIVE
+ 4 | dictionaryclient     | INSTALLED
+ 5 | dictionaryclient2    | INSTALLED
+ 6 | dictionaryclient3    | INSTALLED
+ 7 | spellcheckservice    | INSTALLED
+ 8 | spellcheckclient     | INSTALLED
+
 >
 \endverbatim
 
-To stop the bundle, use the `u <id>` command. If the bundle from
+To stop the bundle, use the `stop <id | name>` command. If the bundle from
 \ref MicroServices_Example1 "Example 1" is still active,
 then we should see it print out the details of the service event it receives
 when our new bundle registers its dictionary service. Using the `usFrameworkExamplesDriver`
-commands `u` and `l` we can stop and start it at will, respectively. Each
+commands `stop` and `start` we can stop and start it at will, respectively. Each
 time we start and stop our dictionary service bundle, we should see the details
 of the associated service event printed from the bundle from Example 1. In
 \ref MicroServices_Example3 "Example 3", we will create a client for our
-dictionary service. To exit `usFrameworkExamplesDriver`, we use the `q` command.
+dictionary service. To exit `usFrameworkExamplesDriver`, we use the `shutdown` command.
 
 \note Because our french dictionary bundle has a link dependency on the
-dictionary service bundle from Example 2, this bundle is automatically loaded
-by the operating system loader. Unloading it will only succeed if there are
-no other dependent bundles like our french dictionary bundle currently loaded.
+dictionary service bundle from Example 2, this bundle`s shared library
+is automatically loaded by the operating system loader. However, its status
+remains `INSTALLED` until it is exlicitly started.
 
 Next: \ref MicroServices_Example3
 

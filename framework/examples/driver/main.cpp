@@ -205,7 +205,7 @@ int main(int /*argc*/, char** /*argv*/)
       std::map<long, Bundle> bundles;
       for (auto& b : framework.GetBundleContext().GetBundles())
       {
-        bundles.emplace(b.GetBundleId(), b);
+        bundles.insert(std::make_pair(b.GetBundleId(), b));
       }
 
       std::cout << std::left;

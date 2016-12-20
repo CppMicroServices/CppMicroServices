@@ -4,6 +4,7 @@ set(${PROJECT_NAME}_MAJOR_VERSION 2)
 set(${PROJECT_NAME}_MINOR_VERSION 99)
 set(${PROJECT_NAME}_PATCH_VERSION 0)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+set(US_GLOBAL_VERSION_SUFFIX 3)
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
@@ -189,6 +190,8 @@ elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
 
+us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
+
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
@@ -199,14 +202,14 @@ if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir bin/)
   set(default_archive_install_dir lib/)
-  set(default_header_install_dir include/)
-  set(default_auxiliary_install_dir share/)
+  set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
 else()
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir lib/)
   set(default_archive_install_dir lib/)
-  set(default_header_install_dir include/)
-  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER})
+  set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
@@ -361,8 +364,8 @@ endif()
 if(MINGW)
   # suppress warnings about auto imported symbols
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
-  # we need to define a Windows version
-  set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
+  # we need to define a Windows version (Windows Vista)
+  set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
@@ -460,7 +463,8 @@ set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set(PACKAGE_CONFIG_CMAKE_DIR ${US_CMAKE_DIR})
 
-set(US_RCC_EXECUTABLE_NAME usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
+set(US_RCC_EXECUTABLE_TARGET usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
+set(US_RCC_EXECUTABLE_OUTPUT_NAME ${US_RCC_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
@@ -471,9 +475,20 @@ configure_file(
 set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/GlobalConfig.h")
 configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
 include_directories(${US_INCLUDE_DIRS})
 
 add_subdirectory(tools/rc)
+
+export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
 
 add_subdirectory(framework)
 add_subdirectory(httpservice)
@@ -489,18 +504,8 @@ add_subdirectory(tools/shell)
 add_subdirectory(doc)
 
 #-----------------------------------------------------------------------------
-# Last configuration and install steps
+# Installation
 #-----------------------------------------------------------------------------
-
-# Version information
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-  @ONLY
-  )
-
-export(TARGETS ${US_RCC_EXECUTABLE_NAME}
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
 
 if(NOT US_NO_INSTALL)
 

@@ -48,7 +48,6 @@ if(WIN32)
   list(APPEND compile_definitions WIN32)
 elseif(LINUX)
   list(APPEND compile_definitions LINUX)
-
 elseif(APPLE)
   list(APPEND compile_definitions DARWIN)
 endif()
@@ -75,6 +74,10 @@ usMacroCreateBundle(HttpService
 
 if(CMAKE_THREAD_LIBS_INIT)
   target_link_libraries(usHttpService ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+if(MINGW)
+  target_link_libraries(usHttpService Ws2_32)
 endif()
 
 # Needed for clock_gettime with glibc < 2.17

@@ -10,6 +10,11 @@ if(MSVC)
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " /wd4311 /wd4312 /wd4996"
   )
+elseif(MINGW)
+  set_property(
+    SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
+    PROPERTY COMPILE_FLAGS " -DUSE_STRLWR=0"
+  )
 endif()
 
 usFunctionCheckCompilerFlags(-Wno-switch _no_switch_flag)

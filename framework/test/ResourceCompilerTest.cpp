@@ -482,7 +482,7 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
 
   testEscapePath();
 
-  auto rcbinpath = testing::BIN_PATH + testing::DIR_SEP + "usResourceCompiler" + testing::EXE_EXT;
+  auto rcbinpath = testing::RCC_PATH;
   /*
   * If ResourceCompiler executable is not found, we can't run the tests, we
   * mark it as a failure and exit

@@ -191,6 +191,7 @@ endif()
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
+us_cache_var(US_ENABLE_CCOV OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
@@ -284,6 +285,7 @@ set(US_CXX11_FLAGS )
 set(US_CXX11_LINK_FLAGS )
 set(US_CXX_TSAN_FLAGS )
 set(US_TSAN_LINK_FLAGS )
+set(US_CXX_CCOV_FLAGS )
 
 if(MSVC)
   set(disabled_warnings
@@ -356,6 +358,13 @@ else()
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
   endif()
+  
+  set(CMAKE_REQUIRED_LIBRARIES "--coverage")
+  usFunctionCheckCompilerFlags("--coverage" US_CXX_CCOV_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_CCOV_FLAGS AND US_ENABLE_CCOV)
+    message(WARNING "Code coverage requested, but compiler does not recognize it")
+  endif()
 endif()
 
 if(MINGW)
@@ -372,6 +381,10 @@ if(US_ENABLE_THREADING_SUPPORT)
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
+endif()
+
+if(US_ENABLE_CCOV)
+  set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_CCOV_FLAGS}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
@@ -402,6 +415,10 @@ endif()
 
 if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
+endif()
+
+if(US_CXX_CCOV_FLAGS AND US_ENABLE_CCOV)
+  set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_CXX_CCOV_FLAGS}")
 endif()
 
 usFunctionCheckResourceLinking()

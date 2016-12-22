@@ -35,7 +35,7 @@ macro(build_and_test)
     ctest_memcheck()
   endif()
 
-  if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
+  if(CTEST_COVERAGE_COMMAND)
     ctest_coverage()
   else()
     message(FATAL_ERROR "CMake could not find coverage tool")

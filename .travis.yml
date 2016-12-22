@@ -68,6 +68,6 @@ script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
-  - cd $BUILD_DIR
+  - cd /tmp/cppmicroservices_builds
   - bash <(curl -s https://codecov.io/bash) -X gcov
 

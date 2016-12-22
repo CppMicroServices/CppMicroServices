@@ -37,6 +37,8 @@ macro(build_and_test)
 
   if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
     ctest_coverage()
+  else()
+    message(FATAL_ERROR "CMake could not find coverage tool")
   endif()
 
   #ctest_submit()

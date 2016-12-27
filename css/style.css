@@ -92,3 +92,9 @@ nav ul a.active {
 .btn-large {
   margin: 0 0.5rem;
 }
+
+.disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.6;
+}

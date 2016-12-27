@@ -1,0 +1,100 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+a {
+  color: #ff9800;
+}
+
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+nav .brand-logo {
+  font-size: 1.8rem;
+  font-weight: 200;
+  letter-spacing: 4px;
+}
+
+nav {
+	box-shadow:none !important;
+	-webkit-box-shadow:none !important
+}
+
+nav ul a {
+  font-weight: 200;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+nav ul a.active {
+  font-weight: 400;
+}
+
+.text-h3 {
+  line-height: 4rem;
+  margin-bottom: 4%;
+}
+
+.card-icon {
+  padding-right: 16px;
+}
+
+.chip a {
+  color: white;
+  text-decoration: underline;
+}
+
+.caption {
+  font-weight: 300;
+  font-size: 1.25rem;
+  margin-bottom: 30px;
+}
+
+.card .card-action a {
+  color: #ffc107 !important;
+}
+
+.card .card-action a:hover {
+  color: #ffd54f !important;
+}
+
+.chip.large {
+  height: 40px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 40px;
+  padding: 0 12px;
+  border-radius: 20px;
+  margin-right: 5px;
+}
+
+.chip.large .left-icon {
+    float: left;
+    font-size: 22px;
+    line-height: 40px;
+    padding-right: 12px;
+}
+
+.chip.large .close {
+    font-size: 18px;
+    line-height: 40px;
+    padding-left: 12px;
+}
+
+.btn-large {
+  margin: 0 0.5rem;
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.6;
+}

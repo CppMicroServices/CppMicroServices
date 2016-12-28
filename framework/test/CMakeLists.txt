@@ -94,7 +94,7 @@ usFunctionGenerateBundleInit(_srcs)
 usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs} ${_third_party_srcs})
 # Needed for ResourceCompilerTest
-add_dependencies(${_test_driver} ${US_RCC_EXECUTABLE_NAME})
+add_dependencies(${_test_driver} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
 if(NOT US_BUILD_SHARED_LIBS)

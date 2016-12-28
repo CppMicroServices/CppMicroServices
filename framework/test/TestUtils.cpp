@@ -135,7 +135,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + libName + LIB_EXT);
+        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + US_LIB_PREFIX + libName + US_LIB_EXT);
 #else
         bundles = frameworkCtx.GetBundles();
 #endif
@@ -152,7 +152,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     return {};
 }
 
-std::string GetTempDirectory() 
+std::string GetTempDirectory()
 {
 #if defined (US_PLATFORM_WINDOWS)
   std::wstring temp_dir;

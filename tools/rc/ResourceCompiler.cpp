@@ -57,7 +57,7 @@ static std::string get_error_str()
                             NULL,
                             dw,
                             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                            (LPTSTR) &lpMsgBuf,
+                            reinterpret_cast<LPTSTR>(&lpMsgBuf),
                             0,
                             NULL );
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER

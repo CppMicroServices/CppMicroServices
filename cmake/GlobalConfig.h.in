@@ -55,6 +55,10 @@
 #cmakedefine US_BIG_ENDIAN
 #cmakedefine US_LITTLE_ENDIAN
 
+#define US_LIB_PREFIX "@CMAKE_SHARED_LIBRARY_PREFIX@"
+#define US_LIB_EXT "@CMAKE_SHARED_LIBRARY_SUFFIX@"
+#define US_EXE_EXT "@CMAKE_EXECUTABLE_SUFFIX@"
+
 ///-------------------------------------------------------------------
 // Macros for import/export declarations
 //-------------------------------------------------------------------

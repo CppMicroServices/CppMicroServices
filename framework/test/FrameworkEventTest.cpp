@@ -97,7 +97,7 @@ int FrameworkEventTest(int /*argc*/, char* /*argv*/[])
     exception_caught = true;
 
     US_TEST_CONDITION_REQUIRED(ex.what() == std::string("test exception"), "Test FrameworkEvent::Type::FRAMEWORK_ERROR exception");
-    US_TEST_CONDITION_REQUIRED(typeid(std::runtime_error).name() == typeid(ex).name(), "Test that the correct exception type was thrown");
+    US_TEST_CONDITION_REQUIRED(std::string(typeid(std::runtime_error).name()) == typeid(ex).name(), std::string("Test that the correct exception type was thrown: ") + typeid(std::runtime_error).name() + " == " + typeid(ex).name());
   }
   US_TEST_CONDITION_REQUIRED(exception_caught, "Test throw/catch a FrameworkEvent exception");
 

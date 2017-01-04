@@ -148,7 +148,7 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #define CLOCK_REALTIME (2)
 #endif
 
-#if (_DARWIN_FEATURE_CLOCK_GETTIME == 0)
+#if defined(_DARWIN_FEATURE_CLOCK_GETTIME) && (_DARWIN_FEATURE_CLOCK_GETTIME == 0)
 /* clock_gettime is not implemented on OSX */
 int clock_gettime(int clk_id, struct timespec *t);
 
@@ -193,7 +193,7 @@ clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
-#endif // _DARWIN_FEATURE_CLOCK_GETTIME == 0
+#endif // defined(_DARWIN_FEATURE_CLOCK_GETTIME) && (_DARWIN_FEATURE_CLOCK_GETTIME == 0)
 #endif
 
 

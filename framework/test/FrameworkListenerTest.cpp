@@ -47,9 +47,9 @@ public:
 
   bool CheckEvents(const std::vector<FrameworkEvent>& events)
   {
-	bool listenState = true; // assume success
-	if (events.size() != _events.size())
-	{
+    bool listenState = true; // assume success
+    if (events.size() != _events.size())
+    {
       listenState = false;
       US_TEST_OUTPUT( << "*** Framework event mismatch ***\n expected "
                         << events.size() << " event(s)\n found "
@@ -62,23 +62,23 @@ public:
         const FrameworkEvent& pR = i < _events.size() ? _events[i] : FrameworkEvent();
         US_TEST_OUTPUT( << " - " << pE << " - " << pR);
       }
-	}
-	else
-	{
-	  for (std::size_t i = 0; i < events.size(); ++i)
-	  {
-		const FrameworkEvent& pE = events[i];
-		const FrameworkEvent& pR = _events[i];
-		if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle())
-		{
+    }
+    else
+    {
+      for (std::size_t i = 0; i < events.size(); ++i)
+      {
+        const FrameworkEvent& pE = events[i];
+        const FrameworkEvent& pR = _events[i];
+        if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle())
+        {
           listenState = false;
-		  US_TEST_OUTPUT( << "*** Wrong framework event ***\n found " << pR << "\n expected " << pE);
-		}
-	  }
-	}
+          US_TEST_OUTPUT( << "*** Wrong framework event ***\n found " << pR << "\n expected " << pE);
+        }
+      }
+    }
 
-	_events.clear();
-	return listenState;
+    _events.clear();
+    return listenState;
   }
 
   void frameworkEvent(const FrameworkEvent& evt)
@@ -96,10 +96,10 @@ private:
   std::vector<FrameworkEvent> _events;
 };
 
-void testStartStopFrameworkEvents() 
+void testStartStopFrameworkEvents()
 {
   auto f = FrameworkFactory().NewFramework();
-  
+
   TestFrameworkListener l;
   f.Init();
   f.GetBundleContext().AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
@@ -111,7 +111,7 @@ void testStartStopFrameworkEvents()
   US_TEST_CONDITION_REQUIRED(l.CheckEvents(events), "Test for the correct number and order of Framework start/stop events.");
 }
 
-void testAddRemoveFrameworkListener() 
+void testAddRemoveFrameworkListener()
 {
   auto f = FrameworkFactory().NewFramework();
   f.Init();
@@ -139,10 +139,10 @@ void testAddRemoveFrameworkListener()
   fCtx = f.GetBundleContext();
   auto fl = [&count](const FrameworkEvent& ) { ++count; };
   fCtx.AddFrameworkListener(fl);
-  
+
   f.Start();
   US_TEST_CONDITION(count == 1, "Test listener addition");
-  
+
   fCtx.RemoveFrameworkListener(fl);
   // note: The Framework STARTED event is only sent once. Stop and Start the framework to generate another one.
   f.Stop();
@@ -185,7 +185,7 @@ void testAddRemoveFrameworkListener()
   // end @fixme issue #95
 }
 
-void testFrameworkListenersAfterFrameworkStop() 
+void testFrameworkListenersAfterFrameworkStop()
 {
   auto f = FrameworkFactory().NewFramework();
   f.Init();
@@ -206,7 +206,7 @@ void testFrameworkListenersAfterFrameworkStop()
   US_TEST_CONDITION(events == 1 , "Test that listeners were released on Framework Stop");
 }
 
-void testFrameworkListenerThrowingInvariant() 
+void testFrameworkListenerThrowingInvariant()
 {
   /*
     The Framework must publish a FrameworkEvent.ERROR if a callback to an event listener generates an exception - except
@@ -224,7 +224,7 @@ void testFrameworkListenerThrowingInvariant()
   // a framework listener.
   auto f = FrameworkFactory().NewFramework(std::map<std::string, cppmicroservices::Any>{ { Constants::FRAMEWORK_LOG, true } }, &sink);
   f.Init();
-  
+
   bool fwk_error_received(false);
   std::string exception_string("bad callback");
   auto listener = [&fwk_error_received, &exception_string](const FrameworkEvent& evt)
@@ -237,13 +237,13 @@ void testFrameworkListenerThrowingInvariant()
       {
         if (FrameworkEvent::Type::FRAMEWORK_ERROR == evt.GetType() &&
             e.what() == exception_string &&
-            typeid(e).name() == typeid(std::runtime_error).name())
+            std::string(typeid(e).name()) == typeid(std::runtime_error).name())
         {
           fwk_error_received = true;
         }
       }
     };
- 
+
   f.GetBundleContext().AddFrameworkListener(listener);
   // @todo A STARTING BundleEvent should be sent before the Framework runs its Activator (in Start()). Apache Felix does it this way.
   f.Start();
@@ -326,7 +326,7 @@ int FrameworkListenerTest(int /*argc*/, char* /*argv*/[])
   auto lambda2 = [](const FrameworkEvent&) {};
   US_TEST_CONDITION((typeid(lambda1) != typeid(lambda2)), "Test lambda type info (in)equality");
   US_TEST_CONDITION(
-      std::function<void(const FrameworkEvent&)>(lambda1).target<void(const FrameworkEvent&)>() == std::function<void(const FrameworkEvent&)>(lambda2).target<void(const FrameworkEvent&)>(), 
+      std::function<void(const FrameworkEvent&)>(lambda1).target<void(const FrameworkEvent&)>() == std::function<void(const FrameworkEvent&)>(lambda2).target<void(const FrameworkEvent&)>(),
       "Test std::function target equality"
   );
 

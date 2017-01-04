@@ -24,10 +24,9 @@
 #define CPPMICROSERVICES_PROPERTIES_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/ServiceProperties.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/detail/Threads.h"
 
-#include <map>
 #include <string>
 #include <vector>
 
@@ -38,8 +37,7 @@ class Properties : public detail::MultiThreaded<>
 
 public:
 
-  explicit Properties(const ServiceProperties& props);
-  Properties(const std::map<std::string, Any>& p);
+  explicit Properties(const AnyMap& props);
 
   Properties(Properties&& o);
   Properties& operator=(Properties&& o);
@@ -60,10 +58,6 @@ private:
   std::vector<Any> values;
 
   static const Any emptyAny;
-
-  template <typename T>
-  void ConstructProperties(const T& p);
-
 };
 
 class PropertiesHandle

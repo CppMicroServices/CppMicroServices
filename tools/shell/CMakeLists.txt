@@ -14,5 +14,13 @@ if(MSVC)
   )
 endif()
 
-add_executable(usShell ${srcs})
-target_link_libraries(usShell ${US_LIBRARIES})
+set(US_SHELL_EXECUTABLE_NAME usShell${US_GLOBAL_VERSION_SUFFIX})
+add_executable(${US_SHELL_EXECUTABLE_NAME} ${srcs})
+target_link_libraries(${US_SHELL_EXECUTABLE_NAME} ${US_LIBRARIES})
+
+if(NOT US_NO_INSTALL)
+  install(TARGETS ${US_SHELL_EXECUTABLE_NAME}
+          EXPORT ${PROJECT_NAME}Targets
+          FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
+          RUNTIME DESTINATION bin ${US_SDK_INSTALL_COMPONENT})
+endif()

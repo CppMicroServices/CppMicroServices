@@ -56,7 +56,11 @@
   #include <Shlwapi.h>
   #include <crtdbg.h>
   #include <direct.h>
+#ifdef __MINGW32__
+  #include <dirent.h>
+#else
   #include "dirent_win32.h"
+#endif
 
   #define US_STAT struct _stat
   #define us_stat _stat
@@ -401,7 +405,7 @@ std::string GetLastErrorStr()
                 NULL,
                 dw,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR) &lpMsgBuf,
+                reinterpret_cast<LPTSTR>(&lpMsgBuf),
                 0, NULL );
 
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -414,7 +418,7 @@ std::string GetLastErrorStr()
     return std::string("Failed to retrieve error message.");
   }
 
-  std::string errMsg((LPCTSTR)lpMsgBuf);
+  std::string errMsg(reinterpret_cast<LPCTSTR>(lpMsgBuf));
 
   LocalFree(lpMsgBuf);
 

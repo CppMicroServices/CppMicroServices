@@ -73,7 +73,7 @@ int TestEvaluate()
   {
     // Make sure Match's key look-up is case-insensitive
     LDAPFilter ldap( "(Cn=Babs Jensen)" );
-    ServiceProperties props;
+    AnyMap props(AnyMap::UNORDERED_MAP);
     bool eval = false;
 
     // Several values

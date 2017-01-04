@@ -57,8 +57,8 @@ std::shared_ptr<ServiceListenerHook> ServiceHooks::AddingService(const ServiceRe
   }
   catch (...)
   {
-	  std::string message("Failed to call listener hook # " + reference.GetProperty(Constants::SERVICE_ID).ToString());
-	  coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
+    std::string message("Failed to call listener hook # " + reference.GetProperty(Constants::SERVICE_ID).ToString());
+    coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, GetBundleContext().GetBundle(), message, std::current_exception()));
   }
   return lh;
 }

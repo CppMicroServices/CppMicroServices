@@ -1,9 +1,9 @@
 CXX = g++
 CXXFLAGS = -g -Wall -Wno-unused -pedantic -fPIC $(US_CXX_FLAGS)
 LDFLAGS = -Wl,-rpath="$(CppMicroServices_ROOT)/lib" -Wl,-rpath=.
-LDLIBS = -lCppMicroServices
+LDLIBS = -lCppMicroServices${US_DEBUG_POSTFIX}
 
-INCLUDEDIRS = -I"$(CppMicroServices_ROOT)/include"
+INCLUDEDIRS = -I"$(CppMicroServices_ROOT)/include/cppmicroservices3"
 LIBDIRS = -L"$(CppMicroServices_ROOT)/lib" -L.
 
 all : main libbundle.so

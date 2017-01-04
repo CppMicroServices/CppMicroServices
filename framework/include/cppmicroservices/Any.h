@@ -177,7 +177,7 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
  *
  * Code taken from the Boost 1.46.1 library. Original copyright by Kevlin Henney. Modified for CppMicroServices.
  */
-class Any
+class US_Framework_EXPORT Any
 {
 public:
 
@@ -292,15 +292,23 @@ public:
   }
 
   /**
-   * Returns a string representation for the content.
+   * Returns a string representation for the content if it is not empty.
+   *
+   * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
+   * function or specialize the any_value_to_string template function for meaningful output.
+   *
+   * \throws std::logic_error if the Any is empty.
+   */
+  std::string ToString() const;
+
+  /**
+   * Returns a string representation for the content. If the Any is
+   * empty, an empty string is returned.
    *
    * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
    * function or specialize the any_value_to_string template function for meaningful output.
    */
-  std::string ToString() const
-  {
-    return _content->ToString();
-  }
+  std::string ToStringNoExcept() const;
 
   /**
    * Returns a JSON representation for the content.

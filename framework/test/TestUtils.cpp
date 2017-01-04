@@ -135,7 +135,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     try
     {
 #if defined (US_BUILD_SHARED_LIBS)
-        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + LIB_PREFIX + libName + LIB_EXT);
+        bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + US_LIB_PREFIX + libName + US_LIB_EXT);
 #else
         bundles = frameworkCtx.GetBundles();
 #endif
@@ -152,7 +152,7 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     return {};
 }
 
-std::string GetTempDirectory() 
+std::string GetTempDirectory()
 {
 #if defined (US_PLATFORM_WINDOWS)
   std::wstring temp_dir;
@@ -190,6 +190,81 @@ std::string GetCurrentWorkingDirectory()
   }
 #endif
   return std::string();
+}
+
+#ifdef US_PLATFORM_WINDOWS
+#define rmdir _rmdir
+#define chdir _chdir
+#endif
+
+void ChangeDirectory(const std::string& destdir)
+{
+  int ret = chdir(destdir.c_str());
+  if (ret != 0)
+  {
+    std::string msg("Unable to change directory to ");
+    msg += destdir + ". Does this directory exist?";
+    throw std::runtime_error(msg.c_str());
+  }
+}
+
+void MakeDirectory(const std::string& dirname)
+{
+#ifdef US_PLATFORM_WINDOWS
+  int ret = _mkdir(dirname.c_str());
+#else
+  // rws permissions for owner, group. rs permissions for others.
+  int ret = mkdir(dirname.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
+  if (ret != 0)
+  {
+    std::string msg("Unable to make directory:");
+    msg += dirname + ". Does this directory already exist?";
+    throw std::runtime_error(msg.c_str());
+  }
+}
+
+void RemoveDirectory(const std::string& dirname)
+{
+  int ret = rmdir(dirname.c_str());
+  if (ret != 0)
+  {
+    std::string msg("Unable to remove directory:");
+    msg += dirname + ". Is this directory empty?";
+    throw std::runtime_error(msg.c_str());
+  }
+}
+
+void CheckFileAndRemove(std::string f)
+{
+  std::ifstream fobj(f.c_str());
+  if (!fobj.good())
+  {
+    fobj.close();
+    return;
+  }
+  fobj.close();
+
+  if (remove(f.c_str()) != 0)
+  {
+    throw std::runtime_error("Could not remove file " + f);
+
+  }
+}
+
+bool DirectoryExists(const std::string& destdir)
+{
+  // stat() is cross-platform
+  struct stat dirinfo;
+  if (stat(destdir.c_str(), &dirinfo) != 0)
+  {
+    return false;
+  }
+  else if (dirinfo.st_mode & S_IFDIR)
+  {
+    return true;
+  }
+  return false;
 }
 
 Bundle GetBundle(const std::string& bsn, BundleContext context)

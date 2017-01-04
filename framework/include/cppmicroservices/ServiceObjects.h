@@ -27,7 +27,6 @@
 #include "cppmicroservices/FrameworkExport.h"
 #include "cppmicroservices/PrototypeServiceFactory.h"
 #include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/ServiceProperties.h"
 
 namespace cppmicroservices {
 

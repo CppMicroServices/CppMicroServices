@@ -103,8 +103,8 @@ function(usFunctionEmbedResources)
   endif()
 
   set(resource_compiler ${US_RCC_EXECUTABLE})
-  if(TARGET ${US_RCC_EXECUTABLE_NAME})
-    set(resource_compiler ${US_RCC_EXECUTABLE_NAME})
+  if(TARGET ${US_RCC_EXECUTABLE_TARGET})
+    set(resource_compiler ${US_RCC_EXECUTABLE_TARGET})
   elseif(NOT resource_compiler)
     message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
   endif()
@@ -159,8 +159,8 @@ function(usFunctionEmbedResources)
       set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
     elseif(WIN32 AND CMAKE_RC_COMPILER)
       set(US_RESOURCE_ARCHIVE ${_zip_archive})
-      # If the file generated in "Configure" step is specified as the OUTPUT of add_custom_command, 
-      # "Clean" target will delete the file and subsequent build will fail. To avoid failures in 
+      # If the file generated in "Configure" step is specified as the OUTPUT of add_custom_command,
+      # "Clean" target will delete the file and subsequent build will fail. To avoid failures in
       # "ReBuild", generate the resource file in the "Configure" step and copy it in "Build" step
       configure_file(${US_RESOURCE_RC_TEMPLATE} ${_source_output}_autogen)
       add_custom_command(

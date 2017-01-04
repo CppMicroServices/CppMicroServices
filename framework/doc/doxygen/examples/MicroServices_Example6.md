@@ -54,57 +54,46 @@ service implementations. This often leads to bundles which do not export
 any symbols at all and hence need to be loaded into the running process
 manually.
 
-\note Due to the link dependency of our bundle to the bundle containing the
-dictionary service interface as well as a default implementation for it, there
-might be at least one dictionary service registered when our bundle is
-started, depending on your linker settings (e.g. on Windows, the linker usually
-by default optimizes the link dependency away since our bundle does not actually
-use any symbols from the dictionaryservice bundle. On Linux however, the link
-dependency is kept by default.) To observe the dynamic registration and
-un-registration of our spell checker service, we require the availability of
-at least two dictionary services.
-
 For an introduction how to compile our source code, see \ref MicroServices_Example1.
 
 After running the `usFrameworkExamplesDriver` program we should make sure that the
-bundle from Example 1 is active. We can use the `s` shell command to get
+bundle from Example 1 is active. We can use the `start` shell command to get
 a list of all bundles, their state, and their bundle identifier number.
 If the Example 1 bundle is not active, we should start the bundle using the
-start command and the bundle's identifier number or name that is displayed
-by the `s` command. Now we can start the spell checker service bundle by
-entering the `l spellcheckservice` command which will also trigger the starting
+start command and the bundle's identifier number or symbolic name that is displayed
+by the `start` command. Now we can start the spell checker service bundle by
+entering the `start spellcheckservice` command which will also trigger the starting
 of the dictionaryservice bundle containing the english dictionary:
 
 \verbatim
 CppMicroServices-build> bin/usFrameworkExamplesDriver
-> l eventlistener
+> start eventlistener
 Starting to listen for service events.
-> l spellcheckservice
-Ex1: Service of type IDictionaryService/1.0 registered.
-> s
-Id | Name                 | Status
+> start spellcheckservice
+> status
+Id | Symbolic Name        | State
 -----------------------------------
- - | dictionaryclient     | -
- - | dictionaryclient2    | -
- - | dictionaryclient3    | -
- - | frenchdictionary     | -
- - | spellcheckclient     | -
- 1 | CppMicroServices     | ACTIVE
- 2 | Event Listener       | ACTIVE
- 3 | Dictionary Service   | ACTIVE
- 4 | Spell Check Service  | ACTIVE
+ 0 | system_bundle        | ACTIVE
+ 1 | eventlistener        | ACTIVE
+ 2 | dictionaryservice    | INSTALLED
+ 3 | frenchdictionary     | INSTALLED
+ 4 | dictionaryclient     | INSTALLED
+ 5 | dictionaryclient2    | INSTALLED
+ 6 | dictionaryclient3    | INSTALLED
+ 7 | spellcheckservice    | ACTIVE
+ 8 | spellcheckclient     | INSTALLED
 >
 \endverbatim
 
 To trigger the registration of the spell checker service from our bundle, we
-start the frenchdictionary using the `l frenchdictionary` command. If the bundle from
+start the frenchdictionary using the `start frenchdictionary` command. If the bundle from
 \ref MicroServices_Example1 "Example 1" is still active,
 then we should see it print out the details of the service event it receives
 when our new bundle registers its spell checker service:
 
 \verbatim
 CppMicroServices-build> bin/usFrameworkExamplesDriver
-> l frenchdictionary
+> start frenchdictionary
 Ex1: Service of type IDictionaryService registered.
 Ex1: Service of type ISpellCheckService registered.
 >
@@ -116,7 +105,7 @@ the eventlistener bundle will print that our bundle is no longer offering its
 spell checker service. Likewise, when the french dictionary service comes back, so will
 our spell checker service. We create a client for our spell checker service in
 \ref MicroServices_Example7 "Example 7". To exit the `usFrameworkExamplesDriver` program, we
-use the `q` command.
+use the `shutdown` command.
 
 Next: \ref MicroServices_Example7
 

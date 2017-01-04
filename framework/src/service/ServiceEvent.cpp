@@ -23,7 +23,6 @@
 #include "cppmicroservices/ServiceEvent.h"
 
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/ServiceProperties.h"
 
 namespace cppmicroservices {
 

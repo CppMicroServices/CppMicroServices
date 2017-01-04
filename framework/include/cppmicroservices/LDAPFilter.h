@@ -23,7 +23,7 @@
 #ifndef CPPMICROSERVICES_LDAPFILTER_H
 #define CPPMICROSERVICES_LDAPFILTER_H
 
-#include "cppmicroservices/ServiceProperties.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/SharedData.h"
 
 #ifdef _MSC_VER
@@ -127,28 +127,28 @@ public:
   bool Match(const Bundle& bundle) const;
   
   /**
-   * Filter using a <code>ServiceProperties</code> object with case insensitive key lookup. This
-   * <code>LDAPFilter</code> is executed using the specified <code>ServiceProperties</code>'s keys
+   * Filter using a <code>AnyMap</code> object with case insensitive key lookup. This
+   * <code>LDAPFilter</code> is executed using the specified <code>AnyMap</code>'s keys
    * and values. The keys are looked up in a case insensitive manner.
    *
-   * @param dictionary The <code>ServiceProperties</code> whose key/value pairs are used
+   * @param dictionary The <code>AnyMap</code> whose key/value pairs are used
    *        in the match.
-   * @return <code>true</code> if the <code>ServiceProperties</code>'s values match this
+   * @return <code>true</code> if the <code>AnyMap</code>'s values match this
    *         filter; <code>false</code> otherwise.
    */
-  bool Match(const ServiceProperties& dictionary) const;
+  bool Match(const AnyMap& dictionary) const;
 
   /**
-   * Filter using a <code>ServiceProperties</code>. This <code>LDAPFilter</code> is executed using
-   * the specified <code>ServiceProperties</code>'s keys and values. The keys are looked
+   * Filter using a <code>AnyMap</code>. This <code>LDAPFilter</code> is executed using
+   * the specified <code>AnyMap</code>'s keys and values. The keys are looked
    * up in a normal manner respecting case.
    *
-   * @param dictionary The <code>ServiceProperties</code> whose key/value pairs are used
+   * @param dictionary The <code>AnyMap</code> whose key/value pairs are used
    *        in the match.
-   * @return <code>true</code> if the <code>ServiceProperties</code>'s values match this
+   * @return <code>true</code> if the <code>AnyMap</code>'s values match this
    *         filter; <code>false</code> otherwise.
    */
-  bool MatchCase(const ServiceProperties& dictionary) const;
+  bool MatchCase(const AnyMap& dictionary) const;
 
   /**
    * Returns this <code>LDAPFilter</code>'s filter string.

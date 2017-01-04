@@ -31,25 +31,23 @@ As in Example 3, we must link our bundle to the `dictionaryservice` bundle:
 \include dictionaryclient2/CMakeLists.txt
 
 After running the `usFrameworkExamplesDriver` executable, and starting the event
-listener bundle, we can use the `l dictionaryclient2` command to start
+listener bundle, we can use the `start dictionaryclient2` command to start
 our robust dictionary client bundle:
 
 \verbatim
 CppMicroServices-debug> bin/usFrameworkExamplesDriver
-> l eventlistener
+> start eventlistener
 Starting to listen for service events.
-> l dictionaryclient2
-Ex1: Service of type IDictionaryService/1.0 registered.
+> start dictionaryclient2
+Ex1: Service of type IDictionaryService registered.
 Enter a blank line to exit.
 Enter word:
 \endverbatim
 
-The above command loads the bundle and its dependencies (the `dictionaryservice`
-bundle) in a single step. When we load the bundle, it will use the main thread to
+The above command starts the bundle and it will use the main thread to
 prompt us for words. Enter one word at a time to check the words and enter a
-blank line to stop checking words. To reload the bundle, we must use the `s`
-command to get the bundle identifier number for the bundle and first use the
-`u <id>` command to unload the bundle, then the `l <id>` command to re-load it.
+blank line to stop checking words. To reload the bundle, we must first use the
+`stop <id | name>` command to stop the bundle, then the `start <id | name>` command to re-start it.
 To test the dictionary service, enter any of the words in the dictionary
 (e.g., "welcome", "to", "the", "micro", "services", "tutorial") or any word not
 in the dictionary.

@@ -1,7 +1,7 @@
 # Extract the current version from the VERSION file
 file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.0)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -31,6 +31,8 @@ endforeach()
 #------------------------------------------------------------------------------
 
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD 11)
 
 # We make use of the following C++11 language and library features:
 #
@@ -280,24 +282,6 @@ if(MSVC)
   endforeach()
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
-
-  # For CMake 3.2 and later we use target_compile_features()
-  if(CMAKE_VERSION VERSION_LESS 3.2)
-    # C++11 support
-    set(US_CXX11_FLAGS -std=c++11)
-    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
-    if(_have_cxx11)
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-    else()
-      set(US_CXX11_FLAGS -std=c++0x)
-      usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
-      if(_have_cxx0x)
-        set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-      else()
-        set(US_CXX11_FLAGS )
-      endif()
-    endif()
-  endif()
 
   if(US_COMPILER_APPLE_CLANG)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")

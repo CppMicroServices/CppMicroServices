@@ -1,12 +1,13 @@
 # [prj-start]
 project(CppMicroServicesExamples)
 
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD 11)
+
 find_package(CppMicroServices NO_MODULE REQUIRED)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
-
-include_directories(${CppMicroServices_INCLUDE_DIRS})
 # [prj-end]
 
 

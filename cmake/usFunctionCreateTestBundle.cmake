@@ -12,7 +12,7 @@ macro(_us_create_test_bundle_helper)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
-  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} ${US_LINK_LIBRARIES})
+  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} CppMicroServices)
 
   if(_res_files OR US_TEST_LINK_LIBRARIES)
     usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root}

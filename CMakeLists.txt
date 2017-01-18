@@ -1,7 +1,7 @@
 # Extract the current version from the VERSION file
 file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.0)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -29,6 +29,8 @@ endforeach()
 #-----------------------------------------------------------------------------
 # Check minimum required compiler versions
 #------------------------------------------------------------------------------
+
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # We make use of the following C++11 language and library features:
 #
@@ -265,8 +267,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
-set(US_CXX11_FLAGS )
-set(US_CXX11_LINK_FLAGS )
 set(US_CXX_TSAN_FLAGS )
 set(US_TSAN_LINK_FLAGS )
 
@@ -279,23 +279,8 @@ if(MSVC)
   endforeach()
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
-  # C++11 support
-  set(US_CXX11_FLAGS -std=c++11)
-  usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
-  if(_have_cxx11)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-  else()
-    set(US_CXX11_FLAGS -std=c++0x)
-    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
-    if(_have_cxx0x)
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-    else()
-      set(US_CXX11_FLAGS )
-    endif()
-  endif()
 
   if(US_COMPILER_APPLE_CLANG)
-    set(US_CXX11_FLAGS "${US_CXX11_FLAGS} -stdlib=libc++")
     set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
   endif()
 
@@ -445,7 +430,6 @@ set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party ${PROJECT_BINARY_DIR}/incl
 # Configure CppMicroServicesConfig.cmake for the build tree.
 # The file is used in sub-directories.
 
-set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set(PACKAGE_CONFIG_CMAKE_DIR ${US_CMAKE_DIR})
 
@@ -467,8 +451,6 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   @ONLY
   )
-
-include_directories(${US_INCLUDE_DIRS})
 
 add_subdirectory(tools/rc)
 

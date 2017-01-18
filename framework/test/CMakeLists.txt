@@ -16,7 +16,10 @@ endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/TestingConfig.h")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ../../third_party
+  )
 
 #-----------------------------------------------------------------------------
 # Create test bundles

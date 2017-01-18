@@ -72,7 +72,6 @@ set(_resources
 usMacroCreateBundle(WebConsole
   VERSION "0.99.0"
   DEPENDS HttpService
-  INTERNAL_INCLUDE_DIRS src
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_private_headers}
   SOURCES ${_srcs}

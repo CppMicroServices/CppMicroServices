@@ -1,6 +1,8 @@
 
 enable_language(C)
 
+include_directories(../../third_party)
+
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
 
 set(srcs ResourceCompiler.cpp ../../third_party/miniz.c)

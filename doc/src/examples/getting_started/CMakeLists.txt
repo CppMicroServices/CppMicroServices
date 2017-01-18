@@ -6,8 +6,6 @@ find_package(CppMicroServices REQUIRED)
 
 include(GenerateExportHeader)
 
-include_directories(${CppMicroServices_INCLUDE_DIRS})
-
 # [interface-begin]
 #=========================================================
 # A library providing the ServiceTime interface
@@ -21,9 +19,8 @@ add_library(ServiceTime
   )
 
 target_include_directories(ServiceTime PUBLIC
-  $<BUILD_INTERFACE:
-    ${CMAKE_CURRENT_SOURCE_DIR}/service_time;
-    ${CMAKE_CURRENT_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/service_time>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 generate_export_header(ServiceTime)

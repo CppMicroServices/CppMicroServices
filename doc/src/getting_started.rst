@@ -7,8 +7,7 @@ This section gives you a quick tour of the most important concepts in
 order to get you started with developing bundles and publishing and
 consuming services.
 
-We will define a service interface, a bundle providing a service
-implementing this interface, and another bundle consuming it. A
+We will define a service interface, service implementation, and service consumer. A
 simple executable then shows how to install and start these bundles.
 
 The complete source code for this example can be found at
@@ -19,9 +18,9 @@ is discussed in detail below.
 The Build System
 ----------------
 
-This examples comes with a complete ``CMakeLists.txt`` file showing
+These examples come with a complete ``CMakeLists.txt`` file showing
 the main usage scenarios of the provided :any:`CMake helper functions
-<cmake-support>`. The script starts with requiring the *CppMicroServices*
+<cmake-support>`. The script requires the *CppMicroServices*
 package:
 
 .. literalinclude:: examples/getting_started/CMakeLists.txt
@@ -33,7 +32,7 @@ A Simple Service Interface
 --------------------------
 
 Services implement one or more *service interfaces*. An interface can
-be any C++ class, but typically it is a class with only pure virtual
+be any C++ class, but typically contains only pure virtual
 functions. For our example, we create a separate library containing
 a service interface that allows us to retrieve the number of elapsed
 milliseconds since the POSIX epoch:
@@ -41,7 +40,7 @@ milliseconds since the POSIX epoch:
 .. literalinclude:: examples/getting_started/service_time/ServiceTime.h
    :language: cpp
 
-The CMake code does not require C++ Micro Servies specific additions:
+The CMake code does not require C++ Micro Services specific additions:
 
 .. literalinclude:: examples/getting_started/CMakeLists.txt
    :language: cmake
@@ -52,9 +51,9 @@ Bundle and BundleContext
 ------------------------
 
 A *bundle* is the logical set of C++ Micro Services specific initialization
-code, meta data stored in a *manifest.json*
-:any:`resource <concept-resources>` file plus other resources and code.
-Multiple such bundles can be part of the same or different (shared
+code, metadata stored in a *manifest.json*
+:any:`resource <concept-resources>` file, and other resources and code.
+Multiple bundles can be part of the same or different (shared
 or static) library or executable.
 To create the bundle initialization code, you can either use the
 :any:`usFunctionGenerateBundleInit` CMake function or the
@@ -77,16 +76,15 @@ function:
    }
 
 Please note that trying to use ``GetBundleContext()``
-without proper initialization code in the using library will
-either lead to compile or rumtime errors.
+without proper initialization code in the using library will lead to compile or runtime errors.
 
 Publishing a Service
 --------------------
 
 Publishing a bundle is done by calling the :any:`BundleContext::RegisterService
 <cppmicroservices::BundleContext::RegisterService>` function. The
-following code is the complete source of the *service_time_systemclock*
-bundle, that implements the ``ServiceTime`` interface as a service:
+following code for the *service_time_systemclock*
+bundle implements the ``ServiceTime`` interface as a service:
 
 .. literalinclude:: examples/getting_started/service_time_systemclock/ServiceTimeImpl.cpp
    :language: cpp
@@ -96,7 +94,7 @@ A ``std::shared_ptr`` holding the service object is passed as the
 an argument to the ``RegisterService<>()``
 function within a :any:`bundle activator <cppmicroservices::BundleActivator>`. The
 service is registered as long as it is explicitly unregistered or the bundle is stopped.
-The bundle activator is optional, but if it is declared it's
+The bundle activator is optional, but if it is declared, its
 :any:`BundleActivator::Start(BundleContext) <cppmicroservices::BundleActivator::Start>`
 and
 :any:`BundleActivator::Stop(BundleContext) <cppmicroservices::BundleActivator::Stop>`
@@ -110,42 +108,42 @@ The CMake code for creating our bundle looks like this:
    :start-after: [publisher-begin]
    :end-before: [publisher-end]
 
-In addition to the generated bundle initialization code we need to specify a unique
+In addition to the generated bundle initialization code, we need to specify a unique
 bundle name by using the ``US_BUNDLE_NAME`` compile definition as shown above.
 
-We also need to provide the ``manifest.json`` file which is added as a resource and
+We also need to provide the ``manifest.json`` file, which is added as a resource and
 contains the following JSON data:
 
 .. literalinclude:: examples/getting_started/service_time_systemclock/manifest.json
    :language: json
 
-Because our bundle provides an activator, we also need to state its existance by
+Because our bundle provides an activator, we also need to state its existence by
 setting the ``bundle.activator`` key to  ``true``. The last two elements are purely
 informational and not used directly.
 
 Consuming a Service
 -------------------
 
-Service consumption is very similar to publishing a service, except that consumers
-need to be prepared to handle a few more error cases. Again, we use a bundle activator
-to execute code on bundle start that retrieves and consumes a *ServiceTime* service:
+The process to consume a service is very similar to the process for publishing a service, except that consumers
+need to handle some additional error cases. 
+
+Again, we use a bundle activator to execute code on bundle start that retrieves and consumes a *ServiceTime* service:
 
 .. literalinclude:: examples/getting_started/service_time_consumer/ServiceTimeConsumer.cpp
    :language: cpp
    :end-before: [no-cmake]
 
 Because the C++ Micro Services is a dynamic environment, a particular service might
-not be available yet and hence we need to check the validity of some returned
+not be available yet. Therefore, we first need to check the validity of some returned
 objects.
 
-Only in the simplest use cases the above code would be sufficient. To avoid bundle
-start ordering problems (e.g. one bundle assuming the existance of a service
+The above code would be sufficient only in the simplest use cases. To avoid bundle
+start ordering problems (e.g. one bundle assuming the existence of a service
 published by another bundle), a :any:`ServiceTracker <cppmicroservices::ServiceTracker>`
-should be used instead. Such a tracker allows to react on service events and
-make the bundle more robust.
+should be used instead. Such a tracker allows bundles to react on service events and in turn be more robust.
 
 The CMake code for creating a library containing the bundle is very similar to
-the code for the publishing bundle and not included here.
+the code for the publishing bundle and thus not included here.
 
 Installing and Starting Bundles
 -------------------------------
@@ -160,10 +158,9 @@ This is done by a small example program:
 The program expects a list of file system paths pointing to installable libraries.
 It will first construct a new ``Framework`` instance and then
 :any:`install <cppmicroservices::BundleContext::InstallBundles>` the given
-libraries. Then it goes on and starts all available bundles.
+libraries. Next, it will start all available bundles.
 
-When the ``Framework`` instance is destroyed, it will automatically shut down
-itself, essentially stopping all active bundles.
+When the ``Framework`` instance is destroyed, it will automatically shut itself down, essentially stopping all active bundles.
 
 .. seealso::
 

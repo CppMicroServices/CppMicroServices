@@ -142,6 +142,18 @@ Bundle GetBundle(
     BundleContext context = BundleContext()
     );
 
+template <typename T>
+std::string ToString(T val)
+{
+#if defined(__ANDROID__)
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
+}
+
 }
 
 }

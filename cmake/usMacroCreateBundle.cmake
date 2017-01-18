@@ -7,7 +7,7 @@ project(${_project_name})
 cmake_parse_arguments(${PROJECT_NAME}
   "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET;SYMBOLIC_NAME"
-  "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;INTERNAL_LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
+  "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
 )
 
@@ -32,7 +32,6 @@ if(WIN32 AND NOT CYGWIN)
   set(PROJECT_OUTPUT_NAME "${PROJECT_OUTPUT_NAME}${${PROJECT_NAME}_VERSION_MAJOR}")
 endif()
 
-
 if(NOT ${PROJECT_NAME}_SYMBOLIC_NAME)
   set(${PROJECT_NAME}_SYMBOLIC_NAME ${${PROJECT_NAME}_TARGET})
 endif()
@@ -45,13 +44,8 @@ if(${PROJECT_NAME}_DEPENDS)
 endif()
 
 #-----------------------------------------------------------------------------
-# Include dirs and libraries
+# Configure files
 #-----------------------------------------------------------------------------
-
-set(${PROJECT_NAME}_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include
-)
 
 set(${PROJECT_NAME}_INCLUDE_SUBDIR "cppmicroservices")
 if(NOT ${PROJECT_NAME} STREQUAL "Framework")
@@ -69,24 +63,6 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}Config.h.in)
                  ${CMAKE_CURRENT_BINARY_DIR}/include/${${PROJECT_NAME}_INCLUDE_SUBDIR}/${PROJECT_NAME}Config.h)
   list(APPEND ${PROJECT_NAME}_PUBLIC_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/include/${${PROJECT_NAME}_INCLUDE_SUBDIR}/${PROJECT_NAME}Config.h)
-endif()
-
-include_directories(
-  ${US_INCLUDE_DIRS}
-  ${${PROJECT_NAME}_INCLUDE_DIRS}
-)
-
-set(_internal_include_dirs ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
-set(${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS )
-if(_internal_include_dirs)
-  foreach(_internal_include_dir ${_internal_include_dirs})
-    if(IS_ABSOLUTE "${_internal_include_dir}")
-      list(APPEND ${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS ${_internal_include_dir})
-    else()
-      list(APPEND ${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${_internal_include_dir})
-    endif()
-  endforeach()
-  include_directories(${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
 endif()
 
 #-----------------------------------------------------------------------------
@@ -107,8 +83,29 @@ add_library(${PROJECT_TARGET} ${${PROJECT_NAME}_SOURCES}
             ${${PROJECT_NAME}_PRIVATE_HEADERS} ${${PROJECT_NAME}_PUBLIC_HEADERS})
 set_property(TARGET ${PROJECT_TARGET} PROPERTY OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
 
+target_link_libraries(${PROJECT_TARGET} PUBLIC ${US_LIBRARIES})
+
+target_compile_features(${PROJECT_TARGET}
+  PUBLIC cxx_variadic_templates cxx_nullptr cxx_defaulted_functions cxx_deleted_functions
+  )
+
+# Include directories
+target_include_directories(${PROJECT_TARGET}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
+  PRIVATE
+    ${${PROJECT_NAME}_PRIVATE_INCLUDE_DIRS}
+  )
+
 # Compile definitions
-set_property(TARGET ${PROJECT_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME})
+target_compile_definitions(${PROJECT_TARGET}
+  PRIVATE US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME}
+  )
+
+# Convenience properties
 set_property(TARGET ${PROJECT_TARGET} PROPERTY US_BUNDLE_NAME ${${PROJECT_NAME}_SYMBOLIC_NAME})
 
 # Link flags
@@ -123,15 +120,8 @@ set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
 )
 
 # Link additional libraries
-if(${PROJECT_NAME}_LINK_LIBRARIES OR ${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES OR US_LIBRARIES)
-  target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES}
-                        ${${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES})
-endif()
-
-if(${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES)
-  set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
-    INTERFACE_LINK_LIBRARIES ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES}
-  )
+if(${PROJECT_NAME}_LINK_LIBRARIES)
+  target_link_libraries(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_LINK_LIBRARIES})
 endif()
 
 # Embed bundle resources
@@ -207,9 +197,6 @@ endif()
 
 # Configure config file for the build tree
 
-set(PACKAGE_CONFIG_INCLUDE_DIR
-  ${${PROJECT_NAME}_INCLUDE_DIRS}
-  ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_LIBRARY_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 configure_file(

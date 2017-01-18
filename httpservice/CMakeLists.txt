@@ -65,7 +65,7 @@ find_package(Threads REQUIRED)
 usMacroCreateBundle(HttpService
   VERSION "0.99.0"
   DEPENDS Framework
-  INTERNAL_INCLUDE_DIRS src
+  PRIVATE_INCLUDE_DIRS ../third_party
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_private_headers}
   SOURCES ${_srcs}
@@ -73,15 +73,15 @@ usMacroCreateBundle(HttpService
 )
 
 if(CMAKE_THREAD_LIBS_INIT)
-  target_link_libraries(usHttpService ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(usHttpService PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 if(MINGW)
-  target_link_libraries(usHttpService Ws2_32)
+  target_link_libraries(usHttpService PRIVATE Ws2_32)
 endif()
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
-  target_link_libraries(usHttpService rt)
+  target_link_libraries(usHttpService PRIVATE rt)
 endif()
 

@@ -1,6 +1,6 @@
 find_package(CppMicroServices COMPONENTS ShellService REQUIRED)
 
-include_directories(${US_INCLUDE_DIRS})
+include_directories(../../third_party)
 
 set(srcs
   Shell.cpp

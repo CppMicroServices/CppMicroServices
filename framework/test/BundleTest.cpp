@@ -35,7 +35,6 @@
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <thread>
 
@@ -213,7 +212,7 @@ void frame020b()
   US_TEST_CONDITION(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + cppmicroservices::ToString(buA.GetBundleId()) + testing::DIR_SEP;
+  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + testing::ToString(buA.GetBundleId()) + testing::DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 

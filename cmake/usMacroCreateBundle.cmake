@@ -86,7 +86,7 @@ set_property(TARGET ${PROJECT_TARGET} PROPERTY OUTPUT_NAME ${PROJECT_OUTPUT_NAME
 target_link_libraries(${PROJECT_TARGET} PUBLIC ${US_LIBRARIES})
 
 target_compile_features(${PROJECT_TARGET}
-  PUBLIC cxx_variadic_templates cxx_nullptr cxx_defaulted_functions cxx_deleted_functions
+  PUBLIC cxx_variadic_templates cxx_nullptr
   )
 
 # Include directories

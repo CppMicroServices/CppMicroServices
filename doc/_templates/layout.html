@@ -1,0 +1,7 @@
+{% extends "!layout.html" %}
+
+  {% block menu %}
+    {{ super() }}
+    <a href={{ pathto("genindex") }}>Index</a>
+  {% endblock %}
+

@@ -1,0 +1,3 @@
+# Use fixe Sphinx version until https://github.com/michaeljones/breathe/issues/292 is resolved
+sphinx >=1.4,<1.5
+breathe

@@ -36,7 +36,14 @@ class BundleResourcePrivate;
 struct BundleArchive;
 
 /**
+\defgroup gr_bundleresource BundleResource
+
+\brief Groups BundleResource class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_bundleresource
  *
  * Represents a resource (text file, image, etc.) embedded in a CppMicroServices bundle.
  *
@@ -49,8 +56,12 @@ struct BundleArchive;
  *
  * %BundleResource objects have value semantics and copies are very inexpensive.
  *
- * \see BundleResourceStream
- * \see \ref MicroServices_Resources
+ * \rststar
+ * .. seealso::
+ *
+ *    | :any:`BundleResourceStream`
+ *    | :any:`concept-resources`
+ * \endrststar
  */
 class US_Framework_EXPORT BundleResource
 {
@@ -251,7 +262,7 @@ public:
   /**
    * Returns a list of resource objects which are children of this object.
    *
-   * The return BundleResource objects may contain files as well as
+   * The returned BundleResource objects may contain files as well as
    * directory resources.
    *
    * @return A list of child resource objects.
@@ -299,11 +310,23 @@ private:
 };
 
 /**
-* \ingroup MicroServices
-*/
+ * \ingroup MicroServices
+ * \ingroup gr_bundleresource
+ *
+ * Streams the \c resource path into the stream \c os.
+ */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleResource& resource);
 
 }
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_bundleresource
+ *
+ * \struct std::hash<cppmicroservices::BundleResource> BundleResource.h <cppmicroservices/BundleResource.h>
+ *
+ * Hash functor specialization for \link cppmicroservices#BundleResource BundleResource\endlink objects.
+ */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::BundleResource)
   return arg.Hash();

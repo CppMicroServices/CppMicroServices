@@ -40,9 +40,15 @@ template<class S, class T> class ServiceTrackerPrivate;
 
 class BundleContext;
 
+/**
+\defgroup gr_servicetracker ServiceTracker
+
+\brief Groups ServiceTracker related symbols.
+*/
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicetracker
  *
  * The <code>ServiceTracker</code> class simplifies using services from the
  * framework's service registry.

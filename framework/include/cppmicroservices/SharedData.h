@@ -39,7 +39,15 @@ LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 namespace cppmicroservices {
 
 /**
+\defgroup gr_shareddata SharedData
+
+\brief Groups SharedData related symbols.
+*/
+
+
+/**
  * \ingroup MicroServicesUtils
+ * \ingroup gr_shareddata
  */
 class SharedData
 {
@@ -55,6 +63,7 @@ public:
 
 /**
  * \ingroup MicroServicesUtils
+ * \ingroup gr_shareddata
  */
 template <class T>
 class SharedDataPointer
@@ -130,6 +139,7 @@ private:
 
 /**
  * \ingroup MicroServicesUtils
+ * \ingroup gr_shareddata
  */
 template <class T> class ExplicitlySharedDataPointer
 {

@@ -1,16 +1,19 @@
-project(CppMicroServices)
+# Extract the current version from the VERSION file
+file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(${PROJECT_NAME}_MAJOR_VERSION 2)
-set(${PROJECT_NAME}_MINOR_VERSION 99)
-set(${PROJECT_NAME}_PATCH_VERSION 0)
-set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
-set(US_GLOBAL_VERSION_SUFFIX 3)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.0)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+
+project(CppMicroServices VERSION ${_version})
+
+set(US_GLOBAL_VERSION_SUFFIX ${${PROJECT_NAME}_VERSION_MAJOR})
+if (${PROJECT_NAME}_VERSION_MINOR EQUAL 99)
+  math(EXPR US_GLOBAL_VERSION_SUFFIX "${US_GLOBAL_VERSION_SUFFIX}+1")
+endif()
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 2.8.12)
-
-cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 list(APPEND policies_new
@@ -161,26 +164,11 @@ function(us_cache_var _var_name _var_default _var_type _var_help)
     endif()
   endforeach()
 
-  if(US_IS_EMBEDDED)
-    if(NOT DEFINED ${_var_name} OR _force)
-      set(${_var_name} ${_var_default} PARENT_SCOPE)
-    endif()
-  else()
-    set(${_var_name} ${_var_default} CACHE ${_var_type} "${_var_help}" ${_force})
-    if(_advanced)
-      mark_as_advanced(${_var_name})
-    endif()
+  set(${_var_name} ${_var_default} CACHE ${_var_type} "${_var_help}" ${_force})
+  if(_advanced)
+    mark_as_advanced(${_var_name})
   endif()
 endfunction()
-
-# Determine if we are being build inside a larger project
-if(NOT DEFINED US_IS_EMBEDDED)
-  if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set(US_IS_EMBEDDED 0)
-  else()
-    set(US_IS_EMBEDDED 1)
-  endif()
-endif()
 
 # Determine the name of the install component for "SDK" artifacts.
 # The default is "sdk"
@@ -204,12 +192,16 @@ if(WIN32 AND NOT CYGWIN)
   set(default_archive_install_dir lib/)
   set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
   set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_doc_install_dir ${default_auxiliary_install_dir}/doc)
+  set(default_man_install_dir share/man)
 else()
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir lib/)
   set(default_archive_install_dir lib/)
   set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
   set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_doc_install_dir ${default_auxiliary_install_dir}/doc)
+  set(default_man_install_dir share/man)
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
@@ -217,6 +209,8 @@ us_cache_var(LIBRARY_INSTALL_DIR ${default_library_install_dir} STRING "Relative
 us_cache_var(ARCHIVE_INSTALL_DIR ${default_archive_install_dir} STRING "Relative install location for archives" ADVANCED)
 us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative install location for headers" ADVANCED)
 us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
+us_cache_var(DOC_INSTALL_DIR ${default_doc_install_dir} STRING "Relative install location for documentation files" ADVANCED)
+us_cache_var(MAN_INSTALL_DIR ${default_man_install_dir} STRING "Relative install location for man pages" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
@@ -269,18 +263,6 @@ endif()
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
 #-----------------------------------------------------------------------------
-
-if(US_IS_EMBEDDED)
-  set(CMAKE_C_FLAGS)
-  set(CMAKE_C_FLAGS_RELEASE)
-  set(CMAKE_C_FLAGS_DEBUG)
-  set(CMAKE_CXX_FLAGS)
-  set(CMAKE_CXX_FLAGS_RELEASE)
-  set(CMAKE_CXX_FLAGS_DEBUG)
-  set(CMAKE_LINK_FLAGS)
-  set(CMAKE_LINK_FLAGS_RELEASE)
-  set(CMAKE_LINK_FLAGS_DEBUG)
-endif()
 
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
 set(US_CXX11_FLAGS )
@@ -341,7 +323,7 @@ else()
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
-  
+
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
@@ -375,6 +357,10 @@ if(US_ENABLE_THREADING_SUPPORT)
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
+else()
+  # The 3.0 release does not support single-threaded mode any more.
+  # It will be re-enabled with a 3.x release later.
+  message(SEND_ERROR "Disabling threading support is currently unsupported.")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")

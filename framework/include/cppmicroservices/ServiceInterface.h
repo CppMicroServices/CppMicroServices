@@ -34,12 +34,19 @@
 #include <tuple>
 
 /**
+\defgroup gr_serviceinterface Service Interface
+
+\brief Groups Service Interface related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_serviceinterface
  *
  * Returns a unique id for a given type. By default, the
  * demangled name of \c T is returned.
  *
- * This template method may be specialized directly or be
+ * This template method may be specialized directly or by
  * using the macro #CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE to return
  * a custom id for each service interface.
  *
@@ -54,6 +61,7 @@ class ServiceFactory;
 
 /**
  * @ingroup MicroServices
+ * @ingroup gr_serviceinterface
  *
  * A map containing interfaces ids and their corresponding service object
  * smart pointers. InterfaceMap instances represent a complete service object
@@ -143,6 +151,7 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_macros
  *
  * \brief Declare a service interface id.
  *
@@ -194,14 +203,15 @@ namespace cppmicroservices {
 
 /**
  * @ingroup MicroServices
+ * @ingroup gr_serviceinterface
  *
  * Helper class for constructing InterfaceMap instances based
  * on service implementations or service factories.
  *
  * Example usage:
  * \code
- * MyService service; // implementes I1 and I2
- * InterfaceMap im = MakeInterfaceMap<I1,I2>(&service);
+ * std::shared_ptr<MyService> service; // implementes I1 and I2
+ * InterfaceMap im = MakeInterfaceMap<I1,I2>(service);
  * \endcode
  *
  * @see InterfaceMap
@@ -270,6 +280,7 @@ private:
 
 /**
  * @ingroup MicroServices
+ * @ingroup gr_serviceinterface
  *
  * Extract a service interface pointer from a given InterfaceMap instance.
  *
@@ -293,6 +304,7 @@ std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
 
 /**
  * @ingroup MicroServices
+ * @ingroup gr_serviceinterface
  *
  * Extract a service interface pointer from a given InterfaceMap instance.
  *
@@ -301,7 +313,7 @@ std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
  * @return The service interface pointer for the service interface id or
  *         \c nullptr if \c map does not contain an entry for the given type.
  *
- * @see ExtractInterface(const InterfaceMap&)
+ * @see ExtractInterface(const InterfaceMapConstPtr&)
  */
 inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, const std::string& interfaceId)
 {
@@ -321,6 +333,7 @@ inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, c
 ///@{
 /**
  * @ingroup MicroServices
+ * @ingroup gr_serviceinterface
  *
  * Cast the argument to a shared pointer of type \c ServiceFactory. Useful when
  * calling \c BundleContext::RegisterService with a service factory, for example:

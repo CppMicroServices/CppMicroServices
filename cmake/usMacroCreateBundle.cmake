@@ -16,9 +16,9 @@ if(NOT ${PROJECT_NAME}_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
 endif()
 
 string(REPLACE "." ";" _version_numbers ${${PROJECT_NAME}_VERSION})
-list(GET _version_numbers 0 ${PROJECT_NAME}_MAJOR_VERSION)
-list(GET _version_numbers 1 ${PROJECT_NAME}_MINOR_VERSION)
-list(GET _version_numbers 2 ${PROJECT_NAME}_PATCH_VERSION)
+list(GET _version_numbers 0 ${PROJECT_NAME}_VERSION_MAJOR)
+list(GET _version_numbers 1 ${PROJECT_NAME}_VERSION_MINOR)
+list(GET _version_numbers 2 ${PROJECT_NAME}_VERSION_PATCH)
 
 # Set the logical target name
 if(NOT ${PROJECT_NAME}_TARGET)
@@ -29,7 +29,7 @@ set(PROJECT_TARGET ${${PROJECT_NAME}_TARGET})
 # Set the target output name
 set(PROJECT_OUTPUT_NAME ${PROJECT_TARGET})
 if(WIN32 AND NOT CYGWIN)
-  set(PROJECT_OUTPUT_NAME "${PROJECT_OUTPUT_NAME}${${PROJECT_NAME}_MAJOR_VERSION}")
+  set(PROJECT_OUTPUT_NAME "${PROJECT_OUTPUT_NAME}${${PROJECT_NAME}_VERSION_MAJOR}")
 endif()
 
 
@@ -95,7 +95,7 @@ endif()
 
 # Generate the bundle init file
 if(NOT ${PROJECT_NAME}_SKIP_INIT)
-  usFunctionGenerateBundleInit(${PROJECT_NAME}_SOURCES)
+  usFunctionGenerateBundleInit(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)

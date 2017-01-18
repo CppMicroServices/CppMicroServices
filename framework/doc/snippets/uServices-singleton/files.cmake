@@ -5,4 +5,4 @@ set(snippet_src_files
   SingletonTwo.cpp
 )
 
-usFunctionGenerateBundleInit(snippet_src_files)
+usFunctionGenerateBundleInit(TARGET Snippet-uServices-singleton OUT snippet_src_files)

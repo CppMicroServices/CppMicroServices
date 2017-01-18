@@ -29,7 +29,14 @@
 namespace cppmicroservices {
 
 /**
+\defgroup gr_servicereference ServiceReference
+
+\brief Groups ServiceReference related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_servicereference
  *
  * A reference to a service.
  *
@@ -131,6 +138,7 @@ public:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicereference
  *
  * A service reference of unknown type, which is not bound to any
  * interface identifier.

@@ -22,15 +22,15 @@
 // Version information
 //-------------------------------------------------------------------
 
-#define CppMicroServices_MAJOR_VERSION @CppMicroServices_MAJOR_VERSION@
-#define CppMicroServices_MINOR_VERSION @CppMicroServices_MINOR_VERSION@
-#define CppMicroServices_PATCH_VERSION @CppMicroServices_PATCH_VERSION@
+#define CppMicroServices_VERSION_MAJOR @CppMicroServices_VERSION_MAJOR@
+#define CppMicroServices_VERSION_MINOR @CppMicroServices_VERSION_MINOR@
+#define CppMicroServices_VERSION_PATCH @CppMicroServices_VERSION_PATCH@
 #define CppMicroServices_VERSION @CppMicroServices_VERSION@
 #define CppMicroServices_VERSION_STR "@CppMicroServices_VERSION@"
 
-#define US_MAJOR_VERSION @CppMicroServices_MAJOR_VERSION@
-#define US_MINOR_VERSION @CppMicroServices_MINOR_VERSION@
-#define US_PATCH_VERSION @CppMicroServices_PATCH_VERSION@
+#define US_VERSION_MAJOR @CppMicroServices_VERSION_MAJOR@
+#define US_VERSION_MINOR @CppMicroServices_VERSION_MINOR@
+#define US_VERSION_PATCH @CppMicroServices_VERSION_PATCH@
 #define US_VERSION @CppMicroServices_VERSION@
 #define US_VERSION_STR "@CppMicroServices_VERSION@"
 

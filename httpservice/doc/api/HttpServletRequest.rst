@@ -1,0 +1,4 @@
+HttpServletRequest
+------------------
+
+.. doxygenclass:: cppmicroservices::HttpServletRequest

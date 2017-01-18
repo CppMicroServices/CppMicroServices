@@ -85,9 +85,15 @@ set_property(TARGET ${PROJECT_TARGET} PROPERTY OUTPUT_NAME ${PROJECT_OUTPUT_NAME
 
 target_link_libraries(${PROJECT_TARGET} PUBLIC ${US_LIBRARIES})
 
-target_compile_features(${PROJECT_TARGET}
-  PUBLIC cxx_variadic_templates cxx_nullptr
-  )
+if (CMAKE_VERSION VERSION_LESS 3.2)
+  target_compile_options(${PROJECT_TARGET}
+    PUBLIC ${US_CXX11_FLAGS}
+    )
+else()
+  target_compile_features(${PROJECT_TARGET}
+    PUBLIC cxx_variadic_templates cxx_nullptr
+    )
+endif()
 
 # Include directories
 target_include_directories(${PROJECT_TARGET}

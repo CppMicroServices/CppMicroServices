@@ -9,18 +9,6 @@ cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 include_directories(${CppMicroServices_INCLUDE_DIRS})
 # [prj-end]
 
-#-----------------------------------------------------------------------------
-# Set C/CXX flags
-#-----------------------------------------------------------------------------
-
-if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${US_CXX_FLAGS_DEBUG}")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${US_C_FLAGS_DEBUG}")
-endif()
 
 #-----------------------------------------------------------------------------
 # Init output directories
@@ -136,6 +124,8 @@ if(US_BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND}
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                       -D CMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+                       -D CMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
                        -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                        -G ${CMAKE_GENERATOR}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"

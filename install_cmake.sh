@@ -7,9 +7,9 @@ fi
 # check to see if CMake is cached
 if [ ! -f "$HOME/cache/bin/ctest" ]; then
 
-  wget --no-check-certificate https://cmake.org/files/v2.8/cmake-2.8.12.2.tar.gz -O /tmp/cmake.tar.gz;
+  wget --no-check-certificate https://cmake.org/files/v3.0/cmake-3.0.2.tar.gz -O /tmp/cmake.tar.gz;
   tar -xzvf /tmp/cmake.tar.gz -C /tmp;
-  cd /tmp/cmake-2.8.12.2;
+  cd /tmp/cmake-3.0.2;
   ./configure --prefix=$HOME/cache;
   make -j;
   make install;

@@ -52,7 +52,7 @@ US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "Syste
  * defined to be &quot;system.bundle&quot;.
  */
 US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
-  
+
 /**
  * Manifest header identifying the bundle's activator.
  * The value for this attribute is of type bool.
@@ -250,10 +250,15 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
  * - "single" - The framework APIs are not thread-safe.
  * - "multi" - The framework APIs are thread-safe.
  *
- * @remarks This is a read-only property and cannot be altered at run-time.
- * The key's value is set at compile time by the US_ENABLE_THREADING_SUPPORT option.
+ * \rststar
+ * .. note::
  *
- * @see \ref BuildInstructions
+ *    This is a read-only property and cannot be altered at run-time.
+ *    The key's value is set at compile time by the
+ *    ``US_ENABLE_THREADING_SUPPORT`` option. See :any:`build-instructions`
+ *    for more information.
+ * \endrststar
+ *
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
 

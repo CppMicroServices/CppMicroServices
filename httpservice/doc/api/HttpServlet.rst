@@ -1,0 +1,4 @@
+HttpServlet
+-----------
+
+.. doxygenclass:: cppmicroservices::HttpServlet

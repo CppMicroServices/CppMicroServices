@@ -70,7 +70,7 @@ public:
        *     operation
        *
        * @see     UnavailableException
-       * @see     #getServletConfig
+       * @see     #GetServletConfig
        *
        */
   virtual void Init(const ServletConfig& config);
@@ -101,15 +101,10 @@ public:
        * The <code>ServletConfig</code> object returned is the one
        * passed to the <code>init</code> method.
        *
-       * <p>Implementations of this interface are responsible for storing the
-       * <code>ServletConfig</code> object so that this
-       * method can return it. The {@link GenericServlet}
-       * class, which implements this interface, already does this.
-       *
        * @return  the <code>ServletConfig</code> object
        *   that initializes this servlet
        *
-       * @see   #init
+       * @see   #Init
        *
        */
   ServletConfig GetServletConfig() const;

@@ -31,7 +31,16 @@
 
 namespace cppmicroservices {
 
+namespace detail {
+
 US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d)
+{
+  return ::cppmicroservices::MakeBundleContext(d);
+}
+
+}
+
+BundleContext MakeBundleContext(BundleContextPrivate* d)
 {
   return BundleContext(d->shared_from_this());
 }

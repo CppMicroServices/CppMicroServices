@@ -1,3 +1,4 @@
 {
-  "bundle.symbolic_name" : "usShellService"
+  "bundle.symbolic_name" : "usShellService",
+  "bundle.activator" : true
 }

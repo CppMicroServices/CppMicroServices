@@ -1,0 +1,26 @@
+@import url("theme.css");
+
+.wy-nav-side {
+    width: 400px !important;
+}
+
+.wy-side-scroll {
+    width: 420px !important;
+}
+
+.wy-side-nav-search {
+    width: 400px !important;
+    background-color: #607d8b;
+}
+
+.wy-menu-vertical {
+    width: 400px !important;
+}
+
+.wy-nav-content-wrap {
+    margin-left: 400px !important;
+}
+
+.wy-nav-content {
+    max-width: 860px !important;
+}

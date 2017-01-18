@@ -34,20 +34,23 @@ class Properties;
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_serviceregistration
  *
  * A registered service.
  *
- * <p>
  * The framework returns a <code>ServiceRegistrationBase</code> object when a
  * <code>BundleContext#RegisterService()</code> method invocation is successful.
  * The <code>ServiceRegistrationBase</code> object is for the private use of the
  * registering bundle and should not be shared with other bundles.
- * <p>
+ *
  * The <code>ServiceRegistrationBase</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * \note This class is provided as public API for low-level service management only.
- *       In almost all cases you should use the template ServiceRegistration instead.
+ * \rststar
+ * .. note::
+ *    This class is provided as public API for low-level service management only.
+ *    In almost all cases you should use the template ServiceRegistration instead.
+ * \endrststar
  *
  * @see BundleContext#RegisterService()
  */
@@ -201,12 +204,24 @@ private:
 
 };
 
-inline std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase& /*reg*/)
-{
-  return os << "cppmicroservices::ServiceRegistrationBase object";
-}
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_servicereregistration
+ *
+ * Writes a string representation of \c reg to the stream \c os.
+ */
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase& reg);
 
 }
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_serviceregistration
+ *
+ * \struct std::hash<cppmicroservices::ServiceRegistrationBase> ServiceRegistrationBase.h <cppmicroservices/ServiceRegistrationBase.h>
+ *
+ * Hash functor specialization for \link cppmicroservices#ServiceRegistrationBase ServiceRegistrationBase\endlink objects.
+ */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
   return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);

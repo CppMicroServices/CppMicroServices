@@ -3,9 +3,9 @@
 # PACKAGE_VERSION_COMPATIBLE if the current version major number == requested version major number
 # and the current version minor number >= requested version minor number
 
-set(PACKAGE_VERSION_MAJOR @CppMicroServices_MAJOR_VERSION@)
-set(PACKAGE_VERSION_MINOR @CppMicroServices_MINOR_VERSION@)
-set(PACKAGE_VERSION_PATCH @CppMicroServices_PATCH_VERSION@)
+set(PACKAGE_VERSION_MAJOR @CppMicroServices_VERSION_MAJOR@)
+set(PACKAGE_VERSION_MINOR @CppMicroServices_VERSION_MINOR@)
+set(PACKAGE_VERSION_PATCH @CppMicroServices_VERSION_PATCH@)
 set(PACKAGE_VERSION "@CppMicroServices_VERSION@")
 
 if(PACKAGE_VERSION VERSION_EQUAL PACKAGE_FIND_VERSION)

@@ -36,11 +36,15 @@ class ServiceReferenceBasePrivate;
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicereference
  *
  * A reference to a service.
  *
- * \note This class is provided as public API for low-level service queries only.
- *       In almost all cases you should use the template ServiceReference instead.
+ * \rststar
+ * .. note::
+ *    This class is provided as public API for low-level service queries only.
+ *    In almost all cases you should use the template ServiceReference instead.
+ * \endrststar
  */
 class US_Framework_EXPORT ServiceReferenceBase
 {
@@ -238,10 +242,22 @@ private:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicereference
+ *
+ * Writes a string representation of \c serviceRef to the stream \c os.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef);
 
 }
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_servicereference
+ *
+ * \struct std::hash<cppmicroservices::ServiceReferenceBase> ServiceReferenceBase.h <cppmicroservices/ServiceReferenceBase.h>
+ *
+ * Hash functor specialization for \link cppmicroservices#ServiceReferenceBase ServiceReferenceBase\endlink objects.
+ */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceReferenceBase)
   return arg.Hash();

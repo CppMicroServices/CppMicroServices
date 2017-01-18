@@ -1,3 +1,4 @@
 {
-  "bundle.symbolic_name" : "usWebConsole"
+  "bundle.symbolic_name" : "usWebConsole",
+  "bundle.activator" : true
 }

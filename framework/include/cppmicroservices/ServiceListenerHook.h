@@ -35,7 +35,14 @@ class BundleContext;
 class ServiceListenerEntry;
 
 /**
+\defgroup gr_servicelistenerhook ServiceListenerHook
+
+\brief Groups ServiceListenerHook class related symbols.
+*/
+
+/**
  * @ingroup MicroServices
+ * @ingroup gr_servicelistenerhook
  *
  * Service Listener Hook Service.
  *
@@ -165,6 +172,15 @@ struct US_Framework_EXPORT ServiceListenerHook
 };
 
 }
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_servicelistenerhook
+ *
+ * \struct std::hash<cppmicroservices::ServiceListenerHook::ListenerInfo> ServiceListenerHook.h <cppmicroservices/ServiceListenerHook.h>
+ *
+ * Hash functor specialization for \link cppmicroservices#ServiceListenerHook::ListenerInfo ServiceListenerHook::ListenerInfo\endlink objects.
+ */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
   return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(arg.d.Data());

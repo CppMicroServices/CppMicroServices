@@ -36,7 +36,14 @@
 namespace cppmicroservices {
 
 /**
+\defgroup gr_serviceexception BundleEvent
+
+\brief Groups ServiceException class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_serviceexception
  *
  * A service exception used to indicate that a service problem occurred.
  *
@@ -119,9 +126,10 @@ private:
 
 /**
  * \ingroup MicroServices
- * @{
+ * \ingroup gr_serviceexception
+ *
+ * Writes a string representation of \c exc to the stream \c os.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const cppmicroservices::ServiceException& exc);
-/** @}*/
 
 #endif // CPPMICROSERVICES_SERVICEEXCEPTION_H

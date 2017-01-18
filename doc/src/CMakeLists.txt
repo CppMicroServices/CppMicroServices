@@ -124,8 +124,7 @@ if(US_BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND}
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                       -D CMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-                       -D CMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+                       "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                        -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                        -G ${CMAKE_GENERATOR}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
@@ -147,6 +146,7 @@ if(US_BUILD_TESTING)
              COMMAND ${CMAKE_COMMAND}
                      -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                     "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
                      -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                      -G ${CMAKE_GENERATOR}

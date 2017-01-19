@@ -4,9 +4,10 @@ if [ ! -d "$HOME/cache" ]; then
   mkdir $HOME/cache;
 fi
 
-# check to see if CMake is cached
-if [ ! -f "$HOME/cache/bin/ctest" ]; then
+CTEST_EXEC="$HOME/cache/bin/ctest"
 
+# check to see if CMake is cached
+if [[ ! -f "$CTEST_EXEC" || ! "$($CTEST_EXEC --version)" =~ "3.2.3" ]]; then
   wget --no-check-certificate https://cmake.org/files/v3.2/cmake-3.2.3.tar.gz -O /tmp/cmake.tar.gz;
   tar -xzvf /tmp/cmake.tar.gz -C /tmp;
   cd /tmp/cmake-3.2.3;

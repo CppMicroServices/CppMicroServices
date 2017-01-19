@@ -168,6 +168,22 @@ if(US_BUILD_TESTING)
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system
   if(UNIX AND NOT APPLE AND US_BUILD_SHARED_LIBS)
+
+    # We need to supply the correct language flag to the Makefile
+    set(US_CXX11_FLAGS -std=c++11)
+    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
+    if(_have_cxx11)
+      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+    else()
+      set(US_CXX11_FLAGS -std=c++0x)
+      usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
+      if(_have_cxx0x)
+        set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+      else()
+        set(US_CXX11_FLAGS )
+      endif()
+    endif()
+
     find_program(MAKE_COMMAND NAMES make gmake)
     find_program(CXX_COMMAND NAMES g++)
     mark_as_advanced(MAKE_COMMAND CXX_COMMAND)

@@ -12,7 +12,7 @@ if [[ ! -f "$CTEST_EXEC" || ! "$($CTEST_EXEC --version)" =~ "3.2.3" ]]; then
   tar -xzvf /tmp/cmake.tar.gz -C /tmp;
   cd /tmp/cmake-3.2.3;
   ./configure --prefix=$HOME/cache;
-  make -j;
+  make -j2;
   make install;
 else
   echo "Using cached bin dir: $HOME/cache/bin";

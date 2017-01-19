@@ -30,7 +30,7 @@ Introduction
 
 The C++ Micro Services project is a collection of components for building
 modular and dynamic service-oriented applications. It is based on
-`OSGi <http://osgi.org>`_ but tailored to support native cross-platform solutions.
+`OSGi <http://osgi.org>`_, but tailored to support native cross-platform solutions.
 
 Proper usage of C++ Micro Services patterns and concepts leads to systems
 with one or more of the following properties: 
@@ -104,8 +104,9 @@ Quick Start
 -----------
 
 Essentially, the C++ Micro Services library provides you with a powerful
-dynamic service registry, on top of a managed lifecycle for so-called
-*bundles* that are contained in shared or static libraries. Each bundle
+dynamic service registry on top of a managed lifecycle. The framework manages,
+among other things, physical units of modularity called *bundles* that 
+are contained in shared or static libraries. Each bundle
 within a library has an associated :any:`cppmicroservices::BundleContext`
 object, through which the service registry is accessed.
 

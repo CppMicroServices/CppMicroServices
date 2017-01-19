@@ -1,26 +1,15 @@
 # [prj-start]
 project(CppMicroServicesExamples)
 
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD 11)
+
 find_package(CppMicroServices NO_MODULE REQUIRED)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
-
-include_directories(${CppMicroServices_INCLUDE_DIRS})
 # [prj-end]
 
-#-----------------------------------------------------------------------------
-# Set C/CXX flags
-#-----------------------------------------------------------------------------
-
-if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${US_CXX_FLAGS_DEBUG}")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${US_C_FLAGS}")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${US_C_FLAGS_DEBUG}")
-endif()
 
 #-----------------------------------------------------------------------------
 # Init output directories
@@ -136,6 +125,7 @@ if(US_BUILD_TESTING)
                COMMAND ${CMAKE_COMMAND}
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                       "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                        -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                        -G ${CMAKE_GENERATOR}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
@@ -157,6 +147,7 @@ if(US_BUILD_TESTING)
              COMMAND ${CMAKE_COMMAND}
                      -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                     "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
                      -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
                      -G ${CMAKE_GENERATOR}
@@ -177,6 +168,22 @@ if(US_BUILD_TESTING)
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system
   if(UNIX AND NOT APPLE AND US_BUILD_SHARED_LIBS)
+
+    # We need to supply the correct language flag to the Makefile
+    set(US_CXX11_FLAGS -std=c++11)
+    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
+    if(_have_cxx11)
+      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+    else()
+      set(US_CXX11_FLAGS -std=c++0x)
+      usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
+      if(_have_cxx0x)
+        set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
+      else()
+        set(US_CXX11_FLAGS )
+      endif()
+    endif()
+
     find_program(MAKE_COMMAND NAMES make gmake)
     find_program(CXX_COMMAND NAMES g++)
     mark_as_advanced(MAKE_COMMAND CXX_COMMAND)

@@ -1,7 +1,7 @@
 # Extract the current version from the VERSION file
 file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -31,6 +31,8 @@ endforeach()
 #------------------------------------------------------------------------------
 
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD 11)
 
 # We make use of the following C++11 language and library features:
 #
@@ -267,6 +269,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
+set(US_CXX11_FLAGS )
 set(US_CXX_TSAN_FLAGS )
 set(US_TSAN_LINK_FLAGS )
 

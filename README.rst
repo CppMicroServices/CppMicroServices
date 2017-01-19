@@ -105,7 +105,7 @@ Quick Start
 
 Essentially, the C++ Micro Services library provides you with a powerful
 dynamic service registry on top of a managed lifecycle. The framework manages,
-among other things, physical units of modularity called *bundles* that 
+among other things, logical units of modularity called *bundles* that 
 are contained in shared or static libraries. Each bundle
 within a library has an associated :any:`cppmicroservices::BundleContext`
 object, through which the service registry is accessed.

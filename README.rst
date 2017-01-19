@@ -1,29 +1,27 @@
 
-.. only:: html
+.. rubric:: Continuous Integration Status
 
- .. rubric:: Continuous Integration Status
++-------------+-------------------------+--------------------------+
+| Branch      | GCC 4.6                 | Visual Studio 2013       |
+|             +-------------------------+--------------------------+
+|             | XCode 6.4               | Visual Studio 2015       |
+|             +-------------------------+--------------------------+
+|             | XCode 7.3               | MinGW-w64                |
++=============+=========================+==========================+
+| master      | |Linux Build Status|    | |Windows Build status|   |
++-------------+-------------------------+--------------------------+
+| development | |Linux Build Status     | |Windows Build status    |
+|             | (development)|          | (development)|           |
++-------------+-------------------------+--------------------------+
 
- +-------------+-------------------------+----------------------------+
- | Branch      | - GCC 4.6               | - Visual Studio 2013       |
- |             | - XCode 6.4             | - Visual Studio 2015       |
- |             | - XCode 7.3             | - MinGW-w64                |
- +=============+=========================+============================+
- | master      | |Linux Build Status|    | |Windows Build status|     |
- +-------------+-------------------------+----------------------------+
- | development | |Linux Build Status     | |Windows Build status      |
- |             | (development)|          | (development)|             |
- +-------------+-------------------------+----------------------------+
-
- |Coverity Scan Build Status|
+|Coverity Scan Build Status|
 
 C++ Micro Services
 ==================
 
-.. only:: html
+|RTD Build Status (stable)| |RTD Build Status (development)|
 
- |RTD Build Status (stable)| |RTD Build Status (development)|
-
- `Download <https://github.com/CppMicroServices/CppMicroServices/releases>`_
+`Download <https://github.com/CppMicroServices/CppMicroServices/releases>`_
 
 Introduction
 ------------

@@ -20,12 +20,12 @@ services. The source code for our bundle is as follows in a file called
    :start-after: [Activator]
    :end-before: [Activator]
 
-After running the ``usTutorialDriver`` program use the ``s`` command to
+After running the ``usTutorialDriver`` program use the :kbd:`status` command to
 make sure that only the bundles from Example 2, Example 2b, and Example
 6 are started; use the start (``start <id | name>``) and stop
 (``stop <id | name>``) commands as appropriate to start and stop the
 various tutorial bundles, respectively. Now we can start our spell
-checker client bundle by entering ``start spellcheckclient``::
+checker client bundle by entering :kbd:`start spellcheckclient`::
 
    CppMicroServices-build> bin/usTutorialDriver
    > start eventlistener
@@ -47,7 +47,7 @@ checker client bundle by entering ``start spellcheckclient``::
 
 To trigger the registration of the spell checker service from our
 bundle, we start the frenchdictionary using the
-``start frenchdictionary`` command. If the bundle from
+:kbd:`start frenchdictionary` command. If the bundle from
 :any:`Example 1 <example1>` is still active, then we should see it
 print out the details of the service event it receives when our new
 bundle registers its spell checker service::

@@ -80,13 +80,13 @@ For an introduction how to compile our source code, see
 :any:`example1`.
 
 After running the ``usTutorialDriver`` program we should make sure that
-the bundle from Example 1 is active. We can use the ``start`` shell
+the bundle from Example 1 is active. We can use the :kbd:`status` shell
 command to get a list of all bundles, their state, and their bundle
 identifier number. If the Example 1 bundle is not active, we should
 start the bundle using the start command and the bundle's identifier
-number or symbolic name that is displayed by the ``start`` command. Now
+number or symbolic name that is displayed by the :kbd:`status` command. Now
 we can start the spell checker service bundle by entering the
-``start spellcheckservice`` command which will also trigger the starting
+:kbd:`start spellcheckservice` command which will also trigger the starting
 of the dictionaryservice bundle containing the english dictionary::
 
    CppMicroServices-build> bin/usTutorialDriver
@@ -109,7 +109,7 @@ of the dictionaryservice bundle containing the english dictionary::
 
 To trigger the registration of the spell checker service from our
 bundle, we start the frenchdictionary using the
-``start frenchdictionary`` command. If the bundle from
+:kbd:`start frenchdictionary` command. If the bundle from
 :any:`Example 1 <example1>` is still active,
 then we should see it print out the details of the service event it
 receives when our new bundle registers its spell checker service::
@@ -126,4 +126,4 @@ the eventlistener bundle will print that our bundle is no longer
 offering its spell checker service. Likewise, when the french dictionary
 service comes back, so will our spell checker service. We create a
 client for our spell checker service in :any:`Example 7 <example7>`. To
-exit the ``usTutorialDriver`` program, we use the ``shutdown`` command.
+exit the ``usTutorialDriver`` program, we use the :kbd:`shutdown` command.

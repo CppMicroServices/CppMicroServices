@@ -32,7 +32,7 @@ Example 1, we must link our bundle to the ``dictionaryservice`` bundle:
    :language: cmake
 
 After running the ``usTutorialDriver`` executable, and starting the
-event listener bundle, we can use the ``start dictionaryclient`` command
+event listener bundle, we can use the :kbd:`start dictionaryclient` command
 to start our dictionary client bundle::
 
    CppMicroServices-debug> bin/usTutorialDriver
@@ -46,8 +46,8 @@ to start our dictionary client bundle::
 The above command starts the pre-installed bundle. When we start the bundle,
 it will use the main thread to prompt us for words. Enter one word at a
 time to check the words and enter a blank line to stop checking words.
-To reload the bundle, we must first use the ``stop <id | name>`` command
-to stop the bundle, then the ``stop <id | name>`` command to re-start
+To reload the bundle, we must first use the :kbd:`stop dictionaryclient` command
+to stop the bundle, then the :kbd:`start dictionaryclient` command to re-start
 it. To test the dictionary service, enter any of the words in the
 dictionary (e.g., "welcome", "to", "the", "micro", "services",
 "tutorial") or any word not in the dictionary.

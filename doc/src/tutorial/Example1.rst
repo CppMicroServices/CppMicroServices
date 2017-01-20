@@ -74,7 +74,7 @@ a small driver program called ``usTutorialDriver``::
    status               Print status information
    shutdown             Shut down the framework
 
-Typing ``status`` at the command prompt lists all installed bundles and
+Typing :kbd:`status` at the command prompt lists all installed bundles and
 their current state. Note that the driver program pre-installs the
 example bundles, so they will be listed initially with the ``INSTALLED``
 state. To start the eventlistener bundle, type ``start eventlistener``
@@ -101,4 +101,4 @@ its shared library). Keep in mind, that this bundle will not do much at
 this point since it only listens for service events and we are not
 registering any services. In the next example we will register a service
 that will generate an event for this bundle to receive. To exit the
-``usTutorialDriver``, use the ``shutdown`` command.
+``usTutorialDriver``, use the :kbd:`shutdown` command.

@@ -46,7 +46,7 @@ bundle:
    :language: cmake
 
 After running the ``usTutorialDriver`` executable, and starting the
-event listener bundle, we can use the ``start dictionaryclient2``
+event listener bundle, we can use the :kbd:`start dictionaryclient2`
 command to start our robust dictionary client bundle::
 
    CppMicroServices-debug> bin/usTutorialDriver
@@ -60,8 +60,8 @@ command to start our robust dictionary client bundle::
 The above command starts the bundle and it will use the main thread to
 prompt us for words. Enter one word at a time to check the words and
 enter a blank line to stop checking words. To reload the bundle, we must
-first use the ``stop <id | name>`` command to stop the bundle, then the
-``start <id | name>`` command to re-start it. To test the dictionary
+first use the :kbd:`stop dictionaryclient2` command to stop the bundle, then the
+:kbd:`start dictionaryclient2` command to re-start it. To test the dictionary
 service, enter any of the words in the dictionary (e.g., "welcome",
 "to", "the", "micro", "services", "tutorial") or any word not in the
 dictionary.

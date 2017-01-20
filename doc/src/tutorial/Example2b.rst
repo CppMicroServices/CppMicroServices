@@ -39,13 +39,13 @@ and linker dependencies are set:
    :language: cmake
 
 After running the ``usTutorialDriver`` program we should make sure that
-the bundle from Example 1 is active. We can use the ``status`` shell
+the bundle from Example 1 is active. We can use the :kbd:`status` shell
 command to get a list of all bundles, their state, and their bundle
 identifier number. If the Example 1 bundle is not active, we should
 start the bundle using the start command and the bundle's identifier
-number or name that is displayed by the ``status`` command. Now we can
+number or name that is displayed by the :kbd:`status` command. Now we can
 start our dictionary service bundle by typing the
-``start frenchdictionary`` command::
+:kbd:`start frenchdictionary` command::
 
    CppMicroServices-build> bin/usTutorialDriver
    > status
@@ -78,7 +78,7 @@ start our dictionary service bundle by typing the
     8 | spellcheckclient     | INSTALLED
    >
 
-To stop the bundle, use the ``stop <id | name>`` command. If the bundle
+To stop the bundle, use the :kbd:`stop 3` command. If the bundle
 from :any:`Example 1 <example1>` is still
 active, then we should see it print out the details of the service event
 it receives when our new bundle registers its dictionary service. Using
@@ -87,7 +87,7 @@ start it at will, respectively. Each time we start and stop our
 dictionary service bundle, we should see the details of the associated
 service event printed from the bundle from Example 1. In
 :any:`Example 3 <example3>`, we will create a client for our dictionary
-service. To exit ``usTutorialDriver``, we use the ``shutdown`` command.
+service. To exit ``usTutorialDriver``, we use the :kbd:`shutdown` command.
 
 .. note::
 

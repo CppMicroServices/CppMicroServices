@@ -97,7 +97,9 @@ void ServiceTracker<S,T>::Open()
     t.reset(new _TrackedService(this, d->customizer));
     try
     {
-      d->context.AddServiceListener(t.get(), &_TrackedService::ServiceChanged, d->listenerFilter);
+      /* Remove if already exists. No-op if it's an invalid (default) token */
+      d->context.RemoveListener(d->listenerToken);
+      d->listenerToken = d->context.AddServiceListener(t.get(), &_TrackedService::ServiceChanged, d->listenerFilter);
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty())
       {
@@ -120,7 +122,7 @@ void ServiceTracker<S,T>::Open()
     }
     catch (const std::invalid_argument& e)
     {
-      d->context.RemoveServiceListener(t.get(), &_TrackedService::ServiceChanged);
+      d->context.RemoveListener(d->listenerToken);
       throw std::runtime_error(std::string("unexpected std::invalid_argument exception: ")
                                + e.what());
     }
@@ -145,7 +147,7 @@ void ServiceTracker<S,T>::Close()
   references = GetServiceReferences();
   try
   {
-    d->context.RemoveServiceListener(outgoing.get(), &_TrackedService::ServiceChanged);
+    d->context.RemoveListener(d->listenerToken);
   }
   catch (const std::runtime_error& /*e*/)
   {

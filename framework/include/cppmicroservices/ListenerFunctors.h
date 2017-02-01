@@ -27,12 +27,68 @@
 
 #include <cstring>
 #include <functional>
+#include <cstdint>
 
 namespace cppmicroservices {
 
   class ServiceEvent;
   class BundleEvent;
   class FrameworkEvent;
+  class ServiceListeners;
+
+  using ListenerTokenId = std::uint64_t;
+
+  /**
+   * \brief The token returned when a listener is registered with BundleContext.
+   *
+   * The token object enables the clients to remove the listeners from the BundleContext.
+   * This is a move-only type, with the intention that the transfer of ownership will
+   * be handled explicitly by the clients.
+   *
+   */
+  class ListenerToken
+  {
+  public:
+
+    /**
+     * Constructs a default, invalid %ListenerToken object.
+     * Since, this is not associated with any valid listener, a RemoveListener
+     * call taking a default ListenerToken object will do nothing.
+     */
+    ListenerToken() : tokenId(ListenerTokenId(0)) {};
+
+    ListenerToken(const ListenerToken&) = delete;
+
+    ListenerToken& operator=(const ListenerToken&) = delete;
+
+    ListenerToken(ListenerToken&& other) : tokenId(std::move(other.tokenId))
+    {
+      other.tokenId = ListenerTokenId(0);
+    }
+
+    ListenerToken& operator=(ListenerToken&& other)
+    {
+      if (this != &other)
+      {
+        tokenId = std::move(other.tokenId);
+        other.tokenId = ListenerTokenId(0);
+      }
+      return *this;
+    }
+
+  private:
+    // For internal use
+    friend class ServiceListeners;
+
+    ListenerToken(ListenerTokenId _tokenId) : tokenId(_tokenId) {}
+
+    ListenerTokenId getId() const
+    {
+      return tokenId;
+    }
+
+    ListenerTokenId tokenId;
+  };
 
   /**
   \defgroup gr_listeners Listeners
@@ -108,7 +164,6 @@ namespace cppmicroservices {
   template<class X>
   FrameworkListener BindFrameworkListenerToFunctor(X* x, void (X::*Fnc)(const FrameworkEvent&))
   { return std::bind(Fnc, x, std::placeholders::_1); }
-
 }
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListener)

@@ -157,32 +157,29 @@ void testAddRemoveFrameworkListener()
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 
-  // @fixme issue #95 ... can't add more than one lambda defined listener
-  // uncomment this block once issue #95 is fixed.
-  //int count1(0);
-  //int count2(0);
-  //auto listener_callback_counter1 = [&count1](const FrameworkEvent&) { ++count1; std::cout << "listener_callback_counter1: call count " << count1 << std::endl; };
-  //auto listener_callback_counter2 = [&count2](const FrameworkEvent&) { ++count2; std::cout << "listener_callback_counter2: call count " << count2 << std::endl; };
-  //auto listener_callback_throw = [](const FrameworkEvent&) { throw std::runtime_error("boo"); };
-  //
-  //f.Init();
-  //fCtx = f.GetBundleContext();
-  //fCtx.AddFrameworkListener(listener_callback_counter1);
-  //fCtx.AddFrameworkListener(listener_callback_counter2);
-  //fCtx.AddFrameworkListener(listener_callback_throw);
+  int count1(0);
+  int count2(0);
+  auto listener_callback_counter1 = [&count1](const FrameworkEvent&) { ++count1; std::cout << "listener_callback_counter1: call count " << count1 << std::endl; };
+  auto listener_callback_counter2 = [&count2](const FrameworkEvent&) { ++count2; std::cout << "listener_callback_counter2: call count " << count2 << std::endl; };
+  auto listener_callback_throw = [](const FrameworkEvent&) { throw std::runtime_error("boo"); };
 
-  //f.Start();    // generate framework event (started)
-  //US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were called");
-  //US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were called");
+  f.Init();
+  fCtx = f.GetBundleContext();
+  auto t1 = fCtx.AddFrameworkListener(listener_callback_counter1);
+  auto t2 = fCtx.AddFrameworkListener(listener_callback_counter2);
+  auto t3 = fCtx.AddFrameworkListener(listener_callback_throw);
 
-  //fCtx.RemoveFrameworkListener(listener_callback_counter1);
-  //fCtx.RemoveFrameworkListener(listener_callback_counter2);
-  //fCtx.RemoveFrameworkListener(listener_callback_throw);
+  f.Start();    // generate framework event (started)
+  US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were called");
+  US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were called");
 
-  //f.Start();    // generate framework event (started)
-  //US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were NOT called after removal");
-  //US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were NOT called after removal");
-  // end @fixme issue #95
+  fCtx.RemoveListener(t1);
+  fCtx.RemoveListener(t2);
+  fCtx.RemoveListener(t3);
+
+  f.Start();    // generate framework event (started)
+  US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were NOT called after removal");
+  US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were NOT called after removal");
 }
 
 void testFrameworkListenersAfterFrameworkStop()

@@ -24,7 +24,6 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/detail/Log.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -307,8 +306,8 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
-void BundleContext::AddServiceListener(const ServiceListener& delegate,
-                                       const std::string& filter)
+ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
+                                                const std::string& filter)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -318,11 +317,12 @@ void BundleContext::AddServiceListener(const ServiceListener& delegate,
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
+  return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
+  DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
 
@@ -334,7 +334,7 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
   b->coreCtx->listeners.RemoveServiceListener(d, delegate, nullptr);
 }
 
-void BundleContext::AddBundleListener(const BundleListener& delegate)
+ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -344,11 +344,12 @@ void BundleContext::AddBundleListener(const BundleListener& delegate)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
+  return b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate)
 {
+  DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
 
@@ -360,7 +361,7 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
 }
 
-void BundleContext::AddFrameworkListener(const FrameworkListener& listener)
+ListenerToken BundleContext::AddFrameworkListener(const FrameworkListener& listener)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -370,11 +371,12 @@ void BundleContext::AddFrameworkListener(const FrameworkListener& listener)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
+  return b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
 }
 
 void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
 {
+  DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
 
@@ -386,8 +388,8 @@ void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
   b->coreCtx->listeners.RemoveFrameworkListener(d, listener, nullptr);
 }
 
-void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
-                                       const std::string &filter)
+ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
+                                                const std::string &filter)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -397,7 +399,7 @@ void BundleContext::AddServiceListener(const ServiceListener& delegate, void* da
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
+  return b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void* data)
@@ -413,7 +415,7 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void*
   b->coreCtx->listeners.RemoveServiceListener(d, delegate, data);
 }
 
-void BundleContext::AddBundleListener(const BundleListener& delegate, void* data)
+ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate, void* data)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -423,7 +425,7 @@ void BundleContext::AddBundleListener(const BundleListener& delegate, void* data
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddBundleListener(d, delegate, data);
+  return b->coreCtx->listeners.AddBundleListener(d, delegate, data);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* data)
@@ -437,6 +439,19 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* d
   // won the race condition.
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, data);
+}
+
+void BundleContext::RemoveListener(const ListenerToken& token)
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  b->coreCtx->listeners.RemoveListener(d, token);
 }
 
 std::string BundleContext::GetDataFile(const std::string &filename) const

@@ -53,6 +53,7 @@ set(_tests
   BundleTest
   BundleResourceTest
   MemcheckTest
+  MultipleListenersTest
   ResourceCompilerTest
   ServiceFactoryTest
   ServiceHooksTest

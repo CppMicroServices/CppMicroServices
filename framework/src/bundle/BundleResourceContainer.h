@@ -48,6 +48,7 @@ public:
   {
     Stat()
       : index(-1)
+      , compressedSize(0)
       , uncompressedSize(0)
       , modifiedTime(0)
       , isDir(false)
@@ -55,6 +56,7 @@ public:
 
     std::string filePath;
     int index;
+    int compressedSize;
     int uncompressedSize;
     time_t modifiedTime;
     bool isDir;

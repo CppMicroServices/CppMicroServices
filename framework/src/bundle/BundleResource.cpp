@@ -268,6 +268,11 @@ int BundleResource::GetSize() const
   return d->stat.uncompressedSize;
 }
 
+int BundleResource::GetCompressedSize() const
+{
+  return d->stat.compressedSize;
+}
+
 time_t BundleResource::GetLastModified() const
 {
   return d->stat.modifiedTime;

@@ -97,6 +97,7 @@ bool BundleResourceContainer::GetStat(int index, BundleResourceContainer::Stat& 
     // don't make sense to be embedded in a bundle anyway.
     assert(zipStat.m_comp_size < INT_MAX);
     assert(zipStat.m_uncomp_size < INT_MAX);
+    stat.compressedSize = static_cast<int>(zipStat.m_comp_size);
     stat.uncompressedSize = static_cast<int>(zipStat.m_uncomp_size);
     return true;
   }

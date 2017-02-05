@@ -263,6 +263,20 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
 US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
 
 /**
+ * Framework threading support configuration declaring that the framework
+ * is configured for single thread usage. It is not safe to use the
+ * framework API concurrently from multiple threads.
+ */
+US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SINGLE; // = "single";
+
+/**
+ * Framework threading support configuration declaring that the framework
+ * is configured for multi-thread usage. The framework API uses internal
+ * locks such that it is safe to use the API concurrently from multiple threads.
+ */
+US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_MULTI; // = "multi";
+
+/**
  * The framework's log property key name.
  * This property's default value is off (boolean 'false').
  *

@@ -30,6 +30,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <mutex>
 
 namespace cppmicroservices {
 
@@ -69,7 +70,7 @@ public:
   bool GetStat(Stat& stat) const;
   bool GetStat(int index, Stat& stat) const;
 
-  void* GetData(int index) const;
+  std::unique_ptr<void, void(*)(void*)> GetData(int index) const;
 
   void GetChildren(const std::string& resourcePath, bool relativePaths,
                    std::vector<std::string>& names, std::vector<uint32_t>& indices) const;
@@ -98,6 +99,11 @@ private:
 
   std::set<NameIndexPair, PairComp> m_SortedEntries;
   std::set<std::string> m_SortedToplevelDirs;
+
+  // This is used to synchronize miniz file stream API calls.
+  // Working with file streams is stateful (e.g. current read position)
+  // and hence not thread-safe.
+  mutable std::mutex m_ZipFileStreamMutex;
 };
 
 }

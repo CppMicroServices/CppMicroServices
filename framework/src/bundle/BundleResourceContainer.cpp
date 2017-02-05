@@ -104,9 +104,11 @@ bool BundleResourceContainer::GetStat(int index, BundleResourceContainer::Stat& 
   return false;
 }
 
-void* BundleResourceContainer::GetData(int index) const
+std::unique_ptr<void, void(*)(void*)> BundleResourceContainer::GetData(int index) const
 {
-  return mz_zip_reader_extract_to_heap(const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
+  std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
+  void* data = mz_zip_reader_extract_to_heap(const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
+  return { data, ::free };
 }
 
 void BundleResourceContainer::GetChildren(const std::string& resourcePath, bool relativePaths,

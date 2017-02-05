@@ -284,12 +284,12 @@ std::size_t BundleResource::Hash() const
   return hash<std::string>()(d->archive->GetResourcePrefix() + this->GetResourcePath());
 }
 
-void* BundleResource::GetData() const
+std::unique_ptr<void, void(*)(void*)> BundleResource::GetData() const
 {
-  if (!IsValid()) return nullptr;
+  if (!IsValid()) return { nullptr, ::free };
 
-  void* data = d->archive->GetResourceContainer()->GetData(d->stat.index);
-  if (data == nullptr)
+  auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
+  if (!data)
   {
     auto sink = GetBundleContext().GetLogSink();
     DIAG_LOG(*sink) << "Error uncompressing resource data for "

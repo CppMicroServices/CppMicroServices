@@ -310,7 +310,7 @@ private:
 
   std::size_t Hash() const;
 
-  void* GetData() const;
+  std::unique_ptr<void, void(*)(void*)> GetData() const;
 
   BundleResourcePrivate* d;
 

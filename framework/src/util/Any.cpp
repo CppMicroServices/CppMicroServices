@@ -26,20 +26,10 @@
 
 namespace cppmicroservices {
 
-std::string any_value_to_string(const Any& any)
-{
-  return any.ToString();
-}
-
 std::ostream& any_value_to_string(std::ostream& os, const Any& any)
 {
   os << any.ToString();
   return os;
-}
-
-std::string any_value_to_json(const Any& val)
-{
-  return val.ToJSON();
 }
 
 std::ostream& any_value_to_json(std::ostream& os, const Any& val)

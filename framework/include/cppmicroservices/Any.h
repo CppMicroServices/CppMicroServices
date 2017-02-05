@@ -56,10 +56,8 @@ namespace cppmicroservices {
 
 class Any;
 
-US_Framework_EXPORT std::string any_value_to_string(const Any& any);
 US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const Any& any);
 
-US_Framework_EXPORT std::string any_value_to_json(const Any& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const Any& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const std::string& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val);
@@ -77,7 +75,7 @@ std::ostream& any_value_to_string(std::ostream& os, const T& val)
 template<class T>
 std::ostream& any_value_to_json(std::ostream& os, const T& val)
 {
-  return any_value_to_string(os, val);
+  return os << val;
 }
 
 /**
@@ -116,7 +114,7 @@ std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2)
   {
     if (i1 == begin)
     {
-      os << any_value_to_json(*i1);
+      any_value_to_json(os, *i1);
     }
     else
     {

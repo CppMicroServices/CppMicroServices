@@ -96,6 +96,7 @@ void FrameworkPrivate::InitSystemBundle()
       gen->SetWired();
       fwWiring = new FrameworkWiringImpl(coreCtx);
       */
+
   timeStamp = detail::Clock::now();
 }
 
@@ -249,6 +250,20 @@ std::string FrameworkPrivate::GetLocation() const
   // OSGi Core release 6, section 4.6:
   //  The system bundle GetLocation method returns the string: "System Bundle"
   return std::string("System Bundle");
+}
+
+AnyMap FrameworkPrivate::GetHeaders() const
+{
+  AnyMap headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  headers[Constants::BUNDLE_SYMBOLICNAME] = symbolicName;
+  headers[Constants::BUNDLE_NAME] = location;
+  headers[Constants::BUNDLE_VERSION] = version.ToString();
+  headers[Constants::BUNDLE_MANIFESTVERSION] = std::string("2");
+  //headers.put("Bundle-Icon", "icon.png;size=32,icon64.png;size=64");
+  headers[Constants::BUNDLE_VENDOR] = std::string("C++ Micro Services");
+  headers[Constants::BUNDLE_DESCRIPTION] = std::string("C++ Micro Services System Bundle");
+  //headers.put(Constants::PROVIDE_CAPABILITY, provideCapabilityString);
+  return headers;
 }
 
 void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)

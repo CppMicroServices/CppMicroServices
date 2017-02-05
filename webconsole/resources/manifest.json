@@ -1,4 +1,5 @@
 {
   "bundle.symbolic_name" : "usWebConsole",
+  "bundle.name" : "C++ Micro Services Web Console",
   "bundle.activator" : true
 }

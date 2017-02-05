@@ -1,4 +1,5 @@
 {
   "bundle.symbolic_name" : "usShellService",
+  "bundle.name" : "C++ Micro Services Shell Service",
   "bundle.activator" : true
 }

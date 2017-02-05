@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -28,21 +29,22 @@
 
 namespace cppmicroservices {
 
-VariableResolverStreamBuffer::VariableResolverStreamBuffer(std::ostream* out, WebConsoleVariableResolver* variables)
-  : m_State(STATE_NULL)
-  , m_Out(out)
+VariableResolverStreamBuffer::VariableResolverStreamBuffer(
+    std::unique_ptr<std::ostream> out,
+    const std::shared_ptr<WebConsoleVariableResolver>& variables)
+  : m_State(State::NIL)
+  , m_Out(std::move(out))
   , m_Variables(variables)
 {
-  if (m_Variables == nullptr)
+  if (!m_Variables)
   {
-    m_Variables = new WebConsoleDefaultVariableResolver();
+    m_Variables = std::make_shared<WebConsoleDefaultVariableResolver>();
   }
   setp(0, 0);
 }
 
 VariableResolverStreamBuffer::~VariableResolverStreamBuffer()
 {
-  delete m_Out;
 }
 
 std::streambuf::int_type VariableResolverStreamBuffer::overflow(int_type ch)
@@ -50,7 +52,7 @@ std::streambuf::int_type VariableResolverStreamBuffer::overflow(int_type ch)
   if (ch != traits_type::eof())
   {
     assert(std::less_equal<char*>()(pptr(), epptr()));
-    if (parse(ch))
+    if (Parse(ch))
     {
       return ch;
     }
@@ -63,84 +65,172 @@ int VariableResolverStreamBuffer::sync()
   return 0;
 }
 
-bool VariableResolverStreamBuffer::parse(char c)
+bool VariableResolverStreamBuffer::Parse(char c)
 {
   switch (m_State)
   {
-  case STATE_NULL:
-    if ( c == '$' )
-    {
-      m_State = STATE_DOLLAR;
-    }
-    else if ( c == '\\' )
-    {
-      m_State = STATE_ESCAPE;
-    }
-    else
-    {
-      *m_Out << c;
-    }
-    break;
-
-  case STATE_DOLLAR:
+  case State::NIL:
     if ( c == '{' )
     {
-      m_State = STATE_BUFFERING;
+      m_State = State::OBRACE;
     }
     else
     {
-      m_State = STATE_NULL;
-      *m_Out << '$';
       *m_Out << c;
     }
     break;
 
-  case STATE_BUFFERING:
-    if ( c == '}' )
+  case State::OBRACE:
+    if ( c == '{' )
     {
-      m_State = STATE_NULL;
-      *m_Out << translate();
+      m_State = State::MUSTACHE;
+      m_Buffer << "{{";
     }
     else
     {
-      m_LineBuffer << c;
+      m_State = State::NIL;
+      *m_Out << '{';
+      *m_Out << c;
     }
     break;
 
-  case STATE_ESCAPE:
-    m_State = STATE_NULL;
-    if ( c != '$' )
+  case State::MUSTACHE:
+    m_Buffer << c;
+    if ( c == '#' || c == '^' )
     {
-      *m_Out << '\\';
+      m_State = State::MUSTACHE_BLOCK_BEGIN;
     }
-    *m_Out << c;
+    else
+    {
+      m_State = State::MUSTACHE_VAR;
+    }
     break;
+
+  case State::MUSTACHE_VAR:
+    m_Buffer << c;
+    if ( c == '}' )
+    {
+      m_State = State::MUSTACHE_VAR_CBRACE;
+    }
+    break;
+
+  case State::MUSTACHE_VAR_CBRACE:
+    m_Buffer << c;
+    if ( c == '}' )
+    {
+      Translate();
+      m_State = State::NIL;
+    }
+    else
+    {
+      m_State = State::MUSTACHE_VAR;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK_BEGIN:
+    m_Buffer << c;
+    if ( c == '}' )
+    {
+      m_State = State::MUSTACHE_BLOCK_BEGIN_CBRACE;
+    }
+    else
+    {
+      m_BeginTag << c;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK_BEGIN_CBRACE:
+    m_Buffer << c;
+    if ( c == '}' )
+    {
+      m_State = State::MUSTACHE_BLOCK;
+    }
+    else
+    {
+      m_BeginTag << '}';
+      m_BeginTag << c;
+      m_State = State::MUSTACHE_BLOCK_BEGIN;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK:
+    m_Buffer << c;
+    if ( c == '{' )
+    {
+      m_State = State::MUSTACHE_BLOCK_OBRACE;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK_OBRACE:
+    m_Buffer << c;
+    if ( c == '{' )
+    {
+      m_State = State::MUSTACHE_BLOCK_MUSTACHE;
+    }
+    else
+    {
+      m_State = State::MUSTACHE_BLOCK;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK_MUSTACHE:
+    m_Buffer << c;
+    if ( c == '/' )
+    {
+      m_State = State::MUSTACHE_BLOCK_END;
+    }
+    else
+    {
+      m_State = State::MUSTACHE_BLOCK;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK_END:
+    m_Buffer << c;
+    if ( c == '}' )
+    {
+      m_State = State::MUSTACHE_BLOCK_END_CBRACE;
+    }
+    else
+    {
+      m_EndTag << c;
+    }
+    break;
+
+  case State::MUSTACHE_BLOCK_END_CBRACE:
+    m_Buffer << c;
+    if ( c == '}' )
+    {
+      if (m_BeginTag.str() == m_EndTag.str())
+      {
+        Translate();
+        m_BeginTag.str(std::string());
+        m_State = State::NIL;
+      }
+      else
+      {
+        m_State = State::MUSTACHE_BLOCK;
+      }
+      m_EndTag.str(std::string());
+    }
+    else
+    {
+      m_EndTag << '}';
+      m_EndTag << c;
+      m_State = State::MUSTACHE_BLOCK_END;
+    }
+    break;
+
   }
   return true;
 }
 
-std::string VariableResolverStreamBuffer::translate()
+void VariableResolverStreamBuffer::Translate()
 {
-  std::string key = m_LineBuffer.str();
-  m_LineBuffer.str(std::string());
-  m_LineBuffer.clear();
+  std::string buf = m_Buffer.str();
+  m_Buffer.str(std::string());
 
-  std::string value = m_Variables->Resolve(key);
-  if (value.empty())
-  {
-    /*
-    try
-    {
-      value = locale.getString( key );
-    }
-    catch ( MissingResourceException mre )
-    */
-    {
-      // ignore and write the key as the value
-      value = key;
-    }
-  }
-  return value;
+  *m_Out << m_Variables->Resolve(buf);
 }
 
 }

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,9 +22,12 @@
 
 #include "SettingsPlugin.h"
 
+#include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
+
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
 
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
@@ -32,34 +36,36 @@
 
 namespace cppmicroservices {
 
-static std::string LABEL()
-{
-  static std::string s = "settings";
-  return s;
-}
-
-static std::string TITLE()
-{
-  static std::string s = "CppMicroServices Settings";
-  return s;
-}
-
-static std::string CATEGORY()
-{
-  static std::string s;
-  return s;
-}
-
 SettingsPlugin::SettingsPlugin()
-  : SimpleWebConsolePlugin(LABEL(), TITLE(), CATEGORY())
+  : SimpleWebConsolePlugin("settings", "Settings", "")
 {
 }
 
-void SettingsPlugin::RenderContent(HttpServletRequest&, HttpServletResponse& response)
+void SettingsPlugin::RenderContent(HttpServletRequest& request, HttpServletResponse& response)
 {
   BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/settings.html");
   if (res)
   {
+    auto props = GetBundleContext().GetProperties();
+    auto vars = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request));
+    (*vars)["us-thread"] = props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept() == Constants::FRAMEWORK_THREADING_MULTI ? TemplateData::Type::True : TemplateData::Type::False;
+#ifdef US_BUILD_SHARED_LIBS
+    (*vars)["us-shared"] = TemplateData::Type::True;
+#else
+    (*vars)["us-shared"] = TemplateData::Type::False;
+#endif
+    (*vars)["us-storagepath"] = props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
+
+    TemplateData fwProps(TemplateData::Type::List);
+    for (auto p : props)
+    {
+      TemplateData kv;
+      kv["key"] = p.first;
+      kv["value"] = p.second.ToString();
+      fwProps << kv;
+    }
+    (*vars)["us-fwprops"] = std::move(fwProps);
+
     BundleResourceStream rs(res, std::ios_base::binary);
     response.GetOutputStream() << rs.rdbuf();
   }

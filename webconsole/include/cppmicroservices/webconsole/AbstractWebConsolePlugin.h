@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,9 +26,16 @@
 #include "cppmicroservices/httpservice/HttpServlet.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
+#include "cppmicroservices/webconsole/mustache.hpp"
 
 #include <string>
 #include <vector>
+
+namespace Kainjow {
+
+US_WebConsole_EXPORT std::ostream& operator<<(std::ostream& os, const Mustache::Data&);
+
+}
 
 namespace cppmicroservices {
 
@@ -40,6 +48,7 @@ class HttpServletResponse;
 struct WebConsoleVariableResolver;
 
 struct AbstractWebConsolePluginPrivate;
+
 
 /**
  * The Web Console can be extended by registering an OSGi service for the interface
@@ -55,6 +64,8 @@ struct AbstractWebConsolePluginPrivate;
 class US_WebConsole_EXPORT AbstractWebConsolePlugin : public HttpServlet
 {
 public:
+
+  typedef Kainjow::Mustache::Data TemplateData;
 
   /**
    * Retrieves the label. This is the last component in the servlet path.
@@ -87,7 +98,7 @@ public:
 
   virtual std::shared_ptr<WebConsoleVariableResolver> GetVariableResolver(HttpServletRequest& request);
 
-  virtual void SetVariableResolver(HttpServletRequest& request, std::shared_ptr<WebConsoleVariableResolver> resolver);
+  virtual void SetVariableResolver(HttpServletRequest& request, const std::shared_ptr<WebConsoleVariableResolver>& resolver);
 
 protected:
 
@@ -160,7 +171,7 @@ protected:
    * @param writer the writer, where the HTML data is rendered
    * @see #StartResponse(HttpServletRequest&, HttpServletResponse&)
    */
-  void EndResponse(std::ostream& writer);
+  void EndResponse(HttpServletRequest& request, std::ostream& writer);
 
   /**
    * Returns a list of CSS reference paths or <code>null</code> if no

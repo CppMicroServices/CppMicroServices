@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -27,12 +28,8 @@ namespace cppmicroservices {
 
 std::string WebConsoleDefaultVariableResolver::Resolve(const std::string& variable) const
 {
-  const_iterator iter = find(variable);
-  if (iter != end())
-  {
-    return iter->second;
-  }
-  return std::string();
+  Kainjow::Mustache mustache(variable);
+  return mustache.render(*this);
 }
 
 }

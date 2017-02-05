@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -33,12 +34,10 @@ public:
 
 private:
 
-  bool IsHtmlRequest(HttpServletRequest &request);
-
   void RenderContent(HttpServletRequest& /*request*/, HttpServletResponse& response);
 
-  std::string GetIds_JSON() const;
-  std::string GetInterface_JSON(const std::string& iid) const;
+  TemplateData GetIds() const;
+  TemplateData GetInterface(const std::string& iid) const;
 
 };
 

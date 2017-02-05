@@ -1,19 +1,17 @@
-
 <div class="container-fluid">
   <h1>{{pluginTitle}}</h1>
   
   <div class="row">
-    
+
     <div class="col-md-12 table-responsive">
       <table class="table table-striped">
         
-        <thead>
-          <tr><th>Interface Type</th></tr>
-        </thead>
+        <thead><tr><th>Id</th><th>Name</th><th>Version</th><th>Status</th></tr></thead>
+
         <tbody>
-          {{#services}}
-          <tr><td><a href="{{pluginRoot}}/interface/{{id}}">{{id}}</a></td></tr>
-          {{/services}}
+          {{#bundles}}
+          <tr><td>{{id}}</td><td><a href="{{pluginRoot}}/{{id}}">{{name}} ({{bsn}})</a></td><td>{{version}}</td><td>{{state}}</td></tr>
+          {{/bundles}}
         </tbody>
 
       </table>

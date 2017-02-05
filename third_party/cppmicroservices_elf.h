@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   This file is a modified version of the elf.h header included
   in the libc6-dev package. Unneeded definitions have been removed.

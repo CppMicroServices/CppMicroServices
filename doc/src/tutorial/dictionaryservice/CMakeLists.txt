@@ -34,6 +34,7 @@ target_link_libraries(Tutorial-${_lib_name} ${CppMicroServices_LIBRARIES})
 set_target_properties(Tutorial-${_lib_name} PROPERTIES
   LABELS Tutorial
   OUTPUT_NAME ${_lib_name}
+  DEBUG_POSTFIX ""
 )
 
 # The above CMake code achieves the same as the CreateTutorial macro,

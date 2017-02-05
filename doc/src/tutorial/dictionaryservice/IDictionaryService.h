@@ -29,7 +29,7 @@
 #include <string>
 
 #ifdef US_BUILD_SHARED_LIBS
-#ifdef Example_dictionaryservice_EXPORTS
+#ifdef Tutorial_dictionaryservice_EXPORTS
   #define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #else
   #define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT

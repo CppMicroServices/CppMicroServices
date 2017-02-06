@@ -60,7 +60,7 @@ set(_resources
 )
 
 usMacroCreateBundle(WebConsole
-  VERSION "0.99.0"
+  VERSION "0.1.0"
   DEPENDS HttpService
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_private_headers}

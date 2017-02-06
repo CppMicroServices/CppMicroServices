@@ -63,7 +63,7 @@ set(THREADS_PREFER_PTHREAD_FLAG 1)
 find_package(Threads REQUIRED)
 
 usMacroCreateBundle(HttpService
-  VERSION "0.99.0"
+  VERSION "0.1.0"
   DEPENDS Framework
   PRIVATE_INCLUDE_DIRS ../third_party
   PUBLIC_HEADERS ${_public_headers}

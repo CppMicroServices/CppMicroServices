@@ -27,42 +27,47 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 
+#include "cppmicroservices/webconsole/WebConsoleExport.h"
+
+
 namespace cppmicroservices {
 
 /**
- * The <code>VariableResolver</code> interface defines the API for an object
+ * The <code>WebConsoleVariableResolver</code> interface defines the API for an object
  * which may be provided by plugins to provide replacement values for
  * variables in the generated content.
- * <p>
- * Plugins should call the
- * {@link WebConsoleUtil#setVariableResolver(javax.servlet.ServletRequest, VariableResolver)}
+ *
+ * Plugins should call the AbstractWebConsolePlugin#SetVariableResolver
  * method to provide their implementation for variable resolution.
- * <p>
+ *
  * The main use of such a variable resolver is when a plugin is using a static
  * template which provides slots to place dynamically generated content
  * parts.
- * <p>
- * <b>Note</b>: The variable resolver must be set in the request <b>before</b>
- * the response writer is retrieved calling the
- * <code>ServletRequest.getWriter()</code> method. Otherwise the variable
- * resolver will not be used for resolving variables.
  *
- * @see WebConsoleUtil#getVariableResolver(javax.servlet.ServletRequest)
- * @see WebConsoleUtil#setVariableResolver(javax.servlet.ServletRequest, VariableResolver)
+ * \rststar
+ * .. note::
+ *
+ *    The variable resolver must be set in the request *before*
+ *    the response stream is retrieved calling the
+ *    :any:`HttpServletResponse::GetOutputStream <cppmicroservices::HttpServletResponse::GetOutputStream>`
+ *    method. Otherwise the variable resolver will not be used for
+ *    resolving variables.
+ * \endrststar
+ *
+ * @see AbstractWebConsolePlugin#GetVariableResolver(HttpServletRequest&)
+ * @see AbstractWebConsolePlugin#SetVariableResolver
  */
-struct WebConsoleVariableResolver
+struct US_WebConsole_EXPORT WebConsoleVariableResolver
 {
 
   virtual ~WebConsoleVariableResolver();
 
   /**
-   * Returns a replacement value for the named variable or <code>null</code>
-   * if no replacement is available.
+   * Returns a replacement value for the named variable.
    *
    * @param variable The name of the variable for which to return a
    *      replacement.
-   * @return The replacement value or <code>null</code> if no replacement is
-   *      available.
+   * @return The replacement value.
    */
   virtual std::string Resolve(const std::string& variable) const = 0;
 };

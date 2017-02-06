@@ -1,0 +1,4 @@
+AbstractWebConsolePlugin
+------------------------
+
+.. doxygenclass:: cppmicroservices::AbstractWebConsolePlugin

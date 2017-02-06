@@ -67,7 +67,7 @@ endforeach()
 
 add_custom_target(doc ALL DEPENDS ${doc_format_outputs})
 
-if(US_BUILD_DOC_MAN)
+if(US_BUILD_DOC_MAN AND NOT US_NO_INSTALL)
   file(GLOB man_rst RELATIVE ${CppMicroServices_SOURCE_DIR}/doc/man
     ${CppMicroServices_SOURCE_DIR}/doc/man/*.[1-9].rst)
   foreach(m ${man_rst})

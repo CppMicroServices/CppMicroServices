@@ -49,13 +49,13 @@ public:
    * Called by the servlet container to indicate to a servlet that the
    * servlet is being placed into service.
    *
-   * The servlet container calls the <code>init</code>
+   * The servlet container calls the <code>Init</code>
    * method exactly once after instantiating the servlet.
-   * The <code>init</code> method must complete successfully
+   * The <code>Init</code> method must complete successfully
    * before the servlet can receive any requests.
    *
    * The servlet container cannot place the servlet into service
-   * if the <code>init</code> method
+   * if the <code>Init</code> method
    * <ol>
    * <li>Throws a <code>ServletException</code>
    * <li>Does not return within a time period defined by the Web server
@@ -86,7 +86,7 @@ public:
    * method, it will not call the <code>service</code> method again
    * on this servlet.
    *
-   * <p>This method gives the servlet an opportunity
+   * This method gives the servlet an opportunity
    * to clean up any resources that are being held (for example, memory,
    * file handles, threads) and make sure that any persistent state is
    * synchronized with the servlet's current state in memory.
@@ -95,10 +95,10 @@ public:
   virtual void Destroy();
 
   /**
-   * Returns a {@link ServletConfig} object, which contains
+   * Returns a ServletConfig object, which contains
    * initialization and startup parameters for this servlet.
    * The <code>ServletConfig</code> object returned is the one
-   * passed to the <code>init</code> method.
+   * passed to the <code>Init</code> method.
    *
    * @return  the <code>ServletConfig</code> object
    *   that initializes this servlet
@@ -116,9 +116,6 @@ public:
 
 protected:
 
-  friend class ServletHandler;
-  //friend class ServletContainerPrivate;
-
   virtual long long GetLastModified(HttpServletRequest& request);
 
   virtual void DoGet(HttpServletRequest& request, HttpServletResponse& response);
@@ -134,6 +131,10 @@ protected:
 private:
 
   HttpServletPrivate* d;
+
+  friend class ServletHandler;
+  //friend class ServletContainerPrivate;
+
 };
 
 }

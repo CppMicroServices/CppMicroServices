@@ -330,9 +330,6 @@ public:
 
 protected:
 
-  friend class HttpServlet;
-  friend class ServletHandler;
-
   virtual std::streambuf* GetOutputStreamBuffer();
 
   void SetOutputStreamBuffer(std::streambuf* sb);
@@ -340,6 +337,12 @@ protected:
   HttpServletResponse(HttpServletResponsePrivate* d);
 
   ExplicitlySharedDataPointer<HttpServletResponsePrivate> d;
+
+private:
+
+  friend class HttpServlet;
+  friend class ServletHandler;
+
 };
 
 } // namespace cppmicroservices

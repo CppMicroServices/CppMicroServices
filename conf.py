@@ -70,7 +70,7 @@ breathe_projects = { "us": "doc/_api/xml/" }
 
 breathe_default_project = "us"
 
-breathe_default_members = ('members', 'undoc-members')
+breathe_default_members = ('members', 'protected-members', 'undoc-members')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['doc/_templates']
@@ -369,11 +369,13 @@ latex_documents = [
 man_pages = [
     ('doc/man/cppmicroservices.7', 'cppmicroservices', u'CppMicroServices Documentation', [author], 7),
     ('doc/man/cppmicroservices-httpservice.7', 'cppmicroservices-httpservice', u'Http Service', [author], 7),
+    ('doc/man/cppmicroservices-webconsole.7', 'cppmicroservices-webconsole', u'Web Console', [author], 7),
     ('doc/man/cppmicroservices-shellservice.7', 'cppmicroservices-shellservice', u'Shell Service', [author], 7),
     ('doc/man/cppmicroservices.3', 'cppmicroservices', u'CppMicroServices', [author], 3),
     ('doc/man/cppmicroservices-framework.3', 'cppmicroservices-framework', u'CppMicroServices Framework API', [author], 3),
-    ('doc/man/cppmicroservices-httpservice.3', 'cppmicroservices-httpservice', u'CppMicroServices HttpService API', [author], 3),
-    ('doc/man/cppmicroservices-shellservice.3', 'cppmicroservices-shellservice', u'CppMicroServices ShellService API', [author], 3),
+    ('doc/man/cppmicroservices-httpservice.3', 'cppmicroservices-httpservice', u'CppMicroServices Http Service API', [author], 3),
+    ('doc/man/cppmicroservices-webconsole.3', 'cppmicroservices-webconsole', u'CppMicroServices Web Console API', [author], 3),
+    ('doc/man/cppmicroservices-shellservice.3', 'cppmicroservices-shellservice', u'CppMicroServices Shell Service API', [author], 3),
     ('doc/man/usResourceCompiler3.1', 'usResourceCompiler3', u'CppMicroServices Resource Compiler', [author], 1),
     ('doc/man/usShell3.1', 'usShell3', u'CppMicroServices Shell', [author], 1),
 ]

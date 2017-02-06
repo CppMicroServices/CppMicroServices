@@ -38,7 +38,7 @@ struct US_WebConsole_EXPORT WebConsoleConstants
 
   /**
    * The name of the service to register as to be used as a "plugin" for
-   * the web console (value is "javax.servlet.Servlet").
+   * the web console (value is "cppmicroservices::HttpServlet").
    */
   static std::string SERVICE_NAME;
 
@@ -47,7 +47,7 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * (value is "org.cppmicroservices.webconsole.label").
    *
    * This service registration property must be set to a single non-empty
-   * String value. Otherwise the {@link #SERVICE_NAME Servlet} services will
+   * string value. Otherwise the {@link #SERVICE_NAME Servlet} services will
    * be ignored by the Web Console and not be used as a plugin.
    */
   static std::string PLUGIN_LABEL; // = "org.cppmicroservices.webconsole.label"
@@ -62,9 +62,9 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * by the Web Console.
    *
    * For {@link #SERVICE_NAME Servlet} services extending from the
-   * {@link AbstractWebConsolePlugin} abstract class this property is not
+   * AbstractWebConsolePlugin abstract class this property is not
    * technically required. To support lazy service access, e.g. for plugins
-   * implemented using the OSGi <i>Service Factory</i> pattern, the use
+   * implemented using the <i>Service Factory</i> pattern, the use
    * of this service registration property is encouraged.
    */
   static std::string PLUGIN_TITLE; // = "org.cppmicroservices.webconsole.title"
@@ -72,18 +72,18 @@ struct US_WebConsole_EXPORT WebConsoleConstants
   /**
    * The category under which the Web Console plugin is listed in the top
    * navigation (value is "org.cppmicroservices.webconsole.category").
-   * <p>
+   *
    * For {@link #SERVICE_NAME Servlet} services not extending the
-   * {@link AbstractWebConsolePlugin} this property is required to declare a
+   * AbstractWebConsolePlugin this property is required to declare a
    * specific category. Otherwise the plugin is put into the default category.
    *
    * For {@link #SERVICE_NAME Servlet} services extending from the
-   * {@link AbstractWebConsolePlugin} abstract class this property is not
+   * AbstractWebConsolePlugin abstract class this property is not
    * technically required. To support lazy service access with categorization,
-   * e.g. for plugins implemented using the OSGi <i>Service Factory</i>
+   * e.g. for plugins implemented using the <i>Service Factory</i>
    * pattern, the use of this service registration property is strongly
    * encouraged. If the property is missing the
-   * {@link AbstractWebConsolePlugin#getCategory()} is called which should be
+   * AbstractWebConsolePlugin#GetCategory() is called which should be
    * overwritten.
    */
   static std::string PLUGIN_CATEGORY; // = "org.cppmicroservices.webconsole.category"
@@ -92,15 +92,14 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * The name of the service registration properties providing references
    * to addition CSS files that should be loaded when rendering the header
    * for a registered plugin.
-   * <p>
+   *
    * This property is expected to be a single string value or a vector of
    * string values.
    *
    * This service registration property is only used for plugins registered
-   * as {@link #SERVICE_NAME} services which do not extend the
-   * {@link AbstractWebConsolePlugin}. Extensions of the
-   * {@link AbstractWebConsolePlugin} should overwrite the
-   * {@link AbstractWebConsolePlugin#GetCssReferences()} method to provide
+   * as #SERVICE_NAME services which do not extend the AbstractWebConsolePlugin.
+   * Extensions of the AbstractWebConsolePlugin should overwrite the
+   * AbstractWebConsolePlugin#GetCssReferences() method to provide
    * additional CSS resources.
    */
   static std::string PLUGIN_CSS_REFERENCES; // = "org.cppmicroservices.webconsole.css"
@@ -120,9 +119,9 @@ struct US_WebConsole_EXPORT WebConsoleConstants
   /**
    * The name of the request attribute providing the absolute path of the
    * current plugin (value is "org.cppmicroservices.webconsole.pluginRoot"). This consists of
-   * the servlet context path (from <code>ServletRequest::GetContextPath()</code>),
+   * the servlet context path (from <code>HttpServletRequest::GetContextPath()</code>),
    * the configured path of the web console root (<code>/us/console</code>
-   * by default) and the plugin label {@link #PLUGIN_LABEL}.
+   * by default) and the plugin label #PLUGIN_LABEL.
    *
    * The type of this request attribute is <code>std::string</code>.
    */
@@ -132,20 +131,20 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * The name of the request attribute providing a mapping of labels to page
    * titles of registered console plugins (value is "org.cppmicroservices.webconsole.labelMap").
    * This map may be used to render a navigation of the console plugins as the
-   * {@link AbstractWebConsolePlugin#renderTopNavigation(javax.servlet.http.HttpServletRequest, java.io.PrintWriter)}
+   * AbstractWebConsolePlugin#RenderTopNavigation(HttpServletRequest&, std::ostream&)
    * method does.
-   * <p>
+   *
    * The type of this request attribute is <code>AnyMap</code>.
    */
   static std::string ATTR_LABEL_MAP; // = "org.cppmicroservices.webconsole.labelMap"
 
   /**
-   * The name of the request attribute holding the {@link VariableResolver}
+   * The name of the request attribute holding the WebConsoleVariableResolver
    * for the request (value is "org.cppmicroservices.webconsole.variable.resolver").
    *
-   * @see VariableResolver
-   * @see WebConsoleUtil#GetVariableResolver(ServletRequest)
-   * @see WebConsoleUtil#SetVariableResolver(ServletRequest, VariableResolver)
+   * @see WebConsoleVariableResolver
+   * @see AbstractWebConsolePlugin#GetVariableResolver
+   * @see AbstractWebConsolePlugin#SetVariableResolver
    */
   static std::string ATTR_CONSOLE_VARIABLE_RESOLVER; // = "org.cppmicroservices.webconsole.variable.resolver"
 

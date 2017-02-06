@@ -23,6 +23,7 @@
 #ifndef CPPMICROSERVICES_WEBCONSOLEDEFAULTVARIABLERESOLVER_H
 #define CPPMICROSERVICES_WEBCONSOLEDEFAULTVARIABLERESOLVER_H
 
+#include "cppmicroservices/webconsole/WebConsoleExport.h"
 #include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
 #include "cppmicroservices/webconsole/mustache.hpp"
 
@@ -30,7 +31,13 @@
 
 namespace cppmicroservices {
 
-class WebConsoleDefaultVariableResolver
+/**
+ * The default Web Console variable resolver class.
+ *
+ * This variable resolver uses Mustache template logic to resolve
+ * variables.
+ */
+class US_WebConsole_EXPORT WebConsoleDefaultVariableResolver
     : public Kainjow::Mustache::Data
     , public WebConsoleVariableResolver
 {

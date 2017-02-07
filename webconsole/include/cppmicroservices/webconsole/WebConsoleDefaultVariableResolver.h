@@ -31,6 +31,8 @@
 
 namespace cppmicroservices {
 
+typedef Kainjow::Mustache::Data MustacheData;
+
 /**
  * The default Web Console variable resolver class.
  *
@@ -38,12 +40,17 @@ namespace cppmicroservices {
  * variables.
  */
 class US_WebConsole_EXPORT WebConsoleDefaultVariableResolver
-    : public Kainjow::Mustache::Data
-    , public WebConsoleVariableResolver
+    : public WebConsoleVariableResolver
 {
 public:
 
   virtual std::string Resolve(const std::string &variable) const;
+
+  MustacheData& GetData();
+
+private:
+
+  MustacheData m_Data;
 };
 
 }

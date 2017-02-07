@@ -114,8 +114,8 @@ void BundlesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespon
     if (!res)
       break;
 
-    auto vars = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request));
-    (*vars)["bundles"] = GetBundlesData();
+    auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+    data["bundles"] = GetBundlesData();
 
     BundleResourceStream rs(res, std::ios_base::binary);
     response.GetOutputStream() << rs.rdbuf();
@@ -129,8 +129,8 @@ void BundlesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespon
 
     std::string pluginRoot = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
     long id = any_cast<long>(request.GetAttribute(REQ_BUNDLE_ID));
-    auto vars = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request));
-    GetBundleData(id, *vars, pluginRoot);
+    auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+    GetBundleData(id, data, pluginRoot);
 
     BundleResourceStream rs(res, std::ios_base::binary);
     response.GetOutputStream() << rs.rdbuf();

@@ -47,14 +47,14 @@ void SettingsPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
   if (res)
   {
     auto props = GetBundleContext().GetProperties();
-    auto vars = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request));
-    (*vars)["us-thread"] = props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept() == Constants::FRAMEWORK_THREADING_MULTI ? TemplateData::Type::True : TemplateData::Type::False;
+    auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+    data["us-thread"] = props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept() == Constants::FRAMEWORK_THREADING_MULTI ? TemplateData::Type::True : TemplateData::Type::False;
 #ifdef US_BUILD_SHARED_LIBS
-    (*vars)["us-shared"] = TemplateData::Type::True;
+    data["us-shared"] = TemplateData::Type::True;
 #else
-    (*vars)["us-shared"] = TemplateData::Type::False;
+    data["us-shared"] = TemplateData::Type::False;
 #endif
-    (*vars)["us-storagepath"] = props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
+    data["us-storagepath"] = props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
 
     TemplateData fwProps(TemplateData::Type::List);
     for (auto p : props)
@@ -64,7 +64,7 @@ void SettingsPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
       kv["value"] = p.second.ToString();
       fwProps << kv;
     }
-    (*vars)["us-fwprops"] = std::move(fwProps);
+    data["us-fwprops"] = std::move(fwProps);
 
     BundleResourceStream rs(res, std::ios_base::binary);
     response.GetOutputStream() << rs.rdbuf();

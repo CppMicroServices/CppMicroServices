@@ -105,10 +105,11 @@ std::shared_ptr<WebConsoleVariableResolver> AbstractWebConsolePlugin::GetVariabl
   }
 
   auto resolver = std::make_shared<WebConsoleDefaultVariableResolver>();
-  (*resolver)["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
-  (*resolver)["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
-  (*resolver)["pluginLabel"] = GetLabel();
-  (*resolver)["pluginTitle"] = GetTitle();
+  auto& data = resolver->GetData();
+  data["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
+  data["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
+  data["pluginLabel"] = GetLabel();
+  data["pluginTitle"] = GetTitle();
   SetVariableResolver(request, resolver);
 
   return resolver;
@@ -136,13 +137,14 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& reques
   auto resolver = this->GetVariableResolver(request);
   if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
   {
-    (*r)["labelMap"] = any_cast<TemplateData>(request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP));
+    auto& data = r->GetData();
+    data["labelMap"] = any_cast<TemplateData>(request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP));
 
     TemplateData head;
     head["title"] = title;
     head["label"] = GetLabel();
     //    r.put("head.cssLinks", getCssLinks(appRoot));
-    (*r)["head"] = std::move(head);
+    data["head"] = std::move(head);
 
     TemplateData brand;
     brand["name"] = "C++ Micro Services";
@@ -152,7 +154,7 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& reques
     //    r.put("brand.product.img", toUrl( brandingPlugin.getProductImage(), appRoot ));
     //    r.put("brand.favicon", toUrl( brandingPlugin.getFavIcon(), appRoot ));
     //    r.put("brand.css", toUrl( brandingPlugin.getMainStyleSheet(), appRoot ));
-    (*r)["brand"] = std::move(brand);
+    data["brand"] = std::move(brand);
   }
   os << GetHeader();
 
@@ -215,7 +217,8 @@ void AbstractWebConsolePlugin::EndResponse(HttpServletRequest& request, std::ost
   auto resolver = this->GetVariableResolver(request);
   if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
   {
-    (*r)["us-version"] = US_VERSION_STR;
+    auto& data = r->GetData();
+    data["us-version"] = US_VERSION_STR;
 
     auto ctx = GetBundleContext();
     auto bundles = ctx.GetBundles();
@@ -229,10 +232,10 @@ void AbstractWebConsolePlugin::EndResponse(HttpServletRequest& request, std::ost
     }
     std::stringstream ss;
     ss << bundles.size();
-    (*r)["us-num-bundles"] = ss.str();
+    data["us-num-bundles"] = ss.str();
     ss.str(std::string());
     ss << active_count;
-    (*r)["us-num-active-bundles"] = ss.str();
+    data["us-num-active-bundles"] = ss.str();
   }
 
   os << GetFooter();

@@ -53,8 +53,8 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
     if (res)
     {
-      auto vars = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request));
-      (*vars)["services"] = GetIds();
+      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+      data["services"] = GetIds();
 
       BundleResourceStream rs(res, std::ios_base::binary);
       response.GetOutputStream() << rs.rdbuf();
@@ -66,9 +66,9 @@ void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
     BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
     if (res)
     {
-      auto vars = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request));
-      (*vars)["interface"] = id;
-      (*vars)["services"] = GetInterface(id);
+      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+      data["interface"] = id;
+      data["services"] = GetInterface(id);
 
       BundleResourceStream rs(res, std::ios_base::binary);
       response.GetOutputStream() << rs.rdbuf();

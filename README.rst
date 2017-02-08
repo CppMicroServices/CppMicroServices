@@ -68,6 +68,7 @@ Below is a list of tested compiler/OS combinations:
 - Clang XCode 7.3 (OS X 10.11) via Travis CI
 - Visual Studio 2013 via Appveyor
 - Visual Studio 2015 via Appveyor
+- Visual Studio 2017 RC (Windows 7)
 - MinGW-w64 via Appveyor
 
 Legal

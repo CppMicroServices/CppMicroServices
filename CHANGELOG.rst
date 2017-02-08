@@ -6,31 +6,11 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased 3.x <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_
+
+`v3.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.0.0>`_
 -----------------------------------------------------------------------------------------
 
-Added
-~~~~~
-
-Changed
-~~~~~~~
-
-Deprecated
-~~~~~~~~~~
-
-Removed
-~~~~~~~
-
-Fixed
-~~~~~
-
-Security
-~~~~~~~~
-
-`Unreleased 3.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_
------------------------------------------------------------------------------------------
-
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v2.1.1...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v2.1.1...v3.0.0>`_
 
 See the `migration guide <https://github.com/CppMicroServices/CppMicroServices/wiki/Migration-Guide-to-version-3.0>`_
 for moving from a 2.x release to 3.x.

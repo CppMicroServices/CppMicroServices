@@ -1,0 +1,4 @@
+WebConsoleVariableResolver
+--------------------------
+
+.. doxygenstruct:: cppmicroservices::WebConsoleVariableResolver

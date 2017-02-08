@@ -580,6 +580,11 @@ void BundlePrivate::Start(uint32_t options)
   }
 }
 
+AnyMap BundlePrivate::GetHeaders() const
+{
+  return bundleManifest.GetHeaders();
+}
+
 std::exception_ptr BundlePrivate::Start0()
 {
   // res is used to signal that start did not complete in a normal way

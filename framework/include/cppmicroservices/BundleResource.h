@@ -270,11 +270,18 @@ public:
   std::vector<BundleResource> GetChildResources() const;
 
   /**
-   * Returns the size of the resource data for this %BundleResource object.
+   * Returns the (uncompressed) size of the resource data for this %BundleResource object.
    *
-   * @return The resource data size.
+   * @return The uncompressed resource data size.
    */
   int GetSize() const;
+
+  /**
+   * Returns the compressed size of the resource data for this %BundleResource object.
+   *
+   * @return The compressed resource data size.
+   */
+  int GetCompressedSize() const;
 
   /**
    * Returns the last modified time of this resource in seconds from the epoch.
@@ -303,7 +310,7 @@ private:
 
   std::size_t Hash() const;
 
-  void* GetData() const;
+  std::unique_ptr<void, void(*)(void*)> GetData() const;
 
   BundleResourcePrivate* d;
 

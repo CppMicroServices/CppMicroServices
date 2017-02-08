@@ -171,7 +171,7 @@ std::map<std::string, Any> Bundle::GetProperties() const
 
 AnyMap Bundle::GetHeaders() const
 {
-  return d->bundleManifest.GetHeaders();
+  return d->GetHeaders();
 }
 
 Any Bundle::GetProperty(const std::string& key) const
@@ -231,14 +231,14 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 BundleResource Bundle::GetResource(const std::string& path) const
 {
   d->CheckUninstalled();
-  return d->barchive->GetResource(path);
+  return d->barchive ? d->barchive->GetResource(path) : BundleResource();
 }
 
 std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
                                                   bool recurse) const
 {
   d->CheckUninstalled();
-  return d->barchive->FindResources(path, filePattern, recurse);
+  return d->barchive ? d->barchive->FindResources(path, filePattern, recurse) : std::vector<BundleResource>();
 }
 
 Bundle::TimeStamp Bundle::GetLastModified() const

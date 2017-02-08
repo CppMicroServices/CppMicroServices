@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,9 +26,16 @@
 #include "cppmicroservices/httpservice/HttpServlet.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
+#include "cppmicroservices/webconsole/mustache.hpp"
 
 #include <string>
 #include <vector>
+
+namespace Kainjow {
+
+US_WebConsole_EXPORT std::ostream& operator<<(std::ostream& os, const Mustache::Data&);
+
+}
 
 namespace cppmicroservices {
 
@@ -40,6 +48,7 @@ class HttpServletResponse;
 struct WebConsoleVariableResolver;
 
 struct AbstractWebConsolePluginPrivate;
+
 
 /**
  * The Web Console can be extended by registering an OSGi service for the interface
@@ -55,6 +64,8 @@ struct AbstractWebConsolePluginPrivate;
 class US_WebConsole_EXPORT AbstractWebConsolePlugin : public HttpServlet
 {
 public:
+
+  typedef Kainjow::Mustache::Data TemplateData;
 
   /**
    * Retrieves the label. This is the last component in the servlet path.
@@ -87,14 +98,14 @@ public:
 
   virtual std::shared_ptr<WebConsoleVariableResolver> GetVariableResolver(HttpServletRequest& request);
 
-  virtual void SetVariableResolver(HttpServletRequest& request, std::shared_ptr<WebConsoleVariableResolver> resolver);
+  virtual void SetVariableResolver(HttpServletRequest& request, const std::shared_ptr<WebConsoleVariableResolver>& resolver);
 
 protected:
 
   /**
    * Detects whether this request is intended to have the headers and
    * footers of this plugin be rendered or not. This method always returns
-   * <code>true</true> and may be overwritten by plugins to detect
+   * <code>true</code> and may be overwritten by plugins to detect
    * from the actual request, whether or not to render the header and
    * footer.
    *
@@ -109,18 +120,22 @@ protected:
    * <ol>
    * <li>Send back a requested resource
    * <li>{@link #StartResponse(HttpServletRequest&, HttpServletResponse&)}</li>
-   * <li>{@link #RenderTopNavigation(HttpServletRequest&, PrintWriter*)}</li>
+   * <li>{@link #RenderTopNavigation(HttpServletRequest&, std::ostream&)}</li>
    * <li>{@link #RenderContent(HttpServletRequest&, HttpServletResponse&)}</li>
-   * <li>{@link #EndResponse(std::ostream&)}</li>
+   * <li>{@link #EndResponse(HttpServletRequest&, std::ostream&)}</li>
    * </ol>
-   * <p>
-   * <b>Note</b>: If a resource is sent back for the request only the first
-   * step is executed. Otherwise the first step is a null-operation actually
-   * and the latter four steps are executed in order.
-   * <p>
-   * If the {@link #isHtmlRequest(HttpServletRequest)} method returns
+   *
+   * \rststar
+   * .. note::
+   *
+   *    If a resource is sent back for the request only the first
+   *    step is executed. Otherwise the first step is a null-operation actually
+   *    and the latter four steps are executed in order.
+   * \endrststar
+   *
+   * If the {@link #IsHtmlRequest(HttpServletRequest&)} method returns
    * <code>false</code> only the
-   * {@link #renderContent(HttpServletRequest, HttpServletResponse)} method is
+   * {@link #RenderContent(HttpServletRequest&, HttpServletResponse&)} method is
    * called.
    *
    * @see HttpServlet#DoGet(HttpServletRequest&, HttpServletResponse&)
@@ -131,8 +146,8 @@ protected:
    * This method is used to render the content of the plug-in. It is called internally
    * from the Web Console.
    *
-   * @param req the HTTP request send from the user
-   * @param res the HTTP response object, where to render the plugin data.
+   * @param request the HTTP request send from the user
+   * @param response the HTTP response object, where to render the plugin data.
    */
   virtual void RenderContent(HttpServletRequest& request, HttpServletResponse& response) = 0;
 
@@ -142,7 +157,7 @@ protected:
    * @param request the HTTP request coming from the user
    * @param response the HTTP response, where data is rendered
    * @return the stream that was used for generating the response.
-   * @see #EndResponse
+   * @see #EndResponse(HttpServletRequest&, std::ostream&)
    */
   std::ostream& StartResponse(HttpServletRequest& request, HttpServletResponse& response);
 
@@ -157,23 +172,24 @@ protected:
   /**
    * This method is responsible for generating the footer of the page.
    *
+   * @param request the HTTP request coming from the user
    * @param writer the writer, where the HTML data is rendered
    * @see #StartResponse(HttpServletRequest&, HttpServletResponse&)
    */
-  void EndResponse(std::ostream& writer);
+  void EndResponse(HttpServletRequest& request, std::ostream& writer);
 
   /**
    * Returns a list of CSS reference paths or <code>null</code> if no
    * additional CSS files are provided by the plugin.
-   * <p>
+   *
    * The result is an array of strings which are used as the value of
    * the <code>href</code> attribute of the <code>&lt;link&gt;</code> elements
    * placed in the head section of the HTML generated. If the reference is
    * a relative path, it is turned into an absolute path by prepending the
-   * value of the {@link WebConsoleConstants#ATTR_APP_ROOT} request attribute.
+   * value of the WebConsoleConstants#ATTR_APP_ROOT request attribute.
    *
    * @return The list of additional CSS files to reference in the head
-   *      section or <code>null</code> if no such CSS files are required.
+   *      section or an empty list if no such CSS files are required.
    */
   std::vector<std::string> GetCssReferences() const;
 
@@ -191,12 +207,9 @@ private:
 
   /**
    * If the request addresses a resource which may be served by the
-   * <code>getResource</code> method of the
-   * {@link #getResourceProvider() resource provider}, this method serves it
+   * <code>GetResource</code> method of this instance, this method serves it
    * and returns <code>true</code>. Otherwise <code>false</code> is returned.
-   * <code>false</code> is also returned if the resource provider has no
-   * <code>getResource</code> method.
-   * <p>
+   *
    * If <code>true</code> is returned, the request is considered complete and
    * request processing terminates. Otherwise request processing continues
    * with normal plugin rendering.
@@ -205,7 +218,7 @@ private:
    * @param response The response object
    * @return <code>true</code> if the request causes a resource to be sent back.
    *
-   * @throws IOException If an error occurs accessing or spooling the resource.
+   * @throws std::exception If an error occurs accessing or spooling the resource.
    */
   bool SpoolResource(HttpServletRequest& request, HttpServletResponse& response) const;
 

@@ -182,6 +182,6 @@ file for details about the contribution process.
 .. |RTD Build Status (stable)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=stable&style=flat-square
    :target: http://docs.cppmicroservices.org/en/stable/?badge=stable
    :alt: Documentation Status (stable)
-.. |RTD Build Status (development)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=development&style=flat-square
-   :target: http://docs.cppmicroservices.org/en/development/?badge=development
+.. |RTD Build Status (development)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=latest&style=flat-square
+   :target: http://docs.cppmicroservices.org/en/latest/?badge=development
    :alt: Documentation Status (development)

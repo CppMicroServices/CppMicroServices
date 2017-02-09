@@ -13,32 +13,33 @@
 </head>
 <body>
 
-  <!-- Navigation -->
-  <div class="navbar-fixed">
-  <nav class="blue-grey white-text" role="navigation">
-    <div class="nav-wrapper container">
-      <a id="logo-container" href="#" class="brand-logo">CppMicroServices</a>
-      <ul class="right hide-on-med-and-down">
-        <li><a href="#overview">Overview</a></li>
-        <li><a href="#bundles">Bundles</a></li>
-        <li><a href="#docs">Docs</a></li>
-        <li><a href="#help">Help</a></li>
-      </ul>
-
-      <ul id="nav-mobile" class="side-nav">
-        <li><a href="#">Navbar Link</a></li>
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
-  </nav>
+<!-- Navigation -->
+<nav class="blue-grey white-text nav-fixed" role="navigation">
+  <div class="nav-wrapper container">
+    <a id="logo-container" href="#" class="brand-logo">CppMicroServices</a>
+    <ul class="right hide-on-med-and-down">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#bundles">Bundles</a></li>
+      <li><a href="#docs">Docs</a></li>
+      <li><a href="#help">Help</a></li>
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
   </div>
+</nav>
+
+  <ul id="nav-mobile" class="side-nav">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#bundles">Bundles</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#help">Help</a></li>
+  </ul>
 
   <!-- Banner -->
   <div class="section no-pad-bot blue-grey white-text" id="index-banner">
     <div class="container">
-      <div class="chip large right red darken-1 white-text">
+      <div class="chip large right teal white-text">
         <i class="left-icon material-icons">whatshot</i>
-        Upcoming <a href="https://github.com/CppMicroServices/CppMicroServices/milestone/2">Release 3.0</a>&nbsp;
+        <a href="https://github.com/CppMicroServices/CppMicroServices/releases/tag/v3.0.0">Version 3.0</a> released!&nbsp;
       </div>
           
       <br><br>
@@ -47,7 +48,7 @@
         <h5 class="header col s12 thin">Build modular and dynamic service-oriented C++ applications</h5>
       </div>
       <div class="row center">
-        <a href="http://cppmicroservices.org/doc_2_1/MicroServices_GettingStarted.html" class="btn-large waves-effect waves-light orange">
+        <a href="http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html" class="btn-large waves-effect waves-light orange">
           <i class="material-icons left">school</i>Get Started
         </a>
         <a href="https://github.com/CppMicroServices/CppMicroServices/releases/latest" class="btn-large waves-effect waves-light orange">
@@ -145,7 +146,7 @@
             <h5 class="center">Apache 2.0 License</h5>
 
             <p class="light">The software is open-source and licensed under the liberal and
-              commercially friendly <a href="https://github.com/CppMicroServices/CppMicroServices/blob/development/LICENSE">Apache 2.0 License</a>.
+              commercially friendly <a href="https://github.com/CppMicroServices/CppMicroServices/blob/master/LICENSE">Apache 2.0 License</a>.
             </p>
           </div>
         </div>
@@ -171,7 +172,7 @@
           <div class="card teal">
             <div class="card-stacked white-text">
               <div class="card-content">
-                <span class="badge white-text teal lighten-1" data-badge-caption="(stable)">v2.1</span>
+                <span class="badge white-text teal lighten-1">stable</span>
                 <span class="card-title valign-wrapper"><i class="material-icons card-icon">my_location</i>
             Framework</span>
                 <p>The core framework, required for interacting with bundles and services.
@@ -180,7 +181,7 @@
                 </p>
               </div>
               <div class="card-action">
-                <a href="http://cppmicroservices.org/doc_2_1/group__MicroServices.html">Learn more</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices.7.html">Learn more</a>
               </div>
             </div>
           </div>
@@ -192,14 +193,14 @@
           <div class="card teal">
             <div class="card-stacked white-text">
               <div class="card-content">
-                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="badge white-text red lighten-2">experimental</span>
                 <span class="card-title valign-wrapper"><i class="material-icons card-icon">code</i>
                 Shell</span>
                 <p>The Shell is a command line tool for interacting with a C++ Micro Services applications
                   using a textual user interface (TUI). It allows you to inspect services and manage bundles.</p>
               </div>
               <div class="card-action">
-                <a href="#" class="disabled">Learn more (not released yet)</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/doc/man/usShell3.1.html">Learn more</a>
               </div>
             </div>
           </div>
@@ -211,7 +212,7 @@
           <div class="card teal">
             <div class="card-stacked white-text">
               <div class="card-content">
-                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="badge white-text red lighten-2">experimental</span>
                 <span class="card-title valign-wrapper"><i class="material-icons card-icon">public</i>
             Web Console</span>
                 <p>The Web Console is a rich and extensible html management agent. Using this bundle adds
@@ -220,7 +221,7 @@
                 </p>
               </div>
               <div class="card-action">
-                <a href="#" class="disabled">Learn more (not released yet)</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices-webconsole.7.html">Learn more</a>
               </div>
             </div>
           </div>
@@ -236,14 +237,14 @@
           <div class="card teal">
             <div class="card-stacked white-text">
               <div class="card-content">
-                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="badge white-text red lighten-2">experimental</span>
                 <span class="card-title valign-wrapper"><i class="material-icons card-icon">settings</i>
                 Shell Service</span>
                 <p>The shell service provided by this bundle evaluates shell commands and is the standard
                   back-end for clients like the Shell TUI.</p>
               </div>
               <div class="card-action">
-                <a href="#" class="disabled">Learn more (not released yet)</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices-shellservice.7.html">Learn more</a>
               </div>
             </div>
           </div>
@@ -255,7 +256,7 @@
           <div class="card teal">
             <div class="card-stacked white-text">
               <div class="card-content">
-                <span class="badge white-text red lighten-2" data-badge-caption="(experimental)">v0.1</span>
+                <span class="badge white-text red lighten-2">experimental</span>
                 <span class="card-title valign-wrapper"><i class="material-icons card-icon">http</i>
             Http Service</span>
                 <p>This bundle provides a http servlet engine on top of an embedded web server. Use it
@@ -263,7 +264,7 @@
                 </p>
               </div>
               <div class="card-action">
-                <a href="#" class="disabled">Learn more (not released yet)</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices-httpservice.7.html">Learn more</a>
               </div>
             </div>
           </div>
@@ -295,7 +296,7 @@
                 <p>Covers supported platforms, the build process, and a quick introduction to the basic features.</p>
               </div>
               <div class="card-action">
-                <a href="http://cppmicroservices.org/doc_2_1/MicroServices_GettingStarted.html">Get started...</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/index.html#general">Get started...</a>
               </div>
             </div>
           </div>
@@ -311,7 +312,7 @@
                 </p>
               </div>
               <div class="card-action">
-                <a href="http://cppmicroservices.org/doc_2_1/pages.html">Grasp the Concepts...</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices.7.html">Grasp the Concepts...</a>
               </div>
             </div>
           </div>
@@ -329,7 +330,7 @@
                 </p>
               </div>
               <div class="card-action">
-                <a href="http://cppmicroservices.org/doc_2_1/MicroServices_UserDocs.html">Learn Best Practices...</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/index.html#best_practices">Learn Best Practices...</a>
               </div>
             </div>
           </div>
@@ -345,7 +346,7 @@
                 </p>
               </div>
               <div class="card-action">
-                <a href="http://cppmicroservices.org/doc_2_1/modules.html">Study the API Reference...</a>
+                <a href="http://docs.cppmicroservices.org/en/stable/index.html#api_ref">Study the API Reference...</a>
               </div>
             </div>
           </div>
@@ -395,10 +396,10 @@
 
         <div class="col s12 m3">
           <div class="icon-block">
-            <h2 class="center"><a href="http://forum.cppmicroservices.org"><i class="material-icons teal-text">forum</i></a></h2>
+            <h2 class="center"><a href="https://forum.cppmicroservices.org"><i class="material-icons teal-text">forum</i></a></h2>
             <h5 class="center">Forum</h5>
 
-            <p class="light">Ask questions in the <a href="http://forum.cppmicroservices.org">Forum</a> or browse
+            <p class="light">Ask questions in the <a href="https://forum.cppmicroservices.org">Forum</a> or browse
             previous discussions.</p>
           </div>
         </div>
@@ -423,26 +424,30 @@
         <div class="col l3 m6 s12">
           <h5 class="white-text thin">Main</h5>
           <ul>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/MicroServices_GettingStarted.html">Get Started</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/src/build_instructions.html">Build Instructions</a></li>
             <li><a class="white-text" href="https://github.com/CppMicroServices/CppMicroServices">GitHub Project</a></li>
             <li><a class="white-text" href="https://github.com/CppMicroServices/CppMicroServices/releases/latest">Download</a></li>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/index.html">Documentation</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/index.html">Documentation</a></li>
           </ul>
         </div>
         <div class="col l3 m6 s12">
           <h5 class="white-text thin">Bundles &amp; Tools</h5>
           <ul>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/group__MicroServices.html">Framework</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices.7.html">Framework</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices-httpservice.7.html">Http Service</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices-webconsole.7.html">Web Console</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/man/cppmicroservices-shellservice.7.html">Shell Service</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/man/usResourceCompiler3.1.html">Resource Compiler</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/man/usShell3.1.html">Shell</a></li>
           </ul>
         </div>
         <div class="col l3 m6 s12">
           <h5 class="white-text thin">Documentation</h5>
           <ul>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/index.html">Index</a></li>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/MicroServices_GettingStarted.html">Getting Started</a></li>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/pages.html">Concepts</a></li>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/MicroServices_UserDocs.html">Best Practices</a></li>
-            <li><a class="white-text" href="http://cppmicroservices.org/doc_2_1/modules.html">API Reference</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/index.html">Index</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html">Getting Started</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/index.html#best_practices">Best Practices</a></li>
+            <li><a class="white-text" href="http://docs.cppmicroservices.org/en/stable/index.html#api_ref">API Reference</a></li>
           </ul>
         </div>
         <div class="col l3 m6 s12">
@@ -450,7 +455,7 @@
           <ul>
             <li><a class="white-text" href="https://github.com/CppMicroServices/CppMicroServices/blob/development/CONTRIBUTING.rst">Contribute</a></li>
             <li><a class="white-text" href="https://github.com/CppMicroServices/CppMicroservices/wiki">Wiki</a></li>
-            <li><a class="white-text" href="http://forum.cppmicroservices.org/">Forum</a></li>
+            <li><a class="white-text" href="https://forum.cppmicroservices.org/">Forum</a></li>
             <li><a class="white-text" href="https://github.com/CppMicroServices/CppMicroServices/issues">Feedback</a></li>
           </ul>
         </div>

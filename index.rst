@@ -13,6 +13,7 @@ Start reading at the top for a quick start.
 
 .. toctree::
    :caption: General
+   :name: general
 
    Overview </README>
    /doc/src/build_instructions
@@ -22,12 +23,14 @@ Start reading at the top for a quick start.
 
 .. toctree::
    :caption: Best Practices
+   :name: best_practices
 
    /doc/src/tutorial/index
    /doc/src/best_practices/emulate_singleton
    
 .. toctree::
    :caption: Bundles & Tools
+   :name: bundles_tools
 
    /doc/man/cppmicroservices.7
    /doc/man/cppmicroservices-httpservice.7
@@ -38,6 +41,7 @@ Start reading at the top for a quick start.
    
 .. toctree::
    :caption: API Reference
+   :name: api_ref
 
    /doc/man/cppmicroservices.3
    /doc/man/cppmicroservices-framework.3

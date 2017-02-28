@@ -16,11 +16,11 @@ and cannot be altered by the bundle author:
 Bundle authors must always add the following property to their bundle's
 ``manifest.json`` file:
 
--  ``bundle.name`` - The human readable name of the bundle (type
+-  ``bundle.symbolic_name`` - The human readable name of the bundle (type
    ``std::string``)
 
 C++ Micro Services will not install any bundle which doesn't contain a
-valid 'bundle.name' property in its ``manifest.json`` file.
+valid 'bundle.symbolic_name' property in its ``manifest.json`` file.
 
 Bundle authors can add custom properties by providing a
 ``manifest.json`` file, embedded as a top-level resource into the bundle
@@ -31,7 +31,7 @@ be:
 .. code:: json
 
     {
-      "bundle.name" : "my bundle",
+      "bundle.symbolic_name" : "my bundle",
       "bundle.version" : "1.0.2",
       "bundle.description" : "This bundle provides an awesome service",
       "authors" : [ "John Doe", "Douglas Reynolds", "Daniel Cannady" ],
@@ -50,9 +50,6 @@ Services library specifies the following standard keys for re-use in
    ``std::string``)
 -  ``bundle.description`` - A description for the bundle (type
    ``std::string``)
--  ``bundle.autoload_dir`` - A custom auto-load directory for the bundle
-   (type ``std::string``). If not set, this property defaults to the
-   bundle's library name.
 
 .. note::
 

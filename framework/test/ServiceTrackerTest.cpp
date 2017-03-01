@@ -173,7 +173,7 @@ void TestServiceTracker(BundleContext context)
     st2.Close();
 
     // Closing the tracker should notify the waiters
-    auto wait_until = Clock::now() + std::chrono::seconds(3);
+    auto wait_until = detail::Clock::now() + std::chrono::seconds(3);
     US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == US_FUTURE_READY, "Closed service tracker notifies waiters");
     US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == US_FUTURE_READY, "Closed service tracker notifies waiters");
   }
@@ -243,7 +243,7 @@ void TestServiceTracker(BundleContext context)
 
   // 14a Get the highest ranked service, directly this time
   auto o3 = st1->GetService();
-  US_TEST_CONDITION_REQUIRED(o1.get() != nullptr && !o3->empty(), "Check for non-null service");
+  US_TEST_CONDITION_REQUIRED(o3.get() != nullptr && !o3->empty(), "Check for non-null service");
   US_TEST_CONDITION_REQUIRED(o1 == o3, "Check for equal service instances");
 
   // 15. Now release the tracking of that service and then try to get it

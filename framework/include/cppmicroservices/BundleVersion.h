@@ -35,7 +35,14 @@
 namespace cppmicroservices {
 
 /**
+\defgroup gr_bundleversion BundleVersion
+
+\brief Groups BundleVersion class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_bundleversion
  *
  * Version identifier for CppMicroServices bundles.
  *
@@ -252,6 +259,9 @@ public:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundleversion
+ *
+ * Streams the string representation of \c v into the stream \c os, using BundleVersion::ToString.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleVersion& v);
 

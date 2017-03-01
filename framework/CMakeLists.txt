@@ -34,11 +34,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
                ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
 usMacroCreateBundle(Framework
-  VERSION "2.99.0"
+  VERSION "${CppMicroServices_VERSION}"
   TARGET CppMicroServices
   SYMBOLIC_NAME system_bundle
   SKIP_INIT # we do it manually
-  INTERNAL_INCLUDE_DIRS src/util src/service src/bundle
+  PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
   LINK_LIBRARIES ${_link_libraries}
   SOURCES ${_framework_srcs}
   PUBLIC_HEADERS ${_framework_public_headers}
@@ -47,6 +47,6 @@ usMacroCreateBundle(Framework
 )
 
 set_property(
-  TARGET CppMicroServices APPEND PROPERTY
+  TARGET ${PROJECT_TARGET} APPEND PROPERTY
   COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_WRITING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES"
   )

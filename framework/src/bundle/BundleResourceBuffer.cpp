@@ -36,28 +36,26 @@
 #endif
 
 namespace cppmicroservices {
-  
+
 namespace detail {
 
 class BundleResourceBufferPrivate
 {
 public:
 
-  BundleResourceBufferPrivate(void* data, std::size_t size, const char* begin, std::ios_base::openmode mode)
+  BundleResourceBufferPrivate(std::unique_ptr<void, void(*)(void*)> data,
+                              std::size_t size,
+                              const char* begin,
+                              std::ios_base::openmode mode)
     : begin(begin)
     , end(begin + size)
     , current(begin)
     , mode(mode)
-    , uncompressedData(reinterpret_cast<unsigned char*>(data))
+    , uncompressedData(reinterpret_cast<unsigned char*>(data.release()), data.get_deleter())
   #ifdef DATA_NEEDS_NEWLINE_CONVERSION
     , pos(0)
   #endif
   {
-  }
-
-  ~BundleResourceBufferPrivate()
-  {
-    free(uncompressedData);
   }
 
   const char* const begin;
@@ -66,7 +64,7 @@ public:
 
   const std::ios_base::openmode mode;
 
-  unsigned char* uncompressedData;
+  std::unique_ptr<unsigned char, void(*)(void*)> uncompressedData;
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
   // records the stream position ignoring CR characters
@@ -75,18 +73,18 @@ public:
 
 };
 
-BundleResourceBuffer::BundleResourceBuffer(void* data, std::size_t _size,
+BundleResourceBuffer::BundleResourceBuffer(std::unique_ptr<void, void(*)(void*)> data,
+                                           std::size_t _size,
                                            std::ios_base::openmode mode)
   : d(nullptr)
 {
   assert(_size < static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
-  // assert(data != nullptr);
 
-  char* begin = reinterpret_cast<char*>(data);
-  std::size_t size = _size;
+  char* begin = reinterpret_cast<char*>(data.get());
+  std::size_t size = begin ? _size : 0;
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
-  if (data != nullptr && !(mode & std::ios_base::binary) && begin[0] == '\r')
+  if (begin != nullptr && !(mode & std::ios_base::binary) && begin[0] == '\r')
   {
     ++begin;
     --size;
@@ -94,18 +92,17 @@ BundleResourceBuffer::BundleResourceBuffer(void* data, std::size_t _size,
 #endif
 
 #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
-  if (data != nullptr && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
+  if (begin != nullptr && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
   {
     --size;
   }
 #endif
 
-  d = new BundleResourceBufferPrivate(data, size, begin, mode);
+  d.reset(new BundleResourceBufferPrivate(std::move(data), size, begin, mode));
 }
 
 BundleResourceBuffer::~BundleResourceBuffer()
 {
-  delete d;
 }
 
 BundleResourceBuffer::int_type BundleResourceBuffer::underflow()

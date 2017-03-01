@@ -2,8 +2,11 @@
 *.o
 *.so
 CMakeLists.txt.user*
+CMakeSettings.json
 gh-pages
-framework/examples/makefile/main
+doc/_api
+doc/_build
+doc/src/examples/makefile/main
 *.tlog
 *.lastbuildstate
 *.obj
@@ -34,3 +37,4 @@ framework/examples/makefile/main
 *.xcconfig
 *.pbxproj
 *.DS_Store
+*.pyc

@@ -23,7 +23,7 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
-#include "cppmicroservices/Chrono.h"
+#include "cppmicroservices/detail/Chrono.h"
 
 #include <memory>
 #include <string>
@@ -40,6 +40,8 @@ struct BundleStorage;
  */
 struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 {
+
+  typedef detail::Clock::time_point TimeStamp;
 
   struct Data
   {
@@ -133,12 +135,12 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   /**
    * Get last modified timestamp.
    */
-  Clock::time_point GetLastModified() const;
+  TimeStamp GetLastModified() const;
 
   /**
    * Set stored last modified timestamp.
    */
-  void SetLastModified(const Clock::time_point& tp);
+  void SetLastModified(const TimeStamp& ts);
 
   /**
    * Get auto-start setting.

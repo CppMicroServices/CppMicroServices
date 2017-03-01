@@ -25,12 +25,17 @@
 #include "TestingMacros.h"
 
 #include <limits>
+#include <stdexcept>
 
 using namespace cppmicroservices;
 
 int AnyTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("AnyTest");
+
+  Any anyEmpty;
+  US_TEST_FOR_EXCEPTION(std::logic_error, anyEmpty.ToString())
+  US_TEST_NO_EXCEPTION(anyEmpty.ToStringNoExcept())
 
   Any anyBool = true;
   US_TEST_CONDITION(anyBool.Type() == typeid(bool), "Any[bool].Type()")

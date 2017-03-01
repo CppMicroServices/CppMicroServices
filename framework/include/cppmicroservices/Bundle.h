@@ -24,8 +24,10 @@
 #ifndef CPPMICROSERVICES_BUNDLE_H
 #define CPPMICROSERVICES_BUNDLE_H
 
+#include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/BundleVersion.h"
-#include "cppmicroservices/Chrono.h"
+#include "cppmicroservices/detail/Chrono.h"
 
 #include <memory>
 #include <map>
@@ -45,7 +47,14 @@ class ServiceReference;
 typedef ServiceReference<void> ServiceReferenceU;
 
 /**
+\defgroup gr_bundle Bundle
+
+\brief Groups Bundle class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
  *
  * An installed bundle in the Framework.
  *
@@ -91,8 +100,11 @@ class US_Framework_EXPORT Bundle
 
 public:
 
-  typedef Clock::time_point TimeStamp;
+  typedef detail::Clock::time_point TimeStamp;
 
+  /**
+   * The bundle state.
+   */
   enum State : uint32_t {
 
     /**
@@ -141,7 +153,7 @@ public:
      *
      * A bundle is in the \c STATE_STARTING state when its {@link #Start(uint32_t)
      * Start} method is active. A bundle must be in this state when the bundle's
-     * {@link BundleActivator#Start(BundleContext)} is called.
+     * BundleActivator#Start(BundleContext) is called.
      * If the \c BundleActivator#Start method completes without exception, then
      * the bundle has successfully started and moves to the \c STATE_ACTIVE
      * state.
@@ -385,9 +397,39 @@ public:
    * @return A map containing this bundle's Manifest properties as
    *         key/value pairs.
    *
-   * @sa \ref MicroServices_BundleProperties
+   * @deprecated Since 3.0, use GetHeaders() instead.
+   *
+   * \rststar
+   * .. seealso::
+   *
+   *    :any:`concept-bundle-properties`
+   * \endrststar
    */
   std::map<std::string, Any> GetProperties() const;
+
+  /**
+   * Returns this bundle's Manifest headers and values.
+   *
+   * Manifest header names are case-insensitive. The methods of the returned
+   * \c AnyMap object operate on header names in a case-insensitive
+   * manner.
+   *
+   * If a Manifest header value starts with &quot;%&quot;, it is
+   * localized according to the default locale. If no localization is found
+   * for a header value, the header value without the leading &quot;%&quot; is
+   * returned.
+   *
+   * \note Localization is not yet supported, hence the leading &quot;%&quot;
+   * is always removed.
+   *
+   * This method continues to return Manifest header information while
+   * this bundle is in the \c UNINSTALLED state.
+   *
+   * @return A map containing this bundle's Manifest headers and values.
+   *
+   * @see Constants#BUNDLE_LOCALIZATION
+   */
+  AnyMap GetHeaders() const;
 
   /**
    * Returns the value of the specified property for this bundle.
@@ -398,19 +440,33 @@ public:
    * @return The value of the requested property, or an empty string
    *         if the property is undefined.
    *
-   * @sa GetPropertyKeys()
-   * @sa \ref MicroServices_BundleProperties
+   * \rststar
+   * .. deprecated:: 3.0
+   *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` or :any:`BundleContext::GetProperty(const std::string&) <cppmicroservices::BundleContext::GetProperty>` instead.
+   *
+   * .. seealso::
+   *
+   *    | :any:`cppmicroservices::Bundle::GetPropertyKeys`
+   *    | :any:`concept-bundle-properties`
+   * \endrststar
    */
-  Any GetProperty(const std::string& key) const;
+  US_DEPRECATED Any GetProperty(const std::string& key) const;
 
   /**
    * Returns a list of top-level property keys for this bundle.
    *
    * @return A list of available property keys.
    *
-   * @sa \ref MicroServices_BundleProperties
+   * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperties()
+   * instead.
+   *
+   * \rststar
+   * .. seealso::
+   *
+   *    :any:`concept-bundle-properties`
+   * \endrststar
    */
-  std::vector<std::string> GetPropertyKeys() const;
+  US_DEPRECATED std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns this bundle's ServiceReference list for all services it
@@ -424,7 +480,8 @@ public:
    * @return A list of ServiceReference objects for services this
    * bundle has registered.
    *
-   * @throws std::logic_error If this bundle has been uninstalled.
+   * @throws std::logic_error If this bundle has been uninstalled, if
+   *         the ServiceRegistrationBase object is invalid, or if the service is unregistered.
    */
   std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
@@ -441,7 +498,8 @@ public:
    * @return A list of ServiceReference objects for all services this
    * bundle is using.
    *
-   * @throws std::logic_error If this bundle has been uninstalled.
+   * @throws std::logic_error If this bundle has been uninstalled, if
+   *         the ServiceRegistrationBase object is invalid, or if the service is unregistered.
    */
   std::vector<ServiceReferenceU> GetServicesInUse() const;
 
@@ -505,14 +563,14 @@ public:
    * <em>Started with eager activation</em> if not set.
    *
    * The following steps are executed to start this bundle:
-   * -# If this bundle is in the process of being activated or deactivated
+   * -# If this bundle is in the process of being activated or deactivated,
    *    then this method waits for activation or deactivation to complete
    *    before continuing. If this does not occur in a reasonable time, a
    *    \c std::runtime_error is thrown to indicate this bundle was unable to
    *    be started.
-   * -# If this bundle's state is \c STATE_ACTIVE then this method returns
+   * -# If this bundle's state is \c STATE_ACTIVE, then this method returns
    *    immediately.
-   * -# If the {@link #START_TRANSIENT} option is not set then set this
+   * -# If the {@link #START_TRANSIENT} option is not set, then set this
    *    bundle's autostart setting to <em>Started with declared activation</em>
    *    if the {@link #START_ACTIVATION_POLICY} option is set or
    *    <em>Started with eager activation</em> if not set. When the Framework is
@@ -524,7 +582,7 @@ public:
    * -# If the {@link #START_ACTIVATION_POLICY} option is set and this
    *    bundle's declared activation policy is {@link Constants#ACTIVATION_LAZY
    *    lazy} then:
-   *    - If this bundle's state is \c STATE_STARTING then this method returns
+   *    - If this bundle's state is \c STATE_STARTING, then this method returns
    *      immediately.
    *    - This bundle's state is set to \c STATE_STARTING.
    *    - A bundle event of type {@link BundleEvent#BUNDLE_LAZY_ACTIVATION} is fired.
@@ -534,7 +592,7 @@ public:
    * -# A bundle event of type {@link BundleEvent#BUNDLE_STARTING} is fired.
    * -# If the bundle is contained in a shared library, the library is loaded
    *    and the {@link BundleActivator#Start(BundleContext)}
-   *    method of this bundle's \c BundleActivator, if one is specified, is
+   *    method of this bundle's \c BundleActivator (if one is specified) is
    *    called. If the shared library could not be loaded, or the \c BundleActivator
    *    is invalid or throws an exception then:
    *    - This bundle's state is set to \c STATE_STOPPING.
@@ -566,7 +624,7 @@ public:
    *    exception unless the lazy activation policy was used.
    *
    * <b>Postconditions, when an exception is thrown </b>
-   * -# Depending on when the exception occurred, bundle autostart setting is
+   * -# Depending on when the exception occurred, the bundle autostart setting is
    *    modified unless the {@link #START_TRANSIENT} option was set.
    * -# \c GetState() not in { \c STATE_STARTING, \c STATE_ACTIVE }.
    *
@@ -670,7 +728,7 @@ public:
    * related to this bundle that it is able to remove.
    *
    * The following steps are executed to uninstall a bundle:
-   * -# If this bundle's state is \c STATE_UNINSTALLED} then a
+   * -# If this bundle's state is \c STATE_UNINSTALLED, then a
    *    std::logic_error is thrown.
    * -# If this bundle's state is \c STATE_ACTIVE, \c STATE_STARTING or
    *    \c STATE_STOPPING, this bundle is stopped as described in the
@@ -695,7 +753,8 @@ public:
    *
    * @throws std::runtime_error If the uninstall failed. This can occur if
    *         another thread is attempting to change this bundle's state and
-   *         does not complete in a timely manner.
+   *         does not complete in a timely manner, or if the bundle is embedded
+   *         in an executable.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    * @see #Stop()
@@ -717,14 +776,23 @@ protected:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
+ *
+ * Streams a textual representation of ``bundle`` into the stream ``os``.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const Bundle& bundle);
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
+ *
+ * This is the same as calling ``os << *bundle``.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, Bundle const * bundle);
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
+ *
+ * Streams a textual representation of the bundle state enumeration.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, Bundle::State state);
 

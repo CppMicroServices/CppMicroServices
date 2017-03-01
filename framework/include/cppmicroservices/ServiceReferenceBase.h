@@ -36,11 +36,15 @@ class ServiceReferenceBasePrivate;
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicereference
  *
  * A reference to a service.
  *
- * \note This class is provided as public API for low-level service queries only.
- *       In almost all cases you should use the template ServiceReference instead.
+ * \rststar
+ * .. note::
+ *    This class is provided as public API for low-level service queries only.
+ *    In almost all cases you should use the template ServiceReference instead.
+ * \endrststar
  */
 class US_Framework_EXPORT ServiceReferenceBase
 {
@@ -94,23 +98,40 @@ public:
    * unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
+   * @deprecated Since 3.0, use GetPropertyKeys() instead.
+   *
    * @param keys A vector being filled with the property keys.
    */
   void GetPropertyKeys(std::vector<std::string>& keys) const;
+
+  /**
+   * Returns a list of the keys in the <code>ServiceProperties</code>
+   * object of the service referenced by this <code>ServiceReferenceBase</code>
+   * object.
+   *
+   * <p>
+   * This method will continue to return the keys after the service has been
+   * unregistered. This is so references to unregistered services can
+   * still be interrogated.
+   *
+   * @return A vector being filled with the property keys.
+   */
+  std::vector<std::string> GetPropertyKeys() const;
 
   /**
    * Returns the bundle that registered the service referenced by this
    * <code>ServiceReferenceBase</code> object.
    *
    * <p>
-   * This method must return <code>nullptr</code> when the service has been
+   * This method must return an invalid bundle when the service has been
    * unregistered. This can be used to determine if the service has been
    * unregistered.
    *
    * @return The bundle that registered the service referenced by this
-   *         <code>ServiceReferenceBase</code> object; <code>nullptr</code> if that
+   *         <code>ServiceReferenceBase</code> object; an invalid bundle if that
    *         service has already been unregistered.
    * @see BundleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * @see Bundle::operator bool() const
    */
   Bundle GetBundle() const;
 
@@ -138,7 +159,7 @@ public:
   std::string GetInterfaceId() const;
 
   /**
-   * Checks wether this ServiceReferenceBase object can be converted to
+   * Checks whether this ServiceReferenceBase object can be converted to
    * another ServiceReferenceBase object, which will be bound to the
    * given interface identifier.
    *
@@ -221,10 +242,22 @@ private:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicereference
+ *
+ * Writes a string representation of \c serviceRef to the stream \c os.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef);
 
 }
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_servicereference
+ *
+ * \struct std::hash<cppmicroservices::ServiceReferenceBase> ServiceReferenceBase.h <cppmicroservices/ServiceReferenceBase.h>
+ *
+ * Hash functor specialization for \link cppmicroservices#ServiceReferenceBase ServiceReferenceBase\endlink objects.
+ */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceReferenceBase)
   return arg.Hash();

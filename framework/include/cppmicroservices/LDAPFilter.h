@@ -23,7 +23,7 @@
 #ifndef CPPMICROSERVICES_LDAPFILTER_H
 #define CPPMICROSERVICES_LDAPFILTER_H
 
-#include "cppmicroservices/ServiceProperties.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/SharedData.h"
 
 #ifdef _MSC_VER
@@ -38,7 +38,14 @@ class ServiceReferenceBase;
 class Bundle;
 
 /**
+\defgroup gr_ldap LDAP Filter
+
+\brief Groups LDAPFilter class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_ldap
  *
  * An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter.
  *
@@ -111,12 +118,12 @@ public:
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    */
   bool Match(const ServiceReferenceBase& reference) const;
-    
+
  /**
    * Filter using a bundle's manifest properties.
    * <p>
    * This <code>LDAPFilter</code> is executed using the keys and values of the
-   * bundle's manifest properties. The keys are looked up in a case insensitive 
+   * bundle's manifest properties. The keys are looked up in a case insensitive
    * manner.
    *
    * @param bundle The bundle whose properties are used
@@ -125,30 +132,30 @@ public:
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    */
   bool Match(const Bundle& bundle) const;
-  
-  /**
-   * Filter using a <code>ServiceProperties</code> object with case insensitive key lookup. This
-   * <code>LDAPFilter</code> is executed using the specified <code>ServiceProperties</code>'s keys
-   * and values. The keys are looked up in a case insensitive manner.
-   *
-   * @param dictionary The <code>ServiceProperties</code> whose key/value pairs are used
-   *        in the match.
-   * @return <code>true</code> if the <code>ServiceProperties</code>'s values match this
-   *         filter; <code>false</code> otherwise.
-   */
-  bool Match(const ServiceProperties& dictionary) const;
 
   /**
-   * Filter using a <code>ServiceProperties</code>. This <code>LDAPFilter</code> is executed using
-   * the specified <code>ServiceProperties</code>'s keys and values. The keys are looked
-   * up in a normal manner respecting case.
+   * Filter using a <code>AnyMap</code> object with case insensitive key lookup. This
+   * <code>LDAPFilter</code> is executed using the specified <code>AnyMap</code>'s keys
+   * and values. The keys are looked up in a case insensitive manner.
    *
-   * @param dictionary The <code>ServiceProperties</code> whose key/value pairs are used
+   * @param dictionary The <code>AnyMap</code> whose key/value pairs are used
    *        in the match.
-   * @return <code>true</code> if the <code>ServiceProperties</code>'s values match this
+   * @return <code>true</code> if the <code>AnyMap</code>'s values match this
    *         filter; <code>false</code> otherwise.
    */
-  bool MatchCase(const ServiceProperties& dictionary) const;
+  bool Match(const AnyMap& dictionary) const;
+
+  /**
+   * Filter using a <code>AnyMap</code>. This <code>LDAPFilter</code> is executed using
+   * the specified <code>AnyMap</code>'s keys and values. The keys are looked
+   * up in a normal manner respecting case.
+   *
+   * @param dictionary The <code>AnyMap</code> whose key/value pairs are used
+   *        in the match.
+   * @return <code>true</code> if the <code>AnyMap</code>'s values match this
+   *         filter; <code>false</code> otherwise.
+   */
+  bool MatchCase(const AnyMap& dictionary) const;
 
   /**
    * Returns this <code>LDAPFilter</code>'s filter string.
@@ -183,6 +190,10 @@ protected:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_ldap
+ *
+ * Streams the string representation of \c filter into the stream \c os
+ * via LDAPFilter::ToString().
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter);
 

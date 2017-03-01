@@ -147,9 +147,9 @@ void ServiceTracker<S,T>::Close()
   {
     d->context.RemoveServiceListener(outgoing.get(), &_TrackedService::ServiceChanged);
   }
-  catch (const std::logic_error& /*e*/)
+  catch (const std::runtime_error& /*e*/)
   {
-    /* In case the context was stopped. */
+    /* In case the context was stopped or invalid. */
   }
 
   d->Modified(); /* clear the cache */
@@ -165,7 +165,7 @@ void ServiceTracker<S,T>::Close()
         d->cachedService.Load() == nullptr)
     {
       DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
-										<< d->filter;
+                    << d->filter;
     }
   }
 
@@ -194,7 +194,8 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
   typedef std::chrono::duration<Rep, Period> D;
 
   auto timeout = rel_time;
-  const Clock::time_point endTime = (rel_time == D::zero()) ? Clock::time_point() : (Clock::now() + rel_time);
+  const detail::Clock::time_point endTime =
+      (rel_time == D::zero()) ? detail::Clock::time_point() : (detail::Clock::now() + rel_time);
   do
   {
     auto t = d->Tracked();
@@ -213,9 +214,9 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
     object = GetService();
     // Adapt the timeout in case we "missed" the object after having
     // been notified within the timeout.
-    if (!object && endTime > Clock::time_point())
+    if (!object && endTime > detail::Clock::time_point())
     {
-      timeout = std::chrono::duration_cast<D>(endTime - Clock::now());
+      timeout = std::chrono::duration_cast<D>(endTime - detail::Clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
   } while (!object);
@@ -248,7 +249,7 @@ ServiceTracker<S,T>::GetServiceReference() const
   if (reference.GetBundle())
   {
     DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
-									<< d->filter;
+                  << d->filter;
     return reference;
   }
   DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
@@ -360,7 +361,7 @@ ServiceTracker<S,T>::GetService() const
   if (service)
   {
     DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
-									<< d->filter;
+                  << d->filter;
     return service;
   }
   DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;

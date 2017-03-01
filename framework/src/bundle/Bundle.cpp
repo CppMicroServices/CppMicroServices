@@ -166,12 +166,17 @@ BundleVersion Bundle::GetVersion() const
 
 std::map<std::string, Any> Bundle::GetProperties() const
 {
-  return d->bundleManifest.GetProperties();
+  return d->bundleManifest.GetPropertiesDeprecated();
+}
+
+AnyMap Bundle::GetHeaders() const
+{
+  return d->GetHeaders();
 }
 
 Any Bundle::GetProperty(const std::string& key) const
 {
-  Any property(d->bundleManifest.GetValue(key));
+  Any property(d->bundleManifest.GetValueDeprecated(key));
 
   // Clients must be able to query both a bundle's properties
   // and the framework's properties through any Bundle's
@@ -192,7 +197,7 @@ Any Bundle::GetProperty(const std::string& key) const
 
 std::vector<std::string> Bundle::GetPropertyKeys() const
 {
-  return d->bundleManifest.GetKeys();
+  return d->bundleManifest.GetKeysDeprecated();
 }
 
 std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
@@ -226,14 +231,14 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 BundleResource Bundle::GetResource(const std::string& path) const
 {
   d->CheckUninstalled();
-  return d->barchive->GetResource(path);
+  return d->barchive ? d->barchive->GetResource(path) : BundleResource();
 }
 
 std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
                                                   bool recurse) const
 {
   d->CheckUninstalled();
-  return d->barchive->FindResources(path, filePattern, recurse);
+  return d->barchive ? d->barchive->FindResources(path, filePattern, recurse) : std::vector<BundleResource>();
 }
 
 Bundle::TimeStamp Bundle::GetLastModified() const

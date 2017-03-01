@@ -5,12 +5,14 @@ macro(_us_create_test_bundle_helper)
   set_property(TARGET ${name}
                APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${name})
   set_property(TARGET ${name} PROPERTY US_BUNDLE_NAME ${name})
+  # Clear a possible debug postfix
+  set_property(TARGET ${name} PROPERTY DEBUG_POSTFIX "")
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
-  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} ${US_LINK_LIBRARIES})
+  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} CppMicroServices)
 
   if(_res_files OR US_TEST_LINK_LIBRARIES)
     usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root}
@@ -34,7 +36,7 @@ function(usFunctionCreateTestBundle name)
   set(_srcs ${ARGN})
   set(_res_files )
   set(_bin_res_files )
-  usFunctionGenerateBundleInit(_srcs)
+  usFunctionGenerateBundleInit(TARGET ${name} OUT _srcs)
   _us_create_test_bundle_helper()
 endfunction()
 
@@ -57,6 +59,6 @@ function(usFunctionCreateTestBundleWithResources name)
   else()
     set(_res_root ${CMAKE_CURRENT_SOURCE_DIR}/resources)
   endif()
-  usFunctionGenerateBundleInit(_srcs)
+  usFunctionGenerateBundleInit(TARGET ${name} OUT _srcs)
   _us_create_test_bundle_helper()
 endfunction()

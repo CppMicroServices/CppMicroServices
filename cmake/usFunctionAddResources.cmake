@@ -1,48 +1,63 @@
-#! \ingroup MicroServicesCMake
-#! \brief Add resources to a library or executable.
-#!
-#! This CMake function uses an external command line program to generate a ZIP archive
-#! containing data from external resources such as text files or images or other ZIP
-#! archives. The created archive file can be appended or linked into the target file
-#! using the usFunctionEmbedResources macro.
-#!
-#! Each bundle can call this function to add resources and make them available at
-#! runtime through the Bundle class. Multiple calls to this function append the
-#! input files.
-#!
-#! In the case of linking static bundles which contain resources to the target bundle,
-#! adding the static bundle target name to the ZIP_ARCHIVES list will merge its
-#! resources into the target bundle.
-#!
-#! Example usage:
-#! \code{.cmake}
-#! set(bundle_srcs )
-#! usFunctionAddResources(TARGET mylib
-#!                        BUNDLE_NAME org_me_mylib
-#!                        FILES config.properties logo.png
-#!                       )
-#! \endcode
-#!
-#! \param TARGET (required) The target to which the resource files are added.
-#! \param BUNDLE_NAME (required/optional) The bundle name of the target, as specified in
-#!        the \c US_BUNDLE_NAME pre-processor definition of that target. This parameter
-#!        is optional if a target property with the name US_BUNDLE_NAME exists, containing
-#!        the required bundle name.
-#! \param COMPRESSION_LEVEL (optional) The zip compression level (0-9). Defaults to the default zip
-#!        level. Level 0 disables compression.
-#! \param WORKING_DIRECTORY (optional) The root path for all resource files listed after the
-#!        FILES argument. If no or a relative path is given, it is considered relative to the
-#!        current CMake source directory.
-#! \param FILES (optional) A list of resource files (paths to external files in the file system)
-#!        relative to the current working directory.
-#! \param ZIP_ARCHIVES (optional) A list of zip archives (relative to the current working directory
-#!        or absolute file paths) whose contents is merged into the target bundle. If a list entry
-#!        is a valid target name and that target is a static library, its absolute file path is
-#!        used instead.
-#!
-#! \sa usFunctionEmbedResources
-#! \sa \ref MicroServices_Resources
-#!
+
+#.rst:
+#
+# .. cmake:command:: usFunctionAddResources
+#
+# Add resources to a library or executable.
+#
+# .. code-block:: cmake
+#
+#    usFunctionAddResources(TARGET target [BUNDLE_NAME bundle_name]
+#      [WORKING_DIRECTORY dir] [COMPRESSION_LEVEL level]
+#      [FILES res1...] [ZIP_ARCHIVES archive1...])
+#
+# This CMake function uses an external command line program to generate a ZIP archive
+# containing data from external resources such as text files or images or other ZIP
+# archives. The created archive file can be appended or linked into the target file
+# using the :cmake:command:`usFunctionEmbedResources` function.
+#
+# Each bundle can call this function to add resources and make them available at
+# runtime through the Bundle class. Multiple calls to this function append the
+# input files.
+#
+# In the case of linking static bundles which contain resources to the target bundle,
+# adding the static bundle target name to the ``ZIP_ARCHIVES`` list will merge its
+# resources into the target bundle.
+#
+# .. code-block:: cmake
+#    :caption: Example
+#
+#    set(bundle_srcs )
+#    usFunctionAddResources(TARGET mylib
+#                           BUNDLE_NAME org_me_mylib
+#                           FILES config.properties logo.png
+#                          )
+#
+# **One-value keywords**
+#    * ``TARGET`` (required): The target to which the resource files are added.
+#    * ``BUNDLE_NAME`` (required/optional): The bundle name of the target, as specified in
+#      the \c US_BUNDLE_NAME pre-processor definition of that target. This parameter
+#      is optional if a target property with the name US_BUNDLE_NAME exists, containing
+#      the required bundle name.
+#    * ``COMPRESSION_LEVEL`` (optional): The zip compression level (0-9). Defaults to the default zip
+#      level. Level 0 disables compression.
+#    * ``WORKING_DIRECTORY`` (optional): The root path for all resource files listed after the
+#      FILES argument. If no or a relative path is given, it is considered relative to the
+#      current CMake source directory.
+#
+# **Multi-value keywords**
+#    * ``FILES`` (optional): A list of resource files (paths to external files in the file system)
+#      relative to the current working directory.
+#    * ``ZIP_ARCHIVES`` (optional): A list of zip archives (relative to the current working directory
+#      or absolute file paths) whose contents is merged into the target bundle. If a list entry
+#      is a valid target name and that target is a static library, its absolute file path is
+#      used instead.
+#
+# .. seealso::
+#
+#    | :cmake:command:`usFunctionEmbedResources`
+#    | :any:`concept-resources`
+#
 function(usFunctionAddResources)
 
   cmake_parse_arguments(US_RESOURCE "" "TARGET;BUNDLE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
@@ -75,8 +90,8 @@ function(usFunctionAddResources)
   endif()
 
   set(resource_compiler ${US_RCC_EXECUTABLE})
-  if(TARGET ${US_RCC_EXECUTABLE_NAME})
-    set(resource_compiler ${US_RCC_EXECUTABLE_NAME})
+  if(TARGET ${US_RCC_EXECUTABLE_TARGET})
+    set(resource_compiler ${US_RCC_EXECUTABLE_TARGET})
   elseif(NOT resource_compiler)
     message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
   endif()
@@ -128,7 +143,7 @@ function(usFunctionAddResources)
       list(APPEND _us_zip_args ${_file})
     endforeach()
   endif()
-  
+
   if(US_RESOURCE_BUNDLE_NAME)
     set(_bundle_args -n ${US_RESOURCE_BUNDLE_NAME})
   endif()

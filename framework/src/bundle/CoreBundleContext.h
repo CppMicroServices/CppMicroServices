@@ -21,6 +21,25 @@
 =============================================================================*/
 
 
+/**
+
+\defgroup MicroServices Micro Services Classes
+
+\brief This category includes classes related to the C++ Micro Services component.
+
+The C++ Micro Services component provides a dynamic service registry based on the service layer
+as specified in the OSGi R4.2 specifications.
+
+*/
+
+/**
+
+\defgroup MicroServicesUtils Utility Classes
+
+\brief This category includes utility classes which can be used by others.
+
+*/
+
 #ifndef CPPMICROSERVICES_COREBUNDLECONTEXT_H
 #define CPPMICROSERVICES_COREBUNDLECONTEXT_H
 
@@ -76,6 +95,9 @@ public:
   * Framework properties, which contain both the
   * launch properties and the system properties.
   * See OSGi spec revision 6, section 4.2.2
+  *
+  * Note: CppMicroServices currently has no concept
+  * of "system properties".
   */
   std::map<std::string, Any> frameworkProperties;
 

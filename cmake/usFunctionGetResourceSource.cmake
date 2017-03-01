@@ -1,27 +1,39 @@
-#! \ingroup MicroServicesCMake
-#! \brief Get a source file name for handling resource dependencies
-#!
-#! This CMake function retrieves the name of a generated file which has to be added
-#! to a bundles source file list to set-up resource file dependencies. This ensures
-#! that changed resource files will automatically be re-added to the bundle.
-#!
-#! Example usage:
-#! \code{.cmake}
-#! set(bundle_srcs mylib.cpp)
-#! usFunctionGetResourceSource(TARGET mylib
-#!                             OUT bundle_srcs
-#!                            )
-#! add_library(mylib ${bundle_srcs})
-#! \endcode
-#!
-#! \param TARGET (required) The name of the target to which the resource files are added.
-#! \param OUT (required) A list variable to which the file name will be appended.
-#! \param LINK (optional) Generate a suitable source file for LINK mode.
-#! \param APPEND (optional) Generate a suitable source file for APPEND mode.
-#!
-#! \sa usFunctionAddResources
-#! \sa usFunctionEmbedResources
-#!
+#.rst:
+#
+# .. cmake:command:: usFunctionGetResourceSource
+#
+# Get a source file name for handling resource dependencies
+#
+# .. code-block:: cmake
+#
+#    usFunctionGetResourceSource(TARGET target OUT <out_var> [LINK | APPEND])
+#
+# This CMake function retrieves the name of a generated file which has to be added
+# to a bundles source file list to set-up resource file dependencies. This ensures
+# that changed resource files will automatically be re-added to the bundle.
+#
+# .. code-block:: cmake
+#    :caption: Example
+#
+#    set(bundle_srcs mylib.cpp)
+#    usFunctionGetResourceSource(TARGET mylib
+#                                OUT bundle_srcs
+#                               )
+#    add_library(mylib ${bundle_srcs})
+#
+# **One-value keywords**
+#    * ``TARGET`` (required): The name of the target to which the resource files are added.
+#    * ``OUT`` (required): A list variable to which the file name will be appended.
+#
+# **Options**
+#    * ``LINK`` (optional): Generate a suitable source file for *LINK* mode.
+#    * ``APPEND`` (optional): Generate a suitable source file for *APPEND* mode.
+#
+# .. seealso::
+#
+#    | :cmake:command:`usFunctionAddResources`
+#    | :cmake:command:`usFunctionEmbedResources`
+#
 function(usFunctionGetResourceSource)
   cmake_parse_arguments(_res "LINK;APPEND" "TARGET;OUT" "" "" ${ARGN})
   if(NOT _res_TARGET)

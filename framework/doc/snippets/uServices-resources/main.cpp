@@ -52,7 +52,9 @@ void extenderPattern(const BundleContext& bundleCtx)
   for(auto const bundle : bundleCtx.GetBundles())
   {
     if (bundle.GetState() == Bundle::STATE_UNINSTALLED) continue;
-    std::string componentPath = bundle.GetProperty("service-component").ToString();
+    auto headers = bundle.GetHeaders();
+    auto iter = headers.find("service-component");
+    std::string componentPath = (iter == headers.end()) ? std::string() : iter->second.ToString();
     if (!componentPath.empty())
     {
       BundleResource componentResource = bundle.GetResource(componentPath);
@@ -69,6 +71,12 @@ void extenderPattern(const BundleContext& bundleCtx)
 
 int main(int /*argc*/, char* /*argv*/[])
 {
+  std::cout << "This snippet is not meant to be executed.\n"
+               "It does not provide a complete working example.\n"
+               "See http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
+            << std::endl;
+  return 0;
+
   //! [0]
   auto bundleContext = GetBundleContext();
   auto bundle = bundleContext.GetBundle();
@@ -79,6 +87,4 @@ int main(int /*argc*/, char* /*argv*/[])
   // Find the resource named vertex_shader.txt starting at the root directory
   std::vector<BundleResource> shaders = bundle.FindResources("", "vertex_shader.txt", true);
   //! [0]
-
-  return 0;
 }

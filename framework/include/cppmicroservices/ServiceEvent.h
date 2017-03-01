@@ -32,7 +32,15 @@ namespace cppmicroservices {
 class ServiceEventData;
 
 /**
+\defgroup gr_serviceevent ServiceEvent
+
+\brief Groups ServiceEvent class related symbols.
+*/
+
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_serviceevent
  *
  * An event from the Micro Services framework describing a service lifecycle change.
  * <p>
@@ -48,7 +56,10 @@ class US_Framework_EXPORT ServiceEvent
 
 public:
 
-  enum Type {
+  /**
+   * The service event type.
+   */
+  enum Type : uint32_t {
 
     /**
      * This service has been registered.
@@ -56,7 +67,7 @@ public:
      * This event is delivered <strong>after</strong> the service
      * has been registered with the framework.
      *
-     * @see BundleContext#RegisterService()
+     * @see BundleContext#RegisterService
      */
     SERVICE_REGISTERED = 0x00000001,
 
@@ -84,7 +95,6 @@ public:
      * the service while completing the service unregistration operation.
      *
      * @see ServiceRegistration#Unregister
-     * @see BundleContext#UngetService
      */
     SERVICE_UNREGISTERING = 0x00000004,
 
@@ -164,11 +174,19 @@ public:
 
 /**
  * \ingroup MicroServices
- * @{
+ * \ingroup gr_serviceevent
+ *
+ * Writes a string representation of \c type to the stream \c os.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type);
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_serviceevent
+ *
+ * Writes a string representation of \c event to the stream \c os.
+ */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& event);
-/** @}*/
 
 }
 

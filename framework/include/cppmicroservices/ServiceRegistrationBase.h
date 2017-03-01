@@ -34,20 +34,23 @@ class Properties;
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_serviceregistration
  *
  * A registered service.
  *
- * <p>
  * The framework returns a <code>ServiceRegistrationBase</code> object when a
  * <code>BundleContext#RegisterService()</code> method invocation is successful.
  * The <code>ServiceRegistrationBase</code> object is for the private use of the
  * registering bundle and should not be shared with other bundles.
- * <p>
+ *
  * The <code>ServiceRegistrationBase</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * \note This class is provided as public API for low-level service management only.
- *       In almost all cases you should use the template ServiceRegistration instead.
+ * \rststar
+ * .. note::
+ *    This class is provided as public API for low-level service management only.
+ *    In almost all cases you should use the template ServiceRegistration instead.
+ * \endrststar
  *
  * @see BundleContext#RegisterService()
  */
@@ -62,7 +65,7 @@ public:
 
   /**
    * A boolean conversion operator converting this ServiceRegistrationBase object
-   * to \c true if it is valid and to \c false otherwise. A SeriveRegistration
+   * to \c true if it is valid and to \c false otherwise. A ServiceRegistrationBase
    * object is invalid if it was default-constructed or was invalidated by
    * assigning 0 to it.
    *
@@ -84,10 +87,10 @@ public:
   ~ServiceRegistrationBase();
 
   /**
-   * Returns a <code>ServiceReference</code> object for a service being
+   * Returns a <code>ServiceReferenceBase</code> object for a service being
    * registered.
    * <p>
-   * The <code>ServiceReference</code> object may be shared with other
+   * The <code>ServiceReferenceBase</code> object may be shared with other
    * bundles.
    *
    * @throws std::logic_error If this
@@ -120,7 +123,9 @@ public:
    * @throws std::logic_error If this <code>ServiceRegistrationBase</code>
    *         object has already been unregistered or if it is invalid.
    * @throws std::invalid_argument If <code>properties</code> contains
-   *         case variants of the same key name.
+   *         case variants of the same key name or if the number of the keys
+   *         of <code>properties</code> exceeds the value returned by
+   *         std::numeric_limits<int>::max().
    */
   void SetProperties(const ServiceProperties& properties);
 
@@ -199,12 +204,24 @@ private:
 
 };
 
-inline std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase& /*reg*/)
-{
-  return os << "cppmicroservices::ServiceRegistrationBase object";
-}
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_servicereregistration
+ *
+ * Writes a string representation of \c reg to the stream \c os.
+ */
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase& reg);
 
 }
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_serviceregistration
+ *
+ * \struct std::hash<cppmicroservices::ServiceRegistrationBase> ServiceRegistrationBase.h <cppmicroservices/ServiceRegistrationBase.h>
+ *
+ * Hash functor specialization for \link cppmicroservices#ServiceRegistrationBase ServiceRegistrationBase\endlink objects.
+ */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
   return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);

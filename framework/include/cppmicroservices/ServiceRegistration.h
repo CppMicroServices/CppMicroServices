@@ -28,7 +28,14 @@
 namespace cppmicroservices {
 
 /**
+\defgroup gr_serviceregistration ServiceRegistration
+
+\brief Groups ServiceRegistration related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_serviceregistration
  *
  * A registered service.
  *
@@ -41,7 +48,8 @@ namespace cppmicroservices {
  * The <code>ServiceRegistration</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * @tparam S Class type of the service interface
+ * @tparam I1 Class type of the first service interface
+ * @tparam Interfaces Template parameter pack containing zero or more service interfaces
  * @see BundleContext#RegisterService()
  */
 template<class I1, class ...Interfaces>
@@ -136,6 +144,7 @@ public:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gt_serviceregistration
  *
  * A service registration object of unknown type.
  */

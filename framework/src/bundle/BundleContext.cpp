@@ -78,6 +78,34 @@ std::shared_ptr<detail::LogSink> BundleContext::GetLogSink() const
   return d->bundle->coreCtx->sink->shared_from_this();
 }
 
+Any BundleContext::GetProperty(const std::string& key) const
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  auto iter = b->coreCtx->frameworkProperties.find(key);
+  return iter == b->coreCtx->frameworkProperties.end() ?
+        Any() : iter->second;
+}
+
+AnyMap BundleContext::GetProperties() const
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  return b->coreCtx->frameworkProperties;
+}
+
 Bundle BundleContext::GetBundle() const
 {
   d->CheckValid();

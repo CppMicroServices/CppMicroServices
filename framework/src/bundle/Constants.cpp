@@ -30,6 +30,7 @@ namespace Constants {
 const std::string SYSTEM_BUNDLE_LOCATION              = "System Bundle";
 const std::string SYSTEM_BUNDLE_SYMBOLICNAME          = "system_bundle";
 
+const std::string BUNDLE_ACTIVATOR                    = "bundle.activator";
 const std::string BUNDLE_CATEGORY                     = "bundle.category";
 const std::string BUNDLE_COPYRIGHT                    = "bundle.copyright";
 const std::string BUNDLE_DESCRIPTION                  = "bundle.description";
@@ -48,6 +49,8 @@ const std::string FRAMEWORK_STORAGE                   = "org.cppmicroservices.fr
 const std::string FRAMEWORK_STORAGE_CLEAN             = "org.cppmicroservices.framework.storage.clean";
 const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT = "onFirstInit";
 const std::string FRAMEWORK_THREADING_SUPPORT         = "org.cppmicroservices.framework.threading.support";
+const std::string FRAMEWORK_THREADING_SINGLE          = "single";
+const std::string FRAMEWORK_THREADING_MULTI           = "multi";
 const std::string FRAMEWORK_LOG                       = "org.cppmicroservices.framework.log";
 const std::string FRAMEWORK_UUID                      = "org.cppmicroservices.framework.uuid";
 

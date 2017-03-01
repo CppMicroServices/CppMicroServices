@@ -1,15 +1,19 @@
-project(CppMicroServices)
+# Extract the current version from the VERSION file
+file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(${PROJECT_NAME}_MAJOR_VERSION 2)
-set(${PROJECT_NAME}_MINOR_VERSION 99)
-set(${PROJECT_NAME}_PATCH_VERSION 0)
-set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
+
+cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
+
+project(CppMicroServices VERSION ${_version})
+
+set(US_GLOBAL_VERSION_SUFFIX ${${PROJECT_NAME}_VERSION_MAJOR})
+if (${PROJECT_NAME}_VERSION_MINOR EQUAL 99)
+  math(EXPR US_GLOBAL_VERSION_SUFFIX "${US_GLOBAL_VERSION_SUFFIX}+1")
+endif()
 
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 2.8.12)
-
-cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 list(APPEND policies_new
@@ -25,6 +29,10 @@ endforeach()
 #-----------------------------------------------------------------------------
 # Check minimum required compiler versions
 #------------------------------------------------------------------------------
+
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD 11)
 
 # We make use of the following C++11 language and library features:
 #
@@ -160,26 +168,11 @@ function(us_cache_var _var_name _var_default _var_type _var_help)
     endif()
   endforeach()
 
-  if(US_IS_EMBEDDED)
-    if(NOT DEFINED ${_var_name} OR _force)
-      set(${_var_name} ${_var_default} PARENT_SCOPE)
-    endif()
-  else()
-    set(${_var_name} ${_var_default} CACHE ${_var_type} "${_var_help}" ${_force})
-    if(_advanced)
-      mark_as_advanced(${_var_name})
-    endif()
+  set(${_var_name} ${_var_default} CACHE ${_var_type} "${_var_help}" ${_force})
+  if(_advanced)
+    mark_as_advanced(${_var_name})
   endif()
 endfunction()
-
-# Determine if we are being build inside a larger project
-if(NOT DEFINED US_IS_EMBEDDED)
-  if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set(US_IS_EMBEDDED 0)
-  else()
-    set(US_IS_EMBEDDED 1)
-  endif()
-endif()
 
 # Determine the name of the install component for "SDK" artifacts.
 # The default is "sdk"
@@ -188,6 +181,8 @@ if(NOT DEFINED US_SDK_INSTALL_COMPONENT)
 elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
+
+us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
@@ -199,14 +194,18 @@ if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir bin/)
   set(default_archive_install_dir lib/)
-  set(default_header_install_dir include/)
-  set(default_auxiliary_install_dir share/)
+  set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_doc_install_dir ${default_auxiliary_install_dir}/doc)
+  set(default_man_install_dir share/man)
 else()
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir lib/)
   set(default_archive_install_dir lib/)
-  set(default_header_install_dir include/)
-  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER})
+  set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_auxiliary_install_dir share/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
+  set(default_doc_install_dir ${default_auxiliary_install_dir}/doc)
+  set(default_man_install_dir share/man)
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
@@ -214,6 +213,8 @@ us_cache_var(LIBRARY_INSTALL_DIR ${default_library_install_dir} STRING "Relative
 us_cache_var(ARCHIVE_INSTALL_DIR ${default_archive_install_dir} STRING "Relative install location for archives" ADVANCED)
 us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative install location for headers" ADVANCED)
 us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Relative install location for auxiliary files" ADVANCED)
+us_cache_var(DOC_INSTALL_DIR ${default_doc_install_dir} STRING "Relative install location for documentation files" ADVANCED)
+us_cache_var(MAN_INSTALL_DIR ${default_man_install_dir} STRING "Relative install location for man pages" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
 set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
@@ -221,6 +222,10 @@ set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
+if(APPLE)
+  # Avoid RPATH warning in cmakegui
+  set(CMAKE_MACOSX_RPATH 1)
+endif()
 
 #-----------------------------------------------------------------------------
 # Testing configuration
@@ -263,21 +268,8 @@ endif()
 # US C/CXX Flags
 #-----------------------------------------------------------------------------
 
-if(US_IS_EMBEDDED)
-  set(CMAKE_C_FLAGS)
-  set(CMAKE_C_FLAGS_RELEASE)
-  set(CMAKE_C_FLAGS_DEBUG)
-  set(CMAKE_CXX_FLAGS)
-  set(CMAKE_CXX_FLAGS_RELEASE)
-  set(CMAKE_CXX_FLAGS_DEBUG)
-  set(CMAKE_LINK_FLAGS)
-  set(CMAKE_LINK_FLAGS_RELEASE)
-  set(CMAKE_LINK_FLAGS_DEBUG)
-endif()
-
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
 set(US_CXX11_FLAGS )
-set(US_CXX11_LINK_FLAGS )
 set(US_CXX_TSAN_FLAGS )
 set(US_TSAN_LINK_FLAGS )
 
@@ -290,23 +282,8 @@ if(MSVC)
   endforeach()
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
-  # C++11 support
-  set(US_CXX11_FLAGS -std=c++11)
-  usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
-  if(_have_cxx11)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-  else()
-    set(US_CXX11_FLAGS -std=c++0x)
-    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
-    if(_have_cxx0x)
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-    else()
-      set(US_CXX11_FLAGS )
-    endif()
-  endif()
 
   if(US_COMPILER_APPLE_CLANG)
-    set(US_CXX11_FLAGS "${US_CXX11_FLAGS} -stdlib=libc++")
     set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
   endif()
 
@@ -334,6 +311,7 @@ else()
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
   endif()
+
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
@@ -356,8 +334,8 @@ endif()
 if(MINGW)
   # suppress warnings about auto imported symbols
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
-  # we need to define a Windows version
-  set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
+  # we need to define a Windows version (Windows Vista)
+  set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
@@ -367,6 +345,10 @@ if(US_ENABLE_THREADING_SUPPORT)
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
+else()
+  # The 3.0 release does not support single-threaded mode any more.
+  # It will be re-enabled with a 3.x release later.
+  message(SEND_ERROR "Disabling threading support is currently unsupported.")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
@@ -451,11 +433,11 @@ set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party ${PROJECT_BINARY_DIR}/incl
 # Configure CppMicroServicesConfig.cmake for the build tree.
 # The file is used in sub-directories.
 
-set(PACKAGE_CONFIG_INCLUDE_DIR ${US_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set(PACKAGE_CONFIG_CMAKE_DIR ${US_CMAKE_DIR})
 
-set(US_RCC_EXECUTABLE_NAME usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
+set(US_RCC_EXECUTABLE_TARGET usResourceCompiler CACHE INTERNAL "The target name of the usResourceCompiler executable.")
+set(US_RCC_EXECUTABLE_OUTPUT_NAME ${US_RCC_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
@@ -466,9 +448,18 @@ configure_file(
 set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/GlobalConfig.h")
 configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
-include_directories(${US_INCLUDE_DIRS})
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )
 
 add_subdirectory(tools/rc)
+
+export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
 
 add_subdirectory(framework)
 add_subdirectory(httpservice)
@@ -484,18 +475,8 @@ add_subdirectory(tools/shell)
 add_subdirectory(doc)
 
 #-----------------------------------------------------------------------------
-# Last configuration and install steps
+# Installation
 #-----------------------------------------------------------------------------
-
-# Version information
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-  @ONLY
-  )
-
-export(TARGETS ${US_RCC_EXECUTABLE_NAME}
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
 
 if(NOT US_NO_INSTALL)
 

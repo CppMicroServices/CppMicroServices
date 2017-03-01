@@ -55,8 +55,8 @@ struct FrameworkListenerCompare : std::binary_function<std::pair<FrameworkListen
   bool operator()(const std::pair<FrameworkListener, void*>& p1,
                   const std::pair<FrameworkListener, void*>& p2) const
   {
-	return p1.second == p2.second &&
-            p1.first.target<void(const FrameworkEvent&)>() == p2.first.target<void(const FrameworkEvent&)>();
+    return p1.second == p2.second &&
+           p1.first.target<void(const FrameworkEvent&)>() == p2.first.target<void(const FrameworkEvent&)>();
   }
 };
 
@@ -140,23 +140,22 @@ void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextP
 
 void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
-  auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+  auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = frameworkListenerMap.value[context];
   if (std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
-	listeners.push_back(std::make_pair(listener, data));
+    listeners.push_back(std::make_pair(listener, data));
   }
 }
 
 void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
-  auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+  auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = frameworkListenerMap.value[context];
-  auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
-  if (it != listeners.end())
-  {
-    frameworkListenerMap.value[context].erase(it);
-  }
+  listeners.erase(std::remove_if(listeners.begin(),
+                                 listeners.end(),
+                                 std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)),
+                  listeners.end());
 }
 
 void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
@@ -240,7 +239,7 @@ void ServiceListeners::RemoveAllListeners(const std::shared_ptr<BundleContextPri
   }
 
   {
-    auto l = frameworkListenerMap.Lock(); US_UNUSED(1);
+    auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
     frameworkListenerMap.value.erase(context);
   }
 }
@@ -295,7 +294,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
       {
         std::string message("Service listener in " + l.GetBundleContext().GetBundle().GetSymbolicName() + " threw an exception!");
         SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::FRAMEWORK_ERROR, 
+            FrameworkEvent::Type::FRAMEWORK_ERROR,
             l.GetBundleContext().GetBundle(),
             message,
             std::current_exception()));

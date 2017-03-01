@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,63 +26,14 @@
 
 namespace cppmicroservices {
 
-std::string WebConsoleConstants::SERVICE_NAME()
-{
-  return us_service_interface_iid<HttpServlet>();
-}
-
-std::string WebConsoleConstants::PLUGIN_LABEL()
-{
-  static std::string s = "org.cppmicroservices.webconsole.label";
-  return s;
-}
-
-std::string WebConsoleConstants::PLUGIN_TITLE()
-{
-  static std::string s = "org.cppmicroservices.webconsole.title";
-  return s;
-}
-
-std::string WebConsoleConstants::PLUGIN_CATEGORY()
-{
-  static std::string s = "org.cppmicroservices.webconsole.category";
-  return s;
-}
-
-std::string WebConsoleConstants::PLUGIN_CSS_REFERENCES()
-{
-  static std::string s = "org.cppmicroservices.webconsole.css";
-  return s;
-}
-
-std::string WebConsoleConstants::ATTR_APP_ROOT()
-{
-  static std::string s = "org.cppmicroservices.webconsole.appRoot";
-  return s;
-}
-
-std::string WebConsoleConstants::ATTR_PLUGIN_ROOT()
-{
-  static std::string s = "org.cppmicroservices.webconsole.pluginRoot";
-  return s;
-}
-
-std::string WebConsoleConstants::ATTR_LABEL_MAP()
-{
-  static std::string s = "org.cppmicroservices.webconsole.labelMap";
-  return s;
-}
-
-std::string WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER()
-{
-  static std::string s = "org.cppmicroservices.webconsole.variable.resolver";
-  return s;
-}
-
-std::string WebConsoleConstants::ATTR_LANG_MAP()
-{
-  static std::string s = "org.cppmicroservices.webconsole.langMap";
-  return s;
-}
+std::string WebConsoleConstants::SERVICE_NAME = us_service_interface_iid<HttpServlet>();
+std::string WebConsoleConstants::PLUGIN_LABEL = "org.cppmicroservices.webconsole.label";
+std::string WebConsoleConstants::PLUGIN_TITLE = "org.cppmicroservices.webconsole.title";
+std::string WebConsoleConstants::PLUGIN_CATEGORY = "org.cppmicroservices.webconsole.category";
+std::string WebConsoleConstants::PLUGIN_CSS_REFERENCES = "org.cppmicroservices.webconsole.css";
+std::string WebConsoleConstants::ATTR_APP_ROOT = "org.cppmicroservices.webconsole.appRoot";
+std::string WebConsoleConstants::ATTR_PLUGIN_ROOT =  "org.cppmicroservices.webconsole.pluginRoot";
+std::string WebConsoleConstants::ATTR_LABEL_MAP = "org.cppmicroservices.webconsole.labelMap";
+std::string WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER = "org.cppmicroservices.webconsole.variable.resolver";
 
 }

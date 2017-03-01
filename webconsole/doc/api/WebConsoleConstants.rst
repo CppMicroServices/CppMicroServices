@@ -1,0 +1,4 @@
+WebConsoleConstants
+-------------------
+
+.. doxygenstruct:: cppmicroservices::WebConsoleConstants

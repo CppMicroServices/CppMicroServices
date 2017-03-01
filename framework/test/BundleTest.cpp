@@ -35,7 +35,6 @@
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <thread>
 
@@ -142,12 +141,17 @@ void frame020a()
 
   US_TEST_CONDITION_REQUIRED(buA.GetState() == Bundle::STATE_INSTALLED, "Test bundle A in state installed")
 
-  US_TEST_CONDITION(buA.GetLastModified() > Clock::time_point(), "Test bundle A last modified")
-  US_TEST_CONDITION(buA.GetLastModified() <= Clock::now(), "Test bundle A last modified")
+  US_TEST_CONDITION(buA.GetLastModified() > Bundle::TimeStamp(), "Test bundle A last modified")
+  US_TEST_CONDITION(buA.GetLastModified() <= detail::Clock::now(), "Test bundle A last modified")
 
   // Check that no service reference exist yet.
   ServiceReferenceU sr1 = bc.GetServiceReference("cppmicroservices::TestBundleAService");
   US_TEST_CONDITION_REQUIRED(!sr1, "service from bundle A must not exist yet")
+
+  // Check manifest headers
+  auto headers = buA.GetHeaders();
+  US_TEST_CONDITION_REQUIRED(headers.size() > 0, "One or more manifest header")
+  US_TEST_CONDITION(headers.at("bundle.symbolic_name") == std::string("TestBundleA"), "BSN manifest header")
 
   // check the listeners for events
   std::vector<BundleEvent> pEvts;
@@ -202,13 +206,13 @@ void frame020b()
 
   buA.Start();
 
-  US_TEST_CONDITION(bc.GetBundle().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
+  US_TEST_CONDITION(bc.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   // launching properties should be accessible through any bundle
-  US_TEST_CONDITION(buA.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
+  US_TEST_CONDITION(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + cppmicroservices::ToString(buA.GetBundleId()) + testing::DIR_SEP;
+  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + testing::ToString(buA.GetBundleId()) + testing::DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 
@@ -233,6 +237,12 @@ void frame030b()
   {
     US_TEST_FAILED_MSG(<< "Stop bundle exception: " << e.what())
   }
+
+  // Check manifest headers in stopped state
+  auto headers = buA.GetHeaders();
+  US_TEST_CONDITION_REQUIRED(headers.size() > 0, "One ore more manifest header")
+  US_TEST_CONDITION(headers.at("bundle.symbolic_name") == std::string("TestBundleA"), "BSN manifest header")
+
 
   std::vector<BundleEvent> pEvts;
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, buA));
@@ -264,11 +274,12 @@ void frame035a()
   // check expected meta-data
   US_TEST_CONDITION("main" == buExec.GetSymbolicName(), "Test bundle name")
   US_TEST_CONDITION(BundleVersion(0,1,0) == buExec.GetVersion(), "Test test driver bundle version")
-  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == buExec.GetBundleContext().GetBundle(systemId).GetVersion(), "Test CppMicroServices version")
+  US_TEST_CONDITION(BundleVersion(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH) == buExec.GetBundleContext().GetBundle(systemId).GetVersion(), "Test CppMicroServices version")
 }
 
 
-// Get location, persistent storage and status of the bundle
+// Get location, persistent storage and status of the bundle.
+// Test bundle context properties
 void frame037a()
 {
   std::string location = buExec.GetLocation();
@@ -278,8 +289,8 @@ void frame037a()
   US_TEST_CONDITION(buExec.GetState() & Bundle::STATE_ACTIVE, "Test for started flag")
 
   // launching properties should be accessible through any bundle
-  auto p1 = bc.GetBundle().GetProperty(Constants::FRAMEWORK_UUID);
-  auto p2 = buExec.GetProperty(Constants::FRAMEWORK_UUID);
+  auto p1 = bc.GetBundle().GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID);
+  auto p2 = buExec.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID);
   US_TEST_CONDITION(!p1.Empty() && p1.ToString() == p2.ToString(), "Test for uuid accesible from framework and bundle")
 
   std::cout << buExec.GetBundleContext().GetDataFile("") << std::endl;
@@ -287,6 +298,11 @@ void frame037a()
 
   US_TEST_CONDITION(buExec.GetBundleContext().GetDataFile("").substr(0, baseStoragePath.size()) == baseStoragePath, "Test for valid data path")
   US_TEST_CONDITION(buExec.GetBundleContext().GetDataFile("bla").substr(0, baseStoragePath.size()) == baseStoragePath, "Test for valid data file path")
+
+  US_TEST_CONDITION(buExec.GetBundleContext().GetProperty(Constants::FRAMEWORK_UUID).Empty() == false, "Test for non-empty framework uuid property")
+  auto props = buExec.GetBundleContext().GetProperties();
+  US_TEST_CONDITION_REQUIRED(props.empty() == false, "Test for non-empty bundle props")
+  US_TEST_CONDITION(props.count(Constants::FRAMEWORK_VERSION) == 1, "Test for existing framework version prop")
 }
 
 
@@ -388,7 +404,7 @@ void TestBundleStates()
 
     auto frameworkCtx = framework.GetBundleContext();
     frameworkCtx.AddBundleListener(&listener, &TestBundleListener::BundleChanged);
-  
+
     // Test Start -> Stop for auto-installed bundles
     auto bundles = frameworkCtx.GetBundles();
     for (auto& bundle : bundles)
@@ -396,20 +412,35 @@ void TestBundleStates()
       if (bundle != framework)
       {
         US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED, "Test installed bundle state")
-        bundle.Start();
-        US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
-        bundle.Stop();
-        US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
-        bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+        try
+        {
+          bundle.Start();
+          US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_ACTIVE, "Test started bundle state")
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundle));
+        }
+        catch (const std::runtime_error& /*ex*/)
+        {
+          US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_RESOLVED, "Test bundle state if bundle start failed")
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+        }
+        // stop the bundle if it is in active state
+        if(bundle.GetState() & Bundle::STATE_ACTIVE)
+        {
+          bundle.Stop();
+          US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false, "Test stopped bundle state")
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundle));
+          bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundle));
+        }
       }
     }
     US_TEST_CONDITION(listener.CheckListenerEvents(bundleEvents, false), "Test for unexpected events");
     bundleEvents.clear();
-  
+
 #ifdef US_BUILD_SHARED_LIBS    // following combination can be tested only for shared library builds
     Bundle bundle;
     // Test install -> uninstall
@@ -477,7 +508,7 @@ void TestBundleStates()
     bundle.Uninstall();
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
     US_TEST_CONDITION(lm < bundle.GetLastModified(), "Last modified time changed after uninstall")
-    US_TEST_CONDITION(bundle.GetLastModified() <= Clock::now(), "Last modified time <= now")
+    US_TEST_CONDITION(bundle.GetLastModified() <= detail::Clock::now(), "Last modified time <= now")
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));
@@ -554,7 +585,7 @@ void TestDuplicateInstall()
     US_TEST_CONDITION(bundle == bundleDuplicate, "Test for the same bundle instance");
     US_TEST_CONDITION(bundle.GetBundleId() == bundleDuplicate.GetBundleId(), "Test for the same bundle id");
 }
-  
+
 void TestAutoInstallEmbeddedBundles()
 {
   FrameworkFactory factory;
@@ -562,7 +593,7 @@ void TestAutoInstallEmbeddedBundles()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
   US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + testing::EXE_EXT);
+  frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT);
   US_TEST_FOR_EXCEPTION_END(std::runtime_error)
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).

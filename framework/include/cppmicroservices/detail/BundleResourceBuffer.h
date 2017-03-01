@@ -26,6 +26,7 @@
 #include "cppmicroservices/FrameworkExport.h"
 
 #include <streambuf>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -41,7 +42,8 @@ public:
   BundleResourceBuffer(const BundleResourceBuffer&) = delete;
   BundleResourceBuffer& operator=(const BundleResourceBuffer&) = delete;
 
-  explicit BundleResourceBuffer(void* data, std::size_t size,
+  explicit BundleResourceBuffer(std::unique_ptr<void, void(*)(void*)> data,
+                                std::size_t size,
                                 std::ios_base::openmode mode);
 
   ~BundleResourceBuffer();
@@ -61,7 +63,7 @@ private:
 
 private:
 
-  BundleResourceBufferPrivate* d;
+  std::unique_ptr<BundleResourceBufferPrivate> d;
 
 };
 

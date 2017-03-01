@@ -116,14 +116,14 @@ std::vector<BundleResource> BundleArchive::FindResources(
   return result;
 }
 
-Clock::time_point BundleArchive::GetLastModified() const
+BundleArchive::TimeStamp BundleArchive::GetLastModified() const
 {
-  return Clock::time_point() + std::chrono::milliseconds(data->lastModified);
+  return TimeStamp() + std::chrono::milliseconds(data->lastModified);
 }
 
-void BundleArchive::SetLastModified(const Clock::time_point& tp)
+void BundleArchive::SetLastModified(const TimeStamp& ts)
 {
-  data->lastModified = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
+  data->lastModified = std::chrono::duration_cast<std::chrono::milliseconds>(ts.time_since_epoch()).count();
 }
 
 int32_t BundleArchive::GetAutostartSetting() const

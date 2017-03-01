@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -62,8 +63,8 @@ private:
       {
         auto resolver = m_Plugin->GetVariableResolver(m_Request);
         m_StreamBuf = new VariableResolverStreamBuffer(
-                        new std::ostream(HttpServletResponse::GetOutputStreamBuffer()),
-                        resolver.get());
+                        std::unique_ptr<std::ostream>(new std::ostream(HttpServletResponse::GetOutputStreamBuffer())),
+                        resolver);
       }
       return m_StreamBuf;
     }
@@ -93,23 +94,13 @@ void WebConsolePluginTracker::AddPlugin(const std::string& label, AbstractWebCon
 
   plugin->Init(PluginConfig(m_ServletContext));
   m_Plugins[label] = plugin;
-
-  std::map<std::string, Any> menuItem;
-  menuItem["label"] = label;
-  menuItem["href"] = label;
-  menuItem["current"] = false;
-
-  m_Labels->push_back(menuItem);
+  m_LabelMap[label] = LabelMapEntry{ label, plugin->GetTitle() };
 }
 
 WebConsolePluginTracker::WebConsolePluginTracker()
   : ServiceTracker<HttpServlet>(GetBundleContext())
-  , m_LabelMapAny(std::map<std::string, Any>())
-  , m_Labels(nullptr)
   , m_ServletContext(nullptr)
 {
-  ref_any_cast<std::map<std::string, Any> >(m_LabelMapAny)["menuItems"] = std::vector<Any>();
-  m_Labels = &ref_any_cast<std::vector<Any> >(ref_any_cast<std::map<std::string, Any> >(m_LabelMapAny)["menuItems"]);
 }
 
 void WebConsolePluginTracker::Open(const std::shared_ptr<ServletContext>& context)
@@ -125,9 +116,24 @@ AbstractWebConsolePlugin* WebConsolePluginTracker::GetPlugin(const std::string& 
   return iter->second;
 }
 
-std::string WebConsolePluginTracker::GetLabelMapJSON() const
+AbstractWebConsolePlugin::TemplateData WebConsolePluginTracker::GetLabelMap(const std::string& current) const
 {
-  return m_LabelMapAny.ToJSON();
+  auto labelMap = AbstractWebConsolePlugin::TemplateData::List();
+
+  for (auto e : m_LabelMap)
+  {
+    AbstractWebConsolePlugin::TemplateData menuItem;
+    menuItem["title"] = e.second.title;
+    menuItem["label"] = e.second.label;
+    menuItem["href"] = e.second.label;
+    if (e.second.label == current)
+    {
+      menuItem["active"] = "active";
+    }
+    labelMap << std::move(menuItem);
+  }
+
+  return labelMap;
 }
 
 void WebConsolePluginTracker::Open()
@@ -137,7 +143,7 @@ void WebConsolePluginTracker::Open()
 
 std::shared_ptr<HttpServlet>  WebConsolePluginTracker::AddingService(const ServiceReference<HttpServlet>& reference)
 {
-  std::string label = this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL());
+  std::string label = this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL);
   if (label.empty())
   {
     return nullptr;
@@ -173,20 +179,20 @@ void WebConsoleServlet::Init(const ServletConfig& config)
 
 void WebConsoleServlet::Service(HttpServletRequest& request, HttpServletResponse& response)
 {
-  std::cout << "RequestUrl: " << request.GetRequestUrl() << std::endl;
-  std::cout << "RequestUri: " << request.GetRequestUri() << std::endl;
-  std::cout << "ContextPath: " << request.GetContextPath() << std::endl;
-  std::cout << "PathInfo: " << request.GetPathInfo() << std::endl;
-  std::cout << "ServletPath: " << request.GetServletPath() << std::endl;
+  //std::cout << "RequestUrl: " << request.GetRequestUrl() << std::endl;
+  //std::cout << "RequestUri: " << request.GetRequestUri() << std::endl;
+  //std::cout << "ContextPath: " << request.GetContextPath() << std::endl;
+  //std::cout << "PathInfo: " << request.GetPathInfo() << std::endl;
+  //std::cout << "ServletPath: " << request.GetServletPath() << std::endl;
   //std::cout << "LocalName: " << request.GetLocalName() << std::endl;
   //std::cout << "LocalPort: " << request.GetLocalPort() << std::endl;
   //std::cout << "Protocol: " << request.GetProtocol() << std::endl;
-  std::cout << "Scheme: " << request.GetScheme() << std::endl;
+  //std::cout << "Scheme: " << request.GetScheme() << std::endl;
   //std::cout << "RemoteAddr: " << request.GetRemoteAddr() << std::endl;
   //std::cout << "RemoteHost: " << request.GetRemoteHost() << std::endl;
   //std::cout << "RemotePort: " << request.GetRemotePort() << std::endl;
-  std::cout << "ServerName: " << request.GetServerName() << std::endl;
-  std::cout << "ServerPort: " << request.GetServerPort() << std::endl;
+  //std::cout << "ServerName: " << request.GetServerName() << std::endl;
+  //std::cout << "ServerPort: " << request.GetServerPort() << std::endl;
 
   // check whether we are not at .../{webManagerRoot}
   std::string pathInfo = request.GetPathInfo();
@@ -225,11 +231,11 @@ void WebConsoleServlet::Service(HttpServletRequest& request, HttpServletResponse
 
     // the official request attributes
     //request.SetAttribute(WebConsoleConstants::ATTR_LANG_MAP, getLangMap());
-    request.SetAttribute(WebConsoleConstants::ATTR_LABEL_MAP(), m_PluginTracker.GetLabelMapJSON());
+    request.SetAttribute(WebConsoleConstants::ATTR_LABEL_MAP, m_PluginTracker.GetLabelMap(label));
     //request.SetAttribute(WebConsoleConstants::ATTR_LABEL_MAP_CATEGORIZED, labelMap );
-    request.SetAttribute(WebConsoleConstants::ATTR_APP_ROOT(),
+    request.SetAttribute(WebConsoleConstants::ATTR_APP_ROOT,
                          request.GetContextPath() + request.GetServletPath());
-    request.SetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT(),
+    request.SetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT,
                          request.GetContextPath() + request.GetServletPath() + '/' + label);
 
     // wrap the response for localization and template variable replacement

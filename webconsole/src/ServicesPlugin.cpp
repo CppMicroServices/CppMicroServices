@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,6 +22,8 @@
 
 #include "ServicesPlugin.h"
 
+#include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
+
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
 
@@ -35,162 +38,91 @@
 
 namespace cppmicroservices {
 
-static std::string LABEL()
-{
-  static std::string s = "services";
-  return s;
-}
-
-static std::string TITLE()
-{
-  static std::string s = "CppMicroServices Services";
-  return s;
-}
-
-static std::string CATEGORY()
-{
-  static std::string s;
-  return s;
-}
+std::string NumToString(int64_t val);
 
 ServicesPlugin::ServicesPlugin()
-  : SimpleWebConsolePlugin(LABEL(), TITLE(), CATEGORY())
+  : SimpleWebConsolePlugin("services", "Services", "")
 {
-}
-
-bool ServicesPlugin::IsHtmlRequest(HttpServletRequest& request)
-{
-  std::vector<std::string> acceptHeaders = request.GetHeaders("Accept");
-  std::vector<std::string>::iterator htmlIter = std::find(acceptHeaders.begin(), acceptHeaders.end(), "text/html");
-  std::vector<std::string>::iterator jsonIter = std::find(acceptHeaders.begin(), acceptHeaders.end(), "application/json");
-  if (jsonIter < htmlIter)
-  {
-    request.SetAttribute("_format", std::string("json"));
-    return false;
-  }
-  else
-  {
-    request.SetAttribute("_format", std::string("html"));
-    return true;
-  }
 }
 
 void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletResponse& response)
 {
   std::string pathInfo = request.GetPathInfo();
-  std::string format = request.GetAttribute("_format").ToString();
   if (pathInfo == "/services")
   {
-    if (format == "json")
+    BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
+    if (res)
     {
-      response.SetContentType("application/json");
-      response.GetOutputStream() << GetIds_JSON();
-    }
-    else
-    {
-      BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
-      if (res)
-      {
-        BundleResourceStream rs(res, std::ios_base::binary);
-        response.GetOutputStream() << rs.rdbuf();
-      }
+      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+      data["services"] = GetIds();
+
+      BundleResourceStream rs(res, std::ios_base::binary);
+      response.GetOutputStream() << rs.rdbuf();
     }
   }
   else if (pathInfo.size() > 20 && pathInfo.compare(0, 20, "/services/interface/") == 0)
   {
     std::string id = pathInfo.substr(20);
-    if (format == "json")
+    BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
+    if (res)
     {
-      response.SetContentType("application/json");
-      response.GetOutputStream() << GetInterface_JSON(id);
-    }
-    else
-    {
-      BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
-      if (res)
-      {
-        BundleResourceStream rs(res, std::ios_base::binary);
-        response.GetOutputStream() << rs.rdbuf();
-      }
-    }
-  }
-  else
-  {
+      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+      data["interface"] = id;
+      data["services"] = GetInterface(id);
 
+      BundleResourceStream rs(res, std::ios_base::binary);
+      response.GetOutputStream() << rs.rdbuf();
+    }
   }
 }
 
-std::string ServicesPlugin::GetIds_JSON() const
+AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetIds() const
 {
   std::set<std::string> ids;
   std::vector<ServiceReferenceU> refs = GetContext().GetServiceReferences("");
-  for (std::vector<ServiceReferenceU>::const_iterator iter = refs.begin(), endIter = refs.end();
-       iter != endIter; ++iter)
+  for (auto ref : refs)
   {
-    Any objectClass = iter->GetProperty(Constants::OBJECTCLASS);
-    std::vector<std::string>& oc = ref_any_cast<std::vector<std::string> >(objectClass);
-    for (std::vector<std::string>::const_iterator ocIter = oc.begin(), ocEndIter = oc.end();
-         ocIter != ocEndIter; ++ocIter)
+    Any objectClass = ref.GetProperty(Constants::OBJECTCLASS);
+    auto const& oc = ref_any_cast<std::vector<std::string> >(objectClass);
+    for (auto const& id : oc)
     {
-      ids.insert(*ocIter);
+      ids.insert(id);
     }
   }
 
-  std::string json = "{ \"ids\" : [";
-  for (std::set<std::string>::const_iterator iter = ids.begin(), endIter = ids.end();
-       iter != endIter; ++iter)
+  TemplateData data(TemplateData::Type::List);
+  for (auto const& id : ids)
   {
-    if (iter == ids.begin())
-    {
-      json += "\"" + *iter + "\"";
-    }
-    else
-    {
-      json += ", \"" + *iter + "\"";
-    }
+    data << TemplateData{"id", id};
   }
-  json += "]}";
-  return json;
+  return data;
 }
 
-std::string ServicesPlugin::GetInterface_JSON(const std::string& iid) const
+AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetInterface(const std::string& iid) const
 {
-  std::vector<ServiceReferenceU> refs = GetContext().GetServiceReferences(iid);
-  std::stringstream json;
-  json << "{ \"services\" : [";
-  for (std::vector<ServiceReferenceU>::const_iterator iter = refs.begin(), endIter = refs.end();
-       iter != endIter; ++iter)
+  TemplateData data(TemplateData::Type::List);
+
+  for (auto& ref : GetContext().GetServiceReferences(iid))
   {
-    std::vector<std::string> keys;
-    iter->GetPropertyKeys(keys);
-    Any propsAny = std::map<std::string, Any>();
-    std::map<std::string, Any>& props = ref_any_cast<std::map<std::string, Any> >(propsAny);
-    for (std::vector<std::string>::const_iterator keyIter = keys.begin(), keyEndIter = keys.end();
-         keyIter != keyEndIter; ++keyIter)
+    AnyMap props(AnyMap::ORDERED_MAP);
+    for (auto const& key : ref.GetPropertyKeys())
     {
-      if (*keyIter != Constants::SERVICE_ID &&
-          *keyIter != Constants::SERVICE_RANKING &&
-          *keyIter != Constants::OBJECTCLASS &&
-          *keyIter != Constants::SERVICE_SCOPE)
-      {
-        props.insert(std::make_pair(*keyIter, iter->GetProperty(*keyIter)));
-      }
+      props[key] = ref.GetProperty(key);
     }
 
-    if (iter != refs.begin())
-    {
-      json << ",";
-    }
-    json << "{ \"bundle\":\"" << iter->GetBundle().GetSymbolicName() << "\","
-         << "  \"id\":" << iter->GetProperty(Constants::SERVICE_ID).ToJSON() << ","
-         << "  \"ranking\":" << iter->GetProperty(Constants::SERVICE_RANKING).ToJSON() << ","
-         << "  \"scope\":" << iter->GetProperty(Constants::SERVICE_SCOPE).ToJSON() << ","
-         << "  \"classes\":" << iter->GetProperty(Constants::OBJECTCLASS).ToJSON() << ","
-         << "  \"props\":" << propsAny.ToJSON()
-         << "}";
+    TemplateData entry;
+    entry["bundle"] = ref.GetBundle().GetSymbolicName();
+    entry["bundle-id"] = NumToString(ref.GetBundle().GetBundleId());
+    entry["id"] = ref.GetProperty(Constants::SERVICE_ID).ToStringNoExcept();
+    entry["ranking"] = ref.GetProperty(Constants::SERVICE_RANKING).ToStringNoExcept();
+    entry["scope"] = ref.GetProperty(Constants::SERVICE_SCOPE).ToStringNoExcept();
+    entry["types"] = ref.GetProperty(Constants::OBJECTCLASS).ToStringNoExcept();
+    entry["props"] = Any(props).ToJSON();
+
+    data << std::move(entry);
   }
-  json << "]}";
-  return json.str();
+
+  return data;
 }
 
 }

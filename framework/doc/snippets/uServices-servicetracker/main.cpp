@@ -52,6 +52,12 @@ struct MyTrackingCustomizerVoid : public ServiceTrackerCustomizer<void, MyTracke
 
 int main(int /*argc*/, char* /*argv*/[])
 {
+  std::cout << "This snippet is not meant to be executed.\n"
+               "It does not provide a complete working example.\n"
+               "See http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
+            << std::endl;
+  return 0;
+
   {
 //! [tracker]
 MyTrackingCustomizer myCustomizer;
@@ -68,6 +74,5 @@ ServiceTracker<IFooService, MyTrackedClass> tracker(GetBundleContext(), &myCusto
   catch (const cppmicroservices::ServiceException&)
   {}
 
-  return 0;
 }
 

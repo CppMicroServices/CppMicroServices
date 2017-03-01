@@ -1,61 +1,26 @@
-<table class="tight striped sortable" cellspacing="0" celpadding="0">
-<thead><tr>
-  <th>Bundle</th><th>Id</th><th>Ranking</th><th>Scope</th><th>Classes</th><th>Properties</th>
-</tr></thead>
-<tbody class="template">
-<tr>
-<td class="bundle-name"><a href="${appRoot}/bundles/id/"></a></td>
-<td class="service-id"></td>
-<td class="service-ranking"></td>
-<td class="service-scope"></td>
-<td class="service-classes"></td>
-<td class="service-props"></td>
-</tr>
-</tbody>
-</table>
+<div class="container-fluid">
+  <h2>Interface {{interface}}</h2>
 
-<script>
+  <p>Back to <a href="{{pluginRoot}}"> {{pluginTitle}}</a></p>
+  
+  <div class="row">
+    
+    <div class="col-md-12 table-responsive">
+      <table class="table table-striped">
+        
+        <thead>
+          <tr><th>Bundle</th><th>Service ID</th><th>Types</th><th>Ranking</th><th>Scope</th><th>Properties</th></tr>
+        </thead>
+        <tbody>
+          {{#services}}
+          <tr><td><a href="{{appRoot}}/bundles/{{bundle-id}}">{{bundle}}</a></td><td>{{id}}</td><td>{{types}}</td><td>{{ranking}}</td><td>{{scope}}</td><td class="json" id="service-props-{{id}}"></td></tr>
+          <script>$('#service-props-{{id}}').jsonViewer({{&props}}, { collapsed: true });</script>
+          {{/services}}
+        </tbody>
 
-function json2html(json) {
-    var i, ret = "";
-    ret += "<ul>";
-    for( i in json) {
-        ret += "<li>"+i+": ";
-        if( typeof json[i] === "object") ret += json2html(json[i]);
-        else ret += json[i];
-        ret += "</li>";
-    }
-    ret += "</ul>";
-    return ret;
-}
-
-var request = $.getJSON("");
-
-request.done(function(data) {
-  var directive = {
-    'tr':{
-      'service<-services':{
-        'td.bundle-name':'service.bundle',
-        'td.service-id':'service.id',
-        'td.service-ranking':'service.ranking',
-        'td.service-scope':'service.scope',
-        'td.service-classes':'service.classes',
-        'td.service-props':function(a) { return json2html(a.item.props); }
-      }
-    }
-  };
-  $('tbody.template').render(data, directive);
-
-  // fix row classes
-  var rows = $('table.sortable').find('tbody tr');
-  rows.removeClass('alt first last');
-  var table = $('table.sortable');
-  table.find('tr:even').addClass('alt');
-  table.find('tr:first').addClass('first');
-  table.find('tr:last').addClass('last');
-});
-
-request.fail(function(jqXHR, textStatus, errorThrown) {
-  alert(textStatus + errorThrown);
-});
-</script>
+      </table>
+    </div>
+    
+  </div>
+  
+</div> <!-- /container -->

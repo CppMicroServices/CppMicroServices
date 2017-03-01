@@ -1,78 +1,89 @@
-if(NOT US_IS_EMBEDDED AND NOT US_NO_DOCUMENTATION)
-  find_package(Doxygen)
+#-----------------------------------------------------------------------------
+# Build the tutorial and example code
+#-----------------------------------------------------------------------------
 
-  if(DOXYGEN_FOUND)
+if(US_BUILD_EXAMPLES AND NOT ${PROJECT_NAME}_SKIP_EXAMPLES AND
+   EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists.txt)
+  set(CppMicroServices_DIR ${CppMicroServices_BINARY_DIR})
+  add_subdirectory(src)
+endif()
 
-    option(US_DOCUMENTATION_FOR_WEBPAGE "Build Doxygen documentation for the webpage" OFF)
-    set(US_DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Doxygen output directory")
-    mark_as_advanced(US_DOCUMENTATION_FOR_WEBPAGE US_DOXYGEN_OUTPUT_DIR)
+#-----------------------------------------------------------------------------
+# Build the documentation itself
+#-----------------------------------------------------------------------------
 
-    set(US_HAVE_DOT "NO")
-    if(DOXYGEN_DOT_EXECUTABLE)
-      set(US_HAVE_DOT "YES")
+us_cache_var(US_BUILD_DOC_MAN OFF BOOL "Build man pages")
+us_cache_var(US_BUILD_DOC_HTML OFF BOOL "Build html documentation")
+
+find_package(Doxygen)
+
+find_program(SPHINX_EXECUTABLE
+  NAMES sphinx-build
+  DOC "Sphinx Documentation Builder (sphinx-doc.org)"
+  )
+us_cache_var(SPHINX_FLAGS "" STRING "Flags to pass to sphinx-build" ADVANCED)
+separate_arguments(sphinx_flags UNIX_COMMAND "${SPHINX_FLAGS}")
+
+if(NOT US_BUILD_DOC_MAN AND NOT US_BUILD_DOC_HTML)
+  return()
+elseif(NOT SPHINX_EXECUTABLE)
+  message(FATAL_ERROR "SPHINX_EXECUTABLE (sphinx-build) is not found!")
+elseif(NOT Doxygen_FOUND)
+  message(FATAL_ERROR "Doxygen is not found!")
+endif()
+
+set(doc_formats "")
+if(US_BUILD_DOC_HTML)
+  list(APPEND doc_formats html)
+endif()
+if(US_BUILD_DOC_MAN)
+  list(APPEND doc_formats man)
+endif()
+
+set(doc_format_outputs "")
+set(doc_format_last "")
+foreach(format ${doc_formats})
+  set(doc_format_output "doc_format_${format}")
+  set(doc_format_log "build-${format}.log")
+  add_custom_command(
+    OUTPUT ${doc_format_output}
+    COMMAND ${SPHINX_EXECUTABLE}
+            -c ${CppMicroServices_SOURCE_DIR}
+            -d ${CppMicroServices_BINARY_DIR}/doctrees
+            -b ${format}
+            ${sphinx_flags}
+            ${CppMicroServices_SOURCE_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}/${format}
+            > ${doc_format_log} # log stdout, pass stderr
+    DEPENDS ${doc_format_last}
+    WORKING_DIRECTORY ${CppMicroServices_SOURCE_DIR}
+    COMMENT "sphinx-build ${format}: see doc/${doc_format_log}"
+    VERBATIM
+    )
+  set_property(SOURCE ${doc_format_output} PROPERTY SYMBOLIC 1)
+  list(APPEND doc_format_outputs ${doc_format_output})
+  set(doc_format_last ${doc_format_output})
+endforeach()
+
+add_custom_target(doc ALL DEPENDS ${doc_format_outputs})
+
+if(US_BUILD_DOC_MAN AND NOT US_NO_INSTALL)
+  file(GLOB man_rst RELATIVE ${CppMicroServices_SOURCE_DIR}/doc/man
+    ${CppMicroServices_SOURCE_DIR}/doc/man/*.[1-9].rst)
+  foreach(m ${man_rst})
+    if("x${m}" MATCHES "^x(.+)\\.([1-9])\\.rst$")
+      set(name "${CMAKE_MATCH_1}")
+      set(sec "${CMAKE_MATCH_2}")
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/man/${name}.${sec}
+              DESTINATION ${MAN_INSTALL_DIR}/man${sec}
+              COMPONENT doc)
     endif()
+  endforeach()
+endif()
 
-    if(NOT DEFINED US_DOXYGEN_DOT_NUM_THREADS)
-      set(US_DOXYGEN_DOT_NUM_THREADS 4)
-    endif()
-
-    # We are in standalone mode, so we generate a "mainpage"
-    set(US_DOXYGEN_MAIN_PAGE_CMD "\\mainpage")
-    set(US_DOXYGEN_ENABLED_SECTIONS "us_standalone")
-
-    if(US_DOCUMENTATION_FOR_WEBPAGE)
-      configure_file(doxygen/header.html
-                     ${CMAKE_CURRENT_BINARY_DIR}/header.html COPYONLY)
-      set(US_DOXYGEN_HEADER header.html)
-
-      configure_file(doxygen/footer.html
-                     ${CMAKE_CURRENT_BINARY_DIR}/footer.html COPYONLY)
-      set(US_DOXYGEN_FOOTER footer.html)
-
-      configure_file(doxygen/doxygen_extra.css
-                     ${CMAKE_CURRENT_BINARY_DIR}/doxygen_extra.css COPYONLY)
-      set(US_DOXYGEN_EXTRA_CSS doxygen_extra.css)
-
-      set(US_DOXYGEN_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/gh-pages)
-      if(${PROJECT_NAME}_MINOR_VERSION EQUAL 99)
-        set(US_DOXYGEN_HTML_OUTPUT "doc_latest")
-      else()
-        set(US_DOXYGEN_HTML_OUTPUT "doc_${${PROJECT_NAME}_MAJOR_VERSION}_${${PROJECT_NAME}_MINOR_VERSION}")
-      endif()
-    else()
-      set(US_DOXYGEN_HEADER )
-      set(US_DOXYGEN_FOOTER )
-      set(US_DOXYGEN_CSS )
-      set(US_DOXYGEN_HTML_OUTPUT "html")
-    endif()
-
-    # Compile a command line tool which transforms comments in CMake scripts into
-    # Doxygen parseable C code.
-    set(CMakeDoxygenFilter_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CMakeDoxygenFilter${CMAKE_EXECUTABLE_SUFFIX}")
-    try_compile(_result_var
-                "${CMAKE_CURRENT_BINARY_DIR}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp"
-                OUTPUT_VARIABLE _compile_output
-                COPY_FILE ${CMakeDoxygenFilter_EXECUTABLE}
-               )
-
-    if(NOT _result_var)
-      message(FATAL_ERROR "error: Faild to compile ${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp (result: ${result_var})\n${_compile_output}")
-    endif()
-
-    configure_file(doxygen.conf.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
-
-    add_custom_target(doc
-                      ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                      VERBATIM
-                      )
-
-    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" --target doc)")
-
-    install(DIRECTORY "${US_DOXYGEN_OUTPUT_DIR}/${US_DOXYGEN_HTML_OUTPUT}"
-            DESTINATION "${AUXILIARY_INSTALL_DIR}/doc/"
-            COMPONENT doc)
-  endif()
+if(US_BUILD_DOC_HTML AND NOT US_NO_INSTALL)
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
+          DESTINATION ${DOC_INSTALL_DIR}
+          COMPONENT doc
+         )
 endif()

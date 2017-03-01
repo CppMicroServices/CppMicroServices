@@ -36,7 +36,14 @@ class Bundle;
 class BundleEventData;
 
 /**
+\defgroup gr_bundleevent BundleEvent
+
+\brief Groups BundleEvent class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_bundleevent
  *
  * An event from the Micro Services framework describing a bundle lifecycle change.
  * <p>
@@ -54,6 +61,9 @@ class US_Framework_EXPORT BundleEvent
 
 public:
 
+  /**
+   * The bundle event type.
+   */
   enum Type : uint32_t {
 
     /**
@@ -234,11 +244,19 @@ public:
 
 /**
  * \ingroup MicroServices
- * @{
+ * \ingroup gr_bundleevent
+ *
+ * Writes a string representation of \c eventType to the stream \c os.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType);
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_bundleevent
+ *
+ * Writes a string representation of \c event to the stream \c os.
+ */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleEvent& event);
-/** @}*/
 
 }
 

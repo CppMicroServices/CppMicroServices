@@ -27,7 +27,6 @@
 #include "cppmicroservices/FrameworkExport.h"
 #include "cppmicroservices/PrototypeServiceFactory.h"
 #include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/ServiceProperties.h"
 
 namespace cppmicroservices {
 
@@ -65,7 +64,14 @@ protected:
 };
 
 /**
+\defgroup gr_serviceobjects ServiceObjects
+
+\brief Groups ServiceObjects class related symbols.
+*/
+
+/**
  * @ingroup MicroServices
+ * @ingroup gr_serviceobjects
  *
  * Allows multiple service objects for a service to be obtained.
  *
@@ -153,11 +159,12 @@ private:
 
 /**
  * @ingroup MicroServices
+ * @ingroup gr_serviceobjects
  *
  * Allows multiple service objects for a service to be obtained.
  *
  * This is a specialization of the ServiceObjects class template for
- * "void", which maps to all service interface types.
+ * \c void, which maps to all service interface types.
  *
  * @see ServiceObjects
  */
@@ -177,7 +184,7 @@ public:
    * Returns a service object as a InterfaceMap instance for the referenced service.
    *
    * This method is the same as ServiceObjects<S>::GetService() except for the
-   * return type. Further, this method will always return an empty InterfaeMap
+   * return type. Further, this method will always return an empty InterfaceMap
    * object when the referenced service has been unregistered.
    *
    * @return A InterfaceMapConstPtr object for the referenced service, which is empty if

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,19 +24,26 @@
 #define CPPMICROSERVICES_VARIABLERESOLVERSTREAMBUFFER_H
 
 #include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
 
+#include <memory>
 #include <streambuf>
 #include <sstream>
 
 namespace cppmicroservices {
 
-struct WebConsoleVariableResolver;
-
 class VariableResolverStreamBuffer : public std::streambuf
 {
 public:
-  explicit VariableResolverStreamBuffer(std::ostream* out, WebConsoleVariableResolver* variables);
+  explicit VariableResolverStreamBuffer(
+      std::unique_ptr<std::ostream> out,
+      const std::shared_ptr<WebConsoleVariableResolver>& resolver
+      );
+
   ~VariableResolverStreamBuffer();
+
+  VariableResolverStreamBuffer(const VariableResolverStreamBuffer&) = delete;
+  VariableResolverStreamBuffer& operator=(const VariableResolverStreamBuffer&) = delete;
 
 private:
 
@@ -44,74 +52,69 @@ private:
   int sync();
 
   /**
-       * Write a single character following the state machine:
-       * <table>
-       * <tr><th>State</th><th>Character</th><th>Task</th><th>Next State</th></tr>
-       * <tr><td>NULL</td><td>$</td><td>&nbsp;</td><td>DOLLAR</td></tr>
-       * <tr><td>NULL</td><td>\</td><td>&nbsp;</td><td>ESCAPE</td></tr>
-       * <tr><td>NULL</td><td>any</td><td>write c</td><td>NULL</td></tr>
-       * <tr><td>DOLLAR</td><td>{</td><td>&nbsp;</td><td>BUFFERING</td></tr>
-       * <tr><td>DOLLAR</td><td>any</td><td>write $ and c</td><td>NULL</td></tr>
-       * <tr><td>BUFFERING</td><td>}</td><td>translate and write translation</td><td>NULL</td></tr>
-       * <tr><td>BUFFERING</td><td>any</td><td>buffer c</td><td>BUFFERING</td></tr>
-       * <tr><td>ESACPE</td><td>$</td><td>write $</td><td>NULL</td></tr>
-       * <tr><td>ESCAPE</td><td>any</td><td>write \ and c</td><td>NULL</td></tr>
-       * </table>
-       *
-       * @exception IOException If an I/O error occurs
-       */
-  bool parse(char c);
+   * Write a single character following the state machine:
+   *
+   * State                       | Character | Task                                   | Next State
+   * ------------------------------------------------------------------------------------------------------------
+   * NIL                         | {         |                                        | OBRACE
+   * NIL                         | any       | write c                                | NIL
+   * OBRACE                      | {         | buffer {{                              | MUSTACHE
+   * OBRACE                      | any       | write { and c                          | NIL
+   * MUSTACHE                    | # or ^    | buffer c                               | MUSTACHE_BLOCK_BEGIN
+   * MUSTACHE                    | any       | buffer c                               | MUSTACHE_VAR
+   * MUSTACHE_VAR                | }         | buffer c                               | MUSTACHE_VAR_CBRACE
+   * MUSTACHE_VAR                | any       | buffer c                               | MUSTACHE_VAR
+   * MUSTACHE_VAR_CBRACE         | }         | buffer c, render buffer                | NIL
+   * MUSTACHE_VAR_CBRACE         | any       | buffer c                               | MUSTACHE_VAR
+   * MUSTACHE_BLOCK_BEGIN        | }         | buffer c                               | MUSTACHE_BLOCK_BEGIN_CBRACE
+   * MUSTACHE_BLOCK_BEGIN        | any       | buffer c, btag c                       | MUSTACHE_BLOCK_BEGIN
+   * MUSTACHE_BLOCK_BEGIN_CBRACE | }         | buffer c                               | MUSTACHE_BLOCK
+   * MUSTACHE_BLOCK_BEGIN_CBRACE | any       | buffer c, btag } and c                 | MUSTACHE_BLOCK_BEGIN
+   * MUSTACHE_BLOCK              | {         | buffer c                               | MUSTACHE_BLOCK_OBRACE
+   * MUSTACHE_BLOCK              | any       | buffer c                               | MUSTACHE_BLOCK
+   * MUSTACHE_BLOCK_OBRACE       | {         | buffer c                               | MUSTACHE_BLOCK_MUSTACHE
+   * MUSTACHE_BLOCK_OBRACE       | any       | buffer c                               | MUSTACHE_BLOCK
+   * MUSTACHE_BLOCK_MUSTACHE     | /         | buffer c                               | MUSTACHE_BLOCK_END
+   * MUSTACHE_BLOCK_MUSTACHE     | any       | buffer c                               | MUSTACHE BLOCK
+   * MUSTACHE_BLOCK_END          | }         | buffer c                               | MUSTACHE_BLOCK_END_CBRACE
+   * MUSTACHE_BLOCK_END          | any       | buffer c, etag c                       | MUSTACHE_BLOCK_END
+   * MUSTACHE_BLOCK_END_CBRACE   | }         | buffer c, if tags match render buffer  | if match NIL else MUSTACHE_BLOCK
+   * MUSTACHE_BLOCK_END_CBRACE   | any       | buffer c, etag } and c                 | MUSTACHE_BLOCK END
+   *
+   * @exception IOException If an I/O error occurs
+   */
+  bool Parse(char c);
 
-  std::string translate();
+  void Translate();
 
-  VariableResolverStreamBuffer(const VariableResolverStreamBuffer&);
-  VariableResolverStreamBuffer& operator=(const VariableResolverStreamBuffer&);
+  enum class State {
 
-private:
+    NIL,
+    OBRACE,
+    MUSTACHE,
+    MUSTACHE_VAR,
+    MUSTACHE_VAR_CBRACE,
+    MUSTACHE_BLOCK_BEGIN,
+    MUSTACHE_BLOCK_BEGIN_CBRACE,
+    MUSTACHE_BLOCK,
+    MUSTACHE_BLOCK_OBRACE,
+    MUSTACHE_BLOCK_MUSTACHE,
+    MUSTACHE_BLOCK_END,
+    MUSTACHE_BLOCK_END_CBRACE
 
-  enum State {
-  /**
-       * normal processing state, $ signs are recognized here
-       * proceeds to {@link #STATE_DOLLAR} if a $ sign is encountered
-       * proceeds to {@link #STATE_ESCAPE} if a \ sign is encountered
-       * otherwise just writes the character
-       */
-    STATE_NULL,
-
-      /**
-       * State after a $ sign has been recognized
-       * proceeds to {@value #STATE_BUFFERING} if a { sign is encountered
-       * otherwise proceeds to {@link #STATE_NULL} and writes the $ sign and
-       * the current character
-       */
-     STATE_DOLLAR,
-
-      /**
-       * buffers characters until a } is encountered
-       * proceeds to {@link #STATE_NULL} if a } sign is encountered and
-       * translates and writes buffered text before returning
-       * otherwise collects characters to gather the translation key
-       */
-      STATE_BUFFERING,
-
-      /**
-       * escaping the next character, if the character is a $ sign, the
-       * $ sign is writeted. otherwise the \ and the next character is
-       * written
-       * proceeds to {@link #STATE_NULL}
-       */
-      STATE_ESCAPE = 3
   };
 
-      /**
-       * The current state, starts with {@link #STATE_NULL}
-       */
+  /**
+   * The current state, starts with State::NIL
+   */
   State m_State;
 
-  std::ostream* m_Out;
-  WebConsoleVariableResolver* m_Variables;
-  char m_Buffer;
-  std::stringstream m_LineBuffer;
+  std::unique_ptr<std::ostream> m_Out;
+
+  std::shared_ptr<WebConsoleVariableResolver> m_Variables;
+  std::stringstream m_Buffer;
+  std::stringstream m_BeginTag;
+  std::stringstream m_EndTag;
 };
 
 }

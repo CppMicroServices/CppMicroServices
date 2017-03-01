@@ -1,6 +1,6 @@
 find_package(CppMicroServices COMPONENTS ShellService REQUIRED)
 
-include_directories(${US_INCLUDE_DIRS})
+include_directories(../../third_party)
 
 set(srcs
   Shell.cpp
@@ -14,5 +14,17 @@ if(MSVC)
   )
 endif()
 
-add_executable(usShell ${srcs})
-target_link_libraries(usShell ${US_LIBRARIES})
+set(US_SHELL_EXECUTABLE_TARGET usShell)
+set(US_SHELL_EXECUTABLE_OUTPUT_NAME ${US_SHELL_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
+
+add_executable(${US_SHELL_EXECUTABLE_TARGET} ${srcs})
+set_property(TARGET ${US_SHELL_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_SHELL_EXECUTABLE_OUTPUT_NAME})
+
+target_link_libraries(${US_SHELL_EXECUTABLE_TARGET} ${US_LIBRARIES})
+
+if(NOT US_NO_INSTALL)
+  install(TARGETS ${US_SHELL_EXECUTABLE_TARGET}
+          EXPORT ${PROJECT_NAME}Targets
+          FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
+          RUNTIME DESTINATION bin ${US_SDK_INSTALL_COMPONENT})
+endif()

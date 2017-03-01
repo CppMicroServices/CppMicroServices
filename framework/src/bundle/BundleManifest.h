@@ -25,11 +25,12 @@
 
 #include "cppmicroservices/Any.h"
 
+#include "cppmicroservices/AnyMap.h"
+
 namespace cppmicroservices {
 
 class BundleManifest
 {
-  typedef std::map<std::string, Any> AnyMap;
 
 public:
 
@@ -37,19 +38,20 @@ public:
 
   void Parse(std::istream& is);
 
-  bool Contains(const std::string& key) const;
+  AnyMap GetHeaders() const;
 
+  bool Contains(const std::string& key) const;
   Any GetValue(const std::string& key) const;
 
-  std::vector<std::string> GetKeys() const;
+  Any GetValueDeprecated(const std::string& key) const;
+  std::vector<std::string> GetKeysDeprecated() const;
 
-  void SetValue(const std::string& key, const Any& value);
-    
-  AnyMap GetProperties() const;
+  std::map<std::string, Any> GetPropertiesDeprecated() const;
 
 private:
 
-  AnyMap m_Properties;
+  std::map<std::string, Any> m_PropertiesDeprecated;
+  AnyMap m_Headers;
 };
 
 }

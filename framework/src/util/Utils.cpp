@@ -56,7 +56,11 @@
   #include <Shlwapi.h>
   #include <crtdbg.h>
   #include <direct.h>
+#ifdef __MINGW32__
+  #include <dirent.h>
+#else
   #include "dirent_win32.h"
+#endif
 
   #define US_STAT struct _stat
   #define us_stat _stat
@@ -296,12 +300,25 @@ bool IsSharedLibrary(const std::string& location)
 
 bool IsBundleFile(const std::string& location)
 {
-  // Currently, we require a zip file with at least one top-level
-  // directory for a valid bundle file.
+  // We require a zip file with at least one top-level directory
+  // containing a manifest.json file for a file to be a valid bundle.
   try
   {
+    // If this location is a bundle, a top level directory will
+    // contain a manifest.json file at its root. There is no need
+    // to recursively search nested directories.
     BundleResourceContainer resContainer(location);
-    return !resContainer.GetTopLevelDirs().empty();
+    auto topLevelDirs = resContainer.GetTopLevelDirs();
+    return std::any_of(topLevelDirs.begin(), topLevelDirs.end(), [&resContainer](const std::string& dir) -> bool {
+
+      std::vector<std::string> names;
+      std::vector<uint32_t> indices;
+
+      resContainer.GetChildren(dir + "/", true, names, indices);
+      return std::any_of(names.begin(), names.end(), [](const std::string& resourceName) -> bool { 
+        return resourceName == std::string("manifest.json");
+      });
+    });
   }
   catch (...)
   {
@@ -388,7 +405,7 @@ std::string GetLastErrorStr()
                 NULL,
                 dw,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR) &lpMsgBuf,
+                reinterpret_cast<LPTSTR>(&lpMsgBuf),
                 0, NULL );
 
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -401,7 +418,7 @@ std::string GetLastErrorStr()
     return std::string("Failed to retrieve error message.");
   }
 
-  std::string errMsg((LPCTSTR)lpMsgBuf);
+  std::string errMsg(reinterpret_cast<LPCTSTR>(lpMsgBuf));
 
   LocalFree(lpMsgBuf);
 

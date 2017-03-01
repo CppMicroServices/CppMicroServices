@@ -1,39 +1,24 @@
-<table class="tight striped sortable" cellspacing="0" celpadding="0">
-<thead><tr>
-  <th>Id</th>
-</tr></thead>
-<tbody class="template">
-<tr>
-<td class="service-id"><a href="${pluginRoot}/interface/"></a></td>
-</tr>
-</tbody>
-</table>
 
-<script>
+<div class="container-fluid">
+  <h1>{{pluginTitle}}</h1>
+  
+  <div class="row">
+    
+    <div class="col-md-12 table-responsive">
+      <table class="table table-striped">
+        
+        <thead>
+          <tr><th>Interface Type</th></tr>
+        </thead>
+        <tbody>
+          {{#services}}
+          <tr><td><a href="{{pluginRoot}}/interface/{{id}}">{{id}}</a></td></tr>
+          {{/services}}
+        </tbody>
 
-var request = $.getJSON("${pluginRoot}");
-
-request.done(function(data) {
-  var directive = {
-    'tr':{
-      'id<-ids':{
-        'a':'id',
-        'a@href+':'id'
-      }
-    }
-  };
-  $('tbody.template').render(data, directive);
-
-  // fix row classes
-  var rows = $('table.sortable').find('tbody tr');
-  rows.removeClass('alt first last');
-  var table = $('table.sortable');
-  table.find('tr:even').addClass('alt');
-  table.find('tr:first').addClass('first');
-  table.find('tr:last').addClass('last');
-});
-
-request.fail(function(jqXHR, textStatus, errorThrown) {
-  alert(textStatus + errorThrown);
-});
-</script>
+      </table>
+    </div>
+    
+  </div>
+  
+</div> <!-- /container -->

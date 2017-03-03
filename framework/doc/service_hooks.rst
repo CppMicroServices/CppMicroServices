@@ -12,10 +12,11 @@ intended for use by application bundles but rather by bundles in need of
 *hooking* into the service registry and modifying the behaviour of
 application bundles.
 
-Specific use case for service hooks include proxying of existing
-services by hiding the original service and registering a *proxy
-service* with the same properties or providing services *on demand*
-based on registered service listeners from external bundles.
+Some example use cases for service hooks include:
+
+- Proxying of existing services by hiding the original service and registering a *proxy
+service* with the same properties 
+- Providing services *on demand* based on registered service listeners from external bundles
 
 Event Listener Hook
 -------------------
@@ -24,9 +25,11 @@ A bundle can intercept events being delivered to other bundles by
 registering a :any:`ServiceEventListenerHook <cppmicroservices::ServiceEventListenerHook>`
 object as a service. The CppMicroServices library will send all service
 events to all the registered hooks using the reversed ordering of their
-ServiceReference objects. Note that event listener hooks are called
-*after* the event was created but *before* it is filtered by the optional
-filter expression of the service listeners. Hence an event listener hook
+ServiceReference objects. 
+
+Note that event listener hooks are called
+*after* the event was created, but *before* it is filtered by the optional
+filter expression of the service listeners. Therefore, an event listener hook
 receives all
 :any:`SERVICE_REGISTERED <gr_serviceevent::SERVICE_REGISTERED>`,
 :any:`SERVICE_MODIFIED <gr_serviceevent::SERVICE_MODIFIED>`,

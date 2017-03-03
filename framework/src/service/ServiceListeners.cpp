@@ -148,8 +148,8 @@ void ServiceListeners::RemoveServiceListener(const std::shared_ptr<BundleContext
   {
     auto l = this->Lock(); US_UNUSED(l);
     auto it = std::find_if(serviceSet.begin(), serviceSet.end(),
-                           [&listener, &data](const ServiceListenerEntry& entry) {
-                             return entry.contains(data, listener);
+                           [&context, &listener, &data](const ServiceListenerEntry& entry) {
+                             return entry.contains(context, data, listener);
                            });
     RemoveServiceListenerEntry(it, sle);
   }
@@ -159,14 +159,15 @@ void ServiceListeners::RemoveServiceListener(const std::shared_ptr<BundleContext
   }
 }
 
-void ServiceListeners::RemoveServiceListener(const ListenerTokenId& tokenId)
+void ServiceListeners::RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context,
+                                             const ListenerTokenId& tokenId)
 {
   ServiceListenerEntry sle;
   {
     auto l = this->Lock(); US_UNUSED(l);
     auto it = std::find_if(serviceSet.begin(), serviceSet.end(),
-                           [&tokenId](const ServiceListenerEntry& entry) {
-                             return entry.contains(tokenId);
+                           [&context, &tokenId](const ServiceListenerEntry& entry) {
+                             return entry.contains(context, tokenId);
                            });
     RemoveServiceListenerEntry(it, sle);
   }
@@ -253,8 +254,8 @@ void ServiceListeners::RemoveListener(const std::shared_ptr<BundleContextPrivate
       return;
     }
   }
-  RemoveServiceListener(token.getId());
 
+  RemoveServiceListener(context, token.getId());
 }
 
 void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)

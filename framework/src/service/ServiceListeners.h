@@ -219,7 +219,8 @@ private:
   void RemoveServiceListenerEntry(ServiceListenerEntries::iterator it,
                                   ServiceListenerEntry& sle);
 
-  void RemoveServiceListener(const ListenerTokenId& tokenId);
+  void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context,
+                             const ListenerTokenId& tokenId);
 
   /**
    * Remove all references to a service listener from the service listener

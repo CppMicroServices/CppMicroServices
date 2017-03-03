@@ -100,8 +100,8 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     const LDAPFilter& filter,
     ServiceTrackerCustomizer<S,T>* customizer
     )
-  : context(context), filter(filter), listenerToken(), customizer(customizer),
-    listenerFilter(filter.ToString()), trackReference(),
+  : context(context), filter(filter), customizer(customizer),
+    listenerFilter(filter.ToString()), listenerToken(), trackReference(),
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();

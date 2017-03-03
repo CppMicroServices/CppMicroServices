@@ -676,7 +676,7 @@ public:
    *         longer valid.
    * @see AddServiceListener()
    */
-  US_DEPRECATED void RemoveServiceListener(const ServiceListener& callable);
+  void RemoveServiceListener(const ServiceListener& callable);
 
   /**
    * Adds the specified <code>callable</code> to the context bundles's list
@@ -714,7 +714,7 @@ public:
    * @see AddBundleListener()
    * @see BundleListener
    */
-  US_DEPRECATED void RemoveBundleListener(const BundleListener& callable);
+  void RemoveBundleListener(const BundleListener& callable);
 
   /**
    * Adds the specified <code>callable</code> to the context bundles's list
@@ -749,7 +749,7 @@ public:
    * @see AddFrameworkListener()
    * @see FrameworkListener
    */
-  US_DEPRECATED void RemoveFrameworkListener(const FrameworkListener& callable);
+  void RemoveFrameworkListener(const FrameworkListener& callable);
 
   /**
    * Removes the registered listener associated with the <code>token</code>
@@ -856,7 +856,7 @@ public:
    * @see AddServiceListener()
    */
   template<class R>
-  US_DEPRECATED void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&))
+  void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&))
   {
     DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
     RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback),
@@ -912,7 +912,7 @@ public:
    * @see AddBundleListener()
    */
   template<class R>
-  US_DEPRECATED void RemoveBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
+  void RemoveBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
   {
     DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
     RemoveBundleListener(BundleListenerMemberFunctor(receiver, callback),
@@ -964,7 +964,7 @@ public:
    * @see AddFrameworkListener()
    */
   template<class R>
-  US_DEPRECATED void RemoveFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  void RemoveFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
   {
     DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
     RemoveFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));

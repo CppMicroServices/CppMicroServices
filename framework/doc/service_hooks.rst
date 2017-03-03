@@ -14,8 +14,8 @@ application bundles.
 
 Some example use cases for service hooks include:
 
-- Proxying of existing services by hiding the original service and registering a *proxy
-service* with the same properties 
+- Proxying of existing services by hiding the original service and 
+registering a *proxy service* with the same properties 
 - Providing services *on demand* based on registered service listeners from external bundles
 
 Event Listener Hook
@@ -66,9 +66,10 @@ Listener Hook
 The CppMicroServices API provides information about the registration,
 unregistration, and modification of services. However, it does not
 directly allow the introspection of bundles to get information about
-what services a bundle is waiting for. Waiting for a service to arrive
-(via a registered service listener) before performing its function is a
-common pattern for bundles. Listener Hooks provide a mechanism to get
+what services a bundle is waiting for. 
+
+Bundles may need to wait for a service to arrive (via a registered service
+listener) before performing their functions. Listener Hooks provide a mechanism to get
 informed about all existing, newly registered, and removed service
 listeners.
 
@@ -78,11 +79,11 @@ interface will be notified about service listeners by being passed
 :any:`ServiceListenerHook::ListenerInfo <cppmicroservices::ServiceListenerHook::ListenerInfo>`
 objects. Each ``ListenerInfo`` object is related to the registration /
 unregistration cycle of a specific service listener. That is,
-registering the same service listener again, even with a different
-filter, will automatically unregister the previouse registration and
+registering the same service listener again (even with a different
+filter) will automatically unregister the previous registration and
 the newly registered service listener is related to a different
 ``ListenerInfo`` object. ``ListenerInfo`` objects can be stored in
-unordered containers and compared with each other, e.g. to match
+unordered containers and compared with each other- for example, to match
 :any:`ServiceListenerHook::Added() <cppmicroservices::ServiceListenerHook::Added>`
 and :any:`ServiceListenerHook::Removed() <cppmicroservices::ServiceListenerHook::Removed>`
 calls.
@@ -93,7 +94,7 @@ may be reported before its corresponding addition. To handle this case,
 the :any:`ListenerInfo::IsRemoved() <cppmicroservices::ServiceListenerHook::ListenerInfo::IsRemoved>`
 method is provided which can be used in the
 :any:`ServiceListenerHook::Added() <cppmicroservices::ServiceListenerHook::Added>`
-method to detect the out of order delivery. A simple strategy is to
+method to detect a delivery that is out of order. A simple strategy is to
 ignore removed events without corresponding added events and ignore
 added events where the ``ListenerInfo`` object is already removed:
 
@@ -110,12 +111,12 @@ Ordinary Services
 
 All service hooks are treated as ordinary services. If the
 CppMicroServices library uses them, their Service References will show
-that the CppMicroServices bundles is using them, and if a hook is a
+that the CppMicroServices bundles are using them, and if a hook is a
 Service Factory, then the actual instance will be properly created.
 
 The only speciality of the service hooks is that the CppMicroServices
 library does not use them for the hooks themselves. That is, the Service
-Event and Service Find Hooks can not be used to hide the services from
+Event and Service Find Hooks cannot be used to hide the services from
 the CppMicroServices library.
 
 Ordering
@@ -132,10 +133,10 @@ Multi Threading
 ~~~~~~~~~~~~~~~
 
 All hooks must be thread-safe because the hooks can be called at any
-time. All hook methods must be re-entrant, they can be entered at any
+time. All hook methods must be re-entrant, as they can be entered at any
 time and in rare cases in the wrong order. The CppMicroServices library
-calls all hook methods synchronously but the calls might be triggered
+calls all hook methods synchronously, but the calls might be triggered
 from any user thread interacting with the CppMicroServices API. The
-CppMicroServices API can be called from any of the hook methods but
+CppMicroServices API can be called from any of the hook methods, but
 implementers must be careful to not hold any lock while calling
 CppMicroServices methods.

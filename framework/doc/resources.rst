@@ -1,14 +1,14 @@
 .. _concept-resources:
 
-The Resources System
+The Resource System
 ====================
 
-The C++ Micro Services library provides a generic resources system that allows you to:
+The C++ Micro Services library provides a generic resource system that allows you to:
 
 - Embed resources in a bundle.
 - Access resources at runtime.
 
-The features and limitations of the resources system are described in more detail in
+The features and limitations of the resource system are described in more detail in
 the following sections.
 
 
@@ -53,7 +53,7 @@ OSGi.
 Runtime Overhead
 ----------------
 
-The resources system has the following runtime characteristics:
+The resource has the following runtime characteristics:
 
 -  During static initialization of a bundle, it's ZIP archive header
    data (if available) is parsed and stored in memory.
@@ -69,7 +69,7 @@ The resources system has the following runtime characteristics:
  
 -  Resources have a size limitation of 2GB, due to the used ZIP format.
 -  Resource entries are stored with case-insensitive names. On
-   case-sensitive file systemes, adding resources with the same name but
+   case-sensitive file systems, adding resources with the same name but
    different capitalization will lead to an error.
 -  Looking up resources by name at runtime *is* case sensitive.
 -  The CppMicroServices library will search for a valid zip file inside

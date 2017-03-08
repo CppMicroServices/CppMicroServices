@@ -34,6 +34,7 @@
 #include "TestUtils.h"
 
 #include <future>
+#include <array>
 
 using namespace cppmicroservices;
 
@@ -276,10 +277,10 @@ namespace
     framework.Init();
     BundleContext fCtx = framework.GetBundleContext();
 
-    std::vector<std::future<ListenerToken>> futures;
     std::vector<ListenerToken> tokens;
     int count = 0;
     const int num_listeners = 1001;
+    std::array<std::future<ListenerToken>, num_listeners> futures;
     const int remove_count = num_listeners / 2;
     auto add_listener = [&fCtx, &count]()
     {
@@ -293,7 +294,7 @@ namespace
     // 3. Remove the first remove_count number of listeners using the tokens.
     for (int i = 0; i < num_listeners; i++)
     {
-      futures.push_back(std::async(std::launch::async, add_listener));
+      futures[i] = std::async(std::launch::async, add_listener);
     }
     for (auto& future_ : futures)
     {
@@ -307,6 +308,7 @@ namespace
 
     US_TEST_CONDITION(count == (num_listeners - remove_count),
                       "Testing multithreaded listener addition and sequential removal using tokens.")
+    framework.Stop();
   }
 #endif // US_ENABLE_THREADING_SUPPORT
 

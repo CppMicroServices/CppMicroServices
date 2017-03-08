@@ -322,7 +322,6 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
-  DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
 
@@ -349,7 +348,6 @@ ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate)
 {
-  DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
 
@@ -376,7 +374,6 @@ ListenerToken BundleContext::AddFrameworkListener(const FrameworkListener& liste
 
 void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
 {
-  DIAG_LOG(*GetLogSink()) << "This API function is deprecated. Please consider using RemoveListener(ListenerToken) instead.";
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
 
@@ -441,7 +438,7 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* d
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, data);
 }
 
-void BundleContext::RemoveListener(const ListenerToken& token)
+void BundleContext::RemoveListener(ListenerToken token)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -451,7 +448,7 @@ void BundleContext::RemoveListener(const ListenerToken& token)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveListener(d, token);
+  b->coreCtx->listeners.RemoveListener(d, std::move(token));
 }
 
 std::string BundleContext::GetDataFile(const std::string &filename) const

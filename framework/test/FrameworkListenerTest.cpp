@@ -173,9 +173,9 @@ void testAddRemoveFrameworkListener()
   US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were called");
   US_TEST_CONDITION(count2 == 1, "Test that multiple framework listeners were called");
 
-  fCtx.RemoveListener(t1);
-  fCtx.RemoveListener(t2);
-  fCtx.RemoveListener(t3);
+  fCtx.RemoveListener(std::move(t1));
+  fCtx.RemoveListener(std::move(t2));
+  fCtx.RemoveListener(std::move(t3));
 
   f.Start();    // generate framework event (started)
   US_TEST_CONDITION(count1 == 1, "Test that multiple framework listeners were NOT called after removal");

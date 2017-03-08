@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_LISTENERFUNCTORS_H
 
 #include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/FrameworkExport.h"
 
 #include <cstring>
 #include <functional>
@@ -36,7 +37,7 @@ namespace cppmicroservices {
   class FrameworkEvent;
   class ServiceListeners;
 
-  using ListenerTokenId = std::uint64_t;
+  typedef std::uint64_t ListenerTokenId;
 
   /**
    * \brief The token returned when a listener is registered with BundleContext.
@@ -46,46 +47,43 @@ namespace cppmicroservices {
    * be handled explicitly by the clients.
    *
    */
-  class ListenerToken
+  class US_Framework_EXPORT ListenerToken
   {
   public:
 
     /**
      * Constructs a default, invalid %ListenerToken object.
-     * Since, this is not associated with any valid listener, a RemoveListener
+     * As this is not associated with any valid listener, a RemoveListener
      * call taking a default ListenerToken object will do nothing.
      */
-    ListenerToken() : tokenId(ListenerTokenId(0)) {};
+    ListenerToken();
 
     ListenerToken(const ListenerToken&) = delete;
 
     ListenerToken& operator=(const ListenerToken&) = delete;
 
-    ListenerToken(ListenerToken&& other) : tokenId(std::move(other.tokenId))
-    {
-      other.tokenId = ListenerTokenId(0);
-    }
+    ListenerToken(ListenerToken&& other);
 
-    ListenerToken& operator=(ListenerToken&& other)
-    {
-      if (this != &other)
-      {
-        tokenId = std::move(other.tokenId);
-        other.tokenId = ListenerTokenId(0);
-      }
-      return *this;
-    }
+    ListenerToken& operator=(ListenerToken&& other);
+
+    /**
+     * Tests this %ListenerToken object for validity.
+     *
+     * Invalid \c ListenerToken objects are created by the default constructor.
+     * Also, a \c ListenerToken object can become invalid if it is moved to another
+     * ListenerToken object.
+     *
+     * @return \c true if this %ListenerToken object is valid, false otherwise.
+     */
+    explicit operator bool() const;
 
   private:
     // For internal use
     friend class ServiceListeners;
 
-    ListenerToken(ListenerTokenId _tokenId) : tokenId(_tokenId) {}
+    explicit ListenerToken(ListenerTokenId _tokenId);
 
-    ListenerTokenId getId() const
-    {
-      return tokenId;
-    }
+    ListenerTokenId getId() const;
 
     ListenerTokenId tokenId;
   };

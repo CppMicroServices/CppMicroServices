@@ -67,9 +67,9 @@ public:
 
   bool operator==(const ServiceListenerEntry& other) const;
 
-  bool contains(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId) const;
+  bool Contains(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId) const;
 
-  bool contains(const std::shared_ptr<BundleContextPrivate>& context,
+  bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
                 void* data, const ServiceListener& listener) const;
 
   std::size_t Hash() const;

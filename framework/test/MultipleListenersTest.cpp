@@ -157,29 +157,29 @@ namespace
     auto token10 = fCtx.AddFrameworkListener(CallbackFunctor());
     auto token11 = fCtx.AddFrameworkListener(bind1);
     // Remove all added listeners using tokens.
-    fCtx.RemoveListener(token1);
-    fCtx.RemoveListener(token2);
-    fCtx.RemoveListener(token3);
-    fCtx.RemoveListener(token4);
-    fCtx.RemoveListener(token5);
-    fCtx.RemoveListener(token6);
-    fCtx.RemoveListener(token7);
-    fCtx.RemoveListener(token8);
-    fCtx.RemoveListener(token9);
-    fCtx.RemoveListener(token10);
-    fCtx.RemoveListener(token11);
-    // Remove all added listeners again using token. These should all be no-op.
-    fCtx.RemoveListener(token1);
-    fCtx.RemoveListener(token2);
-    fCtx.RemoveListener(token3);
-    fCtx.RemoveListener(token4);
-    fCtx.RemoveListener(token5);
-    fCtx.RemoveListener(token6);
-    fCtx.RemoveListener(token7);
-    fCtx.RemoveListener(token8);
-    fCtx.RemoveListener(token9);
-    fCtx.RemoveListener(token10);
-    fCtx.RemoveListener(token11);
+    fCtx.RemoveListener(std::move(token1));
+    fCtx.RemoveListener(std::move(token2));
+    fCtx.RemoveListener(std::move(token3));
+    fCtx.RemoveListener(std::move(token4));
+    fCtx.RemoveListener(std::move(token5));
+    fCtx.RemoveListener(std::move(token6));
+    fCtx.RemoveListener(std::move(token7));
+    fCtx.RemoveListener(std::move(token8));
+    fCtx.RemoveListener(std::move(token9));
+    fCtx.RemoveListener(std::move(token10));
+    fCtx.RemoveListener(std::move(token11));
+    // Remove all added listeners again using the tokens. These should all be no-op.
+    fCtx.RemoveListener(std::move(token1));
+    fCtx.RemoveListener(std::move(token2));
+    fCtx.RemoveListener(std::move(token3));
+    fCtx.RemoveListener(std::move(token4));
+    fCtx.RemoveListener(std::move(token5));
+    fCtx.RemoveListener(std::move(token6));
+    fCtx.RemoveListener(std::move(token7));
+    fCtx.RemoveListener(std::move(token8));
+    fCtx.RemoveListener(std::move(token9));
+    fCtx.RemoveListener(std::move(token10));
+    fCtx.RemoveListener(std::move(token11));
     // This should result in no output because all the listeners were successfully removed
     f.Start();    // generate framework event (started)
     f.Stop();
@@ -190,15 +190,19 @@ namespace
     f.Init();
     fCtx = f.GetBundleContext();
     token1 = fCtx.AddFrameworkListener(callback_function_1);
+    US_TEST_CONDITION(token1, "Check validity of a token1");
     token2 = fCtx.AddFrameworkListener(&callback_function_2);
     token3 = fCtx.AddFrameworkListener(&l1, &Listener::memfn1);
     token3 = fCtx.AddFrameworkListener(&l2, &Listener::memfn2);
     token4 = std::move(token1); // move assignment
+    US_TEST_CONDITION(!token1, "Check invalidity of a moved-from token1");
     auto token2_(std::move(token2)); // move construction
+    US_TEST_CONDITION(!token2, "Check invalidity of a moved-from token2");
     ListenerToken emptytoken; // default construction
-    fCtx.RemoveListener(token4);
-    fCtx.RemoveListener(token2_);
-    fCtx.RemoveListener(emptytoken); // This should do nothing.
+    US_TEST_CONDITION(!emptytoken, "Check invalidity of a newly constructed token");
+    fCtx.RemoveListener(std::move(token4));
+    fCtx.RemoveListener(std::move(token2_));
+    fCtx.RemoveListener(std::move(emptytoken)); // This should do nothing.
     f.Start();    // generate framework event (started)
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
@@ -247,9 +251,9 @@ namespace
     tListen.tokens.push_back(fCtx.AddFrameworkListener(&tListen, &TestListener::frameworkChanged));
     tListen.tokens.push_back(fCtx.AddFrameworkListener(&tListen, &TestListener::frameworkChanged));
 
-    fCtx.RemoveListener(tListen.tokens[0]);
-    fCtx.RemoveListener(tListen.tokens[2]);
-    fCtx.RemoveListener(tListen.tokens[4]);
+    fCtx.RemoveListener(std::move(tListen.tokens[0]));
+    fCtx.RemoveListener(std::move(tListen.tokens[2]));
+    fCtx.RemoveListener(std::move(tListen.tokens[4]));
     f.Start();
 
     auto bundleA = testing::InstallLib(fCtx, "TestBundleA");
@@ -297,7 +301,7 @@ namespace
     }
     for (int i = 0; i < remove_count; ++i)
     {
-      fCtx.RemoveListener(tokens[i]);
+      fCtx.RemoveListener(std::move(tokens[i]));
     }
     framework.Start();
 

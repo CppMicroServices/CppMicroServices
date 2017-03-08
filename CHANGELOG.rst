@@ -26,6 +26,11 @@ Removed
 Fixed
 ~~~~~
 
+-  Cannot add more than one listener if its expressed as a lambda.
+   `#95 <https://github.com/CppMicroServices/CppMicroServices/issues/95>`_
+-  Removing Listeners does not work well
+   `#83 <https://github.com/CppMicroServices/CppMicroServices/issues/83>`_
+
 Security
 ~~~~~~~~
 
@@ -115,10 +120,6 @@ Fixed
    `#19 <https://github.com/CppMicroServices/CppMicroServices/issues/19>`_
 -  Fixed documentation of public headers.
    `#165 <https://github.com/CppMicroServices/CppMicroServices/issues/165>`_
--  Cannot add more than one listener if its expressed as a lambda.
-   `#95 <https://github.com/CppMicroServices/CppMicroServices/issues/95>`_
--  Removing Listeners does not work well
-   `#83 <https://github.com/CppMicroServices/CppMicroServices/issues/83>`_
 
 `v2.1.1 <https://github.com/cppmicroservices/cppmicroservices/tree/v2.1.1>`_ (2014-01-22)
 -----------------------------------------------------------------------------------------

@@ -51,8 +51,9 @@ class ServiceListeners : private detail::MultiThreaded<>
 
 public:
 
-  typedef std::tuple<BundleListener, void*, ListenerTokenId> BundleListenerEntry;
-  typedef std::unordered_map<std::shared_ptr<BundleContextPrivate>, std::list<BundleListenerEntry>> BundleListenerMap;
+  typedef std::tuple<BundleListener, void*> BundleListenerEntry;
+  typedef std::unordered_map<std::shared_ptr<BundleContextPrivate>,
+                             std::unordered_map<ListenerTokenId, BundleListenerEntry>> BundleListenerMap;
   struct : public MultiThreaded<> {
     BundleListenerMap value;
   } bundleListenerMap;
@@ -60,17 +61,16 @@ public:
   typedef std::unordered_map<std::string, std::list<ServiceListenerEntry> > CacheType;
   typedef std::unordered_set<ServiceListenerEntry> ServiceListenerEntries;
 
-  typedef std::tuple<FrameworkListener, void*, ListenerTokenId> FrameworkListenerEntry;
-  typedef std::map<std::shared_ptr<BundleContextPrivate>, std::vector<FrameworkListenerEntry>> FrameworkListeners;
+  typedef std::tuple<FrameworkListener, void*> FrameworkListenerEntry;
+  typedef std::unordered_map<std::shared_ptr<BundleContextPrivate>,
+                             std::unordered_map<ListenerTokenId, FrameworkListenerEntry>> FrameworkListenerMap;
 
 private:
 
-  struct : public MultiThreaded<> {
-    std::atomic<uint64_t> value;
-  } listenerId;
+  std::atomic<uint64_t> listenerId;
 
   struct : public MultiThreaded<> {
-      FrameworkListeners value;
+      FrameworkListenerMap value;
   } frameworkListenerMap;
 
   std::vector<std::string> hashedServiceKeys;
@@ -167,7 +167,7 @@ public:
    * @param context The bundle context who wants to remove listener.
    * @param token A ListenerToken type object which corresponds to the listener.
    */
-  void RemoveListener(const std::shared_ptr<BundleContextPrivate>& context, const ListenerToken& token);
+  void RemoveListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerToken token);
 
   void SendFrameworkEvent(const FrameworkEvent& evt);
 
@@ -216,8 +216,8 @@ private:
    */
   ListenerToken MakeListenerToken();
 
-  void RemoveServiceListenerEntry(ServiceListenerEntries::iterator it,
-                                  ServiceListenerEntry& sle);
+  void RemoveServiceListenerEntry_unlocked(ServiceListenerEntries::iterator it,
+                                           ServiceListenerEntry& sle);
 
   void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context,
                              const ListenerTokenId& tokenId);

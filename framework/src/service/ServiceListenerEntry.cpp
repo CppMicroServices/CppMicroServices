@@ -175,13 +175,13 @@ bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
     ServiceListenerCompare()(d->listener, other.d->listener);
 }
 
-bool ServiceListenerEntry::contains(const std::shared_ptr<BundleContextPrivate>& context,
+bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
                                     ListenerTokenId tokenId) const
 {
   return (d->context == context) && (d->tokenId == tokenId);
 }
 
-bool ServiceListenerEntry::contains(const std::shared_ptr<BundleContextPrivate>& context,
+bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
                                     void* data, const ServiceListener& listener) const
 {
   return (d->context == context) && (d->data == data) && ServiceListenerCompare()(d->listener, listener);

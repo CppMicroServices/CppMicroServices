@@ -392,7 +392,8 @@ int GetLastErrorNo()
 std::string GetLastErrorStr()
 {
 #ifdef US_PLATFORM_POSIX
-  return std::string(strerror(errno));
+  char* errorString = strerror(errno);
+  return std::string(((errorString == nullptr)?"":errorString));
 #else
   // Retrieve the system error message for the last-error code
   LPVOID lpMsgBuf;

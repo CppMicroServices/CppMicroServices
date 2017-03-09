@@ -163,7 +163,8 @@ std::string GetTempDirectory()
   if (buffer) CoTaskMemFree(static_cast<void*>(buffer));
   return std::string(temp_dir.cbegin(), temp_dir.cend());
 #else
-  return std::string("/tmp");
+    char* tempdir = getenv("TMPDIR");
+  return std::string(((tempdir == nullptr)?"":tempdir));
 #endif
 }
 

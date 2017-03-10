@@ -164,7 +164,7 @@ std::string GetTempDirectory()
   return std::string(temp_dir.cbegin(), temp_dir.cend());
 #else
   char* tempdir = getenv("TMPDIR");
-  return std::string(((tempdir == nullptr)?"":tempdir));
+  return std::string(((tempdir == nullptr)?"/tmp":tempdir));
 #endif
 }
 

@@ -46,24 +46,24 @@ namespace cppmicroservices {
  * These will be removed when the only way to remove listeners is through tokens.
  * (when the removal of listeners through supplying names of callables is removed)
  */
-auto BundleListenerCompareListenerData = [](const BundleListener& l1, void* d1,
-                                            const std::pair<ListenerTokenId,
-                                                            ServiceListeners::BundleListenerEntry>& p2)
+static auto BundleListenerCompareListenerData = [](const BundleListener& l1, void* d1,
+                                                   const std::pair<ListenerTokenId,
+                                                   ServiceListeners::BundleListenerEntry>& p2)
 {
   return d1 == std::get<1>(p2.second) &&
     l1.target<void(const BundleEvent&)>() == std::get<0>(p2.second).target<void(const BundleEvent&)>();
 };
 
-auto FrameworkListenerCompareListenerData = [](const FrameworkListener& l1, void* d1,
-                                               const std::pair<ListenerTokenId,
-                                                               ServiceListeners::FrameworkListenerEntry>& p2)
+static auto FrameworkListenerCompareListenerData = [](const FrameworkListener& l1, void* d1,
+                                                      const std::pair<ListenerTokenId,
+                                                      ServiceListeners::FrameworkListenerEntry>& p2)
 {
   return d1 == std::get<1>(p2.second) &&
     l1.target<void(const FrameworkEvent&)>() == std::get<0>(p2.second).target<void(const FrameworkEvent&)>();
 };
 
 ServiceListeners::ServiceListeners(CoreBundleContext* coreCtx)
-  : coreCtx(coreCtx), listenerId(0)
+  : listenerId(0), coreCtx(coreCtx)
 {
   hashedServiceKeys.push_back(Constants::OBJECTCLASS);
   hashedServiceKeys.push_back(Constants::SERVICE_ID);
@@ -221,7 +221,6 @@ void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleConte
 }
 
 /**
- * Called by RemoveListener(listenerToken)
  * Iterates over the set of FrameworkListeners, BundleListeners and ServiceListeners to find the tokenId and
  * remove the listener corresponding to the tokenId.
  */
@@ -236,12 +235,18 @@ void ServiceListeners::RemoveListener(const std::shared_ptr<BundleContextPrivate
   {
     auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
     auto& listeners = frameworkListenerMap.value[context];
-    listeners.erase(tokenId);
+    if (listeners.erase(tokenId) != 0)
+    {
+      return;
+    }
   }
   {
     auto l = bundleListenerMap.Lock(); US_UNUSED(l);
     auto& listeners = bundleListenerMap.value[context];
-    listeners.erase(tokenId);
+    if (listeners.erase(tokenId) != 0)
+    {
+      return;
+    }
   }
   RemoveServiceListener(context, tokenId);
 }

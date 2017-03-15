@@ -34,7 +34,7 @@
 #include "TestingMacros.h"
 #include "TestingConfig.h"
 
-US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
+US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
 
 using namespace cppmicroservices;
 

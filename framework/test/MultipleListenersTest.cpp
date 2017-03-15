@@ -37,7 +37,7 @@
 #include <array>
 #include <bitset>
 
-US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
+US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
 
 using namespace cppmicroservices;
 
@@ -73,6 +73,7 @@ namespace
 
   void callback_function_3(int val, const FrameworkEvent&)
   {
+    US_UNUSED(val);
     bitfield.set(CALLBACK3);
     ++count;
   }
@@ -321,7 +322,7 @@ namespace
     std::vector<ListenerToken> tokens;
     std::vector<std::future<ListenerToken>> futures;
     const int num_listeners = 1001;
-    const int remove_count = num_listeners / 2;
+    //const int remove_count = num_listeners / 2;
     int count = 0;
 
     auto add_listener = [&fCtx, &count]() -> ListenerToken

@@ -119,7 +119,7 @@ void TestFindHook(const Framework& framework)
 void TestEventHook(const Framework& framework)
 {
   TestBundleListener bundleListener;
-US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
+US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
   framework.GetBundleContext().AddBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
 
   auto bundleA = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");

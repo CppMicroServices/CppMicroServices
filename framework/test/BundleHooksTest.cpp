@@ -119,6 +119,7 @@ void TestFindHook(const Framework& framework)
 void TestEventHook(const Framework& framework)
 {
   TestBundleListener bundleListener;
+US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
   framework.GetBundleContext().AddBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
 
   auto bundleA = testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
@@ -144,6 +145,7 @@ void TestEventHook(const Framework& framework)
 
   eventHookReg.Unregister();
   framework.GetBundleContext().RemoveBundleListener(&bundleListener, &TestBundleListener::BundleChanged);
+US_GCC_POP_WARNING
 }
 
 } // end unnamed namespace

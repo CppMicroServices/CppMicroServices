@@ -35,24 +35,46 @@
 
 #include <future>
 #include <array>
+#include <bitset>
+
+US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
 
 using namespace cppmicroservices;
 
 namespace
 {
+  enum ListenerType :short
+  {
+    CALLBACK1 = 0,
+    CALLBACK2,
+    CALLBACK3,
+    FUNCTOR,
+    MEMFN1,
+    MEMFN2,
+    LAMBDA1,
+    LAMBDA2,
+  };
+
+  int count = 0;
+  const int BITFIELD_LEN = 8;
+  std::bitset<BITFIELD_LEN> bitfield(0x0);
+
   void callback_function_1(const FrameworkEvent&)
   {
-    US_TEST_OUTPUT( << "From free function callback_function_1");
+    bitfield.set(CALLBACK1);
+    ++count;
   }
 
   void callback_function_2(const FrameworkEvent&)
   {
-    US_TEST_OUTPUT( << "From free function callback_function_2");
+    bitfield.set(CALLBACK2);
+    ++count;
   }
 
   void callback_function_3(int val, const FrameworkEvent&)
   {
-    US_TEST_OUTPUT( << "From free function callback_function_3 with val " << val );
+    bitfield.set(CALLBACK3);
+    ++count;
   }
 
   class CallbackFunctor
@@ -60,7 +82,8 @@ namespace
   public:
     void operator()(const FrameworkEvent&)
     {
-      US_TEST_OUTPUT( << "From function object of type CallbackFunctor");
+      bitfield.set(FUNCTOR);
+      ++count;
     }
   };
 
@@ -69,12 +92,14 @@ namespace
   public:
     void memfn1(const FrameworkEvent&)
     {
-      US_TEST_OUTPUT( << "From member function Listener::memfn1");
+      bitfield.set(MEMFN1);
+      ++count;
     }
 
     void memfn2(const FrameworkEvent&)
     {
-      US_TEST_OUTPUT(<< "From member function Listener::memfn2");
+      bitfield.set(MEMFN2);
+      ++count;
     }
   };
 
@@ -82,8 +107,14 @@ namespace
 
   void testMultipleListeners()
   {
-    auto lambda1 = [](const FrameworkEvent&) { US_TEST_OUTPUT( << "From lambda1"); };
-    auto lambda2 = [](const FrameworkEvent&) { US_TEST_OUTPUT( << "From lambda2"); };
+    auto lambda1 = [](const FrameworkEvent&) {
+      bitfield.set(LAMBDA1);
+      ++count;
+    };
+    auto lambda2 = [](const FrameworkEvent&) {
+      bitfield.set(LAMBDA2);
+      ++count;
+    };
     CallbackFunctor cb;
     Listener l1;
     Listener l2;
@@ -103,6 +134,8 @@ namespace
     fCtx.AddFrameworkListener(CallbackFunctor());
     fCtx.AddFrameworkListener(std::bind(callback_function_3, 42, std::placeholders::_1));
     f.Start();    // generate framework event (started)
+    US_TEST_CONDITION(bitfield.all(), "Test if all the listeners are triggered.");
+    US_TEST_CONDITION(count == 9, "Test the listeners count.")
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
     US_TEST_OUTPUT(<< "-- End of testing addition of multiple listeners" << "\n\n");
@@ -111,6 +144,8 @@ namespace
     // This removal using the names is deprecated and will be removed in the next major release.
     f.Init();
     fCtx = f.GetBundleContext();
+    bitfield.reset();
+    count = 0;
     // Add listeners of each variety
     fCtx.AddFrameworkListener(callback_function_1);
     fCtx.AddFrameworkListener(&callback_function_2);
@@ -139,6 +174,8 @@ namespace
     fCtx.RemoveFrameworkListener(cb);
     fCtx.RemoveFrameworkListener(bind1);
     f.Start();    // generate framework event (started)
+    US_TEST_CONDITION(bitfield.none(), "Test if none of the listeners are registered.");
+    US_TEST_CONDITION(count == 0, "Test the listeners count.")
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
     US_TEST_OUTPUT(<< "-- End of testing removing listeners using the name of the callable" << "\n\n");
@@ -183,6 +220,8 @@ namespace
     fCtx.RemoveListener(std::move(token11));
     // This should result in no output because all the listeners were successfully removed
     f.Start();    // generate framework event (started)
+    US_TEST_CONDITION(bitfield.none(), "Test if none of the listeners are registered.");
+    US_TEST_CONDITION(count == 0, "Test the listeners count.")
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
     US_TEST_OUTPUT(<< "-- End of testing addition and removing listeners using tokens" << "\n\n");
@@ -205,6 +244,8 @@ namespace
     fCtx.RemoveListener(std::move(token2_));
     fCtx.RemoveListener(std::move(emptytoken)); // This should do nothing.
     f.Start();    // generate framework event (started)
+    US_TEST_CONDITION(bitfield.to_string() == "00110000", "Test if only member functions 1 & 2 are registered.");
+    US_TEST_CONDITION(count == 2, "Test the listeners count.")
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
     US_TEST_OUTPUT(<< "-- End of testing move ability" << "\n\n");
@@ -278,37 +319,37 @@ namespace
     BundleContext fCtx = framework.GetBundleContext();
 
     std::vector<ListenerToken> tokens;
-    int count = 0;
+    std::vector<std::future<ListenerToken>> futures;
     const int num_listeners = 1001;
-    std::array<std::future<ListenerToken>, num_listeners> futures;
     const int remove_count = num_listeners / 2;
-    auto add_listener = [&fCtx, &count]()
+    int count = 0;
+
+    auto add_listener = [&fCtx, &count]() -> ListenerToken
     {
       auto listener = [&count](const FrameworkEvent&){ ++count; };
       auto token = fCtx.AddFrameworkListener(listener);
       return token;
     };
 
-    // 1. Add num_listeners number of listeners asynchronously.
-    // 2. Gather the resulting tokens.
-    // 3. Remove the first remove_count number of listeners using the tokens.
     for (int i = 0; i < num_listeners; i++)
     {
-      futures[i] = std::async(std::launch::async, add_listener);
+      std::this_thread::sleep_for(std::chrono::microseconds(1));
+      futures.push_back(std::async(std::launch::async, add_listener));
     }
     for (auto& future_ : futures)
     {
       tokens.push_back(future_.get());
     }
-    for (int i = 0; i < remove_count; ++i)
+
+    for (auto& token : tokens)
     {
-      fCtx.RemoveListener(std::move(tokens[i]));
+      fCtx.RemoveListener(std::move(token));
     }
     framework.Start();
-
-    US_TEST_CONDITION(count == (num_listeners - remove_count),
+    US_TEST_CONDITION(count == 0,
                       "Testing multithreaded listener addition and sequential removal using tokens.")
     framework.Stop();
+    framework.WaitForStop(std::chrono::seconds(0));
   }
 #endif // US_ENABLE_THREADING_SUPPORT
 
@@ -326,3 +367,5 @@ int MultipleListenersTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_END()
 }
+
+US_GCC_POP_WARNING

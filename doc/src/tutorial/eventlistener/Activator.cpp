@@ -51,7 +51,9 @@ private:
   void Start(BundleContext context)
   {
     std::cout << "Starting to listen for service events." << std::endl;
-    context.AddServiceListener(this, &Activator::ServiceChanged);
+US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
+    listenerToken = context.AddServiceListener(this, &Activator::ServiceChanged);
+US_GCC_POP_WARNING
   }
 
   /**
@@ -62,7 +64,7 @@ private:
    */
   void Stop(BundleContext context)
   {
-    context.RemoveServiceListener(this, &Activator::ServiceChanged);
+    context.RemoveListener(std::move(listenerToken));
     std::cout << "Stopped listening for service events." << std::endl;
 
     // Note: It is not required that we remove the listener here,
@@ -91,6 +93,8 @@ private:
       std::cout << "Ex1: Service of type " << objectClass << " modified." << std::endl;
     }
   }
+
+  ListenerToken listenerToken;
 };
 
 }

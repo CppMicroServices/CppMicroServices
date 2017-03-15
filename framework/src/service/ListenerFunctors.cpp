@@ -50,7 +50,7 @@ ListenerToken::operator bool() const
   return (tokenId != ListenerTokenId(0));
 }
 
-ListenerTokenId ListenerToken::getId() const
+ListenerTokenId ListenerToken::Id() const
 {
   return tokenId;
 }

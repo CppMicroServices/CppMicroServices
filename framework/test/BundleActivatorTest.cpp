@@ -76,7 +76,9 @@ void TestWrongPropertyTypeWithClass(BundleContext& context)
   context.AddFrameworkListener(fl);
   US_TEST_NO_EXCEPTION(bundle.Start());
   US_TEST_CONDITION(receivedExpectedEvent == true, "Test for FrameworkEvent");
+US_GCC_PUSH_DISABLE_WARNING(no-deprecated-declarations)
   context.RemoveFrameworkListener(fl);
+US_GCC_POP_WARNING
   // verify bundle activator was not called => service not registered
   ServiceReferenceU ref = bundle.GetBundleContext().GetServiceReference("cppmicroservices::TestBundleBA_S1Service");
   US_TEST_CONDITION(!ref, "Invalid reference");

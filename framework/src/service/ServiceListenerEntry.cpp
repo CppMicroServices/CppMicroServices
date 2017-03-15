@@ -49,18 +49,6 @@ public:
   ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
 
   ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                           void* data, const std::string& filter)
-    : ServiceListenerHook::ListenerInfoData(context, l, data, filter)
-    , ldap()
-    , hashValue(0)
-  {
-    if (!filter.empty())
-    {
-      ldap = LDAPExpr(filter);
-    }
-  }
-
-  ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
                            void* data, ListenerTokenId tokenId, const std::string& filter)
     : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
     , ldap()
@@ -138,15 +126,6 @@ ServiceListenerEntry::ServiceListenerEntry(
     const std::shared_ptr<BundleContextPrivate>& context,
     const ServiceListener& l,
     void* data,
-    const std::string& filter)
-  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, ListenerTokenId(0), filter))
-{
-}
-
-ServiceListenerEntry::ServiceListenerEntry(
-    const std::shared_ptr<BundleContextPrivate>& context,
-    const ServiceListener& l,
-    void* data,
     ListenerTokenId tokenId,
     const std::string& filter)
   : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, tokenId, filter))
@@ -182,7 +161,7 @@ bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>&
 }
 
 bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                                    void* data, const ServiceListener& listener) const
+                                    const ServiceListener& listener, void* data) const
 {
   return (d->context == context) && (d->data == data) && ServiceListenerCompare()(d->listener, listener);
 }

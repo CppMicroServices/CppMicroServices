@@ -78,12 +78,12 @@ namespace cppmicroservices {
     explicit operator bool() const;
 
   private:
-    // For internal use
+    // The only (internal) client which can initialize this class with a ListenerTokenId.
     friend class ServiceListeners;
 
     explicit ListenerToken(ListenerTokenId _tokenId);
 
-    ListenerTokenId getId() const;
+    ListenerTokenId Id() const;
 
     ListenerTokenId tokenId;
   };

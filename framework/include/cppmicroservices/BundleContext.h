@@ -408,7 +408,7 @@ public:
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
    * @throws std::runtime_error If this BundleContext is no longer valid.
-   * @throws std:: logic_error If the ServiceRegistrationBase object is invalid,
+   * @throws std::logic_error If the ServiceRegistrationBase object is invalid,
    *         or if the service is unregistered.
    */
   std::vector<ServiceReferenceU> GetServiceReferences(const std::string& clazz, const std::string& filter = std::string());
@@ -610,41 +610,39 @@ public:
   }
 
   /**
-   * Adds the specified <code>callable</code> with the
+   * Adds the specified <code>listener</code> with the
    * specified <code>filter</code> to the context bundles's list of listeners.
    * See LDAPFilter for a description of the filter syntax. Listeners
    * are notified when a service has a lifecycle state change.
    *
    * <p>
-   * You must take care to remove registered listeners before the <code>callable</code>
-   * object is destroyed. However, the Micro Services framework takes care
-   * of removing all listeners registered by this context bundle's classes
-   * after the bundle is stopped.
+   * The framework takes care of removing all listeners registered by this
+   * context bundle's classes after the bundle is stopped.
    *
    * <p>
-   * The callable is called if the filter criteria is met. To filter based
-   * upon the class of the service, the filter should reference the
-   * Constants#OBJECTCLASS property. If <code>filter</code> is
+   * The <code>listener</code> is called if the filter criteria is met.
+   * To filter based upon the class of the service, the filter should reference
+   * the Constants#OBJECTCLASS property. If <code>filter</code> is
    * empty, all services are considered to match the filter.
    *
    * <p>
    * When using a <code>filter</code>, it is possible that the
    * <code>ServiceEvent</code>s for the complete lifecycle of a service
-   * will not be delivered to the callable. For example, if the
-   * <code>filter</code> only matches when the property <code>x</code> has
-   * the value <code>1</code>, the callable will not be called if the
-   * service is registered with the property <code>x</code> not set to the
-   * value <code>1</code>. Subsequently, when the service is modified
-   * setting property <code>x</code> to the value <code>1</code>, the
-   * filter will match and the callable will be called with a
+   * will not be delivered to the <code>listener</code>. For example, if the
+   * <code>filter</code> only matches when the property <code>example_property</code>
+   * has the value <code>1</code>, the <code>listener</code> will not be called if the
+   * service is registered with the property <code>example_property</code> not
+   * set to the value <code>1</code>. Subsequently, when the service is modified
+   * setting property <code>example_property</code> to the value <code>1</code>,
+   * the filter will match and the <code>listener</code> will be called with a
    * <code>ServiceEvent</code> of type <code>SERVICE_MODIFIED</code>. Thus, the
-   * callable will not be called with a <code>ServiceEvent</code> of type
+   * <code>listener</code> will not be called with a <code>ServiceEvent</code> of type
    * <code>SERVICE_REGISTERED</code>.
    *
-   * @param callable Any type of callable.
+   * @param listener Any callable object.
    * @param filter The filter criteria.
-   * @returns a ListenerToken object which can be used to remove the callable from the
-   *          registered listeners.
+   * @returns a ListenerToken object which can be used to remove the
+   *          <code>listener</code> from the list of registered listeners.
    * @throws std::invalid_argument If <code>filter</code> contains an
    *         invalid filter string that cannot be parsed.
    * @throws std::runtime_error If this BundleContext is no
@@ -653,15 +651,15 @@ public:
    * @see ServiceListener
    * @see RemoveServiceListener()
    */
-  ListenerToken AddServiceListener(const ServiceListener& callable,
+  ListenerToken AddServiceListener(const ServiceListener& listener,
                                    const std::string& filter = std::string());
 
   /**
-   * Removes the specified <code>callable</code> from the context bundle's
+   * Removes the specified <code>listener</code> from the context bundle's
    * list of listeners.
    *
    * <p>
-   * If the <code>callable</code> is not contained in this
+   * If the <code>listener</code> is not contained in this
    * context bundle's list of listeners, this method does nothing.
    *
    * \rststar
@@ -671,34 +669,34 @@ public:
    *    Use :func:`RemoveListener()` instead.
    * \endrststar
    *
-   * @param callable The callable to remove.
+   * @param listener The callable object to remove.
    * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see AddServiceListener()
    */
-  void RemoveServiceListener(const ServiceListener& callable);
+  US_DEPRECATED void RemoveServiceListener(const ServiceListener& listener);
 
   /**
-   * Adds the specified <code>callable</code> to the context bundles's list
+   * Adds the specified <code>listener</code> to the context bundles's list
    * of listeners. Listeners are notified when a bundle has a lifecycle
    * state change.
    *
-   * @param callable Any type of callable.
-   * @returns a ListenerToken object which can be used to remove the callable from the
-   *          registered listeners.
+   * @param listener Any callable object.
+   * @returns a ListenerToken object which can be used to remove the
+   *          <code>listener</code> from the list of registered listeners.
    * @throws std::logic_error If this BundleContext is no
    *         longer valid.
    * @see BundleEvent
    * @see BundleListener
    */
-  ListenerToken AddBundleListener(const BundleListener& callable);
+  ListenerToken AddBundleListener(const BundleListener& listener);
 
   /**
-   * Removes the specified <code>callable</code> from the context bundle's
+   * Removes the specified <code>listener</code> from the context bundle's
    * list of listeners.
    *
    * <p>
-   * If the <code>callable</code> pair is not contained in this
+   * If the <code>listener</code> is not contained in this
    * context bundle's list of listeners, this method does nothing.
    *
    * \rststar
@@ -708,33 +706,33 @@ public:
    *    Use :func:`RemoveListener()` instead.
    * \endrststar
    *
-   * @param callable The callable to remove.
+   * @param listener The callable object to remove.
    * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see AddBundleListener()
    * @see BundleListener
    */
-  void RemoveBundleListener(const BundleListener& callable);
+  US_DEPRECATED void RemoveBundleListener(const BundleListener& listener);
 
   /**
-   * Adds the specified <code>callable</code> to the context bundles's list
+   * Adds the specified <code>listener</code> to the context bundles's list
    * of framework listeners. Listeners are notified of framework events.
    *
-   * @param callable Any type of callable.
-   * @returns a ListenerToken object which can be used to remove the callable from the
-   *          registered listeners.
+   * @param listener Any callable object.
+   * @returns a ListenerToken object which can be used to remove the
+   *          <code>listener</code> from the list of registered listeners.
    * @throws std::runtime_error If this BundleContext is no longer valid.
    * @see FrameworkEvent
    * @see FrameworkListener
    */
-  ListenerToken AddFrameworkListener(const FrameworkListener& callable);
+  ListenerToken AddFrameworkListener(const FrameworkListener& listener);
 
   /**
-   * Removes the specified <code>callable</code> from the context bundle's
+   * Removes the specified <code>listener</code> from the context bundle's
    * list of framework listeners.
    *
    * <p>
-   * If the <code>(receiver,callable)</code> pair is not contained in this
+   * If the <code>listener</code> is not contained in this
    * context bundle's list of listeners, this method does nothing.
    *
    * \rststar
@@ -744,24 +742,25 @@ public:
    *    Use :func:`RemoveListener()` instead.
    * \endrststar
    *
-   * @param callable The callable to remove.
+   * @param listener The callable object to remove.
    * @throws std::runtime_error If this BundleContext is no longer valid.
    * @see AddFrameworkListener()
    * @see FrameworkListener
    */
-  void RemoveFrameworkListener(const FrameworkListener& callable);
+  US_DEPRECATED void RemoveFrameworkListener(const FrameworkListener& listener);
 
   /**
    * Removes the registered listener associated with the <code>token</code>
    *
    * <p>
    * If the listener associated with the <code>token</code> is not contained in this
-   * context bundle's list of listeners, this method does nothing.
-
+   * context bundle's list of listeners or if <code>token</code> is an invalid token,
+   * this method does nothing.
+   *
    * <p>
    * The token can correspond to one of Service, Bundle or Framework listeners. Using
    * this function to remove the registered listeners is the recommended approach over
-   * using any of the other deprecated functions like
+   * using any of the other deprecated functions -
    * Remove{Bundle,Framework,Service}Listener.
    *
    * @param token is an object of type ListenerToken.
@@ -802,11 +801,11 @@ public:
    * When using a <code>filter</code>, it is possible that the
    * <code>ServiceEvent</code>s for the complete lifecycle of a service
    * will not be delivered to the callback. For example, if the
-   * <code>filter</code> only matches when the property <code>x</code> has
-   * the value <code>1</code>, the callback will not be called if the
-   * service is registered with the property <code>x</code> not set to the
-   * value <code>1</code>. Subsequently, when the service is modified
-   * setting property <code>x</code> to the value <code>1</code>, the
+   * <code>filter</code> only matches when the property <code>example_property</code>
+   * has the value <code>1</code>, the callback will not be called if the
+   * service is registered with the property <code>example_property</code> not
+   * set to the value <code>1</code>. Subsequently, when the service is modified
+   * setting property <code>example_property</code> to the value <code>1</code>, the
    * filter will match and the callback will be called with a
    * <code>ServiceEvent</code> of type <code>SERVICE_MODIFIED</code>. Thus, the
    * callback will not be called with a <code>ServiceEvent</code> of type
@@ -826,7 +825,7 @@ public:
    * @see RemoveServiceListener()
    */
   template<class R>
-  US_DEPRECATED ListenerToken AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&),
+  ListenerToken AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&),
                                    const std::string& filter = std::string())
   {
     return AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
@@ -856,7 +855,7 @@ public:
    * @see AddServiceListener()
    */
   template<class R>
-  void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&))
+  US_DEPRECATED void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&))
   {
     RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback),
                           static_cast<void*>(receiver));
@@ -882,7 +881,7 @@ public:
    * @see BundleEvent
    */
   template<class R>
-  US_DEPRECATED ListenerToken AddBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
+  ListenerToken AddBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
   {
     return AddBundleListener(BundleListenerMemberFunctor(receiver, callback),
                              static_cast<void*>(receiver));
@@ -911,7 +910,7 @@ public:
    * @see AddBundleListener()
    */
   template<class R>
-  void RemoveBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
+  US_DEPRECATED void RemoveBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
   {
     RemoveBundleListener(BundleListenerMemberFunctor(receiver, callback),
                          static_cast<void*>(receiver));
@@ -935,7 +934,7 @@ public:
    * @see FrameworkEvent
    */
   template<class R>
-  US_DEPRECATED ListenerToken AddFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  ListenerToken AddFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
   {
     return AddFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
   }
@@ -962,7 +961,7 @@ public:
    * @see AddFrameworkListener()
    */
   template<class R>
-  void RemoveFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  US_DEPRECATED void RemoveFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
   {
     RemoveFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
   }

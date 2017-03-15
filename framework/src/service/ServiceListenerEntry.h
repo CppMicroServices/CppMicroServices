@@ -55,8 +55,6 @@ public:
   void SetRemoved(bool removed) const;
 
   ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l, void* data,
-                       const std::string& filter = "");
-  ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l, void* data,
                        ListenerTokenId tokenId, const std::string& filter = "");
 
   const LDAPExpr& GetLDAPExpr() const;
@@ -70,7 +68,7 @@ public:
   bool Contains(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId) const;
 
   bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                void* data, const ServiceListener& listener) const;
+                const ServiceListener& listener, void* data) const;
 
   std::size_t Hash() const;
 

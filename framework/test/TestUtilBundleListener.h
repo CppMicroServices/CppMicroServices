@@ -29,8 +29,6 @@
 
 #include "TestingMacros.h"
 
-US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
-
 namespace cppmicroservices {
 
 class TestBundleListener {
@@ -139,7 +137,5 @@ private:
 };
 
 }
-
-US_GCC_POP_WARNING
 
 #endif // CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H

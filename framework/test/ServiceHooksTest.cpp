@@ -39,8 +39,6 @@
 
 #include <unordered_set>
 
-US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
-
 using namespace cppmicroservices;
 
 namespace {
@@ -426,5 +424,3 @@ int ServiceHooksTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_END()
 }
-
-US_GCC_POP_WARNING

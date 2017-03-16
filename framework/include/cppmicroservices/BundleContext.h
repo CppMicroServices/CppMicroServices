@@ -811,6 +811,15 @@ public:
    * callback will not be called with a <code>ServiceEvent</code> of type
    * <code>SERVICE_REGISTERED</code>.
    *
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *    This function exists only to maintain backwards compatibility
+   *     and will be removed in the next major release.
+   *    Use either `std::bind` or :func:`ServiceListenerMemberFunctor`
+   *     to bind the member function and then pass the result to the
+   *     single parameter variant of :func:`AddServiceListener` instead.
+   * \endrststar
+   *
    * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
@@ -825,8 +834,8 @@ public:
    * @see RemoveServiceListener()
    */
   template<class R>
-  ListenerToken AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&),
-                                   const std::string& filter = std::string())
+  US_DEPRECATED ListenerToken AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&),
+                                                 const std::string& filter = std::string())
   {
     return AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
                               static_cast<void*>(receiver), filter);
@@ -870,6 +879,15 @@ public:
    * If the context bundle's list of listeners already contains a pair <code>(r,c)</code>
    * of <code>receiver</code> and <code>callback</code> such that
    * <code>(r == receiver && c == callback)</code>, then this method does nothing.
+
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *    This function exists only to maintain backwards compatibility
+   *     and will be removed in the next major release.
+   *    Use either `std::bind` or :func:`BundleListenerMemberFunctor`
+   *     to bind the member function and then pass the result to the
+   *     single parameter variant of :func:`AddBundleListener` instead.
+   * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
@@ -881,7 +899,7 @@ public:
    * @see BundleEvent
    */
   template<class R>
-  ListenerToken AddBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
+  US_DEPRECATED ListenerToken AddBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
   {
     return AddBundleListener(BundleListenerMemberFunctor(receiver, callback),
                              static_cast<void*>(receiver));
@@ -925,6 +943,15 @@ public:
    * of <code>receiver</code> and <code>callback</code> such that
    * <code>(r == receiver && c == callback)</code>, then this method does nothing.
    *
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *    This function exists only to maintain backwards compatibility
+   *     and will be removed in the next major release.
+   *    Use either `std::bind` or :func:`BindFrameworkListenerToFunctor`
+   *     to bind the member function and then pass the result to the
+   *     single parameter variant of :func:`AddFrameworkListener` instead.
+   * \endrststar
+   *
    * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
@@ -934,7 +961,7 @@ public:
    * @see FrameworkEvent
    */
   template<class R>
-  ListenerToken AddFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  US_DEPRECATED ListenerToken AddFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
   {
     return AddFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
   }

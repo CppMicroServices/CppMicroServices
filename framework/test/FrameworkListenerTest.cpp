@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
@@ -32,8 +33,6 @@
 
 #include <thread>
 #include <vector>
-
-US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
 
 using namespace cppmicroservices;
 
@@ -345,5 +344,3 @@ int FrameworkListenerTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_END()
 }
-
-US_GCC_POP_WARNING

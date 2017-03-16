@@ -86,10 +86,8 @@ int ConcurrencyTest(int /*argc*/, char* /*argv*/[])
 
     */
 
-US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
     // make sure the bundle really is started
     context.RemoveBundleListener(bundleListener);
-US_GCC_POP_WARNING
     bundle.Start();
 
     tracker.WaitForService();

@@ -37,8 +37,6 @@
 #include <array>
 #include <bitset>
 
-US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
-
 using namespace cppmicroservices;
 
 namespace

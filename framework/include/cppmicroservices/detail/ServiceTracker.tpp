@@ -99,7 +99,9 @@ void ServiceTracker<S,T>::Open()
     {
       /* Remove if already exists. No-op if it's an invalid (default) token */
       d->context.RemoveListener(std::move(d->listenerToken));
-      d->listenerToken = d->context.AddServiceListener(t.get(), &_TrackedService::ServiceChanged, d->listenerFilter);
+      d->listenerToken = d->context.AddServiceListener(std::bind(&_TrackedService::ServiceChanged,
+                                                                 t.get(), std::placeholders::_1),
+                                                       d->listenerFilter);
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty())
       {

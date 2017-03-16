@@ -51,9 +51,7 @@ private:
   void Start(BundleContext context)
   {
     std::cout << "Starting to listen for service events." << std::endl;
-US_GCC_PUSH_DISABLE_WARNING(deprecated-declarations)
-    listenerToken = context.AddServiceListener(this, &Activator::ServiceChanged);
-US_GCC_POP_WARNING
+    listenerToken = context.AddServiceListener(std::bind(&Activator::ServiceChanged, this, std::placeholders::_1));
   }
 
   /**

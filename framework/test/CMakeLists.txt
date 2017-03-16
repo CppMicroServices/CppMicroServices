@@ -92,6 +92,7 @@ set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
 set(_third_party_srcs ../../third_party/miniz.c)
 
+
 # Generate a custom "bundle init" file for the test driver executable
 usFunctionGenerateBundleInit(TARGET ${_test_driver} OUT _srcs)
 
@@ -101,6 +102,25 @@ add_executable(${_test_driver} ${_srcs} ${_additional_srcs} ${_third_party_srcs}
 add_dependencies(${_test_driver} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
+
+# Disable deprecation warnings in the test code.
+if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+  #target_compile_optinons(${_test_driver} PUBLIC "-Wno-deprecated-declarations")
+  set_source_files_properties(BundleActivatorTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(BundleHooksTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(BundleTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(ConcurrencyTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(FrameworkListenerTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(FrameworkTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(MultipleListenersTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(ServiceListenerTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(ServiceHooksTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(ServiceRegistryPerformanceTest.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(StaticBundleTest PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+endif()
+
 if(NOT US_BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_bundle_libs})
 endif()

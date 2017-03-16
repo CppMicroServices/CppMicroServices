@@ -151,17 +151,50 @@ namespace cppmicroservices {
    */
   typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
 
-  template<class X>
-  ServiceListener ServiceListenerMemberFunctor(X* x, void (X::*memFn)(const ServiceEvent&))
-  { return std::bind(memFn, x, std::placeholders::_1); }
+  /**
+   * A convenience function that binds the member function <code>callback</code> of
+   * an object of type <code>R</code> and returns a <code>ServiceListener</code> object.
+   * This object can then be passed into :func:``AddServiceListener`.
+   *
+   * @tparam R The type containing the member function.
+   * @param receiver The object of type R.
+   * @param callback The member function pointer.
+   * @returns a ServiceListener object.
+   * @see AddServiceListener()
+   */
+  template<class R>
+  ServiceListener ServiceListenerMemberFunctor(R* receiver, void (R::*callback)(const ServiceEvent&))
+  { return std::bind(callback, receiver, std::placeholders::_1); }
 
-  template<class X>
-  BundleListener BundleListenerMemberFunctor(X* x, void (X::*memFn)(const BundleEvent&))
-  { return std::bind(memFn, x, std::placeholders::_1); }
+  /**
+   * A convenience function that binds the member function <code>callback</code> of
+   * an object of type <code>R</code> and returns a <code>BundleListener</code> object.
+   * This object can then be passed into :func:``AddBundleListener`.
+   *
+   * @tparam R The type containing the member function.
+   * @param receiver The object of type R.
+   * @param callback The member function pointer.
+   * @returns a BundleListener object.
+   * @see AddBundleListener()
+   */
+  template<class R>
+  BundleListener BundleListenerMemberFunctor(R* receiver, void (R::*callback)(const BundleEvent&))
+  { return std::bind(callback, receiver, std::placeholders::_1); }
 
-  template<class X>
-  FrameworkListener BindFrameworkListenerToFunctor(X* x, void (X::*Fnc)(const FrameworkEvent&))
-  { return std::bind(Fnc, x, std::placeholders::_1); }
+  /**
+   * A convenience function that binds the member function <code>callback</code> of
+   * an object of type <code>R</code> and returns a <code>FrameworkListener</code> object.
+   * This object can then be passed into :func:``AddFrameworkListener`.
+   *
+   * @tparam R The type containing the member function.
+   * @param receiver The object of type R.
+   * @param callback The member function pointer.
+   * @returns a FrameworkListener object.
+   * @see AddFrameworkListener()
+   */
+  template<class R>
+  FrameworkListener BindFrameworkListenerToFunctor(R* receiver, void (R::*callback)(const FrameworkEvent&))
+  { return std::bind(callback, receiver, std::placeholders::_1); }
 }
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListener)

@@ -366,5 +366,3 @@ int MultipleListenersTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_END()
 }
-
-US_GCC_POP_WARNING

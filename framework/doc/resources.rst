@@ -53,7 +53,7 @@ OSGi.
 Runtime Overhead
 ----------------
 
-The resource has the following runtime characteristics:
+The resource system has the following runtime characteristics:
 
 -  During static initialization of a bundle, it's ZIP archive header
    data (if available) is parsed and stored in memory.
@@ -67,7 +67,7 @@ The resource has the following runtime characteristics:
  Conventions and Limitations
  ---------------------------
  
--  Resources have a size limitation of 2GB, due to the used ZIP format.
+-  Resources have a size limitation of 2GB due to the use of the ZIP format.
 -  Resource entries are stored with case-insensitive names. On
    case-sensitive file systems, adding resources with the same name but
    different capitalization will lead to an error.

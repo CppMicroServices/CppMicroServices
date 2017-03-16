@@ -76,5 +76,5 @@ The resource system has the following runtime characteristics:
    a shared library, starting from the end of the file. If other zip
    files are embedded in the bundle as well (e.g. as an additional
    resource embedded via the Windows RC compiler or using other
-   techniques), it will stop at the first valid zip file and use it a
+   techniques), it will stop at the first valid zip file and use it as
    the resource container.

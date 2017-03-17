@@ -86,6 +86,7 @@ void ServiceListeners::Clear()
 
 ListenerToken ServiceListeners::MakeListenerToken()
 {
+  auto l = this->Lock(); US_UNUSED(l);
   return ListenerToken(++listenerId);
 }
 
@@ -176,8 +177,7 @@ ListenerToken ServiceListeners::AddBundleListener(const std::shared_ptr<BundleCo
 
   auto l = bundleListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = bundleListenerMap.value[context];
-  auto ret = listeners.emplace(std::make_pair(token.Id(), std::make_tuple(listener, data)));
-  assert(ret.second);
+  listeners[token.Id()] = std::make_tuple(listener, data);
   return token;
 }
 
@@ -201,8 +201,7 @@ ListenerToken ServiceListeners::AddFrameworkListener(const std::shared_ptr<Bundl
 
   auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = frameworkListenerMap.value[context];
-  auto ret = listeners.emplace(std::make_pair(token.Id(), std::make_tuple(listener, data)));
-  assert(ret.second);
+  listeners[token.Id()] = std::make_tuple(listener, data);
   return token;
 }
 

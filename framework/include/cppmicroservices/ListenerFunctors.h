@@ -152,45 +152,51 @@ namespace cppmicroservices {
   typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
 
   /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
    * A convenience function that binds the member function <code>callback</code> of
    * an object of type <code>R</code> and returns a <code>ServiceListener</code> object.
-   * This object can then be passed into :func:``AddServiceListener`.
+   * This object can then be passed into <code>AddServiceListener()</code>.
    *
    * @tparam R The type containing the member function.
    * @param receiver The object of type R.
    * @param callback The member function pointer.
    * @returns a ServiceListener object.
-   * @see AddServiceListener()
    */
   template<class R>
   ServiceListener ServiceListenerMemberFunctor(R* receiver, void (R::*callback)(const ServiceEvent&))
   { return std::bind(callback, receiver, std::placeholders::_1); }
 
   /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
    * A convenience function that binds the member function <code>callback</code> of
    * an object of type <code>R</code> and returns a <code>BundleListener</code> object.
-   * This object can then be passed into :func:``AddBundleListener`.
+   * This object can then be passed into <code>AddBundleListener()</code>.
    *
    * @tparam R The type containing the member function.
    * @param receiver The object of type R.
    * @param callback The member function pointer.
    * @returns a BundleListener object.
-   * @see AddBundleListener()
    */
   template<class R>
   BundleListener BundleListenerMemberFunctor(R* receiver, void (R::*callback)(const BundleEvent&))
   { return std::bind(callback, receiver, std::placeholders::_1); }
 
   /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
    * A convenience function that binds the member function <code>callback</code> of
    * an object of type <code>R</code> and returns a <code>FrameworkListener</code> object.
-   * This object can then be passed into :func:``AddFrameworkListener`.
+   * This object can then be passed into <code>AddFrameworkListener()</code>.
    *
    * @tparam R The type containing the member function.
    * @param receiver The object of type R.
    * @param callback The member function pointer.
    * @returns a FrameworkListener object.
-   * @see AddFrameworkListener()
    */
   template<class R>
   FrameworkListener BindFrameworkListenerToFunctor(R* receiver, void (R::*callback)(const FrameworkEvent&))

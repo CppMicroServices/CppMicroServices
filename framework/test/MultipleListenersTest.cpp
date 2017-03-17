@@ -302,11 +302,12 @@ namespace
     bundleA.Start();
 
     US_TEST_CONDITION(tListen.service_count == 1, "Test for number of times service listeners got triggered")
-    US_TEST_CONDITION(tListen.bundle_count == 4, "Test for number of times bundle listeners got triggered")
+    US_TEST_CONDITION(tListen.bundle_count > 0, "Test for number of times bundle listeners got triggered")
     US_TEST_CONDITION(tListen.framework_count == 1, "Test for number of times framework listeners got triggered")
 
     bundleA.Stop();
     f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
   }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -317,9 +318,10 @@ namespace
     framework.Init();
     BundleContext fCtx = framework.GetBundleContext();
 
+    const int num_listeners = 1001;
+    const int num_remove = num_listeners / 2;
     std::vector<ListenerToken> tokens;
     std::vector<std::future<ListenerToken>> futures;
-    const int num_listeners = 1001;
     //const int remove_count = num_listeners / 2;
     int count = 0;
 
@@ -330,9 +332,10 @@ namespace
       return token;
     };
 
+
     for (int i = 0; i < num_listeners; i++)
     {
-      std::this_thread::sleep_for(std::chrono::microseconds(1));
+      //std::this_thread::sleep_for(std::chrono::microseconds(1));
       futures.push_back(std::async(std::launch::async, add_listener));
     }
     for (auto& future_ : futures)
@@ -340,12 +343,12 @@ namespace
       tokens.push_back(future_.get());
     }
 
-    for (auto& token : tokens)
+    for (int i = 0; i < num_remove; i++)
     {
-      fCtx.RemoveListener(std::move(token));
+      fCtx.RemoveListener(std::move(tokens[i]));
     }
     framework.Start();
-    US_TEST_CONDITION(count == 0,
+    US_TEST_CONDITION(count == num_listeners - num_remove,
                       "Testing multithreaded listener addition and sequential removal using tokens.")
     framework.Stop();
     framework.WaitForStop(std::chrono::seconds(0));

@@ -163,6 +163,45 @@ int AnyTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(anyMap3.Type() == typeid(std::map<std::string, Any>), "Any[std::map<std::string,Any>].Type()")
   US_TEST_CONDITION(anyMap3.ToString() == "{map : {1 : 0.3, 3 : bye}, number : 5, vector : [9,8,7]}", "Any[std::map<std::string,Any>].ToString()")
   US_TEST_CONDITION(anyMap3.ToJSON() == "{\"map\" : {\"1\" : 0.3, \"3\" : \"bye\"}, \"number\" : 5, \"vector\" : [9,8,7]}", "Any[std::map<std::string,Any>].ToJSON()")
+
+  // Test BadAnyCastException exceptions
+  const Any uncastableConstAny(0.0);
+  Any uncastableAny(0.0);
+
+  US_TEST_FOR_EXCEPTION(cppmicroservices::BadAnyCastException, any_cast<std::string>(uncastableConstAny))
   
+  try
+  {
+    (void)any_cast<std::string>(uncastableConstAny);
+  }
+  catch (const cppmicroservices::BadAnyCastException& ex) { US_TEST_OUTPUT(<< ex.what()) }
+
+
+  US_TEST_FOR_EXCEPTION(cppmicroservices::BadAnyCastException, any_cast<std::string>(uncastableAny))
+
+  try
+  {
+    (void)any_cast<std::string>(uncastableAny);
+  }
+  catch (const cppmicroservices::BadAnyCastException& ex) { US_TEST_OUTPUT(<< ex.what()) }
+
+
+  US_TEST_FOR_EXCEPTION(cppmicroservices::BadAnyCastException, ref_any_cast<std::string>(uncastableConstAny))
+
+  try
+  {
+    (void)ref_any_cast<std::string>(uncastableConstAny);
+  }
+  catch (const cppmicroservices::BadAnyCastException& ex) { US_TEST_OUTPUT(<< ex.what()) }
+
+
+  US_TEST_FOR_EXCEPTION(cppmicroservices::BadAnyCastException, ref_any_cast<std::string>(uncastableAny))
+
+  try
+  {
+    (void)ref_any_cast<std::string>(uncastableAny);
+  }
+  catch (const cppmicroservices::BadAnyCastException& ex) { US_TEST_OUTPUT(<< ex.what()) }
+
   US_TEST_END()
 }

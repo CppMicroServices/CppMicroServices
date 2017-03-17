@@ -4,10 +4,7 @@ Static Bundles
 ==============
 
 The normal and most flexible way to add a CppMicroServices bundle to
-an application is to compile it into a shared library that is later
-installed programmatically using the API 
-:any:`installed <cppmicroservices::BundleContext::InstallBundles>` at
-runtime.
+an application is to compile it into a shared library using the :any:BundleContext::InstallBundles() <cppmicroservices::BundleContext::InstallBundles> function at runtime.
 
 However, bundles can be linked statically to your application or shared
 library. This makes the deployment of your application less error-prone

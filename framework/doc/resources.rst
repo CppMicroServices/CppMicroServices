@@ -1,7 +1,7 @@
 .. _concept-resources:
 
 The Resource System
-====================
+===================
 
 The C++ Micro Services library provides a generic resource system that allows you to:
 

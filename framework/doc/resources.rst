@@ -64,8 +64,8 @@ The resource system has the following runtime characteristics:
    the uncompressed resource data and inflate it. The memory will be
    free'ed after the ``BundleResourceStream`` object is destroyed.
    
- Conventions and Limitations
- ---------------------------
+Conventions and Limitations
+---------------------------
  
 -  Resources have a size limitation of 2GB due to the use of the ZIP format.
 -  Resource entries are stored with case-insensitive names. On

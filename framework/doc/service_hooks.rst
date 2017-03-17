@@ -14,9 +14,10 @@ application bundles.
 
 Some example use cases for service hooks include:
 
-   - Proxying of existing services by hiding the original service and 
-     registering a *proxy service* with the same properties 
-   - Providing services *on demand* based on registered service listeners from external bundles
+-  Proxying of existing services by hiding the original service and
+   registering a *proxy service* with the same properties
+-  Providing services *on demand* based on registered service listeners
+   from external bundles
 
 Event Listener Hook
 -------------------

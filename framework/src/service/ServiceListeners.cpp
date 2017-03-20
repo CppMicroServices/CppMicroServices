@@ -86,7 +86,6 @@ void ServiceListeners::Clear()
 
 ListenerToken ServiceListeners::MakeListenerToken()
 {
-  auto l = this->Lock(); US_UNUSED(l);
   return ListenerToken(++listenerId);
 }
 

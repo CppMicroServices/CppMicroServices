@@ -151,14 +151,71 @@ namespace cppmicroservices {
    */
   typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
 
+  /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
+   * A convenience function that binds the member function <code>callback</code> of
+   * an object of type <code>R</code> and returns a <code>ServiceListener</code> object.
+   * This object can then be passed into <code>AddServiceListener()</code>.
+   *
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *    This function exists only to maintain backwards compatibility
+   *     and will be removed in the next major release. Use std::bind instead.
+   * \endrststar
+   *
+   * @tparam R The type containing the member function.
+   * @param receiver The object of type R.
+   * @param callback The member function pointer.
+   * @returns a ServiceListener object.
+   */
   template<class R>
   US_DEPRECATED ServiceListener ServiceListenerMemberFunctor(R* receiver, void (R::*callback)(const ServiceEvent&))
   { return std::bind(callback, receiver, std::placeholders::_1); }
 
+  /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
+   * A convenience function that binds the member function <code>callback</code> of
+   * an object of type <code>R</code> and returns a <code>BundleListener</code> object.
+   * This object can then be passed into <code>AddBundleListener()</code>.
+   *
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *    This function exists only to maintain backwards compatibility
+   *     and will be removed in the next major release. Use std::bind instead.
+   * \endrststar
+   *
+   * @tparam R The type containing the member function.
+   * @param receiver The object of type R.
+   * @param callback The member function pointer.
+   * @returns a BundleListener object.
+   */
   template<class R>
   US_DEPRECATED BundleListener BundleListenerMemberFunctor(R* receiver, void (R::*callback)(const BundleEvent&))
   { return std::bind(callback, receiver, std::placeholders::_1); }
 
+  /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
+   * A convenience function that binds the member function <code>callback</code> of
+   * an object of type <code>R</code> and returns a <code>FrameworkListener</code> object.
+   * This object can then be passed into <code>AddFrameworkListener()</code>.
+   *
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *    This function exists only to maintain backwards compatibility
+   *     and will be removed in the next major release. Use std::bind instead.
+   * \endrststar
+   *
+   * @tparam R The type containing the member function.
+   * @param receiver The object of type R.
+   * @param callback The member function pointer.
+   * @returns a FrameworkListener object.
+   */
   template<class R>
   US_DEPRECATED FrameworkListener BindFrameworkListenerToFunctor(R* receiver, void (R::*callback)(const FrameworkEvent&))
   { return std::bind(callback, receiver, std::placeholders::_1); }

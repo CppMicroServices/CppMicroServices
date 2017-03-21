@@ -311,45 +311,156 @@ namespace
   }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-  void testConcurrent()
+  // Test the addition of thousand listeners asynchronously.
+  void testConcurrentAdd()
   {
     FrameworkFactory factory;
     auto framework = factory.NewFramework();
     framework.Init();
     BundleContext fCtx = framework.GetBundleContext();
 
-    const int num_listeners = 1001;
-    const int num_remove = num_listeners / 2;
+    const int numAdditions = 1001;
     std::vector<ListenerToken> tokens;
     std::vector<std::future<ListenerToken>> futures;
-    //const int remove_count = num_listeners / 2;
     int count = 0;
 
-    auto add_listener = [&fCtx, &count]() -> ListenerToken
+    auto addListener = [&fCtx, &count]() -> ListenerToken
     {
       auto listener = [&count](const FrameworkEvent&){ ++count; };
       auto token = fCtx.AddFrameworkListener(listener);
       return token;
     };
 
+    for (int i = 0; i < numAdditions; i++)
+    {
+      futures.push_back(std::async(std::launch::async, addListener));
+    }
+    for (auto& future : futures)
+    {
+      tokens.push_back(future.get());
+    }
+    for (auto& token : tokens)
+    {
+      fCtx.RemoveListener(std::move(token));
+    }
 
-    for (int i = 0; i < num_listeners; i++)
-    {
-      //std::this_thread::sleep_for(std::chrono::microseconds(1));
-      futures.push_back(std::async(std::launch::async, add_listener));
-    }
-    for (auto& future_ : futures)
-    {
-      tokens.push_back(future_.get());
-    }
-
-    for (int i = 0; i < num_remove; i++)
-    {
-      fCtx.RemoveListener(std::move(tokens[i]));
-    }
     framework.Start();
-    US_TEST_CONDITION(count == num_listeners - num_remove,
-                      "Testing multithreaded listener addition and sequential removal using tokens.")
+    US_TEST_CONDITION(count == 0,
+      "Testing concurrent listener addition and sequential removal.")
+    framework.Stop();
+    framework.WaitForStop(std::chrono::seconds(0));
+  }
+
+  // Test true concurrent addition and removal of listeners.
+  // This is a better simulation of what we want to test - that only the API
+  // calls that add listeners or remove listeners are executed at the same time,
+  // and not other boilerplate code.
+  void testConcurrentAddRemove()
+  {
+    FrameworkFactory factory;
+    auto framework = factory.NewFramework();
+    framework.Init();
+    BundleContext fCtx = framework.GetBundleContext();
+
+    const int numAdditions = 50;
+    const int numRemovals = 30;
+    std::vector<uint8_t> listenerFlags(numAdditions, 0);
+    std::vector<ListenerToken> tokens;
+
+    // Test concurrent addition
+    // All threads wait at the 'ready.wait()' point inside the lambdas,
+    // until the time when the promise 'go' is set by the main thread.
+    {
+      std::vector<std::future<ListenerToken>> futures;
+      std::promise<void> go;
+      std::shared_future<void> ready(go.get_future());
+      std::vector<std::promise<void>> readies(numAdditions);
+
+      auto addListener = [&fCtx, &readies, ready]
+        (std::vector<uint8_t>& flags, int i) -> ListenerToken
+      {
+        auto listener = [&flags, i](const FrameworkEvent&){ flags[i] = 1; };
+        readies[i].set_value();
+        ready.wait();
+        auto token = fCtx.AddFrameworkListener(listener);
+        return token;
+      };
+
+      try
+      {
+        for (int i = 0; i < numAdditions; i++)
+        {
+          futures.push_back(std::async(std::launch::async,
+                                       addListener, std::ref(listenerFlags), i));
+        }
+        for (auto& r : readies)
+        {
+          r.get_future().wait();
+        }
+
+        go.set_value();
+
+        for (auto& future: futures)
+        {
+          tokens.push_back(future.get());
+        }
+      }
+      catch (...)
+      {
+        go.set_value();
+        throw;
+      }
+    }
+
+    // Test concurrent removal
+    // All threads wait at the 'ready.wait()' point inside the lambdas,
+    // until the time when the promise 'go' is set by the main thread.
+    {
+      std::vector<std::future<void>> futures;
+      std::promise<void> go;
+      std::shared_future<void> ready(go.get_future());
+      std::vector<std::promise<void>> readies(numRemovals);
+
+      auto removeListener = [&fCtx, &readies, ready]
+        (std::vector<uint8_t>& flags, int i, ListenerToken token)
+      {
+        auto listener = [&flags, i](const FrameworkEvent&){ flags[i] = 0; };
+        readies[i].set_value();
+        ready.wait();
+        fCtx.RemoveListener(std::move(token));
+      };
+
+      try
+      {
+        for (int i = 0; i < numRemovals; i++)
+        {
+          futures.push_back(
+            std::async(std::launch::async,
+                       removeListener, std::ref(listenerFlags), i, std::move(tokens[i])));
+        }
+        for (auto& r : readies)
+        {
+          r.get_future().wait();
+        }
+
+        go.set_value();
+
+        for (auto& future: futures)
+        {
+          future.get();
+        }
+      }
+      catch (...)
+      {
+        go.set_value();
+        throw;
+      }
+    }
+
+    framework.Start();
+    auto countOnes = std::count(listenerFlags.begin(), listenerFlags.end(), 1);
+    US_TEST_CONDITION(countOnes == numAdditions - numRemovals,
+                      "Testing concurrent listener addition and removal")
     framework.Stop();
     framework.WaitForStop(std::chrono::seconds(0));
   }
@@ -364,7 +475,8 @@ int MultipleListenersTest(int /*argc*/, char* /*argv*/[])
   testListenerTypes();
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-  testConcurrent();
+  testConcurrentAdd();
+  testConcurrentAddRemove();
 #endif
 
   US_TEST_END()

@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_BUNDLECONTEXT_H
 
 #include "cppmicroservices/GlobalConfig.h"
-#include "cppmicroservices/detail/Log.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
@@ -815,9 +814,8 @@ public:
    * .. deprecated:: 3.1.0
    *    This function exists only to maintain backwards compatibility
    *     and will be removed in the next major release.
-   *    Use either `std::bind` or :func:`ServiceListenerMemberFunctor`
-   *     to bind the member function and then pass the result to the
-   *     single parameter variant of :func:`AddServiceListener` instead.
+   *    Use `std::bind` to bind the member function and then pass the result
+   *     to the single parameter variant of :func:`AddServiceListener` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be called)
@@ -884,8 +882,7 @@ public:
    * .. deprecated:: 3.1.0
    *    This function exists only to maintain backwards compatibility
    *     and will be removed in the next major release.
-   *    Use either `std::bind` or :func:`BundleListenerMemberFunctor`
-   *     to bind the member function and then pass the result to the
+   *    Use `std::bind` to bind the member function and then pass the result to the
    *     single parameter variant of :func:`AddBundleListener` instead.
    * \endrststar
    *
@@ -947,8 +944,7 @@ public:
    * .. deprecated:: 3.1.0
    *    This function exists only to maintain backwards compatibility
    *     and will be removed in the next major release.
-   *    Use either `std::bind` or :func:`BindFrameworkListenerToFunctor`
-   *     to bind the member function and then pass the result to the
+   *    Use `std::bind` to bind the member function and then pass the result to the
    *     single parameter variant of :func:`AddFrameworkListener` instead.
    * \endrststar
    *

@@ -164,7 +164,7 @@ public:
    * Remove either a service, bundle or framework listener from current framework.
    * If the token is invalid, this method does nothing.
    *
-   * @param context The bundle context who wants to remove listener.
+   * @param context The bundle context who wants to remove the listener.
    * @param token A ListenerToken type object which corresponds to the listener.
    */
   void RemoveListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerToken token);
@@ -211,7 +211,7 @@ public:
 private:
 
   /**
-   * Factory method for return an unique ListenerToken object.
+   * Factory method that returns an unique ListenerToken object.
    * Called by methods which add listeners.
    */
   ListenerToken MakeListenerToken();

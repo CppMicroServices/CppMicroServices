@@ -20,6 +20,12 @@ Changed
 Deprecated
 ~~~~~~~~~~
 
+- The following methods in BundleContext:
+  RemoveBundleListener, RemoveFrameworkListener, RemoveServiceListener.
+  The variants of AddBundleListener, AddFrameworkListener, AddServiceListener that take member functions.
+- The functions: ServiceListenerMemberFunctor, BundleListenerMemberFunctor and BindFrameworkListenerToFunctor.
+
+
 Removed
 ~~~~~~~
 

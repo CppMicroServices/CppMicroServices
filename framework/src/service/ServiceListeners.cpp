@@ -24,8 +24,6 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
-#include <cassert>
-
 #include "ServiceListeners.h"
 
 #include "cppmicroservices/FrameworkEvent.h"
@@ -41,10 +39,12 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 namespace cppmicroservices {
 
 /**
- * Predicate functions used for comparison when adding and removing listeners.
- * These are legacy functions to support backwards compatibility.
- * These will be removed when the only way to remove listeners is through tokens.
- * (when the removal of listeners through supplying names of callables is removed)
+ * Predicate functions used for comparison when removing listeners.
+ * These are legacy functions to support backwards compatibility,
+ * and will be removed when the listeners can be removed only through RemoveListener() call.
+ *
+ * Note: Only the "d1" part is used to compare for sameness. The listener comparison
+ * always returns "true", because std::function objects aren't equality comparable.
  */
 static auto BundleListenerCompareListenerData = [](const BundleListener& l1, void* d1,
                                                    const std::pair<ListenerTokenId,
@@ -93,15 +93,7 @@ ListenerToken ServiceListeners::AddServiceListener(const std::shared_ptr<BundleC
                                                    void* data, const std::string& filter)
 {
   // The following condition is true only if the listener is a non-static member function.
-  // In that case, if we already have a listener with the same ServiceListener and data, we remove that.
-  // Effectively, this replaces the existing listener with the new listener if it has the same ServiceListener
-  // and data.
-  //
-  // Note: Only the "data" part is used to compare for sameness. This is the address of the object
-  // which has the non-static member function as the listener.
-  // The "listener" part comparison always returns "true", because std::function objects aren't
-  // equality comparable and the exact type must be known for the std::function::target<> function to not
-  // return a nullptr. The exact type is not known because std::function erases the type.
+  // If so, the existing listener is replaced with the new listener.
   if (data != nullptr)
   {
     RemoveServiceListener(context, listener, data);
@@ -218,10 +210,6 @@ void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleConte
   }
 }
 
-/**
- * Iterates over the set of FrameworkListeners, BundleListeners and ServiceListeners to find the tokenId and
- * remove the listener corresponding to the tokenId.
- */
 void ServiceListeners::RemoveListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerToken token)
 {
   if (!token)

@@ -103,11 +103,11 @@ add_dependencies(${_test_driver} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
 
-# Disable deprecation warnings in the test code.
+# Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  set_source_files_properties(${_srcs} PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+  set_source_files_properties(${_srcs} PROPERTIES COMPILE_FLAGS -Wno-error=-deprecated-declarations)
 endif()
 
 if(NOT US_BUILD_SHARED_LIBS)

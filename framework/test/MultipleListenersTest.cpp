@@ -421,8 +421,10 @@ namespace
       std::shared_future<void> ready(go.get_future());
       std::vector<std::promise<void>> readies(numRemovals);
 
+      // Using ListenerToken& because of VS2013 compiler bug
+      // https://connect.microsoft.com/VisualStudio/feedback/details/884836
       auto removeListener = [&fCtx, &readies, ready]
-        (int i, ListenerToken token)
+        (int i, ListenerToken& token)
       {
         readies[i].set_value();
         ready.wait();
@@ -435,7 +437,7 @@ namespace
         {
           futures.push_back(
             std::async(std::launch::async,
-                       removeListener, i, std::move(tokens[i])));
+                       removeListener, i, std::ref(tokens[i])));
         }
         for (auto& r : readies)
         {

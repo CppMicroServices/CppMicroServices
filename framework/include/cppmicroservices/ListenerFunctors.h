@@ -28,7 +28,6 @@
 
 #include <cstring>
 #include <functional>
-#include <cstdint>
 
 namespace cppmicroservices {
 
@@ -36,57 +35,6 @@ namespace cppmicroservices {
   class BundleEvent;
   class FrameworkEvent;
   class ServiceListeners;
-
-  typedef std::uint64_t ListenerTokenId;
-
-  /**
-   * \brief The token returned when a listener is registered with BundleContext.
-   *
-   * The token object enables the clients to remove the listeners from the BundleContext.
-   * This is a move-only type, with the intention that the transfer of ownership will
-   * be handled explicitly by the clients.
-   *
-   */
-  class US_Framework_EXPORT ListenerToken
-  {
-  public:
-
-    /**
-     * Constructs a default, invalid %ListenerToken object.
-     * As this is not associated with any valid listener, a RemoveListener
-     * call taking a default ListenerToken object will do nothing.
-     */
-    ListenerToken();
-
-    ListenerToken(const ListenerToken&) = delete;
-
-    ListenerToken& operator=(const ListenerToken&) = delete;
-
-    ListenerToken(ListenerToken&& other);
-
-    ListenerToken& operator=(ListenerToken&& other);
-
-    /**
-     * Tests this %ListenerToken object for validity.
-     *
-     * Invalid \c ListenerToken objects are created by the default constructor.
-     * Also, a \c ListenerToken object can become invalid if it is moved to another
-     * ListenerToken object.
-     *
-     * @return \c true if this %ListenerToken object is valid, false otherwise.
-     */
-    explicit operator bool() const;
-
-  private:
-    // The only (internal) client which can initialize this class with a ListenerTokenId.
-    friend class ServiceListeners;
-
-    explicit ListenerToken(ListenerTokenId _tokenId);
-
-    ListenerTokenId Id() const;
-
-    ListenerTokenId tokenId;
-  };
 
   /**
   \defgroup gr_listeners Listeners

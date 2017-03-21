@@ -20,7 +20,9 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/ListenerToken.h"
+
+#include <utility>
 
 namespace cppmicroservices {
 

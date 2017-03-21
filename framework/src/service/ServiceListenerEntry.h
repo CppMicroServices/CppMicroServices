@@ -24,6 +24,7 @@
 #ifndef CPPMICROSERVICES_SERVICELISTENERENTRY_H
 #define CPPMICROSERVICES_SERVICELISTENERENTRY_H
 
+#include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ServiceListenerHook.h"
 

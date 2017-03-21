@@ -107,7 +107,7 @@ set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  set_source_files_properties(${_srcs} PROPERTIES COMPILE_FLAGS -Wno-error=-deprecated-declarations)
+  set_source_files_properties(${_srcs} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
 endif()
 
 if(NOT US_BUILD_SHARED_LIBS)

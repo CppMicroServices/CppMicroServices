@@ -422,9 +422,8 @@ namespace
       std::vector<std::promise<void>> readies(numRemovals);
 
       auto removeListener = [&fCtx, &readies, ready]
-        (std::vector<uint8_t>& flags, int i, ListenerToken token)
+        (int i, ListenerToken token)
       {
-        auto listener = [&flags, i](const FrameworkEvent&){ flags[i] = 0; };
         readies[i].set_value();
         ready.wait();
         fCtx.RemoveListener(std::move(token));
@@ -436,7 +435,7 @@ namespace
         {
           futures.push_back(
             std::async(std::launch::async,
-                       removeListener, std::ref(listenerFlags), i, std::move(tokens[i])));
+                       removeListener, i, std::move(tokens[i])));
         }
         for (auto& r : readies)
         {

@@ -166,6 +166,11 @@ bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>&
   return (d->context == context) && (d->data == data) && ServiceListenerCompare()(d->listener, listener);
 }
 
+ListenerTokenId ServiceListenerEntry::Id() const
+{
+  return d->tokenId;
+}
+
 std::size_t ServiceListenerEntry::Hash() const
 {
   using namespace std;
@@ -174,7 +179,7 @@ std::size_t ServiceListenerEntry::Hash() const
   {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
         ((hash<BundleContextPrivate*>()(d->context.get()) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
-        (hash<ServiceListener>()(d->listener) << 1);
+        ((hash<ServiceListener>()(d->listener)) ^ (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
 }

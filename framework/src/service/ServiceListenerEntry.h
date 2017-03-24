@@ -71,6 +71,8 @@ public:
   bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
                 const ServiceListener& listener, void* data) const;
 
+  ListenerTokenId Id() const;
+
   std::size_t Hash() const;
 
 };

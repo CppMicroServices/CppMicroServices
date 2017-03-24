@@ -110,15 +110,15 @@ public:
 
   /**
    * Remove service listener from current framework. Silently ignore
-   * if listener doesn't exist. If listener is registered more than
-   * once remove all instances.
+   * if listener doesn't exist.
    *
    * @param context The bundle context who wants to remove listener.
+   * @param tokenId The ListenerTokenId associated with the listener.
    * @param listener Object to remove.
    * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
-                             void* data);
+  void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId,
+                             const ServiceListener& listener, void* data);
 
   /**
    * Add a new bundle listener.
@@ -215,9 +215,6 @@ private:
    * Called by methods which add listeners.
    */
   ListenerToken MakeListenerToken();
-
-  template <class T>
-  void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const T& listenerprops);
 
   /**
    * Remove all references to a service listener from the service listener

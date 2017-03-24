@@ -330,7 +330,7 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(d, delegate, nullptr);
+  b->coreCtx->listeners.RemoveServiceListener(d, ListenerTokenId(0), delegate, nullptr);
 }
 
 ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
@@ -409,7 +409,7 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void*
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(d, delegate, data);
+  b->coreCtx->listeners.RemoveServiceListener(d, ListenerTokenId(0), delegate, data);
 }
 
 ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate, void* data)

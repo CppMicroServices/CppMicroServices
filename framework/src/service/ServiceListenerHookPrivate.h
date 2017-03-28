@@ -34,8 +34,6 @@ class ServiceListenerHook::ListenerInfoData : public SharedData
 {
 public:
   ListenerInfoData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                   void* data, const std::string& filter);
-  ListenerInfoData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
                    void* data, ListenerTokenId tokenId, const std::string& filter);
 
   virtual ~ListenerInfoData();

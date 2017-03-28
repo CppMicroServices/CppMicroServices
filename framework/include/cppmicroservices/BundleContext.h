@@ -86,7 +86,7 @@ template<class S> struct ServiceHolder;
  * The <code>BundleContext</code> object is only valid during the execution of
  * its context bundle; that is, during the period when the context bundle
  * is started. If the <code>BundleContext</code>
- * object is used subsequently, a <code>std::logic_error</code> is
+ * object is used subsequently, a <code>std::runtime_error</code> is
  * thrown. The <code>BundleContext</code> object is never reused after
  * its context bundle is stopped.
  *
@@ -612,7 +612,7 @@ public:
   /**
    * Adds the specified <code>listener</code> with the
    * specified <code>filter</code> to the context bundles's list of listeners.
-   * See LDAPFilter for a description of the filter syntax. Listeners
+   * See <code>LDAPFilter</code> for a description of the filter syntax. Listeners
    * are notified when a service has a lifecycle state change.
    *
    * <p>
@@ -684,7 +684,7 @@ public:
    * @param listener Any callable object.
    * @returns a ListenerToken object which can be used to remove the
    *          <code>listener</code> from the list of registered listeners.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see BundleEvent
    * @see BundleListener
@@ -775,7 +775,7 @@ public:
   /**
    * Adds the specified <code>callback</code> with the
    * specified <code>filter</code> to the context bundles's list of listeners.
-   * See LDAPFilter for a description of the filter syntax. Listeners
+   * See <code>LDAPFilter</code> for a description of the filter syntax. Listeners
    * are notified when a service has a lifecycle state change.
    *
    * <p>
@@ -892,7 +892,7 @@ public:
    * @param callback The member function pointer to call.
    * @returns a ListenerToken object which can be used to remove the callable from the
    *          registered listeners.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see BundleEvent
    */
@@ -921,7 +921,7 @@ public:
    * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
-   * @throws std::logic_error If this BundleContext is no
+   * @throws std::runtime_error If this BundleContext is no
    *         longer valid.
    * @see AddBundleListener()
    */
@@ -981,7 +981,7 @@ public:
    * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @see AddFrameworkListener()
    */
   template<class R>

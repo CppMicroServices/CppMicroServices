@@ -354,7 +354,7 @@ namespace
   // NOTE: These should be replaced with template lambdas and moved inside
   // testConcurrectAddRemove() when we support only C++14 and beyond.
   template <typename ListenerType>
-  ListenerToken AddListener(BundleContext&, ListenerType listener)
+  ListenerToken AddListener(BundleContext&, ListenerType)
   {
   }
 

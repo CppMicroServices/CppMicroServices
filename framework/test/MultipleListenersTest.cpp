@@ -351,11 +351,37 @@ namespace
     framework.WaitForStop(std::chrono::seconds(0));
   }
 
+  // NOTE: These should be replaced with template lambdas and moved inside
+  // testConcurrectAddRemove() when we support only C++14 and beyond.
+  template <typename ListenerType>
+  ListenerToken AddListener(BundleContext&, ListenerType listener)
+  {
+  }
+
+  template <>
+  ListenerToken AddListener(BundleContext& fCtx, FrameworkListener listener)
+  {
+    return fCtx.AddFrameworkListener(listener);
+  }
+
+  template <>
+  ListenerToken AddListener(BundleContext& fCtx, ServiceListener listener)
+  {
+    return fCtx.AddServiceListener(listener);
+  }
+
+  template <>
+  ListenerToken AddListener(BundleContext& fCtx, BundleListener listener)
+  {
+    return fCtx.AddBundleListener(listener);
+  }
+
   // Test true concurrent addition and removal of listeners.
   // This is a better simulation of what we want to test - that only the API
   // calls that add listeners or remove listeners are executed at the same time,
   // and not other boilerplate code.
-  void testConcurrentAddRemove()
+  template <typename ListenerType, typename EventType>
+  void testConcurrentAddRemove(std::string listenerStr)
   {
     FrameworkFactory factory;
     auto framework = factory.NewFramework();
@@ -379,10 +405,10 @@ namespace
       auto addListener = [&fCtx, &readies, ready]
         (std::vector<uint8_t>& flags, int i) -> ListenerToken
       {
-        auto listener = [&flags, i](const FrameworkEvent&){ flags[i] = 1; };
+        auto listener = [&flags, i](const EventType&){ flags[i] = 1; };
         readies[i].set_value();
         ready.wait();
-        auto token = fCtx.AddFrameworkListener(listener);
+        auto token = AddListener<ListenerType>(fCtx, listener);
         return token;
       };
 
@@ -459,9 +485,14 @@ namespace
     }
 
     framework.Start();
+    auto bundleA = testing::InstallLib(fCtx, "TestBundleA");
+    bundleA.Start();
+
     auto countOnes = std::count(listenerFlags.begin(), listenerFlags.end(), 1);
-    US_TEST_CONDITION(countOnes == numAdditions - numRemovals,
-                      "Testing concurrent listener addition and removal")
+    US_TEST_OUTPUT(<< "");
+    std::string message("Testing concurrent " + listenerStr + " addition and removal");
+    US_TEST_CONDITION(countOnes == numAdditions - numRemovals, message)
+    bundleA.Stop();
     framework.Stop();
     framework.WaitForStop(std::chrono::seconds(0));
   }
@@ -477,7 +508,10 @@ int MultipleListenersTest(int /*argc*/, char* /*argv*/[])
 
 #ifdef US_ENABLE_THREADING_SUPPORT
   testConcurrentAdd();
-  testConcurrentAddRemove();
+  // Test all the three types of listeners.
+  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>("framework listener");
+  testConcurrentAddRemove<BundleListener, BundleEvent>("bundle listener");
+  testConcurrentAddRemove<ServiceListener, ServiceEvent>("service listener");
 #endif
 
   US_TEST_END()

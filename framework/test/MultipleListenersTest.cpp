@@ -356,6 +356,7 @@ namespace
   template <typename ListenerType>
   ListenerToken AddListener(BundleContext&, ListenerType)
   {
+    return ListenerToken();
   }
 
   template <>

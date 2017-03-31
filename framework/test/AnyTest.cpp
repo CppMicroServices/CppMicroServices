@@ -32,9 +32,9 @@ using namespace cppmicroservices;
 template <typename T>
 void TestUnsafeAnyCast(Any& anyObj, T val)
 {
-  US_TEST_CONDITION(unsafe_any_cast<T>(&anyObj) != nullptr, "unsafe_any_cast");
-  US_TEST_CONDITION(typeid(unsafe_any_cast<T>(&anyObj)) == typeid(T*), "compare return type of unsafe_any_cast");
-  US_TEST_CONDITION(*(unsafe_any_cast<T>(&anyObj)) == val, "compare returned value from unsafe_any_cast");
+  T* valPtr = unsafe_any_cast<T>(&anyObj);
+  US_TEST_CONDITION(valPtr != nullptr, "unsafe_any_cast");
+  US_TEST_CONDITION(*(valPtr) == val, "compare returned value from unsafe_any_cast");
 }
 
 int AnyTest(int /*argc*/, char* /*argv*/[])

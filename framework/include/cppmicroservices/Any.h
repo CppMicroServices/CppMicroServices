@@ -590,7 +590,7 @@ ValueType& ref_any_cast(Any& operand)
 template <typename ValueType>
 ValueType* unsafe_any_cast(Any* operand)
 {
-  return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
+  return &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held;
 }
 
 /**

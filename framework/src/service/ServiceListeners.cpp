@@ -157,7 +157,7 @@ void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextP
   auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(BundleListenerCompareListenerData, listener, data, std::placeholders::_1));
   if (it != listeners.end())
   {
-      listeners.erase(it);
+    listeners.erase(it);
   }
 }
 

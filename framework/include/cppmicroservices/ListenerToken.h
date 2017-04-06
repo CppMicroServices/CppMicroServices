@@ -32,10 +32,10 @@ namespace cppmicroservices {
   typedef std::uint64_t ListenerTokenId;
 
   /**
-   * \brief The token returned when a listener is registered with framework.
+   * \brief The token returned when a listener is registered with the framework.
    *
-   * The token object is a move-only type and enables the clients to remove
-   * the listeners from the framework.
+   * The token object is a move-only type and enables clients to remove the
+   * listeners from the framework.
    */
   class US_Framework_EXPORT ListenerToken
   {

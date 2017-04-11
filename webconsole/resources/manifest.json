@@ -1,3 +1,6 @@
 {
-  "bundle.symbolic_name" : "usWebConsole"
+  "bundle.symbolic_name" : "usWebConsole",
+  "bundle.name" : "C++ Micro Services Web Console",
+  "bundle.version" : "0.1.0",
+  "bundle.activator" : true
 }

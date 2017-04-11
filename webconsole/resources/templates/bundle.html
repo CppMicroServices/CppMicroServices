@@ -1,0 +1,55 @@
+<div class="container-fluid">
+  <h2>{{bundle-name}} ({{bundle-bsn}})</h1>
+
+  <p>Back to <a href="{{pluginRoot}}"> {{pluginTitle}}</a></p>
+  
+  <div class="row">
+    
+    <div class="col-md-12">
+      
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#manifest" aria-controls="manifest" role="tab" data-toggle="tab">Manifest</a></li>
+        <li role="presentation"><a href="#services" aria-controls="services" role="tab" data-toggle="tab">Registered Services</a></li>
+        <li role="presentation"><a href="#resources" aria-controls="resources" role="tab" data-toggle="tab">Resources</a></li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+
+        <div role="tabpanel" class="tab-pane json active" id="manifest"></div>
+
+        <div role="tabpanel" class="tab-pane" id="services">
+          <table class="table table-striped">
+            <thead>
+              <tr><th>Service ID</th><th>Types</th><th>Ranking</th><th>Scope</th><th>Properties</th></tr>
+            </thead>
+            <tbody>
+              {{#services}}
+              <tr><td>{{id}}</td><td>{{types}}</td><td>{{ranking}}</td><td>{{scope}}</td><td class="json" id="service-props-{{id}}"></td></tr>
+              <script>$('#service-props-{{id}}').jsonViewer({{&props}}, { collapsed: true });</script>
+              {{/services}}
+            </tbody>
+          </table>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="resources"></div>
+
+      </div>
+
+    </div>
+    
+  </div>
+  
+</div> <!-- /container -->
+
+<script>
+  $('#manifest').jsonViewer({{&bundle-manifest}}, { collapsed: false });
+  $('#resources').treeview({ data: {{&bundle-resources}},
+     showBorder: false,
+     showTags: true,
+     enableLinks: true,
+     collapseIcon: 'glyphicon glyphicon-menu-down',
+     expandIcon: 'glyphicon glyphicon-menu-right'
+     });
+</script>

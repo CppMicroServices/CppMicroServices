@@ -34,10 +34,31 @@ namespace cppmicroservices {
   class BundleEvent;
   class FrameworkEvent;
 
+  /**
+  \defgroup gr_listeners Listeners
+
+  \brief Groups Listener related symbols.
+  */
+
+  /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
+   * A \c ServiceEvent listener.
+   *
+   * A \c ServiceListener can be any callable object and is registered
+   * with the Framework using the
+   * {@link BundleContext#AddServiceListener(const ServiceListener&, const std::string&)} method.
+   * \c ServiceListener instances are called with a \c ServiceEvent object when a
+   * service has been registered, unregistered, or modified.
+   *
+   * @see ServiceEvent
+   */
   typedef std::function<void(const ServiceEvent&)> ServiceListener;
 
   /**
    * \ingroup MicroServices
+   * \ingroup gr_listeners
    *
    * A \c BundleEvent listener. When a \c BundleEvent is fired, it is
    * asynchronously (if threading support is enabled) delivered to a
@@ -48,13 +69,32 @@ namespace cppmicroservices {
    * A \c BundleListener can be any callable object and is registered
    * with the Framework using the
    * {@link BundleContext#AddBundleListener(const BundleListener&)} method.
-   * {\c BundleListener}s are called with a \c BundleEvent object when a
+   * \c BundleListener instances are called with a \c BundleEvent object when a
    * bundle has been installed, resolved, started, stopped, updated, unresolved,
    * or uninstalled.
    *
    * @see BundleEvent
    */
   typedef std::function<void(const BundleEvent&)> BundleListener;
+
+  /**
+   * \ingroup MicroServices
+   * \ingroup gr_listeners
+   *
+   * A \c FrameworkEvent listener. When a \c BundleEvent is fired, it is
+   * asynchronously (if threading support is enabled) delivered to a
+   * \c FrameworkListener. The Framework delivers \c FrameworkEvent objects to
+   * a \c FrameworkListener in order and does not concurrently call a
+   * \c FrameworkListener.
+   *
+   * A \c FrameworkListener can be any callable object and is registered
+   * with the Framework using the
+   * {@link BundleContext#AddFrameworkListener(const FrameworkListener&)} method.
+   * \c FrameworkListener instances are called with a \c FrameworkEvent object when a
+   * framework life-cycle event or notification message occured.
+   *
+   * @see FrameworkEvent
+   */
   typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
 
   template<class X>

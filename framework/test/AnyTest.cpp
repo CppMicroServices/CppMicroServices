@@ -29,6 +29,14 @@
 
 using namespace cppmicroservices;
 
+template <typename T>
+void TestUnsafeAnyCast(Any& anyObj, T val)
+{
+  T* valPtr = unsafe_any_cast<T>(&anyObj);
+  US_TEST_CONDITION(valPtr != nullptr, "unsafe_any_cast");
+  US_TEST_CONDITION(*(valPtr) == val, "compare returned value from unsafe_any_cast");
+}
+
 int AnyTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("AnyTest");
@@ -42,39 +50,46 @@ int AnyTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(any_cast<bool>(anyBool) == true, "any_cast<bool>()")
   US_TEST_CONDITION(anyBool.ToString() == "1", "Any[bool].ToString()")
   US_TEST_CONDITION(anyBool.ToJSON() == "true", "Any[bool].ToJSON()")
+  TestUnsafeAnyCast<bool>(anyBool, true);
   anyBool = false;
   US_TEST_CONDITION(anyBool.ToString() == "0", "Any[bool].ToString()")
   US_TEST_CONDITION(anyBool.ToJSON() == "false", "Any[bool].ToJSON()")
+  TestUnsafeAnyCast<bool>(anyBool, false);
 
   Any anyInt = 13;
   US_TEST_CONDITION(anyInt.Type() == typeid(int), "Any[int].Type()")
   US_TEST_CONDITION(any_cast<int>(anyInt) == 13, "any_cast<int>()")
   US_TEST_CONDITION(anyInt.ToString() == "13", "Any[int].ToString()")
   US_TEST_CONDITION(anyInt.ToJSON() == "13", "Any[int].ToJSON()")
+  TestUnsafeAnyCast<int>(anyInt, 13);
 
   Any anyChar = 'a';
   US_TEST_CONDITION(anyChar.Type() == typeid(char), "Any[char].Type()")
   US_TEST_CONDITION(any_cast<char>(anyChar) == 'a', "any_cast<char>()")
   US_TEST_CONDITION(anyChar.ToString() == "a", "Any[char].ToString()")
   US_TEST_CONDITION(anyChar.ToJSON() == "a", "Any[char].ToJSON()")
+  TestUnsafeAnyCast<char>(anyChar, 'a');
 
   Any anyFloat = 0.2f;
   US_TEST_CONDITION(anyFloat.Type() == typeid(float), "Any[float].Type()")
   US_TEST_CONDITION(any_cast<float>(anyFloat) - 0.2f < std::numeric_limits<float>::epsilon(), "any_cast<float>()")
   US_TEST_CONDITION(anyFloat.ToString() == "0.2", "Any[float].ToString()")
   US_TEST_CONDITION(anyFloat.ToString() == "0.2", "Any[float].ToJSON()")
+  TestUnsafeAnyCast<float>(anyFloat, 0.2f);
 
   Any anyDouble = 0.5;
   US_TEST_CONDITION(anyDouble.Type() == typeid(double), "Any[double].Type()")
   US_TEST_CONDITION(any_cast<double>(anyDouble) - 0.5 < std::numeric_limits<double>::epsilon(), "any_cast<double>()")
   US_TEST_CONDITION(anyDouble.ToString() == "0.5", "Any[double].ToString()")
   US_TEST_CONDITION(anyDouble.ToString() == "0.5", "Any[double].ToJSON()")
+  TestUnsafeAnyCast<double>(anyDouble, 0.5);
 
   Any anyString = std::string("hello");
   US_TEST_CONDITION(anyString.Type() == typeid(std::string), "Any[std::string].Type()")
   US_TEST_CONDITION(any_cast<std::string>(anyString) == "hello", "any_cast<std::string>()")
   US_TEST_CONDITION(anyString.ToString() == "hello", "Any[std::string].ToString()")
   US_TEST_CONDITION(anyString.ToJSON() == "\"hello\"", "Any[std::string].ToJSON()")
+  TestUnsafeAnyCast<std::string>(anyString, std::string("hello"));
 
   std::vector<int> vecInts;
   vecInts.push_back(1);
@@ -148,6 +163,6 @@ int AnyTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(anyMap3.Type() == typeid(std::map<std::string, Any>), "Any[std::map<std::string,Any>].Type()")
   US_TEST_CONDITION(anyMap3.ToString() == "{map : {1 : 0.3, 3 : bye}, number : 5, vector : [9,8,7]}", "Any[std::map<std::string,Any>].ToString()")
   US_TEST_CONDITION(anyMap3.ToJSON() == "{\"map\" : {\"1\" : 0.3, \"3\" : \"bye\"}, \"number\" : 5, \"vector\" : [9,8,7]}", "Any[std::map<std::string,Any>].ToJSON()")
-
+  
   US_TEST_END()
 }

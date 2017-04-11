@@ -27,7 +27,7 @@
 #include "cppmicroservices/ServiceTracker.h"
 
 #include "TestingMacros.h"
-#include "Utils.h"
+#include "TestUtils.h"
 
 #include <condition_variable>
 #include <future>
@@ -94,7 +94,7 @@ public:
     {
       // Register a service ten times with different properties
       InterfaceMap im;
-      im[std::string("org.cppmicroservices.c1.") + cppmicroservices::ToString(c)] = std::make_shared<int>(1);
+      im[std::string("org.cppmicroservices.c1.") + testing::ToString(c)] = std::make_shared<int>(1);
       ServiceProperties props;
       props["i"] = i;
       auto reg = context.RegisterService(std::make_shared<const InterfaceMap>(im), props);

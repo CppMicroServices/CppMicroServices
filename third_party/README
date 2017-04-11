@@ -104,3 +104,14 @@ Patches
 
  * Use system function clock_gettime on Mac OS X 10.12 and above
 
+Mustache
+--------
+
+See webconsole/include/cppmicroservices/webconsole/mustache.hpp for license information.
+
+https://github.com/kainjow/Mustache/releases
+2.0
+
+Patches
+
+ * Support GCC 4.6

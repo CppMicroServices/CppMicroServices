@@ -1,48 +1,67 @@
-#! \ingroup MicroServicesCMake
-#! \brief Embed resources in a library or executable.
-#!
-#! This CMake function uses an external command line program to generate a ZIP archive
-#! containing data from external resources such as text files or images or other ZIP
-#! archives. The created archive file is appended or embedded as a binary blob to the target file.
-#!
-#! \note To set-up correct file dependencies from your bundle target to your resource
-#!       files, you have to add a special source file to the source list of the target.
-#!       The source file name can be retrieved by using #usFunctionGetResourceSource.
-#!       This ensures that changed resource files will automatically be re-added to the
-#!       bundle.
-#!
-#! There are two differend modes for including resources: APPEND and LINK. In APPEND mode,
-#! the generated zip file is appended at the end of the target file. In LINK mode, the
-#! zip file is compiled / linked into the target using platform specific techniques. LINK
-#! mode is necessary if certain tools make additional assumptions about the object layout
-#! of the target file (e.g. codesign on MacOS). LINK mode may result in slower bundle
-#! initialization and bigger object files. The default mode is LINK mode on MacOS and
-#! APPEND mode on all other platforms.
-#!
-#! Example usage:
-#! \code{.cmake}
-#! set(bundle_srcs )
-#! usFunctionEmbedResources(TARGET mylib
-#!                          BUNDLE_NAME org_me_mylib
-#!                          FILES config.properties logo.png
-#!                         )
-#! \endcode
-#!
-#! \param TARGET (required) The target to which the resource files are added.
-#! \param BUNDLE_NAME (required/optional) The bundle name of the target, as specified in
-#!        the \c US_BUNDLE_NAME pre-processor definition of that target. This parameter
-#!        is optional if a target property with the name US_BUNDLE_NAME exists, containing
-#!        the required bundle name.
-#! \param APPEND Append the resources zip file to the target file.
-#! \param LINK Link (embed) the resources zip file if possible.
-#!
-#! For the WORKING_DIRECTORY, COMPRESSION_LEVEL, FILES, ZIP_ARCHIVES parameters see the
-#! documentation of the usFunctionAddResources macro which is called with these parameters if set.
-#!
-#! \sa usFunctionAddResources
-#! \sa usFunctionGetResourceSource
-#! \sa \ref MicroServices_Resources
-#!
+
+#.rst:
+#
+# .. cmake:command:: usFunctionEmbedResources
+#
+# Embed resources in a library or executable.
+#
+# .. code-block:: cmake
+#
+#    usFunctionEmbedResources(TARGET target [BUNDLE_NAME bundle_name] [APPEND | LINK]
+#      [WORKING_DIRECTORY dir] [COMPRESSION_LEVEL level]
+#      [FILES res1...] [ZIP_ARCHIVES archive1...])
+#
+# This CMake function uses an external command line program to generate a ZIP archive
+# containing data from external resources such as text files or images or other ZIP
+# archives. External resources can be added to a bundle using the
+# :cmake:command:`usFunctionAddResources` function or directly using this function
+# using similar parameters. The created archive file is appended or embedded as a
+# binary blob to the target file.
+#
+# .. note::
+#
+#    To set-up correct file dependencies from your bundle target to your resource
+#    files, you have to add a special source file to the source list of the target.
+#    The source file name can be retrieved by using :cmake:command:`usFunctionGetResourceSource`.
+#    This ensures that changed resource files will automatically be re-added to the
+#    bundle.
+#
+# There are two differend modes for including resources: *APPEND* and *LINK*. In *APPEND* mode,
+# the generated zip file is appended at the end of the target file. In *LINK* mode, the
+# zip file is compiled / linked into the target using platform specific techniques. *LINK*
+# mode is necessary if certain tools make additional assumptions about the object layout
+# of the target file (e.g. codesign on MacOS). *LINK* mode may result in slower bundle
+# initialization and bigger object files. The default mode is *LINK* mode on MacOS and
+# *APPEND* mode on all other platforms.
+#
+# .. code-block:: cmake
+#    :caption: Example
+#
+#    usFunctionEmbedResources(TARGET mylib
+#                             BUNDLE_NAME org_me_mylib
+#                             FILES config.properties logo.png
+#                            )
+#
+# **One-value keywords**
+#    * ``TARGET`` (required): The target to which the resource files are added.
+#    * ``BUNDLE_NAME`` (required/optional): The bundle name of the target, as specified in
+#      the ``US_BUNDLE_NAME`` pre-processor definition of that target. This parameter
+#      is optional if a target property with the name ``US_BUNDLE_NAME`` exists, containing
+#      the required bundle name.
+#
+# **Options**
+#    * ``APPEND``: Append the resources zip file to the target file.
+#    * ``LINK``: Link (embed) the resources zip file if possible.
+#
+# For the ``WORKING_DIRECTORY``, ``COMPRESSION_LEVEL``, ``FILES``, ``ZIP_ARCHIVES`` parameters see the
+# documentation of the usFunctionAddResources macro which is called with these parameters if set.
+#
+# .. seealso::
+#
+#    | :cmake:command:`usFunctionAddResources`
+#    | :cmake:command:`usFunctionGetResourceSource`
+#    | :any:`concept-resources`
+#
 function(usFunctionEmbedResources)
 
   cmake_parse_arguments(US_RESOURCE "APPEND;LINK" "TARGET;BUNDLE_NAME;WORKING_DIRECTORY;COMPRESSION_LEVEL" "FILES;ZIP_ARCHIVES" ${ARGN})
@@ -136,7 +155,7 @@ function(usFunctionEmbedResources)
   if(US_RESOURCE_LINK)
     if(APPLE)
       # Issue #151: Since we explicitly compile CMakeResourceDependencies.cpp, we cache the OSX specific compiler flags
-      set(US_OSX_CXX_FLAGS ) 
+      set(US_OSX_CXX_FLAGS )
       if(CMAKE_OSX_SYSROOT)
         list(APPEND US_OSX_CXX_FLAGS -isysroot ${CMAKE_OSX_SYSROOT})
       endif()
@@ -207,7 +226,7 @@ function(usFunctionEmbedResources)
     add_custom_command(
       TARGET ${US_RESOURCE_TARGET}
       POST_BUILD
-      COMMAND ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_BUNDLE_NAME} -z ${_zip_archive}
+      COMMAND ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> -z ${_zip_archive}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM

@@ -44,14 +44,20 @@ DEALINGS IN THE SOFTWARE.
 #include <typeinfo>
 #include <vector>
 
+/**
+
+\defgroup gr_any Any
+
+\brief The Any class and related functions.
+
+*/
+
 namespace cppmicroservices {
 
 class Any;
 
-US_Framework_EXPORT std::string any_value_to_string(const Any& any);
 US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const Any& any);
 
-US_Framework_EXPORT std::string any_value_to_json(const Any& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const Any& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const std::string& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val);
@@ -69,7 +75,7 @@ std::ostream& any_value_to_string(std::ostream& os, const T& val)
 template<class T>
 std::ostream& any_value_to_json(std::ostream& os, const T& val)
 {
-  return any_value_to_string(os, val);
+  return os << val;
 }
 
 /**
@@ -108,7 +114,7 @@ std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2)
   {
     if (i1 == begin)
     {
-      os << any_value_to_json(*i1);
+      any_value_to_json(os, *i1);
     }
     else
     {
@@ -170,7 +176,7 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
 
 
 /**
- * \ingroup MicroServicesUtils
+ * \ingroup gr_any
  *
  * An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
  * of the internally stored data.
@@ -212,6 +218,11 @@ public:
     : _content(other._content ? other._content->Clone() : 0)
   {}
 
+  /**
+   * Move constructor.
+   *
+   * @param other The Any to move
+   */
   Any(Any&& other)
     : _content(std::move(other._content))
   {}
@@ -242,6 +253,17 @@ public:
     return *any_cast<ValueType>(this) == val;
   }
 
+  /**
+   * Compares this Any with another value for inequality.
+   *
+   * This is the same as
+   * \code
+   * !this->operator==(val)
+   * \endcode
+   *
+   * \param val The value to compare to.
+   * \returns \c true if this Any does not contain value \c val, \c false otherwise.
+   */
   template <typename ValueType>
   bool operator!=(const ValueType& val)
   {
@@ -277,6 +299,12 @@ public:
     return *this;
   }
 
+  /**
+   * Move assignment operator for Any.
+   *
+   * \param rhs The Any which should be moved into this Any.
+   * \return A reference to this Any.
+   */
   Any& operator=(Any&& rhs)
   {
     _content = std::move(rhs._content);
@@ -394,6 +422,12 @@ private:
     std::unique_ptr<Placeholder> _content;
 };
 
+/**
+ * \ingroup gr_any
+ *
+ * The BadAnyCastException class is thrown in case
+ * of casting an Any instance
+ */
 class BadAnyCastException : public std::bad_cast
 {
 public:
@@ -419,6 +453,8 @@ private:
 };
 
 /**
+ * \ingroup gr_any
+ *
  * any_cast operator used to extract the ValueType from an Any*. Will return a pointer
  * to the stored value.
  *
@@ -437,6 +473,8 @@ ValueType* any_cast(Any* operand)
 }
 
 /**
+ * \ingroup gr_any
+ *
  * any_cast operator used to extract a const ValueType pointer from an const Any*. Will return a const pointer
  * to the stored value.
  *
@@ -453,13 +491,17 @@ const ValueType* any_cast(const Any* operand)
 }
 
 /**
+ * \ingroup gr_any
+ *
  * any_cast operator used to extract a copy of the ValueType from an const Any&.
  *
  * Example Usage:
  * \code
  * MyType tmp = any_cast<MyType>(anAny)
  * \endcode
- * Will throw a BadCastException if the cast fails.
+ *
+ * \throws BadAnyCastException if the cast fails.
+ *
  * Dont use an any_cast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
  * Some compilers will accept this code although a copy is returned. Use the ref_any_cast in
  * these cases.
@@ -473,13 +515,17 @@ ValueType any_cast(const Any& operand)
 }
 
 /**
+ * \ingroup gr_any
+ *
  * any_cast operator used to extract a copy of the ValueType from an Any&.
  *
  * Example Usage:
  * \code
  * MyType tmp = any_cast<MyType>(anAny)
  * \endcode
- * Will throw a BadCastException if the cast fails.
+ *
+ * \throws BadAnyCastException if the cast fails.
+ *
  * Dont use an any_cast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
  * Some compilers will accept this code although a copy is returned. Use the ref_any_cast in
  * these cases.
@@ -493,12 +539,16 @@ ValueType any_cast(Any& operand)
 }
 
 /**
+ * \ingroup gr_any
+ *
  * ref_any_cast operator used to return a const reference to the internal data.
  *
  * Example Usage:
  * \code
  * const MyType& tmp = ref_any_cast<MyType>(anAny);
  * \endcode
+ *
+ * \throws BadAnyCastException if the cast fails.
  */
 template <typename ValueType>
 const ValueType& ref_any_cast(const Any & operand)
@@ -509,12 +559,16 @@ const ValueType& ref_any_cast(const Any & operand)
 }
 
 /**
+ * \ingroup gr_any
+ *
  * ref_any_cast operator used to return a reference to the internal data.
  *
  * Example Usage:
  * \code
  * MyType& tmp = ref_any_cast<MyType>(anAny);
  * \endcode
+ *
+ * \throws BadAnyCastException if the cast fails.
  */
 template <typename ValueType>
 ValueType& ref_any_cast(Any& operand)
@@ -536,7 +590,7 @@ ValueType& ref_any_cast(Any& operand)
 template <typename ValueType>
 ValueType* unsafe_any_cast(Any* operand)
 {
-  return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
+  return &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held;
 }
 
 /**

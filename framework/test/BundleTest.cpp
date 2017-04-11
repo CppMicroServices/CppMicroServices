@@ -35,7 +35,6 @@
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <thread>
 
@@ -142,8 +141,8 @@ void frame020a()
 
   US_TEST_CONDITION_REQUIRED(buA.GetState() == Bundle::STATE_INSTALLED, "Test bundle A in state installed")
 
-  US_TEST_CONDITION(buA.GetLastModified() > Clock::time_point(), "Test bundle A last modified")
-  US_TEST_CONDITION(buA.GetLastModified() <= Clock::now(), "Test bundle A last modified")
+  US_TEST_CONDITION(buA.GetLastModified() > Bundle::TimeStamp(), "Test bundle A last modified")
+  US_TEST_CONDITION(buA.GetLastModified() <= detail::Clock::now(), "Test bundle A last modified")
 
   // Check that no service reference exist yet.
   ServiceReferenceU sr1 = bc.GetServiceReference("cppmicroservices::TestBundleAService");
@@ -213,7 +212,7 @@ void frame020b()
   US_TEST_CONDITION(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + cppmicroservices::ToString(buA.GetBundleId()) + testing::DIR_SEP;
+  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + testing::ToString(buA.GetBundleId()) + testing::DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 
@@ -275,7 +274,7 @@ void frame035a()
   // check expected meta-data
   US_TEST_CONDITION("main" == buExec.GetSymbolicName(), "Test bundle name")
   US_TEST_CONDITION(BundleVersion(0,1,0) == buExec.GetVersion(), "Test test driver bundle version")
-  US_TEST_CONDITION(BundleVersion(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION) == buExec.GetBundleContext().GetBundle(systemId).GetVersion(), "Test CppMicroServices version")
+  US_TEST_CONDITION(BundleVersion(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH) == buExec.GetBundleContext().GetBundle(systemId).GetVersion(), "Test CppMicroServices version")
 }
 
 
@@ -509,7 +508,7 @@ void TestBundleStates()
     bundle.Uninstall();
     US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED, "Test uninstalled bundle state")
     US_TEST_CONDITION(lm < bundle.GetLastModified(), "Last modified time changed after uninstall")
-    US_TEST_CONDITION(bundle.GetLastModified() <= Clock::now(), "Last modified time <= now")
+    US_TEST_CONDITION(bundle.GetLastModified() <= detail::Clock::now(), "Last modified time <= now")
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
     bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundle));

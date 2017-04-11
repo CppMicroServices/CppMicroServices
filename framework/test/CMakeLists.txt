@@ -16,7 +16,10 @@ endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/TestingConfig.h")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ../../third_party
+  )
 
 #-----------------------------------------------------------------------------
 # Create test bundles
@@ -89,7 +92,7 @@ create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_ex
 set(_third_party_srcs ../../third_party/miniz.c)
 
 # Generate a custom "bundle init" file for the test driver executable
-usFunctionGenerateBundleInit(_srcs)
+usFunctionGenerateBundleInit(TARGET ${_test_driver} OUT _srcs)
 
 usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs} ${_third_party_srcs})

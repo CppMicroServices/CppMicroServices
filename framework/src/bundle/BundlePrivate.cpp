@@ -487,7 +487,7 @@ void BundlePrivate::Uninstall()
       //generations.set(0, new BundleGeneration(oldGen));
       //oldGen.purge(false);
       Purge();
-      barchive->SetLastModified(Clock::now());
+      barchive->SetLastModified(detail::Clock::now());
       operation = BundlePrivate::OP_IDLE;
       if (!bundleDir.empty())
       {
@@ -578,6 +578,11 @@ void BundlePrivate::Start(uint32_t options)
     operation = BundlePrivate::OP_IDLE;
     coreCtx->resolver.NotifyAll();
   }
+}
+
+AnyMap BundlePrivate::GetHeaders() const
+{
+  return bundleManifest.GetHeaders();
 }
 
 std::exception_ptr BundlePrivate::Start0()
@@ -809,10 +814,10 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   , aborted(static_cast<uint8_t>(Aborted::NONE))
   , bundleThread()
   , symbolicName(Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
-  , version(CppMicroServices_MAJOR_VERSION, CppMicroServices_MINOR_VERSION, CppMicroServices_PATCH_VERSION)
+  , version(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH)
   , fragment()
   , lazyActivation(false)
-  , timeStamp(Clock::now())
+  , timeStamp(detail::Clock::now())
   , fragments()
   , bundleManifest()
   , lib()

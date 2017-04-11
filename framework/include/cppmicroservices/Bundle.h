@@ -27,7 +27,7 @@
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/BundleVersion.h"
-#include "cppmicroservices/Chrono.h"
+#include "cppmicroservices/detail/Chrono.h"
 
 #include <memory>
 #include <map>
@@ -47,7 +47,14 @@ class ServiceReference;
 typedef ServiceReference<void> ServiceReferenceU;
 
 /**
+\defgroup gr_bundle Bundle
+
+\brief Groups Bundle class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
  *
  * An installed bundle in the Framework.
  *
@@ -93,8 +100,11 @@ class US_Framework_EXPORT Bundle
 
 public:
 
-  typedef Clock::time_point TimeStamp;
+  typedef detail::Clock::time_point TimeStamp;
 
+  /**
+   * The bundle state.
+   */
   enum State : uint32_t {
 
     /**
@@ -143,7 +153,7 @@ public:
      *
      * A bundle is in the \c STATE_STARTING state when its {@link #Start(uint32_t)
      * Start} method is active. A bundle must be in this state when the bundle's
-     * {@link BundleActivator#Start(BundleContext)} is called.
+     * BundleActivator#Start(BundleContext) is called.
      * If the \c BundleActivator#Start method completes without exception, then
      * the bundle has successfully started and moves to the \c STATE_ACTIVE
      * state.
@@ -389,7 +399,11 @@ public:
    *
    * @deprecated Since 3.0, use GetHeaders() instead.
    *
-   * @sa \ref MicroServices_BundleProperties
+   * \rststar
+   * .. seealso::
+   *
+   *    :any:`concept-bundle-properties`
+   * \endrststar
    */
   std::map<std::string, Any> GetProperties() const;
 
@@ -426,11 +440,15 @@ public:
    * @return The value of the requested property, or an empty string
    *         if the property is undefined.
    *
-   * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperty
-   * instead.
+   * \rststar
+   * .. deprecated:: 3.0
+   *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` or :any:`BundleContext::GetProperty(const std::string&) <cppmicroservices::BundleContext::GetProperty>` instead.
    *
-   * @sa GetPropertyKeys()
-   * @sa \ref MicroServices_BundleProperties
+   * .. seealso::
+   *
+   *    | :any:`cppmicroservices::Bundle::GetPropertyKeys`
+   *    | :any:`concept-bundle-properties`
+   * \endrststar
    */
   US_DEPRECATED Any GetProperty(const std::string& key) const;
 
@@ -442,7 +460,11 @@ public:
    * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperties()
    * instead.
    *
-   * @sa \ref MicroServices_BundleProperties
+   * \rststar
+   * .. seealso::
+   *
+   *    :any:`concept-bundle-properties`
+   * \endrststar
    */
   US_DEPRECATED std::vector<std::string> GetPropertyKeys() const;
 
@@ -458,7 +480,7 @@ public:
    * @return A list of ServiceReference objects for services this
    * bundle has registered.
    *
-   * @throws std::logic_error If this bundle has been uninstalled, if 
+   * @throws std::logic_error If this bundle has been uninstalled, if
    *         the ServiceRegistrationBase object is invalid, or if the service is unregistered.
    */
   std::vector<ServiceReferenceU> GetRegisteredServices() const;
@@ -541,7 +563,7 @@ public:
    * <em>Started with eager activation</em> if not set.
    *
    * The following steps are executed to start this bundle:
-   * -# If this bundle is in the process of being activated or deactivated, 
+   * -# If this bundle is in the process of being activated or deactivated,
    *    then this method waits for activation or deactivation to complete
    *    before continuing. If this does not occur in a reasonable time, a
    *    \c std::runtime_error is thrown to indicate this bundle was unable to
@@ -754,14 +776,23 @@ protected:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
+ *
+ * Streams a textual representation of ``bundle`` into the stream ``os``.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const Bundle& bundle);
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
+ *
+ * This is the same as calling ``os << *bundle``.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, Bundle const * bundle);
 /**
  * \ingroup MicroServices
+ * \ingroup gr_bundle
+ *
+ * Streams a textual representation of the bundle state enumeration.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, Bundle::State state);
 

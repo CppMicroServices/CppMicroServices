@@ -36,7 +36,16 @@ class BundleContextPrivate;
 }
 
 /**
+
+\defgroup gr_macros Macros
+
+\brief Preprocessor macros.
+
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_macros
  *
  * \brief Initialize a static bundle.
  *
@@ -44,12 +53,17 @@ class BundleContextPrivate;
  *
  * This macro initializes the static bundle named \c _bundle_name.
  *
- * If the bundle provides an activator, use the #CPPMICROSERVICES_IMPORT_BUNDLE macro instead,
- * to ensure that the activator is called. Do not forget to actually link
- * the static bundle to the importing executable or shared library.
+ * If the bundle provides an activator, use the #CPPMICROSERVICES_IMPORT_BUNDLE
+ * macro instead, to ensure that the activator is referenced and can be called.
+ * Do not forget to actually link the static bundle to the importing executable or
+ * shared library.
  *
- * \sa CPPMICROSERVICES_IMPORT_BUNDLE
- * \sa \ref MicroServices_StaticBundles
+ * \rststar
+ * .. seealso::
+ *
+ *    | :any:`CPPMICROSERVICES_IMPORT_BUNDLE`
+ *    | :any:`concept-static-bundles`
+ * \endrststar
  */
 #define CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                            \
   extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(_bundle_name) ();            \
@@ -61,7 +75,7 @@ class BundleContextPrivate;
   }
 
 /**
- * \ingroup MicroServices
+ * \ingroup gr_macros
  *
  * \brief Import a static bundle.
  *
@@ -70,7 +84,7 @@ class BundleContextPrivate;
  * This macro imports the static bundle named \c _bundle_name.
  *
  * Inserting this macro into your application's source code will allow you to make use of
- * a static bundle. It will initialize the static bundle and calls its
+ * a static bundle. It will initialize the static bundle and reference its
  * BundleActivator. If the bundle does not provide an activator, use the
  * #CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE macro instead. Do not forget to actually link
  * the static bundle to the importing executable or shared library.
@@ -78,8 +92,12 @@ class BundleContextPrivate;
  * Example:
  * \snippet uServices-staticbundles/main.cpp ImportStaticBundleIntoMain
  *
- * \sa CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE
- * \sa \ref MicroServices_StaticBundles
+ * \rststar
+ * .. seealso::
+ *
+ *    | :any:`CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE`
+ *    | :any:`concept-static-bundles`
+ * \endrststar
  */
 #define CPPMICROSERVICES_IMPORT_BUNDLE(_bundle_name)                                            \
   CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                       \

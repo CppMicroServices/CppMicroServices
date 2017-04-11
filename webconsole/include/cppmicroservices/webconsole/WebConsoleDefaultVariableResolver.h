@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,17 +23,34 @@
 #ifndef CPPMICROSERVICES_WEBCONSOLEDEFAULTVARIABLERESOLVER_H
 #define CPPMICROSERVICES_WEBCONSOLEDEFAULTVARIABLERESOLVER_H
 
+#include "cppmicroservices/webconsole/WebConsoleExport.h"
 #include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
+#include "cppmicroservices/webconsole/mustache.hpp"
 
 #include <map>
 
 namespace cppmicroservices {
 
-class WebConsoleDefaultVariableResolver : public std::map<std::string,std::string>, public WebConsoleVariableResolver
+typedef Kainjow::Mustache::Data MustacheData;
+
+/**
+ * The default Web Console variable resolver class.
+ *
+ * This variable resolver uses Mustache template logic to resolve
+ * variables.
+ */
+class US_WebConsole_EXPORT WebConsoleDefaultVariableResolver
+    : public WebConsoleVariableResolver
 {
 public:
 
   virtual std::string Resolve(const std::string &variable) const;
+
+  MustacheData& GetData();
+
+private:
+
+  MustacheData m_Data;
 };
 
 }

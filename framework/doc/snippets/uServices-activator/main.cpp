@@ -1,5 +1,7 @@
 #include "cppmicroservices/BundleActivator.h"
 
+#include <iostream>
+
 using namespace cppmicroservices;
 
 //! [0]
@@ -22,6 +24,9 @@ CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 int main(int /*argc*/, char* /*argv*/[])
 {
-  MyActivator ma;
+  std::cout << "This snippet is not meant to be executed.\n"
+               "It does not provide a complete working example.\n"
+               "See http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
+            << std::endl;
   return 0;
 }

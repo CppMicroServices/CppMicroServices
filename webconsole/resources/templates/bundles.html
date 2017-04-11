@@ -1,0 +1,22 @@
+<div class="container-fluid">
+  <h1>{{pluginTitle}}</h1>
+  
+  <div class="row">
+
+    <div class="col-md-12 table-responsive">
+      <table class="table table-striped">
+        
+        <thead><tr><th>Id</th><th>Name</th><th>Version</th><th>Status</th></tr></thead>
+
+        <tbody>
+          {{#bundles}}
+          <tr><td>{{id}}</td><td><a href="{{pluginRoot}}/{{id}}">{{name}} ({{bsn}})</a></td><td>{{version}}</td><td>{{state}}</td></tr>
+          {{/bundles}}
+        </tbody>
+
+      </table>
+    </div>
+    
+  </div>
+  
+</div> <!-- /container -->

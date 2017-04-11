@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -46,55 +47,53 @@ public:
   /**
    * Creates new Simple Web Console Plugin with the given category.
    *
-   * @param label the front label. See
-   *            {@link AbstractWebConsolePlugin#getLabel()}
-   * @param title the plugin title . See
-   *            {@link AbstractWebConsolePlugin#getTitle()}
+   * @param label the front label. See AbstractWebConsolePlugin#GetLabel()
+   * @param title the plugin title . See AbstractWebConsolePlugin#GetTitle()
    * @param category the plugin's navigation category. See
-   *            {@link AbstractWebConsolePlugin#getCategory()}
+   *        AbstractWebConsolePlugin#GetCategory()
    * @param css the additional plugin CSS. See
-   *            {@link AbstractWebConsolePlugin#getCssReferences()}
+   *        AbstractWebConsolePlugin#GetCssReferences()
    */
   SimpleWebConsolePlugin(const std::string& label, const std::string& title,
                          const std::string& category = std::string(),
                          const std::vector<std::string>& css = std::vector<std::string>());
 
   /**
-   * @see org.apache.felix.webconsole.AbstractWebConsolePlugin#getLabel()
+   * @see AbstractWebConsolePlugin#GetLabel()
    */
   std::string GetLabel() const;
 
   /**
-   * @see org.apache.felix.webconsole.AbstractWebConsolePlugin#getTitle()
+   * @see AbstractWebConsolePlugin#GetTitle()
    */
    std::string GetTitle() const;
 
   /**
-   * @see org.apache.felix.webconsole.AbstractWebConsolePlugin#getCategory()
+   * @see AbstractWebConsolePlugin#GetCategory()
    */
   std::string GetCategory() const;
 
   /**
    * This is an utility method. It is used to register the plugin service. Don't
-   * forget to call the {@link #unregister()} when the plugin is no longer
+   * forget to call #Unregister() when the plugin is no longer
    * needed.
    *
-   * @param bc the bundle context used for service registration.
-   * @return self
+   * @param context the bundle context used for service registration.
+   * @return A shared pointer to this plugin.
    */
-  SimpleWebConsolePlugin* Register(const BundleContext& context = GetBundleContext());
+  std::shared_ptr<SimpleWebConsolePlugin> Register(const BundleContext& context = GetBundleContext());
 
 
   /**
    * An utility method that removes the service, registered by the
-   * {@link #register(BundleContext)} method.
+   * #Register(const BundleContext&) method.
    */
   void Unregister();
 
 protected:
 
   /**
-   * @see org.apache.felix.webconsole.AbstractWebConsolePlugin#getCssReferences()
+   * @see AbstractWebConsolePlugin#GetCssReferences()
    */
   std::vector<std::string> GetCssReferences() const;
 
@@ -103,14 +102,13 @@ protected:
 private:
 
   /**
-   * Called internally by {@link AbstractWebConsolePlugin} to load resources.
+   * Called internally by AbstractWebConsolePlugin to load resources.
    *
    * This particular implementation depends on the label. As example, if the
-   * plugin is accessed as <code>/system/console/abc</code>, and the plugin
-   * resources are accessed like <code>/system/console/abc/res/logo.gif</code>,
+   * plugin is accessed as <code>/us/console/abc</code>, and the plugin
+   * resources are accessed like <code>/us/console/abc/res/logo.gif</code>,
    * the code here will try load resource <code>/res/logo.gif</code> from the
    * bundle, providing the plugin.
-   *
    *
    * @param path the path to read.
    * @return the URL of the resource or <code>null</code> if not found.

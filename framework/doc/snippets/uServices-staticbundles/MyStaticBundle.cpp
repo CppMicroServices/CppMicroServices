@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/BundleActivator.h"
+#include <cppmicroservices/BundleActivator.h>
 
 #include <iostream>
 

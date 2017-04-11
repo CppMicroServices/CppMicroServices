@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,13 +25,14 @@
 
 #include "cppmicroservices/httpservice/HttpServlet.h"
 
+#include "cppmicroservices/webconsole/AbstractWebConsolePlugin.h"
+
 #include "cppmicroservices/ServiceTracker.h"
 
 namespace cppmicroservices {
 
 class HttpServletRequest;
 class HttpServletResponse;
-class AbstractWebConsolePlugin;
 
 class WebConsolePluginTracker : public ServiceTracker<HttpServlet>
 {
@@ -43,11 +45,17 @@ public:
 
   AbstractWebConsolePlugin* GetPlugin(const std::string& label) const;
 
-  std::string GetLabelMapJSON() const;
+  AbstractWebConsolePlugin::TemplateData GetLabelMap(const std::string& current) const;
 
 private:
 
   typedef ServiceTracker<HttpServlet> Superclass;
+
+  struct LabelMapEntry
+  {
+    std::string label;
+    std::string title;
+  };
 
   void Open();
 
@@ -59,8 +67,7 @@ private:
 
   typedef std::map<std::string, AbstractWebConsolePlugin*> PluginMapType;
   PluginMapType m_Plugins;
-  Any m_LabelMapAny;
-  std::vector<Any>* m_Labels;
+  std::map<std::string, LabelMapEntry> m_LabelMap;
 
   std::shared_ptr<ServletContext> m_ServletContext;
 };

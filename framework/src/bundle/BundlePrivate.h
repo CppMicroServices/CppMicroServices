@@ -163,6 +163,8 @@ public:
 
   virtual void Start(uint32_t options);
 
+  virtual AnyMap GetHeaders() const;
+
   /**
    * Start code that is executed in the bundleThread without holding the
    * packages lock.

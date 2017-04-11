@@ -60,6 +60,18 @@ class BundleContext;
  * default constructor so that a <code>%BundleActivator</code>
  * object can be created by the CppMicroServices library.
  *
+ * \rststar
+ * .. note::
+ *
+ *    A bundle activator needs to be *exported* by using the
+ *    :any:`CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR` macro.
+ *    The bundle *manifest.json* :any:`resource <concept-resources>`
+ *    also needs to contain a ::
+ *
+ *       "bundle.activator" : true
+ *
+ *    element.
+ * \endrststar
  */
 struct BundleActivator
 {
@@ -104,7 +116,7 @@ struct BundleActivator
 }
 
 /**
- * \ingroup MicroServices
+ * \ingroup gr_macros
  *
  * \brief Export a bundle activator class.
  *

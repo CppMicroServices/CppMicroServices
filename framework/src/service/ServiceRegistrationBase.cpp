@@ -310,4 +310,9 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(ServiceRegistrationB
   return *this;
 }
 
+std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase&)
+{
+  return os << "cppmicroservices::ServiceRegistrationBase object";
+}
+
 }

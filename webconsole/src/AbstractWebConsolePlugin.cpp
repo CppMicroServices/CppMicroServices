@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -34,8 +35,28 @@
 
 #include <iostream>
 
+namespace Kainjow {
+
+std::ostream& operator<<(std::ostream& os, const Mustache::Data&)
+{
+  os << "Opaque mustache data";
+  return os;
+}
+
+}
 
 namespace cppmicroservices {
+
+std::string NumToString(int64_t val)
+{
+#if defined(__ANDROID__)
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
+}
 
 std::string AbstractWebConsolePlugin::GetCategory() const
 {
@@ -66,7 +87,7 @@ void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request, HttpServletRes
       //pw.println( "</div>" );
 
       // close the main div, body, and html
-      EndResponse(os);
+      EndResponse(request, os);
     }
     else
     {
@@ -77,23 +98,26 @@ void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request, HttpServletRes
 
 std::shared_ptr<WebConsoleVariableResolver> AbstractWebConsolePlugin::GetVariableResolver(HttpServletRequest& request)
 {
-  Any resolverAny = request.GetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER());
+  Any resolverAny = request.GetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER);
   if (!resolverAny.Empty() && resolverAny.Type() == typeid(std::shared_ptr<WebConsoleVariableResolver>))
   {
     return any_cast<std::shared_ptr<WebConsoleVariableResolver>>(resolverAny);
   }
 
   auto resolver = std::make_shared<WebConsoleDefaultVariableResolver>();
-  (*resolver)["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT()).ToString();
-  (*resolver)["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT()).ToString();
+  auto& data = resolver->GetData();
+  data["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
+  data["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
+  data["pluginLabel"] = GetLabel();
+  data["pluginTitle"] = GetTitle();
   SetVariableResolver(request, resolver);
 
   return resolver;
 }
 
-void AbstractWebConsolePlugin::SetVariableResolver(HttpServletRequest& request, std::shared_ptr<WebConsoleVariableResolver> resolver)
+void AbstractWebConsolePlugin::SetVariableResolver(HttpServletRequest& request, const std::shared_ptr<WebConsoleVariableResolver>& resolver)
 {
-  request.SetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER(), resolver);
+  request.SetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER, resolver);
 }
 
 std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& request, HttpServletResponse& response)
@@ -113,17 +137,24 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& reques
   auto resolver = this->GetVariableResolver(request);
   if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
   {
-    (*r)["labelMap"] = request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP()).ToString();
+    auto& data = r->GetData();
+    data["labelMap"] = any_cast<TemplateData>(request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP));
 
-    //    r.put("head.title", title); //$NON-NLS-1$
-    (*r)["head.label"] = GetLabel();
-    //    r.put("head.cssLinks", getCssLinks(appRoot)); //$NON-NLS-1$
-    //    r.put("brand.name", brandingPlugin.getBrandName()); //$NON-NLS-1$
-    //    r.put("brand.product.url", brandingPlugin.getProductURL()); //$NON-NLS-1$
-    //    r.put("brand.product.name", brandingPlugin.getProductName()); //$NON-NLS-1$
-    //    r.put("brand.product.img", toUrl( brandingPlugin.getProductImage(), appRoot )); //$NON-NLS-1$
-    //    r.put("brand.favicon", toUrl( brandingPlugin.getFavIcon(), appRoot )); //$NON-NLS-1$
-    //    r.put("brand.css", toUrl( brandingPlugin.getMainStyleSheet(), appRoot )); //$NON-NLS-1$
+    TemplateData head;
+    head["title"] = title;
+    head["label"] = GetLabel();
+    //    r.put("head.cssLinks", getCssLinks(appRoot));
+    data["head"] = std::move(head);
+
+    TemplateData brand;
+    brand["name"] = "C++ Micro Services";
+    //    r.put("brand.name", brandingPlugin.getBrandName());
+    //    r.put("brand.product.url", brandingPlugin.getProductURL());
+    //    r.put("brand.product.name", brandingPlugin.getProductName());
+    //    r.put("brand.product.img", toUrl( brandingPlugin.getProductImage(), appRoot ));
+    //    r.put("brand.favicon", toUrl( brandingPlugin.getFavIcon(), appRoot ));
+    //    r.put("brand.css", toUrl( brandingPlugin.getMainStyleSheet(), appRoot ));
+    data["brand"] = std::move(brand);
   }
   os << GetHeader();
 
@@ -181,8 +212,32 @@ void AbstractWebConsolePlugin::RenderTopNavigation(HttpServletRequest& /*request
 //  }
 }
 
-void AbstractWebConsolePlugin::EndResponse(std::ostream& os)
+void AbstractWebConsolePlugin::EndResponse(HttpServletRequest& request, std::ostream& os)
 {
+  auto resolver = this->GetVariableResolver(request);
+  if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
+  {
+    auto& data = r->GetData();
+    data["us-version"] = US_VERSION_STR;
+
+    auto ctx = GetBundleContext();
+    auto bundles = ctx.GetBundles();
+    int active_count = 0;
+    for (auto& b : bundles)
+    {
+      if (b.GetState() & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING))
+      {
+        ++active_count;
+      }
+    }
+    std::stringstream ss;
+    ss << bundles.size();
+    data["us-num-bundles"] = ss.str();
+    ss.str(std::string());
+    ss << active_count;
+    data["us-num-active-bundles"] = ss.str();
+  }
+
   os << GetFooter();
 }
 

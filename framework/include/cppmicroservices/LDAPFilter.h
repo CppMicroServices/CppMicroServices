@@ -38,7 +38,14 @@ class ServiceReferenceBase;
 class Bundle;
 
 /**
+\defgroup gr_ldap LDAP Filter
+
+\brief Groups LDAPFilter class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_ldap
  *
  * An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter.
  *
@@ -111,12 +118,12 @@ public:
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    */
   bool Match(const ServiceReferenceBase& reference) const;
-    
+
  /**
    * Filter using a bundle's manifest properties.
    * <p>
    * This <code>LDAPFilter</code> is executed using the keys and values of the
-   * bundle's manifest properties. The keys are looked up in a case insensitive 
+   * bundle's manifest properties. The keys are looked up in a case insensitive
    * manner.
    *
    * @param bundle The bundle whose properties are used
@@ -125,7 +132,7 @@ public:
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    */
   bool Match(const Bundle& bundle) const;
-  
+
   /**
    * Filter using a <code>AnyMap</code> object with case insensitive key lookup. This
    * <code>LDAPFilter</code> is executed using the specified <code>AnyMap</code>'s keys
@@ -183,6 +190,10 @@ protected:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_ldap
+ *
+ * Streams the string representation of \c filter into the stream \c os
+ * via LDAPFilter::ToString().
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter);
 

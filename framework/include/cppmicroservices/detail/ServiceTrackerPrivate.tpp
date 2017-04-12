@@ -40,7 +40,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer
     )
-  : context(context), customizer(customizer), trackReference(reference),
+  : context(context), customizer(customizer), listenerToken(), trackReference(reference),
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
@@ -70,7 +70,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer
     )
-  : context(context), customizer(customizer), trackClass(clazz),
+  : context(context), customizer(customizer), listenerToken(), trackClass(clazz),
     trackReference(), trackedService(), cachedReference(),
     cachedService(), q_ptr(st)
 {
@@ -101,7 +101,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTrackerCustomizer<S,T>* customizer
     )
   : context(context), filter(filter), customizer(customizer),
-    listenerFilter(filter.ToString()), trackReference(),
+    listenerFilter(filter.ToString()), listenerToken(), trackReference(),
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();

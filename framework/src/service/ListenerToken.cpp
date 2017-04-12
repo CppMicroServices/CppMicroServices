@@ -10,7 +10,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,32 +20,41 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
-#define CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
+#include "cppmicroservices/ListenerToken.h"
 
-#include "cppmicroservices/ServiceListenerHook.h"
-#include "cppmicroservices/SharedData.h"
-
-#include "ServiceListenerEntry.h"
+#include <utility>
 
 namespace cppmicroservices {
 
-class ServiceListenerHook::ListenerInfoData : public SharedData
+ListenerToken::ListenerToken()
+  : tokenId(ListenerTokenId(0))
+{}
+
+ListenerToken::ListenerToken(ListenerTokenId _tokenId)
+  : tokenId(_tokenId)
+{}
+
+ListenerToken::ListenerToken(ListenerToken&& other)
+  : tokenId(std::move(other.tokenId))
 {
-public:
-  ListenerInfoData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                   void* data, ListenerTokenId tokenId, const std::string& filter);
-
-  virtual ~ListenerInfoData();
-
-  std::shared_ptr<BundleContextPrivate> const context;
-  ServiceListener listener;
-  void* data;
-  ListenerTokenId tokenId;
-  std::string filter;
-  bool bRemoved;
-};
-
+  other.tokenId = ListenerTokenId(0);
 }
 
-#endif // CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
+ListenerToken& ListenerToken::operator=(ListenerToken&& other)
+{
+  tokenId = std::move(other.tokenId);
+  other.tokenId = ListenerTokenId(0);
+  return *this;
+}
+
+ListenerToken::operator bool() const
+{
+  return (tokenId != ListenerTokenId(0));
+}
+
+ListenerTokenId ListenerToken::Id() const
+{
+  return tokenId;
+}
+
+}

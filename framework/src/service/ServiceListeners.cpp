@@ -36,32 +36,12 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 #include "ServiceReferenceBasePrivate.h"
 #include "Utils.h"
 
+#include <cassert>
+
 namespace cppmicroservices {
 
-struct BundleListenerCompare : std::binary_function<std::pair<BundleListener, void*>,
-                                                    std::pair<BundleListener, void*>, bool>
-{
-  bool operator()(const std::pair<BundleListener, void*>& p1,
-                  const std::pair<BundleListener, void*>& p2) const
-  {
-    return p1.second == p2.second &&
-           p1.first.target<void(const BundleEvent&)>() == p2.first.target<void(const BundleEvent&)>();
-  }
-};
-
-struct FrameworkListenerCompare : std::binary_function<std::pair<FrameworkListener, void*>,
-                                                       std::pair<FrameworkListener, void*>, bool>
-{
-  bool operator()(const std::pair<FrameworkListener, void*>& p1,
-                  const std::pair<FrameworkListener, void*>& p2) const
-  {
-    return p1.second == p2.second &&
-           p1.first.target<void(const FrameworkEvent&)>() == p2.first.target<void(const FrameworkEvent&)>();
-  }
-};
-
 ServiceListeners::ServiceListeners(CoreBundleContext* coreCtx)
-  : coreCtx(coreCtx)
+  : listenerId(0), coreCtx(coreCtx)
 {
   hashedServiceKeys.push_back(Constants::OBJECTCLASS);
   hashedServiceKeys.push_back(Constants::SERVICE_ID);
@@ -82,32 +62,57 @@ void ServiceListeners::Clear()
   frameworkListenerMap.Lock(), frameworkListenerMap.value.clear();
 }
 
-void ServiceListeners::AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
-                                          void* data, const std::string& filter)
+ListenerToken ServiceListeners::MakeListenerToken()
 {
-  ServiceListenerEntry sle(context, listener, data, filter);
-  RemoveServiceListener(sle);
+  return ListenerToken(++listenerId);
+}
+
+ListenerToken ServiceListeners::AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
+                                                   void* data, const std::string& filter)
+{
+  // The following condition is true only if the listener is a non-static member function.
+  // If so, the existing listener is replaced with the new listener.
+  if (data != nullptr)
+  {
+    RemoveServiceListener(context, ListenerTokenId(0), listener, data);
+  }
+
+  auto token = MakeListenerToken();
+  ServiceListenerEntry sle(context, listener, data, token.Id(), filter);
   {
     auto l = this->Lock(); US_UNUSED(l);
     serviceSet.insert(sle);
     CheckSimple_unlocked(sle);
   }
   coreCtx->serviceHooks.HandleServiceListenerReg(sle);
+  return token;
 }
 
-void ServiceListeners::RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
-                                             void* data)
-{
-  ServiceListenerEntry entryToRemove(context, listener, data);
-  RemoveServiceListener(entryToRemove);
-}
-
-void ServiceListeners::RemoveServiceListener(const ServiceListenerEntry& entryToRemove)
+void ServiceListeners::RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId,
+                                             const ServiceListener& listener, void* data)
 {
   ServiceListenerEntry sle;
   {
     auto l = this->Lock(); US_UNUSED(l);
-    auto it = serviceSet.find(entryToRemove);
+    std::function<bool(const ServiceListenerEntry&)> entryExists;
+    if (tokenId)
+    {
+      assert(!listener);
+      assert(data == nullptr);
+      entryExists = [&context, &tokenId](const ServiceListenerEntry& entry) -> bool
+      {
+        return entry.Contains(context, tokenId);
+      };
+    }
+    else
+    {
+      entryExists = [&context, &listener, &data](const ServiceListenerEntry& entry) -> bool
+      {
+        return entry.Contains(context, listener, data);
+      };
+    }
+
+    auto it = std::find_if(serviceSet.begin(), serviceSet.end(), entryExists);
     if (it != serviceSet.end())
     {
       sle = *it;
@@ -122,40 +127,95 @@ void ServiceListeners::RemoveServiceListener(const ServiceListenerEntry& entryTo
   }
 }
 
-void ServiceListeners::AddBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data)
+ListenerToken ServiceListeners::AddBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data)
 {
+  auto token = MakeListenerToken();
+
   auto l = bundleListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = bundleListenerMap.value[context];
-  if (std::find_if(listeners.begin(), listeners.end(), std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
-  {
-    listeners.push_back(std::make_pair(listener, data));
-  }
+  listeners[token.Id()] = std::make_tuple(listener, data);
+  return token;
 }
 
+/**
+ * Called by the deprecated RemoveBundleListener(name_of_callable)
+ */
 void ServiceListeners::RemoveBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data)
 {
-  auto l = bundleListenerMap.Lock(); US_UNUSED(l);
-  bundleListenerMap.value[context].remove_if(std::bind(BundleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
-}
-
-void ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
-{
-  auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
-  auto& listeners = frameworkListenerMap.value[context];
-  if (std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
+  // Note: Only the "data" part is used to compare for sameness. The listener comparison
+  // always returns "true", because std::function objects aren't equality comparable.
+  auto BundleListenerCompareListenerData = [](const BundleListener& listener, void* data,
+                                              const std::pair<ListenerTokenId,
+                                              ServiceListeners::BundleListenerEntry>& pair)
   {
-    listeners.push_back(std::make_pair(listener, data));
+    return data == std::get<1>(pair.second) &&
+      listener.target<void(const BundleEvent&)>() == std::get<0>(pair.second).target<void(const BundleEvent&)>();
+  };
+
+  auto l = bundleListenerMap.Lock(); US_UNUSED(l);
+  auto& listeners = bundleListenerMap.value[context];
+  auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(BundleListenerCompareListenerData, listener, data, std::placeholders::_1));
+  if (it != listeners.end())
+  {
+    listeners.erase(it);
   }
 }
 
-void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
+ListenerToken ServiceListeners::AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
 {
+  auto token = MakeListenerToken();
+
   auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
   auto& listeners = frameworkListenerMap.value[context];
-  listeners.erase(std::remove_if(listeners.begin(),
-                                 listeners.end(),
-                                 std::bind(FrameworkListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)),
-                  listeners.end());
+  listeners[token.Id()] = std::make_tuple(listener, data);
+  return token;
+}
+
+/**
+ * Called by the deprecated RemoveFrameworkListener(name_of_callable)
+ */
+void ServiceListeners::RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data)
+{
+  // Note: Only the "data" part is used to compare for sameness. The listener comparison
+  // always returns "true", because std::function objects aren't equality comparable.
+  auto FrameworkListenerCompareListenerData = [](const FrameworkListener& listener, void* data,
+                                              const std::pair<ListenerTokenId,
+                                              ServiceListeners::FrameworkListenerEntry>& pair)
+  {
+    return data == std::get<1>(pair.second) &&
+      listener.target<void(const FrameworkEvent&)>() == std::get<0>(pair.second).target<void(const FrameworkEvent&)>();
+  };
+
+  auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
+  auto& listeners = frameworkListenerMap.value[context];
+  auto it = std::find_if(listeners.begin(), listeners.end(), std::bind(FrameworkListenerCompareListenerData, listener, data, std::placeholders::_1));
+  if (it != listeners.end())
+  {
+    listeners.erase(it);
+  }
+}
+
+template <typename T>
+static bool RemoveListenerEntry(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId, T& listenerMap)
+{
+  auto l = listenerMap.Lock(); US_UNUSED(l);
+  auto& listeners = listenerMap.value[context];
+  return (listeners.erase(tokenId) != 0);
+}
+
+void ServiceListeners::RemoveListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerToken token)
+{
+  if (!token)
+  {
+    return;
+  }
+
+  auto tokenId = token.Id();
+  // invoke RemoveServiceListener only if the other two RemoveListener functions return false.
+  if (!(RemoveListenerEntry(context, tokenId, frameworkListenerMap) || RemoveListenerEntry(context, tokenId, bundleListenerMap)))
+  {
+    RemoveServiceListener(context, tokenId, {}, nullptr);
+  }
 }
 
 void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
@@ -163,7 +223,7 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
   // avoid deadlocks, race conditions and other undefined behavior
   // by using a local snapshot of all listeners.
   // A lock shouldn't be held while calling into user code (e.g. callbacks).
-  FrameworkListeners listener_snapshot;
+  FrameworkListenerMap listener_snapshot;
   {
     auto l = frameworkListenerMap.Lock(); US_UNUSED(l);
     listener_snapshot = frameworkListenerMap.value;
@@ -175,11 +235,11 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
     {
       try
       {
-        (listener.first)(evt);
+        std::get<0>(listener.second)(evt);
       }
       catch (...)
       {
-        // do not send a FrameworkEvent as that could cause a deadlock or an inifinite loop.
+        // do not send a FrameworkEvent as that could cause a deadlock or an infinite loop.
         // Instead, log to the internal logger
         // @todo send this to the LogService instead when its supported.
         DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << GetLastExceptionStr() << "\n";
@@ -199,7 +259,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
     {
       try
       {
-        (bundleListener.first)(evt);
+        std::get<0>(bundleListener.second)(evt);
       }
       catch (...)
       {

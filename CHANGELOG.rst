@@ -20,11 +20,22 @@ Changed
 Deprecated
 ~~~~~~~~~~
 
+- The following methods in BundleContext:
+  RemoveBundleListener, RemoveFrameworkListener, RemoveServiceListener.
+  The variants of AddBundleListener, AddFrameworkListener, AddServiceListener that take member functions.
+- The functions: ServiceListenerMemberFunctor, BundleListenerMemberFunctor and BindFrameworkListenerToFunctor.
+
+
 Removed
 ~~~~~~~
 
 Fixed
 ~~~~~
+
+-  Cannot add more than one listener if its expressed as a lambda.
+   `#95 <https://github.com/CppMicroServices/CppMicroServices/issues/95>`_
+-  Removing Listeners does not work well
+   `#83 <https://github.com/CppMicroServices/CppMicroServices/issues/83>`_
 
 Security
 ~~~~~~~~

@@ -16,6 +16,7 @@ set(_srcs
   util/SharedLibrary.cpp
   util/Utils.cpp
 
+  service/ListenerToken.cpp
   service/ServiceException.cpp
   service/ServiceEvent.cpp
   service/ServiceEventListenerHook.cpp

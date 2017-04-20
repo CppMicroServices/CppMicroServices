@@ -32,6 +32,8 @@
 #include "TestingMacros.h"
 #include "TestUtils.h"
 
+#include <thread>
+
 using namespace cppmicroservices;
 
 namespace cppmicroservices {
@@ -167,6 +169,43 @@ void TestServiceFactoryPrototypeScope(BundleContext context)
   bundleH.Stop();
 }
 
+#ifdef US_ENABLE_THREADING_SUPPORT
+
+// test that concurrent calls to ServiceFactory::GetService and ServiceFactory::UngetService
+// don't cause race conditions.
+void TestConcurrentServiceFactory()
+{
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+
+  auto bundle = testing::InstallLib(framework.GetBundleContext(), "TestBundleH");
+  bundle.Start();
+
+  std::vector<std::thread> worker_threads;
+  for (size_t i = 0; i < 100; ++i)
+  {
+    worker_threads.push_back(std::thread([framework]()
+        {
+          for (int i = 0; i < 1000; ++i)
+          {
+              auto frameworkCtx = framework.GetBundleContext();
+              if (frameworkCtx)
+              {
+                auto ref = frameworkCtx.GetServiceReference<cppmicroservices::TestBundleH2>();
+                if (ref)
+                {
+                  std::shared_ptr<cppmicroservices::TestBundleH2> svc = frameworkCtx.GetService(ref);
+                  US_TEST_CONDITION_REQUIRED(svc, "test for valid service object");
+                }
+              }
+          }
+        }));
+  }
+
+  for (auto& t : worker_threads) t.join();
+}
+#endif
+
 int ServiceFactoryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceFactoryTest");
@@ -178,6 +217,10 @@ int ServiceFactoryTest(int /*argc*/, char* /*argv*/[])
   
   TestServiceFactoryPrototypeScope(framework.GetBundleContext());
   TestServiceFactoryBundleScope(framework.GetBundleContext());
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+  TestConcurrentServiceFactory();
+#endif
 
   US_TEST_END()
 }

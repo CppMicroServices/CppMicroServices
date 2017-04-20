@@ -130,7 +130,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundleP
   if (!serviceFactory)
   {
     auto l = registration->Lock(); US_UNUSED(l);
-          s = registration->service;
+    s = registration->service;
     if (s && !s->empty()) ++registration->dependents[bundle];
   }
   else
@@ -225,7 +225,7 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
 
   {
     auto l = registration->Lock(); US_UNUSED(l);
-    int count= registration->dependents[bundle.get()];
+    int count = registration->dependents[bundle.get()];
     if (count > 0)
     {
       hadReferences = true;

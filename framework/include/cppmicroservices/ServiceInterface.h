@@ -24,6 +24,7 @@
 #ifndef CPPMICROSERVICES_SERVICEINTERFACE_H
 #define CPPMICROSERVICES_SERVICEINTERFACE_H
 
+#include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceException.h"
 

@@ -4,9 +4,11 @@
 +-------------+-------------------------+--------------------------+
 | Branch      | GCC 4.6                 | Visual Studio 2013       |
 |             +-------------------------+--------------------------+
-|             | XCode 6.4               | Visual Studio 2015       |
+|             | Xcode 6.4               | Visual Studio 2015       |
 |             +-------------------------+--------------------------+
-|             | XCode 7.3               | MinGW-w64                |
+|             | Xcode 7.3               | MinGW-w64                |
+|             +-------------------------+--------------------------+
+|             | Xcode 8.2               |                          |
 +=============+=========================+==========================+
 | master      | |Linux Build Status|    | |Windows Build status|   |
 +-------------+-------------------------+--------------------------+
@@ -56,7 +58,7 @@ Minimum required compiler versions:
 
 - GCC 4.6
 - Clang 3.1
-- Clang from XCode 6.4
+- Clang from Xcode 6.4
 - Visual Studio 2013
 
 Below is a list of tested compiler/OS combinations:
@@ -64,8 +66,9 @@ Below is a list of tested compiler/OS combinations:
 - GCC 4.6.3 (Ubuntu 12.04) via Travis CI
 - GCC 6.2.1 (Fedora 25)
 - Clang 3.8.0 (Fedora 25)
-- Clang XCode 6.4 (OS X 10.10) via Travis CI
-- Clang XCode 7.3 (OS X 10.11) via Travis CI
+- Clang Xcode 6.4 (OS X 10.10) via Travis CI
+- Clang Xcode 7.3 (OS X 10.11) via Travis CI
+- Clang Xcode 8.2 (OS X 10.12) via Travis CI
 - Visual Studio 2013 via Appveyor
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 RC (Windows 7)

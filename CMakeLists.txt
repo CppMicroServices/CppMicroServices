@@ -225,7 +225,7 @@ set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" C
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 if(APPLE)
   # Avoid RPATH warning in cmakegui
-  set(CMAKE_MACOSX_RPATH 1)
+  set(CMAKE_MACOSX_RPATH ON)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -273,6 +273,8 @@ if(US_BUILD_TESTING)
     find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
     mark_as_advanced(US_COVERAGE_COMMAND)
   endif()
+
+  find_package(GTest REQUIRED)
 endif()
 
 

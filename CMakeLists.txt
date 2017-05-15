@@ -189,6 +189,7 @@ us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
+us_cache_var(GTEST_ROOT "" PATH "Root directory of GTest installation")
 
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
@@ -262,7 +263,19 @@ if(US_BUILD_TESTING)
   enable_testing()
   find_program(US_MEMCHECK_COMMAND valgrind)
   mark_as_advanced(US_MEMCHECK_COMMAND)
+
+  if(GTEST_ROOT STREQUAL "")
+    MESSAGE(STATUS "GTEST_ROOT variable is not defined.")
+  else()
+    MESSAGE(STATUS "GTEST_ROOT: " ${GTEST_ROOT})
+    find_package(GTest REQUIRED)
 endif()
+
+MESSAGE(STATUS "Include directories: " ${GTEST_INCLUDE_DIRS})
+MESSAGE(STATUS "GTest libraries: " ${GTEST_BOTH_LIBRARIES})
+
+endif()
+
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags

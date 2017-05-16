@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -27,6 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceEvent.h"
 
@@ -653,12 +654,37 @@ void TestNonStandardBundleExtension()
   f.Stop();
 }
 
+void TestUnicodePaths()
+{
+	FrameworkFactory factory;
+	auto f = factory.NewFramework();
+	f.Start();
+	auto frameworkCtx = f.GetBundleContext();
+	try 
+	{
+		std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+		auto bundles = frameworkCtx.InstallBundles(path_utf8);
+		US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
+		auto bundle = bundles.at(0);
+		US_TEST_CONDITION(bundle.GetLocation() == path_utf8, "Bundle location is the same as the path used to install");
+		US_TEST_NO_EXCEPTION(bundle.Start());
+		US_TEST_CONDITION(bundle.GetState() == Bundle::State::STATE_ACTIVE, "Bundle with unicode path failed to start");
+		US_TEST_NO_EXCEPTION(bundle.Stop());
+	}
+	catch (...)
+	{
+		US_TEST_CONDITION(false == true, "failed to install bundle");
+	}
+	f.Stop();
+	f.WaitForStop(std::chrono::milliseconds::zero());
+}
+
 }
 
 int BundleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleTest");
-
+  
   {
     auto framework = FrameworkFactory().NewFramework();
     framework.Start();
@@ -706,6 +732,8 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestDuplicateInstall();
   TestAutoInstallEmbeddedBundles();
   TestNonStandardBundleExtension();
+
+  TestUnicodePaths();
 
   US_TEST_END()
 }

@@ -46,6 +46,7 @@ const char DIR_SEP_POSIX = '/';
 
 #ifdef US_PLATFORM_WINDOWS
 const char DIR_SEP = DIR_SEP_WIN32;
+std::unique_ptr<wchar_t[]> UTF8ToWchar(const char* inStr);
 #else
 const char DIR_SEP = DIR_SEP_POSIX;
 #endif

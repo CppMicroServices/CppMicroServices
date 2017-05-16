@@ -15,11 +15,11 @@ matrix:
             apt:
               packages: valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=0
+          env: BUILD_CONFIGURATION=0 WITH_COVERAGE=1
         - os: linux
           addons: *valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=1
+          env: BUILD_CONFIGURATION=1 WITH_COVERAGE=1
         # minimum supported compiler on OS X
         - os: osx
           osx_image: xcode6.4
@@ -40,11 +40,11 @@ matrix:
         - os: osx
           osx_image: xcode8.2
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1
         - os: osx
           osx_image: xcode8.2
           compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1
 
 cache:
   directories:

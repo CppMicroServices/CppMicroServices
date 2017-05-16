@@ -58,10 +58,11 @@ public:
    * Install a new bundle library.
    *
    * @param location The location to be installed
+   * @param caller The bundle performing the install
+   * @return A vector of bundles installed
    */
   std::vector<Bundle> Install(const std::string& location,
-                              BundlePrivate* caller,
-                              bool allowExecutable = false);
+                              BundlePrivate* caller);
 
 
   std::vector<Bundle> Install0(

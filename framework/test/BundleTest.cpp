@@ -592,9 +592,9 @@ void TestAutoInstallEmbeddedBundles()
   auto f = factory.NewFramework();
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
-  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT);
-  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT));
+
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).
   US_TEST_CONDITION(2 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
@@ -602,10 +602,37 @@ void TestAutoInstallEmbeddedBundles()
   // There are atleast 2 bundles, maybe more depending on how the executable is created
   US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #endif
-  auto bundle = frameworkCtx.GetBundles();
+  auto bundles = frameworkCtx.GetBundles();
   US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  bundle[0].Uninstall();
+  bundles[1].Uninstall();
   US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+  
+  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
+  bundles[0].Uninstall();
+  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+  f.Stop();
+}
+
+void TestNonStandardBundleExtension()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "TestBundleExt.cppms"));
+
+#ifdef US_BUILD_SHARED_LIBS
+  // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
+  US_TEST_CONDITION(3 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#else
+  // There are atleast 3 bundles, maybe more depending on how the executable is created
+  US_TEST_CONDITION(3 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#endif
+
+  auto bundle = frameworkCtx.GetBundle(2);
+  US_TEST_NO_EXCEPTION(bundle.Start());
+  US_TEST_NO_EXCEPTION(bundle.Uninstall());
   f.Stop();
 }
 
@@ -661,6 +688,7 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestForInstallFailure();
   TestDuplicateInstall();
   TestAutoInstallEmbeddedBundles();
+  TestNonStandardBundleExtension();
 
   US_TEST_END()
 }

@@ -405,7 +405,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
 
 void BundlePrivate::Uninstall()
 {
-  if (!IsSharedLibrary(GetLocation()))
+  if (BundleUtils::GetExecutablePath() == GetLocation())
   {
     throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
   }
@@ -630,17 +630,17 @@ std::exception_ptr BundlePrivate::Start0()
       CreateActivatorHook createActivatorHook = nullptr;
 
       void* libHandle = nullptr;
-      if(IsSharedLibrary(lib.GetFilePath()))
+      if ((lib.GetFilePath() == BundleUtils::GetExecutablePath()))
+      {
+        libHandle = BundleUtils::GetExecutableHandle();
+      }
+      else
       {
         if (!lib.IsLoaded())
         {
           lib.Load();
         }
         libHandle = lib.GetHandle();
-      }
-      else
-      {
-        libHandle = BundleUtils::GetExecutableHandle();
       }
 
 

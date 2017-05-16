@@ -109,7 +109,8 @@ void SharedLibrary::Load(int flags)
   }
 #else
   US_UNUSED(flags);
-  d->m_Handle = LoadLibrary(libPath.c_str());
+  std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(libPath.c_str()));
+  d->m_Handle = LoadLibraryW(wpath.get());
   if (!d->m_Handle)
   {
     std::string errMsg = "Loading ";

@@ -61,12 +61,32 @@
 #else
   #include "dirent_win32.h"
 #endif
+#define US_STAT struct __stat64
+int us_stat(const char *path,
+			US_STAT *buffer)
+{
+	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
+	return _wstat64(wpath.get(), buffer);
+}
 
-  #define US_STAT struct _stat
-  #define us_stat _stat
-  #define us_mkdir _mkdir
-  #define us_rmdir _rmdir
-  #define us_unlink _unlink
+int us_mkdir(const char* path)
+{
+	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
+	return _wmkdir(wpath.get());
+}
+
+int us_rmdir(const char* path)
+{
+	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
+	return _wrmdir(wpath.get());
+}
+
+int us_unlink(const char* path)
+{
+	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
+	return _wunlink(wpath.get());
+}
+
 #endif
 
 #ifdef US_HAVE_CXXABI_H
@@ -88,10 +108,31 @@ std::string library_suffix()
 #endif
 }
 
+// Convert a wide Unicode string to an UTF8 string
+std::string utf8_encode(const std::wstring &wstr)
+{
+	if (wstr.empty()) return std::string();
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+	std::string strTo(size_needed, 0);
+	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+	return strTo;
 }
 
-namespace cppmicroservices {
+}
 
+
+namespace cppmicroservices {
+	std::unique_ptr<wchar_t[]> UTF8ToWchar(const char* inStr)
+	{
+		if (!inStr)
+		{
+			return nullptr;
+		}
+		int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
+		std::unique_ptr<wchar_t[]> wstr(new wchar_t[wchars_count]);
+		MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr.get(), wchars_count);
+		return wstr;
+	}
 //-------------------------------------------------------------------
 // File system functions
 //-------------------------------------------------------------------
@@ -132,12 +173,12 @@ std::vector<std::string> SplitString(const std::string& str, const std::string& 
 std::string GetCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
-  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
+  DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
   if (bufSize == 0) bufSize = 1;
-  std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-  if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
+  std::shared_ptr<wchar_t> buf(make_shared_array<wchar_t>(bufSize));
+  if (::GetCurrentDirectoryW(bufSize, buf.get()) != 0)
   {
-    return std::string(buf.get());
+    return utf8_encode(buf.get());
   }
 #else
   std::size_t bufSize = PATH_MAX;
@@ -154,6 +195,8 @@ std::string GetCurrentWorkingDirectory()
   return std::string();
 }
 
+
+
 bool Exists(const std::string& path)
 {
 #ifdef US_PLATFORM_POSIX
@@ -164,7 +207,8 @@ bool Exists(const std::string& path)
     else throw std::invalid_argument(GetLastErrorStr());
   }
 #else
-  DWORD attr(::GetFileAttributes(path.c_str()));
+  std::unique_ptr<wchar_t[]> wpath(UTF8ToWchar(path.c_str()));
+  DWORD attr(::GetFileAttributesW(wpath.get()));
   if (attr == INVALID_FILE_ATTRIBUTES)
   {
     if (not_found_error(::GetLastError())) return false;
@@ -194,13 +238,15 @@ bool IsFile(const std::string& path)
     else throw std::invalid_argument(GetLastErrorStr());
   }
   return S_ISREG(s.st_mode);
+
 }
 
 bool IsRelative(const std::string& path)
 {
 #ifdef US_PLATFORM_WINDOWS
   if (path.size() > MAX_PATH) return false;
-  return (TRUE == ::PathIsRelative(path.c_str()))? true:false;
+  std::unique_ptr<wchar_t[]> wpath(UTF8ToWchar(path.c_str()));
+  return (TRUE == ::PathIsRelativeW(wpath.get())) ? true:false;
 #else
   return path.empty() || path[0] != DIR_SEP;
 #endif

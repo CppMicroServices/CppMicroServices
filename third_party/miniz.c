@@ -2850,17 +2850,54 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
   #include <sys/stat.h>
 
   #if defined(_MSC_VER) || defined(__MINGW64__)
+#define UNICODE_SUPPORT 1
+#if UNICODE_SUPPORT
+#include <Windows.h>
+#include <stringapiset.h>
+#include <wchar.h>
+static wchar_t* create_wchar_from_utf8(const char* inStr)
+{
+	int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
+	wchar_t* wstr = malloc(sizeof(wchar_t)*wchars_count);
+	if (MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr, wchars_count) == 0)
+	{
+		// if conversion failed, empty out the buffer.
+		wmemset(wstr, L'\0', wchars_count);
+	}
+	return wstr;
+}
+#endif
+
     static FILE *mz_fopen(const char *pFilename, const char *pMode)
     {
       FILE* pFile = NULL;
+#if UNICODE_SUPPORT
+	  wchar_t* pFilenameW = create_wchar_from_utf8(pFilename);
+	  wchar_t* pModeW = create_wchar_from_utf8(pMode);
+	  (void)_wfopen_s(&pFile, pFilenameW, pModeW);
+	  free(pFilenameW);
+	  free(pModeW);
+#else
       fopen_s(&pFile, pFilename, pMode);
+#endif
       return pFile;
     }
     static FILE *mz_freopen(const char *pPath, const char *pMode, FILE *pStream)
     {
       FILE* pFile = NULL;
+#if UNICODE_SUPPORT
+	  wchar_t* pFilenameW = create_wchar_from_utf8(pPath);
+	  wchar_t* pModeW = create_wchar_from_utf8(pMode);
+	  if (_wfreopen_s(&pFile, pFilenameW, pModeW, pStream))
+	  {
+		  pFile = NULL;
+	  }
+	  free(pFilenameW);
+	  free(pModeW);
+#else
       if (freopen_s(&pFile, pPath, pMode, pStream))
         return NULL;
+#endif
       return pFile;
     }
     #ifndef MINIZ_NO_TIME

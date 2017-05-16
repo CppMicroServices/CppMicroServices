@@ -46,7 +46,11 @@ const char* dlerror(void)
 void* dlopen(const char * path, int mode)
 {
   (void)mode; // ignored
-  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandle(nullptr) : LoadLibrary(path));
+  auto loadLibrary = [](const char* path) -> HANDLE {
+	  std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
+	  return LoadLibraryW(wpath.get());
+  };
+  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr) : loadLibrary(path));
 }
 
 void* dlsym(void *handle, const char *symbol)

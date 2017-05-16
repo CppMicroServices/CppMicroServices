@@ -620,7 +620,7 @@ void TestNonStandardBundleExtension()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
 
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "TestBundleExt.cppms"));
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
 
 #ifdef US_BUILD_SHARED_LIBS
   // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt

@@ -620,9 +620,8 @@ void TestNonStandardBundleExtension()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
 
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
-
 #ifdef US_BUILD_SHARED_LIBS
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
   // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
   US_TEST_CONDITION(3 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #else
@@ -632,7 +631,13 @@ void TestNonStandardBundleExtension()
 
   auto bundle = frameworkCtx.GetBundle(2);
   US_TEST_NO_EXCEPTION(bundle.Start());
+#ifdef US_BUILD_SHARED_LIBS
   US_TEST_NO_EXCEPTION(bundle.Uninstall());
+#else
+  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
+  bundle.Uninstall();
+  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+#endif
   f.Stop();
 }
 

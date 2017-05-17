@@ -249,6 +249,12 @@ function(us_add_tests test_driver)
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
+  if(US_COVERAGE_COMMAND)
+    file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
+    add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception -- $<TARGET_FILE:${test_driver}> ${test}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
+  endif()
   endforeach()
 endfunction()
 
@@ -263,7 +269,12 @@ if(US_BUILD_TESTING)
   enable_testing()
   find_program(US_MEMCHECK_COMMAND valgrind)
   mark_as_advanced(US_MEMCHECK_COMMAND)
+  if(WIN32 AND US_ENABLE_CCOV)
+    find_program(US_COVERAGE_COMMAND OpenCppCoverage)
+    mark_as_advanced(US_COVERAGE_COMMAND)
+  endif()
 endif()
+
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags

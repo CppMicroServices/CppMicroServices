@@ -1,0 +1,6 @@
+coverage:
+  ignore:
+    - "third_party/*"  # ignore folders and all its contents
+
+  fixes:
+    - "projects/cppmicroservices::"

@@ -1,5 +1,25 @@
 
-usFunctionCreateTestBundleWithResources(TestBundleU SOURCES TestBundleU.cpp RESOURCES manifest.json)
+usFunctionCreateTestBundleWithResources(TestBundleU SOURCES TestBundleU.cpp RESOURCES manifest.json LINK_RESOURCES)
 
-set_target_properties(TestBundleU PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/くいりのまちとこしくそ/ )
+# override the library and runtime output directories for the target to include unicode characters
+set(unicode_dir_name くいりのまちとこしくそ)
+if(DEFINED CMAKE_CONFIGURATION_TYPES)
+  foreach(_type ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${_type} cur_config)
+    if(DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY_${_type})
+    else()
+      set_target_properties(TestBundleU PROPERTIES LIBRARY_OUTPUT_DIRECTORY_${cur_config} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${_type}/${unicode_dir_name}/ )
+    endif()
+    if(DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY_${_type})
+    else()
+      set_target_properties(TestBundleU PROPERTIES RUNTIME_OUTPUT_DIRECTORY_${cur_config} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_type}/${unicode_dir_name}/ )
+    endif()
+    get_target_property(propval TestBundleU LIBRARY_OUTPUT_DIRECTORY_${cur_config})
+    get_target_property(propvalr TestBundleU RUNTIME_OUTPUT_DIRECTORY_${cur_config})
+  endforeach()
+endif()
+set_target_properties(TestBundleU PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${unicode_dir_name}/ )
+get_target_property(propval TestBundleU LIBRARY_OUTPUT_DIRECTORY)
+set_target_properties(TestBundleU PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${unicode_dir_name}/ )
+get_target_property(propvalr TestBundleU RUNTIME_OUTPUT_DIRECTORY)
 

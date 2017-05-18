@@ -1,4 +1,4 @@
-﻿/*=============================================================================
+/*=============================================================================
 
   Library: CppMicroServices
 
@@ -612,6 +612,10 @@ void TestAutoInstallEmbeddedBundles()
 
 void TestUnicodePaths()
 {
+  // skip this test if building static libraries or if using compiler lower than Visual Studio 2015
+#if !defined(US_BUILD_SHARED_LIBS) || (defined(_MSC_VER) && (_MSC_VER < 1900))
+  US_TEST_OUTPUT( << "Skipping test point for unicode path");
+#else
 	FrameworkFactory factory;
 	auto f = factory.NewFramework();
 	f.Start();
@@ -637,6 +641,7 @@ void TestUnicodePaths()
 	}
 	f.Stop();
 	f.WaitForStop(std::chrono::milliseconds::zero());
+#endif
 }
 
 }

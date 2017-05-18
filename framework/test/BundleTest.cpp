@@ -624,12 +624,16 @@ void TestUnicodePaths()
 		auto bundle = bundles.at(0);
 		US_TEST_CONDITION(bundle.GetLocation() == path_utf8, "Bundle location is the same as the path used to install");
 		US_TEST_NO_EXCEPTION(bundle.Start());
-		US_TEST_CONDITION(bundle.GetState() == Bundle::State::STATE_ACTIVE, "Bundle with unicode path failed to start");
+		US_TEST_CONDITION(bundle.GetState() == Bundle::State::STATE_ACTIVE, "Bundle check start state");
 		US_TEST_NO_EXCEPTION(bundle.Stop());
 	}
+    catch (const std::exception& ex)
+    {
+        US_TEST_CONDITION(false, ex.what());
+    }
 	catch (...)
 	{
-		US_TEST_CONDITION(false == true, "failed to install bundle");
+		US_TEST_CONDITION(false, "TestUnicodePaths failed with unknown exception");
 	}
 	f.Stop();
 	f.WaitForStop(std::chrono::milliseconds::zero());

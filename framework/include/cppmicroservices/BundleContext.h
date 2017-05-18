@@ -26,7 +26,6 @@
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ListenerToken.h"
-#include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
 

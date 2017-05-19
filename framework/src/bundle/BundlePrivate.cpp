@@ -405,11 +405,6 @@ void BundlePrivate::FinalizeActivation(LockType& l)
 
 void BundlePrivate::Uninstall()
 {
-  if (BundleUtils::GetExecutablePath() == GetLocation())
-  {
-    throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
-  }
-
   {
     auto l = coreCtx->resolver.Lock(); US_UNUSED(l);
     //BundleGeneration current = current();

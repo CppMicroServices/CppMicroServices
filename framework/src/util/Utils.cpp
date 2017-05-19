@@ -108,20 +108,14 @@ std::string library_suffix()
 #endif
 }
 
-// Convert a wide Unicode string to an UTF8 string
-std::string utf8_encode(const std::wstring &wstr)
-{
-	if (wstr.empty()) return std::string();
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-	std::string strTo(size_needed, 0);
-	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-	return strTo;
-}
-
 }
 
 
 namespace cppmicroservices {
+	//-------------------------------------------------------------------
+	// Util functions
+	//-------------------------------------------------------------------
+#ifdef US_PLATFORM_WINDOWS
 	std::unique_ptr<wchar_t[]> UTF8ToWchar(const char* inStr)
 	{
 		if (!inStr)
@@ -133,6 +127,19 @@ namespace cppmicroservices {
 		MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr.get(), wchars_count);
 		return wstr;
 	}
+
+	std::unique_ptr<char[]> WcharToUTF8(const wchar_t* inWStr)
+	{
+		if (!inWStr)
+		{
+			return nullptr;
+		}
+		int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr, static_cast<int>(wcslen(inWStr)), NULL, 0, NULL, NULL);
+		std::unique_ptr<char[]> str(new char[size_needed]);
+		WideCharToMultiByte(CP_UTF8, 0, inWStr, static_cast<int>(wcslen(inWStr)), str.get(), size_needed, NULL, NULL);
+		return str;
+	}
+#endif
 //-------------------------------------------------------------------
 // File system functions
 //-------------------------------------------------------------------
@@ -178,7 +185,7 @@ std::string InitCurrentWorkingDirectory()
   std::shared_ptr<wchar_t> buf(make_shared_array<wchar_t>(bufSize));
   if (::GetCurrentDirectoryW(bufSize, buf.get()) != 0)
   {
-    return utf8_encode(buf.get());
+    return WcharToUTF8(buf.get()).get();
   }
 #else
   std::size_t bufSize = PATH_MAX;
@@ -450,14 +457,14 @@ std::string GetLastErrorStr()
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
 
-  DWORD rc = FormatMessage(
+  DWORD rc = FormatMessageW(
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
                 FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL,
                 dw,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                reinterpret_cast<LPTSTR>(&lpMsgBuf),
+                reinterpret_cast<LPWSTR>(&lpMsgBuf),
                 0, NULL );
 
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -470,11 +477,11 @@ std::string GetLastErrorStr()
     return std::string("Failed to retrieve error message.");
   }
 
-  std::string errMsg(reinterpret_cast<LPCTSTR>(lpMsgBuf));
+  std::unique_ptr<char[]> errMsg = WcharToUTF8(reinterpret_cast<LPCWSTR>(lpMsgBuf));
 
   LocalFree(lpMsgBuf);
 
-  return errMsg;
+  return errMsg.get();
 #endif
 }
 

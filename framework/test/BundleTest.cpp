@@ -592,9 +592,9 @@ void TestAutoInstallEmbeddedBundles()
   auto f = factory.NewFramework();
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
-  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT);
-  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT));
+
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).
   US_TEST_CONDITION(2 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
@@ -602,10 +602,54 @@ void TestAutoInstallEmbeddedBundles()
   // There are atleast 2 bundles, maybe more depending on how the executable is created
   US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #endif
-  auto bundle = frameworkCtx.GetBundles();
-  US_TEST_FOR_EXCEPTION_BEGIN(std::runtime_error)
-  bundle[0].Uninstall();
-  US_TEST_FOR_EXCEPTION_END(std::runtime_error)
+  
+  auto bundles = frameworkCtx.GetBundles();
+  auto bundleIter = std::find_if(bundles.begin(), bundles.end(),
+                                  [](const Bundle& b)
+                                  {
+                                      return (std::string("main") == b.GetSymbolicName());
+                                  }
+                                 );
+
+  US_TEST_CONDITION_REQUIRED(bundleIter != bundles.end(), "Found a valid usFrameworkTestDriver bundle")
+  US_TEST_NO_EXCEPTION((*bundleIter).Start());
+  US_TEST_NO_EXCEPTION((*bundleIter).Uninstall());
+
+  auto b = frameworkCtx.GetBundle(0);
+  US_TEST_FOR_EXCEPTION(std::runtime_error, b.Uninstall());
+  
+  f.Stop();
+}
+
+void TestNonStandardBundleExtension()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+#ifdef US_BUILD_SHARED_LIBS
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
+  // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
+  US_TEST_CONDITION(3 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#else
+  // There are atleast 3 bundles, maybe more depending on how the executable is created
+  US_TEST_CONDITION(3 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
+#endif
+
+  // Test the non-standard file extension bundle's lifecycle
+  auto bundles = frameworkCtx.GetBundles();
+  auto bundleIter = std::find_if(bundles.begin(), bundles.end(), 
+                                  [](const Bundle& b) 
+                                  {
+                                        return (std::string("TestBundleExt") == b.GetSymbolicName());
+                                  }
+                                );
+
+  US_TEST_CONDITION_REQUIRED(bundleIter != bundles.end(), "Found a valid non-standard file extension bundle")
+  US_TEST_NO_EXCEPTION((*bundleIter).Start());
+  US_TEST_NO_EXCEPTION((*bundleIter).Uninstall());
+
   f.Stop();
 }
 
@@ -661,6 +705,7 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestForInstallFailure();
   TestDuplicateInstall();
   TestAutoInstallEmbeddedBundles();
+  TestNonStandardBundleExtension();
 
   US_TEST_END()
 }

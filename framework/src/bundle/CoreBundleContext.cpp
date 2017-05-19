@@ -144,7 +144,7 @@ void CoreBundleContext::Init()
       IsBundleFile(execPath))
   {
   // auto-install all embedded bundles inside the executable
-    bundleRegistry.Install(execPath, systemBundle.get(), true);
+    bundleRegistry.Install(execPath, systemBundle.get());
   }
 
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";

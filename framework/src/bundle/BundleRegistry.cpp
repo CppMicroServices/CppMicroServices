@@ -63,15 +63,9 @@ void BundleRegistry::Clear()
 }
 
 std::vector<Bundle> BundleRegistry::Install(const std::string& location,
-                                            BundlePrivate* caller,
-                                            bool allowExecutable)
+                                            BundlePrivate* caller)
 {
   CheckIllegalState();
-
-  if (!allowExecutable && !IsSharedLibrary(location))
-  {
-    throw std::runtime_error("Cannot install bundles from "+ location +" because it is not a shared library");
-  }
 
   auto l = this->Lock(); US_UNUSED(l);
   auto range = (bundles.Lock(), bundles.v.equal_range(location));

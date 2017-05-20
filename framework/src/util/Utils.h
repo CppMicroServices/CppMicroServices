@@ -46,8 +46,6 @@ const char DIR_SEP_POSIX = '/';
 
 #ifdef US_PLATFORM_WINDOWS
 const char DIR_SEP = DIR_SEP_WIN32;
-std::unique_ptr<wchar_t[]> UTF8ToWchar(const char* inStr);
-std::unique_ptr<char[]> WcharToUTF8(const wchar_t* inWStr);
 #else
 const char DIR_SEP = DIR_SEP_POSIX;
 #endif
@@ -146,6 +144,16 @@ std::string ToString(T val)
 #endif
 }
 
+//-------------------------------------------------------------------
+// Unicode Utility functions
+//-------------------------------------------------------------------
+
+#ifdef US_PLATFORM_WINDOWS
+// method to convert UTF8 std::string to std::wstring
+std::wstring ToWString(const std::string& inStr);
+// method to convert a std::wstring to UTF8 std::string
+std::string ToUTF8String(const std::wstring& inWStr);
+#endif
 
 } // namespace cppmicroservices
 

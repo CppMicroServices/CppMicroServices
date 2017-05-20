@@ -46,9 +46,9 @@ const char* dlerror(void)
 void* dlopen(const char * path, int mode)
 {
   (void)mode; // ignored
-  auto loadLibrary = [](const char* path) -> HANDLE {
-	  std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
-	  return LoadLibraryW(wpath.get());
+  auto loadLibrary = [](const std::string& path) -> HANDLE {
+	  std::wstring wpath(cppmicroservices::ToWString(path));
+	  return LoadLibraryW(wpath.c_str());
   };
   return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr) : loadLibrary(path));
 }

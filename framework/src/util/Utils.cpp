@@ -62,29 +62,29 @@
   #include "dirent_win32.h"
 #endif
 #define US_STAT struct __stat64
-int us_stat(const char *path,
+int us_stat(const std::string& path,
 			US_STAT *buffer)
 {
-	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
-	return _wstat64(wpath.get(), buffer);
+	std::wstring wpath(cppmicroservices::ToWString(path));
+	return _wstat64(wpath.c_str(), buffer);
 }
 
-int us_mkdir(const char* path)
+int us_mkdir(const std::string& path)
 {
-	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
-	return _wmkdir(wpath.get());
+	std::wstring wpath(cppmicroservices::ToWString(path));
+	return _wmkdir(wpath.c_str());
 }
 
-int us_rmdir(const char* path)
+int us_rmdir(const std::string& path)
 {
-	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
-	return _wrmdir(wpath.get());
+	std::wstring wpath(cppmicroservices::ToWString(path));
+	return _wrmdir(wpath.c_str());
 }
 
-int us_unlink(const char* path)
+int us_unlink(const std::string& path)
 {
-	std::unique_ptr<wchar_t[]> wpath(cppmicroservices::UTF8ToWchar(path));
-	return _wunlink(wpath.get());
+	std::wstring wpath(cppmicroservices::ToWString(path));
+	return _wunlink(wpath.c_str());
 }
 
 #endif
@@ -113,31 +113,23 @@ std::string library_suffix()
 
 namespace cppmicroservices {
 	//-------------------------------------------------------------------
-	// Util functions
+	// Unicode Utility functions
 	//-------------------------------------------------------------------
 #ifdef US_PLATFORM_WINDOWS
-	std::unique_ptr<wchar_t[]> UTF8ToWchar(const char* inStr)
+	std::wstring ToWString(const std::string& inStr)
 	{
-		if (!inStr)
-		{
-			return nullptr;
-		}
-		int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
-		std::unique_ptr<wchar_t[]> wstr(new wchar_t[wchars_count]);
-		MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr.get(), wchars_count);
-		return wstr;
+		int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
+		std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchars_count]);
+		MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchars_count);
+		return wBuf.get();
 	}
 
-	std::unique_ptr<char[]> WcharToUTF8(const wchar_t* inWStr)
+	std::string ToUTF8String(const std::wstring& inWStr)
 	{
-		if (!inWStr)
-		{
-			return nullptr;
-		}
-		int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr, static_cast<int>(wcslen(inWStr)), NULL, 0, NULL, NULL);
+		int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
 		std::unique_ptr<char[]> str(new char[size_needed]);
-		WideCharToMultiByte(CP_UTF8, 0, inWStr, static_cast<int>(wcslen(inWStr)), str.get(), size_needed, NULL, NULL);
-		return str;
+		WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), size_needed, NULL, NULL);
+		return str.get();
 	}
 #endif
 //-------------------------------------------------------------------
@@ -182,10 +174,10 @@ std::string InitCurrentWorkingDirectory()
 #ifdef US_PLATFORM_WINDOWS
   DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
   if (bufSize == 0) bufSize = 1;
-  std::shared_ptr<wchar_t> buf(make_shared_array<wchar_t>(bufSize));
+  std::unique_ptr<wchar_t[]> buf(new wchar_t[bufSize]);
   if (::GetCurrentDirectoryW(bufSize, buf.get()) != 0)
   {
-    return WcharToUTF8(buf.get()).get();
+	  return ToUTF8String(std::wstring(buf.get()));
   }
 #else
   std::size_t bufSize = PATH_MAX;
@@ -219,8 +211,8 @@ bool Exists(const std::string& path)
     else throw std::invalid_argument(GetLastErrorStr());
   }
 #else
-  std::unique_ptr<wchar_t[]> wpath(UTF8ToWchar(path.c_str()));
-  DWORD attr(::GetFileAttributesW(wpath.get()));
+  std::wstring wpath(ToWString(path));
+  DWORD attr(::GetFileAttributesW(wpath.c_str()));
   if (attr == INVALID_FILE_ATTRIBUTES)
   {
     if (not_found_error(::GetLastError())) return false;
@@ -257,8 +249,8 @@ bool IsRelative(const std::string& path)
 {
 #ifdef US_PLATFORM_WINDOWS
   if (path.size() > MAX_PATH) return false;
-  std::unique_ptr<wchar_t[]> wpath(UTF8ToWchar(path.c_str()));
-  return (TRUE == ::PathIsRelativeW(wpath.get())) ? true:false;
+  std::wstring wpath(ToWString(path));
+  return (TRUE == ::PathIsRelativeW(wpath.c_str())) ? true:false;
 #else
   return path.empty() || path[0] != DIR_SEP;
 #endif
@@ -477,11 +469,9 @@ std::string GetLastErrorStr()
     return std::string("Failed to retrieve error message.");
   }
 
-  std::unique_ptr<char[]> errMsg = WcharToUTF8(reinterpret_cast<LPCWSTR>(lpMsgBuf));
-
   LocalFree(lpMsgBuf);
 
-  return errMsg.get();
+  return ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf)));
 #endif
 }
 

@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -660,31 +660,31 @@ void TestUnicodePaths()
 #if !defined(US_BUILD_SHARED_LIBS) || (defined(_MSC_VER) && (_MSC_VER < 1900))
   US_TEST_OUTPUT( << "Skipping test point for unicode path");
 #else
-	FrameworkFactory factory;
-	auto f = factory.NewFramework();
-	f.Start();
-	auto frameworkCtx = f.GetBundleContext();
-	try 
-	{
-		std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
-		auto bundles = frameworkCtx.InstallBundles(path_utf8);
-		US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
-		auto bundle = bundles.at(0);
-		US_TEST_CONDITION(bundle.GetLocation() == path_utf8, "Bundle location is the same as the path used to install");
-		US_TEST_NO_EXCEPTION(bundle.Start());
-		US_TEST_CONDITION(bundle.GetState() == Bundle::State::STATE_ACTIVE, "Bundle check start state");
-		US_TEST_NO_EXCEPTION(bundle.Stop());
-	}
-    catch (const std::exception& ex)
-    {
-        US_TEST_CONDITION(false, ex.what());
-    }
-	catch (...)
-	{
-		US_TEST_CONDITION(false, "TestUnicodePaths failed with unknown exception");
-	}
-	f.Stop();
-	f.WaitForStop(std::chrono::milliseconds::zero());
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+  try 
+  {
+    std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+    auto bundles = frameworkCtx.InstallBundles(path_utf8);
+    US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
+    auto bundle = bundles.at(0);
+    US_TEST_CONDITION(bundle.GetLocation() == path_utf8, "Bundle location is the same as the path used to install");
+    US_TEST_NO_EXCEPTION(bundle.Start());
+    US_TEST_CONDITION(bundle.GetState() == Bundle::State::STATE_ACTIVE, "Bundle check start state");
+    US_TEST_NO_EXCEPTION(bundle.Stop());
+  }
+  catch (const std::exception& ex)
+  {
+    US_TEST_CONDITION(false, ex.what());
+  }
+  catch (...)
+  {
+    US_TEST_CONDITION(false, "TestUnicodePaths failed with unknown exception");
+  }
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 #endif
 }
 

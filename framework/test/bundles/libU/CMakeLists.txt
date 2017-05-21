@@ -1,4 +1,4 @@
-
+﻿
 usFunctionCreateTestBundleWithResources(TestBundleU SOURCES TestBundleU.cpp RESOURCES manifest.json LINK_RESOURCES)
 
 # override the library and runtime output directories for the target to include unicode characters in path

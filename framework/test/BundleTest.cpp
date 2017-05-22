@@ -612,8 +612,8 @@ void TestAutoInstallEmbeddedBundles()
 
 void TestUnicodePaths()
 {
-  // skip this test if building static libraries or if using compiler lower than Visual Studio 2015
-#if !defined(US_BUILD_SHARED_LIBS) || (defined(_MSC_VER) && (_MSC_VER < 1900))
+  // skip this test if building static libraries or using MINGW evironment or using Visual Studio < VS2015
+#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || (defined(_MSC_VER) && (_MSC_VER < 1900))
   US_TEST_OUTPUT( << "Skipping test point for unicode path");
 #else
   FrameworkFactory factory;

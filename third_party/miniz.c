@@ -2869,25 +2869,25 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
     static FILE *mz_fopen(const char *pFilename, const char *pMode)
     {
       FILE* pFile = NULL;
-	  wchar_t* pFilenameW = utf8_to_wchar(pFilename);
-	  wchar_t* pModeW = utf8_to_wchar(pMode);
-	  (void)_wfopen_s(&pFile, pFilenameW, pModeW);
-	  free(pFilenameW);
-	  free(pModeW);
+      wchar_t* pFilenameW = utf8_to_wchar(pFilename);
+      wchar_t* pModeW = utf8_to_wchar(pMode);
+     (void)_wfopen_s(&pFile, pFilenameW, pModeW);
+      free(pFilenameW);
+      free(pModeW);
       return pFile;
     }
     
     static FILE *mz_freopen(const char *pPath, const char *pMode, FILE *pStream)
     {
       FILE* pFile = NULL;
-	  wchar_t* pFilenameW = utf8_to_wchar(pPath);
-	  wchar_t* pModeW = utf8_to_wchar(pMode);
-	  if (_wfreopen_s(&pFile, pFilenameW, pModeW, pStream))
-	  {
-		  pFile = NULL;
-	  }
-	  free(pFilenameW);
-	  free(pModeW);
+      wchar_t* pFilenameW = utf8_to_wchar(pPath);
+      wchar_t* pModeW = utf8_to_wchar(pMode);
+      if (_wfreopen_s(&pFile, pFilenameW, pModeW, pStream))
+      {
+        pFile = NULL;
+      }
+      free(pFilenameW);
+      free(pModeW);
       return pFile;
     }
     #ifndef MINIZ_NO_TIME

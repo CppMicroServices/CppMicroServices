@@ -63,28 +63,28 @@
 #endif
 #define US_STAT struct __stat64
 int us_stat(const std::string& path,
-			US_STAT *buffer)
+            US_STAT *buffer)
 {
-	std::wstring wpath(cppmicroservices::ToWString(path));
-	return _wstat64(wpath.c_str(), buffer);
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wstat64(wpath.c_str(), buffer);
 }
 
 int us_mkdir(const std::string& path)
 {
-	std::wstring wpath(cppmicroservices::ToWString(path));
-	return _wmkdir(wpath.c_str());
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wmkdir(wpath.c_str());
 }
 
 int us_rmdir(const std::string& path)
 {
-	std::wstring wpath(cppmicroservices::ToWString(path));
-	return _wrmdir(wpath.c_str());
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wrmdir(wpath.c_str());
 }
 
 int us_unlink(const std::string& path)
 {
-	std::wstring wpath(cppmicroservices::ToWString(path));
-	return _wunlink(wpath.c_str());
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wunlink(wpath.c_str());
 }
 
 #endif
@@ -112,25 +112,25 @@ std::string library_suffix()
 
 
 namespace cppmicroservices {
-	//-------------------------------------------------------------------
-	// Unicode Utility functions
-	//-------------------------------------------------------------------
+  //-------------------------------------------------------------------
+  // Unicode Utility functions
+  //-------------------------------------------------------------------
 #ifdef US_PLATFORM_WINDOWS
-	std::wstring ToWString(const std::string& inStr)
-	{
-		int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
-		std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchars_count]);
-		MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchars_count);
-		return wBuf.get();
-	}
+  std::wstring ToWString(const std::string& inStr)
+  {
+    int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
+    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchars_count]);
+    MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchars_count);
+    return wBuf.get();
+  }
 
-	std::string ToUTF8String(const std::wstring& inWStr)
-	{
-		int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
-		std::unique_ptr<char[]> str(new char[size_needed]);
-		WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), size_needed, NULL, NULL);
-		return str.get();
-	}
+  std::string ToUTF8String(const std::wstring& inWStr)
+  {
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
+    std::unique_ptr<char[]> str(new char[size_needed]);
+    WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), size_needed, NULL, NULL);
+    return str.get();
+  }
 #endif
 //-------------------------------------------------------------------
 // File system functions
@@ -177,7 +177,7 @@ std::string GetCurrentWorkingDirectory()
   std::unique_ptr<wchar_t[]> buf(new wchar_t[bufSize]);
   if (::GetCurrentDirectoryW(bufSize, buf.get()) != 0)
   {
-	  return ToUTF8String(std::wstring(buf.get()));
+    return ToUTF8String(std::wstring(buf.get()));
   }
 #else
   std::size_t bufSize = PATH_MAX;

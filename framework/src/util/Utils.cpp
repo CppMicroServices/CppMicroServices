@@ -120,25 +120,19 @@ namespace cppmicroservices {
   // function returns empty string if inStr is empty or if the conversion failed
   std::wstring ToWString(const std::string& inStr)
   {
-    int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
-    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchars_count+1]);
-    if ((wchars_count == 0) || (MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchars_count) == 0))
-    {
-      wBuf.get()[0] = L'\0';
-    }
-    return wBuf.get();
+    int wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
+    std::vector<wchar_t> vBuf(wchar_count);
+    MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, vBuf.data(), wchar_count);
+    return std::wstring(vBuf.begin(), vBuf.end());
   }
 
   // function return empty string if inWStr is empty or if the conversion failed
   std::string ToUTF8String(const std::wstring& inWStr)
   {
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
-    std::unique_ptr<char[]> str(new char[size_needed+1]);
-    if ((size_needed == 0) || (WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), size_needed, NULL, NULL) == 0))
-    {
-      str.get()[0] = '\0';
-    }
-    return str.get();
+    int char_count = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
+    std::vector<char> vBuf(char_count);
+	WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, vBuf.data(), char_count, NULL, NULL);
+    return std::string(vBuf.begin(), vBuf.end());
   }
 #endif
 //-------------------------------------------------------------------

@@ -2856,10 +2856,12 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
     static wchar_t* utf8_to_wchar(const char* inStr)
     {
       if (inStr == NULL)
+      {
         return NULL;
+      }
       int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
-      wchar_t* wstr = malloc(sizeof(wchar_t)*wchars_count);
-      if (MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr, wchars_count) == 0)
+      wchar_t* wstr = MZ_MALLOC(sizeof(wchar_t)*(wchars_count+1));
+      if ((wchars_count == 0) || (MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr, wchars_count) == 0))
       {
         wstr[0] = L'\0';
       }
@@ -2872,8 +2874,8 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
       wchar_t* pFilenameW = utf8_to_wchar(pFilename);
       wchar_t* pModeW = utf8_to_wchar(pMode);
      (void)_wfopen_s(&pFile, pFilenameW, pModeW);
-      free(pFilenameW);
-      free(pModeW);
+      MZ_FREE(pFilenameW);
+      MZ_FREE(pModeW);
       return pFile;
     }
     
@@ -2886,8 +2888,8 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
       {
         pFile = NULL;
       }
-      free(pFilenameW);
-      free(pModeW);
+      MZ_FREE(pFilenameW);
+      MZ_FREE(pModeW);
       return pFile;
     }
     #ifndef MINIZ_NO_TIME

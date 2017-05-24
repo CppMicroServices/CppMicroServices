@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -116,19 +116,28 @@ namespace cppmicroservices {
   // Unicode Utility functions
   //-------------------------------------------------------------------
 #ifdef US_PLATFORM_WINDOWS
+
+  // function returns empty string if inStr is empty or if the conversion failed
   std::wstring ToWString(const std::string& inStr)
   {
     int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
-    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchars_count]);
-    MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchars_count);
+    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchars_count+1]);
+    if ((wchars_count == 0) || (MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchars_count) == 0))
+    {
+      wBuf.get()[0] = L'\0';
+    }
     return wBuf.get();
   }
 
+  // function return empty string if inWStr is empty or if the conversion failed
   std::string ToUTF8String(const std::wstring& inWStr)
   {
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
-    std::unique_ptr<char[]> str(new char[size_needed]);
-    WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), size_needed, NULL, NULL);
+    std::unique_ptr<char[]> str(new char[size_needed+1]);
+    if ((size_needed == 0) || (WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), size_needed, NULL, NULL) == 0))
+    {
+      str.get()[0] = '\0';
+    }
     return str.get();
   }
 #endif
@@ -436,9 +445,9 @@ std::string GetLastErrorStr()
   return std::string(((errorString == nullptr)?"":errorString));
 #else
   // Retrieve the system error message for the last-error code
-  LPVOID lpMsgBuf;
+  LPVOID lpMsgBuf = nullptr;
   DWORD dw = GetLastError();
-
+  std::string returnMsg;
   DWORD rc = FormatMessageW(
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
                 FORMAT_MESSAGE_FROM_SYSTEM |
@@ -456,12 +465,14 @@ std::string GetLastErrorStr()
   // Inform the caller that the error message couldn't be retrieved.
   if (rc == 0)
   {
-    return std::string("Failed to retrieve error message.");
+    returnMsg = "Failed to retrieve error message.";
   }
-
-  LocalFree(lpMsgBuf);
-
-  return ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf)));
+  else
+  {
+    returnMsg = ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf)));
+    LocalFree(lpMsgBuf);
+  }
+  return returnMsg;
 #endif
 }
 

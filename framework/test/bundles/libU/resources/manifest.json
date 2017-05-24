@@ -1,5 +1,5 @@
 {
-  "bundle.symbolic_name" : "TestBundleA",
+  "bundle.symbolic_name" : "TestBundleU",
   "bundle.activator" : true,
   "unicode.sample" : "电脑 くいりのまちとこしくそ"
 }

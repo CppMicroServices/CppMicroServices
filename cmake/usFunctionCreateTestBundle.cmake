@@ -2,6 +2,9 @@
 macro(_us_create_test_bundle_helper)
 
   add_library(${name} ${_srcs})
+  if(US_BUILD_SHARED_LIBS AND US_TEST_LIBRARY_EXTENSION)
+    set_target_properties(${name} PROPERTIES SUFFIX ${US_TEST_LIBRARY_EXTENSION})
+  endif()
   set_property(TARGET ${name}
                APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${name})
   set_property(TARGET ${name} PROPERTY US_BUNDLE_NAME ${name})
@@ -41,7 +44,7 @@ function(usFunctionCreateTestBundle name)
 endfunction()
 
 function(usFunctionCreateTestBundleWithResources name)
-  cmake_parse_arguments(US_TEST "SKIP_BUNDLE_LIST;LINK_RESOURCES;APPEND_RESOURCES" "RESOURCES_ROOT" "SOURCES;RESOURCES;BINARY_RESOURCES;LINK_LIBRARIES" "" ${ARGN})
+  cmake_parse_arguments(US_TEST "SKIP_BUNDLE_LIST;LINK_RESOURCES;APPEND_RESOURCES" "RESOURCES_ROOT;LIBRARY_EXTENSION" "SOURCES;RESOURCES;BINARY_RESOURCES;LINK_LIBRARIES" "" ${ARGN})
 
   set(_mode )
   if(US_TEST_LINK_RESOURCES)

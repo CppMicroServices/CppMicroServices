@@ -24,7 +24,6 @@
 
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/GlobalConfig.h"
 
 #include <iostream>
 

@@ -40,7 +40,7 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
 {
   if (!fs::Exists(location))
   {
-    throw std::runtime_error("Location does not exist at" + m_Location);
+    throw std::runtime_error(m_Location + " does not exist");
   }
 
   if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0))

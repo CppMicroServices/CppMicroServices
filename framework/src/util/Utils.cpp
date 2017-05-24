@@ -131,7 +131,7 @@ namespace cppmicroservices {
   {
     int char_count = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
     std::vector<char> vBuf(char_count);
-	WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, vBuf.data(), char_count, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, vBuf.data(), char_count, NULL, NULL);
     return std::string(vBuf.begin(), vBuf.end());
   }
 #endif

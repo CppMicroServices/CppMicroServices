@@ -2853,17 +2853,23 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
     #include <Windows.h>
     #include <stringapiset.h>
     #include <wchar.h>
+    
+    // return NULL if inStr is NULL or if the conversion failed
     static wchar_t* utf8_to_wchar(const char* inStr)
     {
-      if (inStr == NULL)
+      wchar_t* wstr = NULL;
+      if (inStr)
       {
-        return NULL;
-      }
-      int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
-      wchar_t* wstr = MZ_MALLOC(sizeof(wchar_t)*(wchars_count+1));
-      if ((wchars_count == 0) || (MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr, wchars_count) == 0))
-      {
-        wstr[0] = L'\0';
+        int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
+        if (wchars_count > 0)
+        {
+          wstr = MZ_MALLOC(sizeof(wchar_t)*(wchars_count));
+        }
+        if ((wstr != NULL) && (MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr, wchars_count) == 0))
+        {
+          MZ_FREE(wstr);
+          wstr = NULL;
+        }
       }
       return wstr;
     }

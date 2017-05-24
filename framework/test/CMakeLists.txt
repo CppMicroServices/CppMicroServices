@@ -1,2 +1,2 @@
-add_subdirectory(integration)
-add_subdirectory(unit)
+add_subdirectory(frameworktestdriver)
+add_subdirectory(gtest)

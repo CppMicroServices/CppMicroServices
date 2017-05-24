@@ -206,7 +206,7 @@ void testBinaryResource(const Bundle& bundle)
   std::streampos resLength = rs.tellg();
   rs.seekg(0);
 
-  std::ifstream png(US_FRAMEWORK_SOURCE_DIR "/test/integration/bundles/libRWithResources/resources/icons/cppmicroservices.png",
+  std::ifstream png(US_FRAMEWORK_SOURCE_DIR "/test/frameworktestdriver/bundles/libRWithResources/resources/icons/cppmicroservices.png",
                     std::ifstream::in | std::ifstream::binary);
 
   US_TEST_CONDITION_REQUIRED(png.is_open(), "Open reference file")
@@ -246,7 +246,7 @@ void testCompressedResource(const Bundle& bundle)
   std::streampos resLength = rs.tellg();
   rs.seekg(0);
 
-  std::ifstream bmp(US_FRAMEWORK_SOURCE_DIR "/test/integration/bundles/libRWithResources/resources/icons/compressable.bmp",
+  std::ifstream bmp(US_FRAMEWORK_SOURCE_DIR "/test/frameworktestdriver/bundles/libRWithResources/resources/icons/compressable.bmp",
                     std::ifstream::in | std::ifstream::binary);
 
   US_TEST_CONDITION_REQUIRED(bmp.is_open(), "Open reference file")

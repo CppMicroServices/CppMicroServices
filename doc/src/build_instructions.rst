@@ -42,6 +42,11 @@ configuration options at hand.
    docs.cppmicroservices.org.
  - **US_BUILD_DOC_MAN** Build the man pages. This is typically only
    enabled on a Unix-like system.
+ - **GTEST_ROOT** Specify the root directory of a Google Testing
+   framework installation to enable testing using the framework. If
+   this is not specified, usage of Google Testing framework is disabled.
+   Note that the Google Testing framework must have been built as a shared
+   library.
 
 .. note::
 
@@ -63,7 +68,7 @@ Building
 --------
 
 After configuring a build directory with CMake, the project can be
-build. If you chose e.g. *Unix Makefiles*, just type:
+built. If you chose e.g. *Unix Makefiles*, just type:
 
 .. code:: bash
 

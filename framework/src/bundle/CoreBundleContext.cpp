@@ -169,18 +169,28 @@ void CoreBundleContext::Uninit1()
   listeners.Clear();
   resolver.Clear();
 
+  // Do not hold the bundleThreads lock while calling
+  // BundleThread::Quit() because this will join the bundle
+  // thread which may need to acquire the bundleThreads lock
+  // itself.
+  //
+  // At this point, all bundles are stopped and all
+  // bundle context instances invalidated. So no new bundle
+  // threads can be created and it is sufficient to get
+  // the current list once and not check for new bundle
+  // threads again.
+  std::list<std::shared_ptr<BundleThread>> threads;
   {
     auto l = bundleThreads.Lock(); US_UNUSED(l);
-    while (!bundleThreads.value.empty())
-    {
-      bundleThreads.value.front()->Quit();
-      bundleThreads.value.pop_front();
-    }
-    while (!bundleThreads.zombies.empty())
-    {
-      bundleThreads.zombies.front()->Join();
-      bundleThreads.zombies.pop_front();
-    }
+    std::swap(threads, bundleThreads.value);
+    threads.insert(threads.end(), bundleThreads.zombies.begin(), bundleThreads.zombies.end());
+    bundleThreads.zombies.clear();
+  }
+
+  while (!threads.empty())
+  {
+    threads.front()->Quit();
+    threads.pop_front();
   }
 
   dataStorage.clear();

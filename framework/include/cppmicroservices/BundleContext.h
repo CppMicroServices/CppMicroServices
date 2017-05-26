@@ -664,9 +664,10 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use :func:`RemoveListener()` instead.
+   *    and will be removed in the next major release.
+   *    Use :any:`RemoveListener() <cppmicroservices::BundleContext::RemoveListener>` instead.
    * \endrststar
    *
    * @param listener The callable object to remove.
@@ -701,9 +702,10 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use :func:`RemoveListener()` instead.
+   *    and will be removed in the next major release.
+   *    Use :any:`RemoveListener() <cppmicroservices::BundleContext::RemoveListener>` instead.
    * \endrststar
    *
    * @param listener The callable object to remove.
@@ -737,9 +739,10 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use :func:`RemoveListener()` instead.
+   *    and will be removed in the next major release.
+   *    Use :any:`RemoveListener() <cppmicroservices::BundleContext::RemoveListener>` instead.
    * \endrststar
    *
    * @param listener The callable object to remove.
@@ -813,10 +816,11 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
+   *    and will be removed in the next major release.
    *    Use `std::bind` to bind the member function and then pass the result
-   *     to the single parameter variant of :func:`AddServiceListener` instead.
+   *    to :any:`AddServiceListener(const ServiceListener&) <cppmicroservices::BundleContext::AddServiceListener>` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be called)
@@ -850,9 +854,10 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use :func:`RemoveListener()` instead.
+   *    and will be removed in the next major release.
+   *    Use :any:`RemoveListener() <cppmicroservices::BundleContext::RemoveListener>` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be removed)
@@ -881,10 +886,11 @@ public:
 
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use `std::bind` to bind the member function and then pass the result to the
-   *     single parameter variant of :func:`AddBundleListener` instead.
+   *    and will be removed in the next major release.
+   *    Use `std::bind` to bind the member function and then pass the result to
+   *    :any:`AddBundleListener(const BundleListener&) <cppmicroservices::BundleContext::AddBundleListener>` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be called)
@@ -913,9 +919,10 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use :func:`RemoveListener()` instead.
+   *    and will be removed in the next major release.
+   *    Use :any:`RemoveListener() <cppmicroservices::BundleContext::RemoveListener>` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be removed)
@@ -943,10 +950,11 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use `std::bind` to bind the member function and then pass the result to the
-   *     single parameter variant of :func:`AddFrameworkListener` instead.
+   *    and will be removed in the next major release.
+   *    Use `std::bind` to bind the member function and then pass the result to
+   *    :any:`AddFrameworkListener(const FrameworkListener&) <cppmicroservices::BundleContext::AddFrameworkListener>` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be called)
@@ -973,9 +981,10 @@ public:
    *
    * \rststar
    * .. deprecated:: 3.1.0
+   *
    *    This function exists only to maintain backwards compatibility
-   *     and will be removed in the next major release.
-   *    Use :func:`RemoveListener()` instead.
+   *    and will be removed in the next major release.
+   *    Use :any:`RemoveListener() <cppmicroservices::BundleContext::RemoveListener>` instead.
    * \endrststar
    *
    * @tparam R The type of the receiver (containing the member function to be removed)

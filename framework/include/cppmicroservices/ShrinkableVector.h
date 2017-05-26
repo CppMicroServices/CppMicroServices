@@ -49,6 +49,7 @@ public:
   typedef typename container_type::size_type size_type;
   typedef typename container_type::reference reference;
   typedef typename container_type::const_reference const_reference;
+  typedef typename container_type::value_type value_type;
 
   ShrinkableVector()
   : container(emptyVector)
@@ -135,12 +136,32 @@ public:
     return container.at(pos);
   }
 
-  const_reference operator[](size_type i) const
+  /**
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *
+   *    This function exists only to maintain backwards compatibility
+   *    and will be removed in the next major release.
+   *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableVector::at>`
+   *    instead.
+   * \endrststar
+   */
+  US_DEPRECATED const_reference operator[](size_type i) const
   {
     return container[i];
   }
 
-  reference operator[](size_type i)
+  /**
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *
+   *    This function exists only to maintain backwards compatibility
+   *    and will be removed in the next major release.
+   *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableVector::at>`
+   *    instead.
+   * \endrststar
+   */
+  US_DEPRECATED reference operator[](size_type i)
   {
     return container[i];
   }

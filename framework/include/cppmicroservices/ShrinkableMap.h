@@ -80,12 +80,12 @@ public:
 
   void erase(iterator pos)
   {
-    return container.erase(pos);
+    container.erase(pos);
   }
 
   void erase(iterator first, iterator last)
   {
-    return container.erase(first, last);
+    container.erase(first, last);
   }
 
   size_type erase(const Key& key)
@@ -113,9 +113,28 @@ public:
     return container.max_size();
   }
 
-  T& operator[](const Key& key)
+  /**
+   * \rststar
+   * .. deprecated:: 3.1.0
+   *
+   *    This function exists only to maintain backwards compatibility
+   *    and will be removed in the next major release.
+   *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableMap::at>` instead.
+   * \endrststar
+   */
+  US_DEPRECATED T& operator[](const Key& key)
   {
     return container[key];
+  }
+
+  T& at(const Key& key)
+  {
+    return container.at(key);
+  }
+
+  const T& at(const Key& key) const
+  {
+    return container.at(key);
   }
 
   size_type count(const Key& key) const

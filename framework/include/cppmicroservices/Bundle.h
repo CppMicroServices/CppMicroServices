@@ -753,8 +753,7 @@ public:
    *
    * @throws std::runtime_error If the uninstall failed. This can occur if
    *         another thread is attempting to change this bundle's state and
-   *         does not complete in a timely manner, or if the bundle is embedded
-   *         in an executable.
+   *         does not complete in a timely manner.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    * @see #Stop()

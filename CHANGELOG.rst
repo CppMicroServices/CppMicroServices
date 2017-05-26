@@ -17,6 +17,9 @@ Added
 Changed
 ~~~~~~~
 
+- Improved BadAnyCastException message. `#181 <https://github.com/CppMicroServices/CppMicroServices/issues/181>`_
+- Support installing bundles that do not have .DLL/.so/.dylib file extensions. `#205 <https://github.com/CppMicroServices/CppMicroServices/issues/205>`_
+
 Deprecated
 ~~~~~~~~~~
 

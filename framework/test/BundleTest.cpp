@@ -616,9 +616,7 @@ void TestUnicodePaths()
   // 1. building static libraries (test bundle is included in the executable)
   // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
   // 3. using Visual Studio < VS2015 (C++11 unicode string literals are not supported)
-#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || (defined(_MSC_VER) && (_MSC_VER < 1900))
-  US_TEST_OUTPUT( << "Skipping test point for unicode path");
-#else
+#if defined(US_BUILD_SHARED_LIBS) && US_CXX_UNICODE_LITERALS
   FrameworkFactory factory;
   auto f = factory.NewFramework();
   f.Start();

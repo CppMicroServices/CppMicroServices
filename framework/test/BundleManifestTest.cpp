@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -33,6 +33,20 @@
 #include "TestUtils.h"
 
 using namespace cppmicroservices;
+
+void TestUnicodeProperty(BundleContext bc)
+{
+#if defined(US_BUILD_SHARED_LIBS) && US_CXX_UNICODE_LITERALS
+	std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+	auto bundles = bc.InstallBundles(path_utf8);
+	US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
+	auto bundle = bundles.at(0);
+	std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
+	std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
+	US_TEST_CONDITION(expectedValue == actualValue, "Check unicode data from manifest.json");
+	bundle.Stop();
+#endif
+}
 
 int BundleManifestTest(int /*argc*/, char* /*argv*/[])
 {
@@ -72,6 +86,8 @@ int BundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(any_cast<int>(m["number"]) == 4, "map 1 value")
   US_TEST_CONDITION_REQUIRED(m["list"].Type() == typeid(std::vector<Any>), "map 2 type")
   US_TEST_CONDITION_REQUIRED(any_cast<std::vector<Any> >(m["list"]).size() == 2, "map 2 value size")
+
+  TestUnicodeProperty(framework.GetBundleContext());
 
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds(0));

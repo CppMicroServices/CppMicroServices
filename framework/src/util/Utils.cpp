@@ -214,7 +214,12 @@ bool Exists(const std::string& path)
   }
 #else
   std::wstring wpath(ToWString(path));
-  return (PathFileExistsW(wpath.c_str()) == TRUE);
+  DWORD attr(::GetFileAttributesW(wpath.c_str()));
+  if (attr == INVALID_FILE_ATTRIBUTES)
+  {
+    if (not_found_error(::GetLastError())) return false;
+    else throw std::invalid_argument(GetLastErrorStr());
+  }
 #endif
   return true;
 }

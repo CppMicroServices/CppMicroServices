@@ -29,14 +29,6 @@
 
 namespace cppmicroservices {
 
-struct TestBundleU : public TestBundleUService
-{
-
-  TestBundleU() {}
-  virtual ~TestBundleU() {}
-
-};
-
 class TestBundleUActivator : public BundleActivator
 {
 public:
@@ -46,20 +38,13 @@ public:
 
   void Start(BundleContext context)
   {
-      s = std::make_shared<TestBundleU>();
-      std::cout << "Registering TestBundleUService";
-      sr = context.RegisterService<TestBundleUService>(s);
+	  std::cout << "Starting TestBundleU" << std::endl;
   }
 
   void Stop(BundleContext)
   {
-      sr.Unregister();
+	  std::cout << "Stoping TestBundleU" << std::endl;
   }
-
-private:
-
-    std::shared_ptr<TestBundleU> s;
-    ServiceRegistration<TestBundleUService> sr;
 };
 
 }

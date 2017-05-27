@@ -612,10 +612,9 @@ void TestAutoInstallEmbeddedBundles()
 
 void TestUnicodePaths()
 {
-  // skip this test if  
-  // 1. building static libraries (test bundle is included in the executable)
-  // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
-  // 3. using Visual Studio < VS2015 (C++11 unicode string literals are not supported)
+  // skip this test point if 
+  // 1. Building static libraries (bundle is included in the executable)
+  // 2. Compiler does not support unicode literals
 #if defined(US_BUILD_SHARED_LIBS) && US_CXX_UNICODE_LITERALS
   FrameworkFactory factory;
   auto f = factory.NewFramework();

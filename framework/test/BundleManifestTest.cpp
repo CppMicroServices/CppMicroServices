@@ -36,15 +36,20 @@ using namespace cppmicroservices;
 
 void TestUnicodeProperty(BundleContext bc)
 {
+  // skip this test point if 
+  // 1. Building static libraries (bundle is included in the executable)
+  // 2. Compiler does not support unicode literals
 #if defined(US_BUILD_SHARED_LIBS) && US_CXX_UNICODE_LITERALS
-	std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
-	auto bundles = bc.InstallBundles(path_utf8);
-	US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
-	auto bundle = bundles.at(0);
-	std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
-	std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
-	US_TEST_CONDITION(expectedValue == actualValue, "Check unicode data from manifest.json");
-	bundle.Stop();
+  std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+  auto bundles = bc.InstallBundles(path_utf8);
+  US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
+  auto bundle = bundles.at(0);
+  std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
+  std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
+  US_TEST_CONDITION(expectedValue == actualValue, "Check unicode data from manifest.json");
+  bundle.Stop();
+#else
+  (void)bc; // avoid compier warning
 #endif
 }
 

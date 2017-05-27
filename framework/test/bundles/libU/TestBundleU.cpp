@@ -36,14 +36,14 @@ public:
   TestBundleUActivator() {}
   ~TestBundleUActivator() {}
 
-  void Start(BundleContext context)
+  void Start(BundleContext)
   {
-	  std::cout << "Starting TestBundleU" << std::endl;
+    std::cout << "Starting TestBundleU" << std::endl;
   }
 
   void Stop(BundleContext)
   {
-	  std::cout << "Stoping TestBundleU" << std::endl;
+    std::cout << "Stoping TestBundleU" << std::endl;
   }
 };
 

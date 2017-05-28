@@ -656,10 +656,12 @@ void TestNonStandardBundleExtension()
 
 void TestUnicodePaths()
 {
-  // skip this test point if 
-  // 1. Building static libraries (bundle is included in the executable)
-  // 2. Compiler does not support unicode literals
-#if defined(US_BUILD_SHARED_LIBS) && US_CXX_UNICODE_LITERALS
+  // 1. building static libraries (test bundle is included in the executable) 
+  // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path) 
+  // 3. using a compiler with no support for C++11 unicode string literals
+#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS) 
+  US_TEST_OUTPUT(<< "Skipping test point for unicode path");
+#else 
   FrameworkFactory factory;
   auto f = factory.NewFramework();
   f.Start();

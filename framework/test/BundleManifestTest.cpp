@@ -36,10 +36,13 @@ using namespace cppmicroservices;
 
 void TestUnicodeProperty(BundleContext bc)
 {
-  // skip this test point if 
-  // 1. Building static libraries (bundle is included in the executable)
-  // 2. Compiler does not support unicode literals
-#if defined(US_BUILD_SHARED_LIBS) && US_CXX_UNICODE_LITERALS
+  // 1. building static libraries (test bundle is included in the executable) 
+  // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path) 
+  // 3. using a compiler with no support for C++11 unicode string literals
+#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS) 
+  US_TEST_OUTPUT(<< "Skipping test point for unicode path");
+  (void)bc; // avoid compier warning
+#else 
   std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
   auto bundles = bc.InstallBundles(path_utf8);
   US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
@@ -48,8 +51,6 @@ void TestUnicodeProperty(BundleContext bc)
   std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
   US_TEST_CONDITION(expectedValue == actualValue, "Check unicode data from manifest.json");
   bundle.Stop();
-#else
-  (void)bc; // avoid compier warning
 #endif
 }
 

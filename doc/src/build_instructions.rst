@@ -48,6 +48,15 @@ configuration options at hand.
    Note that the Google Testing framework must have been built as a shared
    library.
 
+   .. note::
+
+      In MACOSX platform, when configuring Google Test as a shared library
+      using CMake, if you get a
+      "Policy CMP0042 is not set: MACOSX_RPATH is enabled by default." warning,
+      you will need to add "set(CMAKE_MACOSX_RPATH ON)" to the CMakeLists.txt of
+      Google Test to forcibly enable rpath. This warning is emitted when
+      configuring with recent versions of CMake. 
+
 .. note::
 
    Building the documentation requires

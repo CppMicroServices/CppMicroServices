@@ -180,18 +180,20 @@ void CoreBundleContext::Uninit1()
   // the current list once and not check for new bundle
   // threads again.
   std::list<std::shared_ptr<BundleThread>> threads;
-  {
-    auto l = bundleThreads.Lock(); US_UNUSED(l);
-    std::swap(threads, bundleThreads.value);
-    threads.insert(threads.end(), bundleThreads.zombies.begin(), bundleThreads.zombies.end());
-    bundleThreads.zombies.clear();
-  }
+  bundleThreads.Lock(), std::swap(threads, bundleThreads.value);
 
   while (!threads.empty())
   {
+    // Quit the bundle thread. This joins the bundle thread
+    // with this thread and puts it into the zombies list.
     threads.front()->Quit();
     threads.pop_front();
   }
+
+  // Clear up all bundle threads that have been quit. At this
+  // point, we do not need to lock the bundleTheads structure
+  // any more.
+  bundleThreads.zombies.clear();
 
   dataStorage.clear();
   storage->Close();

@@ -42,11 +42,20 @@ configuration options at hand.
    docs.cppmicroservices.org.
  - **US_BUILD_DOC_MAN** Build the man pages. This is typically only
    enabled on a Unix-like system.
- - **GTEST_ROOT** Specify the root directory of a Google Testing
-   framework installation to enable testing using the framework. If
-   this is not specified, usage of Google Testing framework is disabled.
-   Note that the Google Testing framework must have been built as a shared
-   library.
+ - **GTEST_ROOT** Specify the root directory of the Google Test framework
+   installation. These must be specified to build and run unit tests
+   implemented using Google Test. Note that the Google Testing framework must
+   have been built as a shared library.
+
+   .. note::
+
+      If you are configuring the Google Test framework on a Mac using CMake and
+      receive a warning "Policy CMP0042 is not set: MACOSX_RPATH is enabled by
+      default", you will need to add the line: set(CMAKE_MACOSX_RPATH ON) to
+      the project-wide settings in the top-level CMakeLists.txt file to
+      forcibly enable RPATHs.  This warning is emitted by CMake versions 3.0
+      and later.
+
 
    .. note::
 

@@ -452,6 +452,22 @@ private:
   std::string _msg;
 };
 
+
+namespace detail
+{
+/**
+ *
+ * A utility function used to throw a BadAnyCastException object
+ * containing an exception message containing the source and target type names.
+ *
+ * \param funcName The throwing function's name.
+ * \param anyTypeName A string representing the Any object's underlying type.
+ * \throws cppmicroservices::BadAnyCastException
+ */
+US_Framework_EXPORT void ThrowBadAnyCastException(const std::string& funcName, const std::type_info& source, const std::type_info& target);
+
+}
+
 /**
  * \ingroup gr_any
  *
@@ -469,7 +485,7 @@ ValueType* any_cast(Any* operand)
 {
   return operand && operand->Type() == typeid(ValueType)
       ? &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held
-      : 0;
+      : nullptr;
 }
 
 /**
@@ -510,7 +526,10 @@ template <typename ValueType>
 ValueType any_cast(const Any& operand)
 {
   ValueType* result = any_cast<ValueType>(const_cast<Any*>(&operand));
-  if (!result) throw BadAnyCastException("Failed to convert between const Any types");
+  if (!result)
+  {
+    detail::ThrowBadAnyCastException(std::string("any_cast"), operand.Type(), typeid(ValueType));
+  }
   return *result;
 }
 
@@ -534,7 +553,10 @@ template <typename ValueType>
 ValueType any_cast(Any& operand)
 {
   ValueType* result = any_cast<ValueType>(&operand);
-  if (!result) throw BadAnyCastException("Failed to convert between Any types");
+  if (!result)
+  {
+    detail::ThrowBadAnyCastException(std::string("any_cast"), operand.Type(), typeid(ValueType));
+  }
   return *result;
 }
 
@@ -554,7 +576,10 @@ template <typename ValueType>
 const ValueType& ref_any_cast(const Any & operand)
 {
   ValueType* result = any_cast<ValueType>(const_cast<Any*>(&operand));
-  if (!result) throw BadAnyCastException("RefAnyCast: Failed to convert between const Any types");
+  if (!result)
+  {
+    detail::ThrowBadAnyCastException(std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
+  }
   return *result;
 }
 
@@ -574,7 +599,10 @@ template <typename ValueType>
 ValueType& ref_any_cast(Any& operand)
 {
   ValueType* result = any_cast<ValueType>(&operand);
-  if (!result) throw BadAnyCastException("RefAnyCast: Failed to convert between Any types");
+  if (!result)
+  {
+    detail::ThrowBadAnyCastException(std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
+  }
   return *result;
 }
 
@@ -590,7 +618,7 @@ ValueType& ref_any_cast(Any& operand)
 template <typename ValueType>
 ValueType* unsafe_any_cast(Any* operand)
 {
-  return &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held;
+  return &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held;
 }
 
 /**

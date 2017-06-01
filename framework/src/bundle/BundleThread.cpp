@@ -41,13 +41,12 @@ const int BundleThread::OP_STOP = 3;
 const std::chrono::milliseconds BundleThread::KEEP_ALIVE(1000);
 
 BundleThread::BundleThread(CoreBundleContext* ctx)
-  : fwCtx(ctx)
-  , startStopTimeout(0)
+  : startStopTimeout(0)
   , op()
   , be(BundleEvent::BUNDLE_INSTALLED, nullptr)
   , doRun(true)
 {
-  th.v = std::thread(&BundleThread::Run, this);
+  th.v = std::thread(&BundleThread::Run, this, ctx);
 }
 
 BundleThread::~BundleThread()
@@ -63,7 +62,7 @@ void BundleThread::Quit()
   if (th.v.joinable()) th.v.join();
 }
 
-void BundleThread::Run()
+void BundleThread::Run(CoreBundleContext* fwCtx)
 {
   while (doRun)
   {
@@ -90,6 +89,13 @@ void BundleThread::Run()
         break;
       }
 
+      // If we arrive here, we reached our keep-alive limit without
+      // an operation being queued. However, in the mean time, some
+      // other thread may have picked this thread from the bundleThreads.value
+      // list and calling StartAndWait(). So we only terminate this thread
+      // (by returning) if it was not taken from the bundleThreads list to
+      // do more work. Otherwise, we just keep running for another keep alive
+      // cycle.
       {
         auto l2 = fwCtx->bundleThreads.Lock(); US_UNUSED(l2);
         auto iter = std::find(fwCtx->bundleThreads.value.begin(), fwCtx->bundleThreads.value.end(), this->shared_from_this());
@@ -190,7 +196,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
   bool timeout = false;
   bool uninstall = false;
 
-  fwCtx->resolver.WaitFor(resolveLock, waitTime, [&res]{
+  b->coreCtx->resolver.WaitFor(resolveLock, waitTime, [&res]{
     return res.valid() &&
         res.wait_for(std::chrono::milliseconds::zero()) == US_FUTURE_READY;
   });
@@ -252,23 +258,21 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
   }
   else
   {
+    b->coreCtx->bundleThreads.Lock(), b->coreCtx->bundleThreads.value.push_front(this->shared_from_this());
+    if (operation != op.operation)
     {
-      fwCtx->bundleThreads.Lock(), fwCtx->bundleThreads.value.push_front(this->shared_from_this());
-      if (operation != op.operation)
-      {
-        // TODO! Handle when operation has changed.
-        // i.e. uninstall during operation?
-      }
-      b->ResetBundleThread();
-      try
-      {
-        res.get();
-        return nullptr;
-      }
-      catch (...)
-      {
-        return std::current_exception();
-      }
+      // TODO! Handle when operation has changed.
+      // i.e. uninstall during operation?
+    }
+    b->ResetBundleThread();
+    try
+    {
+      res.get();
+      return nullptr;
+    }
+    catch (...)
+    {
+      return std::current_exception();
     }
   }
 }

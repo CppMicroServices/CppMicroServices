@@ -89,7 +89,7 @@ public:
       // MutexLocker lock(&m_mutex);
 
       // Listen for events pertaining to dictionary services.
-      m_context.AddServiceListener(this, &Activator::ServiceChanged,
+      m_context.AddServiceListener(std::bind(&Activator::ServiceChanged, this, std::placeholders::_1),
                                    std::string("(&(") + Constants::OBJECTCLASS + "=" +
                                    us_service_interface_iid<IDictionaryService>() + ")" + "(Language=*))");
 

@@ -112,6 +112,10 @@ std::string GetCurrentWorkingDirectory();
 
 void TerminateForDebug(const std::exception_ptr ex);
 
+namespace detail {
+US_Framework_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
+}
+
 //-------------------------------------------------------------------
 // Error handling
 //-------------------------------------------------------------------

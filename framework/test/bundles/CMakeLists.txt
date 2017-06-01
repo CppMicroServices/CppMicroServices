@@ -13,6 +13,8 @@ add_subdirectory(libRWithResources)
 add_subdirectory(libRWithAppendedResources)
 add_subdirectory(libRWithLinkedResources)
 
+add_subdirectory(libWithNonStandardExt)
+
 if(US_ENABLE_THREADING_SUPPORT)
   add_subdirectory(libC1)
 endif()

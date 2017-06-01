@@ -405,11 +405,6 @@ void BundlePrivate::FinalizeActivation(LockType& l)
 
 void BundlePrivate::Uninstall()
 {
-  if (!IsSharedLibrary(GetLocation()))
-  {
-    throw std::runtime_error("Bundles embedded in an executable cannot be uninstalled.");
-  }
-
   {
     auto l = coreCtx->resolver.Lock(); US_UNUSED(l);
     //BundleGeneration current = current();
@@ -630,17 +625,17 @@ std::exception_ptr BundlePrivate::Start0()
       CreateActivatorHook createActivatorHook = nullptr;
 
       void* libHandle = nullptr;
-      if(IsSharedLibrary(lib.GetFilePath()))
+      if ((lib.GetFilePath() == BundleUtils::GetExecutablePath()))
+      {
+        libHandle = BundleUtils::GetExecutableHandle();
+      }
+      else
       {
         if (!lib.IsLoaded())
         {
           lib.Load();
         }
         libHandle = lib.GetHandle();
-      }
-      else
-      {
-        libHandle = BundleUtils::GetExecutableHandle();
       }
 
 

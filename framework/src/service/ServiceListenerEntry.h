@@ -24,6 +24,7 @@
 #ifndef CPPMICROSERVICES_SERVICELISTENERENTRY_H
 #define CPPMICROSERVICES_SERVICELISTENERENTRY_H
 
+#include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ServiceListenerHook.h"
 
@@ -54,7 +55,8 @@ public:
 
   void SetRemoved(bool removed) const;
 
-  ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l, void* data, const std::string& filter = "");
+  ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l, void* data,
+                       ListenerTokenId tokenId, const std::string& filter = "");
 
   const LDAPExpr& GetLDAPExpr() const;
 
@@ -63,6 +65,13 @@ public:
   void CallDelegate(const ServiceEvent& event) const;
 
   bool operator==(const ServiceListenerEntry& other) const;
+
+  bool Contains(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId) const;
+
+  bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
+                const ServiceListener& listener, void* data) const;
+
+  ListenerTokenId Id() const;
 
   std::size_t Hash() const;
 

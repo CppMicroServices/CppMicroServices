@@ -1,5 +1,5 @@
 diff --git a/third_party/civetweb/civetweb.c b/third_party/civetweb/civetweb.c
-index 98130f5..83daace 100644
+index 98130f5..cc25d9d 100644
 --- a/third_party/civetweb/civetweb.c
 +++ b/third_party/civetweb/civetweb.c
 @@ -129,8 +129,11 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
@@ -27,7 +27,7 @@ index 98130f5..83daace 100644
 +#define CLOCK_REALTIME (2)
 +#endif
  
-+#if (_DARWIN_FEATURE_CLOCK_GETTIME == 0)
++#if defined(_DARWIN_FEATURE_CLOCK_GETTIME) && (_DARWIN_FEATURE_CLOCK_GETTIME == 0)
  /* clock_gettime is not implemented on OSX */
  int clock_gettime(int clk_id, struct timespec *t);
  
@@ -35,7 +35,7 @@ index 98130f5..83daace 100644
  	}
  	return -1; /* EINVAL - Clock ID is unknown */
  }
-+#endif // _DARWIN_FEATURE_CLOCK_GETTIME == 0
++#endif // defined(_DARWIN_FEATURE_CLOCK_GETTIME) && (_DARWIN_FEATURE_CLOCK_GETTIME == 0)
  #endif
  
  

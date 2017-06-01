@@ -392,7 +392,8 @@ int GetLastErrorNo()
 std::string GetLastErrorStr()
 {
 #ifdef US_PLATFORM_POSIX
-  return std::string(strerror(errno));
+  char* errorString = strerror(errno);
+  return std::string(((errorString == nullptr)?"":errorString));
 #else
   // Retrieve the system error message for the last-error code
   LPVOID lpMsgBuf;
@@ -450,9 +451,11 @@ void TerminateForDebug(const std::exception_ptr ex)
 #endif
 }
 
-US_Framework_EXPORT ::std::string detail::GetDemangledName(const ::std::type_info& typeInfo)
+namespace detail
 {
-  ::std::string result;
+std::string GetDemangledName(const std::type_info& typeInfo)
+{
+  std::string result;
 #ifdef US_HAVE_CXXABI_H
   int status = 0;
   char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);
@@ -491,6 +494,7 @@ US_Framework_EXPORT ::std::string detail::GetDemangledName(const ::std::type_inf
   (void)typeInfo;
 #endif
   return result;
+}
 }
 
 US_MSVC_PUSH_DISABLE_WARNING(4715) // 'function' : not all control paths return a value

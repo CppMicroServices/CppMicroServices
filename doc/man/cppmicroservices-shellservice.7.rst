@@ -5,9 +5,8 @@
 Shell Service
 =============
 
-The Shell Service provides an interface to interact with a
-C++ Micro Services framework and to issue commands. It does not define
-a user interface, see :any:`usShell3(1)` for a client with a
+The Shell Service provides an interface to interact with and issue commands to
+a C++ Micro Services framework. See :any:`usShell3(1)` for a client with a
 textual interface.
 
 .. warning::

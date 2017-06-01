@@ -23,10 +23,30 @@ Changed
 Deprecated
 ~~~~~~~~~~
 
-- The following methods in BundleContext:
-  RemoveBundleListener, RemoveFrameworkListener, RemoveServiceListener.
-  The variants of AddBundleListener, AddFrameworkListener, AddServiceListener that take member functions.
-- The functions: ServiceListenerMemberFunctor, BundleListenerMemberFunctor and BindFrameworkListenerToFunctor.
+- The following BundleContext member functions:
+
+  * ``RemoveBundleListener``
+  * ``RemoveFrameworkListener``
+  * ``RemoveServiceListener``
+
+  And the variants of
+  
+  * ``AddBundleListener``
+  * ``AddFrameworkListener``,
+  * ``AddServiceListener``
+  
+  that take member functions.
+
+- The free functions:
+  
+  * ``ServiceListenerMemberFunctor``
+  * ``BundleListenerMemberFunctor``
+  * ``BindFrameworkListenerToFunctor``
+
+- The functions
+  
+  * ``ShrinkableVector::operator[std::size_t]``
+  * ``ShrinkableMap::operator[const Key&]``
 
 
 Removed
@@ -39,6 +59,12 @@ Fixed
    `#95 <https://github.com/CppMicroServices/CppMicroServices/issues/95>`_
 -  Removing Listeners does not work well
    `#83 <https://github.com/CppMicroServices/CppMicroServices/issues/83>`_
+-  Crash when trying to acquire bundle context
+   `#172 <https://github.com/CppMicroServices/CppMicroServices/issues/172>`_
+-  Fix for ``unsafe_any_cast``
+   `#198 <https://github.com/CppMicroServices/CppMicroServices/pull/198>`_
+-  Stopping a framework while bundle threads are still running may deadlock
+   `#210 <https://github.com/CppMicroServices/CppMicroServices/issues/210>`_
 
 Security
 ~~~~~~~~

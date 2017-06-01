@@ -6,13 +6,10 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased v3.1.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2017-XX-XX)
----------------------------------------------------------------------------------------------------------
+`v3.1.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.1.0>`_ (2017-06-01)
+-----------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.0.0...development>`_
-
-Added
-~~~~~
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.0.0...v3.1.0>`_
 
 Changed
 ~~~~~~~
@@ -30,27 +27,24 @@ Deprecated
   * ``RemoveServiceListener``
 
   And the variants of
-  
+
   * ``AddBundleListener``
   * ``AddFrameworkListener``,
   * ``AddServiceListener``
-  
+
   that take member functions.
 
 - The free functions:
-  
+
   * ``ServiceListenerMemberFunctor``
   * ``BundleListenerMemberFunctor``
   * ``BindFrameworkListenerToFunctor``
 
 - The functions
-  
+
   * ``ShrinkableVector::operator[std::size_t]``
   * ``ShrinkableMap::operator[const Key&]``
 
-
-Removed
-~~~~~~~
 
 Fixed
 ~~~~~
@@ -65,9 +59,6 @@ Fixed
    `#198 <https://github.com/CppMicroServices/CppMicroServices/pull/198>`_
 -  Stopping a framework while bundle threads are still running may deadlock
    `#210 <https://github.com/CppMicroServices/CppMicroServices/issues/210>`_
-
-Security
-~~~~~~~~
 
 `v3.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.0.0>`_ (2017-02-08)
 -----------------------------------------------------------------------------------------

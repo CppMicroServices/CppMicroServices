@@ -166,5 +166,6 @@ test_script:
 - ctest -j2 -C %CONFIGURATION% --output-on-failure
 - ../opencppcoverage_mergereports.bat "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe"
 - pip install codecov
-- codecov -X gcov -f coverage.xml
+- python fixcoveragefilepaths.py -i coverage.xml -s %APPVEYOR_BUILD_FOLDER% -o coverage_pathsfixed.xml
+- cat coverage_pathsfixed.xml
 

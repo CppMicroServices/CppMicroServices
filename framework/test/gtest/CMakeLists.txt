@@ -12,13 +12,15 @@ if(GTEST_INCLUDE_DIRS)
   # executable so that they can be seen at runtime on Windows.
   # Mac and Linux use RPATHs and do not need to do this.
   if (WIN32)
-    foreach( input_file ${GTEST_BOTH_LIBRARIES})
-      string(REPLACE ".lib" ".dll" input_dll_file ${input_file})
+    foreach(lib_fullpath ${GTEST_BOTH_LIBRARIES})
+      get_filename_component(dir ${lib_fullpath} DIRECTORY)
+      get_filename_component(name_no_ext ${lib_fullpath} NAME_WE)
+      set(dll_file "${dir}/${name_no_ext}${CMAKE_SHARED_LIBRARY_SUFFIX}")
       add_custom_command(TARGET UnitTests POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${input_dll_file}"
+            "${dll_file}"
             $<TARGET_FILE_DIR:UnitTests>)
-    endforeach( input_file)
+    endforeach(lib_fullpath)
   endif(WIN32)
 endif()
 

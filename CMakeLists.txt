@@ -265,14 +265,14 @@ if(US_BUILD_TESTING)
   mark_as_advanced(US_MEMCHECK_COMMAND)
 
   if(GTEST_ROOT STREQUAL "")
-    MESSAGE(STATUS "GTEST_ROOT variable is not defined.")
+    message(STATUS "GTEST_ROOT variable is not defined.")
   else()
-    MESSAGE(STATUS "GTEST_ROOT: " ${GTEST_ROOT})
+    message(STATUS "GTEST_ROOT: " ${GTEST_ROOT})
     find_package(GTest REQUIRED)
 endif()
 
-MESSAGE(STATUS "Include directories: " ${GTEST_INCLUDE_DIRS})
-MESSAGE(STATUS "GTest libraries: " ${GTEST_BOTH_LIBRARIES})
+message(STATUS "Include directories: " ${GTEST_INCLUDE_DIRS})
+message(STATUS "GTest libraries: " ${GTEST_BOTH_LIBRARIES})
 
 endif()
 

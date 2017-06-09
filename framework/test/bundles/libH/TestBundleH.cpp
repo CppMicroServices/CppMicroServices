@@ -71,7 +71,6 @@ public:
 
   InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
   {
-    std::cout << "GetService (prototype) in H" << std::endl;
     std::shared_ptr<TestProduct2> product = std::make_shared<TestProduct2>(caller);
     fcbind[caller.GetBundleId()].push_back(product);
     return MakeInterfaceMap<TestBundleH,TestBundleH2>(product);
@@ -92,7 +91,6 @@ public:
 
   InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
   {
-    std::cout << "GetService in H" << std::endl;
     std::shared_ptr<TestProduct> product = std::make_shared<TestProduct>(caller);
     fcbind.insert(std::make_pair(caller.GetBundleId(), product));
     return MakeInterfaceMap<TestBundleH>(product);

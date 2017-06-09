@@ -186,18 +186,20 @@ void TestConcurrentServiceFactory()
   {
     worker_threads.push_back(std::thread([framework]()
         {
+          auto frameworkCtx = framework.GetBundleContext();
+          US_TEST_CONDITION_REQUIRED(frameworkCtx, "Get framework's bundle context");
+          
           for (int i = 0; i < 1000; ++i)
           {
-              auto frameworkCtx = framework.GetBundleContext();
-              if (frameworkCtx)
+            auto ref = frameworkCtx.GetServiceReference<cppmicroservices::TestBundleH2>();
+            if (ref)
+            {
+              std::shared_ptr<cppmicroservices::TestBundleH2> svc = frameworkCtx.GetService(ref);
+              if (!svc)
               {
-                auto ref = frameworkCtx.GetServiceReference<cppmicroservices::TestBundleH2>();
-                if (ref)
-                {
-                  std::shared_ptr<cppmicroservices::TestBundleH2> svc = frameworkCtx.GetService(ref);
-                  US_TEST_CONDITION_REQUIRED(svc, "test for valid service object");
-                }
+                US_TEST_FAILED_MSG(<< "Failed to retrieve a valid service object");
               }
+            }
           }
         }));
   }

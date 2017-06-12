@@ -371,7 +371,7 @@ else()
   message(SEND_ERROR "Disabling threading support is currently unsupported.")
 endif()
 
-if(US_ENABLE_CCOV)
+if(US_ENABLE_CCOV AND US_CXX_CCOV_FLAGS)
   set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_CCOV_FLAGS}")
 endif()
 
@@ -405,7 +405,7 @@ if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
 endif()
 
-if(US_CXX_CCOV_FLAGS AND US_ENABLE_CCOV)
+if(US_ENABLE_CCOV AND US_CXX_CCOV_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_CXX_CCOV_FLAGS}")
 endif()
 

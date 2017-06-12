@@ -28,6 +28,7 @@
 #include "cppmicroservices/ServiceInterface.h"
 
 #include <iostream>
+#include <mutex>
 
 namespace cppmicroservices {
 
@@ -66,11 +67,12 @@ public:
 class TestBundleHPrototypeServiceFactory : public PrototypeServiceFactory
 {
   std::map<long, std::list<std::shared_ptr<TestProduct2>> > fcbind;   // Map calling bundle with implementation
-
+  std::mutex fcbindLock;
 public:
 
   InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
   {
+    std::unique_lock<std::mutex> lock(fcbindLock);
     std::shared_ptr<TestProduct2> product = std::make_shared<TestProduct2>(caller);
     fcbind[caller.GetBundleId()].push_back(product);
     return MakeInterfaceMap<TestBundleH,TestBundleH2>(product);
@@ -78,6 +80,7 @@ public:
 
   void UngetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
+    std::unique_lock<std::mutex> lock(fcbindLock);
     std::shared_ptr<TestProduct2> product = std::dynamic_pointer_cast<TestProduct2>(ExtractInterface<TestBundleH>(service));
     fcbind[caller.GetBundleId()].remove(product);
   }
@@ -87,10 +90,12 @@ public:
 class TestBundleHServiceFactory : public ServiceFactory
 {
   std::map<long, std::shared_ptr<TestProduct>> fcbind;   // Map calling bundle with implementation
+  std::mutex fcbindLock;
 public:
 
   InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
   {
+    std::unique_lock<std::mutex> lock(fcbindLock);
     std::shared_ptr<TestProduct> product = std::make_shared<TestProduct>(caller);
     fcbind.insert(std::make_pair(caller.GetBundleId(), product));
     return MakeInterfaceMap<TestBundleH>(product);
@@ -98,6 +103,7 @@ public:
 
   void UngetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& service)
   {
+    std::unique_lock<std::mutex> lock(fcbindLock);
     std::shared_ptr<TestBundleH> product = ExtractInterface<TestBundleH>(service);
     fcbind.erase(caller.GetBundleId());
   }

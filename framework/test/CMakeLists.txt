@@ -130,6 +130,13 @@ if(US_ENABLE_TSAN)
   set_tests_properties(HelgrindTest PROPERTIES WILL_FAIL 1)
 endif()
 
+# Add a Preprocessor flag if code coverage is turned ON
+# lcov writes coverage files during static destruction causing 
+# failures if a library is unloaded from the process.
+if(US_ENABLE_CCOV)
+  target_compile_definitions(${_test_driver} PUBLIC US_COVERAGE_ENABLED=1)
+endif()
+
 #-----------------------------------------------------------------------------
 # Add dependencies for shared libraries
 #-----------------------------------------------------------------------------

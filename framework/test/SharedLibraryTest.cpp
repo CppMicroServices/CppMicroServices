@@ -33,7 +33,7 @@ using namespace cppmicroservices;
 int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("SharedLibraryTest");
-#if 0 // temporarily disable
+
   const std::string libAFilePath = testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleA" + US_LIB_EXT;
   SharedLibrary lib1(libAFilePath);
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "Absolute file path")
@@ -90,12 +90,16 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_FOR_EXCEPTION(std::logic_error, lib1.Load())
   lib2.SetPrefix(US_LIB_PREFIX);
   lib2.Load();
-
+  
   lib3.Unload();
   US_TEST_CONDITION(!lib3.IsLoaded(), "lib3 unloaded")
   US_TEST_CONDITION(!lib1.IsLoaded(), "lib3 unloaded")
+
+#if !defined(US_COVERAGE_ENABLED)
   lib2.Unload();
-  lib1.Unload();
+  US_TEST_CONDITION(!lib2.IsLoaded(), "lib2 loaded")
 #endif
+  lib1.Unload();
+    
   US_TEST_END()
 }

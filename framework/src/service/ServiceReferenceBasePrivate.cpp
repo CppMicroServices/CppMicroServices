@@ -228,6 +228,11 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
 
   {
     auto l = registration->Lock(); US_UNUSED(l);
+    if (registration->dependents.end() == registration->dependents.find(bundle.get()))
+    {
+      return hadReferences && removeService;
+    }
+
     int count = registration->dependents.at(bundle.get());
     if (count > 0)
     {

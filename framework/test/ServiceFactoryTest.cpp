@@ -187,7 +187,11 @@ void TestConcurrentServiceFactory()
     worker_threads.push_back(std::thread([framework]()
         {
           auto frameworkCtx = framework.GetBundleContext();
-          US_TEST_CONDITION_REQUIRED(frameworkCtx, "Get framework's bundle context");
+          if (!frameworkCtx)
+          {
+            US_TEST_FAILED_MSG(<< "Failed to get Framework's bundle context. Terminating the thread...");
+            return;
+          }
           
           for (int i = 0; i < 1000; ++i)
           {

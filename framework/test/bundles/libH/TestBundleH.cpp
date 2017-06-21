@@ -131,7 +131,7 @@ class TestBundleHServiceFactoryGetServiceThrow : public ServiceFactory
 public:
   InterfaceMapConstPtr GetService(const Bundle& /*caller*/, const ServiceRegistrationBase& /*sReg*/)
   {
-    throw std::exception("Test exception thrown from TestBundleHServiceFactoryThrow::GetService");
+    throw std::runtime_error("Test exception thrown from TestBundleHServiceFactoryThrow::GetService");
   }
 
   void UngetService(const Bundle& /*caller*/, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& /*service*/)
@@ -151,7 +151,7 @@ public:
 
   void UngetService(const Bundle& /*caller*/, const ServiceRegistrationBase& /*sReg*/, const InterfaceMapConstPtr& /*service*/)
   {
-    throw std::exception("Test exception thrown from TestBundleHServiceFactoryUngetServiceThrow::UngetService");
+    throw std::runtime_error("Test exception thrown from TestBundleHServiceFactoryUngetServiceThrow::UngetService");
   }
 };
 
@@ -159,7 +159,7 @@ public:
 class TestBundleHServiceFactoryInterfaceNotFound : public ServiceFactory
 {
 public:
-    InterfaceMapConstPtr GetService(const Bundle& caller, const ServiceRegistrationBase& /*sReg*/)
+    InterfaceMapConstPtr GetService(const Bundle& /*caller*/, const ServiceRegistrationBase& /*sReg*/)
     {
       std::shared_ptr<FakeTestProduct> product = std::make_shared<FakeTestProduct>();
       return MakeInterfaceMap<TestBundleH3>(product);

@@ -114,12 +114,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(const Bund
 
 std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(BundlePrivate* bundle)
 {
-  auto s = ExtractInterface(GetServiceInterfaceMap(bundle), interfaceId);
-  if (!s)
-  {
-    registration->Lock(), --registration->dependents.at(bundle);
-  }
-  return s;
+  return ExtractInterface(GetServiceInterfaceMap(bundle), interfaceId);
 }
 
 InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundlePrivate* bundle)
@@ -128,40 +123,42 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundleP
   if (!registration->available) return s;
   std::shared_ptr<ServiceFactory> serviceFactory;
 
-  auto l = registration->Lock(); US_UNUSED(l);
-  if (!registration->available) return s;
-  serviceFactory = std::static_pointer_cast<ServiceFactory>(
-        registration->GetService_unlocked("org.cppmicroservices.factory"));
-
-  if(registration->dependents.end() == registration->dependents.find(bundle))
   {
+    auto l = registration->Lock(); US_UNUSED(l);
+    if (!registration->available) return s;
+    serviceFactory = std::static_pointer_cast<ServiceFactory>(
+          registration->GetService_unlocked("org.cppmicroservices.factory"));
+
     registration->dependents.insert(std::make_pair(bundle, 0));
-  }
 
-  if (!serviceFactory)
-  {
-    s = registration->service;
-    if (s && !s->empty())
+    if (!serviceFactory)
     {
-      ++registration->dependents.at(bundle);
+      s = registration->service;
+      if (s && !s->empty())
+      {
+        ++registration->dependents.at(bundle);
+      }
+      return s;
     }
-    return s;
   }
 
-  if (0 == registration->dependents.at(bundle))
-  {
-    // No cached service instance exists. Get a new one and cache it.
-    s = GetServiceFromFactory(bundle, serviceFactory);
-    registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
-    if (s && !s->empty()) ++registration->dependents.at(bundle);
-  }
-  else
-  {
-    // Return the cached service instance.
-    s = registration->bundleServiceInstance.at(bundle);
-    if (s && !s->empty()) ++registration->dependents.at(bundle);
-  }
+  // Calling into a service factory could cause re-entrancy into the
+  // framework and even, theoretically, into this function. Ensuring
+  // we don't hold a lock while calling into the service factory eliminates
+  // the possibility of a deadlock. It does not however eliminate the
+  // possbilituy of infinite recursion.
+  s = GetServiceFromFactory(bundle, serviceFactory);
 
+  auto l = registration->Lock(); US_UNUSED(l);
+
+  registration->dependents.insert(std::make_pair(bundle, 0));
+
+  if (s && !s->empty())
+  {
+    auto insertResultPair = registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
+    s = insertResultPair.first->second;
+    ++registration->dependents.at(bundle);
+  }
   return s;
 }
 

@@ -299,9 +299,12 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
-  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(
-        *(reference.d.load()->GetServiceInterfaceMap(b))
-        );
+  InterfaceMapConstPtr imap_copy;
+  auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b);
+  if (serviceInterfaceMap)
+  {
+    imap_copy = std::make_shared<const InterfaceMap>(*(serviceInterfaceMap));
+  }
   std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(b->shared_from_this(), reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }

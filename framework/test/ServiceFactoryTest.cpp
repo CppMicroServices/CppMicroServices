@@ -271,7 +271,7 @@ void TestConcurrentServiceFactory()
             return;
           }
           
-          for (int i = 0; i < 1000; ++i)
+          for (int i = 0; i < 100; ++i)
           {
             auto ref = frameworkCtx.GetServiceReference<cppmicroservices::TestBundleH2>();
             if (ref)

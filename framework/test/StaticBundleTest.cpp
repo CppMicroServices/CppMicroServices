@@ -210,7 +210,7 @@ int StaticBundleTest(int /*argc*/, char* /*argv*/[])
   US_TEST_BEGIN("StaticBundleTest");
 
   FrameworkFactory factory;
-  std::map<std::string, Any> frameworkConfig;
+  FrameworkConfiguration frameworkConfig;
   auto framework = factory.NewFramework(frameworkConfig);
   framework.Start();
 
@@ -227,7 +227,7 @@ int StaticBundleTest(int /*argc*/, char* /*argv*/[])
 
     frame020a(context, listener);
     frame030b(context, listener);
-#ifdef US_BUILD_SHARED_LIBS 
+#ifdef US_BUILD_SHARED_LIBS
     // bundles in the executable are auto-installed.
     // install and uninstall on embedded bundles is not allowed.
     frame040c(context, listener);

@@ -398,7 +398,7 @@ void TestBundleStates()
     std::vector<BundleEvent> bundleEvents;
     FrameworkFactory factory;
 
-    std::map<std::string, Any> frameworkConfig;
+    FrameworkConfiguration frameworkConfig;
     auto framework = factory.NewFramework(frameworkConfig);
     framework.Start();
 
@@ -602,7 +602,7 @@ void TestAutoInstallEmbeddedBundles()
   // There are atleast 2 bundles, maybe more depending on how the executable is created
   US_TEST_CONDITION(2 <= frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #endif
-  
+
   auto bundles = frameworkCtx.GetBundles();
   auto bundleIter = std::find_if(bundles.begin(), bundles.end(),
                                   [](const Bundle& b)
@@ -617,7 +617,7 @@ void TestAutoInstallEmbeddedBundles()
 
   auto b = frameworkCtx.GetBundle(0);
   US_TEST_FOR_EXCEPTION(std::runtime_error, b.Uninstall());
-  
+
   f.Stop();
 }
 
@@ -639,8 +639,8 @@ void TestNonStandardBundleExtension()
 
   // Test the non-standard file extension bundle's lifecycle
   auto bundles = frameworkCtx.GetBundles();
-  auto bundleIter = std::find_if(bundles.begin(), bundles.end(), 
-                                  [](const Bundle& b) 
+  auto bundleIter = std::find_if(bundles.begin(), bundles.end(),
+                                  [](const Bundle& b)
                                   {
                                         return (std::string("TestBundleExt") == b.GetSymbolicName());
                                   }
@@ -689,7 +689,7 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
 
   // test a non-default framework instance using a different persistent storage location.
   {
-    std::map<std::string, Any> frameworkConfig;
+    FrameworkConfiguration frameworkConfig;
     frameworkConfig[Constants::FRAMEWORK_STORAGE] = testing::GetTempDirectory();
     auto framework = FrameworkFactory().NewFramework(frameworkConfig);
     framework.Start();

@@ -162,9 +162,22 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundleP
 
   if (s && !s->empty())
   {
+    // Insert a cached service object instance only if one isn't already cached. If another thread
+    // already inserted a cached service object, discard the service object returned by 
+    // GetServiceFromFactory and return the cached one.
     auto insertResultPair = registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
     s = insertResultPair.first->second;
     ++registration->dependents.at(bundle);
+  }
+  else
+  {
+    // If the service factory returned an invalid service object check the cache and return a valid one
+    // if it exists.
+    if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
+    {
+      s = registration->bundleServiceInstance.at(bundle);
+      ++registration->dependents.at(bundle);
+    }
   }
   return s;
 }

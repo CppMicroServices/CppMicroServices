@@ -140,6 +140,13 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundleP
       }
       return s;
     }
+
+    if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
+    {
+      s = registration->bundleServiceInstance.at(bundle);
+      ++registration->dependents.at(bundle);
+      return s;
+    }
   }
 
   // Calling into a service factory could cause re-entrancy into the

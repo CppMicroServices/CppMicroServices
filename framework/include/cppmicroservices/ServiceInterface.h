@@ -317,6 +317,11 @@ std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
  */
 inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, const std::string& interfaceId)
 {
+  if (!map)
+  {
+    return nullptr;
+  }
+
   if (interfaceId.empty() && map && !map->empty())
   {
     return map->begin()->second;

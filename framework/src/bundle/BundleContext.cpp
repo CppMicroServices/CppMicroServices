@@ -24,7 +24,6 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/detail/Log.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -300,15 +299,18 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
-  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(
-        *(reference.d.load()->GetServiceInterfaceMap(b))
-        );
+  InterfaceMapConstPtr imap_copy;
+  auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b);
+  if (serviceInterfaceMap)
+  {
+    imap_copy = std::make_shared<const InterfaceMap>(*(serviceInterfaceMap));
+  }
   std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(b->shared_from_this(), reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
-void BundleContext::AddServiceListener(const ServiceListener& delegate,
-                                       const std::string& filter)
+ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
+                                                const std::string& filter)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -318,7 +320,7 @@ void BundleContext::AddServiceListener(const ServiceListener& delegate,
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
+  return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
@@ -331,10 +333,10 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(d, delegate, nullptr);
+  b->coreCtx->listeners.RemoveServiceListener(d, ListenerTokenId(0), delegate, nullptr);
 }
 
-void BundleContext::AddBundleListener(const BundleListener& delegate)
+ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -344,7 +346,7 @@ void BundleContext::AddBundleListener(const BundleListener& delegate)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
+  return b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate)
@@ -360,7 +362,7 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
 }
 
-void BundleContext::AddFrameworkListener(const FrameworkListener& listener)
+ListenerToken BundleContext::AddFrameworkListener(const FrameworkListener& listener)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -370,7 +372,7 @@ void BundleContext::AddFrameworkListener(const FrameworkListener& listener)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
+  return b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
 }
 
 void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
@@ -386,8 +388,8 @@ void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
   b->coreCtx->listeners.RemoveFrameworkListener(d, listener, nullptr);
 }
 
-void BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
-                                       const std::string &filter)
+ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
+                                                const std::string &filter)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -397,7 +399,7 @@ void BundleContext::AddServiceListener(const ServiceListener& delegate, void* da
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
+  return b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void* data)
@@ -410,10 +412,10 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void*
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(d, delegate, data);
+  b->coreCtx->listeners.RemoveServiceListener(d, ListenerTokenId(0), delegate, data);
 }
 
-void BundleContext::AddBundleListener(const BundleListener& delegate, void* data)
+ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate, void* data)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -423,7 +425,7 @@ void BundleContext::AddBundleListener(const BundleListener& delegate, void* data
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.AddBundleListener(d, delegate, data);
+  return b->coreCtx->listeners.AddBundleListener(d, delegate, data);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* data)
@@ -437,6 +439,19 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* d
   // won the race condition.
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, data);
+}
+
+void BundleContext::RemoveListener(ListenerToken token)
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  // CONCURRENCY NOTE: This is a check-then-act situation,
+  // but we ignore it since the time window is small and
+  // the result is the same as if the calling thread had
+  // won the race condition.
+
+  b->coreCtx->listeners.RemoveListener(d, std::move(token));
 }
 
 std::string BundleContext::GetDataFile(const std::string &filename) const

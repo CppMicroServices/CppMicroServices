@@ -34,13 +34,15 @@ ServiceListenerHook::~ServiceListenerHook()
 }
 
 ServiceListenerHook::ListenerInfoData::ListenerInfoData(
-    const std::shared_ptr<BundleContextPrivate>& context,
-    const ServiceListener& l,
-    void* data,
-    const std::string& filter)
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceListener& l,
+  void* data,
+  ListenerTokenId tokenId,
+  const std::string& filter)
   : context(context)
   , listener(l)
   , data(data)
+  , tokenId(tokenId)
   , filter(filter)
   , bRemoved(false)
 {

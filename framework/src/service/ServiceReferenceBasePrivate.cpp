@@ -47,7 +47,9 @@ ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBase
 ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 {
   if (registration && !--registration->ref)
+  {
     delete registration;
+  }
 }
 
 InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
@@ -62,7 +64,10 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
                                                     ServiceRegistrationBase(registration));
     if (!smap || smap->empty())
     {
-      registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), std::string("ServiceFactory returned an empty or nullptr interface map."), std::make_exception_ptr(std::logic_error("ServiceFactory produced null"))));
+      registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
+                                                                                  MakeBundle(bundle->shared_from_this()), 
+                                                                                  std::string("ServiceFactory returned an empty or nullptr interface map."), 
+                                                                                  std::make_exception_ptr(std::logic_error("ServiceFactory returned an invalid interface map"))));
       return smap;
     }
     std::vector<std::string> classes = (registration->properties.Lock(),
@@ -72,7 +77,10 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
       {
         std::string message("ServiceFactory produced an object that did not implement: " + clazz);
-        registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), message, std::make_exception_ptr(std::logic_error(message.c_str()))));
+        registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
+                                                                                    MakeBundle(bundle->shared_from_this()), 
+                                                                                    message, 
+                                                                                    std::make_exception_ptr(std::logic_error(message.c_str()))));
         return nullptr;
       }
     }
@@ -81,7 +89,10 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
   catch (...)
   {
     s.reset();
-    registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, MakeBundle(bundle->shared_from_this()), std::string("ServiceFactory threw an unknown exception."), std::current_exception()));
+    registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR, 
+                                                                                MakeBundle(bundle->shared_from_this()), 
+                                                                                std::string("ServiceFactory threw an unknown exception."), 
+                                                                                std::current_exception()));
   }
   return s;
 }
@@ -103,62 +114,69 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetPrototypeService(const Bund
 
 std::shared_ptr<void> ServiceReferenceBasePrivate::GetService(BundlePrivate* bundle)
 {
-  auto s = ExtractInterface(GetServiceInterfaceMap(bundle), interfaceId);
-  if (!s)
-  {
-    registration->Lock(), --registration->dependents[bundle];
-  }
-  return s;
+  return ExtractInterface(GetServiceInterfaceMap(bundle), interfaceId);
 }
 
 InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(BundlePrivate* bundle)
 {
   InterfaceMapConstPtr s;
   if (!registration->available) return s;
-
   std::shared_ptr<ServiceFactory> serviceFactory;
-  int count = 0;
 
   {
     auto l = registration->Lock(); US_UNUSED(l);
     if (!registration->available) return s;
     serviceFactory = std::static_pointer_cast<ServiceFactory>(
           registration->GetService_unlocked("org.cppmicroservices.factory"));
-    count = registration->dependents[bundle];
+
+    registration->dependents.insert(std::make_pair(bundle, 0));
+
+    if (!serviceFactory)
+    {
+      s = registration->service;
+      if (s && !s->empty())
+      {
+        ++registration->dependents.at(bundle);
+      }
+      return s;
+    }
+
+    if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
+    {
+      s = registration->bundleServiceInstance.at(bundle);
+      ++registration->dependents.at(bundle);
+      return s;
+    }
   }
 
-  if (!serviceFactory)
+  // Calling into a service factory could cause re-entrancy into the
+  // framework and even, theoretically, into this function. Ensuring
+  // we don't hold a lock while calling into the service factory eliminates
+  // the possibility of a deadlock. It does not however eliminate the
+  // possbilituy of infinite recursion.
+  s = GetServiceFromFactory(bundle, serviceFactory);
+
+  auto l = registration->Lock(); US_UNUSED(l);
+
+  registration->dependents.insert(std::make_pair(bundle, 0));
+
+  if (s && !s->empty())
   {
-    auto l = registration->Lock(); US_UNUSED(l);
-          s = registration->service;
-    if (s && !s->empty()) ++registration->dependents[bundle];
+    // Insert a cached service object instance only if one isn't already cached. If another thread
+    // already inserted a cached service object, discard the service object returned by 
+    // GetServiceFromFactory and return the cached one.
+    auto insertResultPair = registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
+    s = insertResultPair.first->second;
+    ++registration->dependents.at(bundle);
   }
   else
   {
-    if (count == 0)
+    // If the service factory returned an invalid service object check the cache and return a valid one
+    // if it exists.
+    if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
     {
-      s = GetServiceFromFactory(bundle, serviceFactory);
-
-      auto l = registration->Lock(); US_UNUSED(l);
-      if (registration->dependents[bundle] == 0)
-      {
-        registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
-      }
-      else
-      {
-        // There was a race and we now have one instance too much. Return the
-        // already produced instance and ignore the additional one.
-        s = registration->bundleServiceInstance[bundle];
-      }
-
-      if (s && !s->empty()) ++registration->dependents[bundle];
-    }
-    else
-    {
-      auto l = registration->Lock(); US_UNUSED(l);
-      // return the already produced instance
-      s = registration->bundleServiceInstance[bundle];
-      if (s && !s->empty()) ++registration->dependents[bundle];
+      s = registration->bundleServiceInstance.at(bundle);
+      ++registration->dependents.at(bundle);
     }
   }
   return s;
@@ -196,7 +214,9 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(const std::shared_ptr<Bu
       catch (...)
       {
         std::string message("ServiceFactory threw an exception");
-        registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), message, std::current_exception()));
+        registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
+                                                                                    MakeBundle(bundle->shared_from_this()), message, 
+                                                                                    std::current_exception()));
       }
 
       auto l = registration->Lock(); US_UNUSED(l);
@@ -225,7 +245,12 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
 
   {
     auto l = registration->Lock(); US_UNUSED(l);
-    int count= registration->dependents[bundle.get()];
+    if (registration->dependents.end() == registration->dependents.find(bundle.get()))
+    {
+      return hadReferences && removeService;
+    }
+
+    int count = registration->dependents.at(bundle.get());
     if (count > 0)
     {
       hadReferences = true;
@@ -235,7 +260,7 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
     {
       if (count > 1)
       {
-        registration->dependents[bundle.get()] = count - 1;
+        --registration->dependents.at(bundle.get());
       }
       else if(count == 1)
       {
@@ -249,7 +274,11 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
 
     if (removeService)
     {
-      sfi = registration->bundleServiceInstance[bundle.get()];
+      if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle.get()))
+      {
+        sfi = registration->bundleServiceInstance.at(bundle.get());
+      }
+
       if (sfi && !sfi->empty())
       {
         sf = std::static_pointer_cast<ServiceFactory>(
@@ -269,7 +298,9 @@ bool ServiceReferenceBasePrivate::UngetService(const std::shared_ptr<BundlePriva
     catch (...)
     {
       std::string message("ServiceFactory threw an exception");
-      registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(bundle->shared_from_this()), message, std::current_exception()));
+      registration->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, 
+                                                                                  MakeBundle(bundle->shared_from_this()), 
+                                                                                  message, std::current_exception()));
     }
   }
 

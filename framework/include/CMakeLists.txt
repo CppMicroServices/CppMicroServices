@@ -10,6 +10,7 @@ set(_public_headers
   cppmicroservices/FrameworkFactory.h
   cppmicroservices/LDAPFilter.h
   cppmicroservices/LDAPProp.h
+  cppmicroservices/ListenerToken.h
   cppmicroservices/ListenerFunctors.h
   cppmicroservices/SharedData.h
   cppmicroservices/SharedLibrary.h

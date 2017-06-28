@@ -20,32 +20,22 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
-#define CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
-
-#include "cppmicroservices/ServiceListenerHook.h"
-#include "cppmicroservices/SharedData.h"
-
-#include "ServiceListenerEntry.h"
+#include "cppmicroservices/BundleActivator.h"
+#include "cppmicroservices/BundleContext.h"
 
 namespace cppmicroservices {
 
-class ServiceListenerHook::ListenerInfoData : public SharedData
+class TestBundleExtActivator : public BundleActivator
 {
 public:
-  ListenerInfoData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                   void* data, ListenerTokenId tokenId, const std::string& filter);
 
-  virtual ~ListenerInfoData();
+  TestBundleExtActivator() {}
+  ~TestBundleExtActivator() {}
 
-  std::shared_ptr<BundleContextPrivate> const context;
-  ServiceListener listener;
-  void* data;
-  ListenerTokenId tokenId;
-  std::string filter;
-  bool bRemoved;
+  void Start(BundleContext) { }
+  void Stop(BundleContext) { }
 };
 
 }
 
-#endif // CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleExtActivator)

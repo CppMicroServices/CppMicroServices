@@ -49,7 +49,6 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
 
   const static std::chrono::milliseconds KEEP_ALIVE;
 
-  CoreBundleContext* const fwCtx;
   std::chrono::milliseconds startStopTimeout;
 
   struct Op : detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
@@ -75,7 +74,7 @@ public:
 
   void Quit();
 
-  void Run();
+  void Run(CoreBundleContext* fwCtx);
 
   void Join();
 

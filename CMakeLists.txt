@@ -426,7 +426,7 @@ CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 # c++11 regular expressions are used in the unit tests.
 # Currently the default C++ library for gcc < 4.9 doesn't
 # fully support c++11 regex.
-# Generelize the detection of regex and make its availability
+# Generalize the detection of regex and make its availability
 # conditional of wether the compiler's C++ library supports it
 # or not.
 # This can be removed once the minimum supported gcc version is 4.9

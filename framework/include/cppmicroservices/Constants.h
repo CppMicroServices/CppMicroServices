@@ -297,6 +297,13 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicrose
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
 
+/**
+ * Framework launching property specifying the working directory used for
+ * resolving relative path names. If not set, the framework will use the process
+ * current working directory as set during static initialization of the
+ * framework library.
+ */
+US_Framework_EXPORT extern const std::string FRAMEWORK_WORKING_DIR; // = "org.cppmicroservices.framework.working.dir";
 
 /*
  * Service properties.

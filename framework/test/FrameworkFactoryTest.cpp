@@ -45,7 +45,7 @@ int FrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 
     US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
 
-    std::map < std::string, Any > configuration;
+    FrameworkConfiguration configuration;
     configuration["org.osgi.framework.security"] = std::string("osgi");
     configuration["org.osgi.framework.startlevel.beginning"] = 0;
     configuration["org.osgi.framework.bsnversion"] = std::string("single");
@@ -56,9 +56,9 @@ int FrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
 
     US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
 
-	auto f3 = FrameworkFactory().NewFramework(std::map<std::string, cppmicroservices::Any>(), &std::clog);
+    auto f3 = FrameworkFactory().NewFramework(std::unordered_map<std::string, cppmicroservices::Any>(), &std::clog);
 
-	US_TEST_CONDITION(f3, "Test Framework instantiation with default configuration and custom logger");
+    US_TEST_CONDITION(f3, "Test Framework instantiation with default configuration and custom logger");
 
     US_TEST_END()
 }

@@ -99,7 +99,9 @@ public:
   * Note: CppMicroServices currently has no concept
   * of "system properties".
   */
-  std::map<std::string, Any> frameworkProperties;
+  std::unordered_map<std::string, Any> frameworkProperties;
+
+  const std::string& workingDir;
 
  /**
   * The diagnostic logging sink
@@ -204,7 +206,7 @@ private:
    * Construct a core context
    *
    */
-  CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger);
+  CoreBundleContext(const std::unordered_map<std::string, Any>& props, std::ostream* logger);
 
   struct : detail::MultiThreaded<> { std::weak_ptr<CoreBundleContext> v; } self;
 

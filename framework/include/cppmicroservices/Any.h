@@ -247,10 +247,10 @@ public:
    * \returns \c true if this Any contains value \c val, \c false otherwise.
    */
   template <typename ValueType>
-  bool operator==(const ValueType& val)
+  bool operator==(const ValueType& val) const
   {
     if (Type() != typeid(ValueType)) return false;
-    return *any_cast<ValueType>(this) == val;
+    return *any_cast<const ValueType>(this) == val;
   }
 
   /**
@@ -265,7 +265,7 @@ public:
    * \returns \c true if this Any does not contain value \c val, \c false otherwise.
    */
   template <typename ValueType>
-  bool operator!=(const ValueType& val)
+  bool operator!=(const ValueType& val) const
   {
     return !operator==(val);
   }

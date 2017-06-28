@@ -129,7 +129,7 @@ std::vector<std::string> SplitString(const std::string& str, const std::string& 
   return token;
 }
 
-std::string GetCurrentWorkingDirectory()
+std::string InitCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
   DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
@@ -152,6 +152,13 @@ std::string GetCurrentWorkingDirectory()
   }
 #endif
   return std::string();
+}
+
+static const std::string s_CurrWorkingDir = InitCurrentWorkingDirectory();
+
+std::string GetCurrentWorkingDirectory()
+{
+  return s_CurrWorkingDir;
 }
 
 bool Exists(const std::string& path)
@@ -206,9 +213,9 @@ bool IsRelative(const std::string& path)
 #endif
 }
 
-std::string GetAbsolute(const std::string& path)
+std::string GetAbsolute(const std::string& path, const std::string& base)
 {
-  if (IsRelative(path)) return GetCurrentWorkingDirectory() + DIR_SEP + path;
+  if (IsRelative(path)) return base + DIR_SEP + path;
   return path;
 }
 
@@ -315,7 +322,7 @@ bool IsBundleFile(const std::string& location)
       std::vector<uint32_t> indices;
 
       resContainer.GetChildren(dir + "/", true, names, indices);
-      return std::any_of(names.begin(), names.end(), [](const std::string& resourceName) -> bool { 
+      return std::any_of(names.begin(), names.end(), [](const std::string& resourceName) -> bool {
         return resourceName == std::string("manifest.json");
       });
     });
@@ -351,7 +358,7 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
   {
     return fwdir;
   }
-  const std::string dir = fs::GetAbsolute(fwdir) + DIR_SEP + name;
+  const std::string dir = fs::GetAbsolute(fwdir, ctx->workingDir) + DIR_SEP + name;
   if (!dir.empty())
   {
     if (fs::Exists(dir))

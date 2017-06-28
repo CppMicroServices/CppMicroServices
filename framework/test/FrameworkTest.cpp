@@ -40,7 +40,7 @@ namespace
     void TestDefaultConfig()
     {
         auto f = FrameworkFactory().NewFramework();
-    US_TEST_CONDITION(f, "Test Framework instantiation");
+        US_TEST_CONDITION(f, "Test Framework instantiation");
 
         f.Start();
 
@@ -59,11 +59,12 @@ namespace
         US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_STORAGE) == std::string("fwdir"), "Test for default base storage property")
         US_TEST_CONDITION(any_cast<bool>(ctx.GetProperty(Constants::FRAMEWORK_LOG)) == false, "Test default diagnostic logging")
 
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_WORKING_DIR) == testing::GetCurrentWorkingDirectory(), "Test for default working directory")
     }
 
     void TestCustomConfig()
     {
-        std::map < std::string, Any > configuration;
+        FrameworkConfiguration configuration;
         configuration["org.osgi.framework.security"] = std::string("osgi");
         configuration["org.osgi.framework.startlevel.beginning"] = 0;
         configuration["org.osgi.framework.bsnversion"] = std::string("single");
@@ -71,6 +72,7 @@ namespace
         configuration["org.osgi.framework.custom2"] = std::string("bar");
         configuration[Constants::FRAMEWORK_LOG] = true;
         configuration[Constants::FRAMEWORK_STORAGE] = testing::GetTempDirectory();
+        configuration[Constants::FRAMEWORK_WORKING_DIR] = testing::GetTempDirectory();
 
         // the threading model framework property is set at compile time and read-only at runtime. Test that this
         // is always the case.
@@ -81,7 +83,7 @@ namespace
 #endif
 
         auto f = FrameworkFactory().NewFramework(configuration);
-    US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration");
+        US_TEST_CONDITION(f, "Test Framework instantiation with custom configuration");
 
         try
         {
@@ -104,7 +106,8 @@ namespace
         US_TEST_CONDITION("foo" == any_cast<std::string>(ctx.GetProperty("org.osgi.framework.custom1")), "Test Framework custom launch properties");
         US_TEST_CONDITION("bar" == any_cast<std::string>(ctx.GetProperty("org.osgi.framework.custom2")), "Test Framework custom launch properties");
         US_TEST_CONDITION(any_cast<bool>(ctx.GetProperty(Constants::FRAMEWORK_LOG)) == true, "Test for enabled diagnostic logging");
-    US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for custom base storage path");
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for custom base storage path");
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_WORKING_DIR) == testing::GetTempDirectory(), "Test for custom working directory");
 
 #ifdef US_ENABLE_THREADING_SUPPORT
         US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString() == "multi", "Test for attempt to change threading option")
@@ -115,7 +118,7 @@ namespace
 
     void TestDefaultLogSink()
     {
-        std::map<std::string, Any> configuration;
+        FrameworkConfiguration configuration;
         // turn on diagnostic logging
         configuration[Constants::FRAMEWORK_LOG] = true;
 
@@ -143,7 +146,7 @@ namespace
 
   void TestCustomLogSink()
   {
-    std::map<std::string, Any> configuration;
+    FrameworkConfiguration configuration;
     // turn on diagnostic logging
     configuration[Constants::FRAMEWORK_LOG] = true;
 

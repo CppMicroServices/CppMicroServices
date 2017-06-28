@@ -62,7 +62,7 @@ bool IsDirectory(const std::string& path);
 bool IsFile(const std::string& path);
 bool IsRelative(const std::string& path);
 
-std::string GetAbsolute(const std::string& path);
+std::string GetAbsolute(const std::string& path, const std::string& base);
 
 void MakePath(const std::string& path);
 
@@ -105,10 +105,6 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
 {
   return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
 }
-
-// Platform agnostic way to get the current working directory.
-// Supports Linux, Mac, and Windows.
-std::string GetCurrentWorkingDirectory();
 
 void TerminateForDebug(const std::exception_ptr ex);
 

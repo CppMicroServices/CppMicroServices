@@ -34,7 +34,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "BundleThread.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
-#include "Utils.h" // cppmicroservices::ToString()
+#include "Utils.h"
 
 #include <iomanip>
 
@@ -44,7 +44,7 @@ namespace cppmicroservices {
 
 std::atomic<int> CoreBundleContext::globalId{0};
 
-std::map<std::string, Any> InitProperties(std::map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
   configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
@@ -57,6 +57,15 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
   configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
+  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) == configuration.end())
+  {
+    configuration.insert(std::make_pair(
+                           Constants::FRAMEWORK_WORKING_DIR,
+                           fs::GetCurrentWorkingDirectory()
+                           )
+                         );
+  }
+
   configuration.insert(std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
 
   configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
@@ -65,9 +74,10 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger)
+CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>& props, std::ostream* logger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
+  , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
   , listeners(this)
   , services(this)
   , serviceHooks(this)

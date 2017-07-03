@@ -158,14 +158,19 @@ install:
 - choco install opencppcoverage
 
 build_script:
-- if NOT "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build --config %configuration% -- /maxcpucount
-- if "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build -- -j2
+- if NOT "%platform%"=="mingw-w64"; then
+    cmake --build %APPVEYOR_BUILD_FOLDER%/build --config %configuration% -- /maxcpucount;
+  else
+    cmake --build %APPVEYOR_BUILD_FOLDER%/build -- -j2;
+  fi
 
 test_script:
 - cd %APPVEYOR_BUILD_FOLDER%/build
 - ctest -j2 -C %CONFIGURATION% --output-on-failure
-- if [%WITH_COVERAGE%]==[1] %APPVEYOR_BUILD_FOLDER%/opencppcoverage_mergereports.bat "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe"
-- if [%WITH_COVERAGE%]==[1] pip install codecov
-- if [%WITH_COVERAGE%]==[1] python %APPVEYOR_BUILD_FOLDER%/fixcoveragefilepaths.py -i coverage.xml -s %APPVEYOR_BUILD_FOLDER% -o coverage_pathsfixed.xml
-- if [%WITH_COVERAGE%]==[1] codecov -X gcov -f coverage_pathsfixed.xml
+- if [%WITH_COVERAGE%]==[1]; then
+    %APPVEYOR_BUILD_FOLDER%/opencppcoverage_mergereports.bat "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe";
+    pip install codecov;
+    python %APPVEYOR_BUILD_FOLDER%/fixcoveragefilepaths.py -i coverage.xml -s %APPVEYOR_BUILD_FOLDER% -o coverage_pathsfixed.xml;
+    codecov -X gcov -f coverage_pathsfixed.xml;
+  fi
 

@@ -95,8 +95,8 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(!lib3.IsLoaded(), "lib3 unloaded")
   US_TEST_CONDITION(!lib1.IsLoaded(), "lib3 unloaded")
 
-// gcov writes coverage files during static destruction causing  
-// failures if a library is completely unloaded from the process.
+// gcov on Mac OS X writes coverage files during static destruction  
+// resulting in a crash if a dylib is completely unloaded from the process.
 // https://bugs.llvm.org/show_bug.cgi?id=27224
 #if !defined(US_PLATFORM_APPLE) || !defined(US_COVERAGE_ENABLED)
   lib2.Unload();

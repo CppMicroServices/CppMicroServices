@@ -7,7 +7,7 @@ set myvar=OpenCppCoverage.exe --verbose --export_type=cobertura:coverage.xml
 for /r %%i in (*.cov) do (
   call :concat %%~nxi
 )
-echo %myvar%
+@echo on
 %myvar%
 goto :eof
 

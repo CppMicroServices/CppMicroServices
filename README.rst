@@ -1,22 +1,23 @@
 
 .. rubric:: Continuous Integration Status
 
-+-------------+-------------------------+--------------------------+
-| Branch      | GCC 4.6                 | Visual Studio 2013       |
-|             +-------------------------+--------------------------+
-|             | Xcode 6.4               | Visual Studio 2015       |
-|             +-------------------------+--------------------------+
-|             | Xcode 7.3               | MinGW-w64                |
-|             +-------------------------+--------------------------+
-|             | Xcode 8.2               |                          |
-+=============+=========================+==========================+
-| master      | |Linux Build Status|    | |Windows Build status|   |
-+-------------+-------------------------+--------------------------+
-| development | |Linux Build Status     | |Windows Build status    |
-|             | (development)|          | (development)|           |
-+-------------+-------------------------+--------------------------+
++-------------+-------------------------+--------------------------+------------------------+
+| Branch      | GCC 4.6                 | Visual Studio 2013       |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             | Xcode 6.4               | Visual Studio 2015       |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             | Xcode 7.3               | MinGW-w64                |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             | Xcode 8.2               |                          |                        |
++=============+=========================+==========================+========================+
+| master      | |Linux Build Status|    | |Windows Build status|   | |Code Coverage Status| |
++-------------+-------------------------+--------------------------+------------------------+
+| development | |Linux Build Status     | |Windows Build status    | |Code Coverage Status  |
+|             | (development)|          | (development)|           | (development)|         |
++-------------+-------------------------+--------------------------+------------------------+
 
 |Coverity Scan Build Status|
+
 
 C++ Micro Services
 ==================
@@ -188,3 +189,7 @@ file for details about the contribution process.
 .. |RTD Build Status (development)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=latest&style=flat-square
    :target: http://docs.cppmicroservices.org/en/latest/?badge=development
    :alt: Documentation Status (development)
+.. |Code Coverage Status| image:: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices
+.. |Code Coverage Status (development)| image:: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development/graph/badge.svg
+   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices

@@ -51,7 +51,7 @@ function(create_initial_cache var _shared _threading)
 
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON
-      US_ENABLE_CCOV:BOOL=$ENV{WITH_COVERAGE}
+      US_ENABLE_COVERAGE:BOOL=$ENV{WITH_COVERAGE}
       US_BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
       US_BUILD_EXAMPLES:BOOL=ON

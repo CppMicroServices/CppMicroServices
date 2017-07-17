@@ -14,11 +14,11 @@ matrix:
             apt:
               packages: valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=0
+          env: BUILD_CONFIGURATION=0 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: linux
           addons: *valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=1
+          env: BUILD_CONFIGURATION=1 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         # minimum supported compiler on OS X
         - os: osx
           osx_image: xcode6.4
@@ -36,11 +36,11 @@ matrix:
         - os: osx
           osx_image: xcode8.2
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: osx
           osx_image: xcode8.2
           compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
 
 cache:
   directories:
@@ -69,4 +69,7 @@ before_install:
 script:
   - test $TRAVIS_BRANCH != coverity_scan || exit 0
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
 

@@ -186,6 +186,7 @@ us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name pos
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
+us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
@@ -248,6 +249,12 @@ function(us_add_tests test_driver)
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
+  if(US_COVERAGE_COMMAND)
+    file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
+    add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception -- $<TARGET_FILE:${test_driver}> ${test}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
+  endif()
   endforeach()
 endfunction()
 
@@ -262,7 +269,12 @@ if(US_BUILD_TESTING)
   enable_testing()
   find_program(US_MEMCHECK_COMMAND valgrind)
   mark_as_advanced(US_MEMCHECK_COMMAND)
+  if(WIN32 AND US_ENABLE_COVERAGE)
+    find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
+    mark_as_advanced(US_COVERAGE_COMMAND)
+  endif()
 endif()
+
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -272,6 +284,7 @@ set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
 set(US_CXX11_FLAGS )
 set(US_CXX_TSAN_FLAGS )
 set(US_TSAN_LINK_FLAGS )
+set(US_CXX_COVERAGE_FLAGS )
 
 if(MSVC)
   set(disabled_warnings
@@ -329,6 +342,13 @@ else()
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
   endif()
+  
+  set(CMAKE_REQUIRED_LIBRARIES "-fprofile-arcs -ftest-coverage")
+  usFunctionCheckCompilerFlags("-fprofile-arcs -ftest-coverage" US_CXX_COVERAGE_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_COVERAGE_FLAGS AND US_ENABLE_COVERAGE)
+    message(WARNING "Code coverage requested, but compiler does not recognize it")
+  endif()
 endif()
 
 if(MINGW)
@@ -349,6 +369,11 @@ else()
   # The 3.0 release does not support single-threaded mode any more.
   # It will be re-enabled with a 3.x release later.
   message(SEND_ERROR "Disabling threading support is currently unsupported.")
+endif()
+
+if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
+  # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
+  set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_COVERAGE_FLAGS}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
@@ -379,6 +404,11 @@ endif()
 
 if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
+endif()
+
+if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
+  # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
+  set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_CXX_COVERAGE_FLAGS}")
 endif()
 
 usFunctionCheckResourceLinking()

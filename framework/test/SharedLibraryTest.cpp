@@ -90,12 +90,19 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_FOR_EXCEPTION(std::logic_error, lib1.Load())
   lib2.SetPrefix(US_LIB_PREFIX);
   lib2.Load();
-
+  
   lib3.Unload();
   US_TEST_CONDITION(!lib3.IsLoaded(), "lib3 unloaded")
   US_TEST_CONDITION(!lib1.IsLoaded(), "lib3 unloaded")
-  lib2.Unload();
-  lib1.Unload();
 
+// gcov on Mac OS X writes coverage files during static destruction  
+// resulting in a crash if a dylib is completely unloaded from the process.
+// https://bugs.llvm.org/show_bug.cgi?id=27224
+#if !defined(US_PLATFORM_APPLE) || !defined(US_COVERAGE_ENABLED)
+  lib2.Unload();
+  US_TEST_CONDITION(!lib2.IsLoaded(), "lib2 loaded")
+#endif
+  lib1.Unload();
+    
   US_TEST_END()
 }

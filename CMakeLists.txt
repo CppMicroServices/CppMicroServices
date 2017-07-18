@@ -36,22 +36,23 @@ set(CMAKE_CXX_STANDARD 11)
 
 # We make use of the following C++11 language and library features:
 #
-# Language feature                 GCC   Clang   AppleClang   VisualStudio
-# ------------------------------------------------------------------------
-# Rvalue references                4.3   2.9     ??           2012
-# Variadic templates               4.3   2.9     ??           2013*
-# Initializer lists                4.4   3.1     ??           2013
-# Static assertions                4.3   2.9     ??           2010
-# auto                             4.4   2.9     ??           2010
-# Lambdas                          4.5   3.1     ??           2012
-# decltype                         4.3   2.9     ??           2012
-# Right angle brackets             4.3   2.9     ??           2010
-# Null pointer constant            4.6   3.0     ??           2010
-# Explicit conversion operators    4.5   3.0     ??           2013
-# Defaulted functions              4.4   3.0     ??           2013*
-# Deleted functions                4.4   2.9     ??           2013*
-# Range-based for                  4.6   3.0     ??           2012
-# Atomic operations                4.4   3.1     ??           2012
+# Language feature                 GCC   Clang   Xcode   VisualStudio
+# -------------------------------------------------------------------
+# Rvalue references                4.3   2.9     6       2012
+# Variadic templates               4.3   2.9     6       2013*
+# Initializer lists                4.4   3.1     6       2013
+# Static assertions                4.3   2.9     6       2010
+# auto                             4.4   2.9     6       2010
+# Lambdas                          4.5   3.1     6       2012
+# decltype                         4.3   2.9     6       2012
+# Right angle brackets             4.3   2.9     6       2010
+# Null pointer constant            4.6   3.0     6       2010
+# Explicit conversion operators    4.5   3.0     6       2013
+# Defaulted functions              4.4   3.0     6       2013*
+# Deleted functions                4.4   2.9     6       2013*
+# Range-based for                  4.6   3.0     6       2012
+# Atomic operations                4.4   3.1     6       2012
+# thread_local (optional)          4.8   3.3     8       2015
 #
 # Library features used
 # ---------------------
@@ -65,35 +66,40 @@ set(CMAKE_CXX_STANDARD 11)
 # wait_condition
 # exception_ptr
 
-set(US_COMPILER_GNU_MINIMUM_VERSION           4.6          )
-set(US_COMPILER_CLANG_MINIMUM_VERSION         3.1          )
-set(US_COMPILER_APPLE_CLANG_MINIMUM_VERSION   5.0          ) # ??
-set(US_COMPILER_MSVC_MINIMUM_VERSION          18.00.31101 )
+set(US_COMPILER_GNU_MINIMUM_VERSION          4.6         )
+set(US_COMPILER_Clang_MINIMUM_VERSION        3.1         )
+set(US_COMPILER_AppleClang_MINIMUM_VERSION   6.0         )
+set(US_COMPILER_MSVC_MINIMUM_VERSION         18.00.31101 )
 
-set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT "Visual Studio 2013 Update 4")
+set(US_COMPILER_GNU_MINIMUM_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_VERSION}")
+set(US_COMPILER_Clang_MINIMUM_VERSION_PRODUCT      "Clang ${US_COMPILER_CLANG_MINIMUM_VERSION}")
+set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 6.0 (Clang ${US_COMPILER_AppleClang_MINIMUM_VERSION})")
+set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2013 Update 4 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
+
+set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         4.8   )
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.3   )
+set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  8.0   )
+set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.00 )
+
+set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION}")
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION_PRODUCT      "Clang ${US_COMPILER_CLANG_MINIMUM_RECOMMENDED_VERSION}")
+set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION_PRODUCT "Xcode 8.0 (Clang ${US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION})")
+set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION_PRODUCT       "Visual Studio 2013 Update 4 (MSVC ${US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION})")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_GNU_MINIMUM_VERSION})
-    message(FATAL_ERROR "GCC version ${US_COMPILER_GNU_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
-  endif()
   set(US_COMPILER_GNU 1)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_CLANG_MINIMUM_VERSION})
-    message(FATAL_ERROR "Clang version ${US_COMPILER_CLANG_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
-  endif()
   set(US_COMPILER_CLANG 1)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_APPLE_CLANG_MINIMUM_VERSION})
-    message(FATAL_ERROR "Apple Clang version ${US_COMPILER_APPLE_CLANG_MINIMUM_VERSION} or higher required (you are using version ${CMAKE_CXX_COMPILER_VERSION}).")
-  endif()
   set(US_COMPILER_APPLE_CLANG 1)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_MSVC_MINIMUM_VERSION})
-    message(FATAL_ERROR "${US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT} or newer required (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION} or higher, you are using version ${CMAKE_CXX_COMPILER_VERSION})")
-  endif()
   set(US_COMPILER_MSVC 1)
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
+endif()
+
+if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION})
+  message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -379,7 +385,7 @@ else()
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
   endif()
-  
+
   set(CMAKE_REQUIRED_LIBRARIES "-fprofile-arcs -ftest-coverage")
   usFunctionCheckCompilerFlags("-fprofile-arcs -ftest-coverage" US_CXX_COVERAGE_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
@@ -459,6 +465,25 @@ include(CheckIncludeFileCXX)
 CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 
 #-----------------------------------------------------------------------------
+# C++ language support
+#-----------------------------------------------------------------------------
+
+set(disabled_func )
+
+CHECK_CXX_SOURCE_COMPILES(
+"
+#include <string>
+static thread_local std::string dummy;
+int main() {
+return 0;
+}
+" US_HAVE_THREAD_LOCAL)
+
+if(NOT US_HAVE_THREAD_LOCAL AND US_ENABLE_THREADING_SUPPORT)
+  set(disabled_func "${disabled_func}thread_local support unavailable. Recursive service factory calls will not be detected. See also https://github.com/CppMicroServices/CppMicroServices/issues/213\n")
+endif()
+
+#-----------------------------------------------------------------------------
 # C++ library support
 #-----------------------------------------------------------------------------
 
@@ -478,6 +503,15 @@ auto regex_iter_end = std::sregex_iterator();
 return 0;
 }
 " US_HAVE_REGEX)
+
+if(NOT US_HAVE_THREAD_LOCAL AND US_BUILD_TESTING)
+  set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disalbed.\n")
+endif()
+
+# Print a warning summary
+if (disabled_func)
+  message(WARNING "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_RECOMMENDED_VERSION_PRODUCT} or higher recommended (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}). The following functionality will not be available:\n${disabled_func}")
+endif()
 
 #-----------------------------------------------------------------------------
 # System Information

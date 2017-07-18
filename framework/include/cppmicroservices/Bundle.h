@@ -329,11 +329,11 @@ public:
    * <code>BundleContext</code> can be used by the caller to act on behalf
    * of this bundle.
    *
-   * If this bundle is not in the <code>STATE_STARTED</code> state, then this
-   * bundle has no valid <code>BundleContext</code> and this method will
-   * return a default constructed \c BundleContext object.
+   * If this bundle is not in the \c STATE_STARTING, \c STATE_ACTIVE, or
+   * \c STATE_STOPPING states, then this bundle has no valid \c BundleContext
+   * and this method will an invalid \c BundleContext object.
    *
-   * @return A valid or invalid <code>BundleContext</code> for this bundle or.
+   * @return A valid or invalid <code>BundleContext</code> for this bundle.
    */
   BundleContext GetBundleContext() const;
 

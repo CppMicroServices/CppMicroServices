@@ -186,18 +186,8 @@ public:
     // different bundle context. This is required to work.
     if (caller.GetBundleId() > 0)
     {
-      auto bundles = caller.GetBundleContext().GetBundles();
-      for (auto b : bundles)
-      {
-        // pick the system bundle
-        if (b.GetBundleId() == 0)
-        {
-          validRecursion = true;
-          return b.GetBundleContext().GetService(ServiceReferenceU(sReg.GetReference()));
-        }
-      }
-      // This is never reached. We will always find the system bundle above
-      return nullptr;
+      validRecursion = true;
+      return caller.GetBundleContext().GetBundle(0).GetBundleContext().GetService(ServiceReferenceU(sReg.GetReference()));
     }
 
     if (validRecursion)

@@ -331,7 +331,7 @@ public:
    *
    * If this bundle is not in the \c STATE_STARTING, \c STATE_ACTIVE, or
    * \c STATE_STOPPING states, then this bundle has no valid \c BundleContext
-   * and this method will an invalid \c BundleContext object.
+   * and this method will return an invalid \c BundleContext object.
    *
    * @return A valid or invalid <code>BundleContext</code> for this bundle.
    */

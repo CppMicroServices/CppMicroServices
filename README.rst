@@ -64,7 +64,7 @@ Recommended minimum required compiler versions:
 
 You may use older compilers, but certain functionality may not be
 available. Check the warnings printed during configuration of
-your build tree. The following are the absolut minimum requirements:
+your build tree. The following are the absolute minimum requirements:
 
 - GCC 4.6
 - Clang 3.1

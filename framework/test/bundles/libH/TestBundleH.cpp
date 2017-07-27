@@ -168,7 +168,12 @@ public:
 
 };
 
-// Simulate an error condition whereby the service factory recursively tries to get the same service for the same bundle
+// Simulate an error condition whereby the service factory recursively tries
+// to get the same service for the same bundle if called from the system bundle.
+//
+// If it is called from a non-system bundle, it will call GetService again,
+// using a different bundle (the system bundle) which then returns a valid
+// service object. This recursion is allowed.
 class TestBundleHServiceFactoryRecursion : public ServiceFactory
 {
 public:
@@ -191,15 +196,20 @@ public:
           return b.GetBundleContext().GetService(ServiceReferenceU(sReg.GetReference()));
         }
       }
+      // This is never reached. We will always find the system bundle above
       return nullptr;
     }
 
     if (validRecursion)
     {
+      // We were called by a non-system bundle initially, and then called
+      // ourselve again using a different bundle and return a valid object now.
       validRecursion = false;
       return MakeInterfaceMap<TestBundleH>(std::make_shared<TestBundleH>());
     }
 
+    // Sleep a little, to increase the likelyhood of race conditions when
+    // this service factory is used concurrently.
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     // This code causes infinite recursion into this function.

@@ -148,7 +148,7 @@ void TestServiceFactoryBundleScopeErrorConditions()
   auto listenerToken = bundleH.GetBundleContext().AddFrameworkListener(eventCountListener);
 
   // Test that a service factory which returns a nullptr returns an invalid (nullptr) shared_ptr
-  std::string returnsNullPtrFilter(LDAPProp("returns_nullptr") == std::string("true"));
+  std::string returnsNullPtrFilter(LDAPProp("returns_nullptr") == true);
   auto serviceRefs(context.GetServiceReferences("cppmicroservices::TestBundleH", returnsNullPtrFilter));
   US_TEST_CONDITION_REQUIRED(serviceRefs.size() == 1, "Number of service references returned is 1.");
   US_TEST_CONDITION_REQUIRED("1" == serviceRefs[0].GetProperty(std::string("returns_nullptr")).ToString(), "Test that 'returns_nullptr' service property is 'true'");
@@ -161,7 +161,7 @@ void TestServiceFactoryBundleScopeErrorConditions()
   listenerToken = bundleH.GetBundleContext().AddFrameworkListener(eventCountListener);
 
   // Test getting a service object using an interface which isn't implemented by the service factory
-  std::string returnsWrongInterfaceFilter(LDAPProp("returns_wrong_interface") == std::string("true"));
+  std::string returnsWrongInterfaceFilter(LDAPProp("returns_wrong_interface") == true);
   auto svcNoInterfaceRefs(context.GetServiceReferences("cppmicroservices::TestBundleH", returnsWrongInterfaceFilter));
   US_TEST_CONDITION_REQUIRED(svcNoInterfaceRefs.size() == 1, "Number of service references returned is 1.");
   US_TEST_CONDITION_REQUIRED("1" == svcNoInterfaceRefs[0].GetProperty(std::string("returns_wrong_interface")).ToString(), "Test that 'returns_wrong_interface' service property is 'true'");
@@ -174,7 +174,7 @@ void TestServiceFactoryBundleScopeErrorConditions()
   listenerToken = bundleH.GetBundleContext().AddFrameworkListener(eventCountListener);
 
   // Test getting a service object from a service factory which throws an exception
-  std::string getServiceThrowsFilter(LDAPProp("getservice_exception") == std::string("true"));
+  std::string getServiceThrowsFilter(LDAPProp("getservice_exception") == true);
   auto svcGetServiceThrowsRefs(context.GetServiceReferences("cppmicroservices::TestBundleH", getServiceThrowsFilter));
   US_TEST_CONDITION_REQUIRED(svcGetServiceThrowsRefs.size() == 1, "Number of service references returned is 1.");
   US_TEST_CONDITION_REQUIRED("1" == svcGetServiceThrowsRefs[0].GetProperty(std::string("getservice_exception")).ToString(), "Test that 'getservice_exception' service property is 'true'");
@@ -186,7 +186,7 @@ void TestServiceFactoryBundleScopeErrorConditions()
   fwEvents.clear();
   listenerToken = bundleH.GetBundleContext().AddFrameworkListener(eventCountListener);
 
-  std::string unGetServiceThrowsFilter(LDAPProp("ungetservice_exception") == std::string("true"));
+  std::string unGetServiceThrowsFilter(LDAPProp("ungetservice_exception") == true);
   auto svcUngetServiceThrowsRefs(context.GetServiceReferences("cppmicroservices::TestBundleH", unGetServiceThrowsFilter));
   US_TEST_CONDITION_REQUIRED(svcUngetServiceThrowsRefs.size() == 1, "Number of service references returned is 1.");
   US_TEST_CONDITION_REQUIRED("1" == svcUngetServiceThrowsRefs[0].GetProperty(std::string("ungetservice_exception")).ToString(), "Test that 'ungetservice_exception' service property is 'true'");
@@ -196,7 +196,7 @@ void TestServiceFactoryBundleScopeErrorConditions()
   US_TEST_CONDITION_REQUIRED(1 == fwEvents.size(), "Test that one FrameworkEvent was sent");
 
   fwEvents.clear();
-  std::string recursiveGetServiceFilter(LDAPProp("getservice_recursion") == std::string("true"));
+  std::string recursiveGetServiceFilter(LDAPProp("getservice_recursion") == true);
   auto svcRecursiveGetServiceRefs(context.GetServiceReferences("cppmicroservices::TestBundleH", recursiveGetServiceFilter));
   US_TEST_CONDITION_REQUIRED(svcRecursiveGetServiceRefs.size() == 1, "Number of service references returned is 1.");
   US_TEST_CONDITION_REQUIRED("1" == svcRecursiveGetServiceRefs[0].GetProperty(std::string("getservice_recursion")).ToString(), "Test that 'getservice_recursion' service property is 'true'");

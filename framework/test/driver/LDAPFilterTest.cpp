@@ -158,6 +158,9 @@ void TestLDAPExpressions()
   std::string filter1 = LDAPProp("key2") == someValue && LDAPProp("key3");
   std::string filter2 = LDAPProp("key2") == someValue && (LDAPProp("key1") == emptyValue || LDAPProp("key3"));
   US_TEST_CONDITION(filter1 == filter2, "test null expressions")
+
+  LDAPFilter boolFilter(LDAPProp("t") == true || LDAPProp("f") == false);
+  US_TEST_CONDITION(boolFilter.ToString() == "(|(t=true)(f=false))", "boolean expressions")
 }
 
 int LDAPFilterTest(int /*argc*/, char* /*argv*/[])

@@ -66,6 +66,11 @@ LDAPPropExpr LDAPProp::operator==(const cppmicroservices::Any& any) const
   return operator==(any.ToString());
 }
 
+LDAPPropExpr LDAPProp::operator==(bool b) const
+{
+  return operator==(b ? std::string("true") : std::string("false"));
+}
+
 LDAPProp::operator LDAPPropExpr () const
 {
   return LDAPPropExpr("(" + m_property + "=*)");

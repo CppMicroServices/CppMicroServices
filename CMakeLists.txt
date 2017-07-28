@@ -504,8 +504,8 @@ return 0;
 }
 " US_HAVE_REGEX)
 
-if(NOT US_HAVE_THREAD_LOCAL AND US_BUILD_TESTING)
-  set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disalbed.\n")
+if(NOT US_HAVE_REGEX AND US_BUILD_TESTING)
+  set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disabled.\n")
 endif()
 
 # Print a warning summary

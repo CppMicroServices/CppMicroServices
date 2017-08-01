@@ -281,7 +281,19 @@ if(US_BUILD_TESTING)
     # Prevent overriding the parent project's compiler/linker
     # settings on Windows
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    set(GTEST_BOTH_LIBRARIES gmock gmock_main gtest gtest_main)
+
+    # pthreads on MinGW is not supported, turn it off. Refer to
+    # https://github.com/google/googletest/pull/721/files for details.
+    if(MINGW)
+     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+    endif()
+
+    # An apparent bug in GCC 4.6 with C++11 variadic templates. Don't build gmock for any platform
+    # for now (we don't use it yet anyway). See https://groups.google.com/forum/#!topic/googlemock/XvPDUENM5JM
+    # for details.
+    set(BUILD_GTEST ON CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    set(GTEST_BOTH_LIBRARIES gtest gtest_main)
     add_subdirectory(third_party/googletest)
   endif()
 endif()

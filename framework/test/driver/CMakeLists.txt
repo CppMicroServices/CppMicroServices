@@ -134,6 +134,11 @@ if(US_ENABLE_TSAN)
   set_tests_properties(HelgrindTest PROPERTIES WILL_FAIL 1)
 endif()
 
+# Add a Preprocessor flag if code coverage is turned ON
+if(US_ENABLE_COVERAGE)
+  target_compile_definitions(${_test_driver} PUBLIC US_COVERAGE_ENABLED=1)
+endif()
+
 #-----------------------------------------------------------------------------
 # Add dependencies for shared libraries
 #-----------------------------------------------------------------------------

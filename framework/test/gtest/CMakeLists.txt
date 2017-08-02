@@ -32,6 +32,11 @@ if(US_MEMCHECK_COMMAND)
   set_property(TEST memcheck_${us_gtest_test_exe_name} PROPERTY LABELS valgrind memcheck)
 endif()
 
+# Add a Preprocessor flag if code coverage is turned ON
+if(US_ENABLE_COVERAGE)
+  target_compile_definitions(${us_gtest_test_exe_name} PUBLIC US_COVERAGE_ENABLED=1)
+endif()
+
 # Copy the Google Test libraries into the same folder as the
 # executable so that they can be seen at runtime on Windows.
 # Mac and Linux use RPATHs and do not need to do this.

@@ -15,11 +15,22 @@ add_executable(${us_gtest_test_exe_name} ${_gtest_tests})
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})
 
+# tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
+# GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.
+# At this time, there isn't a need to use GTEST_ADD_TEST.
+
 # Run the GTest EXE from ctest.
 add_test(NAME ${us_gtest_test_exe_name} 
   COMMAND ${us_gtest_test_exe_name}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+
+# Run the GTest EXE from valgrind
+if(US_MEMCHECK_COMMAND)
+  add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  set_property(TEST memcheck_${us_gtest_test_exe_name} PROPERTY LABELS valgrind memcheck)
+endif()
 
 # Copy the Google Test libraries into the same folder as the
 # executable so that they can be seen at runtime on Windows.

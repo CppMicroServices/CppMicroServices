@@ -6,6 +6,9 @@ set(us_gtest_test_exe_name FrameworkTests)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
+#-----------------------------------------------------------------------------
+# Add test source files
+#-----------------------------------------------------------------------------
 set(_gtest_tests 
   BundleVersionTest.cpp
 )
@@ -30,6 +33,14 @@ if(US_MEMCHECK_COMMAND)
   add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   set_property(TEST memcheck_${us_gtest_test_exe_name} PROPERTY LABELS valgrind memcheck)
+endif()
+
+# Enable code coverage for GTest tests
+if(US_COVERAGE_COMMAND)
+  file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
+  add_test(NAME coverage_${us_gtest_test_exe_name} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${us_gtest_test_exe_name}.cov --continue_after_cpp_exception -- $<TARGET_FILE:${us_gtest_test_exe_name}>
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  set_property(TEST coverage_${us_gtest_test_exe_name} PROPERTY LABELS opencppcoverage)
 endif()
 
 # Add a Preprocessor flag if code coverage is turned ON

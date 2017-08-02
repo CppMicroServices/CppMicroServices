@@ -78,6 +78,8 @@ TEST(BundleVersion, Ctor)
   ASSERT_NO_THROW(BundleVersion stringVersion(std::string("0.0.1_qa0_")));
 
   ASSERT_THROW(BundleVersion invalidVersion(std::string("eight.two.twenty._not_ok")), std::invalid_argument);
+
+  ASSERT_THROW(BundleVersion tooManyVersions(std::string("1.1.1._ok.extra_version")), std::invalid_argument);
 }
 
 TEST(BundleVersion, Accessors)
@@ -107,6 +109,7 @@ TEST(BundleVersion, Comparison)
   BundleVersion zeroVersion(0, 0, 0);
   BundleVersion alphaVersion(0, 0, 1);
   BundleVersion betaVersion(0, 1, 0);
+  BundleVersion releaseVersion(1, 0, 0);
   
   ASSERT_THROW(zeroVersion.Compare(BundleVersion::UndefinedVersion()), std::logic_error);
   ASSERT_THROW(BundleVersion::UndefinedVersion().Compare(zeroVersion), std::logic_error);
@@ -118,6 +121,7 @@ TEST(BundleVersion, Comparison)
   ASSERT_EQ(0, zeroVersion.Compare(BundleVersion::EmptyVersion()));
   ASSERT_EQ(1, betaVersion.Compare(alphaVersion));
   ASSERT_EQ(-1, alphaVersion.Compare(betaVersion));
+  ASSERT_EQ(-1, betaVersion.Compare(releaseVersion));
 
   ASSERT_FALSE(zeroVersion == BundleVersion::UndefinedVersion());
   ASSERT_TRUE(zeroVersion == zeroVersion);

@@ -4,30 +4,68 @@
 
 set(us_gtest_test_exe_name usFrameworkTests)
 
-include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(
+  ${GTEST_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  )
 
 #-----------------------------------------------------------------------------
 # Add test source files
 #-----------------------------------------------------------------------------
-set(_gtest_tests 
+
+set(_gtest_tests
   BundleVersionTest.cpp
   LDAPFilterTest.cpp
 )
 
-add_executable(${us_gtest_test_exe_name} ${_gtest_tests})
+if(NOT US_BUILD_SHARED_LIBS)
+  list(APPEND _gtest_tests
+    UtilsTest.cpp
+  )
+endif()
+
+set(_additional_srcs
+  ../util/TestUtils.cpp
+  )
+
+#-----------------------------------------------------------------------------
+# Build the main test driver executable
+#-----------------------------------------------------------------------------
+
+# Generate a custom "bundle init" file for the test driver executable
+usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
+
+usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
+
+add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs})
+
+# Needed for ResourceCompilerTest
+add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})
+set_property(TARGET ${us_gtest_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
+set_property(TARGET ${us_gtest_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})
+
+# Needed for clock_gettime with glibc < 2.17
+if(UNIX AND NOT APPLE)
+  target_link_libraries(${us_gtest_test_exe_name} rt)
+endif()
+
+# Add resources
+usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
+                         FILES manifest.json)
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
 # GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.
 # At this time, there isn't a need to use GTEST_ADD_TEST.
 
 # Run the GTest EXE from ctest.
-add_test(NAME ${us_gtest_test_exe_name} 
+add_test(NAME ${us_gtest_test_exe_name}
   COMMAND ${us_gtest_test_exe_name}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+set_property(TEST ${us_gtest_test_exe_name} PROPERTY LABELS regular)
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)

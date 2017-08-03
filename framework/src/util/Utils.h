@@ -55,7 +55,6 @@ namespace fs {
 // Platform agnostic way to get the current working directory.
 // Supports Linux, Mac, and Windows.
 std::string GetCurrentWorkingDirectory();
-bool not_found_error(int errval);
 bool Exists(const std::string& path);
 
 bool IsDirectory(const std::string& path);
@@ -66,7 +65,7 @@ std::string GetAbsolute(const std::string& path, const std::string& base);
 
 void MakePath(const std::string& path);
 
-US_Framework_EXPORT void RemoveDirectoryRecursive(const std::string& path);
+void RemoveDirectoryRecursive(const std::string& path);
 
 } // namespace fs
 
@@ -116,8 +115,8 @@ US_Framework_EXPORT std::string GetDemangledName(const std::type_info& typeInfo)
 // Error handling
 //-------------------------------------------------------------------
 
-int GetLastErrorNo();
-std::string GetLastErrorStr();
+std::string GetLastCErrorStr();
+std::string GetLastWin32ErrorStr();
 
 std::string GetExceptionStr(const std::exception_ptr& exc);
 std::string GetLastExceptionStr();

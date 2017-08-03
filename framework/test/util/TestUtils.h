@@ -84,7 +84,7 @@ private:
 #endif
 };
 
-// Copied from Utils.h/.cpp
+// Partially copied from Utils.h/.cpp
 // Place in a different namespace to avoid duplicate symbol errors.
 namespace testing {
 
@@ -100,6 +100,8 @@ template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
 
 // Return the current working directory
 std::string GetCurrentWorkingDirectory();
+
+bool IsDirectory(const std::string& path);
 
 /*
 * Change to destination directory specified by destdir
@@ -119,10 +121,73 @@ void MakeDirectory(const std::string& destdir);
 */
 void RemoveDirectory(const std::string& destdir);
 
-/**
+/*
+* Remove directory and all its subdirectories specified by destdir
+* @throws std::runtime_error if the dir cannot be removed
+*/
+void RemoveDirectoryRecursive(const std::string& destdir);
+
+/*
 * Returns a platform appropriate location for use as temporary storage.
 */
 std::string GetTempDirectory();
+
+/*
+ * Closes the file descriptor on destruction.
+ */
+struct File
+{
+  File(const File&) = delete;
+  File& operator=(const File&) = delete;
+
+  File();
+
+  // The file descriptor fd is owned by this
+  File(int fd, const std::string& path);
+
+  File(File&& o);
+  File& operator=(File&& o);
+
+  ~File();
+
+  int FileDescr;
+  std::string Path;
+};
+
+/*
+ * Removes the directory on destruction.
+ */
+struct TempDir
+{
+  TempDir(const TempDir&) = delete;
+  TempDir& operator=(const TempDir&) = delete;
+
+  TempDir();
+
+  // The file descriptor fd is owned by this
+  TempDir(const std::string& path);
+
+  TempDir(TempDir&& o);
+  TempDir& operator=(TempDir&& o);
+
+  ~TempDir();
+
+  operator std::string() const;
+
+  std::string Path;
+};
+
+/*
+ * Creates a new unique sub-directory in the temporary storage
+ * location returned by GetTempDirectory() and returns a string
+ * containing the directory path.
+ *
+ * This is similar to mkdtemp on POSIX systems, but without a
+ * custom template string.
+ */
+std::string MakeUniqueTempDirectory();
+
+File MakeUniqueTempFile(const std::string& base);
 
 /*
 * Checks if a file exists and if so, removes the file

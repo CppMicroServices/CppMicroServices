@@ -98,9 +98,9 @@ namespace cppmicroservices {
 
 namespace fs {
 
-bool not_found_error(int errval)
-{
 #ifdef US_PLATFORM_WINDOWS
+bool not_found_win32_error(int errval)
+{
   return errval == ERROR_FILE_NOT_FOUND
       || errval == ERROR_PATH_NOT_FOUND
       || errval == ERROR_INVALID_NAME       // "//foo"
@@ -109,10 +109,12 @@ bool not_found_error(int errval)
       || errval == ERROR_INVALID_PARAMETER  // ":sys:stat.h"
       || errval == ERROR_BAD_PATHNAME       // "//nosuch" on Win64
       || errval == ERROR_BAD_NETPATH;       // "//nosuch" on Win32
-
-#else
-  return errval == ENOENT || errval == ENOTDIR;
+}
 #endif
+
+bool not_found_c_error(int errval)
+{
+  return errval == ENOENT || errval == ENOTDIR;
 }
 
 std::vector<std::string> SplitString(const std::string& str, const std::string& delim)
@@ -165,17 +167,18 @@ bool Exists(const std::string& path)
 {
 #ifdef US_PLATFORM_POSIX
   US_STAT s;
+  errno = 0;
   if (us_stat(path.c_str(), &s))
   {
-    if (not_found_error(errno)) return false;
-    else throw std::invalid_argument(GetLastErrorStr());
+    if (not_found_c_error(errno)) return false;
+    else throw std::invalid_argument(GetLastCErrorStr());
   }
 #else
   DWORD attr(::GetFileAttributes(path.c_str()));
   if (attr == INVALID_FILE_ATTRIBUTES)
   {
-    if (not_found_error(::GetLastError())) return false;
-    else throw std::invalid_argument(GetLastErrorStr());
+    if (not_found_win32_error(::GetLastError())) return false;
+    else throw std::invalid_argument(GetLastWin32ErrorStr());
   }
 #endif
   return true;
@@ -184,10 +187,11 @@ bool Exists(const std::string& path)
 bool IsDirectory(const std::string& path)
 {
   US_STAT s;
+  errno = 0;
   if (us_stat(path.c_str(), &s))
   {
-    if (not_found_error(errno)) return false;
-    else throw std::invalid_argument(GetLastErrorStr());
+    if (not_found_c_error(errno)) return false;
+    else throw std::invalid_argument(GetLastCErrorStr());
   }
   return S_ISDIR(s.st_mode);
 }
@@ -195,10 +199,11 @@ bool IsDirectory(const std::string& path)
 bool IsFile(const std::string& path)
 {
   US_STAT s;
+  errno = 0;
   if (us_stat(path.c_str(), &s))
   {
-    if (not_found_error(errno)) return false;
-    else throw std::invalid_argument(GetLastErrorStr());
+    if (not_found_c_error(errno)) return false;
+    else throw std::invalid_argument(GetLastCErrorStr());
   }
   return S_ISREG(s.st_mode);
 }
@@ -237,17 +242,15 @@ void MakePath(const std::string& path)
   for (; iter != dirs.end(); ++iter)
   {
     subPath += *iter;
+    errno = 0;
 #ifdef US_PLATFORM_WINDOWS
     if (us_mkdir(subPath.c_str()))
-    {
-      if (GetLastErrorNo() != ERROR_ALREADY_EXISTS) throw std::invalid_argument(GetLastErrorStr());
-    }
 #else
     if (us_mkdir(subPath.c_str(), S_IRWXU))
-    {
-      if (GetLastErrorNo() != EEXIST) throw std::invalid_argument(GetLastErrorStr());
-    }
 #endif
+    {
+      if (errno != EEXIST) throw std::invalid_argument(GetLastCErrorStr());
+    }
     subPath += DIR_SEP;
   }
 }
@@ -255,6 +258,7 @@ void MakePath(const std::string& path)
 void RemoveDirectoryRecursive(const std::string& path)
 {
   int res = -1;
+  errno = 0;
   DIR* dir = opendir(path.c_str());
   if (dir != nullptr)
   {
@@ -284,12 +288,22 @@ void RemoveDirectoryRecursive(const std::string& path)
         res = us_unlink(child.c_str());
       }
     }
-    closedir(dir);
+    int old_err = errno;
+    errno = 0;
+    closedir(dir); // error ignored
+    if (old_err)
+    {
+      errno = old_err;
+    }
   }
 
-  if (!res) res = us_rmdir(path.c_str());
+  if (!res)
+  {
+    errno = 0;
+    res = us_rmdir(path.c_str());
+  }
 
-  if (res) throw std::invalid_argument(GetLastErrorStr());
+  if (res) throw std::invalid_argument(GetLastCErrorStr());
 }
 
 } // namespace fs
@@ -387,34 +401,22 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
 // Error handling
 //-------------------------------------------------------------------
 
-int GetLastErrorNo()
+std::string GetLastWin32ErrorStr()
 {
-#ifdef US_PLATFORM_POSIX
-  return errno;
-#else
-  return ::GetLastError();
-#endif
-}
-
-std::string GetLastErrorStr()
-{
-#ifdef US_PLATFORM_POSIX
-  char* errorString = strerror(errno);
-  return std::string(((errorString == nullptr)?"":errorString));
-#else
+#ifdef US_PLATFORM_WINDOWS
   // Retrieve the system error message for the last-error code
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
 
   DWORD rc = FormatMessage(
-                FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
-                dw,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                reinterpret_cast<LPTSTR>(&lpMsgBuf),
-                0, NULL );
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        reinterpret_cast<LPTSTR>(&lpMsgBuf),
+        0,
+        NULL
+        );
 
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
   // it means that the size of the error message exceeds an internal
@@ -429,8 +431,31 @@ std::string GetLastErrorStr()
   std::string errMsg(reinterpret_cast<LPCTSTR>(lpMsgBuf));
 
   LocalFree(lpMsgBuf);
-
   return errMsg;
+#else
+  return std::string();
+#endif
+}
+
+
+std::string GetLastCErrorStr()
+{
+  char errorString[128];
+#if ((_POSIX_C_SOURCE >= 200112L) && !  _GNU_SOURCE) || defined(US_PLATFORM_APPLE)
+  // This is the XSI strerror_r version
+  if (strerror_r(errno, errorString, sizeof errorString))
+  {
+    return "Unknown error";
+  }
+  return errorString;
+#elif defined(US_PLATFORM_WINDOWS)
+  if (strerror_s(errorString, sizeof errorString, errno))
+  {
+    return "Unknown error";
+  }
+  return errorString;
+#else
+  return strerror_r(errno, errorString, sizeof errorString);
 #endif
 }
 

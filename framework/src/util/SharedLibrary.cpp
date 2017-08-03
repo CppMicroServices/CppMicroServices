@@ -113,7 +113,7 @@ void SharedLibrary::Load(int flags)
   if (!d->m_Handle)
   {
     std::string errMsg = "Loading ";
-    errMsg.append(libPath).append("failed with error: ").append(GetLastErrorStr());
+    errMsg.append(libPath).append("failed with error: ").append(GetLastWin32ErrorStr());
 
     throw std::runtime_error(errMsg);
   }
@@ -143,7 +143,7 @@ void SharedLibrary::Unload()
     if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle)))
     {
       std::string errMsg = "Unloading ";
-      errMsg.append(GetLibraryPath()).append("failed with error: ").append(GetLastErrorStr());
+      errMsg.append(GetLibraryPath()).append("failed with error: ").append(GetLastWin32ErrorStr());
 
       throw std::runtime_error(errMsg);
     }

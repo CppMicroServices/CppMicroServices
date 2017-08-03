@@ -18,7 +18,8 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINAR
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ../../../third_party
+  ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party
   )
 
 
@@ -74,7 +75,7 @@ set(_additional_srcs
   TestDriverActivator.cpp
   TestManager.cpp
   TestUtilBundleListener.cpp
-  TestUtils.cpp
+  ../util/TestUtils.cpp
 )
 
 #-----------------------------------------------------------------------------

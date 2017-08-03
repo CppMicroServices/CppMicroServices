@@ -39,7 +39,7 @@
 const char* dlerror(void)
 {
   static std::string errStr;
-  errStr = cppmicroservices::GetLastErrorStr();
+  errStr = cppmicroservices::GetLastWin32ErrorStr();
   return errStr.c_str();
 }
 
@@ -100,7 +100,7 @@ std::string GetExecutablePath()
 #ifdef US_PLATFORM_WINDOWS
   if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
-    DIAG_LOG(*GetFrameworkLogSink()) << "GetModuleFileName failed" << GetLastErrorStr();
+    DIAG_LOG(*GetFrameworkLogSink()) << "GetModuleFileName failed" << GetLastWin32ErrorStr();
     buf[0] = '\0';
   }
 #elif defined(US_PLATFORM_APPLE)

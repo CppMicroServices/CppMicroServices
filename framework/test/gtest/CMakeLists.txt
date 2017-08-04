@@ -2,7 +2,7 @@
 # Build and run the GTest Suite of tests
 #-----------------------------------------------------------------------------
 
-set(us_gtest_test_exe_name FrameworkTests)
+set(us_gtest_test_exe_name usFrameworkTests)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 

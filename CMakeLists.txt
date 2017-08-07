@@ -219,8 +219,7 @@ us_cache_var(DOC_INSTALL_DIR ${default_doc_install_dir} STRING "Relative install
 us_cache_var(MAN_INSTALL_DIR ${default_man_install_dir} STRING "Relative install location for man pages" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
-set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} FORCE)
-mark_as_advanced(BUILD_SHARED_LIBS)
+us_cache_var(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} BOOL "Build shared libraries" ADVANCED)
 
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
@@ -287,8 +286,6 @@ if(US_BUILD_TESTING)
     us_cache_var(BUILD_GMOCK OFF BOOL "Build GMock" ADVANCED FORCE)
     us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
 
-    us_cache_var(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} BOOL "Build shared libraries" ADVANCED FORCE)
-
     us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
     us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
     us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
@@ -309,9 +306,9 @@ if(US_BUILD_TESTING)
 
     # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a 
     # static library even if CppMicroServices is a shared library.
-    set(BUILD_SHARED_LIBS OFF)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
-    set(BUILD_SHARED_LIBS $(US_BUILD_SHARED_LIBS))
+    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
   endif()
 endif()
 

@@ -115,3 +115,13 @@ https://github.com/kainjow/Mustache/releases
 Patches
 
  * Support GCC 4.6
+
+ 
+ Google Test and Google Mock
+ ----------------------------
+ 
+ See https://github.com/google/googletest/blob/master/googletest/LICENSE for license information.
+ 
+ https://github.com/google/googletest/releases
+ 1.8.0
+ 

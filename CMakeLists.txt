@@ -190,6 +190,7 @@ us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
+us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
@@ -218,14 +219,14 @@ us_cache_var(DOC_INSTALL_DIR ${default_doc_install_dir} STRING "Relative install
 us_cache_var(MAN_INSTALL_DIR ${default_man_install_dir} STRING "Relative install location for man pages" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
 
-set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
+us_cache_var(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} BOOL "Build shared libraries" ADVANCED)
 
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
 set(US_CMAKE_RESOURCE_DEPENDENCIES_CPP "${US_CMAKE_DIR}/CMakeResourceDependencies.cpp" CACHE INTERNAL "The dummy resource dependencies code")
 if(APPLE)
   # Avoid RPATH warning in cmakegui
-  set(CMAKE_MACOSX_RPATH 1)
+  set(CMAKE_MACOSX_RPATH ON)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -272,6 +273,42 @@ if(US_BUILD_TESTING)
   if(WIN32 AND US_ENABLE_COVERAGE)
     find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
     mark_as_advanced(US_COVERAGE_COMMAND)
+  endif()
+
+  if(US_USE_SYSTEM_GTEST)
+    find_package(GTest REQUIRED)
+  else()
+    # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
+
+    # Workaround an apparent bug in GCC 4.6 with C++11 variadic templates. Don't build gmock for any platform
+    # for now (we don't use it yet anyway). See https://groups.google.com/forum/#!topic/googlemock/XvPDUENM5JM
+    # for details.
+    us_cache_var(BUILD_GMOCK OFF BOOL "Build GMock" ADVANCED FORCE)
+    us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
+
+    us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
+    us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
+    us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
+
+    # Prevent overriding the parent project's compiler/linker
+    # settings on Windows
+    us_cache_var(gtest_force_shared_crt ON BOOL "" ADVANCED FORCE)
+
+    us_cache_var(gtest_hide_internal_symbols OFF BOOL "" ADVANCED)
+
+    # pthreads on MinGW is not supported, turn it off. Refer to
+    # https://github.com/google/googletest/pull/721/files for details.
+    if(MINGW)
+     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+    endif()
+
+    set(GTEST_BOTH_LIBRARIES gtest gtest_main)
+
+    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a 
+    # static library even if CppMicroServices is a shared library.
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    add_subdirectory(third_party/googletest)
+    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
   endif()
 endif()
 

@@ -1,3 +1,16 @@
+#-----------------------------------------------------------------------------
+# Create test bundles
+#-----------------------------------------------------------------------------
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/../driver
+  ../../../third_party
+  )
+
+include(usFunctionCreateTestBundle)
+
+set(_us_test_bundle_libs "" CACHE INTERNAL "" FORCE)
+
 add_subdirectory(libA)
 add_subdirectory(libA2)
 add_subdirectory(libBWithStatic)

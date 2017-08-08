@@ -190,6 +190,7 @@ us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
+us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
@@ -274,7 +275,15 @@ if(US_BUILD_TESTING)
     mark_as_advanced(US_COVERAGE_COMMAND)
   endif()
 
-  find_package(GTest REQUIRED)
+  if(US_USE_SYSTEM_GTEST)
+    find_package(GTest REQUIRED)
+  else()
+    # Prevent overriding the parent project's compiler/linker
+    # settings on Windows
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(GTEST_BOTH_LIBRARIES gmock gmock_main gtest gtest_main)
+    add_subdirectory(third_party/googletest)
+  endif()
 endif()
 
 

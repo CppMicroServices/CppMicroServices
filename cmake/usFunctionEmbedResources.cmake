@@ -154,15 +154,15 @@ function(usFunctionEmbedResources)
 
   if(US_RESOURCE_LINK)
     if(APPLE)
-        # This resolves an issue where passing in CMAKE_CXX_FLAGS using
-       # -D CMAKE_CXX_FLAGS:STRING="..." results in a quoted string being passed to
-       # the command below which results in the command being:
-       #  >> clang "..." -c ... -o stub.o
-       # when it should really be:
-       #  >> clang ... -c ... -o stub.o
-       # (pardon the elipsis for abbreviation)
+      # This resolves an issue where passing in CMAKE_CXX_FLAGS using
+      # -D CMAKE_CXX_FLAGS:STRING="..." results in a quoted string being passed to
+      # the command below which results in the command being:
+      #  >> clang "..." -c ... -o stub.o
+      # when it should really be:
+      #  >> clang ... -c ... -o stub.o
+      # (pardon the elipsis for abbreviation)
+      separate_arguments(_us_resource_cxx_flags UNIX_COMMAND ${CMAKE_CXX_FLAGS})
 
-       separate_arguments(_us_resource_cxx_flags UNIX_COMMAND ${CMAKE_CXX_FLAGS})
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}

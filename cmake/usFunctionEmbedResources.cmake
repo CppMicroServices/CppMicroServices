@@ -161,11 +161,8 @@ function(usFunctionEmbedResources)
        # when it should really be:
        #  >> clang ... -c ... -o stub.o
        # (pardon the elipsis for abbreviation)
-       separate_arguments(TEMP_CXX_FLAGS UNIX_COMMAND ${CMAKE_CXX_FLAGS})
-       foreach(flag ${TEMP_CXX_FLAGS})
-         set(US_RESOURCE_CXX_FLAGS ${US_RESOURCE_CXX_FLAGS} ${flag})
-       endforeach(flag)
-
+       
+       separate_arguments(US_RESOURCE_CXX_FLAGS UNIX_COMMAND ${CMAKE_CXX_FLAGS})
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}

@@ -161,12 +161,12 @@ function(usFunctionEmbedResources)
        # when it should really be:
        #  >> clang ... -c ... -o stub.o
        # (pardon the elipsis for abbreviation)
-       
-       separate_arguments(US_RESOURCE_CXX_FLAGS UNIX_COMMAND ${CMAKE_CXX_FLAGS})
+
+       separate_arguments(_us_resource_cxx_flags UNIX_COMMAND ${CMAKE_CXX_FLAGS})
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} ${US_RESOURCE_CXX_FLAGS} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_CXX_COMPILER} ${_us_resource_cxx_flags} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
         COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}

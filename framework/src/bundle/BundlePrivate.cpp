@@ -366,8 +366,8 @@ void BundlePrivate::FinalizeActivation(LockType& l)
       // finalization already in progress.
       return;
     }
-    // Lazy activation; fall through to STATE_RESOLVED.
   }
+  // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
   case Bundle::STATE_RESOLVED:
   {
     // 6:
@@ -439,8 +439,8 @@ void BundlePrivate::Uninstall()
           coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(shared_from_this()), std::string(), std::current_exception()));
         }
       }
-      // Fall through
     }
+    // INTENTIONALLY FALLS THROUGH
     case Bundle::STATE_RESOLVED:
     case Bundle::STATE_INSTALLED:
     {

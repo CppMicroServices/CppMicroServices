@@ -323,8 +323,9 @@ int FrameworkListenerTest(int /*argc*/, char* /*argv*/[])
   auto lambda1 = [](const FrameworkEvent&) {};
   auto lambda2 = [](const FrameworkEvent&) {};
   US_TEST_CONDITION((typeid(lambda1) != typeid(lambda2)), "Test lambda type info (in)equality");
-  US_TEST_CONDITION(
-      std::function<void(const FrameworkEvent&)>(lambda1).target<void(const FrameworkEvent&)>() == std::function<void(const FrameworkEvent&)>(lambda2).target<void(const FrameworkEvent&)>(),
+  const std::function<void(const FrameworkEvent&)> f1(lambda1);
+  const std::function<void(const FrameworkEvent&)> f2(lambda2);
+  US_TEST_CONDITION(f1.target<void(const FrameworkEvent&)>() == f2.target<void(const FrameworkEvent&)>(),
       "Test std::function target equality"
   );
 

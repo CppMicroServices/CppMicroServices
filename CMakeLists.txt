@@ -310,7 +310,7 @@ if(US_BUILD_TESTING)
 
     set(GTEST_BOTH_LIBRARIES gtest gtest_main)
 
-    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a 
+    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
     # static library even if CppMicroServices is a shared library.
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
@@ -478,6 +478,19 @@ int main() {
 return 0;
 }
 " US_HAVE_THREAD_LOCAL)
+
+if(MINGW)
+  #
+  # The MinGW winpthread implementation does not properly destruct
+  # non-POD thread-local objects, leading to segmentation faults on
+  # thread exit. See
+  #
+  # https://github.com/Alexpux/MINGW-packages/issues/2519
+  # https://sourceforge.net/p/mingw-w64/bugs/527/
+  #
+  set(US_HAVE_THREAD_LOCAL 0)
+  set(disabled_func "${disabled_func}MinGW winpthread: ")
+endif()
 
 if(NOT US_HAVE_THREAD_LOCAL AND US_ENABLE_THREADING_SUPPORT)
   set(disabled_func "${disabled_func}thread_local support unavailable. Recursive service factory calls will not be detected. See also https://github.com/CppMicroServices/CppMicroServices/issues/213\n")

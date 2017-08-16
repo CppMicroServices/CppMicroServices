@@ -95,7 +95,8 @@ int Properties::Find_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i)
   {
-    if (ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0)
+    if (key.size() == keys[i].size() &&
+        ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0)
     {
       return static_cast<int>(i);
     }

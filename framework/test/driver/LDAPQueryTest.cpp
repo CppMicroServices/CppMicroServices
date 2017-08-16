@@ -46,6 +46,27 @@ void TestLDAPFilterMatchBundle(const Bundle& bundle)
   US_TEST_CONDITION(!ldapValueMismatchCase.Match(bundle), " Evaluating LDAP expr: " + ldapValueMismatchCase.ToString());
 }
 
+void TestLDAPFilterMatchNoException(const Bundle& bundle)
+{
+  LDAPFilter ldapMatch( "(hosed=1)" );
+  AnyMap props(AnyMap::UNORDERED_MAP);
+  props["hosed"] = std::string("1");
+  props["hosedd"] = std::string("yum");
+  props["hose"] = std::string("yum");
+
+  // After the fix, makes sure this doesn't throw an exception
+  US_TEST_NO_EXCEPTION( ldapMatch.Match(props) );
+  
+  // Test key match
+  US_TEST_CONDITION(ldapMatch.Match(props) == true, "Evaluating LDAP expr: " + ldapMatch.ToString());
+
+  // After the fix, makes sure this doesn't throw an exception
+  US_TEST_NO_EXCEPTION( ldapMatch.Match(bundle) );
+
+  // Test key match
+  US_TEST_CONDITION(ldapMatch.Match(bundle) == true, "Evaluating LDAP expr: " + ldapMatch.ToString());
+}
+
 void TestLDAPFilterMatchServiceReferenceBase(Bundle bundle)
 {
   LDAPFilter ldapMatchCase( "(service.testproperty=YES)" );
@@ -91,6 +112,9 @@ int LDAPQueryTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_OUTPUT(<< "Testing LDAP query of service properties:")
   TestLDAPFilterMatchServiceReferenceBase(bundle);
+
+  US_TEST_OUTPUT(<< "Testing LDAP queries that no longer throw exceptions:")
+  TestLDAPFilterMatchNoException(bundle);
 
   framework.Stop();
 

@@ -54,17 +54,24 @@ void TestLDAPFilterMatchNoException(const Bundle& bundle)
   props["hosedd"] = std::string("yum");
   props["hose"] = std::string("yum");
 
-  // After the fix, makes sure this doesn't throw an exception
+  // Testing no exception is thrown.
   US_TEST_NO_EXCEPTION( ldapMatch.Match(props) );
   
-  // Test key match
+  // Testing key match
   US_TEST_CONDITION(ldapMatch.Match(props) == true, "Evaluating LDAP expr: " + ldapMatch.ToString());
 
-  // After the fix, makes sure this doesn't throw an exception
+  // Testing no exception is thrown.
   US_TEST_NO_EXCEPTION( ldapMatch.Match(bundle) );
 
-  // Test key match
+  // Testing key match
   US_TEST_CONDITION(ldapMatch.Match(bundle) == true, "Evaluating LDAP expr: " + ldapMatch.ToString());
+
+  AnyMap props1(AnyMap::UNORDERED_MAP);
+  props1["hosed"] = std::string("1");
+  props1["HOSED"] = std::string("yum");
+
+  // Testing exception for case variants of the same key.
+  US_TEST_FOR_EXCEPTION(std::runtime_error, ldapMatch.Match(props1) );
 }
 
 void TestLDAPFilterMatchServiceReferenceBase(Bundle bundle)

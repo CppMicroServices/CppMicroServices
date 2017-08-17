@@ -92,7 +92,7 @@ public:
    * be concurrently called for the specified bundle.
    *
    * @param bundle The bundle requesting the service.
-   * @param registration The <code>ServiceRegistrationBase</code> object for the
+   * @param registration The \c ServiceRegistrationBase object for the
    *        requested service.
    * @return A service object that <strong>must</strong> contain entries for all
    *         the interfaces named when the service was registered.
@@ -108,7 +108,7 @@ public:
    * The Framework invokes this method when a service has been released by a
    * bundle. If this method throws an exception, a framework event of type
    * \c FrameworkEvent::FRAMEWORK_ERROR is fired containing a service
-   * exception of type ServiceException::FACTORY_EXCEPTION with the thrown
+   * exception of type \c ServiceException::FACTORY_EXCEPTION with the thrown
    * exception as a nested exception.
    *
    * @param bundle The Bundle releasing the service.

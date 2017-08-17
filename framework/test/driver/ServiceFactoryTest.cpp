@@ -72,7 +72,7 @@ void TestServiceFactoryBundleScope(BundleContext context)
   bundleH.Start();
 
   std::vector<ServiceReferenceU> registeredRefs = bundleH.GetRegisteredServices();
-  US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 7, "Test that the # of registered services is six.");
+  US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 7, "Test that the # of registered services is seven.");
   US_TEST_CONDITION(registeredRefs[0].GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_BUNDLE, "First service is bundle scope");
   US_TEST_CONDITION(registeredRefs[1].GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_BUNDLE, "Second service is bundle scope");
   US_TEST_CONDITION(registeredRefs[2].GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_BUNDLE, "Third service is bundle scope");

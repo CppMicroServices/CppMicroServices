@@ -130,10 +130,8 @@ public:
    *        in the match.
    * @return <code>true</code> if the bundle's properties match this
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
-   * @throws std::runtime_error If the number of keys of the <code>bundle</code>
+   * @throws std::runtime_error If the number of keys of the bundle's properties
    *         exceeds the value returned by std::numeric_limits<int>::max().
-   * @throws std::runtime_error If the <code>bundle</code> contains case variants
-   *         of the same key name.
    */
   bool Match(const Bundle& bundle) const;
 
@@ -146,7 +144,7 @@ public:
    *        in the match.
    * @return <code>true</code> if the <code>AnyMap</code>'s values match this
    *         filter; <code>false</code> otherwise.
-   * @throws std::runtime_error If the number of keys of the <code>dictionary</code>
+   * @throws std::runtime_error If the number of keys in the <code>dictionary</code>
    *         exceeds the value returned by std::numeric_limits<int>::max().
    * @throws std::runtime_error If the <code>dictionary</code> contains case variants
    *         of the same key name.
@@ -162,7 +160,7 @@ public:
    *        in the match.
    * @return <code>true</code> if the <code>AnyMap</code>'s values match this
    *         filter; <code>false</code> otherwise.
-   * @throws std::runtime_error If the number of keys of the <code>dictionary</code>
+   * @throws std::runtime_error If the number of keys in the <code>dictionary</code>
    *         exceeds the value returned by std::numeric_limits<int>::max().
    * @throws std::runtime_error If the <code>dictionary</code> contains case variants
    *         of the same key name.

@@ -320,14 +320,6 @@ int FrameworkListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("FrameworkListenerTest");
 
-  auto lambda1 = [](const FrameworkEvent&) {};
-  auto lambda2 = [](const FrameworkEvent&) {};
-  US_TEST_CONDITION((typeid(lambda1) != typeid(lambda2)), "Test lambda type info (in)equality");
-  US_TEST_CONDITION(
-      std::function<void(const FrameworkEvent&)>(lambda1).target<void(const FrameworkEvent&)>() == std::function<void(const FrameworkEvent&)>(lambda2).target<void(const FrameworkEvent&)>(),
-      "Test std::function target equality"
-  );
-
   /*
     @note Framework events will be sent like service events; synchronously.
           Framework events SHOULD be delivered asynchronously (see OSGi spec), however that's not yet supported.

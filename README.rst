@@ -34,7 +34,7 @@ modular and dynamic service-oriented applications. It is based on
 `OSGi <http://osgi.org>`_, but tailored to support native cross-platform solutions.
 
 Proper usage of C++ Micro Services patterns and concepts leads to systems
-with one or more of the following properties: 
+with one or more of the following properties:
 
 - Re-use of software components
 - Loose coupling between service providers and consumers
@@ -55,7 +55,16 @@ Supported Platforms
 The library makes use of some C++11 features and compiles on many
 different platforms.
 
-Minimum required compiler versions:
+Recommended minimum required compiler versions:
+
+- GCC 4.8
+- Clang 3.3
+- Clang from Xcode 8.0
+- Visual Studio 2015
+
+You may use older compilers, but certain functionality may not be
+available. Check the warnings printed during configuration of
+your build tree. The following are the absolute minimum requirements:
 
 - GCC 4.6
 - Clang 3.1
@@ -108,7 +117,7 @@ Quick Start
 
 Essentially, the C++ Micro Services library provides you with a powerful
 dynamic service registry on top of a managed lifecycle. The framework manages,
-among other things, logical units of modularity called *bundles* that 
+among other things, logical units of modularity called *bundles* that
 are contained in shared or static libraries. Each bundle
 within a library has an associated :any:`cppmicroservices::BundleContext`
 object, through which the service registry is accessed.
@@ -189,7 +198,7 @@ file for details about the contribution process.
 .. |RTD Build Status (development)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=latest&style=flat-square
    :target: http://docs.cppmicroservices.org/en/latest/?badge=development
    :alt: Documentation Status (development)
-.. |Code Coverage Status| image:: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices
-.. |Code Coverage Status (development)| image:: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development/graph/badge.svg
-   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices
+.. |Code Coverage Status| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/master.svg?style=flat-square
+   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
+.. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
+   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development

@@ -10,7 +10,7 @@ if(MSVC)
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " /wd4311 /wd4312 /wd4996"
   )
-elseif(MINGW)
+elseif(MINGW OR MSYS)
   set_property(
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " -DUSE_STRLWR=0"

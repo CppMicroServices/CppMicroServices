@@ -122,6 +122,11 @@ US_MSVC_DISABLE_WARNING(4996)
 // Mark a variable or expression result as unused
 #define US_UNUSED(x) (void)(x)
 
+//-------------------------------------------------------------------
+// C++ Language features
+//-------------------------------------------------------------------
+
+#cmakedefine US_HAVE_THREAD_LOCAL
 
 //-------------------------------------------------------------------
 // C++ Library features

@@ -126,12 +126,12 @@ public:
    * bundle's manifest properties. The keys are looked up in a case insensitive
    * manner.
    *
-   * @param bundle The bundle whose properties are used
+   * @param bundle The bundle whose manifest's properties are used
    *        in the match.
-   * @return <code>true</code> if the bundle's properties match this
+   * @return <code>true</code> if the bundle's manifest properties match this
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
-   * @throws std::runtime_error If the number of keys of the bundle's properties
-   *         exceeds the value returned by std::numeric_limits<int>::max().
+   * @throws std::runtime_error If the number of keys of the bundle's manifest
+   *         properties exceeds the value returned by std::numeric_limits<int>::max().
    */
   bool Match(const Bundle& bundle) const;
 

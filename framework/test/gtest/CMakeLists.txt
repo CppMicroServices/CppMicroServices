@@ -12,6 +12,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(_gtest_tests 
   BundleVersionTest.cpp
   LDAPFilterTest.cpp
+  LDAPTest.cpp
 )
 
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests})

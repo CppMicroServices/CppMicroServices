@@ -120,18 +120,18 @@ public:
   bool Match(const ServiceReferenceBase& reference) const;
 
  /**
-   * Filter using a bundle's manifest properties.
+   * Filter using a bundle's manifest headers.
    * <p>
    * This <code>LDAPFilter</code> is executed using the keys and values of the
-   * bundle's manifest properties. The keys are looked up in a case insensitive
+   * bundle's manifest headers. The keys are looked up in a case insensitive
    * manner.
    *
-   * @param bundle The bundle whose manifest's properties are used
+   * @param bundle The bundle whose manifest's headers are used
    *        in the match.
-   * @return <code>true</code> if the bundle's manifest properties match this
+   * @return <code>true</code> if the bundle's manifest headers match this
    *         <code>LDAPFilter</code> <code>false</code> otherwise.
    * @throws std::runtime_error If the number of keys of the bundle's manifest
-   *         properties exceeds the value returned by std::numeric_limits<int>::max().
+   *         headers exceeds the value returned by std::numeric_limits<int>::max().
    */
   bool Match(const Bundle& bundle) const;
 

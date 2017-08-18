@@ -26,7 +26,7 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-TEST(LDAPTest, LDAPBoolEquals)
+TEST(LDAPTest, LDAPFilterBoolEquals)
 {
   LDAPFilter ldap("(prod=CppMiroServices)");
   LDAPFilter ldap_alt("(prod=CppMiroServices)");

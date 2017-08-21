@@ -5,10 +5,12 @@ Example 2b - Alternative Dictionary Service Bundle
 
 This example creates an alternative implementation of the dictionary
 service defined in :any:`Example 2 <example2>`. The source code for the
-bundle is identical except that instead of using English words, French
-words are used. The only other difference is that in this bundle we do
-not need to define the dictionary service interface again, since we can
-just link the definition from the bundle in Example 2. The main point
+bundle is identical except that:
+
+* Instead of using English words, it uses French words. 
+* We do not need to define the dictionary service interface again, as we can just link the definition from the bundle in Example 2. 
+
+The main point
 of this example is to illustrate that multiple implementations of the
 same service may exist; this example will also be of use to us in
 :any:`Example 5 <example5>`.
@@ -30,7 +32,7 @@ meta-data for our bundle; the manifest file contains the following:
 .. literalinclude:: frenchdictionary/resources/manifest.json
    :language: json
 
-For an introduction how to compile our source code, see
+For a refresher on how to compile our source code, see
 :any:`example1`. Because we use the ``IDictionaryService`` definition
 from Example 2, we also need to make sure that the proper include paths
 and linker dependencies are set:
@@ -38,7 +40,7 @@ and linker dependencies are set:
 .. literalinclude:: frenchdictionary/CMakeLists.txt
    :language: cmake
 
-After running the ``usTutorialDriver`` program we should make sure that
+After running the ``usTutorialDriver`` program, we should make sure that
 the bundle from Example 1 is active. We can use the :kbd:`status` shell
 command to get a list of all bundles, their state, and their bundle
 identifier number. If the Example 1 bundle is not active, we should
@@ -91,8 +93,9 @@ service. To exit ``usTutorialDriver``, we use the :kbd:`shutdown` command.
 
 .. note::
 
-   Because our french dictionary bundle has a link dependency on the
+   Because our French dictionary bundle has a link dependency on the
    dictionary service bundle from Example 2, this bundle's shared
    library is automatically loaded by the operating system's dynamic
    loader. However, its status remains *INSTALLED* until it is
    explicitly started.
+

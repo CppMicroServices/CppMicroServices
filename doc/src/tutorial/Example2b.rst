@@ -98,3 +98,4 @@ service. To exit ``usTutorialDriver``, we use the :kbd:`shutdown` command.
    library is automatically loaded by the operating system's dynamic
    loader. However, its status remains *INSTALLED* until it is
    explicitly started.
+

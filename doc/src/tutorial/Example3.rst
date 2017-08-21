@@ -7,8 +7,8 @@ This example creates a bundle that is a client of the dictionary service
 implemented in :any:`Example 2 <example2>`. In
 the following source code, our bundle uses its bundle context to query
 for a dictionary service. Our client bundle uses the first dictionary
-service it finds and if none are found it simply prints a message saying
-so and stops. Using a service is the same as using any C++ class. The
+service it finds, and if none are found, it prints a message and stops. 
+Services operate with no additional overhead. The
 source code for our bundle is as follows in a file called
 ``dictionaryclient/Activator.cpp``:
 
@@ -19,8 +19,8 @@ source code for our bundle is as follows in a file called
 
 Note that we do not need to unget or release the service in the ``Stop()``
 method, because the C++ Micro Services library will automatically do so
-for us. We must create a ``manifest.json`` file that contains the
-meta-data for our bundle; the manifest file contains the following:
+for us. We must create a ``manifest.json`` file with the
+meta-data for our bundle, which contains the following:
 
 .. literalinclude:: dictionaryclient/resources/manifest.json
    :language: json
@@ -45,7 +45,7 @@ to start our dictionary client bundle::
 
 The above command starts the pre-installed bundle. When we start the bundle,
 it will use the main thread to prompt us for words. Enter one word at a
-time to check the words and enter a blank line to stop checking words.
+time to check the words, and enter a blank line to stop checking words.
 To reload the bundle, we must first use the :kbd:`stop dictionaryclient` command
 to stop the bundle, then the :kbd:`start dictionaryclient` command to re-start
 it. To test the dictionary service, enter any of the words in the

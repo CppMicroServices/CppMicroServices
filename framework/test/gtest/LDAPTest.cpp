@@ -68,6 +68,8 @@ TEST(LDAPTest, LDAPExprIsSimple)
 
   const std::string ldapFilter = "(|(objectClass=foo)(objectClass=bar))";
   ASSERT_TRUE(fCtx.AddServiceListener(lambda, ldapFilter));
+  const std::string ldapFilter2 = "(|(&(objectClass=foo)(objectClass=bar))(objectClass=baz))";
+  ASSERT_TRUE(fCtx.AddServiceListener(lambda, ldapFilter2));
 }
 
 TEST(LDAPTest, LDAPExprEvaluateNot)
@@ -186,4 +188,27 @@ TEST(LDAPTest, LDAPExprPatSubstr)
   props.clear();
   props["name"] = std::string("ab");
   ASSERT_FALSE(ldapMatch.Match(props));
+}
+
+TEST(LDAPTest, LDAPExprParseExceptions)
+{
+  // The numbers in the comments mean the error in the
+  // lines of LDAPExpr.cpp. These will be amended in a future checkin
+  // Testing #173
+  EXPECT_THROW(LDAPFilter("(name=abra)zxdzx"), std::invalid_argument);
+  // Testing #653
+  EXPECT_THROW(LDAPFilter("(!(name=abra)(name=beta))"), std::invalid_argument);
+  // Testing #662 & #811
+  EXPECT_THROW(LDAPFilter("(=abra)"), std::invalid_argument);
+  // Testing #675
+  EXPECT_THROW(LDAPFilter("(name>abra)"), std::invalid_argument);
+  // Testing #679
+  EXPECT_THROW(LDAPFilter("(name=abra("), std::invalid_argument);
+  // Why #711?
+  // Testing #748
+  EXPECT_THROW(LDAPFilter(""), std::invalid_argument);
+  // Testing #767
+  EXPECT_THROW(LDAPFilter("(name=abra"), std::invalid_argument);
+  // Testing #832
+  ASSERT_EQ(LDAPFilter("(name=ab\\a)"), LDAPFilter("(name=aba)"));
 }

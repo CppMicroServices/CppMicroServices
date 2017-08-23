@@ -27,6 +27,7 @@ limitations under the License.
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceEvent.h"
+#include "cppmicroservices/ServiceTracker.h"
 
 #include "gtest/gtest.h"
 
@@ -53,6 +54,35 @@ TEST(LDAPTest, LDAPProp)
   );
   const std::string filterStr = "(&(&(&(&(&(!(bla=jo))(foo=hello))(!(bar=bye)))(baz>=30))(bleh<=50))(doh~=Ballpark))";
   ASSERT_EQ(filter.ToString(), filterStr);
+}
+
+TEST(LDAPTest, LDAPExprGetMatchedObjectClasses)
+{
+  struct MyInterfaceOne {
+    virtual ~MyInterfaceOne() {}
+  };
+  struct MyServiceOne : public MyInterfaceOne {};
+
+  auto f = FrameworkFactory().NewFramework();
+  f.Init();
+  BundleContext context{ f.GetBundleContext() };
+
+  auto serviceOne = std::make_shared<MyServiceOne>();
+  context.RegisterService<MyInterfaceOne>(serviceOne);
+
+  LDAPFilter filter("(&(objectclass=alpha)(objectclass=beta))");
+  ServiceTracker<MyInterfaceOne> tracker(context, filter, nullptr);
+  tracker.Open();
+
+  LDAPFilter filter1("(&(objectclass=beta)(objectclass=alpha))");
+  ServiceTracker<MyInterfaceOne> tracker1(context, filter1, nullptr);
+  tracker1.Open();
+
+  LDAPFilter filter2("(|(objectclass=alpha)(objectclass=beta))");
+  ServiceTracker<MyInterfaceOne> tracker2(context, filter2, nullptr);
+  tracker2.Open();
+
+  ASSERT_TRUE(tracker.GetServiceReferences().size() == 0);
 }
 
 TEST(LDAPTest, LDAPExprIsSimple)
@@ -124,6 +154,9 @@ TEST(LDAPTest, LDAPExprCompare)
   ASSERT_TRUE(ldapMatch.Match(props));
   props.clear();
   props["hosed"] = static_cast<unsigned int>(1);
+  ASSERT_TRUE(ldapMatch.Match(props));
+  props.clear();
+  props["hosed"] = static_cast<unsigned long int>(1);
   ASSERT_TRUE(ldapMatch.Match(props));
   ldapMatch = LDAPFilter("(hosed<=200)");
   props.clear();
@@ -212,3 +245,4 @@ TEST(LDAPTest, LDAPExprParseExceptions)
   // Testing #832
   ASSERT_EQ(LDAPFilter("(name=ab\\a)"), LDAPFilter("(name=aba)"));
 }
+

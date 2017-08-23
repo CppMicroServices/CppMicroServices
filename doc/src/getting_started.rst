@@ -81,7 +81,7 @@ without proper initialization code in the using library will lead to compile or 
 Publishing a Service
 --------------------
 
-Publishing a bundle is done by calling the :any:`BundleContext::RegisterService
+Publishing a service is done by calling the :any:`BundleContext::RegisterService
 <cppmicroservices::BundleContext::RegisterService>` function. The
 following code for the *service_time_systemclock*
 bundle implements the ``ServiceTime`` interface as a service:

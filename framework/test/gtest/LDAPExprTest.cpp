@@ -21,7 +21,6 @@ limitations under the License.
 =============================================================================*/
 
 #include "cppmicroservices/LDAPFilter.h"
-#include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/Bundle.h"
@@ -33,31 +32,9 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-TEST(LDAPTest, LDAPFilterBoolEquals)
+TEST(LDAPExprTest, GetMatchedObjectClasses)
 {
-  LDAPFilter ldap("(prod=CppMiroServices)");
-  LDAPFilter ldap_alt("(prod=CppMiroServices)");
-  ASSERT_TRUE(ldap);
-  ASSERT_EQ(ldap, ldap_alt);
-}
-
-TEST(LDAPTest, LDAPProp)
-{
-  Any any1 = std::string("hello");
-  Any any2 = std::string("bye");
-  Any any3 = std::string("Ballpark");
-  Any anyInt1 = 30;
-  Any anyInt2 = 50;
-  LDAPFilter filter(
-    LDAPProp("bla") != "jo" && LDAPProp("foo") == any1 && LDAPProp("bar") != any2 &&
-    LDAPProp("baz") >= anyInt1 && LDAPProp("bleh") <= anyInt2 && LDAPProp("doh").Approx(any3)
-  );
-  const std::string filterStr = "(&(&(&(&(&(!(bla=jo))(foo=hello))(!(bar=bye)))(baz>=30))(bleh<=50))(doh~=Ballpark))";
-  ASSERT_EQ(filter.ToString(), filterStr);
-}
-
-TEST(LDAPTest, LDAPExprGetMatchedObjectClasses)
-{
+  // Improve coverage for LDAPExpr::GetMatchedObjectClasses()
   struct MyInterfaceOne {
     virtual ~MyInterfaceOne() {}
   };
@@ -82,11 +59,16 @@ TEST(LDAPTest, LDAPExprGetMatchedObjectClasses)
   ServiceTracker<MyInterfaceOne> tracker2(context, filter2, nullptr);
   tracker2.Open();
 
+  LDAPFilter filter3("(&(objectclass=alpha)(objectclass=alpha))");
+  ServiceTracker<MyInterfaceOne> tracker3(context, filter3, nullptr);
+  tracker3.Open();
+
   ASSERT_TRUE(tracker.GetServiceReferences().size() == 0);
 }
 
-TEST(LDAPTest, LDAPExprIsSimple)
+TEST(LDAPExprTest, IsSimple)
 {
+  // Expanding coverage for LDAPExpr::IsSimple by testing the OR filter.
   auto f = FrameworkFactory().NewFramework();
   f.Init();
   BundleContext fCtx{ f.GetBundleContext() };
@@ -102,7 +84,7 @@ TEST(LDAPTest, LDAPExprIsSimple)
   ASSERT_TRUE(fCtx.AddServiceListener(lambda, ldapFilter2));
 }
 
-TEST(LDAPTest, LDAPExprEvaluateNot)
+TEST(LDAPExprTest, EvaluateNot)
 {
   LDAPFilter ldapMatch("(!(hosed=1))");
   AnyMap props(AnyMap::UNORDERED_MAP);
@@ -110,7 +92,7 @@ TEST(LDAPTest, LDAPExprEvaluateNot)
   ASSERT_TRUE(ldapMatch.Match(props));
 }
 
-TEST(LDAPTest, LDAPExprCompare)
+TEST(LDAPExprTest, Compare)
 {
   // Testing wildcard
   LDAPFilter ldapMatch("(hosed=*)");
@@ -194,8 +176,9 @@ TEST(LDAPTest, LDAPExprCompare)
   ASSERT_TRUE(ldapMatch.Match(props));
 }
 
-TEST(LDAPTest, LDAPExprCompareString)
+TEST(LDAPExprTest, CompareString)
 {
+  // Testing string greater-equal, less-equal and approx. filters.
   LDAPFilter ldapMatch("(name>=abra)");
   AnyMap props(AnyMap::UNORDERED_MAP);
   props["name"] = std::string("cadabra");
@@ -204,13 +187,14 @@ TEST(LDAPTest, LDAPExprCompareString)
   ldapMatch = LDAPFilter("(name<=oink)");
   ASSERT_TRUE(ldapMatch.Match(props));
 
+  // Also, test LDAPExpr::FixupString
   ldapMatch = LDAPFilter("(name~=micro)");
   props.clear();
   props["name"] = std::string("MICRO");
   ASSERT_TRUE(ldapMatch.Match(props));
 }
 
-TEST(LDAPTest, LDAPExprPatSubstr)
+TEST(LDAPExprTest, PatSubstr)
 {
   LDAPFilter ldapMatch("(name=ab*d)");
   AnyMap props(AnyMap::UNORDERED_MAP);
@@ -223,26 +207,24 @@ TEST(LDAPTest, LDAPExprPatSubstr)
   ASSERT_FALSE(ldapMatch.Match(props));
 }
 
-TEST(LDAPTest, LDAPExprParseExceptions)
+TEST(LDAPExprTest, ParseExceptions)
 {
-  // The numbers in the comments mean the error in the
-  // lines of LDAPExpr.cpp. These will be amended in a future checkin
-  // Testing #173
+  // Test various exceptions thrown.
+  // Test error condition in LDAPExpr::LDAPExpr()
   EXPECT_THROW(LDAPFilter("(name=abra)zxdzx"), std::invalid_argument);
-  // Testing #653
+  // Test error condition in LDAPExpr::ParseExpr()
   EXPECT_THROW(LDAPFilter("(!(name=abra)(name=beta))"), std::invalid_argument);
-  // Testing #662 & #811
+  // Test attribute name empty error condition in
+  // LDAPExpr::ParseSimple() and LDAPExpr::ParseState::getAttributeName()
   EXPECT_THROW(LDAPFilter("(=abra)"), std::invalid_argument);
-  // Testing #675
+  // Testing undefined operator error condition in LDAPExpr::ParseSimple()
   EXPECT_THROW(LDAPFilter("(name>abra)"), std::invalid_argument);
-  // Testing #679
+  // Testing malformed filter error condition in LDAPExpr::ParseSimple()
   EXPECT_THROW(LDAPFilter("(name=abra("), std::invalid_argument);
-  // Why #711?
-  // Testing #748
+  // Testing empty filter error condition in LDAPExpr::ParseState::ParseState()
   EXPECT_THROW(LDAPFilter(""), std::invalid_argument);
-  // Testing #767
+  // Testing out of range exception in LDAPExpr::ParseState::peek()
   EXPECT_THROW(LDAPFilter("(name=abra"), std::invalid_argument);
-  // Testing #832
+  // Testing '\\' case in LDAPExpr::ParseState::getAttributeValue()
   ASSERT_EQ(LDAPFilter("(name=ab\\a)"), LDAPFilter("(name=aba)"));
 }
-

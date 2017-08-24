@@ -21,9 +21,11 @@ limitations under the License.
 =============================================================================*/
 
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/LDAPProp.h"
+
 #include "gtest/gtest.h"
 
-using cppmicroservices::LDAPFilter;
+using namespace cppmicroservices;
 
 TEST(LDAPFilter, ToString)
 {
@@ -50,3 +52,25 @@ TEST(LDAPFilter, Comparison)
   ASSERT_FALSE(filter1 == filt);
 }
 
+TEST(LDAPFilter, Equality)
+{
+  LDAPFilter ldap("(prod=CppMiroServices)");
+  LDAPFilter ldap_alt("(prod=CppMiroServices)");
+  ASSERT_EQ(ldap, ldap_alt);
+}
+
+TEST(LDAPFilter, LDAPProp)
+{
+  // Testing LDAPProp's operators.
+  Any any1 = std::string("hello");
+  Any any2 = std::string("bye");
+  Any any3 = std::string("Ballpark");
+  Any anyInt1 = 30;
+  Any anyInt2 = 50;
+  LDAPFilter filter(
+    LDAPProp("bla") != "jo" && LDAPProp("foo") == any1 && LDAPProp("bar") != any2 &&
+    LDAPProp("baz") >= anyInt1 && LDAPProp("bleh") <= anyInt2 && LDAPProp("doh").Approx(any3)
+  );
+  const std::string filterStr = "(&(&(&(&(&(!(bla=jo))(foo=hello))(!(bar=bye)))(baz>=30))(bleh<=50))(doh~=Ballpark))";
+  ASSERT_EQ(filter.ToString(), filterStr);
+}

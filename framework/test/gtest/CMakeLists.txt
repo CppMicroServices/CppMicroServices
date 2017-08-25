@@ -10,9 +10,10 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # Add test source files
 #-----------------------------------------------------------------------------
 set(_gtest_tests 
+  AnyMapTest.cpp
   BundleVersionTest.cpp
-  LDAPFilterTest.cpp
   LDAPExprTest.cpp
+  LDAPFilterTest.cpp
 )
 
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests})

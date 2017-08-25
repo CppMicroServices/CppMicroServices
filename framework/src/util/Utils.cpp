@@ -117,28 +117,46 @@ namespace cppmicroservices {
   //-------------------------------------------------------------------
 #ifdef US_PLATFORM_WINDOWS
 
+  void ThrowInvalidArgument(const std::string& msgprefix)
+  {
+    throw std::invalid_argument(msgprefix + " Error: " + GetLastErrorStr());
+  }
+
   // function returns empty string if inStr is empty or if the conversion failed
   std::wstring ToWString(const std::string& inStr)
   {
+    if (inStr.empty())
+    {
+      return std::wstring();
+    }
     int wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
-    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchar_count+1]);
+    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchar_count]);
     wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchar_count);
-    // write the trailing zero to ensure empty string is returned when the above call fails
-    wBuf.get()[wchar_count] = L'\0'; 
+    if (wchar_count == 0)
+    {
+      ThrowInvalidArgument("Failed to convert " + inStr +" to UTF16.");
+    } 
     return wBuf.get();
   }
 
   // function return empty string if inWStr is empty or if the conversion failed
   std::string ToUTF8String(const std::wstring& inWStr)
   {
+    if (inWStr.empty())
+    {
+      return std::string();
+    }
     int char_count = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
-    std::unique_ptr<char[]> str(new char[char_count+1]);
+    std::unique_ptr<char[]> str(new char[char_count]);
     char_count = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), char_count, NULL, NULL);
-    // write the trailing zero to ensure empty string is returned when the above call fails
-    str.get()[char_count] = '\0';
+    if (char_count == 0)
+    {
+      ThrowInvalidArgument("Failed to convert UTF16 string to UTF8.");
+    }
     return str.get();
   }
 #endif
+
 //-------------------------------------------------------------------
 // File system functions
 //-------------------------------------------------------------------
@@ -404,33 +422,43 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
 {
   // See if we have a storage directory
   const std::string fwdir = GetFrameworkDir(ctx);
-  if (fwdir.empty())
+  if (!fwdir.empty())
   {
-    return fwdir;
+	  try
+	  {
+		  const std::string dir = fs::GetAbsolute(fwdir, ctx->workingDir) + DIR_SEP + name;
+		  if (!dir.empty())
+		  {
+			  if (fs::Exists(dir))
+			  {
+				  if (!fs::IsDirectory(dir))
+				  {
+					  throw std::runtime_error("Not a directory: " + dir);
+				  }
+			  }
+			  else
+			  {
+				  if (create)
+				  {
+					  try
+					  {
+						  fs::MakePath(dir);
+					  }
+					  catch (const std::exception& e)
+					  {
+						  throw std::runtime_error("Cannot create directory: " + dir + " (" + e.what() + ")");
+					  }
+				  }
+			  }
+		  }
+		  return dir;
+	  }
+	  catch (const std::invalid_argument& ex) // could be thrown from GetAbsolute, Exists, IsDirectory
+	  {
+		  throw std::runtime_error(ex.what());
+	  }
   }
-  const std::string dir = fs::GetAbsolute(fwdir, ctx->workingDir) + DIR_SEP + name;
-  if (!dir.empty())
-  {
-    if (fs::Exists(dir))
-    {
-      if (!fs::IsDirectory(dir))
-      {
-        throw std::runtime_error("Not a directory: " + dir);
-      }
-    }
-    else
-    {
-      if (create)
-      {
-        try { fs::MakePath(dir); }
-        catch (const std::exception& e)
-        {
-          throw std::runtime_error("Cannot create directory: " + dir + " (" + e.what() + ")");
-        }
-      }
-    }
-  }
-  return dir;
+  return std::string();
 }
 
 //-------------------------------------------------------------------

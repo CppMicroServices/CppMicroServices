@@ -99,15 +99,16 @@ void* GetExecutableHandle()
 std::string GetExecutablePath()
 {
   uint32_t bufsize = MAXPATHLEN;
-  std::unique_ptr<char[]> buf(new char[bufsize]);
-
 #ifdef US_PLATFORM_WINDOWS
-  if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+  std::unique_ptr<wchar_t[]> buf(new wchar_t[bufsize]);
+  if (GetModuleFileNameW(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
     DIAG_LOG(*GetFrameworkLogSink()) << "GetModuleFileName failed" << GetLastErrorStr();
-    buf[0] = '\0';
+    buf[0] = L'\0';
   }
+  return ToUTF8String(buf.get());
 #elif defined(US_PLATFORM_APPLE)
+  std::unique_ptr<char[]> buf(new char[bufsize]);
   int status = _NSGetExecutablePath(buf.get(), &bufsize);
   if (status == -1)
   {
@@ -119,18 +120,21 @@ std::string GetExecutablePath()
      DIAG_LOG(*GetFrameworkLogSink()) << "_NSGetExecutablePath() failed";
   }
   // the returned path may not be an absolute path
+  return buf.get();
 #elif defined(US_PLATFORM_LINUX)
+  std::unique_ptr<char[]> buf(new char[bufsize]);
   ssize_t len = ::readlink("/proc/self/exe", buf.get(), bufsize);
   if (len == -1 || len == bufsize)
   {
     len = 0;
   }
   buf[len] = '\0';
+  return buf.get();
 #else
   // 'dlsym' does not work with symbol name 'main'
   DIAG_LOG(*GetFrameworkLogSink()) << "GetExecutablePath failed";
+  return std::string();
 #endif
-  return buf.get();
 }
 
 void* GetSymbol(void* libHandle, const char* symbol)

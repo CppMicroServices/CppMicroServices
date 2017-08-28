@@ -81,7 +81,6 @@ TEST(AnyMapTest, IteratorTest)
 
   // Testing exception when an invalid iterator is dereferenced.
   AnyMap::const_iter nciter, nciter2;
-  AnyMap::const_iter nciter3(nciter2);
   EXPECT_THROW(*nciter, std::logic_error);
   EXPECT_THROW(++nciter, std::logic_error);
   EXPECT_THROW(nciter++, std::logic_error);
@@ -105,6 +104,7 @@ TEST(AnyMapTest, IteratorTest)
   AnyMap::iter uociiter(uoci.begin());
   AnyMap::iter niter;
   AnyMap::iter niter_copy(niter);
+  AnyMap::const_iter nciter3(niter);
 
   // Testing iterator equality operator
   ASSERT_EQ(oiter, oiter_copy);

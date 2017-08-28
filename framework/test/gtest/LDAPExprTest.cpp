@@ -63,6 +63,10 @@ TEST(LDAPExprTest, GetMatchedObjectClasses)
   ServiceTracker<MyInterfaceOne> tracker3(context, filter3, nullptr);
   tracker3.Open();
 
+  LDAPFilter filter4("(|(object=alpha)(object=beta))");
+  ServiceTracker<MyInterfaceOne> tracker4(context, filter4, nullptr);
+  tracker4.Open();
+
   ASSERT_TRUE(tracker.GetServiceReferences().size() == 0);
 }
 
@@ -84,12 +88,19 @@ TEST(LDAPExprTest, IsSimple)
   ASSERT_TRUE(fCtx.AddServiceListener(lambda, ldapFilter2));
 }
 
-TEST(LDAPExprTest, EvaluateNot)
+TEST(LDAPExprTest, Evaluate)
 {
+  // Testing previously uncovered lines in LDAPExpr::Evaluate()
+  // case NOT
   LDAPFilter ldapMatch("(!(hosed=1))");
   AnyMap props(AnyMap::UNORDERED_MAP);
   props["hosed"] = std::string("2");
   ASSERT_TRUE(ldapMatch.Match(props));
+
+  // case OR returning false
+  LDAPFilter ldapMatch2("(|(hosed=1)(hosed=2))");
+  props["hosed"] = std::string("3");
+  ASSERT_FALSE(ldapMatch2.Match(props));
 }
 
 TEST(LDAPExprTest, Compare)

@@ -73,7 +73,7 @@ TEST(AnyMapTest, IteratorTest)
   ASSERT_EQ((*(++ociter1)).second.ToString(), std::string("2"));
   ASSERT_EQ((*(ociter1++)).second.ToString(), std::string("2"));
   int i = 0;
-  for (auto& oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it)
+  for (AnyMap::const_iter oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it)
   {
     ++i;
     ASSERT_EQ(i, any_cast<int>(oc_it->second));
@@ -84,7 +84,7 @@ TEST(AnyMapTest, IteratorTest)
   EXPECT_THROW(*nciter, std::logic_error);
   EXPECT_THROW(++nciter, std::logic_error);
   EXPECT_THROW(nciter++, std::logic_error);
-  EXPECT_THROW(nciter->second, std::logic_error);
+  EXPECT_THROW(nciter->second != Any(0), std::logic_error);
   ASSERT_EQ(nciter, nciter2);
 
   // Testing ++ operator
@@ -119,7 +119,7 @@ TEST(AnyMapTest, IteratorTest)
   // Testing iterator arrow operator
   ASSERT_TRUE(any_cast<int>(uoiter->second) > 0);
   ASSERT_TRUE(any_cast<int>(uociiter->second) > 0);
-  EXPECT_THROW(niter->second, std::logic_error);
+  EXPECT_THROW(niter->second != Any(0), std::logic_error);
   
   // Testing iterator pre-increment operator
   ASSERT_EQ((*(++oiter)).second.ToString(), std::string("2"));

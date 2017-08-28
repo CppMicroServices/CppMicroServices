@@ -21,6 +21,7 @@ limitations under the License.
 =============================================================================*/
 
 #include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/GlobalConfig.h"
 
 #include "gtest/gtest.h"
 
@@ -84,7 +85,7 @@ TEST(AnyMapTest, IteratorTest)
   EXPECT_THROW(*nciter, std::logic_error);
   EXPECT_THROW(++nciter, std::logic_error);
   EXPECT_THROW(nciter++, std::logic_error);
-  EXPECT_THROW(nciter->second != Any(0), std::logic_error);
+  EXPECT_THROW(US_UNUSED(nciter->second), std::logic_error);
   ASSERT_EQ(nciter, nciter2);
 
   // Testing ++ operator
@@ -119,7 +120,7 @@ TEST(AnyMapTest, IteratorTest)
   // Testing iterator arrow operator
   ASSERT_TRUE(any_cast<int>(uoiter->second) > 0);
   ASSERT_TRUE(any_cast<int>(uociiter->second) > 0);
-  EXPECT_THROW(niter->second != Any(0), std::logic_error);
+  EXPECT_THROW(US_UNUSED(niter->second), std::logic_error);
   
   // Testing iterator pre-increment operator
   ASSERT_EQ((*(++oiter)).second.ToString(), std::string("2"));
@@ -187,6 +188,6 @@ TEST(AnyMapTest, AnyMap)
   std::ostringstream stream1, stream2;
   any_value_to_string(stream1, o_anymap);
   ASSERT_EQ(stream1.str(), "{do : 1, re : 2}");
-  any_value_to_json(stream2, uco_anymap1);
-  ASSERT_EQ(stream2.str(), "{\"DO\" : 1, \"RE\" : 10}");
+  any_value_to_json(stream2, o_anymap1);
+  ASSERT_EQ(stream2.str(), "{\"do\" : 1, \"re\" : 10}");
 }

@@ -151,6 +151,9 @@ TEST(LDAPExprTest, Compare)
   props.clear();
   props["hosed"] = static_cast<unsigned long int>(1);
   ASSERT_TRUE(ldapMatch.Match(props));
+  props.clear();
+  props["hosed"] = static_cast<unsigned long long int>(1);
+  ASSERT_TRUE(ldapMatch.Match(props));
   ldapMatch = LDAPFilter("(hosed<=200)");
   props.clear();
   props["hosed"] = 1;

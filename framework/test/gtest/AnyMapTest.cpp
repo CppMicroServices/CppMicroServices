@@ -37,7 +37,7 @@ TEST(AnyMapTest, CheckExceptions)
 
 TEST(AnyMapTest, AtCompoundKey)
 {
-  // Testing vector<Any> inside vector<Any> compound access
+  // Testing nested vector<Any> compound access
   AnyMap uo(AnyMap::UNORDERED_MAP);
   std::vector<Any> child{ Any(1), Any(2) };
   std::vector<Any> parent{ Any(child) };
@@ -72,15 +72,25 @@ TEST(AnyMapTest, IteratorTest)
   ASSERT_EQ((*ociter1).second.ToString(), std::string("1"));
   ASSERT_EQ((*(++ociter1)).second.ToString(), std::string("2"));
   ASSERT_EQ((*(ociter1++)).second.ToString(), std::string("2"));
+  int i = 0;
+  for (auto& oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it)
+  {
+    ++i;
+    ASSERT_EQ(i, any_cast<int>(oc_it->second));
+  }
 
   // Testing exception when an invalid iterator is dereferenced.
   AnyMap::const_iter nciter, nciter2;
+  AnyMap::const_iter nciter3(nciter2);
   EXPECT_THROW(*nciter, std::logic_error);
   EXPECT_THROW(++nciter, std::logic_error);
   EXPECT_THROW(nciter++, std::logic_error);
+  EXPECT_THROW(nciter->second, std::logic_error);
   ASSERT_EQ(nciter, nciter2);
 
+  // Testing ++ operator
   ASSERT_TRUE(any_cast<int>((*(uociter++)).second) > 0);
+  ASSERT_TRUE(any_cast<int>(uociter->second) > 0);
   ASSERT_TRUE(any_cast<int>((*(uoccciiter++)).second) > 0);
 
   // Testing operator==
@@ -139,34 +149,41 @@ TEST(AnyMapTest, AnyMap)
   AnyMap uco_anymap(uco);
 
   AnyMap o_anymap1(AnyMap::ORDERED_MAP);
+  o_anymap1 = o_anymap1;
   o_anymap1 = o_anymap_copy;
   AnyMap uo_anymap1(AnyMap::UNORDERED_MAP);
   uo_anymap1 = uo_anymap;
   AnyMap uco_anymap1(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   uco_anymap1 = uco_anymap;
 
-  // clear
+  // Testing AnyMap::empty()
+  ASSERT_TRUE(uco_anymap1.empty());
+
+  // Testing AnyMap::clear()
+  AnyMap o_anymap2(o_anymap);
+  o_anymap2.clear();
   uco_anymap1.clear();
   uco_anymap1["DO"] = 1;
   uco_anymap1["RE"] = 2;
   
-  // at
+  // Testing AnyMap::at()
   ASSERT_EQ(any_cast<int>(uo_anymap1.at("re")), 2);
 
-  // operator[] (const)
+  // Testing AnyMap::operator[] (const)
   const std::string key = "re";
   o_anymap1[key] = 10;
   uo_anymap1[key] = 10;
+  uo_anymap1.insert(std::make_pair(std::string("mi"), Any(3)));
   uco_anymap1[key] = 10;
 
-  // find
+  // Testing AnyMap::find()
   ASSERT_TRUE(o_anymap1.find("re") != o_anymap1.end());
   ASSERT_TRUE(uo_anymap1.find("re") != uo_anymap1.end());
 
-  // GetType
+  // Testing AnyMap::GetType()
   ASSERT_EQ(uco_anymap1.GetType(), AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
 
-  // any_value_to_* free functions
+  // Testing any_value_to_* free functions
   std::ostringstream stream1, stream2;
   any_value_to_string(stream1, o_anymap);
   ASSERT_EQ(stream1.str(), "{do : 1, re : 2}");

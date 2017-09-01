@@ -20,23 +20,24 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEUTILS_H
-#define CPPMICROSERVICES_BUNDLEUTILS_H
 
+#ifndef CPPMICROSERVICES_UTIL_ERROR_H
+#define CPPMICROSERVICES_UTIL_ERROR_H
+
+#include <exception>
 #include <string>
-#include <utility>
 
 namespace cppmicroservices {
 
-namespace BundleUtils
-{
-  // returns the handle to the current executable
-  void* GetExecutableHandle();
+namespace util {
 
-  // returns the address of the symbol in library libHandle
-  void* GetSymbol(void* libHandle, const char* symbol);
-}
+std::string GetLastCErrorStr();
+std::string GetLastWin32ErrorStr();
 
+std::string GetExceptionStr(const std::exception_ptr& exc);
+std::string GetLastExceptionStr();
+
+} // namespace util
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_BUNDLEUTILS_H
+#endif // CPPMICROSERVICES_UTIL_ERROR_H

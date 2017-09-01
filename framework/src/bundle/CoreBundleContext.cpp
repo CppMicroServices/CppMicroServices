@@ -30,11 +30,13 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/String.h"
+
 #include "BundleStorageMemory.h"
 #include "BundleThread.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
-#include "Utils.h"
 
 #include <iomanip>
 
@@ -61,7 +63,7 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   {
     configuration.insert(std::make_pair(
                            Constants::FRAMEWORK_WORKING_DIR,
-                           fs::GetCurrentWorkingDirectory()
+                           util::GetCurrentWorkingDirectory()
                            )
                          );
   }
@@ -149,12 +151,19 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
-  auto const execPath = BundleUtils::GetExecutablePath();
-  if (bundleRegistry.GetBundles(execPath).empty() &&
-      IsBundleFile(execPath))
+  try
   {
-  // auto-install all embedded bundles inside the executable
-    bundleRegistry.Install(execPath, systemBundle.get());
+    auto const execPath = util::GetExecutablePath();
+    if (bundleRegistry.GetBundles(execPath).empty() &&
+        IsBundleFile(execPath))
+    {
+      // auto-install all embedded bundles inside the executable
+      bundleRegistry.Install(execPath, systemBundle.get());
+    }
+  }
+  catch (const std::exception& e)
+  {
+    DIAG_LOG(*sink) << e.what();
   }
 
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
@@ -213,7 +222,7 @@ std::string CoreBundleContext::GetDataStorage(long id) const
 {
   if (!dataStorage.empty())
   {
-    return dataStorage + DIR_SEP + cppmicroservices::ToString(id);
+    return dataStorage + util::DIR_SEP + util::ToString(id);
   }
   return std::string();
 }

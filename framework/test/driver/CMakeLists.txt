@@ -76,6 +76,7 @@ set(_additional_srcs
   TestManager.cpp
   TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
+  $<TARGET_OBJECTS:util>
 )
 
 #-----------------------------------------------------------------------------
@@ -97,6 +98,8 @@ add_executable(${_test_driver} ${_srcs} ${_additional_srcs} ${_third_party_srcs}
 add_dependencies(${_test_driver} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_BUNDLE_NAME main)
+
+target_include_directories(${_test_driver} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR

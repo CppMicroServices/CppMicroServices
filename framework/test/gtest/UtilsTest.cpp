@@ -20,8 +20,7 @@ limitations under the License.
 
 =============================================================================*/
 
-#include "../../src/util/Utils.h"
-#include "../../src/bundle/BundleUtils.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include <TestUtils.h>
 
@@ -30,6 +29,7 @@ limitations under the License.
 
 using namespace cppmicroservices;
 using namespace cppmicroservices::testing;
+using namespace cppmicroservices::util;
 
 class UtilsFs : public ::testing::Test
 {
@@ -37,7 +37,7 @@ public:
 
   static void SetUpTestCase()
   {
-    TempDir = cppmicroservices::testing::MakeUniqueTempDirectory();
+    TempDir = MakeUniqueTempDirectory();
   }
 
   static void TearDownTestCase()
@@ -67,12 +67,12 @@ protected:
 
   static std::string GetExistingDir()
   {
-    return fs::GetCurrentWorkingDirectory();
+    return GetCurrentWorkingDirectory();
   }
 
   static std::string GetExistingFile()
   {
-    return BundleUtils::GetExecutablePath();
+    return GetExecutablePath();
   }
 
   static cppmicroservices::testing::TempDir TempDir;
@@ -82,66 +82,66 @@ cppmicroservices::testing::TempDir UtilsFs::TempDir;
 
 TEST_F(UtilsFs, Exists)
 {
-  EXPECT_FALSE(fs::Exists("should not exist"));
-  EXPECT_TRUE(fs::Exists(GetExistingDir())) << "Test for existing directory";
-  EXPECT_TRUE(fs::Exists(GetExistingFile())) << "Test for existing file";
+  EXPECT_FALSE(Exists("should not exist"));
+  EXPECT_TRUE(Exists(GetExistingDir())) << "Test for existing directory";
+  EXPECT_TRUE(Exists(GetExistingFile())) << "Test for existing file";
 
   auto longPath = GetTooLongPath();
   if (!longPath.empty())
   {
 #ifdef US_PLATFORM_WINDOWS
-    EXPECT_FALSE(fs::Exists(longPath));
+    EXPECT_FALSE(Exists(longPath));
 #else
-    EXPECT_THROW({ fs::Exists(longPath); }, std::invalid_argument);
+    EXPECT_THROW({ Exists(longPath); }, std::invalid_argument);
 #endif
   }
 }
 
 TEST_F(UtilsFs, IsDirectory)
 {
-  EXPECT_FALSE(fs::IsDirectory("not a directory"));
-  EXPECT_TRUE(fs::IsDirectory(GetExistingDir()));
-  EXPECT_FALSE(fs::IsDirectory(GetExistingFile()));
+  EXPECT_FALSE(IsDirectory("not a directory"));
+  EXPECT_TRUE(IsDirectory(GetExistingDir()));
+  EXPECT_FALSE(IsDirectory(GetExistingFile()));
 
   auto longPath = GetTooLongPath();
   if (!longPath.empty())
   {
 #ifdef US_PLATFORM_WINDOWS
-    EXPECT_FALSE(fs::IsDirectory(longPath));
+    EXPECT_FALSE(IsDirectory(longPath));
 #else
-    EXPECT_THROW({ fs::IsDirectory(longPath); }, std::invalid_argument);
+    EXPECT_THROW({ IsDirectory(longPath); }, std::invalid_argument);
 #endif
   }
 }
 
 TEST_F(UtilsFs, IsFile)
 {
-  EXPECT_FALSE(fs::IsFile("not a file"));
-  EXPECT_FALSE(fs::IsFile(GetExistingDir()));
-  EXPECT_TRUE(fs::IsFile(GetExistingFile()));
+  EXPECT_FALSE(IsFile("not a file"));
+  EXPECT_FALSE(IsFile(GetExistingDir()));
+  EXPECT_TRUE(IsFile(GetExistingFile()));
 
   auto longPath = GetTooLongPath();
   if (!longPath.empty())
   {
 #ifdef US_PLATFORM_WINDOWS
-    EXPECT_FALSE(fs::IsFile(longPath));
+    EXPECT_FALSE(IsFile(longPath));
 #else
-    EXPECT_THROW({ fs::IsFile(longPath); }, std::invalid_argument);
+    EXPECT_THROW({ IsFile(longPath); }, std::invalid_argument);
 #endif
   }
 }
 
 TEST_F(UtilsFs, IsRelative)
 {
-  EXPECT_TRUE(fs::IsRelative(""));
-  EXPECT_TRUE(fs::IsRelative("rel"));
-  EXPECT_FALSE(fs::IsRelative(GetExistingFile()));
+  EXPECT_TRUE(IsRelative(""));
+  EXPECT_TRUE(IsRelative("rel"));
+  EXPECT_FALSE(IsRelative(GetExistingFile()));
 }
 
 TEST_F(UtilsFs, GetAbsolute)
 {
-  EXPECT_EQ(fs::GetAbsolute("rel", GetExistingDir()), GetExistingDir() + DIR_SEP + "rel");
-  EXPECT_EQ(fs::GetAbsolute(GetExistingFile(), "dummy"), GetExistingFile());
+  EXPECT_EQ(GetAbsolute("rel", GetExistingDir()), GetExistingDir() + DIR_SEP + "rel");
+  EXPECT_EQ(GetAbsolute(GetExistingFile(), "dummy"), GetExistingFile());
 }
 
 TEST_F(UtilsFs, MakeAndRemovePath)
@@ -149,17 +149,17 @@ TEST_F(UtilsFs, MakeAndRemovePath)
   // Try to make a path that contains an existing file as a sub-path
   const File filePath = MakeUniqueTempFile(TempDir);
   const std::string invalidPath = filePath.Path + DIR_SEP + "invalid";
-  EXPECT_THROW(fs::MakePath(invalidPath), std::invalid_argument);
-  EXPECT_THROW(fs::RemoveDirectoryRecursive(invalidPath), std::invalid_argument);
+  EXPECT_THROW(MakePath(invalidPath), std::invalid_argument);
+  EXPECT_THROW(RemoveDirectoryRecursive(invalidPath), std::invalid_argument);
 
   // Test path name limits
   const std::string tooLongPath = GetTooLongPath();
-  EXPECT_THROW(fs::MakePath(tooLongPath), std::invalid_argument);
-  EXPECT_THROW(fs::RemoveDirectoryRecursive(tooLongPath), std::invalid_argument);
+  EXPECT_THROW(MakePath(tooLongPath), std::invalid_argument);
+  EXPECT_THROW(RemoveDirectoryRecursive(tooLongPath), std::invalid_argument);
 
   // Create a valid path
   const std::string validPath = TempDir.Path + DIR_SEP + "one" + DIR_SEP + "two";
-  ASSERT_NO_THROW(fs::MakePath(validPath));
-  ASSERT_NO_THROW(fs::RemoveDirectoryRecursive(validPath));
+  ASSERT_NO_THROW(MakePath(validPath));
+  ASSERT_NO_THROW(RemoveDirectoryRecursive(validPath));
 }
 

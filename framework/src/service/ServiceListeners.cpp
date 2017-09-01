@@ -28,13 +28,14 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/util/Error.h"
+#include "cppmicroservices/util/String.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "Properties.h"
 #include "ServiceReferenceBasePrivate.h"
-#include "Utils.h"
 
 #include <cassert>
 
@@ -242,7 +243,7 @@ void ServiceListeners::SendFrameworkEvent(const FrameworkEvent& evt)
         // do not send a FrameworkEvent as that could cause a deadlock or an infinite loop.
         // Instead, log to the internal logger
         // @todo send this to the LogService instead when its supported.
-        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << GetLastExceptionStr() << "\n";
+        DIAG_LOG(*coreCtx->sink) << "A Framework Listener threw an exception: " << util::GetLastExceptionStr() << "\n";
       }
     }
   }
@@ -398,7 +399,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
     }
 
     long service_id = any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID));
-    AddToSet_unlocked(set, receivers, SERVICE_ID_IX, cppmicroservices::ToString((service_id)));
+    AddToSet_unlocked(set, receivers, SERVICE_ID_IX, cppmicroservices::util::ToString((service_id)));
   }
 }
 

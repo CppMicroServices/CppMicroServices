@@ -16,16 +16,12 @@ include_directories(
 set(_gtest_tests
   BundleVersionTest.cpp
   LDAPFilterTest.cpp
+  UtilsTest.cpp
 )
-
-if(NOT US_BUILD_SHARED_LIBS)
-  list(APPEND _gtest_tests
-    UtilsTest.cpp
-  )
-endif()
 
 set(_additional_srcs
   ../util/TestUtils.cpp
+  $<TARGET_OBJECTS:util>
   )
 
 #-----------------------------------------------------------------------------
@@ -43,6 +39,8 @@ add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs})
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${us_gtest_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${us_gtest_test_exe_name} PROPERTY US_BUNDLE_NAME main)
+
+target_include_directories(${us_gtest_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})

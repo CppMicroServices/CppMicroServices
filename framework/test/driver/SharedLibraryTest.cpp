@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "cppmicroservices/SharedLibrary.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include "TestingConfig.h"
 #include "TestingMacros.h"
@@ -34,7 +35,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("SharedLibraryTest");
 
-  const std::string libAFilePath = testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleA" + US_LIB_EXT;
+  const std::string libAFilePath = testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + "TestBundleA" + US_LIB_EXT;
   SharedLibrary lib1(libAFilePath);
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "Absolute file path")
   US_TEST_CONDITION(lib1.GetLibraryPath() == testing::LIB_PATH, "Library path")
@@ -77,7 +78,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(lib2.GetFilePath() == libAFilePath, "File path")
   lib2.SetPrefix("");
   US_TEST_CONDITION(lib2.GetPrefix().empty(), "Lib prefix")
-  US_TEST_CONDITION(lib2.GetFilePath() == testing::LIB_PATH + testing::DIR_SEP + "TestBundleA" + US_LIB_EXT, "File path")
+  US_TEST_CONDITION(lib2.GetFilePath() == testing::LIB_PATH + util::DIR_SEP + "TestBundleA" + US_LIB_EXT, "File path")
 
   SharedLibrary lib3 = lib2;
   US_TEST_CONDITION(lib3.GetFilePath() == lib2.GetFilePath(), "Compare file path")
@@ -90,12 +91,12 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_FOR_EXCEPTION(std::logic_error, lib1.Load())
   lib2.SetPrefix(US_LIB_PREFIX);
   lib2.Load();
-  
+
   lib3.Unload();
   US_TEST_CONDITION(!lib3.IsLoaded(), "lib3 unloaded")
   US_TEST_CONDITION(!lib1.IsLoaded(), "lib3 unloaded")
 
-// gcov on Mac OS X writes coverage files during static destruction  
+// gcov on Mac OS X writes coverage files during static destruction
 // resulting in a crash if a dylib is completely unloaded from the process.
 // https://bugs.llvm.org/show_bug.cgi?id=27224
 #if !defined(US_PLATFORM_APPLE) || !defined(US_COVERAGE_ENABLED)
@@ -103,6 +104,6 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(!lib2.IsLoaded(), "lib2 loaded")
 #endif
   lib1.Unload();
-    
+
   US_TEST_END()
 }

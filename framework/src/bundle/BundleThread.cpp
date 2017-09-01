@@ -25,9 +25,10 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/FrameworkEvent.h"
 
+#include "cppmicroservices/util/String.h"
+
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <future>
 
@@ -252,7 +253,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
     b->ResetBundleThread();
 
     return std::make_exception_ptr(std::runtime_error(
-                                     "Bundle#" + cppmicroservices::ToString(b->id) + " " +
+                                     "Bundle#" + util::ToString(b->id) + " " +
                                      opType + " failed with reason: " + reason
                                      ));
   }

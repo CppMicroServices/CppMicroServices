@@ -25,39 +25,28 @@ limitations under the License.
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/GlobalConfig.h"
 
-#include "TestingConfig.h"
+#include "cppmicroservices/util/Error.h"
+#include "cppmicroservices/util/FileSystem.h"
 
+#include <TestingConfig.h>
 
-#if defined(US_PLATFORM_WINDOWS)
-#include <io.h>
-#ifdef __MINGW32__
-  #include <dirent.h>
-#else
-  #include "../../../third_party/dirent_win32.h"
-#endif
-
-#define US_STAT struct _stat
-#define us_stat _stat
-#define us_rmdir _rmdir
-#define us_unlink _unlink
-#define us_chdir _chdir
-
-
-#else
-#include <dirent.h>
+#ifndef US_PLATFORM_WINDOWS
 #include <sys/time.h> // gettimeofday etc.
-
-#define US_STAT struct stat
-#define us_stat stat
-#define us_rmdir rmdir
-#define us_unlink unlink
-#define us_chdir chdir
-
+#else
+#include <io.h>
+#include <direct.h>
 #endif
 
+#ifdef US_PLATFORM_APPLE
+#include <unistd.h> // chdir, getpid, close, etc.
+#endif
+
+#include <sys/stat.h> // mkdir, _S_IREAD, etc.
 #include <fcntl.h>
 
 namespace cppmicroservices {
+
+namespace testing {
 
 #if defined(US_PLATFORM_APPLE)
 
@@ -152,14 +141,12 @@ long long HighPrecisionTimer::ElapsedMicro()
 #endif
 
 
-namespace testing {
-
 Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
 {
   std::vector<Bundle> bundles;
 
 #if defined (US_BUILD_SHARED_LIBS)
-  bundles = frameworkCtx.InstallBundles(LIB_PATH + DIR_SEP + US_LIB_PREFIX + libName + US_LIB_EXT);
+  bundles = frameworkCtx.InstallBundles(LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + libName + US_LIB_EXT);
 #else
   bundles = frameworkCtx.GetBundles();
 #endif
@@ -169,6 +156,17 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
     if (b.GetSymbolicName() == libName) return b;
   }
   return {};
+}
+
+void ChangeDirectory(const std::string& destdir)
+{
+  errno = 0;
+  int ret = chdir(destdir.c_str());
+  if (ret != 0)
+  {
+    const std::string msg = "Unable to change directory to " + destdir + ": " + util::GetLastCErrorStr();
+    throw std::runtime_error(msg);
+  }
 }
 
 std::string GetTempDirectory()
@@ -185,27 +183,6 @@ std::string GetTempDirectory()
 #else
   char* tempdir = getenv("TMPDIR");
   return std::string(((tempdir == nullptr)?"/tmp":tempdir));
-#endif
-}
-
-std::string GetLastCErrorStr()
-{
-  char errorString[128];
-#if ((_POSIX_C_SOURCE >= 200112L) && !  _GNU_SOURCE) || defined(US_PLATFORM_APPLE)
-  // This is the XSI strerror_r version
-  if (strerror_r(errno, errorString, sizeof errorString))
-  {
-    return "Unknown error";
-  }
-  return errorString;
-#elif defined(US_PLATFORM_WINDOWS)
-  if (strerror_s(errorString, sizeof errorString, errno))
-  {
-    return "Unknown error";
-  }
-  return errorString;
-#else
-  return strerror_r(errno, errorString, sizeof errorString);
 #endif
 }
 
@@ -454,7 +431,7 @@ TempDir::~TempDir()
   {
     try
     {
-      RemoveDirectoryRecursive(Path);
+      util::RemoveDirectoryRecursive(Path);
     }
     catch (const std::exception&)
     {
@@ -470,186 +447,32 @@ TempDir::operator std::string() const
 
 std::string MakeUniqueTempDirectory()
 {
-  const auto tmpStr = GetTempDirectory() + DIR_SEP + "usdir-XXXXXX";
+  std::string tmpStr = GetTempDirectory();
+  if (!tmpStr.empty() && *--tmpStr.end() != util::DIR_SEP)
+  {
+    tmpStr += util::DIR_SEP;
+  }
+  tmpStr += "usdir-XXXXXX";
   std::vector<char> tmpChars(tmpStr.c_str(), tmpStr.c_str() + tmpStr.length() + 1);
 
   errno = 0;
   if (!mkdtemps_compat(tmpChars.data(), 0))
-    throw std::runtime_error(GetLastCErrorStr());
+    throw std::runtime_error(util::GetLastCErrorStr());
 
   return tmpChars.data();
 }
 
 File MakeUniqueTempFile(const std::string& base)
 {
-  const auto tmpStr = base + DIR_SEP + "usfile-XXXXXX";
+  const auto tmpStr = base + util::DIR_SEP + "usfile-XXXXXX";
   std::vector<char> tmpChars(tmpStr.c_str(), tmpStr.c_str() + tmpStr.length() + 1);
 
   errno = 0;
   int fd = mkstemps_compat(tmpChars.data(), 0);
   if (fd < 0)
-    throw std::runtime_error(GetLastCErrorStr());
+    throw std::runtime_error(util::GetLastCErrorStr());
 
   return File(fd, tmpChars.data());
-}
-
-std::string GetCurrentWorkingDirectory()
-{
-#ifdef US_PLATFORM_WINDOWS
-  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
-  if (bufSize == 0) bufSize = 1;
-  std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-  if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
-  {
-    return std::string(buf.get());
-  }
-#else
-  std::size_t bufSize = PATH_MAX;
-  for (;; bufSize *= 2)
-  {
-    std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-    errno = 0;
-    if (getcwd(buf.get(), bufSize) != 0 && errno != ERANGE)
-    {
-      return std::string(buf.get());
-    }
-  }
-#endif
-  return std::string();
-}
-
-bool IsDirectory(const std::string& path)
-{
-  US_STAT s;
-  errno = 0;
-  if (us_stat(path.c_str(), &s))
-  {
-    if (errno == ENOENT || errno == ENOTDIR) return false;
-    else throw std::invalid_argument(GetLastCErrorStr());
-  }
-  return S_ISDIR(s.st_mode);
-}
-
-void ChangeDirectory(const std::string& destdir)
-{
-  errno = 0;
-  int ret = chdir(destdir.c_str());
-  if (ret != 0)
-  {
-    const std::string msg = "Unable to change directory to " + destdir + ": " + GetLastCErrorStr();
-    throw std::runtime_error(msg);
-  }
-}
-
-void MakeDirectory(const std::string& dirname)
-{
-  errno = 0;
-#ifdef US_PLATFORM_WINDOWS
-  int ret = _mkdir(dirname.c_str());
-#else
-  // rws permissions for owner, group. rs permissions for others.
-  int ret = mkdir(dirname.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-#endif
-  if (ret != 0)
-  {
-    const std::string msg = "Unable to make directory " + dirname + ": " + GetLastCErrorStr();
-    throw std::runtime_error(msg);
-  }
-}
-
-void RemoveDirectory(const std::string& dirname)
-{
-  errno = 0;
-  int ret = rmdir(dirname.c_str());
-  if (ret != 0)
-  {
-    const std::string msg = "Unable to remove directory " + dirname + ": " + GetLastCErrorStr();
-    throw std::runtime_error(msg);
-  }
-}
-
-void RemoveDirectoryRecursive(const std::string& path)
-{
-  int res = -1;
-  errno = 0;
-  DIR* dir = opendir(path.c_str());
-  if (dir != nullptr)
-  {
-    res = 0;
-
-    struct dirent *ent = nullptr;
-    while (!res && (ent = readdir(dir)) != nullptr)
-    {
-      // Skip the names "." and ".." as we don't want to recurse on them.
-      if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
-      {
-        continue;
-      }
-
-      std::string child = path + DIR_SEP + ent->d_name;
-      if
-#ifdef _DIRENT_HAVE_D_TYPE
-          (ent->d_type == DT_DIR)
-#else
-          (IsDirectory(child))
-#endif
-      {
-        RemoveDirectoryRecursive(child);
-      }
-      else
-      {
-        res = us_unlink(child.c_str());
-      }
-    }
-    int old_err = errno;
-    errno = 0;
-    closedir(dir); // error ignored
-    if (old_err)
-    {
-      errno = old_err;
-    }
-  }
-
-  if (!res)
-  {
-    errno = 0;
-    res = us_rmdir(path.c_str());
-  }
-
-  if (res) throw std::invalid_argument(GetLastCErrorStr());
-}
-
-void CheckFileAndRemove(std::string f)
-{
-  std::ifstream fobj(f.c_str());
-  if (!fobj.good())
-  {
-    fobj.close();
-    return;
-  }
-  fobj.close();
-
-  errno = 0;
-  if (remove(f.c_str()) != 0)
-  {
-    throw std::runtime_error("Could not remove file " + f + ": " + GetLastCErrorStr());
-
-  }
-}
-
-bool DirectoryExists(const std::string& destdir)
-{
-  // stat() is cross-platform
-  struct stat dirinfo;
-  if (stat(destdir.c_str(), &dirinfo) != 0)
-  {
-    return false;
-  }
-  else if (dirinfo.st_mode & S_IFDIR)
-  {
-    return true;
-  }
-  return false;
 }
 
 Bundle GetBundle(const std::string& bsn, BundleContext context)

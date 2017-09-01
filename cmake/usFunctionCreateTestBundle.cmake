@@ -1,7 +1,7 @@
 
 macro(_us_create_test_bundle_helper)
 
-  add_library(${name} ${_srcs})
+  add_library(${name} ${_srcs} $<TARGET_OBJECTS:util>)
   if(US_BUILD_SHARED_LIBS AND US_TEST_LIBRARY_EXTENSION)
     set_target_properties(${name} PROPERTIES SUFFIX ${US_TEST_LIBRARY_EXTENSION})
   endif()
@@ -15,6 +15,7 @@ macro(_us_create_test_bundle_helper)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
+  target_include_directories(${name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
   target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} CppMicroServices)
 
   if(_res_files OR US_TEST_LINK_LIBRARIES)

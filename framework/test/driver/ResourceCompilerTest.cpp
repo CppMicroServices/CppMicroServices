@@ -20,18 +20,22 @@
 
 =============================================================================*/
 
+#include "cppmicroservices/util/FileSystem.h"
+
 #include "TestingMacros.h"
-#include "TestUtils.h"
 #include "TestingConfig.h"
+#include "TestUtils.h"
 #include "ZipFile.h"
 
-#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <stdexcept>
 #include <cstdlib>
 #include <string>
 #include <array>
 
 using namespace cppmicroservices;
+using namespace cppmicroservices::util;
 
 static const std::string manifest_json = R"({
 "bundle.symbolic_name" : "main",
@@ -74,10 +78,10 @@ static void createDirHierarchy(const std::string& tempdir)
 
   std::string rc1dir_path (tempdir + "resource1");
   std::string rc2dir_path (tempdir + "resource2");
-  testing::MakeDirectory(rc1dir_path);
-  testing::MakeDirectory(rc2dir_path);
-  std::string rc1file_path(rc1dir_path + testing::DIR_SEP + "resource1.txt");
-  std::string rc2file_path(rc2dir_path + testing::DIR_SEP + "resource2.txt");
+  MakePath(rc1dir_path);
+  MakePath(rc2dir_path);
+  std::string rc1file_path(rc1dir_path + DIR_SEP + "resource1.txt");
+  std::string rc2file_path(rc2dir_path + DIR_SEP + "resource2.txt");
   std::ofstream rc1file(rc1file_path.c_str());
   std::ofstream rc2file(rc2file_path.c_str());
   if (!rc1file.is_open())
@@ -156,7 +160,7 @@ static void testManifestAdd(const std::string& rcbinpath, const std::string& tem
   int ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION_REQUIRED(ret == 0, "Cmdline invocation in testManifestAdd returns 0")
 
-  ZipFile zip(tempdir + testing::DIR_SEP + "Example.zip");
+  ZipFile zip(tempdir + DIR_SEP + "Example.zip");
   US_TEST_CONDITION(zip.size() == 2, "Check number of entries of zip.")
 
   auto entryNames = zip.getNames();
@@ -179,7 +183,7 @@ static void testManifestResAdd(const std::string& rcbinpath, const std::string& 
   cmd << " --manifest-add manifest.json ";
   cmd << " --res-add resource1/resource1.txt";
 
-  auto cwdir = testing::GetCurrentWorkingDirectory();
+  auto cwdir = GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   int ret = std::system(cmd.str().c_str());
   testing::ChangeDirectory(cwdir);
@@ -208,7 +212,7 @@ static void testResAdd(const std::string& rcbinpath, const std::string& tempdir)
   cmd << " --out-file tomerge.zip ";
   cmd << " --res-add resource2/resource2.txt";
 
-  auto cwdir = testing::GetCurrentWorkingDirectory();
+  auto cwdir = GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   int ret = std::system(cmd.str().c_str());
   testing::ChangeDirectory(cwdir);
@@ -240,7 +244,7 @@ static void testZipAdd(const std::string& rcbinpath, const std::string& tempdir)
   cmd << " --res-add resource1/resource1.txt ";
   cmd << " --zip-add tomerge.zip";
 
-  auto cwdir = testing::GetCurrentWorkingDirectory();
+  auto cwdir = GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   int ret = std::system(cmd.str().c_str());
   testing::ChangeDirectory(cwdir);
@@ -403,9 +407,9 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd.clear();
   cmd << rcbinpath;
   cmd << " --bundle-name mybundle ";
-  cmd << " --bundle-file " << tempdir << testing::DIR_SEP << "sample1.dll ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "tomerge.zip ";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example2.zip";
+  cmd << " --bundle-file " << tempdir << DIR_SEP << "sample1.dll ";
+  cmd << " --zip-add " << tempdir << DIR_SEP << "tomerge.zip ";
+  cmd << " --zip-add " << tempdir << DIR_SEP << "Example2.zip";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret == 0,
     "--bundle-name arg without either --manifest-add or --res-add is just a warning")
@@ -417,45 +421,11 @@ static void testrcFailureModes(const std::string& rcbinpath, const std::string& 
   cmd.clear();
   cmd << rcbinpath;
   cmd << " --bundle-name " << "mybundle";
-  cmd << " --out-file " << tempdir << testing::DIR_SEP << "Example7.zip";
-  cmd << " --zip-add " << tempdir << testing::DIR_SEP << "Example.zip";
-  cmd << " --manifest-add " << tempdir << testing::DIR_SEP << "manifest.json";
+  cmd << " --out-file " << tempdir << DIR_SEP << "Example7.zip";
+  cmd << " --zip-add " << tempdir << DIR_SEP << "Example.zip";
+  cmd << " --manifest-add " << tempdir << DIR_SEP << "manifest.json";
   ret = std::system(cmd.str().c_str());
   US_TEST_CONDITION(ret != 0, "Failure mode: duplicate manifest.json")
-}
-
-/*
-* Removes all the stray files and directories. brings back to clean slate
-*/
-static void makeCleanSlate(const std::string& tempdir)
-{
-  // remove files created by the tests
-  testing::CheckFileAndRemove(tempdir + "Example.zip");
-  testing::CheckFileAndRemove(tempdir + "Example2.zip");
-  testing::CheckFileAndRemove(tempdir + "Example4.zip");
-  testing::CheckFileAndRemove(tempdir + "tomerge.zip");
-  testing::CheckFileAndRemove(tempdir + "sample.dll");
-  testing::CheckFileAndRemove(tempdir + "sample1.dll");
-  testing::CheckFileAndRemove(tempdir + "Example5.zip");
-  testing::CheckFileAndRemove(tempdir + "Example7.zip");
-
-  // remove files created for running the tests
-  testing::CheckFileAndRemove(tempdir + "manifest.json");
-  std::string rc1dir_path = tempdir + "resource1";
-  std::string rc1file_path(rc1dir_path + testing::DIR_SEP + "resource1.txt");
-  std::string rc2dir_path = tempdir + "resource2";
-  std::string rc2file_path(rc2dir_path + testing::DIR_SEP + "resource2.txt");
-  testing::CheckFileAndRemove(rc1file_path.c_str());
-  testing::CheckFileAndRemove(rc2file_path.c_str());
-  // remove dirs
-  if (testing::DirectoryExists(rc1dir_path))
-  {
-    testing::RemoveDirectory(rc1dir_path);
-  }
-  if (testing::DirectoryExists(rc2dir_path))
-  {
-    testing::RemoveDirectory(rc2dir_path);
-  }
 }
 
 // Test escapePath functionality
@@ -494,14 +464,12 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
 
-  auto tempdir = testing::GetTempDirectory();
-  tempdir += testing::DIR_SEP;
+  testing::TempDir uniqueTempdir = testing::MakeUniqueTempDirectory();
+  auto tempdir = uniqueTempdir.Path + DIR_SEP;
 #ifndef US_PLATFORM_WINDOWS
   escapePath(tempdir);
   escapePath(rcbinpath);
 #endif
-
-  US_TEST_NO_EXCEPTION_REQUIRED( makeCleanSlate(tempdir) );
 
   US_TEST_NO_EXCEPTION_REQUIRED( createDirHierarchy(tempdir) );
 
@@ -522,8 +490,6 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_NO_EXCEPTION( testHelpReturnsZero(rcbinpath) );
 
   US_TEST_NO_EXCEPTION( testrcFailureModes(rcbinpath, tempdir) );
-
-  US_TEST_NO_EXCEPTION_REQUIRED( makeCleanSlate(tempdir) );
 
   US_TEST_END()
 }

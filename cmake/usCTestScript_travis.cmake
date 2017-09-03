@@ -11,7 +11,12 @@ else()
 endif()
 #set(CTEST_COMPILER "gcc-4.5")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
-set(CTEST_BUILD_FLAGS "-j")
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+  # gcc in combination with gcov seems to consume a lot of memory
+  # and my lead to OOM error on Travis containers. Hence we compile
+  # with -j for non-GNU compilers only.
+  set(CTEST_BUILD_FLAGS "-j")
+endif()
 set(CTEST_BUILD_CONFIGURATION Release)
 
 

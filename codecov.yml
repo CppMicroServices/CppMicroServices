@@ -8,7 +8,8 @@ comment:
 
 coverage:
   ignore:
-    - "third_party/*"  # ignore folders and all its contents
+    - "third_party/.*"  # ignore folder and all its contents
+    - "**/test/.*"      # ignore test code
 
   fixes:
     - "projects/cppmicroservices::"

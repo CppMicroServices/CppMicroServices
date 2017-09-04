@@ -30,8 +30,8 @@ configuration options at hand.
 
    .. note::
 
-      In version 3.0 this option only supports the *ON* value. A follow-up
-      release will restore the single-threaded configuration.
+      In version 3.0 and 3.1 this option only supported the *ON* value.
+      The *OFF* configuration is supported again in version 3.2 and later.
 
  - **US_BUILD_SHARED_LIBS** Specify if the library should be build
    shared or static. See :any:`concept-static-bundles`

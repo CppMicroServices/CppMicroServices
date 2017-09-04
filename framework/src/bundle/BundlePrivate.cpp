@@ -756,6 +756,7 @@ void BundlePrivate::StartFailed()
 
 std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   auto l = coreCtx->bundleThreads.Lock(); US_UNUSED(l);
 
   // clean up old zombies
@@ -776,11 +777,23 @@ std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
   }
 
   return bundleThread;
+#else
+  if (coreCtx->bundleThreads.value.empty())
+  {
+    coreCtx->bundleThreads.value.push_back(std::make_shared<BundleThread>(coreCtx));
+  }
+  return coreCtx->bundleThreads.value.back();
+#endif
 }
 
 bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   return bundleThread != nullptr && *bundleThread == id;
+#else
+  US_UNUSED(id);
+  return true;
+#endif
 }
 
 void BundlePrivate::ResetBundleThread()

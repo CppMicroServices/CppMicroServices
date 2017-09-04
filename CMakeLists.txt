@@ -198,6 +198,11 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 
+if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
+  message(SEND_WARN "Thread-sanitizer enabled without threading support. Forcing US_ENABLE_TSAN to OFF")
+  set(US_ENABLE_TSAN OFF)
+endif()
+
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
   set(default_library_install_dir bin/)
@@ -408,10 +413,6 @@ if(US_ENABLE_THREADING_SUPPORT)
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
-else()
-  # The 3.0 release does not support single-threaded mode any more.
-  # It will be re-enabled with a 3.x release later.
-  message(SEND_ERROR "Disabling threading support is currently unsupported.")
 endif()
 
 if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)

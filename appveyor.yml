@@ -18,18 +18,18 @@ environment:
   matrix:
   # ---------- Visual Studio 2013 ------------
   #---- Win32
-  #- image: Visual Studio 2013
-  #  platform: Win32
-  #  configuration: Debug
-  #  gen: "Visual Studio 12 2013"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- image: Visual Studio 2013
-  #  platform: Win32
-  #  configuration: Debug
-  #  gen: "Visual Studio 12 2013"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - image: Visual Studio 2013
+    platform: Win32
+    configuration: Release
+    gen: "Visual Studio 12 2013"
+    US_SHARED: 0
+    US_THREADED: 0
+  - image: Visual Studio 2013
+    platform: Win32
+    configuration: Release
+    gen: "Visual Studio 12 2013"
+    US_SHARED: 1
+    US_THREADED: 0
   - image: Visual Studio 2013
     platform: Win32
     configuration: Release
@@ -43,18 +43,18 @@ environment:
     US_SHARED: 1
     US_THREADED: 1
   #---- Win64
-  #- image: Visual Studio 2013
-  #  platform: Win64
-  #  configuration: Debug
-  #  gen: "Visual Studio 12 2013 Win64"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- image: Visual Studio 2013
-  #  platform: x64
-  #  configuration: Debug
-  #  gen: "Visual Studio 12 2013 Win64"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - image: Visual Studio 2013
+    platform: Win64
+    configuration: Release
+    gen: "Visual Studio 12 2013 Win64"
+    US_SHARED: 0
+    US_THREADED: 0
+  - image: Visual Studio 2013
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 12 2013 Win64"
+    US_SHARED: 1
+    US_THREADED: 0
   - image: Visual Studio 2013
     platform: x64
     configuration: Release
@@ -69,18 +69,18 @@ environment:
     US_THREADED: 1
   # ---------- Visual Studio 2015 ------------
   #---- Win32
-  #- image: Visual Studio 2015
-  #  platform: Win32
-  #  configuration: Debug
-  #  gen: "Visual Studio 14 2015"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- image: Visual Studio 2015
-  #  platform: x86
-  #  configuration: Debug
-  #  gen: "Visual Studio 14 2015"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - image: Visual Studio 2015
+    platform: Win32
+    configuration: Release
+    gen: "Visual Studio 14 2015"
+    US_SHARED: 0
+    US_THREADED: 0
+  - image: Visual Studio 2015
+    platform: x86
+    configuration: Release
+    gen: "Visual Studio 14 2015"
+    US_SHARED: 1
+    US_THREADED: 0
   - image: Visual Studio 2015
     platform: x86
     configuration: Release
@@ -113,6 +113,18 @@ environment:
     configuration: Release
     gen: "Visual Studio 14 2015 Win64"
     US_SHARED: 0
+    US_THREADED: 0
+  - image: Visual Studio 2015
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 14 2015 Win64"
+    US_SHARED: 1
+    US_THREADED: 0
+  - image: Visual Studio 2015
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 14 2015 Win64"
+    US_SHARED: 0
     US_THREADED: 1
   - image: Visual Studio 2015
     platform: x64
@@ -121,16 +133,16 @@ environment:
     US_SHARED: 1
     US_THREADED: 1
   # ---------- MinGW-w64 (via MSYS2) ------------
-  #- platform: mingw-w64
-  #  configuration: Debug
-  #  gen: "MinGW Makefiles"
-  #  US_SHARED: 0
-  #  US_THREADED: 1
-  #- platform: mingw-w64
-  #  configuration: Debug
-  #  gen: "MinGW Makefiles"
-  #  US_SHARED: 1
-  #  US_THREADED: 1
+  - platform: mingw-w64
+    configuration: Release
+    gen: "MinGW Makefiles"
+    US_SHARED: 0
+    US_THREADED: 0
+  - platform: mingw-w64
+    configuration: Release
+    gen: "MinGW Makefiles"
+    US_SHARED: 1
+    US_THREADED: 0
   - platform: mingw-w64
     configuration: Release
     gen: "MinGW Makefiles"
@@ -163,7 +175,7 @@ build_script:
 - if NOT "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build --config %configuration% -- /maxcpucount
 - if "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build -- -j2
 
-after_test: 
+after_test:
 - if [%WITH_COVERAGE%]==[1] %APPVEYOR_BUILD_FOLDER%/opencppcoverage_mergereports.bat
 - if [%WITH_COVERAGE%]==[1] python %APPVEYOR_BUILD_FOLDER%/fixcoveragefilepaths.py -i coverage.xml -s %APPVEYOR_BUILD_FOLDER% -o coverage_pathsfixed.xml
 - if [%WITH_COVERAGE%]==[1] codecov -X gcov -f coverage_pathsfixed.xml

@@ -19,19 +19,31 @@ matrix:
           addons: *valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=1 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: linux
+          addons: *valgrind
+          compiler: gcc
+          env: BUILD_CONFIGURATION=2 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: linux
+          addons: *valgrind
+          compiler: gcc
+          env: BUILD_CONFIGURATION=3 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         # minimum supported compiler on OS X
         - os: osx
           osx_image: xcode6.4
           compiler: clang
           env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.10
         - os: osx
-          osx_image: xcode7.3
+          osx_image: xcode6.4
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.11
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.10
         - os: osx
-          osx_image: xcode7.3
+          osx_image: xcode6.4
           compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
+          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.10
+        - os: osx
+          osx_image: xcode6.4
+          compiler: clang
+          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.10
         # latest compiler on OS X
         - os: osx
           osx_image: xcode8.2
@@ -41,6 +53,14 @@ matrix:
           osx_image: xcode8.2
           compiler: clang
           env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: osx
+          osx_image: xcode8.2
+          compiler: clang
+          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: osx
+          osx_image: xcode8.2
+          compiler: clang
+          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
 
 cache:
   directories:

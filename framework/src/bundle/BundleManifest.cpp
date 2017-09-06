@@ -22,7 +22,7 @@
 
 #include "BundleManifest.h"
 
-#include "jsoncpp.h"
+#include "json/json.h"
 
 #include <stdexcept>
 
@@ -74,13 +74,13 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
   {
     return Any(jsonValue.asBool());
   }
-  else if (jsonValue.isDouble())
-  {
-    return Any(jsonValue.asDouble());
-  }
   else if (jsonValue.isIntegral())
   {
     return Any(jsonValue.asInt());
+  }
+  else if (jsonValue.isDouble())
+  {
+    return Any(jsonValue.asDouble());
   }
 
   return Any();

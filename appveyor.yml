@@ -14,22 +14,26 @@ skip_tags: true
 matrix:
   fast_finish: true
 
+# We do not test all build configurations with all compiler / platform
+# combinations. For now, just the latest compilers being tested will
+# run all build configurations.
+
 environment:
   matrix:
   # ---------- Visual Studio 2013 ------------
   #---- Win32
-  - image: Visual Studio 2013
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 12 2013"
-    US_SHARED: 0
-    US_THREADED: 0
-  - image: Visual Studio 2013
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 12 2013"
-    US_SHARED: 1
-    US_THREADED: 0
+  #- image: Visual Studio 2013
+  #  platform: Win32
+  #  configuration: Release
+  #  gen: "Visual Studio 12 2013"
+  #  US_SHARED: 0
+  #  US_THREADED: 0
+  #- image: Visual Studio 2013
+  #  platform: Win32
+  #  configuration: Release
+  #  gen: "Visual Studio 12 2013"
+  #  US_SHARED: 1
+  #  US_THREADED: 0
   - image: Visual Studio 2013
     platform: Win32
     configuration: Release
@@ -43,18 +47,18 @@ environment:
     US_SHARED: 1
     US_THREADED: 1
   #---- Win64
-  - image: Visual Studio 2013
-    platform: Win64
-    configuration: Release
-    gen: "Visual Studio 12 2013 Win64"
-    US_SHARED: 0
-    US_THREADED: 0
-  - image: Visual Studio 2013
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 12 2013 Win64"
-    US_SHARED: 1
-    US_THREADED: 0
+  #- image: Visual Studio 2013
+  #  platform: Win64
+  #  configuration: Release
+  #  gen: "Visual Studio 12 2013 Win64"
+  #  US_SHARED: 0
+  #  US_THREADED: 0
+  #- image: Visual Studio 2013
+  #  platform: x64
+  #  configuration: Release
+  #  gen: "Visual Studio 12 2013 Win64"
+  #  US_SHARED: 1
+  #  US_THREADED: 0
   - image: Visual Studio 2013
     platform: x64
     configuration: Release

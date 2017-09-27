@@ -258,7 +258,9 @@ function(us_add_tests test_driver)
   endif()
   if(US_COVERAGE_COMMAND)
     file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
-    add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception -- $<TARGET_FILE:${test_driver}> ${test}
+    file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
+    # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
+    add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU.dll -- $<TARGET_FILE:${test_driver}> ${test}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()

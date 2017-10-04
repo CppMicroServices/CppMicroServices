@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -61,12 +61,32 @@
 #else
   #include "dirent_win32.h"
 #endif
+#define US_STAT struct __stat64
+int us_stat(const std::string& path,
+            US_STAT *buffer)
+{
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wstat64(wpath.c_str(), buffer);
+}
 
-  #define US_STAT struct _stat
-  #define us_stat _stat
-  #define us_mkdir _mkdir
-  #define us_rmdir _rmdir
-  #define us_unlink _unlink
+int us_mkdir(const std::string& path)
+{
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wmkdir(wpath.c_str());
+}
+
+int us_rmdir(const std::string& path)
+{
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wrmdir(wpath.c_str());
+}
+
+int us_unlink(const std::string& path)
+{
+  std::wstring wpath(cppmicroservices::ToWString(path));
+  return _wunlink(wpath.c_str());
+}
+
 #endif
 
 #ifdef US_HAVE_CXXABI_H
@@ -90,7 +110,52 @@ std::string library_suffix()
 
 }
 
+
 namespace cppmicroservices {
+  //-------------------------------------------------------------------
+  // Unicode Utility functions
+  //-------------------------------------------------------------------
+#ifdef US_PLATFORM_WINDOWS
+
+  void ThrowInvalidArgument(const std::string& msgprefix)
+  {
+    throw std::invalid_argument(msgprefix + " Error: " + GetLastErrorStr());
+  }
+
+  // function returns empty string if inStr is empty or if the conversion failed
+  std::wstring ToWString(const std::string& inStr)
+  {
+    if (inStr.empty())
+    {
+      return std::wstring();
+    }
+    int wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
+    std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchar_count]);
+    wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchar_count);
+    if (wchar_count == 0)
+    {
+      ThrowInvalidArgument("Failed to convert " + inStr +" to UTF16.");
+    } 
+    return wBuf.get();
+  }
+
+  // function return empty string if inWStr is empty or if the conversion failed
+  std::string ToUTF8String(const std::wstring& inWStr)
+  {
+    if (inWStr.empty())
+    {
+      return std::string();
+    }
+    int char_count = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, NULL, 0, NULL, NULL);
+    std::unique_ptr<char[]> str(new char[char_count]);
+    char_count = WideCharToMultiByte(CP_UTF8, 0, inWStr.c_str(), -1, str.get(), char_count, NULL, NULL);
+    if (char_count == 0)
+    {
+      ThrowInvalidArgument("Failed to convert UTF16 string to UTF8.");
+    }
+    return str.get();
+  }
+#endif
 
 //-------------------------------------------------------------------
 // File system functions
@@ -132,12 +197,12 @@ std::vector<std::string> SplitString(const std::string& str, const std::string& 
 std::string InitCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
-  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
+  DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
   if (bufSize == 0) bufSize = 1;
-  std::shared_ptr<char> buf(make_shared_array<char>(bufSize));
-  if (::GetCurrentDirectoryA(bufSize, buf.get()) != 0)
+  std::unique_ptr<wchar_t[]> buf(new wchar_t[bufSize]);
+  if (::GetCurrentDirectoryW(bufSize, buf.get()) != 0)
   {
-    return std::string(buf.get());
+    return ToUTF8String(std::wstring(buf.get()));
   }
 #else
   std::size_t bufSize = PATH_MAX;
@@ -171,7 +236,8 @@ bool Exists(const std::string& path)
     else throw std::invalid_argument(GetLastErrorStr());
   }
 #else
-  DWORD attr(::GetFileAttributes(path.c_str()));
+  std::wstring wpath(ToWString(path));
+  DWORD attr(::GetFileAttributesW(wpath.c_str()));
   if (attr == INVALID_FILE_ATTRIBUTES)
   {
     if (not_found_error(::GetLastError())) return false;
@@ -201,13 +267,15 @@ bool IsFile(const std::string& path)
     else throw std::invalid_argument(GetLastErrorStr());
   }
   return S_ISREG(s.st_mode);
+
 }
 
 bool IsRelative(const std::string& path)
 {
 #ifdef US_PLATFORM_WINDOWS
   if (path.size() > MAX_PATH) return false;
-  return (TRUE == ::PathIsRelative(path.c_str()))? true:false;
+  std::wstring wpath(ToWString(path));
+  return (TRUE == ::PathIsRelativeW(wpath.c_str())) ? true:false;
 #else
   return path.empty() || path[0] != DIR_SEP;
 #endif
@@ -354,33 +422,43 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
 {
   // See if we have a storage directory
   const std::string fwdir = GetFrameworkDir(ctx);
-  if (fwdir.empty())
+  if (!fwdir.empty())
   {
-    return fwdir;
+	  try
+	  {
+		  const std::string dir = fs::GetAbsolute(fwdir, ctx->workingDir) + DIR_SEP + name;
+		  if (!dir.empty())
+		  {
+			  if (fs::Exists(dir))
+			  {
+				  if (!fs::IsDirectory(dir))
+				  {
+					  throw std::runtime_error("Not a directory: " + dir);
+				  }
+			  }
+			  else
+			  {
+				  if (create)
+				  {
+					  try
+					  {
+						  fs::MakePath(dir);
+					  }
+					  catch (const std::exception& e)
+					  {
+						  throw std::runtime_error("Cannot create directory: " + dir + " (" + e.what() + ")");
+					  }
+				  }
+			  }
+		  }
+		  return dir;
+	  }
+	  catch (const std::invalid_argument& ex) // could be thrown from GetAbsolute, Exists, IsDirectory
+	  {
+		  throw std::runtime_error(ex.what());
+	  }
   }
-  const std::string dir = fs::GetAbsolute(fwdir, ctx->workingDir) + DIR_SEP + name;
-  if (!dir.empty())
-  {
-    if (fs::Exists(dir))
-    {
-      if (!fs::IsDirectory(dir))
-      {
-        throw std::runtime_error("Not a directory: " + dir);
-      }
-    }
-    else
-    {
-      if (create)
-      {
-        try { fs::MakePath(dir); }
-        catch (const std::exception& e)
-        {
-          throw std::runtime_error("Cannot create directory: " + dir + " (" + e.what() + ")");
-        }
-      }
-    }
-  }
-  return dir;
+  return std::string();
 }
 
 //-------------------------------------------------------------------
@@ -403,17 +481,17 @@ std::string GetLastErrorStr()
   return std::string(((errorString == nullptr)?"":errorString));
 #else
   // Retrieve the system error message for the last-error code
-  LPVOID lpMsgBuf;
+  LPVOID lpMsgBuf = nullptr;
   DWORD dw = GetLastError();
-
-  DWORD rc = FormatMessage(
+  std::string returnMsg;
+  DWORD rc = FormatMessageW(
                 FORMAT_MESSAGE_ALLOCATE_BUFFER |
                 FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL,
                 dw,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                reinterpret_cast<LPTSTR>(&lpMsgBuf),
+                reinterpret_cast<LPWSTR>(&lpMsgBuf),
                 0, NULL );
 
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -423,14 +501,14 @@ std::string GetLastErrorStr()
   // Inform the caller that the error message couldn't be retrieved.
   if (rc == 0)
   {
-    return std::string("Failed to retrieve error message.");
+    returnMsg = "Failed to retrieve error message.";
   }
-
-  std::string errMsg(reinterpret_cast<LPCTSTR>(lpMsgBuf));
-
-  LocalFree(lpMsgBuf);
-
-  return errMsg;
+  else
+  {
+    returnMsg = ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf)));
+    LocalFree(lpMsgBuf);
+  }
+  return returnMsg;
 #endif
 }
 

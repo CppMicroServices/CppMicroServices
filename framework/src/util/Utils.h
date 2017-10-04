@@ -56,16 +56,26 @@ namespace fs {
 // Supports Linux, Mac, and Windows.
 std::string GetCurrentWorkingDirectory();
 bool not_found_error(int errval);
+
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
 bool Exists(const std::string& path);
 
-bool IsDirectory(const std::string& path);
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
+bool IsDirectory(const std::string& path); 
+
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
 bool IsFile(const std::string& path);
+
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
 bool IsRelative(const std::string& path);
 
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
 std::string GetAbsolute(const std::string& path, const std::string& base);
 
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
 void MakePath(const std::string& path);
 
+// throws an std::invalid_argument if the input path is not a valid UTF-8 string
 US_Framework_EXPORT void RemoveDirectoryRecursive(const std::string& path);
 
 } // namespace fs
@@ -144,6 +154,18 @@ std::string ToString(T val)
 #endif
 }
 
+//-------------------------------------------------------------------
+// Unicode Utility functions
+//-------------------------------------------------------------------
+
+#ifdef US_PLATFORM_WINDOWS
+// method to convert UTF8 std::string to std::wstring
+// throws std::invalid_argument if input string contains invalid UTF8 characters
+std::wstring ToWString(const std::string& inStr);
+// method to convert a std::wstring to UTF8 std::string
+// throws std::invalid_argument if input string cannot be converted to UTF8
+std::string ToUTF8String(const std::wstring& inWStr);
+#endif
 
 } // namespace cppmicroservices
 

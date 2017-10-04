@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -27,6 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceEvent.h"
 
@@ -653,12 +654,48 @@ void TestNonStandardBundleExtension()
   f.Stop();
 }
 
+void TestUnicodePaths()
+{
+  // 1. building static libraries (test bundle is included in the executable) 
+  // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path) 
+  // 3. using a compiler with no support for C++11 unicode string literals
+#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS) 
+  US_TEST_OUTPUT(<< "Skipping test point for unicode path");
+#else 
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+  try 
+  {
+    std::string path_utf8 = testing::LIB_PATH + testing::DIR_SEP + u8"くいりのまちとこしくそ" + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+    auto bundles = frameworkCtx.InstallBundles(path_utf8);
+    US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
+    auto bundle = bundles.at(0);
+    US_TEST_CONDITION(bundle.GetLocation() == path_utf8, "Bundle location is the same as the path used to install");
+    US_TEST_NO_EXCEPTION(bundle.Start());
+    US_TEST_CONDITION(bundle.GetState() == Bundle::State::STATE_ACTIVE, "Bundle check start state");
+    US_TEST_NO_EXCEPTION(bundle.Stop());
+  }
+  catch (const std::exception& ex)
+  {
+    US_TEST_CONDITION(false, ex.what());
+  }
+  catch (...)
+  {
+    US_TEST_CONDITION(false, "TestUnicodePaths failed with unknown exception");
+  }
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
+#endif
+}
+
 }
 
 int BundleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleTest");
-
+  
   {
     auto framework = FrameworkFactory().NewFramework();
     framework.Start();
@@ -706,6 +743,8 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestDuplicateInstall();
   TestAutoInstallEmbeddedBundles();
   TestNonStandardBundleExtension();
+
+  TestUnicodePaths();
 
   US_TEST_END()
 }

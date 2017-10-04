@@ -36,7 +36,7 @@ const char DIR_SEP_POSIX = '/';
 extern const char DIR_SEP;
 
 // Get the path of the calling executable.
-// Throws std::runtime_error is the path cannot be
+// Throws std::runtime_error if the path cannot be
 // determined.
 std::string GetExecutablePath();
 

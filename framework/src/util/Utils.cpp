@@ -67,6 +67,11 @@ bool IsSharedLibrary(const std::string& location)
 
 bool IsBundleFile(const std::string& location)
 {
+  if (location.empty())
+  {
+    return false;
+  }
+
   // We require a zip file with at least one top-level directory
   // containing a manifest.json file for a file to be a valid bundle.
   try

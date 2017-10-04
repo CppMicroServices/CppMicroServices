@@ -151,19 +151,28 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
+  std::string execPath;
   try
   {
-    auto const execPath = util::GetExecutablePath();
-    if (bundleRegistry.GetBundles(execPath).empty() &&
-        IsBundleFile(execPath))
-    {
-      // auto-install all embedded bundles inside the executable
-      bundleRegistry.Install(execPath, systemBundle.get());
-    }
+    execPath = util::GetExecutablePath();
   }
   catch (const std::exception& e)
   {
     DIAG_LOG(*sink) << e.what();
+    // Let the exeception propagate all the way up to the
+    // call site of Framework::Init().
+    throw;
+  }
+
+  if (IsBundleFile(execPath) &&
+      bundleRegistry.GetBundles(execPath).empty()
+      )
+  {
+    // Auto-install all embedded bundles inside the executable.
+    // Same here: If an embedded bundle cannot be installed,
+    // an exception is thrown and we will let it propagate all
+    // the way up to the call site of Framework::Init().
+    bundleRegistry.Install(execPath, systemBundle.get());
   }
 
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";

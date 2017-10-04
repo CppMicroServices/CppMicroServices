@@ -24,6 +24,8 @@
 #ifndef CPPMICROSERVICES_UTIL_ERROR_H
 #define CPPMICROSERVICES_UTIL_ERROR_H
 
+#include <cppmicroservices/GlobalConfig.h>
+
 #include <exception>
 #include <string>
 
@@ -32,7 +34,9 @@ namespace cppmicroservices {
 namespace util {
 
 std::string GetLastCErrorStr();
+#ifdef US_PLATFORM_WINDOWS
 std::string GetLastWin32ErrorStr();
+#endif
 
 std::string GetExceptionStr(const std::exception_ptr& exc);
 std::string GetLastExceptionStr();

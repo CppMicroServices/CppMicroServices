@@ -21,8 +21,7 @@
 =============================================================================*/
 
 #include "cppmicroservices/util/Error.h"
-
-#include <cppmicroservices/GlobalConfig.h>
+#include "cppmicroservices/util/String.h"
 
 #ifdef US_PLATFORM_POSIX
   #include <errno.h>
@@ -40,9 +39,9 @@ namespace cppmicroservices {
 
 namespace util {
 
+#ifdef US_PLATFORM_WINDOWS
 std::string GetLastWin32ErrorStr()
 {
-#ifdef US_PLATFORM_WINDOWS
   // Retrieve the system error message for the last-error code
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
@@ -71,19 +70,28 @@ std::string GetLastWin32ErrorStr()
 
   LocalFree(lpMsgBuf);
   return errMsg;
-#else
-  return std::string();
-#endif
 }
+#endif
 
 std::string GetLastCErrorStr()
 {
   char errorString[128];
 #if ((_POSIX_C_SOURCE >= 200112L) && !  _GNU_SOURCE) || defined(US_PLATFORM_APPLE)
   // This is the XSI strerror_r version
-  if (strerror_r(errno, errorString, sizeof errorString))
+  int en = errno;
+  int r = strerror_r(errno, errorString, sizeof errorString);
+  if (r)
   {
-    return "Unknown error";
+    std::string errMsg = "Unknown error " + util::ToString(en) + ": strerror_r failed with error code ";
+    if (r < 0)
+    {
+      errMsg += util::ToString((int)errno);
+    }
+    else
+    {
+      errMsg += util::ToString(r);
+    }
+    return errMsg;
   }
   return errorString;
 #elif defined(US_PLATFORM_WINDOWS)
@@ -97,12 +105,12 @@ std::string GetLastCErrorStr()
 #endif
 }
 
-US_MSVC_PUSH_DISABLE_WARNING(4715) // 'function' : not all control paths return a value
 std::string GetExceptionStr(const std::exception_ptr& exc)
 {
+  std::string excStr;
   if (!exc)
   {
-    return std::string();
+    return excStr;
   }
 
   try
@@ -111,14 +119,14 @@ std::string GetExceptionStr(const std::exception_ptr& exc)
   }
   catch (const std::exception& e)
   {
-    return e.what();
+    excStr = e.what();
   }
   catch (...)
   {
-    return "unknown";
+    excStr = "unknown";
   }
+  return excStr;
 }
-US_MSVC_POP_WARNING
 
 std::string GetLastExceptionStr()
 {

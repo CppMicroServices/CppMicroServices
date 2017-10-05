@@ -159,7 +159,7 @@ void CoreBundleContext::Init()
   catch (const std::exception& e)
   {
     DIAG_LOG(*sink) << e.what();
-    // Let the exeception propagate all the way up to the
+    // Let the exception propagate all the way up to the
     // call site of Framework::Init().
     throw;
   }

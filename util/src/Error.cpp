@@ -85,7 +85,7 @@ std::string GetLastCErrorStr()
     std::string errMsg = "Unknown error " + util::ToString(en) + ": strerror_r failed with error code ";
     if (r < 0)
     {
-      errMsg += util::ToString((int)errno);
+      errMsg += util::ToString(static_cast<int>(errno));
     }
     else
     {

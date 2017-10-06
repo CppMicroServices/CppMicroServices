@@ -77,6 +77,7 @@ set(_additional_srcs
   TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
   $<TARGET_OBJECTS:util>
+  ../../../third_party/jsoncpp.cpp
 )
 
 #-----------------------------------------------------------------------------

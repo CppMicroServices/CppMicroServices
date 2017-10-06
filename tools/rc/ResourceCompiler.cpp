@@ -32,7 +32,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <utility>
 
+#include "json/json.h"
 #include "optionparser.h"
 
 // ---------------------------------------------------------------------------------
@@ -110,6 +112,178 @@ std::string us_tempfile()
 
 #endif
 
+// ---------------------------------------------------------------------------------
+// ------------------------   END PLATFORM SPECIFIC CODE    ------------------------
+// ---------------------------------------------------------------------------------
+
+namespace 
+{
+
+class InvalidManifest : public std::runtime_error
+{
+public:
+  InvalidManifest(const std::string& msg) : std::runtime_error(msg) {}
+  InvalidManifest(const char* msg) : std::runtime_error(msg) {}
+};
+
+/*
+ * @brief parses json content and returns the parsed json or throws.
+ * @tparam jsonContent json content to parse. The type must be convertible to std::istream.
+ * @param root The parsed Json root object.
+ * @throw InvalidManifest if the json is invalid. Parse error information is in the exception.
+ * If an exception is thrown, the root param is invalid.
+ */
+template <class T>
+void parseAndValidateJson(T& jsonContent, Json::Value& root)
+{
+  Json::CharReaderBuilder rbuilder;
+  rbuilder["rejectDupKeys"] = true;
+  rbuilder["allowComments"] = false;
+  std::string errs;
+
+  if (!Json::parseFromStream(rbuilder, jsonContent, &root, &errs))
+  {
+    throw InvalidManifest(errs);
+  }
+}
+
+/*
+ * @brief parses json content from a file and returns the parsed json or throws.
+ * @param jsonFile path to a json file.
+ * @param root The parsed Json root object.
+ * @throw InvalidManifest if the json is invalid. Parse error information is in the exception.
+ * If an exception is thrown, the root param is invalid.
+ */
+void parseAndValidateJsonFromFile(const std::string& jsonFile, Json::Value& root)
+{
+  try
+  {
+    std::ifstream json(jsonFile);
+    parseAndValidateJson(json, root);
+  }
+  catch (const InvalidManifest& e)
+  {
+    std::string exceptionMsg(jsonFile + ": " + e.what());
+    throw InvalidManifest(exceptionMsg);
+  }
+}
+
+/* 
+ * @brief Validate manifest files in an archive.
+ * @param archiveFile archive file path
+ * @throw std::InvalidManifest on the first invalid manifest found.
+ */
+void validateManifestsInArchive(const std::string archiveFile)
+{
+  mz_zip_archive currZipArchive;
+  mz_uint currZipIndex = 0;
+  memset(&currZipArchive, 0, sizeof(mz_zip_archive));
+  std::clog << "Validating manifests in " << archiveFile << " ... " << std::endl;
+  if (!mz_zip_reader_init_file(&currZipArchive, archiveFile.c_str(), 0))
+  {
+    throw std::runtime_error("Could not initialize zip archive " + archiveFile);
+  }
+  char archiveName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+  mz_uint numZipIndices = mz_zip_reader_get_num_files(&currZipArchive);
+  for (currZipIndex = 0; currZipIndex < numZipIndices; ++currZipIndex)
+  {
+    mz_uint numBytes = mz_zip_reader_get_filename(&currZipArchive, currZipIndex, archiveName, sizeof archiveName);
+    std::clog << "\tValidating: " << archiveName << " (from " << archiveFile << ") "<< std::endl;
+    try
+    {
+      if (numBytes > 1 && archiveName[numBytes-2] != '/') // The last character is '\0' in the array
+      {
+        std::string archiveEntry(archiveName);
+        if (archiveEntry.find_first_of("/", 0) == archiveEntry.find_last_of("/") &&
+            std::string::npos != archiveEntry.find("/manifest.json"))
+        {
+          char manifestFileContents[MZ_ZIP_MAX_IO_BUF_SIZE];
+          memset(manifestFileContents, 0, MZ_ZIP_MAX_IO_BUF_SIZE);
+          if(MZ_TRUE == mz_zip_reader_extract_file_to_mem(&currZipArchive, 
+                            archiveEntry.c_str(),
+                            manifestFileContents, 
+                            MZ_ZIP_MAX_IO_BUF_SIZE, 
+                            0))
+          {
+            try
+            {
+              Json::Value root;
+              std::istringstream json(manifestFileContents);
+              parseAndValidateJson(json, root);
+            }
+            catch (const InvalidManifest& e)
+            {
+              std::string exceptionMsg(archiveFile);
+              exceptionMsg += " (" + archiveEntry + ") : " + e.what();
+              throw InvalidManifest(exceptionMsg);
+            } 
+          }
+        }
+      }
+    }
+    catch (const InvalidManifest&)
+    {
+      mz_zip_reader_end(&currZipArchive);
+      throw;
+    }
+    catch (const std::exception&)
+    {
+      mz_zip_reader_end(&currZipArchive);
+      throw;
+    }
+  }
+  std::clog << "Finished validating manifest files from " << archiveName << std::endl;
+  mz_zip_reader_end(&currZipArchive);
+}
+
+/*
+ * @brief concatenates all manifests checking for invalid syntax and
+ * duplicate JSON key names.
+ * @param manifests a map containing manifest file paths and their content.
+ * @pre-condition each manifest in manifests has already been validated by jsoncpp.
+ * @throw InvalidManifest if the manifest has inavlid syntax or duplicate key names
+ * @return valid JSON content
+ */
+Json::Value AggregateManifestsAndValidate(std::map<std::string, Json::Value>& manifests)
+{
+  Json::Value root;
+  
+  for (auto& manifest : manifests)
+  {
+    Json::Value jsonRoot(manifest.second);
+    Json::Value::iterator iter = jsonRoot.begin();
+    for (; iter != jsonRoot.end(); ++iter)
+    {
+      // concatenating all the root objects together means that
+      // duplicate key names only have to be checked for children of
+      // each root object. Any other duplicate keys would have been
+      // detected when validating each individual JSON file.
+      if (Json::Value::null == root[iter.name()])
+      {
+        root[iter.name()] = (*iter);
+      }
+      else
+      {
+        throw InvalidManifest(std::string("Duplicate key: '" + iter.name() + "' found in " + manifest.first));
+      }
+    }
+  }
+
+  std::clog << "concatenated (pre-validated) json:\n" << root.toStyledString() << std::endl;
+
+  // Any duplicate keys would have been flagged earlier while concatenating all the manifest files.
+  // This is a final JSON validation which should only find JSON syntax errors caused by an error in
+  // concatenation.
+  Json::Value manifestJson;
+  std::istringstream json(root.toStyledString());
+  parseAndValidateJson(json, manifestJson);
+
+  std::clog << "final (validated) manifest.json:\n" << manifestJson.toStyledString() << std::endl;
+  return manifestJson;
+}
+
+}
+
 /*
  *@brief class to represent the zip archive for bundles
  */
@@ -119,9 +293,18 @@ public:
              int compressionLevel,
              const std::string& bundleName);
   virtual ~ZipArchive();
+ /*
+  * @brief Add manifest.json to this zip archive
+  * @param manifest contents of the manifest to add to the zip archive
+  * @throw std::runtime exception if failed to add manifest.json
+  * @throw InvalidManifest if manifest.json is invalid
+  */
+  void AddManifestFile(const Json::Value& manifest);
+
   /*
    * @brief Add a file to this zip archive
    * @throw std::runtime exception if failed to add the resource file
+   * @throw InvalidManifest if manifest.json is invalid
    * @param resFileName is the path to the resource to be added
    * @param isManifest indicates if the file is the bundle's manifest
    */
@@ -147,6 +330,19 @@ private:
    * @throw std::runtime exception if failed to add the entry
    */
   void AddDirectory(const std::string& dirName);
+
+  /*
+   * @brief Checks whether the archive file entry already
+   *        exists in the zip archive. If it does, throw an exception.
+   * @throw std::runtime_error if the archive entry already exists.
+   */
+  void CheckAndAddToArchivedNames(const std::string& archiveEntry);
+
+  void PrintErrorAndExit(const std::string& errorMsg)
+  {
+    std::cerr << errorMsg << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
   std::string fileName;
   int compressionLevel;
@@ -174,11 +370,48 @@ ZipArchive::ZipArchive(const std::string& archiveFileName,
   }
 }
 
+void ZipArchive::CheckAndAddToArchivedNames(const std::string& archiveEntry)
+{
+  std::clog << "Adding file " << archiveEntry << " ..." << std::endl;
+  // add the current file to the new archive
+  if (!archivedNames.insert(archiveEntry).second)
+  {
+    throw std::runtime_error("A file already exists with the name " + archiveEntry);
+  }
+}
+
+void ZipArchive::AddManifestFile(const Json::Value& manifest)
+{
+  std::string styledManifestJson(manifest.toStyledString());
+  std::string archiveEntry(bundleName + "/manifest.json");
+
+  CheckAndAddToArchivedNames(archiveEntry);
+
+  if (MZ_FALSE == mz_zip_writer_add_mem(writeArchive.get(),
+                                        archiveEntry.c_str(),
+                                        styledManifestJson.c_str(),
+                                        styledManifestJson.size(),
+                                        compressionLevel))
+  {
+    throw std::runtime_error("Error writing manifest.json to archive " + fileName);
+  }
+  AddDirectory(bundleName + "/");
+}
+
 void ZipArchive::AddResourceFile(const std::string& resFileName,
                                  bool isManifest)
 {
   std::string archiveName = resFileName;
-  // if it is a manifest file, we ignore the parent directory path
+
+  // This check exists solely to maintain a deprecated way of adding manifest.json
+  // through the --res-add option.
+  if (isManifest || resFileName == std::string("manifest.json"))
+  {
+    Json::Value root;
+    parseAndValidateJsonFromFile(resFileName, root);
+  }
+
+  // if it is a manifest file, we ignore the parent directory path because the
   // manifest file is always placed at the root of the bundle name directory
   if (isManifest && resFileName.find_last_of(PATH_SEPARATOR) != std::string::npos)
   {
@@ -186,12 +419,7 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   }
 
   std::string archiveEntry = bundleName + "/" + archiveName;
-  std::clog << "Adding file " << archiveEntry << " ..." << std::endl;
-  // add the current file to the new archive
-  if (!archivedNames.insert(archiveEntry).second)
-  {
-    throw std::runtime_error("A file already exists with this name");
-  }
+  CheckAndAddToArchivedNames(archiveEntry);
 
   if (!mz_zip_writer_add_file(writeArchive.get(), archiveEntry.c_str(), resFileName.c_str(), NULL,
                               0, compressionLevel))
@@ -200,7 +428,7 @@ void ZipArchive::AddResourceFile(const std::string& resFileName,
   }
   // add a directory entries for the file path
   size_t lastPathSeparatorPos = archiveEntry.find("/", 0);
-  while(lastPathSeparatorPos != std::string::npos)
+  while (lastPathSeparatorPos != std::string::npos)
   {
     AddDirectory(archiveEntry.substr(0,lastPathSeparatorPos+1));
     lastPathSeparatorPos = archiveEntry.find("/", lastPathSeparatorPos+1);
@@ -219,12 +447,6 @@ void ZipArchive::AddDirectory(const std::string& dirName)
       throw std::runtime_error("zip add_mem error");
     }
   }
-}
-
-void PrintErrorAndExit(const std::string& errorMsg)
-{
-  std::cerr << errorMsg << std::endl;
-  exit(EXIT_FAILURE);
 }
 
 ZipArchive::~ZipArchive()
@@ -281,9 +503,35 @@ void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
           {
             throw std::runtime_error("Found duplicate file with name " + std::string(archiveName));
           }
+          std::string archiveEntry(archiveName);
+          if (archiveEntry.find_first_of("/", 0) == archiveEntry.find_last_of("/") &&
+              std::string::npos != archiveEntry.find("/manifest.json"))
+          {
+            char manifestFileContents[MZ_ZIP_MAX_IO_BUF_SIZE];
+            memset(manifestFileContents, 0, MZ_ZIP_MAX_IO_BUF_SIZE);
+            if(MZ_TRUE == mz_zip_reader_extract_file_to_mem(&currZipArchive, 
+                            archiveEntry.c_str(),
+                            manifestFileContents, 
+                            MZ_ZIP_MAX_IO_BUF_SIZE, 
+                            0))
+            {
+              try
+              {
+                Json::Value root;
+                std::istringstream json(manifestFileContents);
+                parseAndValidateJson(json, root);
+              }
+              catch (const InvalidManifest& e)
+              {
+                std::string exceptionMsg(archiveFileName);
+                exceptionMsg += " (" + archiveEntry + ") : " + e.what();
+                throw InvalidManifest(exceptionMsg);
+              }
+            }
+          }
           if (!mz_zip_writer_add_from_zip_reader(writeArchive.get(), &currZipArchive, currZipIndex))
           {
-            throw std::runtime_error("Failed to append file " + std::string(archiveName) + "from archive " + archiveFileName);
+            throw std::runtime_error("Failed to append file " + std::string(archiveName) + " from archive " + archiveFileName);
           }
         }
         else
@@ -292,7 +540,12 @@ void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
         }
       }
     }
-    catch(const std::exception&)
+    catch (const InvalidManifest&)
+    {
+      mz_zip_reader_end(&currZipArchive);
+      throw;
+    }
+    catch (const std::exception& )
     {
       mz_zip_reader_end(&currZipArchive);
       throw;
@@ -327,11 +580,19 @@ struct Custom_Arg : public option::Arg
   static option::ArgStatus Numeric(const option::Option& option, bool msg)
   {
     char* endptr = nullptr;
-    if (option.arg != 0 &&
-        strtol(option.arg, &endptr, 10))
+    if (option.arg != nullptr)
     {
-      assert(endptr != nullptr);
-      return option::ARG_OK;
+      errno = 0;
+      // the return value of strtol is misleading since 0 indicates failure and
+      // we support 0 as a valid command line option argument. Checking errno
+      // is the correct way to determine if the argument is valid.
+      strtol(option.arg, &endptr, 10);
+      if (errno != ERANGE)
+      {
+        errno = 0;
+        assert(endptr != nullptr);
+        return option::ARG_OK;
+      }
     }
 
     if (msg)
@@ -369,7 +630,7 @@ const option::Descriptor usage[] =
   {OUTFILE,          0, "o", "out-file"         , Custom_Arg::NonEmpty, " --out-file, -o \tPath to output zip file. If the file exists it will be overwritten. If this option is not provided, a temporary zip fie will be created."},
   {RESADD,           0, "r", "res-add"          , Custom_Arg::NonEmpty, " --res-add, -r \tPath to a resource file, relative to the current working directory."},
   {ZIPADD,           0, "z", "zip-add"          , Custom_Arg::NonEmpty, " --zip-add, -z \tPath to a file containing a zip archive to be merged into the output zip file. "},
-  {MANIFESTADD,      0, "m", "manifest-add"     , Custom_Arg::NonEmpty, " --manifest-add, -m \tPath to the bundle's manifest file. "},
+  {MANIFESTADD,      0, "m", "manifest-add"     , Custom_Arg::NonEmpty, " --manifest-add, -m \tPath to a bundle manifest file. Multiple bundle manifests will be concatenated together into one."},
   {BUNDLEFILE,       0, "b", "bundle-file"      , Custom_Arg::NonEmpty, " --bundle-file, -b \tPath to the bundle binary. The resources zip file will be appended to this binary. "},
   {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\nNote:\n1. Only options --res-add and --zip-add can be specified multiple times."},
   {UNKNOWN,          0, "" ,  ""                , Custom_Arg::None    , "\n2. If option --manifest-add or --res-add is specified, option --bundle-name must be provided."},
@@ -421,7 +682,7 @@ static int checkSanity(option::Parser& parse,
       }
     }
   };
-  check_multiple_args({ BUNDLEFILE, OUTFILE, BUNDLENAME, MANIFESTADD });
+  check_multiple_args({ BUNDLEFILE, OUTFILE, BUNDLENAME });
 
   // At-least one of --bundle-file or --out-file is required.
   if (!options[BUNDLEFILE] && !options[OUTFILE])
@@ -440,7 +701,7 @@ static int checkSanity(option::Parser& parse,
   // Generate a warning that --bundle-name is not necessary in following invocation.
   if (options[BUNDLENAME] && !options[MANIFESTADD] && !options[RESADD] && return_code != EXIT_FAILURE)
   {
-      std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
+    std::clog << "Warning: --bundle-name option is unnecessary here." << std::endl;
   }
 
   return return_code;
@@ -452,6 +713,8 @@ static int checkSanity(option::Parser& parse,
 
 int main(int argc, char** argv)
 {
+  const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
+
   int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
   int return_code = EXIT_SUCCESS;
   std::string bundleName;
@@ -461,7 +724,7 @@ int main(int argc, char** argv)
   option::Stats stats(usage, argc, argv);
   std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
   std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
-  option::Parser parse(usage, argc, argv, options.get(), buffer.get());
+  option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
 
   if (argc == 0 || options[HELP])
   {
@@ -488,7 +751,7 @@ int main(int argc, char** argv)
 
   if (options[COMPRESSIONLEVEL])
   {
-    char* endptr = 0;
+    char* endptr = nullptr;
     compressionLevel = strtol(options[COMPRESSIONLEVEL].arg, &endptr, 10);
   }
   std::clog << "using compression level " << compressionLevel << std::endl;
@@ -520,10 +783,27 @@ int main(int argc, char** argv)
       }
 
       std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
+      
+      // map of manifest file to its JSON data
+      std::map<std::string, Json::Value> manifests; 
+
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])
       {
-        zipArchive->AddResourceFile(options[MANIFESTADD].arg, true);
+        for (option::Option* opt = options[MANIFESTADD]; opt; opt = opt->next()) 
+        {
+          Json::Value manifest;
+          parseAndValidateJsonFromFile(std::string(opt->arg), manifest);
+          bool result;
+          std::tie(std::ignore, result) = manifests.insert(std::make_pair(opt->arg, manifest));
+          if (!result)
+          {
+            std::clog << "Skipping duplicate manifest file " << opt->arg << std::endl;
+          }
+        }
+
+        // concatenate all manifest files into one, validate it and add it to the zip archive.
+        zipArchive->AddManifestFile(AggregateManifestsAndValidate(manifests));
       }
       // Add resource files to the zip archive
       for (option::Option* resopt = options[RESADD]; resopt; resopt = resopt->next())
@@ -541,6 +821,7 @@ int main(int argc, char** argv)
     // ---------------------------------------------------------------------------------
     if (bundleFileOpt)
     {
+      validateManifestsInArchive(zipFile);
       std::string bundleBinaryFile(bundleFileOpt->arg);
       std::ofstream outFileStream(bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
       std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
@@ -565,6 +846,11 @@ int main(int argc, char** argv)
         return_code = EXIT_FAILURE;
       }
     }
+  }
+  catch (const InvalidManifest& ex)
+  {
+    std::cerr << "JSON Parsing Error: " << ex.what() << std::endl;
+    return_code = BUNDLE_MANIFEST_VALIDATION_ERROR_CODE;
   }
   catch (const std::exception& ex)
   {

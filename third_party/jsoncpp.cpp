@@ -291,7 +291,7 @@ bool Reader::parse(std::istream& sin, Value& root, bool collectComments) {
   // Since std::string is reference-counted, this at least does not
   // create an extra copy.
   std::string doc;
-  std::getline(sin, doc, (char)EOF);
+  std::getline(sin, doc, static_cast<char>(EOF));
   return parse(doc, root, collectComments);
 }
 
@@ -2299,7 +2299,7 @@ static inline char* duplicateStringValue(const char* value,
                                          size_t length) {
   // Avoid an integer overflow in the call to malloc below by limiting length
   // to a sane value.
-  if (length >= (size_t)Value::maxInt)
+  if (length >= static_cast<size_t>(Value::maxInt))
     length = Value::maxInt - 1;
 
   char* newString = static_cast<char*>(malloc(length + 1));
@@ -2321,7 +2321,7 @@ static inline char* duplicateAndPrefixStringValue(
 {
   // Avoid an integer overflow in the call to malloc below by limiting length
   // to a sane value.
-  JSON_ASSERT_MESSAGE(length <= (unsigned)Value::maxInt - sizeof(unsigned) - 1U,
+  JSON_ASSERT_MESSAGE(length <= static_cast<unsigned>(Value::maxInt) - sizeof(unsigned) - 1U,
                       "in Json::Value::duplicateAndPrefixStringValue(): "
                       "length too big for prefixing");
   unsigned actualLength = length + static_cast<unsigned>(sizeof(unsigned)) + 1U;

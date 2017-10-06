@@ -38,6 +38,7 @@ be:
       "rating" : 5
     }
 
+    
 All JSON member names of the root object will be available as property
 keys in the bundle containing the ``manifest.json`` file. The C++ Micro
 Services library specifies the following standard keys for re-use in
@@ -58,9 +59,18 @@ Services library specifies the following standard keys for re-use in
    :any:`GetSymbolicName() <cppmicroservices::Bundle::GetSymbolicName>` or
    :any:`GetVersion() <cppmicroservices::Bundle::GetVersion>`.
 
+.. attention::
+
+   JSON is case-sensitive. However C++ Micro Services stores bundle properties in
+   a case in-sensitive way to accommodate :any:`LDAPFilter <cppmicroservices::LDAPFilter>`
+   and :any:`LDAPProp <cppmicroservices::LDAPProp>` which are case-insensitive.
+   Be aware of this when querying bundle properties. Either keep the JSON case-insensitive or
+   standardize on a convention to ensure queries return the correct results.
+
+
 When parsing the ``manifest.json`` file, the JSON types are mapped to
-C++ types and stored in instances of the Any class. The mapping is as
-follows:
+C++ types and stored in instances of the :any:`Any class <cppmicroservices::Any>`.
+The mapping is as follows:
 
 +----------+-----------------+
 | JSON     | C++ (Any)       |

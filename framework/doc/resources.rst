@@ -55,8 +55,8 @@ Runtime Overhead
 
 The resource system has the following runtime characteristics:
 
--  During static initialization of a bundle, it's ZIP archive header
-   data (if available) is parsed and stored in memory.
+-  During bundle install, the bundle's ZIP archive header data (if available)
+   is parsed and stored in memory.
 -  Querying ``Bundle`` or ``BundleResource`` objects for resource
    information will not extract the embedded resource data and hence
    only has minimal runtime and memory overhead.

@@ -95,7 +95,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
     Any anyValue = ParseJsonValue(jsonValue, false);
     if (!anyValue.Empty())
     {
-      anyMap.insert(std::make_pair(it.memberName(), anyValue));
+      anyMap.insert(std::make_pair(it.name(), anyValue));
     }
   }
 }
@@ -109,7 +109,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
     Any anyValue = ParseJsonValue(jsonValue, true);
     if (!anyValue.Empty())
     {
-      anyMap.insert(std::make_pair(it.memberName(), anyValue));
+      anyMap.insert(std::make_pair(it.name(), anyValue));
     }
   }
 }

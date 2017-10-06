@@ -5,7 +5,7 @@ include_directories(../../third_party)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
 
-set(srcs ResourceCompiler.cpp ../../third_party/miniz.c)
+set(srcs ResourceCompiler.cpp ../../third_party/miniz.c ../../third_party/jsoncpp.cpp)
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EXECUTABLE_OUTPUT_NAME})

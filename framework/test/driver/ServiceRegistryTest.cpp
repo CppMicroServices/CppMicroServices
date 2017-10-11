@@ -91,7 +91,7 @@ void TestUnregisterFix(BundleContext context)
   {
   };
 
-  std::atomic_bool done(false);
+  std::atomic_bool done = ATOMIC_VAR_INIT(false);
   auto invokeIsConvertibleTo = [](ServiceReference<ITestServiceA> ref, std::atomic_bool& done) {
     while (!done)
     {

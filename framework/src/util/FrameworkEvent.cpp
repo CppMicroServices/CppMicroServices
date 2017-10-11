@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/Bundle.h"
 
-#include "Utils.h"
+#include "cppmicroservices/util/Error.h"
 
 namespace cppmicroservices {
 
@@ -114,7 +114,7 @@ std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt)
   std::string exceptionStr("NONE");
   if (evt.GetThrowable())
   {
-    exceptionStr = GetExceptionStr(evt.GetThrowable());
+    exceptionStr = util::GetExceptionStr(evt.GetThrowable());
   }
 
   os << evt.GetType() << "\n "

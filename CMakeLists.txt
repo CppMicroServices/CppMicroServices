@@ -543,8 +543,6 @@ endif()
 # Source directory
 #-----------------------------------------------------------------------------
 
-set(US_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party ${PROJECT_BINARY_DIR}/include)
-
 # Configure CppMicroServicesConfig.cmake for the build tree.
 # The file is used in sub-directories.
 
@@ -575,7 +573,7 @@ add_subdirectory(tools/rc)
 export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
 
-
+add_subdirectory(util)
 add_subdirectory(framework)
 add_subdirectory(httpservice)
 add_subdirectory(webconsole)

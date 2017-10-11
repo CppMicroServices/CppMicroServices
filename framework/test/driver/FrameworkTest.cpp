@@ -25,6 +25,8 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
+#include "cppmicroservices/util/FileSystem.h"
+
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
@@ -59,7 +61,7 @@ namespace
         US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_STORAGE) == std::string("fwdir"), "Test for default base storage property")
         US_TEST_CONDITION(any_cast<bool>(ctx.GetProperty(Constants::FRAMEWORK_LOG)) == false, "Test default diagnostic logging")
 
-        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_WORKING_DIR) == testing::GetCurrentWorkingDirectory(), "Test for default working directory")
+        US_TEST_CONDITION(ctx.GetProperty(Constants::FRAMEWORK_WORKING_DIR) == util::GetCurrentWorkingDirectory(), "Test for default working directory")
     }
 
     void TestCustomConfig()

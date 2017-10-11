@@ -17,6 +17,11 @@ See file for license information.
 http://softagalleria.net/dirent.php
 1.20.1
 
+Patches
+
+ * Set errno to ENAMETOOLONG if opendir() is called with a path argument
+   longer than MAX_PATH.
+
 jsoncpp
 -------
 

@@ -22,6 +22,9 @@ limitations under the License.
 
 #include "miniz.h"
 
+#include <vector>
+#include <cstring>
+
 /*
 * @brief Struct which represents an entry in the zip archive.
 */

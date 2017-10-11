@@ -27,14 +27,9 @@ limitations under the License.
 #include "cppmicroservices/BundleContext.h"
 
 #include <string>
-#include <memory>
-#include <fstream>
-#include <sys/stat.h>
 
 #ifdef US_PLATFORM_APPLE
 #include <mach/mach_time.h>
-#include <unistd.h>
-#include <sys/types.h>
 #elif defined(US_PLATFORM_POSIX)
 #include <limits.h>
 #include <time.h>
@@ -50,13 +45,13 @@ limitations under the License.
 #define VC_EXTRA_LEAN
 #endif
 #include <windows.h>
-#include <direct.h>
-#include <Shlwapi.h>
 #else
 #error High precision timer support not available on this platform
 #endif
 
 namespace cppmicroservices {
+
+namespace testing {
 
 class HighPrecisionTimer
 {
@@ -84,22 +79,9 @@ private:
 #endif
 };
 
-// Copied from Utils.h/.cpp
-// Place in a different namespace to avoid duplicate symbol errors.
-namespace testing {
-
 // Helper function to install bundles, given a framework's bundle context and the name of the library.
 // Assumes that test bundles are within the same directory during unit testing.
 Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName);
-
-// A convenient way to construct a shared_ptr holding an array
-template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
-{
-  return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
-}
-
-// Return the current working directory
-std::string GetCurrentWorkingDirectory();
 
 /*
 * Change to destination directory specified by destdir
@@ -108,54 +90,73 @@ std::string GetCurrentWorkingDirectory();
 void ChangeDirectory(const std::string& destdir);
 
 /*
-* Make directory specified by destdir
-* @throws std::runtime_error if the dir cannot be created
-*/
-void MakeDirectory(const std::string& destdir);
-
-/*
-* Remove directory specified by destdir
-* @throws std::runtime_error if the dir cannot be removed
-*/
-void RemoveDirectory(const std::string& destdir);
-
-/**
 * Returns a platform appropriate location for use as temporary storage.
 */
 std::string GetTempDirectory();
 
 /*
-* Checks if a file exists and if so, removes the file
-* If the file doesn't exist, simply returns
-* @throws std::runtime_error if the file cannot be deleted
-*/
-void CheckFileAndRemove(std::string f);
+ * Closes the file descriptor on destruction.
+ */
+struct File
+{
+  File(const File&) = delete;
+  File& operator=(const File&) = delete;
+
+  File();
+
+  // The file descriptor fd is owned by this
+  File(int fd, const std::string& path);
+
+  File(File&& o);
+  File& operator=(File&& o);
+
+  ~File();
+
+  int FileDescr;
+  std::string Path;
+};
 
 /*
-* Return true if the specified directory exists,
-* otherwise return false
-*/
-bool DirectoryExists(const std::string& destdir);
+ * Removes the directory on destruction.
+ */
+struct TempDir
+{
+  TempDir(const TempDir&) = delete;
+  TempDir& operator=(const TempDir&) = delete;
+
+  TempDir();
+
+  // The file descriptor fd is owned by this
+  TempDir(const std::string& path);
+
+  TempDir(TempDir&& o);
+  TempDir& operator=(TempDir&& o);
+
+  ~TempDir();
+
+  operator std::string() const;
+
+  std::string Path;
+};
+
+/*
+ * Creates a new unique sub-directory in the temporary storage
+ * location returned by GetTempDirectory() and returns a string
+ * containing the directory path.
+ *
+ * This is similar to mkdtemp on POSIX systems, but without a
+ * custom template string.
+ */
+std::string MakeUniqueTempDirectory();
+
+File MakeUniqueTempFile(const std::string& base);
 
 Bundle GetBundle(
     const std::string& bsn,
     BundleContext context = BundleContext()
     );
 
-template <typename T>
-std::string ToString(T val)
-{
-#if defined(__ANDROID__)
-  std::ostringstream os;
-  os << val;
-  return os.str();
-#else
-  return std::to_string(val);
-#endif
-}
-
-}
-
-}
+} // namespace testing
+} // namespace cppmicroservices
 
 #endif  // CPPMICROSERVICES_TESTUTILS_H

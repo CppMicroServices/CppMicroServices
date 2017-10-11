@@ -24,6 +24,8 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/Error.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -31,7 +33,6 @@
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistry.h"
-#include "Utils.h"
 
 #include <memory>
 #include <stdio.h>
@@ -253,7 +254,7 @@ struct ServiceHolder
       // the BundlePrivate or CoreBundleContext objects.
       if (!b.expired())
       {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << GetLastExceptionStr();
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << util::GetLastExceptionStr();
       }
       // don't throw exceptions from the destructor. For an explanation, see:
       // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
@@ -467,11 +468,11 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
   std::string dataRoot = b->bundleDir;
   if (!dataRoot.empty())
   {
-    if (!fs::Exists(dataRoot))
+    if (!util::Exists(dataRoot))
     {
-      fs::MakePath(dataRoot);
+      util::MakePath(dataRoot);
     }
-    return dataRoot + DIR_SEP + filename;
+    return dataRoot + util::DIR_SEP + filename;
   }
   return std::string();
 }

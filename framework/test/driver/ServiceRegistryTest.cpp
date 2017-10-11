@@ -31,6 +31,9 @@
 #include "TestingMacros.h"
 
 #include <stdexcept>
+#include <chrono>
+#include <thread>
+#include <atomic>
 
 using namespace cppmicroservices;
 
@@ -78,6 +81,32 @@ void TestMultipleServiceRegistrations(BundleContext context)
 
   ServiceReference<ITestServiceA> ref = context.GetServiceReference<ITestServiceA>();
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
+}
+
+// Spawned thread repeatedly calls the IsConvertibleTo method and when the main thread
+// unregisters the service, it used to result in a crash.
+void TestUnregisterFix(BundleContext context)
+{
+  struct TestServiceA : public ITestServiceA
+  {
+  };
+
+  std::atomic_bool done(false);
+  auto invokeIsConvertibleTo = [](ServiceReference<ITestServiceA> ref, std::atomic_bool& done) {
+    while (!done)
+    {
+      (void)ref.IsConvertibleTo("IBooService");
+    }
+  };
+
+  ServiceRegistration<ITestServiceA> registration = context.RegisterService<ITestServiceA>(std::make_shared<TestServiceA>());
+  ServiceReference<ITestServiceA> reference = context.GetServiceReference<ITestServiceA>();
+  std::thread thread(invokeIsConvertibleTo, reference, std::ref(done));
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  registration.Unregister();
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  done = true;
+  thread.join();
 }
 
 void TestServicePropertiesUpdate(BundleContext context)
@@ -148,6 +177,7 @@ int ServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   TestServiceInterfaceId();
   TestMultipleServiceRegistrations(context);
   TestServicePropertiesUpdate(context);
+  TestUnregisterFix(context);
 
   US_TEST_END()
 }

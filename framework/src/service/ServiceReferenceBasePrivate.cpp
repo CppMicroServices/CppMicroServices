@@ -361,7 +361,12 @@ PropertiesHandle ServiceReferenceBasePrivate::GetProperties() const
 
 bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId) const
 {
-  return registration ? registration->Lock(), registration->service->find(interfaceId) != registration->service->end() : false;
+  if (registration)
+  {
+	  auto l = registration->Lock(); US_UNUSED(l);
+	  return registration->service ? registration->service->find(interfaceId) != registration->service->end() : false;
+  }
+  return false;
 }
 
 }

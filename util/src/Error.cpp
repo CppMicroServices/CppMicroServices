@@ -46,12 +46,12 @@ std::string GetLastWin32ErrorStr()
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
 
-  DWORD rc = FormatMessage(
+  DWORD rc = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
         dw,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPTSTR>(&lpMsgBuf),
+        reinterpret_cast<LPWSTR>(&lpMsgBuf),
         0,
         NULL
         );
@@ -66,7 +66,7 @@ std::string GetLastWin32ErrorStr()
     return std::string("Failed to retrieve error message.");
   }
 
-  std::string errMsg(reinterpret_cast<LPCTSTR>(lpMsgBuf));
+  std::string errMsg(ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf))));
 
   LocalFree(lpMsgBuf);
   return errMsg;

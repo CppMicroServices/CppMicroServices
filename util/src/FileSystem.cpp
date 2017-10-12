@@ -22,7 +22,7 @@
 
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/Error.h"
-
+#include "cppmicroservices/util/String.h"
 #include <cppmicroservices/GlobalConfig.h>
 
 #include <string>
@@ -121,14 +121,15 @@ std::vector<std::string> SplitString(const std::string& str, const std::string& 
 std::string GetExecutablePath()
 {
   uint32_t bufsize = MAXPATHLEN;
-  std::vector<char> buf(bufsize + 1, '\0');
-
 #ifdef US_PLATFORM_WINDOWS
-  if (GetModuleFileName(nullptr, buf.data(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+  std::vector<wchar_t> wbuf(bufsize + 1, '\0');
+  if (GetModuleFileNameW(nullptr, wbuf.data(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
   {
     throw std::runtime_error("GetModuleFileName failed" + GetLastWin32ErrorStr());
   }
+  return ToUTF8String(wbuf.data());
 #elif defined(US_PLATFORM_APPLE)
+  std::vector<char> buf(bufsize + 1, '\0');
   int status = _NSGetExecutablePath(buf.data(), &bufsize);
   if (status == -1)
   {
@@ -140,28 +141,32 @@ std::string GetExecutablePath()
      throw std::runtime_error("_NSGetExecutablePath() failed");
   }
   // the returned path may not be an absolute path
+  return buf.data();
 #elif defined(US_PLATFORM_LINUX)
+  std::vector<char> buf(bufsize + 1, '\0');
   ssize_t len = ::readlink("/proc/self/exe", buf.data(), bufsize);
   if (len == -1 || len == bufsize)
   {
     throw std::runtime_error("Could not read /proc/self/exe into buffer");
   }
+  return buf.data();
 #else
   // 'dlsym' does not work with symbol name 'main'
   throw std::runtime_error("GetExecutablePath failed");
+  return "";
 #endif
-  return buf.data();
+  
 }
 
 std::string InitCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
-  DWORD bufSize = ::GetCurrentDirectoryA(0, NULL);
+  DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
   if (bufSize == 0) bufSize = 1;
-  std::vector<char> buf(bufSize, '\0');
-  if (::GetCurrentDirectoryA(bufSize, buf.data()) != 0)
+  std::vector<wchar_t> buf(bufSize, L'\0');
+  if (::GetCurrentDirectoryW(bufSize, buf.data()) != 0)
   {
-    return std::string(buf.data());
+    return util::ToUTF8String(buf.data());
   }
 #else
   std::size_t bufSize = PATH_MAX;
@@ -196,7 +201,8 @@ bool Exists(const std::string& path)
     else throw std::invalid_argument(GetLastCErrorStr());
   }
 #else
-  DWORD attr(::GetFileAttributes(path.c_str()));
+  std::wstring wpath(ToWString(path));
+  DWORD attr(::GetFileAttributesW(wpath.c_str()));
   if (attr == INVALID_FILE_ATTRIBUTES)
   {
     if (not_found_win32_error(::GetLastError())) return false;
@@ -234,7 +240,8 @@ bool IsRelative(const std::string& path)
 {
 #ifdef US_PLATFORM_WINDOWS
   if (path.size() > MAX_PATH) return false;
-  return (TRUE == ::PathIsRelative(path.c_str()))? true:false;
+  std::wstring wpath(ToWString(path));
+  return (TRUE == ::PathIsRelativeW(wpath.c_str()))? true:false;
 #else
   return path.empty() || path[0] != DIR_SEP;
 #endif

@@ -56,6 +56,19 @@ std::string ToString(T val)
 #endif
 }
 
+//-------------------------------------------------------------------
+// Unicode Utility functions
+//-------------------------------------------------------------------
+
+#ifdef US_PLATFORM_WINDOWS
+// method to convert UTF8 std::string to std::wstring
+// throws std::invalid_argument if input string contains invalid UTF8 characters
+std::wstring ToWString(const std::string& inStr);
+// method to convert a std::wstring to UTF8 std::string
+// throws std::invalid_argument if input string cannot be converted to UTF8
+std::string ToUTF8String(const std::wstring& inWStr);
+#endif
+
 } // namespace util
 } // namespace cppmicroservices
 

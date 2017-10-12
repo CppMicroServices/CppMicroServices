@@ -294,7 +294,7 @@ void testCompressionLevel(const std::string& rcbinpath, const std::string& tempd
   cmd << " --zip-add tomerge.zip";
   cmd << " --compression-level 0";
 
-  auto cwdir = testing::GetCurrentWorkingDirectory();
+  auto cwdir = util::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   US_TEST_CONDITION_REQUIRED(EXIT_SUCCESS == runExecutable(cmd.str()), "Test that --compression-level = 0 successfully creates a zip file.");
   testing::ChangeDirectory(cwdir);
@@ -320,7 +320,7 @@ void testCompressionLevel(const std::string& rcbinpath, const std::string& tempd
   cmd << " --zip-add tomerge.zip";
   cmd << " --compression-level 3";
 
-  cwdir = testing::GetCurrentWorkingDirectory();
+  cwdir = util::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   US_TEST_CONDITION_REQUIRED(EXIT_SUCCESS == runExecutable(cmd.str()), "Test that --compression-level = 3 successfully creates a zip file.");
   testing::ChangeDirectory(cwdir);
@@ -664,7 +664,7 @@ void testManifestAddWithInvalidJSON(const std::string& rcbinpath, const std::str
   cmd3 << " --out-file invalid_syntax_res_add.zip ";
   cmd3 << " --res-add manifest.json";
 
-  auto origdir = testing::GetCurrentWorkingDirectory();
+  auto origdir = util::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   US_TEST_CONDITION(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE == runExecutable(cmd3.str()), "Fail to embed manifest containing JSON syntax errors.");
   testing::ChangeDirectory(origdir);
@@ -684,8 +684,6 @@ void testManifestAddWithInvalidJSON(const std::string& rcbinpath, const std::str
   US_TEST_CONDITION(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE == runExecutable(cmd4.str()), "Fail to embed manifest containing JSON syntax errors.");
   testing::ChangeDirectory(origdir);
   US_TEST_CONDITION(false == containsBundleZipFile(tempdir + invalid_syntax_res_add_bundle_name), "Test that the invalid manifest.json file was not added");
-
-  US_TEST_NO_EXCEPTION_REQUIRED(makeCleanSlate(tempdir));
 }
 
 // In jsoncpp 0.10.6 not allowing comments does NOT result in a parse failure for a JSON file with comments.
@@ -714,8 +712,6 @@ void testManifestAddWithJSONComments(const std::string& rcbinpath, const std::st
   cmd << " --out-file " << tempdir << "json_comment_syntax.zip";
   cmd << " --manifest-add " << tempdir << "manifest.json";
   US_TEST_CONDITION(EXIT_SUCCESS == runExecutable(cmd.str()), "Test embedding a manifest containing JSON comments.");
-
-  US_TEST_NO_EXCEPTION_REQUIRED(makeCleanSlate(tempdir));
 }
 
 void testManifestAddWithDuplicateKeys(const std::string& rcbinpath, const std::string& tempdir)
@@ -759,7 +755,7 @@ void testManifestAddWithDuplicateKeys(const std::string& rcbinpath, const std::s
   cmd3 << " --out-file duplicate_keys_res_add.zip ";
   cmd3 << " --res-add manifest.json";
 
-  auto origdir = testing::GetCurrentWorkingDirectory();
+  auto origdir = util::GetCurrentWorkingDirectory();
   testing::ChangeDirectory(tempdir);
   US_TEST_CONDITION(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE == runExecutable(cmd3.str()), "Fail to embed manifest containing duplicate JSON key names.");
   testing::ChangeDirectory(origdir);
@@ -778,8 +774,6 @@ void testManifestAddWithDuplicateKeys(const std::string& rcbinpath, const std::s
   US_TEST_CONDITION(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE == runExecutable(cmd4.str()), "Fail to embed manifest containing duplicate JSON key names.");
   testing::ChangeDirectory(origdir);
   US_TEST_CONDITION(false == containsBundleZipFile(tempdir + duplicate_keys_res_add_bundle_file), "Test that the invalid manifest.json file was not added");
-
-  US_TEST_NO_EXCEPTION_REQUIRED(makeCleanSlate(tempdir));
 }
 
 // A zip file containing only a manifest.
@@ -790,14 +784,13 @@ public:
     // zip_file_name - zip file path
     // manifest_json - contents of the manifest.json file
     // bundle_name - name of the bundle
-    ManifestZipFile(const std::string zip_file_name, const std::string manifest_json, const std::string bundle_name) :
-        _zip_file_name(zip_file_name)
+    ManifestZipFile(const std::string& zip_file_name, const std::string& manifest_json, const std::string& bundle_name)
   {
     std::string archiveEntry(bundle_name + "/manifest.json");
     mz_zip_archive zip;
     memset(&zip, 0, sizeof(mz_zip_archive));
 
-    mz_zip_writer_init_file(&zip, _zip_file_name.c_str(), 0);
+    mz_zip_writer_init_file(&zip, zip_file_name.c_str(), 0);
     mz_zip_writer_add_mem(&zip, archiveEntry.c_str(), manifest_json.c_str(), manifest_json.size() * sizeof(std::string::value_type), MZ_DEFAULT_COMPRESSION);
     mz_zip_writer_finalize_archive(&zip);
     mz_zip_writer_end(&zip);
@@ -808,20 +801,8 @@ public:
   ManifestZipFile(const ManifestZipFile&&) = delete;
   ManifestZipFile& operator=(const ManifestZipFile&&) = delete;
 
-  ~ManifestZipFile() 
-  {
-    try
-    {
-      testing::CheckFileAndRemove(_zip_file_name);
-    }
-    catch (const std::runtime_error&)
-    {
-      // do nothing, move along...
-    }
-  }
+  ~ManifestZipFile() { }
 
-  private:
-      std::string _zip_file_name;
 };
 
 // Use case: A zip file created using an older usResourceCompiler (which doesn't validate manifest.json)
@@ -865,8 +846,6 @@ void testAppendZipWithInvalidManifest(const std::string& rcbinpath, const std::s
   /// TODO: when --add-manifest is used, two archive entries exist; one for the directory and one for the manifest.json in that directory.
   US_TEST_CONDITION(2 == append_invalid_manifest_zip.size(), "Test that the invalid manifest.json file was not appended to the bundle.");
   US_TEST_CONDITION("main/manifest.json" == append_invalid_manifest_zip[0].name, "Test that only the valid manifest.json exists.");
-
-  US_TEST_NO_EXCEPTION_REQUIRED(makeCleanSlate(tempdir));
 }
 
 // Use case: A zip file created using an older usResourceCompiler (which doesn't validate manifest.json)
@@ -904,8 +883,6 @@ void testZipMergeWithInvalidManifest(const std::string& rcbinpath, const std::st
   ZipFile new_merged_zip(tempdir + "new_merged_zip.zip");
   US_TEST_CONDITION_REQUIRED(1 == new_merged_zip.size(), "Test that the invalid manifest.json file was not merged into the zip file.");
   US_TEST_CONDITION_REQUIRED("main/manifest.json" == new_merged_zip[0].name, "Test that only the valid manifest.json exists.");
-
-  US_TEST_NO_EXCEPTION_REQUIRED(makeCleanSlate(tempdir));
 }
 
 // test that adding multiple manifests result in only one manifest.json being embedded correctly.
@@ -1154,7 +1131,7 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
     "bundle.activator" : true
     })";
 
-  US_TEST_NO_EXCEPTION_REQUIRED( createDirHierarchy(tempdir) );
+  US_TEST_NO_EXCEPTION_REQUIRED( createDirHierarchy(tempdir, manifest_json) );
 
   US_TEST_NO_EXCEPTION( testManifestAdd(rcbinpath, tempdir) );
 

@@ -175,6 +175,7 @@ void CoreBundleContext::Init()
     bundleRegistry.Install(execPath, systemBundle.get());
   }
 
+
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
   for (auto b : bundleRegistry.GetBundles())
   {

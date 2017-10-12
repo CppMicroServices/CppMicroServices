@@ -152,3 +152,12 @@ if(US_BUILD_SHARED_LIBS)
     add_dependencies(${_test_driver} ${_test_bundle})
   endforeach()
 endif()
+
+
+#-----------------------------------------------------------------------------
+# Add preprocessor macro to indicate C++11 unicode literal support
+#-----------------------------------------------------------------------------
+
+target_compile_definitions(${_test_driver} PUBLIC
+                           $<$<COMPILE_FEATURES:cxx_unicode_literals>:US_CXX_UNICODE_LITERALS=1>) 
+

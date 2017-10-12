@@ -83,6 +83,7 @@ void TestMultipleServiceRegistrations(BundleContext context)
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
+#ifdef US_ENABLE_THREADING_SUPPORT
 // Spawned thread repeatedly calls the IsConvertibleTo method and when the main thread
 // unregisters the service, it used to result in a crash.
 void TestUnregisterFix(BundleContext context)
@@ -108,6 +109,19 @@ void TestUnregisterFix(BundleContext context)
   done = true;
   thread.join();
 }
+#else
+void TestUnregisterFix(BundleContext context)
+{
+  struct TestServiceA : public ITestServiceA
+  {
+  };
+
+  ServiceRegistration<ITestServiceA> registration = context.RegisterService<ITestServiceA>(std::make_shared<TestServiceA>());
+  ServiceReference<ITestServiceA> reference = context.GetServiceReference<ITestServiceA>();
+  registration.Unregister();
+  (void)reference.IsConvertibleTo("IBooService");
+}
+#endif
 
 void TestServicePropertiesUpdate(BundleContext context)
 {

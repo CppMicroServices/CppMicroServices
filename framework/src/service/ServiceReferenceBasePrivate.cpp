@@ -363,8 +363,8 @@ bool ServiceReferenceBasePrivate::IsConvertibleTo(const std::string& interfaceId
 {
   if (registration)
   {
-	  auto l = registration->Lock(); US_UNUSED(l);
-	  return registration->service ? registration->service->find(interfaceId) != registration->service->end() : false;
+    auto l = registration->Lock(); US_UNUSED(l);
+    return registration->service ? registration->service->find(interfaceId) != registration->service->end() : false;
   }
   return false;
 }

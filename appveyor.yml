@@ -13,6 +13,9 @@ skip_tags: true
 
 matrix:
   fast_finish: true
+  # allow MinGW failures until issue#243 is resolved.
+  allow_failures:
+  - platform: mingw-w64
 
 # We do not test all build configurations with all compiler / platform
 # combinations. For now, just the latest compilers being tested will

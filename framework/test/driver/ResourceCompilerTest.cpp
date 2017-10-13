@@ -1155,5 +1155,19 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_NO_EXCEPTION( testFailureModes(rcbinpath, tempdir) );
 
+  US_TEST_NO_EXCEPTION(testManifestAddWithInvalidJSON(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testManifestAddWithJSONComments(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testManifestAddWithDuplicateKeys(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testAppendZipWithInvalidManifest(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testZipMergeWithInvalidManifest(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testMultipleManifestAdd(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testMultipleManifestConcatenation(rcbinpath, tempdir));
+
   US_TEST_END()
 }

@@ -31,9 +31,6 @@
 #include "TestingMacros.h"
 
 #include <stdexcept>
-#include <chrono>
-#include <thread>
-#include <atomic>
 
 using namespace cppmicroservices;
 
@@ -83,45 +80,13 @@ void TestMultipleServiceRegistrations(BundleContext context)
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
-#ifdef US_ENABLE_THREADING_SUPPORT
-// Spawned thread repeatedly calls the IsConvertibleTo method and when the main thread
-// unregisters the service, it used to result in a crash.
 void TestUnregisterFix(BundleContext context)
 {
-  struct TestServiceA : public ITestServiceA
-  {
-  };
-
-  std::atomic_bool done = ATOMIC_VAR_INIT(false);
-  auto invokeIsConvertibleTo = [](ServiceReference<ITestServiceA> ref, std::atomic_bool& done) {
-    while (!done)
-    {
-      (void)ref.IsConvertibleTo("IBooService");
-    }
-  };
-
-  ServiceRegistration<ITestServiceA> registration = context.RegisterService<ITestServiceA>(std::make_shared<TestServiceA>());
-  ServiceReference<ITestServiceA> reference = context.GetServiceReference<ITestServiceA>();
-  std::thread thread(invokeIsConvertibleTo, reference, std::ref(done));
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  ServiceRegistration<int> registration = context.RegisterService<int>(std::make_shared<int>());
+  ServiceReference<int> reference = context.GetServiceReference<int>();
   registration.Unregister();
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  done = true;
-  thread.join();
+  US_TEST_CONDITION_REQUIRED(!reference.IsConvertibleTo("IBooService"), "Testing for IsConvertibleTo returning false");
 }
-#else
-void TestUnregisterFix(BundleContext context)
-{
-  struct TestServiceA : public ITestServiceA
-  {
-  };
-
-  ServiceRegistration<ITestServiceA> registration = context.RegisterService<ITestServiceA>(std::make_shared<TestServiceA>());
-  ServiceReference<ITestServiceA> reference = context.GetServiceReference<ITestServiceA>();
-  registration.Unregister();
-  (void)reference.IsConvertibleTo("IBooService");
-}
-#endif
 
 void TestServicePropertiesUpdate(BundleContext context)
 {

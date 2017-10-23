@@ -192,7 +192,7 @@ void ServiceRegistryPerformanceTest::TestRegisterServices()
 
   Log() << "registering " << nServices << " services, listener count=" << listeners.size() << "\n";
 
-  HighPrecisionTimer t;
+  testing::HighPrecisionTimer t;
   t.Start();
   RegisterServices(nServices);
   long long ms = t.ElapsedMilli();
@@ -229,7 +229,7 @@ void ServiceRegistryPerformanceTest::TestModifyServices()
   Log() << "Modify all services, and check that we get #of services ("
         << nServices << ") * #of listeners (" << nListeners << ")  SERVICE_MODIFIED events\n";
 
-  HighPrecisionTimer t;
+  testing::HighPrecisionTimer t;
   t.Start();
   ModifyServices();
   long long ms = t.ElapsedMilli();
@@ -257,7 +257,7 @@ void ServiceRegistryPerformanceTest::TestUnregisterServices()
         << nServices << ") * #of listeners (" << nListeners
         << ")  SERVICE_UNREGISTERING events\n";
 
-  HighPrecisionTimer t;
+  testing::HighPrecisionTimer t;
   t.Start();
   UnregisterServices();
   long long ms = t.ElapsedMilli();

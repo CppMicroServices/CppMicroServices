@@ -25,6 +25,7 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/detail/Log.h"
+#include "cppmicroservices/util/Error.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -122,7 +123,7 @@ struct UngetHelper
       // the BundlePrivate or CoreBundleContext objects.
       if (!b.expired())
       {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetHelper threw an exception. " << GetLastExceptionStr();
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetHelper threw an exception. " << util::GetLastExceptionStr();
       }
       // don't throw exceptions from the destructor. For an explanation, see:
       // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md

@@ -28,9 +28,10 @@
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
-#include "Utils.h"
 
 #ifdef US_PLATFORM_WINDOWS
+
+#include "cppmicroservices/util/Error.h"
 
 #include <windows.h>
 
@@ -39,7 +40,7 @@
 const char* dlerror(void)
 {
   static std::string errStr;
-  errStr = cppmicroservices::GetLastErrorStr();
+  errStr = cppmicroservices::util::GetLastWin32ErrorStr();
   return errStr.c_str();
 }
 
@@ -71,9 +72,6 @@ void* dlsym(void *handle, const char *symbol)
 
 #endif
 
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
 
 namespace cppmicroservices {
 
@@ -90,43 +88,6 @@ namespace BundleUtils
 void* GetExecutableHandle()
 {
   return dlopen(0, RTLD_LAZY);;
-}
-
-std::string GetExecutablePath()
-{
-  uint32_t bufsize = MAXPATHLEN;
-  std::unique_ptr<char[]> buf(new char[bufsize]);
-
-#ifdef US_PLATFORM_WINDOWS
-  if (GetModuleFileName(nullptr, buf.get(), bufsize) == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-  {
-    DIAG_LOG(*GetFrameworkLogSink()) << "GetModuleFileName failed" << GetLastErrorStr();
-    buf[0] = '\0';
-  }
-#elif defined(US_PLATFORM_APPLE)
-  int status = _NSGetExecutablePath(buf.get(), &bufsize);
-  if (status == -1)
-  {
-    buf.reset(new char[bufsize]);
-    status = _NSGetExecutablePath(buf.get(), &bufsize);
-  }
-  if (status != 0)
-  {
-     DIAG_LOG(*GetFrameworkLogSink()) << "_NSGetExecutablePath() failed";
-  }
-  // the returned path may not be an absolute path
-#elif defined(US_PLATFORM_LINUX)
-  ssize_t len = ::readlink("/proc/self/exe", buf.get(), bufsize);
-  if (len == -1 || len == bufsize)
-  {
-    len = 0;
-  }
-  buf[len] = '\0';
-#else
-  // 'dlsym' does not work with symbol name 'main'
-  DIAG_LOG(*GetFrameworkLogSink()) << "GetExecutablePath failed";
-#endif
-  return buf.get();
 }
 
 void* GetSymbol(void* libHandle, const char* symbol)

@@ -20,23 +20,42 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEUTILS_H
-#define CPPMICROSERVICES_BUNDLEUTILS_H
+
+#ifndef CPPMICROSERVICES_UTIL_FILESYSTEM_H
+#define CPPMICROSERVICES_UTIL_FILESYSTEM_H
 
 #include <string>
-#include <utility>
 
 namespace cppmicroservices {
 
-namespace BundleUtils
-{
-  // returns the handle to the current executable
-  void* GetExecutableHandle();
+namespace util {
 
-  // returns the address of the symbol in library libHandle
-  void* GetSymbol(void* libHandle, const char* symbol);
-}
+const char DIR_SEP_WIN32 = '\\';
+const char DIR_SEP_POSIX = '/';
 
+extern const char DIR_SEP;
+
+// Get the path of the calling executable.
+// Throws std::runtime_error if the path cannot be
+// determined.
+std::string GetExecutablePath();
+
+// Platform agnostic way to get the current working directory.
+// Supports Linux, Mac, and Windows.
+std::string GetCurrentWorkingDirectory();
+bool Exists(const std::string& path);
+
+bool IsDirectory(const std::string& path);
+bool IsFile(const std::string& path);
+bool IsRelative(const std::string& path);
+
+std::string GetAbsolute(const std::string& path, const std::string& base);
+
+void MakePath(const std::string& path);
+
+void RemoveDirectoryRecursive(const std::string& path);
+
+} // namespace util
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_BUNDLEUTILS_H
+#endif // CPPMICROSERVICES_UTIL_FILESYSTEM_H

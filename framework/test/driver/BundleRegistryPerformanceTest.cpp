@@ -24,6 +24,7 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include "TestingConfig.h"
 #include "TestingMacros.h"
@@ -48,12 +49,7 @@ namespace
     // without having the extra machinery of error handling in the way.
     inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx, const std::string& bundleName)
     {
-#if defined (US_BUILD_SHARED_LIBS)
-        frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + bundleName + US_LIB_EXT);
-#else
-        US_UNUSED(bundleName);
-        frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT);
-#endif
+        frameworkCtx.InstallBundles(testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + bundleName + US_LIB_EXT);
     }
 
     void TestSerial(const Framework& f)
@@ -63,7 +59,7 @@ namespace
         // used.
         auto bc = f.GetBundleContext();
 
-        HighPrecisionTimer timer;
+        testing::HighPrecisionTimer timer;
         timer.Start();
         InstallTestBundleNoErrorHandling(bc, "TestBundleA");
         InstallTestBundleNoErrorHandling(bc, "TestBundleA2");

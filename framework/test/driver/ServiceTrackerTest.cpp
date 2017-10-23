@@ -156,6 +156,7 @@ void TestServiceTracker(BundleContext context)
   US_TEST_CONDITION_REQUIRED(sa2.size() == 1, "Checking ServiceTracker size");
   US_TEST_CONDITION_REQUIRED(s1 + "0" == sa2[0].GetInterfaceId(), "Checking service implementation name");
 
+#ifdef US_ENABLE_THREADING_SUPPORT
   // 4. Test notifications via closing the tracker
   {
     ServiceTracker<void> st2(context, "dummy");
@@ -177,6 +178,7 @@ void TestServiceTracker(BundleContext context)
     US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == US_FUTURE_READY, "Closed service tracker notifies waiters");
     US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == US_FUTURE_READY, "Closed service tracker notifies waiters");
   }
+#endif
 
   // 5. Close this service tracker
   st1->Close();

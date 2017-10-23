@@ -20,23 +20,43 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEUTILS_H
-#define CPPMICROSERVICES_BUNDLEUTILS_H
+
+#ifndef CPPMICROSERVICES_UTIL_STRING_H
+#define CPPMICROSERVICES_UTIL_STRING_H
 
 #include <string>
-#include <utility>
+
+#if defined(__ANDROID__)
+  #include <sstream>
+#endif
 
 namespace cppmicroservices {
 
-namespace BundleUtils
-{
-  // returns the handle to the current executable
-  void* GetExecutableHandle();
+namespace util {
 
-  // returns the address of the symbol in library libHandle
-  void* GetSymbol(void* libHandle, const char* symbol);
+//-------------------------------------------------------------------
+// Android Compatibility functions
+//-------------------------------------------------------------------
+
+/**
+ * Compatibility functions to replace "std::to_string(...)" functions
+ * on Android, since the latest Android NDKs lack "std::to_string(...)"
+ * support.
+ */
+
+template <typename T>
+std::string ToString(T val)
+{
+#if defined(__ANDROID__)
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
 }
 
+} // namespace util
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_BUNDLEUTILS_H
+#endif // CPPMICROSERVICES_UTIL_STRING_H

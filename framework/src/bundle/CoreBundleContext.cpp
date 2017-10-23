@@ -30,11 +30,13 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/String.h"
+
 #include "BundleStorageMemory.h"
 #include "BundleThread.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
-#include "Utils.h"
 
 #include <iomanip>
 
@@ -61,7 +63,7 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   {
     configuration.insert(std::make_pair(
                            Constants::FRAMEWORK_WORKING_DIR,
-                           fs::GetCurrentWorkingDirectory()
+                           util::GetCurrentWorkingDirectory()
                            )
                          );
   }
@@ -149,11 +151,27 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
-  auto const execPath = BundleUtils::GetExecutablePath();
-  if (bundleRegistry.GetBundles(execPath).empty() &&
-      IsBundleFile(execPath))
+  std::string execPath;
+  try
   {
-  // auto-install all embedded bundles inside the executable
+    execPath = util::GetExecutablePath();
+  }
+  catch (const std::exception& e)
+  {
+    DIAG_LOG(*sink) << e.what();
+    // Let the exception propagate all the way up to the
+    // call site of Framework::Init().
+    throw;
+  }
+
+  if (IsBundleFile(execPath) &&
+      bundleRegistry.GetBundles(execPath).empty()
+      )
+  {
+    // Auto-install all embedded bundles inside the executable.
+    // Same here: If an embedded bundle cannot be installed,
+    // an exception is thrown and we will let it propagate all
+    // the way up to the call site of Framework::Init().
     bundleRegistry.Install(execPath, systemBundle.get());
   }
 
@@ -213,7 +231,7 @@ std::string CoreBundleContext::GetDataStorage(long id) const
 {
   if (!dataStorage.empty())
   {
-    return dataStorage + DIR_SEP + cppmicroservices::ToString(id);
+    return dataStorage + util::DIR_SEP + util::ToString(id);
   }
   return std::string();
 }

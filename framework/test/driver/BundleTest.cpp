@@ -30,6 +30,9 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceEvent.h"
 
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/String.h"
+
 #include "TestDriverActivator.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
@@ -199,20 +202,20 @@ void frame025a()
 
 
 // Start libA and check that it exists and that the storage paths are correct
-void frame020b()
+void frame020b(const std::string& tempPath)
 {
   buA = testing::InstallLib(bc, "TestBundleA");
   US_TEST_CONDITION_REQUIRED(buA, "Test for existing bundle TestBundleA");
 
   buA.Start();
 
-  US_TEST_CONDITION(bc.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
+  US_TEST_CONDITION(bc.GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == tempPath, "Test for valid base storage path");
 
   // launching properties should be accessible through any bundle
-  US_TEST_CONDITION(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == testing::GetTempDirectory(), "Test for valid base storage path");
+  US_TEST_CONDITION(buA.GetBundleContext().GetProperty(Constants::FRAMEWORK_STORAGE).ToString() == tempPath, "Test for valid base storage path");
 
   std::cout << "Framework Storage Base Directory: " << bc.GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetTempDirectory() + testing::DIR_SEP + "data" + testing::DIR_SEP + testing::ToString(buA.GetBundleId()) + testing::DIR_SEP;
+  const std::string baseStoragePath = tempPath + util::DIR_SEP + "data" + util::DIR_SEP + util::ToString(buA.GetBundleId()) + util::DIR_SEP;
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("") == baseStoragePath, "Test for valid data path");
   US_TEST_CONDITION(buA.GetBundleContext().GetDataFile("bla") == (baseStoragePath + "bla"), "Test for valid data file path");
 
@@ -294,7 +297,7 @@ void frame037a()
   US_TEST_CONDITION(!p1.Empty() && p1.ToString() == p2.ToString(), "Test for uuid accesible from framework and bundle")
 
   std::cout << buExec.GetBundleContext().GetDataFile("") << std::endl;
-  const std::string baseStoragePath = testing::GetCurrentWorkingDirectory();
+  const std::string baseStoragePath = util::GetCurrentWorkingDirectory();
 
   US_TEST_CONDITION(buExec.GetBundleContext().GetDataFile("").substr(0, baseStoragePath.size()) == baseStoragePath, "Test for valid data path")
   US_TEST_CONDITION(buExec.GetBundleContext().GetDataFile("bla").substr(0, baseStoragePath.size()) == baseStoragePath, "Test for valid data file path")
@@ -593,7 +596,7 @@ void TestAutoInstallEmbeddedBundles()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
 
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH + testing::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT));
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH + util::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT));
 
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).
@@ -629,7 +632,7 @@ void TestNonStandardBundleExtension()
   auto frameworkCtx = f.GetBundleContext();
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH + testing::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
   // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
   US_TEST_CONDITION(3 == frameworkCtx.GetBundles().size(), "Test # of installed bundles")
 #else
@@ -689,14 +692,15 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
 
   // test a non-default framework instance using a different persistent storage location.
   {
+    testing::TempDir frameworkStorage = testing::MakeUniqueTempDirectory();
     FrameworkConfiguration frameworkConfig;
-    frameworkConfig[Constants::FRAMEWORK_STORAGE] = testing::GetTempDirectory();
+    frameworkConfig[Constants::FRAMEWORK_STORAGE] = static_cast<std::string>(frameworkStorage);
     auto framework = FrameworkFactory().NewFramework(frameworkConfig);
     framework.Start();
 
     FrameworkTestSuite ts(framework.GetBundleContext());
     ts.setup();
-    ts.frame020b();
+    ts.frame020b(frameworkStorage);
     ts.cleanup();
   }
 

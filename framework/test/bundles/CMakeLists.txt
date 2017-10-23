@@ -4,7 +4,8 @@
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../driver
-  ../../../third_party
+  ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party
   )
 
 include(usFunctionCreateTestBundle)

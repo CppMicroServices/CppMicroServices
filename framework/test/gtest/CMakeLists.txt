@@ -12,9 +12,10 @@ include_directories(
 #-----------------------------------------------------------------------------
 # Add test source files
 #-----------------------------------------------------------------------------
-
-set(_gtest_tests
+set(_gtest_tests 
+  AnyMapTest.cpp
   BundleVersionTest.cpp
+  LDAPExprTest.cpp
   LDAPFilterTest.cpp
   UtilsTest.cpp
 )

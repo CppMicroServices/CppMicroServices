@@ -2855,6 +2855,7 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
     #include <wchar.h>
     
     // return NULL if inStr is NULL or if the conversion failed
+    // The string returned is allocated using 'malloc' and hence should be de-allocated using 'free'.
     static wchar_t* utf8_to_wchar(const char* inStr)
     {
       wchar_t* wstr = NULL;

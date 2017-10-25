@@ -682,11 +682,11 @@ void TestUnicodePaths()
   }
   catch (const std::exception& ex)
   {
-    US_TEST_FAILED_MSG(ex.what())
+    US_TEST_FAILED_MSG(<< ex.what());
   }
   catch (...)
   {
-    US_TEST_FAILED_MSG("TestUnicodePaths failed with unknown exception")
+    US_TEST_FAILED_MSG(<< "TestUnicodePaths failed with unknown exception");
   }
 #endif
 }

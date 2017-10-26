@@ -26,6 +26,11 @@
 
 namespace cppmicroservices {
 
+LDAPPropExpr::LDAPPropExpr()
+    : m_ldapExpr()
+{
+}
+
 LDAPPropExpr::LDAPPropExpr(const std::string& expr)
   : m_ldapExpr(expr)
 {}
@@ -48,6 +53,26 @@ bool LDAPPropExpr::IsNull() const
   return m_ldapExpr.empty();
 }
 
+LDAPPropExpr& LDAPPropExpr::operator=(const LDAPPropExpr& expr)
+{
+  if(this != &expr)
+  {
+    m_ldapExpr = expr.m_ldapExpr;
+  }
+  return *this;
+}
+
+LDAPPropExpr& LDAPPropExpr::operator|=(const LDAPPropExpr& right)
+{
+  m_ldapExpr = (*this || right).m_ldapExpr;
+  return *this;
+}
+
+LDAPPropExpr& LDAPPropExpr::operator&=(const LDAPPropExpr& right)
+{
+  m_ldapExpr = (*this && right).m_ldapExpr;
+  return *this;
+}
 
 LDAPProp::LDAPProp(const std::string& property)
   : m_property(property)

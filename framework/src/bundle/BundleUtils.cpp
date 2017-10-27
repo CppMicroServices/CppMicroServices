@@ -32,7 +32,7 @@
 #ifdef US_PLATFORM_WINDOWS
 
 #include "cppmicroservices/util/Error.h"
-
+#include "cppmicroservices/util/String.h"
 #include <windows.h>
 
 #define RTLD_LAZY 0 // unused
@@ -47,7 +47,11 @@ const char* dlerror(void)
 void* dlopen(const char * path, int mode)
 {
   (void)mode; // ignored
-  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandle(nullptr) : LoadLibrary(path));
+  auto loadLibrary = [](const std::string& path) -> HANDLE {
+    std::wstring wpath(cppmicroservices::util::ToWString(path));
+    return LoadLibraryW(wpath.c_str());
+  };
+  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr) : loadLibrary(path));
 }
 
 void* dlsym(void *handle, const char *symbol)

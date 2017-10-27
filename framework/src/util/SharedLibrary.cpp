@@ -30,6 +30,7 @@
   #include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
   #include "cppmicroservices/util/Error.h"
+  #include "cppmicroservices/util/String.h"
   #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
   #endif
@@ -110,7 +111,8 @@ void SharedLibrary::Load(int flags)
   }
 #else
   US_UNUSED(flags);
-  d->m_Handle = LoadLibrary(libPath.c_str());
+  std::wstring wpath(cppmicroservices::util::ToWString(libPath));
+  d->m_Handle = LoadLibraryW(wpath.c_str());
   if (!d->m_Handle)
   {
     std::string errMsg = "Loading ";

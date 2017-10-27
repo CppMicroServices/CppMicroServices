@@ -5,6 +5,7 @@ add_library(util OBJECT
 
   src/Error.cpp
   src/FileSystem.cpp
+  src/String.cpp
 )
 
 set_property(TARGET util PROPERTY POSITION_INDEPENDENT_CODE 1)

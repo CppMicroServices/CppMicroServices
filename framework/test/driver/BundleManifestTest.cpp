@@ -1,4 +1,4 @@
-/*=============================================================================
+﻿/*=============================================================================
 
   Library: CppMicroServices
 
@@ -27,12 +27,32 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-
+#include "cppmicroservices/util/FileSystem.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 #include "TestUtils.h"
 
 using namespace cppmicroservices;
+
+void TestUnicodeProperty(BundleContext bc)
+{
+  // 1. building static libraries (test bundle is included in the executable) 
+  // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path) 
+  // 3. using a compiler with no support for C++11 unicode string literals
+#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS) 
+  US_TEST_OUTPUT(<< "Skipping test point for unicode path");
+  (void)bc; // avoid compier warning
+#else 
+  std::string path_utf8 = testing::LIB_PATH + cppmicroservices::util::DIR_SEP + u8"くいりのまちとこしくそ" + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+  auto bundles = bc.InstallBundles(path_utf8);
+  US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
+  auto bundle = bundles.at(0);
+  std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
+  std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
+  US_TEST_CONDITION(expectedValue == actualValue, "Check unicode data from manifest.json");
+  bundle.Stop();
+#endif
+}
 
 int BundleManifestTest(int /*argc*/, char* /*argv*/[])
 {
@@ -72,6 +92,8 @@ int BundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION_REQUIRED(any_cast<int>(m["number"]) == 4, "map 1 value")
   US_TEST_CONDITION_REQUIRED(m["list"].Type() == typeid(std::vector<Any>), "map 2 type")
   US_TEST_CONDITION_REQUIRED(any_cast<std::vector<Any> >(m["list"]).size() == 2, "map 2 value size")
+
+  TestUnicodeProperty(framework.GetBundleContext());
 
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds(0));

@@ -53,6 +53,7 @@ std::string library_suffix()
 
 }
 
+
 namespace cppmicroservices {
 
 //-------------------------------------------------------------------
@@ -118,7 +119,7 @@ std::string GetFrameworkDir(CoreBundleContext* ctx)
 std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create)
 {
   // See if we have a storage directory
-  const std::string fwdir = GetFrameworkDir(ctx);
+  const std::string fwdir(GetFrameworkDir(ctx));
   if (fwdir.empty())
   {
     return fwdir;

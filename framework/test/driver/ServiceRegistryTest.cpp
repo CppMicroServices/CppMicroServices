@@ -80,6 +80,14 @@ void TestMultipleServiceRegistrations(BundleContext context)
   US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
 }
 
+void TestUnregisterFix(BundleContext context)
+{
+  ServiceRegistration<int> registration = context.RegisterService<int>(std::make_shared<int>());
+  ServiceReference<int> reference = context.GetServiceReference<int>();
+  registration.Unregister();
+  US_TEST_CONDITION_REQUIRED(!reference.IsConvertibleTo("IBooService"), "Testing for IsConvertibleTo returning false");
+}
+
 void TestServicePropertiesUpdate(BundleContext context)
 {
   struct TestServiceA : public ITestServiceA
@@ -148,6 +156,7 @@ int ServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   TestServiceInterfaceId();
   TestMultipleServiceRegistrations(context);
   TestServicePropertiesUpdate(context);
+  TestUnregisterFix(context);
 
   US_TEST_END()
 }

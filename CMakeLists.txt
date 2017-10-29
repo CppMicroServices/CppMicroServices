@@ -34,6 +34,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 set(CMAKE_CXX_STANDARD 11)
 
+# Since version 3.1, CMake pulls in implicit link libraries when compiling
+# source files in C mode. Because we mix C and C++ code in the test driver
+# executable, we end up with a gcc_eh link dependency when using MinGW
+# which breaks exception handling in the executable. See also:
+#
+# https://stackoverflow.com/questions/46688200/mixing-c-and-c-causing-exceptions-to-terminate
+#
+set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
+
 # We make use of the following C++11 language and library features:
 #
 # Language feature                 GCC   Clang   Xcode   VisualStudio

@@ -1,0 +1,11 @@
+diff --git a/third_party/googletest/CMakeLists.txt b/third_party/googletest/CMakeLists.txt
+index 8d2b552e..0dd97a0f 100644
+--- a/third_party/googletest/CMakeLists.txt
++++ b/third_party/googletest/CMakeLists.txt
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 2.6.2)
+ 
++cmake_policy(SET CMP0048 NEW)
+ project( googletest-distribution )
+ 
+ enable_testing()

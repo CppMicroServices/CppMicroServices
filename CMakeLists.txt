@@ -34,6 +34,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 set(CMAKE_CXX_STANDARD 11)
 
+# Since version 3.1, CMake pulls in implicit link libraries when compiling
+# source files in C mode. Because we mix C and C++ code in the test driver
+# executable, we end up with a gcc_eh link dependency when using MinGW
+# which breaks exception handling in the executable. See also:
+#
+# https://stackoverflow.com/questions/46688200/mixing-c-and-c-causing-exceptions-to-terminate
+#
+set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
+
 # We make use of the following C++11 language and library features:
 #
 # Language feature                 GCC   Clang   Xcode   VisualStudio
@@ -82,7 +91,7 @@ set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  8.0   )
 set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.00 )
 
 set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION}")
-set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION_PRODUCT      "Clang ${US_COMPILER_CLANG_MINIMUM_RECOMMENDED_VERSION}")
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION_PRODUCT      "Clang ${US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION}")
 set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION_PRODUCT "Xcode 8.0 (Clang ${US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION})")
 set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION_PRODUCT       "Visual Studio 2015 (MSVC ${US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION})")
 
@@ -473,14 +482,19 @@ CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 
 set(disabled_func )
 
-CHECK_CXX_SOURCE_COMPILES(
-"
-#include <string>
-static thread_local std::string dummy;
-int main() {
-return 0;
-}
-" US_HAVE_THREAD_LOCAL)
+file(GLOB try_compile_srcs ${CMAKE_CURRENT_SOURCE_DIR}/cmake/try_compile/*.cpp)
+foreach(try_compile_src ${try_compile_srcs})
+  get_filename_component(try_compile_var ${try_compile_src} NAME_WE)
+  string(TOUPPER ${try_compile_var} try_compile_var)
+  try_compile(
+    ${try_compile_var}
+    ${CMAKE_CURRENT_BINARY_DIR}/try_compile/${try_compile_var}
+    SOURCES ${try_compile_src}
+    CMAKE_FLAGS -DCMAKE_CXX_EXTENSIONS:BOOL=OFF -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+    # The line below only works on CMake 3.8 and higher
+    # CXX_STANDARD ${CMAKE_CXX_STANDARD}
+  )
+endforeach()
 
 if(MINGW)
   #
@@ -510,16 +524,6 @@ endif()
 # conditional of wether the compiler's C++ library supports it
 # or not.
 # This can be removed once the minimum supported gcc version is 4.9
-CHECK_CXX_SOURCE_COMPILES(
-"
-#include <regex>
-int main() {
-auto regex_iter_end = std::sregex_iterator();
-(void)regex_iter_end;
-return 0;
-}
-" US_HAVE_REGEX)
-
 if(NOT US_HAVE_REGEX AND US_BUILD_TESTING)
   set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disabled.\n")
 endif()

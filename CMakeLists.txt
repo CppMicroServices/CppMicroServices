@@ -482,14 +482,17 @@ CHECK_INCLUDE_FILE_CXX(cxxabi.h US_HAVE_CXXABI_H)
 
 set(disabled_func )
 
-CHECK_CXX_SOURCE_COMPILES(
-"
-#include <string>
-static thread_local std::string dummy;
-int main() {
-return 0;
-}
-" US_HAVE_THREAD_LOCAL)
+file(GLOB try_compile_srcs ${CMAKE_CURRENT_SOURCE_DIR}/cmake/try_compile/*.cpp)
+foreach(try_compile_src ${try_compile_srcs})
+  get_filename_component(try_compile_var ${try_compile_src} NAME_WE)
+  string(TOUPPER ${try_compile_var} try_compile_var)
+  try_compile(
+    ${try_compile_var}
+    ${CMAKE_CURRENT_BINARY_DIR}/try_compile/${try_compile_var}
+    ${try_compile_src}
+    CXX_STANDARD ${CMAKE_CXX_STANDARD}
+  )
+endforeach()
 
 if(MINGW)
   #

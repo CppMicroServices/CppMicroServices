@@ -489,8 +489,10 @@ foreach(try_compile_src ${try_compile_srcs})
   try_compile(
     ${try_compile_var}
     ${CMAKE_CURRENT_BINARY_DIR}/try_compile/${try_compile_var}
-    ${try_compile_src}
-    CXX_STANDARD ${CMAKE_CXX_STANDARD}
+    SOURCES ${try_compile_src}
+    CMAKE_FLAGS -DCMAKE_CXX_EXTENSIONS:BOOL=OFF -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+    # The line below only works on CMake 3.8 and higher
+    # CXX_STANDARD ${CMAKE_CXX_STANDARD}
   )
 endforeach()
 
@@ -522,16 +524,6 @@ endif()
 # conditional of wether the compiler's C++ library supports it
 # or not.
 # This can be removed once the minimum supported gcc version is 4.9
-CHECK_CXX_SOURCE_COMPILES(
-"
-#include <regex>
-int main() {
-auto regex_iter_end = std::sregex_iterator();
-(void)regex_iter_end;
-return 0;
-}
-" US_HAVE_REGEX)
-
 if(NOT US_HAVE_REGEX AND US_BUILD_TESTING)
   set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disabled.\n")
 endif()

@@ -74,14 +74,14 @@ your build tree. The following are the absolute minimum requirements:
 Below is a list of tested compiler/OS combinations:
 
 - GCC 4.6.3 (Ubuntu 12.04) via Travis CI
-- GCC 6.2.1 (Fedora 25)
-- Clang 3.8.0 (Fedora 25)
+  GCC 4.8.4 (Ubuntu 14.04) via Travis CI
+- GCC 7.1.1 (Fedora 26)
+- Clang 4.0.0 (Fedora 26)
 - Clang Xcode 6.4 (OS X 10.10) via Travis CI
 - Clang Xcode 7.3 (OS X 10.11) via Travis CI
 - Clang Xcode 8.2 (OS X 10.12) via Travis CI
 - Visual Studio 2013 via Appveyor
 - Visual Studio 2015 via Appveyor
-- Visual Studio 2017 RC (Windows 7)
 - MinGW-w64 via Appveyor
 
 Legal

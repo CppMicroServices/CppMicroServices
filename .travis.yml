@@ -31,6 +31,13 @@ matrix:
           addons: *valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=3 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        # Run a build on Ubuntu 12.04 with gcc 4.6, using a shared multi-threaded configuration.
+        - os: linux
+          dist: precise
+          sudo: required
+          addons: *valgrind
+          compiler: gcc
+          env: BUILD_CONFIGURATION=0 BUILD_DIR="/tmp/cppmicroservices_builds_precise"
         # minimum supported compiler on OS X
         - os: osx
           osx_image: xcode6.4

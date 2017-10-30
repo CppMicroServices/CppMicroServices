@@ -6,25 +6,46 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased v3.2.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2017-XX-XX)
----------------------------------------------------------------------------------------------------------
+`v3.2.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.2.0>`_ (2017-10-30)
+-----------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.1.0...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.1.0...v3.2.0>`_
 
 Added
 -----
 
+- Code coverage metrics.
+  `#219 <https://github.com/CppMicroServices/CppMicroServices/pull/219>`_
+- GTest integration.
+  `#200 <https://github.com/CppMicroServices/CppMicroServices/issues/200>`_
+- Support boolean properties in LDAP filter creation.
+  `#224 <https://github.com/CppMicroServices/CppMicroServices/issues/224>`_
+- Unicode support.
+  `#245 <https://github.com/CppMicroServices/CppMicroServices/pull/245>`_
+
 Changed
 -------
 
-Removed
--------
-
-Deprecated
-----------
+- Re-enable single-threaded build configuration.
+  `#239 <https://github.com/CppMicroServices/CppMicroServices/pull/239>`_
 
 Fixed
 -----
+
+- Fix a race condition when getting and ungetting a service.
+  `#202 <https://github.com/CppMicroServices/CppMicroServices/issues/202>`_
+- Make reading the current working directory thread-safe.
+  `#209 <https://github.com/CppMicroServices/CppMicroServices/issues/209>`_
+- Guard against recursive service factory calls.
+  `#213 <https://github.com/CppMicroServices/CppMicroServices/issues/213>`_
+- Fix LDAP filter match logic to properly handle keys starting with the same sub-string.
+  `#227 <https://github.com/CppMicroServices/CppMicroServices/issues/227>`_
+- Fix seg fault when using a default constructed LDAPFilter instance.
+  `#232 <https://github.com/CppMicroServices/CppMicroServices/issues/232>`_
+- Several fixes with respect to error code handling.
+  `#238 <https://github.com/CppMicroServices/CppMicroServices/pull/238>`_
+- IsConvertibleTo method doesn't check for validity of member.
+  `#240 <https://github.com/CppMicroServices/CppMicroServices/issues/240>`_
 
 `v3.1.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.1.0>`_ (2017-06-01)
 -----------------------------------------------------------------------------------------

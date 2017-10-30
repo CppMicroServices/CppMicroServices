@@ -326,6 +326,9 @@ if(US_BUILD_TESTING)
 
     set(GTEST_BOTH_LIBRARIES gtest gtest_main)
 
+    # Prevent GTest from installing libraries into our install dir.
+    set(GTEST_NO_INSTALL 1)
+
     # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
     # static library even if CppMicroServices is a shared library.
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)

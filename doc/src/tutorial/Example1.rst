@@ -13,7 +13,7 @@ to help us understand the basics of creating a bundle and its activator.
 A bundle gains access to the C++ Micro Services API using a unique
 instance of :any:`cppmicroservices::BundleContext`.
 In order for a bundle to get its unique bundle context, it must call
-:any:`GetBundleContxt() <cppmicroservices::GetBundleContext>` or
+:any:`GetBundleContext() <cppmicroservices::GetBundleContext>` or
 implement the :any:`cppmicroservices::BundleActivator` interface.
 This interface has two methods, ``Start()`` and ``Stop()``, that both
 receive the bundle's context and are called when the bundle is started
@@ -42,7 +42,7 @@ called ``manifest.json`` that contains the following:
 .. literalinclude:: eventlistener/resources/manifest.json
    :language: json
 
-Now we need to compile the source code. This example uses CMake as the
+Next, we need to compile the source code. This example uses CMake as the
 build system and the top-level CMakeLists.txt file could look like this:
 
 .. literalinclude:: ../CMakeLists.txt

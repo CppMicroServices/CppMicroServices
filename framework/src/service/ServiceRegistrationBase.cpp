@@ -237,7 +237,7 @@ void ServiceRegistrationBase::Unregister()
       }
     }
 
-    // unget module scope services
+    // unget bundle scope services
     for (auto const& i : bundleServiceInstance)
     {
       try

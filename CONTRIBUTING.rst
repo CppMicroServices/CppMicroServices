@@ -143,4 +143,4 @@ Use your real name (sorry, no pseudonyms or anonymous contributions).
 If you set your ``user.name`` and ``user.email`` git configs, you can
 sign your commit automatically with ``git commit -s``.
 
-.. include:: CODEOFCONDUCT.rst
+.. include:: CODE_OF_CONDUCT.rst

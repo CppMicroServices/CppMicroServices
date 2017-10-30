@@ -2850,17 +2850,53 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h, 
   #include <sys/stat.h>
 
   #if defined(_MSC_VER) || defined(__MINGW64__)
+    #include <Windows.h>
+    #include <stringapiset.h>
+    #include <wchar.h>
+    
+    // return NULL if inStr is NULL or if the conversion failed
+    // The string returned is allocated using 'malloc' and hence should be de-allocated using 'free'.
+    static wchar_t* utf8_to_wchar(const char* inStr)
+    {
+      wchar_t* wstr = NULL;
+      if (inStr)
+      {
+        int wchars_count = MultiByteToWideChar(CP_UTF8, 0, inStr, -1, NULL, 0);
+        if (wchars_count > 0)
+        {
+          wstr = MZ_MALLOC(sizeof(wchar_t)*(wchars_count));
+        }
+        if ((wstr != NULL) && (MultiByteToWideChar(CP_UTF8, 0, inStr, -1, wstr, wchars_count) == 0))
+        {
+          MZ_FREE(wstr);
+          wstr = NULL;
+        }
+      }
+      return wstr;
+    }
+
     static FILE *mz_fopen(const char *pFilename, const char *pMode)
     {
       FILE* pFile = NULL;
-      fopen_s(&pFile, pFilename, pMode);
+      wchar_t* pFilenameW = utf8_to_wchar(pFilename);
+      wchar_t* pModeW = utf8_to_wchar(pMode);
+     (void)_wfopen_s(&pFile, pFilenameW, pModeW);
+      MZ_FREE(pFilenameW);
+      MZ_FREE(pModeW);
       return pFile;
     }
+    
     static FILE *mz_freopen(const char *pPath, const char *pMode, FILE *pStream)
     {
       FILE* pFile = NULL;
-      if (freopen_s(&pFile, pPath, pMode, pStream))
-        return NULL;
+      wchar_t* pFilenameW = utf8_to_wchar(pPath);
+      wchar_t* pModeW = utf8_to_wchar(pMode);
+      if (_wfreopen_s(&pFile, pFilenameW, pModeW, pStream))
+      {
+        pFile = NULL;
+      }
+      MZ_FREE(pFilenameW);
+      MZ_FREE(pModeW);
       return pFile;
     }
     #ifndef MINIZ_NO_TIME

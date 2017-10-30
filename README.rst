@@ -1,22 +1,23 @@
 
 .. rubric:: Continuous Integration Status
 
-+-------------+-------------------------+--------------------------+
-| Branch      | GCC 4.6                 | Visual Studio 2013       |
-|             +-------------------------+--------------------------+
-|             | Xcode 6.4               | Visual Studio 2015       |
-|             +-------------------------+--------------------------+
-|             | Xcode 7.3               | MinGW-w64                |
-|             +-------------------------+--------------------------+
-|             | Xcode 8.2               |                          |
-+=============+=========================+==========================+
-| master      | |Linux Build Status|    | |Windows Build status|   |
-+-------------+-------------------------+--------------------------+
-| development | |Linux Build Status     | |Windows Build status    |
-|             | (development)|          | (development)|           |
-+-------------+-------------------------+--------------------------+
++-------------+-------------------------+--------------------------+------------------------+
+| Branch      | GCC 4.6                 | Visual Studio 2013       |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             | Xcode 6.4               | Visual Studio 2015       |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             | Xcode 7.3               | MinGW-w64                |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             | Xcode 8.2               |                          |                        |
++=============+=========================+==========================+========================+
+| master      | |Linux Build Status|    | |Windows Build status|   | |Code Coverage Status| |
++-------------+-------------------------+--------------------------+------------------------+
+| development | |Linux Build Status     | |Windows Build status    | |Code Coverage Status  |
+|             | (development)|          | (development)|           | (development)|         |
++-------------+-------------------------+--------------------------+------------------------+
 
 |Coverity Scan Build Status|
+
 
 C++ Micro Services
 ==================
@@ -33,7 +34,7 @@ modular and dynamic service-oriented applications. It is based on
 `OSGi <http://osgi.org>`_, but tailored to support native cross-platform solutions.
 
 Proper usage of C++ Micro Services patterns and concepts leads to systems
-with one or more of the following properties: 
+with one or more of the following properties:
 
 - Re-use of software components
 - Loose coupling between service providers and consumers
@@ -54,7 +55,16 @@ Supported Platforms
 The library makes use of some C++11 features and compiles on many
 different platforms.
 
-Minimum required compiler versions:
+Recommended minimum required compiler versions:
+
+- GCC 4.8
+- Clang 3.3
+- Clang from Xcode 8.0
+- Visual Studio 2015
+
+You may use older compilers, but certain functionality may not be
+available. Check the warnings printed during configuration of
+your build tree. The following are the absolute minimum requirements:
 
 - GCC 4.6
 - Clang 3.1
@@ -64,14 +74,14 @@ Minimum required compiler versions:
 Below is a list of tested compiler/OS combinations:
 
 - GCC 4.6.3 (Ubuntu 12.04) via Travis CI
-- GCC 6.2.1 (Fedora 25)
-- Clang 3.8.0 (Fedora 25)
+  GCC 4.8.4 (Ubuntu 14.04) via Travis CI
+- GCC 7.1.1 (Fedora 26)
+- Clang 4.0.0 (Fedora 26)
 - Clang Xcode 6.4 (OS X 10.10) via Travis CI
 - Clang Xcode 7.3 (OS X 10.11) via Travis CI
 - Clang Xcode 8.2 (OS X 10.12) via Travis CI
 - Visual Studio 2013 via Appveyor
 - Visual Studio 2015 via Appveyor
-- Visual Studio 2017 RC (Windows 7)
 - MinGW-w64 via Appveyor
 
 Legal
@@ -107,7 +117,7 @@ Quick Start
 
 Essentially, the C++ Micro Services library provides you with a powerful
 dynamic service registry on top of a managed lifecycle. The framework manages,
-among other things, logical units of modularity called *bundles* that 
+among other things, logical units of modularity called *bundles* that
 are contained in shared or static libraries. Each bundle
 within a library has an associated :any:`cppmicroservices::BundleContext`
 object, through which the service registry is accessed.
@@ -188,3 +198,7 @@ file for details about the contribution process.
 .. |RTD Build Status (development)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=latest&style=flat-square
    :target: http://docs.cppmicroservices.org/en/latest/?badge=development
    :alt: Documentation Status (development)
+.. |Code Coverage Status| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/master.svg?style=flat-square
+   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
+.. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
+   :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development

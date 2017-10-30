@@ -105,12 +105,12 @@ bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 
 std::string LDAPFilter::ToString() const
 {
-  return d->ldapExpr.ToString();
+  return ((d) ? d->ldapExpr.ToString() : std::string());
 }
 
 bool LDAPFilter::operator==(const LDAPFilter& other) const
 {
-  return d->ldapExpr.ToString() == other.d->ldapExpr.ToString();
+  return (this->ToString() == other.ToString());
 }
 
 LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)

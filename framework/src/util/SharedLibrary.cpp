@@ -24,11 +24,13 @@
 
 #include "cppmicroservices/BundleActivator.h"
 
-#include "Utils.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #if defined(US_PLATFORM_POSIX)
   #include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
+  #include "cppmicroservices/util/Error.h"
+  #include "cppmicroservices/util/String.h"
   #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
   #endif
@@ -109,11 +111,12 @@ void SharedLibrary::Load(int flags)
   }
 #else
   US_UNUSED(flags);
-  d->m_Handle = LoadLibrary(libPath.c_str());
+  std::wstring wpath(cppmicroservices::util::ToWString(libPath));
+  d->m_Handle = LoadLibraryW(wpath.c_str());
   if (!d->m_Handle)
   {
     std::string errMsg = "Loading ";
-    errMsg.append(libPath).append("failed with error: ").append(GetLastErrorStr());
+    errMsg.append(libPath).append("failed with error: ").append(util::GetLastWin32ErrorStr());
 
     throw std::runtime_error(errMsg);
   }
@@ -143,7 +146,7 @@ void SharedLibrary::Unload()
     if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle)))
     {
       std::string errMsg = "Unloading ";
-      errMsg.append(GetLibraryPath()).append("failed with error: ").append(GetLastErrorStr());
+      errMsg.append(GetLibraryPath()).append("failed with error: ").append(util::GetLastWin32ErrorStr());
 
       throw std::runtime_error(errMsg);
     }
@@ -167,7 +170,7 @@ std::string SharedLibrary::GetName() const
 std::string SharedLibrary::GetFilePath(const std::string& name) const
 {
   if (!d->m_FilePath.empty()) return d->m_FilePath;
-  return GetLibraryPath() + DIR_SEP + GetPrefix() + name + GetSuffix();
+  return GetLibraryPath() + util::DIR_SEP + GetPrefix() + name + GetSuffix();
 }
 
 void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
@@ -178,7 +181,7 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
   d->m_FilePath = absoluteFilePath;
 
   std::string name = d->m_FilePath;
-  std::size_t pos = d->m_FilePath.find_last_of(DIR_SEP);
+  std::size_t pos = d->m_FilePath.find_last_of(util::DIR_SEP);
   if (pos != std::string::npos)
   {
     d->m_Path = d->m_FilePath.substr(0, pos);

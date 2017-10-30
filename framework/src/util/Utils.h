@@ -24,52 +24,12 @@
 #ifndef CPPMICROSERVICES_UTILS_H
 #define CPPMICROSERVICES_UTILS_H
 
-#include "cppmicroservices/FrameworkConfig.h"
+#include "cppmicroservices/FrameworkExport.h"
 
-#include <exception>
-#include <memory>
 #include <string>
-#include <vector>
 
-#if defined(__ANDROID__)
-  #include <sstream>
-#endif
-
-//-------------------------------------------------------------------
-// File system functions
-//-------------------------------------------------------------------
 
 namespace cppmicroservices {
-
-const char DIR_SEP_WIN32 = '\\';
-const char DIR_SEP_POSIX = '/';
-
-#ifdef US_PLATFORM_WINDOWS
-const char DIR_SEP = DIR_SEP_WIN32;
-#else
-const char DIR_SEP = DIR_SEP_POSIX;
-#endif
-
-namespace fs {
-
-// Platform agnostic way to get the current working directory.
-// Supports Linux, Mac, and Windows.
-std::string GetCurrentWorkingDirectory();
-bool not_found_error(int errval);
-bool Exists(const std::string& path);
-
-bool IsDirectory(const std::string& path);
-bool IsFile(const std::string& path);
-bool IsRelative(const std::string& path);
-
-std::string GetAbsolute(const std::string& path);
-
-void MakePath(const std::string& path);
-
-US_Framework_EXPORT void RemoveDirectoryRecursive(const std::string& path);
-
-} // namespace fs
-
 
 //-------------------------------------------------------------------
 // File type checking
@@ -100,52 +60,10 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
 // Generic utility functions
 //-------------------------------------------------------------------
 
-// A convenient way to construct a shared_ptr holding an array
-template<typename T> std::shared_ptr<T> make_shared_array(std::size_t size)
-{
-  return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
-}
-
-// Platform agnostic way to get the current working directory.
-// Supports Linux, Mac, and Windows.
-std::string GetCurrentWorkingDirectory();
-
 void TerminateForDebug(const std::exception_ptr ex);
 
 namespace detail {
 US_Framework_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
-}
-
-//-------------------------------------------------------------------
-// Error handling
-//-------------------------------------------------------------------
-
-int GetLastErrorNo();
-std::string GetLastErrorStr();
-
-std::string GetExceptionStr(const std::exception_ptr& exc);
-std::string GetLastExceptionStr();
-
-//-------------------------------------------------------------------
-// Android Compatibility functions
-//-------------------------------------------------------------------
-
-/**
- * Compatibility functions to replace "std::to_string(...)" functions
- * on Android, since the latest Android NDKs lack "std::to_string(...)"
- * support.
- */
-
-template <typename T>
-std::string ToString(T val)
-{
-#if defined(__ANDROID__)
-  std::ostringstream os;
-  os << val;
-  return os.str();
-#else
-  return std::to_string(val);
-#endif
 }
 
 

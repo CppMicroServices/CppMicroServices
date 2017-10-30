@@ -1009,8 +1009,9 @@ public:
    *
    * @param filename A relative name to the file or directory to be accessed.
    * @return The absolute path to the persistent storage area for the given file name.
-   * @throws std::runtime_error If this BundleContext is no
-   *         longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
+   * @throws std::invalid_argument If the input param filename is not a valid 
+   *         UTF-8 string.
    */
   std::string GetDataFile(const std::string& filename) const;
 
@@ -1033,6 +1034,7 @@ public:
    * @return The Bundle objects of the installed bundle library.
    * @throws std::runtime_error If the BundleContext is no longer valid, or if the installation failed.
    * @throws std::logic_error If the framework instance is no longer active
+   * @throws std::invalid_argument If the location is not a valid UTF8 string
    */
   std::vector<Bundle> InstallBundles(const std::string& location);
 

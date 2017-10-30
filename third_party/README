@@ -17,6 +17,11 @@ See file for license information.
 http://softagalleria.net/dirent.php
 1.20.1
 
+Patches
+
+ * Set errno to ENAMETOOLONG if opendir() is called with a path argument
+   longer than MAX_PATH.
+
 jsoncpp
 -------
 
@@ -115,3 +120,16 @@ https://github.com/kainjow/Mustache/releases
 Patches
 
  * Support GCC 4.6
+
+
+Google Test and Google Mock
+----------------------------
+
+See https://github.com/google/googletest/blob/master/googletest/LICENSE for license information.
+
+https://github.com/google/googletest/releases
+1.8.0
+
+Patches
+
+ * Suppress CMake warning about policy CMP0048

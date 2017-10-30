@@ -154,21 +154,19 @@ function(usFunctionEmbedResources)
 
   if(US_RESOURCE_LINK)
     if(APPLE)
-      # Issue #151: Since we explicitly compile CMakeResourceDependencies.cpp, we cache the OSX specific compiler flags
-      set(US_OSX_CXX_FLAGS )
-      if(CMAKE_OSX_SYSROOT)
-        list(APPEND US_OSX_CXX_FLAGS -isysroot ${CMAKE_OSX_SYSROOT})
-      endif()
-      if(CMAKE_OSX_ARCHITECTURES)
-        list(APPEND US_OSX_CXX_FLAGS -arch ${CMAKE_OSX_ARCHITECTURES})
-      endif()
-      if(CMAKE_OSX_DEPLOYMENT_TARGET)
-        list(APPEND US_OSX_CXX_FLAGS -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET})
-      endif()
+      # This resolves an issue where passing in CMAKE_CXX_FLAGS using
+      # -D CMAKE_CXX_FLAGS:STRING="..." results in a quoted string being passed to
+      # the command below which results in the command being:
+      #  >> clang "..." -c ... -o stub.o
+      # when it should really be:
+      #  >> clang ... -c ... -o stub.o
+      # (pardon the elipsis for abbreviation)
+      separate_arguments(_us_resource_cxx_flags UNIX_COMMAND ${CMAKE_CXX_FLAGS})
+
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} ${US_OSX_CXX_FLAGS} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_CXX_COMPILER} ${_us_resource_cxx_flags} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
         COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}

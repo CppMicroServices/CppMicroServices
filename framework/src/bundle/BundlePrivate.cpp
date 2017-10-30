@@ -31,6 +31,10 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceRegistration.h"
 
+#include "cppmicroservices/util/String.h"
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/Error.h"
+
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundleResourceContainer.h"
@@ -39,7 +43,6 @@
 #include "CoreBundleContext.h"
 #include "Fragment.h"
 #include "ServiceReferenceBasePrivate.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <algorithm>
 #include <cassert>
@@ -61,7 +64,7 @@ void BundlePrivate::Stop(uint32_t options)
     auto l = coreCtx->resolver.Lock();
     if (IsFragment())
     {
-      throw std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + ", can not stop a fragment");
+      throw std::runtime_error("Bundle#" + util::ToString(id) + ", can not stop a fragment");
     }
 
     // 1:
@@ -135,7 +138,7 @@ std::exception_ptr BundlePrivate::Stop1()
     catch (...)
     {
       res = std::make_exception_ptr(
-            std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + ", BundleActivator::Stop() failed: " + GetLastExceptionStr()));
+            std::runtime_error("Bundle#" + util::ToString(id) + ", BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
     }
 
     // if stop was aborted (uninstall or timeout), make sure
@@ -229,7 +232,7 @@ void BundlePrivate::WaitOnOperation(WaitConditionType& wc, LockType& lock, const
       op = "update";
       break;
     }
-    throw std::runtime_error(src + " called during " + op + " of Bundle#" + cppmicroservices::ToString(id));
+    throw std::runtime_error(src + " called during " + op + " of Bundle#" + util::ToString(id));
   }
 }
 
@@ -366,8 +369,8 @@ void BundlePrivate::FinalizeActivation(LockType& l)
       // finalization already in progress.
       return;
     }
-    // Lazy activation; fall through to STATE_RESOLVED.
   }
+  // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
   case Bundle::STATE_RESOLVED:
   {
     // 6:
@@ -396,7 +399,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
     // This happens if call start from inside the BundleActivator.stop
     // method.
     // Don't allow it.
-    throw std::runtime_error("Bundle#" + cppmicroservices::ToString(id) +
+    throw std::runtime_error("Bundle#" + util::ToString(id) +
                              ", start called from BundleActivator::Stop");
   case Bundle::STATE_UNINSTALLED:
     throw std::logic_error("Bundle is in UNINSTALLED state");
@@ -439,8 +442,8 @@ void BundlePrivate::Uninstall()
           coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING, MakeBundle(shared_from_this()), std::string(), std::current_exception()));
         }
       }
-      // Fall through
     }
+    // INTENTIONALLY FALLS THROUGH
     case Bundle::STATE_RESOLVED:
     case Bundle::STATE_INSTALLED:
     {
@@ -488,7 +491,7 @@ void BundlePrivate::Uninstall()
       {
         try
         {
-          if (fs::Exists(bundleDir)) fs::RemoveDirectoryRecursive(bundleDir);
+          if (util::Exists(bundleDir)) util::RemoveDirectoryRecursive(bundleDir);
         }
         catch (...)
         {
@@ -625,7 +628,7 @@ std::exception_ptr BundlePrivate::Start0()
       CreateActivatorHook createActivatorHook = nullptr;
 
       void* libHandle = nullptr;
-      if ((lib.GetFilePath() == BundleUtils::GetExecutablePath()))
+      if ((lib.GetFilePath() == util::GetExecutablePath()))
       {
         libHandle = BundleUtils::GetExecutableHandle();
       }
@@ -675,7 +678,7 @@ std::exception_ptr BundlePrivate::Start0()
     }
     catch (...)
     {
-      res = std::make_exception_ptr(std::runtime_error("Bundle#" + cppmicroservices::ToString(id) + " start failed: " + GetLastExceptionStr()));
+      res = std::make_exception_ptr(std::runtime_error("Bundle#" + util::ToString(id) + " start failed: " + util::GetLastExceptionStr()));
     }
   }
 
@@ -720,7 +723,7 @@ std::exception_ptr BundlePrivate::Start0()
     }
     if (!cause.empty())
     {
-      res = std::make_exception_ptr("Bundle#" + cppmicroservices::ToString(id) + " start failed: " + cause);
+      res = std::make_exception_ptr("Bundle#" + util::ToString(id) + " start failed: " + cause);
     }
   }
 
@@ -756,6 +759,7 @@ void BundlePrivate::StartFailed()
 
 std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   auto l = coreCtx->bundleThreads.Lock(); US_UNUSED(l);
 
   // clean up old zombies
@@ -776,11 +780,23 @@ std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
   }
 
   return bundleThread;
+#else
+  if (coreCtx->bundleThreads.value.empty())
+  {
+    coreCtx->bundleThreads.value.push_back(std::make_shared<BundleThread>(coreCtx));
+  }
+  return coreCtx->bundleThreads.value.back();
+#endif
 }
 
 bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   return bundleThread != nullptr && *bundleThread == id;
+#else
+  US_UNUSED(id);
+  return true;
+#endif
 }
 
 void BundlePrivate::ResetBundleThread()
@@ -861,7 +877,7 @@ BundlePrivate::BundlePrivate(
       }
       catch (...)
       {
-        throw std::runtime_error(std::string("Parsing of manifest.json for bundle ") + symbolicName + " at " + location + " failed: " + GetLastExceptionStr());
+        throw std::runtime_error(std::string("Parsing of manifest.json for bundle ") + symbolicName + " at " + location + " failed: " + util::GetLastExceptionStr());
       }
     }
   }
@@ -881,7 +897,7 @@ BundlePrivate::BundlePrivate(
     }
     catch (...)
     {
-      errMsg = std::string("The version identifier is invalid: ") + GetLastExceptionStr();
+      errMsg = std::string("The version identifier is invalid: ") + util::GetLastExceptionStr();
     }
 
     if (!errMsg.empty())
@@ -905,7 +921,7 @@ BundlePrivate::BundlePrivate(
   auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
   if (!snbl.empty())
   {
-    throw std::invalid_argument("Bundle#" + cppmicroservices::ToString(id) +
+    throw std::invalid_argument("Bundle#" + util::ToString(id) +
                                 ", a bundle with same symbolic name and version " +
                                 "is already installed (" + symbolicName + ", " +
                                 version.ToString() + ")");

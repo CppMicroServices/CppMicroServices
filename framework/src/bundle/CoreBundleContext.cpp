@@ -30,11 +30,13 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/String.h"
+
 #include "BundleStorageMemory.h"
 #include "BundleThread.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <iomanip>
 
@@ -44,7 +46,7 @@ namespace cppmicroservices {
 
 std::atomic<int> CoreBundleContext::globalId{0};
 
-std::map<std::string, Any> InitProperties(std::map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
   configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
@@ -57,6 +59,15 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
   configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
+  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) == configuration.end())
+  {
+    configuration.insert(std::make_pair(
+                           Constants::FRAMEWORK_WORKING_DIR,
+                           util::GetCurrentWorkingDirectory()
+                           )
+                         );
+  }
+
   configuration.insert(std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
 
   configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
@@ -65,9 +76,10 @@ std::map<std::string, Any> InitProperties(std::map<std::string, Any> configurati
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger)
+CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>& props, std::ostream* logger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
+  , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -139,13 +151,30 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
-  auto const execPath = BundleUtils::GetExecutablePath();
-  if (bundleRegistry.GetBundles(execPath).empty() &&
-      IsBundleFile(execPath))
+  std::string execPath;
+  try
   {
-  // auto-install all embedded bundles inside the executable
+    execPath = util::GetExecutablePath();
+  }
+  catch (const std::exception& e)
+  {
+    DIAG_LOG(*sink) << e.what();
+    // Let the exception propagate all the way up to the
+    // call site of Framework::Init().
+    throw;
+  }
+
+  if (IsBundleFile(execPath) &&
+      bundleRegistry.GetBundles(execPath).empty()
+      )
+  {
+    // Auto-install all embedded bundles inside the executable.
+    // Same here: If an embedded bundle cannot be installed,
+    // an exception is thrown and we will let it propagate all
+    // the way up to the call site of Framework::Init().
     bundleRegistry.Install(execPath, systemBundle.get());
   }
+
 
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
   for (auto b : bundleRegistry.GetBundles())
@@ -203,7 +232,7 @@ std::string CoreBundleContext::GetDataStorage(long id) const
 {
   if (!dataStorage.empty())
   {
-    return dataStorage + DIR_SEP + cppmicroservices::ToString(id);
+    return dataStorage + util::DIR_SEP + util::ToString(id);
   }
   return std::string();
 }

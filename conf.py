@@ -128,7 +128,7 @@ exclude_patterns = [
     'doc/_build',
     'Thumbs.db',
     '.DS_Store',
-    'CODEOFCONDUCT.rst',
+    'CODE_OF_CONDUCT.rst',
     ]
 
 # The reST default role (used for this markup: `text`) to use for all

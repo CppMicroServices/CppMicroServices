@@ -53,7 +53,7 @@ const std::string FRAMEWORK_THREADING_SINGLE          = "single";
 const std::string FRAMEWORK_THREADING_MULTI           = "multi";
 const std::string FRAMEWORK_LOG                       = "org.cppmicroservices.framework.log";
 const std::string FRAMEWORK_UUID                      = "org.cppmicroservices.framework.uuid";
-
+const std::string FRAMEWORK_WORKING_DIR               = "org.cppmicroservices.framework.working.dir";
 const std::string OBJECTCLASS                         = "objectclass";
 const std::string SERVICE_ID                          = "service.id";
 const std::string SERVICE_PID                         = "service.pid";

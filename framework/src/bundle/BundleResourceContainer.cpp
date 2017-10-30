@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/BundleResource.h"
 
-#include "Utils.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include <cassert>
 #include <climits>
@@ -38,9 +38,9 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
 {
-  if (!fs::Exists(location))
+  if (!util::Exists(location))
   {
-    throw std::runtime_error("Location does not exist");
+    throw std::runtime_error(m_Location + " does not exist");
   }
 
   if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0))

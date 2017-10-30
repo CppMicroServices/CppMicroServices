@@ -24,6 +24,8 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/util/Error.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -31,7 +33,6 @@
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistry.h"
-#include "Utils.h"
 
 #include <memory>
 #include <stdio.h>
@@ -253,7 +254,7 @@ struct ServiceHolder
       // the BundlePrivate or CoreBundleContext objects.
       if (!b.expired())
       {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << GetLastExceptionStr();
+        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << util::GetLastExceptionStr();
       }
       // don't throw exceptions from the destructor. For an explanation, see:
       // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
@@ -299,9 +300,12 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
 
   // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
-  InterfaceMapConstPtr imap_copy = std::make_shared<const InterfaceMap>(
-        *(reference.d.load()->GetServiceInterfaceMap(b))
-        );
+  InterfaceMapConstPtr imap_copy;
+  auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b);
+  if (serviceInterfaceMap)
+  {
+    imap_copy = std::make_shared<const InterfaceMap>(*(serviceInterfaceMap));
+  }
   std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(b->shared_from_this(), reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
@@ -464,11 +468,11 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
   std::string dataRoot = b->bundleDir;
   if (!dataRoot.empty())
   {
-    if (!fs::Exists(dataRoot))
+    if (!util::Exists(dataRoot))
     {
-      fs::MakePath(dataRoot);
+      util::MakePath(dataRoot);
     }
-    return dataRoot + DIR_SEP + filename;
+    return dataRoot + util::DIR_SEP + filename;
   }
   return std::string();
 }

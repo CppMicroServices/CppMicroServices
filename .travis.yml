@@ -7,6 +7,10 @@ env:
     - PATH=$HOME/cache/bin/:$PATH
     - secure: "g2dT1rLVDXAR7uFkhgKlm7rUqCPHwl+o4CFSqEo5w9H/M5xuuQLP597J8qwhgkWutJABM4G4zLF9yzb5rTbUH1BSdGTzmdUkvJGvLOFq09xwLQP5PAKlq6s1dpVr7J9Ciy49cEVDD2leaikMf9zK3ty9Fv5F2mL3Itd6a/U5M5o="
 
+# We do not test all build configurations with all compiler / platform
+# combinations. For now, just the latest compilers being tested will
+# run all build configurations.
+
 matrix:
     include:
         - os: linux
@@ -14,33 +18,60 @@ matrix:
             apt:
               packages: valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=0
+          env: BUILD_CONFIGURATION=0 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: linux
           addons: *valgrind
           compiler: gcc
-          env: BUILD_CONFIGURATION=1
+          env: BUILD_CONFIGURATION=1 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: linux
+          addons: *valgrind
+          compiler: gcc
+          env: BUILD_CONFIGURATION=2 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: linux
+          addons: *valgrind
+          compiler: gcc
+          env: BUILD_CONFIGURATION=3 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        # Run a build on Ubuntu 12.04 with gcc 4.6, using a shared multi-threaded configuration.
+        - os: linux
+          dist: precise
+          sudo: required
+          addons: *valgrind
+          compiler: gcc
+          env: BUILD_CONFIGURATION=0 BUILD_DIR="/tmp/cppmicroservices_builds_precise"
         # minimum supported compiler on OS X
         - os: osx
           osx_image: xcode6.4
           compiler: clang
           env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.10
         - os: osx
-          osx_image: xcode7.3
+          osx_image: xcode6.4
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.11
-        - os: osx
-          osx_image: xcode7.3
-          compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.10
+        #- os: osx
+        #  osx_image: xcode6.4
+        #  compiler: clang
+        #  env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.10
+        #- os: osx
+        #  osx_image: xcode6.4
+        #  compiler: clang
+        #  env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.10
         # latest compiler on OS X
         - os: osx
           osx_image: xcode8.2
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: osx
           osx_image: xcode8.2
           compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: osx
+          osx_image: xcode8.2
+          compiler: clang
+          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+        - os: osx
+          osx_image: xcode8.2
+          compiler: clang
+          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
 
 cache:
   directories:
@@ -69,4 +100,7 @@ before_install:
 script:
   - test $TRAVIS_BRANCH != coverity_scan || exit 0
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
 

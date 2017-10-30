@@ -102,10 +102,12 @@ endif()
 ########################################################################
 #
 # Install rules
+if (NOT GTEST_NO_INSTALL)
 install(TARGETS gtest gtest_main
   DESTINATION lib)
 install(DIRECTORY ${gtest_SOURCE_DIR}/include/gtest
   DESTINATION include)
+endif()
 
 ########################################################################
 #

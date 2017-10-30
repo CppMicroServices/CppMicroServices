@@ -17,8 +17,9 @@ if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   # with -j for non-GNU compilers only.
 set(CTEST_BUILD_FLAGS "-j")
 endif()
-set(CTEST_BUILD_CONFIGURATION Release)
 
+set(CTEST_CONFIGURATION_TYPE Release)
+set(CTEST_BUILD_CONFIGURATION Release)
 
 set(US_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../")
 

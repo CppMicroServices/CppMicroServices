@@ -31,10 +31,7 @@ matrix:
           addons: *valgrind
           compiler: gcc
           env: BUILD_CONFIGURATION=3 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
-        # Run a build on Ubuntu 12.04 with gcc 4.6, using a shared multi-threaded
-        # configuration. This also *does not* enable code coverage, to test relase
-        # builds without debugging symbols and hence the CMAKE_DEBUG_POSTFIX not
-        # appendend to library names.
+        # Run a build on Ubuntu 12.04 with gcc 4.6, using a shared multi-threaded configuration.
         - os: linux
           dist: precise
           sudo: required

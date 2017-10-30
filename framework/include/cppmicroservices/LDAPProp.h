@@ -37,7 +37,7 @@ namespace cppmicroservices {
 class US_Framework_EXPORT LDAPPropExpr
 {
 public:
-
+  LDAPPropExpr();
   explicit LDAPPropExpr(const std::string& expr);
 
   LDAPPropExpr& operator!();
@@ -46,9 +46,55 @@ public:
 
   bool IsNull() const;
 
-private:
-
   LDAPPropExpr& operator=(const LDAPPropExpr&);
+
+  /**
+  * Convenience operator for LDAP logical or '|'.
+  *
+  * Writing either
+  * \code
+  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+  * expr = expr || LDAPProp("key2") == "value2";
+  * \endcode
+  * or
+  * \code
+  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+  * expr |= LDAPProp("key2") == "value2";
+  * \endcode
+  * leads to the same string "(|(key1=value1) (key2=value2))".
+  *
+  * @param right A LDAP expression object.
+  * @return A LDAP expression object.
+  *
+  * @{
+  */
+  LDAPPropExpr& operator|=(const LDAPPropExpr& right);
+  /// @}
+
+  /**
+  * Convenience operator for LDAP logical and '&'.
+  *
+  * Writing either
+  * \code
+  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+  * expr = expr && LDAPProp("key2") == "value2";
+  * \endcode
+  * or
+  * \code
+  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+  * expr &= LDAPProp("key2") == "value2";
+  * \endcode
+  * leads to the same string "(&(key1=value1) (key2=value2))".
+  *
+  * @param right A LDAP expression object.
+  * @return A LDAP expression object.
+  *
+  * @{
+  */
+  LDAPPropExpr& operator&=(const LDAPPropExpr& right);
+  /// @}
+
+private:
 
   std::string m_ldapExpr;
 };

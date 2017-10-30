@@ -20,11 +20,12 @@ limitations under the License.
 
 =============================================================================*/
 
-#include "cppmicroservices/LDAPFilter.h"
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/Framework.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/ServiceEvent.h"
 #include "cppmicroservices/ServiceTracker.h"
 
@@ -241,4 +242,51 @@ TEST(LDAPExprTest, ParseExceptions)
   EXPECT_THROW(LDAPFilter("(name=abra"), std::invalid_argument);
   // Testing '\\' case in LDAPExpr::ParseState::getAttributeValue()
   ASSERT_EQ(LDAPFilter("(name=ab\\a)"), LDAPFilter("(name=aba)"));
+}
+
+TEST(LDAPExprTest, BitWiseOperatorOr)
+{
+  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") || (LDAPProp("key2") == "value2"));
+
+  LDAPPropExpr expr(LDAPProp("key1") == "value1");
+
+  expr |= LDAPProp("key2") == "value2";
+  ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
+ 
+}
+
+TEST(LDAPExprTest, BitWiseOperatorAnd)
+{
+  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") && (LDAPProp("key2") == "value2"));
+
+  LDAPPropExpr expr(LDAPProp("key1") == "value1");
+
+  expr &= LDAPProp("key2") == "value2";
+
+  ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
+}
+
+TEST(LDAPExprTest, OperatorAssignment)
+{
+  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") || (LDAPProp("key2") == "value2"));
+  LDAPPropExpr expr(LDAPProp("key1") == "value1");
+
+  expr = expr || LDAPProp("key2") == "value2";
+  
+  ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
+}
+
+TEST(LDAPExprTest, AssignToDefaultConstructed)
+{
+  LDAPPropExpr checkedExpr((LDAPProp("key2") == "value2"));
+
+  LDAPPropExpr defaultConstructed;
+  ASSERT_TRUE(defaultConstructed.IsNull());
+
+  defaultConstructed |= LDAPProp("key2") == "value2";
+  ASSERT_EQ(defaultConstructed.operator std::string(), checkedExpr.operator std::string());
+
+  LDAPPropExpr expr(LDAPProp("key2") == "value2");
+  expr |= LDAPPropExpr();
+  ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
 }

@@ -348,6 +348,9 @@ public:
 template<>
 US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m);
 
+template<>
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m);
+
 }
 
 #endif // CPPMICROSERVICES_ANYMAP_H

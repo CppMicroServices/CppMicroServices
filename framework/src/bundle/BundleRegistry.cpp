@@ -28,13 +28,15 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/GetBundleContext.h"
 
+#include "cppmicroservices/util/Error.h"
+#include "cppmicroservices/util/String.h"
+
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
 #include "BundleResourceContainer.h"
 #include "BundleStorage.h"
 #include "CoreBundleContext.h"
 #include "FrameworkPrivate.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <cassert>
 #include <map>
@@ -63,15 +65,9 @@ void BundleRegistry::Clear()
 }
 
 std::vector<Bundle> BundleRegistry::Install(const std::string& location,
-                                            BundlePrivate* caller,
-                                            bool allowExecutable)
+                                            BundlePrivate* caller)
 {
   CheckIllegalState();
-
-  if (!allowExecutable && !IsSharedLibrary(location))
-  {
-    throw std::runtime_error("Cannot install bundles from "+ location +" because it is not a shared library");
-  }
 
   auto l = this->Lock(); US_UNUSED(l);
   auto range = (bundles.Lock(), bundles.v.equal_range(location));
@@ -154,7 +150,7 @@ std::vector<Bundle> BundleRegistry::Install0(
     {
       ba->Purge();
     }
-    throw std::runtime_error("Failed to install bundle library at " + location + ": " + GetLastExceptionStr());
+    throw std::runtime_error("Failed to install bundle library at " + location + ": " + util::GetLastExceptionStr());
   }
 }
 
@@ -261,9 +257,9 @@ void BundleRegistry::Load()
     {
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::cerr << "Failed to load bundle "
-                << cppmicroservices::ToString(ba->GetBundleId())
+                << util::ToString(ba->GetBundleId())
                 << " (" + ba->GetBundleLocation() + ") uninstalled it!"
-                << " (execption: " << GetExceptionStr(std::current_exception()) << ")"
+                << " (execption: " << util::GetExceptionStr(std::current_exception()) << ")"
                 << std::endl;
     }
   }

@@ -25,9 +25,10 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/FrameworkEvent.h"
 
+#include "cppmicroservices/util/String.h"
+
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
-#include "Utils.h" // cppmicroservices::ToString()
 
 #include <future>
 
@@ -38,17 +39,23 @@ const int BundleThread::OP_BUNDLE_EVENT = 1;
 const int BundleThread::OP_START = 2;
 const int BundleThread::OP_STOP = 3;
 
+#ifdef US_ENABLE_THREADING_SUPPORT
 const std::chrono::milliseconds BundleThread::KEEP_ALIVE(1000);
 
 BundleThread::BundleThread(CoreBundleContext* ctx)
-  : fwCtx(ctx)
+  : be(BundleEvent::BUNDLE_INSTALLED, nullptr)
   , startStopTimeout(0)
   , op()
-  , be(BundleEvent::BUNDLE_INSTALLED, nullptr)
   , doRun(true)
 {
-  th.v = std::thread(&BundleThread::Run, this);
+  th.v = std::thread(&BundleThread::Run, this, ctx);
 }
+#else
+BundleThread::BundleThread(CoreBundleContext*)
+  : be(BundleEvent::BUNDLE_INSTALLED, nullptr)
+{
+}
+#endif
 
 BundleThread::~BundleThread()
 {
@@ -57,14 +64,17 @@ BundleThread::~BundleThread()
 
 void BundleThread::Quit()
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   doRun = false;
   op.NotifyAll();
   auto l = th.Lock(); US_UNUSED(l);
   if (th.v.joinable()) th.v.join();
+#endif
 }
 
-void BundleThread::Run()
+void BundleThread::Run(CoreBundleContext* fwCtx)
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   while (doRun)
   {
     std::promise<bool> pr;
@@ -90,6 +100,13 @@ void BundleThread::Run()
         break;
       }
 
+      // If we arrive here, we reached our keep-alive limit without
+      // an operation being queued. However, in the mean time, some
+      // other thread may have picked this thread from the bundleThreads.value
+      // list and calling StartAndWait(). So we only terminate this thread
+      // (by returning) if it was not taken from the bundleThreads list to
+      // do more work. Otherwise, we just keep running for another keep alive
+      // cycle.
       {
         auto l2 = fwCtx->bundleThreads.Lock(); US_UNUSED(l2);
         auto iter = std::find(fwCtx->bundleThreads.value.begin(), fwCtx->bundleThreads.value.end(), this->shared_from_this());
@@ -141,15 +158,20 @@ void BundleThread::Run()
     // lock the resolver in order to synchronize with StartAndWait
     fwCtx->resolver.Lock(), fwCtx->resolver.NotifyAll();
   }
+#else
+  US_UNUSED(fwCtx);
+#endif
 }
 
 void BundleThread::Join()
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   auto l = th.Lock(); US_UNUSED(l);
   if (th.v.joinable())
   {
     th.v.join();
   }
+#endif
 }
 
 void BundleThread::BundleChanged(const BundleEventInternal& be, UniqueLock& resolveLock)
@@ -170,6 +192,7 @@ std::exception_ptr BundleThread::CallStop1(BundlePrivate* b, UniqueLock& resolve
 
 std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, UniqueLock& resolveLock)
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   std::future<bool> res;
   {
     auto l = op.Lock(); US_UNUSED(l);
@@ -190,7 +213,7 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
   bool timeout = false;
   bool uninstall = false;
 
-  fwCtx->resolver.WaitFor(resolveLock, waitTime, [&res]{
+  b->coreCtx->resolver.WaitFor(resolveLock, waitTime, [&res]{
     return res.valid() &&
         res.wait_for(std::chrono::milliseconds::zero()) == US_FUTURE_READY;
   });
@@ -246,41 +269,74 @@ std::exception_ptr BundleThread::StartAndWait(BundlePrivate* b, int operation, U
     b->ResetBundleThread();
 
     return std::make_exception_ptr(std::runtime_error(
-                                     "Bundle#" + cppmicroservices::ToString(b->id) + " " +
+                                     "Bundle#" + util::ToString(b->id) + " " +
                                      opType + " failed with reason: " + reason
                                      ));
   }
   else
   {
+    b->coreCtx->bundleThreads.Lock(), b->coreCtx->bundleThreads.value.push_front(this->shared_from_this());
+    if (operation != op.operation)
     {
-      fwCtx->bundleThreads.Lock(), fwCtx->bundleThreads.value.push_front(this->shared_from_this());
-      if (operation != op.operation)
-      {
-        // TODO! Handle when operation has changed.
-        // i.e. uninstall during operation?
-      }
-      b->ResetBundleThread();
-      try
-      {
-        res.get();
-        return nullptr;
-      }
-      catch (...)
-      {
-        return std::current_exception();
-      }
+      // TODO! Handle when operation has changed.
+      // i.e. uninstall during operation?
+    }
+    b->ResetBundleThread();
+    try
+    {
+      res.get();
+      return nullptr;
+    }
+    catch (...)
+    {
+      return std::current_exception();
     }
   }
+#else
+  US_UNUSED(resolveLock);
+  std::exception_ptr tmpres;
+  try
+  {
+    switch (operation)
+    {
+    case OP_BUNDLE_EVENT:
+      b->coreCtx->listeners.BundleChanged(MakeBundleEvent(this->be.Exchange(BundleEventInternal{ BundleEvent::BUNDLE_INSTALLED, nullptr })));
+      break;
+    case OP_START:
+      tmpres = b->Start0();
+      break;
+    case OP_STOP:
+      tmpres = b->Stop1();
+      break;
+    }
+  }
+  catch (...)
+  {
+    b->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                                                            MakeBundle(b->shared_from_this()),
+                                                            b->symbolicName,
+                                                            std::current_exception()));
+  }
+  return tmpres;
+#endif
 }
 
 bool BundleThread::IsExecutingBundleChanged() const
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   return op.operation == OP_BUNDLE_EVENT;
+#else
+  return false;
+#endif
 }
 
 bool BundleThread::operator==(const std::thread::id& id) const
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
   return (th.Lock(), th.v.get_id() == id);
+#else
+  return std::this_thread::get_id() == id;
+#endif
 }
 
 }

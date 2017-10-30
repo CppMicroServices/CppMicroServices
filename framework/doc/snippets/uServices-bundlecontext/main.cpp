@@ -24,6 +24,9 @@ CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 int main(int /*argc*/, char* /*argv*/[])
 {
-  RetrieveBundleContext();
+  std::cout << "This snippet is not meant to be executed.\n"
+               "It does not provide a complete working example.\n"
+               "See http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
+            << std::endl;
   return 0;
 }

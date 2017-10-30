@@ -37,7 +37,14 @@ class Bundle;
 class FrameworkEventData;
 
 /**
+\defgroup gr_frameworkevent FrameworkEvent
+
+\brief Groups FrameworkEvent class related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_frameworkevent
  *
  * An event from the Micro Services framework describing a Framework event.
  * <p>
@@ -192,10 +199,26 @@ public:
 
 /**
  * \ingroup MicroServices
- * @{
+ * \ingroup gr_frameworkevent
+ *
+ * Writes a string representation of \c eventType to the stream \c os.
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType);
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_frameworkevent
+ *
+ * Writes a string representation of \c evt to the stream \c os.
+ */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt);
+
+/**
+ * \ingroup MicroServices
+ * \ingroup gr_frameworkevent
+ *
+ * Compares two framework events for equality.
+ */
 US_Framework_EXPORT bool operator==(const FrameworkEvent& rhs, const FrameworkEvent& lhs);
 /** @}*/
 

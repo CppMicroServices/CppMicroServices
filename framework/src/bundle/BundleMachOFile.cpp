@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -242,7 +243,7 @@ static std::vector<uint32_t> GetMachOIdent()
 #ifdef __LP64__
   ident[0] = MH_MAGIC_64;
 #else
-  ident[1] = MH_MAGIC;
+  ident[0] = MH_MAGIC;
 #endif
 
 #if defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__)

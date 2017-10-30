@@ -120,9 +120,6 @@ public:
    */
   bool IsNull() const;
 
-  //!
-  static bool Query(const std::string& filter, const PropertiesHandle& pd);
-
   //! Evaluate this LDAP filter.
   bool Evaluate(const PropertiesHandle& p, bool matchCase) const;
 

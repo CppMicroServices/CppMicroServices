@@ -21,25 +21,29 @@
 =============================================================================*/
 
 #include "cppmicroservices/Any.h"
+#include "Utils.h"
 
 #include <stdexcept>
 
 namespace cppmicroservices {
 
-std::string any_value_to_string(const Any& any)
+namespace detail {
+
+void ThrowBadAnyCastException(const std::string& funcName, const std::type_info& source, const std::type_info& target)
 {
-  return any.ToString();
+  std::string msg("cppmicroservices::BadAnyCastException: ");
+  std::string targetTypeName(GetDemangledName(target));
+  std::string sourceTypeName(GetDemangledName(source));
+  msg += funcName + ": Failed to convert from cppmicroservices::Any type " + sourceTypeName + " to target type " + targetTypeName;
+  throw BadAnyCastException(msg);
+}
+
 }
 
 std::ostream& any_value_to_string(std::ostream& os, const Any& any)
 {
   os << any.ToString();
   return os;
-}
-
-std::string any_value_to_json(const Any& val)
-{
-  return val.ToJSON();
 }
 
 std::ostream& any_value_to_json(std::ostream& os, const Any& val)

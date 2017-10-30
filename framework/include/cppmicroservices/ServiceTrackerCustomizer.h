@@ -30,6 +30,7 @@ namespace cppmicroservices {
 
 /**
  * \ingroup MicroServices
+ * \ingroup gr_servicetracker
  *
  * The <code>ServiceTrackerCustomizer</code> interface allows a
  * <code>ServiceTracker</code> to customize the service objects that are
@@ -40,7 +41,6 @@ namespace cppmicroservices {
  * a tracked service is modified or has been removed from a
  * <code>ServiceTracker</code>.
  *
- * <p>
  * The methods in this interface may be called as the result of a
  * <code>ServiceEvent</code> being received by a <code>ServiceTracker</code>.
  * Since <code>ServiceEvent</code>s are synchronously delivered,
@@ -50,7 +50,6 @@ namespace cppmicroservices {
  * <code>ServiceRegistration::Unregister</code>) a service while being
  * synchronized on any object.
  *
- * <p>
  * The <code>ServiceTracker</code> class is thread-safe. It does not call a
  * <code>ServiceTrackerCustomizer</code> while holding any locks.
  * <code>ServiceTrackerCustomizer</code> implementations must also be

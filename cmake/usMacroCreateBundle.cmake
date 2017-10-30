@@ -7,7 +7,7 @@ project(${_project_name})
 cmake_parse_arguments(${PROJECT_NAME}
   "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET;SYMBOLIC_NAME"
-  "DEPENDS;INTERNAL_INCLUDE_DIRS;LINK_LIBRARIES;INTERNAL_LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
+  "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
 )
 
@@ -16,9 +16,9 @@ if(NOT ${PROJECT_NAME}_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
 endif()
 
 string(REPLACE "." ";" _version_numbers ${${PROJECT_NAME}_VERSION})
-list(GET _version_numbers 0 ${PROJECT_NAME}_MAJOR_VERSION)
-list(GET _version_numbers 1 ${PROJECT_NAME}_MINOR_VERSION)
-list(GET _version_numbers 2 ${PROJECT_NAME}_PATCH_VERSION)
+list(GET _version_numbers 0 ${PROJECT_NAME}_VERSION_MAJOR)
+list(GET _version_numbers 1 ${PROJECT_NAME}_VERSION_MINOR)
+list(GET _version_numbers 2 ${PROJECT_NAME}_VERSION_PATCH)
 
 # Set the logical target name
 if(NOT ${PROJECT_NAME}_TARGET)
@@ -29,9 +29,8 @@ set(PROJECT_TARGET ${${PROJECT_NAME}_TARGET})
 # Set the target output name
 set(PROJECT_OUTPUT_NAME ${PROJECT_TARGET})
 if(WIN32 AND NOT CYGWIN)
-  set(PROJECT_OUTPUT_NAME "${PROJECT_OUTPUT_NAME}${${PROJECT_NAME}_MAJOR_VERSION}")
+  set(PROJECT_OUTPUT_NAME "${PROJECT_OUTPUT_NAME}${${PROJECT_NAME}_VERSION_MAJOR}")
 endif()
-
 
 if(NOT ${PROJECT_NAME}_SYMBOLIC_NAME)
   set(${PROJECT_NAME}_SYMBOLIC_NAME ${${PROJECT_NAME}_TARGET})
@@ -45,13 +44,8 @@ if(${PROJECT_NAME}_DEPENDS)
 endif()
 
 #-----------------------------------------------------------------------------
-# Include dirs and libraries
+# Configure files
 #-----------------------------------------------------------------------------
-
-set(${PROJECT_NAME}_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include
-)
 
 set(${PROJECT_NAME}_INCLUDE_SUBDIR "cppmicroservices")
 if(NOT ${PROJECT_NAME} STREQUAL "Framework")
@@ -71,44 +65,50 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}Config.h.in)
     ${CMAKE_CURRENT_BINARY_DIR}/include/${${PROJECT_NAME}_INCLUDE_SUBDIR}/${PROJECT_NAME}Config.h)
 endif()
 
-include_directories(
-  ${US_INCLUDE_DIRS}
-  ${${PROJECT_NAME}_INCLUDE_DIRS}
-)
-
-set(_internal_include_dirs ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
-set(${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS )
-if(_internal_include_dirs)
-  foreach(_internal_include_dir ${_internal_include_dirs})
-    if(IS_ABSOLUTE "${_internal_include_dir}")
-      list(APPEND ${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS ${_internal_include_dir})
-    else()
-      list(APPEND ${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${_internal_include_dir})
-    endif()
-  endforeach()
-  include_directories(${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
-endif()
-
 #-----------------------------------------------------------------------------
 # Create library
 #-----------------------------------------------------------------------------
 
 # Generate the bundle init file
 if(NOT ${PROJECT_NAME}_SKIP_INIT)
-  usFunctionGenerateBundleInit(${PROJECT_NAME}_SOURCES)
+  usFunctionGenerateBundleInit(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
   usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
 endif()
 
+list(APPEND ${PROJECT_NAME}_SOURCES $<TARGET_OBJECTS:util>)
+
 # Create the bundle library
 add_library(${PROJECT_TARGET} ${${PROJECT_NAME}_SOURCES}
             ${${PROJECT_NAME}_PRIVATE_HEADERS} ${${PROJECT_NAME}_PUBLIC_HEADERS})
 set_property(TARGET ${PROJECT_TARGET} PROPERTY OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
 
+target_link_libraries(${PROJECT_TARGET} PUBLIC ${US_LIBRARIES})
+
+target_compile_features(${PROJECT_TARGET}
+  PUBLIC cxx_variadic_templates cxx_nullptr
+  )
+
+# Include directories
+target_include_directories(${PROJECT_TARGET}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
+  PRIVATE
+    ${${PROJECT_NAME}_PRIVATE_INCLUDE_DIRS}
+    $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>
+  )
+
 # Compile definitions
-set_property(TARGET ${PROJECT_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME})
+target_compile_definitions(${PROJECT_TARGET}
+  PRIVATE US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME}
+  )
+
+# Convenience properties
 set_property(TARGET ${PROJECT_TARGET} PROPERTY US_BUNDLE_NAME ${${PROJECT_NAME}_SYMBOLIC_NAME})
 
 # Link flags
@@ -123,15 +123,8 @@ set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
 )
 
 # Link additional libraries
-if(${PROJECT_NAME}_LINK_LIBRARIES OR ${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES OR US_LIBRARIES)
-  target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES}
-                        ${${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES})
-endif()
-
-if(${PROJECT_NAME}_INTERNAL_LINK_LIBRARIES)
-  set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
-    INTERFACE_LINK_LIBRARIES ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES}
-  )
+if(${PROJECT_NAME}_LINK_LIBRARIES)
+  target_link_libraries(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_LINK_LIBRARIES})
 endif()
 
 # Embed bundle resources
@@ -207,9 +200,6 @@ endif()
 
 # Configure config file for the build tree
 
-set(PACKAGE_CONFIG_INCLUDE_DIR
-  ${${PROJECT_NAME}_INCLUDE_DIRS}
-  ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
 set(PACKAGE_CONFIG_RUNTIME_LIBRARY_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 configure_file(

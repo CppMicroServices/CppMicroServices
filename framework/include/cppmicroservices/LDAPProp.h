@@ -56,6 +56,7 @@ private:
 
 /**
  * \ingroup MicroServicesUtils
+ * \ingroup gr_ldap
  *
  * A fluent API for creating LDAP filter strings.
  *
@@ -94,6 +95,7 @@ public:
    */
   LDAPPropExpr operator==(const std::string& s) const;
   LDAPPropExpr operator==(const cppmicroservices::Any& s) const;
+  LDAPPropExpr operator==(bool b) const;
   template<class T>
   LDAPPropExpr operator==(const T& s) const
   {
@@ -213,6 +215,7 @@ private:
 
 /**
  * \ingroup MicroServicesUtils
+ * \ingroup gr_ldap
  *
  * LDAP logical and '&'
  *
@@ -224,6 +227,7 @@ US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(const cppmicroserv
 
 /**
  * \ingroup MicroServicesUtils
+ * \ingroup gr_ldap
  *
  * LDAP logical or '|'
  *

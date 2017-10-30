@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -79,8 +80,8 @@ private:
 
     std::string uri = mg_req_info->local_uri;
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-    std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-    std::cout << "Against uri: " << uri << std::endl;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if(uri.size() > pathPrefix.size())
@@ -188,7 +189,7 @@ std::string ServletContainerPrivate::GetMimeType(const ServletContext* /*context
 
 std::shared_ptr<ServletHandler> ServletContainerPrivate::AddingService(const ServiceReference<HttpServlet>& reference)
 {
-  Any contextRoot = reference.GetProperty(HttpServlet::PROP_CONTEXT_ROOT());
+  Any contextRoot = reference.GetProperty(HttpServlet::PROP_CONTEXT_ROOT);
   if (contextRoot.Empty())
   {
     std::cout << "HttpServlet from " << reference.GetBundle().GetSymbolicName() << " is missing the context root property." << std::endl;

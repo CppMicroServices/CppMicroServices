@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/BundleResource.h"
 
-#include "Utils.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include <cassert>
 #include <climits>
@@ -38,9 +38,9 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
 {
-  if (!fs::Exists(location))
+  if (!util::Exists(location))
   {
-    throw std::runtime_error("Location does not exist");
+    throw std::runtime_error(m_Location + " does not exist");
   }
 
   if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0))
@@ -97,15 +97,18 @@ bool BundleResourceContainer::GetStat(int index, BundleResourceContainer::Stat& 
     // don't make sense to be embedded in a bundle anyway.
     assert(zipStat.m_comp_size < INT_MAX);
     assert(zipStat.m_uncomp_size < INT_MAX);
+    stat.compressedSize = static_cast<int>(zipStat.m_comp_size);
     stat.uncompressedSize = static_cast<int>(zipStat.m_uncomp_size);
     return true;
   }
   return false;
 }
 
-void* BundleResourceContainer::GetData(int index) const
+std::unique_ptr<void, void(*)(void*)> BundleResourceContainer::GetData(int index) const
 {
-  return mz_zip_reader_extract_to_heap(const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
+  std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
+  void* data = mz_zip_reader_extract_to_heap(const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
+  return { data, ::free };
 }
 
 void BundleResourceContainer::GetChildren(const std::string& resourcePath, bool relativePaths,

@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,6 +24,7 @@
 
 #include "SettingsPlugin.h"
 #include "ServicesPlugin.h"
+#include "BundlesPlugin.h"
 
 #include "WebConsoleServlet.h"
 #include "cppmicroservices/BundleContext.h"
@@ -42,21 +44,24 @@ private:
 
   std::shared_ptr<SettingsPlugin> m_SettingsPlugin;
   std::shared_ptr<ServicesPlugin> m_ServicesPlugin;
+  std::shared_ptr<BundlesPlugin> m_BundlesPlugin;
 };
 
 void WebConsoleActivator::Start(BundleContext context)
 {
   m_SettingsPlugin.reset(new SettingsPlugin);
   m_ServicesPlugin.reset(new ServicesPlugin);
+  m_BundlesPlugin.reset(new BundlesPlugin);
   m_WebConsoleServlet.reset(new WebConsoleServlet());
   cppmicroservices::ServiceProperties props;
-  props[HttpServlet::PROP_CONTEXT_ROOT()] = std::string("/console");
+  props[HttpServlet::PROP_CONTEXT_ROOT] = std::string("/console");
   context.RegisterService<HttpServlet>(m_WebConsoleServlet, props);
 
   std::cout << "****** Registering WebConsoleServlet at /console" << std::endl;
 
   m_SettingsPlugin->Register();
   m_ServicesPlugin->Register();
+  m_BundlesPlugin->Register();
 
 //  server->addHandler("/Console/bundles/", new BundlesHtml(context));
 //  server->addHandler("/Console/resources/", new ResourcesHtml(context));

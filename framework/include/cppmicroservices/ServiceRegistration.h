@@ -28,7 +28,14 @@
 namespace cppmicroservices {
 
 /**
+\defgroup gr_serviceregistration ServiceRegistration
+
+\brief Groups ServiceRegistration related symbols.
+*/
+
+/**
  * \ingroup MicroServices
+ * \ingroup gr_serviceregistration
  *
  * A registered service.
  *
@@ -137,6 +144,7 @@ public:
 
 /**
  * \ingroup MicroServices
+ * \ingroup gt_serviceregistration
  *
  * A service registration object of unknown type.
  */

@@ -100,6 +100,12 @@ public:
   std::string listenerFilter;
 
   /**
+   * This token corresponds to the ServiceListener, whenever it is added.
+   * Otherwise, it represents an invalid token.
+   */
+  ListenerToken listenerToken;
+
+  /**
    * Class name to be tracked. If this field is set, then we are tracking by
    * class name.
    */

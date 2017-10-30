@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -63,7 +64,7 @@ private:
       assert(std::less_equal<char*>()(pptr(), epptr()));
       ++m_ContentLength;
       // discard the character
-    pbump(static_cast<int>(pbase() - pptr()));
+      pbump(static_cast<int>(pbase() - pptr()));
       return ch;
     }
     return traits_type::eof();
@@ -138,12 +139,7 @@ static void MaybeSetLastModified(HttpServletResponse& resp,
     resp.SetDateHeader(HEADER_LASTMOD, lastModified);
 }
 
-
-const std::string& HttpServlet::PROP_CONTEXT_ROOT()
-{
-  static const std::string s = "org.cppmicroservices.HttpServlet.contextRoot";
-  return s;
-}
+const std::string HttpServlet::PROP_CONTEXT_ROOT = "org.cppmicroservices.HttpServlet.contextRoot";
 
 HttpServlet::HttpServlet()
   : d(new HttpServletPrivate)

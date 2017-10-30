@@ -237,7 +237,7 @@ void ServiceRegistrationBase::Unregister()
       }
     }
 
-    // unget module scope services
+    // unget bundle scope services
     for (auto const& i : bundleServiceInstance)
     {
       try
@@ -308,6 +308,11 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(ServiceRegistrationB
   d = nullptr;
   std::swap(d, registration.d);
   return *this;
+}
+
+std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase&)
+{
+  return os << "cppmicroservices::ServiceRegistrationBase object";
 }
 
 }

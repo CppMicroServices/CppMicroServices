@@ -331,11 +331,6 @@ bool LDAPExpr::IsNull() const
   return !d;
 }
 
-bool LDAPExpr::Query( const std::string& filter, const PropertiesHandle& pd)
-{
-  return LDAPExpr(filter).Evaluate(pd, false);
-}
-
 bool LDAPExpr::Evaluate( const PropertiesHandle& p, bool matchCase ) const
 {
   if ((d->m_operator & SIMPLE) != 0)

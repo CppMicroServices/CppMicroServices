@@ -913,4 +913,21 @@ std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m)
   return os;
 }
 
+template<>
+std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m)
+{
+  os << "{";
+  typedef any_map::const_iterator Iterator;
+  Iterator i1 = m.begin();
+  const Iterator begin = i1;
+  const Iterator end = m.end();
+  for ( ; i1 != end; ++i1)
+  {
+    if (i1 == begin) os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    else os << ", " << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+  }
+  os << "}";
+  return os;
+}
+
 }

@@ -52,7 +52,7 @@ US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "Syste
  * defined to be &quot;system.bundle&quot;.
  */
 US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
-  
+
 /**
  * Manifest header identifying the bundle's activator.
  * The value for this attribute is of type bool.
@@ -250,12 +250,31 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
  * - "single" - The framework APIs are not thread-safe.
  * - "multi" - The framework APIs are thread-safe.
  *
- * @remarks This is a read-only property and cannot be altered at run-time.
- * The key's value is set at compile time by the US_ENABLE_THREADING_SUPPORT option.
+ * \rststar
+ * .. note::
  *
- * @see \ref BuildInstructions
+ *    This is a read-only property and cannot be altered at run-time.
+ *    The key's value is set at compile time by the
+ *    ``US_ENABLE_THREADING_SUPPORT`` option. See :any:`build-instructions`
+ *    for more information.
+ * \endrststar
+ *
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
+
+/**
+ * Framework threading support configuration declaring that the framework
+ * is configured for single thread usage. It is not safe to use the
+ * framework API concurrently from multiple threads.
+ */
+US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SINGLE; // = "single";
+
+/**
+ * Framework threading support configuration declaring that the framework
+ * is configured for multi-thread usage. The framework API uses internal
+ * locks such that it is safe to use the API concurrently from multiple threads.
+ */
+US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_MULTI; // = "multi";
 
 /**
  * The framework's log property key name.
@@ -278,6 +297,13 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicrose
  */
 US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
 
+/**
+ * Framework launching property specifying the working directory used for
+ * resolving relative path names. If not set, the framework will use the process
+ * current working directory as set during static initialization of the
+ * framework library.
+ */
+US_Framework_EXPORT extern const std::string FRAMEWORK_WORKING_DIR; // = "org.cppmicroservices.framework.working.dir";
 
 /*
  * Service properties.

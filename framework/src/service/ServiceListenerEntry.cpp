@@ -49,8 +49,8 @@ public:
   ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
 
   ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                           void* data, const std::string& filter)
-    : ServiceListenerHook::ListenerInfoData(context, l, data, filter)
+                           void* data, ListenerTokenId tokenId, const std::string& filter)
+    : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
     , ldap()
     , hashValue(0)
   {
@@ -59,6 +59,7 @@ public:
       ldap = LDAPExpr(filter);
     }
   }
+
 
   ~ServiceListenerEntryData()
   {
@@ -125,8 +126,9 @@ ServiceListenerEntry::ServiceListenerEntry(
     const std::shared_ptr<BundleContextPrivate>& context,
     const ServiceListener& l,
     void* data,
+    ListenerTokenId tokenId,
     const std::string& filter)
-  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, filter))
+  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, tokenId, filter))
 {
 }
 
@@ -148,7 +150,25 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
   return ((d->context == nullptr || other.d->context == nullptr) || d->context == other.d->context) &&
-      (d->data == other.d->data) && ServiceListenerCompare()(d->listener, other.d->listener);
+    (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
+    ServiceListenerCompare()(d->listener, other.d->listener);
+}
+
+bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
+                                    ListenerTokenId tokenId) const
+{
+  return (d->context == context) && (d->tokenId == tokenId);
+}
+
+bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
+                                    const ServiceListener& listener, void* data) const
+{
+  return (d->context == context) && (d->data == data) && ServiceListenerCompare()(d->listener, listener);
+}
+
+ListenerTokenId ServiceListenerEntry::Id() const
+{
+  return d->tokenId;
 }
 
 std::size_t ServiceListenerEntry::Hash() const
@@ -159,7 +179,7 @@ std::size_t ServiceListenerEntry::Hash() const
   {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
         ((hash<BundleContextPrivate*>()(d->context.get()) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
-        (hash<ServiceListener>()(d->listener) << 1);
+        ((hash<ServiceListener>()(d->listener)) ^ (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
 }

@@ -21,6 +21,25 @@
 =============================================================================*/
 
 
+/**
+
+\defgroup MicroServices Micro Services Classes
+
+\brief This category includes classes related to the C++ Micro Services component.
+
+The C++ Micro Services component provides a dynamic service registry based on the service layer
+as specified in the OSGi R4.2 specifications.
+
+*/
+
+/**
+
+\defgroup MicroServicesUtils Utility Classes
+
+\brief This category includes utility classes which can be used by others.
+
+*/
+
 #ifndef CPPMICROSERVICES_COREBUNDLECONTEXT_H
 #define CPPMICROSERVICES_COREBUNDLECONTEXT_H
 
@@ -80,7 +99,9 @@ public:
   * Note: CppMicroServices currently has no concept
   * of "system properties".
   */
-  std::map<std::string, Any> frameworkProperties;
+  std::unordered_map<std::string, Any> frameworkProperties;
+
+  const std::string& workingDir;
 
  /**
   * The diagnostic logging sink
@@ -185,7 +206,7 @@ private:
    * Construct a core context
    *
    */
-  CoreBundleContext(const std::map<std::string, Any>& props, std::ostream* logger);
+  CoreBundleContext(const std::unordered_map<std::string, Any>& props, std::ostream* logger);
 
   struct : detail::MultiThreaded<> { std::weak_ptr<CoreBundleContext> v; } self;
 

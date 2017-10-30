@@ -2,8 +2,9 @@
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -66,18 +67,18 @@ std::string SimpleWebConsolePlugin::GetCategory() const
   return m_Category;
 }
 
-SimpleWebConsolePlugin* SimpleWebConsolePlugin::Register(const BundleContext& context)
+std::shared_ptr<SimpleWebConsolePlugin> SimpleWebConsolePlugin::Register(const BundleContext& context)
 {
   ServiceProperties props;
-  props[WebConsoleConstants::PLUGIN_LABEL()] = GetLabel();
-  props[WebConsoleConstants::PLUGIN_TITLE()] = GetTitle();
+  props[WebConsoleConstants::PLUGIN_LABEL] = GetLabel();
+  props[WebConsoleConstants::PLUGIN_TITLE] = GetTitle();
   if (!GetCategory().empty())
   {
-    props[WebConsoleConstants::PLUGIN_CATEGORY()] = GetCategory();
+    props[WebConsoleConstants::PLUGIN_CATEGORY] = GetCategory();
   }
   m_Context = context;
   m_Reg = m_Context.RegisterService<HttpServlet>(shared_from_this(), props);
-  return this;
+  return std::static_pointer_cast<SimpleWebConsolePlugin>(this->shared_from_this());
 }
 
 void SimpleWebConsolePlugin::Unregister()

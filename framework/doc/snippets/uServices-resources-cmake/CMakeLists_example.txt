@@ -1,7 +1,7 @@
 set(bundle_name "org_me_mybundle")
 set(srcs mybundle.cpp)
 
-usFunctionGenerateBundleInit(srcs)
+usFunctionGenerateBundleInit(TARGET mybundle OUT srcs)
 usFunctionGetResourceSource(TARGET mybundle OUT srcs)
 
 add_library(mybundle ${srcs})

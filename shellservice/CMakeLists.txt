@@ -10,7 +10,7 @@ if(MSVC)
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " /wd4311 /wd4312 /wd4996"
   )
-elseif(MINGW)
+elseif(MINGW OR MSYS)
   set_property(
     SOURCE ../third_party/tinyscheme/scheme.c APPEND_STRING
     PROPERTY COMPILE_FLAGS " -DUSE_STRLWR=0"
@@ -48,7 +48,7 @@ usMacroCreateBundle(ShellService
   DEPENDS Framework
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_private_headers}
-  INTERNAL_INCLUDE_DIRS ../third_party/tinyscheme
+  PRIVATE_INCLUDE_DIRS ../third_party/tinyscheme
   SOURCES ${_srcs}
   RESOURCES ${_resources}
   BINARY_RESOURCES tinyscheme/init.scm

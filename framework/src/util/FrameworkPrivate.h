@@ -63,6 +63,8 @@ public:
   virtual void Uninstall();
   virtual std::string GetLocation() const;
 
+  virtual AnyMap GetHeaders() const;
+
   /**
    * Stop this FrameworkContext, suspending all started contexts. This method
    * suspends all started contexts so that they can be automatically restarted

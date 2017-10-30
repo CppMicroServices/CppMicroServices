@@ -29,11 +29,14 @@
 
 #include "BundleEventInternal.h"
 
-#include <atomic>
-#include <chrono>
-#include <future>
 #include <string>
+#include <chrono>
+#include <atomic>
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+#include <future>
 #include <thread>
+#endif
 
 namespace cppmicroservices {
 
@@ -47,9 +50,11 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
   const static int OP_START;
   const static int OP_STOP;
 
+  detail::Atomic<BundleEventInternal> be;
+
+#ifdef US_ENABLE_THREADING_SUPPORT
   const static std::chrono::milliseconds KEEP_ALIVE;
 
-  CoreBundleContext* const fwCtx;
   std::chrono::milliseconds startStopTimeout;
 
   struct Op : detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
@@ -61,21 +66,21 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
     std::promise<bool> pr;
   } op;
 
-  detail::Atomic<BundleEventInternal> be;
   std::atomic<bool> doRun;
 
   struct : detail::MultiThreaded<> { std::thread v; } th;
+#endif
 
 public:
 
-  typedef Op::UniqueLock UniqueLock;
+  typedef detail::MultiThreaded<>::UniqueLock UniqueLock;
 
   BundleThread(CoreBundleContext* ctx);
   ~BundleThread();
 
   void Quit();
 
-  void Run();
+  void Run(CoreBundleContext* fwCtx);
 
   void Join();
 

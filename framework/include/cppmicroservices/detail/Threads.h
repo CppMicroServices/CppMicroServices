@@ -114,7 +114,7 @@ public:
     void Lock() {}
     void UnLock() {}
     template<typename Rep, typename Period>
-    bool TryLockFor(const std::chrono::duration<Rep, Period>& duration)
+    bool TryLockFor(const std::chrono::duration<Rep, Period>&)
     {
       return true;
     }

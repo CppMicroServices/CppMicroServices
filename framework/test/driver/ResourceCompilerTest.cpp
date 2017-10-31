@@ -42,7 +42,6 @@ using namespace cppmicroservices::util;
 namespace
 {
 
-
 // The value returned by the resource compiler when manifest validation failed
 static const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
@@ -54,7 +53,7 @@ static const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
  */
 int runExecutable(const std::string& executable)
 {
-// WEXITSTATUS is only available on POSXI. Wrap std::system into a function
+// WEXITSTATUS is only available on POSIX. Wrap std::system into a function
 // call so that there is consistent and uniform return codes on all platforms.
 #if defined US_PLATFORM_WINDOWS
 #define WEXITSTATUS 
@@ -62,6 +61,17 @@ int runExecutable(const std::string& executable)
   int ret = std::system(executable.c_str());
   return WEXITSTATUS(ret);
 }
+
+/*
+* @brief remove any line feed and new line characters.
+* @param[in,out] str string to be modified
+*/
+void removeLineEndings(std::string& str)
+{
+  str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
+  str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+}
+
 /*
  * Create a sample directory hierarchy in tempdir
  * to perform testing of ResourceCompiler
@@ -464,6 +474,14 @@ void testFailureModes(const std::string& rcbinpath, const std::string& tempdir)
   cmd.str("");
   cmd.clear();
   cmd << rcbinpath;
+  cmd << " --bundle-name foo";
+  cmd << " --manifest-add file_does_not_exist.json";
+  cmd << " --bundle-file test2.dll";
+  US_TEST_CONDITION(EXIT_FAILURE == runExecutable(cmd.str()), "Failure mode: Manifest file does not exist");
+
+  cmd.str("");
+  cmd.clear();
+  cmd << rcbinpath;
   cmd << " --bundle-file test1.dll ";
   cmd << " --bundle-file test2.dll";
   US_TEST_CONDITION(EXIT_FAILURE == runExecutable(cmd.str()), "Failure mode: Multiple bundle-file args");
@@ -777,14 +795,13 @@ void testManifestAddWithDuplicateKeys(const std::string& rcbinpath, const std::s
 }
 
 // A zip file containing only a manifest.
-// The zip file is deleted when this object is destroyed.
 class ManifestZipFile
 {
 public:
-    // zip_file_name - zip file path
-    // manifest_json - contents of the manifest.json file
-    // bundle_name - name of the bundle
-    ManifestZipFile(const std::string& zip_file_name, const std::string& manifest_json, const std::string& bundle_name)
+  // zip_file_name - zip file path
+  // manifest_json - contents of the manifest.json file
+  // bundle_name - name of the bundle
+  ManifestZipFile(const std::string& zip_file_name, const std::string& manifest_json, const std::string& bundle_name)
   {
     std::string archiveEntry(bundle_name + "/manifest.json");
     mz_zip_archive zip;
@@ -983,8 +1000,8 @@ void testMultipleManifestAdd(const std::string& rcbinpath, const std::string& te
   US_TEST_CONDITION(0 == duplicate_merged_zip.size(), "Test that no manifest.json was embedded since there was an duplicate manifest part.");
 }
 
-// return the contents of the manifest file for the giveen bundle_name
-std::string manifestContent(const std::string& zipfile, std::string bundle_name)
+// return the contents of the manifest file for the given bundle_name
+std::string getManifestContent(const std::string& zipfile, std::string bundle_name)
 {
   mz_zip_archive zipArchive;
   memset(&zipArchive, 0, sizeof(mz_zip_archive));
@@ -1084,19 +1101,79 @@ void testMultipleManifestConcatenation(const std::string& rcbinpath, const std::
   std::string expectedJSON(root.toStyledString());
   // retrieve the JSON which was concatenated by usResourceCompiler
   std::string concatenatedJSON;
-  US_TEST_NO_EXCEPTION_REQUIRED(concatenatedJSON = manifestContent(tempdir + "merged_zip.zip", "main"));
+  US_TEST_NO_EXCEPTION_REQUIRED(concatenatedJSON = getManifestContent(tempdir + "merged_zip.zip", "main"));
 
   std::cout << "Expected JSON:\n\n" << expectedJSON << "JSON concatenated by usResourceCompiler:\n\n" << concatenatedJSON << std::endl;
 
   // line feed and new line characters may be lurking in the strings. I don't know how to use miniz and jsoncpp to embed
   // these characters in a consistent manner, so I'm opting to remove them afterwards.
-  concatenatedJSON.erase(std::remove(concatenatedJSON.begin(), concatenatedJSON.end(), '\r'), concatenatedJSON.end());
-  concatenatedJSON.erase(std::remove(concatenatedJSON.begin(), concatenatedJSON.end(), '\n'), concatenatedJSON.end());
-  expectedJSON.erase(std::remove(expectedJSON.begin(), expectedJSON.end(), '\r'), expectedJSON.end());
-  expectedJSON.erase(std::remove(expectedJSON.begin(), expectedJSON.end(), '\n'), expectedJSON.end());
+  removeLineEndings(concatenatedJSON);
+  removeLineEndings(expectedJSON);
   
   US_TEST_CONDITION(0 == concatenatedJSON.compare(expectedJSON), "Test that the concatenated JSON content matches the expected JSON content.");
 
+}
+
+// test adding a manifest and merging a zip file with a manifest containing a null terminator works.
+// This test ensures that the code which extracts the manifest contents from an archive does not truncate the file due to a null terminator.
+// NOTE: The C string null terminator in JSON must be escaped. Otherwise, there is a JSON syntax error.
+void testManifestWithNullTerminator(const std::string& rcbinpath, const std::string& tempdir)
+{
+  const std::string manifest_json = R"({
+    "test" : { 
+        "bar" : "baz\\0bar",
+        "foo\\0bar" : [1, 2, 5, 7]
+    }})";
+
+  const std::string jsonFileName("manifest_with_embedded_null_terminator.json");
+  const std::string zipFile("embedded_null_terminator.zip");
+
+  createManifestFile(tempdir, manifest_json, jsonFileName);
+
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-name " << "main";
+  cmd << " --out-file " << tempdir << zipFile;
+  cmd << " --manifest-add " << tempdir << jsonFileName;
+  US_TEST_CONDITION(EXIT_SUCCESS == runExecutable(cmd.str()), "Test the successful embedding of a manifest containing an embedded null terminator.");
+
+  Json::Reader reader;
+  Json::Value root;
+  bool ok = reader.parse(manifest_json, root, false);
+  US_TEST_CONDITION(true == ok, "Test that the expected JSON content was parsed correctly.");
+
+  std::string expectedJSON(root.toStyledString());
+
+  std::string nullTerminatorJSON;
+  US_TEST_NO_EXCEPTION_REQUIRED(nullTerminatorJSON = getManifestContent(tempdir + "embedded_null_terminator.zip", "main"));
+
+  std::cout << "Expected JSON:\n\n" << expectedJSON << "JSON embedded by usResourceCompiler:\n\n" << nullTerminatorJSON << std::endl;
+
+  // line feed and new line characters may be lurking in the strings. I don't know how to use miniz and jsoncpp to embed
+  // these characters in a consistent manner, so I'm opting to remove them afterwards.
+  removeLineEndings(nullTerminatorJSON);
+  removeLineEndings(expectedJSON);
+
+  US_TEST_CONDITION(0 == nullTerminatorJSON.compare(expectedJSON), "Test that the JSON content matches the expected JSON content.");
+
+  const std::string mergedZipFile("merged_null_terminator.zip");
+
+  cmd.str("");
+  cmd.clear();
+  cmd << rcbinpath;
+  cmd << " --out-file " << tempdir << mergedZipFile;
+  cmd << " --zip-add " << tempdir << zipFile;
+  US_TEST_CONDITION(EXIT_SUCCESS == runExecutable(cmd.str()), "Test the successful merging of zip file containing a manifest with an embedded null terminator.");
+
+  US_TEST_NO_EXCEPTION_REQUIRED(nullTerminatorJSON = getManifestContent(tempdir + mergedZipFile, "main"));
+
+  std::cout << "Expected JSON:\n\n" << expectedJSON << "\n\nJSON merged by usResourceCompiler:\n\n" << nullTerminatorJSON << std::endl;
+
+  // line feed and new line characters may be lurking in the strings. I don't know how to use miniz and jsoncpp to embed
+  // these characters in a consistent manner, so I'm opting to remove them afterwards.
+  removeLineEndings(nullTerminatorJSON);
+
+  US_TEST_CONDITION(0 == nullTerminatorJSON.compare(expectedJSON), "Test that the JSON content matches the expected JSON content.");
 }
 
 }
@@ -1168,6 +1245,8 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
   US_TEST_NO_EXCEPTION(testMultipleManifestAdd(rcbinpath, tempdir));
 
   US_TEST_NO_EXCEPTION(testMultipleManifestConcatenation(rcbinpath, tempdir));
+
+  US_TEST_NO_EXCEPTION(testManifestWithNullTerminator(rcbinpath, tempdir));
 
   US_TEST_END()
 }

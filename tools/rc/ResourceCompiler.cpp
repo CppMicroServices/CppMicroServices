@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <utility>
 
 #include "json/json.h"
@@ -159,6 +160,10 @@ void parseAndValidateJsonFromFile(const std::string& jsonFile, Json::Value& root
   try
   {
     std::ifstream json(jsonFile);
+    if (!json.is_open())
+    {
+      throw std::runtime_error("Could not open file " + jsonFile);
+    }
     parseAndValidateJson(json, root);
   }
   catch (const InvalidManifest& e)
@@ -168,12 +173,45 @@ void parseAndValidateJsonFromFile(const std::string& jsonFile, Json::Value& root
   }
 }
 
+/*
+ * @brief extracts a manifest file from the zip archive and checks for correct JSON syntax.
+ * @param zipArchive miniz data structure representing the opened zip archive.
+ * @param archiveFileName file path of the zip archive.
+ * @param archiveEntry archive entry path of the manifest file.
+ * @throw InvalidManifest if the json is invalid. Parse error information is in the exception.
+ * @throw runtime_error if the manifest file could not be read from the archive.
+ */
+void validateManifestInArchive(mz_zip_archive* zipArchive, const std::string& archiveFile, const std::string& archiveEntry)
+{
+  void* data = mz_zip_reader_extract_file_to_heap(zipArchive, archiveEntry.c_str(), nullptr, 0);
+  std::unique_ptr<void, void(*)(void*)> manifestFileContents(data, ::free);
+
+  if (!manifestFileContents)
+  {
+    throw std::runtime_error("Failed to extract " + archiveEntry + " from " + archiveFile);
+  }
+  
+  try
+  {
+    Json::Value root;
+    std::istringstream json(reinterpret_cast<const char*>(manifestFileContents.get()));
+    parseAndValidateJson(json, root);
+  }
+  catch (const InvalidManifest& e)
+  {
+    std::string exceptionMsg(archiveFile);
+    exceptionMsg += " (" + archiveEntry + ") : " + e.what();
+    throw InvalidManifest(exceptionMsg);
+  }
+}
+
 /* 
  * @brief Validate manifest files in an archive.
  * @param archiveFile archive file path
  * @throw std::InvalidManifest on the first invalid manifest found.
+ * @throw runtime_error on the first manifest file which could not be read from the archive.
  */
-void validateManifestsInArchive(const std::string archiveFile)
+void validateManifestsInArchive(const std::string& archiveFile)
 {
   mz_zip_archive currZipArchive;
   mz_uint currZipIndex = 0;
@@ -197,34 +235,9 @@ void validateManifestsInArchive(const std::string archiveFile)
         if (archiveEntry.find_first_of("/", 0) == archiveEntry.find_last_of("/") &&
             std::string::npos != archiveEntry.find("/manifest.json"))
         {
-          char manifestFileContents[MZ_ZIP_MAX_IO_BUF_SIZE];
-          memset(manifestFileContents, 0, MZ_ZIP_MAX_IO_BUF_SIZE);
-          if(MZ_TRUE == mz_zip_reader_extract_file_to_mem(&currZipArchive, 
-                            archiveEntry.c_str(),
-                            manifestFileContents, 
-                            MZ_ZIP_MAX_IO_BUF_SIZE, 
-                            0))
-          {
-            try
-            {
-              Json::Value root;
-              std::istringstream json(manifestFileContents);
-              parseAndValidateJson(json, root);
-            }
-            catch (const InvalidManifest& e)
-            {
-              std::string exceptionMsg(archiveFile);
-              exceptionMsg += " (" + archiveEntry + ") : " + e.what();
-              throw InvalidManifest(exceptionMsg);
-            } 
-          }
+          validateManifestInArchive(&currZipArchive, archiveFile, archiveEntry);
         }
       }
-    }
-    catch (const InvalidManifest&)
-    {
-      mz_zip_reader_end(&currZipArchive);
-      throw;
     }
     catch (const std::exception&)
     {
@@ -244,7 +257,7 @@ void validateManifestsInArchive(const std::string archiveFile)
  * @throw InvalidManifest if the manifest has inavlid syntax or duplicate key names
  * @return valid JSON content
  */
-Json::Value AggregateManifestsAndValidate(std::map<std::string, Json::Value>& manifests)
+Json::Value AggregateManifestsAndValidate(std::unordered_map<std::string, Json::Value>& manifests)
 {
   Json::Value root;
   
@@ -477,7 +490,7 @@ ZipArchive::~ZipArchive()
   assert(writeArchive->m_zip_mode == MZ_ZIP_MODE_INVALID);
 }
 
-void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
+void ZipArchive::AddResourcesFromArchive(const std::string& archiveFileName)
 {
   mz_zip_archive currZipArchive;
   mz_uint currZipIndex = 0;
@@ -503,32 +516,14 @@ void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
           {
             throw std::runtime_error("Found duplicate file with name " + std::string(archiveName));
           }
+
           std::string archiveEntry(archiveName);
           if (archiveEntry.find_first_of("/", 0) == archiveEntry.find_last_of("/") &&
               std::string::npos != archiveEntry.find("/manifest.json"))
           {
-            char manifestFileContents[MZ_ZIP_MAX_IO_BUF_SIZE];
-            memset(manifestFileContents, 0, MZ_ZIP_MAX_IO_BUF_SIZE);
-            if(MZ_TRUE == mz_zip_reader_extract_file_to_mem(&currZipArchive, 
-                            archiveEntry.c_str(),
-                            manifestFileContents, 
-                            MZ_ZIP_MAX_IO_BUF_SIZE, 
-                            0))
-            {
-              try
-              {
-                Json::Value root;
-                std::istringstream json(manifestFileContents);
-                parseAndValidateJson(json, root);
-              }
-              catch (const InvalidManifest& e)
-              {
-                std::string exceptionMsg(archiveFileName);
-                exceptionMsg += " (" + archiveEntry + ") : " + e.what();
-                throw InvalidManifest(exceptionMsg);
-              }
-            }
+            validateManifestInArchive(&currZipArchive, archiveFileName, archiveEntry);
           }
+
           if (!mz_zip_writer_add_from_zip_reader(writeArchive.get(), &currZipArchive, currZipIndex))
           {
             throw std::runtime_error("Failed to append file " + std::string(archiveName) + " from archive " + archiveFileName);
@@ -539,11 +534,6 @@ void ZipArchive::AddResourcesFromArchive(const std::string &archiveFileName)
           AddDirectory(std::string(archiveName));
         }
       }
-    }
-    catch (const InvalidManifest&)
-    {
-      mz_zip_reader_end(&currZipArchive);
-      throw;
     }
     catch (const std::exception& )
     {
@@ -785,7 +775,7 @@ int main(int argc, char** argv)
       std::unique_ptr<ZipArchive> zipArchive(new ZipArchive(zipFile, compressionLevel, bundleName));
       
       // map of manifest file to its JSON data
-      std::map<std::string, Json::Value> manifests; 
+      std::unordered_map<std::string, Json::Value> manifests; 
 
       // Add the manifest file to zip archive
       if (options[MANIFESTADD])

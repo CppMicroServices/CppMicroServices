@@ -61,11 +61,11 @@ Services library specifies the following standard keys for re-use in
 
 .. attention::
 
-   JSON is case-sensitive. However C++ Micro Services stores bundle properties in
-   a case in-sensitive way to accommodate :any:`LDAPFilter <cppmicroservices::LDAPFilter>`
-   and :any:`LDAPProp <cppmicroservices::LDAPProp>` which are case-insensitive.
-   Be aware of this when querying bundle properties. Either keep the JSON case-insensitive or
-   standardize on a convention to ensure queries return the correct results.
+   Despite JSON being a case-sensitive format, C++ Micro Services stores bundle properties
+   as case-insensitive to accommodate LDAP queries using :any:`LDAPFilter <cppmicroservices::LDAPFilter>`
+   and :any:`LDAPProp <cppmicroservices::LDAPProp>`.
+   Either keep the JSON case-insensitive or standardize on a convention to ensure queries
+   return the correct results.
 
 
 When parsing the ``manifest.json`` file, the JSON types are mapped to

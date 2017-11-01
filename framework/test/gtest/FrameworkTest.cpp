@@ -462,24 +462,24 @@ TEST(FrameworkTest, Events)
   // since all bundles are embedded in the main executable, all bundles are
   // installed at framework start. simply check for start and stop events
   std::vector<cppmicroservices::Bundle> bundles;
-  bundles.push_back(testing::GetBundle("TestBundleA", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleA2", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleB", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleA", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleA2", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleB", fmc));
 #ifdef US_ENABLE_THREADING_SUPPORT
-  bundles.push_back(testing::GetBundle("TestBundleC1", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleC1", fmc));
 #endif
-  bundles.push_back(testing::GetBundle("TestBundleH", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleImportedByB", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleLQ", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleM", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleR", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleRA", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleRL", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleS", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleSL1", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleSL3", fmc));
-  bundles.push_back(testing::GetBundle("TestBundleSL4", fmc));
-  bundles.push_back(testing::GetBundle("main", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleH", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleImportedByB", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleLQ", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleM", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleR", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleRA", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleRL", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleS", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleSL1", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleSL3", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("TestBundleSL4", fmc));
+  bundles.push_back(cppmicroservices::testing::GetBundle("main", fmc));
 #endif
   
   

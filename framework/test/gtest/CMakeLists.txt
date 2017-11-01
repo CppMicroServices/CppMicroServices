@@ -18,9 +18,11 @@ set(_gtest_tests
   LDAPExprTest.cpp
   LDAPFilterTest.cpp
   UtilsTest.cpp
+  FrameworkTest.cpp
 )
 
 set(_additional_srcs
+  ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
   $<TARGET_OBJECTS:util>
   )

@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H
-#define CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H
+#ifndef CPPMICROSERVICES_TESTUTILLISTENERHELPERS_H
+#define CPPMICROSERVICES_TESTUTILLISTENERHELPERS_H
 
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ServiceEvent.h"
@@ -30,39 +30,6 @@
 #include "TestingMacros.h"
 
 namespace cppmicroservices {
-
-class TestBundleListener {
-
-public:
-
-  TestBundleListener();
-
-  void BundleChanged(const BundleEvent& event);
-
-  void ServiceChanged(const ServiceEvent& event);
-
-  BundleEvent GetBundleEvent() const;
-
-  ServiceEvent GetServiceEvent() const;
-
-  bool CheckListenerEvents(
-      bool pexp, BundleEvent::Type ptype,
-      bool sexp, ServiceEvent::Type stype,
-      const Bundle& bundleX, ServiceReferenceU* servX);
-
-  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts, bool relaxed = false);
-
-  bool CheckListenerEvents(const std::vector<ServiceEvent>& seEvts);
-
-  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts,
-                           const std::vector<ServiceEvent>& seEvts,
-                           bool relaxed = false);
-
-private:
-
-  std::vector<ServiceEvent> serviceEvents;
-  std::vector<BundleEvent> bundleEvents;
-};
 
 template<class Receiver>
 class BundleListenerRegistrationHelper

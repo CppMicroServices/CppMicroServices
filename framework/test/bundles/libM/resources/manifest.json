@@ -4,6 +4,7 @@
   "bundle.version": "1.0.0",
   "bundle.activator" : true,
   "number": 5,
+  "double": 1.1,
   "vector": [
     "first",
     2,

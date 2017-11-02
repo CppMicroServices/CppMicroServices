@@ -60,7 +60,7 @@ case, creating shared bundles is not supported. If you create shared
 bundles that link a static version of the CppMicroServices library, the
 runtime behavior is undefined.
 
-In this usage scenario, every bundle will be statically build and linked
+In this usage scenario, every bundle will be statically built and linked
 to an executable:
 
 .. literalinclude:: snippets/uServices-staticbundles/main.cpp

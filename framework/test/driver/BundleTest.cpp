@@ -691,7 +691,132 @@ void TestUnicodePaths()
 #endif
 }
 
+// At the moment only the code path is being exercised to satisfy code coverage metrics.
+// @todo Add more tests once Bundle start options are supported.
+void TestBundleStartOptions()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  US_TEST_NO_EXCEPTION(bundle.Start(cppmicroservices::Bundle::StartOptions::START_ACTIVATION_POLICY));
 }
+
+void TestBundleLessThanOperator()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundleA = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto bundleB = testing::InstallLib(frameworkCtx, "TestBundleB");
+
+  US_TEST_CONDITION_REQUIRED(bundleA < bundleB, "Test that bundles are ordered correctly.");
+  US_TEST_CONDITION_REQUIRED(bundleA < Bundle(), "Test that bundles are ordered correctly.");
+  US_TEST_CONDITION_REQUIRED(!(Bundle() < bundleB), "Test that bundles are ordered correctly.");
+  US_TEST_CONDITION_REQUIRED(!(Bundle() < Bundle()), "Test that bundles are ordered correctly.");
+}
+
+void TestBundleAssignmentOperator()
+{
+  Bundle b;
+  Bundle b1;
+  b = b1;
+  US_TEST_CONDITION_REQUIRED(b1 == b, "Test that the bundle objects are equivalent.");
+
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundleA = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto bundleB = testing::InstallLib(frameworkCtx, "TestBundleB");
+
+  US_TEST_CONDITION_REQUIRED(bundleB.GetBundleId() != bundleA.GetBundleId(), "Test that the bundles are different before assignment.");
+  US_TEST_CONDITION_REQUIRED(bundleB != bundleA, "Test that the bundles are different before assignment.");
+
+  bundleB = bundleA;
+
+  US_TEST_CONDITION_REQUIRED(bundleB.GetBundleId() == bundleA.GetBundleId(), "Test bundle object assignment.");
+  US_TEST_CONDITION_REQUIRED(bundleB == bundleA, "Test that the bundle objects are equivalent.");
+}
+
+void TestBundleStreamOperator()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  const auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  US_TEST_OUTPUT(<< &bundle);
+}
+
+// Tests for a deprecated API 
+// @todo Remove once this API is removed.
+void TestBundleGetProperties()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto bundleProperties = bundle.GetProperties();
+
+  US_TEST_CONDITION_REQUIRED(!bundleProperties.empty(), "Test that bundle properties exist.");
+
+  Any symbolicNameProperty(bundleProperties.at(Constants::BUNDLE_SYMBOLICNAME));
+  US_TEST_CONDITION_REQUIRED(!symbolicNameProperty.Empty(), "Test that bundle properties contain an expected property.");
+  US_TEST_CONDITION_REQUIRED("TestBundleA" == symbolicNameProperty.ToStringNoExcept(), "Test that bundle properties contain an expected property.");
+}
+
+// Tests for a deprecated API 
+// @todo Remove once this API is removed.
+void TestBundleGetProperty()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+
+  // get a bundle property
+  Any bundleProperty(bundle.GetProperty(Constants::BUNDLE_SYMBOLICNAME));
+  US_TEST_CONDITION_REQUIRED("TestBundleA" == bundleProperty.ToStringNoExcept(), "Test querying a bundle property succeeds.");
+
+  // get a framework property
+  Any frameworkProperty(bundle.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT));
+  US_TEST_CONDITION_REQUIRED(!frameworkProperty.ToStringNoExcept().empty(), "Test that querying a framework property from a bundle object succeeds.");
+
+  // get a non existent property
+  Any emptyProperty(bundle.GetProperty("does.not.exist"));
+  US_TEST_CONDITION_REQUIRED(emptyProperty.Empty(), "Test that querying a non-existent property returns an empty property object.");
+}
+
+// Tests for a deprecated API 
+// @todo Remove test once this API is removed.
+void TestBundleGetPropertyKeys()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto keys = bundle.GetPropertyKeys();
+
+  US_TEST_CONDITION_REQUIRED(!keys.empty(), "Test that bundle property keys exist.");
+  US_TEST_CONDITION_REQUIRED(keys.end() != std::find(keys.begin(), keys.end(), Constants::BUNDLE_SYMBOLICNAME), "Test that property keys contain the expected keys.");
+  US_TEST_CONDITION_REQUIRED(keys.end() != std::find(keys.begin(), keys.end(), Constants::BUNDLE_ACTIVATOR), "Test that property keys contain the expected keys.");
+}
+
+
+} // end anonymous namespace
 
 int BundleTest(int /*argc*/, char* /*argv*/[])
 {
@@ -746,6 +871,13 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestAutoInstallEmbeddedBundles();
   TestNonStandardBundleExtension();
   TestUnicodePaths();
+  TestBundleStartOptions();
+  TestBundleLessThanOperator();
+  TestBundleAssignmentOperator();
+  TestBundleStreamOperator();
+  TestBundleGetProperties();
+  TestBundleGetPropertyKeys();
+  TestBundleGetProperty();
 
   US_TEST_END()
 }

@@ -58,8 +58,13 @@ int runExecutable(const std::string& executable)
 #if defined US_PLATFORM_WINDOWS
 #define WEXITSTATUS 
 #endif
+
   int ret = std::system(executable.c_str());
+
+  // WEXITSTATUS uses an old c-sytle cast
+US_GCC_PUSH_DISABLE_WARNING(old-style-cast)
   return WEXITSTATUS(ret);
+US_GCC_POP_WARNING
 }
 
 /*

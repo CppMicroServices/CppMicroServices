@@ -576,7 +576,8 @@ struct Custom_Arg : public option::Arg
       // the return value of strtol is misleading since 0 indicates failure and
       // we support 0 as a valid command line option argument. Checking errno
       // is the correct way to determine if the argument is valid.
-      strtol(option.arg, &endptr, 10);
+      long ret = strtol(option.arg, &endptr, 10);
+      (void)ret;
       if (errno != ERANGE)
       {
         errno = 0;

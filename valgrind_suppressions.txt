@@ -247,6 +247,18 @@
 {
    <miniz-uninitialized_values>
    Memcheck:Cond
+   fun:tdefl_compress
+   fun:tdefl_compress_buffer
+   fun:mz_zip_writer_add_mem_ex
+   fun:mz_zip_writer_add_mem
+   ...
+   fun:main
+}
+
+
+{
+   <miniz-uninitialized_values>
+   Memcheck:Cond
    fun:tdefl_compress_normal
    ...
    fun:mz_zip_writer_add_mem

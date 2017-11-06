@@ -23,6 +23,7 @@ limitations under the License.
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <type_traits>
 
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Framework.h"

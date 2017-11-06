@@ -40,12 +40,27 @@ limitations under the License.
 using namespace cppmicroservices;
 using cppmicroservices::testing::GetTempDirectory;
 
+#if !defined(__clang__) && defined(__GNUC__)
+#define US_GCC_VER (__GNUC__ * 10000 \
+                    + __GNUC_MINOR__ * 100 \
+                    + __GNUC_PATCHLEVEL__)
+#endif
+
+// TODO: Remove all occurences of US_TYPE_OPERATIONS_AVAILABLE macro
+// once the minimum GCC compiler required is 4.7 or above
+#if defined(US_GCC_VER) && (US_GCC_VER < 40700)
+#define US_TYPE_OPERATIONS_AVAILABLE 0
+#else
+#define US_TYPE_OPERATIONS_AVAILABLE 1
+#endif
+
 TEST(FrameworkTest, Ctor)
 {
+#if US_TYPE_OPERATIONS_AVAILABLE
   ASSERT_FALSE(std::is_default_constructible<Framework>::value);
   ASSERT_FALSE(std::is_constructible<Framework>::value);
   ASSERT_TRUE((std::is_constructible<Framework,Bundle>::value));
-
+#endif
   //Bundle b;
   //ASSERT_THROW(Framework(Bundle(b)), std::logic_error); This causes a crash. TODO: Fix crash and uncomment this line.
   
@@ -62,7 +77,9 @@ TEST(FrameworkTest, Ctor)
 
 TEST(FrameworkTest, MoveCtor)
 {
+#if US_TYPE_OPERATIONS_AVAILABLE
   ASSERT_TRUE(std::is_move_constructible<Framework>::value);
+#endif
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
@@ -73,7 +90,9 @@ TEST(FrameworkTest, MoveCtor)
 
 TEST(FrameworkTest, MoveAssign)
 {
+#if US_TYPE_OPERATIONS_AVAILABLE
   ASSERT_TRUE(std::is_move_assignable<Framework>::value);
+#endif
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
@@ -84,7 +103,9 @@ TEST(FrameworkTest, MoveAssign)
 
 TEST(FrameworkTest, CopyCtor)
 {
+#if US_TYPE_OPERATIONS_AVAILABLE
   ASSERT_TRUE(std::is_copy_constructible<Framework>::value);
+#endif
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
@@ -99,7 +120,9 @@ TEST(FrameworkTest, CopyCtor)
 
 TEST(FrameworkTest, CopyAssign)
 {
+#if US_TYPE_OPERATIONS_AVAILABLE
   ASSERT_TRUE(std::is_copy_assignable<Framework>::value);
+#endif
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();

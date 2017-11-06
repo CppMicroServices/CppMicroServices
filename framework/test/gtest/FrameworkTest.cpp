@@ -51,8 +51,12 @@ TEST(FrameworkTest, Ctor)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
-  Bundle bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
-  ASSERT_THROW(Framework(Bundle(bundle)), std::logic_error);
+#if defined(US_BUILD_SHARED_LIBS)
+  auto bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
+#else
+  auto bundle = cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
+#endif
+  ASSERT_THROW(auto f1 = Framework(Bundle(bundle)), std::logic_error);
 }
 
 TEST(FrameworkTest, MoveCtor)

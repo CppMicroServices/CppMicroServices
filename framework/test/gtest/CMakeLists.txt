@@ -19,6 +19,7 @@ set(_gtest_tests
   LDAPFilterTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp
+  ImportTestBundles.cpp
 )
 
 set(_additional_srcs
@@ -53,9 +54,7 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(${us_gtest_test_exe_name} rt)
 endif()
 
-# Add resources
-usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
-                         FILES manifest.json)
+
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
 # GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.
@@ -103,3 +102,20 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
   endforeach(lib_fullpath)
 endif()
 
+#-----------------------------------------------------------------------------
+# Add dependencies on test bundles if building shared libraries or 
+# link them if building static libraries
+#-----------------------------------------------------------------------------
+
+if(US_BUILD_SHARED_LIBS)
+    add_dependencies(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
+    # Add resources
+    usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
+                             FILES manifest.json)
+else()
+    target_link_libraries(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
+    # Add resources
+    usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
+                             FILES manifest.json
+                             ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
+endif()

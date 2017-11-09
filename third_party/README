@@ -29,7 +29,11 @@ MIT License or Public Domain
 
 https://github.com/open-source-parsers/jsoncpp
 (formerly http://jsoncpp.sourceforge.net)
-0.6.0-rc2
+0.10.6
+
+Patches
+
+ * Suppress -Wimplicit-fallthrough warning in GCC 7
 
 miniz
 -----

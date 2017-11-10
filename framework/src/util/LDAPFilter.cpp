@@ -85,22 +85,22 @@ LDAPFilter::operator bool() const
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false);
+  return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false) : false);
 }
     
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(bundle.GetHeaders()), false), false);
+  return ((d) ? d->ldapExpr.Evaluate(PropertiesHandle(Properties(bundle.GetHeaders()), false), false) : false);
 }
 
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
-  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), false);
+  return ((d) ? d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), false) : false);
 }
 
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
-  return d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), true);
+  return ((d) ? d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), true) : false);
 }
 
 std::string LDAPFilter::ToString() const

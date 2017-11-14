@@ -97,7 +97,10 @@ TEST(FrameworkTest, MoveAssign)
   ASSERT_TRUE(f);
   f.Start();
   ASSERT_EQ(f.GetState(), Bundle::STATE_ACTIVE);
-  Framework f1 = std::move(f);
+  Framework f1 = FrameworkFactory().NewFramework();
+  ASSERT_TRUE(f1);
+  ASSERT_EQ(f1.GetState(), Bundle::STATE_INSTALLED);
+  f1 = std::move(f);
   ASSERT_EQ(f1.GetState(), Bundle::STATE_ACTIVE);
 }
 
@@ -110,7 +113,7 @@ TEST(FrameworkTest, CopyCtor)
   ASSERT_TRUE(f);
   f.Start();
   ASSERT_EQ(f.GetState(), Bundle::STATE_ACTIVE);
-  Framework f1(f); // exercise the copy constructor
+  Framework f1(f);
   ASSERT_EQ(f1.GetState(), Bundle::STATE_ACTIVE);
   f1.Stop();
   f1.WaitForStop(std::chrono::milliseconds::zero());
@@ -127,7 +130,10 @@ TEST(FrameworkTest, CopyAssign)
   ASSERT_TRUE(f);
   f.Start();
   ASSERT_EQ(f.GetState(), Bundle::STATE_ACTIVE);
-  Framework f1 = f; // exercise the copy assignment
+  Framework f1 = FrameworkFactory().NewFramework();
+  ASSERT_TRUE(f1);
+  ASSERT_EQ(f1.GetState(), Bundle::STATE_INSTALLED);
+  f1 = f; 
   ASSERT_EQ(f1.GetState(), Bundle::STATE_ACTIVE);
   f1.Stop();
   f1.WaitForStop(std::chrono::milliseconds::zero());

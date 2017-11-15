@@ -106,7 +106,8 @@ void TestServiceReferenceMemberFunctions(BundleContext context)
   // Test ServiceReference member functions GetPropertyKeys()
   std::vector<std::string> keys;
   ref1.GetPropertyKeys(keys);
-  US_TEST_CONDITION(keys.size() > 0, "Test keys size")
+  US_TEST_CONDITION(std::find(keys.begin(), keys.end(), "StringKey") != keys.end(), "Test existence of key StringKey")
+  US_TEST_CONDITION(std::find(keys.begin(), keys.end(), "Status") != keys.end(), "Test existence of key Status")
 
   auto keys_by_val = ref1.GetPropertyKeys();
   US_TEST_CONDITION(keys_by_val == keys, "Test keys equality")

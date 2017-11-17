@@ -73,12 +73,9 @@ private:
 public:
 
   /**
-   * Creates in invalid <code>LDAPFilter</code> object.
-   * Test the validity by using the boolean conversion operator.
+   * Creates a valid <code>LDAPFilter</code> object that
+   * matches nothing.
    *
-   * <p>
-   * Calling methods on an invalid <code>LDAPFilter</code>
-   * will result in undefined behavior.
    */
   LDAPFilter();
 

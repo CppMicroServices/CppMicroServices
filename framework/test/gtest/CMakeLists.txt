@@ -19,12 +19,12 @@ set(_gtest_tests
   LDAPFilterTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp
-  ImportTestBundles.cpp
 )
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
+  ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
   )
 

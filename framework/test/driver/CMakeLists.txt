@@ -75,6 +75,7 @@ set(_additional_srcs
   TestManager.cpp
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
+  ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
 )
 

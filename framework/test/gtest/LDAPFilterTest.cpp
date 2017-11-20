@@ -20,8 +20,12 @@ limitations under the License.
 
 =============================================================================*/
 
+#include "cppmicroservices/Bundle.h"
+
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
+
+#include "cppmicroservices/ServiceReference.h"
 
 #include "gtest/gtest.h"
 
@@ -73,4 +77,13 @@ TEST(LDAPFilter, LDAPProp)
   );
   const std::string filterStr = "(&(&(&(&(&(!(bla=jo))(foo=hello))(!(bar=bye)))(baz>=30))(bleh<=50))(doh~=Ballpark))";
   ASSERT_EQ(filter.ToString(), filterStr);
+}
+
+TEST(LDAPFilter, DefaultConstructedMatch)
+{
+  LDAPFilter filter;
+  ASSERT_NO_THROW(filter.Match(AnyMap(any_map::map_type::ORDERED_MAP)));
+  ASSERT_NO_THROW(filter.Match(ServiceReferenceU()));
+  ASSERT_NO_THROW(filter.Match(Bundle()));
+  ASSERT_NO_THROW(filter.MatchCase(AnyMap(any_map::map_type::ORDERED_MAP)));
 }

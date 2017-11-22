@@ -58,8 +58,7 @@ TEST(FrameworkTest, Ctor)
 {
 #if US_TYPE_OPERATIONS_AVAILABLE
   ASSERT_FALSE(std::is_default_constructible<Framework>::value);
-  ASSERT_FALSE(std::is_constructible<Framework>::value);
-  ASSERT_TRUE((std::is_constructible<Framework,Bundle>::value));
+  ASSERT_TRUE(std::is_constructible<Framework,Bundle>::value);
 #endif
   //Bundle b;
   //ASSERT_THROW(Framework(Bundle(b)), std::logic_error); This causes a crash. TODO: Fix crash and uncomment this line.

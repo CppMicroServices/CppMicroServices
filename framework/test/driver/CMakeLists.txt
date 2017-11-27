@@ -33,7 +33,6 @@ set(_tests
   BundleRegistryPerformanceTest
   FrameworkEventTest
   FrameworkListenerTest
-  FrameworkTest
   FrameworkFactoryTest
   HelgrindTest
   LDAPFilterTest
@@ -74,8 +73,9 @@ endif()
 set(_additional_srcs
   TestDriverActivator.cpp
   TestManager.cpp
-  TestUtilBundleListener.cpp
+  ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
+  ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
 )
 

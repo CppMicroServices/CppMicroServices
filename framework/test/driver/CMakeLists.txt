@@ -74,6 +74,7 @@ set(_additional_srcs
   TestDriverActivator.cpp
   TestManager.cpp
   ../util/TestUtilBundleListener.cpp
+  ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>

@@ -19,6 +19,7 @@ set(_gtest_tests
   LDAPFilterTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp
+  ServiceObjectsTest.cpp
 )
 
 set(_additional_srcs

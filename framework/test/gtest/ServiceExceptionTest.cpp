@@ -23,44 +23,31 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/ServiceObjects.h"
 #include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
-struct ITestServiceA
+TEST(ServiceExceptionTest, TestServiceException)
 {
-  virtual ~ITestServiceA() {}
-};
-
-TEST(ServiceObjectsTest, TestServiceObjects)
-{
-  struct TestServiceA : public ITestServiceA
-  {
-  };
-
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
   framework.Start();
   auto context = framework.GetBundleContext();
 
-  auto s1 = std::make_shared<TestServiceA>();
-  ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<ITestServiceA>(s1);
-  auto ref = context.GetServiceReference("ITestServiceA");
-  ServiceObjects<void> serviceObject = context.GetServiceObjects(ref);
-  ASSERT_TRUE(serviceObject.GetService() != nullptr);
-
-  auto invalid_ref = context.GetServiceReference("InvalidService");
-  ASSERT_THROW(context.GetServiceObjects(invalid_ref), std::invalid_argument);
-
-  auto ref_from_so = serviceObject.GetServiceReference();
-  ASSERT_TRUE(ref_from_so);
-
-  // Move ctor and assignment
-  ServiceObjects<void> serviceObjMove(std::move(serviceObject));
-  serviceObjMove = context.GetServiceObjects(ref_from_so);
-
-  // verify GetService returns null after service unregistration
-  reg1.Unregister();
-  ASSERT_TRUE(serviceObjMove.GetService() == nullptr);
+  // Test ServiceException assignment and ostream operations.
+  // We artifically throw the exception by getting a "void" ServiceReference.
+  ASSERT_THROW(context.GetServiceReferences<void>(), ServiceException);
+  try
+  {
+    auto refs = context.GetServiceReferences<void>();
+  }
+  catch (const ServiceException& se)
+  {
+    ServiceException other_se = se;
+    other_se = se;
+    std::string expected_prefix = "ServiceException: ";
+    std::ostringstream strstream;
+    strstream << other_se;
+    ASSERT_TRUE(strstream.str().compare(0, expected_prefix.length(), expected_prefix) == 0);
+  }
 }

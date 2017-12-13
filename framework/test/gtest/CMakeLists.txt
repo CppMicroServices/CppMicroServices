@@ -19,6 +19,7 @@ set(_gtest_tests
   LDAPFilterTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp
+  ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
 )
 

@@ -29,17 +29,9 @@ using namespace cppmicroservices;
 
 TEST(ServiceExceptionTest, TestServiceException)
 {
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-  auto context = framework.GetBundleContext();
-
-  // Test ServiceException assignment and ostream operations.
-  // We artifically throw the exception by getting a "void" ServiceReference.
-  ASSERT_THROW(context.GetServiceReferences<void>(), ServiceException);
   try
   {
-    auto refs = context.GetServiceReferences<void>();
+    throw ServiceException("A service exception");
   }
   catch (const ServiceException& se)
   {

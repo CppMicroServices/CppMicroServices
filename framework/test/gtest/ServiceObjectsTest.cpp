@@ -58,7 +58,9 @@ TEST(ServiceObjectsTest, TestServiceObjects)
 
   // Move ctor and assignment
   ServiceObjects<void> serviceObjMove(std::move(serviceObject));
+  ASSERT_TRUE(serviceObjMove.GetServiceReference());
   serviceObjMove = context.GetServiceObjects(ref_from_so);
+  ASSERT_TRUE(serviceObjMove.GetServiceReference());
 
   // verify GetService returns null after service unregistration
   reg1.Unregister();

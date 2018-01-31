@@ -28,12 +28,12 @@
 
 namespace cppmicroservices {
 
-class TestBundleFActivator : public BundleActivator
+class TestBundleStartFailActivator : public BundleActivator
 {
 public:
 
-  TestBundleFActivator() {}
-  ~TestBundleFActivator() {}
+  TestBundleStartFailActivator() {}
+  ~TestBundleStartFailActivator() {}
 
   void Start(BundleContext )
   {
@@ -46,4 +46,4 @@ public:
 
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleFActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleStartFailActivator)

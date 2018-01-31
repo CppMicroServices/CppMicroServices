@@ -824,22 +824,53 @@ void TestBundleManifestFailures()
   f.Start();
   auto bc = f.GetBundleContext();
 
+  std::vector<std::string> validBundleNames({f.GetSymbolicName(), "main"});
+  std::sort(validBundleNames.begin(), validBundleNames.end());
+
+  auto validateBundleNames = [](std::vector<std::string>& original, std::vector<std::string>& installed) 
+  {
+    std::sort(installed.begin(), installed.end());
+    return std::includes(original.begin(), original.end(), installed.begin(), installed.end());
+  };
+
+  auto getCurrentBundleNames = [&bc]()
+  {
+    std::vector<std::string> names;
+    for (auto& b : bc.GetBundles())
+    {
+      names.push_back(b.GetSymbolicName());
+    }
+    return names;
+  };
+
   // throw if manifest.json bundle version key is not a string type
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithInvalidVersionType"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an invalid bundle.version type results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+      "Test that an invalid bundle.version type results in not installing the bundle.");
 
   // throw if BundleVersion ctor throws in BundlePrivate ctor
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithInvalidVersion"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an invalid bundle.version results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+      "Test that an invalid bundle.version results in not installing the bundle.");
 
   // throw if missing bundle.symbolic_name key in manifest.json
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithoutBundleName"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that a missing bundle.symbolic_name results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+      "Test that a missing bundle.symbolic_name results in not installing the bundle.");
 
   // throw if empty bundle.symbolic_name value in manifest.json
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithEmptyBundleName"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an empty bundle.symbolic_name results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+      "Test that an empty bundle.symbolic_name results in not installing the bundle.");
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
 }
+#endif
 
 // Test the behavior of illegal bundle state changes.
 void TestIllegalBundleStateChange()
@@ -855,11 +886,25 @@ void TestIllegalBundleStateChange()
   // Test stopping an uninstalled bundle
   US_TEST_FOR_EXCEPTION(std::logic_error, bundleA.Stop());
 
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
+
+  f = FrameworkFactory().NewFramework();
+  US_TEST_NO_EXCEPTION(f.Start());
+  bc = f.GetBundleContext();
+
   bundleA = testing::InstallLib(bc, "TestBundleA");
   US_TEST_NO_EXCEPTION(bundleA.Start());
   US_TEST_NO_EXCEPTION(bundleA.Uninstall());
   // Test starting an uninstalled bundle
   US_TEST_FOR_EXCEPTION(std::logic_error, bundleA.Start());
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
+
+  f = FrameworkFactory().NewFramework();
+  US_TEST_NO_EXCEPTION(f.Start());
+  bc = f.GetBundleContext();
 
   bundleA = testing::InstallLib(bc, "TestBundleA");
   US_TEST_NO_EXCEPTION(bundleA.Start());
@@ -875,6 +920,9 @@ void TestIllegalBundleStateChange()
   US_TEST_NO_EXCEPTION(testing::InstallLib(bc, "TestBundleA"));
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleADuplicate"));
 #endif
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
 }
 
 // test failure on waiting for bundle operations.
@@ -979,6 +1027,7 @@ void TestWaitOnBundleOperation()
   f6.WaitForStop(std::chrono::seconds::zero());
 }
 
+#if defined (US_BUILD_SHARED_LIBS)
 // Test the behavior of a bundle activator which throws an exception.
 void TestBundleActivatorFailures()
 {
@@ -1083,18 +1132,19 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestBundleGetPropertyKeys();
   TestBundleGetProperty();
 
-#if defined (US_BUILD_SHARED_LIBS)
   // will not test:
   // Fragments - unable to test without defining what a Fragment is and implementing it
   //    Fragment code path in BundlePrivate::GetUpdatedState
   // lazy activation code path - requires defining lazy activation for C++ and implementing it. 
   // BundlePrivate::GetAutoStartSetting() - no callers, internal or external
   // invalid json use case - this is automatically checked by usResourceCompiler.
+#if defined (US_BUILD_SHARED_LIBS)
   TestBundleManifestFailures();
-  TestIllegalBundleStateChange();
   TestBundleActivatorFailures();
-  TestWaitOnBundleOperation();
 #endif
+
+  TestIllegalBundleStateChange();
+  TestWaitOnBundleOperation();
 
   US_TEST_END()
 }

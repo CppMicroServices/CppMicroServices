@@ -28,8 +28,10 @@ if(US_BUILD_SHARED_LIBS)
   add_subdirectory(libMWithoutBundleName)
   add_subdirectory(libStartFail)
   add_subdirectory(libStopFail)
-  add_subdirectory(libWaitOnBundleOperation)
 endif()
+
+add_subdirectory(libWaitOnBundleOperation)
+  
 add_subdirectory(libS)
 add_subdirectory(libSL1)
 add_subdirectory(libSL3)

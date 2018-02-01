@@ -827,44 +827,40 @@ void TestBundleManifestFailures()
   std::vector<std::string> validBundleNames({f.GetSymbolicName(), "main"});
   std::sort(validBundleNames.begin(), validBundleNames.end());
 
-  auto validateBundleNames = [](std::vector<std::string>& original, std::vector<std::string>& installed) 
+  auto validateBundleNames = [&bc](std::vector<std::string>& original)
   {
-    std::sort(installed.begin(), installed.end());
-    return std::includes(original.begin(), original.end(), installed.begin(), installed.end());
-  };
-
-  auto getCurrentBundleNames = [&bc]()
-  {
+    auto installed = bc.GetBundles();
     std::vector<std::string> names;
-    for (auto& b : bc.GetBundles())
+    for (auto& b : installed)
     {
       names.push_back(b.GetSymbolicName());
     }
-    return names;
+    std::sort(names.begin(), names.end());
+    return std::includes(original.begin(), original.end(), names.begin(), names.end());
   };
 
   // throw if manifest.json bundle version key is not a string type
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithInvalidVersionType"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an invalid bundle.version type results in not installing the bundle.");
-  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
       "Test that an invalid bundle.version type results in not installing the bundle.");
 
   // throw if BundleVersion ctor throws in BundlePrivate ctor
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithInvalidVersion"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an invalid bundle.version results in not installing the bundle.");
-  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
       "Test that an invalid bundle.version results in not installing the bundle.");
 
   // throw if missing bundle.symbolic_name key in manifest.json
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithoutBundleName"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that a missing bundle.symbolic_name results in not installing the bundle.");
-  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
       "Test that a missing bundle.symbolic_name results in not installing the bundle.");
 
   // throw if empty bundle.symbolic_name value in manifest.json
   US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithEmptyBundleName"));
   US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an empty bundle.symbolic_name results in not installing the bundle.");
-  US_TEST_CONDITION(true == validateBundleNames(validBundleNames, getCurrentBundleNames()),
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
       "Test that an empty bundle.symbolic_name results in not installing the bundle.");
 
   f.Stop();

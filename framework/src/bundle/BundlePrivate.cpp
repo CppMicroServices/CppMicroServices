@@ -723,7 +723,7 @@ std::exception_ptr BundlePrivate::Start0()
     }
     if (!cause.empty())
     {
-      res = std::make_exception_ptr("Bundle#" + util::ToString(id) + " start failed: " + cause);
+      res = std::make_exception_ptr(std::runtime_error("Bundle#" + util::ToString(id) + " start failed: " + cause));
     }
   }
 
@@ -913,7 +913,7 @@ BundlePrivate::BundlePrivate(
   }
 
   Any bsn(bundleManifest.GetValue(Constants::BUNDLE_SYMBOLICNAME));
-  if (bsn.Empty())
+  if (bsn.Empty() || bsn.ToStringNoExcept().empty())
   {
     throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is empty in the bundle manifest for bundle " + symbolicName + ".");
   }

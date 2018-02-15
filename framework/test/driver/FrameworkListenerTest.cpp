@@ -29,6 +29,7 @@
 
 #include "TestingConfig.h"
 #include "TestingMacros.h"
+#include "TestUtilFrameworkListener.h"
 #include "TestUtils.h"
 
 #include <thread>
@@ -37,65 +38,6 @@
 using namespace cppmicroservices;
 
 namespace {
-
-class TestFrameworkListener
-{
-public:
-  TestFrameworkListener() : _events() {}
-  virtual ~TestFrameworkListener() {};
-
-  std::size_t events_received() const { return _events.size(); }
-
-  bool CheckEvents(const std::vector<FrameworkEvent>& events)
-  {
-    bool listenState = true; // assume success
-    if (events.size() != _events.size())
-    {
-      listenState = false;
-      US_TEST_OUTPUT( << "*** Framework event mismatch ***\n expected "
-                        << events.size() << " event(s)\n found "
-                        << _events.size() << " event(s).");
-
-      const std::size_t max = events.size() > _events.size() ? events.size() : _events.size();
-      for (std::size_t i = 0; i < max; ++i)
-      {
-        const FrameworkEvent& pE = i < events.size() ? events[i] : FrameworkEvent();
-        const FrameworkEvent& pR = i < _events.size() ? _events[i] : FrameworkEvent();
-        US_TEST_OUTPUT( << " - " << pE << " - " << pR);
-      }
-    }
-    else
-    {
-      for (std::size_t i = 0; i < events.size(); ++i)
-      {
-        const FrameworkEvent& pE = events[i];
-        const FrameworkEvent& pR = _events[i];
-        if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle())
-        {
-          listenState = false;
-          US_TEST_OUTPUT( << "*** Wrong framework event ***\n found " << pR << "\n expected " << pE);
-        }
-      }
-    }
-
-    _events.clear();
-    return listenState;
-  }
-
-  void frameworkEvent(const FrameworkEvent& evt)
-  {
-    _events.push_back(evt);
-    std::cout << evt << std::endl;
-  }
-
-  void throwOnFrameworkEvent(const FrameworkEvent&)
-  {
-    throw std::runtime_error("whoopsie!");
-  }
-
-private:
-  std::vector<FrameworkEvent> _events;
-};
 
 void testStartStopFrameworkEvents()
 {

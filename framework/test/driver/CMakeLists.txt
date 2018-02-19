@@ -33,7 +33,6 @@ set(_tests
   BundleRegistryPerformanceTest
   FrameworkEventTest
   FrameworkListenerTest
-  FrameworkTest
   FrameworkFactoryTest
   HelgrindTest
   LDAPFilterTest
@@ -74,8 +73,10 @@ endif()
 set(_additional_srcs
   TestDriverActivator.cpp
   TestManager.cpp
-  TestUtilBundleListener.cpp
+  ../util/TestUtilBundleListener.cpp
+  ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
+  ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
 )
 
@@ -86,7 +87,10 @@ set(_additional_srcs
 set(_test_driver us${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
 create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
-set(_third_party_srcs ../../../third_party/miniz.c)
+set(_third_party_srcs 
+  ../../../third_party/miniz.c
+  ../../../third_party/jsoncpp.cpp
+)
 
 
 # Generate a custom "bundle init" file for the test driver executable

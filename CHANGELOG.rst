@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.3.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.3.0>`_ (2018-02-20)
+-----------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.2.0...v3.3.0>`_
+
+Added
+-----
+
+- Support constructing long LDAP expressions using concise C++
+  `#246 <https://github.com/CppMicroServices/CppMicroServices/issues/246>`_
+- Bundle manifest validation
+  `#182 <https://github.com/CppMicroServices/CppMicroServices/issues/182>`_
+
+Fixed
+-----
+
+- Fix seg faults when using default constructed LDAPFilter
+  `#251 <https://github.com/CppMicroServices/CppMicroServices/issues/251>`_
+
 `v3.2.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.2.0>`_ (2017-10-30)
 -----------------------------------------------------------------------------------------
 

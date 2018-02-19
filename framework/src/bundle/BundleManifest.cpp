@@ -22,7 +22,7 @@
 
 #include "BundleManifest.h"
 
-#include "jsoncpp.h"
+#include "json/json.h"
 
 #include <stdexcept>
 
@@ -74,13 +74,13 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
   {
     return Any(jsonValue.asBool());
   }
-  else if (jsonValue.isDouble())
-  {
-    return Any(jsonValue.asDouble());
-  }
   else if (jsonValue.isIntegral())
   {
     return Any(jsonValue.asInt());
+  }
+  else if (jsonValue.isDouble())
+  {
+    return Any(jsonValue.asDouble());
   }
 
   return Any();
@@ -95,7 +95,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
     Any anyValue = ParseJsonValue(jsonValue, false);
     if (!anyValue.Empty())
     {
-      anyMap.insert(std::make_pair(it.memberName(), anyValue));
+      anyMap.insert(std::make_pair(it.name(), anyValue));
     }
   }
 }
@@ -109,7 +109,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
     Any anyValue = ParseJsonValue(jsonValue, true);
     if (!anyValue.Empty())
     {
-      anyMap.insert(std::make_pair(it.memberName(), anyValue));
+      anyMap.insert(std::make_pair(it.name(), anyValue));
     }
   }
 }

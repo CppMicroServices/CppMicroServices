@@ -33,6 +33,7 @@
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
+#include "TestUtilListenerHelpers.h"
 #include "TestUtils.h"
 
 using namespace cppmicroservices;

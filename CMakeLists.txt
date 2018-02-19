@@ -524,7 +524,7 @@ endif()
 # Currently the default C++ library for gcc < 4.9 doesn't
 # fully support c++11 regex.
 # Generalize the detection of regex and make its availability
-# conditional of wether the compiler's C++ library supports it
+# conditional of whether the compiler's C++ library supports it
 # or not.
 # This can be removed once the minimum supported gcc version is 4.9
 if(NOT US_HAVE_REGEX AND US_BUILD_TESTING)

@@ -47,7 +47,8 @@ The following options are supported by the :program:`usResourceCompiler3` progra
  
 .. option:: --manifest-add, -m
  
-   Path to the bundle's manifest file. 
+   Path to the bundle's manifest file. If multiple --manifest-add options
+   are specified, all manifest files will be concatenated into one.
  
 .. option:: --bundle-file, -b
  
@@ -56,8 +57,8 @@ The following options are supported by the :program:`usResourceCompiler3` progra
 
 .. note::
 
-   #. Only options :option:`--res-add` and :option:`--zip-add` can be specified
-      multiple times.
+   #. Only options :option:`--res-add`, :option:`--zip-add` and :option:`--manifest-add`
+      can be specified multiple times.
    #. If option :option:`--manifest-add` or :option:`--res-add` is specified,
       option :option:`--bundle-name` must be provided.
    #. At-least one of :option:`--bundle-file` or :option:`--out-file` options
@@ -81,8 +82,8 @@ The following options are supported by the :program:`usResourceCompiler3` progra
 If you are not using CMake, you can run the resource compiler from the
 command line yourself.
 
-Example invocations
--------------------
+Example usage
+-------------
 
 Construct a zip blob with contents *mybundle/manifest.json*, merge the
 contents of zip file *filetomerge.zip* into it and write the resulting blob into
@@ -102,4 +103,10 @@ blob to *mybundle.dylib*::
 Append the contents of *archivetoembed.zip* to *mybundle.dll*::
 
    usResourceCompiler3.exe -b mybundle.dll -z archivetoembed.zip
+
+Construct a zip blob with the contents of manifest_part1.json and auto_generated_manifest.json
+concatenated into *mybundle/manifest.json* and embed it into *mybundle.dll*::
+
+   usResourceCompiler3 -n mybundle -b mybundle.dll -m manifest_part1.json
+     -m auto_generated_manifest.json
 

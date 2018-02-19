@@ -31,6 +31,7 @@
 #include "TestingMacros.h"
 
 #include <stdexcept>
+#include <unordered_set>
 
 using namespace cppmicroservices;
 
@@ -86,6 +87,49 @@ void TestUnregisterFix(BundleContext context)
   ServiceReference<int> reference = context.GetServiceReference<int>();
   registration.Unregister();
   US_TEST_CONDITION_REQUIRED(!reference.IsConvertibleTo("IBooService"), "Testing for IsConvertibleTo returning false");
+}
+
+void TestServiceReferenceMemberFunctions(BundleContext context)
+{
+  struct TestServiceA : public ITestServiceA
+  {
+  };
+
+  auto s1 = std::make_shared<TestServiceA>();
+  ServiceProperties props;
+  props["StringKey"] = std::string("A string value");
+  props["Status"] = false;
+
+  ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<ITestServiceA>(s1, props);
+  ServiceReference<ITestServiceA> ref1 = context.GetServiceReference<ITestServiceA>();
+
+  // Test ServiceReference member functions GetPropertyKeys()
+  std::vector<std::string> keys;
+  ref1.GetPropertyKeys(keys);
+  US_TEST_CONDITION(std::find(keys.begin(), keys.end(), "StringKey") != keys.end(), "Test existence of key StringKey")
+  US_TEST_CONDITION(std::find(keys.begin(), keys.end(), "Status") != keys.end(), "Test existence of key Status")
+
+  auto keys_by_val = ref1.GetPropertyKeys();
+  US_TEST_CONDITION(keys_by_val == keys, "Test keys equality")
+
+  // Test the ostream<< operator of ServiceReference
+  std::ostringstream strstream;
+  strstream << ref1;
+  US_TEST_CONDITION(strstream.str().size() > 0, "Test ostream<< operator of ServiceReference")
+
+  // Test the ostream<< operator of an invalid ServiceReference
+  ServiceReference<ITestServiceA> invalid_ref;
+  std::ostringstream strstream2;
+  strstream2 << invalid_ref;
+  US_TEST_CONDITION(strstream2.str() == "Invalid service reference", "Test ostream<< operator of an invalid ServiceReference")
+
+  // Test the custom hash function of ServiceReference
+  std::unordered_set<ServiceReferenceBase> sr_ref_set;
+  sr_ref_set.insert(ref1);
+  sr_ref_set.insert(invalid_ref);
+  US_TEST_CONDITION(sr_ref_set.size() == 2, "Test ServiceReference set cardinality")
+
+  reg1.Unregister();
 }
 
 void TestServicePropertiesUpdate(BundleContext context)
@@ -157,6 +201,7 @@ int ServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   TestMultipleServiceRegistrations(context);
   TestServicePropertiesUpdate(context);
   TestUnregisterFix(context);
+  TestServiceReferenceMemberFunctions(context);
 
   US_TEST_END()
 }

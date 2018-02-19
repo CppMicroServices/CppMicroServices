@@ -29,6 +29,7 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceEvent.h"
 
 #include "cppmicroservices/util/FileSystem.h"
@@ -38,6 +39,7 @@
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 #include "TestUtilBundleListener.h"
+#include "TestUtilFrameworkListener.h"
 #include "TestUtils.h"
 
 #include <thread>
@@ -339,7 +341,6 @@ void frame045a()
 };
 
 namespace {
-
 
 // Verify that the same member function pointers registered as listeners
 // with different receivers works.
@@ -691,7 +692,380 @@ void TestUnicodePaths()
 #endif
 }
 
+// At the moment only the code path is being exercised to satisfy code coverage metrics.
+// @todo Add more tests once Bundle start options are supported.
+void TestBundleStartOptions()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  US_TEST_NO_EXCEPTION(bundle.Start(cppmicroservices::Bundle::StartOptions::START_ACTIVATION_POLICY));
 }
+
+void TestBundleLessThanOperator()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundleA = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto bundleB = testing::InstallLib(frameworkCtx, "TestBundleB");
+
+  US_TEST_CONDITION_REQUIRED(bundleA < bundleB, "Test that bundles are ordered correctly.");
+  US_TEST_CONDITION_REQUIRED(bundleA < Bundle(), "Test that bundles are ordered correctly.");
+  US_TEST_CONDITION_REQUIRED(!(Bundle() < bundleB), "Test that bundles are ordered correctly.");
+  US_TEST_CONDITION_REQUIRED(!(Bundle() < Bundle()), "Test that bundles are ordered correctly.");
+}
+
+void TestBundleAssignmentOperator()
+{
+  Bundle b;
+  Bundle b1;
+  b = b1;
+  US_TEST_CONDITION_REQUIRED(b1 == b, "Test that the bundle objects are equivalent.");
+
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundleA = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto bundleB = testing::InstallLib(frameworkCtx, "TestBundleB");
+
+  US_TEST_CONDITION_REQUIRED(bundleB.GetBundleId() != bundleA.GetBundleId(), "Test that the bundles are different before assignment.");
+  US_TEST_CONDITION_REQUIRED(bundleB != bundleA, "Test that the bundles are different before assignment.");
+
+  bundleB = bundleA;
+
+  US_TEST_CONDITION_REQUIRED(bundleB.GetBundleId() == bundleA.GetBundleId(), "Test bundle object assignment.");
+  US_TEST_CONDITION_REQUIRED(bundleB == bundleA, "Test that the bundle objects are equivalent.");
+}
+
+void TestBundleStreamOperator()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  const auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  US_TEST_OUTPUT(<< &bundle);
+}
+
+// Tests for a deprecated API 
+// @todo Remove once this API is removed.
+void TestBundleGetProperties()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto bundleProperties = bundle.GetProperties();
+
+  US_TEST_CONDITION_REQUIRED(!bundleProperties.empty(), "Test that bundle properties exist.");
+
+  Any symbolicNameProperty(bundleProperties.at(Constants::BUNDLE_SYMBOLICNAME));
+  US_TEST_CONDITION_REQUIRED(!symbolicNameProperty.Empty(), "Test that bundle properties contain an expected property.");
+  US_TEST_CONDITION_REQUIRED("TestBundleA" == symbolicNameProperty.ToStringNoExcept(), "Test that bundle properties contain an expected property.");
+}
+
+// Tests for a deprecated API 
+// @todo Remove once this API is removed.
+void TestBundleGetProperty()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+
+  // get a bundle property
+  Any bundleProperty(bundle.GetProperty(Constants::BUNDLE_SYMBOLICNAME));
+  US_TEST_CONDITION_REQUIRED("TestBundleA" == bundleProperty.ToStringNoExcept(), "Test querying a bundle property succeeds.");
+
+  // get a framework property
+  Any frameworkProperty(bundle.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT));
+  US_TEST_CONDITION_REQUIRED(!frameworkProperty.ToStringNoExcept().empty(), "Test that querying a framework property from a bundle object succeeds.");
+
+  // get a non existent property
+  Any emptyProperty(bundle.GetProperty("does.not.exist"));
+  US_TEST_CONDITION_REQUIRED(emptyProperty.Empty(), "Test that querying a non-existent property returns an empty property object.");
+}
+
+// Tests for a deprecated API 
+// @todo Remove test once this API is removed.
+void TestBundleGetPropertyKeys()
+{
+  FrameworkFactory factory;
+  auto f = factory.NewFramework();
+  f.Start();
+  auto frameworkCtx = f.GetBundleContext();
+
+  auto bundle = testing::InstallLib(frameworkCtx, "TestBundleA");
+  auto keys = bundle.GetPropertyKeys();
+
+  US_TEST_CONDITION_REQUIRED(!keys.empty(), "Test that bundle property keys exist.");
+  US_TEST_CONDITION_REQUIRED(keys.end() != std::find(keys.begin(), keys.end(), Constants::BUNDLE_SYMBOLICNAME), "Test that property keys contain the expected keys.");
+  US_TEST_CONDITION_REQUIRED(keys.end() != std::find(keys.begin(), keys.end(), Constants::BUNDLE_ACTIVATOR), "Test that property keys contain the expected keys.");
+}
+
+#if defined (US_BUILD_SHARED_LIBS)
+// Test installing a bundle with invalid meta-data in its manifest.
+void TestBundleManifestFailures()
+{
+  auto f = FrameworkFactory().NewFramework();
+  f.Start();
+  auto bc = f.GetBundleContext();
+
+  std::vector<std::string> validBundleNames({f.GetSymbolicName(), "main"});
+  std::sort(validBundleNames.begin(), validBundleNames.end());
+
+  auto validateBundleNames = [&bc](std::vector<std::string>& original)
+  {
+    auto installed = bc.GetBundles();
+    std::vector<std::string> names;
+    for (auto& b : installed)
+    {
+      names.push_back(b.GetSymbolicName());
+    }
+    std::sort(names.begin(), names.end());
+    return std::includes(original.begin(), original.end(), names.begin(), names.end());
+  };
+
+  // throw if manifest.json bundle version key is not a string type
+  US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithInvalidVersionType"));
+  US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an invalid bundle.version type results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
+      "Test that an invalid bundle.version type results in not installing the bundle.");
+
+  // throw if BundleVersion ctor throws in BundlePrivate ctor
+  US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithInvalidVersion"));
+  US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an invalid bundle.version results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
+      "Test that an invalid bundle.version results in not installing the bundle.");
+
+  // throw if missing bundle.symbolic_name key in manifest.json
+  US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithoutBundleName"));
+  US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that a missing bundle.symbolic_name results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
+      "Test that a missing bundle.symbolic_name results in not installing the bundle.");
+
+  // throw if empty bundle.symbolic_name value in manifest.json
+  US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleWithEmptyBundleName"));
+  US_TEST_CONDITION(2 == bc.GetBundles().size(), "Test that an empty bundle.symbolic_name results in not installing the bundle.");
+  US_TEST_CONDITION(true == validateBundleNames(validBundleNames),
+      "Test that an empty bundle.symbolic_name results in not installing the bundle.");
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
+}
+#endif
+
+// Test the behavior of illegal bundle state changes.
+void TestIllegalBundleStateChange()
+{
+  US_TEST_OUTPUT(<< "=== Testing Illegal Bundle State Changes ===");
+  auto f = FrameworkFactory().NewFramework();
+  US_TEST_NO_EXCEPTION(f.Start());
+  auto bc = f.GetBundleContext();
+
+  auto bundleA = testing::InstallLib(bc, "TestBundleA");
+  US_TEST_NO_EXCEPTION(bundleA.Start());
+  US_TEST_NO_EXCEPTION(bundleA.Uninstall());
+  // Test stopping an uninstalled bundle
+  US_TEST_FOR_EXCEPTION(std::logic_error, bundleA.Stop());
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
+
+  f = FrameworkFactory().NewFramework();
+  US_TEST_NO_EXCEPTION(f.Start());
+  bc = f.GetBundleContext();
+
+  bundleA = testing::InstallLib(bc, "TestBundleA");
+  US_TEST_NO_EXCEPTION(bundleA.Start());
+  US_TEST_NO_EXCEPTION(bundleA.Uninstall());
+  // Test starting an uninstalled bundle
+  US_TEST_FOR_EXCEPTION(std::logic_error, bundleA.Start());
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
+
+  f = FrameworkFactory().NewFramework();
+  US_TEST_NO_EXCEPTION(f.Start());
+  bc = f.GetBundleContext();
+
+  bundleA = testing::InstallLib(bc, "TestBundleA");
+  US_TEST_NO_EXCEPTION(bundleA.Start());
+  US_TEST_NO_EXCEPTION(bundleA.Uninstall());
+  // Test uninstalling an already uninstalled bundle should throw
+  US_TEST_FOR_EXCEPTION(std::logic_error, bundleA.Uninstall());
+
+  // Test that BundlePrivate::CheckUninstalled throws on bundle operations performed after its been uninstalled.
+  US_TEST_FOR_EXCEPTION(std::logic_error, bundleA.GetRegisteredServices());
+
+  // That that installing a bundle with the same symbolic name and version throws an exception.
+#if defined (US_BUILD_SHARED_LIBS)
+  US_TEST_NO_EXCEPTION(testing::InstallLib(bc, "TestBundleA"));
+  US_TEST_FOR_EXCEPTION(std::runtime_error, testing::InstallLib(bc, "TestBundleADuplicate"));
+#endif
+
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
+}
+
+// test failure on waiting for bundle operations.
+void TestWaitOnBundleOperation()
+{
+  US_TEST_OUTPUT(<< "=== Testing Wait on Bundle Operation Failures ===");
+
+  ///
+  /// Fail to wait on each bundle operation from the bundle activator start method.
+  ///
+  auto f1 = FrameworkFactory().NewFramework(FrameworkConfiguration {
+      {
+          std::string("org.cppmicroservices.framework.testing.waitonoperation.start"),
+          Any{ std::string("start") }
+      }
+  });
+  US_TEST_NO_EXCEPTION(f1.Start());
+  auto bundleWaitOnOperation = testing::InstallLib(f1.GetBundleContext(), "TestBundleWaitOnOperation");
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Start());
+  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED == bundleWaitOnOperation.GetState(), "Test the bundle state after a failed bundle start.");
+
+  f1.Stop();
+  f1.WaitForStop(std::chrono::seconds::zero());
+
+  auto f2 = FrameworkFactory().NewFramework(FrameworkConfiguration{
+      {
+          std::string("org.cppmicroservices.framework.testing.waitonoperation.start"),
+          Any{ std::string("stop") }
+      }
+  });
+  US_TEST_NO_EXCEPTION(f2.Start());
+  bundleWaitOnOperation = testing::InstallLib(f2.GetBundleContext(), "TestBundleWaitOnOperation");
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Start());
+  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED == bundleWaitOnOperation.GetState(), "Test the bundle state after a failed bundle start.");
+
+  f2.Stop();
+  f2.WaitForStop(std::chrono::seconds::zero());
+
+  auto f3 = FrameworkFactory().NewFramework(FrameworkConfiguration{
+      {
+          std::string("org.cppmicroservices.framework.testing.waitonoperation.start"),
+          Any{ std::string("uninstall") }
+      }
+  });
+  US_TEST_NO_EXCEPTION(f3.Start());
+  bundleWaitOnOperation = testing::InstallLib(f3.GetBundleContext(), "TestBundleWaitOnOperation");
+  // This call sometimes throws and sometimes doesn't. There may be a race lurking somewhere...
+  try { bundleWaitOnOperation.Start(); }
+  catch (...) {}
+  US_TEST_CONDITION(Bundle::State::STATE_UNINSTALLED == bundleWaitOnOperation.GetState(), "Test the bundle state after a failed bundle start.");
+
+  f3.Stop();
+  f3.WaitForStop(std::chrono::seconds::zero());
+
+  ///
+  /// Fail to wait on each bundle operation from the bundle activator stop method.
+  ///
+
+  auto f4 = FrameworkFactory().NewFramework(FrameworkConfiguration{
+      {
+          std::string("org.cppmicroservices.framework.testing.waitonoperation.stop"),
+          Any{ std::string("start") }
+      }
+  });
+  US_TEST_NO_EXCEPTION(f4.Start());
+  bundleWaitOnOperation = testing::InstallLib(f4.GetBundleContext(), "TestBundleWaitOnOperation");
+  US_TEST_NO_EXCEPTION(bundleWaitOnOperation.Start());
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Stop());
+  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED == bundleWaitOnOperation.GetState(), "Test the bundle state after a failed bundle stop.");
+
+  f4.Stop();
+  f4.WaitForStop(std::chrono::seconds::zero());
+
+  auto f5 = FrameworkFactory().NewFramework(FrameworkConfiguration{
+      {
+          std::string("org.cppmicroservices.framework.testing.waitonoperation.stop"),
+          Any{ std::string("stop") }
+      }
+  });
+  US_TEST_NO_EXCEPTION(f5.Start());
+  bundleWaitOnOperation = testing::InstallLib(f5.GetBundleContext(), "TestBundleWaitOnOperation");
+  US_TEST_NO_EXCEPTION(bundleWaitOnOperation.Start());
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Stop());
+  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED == bundleWaitOnOperation.GetState(), "Test the bundle state after a failed bundle stop.");
+
+  f5.Stop();
+  f5.WaitForStop(std::chrono::seconds::zero());
+
+  auto f6 = FrameworkFactory().NewFramework(FrameworkConfiguration{
+      {
+          std::string("org.cppmicroservices.framework.testing.waitonoperation.stop"),
+          Any{ std::string("uninstall") }
+      }
+  });
+  US_TEST_NO_EXCEPTION(f6.Start());
+  bundleWaitOnOperation = testing::InstallLib(f6.GetBundleContext(), "TestBundleWaitOnOperation");
+  US_TEST_NO_EXCEPTION(bundleWaitOnOperation.Start());
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Stop());
+  US_TEST_CONDITION(Bundle::State::STATE_UNINSTALLED == bundleWaitOnOperation.GetState(), "Test the bundle state after a failed bundle stop.");
+
+  f6.Stop();
+  f6.WaitForStop(std::chrono::seconds::zero());
+}
+
+#if defined (US_BUILD_SHARED_LIBS)
+// Test the behavior of a bundle activator which throws an exception.
+void TestBundleActivatorFailures()
+{
+  US_TEST_OUTPUT(<< "=== Testing Bundle State Change Failures ===");
+
+  auto f = FrameworkFactory().NewFramework();
+  US_TEST_NO_EXCEPTION(f.Start());
+  auto bc = f.GetBundleContext();
+
+  TestFrameworkListener listener;
+  auto token = bc.AddFrameworkListener(std::bind(&TestFrameworkListener::frameworkEvent, &listener, std::placeholders::_1));
+
+  auto bundleStopFail = testing::InstallLib(bc, "TestBundleStopFail");
+  US_TEST_NO_EXCEPTION(bundleStopFail.Start());
+  // Test the state of a bundle after stop failed
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleStopFail.Stop());
+  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED == bundleStopFail.GetState(), "Test that the bundle is not active after a failed stop.");
+
+  US_TEST_NO_EXCEPTION(bundleStopFail.Start());
+  US_TEST_CONDITION(Bundle::State::STATE_ACTIVE == bundleStopFail.GetState(), "Test that the bundle is active prior to uninstall.");
+  // Test that bundle stop throws an exception and is sent as a FrameworkEvent during uninstall
+  US_TEST_NO_EXCEPTION(bundleStopFail.Uninstall());
+  US_TEST_CONDITION(1 == listener.events_received(), "Test that one FrameworkEvent was received.");
+  US_TEST_CONDITION(listener.CheckEvents(std::vector<FrameworkEvent>{ 
+      FrameworkEvent{ FrameworkEvent::Type::FRAMEWORK_WARNING, 
+          bundleStopFail,
+          std::string(),
+          std::make_exception_ptr(std::runtime_error("whoopsie!")) 
+      }
+  }), "Test that the correct FrameworkEvent was received.");
+  bc.RemoveListener(std::move(token));
+  US_TEST_CONDITION(Bundle::State::STATE_UNINSTALLED == bundleStopFail.GetState(), "Test that even if Stop throws, the bundle is uninstalled.");
+
+  auto bundleStartFail = testing::InstallLib(bc, "TestBundleStartFail");
+  // Test the state of a bundle after start failed
+  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleStartFail.Start());
+  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED == bundleStartFail.GetState(), "Test that the bundle is not active after a failed start.");
+
+}
+#endif
+
+} // end anonymous namespace
 
 int BundleTest(int /*argc*/, char* /*argv*/[])
 {
@@ -746,6 +1120,27 @@ int BundleTest(int /*argc*/, char* /*argv*/[])
   TestAutoInstallEmbeddedBundles();
   TestNonStandardBundleExtension();
   TestUnicodePaths();
+  TestBundleStartOptions();
+  TestBundleLessThanOperator();
+  TestBundleAssignmentOperator();
+  TestBundleStreamOperator();
+  TestBundleGetProperties();
+  TestBundleGetPropertyKeys();
+  TestBundleGetProperty();
+
+  // will not test:
+  // Fragments - unable to test without defining what a Fragment is and implementing it
+  //    Fragment code path in BundlePrivate::GetUpdatedState
+  // lazy activation code path - requires defining lazy activation for C++ and implementing it. 
+  // BundlePrivate::GetAutoStartSetting() - no callers, internal or external
+  // invalid json use case - this is automatically checked by usResourceCompiler.
+#if defined (US_BUILD_SHARED_LIBS)
+  TestBundleManifestFailures();
+  TestBundleActivatorFailures();
+#endif
+
+  TestIllegalBundleStateChange();
+  TestWaitOnBundleOperation();
 
   US_TEST_END()
 }

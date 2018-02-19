@@ -73,6 +73,12 @@ int BundleManifestTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(headers.at(Constants::BUNDLE_VERSION).ToString() == "1.0.0", "Bundle version")
   US_TEST_CONDITION(bundleM.GetVersion() == BundleVersion(1,0,0), "Bundle version 2")
 
+  Any integer = headers.at("number");
+  US_TEST_CONDITION_REQUIRED(integer.Type() == typeid(int), "integer type");
+
+  Any doubleKeyValue = headers.at("double");
+  US_TEST_CONDITION_REQUIRED(doubleKeyValue.Type() == typeid(double), "double type");
+
   Any anyVector = headers.at("vector");
   US_TEST_CONDITION_REQUIRED(anyVector.Type() == typeid(std::vector<Any>), "vector type")
   std::vector<Any>& vec = ref_any_cast<std::vector<Any> >(anyVector);

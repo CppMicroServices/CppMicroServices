@@ -624,6 +624,7 @@ void TestAutoInstallEmbeddedBundles()
   US_TEST_FOR_EXCEPTION(std::runtime_error, b.Uninstall());
 
   f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 void TestNonStandardBundleExtension()
@@ -656,6 +657,7 @@ void TestNonStandardBundleExtension()
   US_TEST_NO_EXCEPTION((*bundleIter).Uninstall());
 
   f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 void TestUnicodePaths()

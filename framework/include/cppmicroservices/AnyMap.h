@@ -338,7 +338,7 @@ public:
    * @return A reference to the key's value.
    *
    * @throws std::invalid_argument if the \c Any value for a given key is not of type \c AnyMap or \c std::vector<Any>.
-   * std::out_of_range if the key is not found or a numerical index would fall out of the range of an \c int type.
+   * @throws std::out_of_range if the key is not found or a numerical index would fall out of the range of an \c int type.
    */
   mapped_type& AtCompoundKey(const key_type& key);
   const mapped_type& AtCompoundKey(const key_type& key) const;

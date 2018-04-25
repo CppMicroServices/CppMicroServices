@@ -220,9 +220,7 @@ TEST(FrameworkTest, FrameworkStartsWhenFileNamedDataExistsInTempDir)
     ScopedFile(std::string directory, std::string filename) :
       filePath(std::move(directory) + util::DIR_SEP + std::move(filename))
     {
-      std::fstream file(filePath, std::fstream::out);
-      file << "test";
-      file.close();
+      CreateFile();
     }
     ~ScopedFile()
     {
@@ -231,6 +229,13 @@ TEST(FrameworkTest, FrameworkStartsWhenFileNamedDataExistsInTempDir)
       std::remove(filePath.c_str());
     }
   private:
+    void CreateFile()
+    {
+      std::fstream file(filePath, std::fstream::out);
+      ASSERT_FALSE(file.fail()) << "Failbit of the file stream should not be set.";
+      file << "test";
+      file.close();
+    }
     const std::string filePath;
   };
 

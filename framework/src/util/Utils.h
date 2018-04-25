@@ -50,11 +50,19 @@ extern const std::string FWDIR_DEFAULT;
 std::string GetFrameworkDir(CoreBundleContext* ctx);
 
 /**
- * Check for local file storage directory.
- *
- * @return A directory path or an empty string if no storage is available.
- */
-std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create = true);
+* Optionally create and get the persistent storage path.
+*
+* @param ctx Pointer to the CoreBundleContext object.
+* @param leafDir The name of the leaf directory in the persistent storage path.
+* @param create Specify if the directory needs to be created if it doesn't already exist.
+*
+* @return A directory path or an empty string if no storage is available.
+*
+* @throw std::runtime_error if the storage directory is inaccessible
+*        or if there exists a file named @c leafDir in that directory
+*        or if the directory cannot be created when @c create is @c true.
+*/
+std::string GetPersistentStoragePath(CoreBundleContext* ctx, const std::string& leafDir, bool create = true);
 
 //-------------------------------------------------------------------
 // Generic utility functions

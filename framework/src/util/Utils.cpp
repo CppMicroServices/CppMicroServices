@@ -116,7 +116,7 @@ std::string GetFrameworkDir(CoreBundleContext* ctx)
   return any_cast<std::string>(it->second);
 }
 
-std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create)
+std::string GetPersistentStoragePath(CoreBundleContext* ctx, const std::string& leafDir, bool create)
 {
   // See if we have a storage directory
   const std::string fwdir(GetFrameworkDir(ctx));
@@ -124,7 +124,7 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
   {
     return fwdir;
   }
-  const std::string dir = util::GetAbsolute(fwdir, ctx->workingDir) + util::DIR_SEP + name;
+  const std::string dir = util::GetAbsolute(fwdir, ctx->workingDir) + util::DIR_SEP + leafDir;
   if (!dir.empty())
   {
     if (util::Exists(dir))

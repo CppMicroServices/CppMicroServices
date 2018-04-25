@@ -23,6 +23,7 @@ limitations under the License.
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <fstream>
 #include <type_traits>
 
 #include "cppmicroservices/FrameworkFactory.h"
@@ -39,6 +40,9 @@ limitations under the License.
 
 using namespace cppmicroservices;
 using cppmicroservices::testing::GetTempDirectory;
+using cppmicroservices::testing::MakeUniqueTempDirectory;
+using cppmicroservices::testing::TempDir;
+using cppmicroservices::testing::File;
 
 #if !defined(__clang__) && defined(__GNUC__)
 #define US_GCC_VER (__GNUC__ * 10000 \
@@ -206,6 +210,56 @@ TEST(FrameworkTest, CustomConfiguration)
 #else
   ASSERT_EQ(ctx.GetProperty(Constants::FRAMEWORK_THREADING_SUPPORT).ToString(), "single");
 #endif
+}
+
+TEST(FrameworkTest, FrameworkStartsWhenFileNamedDataExistsInTempDir)
+{
+  class ScopedFile
+  {
+  public:
+    ScopedFile(std::string directory, std::string filename) :
+      filePath(std::move(directory) + util::DIR_SEP + std::move(filename))
+    {
+      std::fstream file(filePath, std::fstream::out);
+      file << "test";
+      file.close();
+    }
+    ~ScopedFile()
+    {
+      // Note: The file is created in the temp area anyway, so not being able
+      // to remove the file is not catastrophic. We simply ignore it.
+      std::remove(filePath.c_str());
+    }
+  private:
+    const std::string filePath;
+  };
+
+  auto frameworkStorage = MakeUniqueTempDirectory();
+  TempDir scopedDir(frameworkStorage); // delete "frameworkStorage" dir on destruction
+  ScopedFile scopedFile(frameworkStorage, "data"); // create a file named "data" inside "scopedDir" and delete file on destruction
+  FrameworkConfiguration frameworkConfig;
+  frameworkConfig[Constants::FRAMEWORK_STORAGE] = frameworkStorage;
+
+  auto framework = FrameworkFactory().NewFramework(frameworkConfig);
+  ASSERT_TRUE(framework);
+  ASSERT_NO_THROW(framework.Start(););
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+TEST(FrameworkTest, TempDataDirIsNotCreatedWhenFrameworkStarts)
+{
+  TempDir frameworkStorage = MakeUniqueTempDirectory();
+  FrameworkConfiguration frameworkConfig;
+  frameworkConfig[Constants::FRAMEWORK_STORAGE] = static_cast<std::string>(frameworkStorage);
+  std::string persistentStoragePath = static_cast<std::string>(frameworkStorage) + util::DIR_SEP + "data";
+
+  auto framework = FrameworkFactory().NewFramework(frameworkConfig);
+  ASSERT_NO_THROW(framework.Start(););
+  ASSERT_FALSE(util::Exists(persistentStoragePath))
+    << "The framework should not create a directory named data in the temporary directory.";
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 TEST(FrameworkTest, DefaultLogSink)

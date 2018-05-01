@@ -362,10 +362,15 @@ else()
     set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
   endif()
 
+  # If not cross-compiling, turn on Stack Smashing Protection.
+  # This is disabled for ARM as it requires an additional dependecy on libssp.so.
+  if(NOT CMAKE_TOOLCHAIN_FILE)
+    usFunctionCheckCompilerFlags(-fstack-protector-all US_CXX_FLAGS)
+  endif()
+
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
-                    -fstack-protector-all)
+                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
@@ -579,8 +584,11 @@ configure_file(
 
 add_subdirectory(tools/rc)
 
-export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+# Only export the target if we are not cross-compiling, because the target is only built during the host build
+if(NOT CMAKE_CROSSCOMPILING)
+  export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
+         FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+endif()
 
 add_subdirectory(util)
 add_subdirectory(framework)
@@ -602,9 +610,12 @@ add_subdirectory(doc)
 
 if(NOT US_NO_INSTALL)
 
+# Only install the target if we are not cross-compiling, because the target is only built during the host build
+if(NOT CMAKE_CROSSCOMPILING)
   install(EXPORT ${PROJECT_NAME}Targets
           FILE ${PROJECT_NAME}Targets.cmake
           DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+endif()
 
   set(_install_cmake_scripts
     ${US_BUNDLE_INIT_TEMPLATE}

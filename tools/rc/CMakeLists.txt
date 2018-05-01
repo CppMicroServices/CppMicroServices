@@ -9,7 +9,7 @@ set(srcs ResourceCompiler.cpp ../../third_party/miniz.c ../../third_party/jsoncp
 
 # When cross-compiling, import the host executable targets from a file
 if(CMAKE_CROSSCOMPILING)
-  # See http://www.cmake.org/Wiki/CMake_Cross_Compiling#Using_executables_in_the_build_created_during_the_build
+  # See https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/CrossCompiling
   include(${IMPORT_EXECUTABLES})
 
 else()

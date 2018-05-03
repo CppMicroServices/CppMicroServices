@@ -139,7 +139,15 @@ void CoreBundleContext::Init()
 //  {
 //    dataStorage = GetFileStorage(this, "data");
 //  }
-  dataStorage = GetFileStorage(this, "data");
+  try
+  {
+    dataStorage = GetPersistentStoragePath(this, "data", /*create=*/ false);
+  }
+  catch (const std::exception& e)
+  {
+    DIAG_LOG(*sink) << "Ignored runtime exception with message'" << e.what() << "' from the GetPersistentStoragePath function.\n";
+  }
+
 
   systemBundle->InitSystemBundle();
   _us_set_bundle_context_instance_system_bundle(systemBundle->bundleContext.Load().get());

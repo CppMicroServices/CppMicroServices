@@ -92,7 +92,7 @@ function(usFunctionAddResources)
   if(CMAKE_CROSSCOMPILING)
     # Cross-compiled builds need to use the imported host version of usResourceCompiler
     include(${IMPORT_EXECUTABLES})
-    set(resource_compiler ${US_RCC_EXECUTABLE_TARGET})
+    set(resource_compiler native-${US_RCC_EXECUTABLE_TARGET})
   else()
     set(resource_compiler ${US_RCC_EXECUTABLE})
     if(TARGET ${US_RCC_EXECUTABLE_TARGET})

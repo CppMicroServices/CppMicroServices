@@ -271,7 +271,7 @@ Json::Value AggregateManifestsAndValidate(std::unordered_map<std::string, Json::
       // duplicate key names only have to be checked for children of
       // each root object. Any other duplicate keys would have been
       // detected when validating each individual JSON file.
-      if (Json::Value::null == root[iter.name()])
+      if (Json::Value{} == root[iter.name()])
       {
         root[iter.name()] = (*iter);
       }

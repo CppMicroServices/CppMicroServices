@@ -57,21 +57,21 @@ matrix:
         #  env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.10
         # latest compiler on OS X
         - os: osx
-          osx_image: xcode8.2
+          osx_image: xcode9.3
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: osx
-          osx_image: xcode8.2
+          osx_image: xcode9.3
           compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: osx
-          osx_image: xcode8.2
+          osx_image: xcode9.3
           compiler: clang
-          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
         - os: osx
-          osx_image: xcode8.2
+          osx_image: xcode9.3
           compiler: clang
-          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.12 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
+          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1 BUILD_DIR="/tmp/cppmicroservices_builds"
 
 cache:
   directories:

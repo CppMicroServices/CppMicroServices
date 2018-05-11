@@ -6,9 +6,7 @@
 |             +-------------------------+--------------------------+------------------------+
 |             | Xcode 6.4               | Visual Studio 2017       |                        |
 |             +-------------------------+--------------------------+------------------------+
-|             | Xcode 7.3               | MinGW-w64                |                        |
-|             +-------------------------+--------------------------+------------------------+
-|             | Xcode 8.2               |                          |                        |
+|             | Xcode 9.3               | MinGW-w64                |                        |
 +=============+=========================+==========================+========================+
 | master      | |Linux Build Status|    | |Windows Build status|   | |Code Coverage Status| |
 +-------------+-------------------------+--------------------------+------------------------+
@@ -78,8 +76,9 @@ Below is a list of tested compiler/OS combinations:
 - GCC 7.1.1 (Fedora 26)
 - Clang 4.0.0 (Fedora 26)
 - Clang Xcode 6.4 (OS X 10.10) via Travis CI
-- Clang Xcode 7.3 (OS X 10.11) via Travis CI
-- Clang Xcode 8.2 (OS X 10.12) via Travis CI
+- Clang Xcode 7.3 (OS X 10.11)
+- Clang Xcode 8.2 (OS X 10.12)
+- Clang Xcode 9.3 (OS X 10.13) via Travis CI
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via Appveyor
 - MinGW-w64 via Appveyor

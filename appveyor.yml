@@ -1,5 +1,5 @@
-version: 2.99.{build}
 os: Visual Studio 2015
+version: 3.99.{build}
 
 pull_requests:
   do_not_increment_build_number: true
@@ -20,120 +20,120 @@ matrix:
 
 environment:
   matrix:
-  # ---------- Visual Studio 2013 ------------
-  #---- Win32
-  #- image: Visual Studio 2013
-  #  platform: Win32
-  #  configuration: Release
-  #  gen: "Visual Studio 12 2013"
-  #  US_SHARED: 0
-  #  US_THREADED: 0
-  #- image: Visual Studio 2013
-  #  platform: Win32
-  #  configuration: Release
-  #  gen: "Visual Studio 12 2013"
-  #  US_SHARED: 1
-  #  US_THREADED: 0
-  - image: Visual Studio 2013
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 12 2013"
-    US_SHARED: 0
-    US_THREADED: 1
-  - image: Visual Studio 2013
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 12 2013"
-    US_SHARED: 1
-    US_THREADED: 1
-  #---- Win64
-  #- image: Visual Studio 2013
-  #  platform: Win64
-  #  configuration: Release
-  #  gen: "Visual Studio 12 2013 Win64"
-  #  US_SHARED: 0
-  #  US_THREADED: 0
-  #- image: Visual Studio 2013
-  #  platform: x64
-  #  configuration: Release
-  #  gen: "Visual Studio 12 2013 Win64"
-  #  US_SHARED: 1
-  #  US_THREADED: 0
-  - image: Visual Studio 2013
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 12 2013 Win64"
-    US_SHARED: 0
-    US_THREADED: 1
-  - image: Visual Studio 2013
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 12 2013 Win64"
-    US_SHARED: 1
-    US_THREADED: 1
   # ---------- Visual Studio 2015 ------------
   #---- Win32
-  - image: Visual Studio 2015
+  #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  #  platform: Win32
+  #  configuration: Release
+  #  gen: "Visual Studio 14 2015"
+  #  US_SHARED: 0
+  #  US_THREADED: 0
+  #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  #  platform: Win32
+  #  configuration: Release
+  #  gen: "Visual Studio 14 2015"
+  #  US_SHARED: 1
+  #  US_THREADED: 0
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: Win32
     configuration: Release
     gen: "Visual Studio 14 2015"
     US_SHARED: 0
-    US_THREADED: 0
-  - image: Visual Studio 2015
-    platform: x86
-    configuration: Release
-    gen: "Visual Studio 14 2015"
-    US_SHARED: 1
-    US_THREADED: 0
-  - image: Visual Studio 2015
-    platform: x86
-    configuration: Release
-    gen: "Visual Studio 14 2015"
-    US_SHARED: 0
     US_THREADED: 1
-  - image: Visual Studio 2015
-    platform: x86
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    platform: Win32
     configuration: Release
     gen: "Visual Studio 14 2015"
     US_SHARED: 1
     US_THREADED: 1
   #---- Win64
-  - image: Visual Studio 2015
+  #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  #  platform: Win64
+  #  configuration: Release
+  #  gen: "Visual Studio 14 2015 Win64"
+  #  US_SHARED: 0
+  #  US_THREADED: 0
+  #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  #  platform: x64
+  #  configuration: Release
+  #  gen: "Visual Studio 14 2015 Win64"
+  #  US_SHARED: 1
+  #  US_THREADED: 0
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: x64
-    configuration: Debug
+    configuration: Release
     gen: "Visual Studio 14 2015 Win64"
     US_SHARED: 0
     US_THREADED: 1
-    WITH_COVERAGE: 1
-  - image: Visual Studio 2015
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     platform: x64
-    configuration: Debug
+    configuration: Release
     gen: "Visual Studio 14 2015 Win64"
     US_SHARED: 1
     US_THREADED: 1
-    WITH_COVERAGE: 1
-  - image: Visual Studio 2015
-    platform: x64
+  # ---------- Visual Studio 2017 ------------
+  #---- Win32
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
     configuration: Release
-    gen: "Visual Studio 14 2015 Win64"
+    gen: "Visual Studio 15 2017"
     US_SHARED: 0
     US_THREADED: 0
-  - image: Visual Studio 2015
-    platform: x64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
     configuration: Release
-    gen: "Visual Studio 14 2015 Win64"
+    gen: "Visual Studio 15 2017"
     US_SHARED: 1
     US_THREADED: 0
-  - image: Visual Studio 2015
-    platform: x64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
     configuration: Release
-    gen: "Visual Studio 14 2015 Win64"
+    gen: "Visual Studio 15 2017"
     US_SHARED: 0
     US_THREADED: 1
-  - image: Visual Studio 2015
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: Win32
+    configuration: Release
+    gen: "Visual Studio 15 2017"
+    US_SHARED: 1
+    US_THREADED: 1
+  #---- Win64
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    configuration: Debug
+    gen: "Visual Studio 15 2017 Win64"
+    US_SHARED: 0
+    US_THREADED: 1
+    WITH_COVERAGE: 1
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    configuration: Debug
+    gen: "Visual Studio 15 2017 Win64"
+    US_SHARED: 1
+    US_THREADED: 1
+    WITH_COVERAGE: 1
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     platform: x64
     configuration: Release
-    gen: "Visual Studio 14 2015 Win64"
+    gen: "Visual Studio 15 2017 Win64"
+    US_SHARED: 0
+    US_THREADED: 0
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 15 2017 Win64"
+    US_SHARED: 1
+    US_THREADED: 0
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 15 2017 Win64"
+    US_SHARED: 0
+    US_THREADED: 1
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    platform: x64
+    configuration: Release
+    gen: "Visual Studio 15 2017 Win64"
     US_SHARED: 1
     US_THREADED: 1
   # ---------- MinGW-w64 (via MSYS2) ------------
@@ -159,6 +159,7 @@ environment:
     US_THREADED: 1
 
 init:
+- echo %APPVEYOR_BUILD_WORKER_IMAGE%
 - cmake -version
 - git config --global core.autocrlf true
 

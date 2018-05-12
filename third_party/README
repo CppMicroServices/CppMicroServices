@@ -137,3 +137,4 @@ https://github.com/google/googletest/releases
 Patches
 
  * Suppress CMake warning about policy CMP0048
+ * Suppress tr1 namespace deprecation warnings

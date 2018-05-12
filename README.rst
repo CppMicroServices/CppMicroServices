@@ -69,7 +69,7 @@ your build tree. The following are the absolute minimum requirements:
 - GCC 4.6
 - Clang 3.1
 - Clang from Xcode 6.4
-- Visual Studio 2013
+- Visual Studio 2015 (MSVC++ 14.0)
 
 Below is a list of tested compiler/OS combinations:
 
@@ -80,8 +80,8 @@ Below is a list of tested compiler/OS combinations:
 - Clang Xcode 6.4 (OS X 10.10) via Travis CI
 - Clang Xcode 7.3 (OS X 10.11) via Travis CI
 - Clang Xcode 8.2 (OS X 10.12) via Travis CI
-- Visual Studio 2013 via Appveyor
 - Visual Studio 2015 via Appveyor
+- Visual Studio 2017 via Appveyor
 - MinGW-w64 via Appveyor
 
 Legal

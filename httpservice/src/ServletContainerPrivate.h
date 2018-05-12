@@ -26,13 +26,14 @@
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 
+#include "cppmicroservices/httpservice/HttpServlet.h"
+
 class CivetServer;
 
 namespace cppmicroservices {
 
 class BundleContext;
 
-class HttpServlet;
 class ServletContainer;
 class ServletContext;
 class ServletHandler;

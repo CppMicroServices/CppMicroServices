@@ -145,7 +145,7 @@ std::string GetExecutablePath()
 #elif defined(US_PLATFORM_LINUX)
   std::vector<char> buf(bufsize + 1, '\0');
   ssize_t len = ::readlink("/proc/self/exe", buf.data(), bufsize);
-  if (len == -1 || len == bufsize)
+  if (len == -1 || len == static_cast<ssize_t>(bufsize))
   {
     throw std::runtime_error("Could not read /proc/self/exe into buffer");
   }

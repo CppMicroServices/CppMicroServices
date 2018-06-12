@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="288px" preserveAspectRatio="none" style="width:528px;height:288px;" version="1.1" viewBox="0 0 528 288" width="528px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="200" x="165" y="23.5352">SatisfiedState::DoDeactivate</text><rect fill="#FFFFFF" height="29.3105" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="118.5" y="125.2871"/><rect fill="#FFFFFF" height="133.5527" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="317" y="95.9766"/><rect fill="#FFFFFF" height="46.6211" style="stroke: #000000; stroke-width: 1.0;" width="278" x="239" y="169.9082"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="123" x2="123" y1="64.9766" y2="247.5293"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="322" x2="322" y1="64.9766" y2="247.5293"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="456" x2="456" y1="64.9766" y2="247.5293"/><rect fill="#FEFECE" height="30.4883" style="stroke: #A80036; stroke-width: 1.5;" width="191" x="28" y="33.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="177" x="35" y="54.0234">ComponentConfiguration</text><rect fill="#FEFECE" height="30.4883" style="stroke: #A80036; stroke-width: 1.5;" width="191" x="28" y="246.5293"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="177" x="35" y="267.0645">ComponentConfiguration</text><rect fill="#FEFECE" height="30.4883" style="stroke: #A80036; stroke-width: 1.5;" width="106" x="269" y="33.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="92" x="276" y="54.0234">SatisfiedState</text><rect fill="#FEFECE" height="30.4883" style="stroke: #A80036; stroke-width: 1.5;" width="106" x="269" y="246.5293"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="92" x="276" y="267.0645">SatisfiedState</text><rect fill="#FEFECE" height="30.4883" style="stroke: #A80036; stroke-width: 1.5;" width="62" x="425" y="33.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="48" x="432" y="54.0234">Logger</text><rect fill="#FEFECE" height="30.4883" style="stroke: #A80036; stroke-width: 1.5;" width="62" x="425" y="246.5293"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="48" x="432" y="267.0645">Logger</text><rect fill="#FFFFFF" height="29.3105" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="118.5" y="125.2871"/><rect fill="#FFFFFF" height="133.5527" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="317" y="95.9766"/><polygon fill="#A80036" points="305,91.9766,315,95.9766,305,99.9766,309,95.9766" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="3" x2="311" y1="95.9766" y2="95.9766"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="84" x="10" y="91.5449">DoDeactivate</text><polygon fill="#A80036" points="139.5,121.2871,129.5,125.2871,139.5,129.2871,135.5,125.2871" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="133.5" x2="316" y1="125.2871" y2="125.2871"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="112" x="145.5" y="120.8555">UnRegisterService</text><polygon fill="#A80036" points="305,150.5977,315,154.5977,305,158.5977,309,154.5977" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="123.5" x2="311" y1="154.5977" y2="154.5977"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="62" x="130.5" y="150.166">true/false</text><rect fill="none" height="46.6211" style="stroke: #000000; stroke-width: 1.0;" width="278" x="239" y="169.9082"/><polygon fill="#EEEEEE" points="239,169.9082,301,169.9082,301,176.9082,291,186.9082,239,186.9082,239,169.9082" style="stroke: #000000; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="17" x="254" y="183.4766">alt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="128" x="316" y="182.543">[unregistration failure]</text><polygon fill="#A80036" points="444,204.2188,454,208.2188,444,212.2188,448,208.2188" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="327" x2="450" y1="208.2188" y2="208.2188"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="86" x="334" y="203.7871">log exception</text><polygon fill="#A80036" points="14,225.5293,4,229.5293,14,233.5293,10,229.5293" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="8" x2="321" y1="229.5293" y2="229.5293"/><!--
+@startuml
+title SatisfiedState::DoDeactivate
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam shadowing false
+skinparam sequenceGroupBorderThickness 1
+participant ComponentConfiguration
+participant SatisfiedState
+[->SatisfiedState: DoDeactivate
+activate SatisfiedState
+SatisfiedState->ComponentConfiguration: UnRegisterService
+activate ComponentConfiguration
+ComponentConfiguration- ->SatisfiedState: true/false
+deactivate ComponentConfiguration
+alt unregistration failure
+SatisfiedState->Logger: log exception
+end
+[<-SatisfiedState: 
+deactivate SatisfiedState
+@enduml
+
+PlantUML version 1.2017.20(Mon Dec 11 11:57:05 EST 2017)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Java Version: 1.8.0_151-b12
+Operating System: Mac OS X
+OS Version: 10.12.6
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="504px" preserveAspectRatio="none" style="width:619px;height:504px;" version="1.1" viewBox="0 0 619 504" width="619px" zoomAndPan="magnify"><defs/><g><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="229.9609"/><rect fill="#FFFFFF" height="29.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="287.0938"/><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="345.3594"/><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="431.625"/><rect fill="#FFFFFF" height="64.3984" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="446" y="65.2969"/><rect fill="#FFFFFF" height="99.3984" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="446" y="158.6953"/><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="446" y="388.4922"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="98" x2="98" y1="34.2969" y2="463.7578"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="263" x2="263" y1="34.2969" y2="463.7578"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;" x1="451" x2="451" y1="34.2969" y2="463.7578"/><rect fill="#FEFECE" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="140" x="28" y="3"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="126" x="35" y="22.9951">Service Consumer</text><rect fill="#FEFECE" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="140" x="28" y="462.7578"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="126" x="35" y="482.7529">Service Consumer</text><rect fill="#FEFECE" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="90" x="218" y="3"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="76" x="225" y="22.9951">Framework</text><rect fill="#FEFECE" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="90" x="218" y="462.7578"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="76" x="225" y="482.7529">Framework</text><rect fill="#FEFECE" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="186" x="358" y="3"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="172" x="365" y="22.9951">Service Provider (bundle)</text><rect fill="#FEFECE" height="30.2969" style="stroke: #A80036; stroke-width: 1.5;" width="186" x="358" y="462.7578"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="172" x="365" y="482.7529">Service Provider (bundle)</text><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="229.9609"/><rect fill="#FFFFFF" height="29.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="287.0938"/><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="345.3594"/><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="258" y="431.625"/><rect fill="#FFFFFF" height="64.3984" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="446" y="65.2969"/><rect fill="#FFFFFF" height="99.3984" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="446" y="158.6953"/><rect fill="#FFFFFF" height="14.1328" style="stroke: #A80036; stroke-width: 1.0;" width="10" x="446" y="388.4922"/><polygon fill="#A80036" points="434,61.2969,444,65.2969,434,69.2969,438,65.2969" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="263" x2="440" y1="65.2969" y2="65.2969"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="79" x="270" y="60.3638">Load Bundle</text><polygon fill="#FBFB77" points="461,78.4297,461,118.4297,607,118.4297,607,88.4297,597,78.4297,461,78.4297" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="597" x2="597" y1="78.4297" y2="88.4297"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="607" x2="597" y1="88.4297" y2="88.4297"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="87" x="467" y="95.4966">shared library</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="125" x="467" y="110.6294">loaded into process</text><polygon fill="#A80036" points="274,125.6953,264,129.6953,274,133.6953,270,129.6953" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="268" x2="450" y1="129.6953" y2="129.6953"/><polygon fill="#A80036" points="434,154.6953,444,158.6953,434,162.6953,438,158.6953" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="263" x2="440" y1="158.6953" y2="158.6953"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="32" x="270" y="153.7622">Start</text><line style="stroke: #A80036; stroke-width: 1.0;" x1="456" x2="498" y1="187.9609" y2="187.9609"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="498" x2="498" y1="187.9609" y2="200.9609"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="457" x2="498" y1="200.9609" y2="200.9609"/><polygon fill="#A80036" points="467,196.9609,457,200.9609,467,204.9609,463,200.9609" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="135" x="463" y="182.895">Create ServiceObject</text><polygon fill="#A80036" points="279,225.9609,269,229.9609,279,233.9609,275,229.9609" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="273" x2="445" y1="229.9609" y2="229.9609"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="103" x="285" y="225.0278">Register Service</text><polygon fill="#A80036" points="434,240.0938,444,244.0938,434,248.0938,438,244.0938" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="263" x2="440" y1="244.0938" y2="244.0938"/><polygon fill="#A80036" points="274,254.0938,264,258.0938,274,262.0938,270,258.0938" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="268" x2="450" y1="258.0938" y2="258.0938"/><polygon fill="#A80036" points="246,283.0938,256,287.0938,246,291.0938,250,287.0938" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="98" x2="252" y1="287.0938" y2="287.0938"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="84" x="105" y="282.1606">Find Services</text><polygon fill="#A80036" points="109,312.2266,99,316.2266,109,320.2266,105,316.2266" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="103" x2="262" y1="316.2266" y2="316.2266"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="116" x="115" y="311.2935">Service Refs [0..n]</text><polygon fill="#A80036" points="246,341.3594,256,345.3594,246,349.3594,250,345.3594" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="98" x2="252" y1="345.3594" y2="345.3594"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="74" x="105" y="340.4263">Get Service</text><polygon fill="#A80036" points="109,355.4922,99,359.4922,109,363.4922,105,359.4922" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="103" x2="262" y1="359.4922" y2="359.4922"/><polygon fill="#A80036" points="434,384.4922,444,388.4922,434,392.4922,438,388.4922" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="98" x2="440" y1="388.4922" y2="388.4922"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="82" x="105" y="383.5591">Call Methods</text><polygon fill="#A80036" points="109,398.625,99,402.625,109,406.625,105,402.625" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="103" x2="450" y1="402.625" y2="402.625"/><polygon fill="#A80036" points="246,427.625,256,431.625,246,435.625,250,431.625" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0;" x1="98" x2="252" y1="431.625" y2="431.625"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="90" x="105" y="426.6919">Unget Service</text><polygon fill="#A80036" points="109,441.7578,99,445.7578,109,449.7578,105,445.7578" style="stroke: #A80036; stroke-width: 1.0;"/><line style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" x1="103" x2="262" y1="445.7578" y2="445.7578"/><!--
+@startuml
+'Sequence diagram for Core framework
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam shadowing false
+skinparam sequenceGroupBorderThickness 1
+Participant "Service Consumer" as ServiceConsumer
+Participant Framework
+Participant "Service Provider (bundle)" as ServiceProvider
+Framework->ServiceProvider: Load Bundle
+note right of ServiceProvider 
+          shared library
+          loaded into process
+end note
+activate ServiceProvider
+ServiceProvider- ->Framework:
+deactivate ServiceProvider
+
+Framework->ServiceProvider:Start
+activate ServiceProvider
+ServiceProvider->ServiceProvider:Create ServiceObject
+ServiceProvider->Framework:Register Service
+activate Framework
+Framework- ->ServiceProvider:
+deactivate Framework
+ServiceProvider- ->Framework:
+deactivate ServiceProvider
+ServiceConsumer->Framework: Find Services
+activate Framework
+Framework- ->ServiceConsumer: Service Refs [0..n]
+deactivate Framework
+ServiceConsumer->Framework:Get Service
+activate Framework
+Framework- ->ServiceConsumer:
+deactivate Framework
+ServiceConsumer->ServiceProvider:Call Methods
+activate ServiceProvider
+ServiceProvider- ->ServiceConsumer:
+deactivate ServiceProvider
+ServiceConsumer->Framework: Unget Service
+activate Framework
+Framework- ->ServiceConsumer:
+deactivate Framework
+@enduml
+
+PlantUML version 1.2017.18beta10(Unknown compile time)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Java Version: 1.7.0_25-b15
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

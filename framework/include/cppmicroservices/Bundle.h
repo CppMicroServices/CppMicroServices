@@ -405,7 +405,7 @@ public:
    *    :any:`concept-bundle-properties`
    * \endrststar
    */
-  std::map<std::string, Any> GetProperties() const;
+  US_DEPRECATED std::map<std::string, Any> GetProperties() const;
 
   /**
    * Returns this bundle's Manifest headers and values.

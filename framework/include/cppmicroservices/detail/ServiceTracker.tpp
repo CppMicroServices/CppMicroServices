@@ -36,7 +36,11 @@ namespace cppmicroservices {
 template<class S, class T>
 ServiceTracker<S,T>::~ServiceTracker()
 {
-  Close();
+  try 
+  {
+    Close();
+  }
+  catch (...) {}
 }
 
 #ifdef _MSC_VER

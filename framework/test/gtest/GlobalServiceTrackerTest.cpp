@@ -36,7 +36,7 @@ limitations under the License.
 namespace {
     class Foo {
     public:
-        virtual ~Foo() = default;
+        virtual ~Foo() {}
     };
 }
 

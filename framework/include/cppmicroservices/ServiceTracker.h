@@ -194,9 +194,12 @@ public:
    * <code>ServiceTracker</code> was created are now tracked by this
    * <code>ServiceTracker</code>.
    *
-   * @throws std::logic_error If the <code>BundleContext</code>
+   * @throws std::runtime_error If the <code>BundleContext</code>
    *         with which this <code>ServiceTracker</code> was created is no
    *         longer valid.
+   * @throws std::runtime_error If the LDAP filter used to construct
+   *         the <code>ServiceTracker</code> contains an invalid filter 
+   *         expression that cannot be parsed.
    */
   virtual void Open();
 
@@ -210,6 +213,10 @@ public:
    * <p>
    * This implementation calls GetServiceReferences() to get the list
    * of tracked services to remove.
+   *
+   * @throws std::runtime_error If the <code>BundleContext</code>
+   *         with which this <code>ServiceTracker</code> was created is no
+   *         longer valid.
    */
   virtual void Close();
 

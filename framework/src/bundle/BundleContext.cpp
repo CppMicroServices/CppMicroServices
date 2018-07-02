@@ -75,6 +75,7 @@ BundleContext& BundleContext::operator=(std::nullptr_t)
 
 std::shared_ptr<detail::LogSink> BundleContext::GetLogSink() const
 {
+  d->CheckValid();
   return d->bundle->coreCtx->sink->shared_from_this();
 }
 

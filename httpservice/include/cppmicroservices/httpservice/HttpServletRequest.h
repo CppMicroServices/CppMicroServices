@@ -98,10 +98,17 @@ public:
 
   void SetAttribute(const std::string& name, const Any& value);
 
+  /*!
+  * the implementation of this function is an exact copy of the function getPostData() of civetweb version 1.10 from CivetServer  
+  *  which is not included in the last version of CPPMICROSERVICES
+  */
+  std::string GetRequestBody() const;
+
 private:
 
   friend class ServletHandler;
   HttpServletRequest(HttpServletRequestPrivate* d);
+
 
   ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
 };

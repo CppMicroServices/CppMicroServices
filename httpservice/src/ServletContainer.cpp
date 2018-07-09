@@ -106,7 +106,7 @@ private:
 
   virtual bool handlePost(CivetServer *server, struct mg_connection *conn)
   {
-	auto mg_req_info = mg_get_request_info(conn);
+    auto mg_req_info = mg_get_request_info(conn);
     if (mg_req_info->local_uri == nullptr)
     {
       return true;
@@ -144,79 +144,78 @@ private:
 
   virtual bool handlePut(CivetServer *server, struct mg_connection *conn)
   {
-	  auto mg_req_info = mg_get_request_info(conn);
-	  if (mg_req_info->local_uri == nullptr)
-	  {
-		  return true;
-	  }
+    auto mg_req_info = mg_get_request_info(conn);
+    if (mg_req_info->local_uri == nullptr)
+    {
+      return true;
+    }
 
-	  HttpServletRequest request(new HttpServletRequestPrivate(m_Servlet->GetServletContext(), server, conn));
-	  request.d->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
-	  request.d->m_ServletPath = m_ServletPath;
+    HttpServletRequest request(new HttpServletRequestPrivate(m_Servlet->GetServletContext(), server, conn));
+    request.d->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
+    request.d->m_ServletPath = m_ServletPath;
 
-	  std::string uri = mg_req_info->local_uri;
-	  std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-	  //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-	  //std::cout << "Against uri: " << uri << std::endl;
-	  assert(pathPrefix.size() <= uri.size());
-	  assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
-	  if (uri.size() > pathPrefix.size())
-	  {
-		  request.d->m_PathInfo = uri.substr(pathPrefix.size());
-	  }
+    std::string uri = mg_req_info->local_uri;
+    std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
+    assert(pathPrefix.size() <= uri.size());
+    assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
+    if (uri.size() > pathPrefix.size())
+    {
+      request.d->m_PathInfo = uri.substr(pathPrefix.size());
+    }
 
-	  HttpServletResponse response(new HttpServletResponsePrivate(&request, server, conn));
-	  response.SetStatus(HttpServletResponse::SC_OK);
+    HttpServletResponse response(new HttpServletResponsePrivate(&request, server, conn));
+    response.SetStatus(HttpServletResponse::SC_OK);
 
-	  try
-	  {
-		  m_Servlet->Service(request, response);
-	  }
-	  catch (const std::exception& e)
-	  {
-		  std::cout << e.what() << std::endl;
-		  return false;
-	  }
-	  return true;
+    try
+    {
+      m_Servlet->Service(request, response);
+    }
+    catch (const std::exception& e)
+    {
+      std::cout << e.what() << std::endl;
+      return false;
+    }
+    return true;
   }
-	  
 
   virtual bool handleDelete(CivetServer *server, struct mg_connection *conn) 
   {
-	  auto mg_req_info = mg_get_request_info(conn);
-	  if (mg_req_info->local_uri == nullptr)
-	  {
-		  return true;
-	  }
+    auto mg_req_info = mg_get_request_info(conn);
+    if (mg_req_info->local_uri == nullptr)
+    {
+      return true;
+    }
 
-	  HttpServletRequest request(new HttpServletRequestPrivate(m_Servlet->GetServletContext(), server, conn));
-	  request.d->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
-	  request.d->m_ServletPath = m_ServletPath;
+    HttpServletRequest request(new HttpServletRequestPrivate(m_Servlet->GetServletContext(), server, conn));
+    request.d->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
+    request.d->m_ServletPath = m_ServletPath;
 
-	  std::string uri = mg_req_info->local_uri;
-	  std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-	  //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-	  //std::cout << "Against uri: " << uri << std::endl;
-	  assert(pathPrefix.size() <= uri.size());
-	  assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
-	  if (uri.size() > pathPrefix.size())
-	  {
-		  request.d->m_PathInfo = uri.substr(pathPrefix.size());
-	  }
+    std::string uri = mg_req_info->local_uri;
+    std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
+    assert(pathPrefix.size() <= uri.size());
+    assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
+    if (uri.size() > pathPrefix.size())
+    {
+      request.d->m_PathInfo = uri.substr(pathPrefix.size());
+    }
 
-	  HttpServletResponse response(new HttpServletResponsePrivate(&request, server, conn));
-	  response.SetStatus(HttpServletResponse::SC_OK);
+    HttpServletResponse response(new HttpServletResponsePrivate(&request, server, conn));
+    response.SetStatus(HttpServletResponse::SC_OK);
 
-	  try
-	  {
-		  m_Servlet->Service(request, response);
-	  }
-	  catch (const std::exception& e)
-	  {
-		  std::cout << e.what() << std::endl;
-		  return false;
-	  }
-	  return true;
+    try
+    {
+      m_Servlet->Service(request, response);
+    }
+    catch (const std::exception& e)
+    {
+      std::cout << e.what() << std::endl;
+      return false;
+    }
+    return true;
   }
 
 private:

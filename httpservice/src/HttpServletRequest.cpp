@@ -38,12 +38,12 @@
 namespace cppmicroservices {
 
 HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
-	CivetServer* server, mg_connection* conn)
-	: m_ServletContext(servletContext)
-	, m_Server(server)
-	, m_Connection(conn)
-	, m_Scheme("http")
-	, m_ServerPort("80")
+  CivetServer* server, mg_connection* conn)
+  : m_ServletContext(servletContext)
+  , m_Server(server)
+  , m_Connection(conn)
+  , m_Scheme("http")
+  , m_ServerPort("80")
 {
   std::string host = mg_get_header(m_Connection, "Host");
 

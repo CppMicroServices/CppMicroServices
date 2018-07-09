@@ -48,6 +48,7 @@ namespace cppmicroservices {
 class ServletHandler : public CivetHandler
 {
 public:
+
   ServletHandler(const std::shared_ptr<HttpServlet> &servlet, const std::string &servletPath)
     : m_Servlet(servlet), m_ServletPath(servletPath)
   {
@@ -64,6 +65,7 @@ public:
   }
 
 private:
+
   virtual bool handleGet(CivetServer *server, mg_connection *conn)
   {
     auto mg_req_info = mg_get_request_info(conn);
@@ -78,8 +80,8 @@ private:
 
     std::string uri = mg_req_info->local_uri;
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-    // std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-    // std::cout << "Against uri: " << uri << std::endl;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if (uri.size() > pathPrefix.size())
@@ -116,8 +118,8 @@ private:
 
     std::string uri = mg_req_info->local_uri;
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-    // std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-    // std::cout << "Against uri: " << uri << std::endl;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if (uri.size() > pathPrefix.size())
@@ -154,8 +156,8 @@ private:
 
     std::string uri = mg_req_info->local_uri;
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-    // std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-    // std::cout << "Against uri: " << uri << std::endl;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if (uri.size() > pathPrefix.size())
@@ -170,7 +172,7 @@ private:
     {
       m_Servlet->Service(request, response);
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
       std::cout << e.what() << std::endl;
       return false;
@@ -192,8 +194,8 @@ private:
 
     std::string uri = mg_req_info->local_uri;
     std::string pathPrefix = request.d->m_ContextPath + request.d->m_ServletPath;
-    // std::cout << "Checking path prefix: " << pathPrefix << std::endl;
-    // std::cout << "Against uri: " << uri << std::endl;
+    //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
+    //std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if (uri.size() > pathPrefix.size())
@@ -208,7 +210,7 @@ private:
     {
       m_Servlet->Service(request, response);
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
       std::cout << e.what() << std::endl;
       return false;

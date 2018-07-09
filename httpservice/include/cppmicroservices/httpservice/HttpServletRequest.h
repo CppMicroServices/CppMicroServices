@@ -10,7 +10,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,15 +38,14 @@ struct HttpServletRequestPrivate;
 class US_HttpService_EXPORT HttpServletRequest
 {
 public:
-
   ~HttpServletRequest();
 
-  HttpServletRequest(const HttpServletRequest& o);
-  HttpServletRequest& operator=(const HttpServletRequest& o);
+  HttpServletRequest(const HttpServletRequest &o);
+  HttpServletRequest &operator=(const HttpServletRequest &o);
 
   std::shared_ptr<ServletContext> GetServletContext() const;
 
-  Any GetAttribute(const std::string& name) const;
+  Any GetAttribute(const std::string &name) const;
 
   std::vector<std::string> GetAttributeNames() const;
 
@@ -82,37 +81,33 @@ public:
 
   std::string GetQueryString() const;
 
-  std::string GetHeader(const std::string& name) const;
+  std::string GetHeader(const std::string &name) const;
 
-  long long GetDateHeader(const std::string& name) const;
+  long long GetDateHeader(const std::string &name) const;
 
   std::vector<std::string> GetHeaderNames() const;
 
-  std::vector<std::string> GetHeaders(const std::string& name) const;
+  std::vector<std::string> GetHeaders(const std::string &name) const;
 
   std::string GetMethod() const;
 
-  std::vector<std::pair<std::string, float> > GetAcceptHeader() const;
+  std::vector<std::pair<std::string, float>> GetAcceptHeader() const;
 
-  void RemoveAttribute(const std::string& name);
+  void RemoveAttribute(const std::string &name);
 
-  void SetAttribute(const std::string& name, const Any& value);
+  void SetAttribute(const std::string &name, const Any &value);
 
   /*!
-  * the implementation of this function is an exact copy of the function getPostData() of civetweb version 1.10 from CivetServer  
-  *  which is not included in the last version of CPPMICROSERVICES
-  */
+   * the implementation of this function is an exact copy of the function getPostData() of civetweb version 1.10 from
+   * CivetServer which is not included in the last version of CPPMICROSERVICES
+   */
   std::string GetRequestBody() const;
 
 private:
-
   friend class ServletHandler;
-  HttpServletRequest(HttpServletRequestPrivate* d);
-
+  HttpServletRequest(HttpServletRequestPrivate *d);
 
   ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
 };
-
 }
-
 #endif // CPPMICROSERVICES_HTTPREQUEST_H

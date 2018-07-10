@@ -28,8 +28,8 @@
 #include "civetweb/civetweb.h"
 
 #include <cassert>
-#include <ctime>
 #include <cstring>
+#include <ctime>
 
 #ifdef US_PLATFORM_WINDOWS
 #define timegm(x) (_mkgmtime(x))
@@ -38,7 +38,7 @@
 namespace cppmicroservices {
 
 HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
-                                       CivetServer* server, mg_connection* conn)
+  CivetServer* server, mg_connection* conn)
   : m_ServletContext(servletContext)
   , m_Server(server)
   , m_Connection(conn)
@@ -50,17 +50,16 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<Servl
   // find the scheme
   std::size_t pos = host.find_first_of(':');
   std::size_t pos2 = host.find_first_of('/');
-  if (pos != std::string::npos && pos2 != std::string::npos &&
-      pos2 == pos+1)
+  if (pos != std::string::npos && pos2 != std::string::npos && pos2 == pos + 1)
   {
     m_Scheme = host.substr(0, pos);
-    if (pos2 == host.size()-1)
+    if (pos2 == host.size() - 1)
     {
       return;
     }
     else
     {
-      pos = pos2+1;
+      pos = pos2 + 1;
     }
   }
   else
@@ -77,20 +76,20 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<Servl
   if (pos != std::string::npos)
   {
     pos2 = host.find_first_of('/', pos);
-    m_ServerPort = host.substr(pos+1, pos2 == std::string::npos ? pos2 : pos2-pos);
+    m_ServerPort = host.substr(pos + 1, pos2 == std::string::npos ? pos2 : pos2 - pos);
     pos = pos2;
   }
 
   // get the uri
   std::string uri = mg_get_request_info(m_Connection)->uri;
-  pos = uri.find_first_of('?');
-  m_Uri = uri.substr(0, pos);
-
+  // pos = uri.find_first_of('?');
+  // m_Uri = uri.substr(0, pos);
+  m_Uri = uri;
   // get the query string
-  if (pos != std::string::npos)
-  {
-    m_QueryString = uri.substr(pos);
-  }
+  // if (pos != std::string::npos)
+  //{
+  //  m_QueryString = uri.substr(pos);
+  //}
 
   // reconstruct the url
   m_Url = m_Scheme + "://" + m_ServerName + ":" + m_ServerPort + m_Uri;
@@ -99,12 +98,11 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(const std::shared_ptr<Servl
 HttpServletRequest::~HttpServletRequest()
 {
 }
-HttpServletRequest::HttpServletRequest(const HttpServletRequest& o)
-  : d(o.d)
+HttpServletRequest::HttpServletRequest(const HttpServletRequest &o) : d(o.d)
 {
 }
 
-HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest& o)
+HttpServletRequest &HttpServletRequest::operator=(const HttpServletRequest &o)
 {
   d = o.d;
   return *this;
@@ -115,7 +113,7 @@ std::shared_ptr<ServletContext> HttpServletRequest::GetServletContext() const
   return d->m_ServletContext;
 }
 
-Any HttpServletRequest::GetAttribute(const std::string& name) const
+Any HttpServletRequest::GetAttribute(const std::string &name) const
 {
   HttpServletRequestPrivate::AttributeMapType::const_iterator iter = d->m_Attributes.find(name);
   if (iter == d->m_Attributes.end())
@@ -128,9 +126,10 @@ Any HttpServletRequest::GetAttribute(const std::string& name) const
 std::vector<std::string> HttpServletRequest::GetAttributeNames() const
 {
   std::vector<std::string> names;
-  for(HttpServletRequestPrivate::AttributeMapType::const_iterator iter =
-      d->m_Attributes.begin(), endIter = d->m_Attributes.end();
-      iter != endIter; ++iter)
+  for (HttpServletRequestPrivate::AttributeMapType::const_iterator iter = d->m_Attributes.begin(),
+                                                                   endIter = d->m_Attributes.end();
+       iter != endIter;
+       ++iter)
   {
     names.push_back(iter->first);
   }
@@ -139,7 +138,7 @@ std::vector<std::string> HttpServletRequest::GetAttributeNames() const
 
 std::size_t HttpServletRequest::GetContentLength() const
 {
-  const char* contentLength = mg_get_header(d->m_Connection, "Content-Length");
+  const char *contentLength = mg_get_header(d->m_Connection, "Content-Length");
   std::string contentLengthStr = contentLength ? std::string(contentLength) : std::string();
   std::stringstream ss(contentLengthStr);
   std::size_t length = 0;
@@ -149,7 +148,7 @@ std::size_t HttpServletRequest::GetContentLength() const
 
 std::string HttpServletRequest::GetContentType() const
 {
-  const char* contentType = mg_get_header(d->m_Connection, "Content-Type");
+  const char *contentType = mg_get_header(d->m_Connection, "Content-Type");
   return contentType ? std::string(contentType) : std::string();
 }
 
@@ -204,64 +203,45 @@ std::string HttpServletRequest::GetServletPath() const
 
 std::string HttpServletRequest::GetQueryString() const
 {
-  return d->m_QueryString;
+  const char *query = mg_get_request_info(d->m_Connection)->query_string;
+  if (query == nullptr)
+  {
+    return "";
+  }
+  return std::string(query);
 }
 
-std::string HttpServletRequest::GetHeader(const std::string& name) const
+std::string HttpServletRequest::GetHeader(const std::string &name) const
 {
-  const char* header = mg_get_header(d->m_Connection, name.c_str());
-  if (header) return header;
+  const char *header = mg_get_header(d->m_Connection, name.c_str());
+  if (header)
+    return header;
   return std::string();
 }
 
-long long HttpServletRequest::GetDateHeader(const std::string& name) const
+long long HttpServletRequest::GetDateHeader(const std::string &name) const
 {
   // Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
   // Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
   // Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format
 
   std::string datetime = this->GetHeader(name);
-  if (datetime.empty()) return -1;
+  if (datetime.empty())
+    return -1;
 
   const std::size_t num_months = 12;
-  const char* months[num_months] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+  const char *months[num_months] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
   char month_str[32] = {0};
   int second, minute, hour, day, month, year;
   time_t result{};
   struct tm tm;
 
-  if ((sscanf(datetime.c_str(),
-              "%d/%3s/%d %d:%d:%d",
-              &day,
-              month_str,
-              &year,
-              &hour,
-              &minute,
-              &second) == 6) || (sscanf(datetime.c_str(),
-                                        "%d %3s %d %d:%d:%d",
-                                        &day,
-                                        month_str,
-                                        &year,
-                                        &hour,
-                                        &minute,
-                                        &second) == 6)
-      || (sscanf(datetime.c_str(),
-                 "%*3s, %d %3s %d %d:%d:%d",
-                 &day,
-                 month_str,
-                 &year,
-                 &hour,
-                 &minute,
-                 &second) == 6) || (sscanf(datetime.c_str(),
-                                           "%d-%3s-%d %d:%d:%d",
-                                           &day,
-                                           month_str,
-                                           &year,
-                                           &hour,
-                                           &minute,
-                                           &second) == 6)) {
-
+  if ((sscanf(datetime.c_str(), "%d/%3s/%d %d:%d:%d", &day, month_str, &year, &hour, &minute, &second) == 6) ||
+      (sscanf(datetime.c_str(), "%d %3s %d %d:%d:%d", &day, month_str, &year, &hour, &minute, &second) == 6) ||
+      (sscanf(datetime.c_str(), "%*3s, %d %3s %d %d:%d:%d", &day, month_str, &year, &hour, &minute, &second) == 6) ||
+      (sscanf(datetime.c_str(), "%d-%3s-%d %d:%d:%d", &day, month_str, &year, &hour, &minute, &second) == 6))
+  {
     month = -1;
     for (std::size_t i = 0; i < num_months; ++i)
     {
@@ -272,7 +252,8 @@ long long HttpServletRequest::GetDateHeader(const std::string& name) const
       }
     }
 
-    if ((month >= 0) && (year >= 1970)) {
+    if ((month >= 0) && (year >= 1970))
+    {
       memset(&tm, 0, sizeof(tm));
       tm.tm_year = year - 1900;
       tm.tm_mon = month;
@@ -297,7 +278,7 @@ std::vector<std::string> HttpServletRequest::GetHeaderNames() const
   return names;
 }
 
-std::vector<std::string> HttpServletRequest::GetHeaders(const std::string& name) const
+std::vector<std::string> HttpServletRequest::GetHeaders(const std::string &name) const
 {
   std::vector<std::string> headers;
   for (int i = 0; i < mg_get_request_info(d->m_Connection)->num_headers; ++i)
@@ -310,12 +291,11 @@ std::vector<std::string> HttpServletRequest::GetHeaders(const std::string& name)
       char sep = ',';
       std::size_t start = text.find_first_not_of(sep);
       std::size_t end = start;
-      while ((end = text.find(sep, start)) != std::string::npos ||
-             (end == std::string::npos && start != end))
+      while ((end = text.find(sep, start)) != std::string::npos || (end == std::string::npos && start != end))
       {
         std::size_t p1 = text.find_first_not_of(' ', start);
-        std::size_t p2 = text.find_last_not_of(' ', end == std::string::npos ? end : end-1);
-        headers.push_back(text.substr(p1, p2-p1+1));
+        std::size_t p2 = text.find_last_not_of(' ', end == std::string::npos ? end : end - 1);
+        headers.push_back(text.substr(p1, p2 - p1 + 1));
         start = text.find_first_not_of(sep, end);
       }
     }
@@ -328,14 +308,28 @@ std::string HttpServletRequest::GetMethod() const
   return mg_get_request_info(d->m_Connection)->request_method;
 }
 
-void HttpServletRequest::SetAttribute(const std::string& name, const Any& value)
+void HttpServletRequest::SetAttribute(const std::string &name, const Any &value)
 {
   d->m_Attributes[name] = value;
 }
 
-HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate* d)
- : d(d)
+HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate *d) : d(d)
 {
 }
-
+std::string HttpServletRequest::GetRequestBody() const
+{
+  mg_lock_connection(d->m_Connection);
+  std::string postdata;
+  char buf[2048];
+  int r = mg_read(d->m_Connection, buf, sizeof(buf));
+  while (r > 0)
+  {
+    std::string p = std::string(buf);
+    p.resize(r);
+    postdata += p;
+    r = mg_read(d->m_Connection, buf, sizeof(buf));
+  }
+  mg_unlock_connection(d->m_Connection);
+  return postdata;
+}
 }

@@ -22,6 +22,7 @@ set(_gtest_tests
   FrameworkTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
+  ServiceReferenceTest.cpp
 )
 
 set(_additional_srcs

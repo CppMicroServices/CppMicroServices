@@ -142,7 +142,8 @@ namespace detail
 /// \cond
 template<class T> std::string us_service_interface_iid()
 {
-  return cppmicroservices::detail::GetDemangledName(typeid(T));
+  static const std::string name = cppmicroservices::detail::GetDemangledName(typeid(T));
+  return name;
 }
 
 template<> inline std::string us_service_interface_iid<void>() { return std::string(); }

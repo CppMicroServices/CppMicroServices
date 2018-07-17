@@ -47,7 +47,7 @@ namespace ServiceNS
 
 }
 
-// This test exercises the 2 ways to register a service 
+// This test exercises the 2 ways to register a service
 //   a. using the name of the interface i.e. "Foo::Bar"
 //   b. using the type of the interface i.e. <Foo::Bar>
 // multiplied with 2 ways to get the service reference
@@ -59,7 +59,7 @@ TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
 {
   struct TestServiceA : public ServiceNS::ITestServiceA
   {
-    int getValue() const override
+    int getValue() const
     {
       return 42;
     }
@@ -67,7 +67,7 @@ TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
 
   struct TestServiceB : public ServiceNS::ITestServiceB
   {
-    int getValue() const override
+    int getValue() const
     {
       return 1729;
     }

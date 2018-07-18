@@ -439,7 +439,7 @@ public:
   template<class S>
   std::vector<ServiceReference<S>> GetServiceReferences(const std::string& filter = std::string())
   {
-    std::string clazz = us_service_interface_iid<S>();
+    auto& clazz = us_service_interface_iid<S>();
     if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
     typedef std::vector<ServiceReferenceU> BaseVectorT;
     BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
@@ -502,7 +502,7 @@ public:
   template<class S>
   ServiceReference<S> GetServiceReference()
   {
-    std::string clazz = us_service_interface_iid<S>();
+    auto& clazz = us_service_interface_iid<S>();
     if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
     return ServiceReference<S>(GetServiceReference(clazz));
   }

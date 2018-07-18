@@ -53,7 +53,7 @@
  * @tparam T The service interface type.
  * @return A unique id for the service interface type T.
  */
-template<class T> std::string us_service_interface_iid();
+template<class T> const std::string& us_service_interface_iid();
 
 namespace cppmicroservices {
 
@@ -140,13 +140,17 @@ namespace detail
 }
 
 /// \cond
-template<class T> std::string us_service_interface_iid()
+template<class T> const std::string& us_service_interface_iid()
 {
   static const std::string name = cppmicroservices::detail::GetDemangledName(typeid(T));
   return name;
 }
 
-template<> inline std::string us_service_interface_iid<void>() { return std::string(); }
+template<> inline const std::string& us_service_interface_iid<void>()
+{
+  static const std::string name("");
+  return name;
+}
 /// \endcond
 
 
@@ -196,8 +200,11 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
  * @param _service_interface_id A string literal representing a globally unique identifier.
  */
 #define CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)             \
-  template<> inline std::string us_service_interface_iid<_service_interface_type>()          \
-  { return _service_interface_id; }                                                              \
+  template<> inline const std::string& us_service_interface_iid<_service_interface_type>()                     \
+  {                                                                                                            \
+    static const std::string name(_service_interface_id);                                                      \
+    return name;                                                                                               \
+  }
 
 
 namespace cppmicroservices {

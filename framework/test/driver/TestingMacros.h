@@ -54,7 +54,7 @@ namespace cppmicroservices {
      main test function. */
 #define US_TEST_BEGIN(testName)                                                               \
   std::string usTestName(#testName);                                                          \
-  cppmicroservices::TestManager::GetInstance().Initialize();                                                \
+  cppmicroservices::TestManager::GetInstance().Initialize();                                  \
   try {
 
 /** \brief Fail and finish test with message MSG */
@@ -64,21 +64,21 @@ namespace cppmicroservices {
 
 /** \brief Must be called last in the main test function. */
 #define US_TEST_END()                                                                         \
-  } catch (const cppmicroservices::TestFailedException&) {                                                  \
+  } catch (const cppmicroservices::TestFailedException&) {                                    \
     US_TEST_OUTPUT(<< "Further test execution skipped.")                                      \
-    cppmicroservices::TestManager::GetInstance().TestFailed();                                              \
+    cppmicroservices::TestManager::GetInstance().TestFailed();                                \
   } catch (const std::exception& ex) {                                                        \
     US_TEST_OUTPUT(<< "Exception occured: " << ex.what())                                     \
-    cppmicroservices::TestManager::GetInstance().TestFailed();                                              \
+    cppmicroservices::TestManager::GetInstance().TestFailed();                                \
   }                                                                                           \
-  if (cppmicroservices::TestManager::GetInstance().NumberOfFailedTests() > 0) {                             \
+  if (cppmicroservices::TestManager::GetInstance().NumberOfFailedTests() > 0) {               \
     US_TEST_OUTPUT(<< usTestName << ": [DONE FAILED] , subtests passed: " <<                  \
-    cppmicroservices::TestManager::GetInstance().NumberOfPassedTests() << " failed: " <<                    \
-    cppmicroservices::TestManager::GetInstance().NumberOfFailedTests() )                                    \
+    cppmicroservices::TestManager::GetInstance().NumberOfPassedTests() << " failed: " <<      \
+    cppmicroservices::TestManager::GetInstance().NumberOfFailedTests() )                      \
     return EXIT_FAILURE;                                                                      \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< usTestName << ": "                                                      \
-                   << cppmicroservices::TestManager::GetInstance().NumberOfPassedTests()                    \
+                   << cppmicroservices::TestManager::GetInstance().NumberOfPassedTests()      \
                    << " tests [DONE PASSED]")                                                 \
     return EXIT_SUCCESS;                                                                      \
   }
@@ -86,13 +86,13 @@ namespace cppmicroservices {
 #define US_TEST_CONDITION(COND,MSG)                                                           \
   US_TEST_OUTPUT_NO_ENDL(<< MSG)                                                              \
   if ( ! (COND) ) {                                                                           \
-    cppmicroservices::TestManager::GetInstance().TestFailed();                            \
+    cppmicroservices::TestManager::GetInstance().TestFailed();                                \
     US_TEST_OUTPUT(<< " [FAILED]\n" << "In " << __FILE__                                      \
                    << ", line " << __LINE__                                                   \
                    << ":  " #COND " : [FAILED]")                                              \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< " [PASSED]")                                                            \
-    cppmicroservices::TestManager::GetInstance().TestPassed();                            \
+    cppmicroservices::TestManager::GetInstance().TestPassed();                                \
  }
 
 #define US_TEST_CONDITION_REQUIRED(COND,MSG)                                                  \
@@ -103,7 +103,7 @@ namespace cppmicroservices {
                        << ", expression is false: \"" #COND "\"")                             \
   } else {                                                                                    \
     US_TEST_OUTPUT(<< " [PASSED]")                                                            \
-    cppmicroservices::TestManager::GetInstance().TestPassed();                            \
+    cppmicroservices::TestManager::GetInstance().TestPassed();                                \
  }
 
 /**
@@ -117,13 +117,13 @@ namespace cppmicroservices {
   try {
 
 #define US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)                                             \
-    cppmicroservices::TestManager::GetInstance().TestFailed();                            \
+    cppmicroservices::TestManager::GetInstance().TestFailed();                                \
     US_TEST_OUTPUT( << "Expected an '" << #EXCEPTIONCLASS << "' exception. [FAILED]")         \
   }                                                                                           \
-  catch (EXCEPTIONCLASS) {                                                                    \
+  catch (EXCEPTIONCLASS const&) {                                                             \
     US_TEST_OUTPUT(<< "Caught an expected '" << #EXCEPTIONCLASS                               \
                    << "' exception. [PASSED]")                                                \
-    cppmicroservices::TestManager::GetInstance().TestPassed();                            \
+    cppmicroservices::TestManager::GetInstance().TestPassed();                                \
   }
 
 
@@ -137,16 +137,16 @@ namespace cppmicroservices {
   US_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
 
 
-#define US_TEST_FOR_NO_EXCEPTION_END()                                         \
-  cppmicroservices::TestManager::GetInstance().TestPassed();                   \
-}                                                                              \
-catch (const std::exception& ex) {                                             \
-  cppmicroservices::TestManager::GetInstance().TestFailed();                   \
-  US_TEST_OUTPUT( << "Unexpected exception caught : " << ex.what() << " [FAILED]") \
-}                                                                              \
-catch (...) {                                                                  \
-  cppmicroservices::TestManager::GetInstance().TestFailed();                   \
-  US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                   \
+#define US_TEST_FOR_NO_EXCEPTION_END()                                                        \
+  cppmicroservices::TestManager::GetInstance().TestPassed();                                  \
+}                                                                                             \
+catch (const std::exception& ex) {                                                            \
+  cppmicroservices::TestManager::GetInstance().TestFailed();                                  \
+  US_TEST_OUTPUT( << "Unexpected exception caught : " << ex.what() << " [FAILED]")            \
+}                                                                                             \
+catch (...) {                                                                                 \
+  cppmicroservices::TestManager::GetInstance().TestFailed();                                  \
+  US_TEST_OUTPUT( << "Unexpected exception caught [FAILED]")                                  \
 }
 
 
@@ -154,19 +154,19 @@ catch (...) {                                                                  \
 /**
  * \brief Use to verify that STATEMENT does not throw any exception
  */
-#define US_TEST_NO_EXCEPTION(STATEMENT)                                       \
-US_TEST_FOR_EXCEPTION_BEGIN(...)                                              \
-STATEMENT ;                                                                   \
+#define US_TEST_NO_EXCEPTION(STATEMENT)                                                      \
+US_TEST_FOR_EXCEPTION_BEGIN(...)                                                             \
+STATEMENT ;                                                                                  \
 US_TEST_FOR_NO_EXCEPTION_END()
 
-#define US_TEST_FOR_NO_EXCEPTION_OTHERWISE_THROW()                              \
-  cppmicroservices::TestManager::GetInstance().TestPassed();                    \
-}                                                                               \
-catch (const std::exception& ex) {                                              \
-  US_TEST_FAILED_MSG( << "Unexpected exception caught: " << ex.what() << " [FAILED]"); \
-}                                                                               \
-catch (...) {                                                                   \
-  US_TEST_FAILED_MSG( << "Unexpected exception caught: [FAILED]");              \
+#define US_TEST_FOR_NO_EXCEPTION_OTHERWISE_THROW()                                           \
+  cppmicroservices::TestManager::GetInstance().TestPassed();                                 \
+}                                                                                            \
+catch (const std::exception& ex) {                                                           \
+  US_TEST_FAILED_MSG( << "Unexpected exception caught: " << ex.what() << " [FAILED]");       \
+}                                                                                            \
+catch (...) {                                                                                \
+  US_TEST_FAILED_MSG( << "Unexpected exception caught: [FAILED]");                           \
 }
 
 /**
@@ -174,9 +174,9 @@ catch (...) {                                                                   
  * \brief If there's an exception, return (exit the test) by throwing
  * cppmicroservices::TestFailedException()
  */
-#define US_TEST_NO_EXCEPTION_REQUIRED(STATEMENT)                      \
-US_TEST_FOR_EXCEPTION_BEGIN(...)                                              \
-STATEMENT ;                                                                   \
+#define US_TEST_NO_EXCEPTION_REQUIRED(STATEMENT)                                             \
+US_TEST_FOR_EXCEPTION_BEGIN(...)                                                             \
+STATEMENT ;                                                                                  \
 US_TEST_FOR_NO_EXCEPTION_OTHERWISE_THROW()
 
 #endif // CPPMICROSERVICES_TESTINGMACROS_H

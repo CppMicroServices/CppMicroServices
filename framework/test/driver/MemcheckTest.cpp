@@ -32,7 +32,8 @@ int MemcheckTest(int /*argc*/, char* /*argv*/[])
     US_TEST_BEGIN("MemcheckTest");
 
     // this leak is intentional
-    new int;
+    auto x = new int(1);
+    std::cout << x;
 
     US_TEST_END()
 }

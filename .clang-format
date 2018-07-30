@@ -1,36 +1,9 @@
 ---
-BasedOnStyle: WebKit
-Cpp11BracedListStyle: 'true'
-IndentWrappedFunctionNames: 'true'
-KeepEmptyLinesAtTheStartOfBlocks: 'true'
-Language: Cpp
-SpacesInAngles: 'false'
-TabWidth: '2'
-UseTab: Never
-SortIncludes: false
-PointerAlignment: Left
-AlignAfterOpenBracket: DontAlign
-BreakBeforeBraces: Custom
-BraceWrapping:
-  AfterClass: true
-  AfterEnum: true
-  AfterStruct: true
-  AfterFunction: true
-  AfterNamespace: false
-  AfterStruct: true
-  AfterUnion: true
-  AfterExternBlock: true
-  BeforeCatch: true
-  BeforeElse: true
-  IndentBraces: false
-  SplitEmptyFunction: false
-  AfterControlStatement: true
-IndentWidth: 2
-AccessModifierOffset: -2
-AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: true
-SpaceBeforeParens: ControlStatements
-ConstructorInitializerIndentWidth: 2
-ColumnLimit: 90
+BasedOnStyle: Mozilla
 
+# Reflowing comments interfers with .rst identation
+ReflowComments: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+IndentPPDirectives: AfterHash
 ...

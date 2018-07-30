@@ -58,7 +58,7 @@ class MyServiceFactory : public ServiceFactory
 {
   virtual InterfaceMapConstPtr GetService(const Bundle& /*bundle*/, const ServiceRegistrationBase& /*registration*/)
   {
-    return MakeInterfaceMap<InterfaceA>(std::make_shared<MyService>());;
+    return MakeInterfaceMap<InterfaceA>(std::make_shared<MyService>());
   }
 
   virtual void UngetService(const Bundle& /*bundle*/, const ServiceRegistrationBase& /*registration*/,

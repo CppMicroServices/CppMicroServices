@@ -62,7 +62,9 @@ int runExecutable(const std::string& executable)
   int ret = std::system(executable.c_str());
 
   // WEXITSTATUS uses an old c-sytle cast
+  // clang-format off
 US_GCC_PUSH_DISABLE_WARNING(old-style-cast)
+  // clang-format on
   return WEXITSTATUS(ret);
 US_GCC_POP_WARNING
 }

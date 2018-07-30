@@ -29,7 +29,10 @@
 
 #include "linenoise.h"
 
+// clang-format off
 US_GCC_PUSH_DISABLE_WARNING(array-bounds)
+// clang-format on
+
 #include "optionparser.h"
 US_GCC_POP_WARNING
 

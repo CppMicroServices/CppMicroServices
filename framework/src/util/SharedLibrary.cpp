@@ -34,8 +34,11 @@
   #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
   #endif
-  #include <windows.h>
-  #include <strsafe.h>
+  // clang-format off
+  // Do not re-order include directives, it would break MinGW builds.
+#  include <windows.h>
+#  include <strsafe.h>
+  // clang-format on
 #else
   #error Unsupported platform
 #endif

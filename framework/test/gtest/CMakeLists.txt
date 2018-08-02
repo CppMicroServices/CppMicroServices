@@ -23,6 +23,7 @@ set(_gtest_tests
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp
+  MakeInterfaceMapTest.cpp
 )
 
 set(_additional_srcs

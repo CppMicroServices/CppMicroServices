@@ -31,19 +31,14 @@ namespace cppmicroservices {
 class TestBundleStartFailActivator : public BundleActivator
 {
 public:
-
   TestBundleStartFailActivator() {}
   ~TestBundleStartFailActivator() {}
 
-  void Start(BundleContext )
-  {
-    throw std::runtime_error("whoopsie!");
-  }
+  void Start(BundleContext) { throw std::runtime_error("whoopsie!"); }
 
-  void Stop(BundleContext) { }
-
+  void Stop(BundleContext) {}
 };
-
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleStartFailActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleStartFailActivator)

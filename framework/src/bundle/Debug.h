@@ -31,7 +31,6 @@ struct Debug
 
   bool lazyActivation;
 };
-
 }
 
 #endif // CPPMICROSERVICES_DEBUG_H

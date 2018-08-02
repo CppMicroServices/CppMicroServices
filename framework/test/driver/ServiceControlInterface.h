@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICECONTROLINTERFACE_H
 #define CPPMICROSERVICES_SERVICECONTROLINTERFACE_H
 
@@ -36,9 +35,10 @@ struct ServiceControlInterface
 
   virtual ~ServiceControlInterface() {}
 
-  virtual void ServiceControl(int service, const std::string& operation, int ranking) = 0;
+  virtual void ServiceControl(int service,
+                              const std::string& operation,
+                              int ranking) = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICECONTROLINTERFACE_H

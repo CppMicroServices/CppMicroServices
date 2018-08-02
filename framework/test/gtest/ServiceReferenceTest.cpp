@@ -20,31 +20,28 @@ limitations under the License.
 
 =============================================================================*/
 
-#include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
-#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceObjects.h"
 #include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
-namespace ServiceNS
+namespace ServiceNS {
+
+struct ITestServiceA
 {
+  virtual int getValue() const = 0;
+  virtual ~ITestServiceA() {}
+};
 
-  struct ITestServiceA
-  {
-    virtual int getValue() const = 0;
-    virtual ~ITestServiceA() {}
-  };
-
-  struct ITestServiceB
-  {
-    virtual int getValue() const = 0;
-    virtual ~ITestServiceB() {}
-  };
-
-
+struct ITestServiceB
+{
+  virtual int getValue() const = 0;
+  virtual ~ITestServiceB() {}
+};
 }
 
 // This test exercises the 2 ways to register a service
@@ -59,20 +56,13 @@ TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
 {
   struct TestServiceA : public ServiceNS::ITestServiceA
   {
-    int getValue() const
-    {
-      return 42;
-    }
+    int getValue() const { return 42; }
   };
 
   struct TestServiceB : public ServiceNS::ITestServiceB
   {
-    int getValue() const
-    {
-      return 1729;
-    }
+    int getValue() const { return 1729; }
   };
-
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
@@ -91,7 +81,8 @@ TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
   ASSERT_EQ(sr2.GetInterfaceId(), "ServiceNS::ITestServiceA");
   auto interfacemap2 = context.GetService(sr2);
   auto service_void2 = interfacemap2->at("ServiceNS::ITestServiceA");
-  auto service2 = std::static_pointer_cast<ServiceNS::ITestServiceA>(service_void2);
+  auto service2 =
+    std::static_pointer_cast<ServiceNS::ITestServiceA>(service_void2);
   ASSERT_EQ(service2->getValue(), 42);
 
   InterfaceMap im;
@@ -102,7 +93,8 @@ TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
   ASSERT_EQ(sr3.GetInterfaceId(), "ServiceNS::ITestServiceB");
   auto interfacemap3 = context.GetService(sr3);
   auto service_void3 = interfacemap3->at("ServiceNS::ITestServiceB");
-  auto service3 = std::static_pointer_cast<ServiceNS::ITestServiceB>(service_void3);
+  auto service3 =
+    std::static_pointer_cast<ServiceNS::ITestServiceB>(service_void3);
   ASSERT_EQ(service3->getValue(), 1729);
 
   auto sr4 = context.GetServiceReference<ServiceNS::ITestServiceB>();

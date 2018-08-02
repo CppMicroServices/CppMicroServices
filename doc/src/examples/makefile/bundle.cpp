@@ -22,7 +22,6 @@ class US_ABI_LOCAL MyActivator : public BundleActivator
 {
 
 private:
-
   /**
    * A private inner class that implements a dictionary service;
    * see DictionaryService for details of the service.
@@ -33,7 +32,6 @@ private:
     std::set<std::string> m_Dictionary;
 
   public:
-
     DictionaryImpl()
     {
       m_Dictionary.insert("welcome");
@@ -61,9 +59,7 @@ private:
     }
   };
 
-
 public:
-
   /**
    * Implements BundleActivator::Start(). Registers an
    * instance of a dictionary service using the bundle context;
@@ -90,7 +86,6 @@ public:
   {
     // NOTE: The service is automatically unregistered
   }
-
 };
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)

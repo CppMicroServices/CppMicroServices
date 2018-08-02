@@ -33,7 +33,6 @@ namespace cppmicroservices {
 class TestBundleWaitOnOperationActivator : public BundleActivator
 {
 public:
-
   TestBundleWaitOnOperationActivator() {}
   ~TestBundleWaitOnOperationActivator() {}
 
@@ -46,39 +45,39 @@ public:
   // @throw std::runtime_error if the bundle operation timed out.
   void FailWaitOnOperation(BundleContext context, Any prop)
   {
-    if (prop.Empty()) return;
+    if (prop.Empty())
+      return;
 
-    if (prop.ToString() == "start")
-    {
-      context.GetBundle().Start(); 
-    }
-    else if (prop.ToString() == "stop")
-    { 
+    if (prop.ToString() == "start") {
+      context.GetBundle().Start();
+    } else if (prop.ToString() == "stop") {
       context.GetBundle().Stop();
-    }
-    else if (prop.ToString() == "uninstall")
-    { 
+    } else if (prop.ToString() == "uninstall") {
       context.GetBundle().Uninstall();
-    }
-    else 
-    {
+    } else {
       // unknown option - FAIL TEST
-      throw std::runtime_error("unknown framework property value used in TestBundleWaitOnOperationActivator");
+      throw std::runtime_error("unknown framework property value used in "
+                               "TestBundleWaitOnOperationActivator");
     }
   }
 
   void Start(BundleContext context)
   {
-    FailWaitOnOperation(context, Any(context.GetProperty("org.cppmicroservices.framework.testing.waitonoperation.start")));
+    FailWaitOnOperation(
+      context,
+      Any(context.GetProperty(
+        "org.cppmicroservices.framework.testing.waitonoperation.start")));
   }
 
-  void Stop(BundleContext context) 
+  void Stop(BundleContext context)
   {
-    FailWaitOnOperation(context, Any(context.GetProperty("org.cppmicroservices.framework.testing.waitonoperation.stop")));
+    FailWaitOnOperation(
+      context,
+      Any(context.GetProperty(
+        "org.cppmicroservices.framework.testing.waitonoperation.stop")));
   }
-
 };
-
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleWaitOnOperationActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleWaitOnOperationActivator)

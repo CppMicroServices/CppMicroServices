@@ -32,7 +32,6 @@ struct HttpServletPrivate
   mutable std::mutex m_Mutex;
   ServletConfig m_Config;
 };
-
 }
 
 #endif // CPPMICROSERVICES_HTTPSERVLETPRIVATE_H

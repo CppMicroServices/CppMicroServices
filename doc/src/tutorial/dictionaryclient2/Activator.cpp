@@ -51,10 +51,9 @@ class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
-
   Activator()
-   : m_context()
-   , m_dictionary(nullptr)
+    : m_context()
+    , m_dictionary(nullptr)
   {}
 
   /**
@@ -89,18 +88,19 @@ public:
       // MutexLocker lock(&m_mutex);
 
       // Listen for events pertaining to dictionary services.
-      m_context.AddServiceListener(std::bind(&Activator::ServiceChanged, this, std::placeholders::_1),
-                                   std::string("(&(") + Constants::OBJECTCLASS + "=" +
-                                   us_service_interface_iid<IDictionaryService>() + ")" + "(Language=*))");
+      m_context.AddServiceListener(
+        std::bind(&Activator::ServiceChanged, this, std::placeholders::_1),
+        std::string("(&(") + Constants::OBJECTCLASS + "=" +
+          us_service_interface_iid<IDictionaryService>() + ")" +
+          "(Language=*))");
 
       // Query for any service references matching any language.
-      std::vector<ServiceReference<IDictionaryService> > refs =
-          context.GetServiceReferences<IDictionaryService>("(Language=*)");
+      std::vector<ServiceReference<IDictionaryService>> refs =
+        context.GetServiceReferences<IDictionaryService>("(Language=*)");
 
       // If we found any dictionary services, then just get
       // a reference to the first one so we can use it.
-      if (!refs.empty())
-      {
+      if (!refs.empty()) {
         m_ref = refs.front();
         m_dictionary = m_context.GetService(m_ref);
       }
@@ -109,8 +109,7 @@ public:
     std::cout << "Enter a blank line to exit." << std::endl;
 
     // Loop endlessly until the user enters a blank line
-    while (std::cin)
-    {
+    while (std::cin) {
       // Ask the user to enter a word.
       std::cout << "Enter word: ";
 
@@ -119,22 +118,17 @@ public:
 
       // If the user entered a blank line, then
       // exit the loop.
-      if (word.empty())
-      {
+      if (word.empty()) {
         break;
       }
       // If there is no dictionary, then say so.
-      else if (m_dictionary == nullptr)
-      {
+      else if (m_dictionary == nullptr) {
         std::cout << "No dictionary available." << std::endl;
       }
       // Otherwise print whether the word is correct or not.
-      else if (m_dictionary->CheckWord( word ))
-      {
+      else if (m_dictionary->CheckWord(word)) {
         std::cout << "Correct." << std::endl;
-      }
-      else
-      {
+      } else {
         std::cout << "Incorrect." << std::endl;
       }
     }
@@ -164,10 +158,8 @@ public:
 
     // If a dictionary service was registered, see if we
     // need one. If so, get a reference to it.
-    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED)
-    {
-      if (!m_ref)
-      {
+    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED) {
+      if (!m_ref) {
         // Get a reference to the service object.
         m_ref = event.GetServiceReference();
         m_dictionary = m_context.GetService(m_ref);
@@ -176,27 +168,22 @@ public:
     // If a dictionary service was unregistered, see if it
     // was the one we were using. If so, unget the service
     // and try to query to get another one.
-    else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING)
-    {
-      if (event.GetServiceReference() == m_ref)
-      {
+    else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING) {
+      if (event.GetServiceReference() == m_ref) {
         // Unget service object and null references.
         m_ref = nullptr;
         m_dictionary.reset();
 
         // Query to see if we can get another service.
-        std::vector<ServiceReference<IDictionaryService> > refs;
-        try
-        {
-          refs = m_context.GetServiceReferences<IDictionaryService>("(Language=*)");
-        }
-        catch (const std::invalid_argument& e)
-        {
+        std::vector<ServiceReference<IDictionaryService>> refs;
+        try {
+          refs =
+            m_context.GetServiceReferences<IDictionaryService>("(Language=*)");
+        } catch (const std::invalid_argument& e) {
           std::cout << e.what() << std::endl;
         }
 
-        if (!refs.empty())
-        {
+        if (!refs.empty()) {
           // Get a reference to the first service object.
           m_ref = refs.front();
           m_dictionary = m_context.GetService(m_ref);
@@ -206,7 +193,6 @@ public:
   }
 
 private:
-
   // Bundle context
   BundleContext m_context;
 
@@ -216,7 +202,6 @@ private:
   // The service object being used
   std::shared_ptr<IDictionaryService> m_dictionary;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)

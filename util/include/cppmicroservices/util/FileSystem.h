@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_UTIL_FILESYSTEM_H
 #define CPPMICROSERVICES_UTIL_FILESYSTEM_H
 

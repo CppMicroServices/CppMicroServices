@@ -4,17 +4,14 @@
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceInterface.h"
 
-
 class SingletonTwo
 {
 public:
-
   static SingletonTwo& GetInstance();
 
   int b;
 
 private:
-
   SingletonTwo();
   ~SingletonTwo();
 
@@ -31,7 +28,7 @@ public:
   static std::shared_ptr<SingletonTwoService> GetInstance();
 
   int b;
-  
+
   SingletonTwoService();
   ~SingletonTwoService();
 

@@ -74,8 +74,7 @@ TEST(AnyMapTest, IteratorTest)
   ASSERT_EQ((*(++ociter1)).second.ToString(), std::string("2"));
   ASSERT_EQ((*(ociter1++)).second.ToString(), std::string("2"));
   int i = 0;
-  for (AnyMap::const_iter oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it)
-  {
+  for (AnyMap::const_iter oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it) {
     ++i;
     ASSERT_EQ(i, any_cast<int>(oc_it->second));
   }
@@ -96,7 +95,7 @@ TEST(AnyMapTest, IteratorTest)
   // Testing operator==
   auto ociter2(o.cbegin());
   ASSERT_EQ(ociter, ociter2);
-    
+
   // Testing iterator copy ctor.
   AnyMap::iter oiter(o.begin());
   AnyMap::iter oiter_copy(o.begin());
@@ -121,7 +120,7 @@ TEST(AnyMapTest, IteratorTest)
   ASSERT_TRUE(any_cast<int>(uoiter->second) > 0);
   ASSERT_TRUE(any_cast<int>(uociiter->second) > 0);
   EXPECT_THROW(US_UNUSED(niter->second), std::logic_error);
-  
+
   // Testing iterator pre-increment operator
   ASSERT_EQ((*(++oiter)).second.ToString(), std::string("2"));
   ASSERT_TRUE(any_cast<int>((*(++uoiter)).second) > 0);
@@ -166,7 +165,7 @@ TEST(AnyMapTest, AnyMap)
   uco_anymap1.clear();
   uco_anymap1["DO"] = 1;
   uco_anymap1["RE"] = 2;
-  
+
   // Testing AnyMap::at()
   ASSERT_EQ(any_cast<int>(uo_anymap1.at("re")), 2);
 

@@ -26,7 +26,8 @@
 
 namespace cppmicroservices {
 
-std::string WebConsoleDefaultVariableResolver::Resolve(const std::string& variable) const
+std::string WebConsoleDefaultVariableResolver::Resolve(
+  const std::string& variable) const
 {
   Kainjow::Mustache mustache(variable);
   return mustache.render(m_Data);
@@ -36,5 +37,4 @@ MustacheData& WebConsoleDefaultVariableResolver::GetData()
 {
   return m_Data;
 }
-
 }

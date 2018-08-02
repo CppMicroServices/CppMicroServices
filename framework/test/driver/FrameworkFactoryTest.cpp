@@ -20,9 +20,9 @@ limitations under the License.
 
 =============================================================================*/
 
+#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkFactory.h"
 
 #include "TestingConfig.h"
 #include "TestingMacros.h"
@@ -33,32 +33,35 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-int FrameworkFactoryTest(int /*argc*/, char* /*argv*/[])
+int FrameworkFactoryTest(int /*argc*/, char* /*argv*/ [])
 {
-    US_TEST_BEGIN("FrameworkFactoryTest");
+  US_TEST_BEGIN("FrameworkFactoryTest");
 
-    auto f = FrameworkFactory().NewFramework();
+  auto f = FrameworkFactory().NewFramework();
 
-    US_TEST_CONDITION(f, "Test Framework instantiation");
+  US_TEST_CONDITION(f, "Test Framework instantiation");
 
-    auto f1 = FrameworkFactory().NewFramework();
+  auto f1 = FrameworkFactory().NewFramework();
 
-    US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
+  US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
 
-    FrameworkConfiguration configuration;
-    configuration["org.osgi.framework.security"] = std::string("osgi");
-    configuration["org.osgi.framework.startlevel.beginning"] = 0;
-    configuration["org.osgi.framework.bsnversion"] = std::string("single");
-    configuration["org.osgi.framework.custom1"] = std::string("foo");
-    configuration["org.osgi.framework.custom2"] = std::string("bar");
+  FrameworkConfiguration configuration;
+  configuration["org.osgi.framework.security"] = std::string("osgi");
+  configuration["org.osgi.framework.startlevel.beginning"] = 0;
+  configuration["org.osgi.framework.bsnversion"] = std::string("single");
+  configuration["org.osgi.framework.custom1"] = std::string("foo");
+  configuration["org.osgi.framework.custom2"] = std::string("bar");
 
-    auto f2 = FrameworkFactory().NewFramework(configuration);
+  auto f2 = FrameworkFactory().NewFramework(configuration);
 
-    US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
+  US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
 
-    auto f3 = FrameworkFactory().NewFramework(std::unordered_map<std::string, cppmicroservices::Any>(), &std::clog);
+  auto f3 = FrameworkFactory().NewFramework(
+    std::unordered_map<std::string, cppmicroservices::Any>(), &std::clog);
 
-    US_TEST_CONDITION(f3, "Test Framework instantiation with default configuration and custom logger");
+  US_TEST_CONDITION(f3,
+                    "Test Framework instantiation with default configuration "
+                    "and custom logger");
 
-    US_TEST_END()
+  US_TEST_END()
 }

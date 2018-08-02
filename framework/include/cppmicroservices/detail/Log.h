@@ -35,12 +35,17 @@ namespace cppmicroservices {
 
 namespace detail {
 
-class LogSink : public MultiThreaded<>, public std::enable_shared_from_this<LogSink>
+class LogSink
+  : public MultiThreaded<>
+  , public std::enable_shared_from_this<LogSink>
 {
 public:
-  explicit LogSink(std::ostream* sink, bool enable = false) : _enable(enable), _sink(sink)
+  explicit LogSink(std::ostream* sink, bool enable = false)
+    : _enable(enable)
+    , _sink(sink)
   {
-    if (_sink == nullptr) _enable = false;
+    if (_sink == nullptr)
+      _enable = false;
   }
 
   LogSink() = delete;
@@ -52,8 +57,10 @@ public:
 
   void Log(const std::string& msg)
   {
-    if (!_enable) return;
-    auto l = Lock(); US_UNUSED(l);
+    if (!_enable)
+      return;
+    auto l = Lock();
+    US_UNUSED(l);
     *_sink << msg;
   }
 
@@ -62,33 +69,41 @@ private:
   std::ostream* const _sink;
 };
 
-struct LogMsg {
+struct LogMsg
+{
 
   LogMsg(LogSink& sink, const char* file, int ln, const char* func)
-    : enabled(false), buffer(), _sink(sink)
+    : enabled(false)
+    , buffer()
+    , _sink(sink)
   {
     enabled = _sink.Enabled();
-    if (enabled)
-    {
+    if (enabled) {
       buffer << "In " << func << " at " << file << ":" << ln << " : ";
     }
   }
 
   LogMsg(const LogMsg& other)
-    : enabled(other.enabled), buffer(), _sink(other._sink)
+    : enabled(other.enabled)
+    , buffer()
+    , _sink(other._sink)
   {}
 
-  ~LogMsg() { if(enabled) _sink.Log(buffer.str()); }
+  ~LogMsg()
+  {
+    if (enabled)
+      _sink.Log(buffer.str());
+  }
 
   template<typename T>
   LogMsg& operator<<(T&& t)
   {
-    if (enabled) buffer << std::forward<T>(t);
+    if (enabled)
+      buffer << std::forward<T>(t);
     return *this;
   }
 
 private:
-
   bool enabled;
   std::ostringstream buffer;
   LogSink& _sink;
@@ -99,7 +114,7 @@ private:
 } // namespace cppmicroservices
 
 // Write a log line using a <code>LogSink</code> reference.
-#define DIAG_LOG(log_sink) cppmicroservices::detail::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
-
+#define DIAG_LOG(log_sink)                                                     \
+  cppmicroservices::detail::LogMsg(log_sink, __FILE__, __LINE__, __FUNCTION__)
 
 #endif // CPPMICROSERVICES_LOG_H

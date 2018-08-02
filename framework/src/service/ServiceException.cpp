@@ -26,21 +26,17 @@
 
 namespace cppmicroservices {
 
-ServiceException::~ServiceException() throw()
-{
-}
+ServiceException::~ServiceException() throw() {}
 
 ServiceException::ServiceException(const std::string& msg, const Type& type)
-  : std::runtime_error(msg), type(type)
-{
-
-}
+  : std::runtime_error(msg)
+  , type(type)
+{}
 
 ServiceException::ServiceException(const ServiceException& o)
-  : std::runtime_error(o), type(o.type)
-{
-
-}
+  : std::runtime_error(o)
+  , type(o.type)
+{}
 
 ServiceException& ServiceException::operator=(const ServiceException& o)
 {
@@ -53,7 +49,6 @@ ServiceException::Type ServiceException::GetType() const
 {
   return type;
 }
-
 }
 
 using namespace cppmicroservices;

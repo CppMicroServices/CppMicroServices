@@ -41,7 +41,6 @@ class Activator : public BundleActivator
 {
 
 private:
-
   /**
    * Implements BundleActivator::Start(). Prints a message and adds a member
    * function to the bundle context as a service listener.
@@ -51,7 +50,8 @@ private:
   void Start(BundleContext context)
   {
     std::cout << "Starting to listen for service events." << std::endl;
-    listenerToken = context.AddServiceListener(std::bind(&Activator::ServiceChanged, this, std::placeholders::_1));
+    listenerToken = context.AddServiceListener(
+      std::bind(&Activator::ServiceChanged, this, std::placeholders::_1));
   }
 
   /**
@@ -76,25 +76,25 @@ private:
    */
   void ServiceChanged(const ServiceEvent& event)
   {
-    std::string objectClass = ref_any_cast<std::vector<std::string> >(event.GetServiceReference().GetProperty(Constants::OBJECTCLASS)).front();
+    std::string objectClass =
+      ref_any_cast<std::vector<std::string>>(
+        event.GetServiceReference().GetProperty(Constants::OBJECTCLASS))
+        .front();
 
-    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED)
-    {
-      std::cout << "Ex1: Service of type " << objectClass << " registered." << std::endl;
-    }
-    else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING)
-    {
-      std::cout << "Ex1: Service of type " << objectClass << " unregistered." << std::endl;
-    }
-    else if (event.GetType() == ServiceEvent::SERVICE_MODIFIED)
-    {
-      std::cout << "Ex1: Service of type " << objectClass << " modified." << std::endl;
+    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED) {
+      std::cout << "Ex1: Service of type " << objectClass << " registered."
+                << std::endl;
+    } else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING) {
+      std::cout << "Ex1: Service of type " << objectClass << " unregistered."
+                << std::endl;
+    } else if (event.GetType() == ServiceEvent::SERVICE_MODIFIED) {
+      std::cout << "Ex1: Service of type " << objectClass << " modified."
+                << std::endl;
     }
   }
 
   ListenerToken listenerToken;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)

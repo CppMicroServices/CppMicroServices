@@ -23,9 +23,9 @@
 #ifndef CPPMICROSERVICES_TESTUTILLISTENERHELPERS_H
 #define CPPMICROSERVICES_TESTUTILLISTENERHELPERS_H
 
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ServiceEvent.h"
-#include "cppmicroservices/BundleContext.h"
 
 #include "TestingMacros.h"
 
@@ -36,21 +36,19 @@ class BundleListenerRegistrationHelper
 {
 
 public:
+  typedef void (Receiver::*CallbackType)(const BundleEvent&);
 
-  typedef void(Receiver::*CallbackType)(const BundleEvent&);
-
-  BundleListenerRegistrationHelper(const BundleContext& context, Receiver* receiver, CallbackType callback)
+  BundleListenerRegistrationHelper(const BundleContext& context,
+                                   Receiver* receiver,
+                                   CallbackType callback)
     : context(context)
     , receiver(receiver)
     , callback(callback)
   {
-    try
-    {
+    try {
       this->context.AddBundleListener(receiver, callback);
-    }
-    catch (const std::logic_error& ise)
-    {
-      US_TEST_OUTPUT( << "bundle listener registration failed " << ise.what() );
+    } catch (const std::logic_error& ise) {
+      US_TEST_OUTPUT(<< "bundle listener registration failed " << ise.what());
       throw;
     }
   }
@@ -61,7 +59,6 @@ public:
   }
 
 private:
-
   BundleContext context;
   Receiver* receiver;
   CallbackType callback;
@@ -72,21 +69,19 @@ class ServiceListenerRegistrationHelper
 {
 
 public:
+  typedef void (Receiver::*CallbackType)(const ServiceEvent&);
 
-  typedef void(Receiver::*CallbackType)(const ServiceEvent&);
-
-  ServiceListenerRegistrationHelper(const BundleContext& context, Receiver* receiver, CallbackType callback)
+  ServiceListenerRegistrationHelper(const BundleContext& context,
+                                    Receiver* receiver,
+                                    CallbackType callback)
     : context(context)
     , receiver(receiver)
     , callback(callback)
   {
-    try
-    {
+    try {
       this->context.AddServiceListener(receiver, callback);
-    }
-    catch (const std::logic_error& ise)
-    {
-      US_TEST_OUTPUT( << "service listener registration failed " << ise.what() );
+    } catch (const std::logic_error& ise) {
+      US_TEST_OUTPUT(<< "service listener registration failed " << ise.what());
       throw;
     }
   }
@@ -97,12 +92,10 @@ public:
   }
 
 private:
-
   BundleContext context;
   Receiver* receiver;
   CallbackType callback;
 };
-
 }
 
 #endif // CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H

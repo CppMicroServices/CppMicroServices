@@ -29,12 +29,13 @@ US_MSVC_PUSH_DISABLE_WARNING(4355)
 
 namespace cppmicroservices {
 
-BundleResourceStream::BundleResourceStream(const BundleResource& resource, std::ios_base::openmode mode)
-  : BundleResourceBuffer(resource.GetData(), resource.GetSize(), mode | std::ios_base::in)
+BundleResourceStream::BundleResourceStream(const BundleResource& resource,
+                                           std::ios_base::openmode mode)
+  : BundleResourceBuffer(resource.GetData(),
+                         resource.GetSize(),
+                         mode | std::ios_base::in)
   , std::istream(this)
-{
-}
-
+{}
 }
 
 US_MSVC_POP_WARNING

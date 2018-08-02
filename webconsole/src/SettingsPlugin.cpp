@@ -27,38 +27,44 @@
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
 
-#include "cppmicroservices/Constants.h"
-#include "cppmicroservices/GetBundleContext.h"
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
+#include "cppmicroservices/Constants.h"
+#include "cppmicroservices/GetBundleContext.h"
 
 namespace cppmicroservices {
 
 SettingsPlugin::SettingsPlugin()
   : SimpleWebConsolePlugin("settings", "Settings", "")
-{
-}
+{}
 
-void SettingsPlugin::RenderContent(HttpServletRequest& request, HttpServletResponse& response)
+void SettingsPlugin::RenderContent(HttpServletRequest& request,
+                                   HttpServletResponse& response)
 {
-  BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/settings.html");
-  if (res)
-  {
+  BundleResource res =
+    GetBundleContext().GetBundle().GetResource("/templates/settings.html");
+  if (res) {
     auto props = GetBundleContext().GetProperties();
-    auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
-    data["us-thread"] = props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept() == Constants::FRAMEWORK_THREADING_MULTI ? TemplateData::Type::True : TemplateData::Type::False;
+    auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(
+                   GetVariableResolver(request))
+                   ->GetData();
+    data["us-thread"] =
+      props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept() ==
+          Constants::FRAMEWORK_THREADING_MULTI
+        ? TemplateData::Type::True
+        : TemplateData::Type::False;
 #ifdef US_BUILD_SHARED_LIBS
     data["us-shared"] = TemplateData::Type::True;
 #else
     data["us-shared"] = TemplateData::Type::False;
 #endif
-    data["us-storagepath"] = props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
+    data["us-storagepath"] =
+      props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
 
     TemplateData fwProps(TemplateData::Type::List);
-    for (auto p : props)
-    {
+    for (auto p : props) {
       TemplateData kv;
       kv["key"] = p.first;
       kv["value"] = p.second.ToString();
@@ -73,9 +79,7 @@ void SettingsPlugin::RenderContent(HttpServletRequest& request, HttpServletRespo
 
 BundleResource SettingsPlugin::GetResource(const std::string& path) const
 {
-  return (this->GetContext()) ?
-        this->GetContext().GetBundle().GetResource(path) :
-        BundleResource();
+  return (this->GetContext()) ? this->GetContext().GetBundle().GetResource(path)
+                              : BundleResource();
 }
-
 }

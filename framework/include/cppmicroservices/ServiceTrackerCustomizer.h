@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICETRACKERCUSTOMIZER_H
 #define CPPMICROSERVICES_SERVICETRACKERCUSTOMIZER_H
 
@@ -63,14 +62,17 @@ template<class S, class T = S>
 struct ServiceTrackerCustomizer
 {
 
-  struct TypeTraits {
+  struct TypeTraits
+  {
     typedef S ServiceType;
     typedef T TrackedType;
     typedef T TrackedParmType;
 
-    static std::shared_ptr<TrackedType> ConvertToTrackedType(const std::shared_ptr<S>&)
+    static std::shared_ptr<TrackedType> ConvertToTrackedType(
+      const std::shared_ptr<S>&)
     {
-      throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+      throw std::runtime_error("A custom ServiceTrackerCustomizer instance is "
+                               "required for custom tracked objects.");
     }
   };
 
@@ -96,7 +98,8 @@ struct ServiceTrackerCustomizer
    *         service or <code>0</code> if the specified referenced service
    *         should not be tracked.
    */
-  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(
+    const ServiceReference<S>& reference) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been modified.
@@ -108,7 +111,9 @@ struct ServiceTrackerCustomizer
    * @param reference The reference to the service that has been modified.
    * @param service The service object for the specified referenced service.
    */
-  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void ModifiedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
 
   /**
    * A service tracked by the <code>ServiceTracker</code> has been removed.
@@ -120,14 +125,17 @@ struct ServiceTrackerCustomizer
    * @param reference The reference to the service that has been removed.
    * @param service The service object for the specified referenced service.
    */
-  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
 template<class S>
-struct ServiceTrackerCustomizer<S,S>
+struct ServiceTrackerCustomizer<S, S>
 {
 
-  struct TypeTraits {
+  struct TypeTraits
+  {
     typedef S ServiceType;
     typedef S TrackedType;
     typedef S TrackedParmType;
@@ -142,23 +150,30 @@ struct ServiceTrackerCustomizer<S,S>
 
   virtual ~ServiceTrackerCustomizer() {}
 
-  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
-  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
-  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(
+    const ServiceReference<S>& reference) = 0;
+  virtual void ModifiedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
 template<class T>
 struct ServiceTrackerCustomizer<void, T>
 {
 
-  struct TypeTraits {
+  struct TypeTraits
+  {
     typedef void ServiceType;
     typedef T TrackedType;
     typedef T TrackedParmType;
 
     static std::shared_ptr<T> ConvertToTrackedType(const InterfaceMapConstPtr&)
     {
-      throw std::runtime_error("A custom ServiceTrackerCustomizer instance is required for custom tracked objects.");
+      throw std::runtime_error("A custom ServiceTrackerCustomizer instance is "
+                               "required for custom tracked objects.");
     }
   };
 
@@ -166,21 +181,28 @@ struct ServiceTrackerCustomizer<void, T>
   typedef typename TypeTraits::TrackedParmType TrackedParmType;
 
   virtual ~ServiceTrackerCustomizer() {}
-  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
-  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
-  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(
+    const ServiceReference<S>& reference) = 0;
+  virtual void ModifiedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
 };
 
 template<>
 struct ServiceTrackerCustomizer<void, void>
 {
 
-  struct TypeTraits {
+  struct TypeTraits
+  {
     typedef void ServiceType;
     typedef void TrackedType;
     typedef const InterfaceMap TrackedParmType;
 
-    static std::shared_ptr<TrackedParmType> ConvertToTrackedType(const std::shared_ptr<TrackedParmType>& t)
+    static std::shared_ptr<TrackedParmType> ConvertToTrackedType(
+      const std::shared_ptr<TrackedParmType>& t)
     {
       return t;
     }
@@ -191,11 +213,15 @@ struct ServiceTrackerCustomizer<void, void>
   typedef TypeTraits::TrackedParmType TrackedParmType;
 
   virtual ~ServiceTrackerCustomizer() {}
-  virtual std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference) = 0;
-  virtual void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
-  virtual void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual std::shared_ptr<TrackedParmType> AddingService(
+    const ServiceReference<S>& reference) = 0;
+  virtual void ModifiedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
+  virtual void RemovedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParmType>& service) = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICETRACKERCUSTOMIZER_H

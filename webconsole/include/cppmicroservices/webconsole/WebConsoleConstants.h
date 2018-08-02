@@ -86,7 +86,8 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * AbstractWebConsolePlugin#GetCategory() is called which should be
    * overwritten.
    */
-  static std::string PLUGIN_CATEGORY; // = "org.cppmicroservices.webconsole.category"
+  static std::string
+    PLUGIN_CATEGORY; // = "org.cppmicroservices.webconsole.category"
 
   /**
    * The name of the service registration properties providing references
@@ -102,7 +103,8 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * AbstractWebConsolePlugin#GetCssReferences() method to provide
    * additional CSS resources.
    */
-  static std::string PLUGIN_CSS_REFERENCES; // = "org.cppmicroservices.webconsole.css"
+  static std::string
+    PLUGIN_CSS_REFERENCES; // = "org.cppmicroservices.webconsole.css"
 
   /**
    * The name of the request attribute providing the absolute path of the
@@ -114,7 +116,8 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    *
    * The type of this request attribute is <code>std::string</code>.
    */
-  static std::string ATTR_APP_ROOT; // = "org.cppmicroservices.webconsole.appRoot"
+  static std::string
+    ATTR_APP_ROOT; // = "org.cppmicroservices.webconsole.appRoot"
 
   /**
    * The name of the request attribute providing the absolute path of the
@@ -125,7 +128,8 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    *
    * The type of this request attribute is <code>std::string</code>.
    */
-  static std::string ATTR_PLUGIN_ROOT; // = "org.cppmicroservices.webconsole.pluginRoot"
+  static std::string
+    ATTR_PLUGIN_ROOT; // = "org.cppmicroservices.webconsole.pluginRoot"
 
   /**
    * The name of the request attribute providing a mapping of labels to page
@@ -136,7 +140,8 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    *
    * The type of this request attribute is <code>AnyMap</code>.
    */
-  static std::string ATTR_LABEL_MAP; // = "org.cppmicroservices.webconsole.labelMap"
+  static std::string
+    ATTR_LABEL_MAP; // = "org.cppmicroservices.webconsole.labelMap"
 
   /**
    * The name of the request attribute holding the WebConsoleVariableResolver
@@ -146,10 +151,9 @@ struct US_WebConsole_EXPORT WebConsoleConstants
    * @see AbstractWebConsolePlugin#GetVariableResolver
    * @see AbstractWebConsolePlugin#SetVariableResolver
    */
-  static std::string ATTR_CONSOLE_VARIABLE_RESOLVER; // = "org.cppmicroservices.webconsole.variable.resolver"
-
+  static std::string
+    ATTR_CONSOLE_VARIABLE_RESOLVER; // = "org.cppmicroservices.webconsole.variable.resolver"
 };
-
 }
 
 #endif // CPPMICROSERVICES_WEBCONSOLECONSTANTS_H

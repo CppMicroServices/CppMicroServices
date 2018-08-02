@@ -20,14 +20,13 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_UTIL_STRING_H
 #define CPPMICROSERVICES_UTIL_STRING_H
 
 #include <string>
 
 #if defined(__ANDROID__)
-  #include <sstream>
+#  include <sstream>
 #endif
 
 namespace cppmicroservices {
@@ -44,7 +43,7 @@ namespace util {
  * support.
  */
 
-template <typename T>
+template<typename T>
 std::string ToString(T val)
 {
 #if defined(__ANDROID__)

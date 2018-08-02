@@ -40,19 +40,16 @@ typedef Kainjow::Mustache::Data MustacheData;
  * variables.
  */
 class US_WebConsole_EXPORT WebConsoleDefaultVariableResolver
-    : public WebConsoleVariableResolver
+  : public WebConsoleVariableResolver
 {
 public:
-
-  virtual std::string Resolve(const std::string &variable) const;
+  virtual std::string Resolve(const std::string& variable) const;
 
   MustacheData& GetData();
 
 private:
-
   MustacheData m_Data;
 };
-
 }
 
 #endif // CPPMICROSERVICES_WEBCONSOLEDEFAULTVARIABLERESOLVER_H

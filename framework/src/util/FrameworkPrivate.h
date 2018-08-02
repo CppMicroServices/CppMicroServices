@@ -42,7 +42,6 @@ namespace cppmicroservices {
 class FrameworkPrivate : public BundlePrivate
 {
 public:
-
   FrameworkPrivate(CoreBundleContext* fwCtx);
 
   void Init();
@@ -100,7 +99,8 @@ public:
    * The event to return to callers waiting in Framework.waitForStop() when the
    * framework has been stopped.
    */
-  struct FrameworkEventInternal {
+  struct FrameworkEventInternal
+  {
     bool valid;
     FrameworkEvent::Type type;
     std::string msg;
@@ -116,11 +116,7 @@ public:
    * The thread that performs shutdown of this framework instance.
    */
   std::thread shutdownThread;
-
 };
-
-
-
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORKPRIVATE_H

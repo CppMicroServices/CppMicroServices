@@ -21,22 +21,22 @@
 =============================================================================*/
 
 #include "cppmicroservices/httpservice/ServletContext.h"
-#include "cppmicroservices/httpservice/ServletContainer.h"
 #include "ServletContainerPrivate.h"
+#include "cppmicroservices/httpservice/ServletContainer.h"
 
 namespace cppmicroservices {
 
 ServletContext::ServletContext(ServletContainer* container)
   : m_Container(container)
-{
-}
+{}
 
 std::string ServletContext::GetContextPath() const
 {
   return m_Container->GetContextPath(this);
 }
 
-std::shared_ptr<ServletContext> ServletContext::GetContext(const std::string& uripath)
+std::shared_ptr<ServletContext> ServletContext::GetContext(
+  const std::string& uripath)
 {
   return m_Container->GetContext(uripath);
 }
@@ -45,5 +45,4 @@ std::string ServletContext::GetMimeType(const std::string& file) const
 {
   return m_Container->d->GetMimeType(this, file);
 }
-
 }

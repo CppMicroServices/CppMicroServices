@@ -25,9 +25,9 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceTracker.h"
 
+#include "TestUtils.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
-#include "TestUtils.h"
 
 #include <future>
 
@@ -42,35 +42,35 @@ void bundleListener(const BundleEvent& be)
 {
   auto b = be.GetBundle();
   auto type = be.GetType();
-  if (type == BundleEvent::BUNDLE_STARTING || type == BundleEvent::BUNDLE_STARTED)
-  {
+  if (type == BundleEvent::BUNDLE_STARTING ||
+      type == BundleEvent::BUNDLE_STARTED) {
     b.Stop();
-  }
-  else if (type == BundleEvent::BUNDLE_STOPPING || type == BundleEvent::BUNDLE_STOPPED)
-  {
+  } else if (type == BundleEvent::BUNDLE_STOPPING ||
+             type == BundleEvent::BUNDLE_STOPPED) {
     b.Start();
   }
 }
 
-int ConcurrencyTest(int /*argc*/, char* /*argv*/[])
+int ConcurrencyTest(int /*argc*/, char* /*argv*/ [])
 {
-    US_TEST_BEGIN("ConcurrencyTest");
+  US_TEST_BEGIN("ConcurrencyTest");
 
-    FrameworkFactory factory;
+  FrameworkFactory factory;
 
-    auto f = factory.NewFramework();
-    f.Start();
+  auto f = factory.NewFramework();
+  f.Start();
 
-    auto context = f.GetBundleContext();
+  auto context = f.GetBundleContext();
 
-    context.AddBundleListener(bundleListener);
+  context.AddBundleListener(bundleListener);
 
-    ServiceTracker<void> tracker(f.GetBundleContext(), "org.cppmicroservices.c1.additional");
-    tracker.Open();
+  ServiceTracker<void> tracker(f.GetBundleContext(),
+                               "org.cppmicroservices.c1.additional");
+  tracker.Open();
 
-    auto bundle = testing::InstallLib(context, "TestBundleC1");
+  auto bundle = testing::InstallLib(context, "TestBundleC1");
 
-    /* --- The Bundle class is not thread safe yet with respect to state changes ---
+  /* --- The Bundle class is not thread safe yet with respect to state changes ---
 
     // concurrently start and stop the bundle multiple times
     std::vector<std::future<void>> fs;
@@ -86,15 +86,17 @@ int ConcurrencyTest(int /*argc*/, char* /*argv*/[])
 
     */
 
-    // make sure the bundle really is started
-    context.RemoveBundleListener(bundleListener);
-    bundle.Start();
+  // make sure the bundle really is started
+  context.RemoveBundleListener(bundleListener);
+  bundle.Start();
 
-    tracker.WaitForService();
-    auto im = tracker.GetService();
-    US_TEST_CONDITION_REQUIRED(*std::static_pointer_cast<int>(ExtractInterface(im, "org.cppmicroservices.c1.additional")) == 2, "Wait for service")
+  tracker.WaitForService();
+  auto im = tracker.GetService();
+  US_TEST_CONDITION_REQUIRED(*std::static_pointer_cast<int>(ExtractInterface(
+                               im, "org.cppmicroservices.c1.additional")) == 2,
+                             "Wait for service")
 
-    bundle.Stop();
+  bundle.Stop();
 
-    US_TEST_END()
+  US_TEST_END()
 }

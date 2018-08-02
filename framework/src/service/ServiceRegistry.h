@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICEREGISTRY_H
 #define CPPMICROSERVICES_SERVICEREGISTRY_H
 
@@ -34,7 +33,6 @@ class CoreBundleContext;
 class BundlePrivate;
 class Properties;
 
-
 /**
  * Here we handle all the CppMicroServices services that are registered.
  */
@@ -42,7 +40,6 @@ class ServiceRegistry : private detail::MultiThreaded<>
 {
 
 public:
-
   void Clear();
 
   /**
@@ -54,12 +51,17 @@ public:
    *        BundleConstants::OBJECTCLASS.
    * @param sid A service id which will be used instead of a default one.
    */
-  static Properties CreateServiceProperties(const ServiceProperties& in,
-                                            const std::vector<std::string>& classes = std::vector<std::string>(),
-                                            bool isFactory = false, bool isPrototypeFactory = false, long sid = -1);
+  static Properties CreateServiceProperties(
+    const ServiceProperties& in,
+    const std::vector<std::string>& classes = std::vector<std::string>(),
+    bool isFactory = false,
+    bool isPrototypeFactory = false,
+    long sid = -1);
 
-  typedef std::unordered_map<ServiceRegistrationBase, std::vector<std::string> > MapServiceClasses;
-  typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase> > MapClassServices;
+  typedef std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>
+    MapServiceClasses;
+  typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>
+    MapClassServices;
 
   /**
    * All registered services in the current framework.
@@ -120,7 +122,8 @@ public:
    * @param clazz The class name of the requested service.
    * @return A sorted list of {@link ServiceRegistrationPrivate} objects.
    */
-  void Get(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void Get(const std::string& clazz,
+           std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
    * Get a service implementing a certain class.
@@ -129,7 +132,8 @@ public:
    * @param clazz The class name of the requested service.
    * @return A {@link ServiceReference} object.
    */
-  ServiceReferenceBase Get(BundlePrivate* bundle, const std::string& clazz) const;
+  ServiceReferenceBase Get(BundlePrivate* bundle,
+                           const std::string& clazz) const;
 
   /**
    * Get all services implementing a certain class and then
@@ -140,8 +144,10 @@ public:
    * @param bundle The bundle requesting reference.
    * @return A list of {@link ServiceReference} object.
    */
-  void Get(const std::string& clazz, const std::string& filter,
-           BundlePrivate* bundle, std::vector<ServiceReferenceBase>& serviceRefs) const;
+  void Get(const std::string& clazz,
+           const std::string& filter,
+           BundlePrivate* bundle,
+           std::vector<ServiceReferenceBase>& serviceRefs) const;
 
   /**
    * Remove a registered service.
@@ -156,7 +162,9 @@ public:
    * @param p The bundle
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetRegisteredByBundle(BundlePrivate* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void GetRegisteredByBundle(
+    BundlePrivate* m,
+    std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
    * Get all services that a bundle uses.
@@ -164,22 +172,23 @@ public:
    * @param bundle The bundle
    * @return A set of {@link ServiceRegistration} objects
    */
-  void GetUsedByBundle(BundlePrivate* bundle, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void GetUsedByBundle(BundlePrivate* bundle,
+                       std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
 private:
-
   friend class ServiceHooks;
   friend class ServiceRegistrationBase;
 
   void RemoveServiceRegistration_unlocked(const ServiceRegistrationBase& sr);
 
-  void Get_unlocked(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+  void Get_unlocked(const std::string& clazz,
+                    std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
-  void Get_unlocked(const std::string& clazz, const std::string& filter,
-                    BundlePrivate* bundle, std::vector<ServiceReferenceBase>& serviceRefs) const;
-
+  void Get_unlocked(const std::string& clazz,
+                    const std::string& filter,
+                    BundlePrivate* bundle,
+                    std::vector<ServiceReferenceBase>& serviceRefs) const;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRY_H

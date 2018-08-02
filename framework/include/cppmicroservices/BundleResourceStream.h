@@ -41,11 +41,12 @@ class BundleResource;
  *
  * \see BundleResource for an example how to use this class.
  */
-class US_Framework_EXPORT BundleResourceStream : private detail::BundleResourceBuffer, public std::istream
+class US_Framework_EXPORT BundleResourceStream
+  : private detail::BundleResourceBuffer
+  , public std::istream
 {
 
 public:
-
   BundleResourceStream(const BundleResourceStream&) = delete;
   BundleResourceStream& operator=(const BundleResourceStream&) = delete;
 
@@ -61,9 +62,7 @@ public:
    */
   BundleResourceStream(const BundleResource& resource,
                        std::ios_base::openmode mode = std::ios_base::in);
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLERESOURCESTREAM_H

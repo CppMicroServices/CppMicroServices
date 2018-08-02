@@ -23,11 +23,11 @@
 #ifndef CPPMICROSERVICES_SERVLETCONFIG_H
 #define CPPMICROSERVICES_SERVLETCONFIG_H
 
-#include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/SharedData.h"
+#include "cppmicroservices/httpservice/HttpServiceExport.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace cppmicroservices {
 
@@ -44,7 +44,6 @@ class US_HttpService_EXPORT ServletConfig
 {
 
 public:
-
   ServletConfig();
   ServletConfig(const ServletConfig& other);
   ServletConfig& operator=(const ServletConfig& other);
@@ -76,15 +75,12 @@ public:
   std::shared_ptr<ServletContext> GetServletContext() const;
 
 protected:
-
   void SetServletName(const std::string& name);
   void SetServletContext(const std::shared_ptr<ServletContext>& context);
 
 private:
-
   ExplicitlySharedDataPointer<ServletConfigPrivate> d;
 };
-
 }
 
 #endif // SERVLETCONFIG_H

@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_TESTBUNDLEASERVICE_H
 #define CPPMICROSERVICES_TESTBUNDLEASERVICE_H
 
@@ -33,7 +32,6 @@ struct TestBundleAService
 {
   virtual ~TestBundleAService() {}
 };
-
 }
 
 #endif // CPPMICROSERVICES_TESTBUNDLEASERVICE_H

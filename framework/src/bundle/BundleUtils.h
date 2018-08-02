@@ -28,13 +28,12 @@
 
 namespace cppmicroservices {
 
-namespace BundleUtils
-{
-  // returns the handle to the current executable
-  void* GetExecutableHandle();
+namespace BundleUtils {
+// returns the handle to the current executable
+void* GetExecutableHandle();
 
-  // returns the address of the symbol in library libHandle
-  void* GetSymbol(void* libHandle, const char* symbol);
+// returns the address of the symbol in library libHandle
+void* GetSymbol(void* libHandle, const char* symbol);
 }
 
 } // namespace cppmicroservices

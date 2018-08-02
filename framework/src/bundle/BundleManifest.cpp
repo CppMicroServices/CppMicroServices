@@ -35,33 +35,27 @@ typedef std::vector<Any> AnyVector;
 
 void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
 void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap);
-void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci);
+void ParseJsonArray(const Json::Value& jsonArray,
+                    AnyVector& anyVector,
+                    bool ci);
 
 Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
 {
-  if (jsonValue.isObject())
-  {
-    if (ci)
-    {
+  if (jsonValue.isObject()) {
+    if (ci) {
       Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
-    }
-    else
-    {
+    } else {
       Any any = AnyOrderedMap();
       ParseJsonObject(jsonValue, ref_any_cast<AnyOrderedMap>(any));
       return any;
     }
-  }
-  else if (jsonValue.isArray())
-  {
+  } else if (jsonValue.isArray()) {
     Any any = AnyVector();
     ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any), ci);
     return any;
-  }
-  else if (jsonValue.isString())
-  {
+  } else if (jsonValue.isString()) {
     // We do not support attribute localization yet, so we just
     // always remove the leading '%' character.
     std::string val = jsonValue.asString();
@@ -69,17 +63,11 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
       val = val.substr(1);
 
     return Any(val);
-  }
-  else if (jsonValue.isBool())
-  {
+  } else if (jsonValue.isBool()) {
     return Any(jsonValue.asBool());
-  }
-  else if (jsonValue.isIntegral())
-  {
+  } else if (jsonValue.isIntegral()) {
     return Any(jsonValue.asInt());
-  }
-  else if (jsonValue.isDouble())
-  {
+  } else if (jsonValue.isDouble()) {
     return Any(jsonValue.asDouble());
   }
 
@@ -89,12 +77,11 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
 void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
 {
   for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end(); ++it)
-  {
+       it != jsonObject.end();
+       ++it) {
     const Json::Value& jsonValue = *it;
     Any anyValue = ParseJsonValue(jsonValue, false);
-    if (!anyValue.Empty())
-    {
+    if (!anyValue.Empty()) {
       anyMap.insert(std::make_pair(it.name(), anyValue));
     }
   }
@@ -103,50 +90,43 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
 void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
 {
   for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end(); ++it)
-  {
+       it != jsonObject.end();
+       ++it) {
     const Json::Value& jsonValue = *it;
     Any anyValue = ParseJsonValue(jsonValue, true);
-    if (!anyValue.Empty())
-    {
+    if (!anyValue.Empty()) {
       anyMap.insert(std::make_pair(it.name(), anyValue));
     }
   }
 }
 
-void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector,
-                    bool ci)
+void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci)
 {
   for (Json::Value::const_iterator it = jsonArray.begin();
-       it != jsonArray.end(); ++it)
-  {
+       it != jsonArray.end();
+       ++it) {
     const Json::Value& jsonValue = *it;
     Any anyValue = ParseJsonValue(jsonValue, ci);
-    if (!anyValue.Empty())
-    {
+    if (!anyValue.Empty()) {
       anyVector.push_back(anyValue);
     }
   }
 }
-
 }
 
 BundleManifest::BundleManifest()
   : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-{
-}
+{}
 
 void BundleManifest::Parse(std::istream& is)
 {
   Json::Value root;
   Json::Reader jsonReader(Json::Features::strictMode());
-  if (!jsonReader.parse(is, root, false))
-  {
+  if (!jsonReader.parse(is, root, false)) {
     throw std::runtime_error(jsonReader.getFormattedErrorMessages());
   }
 
-  if (!root.isObject())
-  {
+  if (!root.isObject()) {
     throw std::runtime_error("The Json root element must be an object.");
   }
 
@@ -169,8 +149,7 @@ bool BundleManifest::Contains(const std::string& key) const
 Any BundleManifest::GetValue(const std::string& key) const
 {
   auto iter = m_Headers.find(key);
-  if (iter != m_Headers.end())
-  {
+  if (iter != m_Headers.end()) {
     return iter->second;
   }
   return Any();
@@ -179,8 +158,7 @@ Any BundleManifest::GetValue(const std::string& key) const
 Any BundleManifest::GetValueDeprecated(const std::string& key) const
 {
   auto iter = m_PropertiesDeprecated.find(key);
-  if (iter != m_PropertiesDeprecated.end())
-  {
+  if (iter != m_PropertiesDeprecated.end()) {
     return iter->second;
   }
   return Any();
@@ -190,8 +168,8 @@ std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
   std::vector<std::string> keys;
   for (AnyMap::const_iterator iter = m_PropertiesDeprecated.begin();
-       iter != m_PropertiesDeprecated.end(); ++iter)
-  {
+       iter != m_PropertiesDeprecated.end();
+       ++iter) {
     keys.push_back(iter->first);
   }
   return keys;
@@ -201,5 +179,4 @@ std::map<std::string, Any> BundleManifest::GetPropertiesDeprecated() const
 {
   return m_PropertiesDeprecated;
 }
-
 }

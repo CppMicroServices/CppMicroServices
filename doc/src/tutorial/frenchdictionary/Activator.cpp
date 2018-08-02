@@ -48,7 +48,6 @@ class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 private:
-
   /**
    * A private inner class that implements a dictionary service;
    * see DictionaryService for details of the service.
@@ -59,7 +58,6 @@ private:
     std::set<std::string> m_dictionary;
 
   public:
-
     DictionaryImpl()
     {
       m_dictionary.insert("bienvenue");
@@ -86,7 +84,6 @@ private:
   };
 
 public:
-
   /**
    * Implements BundleActivator::Start(). Registers an
    * instance of a dictionary service using the bundle context;
@@ -96,7 +93,8 @@ public:
    */
   void Start(BundleContext context)
   {
-    std::shared_ptr<DictionaryImpl> dictionaryService = std::make_shared<DictionaryImpl>();
+    std::shared_ptr<DictionaryImpl> dictionaryService =
+      std::make_shared<DictionaryImpl>();
     ServiceProperties props;
     props["Language"] = std::string("French");
     context.RegisterService<IDictionaryService>(dictionaryService, props);
@@ -111,9 +109,7 @@ public:
   {
     // NOTE: The service is automatically unregistered
   }
-
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)

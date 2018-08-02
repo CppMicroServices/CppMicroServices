@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_FOOSERVICE_H
 #define CPPMICROSERVICES_FOOSERVICE_H
 
@@ -33,7 +32,6 @@ struct FooService
   virtual ~FooService() {}
   virtual void foo() = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_FOOSERVICE_H

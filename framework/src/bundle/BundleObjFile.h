@@ -43,7 +43,6 @@ struct InvalidObjFileException : public std::exception
 class BundleObjFile
 {
 public:
-
   virtual ~BundleObjFile() {}
 
   virtual std::vector<std::string> GetDependencies() const = 0;
@@ -51,11 +50,8 @@ public:
   virtual std::string GetBundleName() const = 0;
 
 protected:
-
   static bool ExtractBundleName(const std::string& name, std::string& out);
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_MODULEOBJFILE_P_H

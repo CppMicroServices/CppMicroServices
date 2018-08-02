@@ -133,7 +133,6 @@ struct US_Framework_EXPORT ServiceListenerHook
     bool operator==(const ListenerInfo& other) const;
 
   private:
-
     friend class ServiceListenerEntry;
 
     friend struct ::std::hash<ServiceListenerHook::ListenerInfo>;
@@ -168,9 +167,7 @@ struct US_Framework_EXPORT ServiceListenerHook
    *        service listeners which are no longer listening to service events.
    */
   virtual void Removed(const std::vector<ListenerInfo>& listeners) = 0;
-
 };
-
 }
 
 /**
@@ -183,7 +180,8 @@ struct US_Framework_EXPORT ServiceListenerHook
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
-  return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(arg.d.Data());
+return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(
+  arg.d.Data());
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICELISTENERHOOK_H

@@ -30,8 +30,7 @@ TestDriverActivator* TestDriverActivator::m_Instance = nullptr;
 
 TestDriverActivator::TestDriverActivator()
   : m_StartCalled(false)
-{
-}
+{}
 
 bool TestDriverActivator::StartCalled()
 {
@@ -48,7 +47,6 @@ void TestDriverActivator::Stop(BundleContext)
 {
   this->m_Instance = nullptr;
 }
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestDriverActivator)

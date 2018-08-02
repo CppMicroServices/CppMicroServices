@@ -26,19 +26,19 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/httpservice/ServletContainer.h"
 
-#include <cstdlib>
 #include <csignal>
+#include <cstdlib>
 #include <iostream>
 
 #ifdef US_PLATFORM_WINDOWS
-  #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-  #endif
-  #include <windows.h>
-  #define SLEEP(x) Sleep(1000*x)
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
+#  include <windows.h>
+#  define SLEEP(x) Sleep(1000 * x)
 #else
-  #include <unistd.h>
-  #define SLEEP(x) sleep(x)
+#  include <unistd.h>
+#  define SLEEP(x) sleep(x)
 #endif
 
 void signalHandler(int /*num*/)
@@ -54,11 +54,12 @@ int main(int argc, const char* argv[])
   std::signal(SIGQUIT, signalHandler);
 #endif
 
-  if (argc < 2)
-  {
+  if (argc < 2) {
     std::cout << "No command line arguments given.\n"
-                 "Provide a space separated list of file paths pointing to bundles to load.\n"
-                 "The web console driver needs at least the httpservice and webconsole bundle.\n";
+                 "Provide a space separated list of file paths pointing to "
+                 "bundles to load.\n"
+                 "The web console driver needs at least the httpservice and "
+                 "webconsole bundle.\n";
     return 0;
   }
 
@@ -68,21 +69,18 @@ int main(int argc, const char* argv[])
 
   auto ctx = fw.GetBundleContext();
 
-  for (int i = 1; i < argc; ++i)
-  {
+  for (int i = 1; i < argc; ++i) {
     ctx.InstallBundles(argv[i]);
   }
 
-  for (auto& b : ctx.GetBundles())
-  {
+  for (auto& b : ctx.GetBundles()) {
     b.Start();
   }
 
   cppmicroservices::ServletContainer servletContainer(ctx, "us");
   servletContainer.Start();
 
-  while(true)
-  {
+  while (true) {
     SLEEP(1);
   }
 

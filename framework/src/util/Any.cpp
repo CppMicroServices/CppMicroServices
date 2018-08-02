@@ -29,15 +29,17 @@ namespace cppmicroservices {
 
 namespace detail {
 
-void ThrowBadAnyCastException(const std::string& funcName, const std::type_info& source, const std::type_info& target)
+void ThrowBadAnyCastException(const std::string& funcName,
+                              const std::type_info& source,
+                              const std::type_info& target)
 {
   std::string msg("cppmicroservices::BadAnyCastException: ");
   std::string targetTypeName(GetDemangledName(target));
   std::string sourceTypeName(GetDemangledName(source));
-  msg += funcName + ": Failed to convert from cppmicroservices::Any type " + sourceTypeName + " to target type " + targetTypeName;
+  msg += funcName + ": Failed to convert from cppmicroservices::Any type " +
+         sourceTypeName + " to target type " + targetTypeName;
   throw BadAnyCastException(msg);
 }
-
 }
 
 std::ostream& any_value_to_string(std::ostream& os, const Any& any)
@@ -64,8 +66,7 @@ std::ostream& any_value_to_json(std::ostream& os, bool val)
 
 std::string Any::ToString() const
 {
-  if (Empty())
-  {
+  if (Empty()) {
     throw std::logic_error("empty any");
   }
   return _content->ToString();
@@ -75,5 +76,4 @@ std::string Any::ToStringNoExcept() const
 {
   return Empty() ? std::string() : _content->ToString();
 }
-
 }

@@ -22,7 +22,8 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
+US_MSVC_PUSH_DISABLE_WARNING(
+  4180) // qualifier applied to function type has no meaning; ignored
 
 #include "ServiceListenerEntry.h"
 
@@ -32,38 +33,37 @@ US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no 
 
 namespace cppmicroservices {
 
-struct ServiceListenerCompare : std::binary_function<ServiceListener, ServiceListener, bool>
+struct ServiceListenerCompare
+  : std::binary_function<ServiceListener, ServiceListener, bool>
 {
-  bool operator()(const ServiceListener& f1,
-                  const ServiceListener& f2) const
+  bool operator()(const ServiceListener& f1, const ServiceListener& f2) const
   {
-    return f1.target<void(const ServiceEvent&)>() == f2.target<void(const ServiceEvent&)>();
+    return f1.target<void(const ServiceEvent&)>() ==
+           f2.target<void(const ServiceEvent&)>();
   }
 };
 
 class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
 {
 public:
-
   ServiceListenerEntryData(const ServiceListenerEntryData&) = delete;
   ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
 
-  ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                           void* data, ListenerTokenId tokenId, const std::string& filter)
+  ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context,
+                           const ServiceListener& l,
+                           void* data,
+                           ListenerTokenId tokenId,
+                           const std::string& filter)
     : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
     , ldap()
     , hashValue(0)
   {
-    if (!filter.empty())
-    {
+    if (!filter.empty()) {
       ldap = LDAPExpr(filter);
     }
   }
 
-
-  ~ServiceListenerEntryData()
-  {
-  }
+  ~ServiceListenerEntryData() {}
 
   LDAPExpr ldap;
 
@@ -89,29 +89,25 @@ public:
   LDAPExpr::LocalCache local_cache;
 
   std::size_t hashValue;
-
 };
 
-ServiceListenerEntry::ServiceListenerEntry()
-{
-}
+ServiceListenerEntry::ServiceListenerEntry() {}
 
 ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
   : ServiceListenerHook::ListenerInfo(other)
-{
-}
+{}
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info)
+ServiceListenerEntry::ServiceListenerEntry(
+  const ServiceListenerHook::ListenerInfo& info)
   : ServiceListenerHook::ListenerInfo(info)
 {
   assert(info.d);
 }
 
-ServiceListenerEntry::~ServiceListenerEntry()
-{
-}
+ServiceListenerEntry::~ServiceListenerEntry() {}
 
-ServiceListenerEntry& ServiceListenerEntry::operator=(const ServiceListenerEntry& other)
+ServiceListenerEntry& ServiceListenerEntry::operator=(
+  const ServiceListenerEntry& other)
 {
   d = other.d;
   return *this;
@@ -123,14 +119,14 @@ void ServiceListenerEntry::SetRemoved(bool removed) const
 }
 
 ServiceListenerEntry::ServiceListenerEntry(
-    const std::shared_ptr<BundleContextPrivate>& context,
-    const ServiceListener& l,
-    void* data,
-    ListenerTokenId tokenId,
-    const std::string& filter)
-  : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, tokenId, filter))
-{
-}
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceListener& l,
+  void* data,
+  ListenerTokenId tokenId,
+  const std::string& filter)
+  : ServiceListenerHook::ListenerInfo(
+      new ServiceListenerEntryData(context, l, data, tokenId, filter))
+{}
 
 const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {
@@ -149,21 +145,26 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->context == nullptr || other.d->context == nullptr) || d->context == other.d->context) &&
-    (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
-    ServiceListenerCompare()(d->listener, other.d->listener);
+  return ((d->context == nullptr || other.d->context == nullptr) ||
+          d->context == other.d->context) &&
+         (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
+         ServiceListenerCompare()(d->listener, other.d->listener);
 }
 
-bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                                    ListenerTokenId tokenId) const
+bool ServiceListenerEntry::Contains(
+  const std::shared_ptr<BundleContextPrivate>& context,
+  ListenerTokenId tokenId) const
 {
   return (d->context == context) && (d->tokenId == tokenId);
 }
 
-bool ServiceListenerEntry::Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                                    const ServiceListener& listener, void* data) const
+bool ServiceListenerEntry::Contains(
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceListener& listener,
+  void* data) const
 {
-  return (d->context == context) && (d->data == data) && ServiceListenerCompare()(d->listener, listener);
+  return (d->context == context) && (d->data == data) &&
+         ServiceListenerCompare()(d->listener, listener);
 }
 
 ListenerTokenId ServiceListenerEntry::Id() const
@@ -175,15 +176,16 @@ std::size_t ServiceListenerEntry::Hash() const
 {
   using namespace std;
 
-  if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0)
-  {
+  if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0) {
     static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
-        ((hash<BundleContextPrivate*>()(d->context.get()) ^ (hash<void*>()(d->data) << 1)) >> 1) ^
-        ((hash<ServiceListener>()(d->listener)) ^ (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
+      ((hash<BundleContextPrivate*>()(d->context.get()) ^
+        (hash<void*>()(d->data) << 1)) >>
+       1) ^
+      ((hash<ServiceListener>()(d->listener)) ^
+       (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
   return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
 }
-
 }
 
 US_MSVC_POP_WARNING

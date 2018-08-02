@@ -20,26 +20,24 @@ limitations under the License.
 
 =============================================================================*/
 
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/Framework.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkFactory.h"
 #include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
 TEST(ServiceExceptionTest, TestServiceException)
 {
-  try
-  {
+  try {
     throw ServiceException("A service exception");
-  }
-  catch (const ServiceException& se)
-  {
+  } catch (const ServiceException& se) {
     ServiceException other_se = se;
     other_se = se;
     std::string expected_prefix = "ServiceException: ";
     std::ostringstream strstream;
     strstream << other_se;
-    ASSERT_TRUE(strstream.str().compare(0, expected_prefix.length(), expected_prefix) == 0);
+    ASSERT_TRUE(strstream.str().compare(
+                  0, expected_prefix.length(), expected_prefix) == 0);
   }
 }

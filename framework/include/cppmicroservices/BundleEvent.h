@@ -61,11 +61,11 @@ class US_Framework_EXPORT BundleEvent
   std::shared_ptr<BundleEventData> d;
 
 public:
-
   /**
    * The bundle event type.
    */
-  enum Type : uint32_t {
+  enum Type : uint32_t
+  {
 
     /**
      * The bundle has been installed.
@@ -249,7 +249,8 @@ public:
  *
  * Writes a string representation of \c eventType to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             BundleEvent::Type eventType);
 
 /**
  * \ingroup MicroServices
@@ -257,8 +258,8 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, BundleEvent::Type
  *
  * Writes a string representation of \c event to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleEvent& event);
-
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const BundleEvent& event);
 }
 
 US_MSVC_POP_WARNING

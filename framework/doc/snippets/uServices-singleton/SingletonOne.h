@@ -5,19 +5,16 @@
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceRegistration.h"
 
-
 //![s1]
 class SingletonOne
 {
 public:
-
   static SingletonOne& GetInstance();
 
   // Just some member
   int a;
 
 private:
-
   SingletonOne();
   ~SingletonOne();
 
@@ -33,7 +30,6 @@ class SingletonTwoService;
 class SingletonOneService
 {
 public:
-
   // This will return a SingletonOneService instance with the
   // lowest service id at the time this method was called the first
   // time and returned a non-null value (which is usually the instance
@@ -45,7 +41,7 @@ public:
   static std::shared_ptr<SingletonOneService> GetInstance();
 
   int a;
-  
+
   SingletonOneService();
   ~SingletonOneService();
 

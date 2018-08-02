@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICEEXCEPTION_H
 #define CPPMICROSERVICES_SERVICEEXCEPTION_H
 
@@ -29,8 +28,8 @@
 #include <stdexcept>
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4275)
+#  pragma warning(push)
+#  pragma warning(disable : 4275)
 #endif
 
 namespace cppmicroservices {
@@ -58,8 +57,8 @@ namespace cppmicroservices {
 class US_Framework_EXPORT ServiceException : public std::runtime_error
 {
 public:
-
-  enum Type {
+  enum Type
+  {
     /**
      * No exception type is unspecified.
      */
@@ -110,18 +109,15 @@ public:
   Type GetType() const;
 
 private:
-
   /**
    * Type of service exception.
    */
   Type type;
-
 };
-
 }
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+#  pragma warning(pop)
 #endif
 
 /**
@@ -130,6 +126,8 @@ private:
  *
  * Writes a string representation of \c exc to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const cppmicroservices::ServiceException& exc);
+US_Framework_EXPORT std::ostream& operator<<(
+  std::ostream& os,
+  const cppmicroservices::ServiceException& exc);
 
 #endif // CPPMICROSERVICES_SERVICEEXCEPTION_H

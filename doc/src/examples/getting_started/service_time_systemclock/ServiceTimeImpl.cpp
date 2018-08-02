@@ -13,7 +13,7 @@ class ServiceTimeSystemClock : public ServiceTime
     // Relies on the de-facto standard of relying on
     // POSIX time in all known implementations so far.
     return std::chrono::duration_cast<std::chrono::milliseconds>(
-          now.time_since_epoch());
+      now.time_since_epoch());
   }
 };
 

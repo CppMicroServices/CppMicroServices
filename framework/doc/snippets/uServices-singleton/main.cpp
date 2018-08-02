@@ -12,7 +12,6 @@ class MyActivator : public BundleActivator
 {
 
 public:
-
   MyActivator()
     : m_SingletonOne(nullptr)
     , m_SingletonTwo(nullptr)
@@ -23,13 +22,15 @@ public:
   {
     // First create and register a SingletonTwoService instance.
     m_SingletonTwo = std::make_shared<SingletonTwoService>();
-    m_SingletonTwoReg = context.RegisterService<SingletonTwoService>(m_SingletonTwo);
+    m_SingletonTwoReg =
+      context.RegisterService<SingletonTwoService>(m_SingletonTwo);
     // Framework service registry has shared ownership of the SingletonTwoService instance
 
     // Now the SingletonOneService constructor will get a valid
     // SingletonTwoService instance.
     m_SingletonOne = std::make_shared<SingletonOneService>();
-    m_SingletonOneReg = context.RegisterService<SingletonOneService>(m_SingletonOne);
+    m_SingletonOneReg =
+      context.RegisterService<SingletonOneService>(m_SingletonOne);
   }
   //![0]
 
@@ -58,22 +59,22 @@ public:
   //![1]
 
 private:
-
   std::shared_ptr<SingletonOneService> m_SingletonOne;
   std::shared_ptr<SingletonTwoService> m_SingletonTwo;
 
   ServiceRegistration<SingletonOneService> m_SingletonOneReg;
   ServiceRegistration<SingletonTwoService> m_SingletonTwoReg;
-
 };
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 
 int main()
 {
-  std::cout << "This snippet is not meant to be executed.\n"
-               "It does not provide a complete working example.\n"
-               "See http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
-            << std::endl;
+  std::cout
+    << "This snippet is not meant to be executed.\n"
+       "It does not provide a complete working example.\n"
+       "See "
+       "http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
+    << std::endl;
   return 0;
 }

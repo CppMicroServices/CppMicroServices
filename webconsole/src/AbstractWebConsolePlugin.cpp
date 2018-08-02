@@ -28,8 +28,8 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
-#include "cppmicroservices/httpservice/HttpServletResponse.h"
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
+#include "cppmicroservices/httpservice/HttpServletResponse.h"
 #include "cppmicroservices/httpservice/ServletContext.h"
 #include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
 
@@ -42,7 +42,6 @@ std::ostream& operator<<(std::ostream& os, const Mustache::Data&)
   os << "Opaque mustache data";
   return os;
 }
-
 }
 
 namespace cppmicroservices {
@@ -68,13 +67,12 @@ bool AbstractWebConsolePlugin::IsHtmlRequest(HttpServletRequest&)
   return true;
 }
 
-void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request, HttpServletResponse& response)
+void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request,
+                                     HttpServletResponse& response)
 {
-  if (!SpoolResource(request, response))
-  {
+  if (!SpoolResource(request, response)) {
     // detect if this is an html request
-    if (IsHtmlRequest(request))
-    {
+    if (IsHtmlRequest(request)) {
       // start the html response, write the header, open body and main div
       std::ostream& os = StartResponse(request, response);
 
@@ -88,26 +86,29 @@ void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request, HttpServletRes
 
       // close the main div, body, and html
       EndResponse(request, os);
-    }
-    else
-    {
+    } else {
       RenderContent(request, response);
     }
   }
 }
 
-std::shared_ptr<WebConsoleVariableResolver> AbstractWebConsolePlugin::GetVariableResolver(HttpServletRequest& request)
+std::shared_ptr<WebConsoleVariableResolver>
+AbstractWebConsolePlugin::GetVariableResolver(HttpServletRequest& request)
 {
-  Any resolverAny = request.GetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER);
-  if (!resolverAny.Empty() && resolverAny.Type() == typeid(std::shared_ptr<WebConsoleVariableResolver>))
-  {
+  Any resolverAny =
+    request.GetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER);
+  if (!resolverAny.Empty() &&
+      resolverAny.Type() ==
+        typeid(std::shared_ptr<WebConsoleVariableResolver>)) {
     return any_cast<std::shared_ptr<WebConsoleVariableResolver>>(resolverAny);
   }
 
   auto resolver = std::make_shared<WebConsoleDefaultVariableResolver>();
   auto& data = resolver->GetData();
-  data["appRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
-  data["pluginRoot"] = request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
+  data["appRoot"] =
+    request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
+  data["pluginRoot"] =
+    request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
   data["pluginLabel"] = GetLabel();
   data["pluginTitle"] = GetTitle();
   SetVariableResolver(request, resolver);
@@ -115,12 +116,17 @@ std::shared_ptr<WebConsoleVariableResolver> AbstractWebConsolePlugin::GetVariabl
   return resolver;
 }
 
-void AbstractWebConsolePlugin::SetVariableResolver(HttpServletRequest& request, const std::shared_ptr<WebConsoleVariableResolver>& resolver)
+void AbstractWebConsolePlugin::SetVariableResolver(
+  HttpServletRequest& request,
+  const std::shared_ptr<WebConsoleVariableResolver>& resolver)
 {
-  request.SetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER, resolver);
+  request.SetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER,
+                       resolver);
 }
 
-std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& request, HttpServletResponse& response)
+std::ostream& AbstractWebConsolePlugin::StartResponse(
+  HttpServletRequest& request,
+  HttpServletResponse& response)
 {
   response.SetCharacterEncoding("utf-8");
   response.SetContentType("text/html");
@@ -129,16 +135,17 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& reques
 
   // support localization of the plugin title
   std::string title = GetTitle();
-  if (title[0] == '%')
-  {
+  if (title[0] == '%') {
     title = "{$" + title.substr(1) + "}";
   }
 
   auto resolver = this->GetVariableResolver(request);
-  if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
-  {
+  if (std::shared_ptr<WebConsoleDefaultVariableResolver> r =
+        std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(
+          resolver)) {
     auto& data = r->GetData();
-    data["labelMap"] = any_cast<TemplateData>(request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP));
+    data["labelMap"] = any_cast<TemplateData>(
+      request.GetAttribute(WebConsoleConstants::ATTR_LABEL_MAP));
 
     TemplateData head;
     head["title"] = title;
@@ -161,72 +168,74 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(HttpServletRequest& reques
   return os;
 }
 
-void AbstractWebConsolePlugin::RenderTopNavigation(HttpServletRequest& /*request*/, std::ostream& /*writer*/)
+void AbstractWebConsolePlugin::RenderTopNavigation(
+  HttpServletRequest& /*request*/,
+  std::ostream& /*writer*/)
 {
-//  // assume pathInfo to not be null, else this would not be called
-//  std::string current = request.GetPathInfo();
-//  std::size_t slash = current.find_first_of('/', 1);
-//  current = current.substr(1, slash != std::string::npos ? slash-1 : slash);
+  //  // assume pathInfo to not be null, else this would not be called
+  //  std::string current = request.GetPathInfo();
+  //  std::size_t slash = current.find_first_of('/', 1);
+  //  current = current.substr(1, slash != std::string::npos ? slash-1 : slash);
 
-//  std::string appRoot = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
+  //  std::string appRoot = request.GetAttribute(WebConsoleConstants::ATTR_APP_ROOT).ToString();
 
-//  Map menuMap = ( Map ) request.getAttribute( OsgiManager.ATTR_LABEL_MAP_CATEGORIZED );
-//  this.renderMenu( menuMap, appRoot, pw );
+  //  Map menuMap = ( Map ) request.getAttribute( OsgiManager.ATTR_LABEL_MAP_CATEGORIZED );
+  //  this.renderMenu( menuMap, appRoot, pw );
 
-//  // render lang-box
-//  Map langMap = (Map) request.getAttribute(WebConsoleConstants.ATTR_LANG_MAP);
-//  if (null != langMap && !langMap.isEmpty())
-//  {
-//    // determine the currently selected locale from the request and fail-back
-//    // to the default locale if not set
-//    // if locale is missing in locale map, the default 'en' locale is used
-//    Locale reqLocale = request.getLocale();
-//    String locale = null != reqLocale ? reqLocale.getLanguage()
-//                                      : Locale.getDefault().getLanguage();
-//    if (!langMap.containsKey(locale))
-//    {
-//      locale = Locale.getDefault().getLanguage();
-//    }
-//    if (!langMap.containsKey(locale))
-//    {
-//      locale = "en"; //$NON-NLS-1$
-//    }
+  //  // render lang-box
+  //  Map langMap = (Map) request.getAttribute(WebConsoleConstants.ATTR_LANG_MAP);
+  //  if (null != langMap && !langMap.isEmpty())
+  //  {
+  //    // determine the currently selected locale from the request and fail-back
+  //    // to the default locale if not set
+  //    // if locale is missing in locale map, the default 'en' locale is used
+  //    Locale reqLocale = request.getLocale();
+  //    String locale = null != reqLocale ? reqLocale.getLanguage()
+  //                                      : Locale.getDefault().getLanguage();
+  //    if (!langMap.containsKey(locale))
+  //    {
+  //      locale = Locale.getDefault().getLanguage();
+  //    }
+  //    if (!langMap.containsKey(locale))
+  //    {
+  //      locale = "en"; //$NON-NLS-1$
+  //    }
 
-//    pw.println("<div id='langSelect'>"); //$NON-NLS-1$
-//    pw.println(" <span>"); //$NON-NLS-1$
-//    printLocaleElement(pw, appRoot, locale, langMap.get(locale));
-//    pw.println(" </span>"); //$NON-NLS-1$
-//    pw.println(" <span class='flags ui-helper-hidden'>"); //$NON-NLS-1$
-//    for (Iterator li = langMap.keySet().iterator(); li.hasNext();)
-//    {
-//      // <img src="us.gif" alt="en" title="English"/>
-//      final Object l = li.next();
-//      if (!l.equals(locale))
-//      {
-//        printLocaleElement(pw, appRoot, l, langMap.get(l));
-//      }
-//    }
+  //    pw.println("<div id='langSelect'>"); //$NON-NLS-1$
+  //    pw.println(" <span>"); //$NON-NLS-1$
+  //    printLocaleElement(pw, appRoot, locale, langMap.get(locale));
+  //    pw.println(" </span>"); //$NON-NLS-1$
+  //    pw.println(" <span class='flags ui-helper-hidden'>"); //$NON-NLS-1$
+  //    for (Iterator li = langMap.keySet().iterator(); li.hasNext();)
+  //    {
+  //      // <img src="us.gif" alt="en" title="English"/>
+  //      final Object l = li.next();
+  //      if (!l.equals(locale))
+  //      {
+  //        printLocaleElement(pw, appRoot, l, langMap.get(l));
+  //      }
+  //    }
 
-//    pw.println(" </span>"); //$NON-NLS-1$
-//    pw.println("</div>"); //$NON-NLS-1$
-//  }
+  //    pw.println(" </span>"); //$NON-NLS-1$
+  //    pw.println("</div>"); //$NON-NLS-1$
+  //  }
 }
 
-void AbstractWebConsolePlugin::EndResponse(HttpServletRequest& request, std::ostream& os)
+void AbstractWebConsolePlugin::EndResponse(HttpServletRequest& request,
+                                           std::ostream& os)
 {
   auto resolver = this->GetVariableResolver(request);
-  if (std::shared_ptr<WebConsoleDefaultVariableResolver> r = std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(resolver))
-  {
+  if (std::shared_ptr<WebConsoleDefaultVariableResolver> r =
+        std::dynamic_pointer_cast<WebConsoleDefaultVariableResolver>(
+          resolver)) {
     auto& data = r->GetData();
     data["us-version"] = US_VERSION_STR;
 
     auto ctx = GetBundleContext();
     auto bundles = ctx.GetBundles();
     int active_count = 0;
-    for (auto& b : bundles)
-    {
-      if (b.GetState() & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING))
-      {
+    for (auto& b : bundles) {
+      if (b.GetState() & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) {
         ++active_count;
       }
     }
@@ -247,20 +256,18 @@ std::vector<std::string> AbstractWebConsolePlugin::GetCssReferences() const
 }
 
 std::string AbstractWebConsolePlugin::ReadTemplateFile(
-    const std::string& templateFile,
-    cppmicroservices::BundleContext context
-    ) const
+  const std::string& templateFile,
+  cppmicroservices::BundleContext context) const
 {
   std::string result;
 
-  if (!context)
-  {
+  if (!context) {
     context = cppmicroservices::GetBundleContext();
   }
 
-  cppmicroservices::BundleResource res = context.GetBundle().GetResource(templateFile);
-  if (!res)
-  {
+  cppmicroservices::BundleResource res =
+    context.GetBundle().GetResource(templateFile);
+  if (!res) {
     std::cout << "Resource file '" << templateFile << "' not found in bundle '"
               << context.GetBundle().GetSymbolicName() << "'" << std::endl;
     return result;
@@ -277,8 +284,7 @@ std::string AbstractWebConsolePlugin::ReadTemplateFile(
 std::string AbstractWebConsolePlugin::GetHeader() const
 {
   static std::string HEADER;
-  if (HEADER.empty())
-  {
+  if (HEADER.empty()) {
     HEADER = this->ReadTemplateFile("/templates/main_header.html");
   }
   return HEADER;
@@ -287,34 +293,33 @@ std::string AbstractWebConsolePlugin::GetHeader() const
 std::string AbstractWebConsolePlugin::GetFooter() const
 {
   static std::string FOOTER;
-  if (FOOTER.empty())
-  {
+  if (FOOTER.empty()) {
     FOOTER = this->ReadTemplateFile("/templates/main_footer.html");
   }
   return FOOTER;
 }
 
-BundleResource AbstractWebConsolePlugin::GetResource(const std::string& /*path*/) const
+BundleResource AbstractWebConsolePlugin::GetResource(
+  const std::string& /*path*/) const
 {
   return BundleResource();
 }
 
-bool AbstractWebConsolePlugin::SpoolResource(HttpServletRequest& request, HttpServletResponse& response) const
+bool AbstractWebConsolePlugin::SpoolResource(
+  HttpServletRequest& request,
+  HttpServletResponse& response) const
 {
   std::string pi = request.GetPathInfo();
   cppmicroservices::BundleResource res = this->GetResource(pi);
-  if (!res)
-  {
+  if (!res) {
     return false;
   }
 
   // check whether we may return 304/UNMODIFIED
   long long lastModified = res.GetLastModified();
-  if (lastModified > 0)
-  {
-    long long ifModifiedSince = request.GetDateHeader( "If-Modified-Since" );
-    if (ifModifiedSince >= lastModified)
-    {
+  if (lastModified > 0) {
+    long long ifModifiedSince = request.GetDateHeader("If-Modified-Since");
+    if (ifModifiedSince >= lastModified) {
       response.SetStatus(HttpServletResponse::SC_NOT_MODIFIED);
       return true;
     }
@@ -334,5 +339,4 @@ bool AbstractWebConsolePlugin::SpoolResource(HttpServletRequest& request, HttpSe
 
   return true;
 }
-
 }

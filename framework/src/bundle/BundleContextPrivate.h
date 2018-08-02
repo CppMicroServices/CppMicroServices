@@ -35,11 +35,12 @@ namespace cppmicroservices {
 class BundleContext;
 class BundlePrivate;
 
-class BundleContextPrivate : public detail::MultiThreaded<>, public std::enable_shared_from_this<BundleContextPrivate>
+class BundleContextPrivate
+  : public detail::MultiThreaded<>
+  , public std::enable_shared_from_this<BundleContextPrivate>
 {
 
 public:
-
   BundleContextPrivate(BundlePrivate* bundle);
 
   bool IsValid() const;
@@ -53,14 +54,12 @@ public:
    * Is bundle context valid.
    */
   std::atomic<bool> valid;
-
 };
 
 // The following method is exported for the GetBundleContext() method
 US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
 BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d);
 std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c);
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLECONTEXTPRIVATE_H

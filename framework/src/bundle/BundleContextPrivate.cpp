@@ -37,7 +37,6 @@ US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d)
 {
   return ::cppmicroservices::MakeBundleContext(d);
 }
-
 }
 
 BundleContext MakeBundleContext(BundleContextPrivate* d)
@@ -67,8 +66,7 @@ bool BundleContextPrivate::IsValid() const
 
 void BundleContextPrivate::CheckValid() const
 {
-  if (!valid)
-  {
+  if (!valid) {
     throw std::runtime_error("The bundle context is no longer valid");
   }
 }
@@ -76,7 +74,7 @@ void BundleContextPrivate::CheckValid() const
 void BundleContextPrivate::Invalidate()
 {
   valid = false;
-  if (bundle->SetBundleContext) bundle->SetBundleContext(nullptr);
+  if (bundle->SetBundleContext)
+    bundle->SetBundleContext(nullptr);
 }
-
 }

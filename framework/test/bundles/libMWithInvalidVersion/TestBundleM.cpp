@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #include "cppmicroservices/BundleActivator.h"
 
 namespace cppmicroservices {
@@ -28,17 +27,10 @@ namespace cppmicroservices {
 class TestBundleMActivator : public BundleActivator
 {
 public:
+  void Start(BundleContext) {}
 
-  void Start(BundleContext)
-  {
-  }
-
-  void Stop(BundleContext)
-  {
-  }
-
+  void Stop(BundleContext) {}
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleMActivator)

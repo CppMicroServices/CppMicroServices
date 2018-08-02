@@ -27,9 +27,8 @@
 namespace cppmicroservices {
 
 LDAPPropExpr::LDAPPropExpr()
-    : m_ldapExpr()
-{
-}
+  : m_ldapExpr()
+{}
 
 LDAPPropExpr::LDAPPropExpr(const std::string& expr)
   : m_ldapExpr(expr)
@@ -37,7 +36,8 @@ LDAPPropExpr::LDAPPropExpr(const std::string& expr)
 
 LDAPPropExpr& LDAPPropExpr::operator!()
 {
-  if (m_ldapExpr.empty()) return *this;
+  if (m_ldapExpr.empty())
+    return *this;
 
   m_ldapExpr = "(!" + m_ldapExpr + ")";
   return *this;
@@ -55,8 +55,7 @@ bool LDAPPropExpr::IsNull() const
 
 LDAPPropExpr& LDAPPropExpr::operator=(const LDAPPropExpr& expr)
 {
-  if(this != &expr)
-  {
+  if (this != &expr) {
     m_ldapExpr = expr.m_ldapExpr;
   }
   return *this;
@@ -77,12 +76,14 @@ LDAPPropExpr& LDAPPropExpr::operator&=(const LDAPPropExpr& right)
 LDAPProp::LDAPProp(const std::string& property)
   : m_property(property)
 {
-  if (m_property.empty()) throw std::invalid_argument("property must not be empty");
+  if (m_property.empty())
+    throw std::invalid_argument("property must not be empty");
 }
 
 LDAPPropExpr LDAPProp::operator==(const std::string& s) const
 {
-  if (s.empty()) return LDAPPropExpr(s);
+  if (s.empty())
+    return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + "=" + s + ")");
 }
 
@@ -96,7 +97,7 @@ LDAPPropExpr LDAPProp::operator==(bool b) const
   return operator==(b ? std::string("true") : std::string("false"));
 }
 
-LDAPProp::operator LDAPPropExpr () const
+LDAPProp::operator LDAPPropExpr() const
 {
   return LDAPPropExpr("(" + m_property + "=*)");
 }
@@ -108,7 +109,8 @@ LDAPPropExpr LDAPProp::operator!() const
 
 LDAPPropExpr LDAPProp::operator!=(const std::string& s) const
 {
-  if (s.empty()) return LDAPPropExpr(s);
+  if (s.empty())
+    return LDAPPropExpr(s);
   return LDAPPropExpr("(!(" + m_property + "=" + s + "))");
 }
 
@@ -119,7 +121,8 @@ LDAPPropExpr LDAPProp::operator!=(const cppmicroservices::Any& any) const
 
 LDAPPropExpr LDAPProp::operator>=(const std::string& s) const
 {
-  if (s.empty()) return LDAPPropExpr(s);
+  if (s.empty())
+    return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + ">=" + s + ")");
 }
 
@@ -130,7 +133,8 @@ LDAPPropExpr LDAPProp::operator>=(const cppmicroservices::Any& any) const
 
 LDAPPropExpr LDAPProp::operator<=(const std::string& s) const
 {
-  if (s.empty()) return LDAPPropExpr(s);
+  if (s.empty())
+    return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + "<=" + s + ")");
 }
 
@@ -141,7 +145,8 @@ LDAPPropExpr LDAPProp::operator<=(const cppmicroservices::Any& any) const
 
 LDAPPropExpr LDAPProp::Approx(const std::string& s) const
 {
-  if (s.empty()) return LDAPPropExpr(s);
+  if (s.empty())
+    return LDAPPropExpr(s);
   return LDAPPropExpr("(" + m_property + "~=" + s + ")");
 }
 
@@ -149,19 +154,28 @@ LDAPPropExpr LDAPProp::Approx(const cppmicroservices::Any& any) const
 {
   return Approx(any.ToString());
 }
-
 }
 
-cppmicroservices::LDAPPropExpr operator&&(const cppmicroservices::LDAPPropExpr& left, const cppmicroservices::LDAPPropExpr& right)
+cppmicroservices::LDAPPropExpr operator&&(
+  const cppmicroservices::LDAPPropExpr& left,
+  const cppmicroservices::LDAPPropExpr& right)
 {
-  if (left.IsNull()) return right;
-  if (right.IsNull()) return left;
-  return cppmicroservices::LDAPPropExpr("(&" + static_cast<std::string>(left) + static_cast<std::string>(right) + ")");
+  if (left.IsNull())
+    return right;
+  if (right.IsNull())
+    return left;
+  return cppmicroservices::LDAPPropExpr("(&" + static_cast<std::string>(left) +
+                                        static_cast<std::string>(right) + ")");
 }
 
-cppmicroservices::LDAPPropExpr operator||(const cppmicroservices::LDAPPropExpr& left, const cppmicroservices::LDAPPropExpr& right)
+cppmicroservices::LDAPPropExpr operator||(
+  const cppmicroservices::LDAPPropExpr& left,
+  const cppmicroservices::LDAPPropExpr& right)
 {
-  if (left.IsNull()) return right;
-  if (right.IsNull()) return left;
-  return cppmicroservices::LDAPPropExpr("(|" + static_cast<std::string>(left) + static_cast<std::string>(right) + ")");
+  if (left.IsNull())
+    return right;
+  if (right.IsNull())
+    return left;
+  return cppmicroservices::LDAPPropExpr("(|" + static_cast<std::string>(left) +
+                                        static_cast<std::string>(right) + ")");
 }

@@ -31,5 +31,4 @@ Debug::Debug()
   lazyActivation = true;
 #endif
 }
-
 }

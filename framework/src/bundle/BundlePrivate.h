@@ -48,13 +48,13 @@ class Fragment;
 /**
  * \ingroup MicroServices
  */
-class BundlePrivate :
-    public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>,
-    public std::enable_shared_from_this<BundlePrivate>
+class BundlePrivate
+  : public detail::MultiThreaded<detail::MutexLockingStrategy<>,
+                                 detail::WaitCondition>
+  , public std::enable_shared_from_this<BundlePrivate>
 {
 
 public:
-
   typedef MutexLockingStrategy<> MutexHost;
   typedef MutexHost::UniqueLock LockType;
   typedef WaitCondition<MutexHost> WaitConditionType;
@@ -79,7 +79,8 @@ public:
    * @throws std::runtime_error If we have duplicate symbolic name and version.
    * @throws std::invalid_argument Faulty manifest for bundle
    */
-  BundlePrivate(CoreBundleContext* coreCtx, const std::shared_ptr<BundleArchive>& ba);
+  BundlePrivate(CoreBundleContext* coreCtx,
+                const std::shared_ptr<BundleArchive>& ba);
 
   virtual ~BundlePrivate();
 
@@ -112,7 +113,10 @@ public:
    * @throws std::runtime_error if the ongoing (de-)activation does not finish
    *           within reasonable time.
    */
-  void WaitOnOperation(WaitConditionType& wc, LockType& lock, const std::string& src, bool longWait);
+  void WaitOnOperation(WaitConditionType& wc,
+                       LockType& lock,
+                       const std::string& src,
+                       bool longWait);
 
   /**
    * Get updated bundle state. That means check if an installed bundle has been
@@ -221,7 +225,7 @@ public:
    */
   detail::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
 
-  typedef void(*DestroyActivatorHook)(BundleActivator*);
+  typedef void (*DestroyActivatorHook)(BundleActivator*);
   DestroyActivatorHook destroyActivatorHook;
 
   std::unique_ptr<BundleActivator, DestroyActivatorHook> bactivator;
@@ -235,7 +239,7 @@ public:
     OP_UNINSTALLING = 4,
     OP_UNRESOLVING = 5,
     OP_UPDATING = 6
-   };
+  };
 
   /**
    * Type of operation in progress. Blocks bundle calls during activator and
@@ -265,7 +269,6 @@ public:
 
   /** current bundle thread */
   std::shared_ptr<BundleThread> bundleThread;
-
 
   // ------ This belongs to the BundleGeneration class when we introduce it --------
 
@@ -312,14 +315,12 @@ public:
    */
   SharedLibrary lib;
 
-  typedef void(*SetBundleContextHook)(BundleContextPrivate*);
+  typedef void (*SetBundleContextHook)(BundleContextPrivate*);
   SetBundleContextHook SetBundleContext;
-
 };
 
 Bundle MakeBundle(const std::shared_ptr<BundlePrivate>& d);
 std::shared_ptr<BundlePrivate> GetPrivate(const Bundle& b);
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEPRIVATE_H

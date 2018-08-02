@@ -38,14 +38,16 @@ class ServletContainer;
 class ServletContext;
 class ServletHandler;
 
-struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler>
+struct ServletContainerPrivate
+  : private ServiceTrackerCustomizer<HttpServlet, ServletHandler>
 {
   ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q);
 
   void Start();
   void Stop();
 
-  std::string GetMimeType(const ServletContext* context, const std::string& file) const;
+  std::string GetMimeType(const ServletContext* context,
+                          const std::string& file) const;
 
   BundleContext m_Context;
 
@@ -57,15 +59,17 @@ struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, S
   std::string m_ContextPath;
 
 private:
-
   ServletContainer* const q;
   std::list<std::shared_ptr<ServletHandler>> m_Handler;
 
-  virtual std::shared_ptr<ServletHandler> AddingService(const ServiceReference<HttpServlet>& reference);
-  virtual void ModifiedService(const ServiceReference<HttpServlet>& /*reference*/, const std::shared_ptr<ServletHandler>& /*service*/);
-  virtual void RemovedService(const ServiceReference<HttpServlet>& reference, const std::shared_ptr<ServletHandler>& handler);
+  virtual std::shared_ptr<ServletHandler> AddingService(
+    const ServiceReference<HttpServlet>& reference);
+  virtual void ModifiedService(
+    const ServiceReference<HttpServlet>& /*reference*/,
+    const std::shared_ptr<ServletHandler>& /*service*/);
+  virtual void RemovedService(const ServiceReference<HttpServlet>& reference,
+                              const std::shared_ptr<ServletHandler>& handler);
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVLETCONTAINERPRIVATE_H

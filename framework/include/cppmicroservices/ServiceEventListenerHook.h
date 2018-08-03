@@ -49,7 +49,9 @@ struct US_Framework_EXPORT ServiceEventListenerHook
   /**
    * ShrinkableMap type for filtering event listeners.
    */
-  typedef ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo> > ShrinkableMapType;
+  typedef ShrinkableMap<BundleContext,
+                        ShrinkableVector<ServiceListenerHook::ListenerInfo>>
+    ShrinkableMapType;
 
   virtual ~ServiceEventListenerHook();
 
@@ -66,9 +68,9 @@ struct US_Framework_EXPORT ServiceEventListenerHook
    *        values to prevent the event from being delivered to the associated
    *        listeners.
    */
-  virtual void Event(const ServiceEvent& event, ShrinkableMapType& listeners) = 0;
+  virtual void Event(const ServiceEvent& event,
+                     ShrinkableMapType& listeners) = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEEVENTLISTENERHOOK_H

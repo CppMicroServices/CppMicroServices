@@ -20,14 +20,12 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_UTILS_H
 #define CPPMICROSERVICES_UTILS_H
 
 #include "cppmicroservices/FrameworkExport.h"
 
 #include <string>
-
 
 namespace cppmicroservices {
 
@@ -62,7 +60,9 @@ std::string GetFrameworkDir(CoreBundleContext* ctx);
 *        or if there exists a file named @c leafDir in that directory
 *        or if the directory cannot be created when @c create is @c true.
 */
-std::string GetPersistentStoragePath(CoreBundleContext* ctx, const std::string& leafDir, bool create = true);
+std::string GetPersistentStoragePath(CoreBundleContext* ctx,
+                                     const std::string& leafDir,
+                                     bool create = true);
 
 //-------------------------------------------------------------------
 // Generic utility functions
@@ -71,9 +71,9 @@ std::string GetPersistentStoragePath(CoreBundleContext* ctx, const std::string& 
 void TerminateForDebug(const std::exception_ptr ex);
 
 namespace detail {
-US_Framework_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
+US_Framework_EXPORT std::string GetDemangledName(
+  const std::type_info& typeInfo);
 }
-
 
 } // namespace cppmicroservices
 

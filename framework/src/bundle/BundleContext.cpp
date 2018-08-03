@@ -24,8 +24,8 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/Error.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
@@ -43,9 +43,7 @@ BundleContext::BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx)
   : d(ctx)
 {}
 
-BundleContext::BundleContext()
-{
-}
+BundleContext::BundleContext() {}
 
 bool BundleContext::operator==(const BundleContext& rhs) const
 {
@@ -90,8 +88,7 @@ Any BundleContext::GetProperty(const std::string& key) const
   // won the race condition.
 
   auto iter = b->coreCtx->frameworkProperties.find(key);
-  return iter == b->coreCtx->frameworkProperties.end() ?
-        Any() : iter->second;
+  return iter == b->coreCtx->frameworkProperties.end() ? Any() : iter->second;
 }
 
 AnyMap BundleContext::GetProperties() const
@@ -131,8 +128,7 @@ Bundle BundleContext::GetBundle(long id) const
   // won the race condition.
 
   return b->coreCtx->bundleHooks.FilterBundle(
-        *this,
-        MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
+    *this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
 }
 
 std::vector<Bundle> BundleContext::GetBundles(const std::string& location) const
@@ -146,8 +142,7 @@ std::vector<Bundle> BundleContext::GetBundles(const std::string& location) const
   // won the race condition.
 
   std::vector<Bundle> res;
-  for (auto bu : b->coreCtx->bundleRegistry.GetBundles(location))
-  {
+  for (auto bu : b->coreCtx->bundleRegistry.GetBundles(location)) {
     res.emplace_back(MakeBundle(bu));
   }
   return res;
@@ -164,16 +159,16 @@ std::vector<Bundle> BundleContext::GetBundles() const
   // won the race condition.
 
   std::vector<Bundle> bus;
-  for (auto bu : b->coreCtx->bundleRegistry.GetBundles())
-  {
+  for (auto bu : b->coreCtx->bundleRegistry.GetBundles()) {
     bus.emplace_back(MakeBundle(bu));
   }
   b->coreCtx->bundleHooks.FilterBundles(*this, bus);
   return bus;
 }
 
-ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& service,
-                                                    const ServiceProperties& properties)
+ServiceRegistrationU BundleContext::RegisterService(
+  const InterfaceMapConstPtr& service,
+  const ServiceProperties& properties)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -186,8 +181,9 @@ ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& 
   return b->coreCtx->services.RegisterService(b, service, properties);
 }
 
-std::vector<ServiceReferenceU > BundleContext::GetServiceReferences(const std::string& clazz,
-                                                                    const std::string& filter)
+std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
+  const std::string& clazz,
+  const std::string& filter)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -201,8 +197,8 @@ std::vector<ServiceReferenceU > BundleContext::GetServiceReferences(const std::s
   std::vector<ServiceReferenceBase> refs;
   b->coreCtx->services.Get(clazz, filter, b, refs);
   for (std::vector<ServiceReferenceBase>::const_iterator iter = refs.begin();
-       iter != refs.end(); ++iter)
-  {
+       iter != refs.end();
+       ++iter) {
     result.push_back(ServiceReferenceU(*iter));
   }
   return result;
@@ -230,14 +226,16 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
  *        The UngetService is called when all instances of the returned shared_ptr object
  *        go out of scope.
  */
-template <class S>
+template<class S>
 struct ServiceHolder
 {
   const std::weak_ptr<BundlePrivate> b;
   const ServiceReferenceBase sref;
   const std::shared_ptr<S> service;
 
-  ServiceHolder(const std::shared_ptr<BundlePrivate>& b, const ServiceReferenceBase& sr, const std::shared_ptr<S>& s)
+  ServiceHolder(const std::shared_ptr<BundlePrivate>& b,
+                const ServiceReferenceBase& sr,
+                const std::shared_ptr<S>& s)
     : b(b)
     , sref(sr)
     , service(s)
@@ -245,17 +243,14 @@ struct ServiceHolder
 
   ~ServiceHolder()
   {
-    try
-    {
+    try {
       sref.d.load()->UngetService(b.lock(), true);
-    }
-    catch (...)
-    {
+    } catch (...) {
       // Make sure that we don't crash if the shared_ptr service object outlives
       // the BundlePrivate or CoreBundleContext objects.
-      if (!b.expired())
-      {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetService threw an exception. " << util::GetLastExceptionStr();
+      if (!b.expired()) {
+        DIAG_LOG(*b.lock()->coreCtx->sink)
+          << "UngetService threw an exception. " << util::GetLastExceptionStr();
       }
       // don't throw exceptions from the destructor. For an explanation, see:
       // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
@@ -265,11 +260,12 @@ struct ServiceHolder
   }
 };
 
-std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& reference)
+std::shared_ptr<void> BundleContext::GetService(
+  const ServiceReferenceBase& reference)
 {
-  if (!reference)
-  {
-    throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
+  if (!reference) {
+    throw std::invalid_argument("Default constructed ServiceReference is not a "
+                                "valid input to GetService()");
   }
 
   d->CheckValid();
@@ -280,15 +276,17 @@ std::shared_ptr<void> BundleContext::GetService(const ServiceReferenceBase& refe
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(b->shared_from_this(), reference, reference.d.load()->GetService(b)));
+  std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(
+    b->shared_from_this(), reference, reference.d.load()->GetService(b)));
   return std::shared_ptr<void>(h, h->service.get());
 }
 
-InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& reference)
+InterfaceMapConstPtr BundleContext::GetService(
+  const ServiceReferenceU& reference)
 {
-  if (!reference)
-  {
-    throw std::invalid_argument("Default constructed ServiceReference is not a valid input to GetService()");
+  if (!reference) {
+    throw std::invalid_argument("Default constructed ServiceReference is not a "
+                                "valid input to GetService()");
   }
 
   d->CheckValid();
@@ -303,11 +301,12 @@ InterfaceMapConstPtr BundleContext::GetService(const ServiceReferenceU& referenc
   // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
   InterfaceMapConstPtr imap_copy;
   auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b);
-  if (serviceInterfaceMap)
-  {
+  if (serviceInterfaceMap) {
     imap_copy = std::make_shared<const InterfaceMap>(*(serviceInterfaceMap));
   }
-  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(new ServiceHolder<const InterfaceMap>(b->shared_from_this(), reference, imap_copy));
+  std::shared_ptr<ServiceHolder<const InterfaceMap>> h(
+    new ServiceHolder<const InterfaceMap>(
+      b->shared_from_this(), reference, imap_copy));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
@@ -335,7 +334,8 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(d, ListenerTokenId(0), delegate, nullptr);
+  b->coreCtx->listeners.RemoveServiceListener(
+    d, ListenerTokenId(0), delegate, nullptr);
 }
 
 ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
@@ -364,7 +364,8 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
 }
 
-ListenerToken BundleContext::AddFrameworkListener(const FrameworkListener& listener)
+ListenerToken BundleContext::AddFrameworkListener(
+  const FrameworkListener& listener)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -390,8 +391,9 @@ void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
   b->coreCtx->listeners.RemoveFrameworkListener(d, listener, nullptr);
 }
 
-ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate, void* data,
-                                                const std::string &filter)
+ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
+                                                void* data,
+                                                const std::string& filter)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -404,7 +406,8 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
   return b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
 }
 
-void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void* data)
+void BundleContext::RemoveServiceListener(const ServiceListener& delegate,
+                                          void* data)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -414,10 +417,12 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate, void*
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  b->coreCtx->listeners.RemoveServiceListener(d, ListenerTokenId(0), delegate, data);
+  b->coreCtx->listeners.RemoveServiceListener(
+    d, ListenerTokenId(0), delegate, data);
 }
 
-ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate, void* data)
+ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate,
+                                               void* data)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -430,7 +435,8 @@ ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate, v
   return b->coreCtx->listeners.AddBundleListener(d, delegate, data);
 }
 
-void BundleContext::RemoveBundleListener(const BundleListener& delegate, void* data)
+void BundleContext::RemoveBundleListener(const BundleListener& delegate,
+                                         void* data)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -456,7 +462,7 @@ void BundleContext::RemoveListener(ListenerToken token)
   b->coreCtx->listeners.RemoveListener(d, std::move(token));
 }
 
-std::string BundleContext::GetDataFile(const std::string &filename) const
+std::string BundleContext::GetDataFile(const std::string& filename) const
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -467,10 +473,8 @@ std::string BundleContext::GetDataFile(const std::string &filename) const
   // won the race condition.
 
   std::string dataRoot = b->bundleDir;
-  if (!dataRoot.empty())
-  {
-    if (!util::Exists(dataRoot))
-    {
+  if (!dataRoot.empty()) {
+    if (!util::Exists(dataRoot)) {
       util::MakePath(dataRoot);
     }
     return dataRoot + util::DIR_SEP + filename;
@@ -490,6 +494,4 @@ std::vector<Bundle> BundleContext::InstallBundles(const std::string& location)
 
   return b->coreCtx->bundleRegistry.Install(location, b);
 }
-
-
 }

@@ -38,17 +38,16 @@ class WebConsolePluginTracker : public ServiceTracker<HttpServlet>
 {
 
 public:
-
   WebConsolePluginTracker();
 
   void Open(const std::shared_ptr<ServletContext>& servlet);
 
   AbstractWebConsolePlugin* GetPlugin(const std::string& label) const;
 
-  AbstractWebConsolePlugin::TemplateData GetLabelMap(const std::string& current) const;
+  AbstractWebConsolePlugin::TemplateData GetLabelMap(
+    const std::string& current) const;
 
 private:
-
   typedef ServiceTracker<HttpServlet> Superclass;
 
   struct LabelMapEntry
@@ -59,11 +58,13 @@ private:
 
   void Open();
 
-  std::shared_ptr<HttpServlet> AddingService(const ServiceReference<HttpServlet>& reference);
+  std::shared_ptr<HttpServlet> AddingService(
+    const ServiceReference<HttpServlet>& reference);
 
   void AddPlugin(const std::string& label, AbstractWebConsolePlugin* plugin);
 
-  std::string GetProperty(const ServiceReference<HttpServlet>& reference, const std::string& property) const;
+  std::string GetProperty(const ServiceReference<HttpServlet>& reference,
+                          const std::string& property) const;
 
   typedef std::map<std::string, AbstractWebConsolePlugin*> PluginMapType;
   PluginMapType m_Plugins;
@@ -78,17 +79,15 @@ class WebConsoleServlet : public HttpServlet
 public:
   WebConsoleServlet();
 
-  void Init(const ServletConfig &config);
+  void Init(const ServletConfig& config);
 
 private:
-
   void Service(HttpServletRequest& request, HttpServletResponse& response);
 
   AbstractWebConsolePlugin* GetConsolePlugin(const std::string& label) const;
 
   WebConsolePluginTracker m_PluginTracker;
 };
-
 }
 
 #endif // CPPMICROSERVICES_WEBCONSOLESERVLET_H

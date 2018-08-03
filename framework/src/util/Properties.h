@@ -36,7 +36,6 @@ class Properties : public detail::MultiThreaded<>
 {
 
 public:
-
   explicit Properties(const AnyMap& props);
 
   Properties(Properties&& o);
@@ -53,7 +52,6 @@ public:
   void Clear_unlocked();
 
 private:
-
   std::vector<std::string> keys;
   std::vector<Any> values;
 
@@ -73,14 +71,12 @@ public:
     , l(std::move(o.l))
   {}
 
-  const Properties* operator-> () const { return &props; }
+  const Properties* operator->() const { return &props; }
 
 private:
-
   const Properties& props;
   Properties::UniqueLock l;
 };
-
 }
 
 #endif // CPPMICROSERVICES_PROPERTIES_H

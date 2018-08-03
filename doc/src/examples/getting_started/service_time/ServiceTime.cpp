@@ -1,5 +1,3 @@
 #include "ServiceTime.h"
 
-ServiceTime::~ServiceTime()
-{
-}
+ServiceTime::~ServiceTime() {}

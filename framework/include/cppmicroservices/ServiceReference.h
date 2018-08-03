@@ -67,10 +67,10 @@ namespace cppmicroservices {
  * @see BundleContext::GetService
  */
 template<class S>
-class ServiceReference : public ServiceReferenceBase {
+class ServiceReference : public ServiceReferenceBase
+{
 
 public:
-
   typedef S ServiceType;
 
   /**
@@ -78,29 +78,24 @@ public:
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceReference() : ServiceReferenceBase()
-  {
-  }
+  ServiceReference()
+    : ServiceReferenceBase()
+  {}
 
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
   {
     const std::string interfaceId(us_service_interface_iid<S>());
-    if (GetInterfaceId() != interfaceId)
-    {
-      if (this->IsConvertibleTo(interfaceId))
-      {
+    if (GetInterfaceId() != interfaceId) {
+      if (this->IsConvertibleTo(interfaceId)) {
         this->SetInterfaceId(interfaceId);
-      }
-      else
-      {
-        this->operator =(0);
+      } else {
+        this->operator=(0);
       }
     }
   }
 
   using ServiceReferenceBase::operator=;
-
 };
 
 /**
@@ -115,20 +110,18 @@ class ServiceReference<void> : public ServiceReferenceBase
 {
 
 public:
-
   /**
    * Creates an invalid ServiceReference object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceReference() : ServiceReferenceBase()
-  {
-  }
+  ServiceReference()
+    : ServiceReferenceBase()
+  {}
 
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
-  {
-  }
+  {}
 
   using ServiceReferenceBase::operator=;
 
@@ -144,7 +137,6 @@ public:
  * interface identifier.
  */
 typedef ServiceReference<void> ServiceReferenceU;
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCE_H

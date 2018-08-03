@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #include "cppmicroservices/GlobalConfig.h"
 
 US_MSVC_DISABLE_WARNING(4355)
@@ -44,9 +43,10 @@ CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 namespace cppmicroservices {
 
-std::atomic<int> CoreBundleContext::globalId{0};
+std::atomic<int> CoreBundleContext::globalId{ 0 };
 
-std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(
+  std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
   configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
@@ -59,27 +59,29 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
-  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) == configuration.end())
-  {
-    configuration.insert(std::make_pair(
-                           Constants::FRAMEWORK_WORKING_DIR,
-                           util::GetCurrentWorkingDirectory()
-                           )
-                         );
+  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) ==
+      configuration.end()) {
+    configuration.insert(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
+                                        util::GetCurrentWorkingDirectory()));
   }
 
-  configuration.insert(std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
+  configuration.insert(
+    std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
 
-  configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
+  configuration[Constants::FRAMEWORK_VERSION] =
+    std::string(CppMicroServices_VERSION_STR);
   configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
 
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>& props, std::ostream* logger)
+CoreBundleContext::CoreBundleContext(
+  const std::unordered_map<std::string, Any>& props,
+  std::ostream* logger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
-  , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+  , workingDir(ref_any_cast<std::string>(
+      frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -88,16 +90,15 @@ CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>&
   , firstInit(true)
   , initCount(0)
 {
-  bool enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
+  bool enableDiagLog =
+    any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
   std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
   DIAG_LOG(*sink) << "created";
 }
 
-CoreBundleContext::~CoreBundleContext()
-{
-}
+CoreBundleContext::~CoreBundleContext() {}
 
 std::shared_ptr<CoreBundleContext> CoreBundleContext::shared_from_this() const
 {
@@ -114,10 +115,11 @@ void CoreBundleContext::Init()
   DIAG_LOG(*sink) << "initializing";
   initCount++;
 
-  auto storageCleanProp = frameworkProperties.find(Constants::FRAMEWORK_STORAGE_CLEAN);
+  auto storageCleanProp =
+    frameworkProperties.find(Constants::FRAMEWORK_STORAGE_CLEAN);
   if (firstInit && storageCleanProp != frameworkProperties.end() &&
-      storageCleanProp->second == Constants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT)
-  {
+      storageCleanProp->second ==
+        Constants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT) {
     // DeleteFWDir();
     firstInit = false;
   }
@@ -125,32 +127,31 @@ void CoreBundleContext::Init()
   // We use a "pseudo" random UUID.
   const std::string sid_base = "04f4f884-31bb-45c0-b176-";
   std::stringstream ss;
-  ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
+  ss << sid_base << std::setfill('0') << std::setw(8) << std::hex
+     << static_cast<int32_t>(id * 65536 + initCount);
 
   frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
 
   // $TODO we only support non-persistent (main memory) storage yet
   storage.reset(new BundleStorageMemory());
-//  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
-//  {
-//    dataStorage.clear();
-//  }
-//  else
-//  {
-//    dataStorage = GetFileStorage(this, "data");
-//  }
-  try
-  {
-    dataStorage = GetPersistentStoragePath(this, "data", /*create=*/ false);
+  //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
+  //  {
+  //    dataStorage.clear();
+  //  }
+  //  else
+  //  {
+  //    dataStorage = GetFileStorage(this, "data");
+  //  }
+  try {
+    dataStorage = GetPersistentStoragePath(this, "data", /*create=*/false);
+  } catch (const std::exception& e) {
+    DIAG_LOG(*sink) << "Ignored runtime exception with message'" << e.what()
+                    << "' from the GetPersistentStoragePath function.\n";
   }
-  catch (const std::exception& e)
-  {
-    DIAG_LOG(*sink) << "Ignored runtime exception with message'" << e.what() << "' from the GetPersistentStoragePath function.\n";
-  }
-
 
   systemBundle->InitSystemBundle();
-  _us_set_bundle_context_instance_system_bundle(systemBundle->bundleContext.Load().get());
+  _us_set_bundle_context_instance_system_bundle(
+    systemBundle->bundleContext.Load().get());
 
   bundleRegistry.Init();
 
@@ -160,22 +161,16 @@ void CoreBundleContext::Init()
   bundleRegistry.Load();
 
   std::string execPath;
-  try
-  {
+  try {
     execPath = util::GetExecutablePath();
-  }
-  catch (const std::exception& e)
-  {
+  } catch (const std::exception& e) {
     DIAG_LOG(*sink) << e.what();
     // Let the exception propagate all the way up to the
     // call site of Framework::Init().
     throw;
   }
 
-  if (IsBundleFile(execPath) &&
-      bundleRegistry.GetBundles(execPath).empty()
-      )
-  {
+  if (IsBundleFile(execPath) && bundleRegistry.GetBundles(execPath).empty()) {
     // Auto-install all embedded bundles inside the executable.
     // Same here: If an embedded bundle cannot be installed,
     // an exception is thrown and we will let it propagate all
@@ -183,10 +178,8 @@ void CoreBundleContext::Init()
     bundleRegistry.Install(execPath, systemBundle.get());
   }
 
-
   DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
-  for (auto b : bundleRegistry.GetBundles())
-  {
+  for (auto b : bundleRegistry.GetBundles()) {
     DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":"
                     << b->version << " location:" << b->location;
   }
@@ -219,8 +212,7 @@ void CoreBundleContext::Uninit1()
   std::list<std::shared_ptr<BundleThread>> threads;
   bundleThreads.Lock(), std::swap(threads, bundleThreads.value);
 
-  while (!threads.empty())
-  {
+  while (!threads.empty()) {
     // Quit the bundle thread. This joins the bundle thread
     // with this thread and puts it into the zombies list.
     threads.front()->Quit();
@@ -238,11 +230,9 @@ void CoreBundleContext::Uninit1()
 
 std::string CoreBundleContext::GetDataStorage(long id) const
 {
-  if (!dataStorage.empty())
-  {
+  if (!dataStorage.empty()) {
     return dataStorage + util::DIR_SEP + util::ToString(id);
   }
   return std::string();
 }
-
 }

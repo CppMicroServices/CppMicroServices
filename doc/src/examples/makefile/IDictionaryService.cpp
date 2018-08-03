@@ -1,5 +1,3 @@
 #include "IDictionaryService.h"
 
-IDictionaryService::~IDictionaryService()
-{
-}
+IDictionaryService::~IDictionaryService() {}

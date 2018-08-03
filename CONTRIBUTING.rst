@@ -40,6 +40,9 @@ Fork the repository and make changes on your fork in a feature branch:
    your intentions, and name it ``XXXX-something`` where XXXX is the number
    of the issue.
 
+Code must be formatted according to our ```.clang-format``` file, using
+the clang-format tool.
+
 Submit unit tests for your changes.
 
 Update the documentation when creating or modifying features. Test your

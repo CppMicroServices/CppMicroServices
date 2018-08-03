@@ -28,8 +28,8 @@
 #include <iostream>
 #include <memory>
 
-US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
-
+US_MSVC_PUSH_DISABLE_WARNING(
+  4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
 namespace cppmicroservices {
 
@@ -61,11 +61,11 @@ class US_Framework_EXPORT FrameworkEvent
   std::shared_ptr<FrameworkEventData> d;
 
 public:
-
   /**
    * A type code used to identify the event type for future extendability.
    */
-  enum Type : uint32_t {
+  enum Type : uint32_t
+  {
 
     /**
      * The Framework has started.
@@ -85,7 +85,7 @@ public:
      * \link BundleActivator::Start(BundleContext) BundleActivator Start\endlink method
      * has been executed.
      */
-    FRAMEWORK_ERROR	= 0x00000002,
+    FRAMEWORK_ERROR = 0x00000002,
 
     /**
      * A warning has occurred.
@@ -128,7 +128,7 @@ public:
      * This event is fired when the Framework did not stop before the wait timeout expired.
      * The source of this event is the System Bundle.
      */
-    FRAMEWORK_WAIT_TIMEDOUT	= 0x00000200
+    FRAMEWORK_WAIT_TIMEDOUT = 0x00000200
 
   };
 
@@ -154,7 +154,10 @@ public:
    * @param message The message associated with the event.
    * @param exception The exception associated with this event. Should be nullptr if there is no exception.
    */
-  FrameworkEvent(Type type, const Bundle& bundle, const std::string& message, const std::exception_ptr exception = nullptr);
+  FrameworkEvent(Type type,
+                 const Bundle& bundle,
+                 const std::string& message,
+                 const std::exception_ptr exception = nullptr);
 
   /**
    * Returns the bundle associated with the event.
@@ -194,7 +197,6 @@ public:
    * @return The type of Framework event.
    */
   Type GetType() const;
-
 };
 
 /**
@@ -203,7 +205,8 @@ public:
  *
  * Writes a string representation of \c eventType to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, FrameworkEvent::Type eventType);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             FrameworkEvent::Type eventType);
 
 /**
  * \ingroup MicroServices
@@ -211,7 +214,8 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, FrameworkEvent::T
  *
  * Writes a string representation of \c evt to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEvent& evt);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const FrameworkEvent& evt);
 
 /**
  * \ingroup MicroServices
@@ -219,9 +223,9 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const FrameworkEv
  *
  * Compares two framework events for equality.
  */
-US_Framework_EXPORT bool operator==(const FrameworkEvent& rhs, const FrameworkEvent& lhs);
+US_Framework_EXPORT bool operator==(const FrameworkEvent& rhs,
+                                    const FrameworkEvent& lhs);
 /** @}*/
-
 }
 
 US_MSVC_POP_WARNING

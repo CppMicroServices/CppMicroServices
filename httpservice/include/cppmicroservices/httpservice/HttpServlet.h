@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLET_H
 #define CPPMICROSERVICES_HTTPSERVLET_H
 
-#include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/ServiceInterface.h"
+#include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <mutex>
 
@@ -37,10 +37,10 @@ class ServletConfig;
 
 struct HttpServletPrivate;
 
-class US_HttpService_EXPORT HttpServlet : public std::enable_shared_from_this<HttpServlet>
+class US_HttpService_EXPORT HttpServlet
+  : public std::enable_shared_from_this<HttpServlet>
 {
 public:
-
   static const std::string PROP_CONTEXT_ROOT;
 
   HttpServlet();
@@ -108,35 +108,38 @@ public:
    */
   ServletConfig GetServletConfig() const;
 
-  virtual void Service(HttpServletRequest& request, HttpServletResponse& response);
+  virtual void Service(HttpServletRequest& request,
+                       HttpServletResponse& response);
 
   std::shared_ptr<ServletContext> GetServletContext() const;
 
   virtual ~HttpServlet();
 
 protected:
-
   virtual long long GetLastModified(HttpServletRequest& request);
 
-  virtual void DoGet(HttpServletRequest& request, HttpServletResponse& response);
-  virtual void DoHead(HttpServletRequest& request, HttpServletResponse& response);
-  virtual void DoDelete(HttpServletRequest& request, HttpServletResponse& response);
-  virtual void DoPost(HttpServletRequest& request, HttpServletResponse& response);
-  virtual void DoPut(HttpServletRequest& request, HttpServletResponse& response);
+  virtual void DoGet(HttpServletRequest& request,
+                     HttpServletResponse& response);
+  virtual void DoHead(HttpServletRequest& request,
+                      HttpServletResponse& response);
+  virtual void DoDelete(HttpServletRequest& request,
+                        HttpServletResponse& response);
+  virtual void DoPost(HttpServletRequest& request,
+                      HttpServletResponse& response);
+  virtual void DoPut(HttpServletRequest& request,
+                     HttpServletResponse& response);
 
-  virtual void DoTrace(HttpServletRequest& request, HttpServletResponse& response);
+  virtual void DoTrace(HttpServletRequest& request,
+                       HttpServletResponse& response);
 
   std::unique_lock<std::mutex> Lock() const;
 
 private:
-
   HttpServletPrivate* d;
 
   friend class ServletHandler;
   //friend class ServletContainerPrivate;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_HTTPSERVLET_H

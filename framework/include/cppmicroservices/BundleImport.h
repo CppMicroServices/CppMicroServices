@@ -32,7 +32,6 @@ namespace cppmicroservices {
 struct BundleActivator;
 class BundleContext;
 class BundleContextPrivate;
-
 }
 
 /**
@@ -65,13 +64,14 @@ class BundleContextPrivate;
  *    | :any:`concept-static-bundles`
  * \endrststar
  */
-#define CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                            \
-  extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(_bundle_name) ();            \
-  extern "C" void US_SET_CTX_FUNC(_bundle_name) (cppmicroservices::BundleContextPrivate*); \
-  void _dummy_reference_to_ ## _bundle_name ## _bundle_context()             \
-  {                                                                          \
-    US_GET_CTX_FUNC(_bundle_name) ();                                        \
-    US_SET_CTX_FUNC(_bundle_name) (nullptr);                                 \
+#define CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                \
+  extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(_bundle_name)(); \
+  extern "C" void US_SET_CTX_FUNC(_bundle_name)(                               \
+    cppmicroservices::BundleContextPrivate*);                                  \
+  void _dummy_reference_to_##_bundle_name##_bundle_context()                   \
+  {                                                                            \
+    US_GET_CTX_FUNC(_bundle_name)();                                           \
+    US_SET_CTX_FUNC(_bundle_name)(nullptr);                                    \
   }
 
 /**
@@ -99,14 +99,16 @@ class BundleContextPrivate;
  *    | :any:`concept-static-bundles`
  * \endrststar
  */
-#define CPPMICROSERVICES_IMPORT_BUNDLE(_bundle_name)                                            \
-  CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                                       \
-  extern "C" cppmicroservices::BundleActivator* US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();      \
-  extern "C" void US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (cppmicroservices::BundleActivator*); \
-  void _dummy_reference_to_ ## _bundle_name ## _activator()                       \
-  {                                                                               \
-    auto dummyActivator = US_CREATE_ACTIVATOR_FUNC(_bundle_name) ();              \
-    US_DESTROY_ACTIVATOR_FUNC(_bundle_name) (dummyActivator);                     \
+#define CPPMICROSERVICES_IMPORT_BUNDLE(_bundle_name)                           \
+  CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                      \
+  extern "C" cppmicroservices::BundleActivator* US_CREATE_ACTIVATOR_FUNC(      \
+    _bundle_name)();                                                           \
+  extern "C" void US_DESTROY_ACTIVATOR_FUNC(_bundle_name)(                     \
+    cppmicroservices::BundleActivator*);                                       \
+  void _dummy_reference_to_##_bundle_name##_activator()                        \
+  {                                                                            \
+    auto dummyActivator = US_CREATE_ACTIVATOR_FUNC(_bundle_name)();            \
+    US_DESTROY_ACTIVATOR_FUNC(_bundle_name)(dummyActivator);                   \
   }
 
 #endif // CPPMICROSERVICES_BUNDLEIMPORT_H

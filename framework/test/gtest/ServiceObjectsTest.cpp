@@ -20,10 +20,10 @@ limitations under the License.
 
 =============================================================================*/
 
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceObjects.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkFactory.h"
 #include "gtest/gtest.h"
 
 using namespace cppmicroservices;
@@ -36,8 +36,7 @@ struct ITestServiceA
 TEST(ServiceObjectsTest, TestServiceObjects)
 {
   struct TestServiceA : public ITestServiceA
-  {
-  };
+  {};
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
@@ -45,7 +44,8 @@ TEST(ServiceObjectsTest, TestServiceObjects)
   auto context = framework.GetBundleContext();
 
   auto s1 = std::make_shared<TestServiceA>();
-  ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<ITestServiceA>(s1);
+  ServiceRegistration<ITestServiceA> reg1 =
+    context.RegisterService<ITestServiceA>(s1);
   auto ref = context.GetServiceReference("ITestServiceA");
   ServiceObjects<void> serviceObject = context.GetServiceObjects(ref);
   ASSERT_TRUE(serviceObject.GetService() != nullptr);

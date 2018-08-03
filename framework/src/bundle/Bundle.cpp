@@ -42,17 +42,15 @@
 
 namespace cppmicroservices {
 
-Bundle::Bundle(const Bundle & b)
+Bundle::Bundle(const Bundle& b)
   : d(b.d)
   , c(b.c)
-{
-}
+{}
 
 Bundle::Bundle(Bundle&& b)
   : d(std::move(b.d))
   , c(std::move(b.c))
-{
-}
+{}
 
 Bundle& Bundle::operator=(const Bundle& b)
 {
@@ -68,13 +66,14 @@ Bundle& Bundle::operator=(Bundle&& b)
   return *this;
 }
 
-Bundle::Bundle()
-{
-}
+Bundle::Bundle() {}
 
 bool Bundle::operator==(const Bundle& rhs) const
 {
-  return *this ? (rhs ? d->coreCtx->id == rhs.d->coreCtx->id && d->id == rhs.d->id : false) : !rhs;
+  return *this
+           ? (rhs ? d->coreCtx->id == rhs.d->coreCtx->id && d->id == rhs.d->id
+                  : false)
+           : !rhs;
 }
 
 bool Bundle::operator!=(const Bundle& rhs) const
@@ -84,7 +83,11 @@ bool Bundle::operator!=(const Bundle& rhs) const
 
 bool Bundle::operator<(const Bundle& rhs) const
 {
-  return *this ? (rhs ? (d->coreCtx->id == rhs.d->coreCtx->id ? d->id < rhs.d->id : d->coreCtx->id < rhs.d->coreCtx->id) : true) : false;
+  return *this ? (rhs ? (d->coreCtx->id == rhs.d->coreCtx->id
+                           ? d->id < rhs.d->id
+                           : d->coreCtx->id < rhs.d->coreCtx->id)
+                      : true)
+               : false;
 }
 
 Bundle::operator bool() const
@@ -102,12 +105,9 @@ Bundle& Bundle::operator=(std::nullptr_t)
 Bundle::Bundle(const std::shared_ptr<BundlePrivate>& d)
   : d(d)
   , c(d ? d->coreCtx->shared_from_this() : nullptr)
-{
-}
+{}
 
-Bundle::~Bundle()
-{
-}
+Bundle::~Bundle() {}
 
 Bundle::State Bundle::GetState() const
 {
@@ -184,11 +184,9 @@ Any Bundle::GetProperty(const std::string& key) const
   // The Framework's properties include both the launch properties
   // used to initialize the Framework and all relevant
   // "org.cppmicroservices.*" properties.
-  if (property.Empty())
-  {
+  if (property.Empty()) {
     auto props = d->coreCtx->frameworkProperties.find(key);
-    if (props != d->coreCtx->frameworkProperties.end())
-    {
+    if (props != d->coreCtx->frameworkProperties.end()) {
       property = (*props).second;
     }
   }
@@ -207,8 +205,8 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetRegisteredByBundle(d.get(), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
-  {
+       i != sr.end();
+       ++i) {
     res.push_back(i->GetReference());
   }
   return res;
@@ -221,8 +219,8 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
   std::vector<ServiceReferenceU> res;
   d->coreCtx->services.GetUsedByBundle(d.get(), sr);
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
-       i != sr.end(); ++i)
-  {
+       i != sr.end();
+       ++i) {
     res.push_back(i->GetReference());
   }
   return res;
@@ -234,11 +232,14 @@ BundleResource Bundle::GetResource(const std::string& path) const
   return d->barchive ? d->barchive->GetResource(path) : BundleResource();
 }
 
-std::vector<BundleResource> Bundle::FindResources(const std::string& path, const std::string& filePattern,
-                                                  bool recurse) const
+std::vector<BundleResource> Bundle::FindResources(
+  const std::string& path,
+  const std::string& filePattern,
+  bool recurse) const
 {
   d->CheckUninstalled();
-  return d->barchive ? d->barchive->FindResources(path, filePattern, recurse) : std::vector<BundleResource>();
+  return d->barchive ? d->barchive->FindResources(path, filePattern, recurse)
+                     : std::vector<BundleResource>();
 }
 
 Bundle::TimeStamp Bundle::GetLastModified() const
@@ -248,30 +249,34 @@ Bundle::TimeStamp Bundle::GetLastModified() const
 
 std::ostream& operator<<(std::ostream& os, Bundle::State state)
 {
-  switch (state)
-  {
-  case Bundle::STATE_UNINSTALLED: return os << "UNINSTALLED";
-  case Bundle::STATE_INSTALLED: return os << "INSTALLED";
-  case Bundle::STATE_RESOLVED: return os << "RESOLVED";
-  case Bundle::STATE_STARTING: return os << "STARTING";
-  case Bundle::STATE_ACTIVE: return os << "ACTIVE";
-  case Bundle::STATE_STOPPING: return os << "STOPPING";
+  switch (state) {
+    case Bundle::STATE_UNINSTALLED:
+      return os << "UNINSTALLED";
+    case Bundle::STATE_INSTALLED:
+      return os << "INSTALLED";
+    case Bundle::STATE_RESOLVED:
+      return os << "RESOLVED";
+    case Bundle::STATE_STARTING:
+      return os << "STARTING";
+    case Bundle::STATE_ACTIVE:
+      return os << "ACTIVE";
+    case Bundle::STATE_STOPPING:
+      return os << "STOPPING";
   }
   return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Bundle& bundle)
 {
-  os << "Bundle[" << "id=" << bundle.GetBundleId() <<
-        ", loc=" << bundle.GetLocation() <<
-        ", name=" << bundle.GetSymbolicName() <<
-        ", state=" << bundle.GetState() << "]";
+  os << "Bundle["
+     << "id=" << bundle.GetBundleId() << ", loc=" << bundle.GetLocation()
+     << ", name=" << bundle.GetSymbolicName() << ", state=" << bundle.GetState()
+     << "]";
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, Bundle const * bundle)
+std::ostream& operator<<(std::ostream& os, Bundle const* bundle)
 {
   return operator<<(os, *bundle);
 }
-
 }

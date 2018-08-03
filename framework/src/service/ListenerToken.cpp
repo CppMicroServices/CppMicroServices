@@ -56,5 +56,4 @@ ListenerTokenId ListenerToken::Id() const
 {
   return tokenId;
 }
-
 }

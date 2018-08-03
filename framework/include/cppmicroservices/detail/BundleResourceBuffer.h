@@ -25,8 +25,8 @@
 
 #include "cppmicroservices/FrameworkExport.h"
 
-#include <streambuf>
 #include <memory>
+#include <streambuf>
 
 namespace cppmicroservices {
 
@@ -34,22 +34,20 @@ namespace detail {
 
 class BundleResourceBufferPrivate;
 
-class US_Framework_EXPORT BundleResourceBuffer: public std::streambuf
+class US_Framework_EXPORT BundleResourceBuffer : public std::streambuf
 {
 
 public:
-
   BundleResourceBuffer(const BundleResourceBuffer&) = delete;
   BundleResourceBuffer& operator=(const BundleResourceBuffer&) = delete;
 
-  explicit BundleResourceBuffer(std::unique_ptr<void, void(*)(void*)> data,
+  explicit BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
                                 std::size_t size,
                                 std::ios_base::openmode mode);
 
   ~BundleResourceBuffer();
 
 private:
-
   int_type underflow();
 
   int_type uflow();
@@ -58,13 +56,16 @@ private:
 
   std::streamsize showmanyc();
 
-  pos_type seekoff (off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
-  pos_type seekpos (pos_type sp, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+  pos_type seekoff(off_type off,
+                   std::ios_base::seekdir way,
+                   std::ios_base::openmode which = std::ios_base::in |
+                                                   std::ios_base::out);
+  pos_type seekpos(pos_type sp,
+                   std::ios_base::openmode which = std::ios_base::in |
+                                                   std::ios_base::out);
 
 private:
-
   std::unique_ptr<BundleResourceBufferPrivate> d;
-
 };
 
 } // namespace detail

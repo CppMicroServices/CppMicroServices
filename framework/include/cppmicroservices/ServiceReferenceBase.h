@@ -50,7 +50,6 @@ class US_Framework_EXPORT ServiceReferenceBase
 {
 
 public:
-
   ServiceReferenceBase(const ServiceReferenceBase& ref);
 
   /**
@@ -202,7 +201,6 @@ public:
   ServiceReferenceBase& operator=(const ServiceReferenceBase& reference);
 
 private:
-
   friend class BundlePrivate;
   friend class BundleContext;
   friend class BundleHooks;
@@ -216,8 +214,10 @@ private:
   friend class ServiceRegistry;
   friend class LDAPFilter;
 
-  template<class S> friend struct ServiceHolder;
-  template<class S> friend class ServiceReference;
+  template<class S>
+  friend struct ServiceHolder;
+  template<class S>
+  friend class ServiceReference;
 
   friend struct ::std::hash<ServiceReferenceBase>;
 
@@ -237,7 +237,6 @@ private:
   // This class is not thread-safe, but we support thread-safe
   // copying and assignment.
   std::atomic<ServiceReferenceBasePrivate*> d;
-
 };
 
 /**
@@ -246,8 +245,9 @@ private:
  *
  * Writes a string representation of \c serviceRef to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef);
-
+US_Framework_EXPORT std::ostream& operator<<(
+  std::ostream& os,
+  const ServiceReferenceBase& serviceRef);
 }
 
 /**
@@ -260,7 +260,7 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceRefe
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceReferenceBase)
-  return arg.Hash();
+return arg.Hash();
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCEBASE_H

@@ -22,38 +22,35 @@
 
 #include "cppmicroservices/ShrinkableMap.h"
 
+#include "TestUtils.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
-#include "TestUtils.h"
 
 namespace cppmicroservices {
 
 // Fake a ServiceHooks class so we can create
 // ShrinkableMap instances
-class ServiceHooks {
+class ServiceHooks
+{
 
 public:
-
   template<class K, class V>
-  static ShrinkableMap<K,V> MakeMap(std::map<K,V>& m)
+  static ShrinkableMap<K, V> MakeMap(std::map<K, V>& m)
   {
-    return ShrinkableMap<K,V>(m);
+    return ShrinkableMap<K, V>(m);
   }
 };
-
 }
 
 using namespace cppmicroservices;
 
-int ShrinkableMapTest(int /*argc*/, char* /*argv*/[])
+int ShrinkableMapTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("ShrinkableMapTest");
 
-  ShrinkableMap<int, std::string>::container_type m{
-    { 1, "one" },
-    { 2, "two" },
-    { 3, "three" }
-  };
+  ShrinkableMap<int, std::string>::container_type m{ { 1, "one" },
+                                                     { 2, "two" },
+                                                     { 3, "three" } };
 
   auto shrinkable = ServiceHooks::MakeMap(m);
 

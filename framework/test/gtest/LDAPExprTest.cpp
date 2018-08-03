@@ -22,8 +22,8 @@ limitations under the License.
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/ServiceEvent.h"
@@ -36,10 +36,12 @@ using namespace cppmicroservices;
 TEST(LDAPExprTest, GetMatchedObjectClasses)
 {
   // Improve coverage for LDAPExpr::GetMatchedObjectClasses()
-  struct MyInterfaceOne {
+  struct MyInterfaceOne
+  {
     virtual ~MyInterfaceOne() {}
   };
-  struct MyServiceOne : public MyInterfaceOne {};
+  struct MyServiceOne : public MyInterfaceOne
+  {};
 
   auto f = FrameworkFactory().NewFramework();
   f.Init();
@@ -78,14 +80,12 @@ TEST(LDAPExprTest, IsSimple)
   f.Init();
   BundleContext fCtx{ f.GetBundleContext() };
 
-  auto lambda = [](const ServiceEvent&)
-  {
-    std::cout << "ServiceEvent!";
-  };
+  auto lambda = [](const ServiceEvent&) { std::cout << "ServiceEvent!"; };
 
   const std::string ldapFilter = "(|(objectClass=foo)(objectClass=bar))";
   ASSERT_TRUE(fCtx.AddServiceListener(lambda, ldapFilter));
-  const std::string ldapFilter2 = "(|(&(objectClass=foo)(objectClass=bar))(objectClass=baz))";
+  const std::string ldapFilter2 =
+    "(|(&(objectClass=foo)(objectClass=bar))(objectClass=baz))";
   ASSERT_TRUE(fCtx.AddServiceListener(lambda, ldapFilter2));
 }
 
@@ -246,18 +246,19 @@ TEST(LDAPExprTest, ParseExceptions)
 
 TEST(LDAPExprTest, BitWiseOperatorOr)
 {
-  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") || (LDAPProp("key2") == "value2"));
+  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") ||
+                           (LDAPProp("key2") == "value2"));
 
   LDAPPropExpr expr(LDAPProp("key1") == "value1");
 
   expr |= LDAPProp("key2") == "value2";
   ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
- 
 }
 
 TEST(LDAPExprTest, BitWiseOperatorAnd)
 {
-  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") && (LDAPProp("key2") == "value2"));
+  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") &&
+                           (LDAPProp("key2") == "value2"));
 
   LDAPPropExpr expr(LDAPProp("key1") == "value1");
 
@@ -268,11 +269,12 @@ TEST(LDAPExprTest, BitWiseOperatorAnd)
 
 TEST(LDAPExprTest, OperatorAssignment)
 {
-  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") || (LDAPProp("key2") == "value2"));
+  LDAPPropExpr checkedExpr((LDAPProp("key1") == "value1") ||
+                           (LDAPProp("key2") == "value2"));
   LDAPPropExpr expr(LDAPProp("key1") == "value1");
 
   expr = expr || LDAPProp("key2") == "value2";
-  
+
   ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
 }
 
@@ -284,7 +286,8 @@ TEST(LDAPExprTest, AssignToDefaultConstructed)
   ASSERT_TRUE(defaultConstructed.IsNull());
 
   defaultConstructed |= LDAPProp("key2") == "value2";
-  ASSERT_EQ(defaultConstructed.operator std::string(), checkedExpr.operator std::string());
+  ASSERT_EQ(defaultConstructed.operator std::string(),
+            checkedExpr.operator std::string());
 
   LDAPPropExpr expr(LDAPProp("key2") == "value2");
   expr |= LDAPPropExpr();

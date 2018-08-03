@@ -35,9 +35,7 @@ namespace cppmicroservices {
 
 ServiceReferenceBase::ServiceReferenceBase()
   : d(new ServiceReferenceBasePrivate(nullptr))
-{
-
-}
+{}
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : d(ref.d.load())
@@ -47,13 +45,11 @@ ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
   : d(new ServiceReferenceBasePrivate(reg))
-{
-}
+{}
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 {
-  if (d.load()->ref > 1)
-  {
+  if (d.load()->ref > 1) {
     // detach
     --d.load()->ref;
     d = new ServiceReferenceBasePrivate(d.load()->registration);
@@ -82,7 +78,8 @@ ServiceReferenceBase::~ServiceReferenceBase()
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
-  auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
+  auto l = d.load()->registration->properties.Lock();
+  US_UNUSED(l);
   return d.load()->registration->properties.Value_unlocked(key);
 }
 
@@ -93,81 +90,86 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 
 std::vector<std::string> ServiceReferenceBase::GetPropertyKeys() const
 {
-  auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
+  auto l = d.load()->registration->properties.Lock();
+  US_UNUSED(l);
   return d.load()->registration->properties.Keys_unlocked();
 }
 
 Bundle ServiceReferenceBase::GetBundle() const
 {
   auto p = d.load();
-  if (p->registration == nullptr) return Bundle();
+  if (p->registration == nullptr)
+    return Bundle();
 
-  auto l = p->registration->Lock(); US_UNUSED(l);
-  if (p->registration->bundle == nullptr) return Bundle();
+  auto l = p->registration->Lock();
+  US_UNUSED(l);
+  if (p->registration->bundle == nullptr)
+    return Bundle();
   return MakeBundle(p->registration->bundle->shared_from_this());
 }
 
 std::vector<Bundle> ServiceReferenceBase::GetUsingBundles() const
 {
   std::vector<Bundle> bundles;
-  auto l = d.load()->registration->Lock(); US_UNUSED(l);
-  for (auto& iter : d.load()->registration->dependents)
-  {
+  auto l = d.load()->registration->Lock();
+  US_UNUSED(l);
+  for (auto& iter : d.load()->registration->dependents) {
     bundles.push_back(MakeBundle(iter.first->shared_from_this()));
   }
   return bundles;
 }
 
-bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) const
+bool ServiceReferenceBase::operator<(
+  const ServiceReferenceBase& reference) const
 {
-  if (d.load() == reference.d.load()) return false;
+  if (d.load() == reference.d.load())
+    return false;
 
-  if (!(*this))
-  {
+  if (!(*this)) {
     return true;
   }
 
-  if (!reference)
-  {
+  if (!reference) {
     return false;
   }
 
-  if (d.load()->registration == reference.d.load()->registration)
-  {
+  if (d.load()->registration == reference.d.load()->registration) {
     return false;
   }
-
 
   Any anyR1;
   Any anyId1;
   {
-    auto l = d.load()->registration->properties.Lock(); US_UNUSED(l);
-    anyR1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING);
+    auto l = d.load()->registration->properties.Lock();
+    US_UNUSED(l);
+    anyR1 = d.load()->registration->properties.Value_unlocked(
+      Constants::SERVICE_RANKING);
     assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-    anyId1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID);
+    anyId1 =
+      d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID);
     assert(anyId1.Type() == typeid(long int));
   }
 
   Any anyR2;
   Any anyId2;
   {
-    auto l = reference.d.load()->registration->properties.Lock(); US_UNUSED(l);
-    anyR2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING);
+    auto l = reference.d.load()->registration->properties.Lock();
+    US_UNUSED(l);
+    anyR2 = reference.d.load()->registration->properties.Value_unlocked(
+      Constants::SERVICE_RANKING);
     assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-    anyId2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID);
+    anyId2 = reference.d.load()->registration->properties.Value_unlocked(
+      Constants::SERVICE_ID);
     assert(anyId2.Type() == typeid(long int));
   }
 
   const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
   const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
 
-  if (r1 != r2)
-  {
+  if (r1 != r2) {
     // use ranking if ranking differs
     return r1 < r2;
-  }
-  else
-  {
+  } else {
     const long int id1 = *any_cast<long int>(&anyId1);
     const long int id2 = *any_cast<long int>(&anyId2);
 
@@ -177,14 +179,17 @@ bool ServiceReferenceBase::operator<(const ServiceReferenceBase& reference) cons
   }
 }
 
-bool ServiceReferenceBase::operator==(const ServiceReferenceBase& reference) const
+bool ServiceReferenceBase::operator==(
+  const ServiceReferenceBase& reference) const
 {
   return d.load()->registration == reference.d.load()->registration;
 }
 
-ServiceReferenceBase& ServiceReferenceBase::operator=(const ServiceReferenceBase& reference)
+ServiceReferenceBase& ServiceReferenceBase::operator=(
+  const ServiceReferenceBase& reference)
 {
-  if (d == reference.d.load()) return *this;
+  if (d == reference.d.load())
+    return *this;
 
   ServiceReferenceBasePrivate* old_d = d;
   ServiceReferenceBasePrivate* new_d = reference.d;
@@ -213,30 +218,27 @@ std::size_t ServiceReferenceBase::Hash() const
   return hash<ServiceRegistrationBasePrivate*>()(this->d.load()->registration);
 }
 
-std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRef)
+std::ostream& operator<<(std::ostream& os,
+                         const ServiceReferenceBase& serviceRef)
 {
-  if (serviceRef)
-  {
+  if (serviceRef) {
     assert(serviceRef.GetBundle());
 
     os << "Reference for service object registered from "
-       << serviceRef.GetBundle().GetSymbolicName() << " " << serviceRef.GetBundle().GetVersion()
-       << " (";
+       << serviceRef.GetBundle().GetSymbolicName() << " "
+       << serviceRef.GetBundle().GetVersion() << " (";
     std::vector<std::string> keys = serviceRef.GetPropertyKeys();
     size_t keySize = keys.size();
-    for(size_t i = 0; i < keySize; ++i)
-    {
+    for (size_t i = 0; i < keySize; ++i) {
       os << keys[i] << "=" << serviceRef.GetProperty(keys[i]).ToString();
-      if (i < keySize-1) os << ",";
+      if (i < keySize - 1)
+        os << ",";
     }
     os << ")";
-  }
-  else
-  {
+  } else {
     os << "Invalid service reference";
   }
 
   return os;
 }
-
 }

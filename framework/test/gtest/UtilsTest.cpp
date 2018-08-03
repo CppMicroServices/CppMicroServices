@@ -26,7 +26,6 @@ limitations under the License.
 
 #include <gtest/gtest.h>
 
-
 using namespace cppmicroservices;
 using namespace cppmicroservices::testing;
 using namespace cppmicroservices::util;
@@ -34,11 +33,7 @@ using namespace cppmicroservices::util;
 class UtilsFs : public ::testing::Test
 {
 public:
-
-  static void SetUpTestCase()
-  {
-    TempDir = MakeUniqueTempDirectory();
-  }
+  static void SetUpTestCase() { TempDir = MakeUniqueTempDirectory(); }
 
   static void TearDownTestCase()
   {
@@ -49,7 +44,6 @@ public:
   }
 
 protected:
-
   static std::string GetTooLongPath()
   {
 #ifdef US_PLATFORM_WINDOWS
@@ -65,15 +59,9 @@ protected:
     return TempDir.Path + DIR_SEP + longName.data();
   }
 
-  static std::string GetExistingDir()
-  {
-    return GetCurrentWorkingDirectory();
-  }
+  static std::string GetExistingDir() { return GetCurrentWorkingDirectory(); }
 
-  static std::string GetExistingFile()
-  {
-    return GetExecutablePath();
-  }
+  static std::string GetExistingFile() { return GetExecutablePath(); }
 
   static cppmicroservices::testing::TempDir TempDir;
 };
@@ -87,8 +75,7 @@ TEST_F(UtilsFs, Exists)
   EXPECT_TRUE(Exists(GetExistingFile())) << "Test for existing file";
 
   auto longPath = GetTooLongPath();
-  if (!longPath.empty())
-  {
+  if (!longPath.empty()) {
 #ifdef US_PLATFORM_WINDOWS
     EXPECT_FALSE(Exists(longPath));
 #else
@@ -104,8 +91,7 @@ TEST_F(UtilsFs, IsDirectory)
   EXPECT_FALSE(IsDirectory(GetExistingFile()));
 
   auto longPath = GetTooLongPath();
-  if (!longPath.empty())
-  {
+  if (!longPath.empty()) {
 #ifdef US_PLATFORM_WINDOWS
     EXPECT_FALSE(IsDirectory(longPath));
 #else
@@ -121,8 +107,7 @@ TEST_F(UtilsFs, IsFile)
   EXPECT_TRUE(IsFile(GetExistingFile()));
 
   auto longPath = GetTooLongPath();
-  if (!longPath.empty())
-  {
+  if (!longPath.empty()) {
 #ifdef US_PLATFORM_WINDOWS
     EXPECT_FALSE(IsFile(longPath));
 #else
@@ -140,7 +125,8 @@ TEST_F(UtilsFs, IsRelative)
 
 TEST_F(UtilsFs, GetAbsolute)
 {
-  EXPECT_EQ(GetAbsolute("rel", GetExistingDir()), GetExistingDir() + DIR_SEP + "rel");
+  EXPECT_EQ(GetAbsolute("rel", GetExistingDir()),
+            GetExistingDir() + DIR_SEP + "rel");
   EXPECT_EQ(GetAbsolute(GetExistingFile(), "dummy"), GetExistingFile());
 }
 
@@ -158,8 +144,8 @@ TEST_F(UtilsFs, MakeAndRemovePath)
   EXPECT_THROW(RemoveDirectoryRecursive(tooLongPath), std::invalid_argument);
 
   // Create a valid path
-  const std::string validPath = TempDir.Path + DIR_SEP + "one" + DIR_SEP + "two";
+  const std::string validPath =
+    TempDir.Path + DIR_SEP + "one" + DIR_SEP + "two";
   ASSERT_NO_THROW(MakePath(validPath));
   ASSERT_NO_THROW(RemoveDirectoryRecursive(validPath));
 }
-

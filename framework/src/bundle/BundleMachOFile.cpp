@@ -39,27 +39,31 @@ struct InvalidMachOException : public InvalidObjFileException
   {}
 };
 
-template<uint32_t> struct MachO;
+template<uint32_t>
+struct MachO;
 
-template<> struct MachO<MH_MAGIC>
+template<>
+struct MachO<MH_MAGIC>
 {
   typedef mach_header Mhdr;
   typedef nlist symtab_entry;
 };
 
-template<> struct MachO<MH_MAGIC_64>
+template<>
+struct MachO<MH_MAGIC_64>
 {
   typedef mach_header_64 Mhdr;
   typedef nlist_64 symtab_entry;
 };
 
-template<typename I> I readBE(I i)
+template<typename I>
+I readBE(I i)
 {
 #ifdef US_LITTLE_ENDIAN
   I r = 0;
-  for (unsigned int n = 0; n < sizeof(I); ++n)
-  {
-    r |= static_cast<I>(*(reinterpret_cast<unsigned char*>(&i) + n)) << ((sizeof(I) - 1 - n) * 8);
+  for (unsigned int n = 0; n < sizeof(I); ++n) {
+    r |= static_cast<I>(*(reinterpret_cast<unsigned char*>(&i) + n))
+         << ((sizeof(I) - 1 - n) * 8);
   }
   return r;
 #else
@@ -68,10 +72,11 @@ template<typename I> I readBE(I i)
 }
 
 template<class MachOType>
-class BundleMachOFile : public BundleObjFile, private MachOType
+class BundleMachOFile
+  : public BundleObjFile
+  , private MachOType
 {
 public:
-
   typedef typename MachOType::Mhdr Mhdr;
   typedef typename MachOType::symtab_entry symtab_entry;
 
@@ -80,9 +85,9 @@ public:
     fs.seekg(fileOffset);
     Mhdr mhdr;
     fs.read(reinterpret_cast<char*>(&mhdr), sizeof mhdr);
-    if (mhdr.filetype != MH_DYLIB && mhdr.filetype != MH_BUNDLE)
-    {
-      throw InvalidMachOException("Not a Mach-O dynamic shared library or bundle file.");
+    if (mhdr.filetype != MH_DYLIB && mhdr.filetype != MH_BUNDLE) {
+      throw InvalidMachOException(
+        "Not a Mach-O dynamic shared library or bundle file.");
     }
 
     // iterate over all load commands
@@ -91,48 +96,41 @@ public:
     uint32_t symtab_offset = 0;
     uint32_t strtab_offset = 0;
     uint32_t strtab_size = 0;
-    for (uint32_t i = 0; i < ncmds; ++i)
-    {
+    for (uint32_t i = 0; i < ncmds; ++i) {
       load_command lcmd;
       fs.read(reinterpret_cast<char*>(&lcmd), sizeof lcmd);
-      if (lcmd.cmd == LC_ID_DYLIB)
-      {
+      if (lcmd.cmd == LC_ID_DYLIB) {
         dylib dylib_id;
         fs.read(reinterpret_cast<char*>(&dylib_id), sizeof dylib_id);
         PrintVersionString(dylib_id.current_version);
         PrintVersionString(dylib_id.compatibility_version);
         fs.seekg(lcmd_offset + dylib_id.name.offset);
         std::getline(fs, m_InstallName, '\0');
-      }
-      else if (lcmd.cmd == LC_LOAD_DYLIB)
-      {
+      } else if (lcmd.cmd == LC_LOAD_DYLIB) {
         dylib dylib_id;
         fs.read(reinterpret_cast<char*>(&dylib_id), sizeof dylib_id);
         fs.seekg(lcmd_offset + dylib_id.name.offset);
         std::string id;
         std::getline(fs, id, '\0');
         m_Needed.push_back(id);
-      }
-      else if (lcmd.cmd == LC_SYMTAB)
-      {
+      } else if (lcmd.cmd == LC_SYMTAB) {
         fs.seekg(-2 * static_cast<int>(sizeof(uint32_t)), std::ios_base::cur);
         symtab_command symtab;
         fs.read(reinterpret_cast<char*>(&symtab), sizeof symtab);
         symtab_offset = symtab.symoff;
         strtab_offset = symtab.stroff;
         strtab_size = symtab.strsize;
-      }
-      else if (lcmd.cmd == LC_DYSYMTAB)
-      {
+      } else if (lcmd.cmd == LC_DYSYMTAB) {
         fs.seekg(-2 * static_cast<int>(sizeof(uint32_t)), std::ios_base::cur);
         dysymtab_command dysymtab;
         fs.read(reinterpret_cast<char*>(&dysymtab), sizeof dysymtab);
-        if (dysymtab.nextdefsym != 0)
-        {
+        if (dysymtab.nextdefsym != 0) {
           // read the defined external symbol table entries
           symtab_entry* extSyms = new symtab_entry[dysymtab.nextdefsym];
-          fs.seekg(fileOffset + symtab_offset + dysymtab.iextdefsym * sizeof(symtab_entry));
-          fs.read(reinterpret_cast<char*>(extSyms), dysymtab.nextdefsym * sizeof(symtab_entry));
+          fs.seekg(fileOffset + symtab_offset +
+                   dysymtab.iextdefsym * sizeof(symtab_entry));
+          fs.read(reinterpret_cast<char*>(extSyms),
+                  dysymtab.nextdefsym * sizeof(symtab_entry));
 
           // read the string table
           char* strtab = new char[strtab_size];
@@ -141,12 +139,12 @@ public:
 
           // iterate over all defined external symbol table entries
           symtab_entry* extSym = extSyms;
-          for (std::size_t i = 0; i < dysymtab.nextdefsym; ++i, ++extSym)
-          {
-            if (static_cast<uint32_t>(extSym->n_un.n_strx) >= strtab_size) continue;
+          for (std::size_t i = 0; i < dysymtab.nextdefsym; ++i, ++extSym) {
+            if (static_cast<uint32_t>(extSym->n_un.n_strx) >= strtab_size)
+              continue;
             // strip of the leading "_" in the symbol name
-            if (this->ExtractBundleName(&strtab[extSym->n_un.n_strx + 1], m_BundleName))
-            {
+            if (this->ExtractBundleName(&strtab[extSym->n_un.n_strx + 1],
+                                        m_BundleName)) {
               break;
             }
           }
@@ -160,23 +158,13 @@ public:
     }
   }
 
-  virtual std::vector<std::string> GetDependencies() const
-  {
-    return m_Needed;
-  }
+  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
 
-  virtual std::string GetLibName() const
-  {
-    return m_InstallName;
-  }
+  virtual std::string GetLibName() const { return m_InstallName; }
 
-  virtual std::string GetBundleName() const
-  {
-    return m_BundleName;
-  }
+  virtual std::string GetBundleName() const { return m_BundleName; }
 
 private:
-
   std::vector<std::string> m_Needed;
   std::string m_InstallName;
   std::string m_BundleName;
@@ -192,25 +180,24 @@ private:
   }
 };
 
-static std::vector<std::vector<uint32_t> > GetMachOIdents(std::ifstream& is)
+static std::vector<std::vector<uint32_t>> GetMachOIdents(std::ifstream& is)
 {
   // magic (32 or 64 bit) | cputype | offset
-  std::vector<std::vector<uint32_t> > idents;
+  std::vector<std::vector<uint32_t>> idents;
 
   uint32_t magic;
   is.seekg(0);
   is.read(reinterpret_cast<char*>(&magic), sizeof magic);
 
-  if (readBE(magic) == FAT_MAGIC)
-  {
+  if (readBE(magic) == FAT_MAGIC) {
     is.seekg(0);
     fat_header fatHdr;
     is.read(reinterpret_cast<char*>(&fatHdr), sizeof fatHdr);
     fat_arch* fatArchs = new fat_arch[readBE(fatHdr.nfat_arch)];
-    is.read(reinterpret_cast<char*>(fatArchs), sizeof *fatArchs * readBE(fatHdr.nfat_arch));
+    is.read(reinterpret_cast<char*>(fatArchs),
+            sizeof *fatArchs * readBE(fatHdr.nfat_arch));
     fat_arch* currArch = fatArchs;
-    for (uint32_t i = 0; i < readBE(fatHdr.nfat_arch); ++i, ++currArch)
-    {
+    for (uint32_t i = 0; i < readBE(fatHdr.nfat_arch); ++i, ++currArch) {
       is.seekg(readBE(currArch->offset));
       mach_header machHdr;
       is.read(reinterpret_cast<char*>(&machHdr), sizeof machHdr);
@@ -220,9 +207,7 @@ static std::vector<std::vector<uint32_t> > GetMachOIdents(std::ifstream& is)
       ident[2] = readBE(currArch->offset);
       idents.push_back(ident);
     }
-  }
-  else
-  {
+  } else {
     std::vector<uint32_t> ident(3, 0);
     ident[0] = magic;
     is.read(reinterpret_cast<char*>(&ident[1]), sizeof(uint32_t));
@@ -263,59 +248,50 @@ static std::vector<uint32_t> GetMachOIdent()
   return ident;
 }
 
-BundleObjFile* CreateBundleMachOFile(const char* /*selfName*/, const std::string& fileName)
+BundleObjFile* CreateBundleMachOFile(const char* /*selfName*/,
+                                     const std::string& fileName)
 {
   struct stat machStat;
-  if (stat(fileName.c_str(), &machStat) != 0)
-  {
+  if (stat(fileName.c_str(), &machStat) != 0) {
     throw InvalidMachOException("Stat for " + fileName + " failed", errno);
   }
 
   std::size_t fileSize = machStat.st_size;
 
   // magic number
-  if (fileSize < sizeof(uint32_t))
-  {
+  if (fileSize < sizeof(uint32_t)) {
     throw InvalidMachOException("Missing magic number");
   }
 
   std::ifstream machFile(fileName.c_str(), std::ios_base::binary);
-  machFile.exceptions(std::ifstream::failbit | std::ifstream::badbit) ;
+  machFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
   std::vector<uint32_t> selfIdent = GetMachOIdent();
-  std::vector<std::vector<uint32_t> > fileIdents = GetMachOIdents(machFile);
+  std::vector<std::vector<uint32_t>> fileIdents = GetMachOIdents(machFile);
 
   std::vector<uint32_t> matchingIdent(3, 0);
 
   // check if the identifications match for the running application
   // and the Mach-O file (or one of the embedded files in the fat binary)
-  for (std::size_t i = 0; i < fileIdents.size(); ++i)
-  {
-    if (memcmp(&fileIdents[i][0], &selfIdent[0], 2 * sizeof(uint32_t)) == 0)
-    {
+  for (std::size_t i = 0; i < fileIdents.size(); ++i) {
+    if (memcmp(&fileIdents[i][0], &selfIdent[0], 2 * sizeof(uint32_t)) == 0) {
       matchingIdent = fileIdents[i];
     }
   }
 
-  if (matchingIdent[0] == 0)
-  {
+  if (matchingIdent[0] == 0) {
     throw InvalidMachOException("Not a compatible Mach-O file or fat binary");
   }
 
-  if (matchingIdent[0] == MH_MAGIC)
-  {
+  if (matchingIdent[0] == MH_MAGIC) {
     //std::cout << "Mach-O (32-bit) binary" << std::endl;
-    return new BundleMachOFile<MachO<MH_MAGIC> >(machFile, matchingIdent[2]);
-  }
-  else if (matchingIdent[0] == MH_MAGIC_64)
-  {
+    return new BundleMachOFile<MachO<MH_MAGIC>>(machFile, matchingIdent[2]);
+  } else if (matchingIdent[0] == MH_MAGIC_64) {
     //std::cout << "Mach-O (64-bit) binary" << std::endl;
-    return new BundleMachOFile<MachO<MH_MAGIC_64> >(machFile, matchingIdent[2]);
-  }
-  else
-  {
-    throw InvalidMachOException("Internal error: Mach-O magic is neither MH_MAGIC nor MH_MAGIC_64");
+    return new BundleMachOFile<MachO<MH_MAGIC_64>>(machFile, matchingIdent[2]);
+  } else {
+    throw InvalidMachOException(
+      "Internal error: Mach-O magic is neither MH_MAGIC nor MH_MAGIC_64");
   }
 }
-
 }

@@ -27,12 +27,12 @@
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
 
-#include "cppmicroservices/GetBundleContext.h"
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
 #include "cppmicroservices/Constants.h"
+#include "cppmicroservices/GetBundleContext.h"
 
 #include <set>
 
@@ -42,31 +42,33 @@ std::string NumToString(int64_t val);
 
 ServicesPlugin::ServicesPlugin()
   : SimpleWebConsolePlugin("services", "Services", "")
-{
-}
+{}
 
-void ServicesPlugin::RenderContent(HttpServletRequest& request, HttpServletResponse& response)
+void ServicesPlugin::RenderContent(HttpServletRequest& request,
+                                   HttpServletResponse& response)
 {
   std::string pathInfo = request.GetPathInfo();
-  if (pathInfo == "/services")
-  {
-    BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/services.html");
-    if (res)
-    {
-      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+  if (pathInfo == "/services") {
+    BundleResource res =
+      GetBundleContext().GetBundle().GetResource("/templates/services.html");
+    if (res) {
+      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(
+                     GetVariableResolver(request))
+                     ->GetData();
       data["services"] = GetIds();
 
       BundleResourceStream rs(res, std::ios_base::binary);
       response.GetOutputStream() << rs.rdbuf();
     }
-  }
-  else if (pathInfo.size() > 20 && pathInfo.compare(0, 20, "/services/interface/") == 0)
-  {
+  } else if (pathInfo.size() > 20 &&
+             pathInfo.compare(0, 20, "/services/interface/") == 0) {
     std::string id = pathInfo.substr(20);
-    BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/service_interface.html");
-    if (res)
-    {
-      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+    BundleResource res = GetBundleContext().GetBundle().GetResource(
+      "/templates/service_interface.html");
+    if (res) {
+      auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(
+                     GetVariableResolver(request))
+                     ->GetData();
       data["interface"] = id;
       data["services"] = GetInterface(id);
 
@@ -80,33 +82,29 @@ AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetIds() const
 {
   std::set<std::string> ids;
   std::vector<ServiceReferenceU> refs = GetContext().GetServiceReferences("");
-  for (auto ref : refs)
-  {
+  for (auto ref : refs) {
     Any objectClass = ref.GetProperty(Constants::OBJECTCLASS);
-    auto const& oc = ref_any_cast<std::vector<std::string> >(objectClass);
-    for (auto const& id : oc)
-    {
+    auto const& oc = ref_any_cast<std::vector<std::string>>(objectClass);
+    for (auto const& id : oc) {
       ids.insert(id);
     }
   }
 
   TemplateData data(TemplateData::Type::List);
-  for (auto const& id : ids)
-  {
-    data << TemplateData{"id", id};
+  for (auto const& id : ids) {
+    data << TemplateData{ "id", id };
   }
   return data;
 }
 
-AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetInterface(const std::string& iid) const
+AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetInterface(
+  const std::string& iid) const
 {
   TemplateData data(TemplateData::Type::List);
 
-  for (auto& ref : GetContext().GetServiceReferences(iid))
-  {
+  for (auto& ref : GetContext().GetServiceReferences(iid)) {
     AnyMap props(AnyMap::ORDERED_MAP);
-    for (auto const& key : ref.GetPropertyKeys())
-    {
+    for (auto const& key : ref.GetPropertyKeys()) {
       props[key] = ref.GetProperty(key);
     }
 
@@ -114,8 +112,10 @@ AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetInterface(const std::s
     entry["bundle"] = ref.GetBundle().GetSymbolicName();
     entry["bundle-id"] = NumToString(ref.GetBundle().GetBundleId());
     entry["id"] = ref.GetProperty(Constants::SERVICE_ID).ToStringNoExcept();
-    entry["ranking"] = ref.GetProperty(Constants::SERVICE_RANKING).ToStringNoExcept();
-    entry["scope"] = ref.GetProperty(Constants::SERVICE_SCOPE).ToStringNoExcept();
+    entry["ranking"] =
+      ref.GetProperty(Constants::SERVICE_RANKING).ToStringNoExcept();
+    entry["scope"] =
+      ref.GetProperty(Constants::SERVICE_SCOPE).ToStringNoExcept();
     entry["types"] = ref.GetProperty(Constants::OBJECTCLASS).ToStringNoExcept();
     entry["props"] = Any(props).ToJSON();
 
@@ -124,5 +124,4 @@ AbstractWebConsolePlugin::TemplateData ServicesPlugin::GetInterface(const std::s
 
   return data;
 }
-
 }

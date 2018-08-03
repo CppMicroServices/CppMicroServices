@@ -27,21 +27,21 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
-#include <mutex>
 
 namespace cppmicroservices {
 
 struct BundleArchive;
 class BundleResource;
 
-class BundleResourceContainer : public std::enable_shared_from_this<BundleResourceContainer>
+class BundleResourceContainer
+  : public std::enable_shared_from_this<BundleResourceContainer>
 {
 
 public:
-
   BundleResourceContainer(const std::string& location);
   ~BundleResourceContainer();
 
@@ -70,21 +70,26 @@ public:
   bool GetStat(Stat& stat) const;
   bool GetStat(int index, Stat& stat) const;
 
-  std::unique_ptr<void, void(*)(void*)> GetData(int index) const;
+  std::unique_ptr<void, void (*)(void*)> GetData(int index) const;
 
-  void GetChildren(const std::string& resourcePath, bool relativePaths,
-                   std::vector<std::string>& names, std::vector<uint32_t>& indices) const;
+  void GetChildren(const std::string& resourcePath,
+                   bool relativePaths,
+                   std::vector<std::string>& names,
+                   std::vector<uint32_t>& indices) const;
 
-  void FindNodes(const std::shared_ptr<const BundleArchive>& archive, const std::string& path, const std::string& filePattern,
-                 bool recurse, std::vector<BundleResource>& resources) const;
+  void FindNodes(const std::shared_ptr<const BundleArchive>& archive,
+                 const std::string& path,
+                 const std::string& filePattern,
+                 bool recurse,
+                 std::vector<BundleResource>& resources) const;
 
 private:
-
   typedef std::pair<std::string, int> NameIndexPair;
 
   struct PairComp
   {
-    inline bool operator()(const NameIndexPair& p1, const NameIndexPair& p2) const
+    inline bool operator()(const NameIndexPair& p1,
+                           const NameIndexPair& p2) const
     {
       return p1.first < p2.first;
     }
@@ -105,7 +110,6 @@ private:
   // and hence not thread-safe.
   mutable std::mutex m_ZipFileStreamMutex;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H

@@ -47,7 +47,6 @@ class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
-
   /**
    * Implements BundleActivator::Start(). Queries for all available dictionary
    * services. If none are found it simply prints a message and returns,
@@ -62,16 +61,14 @@ public:
   void Start(BundleContext context)
   {
     // Query for all service references matching any language.
-    std::vector<ServiceReference<IDictionaryService> > refs =
-        context.GetServiceReferences<IDictionaryService>("(Language=*)");
+    std::vector<ServiceReference<IDictionaryService>> refs =
+      context.GetServiceReferences<IDictionaryService>("(Language=*)");
 
-    if (!refs.empty())
-    {
+    if (!refs.empty()) {
       std::cout << "Enter a blank line to exit." << std::endl;
 
       // Loop endlessly until the user enters a blank line
-      while (std::cin)
-      {
+      while (std::cin) {
         // Ask the user to enter a word.
         std::cout << "Enter word: ";
 
@@ -80,26 +77,21 @@ public:
 
         // If the user entered a blank line, then
         // exit the loop.
-        if (word.empty())
-        {
+        if (word.empty()) {
           break;
         }
 
         // First, get a dictionary service and then check
         // if the word is correct.
-        std::shared_ptr<IDictionaryService> dictionary = context.GetService<IDictionaryService>(refs.front());
-        if ( dictionary->CheckWord( word ) )
-        {
+        std::shared_ptr<IDictionaryService> dictionary =
+          context.GetService<IDictionaryService>(refs.front());
+        if (dictionary->CheckWord(word)) {
           std::cout << "Correct." << std::endl;
-        }
-        else
-        {
+        } else {
           std::cout << "Incorrect." << std::endl;
         }
       }
-    }
-    else
-    {
+    } else {
       std::cout << "Couldn't find any dictionary service..." << std::endl;
     }
   }
@@ -113,9 +105,7 @@ public:
   {
     // NOTE: The service is automatically released.
   }
-
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)

@@ -35,32 +35,26 @@ struct TestBundleBA_01 : public TestBundleBA_01Service
 
   TestBundleBA_01() {}
   virtual ~TestBundleBA_01() {}
-
 };
 
 class TestBundleAActivator : public BundleActivator
 {
 public:
-
   TestBundleAActivator() {}
   ~TestBundleAActivator() {}
 
   void Start(BundleContext context)
   {
-      std::cout << "Registering TestBundleAService";
-      sr = context.RegisterService<TestBundleBA_01Service>(std::make_shared<TestBundleBA_01>());
+    std::cout << "Registering TestBundleAService";
+    sr = context.RegisterService<TestBundleBA_01Service>(
+      std::make_shared<TestBundleBA_01>());
   }
 
-  void Stop(BundleContext)
-  {
-      sr.Unregister();
-  }
+  void Stop(BundleContext) { sr.Unregister(); }
 
 private:
-
-    ServiceRegistration<TestBundleBA_01Service> sr;
+  ServiceRegistration<TestBundleBA_01Service> sr;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleAActivator)

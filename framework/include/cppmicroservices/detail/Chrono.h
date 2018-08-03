@@ -34,9 +34,7 @@ typedef std::chrono::monotonic_clock Clock;
 #else
 typedef std::chrono::steady_clock Clock;
 #endif
-
 }
-
 }
 
 #endif // CPPMICROSERVICES_CHRONO_H

@@ -23,9 +23,9 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLETREQUEST_H
 #define CPPMICROSERVICES_HTTPSERVLETREQUEST_H
 
-#include "cppmicroservices/httpservice/HttpServiceExport.h"
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/SharedData.h"
+#include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <string>
 #include <vector>
@@ -38,7 +38,6 @@ struct HttpServletRequestPrivate;
 class US_HttpService_EXPORT HttpServletRequest
 {
 public:
-
   ~HttpServletRequest();
 
   HttpServletRequest(const HttpServletRequest& o);
@@ -92,20 +91,18 @@ public:
 
   std::string GetMethod() const;
 
-  std::vector<std::pair<std::string, float> > GetAcceptHeader() const;
+  std::vector<std::pair<std::string, float>> GetAcceptHeader() const;
 
   void RemoveAttribute(const std::string& name);
 
   void SetAttribute(const std::string& name, const Any& value);
 
 private:
-
   friend class ServletHandler;
   HttpServletRequest(HttpServletRequestPrivate* d);
 
   ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
 };
-
 }
 
 #endif // CPPMICROSERVICES_HTTPREQUEST_H

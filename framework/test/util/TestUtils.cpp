@@ -31,18 +31,18 @@ limitations under the License.
 #include <TestingConfig.h>
 
 #ifndef US_PLATFORM_WINDOWS
-#include <sys/time.h> // gettimeofday etc.
+#  include <sys/time.h> // gettimeofday etc.
 #else
-#include <io.h>
-#include <direct.h>
+#  include <direct.h>
+#  include <io.h>
 #endif
 
 #ifdef US_PLATFORM_APPLE
-#include <unistd.h> // chdir, getpid, close, etc.
+#  include <unistd.h> // chdir, getpid, close, etc.
 #endif
 
-#include <sys/stat.h> // mkdir, _S_IREAD, etc.
 #include <fcntl.h>
+#include <sys/stat.h> // mkdir, _S_IREAD, etc.
 
 namespace cppmicroservices {
 
@@ -53,107 +53,113 @@ namespace testing {
 double HighPrecisionTimer::timeConvert = 0.0;
 
 HighPrecisionTimer::HighPrecisionTimer()
-    : startTime(0)
+  : startTime(0)
 {
-    if (timeConvert == 0)
-    {
-        mach_timebase_info_data_t timeBase;
-        mach_timebase_info(&timeBase);
-        timeConvert = static_cast<double>(timeBase.numer) / static_cast<double>(timeBase.denom) / 1000.0;
-    }
+  if (timeConvert == 0) {
+    mach_timebase_info_data_t timeBase;
+    mach_timebase_info(&timeBase);
+    timeConvert = static_cast<double>(timeBase.numer) /
+                  static_cast<double>(timeBase.denom) / 1000.0;
+  }
 }
 
 void HighPrecisionTimer::Start()
 {
-    startTime = mach_absolute_time();
+  startTime = mach_absolute_time();
 }
 
 long long HighPrecisionTimer::ElapsedMilli()
 {
-    uint64_t current = mach_absolute_time();
-    return static_cast<double>(current - startTime) * timeConvert / 1000.0;
+  uint64_t current = mach_absolute_time();
+  return static_cast<double>(current - startTime) * timeConvert / 1000.0;
 }
 
 long long HighPrecisionTimer::ElapsedMicro()
 {
-    uint64_t current = mach_absolute_time();
-    return static_cast<double>(current - startTime) * timeConvert;
+  uint64_t current = mach_absolute_time();
+  return static_cast<double>(current - startTime) * timeConvert;
 }
 
 #elif defined(US_PLATFORM_POSIX)
 
 HighPrecisionTimer::HighPrecisionTimer()
 {
-    startTime.tv_nsec = 0;
-    startTime.tv_sec = 0;
+  startTime.tv_nsec = 0;
+  startTime.tv_sec = 0;
 }
 
 void HighPrecisionTimer::Start()
 {
-    clock_gettime(CLOCK_MONOTONIC, &startTime);
+  clock_gettime(CLOCK_MONOTONIC, &startTime);
 }
 
 long long HighPrecisionTimer::ElapsedMilli()
 {
-    timespec current;
-    clock_gettime(CLOCK_MONOTONIC, &current);
-    return (static_cast<long long>(current.tv_sec) * 1000 + current.tv_nsec / 1000 / 1000) -
-        (static_cast<long long>(startTime.tv_sec) * 1000 + startTime.tv_nsec / 1000 / 1000);
+  timespec current;
+  clock_gettime(CLOCK_MONOTONIC, &current);
+  return (static_cast<long long>(current.tv_sec) * 1000 +
+          current.tv_nsec / 1000 / 1000) -
+         (static_cast<long long>(startTime.tv_sec) * 1000 +
+          startTime.tv_nsec / 1000 / 1000);
 }
 
 long long HighPrecisionTimer::ElapsedMicro()
 {
-    timespec current;
-    clock_gettime(CLOCK_MONOTONIC, &current);
-    return (static_cast<long long>(current.tv_sec) * 1000 * 1000 + current.tv_nsec / 1000) -
-        (static_cast<long long>(startTime.tv_sec) * 1000 * 1000 + startTime.tv_nsec / 1000);
+  timespec current;
+  clock_gettime(CLOCK_MONOTONIC, &current);
+  return (static_cast<long long>(current.tv_sec) * 1000 * 1000 +
+          current.tv_nsec / 1000) -
+         (static_cast<long long>(startTime.tv_sec) * 1000 * 1000 +
+          startTime.tv_nsec / 1000);
 }
 
 #elif defined(US_PLATFORM_WINDOWS)
 
 HighPrecisionTimer::HighPrecisionTimer()
 {
-    if (!QueryPerformanceFrequency(&timerFrequency))
-        throw std::runtime_error("QueryPerformanceFrequency() failed");
+  if (!QueryPerformanceFrequency(&timerFrequency))
+    throw std::runtime_error("QueryPerformanceFrequency() failed");
 }
 
 void HighPrecisionTimer::Start()
 {
-    //DWORD_PTR oldmask = SetThreadAffinityMask(GetCurrentThread(), 0);
-    QueryPerformanceCounter(&startTime);
-    //SetThreadAffinityMask(GetCurrentThread(), oldmask);
+  //DWORD_PTR oldmask = SetThreadAffinityMask(GetCurrentThread(), 0);
+  QueryPerformanceCounter(&startTime);
+  //SetThreadAffinityMask(GetCurrentThread(), oldmask);
 }
 
 long long HighPrecisionTimer::ElapsedMilli()
 {
-    LARGE_INTEGER current;
-    QueryPerformanceCounter(&current);
-    return (current.QuadPart - startTime.QuadPart) / (timerFrequency.QuadPart / 1000);
+  LARGE_INTEGER current;
+  QueryPerformanceCounter(&current);
+  return (current.QuadPart - startTime.QuadPart) /
+         (timerFrequency.QuadPart / 1000);
 }
 
 long long HighPrecisionTimer::ElapsedMicro()
 {
-    LARGE_INTEGER current;
-    QueryPerformanceCounter(&current);
-    return (current.QuadPart - startTime.QuadPart) / (timerFrequency.QuadPart / (1000 * 1000));
+  LARGE_INTEGER current;
+  QueryPerformanceCounter(&current);
+  return (current.QuadPart - startTime.QuadPart) /
+         (timerFrequency.QuadPart / (1000 * 1000));
 }
 
 #endif
-
 
 Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
 {
   std::vector<Bundle> bundles;
 
-#if defined (US_BUILD_SHARED_LIBS)
-  bundles = frameworkCtx.InstallBundles(LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + libName + US_LIB_EXT);
+#if defined(US_BUILD_SHARED_LIBS)
+  bundles = frameworkCtx.InstallBundles(LIB_PATH + util::DIR_SEP +
+                                        US_LIB_PREFIX + libName + US_LIB_EXT);
 #else
   bundles = frameworkCtx.GetBundles();
 #endif
 
-  for (auto b : bundles)
-  {
-    if (b.GetSymbolicName() == libName) return b;
+  for (auto b : bundles) {
+    if (b.GetSymbolicName() == libName)
+      return b;
   }
   return {};
 }
@@ -162,34 +168,34 @@ void ChangeDirectory(const std::string& destdir)
 {
   errno = 0;
   int ret = chdir(destdir.c_str());
-  if (ret != 0)
-  {
-    const std::string msg = "Unable to change directory to " + destdir + ": " + util::GetLastCErrorStr();
+  if (ret != 0) {
+    const std::string msg = "Unable to change directory to " + destdir + ": " +
+                            util::GetLastCErrorStr();
     throw std::runtime_error(msg);
   }
 }
 
 std::string GetTempDirectory()
 {
-#if defined (US_PLATFORM_WINDOWS)
+#if defined(US_PLATFORM_WINDOWS)
   std::wstring temp_dir;
   wchar_t wcharPath[MAX_PATH];
-  if (GetTempPathW(MAX_PATH, wcharPath))
-  {
+  if (GetTempPathW(MAX_PATH, wcharPath)) {
     temp_dir = wcharPath;
   }
 
   return std::string(temp_dir.cbegin(), temp_dir.cend());
 #else
   char* tempdir = getenv("TMPDIR");
-  return std::string(((tempdir == nullptr)?"/tmp":tempdir));
+  return std::string(((tempdir == nullptr) ? "/tmp" : tempdir));
 #endif
 }
 
-static const char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+static const char validLetters[] =
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 // A cross-platform version of the mkstemps function
-static int mkstemps_compat(char *tmpl, int suffixlen)
+static int mkstemps_compat(char* tmpl, int suffixlen)
 {
   static unsigned long long value = 0;
   int savedErrno = errno;
@@ -206,14 +212,14 @@ static int mkstemps_compat(char *tmpl, int suffixlen)
 #endif
 
   const std::size_t len = strlen(tmpl);
-  if ((len - suffixlen) < 6 || strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6))
-  {
+  if ((len - suffixlen) < 6 ||
+      strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6)) {
     errno = EINVAL;
     return -1;
   }
 
   /* This is where the Xs start.  */
-  char *XXXXXX = &tmpl[len - 6 - suffixlen];
+  char* XXXXXX = &tmpl[len - 6 - suffixlen];
 
 /* Get some more or less random data.  */
 #ifdef US_PLATFORM_WINDOWS
@@ -224,27 +230,28 @@ static int mkstemps_compat(char *tmpl, int suffixlen)
     // get system time
     GetSystemTime(&stNow);
     stNow.wMilliseconds = 500;
-    if (!SystemTimeToFileTime(&stNow, &ftNow))
-    {
+    if (!SystemTimeToFileTime(&stNow, &ftNow)) {
       errno = -1;
       return -1;
     }
-    unsigned long long randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
-                                         static_cast<unsigned long long>(ftNow.dwLowDateTime));
-    value = randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+    unsigned long long randomTimeBits =
+      ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
+       static_cast<unsigned long long>(ftNow.dwLowDateTime));
+    value =
+      randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
   }
 #else
   {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
     unsigned long long randomTimeBits =
-      ((static_cast<unsigned long long>(tv.tv_usec) << 32) | static_cast<unsigned long long>(tv.tv_sec));
+      ((static_cast<unsigned long long>(tv.tv_usec) << 32) |
+       static_cast<unsigned long long>(tv.tv_sec));
     value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
   }
 #endif
 
-  for (unsigned int count = 0; count < attempts; value += 7777, ++count)
-  {
+  for (unsigned int count = 0; count < attempts; value += 7777, ++count) {
     unsigned long long v = value;
 
     /* Fill in the random bits.  */
@@ -265,13 +272,10 @@ static int mkstemps_compat(char *tmpl, int suffixlen)
 #else
     int fd = open(tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 #endif
-    if (fd >= 0)
-    {
+    if (fd >= 0) {
       errno = savedErrno;
       return fd;
-    }
-    else if (errno != EEXIST)
-    {
+    } else if (errno != EEXIST) {
       return -1;
     }
   }
@@ -282,7 +286,7 @@ static int mkstemps_compat(char *tmpl, int suffixlen)
 }
 
 // A cross-platform version of the POSIX mkdtemp function
-char* mkdtemps_compat(char *tmpl, int suffixlen)
+char* mkdtemps_compat(char* tmpl, int suffixlen)
 {
   static unsigned long long value = 0;
   int savedErrno = errno;
@@ -299,14 +303,14 @@ char* mkdtemps_compat(char *tmpl, int suffixlen)
 #endif
 
   const std::size_t len = strlen(tmpl);
-  if ((len - suffixlen) < 6 || strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6))
-  {
+  if ((len - suffixlen) < 6 ||
+      strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6)) {
     errno = EINVAL;
     return nullptr;
   }
 
   /* This is where the Xs start.  */
-  char *XXXXXX = &tmpl[len - 6 - suffixlen];
+  char* XXXXXX = &tmpl[len - 6 - suffixlen];
 
 /* Get some more or less random data.  */
 #ifdef US_PLATFORM_WINDOWS
@@ -317,28 +321,29 @@ char* mkdtemps_compat(char *tmpl, int suffixlen)
     // get system time
     GetSystemTime(&stNow);
     stNow.wMilliseconds = 500;
-    if (!SystemTimeToFileTime(&stNow, &ftNow))
-    {
+    if (!SystemTimeToFileTime(&stNow, &ftNow)) {
       errno = -1;
       return nullptr;
     }
-    unsigned long long randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
-                                         static_cast<unsigned long long>(ftNow.dwLowDateTime));
-    value = randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+    unsigned long long randomTimeBits =
+      ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
+       static_cast<unsigned long long>(ftNow.dwLowDateTime));
+    value =
+      randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
   }
 #else
   {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
     unsigned long long randomTimeBits =
-      ((static_cast<unsigned long long>(tv.tv_usec) << 32) | static_cast<unsigned long long>(tv.tv_sec));
+      ((static_cast<unsigned long long>(tv.tv_usec) << 32) |
+       static_cast<unsigned long long>(tv.tv_sec));
     value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
   }
 #endif
 
   unsigned int count = 0;
-  for (; count < attempts; value += 7777, ++count)
-  {
+  for (; count < attempts; value += 7777, ++count) {
     unsigned long long v = value;
 
     /* Fill in the random bits.  */
@@ -359,13 +364,10 @@ char* mkdtemps_compat(char *tmpl, int suffixlen)
 #else
     int r = mkdir(tmpl, S_IRUSR | S_IWUSR | S_IXUSR);
 #endif
-    if (r >= 0)
-    {
+    if (r >= 0) {
       errno = savedErrno;
       return tmpl;
-    }
-    else if (errno != EEXIST)
-    {
+    } else if (errno != EEXIST) {
       return nullptr;
     }
   }
@@ -383,8 +385,7 @@ File::File()
 File::File(int fd, const std::string& path)
   : FileDescr(fd)
   , Path(path)
-{
-}
+{}
 
 File::File(File&& o)
   : FileDescr(o.FileDescr)
@@ -406,18 +407,15 @@ File::~File()
     close(FileDescr);
 }
 
-TempDir::TempDir()
-{}
+TempDir::TempDir() {}
 
 TempDir::TempDir(const std::string& path)
   : Path(path)
-{
-}
+{}
 
 TempDir::TempDir(TempDir&& o)
   : Path(std::move(o.Path))
-{
-}
+{}
 
 TempDir& TempDir::operator=(TempDir&& o)
 {
@@ -427,14 +425,10 @@ TempDir& TempDir::operator=(TempDir&& o)
 
 TempDir::~TempDir()
 {
-  if (!Path.empty())
-  {
-    try
-    {
+  if (!Path.empty()) {
+    try {
       util::RemoveDirectoryRecursive(Path);
-    }
-    catch (const std::exception&)
-    {
+    } catch (const std::exception&) {
       // ignored
     }
   }
@@ -448,12 +442,12 @@ TempDir::operator std::string() const
 std::string MakeUniqueTempDirectory()
 {
   std::string tmpStr = GetTempDirectory();
-  if (!tmpStr.empty() && *--tmpStr.end() != util::DIR_SEP)
-  {
+  if (!tmpStr.empty() && *--tmpStr.end() != util::DIR_SEP) {
     tmpStr += util::DIR_SEP;
   }
   tmpStr += "usdir-XXXXXX";
-  std::vector<char> tmpChars(tmpStr.c_str(), tmpStr.c_str() + tmpStr.length() + 1);
+  std::vector<char> tmpChars(tmpStr.c_str(),
+                             tmpStr.c_str() + tmpStr.length() + 1);
 
   errno = 0;
   if (!mkdtemps_compat(tmpChars.data(), 0))
@@ -465,7 +459,8 @@ std::string MakeUniqueTempDirectory()
 File MakeUniqueTempFile(const std::string& base)
 {
   const auto tmpStr = base + util::DIR_SEP + "usfile-XXXXXX";
-  std::vector<char> tmpChars(tmpStr.c_str(), tmpStr.c_str() + tmpStr.length() + 1);
+  std::vector<char> tmpChars(tmpStr.c_str(),
+                             tmpStr.c_str() + tmpStr.length() + 1);
 
   errno = 0;
   int fd = mkstemps_compat(tmpChars.data(), 0);
@@ -477,14 +472,13 @@ File MakeUniqueTempFile(const std::string& base)
 
 Bundle GetBundle(const std::string& bsn, BundleContext context)
 {
-  if (!context) context = cppmicroservices::GetBundleContext();
-  for (auto b : context.GetBundles())
-  {
-    if (b.GetSymbolicName() == bsn) return b;
+  if (!context)
+    context = cppmicroservices::GetBundleContext();
+  for (auto b : context.GetBundles()) {
+    if (b.GetSymbolicName() == bsn)
+      return b;
   }
   return {};
 }
-
 }
-
 }

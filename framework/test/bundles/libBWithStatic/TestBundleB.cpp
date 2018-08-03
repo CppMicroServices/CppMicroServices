@@ -35,13 +35,11 @@ struct TestBundleB : public TestBundleBService
 
   TestBundleB() {}
   virtual ~TestBundleB() {}
-
 };
 
 class TestBundleBActivator : public BundleActivator
 {
 public:
-
   TestBundleBActivator() {}
   ~TestBundleBActivator() {}
 
@@ -52,17 +50,12 @@ public:
     sr = context.RegisterService<TestBundleBService>(s);
   }
 
-  void Stop(BundleContext)
-  {
-    sr.Unregister();
-  }
+  void Stop(BundleContext) { sr.Unregister(); }
 
 private:
-
   std::shared_ptr<TestBundleB> s;
   ServiceRegistration<TestBundleBService> sr;
 };
-
 }
 
 CPPMICROSERVICES_IMPORT_BUNDLE(TestBundleImportedByB)

@@ -22,9 +22,9 @@
 
 #include "cppmicroservices/BundleActivator.h"
 
-#include "SettingsPlugin.h"
-#include "ServicesPlugin.h"
 #include "BundlesPlugin.h"
+#include "ServicesPlugin.h"
+#include "SettingsPlugin.h"
 
 #include "WebConsoleServlet.h"
 #include "cppmicroservices/BundleContext.h"
@@ -34,12 +34,10 @@ namespace cppmicroservices {
 class WebConsoleActivator : public BundleActivator
 {
 public:
-
   void Start(BundleContext context);
   void Stop(BundleContext context);
 
 private:
-
   std::shared_ptr<HttpServlet> m_WebConsoleServlet;
 
   std::shared_ptr<SettingsPlugin> m_SettingsPlugin;
@@ -63,16 +61,13 @@ void WebConsoleActivator::Start(BundleContext context)
   m_ServicesPlugin->Register();
   m_BundlesPlugin->Register();
 
-//  server->addHandler("/Console/bundles/", new BundlesHtml(context));
-//  server->addHandler("/Console/resources/", new ResourcesHtml(context));
-//  server->addHandler("/Console/", new ConsoleHtmlHandler(context));
-//  server->addHandler("/", new DefaultHandler(context));
+  //  server->addHandler("/Console/bundles/", new BundlesHtml(context));
+  //  server->addHandler("/Console/resources/", new ResourcesHtml(context));
+  //  server->addHandler("/Console/", new ConsoleHtmlHandler(context));
+  //  server->addHandler("/", new DefaultHandler(context));
 }
 
-void WebConsoleActivator::Stop(BundleContext /*context*/)
-{
-}
-
+void WebConsoleActivator::Stop(BundleContext /*context*/) {}
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::WebConsoleActivator)

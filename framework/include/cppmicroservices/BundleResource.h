@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_BUNDLERESOURCE_H
 #define CPPMICROSERVICES_BUNDLERESOURCE_H
 
@@ -67,7 +66,6 @@ class US_Framework_EXPORT BundleResource
 {
 
 public:
-
   /**
    * Creates in invalid %BundleResource object.
    *
@@ -291,16 +289,11 @@ public:
   time_t GetLastModified() const;
 
 private:
+  BundleResource(const std::string& file,
+                 const std::shared_ptr<const BundleArchive>& archive);
 
-  BundleResource(
-        const std::string& file,
-        const std::shared_ptr<const BundleArchive>& archive
-        );
-
-  BundleResource(
-        int index,
-        const std::shared_ptr<const BundleArchive>& archive
-        );
+  BundleResource(int index,
+                 const std::shared_ptr<const BundleArchive>& archive);
 
   friend struct BundleArchive;
   friend class BundleResourceContainer;
@@ -310,10 +303,9 @@ private:
 
   std::size_t Hash() const;
 
-  std::unique_ptr<void, void(*)(void*)> GetData() const;
+  std::unique_ptr<void, void (*)(void*)> GetData() const;
 
   BundleResourcePrivate* d;
-
 };
 
 /**
@@ -322,8 +314,8 @@ private:
  *
  * Streams the \c resource path into the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleResource& resource);
-
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const BundleResource& resource);
 }
 
 /**
@@ -336,7 +328,7 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleResou
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::BundleResource)
-  return arg.Hash();
+return arg.Hash();
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_BUNDLERESOURCE_H

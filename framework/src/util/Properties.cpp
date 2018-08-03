@@ -25,11 +25,11 @@
 #include <limits>
 #include <stdexcept>
 #ifdef US_PLATFORM_WINDOWS
-#include <string.h>
-#define ci_compare strnicmp
+#  include <string.h>
+#  define ci_compare strnicmp
 #else
-#include <strings.h>
-#define ci_compare strncasecmp
+#  include <strings.h>
+#  define ci_compare strncasecmp
 #endif
 
 namespace cppmicroservices {
@@ -38,18 +38,15 @@ const Any Properties::emptyAny;
 
 Properties::Properties(const AnyMap& p)
 {
-  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
-  {
+  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
     throw std::runtime_error("Properties contain too many keys");
   }
 
   keys.reserve(p.size());
   values.reserve(p.size());
 
-  for (auto& iter : p)
-  {
-    if (Find_unlocked(iter.first) > -1)
-    {
+  for (auto& iter : p) {
+    if (Find_unlocked(iter.first) > -1) {
       std::string msg("Properties contain case variants of the key: ");
       msg += iter.first;
       throw std::runtime_error(msg.c_str());
@@ -62,8 +59,7 @@ Properties::Properties(const AnyMap& p)
 Properties::Properties(Properties&& o)
   : keys(std::move(o.keys))
   , values(std::move(o.values))
-{
-}
+{}
 
 Properties& Properties::operator=(Properties&& o)
 {
@@ -75,8 +71,7 @@ Properties& Properties::operator=(Properties&& o)
 Any Properties::Value_unlocked(const std::string& key) const
 {
   int i = Find_unlocked(key);
-  if (i < 0)
-  {
+  if (i < 0) {
     return emptyAny;
   }
   return values[i];
@@ -84,8 +79,7 @@ Any Properties::Value_unlocked(const std::string& key) const
 
 Any Properties::Value_unlocked(int index) const
 {
-  if (index < 0 || static_cast<std::size_t>(index) >= values.size())
-  {
+  if (index < 0 || static_cast<std::size_t>(index) >= values.size()) {
     return emptyAny;
   }
   return values[static_cast<std::size_t>(index)];
@@ -93,11 +87,9 @@ Any Properties::Value_unlocked(int index) const
 
 int Properties::Find_unlocked(const std::string& key) const
 {
-  for (std::size_t i = 0; i < keys.size(); ++i)
-  {
+  for (std::size_t i = 0; i < keys.size(); ++i) {
     if (key.size() == keys[i].size() &&
-        ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0)
-    {
+        ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0) {
       return static_cast<int>(i);
     }
   }
@@ -106,10 +98,8 @@ int Properties::Find_unlocked(const std::string& key) const
 
 int Properties::FindCaseSensitive_unlocked(const std::string& key) const
 {
-  for (std::size_t i = 0; i < keys.size(); ++i)
-  {
-    if (key == keys[i])
-    {
+  for (std::size_t i = 0; i < keys.size(); ++i) {
+    if (key == keys[i]) {
       return static_cast<int>(i);
     }
   }
@@ -126,5 +116,4 @@ void Properties::Clear_unlocked()
   keys.clear();
   values.clear();
 }
-
 }

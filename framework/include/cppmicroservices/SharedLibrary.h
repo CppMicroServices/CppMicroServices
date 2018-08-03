@@ -29,8 +29,8 @@
 #include <string>
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
+#  pragma warning(push)
+#  pragma warning(disable : 4251)
 #endif
 
 namespace cppmicroservices {
@@ -45,7 +45,6 @@ class SharedLibraryPrivate;
 class US_Framework_EXPORT SharedLibrary
 {
 public:
-
   SharedLibrary();
   SharedLibrary(const SharedLibrary& other);
 
@@ -210,15 +209,12 @@ public:
   bool IsLoaded() const;
 
 private:
-
   ExplicitlySharedDataPointer<SharedLibraryPrivate> d;
-
 };
-
 }
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+#  pragma warning(pop)
 #endif
 
 #endif // CPPMICROSERVICES_SHAREDLIBRARY_H

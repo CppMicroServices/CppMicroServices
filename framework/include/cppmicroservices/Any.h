@@ -56,13 +56,16 @@ namespace cppmicroservices {
 
 class Any;
 
-US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const Any& any);
+US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
+                                                      const Any& any);
 
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const Any& val);
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const std::string& val);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    const Any& val);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    const std::string& val);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val);
 
-template <typename ValueType>
+template<typename ValueType>
 ValueType* any_cast(Any* operand);
 
 template<class T>
@@ -86,14 +89,10 @@ std::ostream& container_to_string(std::ostream& os, Iterator i1, Iterator i2)
 {
   os << "[";
   const Iterator begin = i1;
-  for ( ; i1 != i2; ++i1)
-  {
-    if (i1 == begin)
-    {
+  for (; i1 != i2; ++i1) {
+    if (i1 == begin) {
       any_value_to_string(os, *i1);
-    }
-    else
-    {
+    } else {
       os << ",";
       any_value_to_string(os, *i1);
     }
@@ -110,14 +109,10 @@ std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2)
 {
   os << "[";
   const Iterator begin = i1;
-  for ( ; i1 != i2; ++i1)
-  {
-    if (i1 == begin)
-    {
+  for (; i1 != i2; ++i1) {
+    if (i1 == begin) {
       any_value_to_json(os, *i1);
-    }
-    else
-    {
+    } else {
       os << ",";
       any_value_to_json(os, *i1);
     }
@@ -174,7 +169,6 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<M, Any>& m);
 template<class K, class V>
 std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
 
-
 /**
  * \ingroup gr_any
  *
@@ -186,12 +180,10 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
 class US_Framework_EXPORT Any
 {
 public:
-
   /**
    * Creates an empty any type.
    */
-  Any()
-  {}
+  Any() {}
 
   /**
    * Creates an Any which stores the init parameter inside.
@@ -204,7 +196,7 @@ public:
    * Any a(string("12345"));
    * \endcode
    */
-  template <typename ValueType>
+  template<typename ValueType>
   Any(const ValueType& value)
     : _content(new Holder<ValueType>(value))
   {}
@@ -246,10 +238,11 @@ public:
    * \param val The value to compare to.
    * \returns \c true if this Any contains value \c val, \c false otherwise.
    */
-  template <typename ValueType>
+  template<typename ValueType>
   bool operator==(const ValueType& val) const
   {
-    if (Type() != typeid(ValueType)) return false;
+    if (Type() != typeid(ValueType))
+      return false;
     return *any_cast<const ValueType>(this) == val;
   }
 
@@ -264,7 +257,7 @@ public:
    * \param val The value to compare to.
    * \returns \c true if this Any does not contain value \c val, \c false otherwise.
    */
-  template <typename ValueType>
+  template<typename ValueType>
   bool operator!=(const ValueType& val) const
   {
     return !operator==(val);
@@ -281,8 +274,8 @@ public:
    * Any a = string("12345");
    * \endcode
    */
-  template <typename ValueType>
-  Any& operator = (const ValueType& rhs)
+  template<typename ValueType>
+  Any& operator=(const ValueType& rhs)
   {
     Any(rhs).Swap(*this);
     return *this;
@@ -293,7 +286,7 @@ public:
    *
    * \param rhs The Any which should be assigned to this Any.
    */
-  Any& operator = (const Any& rhs)
+  Any& operator=(const Any& rhs)
   {
     Any(rhs).Swap(*this);
     return *this;
@@ -314,10 +307,7 @@ public:
   /**
    * returns true if the Any is empty
    */
-  bool Empty() const
-  {
-    return !_content;
-  }
+  bool Empty() const { return !_content; }
 
   /**
    * Returns a string representation for the content if it is not empty.
@@ -343,10 +333,7 @@ public:
    *
    * Custom types should specialize the any_value_to_json template function for meaningful output.
    */
-  std::string ToJSON() const
-  {
-    return Empty() ? "null" : _content->ToJSON();
-  }
+  std::string ToJSON() const { return Empty() ? "null" : _content->ToJSON(); }
 
   /**
    * Returns the type information of the stored content.
@@ -360,12 +347,10 @@ public:
   }
 
 private:
-
   class Placeholder
   {
   public:
-    virtual ~Placeholder()
-    { }
+    virtual ~Placeholder() {}
 
     virtual std::string ToString() const = 0;
     virtual std::string ToJSON() const = 0;
@@ -374,13 +359,13 @@ private:
     virtual std::unique_ptr<Placeholder> Clone() const = 0;
   };
 
-  template <typename ValueType>
-  class Holder: public Placeholder
+  template<typename ValueType>
+  class Holder : public Placeholder
   {
   public:
     Holder(const ValueType& value)
       : _held(value)
-    { }
+    {}
 
     virtual std::string ToString() const
     {
@@ -396,10 +381,7 @@ private:
       return ss.str();
     }
 
-    virtual const std::type_info& Type() const
-    {
-      return typeid(ValueType);
-    }
+    virtual const std::type_info& Type() const { return typeid(ValueType); }
 
     virtual std::unique_ptr<Placeholder> Clone() const
     {
@@ -409,17 +391,17 @@ private:
     ValueType _held;
 
   private: // intentionally left unimplemented
-    Holder& operator=(const Holder &);
+    Holder& operator=(const Holder&);
   };
 
 private:
-    template <typename ValueType>
-    friend ValueType* any_cast(Any*);
+  template<typename ValueType>
+  friend ValueType* any_cast(Any*);
 
-    template <typename ValueType>
-    friend ValueType* unsafe_any_cast(Any*);
+  template<typename ValueType>
+  friend ValueType* unsafe_any_cast(Any*);
 
-    std::unique_ptr<Placeholder> _content;
+  std::unique_ptr<Placeholder> _content;
 };
 
 /**
@@ -431,14 +413,14 @@ private:
 class BadAnyCastException : public std::bad_cast
 {
 public:
-
   BadAnyCastException(const std::string& msg = "")
-    : std::bad_cast(), _msg(msg)
+    : std::bad_cast()
+    , _msg(msg)
   {}
 
   ~BadAnyCastException() throw() {}
 
-  virtual const char * what() const throw()
+  virtual const char* what() const throw()
   {
     if (_msg.empty())
       return "cppmicroservices::BadAnyCastException: "
@@ -448,13 +430,10 @@ public:
   }
 
 private:
-
   std::string _msg;
 };
 
-
-namespace detail
-{
+namespace detail {
 /**
  *
  * A utility function used to throw a BadAnyCastException object
@@ -464,8 +443,9 @@ namespace detail
  * \param anyTypeName A string representing the Any object's underlying type.
  * \throws cppmicroservices::BadAnyCastException
  */
-US_Framework_EXPORT void ThrowBadAnyCastException(const std::string& funcName, const std::type_info& source, const std::type_info& target);
-
+US_Framework_EXPORT void ThrowBadAnyCastException(const std::string& funcName,
+                                                  const std::type_info& source,
+                                                  const std::type_info& target);
 }
 
 /**
@@ -480,12 +460,13 @@ US_Framework_EXPORT void ThrowBadAnyCastException(const std::string& funcName, c
  * \endcode
  * Will return nullptr if the cast fails, i.e. types don't match.
  */
-template <typename ValueType>
+template<typename ValueType>
 ValueType* any_cast(Any* operand)
 {
   return operand && operand->Type() == typeid(ValueType)
-      ? &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held
-      : nullptr;
+           ? &static_cast<Any::Holder<ValueType>*>(operand->_content.get())
+                ->_held
+           : nullptr;
 }
 
 /**
@@ -500,7 +481,7 @@ ValueType* any_cast(Any* operand)
  * \endcode
  * Will return nullptr if the cast fails, i.e. types don't match.
  */
-template <typename ValueType>
+template<typename ValueType>
 const ValueType* any_cast(const Any* operand)
 {
   return any_cast<ValueType>(const_cast<Any*>(operand));
@@ -522,13 +503,13 @@ const ValueType* any_cast(const Any* operand)
  * Some compilers will accept this code although a copy is returned. Use the ref_any_cast in
  * these cases.
  */
-template <typename ValueType>
+template<typename ValueType>
 ValueType any_cast(const Any& operand)
 {
   ValueType* result = any_cast<ValueType>(const_cast<Any*>(&operand));
-  if (!result)
-  {
-    detail::ThrowBadAnyCastException(std::string("any_cast"), operand.Type(), typeid(ValueType));
+  if (!result) {
+    detail::ThrowBadAnyCastException(
+      std::string("any_cast"), operand.Type(), typeid(ValueType));
   }
   return *result;
 }
@@ -549,13 +530,13 @@ ValueType any_cast(const Any& operand)
  * Some compilers will accept this code although a copy is returned. Use the ref_any_cast in
  * these cases.
  */
-template <typename ValueType>
+template<typename ValueType>
 ValueType any_cast(Any& operand)
 {
   ValueType* result = any_cast<ValueType>(&operand);
-  if (!result)
-  {
-    detail::ThrowBadAnyCastException(std::string("any_cast"), operand.Type(), typeid(ValueType));
+  if (!result) {
+    detail::ThrowBadAnyCastException(
+      std::string("any_cast"), operand.Type(), typeid(ValueType));
   }
   return *result;
 }
@@ -572,13 +553,13 @@ ValueType any_cast(Any& operand)
  *
  * \throws BadAnyCastException if the cast fails.
  */
-template <typename ValueType>
-const ValueType& ref_any_cast(const Any & operand)
+template<typename ValueType>
+const ValueType& ref_any_cast(const Any& operand)
 {
   ValueType* result = any_cast<ValueType>(const_cast<Any*>(&operand));
-  if (!result)
-  {
-    detail::ThrowBadAnyCastException(std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
+  if (!result) {
+    detail::ThrowBadAnyCastException(
+      std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
   }
   return *result;
 }
@@ -595,13 +576,13 @@ const ValueType& ref_any_cast(const Any & operand)
  *
  * \throws BadAnyCastException if the cast fails.
  */
-template <typename ValueType>
+template<typename ValueType>
 ValueType& ref_any_cast(Any& operand)
 {
   ValueType* result = any_cast<ValueType>(&operand);
-  if (!result)
-  {
-    detail::ThrowBadAnyCastException(std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
+  if (!result) {
+    detail::ThrowBadAnyCastException(
+      std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
   }
   return *result;
 }
@@ -615,7 +596,7 @@ ValueType& ref_any_cast(Any& operand)
  * use typeid() comparison, e.g., when our types may travel across
  * different shared libraries.
  */
-template <typename ValueType>
+template<typename ValueType>
 ValueType* unsafe_any_cast(Any* operand)
 {
   return &static_cast<Any::Holder<ValueType>*>(operand->_content.get())->_held;
@@ -630,12 +611,11 @@ ValueType* unsafe_any_cast(Any* operand)
  * use typeid() comparison, e.g., when our types may travel across
  * different shared libraries.
  */
-template <typename ValueType>
+template<typename ValueType>
 const ValueType* unsafe_any_cast(const Any* operand)
 {
   return any_cast<ValueType>(const_cast<Any*>(operand));
 }
-
 
 template<class K>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, Any>& m)
@@ -645,10 +625,11 @@ std::ostream& any_value_to_string(std::ostream& os, const std::map<K, Any>& m)
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
-  for ( ; i1 != end; ++i1)
-  {
-    if (i1 == begin) os << i1->first << " : " << i1->second.ToString();
-    else os << ", " << i1->first << " : " << i1->second.ToString();
+  for (; i1 != end; ++i1) {
+    if (i1 == begin)
+      os << i1->first << " : " << i1->second.ToString();
+    else
+      os << ", " << i1->first << " : " << i1->second.ToString();
   }
   os << "}";
   return os;
@@ -662,10 +643,11 @@ std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m)
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
-  for ( ; i1 != end; ++i1)
-  {
-    if (i1 == begin) os << i1->first << " : " << i1->second;
-    else os << ", " << i1->first << " : " << i1->second;
+  for (; i1 != end; ++i1) {
+    if (i1 == begin)
+      os << i1->first << " : " << i1->second;
+    else
+      os << ", " << i1->first << " : " << i1->second;
   }
   os << "}";
   return os;
@@ -679,10 +661,12 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m)
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
-  for ( ; i1 != end; ++i1)
-  {
-    if (i1 == begin) os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
-    else os << ", " << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+  for (; i1 != end; ++i1) {
+    if (i1 == begin)
+      os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    else
+      os << ", "
+         << "\"" << i1->first << "\" : " << i1->second.ToJSON();
   }
   os << "}";
   return os;
@@ -696,15 +680,16 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
-  for ( ; i1 != end; ++i1)
-  {
-    if (i1 == begin) os << "\"" << i1->first << "\" : " << i1->second;
-    else os << ", " << "\"" << i1->first << "\" : " << i1->second;
+  for (; i1 != end; ++i1) {
+    if (i1 == begin)
+      os << "\"" << i1->first << "\" : " << i1->second;
+    else
+      os << ", "
+         << "\"" << i1->first << "\" : " << i1->second;
   }
   os << "}";
   return os;
 }
-
 }
 
 #endif // CPPMICROSERVICES_ANY_H

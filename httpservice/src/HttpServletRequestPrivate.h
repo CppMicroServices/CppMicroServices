@@ -25,9 +25,9 @@
 
 #include "cppmicroservices/SharedData.h"
 
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 
 class CivetServer;
 struct mg_connection;
@@ -39,7 +39,10 @@ class ServletContext;
 
 struct HttpServletRequestPrivate : public SharedData
 {
-  HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext, CivetServer* server, mg_connection* conn);
+  HttpServletRequestPrivate(
+    const std::shared_ptr<ServletContext>& servletContext,
+    CivetServer* server,
+    mg_connection* conn);
 
   const std::shared_ptr<ServletContext> m_ServletContext;
   CivetServer* const m_Server;
@@ -58,7 +61,6 @@ struct HttpServletRequestPrivate : public SharedData
   typedef std::map<std::string, Any> AttributeMapType;
   AttributeMapType m_Attributes;
 };
-
 }
 
 #endif // CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H

@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 /**
 
 \defgroup MicroServices Micro Services Classes
@@ -80,7 +79,6 @@ class FrameworkPrivate;
 class CoreBundleContext
 {
 public:
-
   /**
    * Framework id.
    */
@@ -103,7 +101,7 @@ public:
 
   const std::string& workingDir;
 
- /**
+  /**
   * The diagnostic logging sink
   * For internal Framework use only. Do not expose
   * to Framework clients.
@@ -198,7 +196,6 @@ public:
   std::string GetDataStorage(long id) const;
 
 private:
-
   // The core context is exclusively constructed by the FrameworkFactory class
   friend class FrameworkFactory;
 
@@ -206,12 +203,14 @@ private:
    * Construct a core context
    *
    */
-  CoreBundleContext(const std::unordered_map<std::string, Any>& props, std::ostream* logger);
+  CoreBundleContext(const std::unordered_map<std::string, Any>& props,
+                    std::ostream* logger);
 
-  struct : detail::MultiThreaded<> { std::weak_ptr<CoreBundleContext> v; } self;
-
+  struct : detail::MultiThreaded<>
+  {
+    std::weak_ptr<CoreBundleContext> v;
+  } self;
 };
-
 }
 
 #endif // CPPMICROSERVICES_COREBUNDLECONTEXT_H

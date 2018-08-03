@@ -6,9 +6,9 @@
 #include <string>
 
 #ifdef MODULE_EXPORTS
-  #define MODULE_EXPORT US_ABI_EXPORT
+#  define MODULE_EXPORT US_ABI_EXPORT
 #else
-  #define MODULE_EXPORT US_ABI_IMPORT
+#  define MODULE_EXPORT US_ABI_IMPORT
 #endif
 
 /**

@@ -22,5 +22,4 @@
 
 #include "ISpellCheckService.h"
 
-ISpellCheckService::~ISpellCheckService()
-{}
+ISpellCheckService::~ISpellCheckService() {}

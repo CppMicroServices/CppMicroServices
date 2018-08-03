@@ -33,15 +33,13 @@ public:
   SettingsPlugin();
 
 private:
-
-  void RenderContent(HttpServletRequest& /*request*/, HttpServletResponse& response);
+  void RenderContent(HttpServletRequest& /*request*/,
+                     HttpServletResponse& response);
 
   // WORKAROUND Remove this overload after the HttpService supports
   // registering resources
   BundleResource GetResource(const std::string& path) const;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_SETTINGSPLUGIN_H

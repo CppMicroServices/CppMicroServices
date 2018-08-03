@@ -30,22 +30,17 @@ namespace cppmicroservices {
 class ShellActivator : public BundleActivator
 {
 public:
-
   void Start(BundleContext context)
   {
     m_ShellService.reset(new ShellService());
     context.RegisterService<ShellService>(m_ShellService);
   }
 
-  void Stop(BundleContext)
-  {
-
-  }
+  void Stop(BundleContext) {}
 
 private:
   std::shared_ptr<ShellService> m_ShellService;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ShellActivator)

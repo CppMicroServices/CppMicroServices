@@ -29,9 +29,7 @@
 
 namespace cppmicroservices {
 
-ServiceListenerHook::~ServiceListenerHook()
-{
-}
+ServiceListenerHook::~ServiceListenerHook() {}
 
 ServiceListenerHook::ListenerInfoData::ListenerInfoData(
   const std::shared_ptr<BundleContextPrivate>& context,
@@ -45,33 +43,26 @@ ServiceListenerHook::ListenerInfoData::ListenerInfoData(
   , tokenId(tokenId)
   , filter(filter)
   , bRemoved(false)
-{
-}
+{}
 
-ServiceListenerHook::ListenerInfoData::~ListenerInfoData()
-{
-}
+ServiceListenerHook::ListenerInfoData::~ListenerInfoData() {}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data)
   : d(data)
-{
-}
+{}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo()
   : d(nullptr)
-{
-}
+{}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo& other)
   : d(other.d)
-{
-}
+{}
 
-ServiceListenerHook::ListenerInfo::~ListenerInfo()
-{
-}
+ServiceListenerHook::ListenerInfo::~ListenerInfo() {}
 
-ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(const ListenerInfo& other)
+ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(
+  const ListenerInfo& other)
 {
   d = other.d;
   return *this;
@@ -97,9 +88,9 @@ bool ServiceListenerHook::ListenerInfo::IsRemoved() const
   return d->bRemoved;
 }
 
-bool ServiceListenerHook::ListenerInfo::operator==(const ListenerInfo& other) const
+bool ServiceListenerHook::ListenerInfo::operator==(
+  const ListenerInfo& other) const
 {
   return d == other.d;
 }
-
 }

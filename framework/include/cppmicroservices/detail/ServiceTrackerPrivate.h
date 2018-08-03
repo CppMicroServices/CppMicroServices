@@ -40,22 +40,23 @@ class ServiceTrackerPrivate : MultiThreaded<>
 {
 
 public:
-
   typedef typename TTT::TrackedType T;
   typedef typename TTT::TrackedParmType TrackedParmType;
 
-  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
+  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                         const BundleContext& context,
                         const ServiceReference<S>& reference,
-                        ServiceTrackerCustomizer<S,T>* customizer);
+                        ServiceTrackerCustomizer<S, T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
-                        const BundleContext& context, const std::string& clazz,
-                        ServiceTrackerCustomizer<S,T>* customizer);
+  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+                        const BundleContext& context,
+                        const std::string& clazz,
+                        ServiceTrackerCustomizer<S, T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S,T>* st,
-                        const BundleContext& context, const LDAPFilter& filter,
-                        ServiceTrackerCustomizer<S,T>* customizer);
+  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+                        const BundleContext& context,
+                        const LDAPFilter& filter,
+                        ServiceTrackerCustomizer<S, T>* customizer);
 
   ~ServiceTrackerPrivate();
 
@@ -71,10 +72,12 @@ public:
    * @throws std::invalid_argument If the specified filterString has an
    *         invalid syntax.
    */
-  std::vector<ServiceReference<S> > GetInitialReferences(const std::string& className,
-                                                         const std::string& filterString);
+  std::vector<ServiceReference<S>> GetInitialReferences(
+    const std::string& className,
+    const std::string& filterString);
 
-  void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs, TrackedService<S,TTT>* t) const;
+  void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs,
+                                     TrackedService<S, TTT>* t) const;
 
   /**
    * The Bundle Context used by this <code>ServiceTracker</code>.
@@ -90,7 +93,7 @@ public:
   /**
    * The <code>ServiceTrackerCustomizer</code> for this tracker.
    */
-  ServiceTrackerCustomizer<S,T>* customizer;
+  ServiceTrackerCustomizer<S, T>* customizer;
 
   /**
    * Filter string for use when adding the ServiceListener. If this field is
@@ -121,7 +124,7 @@ public:
    * Tracked services: <code>ServiceReference</code> -> customized Object and
    * <code>ServiceListenerEntry</code> object
    */
-  Atomic<std::shared_ptr<TrackedService<S,TTT>>> trackedService;
+  Atomic<std::shared_ptr<TrackedService<S, TTT>>> trackedService;
 
   /**
    * Accessor method for the current TrackedService object. This method is only
@@ -130,7 +133,7 @@ public:
    *
    * @return The current Tracked object.
    */
-  std::shared_ptr<TrackedService<S,TTT>> Tracked() const;
+  std::shared_ptr<TrackedService<S, TTT>> Tracked() const;
 
   /**
    * Called by the TrackedService object whenever the set of tracked services is
@@ -153,23 +156,20 @@ public:
    */
   mutable Atomic<std::shared_ptr<TrackedParmType>> cachedService;
 
-
 private:
-
-  inline ServiceTracker<S,T>* q_func()
+  inline ServiceTracker<S, T>* q_func()
   {
-    return static_cast<ServiceTracker<S,T> *>(q_ptr);
+    return static_cast<ServiceTracker<S, T>*>(q_ptr);
   }
 
-  inline const ServiceTracker<S,T>* q_func() const
+  inline const ServiceTracker<S, T>* q_func() const
   {
-    return static_cast<const ServiceTracker<S,T> *>(q_ptr);
+    return static_cast<const ServiceTracker<S, T>*>(q_ptr);
   }
 
-  friend class ServiceTracker<S,T>;
+  friend class ServiceTracker<S, T>;
 
-  ServiceTracker<S,T> * const q_ptr;
-
+  ServiceTracker<S, T>* const q_ptr;
 };
 
 } // namespace detail

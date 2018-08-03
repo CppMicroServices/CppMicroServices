@@ -34,51 +34,43 @@
 
 namespace cppmicroservices {
 
-class TestBundleS : public ServiceControlInterface,
-                    public TestBundleSService0,
-                    public TestBundleSService1,
-                    public TestBundleSService2,
-                    public TestBundleSService3,
-                    public std::enable_shared_from_this<TestBundleS>
+class TestBundleS
+  : public ServiceControlInterface
+  , public TestBundleSService0
+  , public TestBundleSService1
+  , public TestBundleSService2
+  , public TestBundleSService3
+  , public std::enable_shared_from_this<TestBundleS>
 {
 
 public:
-
   TestBundleS(const BundleContext& context)
     : context(context)
   {
-    for(int i = 0; i <= 3; ++i)
-    {
+    for (int i = 0; i <= 3; ++i) {
       servregs.push_back(ServiceRegistrationU());
     }
   }
 
-  virtual const char* GetNameOfClass() const
-  {
-    return "TestBundleS";
-  }
+  virtual const char* GetNameOfClass() const { return "TestBundleS"; }
 
   void ServiceControl(int offset, const std::string& operation, int ranking)
   {
-    if (0 <= offset && offset <= 3)
-    {
-      if (operation == "register")
-      {
-        if (!servregs[offset])
-        {
+    if (0 <= offset && offset <= 3) {
+      if (operation == "register") {
+        if (!servregs[offset]) {
           std::stringstream servicename;
           servicename << SERVICE << offset;
           InterfaceMapPtr ifm = std::make_shared<InterfaceMap>();
           ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
           ServiceProperties props;
-          props.insert(std::make_pair(Constants::SERVICE_RANKING, Any(ranking)));
+          props.insert(
+            std::make_pair(Constants::SERVICE_RANKING, Any(ranking)));
           servregs[offset] = context.RegisterService(ifm, props);
         }
       }
-      if (operation == "unregister")
-      {
-        if (servregs[offset])
-        {
+      if (operation == "unregister") {
+        if (servregs[offset]) {
           ServiceRegistrationU sr1 = servregs[offset];
           sr1.Unregister();
           servregs[offset] = nullptr;
@@ -88,7 +80,6 @@ public:
   }
 
 private:
-
   static const std::string SERVICE; // = "cppmicroservices::TestBundleSService"
 
   BundleContext context;
@@ -101,7 +92,6 @@ class TestBundleSActivator : public BundleActivator
 {
 
 public:
-
   TestBundleSActivator() {}
   ~TestBundleSActivator() {}
 
@@ -114,23 +104,19 @@ public:
 
   void Stop(BundleContext /*context*/)
   {
-    if(sreg)
-    {
+    if (sreg) {
       sreg.Unregister();
     }
-    if(sciReg)
-    {
+    if (sciReg) {
       sciReg.Unregister();
     }
   }
 
 private:
-
   std::shared_ptr<TestBundleS> s;
   ServiceRegistration<TestBundleSService0> sreg;
   ServiceRegistration<ServiceControlInterface> sciReg;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleSActivator)

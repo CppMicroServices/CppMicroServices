@@ -26,11 +26,11 @@
 
 namespace cppmicroservices {
 
-InvalidObjFileException::InvalidObjFileException(const std::string& what, int errorNumber)
+InvalidObjFileException::InvalidObjFileException(const std::string& what,
+                                                 int errorNumber)
   : m_What(what)
 {
-  if (errorNumber)
-  {
+  if (errorNumber) {
     m_What += std::string(": ") + strerror(errorNumber);
   }
 }
@@ -44,12 +44,10 @@ bool BundleObjFile::ExtractBundleName(const std::string& name, std::string& out)
 {
   static const std::string bundleSignature = "_us_import_bundle_initializer_";
   if (name.size() > bundleSignature.size() &&
-      name.compare(0, bundleSignature.size(), bundleSignature) == 0)
-  {
+      name.compare(0, bundleSignature.size(), bundleSignature) == 0) {
     out = name.substr(bundleSignature.size());
     return true;
   }
   return false;
 }
-
 }

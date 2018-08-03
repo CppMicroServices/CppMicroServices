@@ -25,7 +25,8 @@
 
 #include "cppmicroservices/ServiceReference.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+US_MSVC_PUSH_DISABLE_WARNING(
+  4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
 namespace cppmicroservices {
 
@@ -36,7 +37,6 @@ class ServiceEventData;
 
 \brief Groups ServiceEvent class related symbols.
 */
-
 
 /**
  * \ingroup MicroServices
@@ -55,11 +55,11 @@ class US_Framework_EXPORT ServiceEvent
   std::shared_ptr<ServiceEventData> d;
 
 public:
-
   /**
    * The service event type.
    */
-  enum Type : uint32_t {
+  enum Type : uint32_t
+  {
 
     /**
      * This service has been registered.
@@ -169,7 +169,6 @@ public:
    * @return Type of service lifecycle change.
    */
   Type GetType() const;
-
 };
 
 /**
@@ -178,7 +177,8 @@ public:
  *
  * Writes a string representation of \c type to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const ServiceEvent::Type& type);
 
 /**
  * \ingroup MicroServices
@@ -186,8 +186,8 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEven
  *
  * Writes a string representation of \c event to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& event);
-
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const ServiceEvent& event);
 }
 
 US_MSVC_POP_WARNING

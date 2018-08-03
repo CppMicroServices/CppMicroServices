@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICEREGISTRATIONBASEPRIVATE_H
 #define CPPMICROSERVICES_SERVICEREGISTRATIONBASEPRIVATE_H
 
@@ -44,7 +43,6 @@ class ServiceRegistrationBasePrivate : public detail::MultiThreaded<>
 {
 
 protected:
-
   friend class ServiceRegistrationBase;
 
   // The ServiceReferenceBasePrivate class holds a pointer to a
@@ -65,13 +63,16 @@ protected:
   InterfaceMapConstPtr service;
 
 public:
-
   typedef std::unordered_map<BundlePrivate*, int> BundleToRefsMap;
-  typedef std::unordered_map<BundlePrivate*, InterfaceMapConstPtr> BundleToServiceMap;
-  typedef std::unordered_map<BundlePrivate*, std::list<InterfaceMapConstPtr> > BundleToServicesMap;
+  typedef std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>
+    BundleToServiceMap;
+  typedef std::unordered_map<BundlePrivate*, std::list<InterfaceMapConstPtr>>
+    BundleToServicesMap;
 
-  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
-  ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
+  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) =
+    delete;
+  ServiceRegistrationBasePrivate& operator=(
+    const ServiceRegistrationBasePrivate&) = delete;
 
   /**
    * Bundles dependent on this service. Integer is used as
@@ -117,8 +118,8 @@ public:
    */
   std::atomic<bool> unregistering;
 
-
-  ServiceRegistrationBasePrivate(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
+  ServiceRegistrationBasePrivate(BundlePrivate* bundle,
+                                 const InterfaceMapConstPtr& service,
                                  Properties&& props);
 
   ~ServiceRegistrationBasePrivate();
@@ -135,11 +136,9 @@ public:
 
   std::shared_ptr<void> GetService(const std::string& interfaceId) const;
 
-  std::shared_ptr<void> GetService_unlocked(const std::string& interfaceId) const;
-
+  std::shared_ptr<void> GetService_unlocked(
+    const std::string& interfaceId) const;
 };
-
 }
-
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATIONBASEPRIVATE_H

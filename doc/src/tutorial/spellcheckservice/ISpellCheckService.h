@@ -30,13 +30,13 @@
 #include <vector>
 
 #ifdef US_BUILD_SHARED_LIBS
-#ifdef Tutorial_spellcheckservice_EXPORTS
-  #define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
+#  ifdef Tutorial_spellcheckservice_EXPORTS
+#    define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
+#  else
+#    define SPELLCHECKSERVICE_EXPORT US_ABI_IMPORT
+#  endif
 #else
-  #define SPELLCHECKSERVICE_EXPORT US_ABI_IMPORT
-#endif
-#else
-  #define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
+#  define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**

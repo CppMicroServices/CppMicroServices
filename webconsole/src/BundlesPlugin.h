@@ -33,7 +33,6 @@ public:
   BundlesPlugin();
 
 private:
-
   enum class RequestType : int
   {
     Unknown = 0,
@@ -42,21 +41,25 @@ private:
     Resource
   };
 
-  void RenderContent(HttpServletRequest& request, HttpServletResponse& response);
+  void RenderContent(HttpServletRequest& request,
+                     HttpServletResponse& response);
 
   bool IsHtmlRequest(HttpServletRequest& request);
 
   TemplateData GetBundlesData() const;
 
-  void GetBundleData(long id, TemplateData& data, const std::string& pluginRoot) const;
+  void GetBundleData(long id,
+                     TemplateData& data,
+                     const std::string& pluginRoot) const;
 
-  std::pair<std::size_t, std::size_t>
-  GetResourceJsonTree(Bundle& bundle, const std::string& parentPath,
-                      const BundleResource& currResource, std::string& json,
-                      int level, const std::string& pluginRoot) const;
-
+  std::pair<std::size_t, std::size_t> GetResourceJsonTree(
+    Bundle& bundle,
+    const std::string& parentPath,
+    const BundleResource& currResource,
+    std::string& json,
+    int level,
+    const std::string& pluginRoot) const;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLESPLUGIN_H

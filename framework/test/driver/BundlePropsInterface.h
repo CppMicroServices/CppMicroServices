@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H
 #define CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H
 
@@ -37,7 +36,6 @@ struct BundlePropsInterface
 
   virtual const Properties& GetProperties() const = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H

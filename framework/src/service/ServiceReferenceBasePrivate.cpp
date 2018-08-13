@@ -270,11 +270,9 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
   if (!sf)
     return false;
 
-  for (auto imIter = prototypeServiceMaps.begin();
-       imIter != prototypeServiceMaps.end();
-       ++imIter) {
+  for (auto & prototypeServiceMap : prototypeServiceMaps) {
     // compare the contents of the map
-    if (*service.get() == *imIter->get()) {
+    if (*service.get() == *prototypeServiceMap.get()) {
       try {
         sf->UngetService(
           MakeBundle(bundle), ServiceRegistrationBase(registration), service);

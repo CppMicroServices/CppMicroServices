@@ -23,19 +23,20 @@
 #include "BundleObjFile.h"
 
 #include <cstring>
+#include <utility>
 
 namespace cppmicroservices {
 
-InvalidObjFileException::InvalidObjFileException(const std::string& what,
+InvalidObjFileException::InvalidObjFileException(std::string  what,
                                                  int errorNumber)
-  : m_What(what)
+  : m_What(std::move(what))
 {
   if (errorNumber) {
     m_What += std::string(": ") + strerror(errorNumber);
   }
 }
 
-const char* InvalidObjFileException::what() const throw()
+const char* InvalidObjFileException::what() const noexcept
 {
   return m_What.c_str();
 }

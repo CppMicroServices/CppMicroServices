@@ -40,18 +40,20 @@
 #include "civetweb/CivetServer.h"
 
 #include <cassert>
+#include <utility>
+#include <memory>
 
 namespace cppmicroservices {
 
-typedef std::unique_lock<std::mutex> Lock;
+using Lock = std::unique_lock<std::mutex>;
 
 class ServletHandler : public CivetHandler
 {
 public:
-  ServletHandler(const std::shared_ptr<HttpServlet>& servlet,
-                 const std::string& servletPath)
-    : m_Servlet(servlet)
-    , m_ServletPath(servletPath)
+  ServletHandler(std::shared_ptr<HttpServlet>  servlet,
+                 std::string  servletPath)
+    : m_Servlet(std::move(servlet))
+    , m_ServletPath(std::move(servletPath))
   {}
 
   std::shared_ptr<ServletContext> GetServletContext() const
@@ -62,7 +64,7 @@ public:
   std::shared_ptr<HttpServlet> GetServlet() const { return m_Servlet; }
 
 private:
-  virtual bool handleGet(CivetServer* server, mg_connection* conn)
+  bool handleGet(CivetServer* server, mg_connection* conn) override
   {
     auto mg_req_info = mg_get_request_info(conn);
     if (mg_req_info->local_uri == nullptr) {
@@ -140,7 +142,7 @@ void ServletContainerPrivate::Start()
     if (m_Server)
       return;
 
-    m_Server.reset(new CivetServer(nullptr));
+    m_Server = std::make_unique<CivetServer>(nullptr);
     const mg_context* serverContext = m_Server->getContext();
     if (serverContext == nullptr) {
       std::cout << "Servlet Container could not be started." << std::endl;

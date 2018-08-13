@@ -26,23 +26,24 @@
 
 #include <cassert>
 #include <functional>
+#include <utility>
 
 namespace cppmicroservices {
 
 VariableResolverStreamBuffer::VariableResolverStreamBuffer(
   std::unique_ptr<std::ostream> out,
-  const std::shared_ptr<WebConsoleVariableResolver>& variables)
+  std::shared_ptr<WebConsoleVariableResolver>  variables)
   : m_State(State::NIL)
   , m_Out(std::move(out))
-  , m_Variables(variables)
+  , m_Variables(std::move(variables))
 {
   if (!m_Variables) {
     m_Variables = std::make_shared<WebConsoleDefaultVariableResolver>();
   }
-  setp(0, 0);
+  setp(nullptr, nullptr);
 }
 
-VariableResolverStreamBuffer::~VariableResolverStreamBuffer() {}
+VariableResolverStreamBuffer::~VariableResolverStreamBuffer() = default;
 
 std::streambuf::int_type VariableResolverStreamBuffer::overflow(int_type ch)
 {

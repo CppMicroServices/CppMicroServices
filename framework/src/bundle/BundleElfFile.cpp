@@ -46,15 +46,15 @@ struct Elf;
 template<>
 struct Elf<ELFCLASS32>
 {
-  typedef Elf32_Ehdr Ehdr;
-  typedef Elf32_Shdr Shdr;
-  typedef Elf32_Dyn Dyn;
-  typedef Elf32_Addr Addr;
-  typedef Elf32_Sym Sym;
+  using Ehdr = Elf32_Ehdr;
+  using Shdr = Elf32_Shdr;
+  using Dyn = Elf32_Dyn;
+  using Addr = Elf32_Addr;
+  using Sym = Elf32_Sym;
 
-  typedef Elf32_Half Half;
-  typedef Elf32_Word Word;
-  typedef Elf32_Off Off;
+  using Half = Elf32_Half;
+  using Word = Elf32_Word;
+  using Off = Elf32_Off;
 
   static unsigned char GetSymbolEntryType(unsigned char info)
   {
@@ -65,15 +65,15 @@ struct Elf<ELFCLASS32>
 template<>
 struct Elf<ELFCLASS64>
 {
-  typedef Elf64_Ehdr Ehdr;
-  typedef Elf64_Shdr Shdr;
-  typedef Elf64_Dyn Dyn;
-  typedef Elf64_Addr Addr;
-  typedef Elf64_Sym Sym;
+  using Ehdr = Elf64_Ehdr;
+  using Shdr = Elf64_Shdr;
+  using Dyn = Elf64_Dyn;
+  using Addr = Elf64_Addr;
+  using Sym = Elf64_Sym;
 
-  typedef Elf64_Half Half;
-  typedef Elf64_Word Word;
-  typedef Elf64_Off Off;
+  using Half = Elf64_Half;
+  using Word = Elf64_Word;
+  using Off = Elf64_Off;
 
   static unsigned char GetSymbolEntryType(unsigned char info)
   {
@@ -87,15 +87,15 @@ class BundleElfFile
   , private ElfType
 {
 public:
-  typedef typename ElfType::Ehdr Ehdr;
-  typedef typename ElfType::Shdr Shdr;
-  typedef typename ElfType::Dyn Dyn;
-  typedef typename ElfType::Addr Addr;
-  typedef typename ElfType::Sym Sym;
+  using Ehdr = typename ElfType::Ehdr;
+  using Shdr = typename Elf<1>::Shdr;
+  using Dyn = typename Elf<2>::Dyn;
+  using Addr = typename ElfType::Addr;
+  using Sym = typename Elf<2>::Sym;
 
-  typedef typename ElfType::Half Half;
-  typedef typename ElfType::Word Word;
-  typedef typename ElfType::Off Off;
+  using Half = typename Elf<1>::Half;
+  using Word = typename Elf<2>::Word;
+  using Off = typename Elf<2>::Off;
 
   BundleElfFile(std::ifstream& fs, std::size_t fileSize)
     : m_SectionHeaders(nullptr)
@@ -150,11 +150,11 @@ public:
       throw InvalidElfException("ELF .dynsym section header missing");
     }
     strTab = this->GetStringTable(fs, dynsymHdr);
-    std::size_t sectionSize = static_cast<std::size_t>(dynsymHdr->sh_size);
-    char* symbols = new char[sectionSize];
+    auto sectionSize = static_cast<std::size_t>(dynsymHdr->sh_size);
+    auto* symbols = new char[sectionSize];
     fs.seekg(dynsymHdr->sh_offset);
     fs.read(symbols, sectionSize);
-    Sym* symEntry = reinterpret_cast<Sym*>(symbols);
+    auto* symEntry = reinterpret_cast<Sym*>(symbols);
     for (std::size_t symIndex = 0;
          symIndex < sectionSize / dynsymHdr->sh_entsize;
          ++symIndex, ++symEntry) {
@@ -169,7 +169,7 @@ public:
     }
     delete[] symbols;
 
-    for (typename StrTblMapType::const_iterator
+    for (auto
            iter = m_StrTblIndexToStrArray.begin(),
            iterEnd = m_StrTblIndexToStrArray.end();
          iter != iterEnd;
@@ -180,11 +180,11 @@ public:
     delete[] m_SectionHeaders;
   }
 
-  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
+  std::vector<std::string> GetDependencies() const override { return m_Needed; }
 
-  virtual std::string GetLibName() const { return m_Soname; }
+  std::string GetLibName() const override { return m_Soname; }
 
-  virtual std::string GetBundleName() const { return m_BundleName; }
+  std::string GetBundleName() const override { return m_BundleName; }
 
 private:
   Ehdr m_FileHeader;
@@ -216,7 +216,7 @@ private:
     }
 
     Word strTblHdrIdx = shdr->sh_link;
-    typename StrTblMapType::const_iterator iter =
+    auto iter =
       m_StrTblIndexToStrArray.find(strTblHdrIdx);
     if (iter != m_StrTblIndexToStrArray.end()) {
       return iter->second;
@@ -225,7 +225,7 @@ private:
     Shdr* strTblHdr = m_SectionHeaders + strTblHdrIdx;
 
     fs.seekg(strTblHdr->sh_offset);
-    char* strTbl = new char[static_cast<std::size_t>(strTblHdr->sh_size)];
+    auto* strTbl = new char[static_cast<std::size_t>(strTblHdr->sh_size)];
     fs.read(strTbl, strTblHdr->sh_size);
     m_StrTblIndexToStrArray.insert(std::make_pair(strTblHdrIdx, strTbl));
 

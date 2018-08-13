@@ -179,7 +179,7 @@ std::string GetDemangledName(const std::type_info& typeInfo)
   std::string result;
 #ifdef US_HAVE_CXXABI_H
   int status = 0;
-  char* demangled = abi::__cxa_demangle(typeInfo.name(), 0, 0, &status);
+  char* demangled = abi::__cxa_demangle(typeInfo.name(), nullptr, nullptr, &status);
   if (demangled && status == 0) {
     result = demangled;
     free(demangled);

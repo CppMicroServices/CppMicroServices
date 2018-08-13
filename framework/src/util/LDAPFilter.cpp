@@ -45,19 +45,18 @@ public:
   {}
 
   LDAPFilterData(const LDAPFilterData& other)
-    : SharedData(other)
-    , ldapExpr(other.ldapExpr)
-  {}
+     
+  = default;
 
   LDAPExpr ldapExpr;
 };
 
 LDAPFilter::LDAPFilter()
-  : d(0)
+  : d(nullptr)
 {}
 
 LDAPFilter::LDAPFilter(const std::string& filter)
-  : d(0)
+  : d(nullptr)
 {
   try {
     d = new LDAPFilterData(filter);
@@ -67,10 +66,10 @@ LDAPFilter::LDAPFilter(const std::string& filter)
 }
 
 LDAPFilter::LDAPFilter(const LDAPFilter& other)
-  : d(other.d)
-{}
+   
+= default;
 
-LDAPFilter::~LDAPFilter() {}
+LDAPFilter::~LDAPFilter() = default;
 
 LDAPFilter::operator bool() const
 {
@@ -116,11 +115,7 @@ bool LDAPFilter::operator==(const LDAPFilter& other) const
 }
 
 LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
-{
-  d = filter.d;
-
-  return *this;
-}
+= default;
 
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {

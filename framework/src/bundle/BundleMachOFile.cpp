@@ -45,15 +45,15 @@ struct MachO;
 template<>
 struct MachO<MH_MAGIC>
 {
-  typedef mach_header Mhdr;
-  typedef nlist symtab_entry;
+  using Mhdr = mach_header;
+  using symtab_entry = nlist;
 };
 
 template<>
 struct MachO<MH_MAGIC_64>
 {
-  typedef mach_header_64 Mhdr;
-  typedef nlist_64 symtab_entry;
+  using Mhdr = mach_header_64;
+  using symtab_entry = nlist_64;
 };
 
 template<typename I>
@@ -77,8 +77,8 @@ class BundleMachOFile
   , private MachOType
 {
 public:
-  typedef typename MachOType::Mhdr Mhdr;
-  typedef typename MachOType::symtab_entry symtab_entry;
+  using Mhdr = typename MachOType::Mhdr;
+  using symtab_entry = typename MachOType::symtab_entry;
 
   BundleMachOFile(std::ifstream& fs, std::size_t fileOffset)
   {
@@ -92,7 +92,7 @@ public:
 
     // iterate over all load commands
     uint32_t ncmds = mhdr.ncmds;
-    uint32_t lcmd_offset = static_cast<uint32_t>(fs.tellg());
+    auto lcmd_offset = static_cast<uint32_t>(fs.tellg());
     uint32_t symtab_offset = 0;
     uint32_t strtab_offset = 0;
     uint32_t strtab_size = 0;
@@ -126,14 +126,14 @@ public:
         fs.read(reinterpret_cast<char*>(&dysymtab), sizeof dysymtab);
         if (dysymtab.nextdefsym != 0) {
           // read the defined external symbol table entries
-          symtab_entry* extSyms = new symtab_entry[dysymtab.nextdefsym];
+          auto* extSyms = new symtab_entry[dysymtab.nextdefsym];
           fs.seekg(fileOffset + symtab_offset +
                    dysymtab.iextdefsym * sizeof(symtab_entry));
           fs.read(reinterpret_cast<char*>(extSyms),
                   dysymtab.nextdefsym * sizeof(symtab_entry));
 
           // read the string table
-          char* strtab = new char[strtab_size];
+          auto* strtab = new char[strtab_size];
           fs.seekg(fileOffset + strtab_offset);
           fs.read(strtab, strtab_size);
 
@@ -158,11 +158,11 @@ public:
     }
   }
 
-  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
+  std::vector<std::string> GetDependencies() const override { return m_Needed; }
 
-  virtual std::string GetLibName() const { return m_InstallName; }
+  std::string GetLibName() const override { return m_InstallName; }
 
-  virtual std::string GetBundleName() const { return m_BundleName; }
+  std::string GetBundleName() const override { return m_BundleName; }
 
 private:
   std::vector<std::string> m_Needed;
@@ -193,7 +193,7 @@ static std::vector<std::vector<uint32_t>> GetMachOIdents(std::ifstream& is)
     is.seekg(0);
     fat_header fatHdr;
     is.read(reinterpret_cast<char*>(&fatHdr), sizeof fatHdr);
-    fat_arch* fatArchs = new fat_arch[readBE(fatHdr.nfat_arch)];
+    auto* fatArchs = new fat_arch[readBE(fatHdr.nfat_arch)];
     is.read(reinterpret_cast<char*>(fatArchs),
             sizeof *fatArchs * readBE(fatHdr.nfat_arch));
     fat_arch* currArch = fatArchs;
@@ -273,9 +273,9 @@ BundleObjFile* CreateBundleMachOFile(const char* /*selfName*/,
 
   // check if the identifications match for the running application
   // and the Mach-O file (or one of the embedded files in the fat binary)
-  for (std::size_t i = 0; i < fileIdents.size(); ++i) {
-    if (memcmp(&fileIdents[i][0], &selfIdent[0], 2 * sizeof(uint32_t)) == 0) {
-      matchingIdent = fileIdents[i];
+  for (auto & fileIdent : fileIdents) {
+    if (memcmp(&fileIdent[0], &selfIdent[0], 2 * sizeof(uint32_t)) == 0) {
+      matchingIdent = fileIdent;
     }
   }
 

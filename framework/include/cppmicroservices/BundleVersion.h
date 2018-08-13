@@ -123,7 +123,7 @@ public:
   BundleVersion(unsigned int majorVersion,
                 unsigned int minorVersion,
                 unsigned int microVersion,
-                const std::string& qualifier);
+                std::string  qualifier);
 
   /**
    * Created a version identifier from the specified string.

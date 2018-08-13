@@ -1077,7 +1077,7 @@ private:
     const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
-  BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
+  BundleContext(std::shared_ptr<BundleContextPrivate>  ctx);
   // allow templated code to use the internal logger
   template<class S, class TTT, class R>
   friend class detail::BundleAbstractTracked;

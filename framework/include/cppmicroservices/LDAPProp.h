@@ -38,7 +38,7 @@ class US_Framework_EXPORT LDAPPropExpr
 {
 public:
   LDAPPropExpr();
-  explicit LDAPPropExpr(const std::string& expr);
+  explicit LDAPPropExpr(std::string  expr);
 
   LDAPPropExpr& operator!();
 
@@ -127,7 +127,7 @@ public:
    *
    * @param property The name of the LDAP property.
    */
-  LDAPProp(const std::string& property);
+  LDAPProp(std::string  property);
 
   /**
    * LDAP equality '='

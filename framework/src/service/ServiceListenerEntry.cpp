@@ -63,7 +63,7 @@ public:
     }
   }
 
-  ~ServiceListenerEntryData() {}
+  ~ServiceListenerEntryData() override = default;
 
   LDAPExpr ldap;
 
@@ -91,11 +91,11 @@ public:
   std::size_t hashValue;
 };
 
-ServiceListenerEntry::ServiceListenerEntry() {}
+ServiceListenerEntry::ServiceListenerEntry() = default;
 
 ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
-  : ServiceListenerHook::ListenerInfo(other)
-{}
+   
+= default;
 
 ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListenerHook::ListenerInfo& info)
@@ -104,7 +104,7 @@ ServiceListenerEntry::ServiceListenerEntry(
   assert(info.d);
 }
 
-ServiceListenerEntry::~ServiceListenerEntry() {}
+ServiceListenerEntry::~ServiceListenerEntry() = default;
 
 ServiceListenerEntry& ServiceListenerEntry::operator=(
   const ServiceListenerEntry& other)

@@ -43,9 +43,8 @@
 namespace cppmicroservices {
 
 Bundle::Bundle(const Bundle& b)
-  : d(b.d)
-  , c(b.c)
-{}
+   
+= default;
 
 Bundle::Bundle(Bundle&& b)
   : d(std::move(b.d))
@@ -53,11 +52,7 @@ Bundle::Bundle(Bundle&& b)
 {}
 
 Bundle& Bundle::operator=(const Bundle& b)
-{
-  this->d = b.d;
-  this->c = b.c;
-  return *this;
-}
+= default;
 
 Bundle& Bundle::operator=(Bundle&& b)
 {
@@ -66,7 +61,7 @@ Bundle& Bundle::operator=(Bundle&& b)
   return *this;
 }
 
-Bundle::Bundle() {}
+Bundle::Bundle() = default;
 
 bool Bundle::operator==(const Bundle& rhs) const
 {
@@ -107,7 +102,7 @@ Bundle::Bundle(const std::shared_ptr<BundlePrivate>& d)
   , c(d ? d->coreCtx->shared_from_this() : nullptr)
 {}
 
-Bundle::~Bundle() {}
+Bundle::~Bundle() = default;
 
 Bundle::State Bundle::GetState() const
 {
@@ -207,7 +202,7 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
        i != sr.end();
        ++i) {
-    res.push_back(i->GetReference());
+    res.emplace_back(i->GetReference());
   }
   return res;
 }
@@ -221,7 +216,7 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
   for (std::vector<ServiceRegistrationBase>::const_iterator i = sr.begin();
        i != sr.end();
        ++i) {
-    res.push_back(i->GetReference());
+    res.emplace_back(i->GetReference());
   }
   return res;
 }

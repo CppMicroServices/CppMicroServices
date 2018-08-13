@@ -26,6 +26,7 @@
 #include <cctype>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 namespace cppmicroservices {
@@ -50,14 +51,7 @@ BundleVersion BundleVersion::UndefinedVersion()
 }
 
 BundleVersion& BundleVersion::operator=(const BundleVersion& v)
-{
-  majorVersion = v.majorVersion;
-  minorVersion = v.minorVersion;
-  microVersion = v.microVersion;
-  qualifier = v.qualifier;
-  undefined = v.undefined;
-  return *this;
-}
+= default;
 
 BundleVersion::BundleVersion(bool undefined)
   : majorVersion(0)
@@ -89,11 +83,11 @@ BundleVersion::BundleVersion(unsigned int majorVersion,
 BundleVersion::BundleVersion(unsigned int majorVersion,
                              unsigned int minorVersion,
                              unsigned int microVersion,
-                             const std::string& qualifier)
+                             std::string  qualifier)
   : majorVersion(majorVersion)
   , minorVersion(minorVersion)
   , microVersion(microVersion)
-  , qualifier(qualifier)
+  , qualifier(std::move(qualifier))
   , undefined(true)
 {
   this->Validate();
@@ -156,12 +150,8 @@ BundleVersion::BundleVersion(const std::string& version)
 }
 
 BundleVersion::BundleVersion(const BundleVersion& version)
-  : majorVersion(version.majorVersion)
-  , minorVersion(version.minorVersion)
-  , microVersion(version.microVersion)
-  , qualifier(version.qualifier)
-  , undefined(version.undefined)
-{}
+   
+= default;
 
 BundleVersion BundleVersion::ParseVersion(const std::string& version)
 {

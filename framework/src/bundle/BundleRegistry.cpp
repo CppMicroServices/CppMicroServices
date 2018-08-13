@@ -47,7 +47,7 @@ BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
 {}
 
-BundleRegistry::~BundleRegistry(void) {}
+BundleRegistry::~BundleRegistry() = default;
 
 void BundleRegistry::Init()
 {

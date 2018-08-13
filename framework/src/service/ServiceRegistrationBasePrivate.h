@@ -119,7 +119,7 @@ public:
   std::atomic<bool> unregistering;
 
   ServiceRegistrationBasePrivate(BundlePrivate* bundle,
-                                 const InterfaceMapConstPtr& service,
+                                 InterfaceMapConstPtr  service,
                                  Properties&& props);
 
   ~ServiceRegistrationBasePrivate();

@@ -119,7 +119,7 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(
     serviceRegistrations.push_back(res);
     for (auto& clazz : classes) {
       std::vector<ServiceRegistrationBase>& s = classServices[clazz];
-      std::vector<ServiceRegistrationBase>::iterator ip =
+      auto ip =
         std::lower_bound(s.begin(), s.end(), res);
       s.insert(ip, res);
     }
@@ -158,7 +158,7 @@ void ServiceRegistry::Get_unlocked(
   const std::string& clazz,
   std::vector<ServiceRegistrationBase>& serviceRegs) const
 {
-  MapClassServices::const_iterator i = classServices.find(clazz);
+  auto i = classServices.find(clazz);
   if (i != classServices.end()) {
     serviceRegs = i->second;
   }
@@ -230,7 +230,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
       send = serviceRegistrations.end();
     }
   } else {
-    MapClassServices::const_iterator it = classServices.find(clazz);
+    auto it = classServices.find(clazz);
     if (it != classServices.end()) {
       s = it->second.begin();
       send = it->second.end();
@@ -316,12 +316,9 @@ void ServiceRegistry::GetUsedByBundle(
   auto l = this->Lock();
   US_UNUSED(l);
 
-  for (std::vector<ServiceRegistrationBase>::const_iterator i =
-         serviceRegistrations.begin();
-       i != serviceRegistrations.end();
-       ++i) {
-    if (i->d->IsUsedByBundle(bundle)) {
-      res.push_back(*i);
+  for (const auto & serviceRegistration : serviceRegistrations) {
+    if (serviceRegistration.d->IsUsedByBundle(bundle)) {
+      res.push_back(serviceRegistration);
     }
   }
 }

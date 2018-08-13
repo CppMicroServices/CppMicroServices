@@ -30,6 +30,7 @@
 
 #include <atomic>
 #include <string>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -37,8 +38,8 @@ class BundleResourcePrivate
 {
 
 public:
-  BundleResourcePrivate(const std::shared_ptr<const BundleArchive>& archive)
-    : archive(archive)
+  BundleResourcePrivate(std::shared_ptr<const BundleArchive>  archive)
+    : archive(std::move(archive))
     , ref(1)
   {}
 
@@ -80,11 +81,11 @@ void BundleResourcePrivate::InitFilePath(const std::string& file)
 
   // remove duplicate /
   std::string::value_type lastChar = 0;
-  for (std::size_t i = 0; i < rawPath.size(); ++i) {
-    if (rawPath[i] == '/' && lastChar == '/') {
+  for (char i : rawPath) {
+    if (i == '/' && lastChar == '/') {
       continue;
     }
-    lastChar = rawPath[i];
+    lastChar = i;
     path.push_back(lastChar);
   }
   if (path.empty()) {

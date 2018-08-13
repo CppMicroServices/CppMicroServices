@@ -334,12 +334,9 @@ ShellService::ShellService()
 
   std::vector<BundleResource> schemeResources =
     GetBundleContext().GetBundle().FindResources("/", "*.scm", false);
-  for (std::vector<BundleResource>::iterator iter = schemeResources.begin(),
-                                             iterEnd = schemeResources.end();
-       iter != iterEnd;
-       ++iter) {
-    if (*iter) {
-      this->LoadSchemeResource(*iter);
+  for (auto & schemeResource : schemeResources) {
+    if (schemeResource) {
+      this->LoadSchemeResource(schemeResource);
     }
   }
 
@@ -412,14 +409,11 @@ std::vector<std::string> ShellService::GetCompletions(const std::string& in)
     return result;
   }
 
-  for (std::set<std::string>::const_iterator symIter = iter->second.begin(),
-                                             symIterEnd = iter->second.end();
-       symIter != symIterEnd;
-       ++symIter) {
-    if (symIter->size() < cmd.size())
+  for (const auto & symIter : iter->second) {
+    if (symIter.size() < cmd.size())
       continue;
-    if (symIter->compare(0, cmd.size(), cmd) == 0) {
-      result.push_back(prefix + *symIter);
+    if (symIter.compare(0, cmd.size(), cmd) == 0) {
+      result.push_back(prefix + symIter);
     }
   }
   return result;
@@ -430,7 +424,7 @@ void ShellService::LoadSchemeResource(const BundleResource& res)
   std::cout << "Reading " << res.GetResourcePath();
   BundleResourceStream resStream(res);
   int resBufLen = res.GetSize() + 1;
-  char* resBuf = new char[resBufLen];
+  auto* resBuf = new char[resBufLen];
   resStream.read(resBuf, resBufLen);
   if (resStream.eof() || resStream.good()) {
     resBuf[static_cast<std::size_t>(resStream.gcount())] = '\0';

@@ -30,6 +30,7 @@
 #include <cassert>
 #include <cstring>
 #include <ctime>
+#include <utility>
 
 #ifdef US_PLATFORM_WINDOWS
 #  define timegm(x) (_mkgmtime(x))
@@ -38,10 +39,10 @@
 namespace cppmicroservices {
 
 HttpServletRequestPrivate::HttpServletRequestPrivate(
-  const std::shared_ptr<ServletContext>& servletContext,
+  std::shared_ptr<ServletContext>  servletContext,
   CivetServer* server,
   mg_connection* conn)
-  : m_ServletContext(servletContext)
+  : m_ServletContext(std::move(servletContext))
   , m_Server(server)
   , m_Connection(conn)
   , m_Scheme("http")
@@ -91,16 +92,13 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(
   m_Url = m_Scheme + "://" + m_ServerName + ":" + m_ServerPort + m_Uri;
 }
 
-HttpServletRequest::~HttpServletRequest() {}
+HttpServletRequest::~HttpServletRequest() = default;
 HttpServletRequest::HttpServletRequest(const HttpServletRequest& o)
-  : d(o.d)
-{}
+   
+= default;
 
 HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest& o)
-{
-  d = o.d;
-  return *this;
-}
+= default;
 
 std::shared_ptr<ServletContext> HttpServletRequest::GetServletContext() const
 {
@@ -288,7 +286,7 @@ std::vector<std::string> HttpServletRequest::GetHeaderNames() const
 {
   std::vector<std::string> names;
   for (int i = 0; i < mg_get_request_info(d->m_Connection)->num_headers; ++i) {
-    names.push_back(mg_get_request_info(d->m_Connection)->http_headers[i].name);
+    names.emplace_back(mg_get_request_info(d->m_Connection)->http_headers[i].name);
   }
   return names;
 }

@@ -75,7 +75,7 @@ const option::Descriptor usage[] = {
     option::Arg::None,
     "\nExamples:\n"
     "  " US_SHELL_PROG_NAME " --load /home/user/libmybundle.so\n" },
-  { 0, 0, 0, 0, 0, 0 }
+  { 0, 0, nullptr, nullptr, nullptr, nullptr }
 };
 
 static std::shared_ptr<ShellService> g_ShellService;

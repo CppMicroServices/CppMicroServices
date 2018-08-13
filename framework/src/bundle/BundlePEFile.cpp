@@ -44,13 +44,13 @@ struct PE;
 template<>
 struct PE<OPTIONAL_PE32_MAGIC>
 {
-  typedef OptionalHeader32 Ohdr;
+  using Ohdr = OptionalHeader32;
 };
 
 template<>
 struct PE<OPTIONAL_PE64_MAGIC>
 {
-  typedef OptionalHeader64 Ohdr;
+  using Ohdr = OptionalHeader64;
 };
 
 template<class PEType>
@@ -59,7 +59,7 @@ class BundlePEFile
   , private PEType
 {
 public:
-  typedef typename PEType::Ohdr Ohdr;
+  using Ohdr = typename PEType::Ohdr;
 
   BundlePEFile(std::ifstream& fs, const COFFHeader& coffHeader)
     : m_CoffHeader(coffHeader)
@@ -91,7 +91,7 @@ public:
     fs.seekg(GetOffset(exportDir.Name));
     std::getline(fs, m_Soname, '\0');
     // get the "signature" _us_import_bundle_initializer_<bundle-name>
-    uint32_t* nameRVAs = new uint32_t[exportDir.NumberOfNames];
+    auto* nameRVAs = new uint32_t[exportDir.NumberOfNames];
     fs.seekg(GetOffset(exportDir.AddressOfNames));
     fs.read(reinterpret_cast<char*>(nameRVAs),
             sizeof *nameRVAs * exportDir.NumberOfNames);
@@ -137,11 +137,11 @@ public:
     delete[] m_SectionHeaders;
   }
 
-  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
+  std::vector<std::string> GetDependencies() const override { return m_Needed; }
 
-  virtual std::string GetLibName() const { return m_Soname; }
+  std::string GetLibName() const override { return m_Soname; }
 
-  virtual std::string GetBundleName() const { return m_BundleName; }
+  std::string GetBundleName() const override { return m_BundleName; }
 
 private:
   std::size_t GetOffset(uint32_t rva)

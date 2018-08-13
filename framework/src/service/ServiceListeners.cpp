@@ -310,7 +310,7 @@ void ServiceListeners::RemoveAllListeners(
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    for (ServiceListenerEntries::iterator it = serviceSet.begin();
+    for (auto it = serviceSet.begin();
          it != serviceSet.end();) {
 
       if (GetPrivate(it->GetBundleContext()) == context) {
@@ -421,7 +421,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
       AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);
     }
 
-    long service_id =
+    auto service_id =
       any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID));
     AddToSet_unlocked(set,
                       receivers,

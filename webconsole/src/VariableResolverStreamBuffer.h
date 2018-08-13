@@ -37,7 +37,7 @@ class VariableResolverStreamBuffer : public std::streambuf
 public:
   explicit VariableResolverStreamBuffer(
     std::unique_ptr<std::ostream> out,
-    const std::shared_ptr<WebConsoleVariableResolver>& resolver);
+    std::shared_ptr<WebConsoleVariableResolver>  resolver);
 
   ~VariableResolverStreamBuffer();
 

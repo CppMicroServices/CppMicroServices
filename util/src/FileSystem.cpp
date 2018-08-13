@@ -32,8 +32,8 @@
 #ifdef US_PLATFORM_POSIX
 #  include <dirent.h>
 #  include <dlfcn.h>
-#  include <errno.h>
-#  include <string.h>
+#  include <cerrno>
+#  include <cstring>
 #  include <unistd.h> // getcwd
 
 #  define US_STAT struct stat
@@ -169,7 +169,7 @@ std::string InitCurrentWorkingDirectory()
   for (;; bufSize *= 2) {
     std::vector<char> buf(bufSize, '\0');
     errno = 0;
-    if (getcwd(buf.data(), bufSize) != 0 && errno != ERANGE) {
+    if (getcwd(buf.data(), bufSize) != nullptr && errno != ERANGE) {
       return std::string(buf.data());
     }
   }

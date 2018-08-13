@@ -153,7 +153,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
         classes = ref_any_cast<std::vector<std::string>>(
           d->properties.Value_unlocked(Constants::OBJECTCLASS));
 
-        long int sid = any_cast<long int>(
+        auto sid = any_cast<long int>(
           d->properties.Value_unlocked(Constants::SERVICE_ID));
         d->properties = ServiceRegistry::CreateServiceProperties(
           props, classes, false, false, sid);
@@ -225,7 +225,7 @@ void ServiceRegistrationBase::Unregister()
     auto l = d->Lock();
     US_UNUSED(l);
     d->available = false;
-    InterfaceMap::const_iterator factoryIter =
+    auto factoryIter =
       d->service->find("org.cppmicroservices.factory");
     if (d->bundle && factoryIter != d->service->end()) {
       serviceFactory =

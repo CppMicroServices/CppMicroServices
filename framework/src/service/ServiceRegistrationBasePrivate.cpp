@@ -22,6 +22,8 @@
 
 #include "ServiceRegistrationBasePrivate.h"
 
+#include <utility>
+
 #ifdef _MSC_VER
 #  pragma warning(push)
 #  pragma warning(disable : 4355)
@@ -31,10 +33,10 @@ namespace cppmicroservices {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
   BundlePrivate* bundle,
-  const InterfaceMapConstPtr& service,
+  InterfaceMapConstPtr  service,
   Properties&& props)
   : ref(0)
-  , service(service)
+  , service(std::move(service))
   , bundle(bundle)
   , reference(this)
   , properties(std::move(props))

@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <memory>
+
 #include "cppmicroservices/BundleActivator.h"
 
 #include "BundlesPlugin.h"
@@ -34,8 +36,8 @@ namespace cppmicroservices {
 class WebConsoleActivator : public BundleActivator
 {
 public:
-  void Start(BundleContext context);
-  void Stop(BundleContext context);
+  void Start(BundleContext context) override;
+  void Stop(BundleContext context) override;
 
 private:
   std::shared_ptr<HttpServlet> m_WebConsoleServlet;
@@ -47,10 +49,10 @@ private:
 
 void WebConsoleActivator::Start(BundleContext context)
 {
-  m_SettingsPlugin.reset(new SettingsPlugin);
-  m_ServicesPlugin.reset(new ServicesPlugin);
-  m_BundlesPlugin.reset(new BundlesPlugin);
-  m_WebConsoleServlet.reset(new WebConsoleServlet());
+  m_SettingsPlugin = std::make_shared<SettingsPlugin>();
+  m_ServicesPlugin = std::make_shared<ServicesPlugin>();
+  m_BundlesPlugin = std::make_shared<BundlesPlugin>();
+  m_WebConsoleServlet = std::make_shared<WebConsoleServlet>();
   cppmicroservices::ServiceProperties props;
   props[HttpServlet::PROP_CONTEXT_ROOT] = std::string("/console");
   context.RegisterService<HttpServlet>(m_WebConsoleServlet, props);

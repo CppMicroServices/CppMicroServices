@@ -26,7 +26,7 @@
 
 namespace cppmicroservices {
 
-ServiceException::~ServiceException() throw() {}
+ServiceException::~ServiceException() noexcept = default;
 
 ServiceException::ServiceException(const std::string& msg, const Type& type)
   : std::runtime_error(msg)
@@ -34,9 +34,8 @@ ServiceException::ServiceException(const std::string& msg, const Type& type)
 {}
 
 ServiceException::ServiceException(const ServiceException& o)
-  : std::runtime_error(o)
-  , type(o.type)
-{}
+   
+= default;
 
 ServiceException& ServiceException::operator=(const ServiceException& o)
 {

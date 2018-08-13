@@ -24,8 +24,8 @@
 #include "cppmicroservices/util/String.h"
 
 #ifdef US_PLATFORM_POSIX
-#  include <errno.h>
-#  include <string.h>
+#  include <cerrno>
+#  include <cstring>
 
 #else
 #  ifndef WIN32_LEAN_AND_MEAN

@@ -23,6 +23,7 @@
 #include "cppmicroservices/LDAPProp.h"
 
 #include <stdexcept>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -30,8 +31,8 @@ LDAPPropExpr::LDAPPropExpr()
   : m_ldapExpr()
 {}
 
-LDAPPropExpr::LDAPPropExpr(const std::string& expr)
-  : m_ldapExpr(expr)
+LDAPPropExpr::LDAPPropExpr(std::string  expr)
+  : m_ldapExpr(std::move(expr))
 {}
 
 LDAPPropExpr& LDAPPropExpr::operator!()
@@ -73,8 +74,8 @@ LDAPPropExpr& LDAPPropExpr::operator&=(const LDAPPropExpr& right)
   return *this;
 }
 
-LDAPProp::LDAPProp(const std::string& property)
-  : m_property(property)
+LDAPProp::LDAPProp(std::string  property)
+  : m_property(std::move(property))
 {
   if (m_property.empty())
     throw std::invalid_argument("property must not be empty");

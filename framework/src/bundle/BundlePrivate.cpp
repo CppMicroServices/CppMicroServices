@@ -583,7 +583,7 @@ std::exception_ptr BundlePrivate::Start0()
   // the actiavtor inside the bundle is called.
   if (useActivator) {
     try {
-      typedef BundleActivator* (*CreateActivatorHook)(void);
+      using CreateActivatorHook = BundleActivator *(*)();
       CreateActivatorHook createActivatorHook = nullptr;
 
       void* libHandle = nullptr;
@@ -883,7 +883,7 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
   */
 }
 
-BundlePrivate::~BundlePrivate() {}
+BundlePrivate::~BundlePrivate() = default;
 
 void BundlePrivate::CheckUninstalled() const
 {
@@ -898,11 +898,9 @@ void BundlePrivate::RemoveBundleResources()
 
   std::vector<ServiceRegistrationBase> srs;
   coreCtx->services.GetRegisteredByBundle(this, srs);
-  for (std::vector<ServiceRegistrationBase>::iterator i = srs.begin();
-       i != srs.end();
-       ++i) {
+  for (auto & sr : srs) {
     try {
-      i->Unregister();
+      sr.Unregister();
     } catch (const std::logic_error& /*ignore*/) {
       // Someone has unregistered the service after stop completed.
       // This should not occur, but we don't want get stuck in

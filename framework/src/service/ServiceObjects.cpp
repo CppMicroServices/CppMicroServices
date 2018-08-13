@@ -33,6 +33,7 @@
 #include "ServiceReferenceBasePrivate.h"
 
 #include <set>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -43,9 +44,9 @@ public:
   ServiceReferenceBase m_reference;
 
   ServiceObjectsBasePrivate(
-    const std::shared_ptr<BundleContextPrivate>& context,
+    std::shared_ptr<BundleContextPrivate>  context,
     const ServiceReferenceBase& reference)
-    : m_context(context)
+    : m_context(std::move(context))
     , m_reference(reference)
   {}
 
@@ -94,10 +95,10 @@ struct UngetHelper
   const ServiceReferenceBase sref;
   const std::weak_ptr<BundlePrivate> b;
 
-  UngetHelper(const InterfaceMapConstPtr& im,
+  UngetHelper(InterfaceMapConstPtr  im,
               const ServiceReferenceBase& sr,
               const std::shared_ptr<BundlePrivate>& b)
-    : interfaceMap(im)
+    : interfaceMap(std::move(im))
     , sref(sr)
     , b(b)
   {}
@@ -168,7 +169,7 @@ ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other)
   : d(std::move(other.d))
 {}
 
-ServiceObjectsBase::~ServiceObjectsBase() {}
+ServiceObjectsBase::~ServiceObjectsBase() = default;
 
 ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other)
 {

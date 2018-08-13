@@ -30,7 +30,7 @@
 
 #include <sstream>
 #include <stdexcept>
-#include <time.h>
+#include <ctime>
 #include <vector>
 
 namespace cppmicroservices {
@@ -66,11 +66,8 @@ bool HttpServletResponsePrivate::Commit()
 
   std::stringstream ss;
   ss << "HTTP/1.1 " << m_StatusCode << "\r\n";
-  for (std::map<std::string, std::string>::iterator iter = m_Headers.begin(),
-                                                    endIter = m_Headers.end();
-       iter != endIter;
-       ++iter) {
-    ss << iter->first << ": " << iter->second << "\r\n";
+  for (auto & m_Header : m_Headers) {
+    ss << m_Header.first << ": " << m_Header.second << "\r\n";
   }
   ss << "\r\n";
 
@@ -138,18 +135,15 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
   return result;
 }
 
-HttpServletResponse::~HttpServletResponse() {}
+HttpServletResponse::~HttpServletResponse() = default;
 
 HttpServletResponse::HttpServletResponse(const HttpServletResponse& o)
-  : d(o.d)
-{}
+   
+= default;
 
 HttpServletResponse& HttpServletResponse::operator=(
   const HttpServletResponse& o)
-{
-  d = o.d;
-  return *this;
-}
+= default;
 
 void HttpServletResponse::FlushBuffer()
 {
@@ -172,7 +166,7 @@ std::size_t HttpServletResponse::GetBufferSize() const
 
 std::string HttpServletResponse::GetContentType() const
 {
-  std::map<std::string, std::string>::iterator iter =
+  auto iter =
     d->m_Headers.find("Content-Type");
   if (iter != d->m_Headers.end()) {
     return iter->second;

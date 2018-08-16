@@ -185,12 +185,9 @@ LDAPExpr::LDAPExpr(int op,
   : d(new LDAPExprData(op, attrName, attrValue))
 {}
 
-LDAPExpr::LDAPExpr(const LDAPExpr& other)
-   
-= default;
+LDAPExpr::LDAPExpr(const LDAPExpr&) = default;
 
-LDAPExpr& LDAPExpr::operator=(const LDAPExpr& other)
-= default;
+LDAPExpr& LDAPExpr::operator=(const LDAPExpr&) = default;
 
 LDAPExpr::~LDAPExpr() = default;
 

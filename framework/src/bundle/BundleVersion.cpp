@@ -50,8 +50,7 @@ BundleVersion BundleVersion::UndefinedVersion()
   return undefinedV;
 }
 
-BundleVersion& BundleVersion::operator=(const BundleVersion& v)
-= default;
+BundleVersion& BundleVersion::operator=(const BundleVersion&) = default;
 
 BundleVersion::BundleVersion(bool undefined)
   : majorVersion(0)
@@ -149,9 +148,7 @@ BundleVersion::BundleVersion(const std::string& version)
   this->Validate();
 }
 
-BundleVersion::BundleVersion(const BundleVersion& version)
-   
-= default;
+BundleVersion::BundleVersion(const BundleVersion&) = default;
 
 BundleVersion BundleVersion::ParseVersion(const std::string& version)
 {

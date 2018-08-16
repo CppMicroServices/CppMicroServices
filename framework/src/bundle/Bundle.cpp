@@ -42,17 +42,14 @@
 
 namespace cppmicroservices {
 
-Bundle::Bundle(const Bundle& b)
-   
-= default;
+Bundle::Bundle(const Bundle&) = default;
 
 Bundle::Bundle(Bundle&& b)
   : d(std::move(b.d))
   , c(std::move(b.c))
 {}
 
-Bundle& Bundle::operator=(const Bundle& b)
-= default;
+Bundle& Bundle::operator=(const Bundle&) = default;
 
 Bundle& Bundle::operator=(Bundle&& b)
 {

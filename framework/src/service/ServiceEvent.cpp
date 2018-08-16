@@ -52,12 +52,9 @@ ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)
   : d(new ServiceEventData(type, reference))
 {}
 
-ServiceEvent::ServiceEvent(const ServiceEvent& other)
-   
-= default;
+ServiceEvent::ServiceEvent(const ServiceEvent&) = default;
 
-ServiceEvent& ServiceEvent::operator=(const ServiceEvent& other)
-= default;
+ServiceEvent& ServiceEvent::operator=(const ServiceEvent&) = default;
 
 ServiceReferenceU ServiceEvent::GetServiceReference() const
 {

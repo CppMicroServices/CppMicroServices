@@ -36,16 +36,13 @@ FrameworkPrivate* pimpl(const std::shared_ptr<BundlePrivate>& p)
 }
 }
 
-Framework::Framework(const Framework& fw)
-   
-= default;
+Framework::Framework(const Framework&) = default;
 
 Framework::Framework(Framework&& fw)
   : Bundle(std::move(fw))
 {}
 
-Framework& Framework::operator=(const Framework& fw)
-= default;
+Framework& Framework::operator=(const Framework&) = default;
 
 Framework& Framework::operator=(Framework&& fw)
 {

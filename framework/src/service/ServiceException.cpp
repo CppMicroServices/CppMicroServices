@@ -33,9 +33,7 @@ ServiceException::ServiceException(const std::string& msg, const Type& type)
   , type(type)
 {}
 
-ServiceException::ServiceException(const ServiceException& o)
-   
-= default;
+ServiceException::ServiceException(const ServiceException&) = default;
 
 ServiceException& ServiceException::operator=(const ServiceException& o)
 {

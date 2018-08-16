@@ -57,15 +57,11 @@ ServiceListenerHook::ListenerInfo::ListenerInfo()
   : d(nullptr)
 {}
 
-ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo& other)
-   
-= default;
+ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo&) = default;
 
 ServiceListenerHook::ListenerInfo::~ListenerInfo() = default;
 
-ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(
-  const ListenerInfo& other)
-= default;
+ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(const ListenerInfo&) = default;
 
 bool ServiceListenerHook::ListenerInfo::IsNull() const
 {

@@ -44,9 +44,7 @@ public:
     : ldapExpr(filter)
   {}
 
-  LDAPFilterData(const LDAPFilterData& other)
-     
-  = default;
+  LDAPFilterData(const LDAPFilterData&) = default;
 
   LDAPExpr ldapExpr;
 };
@@ -65,9 +63,7 @@ LDAPFilter::LDAPFilter(const std::string& filter)
   }
 }
 
-LDAPFilter::LDAPFilter(const LDAPFilter& other)
-   
-= default;
+LDAPFilter::LDAPFilter(const LDAPFilter&) = default;
 
 LDAPFilter::~LDAPFilter() = default;
 

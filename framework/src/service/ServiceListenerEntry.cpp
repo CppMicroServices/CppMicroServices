@@ -93,9 +93,7 @@ public:
 
 ServiceListenerEntry::ServiceListenerEntry() = default;
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry& other)
-   
-= default;
+ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) = default;
 
 ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListenerHook::ListenerInfo& info)

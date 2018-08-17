@@ -2,7 +2,7 @@
 project(CppMicroServicesExamples)
 
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(CppMicroServices NO_MODULE REQUIRED)
 

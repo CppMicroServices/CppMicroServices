@@ -69,9 +69,7 @@ SharedLibrary::SharedLibrary()
   : d(new SharedLibraryPrivate)
 {}
 
-SharedLibrary::SharedLibrary(const SharedLibrary& other)
-   
-= default;
+SharedLibrary::SharedLibrary(const SharedLibrary&) = default;
 
 SharedLibrary::SharedLibrary(const std::string& libPath,
                              const std::string& name)

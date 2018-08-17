@@ -28,9 +28,9 @@
 
 #include "civetweb/civetweb.h"
 
+#include <ctime>
 #include <sstream>
 #include <stdexcept>
-#include <ctime>
 #include <vector>
 
 namespace cppmicroservices {
@@ -48,6 +48,7 @@ HttpServletResponsePrivate::HttpServletResponsePrivate(
   , m_HttpOutputStream(nullptr)
   , m_IsCommited(false)
   , m_BufferSize(1024)
+  , m_Charset("UTF-8")
 {}
 
 HttpServletResponsePrivate::~HttpServletResponsePrivate()
@@ -65,9 +66,18 @@ bool HttpServletResponsePrivate::Commit()
     return true;
 
   std::stringstream ss;
-  ss << "HTTP/1.1 " << m_StatusCode << "\r\n";
-  for (auto & m_Header : m_Headers) {
-    ss << m_Header.first << ": " << m_Header.second << "\r\n";
+  if (m_StatusCode >= 200 && m_StatusCode <= 202) {
+    ss << "HTTP/1.1 " << m_StatusCode << " "
+       << mg_get_response_code_text(m_Connection, m_StatusCode) << "\r\n";
+  }
+
+  else
+    ss << "HTTP/1.1 " << m_StatusCode << "\r\n";
+  for (std::map<std::string, std::string>::iterator iter = m_Headers.begin(),
+                                                    endIter = m_Headers.end();
+       iter != endIter;
+       ++iter) {
+    ss << iter->first << ": " << iter->second << "\r\n";
   }
   ss << "\r\n";
 
@@ -137,7 +147,8 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
 
 HttpServletResponse::~HttpServletResponse() = default;
 HttpServletResponse::HttpServletResponse(const HttpServletResponse&) = default;
-HttpServletResponse& HttpServletResponse::operator=(const HttpServletResponse&) = default;
+HttpServletResponse& HttpServletResponse::operator=(
+  const HttpServletResponse&) = default;
 
 void HttpServletResponse::FlushBuffer()
 {
@@ -145,6 +156,20 @@ void HttpServletResponse::FlushBuffer()
     *d->m_HttpOutputStream << std::flush;
   } else {
     d->Commit();
+  }
+}
+
+std::string HttpServletResponse::GetCharacterEncoding() const
+{
+  return d->m_Charset;
+}
+
+std::string HttpServletResponse::GetHeader(const std::string& name) const
+{
+  if (ContainsHeader(name)) {
+    return d->m_Headers[name];
+  } else {
+    throw std::runtime_error("Unknown header named '" + name + "'");
   }
 }
 
@@ -160,8 +185,7 @@ std::size_t HttpServletResponse::GetBufferSize() const
 
 std::string HttpServletResponse::GetContentType() const
 {
-  auto iter =
-    d->m_Headers.find("Content-Type");
+  auto iter = d->m_Headers.find("Content-Type");
   if (iter != d->m_Headers.end()) {
     return iter->second;
   }

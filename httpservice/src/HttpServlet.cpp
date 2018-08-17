@@ -282,9 +282,8 @@ void HttpServlet::DoTrace(HttpServletRequest& request,
 
   std::vector<std::string> reqHeaders = request.GetHeaderNames();
 
-  for (const auto & reqHeader : reqHeaders) {
-    responseString +=
-      CRLF + reqHeader + ": " + request.GetHeader(reqHeader);
+  for (const auto& reqHeader : reqHeaders) {
+    responseString += CRLF + reqHeader + ": " + request.GetHeader(reqHeader);
   }
 
   responseString += CRLF;

@@ -34,8 +34,11 @@
 #  include <dlfcn.h>
 #  include <cerrno>
 #  include <cstring>
+#  include <errno.h>
+#  include <string.h>
+#  include <sys/time.h>
 #  include <unistd.h> // getcwd
-
+#  include <cstdlib>  // getenv
 #  define US_STAT struct stat
 #  define us_stat stat
 #  define us_mkdir mkdir
@@ -48,14 +51,15 @@
 #  include <Shlwapi.h>
 #  include <crtdbg.h>
 #  include <direct.h>
+#  include <io.h>
 #  include <stdint.h>
 #  include <windows.h>
+
 #  ifdef __MINGW32__
 #    include <dirent.h>
 #  else
-#    include "dirent_win32.h"
+#      include "dirent_win32.h"
 #  endif
-
 #  define US_STAT struct _stat
 #  define us_stat _stat
 #  define us_mkdir _mkdir
@@ -69,6 +73,9 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include <fcntl.h>
+#include <sys/stat.h> // mkdir, _S_IREAD, etc.
 
 namespace cppmicroservices {
 
@@ -327,7 +334,276 @@ void RemoveDirectoryRecursive(const std::string& path)
   }
 
   if (res)
-    throw std::invalid_argument(GetLastCErrorStr());
+  {
+	  std::string message = "Unable to delete folder '" + path + "' ";
+	  message += "(" + GetLastCErrorStr() + ")";
+	  throw std::invalid_argument(message);
+  }
+}
+
+std::string GetTempDirectory()
+{
+#if defined(US_PLATFORM_WINDOWS)
+  std::wstring temp_dir;
+  wchar_t wcharFullPath[MAX_PATH];
+  wchar_t wcharPath[MAX_PATH];
+  GetTempPathW(MAX_PATH, wcharPath);
+  if (wcharPath && GetLongPathNameW(wcharPath, wcharFullPath, MAX_PATH)) {
+    temp_dir = wcharFullPath;
+  }
+
+  return std::string(temp_dir.cbegin(), temp_dir.cend());
+#else
+  char* tempdir = std::getenv("TMPDIR");
+  return std::string(((tempdir == nullptr) ? "/tmp" : tempdir));
+#endif
+}
+
+static const char validLetters[] =
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+// A cross-platform version of the mkstemps function
+static int mkstemps_compat(char* tmpl, int suffixlen)
+{
+  static unsigned long long value = 0;
+  int savedErrno = errno;
+
+// Lower bound on the number of temporary files to attempt to generate.
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+/* The number of times to attempt to generate a temporary file.  To
+conform to POSIX, this must be no smaller than TMP_MAX.  */
+#if ATTEMPTS_MIN < TMP_MAX
+  const unsigned int attempts = TMP_MAX;
+#else
+  const unsigned int attempts = ATTEMPTS_MIN;
+#endif
+
+  const std::size_t len = strlen(tmpl);
+  if ((len - suffixlen) < 6 ||
+      strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6)) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  /* This is where the Xs start.  */
+  char* XXXXXX = &tmpl[len - 6 - suffixlen];
+
+/* Get some more or less random data.  */
+#ifdef US_PLATFORM_WINDOWS
+  {
+    SYSTEMTIME stNow;
+    FILETIME ftNow;
+
+    // get system time
+    GetSystemTime(&stNow);
+    stNow.wMilliseconds = 500;
+    if (!SystemTimeToFileTime(&stNow, &ftNow)) {
+      errno = -1;
+      return -1;
+    }
+    unsigned long long randomTimeBits =
+      ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
+       static_cast<unsigned long long>(ftNow.dwLowDateTime));
+    value =
+      randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+  }
+#else
+  {
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    unsigned long long randomTimeBits =
+      ((static_cast<unsigned long long>(tv.tv_usec) << 32) |
+       static_cast<unsigned long long>(tv.tv_sec));
+    value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
+  }
+#endif
+
+  for (unsigned int count = 0; count < attempts; value += 7777, ++count) {
+    unsigned long long v = value;
+
+    /* Fill in the random bits.  */
+    XXXXXX[0] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[1] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[2] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[3] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[4] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[5] = validLetters[v % 62];
+
+#ifdef US_PLATFORM_WINDOWS
+    int fd = _open(tmpl, O_RDWR | O_CREAT | O_EXCL, _S_IREAD | _S_IWRITE);
+#else
+    int fd = open(tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+#endif
+    if (fd >= 0) {
+      errno = savedErrno;
+      return fd;
+    } else if (errno != EEXIST) {
+      return -1;
+    }
+  }
+
+  /* We got out of the loop because we ran out of combinations to try.  */
+  errno = EEXIST;
+  return -1;
+}
+
+// A cross-platform version of the POSIX mkdtemp function
+char* mkdtemps_compat(char* tmpl, int suffixlen)
+{
+  static unsigned long long value = 0;
+  int savedErrno = errno;
+
+// Lower bound on the number of temporary dirs to attempt to generate.
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+/* The number of times to attempt to generate a temporary dir.  To
+conform to POSIX, this must be no smaller than TMP_MAX.  */
+#if ATTEMPTS_MIN < TMP_MAX
+  const unsigned int attempts = TMP_MAX;
+#else
+  const unsigned int attempts = ATTEMPTS_MIN;
+#endif
+
+  const std::size_t len = strlen(tmpl);
+  if ((len - suffixlen) < 6 ||
+      strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6)) {
+    errno = EINVAL;
+    return nullptr;
+  }
+
+  /* This is where the Xs start.  */
+  char* XXXXXX = &tmpl[len - 6 - suffixlen];
+
+/* Get some more or less random data.  */
+#ifdef US_PLATFORM_WINDOWS
+  {
+    SYSTEMTIME stNow;
+    FILETIME ftNow;
+
+    // get system time
+    GetSystemTime(&stNow);
+    stNow.wMilliseconds = 500;
+    if (!SystemTimeToFileTime(&stNow, &ftNow)) {
+      errno = -1;
+      return nullptr;
+    }
+    unsigned long long randomTimeBits =
+      ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
+       static_cast<unsigned long long>(ftNow.dwLowDateTime));
+    value =
+      randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+  }
+#else
+  {
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    unsigned long long randomTimeBits =
+      ((static_cast<unsigned long long>(tv.tv_usec) << 32) |
+       static_cast<unsigned long long>(tv.tv_sec));
+    value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
+  }
+#endif
+
+  unsigned int count = 0;
+  for (; count < attempts; value += 7777, ++count) {
+    unsigned long long v = value;
+
+    /* Fill in the random bits.  */
+    XXXXXX[0] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[1] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[2] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[3] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[4] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[5] = validLetters[v % 62];
+
+#ifdef US_PLATFORM_WINDOWS
+    int r = _mkdir(tmpl); //, _S_IREAD | _S_IWRITE | _S_IEXEC);
+#else
+    int r = mkdir(tmpl, S_IRUSR | S_IWUSR | S_IXUSR);
+#endif
+    if (r >= 0) {
+      errno = savedErrno;
+      return tmpl;
+    } else if (errno != EEXIST) {
+      return nullptr;
+    }
+  }
+
+  /* We got out of the loop because we ran out of combinations to try.  */
+  errno = EEXIST;
+  return nullptr;
+}
+
+File::File()
+  : FileDescr(-1)
+  , Path()
+{}
+
+File::File(int fd, const std::string& path)
+  : FileDescr(fd)
+  , Path(path)
+{}
+
+File::File(File&& o)
+  : FileDescr(o.FileDescr)
+  , Path(std::move(o.Path))
+{
+  o.FileDescr = -1;
+}
+
+File& File::operator=(File&& o)
+{
+  std::swap(FileDescr, o.FileDescr);
+  std::swap(Path, o.Path);
+  return *this;
+}
+
+File::~File()
+{
+  if (FileDescr >= 0)
+    close(FileDescr);
+}
+
+std::string MakeUniqueTempDirectory()
+{
+  std::string tmpStr = util::GetTempDirectory();
+  if (!tmpStr.empty() && *--tmpStr.end() != util::DIR_SEP) {
+    tmpStr += util::DIR_SEP;
+  }
+  tmpStr += "usdir-XXXXXX";
+  std::vector<char> tmpChars(tmpStr.c_str(),
+                             tmpStr.c_str() + tmpStr.length() + 1);
+
+  errno = 0;
+  if (!mkdtemps_compat(tmpChars.data(), 0))
+    throw std::runtime_error(util::GetLastCErrorStr());
+
+  return tmpChars.data();
+}
+
+File MakeUniqueTempFile(const std::string& base)
+{
+  const auto tmpStr = base + util::DIR_SEP + "usfile-XXXXXX";
+  std::vector<char> tmpChars(tmpStr.c_str(),
+                             tmpStr.c_str() + tmpStr.length() + 1);
+
+  errno = 0;
+  int fd = mkstemps_compat(tmpChars.data(), 0);
+  if (fd < 0)
+    throw std::runtime_error(util::GetLastCErrorStr());
+
+  return File(fd, tmpChars.data());
 }
 
 } // namespace util

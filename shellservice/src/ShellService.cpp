@@ -291,11 +291,11 @@ struct ShellService::Impl
 
 void ShellService::Impl::InitSymbols()
 {
-  //std::cout << "Calling oblist" << std::endl;
+  // std::cout << "Calling oblist" << std::endl;
   pointer result = scheme_apply0(m_Scheme, "oblist");
   if (m_Scheme->vptr->is_list(m_Scheme, result)) {
     int len = m_Scheme->vptr->list_length(m_Scheme, result);
-    //std::cout << "Result is a list with len = " << len << std::endl;
+    // std::cout << "Result is a list with len = " << len << std::endl;
     for (int i = 0; i < len; ++i) {
       pointer elem = m_Scheme->vptr->pair_car(result);
       if (m_Scheme->vptr->is_list(m_Scheme, elem)) {
@@ -305,7 +305,7 @@ void ShellService::Impl::InitSymbols()
           if (m_Scheme->vptr->is_symbol(symElem)) {
             const char* symName = m_Scheme->vptr->symname(symElem);
             if (symName) {
-              //std::cout << "Found sym: " << symName << std::endl;
+              // std::cout << "Found sym: " << symName << std::endl;
               m_Symbols[symName[0]].insert(symName);
             }
           }

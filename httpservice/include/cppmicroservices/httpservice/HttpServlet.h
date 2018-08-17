@@ -138,7 +138,7 @@ private:
   HttpServletPrivate* d;
 
   friend class ServletHandler;
-  //friend class ServletContainerPrivate;
+  // friend class ServletContainerPrivate;
 };
 }
 

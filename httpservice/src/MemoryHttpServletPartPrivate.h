@@ -20,35 +20,34 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVLETCONTEXT_H
-#define CPPMICROSERVICES_SERVLETCONTEXT_H
+#ifndef CPPMICROSERVICES_MEMORY_HTTPSERVLETPARTPRIVATE_H
+#define CPPMICROSERVICES_MEMORY_HTTPSERVLETPARTPRIVATE_H
 
-#include "cppmicroservices/GlobalConfig.h"
-#include "cppmicroservices/httpservice/HttpServiceExport.h"
-
-#include <memory>
-#include <string>
+#include "HttpServletPartPrivate.h"
 
 namespace cppmicroservices {
 
-class ServletContainer;
+class Any;
+class ServletContext;
 
-class US_HttpService_EXPORT ServletContext
+struct MemoryHttpServletPartPrivate : public HttpServletPartPrivate
 {
-public:
-  std::string GetContextPath() const;
 
-  std::shared_ptr<ServletContext> GetContext(const std::string& uripath);
+  MemoryHttpServletPartPrivate(
+    const std::shared_ptr<ServletContext>& servletContext,
+    CivetServer* server,
+    mg_connection* conn);
 
-  std::string GetMimeType(const std::string& file) const;
+  std::istream* GetInputStream() const override;
 
-private:
-  friend struct ServletContainerPrivate;
-  friend class HttpServiceFactory;
+  long long GetSize() const override;
 
-  ServletContext(ServletContainer* container);
-  ServletContainer* m_Container;
+  std::string GetSubmittedFileName() const override;
+
+  void Delete() override;
+
+  std::string m_Value;
 };
 }
 
-#endif // CPPMICROSERVICES_SERVLETCONTEXT_H
+#endif // CPPMICROSERVICES_MEMORY_HTTPSERVLETPARTPRIVATE_H

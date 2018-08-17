@@ -20,55 +20,48 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SERVLETCONTAINER_H
-#define CPPMICROSERVICES_SERVLETCONTAINER_H
+#ifndef CPPMICROSERVICES_HTTPSERVLETPARTPRIVATE_H
+#define CPPMICROSERVICES_HTTPSERVLETPARTPRIVATE_H
 
-#include "cppmicroservices/httpservice/HttpServiceExport.h"
+#include "cppmicroservices/SharedData.h"
 
+#include <map>
 #include <memory>
 #include <string>
-#include <vector>
 
 class CivetServer;
+struct mg_connection;
 
 namespace cppmicroservices {
 
-struct ServletContainerPrivate;
+class Any;
 class ServletContext;
-class BundleContext;
 
-class US_HttpService_EXPORT ServletContainer
+struct HttpServletPartPrivate : public SharedData
 {
-public:
-  ServletContainer(BundleContext bundleCtx,
-                   const std::string& contextPath = std::string());
-  ~ServletContainer();
+  HttpServletPartPrivate(const std::shared_ptr<ServletContext>& servletContext,
+                         CivetServer* server,
+                         mg_connection* conn);
 
-  void SetContextPath(const std::string& contextPath);
-  std::string GetContextPath() const;
+  virtual ~HttpServletPartPrivate() {}
 
-  /*!
-  * Pass an options collection to the underlying CivetWeb server
-  *
-  * See CivetWeb documentation for available parameters
-  */
-  void Start(const std::vector<std::string>& options);
+  virtual std::istream* GetInputStream() const = 0;
 
-  /*!
-  * Start server with default options
-  */
-  void Start();
+  virtual long long GetSize() const = 0;
 
-  void Stop();
+  virtual std::string GetSubmittedFileName() const = 0;
 
-  std::shared_ptr<ServletContext> GetContext(const std::string& uripath) const;
-  std::string GetContextPath(const ServletContext* context) const;
+  virtual void Delete() = 0;
 
-private:
-  friend class ServletContext;
+  const std::shared_ptr<ServletContext> m_ServletContext;
+  CivetServer* const m_Server;
+  struct mg_connection* const m_Connection;
 
-  ServletContainerPrivate* d;
+  std::string m_ContentType;
+  std::string m_Name;
+  typedef std::map<std::string, Any> AttributeMapType;
+  AttributeMapType m_Headers;
 };
 }
 
-#endif // CPPMICROSERVICES_SERVLETCONTAINER_H
+#endif // CPPMICROSERVICES_HTTPSERVLETPARTPRIVATE_H

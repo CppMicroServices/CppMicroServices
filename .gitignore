@@ -39,3 +39,4 @@ doc/src/examples/makefile/main
 *.DS_Store
 *.pyc
 /build*
+.kdev_include_paths

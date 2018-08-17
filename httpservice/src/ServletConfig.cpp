@@ -54,5 +54,4 @@ ServletConfig::ServletConfig()
 
 ServletConfig::ServletConfig(const ServletConfig&) = default;
 ServletConfig& ServletConfig::operator=(const ServletConfig&) = default;
-    
 }

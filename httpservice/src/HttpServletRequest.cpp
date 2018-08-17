@@ -93,12 +93,8 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(
 }
 
 HttpServletRequest::~HttpServletRequest() = default;
-HttpServletRequest::HttpServletRequest(const HttpServletRequest& o)
-   
-= default;
-
-HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest& o)
-= default;
+HttpServletRequest::HttpServletRequest(const HttpServletRequest&) = default;
+HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest&) = default;
 
 std::shared_ptr<ServletContext> HttpServletRequest::GetServletContext() const
 {

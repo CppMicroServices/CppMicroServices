@@ -136,14 +136,8 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
 }
 
 HttpServletResponse::~HttpServletResponse() = default;
-
-HttpServletResponse::HttpServletResponse(const HttpServletResponse& o)
-   
-= default;
-
-HttpServletResponse& HttpServletResponse::operator=(
-  const HttpServletResponse& o)
-= default;
+HttpServletResponse::HttpServletResponse(const HttpServletResponse&) = default;
+HttpServletResponse& HttpServletResponse::operator=(const HttpServletResponse&) = default;
 
 void HttpServletResponse::FlushBuffer()
 {

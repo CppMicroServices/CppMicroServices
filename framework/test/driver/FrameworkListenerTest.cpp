@@ -44,8 +44,7 @@ void testStartStopFrameworkEvents()
 
   TestFrameworkListener l;
   f.Init();
-  f.GetBundleContext().AddFrameworkListener(
-    &l, &TestFrameworkListener::frameworkEvent);
+  f.GetBundleContext().AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
   f.Start();
   f.Stop();
 

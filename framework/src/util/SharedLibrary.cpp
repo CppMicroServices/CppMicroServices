@@ -88,8 +88,7 @@ SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
 
 SharedLibrary::~SharedLibrary() = default;
 
-SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other)
-= default;
+SharedLibrary& SharedLibrary::operator=(const SharedLibrary&) = default;
 
 void SharedLibrary::Load(int flags)
 {

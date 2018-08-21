@@ -42,7 +42,7 @@ public:
     const std::string& location);
 
   std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-    const std::shared_ptr<const BundleResourceContainer>& resCont,
+    const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::vector<std::string>& topLevelEntries);
 
   bool RemoveArchive(const BundleArchive* ba);

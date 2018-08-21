@@ -58,7 +58,7 @@ struct BundleStorage
    * @return A list of BundleArchive instances representing the installed bundles.
    */
   virtual std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-    const std::shared_ptr<const BundleResourceContainer>& resCont,
+    const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::vector<std::string>& topLevelEntries) = 0;
 
   /**

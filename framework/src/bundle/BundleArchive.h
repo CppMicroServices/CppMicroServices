@@ -58,7 +58,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   BundleArchive(
     BundleStorage* storage,
     std::unique_ptr<Data>&& data,
-    const std::shared_ptr<const BundleResourceContainer>& resourceContainer,
+    const std::shared_ptr<BundleResourceContainer>& resourceContainer,
     const std::string& resourcePrefix,
     const std::string& location);
 
@@ -157,12 +157,12 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    */
   void SetAutostartSetting(int32_t setting);
 
-  std::shared_ptr<const BundleResourceContainer> GetResourceContainer() const;
+  std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
 private:
   BundleStorage* const storage;
   const std::unique_ptr<Data> data;
-  const std::shared_ptr<const BundleResourceContainer> resourceContainer;
+  const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
   const std::string location;
 };

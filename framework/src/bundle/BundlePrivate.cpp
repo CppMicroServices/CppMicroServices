@@ -825,6 +825,13 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
           " at " + location + " failed: " + util::GetLastExceptionStr());
       }
     }
+    // It is unlikely that clients will access bundle resources
+    // if the only resource is the manifest file. On this assumption,
+    // close the open file handle to the zip file to improve performance
+    // and avoid exceeding OS open file handle limits.
+    if (OnlyContainsManifest(location)) {
+      barchive->GetResourceContainer()->CloseContainer();
+    }
   }
 
   // Check if we got version information and validate the version identifier

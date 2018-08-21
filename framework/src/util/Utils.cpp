@@ -98,6 +98,31 @@ bool IsBundleFile(const std::string& location)
   }
 }
 
+bool OnlyContainsManifest(const std::string& location)
+{
+  if (location.empty()) {
+    throw std::runtime_error("Invalid (empty) location provided.");
+  }
+
+  BundleResourceContainer resContainer(location);
+  auto topLevelDirs = resContainer.GetTopLevelDirs();
+  return std::all_of(
+      topLevelDirs.begin(),
+      topLevelDirs.end(),
+      [&resContainer](const std::string& dir) -> bool {
+        std::vector<std::string> names;
+        std::vector<uint32_t> indices;
+
+        resContainer.GetChildren(dir + "/", true, names, indices);
+        return std::all_of(names.begin(),
+                           names.end(),
+                           [](const std::string& resourceName) -> bool {
+                             return resourceName ==
+                                    std::string("manifest.json");
+                           });
+      });
+}
+
 //-------------------------------------------------------------------
 // Framework storage
 //-------------------------------------------------------------------

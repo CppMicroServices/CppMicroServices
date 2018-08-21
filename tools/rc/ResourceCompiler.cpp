@@ -203,7 +203,7 @@ void validateManifestInArchive(mz_zip_archive* zipArchive,
 /* 
  * @brief Validate manifest files in an archive.
  * @param archiveFile archive file path
- * @throw std::InvalidManifest on the first invalid manifest found.
+ * @throw InvalidManifest on the first invalid manifest found.
  * @throw runtime_error on the first manifest file which could not be read from the archive.
  */
 void validateManifestsInArchive(const std::string& archiveFile)

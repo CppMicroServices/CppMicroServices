@@ -37,6 +37,8 @@ namespace cppmicroservices {
 BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
+  , m_ZipFileMutex()
+  , m_IsContainerOpen(false)
 {
   if (!util::Exists(location)) {
     throw std::runtime_error(m_Location + " does not exist");
@@ -51,11 +53,14 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
     throw std::runtime_error("Invalid zip archive layout for bundle at " +
                              m_Location);
   }
+  m_IsContainerOpen = true;
 }
 
 BundleResourceContainer::~BundleResourceContainer()
 {
-  mz_zip_reader_end(&m_ZipArchive);
+  try {
+    CloseContainer();
+  } catch(...) {}
 }
 
 std::string BundleResourceContainer::GetLocation() const
@@ -69,8 +74,9 @@ std::vector<std::string> BundleResourceContainer::GetTopLevelDirs() const
                                    m_SortedToplevelDirs.end() };
 }
 
-bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat) const
+bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat)
 {
+  OpenContainer();
   int fileIndex =
     mz_zip_reader_locate_file(const_cast<mz_zip_archive*>(&m_ZipArchive),
                               stat.filePath.c_str(),
@@ -83,8 +89,9 @@ bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat) const
 }
 
 bool BundleResourceContainer::GetStat(int index,
-                                      BundleResourceContainer::Stat& stat) const
+                                      BundleResourceContainer::Stat& stat)
 {
+  OpenContainer();
   if (index >= 0) {
     mz_zip_archive_file_stat zipStat;
     if (!mz_zip_reader_file_stat(
@@ -111,8 +118,9 @@ bool BundleResourceContainer::GetStat(int index,
 }
 
 std::unique_ptr<void, void (*)(void*)> BundleResourceContainer::GetData(
-  int index) const
+  int index)
 {
+  OpenContainer();
   std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
   void* data = mz_zip_reader_extract_to_heap(
     const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
@@ -206,5 +214,26 @@ bool BundleResourceContainer::Matches(const std::string& name,
     pos = index + tok.size();
   }
   return true;
+}
+
+void BundleResourceContainer::OpenContainer()
+{
+  std::lock_guard<std::mutex> lock(m_ZipFileMutex);
+  if(!m_IsContainerOpen) {
+    if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
+        throw std::runtime_error("Could not init zip archive for bundle at " +
+            m_Location);
+    }
+    m_IsContainerOpen = true;
+  }
+}
+
+void BundleResourceContainer::CloseContainer()
+{
+  std::lock_guard<std::mutex> lock(m_ZipFileMutex);
+  if(m_IsContainerOpen) {
+    mz_zip_reader_end(&m_ZipArchive);
+    m_IsContainerOpen = false;
+  }
 }
 }

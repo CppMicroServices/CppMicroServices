@@ -48,6 +48,7 @@
 #include <cassert>
 #include <cstring>
 #include <iterator>
+#include <chrono>
 
 namespace cppmicroservices {
 
@@ -455,7 +456,7 @@ void BundlePrivate::Uninstall()
         //generations.set(0, new BundleGeneration(oldGen));
         //oldGen.purge(false);
         Purge();
-        barchive->SetLastModified(detail::Clock::now());
+        barchive->SetLastModified(std::chrono::steady_clock::now());
         operation = BundlePrivate::OP_IDLE;
         if (!bundleDir.empty()) {
           try {
@@ -779,7 +780,7 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
             CppMicroServices_VERSION_PATCH)
   , fragment()
   , lazyActivation(false)
-  , timeStamp(detail::Clock::now())
+  , timeStamp(std::chrono::steady_clock::now())
   , fragments()
   , bundleManifest()
   , lib()

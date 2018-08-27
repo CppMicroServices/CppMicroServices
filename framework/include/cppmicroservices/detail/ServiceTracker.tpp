@@ -30,6 +30,7 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <chrono>
 
 namespace cppmicroservices {
 
@@ -202,8 +203,9 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
   typedef std::chrono::duration<Rep, Period> D;
 
   auto timeout = rel_time;
-  const detail::Clock::time_point endTime =
-      (rel_time == D::zero()) ? detail::Clock::time_point() : (detail::Clock::now() + rel_time);
+  auto endTime = (rel_time == D::zero())
+                 ? std::chrono::steady_clock::time_point()
+                 : (std::chrono::steady_clock::now() + rel_time);
   do
   {
     auto t = d->Tracked();
@@ -222,9 +224,9 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
     object = GetService();
     // Adapt the timeout in case we "missed" the object after having
     // been notified within the timeout.
-    if (!object && endTime > detail::Clock::time_point())
+    if (!object && endTime > std::chrono::steady_clock::time_point())
     {
-      timeout = std::chrono::duration_cast<D>(endTime - detail::Clock::now());
+      timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
   } while (!object);

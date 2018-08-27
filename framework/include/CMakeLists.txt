@@ -16,7 +16,6 @@ set(_public_headers
   cppmicroservices/SharedLibrary.h
   cppmicroservices/ShrinkableMap.h
   cppmicroservices/ShrinkableVector.h
-  cppmicroservices/detail/Chrono.h
   cppmicroservices/detail/Log.h
   cppmicroservices/detail/Threads.h
   cppmicroservices/detail/WaitCondition.h

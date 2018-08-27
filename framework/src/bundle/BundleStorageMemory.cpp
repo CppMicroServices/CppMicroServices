@@ -27,6 +27,8 @@
 #include "BundleArchive.h"
 #include "BundleResourceContainer.h"
 
+#include <chrono>
+
 namespace cppmicroservices {
 
 BundleStorageMemory::BundleStorageMemory()
@@ -56,7 +58,7 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
 #endif
     auto id = nextFreeId++;
     auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(
-                detail::Clock::now().time_since_epoch())
+                std::chrono::steady_clock::now().time_since_epoch())
                 .count();
     std::unique_ptr<BundleArchive::Data> data(
       new BundleArchive::Data{ id, ts, -1 });

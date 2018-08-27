@@ -26,11 +26,11 @@
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/GlobalConfig.h"
-#include "cppmicroservices/detail/Chrono.h"
 
 #include <map>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 namespace cppmicroservices {
 
@@ -98,7 +98,7 @@ class US_Framework_EXPORT Bundle
 {
 
 public:
-  typedef detail::Clock::time_point TimeStamp;
+  using TimeStamp = std::chrono::steady_clock::time_point;
 
   /**
    * The bundle state.

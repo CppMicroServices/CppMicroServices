@@ -29,6 +29,8 @@ limitations under the License.
 #include "BundleContextPrivate.h"
 #include "BundleStorage.h"
 
+#include <chrono>
+
 namespace cppmicroservices {
 
 FrameworkPrivate::FrameworkPrivate(CoreBundleContext* fwCtx)
@@ -98,7 +100,7 @@ void FrameworkPrivate::InitSystemBundle()
       fwWiring = new FrameworkWiringImpl(coreCtx);
       */
 
-  timeStamp = detail::Clock::now();
+  timeStamp = std::chrono::steady_clock::now();
 }
 
 void FrameworkPrivate::UninitSystemBundle()

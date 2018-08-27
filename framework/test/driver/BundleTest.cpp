@@ -43,6 +43,7 @@
 #include "TestingMacros.h"
 
 #include <thread>
+#include <chrono>
 
 using namespace cppmicroservices;
 
@@ -134,7 +135,7 @@ public:
 
     US_TEST_CONDITION(buA.GetLastModified() > Bundle::TimeStamp(),
                       "Test bundle A last modified")
-    US_TEST_CONDITION(buA.GetLastModified() <= detail::Clock::now(),
+    US_TEST_CONDITION(buA.GetLastModified() <= std::chrono::steady_clock::now(),
                       "Test bundle A last modified")
 
     // Check that no service reference exist yet.
@@ -551,7 +552,7 @@ void TestBundleStates()
                     "Test uninstalled bundle state")
   US_TEST_CONDITION(lm < bundle.GetLastModified(),
                     "Last modified time changed after uninstall")
-  US_TEST_CONDITION(bundle.GetLastModified() <= detail::Clock::now(),
+  US_TEST_CONDITION(bundle.GetLastModified() <= std::chrono::steady_clock::now(),
                     "Last modified time <= now")
   bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
   bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));

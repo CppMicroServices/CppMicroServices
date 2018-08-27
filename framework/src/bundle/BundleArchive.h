@@ -23,11 +23,10 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
-#include "cppmicroservices/detail/Chrono.h"
-
 #include <memory>
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace cppmicroservices {
 
@@ -40,8 +39,7 @@ struct BundleStorage;
  */
 struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 {
-
-  typedef detail::Clock::time_point TimeStamp;
+  using TimeStamp = std::chrono::steady_clock::time_point;
 
   struct Data
   {

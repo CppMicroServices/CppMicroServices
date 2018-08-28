@@ -100,7 +100,7 @@ public:
   typedef std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>
     TrackingMap;
 
-  ~ServiceTracker();
+  ~ServiceTracker() override;
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -428,7 +428,7 @@ protected:
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
   std::shared_ptr<TrackedParmType> AddingService(
-    const ServiceReference<S>& reference);
+    const ServiceReference<S>& reference) override;
 
   /**
    * Default implementation of the
@@ -446,7 +446,7 @@ protected:
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
    */
   void ModifiedService(const ServiceReference<S>& reference,
-                       const std::shared_ptr<TrackedParmType>& service);
+                       const std::shared_ptr<TrackedParmType>& service) override;
 
   /**
    * Default implementation of the
@@ -465,7 +465,7 @@ protected:
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
    */
   void RemovedService(const ServiceReference<S>& reference,
-                      const std::shared_ptr<TrackedParmType>& service);
+                      const std::shared_ptr<TrackedParmType>& service) override;
 
 private:
   typedef typename ServiceTrackerCustomizer<S, T>::TypeTraits TypeTraits;

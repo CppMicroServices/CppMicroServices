@@ -458,7 +458,7 @@ public:
       throw ServiceException(
         "The service interface class has no "
         "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
-    typedef std::vector<ServiceReferenceU> BaseVectorT;
+    using BaseVectorT = std::vector<ServiceReferenceU>;
     BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
     std::vector<ServiceReference<S>> result;
     for (BaseVectorT::const_iterator i = serviceRefs.begin();

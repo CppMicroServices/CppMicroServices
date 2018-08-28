@@ -53,10 +53,8 @@ BundleVersion BundleVersion::UndefinedVersion()
 BundleVersion& BundleVersion::operator=(const BundleVersion&) = default;
 
 BundleVersion::BundleVersion(bool undefined)
-  : majorVersion(0)
-  , minorVersion(0)
-  , microVersion(0)
-  , qualifier("")
+  : 
+   qualifier("")
   , undefined(undefined)
 {}
 

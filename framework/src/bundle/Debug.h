@@ -29,7 +29,7 @@ struct Debug
 {
   Debug();
 
-  bool lazyActivation;
+  bool lazyActivation{false};
 };
 }
 

@@ -78,9 +78,9 @@ struct PrototypeServiceFactory : public ServiceFactory
    * @see ServiceObjects#GetService()
    * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMapConstPtr GetService(
+  InterfaceMapConstPtr GetService(
     const Bundle& bundle,
-    const ServiceRegistrationBase& registration) = 0;
+    const ServiceRegistrationBase& registration) override = 0;
 
   /**
    * Releases a service object created for a caller.
@@ -95,9 +95,9 @@ struct PrototypeServiceFactory : public ServiceFactory
    *
    * @see ServiceObjects::UngetService()
    */
-  virtual void UngetService(const Bundle& bundle,
+  void UngetService(const Bundle& bundle,
                             const ServiceRegistrationBase& registration,
-                            const InterfaceMapConstPtr& service) = 0;
+                            const InterfaceMapConstPtr& service) override = 0;
 };
 }
 

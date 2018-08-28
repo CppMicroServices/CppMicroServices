@@ -42,8 +42,8 @@ class TrackedService
 {
 
 public:
-  typedef typename TTT::TrackedType T;
-  typedef typename TTT::TrackedParmType TrackedParmType;
+  using T = typename TTT::TrackedType;
+  using TrackedParmType = typename TTT::TrackedParmType;
 
   TrackedService(ServiceTracker<S, T>* serviceTracker,
                  ServiceTrackerCustomizer<S, T>* customizer);
@@ -55,7 +55,7 @@ public:
    *
    * @param event <code>ServiceEvent</code> object from the framework.
    */
-  void ServiceChanged(const ServiceEvent& event);
+  void ServiceChanged(const ServiceEvent& event) override;
 
 private:
   typedef BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
@@ -70,7 +70,7 @@ private:
    *
    * @GuardedBy this
    */
-  void Modified();
+  void Modified() override;
 
   /**
    * Call the specific customizer adding method. This method must not be
@@ -83,7 +83,7 @@ private:
    */
   std::shared_ptr<TrackedParmType> CustomizerAdding(
     ServiceReference<S> item,
-    const ServiceEvent& related);
+    const ServiceEvent& related) override;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -95,7 +95,7 @@ private:
    */
   void CustomizerModified(ServiceReference<S> item,
                           const ServiceEvent& related,
-                          const std::shared_ptr<TrackedParmType>& object);
+                          const std::shared_ptr<TrackedParmType>& object) override;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -107,7 +107,7 @@ private:
    */
   void CustomizerRemoved(ServiceReference<S> item,
                          const ServiceEvent& related,
-                         const std::shared_ptr<TrackedParmType>& object);
+                         const std::shared_ptr<TrackedParmType>& object) override;
 };
 
 } // namespace detail

@@ -56,8 +56,8 @@ class BundleAbstractTracked
 {
 
 public:
-  typedef typename TTT::TrackedType T;
-  typedef typename TTT::TrackedParmType TrackedParmType;
+  using T = typename TTT::TrackedType;
+  using TrackedParmType = typename TTT::TrackedParmType;
 
   typedef std::map<S, std::shared_ptr<TrackedParmType>> TrackingMap;
 

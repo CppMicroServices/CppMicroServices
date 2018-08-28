@@ -43,7 +43,7 @@ class BundlePrivate;
 template<class S>
 class ServiceReference;
 
-typedef ServiceReference<void> ServiceReferenceU;
+using ServiceReferenceU = ServiceReference<void>;
 
 /**
 \defgroup gr_bundle Bundle

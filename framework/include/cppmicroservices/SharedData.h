@@ -72,8 +72,8 @@ template<class T>
 class SharedDataPointer
 {
 public:
-  typedef T Type;
-  typedef T* pointer;
+  using Type = T;
+  using pointer = T *;
 
   inline void Detach()
   {
@@ -116,7 +116,7 @@ public:
   }
 
   inline SharedDataPointer()
-    : d(0)
+    : d(nullptr)
   {}
   inline ~SharedDataPointer()
   {
@@ -183,8 +183,8 @@ template<class T>
 class ExplicitlySharedDataPointer
 {
 public:
-  typedef T Type;
-  typedef T* pointer;
+  using Type = T;
+  using pointer = T *;
 
   inline T& operator*() const { return *d; }
   inline T* operator->() { return d; }

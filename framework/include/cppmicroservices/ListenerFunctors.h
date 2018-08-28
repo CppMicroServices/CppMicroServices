@@ -56,7 +56,7 @@ class ServiceListeners;
    *
    * @see ServiceEvent
    */
-typedef std::function<void(const ServiceEvent&)> ServiceListener;
+using ServiceListener = std::function<void (const ServiceEvent &)>;
 
 /**
    * \ingroup MicroServices
@@ -77,7 +77,7 @@ typedef std::function<void(const ServiceEvent&)> ServiceListener;
    *
    * @see BundleEvent
    */
-typedef std::function<void(const BundleEvent&)> BundleListener;
+using BundleListener = std::function<void (const BundleEvent &)>;
 
 /**
    * \ingroup MicroServices
@@ -97,7 +97,7 @@ typedef std::function<void(const BundleEvent&)> BundleListener;
    *
    * @see FrameworkEvent
    */
-typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
+using FrameworkListener = std::function<void (const FrameworkEvent &)>;
 
 /**
    * \ingroup MicroServices
@@ -182,8 +182,8 @@ BindFrameworkListenerToFunctor(R* receiver,
 }
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListener)
-typedef void (*TargetType)(const cppmicroservices::ServiceEvent&);
-const TargetType* targetFunc = arg.target<TargetType>();
+using TargetType = void (*)(const cppmicroservices::ServiceEvent &);
+const auto* targetFunc = arg.target<TargetType>();
 void* targetPtr = nullptr;
 std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
 return hash<void*>()(targetPtr);

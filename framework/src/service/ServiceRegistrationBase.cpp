@@ -40,7 +40,7 @@ US_MSVC_DISABLE_WARNING(
 namespace cppmicroservices {
 
 ServiceRegistrationBase::ServiceRegistrationBase()
-  : d(nullptr)
+   
 {}
 
 ServiceRegistrationBase::ServiceRegistrationBase(

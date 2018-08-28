@@ -245,7 +245,7 @@ public:
   /// @}
 
 private:
-  LDAPProp& operator=(const LDAPProp&);
+  LDAPProp& operator=(const LDAPProp&) = delete;
 
   std::string m_property;
 };

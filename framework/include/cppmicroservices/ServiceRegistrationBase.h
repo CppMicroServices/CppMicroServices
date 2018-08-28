@@ -201,7 +201,7 @@ private:
                           const InterfaceMapConstPtr& service,
                           Properties&& props);
 
-  ServiceRegistrationBasePrivate* d;
+  ServiceRegistrationBasePrivate* d{nullptr};
 };
 
 /**

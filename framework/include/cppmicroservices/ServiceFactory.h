@@ -61,7 +61,7 @@ class ServiceFactory
 {
 
 public:
-  virtual ~ServiceFactory() {}
+  virtual ~ServiceFactory() = default;
 
   /**
    * Returns a service object for a bundle.

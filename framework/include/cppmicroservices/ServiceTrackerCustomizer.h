@@ -64,9 +64,9 @@ struct ServiceTrackerCustomizer
 
   struct TypeTraits
   {
-    typedef S ServiceType;
-    typedef T TrackedType;
-    typedef T TrackedParmType;
+    using ServiceType = S;
+    using TrackedType = T;
+    using TrackedParmType = T;
 
     static std::shared_ptr<TrackedType> ConvertToTrackedType(
       const std::shared_ptr<S>&)
@@ -76,9 +76,9 @@ struct ServiceTrackerCustomizer
     }
   };
 
-  typedef typename TypeTraits::TrackedParmType TrackedParmType;
+  using TrackedParmType = typename TypeTraits::TrackedParmType;
 
-  virtual ~ServiceTrackerCustomizer() {}
+  virtual ~ServiceTrackerCustomizer() = default;
 
   /**
    * A service is being added to the <code>ServiceTracker</code>.
@@ -136,9 +136,9 @@ struct ServiceTrackerCustomizer<S, S>
 
   struct TypeTraits
   {
-    typedef S ServiceType;
-    typedef S TrackedType;
-    typedef S TrackedParmType;
+    using ServiceType = S;
+    using TrackedType = S;
+    using TrackedParmType = S;
 
     static std::shared_ptr<S> ConvertToTrackedType(const std::shared_ptr<S>& t)
     {
@@ -146,9 +146,9 @@ struct ServiceTrackerCustomizer<S, S>
     }
   };
 
-  typedef typename TypeTraits::TrackedParmType TrackedParmType;
+  using TrackedParmType = typename TypeTraits::TrackedParmType;
 
-  virtual ~ServiceTrackerCustomizer() {}
+  virtual ~ServiceTrackerCustomizer() = default;
 
   virtual std::shared_ptr<TrackedParmType> AddingService(
     const ServiceReference<S>& reference) = 0;
@@ -166,9 +166,9 @@ struct ServiceTrackerCustomizer<void, T>
 
   struct TypeTraits
   {
-    typedef void ServiceType;
-    typedef T TrackedType;
-    typedef T TrackedParmType;
+    using ServiceType = void;
+    using TrackedType = T;
+    using TrackedParmType = T;
 
     static std::shared_ptr<T> ConvertToTrackedType(const InterfaceMapConstPtr&)
     {
@@ -177,10 +177,10 @@ struct ServiceTrackerCustomizer<void, T>
     }
   };
 
-  typedef void S;
-  typedef typename TypeTraits::TrackedParmType TrackedParmType;
+  using S = void;
+  using TrackedParmType = typename TypeTraits::TrackedParmType;
 
-  virtual ~ServiceTrackerCustomizer() {}
+  virtual ~ServiceTrackerCustomizer() = default;
   virtual std::shared_ptr<TrackedParmType> AddingService(
     const ServiceReference<S>& reference) = 0;
   virtual void ModifiedService(
@@ -197,9 +197,9 @@ struct ServiceTrackerCustomizer<void, void>
 
   struct TypeTraits
   {
-    typedef void ServiceType;
-    typedef void TrackedType;
-    typedef const InterfaceMap TrackedParmType;
+    using ServiceType = void;
+    using TrackedType = void;
+    using TrackedParmType = const InterfaceMap;
 
     static std::shared_ptr<TrackedParmType> ConvertToTrackedType(
       const std::shared_ptr<TrackedParmType>& t)
@@ -208,11 +208,11 @@ struct ServiceTrackerCustomizer<void, void>
     }
   };
 
-  typedef void S;
-  typedef void T;
-  typedef TypeTraits::TrackedParmType TrackedParmType;
+  using S = void;
+  using T = void;
+  using TrackedParmType = TypeTraits::TrackedParmType;
 
-  virtual ~ServiceTrackerCustomizer() {}
+  virtual ~ServiceTrackerCustomizer() = default;
   virtual std::shared_ptr<TrackedParmType> AddingService(
     const ServiceReference<S>& reference) = 0;
   virtual void ModifiedService(

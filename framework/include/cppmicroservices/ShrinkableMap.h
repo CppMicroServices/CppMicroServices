@@ -43,14 +43,14 @@ private:
 
 public:
   typedef std::map<Key, T> container_type;
-  typedef typename container_type::iterator iterator;
-  typedef typename container_type::const_iterator const_iterator;
-  typedef typename container_type::size_type size_type;
-  typedef typename container_type::key_type key_type;
-  typedef typename container_type::mapped_type mapped_type;
-  typedef typename container_type::value_type value_type;
-  typedef typename container_type::reference reference;
-  typedef typename container_type::const_reference const_reference;
+  using iterator = typename container_type::iterator;
+  using const_iterator = typename container_type::const_iterator;
+  using size_type = typename container_type::size_type;
+  using key_type = typename container_type::key_type;
+  using mapped_type = typename container_type::mapped_type;
+  using value_type = typename container_type::value_type;
+  using reference = typename container_type::reference;
+  using const_reference = typename container_type::const_reference;
 
   ShrinkableMap()
     : container(emptyContainer)

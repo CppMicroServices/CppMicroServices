@@ -68,7 +68,7 @@ class US_Framework_EXPORT LDAPFilter
 {
 
 private:
-  typedef SharedDataPointer<LDAPFilterData> LDAPFilter::*bool_type;
+  using bool_type = SharedDataPointer<LDAPFilterData> LDAPFilter::*;
 
 public:
   /**

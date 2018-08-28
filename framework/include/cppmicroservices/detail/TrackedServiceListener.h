@@ -35,7 +35,7 @@ namespace detail {
  */
 struct TrackedServiceListener
 {
-  virtual ~TrackedServiceListener() {}
+  virtual ~TrackedServiceListener() = default;
 
   /**
    * Slot connected to service events for the

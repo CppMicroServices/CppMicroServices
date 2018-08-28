@@ -37,9 +37,7 @@ BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked(BundleContext* bc)
 
 template<class S, class TTT, class R>
 BundleAbstractTracked<S,TTT,R>::~BundleAbstractTracked()
-{
-
-}
+= default;
 
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::SetInitial(const std::vector<S>& initiallist)

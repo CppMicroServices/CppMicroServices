@@ -43,8 +43,7 @@ class BundlePrivate;
 template<class S>
 class ServiceReference;
 
-typedef ServiceReference<void> ServiceReferenceU;
-
+using ServiceReferenceU = ServiceReference<void>;
 using clock_t = std::chrono::high_resolution_clock;
 
 /**

@@ -45,6 +45,8 @@ class ServiceReference;
 
 typedef ServiceReference<void> ServiceReferenceU;
 
+using clock_t = std::chrono::high_resolution_clock;
+
 /**
 \defgroup gr_bundle Bundle
 
@@ -98,7 +100,7 @@ class US_Framework_EXPORT Bundle
 {
 
 public:
-  using TimeStamp = std::chrono::steady_clock::time_point;
+  using TimeStamp = clock_t::time_point;
 
   /**
    * The bundle state.

@@ -584,7 +584,7 @@ std::exception_ptr BundlePrivate::Start0()
   // the actiavtor inside the bundle is called.
   if (useActivator) {
     try {
-      using CreateActivatorHook = BundleActivator *(*)();
+      typedef BundleActivator* (*CreateActivatorHook)(void);
       CreateActivatorHook createActivatorHook = nullptr;
 
       void* libHandle = nullptr;

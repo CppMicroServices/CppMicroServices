@@ -546,7 +546,7 @@ void TestBundleStates()
   bundle.Stop();
   US_TEST_CONDITION((bundle.GetState() & Bundle::STATE_ACTIVE) == false,
                     "Test stopped bundle state")
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   bundle.Uninstall();
   US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_UNINSTALLED,
                     "Test uninstalled bundle state")

@@ -44,7 +44,7 @@ template<class S>
 class ServiceReference;
 
 using ServiceReferenceU = ServiceReference<void>;
-using clock_t = std::chrono::high_resolution_clock;
+using clock_t = std::chrono::steady_clock;
 
 /**
 \defgroup gr_bundle Bundle

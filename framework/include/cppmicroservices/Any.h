@@ -419,7 +419,7 @@ public:
     , _msg(std::move(msg))
   {}
 
-  ~BadAnyCastException() noexcept override = default;
+  ~BadAnyCastException() override = default;
 
   const char* what() const noexcept override
   {
@@ -622,7 +622,7 @@ template<class K>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, Any>& m)
 {
   os << "{";
-  typedef typename std::map<K, Any>::const_iterator Iterator;
+  using Iterator = typename std::map<K, Any>::const_iterator;
   auto i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
@@ -640,7 +640,7 @@ template<class K, class V>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m)
 {
   os << "{";
-  typedef typename std::map<K, V>::const_iterator Iterator;
+  using Iterator = typename std::map<K, V>::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
@@ -658,7 +658,7 @@ template<class K>
 std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m)
 {
   os << "{";
-  typedef typename std::map<K, Any>::const_iterator Iterator;
+  using Iterator = typename std::map<K, Any>::const_iterator;
   auto i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
@@ -677,7 +677,7 @@ template<class K, class V>
 std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
 {
   os << "{";
-  typedef typename std::map<K, V>::const_iterator Iterator;
+  using Iterator = typename std::map<K, V>::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();

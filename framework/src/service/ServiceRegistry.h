@@ -58,10 +58,8 @@ public:
     bool isPrototypeFactory = false,
     long sid = -1);
 
-  typedef std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>
-    MapServiceClasses;
-  typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>
-    MapClassServices;
+  using MapServiceClasses = std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>;
+  using MapClassServices = std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>;
 
   /**
    * All registered services in the current framework.

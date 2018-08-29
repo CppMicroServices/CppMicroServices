@@ -50,8 +50,8 @@ class ZipFile
 {
 
 public:
-  typedef std::vector<EntryInfo>::const_reference const_reference;
-  typedef std::vector<EntryInfo>::size_type size_type;
+  using const_reference = std::vector<EntryInfo>::const_reference;
+  using size_type = std::vector<EntryInfo>::size_type;
 
   /*
   * @brief Read a zip archive and fill entries

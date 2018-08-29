@@ -94,11 +94,10 @@ class ServiceTracker : protected ServiceTrackerCustomizer<S, T>
 {
 public:
   /// The type of the tracked object
-  typedef
-    typename ServiceTrackerCustomizer<S, T>::TrackedParmType TrackedParmType;
+  using TrackedParmType =
+    typename ServiceTrackerCustomizer<S, T>::TrackedParmType;
 
-  typedef std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>
-    TrackingMap;
+  using TrackingMap = std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>;
 
   ~ServiceTracker() override;
 
@@ -468,12 +467,12 @@ protected:
                       const std::shared_ptr<TrackedParmType>& service) override;
 
 private:
-  typedef typename ServiceTrackerCustomizer<S, T>::TypeTraits TypeTraits;
+  using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;
 
-  typedef ServiceTracker<S, T> _ServiceTracker;
-  typedef detail::TrackedService<S, TypeTraits> _TrackedService;
-  typedef detail::ServiceTrackerPrivate<S, TypeTraits> _ServiceTrackerPrivate;
-  typedef ServiceTrackerCustomizer<S, T> _ServiceTrackerCustomizer;
+  using _ServiceTracker = ServiceTracker<S, T>;
+  using _TrackedService = detail::TrackedService<S, TypeTraits>;
+  using _ServiceTrackerPrivate = detail::ServiceTrackerPrivate<S, TypeTraits>;
+  using _ServiceTrackerCustomizer = ServiceTrackerCustomizer<S, T>;
 
   friend class detail::TrackedService<S, TypeTraits>;
   friend class detail::ServiceTrackerPrivate<S, TypeTraits>;

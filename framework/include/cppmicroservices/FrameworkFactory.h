@@ -39,7 +39,7 @@ class Any;
 
 class Framework;
 
-typedef std::unordered_map<std::string, Any> FrameworkConfiguration;
+using FrameworkConfiguration = std::unordered_map<std::string, Any>;
 
 /**
  * \ingroup MicroServices

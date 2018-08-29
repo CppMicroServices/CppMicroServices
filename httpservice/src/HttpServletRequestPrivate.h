@@ -58,7 +58,7 @@ struct HttpServletRequestPrivate : public SharedData
   std::string m_QueryString;
   std::string m_Url;
 
-  typedef std::map<std::string, Any> AttributeMapType;
+  using AttributeMapType = std::map<std::string, Any>;
   AttributeMapType m_Attributes;
 };
 }

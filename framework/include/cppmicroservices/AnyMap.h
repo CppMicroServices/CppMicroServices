@@ -68,22 +68,19 @@ class US_Framework_EXPORT any_map
 public:
   using key_type = std::string;
   using mapped_type = Any;
-  typedef std::pair<const key_type, mapped_type> value_type;
+  using value_type = std::pair<const key_type, mapped_type>;
   using size_type = std::size_t;
   using difference_type = std::ptrdiff_t;
   using reference = value_type &;
   using const_reference = const value_type &;
   using pointer = value_type *;
   using const_pointer = const value_type *;
-
-  typedef std::map<std::string, Any> ordered_any_map;
-  typedef std::unordered_map<std::string, Any> unordered_any_map;
-  typedef std::unordered_map<std::string,
-                             Any,
-                             detail::any_map_cihash,
-                             detail::any_map_ciequal>
-    unordered_any_cimap;
-
+  using ordered_any_map = std::map<std::string, Any>;
+  using unordered_any_map = std::unordered_map<std::string, Any>;
+  using unordered_any_cimap = std::unordered_map<std::string,
+                                                 Any,
+                                                 detail::any_map_cihash,
+                                                 detail::any_map_ciequal>;
   enum map_type : uint8_t
   {
     ORDERED_MAP,

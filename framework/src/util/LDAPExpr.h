@@ -53,10 +53,10 @@ public:
   const static int COMPLEX = AND | OR | NOT;
   const static int SIMPLE = EQ | LE | GE | APPROX;
 
-  typedef char Byte;
-  typedef std::vector<std::string> StringList;
-  typedef std::vector<StringList> LocalCache;
-  typedef std::unordered_set<std::string> ObjectClassSet;
+  using Byte = char;
+  using StringList = std::vector<std::string>;
+  using LocalCache = std::vector<StringList>;
+  using ObjectClassSet = std::unordered_set<std::string>;
 
   /**
    * Creates an invalid LDAPExpr object. Use with care.

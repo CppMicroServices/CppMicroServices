@@ -67,9 +67,6 @@ class Bundle;
 class US_Framework_EXPORT LDAPFilter
 {
 
-private:
-  using bool_type = SharedDataPointer<LDAPFilterData> LDAPFilter::*;
-
 public:
   /**
    * Creates a valid <code>LDAPFilter</code> object that

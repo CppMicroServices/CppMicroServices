@@ -39,9 +39,8 @@ US_MSVC_DISABLE_WARNING(
 
 namespace cppmicroservices {
 
-typedef std::unordered_map<BundlePrivate*,
-                           std::unordered_set<ServiceRegistrationBasePrivate*>>
-  ThreadMarksMapType;
+using ThreadMarksMapType = std::unordered_map<BundlePrivate*,
+                           std::unordered_set<ServiceRegistrationBasePrivate*>>;
 
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(
   ServiceRegistrationBasePrivate* reg)

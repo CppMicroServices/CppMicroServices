@@ -77,7 +77,7 @@ class ServiceFactory;
  *
  * @see MakeInterfaceMap
  */
-typedef std::map<std::string, std::shared_ptr<void>> InterfaceMap;
+using InterfaceMap = std::map<std::string, std::shared_ptr<void>>;
 using InterfaceMapPtr = std::shared_ptr<InterfaceMap>;
 using InterfaceMapConstPtr = std::shared_ptr<const InterfaceMap>;
 

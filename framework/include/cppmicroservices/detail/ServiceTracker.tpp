@@ -200,7 +200,7 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
   auto object = GetService();
   if (object) return object;
 
-  typedef std::chrono::duration<Rep, Period> D;
+  using D = std::chrono::duration<Rep, Period>;
 
   auto timeout = rel_time;
   auto endTime = (rel_time == D::zero())

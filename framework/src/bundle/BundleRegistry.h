@@ -138,7 +138,7 @@ private:
 
   CoreBundleContext* coreCtx;
 
-  typedef std::multimap<std::string, std::shared_ptr<BundlePrivate>> BundleMap;
+using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 
   /**
    * Table of all installed bundles in this framework.

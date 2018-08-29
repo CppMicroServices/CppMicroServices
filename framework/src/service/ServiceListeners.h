@@ -49,25 +49,21 @@ class ServiceListeners : private detail::MultiThreaded<>
 {
 
 public:
-  typedef std::tuple<BundleListener, void*> BundleListenerEntry;
-  typedef std::unordered_map<
-    std::shared_ptr<BundleContextPrivate>,
-    std::unordered_map<ListenerTokenId, BundleListenerEntry>>
-    BundleListenerMap;
+  using BundleListenerEntry = std::tuple<BundleListener, void*>;
+  using BundleListenerMap = std::unordered_map<std::shared_ptr<BundleContextPrivate>,
+                                               std::unordered_map<ListenerTokenId, BundleListenerEntry>>;
+  
   struct : public MultiThreaded<>
   {
     BundleListenerMap value;
   } bundleListenerMap;
 
-  typedef std::unordered_map<std::string, std::list<ServiceListenerEntry>>
-    CacheType;
-  typedef std::unordered_set<ServiceListenerEntry> ServiceListenerEntries;
+  using CacheType = std::unordered_map<std::string, std::list<ServiceListenerEntry>>;
+  using ServiceListenerEntries = std::unordered_set<ServiceListenerEntry>;
 
-  typedef std::tuple<FrameworkListener, void*> FrameworkListenerEntry;
-  typedef std::unordered_map<
-    std::shared_ptr<BundleContextPrivate>,
-    std::unordered_map<ListenerTokenId, FrameworkListenerEntry>>
-    FrameworkListenerMap;
+  using FrameworkListenerEntry = std::tuple<FrameworkListener, void*>;
+  using FrameworkListenerMap = std::unordered_map<std::shared_ptr<BundleContextPrivate>,
+                                                  std::unordered_map<ListenerTokenId, FrameworkListenerEntry>>;
 
 private:
   std::atomic<uint64_t> listenerId;

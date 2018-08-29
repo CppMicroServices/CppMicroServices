@@ -58,8 +58,7 @@ public:
   void ServiceChanged(const ServiceEvent& event) override;
 
 private:
-  typedef BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
-    Superclass;
+  using Superclass = BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
 
   ServiceTracker<S, T>* serviceTracker;
   ServiceTrackerCustomizer<S, T>* customizer;

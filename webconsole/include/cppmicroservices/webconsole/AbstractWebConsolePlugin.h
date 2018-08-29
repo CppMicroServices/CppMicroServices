@@ -63,7 +63,7 @@ struct AbstractWebConsolePluginPrivate;
 class US_WebConsole_EXPORT AbstractWebConsolePlugin : public HttpServlet
 {
 public:
-  typedef Kainjow::Mustache::Data TemplateData;
+  using TemplateData = Kainjow::Mustache::Data;
 
   /**
    * Retrieves the label. This is the last component in the servlet path.

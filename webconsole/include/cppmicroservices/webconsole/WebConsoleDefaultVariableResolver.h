@@ -31,7 +31,7 @@
 
 namespace cppmicroservices {
 
-typedef Kainjow::Mustache::Data MustacheData;
+using MustacheData = Kainjow::Mustache::Data;
 
 /**
  * The default Web Console variable resolver class.

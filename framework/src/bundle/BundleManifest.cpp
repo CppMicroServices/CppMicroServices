@@ -30,7 +30,7 @@ namespace cppmicroservices {
 
 namespace {
 
-typedef std::map<std::string, Any> AnyOrderedMap;
+using AnyOrderedMap = std::map<std::string, Any>;
 using AnyVector = std::vector<Any>;
 
 void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);

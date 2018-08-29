@@ -121,7 +121,7 @@ private:
 
   ServiceRegistrationU sr;
 
-  typedef ServiceTracker<FooService> FooTracker;
+  using FooTracker = ServiceTracker<FooService>;
   std::unique_ptr<SL1ServiceTrackerCustomizer> trackerCustomizer;
   std::unique_ptr<FooTracker> tracker;
   BundleContext context;

@@ -79,7 +79,7 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
 #endif
 
 public:
-  typedef detail::MultiThreaded<>::UniqueLock UniqueLock;
+using UniqueLock = detail::MultiThreaded<>::UniqueLock;
 
   BundleThread(CoreBundleContext* ctx);
   ~BundleThread();

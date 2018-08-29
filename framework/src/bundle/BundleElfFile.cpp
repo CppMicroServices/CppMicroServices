@@ -190,7 +190,7 @@ private:
   Ehdr m_FileHeader;
   Shdr* m_SectionHeaders;
 
-  typedef std::map<Word, char*> StrTblMapType;
+  using StrTblMapType = std::map<Word, char*>;
   StrTblMapType m_StrTblIndexToStrArray;
 
   std::vector<std::string> m_Needed;

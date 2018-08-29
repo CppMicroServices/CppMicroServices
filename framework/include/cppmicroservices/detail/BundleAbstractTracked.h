@@ -59,7 +59,7 @@ public:
   using T = typename TTT::TrackedType;
   using TrackedParmType = typename TTT::TrackedParmType;
 
-  typedef std::map<S, std::shared_ptr<TrackedParmType>> TrackingMap;
+  using TrackingMap = std::map<S, std::shared_ptr<TrackedParmType>>;
 
   /**
    * BundleAbstractTracked constructor.
@@ -269,7 +269,7 @@ public:
   void TrackAdding(S item, R related);
 
 private:
-  typedef BundleAbstractTracked<S, TTT, R> Self;
+  using Self = BundleAbstractTracked<S, TTT, R>;
 
   /**
    * Map of tracked items to customized objects.

@@ -584,9 +584,6 @@ std::exception_ptr BundlePrivate::Start0()
   // the actiavtor inside the bundle is called.
   if (useActivator) {
     try {
-      typedef BundleActivator* (*CreateActivatorHook)(void);
-      CreateActivatorHook createActivatorHook = nullptr;
-
       void* libHandle = nullptr;
       if ((lib.GetFilePath() == util::GetExecutablePath())) {
         libHandle = BundleUtils::GetExecutableHandle();
@@ -601,39 +598,30 @@ std::exception_ptr BundlePrivate::Start0()
 
       // save this bundle's context so that it can be accessible anywhere
       // from within this bundle's code.
-      std::string set_bundle_context_func =
-        US_STR(US_SET_CTX_PREFIX) + symbolicName;
-      void* setBundleContextSym =
-        BundleUtils::GetSymbol(libHandle, set_bundle_context_func.c_str());
-      std::memcpy(&SetBundleContext, &setBundleContextSym, sizeof(void*));
+      std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
+      BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func);
+      
       if (SetBundleContext) {
         SetBundleContext(ctx.get());
       }
 
       // get the create/destroy activator callbacks
-      std::string create_activator_func =
-        US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
-      void* createActivatorHookSym =
-        BundleUtils::GetSymbol(libHandle, create_activator_func.c_str());
-      std::memcpy(&createActivatorHook, &createActivatorHookSym, sizeof(void*));
+      std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
+      std::function<BundleActivator*(void)> createActivatorHook;
+      BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func);
 
-      std::string destroy_activator_func =
-        US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-      void* destroyActivatorHookSym =
-        BundleUtils::GetSymbol(libHandle, destroy_activator_func.c_str());
-      std::memcpy(
-        &destroyActivatorHook, &destroyActivatorHookSym, sizeof(void*));
+      std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
+      BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func);
 
-      if (createActivatorHook == nullptr) {
+      if (!createActivatorHook) {
         throw std::runtime_error("Bundle activator constructor not found");
       }
-      if (destroyActivatorHook == nullptr) {
+      if (!destroyActivatorHook) {
         throw std::runtime_error("Bundle activator destructor not found");
       }
 
       // get a BundleActivator instance
-      bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(
-        createActivatorHook(), destroyActivatorHook);
+      bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
     } catch (...) {
       res = std::make_exception_ptr(

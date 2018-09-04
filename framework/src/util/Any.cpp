@@ -64,6 +64,12 @@ std::ostream& any_value_to_json(std::ostream& os, bool val)
   return os << (val ? "true" : "false");
 }
 
+// The default constructor implementation needs to be in the implementation file, not the
+// header in order to avoid this error:
+// "default initialization of an object of const type 'const cppmicroservices::Any' without
+// a user-provided default constructor"
+Any::Any() = default;
+    
 std::string Any::ToString() const
 {
   if (Empty()) {

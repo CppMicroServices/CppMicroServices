@@ -184,7 +184,7 @@ public:
   /**
    * Creates an empty any type.
    */
-  Any() = default;
+    Any();
 
   /**
    * Creates an Any which stores the init parameter inside.

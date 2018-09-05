@@ -44,7 +44,6 @@ template<class S>
 class ServiceReference;
 
 using ServiceReferenceU = ServiceReference<void>;
-using clock_t = std::chrono::steady_clock;
 
 /**
 \defgroup gr_bundle Bundle
@@ -99,7 +98,7 @@ class US_Framework_EXPORT Bundle
 {
 
 public:
-  using TimeStamp = clock_t::time_point;
+  using TimeStamp = std::chrono::steady_clock::time_point;
 
   /**
    * The bundle state.

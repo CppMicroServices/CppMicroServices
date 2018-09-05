@@ -456,7 +456,7 @@ void BundlePrivate::Uninstall()
         //generations.set(0, new BundleGeneration(oldGen));
         //oldGen.purge(false);
         Purge();
-        barchive->SetLastModified(clock_t::now());
+        barchive->SetLastModified(std::chrono::steady_clock::now());
         operation = BundlePrivate::OP_IDLE;
         if (!bundleDir.empty()) {
           try {
@@ -780,7 +780,7 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
             CppMicroServices_VERSION_PATCH)
   , fragment()
   , lazyActivation(false)
-  , timeStamp(clock_t::now())
+  , timeStamp(std::chrono::steady_clock::now())
   , fragments()
   , bundleManifest()
   , lib()

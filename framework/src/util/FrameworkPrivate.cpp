@@ -100,7 +100,7 @@ void FrameworkPrivate::InitSystemBundle()
       fwWiring = new FrameworkWiringImpl(coreCtx);
       */
 
-  timeStamp = clock_t::now();
+  timeStamp = std::chrono::steady_clock::now();
 }
 
 void FrameworkPrivate::UninitSystemBundle()

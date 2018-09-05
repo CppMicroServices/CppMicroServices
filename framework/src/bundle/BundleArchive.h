@@ -23,8 +23,6 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
-#include <cppmicroservices/Bundle.h>
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,7 +39,7 @@ struct BundleStorage;
  */
 struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 {
-  using TimeStamp = clock_t::time_point;
+  using TimeStamp = std::chrono::steady_clock::time_point;
 
   struct Data
   {

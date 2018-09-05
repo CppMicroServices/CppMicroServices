@@ -204,8 +204,8 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
 
   auto timeout = rel_time;
   auto endTime = (rel_time == D::zero())
-                 ? clock_t::time_point()
-                 : (clock_t::now() + rel_time);
+                 ? std::chrono::steady_clock::time_point()
+                 : (std::chrono::steady_clock::now() + rel_time);
   do
   {
     auto t = d->Tracked();
@@ -224,9 +224,9 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
     object = GetService();
     // Adapt the timeout in case we "missed" the object after having
     // been notified within the timeout.
-    if (!object && endTime > clock_t::time_point())
+    if (!object && endTime > std::chrono::steady_clock::time_point())
     {
-      timeout = std::chrono::duration_cast<D>(endTime - clock_t::now());
+      timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
   } while (!object);

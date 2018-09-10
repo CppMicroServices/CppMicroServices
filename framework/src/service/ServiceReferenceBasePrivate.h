@@ -104,7 +104,7 @@ public:
   /**
    * Reference count for implicitly shared private implementation.
    */
-  std::atomic<int> ref;
+  std::atomic<int> refCount;
 
   /**
    * Link to registration object for this reference.

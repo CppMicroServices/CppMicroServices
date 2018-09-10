@@ -45,7 +45,7 @@ typedef std::unordered_map<BundlePrivate*,
 
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(
   ServiceRegistrationBasePrivate* reg)
-  : ref(1)
+  : refCount(1)
   , registration(reg)
 {
   if (registration)

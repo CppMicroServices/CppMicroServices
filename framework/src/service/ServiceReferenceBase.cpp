@@ -40,7 +40,7 @@ ServiceReferenceBase::ServiceReferenceBase()
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : impl_ptr(ref.impl())
 {
-  ++impl()->ref;
+  ++impl()->refCount;
 }
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
@@ -49,9 +49,9 @@ ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 {
-  if (impl()->ref > 1) {
+  if (impl()->refCount > 1) {
     // detach
-    --impl()->ref;
+    --impl()->refCount;
     impl_ptr = new ServiceReferenceBasePrivate(impl()->registration);
   }
   impl()->interfaceId = interfaceId;
@@ -64,7 +64,7 @@ ServiceReferenceBase::operator bool() const
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 {
-  if (!--impl()->ref)
+  if (!--impl()->refCount)
     delete impl();
   impl_ptr = new ServiceReferenceBasePrivate(nullptr);
   return *this;
@@ -72,7 +72,7 @@ ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 
 ServiceReferenceBase::~ServiceReferenceBase()
 {
-  if (!--impl()->ref)
+  if (!--impl()->refCount)
     delete impl();
 }
 
@@ -193,10 +193,10 @@ ServiceReferenceBase& ServiceReferenceBase::operator=(
 
   ServiceReferenceBasePrivate* old_d = impl_ptr;
   ServiceReferenceBasePrivate* new_d = reference.impl_ptr;
-  ++new_d->ref;
+  ++new_d->refCount;
   impl_ptr = new_d;
 
-  if (!--old_d->ref)
+  if (!--old_d->refCount)
     delete old_d;
 
   return *this;

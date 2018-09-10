@@ -399,7 +399,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
   // Get a copy of the service reference and keep it until we are
   // done with its properties.
   auto ref = evt.GetServiceReference();
-  auto props = ref.d.load()->GetProperties();
+  auto props = ref.impl()->GetProperties();
 
   {
     auto l = this->Lock();

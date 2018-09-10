@@ -73,7 +73,7 @@ void BundleHooks::FilterBundles(const BundleContext& context,
     ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
     std::shared_ptr<BundleFindHook> fh =
       std::static_pointer_cast<BundleFindHook>(
-        sr.d.load()->GetService(GetPrivate(selfBundle).get()));
+        sr.impl()->GetService(GetPrivate(selfBundle).get()));
     if (fh) {
       try {
         fh->Find(context, filtered);
@@ -135,7 +135,7 @@ void BundleHooks::FilterBundleEventReceivers(
       }
 
       std::shared_ptr<BundleEventHook> eh =
-        std::static_pointer_cast<BundleEventHook>(sr.d.load()->GetService(
+        std::static_pointer_cast<BundleEventHook>(sr.impl()->GetService(
           GetPrivate(GetBundleContext().GetBundle()).get()));
       if (eh) {
         try {

@@ -916,7 +916,7 @@ void BundlePrivate::RemoveBundleResources()
        i != srs.end();
        ++i) {
     i->GetReference(std::string())
-      .d.load()
+      .impl()
       ->UngetService(this->shared_from_this(), false);
   }
 }

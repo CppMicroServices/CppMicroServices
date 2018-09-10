@@ -200,6 +200,11 @@ public:
 
   ServiceReferenceBase& operator=(const ServiceReferenceBase& reference);
 
+    ServiceReferenceBasePrivate* impl() const
+    {
+        return impl_ptr.load();
+    }
+
 private:
   friend class BundlePrivate;
   friend class BundleContext;
@@ -236,7 +241,7 @@ private:
 
   // This class is not thread-safe, but we support thread-safe
   // copying and assignment.
-  std::atomic<ServiceReferenceBasePrivate*> d;
+  std::atomic<ServiceReferenceBasePrivate*> impl_ptr;
 };
 
 /**

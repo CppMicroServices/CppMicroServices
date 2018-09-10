@@ -58,10 +58,10 @@ public:
       Constants::SCOPE_PROTOTYPE;
 
     if (isPrototypeScope) {
-      result = m_reference.d.load()->GetPrototypeService(
+      result = m_reference.impl()->GetPrototypeService(
         MakeBundleContext(m_context).GetBundle());
     } else {
-      result = m_reference.d.load()->GetServiceInterfaceMap(
+      result = m_reference.impl()->GetServiceInterfaceMap(
         GetPrivate(MakeBundleContext(m_context).GetBundle()).get());
     }
 
@@ -111,9 +111,9 @@ struct UngetHelper
           Constants::SCOPE_PROTOTYPE;
 
         if (isPrototypeScope) {
-          sref.d.load()->UngetPrototypeService(bundle, interfaceMap);
+          sref.impl()->UngetPrototypeService(bundle, interfaceMap);
         } else {
-          sref.d.load()->UngetService(bundle, true);
+          sref.impl()->UngetService(bundle, true);
         }
       }
     } catch (...) {

@@ -200,9 +200,9 @@ public:
 
   ServiceReferenceBase& operator=(const ServiceReferenceBase& reference);
 
-    ServiceReferenceBasePrivate* impl() const
+  std::shared_ptr<ServiceReferenceBasePrivate> impl() const
     {
-        return impl_ptr.load();
+        return std::atomic_load(&impl_ptr);
     }
 
 private:
@@ -239,9 +239,14 @@ private:
 
   void SetInterfaceId(const std::string& interfaceId);
 
+  void set_impl_ptr(const std::shared_ptr<ServiceReferenceBasePrivate>& new_impl_ptr)
+  {
+      auto tmp = impl_ptr;
+      while(!std::atomic_compare_exchange_strong(&impl_ptr, &tmp, new_impl_ptr));
+  }
   // This class is not thread-safe, but we support thread-safe
   // copying and assignment.
-  std::atomic<ServiceReferenceBasePrivate*> impl_ptr;
+  std::shared_ptr<ServiceReferenceBasePrivate> impl_ptr;
 };
 
 /**

@@ -43,10 +43,8 @@ typedef std::unordered_map<BundlePrivate*,
                            std::unordered_set<ServiceRegistrationBasePrivate*>>
   ThreadMarksMapType;
 
-ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(
-  ServiceRegistrationBasePrivate* reg)
-  : refCount(1)
-  , registration(reg)
+ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)
+  : registration(reg)
 {
   if (registration)
     ++registration->ref;

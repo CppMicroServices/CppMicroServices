@@ -40,7 +40,6 @@ ServiceReferenceBase::ServiceReferenceBase()
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : impl_ptr(ref.impl())
 {
-  ++impl()->refCount;
 }
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
@@ -49,11 +48,7 @@ ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 {
-  if (impl()->refCount > 1) {
-    // detach
-    --impl()->refCount;
-    impl_ptr = new ServiceReferenceBasePrivate(impl()->registration);
-  }
+  impl_ptr = std::make_shared<ServiceReferenceBasePrivate>(impl()->registration);
   impl()->interfaceId = interfaceId;
 }
 
@@ -64,16 +59,12 @@ ServiceReferenceBase::operator bool() const
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
 {
-  if (!--impl()->refCount)
-    delete impl();
-  impl_ptr = new ServiceReferenceBasePrivate(nullptr);
+  set_impl_ptr(std::make_shared<ServiceReferenceBasePrivate>(nullptr));
   return *this;
 }
 
 ServiceReferenceBase::~ServiceReferenceBase()
 {
-  if (!--impl()->refCount)
-    delete impl();
 }
 
 Any ServiceReferenceBase::GetProperty(const std::string& key) const
@@ -179,26 +170,17 @@ bool ServiceReferenceBase::operator<(
   }
 }
 
-bool ServiceReferenceBase::operator==(
-  const ServiceReferenceBase& reference) const
+bool ServiceReferenceBase::operator==(const ServiceReferenceBase& reference) const
 {
   return impl()->registration == reference.impl()->registration;
 }
 
-ServiceReferenceBase& ServiceReferenceBase::operator=(
-  const ServiceReferenceBase& reference)
+ServiceReferenceBase& ServiceReferenceBase::operator=(const ServiceReferenceBase& reference)
 {
   if (impl_ptr == reference.impl())
     return *this;
 
-  ServiceReferenceBasePrivate* old_d = impl_ptr;
-  ServiceReferenceBasePrivate* new_d = reference.impl_ptr;
-  ++new_d->refCount;
-  impl_ptr = new_d;
-
-  if (!--old_d->refCount)
-    delete old_d;
-
+  set_impl_ptr(reference.impl_ptr);
   return *this;
 }
 

@@ -201,7 +201,7 @@ private:
                           const InterfaceMapConstPtr& service,
                           Properties&& props);
 
-  ServiceRegistrationBasePrivate* d;
+  ServiceRegistrationBasePrivate* regdata_ptr;
 };
 
 /**
@@ -225,7 +225,7 @@ US_Framework_EXPORT std::ostream& operator<<(
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
-return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);
+return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.regdata_ptr);
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H

@@ -47,12 +47,12 @@ ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBase
   : registration(reg)
 {
   if (registration)
-    ++registration->ref;
+    ++registration->regDataRefCount;
 }
 
 ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 {
-  if (registration && !--registration->ref) {
+  if (registration && !--registration->regDataRefCount) {
     delete registration;
   }
 }

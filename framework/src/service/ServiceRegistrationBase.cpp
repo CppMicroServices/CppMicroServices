@@ -40,76 +40,76 @@ US_MSVC_DISABLE_WARNING(
 namespace cppmicroservices {
 
 ServiceRegistrationBase::ServiceRegistrationBase()
-  : d(nullptr)
+  : regdata_ptr(nullptr)
 {}
 
 ServiceRegistrationBase::ServiceRegistrationBase(
   const ServiceRegistrationBase& reg)
-  : d(reg.d)
+  : regdata_ptr(reg.regdata_ptr)
 {
-  if (d)
-    ++d->ref;
+  if (regdata_ptr)
+    ++regdata_ptr->regDataRefCount;
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg)
-  : d(nullptr)
+  : regdata_ptr(nullptr)
 {
-  std::swap(d, reg.d);
+  std::swap(regdata_ptr, reg.regdata_ptr);
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(
   ServiceRegistrationBasePrivate* registrationPrivate)
-  : d(registrationPrivate)
+  : regdata_ptr(registrationPrivate)
 {
-  if (d)
-    ++d->ref;
+  if (regdata_ptr)
+    ++regdata_ptr->regDataRefCount;
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(
   BundlePrivate* bundle,
   const InterfaceMapConstPtr& service,
   Properties&& props)
-  : d(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
+  : regdata_ptr(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
 {}
 
 ServiceRegistrationBase::operator bool() const
 {
-  return d != nullptr;
+  return regdata_ptr != nullptr;
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(std::nullptr_t)
 {
-  if (d && !--d->ref) {
-    delete d;
+  if (regdata_ptr && !--regdata_ptr->regDataRefCount) {
+    delete regdata_ptr;
   }
-  d = nullptr;
+  regdata_ptr = nullptr;
   return *this;
 }
 
 ServiceRegistrationBase::~ServiceRegistrationBase()
 {
-  if (d && !--d->ref)
-    delete d;
+  if (regdata_ptr && !--regdata_ptr->regDataRefCount)
+    delete regdata_ptr;
 }
 
 ServiceReferenceBase ServiceRegistrationBase::GetReference(
   const std::string& interfaceId) const
 {
-  if (!d)
+  if (!regdata_ptr)
     throw std::logic_error("ServiceRegistrationBase object invalid");
-  if (!d->available)
+  if (!regdata_ptr->available)
     throw std::logic_error("Service is unregistered");
 
-  auto l = d->Lock();
+  auto l = regdata_ptr->Lock();
   US_UNUSED(l);
-  ServiceReferenceBase ref = d->reference;
+  ServiceReferenceBase ref = regdata_ptr->reference;
   ref.SetInterfaceId(interfaceId);
   return ref;
 }
 
 void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 {
-  if (!d)
+  if (!regdata_ptr)
     throw std::logic_error("ServiceRegistrationBase object invalid");
 
   ServiceEvent modifiedEndMatchEvent;
@@ -117,54 +117,54 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
   ServiceListeners::ServiceListenerEntries before;
 
-  if (d->available) {
+  if (regdata_ptr->available) {
     {
-      auto l = d->Lock();
+      auto l = regdata_ptr->Lock();
       US_UNUSED(l);
-      if (!d->available)
+      if (!regdata_ptr->available)
         throw std::logic_error("Service is unregistered");
       modifiedEndMatchEvent =
-        ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
+        ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, regdata_ptr->reference);
       modifiedEvent =
-        ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
+        ServiceEvent(ServiceEvent::SERVICE_MODIFIED, regdata_ptr->reference);
     }
 
     // This calls into service event listener hooks. We must not hold any looks here
-    d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
+    regdata_ptr->bundle->coreCtx->listeners.GetMatchingServiceListeners(
       modifiedEndMatchEvent, before);
 
     int old_rank = 0;
     int new_rank = 0;
     std::vector<std::string> classes;
     {
-      auto l = d->Lock();
+      auto l = regdata_ptr->Lock();
       US_UNUSED(l);
-      if (!d->available)
+      if (!regdata_ptr->available)
         throw std::logic_error("Service is unregistered");
 
       {
-        auto l2 = d->properties.Lock();
+        auto l2 = regdata_ptr->properties.Lock();
         US_UNUSED(l2);
 
-        Any any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+        Any any = regdata_ptr->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int))
           old_rank = any_cast<int>(any);
 
         classes = ref_any_cast<std::vector<std::string>>(
-          d->properties.Value_unlocked(Constants::OBJECTCLASS));
+          regdata_ptr->properties.Value_unlocked(Constants::OBJECTCLASS));
 
         long int sid = any_cast<long int>(
-          d->properties.Value_unlocked(Constants::SERVICE_ID));
-        d->properties = ServiceRegistry::CreateServiceProperties(
+          regdata_ptr->properties.Value_unlocked(Constants::SERVICE_ID));
+        regdata_ptr->properties = ServiceRegistry::CreateServiceProperties(
           props, classes, false, false, sid);
 
-        any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+        any = regdata_ptr->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int))
           new_rank = any_cast<int>(any);
       }
     }
     if (old_rank != new_rank) {
-      d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(*this,
+      regdata_ptr->bundle->coreCtx->services.UpdateServiceRegistrationOrder(*this,
                                                                   classes);
     }
   } else {
@@ -173,36 +173,36 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
   // Notify listeners, we must no hold any locks here
   ServiceListeners::ServiceListenerEntries matchingListeners;
-  d->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent,
+  regdata_ptr->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent,
                                                             matchingListeners);
-  d->bundle->coreCtx->listeners.ServiceChanged(
+  regdata_ptr->bundle->coreCtx->listeners.ServiceChanged(
     matchingListeners, modifiedEvent, before);
 
-  d->bundle->coreCtx->listeners.ServiceChanged(before, modifiedEndMatchEvent);
+  regdata_ptr->bundle->coreCtx->listeners.ServiceChanged(before, modifiedEndMatchEvent);
 }
 
 void ServiceRegistrationBase::Unregister()
 {
-  if (!d)
+  if (!regdata_ptr)
     throw std::logic_error("ServiceRegistrationBase object invalid");
 
-  if (d->unregistering)
+  if (regdata_ptr->unregistering)
     return; // Silently ignore redundant unregistration.
 
   CoreBundleContext* coreContext = nullptr;
 
-  if (d->available) {
+  if (regdata_ptr->available) {
     // Lock the service registry first
-    auto l1 = d->bundle->coreCtx->services.Lock();
+    auto l1 = regdata_ptr->bundle->coreCtx->services.Lock();
     US_UNUSED(l1);
-    auto l2 = d->Lock();
+    auto l2 = regdata_ptr->Lock();
     US_UNUSED(l2);
-    if (d->unregistering)
+    if (regdata_ptr->unregistering)
       return;
-    d->unregistering = true;
+    regdata_ptr->unregistering = true;
 
-    d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
-    coreContext = d->bundle->coreCtx;
+    regdata_ptr->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
+    coreContext = regdata_ptr->bundle->coreCtx;
   } else {
     throw std::logic_error("Service is unregistered");
   }
@@ -211,7 +211,7 @@ void ServiceRegistrationBase::Unregister()
     // Notify listeners. We must not hold any locks here.
     ServiceListeners::ServiceListenerEntries listeners;
     ServiceEvent unregisteringEvent(ServiceEvent::SERVICE_UNREGISTERING,
-                                    d->reference);
+                                    regdata_ptr->reference);
     coreContext->listeners.GetMatchingServiceListeners(unregisteringEvent,
                                                        listeners);
     coreContext->listeners.ServiceChanged(listeners, unregisteringEvent);
@@ -222,18 +222,18 @@ void ServiceRegistrationBase::Unregister()
   ServiceRegistrationBasePrivate::BundleToServiceMap bundleServiceInstance;
 
   {
-    auto l = d->Lock();
+    auto l = regdata_ptr->Lock();
     US_UNUSED(l);
-    d->available = false;
+    regdata_ptr->available = false;
     InterfaceMap::const_iterator factoryIter =
-      d->service->find("org.cppmicroservices.factory");
-    if (d->bundle && factoryIter != d->service->end()) {
+      regdata_ptr->service->find("org.cppmicroservices.factory");
+    if (regdata_ptr->bundle && factoryIter != regdata_ptr->service->end()) {
       serviceFactory =
         std::static_pointer_cast<ServiceFactory>(factoryIter->second);
     }
     if (serviceFactory) {
-      prototypeServiceInstances = d->prototypeServiceInstances;
-      bundleServiceInstance = d->bundleServiceInstance;
+      prototypeServiceInstances = regdata_ptr->prototypeServiceInstances;
+      bundleServiceInstance = regdata_ptr->bundleServiceInstance;
     }
   }
 
@@ -247,9 +247,9 @@ void ServiceRegistrationBase::Unregister()
         } catch (...) {
           std::string message(
             "ServiceFactory UngetService implementation threw an exception");
-          d->bundle->coreCtx->listeners.SendFrameworkEvent(
+          regdata_ptr->bundle->coreCtx->listeners.SendFrameworkEvent(
             FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                           MakeBundle(d->bundle->shared_from_this()),
+                           MakeBundle(regdata_ptr->bundle->shared_from_this()),
                            message,
                            std::current_exception()));
         }
@@ -264,9 +264,9 @@ void ServiceRegistrationBase::Unregister()
       } catch (...) {
         std::string message(
           "ServiceFactory UngetService implementation threw an exception");
-        d->bundle->coreCtx->listeners.SendFrameworkEvent(
+        regdata_ptr->bundle->coreCtx->listeners.SendFrameworkEvent(
           FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                         MakeBundle(d->bundle->shared_from_this()),
+                         MakeBundle(regdata_ptr->bundle->shared_from_this()),
                          message,
                          std::current_exception()));
       }
@@ -274,37 +274,37 @@ void ServiceRegistrationBase::Unregister()
   }
 
   {
-    auto l = d->Lock();
+    auto l = regdata_ptr->Lock();
     US_UNUSED(l);
 
-    d->bundle = nullptr;
-    d->dependents.clear();
-    d->service.reset();
-    d->prototypeServiceInstances.clear();
-    d->bundleServiceInstance.clear();
+    regdata_ptr->bundle = nullptr;
+    regdata_ptr->dependents.clear();
+    regdata_ptr->service.reset();
+    regdata_ptr->prototypeServiceInstances.clear();
+    regdata_ptr->bundleServiceInstance.clear();
     // increment the reference count, since "d->reference" was used originally
     // to keep d alive.
-    ++d->ref;
-    d->reference = nullptr;
-    d->unregistering = false;
+    ++regdata_ptr->regDataRefCount;
+    regdata_ptr->reference = nullptr;
+    regdata_ptr->unregistering = false;
   }
 }
 
 bool ServiceRegistrationBase::operator<(const ServiceRegistrationBase& o) const
 {
-  if (this == &o || d == o.d)
+  if (this == &o || regdata_ptr == o.regdata_ptr)
     return false;
 
-  if ((!d && !o.d) || !o.d)
+  if ((!regdata_ptr && !o.regdata_ptr) || !o.regdata_ptr)
     return false;
-  if (!d)
+  if (!regdata_ptr)
     return true;
 
   ServiceReferenceBase sr1;
   ServiceReferenceBase sr2;
   {
-    d->Lock(), sr1 = d->reference;
-    o.d->Lock(), sr2 = o.d->reference;
+    regdata_ptr->Lock(), sr1 = regdata_ptr->reference;
+    o.regdata_ptr->Lock(), sr2 = o.regdata_ptr->reference;
   }
   return sr1 < sr2;
 }
@@ -312,18 +312,18 @@ bool ServiceRegistrationBase::operator<(const ServiceRegistrationBase& o) const
 bool ServiceRegistrationBase::operator==(
   const ServiceRegistrationBase& registration) const
 {
-  return d == registration.d;
+  return regdata_ptr == registration.regdata_ptr;
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(
   const ServiceRegistrationBase& registration)
 {
-  ServiceRegistrationBasePrivate* curr_d = d;
-  d = registration.d;
-  if (d)
-    ++d->ref;
+  ServiceRegistrationBasePrivate* curr_d = regdata_ptr;
+  regdata_ptr = registration.regdata_ptr;
+  if (regdata_ptr)
+    ++regdata_ptr->regDataRefCount;
 
-  if (curr_d && !--curr_d->ref)
+  if (curr_d && !--curr_d->regDataRefCount)
     delete curr_d;
 
   return *this;
@@ -332,10 +332,10 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(
   ServiceRegistrationBase&& registration)
 {
-  if (d && !--d->ref)
-    delete d;
-  d = nullptr;
-  std::swap(d, registration.d);
+  if (regdata_ptr && !--regdata_ptr->regDataRefCount)
+    delete regdata_ptr;
+  regdata_ptr = nullptr;
+  std::swap(regdata_ptr, registration.regdata_ptr);
   return *this;
 }
 

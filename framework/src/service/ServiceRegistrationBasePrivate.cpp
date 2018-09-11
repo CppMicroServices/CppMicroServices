@@ -33,7 +33,7 @@ ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
   BundlePrivate* bundle,
   const InterfaceMapConstPtr& service,
   Properties&& props)
-  : ref(0)
+  : regDataRefCount(0)
   , service(service)
   , bundle(bundle)
   , reference(this)

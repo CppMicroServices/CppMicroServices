@@ -55,7 +55,7 @@ protected:
   /**
    * Reference count for implicitly shared private implementation.
    */
-  std::atomic<int> ref;
+  std::atomic<int> regDataRefCount;
 
   /**
    * Service or ServiceFactory object.

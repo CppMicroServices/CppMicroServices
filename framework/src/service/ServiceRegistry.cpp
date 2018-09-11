@@ -246,7 +246,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
     ServiceReferenceBase sri = s->GetReference(clazz);
 
     if (filter.empty() ||
-        ldap.Evaluate(PropertiesHandle(s->d->properties, true), false)) {
+        ldap.Evaluate(PropertiesHandle(s->regdata_ptr->properties, true), false)) {
       res.push_back(sri);
     }
   }
@@ -274,12 +274,12 @@ void ServiceRegistry::RemoveServiceRegistration_unlocked(
 {
   std::vector<std::string> classes;
   {
-    auto l2 = sr.d->properties.Lock();
+    auto l2 = sr.regdata_ptr->properties.Lock();
     US_UNUSED(l2);
-    assert(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).Type() ==
+    assert(sr.regdata_ptr->properties.Value_unlocked(Constants::OBJECTCLASS).Type() ==
            typeid(std::vector<std::string>));
     classes = ref_any_cast<std::vector<std::string>>(
-      sr.d->properties.Value_unlocked(Constants::OBJECTCLASS));
+      sr.regdata_ptr->properties.Value_unlocked(Constants::OBJECTCLASS));
   }
   services.erase(sr);
   serviceRegistrations.erase(
@@ -303,7 +303,7 @@ void ServiceRegistry::GetRegisteredByBundle(
   US_UNUSED(l);
 
   for (auto& sr : serviceRegistrations) {
-    if (sr.d->bundle == p) {
+    if (sr.regdata_ptr->bundle == p) {
       res.push_back(sr);
     }
   }
@@ -320,7 +320,7 @@ void ServiceRegistry::GetUsedByBundle(
          serviceRegistrations.begin();
        i != serviceRegistrations.end();
        ++i) {
-    if (i->d->IsUsedByBundle(bundle)) {
+    if (i->regdata_ptr->IsUsedByBundle(bundle)) {
       res.push_back(*i);
     }
   }

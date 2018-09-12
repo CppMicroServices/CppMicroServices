@@ -39,43 +39,31 @@ US_MSVC_DISABLE_WARNING(
 
 namespace cppmicroservices {
 
-typedef std::unordered_map<BundlePrivate*,
-                           std::unordered_set<ServiceRegistrationBasePrivate*>>
-  ThreadMarksMapType;
+typedef std::unordered_map<BundlePrivate*,  std::unordered_set<ServiceRegistrationBasePrivate*>> ThreadMarksMapType;
 
-ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)
+ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg)
   : registration(reg)
 {
-  if (registration)
-    ++registration->regDataRefCount;
 }
 
 ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
 {
-  if (registration && !--registration->regDataRefCount) {
-    delete registration;
-  }
 }
 
-InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
-  BundlePrivate* bundle,
-  const std::shared_ptr<ServiceFactory>& factory)
+InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(BundlePrivate* bundle,
+                                                                        const std::shared_ptr<ServiceFactory>& factory)
 {
   assert(factory && "Factory service pointer is nullptr");
   InterfaceMapConstPtr s;
   try {
-    InterfaceMapConstPtr smap =
-      factory->GetService(MakeBundle(bundle->shared_from_this()),
-                          ServiceRegistrationBase(registration));
+    InterfaceMapConstPtr smap =   factory->GetService(MakeBundle(bundle->shared_from_this()),
+                                                      ServiceRegistrationBase(registration));
     if (!smap || smap->empty()) {
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_WARNING,
-          MakeBundle(bundle->shared_from_this()),
-          std::string(
-            "ServiceFactory returned an empty or nullptr interface map."),
-          std::make_exception_ptr(std::logic_error(
-            "ServiceFactory returned an invalid interface map"))));
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                       MakeBundle(bundle->shared_from_this()),
+                       std::string("ServiceFactory returned an empty or nullptr interface map."),
+                       std::make_exception_ptr(std::logic_error("ServiceFactory returned an invalid interface map"))));
       return smap;
     }
     std::vector<std::string> classes =
@@ -165,7 +153,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(
     }
     std::unordered_set<ServiceRegistrationBasePrivate*>*& s;
     ServiceRegistrationBasePrivate* r;
-  } unmark{ marks, registration };
+  } unmark{ marks, registration.get() };
   US_UNUSED(unmark);
 
   {
@@ -195,7 +183,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(
     }
 
     marks = &threadMarks[bundle];
-    if (marks->find(registration) != marks->end()) {
+    if (marks->find(registration.get()) != marks->end()) {
       // Prevent recursive service factory calls from the same thread
       // for the same bundle.
       std::string msg = "Recursive call to ServiceFactory::GetService";
@@ -210,7 +198,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(
       return nullptr;
     }
 
-    marks->insert(registration);
+    marks->insert(registration.get());
   }
 
   // Calling into a service factory could cause re-entrancy into the

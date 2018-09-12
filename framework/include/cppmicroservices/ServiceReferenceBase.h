@@ -235,7 +235,7 @@ private:
    */
   ServiceReferenceBase();
 
-  ServiceReferenceBase(ServiceRegistrationBasePrivate* reg);
+  ServiceReferenceBase(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg);
 
   void SetInterfaceId(const std::string& interfaceId);
 

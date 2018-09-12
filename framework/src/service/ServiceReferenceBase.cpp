@@ -34,7 +34,7 @@
 namespace cppmicroservices {
 
 ServiceReferenceBase::ServiceReferenceBase()
-  : impl_ptr(new ServiceReferenceBasePrivate(nullptr))
+  : impl_ptr(std::make_shared<ServiceReferenceBasePrivate>(nullptr))
 {}
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
@@ -42,8 +42,8 @@ ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
 {
 }
 
-ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
-  : impl_ptr(new ServiceReferenceBasePrivate(reg))
+ServiceReferenceBase::ServiceReferenceBase(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg)
+    : impl_ptr(std::make_shared<ServiceReferenceBasePrivate>(reg))
 {}
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
@@ -197,7 +197,7 @@ std::string ServiceReferenceBase::GetInterfaceId() const
 std::size_t ServiceReferenceBase::Hash() const
 {
   using namespace std;
-  return hash<ServiceRegistrationBasePrivate*>()(this->impl()->registration);
+  return hash<ServiceRegistrationBasePrivate*>()(this->impl()->registration.get());
 }
 
 std::ostream& operator<<(std::ostream& os,

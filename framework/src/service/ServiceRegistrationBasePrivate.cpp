@@ -29,14 +29,12 @@
 
 namespace cppmicroservices {
 
-ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-  BundlePrivate* bundle,
-  const InterfaceMapConstPtr& service,
-  Properties&& props)
-  : regDataRefCount(0)
-  , service(service)
+ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle,
+                                                               const InterfaceMapConstPtr& service,
+                                                               Properties&& props)
+  : service(service)
   , bundle(bundle)
-  , reference(this)
+  , reference()
   , properties(std::move(props))
   , available(true)
   , unregistering(false)
@@ -64,14 +62,12 @@ InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
   return (this->Lock(), service);
 }
 
-std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(
-  const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
 {
   return this->Lock(), GetService_unlocked(interfaceId);
 }
 
-std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(
-  const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(const std::string& interfaceId) const
 {
   return ExtractInterface(service, interfaceId);
 }

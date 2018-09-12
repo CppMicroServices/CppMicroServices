@@ -47,8 +47,6 @@ ServiceRegistrationBase::ServiceRegistrationBase(
   const ServiceRegistrationBase& reg)
   : regdata_ptr(reg.regdata_ptr)
 {
-  if (regdata_ptr)
-    ++regdata_ptr->regDataRefCount;
 }
 
 ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg)
@@ -57,19 +55,17 @@ ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg)
   std::swap(regdata_ptr, reg.regdata_ptr);
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(
-  ServiceRegistrationBasePrivate* registrationPrivate)
+ServiceRegistrationBase::ServiceRegistrationBase(const std::shared_ptr<ServiceRegistrationBasePrivate>& registrationPrivate)
   : regdata_ptr(registrationPrivate)
 {
-  if (regdata_ptr)
-    ++regdata_ptr->regDataRefCount;
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(
-  BundlePrivate* bundle,
-  const InterfaceMapConstPtr& service,
-  Properties&& props)
-  : regdata_ptr(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
+ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
+                                                 const InterfaceMapConstPtr& service,
+                                                 Properties&& props)
+  : regdata_ptr(ServiceRegistrationBasePrivate::create(bundle,
+                                                       service,
+                                                       std::move(props)))
 {}
 
 ServiceRegistrationBase::operator bool() const
@@ -79,27 +75,21 @@ ServiceRegistrationBase::operator bool() const
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(std::nullptr_t)
 {
-  if (regdata_ptr && !--regdata_ptr->regDataRefCount) {
-    delete regdata_ptr;
-  }
-  regdata_ptr = nullptr;
+  regdata_ptr.reset();
   return *this;
 }
 
 ServiceRegistrationBase::~ServiceRegistrationBase()
 {
-  if (regdata_ptr && !--regdata_ptr->regDataRefCount)
-    delete regdata_ptr;
 }
 
-ServiceReferenceBase ServiceRegistrationBase::GetReference(
-  const std::string& interfaceId) const
+ServiceReferenceBase ServiceRegistrationBase::GetReference(const std::string& interfaceId) const
 {
   if (!regdata_ptr)
     throw std::logic_error("ServiceRegistrationBase object invalid");
   if (!regdata_ptr->available)
     throw std::logic_error("Service is unregistered");
-
+ 
   auto l = regdata_ptr->Lock();
   US_UNUSED(l);
   ServiceReferenceBase ref = regdata_ptr->reference;
@@ -284,7 +274,6 @@ void ServiceRegistrationBase::Unregister()
     regdata_ptr->bundleServiceInstance.clear();
     // increment the reference count, since "d->reference" was used originally
     // to keep d alive.
-    ++regdata_ptr->regDataRefCount;
     regdata_ptr->reference = nullptr;
     regdata_ptr->unregistering = false;
   }
@@ -318,23 +307,13 @@ bool ServiceRegistrationBase::operator==(
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(
   const ServiceRegistrationBase& registration)
 {
-  ServiceRegistrationBasePrivate* curr_d = regdata_ptr;
   regdata_ptr = registration.regdata_ptr;
-  if (regdata_ptr)
-    ++regdata_ptr->regDataRefCount;
-
-  if (curr_d && !--curr_d->regDataRefCount)
-    delete curr_d;
-
   return *this;
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(
   ServiceRegistrationBase&& registration)
 {
-  if (regdata_ptr && !--regdata_ptr->regDataRefCount)
-    delete regdata_ptr;
-  regdata_ptr = nullptr;
   std::swap(regdata_ptr, registration.regdata_ptr);
   return *this;
 }

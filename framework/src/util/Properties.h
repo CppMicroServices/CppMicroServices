@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace cppmicroservices {
 
@@ -37,7 +38,10 @@ class Properties : public detail::MultiThreaded<>
 
 public:
   explicit Properties(const AnyMap& props);
-
+  ~Properties()
+    {
+        std::cout << "Got here" << std::endl;
+    }
   Properties(Properties&& o);
   Properties& operator=(Properties&& o);
 

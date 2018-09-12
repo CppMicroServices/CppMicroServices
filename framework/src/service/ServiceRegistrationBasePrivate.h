@@ -26,7 +26,8 @@
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/detail/Threads.h"
-
+#include "cppmicroservices/ServiceReferenceBase.h"
+#include "ServiceReferenceBasePrivate.h"
 #include "Properties.h"
 
 #include <atomic>
@@ -53,26 +54,17 @@ protected:
   friend class ServiceReferenceBasePrivate;
 
   /**
-   * Reference count for implicitly shared private implementation.
-   */
-  std::atomic<int> regDataRefCount;
-
-  /**
    * Service or ServiceFactory object.
    */
   InterfaceMapConstPtr service;
 
 public:
   typedef std::unordered_map<BundlePrivate*, int> BundleToRefsMap;
-  typedef std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>
-    BundleToServiceMap;
-  typedef std::unordered_map<BundlePrivate*, std::list<InterfaceMapConstPtr>>
-    BundleToServicesMap;
+  typedef std::unordered_map<BundlePrivate*, InterfaceMapConstPtr> BundleToServiceMap;
+  typedef std::unordered_map<BundlePrivate*, std::list<InterfaceMapConstPtr>> BundleToServicesMap;
 
-  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) =
-    delete;
-  ServiceRegistrationBasePrivate& operator=(
-    const ServiceRegistrationBasePrivate&) = delete;
+  ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) = delete;
+  ServiceRegistrationBasePrivate& operator=(const ServiceRegistrationBasePrivate&) = delete;
 
   /**
    * Bundles dependent on this service. Integer is used as
@@ -135,9 +127,18 @@ public:
   InterfaceMapConstPtr GetInterfaces() const;
 
   std::shared_ptr<void> GetService(const std::string& interfaceId) const;
+  std::shared_ptr<void> GetService_unlocked(const std::string& interfaceId) const;
 
-  std::shared_ptr<void> GetService_unlocked(
-    const std::string& interfaceId) const;
+public:
+  static std::shared_ptr<ServiceRegistrationBasePrivate> create(BundlePrivate* bundle,
+                                                                const InterfaceMapConstPtr& service,
+                                                                Properties&& props)
+  {
+      auto rval = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
+      rval->reference.set_impl_ptr(std::make_shared<ServiceReferenceBasePrivate>(rval));
+      return rval;
+  }
+    
 };
 }
 

@@ -44,10 +44,9 @@ class ServiceReferenceBasePrivate
 {
 public:
   ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&) = delete;
-  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) =
-    delete;
+  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) = delete;
 
-  ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
+  ServiceReferenceBasePrivate(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg);
 
   ~ServiceReferenceBasePrivate();
 
@@ -104,7 +103,7 @@ public:
   /**
    * Link to registration object for this reference.
    */
-  ServiceRegistrationBasePrivate* const registration;
+   std::shared_ptr<ServiceRegistrationBasePrivate> registration;
 
   /**
    * The service interface id for this reference.

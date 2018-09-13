@@ -24,13 +24,12 @@
 #define CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H
 
 #include "cppmicroservices/ServiceListenerHook.h"
-#include "cppmicroservices/SharedData.h"
 
 #include "ServiceListenerEntry.h"
 
 namespace cppmicroservices {
 
-class ServiceListenerHook::ListenerInfoData : public SharedData
+class ServiceListenerHook::ListenerInfoData
 {
 public:
   ListenerInfoData(const std::shared_ptr<BundleContextPrivate>& context,

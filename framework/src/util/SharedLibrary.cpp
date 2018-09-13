@@ -120,7 +120,7 @@ void SharedLibrary::Load(int flags)
 #else
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
-  d->m_Handle = LoadLibraryW(wpath.c_str());
+  libdata_ptr->m_Handle = LoadLibraryW(wpath.c_str());
   if (!d->m_Handle) {
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
@@ -152,7 +152,7 @@ void SharedLibrary::Unload()
             : (std::string("Error unloading ") + GetLibraryPath()));
     }
 #else
-    if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle))) {
+    if (!FreeLibrary(reinterpret_cast<HMODULE>(libdata_ptr->m_Handle))) {
       std::string errMsg = "Unloading ";
       errMsg.append(GetLibraryPath())
         .append("failed with error: ")

@@ -101,7 +101,7 @@ ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListenerHook::ListenerInfo& info)
   : ServiceListenerHook::ListenerInfo(info)
 {
-  assert(info.d);
+  assert(info.data_ptr);
 }
 
 ServiceListenerEntry::~ServiceListenerEntry() {}
@@ -109,13 +109,13 @@ ServiceListenerEntry::~ServiceListenerEntry() {}
 ServiceListenerEntry& ServiceListenerEntry::operator=(
   const ServiceListenerEntry& other)
 {
-  d = other.d;
+  data_ptr = other.data_ptr;
   return *this;
 }
 
 void ServiceListenerEntry::SetRemoved(bool removed) const
 {
-  d->bRemoved = removed;
+  data_ptr->bRemoved = removed;
 }
 
 ServiceListenerEntry::ServiceListenerEntry(
@@ -130,32 +130,32 @@ ServiceListenerEntry::ServiceListenerEntry(
 
 const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {
-  return static_cast<ServiceListenerEntryData*>(d.Data())->ldap;
+  return static_cast<ServiceListenerEntryData*>(data_ptr.get())->ldap;
 }
 
 LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const
 {
-  return static_cast<ServiceListenerEntryData*>(d.Data())->local_cache;
+  return static_cast<ServiceListenerEntryData*>(data_ptr.get())->local_cache;
 }
 
 void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 {
-  d->listener(event);
+  data_ptr->listener(event);
 }
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->context == nullptr || other.d->context == nullptr) ||
-          d->context == other.d->context) &&
-         (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
-         ServiceListenerCompare()(d->listener, other.d->listener);
+  return ((data_ptr->context == nullptr || other.data_ptr->context == nullptr) ||
+          data_ptr->context == other.data_ptr->context) &&
+         (data_ptr->data == other.data_ptr->data) && (data_ptr->tokenId == other.data_ptr->tokenId) &&
+         ServiceListenerCompare()(data_ptr->listener, other.data_ptr->listener);
 }
 
 bool ServiceListenerEntry::Contains(
   const std::shared_ptr<BundleContextPrivate>& context,
   ListenerTokenId tokenId) const
 {
-  return (d->context == context) && (d->tokenId == tokenId);
+  return (data_ptr->context == context) && (data_ptr->tokenId == tokenId);
 }
 
 bool ServiceListenerEntry::Contains(
@@ -163,28 +163,28 @@ bool ServiceListenerEntry::Contains(
   const ServiceListener& listener,
   void* data) const
 {
-  return (d->context == context) && (d->data == data) &&
-         ServiceListenerCompare()(d->listener, listener);
+  return (data_ptr->context == context) && (data_ptr->data == data) &&
+         ServiceListenerCompare()(data_ptr->listener, listener);
 }
 
 ListenerTokenId ServiceListenerEntry::Id() const
 {
-  return d->tokenId;
+  return data_ptr->tokenId;
 }
 
 std::size_t ServiceListenerEntry::Hash() const
 {
   using namespace std;
 
-  if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0) {
-    static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
-      ((hash<BundleContextPrivate*>()(d->context.get()) ^
-        (hash<void*>()(d->data) << 1)) >>
+  if (static_cast<ServiceListenerEntryData*>(data_ptr.get())->hashValue == 0) {
+    static_cast<ServiceListenerEntryData*>(data_ptr.get())->hashValue =
+      ((hash<BundleContextPrivate*>()(data_ptr->context.get()) ^
+        (hash<void*>()(data_ptr->data) << 1)) >>
        1) ^
-      ((hash<ServiceListener>()(d->listener)) ^
-       (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
+      ((hash<ServiceListener>()(data_ptr->listener)) ^
+       (hash<ListenerTokenId>()(data_ptr->tokenId) << 1) << 1);
   }
-  return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
+  return static_cast<ServiceListenerEntryData*>(data_ptr.get())->hashValue;
 }
 }
 

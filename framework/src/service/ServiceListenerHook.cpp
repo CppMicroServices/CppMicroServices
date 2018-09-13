@@ -48,15 +48,15 @@ ServiceListenerHook::ListenerInfoData::ListenerInfoData(
 ServiceListenerHook::ListenerInfoData::~ListenerInfoData() {}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data)
-  : d(data)
+  : data_ptr(data)
 {}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo()
-  : d(nullptr)
+  : data_ptr(nullptr)
 {}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo& other)
-  : d(other.d)
+  : data_ptr(other.data_ptr)
 {}
 
 ServiceListenerHook::ListenerInfo::~ListenerInfo() {}
@@ -64,33 +64,33 @@ ServiceListenerHook::ListenerInfo::~ListenerInfo() {}
 ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(
   const ListenerInfo& other)
 {
-  d = other.d;
+  data_ptr = other.data_ptr;
   return *this;
 }
 
 bool ServiceListenerHook::ListenerInfo::IsNull() const
 {
-  return !d;
+  return !data_ptr;
 }
 
 BundleContext ServiceListenerHook::ListenerInfo::GetBundleContext() const
 {
-  return MakeBundleContext(d->context);
+  return MakeBundleContext(data_ptr->context);
 }
 
 std::string ServiceListenerHook::ListenerInfo::GetFilter() const
 {
-  return d->filter;
+  return data_ptr->filter;
 }
 
 bool ServiceListenerHook::ListenerInfo::IsRemoved() const
 {
-  return d->bRemoved;
+  return data_ptr->bRemoved;
 }
 
 bool ServiceListenerHook::ListenerInfo::operator==(
   const ListenerInfo& other) const
 {
-  return d == other.d;
+  return data_ptr == other.data_ptr;
 }
 }

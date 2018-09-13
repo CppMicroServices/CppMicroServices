@@ -24,10 +24,10 @@
 #define CPPMICROSERVICES_SERVICELISTENERHOOK_H
 
 #include "cppmicroservices/ServiceInterface.h"
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/ShrinkableVector.h"
 
 #include <string>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -139,7 +139,7 @@ struct US_Framework_EXPORT ServiceListenerHook
 
     ListenerInfo(ListenerInfoData* data);
 
-    ExplicitlySharedDataPointer<ListenerInfoData> d;
+    std::shared_ptr<ListenerInfoData> data_ptr;
   };
 
   virtual ~ServiceListenerHook();
@@ -181,7 +181,7 @@ struct US_Framework_EXPORT ServiceListenerHook
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
 return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(
-  arg.d.Data());
+  arg.data_ptr.get());
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICELISTENERHOOK_H

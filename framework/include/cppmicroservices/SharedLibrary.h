@@ -24,9 +24,9 @@
 #define CPPMICROSERVICES_SHAREDLIBRARY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/SharedData.h"
 
 #include <string>
+#include <memory>
 
 #ifdef _MSC_VER
 #  pragma warning(push)
@@ -209,7 +209,7 @@ public:
   bool IsLoaded() const;
 
 private:
-  ExplicitlySharedDataPointer<SharedLibraryPrivate> d;
+  std::shared_ptr<SharedLibraryPrivate> libdata_ptr;
 };
 }
 

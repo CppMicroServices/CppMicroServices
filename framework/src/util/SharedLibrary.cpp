@@ -47,7 +47,7 @@
 
 namespace cppmicroservices {
 
-class SharedLibraryPrivate : public SharedData
+class SharedLibraryPrivate
 {
 public:
   SharedLibraryPrivate()
@@ -65,26 +65,34 @@ public:
   std::string m_Prefix;
 };
 
+namespace {
+  void detach(std::shared_ptr<SharedLibraryPrivate>& ptr)
+  {
+      if (ptr && ptr.use_count() > 1)
+          ptr = std::make_shared<SharedLibraryPrivate>(*ptr);
+  }
+}
+
 SharedLibrary::SharedLibrary()
-  : d(new SharedLibraryPrivate)
+  : libdata_ptr(new SharedLibraryPrivate)
 {}
 
 SharedLibrary::SharedLibrary(const SharedLibrary& other)
-  : d(other.d)
+  : libdata_ptr(other.libdata_ptr)
 {}
 
 SharedLibrary::SharedLibrary(const std::string& libPath,
                              const std::string& name)
-  : d(new SharedLibraryPrivate)
+  : libdata_ptr(new SharedLibraryPrivate)
 {
-  d->m_Name = name;
-  d->m_Path = libPath;
+  libdata_ptr->m_Name = name;
+  libdata_ptr->m_Path = libPath;
 }
 
 SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
-  : d(new SharedLibraryPrivate)
+  : libdata_ptr(new SharedLibraryPrivate)
 {
-  d->m_FilePath = absoluteFilePath;
+  libdata_ptr->m_FilePath = absoluteFilePath;
   SetFilePath(absoluteFilePath);
 }
 
@@ -92,19 +100,19 @@ SharedLibrary::~SharedLibrary() {}
 
 SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other)
 {
-  d = other.d;
+  libdata_ptr = other.libdata_ptr;
   return *this;
 }
 
 void SharedLibrary::Load(int flags)
 {
-  if (d->m_Handle)
+  if (libdata_ptr->m_Handle)
     throw std::logic_error(std::string("Library already loaded: ") +
                            GetFilePath());
   std::string libPath = GetFilePath();
 #ifdef US_PLATFORM_POSIX
-  d->m_Handle = dlopen(libPath.c_str(), flags);
-  if (!d->m_Handle) {
+  libdata_ptr->m_Handle = dlopen(libPath.c_str(), flags);
+  if (!libdata_ptr->m_Handle) {
     const char* err = dlerror();
     throw std::runtime_error(err ? std::string(err)
                                  : (std::string("Error loading ") + libPath));
@@ -135,9 +143,9 @@ void SharedLibrary::Load()
 
 void SharedLibrary::Unload()
 {
-  if (d->m_Handle) {
+  if (libdata_ptr->m_Handle) {
 #ifdef US_PLATFORM_POSIX
-    if (dlclose(d->m_Handle)) {
+    if (dlclose(libdata_ptr->m_Handle)) {
       const char* err = dlerror();
       throw std::runtime_error(
         err ? std::string(err)
@@ -153,27 +161,28 @@ void SharedLibrary::Unload()
       throw std::runtime_error(errMsg);
     }
 #endif
-    d->m_Handle = nullptr;
+    libdata_ptr->m_Handle = nullptr;
   }
 }
 
 void SharedLibrary::SetName(const std::string& name)
 {
-  if (IsLoaded() || !d->m_FilePath.empty())
+  if (IsLoaded() || !libdata_ptr->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Name = name;
+//  libdata_ptr.Detach();
+  detach(libdata_ptr);
+  libdata_ptr->m_Name = name;
 }
 
 std::string SharedLibrary::GetName() const
 {
-  return d->m_Name;
+  return libdata_ptr->m_Name;
 }
 
 std::string SharedLibrary::GetFilePath(const std::string& name) const
 {
-  if (!d->m_FilePath.empty())
-    return d->m_FilePath;
+  if (!libdata_ptr->m_FilePath.empty())
+    return libdata_ptr->m_FilePath;
   return GetLibraryPath() + util::DIR_SEP + GetPrefix() + name + GetSuffix();
 }
 
@@ -182,82 +191,86 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
   if (IsLoaded())
     return;
 
-  d.Detach();
-  d->m_FilePath = absoluteFilePath;
+  //libdata_ptr.Detach();
+  detach(libdata_ptr);
+  libdata_ptr->m_FilePath = absoluteFilePath;
 
-  std::string name = d->m_FilePath;
-  std::size_t pos = d->m_FilePath.find_last_of(util::DIR_SEP);
+  std::string name = libdata_ptr->m_FilePath;
+  std::size_t pos = libdata_ptr->m_FilePath.find_last_of(util::DIR_SEP);
   if (pos != std::string::npos) {
-    d->m_Path = d->m_FilePath.substr(0, pos);
-    name = d->m_FilePath.substr(pos + 1);
+    libdata_ptr->m_Path = libdata_ptr->m_FilePath.substr(0, pos);
+    name = libdata_ptr->m_FilePath.substr(pos + 1);
   } else {
-    d->m_Path.clear();
+    libdata_ptr->m_Path.clear();
   }
 
-  if (name.size() >= d->m_Prefix.size() &&
-      name.compare(0, d->m_Prefix.size(), d->m_Prefix) == 0) {
-    name = name.substr(d->m_Prefix.size());
+  if (name.size() >= libdata_ptr->m_Prefix.size() &&
+      name.compare(0, libdata_ptr->m_Prefix.size(), libdata_ptr->m_Prefix) == 0) {
+    name = name.substr(libdata_ptr->m_Prefix.size());
   }
-  if (name.size() >= d->m_Suffix.size() &&
-      name.compare(name.size() - d->m_Suffix.size(),
-                   d->m_Suffix.size(),
-                   d->m_Suffix) == 0) {
-    name = name.substr(0, name.size() - d->m_Suffix.size());
+  if (name.size() >= libdata_ptr->m_Suffix.size() &&
+      name.compare(name.size() - libdata_ptr->m_Suffix.size(),
+                   libdata_ptr->m_Suffix.size(),
+                   libdata_ptr->m_Suffix) == 0) {
+    name = name.substr(0, name.size() - libdata_ptr->m_Suffix.size());
   }
-  d->m_Name = name;
+  libdata_ptr->m_Name = name;
 }
 
 std::string SharedLibrary::GetFilePath() const
 {
-  return GetFilePath(d->m_Name);
+  return GetFilePath(libdata_ptr->m_Name);
 }
 
 void SharedLibrary::SetLibraryPath(const std::string& path)
 {
-  if (IsLoaded() || !d->m_FilePath.empty())
+  if (IsLoaded() || !libdata_ptr->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Path = path;
+  //libdata_ptr.Detach();
+  detach(libdata_ptr);
+  libdata_ptr->m_Path = path;
 }
 
 std::string SharedLibrary::GetLibraryPath() const
 {
-  return d->m_Path;
+  return libdata_ptr->m_Path;
 }
 
 void SharedLibrary::SetSuffix(const std::string& suffix)
 {
-  if (IsLoaded() || !d->m_FilePath.empty())
+  if (IsLoaded() || !libdata_ptr->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Suffix = suffix;
+  //libdata_ptr.Detach();
+  detach(libdata_ptr);
+  libdata_ptr->m_Suffix = suffix;
 }
 
 std::string SharedLibrary::GetSuffix() const
 {
-  return d->m_Suffix;
+  return libdata_ptr->m_Suffix;
 }
 
 void SharedLibrary::SetPrefix(const std::string& prefix)
 {
-  if (IsLoaded() || !d->m_FilePath.empty())
+  if (IsLoaded() || !libdata_ptr->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Prefix = prefix;
+  //libdata_ptr.Detach();
+  detach(libdata_ptr);
+  libdata_ptr->m_Prefix = prefix;
 }
 
 std::string SharedLibrary::GetPrefix() const
 {
-  return d->m_Prefix;
+  return libdata_ptr->m_Prefix;
 }
 
 void* SharedLibrary::GetHandle() const
 {
-  return d->m_Handle;
+  return libdata_ptr->m_Handle;
 }
 
 bool SharedLibrary::IsLoaded() const
 {
-  return d->m_Handle != nullptr;
+  return libdata_ptr->m_Handle != nullptr;
 }
 }

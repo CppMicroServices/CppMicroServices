@@ -129,7 +129,6 @@ public:
   std::shared_ptr<void> GetService(const std::string& interfaceId) const;
   std::shared_ptr<void> GetService_unlocked(const std::string& interfaceId) const;
 
-public:
   static std::shared_ptr<ServiceRegistrationBasePrivate> create(BundlePrivate* bundle,
                                                                 const InterfaceMapConstPtr& service,
                                                                 Properties&& props)

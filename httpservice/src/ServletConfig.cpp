@@ -29,36 +29,36 @@ ServletConfig::~ServletConfig() {}
 
 std::string ServletConfig::GetServletName() const
 {
-  return d->m_Name;
+  return cfgdata_ptr->m_Name;
 }
 
 std::shared_ptr<ServletContext> ServletConfig::GetServletContext() const
 {
-  return d->m_Context;
+  return cfgdata_ptr->m_Context;
 }
 
 void ServletConfig::SetServletName(const std::string& name)
 {
-  d->m_Name = name;
+  cfgdata_ptr->m_Name = name;
 }
 
 void ServletConfig::SetServletContext(
   const std::shared_ptr<ServletContext>& context)
 {
-  d->m_Context = context;
+  cfgdata_ptr->m_Context = context;
 }
 
 ServletConfig::ServletConfig()
-  : d(new ServletConfigPrivate)
+  : cfgdata_ptr(new ServletConfigPrivate)
 {}
 
 ServletConfig::ServletConfig(const ServletConfig& other)
-  : d(other.d)
+  : cfgdata_ptr(other.cfgdata_ptr)
 {}
 
 ServletConfig& ServletConfig::operator=(const ServletConfig& other)
 {
-  this->d = other.d;
+  this->cfgdata_ptr = other.cfgdata_ptr;
   return *this;
 }
 }

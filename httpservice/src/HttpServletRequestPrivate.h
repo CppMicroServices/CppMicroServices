@@ -39,10 +39,9 @@ class ServletContext;
 
 struct HttpServletRequestPrivate : public SharedData
 {
-  HttpServletRequestPrivate(
-    const std::shared_ptr<ServletContext>& servletContext,
-    CivetServer* server,
-    mg_connection* conn);
+  HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
+                            CivetServer* server,
+                            mg_connection* conn);
 
   const std::shared_ptr<ServletContext> m_ServletContext;
   CivetServer* const m_Server;

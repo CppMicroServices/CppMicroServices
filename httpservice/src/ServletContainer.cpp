@@ -69,24 +69,24 @@ private:
       return true;
     }
 
-    HttpServletRequest request(new HttpServletRequestPrivate(
-      m_Servlet->GetServletContext(), server, conn));
-    request.d->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
-    request.d->m_ServletPath = m_ServletPath;
+    HttpServletRequest request(std::make_shared<HttpServletRequestPrivate>(m_Servlet->GetServletContext(),
+                                                                           server,
+                                                                           conn));
+    request.reqdata_ptr->m_ContextPath = m_Servlet->GetServletContext()->GetContextPath();
+    request.reqdata_ptr->m_ServletPath = m_ServletPath;
 
     std::string uri = mg_req_info->local_uri;
     std::string pathPrefix =
-      request.d->m_ContextPath + request.d->m_ServletPath;
+      request.reqdata_ptr->m_ContextPath + request.reqdata_ptr->m_ServletPath;
     //std::cout << "Checking path prefix: " << pathPrefix << std::endl;
     //std::cout << "Against uri: " << uri << std::endl;
     assert(pathPrefix.size() <= uri.size());
     assert(uri.compare(0, pathPrefix.size(), pathPrefix) == 0);
     if (uri.size() > pathPrefix.size()) {
-      request.d->m_PathInfo = uri.substr(pathPrefix.size());
+      request.reqdata_ptr->m_PathInfo = uri.substr(pathPrefix.size());
     }
 
-    HttpServletResponse response(
-      new HttpServletResponsePrivate(&request, server, conn));
+    HttpServletResponse response(std::make_shared<HttpServletResponsePrivate>(&request, server, conn));
     response.SetStatus(HttpServletResponse::SC_OK);
 
     try {

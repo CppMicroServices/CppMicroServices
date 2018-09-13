@@ -35,10 +35,9 @@
 
 namespace cppmicroservices {
 
-HttpServletResponsePrivate::HttpServletResponsePrivate(
-  HttpServletRequest* request,
-  CivetServer* server,
-  mg_connection* conn)
+HttpServletResponsePrivate::HttpServletResponsePrivate(HttpServletRequest* request,
+                                                       CivetServer* server,
+                                                       mg_connection* conn)
   : m_Request(request)
   , m_Server(server)
   , m_Connection(conn)
@@ -141,40 +140,40 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
 HttpServletResponse::~HttpServletResponse() {}
 
 HttpServletResponse::HttpServletResponse(const HttpServletResponse& o)
-  : d(o.d)
+  : respdata_ptr(o.respdata_ptr)
 {}
 
 HttpServletResponse& HttpServletResponse::operator=(
   const HttpServletResponse& o)
 {
-  d = o.d;
+  respdata_ptr = o.respdata_ptr;
   return *this;
 }
 
 void HttpServletResponse::FlushBuffer()
 {
-  if (d->m_HttpOutputStream) {
-    *d->m_HttpOutputStream << std::flush;
+  if (respdata_ptr->m_HttpOutputStream) {
+    *respdata_ptr->m_HttpOutputStream << std::flush;
   } else {
-    d->Commit();
+    respdata_ptr->Commit();
   }
 }
 
 bool HttpServletResponse::IsCommitted() const
 {
-  return d->m_IsCommited;
+  return respdata_ptr->m_IsCommited;
 }
 
 std::size_t HttpServletResponse::GetBufferSize() const
 {
-  return d->m_BufferSize;
+  return respdata_ptr->m_BufferSize;
 }
 
 std::string HttpServletResponse::GetContentType() const
 {
   std::map<std::string, std::string>::iterator iter =
-    d->m_Headers.find("Content-Type");
-  if (iter != d->m_Headers.end()) {
+    respdata_ptr->m_Headers.find("Content-Type");
+  if (iter != respdata_ptr->m_Headers.end()) {
     return iter->second;
   }
   return std::string();
@@ -182,18 +181,18 @@ std::string HttpServletResponse::GetContentType() const
 
 std::ostream& HttpServletResponse::GetOutputStream()
 {
-  if (!d->m_HttpOutputStream) {
-    d->m_StreamBuf = this->GetOutputStreamBuffer();
-    d->m_HttpOutputStream = new std::ostream(d->m_StreamBuf);
+  if (!respdata_ptr->m_HttpOutputStream) {
+    respdata_ptr->m_StreamBuf = this->GetOutputStreamBuffer();
+    respdata_ptr->m_HttpOutputStream = new std::ostream(respdata_ptr->m_StreamBuf);
   }
-  return *d->m_HttpOutputStream;
+  return *respdata_ptr->m_HttpOutputStream;
 }
 
 void HttpServletResponse::Reset()
 {
   this->ResetBuffer();
-  d->m_StatusCode = SC_NOT_FOUND;
-  d->m_Headers.clear();
+  respdata_ptr->m_StatusCode = SC_NOT_FOUND;
+  respdata_ptr->m_Headers.clear();
 }
 
 void HttpServletResponse::ResetBuffer()
@@ -202,29 +201,29 @@ void HttpServletResponse::ResetBuffer()
     throw std::logic_error(
       "Resetting buffer not possible, response is already committed.");
   }
-  if (d->m_HttpOutputStream) {
-    delete d->m_HttpOutputStream;
-    delete d->m_StreamBuf;
-    d->m_HttpOutputStream = nullptr;
-    d->m_StreamBuf = nullptr;
+  if (respdata_ptr->m_HttpOutputStream) {
+    delete respdata_ptr->m_HttpOutputStream;
+    delete respdata_ptr->m_StreamBuf;
+    respdata_ptr->m_HttpOutputStream = nullptr;
+    respdata_ptr->m_StreamBuf = nullptr;
   }
 }
 
 void HttpServletResponse::SetBufferSize(std::size_t size)
 {
-  if (d->m_StreamBuf) {
+  if (respdata_ptr->m_StreamBuf) {
     throw std::logic_error(
       "Buffer size cannot be set because the buffer is already in use.");
   }
-  d->m_BufferSize = size;
+  respdata_ptr->m_BufferSize = size;
 }
 
 void HttpServletResponse::SetCharacterEncoding(const std::string& charset)
 {
-  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr) {
+  if (this->IsCommitted() || respdata_ptr->m_HttpOutputStream != nullptr) {
     return;
   }
-  d->m_Charset = charset;
+  respdata_ptr->m_Charset = charset;
   std::string contentType = this->GetContentType();
   if (!contentType.empty()) {
     std::size_t pos = contentType.find_first_of(';');
@@ -233,7 +232,7 @@ void HttpServletResponse::SetCharacterEncoding(const std::string& charset)
     } else {
       contentType = contentType.substr(0, pos) + "; " + charset;
     }
-    d->m_Headers["Content-Type"] = contentType;
+    respdata_ptr->m_Headers["Content-Type"] = contentType;
   }
 }
 
@@ -241,33 +240,33 @@ void HttpServletResponse::SetContentLength(std::size_t size)
 {
   std::stringstream ss;
   ss << size;
-  d->m_Headers["Content-Length"] = ss.str();
+  respdata_ptr->m_Headers["Content-Length"] = ss.str();
 }
 
 void HttpServletResponse::SetContentType(const std::string& type)
 {
-  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr) {
+  if (this->IsCommitted() || respdata_ptr->m_HttpOutputStream != nullptr) {
     return;
   }
   std::string contentType = type;
   if (!contentType.empty()) {
     std::size_t pos = type.find_first_of(';');
     if (pos == std::string::npos) {
-      if (!d->m_Charset.empty()) {
-        contentType += "; " + d->m_Charset;
+      if (!respdata_ptr->m_Charset.empty()) {
+        contentType += "; " + respdata_ptr->m_Charset;
       }
     } else {
       pos = contentType.find_first_not_of(' ', pos);
-      d->m_Charset = contentType.substr(pos);
+      respdata_ptr->m_Charset = contentType.substr(pos);
     }
   }
-  d->m_Headers["Content-Type"] = contentType;
+  respdata_ptr->m_Headers["Content-Type"] = contentType;
 }
 
 void HttpServletResponse::AddHeader(const std::string& name,
                                     const std::string& value)
 {
-  std::string& currValue = d->m_Headers[name];
+  std::string& currValue = respdata_ptr->m_Headers[name];
   if (currValue.empty()) {
     currValue += value;
   } else {
@@ -281,7 +280,7 @@ void HttpServletResponse::AddHeader(const std::string& name,
 void HttpServletResponse::SetHeader(const std::string& name,
                                     const std::string& value)
 {
-  d->m_Headers[name] = value;
+  respdata_ptr->m_Headers[name] = value;
 }
 
 #ifdef US_PLATFORM_WINDOWS
@@ -324,27 +323,27 @@ void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
 
 void HttpServletResponse::AddIntHeader(const std::string& name, int value)
 {
-  this->AddHeader(name, d->LexicalCast(value));
+  this->AddHeader(name, respdata_ptr->LexicalCast(value));
 }
 
 void HttpServletResponse::SetIntHeader(const std::string& name, int value)
 {
-  this->SetHeader(name, d->LexicalCast(value));
+  this->SetHeader(name, respdata_ptr->LexicalCast(value));
 }
 
 bool HttpServletResponse::ContainsHeader(const std::string& name) const
 {
-  return d->m_Headers.find(name) != d->m_Headers.end();
+  return respdata_ptr->m_Headers.find(name) != respdata_ptr->m_Headers.end();
 }
 
 int HttpServletResponse::GetStatus() const
 {
-  return d->m_StatusCode;
+  return respdata_ptr->m_StatusCode;
 }
 
 void HttpServletResponse::SetStatus(int statusCode)
 {
-  d->m_StatusCode = statusCode;
+  respdata_ptr->m_StatusCode = statusCode;
 }
 
 void HttpServletResponse::SendError(int statusCode, const std::string& msg)
@@ -367,12 +366,12 @@ void HttpServletResponse::SendRedirect(const std::string& location)
   this->Reset();
   this->SetStatus(SC_FOUND);
 
-  std::string contextPath = d->m_Request->GetServletContext()->GetContextPath();
-  std::string scheme = d->m_Request->GetScheme();
+  std::string contextPath = respdata_ptr->m_Request->GetServletContext()->GetContextPath();
+  std::string scheme = respdata_ptr->m_Request->GetScheme();
   std::string redirectUri = (scheme.empty() ? std::string() : scheme) + "://" +
-                            d->m_Request->GetServerName();
+                            respdata_ptr->m_Request->GetServerName();
   std::stringstream ss;
-  ss << d->m_Request->GetServerPort();
+  ss << respdata_ptr->m_Request->GetServerPort();
   std::string port = ss.str();
   if (!port.empty()) {
     redirectUri += std::string(":") + ss.str();
@@ -410,25 +409,24 @@ void HttpServletResponse::SendRedirect(const std::string& location)
 
   this->SetStatus(SC_TEMPORARY_REDIRECT);
   this->SetHeader("Location", redirectUri);
-  d->Commit();
+  respdata_ptr->Commit();
 }
 
 std::streambuf* HttpServletResponse::GetOutputStreamBuffer()
 {
-  if (d->m_HttpOutputStreamBuf == nullptr) {
-    d->m_HttpOutputStreamBuf =
-      new HttpOutputStreamBuffer(d.Data(), this->GetBufferSize());
+  if (respdata_ptr->m_HttpOutputStreamBuf == nullptr) {
+    respdata_ptr->m_HttpOutputStreamBuf = new HttpOutputStreamBuffer(respdata_ptr, this->GetBufferSize());
   }
-  return d->m_HttpOutputStreamBuf;
+  return respdata_ptr->m_HttpOutputStreamBuf;
 }
 
 void HttpServletResponse::SetOutputStreamBuffer(std::streambuf* sb)
 {
-  delete d->m_StreamBuf;
-  d->m_StreamBuf = sb;
+  delete respdata_ptr->m_StreamBuf;
+  respdata_ptr->m_StreamBuf = sb;
 }
 
-HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
-  : d(d)
+HttpServletResponse::HttpServletResponse(const std::shared_ptr<HttpServletResponsePrivate>& d)
+  : respdata_ptr(d)
 {}
 }

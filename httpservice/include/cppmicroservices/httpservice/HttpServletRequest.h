@@ -24,11 +24,11 @@
 #define CPPMICROSERVICES_HTTPSERVLETREQUEST_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -99,9 +99,9 @@ public:
 
 private:
   friend class ServletHandler;
-  HttpServletRequest(HttpServletRequestPrivate* d);
+  HttpServletRequest(const std::shared_ptr<HttpServletRequestPrivate>& d);
 
-  ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
+  std::shared_ptr<HttpServletRequestPrivate> reqdata_ptr;
 };
 }
 

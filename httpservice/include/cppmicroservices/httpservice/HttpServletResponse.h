@@ -23,11 +23,11 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 #define CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <ctime>
 #include <string>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -332,9 +332,9 @@ protected:
 
   void SetOutputStreamBuffer(std::streambuf* sb);
 
-  HttpServletResponse(HttpServletResponsePrivate* d);
+  HttpServletResponse(const std::shared_ptr<HttpServletResponsePrivate>& d);
 
-  ExplicitlySharedDataPointer<HttpServletResponsePrivate> d;
+  std::shared_ptr<HttpServletResponsePrivate> respdata_ptr;
 
 private:
   friend class HttpServlet;

@@ -93,25 +93,25 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(
 
 HttpServletRequest::~HttpServletRequest() {}
 HttpServletRequest::HttpServletRequest(const HttpServletRequest& o)
-  : d(o.d)
+  : reqdata_ptr(o.reqdata_ptr)
 {}
 
 HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest& o)
 {
-  d = o.d;
+  reqdata_ptr = o.reqdata_ptr;
   return *this;
 }
 
 std::shared_ptr<ServletContext> HttpServletRequest::GetServletContext() const
 {
-  return d->m_ServletContext;
+  return reqdata_ptr->m_ServletContext;
 }
 
 Any HttpServletRequest::GetAttribute(const std::string& name) const
 {
   HttpServletRequestPrivate::AttributeMapType::const_iterator iter =
-    d->m_Attributes.find(name);
-  if (iter == d->m_Attributes.end()) {
+    reqdata_ptr->m_Attributes.find(name);
+  if (iter == reqdata_ptr->m_Attributes.end()) {
     return Any();
   }
   return iter->second;
@@ -121,8 +121,8 @@ std::vector<std::string> HttpServletRequest::GetAttributeNames() const
 {
   std::vector<std::string> names;
   for (HttpServletRequestPrivate::AttributeMapType::const_iterator
-         iter = d->m_Attributes.begin(),
-         endIter = d->m_Attributes.end();
+         iter = reqdata_ptr->m_Attributes.begin(),
+         endIter = reqdata_ptr->m_Attributes.end();
        iter != endIter;
        ++iter) {
     names.push_back(iter->first);
@@ -132,7 +132,7 @@ std::vector<std::string> HttpServletRequest::GetAttributeNames() const
 
 std::size_t HttpServletRequest::GetContentLength() const
 {
-  const char* contentLength = mg_get_header(d->m_Connection, "Content-Length");
+  const char* contentLength = mg_get_header(reqdata_ptr->m_Connection, "Content-Length");
   std::string contentLengthStr =
     contentLength ? std::string(contentLength) : std::string();
   std::stringstream ss(contentLengthStr);
@@ -143,24 +143,24 @@ std::size_t HttpServletRequest::GetContentLength() const
 
 std::string HttpServletRequest::GetContentType() const
 {
-  const char* contentType = mg_get_header(d->m_Connection, "Content-Type");
+  const char* contentType = mg_get_header(reqdata_ptr->m_Connection, "Content-Type");
   return contentType ? std::string(contentType) : std::string();
 }
 
 std::string HttpServletRequest::GetScheme() const
 {
-  return d->m_Scheme;
+  return reqdata_ptr->m_Scheme;
 }
 
 std::string HttpServletRequest::GetServerName() const
 {
-  return d->m_ServerName;
+  return reqdata_ptr->m_ServerName;
 }
 
 int HttpServletRequest::GetServerPort() const
 {
   std::stringstream ss;
-  ss.str(d->m_ServerPort);
+  ss.str(reqdata_ptr->m_ServerPort);
   int port = 0;
   ss >> port;
   return port;
@@ -168,42 +168,42 @@ int HttpServletRequest::GetServerPort() const
 
 std::string HttpServletRequest::GetProtocol() const
 {
-  return mg_get_request_info(d->m_Connection)->http_version;
+  return mg_get_request_info(reqdata_ptr->m_Connection)->http_version;
 }
 
 std::string HttpServletRequest::GetContextPath() const
 {
-  return d->m_ContextPath;
+  return reqdata_ptr->m_ContextPath;
 }
 
 std::string HttpServletRequest::GetPathInfo() const
 {
-  return d->m_PathInfo;
+  return reqdata_ptr->m_PathInfo;
 }
 
 std::string HttpServletRequest::GetRequestUri() const
 {
-  return d->m_Uri;
+  return reqdata_ptr->m_Uri;
 }
 
 std::string HttpServletRequest::GetRequestUrl() const
 {
-  return d->m_Url;
+  return reqdata_ptr->m_Url;
 }
 
 std::string HttpServletRequest::GetServletPath() const
 {
-  return d->m_ServletPath;
+  return reqdata_ptr->m_ServletPath;
 }
 
 std::string HttpServletRequest::GetQueryString() const
 {
-  return d->m_QueryString;
+  return reqdata_ptr->m_QueryString;
 }
 
 std::string HttpServletRequest::GetHeader(const std::string& name) const
 {
-  const char* header = mg_get_header(d->m_Connection, name.c_str());
+  const char* header = mg_get_header(reqdata_ptr->m_Connection, name.c_str());
   if (header)
     return header;
   return std::string();
@@ -287,8 +287,8 @@ long long HttpServletRequest::GetDateHeader(const std::string& name) const
 std::vector<std::string> HttpServletRequest::GetHeaderNames() const
 {
   std::vector<std::string> names;
-  for (int i = 0; i < mg_get_request_info(d->m_Connection)->num_headers; ++i) {
-    names.push_back(mg_get_request_info(d->m_Connection)->http_headers[i].name);
+  for (int i = 0; i < mg_get_request_info(reqdata_ptr->m_Connection)->num_headers; ++i) {
+    names.push_back(mg_get_request_info(reqdata_ptr->m_Connection)->http_headers[i].name);
   }
   return names;
 }
@@ -297,10 +297,10 @@ std::vector<std::string> HttpServletRequest::GetHeaders(
   const std::string& name) const
 {
   std::vector<std::string> headers;
-  for (int i = 0; i < mg_get_request_info(d->m_Connection)->num_headers; ++i) {
-    if (name == mg_get_request_info(d->m_Connection)->http_headers[i].name) {
+  for (int i = 0; i < mg_get_request_info(reqdata_ptr->m_Connection)->num_headers; ++i) {
+    if (name == mg_get_request_info(reqdata_ptr->m_Connection)->http_headers[i].name) {
       std::string text =
-        mg_get_request_info(d->m_Connection)->http_headers[i].value;
+        mg_get_request_info(reqdata_ptr->m_Connection)->http_headers[i].value;
 
       // split comma-separated values and trim tokens
       char sep = ',';
@@ -321,15 +321,15 @@ std::vector<std::string> HttpServletRequest::GetHeaders(
 
 std::string HttpServletRequest::GetMethod() const
 {
-  return mg_get_request_info(d->m_Connection)->request_method;
+  return mg_get_request_info(reqdata_ptr->m_Connection)->request_method;
 }
 
 void HttpServletRequest::SetAttribute(const std::string& name, const Any& value)
 {
-  d->m_Attributes[name] = value;
+  reqdata_ptr->m_Attributes[name] = value;
 }
 
-HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate* d)
-  : d(d)
+HttpServletRequest::HttpServletRequest(const std::shared_ptr<HttpServletRequestPrivate>& d)
+  : reqdata_ptr(d)
 {}
 }

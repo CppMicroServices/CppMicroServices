@@ -36,7 +36,7 @@ namespace cppmicroservices {
 class NoBodyOutputStreamBuffer : public HttpOutputStreamBuffer
 {
 public:
-  explicit NoBodyOutputStreamBuffer(HttpServletResponsePrivate* response)
+  explicit NoBodyOutputStreamBuffer(const std::shared_ptr<HttpServletResponsePrivate>& response)
     : HttpOutputStreamBuffer(response)
     , m_ContentLength(0)
   {}
@@ -75,10 +75,9 @@ private:
 class NoBodyResponse : public HttpServletResponse
 {
 public:
-  NoBodyResponse(HttpServletResponsePrivate* d)
+  NoBodyResponse(const std::shared_ptr<HttpServletResponsePrivate>& d)
     : HttpServletResponse(d)
     , m_NoBodyBuffer(new NoBodyOutputStreamBuffer(d))
-  //, m_DidSetContentLength(false)
   {
     this->SetOutputStreamBuffer(m_NoBodyBuffer);
   }
@@ -94,7 +93,6 @@ public:
 
 private:
   NoBodyOutputStreamBuffer* m_NoBodyBuffer;
-  //bool m_DidSetContentLength;
 };
 
 static const std::string METHOD_DELETE = "DELETE";
@@ -231,7 +229,7 @@ void HttpServlet::DoGet(HttpServletRequest& request,
 void HttpServlet::DoHead(HttpServletRequest& request,
                          HttpServletResponse& response)
 {
-  NoBodyResponse noBodyResponse(response.d.Data());
+  NoBodyResponse noBodyResponse(response.respdata_ptr);
 
   DoGet(request, noBodyResponse);
   noBodyResponse.SetContentLength();

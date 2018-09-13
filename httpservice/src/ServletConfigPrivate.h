@@ -23,8 +23,6 @@
 #ifndef CPPMICROSERVICES_SERVLETCONFIGPRIVATE_H
 #define CPPMICROSERVICES_SERVLETCONFIGPRIVATE_H
 
-#include "cppmicroservices/SharedData.h"
-
 #include <memory>
 #include <string>
 
@@ -32,7 +30,7 @@ namespace cppmicroservices {
 
 class ServletContext;
 
-struct ServletConfigPrivate : public SharedData
+struct ServletConfigPrivate
 {
   ServletConfigPrivate() {}
 

@@ -23,8 +23,6 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H
 #define CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H
 
-#include "cppmicroservices/SharedData.h"
-
 #include <map>
 #include <memory>
 #include <string>
@@ -37,7 +35,7 @@ namespace cppmicroservices {
 class Any;
 class ServletContext;
 
-struct HttpServletRequestPrivate : public SharedData
+struct HttpServletRequestPrivate
 {
   HttpServletRequestPrivate(const std::shared_ptr<ServletContext>& servletContext,
                             CivetServer* server,

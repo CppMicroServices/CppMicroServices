@@ -12,7 +12,6 @@ set(_public_headers
   cppmicroservices/LDAPProp.h
   cppmicroservices/ListenerToken.h
   cppmicroservices/ListenerFunctors.h
-  cppmicroservices/SharedData.h
   cppmicroservices/SharedLibrary.h
   cppmicroservices/ShrinkableMap.h
   cppmicroservices/ShrinkableVector.h

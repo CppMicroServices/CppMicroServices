@@ -53,61 +53,61 @@ public:
 };
 
 LDAPFilter::LDAPFilter()
-  : d(0)
+  : data_ptr(0)
 {}
 
 LDAPFilter::LDAPFilter(const std::string& filter)
-  : d(0)
+  : data_ptr(0)
 {
   try {
-    d = new LDAPFilterData(filter);
+      data_ptr = std::make_shared<LDAPFilterData>(filter);
   } catch (const std::exception& e) {
     throw std::invalid_argument(e.what());
   }
 }
 
 LDAPFilter::LDAPFilter(const LDAPFilter& other)
-  : d(other.d)
+  : data_ptr(other.data_ptr)
 {}
 
 LDAPFilter::~LDAPFilter() {}
 
 LDAPFilter::operator bool() const
 {
-  return d != nullptr;
+  return data_ptr != nullptr;
 }
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(reference.impl()->GetProperties(), false)
+  return ((data_ptr) ? data_ptr->ldapExpr.Evaluate(reference.impl()->GetProperties(), false)
               : false);
 }
 
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  return ((d)
-            ? d->ldapExpr.Evaluate(
+  return ((data_ptr)
+            ? data_ptr->ldapExpr.Evaluate(
                 PropertiesHandle(Properties(bundle.GetHeaders()), false), false)
             : false);
 }
 
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(
+  return ((data_ptr) ? data_ptr->ldapExpr.Evaluate(
                   PropertiesHandle(Properties(dictionary), false), false)
               : false);
 }
 
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(
+  return ((data_ptr) ? data_ptr->ldapExpr.Evaluate(
                   PropertiesHandle(Properties(dictionary), false), true)
               : false);
 }
 
 std::string LDAPFilter::ToString() const
 {
-  return ((d) ? d->ldapExpr.ToString() : std::string());
+  return ((data_ptr) ? data_ptr->ldapExpr.ToString() : std::string());
 }
 
 bool LDAPFilter::operator==(const LDAPFilter& other) const
@@ -117,7 +117,7 @@ bool LDAPFilter::operator==(const LDAPFilter& other) const
 
 LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
 {
-  d = filter.d;
+  data_ptr = filter.data_ptr;
 
   return *this;
 }

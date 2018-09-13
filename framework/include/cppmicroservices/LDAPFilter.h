@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_LDAPFILTER_H
 
 #include "cppmicroservices/AnyMap.h"
-#include "cppmicroservices/SharedData.h"
 
 #ifdef _MSC_VER
 #  pragma warning(push)
@@ -68,7 +67,7 @@ class US_Framework_EXPORT LDAPFilter
 {
 
 private:
-  typedef SharedDataPointer<LDAPFilterData> LDAPFilter::*bool_type;
+    typedef std::shared_ptr<LDAPFilterData> LDAPFilter::*bool_type;
 
 public:
   /**
@@ -189,7 +188,7 @@ public:
   LDAPFilter& operator=(const LDAPFilter& filter);
 
 protected:
-  SharedDataPointer<LDAPFilterData> d;
+    std::shared_ptr<LDAPFilterData> data_ptr;
 };
 
 /**

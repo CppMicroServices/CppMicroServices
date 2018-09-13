@@ -121,7 +121,7 @@ void SharedLibrary::Load(int flags)
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
   libdata_ptr->m_Handle = LoadLibraryW(wpath.c_str());
-  if (!d->m_Handle) {
+  if (!libdata_ptr->m_Handle) {
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")

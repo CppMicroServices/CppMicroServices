@@ -33,7 +33,7 @@
 
 namespace cppmicroservices {
 
-class LDAPFilterData : public SharedData
+class LDAPFilterData
 {
 public:
   LDAPFilterData()
@@ -45,8 +45,7 @@ public:
   {}
 
   LDAPFilterData(const LDAPFilterData& other)
-    : SharedData(other)
-    , ldapExpr(other.ldapExpr)
+    : ldapExpr(other.ldapExpr)
   {}
 
   LDAPExpr ldapExpr;

@@ -126,7 +126,7 @@ public:
   void error(const std::string& m) const;
 };
 
-class LDAPExprData : public SharedData
+class LDAPExprData
 {
 public:
   LDAPExprData(int op, const std::vector<LDAPExpr>& args)
@@ -144,8 +144,7 @@ public:
   {}
 
   LDAPExprData(const LDAPExprData& other)
-    : SharedData(other)
-    , m_operator(other.m_operator)
+    : m_operator(other.m_operator)
     , m_args(other.m_args)
     , m_attrName(other.m_attrName)
     , m_attrValue(other.m_attrValue)
@@ -158,11 +157,11 @@ public:
 };
 
 LDAPExpr::LDAPExpr()
-  : d()
+  : data_ptr()
 {}
 
 LDAPExpr::LDAPExpr(const std::string& filter)
-  : d()
+  : data_ptr()
 {
   ParseState ps(filter);
   try {
@@ -172,29 +171,29 @@ LDAPExpr::LDAPExpr(const std::string& filter)
       ps.error(LDAPExprConstants::GARBAGE() + " '" + ps.rest() + "'");
     }
 
-    d = expr.d;
+    data_ptr = expr.data_ptr;
   } catch (const std::out_of_range&) {
     ps.error(LDAPExprConstants::EOS());
   }
 }
 
 LDAPExpr::LDAPExpr(int op, const std::vector<LDAPExpr>& args)
-  : d(new LDAPExprData(op, args))
+  : data_ptr(new LDAPExprData(op, args))
 {}
 
 LDAPExpr::LDAPExpr(int op,
                    const std::string& attrName,
                    const std::string& attrValue)
-  : d(new LDAPExprData(op, attrName, attrValue))
+  : data_ptr(new LDAPExprData(op, attrName, attrValue))
 {}
 
 LDAPExpr::LDAPExpr(const LDAPExpr& other)
-  : d(other.d)
+  : data_ptr(other.data_ptr)
 {}
 
 LDAPExpr& LDAPExpr::operator=(const LDAPExpr& other)
 {
-  d = other.d;
+  data_ptr = other.data_ptr;
   return *this;
 }
 
@@ -209,23 +208,23 @@ std::string LDAPExpr::Trim(std::string str)
 
 bool LDAPExpr::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
 {
-  if (d->m_operator == EQ) {
-    if (d->m_attrName.length() == Constants::OBJECTCLASS.length() &&
-        std::equal(d->m_attrName.begin(),
-                   d->m_attrName.end(),
+  if (data_ptr->m_operator == EQ) {
+    if (data_ptr->m_attrName.length() == Constants::OBJECTCLASS.length() &&
+        std::equal(data_ptr->m_attrName.begin(),
+                   data_ptr->m_attrName.end(),
                    Constants::OBJECTCLASS.begin(),
                    stricomp) &&
-        d->m_attrValue.find(LDAPExprConstants::WILDCARD()) ==
+        data_ptr->m_attrValue.find(LDAPExprConstants::WILDCARD()) ==
           std::string::npos) {
-      objClasses.insert(d->m_attrValue);
+      objClasses.insert(data_ptr->m_attrValue);
       return true;
     }
     return false;
-  } else if (d->m_operator == AND) {
+  } else if (data_ptr->m_operator == AND) {
     bool result = false;
-    for (std::size_t i = 0; i < d->m_args.size(); i++) {
+    for (std::size_t i = 0; i < data_ptr->m_args.size(); i++) {
       LDAPExpr::ObjectClassSet r;
-      if (d->m_args[i].GetMatchedObjectClasses(r)) {
+      if (data_ptr->m_args[i].GetMatchedObjectClasses(r)) {
         result = true;
         if (objClasses.empty()) {
           objClasses = r;
@@ -251,10 +250,10 @@ bool LDAPExpr::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
       }
     }
     return result;
-  } else if (d->m_operator == OR) {
-    for (std::size_t i = 0; i < d->m_args.size(); i++) {
+  } else if (data_ptr->m_operator == OR) {
+    for (std::size_t i = 0; i < data_ptr->m_args.size(); i++) {
       LDAPExpr::ObjectClassSet r;
-      if (d->m_args[i].GetMatchedObjectClasses(r)) {
+      if (data_ptr->m_args[i].GetMatchedObjectClasses(r)) {
         std::copy(
           r.begin(), r.end(), std::inserter(objClasses, objClasses.begin()));
       } else {
@@ -282,21 +281,21 @@ bool LDAPExpr::IsSimple(const StringList& keywords,
     cache.resize(keywords.size());
   }
 
-  if (d->m_operator == EQ) {
+  if (data_ptr->m_operator == EQ) {
     StringList::const_iterator index;
     if ((index =
            std::find(keywords.begin(),
                      keywords.end(),
-                     matchCase ? d->m_attrName : ToLower(d->m_attrName))) !=
+                     matchCase ? data_ptr->m_attrName : ToLower(data_ptr->m_attrName))) !=
           keywords.end() &&
-        d->m_attrValue.find_first_of(LDAPExprConstants::WILDCARD()) ==
+        data_ptr->m_attrValue.find_first_of(LDAPExprConstants::WILDCARD()) ==
           std::string::npos) {
-      cache[index - keywords.begin()] = StringList(1, d->m_attrValue);
+      cache[index - keywords.begin()] = StringList(1, data_ptr->m_attrValue);
       return true;
     }
-  } else if (d->m_operator == OR) {
-    for (std::size_t i = 0; i < d->m_args.size(); i++) {
-      if (!d->m_args[i].IsSimple(keywords, cache, matchCase))
+  } else if (data_ptr->m_operator == OR) {
+    for (std::size_t i = 0; i < data_ptr->m_args.size(); i++) {
+      if (!data_ptr->m_args[i].IsSimple(keywords, cache, matchCase))
         return false;
     }
     return true;
@@ -306,35 +305,35 @@ bool LDAPExpr::IsSimple(const StringList& keywords,
 
 bool LDAPExpr::IsNull() const
 {
-  return !d;
+  return !data_ptr;
 }
 
 bool LDAPExpr::Evaluate(const PropertiesHandle& p, bool matchCase) const
 {
-  if ((d->m_operator & SIMPLE) != 0) {
+  if ((data_ptr->m_operator & SIMPLE) != 0) {
     // try case sensitive match first
-    int index = p->FindCaseSensitive_unlocked(d->m_attrName);
+    int index = p->FindCaseSensitive_unlocked(data_ptr->m_attrName);
     if (index < 0 && !matchCase)
-      index = p->Find_unlocked(d->m_attrName);
+      index = p->Find_unlocked(data_ptr->m_attrName);
     return index < 0
              ? false
-             : Compare(p->Value_unlocked(index), d->m_operator, d->m_attrValue);
+             : Compare(p->Value_unlocked(index), data_ptr->m_operator, data_ptr->m_attrValue);
   } else { // (d->m_operator & COMPLEX) != 0
-    switch (d->m_operator) {
+    switch (data_ptr->m_operator) {
       case AND:
-        for (std::size_t i = 0; i < d->m_args.size(); i++) {
-          if (!d->m_args[i].Evaluate(p, matchCase))
+        for (std::size_t i = 0; i < data_ptr->m_args.size(); i++) {
+          if (!data_ptr->m_args[i].Evaluate(p, matchCase))
             return false;
         }
         return true;
       case OR:
-        for (std::size_t i = 0; i < d->m_args.size(); i++) {
-          if (d->m_args[i].Evaluate(p, matchCase))
+        for (std::size_t i = 0; i < data_ptr->m_args.size(); i++) {
+          if (data_ptr->m_args[i].Evaluate(p, matchCase))
             return true;
         }
         return false;
       case NOT:
-        return !d->m_args[0].Evaluate(p, matchCase);
+        return !data_ptr->m_args[0].Evaluate(p, matchCase);
       default:
         return false; // Cannot happen
     }
@@ -606,9 +605,9 @@ const std::string LDAPExpr::ToString() const
 {
   std::string res;
   res.append("(");
-  if ((d->m_operator & SIMPLE) != 0) {
-    res.append(d->m_attrName);
-    switch (d->m_operator) {
+  if ((data_ptr->m_operator & SIMPLE) != 0) {
+    res.append(data_ptr->m_attrName);
+    switch (data_ptr->m_operator) {
       case EQ:
         res.append("=");
         break;
@@ -623,8 +622,8 @@ const std::string LDAPExpr::ToString() const
         break;
     }
 
-    for (std::size_t i = 0; i < d->m_attrValue.length(); i++) {
-      Byte c = d->m_attrValue.at(i);
+    for (std::size_t i = 0; i < data_ptr->m_attrValue.length(); i++) {
+      Byte c = data_ptr->m_attrValue.at(i);
       if (c == '(' || c == ')' || c == '*' || c == '\\') {
         res.append(1, '\\');
       } else if (c == LDAPExprConstants::WILDCARD()) {
@@ -633,7 +632,7 @@ const std::string LDAPExpr::ToString() const
       res.append(1, c);
     }
   } else {
-    switch (d->m_operator) {
+    switch (data_ptr->m_operator) {
       case AND:
         res.append("&");
         break;
@@ -644,8 +643,8 @@ const std::string LDAPExpr::ToString() const
         res.append("!");
         break;
     }
-    for (std::size_t i = 0; i < d->m_args.size(); i++) {
-      res.append(d->m_args[i].ToString());
+    for (std::size_t i = 0; i < data_ptr->m_args.size(); i++) {
+      res.append(data_ptr->m_args[i].ToString());
     }
   }
   res.append(")");

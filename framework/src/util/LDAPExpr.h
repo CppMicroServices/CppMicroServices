@@ -24,11 +24,11 @@
 #define CPPMICROSERVICES_LDAPEXPR_H
 
 #include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/SharedData.h"
 
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -169,7 +169,7 @@ private:
                         int pi);
 
   //! Shared pointer
-  SharedDataPointer<LDAPExprData> d;
+    std::shared_ptr<LDAPExprData> data_ptr;
 };
 }
 

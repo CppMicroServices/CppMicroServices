@@ -51,17 +51,14 @@ public:
    *        BundleConstants::OBJECTCLASS.
    * @param sid A service id which will be used instead of a default one.
    */
-  static Properties CreateServiceProperties(
-    const ServiceProperties& in,
-    const std::vector<std::string>& classes = std::vector<std::string>(),
-    bool isFactory = false,
-    bool isPrototypeFactory = false,
-    long sid = -1);
+  static Properties CreateServiceProperties(const ServiceProperties& in,
+                                            const std::vector<std::string>& classes = std::vector<std::string>(),
+                                            bool isFactory = false,
+                                            bool isPrototypeFactory = false,
+                                            long sid = -1);
 
-  typedef std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>
-    MapServiceClasses;
-  typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>
-    MapClassServices;
+  typedef std::unordered_map<ServiceRegistrationBase, std::vector<std::string>> MapServiceClasses;
+  typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase>> MapClassServices;
 
   /**
    * All registered services in the current framework.

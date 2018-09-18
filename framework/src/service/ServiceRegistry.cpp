@@ -44,12 +44,11 @@ void ServiceRegistry::Clear()
   serviceRegistrations.clear();
 }
 
-Properties ServiceRegistry::CreateServiceProperties(
-  const ServiceProperties& in,
-  const std::vector<std::string>& classes,
-  bool isFactory,
-  bool isPrototypeFactory,
-  long sid)
+Properties ServiceRegistry::CreateServiceProperties(const ServiceProperties& in,
+                                                    const std::vector<std::string>& classes,
+                                                    bool isFactory,
+                                                    bool isPrototypeFactory,
+                                                    long sid)
 {
   static std::atomic<long> nextServiceID(1);
   ServiceProperties props(in);
@@ -62,14 +61,11 @@ Properties ServiceRegistry::CreateServiceProperties(
     std::make_pair(Constants::SERVICE_ID, sid != -1 ? sid : nextServiceID++));
 
   if (isPrototypeFactory) {
-    props.insert(
-      std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_PROTOTYPE));
+    props.insert(std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_PROTOTYPE));
   } else if (isFactory) {
-    props.insert(
-      std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_BUNDLE));
+    props.insert(std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_BUNDLE));
   } else {
-    props.insert(
-      std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_SINGLETON));
+    props.insert(std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_SINGLETON));
   }
 
   return Properties(props);
@@ -79,10 +75,9 @@ ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
   : core(coreCtx)
 {}
 
-ServiceRegistrationBase ServiceRegistry::RegisterService(
-  BundlePrivate* bundle,
-  const InterfaceMapConstPtr& service,
-  const ServiceProperties& properties)
+ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle,
+                                                         const InterfaceMapConstPtr& service,
+                                                         const ServiceProperties& properties)
 {
   if (!service || service->empty()) {
     throw std::invalid_argument(
@@ -91,12 +86,9 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(
 
   // Check if we got a service factory
   bool isFactory = service->count("org.cppmicroservices.factory") > 0;
-  bool isPrototypeFactory =
-    (isFactory
-       ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
-           std::static_pointer_cast<ServiceFactory>(
-             service->find("org.cppmicroservices.factory")->second)))
-       : false);
+  bool isPrototypeFactory = (isFactory
+                             ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(std::static_pointer_cast<ServiceFactory>(service->find("org.cppmicroservices.factory")->second)))
+                             : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
@@ -107,11 +99,12 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(
     classes.push_back(i.first);
   }
 
-  ServiceRegistrationBase res(
-    bundle,
-    service,
-    CreateServiceProperties(
-      properties, classes, isFactory, isPrototypeFactory));
+  ServiceRegistrationBase res(bundle,
+                              service,
+                              CreateServiceProperties(properties,
+                                                      classes,
+                                                      isFactory,
+                                                      isPrototypeFactory));
   {
     auto l = this->Lock();
     US_UNUSED(l);

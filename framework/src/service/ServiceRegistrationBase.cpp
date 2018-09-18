@@ -143,10 +143,8 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
         classes = ref_any_cast<std::vector<std::string>>(
           regdata_ptr->properties.Value_unlocked(Constants::OBJECTCLASS));
 
-        long int sid = any_cast<long int>(
-          regdata_ptr->properties.Value_unlocked(Constants::SERVICE_ID));
-        regdata_ptr->properties = ServiceRegistry::CreateServiceProperties(
-          props, classes, false, false, sid);
+        long int sid = any_cast<long int>(regdata_ptr->properties.Value_unlocked(Constants::SERVICE_ID));
+        regdata_ptr->properties = ServiceRegistry::CreateServiceProperties(props, classes, false, false, sid);
 
         any = regdata_ptr->properties.Value_unlocked(Constants::SERVICE_RANKING);
         if (any.Type() == typeid(int))

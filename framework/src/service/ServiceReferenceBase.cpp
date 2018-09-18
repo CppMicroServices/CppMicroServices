@@ -38,8 +38,9 @@ ServiceReferenceBase::ServiceReferenceBase()
 {}
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
-  : impl_ptr(ref.impl())
+  : impl_ptr()
 {
+    set_impl_ptr(ref.impl());
 }
 
 ServiceReferenceBase::ServiceReferenceBase(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg)

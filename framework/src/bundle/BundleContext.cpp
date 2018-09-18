@@ -166,9 +166,8 @@ std::vector<Bundle> BundleContext::GetBundles() const
   return bus;
 }
 
-ServiceRegistrationU BundleContext::RegisterService(
-  const InterfaceMapConstPtr& service,
-  const ServiceProperties& properties)
+ServiceRegistrationU BundleContext::RegisterService(const InterfaceMapConstPtr& service,
+                                                    const ServiceProperties& properties)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);

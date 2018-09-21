@@ -18,7 +18,7 @@ matrix:
 
         # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
         - os: linux
-          addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5", "libstdc++-5-dev"], sources: ["ubuntu-toolchain-r-test"] } }
+          addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5", "libstdc++-6-dev"], sources: ["ubuntu-toolchain-r-test"] } }
           env: MY_CC=gcc-5 MY_CXX=g++-5
 
         # Test our minium Clang version, which is clang 3.5 on Ubuntu Trusty

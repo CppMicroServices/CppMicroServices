@@ -21,10 +21,9 @@
 =============================================================================*/
 
 #include "cppmicroservices/SharedLibrary.h"
-
 #include "cppmicroservices/BundleActivator.h"
-
 #include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/Constants.h"
 
 #if defined(US_PLATFORM_POSIX)
 #  include <dlfcn.h>
@@ -121,6 +120,22 @@ void SharedLibrary::Load(int flags)
 
     throw std::runtime_error(errMsg);
   }
+#endif
+}
+
+void SharedLibrary::Load(const std::unordered_map<std::string, Any>& config)
+{
+#ifdef US_PLATFORM_POSIX
+    int options = RTLD_LAZY | RTLD_LOCAL;
+    try {
+        options = any_cast<int>(config.at(Constants::LIBRARY_LOAD_OPTIONS));
+    }
+    catch (...)
+    {
+    }
+    Load(options);
+#else
+    Load(0);
 #endif
 }
 

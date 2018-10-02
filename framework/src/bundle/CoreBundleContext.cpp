@@ -39,7 +39,9 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include <iomanip>
 
+#ifdef US_PLATFORM_POSIX
 #include <dlfcn.h>
+#endif
 
 CPPMICROSERVICES_INITIALIZE_BUNDLE
 
@@ -69,7 +71,11 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
 
   configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
   configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
+
+#ifdef US_PLATFORM_POSIX
   configuration[Constants::LIBRARY_LOAD_OPTIONS] = Any(RTLD_LAZY | RTLD_LOCAL);
+#endif
+  
   return configuration;
 }
 

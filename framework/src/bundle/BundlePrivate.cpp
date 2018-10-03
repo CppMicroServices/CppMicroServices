@@ -952,7 +952,3 @@ std::shared_ptr<BundlePrivate> GetPrivate(const Bundle& b)
   return b.d;
 }
 }
-
-// Local Variables:
-// c-file-style: "cppms"
-// End:

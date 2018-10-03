@@ -459,7 +459,3 @@ US_Framework_EXPORT extern const std::string LIBRARY_LOAD_OPTIONS;
 }
 
 #endif // CPPMICROSERVICES_CONSTANTS_H
-
-// Local Variables:
-// c-file-style: "cppms"
-// End:

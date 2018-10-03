@@ -230,7 +230,3 @@ private:
 #  endif
 
 #endif // CPPMICROSERVICES_SHAREDLIBRARY_H
-
-// Local Variables:
-// c-file-style: "cppms"
-// End:

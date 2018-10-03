@@ -135,6 +135,7 @@ void SharedLibrary::Load(const std::unordered_map<std::string, Any>& config)
     }
     Load(options);
 #else
+    US_UNUSED(config);
     Load(0);
 #endif
 }

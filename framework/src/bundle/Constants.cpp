@@ -44,14 +44,17 @@ const std::string ACTIVATION_LAZY = "lazy";
 const std::string FRAMEWORK_VERSION = "org.cppmicroservices.framework.version";
 const std::string FRAMEWORK_VENDOR = "org.cppmicroservices.framework.vendor";
 const std::string FRAMEWORK_STORAGE = "org.cppmicroservices.framework.storage";
-const std::string FRAMEWORK_STORAGE_CLEAN = "org.cppmicroservices.framework.storage.clean";
+const std::string FRAMEWORK_STORAGE_CLEAN =
+  "org.cppmicroservices.framework.storage.clean";
 const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT = "onFirstInit";
-const std::string FRAMEWORK_THREADING_SUPPORT = "org.cppmicroservices.framework.threading.support";
+const std::string FRAMEWORK_THREADING_SUPPORT =
+  "org.cppmicroservices.framework.threading.support";
 const std::string FRAMEWORK_THREADING_SINGLE = "single";
 const std::string FRAMEWORK_THREADING_MULTI = "multi";
 const std::string FRAMEWORK_LOG = "org.cppmicroservices.framework.log";
 const std::string FRAMEWORK_UUID = "org.cppmicroservices.framework.uuid";
-const std::string FRAMEWORK_WORKING_DIR = "org.cppmicroservices.framework.working.dir";
+const std::string FRAMEWORK_WORKING_DIR =
+  "org.cppmicroservices.framework.working.dir";
 const std::string OBJECTCLASS = "objectclass";
 const std::string SERVICE_ID = "service.id";
 const std::string SERVICE_PID = "service.pid";
@@ -62,7 +65,8 @@ const std::string SERVICE_SCOPE = "service.scope";
 const std::string SCOPE_SINGLETON = "singleton";
 const std::string SCOPE_BUNDLE = "bundle";
 const std::string SCOPE_PROTOTYPE = "prototype";
-const std::string LIBRARY_LOAD_OPTIONS = "org.cppmicroservices.library.load.options";
+const std::string LIBRARY_LOAD_OPTIONS =
+  "org.cppmicroservices.library.load.options";
 
 }
 }

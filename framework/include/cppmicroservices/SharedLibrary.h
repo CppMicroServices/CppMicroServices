@@ -21,36 +21,36 @@
   =============================================================================*/
 
 #ifndef CPPMICROSERVICES_SHAREDLIBRARY_H
-#define CPPMICROSERVICES_SHAREDLIBRARY_H
+#  define CPPMICROSERVICES_SHAREDLIBRARY_H
 
-#include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/SharedData.h"
-#include "cppmicroservices/Any.h"
+#  include "cppmicroservices/Any.h"
+#  include "cppmicroservices/FrameworkConfig.h"
+#  include "cppmicroservices/SharedData.h"
 
-#include <string>
-#include <unordered_map>
+#  include <string>
+#  include <unordered_map>
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4251)
-#endif
+#  ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4251)
+#  endif
 
 namespace cppmicroservices {
 
-  class SharedLibraryPrivate;
+class SharedLibraryPrivate;
 
 /**
  * \ingroup MicroServicesUtils
  *
  * The SharedLibrary class loads shared libraries at runtime.
  */
-  class US_Framework_EXPORT SharedLibrary
-  {
-    public:
-    SharedLibrary();
-    SharedLibrary(const SharedLibrary& other);
+class US_Framework_EXPORT SharedLibrary
+{
+public:
+  SharedLibrary();
+  SharedLibrary(const SharedLibrary& other);
 
-    /**
+  /**
      * Construct a SharedLibrary object using a library search path and
      * a library base name.
      *
@@ -58,25 +58,25 @@ namespace cppmicroservices {
      * @param name The base name of the shared library, without prefix
      *        and suffix.
      */
-    SharedLibrary(const std::string& libPath, const std::string& name);
+  SharedLibrary(const std::string& libPath, const std::string& name);
 
-    /**
+  /**
      * Construct a SharedLibrary object using an absolute file path to
      * the shared library. Using this constructor effectively disables
      * all setters except SetFilePath().
      *
      * @param absoluteFilePath The absolute path to the shared library.
      */
-    SharedLibrary(const std::string& absoluteFilePath);
+  SharedLibrary(const std::string& absoluteFilePath);
 
-    /**
+  /**
      * Destroys this object but does not unload the shared library.
      */
-    ~SharedLibrary();
+  ~SharedLibrary();
 
-    SharedLibrary& operator=(const SharedLibrary& other);
+  SharedLibrary& operator=(const SharedLibrary& other);
 
-    /**
+  /**
      * Loads the shared library pointed to by this SharedLibrary object.
      * On POSIX systems dlopen() is called with the RTLD_LAZY and
      * RTLD_LOCAL flags unless the compiler is gcc 4.4.x or older. Then
@@ -86,9 +86,9 @@ namespace cppmicroservices {
      * @throws std::logic_error If the library is already loaded.
      * @throws std::runtime_error If loading the library failed.
      */
-    void Load();
-    
-    /**
+  void Load();
+
+  /**
      * Loads the shared library pointed to by this SharedLibrary object.  On
      * POSIX systems dlopen() is called with flags from the key
      * LIBRARY_LOAD_OPTIONS in the frameworkProperties map.
@@ -96,26 +96,26 @@ namespace cppmicroservices {
      * @throws std::logic_error If the library is already loaded.
      * @throws std::runtime_error If loading the library failed.
      */
-    void Load(const std::unordered_map<std::string, Any>& frameworkProperties);
+  void Load(const std::unordered_map<std::string, Any>& frameworkProperties);
 
-    /**
+  /**
      * Loads the shared library pointed to by this SharedLibrary object,
      * using the specified flags on POSIX systems.
      *
      * @throws std::logic_error If the library is already loaded.
      * @throws std::runtime_error If loading the library failed.
      */
-    void Load(int flags);
+  void Load(int flags);
 
-    /**
+  /**
      * Un-loads the shared library pointed to by this SharedLibrary object.
      *
      * @throws std::runtime_error If an error occurred while un-loading the
      *         shared library.
      */
-    void Unload();
+  void Unload();
 
-    /**
+  /**
      * Sets the base name of the shared library. Does nothing if the shared
      * library is already loaded or the SharedLibrary(const std::string&)
      * constructor was used.
@@ -123,24 +123,24 @@ namespace cppmicroservices {
      * @param name The base name of the shared library, without prefix and
      *        suffix.
      */
-    void SetName(const std::string& name);
+  void SetName(const std::string& name);
 
-    /**
+  /**
      * Gets the base name of the shared library.
      * @return The shared libraries base name.
      */
-    std::string GetName() const;
+  std::string GetName() const;
 
-    /**
+  /**
      * Gets the absolute file path for the shared library with base name
      * \c name, using the search path returned by GetLibraryPath().
      *
      * @param name The shared library base name.
      * @return The absolute file path of the shared library.
      */
-    std::string GetFilePath(const std::string& name) const;
+  std::string GetFilePath(const std::string& name) const;
 
-    /**
+  /**
      * Sets the absolute file path of this SharedLibrary object.
      * Using this methods with a non-empty \c absoluteFilePath argument
      * effectively disables all other setters.
@@ -148,86 +148,86 @@ namespace cppmicroservices {
      * @param absoluteFilePath The new absolute file path of this SharedLibrary
      *        object.
      */
-    void SetFilePath(const std::string& absoluteFilePath);
+  void SetFilePath(const std::string& absoluteFilePath);
 
-    /**
+  /**
      * Gets the absolute file path of this SharedLibrary object.
      *
      * @return The absolute file path of the shared library.
      */
-    std::string GetFilePath() const;
+  std::string GetFilePath() const;
 
-    /**
+  /**
      * Sets a new library search path. Does nothing if the shared
      * library is already loaded or the SharedLibrary(const std::string&)
      * constructor was used.
      *
      * @param path The new shared library search path.
      */
-    void SetLibraryPath(const std::string& path);
+  void SetLibraryPath(const std::string& path);
 
-    /**
+  /**
      * Gets the library search path of this SharedLibrary object.
      *
      * @return The library search path.
      */
-    std::string GetLibraryPath() const;
+  std::string GetLibraryPath() const;
 
-    /**
+  /**
      * Sets the suffix for shared library names (e.g. lib). Does nothing if the shared
      * library is already loaded or the SharedLibrary(const std::string&)
      * constructor was used.
      *
      * @param suffix The shared library name suffix.
      */
-    void SetSuffix(const std::string& suffix);
+  void SetSuffix(const std::string& suffix);
 
-    /**
+  /**
      * Gets the file name suffix of this SharedLibrary object.
      *
      * @return The file name suffix of the shared library.
      */
-    std::string GetSuffix() const;
+  std::string GetSuffix() const;
 
-    /**
+  /**
      * Sets the file name prefix for shared library names (e.g. .dll or .so).
      * Does nothing if the shared library is already loaded or the
      * SharedLibrary(const std::string&) constructor was used.
      *
      * @param prefix The shared library name prefix.
      */
-    void SetPrefix(const std::string& prefix);
+  void SetPrefix(const std::string& prefix);
 
-    /**
+  /**
      * Gets the file name prefix of this SharedLibrary object.
      *
      * @return The file name prefix of the shared library.
      */
-    std::string GetPrefix() const;
+  std::string GetPrefix() const;
 
-    /**
+  /**
      * Gets the internal handle of this SharedLibrary object.
      *
      * @return \c nullptr if the shared library is not loaded, the operating
      * system specific handle otherwise.
      */
-    void* GetHandle() const;
+  void* GetHandle() const;
 
-    /**
+  /**
      * Gets the loaded/unloaded stated of this SharedLibrary object.
      *
      * @return \c true if the shared library is loaded, \c false otherwise.
      */
-    bool IsLoaded() const;
+  bool IsLoaded() const;
 
-    private:
-    ExplicitlySharedDataPointer<SharedLibraryPrivate> d;
-  };
+private:
+  ExplicitlySharedDataPointer<SharedLibraryPrivate> d;
+};
 }
 
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
+#  ifdef _MSC_VER
+#    pragma warning(pop)
+#  endif
 
 #endif // CPPMICROSERVICES_SHAREDLIBRARY_H
 

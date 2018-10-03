@@ -40,7 +40,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include <iomanip>
 
 #ifdef US_PLATFORM_POSIX
-#include <dlfcn.h>
+#  include <dlfcn.h>
 #endif
 
 CPPMICROSERVICES_INITIALIZE_BUNDLE
@@ -49,7 +49,8 @@ namespace cppmicroservices {
 
 std::atomic<int> CoreBundleContext::globalId{ 0 };
 
-std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(
+  std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
   configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
@@ -62,28 +63,33 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
-  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) == configuration.end()) {
+  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) ==
+      configuration.end()) {
     configuration.insert(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
                                         util::GetCurrentWorkingDirectory()));
   }
 
-  configuration.insert(std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
+  configuration.insert(
+    std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
 
-  configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
+  configuration[Constants::FRAMEWORK_VERSION] =
+    std::string(CppMicroServices_VERSION_STR);
   configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
 
 #ifdef US_PLATFORM_POSIX
   configuration[Constants::LIBRARY_LOAD_OPTIONS] = Any(RTLD_LAZY | RTLD_LOCAL);
 #endif
-  
+
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>& props,
-                                     std::ostream* logger)
+CoreBundleContext::CoreBundleContext(
+  const std::unordered_map<std::string, Any>& props,
+  std::ostream* logger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
-  , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+  , workingDir(ref_any_cast<std::string>(
+      frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
   , listeners(this)
   , services(this)
   , serviceHooks(this)

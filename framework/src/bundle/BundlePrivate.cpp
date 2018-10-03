@@ -123,18 +123,17 @@ std::exception_ptr BundlePrivate::Stop1()
   std::exception_ptr res;
 
   // 6:
-  coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_STOPPING,
-                                               MakeBundle(this->shared_from_this())));
+  coreCtx->listeners.BundleChanged(BundleEvent(
+    BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
 
   // 7:
   if (wasStarted && bactivator != nullptr) {
     try {
       bactivator->Stop(MakeBundleContext(bundleContext.Load()));
     } catch (...) {
-      res = std::make_exception_ptr(std::runtime_error("Bundle#"
-                                                       + util::ToString(id)
-                                                       + ", BundleActivator::Stop() failed: "
-                                                       + util::GetLastExceptionStr()));
+      res = std::make_exception_ptr(std::runtime_error(
+        "Bundle#" + util::ToString(id) +
+        ", BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
     }
 
     // if stop was aborted (uninstall or timeout), make sure
@@ -193,8 +192,8 @@ void BundlePrivate::WaitOnOperation(WaitConditionType& wc,
 {
   if (operation.load() != OP_IDLE) {
     std::chrono::milliseconds waitfor = longWait
-      ? std::chrono::milliseconds(20000)
-      : std::chrono::milliseconds(500);
+                                          ? std::chrono::milliseconds(20000)
+                                          : std::chrono::milliseconds(500);
     if (wc.WaitFor(
           lock, waitfor, [this] { return operation.load() == OP_IDLE; })) {
       return;
@@ -398,8 +397,8 @@ void BundlePrivate::Uninstall()
           WaitOnOperation(coreCtx->resolver, l, "Bundle::Uninstall", true);
           exception =
             (state & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) != 0
-            ? Stop0(l)
-            : nullptr;
+              ? Stop0(l)
+              : nullptr;
         } catch (...) {
           // Force to install
           SetStateInstalled(false, l);
@@ -533,7 +532,7 @@ void BundlePrivate::Start(uint32_t options)
   }
   // Last step of lazy activation
   coreCtx->listeners.BundleChanged(BundleEvent(
-                                     BundleEvent::BUNDLE_LAZY_ACTIVATION, MakeBundle(this->shared_from_this())));
+    BundleEvent::BUNDLE_LAZY_ACTIVATION, MakeBundle(this->shared_from_this())));
   {
     auto l = coreCtx->resolver.Lock();
     US_UNUSED(l);
@@ -677,7 +676,7 @@ std::exception_ptr BundlePrivate::Start0()
     }
     if (!cause.empty()) {
       res = std::make_exception_ptr(std::runtime_error(
-                                      "Bundle#" + util::ToString(id) + " start failed: " + cause));
+        "Bundle#" + util::ToString(id) + " start failed: " + cause));
     }
   }
 
@@ -689,7 +688,7 @@ std::exception_ptr BundlePrivate::Start0()
     // 10:
     state = Bundle::STATE_ACTIVE;
     coreCtx->listeners.BundleChanged(BundleEvent(
-                                       BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
+      BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
   } else if (operation == OP_ACTIVATING) {
     // 8:
     StartFailed();
@@ -702,12 +701,12 @@ void BundlePrivate::StartFailed()
   // 8:
   state = Bundle::STATE_STOPPING;
   coreCtx->listeners.BundleChanged(BundleEvent(
-                                     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
+    BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
   RemoveBundleResources();
   bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>())->Invalidate();
   state = Bundle::STATE_RESOLVED;
   coreCtx->listeners.BundleChanged(BundleEvent(
-                                     BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
+    BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
 }
 
 std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
@@ -839,7 +838,7 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
       version = BundleVersion(versionAny.ToString());
     } catch (...) {
       errMsg = std::string("The version identifier is invalid: ") +
-        util::GetLastExceptionStr();
+               util::GetLastExceptionStr();
     }
 
     if (!errMsg.empty()) {

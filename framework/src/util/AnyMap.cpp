@@ -929,7 +929,7 @@ const AnyMap::mapped_type& AnyMap::AtCompoundKey(const key_type& key) const
 }
 
 AnyMap::mapped_type AnyMap::AtCompoundKey(const key_type& key,
-                                          AnyMap::mapped_type&& defaultValue) const noexcept
+                                          AnyMap::mapped_type defaultValue) const noexcept
 {
   return detail::AtCompoundKey(*this, key, std::move(defaultValue));
 }

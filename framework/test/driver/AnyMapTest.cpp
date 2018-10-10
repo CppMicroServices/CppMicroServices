@@ -93,6 +93,16 @@ int AnyMapTest(int /*argc*/, char* /*argv*/ [])
                       std::string("there"),
                     "Get uoci.Vec.2.there")
 
+  Any emptyAny;
+  US_TEST_CONDITION(om.AtCompoundKey("key1", emptyAny) == std::string("val1"), "Get key1")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.first", emptyAny) == 1, "Get uoci.first")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.second", emptyAny) == 2, "Get uoci.SECOND")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.0", emptyAny) == std::string("one"),
+                    "Get uoci.Vec.0")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.2.there", emptyAny) ==
+                    std::string("there"),
+                    "Get uoci.Vec.2.there")
+
   std::set<std::string> keys;
   for (auto p : uoci) {
     keys.insert(p.first);
@@ -118,6 +128,18 @@ int AnyMapTest(int /*argc*/, char* /*argv*/ [])
   US_TEST_FOR_EXCEPTION_BEGIN(std::invalid_argument)
   uoci.AtCompoundKey("Vec.1.bla");
   US_TEST_FOR_EXCEPTION_END(std::invalid_argument)
+
+  // Test AtCompoundKey noexcept overload.
+  US_TEST_NO_EXCEPTION(om.AtCompoundKey("dot.key", emptyAny));
+  US_TEST_NO_EXCEPTION({
+    auto val = uoci.AtCompoundKey("Vec.bla", emptyAny);
+    US_TEST_CONDITION(val.Empty(), "expected val is empty");
+  });
+  US_TEST_NO_EXCEPTION({
+    auto val1 = uoci.AtCompoundKey("Vec.1.bla", Any(std::string("")));
+    US_TEST_CONDITION(!val1.Empty(), "expected val is not empty");
+    US_TEST_CONDITION(val1 == std::string(""), "expected val is empty string")
+  });
 
   US_TEST_END()
 }

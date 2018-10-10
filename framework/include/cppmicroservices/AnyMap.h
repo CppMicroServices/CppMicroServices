@@ -366,7 +366,7 @@ public:
    * @param defaultValue is the value to be returned if the key is not found
    * @return A copy of the key's value.
    */
-  mapped_type AtCompoundKey(const key_type& key, mapped_type&& defaultValue) const noexcept;
+  mapped_type AtCompoundKey(const key_type& key, mapped_type defaultValue) const noexcept;
 };
 
 template<>

@@ -25,7 +25,6 @@
 
 #include "miniz.h"
 
-#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <mutex>

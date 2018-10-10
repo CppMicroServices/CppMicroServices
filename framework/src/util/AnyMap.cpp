@@ -89,6 +89,72 @@ const Any& AtCompoundKey(const std::vector<Any>& v, const AnyMap::key_type& key)
     return v.at(index < 0 ? v.size() + index : index);
   }
 }
+  Any AtCompoundKey(const std::vector<Any>& v,
+                    const AnyMap::key_type& key,
+                    Any&& defaultVal);
+
+  Any AtCompoundKey(const AnyMap& m,
+                    const AnyMap::key_type& key,
+                    Any&& defaultVal)
+  {
+    auto pos = key.find(".");
+    if (pos != AnyMap::key_type::npos) {
+      auto head = key.substr(0, pos);
+      auto tail = key.substr(pos + 1);
+      auto itr = m.find(head);
+      if(itr != m.end())
+      {
+        auto& h = itr->second;
+        if (h.Type() == typeid(AnyMap)) {
+          return AtCompoundKey(ref_any_cast<AnyMap>(h), tail, std::move(defaultVal));
+        } else if (h.Type() == typeid(std::vector<Any>)) {
+          return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail, std::move(defaultVal));
+        }
+      }
+    } else {
+      auto itr = m.find(key);
+      if(itr != m.end())
+      {
+        return itr->second;
+      }
+    }
+    return defaultVal;
+  }
+
+  Any AtCompoundKey(const std::vector<Any>& v,
+                    const AnyMap::key_type& key,
+                    Any&& defaultval)
+  {
+    auto pos = key.find(".");
+    auto head = key.substr(0, pos);
+    auto tail = (pos == AnyMap::key_type::npos) ? "" : key.substr(pos + 1);
+    int index = 0;
+    try
+    {
+      index = std::stoi(head);
+    }
+    catch (...)
+    {
+      return defaultval;
+    }
+    if(static_cast<size_t>(std::abs(index)) < v.size())
+    {
+      auto& h = v.at(index < 0 ? v.size() + index : index);
+      if(tail.empty())
+      {
+        return h;
+      }
+      else if (h.Type() == typeid(AnyMap))
+      {
+        return AtCompoundKey(ref_any_cast<AnyMap>(h), tail, std::move(defaultval));
+      }
+      else if (h.Type() == typeid(std::vector<Any>))
+      {
+        return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail, std::move(defaultval));
+      }
+    }
+    return defaultval;
+  }
 }
 
 // ----------------------------------------------------------------
@@ -857,15 +923,15 @@ AnyMap::map_type AnyMap::GetType() const
   return type;
 }
 
-AnyMap::mapped_type& AnyMap::AtCompoundKey(const key_type& key)
-{
-  return const_cast<mapped_type&>(
-    static_cast<const AnyMap*>(this)->AtCompoundKey(key));
-}
-
 const AnyMap::mapped_type& AnyMap::AtCompoundKey(const key_type& key) const
 {
   return detail::AtCompoundKey(*this, key);
+}
+
+AnyMap::mapped_type AnyMap::AtCompoundKey(const key_type& key,
+                                          AnyMap::mapped_type&& defaultValue) const noexcept
+{
+  return detail::AtCompoundKey(*this, key, std::move(defaultValue));
 }
 
 template<>

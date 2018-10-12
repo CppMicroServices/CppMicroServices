@@ -135,7 +135,7 @@ Any AtCompoundKey(const std::vector<Any>& v,
     return defaultval;
   }
   if (static_cast<size_t>(std::abs(index)) < v.size()) {
-    auto& h = v.at(index < 0 ? v.size() + index : index);
+    auto& h = v[(index < 0 ? v.size() + index : index)];
     if (tail.empty()) {
       return h;
     } else if (h.Type() == typeid(AnyMap)) {

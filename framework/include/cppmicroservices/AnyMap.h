@@ -355,9 +355,9 @@ public:
    * can be queried using the following notation:
    * \code
    * map.AtCompoundKey("one", Any());       // returns Any(1)
-   * map.AtCompoundKey("two", Any());       // returns Any()
+   * map.AtCompoundKey("four", Any());       // returns Any()
    * map.AtCompoundKey("three.a", Any());          // returns Any(std::string("anton"))
-   * map.AtCompoundKey("three.b", Any());          // returns Any()
+   * map.AtCompoundKey("three.c", Any());          // returns Any()
    * map.AtCompoundKey("three.b.1", Any());        // returns Any(8)
    * map.AtCompoundKey("three.b.4", Any());        // returns Any()
    * \endcode

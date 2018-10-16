@@ -65,7 +65,7 @@ Update the documentation when creating or modifying features. Test your
 documentation changes for clarity, concision, and correctness.
 
 Pull request descriptions should be as clear as possible and include a
-reference to all the issues that they address. Optionally, if the pull
+reference to all the issues that they address. If the pull
 request is a result of a RFC process, include the link to the corresponding
 RFC pull request.
 

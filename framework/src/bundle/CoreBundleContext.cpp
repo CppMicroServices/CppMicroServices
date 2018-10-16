@@ -52,7 +52,7 @@ std::atomic<int> CoreBundleContext::globalId{ 0 };
 std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
-  configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
+  configuration.emplace(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
 
   // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
   // Run-time modification of the property should be ignored as it is irrelevant.

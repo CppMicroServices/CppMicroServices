@@ -61,7 +61,7 @@ public:
     int compressedSize;
     int uncompressedSize;
     time_t modifiedTime;
-    int32_t crc32;
+    uint32_t crc32;
     bool isDir;
   };
 

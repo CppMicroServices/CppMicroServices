@@ -21,6 +21,7 @@ set(_gtest_tests
   OpenFileHandleTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp
+  BundleObjFileTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp
@@ -30,6 +31,7 @@ set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
+  main.cpp
   $<TARGET_OBJECTS:util>
   )
 

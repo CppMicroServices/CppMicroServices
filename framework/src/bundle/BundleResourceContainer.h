@@ -23,6 +23,8 @@
 #ifndef CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 #define CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 
+#include "cppmicroservices/util/BundleObjFile.h"
+
 #include "miniz.h"
 
 #include <cstdint>
@@ -114,6 +116,7 @@ private:
 
   const std::string m_Location;
   mz_zip_archive m_ZipArchive;
+  std::shared_ptr<RawBundleResources> m_Data;
 
   std::set<NameIndexPair, PairComp> m_SortedEntries;
   std::set<std::string> m_SortedToplevelDirs;

@@ -20,11 +20,13 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_MODULEOBJFILE_P_H
-#define CPPMICROSERVICES_MODULEOBJFILE_P_H
+#ifndef CPPMICROSERVICES_BUNDLEOBJFILE_H
+#define CPPMICROSERVICES_BUNDLEOBJFILE_H
 
 #include "cppmicroservices/GlobalConfig.h"
 
+#include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -40,18 +42,39 @@ struct InvalidObjFileException : public std::exception
   std::string m_What;
 };
 
+// Represents the raw bundle resource data.
+// The data buffer is the bits representing a zip file.
+// The data size is the zip file's size in bytes.
+struct RawBundleResources
+{
+  RawBundleResources(std::unique_ptr<void, void(*)(void*)> data, uint64_t dataSize)
+  : m_Data(std::move(data))
+  , m_DataSize(dataSize)
+  { }
+
+  operator bool() const
+  {
+    return m_Data && m_DataSize > 0;
+  }
+
+  std::unique_ptr<void, void(*)(void*)> m_Data;
+  uint64_t m_DataSize;
+};
+
 class BundleObjFile
 {
 public:
+
   virtual ~BundleObjFile() {}
 
+  /// Return a vector of linked libraries which this bundle depends on.
   virtual std::vector<std::string> GetDependencies() const = 0;
-  virtual std::string GetLibName() const = 0;
-  virtual std::string GetBundleName() const = 0;
-
-protected:
-  static bool ExtractBundleName(const std::string& name, std::string& out);
+  /// Return the this bundle's filename
+  virtual std::string GetLibraryName() const = 0;
+  /// Return the raw bundle resource container bits.
+  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const = 0;
 };
+
 }
 
-#endif // CPPMICROSERVICES_MODULEOBJFILE_P_H
+#endif // CPPMICROSERVICES_BUNDLEOBJFILE_H

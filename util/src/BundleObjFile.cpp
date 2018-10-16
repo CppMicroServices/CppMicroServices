@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "BundleObjFile.h"
+#include "cppmicroservices/util/BundleObjFile.h"
 
 #include <cstring>
 
@@ -38,16 +38,5 @@ InvalidObjFileException::InvalidObjFileException(const std::string& what,
 const char* InvalidObjFileException::what() const throw()
 {
   return m_What.c_str();
-}
-
-bool BundleObjFile::ExtractBundleName(const std::string& name, std::string& out)
-{
-  static const std::string bundleSignature = "_us_import_bundle_initializer_";
-  if (name.size() > bundleSignature.size() &&
-      name.compare(0, bundleSignature.size(), bundleSignature) == 0) {
-    out = name.substr(bundleSignature.size());
-    return true;
-  }
-  return false;
 }
 }

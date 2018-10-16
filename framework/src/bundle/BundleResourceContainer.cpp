@@ -21,15 +21,18 @@
 =============================================================================*/
 
 #include "BundleResourceContainer.h"
+#include "cppmicroservices/util/BundleObjFactory.h"
+#include "cppmicroservices/util/BundleObjFile.h"
 
 #include "cppmicroservices/BundleResource.h"
-
 #include "cppmicroservices/util/FileSystem.h"
 
 #include <cassert>
 #include <climits>
 #include <cstring>
 #include <exception>
+#include <iostream>
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
@@ -38,6 +41,7 @@ namespace cppmicroservices {
 BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
+  , m_Data()
   , m_ZipFileMutex()
   , m_IsContainerOpen(false)
 {
@@ -45,10 +49,21 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
     throw std::runtime_error(m_Location + " does not exist");
   }
 
-  if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
-    throw std::runtime_error("Could not init zip archive for bundle at " +
-                             m_Location);
+  // Assume that the bundle had its meta-data linked into a data section.
+  // If this assumption is false, fall back to reading the meta-data in a
+  // less than optimal way, in terms of memory utilization.
+  try {
+    auto objFile = BundleObjFactory().CreateBundleFileObj(location);
+    m_Data = objFile->GetRawBundleResourceContainer();
+  } catch(...) {}
+
+  if (!m_Data ||
+      !mz_zip_reader_init_mem(&m_ZipArchive, m_Data->m_Data.get(), m_Data->m_DataSize, 0)) {
+    if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
+      throw std::runtime_error("Could not init zip archive for bundle at " + m_Location);
+    }
   }
+ 
   InitSortedEntries();
   if (m_SortedToplevelDirs.empty()) {
     throw std::runtime_error("Invalid zip archive layout for bundle at " +

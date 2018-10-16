@@ -49,8 +49,7 @@ namespace cppmicroservices {
 
 std::atomic<int> CoreBundleContext::globalId{ 0 };
 
-std::unordered_map<std::string, Any> InitProperties(
-  std::unordered_map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
   configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
@@ -63,21 +62,18 @@ std::unordered_map<std::string, Any> InitProperties(
   configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
-  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) ==
-      configuration.end()) {
-    configuration.insert(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
-                                        util::GetCurrentWorkingDirectory()));
-  }
+  configuration.emplace(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
+                                       util::GetCurrentWorkingDirectory()));
 
-  configuration.insert(
-    std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
+  configuration.emplace(std::make_pair(Constants::FRAMEWORK_STORAGE,
+                                       Any(FWDIR_DEFAULT)));
 
-  configuration[Constants::FRAMEWORK_VERSION] =
-    std::string(CppMicroServices_VERSION_STR);
-  configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
+  configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
+  configuration[Constants::FRAMEWORK_VENDOR]  = std::string("CppMicroServices");
 
 #ifdef US_PLATFORM_POSIX
-  configuration[Constants::LIBRARY_LOAD_OPTIONS] = Any(RTLD_LAZY | RTLD_LOCAL);
+  configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS,
+                                       RTLD_LAZY | RTLD_LOCAL));
 #endif
 
   return configuration;

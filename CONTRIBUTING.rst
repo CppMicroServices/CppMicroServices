@@ -37,7 +37,7 @@ team.
 The "RFC" (request for comments) process is intended to provide a consistent and
 controlled path for new features to enter the framework.
 
-Please refer to the `RFC repository <https://github.com/CppMicroServices/rfcs>`
+Please refer to the `RFC repository <https://github.com/CppMicroServices/rfcs>`_
 for more information.
 
 Contribution guidelines

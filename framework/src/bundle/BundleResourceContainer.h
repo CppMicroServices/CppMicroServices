@@ -52,6 +52,7 @@ public:
       , compressedSize(0)
       , uncompressedSize(0)
       , modifiedTime(0)
+      , crc32(0)
       , isDir(false)
     {}
 
@@ -60,6 +61,7 @@ public:
     int compressedSize;
     int uncompressedSize;
     time_t modifiedTime;
+    int32_t crc32;
     bool isDir;
   };
 

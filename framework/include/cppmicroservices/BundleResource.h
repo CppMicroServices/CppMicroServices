@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/FrameworkExport.h"
 
+#include <cstdint>
 #include <memory>
 #include <ostream>
 #include <vector>
@@ -287,6 +288,13 @@ public:
    * @return Last modified time of this resource.
    */
   time_t GetLastModified() const;
+
+  /**
+   * Returns the CRC-32 checksum of this resource.
+   *
+   * @return CRC-32 checksum of this resource.
+   */
+  uint32_t GetCrc32() const;
 
 private:
   BundleResource(const std::string& file,

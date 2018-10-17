@@ -161,6 +161,9 @@ void testInvalidResource(const Bundle& bundle)
 
   US_TEST_CONDITION(res.GetChildren().empty(), "Check empty children")
   US_TEST_CONDITION(res.GetSize() == 0, "Check zero size")
+  US_TEST_CONDITION(res.GetCompressedSize() == 0, "Check zero compressed size")
+  US_TEST_CONDITION(res.GetLastModified() == 0, "Check zero last modification time")
+  US_TEST_CONDITION(res.GetCrc32() == 0, "Check zero CRC-32")
 
   BundleResourceStream rs(res);
   US_TEST_CONDITION(rs.good() == true, "Check invalid resource stream")

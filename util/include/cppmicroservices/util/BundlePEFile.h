@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#if defined (US_PLATFORM_WINDOWS)
+
 #include "BundleObjFile.h"
 
 #include "cppmicroservices_pe.h"
@@ -29,10 +31,9 @@
 #include <memory>
 
 #include <sys/stat.h>
-#if defined (US_PLATFORM_WINDOWS)
+
 #include <Windows.h>
 #include <ImageHlp.h>
-#endif
 
 namespace cppmicroservices {
 
@@ -127,13 +128,12 @@ public:
     }
   }
 
-  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
+  std::vector<std::string> GetDependencies() const override { return m_Needed; }
 
-  virtual std::string GetLibraryName() const { return m_Soname; }
+  std::string GetLibraryName() const override { return m_Soname; }
     
-  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const
+  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override
   {
-#if defined (US_PLATFORM_WINDOWS)
     HMODULE hBundleResources = LoadLibraryEx(m_Location.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
     if (nullptr == hBundleResources) {
       return {};
@@ -152,7 +152,6 @@ public:
         return std::make_shared<RawBundleResources>(std::move(raw), zipSizeInBytes);
       }
     }
-#endif
     return {};
   }
 
@@ -274,3 +273,5 @@ std::unique_ptr<BundleObjFile> CreateBundlePEFile(const std::string& fileName)
 }
 
 }
+
+#endif

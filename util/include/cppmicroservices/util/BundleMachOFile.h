@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#if defined (US_PLATFORM_APPLE)
+
 #include "BundleObjFile.h"
 
 #include "cppmicroservices_mach-o.h"
@@ -84,7 +86,7 @@ std::shared_ptr<RawBundleResources> GetBundleContainer(std::ifstream& fs, std::s
       Section section;
       fs.read(reinterpret_cast<char*>(&section), sizeof(Section));
       if (0 == strcmp("us_resources", section.sectname)) {
-        uint64_t zipSize = section.size;
+        auto zipSize = section.size;
         if (0 < zipSize) {
           void* zipData = malloc(zipSize * sizeof(char));
           if (zipData) {
@@ -152,11 +154,11 @@ public:
     }
   }
 
-  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
+  std::vector<std::string> GetDependencies() const override  { return m_Needed; }
 
-  virtual std::string GetLibraryName() const { return m_InstallName; }
+  std::string GetLibraryName() const override { return m_InstallName; }
 
-  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const { return m_rawData; }
+  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override { return m_rawData; }
 
 private:
   std::vector<std::string> m_Needed;
@@ -268,10 +270,8 @@ std::unique_ptr<BundleObjFile> CreateBundleMachOFile(const std::string& fileName
   }
 
   if (matchingIdent[0] == MH_MAGIC) {
-    //std::cout << "Mach-O (32-bit) binary" << std::endl;
     return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC>>(machFile, matchingIdent[2]));
   } else if (matchingIdent[0] == MH_MAGIC_64) {
-    //std::cout << "Mach-O (64-bit) binary" << std::endl;
     return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC_64>>(machFile, matchingIdent[2]));
   } else {
     throw InvalidMachOException(
@@ -279,3 +279,5 @@ std::unique_ptr<BundleObjFile> CreateBundleMachOFile(const std::string& fileName
   }
 }
 }
+
+#endif

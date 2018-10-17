@@ -47,18 +47,18 @@ struct InvalidObjFileException : public std::exception
 // The data size is the zip file's size in bytes.
 struct RawBundleResources
 {
-  RawBundleResources(std::unique_ptr<void, void(*)(void*)> data, uint64_t dataSize)
+  RawBundleResources(std::unique_ptr<void, void(*)(void*)> data, std::size_t dataSize)
   : m_Data(std::move(data))
   , m_DataSize(dataSize)
   { }
 
   operator bool() const
   {
-    return m_Data && m_DataSize > 0;
+    return m_Data && (m_DataSize > 0);
   }
 
   std::unique_ptr<void, void(*)(void*)> m_Data;
-  uint64_t m_DataSize;
+  std::size_t m_DataSize;
 };
 
 class BundleObjFile

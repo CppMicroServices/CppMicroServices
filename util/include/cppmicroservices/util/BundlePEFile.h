@@ -33,7 +33,6 @@
 #include <sys/stat.h>
 
 #include <Windows.h>
-#include <ImageHlp.h>
 
 namespace cppmicroservices {
 

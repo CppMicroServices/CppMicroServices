@@ -31,7 +31,6 @@ set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
-  main.cpp
   $<TARGET_OBJECTS:util>
   )
 

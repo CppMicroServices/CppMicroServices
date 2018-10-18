@@ -34,7 +34,7 @@ namespace {
 #if defined (US_BUILD_SHARED_LIBS)
 const std::string testBundlePath = cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + "TestBundleRL" + US_LIB_EXT;
 #else
-const std::string testBundlePath = cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP + "usFrameworkTests" + US_EXE_EXT;
+const std::string testBundlePath = cppmicroservices::testing::BIN_PATH + cppmicroservices::util::DIR_SEP + "usFrameworkTests" + US_EXE_EXT;
 #endif
 }
 

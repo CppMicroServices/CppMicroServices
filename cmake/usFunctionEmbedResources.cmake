@@ -26,7 +26,7 @@
 #    This ensures that changed resource files will automatically be re-added to the
 #    bundle.
 #
-# There are two differend modes for including resources: *APPEND* and *LINK*. In *APPEND* mode,
+# There are two different modes for including resources: *APPEND* and *LINK*. In *APPEND* mode,
 # the generated zip file is appended at the end of the target file. In *LINK* mode, the
 # zip file is compiled / linked into the target using platform specific techniques. *LINK*
 # mode is necessary if certain tools make additional assumptions about the object layout

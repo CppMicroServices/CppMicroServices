@@ -65,6 +65,7 @@ TEST(BundleObjFile, NonStandardBundleExt)
 TEST(BundleObjFile, Dependencies)
 {
   ASSERT_TRUE(cppmicroservices::util::Exists(testBundlePath)) << testBundlePath + " should exist on disk.";
+#if defined (US_BUILD_SHARED_LIBS)
   ASSERT_NO_THROW( { 
     auto bundleObj = cppmicroservices::BundleObjFactory().CreateBundleFileObj(testBundlePath);
     auto dependencies = bundleObj->GetDependencies();
@@ -73,6 +74,7 @@ TEST(BundleObjFile, Dependencies)
     // down further in the future when this function is used.
     ASSERT_GT(dependencies.size(), 1u);
   });
+#endif
 }
 
 TEST(BundleObjFile, LibraryName)

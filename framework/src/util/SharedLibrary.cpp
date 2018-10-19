@@ -125,17 +125,17 @@ void SharedLibrary::Load(int flags)
 
 void SharedLibrary::Load(const std::unordered_map<std::string, Any>& config)
 {
+  int options = 0;
 #ifdef US_PLATFORM_POSIX
-  int options = RTLD_LAZY | RTLD_LOCAL;
   try {
     options = any_cast<int>(config.at(Constants::LIBRARY_LOAD_OPTIONS));
   } catch (...) {
+    options = RTLD_LAZY | RTLD_LOCAL;
   }
-  Load(options);
 #else
   US_UNUSED(config);
-  Load(0);
 #endif
+  Load(options);
 }
 
 void SharedLibrary::Load()

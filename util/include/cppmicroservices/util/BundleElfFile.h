@@ -210,7 +210,7 @@ private:
     }
 
     Word strTblHdrIdx = shdr->sh_link;
-    const Shdr* const strTblHdr = m_SectionHeaders.get() + strTblHdrIdx;
+    const Shdr* const strTblHdr = &m_SectionHeaders[strTblHdrIdx];
 
     if (strTblHdr && 0 > strTblHdr->sh_size) {
       return nullptr;

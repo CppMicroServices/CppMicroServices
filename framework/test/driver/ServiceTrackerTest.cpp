@@ -35,6 +35,7 @@
 
 #include <future>
 #include <memory>
+#include <chrono>
 
 using namespace cppmicroservices;
 
@@ -197,7 +198,7 @@ void TestServiceTracker(BundleContext context)
     st2.Close();
 
     // Closing the tracker should notify the waiters
-    auto wait_until = detail::Clock::now() + std::chrono::seconds(3);
+    auto wait_until = std::chrono::steady_clock::now() + std::chrono::seconds(3);
     US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == US_FUTURE_READY,
                                "Closed service tracker notifies waiters");
     US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == US_FUTURE_READY,

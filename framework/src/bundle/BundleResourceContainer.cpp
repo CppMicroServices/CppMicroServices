@@ -29,6 +29,7 @@
 #include <cassert>
 #include <climits>
 #include <cstring>
+#include <exception>
 #include <sstream>
 #include <stdexcept>
 
@@ -60,7 +61,7 @@ BundleResourceContainer::~BundleResourceContainer()
 {
   try {
     CloseContainer();
-  } catch(...) {}
+  } catch(const std::exception&) {}
 }
 
 std::string BundleResourceContainer::GetLocation() const

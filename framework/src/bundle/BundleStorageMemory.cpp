@@ -43,7 +43,7 @@ BundleStorageMemory::InsertBundleLib(const std::string& location)
 }
 
 std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
-  const std::shared_ptr<const BundleResourceContainer>& resCont,
+  const std::shared_ptr<BundleResourceContainer>& resCont,
   const std::vector<std::string>& topLevelEntries)
 {
   std::vector<std::shared_ptr<BundleArchive>> res;

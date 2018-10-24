@@ -57,7 +57,7 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertBundleLib(
 }
 
 std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertArchives(
-  const std::shared_ptr<const BundleResourceContainer>& /*resCont*/,
+  const std::shared_ptr<BundleResourceContainer>& /*resCont*/,
   const std::vector<std::string>& /*topLevelEntries*/)
 {
   throw std::logic_error("not implemented");

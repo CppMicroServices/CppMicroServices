@@ -37,6 +37,19 @@ bool IsSharedLibrary(const std::string& location);
 
 bool IsBundleFile(const std::string& location);
 
+/**
+ * Return true if the bundle's zip file only contains a 
+ * manifest file, false otherwise.
+ *
+ * @param location The bundle file path
+ *
+ * @return true if the bundle's zip file only contains a 
+ *         manifest file, false otherwise.
+ * @throw std::runtime_error if the bundle location is empty or
+ *        the bundle manifest cannot be read.
+ */
+bool OnlyContainsManifest(const std::string& location);
+
 //-------------------------------------------------------------------
 // Framework storage
 //-------------------------------------------------------------------

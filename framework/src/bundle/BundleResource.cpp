@@ -273,6 +273,11 @@ time_t BundleResource::GetLastModified() const
   return d->stat.modifiedTime;
 }
 
+uint32_t BundleResource::GetCrc32() const
+{
+  return d->stat.crc32;
+}
+
 std::size_t BundleResource::Hash() const
 {
   using namespace std;

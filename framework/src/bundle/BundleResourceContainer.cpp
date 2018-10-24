@@ -106,6 +106,7 @@ bool BundleResourceContainer::GetStat(int index,
                    ? true
                    : false;
     stat.modifiedTime = zipStat.m_time;
+    stat.crc32 = zipStat.m_crc32;
     // This will limit the size info from uint64 to uint32 on 32-bit
     // architectures. We don't care because we assume resources > 2GB
     // don't make sense to be embedded in a bundle anyway.

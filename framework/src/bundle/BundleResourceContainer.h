@@ -109,6 +109,10 @@ private:
 
   bool Matches(const std::string& name, const std::string& filePattern) const;
 
+  /// Initialize miniz with the resource zip file information.
+  /// throws std::runtime_error if the underlying zip file cannot be opened or read.
+  void InitMiniz();
+
   /// Opens the zip file so that data can be accessed.
   /// This function is thread-safe.
   /// Throws std::runtime_error if the underlying zip file cannot be opened.

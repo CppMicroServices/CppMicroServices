@@ -36,8 +36,6 @@
 
 namespace cppmicroservices {
 
-namespace {
-#if defined (US_PLATFORM_WINDOWS)
 struct hModuleDeleter
 {
   // if the unique_ptr's deleter contains a nested type named 'pointer',
@@ -51,8 +49,6 @@ struct hModuleDeleter
     }
   }
 };
-#endif
-} // anonymous namespace
 
 struct InvalidPEException : public InvalidObjFileException
 {

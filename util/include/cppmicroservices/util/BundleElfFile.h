@@ -23,6 +23,7 @@
 #if defined (US_PLATFORM_LINUX)
 
 #include "BundleObjFile.h"
+#include "MappedFile.h"
 
 #include "cppmicroservices_elf.h"
 
@@ -101,8 +102,12 @@ public:
   typedef typename ElfType::Word Word;
   typedef typename ElfType::Off Off;
 
-  BundleElfFile(std::ifstream& fs, std::size_t fileSize)
+  BundleElfFile(std::ifstream& fs, std::size_t fileSize, const std::string& fileName)
     : m_SectionHeaders(nullptr)
+    , m_Needed()
+    , m_Soname()
+    , m_rawData()
+    , m_mappedZipData()
   {
     if (fileSize < sizeof(Ehdr)) {
       throw InvalidElfException("Missing ELF header");
@@ -164,18 +169,16 @@ public:
           fs.seekg(m_SectionHeaders[i].sh_offset);
           auto zipContentSize = m_SectionHeaders[i].sh_size;
           if(0 < zipContentSize) {
-            auto zipContent = static_cast<char*>(malloc(zipContentSize));
-            if (zipContent) {
-              std::unique_ptr<void, void(*)(void*)> scopedData(zipContent, ::free);
-              fs.read(reinterpret_cast<char*>(zipContent), zipContentSize);
-              m_rawData = std::make_shared<RawBundleResources>(std::move(scopedData), zipContentSize);
+            off_t pa_offset = (m_SectionHeaders[i].sh_offset) & ~(sysconf(_SC_PAGESIZE) - 1);
+            size_t mappedLength = zipContentSize + (m_SectionHeaders[i].sh_offset) - pa_offset;
+            m_mappedZipData = std::unique_ptr<MappedFile>(new MappedFile(fileName, mappedLength, pa_offset));
+            m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
               break;
             }
           }
         }
       }
     }
-  }
 
   std::vector<std::string> GetDependencies() const override { return m_Needed; }
 
@@ -190,6 +193,7 @@ private:
   std::vector<std::string> m_Needed;
   std::string m_Soname;
   std::shared_ptr<RawBundleResources> m_rawData;
+  std::unique_ptr<MappedFile> m_mappedZipData;
 
   Shdr* FindSectionHeader(Word type, Half startIndex = 0) const
   {
@@ -259,9 +263,9 @@ std::unique_ptr<BundleObjFile> CreateBundleElfFile(const std::string& fileName)
   }
 
   if (elfIdent[EI_CLASS] == ELFCLASS32) {
-    return std::unique_ptr<BundleObjFile>(new BundleElfFile<Elf<ELFCLASS32>>(elfFile, fileSize));
+    return std::unique_ptr<BundleObjFile>(new BundleElfFile<Elf<ELFCLASS32>>(elfFile, fileSize, fileName));
   } else if (elfIdent[EI_CLASS] == ELFCLASS64) {
-    return std::unique_ptr<BundleObjFile>(new BundleElfFile<Elf<ELFCLASS64>>(elfFile, fileSize));
+    return std::unique_ptr<BundleObjFile>(new BundleElfFile<Elf<ELFCLASS64>>(elfFile, fileSize, fileName));
   } else {
     throw InvalidElfException("Unknown ELF format");
   }

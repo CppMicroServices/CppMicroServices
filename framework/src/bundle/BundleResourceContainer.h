@@ -120,7 +120,7 @@ private:
 
   const std::string m_Location;
   mz_zip_archive m_ZipArchive;
-  std::shared_ptr<RawBundleResources> m_RawBundleResourceData;
+  std::unique_ptr<BundleObjFile> m_ObjFile;
 
   std::set<NameIndexPair, PairComp> m_SortedEntries;
   std::set<std::string> m_SortedToplevelDirs;

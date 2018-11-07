@@ -41,7 +41,7 @@ namespace cppmicroservices {
 BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
-  , m_RawBundleResourceData()
+  , m_ObjFile()
   , m_ZipFileMutex()
   , m_IsContainerOpen(false)
 {
@@ -186,14 +186,15 @@ void BundleResourceContainer::InitMiniz()
   // Assume that the bundle had its meta-data linked into a data section.
   // If this assumption is false, fall back to reading the meta-data in a
   // less than optimal way, in terms of memory utilization.
+  std::shared_ptr<RawBundleResources> rawBundleResourceData;
   try {
-    auto objFile = BundleObjFactory().CreateBundleFileObj(m_Location);
-    m_RawBundleResourceData = objFile->GetRawBundleResourceContainer();
+    m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
+    rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
   }
   catch (const std::exception&) {}
 
-  if (!m_RawBundleResourceData ||
-    !mz_zip_reader_init_mem(&m_ZipArchive, m_RawBundleResourceData->m_Data.get(), m_RawBundleResourceData->m_DataSize, 0)) {
+  if (!rawBundleResourceData ||
+    !mz_zip_reader_init_mem(&m_ZipArchive, rawBundleResourceData->GetData(), rawBundleResourceData->GetSize(), 0)) {
     if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
       throw std::runtime_error("Could not init zip archive for bundle at " + m_Location);
     }
@@ -253,7 +254,7 @@ void BundleResourceContainer::CloseContainer()
   std::lock_guard<std::mutex> lock(m_ZipFileMutex);
   if(m_IsContainerOpen) {
     mz_zip_reader_end(&m_ZipArchive);
-    m_RawBundleResourceData.reset();
+    m_ObjFile.reset();
     m_IsContainerOpen = false;
   }
 }

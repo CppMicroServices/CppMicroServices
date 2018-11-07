@@ -106,7 +106,8 @@ TEST(BundleObjFile, GetRawBundleResourceContainer)
     auto data = bundleObj->GetRawBundleResourceContainer();
 
     ASSERT_TRUE(data);
-    ASSERT_GT(data->m_DataSize, 0u);
+    ASSERT_GT(data->GetSize(), 0u);
   });
 #endif
 }
+

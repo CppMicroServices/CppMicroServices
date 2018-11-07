@@ -40,7 +40,7 @@ namespace {
 #if defined (US_PLATFORM_WINDOWS)
 struct hModuleDeleter
 {
-  // if the unique_ptr's deleter contains a nested type named pointer,
+  // if the unique_ptr's deleter contains a nested type named 'pointer',
   // then the unique_ptr will use that type for its managed object
   // pointer instead of T*.
   typedef HMODULE pointer;
@@ -84,7 +84,22 @@ public:
     : m_CoffHeader(coffHeader)
     , m_SectionHeaders(nullptr)
     , m_Location(std::move(location))
+    , m_LoadLibraryHandle(nullptr)
+    , m_rawData(nullptr)
   {
+    HMODULE hBundleResources = LoadLibraryEx(m_Location.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+    // RAII - automatically free the library handle on object destruction
+    m_LoadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter{});
+    if(hBundleResources) {
+      HRSRC hResource = FindResource(hBundleResources, "US_RESOURCES", MAKEINTRESOURCE(300));
+      HGLOBAL hRes = LoadResource(hBundleResources, hResource);
+      const LPVOID res = LockResource(hRes);
+      const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
+      if (0 < zipSizeInBytes) {
+        m_rawData = std::make_shared<RawBundleResources>(res, zipSizeInBytes);
+      }
+    }
+
     fs.read(reinterpret_cast<char*>(&m_OptionalHeader), sizeof m_OptionalHeader);
 
     m_SectionHeaders = std::unique_ptr<SectionHeader[]>(new SectionHeader[coffHeader.NumberOfSections]);
@@ -133,25 +148,7 @@ public:
     
   std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override
   {
-    HMODULE hBundleResources = LoadLibraryEx(m_Location.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-    if (nullptr == hBundleResources) {
-      return {};
-    }
-    // RAII - automatically free the library on scope exit
-    std::unique_ptr<HMODULE, hModuleDeleter> loadLibraryHandle(hBundleResources, hModuleDeleter{});
-    HRSRC hResource = FindResource(hBundleResources, "US_RESOURCES", MAKEINTRESOURCE(300));
-    HGLOBAL hRes = LoadResource(hBundleResources, hResource);
-    const LPVOID res = LockResource(hRes);
-    const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
-    if(0 < zipSizeInBytes) {
-      void* buf = malloc(zipSizeInBytes);
-      if (buf) {
-        memcpy_s(buf, zipSizeInBytes, res, zipSizeInBytes);
-        std::unique_ptr<void, void(*)(void*)> raw(buf, ::free);
-        return std::make_shared<RawBundleResources>(std::move(raw), zipSizeInBytes);
-      }
-    }
-    return {};
+    return m_rawData;
   }
 
 private:
@@ -202,6 +199,8 @@ private:
   std::vector<std::string> m_Needed;
   std::string m_Soname;
   const std::string m_Location;
+  std::unique_ptr<HMODULE, hModuleDeleter> m_LoadLibraryHandle;
+  std::shared_ptr<RawBundleResources> m_rawData;
 };
 
 std::unique_ptr<BundleObjFile> CreateBundlePEFile(const std::string& fileName)

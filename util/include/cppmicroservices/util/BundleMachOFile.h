@@ -23,6 +23,7 @@
 #if defined (US_PLATFORM_APPLE)
 
 #include "BundleObjFile.h"
+#include "MappedFile.h"
 
 #include "cppmicroservices_mach-o.h"
 
@@ -74,35 +75,6 @@ I readBE(I i)
 #endif
 }
 
-template<typename SegmentCommand, typename Section>
-std::shared_ptr<RawBundleResources> GetBundleContainer(std::ifstream& fs, std::size_t fileOffset, uint32_t lcmd_offset)
-{
-  fs.seekg(fileOffset + lcmd_offset);
-  SegmentCommand segment;
-  fs.read(reinterpret_cast<char*>(&segment), sizeof(SegmentCommand));
-  if(0 == strcmp("__TEXT", segment.segname)) {
-    // find "us_resources" section
-    for (uint32_t i = 0; i < segment.nsects; ++i) {
-      Section section;
-      fs.read(reinterpret_cast<char*>(&section), sizeof(Section));
-      if (0 == strcmp("us_resources", section.sectname)) {
-        auto zipSize = section.size;
-        if (0 < zipSize) {
-          void* zipData = malloc(zipSize * sizeof(char));
-          if (zipData) {
-            std::unique_ptr<void, void(*)(void*)> scopedData(zipData, ::free);
-            fs.seekg(fileOffset + section.offset);
-            fs.read(reinterpret_cast<char*>(zipData), zipSize);
-            return std::make_shared<RawBundleResources>( std::move(scopedData), zipSize );
-          }
-        }
-      }
-      fs.seekg(lcmd_offset + sizeof(SegmentCommand) + ((i+1)*sizeof(Section)));
-    }
-  }
-  return {};
-}
-
 template<class MachOType>
 class BundleMachOFile
   : public BundleObjFile
@@ -112,7 +84,12 @@ public:
   typedef typename MachOType::Mhdr Mhdr;
   typedef typename MachOType::symtab_entry symtab_entry;
 
-  BundleMachOFile(std::ifstream& fs, std::size_t fileOffset)
+  BundleMachOFile(std::ifstream& fs, std::size_t fileOffset, const std::string& location)
+    : m_Needed()
+    , m_InstallName()
+    , m_rawData()
+    , m_mappedZipData()
+    , location(location)
   {
     fs.seekg(fileOffset);
     Mhdr mhdr;
@@ -131,10 +108,12 @@ public:
     for (uint32_t i = 0; i < ncmds; ++i) {
       load_command lcmd;
       fs.read(reinterpret_cast<char*>(&lcmd), sizeof lcmd);
-      if (!m_rawData && LC_SEGMENT_64 == lcmd.cmd) {
-        m_rawData = GetBundleContainer<segment_command_64, section_64>(fs, fileOffset, lcmd_offset);
-      } else if (!m_rawData && LC_SEGMENT == lcmd.cmd) {
-        m_rawData = GetBundleContainer<segment_command, section>(fs, fileOffset, lcmd_offset);
+      if (!m_rawData && !m_mappedZipData && LC_SEGMENT_64 == lcmd.cmd) {
+        m_mappedZipData = MapBundleContainer<segment_command_64, section_64>(fs, fileOffset, lcmd_offset);
+        m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
+      } else if (!m_rawData && !m_mappedZipData && LC_SEGMENT == lcmd.cmd) {
+        m_mappedZipData = MapBundleContainer<segment_command, section>(fs, fileOffset, lcmd_offset);
+        m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
       } else if (lcmd.cmd == LC_ID_DYLIB) {
         dylib dylib_id;
         fs.read(reinterpret_cast<char*>(&dylib_id), sizeof dylib_id);
@@ -154,6 +133,29 @@ public:
     }
   }
 
+  template<typename SegmentCommand, typename Section>
+  std::unique_ptr<MappedFile> MapBundleContainer(std::ifstream& fs, std::size_t fileOffset, uint32_t lcmd_offset)
+  {
+    fs.seekg(fileOffset + lcmd_offset);
+    SegmentCommand segment;
+    fs.read(reinterpret_cast<char*>(&segment), sizeof(SegmentCommand));
+    if(0 == strcmp("__TEXT", segment.segname)) {
+       // find "us_resources" section
+       for (uint32_t i = 0; i < segment.nsects; ++i) {
+         Section section;
+         fs.read(reinterpret_cast<char*>(&section), sizeof(Section));
+         if (0 == strcmp("us_resources", section.sectname) &&
+             0 < section.size) {
+           off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
+           size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
+           return std::unique_ptr<MappedFile>(new MappedFile(location, mappedLength, pa_offset));
+         }
+         fs.seekg(lcmd_offset + sizeof(SegmentCommand) + ((i+1)*sizeof(Section)));
+       }
+    }
+    return std::unique_ptr<MappedFile>(new MappedFile());
+  }
+
   std::vector<std::string> GetDependencies() const override  { return m_Needed; }
 
   std::string GetLibraryName() const override { return m_InstallName; }
@@ -164,6 +166,8 @@ private:
   std::vector<std::string> m_Needed;
   std::string m_InstallName;
   std::shared_ptr<RawBundleResources> m_rawData;
+  std::unique_ptr<MappedFile> m_mappedZipData;
+  std::string location;
 };
 
 static std::vector<std::vector<uint32_t>> GetMachOIdents(std::ifstream& is)
@@ -270,9 +274,9 @@ std::unique_ptr<BundleObjFile> CreateBundleMachOFile(const std::string& fileName
   }
 
   if (matchingIdent[0] == MH_MAGIC) {
-    return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC>>(machFile, matchingIdent[2]));
+    return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC>>(machFile, matchingIdent[2], fileName));
   } else if (matchingIdent[0] == MH_MAGIC_64) {
-    return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC_64>>(machFile, matchingIdent[2]));
+    return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC_64>>(machFile, matchingIdent[2], fileName));
   } else {
     throw InvalidMachOException(
       "Internal error: Mach-O magic field value is neither MH_MAGIC nor MH_MAGIC_64");

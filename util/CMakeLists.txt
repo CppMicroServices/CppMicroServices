@@ -6,6 +6,7 @@ add_library(util OBJECT
   include/cppmicroservices/util/BundlePEFile.h
   include/cppmicroservices/util/Error.h
   include/cppmicroservices/util/FileSystem.h
+  include/cppmicroservices/util/MappedFile.h
   include/cppmicroservices/util/String.h
 
   src/BundleObjFactory.cpp

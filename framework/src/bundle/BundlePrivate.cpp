@@ -830,8 +830,9 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
     // if the only resource is the manifest file. On this assumption,
     // close the open file handle to the zip file to improve performance
     // and avoid exceeding OS open file handle limits.
-    if (OnlyContainsManifest(location)) {
-      barchive->GetResourceContainer()->CloseContainer();
+    auto resContainer = barchive->GetResourceContainer();
+    if (OnlyContainsManifest(resContainer)) {
+      resContainer->CloseContainer();
     }
   }
 

@@ -38,17 +38,18 @@ struct InvalidObjFileException : public std::exception
   InvalidObjFileException(const std::string& what, int errorNumber = 0);
 
   virtual const char* what() const throw();
-
+private:
   std::string m_What;
 };
 
 // Represents the raw bundle resource data.
-// The data buffer is the bits representing a zip file.
+// The data buffer contains the bits representing a zip file.
 // The data size is the zip file's size in bytes.
-struct RawBundleResources
+class RawBundleResources
 {
-  RawBundleResources(std::unique_ptr<void, void(*)(void*)> data, std::size_t dataSize)
-  : m_Data(std::move(data))
+public:
+  RawBundleResources(void* data, std::size_t dataSize)
+  : m_Data(data)
   , m_DataSize(dataSize)
   { }
 
@@ -57,7 +58,11 @@ struct RawBundleResources
     return m_Data && (m_DataSize > 0);
   }
 
-  std::unique_ptr<void, void(*)(void*)> m_Data;
+  void* GetData() const { return m_Data; }
+  std::size_t GetSize() const { return m_DataSize; }
+    
+private:
+  void* m_Data;
   std::size_t m_DataSize;
 };
 

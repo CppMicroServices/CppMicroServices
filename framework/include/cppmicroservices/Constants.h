@@ -21,11 +21,11 @@
 =============================================================================*/
 
 #ifndef CPPMICROSERVICES_CONSTANTS_H
-#  define CPPMICROSERVICES_CONSTANTS_H
+#define CPPMICROSERVICES_CONSTANTS_H
 
-#  include "cppmicroservices/FrameworkConfig.h"
+#include "cppmicroservices/FrameworkConfig.h"
 
-#  include <string>
+#include <string>
 
 namespace cppmicroservices {
 

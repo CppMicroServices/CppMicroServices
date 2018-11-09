@@ -21,19 +21,19 @@
   =============================================================================*/
 
 #ifndef CPPMICROSERVICES_SHAREDLIBRARY_H
-#  define CPPMICROSERVICES_SHAREDLIBRARY_H
+#define CPPMICROSERVICES_SHAREDLIBRARY_H
 
-#  include "cppmicroservices/Any.h"
-#  include "cppmicroservices/FrameworkConfig.h"
-#  include "cppmicroservices/SharedData.h"
+#include "cppmicroservices/Any.h"
+#include "cppmicroservices/FrameworkConfig.h"
+#include "cppmicroservices/SharedData.h"
 
-#  include <string>
-#  include <unordered_map>
+#include <string>
+#include <unordered_map>
 
-#  ifdef _MSC_VER
-#    pragma warning(push)
-#    pragma warning(disable : 4251)
-#  endif
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4251)
+#endif
 
 namespace cppmicroservices {
 
@@ -225,8 +225,8 @@ private:
 };
 }
 
-#  ifdef _MSC_VER
-#    pragma warning(pop)
-#  endif
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #endif // CPPMICROSERVICES_SHAREDLIBRARY_H

@@ -40,7 +40,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include <iomanip>
 
 #ifdef US_PLATFORM_POSIX
-#  include <dlfcn.h>
+#include <dlfcn.h>
 #endif
 
 CPPMICROSERVICES_INITIALIZE_BUNDLE

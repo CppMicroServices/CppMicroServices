@@ -47,6 +47,10 @@ public:
     fileDesc = open(fileLocation.c_str(), O_RDONLY);
     if(fileDesc >= 0) {
       mappedAddress = mmap(0, mapLength, PROT_READ, MAP_PRIVATE, fileDesc, offset);
+      if (MAP_FAILED == mappedAddress) {
+        mappedAddress = nullptr;
+        mapSize = 0;
+      }
     }
   }
     

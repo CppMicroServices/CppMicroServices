@@ -47,5 +47,3 @@ third_party/googletest
 !third_party/googletest/googletest/cmake
 !third_party/googletest/googletest/include
 !third_party/googletest/googletest/src
-/maci64
-/glnxa64

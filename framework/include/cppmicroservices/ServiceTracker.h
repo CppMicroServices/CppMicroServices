@@ -100,6 +100,9 @@ public:
   typedef std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>
     TrackingMap;
 
+  /**
+   * Automatically closes the <code>ServiceTracker</code>
+   */
   ~ServiceTracker();
 
   /**
@@ -187,6 +190,7 @@ public:
    *        used as the <code>ServiceTrackerCustomizer</code> and this
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
+   * @throws ServiceException If the service interface name is empty.
    */
   ServiceTracker(const BundleContext& context,
                  ServiceTrackerCustomizer<S, T>* customizer = nullptr);
@@ -240,7 +244,7 @@ public:
    * This implementation calls GetService() to determine if a service
    * is being tracked.
    *
-   * @return Returns the result of GetService().
+   * @return The result of GetService().
    */
   std::shared_ptr<TrackedParmType> WaitForService();
 
@@ -262,7 +266,7 @@ public:
    * @param rel_time The relative time duration to wait for a service. If
    *        zero, the method will wait indefinitely.
    * @throws std::invalid_argument exception if \c rel_time is negative.
-   * @return Returns the result of GetService().
+   * @return The result of GetService().
    */
   template<class Rep, class Period>
   std::shared_ptr<TrackedParmType> WaitForService(
@@ -272,7 +276,7 @@ public:
    * Return a list of <code>ServiceReference</code>s for all services being
    * tracked by this <code>ServiceTracker</code>.
    *
-   * @return List of <code>ServiceReference</code>s.
+   * @return A list of <code>ServiceReference</code> objects.
    */
   virtual std::vector<ServiceReference<S>> GetServiceReferences() const;
 
@@ -303,7 +307,7 @@ public:
    * being tracked by this <code>ServiceTracker</code>.
    *
    * @param reference The reference to the desired service.
-   * @return A service object or <code>null</code> if the service referenced
+   * @return A service object or <code>nullptr</code> if the service referenced
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
@@ -408,7 +412,7 @@ protected:
    *
    * <p>
    * This method is only called when this <code>ServiceTracker</code> has been
-   * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
+   * constructed with a <code>nullptr</code> ServiceTrackerCustomizer argument.
    *
    * <p>
    * This implementation returns the result of calling <code>GetService</code>
@@ -425,6 +429,9 @@ protected:
    *        <code>ServiceTracker</code>.
    * @return The service object to be tracked for the service added to this
    *         <code>ServiceTracker</code>.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
+   * @throws std::invalid_argument If the specified
+   *         <code>ServiceReference</code> is invalid (default constructed).
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
   std::shared_ptr<TrackedParmType> AddingService(
@@ -436,7 +443,7 @@ protected:
    *
    * <p>
    * This method is only called when this <code>ServiceTracker</code> has been
-   * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
+   * constructed with a <code>nullptr</code> ServiceTrackerCustomizer argument.
    *
    * <p>
    * This implementation does nothing.
@@ -454,7 +461,7 @@ protected:
    *
    * <p>
    * This method is only called when this <code>ServiceTracker</code> has been
-   * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
+   * constructed with a <code>nullptr</code> ServiceTrackerCustomizer argument.
    *
    * This method can be overridden in a subclass. If the default
    * implementation of the #AddingService

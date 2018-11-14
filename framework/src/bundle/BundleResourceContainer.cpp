@@ -23,9 +23,11 @@
 #include "BundleResourceContainer.h"
 #include "cppmicroservices/util/BundleObjFactory.h"
 #include "cppmicroservices/util/BundleObjFile.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include "cppmicroservices/BundleResource.h"
-#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include <cassert>
 #include <climits>
@@ -191,7 +193,11 @@ void BundleResourceContainer::InitMiniz()
     m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
     rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
   }
-  catch (const std::exception&) {}
+  catch (const std::exception& ex) {
+    auto sink = GetBundleContext().GetLogSink();
+    DIAG_LOG(*sink) << "Exception thrown creating BundleFileObj : "
+                    << ex.what();
+  }
 
   if (!rawBundleResourceData || 
     !rawBundleResourceData->GetData() ||

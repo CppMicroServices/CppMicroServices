@@ -23,12 +23,10 @@
 #ifndef CPPMICROSERVICES_SHAREDLIBRARY_H
 #define CPPMICROSERVICES_SHAREDLIBRARY_H
 
-#include "cppmicroservices/Any.h"
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/SharedData.h"
 
 #include <string>
-#include <unordered_map>
 
 #ifdef _MSC_VER
 #  pragma warning(push)

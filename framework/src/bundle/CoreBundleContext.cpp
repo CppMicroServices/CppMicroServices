@@ -93,6 +93,7 @@ CoreBundleContext::CoreBundleContext(
   , bundleRegistry(this)
   , firstInit(true)
   , initCount(0)
+  , libraryLoadOptions(0)
 {
   bool enableDiagLog =
     any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
@@ -187,6 +188,16 @@ void CoreBundleContext::Init()
     DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":"
                     << b->version << " location:" << b->location;
   }
+
+#ifdef US_PLATFORM_POSIX
+  try {
+      libraryLoadOptions = any_cast<int>(frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS]);
+  } catch (...) {
+      DIAG_LOG(*sink) << "Unable to read default library load options from config.";
+      libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
+  }
+  DIAG_LOG(*sink) << "Library Load Options = " << libraryLoadOptions;
+#endif
 }
 
 void CoreBundleContext::Uninit0()

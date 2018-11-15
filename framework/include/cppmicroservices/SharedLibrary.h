@@ -89,16 +89,6 @@ public:
   void Load();
 
   /**
-   * Loads the shared library pointed to by this SharedLibrary object.  On
-   * POSIX systems dlopen() is called with flags from the key
-   * LIBRARY_LOAD_OPTIONS in the frameworkProperties map.
-   *
-   * @throws std::logic_error If the library is already loaded.
-   * @throws std::runtime_error If loading the library failed.
-   */
-  void Load(const std::unordered_map<std::string, Any>& frameworkProperties);
-
-  /**
    * Loads the shared library pointed to by this SharedLibrary object,
    * using the specified flags on POSIX systems.
    *

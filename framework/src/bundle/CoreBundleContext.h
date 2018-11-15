@@ -176,6 +176,11 @@ public:
 
   std::shared_ptr<FrameworkPrivate> systemBundle;
 
+  /**
+   * Flags to use for dlopen calls on unix systems. Ignored on Windows.
+   */
+  int libraryLoadOptions;
+  
   ~CoreBundleContext();
 
   // thread-safe shared_from_this implementation

@@ -875,11 +875,11 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
   // Activate extension as soon as they are installed so that
   // they get added in bundle id order.
   /*
-    if (gen.IsExtension() && AttachToFragmentHost(coreCtx->systemBundle->Current()))
-    {
+  if (gen.IsExtension() && AttachToFragmentHost(coreCtx->systemBundle->Current()))
+  {
     gen.SetWired();
     state = Bundle::STATE_RESOLVED;
-    }
+  }
   */
 }
 

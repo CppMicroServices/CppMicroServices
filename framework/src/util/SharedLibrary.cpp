@@ -21,7 +21,9 @@
 =============================================================================*/
 
 #include "cppmicroservices/SharedLibrary.h"
+
 #include "cppmicroservices/BundleActivator.h"
+
 #include "cppmicroservices/util/FileSystem.h"
 
 #if defined(US_PLATFORM_POSIX)

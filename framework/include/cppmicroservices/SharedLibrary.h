@@ -192,7 +192,7 @@ public:
    * @return The file name prefix of the shared library.
    */
   std::string GetPrefix() const;
-  
+
   /**
    * Gets the internal handle of this SharedLibrary object.
    *

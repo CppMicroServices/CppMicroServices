@@ -20,38 +20,23 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_MODULEOBJFILE_P_H
-#define CPPMICROSERVICES_MODULEOBJFILE_P_H
+#include "cppmicroservices/util/BundleObjFile.h"
 
-#include "cppmicroservices/GlobalConfig.h"
-
-#include <string>
-#include <vector>
+#include <cstring>
 
 namespace cppmicroservices {
 
-struct InvalidObjFileException : public std::exception
+InvalidObjFileException::InvalidObjFileException(const std::string& what,
+                                                 int errorNumber)
+  : m_What(what)
 {
-  ~InvalidObjFileException() throw() {}
-  InvalidObjFileException(const std::string& what, int errorNumber = 0);
-
-  virtual const char* what() const throw();
-
-  std::string m_What;
-};
-
-class BundleObjFile
-{
-public:
-  virtual ~BundleObjFile() {}
-
-  virtual std::vector<std::string> GetDependencies() const = 0;
-  virtual std::string GetLibName() const = 0;
-  virtual std::string GetBundleName() const = 0;
-
-protected:
-  static bool ExtractBundleName(const std::string& name, std::string& out);
-};
+  if (errorNumber) {
+    m_What += std::string(": ") + strerror(errorNumber);
+  }
 }
 
-#endif // CPPMICROSERVICES_MODULEOBJFILE_P_H
+const char* InvalidObjFileException::what() const throw()
+{
+  return m_What.c_str();
+}
+}

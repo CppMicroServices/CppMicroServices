@@ -20,7 +20,10 @@
 
 =============================================================================*/
 
+#if defined (US_PLATFORM_LINUX)
+
 #include "BundleObjFile.h"
+#include "MappedFile.h"
 
 #include "cppmicroservices_elf.h"
 
@@ -28,6 +31,8 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <memory>
+#include <new>
 
 #include <sys/stat.h>
 
@@ -97,8 +102,12 @@ public:
   typedef typename ElfType::Word Word;
   typedef typename ElfType::Off Off;
 
-  BundleElfFile(std::ifstream& fs, std::size_t fileSize)
+  BundleElfFile(std::ifstream& fs, std::size_t fileSize, const std::string& fileName)
     : m_SectionHeaders(nullptr)
+    , m_Needed()
+    , m_Soname()
+    , m_rawData()
+    , m_mappedZipData()
   {
     if (fileSize < sizeof(Ehdr)) {
       throw InvalidElfException("Missing ELF header");
@@ -120,86 +129,75 @@ public:
     }
 
     // read in all section headers
-    m_SectionHeaders = new Shdr[m_FileHeader.e_shnum];
+    m_SectionHeaders = std::unique_ptr<Shdr[]>(new Shdr[m_FileHeader.e_shnum]);
     fs.seekg(m_FileHeader.e_shoff);
-    fs.read(reinterpret_cast<char*>(m_SectionHeaders),
-            sizeof *m_SectionHeaders * m_FileHeader.e_shnum);
+    fs.read(reinterpret_cast<char*>(m_SectionHeaders.get()),
+            sizeof(Shdr) * m_FileHeader.e_shnum);
 
     // parse the .dynamic section
     Shdr* dynamicHdr = this->FindSectionHeader(SHT_DYNAMIC);
     if (dynamicHdr == nullptr) {
       throw InvalidElfException("ELF .dynamic section header missing");
     }
-    char* strTab = this->GetStringTable(fs, dynamicHdr);
-    Dyn dynamicSecEntry;
-    fs.seekg(dynamicHdr->sh_offset);
-    fs.read(reinterpret_cast<char*>(&dynamicSecEntry), sizeof dynamicSecEntry);
-    while (dynamicSecEntry.d_tag != DT_NULL) {
-      if (dynamicSecEntry.d_tag == DT_SONAME) {
-        m_Soname = strTab + dynamicSecEntry.d_un.d_val;
-      } else if (dynamicSecEntry.d_tag == DT_NEEDED) {
-        m_Needed.push_back(strTab + dynamicSecEntry.d_un.d_val);
-      }
-      fs.read(reinterpret_cast<char*>(&dynamicSecEntry),
-              sizeof dynamicSecEntry);
-    }
-
-    // parse the .dynsym section
-    Shdr* dynsymHdr = this->FindSectionHeader(SHT_DYNSYM);
-    if (dynsymHdr == nullptr) {
-      throw InvalidElfException("ELF .dynsym section header missing");
-    }
-    strTab = this->GetStringTable(fs, dynsymHdr);
-    std::size_t sectionSize = static_cast<std::size_t>(dynsymHdr->sh_size);
-    char* symbols = new char[sectionSize];
-    fs.seekg(dynsymHdr->sh_offset);
-    fs.read(symbols, sectionSize);
-    Sym* symEntry = reinterpret_cast<Sym*>(symbols);
-    for (std::size_t symIndex = 0;
-         symIndex < sectionSize / dynsymHdr->sh_entsize;
-         ++symIndex, ++symEntry) {
-      if (symEntry->st_shndx == SHN_UNDEF ||
-          this->GetSymbolEntryType(symEntry->st_info) != STT_FUNC) {
-        continue;
-      }
-      std::string symName = strTab + symEntry->st_name;
-      if (this->ExtractBundleName(symName, m_BundleName)) {
-        break;
+    std::unique_ptr<char[]> strTab = this->GetStringTable(fs, dynamicHdr);
+    if(strTab) {
+      Dyn dynamicSecEntry;
+      fs.seekg(dynamicHdr->sh_offset);
+      fs.read(reinterpret_cast<char*>(&dynamicSecEntry), sizeof dynamicSecEntry);
+      while (dynamicSecEntry.d_tag != DT_NULL) {
+        if (dynamicSecEntry.d_tag == DT_SONAME) {
+          m_Soname = strTab.get() + dynamicSecEntry.d_un.d_val;
+        } else if (dynamicSecEntry.d_tag == DT_NEEDED) {
+          m_Needed.push_back(strTab.get() + dynamicSecEntry.d_un.d_val);
+        }
+        fs.read(reinterpret_cast<char*>(&dynamicSecEntry),
+                sizeof dynamicSecEntry);
       }
     }
-    delete[] symbols;
 
-    for (typename StrTblMapType::const_iterator
-           iter = m_StrTblIndexToStrArray.begin(),
-           iterEnd = m_StrTblIndexToStrArray.end();
-         iter != iterEnd;
-         ++iter) {
-      delete[] iter->second;
+    // parse the .us_resources section
+    // keep the buffer in a smart pointer to correctly clean up at end
+    // of scope even if exceptions occur.
+    std::unique_ptr<char[]> buffer = std::unique_ptr<char[]>(new (std::nothrow) char[m_SectionHeaders[m_FileHeader.e_shstrndx].sh_size]);
+    if(nullptr != buffer) {
+      fs.seekg(m_SectionHeaders[m_FileHeader.e_shstrndx].sh_offset);
+      fs.read(buffer.get(), m_SectionHeaders[m_FileHeader.e_shstrndx].sh_size);
+
+      for (int i = 0; i < m_FileHeader.e_shnum; ++i)
+      {
+        if (0 == strcmp(".us_resources", (buffer.get() + m_SectionHeaders[i].sh_name))) {
+          fs.seekg(m_SectionHeaders[i].sh_offset);
+          auto zipContentSize = m_SectionHeaders[i].sh_size;
+          if(0 < zipContentSize) {
+            off_t pa_offset = (m_SectionHeaders[i].sh_offset) & ~(sysconf(_SC_PAGESIZE) - 1);
+            size_t mappedLength = zipContentSize + (m_SectionHeaders[i].sh_offset) - pa_offset;
+            m_mappedZipData = std::unique_ptr<MappedFile>(new MappedFile(fileName, mappedLength, pa_offset));
+            m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
+              break;
+            }
+          }
+        }
+      }
     }
 
-    delete[] m_SectionHeaders;
-  }
+  std::vector<std::string> GetDependencies() const override { return m_Needed; }
 
-  virtual std::vector<std::string> GetDependencies() const { return m_Needed; }
-
-  virtual std::string GetLibName() const { return m_Soname; }
-
-  virtual std::string GetBundleName() const { return m_BundleName; }
+  std::string GetLibraryName() const override { return m_Soname; }
+  
+  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override  { return m_rawData; }
 
 private:
   Ehdr m_FileHeader;
-  Shdr* m_SectionHeaders;
-
-  typedef std::map<Word, char*> StrTblMapType;
-  StrTblMapType m_StrTblIndexToStrArray;
+  std::unique_ptr<Shdr[]> m_SectionHeaders;
 
   std::vector<std::string> m_Needed;
   std::string m_Soname;
-  std::string m_BundleName;
+  std::shared_ptr<RawBundleResources> m_rawData;
+  std::unique_ptr<MappedFile> m_mappedZipData;
 
   Shdr* FindSectionHeader(Word type, Half startIndex = 0) const
   {
-    Shdr* shdr = m_SectionHeaders + startIndex;
+    Shdr* shdr = m_SectionHeaders.get() + startIndex;
     for (int i = startIndex; i < m_FileHeader.e_shnum; ++i, ++shdr) {
       if (shdr->sh_type == type) {
         return shdr;
@@ -208,7 +206,7 @@ private:
     return nullptr;
   }
 
-  char* GetStringTable(std::ifstream& fs, Shdr* shdr)
+  std::unique_ptr<char[]> GetStringTable(std::ifstream& fs, const Shdr* const shdr)
   {
     if (shdr->sh_type != SHT_DYNAMIC && shdr->sh_type != SHT_SYMTAB &&
         shdr->sh_type != SHT_DYNSYM) {
@@ -216,27 +214,26 @@ private:
     }
 
     Word strTblHdrIdx = shdr->sh_link;
-    typename StrTblMapType::const_iterator iter =
-      m_StrTblIndexToStrArray.find(strTblHdrIdx);
-    if (iter != m_StrTblIndexToStrArray.end()) {
-      return iter->second;
+    const Shdr* const strTblHdr = &m_SectionHeaders[strTblHdrIdx];
+
+    if (strTblHdr && 0 > strTblHdr->sh_size) {
+      return nullptr;
     }
 
-    Shdr* strTblHdr = m_SectionHeaders + strTblHdrIdx;
-
     fs.seekg(strTblHdr->sh_offset);
-    char* strTbl = new char[static_cast<std::size_t>(strTblHdr->sh_size)];
-    fs.read(strTbl, strTblHdr->sh_size);
-    m_StrTblIndexToStrArray.insert(std::make_pair(strTblHdrIdx, strTbl));
+    std::unique_ptr<char[]> strTbl = std::unique_ptr<char[]>(new (std::nothrow) char[static_cast<std::size_t>(strTblHdr->sh_size)]);
+    if(strTbl) {
+      fs.read(strTbl.get(), strTblHdr->sh_size);
+    }
 
     return strTbl;
   }
 };
 
-BundleObjFile* CreateBundleElfFile(const char* selfName,
-                                   const std::string& fileName)
+std::unique_ptr<BundleObjFile> CreateBundleElfFile(const std::string& fileName)
 {
   struct stat elfStat;
+  errno = 0;
   if (stat(fileName.c_str(), &elfStat) != 0) {
     throw InvalidElfException("Stat for " + fileName + " failed", errno);
   }
@@ -257,7 +254,7 @@ BundleObjFile* CreateBundleElfFile(const char* selfName,
     throw InvalidElfException("Not an ELF object file");
   }
 
-  std::ifstream selfFile(selfName, std::ios_base::binary);
+  std::ifstream selfFile(fileName, std::ios_base::binary);
   char selfIdent[EI_NIDENT];
   selfFile.read(selfIdent, sizeof selfIdent);
   selfFile.close();
@@ -266,11 +263,13 @@ BundleObjFile* CreateBundleElfFile(const char* selfName,
   }
 
   if (elfIdent[EI_CLASS] == ELFCLASS32) {
-    return new BundleElfFile<Elf<ELFCLASS32>>(elfFile, fileSize);
+    return std::unique_ptr<BundleObjFile>(new BundleElfFile<Elf<ELFCLASS32>>(elfFile, fileSize, fileName));
   } else if (elfIdent[EI_CLASS] == ELFCLASS64) {
-    return new BundleElfFile<Elf<ELFCLASS64>>(elfFile, fileSize);
+    return std::unique_ptr<BundleObjFile>(new BundleElfFile<Elf<ELFCLASS64>>(elfFile, fileSize, fileName));
   } else {
-    throw InvalidElfException("Wrong ELF class");
+    throw InvalidElfException("Unknown ELF format");
   }
 }
 }
+
+#endif

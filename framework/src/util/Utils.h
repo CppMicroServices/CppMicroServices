@@ -23,6 +23,7 @@
 #ifndef CPPMICROSERVICES_UTILS_H
 #define CPPMICROSERVICES_UTILS_H
 
+#include "BundleResourceContainer.h"
 #include "cppmicroservices/FrameworkExport.h"
 
 #include <string>
@@ -33,22 +34,19 @@ namespace cppmicroservices {
 // File type checking
 //-------------------------------------------------------------------
 
-bool IsSharedLibrary(const std::string& location);
-
 bool IsBundleFile(const std::string& location);
 
 /**
  * Return true if the bundle's zip file only contains a 
  * manifest file, false otherwise.
  *
- * @param location The bundle file path
+ * @param resContainer The BundleResourceContainer to check
  *
  * @return true if the bundle's zip file only contains a 
  *         manifest file, false otherwise.
- * @throw std::runtime_error if the bundle location is empty or
- *        the bundle manifest cannot be read.
+ * @throw std::runtime_error if the bundle manifest cannot be read.
  */
-bool OnlyContainsManifest(const std::string& location);
+bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer);
 
 //-------------------------------------------------------------------
 // Framework storage

@@ -1,6 +1,6 @@
 /*=============================================================================
 
-  Library: CppMicroServices
+Library: CppMicroServices
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
@@ -20,34 +20,31 @@
 
 =============================================================================*/
 
-#include "BundleObjFile.h"
+#ifndef CPPMICROSERVICES_BUNDLEOBJFACTORY_H
+#define CPPMICROSERVICES_BUNDLEOBJFACTORY_H
 
-#include <cstring>
+#include "BundleObjFile.h"
 
 namespace cppmicroservices {
 
-InvalidObjFileException::InvalidObjFileException(const std::string& what,
-                                                 int errorNumber)
-  : m_What(what)
+class BundleObjFactory
 {
-  if (errorNumber) {
-    m_What += std::string(": ") + strerror(errorNumber);
-  }
+public:
+    BundleObjFactory() = default;
+    
+    /// Return a BundleObjFile which represents data read from the binary at
+    /// the given location.
+    ///
+    /// @param location absolute path to a PE, ELF or Mach-O binary file.
+    /// @return A BundleObjFile object
+    /// @throws If location is not a valid PE, ELF or Mach-O binary file.
+    ///
+    /// @note The location must be a valid binary format for the host machine.
+    ///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
+    std::unique_ptr<BundleObjFile> CreateBundleFileObj(const std::string& location);
+    
+};
+
 }
 
-const char* InvalidObjFileException::what() const throw()
-{
-  return m_What.c_str();
-}
-
-bool BundleObjFile::ExtractBundleName(const std::string& name, std::string& out)
-{
-  static const std::string bundleSignature = "_us_import_bundle_initializer_";
-  if (name.size() > bundleSignature.size() &&
-      name.compare(0, bundleSignature.size(), bundleSignature) == 0) {
-    out = name.substr(bundleSignature.size());
-    return true;
-  }
-  return false;
-}
-}
+#endif /* CPPMICROSERVICES_BUNDLEOBJFACTORY_H */

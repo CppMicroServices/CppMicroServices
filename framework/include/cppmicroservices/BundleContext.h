@@ -1088,6 +1088,7 @@ private:
   template<class S, class TTT>
   friend class detail::TrackedService;
   friend class BundleResource;
+  friend class BundleResourceContainer;
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code

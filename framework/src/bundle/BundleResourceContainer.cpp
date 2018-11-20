@@ -21,15 +21,20 @@
 =============================================================================*/
 
 #include "BundleResourceContainer.h"
+#include "cppmicroservices/util/BundleObjFactory.h"
+#include "cppmicroservices/util/BundleObjFile.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include "cppmicroservices/BundleResource.h"
-
-#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include <cassert>
 #include <climits>
 #include <cstring>
 #include <exception>
+#include <iostream>
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
@@ -38,6 +43,7 @@ namespace cppmicroservices {
 BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
+  , m_ObjFile()
   , m_ZipFileMutex()
   , m_IsContainerOpen(false)
 {
@@ -45,10 +51,8 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
     throw std::runtime_error(m_Location + " does not exist");
   }
 
-  if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
-    throw std::runtime_error("Could not init zip archive for bundle at " +
-                             m_Location);
-  }
+  InitMiniz();
+ 
   InitSortedEntries();
   if (m_SortedToplevelDirs.empty()) {
     throw std::runtime_error("Invalid zip archive layout for bundle at " +
@@ -179,6 +183,31 @@ void BundleResourceContainer::FindNodes(
   }
 }
 
+void BundleResourceContainer::InitMiniz()
+{
+  // Assume that the bundle had its meta-data linked into a data section.
+  // If this assumption is false, fall back to reading the meta-data in a
+  // less than optimal way, in terms of memory utilization.
+  std::shared_ptr<RawBundleResources> rawBundleResourceData;
+  try {
+    m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
+    rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
+  }
+  catch (const std::exception& ex) {
+    auto sink = GetBundleContext().GetLogSink();
+    DIAG_LOG(*sink) << "Exception thrown creating BundleFileObj : "
+                    << ex.what();
+  }
+
+  if (!rawBundleResourceData || 
+    !rawBundleResourceData->GetData() ||
+    !mz_zip_reader_init_mem(&m_ZipArchive, rawBundleResourceData->GetData(), rawBundleResourceData->GetSize(), 0)) {
+    if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
+      throw std::runtime_error("Could not init zip archive for bundle at " + m_Location);
+    }
+  }
+}
+
 void BundleResourceContainer::InitSortedEntries()
 {
   mz_uint numFiles =
@@ -222,10 +251,7 @@ void BundleResourceContainer::OpenContainer()
 {
   std::lock_guard<std::mutex> lock(m_ZipFileMutex);
   if(!m_IsContainerOpen) {
-    if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
-        throw std::runtime_error("Could not init zip archive for bundle at " +
-            m_Location);
-    }
+    InitMiniz();
     m_IsContainerOpen = true;
   }
 }
@@ -235,6 +261,7 @@ void BundleResourceContainer::CloseContainer()
   std::lock_guard<std::mutex> lock(m_ZipFileMutex);
   if(m_IsContainerOpen) {
     mz_zip_reader_end(&m_ZipArchive);
+    m_ObjFile.reset();
     m_IsContainerOpen = false;
   }
 }

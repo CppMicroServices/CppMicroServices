@@ -21,6 +21,7 @@ set(_gtest_tests
   OpenFileHandleTest.cpp
   UtilsTest.cpp
   FrameworkTest.cpp
+  BundleObjFileTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp

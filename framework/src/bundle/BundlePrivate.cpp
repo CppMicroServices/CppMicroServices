@@ -592,7 +592,7 @@ std::exception_ptr BundlePrivate::Start0()
         libHandle = BundleUtils::GetExecutableHandle();
       } else {
         if (!lib.IsLoaded()) {
-          lib.Load();
+          lib.Load(coreCtx->libraryLoadOptions);
         }
         libHandle = lib.GetHandle();
       }

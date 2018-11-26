@@ -39,17 +39,20 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include <iomanip>
 
+#ifdef US_PLATFORM_POSIX
+#include <dlfcn.h>
+#endif
+
 CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 namespace cppmicroservices {
 
 std::atomic<int> CoreBundleContext::globalId{ 0 };
 
-std::unordered_map<std::string, Any> InitProperties(
-  std::unordered_map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
-  configuration.insert(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
+  configuration.emplace(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
 
   // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
   // Run-time modification of the property should be ignored as it is irrelevant.
@@ -59,18 +62,19 @@ std::unordered_map<std::string, Any> InitProperties(
   configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
-  if (configuration.find(Constants::FRAMEWORK_WORKING_DIR) ==
-      configuration.end()) {
-    configuration.insert(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
-                                        util::GetCurrentWorkingDirectory()));
-  }
+  configuration.emplace(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
+                                       util::GetCurrentWorkingDirectory()));
 
-  configuration.insert(
-    std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
+  configuration.emplace(std::make_pair(Constants::FRAMEWORK_STORAGE,
+                                       Any(FWDIR_DEFAULT)));
 
-  configuration[Constants::FRAMEWORK_VERSION] =
-    std::string(CppMicroServices_VERSION_STR);
-  configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
+  configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
+  configuration[Constants::FRAMEWORK_VENDOR]  = std::string("CppMicroServices");
+
+#ifdef US_PLATFORM_POSIX
+  configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS,
+                                       RTLD_LAZY | RTLD_LOCAL));
+#endif
 
   return configuration;
 }
@@ -89,6 +93,7 @@ CoreBundleContext::CoreBundleContext(
   , bundleRegistry(this)
   , firstInit(true)
   , initCount(0)
+  , libraryLoadOptions(0)
 {
   bool enableDiagLog =
     any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
@@ -183,6 +188,16 @@ void CoreBundleContext::Init()
     DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":"
                     << b->version << " location:" << b->location;
   }
+
+#ifdef US_PLATFORM_POSIX
+  try {
+      libraryLoadOptions = any_cast<int>(frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS]);
+  } catch (...) {
+      DIAG_LOG(*sink) << "Unable to read default library load options from config.";
+      libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
+  }
+  DIAG_LOG(*sink) << "Library Load Options = " << libraryLoadOptions;
+#endif
 }
 
 void CoreBundleContext::Uninit0()

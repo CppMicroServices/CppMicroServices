@@ -43,7 +43,7 @@ BundleStorageMemory::InsertBundleLib(const std::string& location)
 }
 
 std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
-  const std::shared_ptr<const BundleResourceContainer>& resCont,
+  const std::shared_ptr<BundleResourceContainer>& resCont,
   const std::vector<std::string>& topLevelEntries)
 {
   std::vector<std::shared_ptr<BundleArchive>> res;
@@ -57,15 +57,14 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
     }
 #endif
     auto id = nextFreeId++;
-    auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::steady_clock::now().time_since_epoch())
-                .count();
-    std::unique_ptr<BundleArchive::Data> data(
-      new BundleArchive::Data{ id, ts, -1 });
-    auto p = archives.v.insert(std::make_pair(
-      id,
-      std::make_shared<BundleArchive>(
-        this, std::move(data), resCont, prefix, resCont->GetLocation())));
+    auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{ id, ts, -1 });
+    auto p = archives.v.insert(std::make_pair(id,
+                                              std::make_shared<BundleArchive>(this,
+                                                                              std::move(data),
+                                                                              resCont,
+                                                                              prefix,
+                                                                              resCont->GetLocation())));
     res.push_back(p.first->second);
   }
   return res;

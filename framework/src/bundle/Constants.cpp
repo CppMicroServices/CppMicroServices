@@ -66,5 +66,8 @@ const std::string SERVICE_SCOPE = "service.scope";
 const std::string SCOPE_SINGLETON = "singleton";
 const std::string SCOPE_BUNDLE = "bundle";
 const std::string SCOPE_PROTOTYPE = "prototype";
+const std::string LIBRARY_LOAD_OPTIONS =
+  "org.cppmicroservices.library.load.options";
+
 }
 }

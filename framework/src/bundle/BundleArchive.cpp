@@ -40,12 +40,11 @@ BundleArchive::BundleArchive()
   : storage(nullptr)
 {}
 
-BundleArchive::BundleArchive(
-  BundleStorage* storage,
-  std::unique_ptr<Data>&& data,
-  std::shared_ptr<const BundleResourceContainer>  resourceContainer,
-  std::string  resourcePrefix,
-  std::string  location)
+BundleArchive::BundleArchive(BundleStorage* storage,
+                             std::unique_ptr<Data>&& data,
+                             std::shared_ptr<BundleResourceContainer>  resourceContainer,
+                             std::string  resourcePrefix,
+                             std::string  location)
   : storage(storage)
   , data(std::move(data))
   , resourceContainer(std::move(resourceContainer))
@@ -137,7 +136,7 @@ void BundleArchive::SetAutostartSetting(int32_t setting)
   data->autostartSetting = setting;
 }
 
-std::shared_ptr<const BundleResourceContainer>
+std::shared_ptr<BundleResourceContainer>
 BundleArchive::GetResourceContainer() const
 {
   return resourceContainer;

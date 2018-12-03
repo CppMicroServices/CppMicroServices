@@ -23,6 +23,8 @@
 #ifndef CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 #define CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 
+#include "cppmicroservices/util/BundleObjFile.h"
+
 #include "miniz.h"
 
 #include <cstdint>
@@ -52,6 +54,7 @@ public:
       , compressedSize(0)
       , uncompressedSize(0)
       , modifiedTime(0)
+      , crc32(0)
       , isDir(false)
     {}
 
@@ -60,6 +63,7 @@ public:
     int compressedSize;
     int uncompressedSize;
     time_t modifiedTime;
+    uint32_t crc32;
     bool isDir;
   };
 
@@ -67,10 +71,10 @@ public:
 
   std::vector<std::string> GetTopLevelDirs() const;
 
-  bool GetStat(Stat& stat) const;
-  bool GetStat(int index, Stat& stat) const;
+  bool GetStat(Stat& stat);
+  bool GetStat(int index, Stat& stat);
 
-  std::unique_ptr<void, void (*)(void*)> GetData(int index) const;
+  std::unique_ptr<void, void (*)(void*)> GetData(int index);
 
   void GetChildren(const std::string& resourcePath,
                    bool relativePaths,
@@ -82,6 +86,12 @@ public:
                  const std::string& filePattern,
                  bool recurse,
                  std::vector<BundleResource>& resources) const;
+
+  /// Force close the file handle to the underlying zip file.
+  /// This function should only be used as an optimization to
+  /// control the number of open file handles on platforms
+  /// with a limit (e.g. Windows).
+  void CloseContainer();
 
 private:
 using NameIndexPair = std::pair<std::string, int>;
@@ -99,8 +109,18 @@ using NameIndexPair = std::pair<std::string, int>;
 
   bool Matches(const std::string& name, const std::string& filePattern) const;
 
+  /// Initialize miniz with the resource zip file information.
+  /// throws std::runtime_error if the underlying zip file cannot be opened or read.
+  void InitMiniz();
+
+  /// Opens the zip file so that data can be accessed.
+  /// This function is thread-safe.
+  /// Throws std::runtime_error if the underlying zip file cannot be opened.
+  void OpenContainer();
+
   const std::string m_Location;
   mz_zip_archive m_ZipArchive;
+  std::unique_ptr<BundleObjFile> m_ObjFile;
 
   std::set<NameIndexPair, PairComp> m_SortedEntries;
   std::set<std::string> m_SortedToplevelDirs;
@@ -109,6 +129,11 @@ using NameIndexPair = std::pair<std::string, int>;
   // Working with file streams is stateful (e.g. current read position)
   // and hence not thread-safe.
   mutable std::mutex m_ZipFileStreamMutex;
+
+  // Synchronize opening/closing the underlying zip file. Only one thread
+  // should open the underlying zip file.
+  std::mutex m_ZipFileMutex;
+  bool m_IsContainerOpen;
 };
 }
 

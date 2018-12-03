@@ -39,30 +39,11 @@
 #  include <cxxabi.h>
 #endif
 
-namespace {
-std::string library_suffix()
-{
-#ifdef US_PLATFORM_WINDOWS
-  return ".dll";
-#elif defined(US_PLATFORM_APPLE)
-  return ".dylib";
-#else
-  return ".so";
-#endif
-}
-}
-
 namespace cppmicroservices {
 
 //-------------------------------------------------------------------
 // Bundle name and location parsing
 //-------------------------------------------------------------------
-
-bool IsSharedLibrary(const std::string& location)
-{ // Testing for file extension isn't the most robust way to test
-  // for file type.
-  return (location.find(library_suffix()) != std::string::npos);
-}
 
 bool IsBundleFile(const std::string& location)
 {
@@ -96,6 +77,26 @@ bool IsBundleFile(const std::string& location)
   } catch (...) {
     return false;
   }
+}
+
+bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer)
+{
+  auto topLevelDirs = resContainer->GetTopLevelDirs();
+  return std::all_of(
+      topLevelDirs.begin(),
+      topLevelDirs.end(),
+      [&resContainer](const std::string& dir) -> bool {
+        std::vector<std::string> names;
+        std::vector<uint32_t> indices;
+
+    resContainer->GetChildren(dir + "/", true, names, indices);
+        return std::all_of(names.begin(),
+                           names.end(),
+                           [](const std::string& resourceName) -> bool {
+                             return resourceName ==
+                                    std::string("manifest.json");
+                           });
+      });
 }
 
 //-------------------------------------------------------------------

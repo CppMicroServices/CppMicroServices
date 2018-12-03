@@ -359,6 +359,125 @@ union lc_str {
 };
 
 /*
+* The segment load command indicates that a part of this file is to be
+* mapped into the task's address space.  The size of this segment in memory,
+* vmsize, maybe equal to or larger than the amount to map from this file,
+* filesize.  The file is mapped starting at fileoff to the beginning of
+* the segment in memory, vmaddr.  The rest of the memory of the segment,
+* if any, is allocated zero fill on demand.  The segment's maximum virtual
+* memory protection and initial virtual memory protection are specified
+* by the maxprot and initprot fields.  If the segment has sections then the
+* section structures directly follow the segment command and their size is
+* reflected in cmdsize.
+*/
+struct segment_command { /* for 32-bit architectures */
+    uint32_t	cmd;		/* LC_SEGMENT */
+    uint32_t	cmdsize;	/* includes sizeof section structs */
+    char		segname[16];/* segment name */
+    uint32_t	vmaddr;		/* memory address of this segment */
+    uint32_t	vmsize;		/* memory size of this segment */
+    uint32_t	fileoff;	/* file offset of this segment */
+    uint32_t	filesize;	/* amount to map from the file */
+    vm_prot_t	maxprot;	/* maximum VM protection */
+    vm_prot_t	initprot;	/* initial VM protection */
+    uint32_t	nsects;		/* number of sections in segment */
+    uint32_t	flags;		/* flags */
+};
+
+/*
+* The 64-bit segment load command indicates that a part of this file is to be
+* mapped into a 64-bit task's address space.  If the 64-bit segment has
+* sections then section_64 structures directly follow the 64-bit segment
+* command and their size is reflected in cmdsize.
+*/
+struct segment_command_64 { /* for 64-bit architectures */
+    uint32_t	cmd;		/* LC_SEGMENT_64 */
+    uint32_t	cmdsize;	/* includes sizeof section_64 structs */
+    char		segname[16];/* segment name */
+    uint64_t	vmaddr;		/* memory address of this segment */
+    uint64_t	vmsize;		/* memory size of this segment */
+    uint64_t	fileoff;	/* file offset of this segment */
+    uint64_t	filesize;	/* amount to map from the file */
+    vm_prot_t	maxprot;	/* maximum VM protection */
+    vm_prot_t	initprot;	/* initial VM protection */
+    uint32_t	nsects;		/* number of sections in segment */
+    uint32_t	flags;		/* flags */
+};
+
+/* Constants for the flags field of the segment_command */
+#define	SG_HIGHVM	0x1	/* the file contents for this segment is for
+                            the high part of the VM space, the low part
+                            is zero filled (for stacks in core files) */
+#define	SG_FVMLIB	0x2	/* this segment is the VM that is allocated by
+                            a fixed VM library, for overlap checking in
+                            the link editor */
+#define	SG_NORELOC	0x4	/* this segment has nothing that was relocated
+                            in it and nothing relocated to it, that is
+                            it maybe safely replaced without relocation*/
+#define SG_PROTECTED_VERSION_1	0x8 /* This segment is protected.  If the
+                                        segment starts at file offset 0, the
+                                        first page of the segment is not
+                                        protected.  All other pages of the
+                                        segment are protected. */
+
+/*
+* A segment is made up of zero or more sections.  Non-MH_OBJECT files have
+* all of their segments with the proper sections in each, and padded to the
+* specified segment alignment when produced by the link editor.  The first
+* segment of a MH_EXECUTE and MH_FVMLIB format file contains the mach_header
+* and load commands of the object file before its first section.  The zero
+* fill sections are always last in their segment (in all formats).  This
+* allows the zeroed segment padding to be mapped into memory where zero fill
+* sections might be. The gigabyte zero fill sections, those with the section
+* type S_GB_ZEROFILL, can only be in a segment with sections of this type.
+* These segments are then placed after all other segments.
+*
+* The MH_OBJECT format has all of its sections in one segment for
+* compactness.  There is no padding to a specified segment boundary and the
+* mach_header and load commands are not part of the segment.
+*
+* Sections with the same section name, sectname, going into the same segment,
+* segname, are combined by the link editor.  The resulting section is aligned
+* to the maximum alignment of the combined sections and is the new section's
+* alignment.  The combined sections are aligned to their original alignment in
+* the combined section.  Any padded bytes to get the specified alignment are
+* zeroed.
+*
+* The format of the relocation entries referenced by the reloff and nreloc
+* fields of the section structure for mach object files is described in the
+* header file <reloc.h>.
+*/
+struct section { /* for 32-bit architectures */
+    char		sectname[16];	/* name of this section */
+    char		segname[16];	/* segment this section goes in */
+    uint32_t	addr;		/* memory address of this section */
+    uint32_t	size;		/* size in bytes of this section */
+    uint32_t	offset;		/* file offset of this section */
+    uint32_t	align;		/* section alignment (power of 2) */
+    uint32_t	reloff;		/* file offset of relocation entries */
+    uint32_t	nreloc;		/* number of relocation entries */
+    uint32_t	flags;		/* flags (section type and attributes)*/
+    uint32_t	reserved1;	/* reserved (for offset or index) */
+    uint32_t	reserved2;	/* reserved (for count or sizeof) */
+};
+
+struct section_64 { /* for 64-bit architectures */
+    char		sectname[16];	/* name of this section */
+    char		segname[16];	/* segment this section goes in */
+    uint64_t	addr;		/* memory address of this section */
+    uint64_t	size;		/* size in bytes of this section */
+    uint32_t	offset;		/* file offset of this section */
+    uint32_t	align;		/* section alignment (power of 2) */
+    uint32_t	reloff;		/* file offset of relocation entries */
+    uint32_t	nreloc;		/* number of relocation entries */
+    uint32_t	flags;		/* flags (section type and attributes)*/
+    uint32_t	reserved1;	/* reserved (for offset or index) */
+    uint32_t	reserved2;	/* reserved (for count or sizeof) */
+    uint32_t	reserved3;	/* reserved */
+};
+
+
+/*
  * Dynamicly linked shared libraries are identified by two things.  The
  * pathname (the name of the library as found for execution), and the
  * compatibility version number.  The pathname must match and the compatibility

@@ -449,6 +449,12 @@ US_Framework_EXPORT extern const std::string SCOPE_BUNDLE; // = "bundle"
  * @see SERVICE_SCOPE
  */
 US_Framework_EXPORT extern const std::string SCOPE_PROTOTYPE; // = "prototype"
+
+/**
+ * Service property that holds optional flags for dlopen calls on POSIX systems.
+ */
+US_Framework_EXPORT extern const std::string LIBRARY_LOAD_OPTIONS;
+
 }
 }
 

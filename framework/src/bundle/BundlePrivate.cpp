@@ -589,7 +589,7 @@ std::exception_ptr BundlePrivate::Start0()
         libHandle = BundleUtils::GetExecutableHandle();
       } else {
         if (!lib.IsLoaded()) {
-          lib.Load();
+          lib.Load(coreCtx->libraryLoadOptions);
         }
         libHandle = lib.GetHandle();
       }
@@ -813,6 +813,14 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
           std::string("Parsing of manifest.json for bundle ") + symbolicName +
           " at " + location + " failed: " + util::GetLastExceptionStr());
       }
+    }
+    // It is unlikely that clients will access bundle resources
+    // if the only resource is the manifest file. On this assumption,
+    // close the open file handle to the zip file to improve performance
+    // and avoid exceeding OS open file handle limits.
+    auto resContainer = barchive->GetResourceContainer();
+    if (OnlyContainsManifest(resContainer)) {
+      resContainer->CloseContainer();
     }
   }
 

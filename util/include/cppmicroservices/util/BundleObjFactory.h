@@ -1,6 +1,6 @@
 /*=============================================================================
 
-  Library: CppMicroServices
+Library: CppMicroServices
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
@@ -20,34 +20,31 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLESTORAGEFILE_H
-#define CPPMICROSERVICES_BUNDLESTORAGEFILE_H
+#ifndef CPPMICROSERVICES_BUNDLEOBJFACTORY_H
+#define CPPMICROSERVICES_BUNDLEOBJFACTORY_H
 
-#include "BundleStorage.h"
+#include "BundleObjFile.h"
 
 namespace cppmicroservices {
 
-class BundleStorageFile : public BundleStorage
+class BundleObjFactory
 {
-
 public:
-  BundleStorageFile();
-
-  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
-    const std::string& location);
-
-  std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-    const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::vector<std::string>& topLevelEntries);
-
-  bool RemoveArchive(const BundleArchive* ba);
-
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const;
-
-  std::vector<long> GetStartOnLaunchBundles() const;
-
-  void Close();
+    BundleObjFactory() = default;
+    
+    /// Return a BundleObjFile which represents data read from the binary at
+    /// the given location.
+    ///
+    /// @param location absolute path to a PE, ELF or Mach-O binary file.
+    /// @return A BundleObjFile object
+    /// @throws If location is not a valid PE, ELF or Mach-O binary file.
+    ///
+    /// @note The location must be a valid binary format for the host machine.
+    ///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
+    std::unique_ptr<BundleObjFile> CreateBundleFileObj(const std::string& location);
+    
 };
+
 }
 
-#endif // CPPMICROSERVICES_BUNDLESTORAGEFILE_H
+#endif /* CPPMICROSERVICES_BUNDLEOBJFACTORY_H */

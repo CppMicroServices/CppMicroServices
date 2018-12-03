@@ -21,14 +21,20 @@
 =============================================================================*/
 
 #include "BundleResourceContainer.h"
+#include "cppmicroservices/util/BundleObjFactory.h"
+#include "cppmicroservices/util/BundleObjFile.h"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include "cppmicroservices/BundleResource.h"
-
-#include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/detail/Log.h"
 
 #include <cassert>
 #include <climits>
 #include <cstring>
+#include <exception>
+#include <iostream>
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
@@ -37,25 +43,29 @@ namespace cppmicroservices {
 BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
+  , m_ObjFile()
+  , m_ZipFileMutex()
+  , m_IsContainerOpen(false)
 {
   if (!util::Exists(location)) {
     throw std::runtime_error(m_Location + " does not exist");
   }
 
-  if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
-    throw std::runtime_error("Could not init zip archive for bundle at " +
-                             m_Location);
-  }
+  InitMiniz();
+ 
   InitSortedEntries();
   if (m_SortedToplevelDirs.empty()) {
     throw std::runtime_error("Invalid zip archive layout for bundle at " +
                              m_Location);
   }
+  m_IsContainerOpen = true;
 }
 
 BundleResourceContainer::~BundleResourceContainer()
 {
-  mz_zip_reader_end(&m_ZipArchive);
+  try {
+    CloseContainer();
+  } catch(const std::exception&) {}
 }
 
 std::string BundleResourceContainer::GetLocation() const
@@ -69,8 +79,9 @@ std::vector<std::string> BundleResourceContainer::GetTopLevelDirs() const
                                    m_SortedToplevelDirs.end() };
 }
 
-bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat) const
+bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat)
 {
+  OpenContainer();
   int fileIndex =
     mz_zip_reader_locate_file(const_cast<mz_zip_archive*>(&m_ZipArchive),
                               stat.filePath.c_str(),
@@ -83,8 +94,9 @@ bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat) const
 }
 
 bool BundleResourceContainer::GetStat(int index,
-                                      BundleResourceContainer::Stat& stat) const
+                                      BundleResourceContainer::Stat& stat)
 {
+  OpenContainer();
   if (index >= 0) {
     mz_zip_archive_file_stat zipStat;
     if (!mz_zip_reader_file_stat(
@@ -98,6 +110,7 @@ bool BundleResourceContainer::GetStat(int index,
                    ? true
                    : false;
     stat.modifiedTime = zipStat.m_time;
+    stat.crc32 = zipStat.m_crc32;
     // This will limit the size info from uint64 to uint32 on 32-bit
     // architectures. We don't care because we assume resources > 2GB
     // don't make sense to be embedded in a bundle anyway.
@@ -111,8 +124,9 @@ bool BundleResourceContainer::GetStat(int index,
 }
 
 std::unique_ptr<void, void (*)(void*)> BundleResourceContainer::GetData(
-  int index) const
+  int index)
 {
+  OpenContainer();
   std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
   void* data = mz_zip_reader_extract_to_heap(
     const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
@@ -169,6 +183,31 @@ void BundleResourceContainer::FindNodes(
   }
 }
 
+void BundleResourceContainer::InitMiniz()
+{
+  // Assume that the bundle had its meta-data linked into a data section.
+  // If this assumption is false, fall back to reading the meta-data in a
+  // less than optimal way, in terms of memory utilization.
+  std::shared_ptr<RawBundleResources> rawBundleResourceData;
+  try {
+    m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
+    rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
+  }
+  catch (const std::exception& ex) {
+    auto sink = GetBundleContext().GetLogSink();
+    DIAG_LOG(*sink) << "Exception thrown creating BundleFileObj : "
+                    << ex.what();
+  }
+
+  if (!rawBundleResourceData || 
+    !rawBundleResourceData->GetData() ||
+    !mz_zip_reader_init_mem(&m_ZipArchive, rawBundleResourceData->GetData(), rawBundleResourceData->GetSize(), 0)) {
+    if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
+      throw std::runtime_error("Could not init zip archive for bundle at " + m_Location);
+    }
+  }
+}
+
 void BundleResourceContainer::InitSortedEntries()
 {
   mz_uint numFiles =
@@ -206,5 +245,24 @@ bool BundleResourceContainer::Matches(const std::string& name,
     pos = index + tok.size();
   }
   return true;
+}
+
+void BundleResourceContainer::OpenContainer()
+{
+  std::lock_guard<std::mutex> lock(m_ZipFileMutex);
+  if(!m_IsContainerOpen) {
+    InitMiniz();
+    m_IsContainerOpen = true;
+  }
+}
+
+void BundleResourceContainer::CloseContainer()
+{
+  std::lock_guard<std::mutex> lock(m_ZipFileMutex);
+  if(m_IsContainerOpen) {
+    mz_zip_reader_end(&m_ZipArchive);
+    m_ObjFile.reset();
+    m_IsContainerOpen = false;
+  }
 }
 }

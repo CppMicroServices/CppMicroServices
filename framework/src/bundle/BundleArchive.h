@@ -53,12 +53,11 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   BundleArchive();
 
-  BundleArchive(
-    BundleStorage* storage,
-    std::unique_ptr<Data>&& data,
-    std::shared_ptr<const BundleResourceContainer>  resourceContainer,
-    std::string  resourcePrefix,
-    std::string  location);
+  BundleArchive(BundleStorage* storage,
+                std::unique_ptr<Data>&& data,
+                std::shared_ptr<BundleResourceContainer>  resourceContainer,
+                std::string  resourcePrefix,
+                std::string  location);
 
   /**
    * Autostart setting stopped.

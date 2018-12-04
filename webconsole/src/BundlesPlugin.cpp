@@ -124,7 +124,7 @@ void BundlesPlugin::RenderContent(HttpServletRequest& request,
 
       std::string pluginRoot =
         request.GetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT).ToString();
-      long id = any_cast<long>(request.GetAttribute(REQ_BUNDLE_ID));
+      auto id = any_cast<long>(request.GetAttribute(REQ_BUNDLE_ID));
       auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(
                      GetVariableResolver(request))
                      ->GetData();
@@ -135,7 +135,7 @@ void BundlesPlugin::RenderContent(HttpServletRequest& request,
       return;
     }
     case RequestType::Resource: {
-      long id = any_cast<long>(request.GetAttribute(REQ_BUNDLE_ID));
+      auto id = any_cast<long>(request.GetAttribute(REQ_BUNDLE_ID));
       Bundle bundle = GetContext().GetBundle(id);
       if (!bundle)
         break;
@@ -300,14 +300,10 @@ std::pair<std::size_t, std::size_t> BundlesPlugin::GetResourceJsonTree(
         totalSize.second += size.second;
         json += indent + ",\n";
       }
-      for (std::vector<cppmicroservices::BundleResource>::iterator
-             iter = childFiles.begin(),
-             endIter = childFiles.end();
-           iter != endIter;
-           ++iter) {
+      for (auto & childFile : childFiles) {
         auto size = GetResourceJsonTree(bundle,
                                         currResource.GetResourcePath(),
-                                        *iter,
+                                        childFile,
                                         json,
                                         level + 1,
                                         pluginRoot);

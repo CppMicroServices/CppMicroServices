@@ -38,6 +38,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "FrameworkPrivate.h"
 
 #include <iomanip>
+#include <memory>
 
 #ifdef US_PLATFORM_POSIX
 #include <dlfcn.h>
@@ -95,7 +96,7 @@ CoreBundleContext::CoreBundleContext(
   , initCount(0)
   , libraryLoadOptions(0)
 {
-  bool enableDiagLog =
+  auto enableDiagLog =
     any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
   std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
@@ -103,7 +104,7 @@ CoreBundleContext::CoreBundleContext(
   DIAG_LOG(*sink) << "created";
 }
 
-CoreBundleContext::~CoreBundleContext() {}
+CoreBundleContext::~CoreBundleContext() = default;
 
 std::shared_ptr<CoreBundleContext> CoreBundleContext::shared_from_this() const
 {
@@ -138,7 +139,7 @@ void CoreBundleContext::Init()
   frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
 
   // $TODO we only support non-persistent (main memory) storage yet
-  storage.reset(new BundleStorageMemory());
+  storage = std::make_unique<BundleStorageMemory>();
   //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
   //  {
   //    dataStorage.clear();

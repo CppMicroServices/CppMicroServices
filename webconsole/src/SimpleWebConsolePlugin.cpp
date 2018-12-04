@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <utility>
+
 #include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
 
 #include "cppmicroservices/webconsole/WebConsoleConstants.h"
@@ -34,12 +36,12 @@ namespace cppmicroservices {
 SimpleWebConsolePlugin::SimpleWebConsolePlugin(
   const std::string& label,
   const std::string& title,
-  const std::string& category,
-  const std::vector<std::string>& css)
+  std::string  category,
+  std::vector<std::string>  css)
   : m_Label(label)
   , m_Title(title)
-  , m_Category(category)
-  , m_Css(css)
+  , m_Category(std::move(category))
+  , m_Css(std::move(css))
   , m_Context()
 {
   if (label.empty()) {
@@ -88,7 +90,7 @@ void SimpleWebConsolePlugin::Unregister()
   if (m_Reg) {
     m_Reg.Unregister();
   }
-  m_Reg = 0;
+  m_Reg = nullptr;
   m_Context = nullptr;
 }
 

@@ -66,24 +66,21 @@ class US_Framework_EXPORT any_map
 {
 
 public:
-  typedef std::string key_type;
-  typedef Any mapped_type;
-  typedef std::pair<const key_type, mapped_type> value_type;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type& reference;
-  typedef value_type const& const_reference;
-  typedef value_type* pointer;
-  typedef value_type const* const_pointer;
-
-  typedef std::map<std::string, Any> ordered_any_map;
-  typedef std::unordered_map<std::string, Any> unordered_any_map;
-  typedef std::unordered_map<std::string,
-                             Any,
-                             detail::any_map_cihash,
-                             detail::any_map_ciequal>
-    unordered_any_cimap;
-
+  using key_type = std::string;
+  using mapped_type = Any;
+  using value_type = std::pair<const key_type, mapped_type>;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type &;
+  using const_reference = const value_type &;
+  using pointer = value_type *;
+  using const_pointer = const value_type *;
+  using ordered_any_map = std::map<std::string, Any>;
+  using unordered_any_map = std::unordered_map<std::string, Any>;
+  using unordered_any_cimap = std::unordered_map<std::string,
+                                                 Any,
+                                                 detail::any_map_cihash,
+                                                 detail::any_map_ciequal>;
   enum map_type : uint8_t
   {
     ORDERED_MAP,
@@ -105,21 +102,21 @@ private:
       UNORDERED_CI
     };
 
-    iter_type type;
+    iter_type type{NONE};
 
     iterator_base()
-      : type(NONE)
-    {}
+       
+    = default;
 
     iterator_base(iter_type type)
       : type(type)
     {}
 
   public:
-    typedef any_map::value_type value_type;
+    using value_type = any_map::value_type;
 
-    typedef std::forward_iterator_tag iterator_category;
-    typedef any_map::difference_type difference_type;
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = any_map::difference_type;
   };
 
 public:
@@ -128,15 +125,15 @@ public:
   class US_Framework_EXPORT const_iter : public iterator_base
   {
   private:
-    typedef ordered_any_map::const_iterator ociter;
-    typedef unordered_any_map::const_iterator uociter;
-    typedef unordered_any_cimap::const_iterator uocciiter;
+    using ociter = ordered_any_map::const_iterator;
+    using uociter = unordered_any_map::const_iterator;
+    using uocciiter = unordered_any_cimap::const_iterator;
 
   public:
-    typedef any_map::const_reference reference;
-    typedef any_map::const_pointer pointer;
+    using reference = any_map::const_reference;
+    using pointer = any_map::const_pointer;
 
-    typedef const_iter iterator;
+    using iterator = const_iter;
 
     const_iter();
     const_iter(const iterator& it);
@@ -174,15 +171,15 @@ public:
   class US_Framework_EXPORT iter : public iterator_base
   {
   private:
-    typedef ordered_any_map::iterator oiter;
-    typedef unordered_any_map::iterator uoiter;
-    typedef unordered_any_cimap::iterator uociiter;
+    using oiter = ordered_any_map::iterator;
+    using uoiter = unordered_any_map::iterator;
+    using uociiter = unordered_any_cimap::iterator;
 
   public:
-    typedef any_map::reference reference;
-    typedef any_map::pointer pointer;
+    using reference = any_map::reference;
+    using pointer = any_map::pointer;
 
-    typedef iter iterator;
+    using iterator = iter;
 
     iter();
     iter(const iter& it);
@@ -218,8 +215,8 @@ public:
     } it;
   };
 
-  typedef iter iterator;
-  typedef const_iter const_iterator;
+  using iterator = iter;
+  using const_iterator = const_iter;
 
   any_map(map_type type);
   any_map(const ordered_any_map& m);

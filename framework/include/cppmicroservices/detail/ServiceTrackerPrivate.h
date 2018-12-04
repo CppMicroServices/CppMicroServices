@@ -40,16 +40,16 @@ class ServiceTrackerPrivate : MultiThreaded<>
 {
 
 public:
-  typedef typename TTT::TrackedType T;
-  typedef typename TTT::TrackedParmType TrackedParmType;
+  using T = typename TTT::TrackedType;
+  using TrackedParmType = typename TTT::TrackedParmType;
 
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        const BundleContext& context,
+                        BundleContext  context,
                         const ServiceReference<S>& reference,
                         ServiceTrackerCustomizer<S, T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        const BundleContext& context,
+                        BundleContext  context,
                         const std::string& clazz,
                         ServiceTrackerCustomizer<S, T>* customizer);
 

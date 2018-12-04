@@ -65,9 +65,9 @@ class US_Framework_EXPORT BundleVersion
 private:
   friend class BundlePrivate;
 
-  unsigned int majorVersion;
-  unsigned int minorVersion;
-  unsigned int microVersion;
+  unsigned int majorVersion{0};
+  unsigned int minorVersion{0};
+  unsigned int microVersion{0};
   std::string qualifier;
 
   static const char SEPARATOR; //  = "."
@@ -123,7 +123,7 @@ public:
   BundleVersion(unsigned int majorVersion,
                 unsigned int minorVersion,
                 unsigned int microVersion,
-                const std::string& qualifier);
+                std::string  qualifier);
 
   /**
    * Created a version identifier from the specified string.

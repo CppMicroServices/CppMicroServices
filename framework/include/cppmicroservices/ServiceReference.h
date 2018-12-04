@@ -71,7 +71,7 @@ class ServiceReference : public ServiceReferenceBase
 {
 
 public:
-  typedef S ServiceType;
+  using ServiceType = S;
 
   /**
    * Creates an invalid ServiceReference object. You can use
@@ -90,7 +90,7 @@ public:
       if (this->IsConvertibleTo(interfaceId)) {
         this->SetInterfaceId(interfaceId);
       } else {
-        this->operator=(0);
+        this->operator=(nullptr);
       }
     }
   }
@@ -125,7 +125,7 @@ public:
 
   using ServiceReferenceBase::operator=;
 
-  typedef void ServiceType;
+  using ServiceType = void;
 };
 /// \endcond
 
@@ -136,7 +136,7 @@ public:
  * A service reference of unknown type, which is not bound to any
  * interface identifier.
  */
-typedef ServiceReference<void> ServiceReferenceU;
+using ServiceReferenceU = ServiceReference<void>;
 }
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCE_H

@@ -35,7 +35,7 @@ namespace cppmicroservices {
 struct InvalidObjFileException : public std::exception
 {
   ~InvalidObjFileException() throw() {}
-  InvalidObjFileException(const std::string& what, int errorNumber = 0);
+  InvalidObjFileException(std::string  what, int errorNumber = 0);
 
   virtual const char* what() const throw();
 private:

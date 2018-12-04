@@ -22,6 +22,8 @@
 
 #include "BundleArchive.h"
 
+#include <utility>
+
 #include "cppmicroservices/BundleResource.h"
 
 #include "BundleResourceContainer.h"
@@ -38,17 +40,16 @@ BundleArchive::BundleArchive()
   : storage(nullptr)
 {}
 
-BundleArchive::BundleArchive(
-  BundleStorage* storage,
-  std::unique_ptr<Data>&& data,
-  const std::shared_ptr<BundleResourceContainer>& resourceContainer,
-  const std::string& resourcePrefix,
-  const std::string& location)
+BundleArchive::BundleArchive(BundleStorage* storage,
+                             std::unique_ptr<Data>&& data,
+                             std::shared_ptr<BundleResourceContainer>  resourceContainer,
+                             std::string  resourcePrefix,
+                             std::string  location)
   : storage(storage)
   , data(std::move(data))
-  , resourceContainer(resourceContainer)
-  , resourcePrefix(resourcePrefix)
-  , location(location)
+  , resourceContainer(std::move(resourceContainer))
+  , resourcePrefix(std::move(resourcePrefix))
+  , location(std::move(location))
 {}
 
 bool BundleArchive::IsValid() const

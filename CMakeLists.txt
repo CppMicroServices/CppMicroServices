@@ -32,7 +32,7 @@ endforeach()
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
 # source files in C mode. Because we mix C and C++ code in the test driver
@@ -76,7 +76,7 @@ set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
 # exception_ptr
 
 set(US_COMPILER_GNU_MINIMUM_VERSION          5.1         )
-set(US_COMPILER_Clang_MINIMUM_VERSION        3.4         )
+set(US_COMPILER_Clang_MINIMUM_VERSION        3.5         )
 set(US_COMPILER_AppleClang_MINIMUM_VERSION   7.3         )
 set(US_COMPILER_MSVC_MINIMUM_VERSION         19.00.23026 )
 
@@ -86,7 +86,7 @@ set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 7.3 (Clang ${US_COMPIL
 set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2015 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
 
 set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         5.4   )
-set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.4   )
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.5   )
 set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  8.0   )
 set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.00 )
 

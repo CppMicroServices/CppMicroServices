@@ -94,16 +94,15 @@ class ServiceTracker : protected ServiceTrackerCustomizer<S, T>
 {
 public:
   /// The type of the tracked object
-  typedef
-    typename ServiceTrackerCustomizer<S, T>::TrackedParmType TrackedParmType;
+  using TrackedParmType =
+    typename ServiceTrackerCustomizer<S, T>::TrackedParmType;
 
-  typedef std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>
-    TrackingMap;
+  using TrackingMap = std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>;
 
   /**
    * Automatically closes the <code>ServiceTracker</code>
    */
-  ~ServiceTracker();
+  ~ServiceTracker() override;
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -435,7 +434,7 @@ protected:
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
   std::shared_ptr<TrackedParmType> AddingService(
-    const ServiceReference<S>& reference);
+    const ServiceReference<S>& reference) override;
 
   /**
    * Default implementation of the
@@ -453,7 +452,7 @@ protected:
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
    */
   void ModifiedService(const ServiceReference<S>& reference,
-                       const std::shared_ptr<TrackedParmType>& service);
+                       const std::shared_ptr<TrackedParmType>& service) override;
 
   /**
    * Default implementation of the
@@ -472,15 +471,15 @@ protected:
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
    */
   void RemovedService(const ServiceReference<S>& reference,
-                      const std::shared_ptr<TrackedParmType>& service);
+                      const std::shared_ptr<TrackedParmType>& service) override;
 
 private:
-  typedef typename ServiceTrackerCustomizer<S, T>::TypeTraits TypeTraits;
+  using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;
 
-  typedef ServiceTracker<S, T> _ServiceTracker;
-  typedef detail::TrackedService<S, TypeTraits> _TrackedService;
-  typedef detail::ServiceTrackerPrivate<S, TypeTraits> _ServiceTrackerPrivate;
-  typedef ServiceTrackerCustomizer<S, T> _ServiceTrackerCustomizer;
+  using _ServiceTracker = ServiceTracker<S, T>;
+  using _TrackedService = detail::TrackedService<S, TypeTraits>;
+  using _ServiceTrackerPrivate = detail::ServiceTrackerPrivate<S, TypeTraits>;
+  using _ServiceTrackerCustomizer = ServiceTrackerCustomizer<S, T>;
 
   friend class detail::TrackedService<S, TypeTraits>;
   friend class detail::ServiceTrackerPrivate<S, TypeTraits>;

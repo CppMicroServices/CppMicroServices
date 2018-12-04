@@ -51,12 +51,12 @@ class SharedLibraryPrivate : public SharedData
 {
 public:
   SharedLibraryPrivate()
-    : m_Handle(nullptr)
-    , m_Suffix(US_LIB_EXT)
+    : 
+     m_Suffix(US_LIB_EXT)
     , m_Prefix(US_LIB_PREFIX)
   {}
 
-  void* m_Handle;
+  void* m_Handle{nullptr};
 
   std::string m_Name;
   std::string m_Path;
@@ -69,9 +69,7 @@ SharedLibrary::SharedLibrary()
   : d(new SharedLibraryPrivate)
 {}
 
-SharedLibrary::SharedLibrary(const SharedLibrary& other)
-  : d(other.d)
-{}
+SharedLibrary::SharedLibrary(const SharedLibrary&) = default;
 
 SharedLibrary::SharedLibrary(const std::string& libPath,
                              const std::string& name)
@@ -88,13 +86,9 @@ SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
   SetFilePath(absoluteFilePath);
 }
 
-SharedLibrary::~SharedLibrary() {}
+SharedLibrary::~SharedLibrary() = default;
 
-SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other)
-{
-  d = other.d;
-  return *this;
-}
+SharedLibrary& SharedLibrary::operator=(const SharedLibrary&) = default;
 
 void SharedLibrary::Load(int flags)
 {

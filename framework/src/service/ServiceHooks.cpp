@@ -22,6 +22,8 @@
 
 #include "ServiceHooks.h"
 
+#include <memory>
+
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/GetBundleContext.h"

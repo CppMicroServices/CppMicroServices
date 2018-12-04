@@ -63,11 +63,9 @@ protected:
   InterfaceMapConstPtr service;
 
 public:
-  typedef std::unordered_map<BundlePrivate*, int> BundleToRefsMap;
-  typedef std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>
-    BundleToServiceMap;
-  typedef std::unordered_map<BundlePrivate*, std::list<InterfaceMapConstPtr>>
-    BundleToServicesMap;
+  using BundleToRefsMap = std::unordered_map<BundlePrivate*, int>;
+  using BundleToServiceMap = std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>;
+  using BundleToServicesMap = std::unordered_map<BundlePrivate*, std::list<InterfaceMapConstPtr>>;
 
   ServiceRegistrationBasePrivate(const ServiceRegistrationBasePrivate&) =
     delete;
@@ -119,7 +117,7 @@ public:
   std::atomic<bool> unregistering;
 
   ServiceRegistrationBasePrivate(BundlePrivate* bundle,
-                                 const InterfaceMapConstPtr& service,
+                                 InterfaceMapConstPtr  service,
                                  Properties&& props);
 
   ~ServiceRegistrationBasePrivate();

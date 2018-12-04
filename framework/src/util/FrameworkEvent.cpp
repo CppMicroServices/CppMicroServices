@@ -20,6 +20,8 @@
 
 =============================================================================*/
 
+#include <utility>
+
 #include "cppmicroservices/FrameworkEvent.h"
 
 #include "cppmicroservices/Bundle.h"
@@ -32,21 +34,18 @@ class FrameworkEventData
 {
 public:
   FrameworkEventData(FrameworkEvent::Type type,
-                     const Bundle& bundle,
-                     const std::string& message,
+                     Bundle  bundle,
+                     std::string  message,
                      const std::exception_ptr exception)
     : type(type)
-    , bundle(bundle)
-    , message(message)
+    , bundle(std::move(bundle))
+    , message(std::move(message))
     , exception(exception)
   {}
 
   FrameworkEventData(const FrameworkEventData& other)
-    : type(other.type)
-    , bundle(other.bundle)
-    , message(other.message)
-    , exception(other.exception)
-  {}
+     
+  = default;
 
   const FrameworkEvent::Type type;
   const Bundle bundle;

@@ -25,7 +25,7 @@
 
 namespace cppmicroservices {
 
-ServletConfig::~ServletConfig() {}
+ServletConfig::~ServletConfig() = default;
 
 std::string ServletConfig::GetServletName() const
 {
@@ -52,13 +52,7 @@ ServletConfig::ServletConfig()
   : d(new ServletConfigPrivate)
 {}
 
-ServletConfig::ServletConfig(const ServletConfig& other)
-  : d(other.d)
-{}
-
-ServletConfig& ServletConfig::operator=(const ServletConfig& other)
-{
-  this->d = other.d;
-  return *this;
-}
+ServletConfig::ServletConfig(const ServletConfig&) = default;
+ServletConfig& ServletConfig::operator=(const ServletConfig&) = default;
+    
 }

@@ -30,8 +30,8 @@ namespace cppmicroservices {
 
 namespace {
 
-typedef std::map<std::string, Any> AnyOrderedMap;
-typedef std::vector<Any> AnyVector;
+using AnyOrderedMap = std::map<std::string, Any>;
+using AnyVector = std::vector<Any>;
 
 void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
 void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap);
@@ -102,10 +102,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
 
 void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci)
 {
-  for (Json::Value::const_iterator it = jsonArray.begin();
-       it != jsonArray.end();
-       ++it) {
-    const Json::Value& jsonValue = *it;
+  for (const auto & jsonValue : jsonArray) {
     Any anyValue = ParseJsonValue(jsonValue, ci);
     if (!anyValue.Empty()) {
       anyVector.push_back(anyValue);

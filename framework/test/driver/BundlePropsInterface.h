@@ -30,7 +30,7 @@ namespace cppmicroservices {
 
 struct BundlePropsInterface
 {
-  typedef ServiceProperties Properties;
+  using Properties = ServiceProperties;
 
   virtual ~BundlePropsInterface() {}
 

@@ -94,7 +94,7 @@ public:
   void CloseContainer();
 
 private:
-  typedef std::pair<std::string, int> NameIndexPair;
+using NameIndexPair = std::pair<std::string, int>;
 
   struct PairComp
   {

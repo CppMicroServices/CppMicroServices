@@ -31,6 +31,7 @@
 #include <string>
 #include <tuple>
 #include <typeinfo>
+#include <utility>
 
 /**
 \defgroup gr_serviceinterface Service Interface
@@ -76,9 +77,9 @@ class ServiceFactory;
  *
  * @see MakeInterfaceMap
  */
-typedef std::map<std::string, std::shared_ptr<void>> InterfaceMap;
-typedef std::shared_ptr<InterfaceMap> InterfaceMapPtr;
-typedef std::shared_ptr<const InterfaceMap> InterfaceMapConstPtr;
+using InterfaceMap = std::map<std::string, std::shared_ptr<void>>;
+using InterfaceMapPtr = std::shared_ptr<InterfaceMap>;
+using InterfaceMapConstPtr = std::shared_ptr<const InterfaceMap>;
 
 /// \cond
 namespace detail {
@@ -117,7 +118,7 @@ void InsertInterfaceTypes(InterfaceMapPtr& im, const Interfaces& interfaces)
 template<template<class...> class List, class... Args>
 struct InterfacesTuple
 {
-  typedef List<std::shared_ptr<Args>...> type;
+  using type = List<std::shared_ptr<Args>...>;
 
   template<class Impl>
   static type create(const std::shared_ptr<Impl>& impl)
@@ -255,8 +256,8 @@ public:
    *
    * @param factory A service factory.
    */
-  MakeInterfaceMap(const std::shared_ptr<ServiceFactory>& factory)
-    : m_factory(factory)
+  MakeInterfaceMap(std::shared_ptr<ServiceFactory>  factory)
+    : m_factory(std::move(factory))
   {
     if (!m_factory) {
       throw ServiceException(
@@ -307,7 +308,7 @@ private:
 template<class Interface>
 std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
 {
-  InterfaceMap::const_iterator iter =
+  auto iter =
     map->find(us_service_interface_iid<Interface>());
   if (iter != map->end()) {
     return std::static_pointer_cast<Interface>(iter->second);

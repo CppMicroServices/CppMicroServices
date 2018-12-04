@@ -42,13 +42,13 @@ private:
   static std::vector<E> emptyVector;
 
 public:
-  typedef std::vector<E> container_type;
-  typedef typename container_type::iterator iterator;
-  typedef typename container_type::const_iterator const_iterator;
-  typedef typename container_type::size_type size_type;
-  typedef typename container_type::reference reference;
-  typedef typename container_type::const_reference const_reference;
-  typedef typename container_type::value_type value_type;
+  using container_type = std::vector<E>;
+  using iterator = typename container_type::iterator;
+  using const_iterator = typename container_type::const_iterator;
+  using size_type = typename container_type::size_type;
+  using reference = typename container_type::reference;
+  using const_reference = typename container_type::const_reference;
+  using value_type = typename container_type::value_type;
 
   ShrinkableVector()
     : container(emptyVector)

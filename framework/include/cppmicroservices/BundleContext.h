@@ -458,7 +458,7 @@ public:
       throw ServiceException(
         "The service interface class has no "
         "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
-    typedef std::vector<ServiceReferenceU> BaseVectorT;
+    using BaseVectorT = std::vector<ServiceReferenceU>;
     BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
     std::vector<ServiceReference<S>> result;
     for (BaseVectorT::const_iterator i = serviceRefs.begin();
@@ -1077,7 +1077,7 @@ private:
     const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
-  BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
+  BundleContext(std::shared_ptr<BundleContextPrivate>  ctx);
   // allow templated code to use the internal logger
   template<class S, class TTT, class R>
   friend class detail::BundleAbstractTracked;

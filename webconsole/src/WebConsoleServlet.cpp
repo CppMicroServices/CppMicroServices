@@ -32,6 +32,7 @@
 #include "cppmicroservices/httpservice/ServletConfig.h"
 
 #include <iostream>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -49,10 +50,10 @@ public:
     , m_Request(request)
   {}
 
-  ~FilteringResponseWrapper() {}
+  ~FilteringResponseWrapper() override = default;
 
 private:
-  virtual std::streambuf* GetOutputStreamBuffer()
+  std::streambuf* GetOutputStreamBuffer() override
   {
     std::string contentType = this->GetContentType();
     if (contentType.size() >= 9 &&
@@ -60,8 +61,8 @@ private:
       if (m_StreamBuf == nullptr) {
         auto resolver = m_Plugin->GetVariableResolver(m_Request);
         m_StreamBuf = new VariableResolverStreamBuffer(
-          std::unique_ptr<std::ostream>(
-            new std::ostream(HttpServletResponse::GetOutputStreamBuffer())),
+          std::make_unique<std::ostream>(
+            HttpServletResponse::GetOutputStreamBuffer()),
           resolver);
       }
       return m_StreamBuf;
@@ -109,7 +110,7 @@ void WebConsolePluginTracker::Open(
 AbstractWebConsolePlugin* WebConsolePluginTracker::GetPlugin(
   const std::string& label) const
 {
-  PluginMapType::const_iterator iter = m_Plugins.find(label);
+  auto iter = m_Plugins.find(label);
   if (iter == m_Plugins.end())
     return nullptr;
   return iter->second;
@@ -167,7 +168,7 @@ std::string WebConsolePluginTracker::GetProperty(
   return labelProp.ToString();
 }
 
-WebConsoleServlet::WebConsoleServlet() {}
+WebConsoleServlet::WebConsoleServlet() = default;
 
 void WebConsoleServlet::Init(const ServletConfig& config)
 {

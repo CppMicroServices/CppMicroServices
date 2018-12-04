@@ -25,6 +25,7 @@
 
 #include <string>
 #include <utility>
+#include <functional>
 
 namespace cppmicroservices {
 
@@ -34,6 +35,15 @@ void* GetExecutableHandle();
 
 // returns the address of the symbol in library libHandle
 void* GetSymbol(void* libHandle, const char* symbol);
+
+template<typename T> void GetSymbol(std::function<T>& fptr,
+                                    void* libHandle,
+                                    const std::string& symbol)
+{
+    void* f = GetSymbol(libHandle, symbol.c_str());
+    fptr = reinterpret_cast<T*>(f);
+}
+
 }
 
 } // namespace cppmicroservices

@@ -24,5 +24,5 @@
 
 namespace cppmicroservices {
 
-ServiceFindHook::~ServiceFindHook() {}
+ServiceFindHook::~ServiceFindHook() = default;
 }

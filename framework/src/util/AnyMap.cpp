@@ -94,7 +94,7 @@ const Any& AtCompoundKey(const std::vector<Any>& v, const AnyMap::key_type& key)
 // ----------------------------------------------------------------
 // ------------------  any_map::const_iterator  -------------------
 
-any_map::const_iter::const_iter() {}
+any_map::const_iter::const_iter() = default;
 
 any_map::const_iter::const_iter(const any_map::const_iter& it)
   : iterator_base(it.type)
@@ -302,7 +302,7 @@ any_map::const_iter::uocciiter& any_map::const_iter::uoci_it()
 // ----------------------------------------------------------------
 // ---------------------  AnyMap::iterator  -----------------------
 
-any_map::iter::iter() {}
+any_map::iter::iter() = default;
 
 any_map::iter::iter(const iter& it)
   : iterator_base(it.type)
@@ -872,7 +872,7 @@ template<>
 std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m)
 {
   os << "{";
-  typedef any_map::const_iterator Iterator;
+  using Iterator = any_map::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
@@ -890,7 +890,7 @@ template<>
 std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m)
 {
   os << "{";
-  typedef any_map::const_iterator Iterator;
+  using Iterator = any_map::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();

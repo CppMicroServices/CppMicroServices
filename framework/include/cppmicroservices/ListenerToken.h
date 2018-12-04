@@ -29,7 +29,7 @@
 
 namespace cppmicroservices {
 
-typedef std::uint64_t ListenerTokenId;
+using ListenerTokenId = std::uint64_t;
 
 /**
    * \brief The token returned when a listener is registered with the framework.

@@ -44,14 +44,14 @@ public:
   std::size_t GetContentLength() const { return m_ContentLength; }
 
 protected:
-  std::streamsize xsputn(const char* /*s*/, std::streamsize n)
+  std::streamsize xsputn(const char* /*s*/, std::streamsize n) override
   {
     m_ContentLength += static_cast<std::size_t>(n);
     return n;
   }
 
 private:
-  int_type overflow(int_type ch)
+  int_type overflow(int_type ch) override
   {
     if (ch != traits_type::eof()) {
       assert(std::less_equal<char*>()(pptr(), epptr()));
@@ -63,10 +63,10 @@ private:
     return traits_type::eof();
   }
 
-  int sync() { return this->CommitStream() ? 0 : -1; }
+  int sync() override { return this->CommitStream() ? 0 : -1; }
 
-  NoBodyOutputStreamBuffer(const NoBodyOutputStreamBuffer&);
-  NoBodyOutputStreamBuffer& operator=(const NoBodyOutputStreamBuffer&);
+  NoBodyOutputStreamBuffer(const NoBodyOutputStreamBuffer&) = delete;
+  NoBodyOutputStreamBuffer& operator=(const NoBodyOutputStreamBuffer&) = delete;
 
 private:
   std::size_t m_ContentLength;
@@ -282,9 +282,9 @@ void HttpServlet::DoTrace(HttpServletRequest& request,
 
   std::vector<std::string> reqHeaders = request.GetHeaderNames();
 
-  for (std::size_t i = 0; i < reqHeaders.size(); ++i) {
+  for (const auto & reqHeader : reqHeaders) {
     responseString +=
-      CRLF + reqHeaders[i] + ": " + request.GetHeader(reqHeaders[i]);
+      CRLF + reqHeader + ": " + request.GetHeader(reqHeader);
   }
 
   responseString += CRLF;

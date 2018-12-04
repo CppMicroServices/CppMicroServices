@@ -24,5 +24,5 @@
 
 namespace cppmicroservices {
 
-BundleEventHook::~BundleEventHook() {}
+BundleEventHook::~BundleEventHook() = default;
 }

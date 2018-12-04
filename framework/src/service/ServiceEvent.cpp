@@ -52,15 +52,9 @@ ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)
   : d(new ServiceEventData(type, reference))
 {}
 
-ServiceEvent::ServiceEvent(const ServiceEvent& other)
-  : d(other.d)
-{}
+ServiceEvent::ServiceEvent(const ServiceEvent&) = default;
 
-ServiceEvent& ServiceEvent::operator=(const ServiceEvent& other)
-{
-  d = other.d;
-  return *this;
-}
+ServiceEvent& ServiceEvent::operator=(const ServiceEvent&) = default;
 
 ServiceReferenceU ServiceEvent::GetServiceReference() const
 {
@@ -100,7 +94,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
   ServiceReferenceU sr = event.GetServiceReference();
   if (sr) {
     // Some events will not have a service reference
-    long int sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
+    auto sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
     os << " " << sid;
 
     Any classes = sr.GetProperty(Constants::OBJECTCLASS);

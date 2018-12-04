@@ -91,7 +91,7 @@ namespace BundleUtils {
 
 void* GetExecutableHandle()
 {
-  return dlopen(0, RTLD_LAZY);
+  return dlopen(nullptr, RTLD_LAZY);
   ;
 }
 

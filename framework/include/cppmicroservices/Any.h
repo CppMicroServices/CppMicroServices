@@ -42,6 +42,7 @@ DEALINGS IN THE SOFTWARE.
 #include <set>
 #include <sstream>
 #include <typeinfo>
+#include <utility>
 #include <vector>
 
 /**
@@ -183,7 +184,7 @@ public:
   /**
    * Creates an empty any type.
    */
-  Any() {}
+    Any();
 
   /**
    * Creates an Any which stores the init parameter inside.
@@ -207,7 +208,7 @@ public:
    * \param other The Any to copy
    */
   Any(const Any& other)
-    : _content(other._content ? other._content->Clone() : 0)
+    : _content(other._content ? other._content->Clone() : nullptr)
   {}
 
   /**
@@ -350,7 +351,7 @@ private:
   class Placeholder
   {
   public:
-    virtual ~Placeholder() {}
+    virtual ~Placeholder() = default;
 
     virtual std::string ToString() const = 0;
     virtual std::string ToJSON() const = 0;
@@ -363,27 +364,27 @@ private:
   class Holder : public Placeholder
   {
   public:
-    Holder(const ValueType& value)
-      : _held(value)
+    Holder(ValueType  value)
+      : _held(std::move(value))
     {}
 
-    virtual std::string ToString() const
+    std::string ToString() const override
     {
       std::stringstream ss;
       any_value_to_string(ss, _held);
       return ss.str();
     }
 
-    virtual std::string ToJSON() const
+    std::string ToJSON() const override
     {
       std::stringstream ss;
       any_value_to_json(ss, _held);
       return ss.str();
     }
 
-    virtual const std::type_info& Type() const { return typeid(ValueType); }
+    const std::type_info& Type() const override { return typeid(ValueType); }
 
-    virtual std::unique_ptr<Placeholder> Clone() const
+    std::unique_ptr<Placeholder> Clone() const override
     {
       return std::unique_ptr<Placeholder>(new Holder(_held));
     }
@@ -391,7 +392,7 @@ private:
     ValueType _held;
 
   private: // intentionally left unimplemented
-    Holder& operator=(const Holder&);
+    Holder& operator=(const Holder&) = delete;
   };
 
 private:
@@ -413,14 +414,14 @@ private:
 class BadAnyCastException : public std::bad_cast
 {
 public:
-  BadAnyCastException(const std::string& msg = "")
+  BadAnyCastException(std::string  msg = "")
     : std::bad_cast()
-    , _msg(msg)
+    , _msg(std::move(msg))
   {}
 
-  ~BadAnyCastException() throw() {}
+  ~BadAnyCastException() override = default;
 
-  virtual const char* what() const throw()
+  const char* what() const noexcept override
   {
     if (_msg.empty())
       return "cppmicroservices::BadAnyCastException: "
@@ -506,7 +507,7 @@ const ValueType* any_cast(const Any* operand)
 template<typename ValueType>
 ValueType any_cast(const Any& operand)
 {
-  ValueType* result = any_cast<ValueType>(const_cast<Any*>(&operand));
+  auto* result = any_cast<ValueType>(const_cast<Any*>(&operand));
   if (!result) {
     detail::ThrowBadAnyCastException(
       std::string("any_cast"), operand.Type(), typeid(ValueType));
@@ -533,7 +534,7 @@ ValueType any_cast(const Any& operand)
 template<typename ValueType>
 ValueType any_cast(Any& operand)
 {
-  ValueType* result = any_cast<ValueType>(&operand);
+  auto* result = any_cast<ValueType>(&operand);
   if (!result) {
     detail::ThrowBadAnyCastException(
       std::string("any_cast"), operand.Type(), typeid(ValueType));
@@ -556,7 +557,7 @@ ValueType any_cast(Any& operand)
 template<typename ValueType>
 const ValueType& ref_any_cast(const Any& operand)
 {
-  ValueType* result = any_cast<ValueType>(const_cast<Any*>(&operand));
+  auto* result = any_cast<ValueType>(const_cast<Any*>(&operand));
   if (!result) {
     detail::ThrowBadAnyCastException(
       std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
@@ -579,7 +580,7 @@ const ValueType& ref_any_cast(const Any& operand)
 template<typename ValueType>
 ValueType& ref_any_cast(Any& operand)
 {
-  ValueType* result = any_cast<ValueType>(&operand);
+  auto* result = any_cast<ValueType>(&operand);
   if (!result) {
     detail::ThrowBadAnyCastException(
       std::string("ref_any_cast"), operand.Type(), typeid(ValueType));
@@ -621,8 +622,8 @@ template<class K>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, Any>& m)
 {
   os << "{";
-  typedef typename std::map<K, Any>::const_iterator Iterator;
-  Iterator i1 = m.begin();
+  using Iterator = typename std::map<K, Any>::const_iterator;
+  auto i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
@@ -639,7 +640,7 @@ template<class K, class V>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m)
 {
   os << "{";
-  typedef typename std::map<K, V>::const_iterator Iterator;
+  using Iterator = typename std::map<K, V>::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
@@ -657,8 +658,8 @@ template<class K>
 std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m)
 {
   os << "{";
-  typedef typename std::map<K, Any>::const_iterator Iterator;
-  Iterator i1 = m.begin();
+  using Iterator = typename std::map<K, Any>::const_iterator;
+  auto i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
@@ -676,7 +677,7 @@ template<class K, class V>
 std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
 {
   os << "{";
-  typedef typename std::map<K, V>::const_iterator Iterator;
+  using Iterator = typename std::map<K, V>::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();

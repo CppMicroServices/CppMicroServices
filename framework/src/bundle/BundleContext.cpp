@@ -35,15 +35,16 @@
 #include "ServiceRegistry.h"
 
 #include <memory>
-#include <stdio.h>
+#include <utility>
+#include <cstdio>
 
 namespace cppmicroservices {
 
-BundleContext::BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx)
-  : d(ctx)
+BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate>  ctx)
+  : d(std::move(ctx))
 {}
 
-BundleContext::BundleContext() {}
+BundleContext::BundleContext() = default;
 
 bool BundleContext::operator==(const BundleContext& rhs) const
 {
@@ -199,7 +200,7 @@ std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
   for (std::vector<ServiceReferenceBase>::const_iterator iter = refs.begin();
        iter != refs.end();
        ++iter) {
-    result.push_back(ServiceReferenceU(*iter));
+    result.emplace_back(*iter);
   }
   return result;
 }
@@ -235,10 +236,10 @@ struct ServiceHolder
 
   ServiceHolder(const std::shared_ptr<BundlePrivate>& b,
                 const ServiceReferenceBase& sr,
-                const std::shared_ptr<S>& s)
+                std::shared_ptr<S>  s)
     : b(b)
     , sref(sr)
-    , service(s)
+    , service(std::move(s))
   {}
 
   ~ServiceHolder()

@@ -144,7 +144,7 @@ public:
  *
  * A service registration object of unknown type.
  */
-typedef ServiceRegistration<void> ServiceRegistrationU;
+using ServiceRegistrationU = ServiceRegistration<void>;
 }
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATION_H

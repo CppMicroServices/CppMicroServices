@@ -76,7 +76,7 @@ class BundleContext;
 struct BundleActivator
 {
 
-  virtual ~BundleActivator() {}
+  virtual ~BundleActivator() = default;
 
   /**
    * Called when this bundle is started. This method

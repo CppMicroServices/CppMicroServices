@@ -66,9 +66,8 @@ public:
     , bundleCtx(context)
   {}
 
-  typedef ShrinkableMap<BundleContext,
-                        ShrinkableVector<ServiceListenerHook::ListenerInfo>>
-    MapType;
+  using MapType = ShrinkableMap<BundleContext,
+                        ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
   void Event(const ServiceEvent& /*event*/, MapType& listeners)
   {

@@ -120,7 +120,7 @@ public:
 
 private:
   std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
-  typedef ServiceTracker<FooService> FooTracker;
+  using FooTracker = ServiceTracker<FooService>;
   std::unique_ptr<SL3ServiceTrackerCustomizer> trackerCustomizer;
   std::unique_ptr<FooTracker> tracker;
   BundleContext context;

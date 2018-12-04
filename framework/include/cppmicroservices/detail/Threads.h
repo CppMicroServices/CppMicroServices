@@ -40,9 +40,9 @@ template<class Mutex = std::mutex>
 class MutexLockingStrategy
 {
 public:
-  typedef Mutex MutexType;
+  using MutexType = Mutex;
 
-  MutexLockingStrategy() {}
+  MutexLockingStrategy() = default;
 
   MutexLockingStrategy(const MutexLockingStrategy&)
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -55,7 +55,7 @@ public:
   class UniqueLock
   {
   public:
-    UniqueLock() {}
+    UniqueLock() = default;
 
     UniqueLock(const UniqueLock&) = delete;
     UniqueLock& operator=(const UniqueLock&) = delete;
@@ -144,7 +144,7 @@ protected:
 class NoLockingStrategy
 {
 public:
-  typedef void UniqueLock;
+  using UniqueLock = void;
 };
 
 template<class MutexHost>

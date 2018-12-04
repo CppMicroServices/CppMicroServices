@@ -98,7 +98,7 @@ public:
   ServiceException(const ServiceException& o);
   ServiceException& operator=(const ServiceException& o);
 
-  ~ServiceException() throw();
+  ~ServiceException() override;
 
   /**
    * Returns the type for this exception or <code>UNSPECIFIED</code> if the

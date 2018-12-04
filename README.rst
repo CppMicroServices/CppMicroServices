@@ -6,7 +6,7 @@
 |             +-------------------------+--------------------------+------------------------+
 |             | Xcode 7.3 and 9.4       | Visual Studio 2017       |                        |
 |             +-------------------------+--------------------------+------------------------+
-|             | Clang 3.4 and 6.0       | MinGW-w64                |                        |
+|             | Clang 3.5 and 6.0       | MinGW-w64                |                        |
 +=============+=========================+==========================+========================+
 | master      | |Linux Build Status|    | |Windows Build status|   | |Code Coverage Status| |
 +-------------+-------------------------+--------------------------+------------------------+
@@ -56,7 +56,7 @@ on many different platforms.
 Recommended minimum required compiler versions:
 
 - GCC 5.4
-- Clang 3.4
+- Clang 3.5
 - Clang from Xcode 8.0
 - Visual Studio 2015
 
@@ -65,7 +65,7 @@ available. Check the warnings printed during configuration of
 your build tree. The following are the absolute minimum requirements:
 
 - GCC 5.1
-- Clang 3.4
+- Clang 3.5
 - Clang from Xcode 7.3
 - Visual Studio 2015 (MSVC++ 14.0)
 
@@ -73,7 +73,7 @@ Below is a list of tested compiler/OS combinations:
 
 - GCC 5.4 (Ubuntu 14.04) via Travis CI
 - GCC 8.0 (Ubuntu 14.04) via Travis CI
-- Clang 3.4 (Ubuntu 14.04) via Travis CI
+- Clang 3.5 (Ubuntu 14.04) via Travis CI
 - Clang 6.0 (Ubuntu 14.04) via Travis CI
 - Clang Xcode 7.3 (OS X 10.11) via Travis CI
 - Clang Xcode 9.4 (OS X 10.13) via Travis CI

@@ -95,10 +95,10 @@ public:
             Invalid,
         };
 
-        typedef std::unordered_map<StringType, Data> ObjectType;
-        typedef std::vector<Data> ListType;
-        typedef std::function<StringType()> PartialType;
-        typedef std::function<StringType(const StringType&)> LambdaType;
+        using ObjectType = std::unordered_map<StringType, Data>;
+        using ListType = std::vector<Data>;
+        using PartialType = std::function<StringType()>;
+        using LambdaType = std::function<StringType(const StringType&)>;
 
         // Construction
         Data() : type_{Type::Object}, obj_(new ObjectType) {
@@ -316,7 +316,7 @@ public:
         return render(data, ss).str();
     }
 
-    typedef std::function<void(const StringType&)> RenderHandler;
+    using RenderHandler = std::function<void(const StringType&)>;
     void render(const Data& data, const RenderHandler& handler) {
         if (!isValid()) {
             return;
@@ -326,7 +326,7 @@ public:
     }
 
 private:
-    typedef typename StringType::size_type StringSizeType;
+    using StringSizeType = typename StringType::size_type;
 
     class DelimiterSet {
     public:
@@ -478,7 +478,7 @@ private:
     }
 
     void parse(const StringType& input, Context& ctx) {
-        typedef std::basic_ostringstream<typename StringType::value_type> streamstring;
+        using streamstring = std::basic_ostringstream<typename StringType::value_type>;
 
         const StringType braceDelimiterEndUnescaped(3, '}');
         const StringSizeType inputSize{input.size()};
@@ -584,7 +584,7 @@ private:
         Stop,
         Skip,
     };
-    typedef std::function<WalkControl(Component&)> WalkCallback;
+    using WalkCallback = std::function<WalkControl(Component&)>;
 
     void walk(const WalkCallback& callback) const {
         walkChildren(callback, rootComponent_);
@@ -811,8 +811,8 @@ private:
     Component rootComponent_;
 };
 
-typedef Kainjow::BasicMustache<std::string> Mustache;
-typedef Kainjow::BasicMustache<std::wstring> MustacheW;
+using Mustache = Kainjow::BasicMustache<std::string>;
+using MustacheW = Kainjow::BasicMustache<std::wstring>;
 
 } // Kainjow
 

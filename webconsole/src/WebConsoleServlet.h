@@ -48,7 +48,7 @@ public:
     const std::string& current) const;
 
 private:
-  typedef ServiceTracker<HttpServlet> Superclass;
+  using Superclass = ServiceTracker<HttpServlet>;
 
   struct LabelMapEntry
   {
@@ -66,7 +66,7 @@ private:
   std::string GetProperty(const ServiceReference<HttpServlet>& reference,
                           const std::string& property) const;
 
-  typedef std::map<std::string, AbstractWebConsolePlugin*> PluginMapType;
+  using PluginMapType = std::map<std::string, AbstractWebConsolePlugin*>;
   PluginMapType m_Plugins;
   std::map<std::string, LabelMapEntry> m_LabelMap;
 

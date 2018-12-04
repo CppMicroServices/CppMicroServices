@@ -35,6 +35,7 @@
 #include <memory>
 #include <ostream>
 #include <thread>
+#include <functional>
 
 namespace cppmicroservices {
 
@@ -55,9 +56,9 @@ class BundlePrivate
 {
 
 public:
-  typedef MutexLockingStrategy<> MutexHost;
-  typedef MutexHost::UniqueLock LockType;
-  typedef WaitCondition<MutexHost> WaitConditionType;
+using MutexHost = MutexLockingStrategy<>;
+using LockType = MutexHost::UniqueLock;
+using WaitConditionType = WaitCondition<MutexHost>;
 
   BundlePrivate(const BundlePrivate&) = delete;
   BundlePrivate& operator=(const BundlePrivate&) = delete;
@@ -225,7 +226,8 @@ public:
    */
   detail::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
 
-  typedef void (*DestroyActivatorHook)(BundleActivator*);
+  using DestroyActivatorHook = std::function<void(BundleActivator*)>;
+  
   DestroyActivatorHook destroyActivatorHook;
 
   std::unique_ptr<BundleActivator, DestroyActivatorHook> bactivator;
@@ -315,7 +317,7 @@ public:
    */
   SharedLibrary lib;
 
-  typedef void (*SetBundleContextHook)(BundleContextPrivate*);
+  using SetBundleContextHook = std::function<void (BundleContextPrivate*)>;
   SetBundleContextHook SetBundleContext;
 };
 

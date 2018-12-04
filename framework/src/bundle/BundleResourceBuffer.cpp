@@ -25,7 +25,8 @@
 #include <cassert>
 #include <cstdint>
 #include <limits>
-#include <stdlib.h>
+#include <memory>
+#include <cstdlib>
 
 #ifdef US_PLATFORM_WINDOWS
 #  define DATA_NEEDS_NEWLINE_CONVERSION 1
@@ -80,7 +81,7 @@ BundleResourceBuffer::BundleResourceBuffer(
   assert(_size <
          static_cast<std::size_t>(std::numeric_limits<uint32_t>::max()));
 
-  char* begin = reinterpret_cast<char*>(data.get());
+  auto* begin = reinterpret_cast<char*>(data.get());
   std::size_t size = begin ? _size : 0;
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
@@ -97,10 +98,10 @@ BundleResourceBuffer::BundleResourceBuffer(
   }
 #endif
 
-  d.reset(new BundleResourceBufferPrivate(std::move(data), size, begin, mode));
+  d = std::make_unique<BundleResourceBufferPrivate>(std::move(data), size, begin, mode);
 }
 
-BundleResourceBuffer::~BundleResourceBuffer() {}
+BundleResourceBuffer::~BundleResourceBuffer() = default;
 
 BundleResourceBuffer::int_type BundleResourceBuffer::underflow()
 {

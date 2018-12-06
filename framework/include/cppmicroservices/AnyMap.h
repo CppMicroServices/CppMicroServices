@@ -327,8 +327,43 @@ public:
    * @throws std::invalid_argument if the \c Any value for a given key is not of type \c AnyMap or \c std::vector<Any>.
    * @throws std::out_of_range if the key is not found or a numerical index would fall out of the range of an \c int type.
    */
-  mapped_type& AtCompoundKey(const key_type& key);
   const mapped_type& AtCompoundKey(const key_type& key) const;
+
+  /**
+   * Return a key's value, using a compound key notation if the key is found in the map or
+   * return the provided default value if the key is not found
+   *
+   * A compound key consists of one or more key names, concatenated with
+   * the '.' (dot) character. Each key except the last requires the referenced
+   * Any object to be of type \c AnyMap or \c std::vector<Any>. Containers
+   * of type \c std::vector<Any> are indexed using 0-based numerical key names.
+   *
+   * For example, a \c AnyMap object holding data of the following layout
+   * \code{.json}
+   * {
+   *   one: 1,
+   *   two: "two",
+   *   three: {
+   *     a: "anton",
+   *     b: [ 3, 8 ]
+   *   }
+   * }
+   * \endcode
+   * can be queried using the following notation:
+   * \code
+   * map.AtCompoundKey("one", Any());       // returns Any(1)
+   * map.AtCompoundKey("four", Any());       // returns Any()
+   * map.AtCompoundKey("three.a", Any());          // returns Any(std::string("anton"))
+   * map.AtCompoundKey("three.c", Any());          // returns Any()
+   * map.AtCompoundKey("three.b.1", Any());        // returns Any(8)
+   * map.AtCompoundKey("three.b.4", Any());        // returns Any()
+   * \endcode
+   *
+   * @param key The key hierachy to query.
+   * @param defaultValue is the value to be returned if the key is not found
+   * @return A copy of the key's value.
+   */
+  mapped_type AtCompoundKey(const key_type& key, mapped_type defaultValue) const noexcept;
 };
 
 template<>

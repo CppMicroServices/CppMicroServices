@@ -82,7 +82,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
     const Json::Value& jsonValue = *it;
     Any anyValue = ParseJsonValue(jsonValue, false);
     if (!anyValue.Empty()) {
-      anyMap.insert(std::make_pair(it.name(), anyValue));
+      anyMap.emplace(it.name(), std::move(anyValue));
     }
   }
 }
@@ -95,7 +95,7 @@ void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
     const Json::Value& jsonValue = *it;
     Any anyValue = ParseJsonValue(jsonValue, true);
     if (!anyValue.Empty()) {
-      anyMap.insert(std::make_pair(it.name(), anyValue));
+      anyMap.emplace(it.name(), std::move(anyValue));
     }
   }
 }
@@ -105,7 +105,7 @@ void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci)
   for (const auto & jsonValue : jsonArray) {
     Any anyValue = ParseJsonValue(jsonValue, ci);
     if (!anyValue.Empty()) {
-      anyVector.push_back(anyValue);
+      anyVector.emplace_back(std::move(anyValue));
     }
   }
 }

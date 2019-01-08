@@ -216,7 +216,7 @@ public:
    *
    * @param other The Any to move
    */
-  Any(Any&& other)
+  Any(Any&& other) noexcept
     : _content(std::move(other._content))
   {}
 

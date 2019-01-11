@@ -247,6 +247,27 @@ public:
   mapped_type& operator[](key_type&& key);
 
   std::pair<iterator, bool> insert(const value_type& value);
+
+  template< class... Args >
+  std::pair<iterator, bool> emplace(Args&&... args)
+  {
+    switch (type) {
+      case map_type::ORDERED_MAP: {
+        return o_m().emplace(std::forward<Args>(args)...);
+      }
+      case map_type::UNORDERED_MAP: {
+        auto p = uo_m().emplace(std::forward<Args>(args)...);
+        return { iterator(std::move(p.first), iterator::UNORDERED), p.second };
+      }
+      case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS: {
+        auto p = uoci_m().emplace(std::forward<Args>(args)...);
+        return { iterator(std::move(p.first), iterator::UNORDERED_CI), p.second };
+      }
+      default:
+        throw std::logic_error("invalid map type");
+    }
+  }
+  
   const_iterator find(const key_type& key) const;
 
 protected:

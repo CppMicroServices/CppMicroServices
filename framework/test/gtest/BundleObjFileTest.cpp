@@ -62,41 +62,6 @@ TEST(BundleObjFile, NonStandardBundleExt)
 #endif
 }
 
-TEST(BundleObjFile, Dependencies)
-{
-  ASSERT_TRUE(cppmicroservices::util::Exists(testBundlePath)) << testBundlePath + " should exist on disk.";
-#if defined (US_BUILD_SHARED_LIBS)
-  ASSERT_NO_THROW( { 
-    auto bundleObj = cppmicroservices::BundleObjFactory().CreateBundleFileObj(testBundlePath);
-    auto dependencies = bundleObj->GetDependencies();
-    // The test bundle should have at least one dependency.
-    // Given that this function isn't used right now, keep the test simple and lock it
-    // down further in the future when this function is used.
-    ASSERT_GT(dependencies.size(), 1u);
-  });
-#endif
-}
-
-TEST(BundleObjFile, LibraryName)
-{
-#if defined (US_BUILD_SHARED_LIBS)
-  ASSERT_TRUE(cppmicroservices::util::Exists(testBundlePath)) << testBundlePath + " should exist on disk.";
-  // Acknowledge that macOS adds "@rpath/" to the library name.
-  // For now, assume this is what is desired. This could change in the future.
-#if defined(US_PLATFORM_APPLE)
-  std::string goldLibName("@rpath/" US_LIB_PREFIX "TestBundleRL" US_LIB_EXT);
-#else
-  std::string goldLibName(US_LIB_PREFIX "TestBundleRL" US_LIB_EXT);
-#endif
-  ASSERT_NO_THROW({
-    auto bundleObj = cppmicroservices::BundleObjFactory().CreateBundleFileObj(testBundlePath);
-    auto libName = bundleObj->GetLibraryName();
-    ASSERT_STREQ(libName.c_str(), goldLibName.c_str());
-  });
-#endif
-}
-
-
 TEST(BundleObjFile, GetRawBundleResourceContainer)
 {
 #if defined (US_BUILD_SHARED_LIBS)

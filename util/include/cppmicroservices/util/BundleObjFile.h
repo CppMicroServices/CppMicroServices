@@ -72,10 +72,6 @@ public:
 
   virtual ~BundleObjFile() {}
 
-  /// Return a vector of linked libraries which this bundle depends on.
-  virtual std::vector<std::string> GetDependencies() const = 0;
-  /// Return the this bundle's filename
-  virtual std::string GetLibraryName() const = 0;
   /// Return the raw bundle resource container bits.
   virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const = 0;
 };

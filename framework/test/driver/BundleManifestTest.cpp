@@ -61,11 +61,10 @@ void TestUnicodeProperty(BundleContext bc)
 
 void TestDeepManifest(BundleContext bc)
 {
-  std::string path = testing::LIB_PATH + cppmicroservices::util::DIR_SEP +
-    cppmicroservices::util::DIR_SEP + US_LIB_PREFIX +
-    "TestBundleWithDeepManifest" + US_LIB_EXT;
-  auto bundles = bc.InstallBundles(path);
-  US_TEST_CONDITION(bundles.size() == 1, "Install bundle worked");
+  auto bundle = testing::InstallLib(bc, "TestBundleWithDeepManifest");
+  auto headers = bundle.GetHeaders();
+  US_TEST_CONDITION(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString() ==
+                      "TestBundleWithDeepManifest", "Bundle name")
 }
 
 int BundleManifestTest(int /*argc*/, char* /*argv*/ [])

@@ -209,11 +209,11 @@ TEST(AnyMapTest, MoveConstructor)
 
   AnyMap uo(AnyMap::UNORDERED_MAP);
   AnyMap uo_move(std::move(uo));
-  ASSERT_EQ(uo_move.size(), 0) << "Size of an empty moved-to AnyMap must be 0";
+  ASSERT_EQ(uo_move.size(), static_cast<std::size_t>(0)) << "Size of an empty moved-to AnyMap must be 0";
 
   AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   AnyMap uoci_move(std::move(uoci));
-  ASSERT_EQ(uoci_move.size(), 0) << "Size of an empty moved-to AnyMap must be 0";
+  ASSERT_EQ(uoci_move.size(), static_cast<std::size_t>(0)) << "Size of an empty moved-to AnyMap must be 0";
 }
 
 TEST(AnyMapTest, MoveAssignment)

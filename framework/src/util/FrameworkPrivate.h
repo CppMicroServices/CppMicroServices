@@ -56,11 +56,11 @@ public:
 
   void Shutdown(bool restart);
 
-  virtual void Start(uint32_t);
-  virtual void Stop(uint32_t);
+  void Start(uint32_t) override;
+  void Stop(uint32_t) override;
 
-  virtual void Uninstall();
-  virtual std::string GetLocation() const;
+  void Uninstall() override;
+  std::string GetLocation() const override;
 
   const AnyMap& GetHeaders() const override;
 

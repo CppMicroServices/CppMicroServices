@@ -85,11 +85,8 @@ public:
   typedef typename MachOType::symtab_entry symtab_entry;
 
   BundleMachOFile(std::ifstream& fs, std::size_t fileOffset, const std::string& location)
-    : m_Needed()
-    , m_InstallName()
-    , m_rawData()
+    : m_rawData()
     , m_mappedZipData()
-    , location(location)
   {
     fs.seekg(fileOffset);
     Mhdr mhdr;
@@ -109,23 +106,11 @@ public:
       load_command lcmd;
       fs.read(reinterpret_cast<char*>(&lcmd), sizeof lcmd);
       if (!m_rawData && !m_mappedZipData && LC_SEGMENT_64 == lcmd.cmd) {
-        m_mappedZipData = MapBundleContainer<segment_command_64, section_64>(fs, fileOffset, lcmd_offset);
+        m_mappedZipData = MapBundleContainer<segment_command_64, section_64>(fs, location, fileOffset, lcmd_offset);
         m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
       } else if (!m_rawData && !m_mappedZipData && LC_SEGMENT == lcmd.cmd) {
-        m_mappedZipData = MapBundleContainer<segment_command, section>(fs, fileOffset, lcmd_offset);
+        m_mappedZipData = MapBundleContainer<segment_command, section>(fs, location, fileOffset, lcmd_offset);
         m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
-      } else if (lcmd.cmd == LC_ID_DYLIB) {
-        dylib dylib_id;
-        fs.read(reinterpret_cast<char*>(&dylib_id), sizeof dylib_id);
-        fs.seekg(lcmd_offset + dylib_id.name.offset);
-        std::getline(fs, m_InstallName, '\0');
-      } else if (lcmd.cmd == LC_LOAD_DYLIB) {
-        dylib dylib_id;
-        fs.read(reinterpret_cast<char*>(&dylib_id), sizeof dylib_id);
-        fs.seekg(lcmd_offset + dylib_id.name.offset);
-        std::string id;
-        std::getline(fs, id, '\0');
-        m_Needed.push_back(id);
       }
 
       lcmd_offset += lcmd.cmdsize;
@@ -134,7 +119,7 @@ public:
   }
 
   template<typename SegmentCommand, typename Section>
-  std::unique_ptr<MappedFile> MapBundleContainer(std::ifstream& fs, std::size_t fileOffset, uint32_t lcmd_offset)
+  std::unique_ptr<MappedFile> MapBundleContainer(std::ifstream& fs, const std::string& filePath, std::size_t fileOffset, uint32_t lcmd_offset)
   {
     fs.seekg(fileOffset + lcmd_offset);
     SegmentCommand segment;
@@ -148,26 +133,19 @@ public:
              0 < section.size) {
            off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
            size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
-           return std::unique_ptr<MappedFile>(new MappedFile(location, mappedLength, pa_offset));
+           return std::make_unique<MappedFile>(filePath, mappedLength, pa_offset);
          }
          fs.seekg(lcmd_offset + sizeof(SegmentCommand) + ((i+1)*sizeof(Section)));
        }
     }
-    return std::unique_ptr<MappedFile>(new MappedFile());
+    return std::make_unique<MappedFile>();
   }
-
-  std::vector<std::string> GetDependencies() const override  { return m_Needed; }
-
-  std::string GetLibraryName() const override { return m_InstallName; }
 
   std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override { return m_rawData; }
 
 private:
-  std::vector<std::string> m_Needed;
-  std::string m_InstallName;
   std::shared_ptr<RawBundleResources> m_rawData;
   std::unique_ptr<MappedFile> m_mappedZipData;
-  std::string location;
 };
 
 static std::vector<std::vector<uint32_t>> GetMachOIdents(std::ifstream& is)
@@ -274,9 +252,9 @@ std::unique_ptr<BundleObjFile> CreateBundleMachOFile(const std::string& fileName
   }
 
   if (matchingIdent[0] == MH_MAGIC) {
-    return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC>>(machFile, matchingIdent[2], fileName));
+    return std::make_unique<BundleMachOFile<MachO<MH_MAGIC>>>(machFile, matchingIdent[2], fileName);
   } else if (matchingIdent[0] == MH_MAGIC_64) {
-    return std::unique_ptr<BundleObjFile>(new BundleMachOFile<MachO<MH_MAGIC_64>>(machFile, matchingIdent[2], fileName));
+    return std::make_unique<BundleMachOFile<MachO<MH_MAGIC_64>>>(machFile, matchingIdent[2], fileName);
   } else {
     throw InvalidMachOException(
       "Internal error: Mach-O magic field value is neither MH_MAGIC nor MH_MAGIC_64");

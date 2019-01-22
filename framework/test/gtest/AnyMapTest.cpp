@@ -156,6 +156,12 @@ TEST(AnyMapTest, AnyMap)
   AnyMap uco_anymap1(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   uco_anymap1 = uco_anymap;
 
+  AnyMap o1(AnyMap::ORDERED_MAP);
+  o1["key"] = 42;
+  AnyMap uo1(AnyMap::UNORDERED_MAP);
+  uo1 = o1;
+  ASSERT_EQ(any_cast<int>(uo1.at("key")), 42);
+
   // Testing AnyMap::empty()
   ASSERT_TRUE(uco_anymap1.empty());
 
@@ -189,4 +195,21 @@ TEST(AnyMapTest, AnyMap)
   ASSERT_EQ(stream1.str(), "{do : 1, re : 2}");
   any_value_to_json(stream2, o_anymap1);
   ASSERT_EQ(stream2.str(), "{\"do\" : 1, \"re\" : 10}");
+}
+
+TEST(AnyMapTest, Move)
+{
+  AnyMap o(AnyMap::ORDERED_MAP);
+  o["do"] = Any(1);
+  o["re"] = Any(2);
+  AnyMap o_anymap_move_ctor(std::move(o));
+  ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
+  ASSERT_DEATH(o.size(), ".*")
+    << "This call should result in a crash because the object has been moved from";
+
+  AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
+  uo_anymap_move_assign = std::move(o_anymap_move_ctor);
+  ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
+  ASSERT_DEATH(o_anymap_move_ctor.size(), ".*")
+    << "This call should result in a crash because the object has been moved from";
 }

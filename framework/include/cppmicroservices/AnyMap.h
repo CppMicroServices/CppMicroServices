@@ -226,6 +226,9 @@ public:
   any_map(const any_map& m);
   any_map& operator=(const any_map& m);
 
+  any_map(any_map&& m) noexcept;
+  any_map& operator=(any_map&& m) noexcept;
+
   ~any_map();
 
   iter begin();
@@ -280,6 +283,10 @@ private:
   unordered_any_map& uo_m();
   unordered_any_cimap const& uoci_m() const;
   unordered_any_cimap& uoci_m();
+
+  inline void copy_from(const any_map& m);
+  inline void move_from(any_map&& m) noexcept;
+  inline void destroy() noexcept;
 
   union
   {

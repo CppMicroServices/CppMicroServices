@@ -588,19 +588,7 @@ any_map::any_map(const unordered_any_cimap& m)
 any_map::any_map(const any_map& m)
   : type(m.type)
 {
-  switch (type) {
-    case map_type::ORDERED_MAP:
-      map.o = new ordered_any_map(m.o_m());
-      break;
-    case map_type::UNORDERED_MAP:
-      map.uo = new unordered_any_map(m.uo_m());
-      break;
-    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-      map.uoci = new unordered_any_cimap(m.uoci_m());
-      break;
-    default:
-      throw std::logic_error("invalid map type");
-  }
+  copy_from(m);
 }
 
 any_map& any_map::operator=(const any_map& m)
@@ -608,46 +596,29 @@ any_map& any_map::operator=(const any_map& m)
   if (this == &m)
     return *this;
 
-  switch (type) {
-    case map_type::ORDERED_MAP:
-      delete map.o;
-      break;
-    case map_type::UNORDERED_MAP:
-      delete map.uo;
-      break;
-    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-      delete map.uoci;
-      break;
-  }
+  destroy();
+  type = m.type;
+  copy_from(m);
+  return *this;
+}
 
-  switch (m.type) {
-    case map_type::ORDERED_MAP:
-      map.o = new ordered_any_map(m.o_m());
-      break;
-    case map_type::UNORDERED_MAP:
-      map.uo = new unordered_any_map(m.uo_m());
-      break;
-    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-      map.uoci = new unordered_any_cimap(m.uoci_m());
-      break;
-  }
+any_map::any_map(any_map&& m) noexcept
+  : type(m.type)
+{
+  move_from(std::move(m));
+}
 
+any_map& any_map::operator=(any_map&& m) noexcept
+{
+  destroy();
+  type = m.type;
+  move_from(std::move(m));
   return *this;
 }
 
 any_map::~any_map()
 {
-  switch (type) {
-    case map_type::ORDERED_MAP:
-      delete map.o;
-      break;
-    case map_type::UNORDERED_MAP:
-      delete map.uo;
-      break;
-    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-      delete map.uoci;
-      break;
-  }
+  destroy();
 }
 
 any_map::iterator any_map::begin()
@@ -890,6 +861,56 @@ any_map::unordered_any_cimap const& any_map::uoci_m() const
 any_map::unordered_any_cimap& any_map::uoci_m()
 {
   return *map.uoci;
+}
+
+void any_map::copy_from(const any_map& other)
+{
+  switch (other.type) {
+    case map_type::ORDERED_MAP:
+      map.o = new ordered_any_map(other.o_m());
+      break;
+    case map_type::UNORDERED_MAP:
+      map.uo = new unordered_any_map(other.uo_m());
+      break;
+    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+      map.uoci = new unordered_any_cimap(other.uoci_m());
+      break;
+    default:
+      throw std::logic_error("invalid map type");
+  }
+}
+
+void any_map::move_from(any_map&& other) noexcept
+{
+  switch (other.type) {
+    case map_type::ORDERED_MAP:
+      map.o = other.map.o;
+      other.map.o = nullptr;
+      break;
+    case map_type::UNORDERED_MAP:
+      map.uo = other.map.uo;
+      other.map.uo = nullptr;
+      break;
+    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+      map.uoci = other.map.uoci;
+      other.map.uoci = nullptr;
+      break;
+  }
+}
+
+void any_map::destroy() noexcept
+{
+  switch (type) {
+    case map_type::ORDERED_MAP:
+      delete map.o;
+      break;
+    case map_type::UNORDERED_MAP:
+      delete map.uo;
+      break;
+    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+      delete map.uoci;
+      break;
+  }
 }
 
 // ----------------------------------------------------------

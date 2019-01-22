@@ -542,7 +542,7 @@ void BundlePrivate::Start(uint32_t options)
   }
 }
 
-AnyMap BundlePrivate::GetHeaders() const
+const AnyMap& BundlePrivate::GetHeaders() const
 {
   return bundleManifest.GetHeaders();
 }

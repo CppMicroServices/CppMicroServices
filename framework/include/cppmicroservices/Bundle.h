@@ -430,7 +430,7 @@ public:
    *
    * @see Constants#BUNDLE_LOCALIZATION
    */
-  AnyMap GetHeaders() const;
+  const AnyMap& GetHeaders() const;
 
   /**
    * Returns the value of the specified property for this bundle.

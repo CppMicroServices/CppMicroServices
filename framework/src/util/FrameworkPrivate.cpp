@@ -35,7 +35,18 @@ namespace cppmicroservices {
 
 FrameworkPrivate::FrameworkPrivate(CoreBundleContext* fwCtx)
   : BundlePrivate(fwCtx)
+  , headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
+  headers[Constants::BUNDLE_SYMBOLICNAME] = symbolicName;
+  headers[Constants::BUNDLE_NAME] = location;
+  headers[Constants::BUNDLE_VERSION] = version.ToString();
+  headers[Constants::BUNDLE_MANIFESTVERSION] = std::string("2");
+  //headers.put("Bundle-Icon", "icon.png;size=32,icon64.png;size=64");
+  headers[Constants::BUNDLE_VENDOR] = std::string("C++ Micro Services");
+  headers[Constants::BUNDLE_DESCRIPTION] =
+    std::string("C++ Micro Services System Bundle");
+  //headers.put(Constants::PROVIDE_CAPABILITY, provideCapabilityString);
+
   // default the internal framework event to what should be
   // returned if a client calls WaitForStop while this
   // framework is not in an active, starting or stopping state.
@@ -255,18 +266,8 @@ std::string FrameworkPrivate::GetLocation() const
   return std::string("System Bundle");
 }
 
-AnyMap FrameworkPrivate::GetHeaders() const
+const AnyMap& FrameworkPrivate::GetHeaders() const
 {
-  AnyMap headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  headers[Constants::BUNDLE_SYMBOLICNAME] = symbolicName;
-  headers[Constants::BUNDLE_NAME] = location;
-  headers[Constants::BUNDLE_VERSION] = version.ToString();
-  headers[Constants::BUNDLE_MANIFESTVERSION] = std::string("2");
-  //headers.put("Bundle-Icon", "icon.png;size=32,icon64.png;size=64");
-  headers[Constants::BUNDLE_VENDOR] = std::string("C++ Micro Services");
-  headers[Constants::BUNDLE_DESCRIPTION] =
-    std::string("C++ Micro Services System Bundle");
-  //headers.put(Constants::PROVIDE_CAPABILITY, provideCapabilityString);
   return headers;
 }
 

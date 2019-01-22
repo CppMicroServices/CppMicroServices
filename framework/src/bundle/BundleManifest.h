@@ -37,7 +37,7 @@ public:
 
   void Parse(std::istream& is);
 
-  AnyMap GetHeaders() const;
+  const AnyMap& GetHeaders() const;
 
   bool Contains(const std::string& key) const;
   Any GetValue(const std::string& key) const;

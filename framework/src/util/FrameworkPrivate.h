@@ -62,7 +62,7 @@ public:
   virtual void Uninstall();
   virtual std::string GetLocation() const;
 
-  virtual AnyMap GetHeaders() const;
+  const AnyMap& GetHeaders() const override;
 
   /**
    * Stop this FrameworkContext, suspending all started contexts. This method
@@ -116,6 +116,8 @@ public:
    * The thread that performs shutdown of this framework instance.
    */
   std::thread shutdownThread;
+private:
+  AnyMap headers;
 };
 }
 

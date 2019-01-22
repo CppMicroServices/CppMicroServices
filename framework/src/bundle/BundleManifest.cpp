@@ -133,7 +133,7 @@ void BundleManifest::Parse(std::istream& is)
   ParseJsonObject(root, m_Headers);
 }
 
-AnyMap BundleManifest::GetHeaders() const
+const AnyMap& BundleManifest::GetHeaders() const
 {
   return m_Headers;
 }

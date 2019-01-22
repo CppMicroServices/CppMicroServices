@@ -197,7 +197,7 @@ TEST(AnyMapTest, AnyMap)
   ASSERT_EQ(stream2.str(), "{\"do\" : 1, \"re\" : 10}");
 }
 
-TEST(AnyMapTest, Move)
+TEST(AnyMapTest, MoveConstructor)
 {
   AnyMap o(AnyMap::ORDERED_MAP);
   o["do"] = Any(1);
@@ -207,9 +207,24 @@ TEST(AnyMapTest, Move)
   ASSERT_DEATH(o.size(), ".*")
     << "This call should result in a crash because the object has been moved from";
 
+  AnyMap uo(AnyMap::UNORDERED_MAP);
+  AnyMap uo_move(std::move(uo));
+  ASSERT_EQ(uo_move.size(), 0) << "Size of an empty moved-to AnyMap must be 0";
+
+  AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap uoci_move(std::move(uoci));
+  ASSERT_EQ(uoci_move.size(), 0) << "Size of an empty moved-to AnyMap must be 0";
+}
+
+TEST(AnyMapTest, MoveAssignment)
+{
+  AnyMap o(AnyMap::ORDERED_MAP);
+  o["do"] = Any(1);
+  o["re"] = Any(2);
   AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
-  uo_anymap_move_assign = std::move(o_anymap_move_ctor);
+  uo_anymap_move_assign = std::move(o);
   ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
-  ASSERT_DEATH(o_anymap_move_ctor.size(), ".*")
+  ASSERT_DEATH(o.size(), ".*")
     << "This call should result in a crash because the object has been moved from";
+
 }

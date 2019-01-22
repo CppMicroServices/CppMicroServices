@@ -74,5 +74,5 @@
    },
    "bundle.activator" : true,
    "bundle.symbolic_name" : "TestBundleWithDeepManifest",
-   "bundle.vendor" : "The MathWorks, Inc."
+   "bundle.vendor" : "The Company, Inc."
 }

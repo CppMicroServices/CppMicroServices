@@ -426,6 +426,9 @@ public:
    * This method continues to return Manifest header information while
    * this bundle is in the \c UNINSTALLED state.
    *
+   * \note The lifetime of the returned reference is bound to the lifetime of 
+   * this \c Bundle object.
+   *
    * @return A map containing this bundle's Manifest headers and values.
    *
    * @see Constants#BUNDLE_LOCALIZATION

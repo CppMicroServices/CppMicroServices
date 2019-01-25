@@ -161,7 +161,7 @@ std::map<std::string, Any> Bundle::GetProperties() const
   return d->bundleManifest.GetPropertiesDeprecated();
 }
 
-AnyMap Bundle::GetHeaders() const
+const AnyMap& Bundle::GetHeaders() const
 {
   return d->GetHeaders();
 }

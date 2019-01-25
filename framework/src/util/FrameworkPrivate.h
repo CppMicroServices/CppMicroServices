@@ -56,13 +56,13 @@ public:
 
   void Shutdown(bool restart);
 
-  virtual void Start(uint32_t);
-  virtual void Stop(uint32_t);
+  void Start(uint32_t) override;
+  void Stop(uint32_t) override;
 
-  virtual void Uninstall();
-  virtual std::string GetLocation() const;
+  void Uninstall() override;
+  std::string GetLocation() const override;
 
-  virtual AnyMap GetHeaders() const;
+  const AnyMap& GetHeaders() const override;
 
   /**
    * Stop this FrameworkContext, suspending all started contexts. This method
@@ -116,6 +116,8 @@ public:
    * The thread that performs shutdown of this framework instance.
    */
   std::thread shutdownThread;
+private:
+  AnyMap headers;
 };
 }
 

@@ -168,7 +168,7 @@ using WaitConditionType = WaitCondition<MutexHost>;
 
   virtual void Start(uint32_t options);
 
-  virtual AnyMap GetHeaders() const;
+  virtual const AnyMap& GetHeaders() const;
 
   /**
    * Start code that is executed in the bundleThread without holding the

@@ -41,6 +41,7 @@ add_subdirectory(libRWithResources)
 add_subdirectory(libRWithAppendedResources)
 add_subdirectory(libRWithLinkedResources)
 
+add_subdirectory(libWithDeepManifest)
 add_subdirectory(libWithNonStandardExt)
 
 if(US_ENABLE_THREADING_SUPPORT)

@@ -59,6 +59,14 @@ void TestUnicodeProperty(BundleContext bc)
 #endif
 }
 
+void TestInstallBundlesWithDeepManifest(BundleContext bc)
+{
+  auto bundle = testing::InstallLib(bc, "TestBundleWithDeepManifest");
+  auto headers = bundle.GetHeaders();
+  US_TEST_CONDITION(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString() ==
+                      "TestBundleWithDeepManifest", "Bundle name")
+}
+
 int BundleManifestTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("BundleManifestTest");
@@ -118,6 +126,7 @@ int BundleManifestTest(int /*argc*/, char* /*argv*/ [])
                              "map 2 value size")
 
   TestUnicodeProperty(framework.GetBundleContext());
+  TestInstallBundlesWithDeepManifest(framework.GetBundleContext());
 
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds(0));

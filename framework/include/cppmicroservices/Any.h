@@ -364,7 +364,11 @@ private:
   class Holder : public Placeholder
   {
   public:
-    Holder(ValueType  value)
+    Holder(const ValueType& value)
+      : _held(value)
+    {}
+
+    Holder(ValueType&&  value)
       : _held(std::move(value))
     {}
 

@@ -104,7 +104,6 @@ public:
 
   BundleElfFile(std::ifstream& fs, std::size_t fileSize, const std::string& fileName)
     : m_rawData()
-    , m_mappedZipData()
   {
     if (fileSize < sizeof(Ehdr)) {
       throw InvalidElfException("Missing ELF header");
@@ -147,8 +146,7 @@ public:
           if (0 < zipContentSize) {
             off_t pa_offset = (sectionHeaders[i].sh_offset) & ~(sysconf(_SC_PAGESIZE) - 1);
             size_t mappedLength = zipContentSize + (sectionHeaders[i].sh_offset) - pa_offset;
-            m_mappedZipData = std::make_unique<MappedFile>(fileName, mappedLength, pa_offset);
-            m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
+            m_rawData = std::make_shared<RawBundleResources>(std::make_unique<MappedFile>(fileName, mappedLength, pa_offset));
             break;
           }
         }
@@ -160,7 +158,6 @@ public:
 
 private:
   std::shared_ptr<RawBundleResources> m_rawData;
-  std::unique_ptr<MappedFile> m_mappedZipData;
 };
 
 std::unique_ptr<BundleObjFile> CreateBundleElfFile(const std::string& fileName)

@@ -23,6 +23,7 @@
 #if defined (US_PLATFORM_APPLE)
 
 #include "BundleObjFile.h"
+#include "DataContainer.h"
 #include "MappedFile.h"
 
 #include "cppmicroservices_mach-o.h"
@@ -86,7 +87,6 @@ public:
 
   BundleMachOFile(std::ifstream& fs, std::size_t fileOffset, const std::string& location)
     : m_rawData()
-    , m_mappedZipData()
   {
     fs.seekg(fileOffset);
     Mhdr mhdr;
@@ -105,12 +105,10 @@ public:
     for (uint32_t i = 0; i < ncmds; ++i) {
       load_command lcmd;
       fs.read(reinterpret_cast<char*>(&lcmd), sizeof lcmd);
-      if (!m_rawData && !m_mappedZipData && LC_SEGMENT_64 == lcmd.cmd) {
-        m_mappedZipData = MapBundleContainer<segment_command_64, section_64>(fs, location, fileOffset, lcmd_offset);
-        m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
-      } else if (!m_rawData && !m_mappedZipData && LC_SEGMENT == lcmd.cmd) {
-        m_mappedZipData = MapBundleContainer<segment_command, section>(fs, location, fileOffset, lcmd_offset);
-        m_rawData = std::make_shared<RawBundleResources>(m_mappedZipData->GetMappedAddress(), m_mappedZipData->GetSize());
+      if (!m_rawData && LC_SEGMENT_64 == lcmd.cmd) {
+        m_rawData = GetRawBundleResources<segment_command_64, section_64>(fs, location, fileOffset, lcmd_offset);
+      } else if (!m_rawData && LC_SEGMENT == lcmd.cmd) {
+        m_rawData = GetRawBundleResources<segment_command, section>(fs, location, fileOffset, lcmd_offset);
       }
 
       lcmd_offset += lcmd.cmdsize;
@@ -119,7 +117,7 @@ public:
   }
 
   template<typename SegmentCommand, typename Section>
-  std::unique_ptr<MappedFile> MapBundleContainer(std::ifstream& fs, const std::string& filePath, std::size_t fileOffset, uint32_t lcmd_offset)
+  std::shared_ptr<RawBundleResources> GetRawBundleResources(std::ifstream& fs, const std::string& filePath, std::size_t fileOffset, uint32_t lcmd_offset)
   {
     fs.seekg(fileOffset + lcmd_offset);
     SegmentCommand segment;
@@ -131,21 +129,34 @@ public:
          fs.read(reinterpret_cast<char*>(&section), sizeof(Section));
          if (0 == strcmp("us_resources", section.sectname) &&
              0 < section.size) {
-           off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
-           size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
-           return std::make_unique<MappedFile>(filePath, mappedLength, pa_offset);
+           // try to be smart about when to use mmap. Benchmark tests show
+           // that mmap is slower than std::ifstream::read until the file size is around 10mb.
+           constexpr std::size_t zipFileSizeThreshold{10485760};
+           if(section.size >= zipFileSizeThreshold) {
+             off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
+             size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
+             return std::make_shared<RawBundleResources>(std::make_unique<MappedFile>(filePath, mappedLength, pa_offset));
+           } else {
+             void* zipData = malloc(section.size * sizeof(char));
+             if (zipData) {
+               std::unique_ptr<void, void(*)(void*)> scopedData(zipData, ::free);
+               fs.seekg(fileOffset + section.offset);
+               fs.read(reinterpret_cast<char*>(zipData), section.size);
+               return std::make_shared<RawBundleResources>( std::make_unique<RawDataContainer>(std::move(scopedData), section.size) );
+             }
+           }
+           
          }
          fs.seekg(lcmd_offset + sizeof(SegmentCommand) + ((i+1)*sizeof(Section)));
        }
     }
-    return std::make_unique<MappedFile>();
+    return {};
   }
 
   std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override { return m_rawData; }
 
 private:
   std::shared_ptr<RawBundleResources> m_rawData;
-  std::unique_ptr<MappedFile> m_mappedZipData;
 };
 
 static std::vector<std::vector<uint32_t>> GetMachOIdents(std::ifstream& is)

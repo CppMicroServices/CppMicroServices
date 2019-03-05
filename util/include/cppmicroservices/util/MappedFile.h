@@ -25,6 +25,8 @@
 #ifndef CPPMICROSERVICES_MAPPEDFILE_H
 #define CPPMICROSERVICES_MAPPEDFILE_H
 
+#include "DataContainer.h"
+
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -32,7 +34,7 @@
 
 namespace cppmicroservices {
 
-class MappedFile
+class MappedFile : public DataContainer
 {
 public:
   MappedFile()
@@ -66,9 +68,10 @@ public:
 
   MappedFile(const MappedFile&) = delete;
   MappedFile& operator=(const MappedFile&) = delete;
-    
-  size_t GetSize() const { return mapSize; }
-  void* GetMappedAddress() const { return mappedAddress; }
+  
+  void* GetData() const override { return mappedAddress; }
+  std::size_t GetSize() const override { return mapSize; }
+
 private:
   int fileDesc;
   void* mappedAddress;

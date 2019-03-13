@@ -53,7 +53,7 @@ struct hModuleDeleter
 
 // A DataContainer which scopes the lifetimes of the
 // Windows DLL and the data within it together.
-class ResDataContainer : public DataContainer
+class ResDataContainer final : public DataContainer
 {
 public:
   ResDataContainer(std::unique_ptr<HMODULE, hModuleDeleter> moduleHandle,
@@ -64,9 +64,6 @@ public:
     , m_DataSize(dataSize)
   {}
   ~ResDataContainer() = default;
-
-  ResDataContainer(const ResDataContainer&) = delete;
-  ResDataContainer& operator=(const ResDataContainer&) = delete;
 
   void* GetData() const override { return m_Data; }
   std::size_t GetSize() const override { return m_DataSize; }

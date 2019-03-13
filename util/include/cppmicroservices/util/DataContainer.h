@@ -38,11 +38,15 @@ class DataContainer
 {
 public:
   virtual ~DataContainer() = default;
+  DataContainer(DataContainer&&) = default;
+  DataContainer& operator=(DataContainer&&) = default;
   virtual void* GetData() const = 0;
   virtual std::size_t GetSize() const = 0;
+protected:
+  DataContainer() = default;
 };
 
-class RawDataContainer : public DataContainer
+class RawDataContainer final : public DataContainer
 {
 public:
   RawDataContainer(std::unique_ptr<void, void(*)(void*)> data, std::size_t dataSize)
@@ -50,9 +54,6 @@ public:
     , m_DataSize(dataSize)
     { }
   ~RawDataContainer() = default;
-  
-  RawDataContainer(const RawDataContainer&) = delete;
-  RawDataContainer& operator=(const RawDataContainer&) = delete;
     
   void* GetData() const override { return m_Data.get(); }
   std::size_t GetSize() const override { return m_DataSize; }

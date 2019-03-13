@@ -34,7 +34,7 @@
 
 namespace cppmicroservices {
 
-class MappedFile : public DataContainer
+class MappedFile final : public DataContainer
 {
 public:
   MappedFile()
@@ -65,9 +65,6 @@ public:
       close(fileDesc);
     }
   }
-
-  MappedFile(const MappedFile&) = delete;
-  MappedFile& operator=(const MappedFile&) = delete;
   
   void* GetData() const override { return mappedAddress; }
   std::size_t GetSize() const override { return mapSize; }

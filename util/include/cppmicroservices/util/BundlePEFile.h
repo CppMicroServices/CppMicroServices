@@ -23,6 +23,7 @@
 #if defined (US_PLATFORM_WINDOWS)
 
 #include "BundleObjFile.h"
+#include "DataContainer.h"
 #include "Error.h"
 #include "cppmicroservices_pe.h"
 
@@ -50,6 +51,29 @@ struct hModuleDeleter
   }
 };
 
+// A DataContainer which scopes the lifetimes of the
+// Windows DLL and the data within it together.
+class ResDataContainer final : public DataContainer
+{
+public:
+  ResDataContainer(std::unique_ptr<HMODULE, hModuleDeleter> moduleHandle,
+                   LPVOID data,
+                   DWORD dataSize)
+    : m_ModuleHandle(std::move(moduleHandle))
+    , m_Data(data)
+    , m_DataSize(dataSize)
+  {}
+  ~ResDataContainer() = default;
+
+  void* GetData() const override { return m_Data; }
+  std::size_t GetSize() const override { return m_DataSize; }
+
+private:
+  std::unique_ptr<HMODULE, hModuleDeleter> m_ModuleHandle;
+  LPVOID m_Data;
+  DWORD m_DataSize;
+};
+
 struct InvalidPEException : public InvalidObjFileException
 {
   InvalidPEException(std::string what, int errorNumber = 0)
@@ -61,19 +85,18 @@ class BundlePEFile : public BundleObjFile
 {
 public:
   BundlePEFile(std::string location)
-    : m_LoadLibraryHandle(nullptr)
-    , m_rawData(nullptr)
+    : m_rawData(nullptr)
   {
     HMODULE hBundleResources = LoadLibraryEx(location.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
     if (hBundleResources) {
       // RAII - automatically free the library handle on object destruction
-      m_LoadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter{});
+      auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter{});
       HRSRC hResource = FindResource(hBundleResources, "US_RESOURCES", MAKEINTRESOURCE(300));
       HGLOBAL hRes = LoadResource(hBundleResources, hResource);
       const LPVOID res = LockResource(hRes);
       const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
       if (0 < zipSizeInBytes) {
-        m_rawData = std::make_shared<RawBundleResources>(res, zipSizeInBytes);
+        m_rawData = std::make_shared<RawBundleResources>(std::make_unique<ResDataContainer>(std::move(loadLibraryHandle), res, zipSizeInBytes));
       }
     }
     else {
@@ -88,7 +111,6 @@ public:
   }
 
 private:
-  std::unique_ptr<HMODULE, hModuleDeleter> m_LoadLibraryHandle;
   std::shared_ptr<RawBundleResources> m_rawData;
 };
 

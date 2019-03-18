@@ -20,12 +20,10 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEOBJFILE_H
-#define CPPMICROSERVICES_BUNDLEOBJFILE_H
+#ifndef CPPMICROSERVICES_DATACONTAINER_H
+#define CPPMICROSERVICES_DATACONTAINER_H
 
 #include "cppmicroservices/GlobalConfig.h"
-
-#include "DataContainer.h"
 
 #include <cstring>
 #include <memory>
@@ -34,47 +32,37 @@
 
 namespace cppmicroservices {
 
-struct InvalidObjFileException : public std::exception
-{
-  ~InvalidObjFileException() throw() {}
-  InvalidObjFileException(std::string  what, int errorNumber = 0);
-
-  virtual const char* what() const throw();
-private:
-  std::string m_What;
-};
-
-// Represents the raw bundle resource data.
-// The data buffer contains the bits representing a zip file.
-// The data size is the zip file's size in bytes.
-class RawBundleResources
+// A generic abstract base class to store
+// and retrieve raw data bytes
+class DataContainer
 {
 public:
-  RawBundleResources(std::unique_ptr<DataContainer> data)
+  virtual ~DataContainer() = default;
+  DataContainer(DataContainer&&) = default;
+  DataContainer& operator=(DataContainer&&) = default;
+  virtual void* GetData() const = 0;
+  virtual std::size_t GetSize() const = 0;
+protected:
+  DataContainer() = default;
+};
+
+class RawDataContainer final : public DataContainer
+{
+public:
+  RawDataContainer(std::unique_ptr<void, void(*)(void*)> data, std::size_t dataSize)
     : m_Data(std::move(data))
-  { }
-
-  operator bool() const
-  {
-    return m_Data && m_Data->GetData() && (m_Data->GetSize() > 0);
-  }
-
-  void* GetData() const { return m_Data->GetData(); }
-  std::size_t GetSize() const { return m_Data->GetSize(); }
+    , m_DataSize(dataSize)
+    { }
+  ~RawDataContainer() = default;
     
+  void* GetData() const override { return m_Data.get(); }
+  std::size_t GetSize() const override { return m_DataSize; }
+  
 private:
-  std::unique_ptr<DataContainer> m_Data;
+  std::unique_ptr<void, void(*)(void*)> m_Data;
+  std::size_t m_DataSize;
 };
 
-class BundleObjFile
-{
-public:
-
-  virtual ~BundleObjFile() {}
-
-  /// Return the raw bundle resource container bits.
-  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const = 0;
-};
 
 }
 

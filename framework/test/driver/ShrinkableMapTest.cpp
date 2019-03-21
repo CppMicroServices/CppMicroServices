@@ -35,7 +35,7 @@ class ServiceHooks
 
 public:
   template<class K, class V>
-  static ShrinkableMap<K, V> MakeMap(std::map<K, V>& m)
+  static ShrinkableMap<K, V> MakeMap(std::unordered_map<K, V>& m)
   {
     return ShrinkableMap<K, V>(m);
   }

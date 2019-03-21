@@ -158,13 +158,13 @@ void ServiceHooks::FilterServiceEventReceivers(
                         eventListenerHooks);
   if (!eventListenerHooks.empty()) {
     std::sort(eventListenerHooks.begin(), eventListenerHooks.end());
-    std::map<BundleContext, std::vector<ServiceListenerHook::ListenerInfo>>
+    std::unordered_map<BundleContext, std::vector<ServiceListenerHook::ListenerInfo>>
       listeners;
     for (auto& sle : receivers) {
       listeners[sle.GetBundleContext()].push_back(sle);
     }
 
-    std::map<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>
+    std::unordered_map<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>
       shrinkableListeners;
     for (auto& l : listeners) {
       shrinkableListeners.insert(std::make_pair(

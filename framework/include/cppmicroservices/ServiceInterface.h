@@ -26,7 +26,7 @@
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceException.h"
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -77,7 +77,7 @@ class ServiceFactory;
  *
  * @see MakeInterfaceMap
  */
-using InterfaceMap = std::map<std::string, std::shared_ptr<void>>;
+using InterfaceMap = std::unordered_map<std::string, std::shared_ptr<void>>;
 using InterfaceMapPtr = std::shared_ptr<InterfaceMap>;
 using InterfaceMapConstPtr = std::shared_ptr<const InterfaceMap>;
 

@@ -590,6 +590,7 @@ configure_file(
   )
 
 add_subdirectory(tools/rc)
+add_subdirectory(tools/jsonschemavalidator)
 
 export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)

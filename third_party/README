@@ -138,3 +138,10 @@ Patches
 
  * Suppress CMake warning about policy CMP0048
  * Suppress tr1 namespace deprecation warnings
+
+ RapidJSON
+ ---------
+
+ MIT License
+
+ https://github.com/Tencent/rapidjson/tree/version1.1.0

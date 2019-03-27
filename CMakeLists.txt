@@ -308,11 +308,7 @@ if(US_BUILD_TESTING)
     find_package(GTest REQUIRED)
   else()
     # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
-
-    # Workaround an apparent bug in GCC 4.6 with C++11 variadic templates. Don't build gmock for any platform
-    # for now (we don't use it yet anyway). See https://groups.google.com/forum/#!topic/googlemock/XvPDUENM5JM
-    # for details.
-    us_cache_var(BUILD_GMOCK OFF BOOL "Build GMock" ADVANCED FORCE)
+    us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
     us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
 
     us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
@@ -332,6 +328,7 @@ if(US_BUILD_TESTING)
     endif()
 
     set(GTEST_BOTH_LIBRARIES gtest gtest_main)
+    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
 
     # Prevent GTest from installing libraries into our install dir.
     set(GTEST_NO_INSTALL 1)

@@ -38,13 +38,4 @@ doc/src/examples/makefile/main
 *.pbxproj
 *.DS_Store
 *.pyc
-third_party/googletest
-!third_party/googletest/CMakeLists.txt
-!third_party/googletest/README.md
-!third_party/googletest/googletest/LICENSE
-!third_party/googletest/googletest/README.md
-!third_party/googletest/googletest/CMakeLists.txt
-!third_party/googletest/googletest/cmake
-!third_party/googletest/googletest/include
-!third_party/googletest/googletest/src
 /build*

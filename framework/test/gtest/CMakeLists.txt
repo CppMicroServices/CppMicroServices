@@ -6,6 +6,7 @@ set(us_gtest_test_exe_name usFrameworkTests)
 
 include_directories(
   ${GTEST_INCLUDE_DIRS}
+  ${GMOCK_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
   )
 
@@ -53,6 +54,7 @@ set_property(TARGET ${us_gtest_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 target_include_directories(${us_gtest_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})
 
 # Needed for clock_gettime with glibc < 2.17

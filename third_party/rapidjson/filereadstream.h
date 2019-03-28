@@ -41,8 +41,8 @@ public:
         \param buffer user-supplied buffer.
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
-  FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(nullptr), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
-    RAPIDJSON_ASSERT(fp_ != nullptr);
+    FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
+        RAPIDJSON_ASSERT(fp_ != 0);
         RAPIDJSON_ASSERT(bufferSize >= 4);
         Read();
     }
@@ -54,12 +54,12 @@ public:
     // Not implemented
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); } 
-  Ch* PutBegin() { RAPIDJSON_ASSERT(false); return nullptr; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
     // For encoding detection only.
     const Ch* Peek4() const {
-      return (current_ + 4 <= bufferLast_) ? current_ : nullptr;
+        return (current_ + 4 - !eof_ <= bufferLast_) ? current_ : 0;
     }
 
 private:
@@ -68,7 +68,7 @@ private:
             ++current_;
         else if (!eof_) {
             count_ += readCount_;
-            readCount_ = fread(buffer_, 1, bufferSize_, fp_);
+            readCount_ = std::fread(buffer_, 1, bufferSize_, fp_);
             bufferLast_ = buffer_ + readCount_ - 1;
             current_ = buffer_;
 

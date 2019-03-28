@@ -1,3 +1,25 @@
+/*=============================================================================
+
+Library: CppMicroServices
+
+Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+file at the top-level directory of this distribution and at
+https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=============================================================================*/
+
 #include "optionparser.h"
 #include "rapidjson/error/en.h"
 #include "rapidjson/filereadstream.h"
@@ -8,76 +30,97 @@
 
 using namespace rapidjson;
 
+// functor object for deleting FILE objects
+struct FILEDeleter
+{
+  typedef FILE* pointer;
+  void operator()(FILE *pFile)
+  {
+    if (pFile)
+      fclose(pFile);
+  }
+};
+
+/**
+ * \brief Utility function to create a rapidjson::Document object from a file path
+ *
+ * \jsonfile is the file path of the json data
+ *
+ * \returns rapidjson::Document object representing the json file
+ * \throws std::runtime_error if the input file is non-existent or is not a valid json file
+ */
+Document ReadJSONDocument(const std::string& filePath)
+{
+  std::unique_ptr<FILE, FILEDeleter> fp(fopen(filePath.c_str(), "r"));
+  if (!fp)
+  {
+    std::string err("File '" + filePath + "' not found");
+    throw std::runtime_error(err);
+  }
+  char buffer[4096];
+  FileReadStream fs(fp.get(), buffer, sizeof(buffer));
+  Document doc;
+  doc.ParseStream(fs);
+  if(doc.HasParseError())
+  {
+    throw std::runtime_error("File '" + filePath + "' is not a valid JSON\n Error(offset " + std::to_string(doc.GetErrorOffset()) + "): " + GetParseError_En(doc.GetParseError()));
+  }
+  return doc;
+}
+
 /**
  * \brief Function to validate json file against a schema file
  *
- * \schema is the file path of the schema file
+ * \schemafile is the file path of the schema
  * \jsonfile is the file path of the json data
+ *
+ * \returns std::pair<bool, std::string>. The first element of the pair is true
+ *          if the json file matches the schema, error otherwise. In case of
+ *          error, the second element contains the error report
  */
-int validate(std::string schemafile, std::string jsonfile)
+std::pair<bool, std::string> validate(const std::string& jsonfile, const std::string& schemafile) noexcept
 {
-  // Read a JSON schema from file into Document
-  Document d;
-  char buffer[4096];
-
+  try
   {
-    FILE *fp = fopen(schemafile.c_str(), "r");
-    if (!fp) {
-      std::cerr << "Schema file '" << schemafile << "' not found" << std::endl;
-      return EXIT_FAILURE;
+    SchemaDocument sd(ReadJSONDocument(schemafile));
+    SchemaValidator validator(sd);
+    Document json = ReadJSONDocument(jsonfile);
+    if (!json.Accept(validator))
+    {
+      std::string errorMsg("JSON file " + jsonfile + " does not match schema file " + schemafile);
+      StringBuffer sb;
+      PrettyWriter<StringBuffer> w(sb);
+      validator.GetError().Accept(w);
+      errorMsg.append("\nError report:\n");
+      errorMsg.append(sb.GetString());
+      throw std::runtime_error(errorMsg);
     }
-    FileReadStream fs(fp, buffer, sizeof(buffer));
-    if (d.ParseStream(fs).HasParseError()) {
-      std::cerr << "Schema file '" << schemafile << "' is not a valid JSON" << std::endl;
-      std::cerr << "Error(offset " << static_cast<unsigned>(d.GetErrorOffset()) << "): " << GetParseError_En(d.GetParseError()) << std::endl;
-      fclose(fp);
-      return EXIT_FAILURE;
-    }
-    fclose(fp);
   }
-
-  // Then convert the Document into SchemaDocument
-  SchemaDocument sd(d);
-  SchemaValidator validator(sd);
-  Document json;
+  catch(std::exception& e)
   {
-    FILE *fp = fopen(jsonfile.c_str(), "r");
-    if (!fp) {
-      std::cout << "Data file '" << jsonfile << "' not found" << std::endl;
-      return EXIT_FAILURE;
-    }
-    FileReadStream is(fp, buffer, sizeof(buffer));
-    if (json.ParseStream(is).HasParseError()) {
-      // the input is not a valid JSON.
-      std::cerr << "Input data file " << jsonfile << " is not a valid JSON file" << std::endl;
-      std::cerr <<"Error(offset " << static_cast<unsigned>(json.GetErrorOffset()) << "): " << GetParseError_En(json.GetParseError()) << std::endl;
-      fclose(fp);
-      return EXIT_FAILURE;
-    }
-    fclose(fp);
+    return std::make_pair(false, e.what());
   }
-
-  if (!json.Accept(validator)) {
-    std::cout << "JSON file " << jsonfile << " does not match schema file " << schemafile << std::endl;
-    StringBuffer sb;
-    PrettyWriter<StringBuffer> w(sb);
-    validator.GetError().Accept(w);
-    std::cerr << "Error report:" << std::endl << sb.GetString() << std::endl;
-    return EXIT_FAILURE;
-  }
-  return EXIT_SUCCESS;
+  return std::make_pair(true, "JSON file" + jsonfile + " matches the schema " + schemafile);
 }
 
+/**
+ * Subclass of option::Arg used to validate input options for the program
+ */
 struct Custom_Arg : public option::Arg
 {
+  /**
+   * This callback is used to error out if the option is empty
+   */
   static option::ArgStatus NonEmpty(const option::Option& option, bool msg)
   {
     auto retVal = option::ARG_OK;
-    if (option.arg == 0 || option.arg[0] == 0) {
-      if (msg) {
+    if (option.arg == 0 || option.arg[0] == 0)
+    {
+      retVal = option::ARG_ILLEGAL;
+      if (msg)
+      {
         std::cerr << "ERROR: Option '" << option.name << "' requires a non-empty argument" << std::endl;
       }
-      retVal = option::ARG_ILLEGAL;
     }
     return retVal;
   }
@@ -120,32 +163,38 @@ const option::Descriptor usage[] = {
   { 0, 0, 0, 0, 0, 0 }
 };
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   argc -= (argc > 0);
-  argv += (argc > 0); // skip program name argv[0]
+  argv += (argc > 0); // skip program name in argv[0]
   option::Stats stats(usage, argc, argv);
-  std::unique_ptr<option::Option[]> options(
-                                            new option::Option[stats.options_max]);
-  std::unique_ptr<option::Option[]> buffer(
-                                           new option::Option[stats.buffer_max]);
-  option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
-
-  if (argc == 0 || options[HELP]) {
+  option::Option options[stats.options_max], buffer[stats.buffer_max];
+  option::Parser parse(true, usage, argc, argv, options, buffer);
+  auto retVal = EXIT_SUCCESS;
+  if (argc == 0 || options[HELP])
+  {
     option::printUsage(std::clog, usage);
-    return EXIT_SUCCESS;
   }
-
-  if (!options[SCHEMAFILE]) {
-    std::cerr << "A schema file must be specified using the --schema-file option. Check usage." << std::endl;
-    return EXIT_FAILURE;
+  else if (!options[SCHEMAFILE])
+  {
+    std::cerr << "A schema file must be specified using the --schema-file(-s) option. Check usage." << std::endl;
+    retVal = EXIT_FAILURE;
   }
-
-  if (!options[JSONFILE]) {
-    std::cerr << "A json file must be specified using the --json-file option. Check usage." << std::endl;
-    return EXIT_FAILURE;
+  else if (!options[JSONFILE])
+  {
+    std::cerr << "A json file must be specified using the --json-file(-j) option. Check usage." << std::endl;
+    retVal = EXIT_FAILURE;
   }
-
-  std::string jsonfilepath(options[JSONFILE].arg);
-  std::string schemafilepath(options[SCHEMAFILE].arg);
-  return validate(schemafilepath, jsonfilepath);
+  else
+  {
+    std::string jsonfilepath(options[JSONFILE].arg);
+    std::string schemafilepath(options[SCHEMAFILE].arg);
+    auto result = validate(jsonfilepath, schemafilepath);
+    if(!result.first)
+    {
+      std::cerr << result.second << std::endl;
+      retVal = EXIT_FAILURE;
+    }
+  }
+  return retVal;
 }

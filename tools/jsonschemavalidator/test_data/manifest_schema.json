@@ -31,7 +31,7 @@
           "examples": [
             "com_mycompany_bundle"
           ],
-          "pattern": "^([a-zA-Z0-9_]*)$"
+          "pattern": "^([a-zA-Z0-9_]+)$"
         },
         "version": {
           "$id": "#/properties/bundle/properties/version",

@@ -1,4 +1,7 @@
-
+.. image:: https://badges.gitter.im/cpposgi/community.svg
+   :alt: Join the chat at https://gitter.im/cpposgi/community
+   :target: https://gitter.im/cpposgi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+   
 .. rubric:: Continuous Integration Status
 
 +-------------+-------------------------+--------------------------+------------------------+
@@ -199,8 +202,3 @@ file for details about the contribution process.
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
 .. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development
-
-
-.. image:: https://badges.gitter.im/cpposgi/community.svg
-   :alt: Join the chat at https://gitter.im/cpposgi/community
-   :target: https://gitter.im/cpposgi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

@@ -85,14 +85,14 @@ endif()
 set(US_LIBRARIES )
 set(US_RUNTIME_LIBRARY_DIRS )
 
-# Components support
-set(US_BUNDLES Framework HttpService WebConsole ShellService) # ConfigAdmin EventAdmin ...
-
 set(US_CORE_BUNDLE Framework)
 set(US_HTTP_SERVICE_BUNDLE HttpService)
 set(US_WEB_SERVICE_BUNDLE WebService)
 set(US_WEB_CONSOLE_SERVICE_BUNDLE WebConsole)
 set(US_SHELL_SERVICE_BUNDLE ShellService)
+
+# Components support
+set(US_BUNDLES ${US_CORE_BUNDLE} ${US_HTTP_SERVICE_BUNDLE} ${US_WEB_SERVICE_BUNDLE} ${US_WEB_CONSOLE_SERVICE_BUNDLE}) # ConfigAdmin EventAdmin ...
 
 set(US_${US_HTTP_SERVICE_BUNDLE}_BUNDLE_DEPS ${US_CORE_BUNDLE})
 set(US_${US_WEB_CONSOLE_SERVICE_BUNDLE}_BUNDLE_DEPS ${US_CORE_BUNDLE} ${US_HTTP_SERVICE_BUNDLE})

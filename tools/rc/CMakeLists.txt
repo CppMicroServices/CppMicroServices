@@ -17,6 +17,10 @@ set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} APPEND PROPERTY
              COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_READING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES")
 
 if(NOT US_NO_INSTALL)
+    # ================================================================================
+    # EXPORTING FROM AN INSTALLATION TREE
+    # To understand in great details the concepts behind this command please refer to:
+    # https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/Exporting-and-Importing-Targets#exporting-from-an-installation-tree
     install(TARGETS ${US_RCC_EXECUTABLE_TARGET}
             EXPORT ${PROJECT_NAME}Targets
             FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
@@ -33,5 +37,10 @@ else()
   # when exporting.
   # Doing this allows the host built usResourceCompiler to be used when cross-compiling and allows
   # the usResourceCompiler to be built and installed for the target machine.
+  #
+  # ================================================================================
+  # EXPORTING FROM A BUILD TREE
+  # To understand in great details the concepts behind this command please refer to:
+  # https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/Exporting-and-Importing-Targets#exporting-from-a-build-tree
   export( TARGETS ${US_RCC_EXECUTABLE_TARGET} FILE ${IMPORT_EXECUTABLES} NAMESPACE native-)
 endif()

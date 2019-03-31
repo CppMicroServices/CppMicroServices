@@ -1,0 +1,12 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "usResourceCompiler4.exe (Install) (tools\\usResourceCompiler4.exe)",
+      "name": "usResourceCompiler4.exe (Install) (tools\\usResourceCompiler4.exe)"
+    }
+  ]
+}

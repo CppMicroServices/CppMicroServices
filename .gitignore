@@ -48,3 +48,5 @@ third_party/googletest
 !third_party/googletest/googletest/include
 !third_party/googletest/googletest/src
 /build*
+.vs
+.vscode

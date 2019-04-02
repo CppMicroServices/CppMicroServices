@@ -7,9 +7,6 @@ set(srcs main.cpp)
 
 add_executable(jsonschemavalidator ${srcs})
 set_property(TARGET jsonschemavalidator PROPERTY OUTPUT_NAME jsonschemavalidator)
-if(WIN32)
-    target_link_libraries(jsonschemavalidator Shlwapi)
-endif()
 
 if(NOT US_NO_INSTALL)
     install(TARGETS jsonschemavalidator
@@ -47,7 +44,7 @@ add_test(NAME NegativeTest_Schema_Validator_Manifest_With_Invalid_Version
          COMMAND $<TARGET_FILE:jsonschemavalidator> -s ${CMAKE_CURRENT_SOURCE_DIR}/test_data/manifest_schema.json -j ${CMAKE_CURRENT_SOURCE_DIR}/test_data/manifest_invalid_version.json
          WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Expect these tests to fail 
+# Expect negative tests to fail 
 set_tests_properties(NegativeTest_Schema_Validator_InvalidPaths 
                      NegativeTest_Schema_Validator_No_Data_Arg
                      NegativeTest_Schema_Validator_No_Schema_Arg

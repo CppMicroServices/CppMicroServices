@@ -545,9 +545,16 @@ public:
    * associated with this <code>reference</code> has been unregistered.
    *
    * <p>
+   * The <code>ServiceObjects</code> object must be used to obtain multiple service
+   * objects for services with prototype scope. For services with singleton or bundle
+   * scope, the ServiceObjects::GetService() method behaves the same as the
+   * GetService(const ServiceReference<S>&) method. That is, only one,
+   * use-counted service object is available from the ServiceObjects object.
+   *
+   * <p>
    * The following steps are taken to get the service object:
    * <ol>
-   * <li>If the service has been unregistered, empty object is returned.
+   * <li>If the service has been unregistered, an empty object is returned.
    * <li>The context bundle's use count for this service is incremented by
    * one.
    * <li>If the context bundle's use count for the service is currently one
@@ -572,6 +579,7 @@ public:
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
    * @see ServiceFactory
+   * @see ServiceObjects
    */
   std::shared_ptr<void> GetService(const ServiceReferenceBase& reference);
 
@@ -608,9 +616,7 @@ public:
    * ServiceReference object. The ServiceObjects object can be used to obtain
    * multiple service objects for services with prototype scope. For services with
    * singleton or bundle scope, the ServiceObjects::GetService() method behaves
-   * the same as the GetService(const ServiceReference<S>&) method and the
-   * ServiceObjects::UngetService(const ServiceReferenceBase&) method behaves the
-   * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
+   * the same as the GetService(const ServiceReference<S>&) method. That is, only one,
    * use-counted service object is available from the ServiceObjects object.
    *
    * @tparam S Type of Service.

@@ -26,6 +26,7 @@ limitations under the License.
 #include "rapidjson/schema.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
+#include <memory>
 #include <iostream>
 
 using namespace rapidjson;

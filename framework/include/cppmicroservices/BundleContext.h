@@ -545,12 +545,10 @@ public:
    * associated with this <code>reference</code> has been unregistered.
    *
    * <p>
-   * The <code>ServiceObjects</code> object must be used to obtain multiple service objects for
-   * services with prototype scope. For services with singleton or bundle scope,
-   * the ServiceObjects::GetService() method behaves the same as the
-   * GetService(const ServiceReference<S>&) method and the 
-   * ServiceObjects::UngetService(const ServiceReferenceBase&) method behaves the
-   * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
+   * The <code>ServiceObjects</code> object must be used to obtain multiple service
+   * objects for services with prototype scope. For services with singleton or bundle
+   * scope, the ServiceObjects::GetService() method behaves the same as the
+   * GetService(const ServiceReference<S>&) method. That is, only one,
    * use-counted service object is available from the ServiceObjects object.
    *
    * <p>
@@ -618,9 +616,7 @@ public:
    * ServiceReference object. The ServiceObjects object can be used to obtain
    * multiple service objects for services with prototype scope. For services with
    * singleton or bundle scope, the ServiceObjects::GetService() method behaves
-   * the same as the GetService(const ServiceReference<S>&) method and the
-   * ServiceObjects::UngetService(const ServiceReferenceBase&) method behaves the
-   * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
+   * the same as the GetService(const ServiceReference<S>&) method. That is, only one,
    * use-counted service object is available from the ServiceObjects object.
    *
    * @tparam S Type of Service.

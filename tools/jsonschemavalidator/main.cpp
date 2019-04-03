@@ -28,6 +28,7 @@ limitations under the License.
 #include "rapidjson/prettywriter.h"
 #include <memory>
 #include <iostream>
+#include <string>
 
 using namespace rapidjson;
 
@@ -169,8 +170,10 @@ int main(int argc, char *argv[])
   argc -= (argc > 0);
   argv += (argc > 0); // skip program name in argv[0]
   option::Stats stats(usage, argc, argv);
-  option::Option options[stats.options_max], buffer[stats.buffer_max];
-  option::Parser parse(true, usage, argc, argv, options, buffer);
+  std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
+  std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
+  option::Parser parse(true, usage, argc, argv, options.get(), buffer.get());
+
   auto retVal = EXIT_SUCCESS;
   if (argc == 0 || options[HELP])
   {

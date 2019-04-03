@@ -23,6 +23,7 @@ limitations under the License.
 #include <fstream>   // std::ifstream
 #include <iostream>  // std::cerr
 #include <memory>    // std::unique_ptr
+#include <sstream>   // std::sstream
 #include <stdexcept> // std::runtime_error
 #include <string>    // std::to_string
 
@@ -77,14 +78,15 @@ std::pair<bool, std::string> validate(const std::string& jsonfile,
     rapidjson::SchemaValidator validator(sd);
     rapidjson::Document json = ReadJSONDocument(jsonfile);
     if (!json.Accept(validator)) {
-      std::string errorMsg("JSON file " + jsonfile +
-                           " does not match schema file " + schemafile);
       rapidjson::StringBuffer sb;
       rapidjson::PrettyWriter<rapidjson::StringBuffer> w(sb);
       validator.GetError().Accept(w);
-      errorMsg.append("\nError report:\n");
-      errorMsg.append(sb.GetString());
-      throw std::runtime_error(errorMsg);
+      std::stringstream errStream;
+      errStream << "JSON file " << jsonfile << " does not match schema file "
+                << schemafile << std::endl;
+      errStream << "Error report:" << std::endl;
+      errStream << sb.GetString() << std::endl;
+      throw std::runtime_error(errStream.str());
     }
   } catch (const std::exception& e) {
     return std::make_pair(false, e.what());
@@ -154,8 +156,10 @@ const option::Descriptor usage[] = {
 
 int main(int argc, char* argv[])
 {
-  argc -= (argc > 0);
-  argv += (argc > 0); // skip program name in argv[0]
+  if (argc > 0) {
+    --argc;
+    ++argv; // skip program name in argv[0]
+  }
   option::Stats stats(usage, argc, argv);
   std::unique_ptr<option::Option[]> options(
     new option::Option[stats.options_max]);

@@ -122,9 +122,10 @@ TEST_F(ServiceFactoryTest, TestGetServiceThrows)
 {
   auto context = framework.GetBundleContext();
   auto sf = std::make_shared<MockFactory>();
+  std::string exceptionMsg("Exception in user code");
   EXPECT_CALL(*sf, GetService(testing::_, testing::_))
     .Times(1)
-    .WillRepeatedly(testing::Throw(std::runtime_error("Some exception")));
+    .WillRepeatedly(testing::Throw(std::runtime_error(exceptionMsg)));
   EXPECT_CALL(*sf, UngetService(testing::_, testing::_, testing::_)).Times(0);
 
   ServiceRegistration<ITestServiceA> reg1 =
@@ -135,8 +136,14 @@ TEST_F(ServiceFactoryTest, TestGetServiceThrows)
   auto sref = context.GetServiceReference<ITestServiceA>();
   ASSERT_TRUE(static_cast<bool>(sref));
   auto lToken = context.AddFrameworkListener(
-    [](const cppmicroservices::FrameworkEvent& evt) {
+    [&exceptionMsg](const cppmicroservices::FrameworkEvent& evt) {
       ASSERT_EQ(evt.GetType(), FrameworkEvent::FRAMEWORK_ERROR);
+      ASSERT_NE(evt.GetThrowable(), nullptr);
+      EXPECT_NO_THROW(try {
+        std::rethrow_exception(evt.GetThrowable());
+      } catch (const std::runtime_error& err) {
+        ASSERT_STREQ(err.what(), exceptionMsg.c_str());
+      });
     });
   ASSERT_EQ(context.GetService<ITestServiceA>(sref), nullptr);
   context.RemoveListener(std::move(lToken));

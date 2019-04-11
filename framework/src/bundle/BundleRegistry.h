@@ -25,7 +25,7 @@
 
 #include "cppmicroservices/detail/Threads.h"
 
-#include <unordered_map>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -138,7 +138,7 @@ private:
 
   CoreBundleContext* coreCtx;
 
-using BundleMap = std::unordered_multimap<std::string, std::shared_ptr<BundlePrivate>>;
+using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 
   /**
    * Table of all installed bundles in this framework.

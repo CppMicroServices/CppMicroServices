@@ -1089,8 +1089,6 @@ private:
   friend class detail::TrackedService;
   friend class BundleResource;
   friend class BundleResourceContainer;
-  template<class T>
-  friend struct std::hash;
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code
@@ -1109,15 +1107,5 @@ private:
 };
 
 } // namespace cppmicroservices
-
-namespace std {
-  template <> struct hash<cppmicroservices::BundleContext>
-  {
-    size_t operator()(const cppmicroservices::BundleContext& ctxt) const
-    {
-      return hash<std::shared_ptr<cppmicroservices::BundleContextPrivate>>()(ctxt.d);
-    }
-  };
-}
 
 #endif /* CPPMICROSERVICES_BUNDLECONTEXT_H */

@@ -25,7 +25,7 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 
-#include <unordered_map>
+#include <map>
 
 namespace cppmicroservices {
 
@@ -39,10 +39,10 @@ template<class Key, class T>
 class ShrinkableMap
 {
 private:
-  static std::unordered_map<Key, T> emptyContainer;
+  static std::map<Key, T> emptyContainer;
 
 public:
-  using  container_type = std::unordered_map<Key, T>;
+  using  container_type = std::map<Key, T>;
   using iterator = typename container_type::iterator;
   using const_iterator = typename container_type::const_iterator;
   using size_type = typename container_type::size_type;
@@ -134,7 +134,7 @@ private:
 };
 
 template<class Key, class T>
-std::unordered_map<Key, T> ShrinkableMap<Key, T>::emptyContainer;
+std::map<Key, T> ShrinkableMap<Key, T>::emptyContainer;
 }
 
 #endif // CPPMICROSERVICES_SHRINKABLEMAP_H

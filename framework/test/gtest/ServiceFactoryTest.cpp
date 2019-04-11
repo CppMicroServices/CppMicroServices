@@ -89,7 +89,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceReturnsIncompleteMap)
   EXPECT_CALL(*sf, GetService(testing::_, testing::_))
     .Times(2)
     .WillRepeatedly(testing::Invoke(
-      [](const Bundle& bundle, const ServiceRegistrationBase& reg) {
+      [](const Bundle& /*bundle*/, const ServiceRegistrationBase& /*reg*/) {
         std::shared_ptr<ITestServiceA> implPtr =
           std::make_shared<TestServiceAImpl>();
         return MakeInterfaceMap<ITestServiceA>(implPtr);
@@ -102,7 +102,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceReturnsIncompleteMap)
       { { Constants::SERVICE_SCOPE, Any(Constants::SCOPE_PROTOTYPE) } });
 
   auto sref1 = context.GetServiceReference<ITestServiceA>();
-  ASSERT_TRUE((bool)sref1);
+  ASSERT_TRUE(static_cast<bool>(sref1));
   FrameworkEvent lastEvent;
   auto lToken = context.AddFrameworkListener(
     [](const cppmicroservices::FrameworkEvent& evt) {
@@ -110,7 +110,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceReturnsIncompleteMap)
     });
   ASSERT_EQ(context.GetService<ITestServiceA>(sref1), nullptr);
   auto sref2 = context.GetServiceReference<ITestServiceB>();
-  ASSERT_TRUE((bool)sref2);
+  ASSERT_TRUE(static_cast<bool>(sref2));
   ASSERT_EQ(context.GetService<ITestServiceB>(sref2), nullptr);
   context.RemoveListener(std::move(lToken));
 }
@@ -133,7 +133,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceThrows)
       { { Constants::SERVICE_SCOPE, Any(Constants::SCOPE_PROTOTYPE) } });
 
   auto sref = context.GetServiceReference<ITestServiceA>();
-  ASSERT_TRUE((bool)sref);
+  ASSERT_TRUE(static_cast<bool>(sref));
   auto lToken = context.AddFrameworkListener(
     [](const cppmicroservices::FrameworkEvent& evt) {
       ASSERT_EQ(evt.GetType(), FrameworkEvent::FRAMEWORK_ERROR);
@@ -159,7 +159,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceReturnsNull)
       { { Constants::SERVICE_SCOPE, Any(Constants::SCOPE_PROTOTYPE) } });
 
   auto sref = context.GetServiceReference<ITestServiceA>();
-  ASSERT_TRUE((bool)sref);
+  ASSERT_TRUE(static_cast<bool>(sref));
   auto lToken = context.AddFrameworkListener(
     [](const cppmicroservices::FrameworkEvent& evt) {
       ASSERT_EQ(evt.GetType(), FrameworkEvent::FRAMEWORK_WARNING);

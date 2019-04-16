@@ -26,11 +26,15 @@
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceException.h"
 
-#include <unordered_map>
 #include <memory>
 #include <string>
 #include <tuple>
 #include <typeinfo>
+#if defined(_MSC_VER) && (_MSC_VER < 1910) // Pre Visual Studio 2017
+#  include <map>
+#else
+#  include <unordered_map>
+#endif
 #include <utility>
 
 /**
@@ -77,7 +81,11 @@ class ServiceFactory;
  *
  * @see MakeInterfaceMap
  */
+#if defined(_MSC_VER) && (_MSC_VER < 1910) // Pre Visual Studio 2017
+using InterfaceMap = std::map<std::string, std::shared_ptr<void>>;
+#else
 using InterfaceMap = std::unordered_map<std::string, std::shared_ptr<void>>;
+#endif
 using InterfaceMapPtr = std::shared_ptr<InterfaceMap>;
 using InterfaceMapConstPtr = std::shared_ptr<const InterfaceMap>;
 
@@ -256,7 +264,7 @@ public:
    *
    * @param factory A service factory.
    */
-  MakeInterfaceMap(std::shared_ptr<ServiceFactory>  factory)
+  MakeInterfaceMap(std::shared_ptr<ServiceFactory> factory)
     : m_factory(std::move(factory))
   {
     if (!m_factory) {
@@ -308,8 +316,7 @@ private:
 template<class Interface>
 std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
 {
-  auto iter =
-    map->find(us_service_interface_iid<Interface>());
+  auto iter = map->find(us_service_interface_iid<Interface>());
   if (iter != map->end()) {
     return std::static_pointer_cast<Interface>(iter->second);
   }

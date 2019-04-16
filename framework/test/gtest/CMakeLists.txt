@@ -16,6 +16,7 @@ include_directories(
 set(_gtest_tests 
   AnyMapTest.cpp
   BundleVersionTest.cpp
+  InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp
   LDAPExprTest.cpp
   LDAPFilterTest.cpp
@@ -52,6 +53,13 @@ set_property(TARGET ${us_gtest_test_exe_name} APPEND PROPERTY COMPILE_DEFINITION
 set_property(TARGET ${us_gtest_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 
 target_include_directories(${us_gtest_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
+
+# Disable deprecation warnings.
+if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+  set_source_files_properties(${_gtest_tests} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
+endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})

@@ -39,6 +39,7 @@
 
 #include <chrono>
 #include <thread>
+#include <stdexcept>
 
 namespace cppmicroservices {
 
@@ -138,21 +139,33 @@ BundleContext Bundle::GetBundleContext() const
 
 long Bundle::GetBundleId() const
 {
+  if(!d)
+    throw std::invalid_argument("invalid bundle");
+
   return d->id;
 }
 
 std::string Bundle::GetLocation() const
 {
+  if(!d)
+    throw std::invalid_argument("invalid bundle");
+
   return d->GetLocation();
 }
 
 std::string Bundle::GetSymbolicName() const
 {
+  if(!d)
+    throw std::invalid_argument("invalid bundle");
+
   return d->symbolicName;
 }
 
 BundleVersion Bundle::GetVersion() const
 {
+  if(!d)
+    throw std::invalid_argument("invalid bundle");
+
   return d->version;
 }
 
@@ -163,6 +176,9 @@ std::map<std::string, Any> Bundle::GetProperties() const
 
 const AnyMap& Bundle::GetHeaders() const
 {
+  if(!d)
+    throw std::invalid_argument("invalid bundle");
+
   return d->GetHeaders();
 }
 

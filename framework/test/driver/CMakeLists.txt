@@ -41,7 +41,6 @@ set(_tests
   BundleActivatorTest
   BundleEventTest
   BundleHooksTest
-  BundleManifestTest
   BundleTest
   BundleResourceTest
   MemcheckTest

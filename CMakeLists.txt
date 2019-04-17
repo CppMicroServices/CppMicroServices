@@ -595,6 +595,8 @@ add_subdirectory(tools/jsonschemavalidator)
 export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
 
+include_directories(BEFORE ${CppMicroServices_BINARY_DIR}/include)
+
 add_subdirectory(util)
 add_subdirectory(framework)
 add_subdirectory(httpservice)

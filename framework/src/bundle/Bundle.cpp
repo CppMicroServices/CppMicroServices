@@ -40,6 +40,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <thread>
+#include <stdexcept>
 
 namespace cppmicroservices {
 

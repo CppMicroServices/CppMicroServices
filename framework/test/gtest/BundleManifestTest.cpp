@@ -103,7 +103,7 @@ TEST(BundleManifestTest, ParseManifest)
   Any anyVector = headers.at("vector");
   ASSERT_EQ(anyVector.Type(), typeid(std::vector<Any>));
   std::vector<Any>& vec = ref_any_cast<std::vector<Any>>(anyVector);
-  ASSERT_EQ(vec.size(), 3);
+  ASSERT_EQ(vec.size(), 3ul);
   ASSERT_EQ(vec[0].Type(), typeid(std::string));
   ASSERT_THAT(vec[0].ToString(), ::testing::StrEq("first"));
   ASSERT_EQ(vec[1].Type(), typeid(int));
@@ -112,13 +112,13 @@ TEST(BundleManifestTest, ParseManifest)
   Any anyMap = headers.at("map");
   ASSERT_EQ(anyMap.Type(), typeid(AnyMap));
   AnyMap& m = ref_any_cast<AnyMap>(anyMap);
-  ASSERT_EQ(m.size(), 3);
+  ASSERT_EQ(m.size(), 3ul);
   ASSERT_EQ(m["string"].Type(), typeid(std::string));
   ASSERT_THAT(m["string"].ToString(), ::testing::StrEq("hi"));
   ASSERT_EQ(m["number"].Type(), typeid(int));
   ASSERT_EQ(any_cast<int>(m["number"]), 4);
   ASSERT_EQ(m["list"].Type(), typeid(std::vector<Any>));
-  ASSERT_EQ(any_cast<std::vector<Any>>(m["list"]).size(), 2);
+  ASSERT_EQ(any_cast<std::vector<Any>>(m["list"]).size(), 2ul);
 
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());

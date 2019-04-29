@@ -15,6 +15,7 @@ include_directories(
 #-----------------------------------------------------------------------------
 set(_gtest_tests 
   AnyMapTest.cpp
+  BundleManifestTest.cpp
   BundleVersionTest.cpp
   InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp

@@ -263,17 +263,17 @@ set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEP
 function(us_add_tests test_driver)
   foreach(test ${ARGN})
     add_test(NAME ${test} COMMAND ${test_driver} ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST ${test} PROPERTY LABELS regular)
   if(US_MEMCHECK_COMMAND)
     add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST memcheck_${test} PROPERTY LABELS valgrind memcheck)
     if(US_ENABLE_HELGRIND)
       # By default, these tests are not active until the concurrent bundle
       # start / stop mechanism has been properly implemented (GitHub Issue #25)
       add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
@@ -282,7 +282,7 @@ function(us_add_tests test_driver)
     file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
     # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
     add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU.dll -- $<TARGET_FILE:${test_driver}> ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()
   endforeach()
@@ -291,7 +291,7 @@ endfunction()
 # Valgrind rc file
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/valgrindrc
-  ${CMAKE_BINARY_DIR}/.valgrindrc
+  ${CppMicroServices_BINARY_DIR}/.valgrindrc
   @ONLY
   )
 

@@ -12,7 +12,7 @@ if(NOT US_NO_INSTALL)
     install(TARGETS jsonschemavalidator
             EXPORT ${PROJECT_NAME}Targets
             FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
-            RUNTIME DESTINATION bin ${US_SDK_INSTALL_COMPONENT})
+            RUNTIME DESTINATION ${TOOLS_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 endif()
 
 # Add the tests

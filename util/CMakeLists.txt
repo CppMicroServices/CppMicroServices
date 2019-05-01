@@ -23,6 +23,6 @@ target_include_directories(util
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE
-    ${CMAKE_SOURCE_DIR}/third_party
-    ${CMAKE_BINARY_DIR}/include
+    ${PROJECT_SOURCE_DIR}/third_party
+    ${PROJECT_BINARY_DIR}/include
 )

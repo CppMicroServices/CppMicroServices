@@ -340,6 +340,11 @@ if(US_BUILD_TESTING)
     # static library even if CppMicroServices is a shared library.
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
+
+    set(BENCHMARK_ENABLE_INSTALL OFF)
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    add_subdirectory(third_party/benchmark)
+
     set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
   endif()
 endif()

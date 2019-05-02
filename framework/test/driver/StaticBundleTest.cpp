@@ -67,13 +67,11 @@ void frame020a(BundleContext context, TestBundleListener& listener)
     US_TEST_CONDITION_REQUIRED(refs.size() == 2,
                                "Test that both the service from the shared and "
                                "imported library are regsitered");
-
-    auto o1 = context.GetService(refs.front());
-    US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
-
-    auto o2 = context.GetService(refs.back());
-    US_TEST_CONDITION(o2 && !o2->empty(),
-                      "Test if second service object found");
+    for(auto& sRef : refs)
+    {
+      auto o = context.GetService(sRef);
+      US_TEST_CONDITION(o && !o->empty(), "Test if service object found");
+    }
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
@@ -93,10 +91,10 @@ void frame020a(BundleContext context, TestBundleListener& listener)
       BundleEvent(BundleEvent::BUNDLE_STARTED, bundleImportedByB));
 
     std::vector<ServiceEvent> seEvts;
-    seEvts.push_back(
-      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
-    seEvts.push_back(
-      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
+    for(auto& sRef : refs)
+    {
+      seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_REGISTERED, sRef));
+    }
 
     bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS
@@ -124,8 +122,10 @@ void frame030b(BundleContext context, TestBundleListener& listener)
 
   std::vector<ServiceReferenceU> refs =
     context.GetServiceReferences("cppmicroservices::TestBundleBService");
-  US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
-  US_TEST_CONDITION(refs.back(), "Test for second valid service reference")
+  for(auto& sRef : refs)
+  {
+    US_TEST_CONDITION(sRef, "Test for valid service reference")
+  }
 
   try {
     bundleB.Stop();
@@ -150,10 +150,10 @@ void frame030b(BundleContext context, TestBundleListener& listener)
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPED, bundleImportedByB));
 
   std::vector<ServiceEvent> seEvts;
-  seEvts.push_back(
-    ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.back()));
-  seEvts.push_back(
-    ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.front()));
+  for(auto& sRef : refs)
+  {
+    seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, sRef));
+  }
 
   bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS

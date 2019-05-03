@@ -110,7 +110,6 @@ void TestServiceFactoryBundleScope(BundleContext context)
   US_TEST_CONDITION(sr1.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
                       Constants::SCOPE_BUNDLE,
                     "service is bundle scope");
-  std::cout << "Retrieved service is " << sr1 << std::endl;
 
   InterfaceMapConstPtr service = context.GetService(sr1);
   US_TEST_CONDITION_REQUIRED(service && service->size() >= 1,
@@ -489,7 +488,7 @@ int ServiceFactoryTest(int /*argc*/, char* /*argv*/ [])
   TestServiceFactoryBundleScopeErrorConditions();
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-  //TestConcurrentServiceFactory();
+  TestConcurrentServiceFactory();
 #endif
 
   US_TEST_END()

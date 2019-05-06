@@ -310,8 +310,7 @@ void ServiceListeners::RemoveAllListeners(
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    for (auto it = serviceSet.begin();
-         it != serviceSet.end();) {
+    for (auto it = serviceSet.begin(); it != serviceSet.end();) {
 
       if (GetPrivate(it->GetBundleContext()) == context) {
         RemoveFromCache_unlocked(*it);
@@ -399,7 +398,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
   // Get a copy of the service reference and keep it until we are
   // done with its properties.
   auto ref = evt.GetServiceReference();
-  auto props = ref.d.load()->GetProperties();
+  auto props = ref.GetPrivate()->GetProperties();
 
   {
     auto l = this->Lock();

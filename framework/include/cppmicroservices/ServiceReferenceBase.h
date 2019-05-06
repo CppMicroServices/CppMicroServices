@@ -234,9 +234,9 @@ private:
 
   void SetInterfaceId(const std::string& interfaceId);
 
-  // This class is not thread-safe, but we support thread-safe
-  // copying and assignment.
-  std::atomic<ServiceReferenceBasePrivate*> d;
+  std::shared_ptr<ServiceReferenceBasePrivate> privateRef;
+  std::shared_ptr<ServiceReferenceBasePrivate> GetPrivate() const;
+  void SetPrivate(std::shared_ptr<ServiceReferenceBasePrivate> newRef);
 };
 
 /**

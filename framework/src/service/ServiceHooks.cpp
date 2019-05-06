@@ -128,7 +128,7 @@ void ServiceHooks::FilterServiceReferences(
          ++fhrIter) {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
       auto fh = std::static_pointer_cast<ServiceFindHook>(
-        sr.d.load()->GetService(GetPrivate(selfBundle).get()));
+        sr.GetPrivate()->GetService(GetPrivate(selfBundle).get()));
       if (fh) {
         try {
           fh->Find(MakeBundleContext(context->shared_from_this()),
@@ -183,7 +183,7 @@ void ServiceHooks::FilterServiceEventReceivers(
          ++sriIter) {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
       auto elh = std::static_pointer_cast<ServiceEventListenerHook>(
-        sr.d.load()->GetService(GetPrivate(selfBundle).get()));
+        sr.GetPrivate()->GetService(GetPrivate(selfBundle).get()));
       if (elh) {
         try {
           elh->Event(evt, filtered);

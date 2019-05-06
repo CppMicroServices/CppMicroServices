@@ -39,13 +39,15 @@ US_MSVC_DISABLE_WARNING(
 
 namespace cppmicroservices {
 
-using ThreadMarksMapType = std::unordered_map<BundlePrivate*,
-                           std::unordered_set<ServiceRegistrationBasePrivate*>>;
+using ThreadMarksMapType =
+  std::unordered_map<BundlePrivate*,
+                     std::unordered_set<ServiceRegistrationBasePrivate*>>;
 
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(
-  ServiceRegistrationBasePrivate* reg)
-  : ref(1)
-  , registration(reg)
+  ServiceRegistrationBasePrivate* reg,
+  std::string interfaceId)
+  : registration(reg)
+  , interfaceId(interfaceId)
 {
   if (registration)
     ++registration->ref;
@@ -269,7 +271,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
   if (!sf)
     return false;
 
-  for (auto & prototypeServiceMap : prototypeServiceMaps) {
+  for (auto& prototypeServiceMap : prototypeServiceMaps) {
     // compare the contents of the map
     if (*service.get() == *prototypeServiceMap.get()) {
       try {

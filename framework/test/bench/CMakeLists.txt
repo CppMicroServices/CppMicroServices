@@ -13,7 +13,7 @@ include_directories(
 # Add test source files
 #-----------------------------------------------------------------------------
 set(_bench_src 
-  BenchTest.cpp
+  ServiceRegistryTest.cpp
 )
 
 

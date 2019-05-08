@@ -411,10 +411,11 @@ public:
    *         key/value pairs.
    *
    * @throws std::invalid_argument if this bundle is not initialized.
-   * 
-   * @deprecated Since 3.0, use GetHeaders() instead.
    *
    * \rststar
+   * .. deprecated:: 3.0
+   *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` instead.
+   *
    * .. seealso::
    *
    *    :any:`concept-bundle-properties`
@@ -468,7 +469,6 @@ public:
    *
    * .. seealso::
    *
-   *    | :any:`cppmicroservices::Bundle::GetPropertyKeys`
    *    | :any:`concept-bundle-properties`
    * \endrststar
    */
@@ -481,10 +481,11 @@ public:
    *
    * @throws std::invalid_argument if this bundle is not initialized.
    * 
-   * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperties()
-   * instead.
    *
    * \rststar
+   * .. deprecated:: 3.0
+   *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` instead.
+   *
    * .. seealso::
    *
    *    :any:`concept-bundle-properties`

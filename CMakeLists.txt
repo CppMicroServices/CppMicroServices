@@ -296,56 +296,6 @@ configure_file(
   @ONLY
   )
 
-if(US_BUILD_TESTING)
-  enable_testing()
-  find_program(US_MEMCHECK_COMMAND valgrind)
-  mark_as_advanced(US_MEMCHECK_COMMAND)
-  if(WIN32 AND US_ENABLE_COVERAGE)
-    find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
-    mark_as_advanced(US_COVERAGE_COMMAND)
-  endif()
-
-  if(US_USE_SYSTEM_GTEST)
-    find_package(GTest REQUIRED)
-  else()
-    # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
-    us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
-    us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
-
-    us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
-    us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
-    us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
-
-    # Prevent overriding the parent project's compiler/linker
-    # settings on Windows
-    us_cache_var(gtest_force_shared_crt ON BOOL "" ADVANCED FORCE)
-
-    us_cache_var(gtest_hide_internal_symbols OFF BOOL "" ADVANCED)
-
-    # pthreads on MinGW is not supported, turn it off. Refer to
-    # https://github.com/google/googletest/pull/721/files for details.
-    if(MINGW)
-     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
-    endif()
-
-    set(GTEST_BOTH_LIBRARIES gtest gtest_main)
-    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
-
-    # Prevent GTest from installing libraries into our install dir.
-    set(GTEST_NO_INSTALL 1)
-
-    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
-    # static library even if CppMicroServices is a shared library.
-    set(_us_build_shared ${BUILD_SHARED_LIBS})
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    add_subdirectory(third_party/googletest)
-
-    set(BENCHMARK_ENABLE_INSTALL OFF)
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    add_subdirectory(third_party/benchmark)
-
-    set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
-  endif()
 endif()
 
 
@@ -569,6 +519,60 @@ test_big_endian(US_BIG_ENDIAN)
 
 if(NOT US_BIG_ENDIAN)
   set(US_LITTLE_ENDIAN 1)
+endif()
+
+#-----------------------------------------------------------------------------
+# Testing
+#-----------------------------------------------------------------------------
+if(US_BUILD_TESTING)
+  enable_testing()
+  find_program(US_MEMCHECK_COMMAND valgrind)
+  mark_as_advanced(US_MEMCHECK_COMMAND)
+  if(WIN32 AND US_ENABLE_COVERAGE)
+    find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
+    mark_as_advanced(US_COVERAGE_COMMAND)
+  endif()
+
+  if(US_USE_SYSTEM_GTEST)
+    find_package(GTest REQUIRED)
+  else()
+    # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
+    us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
+    us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
+
+    us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
+    us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
+    us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
+
+    # Prevent overriding the parent project's compiler/linker
+    # settings on Windows
+    us_cache_var(gtest_force_shared_crt ON BOOL "" ADVANCED FORCE)
+
+    us_cache_var(gtest_hide_internal_symbols OFF BOOL "" ADVANCED)
+
+    # pthreads on MinGW is not supported, turn it off. Refer to
+    # https://github.com/google/googletest/pull/721/files for details.
+    if(MINGW)
+     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+    endif()
+
+    set(GTEST_BOTH_LIBRARIES gtest gtest_main)
+    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
+
+    # Prevent GTest from installing libraries into our install dir.
+    set(GTEST_NO_INSTALL 1)
+
+    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
+    # static library even if CppMicroServices is a shared library.
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    add_subdirectory(third_party/googletest)
+
+    set(BENCHMARK_ENABLE_INSTALL OFF)
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    add_subdirectory(third_party/benchmark)
+
+    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

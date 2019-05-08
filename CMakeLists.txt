@@ -473,6 +473,10 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   endforeach()
 endif()
 
+if(US_COMPILER_CLANG AND NOT APPLE)
+  set(US_LINK_FLAGS "${US_LINK_FLAGS} -lc++abi")
+endif()
+
 if(NOT MSVC)
   if (US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_TSAN_LINK_FLAGS "-fsanitize=thread")

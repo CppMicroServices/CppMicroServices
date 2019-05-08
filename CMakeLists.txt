@@ -369,7 +369,7 @@ if(MSVC)
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
 
-  if(US_COMPILER_APPLE_CLANG)
+  if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
   endif()
 

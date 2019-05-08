@@ -94,9 +94,9 @@ void frame020a(BundleContext context, TestBundleListener& listener)
 
     std::vector<ServiceEvent> seEvts;
     seEvts.push_back(
-      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
+                     ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
     seEvts.push_back(
-      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
+                     ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
 
     bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS
@@ -151,9 +151,9 @@ void frame030b(BundleContext context, TestBundleListener& listener)
 
   std::vector<ServiceEvent> seEvts;
   seEvts.push_back(
-    ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.back()));
+                   ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.back()));
   seEvts.push_back(
-    ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.front()));
+                   ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.front()));
 
   bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS

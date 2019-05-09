@@ -27,6 +27,11 @@
 
 #include <fstream>
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4275)
+#endif
+
 namespace cppmicroservices {
 
 class BundleResource;
@@ -64,5 +69,9 @@ public:
                        std::ios_base::openmode mode = std::ios_base::in);
 };
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #endif // CPPMICROSERVICES_BUNDLERESOURCESTREAM_H

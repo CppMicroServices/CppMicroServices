@@ -33,6 +33,7 @@ limitations under the License.
 #ifndef US_PLATFORM_WINDOWS
 #  include <sys/time.h> // gettimeofday etc.
 #else
+#  include "cppmicroservices/util/String.h" // for utf8 conversion
 #  include <direct.h>
 #  include <io.h>
 #endif
@@ -184,7 +185,7 @@ std::string GetTempDirectory()
     temp_dir = wcharPath;
   }
 
-  return std::string(temp_dir.cbegin(), temp_dir.cend());
+  return util::ToUTF8String(temp_dir);
 #else
   char* tempdir = getenv("TMPDIR");
   return std::string(((tempdir == nullptr) ? "/tmp" : tempdir));

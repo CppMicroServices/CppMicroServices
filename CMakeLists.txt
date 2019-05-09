@@ -350,7 +350,7 @@ else()
   # symbols (unless explicitly overriden). See
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
   # to understand what -fvisibility-ms-compat does.
-  if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
+  if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)

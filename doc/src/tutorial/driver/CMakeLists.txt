@@ -12,7 +12,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}DriverConfig.h.in
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-if(NOT US_BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS)
   # Using static bundles requires that they be linked into an EXE or shared library and that
   # any resources inside the static bundles are merged into that EXE or shared library.
 

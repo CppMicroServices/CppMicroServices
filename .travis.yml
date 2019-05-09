@@ -95,7 +95,7 @@ addons:
       name: CppMicroServices/CppMicroServices
       description: "Build submitted via Travis CI"
     notification_email: sascha.zelzer@gmail.com
-    build_command_prepend: "mkdir us-cov; cd us-cov; cmake -DCMAKE_BUILD_TYPE:STRING=Release -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_BUILD_TESTING:BOOL=ON -DUS_BUILD_SHARED_LIBS:BOOL=ON ../"
+    build_command_prepend: "mkdir us-cov; cd us-cov; cmake -DCMAKE_BUILD_TYPE:STRING=Release -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON ../"
     build_command:   "make -j 4"
     branch_pattern: coverity_scan
 

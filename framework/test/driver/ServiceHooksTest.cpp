@@ -25,6 +25,7 @@
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/LDAPProp.h"
@@ -38,6 +39,9 @@
 #include "TestingMacros.h"
 
 #include <unordered_set>
+
+// conflicts with FrameworkEvent::GetMessage
+#undef GetMessage
 
 using namespace cppmicroservices;
 
@@ -54,6 +58,17 @@ public:
   std::vector<ServiceEvent> events;
 };
 
+class TestFrameworkListener
+{
+public:
+  void Event(const FrameworkEvent& frameworkEvent)
+  {
+    events.push_back(frameworkEvent);
+  }
+
+  std::vector<FrameworkEvent> events;
+};
+
 class TestServiceEventListenerHook : public ServiceEventListenerHook
 {
 private:
@@ -66,8 +81,9 @@ public:
     , bundleCtx(context)
   {}
 
-  using MapType = ShrinkableMap<BundleContext,
-                        ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
+  using MapType =
+    ShrinkableMap<BundleContext,
+                  ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
   void Event(const ServiceEvent& /*event*/, MapType& listeners)
   {
@@ -138,6 +154,20 @@ public:
   static std::vector<int> ordering;
 };
 
+class TestServiceEventListenerHookFailure : public ServiceEventListenerHook
+{
+public:
+  using MapType =
+    ShrinkableMap<BundleContext,
+                  ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
+
+  void Event(const ServiceEvent&, MapType&)
+  {
+    throw std::runtime_error(
+      "TestServiceEventListenerHookFailure Event exception");
+  }
+};
+
 std::vector<int> TestServiceEventListenerHook::ordering;
 
 class TestServiceFindHook : public ServiceFindHook
@@ -167,6 +197,19 @@ public:
 };
 
 std::vector<int> TestServiceFindHook::ordering;
+
+// Test failure modes for FindHook
+class TestServiceFindHookFailure : public ServiceFindHook
+{
+public:
+  void Find(const BundleContext&,
+            const std::string&,
+            const std::string&,
+            ShrinkableVector<ServiceReferenceBase>&)
+  {
+    throw std::runtime_error("TestServiceFindHookFailure Find exception");
+  }
+};
 
 class TestServiceListenerHook : public ServiceListenerHook
 {
@@ -213,6 +256,21 @@ public:
 };
 
 std::vector<int> TestServiceListenerHook::ordering;
+
+class TestServiceListenerHookFailure : public ServiceListenerHook
+{
+public:
+  void Added(const std::vector<ListenerInfo>&)
+  {
+    throw std::runtime_error("TestServiceListenerHookFailure Added exception");
+  }
+
+  void Removed(const std::vector<ListenerInfo>&)
+  {
+    throw std::runtime_error(
+      "TestServiceListenerHookFailure Removed exception");
+  }
+};
 
 void TestEventListenerHook(const Framework& framework)
 {
@@ -436,6 +494,124 @@ void TestFindHook(const Framework& framework)
                                 &TestServiceListener::ServiceChanged);
 }
 
+void TestFindHookFailure(const Framework& framework)
+{
+  auto findHookReg =
+    framework.GetBundleContext().RegisterService<ServiceFindHook>(
+      std::make_shared<TestServiceFindHookFailure>());
+
+  auto bundle =
+    testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
+
+  TestFrameworkListener listener;
+  auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
+    std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
+
+  bundle.Start();
+
+  std::vector<ServiceReferenceU> refs =
+    framework.GetBundleContext().GetServiceReferences(
+      "cppmicroservices::TestBundleAService");
+
+  US_TEST_CONDITION_REQUIRED(1 == listener.events.size(),
+                             "Test for correct number of Framework events");
+
+  std::for_each(
+    listener.events.begin(),
+    listener.events.end(),
+    [](const FrameworkEvent& evt) {
+      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
+                                 "Test for the existence of an exception");
+      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
+                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                 "Test for the correct framework event type");
+      std::string msg(evt.GetMessage());
+      US_TEST_CONDITION_REQUIRED(std::string::npos !=
+                                   msg.find("Failed to call find hook #"),
+                                 "Test for the correct event message");
+    });
+
+  bundle.Stop();
+  findHookReg.Unregister();
+  framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
+}
+
+void TestEventListenerHookFailure(const Framework& framework)
+{
+  auto eventListenerHookReg =
+    framework.GetBundleContext().RegisterService<ServiceEventListenerHook>(
+      std::make_shared<TestServiceEventListenerHookFailure>());
+
+  auto bundle =
+    testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
+
+  TestFrameworkListener listener;
+  auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
+    std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
+
+  bundle.Start();
+
+  US_TEST_CONDITION_REQUIRED(1 == listener.events.size(),
+                             "Test for correct number of Framework events");
+
+  std::for_each(
+    listener.events.begin(),
+    listener.events.end(),
+    [](const FrameworkEvent& evt) {
+      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
+                                 "Test for the existence of an exception");
+      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
+                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                 "Test for the correct framework event type");
+      std::string msg(evt.GetMessage());
+      US_TEST_CONDITION_REQUIRED(std::string::npos !=
+                                   msg.find("Failed to call event hook  #"),
+                                 "Test for the correct event message");
+    });
+
+  bundle.Stop();
+  eventListenerHookReg.Unregister();
+  framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
+}
+
+void TestListenerHookFailure(const Framework& framework)
+{
+  auto listenerHookReg =
+    framework.GetBundleContext().RegisterService<ServiceListenerHook>(
+      std::make_shared<TestServiceListenerHookFailure>());
+
+  TestFrameworkListener listener;
+  auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
+    std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
+
+  auto listenerToken = framework.GetBundleContext().AddServiceListener([](const ServiceEvent&) { });
+
+  framework.GetBundleContext().RemoveListener(std::move(listenerToken));
+
+  US_TEST_CONDITION_REQUIRED(2 == listener.events.size(),
+                             "Test for correct number of Framework events");
+
+  std::for_each(
+    listener.events.begin(),
+    listener.events.end(),
+    [](const FrameworkEvent& evt) {
+      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
+                                 "Test for the existence of an exception");
+      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
+                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                 "Test for the correct framework event type");
+      std::string msg(evt.GetMessage());
+      US_TEST_CONDITION_REQUIRED(std::string::npos !=
+                                   msg.find("Failed to call listener hook #"),
+                                 "Test for the correct event message");
+    });
+
+  listenerHookReg.Unregister();
+  framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
+}
+
 } // end unnamed namespace
 
 int ServiceHooksTest(int /*argc*/, char* /*argv*/ [])
@@ -463,6 +639,12 @@ int ServiceHooksTest(int /*argc*/, char* /*argv*/ [])
   TestListenerHook(framework);
   TestFindHook(framework);
   TestEventListenerHook(framework);
+  TestFindHookFailure(framework);
+  TestEventListenerHookFailure(framework);
+  TestListenerHookFailure(framework);
+
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 
   US_TEST_END()
 }

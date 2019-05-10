@@ -33,7 +33,7 @@ configuration options at hand.
       In version 3.0 and 3.1 this option only supported the *ON* value.
       The *OFF* configuration is supported again in version 3.2 and later.
 
- - **US_BUILD_SHARED_LIBS** Specify if the library should be build
+ - **BUILD_SHARED_LIBS** Specify if the library should be build
    shared or static. See :any:`concept-static-bundles`
    for detailed information about static CppMicroServices bundles. 
  - **US_BUILD_TESTING** Build unit tests and code snippets.

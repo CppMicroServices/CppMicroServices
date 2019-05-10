@@ -125,7 +125,7 @@ endif()
 # link them if building static libraries
 #-----------------------------------------------------------------------------
 
-if(US_BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
     add_dependencies(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
     # Add resources
     usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}

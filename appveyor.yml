@@ -170,7 +170,7 @@ before_build:
 - if "%platform%"=="mingw-w64" set PATH=C:\msys64\mingw64\bin;%PATH%
 - if [%WITH_COVERAGE%]==[1] set PATH=%PATH%;C:\Program Files\OpenCppCoverage
 - echo %PATH%
-- cmake .. -G"%gen%" -DCMAKE_BUILD_TYPE=%configuration% -DUS_BUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_ENABLE_COVERAGE:BOOL=%WITH_COVERAGE% -DUS_BUILD_TESTING:BOOL=1 2>&1
+- cmake .. -G"%gen%" -DCMAKE_BUILD_TYPE=%configuration% -DBUILD_SHARED_LIBS:BOOL=%US_SHARED% -DUS_ENABLE_THREADING_SUPPORT:BOOL=%US_THREADED% -DUS_ENABLE_COVERAGE:BOOL=%WITH_COVERAGE% -DUS_BUILD_TESTING:BOOL=1 2>&1
 
 install:
 - if [%WITH_COVERAGE%]==[1] choco install opencppcoverage

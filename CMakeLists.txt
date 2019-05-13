@@ -31,7 +31,7 @@ endforeach()
 #------------------------------------------------------------------------------
 
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
@@ -257,6 +257,17 @@ endif()
 #
 set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEPATH "A file containing the CMake target definition for the host build version of usResourceCompiler.")
 
+# global options based on compiler
+if(NOT APPLE AND US_COMPILER_CLANG)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
+if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
 #-----------------------------------------------------------------------------
 # Testing configuration
 #-----------------------------------------------------------------------------
@@ -296,6 +307,57 @@ configure_file(
   @ONLY
   )
 
+if(US_BUILD_TESTING)
+enable_testing()
+find_program(US_MEMCHECK_COMMAND valgrind)
+mark_as_advanced(US_MEMCHECK_COMMAND)
+if(WIN32 AND US_ENABLE_COVERAGE)
+  find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
+  mark_as_advanced(US_COVERAGE_COMMAND)
+endif()
+
+if(US_USE_SYSTEM_GTEST)
+  find_package(GTest REQUIRED)
+else()
+  # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
+  us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
+  us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
+
+  us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
+  us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
+  us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
+
+  # Prevent overriding the parent project's compiler/linker
+  # settings on Windows
+  us_cache_var(gtest_force_shared_crt ON BOOL "" ADVANCED FORCE)
+
+  us_cache_var(gtest_hide_internal_symbols OFF BOOL "" ADVANCED)
+
+  # pthreads on MinGW is not supported, turn it off. Refer to
+  # https://github.com/google/googletest/pull/721/files for details.
+  if(MINGW)
+   set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+  endif()
+
+  set(GTEST_BOTH_LIBRARIES gtest gtest_main)
+  set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
+
+  # Prevent GTest from installing libraries into our install dir.
+  set(GTEST_NO_INSTALL 1)
+
+  # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
+  # static library even if CppMicroServices is a shared library.
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(third_party/googletest)
+
+  set(BENCHMARK_ENABLE_INSTALL OFF)
+  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+  add_subdirectory(third_party/benchmark)
+
+  set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+endif()
+endif()
+
 
 #-----------------------------------------------------------------------------
 # US C/CXX Flags
@@ -316,10 +378,6 @@ if(MSVC)
   endforeach()
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
-
-  if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
-  endif()
 
   # If not cross-compiling, turn on Stack Smashing Protection.
   # This is done in cases where libssp.so may not be available in the
@@ -388,11 +446,9 @@ if(MINGW)
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
-
-if(NOT MINGW)
-	set(THREADS_PREFER_PTHREAD_FLAG 1)
-endif()
-  
+  if(NOT MINGW)
+    set(THREADS_PREFER_PTHREAD_FLAG 1)
+  endif()
   find_package(Threads REQUIRED)
 
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
@@ -523,59 +579,7 @@ if(NOT US_BIG_ENDIAN)
   set(US_LITTLE_ENDIAN 1)
 endif()
 
-#-----------------------------------------------------------------------------
-# Testing
-#-----------------------------------------------------------------------------
-if(US_BUILD_TESTING)
-  enable_testing()
-  find_program(US_MEMCHECK_COMMAND valgrind)
-  mark_as_advanced(US_MEMCHECK_COMMAND)
-  if(WIN32 AND US_ENABLE_COVERAGE)
-    find_program(US_COVERAGE_COMMAND NAMES OpenCppCoverage OpenCppCoverage.exe DOC "path to the code coverage tool" HINTS "C:/Program Files/OpenCppCoverage" "C:/Program Files (x86)/OpenCppCoverage")
-    mark_as_advanced(US_COVERAGE_COMMAND)
-  endif()
 
-  if(US_USE_SYSTEM_GTEST)
-    find_package(GTest REQUIRED)
-  else()
-    # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
-    us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
-    us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
-
-    us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
-    us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
-    us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
-
-    # Prevent overriding the parent project's compiler/linker
-    # settings on Windows
-    us_cache_var(gtest_force_shared_crt ON BOOL "" ADVANCED FORCE)
-
-    us_cache_var(gtest_hide_internal_symbols OFF BOOL "" ADVANCED)
-
-    # pthreads on MinGW is not supported, turn it off. Refer to
-    # https://github.com/google/googletest/pull/721/files for details.
-    if(MINGW)
-     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
-    endif()
-
-    set(GTEST_BOTH_LIBRARIES gtest gtest_main)
-    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
-
-    # Prevent GTest from installing libraries into our install dir.
-    set(GTEST_NO_INSTALL 1)
-
-    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
-    # static library even if CppMicroServices is a shared library.
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    add_subdirectory(third_party/googletest)
-
-    set(BENCHMARK_ENABLE_INSTALL OFF)
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    add_subdirectory(third_party/benchmark)
-
-    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
-  endif()
-endif()
 
 #-----------------------------------------------------------------------------
 # Source directory

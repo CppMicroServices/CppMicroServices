@@ -103,11 +103,6 @@ public:
   bool IsConvertibleTo(const std::string& interfaceId) const;
 
   /**
-   * Reference count for implicitly shared private implementation.
-   */
-  //std::atomic<int> ref;
-
-  /**
    * Link to registration object for this reference.
    */
   ServiceRegistrationBasePrivate* const registration;

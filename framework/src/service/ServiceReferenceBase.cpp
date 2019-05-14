@@ -34,15 +34,15 @@
 namespace cppmicroservices {
 
 ServiceReferenceBase::ServiceReferenceBase()
-  : privateRef(new ServiceReferenceBasePrivate(nullptr))
+  : d(new ServiceReferenceBasePrivate(nullptr))
 {}
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
-  : privateRef(ref.GetPrivate())
+  : d(ref.GetPrivate())
 {}
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
-  : privateRef(new ServiceReferenceBasePrivate(reg))
+  : d(new ServiceReferenceBasePrivate(reg))
 {}
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
@@ -57,13 +57,13 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 std::shared_ptr<ServiceReferenceBasePrivate> ServiceReferenceBase::GetPrivate()
   const
 {
-  return std::atomic_load(&privateRef);
+  return std::atomic_load(&d);
 }
 
 void ServiceReferenceBase::SetPrivate(
   std::shared_ptr<ServiceReferenceBasePrivate> newRef)
 {
-  std::atomic_store(&privateRef, std::move(newRef));
+  std::atomic_store(&d, std::move(newRef));
 }
 
 ServiceReferenceBase::operator bool() const

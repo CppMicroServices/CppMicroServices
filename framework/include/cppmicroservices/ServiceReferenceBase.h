@@ -234,7 +234,7 @@ private:
 
   void SetInterfaceId(const std::string& interfaceId);
 
-  std::shared_ptr<ServiceReferenceBasePrivate> privateRef;
+  std::shared_ptr<ServiceReferenceBasePrivate> d;
   std::shared_ptr<ServiceReferenceBasePrivate> GetPrivate() const;
   void SetPrivate(std::shared_ptr<ServiceReferenceBasePrivate> newRef);
 };

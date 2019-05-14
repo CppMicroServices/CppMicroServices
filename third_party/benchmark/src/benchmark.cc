@@ -30,6 +30,7 @@
 #include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <memory>

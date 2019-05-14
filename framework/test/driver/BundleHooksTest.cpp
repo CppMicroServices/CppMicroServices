@@ -26,12 +26,16 @@
 #include "cppmicroservices/BundleEventHook.h"
 #include "cppmicroservices/BundleFindHook.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
+
+// conflicts with FrameworkEvent::GetMessage
+#undef GetMessage
 
 using namespace cppmicroservices;
 
@@ -46,6 +50,17 @@ public:
   }
 
   std::vector<BundleEvent> events;
+};
+
+class TestFrameworkListener
+{
+public:
+  void Event(const FrameworkEvent& frameworkEvent)
+  {
+    events.push_back(frameworkEvent);
+  }
+
+  std::vector<FrameworkEvent> events;
 };
 
 class TestBundleFindHook : public BundleFindHook
@@ -63,6 +78,15 @@ public:
   }
 };
 
+class TestBundleFindHookFailure : public BundleFindHook
+{
+public:
+  void Find(const BundleContext&, ShrinkableVector<Bundle>&)
+  {
+    throw std::runtime_error("TestBundleFindHookFailure Event exception");
+  }
+};
+
 class TestBundleEventHook : public BundleEventHook
 {
 public:
@@ -74,6 +98,16 @@ public:
       contexts
         .clear(); //erase(std::remove(contexts.begin(), contexts.end(), GetBundleContext()), contexts.end());
     }
+  }
+};
+
+class TestBundleEventHookFailure : public BundleEventHook
+{
+public:
+  void Event(const BundleEvent&,
+             ShrinkableVector<BundleContext>& )
+  {
+    throw std::runtime_error("TestBundleEventHookFailure Event exception");
   }
 };
 
@@ -124,15 +158,15 @@ void TestEventHook(const Framework& framework)
 
   auto bundleA =
     testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundleA, "Non-null bundle")
+  US_TEST_CONDITION_REQUIRED(bundleA, "Non-null bundle");
 
   bundleA.Start();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 2,
-                             "Test for received load bundle events")
+                             "Test for received load bundle events");
 
   bundleA.Stop();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 4,
-                             "Test for received unload bundle events")
+                             "Test for received unload bundle events");
 
   auto eventHookReg =
     framework.GetBundleContext().RegisterService<BundleEventHook>(
@@ -142,21 +176,100 @@ void TestEventHook(const Framework& framework)
 
   bundleA.Start();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 1,
-                             "Test for filtered load bundle events")
+                             "Test for filtered load bundle events");
   US_TEST_CONDITION_REQUIRED(bundleListener.events[0].GetType() ==
                                BundleEvent::BUNDLE_STARTED,
                              "Test for BUNDLE_STARTED event")
 
   bundleA.Stop();
   US_TEST_CONDITION_REQUIRED(bundleListener.events.size() == 2,
-                             "Test for filtered unload bundle events")
+                             "Test for filtered unload bundle events");
   US_TEST_CONDITION_REQUIRED(bundleListener.events[1].GetType() ==
                                BundleEvent::BUNDLE_STOPPED,
-                             "Test for BUNDLE_STOPPED event")
+                             "Test for BUNDLE_STOPPED event");
 
   eventHookReg.Unregister();
   framework.GetBundleContext().RemoveBundleListener(
     &bundleListener, &TestBundleListener::BundleChanged);
+}
+
+void TestEventHookFailure(const Framework& framework)
+{
+  auto bundleA =
+    testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundleA, "Non-null bundle");
+
+  auto eventHookReg =
+    framework.GetBundleContext().RegisterService<BundleEventHook>(
+      std::make_shared<TestBundleEventHookFailure>());
+
+  TestFrameworkListener listener;
+  auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
+    std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
+
+  bundleA.Start();
+
+  // bundle starting and bundle started events
+  US_TEST_CONDITION_REQUIRED(listener.events.size() == 2,
+                             "Test for expected number of framework events");
+
+  std::for_each(
+      listener.events.begin(),
+      listener.events.end(),
+      [](const FrameworkEvent& evt) {
+        US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
+                                    "Test for the existence of an exception");
+        US_TEST_CONDITION_REQUIRED(evt.GetType() ==
+                                    FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                    "Test for the correct framework event type");
+        std::string msg(evt.GetMessage());
+        US_TEST_CONDITION_REQUIRED(
+        std::string::npos != msg.find("Failed to call Bundle EventHook #"),
+        "Test for the correct event message");
+      });
+
+  bundleA.Stop();
+  eventHookReg.Unregister();
+  framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
+}
+
+void TestFindHookFailure(const Framework& framework)
+{
+  auto eventHookReg =
+    framework.GetBundleContext().RegisterService<BundleFindHook>(
+      std::make_shared<TestBundleFindHookFailure>());
+
+  TestFrameworkListener listener;
+  auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
+    std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
+
+  auto bundleA =
+    testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
+  US_TEST_CONDITION_REQUIRED(bundleA, "Non-null bundle");
+  bundleA.Start();
+
+  // bundle starting and bundle started events
+  US_TEST_CONDITION_REQUIRED(listener.events.size() == 1,
+                             "Test for expected number of framework events");
+
+  std::for_each(
+    listener.events.begin(),
+    listener.events.end(),
+    [](const FrameworkEvent& evt) {
+      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
+                                 "Test for the existence of an exception");
+      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
+                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                 "Test for the correct framework event type");
+      std::string msg(evt.GetMessage());
+      US_TEST_CONDITION_REQUIRED(
+        std::string::npos != msg.find("Failed to call Bundle FindHook  #"),
+        "Test for the correct event message");
+    });
+
+  bundleA.Stop();
+  eventHookReg.Unregister();
+  framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
 } // end unnamed namespace
@@ -171,6 +284,12 @@ int BundleHooksTest(int /*argc*/, char* /*argv*/ [])
 
   TestFindHook(framework);
   TestEventHook(framework);
+
+  TestEventHookFailure(framework);
+  TestFindHookFailure(framework);
+
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 
   US_TEST_END()
 }

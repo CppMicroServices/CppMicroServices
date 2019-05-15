@@ -259,6 +259,8 @@ set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEP
 
 # global options based on compiler
 if(NOT APPLE AND US_COMPILER_CLANG)
+  # use libc++ instead of libstdc++ when using the clang/llvm toolchain
+  # libstdc++ shipped with GCC 4.9 does not support std::atomic operations on std::shared_ptr
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
@@ -479,10 +481,6 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
       set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
     endif()
   endforeach()
-endif()
-
-if(US_COMPILER_CLANG AND NOT APPLE)
-  set(US_LINK_FLAGS "${US_LINK_FLAGS} -lc++abi")
 endif()
 
 if(NOT MSVC)

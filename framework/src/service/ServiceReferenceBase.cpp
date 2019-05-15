@@ -128,8 +128,8 @@ std::vector<Bundle> ServiceReferenceBase::GetUsingBundles() const
 bool ServiceReferenceBase::operator<(
   const ServiceReferenceBase& reference) const
 {
-  auto const& lhsPRef = GetPrivate();
-  auto const& rhsPRef = reference.GetPrivate();
+  auto lhsPRef = GetPrivate();
+  auto rhsPRef = reference.GetPrivate();
   if (lhsPRef == rhsPRef)
     return false;
 

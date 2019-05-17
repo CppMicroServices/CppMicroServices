@@ -349,6 +349,7 @@ else()
 
   # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
   # static library even if CppMicroServices is a shared library.
+  set(_us_build_shared ${BUILD_SHARED_LIBS})
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
   add_subdirectory(third_party/googletest)
 
@@ -356,7 +357,7 @@ else()
   set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
   add_subdirectory(third_party/benchmark)
 
-  set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+  set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
 endif()
 endif()
 

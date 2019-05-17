@@ -155,5 +155,8 @@ See https://github.com/google/benchmark/blob/master/LICENSE for license informat
 https://github.com/google/benchmark/releases
 1.4.1
 
+Patches
+
+ * Supress build error in clang builds, due to usage of "offsetof" macro.
 
 

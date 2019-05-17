@@ -1,0 +1,31 @@
+From abe768eba9fbc2dd1907f10bd46971551f0e4185 Mon Sep 17 00:00:00 2001
+From: Abhinay Reddyreddy <karthikreddy09@icloud.com>
+Date: Wed, 15 May 2019 09:33:40 -0400
+Subject: [PATCH] Try removing the static_assert to fix build error
+
+Signed-off-by: The Mathworks Inc <Roy.Lurie@mathworks.com>
+---
+ third_party/benchmark/src/benchmark.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/third_party/benchmark/src/benchmark.cc b/third_party/benchmark/src/benchmark.cc
+index ff331c7a..5ca6e153 100755
+--- a/third_party/benchmark/src/benchmark.cc
++++ b/third_party/benchmark/src/benchmark.cc
+@@ -154,11 +154,13 @@ State::State(size_t max_iters, const std::vector<int64_t>& ranges, int thread_i,
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Winvalid-offsetof"
+ #endif
++#if defined(__APPLE__) || !defined(__clang__) // remove the following block for clang on linux to avoid compile error
+   // Offset tests to ensure commonly accessed data is on the first cache line.
+   const int cache_line_size = 64;
+   static_assert(offsetof(State, error_occurred_) <=
+                     (cache_line_size - sizeof(error_occurred_)),
+                 "");
++#endif
+ #if defined(__INTEL_COMPILER)
+ #pragma warning pop
+ #elif defined(__GNUC__)
+-- 
+2.17.2 (Apple Git-113)
+

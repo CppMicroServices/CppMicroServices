@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_BUNDLECONTEXT_H
 
 #include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/IBundleContext.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceInterface.h"
@@ -101,7 +102,7 @@ struct ServiceHolder;
  *
  * @remarks This class is thread safe.
  */
-class US_Framework_EXPORT BundleContext
+class US_Framework_EXPORT BundleContext : public IBundleContext
 {
 
 public:
@@ -115,6 +116,8 @@ public:
    * @see operator bool() const
    */
   BundleContext();
+
+  ~BundleContext() = default;
 
   /**
    * Compares this \c BundleContext object with the specified
@@ -424,7 +427,7 @@ public:
    */
   std::vector<ServiceReferenceU> GetServiceReferences(
     const std::string& clazz,
-    const std::string& filter = std::string());
+    const std::string& filter = std::string()) override;
 
   /**
    * Returns a list of <code>ServiceReference</code> objects. The returned
@@ -499,7 +502,7 @@ public:
    *
    * @see #GetServiceReferences(const std::string&, const std::string&)
    */
-  ServiceReferenceU GetServiceReference(const std::string& clazz);
+  ServiceReferenceU GetServiceReference(const std::string& clazz) override;
 
   /**
    * Returns a <code>ServiceReference</code> object for a service that
@@ -581,9 +584,10 @@ public:
    * @see ServiceFactory
    * @see ServiceObjects
    */
-  std::shared_ptr<void> GetService(const ServiceReferenceBase& reference);
+  std::shared_ptr<void> GetService(
+    const ServiceReferenceBase& reference) override;
 
-  InterfaceMapConstPtr GetService(const ServiceReferenceU& reference);
+  InterfaceMapConstPtr GetService(const ServiceReferenceU& reference) override;
 
   /**
    * Returns the service object referenced by the specified
@@ -1083,7 +1087,7 @@ private:
     const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
-  BundleContext(std::shared_ptr<BundleContextPrivate>  ctx);
+  BundleContext(std::shared_ptr<BundleContextPrivate> ctx);
   // allow templated code to use the internal logger
   template<class S, class TTT, class R>
   friend class detail::BundleAbstractTracked;

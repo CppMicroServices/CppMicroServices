@@ -157,6 +157,6 @@ https://github.com/google/benchmark/releases
 
 Patches
 
- * Supress build error in clang builds, due to usage of "offsetof" macro.
+ * Suppress build error in clang builds, due to usage of "offsetof" macro.
 
 

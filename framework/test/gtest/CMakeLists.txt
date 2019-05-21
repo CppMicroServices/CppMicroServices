@@ -15,7 +15,9 @@ include_directories(
 #-----------------------------------------------------------------------------
 set(_gtest_tests 
   AnyMapTest.cpp
+  BundleManifestTest.cpp
   BundleVersionTest.cpp
+  InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp
   LDAPExprTest.cpp
   LDAPFilterTest.cpp
@@ -54,6 +56,13 @@ set_property(TARGET ${us_gtest_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 
 target_include_directories(${us_gtest_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
+# Disable deprecation warnings.
+if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+  set_source_files_properties(${_gtest_tests} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
+endif()
+
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})
@@ -72,14 +81,14 @@ endif()
 # Run the GTest EXE from ctest.
 add_test(NAME ${us_gtest_test_exe_name}
   COMMAND ${us_gtest_test_exe_name}
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
 )
 set_property(TEST ${us_gtest_test_exe_name} PROPERTY LABELS regular)
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)
   add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
   set_property(TEST memcheck_${us_gtest_test_exe_name} PROPERTY LABELS valgrind memcheck)
 endif()
 
@@ -87,7 +96,7 @@ endif()
 if(US_COVERAGE_COMMAND)
   file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
   add_test(NAME coverage_${us_gtest_test_exe_name} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${us_gtest_test_exe_name}.cov --continue_after_cpp_exception -- $<TARGET_FILE:${us_gtest_test_exe_name}>
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
   set_property(TEST coverage_${us_gtest_test_exe_name} PROPERTY LABELS opencppcoverage)
 endif()
 

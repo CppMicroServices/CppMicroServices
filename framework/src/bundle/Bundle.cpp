@@ -38,7 +38,9 @@
 #include "Utils.h"
 
 #include <chrono>
+#include <stdexcept>
 #include <thread>
+#include <stdexcept>
 
 namespace cppmicroservices {
 
@@ -103,16 +105,28 @@ Bundle::~Bundle() = default;
 
 Bundle::State Bundle::GetState() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return static_cast<State>(d->state.load());
 }
 
 void Bundle::Start()
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->Start(0);
 }
 
 void Bundle::Start(uint32_t options)
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->Start(options);
 }
 
@@ -123,51 +137,91 @@ void Bundle::Stop()
 
 void Bundle::Stop(uint32_t options)
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->Stop(options);
 }
 
 void Bundle::Uninstall()
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->Uninstall();
 }
 
 BundleContext Bundle::GetBundleContext() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return MakeBundleContext(d->bundleContext.Load());
 }
 
 long Bundle::GetBundleId() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->id;
 }
 
 std::string Bundle::GetLocation() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->GetLocation();
 }
 
 std::string Bundle::GetSymbolicName() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->symbolicName;
 }
 
 BundleVersion Bundle::GetVersion() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->version;
 }
 
 std::map<std::string, Any> Bundle::GetProperties() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->bundleManifest.GetPropertiesDeprecated();
 }
 
 const AnyMap& Bundle::GetHeaders() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->GetHeaders();
 }
 
 Any Bundle::GetProperty(const std::string& key) const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   Any property(d->bundleManifest.GetValueDeprecated(key));
 
   // Clients must be able to query both a bundle's properties
@@ -187,11 +241,19 @@ Any Bundle::GetProperty(const std::string& key) const
 
 std::vector<std::string> Bundle::GetPropertyKeys() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->bundleManifest.GetKeysDeprecated();
 }
 
 std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->CheckUninstalled();
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
@@ -206,6 +268,10 @@ std::vector<ServiceReferenceU> Bundle::GetRegisteredServices() const
 
 std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->CheckUninstalled();
   std::vector<ServiceRegistrationBase> sr;
   std::vector<ServiceReferenceU> res;
@@ -220,6 +286,10 @@ std::vector<ServiceReferenceU> Bundle::GetServicesInUse() const
 
 BundleResource Bundle::GetResource(const std::string& path) const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->CheckUninstalled();
   return d->barchive ? d->barchive->GetResource(path) : BundleResource();
 }
@@ -229,6 +299,10 @@ std::vector<BundleResource> Bundle::FindResources(
   const std::string& filePattern,
   bool recurse) const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   d->CheckUninstalled();
   return d->barchive ? d->barchive->FindResources(path, filePattern, recurse)
                      : std::vector<BundleResource>();
@@ -236,6 +310,10 @@ std::vector<BundleResource> Bundle::FindResources(
 
 Bundle::TimeStamp Bundle::GetLastModified() const
 {
+  if (!d) {
+    throw std::invalid_argument("invalid bundle");
+  }
+
   return d->barchive ? d->barchive->GetLastModified() : d->timeStamp;
 }
 

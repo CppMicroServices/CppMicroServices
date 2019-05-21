@@ -22,7 +22,9 @@
 
 #include "BundleManifest.h"
 
-#include "json/json.h"
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include <stdexcept>
 
@@ -33,15 +35,15 @@ namespace {
 using AnyOrderedMap = std::map<std::string, Any>;
 using AnyVector = std::vector<Any>;
 
-void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
-void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap);
-void ParseJsonArray(const Json::Value& jsonArray,
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap);
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap);
+void ParseJsonArray(const rapidjson::Value& jsonArray,
                     AnyVector& anyVector,
                     bool ci);
 
-Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
+Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
 {
-  if (jsonValue.isObject()) {
+  if (jsonValue.IsObject()) {
     if (ci) {
       Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
@@ -51,58 +53,52 @@ Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
       ParseJsonObject(jsonValue, ref_any_cast<AnyOrderedMap>(any));
       return any;
     }
-  } else if (jsonValue.isArray()) {
+  } else if (jsonValue.IsArray()) {
     Any any = AnyVector();
     ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any), ci);
     return any;
-  } else if (jsonValue.isString()) {
+  } else if (jsonValue.IsString()) {
     // We do not support attribute localization yet, so we just
     // always remove the leading '%' character.
-    std::string val = jsonValue.asString();
+    std::string val = jsonValue.GetString();
     if (!val.empty() && val[0] == '%')
       val = val.substr(1);
 
     return Any(val);
-  } else if (jsonValue.isBool()) {
-    return Any(jsonValue.asBool());
-  } else if (jsonValue.isIntegral()) {
-    return Any(jsonValue.asInt());
-  } else if (jsonValue.isDouble()) {
-    return Any(jsonValue.asDouble());
+  } else if (jsonValue.IsBool()) {
+    return Any(jsonValue.GetBool());
+  } else if (jsonValue.IsInt()) {
+    return Any(jsonValue.GetInt());
+  } else if (jsonValue.IsDouble()) {
+    return Any(jsonValue.GetDouble());
   }
 
   return Any();
 }
 
-void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap)
 {
-  for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end();
-       ++it) {
-    const Json::Value& jsonValue = *it;
-    Any anyValue = ParseJsonValue(jsonValue, false);
+  for (const auto& m : jsonObject.GetObject()) {
+    Any anyValue = ParseJsonValue(m.value, false);
     if (!anyValue.Empty()) {
-      anyMap.emplace(it.name(), std::move(anyValue));
+      anyMap.emplace(m.name.GetString(), std::move(anyValue));
     }
   }
 }
 
-void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap)
 {
-  for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end();
-       ++it) {
-    const Json::Value& jsonValue = *it;
-    Any anyValue = ParseJsonValue(jsonValue, true);
+  for (const auto& m : jsonObject.GetObject()) {
+    Any anyValue = ParseJsonValue(m.value, true);
     if (!anyValue.Empty()) {
-      anyMap.emplace(it.name(), std::move(anyValue));
+      anyMap.emplace(m.name.GetString(), std::move(anyValue));
     }
   }
 }
 
-void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci)
+void ParseJsonArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, bool ci)
 {
-  for (const auto & jsonValue : jsonArray) {
+  for (const auto& jsonValue : jsonArray.GetArray()) {
     Any anyValue = ParseJsonValue(jsonValue, ci);
     if (!anyValue.Empty()) {
       anyVector.emplace_back(std::move(anyValue));
@@ -117,13 +113,13 @@ BundleManifest::BundleManifest()
 
 void BundleManifest::Parse(std::istream& is)
 {
-  Json::Value root;
-  Json::Reader jsonReader(Json::Features::strictMode());
-  if (!jsonReader.parse(is, root, false)) {
-    throw std::runtime_error(jsonReader.getFormattedErrorMessages());
+  rapidjson::IStreamWrapper jsonStream(is);
+  rapidjson::Document root;
+  if (root.ParseStream(jsonStream).HasParseError()) {
+    throw std::runtime_error(rapidjson::GetParseError_En(root.GetParseError()));
   }
 
-  if (!root.isObject()) {
+  if (!root.IsObject()) {
     throw std::runtime_error("The Json root element must be an object.");
   }
 
@@ -137,7 +133,6 @@ void BundleManifest::Parse(std::istream& is)
                 , m_Headers.end()
                 , [&](auto const& h) { m_PropertiesDeprecated.emplace(h.first, h.second); });
 #endif
-  
 }
 
 const AnyMap& BundleManifest::GetHeaders() const

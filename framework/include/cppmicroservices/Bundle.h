@@ -27,10 +27,10 @@
 #include "cppmicroservices/BundleVersion.h"
 #include "cppmicroservices/GlobalConfig.h"
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <vector>
-#include <chrono>
 
 namespace cppmicroservices {
 
@@ -322,6 +322,8 @@ public:
    * @return An element of \c STATE_UNINSTALLED,\c STATE_INSTALLED,
    *         \c STATE_RESOLVED, \c STATE_STARTING, \c STATE_STOPPING,
    *         \c STATE_ACTIVE.
+   * 
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   State GetState() const;
 
@@ -335,6 +337,8 @@ public:
    * and this method will return an invalid \c BundleContext object.
    *
    * @return A valid or invalid <code>BundleContext</code> for this bundle.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   BundleContext GetBundleContext() const;
 
@@ -354,6 +358,8 @@ public:
    * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The unique identifier of this bundle.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   long GetBundleId() const;
 
@@ -365,6 +371,8 @@ public:
    * while this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The string representation of this bundle's location.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   std::string GetLocation() const;
 
@@ -377,6 +385,8 @@ public:
    * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The symbolic name of this bundle.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   std::string GetSymbolicName() const;
 
@@ -389,6 +399,8 @@ public:
    * this bundle is in the <code>STATE_UNINSTALLED</code> state.
    *
    * @return The version of this bundle.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   BundleVersion GetVersion() const;
 
@@ -398,9 +410,12 @@ public:
    * @return A map containing this bundle's Manifest properties as
    *         key/value pairs.
    *
-   * @deprecated Since 3.0, use GetHeaders() instead.
+   * @throws std::invalid_argument if this bundle is not initialized.
    *
    * \rststar
+   * .. deprecated:: 3.0
+   *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` instead.
+   *
    * .. seealso::
    *
    *    :any:`concept-bundle-properties`
@@ -431,6 +446,8 @@ public:
    *
    * @return A map containing this bundle's Manifest headers and values.
    *
+   * @throws std::invalid_argument if this bundle is not initialized.
+   *
    * @see Constants#BUNDLE_LOCALIZATION
    */
   const AnyMap& GetHeaders() const;
@@ -444,13 +461,14 @@ public:
    * @return The value of the requested property, or an empty string
    *         if the property is undefined.
    *
+   * @throws std::invalid_argument if this bundle is not initialized.
+   *
    * \rststar
    * .. deprecated:: 3.0
    *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` or :any:`BundleContext::GetProperty(const std::string&) <cppmicroservices::BundleContext::GetProperty>` instead.
    *
    * .. seealso::
    *
-   *    | :any:`cppmicroservices::Bundle::GetPropertyKeys`
    *    | :any:`concept-bundle-properties`
    * \endrststar
    */
@@ -461,10 +479,13 @@ public:
    *
    * @return A list of available property keys.
    *
-   * @deprecated Since 3.0, use GetHeaders() or BundleContext::GetProperties()
-   * instead.
+   * @throws std::invalid_argument if this bundle is not initialized.
+   * 
    *
    * \rststar
+   * .. deprecated:: 3.0
+   *    Use :any:`GetHeaders() <cppmicroservices::Bundle::GetHeaders>` instead.
+   *
    * .. seealso::
    *
    *    :any:`concept-bundle-properties`
@@ -486,6 +507,8 @@ public:
    *
    * @throws std::logic_error If this bundle has been uninstalled, if
    *         the ServiceRegistrationBase object is invalid, or if the service is unregistered.
+   * 
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   std::vector<ServiceReferenceU> GetRegisteredServices() const;
 
@@ -504,6 +527,8 @@ public:
    *
    * @throws std::logic_error If this bundle has been uninstalled, if
    *         the ServiceRegistrationBase object is invalid, or if the service is unregistered.
+   * 
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   std::vector<ServiceReferenceU> GetServicesInUse() const;
 
@@ -517,6 +542,8 @@ public:
    * be found in this bundle an invalid BundleResource object is returned.
    *
    * @throws std::logic_error If this bundle has been uninstalled.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   BundleResource GetResource(const std::string& path) const;
 
@@ -544,6 +571,8 @@ public:
    * @return A vector of BundleResource objects for each matching entry.
    *
    * @throws std::logic_error If this bundle has been uninstalled.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   std::vector<BundleResource> FindResources(const std::string& path,
                                             const std::string& filePattern,
@@ -554,6 +583,8 @@ public:
    * considered to be modified when it is installed, updated or uninstalled.
    *
    * @return The time when this bundle was last modified.
+   *
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   TimeStamp GetLastModified() const;
 
@@ -641,6 +672,7 @@ public:
    * @throws std::runtime_error If this bundle could not be started.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   void Start(uint32_t options);
 
@@ -652,6 +684,9 @@ public:
    * @throws std::runtime_error If this bundle could not be started.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
+   * 
+   * @throws std::invalid_argument if this bundle is not initialized.
+   * 
    * @see #Start(uint32_t)
    */
   void Start();
@@ -710,6 +745,8 @@ public:
    * @throws std::runtime_error If the bundle failed to stop.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
+   * 
+   * @throws std::invalid_argument if this bundle is not initialized.
    */
   void Stop(uint32_t options);
 
@@ -762,6 +799,9 @@ public:
    *         does not complete in a timely manner.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
+   * 
+   * @throws std::invalid_argument if this bundle is not initialized.
+   * 
    * @see #Stop()
    */
   void Uninstall();

@@ -46,9 +46,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cstring>
 #include <iterator>
-#include <chrono>
 
 namespace cppmicroservices {
 
@@ -598,20 +598,26 @@ std::exception_ptr BundlePrivate::Start0()
 
       // save this bundle's context so that it can be accessible anywhere
       // from within this bundle's code.
-      std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
-      BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func);
-      
+      std::string set_bundle_context_func =
+        US_STR(US_SET_CTX_PREFIX) + symbolicName;
+      BundleUtils::GetSymbol(
+        SetBundleContext, libHandle, set_bundle_context_func);
+
       if (SetBundleContext) {
         SetBundleContext(ctx.get());
       }
 
       // get the create/destroy activator callbacks
-      std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
+      std::string create_activator_func =
+        US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
       std::function<BundleActivator*(void)> createActivatorHook;
-      BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func);
+      BundleUtils::GetSymbol(
+        createActivatorHook, libHandle, create_activator_func);
 
-      std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-      BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func);
+      std::string destroy_activator_func =
+        US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
+      BundleUtils::GetSymbol(
+        destroyActivatorHook, libHandle, destroy_activator_func);
 
       if (!createActivatorHook) {
         throw std::runtime_error("Bundle activator constructor not found");
@@ -621,7 +627,8 @@ std::exception_ptr BundlePrivate::Start0()
       }
 
       // get a BundleActivator instance
-      bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(), destroyActivatorHook);
+      bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(
+        createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
     } catch (...) {
       res = std::make_exception_ptr(
@@ -895,7 +902,7 @@ void BundlePrivate::RemoveBundleResources()
 
   std::vector<ServiceRegistrationBase> srs;
   coreCtx->services.GetRegisteredByBundle(this, srs);
-  for (auto & sr : srs) {
+  for (auto& sr : srs) {
     try {
       sr.Unregister();
     } catch (const std::logic_error& /*ignore*/) {
@@ -911,7 +918,7 @@ void BundlePrivate::RemoveBundleResources()
        i != srs.end();
        ++i) {
     i->GetReference(std::string())
-      .d.load()
+      .GetPrivate()
       ->UngetService(this->shared_from_this(), false);
   }
 }

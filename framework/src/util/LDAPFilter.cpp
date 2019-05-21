@@ -74,8 +74,9 @@ LDAPFilter::operator bool() const
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false)
-              : false);
+  return (
+    (d) ? d->ldapExpr.Evaluate(reference.GetPrivate()->GetProperties(), false)
+        : false);
 }
 
 bool LDAPFilter::Match(const Bundle& bundle) const
@@ -110,8 +111,7 @@ bool LDAPFilter::operator==(const LDAPFilter& other) const
   return (this->ToString() == other.ToString());
 }
 
-LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
-= default;
+LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter) = default;
 
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {

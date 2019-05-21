@@ -43,9 +43,8 @@ public:
   std::shared_ptr<BundleContextPrivate> m_context;
   ServiceReferenceBase m_reference;
 
-  ServiceObjectsBasePrivate(
-    std::shared_ptr<BundleContextPrivate>  context,
-    const ServiceReferenceBase& reference)
+  ServiceObjectsBasePrivate(std::shared_ptr<BundleContextPrivate> context,
+                            const ServiceReferenceBase& reference)
     : m_context(std::move(context))
     , m_reference(reference)
   {}
@@ -59,10 +58,10 @@ public:
       Constants::SCOPE_PROTOTYPE;
 
     if (isPrototypeScope) {
-      result = m_reference.d.load()->GetPrototypeService(
+      result = m_reference.GetPrivate()->GetPrototypeService(
         MakeBundleContext(m_context).GetBundle());
     } else {
-      result = m_reference.d.load()->GetServiceInterfaceMap(
+      result = m_reference.GetPrivate()->GetServiceInterfaceMap(
         GetPrivate(MakeBundleContext(m_context).GetBundle()).get());
     }
 
@@ -95,7 +94,7 @@ struct UngetHelper
   const ServiceReferenceBase sref;
   const std::weak_ptr<BundlePrivate> b;
 
-  UngetHelper(InterfaceMapConstPtr  im,
+  UngetHelper(InterfaceMapConstPtr im,
               const ServiceReferenceBase& sr,
               const std::shared_ptr<BundlePrivate>& b)
     : interfaceMap(std::move(im))
@@ -112,9 +111,9 @@ struct UngetHelper
           Constants::SCOPE_PROTOTYPE;
 
         if (isPrototypeScope) {
-          sref.d.load()->UngetPrototypeService(bundle, interfaceMap);
+          sref.GetPrivate()->UngetPrototypeService(bundle, interfaceMap);
         } else {
-          sref.d.load()->UngetService(bundle, true);
+          sref.GetPrivate()->UngetService(bundle, true);
         }
       }
     } catch (...) {

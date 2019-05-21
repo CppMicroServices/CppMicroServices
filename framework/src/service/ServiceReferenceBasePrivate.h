@@ -47,7 +47,8 @@ public:
   ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) =
     delete;
 
-  ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
+  ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg,
+                              std::string interfaceId = "");
 
   ~ServiceReferenceBasePrivate();
 
@@ -100,11 +101,6 @@ public:
   PropertiesHandle GetProperties() const;
 
   bool IsConvertibleTo(const std::string& interfaceId) const;
-
-  /**
-   * Reference count for implicitly shared private implementation.
-   */
-  std::atomic<int> ref;
 
   /**
    * Link to registration object for this reference.

@@ -127,10 +127,17 @@ void BundleManifest::Parse(std::istream& is)
     throw std::runtime_error("The Json root element must be an object.");
   }
 
-  // This is deprecated in 3.0
   ParseJsonObject(root, m_PropertiesDeprecated);
-
   ParseJsonObject(root, m_Headers);
+#if NEVER
+  // Now copy the headers to the std::map to support deprecated apis... this will be
+  // removed when they are.
+  // TODO: Remove when deprecated apis are no longer supported.
+  std::for_each(m_Headers.begin()
+                , m_Headers.end()
+                , [&](auto const& h) { m_PropertiesDeprecated.emplace(h.first, h.second); });
+#endif
+  
 }
 
 const AnyMap& BundleManifest::GetHeaders() const

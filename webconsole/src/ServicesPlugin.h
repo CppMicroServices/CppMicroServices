@@ -33,8 +33,8 @@ public:
   ServicesPlugin();
 
 private:
-  void RenderContent(HttpServletRequest& /*request*/,
-                     HttpServletResponse& response);
+  void RenderContent(IHttpServletRequest& /*request*/,
+                     IHttpServletResponse& response);
 
   TemplateData GetIds() const;
   TemplateData GetInterface(const std::string& iid) const;

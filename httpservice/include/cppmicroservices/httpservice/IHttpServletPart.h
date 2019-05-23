@@ -20,96 +20,83 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_HTTPSERVLETPART_H
-#define CPPMICROSERVICES_HTTPSERVLETPART_H
+#ifndef CPPMICROSERVICES_IHTTPSERVLETPART_H
+#define CPPMICROSERVICES_IHTTPSERVLETPART_H
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
-#include "cppmicroservices/httpservice/IHttpServletPart.h"
+
 #include <istream>
 #include <string>
 #include <vector>
 
 namespace cppmicroservices {
 
-struct HttpServletPartPrivate;
-class ServletContext;
-class HttpServletRequest;
-
 /**
  * Store one part of a multipart request. Follows the implementation
  * javax.servlet.http.Part
  * https://docs.oracle.com/javaee/7/api/javax/servlet/http/Part.html
  */
-class US_HttpService_EXPORT HttpServletPart : public IHttpServletPart
+class US_HttpService_EXPORT IHttpServletPart
 {
 public:
-  ~HttpServletPart();
-
-  HttpServletPart(const HttpServletPart& o);
-  HttpServletPart& operator=(const HttpServletPart& o);
+  virtual ~IHttpServletPart() = default;
 
   /**
    * Deletes the underlying storage for a file item, including deleting any
    * associated temporary disk file.
    */
-  void Delete() override;
+  virtual void Delete() = 0;
 
   /**
    * Gets the content type of this part.
    */
-  std::string GetContentType() const override;
+  virtual std::string GetContentType() const = 0;
 
   /**
    * Returns the value of the specified mime header as a std::string.
    */
-  std::string GetHeader(const std::string& name) const override;
+  virtual std::string GetHeader(const std::string& name) const = 0;
 
   /**
    * Gets the header names of this Part.
    */
-  std::vector<std::string> GetHeaderNames() const override;
+  virtual std::vector<std::string> GetHeaderNames() const = 0;
 
   /**
    * Gets the values of the Part header with the given name.
    */
-  std::vector<std::string> GetHeaders(const std::string& name) const override;
+  virtual std::vector<std::string> GetHeaders(
+    const std::string& name) const = 0;
 
   /**
    * Gets the content of this part as an InputStream
    */
-  std::istream* GetInputStream() override;
+  virtual std::istream* GetInputStream() = 0;
 
   /**
    * Gets the name of this part
    */
-  std::string GetName() const override;
+  virtual std::string GetName() const = 0;
 
   /**
    * Returns the size of this file.
    */
-  long long GetSize() const override;
+  virtual long long GetSize() const = 0;
 
   /**
    * Gets the file name specified by the client
    */
-  std::string GetSubmittedFileName() const override;
+  virtual std::string GetSubmittedFileName() const = 0;
 
   /**
    * A convenience method to write this uploaded item to disk.
    */
-  void Write(const std::string& fileName) override;
+  virtual void Write(const std::string& fileName) = 0;
 
   static const std::string NO_FILE;
-
-private:
-  friend class ServletHandler;
-  friend class HttpServletRequest;
-  HttpServletPart(HttpServletPartPrivate* d);
-
-  ExplicitlySharedDataPointer<HttpServletPartPrivate> d;
 };
 }
 
-#endif // CPPMICROSERVICES_HTTPREQUEST_H
+#endif // CPPMICROSERVICES_IHTTPREQUEST_H

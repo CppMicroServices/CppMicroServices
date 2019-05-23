@@ -154,7 +154,7 @@ struct Expected
     std::map<std::string, std::string>::iterator paramIt;
 
     // to avoid compiler warning int <- size_t
-    // below in 
+    // below in
     // cnx->request_info.num_headers = integerCounter;
     int integerCounter = 0;
 

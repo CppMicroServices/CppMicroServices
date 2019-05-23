@@ -147,6 +147,9 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
 
 HttpServletResponse::~HttpServletResponse() = default;
 HttpServletResponse::HttpServletResponse(const HttpServletResponse&) = default;
+
+HttpServletResponse::HttpServletResponse(const IHttpServletResponse&){};
+
 HttpServletResponse& HttpServletResponse::operator=(
   const HttpServletResponse&) = default;
 

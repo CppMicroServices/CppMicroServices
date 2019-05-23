@@ -155,7 +155,7 @@ TEST(HttpServletTest, GetAttribute_POST_form_data)
     << "GET operation must have hit the servlet";
   ASSERT_TRUE((nullptr != request)) << "Processed request must not be null";
 
-  cppmicroservices::HttpServletPart* part;
+  cppmicroservices::IHttpServletPart* part;
   size_t partCount = request->GetParts().size();
   size_t TWO = 2;
   ASSERT_EQ(TWO, partCount) << "We must have two parts in this request";

@@ -59,17 +59,17 @@ public:
    */
   bool OperationReceived();
 
-  void DoPost(cppmicroservices::HttpServletRequest& request,
-              cppmicroservices::HttpServletResponse& response) override;
+  void DoPost(cppmicroservices::IHttpServletRequest& request,
+              cppmicroservices::IHttpServletResponse& response) override;
 
-  void DoPut(cppmicroservices::HttpServletRequest& request,
-             cppmicroservices::HttpServletResponse& response) override;
+  void DoPut(cppmicroservices::IHttpServletRequest& request,
+             cppmicroservices::IHttpServletResponse& response) override;
 
-  void DoDelete(cppmicroservices::HttpServletRequest& request,
-                cppmicroservices::HttpServletResponse& response) override;
+  void DoDelete(cppmicroservices::IHttpServletRequest& request,
+                cppmicroservices::IHttpServletResponse& response) override;
 
-  void DoGet(cppmicroservices::HttpServletRequest& request,
-             cppmicroservices::HttpServletResponse& response) override;
+  void DoGet(cppmicroservices::IHttpServletRequest& request,
+             cppmicroservices::IHttpServletResponse& response) override;
 
   void SetRequestBody(const std::string& body);
   std::string GetRequestBody();

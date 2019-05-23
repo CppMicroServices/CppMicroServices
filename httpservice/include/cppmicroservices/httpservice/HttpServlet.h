@@ -25,13 +25,13 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletResponse.h"
 
 #include <mutex>
 
 namespace cppmicroservices {
 
-class HttpServletRequest;
-class HttpServletResponse;
 class ServletContext;
 class ServletConfig;
 
@@ -108,29 +108,29 @@ public:
    */
   ServletConfig GetServletConfig() const;
 
-  virtual void Service(HttpServletRequest& request,
-                       HttpServletResponse& response);
+  virtual void Service(IHttpServletRequest& request,
+                       IHttpServletResponse& response);
 
   std::shared_ptr<ServletContext> GetServletContext() const;
 
   virtual ~HttpServlet();
 
 protected:
-  virtual long long GetLastModified(HttpServletRequest& request);
+  virtual long long GetLastModified(IHttpServletRequest& request);
 
-  virtual void DoGet(HttpServletRequest& request,
-                     HttpServletResponse& response);
-  virtual void DoHead(HttpServletRequest& request,
-                      HttpServletResponse& response);
-  virtual void DoDelete(HttpServletRequest& request,
-                        HttpServletResponse& response);
-  virtual void DoPost(HttpServletRequest& request,
-                      HttpServletResponse& response);
-  virtual void DoPut(HttpServletRequest& request,
-                     HttpServletResponse& response);
+  virtual void DoGet(IHttpServletRequest& request,
+                     IHttpServletResponse& response);
+  virtual void DoHead(IHttpServletRequest& request,
+                      IHttpServletResponse& response);
+  virtual void DoDelete(IHttpServletRequest& request,
+                        IHttpServletResponse& response);
+  virtual void DoPost(IHttpServletRequest& request,
+                      IHttpServletResponse& response);
+  virtual void DoPut(IHttpServletRequest& request,
+                     IHttpServletResponse& response);
 
-  virtual void DoTrace(HttpServletRequest& request,
-                       HttpServletResponse& response);
+  virtual void DoTrace(IHttpServletRequest& request,
+                       IHttpServletResponse& response);
 
   std::unique_lock<std::mutex> Lock() const;
 

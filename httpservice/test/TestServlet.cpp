@@ -33,8 +33,8 @@ TestServlet::TestServlet()
 
 TestServlet::~TestServlet() {}
 
-void TestServlet::DoPost(cppmicroservices::HttpServletRequest& request,
-                         cppmicroservices::HttpServletResponse& response)
+void TestServlet::DoPost(cppmicroservices::IHttpServletRequest& request,
+                         cppmicroservices::IHttpServletResponse& response)
 {
 
 #ifndef NDEBUG
@@ -43,7 +43,9 @@ void TestServlet::DoPost(cppmicroservices::HttpServletRequest& request,
 #endif
 
   this->m_OperationReceived = true;
-  this->m_Request = new cppmicroservices::HttpServletRequest(request);
+  cppmicroservices::HttpServletRequest* req = nullptr;
+  req = static_cast<cppmicroservices::HttpServletRequest*>(&request);
+  this->m_Request = new cppmicroservices::HttpServletRequest(*req);
 
   request.ReadParts();
 
@@ -64,8 +66,8 @@ void TestServlet::Destroy()
   this->HttpServlet::Destroy();
 }
 
-void TestServlet::DoGet(cppmicroservices::HttpServletRequest& request,
-                        cppmicroservices::HttpServletResponse& response)
+void TestServlet::DoGet(cppmicroservices::IHttpServletRequest& request,
+                        cppmicroservices::IHttpServletResponse& response)
 {
 #ifndef NDEBUG
   std::cerr << "[INFO      ] "
@@ -74,7 +76,9 @@ void TestServlet::DoGet(cppmicroservices::HttpServletRequest& request,
 
   this->m_OperationReceived = true;
 
-  this->m_Request = new cppmicroservices::HttpServletRequest(request);
+  cppmicroservices::HttpServletRequest* req = nullptr;
+  req = static_cast<cppmicroservices::HttpServletRequest*>(&request);
+  this->m_Request = new cppmicroservices::HttpServletRequest(*req);
 
   response.GetOutputStream() << GET_RESPONSE_OK;
   response.SetContentLength(GET_RESPONSE_OK.length());
@@ -82,8 +86,8 @@ void TestServlet::DoGet(cppmicroservices::HttpServletRequest& request,
   response.SetStatus(200);
 }
 
-void TestServlet::DoPut(cppmicroservices::HttpServletRequest& request,
-                        cppmicroservices::HttpServletResponse& response)
+void TestServlet::DoPut(cppmicroservices::IHttpServletRequest& request,
+                        cppmicroservices::IHttpServletResponse& response)
 {
 #ifndef NDEBUG
   std::cerr << "[INFO      ] "
@@ -92,7 +96,9 @@ void TestServlet::DoPut(cppmicroservices::HttpServletRequest& request,
 
   this->m_OperationReceived = true;
 
-  this->m_Request = new cppmicroservices::HttpServletRequest(request);
+  cppmicroservices::HttpServletRequest* req = nullptr;
+  req = static_cast<cppmicroservices::HttpServletRequest*>(&request);
+  this->m_Request = new cppmicroservices::HttpServletRequest(*req);
 
   response.GetOutputStream() << PUT_RESPONSE_OK;
   response.SetContentLength(PUT_RESPONSE_OK.length());
@@ -114,8 +120,8 @@ std::string TestServlet::GetRequestBody()
   return m_RequestBody;
 }
 
-void TestServlet::DoDelete(cppmicroservices::HttpServletRequest& request,
-                           cppmicroservices::HttpServletResponse& response)
+void TestServlet::DoDelete(cppmicroservices::IHttpServletRequest& request,
+                           cppmicroservices::IHttpServletResponse& response)
 {
 #ifndef NDEBUG
   std::cerr << "[INFO      ] "
@@ -124,7 +130,9 @@ void TestServlet::DoDelete(cppmicroservices::HttpServletRequest& request,
 
   this->m_OperationReceived = true;
 
-  this->m_Request = new cppmicroservices::HttpServletRequest(request);
+  cppmicroservices::HttpServletRequest* req = nullptr;
+  req = static_cast<cppmicroservices::HttpServletRequest*>(&request);
+  this->m_Request = new cppmicroservices::HttpServletRequest(*req);
 
   response.GetOutputStream() << DELETE_RESPONSE_OK;
   response.SetContentLength(DELETE_RESPONSE_OK.length());

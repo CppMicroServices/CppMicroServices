@@ -49,6 +49,12 @@ set(_public_headers
   include/cppmicroservices/httpservice/ServletConfig.h
   include/cppmicroservices/httpservice/ServletContainer.h
   include/cppmicroservices/httpservice/HttpServiceFactory.h
+
+  include/cppmicroservices/httpservice/IHttpServletPart.h
+  include/cppmicroservices/httpservice/IHttpServletRequest.h
+  include/cppmicroservices/httpservice/IHttpServletResponse.h
+  include/cppmicroservices/httpservice/IServletContext.h
+
 )
 
 

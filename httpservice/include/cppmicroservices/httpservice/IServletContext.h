@@ -20,46 +20,29 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLESPLUGIN_H
-#define CPPMICROSERVICES_BUNDLESPLUGIN_H
+#ifndef CPPMICROSERVICES_ISERVLETCONTEXT_H
+#define CPPMICROSERVICES_ISERVLETCONTEXT_H
 
-#include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
+#include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/httpservice/HttpServiceExport.h"
+
+#include <memory>
+#include <string>
 
 namespace cppmicroservices {
 
-class BundlesPlugin : public SimpleWebConsolePlugin
+class US_HttpService_EXPORT IServletContext
 {
 public:
-  BundlesPlugin();
+  virtual ~IServletContext() = default;
 
-private:
-  enum class RequestType : int
-  {
-    Unknown = 0,
-    MainPage,
-    Bundle,
-    Resource
-  };
+  virtual std::string GetContextPath() const = 0;
 
-  void RenderContent(IHttpServletRequest& request,
-                     IHttpServletResponse& response);
+  virtual std::shared_ptr<IServletContext> GetContext(
+    const std::string& uripath) = 0;
 
-  bool IsHtmlRequest(IHttpServletRequest& request);
-
-  TemplateData GetBundlesData() const;
-
-  void GetBundleData(long id,
-                     TemplateData& data,
-                     const std::string& pluginRoot) const;
-
-  std::pair<std::size_t, std::size_t> GetResourceJsonTree(
-    Bundle& bundle,
-    const std::string& parentPath,
-    const BundleResource& currResource,
-    std::string& json,
-    int level,
-    const std::string& pluginRoot) const;
+  virtual std::string GetMimeType(const std::string& file) const = 0;
 };
 }
 
-#endif // CPPMICROSERVICES_BUNDLESPLUGIN_H
+#endif // CPPMICROSERVICES_ISERVLETCONTEXT_H

@@ -26,6 +26,8 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletPart.h"
 
 #include <string>
 #include <vector>
@@ -35,92 +37,91 @@ namespace cppmicroservices {
 class ServletContext;
 struct HttpServletRequestPrivate;
 struct HttpServletPartPrivate;
-class HttpServletPart;
 
-class US_HttpService_EXPORT HttpServletRequest
+class US_HttpService_EXPORT HttpServletRequest : public IHttpServletRequest
 {
 public:
-  virtual ~HttpServletRequest();
+  ~HttpServletRequest();
 
   HttpServletRequest(const HttpServletRequest& o);
   HttpServletRequest& operator=(const HttpServletRequest& o);
 
-  virtual std::shared_ptr<ServletContext> GetServletContext() const;
+  std::shared_ptr<ServletContext> GetServletContext() const override;
 
-  virtual Any GetAttribute(const std::string& name) const;
+  Any GetAttribute(const std::string& name) const override;
 
-  virtual std::vector<std::string> GetAttributeNames() const;
+  std::vector<std::string> GetAttributeNames() const override;
 
-  virtual std::size_t GetContentLength() const;
+  std::size_t GetContentLength() const override;
 
-  virtual std::string GetContentType() const;
+  std::string GetContentType() const override;
 
-  //virtual std::string GetLocalName() const;
+  // std::string GetLocalName() const override;
 
-  //virtual std::string GetRemoteHost() const;
+  // std::string GetRemoteHost() const override;
 
-  //virtual int GetLocalPort() const;
+  // int GetLocalPort() const override;
 
-  //virtual int GetRemotePort() const;
+  // int GetRemotePort() const override;
 
-  virtual std::string GetScheme() const;
+  std::string GetScheme() const override;
 
-  virtual std::string GetServerName() const;
+  std::string GetServerName() const override;
 
-  virtual int GetServerPort() const;
+  int GetServerPort() const override;
 
-  virtual std::string GetProtocol() const;
+  std::string GetProtocol() const override;
 
-  virtual std::string GetContextPath() const;
+  std::string GetContextPath() const override;
 
-  virtual std::string GetPathInfo() const;
+  std::string GetPathInfo() const override;
 
-  virtual std::string GetRequestUri() const;
+  std::string GetRequestUri() const override;
 
-  virtual std::string GetRequestUrl() const;
+  std::string GetRequestUrl() const override;
 
-  virtual std::string GetServletPath() const;
+  std::string GetServletPath() const override;
 
-  virtual std::string GetQueryString() const;
+  std::string GetQueryString() const override;
 
-  virtual std::string GetHeader(const std::string& name) const;
+  std::string GetHeader(const std::string& name) const override;
 
-  virtual long long GetDateHeader(const std::string& name) const;
+  long long GetDateHeader(const std::string& name) const override;
 
-  virtual std::vector<std::string> GetHeaderNames() const;
+  std::vector<std::string> GetHeaderNames() const override;
 
-  virtual std::vector<std::string> GetHeaders(const std::string& name) const;
+  std::vector<std::string> GetHeaders(const std::string& name) const override;
 
-  virtual std::string GetMethod() const;
+  std::string GetMethod() const override;
 
-  //virtual std::vector<std::pair<std::string, float>> GetAcceptHeader() const;
+  //virtual std::vector<std::pair<std::string, float>> GetAcceptHeader() const override;
 
-  virtual void RemoveAttribute(const std::string& name);
+  void RemoveAttribute(const std::string& name) override;
 
-  virtual void SetAttribute(const std::string& name, const Any& value);
+  void SetAttribute(const std::string& name, const Any& value) override;
 
   /*!
    * Return the value of asked query parameter or empty Any if the parameter is
    * not found
    */
-  virtual Any GetParameter(const std::string& name) const;
+  Any GetParameter(const std::string& name) const override;
 
   /*!
    *
    * Gets all the Part components of this request, provided that it is of type
    * multipart/form-data.
    */
-  virtual std::vector<HttpServletPart*> GetParts() const;
+  std::vector<IHttpServletPart*> GetParts() const override;
 
   /*!
   * Get the body of the request, if any
   */
-  virtual std::string GetBody() const;
+  std::string GetBody() const override;
 
   /*!
    * Gets the Part with the given name.
    */
-  virtual HttpServletPart* GetPart(const std::string& name) const;
+  IHttpServletPart* GetPart(const std::string& name) const override;
 
   /*!
    * Triggers the load of files transmitted by HTTP POST, multipart/form-data
@@ -129,13 +130,15 @@ public:
    * An optional callback can be used to perform special operation on the
    * ServletPart
    */
-  virtual void ReadParts(void* callback(HttpServletPart*) = 0);
+  void ReadParts(void* callback(IHttpServletPart*) = 0) override;
 
   HttpServletRequest(HttpServletRequestPrivate* d);
 
 private:
   friend class ServletHandler;
   friend class HttpServiceFactory;
+
+  void* RawData() override;
 
   ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
 

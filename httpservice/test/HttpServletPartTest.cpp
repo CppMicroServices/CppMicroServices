@@ -82,7 +82,7 @@ TEST_F(HttpServletPartTest, GetContentType_oneFileMultipart)
   ASSERT_TRUE((request->GetParts().size() == 1))
     << "One file is transmitted in this request";
 
-  us::HttpServletPart* part = request->GetParts()[0];
+  us::IHttpServletPart* part = request->GetParts()[0];
   ASSERT_TRUE(part->GetContentType() == "text/plain")
     << "Part.GetContentType() returns the content-type sent by the request";
 }
@@ -106,7 +106,7 @@ TEST_F(HttpServletPartTest, GetName_oneFileMultipart)
   ASSERT_TRUE((request->GetParts().size() == 1))
     << "One file is transmitted in this request";
 
-  us::HttpServletPart* part = request->GetParts()[0];
+  us::IHttpServletPart* part = request->GetParts()[0];
   ASSERT_TRUE(part->GetName() == "sampleFileFormName")
     << "Part.GetName() returns the name of the part";
 }
@@ -130,7 +130,7 @@ TEST_F(HttpServletPartTest, GetSubmittedFilename_oneFileMultipart)
   ASSERT_TRUE((request->GetParts().size() == 1))
     << "One file is transmitted in this request";
 
-  us::HttpServletPart* part = request->GetParts()[0];
+  us::IHttpServletPart* part = request->GetParts()[0];
   ASSERT_TRUE(part->GetSubmittedFileName() == "sampleFile.txt")
     << "Part.GetSubmittedFilename() returns the filename sent by the request";
 }
@@ -154,7 +154,7 @@ TEST_F(HttpServletPartTest, GetInputStream_multipart)
   ASSERT_TRUE((request->GetParts().size() == 1))
     << "One file is transmitted in this request";
 
-  us::HttpServletPart* myPart = request->GetPart("sampleFileFormName");
+  us::IHttpServletPart* myPart = request->GetPart("sampleFileFormName");
 
   std::istream* partValue = myPart->GetInputStream();
   std::string actualContent{ std::istreambuf_iterator<char>(*partValue),
@@ -191,7 +191,7 @@ TEST_F(HttpServletPartTest, Write_multipart)
   ASSERT_TRUE((request->GetParts().size() == 1))
     << "One file is transmitted in this request";
 
-  us::HttpServletPart* myPart = request->GetPart("sampleFileFormName");
+  us::IHttpServletPart* myPart = request->GetPart("sampleFileFormName");
 
   myPart->Write(temporaryFilename);
 

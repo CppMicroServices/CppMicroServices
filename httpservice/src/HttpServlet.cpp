@@ -36,6 +36,8 @@ namespace cppmicroservices {
 class NoBodyOutputStreamBuffer : public HttpOutputStreamBuffer
 {
 public:
+  virtual ~NoBodyOutputStreamBuffer(){};
+
   explicit NoBodyOutputStreamBuffer(HttpServletResponsePrivate* response)
     : HttpOutputStreamBuffer(response)
     , m_ContentLength(0)
@@ -115,7 +117,7 @@ static const std::string HEADER_LASTMOD = "Last-Modified";
  * written. A subclass might have set this header already, so we
  * check.
  */
-static void MaybeSetLastModified(HttpServletResponse& resp,
+static void MaybeSetLastModified(IHttpServletResponse& resp,
                                  long long lastModified)
 {
   if (resp.ContainsHeader(HEADER_LASTMOD))
@@ -151,8 +153,8 @@ std::shared_ptr<ServletContext> HttpServlet::GetServletContext() const
   return Lock(), d->m_Config.GetServletContext();
 }
 
-void HttpServlet::Service(HttpServletRequest& request,
-                          HttpServletResponse& response)
+void HttpServlet::Service(IHttpServletRequest& request,
+                          IHttpServletResponse& response)
 {
   std::string method = request.GetMethod();
 
@@ -211,13 +213,13 @@ HttpServlet::~HttpServlet()
   delete d;
 }
 
-long long HttpServlet::GetLastModified(HttpServletRequest& /*request*/)
+long long HttpServlet::GetLastModified(IHttpServletRequest& /*request*/)
 {
   return -1;
 }
 
-void HttpServlet::DoGet(HttpServletRequest& request,
-                        HttpServletResponse& response)
+void HttpServlet::DoGet(IHttpServletRequest& request,
+                        IHttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http GET method not supported";
@@ -228,17 +230,21 @@ void HttpServlet::DoGet(HttpServletRequest& request,
   }
 }
 
-void HttpServlet::DoHead(HttpServletRequest& request,
-                         HttpServletResponse& response)
+void HttpServlet::DoHead(IHttpServletRequest& request,
+                         IHttpServletResponse& /*response*/)
 {
-  NoBodyResponse noBodyResponse(response.d.Data());
-
-  DoGet(request, noBodyResponse);
-  noBodyResponse.SetContentLength();
+  void* data = request.RawData();
+  if (nullptr != data) {
+    HttpServletResponsePrivate* responseData;
+    responseData = static_cast<HttpServletResponsePrivate*>(data);
+    NoBodyResponse noBodyResponse(responseData);
+    DoGet(request, noBodyResponse);
+    noBodyResponse.SetContentLength();
+  }
 }
 
-void HttpServlet::DoDelete(HttpServletRequest& request,
-                           HttpServletResponse& response)
+void HttpServlet::DoDelete(IHttpServletRequest& request,
+                           IHttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http DELETE method not supported";
@@ -249,8 +255,8 @@ void HttpServlet::DoDelete(HttpServletRequest& request,
   }
 }
 
-void HttpServlet::DoPost(HttpServletRequest& request,
-                         HttpServletResponse& response)
+void HttpServlet::DoPost(IHttpServletRequest& request,
+                         IHttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http POST method not supported";
@@ -261,8 +267,8 @@ void HttpServlet::DoPost(HttpServletRequest& request,
   }
 }
 
-void HttpServlet::DoPut(HttpServletRequest& request,
-                        HttpServletResponse& response)
+void HttpServlet::DoPut(IHttpServletRequest& request,
+                        IHttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http PUT method not supported";
@@ -273,8 +279,8 @@ void HttpServlet::DoPut(HttpServletRequest& request,
   }
 }
 
-void HttpServlet::DoTrace(HttpServletRequest& request,
-                          HttpServletResponse& response)
+void HttpServlet::DoTrace(IHttpServletRequest& request,
+                          IHttpServletResponse& response)
 {
   std::string CRLF = "\r\n";
   std::string responseString =

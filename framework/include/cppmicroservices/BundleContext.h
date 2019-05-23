@@ -117,8 +117,6 @@ public:
    */
   BundleContext();
 
-  ~BundleContext() = default;
-
   /**
    * Compares this \c BundleContext object with the specified
    * bundle context.

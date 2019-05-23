@@ -24,7 +24,7 @@
 #define CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H
 
 #include "cppmicroservices/SharedData.h"
-#include "cppmicroservices/httpservice/HttpServletPart.h"
+#include "cppmicroservices/httpservice/IHttpServletPart.h"
 
 #include <map>
 #include <memory>
@@ -64,7 +64,7 @@ struct HttpServletRequestPrivate : public SharedData
 
   std::string m_TempDirname;
 
-  typedef std::map<std::string, HttpServletPart*> PartsMapType;
+  typedef std::map<std::string, IHttpServletPart*> PartsMapType;
   PartsMapType m_PartsMap;
 
   typedef std::map<std::string, Any> AttributeMapType;

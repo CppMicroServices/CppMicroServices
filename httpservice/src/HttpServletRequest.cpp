@@ -506,20 +506,20 @@ int HttpServletRequest::field_get(const char* key,
     dynamic_cast<MemoryHttpServletPartPrivate*>(user_data_parsed->PrivatePart);
   if (nullptr != privatePart) {
     privatePart->m_Value = std::string(value).substr(0, valuelen);
-    HttpServletPart* part = new HttpServletPart(privatePart);
+    IHttpServletPart* part = new HttpServletPart(privatePart);
 
 #ifdef _MSC_VER
-    void (*callback)(HttpServletPart*) =
-      static_cast<void (*)(HttpServletPart*)>(user_data_parsed->Callback);
+    void (*callback)(IHttpServletPart*) =
+      static_cast<void (*)(IHttpServletPart*)>(user_data_parsed->Callback);
 #else
-    void (*callback)(HttpServletPart*) =
+    void (*callback)(IHttpServletPart*) =
       reinterpret_cast<decltype(callback)>(user_data_parsed->Callback);
 #endif
 
     HttpServletRequest* httpRequest;
     httpRequest = static_cast<HttpServletRequest*>(user_data_parsed->request);
     httpRequest->d->m_PartsMap.insert(
-      std::pair<std::string, HttpServletPart*>(privatePart->m_Name, part));
+      std::pair<std::string, IHttpServletPart*>(privatePart->m_Name, part));
 
     if (callback != NULL) {
       callback(part);
@@ -538,23 +538,23 @@ int HttpServletRequest::field_store(const char* path,
   privatePart =
     dynamic_cast<FileHttpServletPartPrivate*>(user_data_parsed->PrivatePart);
   if (nullptr != privatePart) {
-    HttpServletPart* part = new HttpServletPart(privatePart);
+    IHttpServletPart* part = new HttpServletPart(privatePart);
 
     privatePart->m_TemporaryFileName = std::string(path);
     privatePart->m_Size = file_size;
 
 #ifdef _MSC_VER
-    void (*callback)(HttpServletPart*) =
-      static_cast<void (*)(HttpServletPart*)>(user_data_parsed->Callback);
+    void (*callback)(IHttpServletPart*) =
+      static_cast<void (*)(IHttpServletPart*)>(user_data_parsed->Callback);
 #else
-    void (*callback)(HttpServletPart*) =
+    void (*callback)(IHttpServletPart*) =
       reinterpret_cast<decltype(callback)>(user_data_parsed->Callback);
 #endif
 
     HttpServletRequest* httpRequest;
     httpRequest = static_cast<HttpServletRequest*>(user_data_parsed->request);
     httpRequest->d->m_PartsMap.insert(
-      std::pair<std::string, HttpServletPart*>(privatePart->m_Name, part));
+      std::pair<std::string, IHttpServletPart*>(privatePart->m_Name, part));
 
     if (callback != NULL) {
       callback(part);
@@ -563,7 +563,7 @@ int HttpServletRequest::field_store(const char* path,
   return 0;
 }
 
-void HttpServletRequest::ReadParts(void* callback(HttpServletPart*))
+void HttpServletRequest::ReadParts(void* callback(IHttpServletPart*))
 {
   UserData user_data;
   user_data.PrivatePart = nullptr;
@@ -584,10 +584,10 @@ HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate* d)
   : d(d)
 {}
 
-std::vector<HttpServletPart*> HttpServletRequest::GetParts() const
+std::vector<IHttpServletPart*> HttpServletRequest::GetParts() const
 {
-  std::vector<HttpServletPart*> v;
-  for (std::map<std::string, HttpServletPart*>::iterator it =
+  std::vector<IHttpServletPart*> v;
+  for (std::map<std::string, IHttpServletPart*>::iterator it =
          d->m_PartsMap.begin();
        it != d->m_PartsMap.end();
        ++it) {
@@ -596,10 +596,15 @@ std::vector<HttpServletPart*> HttpServletRequest::GetParts() const
   return v;
 }
 
-HttpServletPart* HttpServletRequest::GetPart(const std::string& name) const
+void* HttpServletRequest::RawData()
 {
-  HttpServletPart* result = nullptr;
-  std::map<std::string, HttpServletPart*>::iterator it;
+  return d.Data();
+}
+
+IHttpServletPart* HttpServletRequest::GetPart(const std::string& name) const
+{
+  IHttpServletPart* result = nullptr;
+  std::map<std::string, IHttpServletPart*>::iterator it;
   it = d->m_PartsMap.find(name);
   bool found = (it != d->m_PartsMap.end());
   if (found) {

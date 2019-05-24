@@ -34,13 +34,13 @@
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistry.h"
 
+#include <cstdio>
 #include <memory>
 #include <utility>
-#include <cstdio>
 
 namespace cppmicroservices {
 
-BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate>  ctx)
+BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate> ctx)
   : d(std::move(ctx))
 {}
 
@@ -236,7 +236,7 @@ struct ServiceHolder
 
   ServiceHolder(const std::shared_ptr<BundlePrivate>& b,
                 const ServiceReferenceBase& sr,
-                std::shared_ptr<S>  s)
+                std::shared_ptr<S> s)
     : b(b)
     , sref(sr)
     , service(std::move(s))
@@ -297,17 +297,10 @@ InterfaceMapConstPtr BundleContext::GetService(
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
-
-  // Although according to the API contract the returned map should not be modified, there is nothing stopping the consumer from
-  // using a const_pointer_cast and modifying the map. This copy step is to protect the map stored within the framework.
-  InterfaceMapConstPtr imap_copy;
   auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b);
-  if (serviceInterfaceMap) {
-    imap_copy = std::make_shared<const InterfaceMap>(*(serviceInterfaceMap));
-  }
   std::shared_ptr<ServiceHolder<const InterfaceMap>> h(
     new ServiceHolder<const InterfaceMap>(
-      b->shared_from_this(), reference, imap_copy));
+      b->shared_from_this(), reference, serviceInterfaceMap));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 

@@ -155,7 +155,6 @@ void BundleManifest::Parse(std::istream& is)
 
   
   ParseJsonObject(root, m_Headers);
-  (void)GetPropertiesDeprecated();
 }
 
 const AnyMap& BundleManifest::GetHeaders() const

@@ -35,6 +35,11 @@ using AnyOrderedMap = std::map<std::string, cppmicroservices::Any>;
 using AnyMap = cppmicroservices::AnyMap;
 using AnyVector = std::vector<cppmicroservices::Any>;
 
+/**
+ * recursively copy the content of headers into deprecated. "headers" is an AnyMap, which
+ * stores any hierarchical values in AnyMaps also. The purpose of this function is to
+ * store the data in a std::map hierarchy instead.
+ */
 void copy_deprecated_properties(const AnyMap& headers
                                 , AnyOrderedMap& deprecated)
 {
@@ -46,11 +51,12 @@ void copy_deprecated_properties(const AnyMap& headers
                 , [&](auto const& h) {
                     if (typeid(AnyMap) == h.second.Type())
                     {
-                      // recursively copy the anymap to a stdmap and store in deprecated.
-                      AnyOrderedMap cheaders;
+                      // recursively copy the anymap to a std::map and store in deprecated.
+                      AnyOrderedMap deprecated_headers;
                       copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
-                                                 , cheaders);
-                      deprecated.emplace(h.first, std::move(cheaders));
+                                                 , deprecated_headers);
+                      deprecated.emplace(h.first
+                                         , std::move(deprecated_headers));
                     }
                     else
                     {
@@ -135,6 +141,7 @@ void ParseJsonArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, boo
     }
   }
 }
+
 }
 
 BundleManifest::BundleManifest()

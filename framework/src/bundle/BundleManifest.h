@@ -48,6 +48,9 @@ public:
   std::map<std::string, Any> GetPropertiesDeprecated() const;
 
 private:
+  // m_PropertiesDeprecated must be mutable because its content is lazily initialized when
+  // one of the const methods GetValueDeprecated(), GetKeysDeprecated(), or
+  // GetPropertiesDeprecated() is called.
   mutable std::map<std::string, Any> m_PropertiesDeprecated;
   AnyMap m_Headers;
 };

@@ -27,19 +27,49 @@
 #include <rapidjson/istreamwrapper.h>
 
 #include <stdexcept>
+#include <typeinfo>
+
+namespace {
+
+using AnyOrderedMap = std::map<std::string, cppmicroservices::Any>;
+using AnyMap = cppmicroservices::AnyMap;
+using AnyVector = std::vector<cppmicroservices::Any>;
+
+void copy_deprecated_properties(const AnyMap& headers
+                                , AnyOrderedMap& deprecated)
+{
+  if (!deprecated.empty())
+    return;
+  
+  std::for_each(headers.begin()
+                , headers.end()
+                , [&](auto const& h) {
+                    if (typeid(AnyMap) == h.second.Type())
+                    {
+                      // recursively copy the anymap to a stdmap and store in deprecated.
+                      AnyOrderedMap cheaders;
+                      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
+                                                 , cheaders);
+                      deprecated.emplace(h.first, std::move(cheaders));
+                    }
+                    else
+                    {
+                      deprecated.emplace(h.first, h.second);
+                    }
+                  });
+}
+}
 
 namespace cppmicroservices {
 
 namespace {
-
-using AnyOrderedMap = std::map<std::string, Any>;
-using AnyVector = std::vector<Any>;
 
 void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap);
 void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap);
 void ParseJsonArray(const rapidjson::Value& jsonArray,
                     AnyVector& anyVector,
                     bool ci);
+
 
 Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
 {
@@ -123,16 +153,9 @@ void BundleManifest::Parse(std::istream& is)
     throw std::runtime_error("The Json root element must be an object.");
   }
 
-  ParseJsonObject(root, m_PropertiesDeprecated);
+  
   ParseJsonObject(root, m_Headers);
-#if NEVER
-  // Now copy the headers to the std::map to support deprecated apis... this will be
-  // removed when they are.
-  // TODO: Remove when deprecated apis are no longer supported.
-  std::for_each(m_Headers.begin()
-                , m_Headers.end()
-                , [&](auto const& h) { m_PropertiesDeprecated.emplace(h.first, h.second); });
-#endif
+  (void)GetPropertiesDeprecated();
 }
 
 const AnyMap& BundleManifest::GetHeaders() const
@@ -148,7 +171,8 @@ bool BundleManifest::Contains(const std::string& key) const
 Any BundleManifest::GetValue(const std::string& key) const
 {
   auto iter = m_Headers.find(key);
-  if (iter != m_Headers.end()) {
+  if (m_Headers.cend() != iter)
+  {
     return iter->second;
   }
   return Any();
@@ -156,8 +180,10 @@ Any BundleManifest::GetValue(const std::string& key) const
 
 Any BundleManifest::GetValueDeprecated(const std::string& key) const
 {
+  copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
   auto iter = m_PropertiesDeprecated.find(key);
-  if (iter != m_PropertiesDeprecated.end()) {
+  if (m_PropertiesDeprecated.cend() != iter)
+  {
     return iter->second;
   }
   return Any();
@@ -165,10 +191,12 @@ Any BundleManifest::GetValueDeprecated(const std::string& key) const
 
 std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
+  copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
   std::vector<std::string> keys;
-  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.begin();
-       iter != m_PropertiesDeprecated.end();
-       ++iter) {
+  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.cbegin();
+       iter != m_PropertiesDeprecated.cend();
+       ++iter)
+  {
     keys.push_back(iter->first);
   }
   return keys;
@@ -176,6 +204,8 @@ std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 
 std::map<std::string, Any> BundleManifest::GetPropertiesDeprecated() const
 {
+  copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
   return m_PropertiesDeprecated;
 }
+
 }

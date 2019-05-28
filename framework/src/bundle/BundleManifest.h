@@ -48,9 +48,10 @@ public:
   std::map<std::string, Any> GetPropertiesDeprecated() const;
 
 private:
-  std::map<std::string, Any> m_PropertiesDeprecated;
+  mutable std::map<std::string, Any> m_PropertiesDeprecated;
   AnyMap m_Headers;
 };
+
 }
 
 #endif // CPPMICROSERVICES_BUNDLEMANIFEST_H

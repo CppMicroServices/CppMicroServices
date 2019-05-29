@@ -69,8 +69,14 @@ TEST(BundleManifestTest, InstallBundleWithDeepManifest)
   framework.Start();
   auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleWithDeepManifest");
   auto headers = bundle.GetHeaders();
-  ASSERT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString(),
-                      ::testing::StrEq("TestBundleWithDeepManifest")) << "Bundle symblic name doesn't match.";
+  ASSERT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
+              , ::testing::StrEq("TestBundleWithDeepManifest")) << "Bundle symblic name doesn't match.";
+
+  // The same key/value must continue to exist in the deprecated properties map.
+  auto deprecatedProperties = bundle.GetProperties();
+  ASSERT_THAT(deprecatedProperties.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
+              , ::testing::StrEq("TestBundleWithDeepManifest")) << "Bundle symblic name doesn't match.";
+  
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
 }
@@ -80,19 +86,34 @@ TEST(BundleManifestTest, ParseManifest)
   auto framework = FrameworkFactory().NewFramework();
   framework.Start();
 
-  auto bundleM =
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleM");
+  auto bundleM = cppmicroservices::testing::InstallLib(framework.GetBundleContext()
+                                                       , "TestBundleM");
+  
   ASSERT_TRUE(bundleM) << "Failed to install TestBundleM";
 
   auto headers = bundleM.GetHeaders();
+  
+  EXPECT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
+              , ::testing::StrEq("TestBundleM"));
+  EXPECT_THAT(headers.at(Constants::BUNDLE_DESCRIPTION).ToString()
+              , ::testing::StrEq("My Bundle description"));
+  EXPECT_THAT(headers.at(Constants::BUNDLE_VERSION).ToString()
+              , ::testing::StrEq("1.0.0"));
+  
+  // We should also check to make sure that the deprecated properties have been set up
+  // correctly. 
+  auto deprecatedProperties = bundleM.GetProperties();
+  EXPECT_THAT(deprecatedProperties.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
+              , ::testing::StrEq("TestBundleM"));
+  EXPECT_THAT(deprecatedProperties.at(Constants::BUNDLE_DESCRIPTION).ToString()
+              , ::testing::StrEq("My Bundle description"));
+  EXPECT_THAT(deprecatedProperties.at(Constants::BUNDLE_VERSION).ToString()
+              , ::testing::StrEq("1.0.0"));
 
-  EXPECT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString(),
-               ::testing::StrEq("TestBundleM"));
-  EXPECT_THAT(bundleM.GetSymbolicName(), ::testing::StrEq("TestBundleM"));
-  EXPECT_THAT(headers.at(Constants::BUNDLE_DESCRIPTION).ToString(),
-               ::testing::StrEq("My Bundle description"));
-  EXPECT_THAT(headers.at(Constants::BUNDLE_VERSION).ToString(), ::testing::StrEq("1.0.0"));
-  EXPECT_EQ(bundleM.GetVersion(), BundleVersion(1, 0, 0));
+  EXPECT_THAT(bundleM.GetSymbolicName()
+              , ::testing::StrEq("TestBundleM"));
+  EXPECT_EQ(bundleM.GetVersion()
+            , BundleVersion(1, 0, 0));
 
   Any integer = headers.at("number");
   ASSERT_EQ(integer.Type(), typeid(int));

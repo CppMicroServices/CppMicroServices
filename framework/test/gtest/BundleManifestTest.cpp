@@ -36,6 +36,49 @@
 
 using namespace cppmicroservices;
 
+namespace
+{
+    /**
+     * recursively compare the content of headers with deprecated. "headers" is an AnyMap, which
+     * stores any hierarchical values in AnyMaps also. The purpose of this function is to
+     * store the data in a std::map hierarchy instead.
+     */
+    bool compare_deprecated_properties(const AnyMap& headers
+                                       , const std::map<std::string, Any>& deprecated)
+    {
+        for (auto const& h : headers)
+        {
+            if (typeid(AnyMap) == h.second.Type())
+            {
+                try
+                {
+                    auto subHeaders = any_cast<AnyMap>(h.second);
+                    auto subDeprecated = any_cast<std::map<std::string, Any>>(deprecated.at(h.first));
+                    return compare_deprecated_properties(subHeaders, subDeprecated);
+                }
+                catch (std::exception& e)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    auto const& deprecatedValue = deprecated.at(h.first);
+                    if (h.second.ToString() != deprecatedValue.ToString())
+                        return false;
+                }
+                catch (std::exception& e)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+
 TEST(BundleManifestTest, UnicodeProperty)
 {
   // 1. building static libraries (test bundle is included in the executable)
@@ -74,8 +117,7 @@ TEST(BundleManifestTest, InstallBundleWithDeepManifest)
 
   // The same key/value must continue to exist in the deprecated properties map.
   auto deprecatedProperties = bundle.GetProperties();
-  ASSERT_THAT(deprecatedProperties.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
-              , ::testing::StrEq("TestBundleWithDeepManifest")) << "Bundle symblic name doesn't match.";
+  ASSERT_TRUE(compare_deprecated_properties(headers, deprecatedProperties)) << "Deprecated properties mismatch";
   
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
@@ -103,12 +145,7 @@ TEST(BundleManifestTest, ParseManifest)
   // We should also check to make sure that the deprecated properties have been set up
   // correctly. 
   auto deprecatedProperties = bundleM.GetProperties();
-  EXPECT_THAT(deprecatedProperties.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
-              , ::testing::StrEq("TestBundleM"));
-  EXPECT_THAT(deprecatedProperties.at(Constants::BUNDLE_DESCRIPTION).ToString()
-              , ::testing::StrEq("My Bundle description"));
-  EXPECT_THAT(deprecatedProperties.at(Constants::BUNDLE_VERSION).ToString()
-              , ::testing::StrEq("1.0.0"));
+  ASSERT_TRUE(compare_deprecated_properties(headers, deprecatedProperties)) << "Deprecated properties mismatch";
 
   EXPECT_THAT(bundleM.GetSymbolicName()
               , ::testing::StrEq("TestBundleM"));

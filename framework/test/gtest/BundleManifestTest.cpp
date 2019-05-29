@@ -50,6 +50,9 @@ namespace
         {
             if (typeid(AnyMap) == h.second.Type())
             {
+                // If the headers contain a submap, we need to recurse to compare the
+                // values in the submaps since the deprecated properties are stored in a
+                // std::map.
                 try
                 {
                     auto subHeaders = any_cast<AnyMap>(h.second);

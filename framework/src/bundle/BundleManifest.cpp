@@ -41,29 +41,22 @@ using AnyVector = std::vector<cppmicroservices::Any>;
  * store the data in a std::map hierarchy instead.
  */
 void copy_deprecated_properties(const AnyMap& headers
-                                , AnyOrderedMap& deprecated)
+                                  , AnyOrderedMap& deprecated)
 {
-  if (!deprecated.empty())
-    return;
-  
-  std::for_each(headers.begin()
-                , headers.end()
-                , [&](auto const& h) {
-                    if (typeid(AnyMap) == h.second.Type())
-                    {
-                      // recursively copy the anymap to a std::map and store in deprecated.
-                      AnyOrderedMap deprecated_headers;
-                      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
-                                                 , deprecated_headers);
-                      deprecated.emplace(h.first
-                                         , std::move(deprecated_headers));
-                    }
-                    else
-                    {
-                      deprecated.emplace(h.first, h.second);
-                    }
-                  });
+  for (auto const& h : headers) {
+    if (typeid(AnyMap) == h.second.Type()) {
+      // recursively copy the anymap to a std::map and store in deprecated.
+      AnyOrderedMap deprecated_headers;
+      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
+                                 , deprecated_headers);
+      deprecated.emplace(h.first, std::move(deprecated_headers));
+    }
+    else {
+      deprecated.emplace(h.first, h.second);
+    }
+  }
 }
+
 }
 
 namespace cppmicroservices {
@@ -184,12 +177,17 @@ Any BundleManifest::GetValue(const std::string& key) const
   return Any();
 }
 
+void BundleManifest::CopyDeprecatedProperties() const
+{
+  std::call_once(m_DidCopyDeprecatedProperties
+                 , [&]() { copy_deprecated_properties(m_Headers, m_PropertiesDeprecated); });
+}
+
 Any BundleManifest::GetValueDeprecated(const std::string& key) const
 {
-  copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
+  CopyDeprecatedProperties();
   auto iter = m_PropertiesDeprecated.find(key);
-  if (m_PropertiesDeprecated.cend() != iter)
-  {
+  if (m_PropertiesDeprecated.cend() != iter) {
     return iter->second;
   }
   return Any();
@@ -197,12 +195,11 @@ Any BundleManifest::GetValueDeprecated(const std::string& key) const
 
 std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
-  copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
+  CopyDeprecatedProperties();
   std::vector<std::string> keys;
   for (AnyMap::const_iterator iter = m_PropertiesDeprecated.cbegin();
        iter != m_PropertiesDeprecated.cend();
-       ++iter)
-  {
+       ++iter) {
     keys.push_back(iter->first);
   }
   return keys;
@@ -210,7 +207,7 @@ std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 
 std::map<std::string, Any> BundleManifest::GetPropertiesDeprecated() const
 {
-  copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
+  CopyDeprecatedProperties();
   return m_PropertiesDeprecated;
 }
 

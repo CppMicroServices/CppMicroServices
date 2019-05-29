@@ -38,55 +38,50 @@ using namespace cppmicroservices;
 
 namespace
 {
-    /**
-     * recursively compare the content of headers with deprecated. "headers" is an AnyMap, which
-     * stores any hierarchical values in AnyMaps also. The purpose of this function is to
-     * store the data in a std::map hierarchy instead.
-     */
-    bool compare_deprecated_properties(const AnyMap& headers
-                                       , const std::map<std::string, Any>& deprecated)
-    {
-        try
-        {
-            for (auto const& h : headers)
-            {
-                if (typeid(AnyMap) == h.second.Type())
-                {
-                    // If the headers contain a submap, we need to recurse to compare the
-                    // values in the submaps since the deprecated properties are stored in a
-                    // std::map.
-                    auto subHeaders = any_cast<AnyMap>(h.second);
-                    auto subDeprecated = any_cast<std::map<std::string, Any>>(deprecated.at(h.first));
-                    return compare_deprecated_properties(subHeaders, subDeprecated);
-                }
-                else
-                {
-                    auto const& deprecatedValue = deprecated.at(h.first);
+/**
+ * recursively compare the content of headers with deprecated. "headers" is an AnyMap, which
+ * stores any hierarchical values in AnyMaps also. The purpose of this function is to
+ * store the data in a std::map hierarchy instead.
+ */
+bool compare_deprecated_properties(const AnyMap& headers
+                                   , const std::map<std::string, Any>& deprecated)
+{
+  try {
+    for (auto const& h : headers) {
+      if (typeid(AnyMap) == h.second.Type()) {
+        // If the headers contain a submap, we need to recurse to compare the
+        // values in the submaps since the deprecated properties are stored in a
+        // std::map.
+        auto subHeaders = any_cast<AnyMap>(h.second);
+        auto subDeprecated = any_cast<std::map<std::string, Any>>(deprecated.at(h.first));
+        return compare_deprecated_properties(subHeaders, subDeprecated);
+      }
+      else {
+        auto const& deprecatedValue = deprecated.at(h.first);
                     
-                    // There's no way to compare the values contained in the "Any"s. So,
-                    // first make sure the type ids match
-                    if (h.second.Type() != deprecatedValue.Type())
-                        return false;
+        // There's no way to compare the values contained in the "Any"s. So,
+        // first make sure the type ids match
+        if (h.second.Type() != deprecatedValue.Type())
+          return false;
 
-                    // And if the types match, make sure that the values
-                    // match. Unfortunately the only way to get the value out is via an
-                    // any_cast which requires the actual C++ type be known, and since we
-                    // don't, we have to compare the string representations.
-                    if (h.second.ToString() != deprecatedValue.ToString())
-                        return false;
-                }
-            }
-        }
-        catch (...)
-        {
-            // The ".at" method on maps can throw, and can the any_cast<> operation. These
-            // will only throw if there's some sort of mismatch between the content of
-            // "headers" and "deprecated".
-            return false;
-        }
-
-        return true;
+        // And if the types match, make sure that the values
+        // match. Unfortunately the only way to get the value out is via an
+        // any_cast which requires the actual C++ type be known, and since we
+        // don't, we have to compare the string representations.
+        if (h.second.ToString() != deprecatedValue.ToString())
+          return false;
+      }
     }
+  }
+  catch (...) {
+    // The ".at" method on maps can throw, and can the any_cast<> operation. These
+    // will only throw if there's some sort of mismatch between the content of
+    // "headers" and "deprecated".
+    return false;
+  }
+  return true;
+}
+
 }
 
 TEST(BundleManifestTest, UnicodeProperty)

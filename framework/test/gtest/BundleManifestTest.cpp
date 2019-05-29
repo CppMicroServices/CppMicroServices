@@ -77,7 +77,7 @@ namespace
                 }
             }
         }
-        catch (std::exception& e)
+        catch (...)
         {
             // The ".at" method on maps can throw, and can the any_cast<> operation. These
             // will only throw if there's some sort of mismatch between the content of

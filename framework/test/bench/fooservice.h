@@ -1,6 +1,6 @@
 
 // A dummy interface and impl to use with service trackers
-namespace googlebenchmark {
+namespace benchmark {
 namespace test {
 class Foo
 {

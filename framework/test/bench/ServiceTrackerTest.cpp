@@ -42,9 +42,9 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)
 (benchmark::State& state)
 {
   auto fc = framework->GetBundleContext();
-  auto serviceReg = fc.RegisterService<googlebenchmark::test::Foo>(std::make_shared<googlebenchmark::test::FooImpl>());
-  cppmicroservices::ServiceTracker<googlebenchmark::test::Foo> fooTracker(
-    fc, serviceReg.GetReference<googlebenchmark::test::Foo>());
+  auto serviceReg = fc.RegisterService<benchmark::test::Foo>(std::make_shared<benchmark::test::FooImpl>());
+  cppmicroservices::ServiceTracker<benchmark::test::Foo> fooTracker(
+    fc, serviceReg.GetReference<benchmark::test::Foo>());
   for (auto _ : state) {
     auto start = std::chrono::high_resolution_clock::now();
     fooTracker.Open();
@@ -62,8 +62,8 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithBundleContext)
 (benchmark::State& state)
 {
   auto fc = framework->GetBundleContext();
-  auto serviceReg = fc.RegisterService<googlebenchmark::test::Foo>(std::make_shared<googlebenchmark::test::FooImpl>());
-  cppmicroservices::ServiceTracker<googlebenchmark::test::Foo> fooTracker(fc);
+  auto serviceReg = fc.RegisterService<benchmark::test::Foo>(std::make_shared<benchmark::test::FooImpl>());
+  cppmicroservices::ServiceTracker<benchmark::test::Foo> fooTracker(fc);
   for (auto _ : state) {
     auto start = std::chrono::high_resolution_clock::now();
     fooTracker.Open();
@@ -81,8 +81,8 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
 (benchmark::State& state)
 {
   auto fc = framework->GetBundleContext();
-  auto serviceReg = fc.RegisterService<googlebenchmark::test::Foo>(std::make_shared<googlebenchmark::test::FooImpl>());
-  cppmicroservices::ServiceTracker<googlebenchmark::test::Foo> fooTracker(fc, std::string("googlebenchmark::test::Foo"));
+  auto serviceReg = fc.RegisterService<benchmark::test::Foo>(std::make_shared<benchmark::test::FooImpl>());
+  cppmicroservices::ServiceTracker<benchmark::test::Foo> fooTracker(fc, std::string("benchmark::test::Foo"));
 
   for (auto _ : state) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -104,17 +104,17 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalability)
   auto fc = framework->GetBundleContext();
 
   int64_t maxServiceTrackers{ state.range(0) };
-  std::vector<std::unique_ptr<cppmicroservices::ServiceTracker<googlebenchmark::test::Foo>>> trackers;
+  std::vector<std::unique_ptr<cppmicroservices::ServiceTracker<benchmark::test::Foo>>> trackers;
   for (int64_t i = 0; i < maxServiceTrackers; ++i) {
     auto fooTracker =
-      std::make_unique<cppmicroservices::ServiceTracker<googlebenchmark::test::Foo>>(fc);
+      std::make_unique<cppmicroservices::ServiceTracker<benchmark::test::Foo>>(fc);
     fooTracker->Open();
     trackers.emplace_back(std::move(fooTracker));
   }
 
   // how long does it take for N trackers to receive the register service event?
   for (auto _ : state) {
-    fc.RegisterService<googlebenchmark::test::Foo>(std::make_shared<googlebenchmark::test::FooImpl>());
+    fc.RegisterService<benchmark::test::Foo>(std::make_shared<benchmark::test::FooImpl>());
   }
 
   for (auto& tracker : trackers) {

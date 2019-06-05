@@ -14,6 +14,7 @@ include_directories(
 #-----------------------------------------------------------------------------
 set(_bench_src 
   ServiceRegistryTest.cpp
+  ServiceTrackerTest.cpp
 )
 
 

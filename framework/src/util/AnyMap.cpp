@@ -118,7 +118,7 @@ Any AtCompoundKey(const AnyMap& m,
       return itr->second;
     }
   }
-  return defaultVal;
+  return std::move(defaultVal);
 }
 
 Any AtCompoundKey(const std::vector<Any>& v,
@@ -132,7 +132,7 @@ Any AtCompoundKey(const std::vector<Any>& v,
   try {
     index = std::stoi(head);
   } catch (...) {
-    return defaultval;
+    return std::move(defaultval);
   }
   if (static_cast<size_t>(std::abs(index)) < v.size()) {
     auto& h = v[(index < 0 ? v.size() + index : index)];
@@ -146,7 +146,7 @@ Any AtCompoundKey(const std::vector<Any>& v,
         ref_any_cast<std::vector<Any>>(h), tail, std::move(defaultval));
     }
   }
-  return defaultval;
+  return std::move(defaultval);
 }
 }
 

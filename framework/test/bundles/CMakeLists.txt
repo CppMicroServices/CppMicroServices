@@ -54,3 +54,7 @@ add_subdirectory(libBA_X1)
 add_subdirectory(libBA_S1)
 add_subdirectory(libBA_10)
 add_subdirectory(libU)
+add_subdirectory(DataOnlyTestBundle)
+add_subdirectory(dummyService)
+add_subdirectory(largeBundle)
+

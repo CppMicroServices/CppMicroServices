@@ -23,8 +23,6 @@ public:
 
   void SetUp(const ::benchmark::State&)
   {
-    using namespace cppmicroservices;
-    
     framework      = std::make_shared<Framework>(FrameworkFactory().NewFramework());
     framework->Start();
     auto context   = framework->GetBundleContext();

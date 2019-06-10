@@ -39,9 +39,7 @@ US_MSVC_DISABLE_WARNING(
 
 namespace cppmicroservices {
 
-ServiceRegistrationBase::ServiceRegistrationBase()
-   
-{}
+ServiceRegistrationBase::ServiceRegistrationBase() {}
 
 ServiceRegistrationBase::ServiceRegistrationBase(
   const ServiceRegistrationBase& reg)
@@ -129,7 +127,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
         ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
     }
 
-    // This calls into service event listener hooks. We must not hold any looks here
+    // This calls into service event listener hooks. We must not hold any locks here
     d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
       modifiedEndMatchEvent, before);
 
@@ -141,26 +139,28 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       US_UNUSED(l);
       if (!d->available)
         throw std::logic_error("Service is unregistered");
-
+      auto propsCopy(props);
       {
         auto l2 = d->properties.Lock();
         US_UNUSED(l2);
+        propsCopy[Constants::SERVICE_ID] =
+          d->properties.Value_unlocked(Constants::SERVICE_ID);
+        propsCopy[Constants::OBJECTCLASS] =
+          d->properties.Value_unlocked(Constants::OBJECTCLASS);
+        propsCopy[Constants::SERVICE_SCOPE] =
+          d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
 
-        Any any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
-        if (any.Type() == typeid(int))
-          old_rank = any_cast<int>(any);
+        auto itr = propsCopy.find(Constants::SERVICE_RANKING);
+        if (itr != propsCopy.end()) {
+          new_rank = any_cast<int>(itr->second);
+        }
 
-        classes = ref_any_cast<std::vector<std::string>>(
-          d->properties.Value_unlocked(Constants::OBJECTCLASS));
-
-        auto sid = any_cast<long int>(
-          d->properties.Value_unlocked(Constants::SERVICE_ID));
-        d->properties = ServiceRegistry::CreateServiceProperties(
-          props, classes, false, false, sid);
-
-        any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
-        if (any.Type() == typeid(int))
-          new_rank = any_cast<int>(any);
+        auto oldRankAny =
+          d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+        if (!oldRankAny.Empty()) {
+          old_rank = any_cast<int>(oldRankAny);
+        }
+        d->properties = Properties(propsCopy);
       }
     }
     if (old_rank != new_rank) {
@@ -171,7 +171,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
     throw std::logic_error("Service is unregistered");
   }
 
-  // Notify listeners, we must no hold any locks here
+  // Notify listeners, we must not hold any locks here
   ServiceListeners::ServiceListenerEntries matchingListeners;
   d->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent,
                                                             matchingListeners);
@@ -192,16 +192,19 @@ void ServiceRegistrationBase::Unregister()
   CoreBundleContext* coreContext = nullptr;
 
   if (d->available) {
-    // Lock the service registry first
-    auto l1 = d->bundle->coreCtx->services.Lock();
-    US_UNUSED(l1);
-    auto l2 = d->Lock();
-    US_UNUSED(l2);
-    if (d->unregistering)
-      return;
-    d->unregistering = true;
+    {
+      auto l2 = d->Lock();
+      US_UNUSED(l2);
+      if (d->unregistering)
+        return;
+      d->unregistering = true;
+    }
+    {
+      auto l1 = d->bundle->coreCtx->services.Lock();
+      US_UNUSED(l1);
+      d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
+    }
 
-    d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
     coreContext = d->bundle->coreCtx;
   } else {
     throw std::logic_error("Service is unregistered");
@@ -225,8 +228,7 @@ void ServiceRegistrationBase::Unregister()
     auto l = d->Lock();
     US_UNUSED(l);
     d->available = false;
-    auto factoryIter =
-      d->service->find("org.cppmicroservices.factory");
+    auto factoryIter = d->service->find("org.cppmicroservices.factory");
     if (d->bundle && factoryIter != d->service->end()) {
       serviceFactory =
         std::static_pointer_cast<ServiceFactory>(factoryIter->second);

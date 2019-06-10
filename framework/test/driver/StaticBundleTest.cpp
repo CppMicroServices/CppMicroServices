@@ -94,9 +94,9 @@ void frame020a(BundleContext context, TestBundleListener& listener)
 
     std::vector<ServiceEvent> seEvts;
     seEvts.push_back(
-                     ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
+      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
     seEvts.push_back(
-                     ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
+      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
 
     bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS
@@ -151,9 +151,9 @@ void frame030b(BundleContext context, TestBundleListener& listener)
 
   std::vector<ServiceEvent> seEvts;
   seEvts.push_back(
-                   ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.back()));
+    ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.front()));
   seEvts.push_back(
-                   ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.front()));
+    ServiceEvent(ServiceEvent::SERVICE_UNREGISTERING, refs.back()));
 
   bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS
@@ -225,7 +225,7 @@ void frame040c(BundleContext context, TestBundleListener& listener)
 
 } // end unnamed namespace
 
-int StaticBundleTest(int /*argc*/, char* /*argv*/ [])
+int StaticBundleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("StaticBundleTest");
 

@@ -13,7 +13,3 @@ class FooImpl : public Foo
 
 }
 }
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

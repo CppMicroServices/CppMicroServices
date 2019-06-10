@@ -112,7 +112,3 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, FindServices)(benchmark::State& state
 // second parameter in the Ranges specifies the number of interfaces used in the call to RegisterService
 BENCHMARK_REGISTER_F(ServiceRegistryFixture, FindServices)->RangeMultiplier(4)
                                                           ->Ranges({{1, 1000}, {1, 1000}});
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

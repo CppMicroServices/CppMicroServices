@@ -123,7 +123,3 @@ BENCHMARK_CAPTURE(MatchFilterWithBundle, Simple, GetSimpleLDAPFilter());
 BENCHMARK_CAPTURE(MatchFilterWithBundle, Complex, GetComplexLDAPFilter());
 BENCHMARK_CAPTURE(MatchFilterWithServiceReference, Simple, GetSimpleLDAPFilter());
 BENCHMARK_CAPTURE(MatchFilterWithServiceReference, Complex, GetComplexLDAPFilter());
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

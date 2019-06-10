@@ -59,7 +59,3 @@ BENCHMARK_DEFINE_F(BundleInstallFixture, LargeBundleInstallCppFramework)(benchma
 // Register functions as benchmark
 BENCHMARK_REGISTER_F(BundleInstallFixture, BundleInstallCppFramework)->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, LargeBundleInstallCppFramework)->UseManualTime();
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

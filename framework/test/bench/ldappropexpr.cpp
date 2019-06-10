@@ -29,7 +29,3 @@ static void ConstructFilterNotOperator(benchmark::State& state)
 // Register functions as benchmarrk
 BENCHMARK(ConstructFilterIncremental);
 BENCHMARK(ConstructFilterNotOperator);
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

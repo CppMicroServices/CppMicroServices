@@ -188,7 +188,3 @@ BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, ErrorPath_NoThrowOverload)->Arg(1)
                                                                       ->Arg(15)
                                                                       ->Arg(18)
                                                                       ->Arg(20);
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

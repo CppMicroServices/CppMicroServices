@@ -137,7 +137,3 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)->Arg(1)
                                                                       ->Arg(4000)
                                                                       ->Arg(10000);
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

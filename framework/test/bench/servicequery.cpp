@@ -88,7 +88,3 @@ BENCHMARK_REGISTER_F(ServiceFixture, GetAllServiceReferencesByInterface);
 BENCHMARK_REGISTER_F(ServiceFixture, GetAllServiceReferencesByClassName);
 BENCHMARK_REGISTER_F(ServiceFixture, GetAllServiceReferencesByClassNameAndLDAPFilter);
 BENCHMARK_REGISTER_F(ServiceFixture, GetAllServiceReferencesByInterfaceAndLDAPFilter);
-
-//// Local Variables:
-//// c-file-style: "cppms"
-//// End:

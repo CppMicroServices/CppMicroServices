@@ -134,7 +134,6 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(
 }
 
 void ServiceRegistry::UpdateServiceRegistrationOrder(
-  const ServiceRegistrationBase& /*sr*/,
   const std::vector<std::string>& classes)
 {
   auto l = this->Lock();

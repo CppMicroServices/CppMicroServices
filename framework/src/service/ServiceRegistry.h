@@ -106,14 +106,12 @@ public:
                                           const ServiceProperties& properties);
 
   /**
-   * Service ranking changed, reorder registered services
-   * according to ranking.
+   * Reorder registered services. Call this method if the ranking for
+   * a service registration has changed
    *
-   * @param serviceRegistration The ServiceRegistrationPrivate object.
-   * @param rank New rank of object.
+   * @param classes is the list of classes whose entries need to be reordered
    */
-  void UpdateServiceRegistrationOrder(const ServiceRegistrationBase& sr,
-                                      const std::vector<std::string>& classes);
+  void UpdateServiceRegistrationOrder(const std::vector<std::string>& classes);
 
   /**
    * Get all services implementing a certain class.

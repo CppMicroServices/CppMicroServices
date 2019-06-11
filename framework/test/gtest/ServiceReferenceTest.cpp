@@ -123,7 +123,7 @@ TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithMultipleRegistrations)
 {
   auto context = framework.GetBundleContext();
   // register multiple service impls against the same interface
-  // very that GetServiceReference returns the first registered service
+  // verify that GetServiceReference returns the first registered service
   std::vector<std::shared_ptr<TestServiceA>> implArr;
   for (int i = 0; i < 10; ++i) {
     auto impl = std::make_shared<TestServiceA>();

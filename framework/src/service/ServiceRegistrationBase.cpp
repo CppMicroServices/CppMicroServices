@@ -137,8 +137,10 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
     {
       auto l = d->Lock();
       US_UNUSED(l);
-      if (!d->available)
+      if (!d->available) {
         throw std::logic_error("Service is unregistered");
+      }
+
       auto propsCopy(props);
       {
         auto l2 = d->properties.Lock();
@@ -183,11 +185,13 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
 void ServiceRegistrationBase::Unregister()
 {
-  if (!d)
+  if (!d) {
     throw std::logic_error("ServiceRegistrationBase object invalid");
+  }
 
-  if (d->unregistering)
+  if (d->unregistering) {
     return; // Silently ignore redundant unregistration.
+  }
 
   CoreBundleContext* coreContext = nullptr;
 
@@ -195,8 +199,9 @@ void ServiceRegistrationBase::Unregister()
     {
       auto l2 = d->Lock();
       US_UNUSED(l2);
-      if (d->unregistering)
+      if (d->unregistering) {
         return;
+      }
       d->unregistering = true;
     }
     {

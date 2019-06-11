@@ -26,7 +26,9 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceObjects.h"
+#include "cppmicroservices/ServiceRegistration.h"
 #include "gtest/gtest.h"
+#include <array>
 
 using namespace cppmicroservices;
 
@@ -216,4 +218,23 @@ TEST_F(ServiceReferenceTest,
                                     (serviceRank == bestMatchServiceRank &&
                                      serviceId < bestMatchServiceId);
                            }));
+}
+
+TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithModifiedProperties)
+{
+  auto context = framework.GetBundleContext();
+  std::array<cppmicroservices::ServiceRegistration<ServiceNS::ITestServiceA>, 2>
+    regArr;
+  regArr[0] = context.RegisterService<ServiceNS::ITestServiceA>(
+    std::make_shared<TestServiceA>());
+  regArr[1] = context.RegisterService<ServiceNS::ITestServiceA>(
+    std::make_shared<TestServiceA>());
+
+  ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(),
+            regArr[0].GetReference());
+
+  // modify the lower priority registration to bump up the priority
+  regArr[1].SetProperties({ { Constants::SERVICE_RANKING, 10 } });
+  ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(),
+            regArr[1].GetReference());
 }

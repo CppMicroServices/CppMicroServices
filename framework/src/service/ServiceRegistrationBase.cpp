@@ -133,7 +133,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
     int old_rank = 0;
     int new_rank = 0;
-    std::vector<std::string> classes;
+    auto propsCopy(props);
     {
       auto l = d->Lock();
       US_UNUSED(l);
@@ -141,33 +141,31 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
         throw std::logic_error("Service is unregistered");
       }
 
-      auto propsCopy(props);
-      {
-        auto l2 = d->properties.Lock();
-        US_UNUSED(l2);
-        propsCopy[Constants::SERVICE_ID] =
-          d->properties.Value_unlocked(Constants::SERVICE_ID);
-        propsCopy[Constants::OBJECTCLASS] =
-          d->properties.Value_unlocked(Constants::OBJECTCLASS);
-        propsCopy[Constants::SERVICE_SCOPE] =
-          d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
+      auto l2 = d->properties.Lock();
+      US_UNUSED(l2);
+      propsCopy[Constants::SERVICE_ID] =
+        d->properties.Value_unlocked(Constants::SERVICE_ID);
+      propsCopy[Constants::OBJECTCLASS] =
+        d->properties.Value_unlocked(Constants::OBJECTCLASS);
+      propsCopy[Constants::SERVICE_SCOPE] =
+        d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
 
-        auto itr = propsCopy.find(Constants::SERVICE_RANKING);
-        if (itr != propsCopy.end()) {
-          new_rank = any_cast<int>(itr->second);
-        }
-
-        auto oldRankAny =
-          d->properties.Value_unlocked(Constants::SERVICE_RANKING);
-        if (!oldRankAny.Empty()) {
-          old_rank = any_cast<int>(oldRankAny);
-        }
-        d->properties = Properties(propsCopy);
+      auto itr = propsCopy.find(Constants::SERVICE_RANKING);
+      if (itr != propsCopy.end()) {
+        new_rank = any_cast<int>(itr->second);
       }
+
+      auto oldRankAny =
+        d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+      if (!oldRankAny.Empty()) {
+        old_rank = any_cast<int>(oldRankAny);
+      }
+      d->properties = Properties(propsCopy);
     }
     if (old_rank != new_rank) {
-      d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(*this,
-                                                                  classes);
+      auto classes = cppmicroservices::any_cast<std::vector<std::string>>(
+        propsCopy[Constants::OBJECTCLASS]);
+      d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
     }
   } else {
     throw std::logic_error("Service is unregistered");

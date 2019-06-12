@@ -149,7 +149,6 @@ TEST(AnyMapTest, AnyMap)
   AnyMap uco_anymap(uco);
 
   AnyMap o_anymap1(AnyMap::ORDERED_MAP);
-  o_anymap1 = o_anymap1;
   o_anymap1 = o_anymap_copy;
   AnyMap uo_anymap1(AnyMap::UNORDERED_MAP);
   uo_anymap1 = uo_anymap;

@@ -1,0 +1,3 @@
+
+usFunctionCreateTestBundleWithResources(DataOnlyTestBundle RESOURCES manifest.json)
+

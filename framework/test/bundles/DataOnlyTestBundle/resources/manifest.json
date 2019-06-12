@@ -1,0 +1,83 @@
+{
+    "bundle.symbolic_name" : "DataOnlyTestBundle",
+    "bundle_priority" : "high",
+    "bundle_start" : "greedy",
+    "bundle_configuration" : [{
+        "mode": "cloud",
+        "minProgLevel": "Dynamic",
+        "run_during_start" : "false"
+    }],
+    "Test_AtCompoundKey": {
+	"relativelylongkeyname_element": true,
+	"relativelylongkeyname_map": {
+	    "relativelylongkeyname_element": true,
+	    "relativelylongkeyname_map": {
+		"relativelylongkeyname_element": true,
+		"relativelylongkeyname_map": {
+		    "relativelylongkeyname_element": true,
+		    "relativelylongkeyname_map": {
+			"relativelylongkeyname_element": true,
+			"relativelylongkeyname_map": {
+			    "relativelylongkeyname_element": true,
+			    "relativelylongkeyname_map": {
+				"relativelylongkeyname_element": true,
+				"relativelylongkeyname_map": {
+				    "relativelylongkeyname_element": true,
+				    "relativelylongkeyname_map": {
+					"relativelylongkeyname_element": true,
+					"relativelylongkeyname_map": {
+					    "relativelylongkeyname_element": true,
+					    "relativelylongkeyname_map": {
+						"relativelylongkeyname_element": true,
+						"relativelylongkeyname_map": {
+						    "relativelylongkeyname_element": true,
+						    "relativelylongkeyname_map": {
+							"relativelylongkeyname_element": true,
+							"relativelylongkeyname_map": {
+							    "relativelylongkeyname_element": true,
+							    "relativelylongkeyname_map": {
+								"relativelylongkeyname_element": true,
+								"relativelylongkeyname_map": {
+								    "relativelylongkeyname_element": true,
+								    "relativelylongkeyname_map": {
+									"relativelylongkeyname_element": true,
+									"relativelylongkeyname_map": {
+									    "relativelylongkeyname_element": true,
+									    "relativelylongkeyname_map": {
+										"relativelylongkeyname_element": true,
+										"relativelylongkeyname_map": {
+										    "relativelylongkeyname_element": true,
+										    "relativelylongkeyname_map": {
+											"relativelylongkeyname_element": true,
+											"relativelylongkeyname_map": {
+											    "relativelylongkeyname_element": true,
+											    "relativelylongkeyname_map": {
+												"relativelylongkeyname_element": true,
+												"relativelylongkeyname_map": {
+												    "relativelylongkeyname_element": true,
+												    "relativelylongkeyname_map": {}
+												}
+											    }
+											}
+										    }
+										}
+									    }
+									}
+								    }
+								}
+							    }
+							}
+						    }
+						}
+					    }
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+}

@@ -1,0 +1,3 @@
+
+usFunctionCreateTestBundleWithResources(dummyService RESOURCES manifest.json)
+

@@ -54,30 +54,28 @@ InterfaceMapPtr MakeInterfaceMapWithNInterfaces(int64_t interfaceCount)
   InterfaceMapPtr iMap = MakeInterfaceMap<>(impl);
   iMap->clear();
   for (auto j = interfaceCount; j > 0; --j) {
-    std::string iName{ "TestInterface" + std::to_string(j) };
-    iMap->insert(
-      std::make_pair(iName, impl));
+    std::string iName { "TestInterface" + std::to_string(j) };
+    iMap->insert(std::make_pair(iName, impl));
   }
   return iMap;
 }
 
-BENCHMARK_DEFINE_F(ServiceRegistryFixture, RegisterServices)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(ServiceRegistryFixture, RegisterServices)(benchmark::State& state)
 {
-  auto fc = framework->GetBundleContext();
-  auto regCount = state.range(0);
+  using namespace std::chrono;
+
+  auto fc             = framework->GetBundleContext();
+  auto regCount       = state.range(0);
   auto interfaceCount = state.range(1);
-  auto interfaceMap = MakeInterfaceMapWithNInterfaces(interfaceCount);
+  auto interfaceMap   = MakeInterfaceMapWithNInterfaces(interfaceCount);
 
   for (auto _ : state) {
     for (auto i = regCount; i > 0; --i) {
       InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
-      auto start = std::chrono::high_resolution_clock::now();
-      (void)fc.RegisterService(
-        iMapCopy); // benchmark the call to RegisterService
-      auto end = std::chrono::high_resolution_clock::now();
-      auto elapsed_seconds =
-        std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+      auto start = high_resolution_clock::now();
+      (void)fc.RegisterService(iMapCopy); // benchmark the call to RegisterService
+      auto end = high_resolution_clock::now();
+      auto elapsed_seconds = duration_cast<duration<double>>(end - start);
       state.SetIterationTime(elapsed_seconds.count());
     }
   }
@@ -85,18 +83,16 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, RegisterServices)
 
 // first parameter in Ranges specifies the number of calls to RegisterService
 // second parameter in the Ranges specifies the number of interfaces used in the call to RegisterService
-BENCHMARK_REGISTER_F(ServiceRegistryFixture, RegisterServices)
-  ->RangeMultiplier(4)
-  ->Ranges({ { 1, 50000 }, { 1, 1000 } })
-  ->UseManualTime();
+BENCHMARK_REGISTER_F(ServiceRegistryFixture, RegisterServices)->RangeMultiplier(4)
+                                                              ->Ranges({{1, 1000}, {1, 1000}})
+                                                              ->UseManualTime();
 
-BENCHMARK_DEFINE_F(ServiceRegistryFixture, FindServices)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(ServiceRegistryFixture, FindServices)(benchmark::State& state)
 {
-  auto fc = framework->GetBundleContext();
-  auto regCount = state.range(0);
+  auto fc             = framework->GetBundleContext();
+  auto regCount       = state.range(0);
   auto interfaceCount = state.range(1);
-  auto interfaceMap = MakeInterfaceMapWithNInterfaces(interfaceCount);
+  auto interfaceMap   = MakeInterfaceMapWithNInterfaces(interfaceCount);
 
   for (auto i = regCount; i > 0; --i) {
     InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
@@ -114,6 +110,5 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, FindServices)
 
 // first parameter in Ranges specifies the number of calls to RegisterService
 // second parameter in the Ranges specifies the number of interfaces used in the call to RegisterService
-BENCHMARK_REGISTER_F(ServiceRegistryFixture, FindServices)
-  ->RangeMultiplier(4)
-  ->Ranges({ { 1, 50000 }, { 1, 1000 } });
+BENCHMARK_REGISTER_F(ServiceRegistryFixture, FindServices)->RangeMultiplier(4)
+                                                          ->Ranges({{1, 1000}, {1, 1000}});

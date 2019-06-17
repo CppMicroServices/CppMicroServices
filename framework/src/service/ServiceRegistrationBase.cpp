@@ -152,19 +152,28 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
       auto itr = propsCopy.find(Constants::SERVICE_RANKING);
       if (itr != propsCopy.end()) {
-        new_rank = any_cast<int>(itr->second);
+        try {
+          new_rank = any_cast<int>(itr->second);
+        } catch (const BadAnyCastException& ex) {
+          std::string exMsg(
+            "SERVICE_RANKING property has unexpected value type. ");
+          exMsg.append(ex.what());
+          throw std::invalid_argument(exMsg);
+        }
       }
 
       auto oldRankAny =
         d->properties.Value_unlocked(Constants::SERVICE_RANKING);
       if (!oldRankAny.Empty()) {
+        // since the old ranking is extracted from existing service properties
+        // stored in the service registry, no need to type check before casting
         old_rank = any_cast<int>(oldRankAny);
       }
       d->properties = Properties(propsCopy);
     }
     if (old_rank != new_rank) {
-      auto classes = cppmicroservices::any_cast<std::vector<std::string>>(
-        propsCopy[Constants::OBJECTCLASS]);
+      auto classes =
+        any_cast<std::vector<std::string>>(propsCopy[Constants::OBJECTCLASS]);
       d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
     }
   } else {
@@ -187,30 +196,25 @@ void ServiceRegistrationBase::Unregister()
     throw std::logic_error("ServiceRegistrationBase object invalid");
   }
 
-  if (d->unregistering) {
-    return; // Silently ignore redundant unregistration.
-  }
-
   CoreBundleContext* coreContext = nullptr;
 
-  if (d->available) {
-    {
-      auto l2 = d->Lock();
-      US_UNUSED(l2);
-      if (d->unregistering) {
-        return;
-      }
-      d->unregistering = true;
-    }
+  if (!d->available) {
+    throw std::logic_error("Service is unregistered");
+  }
+  bool isUnregistering(false); // expected state
+  if (atomic_compare_exchange_strong(
+        &d->unregistering, &isUnregistering, true)) {
     {
       auto l1 = d->bundle->coreCtx->services.Lock();
       US_UNUSED(l1);
       d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
     }
-
     coreContext = d->bundle->coreCtx;
-  } else {
-    throw std::logic_error("Service is unregistered");
+  }
+
+  if (isUnregistering) {
+    // another thread has changed the state to UNREGISTERING
+    return;
   }
 
   if (coreContext) {

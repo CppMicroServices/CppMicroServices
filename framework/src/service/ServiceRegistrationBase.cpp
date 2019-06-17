@@ -107,77 +107,76 @@ ServiceReferenceBase ServiceRegistrationBase::GetReference(
 
 void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 {
-  if (!d)
+  if (!d) {
     throw std::logic_error("ServiceRegistrationBase object invalid");
+  }
 
   ServiceEvent modifiedEndMatchEvent;
   ServiceEvent modifiedEvent;
 
   ServiceListeners::ServiceListenerEntries before;
 
-  if (d->available) {
-    {
-      auto l = d->Lock();
-      US_UNUSED(l);
-      if (!d->available)
-        throw std::logic_error("Service is unregistered");
-      modifiedEndMatchEvent =
-        ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
-      modifiedEvent =
-        ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
-    }
-
-    // This calls into service event listener hooks. We must not hold any locks here
-    d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
-      modifiedEndMatchEvent, before);
-
-    int old_rank = 0;
-    int new_rank = 0;
-    auto propsCopy(props);
-    {
-      auto l = d->Lock();
-      US_UNUSED(l);
-      if (!d->available) {
-        throw std::logic_error("Service is unregistered");
-      }
-
-      auto l2 = d->properties.Lock();
-      US_UNUSED(l2);
-      propsCopy[Constants::SERVICE_ID] =
-        d->properties.Value_unlocked(Constants::SERVICE_ID);
-      propsCopy[Constants::OBJECTCLASS] =
-        d->properties.Value_unlocked(Constants::OBJECTCLASS);
-      propsCopy[Constants::SERVICE_SCOPE] =
-        d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
-
-      auto itr = propsCopy.find(Constants::SERVICE_RANKING);
-      if (itr != propsCopy.end()) {
-        try {
-          new_rank = any_cast<int>(itr->second);
-        } catch (const BadAnyCastException& ex) {
-          std::string exMsg(
-            "SERVICE_RANKING property has unexpected value type. ");
-          exMsg.append(ex.what());
-          throw std::invalid_argument(exMsg);
-        }
-      }
-
-      auto oldRankAny =
-        d->properties.Value_unlocked(Constants::SERVICE_RANKING);
-      if (!oldRankAny.Empty()) {
-        // since the old ranking is extracted from existing service properties
-        // stored in the service registry, no need to type check before casting
-        old_rank = any_cast<int>(oldRankAny);
-      }
-      d->properties = Properties(propsCopy);
-    }
-    if (old_rank != new_rank) {
-      auto classes =
-        any_cast<std::vector<std::string>>(propsCopy[Constants::OBJECTCLASS]);
-      d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
-    }
-  } else {
+  if (!d->available) {
     throw std::logic_error("Service is unregistered");
+  }
+
+  {
+    auto l = d->Lock();
+    US_UNUSED(l);
+    if (!d->available)
+      throw std::logic_error("Service is unregistered");
+    modifiedEndMatchEvent =
+      ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
+    modifiedEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
+  }
+
+  // This calls into service event listener hooks. We must not hold any locks here
+  d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
+    modifiedEndMatchEvent, before);
+
+  int old_rank = 0;
+  int new_rank = 0;
+  Any objectClasses;
+  {
+    auto l = d->Lock();
+    US_UNUSED(l);
+    if (!d->available) {
+      throw std::logic_error("Service is unregistered");
+    }
+
+    auto l2 = d->properties.Lock();
+    US_UNUSED(l2);
+    auto propsCopy(props);
+    propsCopy[Constants::SERVICE_ID] =
+      d->properties.Value_unlocked(Constants::SERVICE_ID);
+    objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS);
+    propsCopy[Constants::OBJECTCLASS] = objectClasses;
+    propsCopy[Constants::SERVICE_SCOPE] =
+      d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
+
+    auto itr = propsCopy.find(Constants::SERVICE_RANKING);
+    if (itr != propsCopy.end()) {
+      try {
+        new_rank = any_cast<int>(itr->second);
+      } catch (const BadAnyCastException& ex) {
+        std::string exMsg(
+          "SERVICE_RANKING property has unexpected value type. ");
+        exMsg.append(ex.what());
+        throw std::invalid_argument(exMsg);
+      }
+    }
+
+    auto oldRankAny = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+    if (!oldRankAny.Empty()) {
+      // since the old ranking is extracted from existing service properties
+      // stored in the service registry, no need to type check before casting
+      old_rank = any_cast<int>(oldRankAny);
+    }
+    d->properties = Properties(std::move(propsCopy));
+  }
+  if (old_rank != new_rank) {
+    auto classes = any_cast<std::vector<std::string>>(objectClasses);
+    d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
   }
 
   // Notify listeners, we must not hold any locks here

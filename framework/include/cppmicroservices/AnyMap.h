@@ -71,10 +71,10 @@ public:
   using value_type = std::pair<const key_type, mapped_type>;
   using size_type = std::size_t;
   using difference_type = std::ptrdiff_t;
-  using reference = value_type &;
-  using const_reference = const value_type &;
-  using pointer = value_type *;
-  using const_pointer = const value_type *;
+  using reference = value_type&;
+  using const_reference = const value_type&;
+  using pointer = value_type*;
+  using const_pointer = const value_type*;
   using ordered_any_map = std::map<std::string, Any>;
   using unordered_any_map = std::unordered_map<std::string, Any>;
   using unordered_any_cimap = std::unordered_map<std::string,
@@ -102,11 +102,11 @@ private:
       UNORDERED_CI
     };
 
-    iter_type type{NONE};
+    iter_type type{ NONE };
 
     iterator_base()
-       
-    = default;
+
+      = default;
 
     iterator_base(iter_type type)
       : type(type)
@@ -251,7 +251,7 @@ public:
 
   std::pair<iterator, bool> insert(const value_type& value);
 
-  template< class... Args >
+  template<class... Args>
   std::pair<iterator, bool> emplace(Args&&... args)
   {
     switch (type) {
@@ -264,13 +264,14 @@ public:
       }
       case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS: {
         auto p = uoci_m().emplace(std::forward<Args>(args)...);
-        return { iterator(std::move(p.first), iterator::UNORDERED_CI), p.second };
+        return { iterator(std::move(p.first), iterator::UNORDERED_CI),
+                 p.second };
       }
       default:
         throw std::logic_error("invalid map type");
     }
   }
-  
+
   const_iterator find(const key_type& key) const;
 
 protected:
@@ -313,8 +314,11 @@ class US_Framework_EXPORT AnyMap : public any_map
 public:
   AnyMap(map_type type);
   AnyMap(const ordered_any_map& m);
+  AnyMap(ordered_any_map&& m);
   AnyMap(const unordered_any_map& m);
+  AnyMap(unordered_any_map&& m);
   AnyMap(const unordered_any_cimap& m);
+  AnyMap(unordered_any_cimap&& m);
 
   /**
    * Get the underlying STL container type.
@@ -391,7 +395,8 @@ public:
    * @param defaultValue is the value to be returned if the key is not found
    * @return A copy of the key's value.
    */
-  mapped_type AtCompoundKey(const key_type& key, mapped_type defaultValue) const noexcept;
+  mapped_type AtCompoundKey(const key_type& key, mapped_type defaultValue) const
+    noexcept;
 };
 
 template<>

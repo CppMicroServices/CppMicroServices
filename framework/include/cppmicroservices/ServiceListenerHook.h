@@ -139,7 +139,7 @@ struct US_Framework_EXPORT ServiceListenerHook
 
     ListenerInfo(ListenerInfoData* data);
 
-    ExplicitlySharedDataPointer<ListenerInfoData> d;
+    std::shared_ptr<ListenerInfoData> d;
   };
 
   virtual ~ServiceListenerHook();
@@ -181,7 +181,7 @@ struct US_Framework_EXPORT ServiceListenerHook
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
 return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(
-  arg.d.Data());
+  arg.d.get());
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICELISTENERHOOK_H

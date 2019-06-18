@@ -94,10 +94,10 @@ class ServiceTracker : protected ServiceTrackerCustomizer<S, T>
 {
 public:
   /// The type of the tracked object
-  using TrackedParmType =
-    typename ServiceTrackerCustomizer<S, T>::TrackedParmType;
+  using TrackedParamType =
+    typename ServiceTrackerCustomizer<S, T>::TrackedParamType;
 
-  using TrackingMap = std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>>;
+  using TrackingMap = std::unordered_map<ServiceReference<S>, std::shared_ptr<TrackedParamType>>;
 
   /**
    * Automatically closes the <code>ServiceTracker</code>
@@ -245,7 +245,7 @@ public:
    *
    * @return The result of GetService().
    */
-  std::shared_ptr<TrackedParmType> WaitForService();
+  std::shared_ptr<TrackedParamType> WaitForService();
 
   /**
    * Wait for at least one service to be tracked by this
@@ -268,7 +268,7 @@ public:
    * @return The result of GetService().
    */
   template<class Rep, class Period>
-  std::shared_ptr<TrackedParmType> WaitForService(
+  std::shared_ptr<TrackedParamType> WaitForService(
     const std::chrono::duration<Rep, Period>& rel_time);
 
   /**
@@ -310,7 +310,7 @@ public:
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
-  virtual std::shared_ptr<TrackedParmType> GetService(
+  virtual std::shared_ptr<TrackedParamType> GetService(
     const ServiceReference<S>& reference) const;
 
   /**
@@ -326,7 +326,7 @@ public:
    * @return A list of service objects or an empty list if no services
    *         are being tracked.
    */
-  virtual std::vector<std::shared_ptr<TrackedParmType>> GetServices() const;
+  virtual std::vector<std::shared_ptr<TrackedParamType>> GetServices() const;
 
   /**
    * Returns a service object for one of the services being tracked by this
@@ -339,7 +339,7 @@ public:
    * @return A service object or <code>null</code> if no services are being
    *         tracked.
    */
-  virtual std::shared_ptr<TrackedParmType> GetService() const;
+  virtual std::shared_ptr<TrackedParamType> GetService() const;
 
   /**
    * Remove a service from this <code>ServiceTracker</code>.
@@ -433,7 +433,7 @@ protected:
    *         <code>ServiceReference</code> is invalid (default constructed).
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  std::shared_ptr<TrackedParmType> AddingService(
+  std::shared_ptr<TrackedParamType> AddingService(
     const ServiceReference<S>& reference) override;
 
   /**
@@ -452,7 +452,7 @@ protected:
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
    */
   void ModifiedService(const ServiceReference<S>& reference,
-                       const std::shared_ptr<TrackedParmType>& service) override;
+                       const std::shared_ptr<TrackedParamType>& service) override;
 
   /**
    * Default implementation of the
@@ -471,7 +471,7 @@ protected:
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
    */
   void RemovedService(const ServiceReference<S>& reference,
-                      const std::shared_ptr<TrackedParmType>& service) override;
+                      const std::shared_ptr<TrackedParamType>& service) override;
 
 private:
   using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;

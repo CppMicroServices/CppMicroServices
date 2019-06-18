@@ -43,7 +43,7 @@ class TrackedService
 
 public:
   using T = typename TTT::TrackedType;
-  using TrackedParmType = typename TTT::TrackedParmType;
+  using TrackedParamType = typename TTT::TrackedParamType;
 
   TrackedService(ServiceTracker<S, T>* serviceTracker,
                  ServiceTrackerCustomizer<S, T>* customizer);
@@ -80,7 +80,7 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  std::shared_ptr<TrackedParmType> CustomizerAdding(
+  std::shared_ptr<TrackedParamType> CustomizerAdding(
     ServiceReference<S> item,
     const ServiceEvent& related) override;
 
@@ -94,7 +94,7 @@ private:
    */
   void CustomizerModified(ServiceReference<S> item,
                           const ServiceEvent& related,
-                          const std::shared_ptr<TrackedParmType>& object) override;
+                          const std::shared_ptr<TrackedParamType>& object) override;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -106,7 +106,7 @@ private:
    */
   void CustomizerRemoved(ServiceReference<S> item,
                          const ServiceEvent& related,
-                         const std::shared_ptr<TrackedParmType>& object) override;
+                         const std::shared_ptr<TrackedParamType>& object) override;
 };
 
 } // namespace detail

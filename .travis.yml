@@ -23,14 +23,18 @@ matrix:
 
         # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
         - os: linux
-          addons: { apt: { packages: ["valgrind", "clang-3.5", "libc++-dev", "libc++abi-dev", "g++-4.9"], sources: ["ubuntu-toolchain-r-test"] } }
+          dist: trusty
+          compiler: clang
+          addons: { apt: { packages: ["valgrind", "clang-3.5", "libc++-dev", "libc++abi-dev", "g++-4.9"], sources: ["ubuntu-toolchain-r-test", llvm-toolchain-trusty-3.5] } }
           # Travis puts /usr/local/clang-5.0.0/bin in front of the path, so we have to "fix" that
-          env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
+          env: MY_CC=clang-3.5 MY_CXX=clang++-3.5 PATH=/usr/bin:$PATH
 
         # Test one build configuration with the latest available Clang
         - os: linux
-          addons: { apt: { packages: ["valgrind", "clang-6.0", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-6.0"] } }
-          env: MY_CC=clang-6.0 MY_CXX=clang++-6.0
+          dist: xenial
+          compiler: clang
+          addons: { apt: { packages: ["valgrind", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test"] } }
+          env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
 
         # Test all build configuration with the latest available GCC
         - os: linux

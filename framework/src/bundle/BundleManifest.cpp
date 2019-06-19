@@ -27,19 +27,48 @@
 #include <rapidjson/istreamwrapper.h>
 
 #include <stdexcept>
+#include <typeinfo>
+
+namespace {
+
+using AnyOrderedMap = std::map<std::string, cppmicroservices::Any>;
+using AnyMap = cppmicroservices::AnyMap;
+using AnyVector = std::vector<cppmicroservices::Any>;
+
+/**
+ * recursively copy the content of headers into deprecated. "headers" is an AnyMap, which
+ * stores any hierarchical values in AnyMaps also. The purpose of this function is to
+ * store the data in a std::map hierarchy instead.
+ */
+void copy_deprecated_properties(const AnyMap& headers
+                                  , AnyOrderedMap& deprecated)
+{
+  for (auto const& h : headers) {
+    if (typeid(AnyMap) == h.second.Type()) {
+      // recursively copy the anymap to a std::map and store in deprecated.
+      AnyOrderedMap deprecated_headers;
+      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
+                                 , deprecated_headers);
+      deprecated.emplace(h.first, std::move(deprecated_headers));
+    }
+    else {
+      deprecated.emplace(h.first, h.second);
+    }
+  }
+}
+
+}
 
 namespace cppmicroservices {
 
 namespace {
-
-using AnyOrderedMap = std::map<std::string, Any>;
-using AnyVector = std::vector<Any>;
 
 void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap);
 void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap);
 void ParseJsonArray(const rapidjson::Value& jsonArray,
                     AnyVector& anyVector,
                     bool ci);
+
 
 Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
 {
@@ -105,6 +134,7 @@ void ParseJsonArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, boo
     }
   }
 }
+
 }
 
 BundleManifest::BundleManifest()
@@ -123,11 +153,8 @@ void BundleManifest::Parse(std::istream& is)
     throw std::runtime_error("The Json root element must be an object.");
   }
 
-  // This is deprecated in 3.0
-  ParseJsonObject(root, m_PropertiesDeprecated);
-
+  
   ParseJsonObject(root, m_Headers);
-
 }
 
 const AnyMap& BundleManifest::GetHeaders() const
@@ -143,16 +170,24 @@ bool BundleManifest::Contains(const std::string& key) const
 Any BundleManifest::GetValue(const std::string& key) const
 {
   auto iter = m_Headers.find(key);
-  if (iter != m_Headers.end()) {
+  if (m_Headers.cend() != iter)
+  {
     return iter->second;
   }
   return Any();
 }
 
+void BundleManifest::CopyDeprecatedProperties() const
+{
+  std::call_once(m_DidCopyDeprecatedProperties
+                 , [&]() { copy_deprecated_properties(m_Headers, m_PropertiesDeprecated); });
+}
+
 Any BundleManifest::GetValueDeprecated(const std::string& key) const
 {
+  CopyDeprecatedProperties();
   auto iter = m_PropertiesDeprecated.find(key);
-  if (iter != m_PropertiesDeprecated.end()) {
+  if (m_PropertiesDeprecated.cend() != iter) {
     return iter->second;
   }
   return Any();
@@ -160,9 +195,10 @@ Any BundleManifest::GetValueDeprecated(const std::string& key) const
 
 std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
+  CopyDeprecatedProperties();
   std::vector<std::string> keys;
-  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.begin();
-       iter != m_PropertiesDeprecated.end();
+  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.cbegin();
+       iter != m_PropertiesDeprecated.cend();
        ++iter) {
     keys.push_back(iter->first);
   }
@@ -171,6 +207,8 @@ std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 
 std::map<std::string, Any> BundleManifest::GetPropertiesDeprecated() const
 {
+  CopyDeprecatedProperties();
   return m_PropertiesDeprecated;
 }
+
 }

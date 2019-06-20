@@ -33,9 +33,9 @@
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 
+#include <chrono>
 #include <future>
 #include <memory>
-#include <chrono>
 
 using namespace cppmicroservices;
 
@@ -43,23 +43,15 @@ bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
                          std::vector<std::string>::const_iterator idBegin,
                          std::vector<std::string>::const_iterator idEnd)
 {
-  std::vector<std::string> ids;
-  ids.assign(idBegin, idEnd);
+  std::vector<std::string> ids{ idBegin, idEnd };
 
-  for (std::vector<ServiceReferenceU>::const_iterator sri = refs.begin();
-       sri != refs.end();
-       ++sri) {
-    for (std::vector<std::string>::iterator idIter = ids.begin();
-         idIter != ids.end();
-         ++idIter) {
-      if (sri->IsConvertibleTo(*idIter)) {
-        ids.erase(idIter);
-        break;
-      }
-    }
-  }
-
-  return ids.empty();
+  return std::all_of(refs.cbegin(), refs.cend(), [interfaceIds = std::move(ids)](const ServiceReferenceU& ref) {
+    return std::any_of(interfaceIds.cbegin(),
+                         interfaceIds.cend(),
+                         [&ref](const std::string& interfaceId) {
+        return ref.IsConvertibleTo(interfaceId);
+      });
+  });
 }
 
 struct MyInterfaceOne
@@ -198,7 +190,8 @@ void TestServiceTracker(BundleContext context)
     st2.Close();
 
     // Closing the tracker should notify the waiters
-    auto wait_until = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+    auto wait_until =
+      std::chrono::steady_clock::now() + std::chrono::seconds(3);
     US_TEST_CONDITION_REQUIRED(fut1.wait_until(wait_until) == US_FUTURE_READY,
                                "Closed service tracker notifies waiters");
     US_TEST_CONDITION_REQUIRED(fut2.wait_until(wait_until) == US_FUTURE_READY,
@@ -240,10 +233,8 @@ void TestServiceTracker(BundleContext context)
   US_TEST_CONDITION_REQUIRED(sa2.size() == 2,
                              "Checking service reference count");
   US_TEST_CONDITION_REQUIRED(
-    CheckConvertibility(sa2, ids.begin(), ids.begin() + 2),
-    "Check for expected interface id [0]");
-  US_TEST_CONDITION_REQUIRED(sa2[1].IsConvertibleTo(s1 + "1"),
-                             "Check for expected interface id [1]");
+    CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 2),
+    "Check for 2 expected interface ids");
 
   // 10. Get libTestBundleS to register one more service and see if it appears
   serviceController->ServiceControl(2, "register", 1);
@@ -253,16 +244,16 @@ void TestServiceTracker(BundleContext context)
                              "Checking service reference count");
 
   US_TEST_CONDITION_REQUIRED(
-    CheckConvertibility(sa2, ids.begin(), ids.begin() + 3),
-    "Check for expected interface id [2]");
+    CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 3),
+    "Check for 3 expected interface ids");
 
   // 11. Get libTestBundleS to register one more service and see if it appears
   serviceController->ServiceControl(3, "register", 2);
   sa2 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa2.size() == 4,
                              "Checking service reference count");
-  US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.begin(), ids.end()),
-                             "Check for expected interface id [3]");
+  US_TEST_CONDITION_REQUIRED(CheckConvertibility(sa2, ids.cbegin(), ids.cend()),
+                             "Check for 4 expected interface ids");
 
   // 12. Get libTestBundleS to unregister one service and see if it disappears
   serviceController->ServiceControl(3, "unregister", 0);
@@ -304,8 +295,8 @@ void TestServiceTracker(BundleContext context)
   auto sa3 = st1->GetServiceReferences();
   US_TEST_CONDITION_REQUIRED(sa3.size() == 3, "Check service reference count");
   US_TEST_CONDITION_REQUIRED(
-    CheckConvertibility(sa3, ids.begin(), ids.begin() + 3),
-    "Check for expected interface id [0]");
+    CheckConvertibility(sa3, ids.cbegin(), ids.cbegin() + 3),
+    "Check for 3 expected interface ids");
 
   st1->Remove(h1); // remove tracking on one servref
   sa2 = st1->GetServiceReferences();

@@ -41,7 +41,7 @@ class ServiceTrackerPrivate : MultiThreaded<>
 
 public:
   using T = typename TTT::TrackedType;
-  using TrackedParmType = typename TTT::TrackedParmType;
+  using TrackedParamType = typename TTT::TrackedParamType;
 
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                         BundleContext  context,
@@ -154,7 +154,7 @@ public:
   /**
    * Cached service object for GetService.
    */
-  mutable Atomic<std::shared_ptr<TrackedParmType>> cachedService;
+  mutable Atomic<std::shared_ptr<TrackedParamType>> cachedService;
 
 private:
   inline ServiceTracker<S, T>* q_func()

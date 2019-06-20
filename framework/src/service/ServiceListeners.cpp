@@ -448,14 +448,12 @@ void ServiceListeners::RemoveFromCache_unlocked(const ServiceListenerEntry& sle)
   if (!sle.GetLocalCache().empty()) {
     for (std::size_t i = 0; i < hashedServiceKeys.size(); ++i) {
       CacheType& keymap = cache[i];
-      std::vector<std::string>& l = sle.GetLocalCache()[i];
-      for (std::vector<std::string>::const_iterator it = l.begin();
-           it != l.end();
-           ++it) {
-        std::list<ServiceListenerEntry>& sles = keymap[*it];
+      std::vector<std::string>& filters = sle.GetLocalCache()[i];
+      for (auto const& filter : filters) {
+        std::list<ServiceListenerEntry>& sles = keymap[filter];
         sles.remove(sle);
         if (sles.empty()) {
-          keymap.erase(*it);
+          keymap.erase(filter);
         }
       }
     }

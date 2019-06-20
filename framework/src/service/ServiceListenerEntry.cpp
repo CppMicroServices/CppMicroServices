@@ -128,12 +128,12 @@ ServiceListenerEntry::ServiceListenerEntry(
 
 const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {
-  return static_cast<ServiceListenerEntryData*>(d.Data())->ldap;
+  return static_cast<ServiceListenerEntryData*>(d.get())->ldap;
 }
 
 LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const
 {
-  return static_cast<ServiceListenerEntryData*>(d.Data())->local_cache;
+  return static_cast<ServiceListenerEntryData*>(d.get())->local_cache;
 }
 
 void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
@@ -174,15 +174,15 @@ std::size_t ServiceListenerEntry::Hash() const
 {
   using namespace std;
 
-  if (static_cast<ServiceListenerEntryData*>(d.Data())->hashValue == 0) {
-    static_cast<ServiceListenerEntryData*>(d.Data())->hashValue =
+  if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0) {
+    static_cast<ServiceListenerEntryData*>(d.get())->hashValue =
       ((hash<BundleContextPrivate*>()(d->context.get()) ^
         (hash<void*>()(d->data) << 1)) >>
        1) ^
       ((hash<ServiceListener>()(d->listener)) ^
        (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
-  return static_cast<ServiceListenerEntryData*>(d.Data())->hashValue;
+  return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
 }
 }
 

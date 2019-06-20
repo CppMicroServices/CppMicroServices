@@ -96,6 +96,10 @@ public:
   }
 
   using ServiceReferenceBase::operator=;
+
+  using ServiceReferenceBase::operator==;
+
+  using ServiceReferenceBase::Hash;
 };
 
 /**
@@ -125,6 +129,10 @@ public:
 
   using ServiceReferenceBase::operator=;
 
+  using ServiceReferenceBase::operator==;
+
+  using ServiceReferenceBase::Hash;
+
   using ServiceType = void;
 };
 /// \endcond
@@ -137,6 +145,17 @@ public:
  * interface identifier.
  */
 using ServiceReferenceU = ServiceReference<void>;
+}
+
+namespace std {
+template<class S>
+struct hash<cppmicroservices::ServiceReference<S>>
+{
+  std::size_t operator()(const cppmicroservices::ServiceReference<S>& arg) const
+  {
+    return arg.Hash();
+  }
+};
 }
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCE_H

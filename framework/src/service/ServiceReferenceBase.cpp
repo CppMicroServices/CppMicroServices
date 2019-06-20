@@ -214,8 +214,7 @@ std::string ServiceReferenceBase::GetInterfaceId() const
 
 std::size_t ServiceReferenceBase::Hash() const
 {
-  using namespace std;
-  return hash<ServiceRegistrationBasePrivate*>()(this->d.load()->registration);
+  return std::hash<ServiceRegistrationBasePrivate*>()(this->d.load()->registration);
 }
 
 std::ostream& operator<<(std::ostream& os,

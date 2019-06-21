@@ -34,13 +34,27 @@ namespace detail {
 
 struct any_map_cihash
 {
-  std::size_t operator()(const std::string& key) const;
+  std::size_t operator()(const std::string& key) const
+  {
+    std::string lcase = key;
+    std::transform(lcase.begin(), lcase.end(), lcase.begin(), ::tolower);
+    return std::hash<std::string>{}(lcase);
+  }
 };
 
 struct any_map_ciequal
 {
-  bool operator()(const std::string& l, const std::string& r) const;
+  bool operator()(const std::string& l, const std::string& r) const
+  {
+    return (l.size() == r.size()
+            && std::equal(l.begin(), l.end(), r.begin()
+                          , [](char a, char b)
+                            {
+                              return tolower(a) == tolower(b);
+                            }));
+  }
 };
+
 }
 
 /**

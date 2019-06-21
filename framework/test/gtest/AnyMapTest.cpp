@@ -149,7 +149,6 @@ TEST(AnyMapTest, AnyMap)
   AnyMap uco_anymap(uco);
 
   AnyMap o_anymap1(AnyMap::ORDERED_MAP);
-  o_anymap1 = o_anymap1;
   o_anymap1 = o_anymap_copy;
   AnyMap uo_anymap1(AnyMap::UNORDERED_MAP);
   uo_anymap1 = uo_anymap;
@@ -227,4 +226,18 @@ TEST(AnyMapTest, MoveAssignment)
   ASSERT_DEATH(o.size(), ".*")
     << "This call should result in a crash because the object has been moved from";
 
+}
+
+TEST(AnyMapTest, CIHash)
+{
+  std::string allUpper = "THIS IS A TEST";
+  std::string allLower = "this is a test";
+
+  detail::any_map_cihash hash;
+  std::size_t hashUpper = hash(allUpper);
+  std::size_t hashLower = hash(allLower);
+  
+  ASSERT_EQ(hashUpper, hashLower);
+  ASSERT_EQ(true, 0 != hashUpper);
+  ASSERT_EQ(true, 0 != hashLower);
 }

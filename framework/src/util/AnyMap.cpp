@@ -23,6 +23,8 @@
 #include "cppmicroservices/AnyMap.h"
 
 #include <stdexcept>
+#include <algorithm>
+#include <functional>
 
 namespace cppmicroservices {
 
@@ -30,9 +32,9 @@ namespace detail {
 
 std::size_t any_map_cihash::operator()(const std::string& key) const
 {
-  std::size_t h = 0;
-  std::for_each(key.begin(), key.end(), [&h](char c) { h += tolower(c); });
-  return h;
+  std::string lcase = key;
+  std::transform(lcase.begin(), lcase.end(), lcase.begin(), ::tolower);
+  return std::hash<std::string>{}(lcase);
 }
 
 bool any_map_ciequal::operator()(const std::string& l,
@@ -118,7 +120,7 @@ Any AtCompoundKey(const AnyMap& m,
       return itr->second;
     }
   }
-  return defaultVal;
+  return std::move(defaultVal);
 }
 
 Any AtCompoundKey(const std::vector<Any>& v,
@@ -132,7 +134,7 @@ Any AtCompoundKey(const std::vector<Any>& v,
   try {
     index = std::stoi(head);
   } catch (...) {
-    return defaultval;
+    return std::move(defaultval);
   }
   if (static_cast<size_t>(std::abs(index)) < v.size()) {
     auto& h = v[(index < 0 ? v.size() + index : index)];
@@ -146,7 +148,7 @@ Any AtCompoundKey(const std::vector<Any>& v,
         ref_any_cast<std::vector<Any>>(h), tail, std::move(defaultval));
     }
   }
-  return defaultval;
+  return std::move(defaultval);
 }
 }
 

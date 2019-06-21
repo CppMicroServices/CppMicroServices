@@ -72,7 +72,7 @@ Properties ServiceRegistry::CreateServiceProperties(
       std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_SINGLETON));
   }
 
-  return Properties(props);
+  return Properties(std::move(props));
 }
 
 ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
@@ -118,10 +118,9 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(
     services.insert(std::make_pair(res, classes));
     serviceRegistrations.push_back(res);
     for (auto& clazz : classes) {
-      std::vector<ServiceRegistrationBase>& s = classServices[clazz];
-      auto ip =
-        std::lower_bound(s.begin(), s.end(), res);
-      s.insert(ip, res);
+      auto& s = classServices[clazz];
+      auto ip = std::lower_bound(s.rbegin(), s.rend(), res);
+      s.insert(ip.base(), res);
     }
   }
 
@@ -135,15 +134,13 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(
 }
 
 void ServiceRegistry::UpdateServiceRegistrationOrder(
-  const ServiceRegistrationBase& sr,
   const std::vector<std::string>& classes)
 {
   auto l = this->Lock();
   US_UNUSED(l);
   for (auto& clazz : classes) {
-    std::vector<ServiceRegistrationBase>& s = classServices[clazz];
-    s.erase(std::remove(s.begin(), s.end(), sr), s.end());
-    s.insert(std::lower_bound(s.begin(), s.end(), sr), sr);
+    auto& s = classServices[clazz];
+    std::sort(s.rbegin(), s.rend());
   }
 }
 
@@ -177,7 +174,7 @@ ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle,
                           << " refs";
 
     if (!srs.empty()) {
-      return srs.back();
+      return srs.front();
     }
   } catch (const std::invalid_argument&) {
   }
@@ -286,7 +283,7 @@ void ServiceRegistry::RemoveServiceRegistration_unlocked(
     std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
     serviceRegistrations.end());
   for (auto& clazz : classes) {
-    std::vector<ServiceRegistrationBase>& s = classServices[clazz];
+    auto& s = classServices[clazz];
     if (s.size() > 1) {
       s.erase(std::remove(s.begin(), s.end(), sr), s.end());
     } else {
@@ -316,7 +313,7 @@ void ServiceRegistry::GetUsedByBundle(
   auto l = this->Lock();
   US_UNUSED(l);
 
-  for (const auto & serviceRegistration : serviceRegistrations) {
+  for (const auto& serviceRegistration : serviceRegistrations) {
     if (serviceRegistration.d->IsUsedByBundle(bundle)) {
       res.push_back(serviceRegistration);
     }

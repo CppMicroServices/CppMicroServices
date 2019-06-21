@@ -194,15 +194,9 @@ std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  std::vector<ServiceReferenceU> result;
   std::vector<ServiceReferenceBase> refs;
   b->coreCtx->services.Get(clazz, filter, b, refs);
-  for (std::vector<ServiceReferenceBase>::const_iterator iter = refs.begin();
-       iter != refs.end();
-       ++iter) {
-    result.emplace_back(*iter);
-  }
-  return result;
+  return std::vector<ServiceReferenceU>(refs.begin(), refs.end());
 }
 
 ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)

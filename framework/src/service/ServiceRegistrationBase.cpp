@@ -39,9 +39,7 @@ US_MSVC_DISABLE_WARNING(
 
 namespace cppmicroservices {
 
-ServiceRegistrationBase::ServiceRegistrationBase()
-   
-{}
+ServiceRegistrationBase::ServiceRegistrationBase() {}
 
 ServiceRegistrationBase::ServiceRegistrationBase(
   const ServiceRegistrationBase& reg)
@@ -109,69 +107,79 @@ ServiceReferenceBase ServiceRegistrationBase::GetReference(
 
 void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 {
-  if (!d)
+  if (!d) {
     throw std::logic_error("ServiceRegistrationBase object invalid");
+  }
 
   ServiceEvent modifiedEndMatchEvent;
   ServiceEvent modifiedEvent;
 
   ServiceListeners::ServiceListenerEntries before;
 
-  if (d->available) {
-    {
-      auto l = d->Lock();
-      US_UNUSED(l);
-      if (!d->available)
-        throw std::logic_error("Service is unregistered");
-      modifiedEndMatchEvent =
-        ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
-      modifiedEvent =
-        ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
-    }
-
-    // This calls into service event listener hooks. We must not hold any looks here
-    d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
-      modifiedEndMatchEvent, before);
-
-    int old_rank = 0;
-    int new_rank = 0;
-    std::vector<std::string> classes;
-    {
-      auto l = d->Lock();
-      US_UNUSED(l);
-      if (!d->available)
-        throw std::logic_error("Service is unregistered");
-
-      {
-        auto l2 = d->properties.Lock();
-        US_UNUSED(l2);
-
-        Any any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
-        if (any.Type() == typeid(int))
-          old_rank = any_cast<int>(any);
-
-        classes = ref_any_cast<std::vector<std::string>>(
-          d->properties.Value_unlocked(Constants::OBJECTCLASS));
-
-        auto sid = any_cast<long int>(
-          d->properties.Value_unlocked(Constants::SERVICE_ID));
-        d->properties = ServiceRegistry::CreateServiceProperties(
-          props, classes, false, false, sid);
-
-        any = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
-        if (any.Type() == typeid(int))
-          new_rank = any_cast<int>(any);
-      }
-    }
-    if (old_rank != new_rank) {
-      d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(*this,
-                                                                  classes);
-    }
-  } else {
+  if (!d->available) {
     throw std::logic_error("Service is unregistered");
   }
 
-  // Notify listeners, we must no hold any locks here
+  {
+    auto l = d->Lock();
+    US_UNUSED(l);
+    if (!d->available)
+      throw std::logic_error("Service is unregistered");
+    modifiedEndMatchEvent =
+      ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
+    modifiedEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
+  }
+
+  // This calls into service event listener hooks. We must not hold any locks here
+  d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
+    modifiedEndMatchEvent, before);
+
+  int old_rank = 0;
+  int new_rank = 0;
+  Any objectClasses;
+  {
+    auto l = d->Lock();
+    US_UNUSED(l);
+    if (!d->available) {
+      throw std::logic_error("Service is unregistered");
+    }
+
+    auto l2 = d->properties.Lock();
+    US_UNUSED(l2);
+    auto propsCopy(props);
+    propsCopy[Constants::SERVICE_ID] =
+      d->properties.Value_unlocked(Constants::SERVICE_ID);
+    objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS);
+    propsCopy[Constants::OBJECTCLASS] = objectClasses;
+    propsCopy[Constants::SERVICE_SCOPE] =
+      d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
+
+    auto itr = propsCopy.find(Constants::SERVICE_RANKING);
+    if (itr != propsCopy.end()) {
+      try {
+        new_rank = any_cast<int>(itr->second);
+      } catch (const BadAnyCastException& ex) {
+        std::string exMsg(
+          "SERVICE_RANKING property has unexpected value type. ");
+        exMsg.append(ex.what());
+        throw std::invalid_argument(exMsg);
+      }
+    }
+
+    auto oldRankAny = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+    if (!oldRankAny.Empty()) {
+      // since the old ranking is extracted from existing service properties
+      // stored in the service registry, no need to type check before casting
+      old_rank = any_cast<int>(oldRankAny);
+    }
+    d->properties = Properties(std::move(propsCopy));
+  }
+  if (old_rank != new_rank) {
+    auto classes = any_cast<std::vector<std::string>>(objectClasses);
+    d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
+  }
+
+  // Notify listeners, we must not hold any locks here
   ServiceListeners::ServiceListenerEntries matchingListeners;
   d->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent,
                                                             matchingListeners);
@@ -183,28 +191,29 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
 void ServiceRegistrationBase::Unregister()
 {
-  if (!d)
+  if (!d) {
     throw std::logic_error("ServiceRegistrationBase object invalid");
-
-  if (d->unregistering)
-    return; // Silently ignore redundant unregistration.
+  }
 
   CoreBundleContext* coreContext = nullptr;
 
-  if (d->available) {
-    // Lock the service registry first
-    auto l1 = d->bundle->coreCtx->services.Lock();
-    US_UNUSED(l1);
-    auto l2 = d->Lock();
-    US_UNUSED(l2);
-    if (d->unregistering)
-      return;
-    d->unregistering = true;
-
-    d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
-    coreContext = d->bundle->coreCtx;
-  } else {
+  if (!d->available) {
     throw std::logic_error("Service is unregistered");
+  }
+  bool isUnregistering(false); // expected state
+  if (atomic_compare_exchange_strong(
+        &d->unregistering, &isUnregistering, true)) {
+    {
+      auto l1 = d->bundle->coreCtx->services.Lock();
+      US_UNUSED(l1);
+      d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
+    }
+    coreContext = d->bundle->coreCtx;
+  }
+
+  if (isUnregistering) {
+    // another thread has changed the state to UNREGISTERING
+    return;
   }
 
   if (coreContext) {
@@ -225,8 +234,7 @@ void ServiceRegistrationBase::Unregister()
     auto l = d->Lock();
     US_UNUSED(l);
     d->available = false;
-    auto factoryIter =
-      d->service->find("org.cppmicroservices.factory");
+    auto factoryIter = d->service->find("org.cppmicroservices.factory");
     if (d->bundle && factoryIter != d->service->end()) {
       serviceFactory =
         std::static_pointer_cast<ServiceFactory>(factoryIter->second);

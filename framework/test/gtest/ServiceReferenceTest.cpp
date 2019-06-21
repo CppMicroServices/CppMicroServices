@@ -21,11 +21,14 @@ limitations under the License.
 =============================================================================*/
 
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceObjects.h"
+#include "cppmicroservices/ServiceRegistration.h"
 #include "gtest/gtest.h"
+#include <array>
 
 using namespace cppmicroservices;
 
@@ -44,6 +47,34 @@ struct ITestServiceB
 };
 }
 
+namespace {
+struct TestServiceA : public ServiceNS::ITestServiceA
+{
+  int getValue() const { return 42; }
+};
+
+struct TestServiceB : public ServiceNS::ITestServiceB
+{
+  int getValue() const { return 1729; }
+};
+}
+
+class ServiceReferenceTest : public ::testing::Test
+{
+public:
+  ServiceReferenceTest()
+    : framework(FrameworkFactory().NewFramework()){};
+  ~ServiceReferenceTest() override = default;
+  void SetUp() override { framework.Start(); }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+  Framework framework;
+};
+
 // This test exercises the 2 ways to register a service
 //   a. using the name of the interface i.e. "Foo::Bar"
 //   b. using the type of the interface i.e. <Foo::Bar>
@@ -52,21 +83,8 @@ struct ITestServiceB
 //   b. using the type of the interface
 // NOTE: We do have tests for this in different places,
 // but this test consolidates all these modes together.
-TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
+TEST_F(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
 {
-  struct TestServiceA : public ServiceNS::ITestServiceA
-  {
-    int getValue() const { return 42; }
-  };
-
-  struct TestServiceB : public ServiceNS::ITestServiceB
-  {
-    int getValue() const { return 1729; }
-  };
-
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
   auto context = framework.GetBundleContext();
 
   auto impl = std::make_shared<TestServiceA>();
@@ -101,7 +119,122 @@ TEST(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
   ASSERT_EQ(sr4.GetInterfaceId(), "ServiceNS::ITestServiceB");
   auto service4 = context.GetService(sr4);
   ASSERT_EQ(service4->getValue(), 1729);
+}
 
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
+TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithMultipleRegistrations)
+{
+  auto context = framework.GetBundleContext();
+  // register multiple service impls against the same interface
+  // verify that GetServiceReference returns the first registered service
+  std::vector<std::shared_ptr<TestServiceA>> implArr;
+  for (int i = 0; i < 10; ++i) {
+    auto impl = std::make_shared<TestServiceA>();
+    implArr.push_back(impl);
+    (void)context.RegisterService<ServiceNS::ITestServiceA>(impl);
+  }
+
+  auto sRefArr = context.GetServiceReferences<ServiceNS::ITestServiceA>();
+  ASSERT_EQ(sRefArr.size(), implArr.size());
+
+  // verify GetServiceReference returns the best match. In this case,
+  // the service with the least id
+  auto sRef = context.GetServiceReference<ServiceNS::ITestServiceA>();
+  auto bestMatchServiceId =
+    any_cast<long int>(sRef.GetProperty(Constants::SERVICE_ID));
+  EXPECT_TRUE(std::none_of(
+    sRefArr.begin(),
+    sRefArr.end(),
+    [&bestMatchServiceId](const ServiceReferenceBase& sRef) {
+      auto serviceId =
+        any_cast<long int>(sRef.GetProperty(Constants::SERVICE_ID));
+      return (serviceId < bestMatchServiceId);
+    }));
+}
+
+TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithRanking)
+{
+  auto context = framework.GetBundleContext();
+  // register multiple instance of services with varying ranks
+  std::vector<std::shared_ptr<TestServiceA>> implArr;
+  for (int i = 0; i < 10; ++i) {
+    auto impl = std::make_shared<TestServiceA>();
+    implArr.push_back(impl);
+    (void)context.RegisterService<ServiceNS::ITestServiceA>(
+      impl, { { Constants::SERVICE_RANKING, i } });
+  }
+
+  auto sRefArr = context.GetServiceReferences<ServiceNS::ITestServiceA>();
+  ASSERT_EQ(sRefArr.size(), implArr.size());
+
+  // verify GetServiceReference returns the best match. In this case,
+  // the service with the highest rank
+  auto sRef = context.GetServiceReference<ServiceNS::ITestServiceA>();
+  auto bestMatchServiceRank =
+    any_cast<int>(sRef.GetProperty(Constants::SERVICE_RANKING));
+  EXPECT_TRUE(std::none_of(
+    sRefArr.begin(),
+    sRefArr.end(),
+    [&bestMatchServiceRank](const ServiceReferenceBase& sRef) {
+      auto serviceRank =
+        any_cast<int>(sRef.GetProperty(Constants::SERVICE_RANKING));
+      return (serviceRank > bestMatchServiceRank);
+    }));
+}
+
+TEST_F(ServiceReferenceTest,
+       TestGetServiceReferenceWithMultipleRegistrationsPerRank)
+{
+  auto context = framework.GetBundleContext();
+  // register multiple instance of services for each rank in a range of ranks
+  std::vector<std::shared_ptr<TestServiceA>> implArr;
+  for (int rank = 0; rank < 5; ++rank) {
+    for (int serviceCount = 0; serviceCount < 5; ++serviceCount) {
+      auto impl = std::make_shared<TestServiceA>();
+      implArr.push_back(impl);
+      (void)context.RegisterService<ServiceNS::ITestServiceA>(
+        impl, { { Constants::SERVICE_RANKING, rank } });
+    }
+  }
+
+  auto sRefArr = context.GetServiceReferences<ServiceNS::ITestServiceA>();
+  ASSERT_EQ(sRefArr.size(), implArr.size());
+
+  // verify GetServiceReference returns the best match. In this case,
+  // the service with the higest rank and least id
+  auto sRef = context.GetServiceReference<ServiceNS::ITestServiceA>();
+  auto bestMatchServiceId =
+    any_cast<long int>(sRef.GetProperty(Constants::SERVICE_ID));
+  auto bestMatchServiceRank =
+    any_cast<int>(sRef.GetProperty(Constants::SERVICE_RANKING));
+  EXPECT_TRUE(std::none_of(sRefArr.begin(),
+                           sRefArr.end(),
+                           [&bestMatchServiceRank, &bestMatchServiceId](
+                             const ServiceReferenceBase& sRef) {
+                             auto serviceRank = any_cast<int>(
+                               sRef.GetProperty(Constants::SERVICE_RANKING));
+                             auto serviceId = any_cast<long int>(
+                               sRef.GetProperty(Constants::SERVICE_ID));
+                             return (serviceRank > bestMatchServiceRank) ||
+                                    (serviceRank == bestMatchServiceRank &&
+                                     serviceId < bestMatchServiceId);
+                           }));
+}
+
+TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithModifiedProperties)
+{
+  auto context = framework.GetBundleContext();
+  std::array<cppmicroservices::ServiceRegistration<ServiceNS::ITestServiceA>, 2>
+    regArr;
+  regArr[0] = context.RegisterService<ServiceNS::ITestServiceA>(
+    std::make_shared<TestServiceA>());
+  regArr[1] = context.RegisterService<ServiceNS::ITestServiceA>(
+    std::make_shared<TestServiceA>());
+
+  ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(),
+            regArr[0].GetReference());
+
+  // modify the lower priority registration to bump up the priority
+  regArr[1].SetProperties({ { Constants::SERVICE_RANKING, 10 } });
+  ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(),
+            regArr[1].GetReference());
 }

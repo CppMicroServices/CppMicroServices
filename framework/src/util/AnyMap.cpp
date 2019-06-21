@@ -924,12 +924,24 @@ AnyMap::AnyMap(const ordered_any_map& m)
   : any_map(m)
 {}
 
+AnyMap::AnyMap(ordered_any_map&& m)
+  : any_map(std::move(m))
+{}
+
 AnyMap::AnyMap(const unordered_any_map& m)
   : any_map(m)
 {}
 
+AnyMap::AnyMap(unordered_any_map&& m)
+  : any_map(std::move(m))
+{}
+
 AnyMap::AnyMap(const unordered_any_cimap& m)
   : any_map(m)
+{}
+
+AnyMap::AnyMap(unordered_any_cimap&& m)
+  : any_map(std::move(m))
 {}
 
 AnyMap::map_type AnyMap::GetType() const
@@ -942,8 +954,9 @@ const AnyMap::mapped_type& AnyMap::AtCompoundKey(const key_type& key) const
   return detail::AtCompoundKey(*this, key);
 }
 
-AnyMap::mapped_type AnyMap::AtCompoundKey(const key_type& key,
-                                          AnyMap::mapped_type defaultValue) const noexcept
+AnyMap::mapped_type AnyMap::AtCompoundKey(
+  const key_type& key,
+  AnyMap::mapped_type defaultValue) const noexcept
 {
   return detail::AtCompoundKey(*this, key, std::move(defaultValue));
 }

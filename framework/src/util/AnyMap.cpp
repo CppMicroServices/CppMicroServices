@@ -23,8 +23,6 @@
 #include "cppmicroservices/AnyMap.h"
 
 #include <stdexcept>
-#include <algorithm>
-#include <functional>
 
 namespace cppmicroservices {
 

@@ -241,3 +241,15 @@ TEST(AnyMapTest, CIHash)
   ASSERT_EQ(true, 0 != hashUpper);
   ASSERT_EQ(true, 0 != hashLower);
 }
+
+TEST(AnyMapTest, CIHashUnique)
+{
+  std::string v1 = "ABC";
+  std::string v2 = "CAB";
+
+  detail::any_map_cihash hash;
+  std::size_t hashV1 = hash(v1);
+  std::size_t hashV2 = hash(v2);
+  
+  ASSERT_EQ(true, hashV1 != hashV2);
+}

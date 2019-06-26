@@ -32,12 +32,12 @@ namespace cppmicroservices {
 
 namespace detail {
 
-struct any_map_cihash
+struct US_Framework_EXPORT any_map_cihash
 {
   std::size_t operator()(const std::string& key) const;
 };
 
-struct any_map_ciequal
+struct US_Framework_EXPORT any_map_ciequal
 {
   bool operator()(const std::string& l, const std::string& r) const;
 };

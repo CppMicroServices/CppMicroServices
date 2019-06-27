@@ -30,18 +30,19 @@ namespace detail {
 
 std::size_t any_map_cihash::operator()(const std::string& key) const
 {
-  std::size_t h = 0;
-  std::for_each(key.begin(), key.end(), [&h](char c) { h += tolower(c); });
-  return h;
+  std::string lcase = key;
+  std::transform(lcase.begin(), lcase.end(), lcase.begin(), ::tolower);
+  return std::hash<std::string>{}(lcase);
 }
 
-bool any_map_ciequal::operator()(const std::string& l,
-                                 const std::string& r) const
+bool any_map_ciequal::operator()(const std::string& l, const std::string& r) const
 {
-  return l.size() == r.size() &&
-         std::equal(l.begin(), l.end(), r.begin(), [](char a, char b) {
-           return tolower(a) == tolower(b);
-         });
+  return (l.size() == r.size()
+          && std::equal(l.begin(), l.end(), r.begin()
+                        , [](char a, char b)
+                          {
+                            return tolower(a) == tolower(b);
+                          }));
 }
 
 const Any& AtCompoundKey(const std::vector<Any>& v,

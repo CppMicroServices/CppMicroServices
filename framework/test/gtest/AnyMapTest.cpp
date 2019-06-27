@@ -227,3 +227,29 @@ TEST(AnyMapTest, MoveAssignment)
     << "This call should result in a crash because the object has been moved from";
 
 }
+
+TEST(AnyMapTest, CIHash)
+{
+  std::string allUpper = "THIS IS A TEST";
+  std::string allLower = "this is a test";
+
+  any_map::unordered_any_cimap::hasher hash;
+  std::size_t hashUpper = hash(allUpper);
+  std::size_t hashLower = hash(allLower);
+  
+  ASSERT_EQ(hashUpper, hashLower);
+  ASSERT_EQ(true, 0 != hashUpper);
+  ASSERT_EQ(true, 0 != hashLower);
+}
+
+TEST(AnyMapTest, CIHashUnique)
+{
+  std::string v1 = "ABC";
+  std::string v2 = "CAB";
+
+  any_map::unordered_any_cimap::hasher hash;
+  std::size_t hashV1 = hash(v1);
+  std::size_t hashV2 = hash(v2);
+  
+  ASSERT_EQ(true, hashV1 != hashV2);
+}

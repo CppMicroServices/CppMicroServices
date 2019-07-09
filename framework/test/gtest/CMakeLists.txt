@@ -60,7 +60,10 @@ target_include_directories(${us_gtest_test_exe_name} PRIVATE $<TARGET_PROPERTY:u
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  set_source_files_properties(${_gtest_tests} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
+  set_source_files_properties(${_gtest_tests}
+								PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
+											COMPILE_FLAGS -Wno-deprecated
+											COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})

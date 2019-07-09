@@ -108,7 +108,10 @@ target_include_directories(${_test_driver} PRIVATE $<TARGET_PROPERTY:util,INCLUD
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  set_source_files_properties(${_srcs} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
+  set_source_files_properties(${_srcs} 
+								PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
+											COMPILE_FLAGS -Wno-deprecated
+											COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)

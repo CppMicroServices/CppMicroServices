@@ -31,6 +31,7 @@
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 
+#include <chrono>
 #include <thread>
 #include <vector>
 
@@ -54,6 +55,8 @@ void testStartStopFrameworkEvents()
   US_TEST_CONDITION_REQUIRED(
     l.CheckEvents(events),
     "Test for the correct number and order of Framework start/stop events.");
+  
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 void testAddRemoveFrameworkListener()
@@ -145,6 +148,9 @@ void testAddRemoveFrameworkListener()
   US_TEST_CONDITION(
     count2 == 1,
     "Test that multiple framework listeners were NOT called after removal");
+  
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 void testFrameworkListenersAfterFrameworkStop()
@@ -170,6 +176,9 @@ void testFrameworkListenersAfterFrameworkStop()
   f.Start(); // generate framework event (started) with no listener to see it
   US_TEST_CONDITION(events == 1,
                     "Test that listeners were released on Framework Stop");
+  
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 void testFrameworkListenerThrowingInvariant()
@@ -268,6 +277,9 @@ void testFrameworkListenerThrowingInvariant()
     std::string::npos !=
       logstream.str().find("A Framework Listener threw an exception:"),
     "Test for internal log message from Framework event handler");
+  
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT

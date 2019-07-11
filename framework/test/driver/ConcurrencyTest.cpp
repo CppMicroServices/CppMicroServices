@@ -23,33 +23,20 @@ limitations under the License.
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceTracker.h"
-
 #include "TestUtils.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 
 #include <future>
 
-/*
+  /*
  * This test is meant to be run with a thread sanity checker. E.g. thread
  * sanitizer (using Clang or GCC) or helgrind.
  */
 
-using namespace cppmicroservices;
-
-void bundleListener(const BundleEvent& be)
-{
-  auto b = be.GetBundle();
-  auto type = be.GetType();
-  if (type == BundleEvent::BUNDLE_STARTING ||
-      type == BundleEvent::BUNDLE_STARTED) {
-    b.Stop();
-  } else if (type == BundleEvent::BUNDLE_STOPPING ||
-             type == BundleEvent::BUNDLE_STOPPED) {
-    b.Start();
-  }
-}
+  using namespace cppmicroservices;
 
 int ConcurrencyTest(int /*argc*/, char* /*argv*/ [])
 {
@@ -62,7 +49,17 @@ int ConcurrencyTest(int /*argc*/, char* /*argv*/ [])
 
   auto context = f.GetBundleContext();
 
-  context.AddBundleListener(bundleListener);
+  auto token = context.AddBundleListener([](const BundleEvent& be) {
+    auto b = be.GetBundle();
+    auto type = be.GetType();
+    if (type == BundleEvent::BUNDLE_STARTING ||
+        type == BundleEvent::BUNDLE_STARTED) {
+      b.Stop();
+    } else if (type == BundleEvent::BUNDLE_STOPPING ||
+               type == BundleEvent::BUNDLE_STOPPED) {
+      b.Start();
+    }
+  });
 
   ServiceTracker<void> tracker(f.GetBundleContext(),
                                "org.cppmicroservices.c1.additional");
@@ -70,24 +67,23 @@ int ConcurrencyTest(int /*argc*/, char* /*argv*/ [])
 
   auto bundle = testing::InstallLib(context, "TestBundleC1");
 
-  /* --- The Bundle class is not thread safe yet with respect to state changes ---
-
-    // concurrently start and stop the bundle multiple times
-    std::vector<std::future<void>> fs;
-    for (std::size_t i = 0; i < 10; ++i)
-    {
-      fs.emplace_back(std::async(std::launch::async, [&bundle] { bundle->Stop(); }));
-      fs.emplace_back(std::async(std::launch::async, [&bundle] { bundle->Start(); }));
-    }
-    for (auto& f : fs)
-    {
+  // concurrently start and stop the bundle multiple times
+  std::vector<std::future<void>> fs;
+  for (std::size_t i = 0; i < 10; ++i) {
+    fs.emplace_back(
+      std::async(std::launch::async, [&bundle] { bundle.Stop(); }));
+    fs.emplace_back(
+      std::async(std::launch::async, [&bundle] { bundle.Start(); }));
+  }
+  for (auto& f : fs) {
+    try {
       f.get();
+    } catch (const std::exception&) {
     }
-
-    */
+  }
 
   // make sure the bundle really is started
-  context.RemoveBundleListener(bundleListener);
+  context.RemoveListener(std::move(token));
   bundle.Start();
 
   tracker.WaitForService();
@@ -97,6 +93,9 @@ int ConcurrencyTest(int /*argc*/, char* /*argv*/ [])
                              "Wait for service")
 
   bundle.Stop();
+
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 
   US_TEST_END()
 }

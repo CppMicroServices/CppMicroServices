@@ -31,7 +31,7 @@ LDAPPropExpr::LDAPPropExpr()
   : m_ldapExpr()
 {}
 
-LDAPPropExpr::LDAPPropExpr(std::string  expr)
+LDAPPropExpr::LDAPPropExpr(std::string expr)
   : m_ldapExpr(std::move(expr))
 {}
 
@@ -52,14 +52,6 @@ LDAPPropExpr::operator std::string() const
 bool LDAPPropExpr::IsNull() const
 {
   return m_ldapExpr.empty();
-}
-
-LDAPPropExpr& LDAPPropExpr::operator=(const LDAPPropExpr& expr)
-{
-  if (this != &expr) {
-    m_ldapExpr = expr.m_ldapExpr;
-  }
-  return *this;
 }
 
 LDAPPropExpr& LDAPPropExpr::operator|=(const LDAPPropExpr& right)

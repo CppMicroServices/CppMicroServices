@@ -90,8 +90,7 @@ ServiceRegistrationBase::~ServiceRegistrationBase()
     delete d;
 }
 
-ServiceReferenceBase ServiceRegistrationBase::GetReference(
-  const std::string& interfaceId) const
+ServiceReferenceBase ServiceRegistrationBase::GetReference(const std::string& interfaceId) const
 {
   if (!d)
     throw std::logic_error("ServiceRegistrationBase object invalid");

@@ -1,0 +1,4 @@
+add_subdirectory(LogService)
+add_subdirectory(ServiceComponent)
+add_subdirectory(DeclarativeServices)
+add_subdirectory(tools)

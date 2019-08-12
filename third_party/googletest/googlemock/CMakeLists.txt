@@ -103,10 +103,12 @@ endif()
 ########################################################################
 #
 # Install rules
-install(TARGETS gmock gmock_main
+if (NOT GMOCK_NO_INSTALL)
+  install(TARGETS gmock gmock_main
   DESTINATION lib)
-install(DIRECTORY ${gmock_SOURCE_DIR}/include/gmock
+  install(DIRECTORY ${gmock_SOURCE_DIR}/include/gmock
   DESTINATION include)
+endif()
 
 ########################################################################
 #

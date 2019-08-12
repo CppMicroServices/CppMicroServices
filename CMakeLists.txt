@@ -331,8 +331,9 @@ if(US_BUILD_TESTING)
     set(GTEST_BOTH_LIBRARIES gtest gtest_main)
     set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
 
-    # Prevent GTest from installing libraries into our install dir.
+    # Prevent GTest/GMock from installing libraries into our install dir.
     set(GTEST_NO_INSTALL 1)
+    set(GMOCK_NO_INSTALL 1)
 
     # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
     # static library even if CppMicroServices is a shared library.
@@ -340,7 +341,7 @@ if(US_BUILD_TESTING)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
 
-    set(BENCHMARK_ENABLE_INSTALL OFF)
+    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/benchmark)
 

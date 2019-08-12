@@ -30,10 +30,7 @@
 #include "ComponentInstance.hpp"
 #include "Binders.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace detail {
+namespace cppmicroservices { namespace service { namespace component { namespace detail {
 
 /**
  * Util class to detect if a class has a method named Activate
@@ -65,8 +62,8 @@ public:
   enum { value = sizeof(func<T>(nullptr)) == sizeof(char) };
 };
 
-namespace util
-{
+namespace util {
+
 /**
  * Helper function used to call a given function for each element of the tuple
  */
@@ -77,7 +74,8 @@ void for_each(T&& t, FUNC f, std::index_sequence<Is...>)
   int dummy[] = {0, (f(std::get<Is>(t), Is), 0)...};
   static_cast<void>(dummy); // silence unused varible warning
 }
-}
+
+} // util namespace
 
 template<typename... Ts, typename FUNC>
 void for_each_in_tuple(std::tuple<Ts...> const& t, FUNC f)
@@ -86,22 +84,33 @@ void for_each_in_tuple(std::tuple<Ts...> const& t, FUNC f)
 }
 
 /**
- * This class implements the private interface ComponentInstance. Extern C functions responsible
- * for instantiating objects from this class are generated using the code generator tool.
+ * This class implements the private interface ComponentInstance. Extern C functions
+ * responsible for instantiating objects from this class are generated using the code
+ * generator tool.
  *
  * T - service component implementation class
- * InterfaceTuple - a tuple containing the interface types of the services provided by the service component
- * Inject - indicates if the service component wants it's dependencies injected. Default is true.
- *          When Inject is true, all references (static & dynamic) are injected using constructor injection.
- *          If a reference has dynamic  policy, in addition to constructor injection, the bind and unbind
- *          callbacks maybe called by the runtime to update the reference.
- *          When Inject is false, no references are injected. Service component implementation object is
- *          responsible for retrieving its dependencies.
- * Refs - variadic parameter to specify the service reference types consumed by the component
+ * 
+ * InterfaceTuple - a tuple containing the interface types of the services provided by the
+ *                  service component
+ * 
+ * Inject - indicates if the service component wants it's dependencies injected. Default
+ *          is true.  When Inject is true, all references (static & dynamic) are injected
+ *          using constructor injection.  If a reference has dynamic policy, in addition
+ *          to constructor injection, the bind and unbind callbacks maybe called by the
+ *          runtime to update the reference.  When Inject is false, no references are
+ *          injected. Service component implementation object is responsible for
+ *          retrieving its dependencies.
+ *          
+ * Refs - variadic parameter to specify the service reference types consumed by the
+ *        component
  */
-template <class T, class InterfaceTuple = std::tuple<>, class Inject = std::true_type, class ...Refs>
-class ComponentInstanceImpl final : public ComponentInstance {
-
+template <class T
+          , class InterfaceTuple = std::tuple<>
+          , class Inject = std::true_type
+          , class ...Refs>
+class ComponentInstanceImpl final
+  : public ComponentInstance
+{
 public:
   ComponentInstanceImpl(const std::vector<std::shared_ptr<Binder<T>>>& binders = {})
     : mContext(nullptr)
@@ -177,7 +186,9 @@ private:
     return mContext->LocateService<R>(name);
   }
 
-  template<class C = T, class I = InterfaceTuple, std::size_t... Is>
+  template<class C = T
+           , class I = InterfaceTuple
+           , std::size_t... Is>
   cppmicroservices::InterfaceMapPtr MakeInterfaceMapWithTuple(const std::shared_ptr<T>& sObj,
                                                               std::index_sequence<Is...>)
   {
@@ -194,7 +205,8 @@ private:
     return nullptr;
   }
 
-  template <class I = InterfaceTuple, typename std::enable_if<std::tuple_size<I>::value != 0, int>::type = 0>
+  template <class I = InterfaceTuple
+            , typename std::enable_if<std::tuple_size<I>::value != 0, int>::type = 0>
   cppmicroservices::InterfaceMapPtr GetInterfaceMapHelper(const std::shared_ptr<T>& sObj)
   {
     return MakeInterfaceMapWithTuple(sObj, std::make_index_sequence<std::tuple_size<I>::value>{});
@@ -213,18 +225,20 @@ private:
   }
 
   // this method is used when injection is false and default constructor is provided by the implementation class
-  template <class C = T, class I = Inject,
-            class X = typename std::enable_if<I::value == false>::type,
-            class Y = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
+  template <class C = T
+            , class I = Inject
+            , class X = typename std::enable_if<I::value == false>::type
+            , class Y = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
   std::shared_ptr<T> DoCreate(bool)
   {
     return std::make_shared<T>();
   }
 
   // this method is used when injection is false and default constructor is not provided by the implementation class
-  template <class C = T, class I = Inject,
-            class X = typename std::enable_if<I::value == false>::type,
-            class Y = typename std::enable_if<std::is_default_constructible<C>::value == false>::type>
+  template <class C = T
+            , class I = Inject
+            , class X = typename std::enable_if<I::value == false>::type
+            , class Y = typename std::enable_if<std::is_default_constructible<C>::value == false>::type>
   std::shared_ptr<T> DoCreate(bool dummy1, bool dummy2 = false)
   {
     (void)dummy1;
@@ -234,9 +248,10 @@ private:
   }
 
   // this method is used when injection is true and constructor with suitable parameters is not provided by the implementation class
-  template <class C = T, class I = Inject,
-            class Y = typename std::enable_if<I::value == true>::type,
-            class X = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<Refs>&...>::value == false>::type>
+  template <class C = T
+            , class I = Inject
+            , class Y = typename std::enable_if<I::value == true>::type
+            , class X = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<Refs>&...>::value == false>::type>
   std::shared_ptr<T> DoCreate(const bool&)
   {
     static_assert(std::is_constructible<C, const std::shared_ptr<Refs>&...>::value , "Suitable constructor not found for constructor injection");
@@ -244,9 +259,10 @@ private:
   }
 
   // this method is used when injection is true and constructor with parameters is provided by the implementation class
-  template <class C = T, class I = Inject,
-            class Y = typename std::enable_if<I::value == true>::type,
-            class X = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<Refs>&...>::value>::type>
+  template <class C = T
+            , class I = Inject
+            , class Y = typename std::enable_if<I::value == true>::type
+            , class X = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<Refs>&...>::value>::type>
   std::shared_ptr<T> DoCreate(bool& injected)
   {
     std::tuple<std::shared_ptr<Refs> ...> depObjs = GetAllDependencies(std::make_index_sequence<std::tuple_size<std::tuple<Refs...>>::value>{});
@@ -267,8 +283,8 @@ private:
   /**
    * This method is used if the component implementation class provides an Activate method.
    */
-  template <class Impl = T,
-            class Z = typename std::enable_if<HasActivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
+  template <class Impl = T
+            , class Z = typename std::enable_if<HasActivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
   void DoActivate(const std::shared_ptr<ComponentContext>& ctxt)
   {
     mServiceImpl->Activate(ctxt);
@@ -286,8 +302,8 @@ private:
   /**
    * This method is used if the component implementation class provides an Activate method.
    */
-  template <class Impl = T,
-            class Z = typename std::enable_if<HasDeactivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
+  template <class Impl = T
+            , class Z = typename std::enable_if<HasDeactivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
   void DoDeactivate(const std::shared_ptr<ComponentContext>& ctxt)
   {
     mServiceImpl->Deactivate(ctxt);
@@ -298,9 +314,7 @@ private:
   std::vector<std::shared_ptr<Binder<T>>> refBinders;  // Helpers used for bind and unbind calls on the instance
   std::map<std::string, size_t> refBinderMap;          // a map to retrieve binders based on reference name
 };
-}
-}
-}
-}
+
+}}}} // namespaces
 
 #endif /* ComponentInstance_hpp */

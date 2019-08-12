@@ -29,10 +29,8 @@
 #include "../ComponentContext.hpp"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace detail {
+namespace cppmicroservices { namespace service { namespace component { namespace detail {
+
 /**
  * This interface is used by the declarative services runtime to manage the
  * creation, dependency injection and deletion of instances of the service
@@ -84,9 +82,7 @@ class US_ServiceComponent_EXPORT ComponentInstance {
    */
   virtual cppmicroservices::InterfaceMapPtr GetInterfaceMap() = 0;
 };
-}
-}
-}
-}
+
+}}}} // namespaces
 
 #endif /* ComponentInstance_hpp */

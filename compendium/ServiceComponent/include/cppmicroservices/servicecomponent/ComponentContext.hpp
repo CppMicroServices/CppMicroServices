@@ -34,9 +34,8 @@
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
-namespace cppmicroservices {
-namespace service {
-namespace component {
+
+namespace cppmicroservices { namespace service { namespace component {
 
 /**
  * A Component Context object is used by a component instance to interact with
@@ -47,7 +46,8 @@ namespace component {
  * A component instance may obtain its Component Context object through its
  * activate, modified, and deactivate methods.
  */
-class US_ServiceComponent_EXPORT ComponentContext {
+class US_ServiceComponent_EXPORT ComponentContext
+{
   public:
   virtual ~ComponentContext() noexcept;
 
@@ -204,7 +204,7 @@ class US_ServiceComponent_EXPORT ComponentContext {
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating the bound service.
    */
-  virtual  std::shared_ptr<void> LocateService(const std::string& name, const std::string& type) const = 0;
+  virtual std::shared_ptr<void> LocateService(const std::string& name, const std::string& type) const = 0;
 
   /**
    * Returns the service objects for the specified reference name and type.
@@ -221,7 +221,7 @@ class US_ServiceComponent_EXPORT ComponentContext {
    */
   virtual  std::vector<std::shared_ptr<void>> LocateServices(const std::string& name, const std::string& type) const = 0;
 };
-}
-}
-}
+
+}}} // namespaces
+
 #endif /* ComponentContext_hpp */

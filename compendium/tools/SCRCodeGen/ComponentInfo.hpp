@@ -58,9 +58,9 @@ struct ComponentInfo
 // that's understood by the code-generator
 std::string GetComponentNameStr(const ComponentInfo& compInfo);
 std::string GetServiceInterfacesStr(const ServiceInfo& compInfo);
-std::string GetReferencesStr(const ComponentInfo& compInfo);
-std::string GetInjectReferencesStr(const ComponentInfo& compInfo);
-std::string GetReferenceBinderStr(const ReferenceInfo& ref);
+std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo);
+std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo);
+std::string GetReferenceBinderStr(const ReferenceInfo& ref, bool injectReferences);
 
 } // namespace datamodel
 } // namespace codegen

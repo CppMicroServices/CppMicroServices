@@ -57,7 +57,7 @@ target_link_libraries(${scrcodegen_test_exe_name}
 	PRIVATE
 		${GTEST_BOTH_LIBRARIES}
 		${GMOCK_BOTH_LIBRARIES}
-        CppMicroServices
+                CppMicroServices
 )
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)

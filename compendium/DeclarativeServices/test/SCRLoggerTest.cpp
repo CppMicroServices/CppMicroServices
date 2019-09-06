@@ -30,7 +30,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/BundleContext.h"
 #include "Mocks.hpp"
-#include "SCRLogger.hpp"
+#include "../src/SCRLogger.hpp"
 
 using cppmicroservices::logservice::LogService;
 using cppmicroservices::logservice::SeverityLevel;

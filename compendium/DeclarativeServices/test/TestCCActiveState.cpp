@@ -30,7 +30,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
-#include "manager/states/CCActiveState.hpp"
+#include "../src/manager/states/CCActiveState.hpp"
 
 typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
 

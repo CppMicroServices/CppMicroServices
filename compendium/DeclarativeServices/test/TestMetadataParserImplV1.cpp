@@ -21,10 +21,10 @@
   =============================================================================*/
 #include "Mocks.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "metadata/MetadataParserFactory.hpp"
-#include "metadata/MetadataParserImpl.hpp"
-#include "metadata/ReferenceMetadata.hpp"
-#include "metadata/Util.hpp"
+#include "../src/metadata/MetadataParserFactory.hpp"
+#include "../src/metadata/MetadataParserImpl.hpp"
+#include "../src/metadata/ReferenceMetadata.hpp"
+#include "../src/metadata/Util.hpp"
 #include "gtest/gtest.h"
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>

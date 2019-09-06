@@ -4,7 +4,8 @@ set(_srcs
     Main.cpp
     ManifestParserImpl.cpp
     Util.cpp
-	../../../third_party/jsoncpp.cpp)
+      ../../../third_party/jsoncpp.cpp)
+  
 set(_private_headers
     ComponentCallbackGenerator.hpp
     ComponentInfo.hpp
@@ -31,10 +32,6 @@ if(NOT US_NO_INSTALL)
             RUNTIME DESTINATION ${TOOLS_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 endif()
 
-if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
-  add_subdirectory(test)
-endif()
-
 if(CMAKE_CROSSCOMPILING)
   # When cross-compiling, import the host machine executable from a file
   # See https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/CrossCompiling
@@ -48,9 +45,9 @@ else()
   export( TARGETS ${US_SCRCODEGEN_EXECUTABLE_TARGET} FILE ${IMPORT_EXECUTABLES} NAMESPACE native-)
 endif()
 
-# if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
-  # add_subdirectory(test)
-# endif()
+if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
+  add_subdirectory(test)
+endif()
 
 export(TARGETS ${US_SCRCODEGEN_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)

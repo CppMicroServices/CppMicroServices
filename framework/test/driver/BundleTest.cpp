@@ -579,7 +579,7 @@ void TestForInstallFailure()
 
   // Test that bogus bundle installs throw the appropriate exception
   try {
-    frameworkCtx.InstallBundles(std::string());
+    frameworkCtx.InstallBundles(std::string {});
     US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
   } catch (const std::runtime_error& ex) {
     US_TEST_OUTPUT(<< "Caught std::runtime_exception: " << ex.what())
@@ -634,8 +634,10 @@ void TestAutoInstallEmbeddedBundles()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
 
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(
-    testing::BIN_PATH + util::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT));
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH
+                                                   + util::DIR_SEP
+                                                   + "usFrameworkTestDriver"
+                                                   + US_EXE_EXT));
 
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).
@@ -673,8 +675,12 @@ void TestNonStandardBundleExtension()
   auto frameworkCtx = f.GetBundleContext();
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(
-    testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + "TestBundleExt.cppms"));
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH
+                                                   + util::DIR_SEP
+                                                   + US_LIB_PREFIX
+                                                   + "TestBundleExt"
+                                                   + ".cppms"));
+  
   // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
   US_TEST_CONDITION(3 == frameworkCtx.GetBundles().size(),
                     "Test # of installed bundles")
@@ -714,10 +720,13 @@ void TestUnicodePaths()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
   try {
-    std::string path_utf8 =
-      testing::LIB_PATH + cppmicroservices::util::DIR_SEP +
-      u8"くいりのまちとこしくそ" + cppmicroservices::util::DIR_SEP +
-      US_LIB_PREFIX + "TestBundleU" + US_LIB_EXT;
+    std::string path_utf8 = testing::LIB_PATH
+                            + cppmicroservices::util::DIR_SEP
+                            + u8"くいりのまちとこしくそ"
+                            + cppmicroservices::util::DIR_SEP
+                            + US_LIB_PREFIX
+                            + "TestBundleU"
+                            + US_LIB_EXT;
     auto bundles = frameworkCtx.InstallBundles(path_utf8);
     US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
     auto bundle = bundles.at(0);

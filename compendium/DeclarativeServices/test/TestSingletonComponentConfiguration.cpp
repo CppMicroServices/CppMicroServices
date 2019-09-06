@@ -24,10 +24,10 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "Mocks.hpp"
-#include "manager/SingletonComponentConfiguration.hpp"
+#include "../src/manager/SingletonComponentConfiguration.hpp"
 #include "ConcurrencyTestUtil.hpp"
-#include "manager/states/CCRegisteredState.hpp"
-#include "manager/states/CCActiveState.hpp"
+#include "../src/manager/states/CCRegisteredState.hpp"
+#include "../src/manager/states/CCActiveState.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {

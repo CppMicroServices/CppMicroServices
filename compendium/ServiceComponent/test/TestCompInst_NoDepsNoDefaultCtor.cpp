@@ -19,7 +19,7 @@
   limitations under the License.
 
   =============================================================================*/
-
+#if NEVER
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
@@ -32,7 +32,6 @@
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
-#if NEVER
 namespace {
 
 // dummy class used for testing
@@ -40,10 +39,8 @@ class TestServiceImpl
 {
 public:
   TestServiceImpl() = delete;
-  TestServiceImpl(int a) : m(a) {};
+  TestServiceImpl(int) {}
   virtual ~TestServiceImpl() = default;
-private:
-  int m;
 };
 
 /**

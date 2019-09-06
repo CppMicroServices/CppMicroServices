@@ -22,9 +22,9 @@
 #include <cppmicroservices/FrameworkFactory.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include "gtest/gtest.h"
-#include "metadata/ServiceMetadata.hpp"
-#include "metadata/MetadataParserImpl.hpp"
-#include "metadata/MetadataParserFactory.hpp"
+#include "../src/metadata/ServiceMetadata.hpp"
+#include "../src/metadata/MetadataParserImpl.hpp"
+#include "../src/metadata/MetadataParserFactory.hpp"
 #include "Mocks.hpp"
 
 using cppmicroservices::scrimpl::metadata::MetadataParserFactory;

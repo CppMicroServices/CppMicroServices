@@ -27,7 +27,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
-#include "manager/states/CCUnsatisfiedReferenceState.hpp"
+#include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
 #include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
 

@@ -27,9 +27,7 @@
 
 #include <cppmicroservices/servicecomponent/ServiceComponentExport.h>
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
+namespace cppmicroservices { namespace service { namespace component {
 
 /**
  * Defines standard names for Service Component constants.
@@ -79,7 +77,6 @@ US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
 US_ServiceComponent_EXPORT extern const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 }
 
-} // end namespaces
-}
-}
+}}} // namespaces
+
 #endif // ComponentConstants_hpp

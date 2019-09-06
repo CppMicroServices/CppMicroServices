@@ -35,7 +35,7 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include "cppmicroservices/servicecomponent/ComponentException.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "ComponentContextImpl.hpp"
+#include "../src/ComponentContextImpl.hpp"
 
 using cppmicroservices::service::component::ComponentContext;
 using cppmicroservices::service::component::ComponentException;

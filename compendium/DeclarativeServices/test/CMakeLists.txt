@@ -4,6 +4,19 @@
 
 set(us_declarativeservices_test_exe_name usDeclarativeServicesTests)
 
+# Make sure that the correct paths separators are used on each platform
+if(WIN32)
+  set(DIR_SEP "\\\\")
+  string(REPLACE "/" "\\\\" CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  string(REPLACE "/" "\\\\" CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(DIR_SEP "/")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
+
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
@@ -48,22 +61,22 @@ set(_declarativeservices_tests
   TestServiceComponentRuntimeImpl.cpp
   TestServiceMetadataParserV1.cpp
   TestSingletonComponentConfiguration.cpp
+  TestBundleStartOrder.cpp
+  TestComponentDescription.cpp
+  TestComponentInitialState.cpp
+  TestComponentLifecycle.cpp
+  TestDictionary.cpp
+  TestFixture.hpp
+  TestServiceComponentRuntime.cpp
+  TestServiceProvider.cpp
+  ImportTestBundles.cpp
   main.cpp
 )
 
-include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
-  ${CppMicroServices_BINARY_DIR}/include
-  ${CppMicroServices_BINARY_DIR}/framework/include
-  ${CppMicroServices_BINARY_DIR}/compendium/ServiceComponent/include
-  ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
-  ${CppMicroServices_SOURCE_DIR}/compendium/ServiceComponent/include
-  ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
-  ${CppMicroServices_SOURCE_DIR}/compendium/DeclarativeServices/src
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
-  )
+include_directories(${PROJECT_BINARY_DIR}/include)
 
 set(_additional_srcs
+  TestUtils.cpp
   ../src/SCRActivator.cpp
   )
 
@@ -72,31 +85,84 @@ set(_additional_srcs
 #-----------------------------------------------------------------------------
 
 # Generate a custom "bundle init" file for the test driver executable
-usFunctionGenerateBundleInit(TARGET ${us_declarativeservices_test_exe_name} OUT _additional_srcs)
+usFunctionGenerateBundleInit(
+  TARGET ${us_declarativeservices_test_exe_name}
+  OUT _additional_srcs
+  )
 
-usFunctionGetResourceSource(TARGET ${us_declarativeservices_test_exe_name} OUT _additional_srcs)
+usFunctionGetResourceSource(
+  TARGET ${us_declarativeservices_test_exe_name}
+  OUT _additional_srcs)
 
-add_executable(${us_declarativeservices_test_exe_name} ${_declarativeservices_tests} ${_additional_srcs})
+add_executable(${us_declarativeservices_test_exe_name}
+  ${_declarativeservices_tests}
+  ${_additional_srcs})
 
-set_property(TARGET ${us_declarativeservices_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
-set_property(TARGET ${us_declarativeservices_test_exe_name} PROPERTY US_BUNDLE_NAME main)
+set_property(
+  TARGET ${us_declarativeservices_test_exe_name}
+  APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main
+  )
 
+set_property(
+  TARGET ${us_declarativeservices_test_exe_name}
+  PROPERTY US_BUNDLE_NAME main
+  )
 
-target_include_directories(${us_declarativeservices_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
+target_include_directories(${us_declarativeservices_test_exe_name}
+  PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  set_source_files_properties(${_declarativeservices_tests} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
+  set_source_files_properties(${_declarativeservices_tests}
+    PROPERTIES
+    COMPILE_FLAGS -Wno-error=deprecated-declarations
+    COMPILE_FLAGS -Wno-sign-compare
+    )
 endif()
 
+set(_test_bundles
+  BenchmarkDS
+  DSFrenchDictionary
+  DSGraph01
+  DSGraph02
+  DSGraph03
+  DSGraph04
+  DSGraph05
+  DSGraph06
+  DSGraph07
+  DSSpellChecker
+  TestBundleDSTOI1
+  TestBundleDSTOI10
+  TestBundleDSTOI12
+  TestBundleDSTOI14
+  TestBundleDSTOI15
+  TestBundleDSTOI16
+  TestBundleDSTOI2
+  TestBundleDSTOI3
+  TestBundleDSTOI5
+  TestBundleDSTOI6
+  TestBundleDSTOI9
+  EnglishDictionary
+  #DeclarativeServices
+  )
+
 target_link_libraries(${us_declarativeservices_test_exe_name} 
-	PRIVATE
-		${GTEST_BOTH_LIBRARIES}
-		${GMOCK_BOTH_LIBRARIES}
-		${${PROJECT_NAME}_LINK_LIBRARIES}
-		DeclarativeServicesObjs
+  PRIVATE
+  ${GTEST_BOTH_LIBRARIES}
+  ${GMOCK_BOTH_LIBRARIES}
+  ${${PROJECT_NAME}_LINK_LIBRARIES}
+  DeclarativeServicesObjs
+  usTestInterfaces
+  usServiceComponent
+  usLogService
+  usIDictionaryService
+  usISpellCheckService
+  gtest
+  gmock
+  util
+  ${_test_bundles}
 )
 
 # Needed for clock_gettime with glibc < 2.17
@@ -169,6 +235,6 @@ else()
 	# Add resources
     usFunctionEmbedResources(TARGET ${us_declarativeservices_test_exe_name}
                              FILES manifest.json
-                             ZIP_ARCHIVES ${Framework_TARGET})
+                             ZIP_ARCHIVES ${Framework_TARGET} ${_test_bundles})
 endif()
 

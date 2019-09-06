@@ -19,7 +19,7 @@
  limitations under the License.
 
  =============================================================================*/
-
+#if NEVER
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
@@ -35,7 +35,6 @@ using cppmicroservices::service::component::detail::Binder;
 using cppmicroservices::service::component::detail::StaticBinder;
 using cppmicroservices::service::component::detail::DynamicBinder;
 
-#if NEVER
 namespace {
 
   // dummy types used for testing

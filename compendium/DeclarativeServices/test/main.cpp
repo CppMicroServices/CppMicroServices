@@ -19,7 +19,6 @@
   limitations under the License.
 
   =============================================================================*/
-
 #include "gmock/gmock.h"
 
 int main(int argc, char **argv)

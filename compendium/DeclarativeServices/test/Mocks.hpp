@@ -24,15 +24,15 @@
 #define __MOCKS_HPP__
 #include "gmock/gmock.h"
 #include <cppmicroservices/ServiceFactory.h>
-#include "ComponentRegistry.hpp"
-#include "manager/ComponentManager.hpp"
-#include "manager/ComponentManagerImpl.hpp"
-#include "manager/states/ComponentManagerState.hpp"
-#include "manager/ReferenceManager.hpp"
-#include "manager/ReferenceManagerImpl.hpp"
-#include "manager/ComponentConfiguration.hpp"
-#include "manager/ComponentConfigurationImpl.hpp"
-#include "manager/states/ComponentConfigurationState.hpp"
+#include "../src/ComponentRegistry.hpp"
+#include "../src/manager/ComponentManager.hpp"
+#include "../src/manager/ComponentManagerImpl.hpp"
+#include "../src/manager/states/ComponentManagerState.hpp"
+#include "../src/manager/ReferenceManager.hpp"
+#include "../src/manager/ReferenceManagerImpl.hpp"
+#include "../src/manager/ComponentConfiguration.hpp"
+#include "../src/manager/ComponentConfigurationImpl.hpp"
+#include "../src/manager/states/ComponentConfigurationState.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {

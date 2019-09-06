@@ -26,12 +26,12 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceInterface.h"
-#include "manager/ComponentConfigurationImpl.hpp"
+#include "../src/manager/ComponentConfigurationImpl.hpp"
 #include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
-#include "manager/states/CCUnsatisfiedReferenceState.hpp"
-#include "manager/states/CCRegisteredState.hpp"
-#include "manager/states/CCActiveState.hpp"
+#include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
+#include "../src/manager/states/CCRegisteredState.hpp"
+#include "../src/manager/states/CCActiveState.hpp"
 
 using cppmicroservices::service::component::ComponentContext;
 

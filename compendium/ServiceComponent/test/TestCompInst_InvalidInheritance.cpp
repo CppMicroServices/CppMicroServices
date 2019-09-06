@@ -19,7 +19,7 @@
   limitations under the License.
 
   =============================================================================*/
-
+#if NEVER
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
@@ -34,7 +34,6 @@
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
-#if NEVER
 namespace {
 
 // dummy types used for testing
@@ -62,5 +61,5 @@ int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-#endif
 
+#endif

@@ -485,11 +485,12 @@ class ValidCodegenTest
 
 TEST_P(ValidCodegenTest, TestCodegenFunctionality)
 {
-
   CodegenValidManifestState vcs = GetParam();
   auto scr = GetManifestSCRData(vcs.manifest);
-  auto version =
-    util::JsonValueValidator(scr, "version", Json::ValueType::intValue)();
+  auto version = util::JsonValueValidator(scr
+                                          , "version"
+                                          , Json::ValueType::intValue)();
+  
   auto manifestParser = ManifestParserFactory::Create(version.asInt());
   auto componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
   ComponentCallbackGenerator compGen(vcs.headers, componentInfos);

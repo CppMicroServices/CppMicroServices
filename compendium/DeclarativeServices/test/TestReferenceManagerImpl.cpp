@@ -26,7 +26,7 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "manager/ReferenceManagerImpl.hpp"
+#include "../src/manager/ReferenceManagerImpl.hpp"
 
 #include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"

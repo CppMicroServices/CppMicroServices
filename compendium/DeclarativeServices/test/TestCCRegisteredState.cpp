@@ -28,7 +28,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
-#include "manager/states/CCRegisteredState.hpp"
+#include "../src/manager/states/CCRegisteredState.hpp"
 #include "ConcurrencyTestUtil.hpp"
 
 namespace cppmicroservices {

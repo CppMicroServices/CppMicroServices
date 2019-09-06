@@ -28,10 +28,7 @@
 
 #include <cppmicroservices/ServiceReference.h>
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace detail {
+namespace cppmicroservices { namespace service { namespace component { namespace detail {
 
 /**
  * Binder objects are used by the runtime to call the Bind and Unbind methods on a service component object.
@@ -42,14 +39,25 @@ class Binder
 public:
   Binder(const std::string& refName,
          const std::string& refType)
-    :mRefName(refName)
-   ,mRefType(refType){}
+    : mRefName(refName)
+    , mRefType(refType)
+  {}
+  
   virtual ~Binder() {};
+  
   virtual void Bind(cppmicroservices::BundleContext bc,
                     const cppmicroservices::ServiceReferenceBase& sRef,
                     const std::shared_ptr<T>& comp) = 0;
   virtual void UnBind(cppmicroservices::BundleContext bc,
                       const cppmicroservices::ServiceReferenceBase& sRef,
+                      const std::shared_ptr<T>& comp) = 0;
+  virtual void Bind(const std::shared_ptr<ComponentContext>& ctxt,
+                    const std::shared_ptr<T>& comp) = 0;
+  virtual void Unbind(const std::shared_ptr<ComponentContext>& ctxt,
+                      const std::shared_ptr<T>& comp) = 0;
+  virtual void Bind(const std::shared_ptr<void>& serv,
+                    const std::shared_ptr<T>& comp) = 0;
+  virtual void Unbind(const std::shared_ptr<void>& serv,
                       const std::shared_ptr<T>& comp) = 0;
   std::string GetReferenceName() { return mRefName; }
   std::string GetReferenceType() { return mRefType; }
@@ -75,9 +83,9 @@ public:
    * References with static policy must not be modified throught out the lifetime
    * of the service component object.
    */
-  virtual void Bind(cppmicroservices::BundleContext,
-                    const cppmicroservices::ServiceReferenceBase&,
-                    const std::shared_ptr<T>&) override
+  void Bind(cppmicroservices::BundleContext
+            , const cppmicroservices::ServiceReferenceBase&
+            , const std::shared_ptr<T>&) override
   {
     throw std::runtime_error("Static dependency must not change at runtime");
   }
@@ -87,9 +95,33 @@ public:
    * References with static policy must not be modified throught out the lifetime
    * of the service component object.
    */
-  virtual void UnBind(cppmicroservices::BundleContext,
-                      const cppmicroservices::ServiceReferenceBase&,
-                      const std::shared_ptr<T>&) override
+  void UnBind(cppmicroservices::BundleContext
+              , const cppmicroservices::ServiceReferenceBase&
+              , const std::shared_ptr<T>&) override
+  {
+    throw std::runtime_error("Static dependency must not change at runtime");
+  }
+
+  void Bind(const std::shared_ptr<ComponentContext>&
+            , const std::shared_ptr<T>&) override
+  {
+    throw std::runtime_error("Static dependency must not change at runtime");
+  }
+  
+  void Unbind(const std::shared_ptr<ComponentContext>&
+              , const std::shared_ptr<T>&) override
+  {
+    throw std::runtime_error("Static dependency must not change at runtime");
+  }
+
+  void Bind(const std::shared_ptr<void>&
+            , const std::shared_ptr<T>&) override
+  {
+    throw std::runtime_error("Static dependency must not change at runtime");
+  }
+
+  void Unbind(const std::shared_ptr<void>&
+              , const std::shared_ptr<T>&) override
   {
     throw std::runtime_error("Static dependency must not change at runtime");
   }
@@ -104,12 +136,12 @@ class DynamicBinder final
 {
 public:
 
-  typedef std::function<void(T*,const std::shared_ptr<R>&)> BindFunc;
-  typedef std::function<void(T*,const std::shared_ptr<R>&)> UnbindFunc;
+  using BindFuncT = std::function<void(T*,const std::shared_ptr<R>&)>;
+  using UnbindFuncT = std::function<void(T*,const std::shared_ptr<R>&)>;
 
-  DynamicBinder(const std::string& refName,
-                BindFunc bindFPtr,
-                UnbindFunc unbindFPtr)
+  DynamicBinder(const std::string& refName
+                , BindFuncT bindFPtr
+                , UnbindFuncT unbindFPtr)
     : Binder<T>(refName, us_service_interface_iid<R>())
     , bindFunction(bindFPtr)
     , unbindFunction(unbindFPtr)
@@ -117,9 +149,9 @@ public:
 
   virtual ~DynamicBinder() = default;
 
-  virtual void Bind(cppmicroservices::BundleContext bc,
-                    const cppmicroservices::ServiceReferenceBase& sRef,
-                    const std::shared_ptr<T>& comp) override
+  void Bind(cppmicroservices::BundleContext bc
+            , const cppmicroservices::ServiceReferenceBase& sRef
+            , const std::shared_ptr<T>& comp) override
   {
     cppmicroservices::ServiceReference<R> typedRef(sRef);
     if(!typedRef)
@@ -127,31 +159,68 @@ public:
       throw std::runtime_error("Invalid service reference");
     }
     std::shared_ptr<R> service = bc.template GetService<R>(typedRef);
+    DoBind(service, comp);
+  }
+
+  void UnBind(cppmicroservices::BundleContext bc
+              , const cppmicroservices::ServiceReferenceBase& sRef
+              , const std::shared_ptr<T>& comp) override
+  {
+    cppmicroservices::ServiceReference<R> typedRef(sRef);
+    if(!typedRef)
+    {
+      throw std::runtime_error("Invalid service reference");
+    }
+    std::shared_ptr<R> service = bc.template GetService<R>(typedRef);
+    DoUnbind(service, comp);
+  }
+
+  void Bind(const std::shared_ptr<ComponentContext>& ctxt
+            , const std::shared_ptr<T>& comp) override
+  {
+    std::shared_ptr<R> service = ctxt->LocateService<R>(this->GetReferenceName());
+    DoBind(service, comp);
+  }
+  
+  void Unbind(const std::shared_ptr<ComponentContext>&
+              , const std::shared_ptr<T>&) override
+  {
+    throw std::runtime_error("UnImplemented method");
+  }
+
+  void Bind(const std::shared_ptr<void>& serv
+            , const std::shared_ptr<T>& comp) override
+  {
+    std::shared_ptr<R> service = std::static_pointer_cast<R>(serv);
+    DoBind(service, comp);
+  }
+
+  void DoBind(const std::shared_ptr<R>& service
+              , const std::shared_ptr<T>& comp)
+  {
     auto bind = std::bind(bindFunction, comp.get(), service);
     bind(); // call the method on the component instance with service as parameter.
   }
 
-  virtual void UnBind(cppmicroservices::BundleContext bc,
-                      const cppmicroservices::ServiceReferenceBase& sRef,
-                      const std::shared_ptr<T>& comp) override
+  void Unbind(const std::shared_ptr<void>& serv
+              , const std::shared_ptr<T>& comp) override
   {
-    cppmicroservices::ServiceReference<R> typedRef(sRef);
-    if(!typedRef)
-    {
-      throw std::runtime_error("Invalid service reference");
-    }
-    std::shared_ptr<R> service = bc.template GetService<R>(typedRef);
+    std::shared_ptr<R> service = std::static_pointer_cast<R>(serv);
+    DoUnbind(service, comp);
+  }
+
+  void DoUnbind(const std::shared_ptr<R>& service
+                , const std::shared_ptr<T>& comp)
+  {
     auto unbind = std::bind(unbindFunction, comp.get(), service);
     unbind(); // call the method on the component instance with service as parameter.
   }
 
 private:
-  BindFunc bindFunction;      // the function object used for callback to bind the reference
-  UnbindFunc unbindFunction;  // the function object used for callback to unbind the reference
+  BindFuncT bindFunction;      // the function object used for callback to bind the reference
+  UnbindFuncT unbindFunction;  // the function object used for callback to unbind the reference
 };
-}
-}
-}
-}
+
+}}}} // namespaces
 
 #endif /* Binders_h */

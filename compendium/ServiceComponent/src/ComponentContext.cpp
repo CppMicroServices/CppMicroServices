@@ -22,10 +22,8 @@
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
+namespace cppmicroservices { namespace service { namespace component {
+
 ComponentContext::~ComponentContext() noexcept {} ;
-}
-}
-}
+
+}}} // namespaces

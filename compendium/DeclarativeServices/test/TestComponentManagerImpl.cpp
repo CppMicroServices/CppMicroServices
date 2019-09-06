@@ -31,9 +31,9 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/BundleContext.h"
 
-#include "manager/ComponentManagerImpl.hpp"
-#include "manager/states/ComponentManagerState.hpp"
-#include "metadata/ComponentMetadata.hpp"
+#include "../src/manager/ComponentManagerImpl.hpp"
+#include "../src/manager/states/ComponentManagerState.hpp"
+#include "../src/metadata/ComponentMetadata.hpp"
 
 #include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"

@@ -26,9 +26,9 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/BundleContext.h>
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "SCRBundleExtension.hpp"
+#include "../src/SCRBundleExtension.hpp"
 #include "Mocks.hpp"
-#include "metadata/Util.hpp"
+#include "../src/metadata/Util.hpp"
 
 #define str(s) #s
 #define xstr(s) str(s)

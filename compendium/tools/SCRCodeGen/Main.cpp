@@ -27,13 +27,17 @@
 #include <cctype>
 #include <cstdarg>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 #include "json/json.h"
 #include "ComponentInfo.hpp"
 #include "ManifestParserFactory.hpp"
 #include "ManifestParser.hpp"
+#include "gtest/gtest_prod.h"
+#include "ComponentInfo.hpp"
+#include "Util.hpp"
 #include "ComponentCallbackGenerator.hpp"
-
 using codegen::ComponentCallbackGenerator;
 using codegen::util::JsonValueValidator;
 using codegen::util::ParseManifestOrThrow;

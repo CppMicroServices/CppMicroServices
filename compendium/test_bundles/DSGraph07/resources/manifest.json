@@ -1,0 +1,15 @@
+{
+    "bundle.symbolic_name" : "DSGraph07",
+    "bundle.name" : "DSGraph07",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "enabled": true,
+            "immediate" : true,
+            "implementation-class": "graph::DSGraph07Impl",
+            "service" : {
+                "interfaces" : ["test::DSGraph07"]
+            }
+        }]
+    }
+}

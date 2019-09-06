@@ -37,7 +37,7 @@
 #include <cppmicroservices/ServiceTracker.h>
 
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "manager/RegistrationManager.hpp"
+#include "../src/manager/RegistrationManager.hpp"
 
 using cppmicroservices::Constants::SERVICE_SCOPE;
 using cppmicroservices::Constants::SCOPE_BUNDLE;

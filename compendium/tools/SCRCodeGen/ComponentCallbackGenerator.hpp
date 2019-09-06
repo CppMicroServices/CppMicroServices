@@ -31,14 +31,13 @@
 
 using codegen::datamodel::ComponentInfo;
 
-namespace codegen
-{
+namespace codegen {
 
 class ComponentCallbackGenerator
 {
 public:
-  ComponentCallbackGenerator(const std::vector<std::string>& includeHeaders,
-                             const std::vector<ComponentInfo>& componentInfos)
+  ComponentCallbackGenerator(const std::vector<std::string>& includeHeaders
+                             , const std::vector<ComponentInfo>& componentInfos)
     : mHeaderIncludes(includeHeaders)
     , mComponentInfos(componentInfos)
     , mStrStream()
@@ -64,70 +63,87 @@ private:
 
   void SubstituteHeader()
   {
-    const std::string includes = R"cpptemplate(
-#include <vector>
-#include <cppmicroservices/ServiceInterface.h>
-#include "ServiceComponent/detail/ComponentInstanceImpl.hpp"
-)cpptemplate";
-    mStrStream << includes;
-
+    mStrStream << std::endl
+               << R"(#include <vector>)" << std::endl
+               << R"(#include <cppmicroservices/ServiceInterface.h>)" << std::endl
+               << R"(#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp")" << std::endl;
+    
     for (const auto& header : mHeaderIncludes)
     {
-      mStrStream << codegen::util::Substitute("#include \"{0}\"", header) << "\n";
+      mStrStream << util::Substitute(R"(#include "{0}")", header) << std::endl;
     }
-
-    const std::string namespaces = R"cpptemplate(
-namespace sc = cppmicroservices::service::component;
-namespace scd = cppmicroservices::service::component::detail;
-using scd::ComponentInstance;
-using scd::ComponentInstanceImpl;
-using scd::Binder;
-using scd::StaticBinder;
-using scd::DynamicBinder;
-)cpptemplate";
-    mStrStream << namespaces;
+    mStrStream << std::endl
+               << "namespace sc = cppmicroservices::service::component;" << std::endl
+               << "namespace scd = cppmicroservices::service::component::detail;" << std::endl
+               << "using scd::ComponentInstance;" << std::endl
+               << "using scd::ComponentInstanceImpl;" << std::endl
+               << "using scd::Binder;" << std::endl
+               << "using scd::StaticBinder;" << std::endl
+               << "using scd::DynamicBinder;" << std::endl;
   }
 
   void SubstituteBody()
   {
     for (const auto& componentInfo : mComponentInfos)
     {
-      const std::string createFuncPartBegin = R"cpptemplate(
-extern "C" US_ABI_EXPORT ComponentInstance* NewInstance_{0}()
-{)cpptemplate";
-      mStrStream << codegen::util::Substitute(createFuncPartBegin, datamodel::GetComponentNameStr(componentInfo)) << "\n";
+      // Generate the factory function for creating each component
+      mStrStream << std::endl
+                 << util::Substitute(R"(extern "C" US_ABI_EXPORT ComponentInstance* NewInstance_{0}())"
+                                     , datamodel::GetComponentNameStr(componentInfo)) << std::endl
+                 << "{" << std::endl;
 
       auto isReferencesEmpty = componentInfo.references.empty();
-      if(!isReferencesEmpty)
+      if(false == isReferencesEmpty)
       {
-        std::string binders = "  std::vector<std::shared_ptr<Binder<{0}>>> binders;";
-        mStrStream << codegen::util::Substitute(binders, componentInfo.implClassName) << "\n";
+        mStrStream << util::Substitute("  std::vector<std::shared_ptr<Binder<{0}>>> binders;"
+                                       , componentInfo.implClassName)
+                   << std::endl;
       }
 
       for(const auto& ref : componentInfo.references)
       {
-        std::string refbinderStr = "  binders.push_back(" + datamodel::GetReferenceBinderStr(ref) + ");";
-        mStrStream << codegen::util::Substitute(refbinderStr, componentInfo.implClassName) << "\n";
+        if ((false == componentInfo.injectReferences)
+            || (ref.policy == "dynamic"))
+        {
+          mStrStream << "  binders.push_back("
+                     << util::Substitute(datamodel::GetReferenceBinderStr(ref, componentInfo.injectReferences)
+                                         , componentInfo.implClassName)
+                     << ");"
+                     << std::endl;
+        }
       }
+      
+      mStrStream << "  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<"
+                 << componentInfo.implClassName
+                 << ", std::tuple<"
+                 << datamodel::GetServiceInterfacesStr(componentInfo.service)
+                 << ">";
 
-      std::string compInstance = "  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<" + componentInfo.implClassName;
-      compInstance.append(", std::tuple<" + datamodel::GetServiceInterfacesStr(componentInfo.service) + ">");
-      compInstance.append(", " + datamodel::GetInjectReferencesStr(componentInfo));
-      compInstance.append(isReferencesEmpty ? ">();": ", " + datamodel::GetReferencesStr(componentInfo) + ">(binders);");
-      mStrStream << compInstance << "\n";
+      if (true == isReferencesEmpty)
+      {
+        mStrStream << ">();";
+      }
+      else {
+        mStrStream << datamodel::GetCtorInjectedRefTypes(componentInfo)
+                   << ">("
+                   << datamodel::GetCtorInjectedRefNames(componentInfo)
+                   << ", binders"
+                   << ");";
+      }
+      
+      mStrStream << std::endl
+                 << std::endl
+                 << "  return componentInstance;" << std::endl
+                 << "}" << std::endl;
 
-      const std::string createFuncPartEnd = R"cpptemplate(
-  return componentInstance;
-})cpptemplate";
-      mStrStream << createFuncPartEnd << "\n";
-
-      const std::string deleteFunc = R"cpptemplate(
-extern "C" US_ABI_EXPORT void DeleteInstance_{0}(ComponentInstance* componentInstance)
-{
-  delete componentInstance;
-}
-)cpptemplate";
-      mStrStream << codegen::util::Substitute(deleteFunc, datamodel::GetComponentNameStr(componentInfo)) << "\n";
+      // Create deleter function for each component.
+      mStrStream << std::endl
+                 << util::Substitute(R"(extern "C" US_ABI_EXPORT void DeleteInstance_{0}(ComponentInstance* componentInstance))"
+                                     , datamodel::GetComponentNameStr(componentInfo)) << std::endl
+                 << "{" << std::endl
+                 << "  delete componentInstance;" << std::endl
+                 << "}" << std::endl
+                 << std::endl;
     }
   }
 
@@ -135,6 +151,6 @@ extern "C" US_ABI_EXPORT void DeleteInstance_{0}(ComponentInstance* componentIns
   const std::vector<ComponentInfo> mComponentInfos;
   std::stringstream mStrStream;
 };
-} // namespace codegen
 
-#endif // COMPONENTCALLBACKGENERATOR_HPP
+} // namespace codegen
+#endif

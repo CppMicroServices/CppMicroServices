@@ -21,7 +21,7 @@
   =============================================================================*/
 
 #include "gtest/gtest.h"
-#include "manager/ConcurrencyUtil.hpp"
+#include "../src/manager/ConcurrencyUtil.hpp"
 #include "ConcurrencyTestUtil.hpp"
 
 namespace cppmicroservices{

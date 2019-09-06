@@ -30,7 +30,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleImport.h"
 #include "cppmicroservices/Constants.h"
-#include "SCRActivator.hpp"
+#include "../src/SCRActivator.hpp"
 
 #include "Mocks.hpp"
 

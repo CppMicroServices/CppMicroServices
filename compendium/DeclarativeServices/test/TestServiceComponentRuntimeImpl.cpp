@@ -25,7 +25,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/BundleContext.h"
 #include "Mocks.hpp"
-#include "ServiceComponentRuntimeImpl.hpp"
+#include "../src/ServiceComponentRuntimeImpl.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {

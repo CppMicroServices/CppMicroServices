@@ -136,6 +136,15 @@ include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
 include(usFunctionGenerateBundleInit)
 include(usMacroCreateBundle)
+include(usFunctionCreateTestBundle)
+include(usFunctionCreateDSTestBundle)
+
+if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
+  if (HAS_MISSING_BRACES_FLAG)
+    add_compile_options(-Wno-missing-braces)
+  endif()
+endif()
 
 if(US_BUILD_TESTING)
   include(usFunctionCompileSnippets)
@@ -198,7 +207,7 @@ elseif(US_SDK_INSTALL_COMPONENT)
 endif()
 
 us_cache_var(BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
-us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
+#us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
@@ -626,7 +635,7 @@ add_subdirectory(webconsole)
 add_subdirectory(shellservice)
 
 # Declarative Services requires threading to function.
-if (US_ENABLE_THREADING_SUPPORT)
+if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
   add_subdirectory(compendium)
 endif()
 

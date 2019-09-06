@@ -32,10 +32,8 @@
 #include "dto/ComponentConfigurationDTO.hpp"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace runtime {
+namespace cppmicroservices { namespace service { namespace component { namespace runtime {
+
 /**
  * The {@code ServiceComponentRuntime} service represents the Declarative
  * Services actor, known as Service Component Runtime (SCR), that manages the
@@ -161,10 +159,8 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    */
   virtual std::shared_future<void> DisableComponent(const dto::ComponentDescriptionDTO& description) = 0;
 };
-}
-}
-}
-}
+
+}}}} // namespaces
 
 
 #endif /* ServiceComponentRuntime_hpp */

@@ -20,27 +20,21 @@
 
   =============================================================================*/
 #include "gtest/gtest.h"
-#include "metadata/MetadataParserFactory.hpp"
-#include "metadata/MetadataParser.hpp"
+#include "../src/metadata/MetadataParserFactory.hpp"
+#include "../src/metadata/MetadataParser.hpp"
 #include "Mocks.hpp"
 
 using namespace cppmicroservices;
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
+namespace cppmicroservices { namespace scrimpl { namespace metadata {
 
 TEST(MetadataParserTest, ManifestVersionInvalid)
 {
   auto logger = std::make_shared<FakeLogger>();
-  EXPECT_THROW(
-    MetadataParserFactory::Create(0, logger);,
-    std::runtime_error);
-  EXPECT_THROW(
-    MetadataParserFactory::Create(2, logger);,
-    std::runtime_error);
+  EXPECT_THROW(MetadataParserFactory::Create(0, logger);
+               , std::runtime_error);
+  EXPECT_THROW(MetadataParserFactory::Create(2, logger);
+               , std::runtime_error);
 }
 
-}
-}
-}
+}}} // namespaces

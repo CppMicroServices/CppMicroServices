@@ -29,10 +29,10 @@
 #include <cppmicroservices/FrameworkFactory.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/BundleContext.h>
-#include "ComponentRegistry.hpp"
-#include "manager/ComponentManager.hpp"
-#include "manager/ComponentConfiguration.hpp"
-#include "metadata/ComponentMetadata.hpp"
+#include "../src/ComponentRegistry.hpp"
+#include "../src/manager/ComponentManager.hpp"
+#include "../src/manager/ComponentConfiguration.hpp"
+#include "../src/metadata/ComponentMetadata.hpp"
 #include "Mocks.hpp"
 using cppmicroservices::Bundle;
 using cppmicroservices::scrimpl::ComponentManager;

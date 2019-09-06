@@ -149,7 +149,7 @@ function(usFunctionEmbedResources)
     endif()
     add_custom_command(
       OUTPUT ${_zip_archive}
-      COMMAND ${resource_compiler} -o ${_zip_archive} -n dummy ${_zip_args}
+      COMMAND ${resource_compiler} -v -o ${_zip_archive} -n dummy ${_zip_args}
       DEPENDS ${_res_zips} ${resource_compiler}
       COMMENT "Creating resources zip file for ${US_RESOURCE_TARGET}"
       VERBATIM

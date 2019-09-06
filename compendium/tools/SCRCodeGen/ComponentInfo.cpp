@@ -25,8 +25,7 @@
 
 #include "ComponentInfo.hpp"
 
-namespace codegen {
-namespace datamodel {
+namespace codegen { namespace datamodel {
 
 std::string GetComponentNameStr(const ComponentInfo& compInfo)
 {
@@ -48,36 +47,57 @@ std::string GetServiceInterfacesStr(const ServiceInfo& serviceInfo)
   return strstream.str();
 }
 
-std::string GetReferencesStr(const ComponentInfo& compInfo)
+std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo)
 {
   std::string result;
-  const auto delim = ", ";
-  auto sep = "";
+  auto sep = ", ";
   for (const auto& reference :  compInfo.references)
   {
-    result += (sep + reference.interface);
-    sep = delim;
+    if ((true == compInfo.injectReferences)
+        && (reference.policy == "static"))
+    {
+      result += (sep + reference.interface);
+    }
   }
   return result;
 }
 
-std::string GetInjectReferencesStr(const ComponentInfo& compInfo)
+std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo)
 {
-  return compInfo.injectReferences ? "std::true_type" : "std::false_type";
+  std::stringstream resultStr;
+  auto sep = "";
+
+  resultStr << "{{";
+  for (const auto& reference :  compInfo.references)
+  {
+    if ((true == compInfo.injectReferences)
+        && (reference.policy == "static"))
+    {
+      resultStr << sep << "\"" << reference.name << "\"";
+      sep = ", ";
+    }
+  }
+  resultStr << "}}";
+  return resultStr.str();
 }
 
-std::string GetReferenceBinderStr(const ReferenceInfo& ref)
+std::string GetReferenceBinderStr(const ReferenceInfo& ref, bool injectReferences)
 {
   auto isStatic = (ref.policy == "static");
-  std::string binderObjStr = "std::make_shared<";
-  binderObjStr += isStatic ? "Static" : "Dynamic";
-  binderObjStr += "Binder<{0}, ";
-  binderObjStr += ref.interface;
-  binderObjStr += ">>(\"" + ref.name + "\"";
-  binderObjStr += isStatic ? "" : ", &{0}::Bind" + ref.name + ", &{0}::Unbind" + ref.name;
-  binderObjStr += ")";
-  return binderObjStr;
+  std::stringstream binderObjStr;
+  if (!isStatic || !injectReferences)
+  {
+    binderObjStr << "std::make_shared<DynamicBinder<{0}, "
+                 << ref.interface
+                 << ">>(\"" + ref.name + "\""
+                 << ", &{0}::Bind"
+                 << ref.name
+                 << ", &{0}::Unbind"
+                 << ref.name
+                 << ")";
+  }
+  return binderObjStr.str();
 }
-} // namespace datamodel
-} // namespace codegen
+
+}} // namespaces
 

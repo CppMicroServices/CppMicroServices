@@ -1154,7 +1154,7 @@ void TestBundleActivatorFailures()
                     "Test that one FrameworkEvent was received.");
   US_TEST_CONDITION(
     listener.CheckEvents(std::vector<FrameworkEvent>{ FrameworkEvent{
-      FrameworkEvent::Type::FRAMEWORK_WARNING,
+      FrameworkEvent::Type::FRAMEWORK_ERROR,
       bundleStopFail,
       std::string(),
       std::make_exception_ptr(std::runtime_error("whoopsie!")) } }),

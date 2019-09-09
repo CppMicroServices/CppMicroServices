@@ -412,7 +412,7 @@ void BundlePrivate::Uninstall()
             std::rethrow_exception(exception);
           } catch (...) {
             coreCtx->listeners.SendFrameworkEvent(
-              FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+              FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                              MakeBundle(shared_from_this()),
                              std::string(),
                              std::current_exception()));

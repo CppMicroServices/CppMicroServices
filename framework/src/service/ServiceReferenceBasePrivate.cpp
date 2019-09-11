@@ -278,7 +278,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
       } catch (...) {
         std::string message("ServiceFactory threw an exception");
         registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                          MakeBundle(bundle->shared_from_this()),
                          message,
                          std::current_exception()));
@@ -358,7 +358,7 @@ bool ServiceReferenceBasePrivate::UngetService(
     } catch (...) {
       std::string message("ServiceFactory threw an exception");
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                        MakeBundle(bundle->shared_from_this()),
                        message,
                        std::current_exception()));

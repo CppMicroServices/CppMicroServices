@@ -35,12 +35,18 @@ class BundleEventTest : public ::testing::Test
 protected:
   Bundle            bundle;
   BundleEvent       bEvt;
+  Framework         f;
   FrameworkEvent    fEvt;
   BundleEvent::Type eventType;
 
+public:
+  BundleEventTest()
+    : f(FrameworkFactory().NewFramework()){};
+
+  ~BundleEventTest() override = default;
+
   virtual void SetUp()
   {
-    auto f = FrameworkFactory().NewFramework();
     f.Start();
 
 #if defined(US_BUILD_SHARED_LIBS)
@@ -51,34 +57,33 @@ protected:
       cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
 #endif
 
-    f.Stop();
-    fEvt = f.WaitForStop(std::chrono::milliseconds::zero());
     eventType = bEvt.GetType();
   }
 
   virtual void TearDown()
-  {}
+  {
+    f.Stop();
+    fEvt = f.WaitForStop(std::chrono::milliseconds::zero());
+  }
 };
 
 TEST_F(BundleEventTest, invalidBundleEvents)
 {
-  const auto eventBundle = bEvt.GetBundle();
-  ASSERT_THROW(BundleEvent(eventType, eventBundle),
+  Bundle b;
+  ASSERT_THROW(BundleEvent(eventType, b),
                std::invalid_argument);
 }
 
 TEST_F(BundleEventTest, invalidBundleOrigin)
 {
-  const auto eventBundle = fEvt.GetBundle();
   const auto eventOrigin = bEvt.GetOrigin();
-  ASSERT_THROW(BundleEvent(eventType, eventBundle, eventOrigin),
+  ASSERT_THROW(BundleEvent(eventType, bundle, eventOrigin),
                std::invalid_argument);
 }
 
-TEST_F(BundleEventTest, bundleOrigin)
+TEST_F(BundleEventTest, validBundleOrigin)
 {
-  const auto  eventBundle = fEvt.GetBundle();
-  ASSERT_NO_THROW(BundleEvent(eventType, eventBundle, bundle));
+  ASSERT_NO_THROW(BundleEvent(eventType, bundle, bundle));
 }
 
 TEST_F(BundleEventTest, StreamLazyActivationBundleEventType)

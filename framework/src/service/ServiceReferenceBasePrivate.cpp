@@ -107,7 +107,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                      MakeBundle(bundle->shared_from_this()),
                      message,
-                     std::make_exception_ptr(ServiceException(message.c_str(),
+                     std::make_exception_ptr(ServiceException(message,
                        ServiceException::Type::FACTORY_EXCEPTION))));
   }
   return s;

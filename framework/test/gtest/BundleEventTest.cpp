@@ -33,11 +33,8 @@ using namespace cppmicroservices;
 class BundleEventTest : public ::testing::Test
 {
 protected:
-  Bundle            bundle;
-  BundleEvent       bEvt;
-  Framework         f;
-  FrameworkEvent    fEvt;
-  BundleEvent::Type eventType;
+  Bundle    bundle;
+  Framework f;
 
 public:
   BundleEventTest()
@@ -56,34 +53,33 @@ public:
     bundle = 
       cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
 #endif
-
-    eventType = bEvt.GetType();
   }
 
   virtual void TearDown()
   {
     f.Stop();
-    fEvt = f.WaitForStop(std::chrono::milliseconds::zero());
+    f.WaitForStop(std::chrono::milliseconds::zero());
   }
 };
 
 TEST_F(BundleEventTest, invalidBundleEvents)
 {
   Bundle b;
-  ASSERT_THROW(BundleEvent(eventType, b),
+  ASSERT_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, b),
                std::invalid_argument);
 }
 
 TEST_F(BundleEventTest, invalidBundleOrigin)
 {
-  const auto eventOrigin = bEvt.GetOrigin();
-  ASSERT_THROW(BundleEvent(eventType, bundle, eventOrigin),
+  Bundle b;
+  ASSERT_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, b),
                std::invalid_argument);
 }
 
 TEST_F(BundleEventTest, validBundleOrigin)
 {
-  ASSERT_NO_THROW(BundleEvent(eventType, bundle, bundle));
+  ASSERT_NO_THROW(
+    BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, bundle));
 }
 
 TEST_F(BundleEventTest, StreamLazyActivationBundleEventType)

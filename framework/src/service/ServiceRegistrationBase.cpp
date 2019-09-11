@@ -259,7 +259,8 @@ void ServiceRegistrationBase::Unregister()
             FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                            MakeBundle(d->bundle->shared_from_this()),
                            message,
-                           std::current_exception()));
+                           std::make_exception_ptr(ServiceException(message, 
+                             ServiceException::Type::FACTORY_EXCEPTION))));
         }
       }
     }
@@ -276,7 +277,8 @@ void ServiceRegistrationBase::Unregister()
           FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                          MakeBundle(d->bundle->shared_from_this()),
                          message,
-                         std::current_exception()));
+                         std::make_exception_ptr(ServiceException(message, 
+                           ServiceException::Type::FACTORY_EXCEPTION))));
       }
     }
   }

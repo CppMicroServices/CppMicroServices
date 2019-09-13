@@ -76,7 +76,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
           MakeBundle(bundle->shared_from_this()),
           message,
-          std::make_exception_ptr(ServiceException(message.c_str(), 
+          std::make_exception_ptr(ServiceException(message, 
             ServiceException::Type::FACTORY_ERROR)
           )));
       return smap;
@@ -100,14 +100,14 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
-  } catch (...) {
+  } catch (std::exception& ex) {
     s.reset();
     std::string message = "ServiceFactory threw an unknown exception.";
     registration->bundle->coreCtx->listeners.SendFrameworkEvent(
       FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                      MakeBundle(bundle->shared_from_this()),
                      message,
-                     std::make_exception_ptr(ServiceException(message,
+                     std::make_exception_ptr(ServiceException(ex.what(),
                        ServiceException::Type::FACTORY_EXCEPTION))));
   }
   return s;
@@ -279,13 +279,13 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
       try {
         sf->UngetService(
           MakeBundle(bundle), ServiceRegistrationBase(registration), service);
-      } catch (...) {
+      } catch (std::exception& ex) {
         std::string message("ServiceFactory threw an exception");
         registration->bundle->coreCtx->listeners.SendFrameworkEvent(
           FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                          MakeBundle(bundle->shared_from_this()),
                          message,
-                         std::make_exception_ptr(ServiceException(message,
+                         std::make_exception_ptr(ServiceException(ex.what(),
                            ServiceException::Type::FACTORY_EXCEPTION))));
       }
 
@@ -360,13 +360,13 @@ bool ServiceReferenceBasePrivate::UngetService(
     try {
       sf->UngetService(
         MakeBundle(bundle), ServiceRegistrationBase(registration), sfi);
-    } catch (...) {
+    } catch (std::exception& ex) {
       std::string message("ServiceFactory threw an exception");
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
         FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                        MakeBundle(bundle->shared_from_this()),
                        message,
-                       std::make_exception_ptr(ServiceException(message, 
+                       std::make_exception_ptr(ServiceException(ex.what(), 
                          ServiceException::Type::FACTORY_EXCEPTION))));
     }
   }

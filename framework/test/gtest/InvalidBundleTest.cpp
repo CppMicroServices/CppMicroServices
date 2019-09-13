@@ -130,3 +130,15 @@ TEST(InvalidBundle, GetLastModifiedFromInvalidBundle)
   Bundle b;
   EXPECT_THROW(b.GetLastModified(), std::invalid_argument);
 }
+
+TEST(InvalidBundle, GetBundleStateFromInvalidBundle)
+{
+  Bundle b;
+  EXPECT_THROW(b.GetState(), std::invalid_argument);
+}
+
+TEST(InvalidBundle, GetBundleVersionFromInvalidBundle)
+{
+  Bundle b;
+  EXPECT_THROW(b.GetVersion(), std::invalid_argument);
+}

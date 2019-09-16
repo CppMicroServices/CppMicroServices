@@ -252,7 +252,7 @@ void ServiceRegistrationBase::Unregister()
         try {
           serviceFactory->UngetService(
             MakeBundle(i.first->shared_from_this()), *this, service);
-        } catch (std::exception& ex) {
+        } catch (const std::exception& ex) {
           std::string message(
             "ServiceFactory UngetService implementation threw an exception");
           d->bundle->coreCtx->listeners.SendFrameworkEvent(
@@ -270,7 +270,7 @@ void ServiceRegistrationBase::Unregister()
       try {
         serviceFactory->UngetService(
           MakeBundle(i.first->shared_from_this()), *this, i.second);
-      } catch (std::exception& ex) {
+      } catch (const std::exception& ex) {
         std::string message(
           "ServiceFactory UngetService implementation threw an exception");
         d->bundle->coreCtx->listeners.SendFrameworkEvent(

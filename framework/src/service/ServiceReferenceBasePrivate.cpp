@@ -100,7 +100,7 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
-  } catch (std::exception& ex) {
+  } catch (const std::exception& ex) {
     s.reset();
     std::string message = "ServiceFactory threw an unknown exception.";
     registration->bundle->coreCtx->listeners.SendFrameworkEvent(
@@ -279,7 +279,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
       try {
         sf->UngetService(
           MakeBundle(bundle), ServiceRegistrationBase(registration), service);
-      } catch (std::exception& ex) {
+      } catch (const std::exception& ex) {
         std::string message("ServiceFactory threw an exception");
         registration->bundle->coreCtx->listeners.SendFrameworkEvent(
           FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -360,7 +360,7 @@ bool ServiceReferenceBasePrivate::UngetService(
     try {
       sf->UngetService(
         MakeBundle(bundle), ServiceRegistrationBase(registration), sfi);
-    } catch (std::exception& ex) {
+    } catch (const std::exception& ex) {
       std::string message("ServiceFactory threw an exception");
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
         FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,

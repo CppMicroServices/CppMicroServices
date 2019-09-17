@@ -122,7 +122,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceThrows)
 {
   auto context = framework.GetBundleContext();
   auto sf = std::make_shared<MockFactory>();
-  std::string exceptionMsg("Exception in user code");
+  std::string exceptionMsg("ServiceFactory threw an unknown exception.");
   EXPECT_CALL(*sf, GetService(testing::_, testing::_))
     .Times(1)
     .WillRepeatedly(testing::Throw(std::runtime_error(exceptionMsg)));
@@ -169,7 +169,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceReturnsNull)
   ASSERT_TRUE(static_cast<bool>(sref));
   auto lToken = context.AddFrameworkListener(
     [](const cppmicroservices::FrameworkEvent& evt) {
-      ASSERT_EQ(evt.GetType(), FrameworkEvent::FRAMEWORK_WARNING);
+      ASSERT_EQ(evt.GetType(), FrameworkEvent::FRAMEWORK_ERROR);
     });
   ASSERT_EQ(context.GetService<ITestServiceA>(sref), nullptr);
   context.RemoveListener(std::move(lToken));

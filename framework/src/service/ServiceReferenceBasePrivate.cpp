@@ -69,14 +69,16 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       factory->GetService(MakeBundle(bundle->shared_from_this()),
                           ServiceRegistrationBase(registration));
     if (!smap || smap->empty()) {
+      std::string message =
+        "ServiceFactory returned an empty or nullptr interface map.";
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
         FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_WARNING,
+          FrameworkEvent::Type::FRAMEWORK_ERROR,
           MakeBundle(bundle->shared_from_this()),
-          std::string(
-            "ServiceFactory returned an empty or nullptr interface map."),
-          std::make_exception_ptr(std::logic_error(
-            "ServiceFactory returned an invalid interface map"))));
+          message,
+          std::make_exception_ptr(ServiceException(message, 
+            ServiceException::Type::FACTORY_ERROR)
+          )));
       return smap;
     }
     std::vector<std::string> classes =
@@ -98,13 +100,15 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
-  } catch (...) {
+  } catch (const std::exception& ex) {
     s.reset();
+    std::string message = "ServiceFactory threw an unknown exception.";
     registration->bundle->coreCtx->listeners.SendFrameworkEvent(
       FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                      MakeBundle(bundle->shared_from_this()),
-                     std::string("ServiceFactory threw an unknown exception."),
-                     std::current_exception()));
+                     message,
+                     std::make_exception_ptr(ServiceException(ex.what(),
+                       ServiceException::Type::FACTORY_EXCEPTION))));
   }
   return s;
 }
@@ -275,13 +279,14 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
       try {
         sf->UngetService(
           MakeBundle(bundle), ServiceRegistrationBase(registration), service);
-      } catch (...) {
+      } catch (const std::exception& ex) {
         std::string message("ServiceFactory threw an exception");
         registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                          MakeBundle(bundle->shared_from_this()),
                          message,
-                         std::current_exception()));
+                         std::make_exception_ptr(ServiceException(ex.what(),
+                           ServiceException::Type::FACTORY_EXCEPTION))));
       }
 
       auto l = registration->Lock();
@@ -355,13 +360,14 @@ bool ServiceReferenceBasePrivate::UngetService(
     try {
       sf->UngetService(
         MakeBundle(bundle), ServiceRegistrationBase(registration), sfi);
-    } catch (...) {
+    } catch (const std::exception& ex) {
       std::string message("ServiceFactory threw an exception");
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                        MakeBundle(bundle->shared_from_this()),
                        message,
-                       std::current_exception()));
+                       std::make_exception_ptr(ServiceException(ex.what(), 
+                         ServiceException::Type::FACTORY_EXCEPTION))));
     }
   }
 

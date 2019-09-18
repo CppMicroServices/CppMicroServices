@@ -23,13 +23,13 @@
 #include "cppmicroservices/httpservice/HttpServlet.h"
 #include "HttpServletPrivate.h"
 
-#include "cppmicroservices/httpservice/HttpServletResponse.h"
-#include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "HttpOutputStreamBuffer.h"
+#include "cppmicroservices/httpservice/HttpServletRequest.h"
+#include "cppmicroservices/httpservice/HttpServletResponse.h"
 
 #include <cassert>
-#include <iostream>
 #include <functional>
+#include <iostream>
 
 namespace cppmicroservices {
 
@@ -39,28 +39,21 @@ public:
   explicit NoBodyOutputStreamBuffer(HttpServletResponsePrivate* response)
     : HttpOutputStreamBuffer(response)
     , m_ContentLength(0)
-  {
-  }
+  {}
 
-  std::size_t GetContentLength() const
-  {
-    return m_ContentLength;
-  }
+  std::size_t GetContentLength() const { return m_ContentLength; }
 
 protected:
-
-  std::streamsize xsputn(const char* /*s*/, std::streamsize n)
+  std::streamsize xsputn(const char* /*s*/, std::streamsize n) override
   {
     m_ContentLength += static_cast<std::size_t>(n);
     return n;
   }
 
 private:
-
-  int_type overflow(int_type ch)
+  int_type overflow(int_type ch) override
   {
-    if (ch != traits_type::eof())
-    {
+    if (ch != traits_type::eof()) {
       assert(std::less_equal<char*>()(pptr(), epptr()));
       ++m_ContentLength;
       // discard the character
@@ -70,28 +63,22 @@ private:
     return traits_type::eof();
   }
 
-  int sync()
-  {
-    return this->CommitStream() ? 0 : -1;
-  }
+  int sync() override { return this->CommitStream() ? 0 : -1; }
 
-  NoBodyOutputStreamBuffer(const NoBodyOutputStreamBuffer&);
-  NoBodyOutputStreamBuffer& operator=(const NoBodyOutputStreamBuffer&);
+  NoBodyOutputStreamBuffer(const NoBodyOutputStreamBuffer&) = delete;
+  NoBodyOutputStreamBuffer& operator=(const NoBodyOutputStreamBuffer&) = delete;
 
 private:
-
   std::size_t m_ContentLength;
-
 };
 
 class NoBodyResponse : public HttpServletResponse
 {
 public:
-
   NoBodyResponse(HttpServletResponsePrivate* d)
     : HttpServletResponse(d)
     , m_NoBodyBuffer(new NoBodyOutputStreamBuffer(d))
-    //, m_DidSetContentLength(false)
+  //, m_DidSetContentLength(false)
   {
     this->SetOutputStreamBuffer(m_NoBodyBuffer);
   }
@@ -100,14 +87,12 @@ public:
 
   void SetContentLength()
   {
-    if (!this->ContainsHeader("Content-Type"))
-    {
+    if (!this->ContainsHeader("Content-Type")) {
       this->SetContentLength(m_NoBodyBuffer->GetContentLength());
     }
   }
 
 private:
-
   NoBodyOutputStreamBuffer* m_NoBodyBuffer;
   //bool m_DidSetContentLength;
 };
@@ -139,12 +124,12 @@ static void MaybeSetLastModified(HttpServletResponse& resp,
     resp.SetDateHeader(HEADER_LASTMOD, lastModified);
 }
 
-const std::string HttpServlet::PROP_CONTEXT_ROOT = "org.cppmicroservices.HttpServlet.contextRoot";
+const std::string HttpServlet::PROP_CONTEXT_ROOT =
+  "org.cppmicroservices.HttpServlet.contextRoot";
 
 HttpServlet::HttpServlet()
   : d(new HttpServletPrivate)
-{
-}
+{}
 
 void HttpServlet::Init(const ServletConfig& config)
 {
@@ -166,73 +151,57 @@ std::shared_ptr<ServletContext> HttpServlet::GetServletContext() const
   return Lock(), d->m_Config.GetServletContext();
 }
 
-void HttpServlet::Service(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::Service(HttpServletRequest& request,
+                          HttpServletResponse& response)
 {
   std::string method = request.GetMethod();
 
-  if (method == METHOD_GET)
-  {
+  if (method == METHOD_GET) {
     long long lastModified = GetLastModified(request);
-    if (lastModified == -1)
-    {
+    if (lastModified == -1) {
       // servlet doesn't support if-modified-since, no reason
       // to go through further expensive logic
       DoGet(request, response);
-    }
-    else
-    {
+    } else {
       long long ifModifiedSince = request.GetDateHeader(HEADER_IFMODSINCE);
       std::cout << "ifModifiedSince: " << ifModifiedSince << std::endl;
       std::cout << "lastModified: " << lastModified << std::endl;
-      if (ifModifiedSince < lastModified)
-      {
+      if (ifModifiedSince < lastModified) {
         // If the servlet mod time is later, call doGet()
         // Round down to the nearest second for a proper compare
         // A ifModifiedSince of -1 will always be less
         MaybeSetLastModified(response, lastModified);
         DoGet(request, response);
-      }
-      else
-      {
+      } else {
         response.SetStatus(HttpServletResponse::SC_NOT_MODIFIED);
       }
     }
 
-  }
-  else if (method == METHOD_HEAD)
-  {
+  } else if (method == METHOD_HEAD) {
     long long lastModified = GetLastModified(request);
     MaybeSetLastModified(response, lastModified);
     DoHead(request, response);
-  }
-  else if (method == METHOD_POST)
-  {
+  } else if (method == METHOD_POST) {
     DoPost(request, response);
-  }
-  else if (method == METHOD_PUT)
-  {
+  } else if (method == METHOD_PUT) {
     DoPut(request, response);
-  }
-  else if (method == METHOD_DELETE)
-  {
+  } else if (method == METHOD_DELETE) {
     DoDelete(request, response);
   }
-//  else if (method == METHOD_OPTIONS)
-//  {
-//    DoOptions(request, response);
-//  }
-  else if (method == METHOD_TRACE)
-  {
-    DoTrace(request,response);
-  }
-  else
-  {
+  //  else if (method == METHOD_OPTIONS)
+  //  {
+  //    DoOptions(request, response);
+  //  }
+  else if (method == METHOD_TRACE) {
+    DoTrace(request, response);
+  } else {
     //
     // Note that this means NO servlet supports whatever
     // method was requested, anywhere on this server.
     //
 
-    std::string errMsg = std::string("Http method ") + method + " not implemented";
+    std::string errMsg =
+      std::string("Http method ") + method + " not implemented";
     response.SendError(HttpServletResponse::SC_NOT_IMPLEMENTED, errMsg);
   }
 }
@@ -247,21 +216,20 @@ long long HttpServlet::GetLastModified(HttpServletRequest& /*request*/)
   return -1;
 }
 
-void HttpServlet::DoGet(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::DoGet(HttpServletRequest& request,
+                        HttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http GET method not supported";
-  if (protocol.size() > 2 && protocol.substr(protocol.size()-3) == "1.1")
-  {
+  if (protocol.size() > 2 && protocol.substr(protocol.size() - 3) == "1.1") {
     response.SendError(HttpServletResponse::SC_METHOD_NOT_ALLOWED, msg);
-  }
-  else
-  {
+  } else {
     response.SendError(HttpServletResponse::SC_BAD_REQUEST, msg);
   }
 }
 
-void HttpServlet::DoHead(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::DoHead(HttpServletRequest& request,
+                         HttpServletResponse& response)
 {
   NoBodyResponse noBodyResponse(response.d.Data());
 
@@ -269,60 +237,54 @@ void HttpServlet::DoHead(HttpServletRequest& request, HttpServletResponse& respo
   noBodyResponse.SetContentLength();
 }
 
-void HttpServlet::DoDelete(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::DoDelete(HttpServletRequest& request,
+                           HttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http DELETE method not supported";
-  if (protocol.size() > 2 && protocol.substr(protocol.size()-3) == "1.1")
-  {
+  if (protocol.size() > 2 && protocol.substr(protocol.size() - 3) == "1.1") {
     response.SendError(HttpServletResponse::SC_METHOD_NOT_ALLOWED, msg);
-  }
-  else
-  {
+  } else {
     response.SendError(HttpServletResponse::SC_BAD_REQUEST, msg);
   }
 }
 
-void HttpServlet::DoPost(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::DoPost(HttpServletRequest& request,
+                         HttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http POST method not supported";
-  if (protocol.size() > 2 && protocol.substr(protocol.size()-3) == "1.1")
-  {
+  if (protocol.size() > 2 && protocol.substr(protocol.size() - 3) == "1.1") {
     response.SendError(HttpServletResponse::SC_METHOD_NOT_ALLOWED, msg);
-  }
-  else
-  {
+  } else {
     response.SendError(HttpServletResponse::SC_BAD_REQUEST, msg);
   }
 }
 
-void HttpServlet::DoPut(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::DoPut(HttpServletRequest& request,
+                        HttpServletResponse& response)
 {
   std::string protocol = request.GetProtocol();
   std::string msg = "Http PUT method not supported";
-  if (protocol.size() > 2 && protocol.substr(protocol.size()-3) == "1.1")
-  {
+  if (protocol.size() > 2 && protocol.substr(protocol.size() - 3) == "1.1") {
     response.SendError(HttpServletResponse::SC_METHOD_NOT_ALLOWED, msg);
-  }
-  else
-  {
+  } else {
     response.SendError(HttpServletResponse::SC_BAD_REQUEST, msg);
   }
 }
 
-void HttpServlet::DoTrace(HttpServletRequest& request, HttpServletResponse& response)
+void HttpServlet::DoTrace(HttpServletRequest& request,
+                          HttpServletResponse& response)
 {
   std::string CRLF = "\r\n";
-  std::string responseString = "TRACE " + request.GetRequestUri() +
-                               " " + request.GetProtocol();
+  std::string responseString =
+    "TRACE " + request.GetRequestUri() + " " + request.GetProtocol();
 
   std::vector<std::string> reqHeaders = request.GetHeaderNames();
 
-  for (std::size_t i = 0; i < reqHeaders.size(); ++i)
-  {
-    responseString += CRLF + reqHeaders[i] + ": " +
-                      request.GetHeader(reqHeaders[i]);
+  for (const auto & reqHeader : reqHeaders) {
+    responseString +=
+      CRLF + reqHeader + ": " + request.GetHeader(reqHeader);
   }
 
   responseString += CRLF;
@@ -337,5 +299,4 @@ std::unique_lock<std::mutex> HttpServlet::Lock() const
 {
   return std::unique_lock<std::mutex>(d->m_Mutex);
 }
-
 }

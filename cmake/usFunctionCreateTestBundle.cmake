@@ -2,7 +2,7 @@
 macro(_us_create_test_bundle_helper)
 
   add_library(${name} ${_srcs} $<TARGET_OBJECTS:util>)
-  if(US_BUILD_SHARED_LIBS AND US_TEST_LIBRARY_EXTENSION)
+  if(BUILD_SHARED_LIBS AND US_TEST_LIBRARY_EXTENSION)
     set_target_properties(${name} PROPERTIES SUFFIX ${US_TEST_LIBRARY_EXTENSION})
   endif()
   set_property(TARGET ${name}

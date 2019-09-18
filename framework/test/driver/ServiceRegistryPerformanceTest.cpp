@@ -21,13 +21,13 @@
 =============================================================================*/
 
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceEvent.h"
 
-#include "TestingMacros.h"
 #include "TestUtils.h"
+#include "TestingMacros.h"
 
 #include <vector>
 
@@ -40,12 +40,10 @@ struct IPerfTestService
   virtual ~IPerfTestService() {}
 };
 
-
 class ServiceRegistryPerformanceTest
 {
 
 private:
-
   friend class MyServiceListener;
 
   BundleContext context;
@@ -57,12 +55,11 @@ private:
   std::size_t nUnregistering;
   std::size_t nModified;
 
-  std::vector<ServiceRegistration<IPerfTestService> > regs;
+  std::vector<ServiceRegistration<IPerfTestService>> regs;
   std::vector<MyServiceListener*> listeners;
   std::vector<std::shared_ptr<IPerfTestService>> services;
 
 public:
-
   ServiceRegistryPerformanceTest(const BundleContext& context);
 
   void InitTestCase();
@@ -75,86 +72,72 @@ public:
   void TestUnregisterServices();
 
 private:
-
-  std::ostream& Log() const
-  {
-    return std::cout;
-  }
+  std::ostream& Log() const { return std::cout; }
 
   void AddListeners(int n);
   void RegisterServices(int n);
   void ModifyServices();
   void UnregisterServices();
-
 };
 
 class MyServiceListener
 {
 
 private:
-
   ServiceRegistryPerformanceTest* ts;
 
 public:
-
   MyServiceListener(ServiceRegistryPerformanceTest* ts)
     : ts(ts)
-  {
-  }
+  {}
 
   void ServiceChanged(const ServiceEvent& ev)
   {
-    switch(ev.GetType())
-    {
-    case ServiceEvent::SERVICE_REGISTERED:
-      ts->nRegistered++;
-      break;
-    case ServiceEvent::SERVICE_UNREGISTERING:
-      ts->nUnregistering++;
-      break;
-    case ServiceEvent::SERVICE_MODIFIED:
-      ts->nModified++;
-      break;
-    default:
-      break;
+    switch (ev.GetType()) {
+      case ServiceEvent::SERVICE_REGISTERED:
+        ts->nRegistered++;
+        break;
+      case ServiceEvent::SERVICE_UNREGISTERING:
+        ts->nUnregistering++;
+        break;
+      case ServiceEvent::SERVICE_MODIFIED:
+        ts->nModified++;
+        break;
+      default:
+        break;
     }
   }
 };
 
-
-ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(const BundleContext& context)
+ServiceRegistryPerformanceTest::ServiceRegistryPerformanceTest(
+  const BundleContext& context)
   : context(context)
   , nListeners(100)
   , nServices(1000)
   , nRegistered(0)
   , nUnregistering(0)
   , nModified(0)
-{
-}
+{}
 
 void ServiceRegistryPerformanceTest::InitTestCase()
 {
   Log() << "Initialize event counters\n";
 
-  nRegistered    = 0;
+  nRegistered = 0;
   nUnregistering = 0;
-  nModified      = 0;
+  nModified = 0;
 }
 
 void ServiceRegistryPerformanceTest::CleanupTestCase()
 {
   Log() << "Remove all service listeners\n";
 
-  for(std::size_t i = 0; i < listeners.size(); i++)
-  {
-    try
-    {
+  for (std::size_t i = 0; i < listeners.size(); i++) {
+    try {
       MyServiceListener* l = listeners[i];
       context.RemoveServiceListener(l, &MyServiceListener::ServiceChanged);
       delete l;
-    }
-    catch (const std::exception& e)
-    {
+    } catch (const std::exception& e) {
       Log() << e.what();
     }
   }
@@ -169,16 +152,13 @@ void ServiceRegistryPerformanceTest::TestAddListeners()
 void ServiceRegistryPerformanceTest::AddListeners(int n)
 {
   Log() << "adding " << n << " service listeners\n";
-  for(int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     MyServiceListener* l = new MyServiceListener(this);
-    try
-    {
+    try {
       listeners.push_back(l);
-      context.AddServiceListener(l, &MyServiceListener::ServiceChanged, "(perf.service.value>=0)");
-    }
-    catch (const std::exception& e)
-    {
+      context.AddServiceListener(
+        l, &MyServiceListener::ServiceChanged, "(perf.service.value>=0)");
+    } catch (const std::exception& e) {
       Log() << e.what();
     }
   }
@@ -188,9 +168,11 @@ void ServiceRegistryPerformanceTest::AddListeners(int n)
 void ServiceRegistryPerformanceTest::TestRegisterServices()
 {
   Log() << "Register services, and check that we get #of services ("
-        << nServices << ") * #of listeners (" << nListeners << ")  SERVICE_REGISTERED events\n";
+        << nServices << ") * #of listeners (" << nListeners
+        << ")  SERVICE_REGISTERED events\n";
 
-  Log() << "registering " << nServices << " services, listener count=" << listeners.size() << "\n";
+  Log() << "registering " << nServices
+        << " services, listener count=" << listeners.size() << "\n";
 
   testing::HighPrecisionTimer t;
   t.Start();
@@ -198,28 +180,27 @@ void ServiceRegistryPerformanceTest::TestRegisterServices()
   long long ms = t.ElapsedMilli();
   Log() << "register took " << ms << "ms\n";
   US_TEST_CONDITION_REQUIRED(nServices * listeners.size() == nRegistered,
-                             "# SERVICE_REGISTERED events must be same as # of registered services  * # of listeners");
+                             "# SERVICE_REGISTERED events must be same as # of "
+                             "registered services  * # of listeners");
 }
 
 void ServiceRegistryPerformanceTest::RegisterServices(int n)
 {
   class PerfTestService : public IPerfTestService
-  {
-  };
+  {};
 
   std::string pid("my.service.");
 
-  for(int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     ServiceProperties props;
     std::stringstream ss;
     ss << pid << i;
     props["service.pid"] = ss.str();
-    props["perf.service.value"] = i+1;
+    props["perf.service.value"] = i + 1;
 
     services.emplace_back(std::make_shared<PerfTestService>());
     ServiceRegistration<IPerfTestService> reg =
-        context.RegisterService<IPerfTestService>(services.back(), props);
+      context.RegisterService<IPerfTestService>(services.back(), props);
     regs.push_back(reg);
   }
 }
@@ -227,7 +208,8 @@ void ServiceRegistryPerformanceTest::RegisterServices(int n)
 void ServiceRegistryPerformanceTest::TestModifyServices()
 {
   Log() << "Modify all services, and check that we get #of services ("
-        << nServices << ") * #of listeners (" << nListeners << ")  SERVICE_MODIFIED events\n";
+        << nServices << ") * #of listeners (" << nListeners
+        << ")  SERVICE_MODIFIED events\n";
 
   testing::HighPrecisionTimer t;
   t.Start();
@@ -235,15 +217,16 @@ void ServiceRegistryPerformanceTest::TestModifyServices()
   long long ms = t.ElapsedMilli();
   Log() << "modify took " << ms << "ms\n";
   US_TEST_CONDITION_REQUIRED(nServices * listeners.size() == nModified,
-                             "# SERVICE_MODIFIED events must be same as # of modified services  * # of listeners");
+                             "# SERVICE_MODIFIED events must be same as # of "
+                             "modified services  * # of listeners");
 }
 
 void ServiceRegistryPerformanceTest::ModifyServices()
 {
-  Log() << "modifying " << regs.size() << " services, listener count=" << listeners.size() << "\n";
+  Log() << "modifying " << regs.size()
+        << " services, listener count=" << listeners.size() << "\n";
 
-  for(std::size_t i = 0; i < regs.size(); i++)
-  {
+  for (std::size_t i = 0; i < regs.size(); i++) {
     ServiceRegistration<IPerfTestService> reg = regs[i];
     ServiceProperties props;
     props["perf.service.value"] = i * 2;
@@ -261,24 +244,24 @@ void ServiceRegistryPerformanceTest::TestUnregisterServices()
   t.Start();
   UnregisterServices();
   long long ms = t.ElapsedMilli();
-  Log() <<  "unregister took " << ms << "ms\n";
-  US_TEST_CONDITION_REQUIRED(nServices * listeners.size() == nUnregistering, "# SERVICE_UNREGISTERING events must be same as # of (un)registered services * # of listeners");
+  Log() << "unregister took " << ms << "ms\n";
+  US_TEST_CONDITION_REQUIRED(nServices * listeners.size() == nUnregistering,
+                             "# SERVICE_UNREGISTERING events must be same as # "
+                             "of (un)registered services * # of listeners");
 }
 
 void ServiceRegistryPerformanceTest::UnregisterServices()
 {
-  Log() << "unregistering " << regs.size() << " services, listener count="
-        << listeners.size() << "\n";
-  for(std::size_t i = 0; i < regs.size(); i++)
-  {
+  Log() << "unregistering " << regs.size()
+        << " services, listener count=" << listeners.size() << "\n";
+  for (std::size_t i = 0; i < regs.size(); i++) {
     ServiceRegistration<IPerfTestService> reg = regs[i];
     reg.Unregister();
   }
   regs.clear();
 }
 
-
-int ServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
+int ServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
 

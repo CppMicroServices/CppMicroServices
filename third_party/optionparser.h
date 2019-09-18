@@ -1,7 +1,7 @@
 /*
  * The Lean Mean C++ Option Parser
  *
- * Copyright (C) 2012 Matthias S. Benkmann
+ * Copyright (C) 2012-2017 Matthias S. Benkmann
  *
  * The "Software" in the following 2 paragraphs refers to this file containing
  * the code to The Lean Mean C++ Option Parser.
@@ -43,11 +43,13 @@
  * @brief This is the only file required to use The Lean Mean C++ Option Parser.
  *        Just \#include it and you're set.
  *
- * The Lean Mean C++ Option Parser handles the program's command line arguments 
+ * The Lean Mean C++ Option Parser handles the program's command line arguments
  * (argc, argv).
- * It supports the short and long option formats of getopt(), getopt_long() 
+ * It supports the short and long option formats of getopt(), getopt_long()
  * and getopt_long_only() but has a more convenient interface.
- * The following features set it apart from other option parsers:
+ *
+ * @par Feedback:
+ * Send questions, bug reports, feature requests etc. to: <tt><b>optionparser-feedback(a)lists.sourceforge.net</b></tt>
  *
  * @par Highlights:
  * <ul style="padding-left:1em;margin-left:0">
@@ -82,18 +84,23 @@
  *     @endcode
  *     </ul>
  * </ul> @n
- * Despite these features the code size remains tiny. 
+ * Despite these features the code size remains tiny.
  * It is smaller than <a href="http://uclibc.org">uClibc</a>'s GNU getopt() and just a
  * couple 100 bytes larger than uClibc's SUSv3 getopt(). @n
  * (This does not include the usage formatter, of course. But you don't have to use that.)
  *
  * @par Download:
  * Tarball with examples and test programs:
- * <a style="font-size:larger;font-weight:bold" href="http://sourceforge.net/projects/optionparser/files/optionparser-1.3.tar.gz/download">optionparser-1.3.tar.gz</a> @n
+ * <a style="font-size:larger;font-weight:bold" href="http://sourceforge.net/projects/optionparser/files/optionparser-1.7.tar.gz/download">optionparser-1.7.tar.gz</a> @n
  * Just the header (this is all you really need):
  * <a style="font-size:larger;font-weight:bold" href="http://optionparser.sourceforge.net/optionparser.h">optionparser.h</a>
  *
  * @par Changelog:
+ * <b>Version 1.7:</b> Work on const-correctness. @n
+ * <b>Version 1.6:</b> Fix for MSC compiler. @n
+ * <b>Version 1.5:</b> Fixed 2 warnings about potentially uninitialized variables. @n
+ *                     Added const version of Option::next(). @n
+ * <b>Version 1.4:</b> Fixed 2 printUsage() bugs that messed up output with small COLUMNS values. @n
  * <b>Version 1.3:</b> Compatible with Microsoft Visual C++. @n
  * <b>Version 1.2:</b> Added @ref option::Option::namelen "Option::namelen" and removed the extraction
  *                     of short option characters into a special buffer. @n
@@ -103,10 +110,6 @@
  * <b>Version 1.1:</b> Optional mode with argument reordering as done by GNU getopt(), so that
  *                     options and non-options can be mixed. See
  *                     @ref option::Parser::parse() "Parser::parse()".
- *
- * @par Feedback:
- * Send questions, bug reports, feature requests etc. to: <tt><b>optionparser-feedback<span id="antispam">&nbsp;(a)&nbsp;</span>lists.sourceforge.net</b></tt>
- * @htmlonly <script type="text/javascript">document.getElementById("antispam").innerHTML="@"</script> @endhtmlonly
  *
  *
  * @par Example program:
@@ -215,13 +218,16 @@
 #ifndef OPTIONPARSER_H_
 #define OPTIONPARSER_H_
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#pragma intrinsic(_BitScanReverse)
+#endif
+
 /** @brief The namespace of The Lean Mean C++ Option Parser. */
 namespace option
 {
 
 #ifdef _MSC_VER
-#include <intrin.h>
-#pragma intrinsic(_BitScanReverse)
 struct MSC_Builtin_CLZ
 {
   static int builtin_clz(unsigned x)
@@ -550,10 +556,10 @@ public:
    *
    * Returns 0 when called for an unused/invalid option.
    */
-  int count()
+  int count() const
   {
     int c = (desc == 0 ? 0 : 1);
-    Option* p = first();
+    const Option* p = first();
     while (!p->isLast())
     {
       ++c;
@@ -608,6 +614,14 @@ public:
   }
 
   /**
+  * const version of Option::first().
+  */
+  const Option* first() const
+  {
+    return const_cast<Option*>(this)->first();
+  }
+
+  /**
    * @brief Returns a pointer to the last element of the linked list.
    *
    * Use this when you want the last occurrence of an option on the command line to
@@ -624,6 +638,14 @@ public:
    * the state listed last on the command line.
    */
   Option* last()
+  {
+    return first()->prevwrap();
+  }
+
+  /**
+  * const version of Option::last().
+  */
+  const Option* last() const
   {
     return first()->prevwrap();
   }
@@ -655,6 +677,14 @@ public:
   }
 
   /**
+  * const version of Option::prevwrap().
+  */
+  const Option* prevwrap() const
+  {
+    return untag(prev_);
+  }
+
+  /**
    * @brief Returns a pointer to the next element of the linked list or NULL if called
    * on last().
    *
@@ -663,6 +693,14 @@ public:
    * line.
    */
   Option* next()
+  {
+    return isLast() ? 0 : next_;
+  }
+
+  /**
+  * const version of Option::next().
+  */
+  const Option* next() const
   {
     return isLast() ? 0 : next_;
   }
@@ -1558,9 +1596,9 @@ inline bool Parser::workhorse(bool gnu, const Descriptor usage[], int numargs, c
 
     do // loop over short options in group, for long options the body is executed only once
     {
-      int idx;
+      int idx = 0;
 
-      const char* optarg;
+      const char* optarg = 0;
 
       /******************** long option **********************/
       if (handle_short_options == false || try_single_minus_longopt)
@@ -1927,8 +1965,8 @@ struct PrintUsageImplementation
     int target_line_in_block; //!< Line index of the parts we should return to the user on this iteration.
     bool hit_target_line; //!< Flag whether we encountered a part with line index target_line_in_block in the current cell.
 
-    /** 
-     * @brief Determines the byte and character lengths of the part at @ref ptr and 
+    /**
+     * @brief Determines the byte and character lengths of the part at @ref ptr and
      * stores them in @ref len and @ref screenlen respectively.
      */
     void update_length()
@@ -2490,7 +2528,11 @@ struct PrintUsageImplementation
 
       int rightwidth = width - tabstop[lastcolumn];
       bool print_last_column_on_own_line = false;
-      if (rightwidth < last_column_min_width && rightwidth < col_width[lastcolumn])
+      if (rightwidth < last_column_min_width &&  // if we don't have the minimum requested width for the last column
+            ( col_width[lastcolumn] == 0 ||      // and all last columns are > overlong_column_threshold
+              rightwidth < col_width[lastcolumn] // or there is at least one last column that requires more than the space available
+            )
+          )
       {
         print_last_column_on_own_line = true;
         rightwidth = last_column_own_line_max_width;
@@ -2546,7 +2588,7 @@ struct PrintUsageImplementation
 
             LineWrapper& lineWrapper = (part.column() == 0) ? interjectionLineWrapper : lastColumnLineWrapper;
 
-            if (!print_last_column_on_own_line)
+            if (!print_last_column_on_own_line || part.column() != lastcolumn)
               lineWrapper.process(write, part.data(), part.length());
           }
         } // while

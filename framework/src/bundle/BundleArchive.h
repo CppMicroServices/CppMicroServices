@@ -23,11 +23,10 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
-#include "cppmicroservices/detail/Chrono.h"
-
 #include <memory>
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace cppmicroservices {
 
@@ -40,8 +39,7 @@ struct BundleStorage;
  */
 struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 {
-
-  typedef detail::Clock::time_point TimeStamp;
+  using TimeStamp = std::chrono::steady_clock::time_point;
 
   struct Data
   {
@@ -55,13 +53,11 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   BundleArchive();
 
-  BundleArchive(
-      BundleStorage* storage,
-      std::unique_ptr<Data>&& data,
-      const std::shared_ptr<const BundleResourceContainer>& resourceContainer,
-      const std::string& resourcePrefix,
-      const std::string& location
-      );
+  BundleArchive(BundleStorage* storage,
+                std::unique_ptr<Data>&& data,
+                std::shared_ptr<BundleResourceContainer>  resourceContainer,
+                std::string  resourcePrefix,
+                std::string  location);
 
   /**
    * Autostart setting stopped.
@@ -82,7 +78,8 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    *
    * @see BundleArchive#setAutostartSetting(String)
    */
-  static const std::string AUTOSTART_SETTING_ACTIVATION_POLICY; // = "activation_policy";
+  static const std::string
+    AUTOSTART_SETTING_ACTIVATION_POLICY; // = "activation_policy";
 
   bool IsValid() const;
 
@@ -129,7 +126,8 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    * @param recurse
    * @return
    */
-  std::vector<BundleResource> FindResources(const std::string& path, const std::string& filePattern,
+  std::vector<BundleResource> FindResources(const std::string& path,
+                                            const std::string& filePattern,
                                             bool recurse) const;
 
   /**
@@ -156,18 +154,15 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    */
   void SetAutostartSetting(int32_t setting);
 
-  std::shared_ptr<const BundleResourceContainer> GetResourceContainer() const;
+  std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
 private:
-
   BundleStorage* const storage;
   const std::unique_ptr<Data> data;
-  const std::shared_ptr<const BundleResourceContainer> resourceContainer;
+  const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
   const std::string location;
 };
-
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEARCHIVE_H

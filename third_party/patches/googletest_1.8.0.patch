@@ -1,28 +1,14 @@
 diff --git a/third_party/googletest/CMakeLists.txt b/third_party/googletest/CMakeLists.txt
-index 8d2b552e..0dd97a0f 100644
+index 8d2b552e..21c3effb 100644
 --- a/third_party/googletest/CMakeLists.txt
 +++ b/third_party/googletest/CMakeLists.txt
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,9 @@
  cmake_minimum_required(VERSION 2.6.2)
  
 +cmake_policy(SET CMP0048 NEW)
++if(MSVC)
++  add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
++endif()
  project( googletest-distribution )
  
  enable_testing()
-diff --git a/third_party/googletest/googletest/CMakeLists.txt b/third_party/googletest/googletest/CMakeLists.txt
-index 621d0f04..8839597f 100644
---- a/third_party/googletest/googletest/CMakeLists.txt
-+++ b/third_party/googletest/googletest/CMakeLists.txt
-@@ -102,10 +102,12 @@ endif()
- ########################################################################
- #
- # Install rules
-+if (NOT GTEST_NO_INSTALL)
- install(TARGETS gtest gtest_main
-   DESTINATION lib)
- install(DIRECTORY ${gtest_SOURCE_DIR}/include/gtest
-   DESTINATION include)
-+endif()
- 
- ########################################################################
- #

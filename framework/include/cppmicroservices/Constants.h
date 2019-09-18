@@ -45,13 +45,15 @@ namespace Constants {
  * Location identifier of the OSGi <i>system bundle </i>, which is defined
  * to be &quot;System %Bundle&quot;.
  */
-US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "System Bundle";
+US_Framework_EXPORT extern const std::string
+  SYSTEM_BUNDLE_LOCATION; // = "System Bundle";
 
 /**
  * Alias for the symbolic name of the OSGi <i>system bundle </i>. It is
  * defined to be &quot;system.bundle&quot;.
  */
-US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
+US_Framework_EXPORT extern const std::string
+  SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
 
 /**
  * Manifest header identifying the bundle's activator.
@@ -62,7 +64,8 @@ US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "s
  *
  * The header value may be retrieved via the \c Bundle::GetProperty method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATOR; // = "bundle.activator";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_ACTIVATOR; // = "bundle.activator";
 
 /**
  * Manifest header identifying the bundle's category.
@@ -70,7 +73,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATOR; // = "bundle.acti
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_CATEGORY; // = "bundle.category";
 
 /**
  * Manifest header identifying the bundle's copyright information.
@@ -78,7 +82,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_CATEGORY; // = "bundle.categ
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_COPYRIGHT; // = "bundle.copyright";
 
 /**
  * Manifest header containing a brief description of the bundle's
@@ -87,7 +92,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copy
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_DESCRIPTION; // = "bundle.description";
 
 /**
  * Manifest header identifying the bundle's manifest version.
@@ -95,7 +101,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.de
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_MANIFESTVERSION; // = "bundle.manifest_version";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_MANIFESTVERSION; // = "bundle.manifest_version";
 
 /**
  * Manifest header identifying the bundle's name.
@@ -111,7 +118,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_NAME; // = "bundle.name";
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_VENDOR; // = "bundle.vendor";
 
 /**
  * Manifest header identifying the bundle's version.
@@ -119,7 +127,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_VENDOR; // = "bundle.vendor"
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.version";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_VERSION; // = "bundle.version";
 
 /**
  * Manifest header identifying the bundle's documentation URL, from which
@@ -128,7 +137,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.versio
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_DOCURL; // = "bundle.doc_url";
 
 /**
  * Manifest header identifying the contact address where problems with the
@@ -137,7 +147,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
 
 /**
  * Manifest header identifying the bundle's symbolic name.
@@ -145,7 +156,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle
  * The header value may be retrieved from the \c AnyMap object
  * returned by the \c Bundle::GetHeaders() method.
  */
-US_Framework_EXPORT extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
 
 /**
  * Manifest header identifying the base name of the bundle's localization
@@ -156,14 +168,16 @@ US_Framework_EXPORT extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.s
  *
  * @see #BUNDLE_LOCALIZATION_DEFAULT_BASENAME
  */
-US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION; // = "bundle.localization";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_LOCALIZATION; // = "bundle.localization";
 
 /**
  * Default value for the \c bundle.localization manifest header.
  *
  * @see #BUNDLE_LOCALIZATION
  */
-US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION_DEFAULT_BASENAME; // = "US-INF/l10n/bundle";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_LOCALIZATION_DEFAULT_BASENAME; // = "US-INF/l10n/bundle";
 
 /**
  * Manifest header identifying the bundle's activation policy.
@@ -173,7 +187,8 @@ US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION_DEFAULT_BASENAM
  *
  * @see #ACTIVATION_LAZY
  */
-US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bundle.activation_policy";
+US_Framework_EXPORT extern const std::string
+  BUNDLE_ACTIVATIONPOLICY; // = "bundle.activation_policy";
 
 /**
  * Bundle activation policy declaring the bundle must be activated when the
@@ -202,7 +217,8 @@ US_Framework_EXPORT extern const std::string ACTIVATION_LAZY; // = "lazy";
  *
  * The header value may be retrieved via the \c BundleContext::GetProperty method.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
 
 /**
  * Framework environment property identifying the Framework implementation
@@ -210,7 +226,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmic
  *
  * The header value may be retrieved via the \c BundleContext::GetProperty method.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
 
 /**
  * Framework launching property specifying the persistent storage area used
@@ -224,7 +241,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicr
  * If this property is not set, the framework uses the "fwdir" directory in
  * the current working directory for the persistent storage area.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE; // = "org.cppmicroservices.framework.storage";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_STORAGE; // = "org.cppmicroservices.framework.storage";
 
 /**
  * Framework launching property specifying if and when the persistent
@@ -233,7 +251,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE; // = "org.cppmic
  *
  * @see #FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN; // = "org.cppmicroservices.framework.storage.clean";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_STORAGE_CLEAN; // = "org.cppmicroservices.framework.storage.clean";
 
 /**
  * Specifies that the framework storage area must be cleaned before the
@@ -241,7 +260,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN; // = "org.
  * updates of the framework will not result in cleaning the framework
  * storage area.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // = "onFirstInit";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // = "onFirstInit";
 
 /**
  * The framework's threading support property key name.
@@ -260,21 +280,24 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
  * \endrststar
  *
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
 
 /**
  * Framework threading support configuration declaring that the framework
  * is configured for single thread usage. It is not safe to use the
  * framework API concurrently from multiple threads.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SINGLE; // = "single";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_THREADING_SINGLE; // = "single";
 
 /**
  * Framework threading support configuration declaring that the framework
  * is configured for multi-thread usage. The framework API uses internal
  * locks such that it is safe to use the API concurrently from multiple threads.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_MULTI; // = "multi";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_THREADING_MULTI; // = "multi";
 
 /**
  * The framework's log property key name.
@@ -283,7 +306,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_MULTI; // = "mu
  * @internal
  * @see #DIAG_LOG
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicroservices.framework.log";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_LOG; // = "org.cppmicroservices.framework.log";
 
 /**
  * Framework environment property identifying the Framework's universally
@@ -295,7 +319,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicrose
  *
  * The header value may be retrieved via the \c BundleContext::GetProperty method.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
 
 /**
  * Framework launching property specifying the working directory used for
@@ -303,7 +328,8 @@ US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicros
  * current working directory as set during static initialization of the
  * framework library.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_WORKING_DIR; // = "org.cppmicroservices.framework.working.dir";
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_WORKING_DIR; // = "org.cppmicroservices.framework.working.dir";
 
 /*
  * Service properties.
@@ -367,7 +393,8 @@ US_Framework_EXPORT extern const std::string SERVICE_PID; // = "service.pid";
  * If the supplied property value is not of type <code>int</code>, it is
  * deemed to have a ranking value of zero.
  */
-US_Framework_EXPORT extern const std::string SERVICE_RANKING; // = "service.ranking";
+US_Framework_EXPORT extern const std::string
+  SERVICE_RANKING; // = "service.ranking";
 
 /**
  * Service property identifying a service's vendor.
@@ -375,7 +402,8 @@ US_Framework_EXPORT extern const std::string SERVICE_RANKING; // = "service.rank
  * This property may be supplied in the properties \c ServiceProperties object
  * passed to the \c BundleContext#RegisterService method.
  */
-US_Framework_EXPORT extern const std::string SERVICE_VENDOR; //	= "service.vendor";
+US_Framework_EXPORT extern const std::string
+  SERVICE_VENDOR; //	= "service.vendor";
 
 /**
  * Service property identifying a service's description.
@@ -383,7 +411,8 @@ US_Framework_EXPORT extern const std::string SERVICE_VENDOR; //	= "service.vendo
  * This property may be supplied in the properties \c ServiceProperties object
  * passed to the \c BundleContext#RegisterService method.
  */
-US_Framework_EXPORT extern const std::string SERVICE_DESCRIPTION; // = "service.description";
+US_Framework_EXPORT extern const std::string
+  SERVICE_DESCRIPTION; // = "service.description";
 
 /**
  * Service property identifying a service's scope.
@@ -421,8 +450,12 @@ US_Framework_EXPORT extern const std::string SCOPE_BUNDLE; // = "bundle"
  */
 US_Framework_EXPORT extern const std::string SCOPE_PROTOTYPE; // = "prototype"
 
-}
+/**
+ * Service property that holds optional flags for dlopen calls on POSIX systems.
+ */
+US_Framework_EXPORT extern const std::string LIBRARY_LOAD_OPTIONS;
 
+}
 }
 
 #endif // CPPMICROSERVICES_CONSTANTS_H

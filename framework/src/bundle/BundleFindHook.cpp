@@ -24,8 +24,5 @@
 
 namespace cppmicroservices {
 
-BundleFindHook::~BundleFindHook()
-{
-}
-
+BundleFindHook::~BundleFindHook() = default;
 }

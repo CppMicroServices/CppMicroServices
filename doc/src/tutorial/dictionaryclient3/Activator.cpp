@@ -50,10 +50,9 @@ class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
-
   Activator()
-   : m_context()
-   , m_tracker(nullptr)
+    : m_context()
+    , m_tracker(nullptr)
   {}
 
   /**
@@ -77,17 +76,16 @@ public:
 
     // Create a service tracker to monitor dictionary services.
     m_tracker = new ServiceTracker<IDictionaryService>(
-                  m_context, LDAPFilter(std::string("(&(") + Constants::OBJECTCLASS + "=" +
-                                        us_service_interface_iid<IDictionaryService>() + ")" +
-                                        "(Language=*))")
-                  );
+      m_context,
+      LDAPFilter(std::string("(&(") + Constants::OBJECTCLASS + "=" +
+                 us_service_interface_iid<IDictionaryService>() + ")" +
+                 "(Language=*))"));
     m_tracker->Open();
 
     std::cout << "Enter a blank line to exit." << std::endl;
 
     // Loop endlessly until the user enters a blank line
-    while (std::cin)
-    {
+    while (std::cin) {
       // Ask the user to enter a word.
       std::cout << "Enter word: ";
 
@@ -99,22 +97,17 @@ public:
 
       // If the user entered a blank line, then
       // exit the loop.
-      if (word.empty())
-      {
+      if (word.empty()) {
         break;
       }
       // If there is no dictionary, then say so.
-      else if (!dictionary)
-      {
+      else if (!dictionary) {
         std::cout << "No dictionary available." << std::endl;
       }
       // Otherwise print whether the word is correct or not.
-      else if (dictionary->CheckWord(word))
-      {
+      else if (dictionary->CheckWord(word)) {
         std::cout << "Correct." << std::endl;
-      }
-      else
-      {
+      } else {
         std::cout << "Incorrect." << std::endl;
       }
     }
@@ -128,19 +121,15 @@ public:
    * the C++ Micro Services library will automatically unget any used services.
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext /*context*/)
-  {
-  }
+  void Stop(BundleContext /*context*/) {}
 
 private:
-
   // Bundle context
   BundleContext m_context;
 
   // The service tracker
   ServiceTracker<IDictionaryService>* m_tracker;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)

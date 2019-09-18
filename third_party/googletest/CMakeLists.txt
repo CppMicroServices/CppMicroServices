@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.6.2)
 
 cmake_policy(SET CMP0048 NEW)
+if(MSVC)
+  add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+endif()
 project( googletest-distribution )
 
 enable_testing()

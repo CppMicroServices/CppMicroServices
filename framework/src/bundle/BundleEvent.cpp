@@ -31,13 +31,17 @@ namespace cppmicroservices {
 class BundleEventData
 {
 public:
-
-  BundleEventData(BundleEvent::Type type, const Bundle& bundle,
-                   const Bundle& origin)
-    : type(type), bundle(bundle), origin(origin)
+  BundleEventData(BundleEvent::Type type,
+                  const Bundle& bundle,
+                  const Bundle& origin)
+    : type(type)
+    , bundle(bundle)
+    , origin(origin)
   {
-    if (!bundle) throw std::invalid_argument("invalid bundle");
-    if (!origin) throw std::invalid_argument("invalid origin");
+    if (!bundle)
+      throw std::invalid_argument("invalid bundle");
+    if (!origin)
+      throw std::invalid_argument("invalid origin");
   }
 
   const BundleEvent::Type type;
@@ -53,9 +57,7 @@ public:
 
 BundleEvent::BundleEvent()
   : d(nullptr)
-{
-
-}
+{}
 
 BundleEvent::operator bool() const
 {
@@ -64,66 +66,79 @@ BundleEvent::operator bool() const
 
 BundleEvent::BundleEvent(Type type, const Bundle& bundle)
   : d(new BundleEventData(type, bundle, bundle))
-{
-
-}
+{}
 
 BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
   : d(new BundleEventData(type, bundle, origin))
-{
-
-}
+{}
 
 Bundle BundleEvent::GetBundle() const
 {
-  if (!d) return Bundle{};
+  if (!d)
+    return Bundle{};
   return d->bundle;
 }
 
 BundleEvent::Type BundleEvent::GetType() const
 {
-  if (!d) return BundleEvent::Type::BUNDLE_UNINSTALLED;
+  if (!d)
+    return BundleEvent::Type::BUNDLE_UNINSTALLED;
   return d->type;
 }
 
 Bundle BundleEvent::GetOrigin() const
 {
-  if (!d) return Bundle{};
+  if (!d)
+    return Bundle{};
   return d->origin;
 }
 
 bool BundleEvent::operator==(const BundleEvent& evt) const
 {
-  if (!(*this) && !evt) return true;
-  if (!(*this) || !evt) return false;
-  return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() && GetOrigin() == evt.GetOrigin();
+  if (!(*this) && !evt)
+    return true;
+  if (!(*this) || !evt)
+    return false;
+  return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() &&
+         GetOrigin() == evt.GetOrigin();
 }
 
 std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
 {
-  switch (eventType)
-  {
-  case BundleEvent::BUNDLE_STARTED:         return os << "STARTED";
-  case BundleEvent::BUNDLE_STOPPED:         return os << "STOPPED";
-  case BundleEvent::BUNDLE_STARTING:        return os << "STARTING";
-  case BundleEvent::BUNDLE_STOPPING:        return os << "STOPPING";
-  case BundleEvent::BUNDLE_INSTALLED:       return os << "INSTALLED";
-  case BundleEvent::BUNDLE_UNINSTALLED:     return os << "UNINSTALLED";
-  case BundleEvent::BUNDLE_RESOLVED:        return os << "RESOLVED";
-  case BundleEvent::BUNDLE_UNRESOLVED:      return os << "UNRESOLVED";
-  case BundleEvent::BUNDLE_LAZY_ACTIVATION: return os << "LAZY_ACTIVATION";
+  switch (eventType) {
+    case BundleEvent::BUNDLE_STARTED:
+      return os << "STARTED";
+    case BundleEvent::BUNDLE_STOPPED:
+      return os << "STOPPED";
+    case BundleEvent::BUNDLE_STARTING:
+      return os << "STARTING";
+    case BundleEvent::BUNDLE_STOPPING:
+      return os << "STOPPING";
+    case BundleEvent::BUNDLE_INSTALLED:
+      return os << "INSTALLED";
+    case BundleEvent::BUNDLE_UNINSTALLED:
+      return os << "UNINSTALLED";
+    case BundleEvent::BUNDLE_RESOLVED:
+      return os << "RESOLVED";
+    case BundleEvent::BUNDLE_UNRESOLVED:
+      return os << "UNRESOLVED";
+    case BundleEvent::BUNDLE_LAZY_ACTIVATION:
+      return os << "LAZY_ACTIVATION";
 
-  default: return os << "Unknown bundle event type (" << static_cast<int>(eventType) << ")";
+    default:
+      return os << "Unknown bundle event type (" << static_cast<int>(eventType)
+                << ")";
   }
 }
 
 std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
 {
-  if (!event) return os << "NONE";
+  if (!event)
+    return os << "NONE";
 
   auto m = event.GetBundle();
-  os << event.GetType() << " #" << m.GetBundleId() << " (" << m.GetSymbolicName() << " at " << m.GetLocation() << ")";
+  os << event.GetType() << " #" << m.GetBundleId() << " ("
+     << m.GetSymbolicName() << " at " << m.GetLocation() << ")";
   return os;
 }
-
 }

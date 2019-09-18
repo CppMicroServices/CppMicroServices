@@ -33,8 +33,11 @@ namespace cppmicroservices {
 class ServiceListenerHook::ListenerInfoData : public SharedData
 {
 public:
-  ListenerInfoData(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l,
-                   void* data, ListenerTokenId tokenId, const std::string& filter);
+  ListenerInfoData(std::shared_ptr<BundleContextPrivate>  context,
+                   ServiceListener  l,
+                   void* data,
+                   ListenerTokenId tokenId,
+                   std::string  filter);
 
   virtual ~ListenerInfoData();
 
@@ -45,7 +48,6 @@ public:
   std::string filter;
   bool bRemoved;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H

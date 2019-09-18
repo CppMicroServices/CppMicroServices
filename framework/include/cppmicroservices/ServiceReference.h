@@ -67,40 +67,39 @@ namespace cppmicroservices {
  * @see BundleContext::GetService
  */
 template<class S>
-class ServiceReference : public ServiceReferenceBase {
+class ServiceReference : public ServiceReferenceBase
+{
 
 public:
-
-  typedef S ServiceType;
+  using ServiceType = S;
 
   /**
    * Creates an invalid ServiceReference object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceReference() : ServiceReferenceBase()
-  {
-  }
+  ServiceReference()
+    : ServiceReferenceBase()
+  {}
 
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
   {
     const std::string interfaceId(us_service_interface_iid<S>());
-    if (GetInterfaceId() != interfaceId)
-    {
-      if (this->IsConvertibleTo(interfaceId))
-      {
+    if (GetInterfaceId() != interfaceId) {
+      if (this->IsConvertibleTo(interfaceId)) {
         this->SetInterfaceId(interfaceId);
-      }
-      else
-      {
-        this->operator =(0);
+      } else {
+        this->operator=(nullptr);
       }
     }
   }
 
   using ServiceReferenceBase::operator=;
 
+  using ServiceReferenceBase::operator==;
+
+  using ServiceReferenceBase::Hash;
 };
 
 /**
@@ -115,24 +114,26 @@ class ServiceReference<void> : public ServiceReferenceBase
 {
 
 public:
-
   /**
    * Creates an invalid ServiceReference object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceReference() : ServiceReferenceBase()
-  {
-  }
+  ServiceReference()
+    : ServiceReferenceBase()
+  {}
 
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
-  {
-  }
+  {}
 
   using ServiceReferenceBase::operator=;
 
-  typedef void ServiceType;
+  using ServiceReferenceBase::operator==;
+
+  using ServiceReferenceBase::Hash;
+
+  using ServiceType = void;
 };
 /// \endcond
 
@@ -143,8 +144,18 @@ public:
  * A service reference of unknown type, which is not bound to any
  * interface identifier.
  */
-typedef ServiceReference<void> ServiceReferenceU;
+using ServiceReferenceU = ServiceReference<void>;
+}
 
+namespace std {
+template<class S>
+struct hash<cppmicroservices::ServiceReference<S>>
+{
+  std::size_t operator()(const cppmicroservices::ServiceReference<S>& arg) const
+  {
+    return arg.Hash();
+  }
+};
 }
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCE_H

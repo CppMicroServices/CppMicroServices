@@ -33,18 +33,20 @@
 #include "ServiceReferenceBasePrivate.h"
 
 #include <set>
+#include <utility>
 
 namespace cppmicroservices {
 
 class ServiceObjectsBasePrivate
 {
 public:
-
   std::shared_ptr<BundleContextPrivate> m_context;
   ServiceReferenceBase m_reference;
 
-  ServiceObjectsBasePrivate(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference)
-    : m_context(context)
+  ServiceObjectsBasePrivate(
+    std::shared_ptr<BundleContextPrivate>  context,
+    const ServiceReferenceBase& reference)
+    : m_context(std::move(context))
     , m_reference(reference)
   {}
 
@@ -52,27 +54,28 @@ public:
   {
     InterfaceMapConstPtr result;
 
-    bool isPrototypeScope = m_reference.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
-                            Constants::SCOPE_PROTOTYPE;
+    bool isPrototypeScope =
+      m_reference.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
+      Constants::SCOPE_PROTOTYPE;
 
-    if (isPrototypeScope)
-    {
-      result = m_reference.d.load()->GetPrototypeService(MakeBundleContext(m_context).GetBundle());
-    }
-    else
-    {
-      result = m_reference.d.load()->GetServiceInterfaceMap(GetPrivate(MakeBundleContext(m_context).GetBundle()).get());
+    if (isPrototypeScope) {
+      result = m_reference.d.load()->GetPrototypeService(
+        MakeBundleContext(m_context).GetBundle());
+    } else {
+      result = m_reference.d.load()->GetServiceInterfaceMap(
+        GetPrivate(MakeBundleContext(m_context).GetBundle()).get());
     }
 
     return result;
   }
 };
 
-ServiceObjectsBase::ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference)
+ServiceObjectsBase::ServiceObjectsBase(
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceReferenceBase& reference)
   : d(new ServiceObjectsBasePrivate(context, reference))
 {
-  if (!reference)
-  {
+  if (!reference) {
     throw std::invalid_argument("The service reference is invalid");
   }
 }
@@ -92,38 +95,34 @@ struct UngetHelper
   const ServiceReferenceBase sref;
   const std::weak_ptr<BundlePrivate> b;
 
-  UngetHelper(const InterfaceMapConstPtr& im, const ServiceReferenceBase& sr, const std::shared_ptr<BundlePrivate>& b)
-    : interfaceMap(im)
+  UngetHelper(InterfaceMapConstPtr  im,
+              const ServiceReferenceBase& sr,
+              const std::shared_ptr<BundlePrivate>& b)
+    : interfaceMap(std::move(im))
     , sref(sr)
     , b(b)
   {}
   ~UngetHelper()
   {
-    try
-    {
+    try {
       auto bundle = b.lock();
-      if(sref)
-      {
-        bool isPrototypeScope = sref.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
-            Constants::SCOPE_PROTOTYPE;
+      if (sref) {
+        bool isPrototypeScope =
+          sref.GetProperty(Constants::SERVICE_SCOPE).ToString() ==
+          Constants::SCOPE_PROTOTYPE;
 
-        if (isPrototypeScope)
-        {
+        if (isPrototypeScope) {
           sref.d.load()->UngetPrototypeService(bundle, interfaceMap);
-        }
-        else
-        {
+        } else {
           sref.d.load()->UngetService(bundle, true);
         }
       }
-    }
-    catch (...)
-    {
+    } catch (...) {
       // Make sure that we don't crash if the shared_ptr service object outlives
       // the BundlePrivate or CoreBundleContext objects.
-      if (!b.expired())
-      {
-        DIAG_LOG(*b.lock()->coreCtx->sink) << "UngetHelper threw an exception. " << util::GetLastExceptionStr();
+      if (!b.expired()) {
+        DIAG_LOG(*b.lock()->coreCtx->sink)
+          << "UngetHelper threw an exception. " << util::GetLastExceptionStr();
       }
       // don't throw exceptions from the destructor. For an explanation, see:
       // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
@@ -135,25 +134,29 @@ struct UngetHelper
 
 std::shared_ptr<void> ServiceObjectsBase::GetService() const
 {
-  if (!d->m_reference)
-  {
+  if (!d->m_reference) {
     return nullptr;
   }
 
-  std::shared_ptr<UngetHelper> h(new UngetHelper(d->GetServiceInterfaceMap(), d->m_reference, d->m_context->bundle->shared_from_this()));
-  return std::shared_ptr<void>(h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
+  std::shared_ptr<UngetHelper> h(
+    new UngetHelper(d->GetServiceInterfaceMap(),
+                    d->m_reference,
+                    d->m_context->bundle->shared_from_this()));
+  return std::shared_ptr<void>(
+    h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
 }
 
 InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
 {
   InterfaceMapConstPtr result;
-  if (!d->m_reference)
-  {
+  if (!d->m_reference) {
     return result;
   }
   // copy construct a new map to be handed out to consumers
-  result = std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
-  std::shared_ptr<UngetHelper> h(new UngetHelper{ result, d->m_reference, d->m_context->bundle->shared_from_this() });
+  result =
+    std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
+  std::shared_ptr<UngetHelper> h(new UngetHelper{
+    result, d->m_reference, d->m_context->bundle->shared_from_this() });
   return InterfaceMapConstPtr(h, h->interfaceMap.get());
 }
 
@@ -164,14 +167,11 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
 
 ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other)
   : d(std::move(other.d))
-{
-}
+{}
 
-ServiceObjectsBase::~ServiceObjectsBase()
-{
-}
+ServiceObjectsBase::~ServiceObjectsBase() = default;
 
-ServiceObjectsBase& ServiceObjectsBase::operator =(ServiceObjectsBase&& other)
+ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other)
 {
   d = std::move(other.d);
   return *this;
@@ -197,8 +197,9 @@ ServiceReferenceU ServiceObjects<void>::GetServiceReference() const
   return this->ServiceObjectsBase::GetReference();
 }
 
-ServiceObjects<void>::ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceU& reference)
+ServiceObjects<void>::ServiceObjects(
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceReferenceU& reference)
   : ServiceObjectsBase(context, reference)
 {}
-
 }

@@ -20,18 +20,19 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/webconsole/AbstractWebConsolePlugin.h"
 #include "WebConsoleServlet.h"
+#include "cppmicroservices/webconsole/AbstractWebConsolePlugin.h"
 
+#include "VariableResolverStreamBuffer.h"
 #include "cppmicroservices/webconsole/WebConsoleConstants.h"
 #include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
-#include "VariableResolverStreamBuffer.h"
 
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
 #include "cppmicroservices/httpservice/ServletConfig.h"
 
 #include <iostream>
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -39,37 +40,33 @@ class FilteringResponseWrapper : public HttpServletResponse
 {
 
 public:
-
-  FilteringResponseWrapper(HttpServletRequest& request, HttpServletResponse& response, AbstractWebConsolePlugin* plugin)
-   : HttpServletResponse(response)
-   //, m_Stream(nullptr)
-   , m_StreamBuf(nullptr)
-   , m_Plugin(plugin)
-   , m_Request(request)
+  FilteringResponseWrapper(HttpServletRequest& request,
+                           HttpServletResponse& response,
+                           AbstractWebConsolePlugin* plugin)
+    : HttpServletResponse(response)
+    //, m_Stream(nullptr)
+    , m_StreamBuf(nullptr)
+    , m_Plugin(plugin)
+    , m_Request(request)
   {}
 
-  ~FilteringResponseWrapper()
-  {
-  }
+  ~FilteringResponseWrapper() override = default;
 
 private:
-
-  virtual std::streambuf* GetOutputStreamBuffer()
+  std::streambuf* GetOutputStreamBuffer() override
   {
     std::string contentType = this->GetContentType();
-    if (contentType.size() >= 9 && contentType.compare(0, 9, "text/html") == 0)
-    {
-      if (m_StreamBuf == nullptr)
-      {
+    if (contentType.size() >= 9 &&
+        contentType.compare(0, 9, "text/html") == 0) {
+      if (m_StreamBuf == nullptr) {
         auto resolver = m_Plugin->GetVariableResolver(m_Request);
         m_StreamBuf = new VariableResolverStreamBuffer(
-                        std::unique_ptr<std::ostream>(new std::ostream(HttpServletResponse::GetOutputStreamBuffer())),
-                        resolver);
+          std::make_unique<std::ostream>(
+            HttpServletResponse::GetOutputStreamBuffer()),
+          resolver);
       }
       return m_StreamBuf;
-    }
-    else
-    {
+    } else {
       return HttpServletResponse::GetOutputStreamBuffer();
     }
   }
@@ -80,7 +77,8 @@ private:
   HttpServletRequest& m_Request;
 };
 
-void WebConsolePluginTracker::AddPlugin(const std::string& label, AbstractWebConsolePlugin* plugin)
+void WebConsolePluginTracker::AddPlugin(const std::string& label,
+                                        AbstractWebConsolePlugin* plugin)
 {
   std::cout << "Adding console plugin with label " << label << std::endl;
 
@@ -100,34 +98,35 @@ void WebConsolePluginTracker::AddPlugin(const std::string& label, AbstractWebCon
 WebConsolePluginTracker::WebConsolePluginTracker()
   : ServiceTracker<HttpServlet>(GetBundleContext())
   , m_ServletContext(nullptr)
-{
-}
+{}
 
-void WebConsolePluginTracker::Open(const std::shared_ptr<ServletContext>& context)
+void WebConsolePluginTracker::Open(
+  const std::shared_ptr<ServletContext>& context)
 {
   this->m_ServletContext = context;
   Superclass::Open();
 }
 
-AbstractWebConsolePlugin* WebConsolePluginTracker::GetPlugin(const std::string& label) const
+AbstractWebConsolePlugin* WebConsolePluginTracker::GetPlugin(
+  const std::string& label) const
 {
-  PluginMapType::const_iterator iter = m_Plugins.find(label);
-  if (iter == m_Plugins.end()) return nullptr;
+  auto iter = m_Plugins.find(label);
+  if (iter == m_Plugins.end())
+    return nullptr;
   return iter->second;
 }
 
-AbstractWebConsolePlugin::TemplateData WebConsolePluginTracker::GetLabelMap(const std::string& current) const
+AbstractWebConsolePlugin::TemplateData WebConsolePluginTracker::GetLabelMap(
+  const std::string& current) const
 {
   auto labelMap = AbstractWebConsolePlugin::TemplateData::List();
 
-  for (auto e : m_LabelMap)
-  {
+  for (auto e : m_LabelMap) {
     AbstractWebConsolePlugin::TemplateData menuItem;
     menuItem["title"] = e.second.title;
     menuItem["label"] = e.second.label;
     menuItem["href"] = e.second.label;
-    if (e.second.label == current)
-    {
+    if (e.second.label == current) {
       menuItem["active"] = "active";
     }
     labelMap << std::move(menuItem);
@@ -141,35 +140,35 @@ void WebConsolePluginTracker::Open()
   Superclass::Open();
 }
 
-std::shared_ptr<HttpServlet>  WebConsolePluginTracker::AddingService(const ServiceReference<HttpServlet>& reference)
+std::shared_ptr<HttpServlet> WebConsolePluginTracker::AddingService(
+  const ServiceReference<HttpServlet>& reference)
 {
-  std::string label = this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL);
-  if (label.empty())
-  {
+  std::string label =
+    this->GetProperty(reference, WebConsoleConstants::PLUGIN_LABEL);
+  if (label.empty()) {
     return nullptr;
   }
   std::shared_ptr<HttpServlet> servlet = Superclass::AddingService(reference);
-  std::shared_ptr<AbstractWebConsolePlugin> plugin = std::dynamic_pointer_cast<AbstractWebConsolePlugin>(servlet);
-  if (plugin)
-  {
+  std::shared_ptr<AbstractWebConsolePlugin> plugin =
+    std::dynamic_pointer_cast<AbstractWebConsolePlugin>(servlet);
+  if (plugin) {
     this->AddPlugin(label, plugin.get());
   }
   return plugin;
 }
 
-std::string WebConsolePluginTracker::GetProperty(const ServiceReference<HttpServlet>& reference, const std::string& property) const
+std::string WebConsolePluginTracker::GetProperty(
+  const ServiceReference<HttpServlet>& reference,
+  const std::string& property) const
 {
   cppmicroservices::Any labelProp = reference.GetProperty(property);
-  if (labelProp.Empty() || labelProp.Type() != typeid(std::string))
-  {
+  if (labelProp.Empty() || labelProp.Type() != typeid(std::string)) {
     return std::string();
   }
   return labelProp.ToString();
 }
 
-WebConsoleServlet::WebConsoleServlet()
-{
-}
+WebConsoleServlet::WebConsoleServlet() = default;
 
 void WebConsoleServlet::Init(const ServletConfig& config)
 {
@@ -177,7 +176,8 @@ void WebConsoleServlet::Init(const ServletConfig& config)
   this->m_PluginTracker.Open(config.GetServletContext());
 }
 
-void WebConsoleServlet::Service(HttpServletRequest& request, HttpServletResponse& response)
+void WebConsoleServlet::Service(HttpServletRequest& request,
+                                HttpServletResponse& response)
 {
   //std::cout << "RequestUrl: " << request.GetRequestUrl() << std::endl;
   //std::cout << "RequestUri: " << request.GetRequestUri() << std::endl;
@@ -196,11 +196,9 @@ void WebConsoleServlet::Service(HttpServletRequest& request, HttpServletResponse
 
   // check whether we are not at .../{webManagerRoot}
   std::string pathInfo = request.GetPathInfo();
-  if (pathInfo.empty() || pathInfo == "/")
-  {
+  if (pathInfo.empty() || pathInfo == "/") {
     std::string path = request.GetServletPath();
-    if (path[path.size()-1] != '/')
-    {
+    if (path[path.size() - 1] != '/') {
       path += '/';
     }
     // path += holder.getDefaultPluginLabel();
@@ -210,52 +208,50 @@ void WebConsoleServlet::Service(HttpServletRequest& request, HttpServletResponse
   }
 
   std::size_t slash = pathInfo.find_first_of('/', 1);
-  if (slash < 2)
-  {
+  if (slash < 2) {
     slash = std::string::npos;
   }
 
-  std::string label = pathInfo.substr(1, slash != std::string::npos ? slash-1 : slash);
+  std::string label =
+    pathInfo.substr(1, slash != std::string::npos ? slash - 1 : slash);
 
   // WORKAROUND until registration of resources is supported
-  if (label == "res")
-  {
+  if (label == "res") {
     label = "settings";
   }
 
   AbstractWebConsolePlugin* plugin = GetConsolePlugin(label);
-  if (plugin != nullptr)
-  {
+  if (plugin != nullptr) {
     //final Map labelMap = holder.getLocalizedLabelMap( resourceBundleManager, locale, this.defaultCategory );
     //final Object flatLabelMap = labelMap.remove( WebConsoleConstants.ATTR_LABEL_MAP );
 
     // the official request attributes
     //request.SetAttribute(WebConsoleConstants::ATTR_LANG_MAP, getLangMap());
-    request.SetAttribute(WebConsoleConstants::ATTR_LABEL_MAP, m_PluginTracker.GetLabelMap(label));
+    request.SetAttribute(WebConsoleConstants::ATTR_LABEL_MAP,
+                         m_PluginTracker.GetLabelMap(label));
     //request.SetAttribute(WebConsoleConstants::ATTR_LABEL_MAP_CATEGORIZED, labelMap );
     request.SetAttribute(WebConsoleConstants::ATTR_APP_ROOT,
                          request.GetContextPath() + request.GetServletPath());
     request.SetAttribute(WebConsoleConstants::ATTR_PLUGIN_ROOT,
-                         request.GetContextPath() + request.GetServletPath() + '/' + label);
+                         request.GetContextPath() + request.GetServletPath() +
+                           '/' + label);
 
     // wrap the response for localization and template variable replacement
     //request = wrapRequest(request, locale);
     FilteringResponseWrapper filteringResponse(request, response, plugin);
 
     plugin->Service(request, filteringResponse);
-  }
-  else
-  {
+  } else {
     response.SetCharacterEncoding("utf-8"); //$NON-NLS-1$
-    response.SetContentType("text/html"); //$NON-NLS-1$
+    response.SetContentType("text/html");   //$NON-NLS-1$
     response.SetStatus(HttpServletResponse::SC_NOT_FOUND);
     response.GetOutputStream() << "No plug-in found handling this URL";
   }
 }
 
-AbstractWebConsolePlugin* WebConsoleServlet::GetConsolePlugin(const std::string& label) const
+AbstractWebConsolePlugin* WebConsoleServlet::GetConsolePlugin(
+  const std::string& label) const
 {
   return m_PluginTracker.GetPlugin(label);
 }
-
 }

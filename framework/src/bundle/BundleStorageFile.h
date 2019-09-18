@@ -31,14 +31,14 @@ class BundleStorageFile : public BundleStorage
 {
 
 public:
-
   BundleStorageFile();
 
-  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(const std::string& location);
+  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
+    const std::string& location);
 
   std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-      const std::shared_ptr<const BundleResourceContainer>& resCont,
-      const std::vector<std::string>& topLevelEntries);
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::vector<std::string>& topLevelEntries);
 
   bool RemoveArchive(const BundleArchive* ba);
 
@@ -47,9 +47,7 @@ public:
   std::vector<long> GetStartOnLaunchBundles() const;
 
   void Close();
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLESTORAGEFILE_H

@@ -30,8 +30,10 @@ namespace cppmicroservices {
 class TestManager
 {
 public:
-
-  TestManager() : m_FailedTests(0), m_PassedTests(0) {}
+  TestManager()
+    : m_FailedTests(0)
+    , m_PassedTests(0)
+  {}
   virtual ~TestManager() {}
 
   static TestManager& GetInstance();
@@ -52,7 +54,6 @@ protected:
   int m_FailedTests;
   int m_PassedTests;
 };
-
 }
 
 #endif // CPPMICROSERVICES_TESTMANAGER_H

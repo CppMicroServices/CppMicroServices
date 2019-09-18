@@ -28,51 +28,51 @@ limitations under the License.
 
 #include <stdexcept>
 
-namespace cppmicroservices
+namespace cppmicroservices {
+
+TestFrameworkListener::TestFrameworkListener()
+  : _events()
+{}
+TestFrameworkListener::~TestFrameworkListener(){};
+
+std::size_t TestFrameworkListener::events_received() const
 {
-
-TestFrameworkListener::TestFrameworkListener() : _events() {}
-TestFrameworkListener::~TestFrameworkListener() {};
-
-std::size_t TestFrameworkListener::events_received() const 
-{ 
   return _events.size();
 }
 
-bool TestFrameworkListener::CheckEvents(const std::vector<FrameworkEvent>& events)
+bool TestFrameworkListener::CheckEvents(
+  const std::vector<FrameworkEvent>& events)
 {
-    bool listenState = true; // assume success
-    if (events.size() != _events.size())
-    {
+  bool listenState = true; // assume success
+  if (events.size() != _events.size()) {
+    listenState = false;
+    US_TEST_OUTPUT(<< "*** Framework event mismatch ***\n expected "
+                   << events.size() << " event(s)\n found " << _events.size()
+                   << " event(s).");
+
+    const std::size_t max =
+      events.size() > _events.size() ? events.size() : _events.size();
+    for (std::size_t i = 0; i < max; ++i) {
+      const FrameworkEvent& pE =
+        i < events.size() ? events[i] : FrameworkEvent();
+      const FrameworkEvent& pR =
+        i < _events.size() ? _events[i] : FrameworkEvent();
+      US_TEST_OUTPUT(<< " - " << pE << " - " << pR);
+    }
+  } else {
+    for (std::size_t i = 0; i < events.size(); ++i) {
+      const FrameworkEvent& pE = events[i];
+      const FrameworkEvent& pR = _events[i];
+      if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
         listenState = false;
-        US_TEST_OUTPUT(<< "*** Framework event mismatch ***\n expected "
-            << events.size() << " event(s)\n found "
-            << _events.size() << " event(s).");
-
-        const std::size_t max = events.size() > _events.size() ? events.size() : _events.size();
-        for (std::size_t i = 0; i < max; ++i)
-        {
-            const FrameworkEvent& pE = i < events.size() ? events[i] : FrameworkEvent();
-            const FrameworkEvent& pR = i < _events.size() ? _events[i] : FrameworkEvent();
-            US_TEST_OUTPUT(<< " - " << pE << " - " << pR);
-        }
+        US_TEST_OUTPUT(<< "*** Wrong framework event ***\n found " << pR
+                       << "\n expected " << pE);
+      }
     }
-    else
-    {
-        for (std::size_t i = 0; i < events.size(); ++i)
-        {
-            const FrameworkEvent& pE = events[i];
-            const FrameworkEvent& pR = _events[i];
-            if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle())
-            {
-                listenState = false;
-                US_TEST_OUTPUT(<< "*** Wrong framework event ***\n found " << pR << "\n expected " << pE);
-            }
-        }
-    }
+  }
 
-    _events.clear();
-    return listenState;
+  _events.clear();
+  return listenState;
 }
 
 void TestFrameworkListener::frameworkEvent(const FrameworkEvent& evt)
@@ -85,5 +85,4 @@ void TestFrameworkListener::throwOnFrameworkEvent(const FrameworkEvent&)
 {
   throw std::runtime_error("whoopsie!");
 }
-
 }

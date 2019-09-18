@@ -24,8 +24,5 @@
 
 namespace cppmicroservices {
 
-WebConsoleVariableResolver::~WebConsoleVariableResolver()
-{
-}
-
+WebConsoleVariableResolver::~WebConsoleVariableResolver() = default;
 }

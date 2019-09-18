@@ -36,47 +36,36 @@ namespace cppmicroservices {
 class LDAPFilterData : public SharedData
 {
 public:
-
-  LDAPFilterData() : ldapExpr()
+  LDAPFilterData()
+    : ldapExpr()
   {}
 
   LDAPFilterData(const std::string& filter)
     : ldapExpr(filter)
   {}
 
-  LDAPFilterData(const LDAPFilterData& other)
-    : SharedData(other), ldapExpr(other.ldapExpr)
-  {}
+  LDAPFilterData(const LDAPFilterData&) = default;
 
   LDAPExpr ldapExpr;
 };
 
 LDAPFilter::LDAPFilter()
-  : d(0)
-{
-}
+  : d(nullptr)
+{}
 
 LDAPFilter::LDAPFilter(const std::string& filter)
-  : d(0)
+  : d(nullptr)
 {
-  try
-  {
+  try {
     d = new LDAPFilterData(filter);
-  }
-  catch (const std::exception& e)
-  {
+  } catch (const std::exception& e) {
     throw std::invalid_argument(e.what());
   }
 }
 
-LDAPFilter::LDAPFilter(const LDAPFilter& other)
-  : d(other.d)
-{
-}
+LDAPFilter::LDAPFilter(const LDAPFilter&) = default;
 
-LDAPFilter::~LDAPFilter()
-{
-}
+LDAPFilter::~LDAPFilter() = default;
 
 LDAPFilter::operator bool() const
 {
@@ -85,22 +74,30 @@ LDAPFilter::operator bool() const
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false) : false);
+  return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false)
+              : false);
 }
-    
+
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(PropertiesHandle(Properties(bundle.GetHeaders()), false), false) : false);
+  return ((d)
+            ? d->ldapExpr.Evaluate(
+                PropertiesHandle(Properties(bundle.GetHeaders()), false), false)
+            : false);
 }
 
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), false) : false);
+  return ((d) ? d->ldapExpr.Evaluate(
+                  PropertiesHandle(Properties(dictionary), false), false)
+              : false);
 }
 
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(PropertiesHandle(Properties(dictionary), false), true) : false);
+  return ((d) ? d->ldapExpr.Evaluate(
+                  PropertiesHandle(Properties(dictionary), false), true)
+              : false);
 }
 
 std::string LDAPFilter::ToString() const
@@ -114,15 +111,10 @@ bool LDAPFilter::operator==(const LDAPFilter& other) const
 }
 
 LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
-{
-  d = filter.d;
-
-  return *this;
-}
+= default;
 
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {
   return os << filter.ToString();
 }
-
 }

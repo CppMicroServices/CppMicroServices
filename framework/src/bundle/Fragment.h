@@ -36,39 +36,27 @@ class Fragment
 {
 
 public:
-
   std::vector<BundlePrivate*> Targets() const
   {
     // TODO
     return std::vector<BundlePrivate*>();
   }
 
-  bool IsHost(BundlePrivate*) const
-  {
-    return false;
-  }
+  bool IsHost(BundlePrivate*) const { return false; }
 
-  bool HasHosts() const
-  {
-    return !hosts.empty();
-  }
+  bool HasHosts() const { return !hosts.empty(); }
 
   void RemoveHost(BundlePrivate* host)
   {
-    if (host == nullptr)
-    {
+    if (host == nullptr) {
       hosts.clear();
-    }
-    else
-    {
+    } else {
       hosts.erase(std::find(hosts.begin(), hosts.end(), host));
     }
   }
 
   std::vector<BundlePrivate*> hosts;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_FRAGMENT_H

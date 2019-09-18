@@ -27,41 +27,44 @@
 #include "BundleArchive.h"
 #include "BundleResourceContainer.h"
 
+#include <chrono>
+
 namespace cppmicroservices {
 
 BundleStorageMemory::BundleStorageMemory()
   : nextFreeId(1)
-{
-}
+{}
 
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertBundleLib(const std::string& location)
+std::vector<std::shared_ptr<BundleArchive>>
+BundleStorageMemory::InsertBundleLib(const std::string& location)
 {
   auto resCont = std::make_shared<BundleResourceContainer>(location);
   return InsertArchives(resCont, resCont->GetTopLevelDirs());
 }
 
 std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
-    const std::shared_ptr<const BundleResourceContainer>& resCont,
-    const std::vector<std::string>& topLevelEntries)
+  const std::shared_ptr<BundleResourceContainer>& resCont,
+  const std::vector<std::string>& topLevelEntries)
 {
   std::vector<std::shared_ptr<BundleArchive>> res;
-  auto l = archives.Lock(); US_UNUSED(l);
-  for (auto const& prefix : topLevelEntries)
-  {
+  auto l = archives.Lock();
+  US_UNUSED(l);
+  for (auto const& prefix : topLevelEntries) {
 #ifndef US_BUILD_SHARED_LIBS
     // The system bundle is already installed
-    if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
-    {
+    if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME) {
       continue;
     }
 #endif
     auto id = nextFreeId++;
-    auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(detail::Clock::now().time_since_epoch()).count();
-    std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{id, ts, -1});
-    auto p = archives.v.insert(std::make_pair(
-          id,
-          std::make_shared<BundleArchive>(this, std::move(data), resCont, prefix, resCont->GetLocation())
-          ));
+    auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{ id, ts, -1 });
+    auto p = archives.v.insert(std::make_pair(id,
+                                              std::make_shared<BundleArchive>(this,
+                                                                              std::move(data),
+                                                                              resCont,
+                                                                              prefix,
+                                                                              resCont->GetLocation())));
     res.push_back(p.first->second);
   }
   return res;
@@ -69,22 +72,23 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
 
 bool BundleStorageMemory::RemoveArchive(const BundleArchive* ba)
 {
-  auto l = archives.Lock(); US_UNUSED(l);
+  auto l = archives.Lock();
+  US_UNUSED(l);
   auto iter = archives.v.find(ba->GetBundleId());
-  if (iter != archives.v.end())
-  {
+  if (iter != archives.v.end()) {
     archives.v.erase(iter);
     return true;
   }
   return false;
 }
 
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::GetAllBundleArchives() const
+std::vector<std::shared_ptr<BundleArchive>>
+BundleStorageMemory::GetAllBundleArchives() const
 {
   std::vector<std::shared_ptr<BundleArchive>> res;
-  auto l = archives.Lock(); US_UNUSED(l);
-  for (auto const& v : archives.v)
-  {
+  auto l = archives.Lock();
+  US_UNUSED(l);
+  for (auto const& v : archives.v) {
     res.emplace_back(v.second);
   }
   return res;
@@ -93,11 +97,10 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::GetAllBundleArc
 std::vector<long> BundleStorageMemory::GetStartOnLaunchBundles() const
 {
   std::vector<long> res;
-  auto l = archives.Lock(); US_UNUSED(l);
-  for (auto& v : archives.v)
-  {
-    if (v.second->GetAutostartSetting() != -1)
-    {
+  auto l = archives.Lock();
+  US_UNUSED(l);
+  for (auto& v : archives.v) {
+    if (v.second->GetAutostartSetting() != -1) {
       res.emplace_back(v.second->GetBundleId());
     }
   }
@@ -110,5 +113,4 @@ void BundleStorageMemory::Close()
   // is going down and no other threads can access it.
   archives.v.clear();
 }
-
 }

@@ -20,18 +20,22 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICEINTERFACE_H
 #define CPPMICROSERVICES_SERVICEINTERFACE_H
 
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceException.h"
 
-#include <map>
 #include <memory>
 #include <string>
-#include <typeinfo>
 #include <tuple>
+#include <typeinfo>
+#if defined(_MSC_VER) && (_MSC_VER < 1910) // Pre Visual Studio 2017
+#  include <map>
+#else
+#  include <unordered_map>
+#endif
+#include <utility>
 
 /**
 \defgroup gr_serviceinterface Service Interface
@@ -53,7 +57,8 @@
  * @tparam T The service interface type.
  * @return A unique id for the service interface type T.
  */
-template<class T> std::string us_service_interface_iid();
+template<class T>
+const std::string& us_service_interface_iid();
 
 namespace cppmicroservices {
 
@@ -76,78 +81,94 @@ class ServiceFactory;
  *
  * @see MakeInterfaceMap
  */
-typedef std::map<std::string, std::shared_ptr<void>> InterfaceMap;
-typedef std::shared_ptr<InterfaceMap> InterfaceMapPtr;
-typedef std::shared_ptr<const InterfaceMap> InterfaceMapConstPtr;
+#if defined(_MSC_VER) && (_MSC_VER < 1910) // Pre Visual Studio 2017
+using InterfaceMap = std::map<std::string, std::shared_ptr<void>>;
+#else
+using InterfaceMap = std::unordered_map<std::string, std::shared_ptr<void>>;
+#endif
+using InterfaceMapPtr = std::shared_ptr<InterfaceMap>;
+using InterfaceMapConstPtr = std::shared_ptr<const InterfaceMap>;
 
 /// \cond
-namespace detail
+namespace detail {
+US_Framework_EXPORT std::string GetDemangledName(
+  const std::type_info& typeInfo);
+
+template<class Interfaces, size_t size>
+struct InsertInterfaceHelper
 {
-  US_Framework_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
-
-  template <class Interfaces, size_t size>
-  struct InsertInterfaceHelper
+  static void insert(InterfaceMapPtr& im, const Interfaces& interfaces)
   {
-      static void insert(InterfaceMapPtr& im, const Interfaces& interfaces)
-      {
-          std::pair<std::string, std::shared_ptr<void>> aPair= std::make_pair(std::string(us_service_interface_iid<typename std::tuple_element<size-1, Interfaces>::type::element_type>()),
-                                           std::static_pointer_cast<void>(std::get<size-1>(interfaces)));
-          im->insert(aPair);
-          InsertInterfaceHelper<Interfaces,size-1>::insert(im, interfaces);
-      }
-  };
-
-  template<class T>
-  struct InsertInterfaceHelper<T,0>
-  {
-      static void insert(InterfaceMapPtr&, const T&) {}
-  };
-
-  template<class Interfaces>
-  void InsertInterfaceTypes(InterfaceMapPtr& im, const Interfaces& interfaces)
-  {
-      InsertInterfaceHelper<Interfaces, std::tuple_size<Interfaces>::value>::insert(im, interfaces);
+    std::pair<std::string, std::shared_ptr<void>> aPair = std::make_pair(
+      std::string(
+        us_service_interface_iid<
+          typename std::tuple_element<size - 1,
+                                      Interfaces>::type::element_type>()),
+      std::static_pointer_cast<void>(std::get<size - 1>(interfaces)));
+    im->insert(aPair);
+    InsertInterfaceHelper<Interfaces, size - 1>::insert(im, interfaces);
   }
+};
 
-  template<template<class...> class List, class ...Args>
-  struct InterfacesTuple {
-      typedef List<std::shared_ptr<Args>...> type;
+template<class T>
+struct InsertInterfaceHelper<T, 0>
+{
+  static void insert(InterfaceMapPtr&, const T&) {}
+};
 
-      template<class Impl>
-      static type create(const std::shared_ptr<Impl>& impl)
-      {
-          return type(std::static_pointer_cast<Args>(impl)...);
-      }
-  };
+template<class Interfaces>
+void InsertInterfaceTypes(InterfaceMapPtr& im, const Interfaces& interfaces)
+{
+  InsertInterfaceHelper<Interfaces, std::tuple_size<Interfaces>::value>::insert(
+    im, interfaces);
+}
 
-  template<class T, class... List>
-  struct Contains : std::true_type {};
+template<template<class...> class List, class... Args>
+struct InterfacesTuple
+{
+  using type = List<std::shared_ptr<Args>...>;
 
-  template<class T, class Head, class... Rest>
-  struct Contains<T, Head, Rest...>
-    : std::conditional< std::is_same<T, Head>::value,
-          std::true_type,
-          Contains<T, Rest...>
-          >::type
-  {};
+  template<class Impl>
+  static type create(const std::shared_ptr<Impl>& impl)
+  {
+    return type(std::static_pointer_cast<Args>(impl)...);
+  }
+};
 
-  template<class T>
-  struct Contains<T> : std::false_type {};
+template<class T, class... List>
+struct Contains : std::true_type
+{};
 
+template<class T, class Head, class... Rest>
+struct Contains<T, Head, Rest...>
+  : std::conditional<std::is_same<T, Head>::value,
+                     std::true_type,
+                     Contains<T, Rest...>>::type
+{};
+
+template<class T>
+struct Contains<T> : std::false_type
+{};
 }
 /// \endcond
-
 }
 
 /// \cond
-template<class T> std::string us_service_interface_iid()
+template<class T>
+const std::string& us_service_interface_iid()
 {
-  return cppmicroservices::detail::GetDemangledName(typeid(T));
+  static const std::string name =
+    cppmicroservices::detail::GetDemangledName(typeid(T));
+  return name;
 }
 
-template<> inline std::string us_service_interface_iid<void>() { return std::string(); }
+template<>
+inline const std::string& us_service_interface_iid<void>()
+{
+  static const std::string name("");
+  return name;
+}
 /// \endcond
-
 
 /**
  * \ingroup MicroServices
@@ -194,10 +215,15 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
  * @param _service_interface_type The service interface type.
  * @param _service_interface_id A string literal representing a globally unique identifier.
  */
-#define CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)             \
-  template<> inline std::string us_service_interface_iid<_service_interface_type>()          \
-  { return _service_interface_id; }                                                              \
-
+#define CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(_service_interface_type,    \
+                                                   _service_interface_id)      \
+  template<>                                                                   \
+  inline const std::string&                                                    \
+  us_service_interface_iid<_service_interface_type>()                          \
+  {                                                                            \
+    static const std::string name(_service_interface_id);                      \
+    return name;                                                               \
+  }
 
 namespace cppmicroservices {
 
@@ -216,7 +242,7 @@ namespace cppmicroservices {
  *
  * @see InterfaceMap
  */
-template<class ...Interfaces>
+template<class... Interfaces>
 class MakeInterfaceMap
 {
 
@@ -229,7 +255,8 @@ public:
    */
   template<class Impl>
   MakeInterfaceMap(const std::shared_ptr<Impl>& impl)
-    : m_interfaces(detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
+    : m_interfaces(
+        detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
   {}
 
   /**
@@ -237,19 +264,16 @@ public:
    *
    * @param factory A service factory.
    */
-  MakeInterfaceMap(const std::shared_ptr<ServiceFactory>& factory)
-    : m_factory(factory)
+  MakeInterfaceMap(std::shared_ptr<ServiceFactory> factory)
+    : m_factory(std::move(factory))
   {
-    if (!m_factory)
-    {
-      throw ServiceException("The service factory argument must not be nullptr.");
+    if (!m_factory) {
+      throw ServiceException(
+        "The service factory argument must not be nullptr.");
     }
   }
 
-  operator InterfaceMapPtr ()
-  {
-    return getInterfaceMap();
-  }
+  operator InterfaceMapPtr() { return getInterfaceMap(); }
 
   // overload for the const version of the map
   operator InterfaceMapConstPtr()
@@ -258,16 +282,14 @@ public:
   }
 
 private:
-
   InterfaceMapPtr getInterfaceMap()
   {
     InterfaceMapPtr sim = std::make_shared<InterfaceMap>();
     detail::InsertInterfaceTypes(sim, m_interfaces);
 
-    if (m_factory)
-    {
-      sim->insert(std::make_pair(std::string("org.cppmicroservices.factory"),
-                                 m_factory));
+    if (m_factory) {
+      sim->insert(
+        std::make_pair(std::string("org.cppmicroservices.factory"), m_factory));
     }
 
     return sim;
@@ -275,7 +297,8 @@ private:
 
   std::shared_ptr<ServiceFactory> m_factory;
 
-  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type m_interfaces;
+  typename detail::InterfacesTuple<std::tuple, Interfaces...>::type
+    m_interfaces;
 };
 
 /**
@@ -293,14 +316,12 @@ private:
 template<class Interface>
 std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
 {
-  InterfaceMap::const_iterator iter = map->find(us_service_interface_iid<Interface>());
-  if (iter != map->end())
-  {
+  auto iter = map->find(us_service_interface_iid<Interface>());
+  if (iter != map->end()) {
     return std::static_pointer_cast<Interface>(iter->second);
   }
   return nullptr;
 }
-
 
 /**
  * @ingroup MicroServices
@@ -315,21 +336,19 @@ std::shared_ptr<Interface> ExtractInterface(const InterfaceMapConstPtr& map)
  *
  * @see ExtractInterface(const InterfaceMapConstPtr&)
  */
-inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, const std::string& interfaceId)
+inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map,
+                                              const std::string& interfaceId)
 {
-  if (!map)
-  {
+  if (!map) {
     return nullptr;
   }
 
-  if (interfaceId.empty() && map && !map->empty())
-  {
+  if (interfaceId.empty() && map && !map->empty()) {
     return map->begin()->second;
   }
 
   auto iter = map->find(interfaceId);
-  if (iter != map->end())
-  {
+  if (iter != map->end()) {
     return iter->second;
   }
   return nullptr;
@@ -356,12 +375,10 @@ inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map, c
 template<class T>
 std::shared_ptr<ServiceFactory> ToFactory(const std::shared_ptr<T>& factory)
 {
-    return std::static_pointer_cast<ServiceFactory>(factory);
+  return std::static_pointer_cast<ServiceFactory>(factory);
 }
 
 ///@}
-
 }
-
 
 #endif // CPPMICROSERVICES_SERVICEINTERFACE_H

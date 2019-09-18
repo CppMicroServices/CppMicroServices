@@ -42,99 +42,52 @@ private:
   static std::vector<E> emptyVector;
 
 public:
-
-  typedef std::vector<E> container_type;
-  typedef typename container_type::iterator iterator;
-  typedef typename container_type::const_iterator const_iterator;
-  typedef typename container_type::size_type size_type;
-  typedef typename container_type::reference reference;
-  typedef typename container_type::const_reference const_reference;
-  typedef typename container_type::value_type value_type;
+  using container_type = std::vector<E>;
+  using iterator = typename container_type::iterator;
+  using const_iterator = typename container_type::const_iterator;
+  using size_type = typename container_type::size_type;
+  using reference = typename container_type::reference;
+  using const_reference = typename container_type::const_reference;
+  using value_type = typename container_type::value_type;
 
   ShrinkableVector()
-  : container(emptyVector)
-  {
-  }
+    : container(emptyVector)
+  {}
 
-  iterator begin()
-  {
-    return container.begin();
-  }
+  iterator begin() { return container.begin(); }
 
-  const_iterator begin() const
-  {
-    return container.begin();
-  }
+  const_iterator begin() const { return container.begin(); }
 
-  iterator end()
-  {
-    return container.end();
-  }
+  iterator end() { return container.end(); }
 
-  const_iterator end() const
-  {
-    return container.end();
-  }
+  const_iterator end() const { return container.end(); }
 
-  reference front()
-  {
-    return container.front();
-  }
+  reference front() { return container.front(); }
 
-  const_reference front() const
-  {
-    return container.front();
-  }
+  const_reference front() const { return container.front(); }
 
-  reference back()
-  {
-    return container.back();
-  }
+  reference back() { return container.back(); }
 
-  const_reference back() const
-  {
-    return container.back();
-  }
+  const_reference back() const { return container.back(); }
 
-  iterator erase(iterator pos)
-  {
-    return container.erase(pos);
-  }
+  iterator erase(iterator pos) { return container.erase(pos); }
 
   iterator erase(iterator first, iterator last)
   {
     return container.erase(first, last);
   }
 
-  void pop_back()
-  {
-    container.pop_back();
-  }
+  void pop_back() { container.pop_back(); }
 
-  bool empty() const
-  {
-    return container.empty();
-  }
+  bool empty() const { return container.empty(); }
 
-  void clear()
-  {
-    container.clear();
-  }
+  void clear() { container.clear(); }
 
-  size_type size() const
-  {
-    return container.size();
-  }
+  size_type size() const { return container.size(); }
 
-  reference at(size_type pos)
-  {
-    return container.at(pos);
-  }
+  reference at(size_type pos) { return container.at(pos); }
 
-  const_reference at(size_type pos) const
-  {
-    return container.at(pos);
-  }
+  const_reference at(size_type pos) const { return container.at(pos); }
 
   /**
    * \rststar
@@ -161,13 +114,9 @@ public:
    *    instead.
    * \endrststar
    */
-  US_DEPRECATED reference operator[](size_type i)
-  {
-    return container[i];
-  }
+  US_DEPRECATED reference operator[](size_type i) { return container[i]; }
 
 private:
-
   friend class BundleHooks;
   friend class ServiceHooks;
 
@@ -180,7 +129,6 @@ private:
 
 template<class E>
 std::vector<E> ShrinkableVector<E>::emptyVector;
-
 }
 
 #endif // CPPMICROSERVICES_SHRINKABLEVECTOR_H

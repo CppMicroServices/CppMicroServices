@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_RESOLVER_H
 #define CPPMICROSERVICES_RESOLVER_H
 
@@ -32,12 +31,13 @@ namespace cppmicroservices {
 /**
  * This class is not part of the public API.
  */
-class Resolver : public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
+class Resolver
+  : public detail::MultiThreaded<detail::MutexLockingStrategy<>,
+                                 detail::WaitCondition>
 {
 public:
   void Clear() {}
 };
-
 }
 
 #endif // CPPMICROSERVICES_RESOLVER_H

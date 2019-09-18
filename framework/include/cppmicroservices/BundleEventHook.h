@@ -64,9 +64,9 @@ struct US_Framework_EXPORT BundleEventHook
    *        list to prevent the event from being delivered to the
    *        associated bundles.
    */
-  virtual void Event(const BundleEvent& event, ShrinkableVector<BundleContext>& contexts) = 0;
+  virtual void Event(const BundleEvent& event,
+                     ShrinkableVector<BundleContext>& contexts) = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEEVENTHOOK_H

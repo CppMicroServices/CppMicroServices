@@ -20,9 +20,9 @@
 
 =============================================================================*/
 
+#include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
 
 #include "TestingMacros.h"
@@ -34,33 +34,29 @@ using namespace cppmicroservices;
 int TestParsing()
 {
   // WELL FORMED Expr
-  try
-  {
+  try {
     US_TEST_OUTPUT(<< "Parsing (cn=Babs Jensen)")
-    LDAPFilter ldap( "(cn=Babs Jensen)" );
+    LDAPFilter ldap("(cn=Babs Jensen)");
     US_TEST_OUTPUT(<< "Parsing (!(cn=Tim Howes))")
-    ldap = LDAPFilter( "(!(cn=Tim Howes))" );
-    US_TEST_OUTPUT(<< "Parsing " << std::string("(&(") + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))")
-    ldap = LDAPFilter( std::string("(&(") + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))" );
+    ldap = LDAPFilter("(!(cn=Tim Howes))");
+    US_TEST_OUTPUT(<< "Parsing "
+                   << std::string("(&(") + Constants::OBJECTCLASS +
+                        "=Person)(|(sn=Jensen)(cn=Babs J*)))")
+    ldap = LDAPFilter(std::string("(&(") + Constants::OBJECTCLASS +
+                      "=Person)(|(sn=Jensen)(cn=Babs J*)))");
     US_TEST_OUTPUT(<< "Parsing (o=univ*of*mich*)")
-    ldap = LDAPFilter( "(o=univ*of*mich*)" );
-  }
-  catch (const std::invalid_argument& e)
-  {
+    ldap = LDAPFilter("(o=univ*of*mich*)");
+  } catch (const std::invalid_argument& e) {
     US_TEST_OUTPUT(<< e.what());
     return EXIT_FAILURE;
   }
 
-
   // MALFORMED Expr
-  try
-  {
-    US_TEST_OUTPUT( << "Parsing malformed expr: cn=Babs Jensen)")
-    LDAPFilter ldap( "cn=Babs Jensen)" );
+  try {
+    US_TEST_OUTPUT(<< "Parsing malformed expr: cn=Babs Jensen)")
+    LDAPFilter ldap("cn=Babs Jensen)");
     return EXIT_FAILURE;
-  }
-  catch (const std::invalid_argument&)
-  {
+  } catch (const std::invalid_argument&) {
   }
 
   return EXIT_SUCCESS;
@@ -69,10 +65,9 @@ int TestParsing()
 int TestEvaluate()
 {
   // EVALUATE
-  try
-  {
+  try {
     // Make sure Match's key look-up is case-insensitive
-    LDAPFilter ldap( "(Cn=Babs Jensen)" );
+    LDAPFilter ldap("(Cn=Babs Jensen)");
     AnyMap props(AnyMap::UNORDERED_MAP);
     bool eval = false;
 
@@ -81,35 +76,32 @@ int TestEvaluate()
     props["unused"] = std::string("Jansen");
     US_TEST_OUTPUT(<< "Evaluating expr: " << ldap.ToString())
     eval = ldap.Match(props);
-    if (!eval)
-    {
+    if (!eval) {
       return EXIT_FAILURE;
     }
 
     // WILDCARD
-    ldap = LDAPFilter( "(cn=Babs *)" );
+    ldap = LDAPFilter("(cn=Babs *)");
     props.clear();
     props["cn"] = std::string("Babs Jensen");
     US_TEST_OUTPUT(<< "Evaluating wildcard expr: " << ldap.ToString())
     eval = ldap.Match(props);
-    if ( !eval )
-    {
+    if (!eval) {
       return EXIT_FAILURE;
     }
 
     // NOT FOUND
-    ldap = LDAPFilter( "(cn=Babs *)" );
+    ldap = LDAPFilter("(cn=Babs *)");
     props.clear();
     props["unused"] = std::string("New");
     US_TEST_OUTPUT(<< "Expr not found test: " << ldap.ToString())
     eval = ldap.Match(props);
-    if ( eval )
-    {
+    if (eval) {
       return EXIT_FAILURE;
     }
 
     // std::vector with integer values
-    ldap = LDAPFilter( "  ( |(cn=Babs *)(sn=1) )" );
+    ldap = LDAPFilter("  ( |(cn=Babs *)(sn=1) )");
     props.clear();
     std::vector<Any> list;
     list.push_back(std::string("Babs Jensen"));
@@ -117,25 +109,21 @@ int TestEvaluate()
     props["sn"] = list;
     US_TEST_OUTPUT(<< "Evaluating vector expr: " << ldap.ToString())
     eval = ldap.Match(props);
-    if (!eval)
-    {
+    if (!eval) {
       return EXIT_FAILURE;
     }
 
     // wrong case
-    ldap = LDAPFilter( "(cN=Babs *)" );
+    ldap = LDAPFilter("(cN=Babs *)");
     props.clear();
     props["cn"] = std::string("Babs Jensen");
     US_TEST_OUTPUT(<< "Evaluating case sensitive expr: " << ldap.ToString())
     eval = ldap.MatchCase(props);
-    if (eval)
-    {
+    if (eval) {
       return EXIT_FAILURE;
     }
-  }
-  catch (const std::invalid_argument& e)
-  {
-    US_TEST_OUTPUT( << e.what() )
+  } catch (const std::invalid_argument& e) {
+    US_TEST_OUTPUT(<< e.what())
     return EXIT_FAILURE;
   }
 
@@ -144,32 +132,36 @@ int TestEvaluate()
 
 void TestLDAPExpressions()
 {
-  LDAPFilter filter(
-        LDAPProp("bla") == "jo" && !(LDAPProp("ha") == 1) &&
-        (LDAPProp("presence") || !LDAPProp("absence")) &&
-        LDAPProp("le") <= 4.1 && LDAPProp("ge") >= -3 &&
-        LDAPProp("approx").Approx("Approx")
-        );
-  const std::string filterStr = "(&(&(&(&(&(bla=jo)(!(ha=1)))(|(presence=*)(!(absence=*))))(le<=4.1))(ge>=-3))(approx~=Approx))";
-  US_TEST_CONDITION(filter.ToString() == filterStr, "test generated filter string")
+  LDAPFilter filter(LDAPProp("bla") == "jo" && !(LDAPProp("ha") == 1) &&
+                    (LDAPProp("presence") || !LDAPProp("absence")) &&
+                    LDAPProp("le") <= 4.1 && LDAPProp("ge") >= -3 &&
+                    LDAPProp("approx").Approx("Approx"));
+  const std::string filterStr =
+    "(&(&(&(&(&(bla=jo)(!(ha=1)))(|(presence=*)(!(absence=*))))(le<=4.1))(ge>=-"
+    "3))(approx~=Approx))";
+  US_TEST_CONDITION(filter.ToString() == filterStr,
+                    "test generated filter string")
 
   std::string emptyValue;
   std::string someValue = "some";
   std::string filter1 = LDAPProp("key2") == someValue && LDAPProp("key3");
-  std::string filter2 = LDAPProp("key2") == someValue && (LDAPProp("key1") == emptyValue || LDAPProp("key3"));
+  std::string filter2 = LDAPProp("key2") == someValue &&
+                        (LDAPProp("key1") == emptyValue || LDAPProp("key3"));
   US_TEST_CONDITION(filter1 == filter2, "test null expressions")
 
   LDAPFilter boolFilter(LDAPProp("t") == true || LDAPProp("f") == false);
-  US_TEST_CONDITION(boolFilter.ToString() == "(|(t=true)(f=false))", "boolean expressions")
+  US_TEST_CONDITION(boolFilter.ToString() == "(|(t=true)(f=false))",
+                    "boolean expressions")
 }
 
-int LDAPFilterTest(int /*argc*/, char* /*argv*/[])
+int LDAPFilterTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("LDAPFilterTest");
 
   TestLDAPExpressions();
   US_TEST_CONDITION(TestParsing() == EXIT_SUCCESS, "Parsing LDAP expressions: ")
-  US_TEST_CONDITION(TestEvaluate() == EXIT_SUCCESS, "Evaluating LDAP expressions: ")
+  US_TEST_CONDITION(TestEvaluate() == EXIT_SUCCESS,
+                    "Evaluating LDAP expressions: ")
 
   US_TEST_END()
 }

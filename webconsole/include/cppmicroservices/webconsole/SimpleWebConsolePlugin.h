@@ -25,8 +25,8 @@
 
 #include "cppmicroservices/webconsole/AbstractWebConsolePlugin.h"
 
-#include "cppmicroservices/webconsole/WebConsoleExport.h"
 #include "cppmicroservices/ServiceRegistration.h"
+#include "cppmicroservices/webconsole/WebConsoleExport.h"
 
 namespace cppmicroservices {
 
@@ -39,11 +39,11 @@ namespace cppmicroservices {
  *   - Default implementation for resource loading
  *
  */
-class US_WebConsole_EXPORT SimpleWebConsolePlugin : public AbstractWebConsolePlugin
+class US_WebConsole_EXPORT SimpleWebConsolePlugin
+  : public AbstractWebConsolePlugin
 {
 
 public:
-
   /**
    * Creates new Simple Web Console Plugin with the given category.
    *
@@ -54,9 +54,11 @@ public:
    * @param css the additional plugin CSS. See
    *        AbstractWebConsolePlugin#GetCssReferences()
    */
-  SimpleWebConsolePlugin(const std::string& label, const std::string& title,
-                         const std::string& category = std::string(),
-                         const std::vector<std::string>& css = std::vector<std::string>());
+  SimpleWebConsolePlugin(
+    const std::string& label,
+    const std::string& title,
+    std::string  category = std::string(),
+    std::vector<std::string>  css = std::vector<std::string>());
 
   /**
    * @see AbstractWebConsolePlugin#GetLabel()
@@ -66,7 +68,7 @@ public:
   /**
    * @see AbstractWebConsolePlugin#GetTitle()
    */
-   std::string GetTitle() const;
+  std::string GetTitle() const;
 
   /**
    * @see AbstractWebConsolePlugin#GetCategory()
@@ -81,8 +83,8 @@ public:
    * @param context the bundle context used for service registration.
    * @return A shared pointer to this plugin.
    */
-  std::shared_ptr<SimpleWebConsolePlugin> Register(const BundleContext& context = GetBundleContext());
-
+  std::shared_ptr<SimpleWebConsolePlugin> Register(
+    const BundleContext& context = GetBundleContext());
 
   /**
    * An utility method that removes the service, registered by the
@@ -91,7 +93,6 @@ public:
   void Unregister();
 
 protected:
-
   /**
    * @see AbstractWebConsolePlugin#GetCssReferences()
    */
@@ -100,7 +101,6 @@ protected:
   BundleContext GetContext() const;
 
 private:
-
   /**
    * Called internally by AbstractWebConsolePlugin to load resources.
    *
@@ -127,7 +127,6 @@ private:
   ServiceRegistration<HttpServlet> m_Reg;
   BundleContext m_Context;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SIMPLEWEBCONSOLEPLUGIN_H

@@ -30,13 +30,18 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <chrono>
 
 namespace cppmicroservices {
 
 template<class S, class T>
 ServiceTracker<S,T>::~ServiceTracker()
 {
-  Close();
+  try 
+  {
+    Close();
+  }
+  catch (...) {}
 }
 
 #ifdef _MSC_VER
@@ -176,7 +181,7 @@ void ServiceTracker<S,T>::Close()
 }
 
 template<class S, class T>
-std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>
 ServiceTracker<S,T>::WaitForService()
 {
   return WaitForService(std::chrono::milliseconds::zero());
@@ -184,7 +189,7 @@ ServiceTracker<S,T>::WaitForService()
 
 template<class S, class T>
 template<class Rep, class Period>
-std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>
 ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& rel_time)
 {
   if (rel_time.count() < 0)
@@ -195,17 +200,18 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
   auto object = GetService();
   if (object) return object;
 
-  typedef std::chrono::duration<Rep, Period> D;
+  using D = std::chrono::duration<Rep, Period>;
 
   auto timeout = rel_time;
-  const detail::Clock::time_point endTime =
-      (rel_time == D::zero()) ? detail::Clock::time_point() : (detail::Clock::now() + rel_time);
+  auto endTime = (rel_time == D::zero())
+                 ? std::chrono::steady_clock::time_point()
+                 : (std::chrono::steady_clock::now() + rel_time);
   do
   {
     auto t = d->Tracked();
     if (!t)
     { /* if ServiceTracker is not open */
-      return std::shared_ptr<TrackedParmType>();
+      return std::shared_ptr<TrackedParamType>();
     }
 
     {
@@ -218,9 +224,9 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
     object = GetService();
     // Adapt the timeout in case we "missed" the object after having
     // been notified within the timeout.
-    if (!object && endTime > detail::Clock::time_point())
+    if (!object && endTime > std::chrono::steady_clock::time_point())
     {
-      timeout = std::chrono::duration_cast<D>(endTime - detail::Clock::now());
+      timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
   } while (!object);
@@ -325,21 +331,21 @@ ServiceTracker<S,T>::GetServiceReference() const
 }
 
 template<class S, class T>
-std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>
 ServiceTracker<S,T>::GetService(const ServiceReference<S>& reference) const
 {
   auto t = d->Tracked();
   if (!t)
   { /* if ServiceTracker is not open */
-    return std::shared_ptr<TrackedParmType>();
+    return std::shared_ptr<TrackedParamType>();
   }
   return (t->Lock(), t->GetCustomizedObject_unlocked(reference));
 }
 
 template<class S, class T>
-std::vector<std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>> ServiceTracker<S,T>::GetServices() const
+std::vector<std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>> ServiceTracker<S,T>::GetServices() const
 {
-  std::vector<std::shared_ptr<TrackedParmType>> services;
+  std::vector<std::shared_ptr<TrackedParamType>> services;
   auto t = d->Tracked();
   if (!t)
   { /* if ServiceTracker is not open */
@@ -358,7 +364,7 @@ std::vector<std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>> Serv
 }
 
 template<class S, class T>
-std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>
 ServiceTracker<S,T>::GetService() const
 {
   auto service = d->cachedService.Load();
@@ -375,7 +381,7 @@ ServiceTracker<S,T>::GetService() const
     auto reference = GetServiceReference();
     if (!reference.GetBundle())
     {
-      return std::shared_ptr<TrackedParmType>();
+      return std::shared_ptr<TrackedParamType>();
     }
     service = GetService(reference);
     d->cachedService.Store(service);
@@ -383,7 +389,7 @@ ServiceTracker<S,T>::GetService() const
   }
   catch (const ServiceException&)
   {
-    return std::shared_ptr<TrackedParmType>();
+    return std::shared_ptr<TrackedParamType>();
   }
 }
 
@@ -443,20 +449,20 @@ bool ServiceTracker<S,T>::IsEmpty() const
 }
 
 template<class S, class T>
-std::shared_ptr<typename ServiceTracker<S,T>::TrackedParmType>
+std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>
 ServiceTracker<S,T>::AddingService(const ServiceReference<S>& reference)
 {
   return TypeTraits::ConvertToTrackedType(d->context.GetService(reference));
 }
 
 template<class S, class T>
-void ServiceTracker<S,T>::ModifiedService(const ServiceReference<S>& /*reference*/, const std::shared_ptr<TrackedParmType>& /*service*/)
+void ServiceTracker<S,T>::ModifiedService(const ServiceReference<S>& /*reference*/, const std::shared_ptr<TrackedParamType>& /*service*/)
 {
   /* do nothing */
 }
 
 template<class S, class T>
-void ServiceTracker<S,T>::RemovedService(const ServiceReference<S>& /*reference*/, const std::shared_ptr<TrackedParmType>& /*service*/)
+void ServiceTracker<S,T>::RemovedService(const ServiceReference<S>& /*reference*/, const std::shared_ptr<TrackedParamType>& /*service*/)
 {
   /* do nothing */
 }

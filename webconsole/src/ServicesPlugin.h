@@ -33,14 +33,12 @@ public:
   ServicesPlugin();
 
 private:
-
-  void RenderContent(HttpServletRequest& /*request*/, HttpServletResponse& response);
+  void RenderContent(HttpServletRequest& /*request*/,
+                     HttpServletResponse& response);
 
   TemplateData GetIds() const;
   TemplateData GetInterface(const std::string& iid) const;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICESPLUGIN_H

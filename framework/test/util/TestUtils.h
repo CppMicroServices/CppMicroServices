@@ -29,24 +29,24 @@ limitations under the License.
 #include <string>
 
 #ifdef US_PLATFORM_APPLE
-#include <mach/mach_time.h>
+#  include <mach/mach_time.h>
 #elif defined(US_PLATFORM_POSIX)
-#include <limits.h>
-#include <time.h>
-#include <unistd.h>
-#ifndef _POSIX_MONOTONIC_CLOCK
-#error Monotonic clock support missing on this POSIX platform
-#endif
+#  include <limits.h>
+#  include <time.h>
+#  include <unistd.h>
+#  ifndef _POSIX_MONOTONIC_CLOCK
+#    error Monotonic clock support missing on this POSIX platform
+#  endif
 #elif defined(US_PLATFORM_WINDOWS)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#ifndef VC_EXTRA_LEAN
-#define VC_EXTRA_LEAN
-#endif
-#include <windows.h>
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
+#  ifndef VC_EXTRA_LEAN
+#    define VC_EXTRA_LEAN
+#  endif
+#  include <windows.h>
 #else
-#error High precision timer support not available on this platform
+#  error High precision timer support not available on this platform
 #endif
 
 namespace cppmicroservices {
@@ -57,25 +57,23 @@ class HighPrecisionTimer
 {
 
 public:
+  HighPrecisionTimer();
 
-    HighPrecisionTimer();
+  void Start();
 
-    void Start();
+  long long ElapsedMilli();
 
-    long long ElapsedMilli();
-
-    long long ElapsedMicro();
+  long long ElapsedMicro();
 
 private:
-
 #ifdef US_PLATFORM_APPLE
-    static double timeConvert;
-    uint64_t startTime;
+  static double timeConvert;
+  uint64_t startTime;
 #elif defined(US_PLATFORM_POSIX)
-    timespec startTime;
+  timespec startTime;
 #elif defined(US_PLATFORM_WINDOWS)
-    LARGE_INTEGER timerFrequency;
-    LARGE_INTEGER startTime;
+  LARGE_INTEGER timerFrequency;
+  LARGE_INTEGER startTime;
 #endif
 };
 
@@ -151,12 +149,10 @@ std::string MakeUniqueTempDirectory();
 
 File MakeUniqueTempFile(const std::string& base);
 
-Bundle GetBundle(
-    const std::string& bsn,
-    BundleContext context = BundleContext()
-    );
+Bundle GetBundle(const std::string& bsn,
+                 BundleContext context = BundleContext());
 
 } // namespace testing
 } // namespace cppmicroservices
 
-#endif  // CPPMICROSERVICES_TESTUTILS_H
+#endif // CPPMICROSERVICES_TESTUTILS_H

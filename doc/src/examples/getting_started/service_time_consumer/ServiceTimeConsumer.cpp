@@ -26,8 +26,7 @@ class ServiceTimeConsumerActivator : public BundleActivator
 
   void PrintTime(const ServiceTimeRef& ref) const
   {
-    if (!ref)
-    {
+    if (!ref) {
       std::cout << "ServiceTime reference invalid" << std::endl;
       return;
     }
@@ -37,13 +36,11 @@ class ServiceTimeConsumerActivator : public BundleActivator
 
     // Get the ServiceTime service
     auto svc_time = ctx.GetService(ref);
-    if (!svc_time)
-    {
+    if (!svc_time) {
       std::cout << "ServiceTime not available" << std::endl;
-    }
-    else
-    {
-      std::cout << "Elapsed: " << svc_time->elapsed().count() << "ms" << std::endl;
+    } else {
+      std::cout << "Elapsed: " << svc_time->elapsed().count() << "ms"
+                << std::endl;
     }
   }
 };

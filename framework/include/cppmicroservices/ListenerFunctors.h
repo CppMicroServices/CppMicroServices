@@ -23,26 +23,26 @@
 #ifndef CPPMICROSERVICES_LISTENERFUNCTORS_H
 #define CPPMICROSERVICES_LISTENERFUNCTORS_H
 
-#include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/FrameworkExport.h"
+#include "cppmicroservices/GlobalConfig.h"
 
 #include <cstring>
 #include <functional>
 
 namespace cppmicroservices {
 
-  class ServiceEvent;
-  class BundleEvent;
-  class FrameworkEvent;
-  class ServiceListeners;
+class ServiceEvent;
+class BundleEvent;
+class FrameworkEvent;
+class ServiceListeners;
 
-  /**
+/**
   \defgroup gr_listeners Listeners
 
   \brief Groups Listener related symbols.
   */
 
-  /**
+/**
    * \ingroup MicroServices
    * \ingroup gr_listeners
    *
@@ -56,9 +56,9 @@ namespace cppmicroservices {
    *
    * @see ServiceEvent
    */
-  typedef std::function<void(const ServiceEvent&)> ServiceListener;
+using ServiceListener = std::function<void (const ServiceEvent &)>;
 
-  /**
+/**
    * \ingroup MicroServices
    * \ingroup gr_listeners
    *
@@ -77,9 +77,9 @@ namespace cppmicroservices {
    *
    * @see BundleEvent
    */
-  typedef std::function<void(const BundleEvent&)> BundleListener;
+using BundleListener = std::function<void (const BundleEvent &)>;
 
-  /**
+/**
    * \ingroup MicroServices
    * \ingroup gr_listeners
    *
@@ -97,9 +97,9 @@ namespace cppmicroservices {
    *
    * @see FrameworkEvent
    */
-  typedef std::function<void(const FrameworkEvent&)> FrameworkListener;
+using FrameworkListener = std::function<void (const FrameworkEvent &)>;
 
-  /**
+/**
    * \ingroup MicroServices
    * \ingroup gr_listeners
    *
@@ -118,11 +118,15 @@ namespace cppmicroservices {
    * @param callback The member function pointer.
    * @returns a ServiceListener object.
    */
-  template<class R>
-  US_DEPRECATED ServiceListener ServiceListenerMemberFunctor(R* receiver, void (R::*callback)(const ServiceEvent&))
-  { return std::bind(callback, receiver, std::placeholders::_1); }
+template<class R>
+US_DEPRECATED ServiceListener
+ServiceListenerMemberFunctor(R* receiver,
+                             void (R::*callback)(const ServiceEvent&))
+{
+  return std::bind(callback, receiver, std::placeholders::_1);
+}
 
-  /**
+/**
    * \ingroup MicroServices
    * \ingroup gr_listeners
    *
@@ -141,11 +145,15 @@ namespace cppmicroservices {
    * @param callback The member function pointer.
    * @returns a BundleListener object.
    */
-  template<class R>
-  US_DEPRECATED BundleListener BundleListenerMemberFunctor(R* receiver, void (R::*callback)(const BundleEvent&))
-  { return std::bind(callback, receiver, std::placeholders::_1); }
+template<class R>
+US_DEPRECATED BundleListener
+BundleListenerMemberFunctor(R* receiver,
+                            void (R::*callback)(const BundleEvent&))
+{
+  return std::bind(callback, receiver, std::placeholders::_1);
+}
 
-  /**
+/**
    * \ingroup MicroServices
    * \ingroup gr_listeners
    *
@@ -164,17 +172,21 @@ namespace cppmicroservices {
    * @param callback The member function pointer.
    * @returns a FrameworkListener object.
    */
-  template<class R>
-  US_DEPRECATED FrameworkListener BindFrameworkListenerToFunctor(R* receiver, void (R::*callback)(const FrameworkEvent&))
-  { return std::bind(callback, receiver, std::placeholders::_1); }
+template<class R>
+US_DEPRECATED FrameworkListener
+BindFrameworkListenerToFunctor(R* receiver,
+                               void (R::*callback)(const FrameworkEvent&))
+{
+  return std::bind(callback, receiver, std::placeholders::_1);
+}
 }
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListener)
-  typedef void(*TargetType)(const cppmicroservices::ServiceEvent&);
-  const TargetType* targetFunc = arg.target<TargetType>();
-  void* targetPtr = nullptr;
-  std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
-  return hash<void*>()(targetPtr);
+using TargetType = void (*)(const cppmicroservices::ServiceEvent &);
+const auto* targetFunc = arg.target<TargetType>();
+void* targetPtr = nullptr;
+std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
+return hash<void*>()(targetPtr);
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_LISTENERFUNCTORS_H

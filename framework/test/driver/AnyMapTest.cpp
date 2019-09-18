@@ -28,7 +28,7 @@
 
 using namespace cppmicroservices;
 
-int AnyMapTest(int /*argc*/, char* /*argv*/[])
+int AnyMapTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("AnyMapTest");
 
@@ -41,10 +41,12 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(om.empty(), "Empty ordered map")
   US_TEST_CONDITION(om.count("key1") == 0, "No key1 key")
 
-  auto it = om.insert(std::make_pair(std::string("key1"), Any(std::string("val1"))));
+  auto it =
+    om.insert(std::make_pair(std::string("key1"), Any(std::string("val1"))));
   US_TEST_CONDITION(it.second, "Insert key1");
   US_TEST_CONDITION(it.first->first == "key1", "Insert iter correct")
-  US_TEST_CONDITION(it.first->second == std::string("val1"), "Insert iter correct")
+  US_TEST_CONDITION(it.first->second == std::string("val1"),
+                    "Insert iter correct")
   US_TEST_CONDITION(om["key1"] == std::string("val1"), "Get inserted item")
 
   /* Create a AnyMap with the following JSON representation:
@@ -76,7 +78,7 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   uo["hi"] = std::string("hi");
   uo["there"] = std::string("there");
 
-  std::vector<Any> anyVec { Any(std::string("one")), Any(2), Any(uo) };
+  std::vector<Any> anyVec{ Any(std::string("one")), Any(2), Any(uo) };
   uoci["vec"] = anyVec;
 
   om["uoci"] = uoci;
@@ -85,12 +87,24 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   US_TEST_CONDITION(om.AtCompoundKey("key1") == std::string("val1"), "Get key1")
   US_TEST_CONDITION(om.AtCompoundKey("uoci.first") == 1, "Get uoci.first")
   US_TEST_CONDITION(om.AtCompoundKey("uoci.second") == 2, "Get uoci.SECOND")
-  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.0") == std::string("one"), "Get uoci.Vec.0")
-  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.2.there") == std::string("there"), "Get uoci.Vec.2.there")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.0") == std::string("one"),
+                    "Get uoci.Vec.0")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.2.there") ==
+                      std::string("there"),
+                    "Get uoci.Vec.2.there")
+
+  Any emptyAny;
+  US_TEST_CONDITION(om.AtCompoundKey("key1", emptyAny) == std::string("val1"), "Get key1")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.first", emptyAny) == 1, "Get uoci.first")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.second", emptyAny) == 2, "Get uoci.SECOND")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.0", emptyAny) == std::string("one"),
+                    "Get uoci.Vec.0")
+  US_TEST_CONDITION(om.AtCompoundKey("uoci.Vec.2.there", emptyAny) ==
+                    std::string("there"),
+                    "Get uoci.Vec.2.there")
 
   std::set<std::string> keys;
-  for (auto p : uoci)
-  {
+  for (auto p : uoci) {
     keys.insert(p.first);
   }
   auto key = keys.begin();
@@ -114,6 +128,18 @@ int AnyMapTest(int /*argc*/, char* /*argv*/[])
   US_TEST_FOR_EXCEPTION_BEGIN(std::invalid_argument)
   uoci.AtCompoundKey("Vec.1.bla");
   US_TEST_FOR_EXCEPTION_END(std::invalid_argument)
+
+  // Test AtCompoundKey noexcept overload.
+  US_TEST_NO_EXCEPTION(om.AtCompoundKey("dot.key", emptyAny));
+  US_TEST_NO_EXCEPTION({
+    auto val = uoci.AtCompoundKey("Vec.bla", emptyAny);
+    US_TEST_CONDITION(val.Empty(), "expected val is empty");
+  });
+  US_TEST_NO_EXCEPTION({
+    auto val1 = uoci.AtCompoundKey("Vec.1.bla", Any(std::string("")));
+    US_TEST_CONDITION(!val1.Empty(), "expected val is not empty");
+    US_TEST_CONDITION(val1 == std::string(""), "expected val is empty string")
+  });
 
   US_TEST_END()
 }

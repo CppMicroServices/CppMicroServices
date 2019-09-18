@@ -1,0 +1,10 @@
+{
+    "bundle.symbolic_name" : "largeBundle",
+    "bundle_priority" : "high",
+    "bundle_start" : "greedy",
+    "bundle_configuration" : [{
+        "mode": "cloud",
+        "minProgLevel": "Dynamic",
+        "run_during_start" : "false"
+    }]
+}

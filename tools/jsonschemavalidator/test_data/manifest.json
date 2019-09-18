@@ -1,0 +1,7 @@
+{
+  "bundle": {
+    "vendor": "My Company, Inc.",
+    "symbolic_name": "com_mycompany_bundle",
+    "version": "1.0.0.patch-2019-10-11"
+  }
+}

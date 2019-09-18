@@ -2,13 +2,11 @@
 .. rubric:: Continuous Integration Status
 
 +-------------+-------------------------+--------------------------+------------------------+
-| Branch      | GCC 4.6                 | Visual Studio 2013       |                        |
+| Branch      | GCC 5.4 and 8.0         | Visual Studio 2015       |                        |
 |             +-------------------------+--------------------------+------------------------+
-|             | Xcode 6.4               | Visual Studio 2015       |                        |
+|             | Xcode 7.3 and 9.4       | Visual Studio 2017       |                        |
 |             +-------------------------+--------------------------+------------------------+
-|             | Xcode 7.3               | MinGW-w64                |                        |
-|             +-------------------------+--------------------------+------------------------+
-|             | Xcode 8.2               |                          |                        |
+|             | Clang 3.5 and 6.0       | MinGW-w64                |                        |
 +=============+=========================+==========================+========================+
 | master      | |Linux Build Status|    | |Windows Build status|   | |Code Coverage Status| |
 +-------------+-------------------------+--------------------------+------------------------+
@@ -52,13 +50,13 @@ dependencies are included and mostly used for implementation details.
 Supported Platforms
 -------------------
 
-The library makes use of some C++11 features and compiles on many
-different platforms.
+The library makes use of C++14 language and library features and compiles
+on many different platforms.
 
 Recommended minimum required compiler versions:
 
-- GCC 4.8
-- Clang 3.3
+- GCC 5.4
+- Clang 3.5
 - Clang from Xcode 8.0
 - Visual Studio 2015
 
@@ -66,22 +64,21 @@ You may use older compilers, but certain functionality may not be
 available. Check the warnings printed during configuration of
 your build tree. The following are the absolute minimum requirements:
 
-- GCC 4.6
-- Clang 3.1
-- Clang from Xcode 6.4
-- Visual Studio 2013
+- GCC 5.1
+- Clang 3.5
+- Clang from Xcode 7.3
+- Visual Studio 2015 (MSVC++ 14.0)
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 4.6.3 (Ubuntu 12.04) via Travis CI
-  GCC 4.8.4 (Ubuntu 14.04) via Travis CI
-- GCC 7.1.1 (Fedora 26)
-- Clang 4.0.0 (Fedora 26)
-- Clang Xcode 6.4 (OS X 10.10) via Travis CI
+- GCC 5.4 (Ubuntu 14.04) via Travis CI
+- GCC 8.0 (Ubuntu 14.04) via Travis CI
+- Clang 3.5 (Ubuntu 14.04) via Travis CI
+- Clang 6.0 (Ubuntu 14.04) via Travis CI
 - Clang Xcode 7.3 (OS X 10.11) via Travis CI
-- Clang Xcode 8.2 (OS X 10.12) via Travis CI
-- Visual Studio 2013 via Appveyor
+- Clang Xcode 9.4 (OS X 10.13) via Travis CI
 - Visual Studio 2015 via Appveyor
+- Visual Studio 2017 via Appveyor
 - MinGW-w64 via Appveyor
 
 Legal

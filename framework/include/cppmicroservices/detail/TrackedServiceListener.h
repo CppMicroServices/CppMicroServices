@@ -35,7 +35,7 @@ namespace detail {
  */
 struct TrackedServiceListener
 {
-  virtual ~TrackedServiceListener() {}
+  virtual ~TrackedServiceListener() = default;
 
   /**
    * Slot connected to service events for the
@@ -45,7 +45,6 @@ struct TrackedServiceListener
    * @param event <code>ServiceEvent</code> object from the framework.
    */
   virtual void ServiceChanged(const ServiceEvent& event) = 0;
-
 };
 
 } // namespace detail

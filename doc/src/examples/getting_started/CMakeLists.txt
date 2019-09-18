@@ -122,7 +122,7 @@ set(_srcs
   main.cpp
   )
 
-if(NOT US_BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS)
   # Set up dependencies to resources from static bundles
   usFunctionGetResourceSource(TARGET GettingStarted OUT _srcs)
 endif()
@@ -131,7 +131,7 @@ add_executable(GettingStarted ${_srcs})
 
 target_link_libraries(GettingStarted CppMicroServices)
 
-if(NOT US_BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS)
   set(_static_bundles ServiceTime_SystemClock ServiceTime_Consumer)
   target_link_libraries(GettingStarted ${_static_bundles})
   usFunctionEmbedResources(TARGET GettingStarted

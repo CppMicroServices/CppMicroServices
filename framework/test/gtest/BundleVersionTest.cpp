@@ -34,6 +34,7 @@ TEST(BundleVersion, EmptyVersion)
   ASSERT_EQ(zero, empty.GetMicro());
   ASSERT_EQ(std::string(), empty.GetQualifier());
   ASSERT_FALSE(empty.IsUndefined());
+  ASSERT_NO_THROW(BundleVersion stEmpty(std::string{}));
 }
 
 TEST(BundleVersion, UndefinedVersion)
@@ -48,17 +49,19 @@ TEST(BundleVersion, UndefinedVersion)
 
 TEST(BundleVersion, InvalidQualifier)
 {
-  ASSERT_THROW({
-      BundleVersion invalidQualifier(BundleVersion(1, 0, 0, std::string("<0>")));
-  }, std::invalid_argument);
+  ASSERT_THROW(
+    {
+      BundleVersion invalidQualifier(
+        BundleVersion(1, 0, 0, std::string("<0>")));
+    },
+    std::invalid_argument);
 
-  ASSERT_THROW({
-      BundleVersion invalidQualifier2(1, 0, 0, std::string("<?>0><"));
-  }, std::invalid_argument);
+  ASSERT_THROW(
+    { BundleVersion invalidQualifier2(1, 0, 0, std::string("<?>0><")); },
+    std::invalid_argument);
 
-  ASSERT_NO_THROW({
-      BundleVersion validQualifier2(1, 0, 0, std::string("_aok_1"));
-  });
+  ASSERT_NO_THROW(
+    { BundleVersion validQualifier2(1, 0, 0, std::string("_aok_1")); });
 }
 
 TEST(BundleVersion, Ctor)
@@ -77,9 +80,13 @@ TEST(BundleVersion, Ctor)
 
   ASSERT_NO_THROW(BundleVersion stringVersion(std::string("0.0.1_qa0_")));
 
-  ASSERT_THROW(BundleVersion invalidVersion(std::string("eight.two.twenty._not_ok")), std::invalid_argument);
+  ASSERT_THROW(
+    BundleVersion invalidVersion(std::string("eight.two.twenty._not_ok")),
+    std::invalid_argument);
 
-  ASSERT_THROW(BundleVersion tooManyVersions(std::string("1.1.1._ok.extra_version")), std::invalid_argument);
+  ASSERT_THROW(
+    BundleVersion tooManyVersions(std::string("1.1.1._ok.extra_version")),
+    std::invalid_argument);
 }
 
 TEST(BundleVersion, Accessors)
@@ -97,11 +104,13 @@ TEST(BundleVersion, Accessors)
 
 TEST(BundleVersion, ToString)
 {
-  ASSERT_EQ(std::string("undefined"), BundleVersion::UndefinedVersion().ToString());
+  ASSERT_EQ(std::string("undefined"),
+            BundleVersion::UndefinedVersion().ToString());
   ASSERT_EQ(std::string("0.0.0"), BundleVersion::EmptyVersion().ToString());
 
   ASSERT_EQ(std::string("1.0.0"), BundleVersion(1, 0, 0).ToString());
-  ASSERT_EQ(std::string("1.0.0._qualifier1"), BundleVersion(1, 0, 0, std::string("_qualifier1")).ToString());
+  ASSERT_EQ(std::string("1.0.0._qualifier1"),
+            BundleVersion(1, 0, 0, std::string("_qualifier1")).ToString());
 }
 
 TEST(BundleVersion, Comparison)
@@ -110,9 +119,11 @@ TEST(BundleVersion, Comparison)
   BundleVersion alphaVersion(0, 0, 1);
   BundleVersion betaVersion(0, 1, 0);
   BundleVersion releaseVersion(1, 0, 0);
-  
-  ASSERT_THROW(zeroVersion.Compare(BundleVersion::UndefinedVersion()), std::logic_error);
-  ASSERT_THROW(BundleVersion::UndefinedVersion().Compare(zeroVersion), std::logic_error);
+
+  ASSERT_THROW(zeroVersion.Compare(BundleVersion::UndefinedVersion()),
+               std::logic_error);
+  ASSERT_THROW(BundleVersion::UndefinedVersion().Compare(zeroVersion),
+               std::logic_error);
 
   ASSERT_EQ(0, zeroVersion.Compare(zeroVersion));
   ASSERT_NE(0, zeroVersion.Compare(alphaVersion));
@@ -128,19 +139,25 @@ TEST(BundleVersion, Comparison)
   ASSERT_TRUE(zeroVersion == BundleVersion::EmptyVersion());
   ASSERT_FALSE(zeroVersion == alphaVersion);
   ASSERT_FALSE(alphaVersion == betaVersion);
+  ASSERT_TRUE(BundleVersion::UndefinedVersion() == BundleVersion::UndefinedVersion());
+  ASSERT_THROW((void)(BundleVersion::UndefinedVersion() == zeroVersion.EmptyVersion()), 
+	           std::logic_error);
 }
 
 TEST(BundleVersion, ParseVersion)
 {
-  ASSERT_TRUE(BundleVersion::EmptyVersion() == BundleVersion::ParseVersion(std::string()));
-  ASSERT_TRUE(BundleVersion::EmptyVersion() == BundleVersion::ParseVersion(std::string("           ")));
-  ASSERT_FALSE(BundleVersion::EmptyVersion() == BundleVersion::ParseVersion(std::string("     1     ")));
+  ASSERT_TRUE(BundleVersion::EmptyVersion() ==
+              BundleVersion::ParseVersion(std::string()));
+  ASSERT_TRUE(BundleVersion::EmptyVersion() ==
+              BundleVersion::ParseVersion(std::string("           ")));
+  ASSERT_FALSE(BundleVersion::EmptyVersion() ==
+               BundleVersion::ParseVersion(std::string("     1     ")));
 
   ASSERT_NO_THROW(BundleVersion::ParseVersion(std::string("0.0.1")));
   ASSERT_NO_THROW(BundleVersion::ParseVersion(std::string("0.0.1_abc123")));
   ASSERT_NO_THROW(BundleVersion::ParseVersion(std::string("0.0.1-xyz098")));
 
   // FIXME: THIS SHOULD THROW OR FAIL SOMEHOW --> ASSERT_THROW(BundleVersion::ParseVersion(std::string("0.0.1-??0??")), std::invalid_argument);
-  ASSERT_THROW(BundleVersion::ParseVersion(std::string("0.0.1.-??0??")), std::invalid_argument);
+  ASSERT_THROW(BundleVersion::ParseVersion(std::string("0.0.1.-??0??")),
+               std::invalid_argument);
 }
-

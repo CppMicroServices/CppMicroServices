@@ -22,20 +22,21 @@
 
 #include "ServiceRegistrationBasePrivate.h"
 
+#include <utility>
+
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
+#  pragma warning(push)
+#  pragma warning(disable : 4355)
 #endif
 
 namespace cppmicroservices {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-    BundlePrivate* bundle,
-    const InterfaceMapConstPtr& service,
-    Properties&& props
-    )
+  BundlePrivate* bundle,
+  InterfaceMapConstPtr  service,
+  Properties&& props)
   : ref(0)
-  , service(service)
+  , service(std::move(service))
   , bundle(bundle)
   , reference(this)
   , properties(std::move(props))
@@ -53,9 +54,11 @@ ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
 
 bool ServiceRegistrationBasePrivate::IsUsedByBundle(BundlePrivate* bundle) const
 {
-  auto l = this->Lock(); US_UNUSED(l);
+  auto l = this->Lock();
+  US_UNUSED(l);
   return (dependents.find(bundle) != dependents.end()) ||
-      (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
+         (prototypeServiceInstances.find(bundle) !=
+          prototypeServiceInstances.end());
 }
 
 InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
@@ -63,18 +66,19 @@ InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
   return (this->Lock(), service);
 }
 
-std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(
+  const std::string& interfaceId) const
 {
   return this->Lock(), GetService_unlocked(interfaceId);
 }
 
-std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(const std::string& interfaceId) const
+std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(
+  const std::string& interfaceId) const
 {
   return ExtractInterface(service, interfaceId);
 }
-
 }
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+#  pragma warning(pop)
 #endif

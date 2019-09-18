@@ -24,8 +24,8 @@
 #define CPPMICROSERVICES_BUNDLEMANIFEST_H
 
 #include "cppmicroservices/Any.h"
-
 #include "cppmicroservices/AnyMap.h"
+#include <mutex>
 
 namespace cppmicroservices {
 
@@ -33,12 +33,11 @@ class BundleManifest
 {
 
 public:
-
   BundleManifest();
 
   void Parse(std::istream& is);
 
-  AnyMap GetHeaders() const;
+  const AnyMap& GetHeaders() const;
 
   bool Contains(const std::string& key) const;
   Any GetValue(const std::string& key) const;
@@ -49,9 +48,19 @@ public:
   std::map<std::string, Any> GetPropertiesDeprecated() const;
 
 private:
-
-  std::map<std::string, Any> m_PropertiesDeprecated;
+  // m_PropertiesDeprecated must be mutable because its content is lazily initialized when
+  // one of the const methods GetValueDeprecated(), GetKeysDeprecated(), or
+  // GetPropertiesDeprecated() is called.
+  mutable std::map<std::string, Any> m_PropertiesDeprecated;
+  mutable std::once_flag m_DidCopyDeprecatedProperties;
   AnyMap m_Headers;
+
+  /** copies m_Headers to m_PropertiesDeprecated exactly once per BundleManifest using
+   * std::call_once. Needs to be a const method because it's called from other const
+   * methods. However, it does modify the values of both mutable fields:
+   * m_PropertiesDeprecated and m_DidCopyDeprecatedProperties
+   */
+  void CopyDeprecatedProperties() const;
 };
 
 }

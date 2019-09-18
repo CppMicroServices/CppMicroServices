@@ -2,7 +2,7 @@
 project(CppMicroServicesExamples)
 
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(CppMicroServices NO_MODULE REQUIRED)
 
@@ -117,6 +117,10 @@ if(US_BUILD_TESTING)
 
   list(APPEND _doc_code_tests InstallCleanTest InstallTest DocCodeCleanTest
                              DocCodeCreateDirTest)
+  set(generator_platform)
+  if(CMAKE_GENERATOR_PLATFORM)
+    set(generator_platform -A ${CMAKE_GENERATOR_PLATFORM})
+  endif()
 
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
@@ -126,8 +130,8 @@ if(US_BUILD_TESTING)
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
                        "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
-                       -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
-                       -G ${CMAKE_GENERATOR}
+                       -D BUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+                       -G ${CMAKE_GENERATOR} ${generator_platform}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                        "${CMAKE_CURRENT_LIST_DIR}")
       set_tests_properties(DocCodeConfigureTest-${config} PROPERTIES
@@ -149,8 +153,8 @@ if(US_BUILD_TESTING)
                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                      "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                     -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
-                     -G ${CMAKE_GENERATOR}
+                     -D BUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+                     -G ${CMAKE_GENERATOR} ${generator_platform}
                      "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                      "${CMAKE_CURRENT_LIST_DIR}")
     set_tests_properties(DocCodeConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
@@ -167,7 +171,7 @@ if(US_BUILD_TESTING)
 
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system
-  if(UNIX AND NOT APPLE AND US_BUILD_SHARED_LIBS)
+  if(UNIX AND NOT APPLE AND BUILD_SHARED_LIBS)
 
     # We need to supply the correct language flag to the Makefile
     set(US_CXX11_FLAGS -std=c++11)

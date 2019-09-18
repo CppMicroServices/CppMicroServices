@@ -94,7 +94,7 @@ The Lean Mean C++ Option Parser
 MIT License
 
 http://sourceforge.net/projects/optionparser
-1.3
+1.7
 
 Patches
 
@@ -137,3 +137,23 @@ https://github.com/google/googletest/releases
 Patches
 
  * Suppress CMake warning about policy CMP0048
+ * Suppress tr1 namespace deprecation warnings
+
+RapidJSON
+---------
+
+See https://github.com/Tencent/rapidjson/blob/master/license.txt for license information
+
+https://github.com/Tencent/rapidjson/
+091de040edb3355dcf2f4a18c425aec51b906f08
+
+Google benchmark
+----------------
+
+See https://github.com/google/benchmark/blob/master/LICENSE for license information
+
+https://github.com/google/benchmark/releases
+1.4.1
+
+
+

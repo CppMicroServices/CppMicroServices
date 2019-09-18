@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H
 #define CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H
 
@@ -31,13 +30,12 @@ namespace cppmicroservices {
 
 struct BundlePropsInterface
 {
-  typedef ServiceProperties Properties;
+  using Properties = ServiceProperties;
 
   virtual ~BundlePropsInterface() {}
 
   virtual const Properties& GetProperties() const = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H

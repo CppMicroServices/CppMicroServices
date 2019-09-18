@@ -22,15 +22,19 @@ limitations under the License.
 
 #include "miniz.h"
 
-#include <vector>
 #include <cstring>
+#include <vector>
 
 /*
 * @brief Struct which represents an entry in the zip archive.
 */
 struct EntryInfo
 {
-  enum class EntryType { FILE, DIRECTORY };
+  enum class EntryType
+  {
+    FILE,
+    DIRECTORY
+  };
 
   std::string name;
   EntryType type;
@@ -46,8 +50,8 @@ class ZipFile
 {
 
 public:
-  typedef std::vector<EntryInfo>::const_reference const_reference;
-  typedef std::vector<EntryInfo>::size_type size_type;
+  using const_reference = std::vector<EntryInfo>::const_reference;
+  using size_type = std::vector<EntryInfo>::size_type;
 
   /*
   * @brief Read a zip archive and fill entries
@@ -58,42 +62,34 @@ public:
   {
     mz_zip_archive ziparchive;
     memset(&ziparchive, 0, sizeof(mz_zip_archive));
-    if (!mz_zip_reader_init_file(&ziparchive, filename.c_str(), 0))
-    {
+    if (!mz_zip_reader_init_file(&ziparchive, filename.c_str(), 0)) {
       throw std::runtime_error("Could not read zip archive file " + filename);
     }
 
     mz_uint numindices = mz_zip_reader_get_num_files(&ziparchive);
-    for (mz_uint index = 0; index < numindices; ++index)
-    {
+    for (mz_uint index = 0; index < numindices; ++index) {
       mz_zip_archive_file_stat filestat;
       EntryInfo entry;
       mz_zip_reader_file_stat(&ziparchive, index, &filestat);
 
       entry.name = filestat.m_filename;
-      entry.type = mz_zip_reader_is_file_a_directory(&ziparchive, index) ? \
-        EntryInfo::EntryType::DIRECTORY : EntryInfo::EntryType::FILE;
+      entry.type = mz_zip_reader_is_file_a_directory(&ziparchive, index)
+                     ? EntryInfo::EntryType::DIRECTORY
+                     : EntryInfo::EntryType::FILE;
       entry.compressedSize = filestat.m_comp_size;
       entry.uncompressedSize = filestat.m_uncomp_size;
       entry.crc32 = filestat.m_crc32;
       entries.push_back(entry);
     }
 
-    if (!mz_zip_reader_end(&ziparchive))
-    {
+    if (!mz_zip_reader_end(&ziparchive)) {
       throw std::runtime_error("Could not close zip archive file " + filename);
     }
   }
 
-  size_type size() const
-  {
-    return entries.size();
-  }
+  size_type size() const { return entries.size(); }
 
-  const_reference operator[](size_type i) const
-  {
-    return entries[i];
-  }
+  const_reference operator[](size_type i) const { return entries[i]; }
 
   /*
   * @brief: Returns the names of all entries in a std::vector
@@ -101,8 +97,7 @@ public:
   std::vector<std::string> getNames() const
   {
     std::vector<std::string> entryNames;
-    for (const auto& entry : entries)
-    {
+    for (const auto& entry : entries) {
       entryNames.push_back(entry.name);
     }
     return entryNames;

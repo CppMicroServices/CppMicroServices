@@ -39,79 +39,44 @@ template<class Key, class T>
 class ShrinkableMap
 {
 private:
-  static std::map<Key,T> emptyContainer;
+  static std::map<Key, T> emptyContainer;
 
 public:
-
-  typedef std::map<Key,T> container_type;
-  typedef typename container_type::iterator iterator;
-  typedef typename container_type::const_iterator const_iterator;
-  typedef typename container_type::size_type size_type;
-  typedef typename container_type::key_type key_type;
-  typedef typename container_type::mapped_type mapped_type;
-  typedef typename container_type::value_type value_type;
-  typedef typename container_type::reference reference;
-  typedef typename container_type::const_reference const_reference;
+  using  container_type = std::map<Key, T>;
+  using iterator = typename container_type::iterator;
+  using const_iterator = typename container_type::const_iterator;
+  using size_type = typename container_type::size_type;
+  using key_type = typename container_type::key_type;
+  using mapped_type = typename container_type::mapped_type;
+  using value_type = typename container_type::value_type;
+  using reference = typename container_type::reference;
+  using const_reference = typename container_type::const_reference;
 
   ShrinkableMap()
     : container(emptyContainer)
-  {
-  }
+  {}
 
-  iterator begin()
-  {
-    return container.begin();
-  }
+  iterator begin() { return container.begin(); }
 
-  const_iterator begin() const
-  {
-    return container.begin();
-  }
+  const_iterator begin() const { return container.begin(); }
 
-  iterator end()
-  {
-    return container.end();
-  }
+  iterator end() { return container.end(); }
 
-  const_iterator end() const
-  {
-    return container.end();
-  }
+  const_iterator end() const { return container.end(); }
 
-  void erase(iterator pos)
-  {
-    container.erase(pos);
-  }
+  void erase(iterator pos) { container.erase(pos); }
 
-  void erase(iterator first, iterator last)
-  {
-    container.erase(first, last);
-  }
+  void erase(iterator first, iterator last) { container.erase(first, last); }
 
-  size_type erase(const Key& key)
-  {
-    return container.erase(key);
-  }
+  size_type erase(const Key& key) { return container.erase(key); }
 
-  bool empty() const
-  {
-    return container.empty();
-  }
+  bool empty() const { return container.empty(); }
 
-  void clear()
-  {
-    container.clear();
-  }
+  void clear() { container.clear(); }
 
-  size_type size() const
-  {
-    return container.size();
-  }
+  size_type size() const { return container.size(); }
 
-  size_type max_size() const
-  {
-    return container.max_size();
-  }
+  size_type max_size() const { return container.max_size(); }
 
   /**
    * \rststar
@@ -122,60 +87,36 @@ public:
    *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableMap::at>` instead.
    * \endrststar
    */
-  US_DEPRECATED T& operator[](const Key& key)
-  {
-    return container[key];
-  }
+  US_DEPRECATED T& operator[](const Key& key) { return container[key]; }
 
-  T& at(const Key& key)
-  {
-    return container.at(key);
-  }
+  T& at(const Key& key) { return container.at(key); }
 
-  const T& at(const Key& key) const
-  {
-    return container.at(key);
-  }
+  const T& at(const Key& key) const { return container.at(key); }
 
-  size_type count(const Key& key) const
-  {
-    return container.count(key);
-  }
+  size_type count(const Key& key) const { return container.count(key); }
 
-  iterator find(const Key& key)
-  {
-    return container.find(key);
-  }
+  iterator find(const Key& key) { return container.find(key); }
 
-  const_iterator find(const Key& key) const
-  {
-    return container.find(key);
-  }
+  const_iterator find(const Key& key) const { return container.find(key); }
 
-  std::pair<iterator,iterator> equal_range(const Key& key)
+  std::pair<iterator, iterator> equal_range(const Key& key)
   {
     return container.equal_range(key);
   }
 
-  std::pair<const_iterator,const_iterator> equal_range(const Key& key) const
+  std::pair<const_iterator, const_iterator> equal_range(const Key& key) const
   {
     return container.equal_range(key);
   }
 
-  iterator lower_bound(const Key& key)
-  {
-    return container.lower_bound(key);
-  }
+  iterator lower_bound(const Key& key) { return container.lower_bound(key); }
 
   const_iterator lower_bound(const Key& key) const
   {
     return container.lower_bound(key);
   }
 
-  iterator upper_bound(const Key& key)
-  {
-    return container.upper_bound(key);
-  }
+  iterator upper_bound(const Key& key) { return container.upper_bound(key); }
 
   const_iterator upper_bound(const Key& key) const
   {
@@ -183,7 +124,6 @@ public:
   }
 
 private:
-
   friend class ServiceHooks;
 
   ShrinkableMap(container_type& container)
@@ -194,8 +134,7 @@ private:
 };
 
 template<class Key, class T>
-std::map<Key,T> ShrinkableMap<Key,T>::emptyContainer;
-
+std::map<Key, T> ShrinkableMap<Key, T>::emptyContainer;
 }
 
 #endif // CPPMICROSERVICES_SHRINKABLEMAP_H

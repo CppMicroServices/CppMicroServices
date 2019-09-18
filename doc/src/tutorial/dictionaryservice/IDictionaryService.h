@@ -29,13 +29,13 @@
 #include <string>
 
 #ifdef US_BUILD_SHARED_LIBS
-#ifdef Tutorial_dictionaryservice_EXPORTS
-  #define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
+#  ifdef Tutorial_dictionaryservice_EXPORTS
+#    define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
+#  else
+#    define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT
+#  endif
 #else
-  #define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT
-#endif
-#else
-#define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
+#  define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**

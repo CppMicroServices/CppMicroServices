@@ -41,7 +41,6 @@ set(_tests
   BundleActivatorTest
   BundleEventTest
   BundleHooksTest
-  BundleManifestTest
   BundleTest
   BundleResourceTest
   MemcheckTest
@@ -59,7 +58,7 @@ set(_tests
   StaticBundleTest
 )
 
-if(US_BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
   list(APPEND _tests
        ServiceListenerTest
        SharedLibraryTest
@@ -109,10 +108,13 @@ target_include_directories(${_test_driver} PRIVATE $<TARGET_PROPERTY:util,INCLUD
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
-  set_source_files_properties(${_srcs} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
+  set_source_files_properties(${_srcs} 
+								PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
+											COMPILE_FLAGS -Wno-deprecated
+											COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
-if(NOT US_BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_bundle_libs})
 endif()
 
@@ -151,7 +153,7 @@ endif()
 # Add dependencies for shared libraries
 #-----------------------------------------------------------------------------
 
-if(US_BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
   foreach(_test_bundle ${_us_test_bundle_libs})
     add_dependencies(${_test_driver} ${_test_bundle})
   endforeach()

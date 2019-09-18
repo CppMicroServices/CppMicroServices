@@ -20,31 +20,34 @@
 
 =============================================================================*/
 
+#include <utility>
+
 #include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
 
 #include "cppmicroservices/webconsole/WebConsoleConstants.h"
 
-#include "cppmicroservices/ServiceProperties.h"
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleResource.h"
+#include "cppmicroservices/ServiceProperties.h"
 
 namespace cppmicroservices {
 
-SimpleWebConsolePlugin::SimpleWebConsolePlugin(const std::string& label, const std::string& title,
-                                               const std::string& category, const std::vector<std::string>& css)
+SimpleWebConsolePlugin::SimpleWebConsolePlugin(
+  const std::string& label,
+  const std::string& title,
+  std::string  category,
+  std::vector<std::string>  css)
   : m_Label(label)
   , m_Title(title)
-  , m_Category(category)
-  , m_Css(css)
+  , m_Category(std::move(category))
+  , m_Css(std::move(css))
   , m_Context()
 {
-  if (label.empty())
-  {
+  if (label.empty()) {
     throw std::invalid_argument("Empty label");
   }
-  if (title.empty())
-  {
+  if (title.empty()) {
     throw std::invalid_argument("Empty title");
   }
 
@@ -67,27 +70,27 @@ std::string SimpleWebConsolePlugin::GetCategory() const
   return m_Category;
 }
 
-std::shared_ptr<SimpleWebConsolePlugin> SimpleWebConsolePlugin::Register(const BundleContext& context)
+std::shared_ptr<SimpleWebConsolePlugin> SimpleWebConsolePlugin::Register(
+  const BundleContext& context)
 {
   ServiceProperties props;
   props[WebConsoleConstants::PLUGIN_LABEL] = GetLabel();
   props[WebConsoleConstants::PLUGIN_TITLE] = GetTitle();
-  if (!GetCategory().empty())
-  {
+  if (!GetCategory().empty()) {
     props[WebConsoleConstants::PLUGIN_CATEGORY] = GetCategory();
   }
   m_Context = context;
   m_Reg = m_Context.RegisterService<HttpServlet>(shared_from_this(), props);
-  return std::static_pointer_cast<SimpleWebConsolePlugin>(this->shared_from_this());
+  return std::static_pointer_cast<SimpleWebConsolePlugin>(
+    this->shared_from_this());
 }
 
 void SimpleWebConsolePlugin::Unregister()
 {
-  if (m_Reg)
-  {
+  if (m_Reg) {
     m_Reg.Unregister();
   }
-  m_Reg = 0;
+  m_Reg = nullptr;
   m_Context = nullptr;
 }
 
@@ -101,12 +104,12 @@ BundleContext SimpleWebConsolePlugin::GetContext() const
   return m_Context;
 }
 
-BundleResource SimpleWebConsolePlugin::GetResource(const std::string& path) const
+BundleResource SimpleWebConsolePlugin::GetResource(
+  const std::string& path) const
 {
   return (m_Context && path.size() > m_LabelRes.size() &&
-          path.compare(0, m_LabelRes.size(), m_LabelRes) == 0) ?
-        m_Context.GetBundle().GetResource(path.substr(m_LabelResLen)) :
-        BundleResource();
+          path.compare(0, m_LabelRes.size(), m_LabelRes) == 0)
+           ? m_Context.GetBundle().GetResource(path.substr(m_LabelResLen))
+           : BundleResource();
 }
-
 }

@@ -52,20 +52,19 @@ namespace cppmicroservices {
  * @tparam Interfaces Template parameter pack containing zero or more service interfaces
  * @see BundleContext#RegisterService()
  */
-template<class I1, class ...Interfaces>
+template<class I1, class... Interfaces>
 class ServiceRegistration : public ServiceRegistrationBase
 {
 
 public:
-
   /**
    * Creates an invalid ServiceRegistration object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceRegistration() : ServiceRegistrationBase()
-  {
-  }
+  ServiceRegistration()
+    : ServiceRegistrationBase()
+  {}
 
   /**
    * Returns a <code>ServiceReference</code> object for a service being
@@ -82,8 +81,10 @@ public:
   template<class Interface>
   ServiceReference<Interface> GetReference() const
   {
-    static_assert(detail::Contains<Interface, I1, Interfaces...>::value, "Requested interface type not available");
-    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<Interface>());
+    static_assert(detail::Contains<Interface, I1, Interfaces...>::value,
+                  "Requested interface type not available");
+    return this->ServiceRegistrationBase::GetReference(
+      us_service_interface_iid<Interface>());
   }
 
   /**
@@ -100,21 +101,18 @@ public:
    */
   ServiceReference<I1> GetReference() const
   {
-    return this->ServiceRegistrationBase::GetReference(us_service_interface_iid<I1>());
+    return this->ServiceRegistrationBase::GetReference(
+      us_service_interface_iid<I1>());
   }
-
 
   using ServiceRegistrationBase::operator=;
 
 private:
-
   friend class BundleContext;
 
   ServiceRegistration(const ServiceRegistrationBase& base)
     : ServiceRegistrationBase(base)
-  {
-  }
-
+  {}
 };
 
 /// \cond
@@ -123,20 +121,18 @@ template<>
 class ServiceRegistration<void> : public ServiceRegistrationBase
 {
 public:
-
   /**
    * Creates an invalid ServiceRegistration object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
-  ServiceRegistration() : ServiceRegistrationBase()
-  {
-  }
+  ServiceRegistration()
+    : ServiceRegistrationBase()
+  {}
 
   ServiceRegistration(const ServiceRegistrationBase& base)
     : ServiceRegistrationBase(base)
-  {
-  }
+  {}
 
   using ServiceRegistrationBase::operator=;
 };
@@ -148,8 +144,7 @@ public:
  *
  * A service registration object of unknown type.
  */
-typedef ServiceRegistration<void> ServiceRegistrationU;
-
+using ServiceRegistrationU = ServiceRegistration<void>;
 }
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATION_H

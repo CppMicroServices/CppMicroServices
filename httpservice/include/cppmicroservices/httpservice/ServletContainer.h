@@ -25,8 +25,8 @@
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace cppmicroservices {
 
@@ -37,7 +37,8 @@ class BundleContext;
 class US_HttpService_EXPORT ServletContainer
 {
 public:
-  ServletContainer(BundleContext bundleCtx, const std::string& contextPath = std::string());
+  ServletContainer(BundleContext bundleCtx,
+                   const std::string& contextPath = std::string());
   ~ServletContainer();
 
   void SetContextPath(const std::string& contextPath);
@@ -50,12 +51,10 @@ public:
   std::string GetContextPath(const ServletContext* context) const;
 
 private:
-
   friend class ServletContext;
 
   ServletContainerPrivate* d;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVLETCONTAINER_H

@@ -40,8 +40,7 @@ struct CoreBundleContextHolder
   ~CoreBundleContextHolder()
   {
     auto const state = ctx->systemBundle->state.load();
-    if (((Bundle::STATE_STARTING | Bundle::STATE_ACTIVE) & state) == 0)
-    {
+    if (((Bundle::STATE_STARTING | Bundle::STATE_ACTIVE) & state) == 0) {
       // Call WaitForStop in case someone did call Framework::Stop()
       // but didn't wait for it. This joins with a potentially
       // running framework shut down thread.
@@ -52,7 +51,8 @@ struct CoreBundleContextHolder
     // Create a new CoreBundleContext holder, in case some event listener
     // gets the system bundle and starts it again.
     auto fwCtx = ctx.get();
-    std::shared_ptr<CoreBundleContext> holder(std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
+    std::shared_ptr<CoreBundleContext> holder(
+      std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
     holder->SetThis(holder);
     holder->systemBundle->Shutdown(false);
     holder->systemBundle->WaitForStop(std::chrono::milliseconds::zero());
@@ -61,11 +61,15 @@ struct CoreBundleContextHolder
   std::unique_ptr<CoreBundleContext> ctx;
 };
 
-Framework FrameworkFactory::NewFramework(const FrameworkConfiguration& configuration, std::ostream* logger)
+Framework FrameworkFactory::NewFramework(
+  const FrameworkConfiguration& configuration,
+  std::ostream* logger)
 {
-  std::unique_ptr<CoreBundleContext> ctx(new CoreBundleContext(configuration, logger));
+  std::unique_ptr<CoreBundleContext> ctx(
+    new CoreBundleContext(configuration, logger));
   auto fwCtx = ctx.get();
-  std::shared_ptr<CoreBundleContext> holder(std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
+  std::shared_ptr<CoreBundleContext> holder(
+    std::make_shared<CoreBundleContextHolder>(std::move(ctx)), fwCtx);
   holder->SetThis(holder);
   return Framework(holder->systemBundle);
 }
@@ -75,15 +79,15 @@ Framework FrameworkFactory::NewFramework()
   return NewFramework(FrameworkConfiguration());
 }
 
-Framework FrameworkFactory::NewFramework(const std::map<std::string, Any>& configuration, std::ostream* logger)
+Framework FrameworkFactory::NewFramework(
+  const std::map<std::string, Any>& configuration,
+  std::ostream* logger)
 {
   FrameworkConfiguration fwConfig;
-  for (auto& c : configuration)
-  {
+  for (auto& c : configuration) {
     fwConfig.insert(c);
   }
 
   return NewFramework(fwConfig, logger);
 }
-
 }

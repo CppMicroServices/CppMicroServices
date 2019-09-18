@@ -36,14 +36,14 @@ class BundleStorageMemory : public BundleStorage
 {
 
 public:
-
   BundleStorageMemory();
 
-  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(const std::string& location);
+  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
+    const std::string& location);
 
   std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-      const std::shared_ptr<const BundleResourceContainer>& resCont,
-      const std::vector<std::string>& topLevelEntries);
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::vector<std::string>& topLevelEntries);
 
   bool RemoveArchive(const BundleArchive* ba);
 
@@ -54,7 +54,6 @@ public:
   void Close();
 
 private:
-
   /**
    * Next available bundle id.
    */
@@ -63,9 +62,10 @@ private:
   /**
    * Bundle id sorted list of all active bundle archives.
    */
-  struct : detail::MultiThreaded<> { std::map<long, std::shared_ptr<BundleArchive>> v; } archives;
-
-
+  struct : detail::MultiThreaded<>
+  {
+    std::map<long, std::shared_ptr<BundleArchive>> v;
+  } archives;
 };
 
 } // namespace cppmicroservices

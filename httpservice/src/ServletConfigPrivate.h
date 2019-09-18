@@ -34,13 +34,11 @@ class ServletContext;
 
 struct ServletConfigPrivate : public SharedData
 {
-  ServletConfigPrivate()
-  {}
+  ServletConfigPrivate() {}
 
   std::string m_Name;
   std::shared_ptr<ServletContext> m_Context;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVLETCONFIGPRIVATE_H

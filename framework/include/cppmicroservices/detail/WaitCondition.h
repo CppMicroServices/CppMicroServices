@@ -36,7 +36,6 @@ template<class MutexHost>
 class WaitCondition
 {
 public:
-
   void Wait(typename MutexHost::UniqueLock& lock)
   {
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -58,16 +57,14 @@ public:
   }
 
   template<class Rep, class Period>
-  std::cv_status WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time)
+  std::cv_status WaitFor(typename MutexHost::UniqueLock& lock,
+                         const std::chrono::duration<Rep, Period>& rel_time)
   {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    if (rel_time == std::chrono::duration<Rep, Period>::zero())
-    {
+    if (rel_time == std::chrono::duration<Rep, Period>::zero()) {
       Wait(lock);
       return std::cv_status::no_timeout;
-    }
-    else
-    {
+    } else {
       return m_CondVar.wait_for(lock.m_Lock, rel_time);
     }
 #else
@@ -78,16 +75,15 @@ public:
   }
 
   template<class Rep, class Period, class Predicate>
-  bool WaitFor(typename MutexHost::UniqueLock& lock, const std::chrono::duration<Rep, Period>& rel_time, Predicate pred)
+  bool WaitFor(typename MutexHost::UniqueLock& lock,
+               const std::chrono::duration<Rep, Period>& rel_time,
+               Predicate pred)
   {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    if (rel_time == std::chrono::duration<Rep, Period>::zero())
-    {
+    if (rel_time == std::chrono::duration<Rep, Period>::zero()) {
       Wait(lock, pred);
       return true;
-    }
-    else
-    {
+    } else {
       return m_CondVar.wait_for(lock.m_Lock, rel_time, pred);
     }
 #else
@@ -115,7 +111,6 @@ public:
   }
 
 private:
-
 #ifdef US_ENABLE_THREADING_SUPPORT
   std::condition_variable m_CondVar;
 #endif

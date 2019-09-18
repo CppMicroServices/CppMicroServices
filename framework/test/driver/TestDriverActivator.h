@@ -30,7 +30,6 @@ namespace cppmicroservices {
 class TestDriverActivator : public BundleActivator
 {
 public:
-
   TestDriverActivator();
 
   static bool StartCalled();
@@ -40,11 +39,9 @@ public:
   void Stop(BundleContext);
 
 private:
-
   static TestDriverActivator* m_Instance;
   bool m_StartCalled;
 };
-
 }
 
 #endif // CPPMICROSERVICES_TESTDRIVERACTIVATOR_H

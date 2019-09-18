@@ -31,11 +31,11 @@
 
 #ifdef US_PLATFORM_WINDOWS
 
-#include "cppmicroservices/util/Error.h"
-#include "cppmicroservices/util/String.h"
-#include <windows.h>
+#  include "cppmicroservices/util/Error.h"
+#  include "cppmicroservices/util/String.h"
+#  include <windows.h>
 
-#define RTLD_LAZY 0 // unused
+#  define RTLD_LAZY 0 // unused
 
 const char* dlerror(void)
 {
@@ -44,38 +44,39 @@ const char* dlerror(void)
   return errStr.c_str();
 }
 
-void* dlopen(const char * path, int mode)
+void* dlopen(const char* path, int mode)
 {
   (void)mode; // ignored
   auto loadLibrary = [](const std::string& path) -> HANDLE {
     std::wstring wpath(cppmicroservices::util::ToWString(path));
     return LoadLibraryW(wpath.c_str());
   };
-  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr) : loadLibrary(path));
+  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr)
+                                                 : loadLibrary(path));
 }
 
-void* dlsym(void *handle, const char *symbol)
+void* dlsym(void* handle, const char* symbol)
 {
-  return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(handle), symbol));
+  return reinterpret_cast<void*>(
+    GetProcAddress(reinterpret_cast<HMODULE>(handle), symbol));
 }
 
 #elif defined(__GNUC__)
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+#  ifndef _GNU_SOURCE
+#    define _GNU_SOURCE
+#  endif
+
+#  include <dlfcn.h>
+
+#  if defined(__APPLE__)
+#    include <mach-o/dyld.h>
+#    include <sys/param.h>
+#  endif
+
+#  include <unistd.h>
+
 #endif
-
-#include <dlfcn.h>
-
-#if defined(__APPLE__)
-#include <mach-o/dyld.h>
-#include <sys/param.h>
-#endif
-
-#include <unistd.h>
-
-#endif
-
 
 namespace cppmicroservices {
 
@@ -86,21 +87,22 @@ std::shared_ptr<detail::LogSink> GetFrameworkLogSink()
   return GetPrivate(GetBundleContext())->bundle->coreCtx->sink;
 }
 
-namespace BundleUtils
-{
+namespace BundleUtils {
 
 void* GetExecutableHandle()
 {
-  return dlopen(0, RTLD_LAZY);;
+  return dlopen(nullptr, RTLD_LAZY);
+  ;
 }
 
 void* GetSymbol(void* libHandle, const char* symbol)
 {
   void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
-  if (!addr)
-  {
+  if (!addr) {
     const char* dlerrorMsg = dlerror();
-    DIAG_LOG(*GetFrameworkLogSink()) << "GetSymbol() failed to find (" << symbol << ") with error : "<< (dlerrorMsg ? dlerrorMsg : "unknown");
+    DIAG_LOG(*GetFrameworkLogSink())
+      << "GetSymbol() failed to find (" << symbol
+      << ") with error : " << (dlerrorMsg ? dlerrorMsg : "unknown");
   }
   return addr;
 }

@@ -38,4 +38,3 @@ public:
 };
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyStaticBundleActivator)
-

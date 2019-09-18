@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_TRACKEDSERVICE_H
 #define CPPMICROSERVICES_TRACKEDSERVICE_H
 
@@ -29,7 +28,7 @@
 #include "cppmicroservices/detail/TrackedServiceListener.h"
 
 namespace cppmicroservices {
-  
+
 namespace detail {
 
 /**
@@ -37,17 +36,17 @@ namespace detail {
  * the CppMicroServices bundle system.
  */
 template<class S, class TTT>
-class TrackedService : public TrackedServiceListener,
-    public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
+class TrackedService
+  : public TrackedServiceListener
+  , public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
 {
 
 public:
+  using T = typename TTT::TrackedType;
+  using TrackedParamType = typename TTT::TrackedParamType;
 
-  typedef typename TTT::TrackedType T;
-  typedef typename TTT::TrackedParmType TrackedParmType;
-
-  TrackedService(ServiceTracker<S,T>* serviceTracker,
-                 ServiceTrackerCustomizer<S,T>* customizer);
+  TrackedService(ServiceTracker<S, T>* serviceTracker,
+                 ServiceTrackerCustomizer<S, T>* customizer);
 
   /**
    * Method connected to service events for the
@@ -56,14 +55,13 @@ public:
    *
    * @param event <code>ServiceEvent</code> object from the framework.
    */
-  void ServiceChanged(const ServiceEvent& event);
+  void ServiceChanged(const ServiceEvent& event) override;
 
 private:
+  using Superclass = BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
 
-  typedef BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent> Superclass;
-
-  ServiceTracker<S,T>* serviceTracker;
-  ServiceTrackerCustomizer<S,T>* customizer;
+  ServiceTracker<S, T>* serviceTracker;
+  ServiceTrackerCustomizer<S, T>* customizer;
 
   /**
    * Increment the tracking count and tell the tracker there was a
@@ -71,7 +69,7 @@ private:
    *
    * @GuardedBy this
    */
-  void Modified();
+  void Modified() override;
 
   /**
    * Call the specific customizer adding method. This method must not be
@@ -82,7 +80,9 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  std::shared_ptr<TrackedParmType> CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related);
+  std::shared_ptr<TrackedParamType> CustomizerAdding(
+    ServiceReference<S> item,
+    const ServiceEvent& related) override;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -93,7 +93,8 @@ private:
    * @param object Customized object for the tracked item.
    */
   void CustomizerModified(ServiceReference<S> item,
-                          const ServiceEvent& related, const std::shared_ptr<TrackedParmType>& object) ;
+                          const ServiceEvent& related,
+                          const std::shared_ptr<TrackedParamType>& object) override;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -104,7 +105,8 @@ private:
    * @param object Customized object for the tracked item.
    */
   void CustomizerRemoved(ServiceReference<S> item,
-                         const ServiceEvent& related, const std::shared_ptr<TrackedParmType>& object) ;
+                         const ServiceEvent& related,
+                         const std::shared_ptr<TrackedParamType>& object) override;
 };
 
 } // namespace detail

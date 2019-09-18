@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #include "cppmicroservices/BundleResource.h"
 
 #include "cppmicroservices/GetBundleContext.h"
@@ -31,6 +30,7 @@
 
 #include <atomic>
 #include <string>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -38,9 +38,8 @@ class BundleResourcePrivate
 {
 
 public:
-
-  BundleResourcePrivate(const std::shared_ptr<const BundleArchive>& archive)
-    : archive(archive)
+  BundleResourcePrivate(std::shared_ptr<const BundleArchive>  archive)
+    : archive(std::move(archive))
     , ref(1)
   {}
 
@@ -65,59 +64,48 @@ public:
 void BundleResourcePrivate::InitFilePath(const std::string& file)
 {
   std::string normalizedFile = file;
-  if (normalizedFile.empty() || normalizedFile[0] != '/')
-  {
+  if (normalizedFile.empty() || normalizedFile[0] != '/') {
     normalizedFile = '/' + normalizedFile;
   }
 
   std::string rawPath;
   std::size_t index = normalizedFile.find_last_of('/');
-  if (index == std::string::npos)
-  {
+  if (index == std::string::npos) {
     fileName = normalizedFile;
-  }
-  else if (index < normalizedFile.size()-1)
-  {
-    fileName = normalizedFile.substr(index+1);
-    rawPath = normalizedFile.substr(0,index+1);
-  }
-  else
-  {
+  } else if (index < normalizedFile.size() - 1) {
+    fileName = normalizedFile.substr(index + 1);
+    rawPath = normalizedFile.substr(0, index + 1);
+  } else {
     rawPath = normalizedFile;
   }
 
   // remove duplicate /
   std::string::value_type lastChar = 0;
-  for (std::size_t i = 0; i < rawPath.size(); ++i)
-  {
-    if (rawPath[i] == '/' && lastChar == '/')
-    {
+  for (char i : rawPath) {
+    if (i == '/' && lastChar == '/') {
       continue;
     }
-    lastChar = rawPath[i];
+    lastChar = i;
     path.push_back(lastChar);
   }
-  if (path.empty())
-  {
+  if (path.empty()) {
     path.push_back('/');
   }
 }
 
 BundleResource::BundleResource()
   : d(new BundleResourcePrivate(nullptr))
-{
-}
+{}
 
-BundleResource::BundleResource(const BundleResource &resource)
+BundleResource::BundleResource(const BundleResource& resource)
   : d(resource.d)
 {
   ++d->ref;
 }
 
 BundleResource::BundleResource(
-    const std::string& file,
-    const std::shared_ptr<const BundleArchive>& archive
-    )
+  const std::string& file,
+  const std::shared_ptr<const BundleArchive>& archive)
   : d(new BundleResourcePrivate(archive))
 {
   d->InitFilePath(file);
@@ -128,13 +116,13 @@ BundleResource::BundleResource(
 }
 
 BundleResource::BundleResource(
-    int index,
-    const std::shared_ptr<const BundleArchive>& archive
-    )
+  int index,
+  const std::shared_ptr<const BundleArchive>& archive)
   : d(new BundleResourcePrivate(archive))
 {
   d->archive->GetResourceContainer()->GetStat(index, d->stat);
-  d->InitFilePath(d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
+  d->InitFilePath(
+    d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
 }
 
 BundleResource::~BundleResource()
@@ -143,7 +131,7 @@ BundleResource::~BundleResource()
     delete d;
 }
 
-BundleResource& BundleResource::operator =(const BundleResource& resource)
+BundleResource& BundleResource::operator=(const BundleResource& resource)
 {
   BundleResourcePrivate* curr_d = d;
   d = resource.d;
@@ -155,21 +143,25 @@ BundleResource& BundleResource::operator =(const BundleResource& resource)
   return *this;
 }
 
-bool BundleResource::operator <(const BundleResource& resource) const
+bool BundleResource::operator<(const BundleResource& resource) const
 {
   return this->GetResourcePath() < resource.GetResourcePath();
 }
 
-bool BundleResource::operator ==(const BundleResource& resource) const
+bool BundleResource::operator==(const BundleResource& resource) const
 {
-  if (!this->IsValid()) return !resource.IsValid();
-  if (!resource.IsValid()) return false;
-  return d->archive->GetResourceContainer() == resource.d->archive->GetResourceContainer() &&
-      d->archive->GetResourcePrefix() == resource.d->archive->GetResourcePrefix() &&
-      this->GetResourcePath() == resource.GetResourcePath();
+  if (!this->IsValid())
+    return !resource.IsValid();
+  if (!resource.IsValid())
+    return false;
+  return d->archive->GetResourceContainer() ==
+           resource.d->archive->GetResourceContainer() &&
+         d->archive->GetResourcePrefix() ==
+           resource.d->archive->GetResourcePrefix() &&
+         this->GetResourcePath() == resource.GetResourcePath();
 }
 
-bool BundleResource::operator !=(const BundleResource &resource) const
+bool BundleResource::operator!=(const BundleResource& resource) const
 {
   return !(*this == resource);
 }
@@ -212,13 +204,15 @@ std::string BundleResource::GetCompleteBaseName() const
 std::string BundleResource::GetSuffix() const
 {
   std::size_t index = d->fileName.find_last_of('.');
-  return index < d->fileName.size()-1 ? d->fileName.substr(index+1) : std::string("");
+  return index < d->fileName.size() - 1 ? d->fileName.substr(index + 1)
+                                        : std::string("");
 }
 
 std::string BundleResource::GetCompleteSuffix() const
 {
   std::size_t index = d->fileName.find_first_of('.');
-  return index < d->fileName.size()-1 ? d->fileName.substr(index+1) : std::string("");
+  return index < d->fileName.size() - 1 ? d->fileName.substr(index + 1)
+                                        : std::string("");
 }
 
 bool BundleResource::IsDir() const
@@ -233,12 +227,12 @@ bool BundleResource::IsFile() const
 
 std::vector<std::string> BundleResource::GetChildren() const
 {
-  if (!IsValid() || !IsDir()) return d->children;
+  if (!IsValid() || !IsDir())
+    return d->children;
 
-  if (d->children.empty())
-  {
-    d->archive->GetResourceContainer()->GetChildren(d->stat.filePath, true,
-                                                    d->children, d->childNodes);
+  if (d->children.empty()) {
+    d->archive->GetResourceContainer()->GetChildren(
+      d->stat.filePath, true, d->children, d->childNodes);
   }
   return d->children;
 }
@@ -247,18 +241,20 @@ std::vector<BundleResource> BundleResource::GetChildResources() const
 {
   std::vector<BundleResource> childResources;
 
-  if (!IsValid() || !IsDir()) return childResources;
+  if (!IsValid() || !IsDir())
+    return childResources;
 
-  if (d->childNodes.empty())
-  {
-    d->archive->GetResourceContainer()->GetChildren(this->GetResourcePath(), true,
-                                                    d->children, d->childNodes);
+  if (d->childNodes.empty()) {
+    d->archive->GetResourceContainer()->GetChildren(
+      this->GetResourcePath(), true, d->children, d->childNodes);
   }
 
   for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(),
-       iterEnd = d->childNodes.end(); iter != iterEnd; ++iter)
-  {
-    childResources.push_back(BundleResource(static_cast<int>(*iter), d->archive));
+                                             iterEnd = d->childNodes.end();
+       iter != iterEnd;
+       ++iter) {
+    childResources.push_back(
+      BundleResource(static_cast<int>(*iter), d->archive));
   }
   return childResources;
 }
@@ -278,19 +274,25 @@ time_t BundleResource::GetLastModified() const
   return d->stat.modifiedTime;
 }
 
+uint32_t BundleResource::GetCrc32() const
+{
+  return d->stat.crc32;
+}
+
 std::size_t BundleResource::Hash() const
 {
   using namespace std;
-  return hash<std::string>()(d->archive->GetResourcePrefix() + this->GetResourcePath());
+  return hash<std::string>()(d->archive->GetResourcePrefix() +
+                             this->GetResourcePath());
 }
 
-std::unique_ptr<void, void(*)(void*)> BundleResource::GetData() const
+std::unique_ptr<void, void (*)(void*)> BundleResource::GetData() const
 {
-  if (!IsValid()) return { nullptr, ::free };
+  if (!IsValid())
+    return { nullptr, ::free };
 
   auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
-  if (!data)
-  {
+  if (!data) {
     auto sink = GetBundleContext().GetLogSink();
     DIAG_LOG(*sink) << "Error uncompressing resource data for "
                     << this->GetResourcePath() << " from "

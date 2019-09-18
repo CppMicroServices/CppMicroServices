@@ -25,19 +25,19 @@
 
 #include "cppmicroservices/Any.h"
 
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace cppmicroservices {
 
 namespace detail {
 
-struct any_map_cihash
+struct US_Framework_EXPORT any_map_cihash
 {
   std::size_t operator()(const std::string& key) const;
 };
 
-struct any_map_ciequal
+struct US_Framework_EXPORT any_map_ciequal
 {
   bool operator()(const std::string& l, const std::string& r) const;
 };
@@ -67,21 +67,21 @@ class US_Framework_EXPORT any_map
 {
 
 public:
-
-  typedef std::string key_type;
-  typedef Any mapped_type;
-  typedef std::pair<const key_type, mapped_type> value_type;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type& reference;
-  typedef value_type const& const_reference;
-  typedef value_type* pointer;
-  typedef value_type const* const_pointer;
-
-  typedef std::map<std::string, Any> ordered_any_map;
-  typedef std::unordered_map<std::string, Any> unordered_any_map;
-  typedef std::unordered_map<std::string, Any, detail::any_map_cihash, detail::any_map_ciequal> unordered_any_cimap;
-
+  using key_type = std::string;
+  using mapped_type = Any;
+  using value_type = std::pair<const key_type, mapped_type>;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type&;
+  using const_reference = const value_type&;
+  using pointer = value_type*;
+  using const_pointer = const value_type*;
+  using ordered_any_map = std::map<std::string, Any>;
+  using unordered_any_map = std::unordered_map<std::string, Any>;
+  using unordered_any_cimap = std::unordered_map<std::string,
+                                                 Any,
+                                                 detail::any_map_cihash,
+                                                 detail::any_map_ciequal>;
   enum map_type : uint8_t
   {
     ORDERED_MAP,
@@ -90,13 +90,11 @@ public:
   };
 
 private:
-
   class US_Framework_EXPORT iterator_base
   {
     friend class any_map;
 
   protected:
-
     enum iter_type : uint8_t
     {
       NONE,
@@ -105,43 +103,38 @@ private:
       UNORDERED_CI
     };
 
-    iter_type type;
+    iter_type type{ NONE };
 
     iterator_base()
-      : type(NONE)
-    {}
+
+      = default;
 
     iterator_base(iter_type type)
       : type(type)
     {}
 
   public:
+    using value_type = any_map::value_type;
 
-    typedef any_map::value_type value_type;
-
-    typedef std::forward_iterator_tag iterator_category;
-    typedef any_map::difference_type difference_type;
-
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = any_map::difference_type;
   };
 
 public:
-
   class iter;
 
   class US_Framework_EXPORT const_iter : public iterator_base
   {
   private:
-
-    typedef ordered_any_map::const_iterator ociter;
-    typedef unordered_any_map::const_iterator uociter;
-    typedef unordered_any_cimap::const_iterator uocciiter;
+    using ociter = ordered_any_map::const_iterator;
+    using uociter = unordered_any_map::const_iterator;
+    using uocciiter = unordered_any_cimap::const_iterator;
 
   public:
+    using reference = any_map::const_reference;
+    using pointer = any_map::const_pointer;
 
-    typedef any_map::const_reference reference;
-    typedef any_map::const_pointer pointer;
-
-    typedef const_iter iterator;
+    using iterator = const_iter;
 
     const_iter();
     const_iter(const iterator& it);
@@ -151,8 +144,8 @@ public:
     const_iter(ociter&& it);
     const_iter(uociter&& it, iter_type type);
 
-    reference operator* () const;
-    pointer operator-> () const;
+    reference operator*() const;
+    pointer operator->() const;
 
     iterator& operator++();
     iterator operator++(int);
@@ -161,7 +154,6 @@ public:
     bool operator!=(const iterator& x) const;
 
   private:
-
     ociter const& o_it() const;
     ociter& o_it();
     uociter const& uo_it() const;
@@ -169,7 +161,8 @@ public:
     uocciiter const& uoci_it() const;
     uocciiter& uoci_it();
 
-    union {
+    union
+    {
       ociter* o;
       uociter* uo;
       uocciiter* uoci;
@@ -179,17 +172,15 @@ public:
   class US_Framework_EXPORT iter : public iterator_base
   {
   private:
-
-    typedef ordered_any_map::iterator oiter;
-    typedef unordered_any_map::iterator uoiter;
-    typedef unordered_any_cimap::iterator uociiter;
+    using oiter = ordered_any_map::iterator;
+    using uoiter = unordered_any_map::iterator;
+    using uociiter = unordered_any_cimap::iterator;
 
   public:
+    using reference = any_map::reference;
+    using pointer = any_map::pointer;
 
-    typedef any_map::reference reference;
-    typedef any_map::pointer pointer;
-
-    typedef iter iterator;
+    using iterator = iter;
 
     iter();
     iter(const iter& it);
@@ -198,8 +189,8 @@ public:
     iter(oiter&& it);
     iter(uoiter&& it, iter_type type);
 
-    reference operator* () const;
-    pointer operator-> () const;
+    reference operator*() const;
+    pointer operator->() const;
 
     iterator& operator++();
     iterator operator++(int);
@@ -208,7 +199,6 @@ public:
     bool operator!=(const iterator& x) const;
 
   private:
-
     friend class const_iter;
 
     oiter const& o_it() const;
@@ -218,16 +208,16 @@ public:
     uociiter const& uoci_it() const;
     uociiter& uoci_it();
 
-    union {
+    union
+    {
       oiter* o;
       uoiter* uo;
       uociiter* uoci;
     } it;
-
   };
 
-  typedef iter iterator;
-  typedef const_iter const_iterator;
+  using iterator = iter;
+  using const_iterator = const_iter;
 
   any_map(map_type type);
   any_map(const ordered_any_map& m);
@@ -236,6 +226,9 @@ public:
 
   any_map(const any_map& m);
   any_map& operator=(const any_map& m);
+
+  any_map(any_map&& m) noexcept;
+  any_map& operator=(any_map&& m) noexcept;
 
   ~any_map();
 
@@ -258,14 +251,34 @@ public:
   mapped_type& operator[](key_type&& key);
 
   std::pair<iterator, bool> insert(const value_type& value);
+
+  template<class... Args>
+  std::pair<iterator, bool> emplace(Args&&... args)
+  {
+    switch (type) {
+      case map_type::ORDERED_MAP: {
+        return o_m().emplace(std::forward<Args>(args)...);
+      }
+      case map_type::UNORDERED_MAP: {
+        auto p = uo_m().emplace(std::forward<Args>(args)...);
+        return { iterator(std::move(p.first), iterator::UNORDERED), p.second };
+      }
+      case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS: {
+        auto p = uoci_m().emplace(std::forward<Args>(args)...);
+        return { iterator(std::move(p.first), iterator::UNORDERED_CI),
+                 p.second };
+      }
+      default:
+        throw std::logic_error("invalid map type");
+    }
+  }
+
   const_iterator find(const key_type& key) const;
 
 protected:
-
   map_type type;
 
 private:
-
   ordered_any_map const& o_m() const;
   ordered_any_map& o_m();
   unordered_any_map const& uo_m() const;
@@ -273,7 +286,12 @@ private:
   unordered_any_cimap const& uoci_m() const;
   unordered_any_cimap& uoci_m();
 
-  union {
+  inline void copy_from(const any_map& m);
+  inline void move_from(any_map&& m) noexcept;
+  inline void destroy() noexcept;
+
+  union
+  {
     ordered_any_map* o;
     unordered_any_map* uo;
     unordered_any_cimap* uoci;
@@ -295,11 +313,13 @@ private:
 class US_Framework_EXPORT AnyMap : public any_map
 {
 public:
-
   AnyMap(map_type type);
   AnyMap(const ordered_any_map& m);
+  AnyMap(ordered_any_map&& m);
   AnyMap(const unordered_any_map& m);
+  AnyMap(unordered_any_map&& m);
   AnyMap(const unordered_any_cimap& m);
+  AnyMap(unordered_any_cimap&& m);
 
   /**
    * Get the underlying STL container type.
@@ -338,19 +358,55 @@ public:
    * @return A reference to the key's value.
    *
    * @throws std::invalid_argument if the \c Any value for a given key is not of type \c AnyMap or \c std::vector<Any>.
-   * std::out_of_range if the key is not found or a numerical index would fall out of the range of an \c int type.
+   * @throws std::out_of_range if the key is not found or a numerical index would fall out of the range of an \c int type.
    */
-  mapped_type& AtCompoundKey(const key_type& key);
   const mapped_type& AtCompoundKey(const key_type& key) const;
 
+  /**
+   * Return a key's value, using a compound key notation if the key is found in the map or
+   * return the provided default value if the key is not found
+   *
+   * A compound key consists of one or more key names, concatenated with
+   * the '.' (dot) character. Each key except the last requires the referenced
+   * Any object to be of type \c AnyMap or \c std::vector<Any>. Containers
+   * of type \c std::vector<Any> are indexed using 0-based numerical key names.
+   *
+   * For example, a \c AnyMap object holding data of the following layout
+   * \code{.json}
+   * {
+   *   one: 1,
+   *   two: "two",
+   *   three: {
+   *     a: "anton",
+   *     b: [ 3, 8 ]
+   *   }
+   * }
+   * \endcode
+   * can be queried using the following notation:
+   * \code
+   * map.AtCompoundKey("one", Any());       // returns Any(1)
+   * map.AtCompoundKey("four", Any());       // returns Any()
+   * map.AtCompoundKey("three.a", Any());          // returns Any(std::string("anton"))
+   * map.AtCompoundKey("three.c", Any());          // returns Any()
+   * map.AtCompoundKey("three.b.1", Any());        // returns Any(8)
+   * map.AtCompoundKey("three.b.4", Any());        // returns Any()
+   * \endcode
+   *
+   * @param key The key hierachy to query.
+   * @param defaultValue is the value to be returned if the key is not found
+   * @return A copy of the key's value.
+   */
+  mapped_type AtCompoundKey(const key_type& key, mapped_type defaultValue) const
+    noexcept;
 };
 
 template<>
-US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m);
+US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
+                                                      const AnyMap& m);
 
 template<>
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m);
-
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    const AnyMap& m);
 }
 
 #endif // CPPMICROSERVICES_ANYMAP_H

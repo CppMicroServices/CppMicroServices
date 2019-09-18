@@ -1,0 +1,49 @@
+diff --git a/third_party/miniz.c b/third_party/miniz.c
+old mode 100644
+new mode 100755
+index 6b0ebd7a..16efc6e1
+--- a/third_party/miniz.c
++++ b/third_party/miniz.c
+@@ -2885,6 +2885,15 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h,
+       MZ_FREE(pModeW);
+       return pFile;
+     }
++
++    static int mz_stat(const char *pFilename, struct _stat64 *file_stat)
++    {
++        FILE* pFile = NULL;
++        wchar_t* pFilenameW = utf8_to_wchar(pFilename);
++        int errcode = _wstat64(pFilenameW, file_stat);
++        MZ_FREE(pFilenameW);
++        return errcode;
++    }
+     
+     static FILE *mz_freopen(const char *pPath, const char *pMode, FILE *pStream)
+     {
+@@ -2909,8 +2918,8 @@ void *tdefl_write_image_to_png_file_in_memory(const void *pImage, int w, int h,
+     #define MZ_FWRITE fwrite
+     #define MZ_FTELL64 _ftelli64
+     #define MZ_FSEEK64 _fseeki64
+-    #define MZ_FILE_STAT_STRUCT _stat
+-    #define MZ_FILE_STAT _stat
++    #define MZ_FILE_STAT_STRUCT _stat64
++    #define MZ_FILE_STAT mz_stat
+     #define MZ_FFLUSH fflush
+     #define MZ_FREOPEN mz_freopen
+     #define MZ_DELETE_FILE remove
+@@ -3374,12 +3383,12 @@ mz_bool mz_zip_reader_init_file(mz_zip_archive *pZip, const char *pFilename, mz_
+   MZ_FILE *pFile = MZ_FOPEN(pFilename, "rb");
+   if (!pFile)
+     return MZ_FALSE;
+-  if (MZ_FSEEK64(pFile, 0, SEEK_END))
++  struct MZ_FILE_STAT_STRUCT file_stat;
++  if (0 != MZ_FILE_STAT(pFilename, &file_stat))
+   {
+-    MZ_FCLOSE(pFile);
+     return MZ_FALSE;
+   }
+-  file_size = MZ_FTELL64(pFile);
++  file_size = file_stat.st_size;
+   if (!mz_zip_reader_init_internal(pZip, flags))
+   {
+     MZ_FCLOSE(pFile);

@@ -29,13 +29,13 @@
 
 #include "BundleEventInternal.h"
 
-#include <string>
-#include <chrono>
 #include <atomic>
+#include <chrono>
+#include <string>
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-#include <future>
-#include <thread>
+#  include <future>
+#  include <thread>
 #endif
 
 namespace cppmicroservices {
@@ -57,9 +57,13 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
 
   std::chrono::milliseconds startStopTimeout;
 
-  struct Op : detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
+  struct Op
+    : detail::MultiThreaded<detail::MutexLockingStrategy<>,
+                            detail::WaitCondition>
   {
-    Op() : operation(OP_IDLE) {}
+    Op()
+      : operation(OP_IDLE)
+    {}
 
     std::atomic<BundlePrivate*> bundle;
     std::atomic<int> operation;
@@ -68,12 +72,14 @@ class BundleThread : public std::enable_shared_from_this<BundleThread>
 
   std::atomic<bool> doRun;
 
-  struct : detail::MultiThreaded<> { std::thread v; } th;
+  struct : detail::MultiThreaded<>
+  {
+    std::thread v;
+  } th;
 #endif
 
 public:
-
-  typedef detail::MultiThreaded<>::UniqueLock UniqueLock;
+using UniqueLock = detail::MultiThreaded<>::UniqueLock;
 
   BundleThread(CoreBundleContext* ctx);
   ~BundleThread();
@@ -102,14 +108,14 @@ public:
   /**
    * Note! Must be called while holding packages lock.
    */
-  std::exception_ptr StartAndWait(BundlePrivate* b, int op, UniqueLock& resolveLock);
+  std::exception_ptr StartAndWait(BundlePrivate* b,
+                                  int op,
+                                  UniqueLock& resolveLock);
 
   bool IsExecutingBundleChanged() const;
 
   bool operator==(const std::thread::id& id) const;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLETHREAD_H

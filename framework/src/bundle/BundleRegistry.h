@@ -43,10 +43,10 @@ struct BundleActivator;
  * Here we handle all the bundles that are known to the framework.
  * @remarks This class is thread-safe.
  */
-class BundleRegistry : private detail::MultiThreaded<> {
+class BundleRegistry : private detail::MultiThreaded<>
+{
 
 public:
-
   BundleRegistry(CoreBundleContext* coreCtx);
   virtual ~BundleRegistry(void);
 
@@ -64,11 +64,10 @@ public:
   std::vector<Bundle> Install(const std::string& location,
                               BundlePrivate* caller);
 
-
   std::vector<Bundle> Install0(
-      const std::string& location,
-      const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
-      BundlePrivate* caller);
+    const std::string& location,
+    const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
+    BundlePrivate* caller);
 
   /**
    * Remove bundle registration.
@@ -92,7 +91,8 @@ public:
    * @param location The location of the bundles to get.
    * @return A list of Bundle instances.
    */
-  std::vector<std::shared_ptr<BundlePrivate>> GetBundles(const std::string& location) const;
+  std::vector<std::shared_ptr<BundlePrivate>> GetBundles(
+    const std::string& location) const;
 
   /**
    * Get all bundles that have the specified bundle symbolic
@@ -102,7 +102,9 @@ public:
    * @param version The bundle version of bundle to get.
    * @return Collection of BundleImpls.
    */
-  std::vector<std::shared_ptr<BundlePrivate>> GetBundles(const std::string& name, const BundleVersion& version) const;
+  std::vector<std::shared_ptr<BundlePrivate>> GetBundles(
+    const std::string& name,
+    const BundleVersion& version) const;
 
   /**
    * Get all known bundles.
@@ -128,25 +130,25 @@ public:
   void Load();
 
 private:
-
   // don't allow copying the BundleRegistry.
-  BundleRegistry(const BundleRegistry& );
-  BundleRegistry& operator=(const BundleRegistry& );
+  BundleRegistry(const BundleRegistry&);
+  BundleRegistry& operator=(const BundleRegistry&);
 
   void CheckIllegalState() const;
 
   CoreBundleContext* coreCtx;
 
-  typedef std::multimap<std::string, std::shared_ptr<BundlePrivate>> BundleMap;
+using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 
   /**
    * Table of all installed bundles in this framework.
    * Key is the bundle location.
    */
-  struct : MultiThreaded<> { BundleMap v; } bundles;
-
+  struct : MultiThreaded<>
+  {
+    BundleMap v;
+  } bundles;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEREGISTRY_H

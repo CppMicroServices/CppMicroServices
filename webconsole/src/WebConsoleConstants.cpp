@@ -26,14 +26,22 @@
 
 namespace cppmicroservices {
 
-std::string WebConsoleConstants::SERVICE_NAME = us_service_interface_iid<HttpServlet>();
-std::string WebConsoleConstants::PLUGIN_LABEL = "org.cppmicroservices.webconsole.label";
-std::string WebConsoleConstants::PLUGIN_TITLE = "org.cppmicroservices.webconsole.title";
-std::string WebConsoleConstants::PLUGIN_CATEGORY = "org.cppmicroservices.webconsole.category";
-std::string WebConsoleConstants::PLUGIN_CSS_REFERENCES = "org.cppmicroservices.webconsole.css";
-std::string WebConsoleConstants::ATTR_APP_ROOT = "org.cppmicroservices.webconsole.appRoot";
-std::string WebConsoleConstants::ATTR_PLUGIN_ROOT =  "org.cppmicroservices.webconsole.pluginRoot";
-std::string WebConsoleConstants::ATTR_LABEL_MAP = "org.cppmicroservices.webconsole.labelMap";
-std::string WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER = "org.cppmicroservices.webconsole.variable.resolver";
-
+std::string WebConsoleConstants::SERVICE_NAME =
+  us_service_interface_iid<HttpServlet>();
+std::string WebConsoleConstants::PLUGIN_LABEL =
+  "org.cppmicroservices.webconsole.label";
+std::string WebConsoleConstants::PLUGIN_TITLE =
+  "org.cppmicroservices.webconsole.title";
+std::string WebConsoleConstants::PLUGIN_CATEGORY =
+  "org.cppmicroservices.webconsole.category";
+std::string WebConsoleConstants::PLUGIN_CSS_REFERENCES =
+  "org.cppmicroservices.webconsole.css";
+std::string WebConsoleConstants::ATTR_APP_ROOT =
+  "org.cppmicroservices.webconsole.appRoot";
+std::string WebConsoleConstants::ATTR_PLUGIN_ROOT =
+  "org.cppmicroservices.webconsole.pluginRoot";
+std::string WebConsoleConstants::ATTR_LABEL_MAP =
+  "org.cppmicroservices.webconsole.labelMap";
+std::string WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER =
+  "org.cppmicroservices.webconsole.variable.resolver";
 }

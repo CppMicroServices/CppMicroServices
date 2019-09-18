@@ -29,9 +29,8 @@ struct Debug
 {
   Debug();
 
-  bool lazyActivation;
+  bool lazyActivation{false};
 };
-
 }
 
 #endif // CPPMICROSERVICES_DEBUG_H

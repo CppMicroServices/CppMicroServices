@@ -34,38 +34,27 @@ class FooServiceImpl : public FooService
 {
 
 public:
-  void foo()
-  {
-    std::cout << "TestBundleSL4: Doing foo";
-  }
+  void foo() { std::cout << "TestBundleSL4: Doing foo"; }
 };
 
-class ActivatorSL4 :
-public BundleActivator
+class ActivatorSL4 : public BundleActivator
 {
 
 public:
-
-  ~ActivatorSL4()
-  {
-
-  }
+  ~ActivatorSL4() {}
 
   void Start(BundleContext context)
   {
-    sr = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+    sr =
+      context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
     std::cout << "TestBundleSL4: Registered " << sr;
   }
 
-  void Stop(BundleContext /*context*/)
-  {
-  }
+  void Stop(BundleContext /*context*/) {}
 
 private:
-
   ServiceRegistration<FooService> sr;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL4)

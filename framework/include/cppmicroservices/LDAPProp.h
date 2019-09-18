@@ -27,8 +27,8 @@
 #include "cppmicroservices/FrameworkConfig.h"
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
+#  pragma warning(push)
+#  pragma warning(disable : 4251)
 #endif
 
 namespace cppmicroservices {
@@ -38,7 +38,7 @@ class US_Framework_EXPORT LDAPPropExpr
 {
 public:
   LDAPPropExpr();
-  explicit LDAPPropExpr(const std::string& expr);
+  explicit LDAPPropExpr(std::string  expr);
 
   LDAPPropExpr& operator!();
 
@@ -95,7 +95,6 @@ public:
   /// @}
 
 private:
-
   std::string m_ldapExpr;
 };
 /// \endcond
@@ -123,13 +122,12 @@ private:
 class US_Framework_EXPORT LDAPProp
 {
 public:
-
   /**
    * Create a LDAPProp instance for the named LDAP property.
    *
    * @param property The name of the LDAP property.
    */
-  LDAPProp(const std::string& property);
+  LDAPProp(std::string  property);
 
   /**
    * LDAP equality '='
@@ -151,7 +149,7 @@ public:
   }
   /// @}
 
-  operator LDAPPropExpr () const;
+  operator LDAPPropExpr() const;
 
   /**
    * States the absence of the LDAP property.
@@ -247,16 +245,14 @@ public:
   /// @}
 
 private:
-
-  LDAPProp& operator=(const LDAPProp&);
+  LDAPProp& operator=(const LDAPProp&) = delete;
 
   std::string m_property;
 };
-
 }
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+#  pragma warning(pop)
 #endif
 
 /**
@@ -269,7 +265,9 @@ private:
  * @param right A LDAP expression.
  * @return A LDAP expression
  */
-US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(const cppmicroservices::LDAPPropExpr& left, const cppmicroservices::LDAPPropExpr& right);
+US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(
+  const cppmicroservices::LDAPPropExpr& left,
+  const cppmicroservices::LDAPPropExpr& right);
 
 /**
  * \ingroup MicroServicesUtils
@@ -281,6 +279,8 @@ US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(const cppmicroserv
  * @param right A LDAP expression.
  * @return A LDAP expression
  */
-US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator||(const cppmicroservices::LDAPPropExpr& left, const cppmicroservices::LDAPPropExpr& right);
+US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator||(
+  const cppmicroservices::LDAPPropExpr& left,
+  const cppmicroservices::LDAPPropExpr& right);
 
 #endif // CPPMICROSERVICES_LDAPPROP_H

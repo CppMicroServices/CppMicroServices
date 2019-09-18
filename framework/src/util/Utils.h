@@ -20,14 +20,13 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_UTILS_H
 #define CPPMICROSERVICES_UTILS_H
 
+#include "BundleResourceContainer.h"
 #include "cppmicroservices/FrameworkExport.h"
 
 #include <string>
-
 
 namespace cppmicroservices {
 
@@ -35,9 +34,19 @@ namespace cppmicroservices {
 // File type checking
 //-------------------------------------------------------------------
 
-bool IsSharedLibrary(const std::string& location);
-
 bool IsBundleFile(const std::string& location);
+
+/**
+ * Return true if the bundle's zip file only contains a 
+ * manifest file, false otherwise.
+ *
+ * @param resContainer The BundleResourceContainer to check
+ *
+ * @return true if the bundle's zip file only contains a 
+ *         manifest file, false otherwise.
+ * @throw std::runtime_error if the bundle manifest cannot be read.
+ */
+bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer);
 
 //-------------------------------------------------------------------
 // Framework storage
@@ -50,11 +59,21 @@ extern const std::string FWDIR_DEFAULT;
 std::string GetFrameworkDir(CoreBundleContext* ctx);
 
 /**
- * Check for local file storage directory.
- *
- * @return A directory path or an empty string if no storage is available.
- */
-std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool create = true);
+* Optionally create and get the persistent storage path.
+*
+* @param ctx Pointer to the CoreBundleContext object.
+* @param leafDir The name of the leaf directory in the persistent storage path.
+* @param create Specify if the directory needs to be created if it doesn't already exist.
+*
+* @return A directory path or an empty string if no storage is available.
+*
+* @throw std::runtime_error if the storage directory is inaccessible
+*        or if there exists a file named @c leafDir in that directory
+*        or if the directory cannot be created when @c create is @c true.
+*/
+std::string GetPersistentStoragePath(CoreBundleContext* ctx,
+                                     const std::string& leafDir,
+                                     bool create = true);
 
 //-------------------------------------------------------------------
 // Generic utility functions
@@ -63,9 +82,9 @@ std::string GetFileStorage(CoreBundleContext* ctx, const std::string& name, bool
 void TerminateForDebug(const std::exception_ptr ex);
 
 namespace detail {
-US_Framework_EXPORT std::string GetDemangledName(const std::type_info& typeInfo);
+US_Framework_EXPORT std::string GetDemangledName(
+  const std::type_info& typeInfo);
 }
-
 
 } // namespace cppmicroservices
 

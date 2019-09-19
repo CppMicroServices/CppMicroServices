@@ -36,22 +36,22 @@ void streamOperatorTest(Bundle::State bundleState, std::string expectedStr)
   std::cout.rdbuf(backup);
 }
 
-TEST(BundleStreamOperatorTest, streamStateUninstalled)
+TEST(BundleStreamOperatorTest, bundleStateUninstalled)
 {
   streamOperatorTest(Bundle::STATE_UNINSTALLED, "UNINSTALLED");
 }
 
-TEST(BundleStreamOperatorTest, streamStateStarting)
+TEST(BundleStreamOperatorTest, bundleStateStarting)
 {
   streamOperatorTest(Bundle::STATE_STARTING, "STARTING");
 }
 
-TEST(BundleStreamOperatorTest, streamStateStopping)
+TEST(BundleStreamOperatorTest, bundleStateStopping)
 {
   streamOperatorTest(Bundle::STATE_STOPPING, "STOPPING");
 }
 
-TEST(BundleStreamOperatorTest, streamStateDefault)
+TEST(BundleStreamOperatorTest, bundleStateDefault)
 {
   streamOperatorTest(Bundle::State(), std::string{});
 }

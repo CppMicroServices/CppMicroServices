@@ -366,6 +366,7 @@ if(MSVC)
     4244 # type conversions
     4996 # unsafe functions
     4267
+    4018
   )
   foreach(wd ${disabled_warnings})
     set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")

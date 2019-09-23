@@ -23,7 +23,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
                ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
 if(MINGW)
-# silence ignored attributes warnings
+  # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
 endif()
                

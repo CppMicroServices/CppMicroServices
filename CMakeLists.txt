@@ -462,7 +462,7 @@ endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
   if(NOT MINGW)
-  set(THREADS_PREFER_PTHREAD_FLAG 1)
+    set(THREADS_PREFER_PTHREAD_FLAG 1)
   endif()
   find_package(Threads REQUIRED)
 
@@ -635,6 +635,7 @@ add_subdirectory(webconsole)
 add_subdirectory(shellservice)
 
 # Declarative Services requires threading to function.
+# Static linkage is not yet supported for declarative services.
 if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
   add_subdirectory(compendium)
 endif()

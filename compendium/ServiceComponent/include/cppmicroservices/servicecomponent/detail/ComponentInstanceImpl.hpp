@@ -269,10 +269,8 @@ public:
   template <class C = T, class I = Injection,
             class X = typename std::enable_if<I::value == false>::type,
             class Y = typename std::enable_if<std::is_default_constructible<C>::value == false>::type>
-  std::shared_ptr<T> DoCreate(bool dummy1, bool dummy2 = false)
+  std::shared_ptr<T> DoCreate(bool, bool = false)
   {
-    (void)dummy1;
-    (void)dummy2;
     static_assert(std::is_default_constructible<C>::value, "Default Constructor expected when injection is false");
     return nullptr;
   }

@@ -36,15 +36,14 @@ using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME;
 
-namespace cppmicroservices {
-namespace scrimpl {
+namespace cppmicroservices { namespace scrimpl {
 
 std::atomic<unsigned long> ComponentConfigurationImpl::idCounter(0);
 
-ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                                                       const Bundle& bundle,
-                                                       std::shared_ptr<const ComponentRegistry> registry,
-                                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata
+                                                       , const Bundle& bundle
+                                                       , std::shared_ptr<const ComponentRegistry> registry
+                                                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger)
   : configID(++idCounter)
   , metadata(std::move(metadata))
   , bundle(bundle)
@@ -54,20 +53,18 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const met
   , newCompInstanceFunc(nullptr)
   , deleteCompInstanceFunc(nullptr)
 {
-  if(!this->metadata || !this->bundle || !this->registry || !this->logger)
-  {
+  if(!this->metadata || !this->bundle || !this->registry || !this->logger) {
     throw std::invalid_argument("ComponentConfigurationImpl - Invalid arguments passed to constructor");
   }
+  
   auto const& serviceMetadata = this->metadata->serviceMetadata;
-  if(!serviceMetadata.interfaces.empty())
-  {
+  if(!serviceMetadata.interfaces.empty()) {
     regManager = std::make_unique<RegistrationManager>(bundle.GetBundleContext(),
                                                        serviceMetadata.interfaces,
                                                        serviceMetadata.scope,
                                                        this->logger);
   }
-  for (auto const& refMetadata : this->metadata->refsMetadata)
-  {
+  for (auto const& refMetadata : this->metadata->refsMetadata) {
     auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
                                                              bundle.GetBundleContext(),
                                                              this->logger);
@@ -81,12 +78,14 @@ ComponentConfigurationImpl::~ComponentConfigurationImpl()
 
 void ComponentConfigurationImpl::Stop()
 {
-  std::for_each(referenceManagerTokens.begin(), referenceManagerTokens.end(), [](const std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>::value_type& kvpair){
-                                                                                (kvpair.first)->UnregisterListener(kvpair.second);
-                                                                              });
+  std::for_each(referenceManagerTokens.begin()
+                , referenceManagerTokens.end()
+                , [](const std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>::value_type& kvpair){
+                    (kvpair.first)->UnregisterListener(kvpair.second);
+                  });
+  
   referenceManagerTokens.clear();
-  for(auto& refMgr : referenceManagers)
-  {
+  for(auto& refMgr : referenceManagers) {
     refMgr.second->StopTracking();
   }
 }
@@ -102,14 +101,11 @@ void ComponentConfigurationImpl::Initialize()
 {
   // Call Register if no dependencies exist
   // If dependencies exist, the dependency tracker mechanism will trigger the call to Register at the appropriate time.
-  if(referenceManagers.empty())
-  {
+  if(referenceManagers.empty()) {
     GetState()->Register(*this);
   }
-  else
-  {
-    for(auto& kv : referenceManagers)
-    {
+  else {
+    for(auto& kv : referenceManagers) {
       auto& refManager = kv.second;
       auto token = refManager->RegisterListener(std::bind(&ComponentConfigurationImpl::RefChangedState, this, std::placeholders::_1));
       referenceManagerTokens.emplace(refManager, token);
@@ -119,8 +115,7 @@ void ComponentConfigurationImpl::Initialize()
 
 void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& notification)
 {
-  switch(notification.event)
-  {
+  switch(notification.event) {
     case RefEvent::BECAME_SATISFIED:
       RefSatisfied(notification.senderName);
       break;
@@ -135,31 +130,35 @@ void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& no
 std::vector<std::shared_ptr<ReferenceManager>> ComponentConfigurationImpl::GetAllDependencyManagers() const
 {
   std::vector<std::shared_ptr<ReferenceManager>> refManagers;
-  for(auto const& kv : referenceManagers)
-  {
+  for(auto const& kv : referenceManagers) {
     refManagers.push_back(kv.second);
   }
   return refManagers;
 }
 std::shared_ptr<ReferenceManager> ComponentConfigurationImpl::GetDependencyManager(const std::string& refName) const
 {
-  return (referenceManagers.count(refName) != 0u) ? referenceManagers.at(refName) : nullptr;
+  return ((referenceManagers.count(refName) != 0u)
+          ? referenceManagers.at(refName)
+          : nullptr);
 }
 
 ServiceReferenceBase ComponentConfigurationImpl::GetServiceReference() const
 {
-  return regManager ? regManager->GetServiceReference() : ServiceReferenceU();
+  return (regManager
+          ? regManager->GetServiceReference()
+          : ServiceReferenceU());
 }
 
 bool ComponentConfigurationImpl::RegisterService()
 {
-  return (regManager ? regManager->RegisterService(GetFactory(), GetProperties()) : false);
+  return (regManager
+          ? regManager->RegisterService(GetFactory(), GetProperties())
+          : false);
 }
 
 void ComponentConfigurationImpl::UnregisterService()
 {
-  if(regManager && regManager->IsServiceRegistered())
-  {
+  if(regManager && regManager->IsServiceRegistered()) {
     regManager->UnregisterService();
   }
 }
@@ -174,9 +173,9 @@ public:
   SatisfiedFunctor& operator=(SatisfiedFunctor&& cpy) = default;
   ~SatisfiedFunctor() = default;
   bool IsSatisfied() const { return(state); }
-  void operator () (const std::unordered_map<std::string, std::shared_ptr<ReferenceManager>>::value_type& item) {
-    if(skipKey.empty() || item.first != skipKey)
-    {
+  void operator () (const std::unordered_map<std::string, std::shared_ptr<ReferenceManager>>::value_type& item)
+  {
+    if(skipKey.empty() || item.first != skipKey) {
       state = state && item.second->IsSatisfied();
     }
   }
@@ -188,16 +187,14 @@ private:
 void ComponentConfigurationImpl::RefSatisfied(const std::string& refName)
 {
   SatisfiedFunctor f = std::for_each(referenceManagers.begin(), referenceManagers.end(), SatisfiedFunctor(refName));
-  if(f.IsSatisfied())
-  {
+  if(f.IsSatisfied()) {
     GetState()->Register(*this);
   }
 }
 
 void ComponentConfigurationImpl::RefUnsatisfied(const std::string& refName)
 {
-  if(referenceManagers.count(refName) != 0u)
-  {
+  if(referenceManagers.count(refName) != 0u) {
     // the state of the rest of the dependency managers is irrelevant.
     // deactivate the configuration
     GetState()->Deactivate(*this);
@@ -224,8 +221,8 @@ ComponentState ComponentConfigurationImpl::GetConfigState() const
   return GetState()->GetValue();
 }
 
-bool ComponentConfigurationImpl::CompareAndSetState(std::shared_ptr<ComponentConfigurationState>* expectedState,
-                                                    std::shared_ptr<ComponentConfigurationState> desiredState)
+bool ComponentConfigurationImpl::CompareAndSetState(std::shared_ptr<ComponentConfigurationState>* expectedState
+                                                    , std::shared_ptr<ComponentConfigurationState> desiredState)
 {
   return std::atomic_compare_exchange_strong(&state, expectedState, desiredState);
 }
@@ -238,8 +235,7 @@ std::shared_ptr<ComponentConfigurationState> ComponentConfigurationImpl::GetStat
 
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
-  if(newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr)
-  {
+  if(newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) = GetComponentCreatorDeletors(GetMetadata()->implClassName, GetBundle());
   }
 }
@@ -258,5 +254,5 @@ InstanceContextPair ComponentConfigurationImpl::CreateAndActivateComponentInstan
   componentInstance->Activate();
   return std::make_pair(componentInstance, ctxt);
 }
-}
-}
+
+}} // namespaces

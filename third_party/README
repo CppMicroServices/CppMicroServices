@@ -155,5 +155,16 @@ See https://github.com/google/benchmark/blob/master/LICENSE for license informat
 https://github.com/google/benchmark/releases
 1.4.1
 
+Abseil (absl)
+-------------
+
+See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license information
+
+https://github.com/abseil/abseil-cpp
+6ec136281086b71da32b5fb068bd6e46b78a5c79
+
+Patches
+
+ * Explicitly cast size_t to unsigned int to remove warning which was treated as an error
 
 

@@ -363,6 +363,9 @@ set(US_CXX_COVERAGE_FLAGS )
 if(MSVC)
   set(disabled_warnings
     4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+    4244 # type conversions
+    4996 # unsafe functions
+    4267
   )
   foreach(wd ${disabled_warnings})
     set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")

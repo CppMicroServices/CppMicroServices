@@ -163,8 +163,3 @@ See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license informa
 https://github.com/abseil/abseil-cpp
 6ec136281086b71da32b5fb068bd6e46b78a5c79
 
-Patches
-
- * Explicitly cast size_t to unsigned int to remove warning which was treated as an error
-
-

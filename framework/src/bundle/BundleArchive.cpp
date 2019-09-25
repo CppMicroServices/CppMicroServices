@@ -40,11 +40,12 @@ BundleArchive::BundleArchive()
   : storage(nullptr)
 {}
 
-BundleArchive::BundleArchive(BundleStorage* storage,
-                             std::unique_ptr<Data>&& data,
-                             std::shared_ptr<BundleResourceContainer>  resourceContainer,
-                             std::string  resourcePrefix,
-                             std::string  location)
+BundleArchive::BundleArchive(
+  BundleStorage* storage,
+  std::unique_ptr<Data>&& data,
+  std::shared_ptr<BundleResourceContainer> resourceContainer,
+  std::string resourcePrefix,
+  std::string location)
   : storage(storage)
   , data(std::move(data))
   , resourceContainer(std::move(resourceContainer))
@@ -77,25 +78,35 @@ std::string BundleArchive::GetResourcePrefix() const
   return resourcePrefix;
 }
 
-BundleResource BundleArchive::GetResource(const std::string& path) const
+BundleResource BundleArchive::GetResource(const std::string& path)
 {
   if (!resourceContainer) {
     return BundleResource();
   }
+
+  if (!resourceContainer->IsContainerOpen()) {
+    resourceContainer->OpenContainer();
+  }
+
   BundleResource result(path, this->shared_from_this());
-  if (result)
+  if (result) {
     return result;
+  }
   return BundleResource();
 }
 
 std::vector<BundleResource> BundleArchive::FindResources(
   const std::string& path,
   const std::string& filePattern,
-  bool recurse) const
+  bool recurse)
 {
   std::vector<BundleResource> result;
   if (!resourceContainer) {
     return result;
+  }
+
+  if (!resourceContainer->IsContainerOpen()) {
+    resourceContainer->OpenContainer();
   }
 
   std::string normalizedPath = path;
@@ -111,6 +122,7 @@ std::vector<BundleResource> BundleArchive::FindResources(
                                filePattern.empty() ? "*" : filePattern,
                                recurse,
                                result);
+
   return result;
 }
 
@@ -136,9 +148,24 @@ void BundleArchive::SetAutostartSetting(int32_t setting)
   data->autostartSetting = setting;
 }
 
-std::shared_ptr<BundleResourceContainer>
-BundleArchive::GetResourceContainer() const
+std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
+  const
 {
   return resourceContainer;
+}
+
+void UpdateOpenResourceCount(std::shared_ptr<BundleArchive> archive, int amt) {
+  if (archive) {
+    archive->numOpenResources += amt;
+
+    if (archive->numOpenResources < 0) {
+      throw std::runtime_error("Number of open resources is negative.");
+    }
+
+    if (archive->numOpenResources == 0 &&
+        archive->resourceContainer->IsContainerOpen()) {
+      archive->resourceContainer->CloseContainer();
+    }
+  }
 }
 }

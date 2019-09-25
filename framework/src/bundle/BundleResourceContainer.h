@@ -81,7 +81,7 @@ public:
                    std::vector<std::string>& names,
                    std::vector<uint32_t>& indices) const;
 
-  void FindNodes(const std::shared_ptr<const BundleArchive>& archive,
+  void FindNodes(const std::shared_ptr<BundleArchive>& archive,
                  const std::string& path,
                  const std::string& filePattern,
                  bool recurse,
@@ -92,6 +92,8 @@ public:
   /// control the number of open file handles on platforms
   /// with a limit (e.g. Windows).
   void CloseContainer();
+
+  bool IsContainerOpen() const;
 
 private:
 using NameIndexPair = std::pair<std::string, int>;
@@ -104,6 +106,9 @@ using NameIndexPair = std::pair<std::string, int>;
       return p1.first < p2.first;
     }
   };
+
+  friend struct BundleArchive;
+  friend class BundleResourcePrivate;
 
   void InitSortedEntries();
 

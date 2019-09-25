@@ -33,6 +33,7 @@ namespace cppmicroservices {
 class BundleResource;
 class BundleResourceContainer;
 struct BundleStorage;
+class BundleResourcePrivate;
 
 /**
  * Class for managing bundle data.
@@ -115,7 +116,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    * @param path Entry to get reference to.
    * @return BundleResource to entry.
    */
-  BundleResource GetResource(const std::string& path) const;
+  BundleResource GetResource(const std::string& path);
 
   /**
    * Returns a list of all the paths to entries within the bundle matching
@@ -128,7 +129,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    */
   std::vector<BundleResource> FindResources(const std::string& path,
                                             const std::string& filePattern,
-                                            bool recurse) const;
+                                            bool recurse);
 
   /**
    * Get last modified timestamp.
@@ -157,9 +158,14 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
 private:
+  friend void UpdateOpenResourceCount(
+    std::shared_ptr<BundleArchive> archive, int amt);
+
+private:
   BundleStorage* const storage;
   const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
+  unsigned int numOpenResources = 0;
   const std::string resourcePrefix;
   const std::string location;
 };

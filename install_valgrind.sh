@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+#! /usr/bin/env bash
 #
 wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
 tar -xjf valgrind-3.15.0.tar.bz2

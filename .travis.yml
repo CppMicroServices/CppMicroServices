@@ -22,15 +22,7 @@ matrix:
           env: MY_CC=gcc-5 MY_CXX=g++-5
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
         - os: linux
@@ -44,15 +36,7 @@ matrix:
             - PATH=/usr/local/bin:/usr/bin:$PATH
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         # Test one build configuration with the latest available Clang
         - os: linux
@@ -62,15 +46,7 @@ matrix:
           env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         # Test all build configuration with the latest available GCC
         - os: linux
@@ -78,60 +54,28 @@ matrix:
           env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         - os: linux
           addons: *gcc8-valgrind
           env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         - os: linux
           addons: *gcc8-valgrind
           env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         - os: linux
           addons: *gcc8-valgrind
           env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1
           before_install:
             # Install a newer version of valgrind
-            - wget https://sourceware.org/pub/valgrind/valgrind-3.15.0.tar.bz2
-            - tar -xjf valgrind-3.15.0.tar.bz2
-            - pushd valgrind-3.15.0
-            - ./configure --prefix=/usr/local
-            - make
-            - sudo make install
-            - ccache --clear
-            - popd
-            - valgrind --version
+            - ./install_valgrind.sh
 
         # minimum supported compiler on OS X
         - os: osx

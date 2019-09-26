@@ -154,6 +154,7 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 
+/*
 void CloseContainerIfNecessary(std::shared_ptr<BundleArchive> archive) 
 {
   if (archive && archive->numOpenResources == 0 && 
@@ -161,4 +162,5 @@ void CloseContainerIfNecessary(std::shared_ptr<BundleArchive> archive)
     archive->resourceContainer->CloseContainer();
   }
 }
+*/
 }

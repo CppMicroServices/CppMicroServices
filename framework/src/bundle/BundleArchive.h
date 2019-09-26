@@ -160,15 +160,6 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 private:
   friend class BundleResourcePrivate;
 
-  /**
-   * Queries the number of opened resources associated with this bundle. If
-   * there are no BundleResources currently opened, it closes the 
-   * BundleResourceContainer.
-   *
-   * @param archive the bundle archive to check.
-   */
-  friend void CloseContainerIfNecessary(std::shared_ptr<BundleArchive> archive);
-
 private:
   BundleStorage* const storage;
   const std::unique_ptr<Data> data;

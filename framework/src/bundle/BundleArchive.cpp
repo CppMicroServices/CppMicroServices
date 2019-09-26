@@ -154,19 +154,11 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 
-void UpdateOpenResourceCount(std::shared_ptr<BundleArchive> archive, int amt)
+void CloseContainerIfNecessary(std::shared_ptr<BundleArchive> archive) 
 {
-  if (archive) {
-    archive->numOpenResources += amt;
-
-    if (archive->numOpenResources < 0) {
-      throw std::runtime_error("Number of open resources is negative.");
-    }
-
-    if (archive->numOpenResources == 0 &&
-        archive->resourceContainer->IsContainerOpen()) {
-      archive->resourceContainer->CloseContainer();
-    }
+  if (archive && archive->numOpenResources == 0 && 
+      archive->resourceContainer->IsContainerOpen()) {
+    archive->resourceContainer->CloseContainer();
   }
 }
 }

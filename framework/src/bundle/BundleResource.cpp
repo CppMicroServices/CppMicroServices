@@ -65,17 +65,19 @@ BundleResourcePrivate::BundleResourcePrivate(std::shared_ptr<BundleArchive> arch
   , ref(1)
 {
   if (this->archive) {
-    if (!this->archive->GetResourceContainer()->IsContainerOpen())
-      this->archive->GetResourceContainer()->OpenContainer();
+    if (!this->archive->resourceContainer->IsContainerOpen())
+      this->archive->resourceContainer->OpenContainer();
 
-    UpdateOpenResourceCount(this->archive, 1);
+    this->archive->numOpenResources++;
+    CloseContainerIfNecessary(this->archive);
   }
 }
 
 BundleResourcePrivate::~BundleResourcePrivate()
 {
   if (this->archive) {
-    UpdateOpenResourceCount(this->archive, -1);
+    this->archive->numOpenResources--;
+    CloseContainerIfNecessary(this->archive);
   }
 }
 

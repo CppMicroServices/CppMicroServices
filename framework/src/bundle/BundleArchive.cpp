@@ -154,7 +154,8 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 
-void UpdateOpenResourceCount(std::shared_ptr<BundleArchive> archive, int amt) {
+void UpdateOpenResourceCount(std::shared_ptr<BundleArchive> archive, int amt)
+{
   if (archive) {
     archive->numOpenResources += amt;
 

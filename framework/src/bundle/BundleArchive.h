@@ -158,6 +158,12 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
 private:
+  // This function allows for modifying the internal count of opened resources.
+  // While it isn't defined as a member function, it is marked as friend so that
+  // wherever this is implemented, it can access the numOpenResources field of
+  // the object. The 'amt' parameter specifies how much to increment or decrement
+  // the count by; it can be any number but if the decrement or increment of this
+  // count makes it less than 0, then an exception is thrown.
   friend void UpdateOpenResourceCount(
     std::shared_ptr<BundleArchive> archive, int amt);
 

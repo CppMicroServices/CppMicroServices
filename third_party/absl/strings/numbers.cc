@@ -42,11 +42,11 @@
 #  pragma warning(push)
 #  pragma warning(disable : 4244 4996)
 #elif __GNUC__
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Werror"
+//#  pragma GCC diagnostic push
+//#  pragma GCC diagnostic ignored "-Werror"
 #elif __clang__
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Werror"
+//#  pragma clang diagnostic push
+//#  pragma clang diagnostic ignored "-Werror"
 #endif
 
 namespace absl {

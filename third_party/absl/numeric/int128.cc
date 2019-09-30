@@ -22,6 +22,17 @@
 #include <string>
 #include <type_traits>
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4244 4996)
+#elif __GNUC__
+//#  pragma GCC diagnostic push
+//#  pragma GCC diagnostic ignored "-Werror"
+#elif __clang__
+//#  pragma clang diagnostic push
+//#  pragma clang diagnostic ignored "-Werror"
+#endif
+
 namespace absl {
 
 const uint128 kuint128max = MakeUint128(std::numeric_limits<uint64_t>::max(),
@@ -271,3 +282,11 @@ constexpr int numeric_limits<absl::uint128>::max_exponent10;
 constexpr bool numeric_limits<absl::uint128>::traps;
 constexpr bool numeric_limits<absl::uint128>::tinyness_before;
 }  // namespace std
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#elif __GNUC__
+#  pragma GCC diagnostic pop
+#elif __clang__
+#  pragma clang diagnostic pop
+#endif

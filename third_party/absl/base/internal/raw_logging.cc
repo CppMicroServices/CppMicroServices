@@ -71,11 +71,11 @@
 #  pragma warning(push)
 #  pragma warning(disable : 4267)
 #elif __GNUC__
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Werror"
+//#  pragma GCC diagnostic push
+//#  pragma GCC diagnostic ignored "-Werror"
 #elif __clang__
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Werror"
+//#  pragma clang diagnostic push
+//#  pragma clang diagnostic ignored "-Werror"
 #endif
 
 // TODO(gfalcon): We want raw-logging to work on as many platforms as possible.

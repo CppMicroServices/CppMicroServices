@@ -38,13 +38,13 @@ class BundleResourcePrivate
 {
 
 public:
-  BundleResourcePrivate(std::shared_ptr<BundleArchive> archive);
+  BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive);
 
   ~BundleResourcePrivate();
 
   void InitFilePath(const std::string& file);
 
-  const std::shared_ptr<BundleArchive> archive;
+  const std::shared_ptr<const BundleArchive> archive;
 
   BundleResourceContainer::Stat stat;
 
@@ -60,7 +60,7 @@ public:
   std::atomic<int> ref;
 };
 
-BundleResourcePrivate::BundleResourcePrivate(std::shared_ptr<BundleArchive> archive)
+BundleResourcePrivate::BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive)
   : archive(std::move(archive))
   , ref(1)
 {
@@ -125,7 +125,7 @@ BundleResource::BundleResource(const BundleResource& resource)
 }
 
 BundleResource::BundleResource(const std::string& file,
-                               const std::shared_ptr<BundleArchive>& archive)
+                               const std::shared_ptr<const BundleArchive>& archive)
   : d(new BundleResourcePrivate(archive))
 {
   d->InitFilePath(file);
@@ -136,7 +136,7 @@ BundleResource::BundleResource(const std::string& file,
 }
 
 BundleResource::BundleResource(int index,
-                               const std::shared_ptr<BundleArchive>& archive)
+                               const std::shared_ptr<const BundleArchive>& archive)
   : d(new BundleResourcePrivate(archive))
 {
   d->archive->GetResourceContainer()->GetStat(index, d->stat);

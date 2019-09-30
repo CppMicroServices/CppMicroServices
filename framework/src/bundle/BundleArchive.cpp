@@ -78,7 +78,7 @@ std::string BundleArchive::GetResourcePrefix() const
   return resourcePrefix;
 }
 
-BundleResource BundleArchive::GetResource(const std::string& path)
+BundleResource BundleArchive::GetResource(const std::string& path) const
 {
   if (!resourceContainer) {
     return BundleResource();
@@ -98,7 +98,7 @@ BundleResource BundleArchive::GetResource(const std::string& path)
 std::vector<BundleResource> BundleArchive::FindResources(
   const std::string& path,
   const std::string& filePattern,
-  bool recurse)
+  bool recurse) const
 {
   std::vector<BundleResource> result;
   if (!resourceContainer) {
@@ -153,14 +153,4 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
 {
   return resourceContainer;
 }
-
-/*
-void CloseContainerIfNecessary(std::shared_ptr<BundleArchive> archive) 
-{
-  if (archive && archive->numOpenResources == 0 && 
-      archive->resourceContainer->IsContainerOpen()) {
-    archive->resourceContainer->CloseContainer();
-  }
-}
-*/
 }

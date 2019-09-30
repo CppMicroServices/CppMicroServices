@@ -116,7 +116,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    * @param path Entry to get reference to.
    * @return BundleResource to entry.
    */
-  BundleResource GetResource(const std::string& path);
+  BundleResource GetResource(const std::string& path) const;
 
   /**
    * Returns a list of all the paths to entries within the bundle matching
@@ -129,7 +129,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    */
   std::vector<BundleResource> FindResources(const std::string& path,
                                             const std::string& filePattern,
-                                            bool recurse);
+                                            bool recurse) const;
 
   /**
    * Get last modified timestamp.
@@ -164,7 +164,7 @@ private:
   BundleStorage* const storage;
   const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
-  unsigned int numOpenResources = 0;
+  mutable unsigned int numOpenResources = 0;
   const std::string resourcePrefix;
   const std::string location;
 };

@@ -81,7 +81,7 @@ public:
                    std::vector<std::string>& names,
                    std::vector<uint32_t>& indices) const;
 
-  void FindNodes(const std::shared_ptr<BundleArchive>& archive,
+  void FindNodes(const std::shared_ptr<const BundleArchive>& archive,
                  const std::string& path,
                  const std::string& filePattern,
                  bool recurse,

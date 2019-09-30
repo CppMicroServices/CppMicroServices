@@ -298,10 +298,10 @@ public:
 
 private:
   BundleResource(const std::string& file,
-                 const std::shared_ptr<BundleArchive>& archive);
+                 const std::shared_ptr<const BundleArchive>& archive);
 
   BundleResource(int index,
-                 const std::shared_ptr<BundleArchive>& archive);
+                 const std::shared_ptr<const BundleArchive>& archive);
 
   friend struct BundleArchive;
   friend class BundleResourceContainer;

@@ -124,22 +124,3 @@ set(_private_headers
   ../../third_party/absl/strings/internal/memutil.h
 )
 
-# Turn off warnings when compiling Abseil files
-file(GLOB_RECURSE ABSL_FILES 
-  "${CMAKE_SOURCE_DIR}/third_party/absl/*.cc" 
-  "${CMAKE_SOURCE_DIR}/third_party/absl/*.c" 
-  "${CMAKE_SOURCE_DIR}/third_party/absl/*.h")
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR 
-    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" 
-    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CF "-w")
-  set_source_files_properties(
-    ${ABSL_FILES}
-    PROPERTIES
-    COMPILE_FLAGS ${CF}
-  ) 
-endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR 
-      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR 
-      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-

@@ -78,12 +78,7 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
     auto head = key.substr(0, pos);
     auto tail = key.substr(pos + 1);
 
-    int index;
-    bool res = absl::SimpleAtoi(head, &index);
-    if (!res)
-      throw std::invalid_argument("Unsupported Any type at '" +
-                                  std::string(head) + "' for dotted get");
-
+    int index = std::stoi(std::string(head));
     auto& h = v.at(index < 0 ? v.size() + index : index);
 
     if (h.Type() == typeid(AnyMap)) {
@@ -94,11 +89,7 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
     throw std::invalid_argument("Unsupported Any type at '" + std::string(head) +
                                 "' for dotted get");
   } else {
-    int index;
-    bool res = absl::SimpleAtoi(key, &index);
-    if (!res)
-      throw std::invalid_argument("Unsupported Any type at '" +
-                                  std::string(key) + "' for dotted get");
+    int index = std::stoi(std::string(key));
     return v.at(index < 0 ? v.size() + index : index);
   }
 }
@@ -143,9 +134,11 @@ Any AtCompoundKey(const std::vector<Any>& v,
   const auto tail = (pos == AnyMap::key_type::npos) ? "" : key.substr(pos + 1);
 
   int index = 0;
-  bool res = absl::SimpleAtoi(head, &index);
-  if (!res)
+  try {
+    index = std::stoi(std::string(head));
+  } catch (...) {
     return std::move(defaultval);
+  }
 
   if (static_cast<size_t>(std::abs(index)) < v.size()) {
     auto& h = v[(index < 0 ? v.size() + index : index)];

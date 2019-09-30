@@ -67,6 +67,17 @@
 #undef ABSL_HAVE_RAW_IO
 #endif
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4267)
+#elif __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Werror"
+#elif __clang__
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Werror"
+#endif
+
 // TODO(gfalcon): We want raw-logging to work on as many platforms as possible.
 // Explicitly #error out when not ABSL_LOW_LEVEL_WRITE_SUPPORTED, except for a
 // whitelisted set of platforms for which we expect not to be able to raw log.
@@ -233,3 +244,11 @@ void RegisterInternalLogFunction(InternalLogFunction func) {
 
 }  // namespace raw_logging_internal
 }  // namespace absl
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#elif __GNUC__
+#  pragma GCC diagnostic pop
+#elif __clang__
+#  pragma clang diagnostic pop
+#endif

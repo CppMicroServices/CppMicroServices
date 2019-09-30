@@ -95,9 +95,9 @@ static const char kTruncated[] = " ... (message truncated)\n";
 // truncation occurred, if possible leave room in the buffer for the message
 // kTruncated[].
 inline static bool VADoRawLog(char** buf, int* size, const char* format,
-                              va_list ap) ABSL_PRINTF_ATTRIBUTE(3, 0);
+			      va_list ap) ABSL_PRINTF_ATTRIBUTE(3, 0);
 inline static bool VADoRawLog(char** buf, int* size,
-                              const char* format, va_list ap) {
+			      const char* format, va_list ap) {
   int n = vsnprintf(*buf, *size, format, ap);
   bool result = true;
   if (n < 0 || n > *size) {
@@ -138,9 +138,9 @@ bool DoRawLog(char** buf, int* size, const char* format, ...) {
 }
 
 void RawLogVA(absl::LogSeverity severity, const char* file, int line,
-              const char* format, va_list ap) ABSL_PRINTF_ATTRIBUTE(4, 0);
+	      const char* format, va_list ap) ABSL_PRINTF_ATTRIBUTE(4, 0);
 void RawLogVA(absl::LogSeverity severity, const char* file, int line,
-              const char* format, va_list ap) {
+	      const char* format, va_list ap) {
   char buffer[kLogBufSize];
   char* buf = buffer;
   int size = sizeof(buffer);
@@ -209,9 +209,9 @@ void SafeWriteToStderr(const char *s, size_t len) {
 }
 
 void RawLog(absl::LogSeverity severity, const char* file, int line,
-            const char* format, ...) ABSL_PRINTF_ATTRIBUTE(4, 5);
+	    const char* format, ...) ABSL_PRINTF_ATTRIBUTE(4, 5);
 void RawLog(absl::LogSeverity severity, const char* file, int line,
-            const char* format, ...) {
+	    const char* format, ...) {
   va_list ap;
   va_start(ap, format);
   RawLogVA(severity, file, line, format, ap);
@@ -223,7 +223,7 @@ void RawLog(absl::LogSeverity severity, const char* file, int line,
 // TODO(gfalcon): When string_view no longer depends on base, change this
 // interface to take its message as a string_view instead.
 static void DefaultInternalLog(absl::LogSeverity severity, const char* file,
-                               int line, const std::string& message) {
+			       int line, const std::string& message) {
   RawLog(severity, file, line, "%s", message.c_str());
 }
 
@@ -248,7 +248,7 @@ void RegisterInternalLogFunction(InternalLogFunction func) {
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #elif __GNUC__
-#  pragma GCC diagnostic pop
+//#  pragma GCC diagnostic pop
 #elif __clang__
-#  pragma clang diagnostic pop
+//#  pragma clang diagnostic pop
 #endif

@@ -179,7 +179,7 @@ const uint32_t kTenToNth[10] = {
 
 template <int max_words>
 int BigUnsigned<max_words>::ReadFloatMantissa(const ParsedFloat& fp,
-                                              int significant_digits) {
+					      int significant_digits) {
   SetToZero();
   assert(fp.type == FloatType::kNumber);
 
@@ -201,7 +201,7 @@ int BigUnsigned<max_words>::ReadFloatMantissa(const ParsedFloat& fp,
 
 template <int max_words>
 int BigUnsigned<max_words>::ReadDigits(const char* begin, const char* end,
-                                       int significant_digits) {
+				       int significant_digits) {
   assert(significant_digits <= Digits10() + 1);
   SetToZero();
 
@@ -255,7 +255,7 @@ int BigUnsigned<max_words>::ReadDigits(const char* begin, const char* end,
     int digit = (*begin - '0');
     --significant_digits;
     if (significant_digits == 0 && std::next(begin) != end &&
-        (digit == 0 || digit == 5)) {
+	(digit == 0 || digit == 5)) {
       // If this is the very last significant digit, but insignificant digits
       // remain, we know that the last of those remaining significant digits is
       // nonzero.  (If it wasn't, we would have stripped it before we got here.)
@@ -303,18 +303,18 @@ template <int max_words>
   bool first_pass = true;
   while (n >= kLargePowerOfFiveStep) {
     int big_power =
-        std::min(n / kLargePowerOfFiveStep, kLargestPowerOfFiveIndex);
+	std::min(n / kLargePowerOfFiveStep, kLargestPowerOfFiveIndex);
     if (first_pass) {
       // just copy, rather than multiplying by 1
       std::copy(
-          LargePowerOfFiveData(big_power),
-          LargePowerOfFiveData(big_power) + LargePowerOfFiveSize(big_power),
-          answer.words_);
+	  LargePowerOfFiveData(big_power),
+	  LargePowerOfFiveData(big_power) + LargePowerOfFiveSize(big_power),
+	  answer.words_);
       answer.size_ = LargePowerOfFiveSize(big_power);
       first_pass = false;
     } else {
       answer.MultiplyBy(LargePowerOfFiveSize(big_power),
-                        LargePowerOfFiveData(big_power));
+			LargePowerOfFiveData(big_power));
     }
     n -= kLargePowerOfFiveStep * big_power;
   }
@@ -324,8 +324,8 @@ template <int max_words>
 
 template <int max_words>
 void BigUnsigned<max_words>::MultiplyStep(int original_size,
-                                          const uint32_t* other_words,
-                                          int other_size, int step) {
+					  const uint32_t* other_words,
+					  int other_size, int step) {
   int this_i = std::min(original_size - 1, step);
   int other_i = step - this_i;
 
@@ -370,7 +370,7 @@ template class BigUnsigned<84>;
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #elif __GNUC__
-#  pragma GCC diagnostic pop
+//#  pragma GCC diagnostic pop
 #elif __clang__
-#  pragma clang diagnostic pop
+//#  pragma clang diagnostic pop
 #endif

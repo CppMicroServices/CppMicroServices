@@ -315,7 +315,7 @@ char* numbers_internal::FastIntToBuffer(int64_t i, char* buffer) {
 // return that number multiplied by the given 32-bit value.  If the result is
 // too large to fit in a 128-bit number, divide it by 2 until it fits.
 static std::pair<uint64_t, uint64_t> Mul32(std::pair<uint64_t, uint64_t> num,
-                                           uint32_t mul) {
+					   uint32_t mul) {
   uint64_t bits0_31 = num.second & 0xFFFFFFFF;
   uint64_t bits32_63 = num.second >> 32;
   uint64_t bits64_95 = num.first & 0xFFFFFFFF;
@@ -344,7 +344,7 @@ static std::pair<uint64_t, uint64_t> Mul32(std::pair<uint64_t, uint64_t> num,
 
   uint64_t bits0_63 = bits0_31 + (bits32_63 << 32);
   uint64_t bits64_127 = bits64_95 + (bits96_127 << 32) + (bits32_63 >> 32) +
-                        (bits0_63 < bits0_31);
+			(bits0_63 < bits0_31);
   uint64_t bits128_up = (bits96_127 >> 32) + (bits64_127 < bits64_95);
   if (bits128_up == 0) return {bits64_127, bits0_63};
 
@@ -520,11 +520,11 @@ static ExpDigits SplitToSix(const double value) {
 // The result is the same as "%g", a.k.a. "%.6g".
 size_t numbers_internal::SixDigitsToBuffer(double d, char* const buffer) {
   static_assert(std::numeric_limits<float>::is_iec559,
-                "IEEE-754/IEC-559 support only");
+		"IEEE-754/IEC-559 support only");
 
   char* out = buffer;  // we write data to out, incrementing as we go, but
-                       // FloatToBuffer always returns the address of the buffer
-                       // passed in.
+		       // FloatToBuffer always returns the address of the buffer
+		       // passed in.
 
   if (std::isnan(d)) {
     strcpy(out, "nan");  // NOLINT(runtime/printf)
@@ -558,17 +558,17 @@ size_t numbers_internal::SixDigitsToBuffer(double d, char* const buffer) {
     case 4:
       memcpy(out, &digits[0], 5), out += 5;
       if (digits[5] != '0') {
-        *out++ = '.';
-        *out++ = digits[5];
+	*out++ = '.';
+	*out++ = digits[5];
       }
       *out = 0;
       return out - buffer;
     case 3:
       memcpy(out, &digits[0], 4), out += 4;
       if ((digits[5] | digits[4]) != '0') {
-        *out++ = '.';
-        *out++ = digits[4];
-        if (digits[5] != '0') *out++ = digits[5];
+	*out++ = '.';
+	*out++ = digits[4];
+	if (digits[5] != '0') *out++ = digits[5];
       }
       *out = 0;
       return out - buffer;
@@ -666,8 +666,8 @@ static const int8_t kAsciiToInt[256] = {
 
 // Parse the sign and optional hex or oct prefix in text.
 inline bool safe_parse_sign_and_base(absl::string_view* text /*inout*/,
-                                     int* base_ptr /*inout*/,
-                                     bool* negative_ptr /*output*/) {
+				     int* base_ptr /*inout*/,
+				     bool* negative_ptr /*output*/) {
   if (text->data() == nullptr) {
     return false;
   }
@@ -702,12 +702,12 @@ inline bool safe_parse_sign_and_base(absl::string_view* text /*inout*/,
   // Also validate the base.
   if (base == 0) {
     if (end - start >= 2 && start[0] == '0' &&
-        (start[1] == 'x' || start[1] == 'X')) {
+	(start[1] == 'x' || start[1] == 'X')) {
       base = 16;
       start += 2;
       if (start >= end) {
-        // "0x" with no digits after is invalid.
-        return false;
+	// "0x" with no digits after is invalid.
+	return false;
       }
     } else if (end - start >= 1 && start[0] == '0') {
       base = 8;
@@ -717,11 +717,11 @@ inline bool safe_parse_sign_and_base(absl::string_view* text /*inout*/,
     }
   } else if (base == 16) {
     if (end - start >= 2 && start[0] == '0' &&
-        (start[1] == 'x' || start[1] == 'X')) {
+	(start[1] == 'x' || start[1] == 'X')) {
       start += 2;
       if (start >= end) {
-        // "0x" with no digits after is invalid.
-        return false;
+	// "0x" with no digits after is invalid.
+	return false;
       }
     }
   } else if (base >= 2 && base <= 36) {
@@ -775,10 +775,10 @@ struct LookupTables {
 #define X_OVER_BASE_INITIALIZER(X)                                        \
   {                                                                       \
     0, 0, X / 2, X / 3, X / 4, X / 5, X / 6, X / 7, X / 8, X / 9, X / 10, \
-        X / 11, X / 12, X / 13, X / 14, X / 15, X / 16, X / 17, X / 18,   \
-        X / 19, X / 20, X / 21, X / 22, X / 23, X / 24, X / 25, X / 26,   \
-        X / 27, X / 28, X / 29, X / 30, X / 31, X / 32, X / 33, X / 34,   \
-        X / 35, X / 36,                                                   \
+	X / 11, X / 12, X / 13, X / 14, X / 15, X / 16, X / 17, X / 18,   \
+	X / 19, X / 20, X / 21, X / 22, X / 23, X / 24, X / 25, X / 26,   \
+	X / 27, X / 28, X / 29, X / 30, X / 31, X / 32, X / 33, X / 34,   \
+	X / 35, X / 36,                                                   \
   }
 
 template <typename IntType>
@@ -793,7 +793,7 @@ const IntType LookupTables<IntType>::kVminOverBase[] =
 
 template <typename IntType>
 inline bool safe_parse_positive_int(absl::string_view text, int base,
-                                    IntType* value_p) {
+				    IntType* value_p) {
   IntType value = 0;
   const IntType vmax = std::numeric_limits<IntType>::max();
   assert(vmax > 0);
@@ -827,7 +827,7 @@ inline bool safe_parse_positive_int(absl::string_view text, int base,
 
 template <typename IntType>
 inline bool safe_parse_negative_int(absl::string_view text, int base,
-                                    IntType* value_p) {
+				    IntType* value_p) {
   IntType value = 0;
   const IntType vmin = std::numeric_limits<IntType>::min();
   assert(vmin < 0);
@@ -870,7 +870,7 @@ inline bool safe_parse_negative_int(absl::string_view text, int base,
 // http://pubs.opengroup.org/onlinepubs/9699919799/functions/strtol.html
 template <typename IntType>
 inline bool safe_int_internal(absl::string_view text, IntType* value_p,
-                              int base) {
+			      int base) {
   *value_p = 0;
   bool negative;
   if (!safe_parse_sign_and_base(&text, &base, &negative)) {
@@ -885,7 +885,7 @@ inline bool safe_int_internal(absl::string_view text, IntType* value_p,
 
 template <typename IntType>
 inline bool safe_uint_internal(absl::string_view text, IntType* value_p,
-                               int base) {
+			       int base) {
   *value_p = 0;
   bool negative;
   if (!safe_parse_sign_and_base(&text, &base, &negative) || negative) {
@@ -918,7 +918,7 @@ bool safe_strtou64_base(absl::string_view text, uint64_t* value, int base) {
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #elif __GNUC__
-#  pragma GCC diagnostic pop
+//#  pragma GCC diagnostic pop
 #elif __clang__
-#  pragma clang diagnostic pop
+//#  pragma clang diagnostic pop
 #endif

@@ -75,9 +75,9 @@ std::ostream& operator<<(std::ostream& o, string_view piece) {
     if (static_cast<size_t>(o.width()) > piece.size()) {
       size_t pad = o.width() - piece.size();
       if ((o.flags() & o.adjustfield) == o.left) {
-        rpad = pad;
+	rpad = pad;
       } else {
-        lpad = pad;
+	lpad = pad;
       }
     }
     if (lpad) WritePadding(o, lpad);
@@ -132,7 +132,7 @@ string_view::size_type string_view::rfind(char c, size_type pos) const
 }
 
 string_view::size_type string_view::find_first_of(string_view s,
-                                                  size_type pos) const
+						  size_type pos) const
     noexcept {
   if (empty() || s.empty()) {
     return npos;
@@ -149,7 +149,7 @@ string_view::size_type string_view::find_first_of(string_view s,
 }
 
 string_view::size_type string_view::find_first_not_of(string_view s,
-                                                      size_type pos) const
+						      size_type pos) const
     noexcept {
   if (empty()) return npos;
   // Avoid the cost of LookupTable() for a single-character search.
@@ -164,7 +164,7 @@ string_view::size_type string_view::find_first_not_of(string_view s,
 }
 
 string_view::size_type string_view::find_first_not_of(char c,
-                                                      size_type pos) const
+						      size_type pos) const
     noexcept {
   if (empty()) return npos;
   for (; pos < length_; ++pos) {
@@ -176,7 +176,7 @@ string_view::size_type string_view::find_first_not_of(char c,
 }
 
 string_view::size_type string_view::find_last_of(string_view s,
-                                                 size_type pos) const noexcept {
+						 size_type pos) const noexcept {
   if (empty() || s.empty()) return npos;
   // Avoid the cost of LookupTable() for a single-character search.
   if (s.length_ == 1) return find_last_of(s.ptr_[0], pos);
@@ -191,7 +191,7 @@ string_view::size_type string_view::find_last_of(string_view s,
 }
 
 string_view::size_type string_view::find_last_not_of(string_view s,
-                                                     size_type pos) const
+						     size_type pos) const
     noexcept {
   if (empty()) return npos;
   size_type i = std::min(pos, length_ - 1);
@@ -209,7 +209,7 @@ string_view::size_type string_view::find_last_not_of(string_view s,
 }
 
 string_view::size_type string_view::find_last_not_of(char c,
-                                                     size_type pos) const
+						     size_type pos) const
     noexcept {
   if (empty()) return npos;
   size_type i = std::min(pos, length_ - 1);
@@ -244,9 +244,9 @@ constexpr string_view::size_type string_view::kMaxSize;
 #  ifdef _MSC_VER
 #    pragma warning(pop)
 #  elif __GNUC__
-#    pragma GCC diagnostic pop
+//#    pragma GCC diagnostic pop
 #  elif __clang__
-#    pragma clang diagnostic pop
+//#    pragma clang diagnostic pop
 #  endif
 
 #endif  // ABSL_HAVE_STD_STRING_VIEW

@@ -91,7 +91,7 @@ ABSL_BASE_INTERNAL_FORCEINLINE int CountLeadingZeros64(uint64_t n) {
   //  ARM64: clz
   //  PPC: cntlzd
   static_assert(sizeof(unsigned long long) == sizeof(n),  // NOLINT(runtime/int)
-                "__builtin_clzll does not take 64-bit arg");
+		"__builtin_clzll does not take 64-bit arg");
 
   // Handle 0 as a special case because __builtin_clzll(0) is undefined.
   if (n == 0) {
@@ -124,7 +124,7 @@ ABSL_BASE_INTERNAL_FORCEINLINE int CountLeadingZeros32(uint32_t n) {
   //  ARM64: clz
   //  PPC: cntlzd
   static_assert(sizeof(int) == sizeof(n),
-                "__builtin_clz does not take 32-bit arg");
+		"__builtin_clz does not take 32-bit arg");
 
   // Handle 0 as a special case because __builtin_clz(0) is undefined.
   if (n == 0) {
@@ -163,7 +163,7 @@ ABSL_BASE_INTERNAL_FORCEINLINE int CountTrailingZerosNonZero64(uint64_t n) {
   return result;
 #elif defined(__GNUC__)
   static_assert(sizeof(unsigned long long) == sizeof(n),  // NOLINT(runtime/int)
-                "__builtin_ctzll does not take 64-bit arg");
+		"__builtin_ctzll does not take 64-bit arg");
   return __builtin_ctzll(n);
 #else
   return CountTrailingZerosNonZero64Slow(n);
@@ -188,7 +188,7 @@ ABSL_BASE_INTERNAL_FORCEINLINE int CountTrailingZerosNonZero32(uint32_t n) {
   return result;
 #elif defined(__GNUC__)
   static_assert(sizeof(int) == sizeof(n),
-                "__builtin_ctz does not take 32-bit arg");
+		"__builtin_ctz does not take 32-bit arg");
   return __builtin_ctz(n);
 #else
   return CountTrailingZerosNonZero32Slow(n);
@@ -203,9 +203,9 @@ ABSL_BASE_INTERNAL_FORCEINLINE int CountTrailingZerosNonZero32(uint32_t n) {
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #elif __GNUC__
-#  pragma GCC diagnostic pop
+//#  pragma GCC diagnostic pop
 #elif __clang__
-#  pragma clang diagnostic pop
+//#  pragma clang diagnostic pop
 #endif
 
 #endif  // ABSL_BASE_INTERNAL_BITS_H_

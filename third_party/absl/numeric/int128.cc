@@ -36,7 +36,7 @@
 namespace absl {
 
 const uint128 kuint128max = MakeUint128(std::numeric_limits<uint64_t>::max(),
-                                        std::numeric_limits<uint64_t>::max());
+					std::numeric_limits<uint64_t>::max());
 
 namespace {
 
@@ -78,7 +78,7 @@ static inline int Fls128(uint128 n) {
 // division algorithm adapted from:
 // https://stackoverflow.com/questions/5386377/division-without-using
 void DivModImpl(uint128 dividend, uint128 divisor, uint128* quotient_ret,
-                uint128* remainder_ret) {
+		uint128* remainder_ret) {
   assert(divisor != 0);
 
   if (divisor > dividend) {
@@ -123,8 +123,8 @@ uint128 MakeUint128FromFloat(T v) {
 
   // Undefined behavior if v is NaN or cannot fit into uint128.
   assert(std::isfinite(v) && v > -1 &&
-         (std::numeric_limits<T>::max_exponent <= 128 ||
-          v < std::ldexp(static_cast<T>(1), 128)));
+	 (std::numeric_limits<T>::max_exponent <= 128 ||
+	  v < std::ldexp(static_cast<T>(1), 128)));
 
   if (v >= std::ldexp(static_cast<T>(1), 64)) {
     uint64_t hi = static_cast<uint64_t>(std::ldexp(v, -64));
@@ -153,7 +153,7 @@ uint128 MakeUint128FromFloat(long double v) {
   v = std::ldexp(v - static_cast<double>(w1), 50);
   uint64_t w2 = static_cast<uint64_t>(static_cast<double>(std::trunc(v)));
   return (static_cast<uint128>(w0) << 100) | (static_cast<uint128>(w1) << 50) |
-         static_cast<uint128>(w2);
+	 static_cast<uint128>(w2);
 }
 #endif  // __clang__ && !__SSE3__
 }  // namespace
@@ -165,7 +165,7 @@ uint128::uint128(long double v) : uint128(MakeUint128FromFloat(v)) {}
 uint128 operator/(uint128 lhs, uint128 rhs) {
 #if defined(ABSL_HAVE_INTRINSIC_INT128)
   return static_cast<unsigned __int128>(lhs) /
-         static_cast<unsigned __int128>(rhs);
+	 static_cast<unsigned __int128>(rhs);
 #else  // ABSL_HAVE_INTRINSIC_INT128
   uint128 quotient = 0;
   uint128 remainder = 0;
@@ -176,7 +176,7 @@ uint128 operator/(uint128 lhs, uint128 rhs) {
 uint128 operator%(uint128 lhs, uint128 rhs) {
 #if defined(ABSL_HAVE_INTRINSIC_INT128)
   return static_cast<unsigned __int128>(lhs) %
-         static_cast<unsigned __int128>(rhs);
+	 static_cast<unsigned __int128>(rhs);
 #else  // ABSL_HAVE_INTRINSIC_INT128
   uint128 quotient = 0;
   uint128 remainder = 0;
@@ -244,8 +244,8 @@ std::ostream& operator<<(std::ostream& os, uint128 v) {
     if (adjustfield == std::ios::left) {
       rep.append(width - rep.size(), os.fill());
     } else if (adjustfield == std::ios::internal &&
-               (flags & std::ios::showbase) &&
-               (flags & std::ios::basefield) == std::ios::hex && v != 0) {
+	       (flags & std::ios::showbase) &&
+	       (flags & std::ios::basefield) == std::ios::hex && v != 0) {
       rep.insert(2, width - rep.size(), os.fill());
     } else {
       rep.insert(0, width - rep.size(), os.fill());
@@ -286,7 +286,7 @@ constexpr bool numeric_limits<absl::uint128>::tinyness_before;
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #elif __GNUC__
-#  pragma GCC diagnostic pop
+//#  pragma GCC diagnostic pop
 #elif __clang__
-#  pragma clang diagnostic pop
+//#  pragma clang diagnostic pop
 #endif

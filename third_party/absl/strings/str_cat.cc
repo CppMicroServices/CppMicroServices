@@ -109,7 +109,7 @@ static char* Append(char* out, const AlphaNum& x) {
 std::string StrCat(const AlphaNum& a, const AlphaNum& b) {
   std::string result;
   absl::strings_internal::STLStringResizeUninitialized(&result,
-                                                       a.size() + b.size());
+						       a.size() + b.size());
   char* const begin = &result[0];
   char* out = begin;
   out = Append(out, a);
@@ -132,7 +132,7 @@ std::string StrCat(const AlphaNum& a, const AlphaNum& b, const AlphaNum& c) {
 }
 
 std::string StrCat(const AlphaNum& a, const AlphaNum& b, const AlphaNum& c,
-                   const AlphaNum& d) {
+		   const AlphaNum& d) {
   std::string result;
   strings_internal::STLStringResizeUninitialized(
       &result, a.size() + b.size() + c.size() + d.size());
@@ -175,10 +175,10 @@ std::string CatPieces(std::initializer_list<absl::string_view> pieces) {
 // empty string is always allowed.
 #define ASSERT_NO_OVERLAP(dest, src) \
   assert(((src).size() == 0) ||      \
-         (uintptr_t((src).data() - (dest).data()) > uintptr_t((dest).size())))
+	 (uintptr_t((src).data() - (dest).data()) > uintptr_t((dest).size())))
 
 void AppendPieces(std::string* dest,
-                  std::initializer_list<absl::string_view> pieces) {
+		  std::initializer_list<absl::string_view> pieces) {
   size_t old_size = dest->size();
   size_t total_size = old_size;
   for (const absl::string_view piece : pieces) {
@@ -220,7 +220,7 @@ void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b) {
 }
 
 void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b,
-               const AlphaNum& c) {
+	       const AlphaNum& c) {
   ASSERT_NO_OVERLAP(*dest, a);
   ASSERT_NO_OVERLAP(*dest, b);
   ASSERT_NO_OVERLAP(*dest, c);
@@ -236,7 +236,7 @@ void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b,
 }
 
 void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b,
-               const AlphaNum& c, const AlphaNum& d) {
+	       const AlphaNum& c, const AlphaNum& d) {
   ASSERT_NO_OVERLAP(*dest, a);
   ASSERT_NO_OVERLAP(*dest, b);
   ASSERT_NO_OVERLAP(*dest, c);
@@ -258,7 +258,7 @@ void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b,
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #elif __GNUC__
-#  pragma GCC diagnostic pop
+//#  pragma GCC diagnostic pop
 #elif __clang__
-#  pragma clang diagnostic pop
+//#  pragma clang diagnostic pop
 #endif

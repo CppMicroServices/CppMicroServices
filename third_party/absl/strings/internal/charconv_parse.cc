@@ -26,7 +26,7 @@
 #  pragma warning(disable : 4267 4018)
 #elif __GNUC__
 #  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wsign-compre"
+#  pragma GCC diagnostic ignored "-Wsign-compare"
 #elif __clang__
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wsign-compare"

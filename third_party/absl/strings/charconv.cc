@@ -56,17 +56,6 @@
 // end result normally has the 53rd bit set.  It represents subnormals by using
 // narrower mantissas.
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244)
-#elif __GNUC__
-//#  pragma GCC diagnostic push
-//#  pragma GCC diagnostic ignored "-Werror"
-#elif __clang__
-//#  pragma clang diagnostic push
-//#  pragma clang diagnostic ignored "-Werror"
-#endif
-
 namespace absl {
 namespace {
 
@@ -992,11 +981,3 @@ const int16_t kPower10ExponentTable[] = {
 
 }  // namespace
 }  // namespace absl
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#elif __GNUC__
-//#  pragma GCC diagnostic pop
-#elif __clang__
-//#  pragma clang diagnostic pop
-#endif

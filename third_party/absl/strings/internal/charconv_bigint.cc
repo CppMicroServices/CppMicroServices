@@ -18,17 +18,6 @@
 #include <cassert>
 #include <string>
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244)
-#elif __GNUC__
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Warray-bounds"
-#elif __clang__
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Warray-bounds"
-#endif
-
 namespace absl {
 namespace strings_internal {
 
@@ -366,11 +355,3 @@ template class BigUnsigned<84>;
 
 }  // namespace strings_internal
 }  // namespace absl
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#elif __GNUC__
-#  pragma GCC diagnostic pop
-#elif __clang__
-#  pragma clang diagnostic pop
-#endif

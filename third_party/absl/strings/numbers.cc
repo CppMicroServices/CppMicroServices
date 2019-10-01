@@ -38,17 +38,6 @@
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244 4996)
-#elif __GNUC__
-//#  pragma GCC diagnostic push
-//#  pragma GCC diagnostic ignored "-Werror"
-#elif __clang__
-//#  pragma clang diagnostic push
-//#  pragma clang diagnostic ignored "-Werror"
-#endif
-
 namespace absl {
 
 bool SimpleAtof(absl::string_view str, float* out) {
@@ -914,11 +903,3 @@ bool safe_strtou64_base(absl::string_view text, uint64_t* value, int base) {
 }  // namespace numbers_internal
 
 }  // namespace absl
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#elif __GNUC__
-//#  pragma GCC diagnostic pop
-#elif __clang__
-//#  pragma clang diagnostic pop
-#endif

@@ -36,11 +36,11 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #if defined(US_PLATFORM_WINDOWS)
-#include "windows.h"
+#  include "windows.h"
 #elif defined(US_PLATFORM_POSIX)
-#include <stdio.h>
-#include <sys/types.h>
-#include <unistd.h>
+#  include <stdio.h>
+#  include <sys/types.h>
+#  include <unistd.h>
 #endif
 
 using namespace cppmicroservices;
@@ -106,13 +106,13 @@ TEST(OpenFileHandleTest, InstallBundle)
 
 // Test that the bundle properly opens and closes its resource container as
 // bundle resources are requested and discarded
-TEST(OpenFileHandleTest, BundleOpenCloseContainer) 
+TEST(OpenFileHandleTest, BundleOpenCloseContainer)
 {
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
 
-  #if defined(US_BUILD_SHARED_LIBS)
+#if defined(US_BUILD_SHARED_LIBS)
   auto bundle =
     cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleR");
 #else
@@ -122,35 +122,36 @@ TEST(OpenFileHandleTest, BundleOpenCloseContainer)
 
   auto handleCountAfterInstall = GetHandleCountForCurrentProcess();
 
-  // Acquire resources from the bundle
-  auto res = bundle.FindResources("", "*.txt", true);
-  ASSERT_TRUE(res.size());
+  {
+    // Grab a resource
+    auto res = bundle.GetResource("icons/cppmicroservices.png");
+    ASSERT_TRUE(res);
 
-  // Check that the handle count is not equal to the original count
-  auto handleCountAfterGetResource = GetHandleCountForCurrentProcess();
-  ASSERT_NE(handleCountAfterInstall, handleCountAfterGetResource);
+    // Check that the handle count is not equal to the original count
+    auto handleCountAfterGetResource = GetHandleCountForCurrentProcess();
+    ASSERT_NE(handleCountAfterInstall, handleCountAfterGetResource);
 
-  // Grab more resources
-  auto res2 = bundle.GetResource("icons/cppmicroservices.png");
-  ASSERT_TRUE(res2);
+    {
+      // Grab more resources
+      auto res2 = bundle.FindResources("", "*.txt", true);
+      auto handleCountAfterMultipleGetResources =
+        GetHandleCountForCurrentProcess();
 
-  // Drop the reference to the first BundleResources acquired
-  for (BundleResource& r : res) {
-    r.~BundleResource();
+      // Check that the handle count is not the same as right when the
+      // bundle was installed
+      ASSERT_NE(handleCountAfterInstall, handleCountAfterMultipleGetResources);
+    }
+
+    // Check that the handle count is not the same as the original count
+    // even after releasing some resources
+    auto handleCountAfterFirstRelease = GetHandleCountForCurrentProcess();
+    ASSERT_NE(handleCountAfterInstall, handleCountAfterFirstRelease);
   }
 
-  // Check that the bundle has not closed the container yet (handle count still not what
-  // the original was after install)
-  auto handleCountAfterFirstResourceRelease = GetHandleCountForCurrentProcess();
-  ASSERT_NE(handleCountAfterInstall, handleCountAfterFirstResourceRelease);
-
-  // Release last BundleResource and check if the current handle count is equal to the 
-  // initial count
-  res2 = BundleResource();
+  // Check that the handle count is the same as the original after releasing
+  // all references to BundleResources for the Bundle
   auto handleCountAfterFullResourceRelease = GetHandleCountForCurrentProcess();
   ASSERT_EQ(handleCountAfterInstall, handleCountAfterFullResourceRelease);
-
-  bundle.Uninstall();
 
   // Shutdown framework
   f.Stop();

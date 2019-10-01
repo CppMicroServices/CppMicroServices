@@ -149,4 +149,8 @@ TEST(OpenFileHandleTest, BundleOpenCloseContainer)
   res2 = BundleResource();
   auto handleCountAfterFullResourceRelease = GetHandleCountForCurrentProcess();
   ASSERT_EQ(handleCountAfterInstall, handleCountAfterFullResourceRelease);
+
+  // Shutdown framework
+  f.Stop();
+  f.WaitForStop(std::chrono::seconds::zero());
 }

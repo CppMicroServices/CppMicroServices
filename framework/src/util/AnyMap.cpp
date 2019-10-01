@@ -86,8 +86,8 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
     } else if (h.Type() == typeid(std::vector<Any>)) {
       return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail);
     }
-    throw std::invalid_argument("Unsupported Any type at '" + std::string(head) +
-                                "' for dotted get");
+    throw std::invalid_argument("Unsupported Any type at '" +
+                                std::string(head) + "' for dotted get");
   } else {
     int index = std::stoi(std::string(key));
     return v.at(index < 0 ? v.size() + index : index);

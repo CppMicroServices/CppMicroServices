@@ -57,22 +57,6 @@ set(_srcs
   bundle/Debug.cpp
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
-
-  ../../third_party/absl/base/log_severity.cc
-  ../../third_party/absl/base/internal/raw_logging.cc
-  ../../third_party/absl/base/internal/throw_delegate.cc
-
-  ../../third_party/absl/numeric/int128.cc
-
-  ../../third_party/absl/strings/ascii.cc
-  ../../third_party/absl/strings/charconv.cc
-  ../../third_party/absl/strings/match.cc
-  ../../third_party/absl/strings/numbers.cc
-  ../../third_party/absl/strings/str_cat.cc
-  ../../third_party/absl/strings/string_view.cc
-  ../../third_party/absl/strings/internal/charconv_bigint.cc
-  ../../third_party/absl/strings/internal/charconv_parse.cc
-  ../../third_party/absl/strings/internal/memutil.cc
 )
 
 set(_private_headers
@@ -106,21 +90,5 @@ set(_private_headers
   bundle/Debug.h
   bundle/Fragment.h
   bundle/Resolver.h
-
-  ../../third_party/absl/base/attributes.h
-  ../../third_party/absl/base/config.h
-  ../../third_party/absl/base/log_severity.h
-  ../../third_party/absl/base/macros.h
-  ../../third_party/absl/base/optimization.h
-  ../../third_party/absl/base/policy_checks.h
-  ../../third_party/absl/base/port.h
-  ../../third_party/absl/base/internal/atomic_hook.h
-  ../../third_party/absl/base/internal/raw_logging.h
-  ../../third_party/absl/base/internal/throw_delegate.h
-
-  ../../third_party/absl/strings/ascii.h
-  ../../third_party/absl/strings/numbers.h
-  ../../third_party/absl/strings/string_view.h
-  ../../third_party/absl/strings/internal/memutil.h
 )
 

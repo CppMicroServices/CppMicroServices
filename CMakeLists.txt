@@ -19,6 +19,7 @@ cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 list(APPEND policies_new
   CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
   CMP0054 # Only interpret if() arguments as variables or keywords when unquoted
+  CMP0079
   )
 foreach(policy ${policies_new})
   if(POLICY ${policy})
@@ -453,6 +454,12 @@ if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
   # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
   set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_COVERAGE_FLAGS}")
 endif()
+
+#-----------------------------------------------------------------------------
+# Compile libraries here if you do not want -Werror or /WX on
+#-----------------------------------------------------------------------------
+add_subdirectory(third_party/absl)
+#-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")

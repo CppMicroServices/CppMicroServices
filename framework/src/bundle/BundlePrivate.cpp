@@ -878,6 +878,9 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
     state = Bundle::STATE_RESOLVED;
   }
   */
+
+  // Close the resource container after the bundle has been made
+  barchive->GetResourceContainer()->CloseContainer();
 }
 
 BundlePrivate::~BundlePrivate() = default;

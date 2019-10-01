@@ -150,6 +150,8 @@ TEST(OpenFileHandleTest, BundleOpenCloseContainer)
   auto handleCountAfterFullResourceRelease = GetHandleCountForCurrentProcess();
   ASSERT_EQ(handleCountAfterInstall, handleCountAfterFullResourceRelease);
 
+  bundle.Uninstall();
+
   // Shutdown framework
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());

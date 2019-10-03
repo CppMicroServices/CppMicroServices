@@ -149,7 +149,6 @@ set(_test_bundles
   TestBundleDSTOI6
   TestBundleDSTOI9
   EnglishDictionary
-  #DeclarativeServices
   )
 
 target_link_libraries(${us_declarativeservices_test_exe_name} 

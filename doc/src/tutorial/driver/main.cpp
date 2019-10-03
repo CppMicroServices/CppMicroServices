@@ -109,8 +109,12 @@ int main(int /*argc*/, char** /*argv*/)
     /* install all available bundles for this example */
 #if defined(US_BUILD_SHARED_LIBS)
     for (auto name : GetExampleBundles()) {
-      framework.GetBundleContext().InstallBundles(
-        BUNDLE_PATH + PATH_SEPARATOR + US_LIB_PREFIX + name + US_LIB_EXT);
+      framework.GetBundleContext().InstallBundles(BUNDLE_PATH
+                                                  + PATH_SEPARATOR
+                                                  + US_LIB_PREFIX
+                                                  + name
+                                                  + US_DEBUG_POSTFIX
+                                                  + US_LIB_EXT);
     }
 #endif
 

@@ -36,7 +36,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("SharedLibraryTest");
 
-  auto lib1Name = "TestBundleA";
+  auto lib1Name = "TestBundleA" US_DEBUG_POSTFIX;
   
   const std::string libAFilePath = testing::LIB_PATH
                                    + util::DIR_SEP
@@ -83,7 +83,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/ [])
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "File path")
   lib1.Unload();
 
-  auto lib2Name = "TestBundleA";
+  auto lib2Name = "TestBundleA"  US_DEBUG_POSTFIX;
   SharedLibrary lib2(testing::LIB_PATH, lib2Name);
   US_TEST_CONDITION(lib2.GetFilePath() == libAFilePath, "File path")
   lib2.SetPrefix("");
@@ -91,6 +91,7 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/ [])
     US_TEST_CONDITION(lib2.GetFilePath() == (testing::LIB_PATH
                                              + util::DIR_SEP
                                              + "TestBundleA"
+                                             + US_DEBUG_POSTFIX
                                              + US_LIB_EXT)
                       , "File path")
 

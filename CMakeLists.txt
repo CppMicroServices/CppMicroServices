@@ -207,7 +207,7 @@ elseif(US_SDK_INSTALL_COMPONENT)
 endif()
 
 us_cache_var(BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
-us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED FORCE)
+us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)

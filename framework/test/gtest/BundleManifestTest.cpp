@@ -101,6 +101,7 @@ TEST(BundleManifestTest, UnicodeProperty)
                           + cppmicroservices::util::DIR_SEP
                           + US_LIB_PREFIX
                           + "TestBundleU"
+                          + US_DEBUG_POSTFIX
                           + US_LIB_EXT;
   
   auto bundles = bc.InstallBundles(path_utf8);

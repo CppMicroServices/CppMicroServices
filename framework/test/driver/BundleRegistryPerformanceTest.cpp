@@ -53,6 +53,7 @@ inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
                               + util::DIR_SEP
                               + US_LIB_PREFIX
                               + bundleName
+                              + US_DEBUG_POSTFIX
                               + US_LIB_EXT);
 }
 

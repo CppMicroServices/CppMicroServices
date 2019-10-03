@@ -679,6 +679,7 @@ void TestNonStandardBundleExtension()
                                                    + util::DIR_SEP
                                                    + US_LIB_PREFIX
                                                    + "TestBundleExt"
+                                                   + US_DEBUG_POSTFIX
                                                    + ".cppms"));
   
   // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
@@ -726,6 +727,7 @@ void TestUnicodePaths()
                             + cppmicroservices::util::DIR_SEP
                             + US_LIB_PREFIX
                             + "TestBundleU"
+                            + US_DEBUG_POSTFIX
                             + US_LIB_EXT;
     auto bundles = frameworkCtx.InstallBundles(path_utf8);
     US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");

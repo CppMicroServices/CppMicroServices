@@ -34,7 +34,7 @@ std::string PathToLib(const std::string& libName)
           + cppmicroservices::util::DIR_SEP
           + US_LIB_PREFIX
           + libName
-          + US_DEBUG_POSTFIX
+          + US_LIB_POSTFIX
           + US_LIB_EXT);
 }
 

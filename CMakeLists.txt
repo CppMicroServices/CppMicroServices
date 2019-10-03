@@ -216,6 +216,13 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 
+set(US_LIB_POSTFIX "")
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  set(US_LIB_POSTFIX d)
+endif()
+message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+message("US_LIB_POSTFIX = ${US_LIB_POSTFIX}")
+  
 if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   message(SEND_WARN "Thread-sanitizer enabled without threading support. Forcing US_ENABLE_TSAN to OFF")
   set(US_ENABLE_TSAN OFF)

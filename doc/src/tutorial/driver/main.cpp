@@ -113,7 +113,7 @@ int main(int /*argc*/, char** /*argv*/)
                                                   + PATH_SEPARATOR
                                                   + US_LIB_PREFIX
                                                   + name
-                                                  + US_DEBUG_POSTFIX
+                                                  + US_LIB_POSTFIX
                                                   + US_LIB_EXT);
     }
 #endif

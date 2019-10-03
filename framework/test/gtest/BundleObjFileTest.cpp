@@ -38,7 +38,7 @@ const std::string testBundlePath = cppmicroservices::testing::LIB_PATH
                                    + cppmicroservices::util::DIR_SEP
                                    + US_LIB_PREFIX
                                    + "TestBundleRL"
-                                   + US_DEBUG_POSTFIX
+                                   + US_LIB_POSTFIX
                                    + US_LIB_EXT;
 #else
 const std::string testBundlePath = cppmicroservices::testing::BIN_PATH
@@ -70,7 +70,7 @@ TEST(BundleObjFile, NonStandardBundleExt)
                                        + cppmicroservices::util::DIR_SEP
                                        + US_LIB_PREFIX
                                        + "TestBundleExt"
-                                       + US_DEBUG_POSTFIX
+                                       + US_LIB_POSTFIX
                                        + ".cppms");
   ASSERT_TRUE(cppmicroservices::util::Exists(nonStandardExtBundlePath)) << nonStandardExtBundlePath + " should exist on disk.";
   ASSERT_NO_THROW(cppmicroservices::BundleObjFactory().CreateBundleFileObj(nonStandardExtBundlePath));

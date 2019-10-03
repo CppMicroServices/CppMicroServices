@@ -78,7 +78,7 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
     auto head = key.substr(0, pos);
     auto tail = key.substr(pos + 1);
 
-    int index = std::stoi(std::string(head));
+    const int index = std::stoi(std::string(head));
     auto& h = v.at(index < 0 ? v.size() + index : index);
 
     if (h.Type() == typeid(AnyMap)) {
@@ -89,7 +89,7 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
     throw std::invalid_argument("Unsupported Any type at '" +
                                 std::string(head) + "' for dotted get");
   } else {
-    int index = std::stoi(std::string(key));
+    const int index = std::stoi(std::string(key));
     return v.at(index < 0 ? v.size() + index : index);
   }
 }

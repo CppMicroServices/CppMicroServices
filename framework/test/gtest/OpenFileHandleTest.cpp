@@ -45,7 +45,7 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-/*
+#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
 static unsigned long GetHandleCountForCurrentProcess()
 {
 #if defined(US_PLATFORM_WINDOWS)
@@ -77,26 +77,26 @@ static unsigned long GetHandleCountForCurrentProcess()
     "unsupported platform - can't get handle count for current process.")
 #endif
 }
-*/
+#endif
 
-// Test that the file handle count doesn't change after installing a bundle.
-// Installing a bundle should not hold the file open.
-TEST(OpenFileHandleTest, InstallBundle)
+  // Test that the file handle count doesn't change after installing a bundle.
+  // Installing a bundle should not hold the file open.
+  TEST(OpenFileHandleTest, InstallBundle)
 {
-#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
+#  if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
 
   auto handleCountBefore = GetHandleCountForCurrentProcess();
 
-#if defined(US_BUILD_SHARED_LIBS)
+#    if defined(US_BUILD_SHARED_LIBS)
   auto bundle =
     cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
-#else
+#    else
   auto bundle =
     cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
-#endif
+#    endif
 
   auto handleCountAfter = GetHandleCountForCurrentProcess();
   ASSERT_EQ(handleCountBefore, handleCountAfter)
@@ -105,25 +105,25 @@ TEST(OpenFileHandleTest, InstallBundle)
 
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
-#endif
+#  endif
 }
 
 // Test that the bundle properly opens and closes its resource container as
 // bundle resources are requested and discarded
 TEST(OpenFileHandleTest, BundleOpenCloseContainer)
 {
-#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
+#  if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
 
-#if defined(US_BUILD_SHARED_LIBS)
+#    if defined(US_BUILD_SHARED_LIBS)
   auto bundle =
     cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleR");
-#else
+#    else
   auto bundle =
     cppmicroservices::testing::GetBundle("TestBundleR", f.GetBundleContext());
-#endif
+#    endif
 
   auto handleCountAfterInstall = GetHandleCountForCurrentProcess();
 
@@ -161,5 +161,5 @@ TEST(OpenFileHandleTest, BundleOpenCloseContainer)
   // Shutdown framework
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
-#endif
+#  endif
 }

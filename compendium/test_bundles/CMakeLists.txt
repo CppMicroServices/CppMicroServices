@@ -1,3 +1,5 @@
+set(CMAKE_DEBUG_POSTFIX "")
+
 add_subdirectory(TestInterfaces)
 add_subdirectory(BenchmarkDS)
 add_subdirectory(DSGraph01)

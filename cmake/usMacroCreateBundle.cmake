@@ -158,15 +158,15 @@ if(NOT US_NO_INSTALL)
           LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
           ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 
-  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices)
+#  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices)
     install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices
             DESTINATION ${HEADER_INSTALL_DIR})
-  endif()
+#  endif()
 
-  if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices)
+#  if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices
             DESTINATION ${HEADER_INSTALL_DIR})
-  endif()
+#  endif()
 endif()
 
 #-----------------------------------------------------------------------------

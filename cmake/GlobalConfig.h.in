@@ -10,6 +10,8 @@
 #cmakedefine US_ENABLE_THREADING_SUPPORT
 #cmakedefine US_HAVE_VISIBILITY_ATTRIBUTE
 
+#define US_DEBUG_POSTFIX "@CMAKE_DEBUG_POSTFIX@"
+
 //-------------------------------------------------------------------
 // Header Availability
 //-------------------------------------------------------------------

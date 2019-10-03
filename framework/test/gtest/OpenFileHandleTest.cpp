@@ -45,6 +45,7 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
+/*
 static unsigned long GetHandleCountForCurrentProcess()
 {
 #if defined(US_PLATFORM_WINDOWS)
@@ -76,11 +77,13 @@ static unsigned long GetHandleCountForCurrentProcess()
     "unsupported platform - can't get handle count for current process.")
 #endif
 }
+*/
 
 // Test that the file handle count doesn't change after installing a bundle.
 // Installing a bundle should not hold the file open.
 TEST(OpenFileHandleTest, InstallBundle)
 {
+#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
@@ -102,12 +105,14 @@ TEST(OpenFileHandleTest, InstallBundle)
 
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
+#endif
 }
 
 // Test that the bundle properly opens and closes its resource container as
 // bundle resources are requested and discarded
 TEST(OpenFileHandleTest, BundleOpenCloseContainer)
 {
+#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
@@ -156,4 +161,5 @@ TEST(OpenFileHandleTest, BundleOpenCloseContainer)
   // Shutdown framework
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
+#endif
 }

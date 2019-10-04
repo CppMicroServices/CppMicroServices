@@ -34,6 +34,7 @@ TEST(BundleVersion, EmptyVersion)
   ASSERT_EQ(zero, empty.GetMicro());
   ASSERT_EQ(std::string(), empty.GetQualifier());
   ASSERT_FALSE(empty.IsUndefined());
+  ASSERT_NO_THROW(BundleVersion stEmpty(std::string{}));
 }
 
 TEST(BundleVersion, UndefinedVersion)
@@ -138,6 +139,9 @@ TEST(BundleVersion, Comparison)
   ASSERT_TRUE(zeroVersion == BundleVersion::EmptyVersion());
   ASSERT_FALSE(zeroVersion == alphaVersion);
   ASSERT_FALSE(alphaVersion == betaVersion);
+  ASSERT_TRUE(BundleVersion::UndefinedVersion() == BundleVersion::UndefinedVersion());
+  ASSERT_THROW((void)(BundleVersion::UndefinedVersion() == zeroVersion.EmptyVersion()), 
+	           std::logic_error);
 }
 
 TEST(BundleVersion, ParseVersion)

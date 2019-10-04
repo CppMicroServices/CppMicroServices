@@ -251,14 +251,15 @@ void ServiceRegistrationBase::Unregister()
         try {
           serviceFactory->UngetService(
             MakeBundle(i.first->shared_from_this()), *this, service);
-        } catch (...) {
+        } catch (const std::exception& ex) {
           std::string message(
             "ServiceFactory UngetService implementation threw an exception");
           d->bundle->coreCtx->listeners.SendFrameworkEvent(
-            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                            MakeBundle(d->bundle->shared_from_this()),
                            message,
-                           std::current_exception()));
+                           std::make_exception_ptr(ServiceException(ex.what(), 
+                             ServiceException::Type::FACTORY_EXCEPTION))));
         }
       }
     }
@@ -268,14 +269,15 @@ void ServiceRegistrationBase::Unregister()
       try {
         serviceFactory->UngetService(
           MakeBundle(i.first->shared_from_this()), *this, i.second);
-      } catch (...) {
+      } catch (const std::exception& ex) {
         std::string message(
           "ServiceFactory UngetService implementation threw an exception");
         d->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                          MakeBundle(d->bundle->shared_from_this()),
                          message,
-                         std::current_exception()));
+                         std::make_exception_ptr(ServiceException(ex.what(), 
+                           ServiceException::Type::FACTORY_EXCEPTION))));
       }
     }
   }

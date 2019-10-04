@@ -11,13 +11,6 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/include/IDictionaryService/${PROJECT_NAME}Export.h
   )
 
-include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
-  ${CppMicroServices_SOURCE_DIR}/include
-  ${CppMicroServices_SOURCE_DIR}/compendium/test_bundles/IDictionaryService/include
-  ${CppMicroServices_BINARY_DIR}/framework/include
-  ${CppMicroServices_BINARY_DIR}/compendium/test_bundles/IDictionaryService/include
-  )
-
 # Include directories
 target_include_directories(usIDictionaryService
   PUBLIC

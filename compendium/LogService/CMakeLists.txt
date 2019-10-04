@@ -34,14 +34,11 @@ target_include_directories(usLogService
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${CppMicroServices_SOURCE_DIR}/framework/include>
     $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/framework/include>
     $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
   )
-
-include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
-  ${CppMicroServices_BINARY_DIR}/include
-  ${CppMicroServices_BINARY_DIR}/framework/include
-)
 
 # install support
 install(TARGETS ${${PROJECT_NAME}_TARGET}

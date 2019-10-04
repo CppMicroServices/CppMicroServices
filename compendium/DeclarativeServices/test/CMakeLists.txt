@@ -231,13 +231,13 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_SHARED_LIBS)
-	# Add resources
-    usFunctionEmbedResources(TARGET ${us_declarativeservices_test_exe_name}
-                             FILES manifest.json)
+  # Add resources
+  usFunctionEmbedResources(TARGET ${us_declarativeservices_test_exe_name}
+                           FILES manifest.json)
 else()
-	# Add resources
-    usFunctionEmbedResources(TARGET ${us_declarativeservices_test_exe_name}
-                             FILES manifest.json
-                             ZIP_ARCHIVES ${Framework_TARGET} ${_test_bundles})
+  # Add resources
+  usFunctionEmbedResources(TARGET ${us_declarativeservices_test_exe_name}
+                           FILES manifest.json
+                           ZIP_ARCHIVES ${Framework_TARGET} ${_test_bundles})
 endif()
 

@@ -33,11 +33,6 @@ target_include_directories(usServiceComponent
     $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
   )
 
-include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
-  ${CppMicroServices_BINARY_DIR}/include
-  ${CppMicroServices_BINARY_DIR}/framework/include
-  )
-  
 target_link_libraries(${PROJECT_TARGET} PUBLIC CppMicroServices)
 
 # install support

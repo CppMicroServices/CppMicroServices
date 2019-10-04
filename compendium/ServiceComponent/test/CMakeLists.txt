@@ -10,13 +10,6 @@ include_directories(
   )
 
 
-if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
-  check_cxx_compiler_flag(-Wno-inconsistent-missing-override HAS_MISSING_OVERRIDE_FLAG)
-  if (HAS_MISSING_OVERRIDE_FLAG)
-    add_compile_options(-Wno-inconsistent-missing-override)
-  endif()
-endif()
-
 if(MSVC)
   add_compile_definitions(GTEST_HAS_STD_TUPLE_=1)
   add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)

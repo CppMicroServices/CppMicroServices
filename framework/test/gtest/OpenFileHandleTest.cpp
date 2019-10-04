@@ -36,11 +36,11 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #if defined(US_PLATFORM_WINDOWS)
-#include "windows.h"
+#  include "windows.h"
 #elif defined(US_PLATFORM_POSIX)
-#include <stdio.h>
-#include <sys/types.h>
-#include <unistd.h>
+#  include <stdio.h>
+#  include <sys/types.h>
+#  include <unistd.h>
 #endif
 
 using namespace cppmicroservices;
@@ -48,7 +48,7 @@ using namespace cppmicroservices;
 #if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
 static unsigned long GetHandleCountForCurrentProcess()
 {
-#if defined(US_PLATFORM_WINDOWS)
+#  if defined(US_PLATFORM_WINDOWS)
   auto processHandle = GetCurrentProcess();
   unsigned long handleCount{ 0 };
   if (!GetProcessHandleCount(processHandle, &handleCount)) {
@@ -56,7 +56,7 @@ static unsigned long GetHandleCountForCurrentProcess()
       "GetProcessHandleCount failed to retrieve the number of open handles.");
   }
   return handleCount;
-#elif defined(US_PLATFORM_POSIX)
+#  elif defined(US_PLATFORM_POSIX)
   auto pid_t = getpid();
   std::string command("lsof -p " + std::to_string(pid_t) + " | wc -l");
   FILE* fd = popen(command.c_str(), "r");
@@ -72,31 +72,31 @@ static unsigned long GetHandleCountForCurrentProcess()
     throw std::runtime_error("pclose failed.");
   }
   return stoul(result);
-#else
+#  else
   throw std::runtime_error(
     "unsupported platform - can't get handle count for current process.")
-#endif
+#  endif
 }
 #endif
 
-  // Test that the file handle count doesn't change after installing a bundle.
-  // Installing a bundle should not hold the file open.
-  TEST(OpenFileHandleTest, InstallBundle)
+// Test that the file handle count doesn't change after installing a bundle.
+// Installing a bundle should not hold the file open.
+TEST(OpenFileHandleTest, InstallBundle)
 {
-#  if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
+#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
 
   auto handleCountBefore = GetHandleCountForCurrentProcess();
 
-#    if defined(US_BUILD_SHARED_LIBS)
+#  if defined(US_BUILD_SHARED_LIBS)
   auto bundle =
     cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
-#    else
+#  else
   auto bundle =
     cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
-#    endif
+#  endif
 
   auto handleCountAfter = GetHandleCountForCurrentProcess();
   ASSERT_EQ(handleCountBefore, handleCountAfter)
@@ -105,25 +105,25 @@ static unsigned long GetHandleCountForCurrentProcess()
 
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
-#  endif
+#endif
 }
 
 // Test that the bundle properly opens and closes its resource container as
 // bundle resources are requested and discarded
 TEST(OpenFileHandleTest, BundleOpenCloseContainer)
 {
-#  if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
+#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
 
-#    if defined(US_BUILD_SHARED_LIBS)
+#  if defined(US_BUILD_SHARED_LIBS)
   auto bundle =
     cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleR");
-#    else
+#  else
   auto bundle =
     cppmicroservices::testing::GetBundle("TestBundleR", f.GetBundleContext());
-#    endif
+#  endif
 
   auto handleCountAfterInstall = GetHandleCountForCurrentProcess();
 
@@ -161,5 +161,5 @@ TEST(OpenFileHandleTest, BundleOpenCloseContainer)
   // Shutdown framework
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
-#  endif
+#endif
 }

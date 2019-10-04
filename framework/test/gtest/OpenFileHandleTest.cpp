@@ -36,11 +36,11 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #if defined(US_PLATFORM_WINDOWS)
-#  include "windows.h"
+#include "windows.h"
 #elif defined(US_PLATFORM_POSIX)
-#  include <stdio.h>
-#  include <sys/types.h>
-#  include <unistd.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 using namespace cppmicroservices;

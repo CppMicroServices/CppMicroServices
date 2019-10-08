@@ -1,4 +1,4 @@
-find_package(CppMicroServices COMPONENTS ShellService REQUIRED)
+find_package(CppMicroServices REQUIRED)
 
 include_directories(../../third_party)
 

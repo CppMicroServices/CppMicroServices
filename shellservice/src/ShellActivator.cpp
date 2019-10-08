@@ -25,7 +25,8 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 
-#include "cppmicroservices/shellservice/ShellService.h"
+#include "cppmicroservices/shellservice/ShellServiceImpl.h"
+#include "cppmicroservices/shellservice/ShellCommandsImpl.h"
 
 namespace cppmicroservices {
 
@@ -34,14 +35,15 @@ class ShellActivator : public BundleActivator
 public:
   void Start(BundleContext context) override
   {
-    m_ShellService = std::make_shared<ShellService>();
-    context.RegisterService<ShellService>(m_ShellService);
+    context.RegisterService<ShellService>(std::make_shared<ShellServiceImpl>());
+    context.RegisterService<ShellCommandInterface>(std::make_shared<ShellCommandLs>(), {{"commandName", Any(std::string("us-ls"))}});
+    context.RegisterService<ShellCommandInterface>(std::make_shared<ShellCommandInstall>(), {{"commandName", Any(std::string("us-install"))}});
+    context.RegisterService<ShellCommandInterface>(std::make_shared<ShellCommandUninstall>(), {{"commandName", Any(std::string("us-uninstall"))}});
+    context.RegisterService<ShellCommandInterface>(std::make_shared<ShellCommandStart>(), {{"commandName", Any(std::string("us-start"))}});
+    context.RegisterService<ShellCommandInterface>(std::make_shared<ShellCommandStop>(), {{"commandName", Any(std::string("us-stop"))}});
   }
 
   void Stop(BundleContext) override {}
-
-private:
-  std::shared_ptr<ShellService> m_ShellService;
 };
 }
 

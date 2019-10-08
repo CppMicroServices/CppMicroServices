@@ -20,21 +20,40 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SHELLSERVICE_H
-#define CPPMICROSERVICES_SHELLSERVICE_H
+#ifndef CPPMICROSERVICES_SHELLSERVICEIMPL_H
+#define CPPMICROSERVICES_SHELLSERVICEIMPL_H
 
 #include "cppmicroservices/GlobalConfig.h"
+#include "ShellService.h"
+
+//#include "cppmicroservices/shellservice/ShellServiceExport.h"
 
 #include <memory>
 #include <vector>
 
 namespace cppmicroservices {
 
-struct ShellService {
-    virtual ~ShellService(){}
-    virtual void ExecuteCommand(const std::string& cmd) = 0;
-};
+class BundleResource;
     
+class ShellServiceImpl : public ShellService
+{
+public:
+  ShellServiceImpl();
+  ~ShellServiceImpl();
+
+  void ExecuteCommand(const std::string& cmd);
+
+  //std::vector<std::string> GetCompletions(const std::string& in);
+
+private:
+  ShellServiceImpl(const ShellServiceImpl&);
+  ShellServiceImpl& operator=(const ShellServiceImpl&);
+
+  //void LoadSchemeResource(const BundleResource& res);
+
+  //struct Impl;
+  //std::unique_ptr<Impl> d;
+};
 }
 
-#endif // CPPMICROSERVICES_SHELLSERVICE_H
+#endif // CPPMICROSERVICES_SHELLSERVICEIMPL_H

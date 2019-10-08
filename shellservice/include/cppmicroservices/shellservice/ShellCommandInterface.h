@@ -20,21 +20,23 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SHELLSERVICE_H
-#define CPPMICROSERVICES_SHELLSERVICE_H
+#ifndef CPPMICROSERVICES_SHELLCOMMANDINTERFACE_H
+#define CPPMICROSERVICES_SHELLCOMMANDINTERFACE_H
 
 #include "cppmicroservices/GlobalConfig.h"
+
+#include "cppmicroservices/BundleContext.h"
 
 #include <memory>
 #include <vector>
 
 namespace cppmicroservices {
 
-struct ShellService {
-    virtual ~ShellService(){}
-    virtual void ExecuteCommand(const std::string& cmd) = 0;
+struct ShellCommandInterface {
+    virtual ~ShellCommandInterface(){}
+    virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments) = 0;
 };
     
 }
 
-#endif // CPPMICROSERVICES_SHELLSERVICE_H
+#endif // CPPMICROSERVICES_SHELLCOMMANDINTERFACE_H

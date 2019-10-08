@@ -23,11 +23,16 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
+
+#include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/shellservice/ShellService.h"
 
 #include "linenoise.h"
+
+#include <unordered_map>
 
 // clang-format off
 US_GCC_PUSH_DISABLE_WARNING(array-bounds)
@@ -74,53 +79,91 @@ const option::Descriptor usage[] = {
     "",
     option::Arg::None,
     "\nExamples:\n"
-    "  " US_SHELL_PROG_NAME " --load /home/user/libmybundle.so\n" },
+    "  " US_SHELL_PROG_NAME " --load=/home/user/libmybundle.so\n" },
   { 0, 0, nullptr, nullptr, nullptr, nullptr }
 };
 
-static std::shared_ptr<ShellService> g_ShellService;
+//static std::shared_ptr<ShellService> g_ShellService;
 
 void shellCompletion(const char* buf, linenoiseCompletions* lc)
 {
-  if (g_ShellService == nullptr || buf == nullptr)
-    return;
-
-  g_ShellService->GetCompletions(buf);
-  std::vector<std::string> completions = g_ShellService->GetCompletions(buf);
-  for (std::vector<std::string>::const_iterator iter = completions.begin(),
-                                                iterEnd = completions.end();
-       iter != iterEnd;
-       ++iter) {
-    linenoiseAddCompletion(lc, iter->c_str());
-  }
+    if (buf[0] == 'h') {
+        linenoiseAddCompletion(lc, "hello");
+        linenoiseAddCompletion(lc, "hello there");
+    }
+//  if (g_ShellService == nullptr || buf == nullptr)
+//    return;
+//
+//  g_ShellService->GetCompletions(buf);
+//  std::vector<std::string> completions = g_ShellService->GetCompletions(buf);
+//  for (std::vector<std::string>::const_iterator iter = completions.begin(),
+//                                                iterEnd = completions.end();
+//       iter != iterEnd;
+//       ++iter) {
+//    linenoiseAddCompletion(lc, iter->c_str());
+//  }
 }
 
 int main(int argc, char** argv)
 {
-  argc -= (argc > 0);
-  argv += (argc > 0); // skip program name argv[0] if present
-  option::Stats stats(usage, argc, argv);
-  std::unique_ptr<option::Option[]> options(
-    new option::Option[stats.options_max]);
-  std::unique_ptr<option::Option[]> buffer(
-    new option::Option[stats.buffer_max]);
-  option::Parser parse(usage, argc, argv, options.get(), buffer.get());
+              argc -= (argc > 0);
+              argv += (argc > 0); // skip program name argv[0] if present
+              option::Stats stats(usage, argc, argv);
+              std::unique_ptr<option::Option[]> options(
+                new option::Option[stats.options_max]);
+              std::unique_ptr<option::Option[]> buffer(
+                new option::Option[stats.buffer_max]);
+              option::Parser parse(usage, argc, argv, options.get(), buffer.get());
 
-  if (parse.error())
-    return 1;
+              if (parse.error())
+                return 1;
 
-  if (options[HELP]) {
-    option::printUsage(std::cout, usage);
-    return 0;
-  }
+              if (options[HELP]) {
+                option::printUsage(std::cout, usage);
+                return 0;
+              }
 
-  linenoiseSetCompletionCallback(shellCompletion);
+              linenoiseSetCompletionCallback(shellCompletion);
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
   framework.Start();
   auto context = framework.GetBundleContext();
 
+  // install ShellService plugin
+  const std::string shellservice_path = "/Users/kevinlee/Documents/git/development/build/lib/Debug/libusShellServiced.0.1.0.dylib";
+  context.InstallBundles(shellservice_path);
+    
+  // start ShellService plugin
+  auto installedBundles = context.GetBundles();
+  ::cppmicroservices::LDAPFilter shellserviceFilter("(bundle.symbolic_name=usShellService)");
+  ::cppmicroservices::Bundle shellservicePlugin;
+    
+  for (const auto& bundle : installedBundles) {
+    if ( shellserviceFilter.Match(bundle) ) {
+      shellservicePlugin = bundle;
+      break;
+    }
+  }
+    
+  shellservicePlugin.Start();
+    
+  // get service
+  auto bc = shellservicePlugin.GetBundleContext();
+  std::shared_ptr<ShellService> shellService;
+  ServiceReference<ShellService> ref = bc.GetServiceReference<ShellService>();
+    
+  if (ref) {
+    shellService = bc.GetService(ref);
+  }
+    
+  if (!shellService) {
+    std::cerr << "Shell service not available" << std::endl;
+    return EXIT_FAILURE;
+  }
+    
+
+  // load user-specified bundles?
   try {
     std::vector<Bundle> bundles;
     for (option::Option* opt = options[LOAD_BUNDLE]; opt; opt = opt->next()) {
@@ -138,21 +181,11 @@ int main(int argc, char** argv)
     std::cerr << e.what() << std::endl;
     return 1;
   }
-
-  std::shared_ptr<ShellService> shellService;
-  ServiceReference<ShellService> ref =
-    context.GetServiceReference<ShellService>();
-  if (ref) {
-    shellService = context.GetService(ref);
-  }
-
-  if (!shellService) {
-    std::cerr << "Shell service not available" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  g_ShellService = shellService;
-
+    
+    
+  //g_ShellService = shellService;
+    
+    
   char* line = nullptr;
   while ((line = linenoise("us> ")) != nullptr) {
     /* Do something with the string. */
@@ -160,6 +193,20 @@ int main(int argc, char** argv)
       linenoiseHistoryAdd(line); /* Add to the history. */
       //linenoiseHistorySave("history.txt"); /* Save the history on disk. */
     }
+    
+    if (std::string(line) == "quit" | std::string(line) == "exit") {
+      break;
+    }
+      
+    if (std::string(line) == "help") {
+        for (auto& bundle: installedBundles) {
+            auto abc = bundle.GetHeaders();
+            auto bb = abc.find("bundle.symbolic_name");
+            auto cc = abc.find("ShellCommands");
+            std::cout << "hello" << std::endl;
+        }
+    }
+      
     shellService->ExecuteCommand(line);
     free(line);
     std::cout << std::endl;

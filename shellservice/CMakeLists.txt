@@ -1,6 +1,6 @@
 set(_srcs
   src/ShellActivator.cpp
-  src/ShellService.cpp
+  src/ShellServiceImpl.cpp
 
   ../third_party/tinyscheme/scheme.c
 )
@@ -27,6 +27,7 @@ endif()
 
 
 set(_private_headers
+  include/cppmicroservices/shellservice/ShellServiceImpl.h
 )
 
 set(_public_headers

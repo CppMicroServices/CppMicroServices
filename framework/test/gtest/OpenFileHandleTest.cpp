@@ -45,7 +45,6 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
 static unsigned long GetHandleCountForCurrentProcess()
 {
 #  if defined(US_PLATFORM_WINDOWS)
@@ -77,13 +76,11 @@ static unsigned long GetHandleCountForCurrentProcess()
     "unsupported platform - can't get handle count for current process.")
 #  endif
 }
-#endif
 
 // Test that the file handle count doesn't change after installing a bundle.
 // Installing a bundle should not hold the file open.
 TEST(OpenFileHandleTest, InstallBundle)
 {
-#if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f);
   f.Start();
@@ -105,11 +102,17 @@ TEST(OpenFileHandleTest, InstallBundle)
 
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
-#endif
 }
 
-// Test that the bundle properly opens and closes its resource container as
-// bundle resources are requested and discarded
+/*
+  Test that the bundle properly opens and closes its resource container as
+  bundle resources are requested and discarded.
+
+  Note: This test is defined out on mac since there appears to be no reliable way
+  to get the current number of open file handles on mac. Even though the system calls 
+  for opening a file handle exist, it still doesn't show up in lsof and thus 
+  the test always fails.
+*/
 TEST(OpenFileHandleTest, BundleOpenCloseContainer)
 {
 #if defined(US_PLATFORM_WINDOWS) || defined(US_PLATFORM_LINUX)

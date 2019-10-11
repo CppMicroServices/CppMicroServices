@@ -438,6 +438,8 @@ if(MINGW)
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
   # we need to define a Windows version (Windows Vista)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
+  # silence ignored attributes warnings
+  add_compile_options(-Wno-attributes -Wno-deprecated-copy)
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)

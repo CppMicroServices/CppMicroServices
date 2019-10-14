@@ -34,13 +34,11 @@ using namespace cppmicroservices;
 class BundleResourceTest : public ::testing::Test
 {
 protected:
-  Bundle bundleR;
+  Bundle    bundleR;
   Framework f;
 
 public:
-  BundleResourceTest()
-    : f(FrameworkFactory().NewFramework())
-  {}
+  BundleResourceTest() : f(FrameworkFactory().NewFramework()) {}
   ~BundleResourceTest() override = default;
 
   virtual void SetUp()
@@ -57,28 +55,26 @@ public:
   }
 };
 
-TEST_F(BundleResourceTest, operatorEqualTo)
+TEST(BundleResourceTestNoBundleInstall, operatorEqualTo)
 {
   BundleResource a;
   BundleResource b;
   ASSERT_TRUE(a == b);
 }
 
-TEST_F(BundleResourceTest, invalidBundleResource)
+TEST(BundleResourceTestNoBundleInstall, getChildResourcesFromInvalidBundle)
 {
   BundleResource result;
-  ASSERT_EQ(size(result.GetChildResources()), 0);
+  ASSERT_EQ(result.GetChildResources().size(), 0);
 }
 
-TEST_F(BundleResourceTest, emptyChildNode)
+TEST_F(BundleResourceTest, getChildResources)
 {
   BundleResource resource = bundleR.GetResource("icons/");
-  ASSERT_EQ(size(resource.GetChildResources()), 0);
-}
+  ASSERT_EQ(resource.GetChildResources().size(), 0);
 
-TEST_F(BundleResourceTest, iterateChildNode)
-{
-  BundleResource resource = bundleR.GetResource("icons/");
+  // GetChildResources() should not have a dependency on GetChildren()
+  // to return the correct size
   resource.GetChildren();
-  ASSERT_EQ(size(resource.GetChildResources()), 3);
+  ASSERT_EQ(resource.GetChildResources().size(), 3);
 }

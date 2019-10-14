@@ -8,8 +8,9 @@ comment:
 
 coverage:
   ignore:
-    - "third_party/.*"  # ignore folder and all its contents
-    - "**/test/.*"      # ignore test code
+    - "third_party/.*"          # ignore folder and all its contents
+    - "**/test/.*"              # ignore test code
+    - "/Applications/Xcode*/.*" # ignore system headers
 
   fixes:
     - "projects/cppmicroservices::"

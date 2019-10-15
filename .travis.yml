@@ -17,9 +17,9 @@ matrix:
     include:
 
         # # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
-        # - os: linux
-        #   addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
-        #   env: MY_CC=gcc-5 MY_CXX=g++-5
+         - os: linux
+           addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
+           env: MY_CC=gcc-5 MY_CXX=g++-5
 
         # # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
         # - os: linux

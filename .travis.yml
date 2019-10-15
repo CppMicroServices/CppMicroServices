@@ -66,7 +66,7 @@ matrix:
 
         # latest compiler on OS X
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.1
           compiler: clang
           env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
 

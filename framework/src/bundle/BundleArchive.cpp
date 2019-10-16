@@ -78,7 +78,7 @@ std::string BundleArchive::GetResourcePrefix() const
   return resourcePrefix;
 }
 
-BundleResource BundleArchive::GetResource(const std::string& path) const
+BundleResource BundleArchive::GetResource(const std::string& path)
 {
   if (!resourceContainer) {
     return BundleResource();
@@ -94,7 +94,7 @@ BundleResource BundleArchive::GetResource(const std::string& path) const
 std::vector<BundleResource> BundleArchive::FindResources(
   const std::string& path,
   const std::string& filePattern,
-  bool recurse) const
+  bool recurse)
 {
   std::vector<BundleResource> result;
   if (!resourceContainer) {

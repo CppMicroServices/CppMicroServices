@@ -162,7 +162,7 @@ void BundleResourceContainer::GetChildren(const std::string& resourcePath,
 }
 
 void BundleResourceContainer::FindNodes(
-  const std::shared_ptr<const BundleArchive>& archive,
+  const std::shared_ptr<BundleArchive>& archive,
   const std::string& path,
   const std::string& filePattern,
   bool recurse,

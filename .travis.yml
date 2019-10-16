@@ -16,74 +16,74 @@ env:
 matrix:
     include:
   
-      # # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
-      # - os: linux
-      #   addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
-      #   env: MY_CC=gcc-5 MY_CXX=g++-5
+      # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
+      - os: linux
+        addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
+        env: MY_CC=gcc-5 MY_CXX=g++-5
 
-      # # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
-      # - os: linux
-      #   dist: trusty
-      #   compiler: clang
-      #   addons: { apt: { packages: ["valgrind", "clang-3.5", "libc++-dev", "libc++abi-dev", "g++-4.9"], sources: ["ubuntu-toolchain-r-test", llvm-toolchain-trusty-3.5] } }
-      #   # Travis puts /usr/local/clang-5.0.0/bin in front of the path, so we have to "fix" that
-      #   env: MY_CC=clang-3.5 MY_CXX=clang++-3.5 PATH=/usr/bin:$PATH
+      # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
+      - os: linux
+        dist: trusty
+        compiler: clang
+        addons: { apt: { packages: ["valgrind", "clang-3.5", "libc++-dev", "libc++abi-dev", "g++-4.9"], sources: ["ubuntu-toolchain-r-test", llvm-toolchain-trusty-3.5] } }
+        # Travis puts /usr/local/clang-5.0.0/bin in front of the path, so we have to "fix" that
+        env: MY_CC=clang-3.5 MY_CXX=clang++-3.5 PATH=/usr/bin:$PATH
 
-      # # Test one build configuration with the latest available Clang
-      # - os: linux
-      #   dist: xenial
-      #   compiler: clang
-      #   addons: { apt: { packages: ["valgrind", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test"] } }
-      #   env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
+      # Test one build configuration with the latest available Clang
+      - os: linux
+        dist: xenial
+        compiler: clang
+        addons: { apt: { packages: ["valgrind", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test"] } }
+        env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
 
-      # # Test all build configuration with the latest available GCC
-      # - os: linux
-      #   addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
-      #   env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
+      # Test all build configuration with the latest available GCC
+      - os: linux
+        addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+        env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
 
-      # - os: linux
-      #   addons: *gcc8-valgrind
-      #   env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1
+      - os: linux
+        addons: *gcc8-valgrind
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1
 
-      # - os: linux
-      #   addons: *gcc8-valgrind
-      #   env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1
+      - os: linux
+        addons: *gcc8-valgrind
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1
 
-      # - os: linux
-      #   addons: *gcc8-valgrind
-      #   env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1
+      - os: linux
+        addons: *gcc8-valgrind
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1
 
-      # # minimum supported compiler on OS X
-      # - os: osx
-      #   osx_image: xcode7.3
-      #   compiler: clang
-      #   env: MACOSX_DEPLOYMENT_TARGET=10.11
+      # minimum supported compiler on OS X
+      - os: osx
+        osx_image: xcode7.3
+        compiler: clang
+        env: MACOSX_DEPLOYMENT_TARGET=10.11
 
-      # - os: osx
-      #   osx_image: xcode7.3
-      #   compiler: clang
-      #   env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
+      - os: osx
+        osx_image: xcode7.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
 
       # latest compiler on OS X
       - os: osx
         osx_image: xcode10.3
         compiler: clang
-        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14.4 WITH_COVERAGE=1
+        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
-      # - os: osx
-      #   osx_image: xcode11.2
-      #   compiler: clang
-      #   env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
-      # - os: osx
-      #   osx_image: xcode11.2
-      #   compiler: clang
-      #   env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
-      # - os: osx
-      #   osx_image: xcode11.2
-      #   compiler: clang
-      #   env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
 cache:
   directories:

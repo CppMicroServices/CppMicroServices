@@ -64,26 +64,26 @@ matrix:
           compiler: clang
           env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
 
-        # latest compiler on OS X
+        # recent OSX compiler
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.3
           compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.3
           compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.3
           compiler: clang
-          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.3
           compiler: clang
-          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
 cache:
   directories:

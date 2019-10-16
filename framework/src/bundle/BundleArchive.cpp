@@ -84,10 +84,6 @@ BundleResource BundleArchive::GetResource(const std::string& path) const
     return BundleResource();
   }
 
-  if (!resourceContainer->IsContainerOpen()) {
-    resourceContainer->OpenContainer();
-  }
-
   BundleResource result(path, this->shared_from_this());
   if (result) {
     return result;
@@ -103,10 +99,6 @@ std::vector<BundleResource> BundleArchive::FindResources(
   std::vector<BundleResource> result;
   if (!resourceContainer) {
     return result;
-  }
-
-  if (!resourceContainer->IsContainerOpen()) {
-    resourceContainer->OpenContainer();
   }
 
   std::string normalizedPath = path;

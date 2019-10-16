@@ -65,9 +65,6 @@ BundleResourcePrivate::BundleResourcePrivate(std::shared_ptr<const BundleArchive
   , ref(1)
 {
   if (this->archive) {
-    if (!this->archive->resourceContainer->IsContainerOpen())
-      this->archive->resourceContainer->OpenContainer();
-
     this->archive->numOpenResources++;
   }
 }

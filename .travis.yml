@@ -7,7 +7,7 @@ env:
     - PATH=$HOME/cache/bin/:$PATH
     - BUILD_DIR=/tmp/cppmicroservices_builds
     - BUILD_CONFIGURATION=0
-    - MAKEFLAGS="-j"
+    - MAKEFLAGS="-j 2"
     - secure: "g2dT1rLVDXAR7uFkhgKlm7rUqCPHwl+o4CFSqEo5w9H/M5xuuQLP597J8qwhgkWutJABM4G4zLF9yzb5rTbUH1BSdGTzmdUkvJGvLOFq09xwLQP5PAKlq6s1dpVr7J9Ciy49cEVDD2leaikMf9zK3ty9Fv5F2mL3Itd6a/U5M5o="
 
 # We do not test all build configurations with all compiler / platform

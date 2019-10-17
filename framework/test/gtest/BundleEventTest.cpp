@@ -42,7 +42,7 @@ public:
 
   ~BundleEventTest() override = default;
 
-  virtual void SetUp()
+  void SetUp() override
   {
     f.Start();
 
@@ -55,7 +55,7 @@ public:
 #endif
   }
 
-  virtual void TearDown()
+  void TearDown() override
   {
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());

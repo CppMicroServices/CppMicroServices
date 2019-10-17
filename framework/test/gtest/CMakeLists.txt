@@ -30,9 +30,9 @@ set(_gtest_tests
   ServiceReferenceTest.cpp
   ServiceFactoryTest.cpp
   BundleEventTest.cpp
+  BundleResourceTest.cpp
   BundleStreamOperatorTest.cpp
   ServiceEventStreamOperatorTest.cpp
-  BundleResourceTest.cpp
 )
 
 set(_additional_srcs

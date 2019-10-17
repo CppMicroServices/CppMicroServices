@@ -176,6 +176,7 @@ class MockComponentInstance
 {
 public:
   MOCK_METHOD1(CreateInstanceAndBindReferences, void(const std::shared_ptr<service::component::ComponentContext>&));
+  MOCK_METHOD0(UnbindReferences, void(void));
   MOCK_METHOD0(Activate, void(void));
   MOCK_METHOD0(Deactivate, void(void));
   MOCK_METHOD0(Modified, void(void));
@@ -249,6 +250,7 @@ public:
   virtual ~MockComponentConfigurationImpl() = default;
   MOCK_METHOD0(GetFactory, std::shared_ptr<ServiceFactory>(void));
   MOCK_METHOD1(CreateAndActivateComponentInstance, std::shared_ptr<ComponentInstance>(const cppmicroservices::Bundle&));
+  MOCK_METHOD1(UnbindAndDeactivateComponentInstance, void(std::shared_ptr<ComponentInstance>));
   MOCK_METHOD0(DestroyComponentInstances, void());
   void SetState(const std::shared_ptr<ComponentConfigurationState>& newState)
   {

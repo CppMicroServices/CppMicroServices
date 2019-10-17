@@ -144,6 +144,49 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle) // DS_TOI_51
 }
 
 /**
+ * verify state progressions for a immediate component
+ * UNSATISFIED_REFERENCE -> ACTIVE -> UNSATISFIED_REFERENCE
+ */
+TEST_F(tServiceComponent, testImmediateComponent_LifeCycle_Dynamic) // DS_TOI_51
+{
+  auto testBundle = StartTestBundle("TestBundleDSTOI7");
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent7");
+  auto compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTOs.size(), 1ul);
+  EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+  auto ctxt = framework.GetBundleContext();
+  auto sRef = ctxt.GetServiceReference<test::Interface2>();
+  EXPECT_FALSE(static_cast<bool>(sRef)) << "Service must not be available before it's dependency";
+  auto depBundle = StartTestBundle("TestBundleDSTOI1");
+
+  // wait for the asynchronous task to take effect
+  auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+                                           compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+                                         },
+    [&compConfigDTOs]()->bool {
+      return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+    });
+
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE after the dependency became available";
+  auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
+  EXPECT_TRUE(static_cast<bool>(sRef1)) << "Service must be available after it's dependency is available";
+  auto service = ctxt.GetService<test::Interface2>(sRef1);
+
+  ASSERT_NE(service, nullptr);
+  EXPECT_NO_THROW(service->ExtendedDescription()) << "Throws if the dependency could not be found";
+  depBundle.Stop();
+  result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+                                      compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+                                    },
+    [&compConfigDTOs]()->bool {
+      return compConfigDTOs.at(0).state == scr::dto::ComponentState::UNSATISFIED_REFERENCE;
+    });
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to UNSATISFIED_REFERENCE after the dependency was removed";
+  auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
+  EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
+}
+
+/**
  * verify state progressions for a delayed component
  * UNSATISFIED_REFERENCE -> SATISFIED -> ACTIVE -> UNSATISFIED_REFERENCE
  */

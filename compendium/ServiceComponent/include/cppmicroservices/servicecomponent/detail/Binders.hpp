@@ -182,10 +182,11 @@ public:
     DoBind(service, comp);
   }
   
-  void Unbind(const std::shared_ptr<ComponentContext>&
-              , const std::shared_ptr<T>&) override
+  void Unbind(const std::shared_ptr<ComponentContext>& ctxt
+              , const std::shared_ptr<T>& comp) override
   {
-    throw std::runtime_error("UnImplemented method");
+    std::shared_ptr<R> service = ctxt->LocateService<R>(this->GetReferenceName());
+    DoUnbind(service, comp);
   }
 
   void Bind(const std::shared_ptr<void>& serv

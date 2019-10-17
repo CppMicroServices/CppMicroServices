@@ -244,6 +244,14 @@ public:
     }
   }
 
+  void UnbindReferences() override
+  {
+    for(auto& binder : this->refBinders)
+    {
+      binder->Unbind(this->mContext, this->mServiceImpl);
+    }
+  }
+  
   /**
    * DoCreate is a helper function used to invoke the appropriate constructor on the Implementation class.
    * SFINAE is used to determine which overload of DoCreate is used by the runtime.

@@ -89,6 +89,7 @@ void SingletonComponentConfigurationImpl::DestroyComponentInstances()
     if(instanceContextPair->first)
     {
       instanceContextPair->first->Deactivate();
+      instanceContextPair->first->UnbindReferences();
     }
   }
   catch(...)

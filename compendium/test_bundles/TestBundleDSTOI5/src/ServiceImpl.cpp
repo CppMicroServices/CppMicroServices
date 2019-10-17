@@ -1,15 +1,14 @@
 #include "ServiceImpl.hpp"
+#include <iostream>
 
 namespace sample {
 
-void ServiceComponent5::Activate(const std::shared_ptr<ComponentContext>& ctxt)
+void ServiceComponent5::Activate(const std::shared_ptr<ComponentContext>& /*ctxt*/)
 {
-  foo = ctxt->LocateService<test::Interface1>("foo");
 }
   
 void ServiceComponent5::Deactivate(const std::shared_ptr<ComponentContext>&)
 {
-  foo = nullptr;
 }
 
 std::string ServiceComponent5::ExtendedDescription()

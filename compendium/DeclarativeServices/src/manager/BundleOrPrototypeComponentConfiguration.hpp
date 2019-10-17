@@ -61,6 +61,7 @@ public:
    */
   std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle) override;
 
+
   /**
    * Method removes all instances of {@link ComponentInstance} object created by this object.
    */

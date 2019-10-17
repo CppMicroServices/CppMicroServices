@@ -81,6 +81,7 @@ void BundleOrPrototypeComponentConfigurationImpl::DeactivateComponentInstance(co
   try
   {
     instCtxt.first->Deactivate();
+    instCtxt.first->UnbindReferences();
   }
   catch(...)
   {

@@ -224,6 +224,8 @@ protected:
    * Helper function used by sub-classes to create and activate a {@link ComponentInstance} object
    */
   InstanceContextPair CreateAndActivateComponentInstanceHelper(const cppmicroservices::Bundle& bundle);
+  void UnbindAndDeactivateComponentInstanceHelper(std::shared_ptr<ComponentInstance> componentInstance);
+
 
   /**
    * Sets the function pointers used to create and delete a {@link ComponentInstance} object

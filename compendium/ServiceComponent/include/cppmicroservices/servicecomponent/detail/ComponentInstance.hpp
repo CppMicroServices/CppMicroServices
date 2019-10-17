@@ -48,7 +48,8 @@ class US_ServiceComponent_EXPORT ComponentInstance {
    * @param ctxt The {@code ComponentContext} object associated with the component instance.
    */
   virtual void CreateInstanceAndBindReferences(const std::shared_ptr<ComponentContext>& ctxt) = 0;
-
+  virtual void UnbindReferences() = 0;
+  
   /**
    * This method is called by the runtime while activating the component configuration.
    * It is called after the call to {@code #CreateInstanceAndBindReferences} method suceeded.

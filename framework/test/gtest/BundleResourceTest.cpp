@@ -41,14 +41,14 @@ public:
   BundleResourceTest() : f(FrameworkFactory().NewFramework()) {}
   ~BundleResourceTest() override = default;
 
-  virtual void SetUp()
+  void SetUp() override
   {
     f.Start();
     auto fCtx = f.GetBundleContext();
     bundleR = cppmicroservices::testing::InstallLib(fCtx, "TestBundleR");
   }
 
-  virtual void TearDown()
+  void TearDown() override
   {
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
@@ -65,16 +65,16 @@ TEST(BundleResourceTestNoBundleInstall, operatorEqualTo)
 TEST(BundleResourceTestNoBundleInstall, getChildResourcesFromInvalidBundle)
 {
   BundleResource result;
-  ASSERT_EQ(result.GetChildResources().size(), 0);
+  ASSERT_EQ(result.GetChildResources().size(), static_cast<unsigned int>(0));
 }
 
 TEST_F(BundleResourceTest, getChildResources)
 {
   BundleResource resource = bundleR.GetResource("icons/");
-  ASSERT_EQ(resource.GetChildResources().size(), 0);
+  ASSERT_EQ(resource.GetChildResources().size(), static_cast<unsigned int>(0));
 
   // GetChildResources() should not have a dependency on GetChildren()
   // to return the correct size
   resource.GetChildren();
-  ASSERT_EQ(resource.GetChildResources().size(), 3);
+  ASSERT_EQ(resource.GetChildResources().size(), static_cast<unsigned int>(3));
 }

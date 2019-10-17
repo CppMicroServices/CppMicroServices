@@ -93,8 +93,6 @@ public:
   /// with a limit (e.g. Windows).
   void CloseContainer();
 
-  bool IsContainerOpen() const;
-
 private:
 using NameIndexPair = std::pair<std::string, int>;
 

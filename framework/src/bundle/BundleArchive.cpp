@@ -147,6 +147,7 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
 }
 }
 /*
+
   NOTE: If these lines of code are removed, then the code coverage tool will complain
       for some reason D: Instead of placing blank lines here, I've decided to bless
       your eyes with the beauty of written word :) Delete at your own risk V.V
@@ -163,5 +164,4 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   But when thou decided to fail for no apparent reason,
   I admittedly think actively about treason.
 
-  ~ Alex, 2019
 */

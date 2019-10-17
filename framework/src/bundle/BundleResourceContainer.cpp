@@ -268,9 +268,4 @@ void BundleResourceContainer::CloseContainer()
     m_IsContainerOpen = false;
   }
 }
-
-bool BundleResourceContainer::IsContainerOpen() const 
-{
-  return m_IsContainerOpen;
-}
 }

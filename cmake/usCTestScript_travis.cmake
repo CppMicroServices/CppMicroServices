@@ -1,4 +1,3 @@
-
 find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
 find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
 find_program(CTEST_GIT_COMMAND NAMES git)
@@ -15,7 +14,7 @@ if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   # gcc in combination with gcov seems to consume a lot of memory
   # and may lead to OOM error on Travis containers. Hence we compile
   # with -j for non-GNU compilers only.
-set(CTEST_BUILD_FLAGS "-j")
+  set(CTEST_BUILD_FLAGS "-j")
 endif()
 
 set(CTEST_CONFIGURATION_TYPE Release)

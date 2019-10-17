@@ -1,4 +1,3 @@
-
 macro(build_and_test)
 
   set(CTEST_SOURCE_DIRECTORY ${US_SOURCE_DIR})
@@ -37,6 +36,7 @@ macro(build_and_test)
 
   if(WITH_COVERAGE)
     if(CTEST_COVERAGE_COMMAND)
+      set(CTEST_COVERAGE_EXTRA_FLAGS "-p")
       ctest_coverage()
     else()
       message(FATAL_ERROR "CMake could not find coverage tool")

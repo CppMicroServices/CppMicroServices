@@ -78,7 +78,7 @@ std::string BundleArchive::GetResourcePrefix() const
   return resourcePrefix;
 }
 
-BundleResource BundleArchive::GetResource(const std::string& path)
+BundleResource BundleArchive::GetResource(const std::string& path) const
 {
   if (!resourceContainer) {
     return BundleResource();
@@ -94,7 +94,7 @@ BundleResource BundleArchive::GetResource(const std::string& path)
 std::vector<BundleResource> BundleArchive::FindResources(
   const std::string& path,
   const std::string& filePattern,
-  bool recurse)
+  bool recurse) const
 {
   std::vector<BundleResource> result;
   if (!resourceContainer) {
@@ -146,3 +146,22 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 }
+/*
+  NOTE: If these lines of code are removed, then the code coverage tool will complain
+      for some reason D: Instead of placing blank lines here, I've decided to bless
+      your eyes with the beauty of written word :) Delete at your own risk V.V
+
+  O code coverage tool that which I face,
+  Thou art so mighty and full of grace.
+
+  Line by line, brace by brace,
+  parsing code 'til you hit that last space.
+
+  No errors produced,
+  Makes my face quite amused,
+
+  But when thou decided to fail for no apparent reason,
+  I admittedly think actively about treason.
+
+  ~ Alex, 2019
+*/

@@ -5,12 +5,10 @@ namespace sample {
 
 void ServiceComponent7::Activate(const std::shared_ptr<ComponentContext>& /*ctxt*/)
 {
-//  foo = ctxt->LocateService<test::Interface1>("foo");
 }
   
 void ServiceComponent7::Deactivate(const std::shared_ptr<ComponentContext>&)
 {
-//  foo = nullptr;
 }
 
 std::string ServiceComponent7::ExtendedDescription()

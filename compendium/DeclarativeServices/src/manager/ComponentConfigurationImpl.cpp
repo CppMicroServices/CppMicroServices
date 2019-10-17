@@ -255,10 +255,4 @@ InstanceContextPair ComponentConfigurationImpl::CreateAndActivateComponentInstan
   return std::make_pair(componentInstance, ctxt);
 }
 
-void ComponentConfigurationImpl::UnbindAndDeactivateComponentInstanceHelper(std::shared_ptr<ComponentInstance> componentInstance)
-{
-  componentInstance->Deactivate();
-  componentInstance->UnbindReferences();
-}
-
 }} // namespaces

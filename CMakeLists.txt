@@ -111,6 +111,11 @@ if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_
   message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
 endif()
 
+STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
+if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
+  set(ARM 1)
+endif()
+
 #-----------------------------------------------------------------------------
 # Update CMake module path
 #------------------------------------------------------------------------------
@@ -389,6 +394,13 @@ else()
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
+
+  if(ARM)
+    # arm gcc warns that several reinterpret_cast need increased alignemnt in reinterpret_cast<>
+    # but it appears to be warning due to unknow/unguaranteed alignment of char*
+    usFunctionCheckCompilerFlags(-Wno-error=cast-align US_CXX_FLAGS)
+  endif()
+
   if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     # The check does not work reliably for gcc
     usFunctionCheckCompilerFlags(-Wno-mismatched-tags US_CXX_FLAGS)
@@ -474,6 +486,10 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
       set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
     endif()
   endforeach()
+  if(ARM)
+    # atomic intrinsics are in libatomic on ARM GCC
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} -latomic")
+  endif()
 endif()
 
 if(NOT MSVC)

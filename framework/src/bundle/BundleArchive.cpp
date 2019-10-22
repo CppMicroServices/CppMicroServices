@@ -37,7 +37,7 @@ const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
   "activation_policy";
 
 BundleArchive::BundleArchive()
-  : storage(nullptr)
+  : storage(nullptr), numOpenResources(0)
 {}
 
 BundleArchive::BundleArchive(
@@ -50,6 +50,7 @@ BundleArchive::BundleArchive(
   , data(std::move(data))
   , resourceContainer(std::move(resourceContainer))
   , resourcePrefix(std::move(resourcePrefix))
+  , numOpenResources(0)
   , location(std::move(location))
 {}
 
@@ -145,23 +146,19 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
 {
   return resourceContainer;
 }
+
+void BundleArchive::IncrementNumOpenResources() const 
+{ 
+  numOpenResources++; 
 }
-/*
 
-  NOTE: If these lines of code are removed, then the code coverage tool will complain
-      for some reason D: Instead of placing blank lines here, I've decided to bless
-      your eyes with the beauty of written word :) Delete at your own risk V.V
+void BundleArchive::DecrementNumOpenResources() const 
+{ 
+  numOpenResources--; 
+}
 
-  O code coverage tool that which I face,
-  Thou art so mighty and full of grace.
-
-  Line by line, brace by brace,
-  parsing code 'til you hit that last space.
-
-  No errors produced,
-  Makes my face quite amused,
-
-  But when thou decided to fail for no apparent reason,
-  I admittedly think actively about treason.
-
-*/
+unsigned int BundleArchive::GetNumOpenResources() const 
+{ 
+  return numOpenResources;
+}
+}

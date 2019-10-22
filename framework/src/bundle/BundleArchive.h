@@ -33,7 +33,6 @@ namespace cppmicroservices {
 class BundleResource;
 class BundleResourceContainer;
 struct BundleStorage;
-//class BundleResourcePrivate;
 
 /**
  * Class for managing bundle data.
@@ -157,15 +156,29 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
-private:
-  friend class BundleResourcePrivate;
+  /**
+   * Increment the number of open resources by one.
+   */
+  void IncrementNumOpenResources() const;
+
+  /**
+   * Decrement the number of open resources by one.
+   */
+  void DecrementNumOpenResources() const;
+
+  /**
+   * Get the number of opened resources.
+   * 
+   * @return the number of opened resources.
+   */
+  unsigned int GetNumOpenResources() const;
 
 private:
   BundleStorage* const storage;
   const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
-  mutable unsigned int numOpenResources = 0;
   const std::string resourcePrefix;
+  mutable unsigned int numOpenResources;
   const std::string location;
 };
 }

@@ -105,9 +105,6 @@ using NameIndexPair = std::pair<std::string, int>;
     }
   };
 
-  friend struct BundleArchive;
-  friend class BundleResourcePrivate;
-
   void InitSortedEntries();
 
   bool Matches(const std::string& name, const std::string& filePattern) const;

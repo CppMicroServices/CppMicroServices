@@ -74,8 +74,9 @@ BundleResourcePrivate::~BundleResourcePrivate()
   if (this->archive) {
     this->archive->DecrementNumOpenResources();
 
-    if (this->archive->GetNumOpenResources() == 0)
+    if (this->archive->GetNumOpenResources() == 0) {
       this->archive->GetResourceContainer()->CloseContainer();
+    }
   }
 }
 

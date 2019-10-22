@@ -149,19 +149,16 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
 
 void BundleArchive::RegisterOpenedResource() const 
 { 
+  std::lock_guard<std::mutex> lock(numOpenResourcesLock);
   numOpenResources++; 
 }
 
 void BundleArchive::UnregisterOpenedResource() const 
 { 
+  std::lock_guard<std::mutex> lock(numOpenResourcesLock);
   numOpenResources--;
   if (numOpenResources == 0) {
     resourceContainer->CloseContainer();
   }
-}
-
-unsigned int BundleArchive::GetNumOpenResources() const 
-{ 
-  return numOpenResources;
 }
 }

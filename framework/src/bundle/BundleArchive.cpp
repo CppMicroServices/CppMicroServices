@@ -147,14 +147,17 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 
-void BundleArchive::IncrementNumOpenResources() const 
+void BundleArchive::RegisterOpenedResource() const 
 { 
   numOpenResources++; 
 }
 
-void BundleArchive::DecrementNumOpenResources() const 
+void BundleArchive::UnregisterOpenedResource() const 
 { 
-  numOpenResources--; 
+  numOpenResources--;
+  if (numOpenResources == 0) {
+    resourceContainer->CloseContainer();
+  }
 }
 
 unsigned int BundleArchive::GetNumOpenResources() const 

@@ -65,18 +65,14 @@ BundleResourcePrivate::BundleResourcePrivate(std::shared_ptr<const BundleArchive
   , ref(1)
 {
   if (this->archive) {
-    this->archive->IncrementNumOpenResources();
+    this->archive->RegisterOpenedResource();
   }
 }
 
 BundleResourcePrivate::~BundleResourcePrivate()
 {
   if (this->archive) {
-    this->archive->DecrementNumOpenResources();
-
-    if (this->archive->GetNumOpenResources() == 0) {
-      this->archive->GetResourceContainer()->CloseContainer();
-    }
+    this->archive->UnregisterOpenedResource();
   }
 }
 

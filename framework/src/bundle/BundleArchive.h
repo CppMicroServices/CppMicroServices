@@ -23,10 +23,11 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
+#include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
-#include <chrono>
 
 namespace cppmicroservices {
 
@@ -55,9 +56,9 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   BundleArchive(BundleStorage* storage,
                 std::unique_ptr<Data>&& data,
-                std::shared_ptr<BundleResourceContainer>  resourceContainer,
-                std::string  resourcePrefix,
-                std::string  location);
+                std::shared_ptr<BundleResourceContainer> resourceContainer,
+                std::string resourcePrefix,
+                std::string location);
 
   /**
    * Autostart setting stopped.
@@ -159,12 +160,15 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   /**
    * Increment the number of open resources by one.
    */
-  void IncrementNumOpenResources() const;
+  void RegisterOpenedResource() const;
 
   /**
    * Decrement the number of open resources by one.
+   * 
+   * Note: If the number of opened resources is 0, then the ResourceContainer
+   *       associated with this BundleArchive object is closed.
    */
-  void DecrementNumOpenResources() const;
+  void UnregisterOpenedResource() const;
 
   /**
    * Get the number of opened resources.
@@ -178,7 +182,7 @@ private:
   const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
-  mutable unsigned int numOpenResources;
+  mutable std::atomic<uint32_t> numOpenResources;
   const std::string location;
 };
 }

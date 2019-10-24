@@ -4,7 +4,7 @@
 +-------------+-------------------------+--------------------------+------------------------+
 | Branch      | GCC 5.4 and 8.0         | Visual Studio 2015       |                        |
 |             +-------------------------+--------------------------+------------------------+
-|             | Xcode 7.3 and 9.4       | Visual Studio 2017       |                        |
+|             | Xcode 7.3 and 10.3      | Visual Studio 2017       |                        |
 |             +-------------------------+--------------------------+------------------------+
 |             | Clang 3.5 and 6.0       | MinGW-w64                |                        |
 +=============+=========================+==========================+========================+
@@ -76,7 +76,7 @@ Below is a list of tested compiler/OS combinations:
 - Clang 3.5 (Ubuntu 14.04) via Travis CI
 - Clang 6.0 (Ubuntu 14.04) via Travis CI
 - Clang Xcode 7.3 (OS X 10.11) via Travis CI
-- Clang Xcode 9.4 (OS X 10.13) via Travis CI
+- Clang Xcode 10.3 (OS X 10.14) via Travis CI
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via Appveyor
 - MinGW-w64 via Appveyor

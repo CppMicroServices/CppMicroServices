@@ -44,9 +44,8 @@ const char* dlerror(void)
   return errStr.c_str();
 }
 
-void* dlopen(const char* path, int mode)
+void* dlopen(const char* path, int)
 {
-  (void)mode; // ignored
   auto loadLibrary = [](const std::string& path) -> HANDLE {
     std::wstring wpath(cppmicroservices::util::ToWString(path));
     return LoadLibraryW(wpath.c_str());

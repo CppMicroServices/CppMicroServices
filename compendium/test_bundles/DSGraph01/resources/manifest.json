@@ -1,0 +1,23 @@
+{
+    "bundle.symbolic_name" : "DSGraph01",
+    "bundle.name" : "DSGraph01",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "implementation-class": "graph::DSGraph01Impl",
+            "service" : {
+                "interfaces" : ["test::DSGraph01"]
+            },
+            "references" : [
+                {
+                    "name" : "dsgraph02",
+                    "interface" : "test::DSGraph02"
+                },
+                {
+                    "name" : "dsgraph03",
+                    "interface" : "test::DSGraph03"
+                }
+            ]
+        }]
+    }
+}

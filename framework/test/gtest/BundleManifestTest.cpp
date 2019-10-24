@@ -95,10 +95,15 @@ TEST(BundleManifestTest, UnicodeProperty)
 #else
   auto framework = FrameworkFactory().NewFramework();
   framework.Start();
-  std::string path_utf8 = testing::LIB_PATH + cppmicroservices::util::DIR_SEP +
-                          u8"くいりのまちとこしくそ" +
-                          cppmicroservices::util::DIR_SEP + US_LIB_PREFIX +
-                          "TestBundleU" + US_LIB_EXT;
+  std::string path_utf8 = testing::LIB_PATH
+                          + cppmicroservices::util::DIR_SEP
+                          + u8"くいりのまちとこしくそ"
+                          + cppmicroservices::util::DIR_SEP
+                          + US_LIB_PREFIX
+                          + "TestBundleU"
+                          + US_LIB_POSTFIX
+                          + US_LIB_EXT;
+  
   auto bundles = bc.InstallBundles(path_utf8);
   ASSERT_EQ(bundles.size(), 1) << "Failed to install bundle using a unicode path";
   auto bundle = bundles.at(0);

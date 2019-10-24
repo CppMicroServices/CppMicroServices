@@ -10,7 +10,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+  =============================================================================*/
 
 #include "Utils.h"
 
@@ -71,7 +71,7 @@ bool IsBundleFile(const std::string& location)
                            names.end(),
                            [](const std::string& resourceName) -> bool {
                              return resourceName ==
-                                    std::string("manifest.json");
+                               std::string("manifest.json");
                            });
       });
   } catch (...) {
@@ -83,20 +83,20 @@ bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resCon
 {
   auto topLevelDirs = resContainer->GetTopLevelDirs();
   return std::all_of(
-      topLevelDirs.begin(),
-      topLevelDirs.end(),
-      [&resContainer](const std::string& dir) -> bool {
-        std::vector<std::string> names;
-        std::vector<uint32_t> indices;
+    topLevelDirs.begin(),
+    topLevelDirs.end(),
+    [&resContainer](const std::string& dir) -> bool {
+      std::vector<std::string> names;
+      std::vector<uint32_t> indices;
 
-    resContainer->GetChildren(dir + "/", true, names, indices);
-        return std::all_of(names.begin(),
-                           names.end(),
-                           [](const std::string& resourceName) -> bool {
-                             return resourceName ==
-                                    std::string("manifest.json");
-                           });
-      });
+      resContainer->GetChildren(dir + "/", true, names, indices);
+      return std::all_of(names.begin(),
+                         names.end(),
+                         [](const std::string& resourceName) -> bool {
+                           return resourceName ==
+                             std::string("manifest.json");
+                         });
+    });
 }
 
 //-------------------------------------------------------------------
@@ -147,7 +147,7 @@ std::string GetPersistentStoragePath(CoreBundleContext* ctx,
 
 void TerminateForDebug(const std::exception_ptr ex)
 {
-#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) &&                \
+#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && \
   defined(_CRT_ERROR)
   std::string message = util::GetLastExceptionStr();
 
@@ -175,6 +175,7 @@ void TerminateForDebug(const std::exception_ptr ex)
 }
 
 namespace detail {
+
 std::string GetDemangledName(const std::type_info& typeInfo)
 {
   std::string result;
@@ -211,6 +212,5 @@ std::string GetDemangledName(const std::type_info& typeInfo)
 #endif
   return result;
 }
-}
 
-} // namespace cppmicroservices
+}} // namespaces

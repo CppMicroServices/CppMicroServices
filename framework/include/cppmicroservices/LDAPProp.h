@@ -38,15 +38,13 @@ class US_Framework_EXPORT LDAPPropExpr
 {
 public:
   LDAPPropExpr();
-  explicit LDAPPropExpr(std::string  expr);
+  explicit LDAPPropExpr(std::string expr);
 
   LDAPPropExpr& operator!();
 
   operator std::string() const;
 
   bool IsNull() const;
-
-  LDAPPropExpr& operator=(const LDAPPropExpr&);
 
   /**
   * Convenience operator for LDAP logical or '|'.

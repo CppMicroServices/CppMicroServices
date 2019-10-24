@@ -124,7 +124,7 @@ set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
 
 # Link additional libraries
 if(${PROJECT_NAME}_LINK_LIBRARIES)
-  target_link_libraries(${${PROJECT_NAME}_TARGET} ${${PROJECT_NAME}_LINK_LIBRARIES})
+  target_link_libraries(${${PROJECT_NAME}_TARGET} PUBLIC ${${PROJECT_NAME}_LINK_LIBRARIES})
 endif()
 
 # Embed bundle resources
@@ -158,8 +158,13 @@ if(NOT US_NO_INSTALL)
           LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
           ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices DESTINATION ${HEADER_INSTALL_DIR})
-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices DESTINATION ${HEADER_INSTALL_DIR})
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices
+          DESTINATION ${HEADER_INSTALL_DIR}
+          OPTIONAL)
+
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices
+          DESTINATION ${HEADER_INSTALL_DIR}
+          OPTIONAL)
 endif()
 
 #-----------------------------------------------------------------------------

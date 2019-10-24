@@ -1,0 +1,14 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI3",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "name": "sampleServiceComponent",
+            "immediate" : true,
+            "implementation-class": "sample::ServiceComponent3",
+            "service" : {
+                "interfaces" : ["test::Interface1"]
+            }
+        }]
+    }
+}

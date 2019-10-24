@@ -1,0 +1,6 @@
+{
+    "bundle.symbolic_name" : "declarative_services",
+    "bundle.name" : "Declarative Services",
+    "bundle.version" : "@DeclarativeServices_VERSION@",
+    "bundle.activator" : true
+}

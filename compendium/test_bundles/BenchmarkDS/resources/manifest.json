@@ -1,0 +1,13 @@
+{
+    "bundle.symbolic_name" : "BenchmarkDS",
+    "bundle.name" : "BenchmarkDS",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "implementation-class": "sample::DSBenchmarkComponent",
+            "service" : {
+                "interfaces" : ["test::Interface1"]
+            }
+        }]
+    }
+}

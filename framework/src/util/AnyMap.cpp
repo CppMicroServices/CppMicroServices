@@ -22,6 +22,9 @@
 
 #include "cppmicroservices/AnyMap.h"
 
+#include "absl/strings/numbers.h"
+#include "absl/strings/string_view.h"
+
 #include <stdexcept>
 
 namespace cppmicroservices {
@@ -35,47 +38,47 @@ std::size_t any_map_cihash::operator()(const std::string& key) const
   return std::hash<std::string>{}(lcase);
 }
 
-bool any_map_ciequal::operator()(const std::string& l, const std::string& r) const
+bool any_map_ciequal::operator()(const std::string& l,
+                                 const std::string& r) const
 {
-  return (l.size() == r.size()
-          && std::equal(l.begin(), l.end(), r.begin()
-                        , [](char a, char b)
-                          {
-                            return tolower(a) == tolower(b);
-                          }));
+  return (l.size() == r.size() &&
+          std::equal(l.begin(), l.end(), r.begin(), [](char a, char b) {
+            return tolower(a) == tolower(b);
+          }));
 }
 
 const Any& AtCompoundKey(const std::vector<Any>& v,
-                         const AnyMap::key_type& key);
+                         const absl::string_view& key);
 
-const Any& AtCompoundKey(const AnyMap& m, const AnyMap::key_type& key)
+const Any& AtCompoundKey(const AnyMap& m, const absl::string_view& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
     auto head = key.substr(0, pos);
     auto tail = key.substr(pos + 1);
 
-    auto& h = m.at(head);
+    auto& h = m.at(std::string(head));
     if (h.Type() == typeid(AnyMap)) {
       return AtCompoundKey(ref_any_cast<AnyMap>(h), tail);
     } else if (h.Type() == typeid(std::vector<Any>)) {
       return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail);
     }
-    throw std::invalid_argument("Unsupported Any type at '" + head +
-                                "' for dotted get");
+    throw std::invalid_argument("Unsupported Any type at '" +
+                                std::string(head) + "' for dotted get");
   } else {
-    return m.at(key);
+    return m.at(std::string(key));
   }
 }
 
-const Any& AtCompoundKey(const std::vector<Any>& v, const AnyMap::key_type& key)
+const Any& AtCompoundKey(const std::vector<Any>& v,
+                         const absl::string_view& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
     auto head = key.substr(0, pos);
     auto tail = key.substr(pos + 1);
 
-    const int index = std::stoi(head);
+    const int index = std::stoi(std::string(head));
     auto& h = v.at(index < 0 ? v.size() + index : index);
 
     if (h.Type() == typeid(AnyMap)) {
@@ -83,26 +86,26 @@ const Any& AtCompoundKey(const std::vector<Any>& v, const AnyMap::key_type& key)
     } else if (h.Type() == typeid(std::vector<Any>)) {
       return AtCompoundKey(ref_any_cast<std::vector<Any>>(h), tail);
     }
-    throw std::invalid_argument("Unsupported Any type at '" + head +
-                                "' for dotted get");
+    throw std::invalid_argument("Unsupported Any type at '" +
+                                std::string(head) + "' for dotted get");
   } else {
-    const int index = std::stoi(key);
+    const int index = std::stoi(std::string(key));
     return v.at(index < 0 ? v.size() + index : index);
   }
 }
 Any AtCompoundKey(const std::vector<Any>& v,
-                  const AnyMap::key_type& key,
+                  const absl::string_view& key,
                   Any&& defaultVal);
 
 Any AtCompoundKey(const AnyMap& m,
-                  const AnyMap::key_type& key,
+                  const absl::string_view& key,
                   Any&& defaultVal)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
     const auto head = key.substr(0, pos);
     const auto tail = key.substr(pos + 1);
-    auto itr = m.find(head);
+    auto itr = m.find(std::string(head));
     if (itr != m.end()) {
       auto& h = itr->second;
       if (h.Type() == typeid(AnyMap)) {
@@ -114,7 +117,7 @@ Any AtCompoundKey(const AnyMap& m,
       }
     }
   } else {
-    auto itr = m.find(key);
+    auto itr = m.find(std::string(key));
     if (itr != m.end()) {
       return itr->second;
     }
@@ -123,18 +126,20 @@ Any AtCompoundKey(const AnyMap& m,
 }
 
 Any AtCompoundKey(const std::vector<Any>& v,
-                  const AnyMap::key_type& key,
+                  const absl::string_view& key,
                   Any&& defaultval)
 {
   auto pos = key.find(".");
   const auto head = key.substr(0, pos);
   const auto tail = (pos == AnyMap::key_type::npos) ? "" : key.substr(pos + 1);
+
   int index = 0;
   try {
-    index = std::stoi(head);
+    index = std::stoi(std::string(head));
   } catch (...) {
     return std::move(defaultval);
   }
+
   if (static_cast<size_t>(std::abs(index)) < v.size()) {
     auto& h = v[(index < 0 ? v.size() + index : index)];
     if (tail.empty()) {

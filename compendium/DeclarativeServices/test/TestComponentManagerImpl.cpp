@@ -341,7 +341,7 @@ std::shared_ptr<metadata::ComponentMetadata> CreateComponentMetadata(const std::
   return compDesc;
 }
 
-INSTANTIATE_TEST_CASE_P(ComponentManagerParameterized, ComponentManagerImplParameterizedTest,
+INSTANTIATE_TEST_SUITE_P(ComponentManagerParameterized, ComponentManagerImplParameterizedTest,
                         testing::Values(CreateComponentMetadata("foo", false)/* default disabled */,
                                         CreateComponentMetadata("bar", true) /* default enabled */));
 }

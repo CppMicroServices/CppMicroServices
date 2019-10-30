@@ -116,7 +116,7 @@ TEST_P(ValidServiceMetadataTest, TestServiceMetadataSuccessModes)
   ASSERT_THAT(prop.interfaces, ::testing::ContainerEq(smvs.interfaces));
 }
 
-INSTANTIATE_TEST_CASE_P(SuccessModes, ValidServiceMetadataTest,
+INSTANTIATE_TEST_SUITE_P(SuccessModes, ValidServiceMetadataTest,
                         testing::Values(
                           ServiceMetadataParserValidState(0, "singleton", {"Interface1", "Interface2"}),
                           ServiceMetadataParserValidState(1, "singleton", {"Interface1", "Interface2"}),

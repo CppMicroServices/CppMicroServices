@@ -129,15 +129,10 @@ Patches
 Google Test and Google Mock
 ----------------------------
 
-See https://github.com/google/googletest/blob/master/googletest/LICENSE for license information.
+See https://github.com/google/googletest/blob/master/LICENSE for license information.
 
-https://github.com/google/googletest/releases
-1.8.0
-
-Patches
-
- * Suppress CMake warning about policy CMP0048
- * Suppress tr1 namespace deprecation warnings
+https://github.com/google/googletest
+ba33a8876c3eda4cb8def8e0e90f45930ef8c54f
 
 RapidJSON
 ---------

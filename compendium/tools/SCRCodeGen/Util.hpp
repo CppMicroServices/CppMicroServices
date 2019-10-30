@@ -52,7 +52,7 @@ public:
     , msg("Invalid value for the name '" + jsonName + "'. Expected ")
   {
     jsonVal = data[jsonName.c_str()];
-    if (Json::Value::null == jsonVal) {
+    if (Json::Value::nullRef == jsonVal) {
       std::string msg =
         "Mandatory name '" + jsonName + "' missing from the manifest";
       throw std::runtime_error(msg);
@@ -77,7 +77,7 @@ public:
     static_assert(S > 0, "Choices cannot be empty!");
 
     jsonVal = data[jsonName.c_str()];
-    if (Json::Value::null == jsonVal) {
+    if (Json::Value::nullRef == jsonVal) {
       jsonVal = choices.front();
       return;
     }

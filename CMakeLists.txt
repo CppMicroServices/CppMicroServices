@@ -113,8 +113,11 @@ endif()
 
 STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
 if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
-  set(ARM 1)
+  if(US_COMPILER_GNU)
+    set(US_COMPILER_GNU_ARM 1)
 endif()
+endif()
+
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -395,7 +398,7 @@ else()
   endforeach()
 
 
-  if(ARM)
+  if(US_COMPILER_GNU_ARM)
     # arm gcc warns that several reinterpret_cast need increased alignemnt in reinterpret_cast<>
     # but it appears to be warning due to unknow/unguaranteed alignment of char*
     usFunctionCheckCompilerFlags(-Wno-error=cast-align US_CXX_FLAGS)
@@ -486,7 +489,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
       set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
     endif()
   endforeach()
-  if(ARM)
+  if(US_COMPILER_GNU_ARM)
     # atomic intrinsics are in libatomic on ARM GCC
     set(US_LINK_FLAGS "${US_LINK_FLAGS} -latomic")
   endif()

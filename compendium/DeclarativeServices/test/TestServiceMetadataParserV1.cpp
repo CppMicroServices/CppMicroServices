@@ -210,7 +210,7 @@ TEST_P(InvalidServiceMetadataTest, TestServiceMetadataFailureModes)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(FailureModes, InvalidServiceMetadataTest,
+INSTANTIATE_TEST_SUITE_P(FailureModes, InvalidServiceMetadataTest,
                         testing::Values(
                           ServiceMetadataParserInvalidState(0,
                                                             "Missing key 'interfaces' in the manifest."),

@@ -389,7 +389,7 @@ if(MSVC)
     4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
   )
 
-  if (${MSVC_VERSION} LESS 1900)
+  if (${MSVC_VERSION} LESS 1910)
     # For googletest on MSVC versions less than MSVC 2017
     # 'identifier' : decorated name length exceeded, name was truncated
     set(disabled_warnings ${disabled_warnings} 4503)

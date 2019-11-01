@@ -77,7 +77,8 @@ private:
 #endif
 };
 
-// Helper function to install bundles, given a framework's bundle context and the name of the library.
+// Helper function to install bundles, given a framework's bundle context and
+// the name of the library.
 // Assumes that test bundles are within the same directory during unit testing.
 Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName);
 
@@ -86,33 +87,6 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName);
 * @throws std::runtime_error if the directory cannot be changed to
 */
 void ChangeDirectory(const std::string& destdir);
-
-/*
-* Returns a platform appropriate location for use as temporary storage.
-*/
-std::string GetTempDirectory();
-
-/*
- * Closes the file descriptor on destruction.
- */
-struct File
-{
-  File(const File&) = delete;
-  File& operator=(const File&) = delete;
-
-  File();
-
-  // The file descriptor fd is owned by this
-  File(int fd, const std::string& path);
-
-  File(File&& o);
-  File& operator=(File&& o);
-
-  ~File();
-
-  int FileDescr;
-  std::string Path;
-};
 
 /*
  * Removes the directory on destruction.
@@ -136,18 +110,6 @@ struct TempDir
 
   std::string Path;
 };
-
-/*
- * Creates a new unique sub-directory in the temporary storage
- * location returned by GetTempDirectory() and returns a string
- * containing the directory path.
- *
- * This is similar to mkdtemp on POSIX systems, but without a
- * custom template string.
- */
-std::string MakeUniqueTempDirectory();
-
-File MakeUniqueTempFile(const std::string& base);
 
 Bundle GetBundle(const std::string& bsn,
                  BundleContext context = BundleContext());

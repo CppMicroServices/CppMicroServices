@@ -48,7 +48,7 @@ TEST(BundleObjFile, InvalidLocation)
 
 TEST(BundleObjFile, InvalidBinaryFileFormat)
 {
-  cppmicroservices::testing::File tempFile = cppmicroservices::testing::MakeUniqueTempFile(cppmicroservices::testing::GetTempDirectory());
+  cppmicroservices::util::File tempFile = cppmicroservices::util::MakeUniqueTempFile(cppmicroservices::util::GetTempDirectory());
   std::string invalidFileFormat(tempFile.Path);
   ASSERT_TRUE(cppmicroservices::util::Exists(invalidFileFormat)) << invalidFileFormat + " should exist on disk.";
   ASSERT_THROW(cppmicroservices::BundleObjFactory().CreateBundleFileObj(invalidFileFormat),

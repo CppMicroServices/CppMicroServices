@@ -45,6 +45,7 @@ set(_public_headers
 
   cppmicroservices/Bundle.h
   cppmicroservices/BundleActivator.h
+  cppmicroservices/IBundleContext.h
   cppmicroservices/BundleContext.h
   cppmicroservices/BundleEvent.h
   cppmicroservices/BundleEventHook.h

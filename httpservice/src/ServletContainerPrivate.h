@@ -28,6 +28,9 @@
 
 #include "cppmicroservices/httpservice/HttpServlet.h"
 
+#include <string>
+#include <vector>
+
 class CivetServer;
 
 namespace cppmicroservices {
@@ -43,6 +46,7 @@ struct ServletContainerPrivate
 {
   ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q);
 
+  void Start(const std::vector<std::string>& options);
   void Start();
   void Stop();
 
@@ -59,6 +63,12 @@ struct ServletContainerPrivate
   std::string m_ContextPath;
 
 private:
+  /**
+   * path of a directory used to store temporary files
+   */
+  std::string m_TempDirname;
+
+  bool m_Started = false;
   ServletContainer* const q;
   std::list<std::shared_ptr<ServletHandler>> m_Handler;
 

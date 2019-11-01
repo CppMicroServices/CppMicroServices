@@ -1206,7 +1206,7 @@ int BundleTest(int /*argc*/, char* /*argv*/ [])
 
   // test a non-default framework instance using a different persistent storage location.
   {
-    testing::TempDir frameworkStorage = testing::MakeUniqueTempDirectory();
+    std::string frameworkStorage = util::MakeUniqueTempDirectory();
     FrameworkConfiguration frameworkConfig;
     frameworkConfig[Constants::FRAMEWORK_STORAGE] =
       static_cast<std::string>(frameworkStorage);

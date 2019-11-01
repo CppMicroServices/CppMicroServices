@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014 the Civetweb developers
+/* Copyright (c) 2013-2017 the Civetweb developers
  * Copyright (c) 2013 No Face Press, LLC
  *
  * License http://opensource.org/licenses/mit-license.php MIT License
@@ -227,9 +227,11 @@ class CIVETWEB_API CivetServer
 	 * @throws CivetException
 	 */
 	CivetServer(const char **options,
-	            const struct CivetCallbacks *callbacks = 0);
+	            const struct CivetCallbacks *callbacks = 0,
+	            const void *UserContext = 0);
 	CivetServer(std::vector<std::string> options,
-	            const struct CivetCallbacks *callbacks = 0);
+	            const struct CivetCallbacks *callbacks = 0,
+	            const void *UserContext = 0);
 
 	/**
 	 * Destructor
@@ -370,7 +372,7 @@ class CIVETWEB_API CivetServer
 	 * getHeader(struct mg_connection *conn, const std::string &headerName)
 	 * @param conn - the connection information
 	 * @param headerName - header name to get the value from
-	 * @returns a char array whcih contains the header value as string
+	 * @returns a char array which contains the header value as string
 	*/
 	static const char *getHeader(struct mg_connection *conn,
 	                             const std::string &headerName);
@@ -378,8 +380,8 @@ class CIVETWEB_API CivetServer
 	/**
 	 * getParam(struct mg_connection *conn, const char *, std::string &, size_t)
 	 *
-	 * Returns a query paramter contained in the supplied buffer.  The
-	 * occurance value is a zero-based index of a particular key name.  This
+	 * Returns a query which contained in the supplied buffer.  The
+	 * occurrence value is a zero-based index of a particular key name.  This
 	 * should not be confused with the index over all of the keys.  Note that
 	 *this
 	 * function assumes that parameters are sent as text in http query string
@@ -406,8 +408,8 @@ class CIVETWEB_API CivetServer
 	/**
 	 * getParam(const std::string &, const char *, std::string &, size_t)
 	 *
-	 * Returns a query paramter contained in the supplied buffer.  The
-	 * occurance value is a zero-based index of a particular key name.  This
+	 * Returns a query parameter contained in the supplied buffer.  The
+	 * occurrence value is a zero-based index of a particular key name.  This
 	 * should not be confused with the index over all of the keys.
 	 *
 	 * @param data - the query string (text)
@@ -429,8 +431,8 @@ class CIVETWEB_API CivetServer
 	/**
 	 * getParam(const char *, size_t, const char *, std::string &, size_t)
 	 *
-	 * Returns a query paramter contained in the supplied buffer.  The
-	 * occurance value is a zero-based index of a particular key name.  This
+	 * Returns a query parameter contained in the supplied buffer.  The
+	 * occurrence value is a zero-based index of a particular key name.  This
 	 * should not be confused with the index over all of the keys.
 	 *
 	 * @param data the - query string (text)
@@ -446,6 +448,18 @@ class CIVETWEB_API CivetServer
 	                     const char *name,
 	                     std::string &dst,
 	                     size_t occurrence = 0);
+
+	/**
+	 * getPostData(struct mg_connection *)
+	 *
+	 * Returns response body from a request made as POST. Since the
+	 * connections map is protected, it can't be directly accessed.
+	 * This uses string to store post data to handle big posts.
+	 *
+	 * @param conn - connection from which post data will be read
+	 * @return Post data (empty if not available).
+	 */
+	static std::string getPostData(struct mg_connection *conn);
 
 	/**
 	 * urlDecode(const std::string &, std::string &, bool)
@@ -531,6 +545,14 @@ class CIVETWEB_API CivetServer
 	                      std::string &dst,
 	                      bool append = false);
 
+	// generic user context which can be set/read,
+	// the server does nothing with this apart from keep it.
+	const void *
+	getUserContext() const
+	{
+		return UserContext;
+	}
+
   protected:
 	class CivetConnection
 	{
@@ -545,11 +567,15 @@ class CIVETWEB_API CivetServer
 	struct mg_context *context;
 	std::map<struct mg_connection *, class CivetConnection> connections;
 
+	// generic user context which can be set/read,
+	// the server does nothing with this apart from keep it.
+	const void *UserContext;
+
   private:
 	/**
 	 * requestHandler(struct mg_connection *, void *cbdata)
 	 *
-	 * Handles the incomming request.
+	 * Handles the incoming request.
 	 *
 	 * @param conn - the connection information
 	 * @param cbdata - pointer to the CivetHandler instance.

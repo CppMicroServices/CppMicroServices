@@ -28,8 +28,8 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
-#include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "cppmicroservices/httpservice/HttpServletResponse.h"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletResponse.h"
 #include "cppmicroservices/httpservice/ServletContext.h"
 #include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
 
@@ -62,13 +62,13 @@ std::string AbstractWebConsolePlugin::GetCategory() const
   return std::string();
 }
 
-bool AbstractWebConsolePlugin::IsHtmlRequest(HttpServletRequest&)
+bool AbstractWebConsolePlugin::IsHtmlRequest(IHttpServletRequest&)
 {
   return true;
 }
 
-void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request,
-                                     HttpServletResponse& response)
+void AbstractWebConsolePlugin::DoGet(IHttpServletRequest& request,
+                                     IHttpServletResponse& response)
 {
   if (!SpoolResource(request, response)) {
     // detect if this is an html request
@@ -93,7 +93,7 @@ void AbstractWebConsolePlugin::DoGet(HttpServletRequest& request,
 }
 
 std::shared_ptr<WebConsoleVariableResolver>
-AbstractWebConsolePlugin::GetVariableResolver(HttpServletRequest& request)
+AbstractWebConsolePlugin::GetVariableResolver(IHttpServletRequest& request)
 {
   Any resolverAny =
     request.GetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER);
@@ -117,7 +117,7 @@ AbstractWebConsolePlugin::GetVariableResolver(HttpServletRequest& request)
 }
 
 void AbstractWebConsolePlugin::SetVariableResolver(
-  HttpServletRequest& request,
+  IHttpServletRequest& request,
   const std::shared_ptr<WebConsoleVariableResolver>& resolver)
 {
   request.SetAttribute(WebConsoleConstants::ATTR_CONSOLE_VARIABLE_RESOLVER,
@@ -125,8 +125,8 @@ void AbstractWebConsolePlugin::SetVariableResolver(
 }
 
 std::ostream& AbstractWebConsolePlugin::StartResponse(
-  HttpServletRequest& request,
-  HttpServletResponse& response)
+  IHttpServletRequest& request,
+  IHttpServletResponse& response)
 {
   response.SetCharacterEncoding("utf-8");
   response.SetContentType("text/html");
@@ -169,7 +169,7 @@ std::ostream& AbstractWebConsolePlugin::StartResponse(
 }
 
 void AbstractWebConsolePlugin::RenderTopNavigation(
-  HttpServletRequest& /*request*/,
+  IHttpServletRequest& /*request*/,
   std::ostream& /*writer*/)
 {
   //  // assume pathInfo to not be null, else this would not be called
@@ -221,7 +221,7 @@ void AbstractWebConsolePlugin::RenderTopNavigation(
   //  }
 }
 
-void AbstractWebConsolePlugin::EndResponse(HttpServletRequest& request,
+void AbstractWebConsolePlugin::EndResponse(IHttpServletRequest& request,
                                            std::ostream& os)
 {
   auto resolver = this->GetVariableResolver(request);
@@ -306,8 +306,8 @@ BundleResource AbstractWebConsolePlugin::GetResource(
 }
 
 bool AbstractWebConsolePlugin::SpoolResource(
-  HttpServletRequest& request,
-  HttpServletResponse& response) const
+  IHttpServletRequest& request,
+  IHttpServletResponse& response) const
 {
   std::string pi = request.GetPathInfo();
   cppmicroservices::BundleResource res = this->GetResource(pi);
@@ -320,7 +320,7 @@ bool AbstractWebConsolePlugin::SpoolResource(
   if (lastModified > 0) {
     long long ifModifiedSince = request.GetDateHeader("If-Modified-Since");
     if (ifModifiedSince >= lastModified) {
-      response.SetStatus(HttpServletResponse::SC_NOT_MODIFIED);
+      response.SetStatus(IHttpServletResponse::SC_NOT_MODIFIED);
       return true;
     }
     // have to send, so set the last modified header now

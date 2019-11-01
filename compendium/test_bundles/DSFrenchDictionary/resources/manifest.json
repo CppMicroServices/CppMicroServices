@@ -1,0 +1,12 @@
+{
+    "bundle.symbolic_name" : "DSFrenchDictionary",
+    "scr" : { 
+        "version" : 1,
+        "components": [{
+            "implementation-class": "DSFrenchDictionary::DictionaryImpl",
+            "service": {
+                "interfaces": ["test::IDictionaryService"]
+            }
+        }]
+    }
+}

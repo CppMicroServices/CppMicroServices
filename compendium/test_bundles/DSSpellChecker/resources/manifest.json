@@ -1,0 +1,17 @@
+{
+    "bundle.symbolic_name" : "DSSpellChecker",
+    "scr" : { 
+        "version" : 1,
+        "components": [{
+            "implementation-class": "DSSpellCheck::SpellCheckImpl",
+            "service": {
+                "scope": "singleton",
+                "interfaces": ["test::ISpellCheckService"]
+            },
+            "references": [{
+                "name": "dictionary",
+                "interface": "test::IDictionaryService"
+            }]
+        }]
+    }
+}

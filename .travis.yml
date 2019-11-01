@@ -16,74 +16,95 @@ env:
 matrix:
     include:
 
-        # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
-        - os: linux
-          addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
-          env: MY_CC=gcc-5 MY_CXX=g++-5
+      # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
+      - os: linux
+        addons: { apt: { packages: ["valgrind", "gcc-5", "g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
+        env: MY_CC=gcc-5 MY_CXX=g++-5
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
-        - os: linux
-          dist: trusty
-          compiler: clang
-          addons: { apt: { packages: ["valgrind", "clang-3.5", "libc++-dev", "libc++abi-dev", "g++-4.9"], sources: ["ubuntu-toolchain-r-test", llvm-toolchain-trusty-3.5] } }
-          # Travis puts /usr/local/clang-5.0.0/bin in front of the path, so we have to "fix" that
-          env: MY_CC=clang-3.5 MY_CXX=clang++-3.5 PATH=/usr/bin:$PATH
+      # Test our minimum Clang version, which is clang 3.5 on Ubuntu Trusty
+      - os: linux
+        dist: trusty
+        compiler: clang
+        addons: { apt: { packages: ["valgrind", "clang-3.5", "libc++-dev", "libc++abi-dev", "g++-4.9"], sources: ["ubuntu-toolchain-r-test", llvm-toolchain-trusty-3.5] } }
+        # Travis puts /usr/local/clang-5.0.0/bin in front of the path, so we have to "fix" that
+        env: MY_CC=clang-3.5 MY_CXX=clang++-3.5 PATH=/usr/local/bin:/usr/bin:$PATH
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        # Test one build configuration with the latest available Clang
-        - os: linux
-          dist: xenial
-          compiler: clang
-          addons: { apt: { packages: ["valgrind", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test"] } }
-          env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
+      # Test one build configuration with the latest available Clang
+      - os: linux
+        dist: xenial
+        compiler: clang
+        addons: { apt: { packages: ["valgrind", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test"] } }
+        env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        # Test all build configuration with the latest available GCC
-        - os: linux
-          addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
-          env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
+      # Test all build configuration with the latest available GCC
+      - os: linux
+        addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+        env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        - os: linux
-          addons: *gcc8-valgrind
-          env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1
+      - os: linux
+        addons: *gcc8-valgrind
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        - os: linux
-          addons: *gcc8-valgrind
-          env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1
+      - os: linux
+        addons: *gcc8-valgrind
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        - os: linux
-          addons: *gcc8-valgrind
-          env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1
+      - os: linux
+        addons: *gcc8-valgrind
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1
+        before_install:
+            # Install a newer version of valgrind
+            - ./install_valgrind.sh
 
-        # minimum supported compiler on OS X
-        - os: osx
-          osx_image: xcode7.3
-          compiler: clang
-          env: MACOSX_DEPLOYMENT_TARGET=10.11
+      # minimum supported compiler on OS X
+      - os: osx
+        osx_image: xcode7.3
+        compiler: clang
+        env: MACOSX_DEPLOYMENT_TARGET=10.11
 
-        - os: osx
-          osx_image: xcode7.3
-          compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
+      - os: osx
+        osx_image: xcode7.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.11
 
-        # latest compiler on OS X
-        - os: osx
-          osx_image: xcode9.4
-          compiler: clang
-          env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+      # latest compiler on OS X
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
-        - os: osx
-          osx_image: xcode9.4
-          compiler: clang
-          env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
-        - os: osx
-          osx_image: xcode9.4
-          compiler: clang
-          env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
-        - os: osx
-          osx_image: xcode9.4
-          compiler: clang
-          env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.13 WITH_COVERAGE=1
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
 cache:
   directories:
@@ -104,19 +125,56 @@ addons:
     branch_pattern: coverity_scan
 
 
-before_install:
-  - test $TRAVIS_BRANCH != coverity_scan -o ${TRAVIS_JOB_NUMBER##*.} = 1 || exit 0
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash install_cmake.sh ; fi
+# the install step will take care of deploying a newer cmake version
+install:
+  # Set up some variables
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]];
+    then
+      CMAKE_OS="Linux";
+    else
+      CMAKE_OS="Darwin";
+    fi
+  - CMAKE_VER_DIR="v3.13"
+  - CMAKE_VER="3.13.2"
+  - CMAKE_DIR="cmake-${CMAKE_VER}-${CMAKE_OS}-x86_64"
+  - CMAKE_FILE="${CMAKE_DIR}.tar.gz"
+  - CMAKE_SHA_FILE="cmake-${CMAKE_VER}-SHA-256.txt"
+  - CMAKE_INSTALL_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - echo "CMAKE_OS=${CMAKE_OS}"
+  - echo "CMAKE_VER_DIR=${CMAKE_VER_DIR}"
+  - echo "CMAKE_VER=${CMAKE_VER}"
+  - echo "CMAKE_DIR=${CMAKE_DIR}"
+  - echo "CMAKE_FILE=${CMAKE_FILE}"
+  - echo "CMAKE_SHA_FILE=${CMAKE_SHA_FILE}"
+  - echo "CMAKE_INSTALL_DIR=${CMAKE_INSTALL_DIR}"
+  # Create a directory for the CMake binaries
+  - mkdir ${CMAKE_INSTALL_DIR} && pushd ${CMAKE_INSTALL_DIR}
+  # we use curl to fetch the cmake binaries
+  - travis_retry curl -O "https://cmake.org/files/${CMAKE_VER_DIR}/${CMAKE_FILE}"
+  - travis_retry curl -O "https://cmake.org/files/${CMAKE_VER_DIR}/${CMAKE_SHA_FILE}"
+  # Check to make sure we got what we expected
+  - grep "${CMAKE_FILE}" ${CMAKE_SHA_FILE} | shasum -c -s
+  # Unpack the cmake distribution
+  - tar -xf "${CMAKE_FILE}"
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]];
+    then
+      mv "${CMAKE_DIR}" cmake-install;
+    else
+      mv "${CMAKE_DIR}/CMake.app/Contents" cmake-install;
+    fi
+  # add both the top-level directory and the bin directory from the archive
+  # to the system PATH. By adding it to the front of the path we hide the
+  # preinstalled CMake with our own.
+  - PATH=${CMAKE_INSTALL_DIR}/cmake-install:${CMAKE_INSTALL_DIR}/cmake-install/bin:$PATH
+  - echo "PATH=${PATH}"
+  # don't forget to switch back to the main build directory once you are done
+  - popd
   - export CC=$MY_CC CXX=$MY_CXX
-  - env
   - cmake --version
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then $CXX --version; fi
-
-
+  
 script:
   - test $TRAVIS_BRANCH != coverity_scan || exit 0
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
-

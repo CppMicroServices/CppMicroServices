@@ -19,6 +19,7 @@ cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 list(APPEND policies_new
   CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
   CMP0054 # Only interpret if() arguments as variables or keywords when unquoted
+  CMP0079
   )
 foreach(policy ${policies_new})
   if(POLICY ${policy})
@@ -31,7 +32,7 @@ endforeach()
 #------------------------------------------------------------------------------
 
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
@@ -136,6 +137,15 @@ include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
 include(usFunctionGenerateBundleInit)
 include(usMacroCreateBundle)
+include(usFunctionCreateTestBundle)
+include(usFunctionCreateDSTestBundle)
+
+if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
+  if (HAS_MISSING_BRACES_FLAG)
+    add_compile_options(-Wno-missing-braces)
+  endif()
+endif()
 
 if(US_BUILD_TESTING)
   include(usFunctionCompileSnippets)
@@ -258,6 +268,19 @@ endif()
 #
 set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEPATH "A file containing the CMake target definition for the host build version of usResourceCompiler.")
 
+# global options based on compiler
+if(NOT APPLE AND US_COMPILER_CLANG)
+  # use libc++ instead of libstdc++ when using the clang/llvm toolchain
+  # libstdc++ shipped with GCC 4.9 does not support std::atomic operations on std::shared_ptr
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
+if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
 #-----------------------------------------------------------------------------
 # Testing configuration
 #-----------------------------------------------------------------------------
@@ -283,8 +306,9 @@ function(us_add_tests test_driver)
     file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
     file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
     # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
-    add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU.dll -- $<TARGET_FILE:${test_driver}> ${test}
-      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+    add_test(NAME coverage_${test}
+             COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
+             WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()
   endforeach()
@@ -371,10 +395,6 @@ if(MSVC)
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
 
-  if(US_COMPILER_APPLE_CLANG)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
-  endif()
-
   # If not cross-compiling, turn on Stack Smashing Protection.
   # This is done in cases where libssp.so may not be available in the
   # cross build toolchain. The dependency with libssp.so was originally
@@ -402,7 +422,7 @@ else()
   # symbols (unless explicitly overriden). See
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
   # to understand what -fvisibility-ms-compat does.
-  if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
+  if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
@@ -439,10 +459,14 @@ if(MINGW)
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
   # we need to define a Windows version (Windows Vista)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
+  # silence ignored attributes warnings
+  add_compile_options(-Wno-attributes -Wno-deprecated-copy)
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
-  set(THREADS_PREFER_PTHREAD_FLAG 1)
+  if(NOT MINGW)
+    set(THREADS_PREFER_PTHREAD_FLAG 1)
+  endif()
   find_package(Threads REQUIRED)
 
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
@@ -454,6 +478,12 @@ if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
   # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
   set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_COVERAGE_FLAGS}")
 endif()
+
+#-----------------------------------------------------------------------------
+# Compile libraries here if you do not want -Werror or /WX on
+#-----------------------------------------------------------------------------
+add_subdirectory(third_party/absl)
+#-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
@@ -569,6 +599,8 @@ if(NOT US_BIG_ENDIAN)
   set(US_LITTLE_ENDIAN 1)
 endif()
 
+
+
 #-----------------------------------------------------------------------------
 # Source directory
 #-----------------------------------------------------------------------------
@@ -610,6 +642,12 @@ add_subdirectory(framework)
 add_subdirectory(httpservice)
 add_subdirectory(webconsole)
 add_subdirectory(shellservice)
+
+# Declarative Services requires threading to function.
+# Static linkage is not yet supported for declarative services.
+if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
+  add_subdirectory(compendium)
+endif()
 
 add_subdirectory(tools/shell)
 

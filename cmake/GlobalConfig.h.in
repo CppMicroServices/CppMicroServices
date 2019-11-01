@@ -10,8 +10,6 @@
 #cmakedefine US_ENABLE_THREADING_SUPPORT
 #cmakedefine US_HAVE_VISIBILITY_ATTRIBUTE
 
-#define US_DEBUG_POSTFIX "@CMAKE_DEBUG_POSTFIX@"
-
 //-------------------------------------------------------------------
 // Header Availability
 //-------------------------------------------------------------------
@@ -58,6 +56,12 @@
 #define US_LIB_PREFIX "@CMAKE_SHARED_LIBRARY_PREFIX@"
 #define US_LIB_EXT "@CMAKE_SHARED_LIBRARY_SUFFIX@"
 #define US_EXE_EXT "@CMAKE_EXECUTABLE_SUFFIX@"
+
+#ifdef NDEBUG // Defined by cmake UNLESS Debug build type is chosen
+#define US_LIB_POSTFIX ""
+#else
+#define US_LIB_POSTFIX "@CMAKE_DEBUG_POSTFIX@" // Set in top level CMakeList.txt
+#endif
 
 ///-------------------------------------------------------------------
 // Macros for import/export declarations

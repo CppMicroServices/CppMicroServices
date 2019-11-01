@@ -153,11 +153,13 @@ State::State(size_t max_iters, const std::vector<int64_t>& ranges, int thread_i,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
+#if defined(__APPLE__) || !defined(__clang__) // remove the following block for clang on linux to avoid compile error
   // Offset tests to ensure commonly accessed data is on the first cache line.
   const int cache_line_size = 64;
   static_assert(offsetof(State, error_occurred_) <=
                     (cache_line_size - sizeof(error_occurred_)),
                 "");
+#endif
 #if defined(__INTEL_COMPILER)
 #pragma warning pop
 #elif defined(__GNUC__)

@@ -497,7 +497,7 @@ TEST_P(ValidCodegenTest, TestCodegenFunctionality)
   EXPECT_EQ(compGen.GetString(), vcs.referenceOutput);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   SuccessModes,
   ValidCodegenTest,
   testing::Values(
@@ -568,7 +568,7 @@ TEST_P(InvalidCodegenTest, TestCodegenFailureModes)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   FailureModes,
   InvalidCodegenTest,
   testing::Values(

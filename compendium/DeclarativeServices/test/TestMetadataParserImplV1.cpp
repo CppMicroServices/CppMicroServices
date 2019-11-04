@@ -231,7 +231,7 @@ TEST_P(InvalidMetadataTest, TestMetadataFailureModes)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   FailureModes,
   InvalidMetadataTest,
   testing::Values(
@@ -288,7 +288,7 @@ TEST_P(InvalidMetadataTestThroughLogger, TestMetadataFailureModes)
   EXPECT_THAT(logger->msg, ::testing::HasSubstr(imsl.errorOutput));
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   FailureModes,
   InvalidMetadataTestThroughLogger,
   testing::Values(

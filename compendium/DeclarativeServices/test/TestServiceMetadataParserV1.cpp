@@ -116,7 +116,7 @@ TEST_P(ValidServiceMetadataTest, TestServiceMetadataSuccessModes)
   ASSERT_THAT(prop.interfaces, ::testing::ContainerEq(smvs.interfaces));
 }
 
-INSTANTIATE_TEST_CASE_P(SuccessModes, ValidServiceMetadataTest,
+INSTANTIATE_TEST_SUITE_P(SuccessModes, ValidServiceMetadataTest,
                         testing::Values(
                           ServiceMetadataParserValidState(0, "singleton", {"Interface1", "Interface2"}),
                           ServiceMetadataParserValidState(1, "singleton", {"Interface1", "Interface2"}),
@@ -210,7 +210,7 @@ TEST_P(InvalidServiceMetadataTest, TestServiceMetadataFailureModes)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(FailureModes, InvalidServiceMetadataTest,
+INSTANTIATE_TEST_SUITE_P(FailureModes, InvalidServiceMetadataTest,
                         testing::Values(
                           ServiceMetadataParserInvalidState(0,
                                                             "Missing key 'interfaces' in the manifest."),

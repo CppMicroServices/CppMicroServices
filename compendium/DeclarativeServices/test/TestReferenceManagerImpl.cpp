@@ -116,7 +116,7 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& polic
   return fakeMetadata;
 }
 
-INSTANTIATE_TEST_CASE_P(ReferenceManagerParameterized, ReferenceManagerImplTest,
+INSTANTIATE_TEST_SUITE_P(ReferenceManagerParameterized, ReferenceManagerImplTest,
                         testing::Values(CreateFakeReferenceMetadata(ReferencePolicy_Static,
                                                                     ReferencePolicyOption_Reluctant,
                                                                     ReferenceCardinality_OptionalUnary),

@@ -173,7 +173,7 @@ TEST_P(ValidReferenceMetadataTest, TestReferenceMetadataSuccessModes)
   ASSERT_EQ(prop.target, rmvs.target);
 }
 
-INSTANTIATE_TEST_CASE_P(SuccessModes, ValidReferenceMetadataTest,
+INSTANTIATE_TEST_SUITE_P(SuccessModes, ValidReferenceMetadataTest,
                         testing::Values(
                           ReferenceMetadataParserValidState(0, "com.bar.foo", "bar", "1..1",
                                                             "static", "reluctant", "bundle", ""),
@@ -308,7 +308,7 @@ TEST_P(InvalidReferenceMetadataTest, TestReferenceMetadataFailureModes)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(FailureModes, InvalidReferenceMetadataTest,
+INSTANTIATE_TEST_SUITE_P(FailureModes, InvalidReferenceMetadataTest,
                         testing::Values(
                           ReferenceMetadataParserInvalidState(0,
                                                               "Missing key 'interface' in the manifest."),

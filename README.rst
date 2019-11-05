@@ -112,6 +112,13 @@ details.
 Quick Start
 -----------
 
+Start by cloning the project repository. It is important to note that since
+the project utilizes git submodules, you must clone the repository with the
+`--recursive` flag. This will also clone the submodules and place them in
+their respective directories. For further reading about how git submodules
+work and how to clone them into an already existing repository on your disk,
+please see `Git's documentation <https://git-scm.com/book/en/v2/Git-Tools-Submodules>`_.
+
 Essentially, the C++ Micro Services library provides you with a powerful
 dynamic service registry on top of a managed lifecycle. The framework manages,
 among other things, logical units of modularity called *bundles* that

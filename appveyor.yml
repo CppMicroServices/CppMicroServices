@@ -175,6 +175,7 @@ before_build:
 install:
 - if [%WITH_COVERAGE%]==[1] choco install opencppcoverage
 - if [%WITH_COVERAGE%]==[1] pip install codecov
+- git submodule update --init --recursive
 
 build_script:
 - if NOT "%platform%"=="mingw-w64" cmake --build %APPVEYOR_BUILD_FOLDER%/build --config %configuration% -- /maxcpucount

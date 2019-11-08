@@ -25,6 +25,7 @@
 #include "TestUtils.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/ServiceEvent.h"
+#include "cppmicroservices/ServiceObjects.h"
 
 namespace sc  = cppmicroservices::service::component;
 namespace scr = cppmicroservices::service::component::runtime;
@@ -73,11 +74,14 @@ TEST_F(tServiceComponent, testThrowingLifeCycleHooks) //DS_TOI_9
 {
   auto testBundle = StartTestBundle("TestBundleDSTOI9");
   auto ctxt = framework.GetBundleContext();
+  auto const refs = ctxt.GetServiceReferences<test::LifeCycleValidation>();
   auto sRef = ctxt.GetServiceReference<test::LifeCycleValidation>();
+  auto serviceObjects = ctxt.GetServiceObjects<test::LifeCycleValidation>(sRef);
+  (void)serviceObjects.GetService();
+  (void)serviceObjects.GetServiceReference();
   ASSERT_TRUE(static_cast<bool>(sRef));
   auto service = ctxt.GetService<test::LifeCycleValidation>(sRef);
   EXPECT_EQ(service, nullptr) << "Service object must be nullptr since the service component should have thrown an exception when activated";
-
   auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent9");
   auto compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDesc);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";

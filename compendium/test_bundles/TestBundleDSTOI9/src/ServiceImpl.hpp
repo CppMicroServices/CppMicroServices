@@ -9,7 +9,7 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 namespace sample {
   class ServiceComponent9 : public test::LifeCycleValidation {
   public:
-    ServiceComponent9() = default;
+    ServiceComponent9();
     ~ServiceComponent9() override;
     void Activate(const std::shared_ptr<ComponentContext>& context);
     void Deactivate(const std::shared_ptr<ComponentContext>& context);

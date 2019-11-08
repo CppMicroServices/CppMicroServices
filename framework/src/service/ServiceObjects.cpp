@@ -151,7 +151,7 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
                                          , d->m_context->bundle->shared_from_this());
   auto deleter = h->interfaceMap
                   ->find(d->m_reference.GetInterfaceId())
-                  ->second.get()
+                  ->second.get();
   return std::shared_ptr<void>(h, deleter);
 }
 

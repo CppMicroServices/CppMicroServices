@@ -62,22 +62,6 @@ public:
                     const InterfaceMapConstPtr&));
 };
 
-class ThrowingFactory
-  : public ServiceFactory
-{
-public:
-  InterfaceMapConstPtr GetService(const Bundle&
-                                  , const ServiceRegistrationBase&)
-  {
-    throw std::runtime_error("Exception thrown from user code");
-  }
-  
-  MOCK_METHOD3(UngetService,
-               void(const Bundle&,
-                    const ServiceRegistrationBase&,
-                    const InterfaceMapConstPtr&));
-};
-
 }
 
 class ServiceFactoryTest : public ::testing::Test

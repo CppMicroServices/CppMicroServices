@@ -190,7 +190,8 @@ TEST_F(ServiceFactoryTest, TestGetServiceObjectThrows)
   auto sref = context.GetServiceReference<ITestServiceA>();
   auto serviceObjects = context.GetServiceObjects<ITestServiceA>(sref);
 
-  // Without a fix for g2113391 this next line crashes
+  // Next line used to crash if a service implementation threw an exception in the
+  // constructor. This test case checks to make sure that the fix is in place.
   (void)serviceObjects.GetService();
 }
 

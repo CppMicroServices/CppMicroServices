@@ -139,8 +139,8 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
   }
 
   auto interfaceMap = d->GetServiceInterfaceMap();
-  // g2113391: interfaceMap can be null under certain circumstance e.g. if a constructor
-  // is thrown in the service implementation.  In that case, we bail out early.
+  // interfaceMap can be null under certain circumstance e.g. if a constructor is thrown
+  // in the service implementation.  In that case, we bail out early.
   if (!interfaceMap) {
     return nullptr;
   }

@@ -181,16 +181,17 @@ TEST_F(ServiceFactoryTest, TestGetServiceObjectThrows)
     .WillRepeatedly(testing::Throw(std::runtime_error(exceptionMsg)));
   EXPECT_CALL(*sf, UngetService(testing::_, testing::_, testing::_)).Times(0);
 
-  auto reg1 = context.RegisterService<ITestServiceA>(ToFactory(sf)
-                                                     , {{
-                                                         Constants::SERVICE_SCOPE
-                                                         , Any(Constants::SCOPE_PROTOTYPE)
-                                                       }});
+  (void)context.RegisterService<ITestServiceA>(ToFactory(sf)
+                                               , {{
+                                                   Constants::SERVICE_SCOPE
+                                                   , Any(Constants::SCOPE_PROTOTYPE)
+                                                 }});
 
   auto sref = context.GetServiceReference<ITestServiceA>();
   auto serviceObjects = context.GetServiceObjects<ITestServiceA>(sref);
+
+  // Without a fix for g2113391 this next line crashes
   (void)serviceObjects.GetService();
-  (void)serviceObjects.GetServiceReference();
 }
 
 // Tests the return type and FrameworkEvent generated when a

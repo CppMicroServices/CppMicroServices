@@ -140,7 +140,7 @@ private:
 
   void CheckIllegalState() const;
 
-  void BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
+  void GetAlreadyInstalledBundlesAtLocation(
     std::pair<BundleMap::iterator, BundleMap::iterator> range,
     std::vector<Bundle>& res,
     std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled);

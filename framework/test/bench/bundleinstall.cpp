@@ -22,7 +22,22 @@ public:
   }
 
   ~BundleInstallFixture() = default;
+
+  static std::vector<cppmicroservices::Bundle> ConcurrentInstallHelper(
+    ::cppmicroservices::Framework& framework,
+    const std::vector<std::string>& bundlesToInstall)
+  {
+    using namespace cppmicroservices;
+    auto fc = framework.GetBundleContext();
+    std::vector<cppmicroservices::Bundle> bundles;
+    for (size_t i = 0; i < bundlesToInstall.size(); i++) {
+      auto bundle = testing::InstallLib(fc, bundlesToInstall[i]);
+      bundles.push_back(bundle);
+    }
     
+    return bundles;
+  }
+  
 protected:
   void InstallWithCppFramework(benchmark::State& state, const std::string& bundleName)
   {
@@ -45,21 +60,6 @@ protected:
 
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
-
-  static std::vector<cppmicroservices::Bundle> ConcurrentInstallHelper(
-    ::cppmicroservices::Framework& framework,
-    const std::vector<std::string>& bundlesToInstall)
-  {
-    using namespace cppmicroservices;
-    auto fc = framework.GetBundleContext();
-    std::vector<cppmicroservices::Bundle> bundles;
-    for (size_t i = 0; i < bundlesToInstall.size(); i++) {
-      auto bundle = testing::InstallLib(fc, bundlesToInstall[i]);
-      bundles.push_back(bundle);
-    }
-
-    return bundles;
   }
 
   void InstallConcurrently(benchmark::State& state, uint32_t numThreads)
@@ -106,9 +106,9 @@ protected:
       auto start = high_resolution_clock::now();
       for (uint32_t i = 0; i < bundlesToInstallPerThread.size(); i++) {
         results[i] = std::async(std::launch::async,
-                                ConcurrentInstallHelper,
-                                framework,
-                                bundlesToInstallPerThread[i]);
+				ConcurrentInstallHelper,
+                                std::ref(framework),
+                                std::cref(bundlesToInstallPerThread[i]));
       }
 
       for (uint32_t i = 0; i < bundlesToInstallPerThread.size(); i++) {

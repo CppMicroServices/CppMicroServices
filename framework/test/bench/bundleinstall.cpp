@@ -132,6 +132,7 @@ BENCHMARK_DEFINE_F(BundleInstallFixture, LargeBundleInstallCppFramework)(benchma
   InstallWithCppFramework(state, "largeBundle");
 }
 
+#if defined(PERFORM_LARGE_CONCURRENCY_TEST)
 BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall1Thread)
 (benchmark::State& state)
 {
@@ -155,11 +156,14 @@ BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
 {
   InstallConcurrently(state, std::thread::hardware_concurrency());
 }
+#endif
 
 // Register functions as benchmark
 BENCHMARK_REGISTER_F(BundleInstallFixture, BundleInstallCppFramework)->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, LargeBundleInstallCppFramework)->UseManualTime();
+#if defined(PERFORM_LARGE_CONCURRENCY_TEST)
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall1Thread)->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)->UseManualTime();
+#endif

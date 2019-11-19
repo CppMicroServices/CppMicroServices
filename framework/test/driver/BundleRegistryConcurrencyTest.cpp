@@ -49,12 +49,17 @@ std::unique_lock<std::mutex> io_lock()
 inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
                                              const std::string& bundleName)
 {
-  frameworkCtx.InstallBundles(testing::LIB_PATH
+  auto bundles = frameworkCtx.InstallBundles(testing::LIB_PATH
                               + util::DIR_SEP
                               + US_LIB_PREFIX
                               + bundleName
                               + US_LIB_POSTFIX
                               + US_LIB_EXT);
+
+  for (auto& b : bundles) {
+    US_TEST_CONDITION(false == !b,
+                      "Test to check if returned bundle is valid.");
+  }
 }
 
 void TestSerial(const Framework& f)
@@ -136,7 +141,7 @@ void TestConcurrent(const Framework& f)
 } // end anonymous namespace
 #endif
 
-int BundleRegistryPerformanceTest(int /*argc*/, char* /*argv*/ [])
+int BundleRegistryConcurrencyTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("BundleRegistryPerformanceTest")
 

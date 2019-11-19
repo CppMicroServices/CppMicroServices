@@ -30,7 +30,7 @@ include_directories(
 set(_tests
   AnyTest
   AnyMapTest
-  BundleRegistryPerformanceTest
+  BundleRegistryConcurrencyTest
   FrameworkEventTest
   FrameworkListenerTest
   FrameworkFactoryTest

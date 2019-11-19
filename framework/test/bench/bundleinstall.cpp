@@ -104,14 +104,14 @@ protected:
     std::vector<std::future<std::vector<cppmicroservices::Bundle>>> results(numThreads);
     for (auto _ : state) {
       auto start = high_resolution_clock::now();
-      for (int i = 0; i < bundlesToInstallPerThread.size(); i++) {
+      for (uint32_t i = 0; i < bundlesToInstallPerThread.size(); i++) {
         results[i] = std::async(std::launch::async,
                                 ConcurrentInstallHelper,
                                 framework,
                                 bundlesToInstallPerThread[i]);
       }
 
-      for (int i = 0; i < bundlesToInstallPerThread.size(); i++) {
+      for (uint32_t i = 0; i < bundlesToInstallPerThread.size(); i++) {
         results[i].wait();
       }
 

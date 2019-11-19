@@ -24,7 +24,7 @@ public:
   ~BundleInstallFixture() = default;
 
   static std::vector<cppmicroservices::Bundle> ConcurrentInstallHelper(
-    ::cppmicroservices::Framework& framework,
+    cppmicroservices::Framework& framework,
     const std::vector<std::string>& bundlesToInstall)
   {
     using namespace cppmicroservices;
@@ -83,21 +83,19 @@ protected:
     uint32_t currentIndex = 0;
     for (uint32_t i = 0; i < numThreads; i++) {
       std::vector<std::string> tempListOfBundles;
-      if (i == numThreads - 1) {
-        for (uint32_t j = 0; j < str5kBundles.size() / numThreads +
-                                   (str5kBundles.size() % numThreads);
-             j++, currentIndex++) {
-          tempListOfBundles.push_back(str5kBundles[currentIndex]);
-        }
-      } else {
-        for (uint32_t j = 0; j < str5kBundles.size() / numThreads;
-             j++, currentIndex++) {
-          tempListOfBundles.push_back(str5kBundles[currentIndex]);
-        }
+
+      size_t numOfIterations =
+        (i == numThreads - 1 ? str5kBundles.size() / numThreads +
+                                 (str5kBundles.size() % numThreads)
+                             : str5kBundles.size() / numThreads);
+      for (uint32_t j = 0; j < uint32_t(numOfIterations); j++, currentIndex++) {
+        tempListOfBundles.push_back(str5kBundles[currentIndex]);
       }
+
       if (i == numThreads - 1) {
         tempListOfBundles.push_back(str5kBundles[0]);
       }
+
       bundlesToInstallPerThread.push_back(tempListOfBundles);
     }
 

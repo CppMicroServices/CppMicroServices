@@ -62,41 +62,180 @@ void BundleRegistry::Clear()
   bundles.v.clear();
 }
 
+/*
+  A struct which contains the necessary objects to utilize condition
+  variables. A thread will wait on this WaitCondition if the waitFlag
+  is set to true.
+*/
+struct WaitCondition
+{
+  std::unique_ptr<std::mutex> m;
+  std::unique_ptr<std::condition_variable> cv;
+  bool waitFlag;
+
+  WaitCondition()
+    : m(std::make_unique<std::mutex>())
+    , cv(std::make_unique<std::condition_variable>())
+    , waitFlag(true)
+  {}
+};
+
+/*
+  This function acquires a lock and decrements the reference count
+  for the specified bundle. If this decrement causes the count to be
+  0, it is erased from the initialBundleInstallMap map.
+*/
+void BundleRegistry::DecrementInitialBundleMapRef(
+  cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
+  const std::string& location)
+{
+  l.Lock();
+  initialBundleInstallMap[location].first--;
+  if (initialBundleInstallMap[location].first == 0) {
+    initialBundleInstallMap.erase(location);
+  }
+  l.UnLock();
+}
+
+/*
+  This function populates the res and alreadyInstalled vectors with the
+  appropriate entries so that they can be used by the Install0 call. This was
+  extracted from Install() for convenience.
+*/
+void BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
+  std::pair<BundleMap::iterator, BundleMap::iterator> range,
+  std::vector<Bundle>& res,
+  std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled)
+{
+  while (range.first != range.second) {
+    auto b = range.first->second;
+    alreadyInstalled.push_back(b);
+    auto bu = coreCtx->bundleHooks.FilterBundle(
+      MakeBundleContext(b->bundleContext.Load()), MakeBundle(b));
+    if (bu) {
+      res.push_back(bu);
+    }
+    ++range.first;
+  }
+}
+
 std::vector<Bundle> BundleRegistry::Install(const std::string& location,
                                             BundlePrivate* caller)
 {
   CheckIllegalState();
 
+  // Grab the lock for the BundleRegistry object so that we can
+  // read into the map without any data races
   auto l = this->Lock();
   US_UNUSED(l);
 
+  // Search the multimap for the current bundle location
   auto range = (bundles.Lock(), bundles.v.equal_range(location));
-  auto p = strSet.find(location);
-  if (range.first == range.second && p == strSet.end()) {
-    strSet.insert(location);
 
+  /*
+    If the bundle is already installed, then execute the regular
+    install process. In this case, there are no data races to worry about.
+
+    If the bundle isn't installed, then one of two things can happen: 1) either
+    the current thread is the first thread trying to install this bundle or 2) the
+    current thread is trying to install a bundle that is not installed which another
+    thread is currently installing.
+
+    If 1): Create an entry in the initialBundleInstallMap which keeps track of whether
+      or not a given bundle is being installed for the first time. After creating this
+      entry, the thread performs the install and notifies all threads waiting on that
+      install to finish so that they too can perform an install (but in the context of it
+      being already installed).
+
+    If 2): Increment the reference counter for the bundle in the initialBundleInstallMap.
+      This ensures that when we decrement the count after the installing thread is done,
+      the map entry isn't deleted since the current thread needs access to the
+      condition_variable and boolean flag. Once the installing thread notifies the thread
+      that it is able to continue with it's install, it goes ahead and performs the regular
+      install procedure.
+  */
+  if (range.first != range.second) {
     l.UnLock();
-    std::vector<Bundle> result = Install0(location, {}, caller);
 
-    l.Lock();
-    strSet.erase(location);
-    return result;
+    std::vector<Bundle> res;
+    std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
+    // Populate the res and alreadyInstalled vectors with the appropriate data
+    // based on what bundles are already installed
+    GetAlreadyInstalledBundlesAtLocation(range, res, alreadyInstalled);
+
+    // Perform the install
+    auto newBundles = Install0(location, alreadyInstalled, caller);
+    res.insert(res.end(), newBundles.begin(), newBundles.end());
+    if (res.empty()) {
+      throw std::runtime_error("All bundles rejected by a bundle hook");
+    } else {
+      return res;
+    }
   } else {
-    l.UnLock();
-    if (range.first != range.second) {
-      std::vector<Bundle> res;
-      std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
-      while (range.first != range.second) {
-        auto b = range.first->second;
-        alreadyInstalled.push_back(b);
-        auto bu = coreCtx->bundleHooks.FilterBundle(
-          MakeBundleContext(b->bundleContext.Load()), MakeBundle(b));
-        if (bu)
-          res.push_back(bu);
-        ++range.first;
+    // Check to see if another thread is installing the currently uninstalled bundle
+    auto p = initialBundleInstallMap.find(location);
+
+    /*
+      If no other thread is installing the desired bundle, create a map entry,
+      install the bundle, and notify all other threads wanting to install this bundle
+      that it is safe to do so. If the current thread is not the installing thread, then
+      it will increment the reference count in the initialBundleInstallMap so that the map
+      entry isn't prematurely deleted, wait to be notified that the install thread is done,
+      and then perform the regular install procedure.
+    */
+    if (p == initialBundleInstallMap.end()) {
+      // Insert entry into the initialBundleInstallMap to prevent other threads from
+      // trying to install this uninstalled bundle at the same time
+      auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
+      initialBundleInstallMap.insert(
+        std::make_pair(location, std::move(pairToInsert)));
+
+      l.UnLock();
+
+      // Perform the install
+      auto installedBundles = Install0(location, {}, caller);
+      {
+        // Notify all waiting threads that it is safe to install the bundle
+        std::lock_guard<std::mutex> lock(
+          *(initialBundleInstallMap[location].second.m));
+        initialBundleInstallMap[location].second.waitFlag = false;
+        initialBundleInstallMap[location].second.cv->notify_all();
       }
 
+      DecrementInitialBundleMapRef(l, location);
+
+      return installedBundles;
+    } else {
+      initialBundleInstallMap[location].first++;
+      l.UnLock();
+
+      {
+        // Wait for the install thread to notify this thread that it is safe
+        // to install the current bundle
+        std::unique_lock<std::mutex> lock(
+          *(initialBundleInstallMap[location].second.m));
+        initialBundleInstallMap[location].second.cv->wait(
+          lock, [&location, this] {
+            return !initialBundleInstallMap[location].second.waitFlag;
+          });
+
+        lock.unlock();
+      }
+
+      l.Lock();
+      // Re-acquire the range because while this thread was waiting, the installing
+      // thread made a modification to bundles.v
+      range = (bundles.Lock(), bundles.v.equal_range(location));
+      l.UnLock();
+
+      std::vector<Bundle> res;
+      std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
+      GetAlreadyInstalledBundlesAtLocation(range, res, alreadyInstalled);
+
+      // Perform the install
       auto newBundles = Install0(location, alreadyInstalled, caller);
+      DecrementInitialBundleMapRef(l, location);
+
       res.insert(res.end(), newBundles.begin(), newBundles.end());
       if (res.empty()) {
         throw std::runtime_error("All bundles rejected by a bundle hook");
@@ -105,8 +244,6 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       }
     }
   }
-
-  return {};
 }
 
 std::vector<Bundle> BundleRegistry::Install0(

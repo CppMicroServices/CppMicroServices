@@ -26,8 +26,8 @@
 #include "cppmicroservices/detail/Threads.h"
 
 #include <map>
+#include <unordered_map>
 #include <memory>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -39,6 +39,7 @@ class Bundle;
 class BundlePrivate;
 class BundleVersion;
 struct BundleActivator;
+struct WaitCondition;
 
 /**
  * Here we handle all the bundles that are known to the framework.
@@ -131,17 +132,27 @@ public:
   void Load();
 
 private:
+  using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
+
   // don't allow copying the BundleRegistry.
   BundleRegistry(const BundleRegistry&);
   BundleRegistry& operator=(const BundleRegistry&);
 
   void CheckIllegalState() const;
 
+  void BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
+    std::pair<BundleMap::iterator, BundleMap::iterator> range,
+    std::vector<Bundle>& res,
+    std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled);
+
+  void DecrementInitialBundleMapRef(
+    cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
+    const std::string& location);
+
+  std::unordered_map<std::string, std::pair<unsigned int, WaitCondition>>
+    initialBundleInstallMap;
+
   CoreBundleContext* coreCtx;
-
-  std::set<std::string> strSet;
-
-using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 
   /**
    * Table of all installed bundles in this framework.

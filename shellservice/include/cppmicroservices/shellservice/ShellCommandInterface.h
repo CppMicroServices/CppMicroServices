@@ -35,6 +35,7 @@ namespace cppmicroservices {
 struct ShellCommandInterface {
     virtual ~ShellCommandInterface(){}
     virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments) = 0;
+    virtual void help() = 0;
 };
     
 }

@@ -32,6 +32,8 @@
 #include <iomanip> // std::setw
 
 namespace cppmicroservices {
+    
+    // us-ls
     void ShellCommandLs::doCommand(BundleContext bc, std::vector<std::string>) {
         std::cout << std::left
                   << std::setw(4)  << "Id"
@@ -58,31 +60,75 @@ namespace cppmicroservices {
         }
     }
     
+    void ShellCommandLs::help() {
+        std::cout << std::left
+                  << std::setw(15) << "us-ls"
+                  << std::setw(100) << "list bundle information"
+                  << std::endl << std::endl;
+    }
+    
+    // us-install
     void ShellCommandInstall::doCommand(BundleContext bc, const std::vector<std::string> arguments) {
         for (auto path : arguments) {
             bc.InstallBundles(path);
         }
     }
     
+    void ShellCommandInstall::help() {
+        std::cout << std::left
+        << std::setw(15) << "us-install"
+        << std::setw(100) << "installs bundle(s) located at given path(s)"
+        << std::endl
+        << std::setw(15) << "" << "us-install <path1> <path2> ..."
+        << std::endl << std::endl;
+    }
+    
+    // us-uninstall
     void ShellCommandUninstall::doCommand(BundleContext bc, const std::vector<std::string> arguments) {
         for (auto bundleId : arguments) {
             auto bundle = bc.GetBundle(std::stoi(bundleId));
             bundle.Uninstall();
         }
     }
+    void ShellCommandUninstall::help() {
+        std::cout << std::left
+        << std::setw(15) << "us-uninstall"
+        << std::setw(100) << "uninstalls bundle(s) by bundle ID(s)"
+        << std::endl
+        << std::setw(15) << "" << "us-uninstall <id1> <id2> ..."
+        << std::endl << std::endl;
+    }
     
+    // us-start
     void ShellCommandStart::doCommand(BundleContext bc, const std::vector<std::string> arguments) {
         for (auto bundleId : arguments) {
             auto bundle = bc.GetBundle(std::stoi(bundleId));
             bundle.Start();
         }
     }
+    void ShellCommandStart::help() {
+        std::cout << std::left
+        << std::setw(15) << "us-start"
+        << std::setw(100) << "starts bundle(s) by bundle ID(s)"
+        << std::endl
+        << std::setw(15) << "" << "us-start <id1> <id2> ..."
+        << std::endl << std::endl;    }
     
+    // us-stop
     void ShellCommandStop::doCommand(BundleContext bc, const std::vector<std::string> arguments) {
         for (auto bundleId : arguments) {
             auto bundle = bc.GetBundle(std::stoi(bundleId));
             bundle.Stop();
         }
+    }
+    
+    void ShellCommandStop::help() {
+        std::cout << std::left
+        << std::setw(15) << "us-stop"
+        << std::setw(100) << "stops bundle(s) by bundle ID(s)"
+        << std::endl
+        << std::setw(15) << "" << "us-start <id1> <id2> ..."
+        << std::endl << std::endl;
     }
     
 }

@@ -2,6 +2,7 @@ set(_srcs
   src/ShellActivator.cpp
   src/ShellServiceImpl.cpp
 
+
   ../third_party/tinyscheme/scheme.c
 )
 

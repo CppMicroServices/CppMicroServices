@@ -29,6 +29,7 @@
 
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/shellservice/ShellService.h"
+#include "cppmicroservices/shellservice/ShellCommandInterface.h"
 
 #include "linenoise.h"
 
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
   auto context = framework.GetBundleContext();
 
   // install ShellService plugin
-  const std::string shellservice_path = "/Users/kevinlee/Documents/git/development/build/lib/Debug/libusShellServiced.0.1.0.dylib";
+  const std::string shellservice_path = "/Users/kevinlee/Documents/git/build/lib/Debug/libusShellServiced.dylib";
   context.InstallBundles(shellservice_path);
     
   // start ShellService plugin
@@ -196,18 +197,20 @@ int main(int argc, char** argv)
     
     if (std::string(line) == "quit" | std::string(line) == "exit") {
       break;
-    }
-      
-    if (std::string(line) == "help") {
-        for (auto& bundle: installedBundles) {
-            auto abc = bundle.GetHeaders();
-            auto bb = abc.find("bundle.symbolic_name");
-            auto cc = abc.find("ShellCommands");
-            std::cout << "hello" << std::endl;
+    } else if (std::string(line) == "help") {
+        auto srShellCommands = context.GetServiceReferences<cppmicroservices::ShellCommandInterface>();
+        
+        sort(srShellCommands.begin(), srShellCommands.end(), [](const ServiceReference<cppmicroservices::ShellCommandInterface> &lhs, const ServiceReference<cppmicroservices::ShellCommandInterface> &rhs){
+            return lhs.GetProperty(Constants::SERVICE_ID).ToString() < rhs.GetProperty(Constants::SERVICE_ID).ToString();
+        });
+        
+        for (auto srShellCommand : srShellCommands) {
+            auto svcShellCommand = context.GetService(srShellCommand);
+            svcShellCommand->help();
         }
+    } else {
+      shellService->ExecuteCommand(line);
     }
-      
-    shellService->ExecuteCommand(line);
     free(line);
     std::cout << std::endl;
   }

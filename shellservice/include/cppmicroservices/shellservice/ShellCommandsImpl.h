@@ -34,6 +34,7 @@ namespace cppmicroservices {
         ShellCommandLs() {};
         virtual ~ShellCommandLs() {};
         virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments);
+        virtual void help();
     };
     
     class ShellCommandInstall : public ShellCommandInterface {
@@ -41,6 +42,7 @@ namespace cppmicroservices {
         ShellCommandInstall() {};
         virtual ~ShellCommandInstall() {};
         virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments);
+        virtual void help();
     };
     
     class ShellCommandUninstall : public ShellCommandInterface {
@@ -48,6 +50,7 @@ namespace cppmicroservices {
         ShellCommandUninstall() {};
         virtual ~ShellCommandUninstall() {};
         virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments);
+        virtual void help();
     };
     
     class ShellCommandStart : public ShellCommandInterface {
@@ -55,6 +58,7 @@ namespace cppmicroservices {
         ShellCommandStart() {};
         virtual ~ShellCommandStart() {};
         virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments);
+        virtual void help();
     };
     
     class ShellCommandStop : public ShellCommandInterface {
@@ -62,6 +66,7 @@ namespace cppmicroservices {
         ShellCommandStop() {};
         virtual ~ShellCommandStop() {};
         virtual void doCommand(cppmicroservices::BundleContext bc, const std::vector<std::string> arguments);
+        virtual void help();
     };
     
 }

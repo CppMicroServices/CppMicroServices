@@ -25,9 +25,11 @@
 
 #include "cppmicroservices/detail/Threads.h"
 
+#include <condition_variable>
 #include <map>
 #include <unordered_map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -39,7 +41,6 @@ class Bundle;
 class BundlePrivate;
 class BundleVersion;
 struct BundleActivator;
-struct WaitCondition;
 
 /**
  * Here we handle all the bundles that are known to the framework.
@@ -148,6 +149,24 @@ private:
   void DecrementInitialBundleMapRef(
     cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
     const std::string& location);
+
+  /*
+    A struct which contains the necessary objects to utilize condition
+    variables. A thread will wait on this WaitCondition if the waitFlag
+    is set to true.
+  */
+  struct WaitCondition
+  {
+    std::unique_ptr<std::mutex> m;
+    std::unique_ptr<std::condition_variable> cv;
+    bool waitFlag;
+
+    WaitCondition()
+      : m(std::make_unique<std::mutex>())
+      , cv(std::make_unique<std::condition_variable>())
+      , waitFlag(true)
+    {}
+  };
 
   std::unordered_map<std::string, std::pair<unsigned int, WaitCondition>>
     initialBundleInstallMap;

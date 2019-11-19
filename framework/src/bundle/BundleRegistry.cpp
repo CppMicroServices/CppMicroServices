@@ -63,24 +63,6 @@ void BundleRegistry::Clear()
 }
 
 /*
-  A struct which contains the necessary objects to utilize condition
-  variables. A thread will wait on this WaitCondition if the waitFlag
-  is set to true.
-*/
-struct WaitCondition
-{
-  std::unique_ptr<std::mutex> m;
-  std::unique_ptr<std::condition_variable> cv;
-  bool waitFlag;
-
-  WaitCondition()
-    : m(std::make_unique<std::mutex>())
-    , cv(std::make_unique<std::condition_variable>())
-    , waitFlag(true)
-  {}
-};
-
-/*
   This function acquires a lock and decrements the reference count
   for the specified bundle. If this decrement causes the count to be
   0, it is erased from the initialBundleInstallMap map.

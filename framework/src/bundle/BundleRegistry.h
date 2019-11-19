@@ -27,6 +27,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -137,6 +138,8 @@ private:
   void CheckIllegalState() const;
 
   CoreBundleContext* coreCtx;
+
+  std::set<std::string> strSet;
 
 using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 

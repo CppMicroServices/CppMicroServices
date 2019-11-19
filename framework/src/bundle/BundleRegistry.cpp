@@ -69,29 +69,44 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
 
   auto l = this->Lock();
   US_UNUSED(l);
-  auto range = (bundles.Lock(), bundles.v.equal_range(location));
-  if (range.first != range.second) {
-    std::vector<Bundle> res;
-    std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
-    while (range.first != range.second) {
-      auto b = range.first->second;
-      alreadyInstalled.push_back(b);
-      auto bu = coreCtx->bundleHooks.FilterBundle(
-        MakeBundleContext(b->bundleContext.Load()), MakeBundle(b));
-      if (bu)
-        res.push_back(bu);
-      ++range.first;
-    }
 
-    auto newBundles = Install0(location, alreadyInstalled, caller);
-    res.insert(res.end(), newBundles.begin(), newBundles.end());
-    if (res.empty()) {
-      throw std::runtime_error("All bundles rejected by a bundle hook");
-    } else {
-      return res;
+  auto range = (bundles.Lock(), bundles.v.equal_range(location));
+  auto p = strSet.find(location);
+  if (range.first == range.second && p == strSet.end()) {
+    strSet.insert(location);
+
+    l.UnLock();
+    std::vector<Bundle> result = Install0(location, {}, caller);
+
+    l.Lock();
+    strSet.erase(location);
+    return result;
+  } else {
+    l.UnLock();
+    if (range.first != range.second) {
+      std::vector<Bundle> res;
+      std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
+      while (range.first != range.second) {
+        auto b = range.first->second;
+        alreadyInstalled.push_back(b);
+        auto bu = coreCtx->bundleHooks.FilterBundle(
+          MakeBundleContext(b->bundleContext.Load()), MakeBundle(b));
+        if (bu)
+          res.push_back(bu);
+        ++range.first;
+      }
+
+      auto newBundles = Install0(location, alreadyInstalled, caller);
+      res.insert(res.end(), newBundles.begin(), newBundles.end());
+      if (res.empty()) {
+        throw std::runtime_error("All bundles rejected by a bundle hook");
+      } else {
+        return res;
+      }
     }
   }
-  return Install0(location, {}, caller);
+
+  return {};
 }
 
 std::vector<Bundle> BundleRegistry::Install0(

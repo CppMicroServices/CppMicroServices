@@ -136,8 +136,8 @@ private:
   using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 
   // don't allow copying the BundleRegistry.
-  BundleRegistry(const BundleRegistry&);
-  BundleRegistry& operator=(const BundleRegistry&);
+  BundleRegistry(const BundleRegistry&) = delete;
+  BundleRegistry& operator=(const BundleRegistry&) = delete;
 
   void CheckIllegalState() const;
 

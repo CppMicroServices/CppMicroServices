@@ -143,7 +143,7 @@ void TestConcurrent(const Framework& f)
 
 int BundleRegistryConcurrencyTest(int /*argc*/, char* /*argv*/ [])
 {
-  US_TEST_BEGIN("BundleRegistryPerformanceTest")
+  US_TEST_BEGIN("BundleRegistryConcurrencyTest")
 
   FrameworkFactory factory;
   auto framework = factory.NewFramework();

@@ -154,7 +154,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       return res;
     }
   } else {
-    // Check to see if another thread is installing the currently uninstalled bundle
+    // Check to see if another thread is currently in the process of installing this
+    // bundle for the first time.
     auto p = initialBundleInstallMap.find(location);
 
     /*

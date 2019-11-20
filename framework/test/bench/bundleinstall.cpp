@@ -29,9 +29,10 @@ public:
   {
     using namespace cppmicroservices;
     auto fc = framework.GetBundleContext();
+
     std::vector<cppmicroservices::Bundle> bundles;
-    for (size_t i = 0; i < bundlesToInstall.size(); i++) {
-      auto bundle = testing::InstallLib(fc, bundlesToInstall[i]);
+    for (const auto& b : bundlesToInstall) {
+      auto bundle = testing::InstallLib(fc, b);
       bundles.push_back(bundle);
     }
     
@@ -79,38 +80,38 @@ protected:
     }
 
     // Split up bundles per thread
+    uint32_t numBundlesToInstall = uint32_t(str5kBundles.size()) / numThreads;
+    std::vector<std::string>::iterator lowerBound = str5kBundles.begin();
+    std::vector<std::string>::iterator upperBound = str5kBundles.begin() + numBundlesToInstall;
+
     std::vector<std::vector<std::string>> bundlesToInstallPerThread;
-    uint32_t currentIndex = 0;
     for (uint32_t i = 0; i < numThreads; i++) {
-      std::vector<std::string> tempListOfBundles;
+      bundlesToInstallPerThread.push_back(
+        std::vector<std::string>(lowerBound, upperBound));
 
-      size_t numOfIterations =
-        (i == numThreads - 1 ? str5kBundles.size() / numThreads +
-                                 (str5kBundles.size() % numThreads)
-                             : str5kBundles.size() / numThreads);
-      for (uint32_t j = 0; j < uint32_t(numOfIterations); j++, currentIndex++) {
-        tempListOfBundles.push_back(str5kBundles[currentIndex]);
+      lowerBound = upperBound;
+      if (i + 1 == numThreads - 1) {
+        upperBound = str5kBundles.end();
+      } else if (i + 1 < numThreads) {
+        // Don't do this if it is the last iteration of the for-loop,
+        // if performed, exception is thrown.
+        upperBound += numBundlesToInstall;
       }
-
-      if (i == numThreads - 1) {
-        tempListOfBundles.push_back(str5kBundles[0]);
-      }
-
-      bundlesToInstallPerThread.push_back(tempListOfBundles);
     }
 
-    std::vector<std::future<std::vector<cppmicroservices::Bundle>>> results(numThreads);
+    std::vector<std::future<std::vector<cppmicroservices::Bundle>>> results;
     for (auto _ : state) {
       auto start = high_resolution_clock::now();
-      for (uint32_t i = 0; i < bundlesToInstallPerThread.size(); i++) {
-        results[i] = std::async(std::launch::async,
-				ConcurrentInstallHelper,
-                                std::ref(framework),
-                                std::cref(bundlesToInstallPerThread[i]));
+
+      for (const auto& bundlesToInstall : bundlesToInstallPerThread) {
+        results.push_back(std::async(std::launch::async,
+                                     ConcurrentInstallHelper,
+                                     std::ref(framework),
+                                     std::cref(bundlesToInstall)));
       }
 
-      for (uint32_t i = 0; i < bundlesToInstallPerThread.size(); i++) {
-        results[i].wait();
+      for (auto& res : results) {
+        res.wait();
       }
 
       auto end = high_resolution_clock::now();

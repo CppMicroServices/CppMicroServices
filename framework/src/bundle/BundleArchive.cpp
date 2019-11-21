@@ -37,7 +37,8 @@ const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
   "activation_policy";
 
 BundleArchive::BundleArchive()
-  : storage(nullptr), numOpenResources(0)
+  : storage(nullptr)
+  , numOpenResources(0)
 {}
 
 BundleArchive::BundleArchive(
@@ -147,16 +148,16 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 
-void BundleArchive::RegisterOpenedResource() const 
-{ 
-  std::lock_guard<std::mutex> lock(numOpenResourcesLock);
-  numOpenResources++; 
+void BundleArchive::RegisterOpenedResource() const
+{
+  uint32_t expected = 0;
+  while(!numOpenResources.compare_exchange_weak(expected, expected + 1));
 }
 
-void BundleArchive::UnregisterOpenedResource() const 
-{ 
-  std::lock_guard<std::mutex> lock(numOpenResourcesLock);
-  numOpenResources--;
+void BundleArchive::UnregisterOpenedResource() const
+{
+  uint32_t expected = 0;
+  while(!numOpenResources.compare_exchange_weak(expected, expected - 1));
   if (numOpenResources == 0) {
     resourceContainer->CloseContainer();
   }

@@ -23,9 +23,9 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
+#include <atomic>
 #include <chrono>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
 
@@ -164,7 +164,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   /**
    * Decrement the number of open resources by one.
-   * 
+   *
    * Note: If the number of opened resources is 0, then the ResourceContainer
    *       associated with this BundleArchive object is closed.
    */
@@ -175,8 +175,7 @@ private:
   const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
-  mutable uint32_t numOpenResources;
-  mutable std::mutex numOpenResourcesLock;
+  mutable std::atomic<uint32_t> numOpenResources;
   const std::string location;
 };
 }

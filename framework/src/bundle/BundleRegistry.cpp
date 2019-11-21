@@ -201,8 +201,6 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
           lock, [&location, this] {
             return !initialBundleInstallMap[location].second.waitFlag;
           });
-
-        lock.unlock();
       }
 
       l.Lock();

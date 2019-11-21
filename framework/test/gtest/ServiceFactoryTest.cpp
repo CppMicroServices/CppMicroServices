@@ -176,7 +176,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceObjectThrows)
 
   // Next line used to crash if a service implementation threw an exception in the
   // constructor. This test case checks to make sure that the fix is in place.
-  (void)serviceObjects.GetService();
+  EXPECT_NO_THROW((void)serviceObjects.GetService());
 }
 
 // Tests the return type and FrameworkEvent generated when a

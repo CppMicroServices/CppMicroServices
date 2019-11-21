@@ -1,0 +1,19 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI7",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponent7",
+            "service": {
+                "interfaces": ["test::Interface2"]
+            },
+            "references":[{
+                "name" : "foo",
+                "policy" : "Dynamic",
+                "interface" : "test::Interface1"
+            }],
+            "inject-references": false
+        }]
+    }
+}

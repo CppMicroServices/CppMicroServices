@@ -49,8 +49,12 @@ std::unique_lock<std::mutex> io_lock()
 inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
                                              const std::string& bundleName)
 {
-  frameworkCtx.InstallBundles(testing::LIB_PATH + util::DIR_SEP +
-                              US_LIB_PREFIX + bundleName + US_LIB_EXT);
+  frameworkCtx.InstallBundles(testing::LIB_PATH
+                              + util::DIR_SEP
+                              + US_LIB_PREFIX
+                              + bundleName
+                              + US_LIB_POSTFIX
+                              + US_LIB_EXT);
 }
 
 void TestSerial(const Framework& f)

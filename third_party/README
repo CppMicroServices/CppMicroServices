@@ -129,15 +129,10 @@ Patches
 Google Test and Google Mock
 ----------------------------
 
-See https://github.com/google/googletest/blob/master/googletest/LICENSE for license information.
+See https://github.com/google/googletest/blob/master/LICENSE for license information.
 
-https://github.com/google/googletest/releases
-1.8.0
-
-Patches
-
- * Suppress CMake warning about policy CMP0048
- * Suppress tr1 namespace deprecation warnings
+https://github.com/google/googletest
+ba33a8876c3eda4cb8def8e0e90f45930ef8c54f
 
 RapidJSON
 ---------
@@ -155,5 +150,11 @@ See https://github.com/google/benchmark/blob/master/LICENSE for license informat
 https://github.com/google/benchmark/releases
 1.4.1
 
+Abseil (absl)
+-------------
 
+See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license information
+
+https://github.com/abseil/abseil-cpp
+6ec136281086b71da32b5fb068bd6e46b78a5c79
 

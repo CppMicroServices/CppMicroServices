@@ -1,0 +1,410 @@
+{
+    "bundle.symbolic_name" : "main",
+    "bundle.version" : "0.1.0",
+    "scr_test_0": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "bar::ServiceImpl",
+                "enabled": false
+            },
+            {
+                "name": "Foo",
+                "enabled": false
+            }
+        ]
+    },
+    "scr_test_1": {
+        "version": 1,
+        "components": [{
+            "implementation-class": "bar::ServiceImpl",
+            "enabled": true
+        }]
+    },
+    "scr_test_2": {
+        "version": 1,
+        "components": [{
+            "implementation-class": "bar::ServiceImpl",
+            "enabled": true,
+            "service": {
+                "interfaces": ["foo::ServiceInterface"],
+                "scope": "singleton"
+            }
+        }]
+    },
+    "scr_test_3": {
+        "version": 1,
+        "components": [{
+            "implementation-class": "bar::ServiceImpl",
+            "enabled": true,
+            "references": [{
+                "name": "log",
+                "interface": "osgi::LogService"
+            }]
+        }]
+    },
+    "test_metadata": {
+        "manifest_json": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    },
+                    "references": [{
+                        "name": "dictionary",
+                        "interface": "DictionaryService::IDictionaryService"
+                    }]
+                }]
+            }
+        },
+        "manifest_dyn": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "inject-references": true,
+                    "enabled": false,
+                    "service": {
+                        "scope": "SINGLETON",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    },
+                    "properties": {
+                        "foo": "bar",
+                        "num_comps": 42
+                    },
+                    "references": [{
+                        "name": "dictionary",
+                        "interface": "DictionaryService::IDictionaryService",
+                        "policy": "dynamic"
+                    }]
+                }]
+            }
+        },
+        "manifest_mult_comp": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo::Impl1"
+                },
+                               {
+                                   "implementation-class": "Foo::Impl2"
+                               }
+                              ]
+            }
+        },
+        "manifest_illegal_ver": {
+            "scr": {
+                "version": 0,
+                "components": [{}]
+            }
+        },
+        "manifest_missing_ver": {
+            "scr": {
+                "components": [{
+                    "implementation-class": "Foo::Impl1",
+                    "service": {
+                        "interfaces": ["Foo::Interface"]
+                    }
+                }]
+            }
+        },
+        "manifest_illegal_ver2": {
+            "scr": {
+                "version": "",
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl"
+                }]
+            }
+        },
+        "manifest_illegal_ver3": {
+            "scr": {
+                "version": "one",
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl"
+                }]
+            }
+        },
+        "manifest_no_comp": {
+            "scr": {
+                "version": 1
+            }
+        },
+        "manifest_badcomp_index_1": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo::Impl1",
+                    "service": {
+                        "interfaces": ["Foo::Interface"]
+                    }
+                },
+                               {
+                                   "implementation-class": "Foo::Impl2",
+                                   "service": {
+                                       "interfaces": [42]
+                                   }
+                               }
+                              ]
+            }
+        },
+        "manifest_illegal_immediate": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo::Impl1",
+                    "immediate": false
+                }]
+            }
+        },
+        "manifest_no_impl_class": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "activate": "Activate",
+                    "deactivate": "Deactivate",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    },
+                    "references": [{
+                        "name": "dictionary",
+                        "interface": "DictionaryService::IDictionaryService"
+                    }]
+                }]
+            }
+        },
+        "manifest_no_ref_name": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "activate": "Activate",
+                    "deactivate": "Deactivate",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    },
+                    "references": [{
+                        "interface": "DictionaryService::IDictionaryService"
+                    }]
+                }]
+            }
+        },
+        "manifest_no_ref_interface": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "activate": "Activate",
+                    "deactivate": "Deactivate",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    },
+                    "references": [{
+                        "name": "dictionary"
+                    }]
+                }]
+            }
+        },
+        "manifest_illegal_service": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "activate": "Activate",
+                    "deactivate": "Deactivate",
+                    "service": 911
+                }]
+            }
+        },
+        "manifest_no_interfaces": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "activate": "Activate",
+                    "deactivate": "Deactivate",
+                    "service": {
+                        "scope": "singleton"
+                    },
+                    "references": [{
+                        "name": "dictionary",
+                        "interface": "DictionaryService::IDictionaryService"
+                    }]
+                }]
+            }
+        },
+        "manifest_empty_interfaces_arr": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": []
+                    }
+                }]
+            }
+        },
+        "manifest_empty_impl_class": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": ""
+                }]
+            }
+        },
+        "manifest_illegal_inject_refs": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo",
+                    "inject-references": "true"
+                }]
+            }
+        },
+        "manifest_illegal_inject_refs2": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo",
+                    "inject-references": {}
+                }]
+            }
+        },
+        "manifest_illegal_ref_arr": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "activate": "Activate",
+                    "deactivate": "Deactivate",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    },
+                    "references" : [{}]
+                }]
+            }
+        },
+        "manifest_empty_ref_name": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": [{
+                        "name": "",
+                        "interface": "Bar"
+                    }]
+                }]
+            }
+        },
+        "manifest_illegal_ref_name": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": [{
+                        "name": 729,
+                        "interface": "Bar"
+                    }]
+                }]
+            }
+        },
+        "manifest_illegal_comp": {
+            "scr": {
+                "version": 1,
+                "components": []
+            }
+        },
+        "manifest_empty_ref": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": []
+                }]
+            }
+        },
+        "manifest_empty_ref_map": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": [{}]
+                }]
+            }
+        },
+        "manifest_empty_ref_interface": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": [{
+                        "name": "Foo",
+                        "interface": ""
+                    }]
+                }]
+            }
+        },
+        "manifest_illegal_ref_interface": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": [{
+                        "name": "Foo",
+                        "interface": 911
+                    }]
+                }]
+            }
+        },
+        "manifest_illegal_scope": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "service": {
+                        "scope": "global",
+                        "interfaces": ["SpellCheck::ISpellCheckService"]
+                    }
+                }]
+            }
+        },
+        "manifest_illegal_ref": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "references": "illegal"
+                }]
+            }
+        },
+        "manifest_illegal_interfaces": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo::Impl1",
+                    "service": {
+                        "interfaces": [1, 2]
+                    }
+                }]
+            }
+        },
+        "manifest_empty_interfaces_string": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "Foo::Impl1",
+                    "service": {
+                        "interfaces": ["", "valid", ""]
+                    }
+                }]
+            }
+        }
+    }
+}

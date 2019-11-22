@@ -23,9 +23,9 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
-#include <atomic>
 #include <chrono>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -175,7 +175,8 @@ private:
   const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
-  mutable std::atomic<uint32_t> numOpenResources;
+  mutable uint32_t numOpenResources;
+  mutable std::mutex numOpenResourcesMutex;
   const std::string location;
 };
 }

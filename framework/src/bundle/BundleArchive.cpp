@@ -150,14 +150,14 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
 
 void BundleArchive::RegisterOpenedResource() const
 {
-  uint32_t expected = 0;
-  while(!numOpenResources.compare_exchange_weak(expected, expected + 1));
+  std::lock_guard<std::mutex> lock(numOpenResourcesMutex);
+  numOpenResources++;
 }
 
 void BundleArchive::UnregisterOpenedResource() const
 {
-  uint32_t expected = 0;
-  while(!numOpenResources.compare_exchange_weak(expected, expected - 1));
+  std::lock_guard<std::mutex> lock(numOpenResourcesMutex);
+  numOpenResources--;
   if (numOpenResources == 0) {
     resourceContainer->CloseContainer();
   }

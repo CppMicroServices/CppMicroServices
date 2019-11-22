@@ -199,6 +199,11 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
         // to install the current bundle
         std::unique_lock<std::mutex> lock(
           *(initialBundleInstallMap[location].second.m));
+        // This while loop exists to prevent a known race condition. If the installing thread notifies before
+        // another thread trying to install the same bundle reaches this wait, it will wait indefinitely. To
+        // fix this, a wait_for is used intead (which utilizes a timeout to avoid this race) and the wait statement
+        // as a whole acts as the while statement's predicate; once the timeout is reached, wait_for exits and the
+        // statement is re-evaluated since it would have returned false.
         while (!initialBundleInstallMap[location].second.cv->wait_for(lock, 0.1ms, [&location, this] {
           return !initialBundleInstallMap[location].second.waitFlag;
           }));

@@ -69,6 +69,9 @@ your build tree. The following are the absolute minimum requirements:
 - Clang from Xcode 7.3
 - Visual Studio 2015 (MSVC++ 14.0)
 
+Recommended minimum required CMake version:
+- CMake 3.12.4 
+
 Below is a list of tested compiler/OS combinations:
 
 - GCC 5.4 (Ubuntu 14.04) via Travis CI

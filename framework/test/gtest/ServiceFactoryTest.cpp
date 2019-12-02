@@ -44,21 +44,24 @@ struct ITestServiceB
 };
 
 // Service implementations
-struct TestServiceAImpl : public ITestServiceA
+struct TestServiceAImpl
+  : public ITestServiceA
 {};
 
 // Mocks
-class MockFactory : public ServiceFactory
+class MockFactory
+  : public ServiceFactory
 {
 public:
   MOCK_METHOD2(GetService,
-               InterfaceMapConstPtr(const Bundle&,
-                                    const ServiceRegistrationBase&));
+               InterfaceMapConstPtr(const Bundle&
+                                    , const ServiceRegistrationBase&));
   MOCK_METHOD3(UngetService,
                void(const Bundle&,
                     const ServiceRegistrationBase&,
                     const InterfaceMapConstPtr&));
 };
+
 }
 
 class ServiceFactoryTest : public ::testing::Test
@@ -140,13 +143,40 @@ TEST_F(ServiceFactoryTest, TestGetServiceThrows)
       ASSERT_EQ(evt.GetType(), FrameworkEvent::FRAMEWORK_ERROR);
       ASSERT_NE(evt.GetThrowable(), nullptr);
       EXPECT_NO_THROW(try {
-        std::rethrow_exception(evt.GetThrowable());
-      } catch (const std::runtime_error& err) {
-        ASSERT_STREQ(err.what(), exceptionMsg.c_str());
-      });
+          std::rethrow_exception(evt.GetThrowable());
+        } catch (const std::runtime_error& err) {
+          ASSERT_STREQ(err.what(), exceptionMsg.c_str());
+        });
     });
   ASSERT_EQ(context.GetService<ITestServiceA>(sref), nullptr);
   context.RemoveListener(std::move(lToken));
+}
+
+// Tests the return type and FrameworkEvent generated when a
+// ServiceFactory instance throws an exception in it's GetService
+// callback
+TEST_F(ServiceFactoryTest, TestGetServiceObjectThrows)
+{
+  auto context = framework.GetBundleContext();
+  auto sf = std::make_shared<MockFactory>();
+  std::string exceptionMsg("ServiceFactory threw an unknown exception.");
+  EXPECT_CALL(*sf, GetService(testing::_, testing::_))
+    .Times(1)
+    .WillRepeatedly(testing::Throw(std::runtime_error(exceptionMsg)));
+  EXPECT_CALL(*sf, UngetService(testing::_, testing::_, testing::_)).Times(0);
+
+  (void)context.RegisterService<ITestServiceA>(ToFactory(sf)
+                                               , {{
+                                                   Constants::SERVICE_SCOPE
+                                                   , Any(Constants::SCOPE_PROTOTYPE)
+                                                 }});
+
+  auto sref = context.GetServiceReference<ITestServiceA>();
+  auto serviceObjects = context.GetServiceObjects<ITestServiceA>(sref);
+
+  // Next line used to crash if a service implementation threw an exception in the
+  // constructor. This test case checks to make sure that the fix is in place.
+  EXPECT_NO_THROW((void)serviceObjects.GetService());
 }
 
 // Tests the return type and FrameworkEvent generated when a

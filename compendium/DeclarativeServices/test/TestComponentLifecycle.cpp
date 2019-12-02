@@ -77,7 +77,6 @@ TEST_F(tServiceComponent, testThrowingLifeCycleHooks) //DS_TOI_9
   ASSERT_TRUE(static_cast<bool>(sRef));
   auto service = ctxt.GetService<test::LifeCycleValidation>(sRef);
   EXPECT_EQ(service, nullptr) << "Service object must be nullptr since the service component should have thrown an exception when activated";
-
   auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent9");
   auto compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDesc);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";

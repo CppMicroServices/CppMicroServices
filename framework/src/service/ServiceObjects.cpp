@@ -138,12 +138,18 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
     return nullptr;
   }
 
-  std::shared_ptr<UngetHelper> h(
-    new UngetHelper(d->GetServiceInterfaceMap(),
-                    d->m_reference,
-                    d->m_context->bundle->shared_from_this()));
-  return std::shared_ptr<void>(
-    h, (h->interfaceMap->find(d->m_reference.GetInterfaceId()))->second.get());
+  auto interfaceMap = d->GetServiceInterfaceMap();
+  // interfaceMap can be null under certain circumstance e.g. if a constructor throws an
+  // exception in the service implementation.  In that case, we bail out early.
+  if (!interfaceMap) {
+    return nullptr;
+  }
+  
+  auto h = std::make_shared<UngetHelper>(interfaceMap
+                                         , d->m_reference
+                                         , d->m_context->bundle->shared_from_this());
+  auto deleter = h->interfaceMap->find(d->m_reference.GetInterfaceId())->second.get();
+  return std::shared_ptr<void>(h, deleter);
 }
 
 InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const

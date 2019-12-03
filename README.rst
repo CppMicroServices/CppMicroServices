@@ -70,6 +70,7 @@ your build tree. The following are the absolute minimum requirements:
 - Visual Studio 2015 (MSVC++ 14.0)
 
 Recommended minimum required CMake version:
+
 - CMake 3.12.4 
 
 Below is a list of tested compiler/OS combinations:

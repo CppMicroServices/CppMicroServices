@@ -174,7 +174,6 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
       initialBundleInstallMap.insert(
         std::make_pair(location, std::move(pairToInsert)));
-
       l.UnLock();
 
       // Perform the install
@@ -192,13 +191,13 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       return installedBundles;
     } else {
       initialBundleInstallMap[location].first++;
-      l.UnLock();
-
+      
       {
         // Wait for the install thread to notify this thread that it is safe
         // to install the current bundle
         std::unique_lock<std::mutex> lock(
           *(initialBundleInstallMap[location].second.m));
+
         // This while loop exists to prevent a known race condition. If the installing thread notifies before
         // another thread trying to install the same bundle reaches this wait, it will wait indefinitely. To
         // fix this, a wait_for is used intead (which utilizes a timeout to avoid this race) and the wait statement
@@ -208,8 +207,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
           return !initialBundleInstallMap[location].second.waitFlag;
           }));
       }
-
-      l.Lock();
+      
       // Re-acquire the range because while this thread was waiting, the installing
       // thread made a modification to bundles.v
       bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));

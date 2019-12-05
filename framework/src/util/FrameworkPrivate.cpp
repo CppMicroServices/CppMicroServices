@@ -41,11 +41,9 @@ FrameworkPrivate::FrameworkPrivate(CoreBundleContext* fwCtx)
   headers[Constants::BUNDLE_NAME] = location;
   headers[Constants::BUNDLE_VERSION] = version.ToString();
   headers[Constants::BUNDLE_MANIFESTVERSION] = std::string("2");
-  //headers.put("Bundle-Icon", "icon.png;size=32,icon64.png;size=64");
   headers[Constants::BUNDLE_VENDOR] = std::string("C++ Micro Services");
   headers[Constants::BUNDLE_DESCRIPTION] =
     std::string("C++ Micro Services System Bundle");
-  //headers.put(Constants::PROVIDE_CAPABILITY, provideCapabilityString);
 
   // default the internal framework event to what should be
   // returned if a client calls WaitForStop while this
@@ -84,32 +82,6 @@ void FrameworkPrivate::Init()
 void FrameworkPrivate::InitSystemBundle()
 {
   bundleContext.Store(std::make_shared<BundleContextPrivate>(this));
-
-  // TODO Capabilities
-  /*
-      std::string sp;
-      sp.append(coreCtx->frameworkProperties.getProperty(Constants::FRAMEWORK_SYSTEMCAPABILITIES));
-      // Add in extra system capabilities
-      std::string epc = coreCtx->frameworkProperties.getProperty(Constants::FRAMEWORK_SYSTEMCAPABILITIES_EXTRA);
-      if (!epc.empty())
-      {
-        if (!sp.empty())
-        {
-          sp.append(',');
-        }
-        sp.append(epc);
-      }
-      provideCapabilityString = sp;
-      */
-
-  // TODO Wiring
-  /*
-      BundleGeneration* gen = new BundleGeneration(this, exportPackageString,
-                                                        provideCapabilityString);
-      generations.add(gen);
-      gen->SetWired();
-      fwWiring = new FrameworkWiringImpl(coreCtx);
-      */
 
   timeStamp = std::chrono::steady_clock::now();
 }

@@ -1246,9 +1246,6 @@ int BundleTest(int /*argc*/, char* /*argv*/ [])
   TestBundleGetProperty();
 
   // will not test:
-  // Fragments - unable to test without defining what a Fragment is and implementing it
-  //    Fragment code path in BundlePrivate::GetUpdatedState
-  // lazy activation code path - requires defining lazy activation for C++ and implementing it.
   // BundlePrivate::GetAutoStartSetting() - no callers, internal or external
   // invalid json use case - this is automatically checked by usResourceCompiler.
 #if defined(US_BUILD_SHARED_LIBS)

@@ -48,7 +48,6 @@ as specified in the OSGi R4.2 specifications.
 
 #include "BundleHooks.h"
 #include "BundleRegistry.h"
-#include "Debug.h"
 #include "Resolver.h"
 #include "ServiceHooks.h"
 #include "ServiceListeners.h"
@@ -59,15 +58,6 @@ as specified in the OSGi R4.2 specifications.
 #include <string>
 
 namespace cppmicroservices {
-
-class ResolverHooks
-{
-  // dummy implementation
-public:
-  void CheckResolveBlocked() {}
-  void BeginResolve(BundlePrivate*) {}
-  void EndResolve(BundlePrivate*) {}
-};
 
 struct BundleStorage;
 class BundleThread;
@@ -109,11 +99,6 @@ public:
   std::shared_ptr<detail::LogSink> sink;
 
   /**
-   * Debug handle.
-   */
-  Debug debug;
-
-  /**
    * Threads for running listeners and activators
    */
   struct : detail::MultiThreaded<>
@@ -151,11 +136,6 @@ public:
    * All bundle hooks.
    */
   BundleHooks bundleHooks;
-
-  /**
-   * All resolver hooks.
-   */
-  ResolverHooks resolverHooks;
 
   /**
    * All capabilities, exported and imported packages in this framework.

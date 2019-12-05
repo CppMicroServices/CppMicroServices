@@ -159,7 +159,6 @@ void CoreBundleContext::Init()
   bundleRegistry.Init();
 
   serviceHooks.Open();
-  //resolverHooks.Open();
 
   bundleRegistry.Load();
 

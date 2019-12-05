@@ -44,7 +44,6 @@ class Bundle;
 class BundleContextPrivate;
 class BundleThread;
 struct BundleActivator;
-class Fragment;
 
 /**
  * \ingroup MicroServices
@@ -185,11 +184,6 @@ using WaitConditionType = WaitCondition<MutexHost>;
   void ResetBundleThread();
 
   /**
-   * Checks if this bundle is a fragment
-   */
-  bool IsFragment() const;
-
-  /**
    * Framework context.
    */
   CoreBundleContext* coreCtx;
@@ -272,8 +266,6 @@ using WaitConditionType = WaitCondition<MutexHost>;
   /** current bundle thread */
   std::shared_ptr<BundleThread> bundleThread;
 
-  // ------ This belongs to the BundleGeneration class when we introduce it --------
-
   /**
    * Bundle symbolic name.
    */
@@ -286,25 +278,10 @@ using WaitConditionType = WaitCondition<MutexHost>;
   BundleVersion version;
 
   /**
-   * Fragment description. This is null when the bundle isn't a fragment bundle.
-   */
-  std::unique_ptr<Fragment> fragment;
-
-  /**
-   * True when this bundle has its activation policy set to "lazy"
-   */
-  bool lazyActivation;
-
-  /**
    * Time when bundle was last modified.
    *
    */
   Bundle::TimeStamp timeStamp;
-
-  /**
-   * All fragment bundles this bundle hosts.
-   */
-  std::vector<BundlePrivate*> fragments;
 
   // Does not need to be locked by "this" when accessed.
   BundleManifest bundleManifest;

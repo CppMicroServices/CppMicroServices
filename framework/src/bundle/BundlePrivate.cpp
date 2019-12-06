@@ -224,8 +224,7 @@ void BundlePrivate::WaitOnOperation(WaitConditionType& wc,
   }
 }
 
-Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger,
-                                             LockType& l)
+Bundle::State BundlePrivate::GetUpdatedState(LockType& l)
 {
   if (state == Bundle::STATE_INSTALLED) {
     try {
@@ -270,7 +269,7 @@ void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
 void BundlePrivate::FinalizeActivation(LockType& l)
 {
   // 4: Resolve bundle (if needed)
-  switch (GetUpdatedState(this, l)) {
+  switch (GetUpdatedState(l)) {
     case Bundle::STATE_INSTALLED: {
       std::rethrow_exception(resolveFailException);
     }

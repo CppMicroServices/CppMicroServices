@@ -124,7 +124,7 @@ using WaitConditionType = WaitCondition<MutexHost>;
    *
    * @return Bundles state
    */
-  Bundle::State GetUpdatedState(BundlePrivate* trigger, LockType& l);
+  Bundle::State GetUpdatedState(LockType& l);
 
   /**
    * Set state to BUNDLE_INSTALLED.

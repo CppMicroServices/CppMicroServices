@@ -71,9 +71,6 @@ TEST(BundleResourceTestNoBundleInstall, getChildResourcesFromInvalidBundle)
 TEST_F(BundleResourceTest, getChildResources)
 {
   BundleResource resource = bundleR.GetResource("icons/");
-  // Demonstrate that call to GetChildren() is not required to get the actual
-  // count of children resources
-  ASSERT_NE(resource.GetChildResources().size(), static_cast<unsigned int>(0));
 
   // Confirm that GetChildResources() returns the correct number
   ASSERT_EQ(resource.GetChildResources().size(), static_cast<unsigned int>(3));

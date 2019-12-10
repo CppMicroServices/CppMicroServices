@@ -58,6 +58,7 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
     throw std::runtime_error("Invalid zip archive layout for bundle at " +
                              m_Location);
   }
+
   m_IsContainerOpen = true;
 }
 

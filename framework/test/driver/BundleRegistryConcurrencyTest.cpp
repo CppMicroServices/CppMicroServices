@@ -57,6 +57,7 @@ inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
                               + US_LIB_EXT);
 
   for (auto& b : bundles) {
+    std::unique_lock<std::mutex> lock = io_lock();
     US_TEST_CONDITION(false == !b,
                       "Test to check if returned bundle is valid.");
   }
@@ -131,9 +132,11 @@ void TestConcurrent(const Framework& f)
     threads.emplace_back([f] { f.GetBundleContext().GetBundles(); });
   }
 
-  for (auto& th : threads)
+  for (auto& th : threads) {
     th.join();
-  US_TEST_CONDITION(numTestBundles == f.GetBundleContext().GetBundles().size(),
+  }
+
+  io_lock(), US_TEST_CONDITION(numTestBundles == f.GetBundleContext().GetBundles().size(),
                     "Test for correct number of installed bundles")
 }
 #  endif

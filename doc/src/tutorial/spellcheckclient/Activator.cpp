@@ -49,10 +49,9 @@ class US_ABI_LOCAL Activator : public BundleActivator
 {
 
 public:
-
   Activator()
-   : m_context()
-   , m_tracker(nullptr)
+    : m_context()
+    , m_tracker(nullptr)
   {}
 
   /**
@@ -79,8 +78,7 @@ public:
     std::cout << "Enter a blank line to exit." << std::endl;
 
     // Loop endlessly until the user enters a blank line
-    while (std::cin)
-    {
+    while (std::cin) {
       // Ask the user to enter a passage.
       std::cout << "Enter passage: ";
 
@@ -92,29 +90,22 @@ public:
 
       // If the user entered a blank line, then
       // exit the loop.
-      if (passage.empty())
-      {
+      if (passage.empty()) {
         break;
       }
       // If there is no spell checker, then say so.
-      else if (checker == nullptr)
-      {
+      else if (checker == nullptr) {
         std::cout << "No spell checker available." << std::endl;
       }
       // Otherwise check passage and print misspelled words.
-      else
-      {
+      else {
         std::vector<std::string> errors = checker->Check(passage);
 
-        if (errors.empty())
-        {
+        if (errors.empty()) {
           std::cout << "Passage is correct." << std::endl;
-        }
-        else
-        {
+        } else {
           std::cout << "Incorrect word(s):" << std::endl;
-          for (std::size_t i = 0; i < errors.size(); ++i)
-          {
+          for (std::size_t i = 0; i < errors.size(); ++i) {
             std::cout << "    " << errors[i] << std::endl;
           }
         }
@@ -130,19 +121,15 @@ public:
    * the C++ Micro Services library will automatically unget any used services.
    * @param context the context for the bundle.
    */
-  void Stop(BundleContext /*context*/)
-  {
-  }
+  void Stop(BundleContext /*context*/) {}
 
 private:
-
   // Bundle context
   BundleContext m_context;
 
   // The service tracker
   ServiceTracker<ISpellCheckService>* m_tracker;
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)

@@ -24,7 +24,7 @@
 #define CPPMICROSERVICES_BUNDLEACTIVATOR_H
 
 #ifndef US_BUNDLE_NAME
-#error Missing US_BUNDLE_NAME preprocessor define
+#  error Missing US_BUNDLE_NAME preprocessor define
 #endif
 
 #include "cppmicroservices/BundleContext.h"
@@ -76,7 +76,7 @@ class BundleContext;
 struct BundleActivator
 {
 
-  virtual ~BundleActivator() {}
+  virtual ~BundleActivator() = default;
 
   /**
    * Called when this bundle is started. This method
@@ -110,9 +110,7 @@ struct BundleActivator
    *         bundle, and release all services used by the bundle.
    */
   virtual void Stop(BundleContext context) = 0;
-
 };
-
 }
 
 /**
@@ -128,14 +126,16 @@ struct BundleActivator
  * Example:
  * \snippet uServices-activator/main.cpp 0
  */
-#define CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(_activator_type)                                                        \
-  extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator* US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME) ()                \
-  {                                                                                                        \
-    return new _activator_type();                                                                          \
-  }                                                                                                        \
-  extern "C" US_ABI_EXPORT void US_DESTROY_ACTIVATOR_FUNC(US_BUNDLE_NAME) (cppmicroservices::BundleActivator* activator) \
-  {                                                                                                        \
-    delete activator;                                                                                      \
+#define CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(_activator_type)              \
+  extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*                  \
+    US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME)()                                 \
+  {                                                                            \
+    return new _activator_type();                                              \
+  }                                                                            \
+  extern "C" US_ABI_EXPORT void US_DESTROY_ACTIVATOR_FUNC(US_BUNDLE_NAME)(     \
+    cppmicroservices::BundleActivator * activator)                             \
+  {                                                                            \
+    delete activator;                                                          \
   }
 
 #endif /* CPPMICROSERVICES_BUNDLEACTIVATOR_H */

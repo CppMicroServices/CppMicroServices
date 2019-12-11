@@ -40,11 +40,9 @@ template<class Mutex = std::mutex>
 class MutexLockingStrategy
 {
 public:
+  using MutexType = Mutex;
 
-  typedef Mutex MutexType;
-
-  MutexLockingStrategy()
-  {}
+  MutexLockingStrategy() = default;
 
   MutexLockingStrategy(const MutexLockingStrategy&)
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -57,9 +55,7 @@ public:
   class UniqueLock
   {
   public:
-
-    UniqueLock()
-    {}
+    UniqueLock() = default;
 
     UniqueLock(const UniqueLock&) = delete;
     UniqueLock& operator=(const UniqueLock&) = delete;
@@ -90,15 +86,9 @@ public:
       : m_Lock(host.m_Mtx, d)
     {}
 
-    void Lock()
-    {
-      m_Lock.lock();
-    }
+    void Lock() { m_Lock.lock(); }
 
-    void UnLock()
-    {
-      m_Lock.unlock();
-    }
+    void UnLock() { m_Lock.unlock(); }
 
     template<typename Rep, typename Period>
     bool TryLockFor(const std::chrono::duration<Rep, Period>& duration)
@@ -121,7 +111,6 @@ public:
 #endif
 
   private:
-
     friend class WaitCondition<MutexLockingStrategy>;
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -142,38 +131,32 @@ public:
    *
    * @return A lock object.
    */
-  UniqueLock Lock() const
-  {
-    return UniqueLock(this);
-  }
+  UniqueLock Lock() const { return UniqueLock(this); }
 
-  UniqueLock DeferLock() const
-  {
-    return UniqueLock(this);
-  }
+  UniqueLock DeferLock() const { return UniqueLock(this); }
 
 protected:
-
 #ifdef US_ENABLE_THREADING_SUPPORT
   mutable MutexType m_Mtx;
 #endif
 };
 
-class NoLockingStrategy {
+class NoLockingStrategy
+{
 public:
-    typedef void UniqueLock;
+  using UniqueLock = void;
 };
 
 template<class MutexHost>
-class NoWaitCondition {};
+class NoWaitCondition
+{};
 
-template<
-    class LockingStrategy = MutexLockingStrategy<>,
-    template<class MutexHost> class WaitConditionStrategy = NoWaitCondition
-    >
+template<class LockingStrategy = MutexLockingStrategy<>,
+         template<class MutexHost> class WaitConditionStrategy =
+           NoWaitCondition>
 class MultiThreaded
-    : public LockingStrategy
-    , public WaitConditionStrategy<LockingStrategy>
+  : public LockingStrategy
+  , public WaitConditionStrategy<LockingStrategy>
 {};
 
 template<class T>
@@ -182,25 +165,19 @@ class Atomic : private MultiThreaded<>
   T m_t;
 
 public:
-
   template<class... Args>
   Atomic(Args&&... args)
-    : m_t{std::forward<Args>(args)...}
+    : m_t{ std::forward<Args>(args)... }
   {}
 
-  T Load() const
-  {
-    return Lock(), m_t;
-  }
+  T Load() const { return Lock(), m_t; }
 
-  void Store(const T& t)
-  {
-    Lock(), m_t = t;
-  }
+  void Store(const T& t) { Lock(), m_t = t; }
 
   T Exchange(const T& t)
   {
-    auto l = Lock(); US_UNUSED(l);
+    auto l = Lock();
+    US_UNUSED(l);
     auto o = m_t;
     m_t = t;
     return o;
@@ -208,16 +185,15 @@ public:
 
   bool CompareExchange(T& expected, const T& desired)
   {
-    auto l = Lock(); US_UNUSED(l);
-    if (expected == m_t)
-    {
+    auto l = Lock();
+    US_UNUSED(l);
+    if (expected == m_t) {
       m_t = desired;
       return true;
     }
     expected = m_t;
     return false;
   }
-
 };
 
 #if !defined(__GNUC__) || __GNUC__ > 4
@@ -234,23 +210,17 @@ class Atomic<std::shared_ptr<T>>
   std::shared_ptr<T> m_t;
 
 public:
+  std::shared_ptr<T> Load() const { return std::atomic_load(&m_t); }
 
-  std::shared_ptr<T> Load() const
-  {
-    return std::atomic_load(&m_t);
-  }
-
-  void Store(const std::shared_ptr<T>& t)
-  {
-    std::atomic_store(&m_t, t);
-  }
+  void Store(const std::shared_ptr<T>& t) { std::atomic_store(&m_t, t); }
 
   std::shared_ptr<T> Exchange(const std::shared_ptr<T>& t)
   {
     return std::atomic_exchange(&m_t, t);
   }
 
-  bool CompareExchange(std::shared_ptr<T>& expected, const std::shared_ptr<T>& desired)
+  bool CompareExchange(std::shared_ptr<T>& expected,
+                       const std::shared_ptr<T>& desired)
   {
     return std::atomic_compare_exchange_strong(&m_t, &expected, desired);
   }

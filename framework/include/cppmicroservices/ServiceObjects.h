@@ -36,11 +36,9 @@ class US_Framework_EXPORT ServiceObjectsBase
 {
 
 private:
-
   std::unique_ptr<ServiceObjectsBasePrivate> d;
 
 public:
-
   ServiceObjectsBase(const ServiceObjectsBase& other) = delete;
   ServiceObjectsBase& operator=(const ServiceObjectsBase& other) = delete;
 
@@ -48,8 +46,8 @@ public:
   ServiceObjectsBase& operator=(ServiceObjectsBase&& other);
 
 protected:
-
-  ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceBase& reference);
+  ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context,
+                     const ServiceReferenceBase& reference);
 
   ~ServiceObjectsBase();
 
@@ -60,7 +58,6 @@ protected:
   InterfaceMapConstPtr GetServiceInterfaceMap() const;
 
   ServiceReferenceBase GetReference() const;
-
 };
 
 /**
@@ -91,12 +88,17 @@ class ServiceObjects : private ServiceObjectsBase
 {
 
 public:
-
   ServiceObjects(const ServiceObjects& other) = delete;
   ServiceObjects& operator=(const ServiceObjects& other) = delete;
 
-  ServiceObjects(ServiceObjects&& other) : ServiceObjectsBase(std::move(other)) {}
-  ServiceObjects& operator=(ServiceObjects&& other) { ServiceObjectsBase::operator=(std::move(other)); return *this; }
+  ServiceObjects(ServiceObjects&& other)
+    : ServiceObjectsBase(std::move(other))
+  {}
+  ServiceObjects& operator=(ServiceObjects&& other)
+  {
+    ServiceObjectsBase::operator=(std::move(other));
+    return *this;
+  }
 
   /**
    * Returns a service object for the referenced service.
@@ -148,13 +150,12 @@ public:
   }
 
 private:
-
   friend class BundleContext;
 
-  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReference<S>& reference)
+  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context,
+                 const ServiceReference<S>& reference)
     : ServiceObjectsBase(context, reference)
   {}
-
 };
 
 /**
@@ -173,7 +174,6 @@ class US_Framework_EXPORT ServiceObjects<void> : private ServiceObjectsBase
 {
 
 public:
-
   ServiceObjects(const ServiceObjects& other) = delete;
   ServiceObjects& operator=(const ServiceObjects& other) = delete;
 
@@ -207,13 +207,11 @@ public:
   ServiceReferenceU GetServiceReference() const;
 
 private:
-
   friend class BundleContext;
 
-  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context, const ServiceReferenceU& reference);
-
+  ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context,
+                 const ServiceReferenceU& reference);
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEOBJECTS_H

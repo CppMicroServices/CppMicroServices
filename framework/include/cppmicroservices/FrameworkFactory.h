@@ -29,9 +29,9 @@
 
 #include <iostream>
 #include <map>
-#include <unordered_map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace cppmicroservices {
 
@@ -39,7 +39,7 @@ class Any;
 
 class Framework;
 
-typedef std::unordered_map<std::string, Any> FrameworkConfiguration;
+using FrameworkConfiguration = std::unordered_map<std::string, Any>;
 
 /**
  * \ingroup MicroServices
@@ -51,7 +51,7 @@ typedef std::unordered_map<std::string, Any> FrameworkConfiguration;
 class US_Framework_EXPORT FrameworkFactory
 {
 public:
-    /**
+  /**
      * Create a new Framework instance.
      *
      * @param configuration The framework properties to configure the new framework instance. If framework properties
@@ -61,18 +61,19 @@ public:
      *
      * @return A new, configured Framework instance.
      */
-    Framework NewFramework(const FrameworkConfiguration& configuration, std::ostream* logger = nullptr);
+  Framework NewFramework(const FrameworkConfiguration& configuration,
+                         std::ostream* logger = nullptr);
 
-    /**
+  /**
      * Create a new Framework instance.
      *
      * This is the same as calling \code NewFramework(FrameworkConfiguration()) \endcode.
      *
      * @return A new, configured Framework instance.
      */
-    Framework NewFramework();
+  Framework NewFramework();
 
-    /**
+  /**
      * Create a new Framework instance.
      *
      * @deprecated Since 3.1, use NewFramework() or NewFramework(const FramworkConfiguration&, std::ostream*)
@@ -80,10 +81,10 @@ public:
      *
      * @return A new, configured Framework instance.
      */
-    US_DEPRECATED Framework NewFramework(const std::map<std::string, Any>& configuration, std::ostream* logger = nullptr);
-
+  US_DEPRECATED Framework
+  NewFramework(const std::map<std::string, Any>& configuration,
+               std::ostream* logger = nullptr);
 };
-
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORKFACTORY_H

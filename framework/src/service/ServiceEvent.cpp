@@ -29,23 +29,19 @@ namespace cppmicroservices {
 class ServiceEventData
 {
 public:
-
-  ServiceEventData(const ServiceEvent::Type& type, const ServiceReferenceBase& reference)
-    : type(type), reference(reference)
-  {
-
-  }
+  ServiceEventData(const ServiceEvent::Type& type,
+                   const ServiceReferenceBase& reference)
+    : type(type)
+    , reference(reference)
+  {}
 
   const ServiceEvent::Type type;
   const ServiceReferenceBase reference;
-
 };
 
 ServiceEvent::ServiceEvent()
   : d(nullptr)
-{
-
-}
+{}
 
 ServiceEvent::operator bool() const
 {
@@ -54,21 +50,11 @@ ServiceEvent::operator bool() const
 
 ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)
   : d(new ServiceEventData(type, reference))
-{
+{}
 
-}
+ServiceEvent::ServiceEvent(const ServiceEvent&) = default;
 
-ServiceEvent::ServiceEvent(const ServiceEvent& other)
-  : d(other.d)
-{
-
-}
-
-ServiceEvent& ServiceEvent::operator=(const ServiceEvent& other)
-{
-  d = other.d;
-  return *this;
-}
+ServiceEvent& ServiceEvent::operator=(const ServiceEvent&) = default;
 
 ServiceReferenceU ServiceEvent::GetServiceReference() const
 {
@@ -82,28 +68,33 @@ ServiceEvent::Type ServiceEvent::GetType() const
 
 std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type)
 {
-  switch(type)
-  {
-  case ServiceEvent::SERVICE_MODIFIED:          return os << "MODIFIED";
-  case ServiceEvent::SERVICE_MODIFIED_ENDMATCH: return os << "MODIFIED_ENDMATCH";
-  case ServiceEvent::SERVICE_REGISTERED:        return os << "REGISTERED";
-  case ServiceEvent::SERVICE_UNREGISTERING:     return os << "UNREGISTERING";
+  switch (type) {
+    case ServiceEvent::SERVICE_MODIFIED:
+      return os << "MODIFIED";
+    case ServiceEvent::SERVICE_MODIFIED_ENDMATCH:
+      return os << "MODIFIED_ENDMATCH";
+    case ServiceEvent::SERVICE_REGISTERED:
+      return os << "REGISTERED";
+    case ServiceEvent::SERVICE_UNREGISTERING:
+      return os << "UNREGISTERING";
 
-  default: return os << "unknown service event type (" << static_cast<int>(type) << ")";
+    default:
+      return os << "unknown service event type (" << static_cast<int>(type)
+                << ")";
   }
 }
 
 std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
 {
-  if (!event) return os << "NONE";
+  if (!event)
+    return os << "NONE";
 
   os << event.GetType();
 
   ServiceReferenceU sr = event.GetServiceReference();
-  if (sr)
-  {
+  if (sr) {
     // Some events will not have a service reference
-    long int sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
+    auto sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
     os << " " << sid;
 
     Any classes = sr.GetProperty(Constants::OBJECTCLASS);
@@ -112,5 +103,4 @@ std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
 
   return os;
 }
-
 }

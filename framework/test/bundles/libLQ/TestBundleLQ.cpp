@@ -39,30 +39,26 @@ struct TestBundleLQ : public TestBundleLQService
 class TestBundleLQActivator : public BundleActivator
 {
 public:
-
   TestBundleLQActivator() {}
   ~TestBundleLQActivator() {}
 
   void Start(BundleContext context)
   {
-      s = std::make_shared<TestBundleLQ>();
+    s = std::make_shared<TestBundleLQ>();
 
-      ServiceProperties props;
-      props["service.testproperty"] = std::string("YES");
-      std::cout << "Registering TestBundleLQService";
-      sr = context.RegisterService<TestBundleLQService>(s, props);
+    ServiceProperties props;
+    props["service.testproperty"] = std::string("YES");
+    std::cout << "Registering TestBundleLQService";
+    sr = context.RegisterService<TestBundleLQService>(s, props);
   }
 
-  void Stop(BundleContext)
-  {
-      sr.Unregister();
-  }
+  void Stop(BundleContext) { sr.Unregister(); }
+
 private:
-
   std::shared_ptr<TestBundleLQ> s;
   ServiceRegistration<TestBundleLQService> sr;
 };
-
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleLQActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleLQActivator)

@@ -20,12 +20,13 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_LDAPEXPR_H
 #define CPPMICROSERVICES_LDAPEXPR_H
 
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/SharedData.h"
+
+#include "absl/strings/string_view.h"
 
 #include <string>
 #include <unordered_set>
@@ -40,10 +41,10 @@ class PropertiesHandle;
 /**
  * This class is not part of the public API.
  */
-class LDAPExpr {
+class LDAPExpr
+{
 
 public:
-
   const static int AND = 0;
   const static int OR = 1;
   const static int NOT = 2;
@@ -54,11 +55,10 @@ public:
   const static int COMPLEX = AND | OR | NOT;
   const static int SIMPLE = EQ | LE | GE | APPROX;
 
-  typedef char Byte;
-  typedef std::vector<std::string> StringList;
-  typedef std::vector<StringList> LocalCache;
-  typedef std::unordered_set<std::string> ObjectClassSet;
-
+  using Byte = char;
+  using StringList = std::vector<std::string>;
+  using LocalCache = std::vector<StringList>;
+  using ObjectClassSet = std::unordered_set<std::string>;
 
   /**
    * Creates an invalid LDAPExpr object. Use with care.
@@ -106,10 +106,9 @@ public:
    * @return <code>true</code> if this expression is simple,
    * <code>false</code> otherwise.
    */
-  bool IsSimple(
-    const StringList& keywords,
-    LocalCache& cache,
-    bool matchCase) const;
+  bool IsSimple(const StringList& keywords,
+                LocalCache& cache,
+                bool matchCase) const;
 
   /**
    * Returns <code>true</code> if this instance is invalid, i.e. it was
@@ -126,9 +125,7 @@ public:
   //!
   const std::string ToString() const;
 
-
 private:
-
   class ParseState;
 
   //!
@@ -152,25 +149,30 @@ private:
 
   //!
   template<typename T>
-  bool CompareIntegralType(const Any& obj, const int op, const std::string& s) const;
+  bool CompareIntegralType(const Any& obj,
+                           const int op,
+                           const std::string& s) const;
 
   //!
-  static bool CompareString(const std::string& s1, int op, const std::string& s2);
+  static bool CompareString(const absl::string_view s1,
+                            int op,
+                            const absl::string_view s2);
 
   //!
-  static std::string FixupString(const std::string &s);
+  static std::string FixupString(const absl::string_view s);
 
   //!
-  static bool PatSubstr(const std::string& s, const std::string& pat);
+  static bool PatSubstr(const absl::string_view s, const absl::string_view pat);
 
   //!
-  static bool PatSubstr(const std::string& s, int si, const std::string& pat, int pi);
+  static bool PatSubstr(const absl::string_view s,
+                        int si,
+                        const absl::string_view pat,
+                        int pi);
 
   //! Shared pointer
   SharedDataPointer<LDAPExprData> d;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_LDAPEXPR_H

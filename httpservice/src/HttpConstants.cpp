@@ -73,5 +73,4 @@ std::string HttpConstants::HTTP_WHITEBOARD_TARGET()
   static std::string s = "org.cppmicroservices.http.whiteboard.target";
   return s;
 }
-
 }

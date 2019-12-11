@@ -36,7 +36,6 @@ struct TestBundleA2 : public TestBundleA2Service
 class TestBundleA2Activator : public BundleActivator
 {
 public:
-
   TestBundleA2Activator() {}
 
   ~TestBundleA2Activator() {}
@@ -54,11 +53,10 @@ public:
   }
 
 private:
-
   std::shared_ptr<TestBundleA2> s;
   ServiceRegistration<TestBundleA2Service> sr;
 };
-
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleA2Activator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleA2Activator)

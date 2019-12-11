@@ -25,11 +25,10 @@
 namespace cppmicroservices {
 
 Debug::Debug()
-  : lazyActivation(false)
+   
 {
 #ifdef _DEBUG
   lazyActivation = true;
 #endif
 }
-
 }

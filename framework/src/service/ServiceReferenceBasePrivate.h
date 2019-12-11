@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 #define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
@@ -38,16 +37,15 @@ class PropertiesHandle;
 class ServiceRegistrationBasePrivate;
 class ServiceReferenceBasePrivate;
 
-
 /**
  * \ingroup MicroServices
  */
 class ServiceReferenceBasePrivate
 {
 public:
-
   ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&) = delete;
-  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) = delete;
+  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) =
+    delete;
 
   ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
 
@@ -81,7 +79,8 @@ public:
    * @return True if service was removed or false if only reference counter was
    *         decremented.
    */
-  bool UngetService(const std::shared_ptr<BundlePrivate>& bundle, bool checkRefCounter);
+  bool UngetService(const std::shared_ptr<BundlePrivate>& bundle,
+                    bool checkRefCounter);
 
   /**
    * Unget prototype scope service objects.
@@ -90,7 +89,8 @@ public:
    * @param service The prototype scope service pointer.
    * @return \c true if the service was removed, \c false otherwise.
    */
-  bool UngetPrototypeService(const std::shared_ptr<BundlePrivate>& bundle, const InterfaceMapConstPtr& service);
+  bool UngetPrototypeService(const std::shared_ptr<BundlePrivate>& bundle,
+                             const InterfaceMapConstPtr& service);
 
   /**
    * Get a handle to the locked service properties.
@@ -117,12 +117,10 @@ public:
   std::string interfaceId;
 
 private:
-
-  InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,
-                                             const std::shared_ptr<ServiceFactory>& factory);
-
+  InterfaceMapConstPtr GetServiceFromFactory(
+    BundlePrivate* bundle,
+    const std::shared_ptr<ServiceFactory>& factory);
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H

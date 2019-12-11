@@ -25,8 +25,8 @@
 
 #include "cppmicroservices/FrameworkExport.h"
 
-#include <streambuf>
 #include <memory>
+#include <streambuf>
 
 namespace cppmicroservices {
 
@@ -34,37 +34,38 @@ namespace detail {
 
 class BundleResourceBufferPrivate;
 
-class US_Framework_EXPORT BundleResourceBuffer: public std::streambuf
+class US_Framework_EXPORT BundleResourceBuffer : public std::streambuf
 {
 
 public:
-
   BundleResourceBuffer(const BundleResourceBuffer&) = delete;
   BundleResourceBuffer& operator=(const BundleResourceBuffer&) = delete;
 
-  explicit BundleResourceBuffer(std::unique_ptr<void, void(*)(void*)> data,
+  explicit BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
                                 std::size_t size,
                                 std::ios_base::openmode mode);
 
-  ~BundleResourceBuffer();
+  ~BundleResourceBuffer() override;
 
 private:
+  int_type underflow() override;
 
-  int_type underflow();
+  int_type uflow() override;
 
-  int_type uflow();
+  int_type pbackfail(int_type ch) override;
 
-  int_type pbackfail(int_type ch);
+  std::streamsize showmanyc() override;
 
-  std::streamsize showmanyc();
-
-  pos_type seekoff (off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
-  pos_type seekpos (pos_type sp, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+  pos_type seekoff(off_type off,
+                   std::ios_base::seekdir way,
+                   std::ios_base::openmode which = std::ios_base::in |
+                                                   std::ios_base::out) override;
+  pos_type seekpos(pos_type sp,
+                   std::ios_base::openmode which = std::ios_base::in |
+                                                   std::ios_base::out) override;
 
 private:
-
   std::unique_ptr<BundleResourceBufferPrivate> d;
-
 };
 
 } // namespace detail

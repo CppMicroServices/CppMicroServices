@@ -39,28 +39,20 @@ class BundleHooks
 {
 
 private:
-
   CoreBundleContext* const coreCtx;
 
 public:
-
   BundleHooks(CoreBundleContext* ctx);
 
-  Bundle FilterBundle(
-      const BundleContext& context,
-      const Bundle& bundle
-      ) const;
+  Bundle FilterBundle(const BundleContext& context, const Bundle& bundle) const;
 
-  void FilterBundles(
-      const BundleContext& context,
-      std::vector<Bundle>& bundles
-      ) const;
+  void FilterBundles(const BundleContext& context,
+                     std::vector<Bundle>& bundles) const;
 
-  void FilterBundleEventReceivers(const BundleEvent& evt,
-                                  ServiceListeners::BundleListenerMap& bundleListeners);
-
+  void FilterBundleEventReceivers(
+    const BundleEvent& evt,
+    ServiceListeners::BundleListenerMap& bundleListeners);
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEHOOKS_H

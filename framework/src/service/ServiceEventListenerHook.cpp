@@ -24,8 +24,5 @@
 
 namespace cppmicroservices {
 
-ServiceEventListenerHook::~ServiceEventListenerHook()
-{
-}
-
+ServiceEventListenerHook::~ServiceEventListenerHook() = default;
 }

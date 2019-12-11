@@ -26,7 +26,7 @@
 #    This ensures that changed resource files will automatically be re-added to the
 #    bundle.
 #
-# There are two differend modes for including resources: *APPEND* and *LINK*. In *APPEND* mode,
+# There are two different modes for including resources: *APPEND* and *LINK*. In *APPEND* mode,
 # the generated zip file is appended at the end of the target file. In *LINK* mode, the
 # zip file is compiled / linked into the target using platform specific techniques. *LINK*
 # mode is necessary if certain tools make additional assumptions about the object layout
@@ -121,11 +121,17 @@ function(usFunctionEmbedResources)
     set(US_RESOURCE_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${US_RESOURCE_WORKING_DIRECTORY}")
   endif()
 
-  set(resource_compiler ${US_RCC_EXECUTABLE})
-  if(TARGET ${US_RCC_EXECUTABLE_TARGET})
-    set(resource_compiler ${US_RCC_EXECUTABLE_TARGET})
-  elseif(NOT resource_compiler)
-    message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
+  if(CMAKE_CROSSCOMPILING)
+    # Cross-compiled builds need to use the imported host version of usResourceCompiler
+    include(${IMPORT_EXECUTABLES})
+    set(resource_compiler native-${US_RCC_EXECUTABLE_TARGET})
+  else()
+    set(resource_compiler ${US_RCC_EXECUTABLE})
+    if(TARGET ${US_RCC_EXECUTABLE_TARGET})
+      set(resource_compiler ${US_RCC_EXECUTABLE_TARGET})
+    elseif(NOT resource_compiler)
+      message(FATAL_ERROR "The CppMicroServices resource compiler was not found. Check the US_RCC_EXECUTABLE CMake variable.")
+    endif()
   endif()
 
   set(_zip_archive )
@@ -193,7 +199,7 @@ function(usFunctionEmbedResources)
       add_custom_command(
         OUTPUT ${_source_output}
         COMMAND ${CMAKE_LINKER} -r -b binary -o ${_source_output} ${_zip_archive_name}
-        COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
+        COMMAND objcopy --rename-section .data=.us_resources,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"

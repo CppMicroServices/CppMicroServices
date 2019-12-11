@@ -27,8 +27,8 @@
 #include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
 
 #include <memory>
-#include <streambuf>
 #include <sstream>
+#include <streambuf>
 
 namespace cppmicroservices {
 
@@ -36,17 +36,16 @@ class VariableResolverStreamBuffer : public std::streambuf
 {
 public:
   explicit VariableResolverStreamBuffer(
-      std::unique_ptr<std::ostream> out,
-      const std::shared_ptr<WebConsoleVariableResolver>& resolver
-      );
+    std::unique_ptr<std::ostream> out,
+    std::shared_ptr<WebConsoleVariableResolver>  resolver);
 
   ~VariableResolverStreamBuffer();
 
   VariableResolverStreamBuffer(const VariableResolverStreamBuffer&) = delete;
-  VariableResolverStreamBuffer& operator=(const VariableResolverStreamBuffer&) = delete;
+  VariableResolverStreamBuffer& operator=(const VariableResolverStreamBuffer&) =
+    delete;
 
 private:
-
   int_type overflow(int_type ch);
 
   int sync();
@@ -87,7 +86,8 @@ private:
 
   void Translate();
 
-  enum class State {
+  enum class State
+  {
 
     NIL,
     OBRACE,
@@ -116,7 +116,6 @@ private:
   std::stringstream m_BeginTag;
   std::stringstream m_EndTag;
 };
-
 }
 
 #endif // CPPMICROSERVICES_VARIABLERESOLVERSTREAMBUFFER_H

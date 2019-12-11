@@ -19,6 +19,7 @@ cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 list(APPEND policies_new
   CMP0025 # Compiler id for Apple Clang is now AppleClang (CMake 3.0)
   CMP0054 # Only interpret if() arguments as variables or keywords when unquoted
+  CMP0079
   )
 foreach(policy ${policies_new})
   if(POLICY ${policy})
@@ -31,8 +32,8 @@ endforeach()
 #------------------------------------------------------------------------------
 
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED 1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 14)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
 # source files in C mode. Because we mix C and C++ code in the test driver
@@ -75,18 +76,18 @@ set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
 # wait_condition
 # exception_ptr
 
-set(US_COMPILER_GNU_MINIMUM_VERSION          4.6         )
-set(US_COMPILER_Clang_MINIMUM_VERSION        3.1         )
-set(US_COMPILER_AppleClang_MINIMUM_VERSION   6.0         )
-set(US_COMPILER_MSVC_MINIMUM_VERSION         18.00.31101 )
+set(US_COMPILER_GNU_MINIMUM_VERSION          5.1         )
+set(US_COMPILER_Clang_MINIMUM_VERSION        3.5         )
+set(US_COMPILER_AppleClang_MINIMUM_VERSION   7.3         )
+set(US_COMPILER_MSVC_MINIMUM_VERSION         19.00.23026 )
 
 set(US_COMPILER_GNU_MINIMUM_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_VERSION}")
 set(US_COMPILER_Clang_MINIMUM_VERSION_PRODUCT      "Clang ${US_COMPILER_CLANG_MINIMUM_VERSION}")
-set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 6.0 (Clang ${US_COMPILER_AppleClang_MINIMUM_VERSION})")
-set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2013 Update 4 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
+set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 7.3 (Clang ${US_COMPILER_AppleClang_MINIMUM_VERSION})")
+set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2015 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
 
-set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         4.8   )
-set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.3   )
+set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         5.4   )
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.5   )
 set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  8.0   )
 set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.00 )
 
@@ -110,6 +111,14 @@ endif()
 if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION})
   message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
 endif()
+
+STRING(SUBSTRING "${CMAKE_SYSTEM_PROCESSOR}" 0 3 SYSTEM_PROCESSOR_SUBSTR)
+if("${SYSTEM_PROCESSOR_SUBSTR}" STREQUAL "arm")
+  if(US_COMPILER_GNU)
+    set(US_COMPILER_GNU_ARM 1)
+endif()
+endif()
+
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -136,6 +145,15 @@ include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
 include(usFunctionGenerateBundleInit)
 include(usMacroCreateBundle)
+include(usFunctionCreateTestBundle)
+include(usFunctionCreateDSTestBundle)
+
+if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
+  if (HAS_MISSING_BRACES_FLAG)
+    add_compile_options(-Wno-missing-braces)
+  endif()
+endif()
 
 if(US_BUILD_TESTING)
   include(usFunctionCompileSnippets)
@@ -197,12 +215,12 @@ elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
 
+us_cache_var(BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
-us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
@@ -214,6 +232,7 @@ endif()
 
 if(WIN32 AND NOT CYGWIN)
   set(default_runtime_install_dir bin/)
+  set(default_tools_install_dir bin/)
   set(default_library_install_dir bin/)
   set(default_archive_install_dir lib/)
   set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
@@ -222,6 +241,7 @@ if(WIN32 AND NOT CYGWIN)
   set(default_man_install_dir share/man)
 else()
   set(default_runtime_install_dir bin/)
+  set(default_tools_install_dir bin/)
   set(default_library_install_dir lib/)
   set(default_archive_install_dir lib/)
   set(default_header_install_dir include/${PROJECT_NAME_LOWER}${US_GLOBAL_VERSION_SUFFIX})
@@ -231,6 +251,7 @@ else()
 endif()
 
 us_cache_var(RUNTIME_INSTALL_DIR ${default_runtime_install_dir} STRING "Relative install location for binaries" ADVANCED)
+us_cache_var(TOOLS_INSTALL_DIR ${default_tools_install_dir} STRING "Relative install location for tools" ADVANCED)
 us_cache_var(LIBRARY_INSTALL_DIR ${default_library_install_dir} STRING "Relative install location for libraries" ADVANCED)
 us_cache_var(ARCHIVE_INSTALL_DIR ${default_archive_install_dir} STRING "Relative install location for archives" ADVANCED)
 us_cache_var(HEADER_INSTALL_DIR ${default_header_install_dir} STRING "Relative install location for headers" ADVANCED)
@@ -238,8 +259,6 @@ us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Rela
 us_cache_var(DOC_INSTALL_DIR ${default_doc_install_dir} STRING "Relative install location for documentation files" ADVANCED)
 us_cache_var(MAN_INSTALL_DIR ${default_man_install_dir} STRING "Relative install location for man pages" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
-
-us_cache_var(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} BOOL "Build shared libraries" ADVANCED)
 
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
@@ -249,6 +268,26 @@ if(APPLE)
   set(CMAKE_MACOSX_RPATH ON)
 endif()
 
+# Cross-compiled builds need access to the host version of usResourceCompiler.
+# ImportExecutables.cmake is generated by the host build and contains the cmake target
+# for the host built usResourceCompiler. ImportExecutables.cmake can be included by the
+# cross-compiled build to access the host built usResourceCompiler.
+#
+set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEPATH "A file containing the CMake target definition for the host build version of usResourceCompiler.")
+
+# global options based on compiler
+if(NOT APPLE AND US_COMPILER_CLANG)
+  # use libc++ instead of libstdc++ when using the clang/llvm toolchain
+  # libstdc++ shipped with GCC 4.9 does not support std::atomic operations on std::shared_ptr
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
+if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
 #-----------------------------------------------------------------------------
 # Testing configuration
 #-----------------------------------------------------------------------------
@@ -256,17 +295,17 @@ endif()
 function(us_add_tests test_driver)
   foreach(test ${ARGN})
     add_test(NAME ${test} COMMAND ${test_driver} ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST ${test} PROPERTY LABELS regular)
   if(US_MEMCHECK_COMMAND)
     add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST memcheck_${test} PROPERTY LABELS valgrind memcheck)
     if(US_ENABLE_HELGRIND)
       # By default, these tests are not active until the concurrent bundle
       # start / stop mechanism has been properly implemented (GitHub Issue #25)
       add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
@@ -274,8 +313,9 @@ function(us_add_tests test_driver)
     file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_NATIVE_PATH)
     file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
     # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
-    add_test(NAME coverage_${test} COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU.dll -- $<TARGET_FILE:${test_driver}> ${test}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    add_test(NAME coverage_${test}
+             COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
+             WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()
   endforeach()
@@ -284,7 +324,7 @@ endfunction()
 # Valgrind rc file
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/valgrindrc
-  ${CMAKE_BINARY_DIR}/.valgrindrc
+  ${CppMicroServices_BINARY_DIR}/.valgrindrc
   @ONLY
   )
 
@@ -301,11 +341,7 @@ if(US_BUILD_TESTING)
     find_package(GTest REQUIRED)
   else()
     # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
-
-    # Workaround an apparent bug in GCC 4.6 with C++11 variadic templates. Don't build gmock for any platform
-    # for now (we don't use it yet anyway). See https://groups.google.com/forum/#!topic/googlemock/XvPDUENM5JM
-    # for details.
-    us_cache_var(BUILD_GMOCK OFF BOOL "Build GMock" ADVANCED FORCE)
+    us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
     us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
 
     us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
@@ -325,15 +361,23 @@ if(US_BUILD_TESTING)
     endif()
 
     set(GTEST_BOTH_LIBRARIES gtest gtest_main)
+    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
 
-    # Prevent GTest from installing libraries into our install dir.
+    # Prevent GTest/GMock from installing libraries into our install dir.
     set(GTEST_NO_INSTALL 1)
+    set(GMOCK_NO_INSTALL 1)
 
     # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
     # static library even if CppMicroServices is a shared library.
+    set(_us_build_shared ${BUILD_SHARED_LIBS})
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
-    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+
+    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    add_subdirectory(third_party/benchmark)
+
+    set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
   endif()
 endif()
 
@@ -352,22 +396,40 @@ if(MSVC)
   set(disabled_warnings
     4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
   )
+
+  if (${MSVC_VERSION} LESS 1910)
+    # For googletest on MSVC versions less than MSVC 2017
+    # 'identifier' : decorated name length exceeded, name was truncated
+    set(disabled_warnings ${disabled_warnings} 4503)
+  endif()
+
   foreach(wd ${disabled_warnings})
     set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")
   endforeach()
   set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
 else()
 
-  if(US_COMPILER_APPLE_CLANG)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} -stdlib=libc++")
+  # If not cross-compiling, turn on Stack Smashing Protection.
+  # This is done in cases where libssp.so may not be available in the
+  # cross build toolchain. The dependency with libssp.so was originally
+  # discovered building with the Android ARM gcc toolchain. It is
+  # being applied to any cross compilation as a precaution.
+  if(NOT CMAKE_CROSSCOMPILING)
+    usFunctionCheckCompilerFlags(-fstack-protector-all US_CXX_FLAGS)
   endif()
 
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
                     -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option
-                    -fstack-protector-all)
+                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
+
+
+  if(US_COMPILER_GNU_ARM)
+    # arm gcc warns that several reinterpret_cast need increased alignemnt in reinterpret_cast<>
+    # but it appears to be warning due to unknow/unguaranteed alignment of char*
+    usFunctionCheckCompilerFlags(-Wno-error=cast-align US_CXX_FLAGS)
+  endif()
 
   if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     # The check does not work reliably for gcc
@@ -381,7 +443,7 @@ else()
   # symbols (unless explicitly overriden). See
   # https://developer.apple.com/library/mac/technotes/tn2185/_index.html#//apple_ref/doc/uid/DTS10004200-CH1-SUBSECTION2
   # to understand what -fvisibility-ms-compat does.
-  if(APPLE AND (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG))
+  if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
     usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
@@ -418,10 +480,14 @@ if(MINGW)
   set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
   # we need to define a Windows version (Windows Vista)
   set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0600 -DNTDDI_VERSION=0x06000000 ${US_CXX_FLAGS}")
+  # silence ignored attributes warnings
+  add_compile_options(-Wno-attributes)
 endif()
 
 if(US_ENABLE_THREADING_SUPPORT)
-  set(THREADS_PREFER_PTHREAD_FLAG 1)
+  if(NOT MINGW)
+    set(THREADS_PREFER_PTHREAD_FLAG 1)
+  endif()
   find_package(Threads REQUIRED)
 
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
@@ -433,6 +499,12 @@ if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
   # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
   set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_COVERAGE_FLAGS}")
 endif()
+
+#-----------------------------------------------------------------------------
+# Compile libraries here if you do not want -Werror or /WX on
+#-----------------------------------------------------------------------------
+add_subdirectory(third_party/absl)
+#-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${US_CXX_FLAGS_RELEASE}")
@@ -452,6 +524,10 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
       set(US_LINK_FLAGS "${US_LINK_FLAGS} ${_linkflag}")
     endif()
   endforeach()
+  if(US_COMPILER_GNU_ARM)
+    # atomic intrinsics are in libatomic on ARM GCC
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} -latomic")
+  endif()
 endif()
 
 if(NOT MSVC)
@@ -548,6 +624,8 @@ if(NOT US_BIG_ENDIAN)
   set(US_LITTLE_ENDIAN 1)
 endif()
 
+
+
 #-----------------------------------------------------------------------------
 # Source directory
 #-----------------------------------------------------------------------------
@@ -568,6 +646,7 @@ configure_file(
   )
 
 set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/GlobalConfig.h")
+set(US_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
 # Version information
@@ -578,6 +657,7 @@ configure_file(
   )
 
 add_subdirectory(tools/rc)
+add_subdirectory(tools/jsonschemavalidator)
 
 export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
@@ -587,6 +667,12 @@ add_subdirectory(framework)
 add_subdirectory(httpservice)
 add_subdirectory(webconsole)
 add_subdirectory(shellservice)
+
+# Declarative Services requires threading to function.
+# Static linkage is not yet supported for declarative services.
+if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
+  add_subdirectory(compendium)
+endif()
 
 add_subdirectory(tools/shell)
 
@@ -602,9 +688,9 @@ add_subdirectory(doc)
 
 if(NOT US_NO_INSTALL)
 
-  install(EXPORT ${PROJECT_NAME}Targets
-          FILE ${PROJECT_NAME}Targets.cmake
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   set(_install_cmake_scripts
     ${US_BUNDLE_INIT_TEMPLATE}

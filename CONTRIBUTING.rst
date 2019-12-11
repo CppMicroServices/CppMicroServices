@@ -24,6 +24,22 @@ When reporting issues, please include your host OS and compiler vendor
 and version. Please also include the steps required to reproduce the
 problem if possible and applicable.
 
+CppMicroServices RFCs
+---------------------
+
+Many changes, including bug fixes and documentation improvements can be
+implemented and reviewed via the normal GitHub pull request workflow.
+
+Some changes though are "substantial", and we ask that these be put through a
+bit of a design process and produce a consensus among the CppMicroServices core
+team.
+
+The "RFC" (request for comments) process is intended to provide a consistent and
+controlled path for new features to enter the framework.
+
+Please refer to the `RFC repository <https://github.com/CppMicroServices/rfcs>`_
+for more information.
+
 Contribution guidelines
 -----------------------
 
@@ -40,13 +56,18 @@ Fork the repository and make changes on your fork in a feature branch:
    your intentions, and name it ``XXXX-something`` where XXXX is the number
    of the issue.
 
+Code must be formatted according to our ```.clang-format``` file, using
+the clang-format tool.
+
 Submit unit tests for your changes.
 
 Update the documentation when creating or modifying features. Test your
 documentation changes for clarity, concision, and correctness.
 
 Pull request descriptions should be as clear as possible and include a
-reference to all the issues that they address.
+reference to all the issues that they address. If the pull
+request is a result of a RFC process, include the link to the corresponding
+RFC pull request.
 
 Commit messages must start with a capitalized and short summary (max. 50
 chars) written in the imperative, followed by an optional, more detailed

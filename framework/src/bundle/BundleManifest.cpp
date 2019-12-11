@@ -22,109 +22,115 @@
 
 #include "BundleManifest.h"
 
-#include "json/json.h"
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include <stdexcept>
+#include <typeinfo>
+
+namespace {
+
+using AnyOrderedMap = std::map<std::string, cppmicroservices::Any>;
+using AnyMap = cppmicroservices::AnyMap;
+using AnyVector = std::vector<cppmicroservices::Any>;
+
+/**
+ * recursively copy the content of headers into deprecated. "headers" is an AnyMap, which
+ * stores any hierarchical values in AnyMaps also. The purpose of this function is to
+ * store the data in a std::map hierarchy instead.
+ */
+void copy_deprecated_properties(const AnyMap& headers
+                                  , AnyOrderedMap& deprecated)
+{
+  for (auto const& h : headers) {
+    if (typeid(AnyMap) == h.second.Type()) {
+      // recursively copy the anymap to a std::map and store in deprecated.
+      AnyOrderedMap deprecated_headers;
+      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
+                                 , deprecated_headers);
+      deprecated.emplace(h.first, std::move(deprecated_headers));
+    }
+    else {
+      deprecated.emplace(h.first, h.second);
+    }
+  }
+}
+
+}
 
 namespace cppmicroservices {
 
 namespace {
 
-typedef std::map<std::string, Any> AnyOrderedMap;
-typedef std::vector<Any> AnyVector;
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap);
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap);
+void ParseJsonArray(const rapidjson::Value& jsonArray,
+                    AnyVector& anyVector,
+                    bool ci);
 
-void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
-void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap);
-void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector, bool ci);
 
-Any ParseJsonValue(const Json::Value& jsonValue, bool ci)
+Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
 {
-  if (jsonValue.isObject())
-  {
-    if (ci)
-    {
+  if (jsonValue.IsObject()) {
+    if (ci) {
       Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
-    }
-    else
-    {
+    } else {
       Any any = AnyOrderedMap();
       ParseJsonObject(jsonValue, ref_any_cast<AnyOrderedMap>(any));
       return any;
     }
-  }
-  else if (jsonValue.isArray())
-  {
+  } else if (jsonValue.IsArray()) {
     Any any = AnyVector();
     ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any), ci);
     return any;
-  }
-  else if (jsonValue.isString())
-  {
+  } else if (jsonValue.IsString()) {
     // We do not support attribute localization yet, so we just
     // always remove the leading '%' character.
-    std::string val = jsonValue.asString();
+    std::string val = jsonValue.GetString();
     if (!val.empty() && val[0] == '%')
       val = val.substr(1);
 
     return Any(val);
-  }
-  else if (jsonValue.isBool())
-  {
-    return Any(jsonValue.asBool());
-  }
-  else if (jsonValue.isIntegral())
-  {
-    return Any(jsonValue.asInt());
-  }
-  else if (jsonValue.isDouble())
-  {
-    return Any(jsonValue.asDouble());
+  } else if (jsonValue.IsBool()) {
+    return Any(jsonValue.GetBool());
+  } else if (jsonValue.IsInt()) {
+    return Any(jsonValue.GetInt());
+  } else if (jsonValue.IsDouble()) {
+    return Any(jsonValue.GetDouble());
   }
 
   return Any();
 }
 
-void ParseJsonObject(const Json::Value& jsonObject, AnyOrderedMap& anyMap)
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap)
 {
-  for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end(); ++it)
-  {
-    const Json::Value& jsonValue = *it;
-    Any anyValue = ParseJsonValue(jsonValue, false);
-    if (!anyValue.Empty())
-    {
-      anyMap.insert(std::make_pair(it.name(), anyValue));
+  for (const auto& m : jsonObject.GetObject()) {
+    Any anyValue = ParseJsonValue(m.value, false);
+    if (!anyValue.Empty()) {
+      anyMap.emplace(m.name.GetString(), std::move(anyValue));
     }
   }
 }
 
-void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
+void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap)
 {
-  for (Json::Value::const_iterator it = jsonObject.begin();
-       it != jsonObject.end(); ++it)
-  {
-    const Json::Value& jsonValue = *it;
-    Any anyValue = ParseJsonValue(jsonValue, true);
-    if (!anyValue.Empty())
-    {
-      anyMap.insert(std::make_pair(it.name(), anyValue));
+  for (const auto& m : jsonObject.GetObject()) {
+    Any anyValue = ParseJsonValue(m.value, true);
+    if (!anyValue.Empty()) {
+      anyMap.emplace(m.name.GetString(), std::move(anyValue));
     }
   }
 }
 
-void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector,
-                    bool ci)
+void ParseJsonArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, bool ci)
 {
-  for (Json::Value::const_iterator it = jsonArray.begin();
-       it != jsonArray.end(); ++it)
-  {
-    const Json::Value& jsonValue = *it;
+  for (const auto& jsonValue : jsonArray.GetArray()) {
     Any anyValue = ParseJsonValue(jsonValue, ci);
-    if (!anyValue.Empty())
-    {
-      anyVector.push_back(anyValue);
+    if (!anyValue.Empty()) {
+      anyVector.emplace_back(std::move(anyValue));
     }
   }
 }
@@ -133,30 +139,25 @@ void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector,
 
 BundleManifest::BundleManifest()
   : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-{
-}
+{}
 
 void BundleManifest::Parse(std::istream& is)
 {
-  Json::Value root;
-  Json::Reader jsonReader(Json::Features::strictMode());
-  if (!jsonReader.parse(is, root, false))
-  {
-    throw std::runtime_error(jsonReader.getFormattedErrorMessages());
+  rapidjson::IStreamWrapper jsonStream(is);
+  rapidjson::Document root;
+  if (root.ParseStream(jsonStream).HasParseError()) {
+    throw std::runtime_error(rapidjson::GetParseError_En(root.GetParseError()));
   }
 
-  if (!root.isObject())
-  {
+  if (!root.IsObject()) {
     throw std::runtime_error("The Json root element must be an object.");
   }
 
-  // This is deprecated in 3.0
-  ParseJsonObject(root, m_PropertiesDeprecated);
-
+  
   ParseJsonObject(root, m_Headers);
 }
 
-AnyMap BundleManifest::GetHeaders() const
+const AnyMap& BundleManifest::GetHeaders() const
 {
   return m_Headers;
 }
@@ -169,18 +170,24 @@ bool BundleManifest::Contains(const std::string& key) const
 Any BundleManifest::GetValue(const std::string& key) const
 {
   auto iter = m_Headers.find(key);
-  if (iter != m_Headers.end())
+  if (m_Headers.cend() != iter)
   {
     return iter->second;
   }
   return Any();
 }
 
+void BundleManifest::CopyDeprecatedProperties() const
+{
+  std::call_once(m_DidCopyDeprecatedProperties
+                 , [&]() { copy_deprecated_properties(m_Headers, m_PropertiesDeprecated); });
+}
+
 Any BundleManifest::GetValueDeprecated(const std::string& key) const
 {
+  CopyDeprecatedProperties();
   auto iter = m_PropertiesDeprecated.find(key);
-  if (iter != m_PropertiesDeprecated.end())
-  {
+  if (m_PropertiesDeprecated.cend() != iter) {
     return iter->second;
   }
   return Any();
@@ -188,10 +195,11 @@ Any BundleManifest::GetValueDeprecated(const std::string& key) const
 
 std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 {
+  CopyDeprecatedProperties();
   std::vector<std::string> keys;
-  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.begin();
-       iter != m_PropertiesDeprecated.end(); ++iter)
-  {
+  for (AnyMap::const_iterator iter = m_PropertiesDeprecated.cbegin();
+       iter != m_PropertiesDeprecated.cend();
+       ++iter) {
     keys.push_back(iter->first);
   }
   return keys;
@@ -199,6 +207,7 @@ std::vector<std::string> BundleManifest::GetKeysDeprecated() const
 
 std::map<std::string, Any> BundleManifest::GetPropertiesDeprecated() const
 {
+  CopyDeprecatedProperties();
   return m_PropertiesDeprecated;
 }
 

@@ -30,19 +30,13 @@ namespace cppmicroservices {
 class TestBundleUActivator : public BundleActivator
 {
 public:
-
   TestBundleUActivator() {}
   ~TestBundleUActivator() {}
 
-  void Start(BundleContext)
-  {
-  }
+  void Start(BundleContext) {}
 
-  void Stop(BundleContext)
-  {
-  }
+  void Stop(BundleContext) {}
 };
-
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleUActivator)

@@ -34,13 +34,14 @@ static const std::size_t MAX_LOCATION_LEN = 256;
 struct ExtraData
 {
   int32_t loc_index; // -1 -> use location field
-  char    location[MAX_LOCATION_LEN];
+  char location[MAX_LOCATION_LEN];
 };
 
 struct PeristentData
 {
   BundleArchive::Data data;
-  char reserved[MAX_ARCHIVE_SIZE - sizeof(BundleArchive::Data) - sizeof(ExtraData)];
+  char reserved[MAX_ARCHIVE_SIZE - sizeof(BundleArchive::Data) -
+                sizeof(ExtraData)];
   ExtraData extra;
 };
 
@@ -49,14 +50,15 @@ BundleStorageFile::BundleStorageFile()
   throw std::logic_error("not implemented");
 }
 
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertBundleLib(const std::string& /*location*/)
+std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertBundleLib(
+  const std::string& /*location*/)
 {
   throw std::logic_error("not implemented");
 }
 
 std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertArchives(
-    const std::shared_ptr<const BundleResourceContainer>& /*resCont*/,
-    const std::vector<std::string>& /*topLevelEntries*/)
+  const std::shared_ptr<BundleResourceContainer>& /*resCont*/,
+  const std::vector<std::string>& /*topLevelEntries*/)
 {
   throw std::logic_error("not implemented");
 }
@@ -66,7 +68,8 @@ bool BundleStorageFile::RemoveArchive(const BundleArchive* /*ba*/)
   throw std::logic_error("not implemented");
 }
 
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::GetAllBundleArchives() const
+std::vector<std::shared_ptr<BundleArchive>>
+BundleStorageFile::GetAllBundleArchives() const
 {
   throw std::logic_error("not implemented");
 }
@@ -80,5 +83,4 @@ void BundleStorageFile::Close()
 {
   throw std::logic_error("not implemented");
 }
-
 }

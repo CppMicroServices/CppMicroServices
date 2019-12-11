@@ -58,7 +58,6 @@ class US_Framework_EXPORT ServiceRegistrationBase
 {
 
 public:
-
   ServiceRegistrationBase(const ServiceRegistrationBase& reg);
 
   ServiceRegistrationBase(ServiceRegistrationBase&& reg);
@@ -98,7 +97,8 @@ public:
    *         unregistered or if it is invalid.
    * @return <code>ServiceReference</code> object.
    */
-  ServiceReferenceBase GetReference(const std::string& interfaceId = std::string()) const;
+  ServiceReferenceBase GetReference(
+    const std::string& interfaceId = std::string()) const;
 
   /**
    * Updates the properties associated with a service.
@@ -175,16 +175,16 @@ public:
 
   bool operator==(const ServiceRegistrationBase& registration) const;
 
-  ServiceRegistrationBase& operator=(const ServiceRegistrationBase& registration);
+  ServiceRegistrationBase& operator=(
+    const ServiceRegistrationBase& registration);
   ServiceRegistrationBase& operator=(ServiceRegistrationBase&& registration);
 
-
 private:
-
   friend class ServiceRegistry;
   friend class ServiceReferenceBasePrivate;
 
-  template<class I1, class ...Interfaces> friend class ServiceRegistration;
+  template<class I1, class... Interfaces>
+  friend class ServiceRegistration;
 
   friend struct ::std::hash<ServiceRegistrationBase>;
 
@@ -197,11 +197,11 @@ private:
 
   ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
 
-  ServiceRegistrationBase(BundlePrivate* bundle, const InterfaceMapConstPtr& service,
+  ServiceRegistrationBase(BundlePrivate* bundle,
+                          const InterfaceMapConstPtr& service,
                           Properties&& props);
 
-  ServiceRegistrationBasePrivate* d;
-
+  ServiceRegistrationBasePrivate* d{nullptr};
 };
 
 /**
@@ -210,8 +210,9 @@ private:
  *
  * Writes a string representation of \c reg to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceRegistrationBase& reg);
-
+US_Framework_EXPORT std::ostream& operator<<(
+  std::ostream& os,
+  const ServiceRegistrationBase& reg);
 }
 
 /**
@@ -224,7 +225,7 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceRegi
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
-  return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);
+return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H

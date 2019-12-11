@@ -63,8 +63,7 @@ class FrameworkPrivate;
 class US_Framework_EXPORT Framework : public Bundle
 {
 public:
-
-    /**
+  /**
      * Convert a \c Bundle representing the system bundle to a
      * \c Framework instance.
      *
@@ -72,14 +71,14 @@ public:
      *
      * @throws std::logic_error If the bundle \b is not the system bundle.
      */
-    explicit Framework(Bundle b);
+  explicit Framework(Bundle b);
 
-    Framework(const Framework& fw); // = default
-    Framework(Framework&& fw); // = default
-    Framework& operator=(const Framework& fw); // = default
-    Framework& operator=(Framework&& fw); // = default
+  Framework(const Framework& fw);            // = default
+  Framework(Framework&& fw);                 // = default
+  Framework& operator=(const Framework& fw); // = default
+  Framework& operator=(Framework&& fw);      // = default
 
-    /**
+  /**
      * Initialize this Framework. After calling this method, this Framework
      * has:
      * - Generated a new {@link Constants#FRAMEWORK_UUID framework UUID}.
@@ -99,9 +98,9 @@ public:
      *
      * @throws std::runtime_error If this Framework could not be initialized.
      */
-    void Init();
+  void Init();
 
-    /**
+  /**
      * Wait until this Framework has completely stopped. The \c Stop
      * method on a Framework performs an asynchronous stop of the Framework
      * if it was built with threading support.
@@ -132,9 +131,9 @@ public:
      *         stopped.</li>
      *         </ul>
      */
-    FrameworkEvent WaitForStop(const std::chrono::milliseconds& timeout);
+  FrameworkEvent WaitForStop(const std::chrono::milliseconds& timeout);
 
-    /**
+  /**
      * Start this Framework.
      *
      * <p>
@@ -154,10 +153,10 @@ public:
      * @throws std::runtime_error If this Framework could not be started.
      */
 #ifdef DOXYGEN_RUN
-    void Start();
+  void Start();
 #endif
 
-    /**
+  /**
      * Start this Framework.
      *
      * <p>
@@ -169,10 +168,10 @@ public:
      * @see #Start()
      */
 #ifdef DOXYGEN_RUN
-    void Start(uint32_t options);
+  void Start(uint32_t options);
 #endif
 
-    /**
+  /**
      * Stop this Framework.
      *
      * <p>
@@ -199,10 +198,10 @@ public:
      * @throws std::runtime_error If stopping this Framework could not be initiated.
      */
 #ifdef DOXYGEN_RUN
-    void Stop();
+  void Stop();
 #endif
 
-    /**
+  /**
      * Stop this Framework.
      *
      * <p>
@@ -215,10 +214,10 @@ public:
      * @see #Stop()
      */
 #ifdef DOXYGEN_RUN
-    void Stop(uint32_t options);
+  void Stop(uint32_t options);
 #endif
 
-    /**
+  /**
      * The Framework cannot be uninstalled.
      *
      * This method always throws a std::runtime_error exception.
@@ -226,10 +225,10 @@ public:
      * @throws std::runtime_error This Framework cannot be uninstalled.
      */
 #ifdef DOXYGEN_RUN
-    void Uninstall();
+  void Uninstall();
 #endif
 
-    /**
+  /**
     * Returns this Framework's location.
     *
     * <p>
@@ -239,19 +238,15 @@ public:
     * @return The string "System Bundle".
     */
 #ifdef DOXYGEN_RUN
-    std::string GetLocation() const;
+  std::string GetLocation() const;
 #endif
 
-
 private:
+  // Framework instances are exclusively constructed by the FrameworkFactory class
+  friend class FrameworkFactory;
 
-    // Framework instances are exclusively constructed by the FrameworkFactory class
-    friend class FrameworkFactory;
-
-    Framework(const std::shared_ptr<FrameworkPrivate>& d);
-
+  Framework(const std::shared_ptr<FrameworkPrivate>& d);
 };
-
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORK_H

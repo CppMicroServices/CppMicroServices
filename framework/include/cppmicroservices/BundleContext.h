@@ -40,13 +40,18 @@ class BundleContextPrivate;
 class ServiceFactory;
 namespace detail {
 class LogSink;
-template<class S, class TTT, class R> class BundleAbstractTracked;
-template<class S, class TTT> class ServiceTrackerPrivate;
-template<class S, class TTT> class TrackedService;
+template<class S, class TTT, class R>
+class BundleAbstractTracked;
+template<class S, class TTT>
+class ServiceTrackerPrivate;
+template<class S, class TTT>
+class TrackedService;
 }
 
-template<class S> class ServiceObjects;
-template<class S> struct ServiceHolder;
+template<class S>
+class ServiceObjects;
+template<class S>
+struct ServiceHolder;
 
 /**
  * \ingroup MicroServices
@@ -100,7 +105,6 @@ class US_Framework_EXPORT BundleContext
 {
 
 public:
-
   /**
    * Constructs an invalid %BundleContext object.
    *
@@ -294,8 +298,9 @@ public:
    * @see ServiceFactory
    * @see PrototypeServiceFactory
    */
-  ServiceRegistrationU RegisterService(const InterfaceMapConstPtr& service,
-                                       const ServiceProperties& properties = ServiceProperties());
+  ServiceRegistrationU RegisterService(
+    const InterfaceMapConstPtr& service,
+    const ServiceProperties& properties = ServiceProperties());
 
   /**
    * Registers the specified service object with the specified properties
@@ -324,10 +329,13 @@ public:
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  template<class I1, class ...Interfaces, class Impl>
-  ServiceRegistration<I1, Interfaces...> RegisterService(const std::shared_ptr<Impl>& impl, const ServiceProperties& properties = ServiceProperties())
+  template<class I1, class... Interfaces, class Impl>
+  ServiceRegistration<I1, Interfaces...> RegisterService(
+    const std::shared_ptr<Impl>& impl,
+    const ServiceProperties& properties = ServiceProperties())
   {
-    InterfaceMapConstPtr servicePointers = MakeInterfaceMap<I1, Interfaces...>(impl);
+    InterfaceMapConstPtr servicePointers =
+      MakeInterfaceMap<I1, Interfaces...>(impl);
     return RegisterService(servicePointers, properties);
   }
 
@@ -358,10 +366,13 @@ public:
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
-  template<class I1, class ...Interfaces>
-  ServiceRegistration<I1, Interfaces...> RegisterService(const std::shared_ptr<ServiceFactory>& factory, const ServiceProperties& properties = ServiceProperties())
+  template<class I1, class... Interfaces>
+  ServiceRegistration<I1, Interfaces...> RegisterService(
+    const std::shared_ptr<ServiceFactory>& factory,
+    const ServiceProperties& properties = ServiceProperties())
   {
-    InterfaceMapConstPtr servicePointers = MakeInterfaceMap<I1, Interfaces...>(factory);
+    InterfaceMapConstPtr servicePointers =
+      MakeInterfaceMap<I1, Interfaces...>(factory);
     return RegisterService(servicePointers, properties);
   }
 
@@ -411,7 +422,9 @@ public:
    * @throws std::logic_error If the ServiceRegistrationBase object is invalid,
    *         or if the service is unregistered.
    */
-  std::vector<ServiceReferenceU> GetServiceReferences(const std::string& clazz, const std::string& filter = std::string());
+  std::vector<ServiceReferenceU> GetServiceReferences(
+    const std::string& clazz,
+    const std::string& filter = std::string());
 
   /**
    * Returns a list of <code>ServiceReference</code> objects. The returned
@@ -432,20 +445,25 @@ public:
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
    * @throws std::logic_error If this BundleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid.
+   * @throws ServiceException If the service interface id of \c S is empty, see @gr_serviceinterface.
    *
    * @see GetServiceReferences(const std::string&, const std::string&)
    */
   template<class S>
-  std::vector<ServiceReference<S>> GetServiceReferences(const std::string& filter = std::string())
+  std::vector<ServiceReference<S>> GetServiceReferences(
+    const std::string& filter = std::string())
   {
-    std::string clazz = us_service_interface_iid<S>();
-    if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
-    typedef std::vector<ServiceReferenceU> BaseVectorT;
+    auto& clazz = us_service_interface_iid<S>();
+    if (clazz.empty())
+      throw ServiceException(
+        "The service interface class has no "
+        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+    using BaseVectorT = std::vector<ServiceReferenceU>;
     BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
-    std::vector<ServiceReference<S> > result;
-    for(BaseVectorT::const_iterator i = serviceRefs.begin(); i != serviceRefs.end(); ++i)
-    {
+    std::vector<ServiceReference<S>> result;
+    for (BaseVectorT::const_iterator i = serviceRefs.begin();
+         i != serviceRefs.end();
+         ++i) {
       result.push_back(ServiceReference<S>(*i));
     }
     return result;
@@ -478,7 +496,6 @@ public:
    * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the named class.
    * @throws std::runtime_error If this BundleContext is no longer valid.
-   * @throws ServiceException If no service was registered under the given class name.
    *
    * @see #GetServiceReferences(const std::string&, const std::string&)
    */
@@ -496,15 +513,18 @@ public:
    * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the type <code>S</code>.
    * @throws std::runtime_error If this BundleContext is no longer valid.
-   * @throws ServiceException It no service was registered under the given class name.
+   * @throws ServiceException If the service interface id of \c S is empty, see @gr_serviceinterface.
    * @see #GetServiceReference(const std::string&)
    * @see #GetServiceReferences(const std::string&)
    */
   template<class S>
   ServiceReference<S> GetServiceReference()
   {
-    std::string clazz = us_service_interface_iid<S>();
-    if (clazz.empty()) throw ServiceException("The service interface class has no CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+    auto& clazz = us_service_interface_iid<S>();
+    if (clazz.empty())
+      throw ServiceException(
+        "The service interface class has no "
+        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
     return ServiceReference<S>(GetServiceReference(clazz));
   }
 
@@ -525,9 +545,16 @@ public:
    * associated with this <code>reference</code> has been unregistered.
    *
    * <p>
+   * The <code>ServiceObjects</code> object must be used to obtain multiple service
+   * objects for services with prototype scope. For services with singleton or bundle
+   * scope, the ServiceObjects::GetService() method behaves the same as the
+   * GetService(const ServiceReference<S>&) method. That is, only one,
+   * use-counted service object is available from the ServiceObjects object.
+   *
+   * <p>
    * The following steps are taken to get the service object:
    * <ol>
-   * <li>If the service has been unregistered, empty object is returned.
+   * <li>If the service has been unregistered, an empty object is returned.
    * <li>The context bundle's use count for this service is incremented by
    * one.
    * <li>If the context bundle's use count for the service is currently one
@@ -552,6 +579,7 @@ public:
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
    * @see ServiceFactory
+   * @see ServiceObjects
    */
   std::shared_ptr<void> GetService(const ServiceReferenceBase& reference);
 
@@ -588,9 +616,7 @@ public:
    * ServiceReference object. The ServiceObjects object can be used to obtain
    * multiple service objects for services with prototype scope. For services with
    * singleton or bundle scope, the ServiceObjects::GetService() method behaves
-   * the same as the GetService(const ServiceReference<S>&) method and the
-   * ServiceObjects::UngetService(const ServiceReferenceBase&) method behaves the
-   * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
+   * the same as the GetService(const ServiceReference<S>&) method. That is, only one,
    * use-counted service object is available from the ServiceObjects object.
    *
    * @tparam S Type of Service.
@@ -837,11 +863,14 @@ public:
    * @see RemoveServiceListener()
    */
   template<class R>
-  US_DEPRECATED ListenerToken AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&),
-                                                 const std::string& filter = std::string())
+  US_DEPRECATED ListenerToken
+  AddServiceListener(R* receiver,
+                     void (R::*callback)(const ServiceEvent&),
+                     const std::string& filter = std::string())
   {
     return AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
-                              static_cast<void*>(receiver), filter);
+                              static_cast<void*>(receiver),
+                              filter);
   }
 
   /**
@@ -868,7 +897,9 @@ public:
    * @see AddServiceListener()
    */
   template<class R>
-  US_DEPRECATED void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent&))
+  US_DEPRECATED void RemoveServiceListener(
+    R* receiver,
+    void (R::*callback)(const ServiceEvent&))
   {
     RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback),
                           static_cast<void*>(receiver));
@@ -903,7 +934,8 @@ public:
    * @see BundleEvent
    */
   template<class R>
-  US_DEPRECATED ListenerToken AddBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
+  US_DEPRECATED ListenerToken
+  AddBundleListener(R* receiver, void (R::*callback)(const BundleEvent&))
   {
     return AddBundleListener(BundleListenerMemberFunctor(receiver, callback),
                              static_cast<void*>(receiver));
@@ -933,7 +965,9 @@ public:
    * @see AddBundleListener()
    */
   template<class R>
-  US_DEPRECATED void RemoveBundleListener(R* receiver, void(R::*callback)(const BundleEvent&))
+  US_DEPRECATED void RemoveBundleListener(
+    R* receiver,
+    void (R::*callback)(const BundleEvent&))
   {
     RemoveBundleListener(BundleListenerMemberFunctor(receiver, callback),
                          static_cast<void*>(receiver));
@@ -966,9 +1000,11 @@ public:
    * @see FrameworkEvent
    */
   template<class R>
-  US_DEPRECATED ListenerToken AddFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  US_DEPRECATED ListenerToken
+  AddFrameworkListener(R* receiver, void (R::*callback)(const FrameworkEvent&))
   {
-    return AddFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
+    return AddFrameworkListener(
+      BindFrameworkListenerToFunctor(receiver, callback));
   }
 
   /**
@@ -994,7 +1030,9 @@ public:
    * @see AddFrameworkListener()
    */
   template<class R>
-  US_DEPRECATED void RemoveFrameworkListener(R* receiver, void(R::*callback)(const FrameworkEvent&))
+  US_DEPRECATED void RemoveFrameworkListener(
+    R* receiver,
+    void (R::*callback)(const FrameworkEvent&))
   {
     RemoveFrameworkListener(BindFrameworkListenerToFunctor(receiver, callback));
   }
@@ -1039,25 +1077,32 @@ public:
   std::vector<Bundle> InstallBundles(const std::string& location);
 
 private:
-
-  friend US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate*);
-  friend BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>&);
+  friend US_Framework_EXPORT BundleContext
+  MakeBundleContext(BundleContextPrivate*);
+  friend BundleContext MakeBundleContext(
+    const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
-  BundleContext(const std::shared_ptr<BundleContextPrivate>& ctx);
+  BundleContext(std::shared_ptr<BundleContextPrivate>  ctx);
   // allow templated code to use the internal logger
-  template<class S, class TTT, class R> friend class detail::BundleAbstractTracked;
-  template<class S, class T> friend class ServiceTracker;
-  template<class S, class TTT> friend class detail::ServiceTrackerPrivate;
-  template<class S, class TTT> friend class detail::TrackedService;
+  template<class S, class TTT, class R>
+  friend class detail::BundleAbstractTracked;
+  template<class S, class T>
+  friend class ServiceTracker;
+  template<class S, class TTT>
+  friend class detail::ServiceTrackerPrivate;
+  template<class S, class TTT>
+  friend class detail::TrackedService;
   friend class BundleResource;
+  friend class BundleResourceContainer;
 
   // Not for use by clients of the Framework.
   // Provides access to the Framework's log sink to allow templated code
   // to log diagnostic information.
   std::shared_ptr<detail::LogSink> GetLogSink() const;
 
-  ListenerToken AddServiceListener(const ServiceListener& delegate, void* data,
+  ListenerToken AddServiceListener(const ServiceListener& delegate,
+                                   void* data,
                                    const std::string& filter);
   void RemoveServiceListener(const ServiceListener& delegate, void* data);
 

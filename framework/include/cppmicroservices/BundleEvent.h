@@ -28,7 +28,8 @@
 #include <iostream>
 #include <memory>
 
-US_MSVC_PUSH_DISABLE_WARNING(4251) // 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+US_MSVC_PUSH_DISABLE_WARNING(4251)
 
 namespace cppmicroservices {
 
@@ -60,11 +61,11 @@ class US_Framework_EXPORT BundleEvent
   std::shared_ptr<BundleEventData> d;
 
 public:
-
   /**
    * The bundle event type.
    */
-  enum Type : uint32_t {
+  enum Type : uint32_t
+  {
 
     /**
      * The bundle has been installed.
@@ -248,7 +249,8 @@ public:
  *
  * Writes a string representation of \c eventType to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             BundleEvent::Type eventType);
 
 /**
  * \ingroup MicroServices
@@ -256,8 +258,8 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, BundleEvent::Type
  *
  * Writes a string representation of \c event to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleEvent& event);
-
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const BundleEvent& event);
 }
 
 US_MSVC_POP_WARNING

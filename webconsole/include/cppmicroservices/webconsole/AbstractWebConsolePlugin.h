@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_ABSTRACTWEBCONSOLEPLUGIN_H
 #define CPPMICROSERVICES_ABSTRACTWEBCONSOLEPLUGIN_H
 
-#include "cppmicroservices/httpservice/HttpServlet.h"
 #include "cppmicroservices/GetBundleContext.h"
+#include "cppmicroservices/httpservice/HttpServlet.h"
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
 #include "cppmicroservices/webconsole/mustache.hpp"
 
@@ -33,8 +33,8 @@
 
 namespace Kainjow {
 
-US_WebConsole_EXPORT std::ostream& operator<<(std::ostream& os, const Mustache::Data&);
-
+US_WebConsole_EXPORT std::ostream& operator<<(std::ostream& os,
+                                              const Mustache::Data&);
 }
 
 namespace cppmicroservices {
@@ -48,7 +48,6 @@ class HttpServletResponse;
 struct WebConsoleVariableResolver;
 
 struct AbstractWebConsolePluginPrivate;
-
 
 /**
  * The Web Console can be extended by registering an OSGi service for the interface
@@ -64,8 +63,7 @@ struct AbstractWebConsolePluginPrivate;
 class US_WebConsole_EXPORT AbstractWebConsolePlugin : public HttpServlet
 {
 public:
-
-  typedef Kainjow::Mustache::Data TemplateData;
+  using TemplateData = Kainjow::Mustache::Data;
 
   /**
    * Retrieves the label. This is the last component in the servlet path.
@@ -96,12 +94,14 @@ public:
    */
   virtual std::string GetCategory() const;
 
-  virtual std::shared_ptr<WebConsoleVariableResolver> GetVariableResolver(HttpServletRequest& request);
+  virtual std::shared_ptr<WebConsoleVariableResolver> GetVariableResolver(
+    HttpServletRequest& request);
 
-  virtual void SetVariableResolver(HttpServletRequest& request, const std::shared_ptr<WebConsoleVariableResolver>& resolver);
+  virtual void SetVariableResolver(
+    HttpServletRequest& request,
+    const std::shared_ptr<WebConsoleVariableResolver>& resolver);
 
 protected:
-
   /**
    * Detects whether this request is intended to have the headers and
    * footers of this plugin be rendered or not. This method always returns
@@ -140,7 +140,8 @@ protected:
    *
    * @see HttpServlet#DoGet(HttpServletRequest&, HttpServletResponse&)
    */
-  virtual void DoGet(HttpServletRequest& request, HttpServletResponse& response);
+  virtual void DoGet(HttpServletRequest& request,
+                     HttpServletResponse& response);
 
   /**
    * This method is used to render the content of the plug-in. It is called internally
@@ -149,7 +150,8 @@ protected:
    * @param request the HTTP request send from the user
    * @param response the HTTP response object, where to render the plugin data.
    */
-  virtual void RenderContent(HttpServletRequest& request, HttpServletResponse& response) = 0;
+  virtual void RenderContent(HttpServletRequest& request,
+                             HttpServletResponse& response) = 0;
 
   /**
    * This method is responsible for generating the top heading of the page.
@@ -159,7 +161,8 @@ protected:
    * @return the stream that was used for generating the response.
    * @see #EndResponse(HttpServletRequest&, std::ostream&)
    */
-  std::ostream& StartResponse(HttpServletRequest& request, HttpServletResponse& response);
+  std::ostream& StartResponse(HttpServletRequest& request,
+                              HttpServletResponse& response);
 
   /**
    * This method is called to generate the top level links with the available plug-ins.
@@ -194,12 +197,11 @@ protected:
   std::vector<std::string> GetCssReferences() const;
 
 protected:
-
   std::string ReadTemplateFile(const std::string& templateFile,
-                               cppmicroservices::BundleContext context = cppmicroservices::GetBundleContext()) const;
+                               cppmicroservices::BundleContext context =
+                                 cppmicroservices::GetBundleContext()) const;
 
 private:
-
   std::string GetHeader() const;
   std::string GetFooter() const;
 
@@ -220,10 +222,9 @@ private:
    *
    * @throws std::exception If an error occurs accessing or spooling the resource.
    */
-  bool SpoolResource(HttpServletRequest& request, HttpServletResponse& response) const;
-
+  bool SpoolResource(HttpServletRequest& request,
+                     HttpServletResponse& response) const;
 };
-
 }
 
 #endif // CPPMICROSERVICES_ABSTRACTWEBCONSOLEPLUGIN_H

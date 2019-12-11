@@ -61,8 +61,7 @@ class ServiceFactory
 {
 
 public:
-
-  virtual ~ServiceFactory() {}
+  virtual ~ServiceFactory() = default;
 
   /**
    * Returns a service object for a bundle.
@@ -99,8 +98,9 @@ public:
    * @see BundleContext#GetService
    * @see InterfaceMapConstPtr
    */
-  virtual InterfaceMapConstPtr GetService(const Bundle& bundle,
-                                          const ServiceRegistrationBase& registration) = 0;
+  virtual InterfaceMapConstPtr GetService(
+    const Bundle& bundle,
+    const ServiceRegistrationBase& registration) = 0;
 
   /**
    * Releases a service object customized for a bundle.
@@ -122,7 +122,6 @@ public:
                             const ServiceRegistrationBase& registration,
                             const InterfaceMapConstPtr& service) = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEFACTORY_H

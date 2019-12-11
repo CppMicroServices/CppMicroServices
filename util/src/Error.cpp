@@ -24,15 +24,15 @@
 #include "cppmicroservices/util/String.h"
 
 #ifdef US_PLATFORM_POSIX
-  #include <errno.h>
-  #include <string.h>
+#  include <cerrno>
+#  include <cstring>
 
 #else
-  #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-  #endif
-  #include <windows.h>
-  #include <crtdbg.h>
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
+#  include <crtdbg.h>
+#  include <windows.h>
 #endif
 
 namespace cppmicroservices {
@@ -46,27 +46,27 @@ std::string GetLastWin32ErrorStr()
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError();
 
-  DWORD rc = FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dw,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPWSTR>(&lpMsgBuf),
-        0,
-        NULL
-        );
+  DWORD rc =
+    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                     FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL,
+                   dw,
+                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                   reinterpret_cast<LPWSTR>(&lpMsgBuf),
+                   0,
+                   NULL);
 
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
   // it means that the size of the error message exceeds an internal
   // buffer limit (128 kb according to MSDN) and lpMsgBuf will be
   // uninitialized.
   // Inform the caller that the error message couldn't be retrieved.
-  if (rc == 0)
-  {
+  if (rc == 0) {
     return std::string("Failed to retrieve error message.");
   }
 
-  std::string errMsg(ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf))));
+  std::string errMsg(
+    ToUTF8String(std::wstring(reinterpret_cast<LPCWSTR>(lpMsgBuf))));
 
   LocalFree(lpMsgBuf);
   return errMsg;
@@ -76,27 +76,23 @@ std::string GetLastWin32ErrorStr()
 std::string GetLastCErrorStr()
 {
   char errorString[128];
-#if ((_POSIX_C_SOURCE >= 200112L) && !  _GNU_SOURCE) || defined(US_PLATFORM_APPLE)
+#if ((_POSIX_C_SOURCE >= 200112L) && !_GNU_SOURCE) || defined(US_PLATFORM_APPLE)
   // This is the XSI strerror_r version
   int en = errno;
   int r = strerror_r(errno, errorString, sizeof errorString);
-  if (r)
-  {
-    std::string errMsg = "Unknown error " + util::ToString(en) + ": strerror_r failed with error code ";
-    if (r < 0)
-    {
+  if (r) {
+    std::string errMsg = "Unknown error " + util::ToString(en) +
+                         ": strerror_r failed with error code ";
+    if (r < 0) {
       errMsg += util::ToString(static_cast<int>(errno));
-    }
-    else
-    {
+    } else {
       errMsg += util::ToString(r);
     }
     return errMsg;
   }
   return errorString;
 #elif defined(US_PLATFORM_WINDOWS)
-  if (strerror_s(errorString, sizeof errorString, errno))
-  {
+  if (strerror_s(errorString, sizeof errorString, errno)) {
     return "Unknown error";
   }
   return errorString;
@@ -108,21 +104,15 @@ std::string GetLastCErrorStr()
 std::string GetExceptionStr(const std::exception_ptr& exc)
 {
   std::string excStr;
-  if (!exc)
-  {
+  if (!exc) {
     return excStr;
   }
 
-  try
-  {
+  try {
     std::rethrow_exception(exc);
-  }
-  catch (const std::exception& e)
-  {
+  } catch (const std::exception& e) {
     excStr = e.what();
-  }
-  catch (...)
-  {
+  } catch (...) {
     excStr = "unknown";
   }
   return excStr;

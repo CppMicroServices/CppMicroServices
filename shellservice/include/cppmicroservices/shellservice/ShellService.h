@@ -27,8 +27,9 @@
 
 #include "cppmicroservices/shellservice/ShellServiceExport.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace cppmicroservices {
 
@@ -37,7 +38,6 @@ class BundleResource;
 class US_ShellService_EXPORT ShellService
 {
 public:
-
   ShellService();
   ~ShellService();
 
@@ -46,7 +46,6 @@ public:
   std::vector<std::string> GetCompletions(const std::string& in);
 
 private:
-
   ShellService(const ShellService&);
   ShellService& operator=(const ShellService&);
 
@@ -55,7 +54,6 @@ private:
   struct Impl;
   std::unique_ptr<Impl> d;
 };
-
 }
 
 #endif // CPPMICROSERVICES_SHELLSERVICE_H

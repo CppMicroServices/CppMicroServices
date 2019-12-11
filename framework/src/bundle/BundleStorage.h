@@ -47,8 +47,8 @@ struct BundleStorage
    * @param location Location of bundle to install.
    * @return A list of BundleArchive instances representing the installed bundles.
    */
-  virtual std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(const std::string& location) = 0;
-
+  virtual std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
+    const std::string& location) = 0;
 
   /**
    * Insert bundles from a container into persistent storagedata.
@@ -58,16 +58,16 @@ struct BundleStorage
    * @return A list of BundleArchive instances representing the installed bundles.
    */
   virtual std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-      const std::shared_ptr<const BundleResourceContainer>& resCont,
-      const std::vector<std::string>& topLevelEntries) = 0;
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::vector<std::string>& topLevelEntries) = 0;
 
   /**
    * Get all bundle archive objects.
    *
    * @return A list with bundle archive objects.
    */
-  virtual std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const = 0;
-
+  virtual std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
+    const = 0;
 
   /**
    * Get all bundles tagged to start at next launch of framework.
@@ -77,14 +77,12 @@ struct BundleStorage
    */
   virtual std::vector<long> GetStartOnLaunchBundles() const = 0;
 
-
   /**
    * Close this bundle storage and all bundles in it.
    */
   virtual void Close() = 0;
 
 private:
-
   friend struct BundleArchive;
 
   /**
@@ -94,9 +92,7 @@ private:
    * @return true if element was removed.
    */
   virtual bool RemoveArchive(const BundleArchive* ba) = 0;
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLESTORAGE_H

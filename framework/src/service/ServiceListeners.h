@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICELISTENERS_H
 #define CPPMICROSERVICES_SERVICELISTENERS_H
 
@@ -33,9 +32,9 @@
 #include <mutex>
 #include <set>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include <tuple>
 
 namespace cppmicroservices {
 
@@ -50,27 +49,28 @@ class ServiceListeners : private detail::MultiThreaded<>
 {
 
 public:
-
-  typedef std::tuple<BundleListener, void*> BundleListenerEntry;
-  typedef std::unordered_map<std::shared_ptr<BundleContextPrivate>,
-                             std::unordered_map<ListenerTokenId, BundleListenerEntry>> BundleListenerMap;
-  struct : public MultiThreaded<> {
+  using BundleListenerEntry = std::tuple<BundleListener, void*>;
+  using BundleListenerMap = std::unordered_map<std::shared_ptr<BundleContextPrivate>,
+                                               std::unordered_map<ListenerTokenId, BundleListenerEntry>>;
+  
+  struct : public MultiThreaded<>
+  {
     BundleListenerMap value;
   } bundleListenerMap;
 
-  typedef std::unordered_map<std::string, std::list<ServiceListenerEntry> > CacheType;
-  typedef std::unordered_set<ServiceListenerEntry> ServiceListenerEntries;
+  using CacheType = std::unordered_map<std::string, std::list<ServiceListenerEntry>>;
+  using ServiceListenerEntries = std::unordered_set<ServiceListenerEntry>;
 
-  typedef std::tuple<FrameworkListener, void*> FrameworkListenerEntry;
-  typedef std::unordered_map<std::shared_ptr<BundleContextPrivate>,
-                             std::unordered_map<ListenerTokenId, FrameworkListenerEntry>> FrameworkListenerMap;
+  using FrameworkListenerEntry = std::tuple<FrameworkListener, void*>;
+  using FrameworkListenerMap = std::unordered_map<std::shared_ptr<BundleContextPrivate>,
+                                                  std::unordered_map<ListenerTokenId, FrameworkListenerEntry>>;
 
 private:
-
   std::atomic<uint64_t> listenerId;
 
-  struct : public MultiThreaded<> {
-      FrameworkListenerMap value;
+  struct : public MultiThreaded<>
+  {
+    FrameworkListenerMap value;
   } frameworkListenerMap;
 
   std::vector<std::string> hashedServiceKeys;
@@ -88,7 +88,6 @@ private:
   CoreBundleContext* coreCtx;
 
 public:
-
   ServiceListeners(CoreBundleContext* coreCtx);
 
   void Clear();
@@ -105,8 +104,11 @@ public:
    * @exception org.osgi.framework.InvalidSyntaxException
    * If the filter is not a correct LDAP expression.
    */
-  ListenerToken AddServiceListener(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& listener,
-                                   void* data, const std::string& filter);
+  ListenerToken AddServiceListener(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const ServiceListener& listener,
+    void* data,
+    const std::string& filter);
 
   /**
    * Remove service listener from current framework. Silently ignore
@@ -117,8 +119,11 @@ public:
    * @param listener Object to remove.
    * @param data Additional data to distinguish ServiceListener objects.
    */
-  void RemoveServiceListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId,
-                             const ServiceListener& listener, void* data);
+  void RemoveServiceListener(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    ListenerTokenId tokenId,
+    const ServiceListener& listener,
+    void* data);
 
   /**
    * Add a new bundle listener.
@@ -128,7 +133,10 @@ public:
    * @param data Additional data to distinguish BundleListener objects.
    * @returns a ListenerToken object that corresponds to the listener.
    */
-  ListenerToken AddBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data);
+  ListenerToken AddBundleListener(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const BundleListener& listener,
+    void* data);
 
   /**
    * Remove bundle listener from current framework. If listener doesn't
@@ -138,7 +146,10 @@ public:
    * @param listener Object to remove.
    * @param data Additional data to distinguish BundleListener objects.
    */
-  void RemoveBundleListener(const std::shared_ptr<BundleContextPrivate>& context, const BundleListener& listener, void* data);
+  void RemoveBundleListener(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const BundleListener& listener,
+    void* data);
 
   /**
   * Add a new framework listener.
@@ -148,7 +159,10 @@ public:
   * @param data Additional data to distinguish FrameworkListener objects.
   * @returns a ListenerToken object that corresponds to the listener.
   */
-  ListenerToken AddFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data);
+  ListenerToken AddFrameworkListener(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const FrameworkListener& listener,
+    void* data);
 
   /**
   * Remove framework listener from current framework. If listener doesn't
@@ -158,7 +172,10 @@ public:
   * @param listener Object to remove.
   * @param data Additional data to distinguish FrameworkListener objects.
   */
-  void RemoveFrameworkListener(const std::shared_ptr<BundleContextPrivate>& context, const FrameworkListener& listener, void* data);
+  void RemoveFrameworkListener(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const FrameworkListener& listener,
+    void* data);
 
   /**
    * Remove either a service, bundle or framework listener from current framework.
@@ -167,7 +184,8 @@ public:
    * @param context The bundle context who wants to remove the listener.
    * @param token A ListenerToken type object which corresponds to the listener.
    */
-  void RemoveListener(const std::shared_ptr<BundleContextPrivate>& context, ListenerToken token);
+  void RemoveListener(const std::shared_ptr<BundleContextPrivate>& context,
+                      ListenerToken token);
 
   void SendFrameworkEvent(const FrameworkEvent& evt);
 
@@ -203,13 +221,13 @@ public:
    *
    *
    */
-  void GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& listeners);
+  void GetMatchingServiceListeners(const ServiceEvent& evt,
+                                   ServiceListenerEntries& listeners);
 
-
-  std::vector<ServiceListenerHook::ListenerInfo> GetListenerInfoCollection() const;
+  std::vector<ServiceListenerHook::ListenerInfo> GetListenerInfoCollection()
+    const;
 
 private:
-
   /**
    * Factory method that returns an unique ListenerToken object.
    * Called by methods which add listeners.
@@ -228,9 +246,11 @@ private:
    */
   void CheckSimple_unlocked(const ServiceListenerEntry& sle);
 
-  void AddToSet_unlocked(ServiceListenerEntries& set, const ServiceListenerEntries& receivers, int cache_ix, const std::string& val);
+  void AddToSet_unlocked(ServiceListenerEntries& set,
+                         const ServiceListenerEntries& receivers,
+                         int cache_ix,
+                         const std::string& val);
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICELISTENERS_H

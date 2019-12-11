@@ -1,0 +1,52 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "bundle"
+  ],
+  "properties": {
+    "bundle": {
+      "$id": "#/properties/bundle",
+      "type": "object",
+      "title": "The Bundle Schema",
+      "properties": {
+        "vendor": {
+          "$id": "#/properties/bundle/properties/vendor",
+          "type": "string",
+          "title": "The Vendor Schema",
+          "default": "",
+          "examples": [
+            "My Company, Inc."
+          ],
+          "pattern": "^(.*)$"
+        },
+        "symbolic_name": {
+          "$id": "#/properties/bundle/properties/symbolic_name",
+          "type": "string",
+          "title": "The Symbolic_name Schema",
+          "default": "",
+          "examples": [
+            "com_mycompany_bundle"
+          ],
+          "pattern": "^([a-zA-Z0-9_]+)$"
+        },
+        "version": {
+          "$id": "#/properties/bundle/properties/version",
+          "type": "string",
+          "title": "The Version Schema",
+          "default": "",
+          "examples": [
+            "1.0.0.9283927"
+          ],
+          "pattern": "^([0-9]+)(\\.([0-9]+(\\.([0-9]+(\\.([0-9a-zA-Z-_]+){1})?){1})?){1})?"
+        }
+      },
+      "required": [
+        "symbolic_name"
+      ]
+    }
+  }
+}

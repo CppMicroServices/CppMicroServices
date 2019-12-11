@@ -23,16 +23,16 @@
 #ifndef CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H
 #define CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H
 
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ServiceEvent.h"
-#include "cppmicroservices/BundleContext.h"
 
 namespace cppmicroservices {
 
-class TestBundleListener {
+class TestBundleListener
+{
 
 public:
-
   TestBundleListener();
 
   void BundleChanged(const BundleEvent& event);
@@ -43,12 +43,15 @@ public:
 
   ServiceEvent GetServiceEvent() const;
 
-  bool CheckListenerEvents(
-      bool pexp, BundleEvent::Type ptype,
-      bool sexp, ServiceEvent::Type stype,
-      const Bundle& bundleX, ServiceReferenceU* servX);
+  bool CheckListenerEvents(bool pexp,
+                           BundleEvent::Type ptype,
+                           bool sexp,
+                           ServiceEvent::Type stype,
+                           const Bundle& bundleX,
+                           ServiceReferenceU* servX);
 
-  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts, bool relaxed = false);
+  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts,
+                           bool relaxed = false);
 
   bool CheckListenerEvents(const std::vector<ServiceEvent>& seEvts);
 
@@ -57,11 +60,9 @@ public:
                            bool relaxed = false);
 
 private:
-
   std::vector<ServiceEvent> serviceEvents;
   std::vector<BundleEvent> bundleEvents;
 };
-
 }
 
 #endif // CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H

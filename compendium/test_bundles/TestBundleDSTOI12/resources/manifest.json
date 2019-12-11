@@ -1,0 +1,24 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI12",
+    "scr": {
+	"version": 1,
+	"components": [{
+	    "implementation-class": "sample::ServiceComponent12",
+	    "service": {
+		"interfaces": ["test::Interface1"]
+	    },
+	    "properties": {
+		"Service.description": "Sample Test",
+		"Service.vendor": "Sample Vendor",
+		"DummyAnyMap": {
+		    "Foo": 10,
+		    "Bar": "xyz",
+		    "NestedMap": {
+			"a": "b"
+		    },
+		    "NestedVector": [1, 2, 3]
+		}
+	    }
+	}]
+    }
+}

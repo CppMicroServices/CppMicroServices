@@ -1,0 +1,78 @@
+{
+   "Test_AtCompoundKey" : {
+      "relativelylongkeyname_element" : true,
+      "relativelylongkeyname_map" : {
+         "relativelylongkeyname_element" : true,
+         "relativelylongkeyname_map" : {
+            "relativelylongkeyname_element" : true,
+            "relativelylongkeyname_map" : {
+               "relativelylongkeyname_element" : true,
+               "relativelylongkeyname_map" : {
+                  "relativelylongkeyname_element" : true,
+                  "relativelylongkeyname_map" : {
+                     "relativelylongkeyname_element" : true,
+                     "relativelylongkeyname_map" : {
+                        "relativelylongkeyname_element" : true,
+                        "relativelylongkeyname_map" : {
+                           "relativelylongkeyname_element" : true,
+                           "relativelylongkeyname_map" : {
+                              "relativelylongkeyname_element" : true,
+                              "relativelylongkeyname_map" : {
+                                 "relativelylongkeyname_element" : true,
+                                 "relativelylongkeyname_map" : {
+                                    "relativelylongkeyname_element" : true,
+                                    "relativelylongkeyname_map" : {
+                                       "relativelylongkeyname_element" : true,
+                                       "relativelylongkeyname_map" : {
+                                          "relativelylongkeyname_element" : true,
+                                          "relativelylongkeyname_map" : {
+                                             "relativelylongkeyname_element" : true,
+                                             "relativelylongkeyname_map" : {
+                                                "relativelylongkeyname_element" : true,
+                                                "relativelylongkeyname_map" : {
+                                                   "relativelylongkeyname_element" : true,
+                                                   "relativelylongkeyname_map" : {
+                                                      "relativelylongkeyname_element" : true,
+                                                      "relativelylongkeyname_map" : {
+                                                         "relativelylongkeyname_element" : true,
+                                                         "relativelylongkeyname_map" : {
+                                                            "relativelylongkeyname_element" : true,
+                                                            "relativelylongkeyname_map" : {
+                                                               "relativelylongkeyname_element" : true,
+                                                               "relativelylongkeyname_map" : {
+                                                                  "relativelylongkeyname_element" : true,
+                                                                  "relativelylongkeyname_map" : {
+                                                                     "relativelylongkeyname_element" : true,
+                                                                     "relativelylongkeyname_map" : {
+                                                                        "relativelylongkeyname_element" : true,
+                                                                        "relativelylongkeyname_map" : {
+                                                                           "relativelylongkeyname_element" : true,
+                                                                           "relativelylongkeyname_map" : {}
+                                                                        }
+                                                                     }
+                                                                  }
+                                                               }
+                                                            }
+                                                         }
+                                                      }
+                                                   }
+                                                }
+                                             }
+                                          }
+                                       }
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "bundle.activator" : true,
+   "bundle.symbolic_name" : "TestBundleWithDeepManifest",
+   "bundle.vendor" : "The Company, Inc."
+}

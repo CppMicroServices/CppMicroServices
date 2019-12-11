@@ -37,9 +37,7 @@ BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked(BundleContext* bc)
 
 template<class S, class TTT, class R>
 BundleAbstractTracked<S,TTT,R>::~BundleAbstractTracked()
-{
-
-}
+= default;
 
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::SetInitial(const std::vector<S>& initiallist)
@@ -112,7 +110,7 @@ void BundleAbstractTracked<S,TTT,R>::Close()
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 {
-  std::shared_ptr<TrackedParmType> object;
+  std::shared_ptr<TrackedParamType> object;
   {
     auto l = this->Lock(); US_UNUSED(l);
     if (closed)
@@ -155,7 +153,7 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 {
-  std::shared_ptr<TrackedParmType> object;
+  std::shared_ptr<TrackedParamType> object;
   {
     auto l = this->Lock(); US_UNUSED(l);
     std::size_t initialSize = initial.size();
@@ -216,12 +214,12 @@ bool BundleAbstractTracked<S,TTT,R>::IsEmpty_unlocked() const
 }
 
 template<class S, class TTT, class R>
-std::shared_ptr<typename BundleAbstractTracked<S,TTT,R>::TrackedParmType>
+std::shared_ptr<typename BundleAbstractTracked<S,TTT,R>::TrackedParamType>
 BundleAbstractTracked<S,TTT,R>::GetCustomizedObject_unlocked(S item) const
 {
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end()) return i->second;
-  return std::shared_ptr<TrackedParmType>();
+  return std::shared_ptr<TrackedParamType>();
 }
 
 template<class S, class TTT, class R>
@@ -254,7 +252,7 @@ void BundleAbstractTracked<S,TTT,R>::CopyEntries_unlocked(TrackingMap& map) cons
 }
 
 template<class S, class TTT, class R>
-bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParmType>& custom)
+bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const std::shared_ptr<TrackedParamType>& custom)
 {
   auto l = this->Lock(); US_UNUSED(l);
   std::size_t addingSize = adding.size();
@@ -283,7 +281,7 @@ template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
 {
   DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::trackAdding:" << item;
-  std::shared_ptr<TrackedParmType> object;
+  std::shared_ptr<TrackedParamType> object;
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
   try

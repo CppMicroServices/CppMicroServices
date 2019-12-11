@@ -2,7 +2,7 @@
 project(CppMicroServicesExamples)
 
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(CppMicroServices NO_MODULE REQUIRED)
 
@@ -117,6 +117,10 @@ if(US_BUILD_TESTING)
 
   list(APPEND _doc_code_tests InstallCleanTest InstallTest DocCodeCleanTest
                              DocCodeCreateDirTest)
+  set(generator_platform)
+  if(CMAKE_GENERATOR_PLATFORM)
+    set(generator_platform -A ${CMAKE_GENERATOR_PLATFORM})
+  endif()
 
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
@@ -126,8 +130,8 @@ if(US_BUILD_TESTING)
                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
                        "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
-                       -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
-                       -G ${CMAKE_GENERATOR}
+                       -D BUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+                       -G ${CMAKE_GENERATOR} ${generator_platform}
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                        "${CMAKE_CURRENT_LIST_DIR}")
       set_tests_properties(DocCodeConfigureTest-${config} PROPERTIES
@@ -149,8 +153,8 @@ if(US_BUILD_TESTING)
                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
                      "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                     -D US_BUILD_SHARED_LIBS:BOOL=${US_BUILD_SHARED_LIBS}
-                     -G ${CMAKE_GENERATOR}
+                     -D BUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+                     -G ${CMAKE_GENERATOR} ${generator_platform}
                      "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                      "${CMAKE_CURRENT_LIST_DIR}")
     set_tests_properties(DocCodeConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
@@ -167,22 +171,19 @@ if(US_BUILD_TESTING)
 
   # The makefile is Linux specific, so only try to build the Makefile example
   # if we are on a proper system
-  if(UNIX AND NOT APPLE AND US_BUILD_SHARED_LIBS)
-
+  if(UNIX AND NOT APPLE AND BUILD_SHARED_LIBS)
+    set(US_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
     # We need to supply the correct language flag to the Makefile
-    set(US_CXX11_FLAGS -std=c++11)
-    usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx11)
-    if(_have_cxx11)
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-    else()
-      set(US_CXX11_FLAGS -std=c++0x)
-      usFunctionCheckCompilerFlags(${US_CXX11_FLAGS} _have_cxx0x)
-      if(_have_cxx0x)
-        set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX11_FLAGS}")
-      else()
-        set(US_CXX11_FLAGS )
+    set(US_CXX_VER_FLAGS -std=c++14)
+    usFunctionCheckCompilerFlags(${US_CXX_VER_FLAGS} _have_cxx14)
+    if(NOT _have_cxx14)
+      set(US_CXX_VER_FLAGS -std=c++0x)
+      usFunctionCheckCompilerFlags(${US_CXX_VER_FLAGS} _have_cxx0x)
+      if(NOT _have_cxx0x)
+        set(US_CXX_VER_FLAGS )
       endif()
     endif()
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_VER_FLAGS}")
 
     find_program(MAKE_COMMAND NAMES make gmake)
     find_program(CXX_COMMAND NAMES g++)
@@ -196,7 +197,7 @@ if(US_BUILD_TESTING)
                COMMAND ${MAKE_COMMAND})
       set_tests_properties(MakefileExampleTest PROPERTIES
                            DEPENDS "MakefileExampleCleanTest;InstallTest"
-                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS};US_CPPMICROSERVICES_TARGET=$<TARGET_FILE:CppMicroServices>")
+                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS};US_CPPMICROSERVICES_TARGET=$<TARGET_FILE:CppMicroServices>;US_CXX=${CMAKE_CXX_COMPILER}")
       list(APPEND _doc_code_tests MakefileExampleCleanTest MakefileExampleTest)
     endif()
   endif()

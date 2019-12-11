@@ -32,22 +32,27 @@ namespace cppmicroservices {
 
 struct ServiceListenerHook;
 
-class ServiceHooks : private detail::MultiThreaded<>, private ServiceTrackerCustomizer<ServiceListenerHook>
+class ServiceHooks
+  : private detail::MultiThreaded<>
+  , private ServiceTrackerCustomizer<ServiceListenerHook>
 {
 
 private:
-
   CoreBundleContext* coreCtx;
   std::unique_ptr<ServiceTracker<ServiceListenerHook>> listenerHookTracker;
 
   std::atomic<bool> bOpen;
 
-  virtual std::shared_ptr<ServiceListenerHook> AddingService(const ServiceReference<ServiceListenerHook>& reference);
-  virtual void ModifiedService(const ServiceReference<ServiceListenerHook>& reference, const std::shared_ptr<ServiceListenerHook>& service);
-  virtual void RemovedService(const ServiceReference<ServiceListenerHook>& reference, const std::shared_ptr<ServiceListenerHook>& service);
+  virtual std::shared_ptr<ServiceListenerHook> AddingService(
+    const ServiceReference<ServiceListenerHook>& reference);
+  virtual void ModifiedService(
+    const ServiceReference<ServiceListenerHook>& reference,
+    const std::shared_ptr<ServiceListenerHook>& service);
+  virtual void RemovedService(
+    const ServiceReference<ServiceListenerHook>& reference,
+    const std::shared_ptr<ServiceListenerHook>& service);
 
 public:
-
   ServiceHooks(CoreBundleContext* coreCtx);
   ~ServiceHooks();
 
@@ -57,20 +62,21 @@ public:
 
   bool IsOpen() const;
 
-  void FilterServiceReferences(BundleContextPrivate* context, const std::string& service,
-                               const std::string& filter, std::vector<ServiceReferenceBase>& refs);
+  void FilterServiceReferences(BundleContextPrivate* context,
+                               const std::string& service,
+                               const std::string& filter,
+                               std::vector<ServiceReferenceBase>& refs);
 
-  void FilterServiceEventReceivers(const ServiceEvent& evt,
-                                   ServiceListeners::ServiceListenerEntries& receivers);
+  void FilterServiceEventReceivers(
+    const ServiceEvent& evt,
+    ServiceListeners::ServiceListenerEntries& receivers);
 
   void HandleServiceListenerReg(const ServiceListenerEntry& sle);
 
   void HandleServiceListenerUnreg(const ServiceListenerEntry& sle);
 
   void HandleServiceListenerUnreg(const std::vector<ServiceListenerEntry>& set);
-
 };
-
 }
 
 #endif // CPPMICROSERVICES_SERVICEHOOKS_H

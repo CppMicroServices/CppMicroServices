@@ -20,7 +20,6 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICETRACKER_H
 #define CPPMICROSERVICES_SERVICETRACKER_H
 
@@ -34,8 +33,10 @@
 namespace cppmicroservices {
 
 namespace detail {
-template<class S, class T> class TrackedService;
-template<class S, class T> class ServiceTrackerPrivate;
+template<class S, class T>
+class TrackedService;
+template<class S, class T>
+class ServiceTrackerPrivate;
 }
 
 class BundleContext;
@@ -89,16 +90,19 @@ class BundleContext;
  * @remarks This class is thread safe.
  */
 template<class S, class T = S>
-class ServiceTracker : protected ServiceTrackerCustomizer<S,T>
+class ServiceTracker : protected ServiceTrackerCustomizer<S, T>
 {
 public:
-
   /// The type of the tracked object
-  typedef typename ServiceTrackerCustomizer<S,T>::TrackedParmType TrackedParmType;
+  using TrackedParamType =
+    typename ServiceTrackerCustomizer<S, T>::TrackedParamType;
 
-  typedef std::map<ServiceReference<S>, std::shared_ptr<TrackedParmType>> TrackingMap;
+  using TrackingMap = std::unordered_map<ServiceReference<S>, std::shared_ptr<TrackedParamType>>;
 
-  ~ServiceTracker();
+  /**
+   * Automatically closes the <code>ServiceTracker</code>
+   */
+  ~ServiceTracker() override;
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -122,7 +126,7 @@ public:
    */
   ServiceTracker(const BundleContext& context,
                  const ServiceReference<S>& reference,
-                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
+                 ServiceTrackerCustomizer<S, T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified class name.
@@ -142,8 +146,9 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(const BundleContext& context, const std::string& clazz,
-                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
+  ServiceTracker(const BundleContext& context,
+                 const std::string& clazz,
+                 ServiceTrackerCustomizer<S, T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -164,8 +169,9 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(const BundleContext& context, const LDAPFilter& filter,
-                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
+  ServiceTracker(const BundleContext& context,
+                 const LDAPFilter& filter,
+                 ServiceTrackerCustomizer<S, T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the class template
@@ -183,8 +189,10 @@ public:
    *        used as the <code>ServiceTrackerCustomizer</code> and this
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
+   * @throws ServiceException If the service interface name is empty.
    */
-  ServiceTracker(const BundleContext& context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
+  ServiceTracker(const BundleContext& context,
+                 ServiceTrackerCustomizer<S, T>* customizer = nullptr);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -194,9 +202,12 @@ public:
    * <code>ServiceTracker</code> was created are now tracked by this
    * <code>ServiceTracker</code>.
    *
-   * @throws std::logic_error If the <code>BundleContext</code>
+   * @throws std::runtime_error If the <code>BundleContext</code>
    *         with which this <code>ServiceTracker</code> was created is no
    *         longer valid.
+   * @throws std::runtime_error If the LDAP filter used to construct
+   *         the <code>ServiceTracker</code> contains an invalid filter 
+   *         expression that cannot be parsed.
    */
   virtual void Open();
 
@@ -210,6 +221,10 @@ public:
    * <p>
    * This implementation calls GetServiceReferences() to get the list
    * of tracked services to remove.
+   *
+   * @throws std::runtime_error If the <code>BundleContext</code>
+   *         with which this <code>ServiceTracker</code> was created is no
+   *         longer valid.
    */
   virtual void Close();
 
@@ -228,9 +243,9 @@ public:
    * This implementation calls GetService() to determine if a service
    * is being tracked.
    *
-   * @return Returns the result of GetService().
+   * @return The result of GetService().
    */
-  std::shared_ptr<TrackedParmType> WaitForService();
+  std::shared_ptr<TrackedParamType> WaitForService();
 
   /**
    * Wait for at least one service to be tracked by this
@@ -250,16 +265,17 @@ public:
    * @param rel_time The relative time duration to wait for a service. If
    *        zero, the method will wait indefinitely.
    * @throws std::invalid_argument exception if \c rel_time is negative.
-   * @return Returns the result of GetService().
+   * @return The result of GetService().
    */
   template<class Rep, class Period>
-  std::shared_ptr<TrackedParmType> WaitForService(const std::chrono::duration<Rep, Period>& rel_time);
+  std::shared_ptr<TrackedParamType> WaitForService(
+    const std::chrono::duration<Rep, Period>& rel_time);
 
   /**
    * Return a list of <code>ServiceReference</code>s for all services being
    * tracked by this <code>ServiceTracker</code>.
    *
-   * @return List of <code>ServiceReference</code>s.
+   * @return A list of <code>ServiceReference</code> objects.
    */
   virtual std::vector<ServiceReference<S>> GetServiceReferences() const;
 
@@ -290,11 +306,12 @@ public:
    * being tracked by this <code>ServiceTracker</code>.
    *
    * @param reference The reference to the desired service.
-   * @return A service object or <code>null</code> if the service referenced
+   * @return A service object or <code>nullptr</code> if the service referenced
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
-  virtual std::shared_ptr<TrackedParmType> GetService(const ServiceReference<S>& reference) const;
+  virtual std::shared_ptr<TrackedParamType> GetService(
+    const ServiceReference<S>& reference) const;
 
   /**
    * Return a list of service objects for all services being tracked by this
@@ -309,7 +326,7 @@ public:
    * @return A list of service objects or an empty list if no services
    *         are being tracked.
    */
-  virtual std::vector<std::shared_ptr<TrackedParmType>> GetServices() const;
+  virtual std::vector<std::shared_ptr<TrackedParamType>> GetServices() const;
 
   /**
    * Returns a service object for one of the services being tracked by this
@@ -322,7 +339,7 @@ public:
    * @return A service object or <code>null</code> if no services are being
    *         tracked.
    */
-  virtual std::shared_ptr<TrackedParmType> GetService() const;
+  virtual std::shared_ptr<TrackedParamType> GetService() const;
 
   /**
    * Remove a service from this <code>ServiceTracker</code>.
@@ -388,14 +405,13 @@ public:
   virtual bool IsEmpty() const;
 
 protected:
-
   /**
    * Default implementation of the
    * <code>ServiceTrackerCustomizer::AddingService</code> method.
    *
    * <p>
    * This method is only called when this <code>ServiceTracker</code> has been
-   * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
+   * constructed with a <code>nullptr</code> ServiceTrackerCustomizer argument.
    *
    * <p>
    * This implementation returns the result of calling <code>GetService</code>
@@ -412,9 +428,13 @@ protected:
    *        <code>ServiceTracker</code>.
    * @return The service object to be tracked for the service added to this
    *         <code>ServiceTracker</code>.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
+   * @throws std::invalid_argument If the specified
+   *         <code>ServiceReference</code> is invalid (default constructed).
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  std::shared_ptr<TrackedParmType> AddingService(const ServiceReference<S>& reference);
+  std::shared_ptr<TrackedParamType> AddingService(
+    const ServiceReference<S>& reference) override;
 
   /**
    * Default implementation of the
@@ -422,7 +442,7 @@ protected:
    *
    * <p>
    * This method is only called when this <code>ServiceTracker</code> has been
-   * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
+   * constructed with a <code>nullptr</code> ServiceTrackerCustomizer argument.
    *
    * <p>
    * This implementation does nothing.
@@ -431,7 +451,8 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
    */
-  void ModifiedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service);
+  void ModifiedService(const ServiceReference<S>& reference,
+                       const std::shared_ptr<TrackedParamType>& service) override;
 
   /**
    * Default implementation of the
@@ -439,7 +460,7 @@ protected:
    *
    * <p>
    * This method is only called when this <code>ServiceTracker</code> has been
-   * constructed with a <code>null</code> ServiceTrackerCustomizer argument.
+   * constructed with a <code>nullptr</code> ServiceTrackerCustomizer argument.
    *
    * This method can be overridden in a subclass. If the default
    * implementation of the #AddingService
@@ -449,23 +470,22 @@ protected:
    * @param service The service object for the removed service.
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
    */
-  void RemovedService(const ServiceReference<S>& reference, const std::shared_ptr<TrackedParmType>& service);
+  void RemovedService(const ServiceReference<S>& reference,
+                      const std::shared_ptr<TrackedParamType>& service) override;
 
 private:
+  using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;
 
-  typedef typename ServiceTrackerCustomizer<S,T>::TypeTraits TypeTraits;
+  using _ServiceTracker = ServiceTracker<S, T>;
+  using _TrackedService = detail::TrackedService<S, TypeTraits>;
+  using _ServiceTrackerPrivate = detail::ServiceTrackerPrivate<S, TypeTraits>;
+  using _ServiceTrackerCustomizer = ServiceTrackerCustomizer<S, T>;
 
-  typedef ServiceTracker<S,T> _ServiceTracker;
-  typedef detail::TrackedService<S,TypeTraits> _TrackedService;
-  typedef detail::ServiceTrackerPrivate<S,TypeTraits> _ServiceTrackerPrivate;
-  typedef ServiceTrackerCustomizer<S,T> _ServiceTrackerCustomizer;
-
-  friend class detail::TrackedService<S,TypeTraits>;
-  friend class detail::ServiceTrackerPrivate<S,TypeTraits>;
+  friend class detail::TrackedService<S, TypeTraits>;
+  friend class detail::ServiceTrackerPrivate<S, TypeTraits>;
 
   std::unique_ptr<_ServiceTrackerPrivate> d;
 };
-
 }
 
 #include "cppmicroservices/detail/ServiceTracker.tpp"

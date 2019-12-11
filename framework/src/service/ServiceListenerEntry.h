@@ -20,12 +20,11 @@
 
 =============================================================================*/
 
-
 #ifndef CPPMICROSERVICES_SERVICELISTENERENTRY_H
 #define CPPMICROSERVICES_SERVICELISTENERENTRY_H
 
-#include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceListenerHook.h"
 
 #include "LDAPExpr.h"
@@ -45,7 +44,6 @@ class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
 {
 
 public:
-
   ServiceListenerEntry();
   ServiceListenerEntry(const ServiceListenerEntry& other);
   ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info);
@@ -55,8 +53,11 @@ public:
 
   void SetRemoved(bool removed) const;
 
-  ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context, const ServiceListener& l, void* data,
-                       ListenerTokenId tokenId, const std::string& filter = "");
+  ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context,
+                       const ServiceListener& l,
+                       void* data,
+                       ListenerTokenId tokenId,
+                       const std::string& filter = "");
 
   const LDAPExpr& GetLDAPExpr() const;
 
@@ -66,21 +67,21 @@ public:
 
   bool operator==(const ServiceListenerEntry& other) const;
 
-  bool Contains(const std::shared_ptr<BundleContextPrivate>& context, ListenerTokenId tokenId) const;
+  bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
+                ListenerTokenId tokenId) const;
 
   bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                const ServiceListener& listener, void* data) const;
+                const ServiceListener& listener,
+                void* data) const;
 
   ListenerTokenId Id() const;
 
   std::size_t Hash() const;
-
 };
-
 }
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerEntry)
-  return arg.Hash();
+return arg.Hash();
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICELISTENERENTRY_H

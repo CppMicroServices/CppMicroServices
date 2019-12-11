@@ -94,7 +94,7 @@ The Lean Mean C++ Option Parser
 MIT License
 
 http://sourceforge.net/projects/optionparser
-1.3
+1.7
 
 Patches
 
@@ -129,11 +129,32 @@ Patches
 Google Test and Google Mock
 ----------------------------
 
-See https://github.com/google/googletest/blob/master/googletest/LICENSE for license information.
+See https://github.com/google/googletest/blob/master/LICENSE for license information.
 
-https://github.com/google/googletest/releases
-1.8.0
+https://github.com/google/googletest
+ba33a8876c3eda4cb8def8e0e90f45930ef8c54f
 
-Patches
+RapidJSON
+---------
 
- * Suppress CMake warning about policy CMP0048
+See https://github.com/Tencent/rapidjson/blob/master/license.txt for license information
+
+https://github.com/Tencent/rapidjson/
+091de040edb3355dcf2f4a18c425aec51b906f08
+
+Google benchmark
+----------------
+
+See https://github.com/google/benchmark/blob/master/LICENSE for license information
+
+https://github.com/google/benchmark/releases
+1.4.1
+
+Abseil (absl)
+-------------
+
+See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license information
+
+https://github.com/abseil/abseil-cpp
+6ec136281086b71da32b5fb068bd6e46b78a5c79
+

@@ -27,8 +27,8 @@
 #include "cppmicroservices/SharedData.h"
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
+#  pragma warning(push)
+#  pragma warning(disable : 4251)
 #endif
 
 namespace cppmicroservices {
@@ -64,14 +64,10 @@ class Bundle;
  *
  * \sa LDAPProp for a fluent API generating LDAP filter strings
  */
-class US_Framework_EXPORT LDAPFilter {
-
-private:
-
-  typedef SharedDataPointer<LDAPFilterData> LDAPFilter::*bool_type;
+class US_Framework_EXPORT LDAPFilter
+{
 
 public:
-
   /**
    * Creates a valid <code>LDAPFilter</code> object that
    * matches nothing.
@@ -116,7 +112,7 @@ public:
    */
   bool Match(const ServiceReferenceBase& reference) const;
 
- /**
+  /**
    * Filter using a bundle's manifest headers.
    * <p>
    * This <code>LDAPFilter</code> is executed using the keys and values of the
@@ -190,9 +186,7 @@ public:
   LDAPFilter& operator=(const LDAPFilter& filter);
 
 protected:
-
   SharedDataPointer<LDAPFilterData> d;
-
 };
 
 /**
@@ -202,12 +196,12 @@ protected:
  * Streams the string representation of \c filter into the stream \c os
  * via LDAPFilter::ToString().
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter);
-
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const LDAPFilter& filter);
 }
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+#  pragma warning(pop)
 #endif
 
 #endif // CPPMICROSERVICES_LDAPFILTER_H

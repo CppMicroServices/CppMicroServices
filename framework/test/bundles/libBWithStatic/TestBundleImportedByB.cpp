@@ -34,13 +34,11 @@ struct TestBundleImportedByB : public TestBundleBService
 
   TestBundleImportedByB() {}
   virtual ~TestBundleImportedByB() {}
-
 };
 
 class TestBundleImportedByBActivator : public BundleActivator
 {
 public:
-
   TestBundleImportedByBActivator() {}
   ~TestBundleImportedByBActivator() {}
 
@@ -51,16 +49,13 @@ public:
     sr = context.RegisterService<TestBundleBService>(s);
   }
 
-  void Stop(BundleContext)
-  {
-    sr.Unregister();
-  }
+  void Stop(BundleContext) { sr.Unregister(); }
 
 private:
   std::shared_ptr<TestBundleImportedByB> s;
   ServiceRegistration<TestBundleImportedByB> sr;
 };
-
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleImportedByBActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleImportedByBActivator)

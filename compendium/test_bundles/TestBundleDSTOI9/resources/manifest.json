@@ -1,0 +1,15 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI9",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "enabled": true,
+            "immediate" : true,
+            "implementation-class": "sample::ServiceComponent9",
+            "service" : {
+                "interfaces" : ["test::LifeCycleValidation"]
+            }
+        }]
+    }
+}
+

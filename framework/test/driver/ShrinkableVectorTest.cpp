@@ -22,30 +22,29 @@
 
 #include "cppmicroservices/ShrinkableVector.h"
 
+#include "TestUtils.h"
 #include "TestingConfig.h"
 #include "TestingMacros.h"
-#include "TestUtils.h"
 
 namespace cppmicroservices {
 
 // Fake a BundleHooks class so we can create
 // ShrinkableVector instances
-class BundleHooks {
+class BundleHooks
+{
 
 public:
-
   template<class E>
   static ShrinkableVector<E> MakeVector(std::vector<E>& c)
   {
     return ShrinkableVector<E>(c);
   }
 };
-
 }
 
 using namespace cppmicroservices;
 
-int ShrinkableVectorTest(int /*argc*/, char* /*argv*/[])
+int ShrinkableVectorTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("ShrinkableVectorTest");
 

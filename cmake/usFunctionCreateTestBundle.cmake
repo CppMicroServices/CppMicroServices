@@ -2,21 +2,24 @@
 macro(_us_create_test_bundle_helper)
 
   add_library(${name} ${_srcs} $<TARGET_OBJECTS:util>)
-  if(US_BUILD_SHARED_LIBS AND US_TEST_LIBRARY_EXTENSION)
+  if(BUILD_SHARED_LIBS AND US_TEST_LIBRARY_EXTENSION)
     set_target_properties(${name} PROPERTIES SUFFIX ${US_TEST_LIBRARY_EXTENSION})
   endif()
   set_property(TARGET ${name}
                APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=${_bundle_symbolic_name})
   set_property(TARGET ${name} PROPERTY US_BUNDLE_NAME ${_bundle_symbolic_name})
   # Clear a possible debug postfix
-  set_property(TARGET ${name} PROPERTY DEBUG_POSTFIX "")
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     get_property(_compile_flags TARGET ${name} PROPERTY COMPILE_FLAGS)
     set_property(TARGET ${name} PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
   endif()
 
-  target_include_directories(${name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
-  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} CppMicroServices)
+  target_include_directories(${name}
+    PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
+  
+  target_link_libraries(${name} ${${PROJECT_NAME}_TARGET} ${US_TEST_LINK_LIBRARIES} ${US_TEST_OTHER_LIBRARIES} CppMicroServices)
 
   if(_res_files OR US_TEST_LINK_LIBRARIES)
     usFunctionAddResources(TARGET ${name} WORKING_DIRECTORY ${_res_root}
@@ -46,7 +49,7 @@ function(usFunctionCreateTestBundle name)
 endfunction()
 
 function(usFunctionCreateTestBundleWithResources name)
-  cmake_parse_arguments(US_TEST "SKIP_BUNDLE_LIST;LINK_RESOURCES;APPEND_RESOURCES" "RESOURCES_ROOT;LIBRARY_EXTENSION;BUNDLE_SYMBOLIC_NAME" "SOURCES;RESOURCES;BINARY_RESOURCES;LINK_LIBRARIES" "" ${ARGN})
+  cmake_parse_arguments(US_TEST "SKIP_BUNDLE_LIST;LINK_RESOURCES;APPEND_RESOURCES" "RESOURCES_ROOT;LIBRARY_EXTENSION;BUNDLE_SYMBOLIC_NAME" "SOURCES;RESOURCES;BINARY_RESOURCES;LINK_LIBRARIES;OTHER_LIBRARIES" "" ${ARGN})
 
   if(US_TEST_BUNDLE_SYMBOLIC_NAME)
     set(_bundle_symbolic_name ${US_TEST_BUNDLE_SYMBOLIC_NAME})

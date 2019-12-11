@@ -21,21 +21,24 @@
 =============================================================================*/
 
 #include "cppmicroservices/httpservice/HttpServletResponse.h"
+#include "HttpOutputStreamBuffer.h"
 #include "HttpServletResponsePrivate.h"
 #include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "HttpOutputStreamBuffer.h"
 #include "cppmicroservices/httpservice/ServletContext.h"
 
 #include "civetweb/civetweb.h"
 
 #include <sstream>
-#include <vector>
 #include <stdexcept>
-#include <time.h>
+#include <ctime>
+#include <vector>
 
 namespace cppmicroservices {
 
-HttpServletResponsePrivate::HttpServletResponsePrivate(HttpServletRequest* request, CivetServer* server, mg_connection* conn)
+HttpServletResponsePrivate::HttpServletResponsePrivate(
+  HttpServletRequest* request,
+  CivetServer* server,
+  mg_connection* conn)
   : m_Request(request)
   , m_Server(server)
   , m_Connection(conn)
@@ -45,14 +48,12 @@ HttpServletResponsePrivate::HttpServletResponsePrivate(HttpServletRequest* reque
   , m_HttpOutputStream(nullptr)
   , m_IsCommited(false)
   , m_BufferSize(1024)
-{
-}
+{}
 
 HttpServletResponsePrivate::~HttpServletResponsePrivate()
 {
   delete m_StreamBuf;
-  if (m_StreamBuf != m_HttpOutputStreamBuf)
-  {
+  if (m_StreamBuf != m_HttpOutputStreamBuf) {
     delete m_HttpOutputStreamBuf;
   }
   delete m_HttpOutputStream;
@@ -60,14 +61,13 @@ HttpServletResponsePrivate::~HttpServletResponsePrivate()
 
 bool HttpServletResponsePrivate::Commit()
 {
-  if (m_IsCommited) return true;
+  if (m_IsCommited)
+    return true;
 
   std::stringstream ss;
   ss << "HTTP/1.1 " << m_StatusCode << "\r\n";
-  for (std::map<std::string, std::string>::iterator iter = m_Headers.begin(),
-       endIter = m_Headers.end(); iter != endIter; ++iter)
-  {
-    ss << iter->first << ": " << iter->second << "\r\n";
+  for (auto & m_Header : m_Headers) {
+    ss << m_Header.first << ": " << m_Header.second << "\r\n";
   }
   ss << "\r\n";
 
@@ -86,22 +86,21 @@ std::string HttpServletResponsePrivate::LexicalCast(long value)
 
   int tmp_value;
 
-  do
-  {
+  do {
     tmp_value = value;
     value /= 10;
     *ptr++ = "0123456789"[tmp_value - value * 10];
-  } while ( value );
+  } while (value);
 
   // Apply negative sign
-  if (tmp_value < 0) *ptr++ = '-';
+  if (tmp_value < 0)
+    *ptr++ = '-';
 
   *ptr-- = '\0';
   // Invert the string
-  while(ptr1 < ptr)
-  {
+  while (ptr1 < ptr) {
     tmp_char = *ptr;
-    *ptr--= *ptr1;
+    *ptr-- = *ptr1;
     *ptr1++ = tmp_char;
   }
   return result;
@@ -116,50 +115,35 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
 
   int tmp_value;
 
-  do
-  {
+  do {
     tmp_value = value;
     value /= 16;
     *ptr++ = "0123456789abcdef"[tmp_value - value * 16];
-  } while ( value );
+  } while (value);
 
   // Apply negative sign
-  if (tmp_value < 0) *ptr++ = '-';
+  if (tmp_value < 0)
+    *ptr++ = '-';
 
   *ptr-- = '\0';
   // Invert the string
-  while(ptr1 < ptr)
-  {
+  while (ptr1 < ptr) {
     tmp_char = *ptr;
-    *ptr--= *ptr1;
+    *ptr-- = *ptr1;
     *ptr1++ = tmp_char;
   }
   return result;
 }
 
-HttpServletResponse::~HttpServletResponse()
-{
-}
-
-HttpServletResponse::HttpServletResponse(const HttpServletResponse& o)
-  : d(o.d)
-{
-}
-
-HttpServletResponse& HttpServletResponse::operator=(const HttpServletResponse& o)
-{
-  d = o.d;
-  return *this;
-}
+HttpServletResponse::~HttpServletResponse() = default;
+HttpServletResponse::HttpServletResponse(const HttpServletResponse&) = default;
+HttpServletResponse& HttpServletResponse::operator=(const HttpServletResponse&) = default;
 
 void HttpServletResponse::FlushBuffer()
 {
-  if (d->m_HttpOutputStream)
-  {
+  if (d->m_HttpOutputStream) {
     *d->m_HttpOutputStream << std::flush;
-  }
-  else
-  {
+  } else {
     d->Commit();
   }
 }
@@ -176,9 +160,9 @@ std::size_t HttpServletResponse::GetBufferSize() const
 
 std::string HttpServletResponse::GetContentType() const
 {
-  std::map<std::string, std::string>::iterator iter = d->m_Headers.find("Content-Type");
-  if (iter != d->m_Headers.end())
-  {
+  auto iter =
+    d->m_Headers.find("Content-Type");
+  if (iter != d->m_Headers.end()) {
     return iter->second;
   }
   return std::string();
@@ -186,8 +170,7 @@ std::string HttpServletResponse::GetContentType() const
 
 std::ostream& HttpServletResponse::GetOutputStream()
 {
-  if (!d->m_HttpOutputStream)
-  {
+  if (!d->m_HttpOutputStream) {
     d->m_StreamBuf = this->GetOutputStreamBuffer();
     d->m_HttpOutputStream = new std::ostream(d->m_StreamBuf);
   }
@@ -203,12 +186,11 @@ void HttpServletResponse::Reset()
 
 void HttpServletResponse::ResetBuffer()
 {
-  if (this->IsCommitted())
-  {
-    throw std::logic_error("Resetting buffer not possible, response is already committed.");
+  if (this->IsCommitted()) {
+    throw std::logic_error(
+      "Resetting buffer not possible, response is already committed.");
   }
-  if (d->m_HttpOutputStream)
-  {
+  if (d->m_HttpOutputStream) {
     delete d->m_HttpOutputStream;
     delete d->m_StreamBuf;
     d->m_HttpOutputStream = nullptr;
@@ -218,30 +200,25 @@ void HttpServletResponse::ResetBuffer()
 
 void HttpServletResponse::SetBufferSize(std::size_t size)
 {
-  if (d->m_StreamBuf)
-  {
-    throw std::logic_error("Buffer size cannot be set because the buffer is already in use.");
+  if (d->m_StreamBuf) {
+    throw std::logic_error(
+      "Buffer size cannot be set because the buffer is already in use.");
   }
   d->m_BufferSize = size;
 }
 
 void HttpServletResponse::SetCharacterEncoding(const std::string& charset)
 {
-  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr)
-  {
+  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr) {
     return;
   }
   d->m_Charset = charset;
   std::string contentType = this->GetContentType();
-  if (!contentType.empty())
-  {
+  if (!contentType.empty()) {
     std::size_t pos = contentType.find_first_of(';');
-    if (pos == std::string::npos)
-    {
+    if (pos == std::string::npos) {
       contentType += "; " + charset;
-    }
-    else
-    {
+    } else {
       contentType = contentType.substr(0, pos) + "; " + charset;
     }
     d->m_Headers["Content-Type"] = contentType;
@@ -257,23 +234,17 @@ void HttpServletResponse::SetContentLength(std::size_t size)
 
 void HttpServletResponse::SetContentType(const std::string& type)
 {
-  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr)
-  {
+  if (this->IsCommitted() || d->m_HttpOutputStream != nullptr) {
     return;
   }
   std::string contentType = type;
-  if (!contentType.empty())
-  {
+  if (!contentType.empty()) {
     std::size_t pos = type.find_first_of(';');
-    if (pos == std::string::npos)
-    {
-      if (!d->m_Charset.empty())
-      {
+    if (pos == std::string::npos) {
+      if (!d->m_Charset.empty()) {
         contentType += "; " + d->m_Charset;
       }
-    }
-    else
-    {
+    } else {
       pos = contentType.find_first_not_of(' ', pos);
       d->m_Charset = contentType.substr(pos);
     }
@@ -281,40 +252,39 @@ void HttpServletResponse::SetContentType(const std::string& type)
   d->m_Headers["Content-Type"] = contentType;
 }
 
-void HttpServletResponse::AddHeader(const std::string& name, const std::string& value)
+void HttpServletResponse::AddHeader(const std::string& name,
+                                    const std::string& value)
 {
   std::string& currValue = d->m_Headers[name];
-  if (currValue.empty())
-  {
+  if (currValue.empty()) {
     currValue += value;
-  }
-  else
-  {
-    if (currValue[currValue.size()-1] != ',')
-    {
+  } else {
+    if (currValue[currValue.size() - 1] != ',') {
       currValue += ',';
     }
     currValue += value;
   }
 }
 
-void HttpServletResponse::SetHeader(const std::string& name, const std::string& value)
+void HttpServletResponse::SetHeader(const std::string& name,
+                                    const std::string& value)
 {
   d->m_Headers[name] = value;
 }
 
 #ifdef US_PLATFORM_WINDOWS
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
+#  ifndef snprintf
+#    define snprintf _snprintf
+#  endif
 #endif
 
 void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
 {
   // Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
 
-  const char* months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-  const char* days[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+  const char* months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+  const char* days[7] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
   std::time_t timeep = date / 1000;
   std::tm t;
 #ifdef US_PLATFORM_WINDOWS
@@ -324,8 +294,18 @@ void HttpServletResponse::SetDateHeader(const std::string& name, long long date)
 #endif
   {
     char dataStr[30];
-    int n = snprintf(dataStr, 30, "%s, %02d %s %d %02d:%02d:%02d GMT", days[t.tm_wday], t.tm_mday, months[t.tm_mon], (1900 + t.tm_year), t.tm_hour, t.tm_min, t.tm_sec);
-    if (n < 0) return;
+    int n = snprintf(dataStr,
+                     30,
+                     "%s, %02d %s %d %02d:%02d:%02d GMT",
+                     days[t.tm_wday],
+                     t.tm_mday,
+                     months[t.tm_mon],
+                     (1900 + t.tm_year),
+                     t.tm_hour,
+                     t.tm_min,
+                     t.tm_sec);
+    if (n < 0)
+      return;
     this->SetHeader(name, dataStr);
   }
 }
@@ -357,8 +337,7 @@ void HttpServletResponse::SetStatus(int statusCode)
 
 void HttpServletResponse::SendError(int statusCode, const std::string& msg)
 {
-  if (this->IsCommitted())
-  {
+  if (this->IsCommitted()) {
     throw std::logic_error("Response already committed.");
   }
   this->SetStatus(statusCode);
@@ -370,8 +349,7 @@ void HttpServletResponse::SendError(int statusCode, const std::string& msg)
 
 void HttpServletResponse::SendRedirect(const std::string& location)
 {
-  if (this->IsCommitted())
-  {
+  if (this->IsCommitted()) {
     throw std::logic_error("Response already committed.");
   }
   this->Reset();
@@ -379,52 +357,39 @@ void HttpServletResponse::SendRedirect(const std::string& location)
 
   std::string contextPath = d->m_Request->GetServletContext()->GetContextPath();
   std::string scheme = d->m_Request->GetScheme();
-  std::string redirectUri = (scheme.empty() ? std::string() : scheme) + "://" + d->m_Request->GetServerName();
+  std::string redirectUri = (scheme.empty() ? std::string() : scheme) + "://" +
+                            d->m_Request->GetServerName();
   std::stringstream ss;
   ss << d->m_Request->GetServerPort();
   std::string port = ss.str();
-  if (!port.empty())
-  {
+  if (!port.empty()) {
     redirectUri += std::string(":") + ss.str();
   }
   redirectUri += contextPath;
 
   std::size_t pos = location.find_first_of('/');
 
-  if (redirectUri[redirectUri.size()-1] != '/')
-  {
-    if (!location.empty() && location[0] != '/')
-    {
+  if (redirectUri[redirectUri.size() - 1] != '/') {
+    if (!location.empty() && location[0] != '/') {
       redirectUri += '/';
     }
-  }
-  else if (!location.empty() && location[0] == '/')
-  {
-    redirectUri = redirectUri.substr(0, redirectUri.size()-1);
+  } else if (!location.empty() && location[0] == '/') {
+    redirectUri = redirectUri.substr(0, redirectUri.size() - 1);
   }
 
-  if (pos == 0 || location.empty())
-  {
+  if (pos == 0 || location.empty()) {
     // relative url with leading '/' or an empty location
     redirectUri += location;
-  }
-  else
-  {
-    if (pos == std::string::npos)
-    {
+  } else {
+    if (pos == std::string::npos) {
       // no '/' at all
       redirectUri += location;
-    }
-    else
-    {
+    } else {
       std::size_t pos2 = location.find_first_of(':');
-      if (pos2 != std::string::npos && pos2 == pos - 1)
-      {
+      if (pos2 != std::string::npos && pos2 == pos - 1) {
         // absolute url
         redirectUri = location;
-      }
-      else
-      {
+      } else {
         // something weird
         redirectUri += location;
       }
@@ -436,11 +401,11 @@ void HttpServletResponse::SendRedirect(const std::string& location)
   d->Commit();
 }
 
-std::streambuf*HttpServletResponse::GetOutputStreamBuffer()
+std::streambuf* HttpServletResponse::GetOutputStreamBuffer()
 {
-  if (d->m_HttpOutputStreamBuf == nullptr)
-  {
-    d->m_HttpOutputStreamBuf = new HttpOutputStreamBuffer(d.Data(), this->GetBufferSize());
+  if (d->m_HttpOutputStreamBuf == nullptr) {
+    d->m_HttpOutputStreamBuf =
+      new HttpOutputStreamBuffer(d.Data(), this->GetBufferSize());
   }
   return d->m_HttpOutputStreamBuf;
 }
@@ -453,7 +418,5 @@ void HttpServletResponse::SetOutputStreamBuffer(std::streambuf* sb)
 
 HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
   : d(d)
-{
-}
-
+{}
 }

@@ -28,6 +28,7 @@
 #include "cppmicroservices/LDAPFilter.h"
 
 #include <stdexcept>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -36,11 +37,11 @@ namespace detail {
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
-    const BundleContext& context,
+    BundleContext  context,
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer
     )
-  : context(context), customizer(customizer), listenerToken(), trackReference(reference),
+  : context(std::move(context)), customizer(customizer), listenerToken(), trackReference(reference),
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
@@ -66,11 +67,11 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
-    const BundleContext& context,
+    BundleContext  context,
     const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer
     )
-  : context(context), customizer(customizer), listenerToken(), trackClass(clazz),
+  : context(std::move(context)), customizer(customizer), listenerToken(), trackClass(clazz),
     trackReference(), trackedService(), cachedReference(),
     cachedService(), q_ptr(st)
 {
@@ -113,9 +114,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
 
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::~ServiceTrackerPrivate()
-{
-
-}
+= default;
 
 template<class S, class TTT>
 std::vector<ServiceReference<S> > ServiceTrackerPrivate<S,TTT>::GetInitialReferences(
@@ -155,7 +154,7 @@ template<class S, class TTT>
 void ServiceTrackerPrivate<S,TTT>::Modified()
 {
   cachedReference.Store(ServiceReference<S>()); /* clear cached value */
-  cachedService.Store(std::shared_ptr<TrackedParmType>()); /* clear cached value */
+  cachedService.Store(std::shared_ptr<TrackedParamType>()); /* clear cached value */
   DIAG_LOG(*context.GetLogSink()) << "ServiceTracker::Modified(): " << filter;
 }
 

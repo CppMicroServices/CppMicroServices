@@ -35,7 +35,8 @@ class BundlePrivate;
 
 struct BundleEventInternal
 {
-  BundleEventInternal(BundleEvent::Type t, std::shared_ptr<BundlePrivate> const& b)
+  BundleEventInternal(BundleEvent::Type t,
+                      std::shared_ptr<BundlePrivate> const& b)
     : type(t)
     , bundle(b)
   {}
@@ -48,7 +49,6 @@ inline BundleEvent MakeBundleEvent(const BundleEventInternal& be)
 {
   return BundleEvent(be.type, MakeBundle(be.bundle));
 }
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEEVENTINTERNAL_H

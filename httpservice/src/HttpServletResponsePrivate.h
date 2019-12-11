@@ -25,8 +25,8 @@
 
 #include "cppmicroservices/SharedData.h"
 
-#include <string>
 #include <map>
+#include <string>
 
 class CivetServer;
 struct mg_connection;
@@ -37,7 +37,9 @@ class HttpServletRequest;
 
 struct HttpServletResponsePrivate : public SharedData
 {
-  HttpServletResponsePrivate(HttpServletRequest* request, CivetServer* server, mg_connection* conn);
+  HttpServletResponsePrivate(HttpServletRequest* request,
+                             CivetServer* server,
+                             mg_connection* conn);
   ~HttpServletResponsePrivate();
 
   bool Commit();
@@ -58,7 +60,6 @@ struct HttpServletResponsePrivate : public SharedData
   std::size_t m_BufferSize;
   std::string m_Charset;
 };
-
 }
 
 #endif // CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H

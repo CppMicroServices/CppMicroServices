@@ -29,7 +29,6 @@
 
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
 
-
 namespace cppmicroservices {
 
 /**
@@ -71,7 +70,6 @@ struct US_WebConsole_EXPORT WebConsoleVariableResolver
    */
   virtual std::string Resolve(const std::string& variable) const = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_WEBCONSOLEVARIABLERESOLVER_H

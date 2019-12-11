@@ -27,12 +27,13 @@ limitations under the License.
  * sanitizer (using Clang or GCC) or memcheck.
  */
 
-int MemcheckTest(int /*argc*/, char* /*argv*/[])
+int MemcheckTest(int /*argc*/, char* /*argv*/ [])
 {
-    US_TEST_BEGIN("MemcheckTest");
+  US_TEST_BEGIN("MemcheckTest");
 
-    // this leak is intentional
-    new int;
+  // this leak is intentional
+  auto x = new int(1);
+  std::cout << x;
 
-    US_TEST_END()
+  US_TEST_END()
 }

@@ -28,8 +28,8 @@
 #include <string>
 
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4251)
+#  pragma warning(push)
+#  pragma warning(disable : 4251)
 #endif
 
 namespace cppmicroservices {
@@ -59,21 +59,20 @@ namespace cppmicroservices {
  * <p>
  * <code>BundleVersion</code> objects are immutable.
  */
-class US_Framework_EXPORT BundleVersion {
+class US_Framework_EXPORT BundleVersion
+{
 
 private:
-
   friend class BundlePrivate;
 
-  unsigned int majorVersion;
-  unsigned int minorVersion;
-  unsigned int microVersion;
-  std::string      qualifier;
+  unsigned int majorVersion{0};
+  unsigned int minorVersion{0};
+  unsigned int microVersion{0};
+  std::string qualifier;
 
   static const char SEPARATOR; //  = "."
 
   bool undefined;
-
 
   /**
    * Called by the BundleVersion constructors to validate the version components.
@@ -87,7 +86,6 @@ private:
   explicit BundleVersion(bool undefined = false);
 
 public:
-
   /**
    * The empty version "0.0.0".
    */
@@ -110,7 +108,9 @@ public:
    * @param microVersion Micro component of the version identifier.
    *
    */
-  BundleVersion(unsigned int majorVersion, unsigned int minorVersion, unsigned int microVersion);
+  BundleVersion(unsigned int majorVersion,
+                unsigned int minorVersion,
+                unsigned int microVersion);
 
   /**
    * Creates a version identifier from the specified components.
@@ -120,7 +120,10 @@ public:
    * @param microVersion Micro component of the version identifier.
    * @param qualifier Qualifier component of the version identifier.
    */
-  BundleVersion(unsigned int majorVersion, unsigned int minorVersion, unsigned int microVersion, const std::string& qualifier);
+  BundleVersion(unsigned int majorVersion,
+                unsigned int minorVersion,
+                unsigned int microVersion,
+                std::string  qualifier);
 
   /**
    * Created a version identifier from the specified string.
@@ -150,7 +153,6 @@ public:
    * @param version Another version identifier
    */
   BundleVersion(const BundleVersion& version);
-
 
   /**
    * Parses a version identifier from the specified string.
@@ -254,7 +256,6 @@ public:
    *         <code>BundleVersion</code> object.
    */
   int Compare(const BundleVersion& object) const;
-
 };
 
 /**
@@ -263,12 +264,13 @@ public:
  *
  * Streams the string representation of \c v into the stream \c os, using BundleVersion::ToString.
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, const BundleVersion& v);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             const BundleVersion& v);
 
 } // namespace cppmicroservices
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#  pragma warning(pop)
 #endif
 
 #endif // CPPMICROSERVICES_BUNDLEVERSION_H

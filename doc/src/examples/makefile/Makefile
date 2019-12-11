@@ -1,4 +1,4 @@
-CXX = g++
+CXX = $(US_CXX)
 CXXFLAGS = -g -Wall -Wno-unused -pedantic -fPIC $(US_CXX_FLAGS)
 LDFLAGS = -Wl,-rpath="$(CppMicroServices_ROOT)/lib" -Wl,-rpath=.
 LDLIBS = "${US_CPPMICROSERVICES_TARGET}"

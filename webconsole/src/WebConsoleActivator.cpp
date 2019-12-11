@@ -20,11 +20,13 @@
 
 =============================================================================*/
 
+#include <memory>
+
 #include "cppmicroservices/BundleActivator.h"
 
-#include "SettingsPlugin.h"
-#include "ServicesPlugin.h"
 #include "BundlesPlugin.h"
+#include "ServicesPlugin.h"
+#include "SettingsPlugin.h"
 
 #include "WebConsoleServlet.h"
 #include "cppmicroservices/BundleContext.h"
@@ -34,12 +36,10 @@ namespace cppmicroservices {
 class WebConsoleActivator : public BundleActivator
 {
 public:
-
-  void Start(BundleContext context);
-  void Stop(BundleContext context);
+  void Start(BundleContext context) override;
+  void Stop(BundleContext context) override;
 
 private:
-
   std::shared_ptr<HttpServlet> m_WebConsoleServlet;
 
   std::shared_ptr<SettingsPlugin> m_SettingsPlugin;
@@ -49,10 +49,10 @@ private:
 
 void WebConsoleActivator::Start(BundleContext context)
 {
-  m_SettingsPlugin.reset(new SettingsPlugin);
-  m_ServicesPlugin.reset(new ServicesPlugin);
-  m_BundlesPlugin.reset(new BundlesPlugin);
-  m_WebConsoleServlet.reset(new WebConsoleServlet());
+  m_SettingsPlugin = std::make_shared<SettingsPlugin>();
+  m_ServicesPlugin = std::make_shared<ServicesPlugin>();
+  m_BundlesPlugin = std::make_shared<BundlesPlugin>();
+  m_WebConsoleServlet = std::make_shared<WebConsoleServlet>();
   cppmicroservices::ServiceProperties props;
   props[HttpServlet::PROP_CONTEXT_ROOT] = std::string("/console");
   context.RegisterService<HttpServlet>(m_WebConsoleServlet, props);
@@ -63,16 +63,13 @@ void WebConsoleActivator::Start(BundleContext context)
   m_ServicesPlugin->Register();
   m_BundlesPlugin->Register();
 
-//  server->addHandler("/Console/bundles/", new BundlesHtml(context));
-//  server->addHandler("/Console/resources/", new ResourcesHtml(context));
-//  server->addHandler("/Console/", new ConsoleHtmlHandler(context));
-//  server->addHandler("/", new DefaultHandler(context));
+  //  server->addHandler("/Console/bundles/", new BundlesHtml(context));
+  //  server->addHandler("/Console/resources/", new ResourcesHtml(context));
+  //  server->addHandler("/Console/", new ConsoleHtmlHandler(context));
+  //  server->addHandler("/", new DefaultHandler(context));
 }
 
-void WebConsoleActivator::Stop(BundleContext /*context*/)
-{
-}
-
+void WebConsoleActivator::Stop(BundleContext /*context*/) {}
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::WebConsoleActivator)

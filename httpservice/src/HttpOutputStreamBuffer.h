@@ -35,15 +35,14 @@ struct HttpServletResponsePrivate;
 class HttpOutputStreamBuffer : public std::streambuf
 {
 public:
-  explicit HttpOutputStreamBuffer(HttpServletResponsePrivate* response, std::size_t bufferSize = 1024);
+  explicit HttpOutputStreamBuffer(HttpServletResponsePrivate* response,
+                                  std::size_t bufferSize = 1024);
   ~HttpOutputStreamBuffer();
 
 protected:
-
   bool CommitStream();
 
 private:
-
   int_type overflow(int_type ch);
 
   int sync();
@@ -54,12 +53,10 @@ private:
   HttpOutputStreamBuffer& operator=(const HttpOutputStreamBuffer&);
 
 private:
-
   std::vector<char> m_Buffer;
   HttpServletResponsePrivate* m_Response;
   bool m_ChunkedCoding;
 };
-
 }
 
 #endif // CPPMICROSERVICES_HTTPOUTPUTSTREAMBUFFER_H

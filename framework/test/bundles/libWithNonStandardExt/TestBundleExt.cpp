@@ -28,14 +28,13 @@ namespace cppmicroservices {
 class TestBundleExtActivator : public BundleActivator
 {
 public:
-
   TestBundleExtActivator() {}
   ~TestBundleExtActivator() {}
 
-  void Start(BundleContext) { }
-  void Stop(BundleContext) { }
+  void Start(BundleContext) {}
+  void Stop(BundleContext) {}
 };
-
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleExtActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleExtActivator)

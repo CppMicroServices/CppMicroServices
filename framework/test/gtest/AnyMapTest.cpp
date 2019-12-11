@@ -74,8 +74,7 @@ TEST(AnyMapTest, IteratorTest)
   ASSERT_EQ((*(++ociter1)).second.ToString(), std::string("2"));
   ASSERT_EQ((*(ociter1++)).second.ToString(), std::string("2"));
   int i = 0;
-  for (AnyMap::const_iter oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it)
-  {
+  for (AnyMap::const_iter oc_it = o.cbegin(); oc_it != o.cend(); ++oc_it) {
     ++i;
     ASSERT_EQ(i, any_cast<int>(oc_it->second));
   }
@@ -96,7 +95,7 @@ TEST(AnyMapTest, IteratorTest)
   // Testing operator==
   auto ociter2(o.cbegin());
   ASSERT_EQ(ociter, ociter2);
-    
+
   // Testing iterator copy ctor.
   AnyMap::iter oiter(o.begin());
   AnyMap::iter oiter_copy(o.begin());
@@ -121,7 +120,7 @@ TEST(AnyMapTest, IteratorTest)
   ASSERT_TRUE(any_cast<int>(uoiter->second) > 0);
   ASSERT_TRUE(any_cast<int>(uociiter->second) > 0);
   EXPECT_THROW(US_UNUSED(niter->second), std::logic_error);
-  
+
   // Testing iterator pre-increment operator
   ASSERT_EQ((*(++oiter)).second.ToString(), std::string("2"));
   ASSERT_TRUE(any_cast<int>((*(++uoiter)).second) > 0);
@@ -150,12 +149,17 @@ TEST(AnyMapTest, AnyMap)
   AnyMap uco_anymap(uco);
 
   AnyMap o_anymap1(AnyMap::ORDERED_MAP);
-  o_anymap1 = o_anymap1;
   o_anymap1 = o_anymap_copy;
   AnyMap uo_anymap1(AnyMap::UNORDERED_MAP);
   uo_anymap1 = uo_anymap;
   AnyMap uco_anymap1(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   uco_anymap1 = uco_anymap;
+
+  AnyMap o1(AnyMap::ORDERED_MAP);
+  o1["key"] = 42;
+  AnyMap uo1(AnyMap::UNORDERED_MAP);
+  uo1 = o1;
+  ASSERT_EQ(any_cast<int>(uo1.at("key")), 42);
 
   // Testing AnyMap::empty()
   ASSERT_TRUE(uco_anymap1.empty());
@@ -166,7 +170,7 @@ TEST(AnyMapTest, AnyMap)
   uco_anymap1.clear();
   uco_anymap1["DO"] = 1;
   uco_anymap1["RE"] = 2;
-  
+
   // Testing AnyMap::at()
   ASSERT_EQ(any_cast<int>(uo_anymap1.at("re")), 2);
 
@@ -190,4 +194,62 @@ TEST(AnyMapTest, AnyMap)
   ASSERT_EQ(stream1.str(), "{do : 1, re : 2}");
   any_value_to_json(stream2, o_anymap1);
   ASSERT_EQ(stream2.str(), "{\"do\" : 1, \"re\" : 10}");
+}
+
+TEST(AnyMapTest, MoveConstructor)
+{
+  AnyMap o(AnyMap::ORDERED_MAP);
+  o["do"] = Any(1);
+  o["re"] = Any(2);
+  AnyMap o_anymap_move_ctor(std::move(o));
+  ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
+  ASSERT_DEATH(o.size(), ".*")
+    << "This call should result in a crash because the object has been moved from";
+
+  AnyMap uo(AnyMap::UNORDERED_MAP);
+  AnyMap uo_move(std::move(uo));
+  ASSERT_EQ(uo_move.size(), 0u) << "Size of an empty moved-to AnyMap must be 0";
+
+  AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap uoci_move(std::move(uoci));
+  ASSERT_EQ(uoci_move.size(), 0u) << "Size of an empty moved-to AnyMap must be 0";
+}
+
+TEST(AnyMapTest, MoveAssignment)
+{
+  AnyMap o(AnyMap::ORDERED_MAP);
+  o["do"] = Any(1);
+  o["re"] = Any(2);
+  AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
+  uo_anymap_move_assign = std::move(o);
+  ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
+  ASSERT_DEATH(o.size(), ".*")
+    << "This call should result in a crash because the object has been moved from";
+
+}
+
+TEST(AnyMapTest, CIHash)
+{
+  std::string allUpper = "THIS IS A TEST";
+  std::string allLower = "this is a test";
+
+  any_map::unordered_any_cimap::hasher hash;
+  std::size_t hashUpper = hash(allUpper);
+  std::size_t hashLower = hash(allLower);
+  
+  ASSERT_EQ(hashUpper, hashLower);
+  ASSERT_EQ(true, 0 != hashUpper);
+  ASSERT_EQ(true, 0 != hashLower);
+}
+
+TEST(AnyMapTest, CIHashUnique)
+{
+  std::string v1 = "ABC";
+  std::string v2 = "CAB";
+
+  any_map::unordered_any_cimap::hasher hash;
+  std::size_t hashV1 = hash(v1);
+  std::size_t hashV2 = hash(v2);
+  
+  ASSERT_EQ(true, hashV1 != hashV2);
 }

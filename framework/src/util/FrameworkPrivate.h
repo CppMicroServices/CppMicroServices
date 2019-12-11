@@ -42,7 +42,6 @@ namespace cppmicroservices {
 class FrameworkPrivate : public BundlePrivate
 {
 public:
-
   FrameworkPrivate(CoreBundleContext* fwCtx);
 
   void Init();
@@ -57,13 +56,13 @@ public:
 
   void Shutdown(bool restart);
 
-  virtual void Start(uint32_t);
-  virtual void Stop(uint32_t);
+  void Start(uint32_t) override;
+  void Stop(uint32_t) override;
 
-  virtual void Uninstall();
-  virtual std::string GetLocation() const;
+  void Uninstall() override;
+  std::string GetLocation() const override;
 
-  virtual AnyMap GetHeaders() const;
+  const AnyMap& GetHeaders() const override;
 
   /**
    * Stop this FrameworkContext, suspending all started contexts. This method
@@ -100,7 +99,8 @@ public:
    * The event to return to callers waiting in Framework.waitForStop() when the
    * framework has been stopped.
    */
-  struct FrameworkEventInternal {
+  struct FrameworkEventInternal
+  {
     bool valid;
     FrameworkEvent::Type type;
     std::string msg;
@@ -116,11 +116,9 @@ public:
    * The thread that performs shutdown of this framework instance.
    */
   std::thread shutdownThread;
-
+private:
+  AnyMap headers;
 };
-
-
-
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORKPRIVATE_H

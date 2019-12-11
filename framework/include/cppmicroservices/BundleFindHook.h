@@ -66,12 +66,9 @@ struct US_Framework_EXPORT BundleFindHook
    *        bundles from the list to prevent the bundles from being
    *        returned to the bundle performing the find operation.
    */
-  virtual void Find(
-      const BundleContext& context,
-      ShrinkableVector<Bundle>& bundles
-      ) = 0;
+  virtual void Find(const BundleContext& context,
+                    ShrinkableVector<Bundle>& bundles) = 0;
 };
-
 }
 
 #endif // CPPMICROSERVICES_BUNDLEFINDHOOK_H

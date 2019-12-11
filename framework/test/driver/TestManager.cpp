@@ -55,5 +55,4 @@ void TestManager::TestPassed()
 {
   m_PassedTests++;
 }
-
 }

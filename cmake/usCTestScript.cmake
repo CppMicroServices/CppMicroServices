@@ -70,7 +70,7 @@ function(create_initial_cache var _shared _threading)
   endif()
 
   string(REPLACE " " "-" _fixedGenerator ${_generator})
-  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME} (${_fixedGenerator})" PARENT_SCOPE)
+  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-(${_fixedGenerator})" PARENT_SCOPE)
 
 endfunction()
 

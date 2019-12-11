@@ -50,6 +50,9 @@ matrix:
         addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
         env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
         before_install:
+            # Check gcc and gcov versions
+            - echo $(gcc --version)
+            - echo $(gcov --version)
             # Install a newer version of valgrind
             - ./install_valgrind.sh
             - sudo ln -sf /usr/bin/gcov-8 /usr/bin/gcov

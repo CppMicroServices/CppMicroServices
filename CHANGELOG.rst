@@ -6,25 +6,6 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased v4.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2019-XX-XX)
----------------------------------------------------------------------------------------------------------
-
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.4.0...development>`_
-
-Added
------
-
-Changed
--------
-
-Removed
--------
-
-Deprecated
-----------
-
-Fixed
------
 
 `v3.4.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.4.0>`_ (2019-12-10)
 ---------------------------------------------------------------------------------------------------------

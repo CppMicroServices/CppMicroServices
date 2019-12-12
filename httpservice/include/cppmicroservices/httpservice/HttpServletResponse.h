@@ -26,6 +26,7 @@
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <ctime>
+#include <memory>
 #include <string>
 
 namespace cppmicroservices {

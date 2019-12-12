@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/FrameworkConfig.h"
 
+#include <memory>
 #include <string>
 
 #ifdef _MSC_VER

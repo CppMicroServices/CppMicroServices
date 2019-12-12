@@ -28,6 +28,7 @@
 
 #include "civetweb/civetweb.h"
 
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <ctime>

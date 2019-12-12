@@ -209,7 +209,7 @@ public:
   bool IsLoaded() const;
 
 private:
-  ExplicitlySharedDataPointer<SharedLibraryPrivate> d;
+  std::shared_ptr<SharedLibraryPrivate> d;
 };
 }
 

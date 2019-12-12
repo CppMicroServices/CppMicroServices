@@ -162,8 +162,10 @@ void SharedLibrary::SetName(const std::string& name)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Name = name;
+
+  SharedLibraryPrivate p = *d;
+  p.m_Name = name;
+  d = std::make_shared<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetName() const
@@ -183,8 +185,9 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
   if (IsLoaded())
     return;
 
-  d.Detach();
-  d->m_FilePath = absoluteFilePath;
+  SharedLibraryPrivate p = *d;
+  p.m_FilePath = absoluteFilePath;
+  d = std::make_shared<SharedLibraryPrivate>(p);
 
   std::string name = d->m_FilePath;
   std::size_t pos = d->m_FilePath.find_last_of(util::DIR_SEP);
@@ -217,8 +220,10 @@ void SharedLibrary::SetLibraryPath(const std::string& path)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Path = path;
+
+  SharedLibraryPrivate p = *d;
+  p.m_Path = path;
+  d = std::make_shared<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetLibraryPath() const
@@ -230,8 +235,10 @@ void SharedLibrary::SetSuffix(const std::string& suffix)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Suffix = suffix;
+
+  SharedLibraryPrivate p = *d;
+  p.m_Suffix = suffix;
+  d = std::make_shared<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetSuffix() const
@@ -243,8 +250,10 @@ void SharedLibrary::SetPrefix(const std::string& prefix)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
-  d->m_Prefix = prefix;
+
+  SharedLibraryPrivate p = *d;
+  p.m_Prefix = prefix;
+  d = std::make_shared<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetPrefix() const

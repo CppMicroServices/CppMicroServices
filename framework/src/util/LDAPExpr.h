@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_LDAPEXPR_H
 
 #include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/SharedData.h"
 
 #include "absl/strings/string_view.h"
 

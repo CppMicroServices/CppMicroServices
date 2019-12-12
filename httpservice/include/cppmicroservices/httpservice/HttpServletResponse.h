@@ -23,7 +23,6 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 #define CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <ctime>

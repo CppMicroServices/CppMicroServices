@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_HTTPSERVLETREQUEST_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <string>

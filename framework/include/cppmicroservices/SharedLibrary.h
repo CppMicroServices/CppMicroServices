@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_SHAREDLIBRARY_H
 
 #include "cppmicroservices/FrameworkConfig.h"
-#include "cppmicroservices/SharedData.h"
 
 #include <string>
 

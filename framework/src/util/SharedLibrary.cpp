@@ -47,7 +47,7 @@
 
 namespace cppmicroservices {
 
-class SharedLibraryPrivate : public SharedData
+class SharedLibraryPrivate
 {
 public:
   SharedLibraryPrivate()

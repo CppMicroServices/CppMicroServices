@@ -88,7 +88,7 @@ private:
     }
 
     HttpServletResponse response(
-      new HttpServletResponsePrivate(&request, server, conn));
+      std::make_shared<HttpServletResponsePrivate>(&request, server, conn));
     response.SetStatus(HttpServletResponse::SC_OK);
 
     try {

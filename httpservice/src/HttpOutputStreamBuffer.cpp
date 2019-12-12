@@ -32,7 +32,7 @@
 namespace cppmicroservices {
 
 HttpOutputStreamBuffer::HttpOutputStreamBuffer(
-  HttpServletResponsePrivate* response,
+  std::shared_ptr<HttpServletResponsePrivate> response,
   std::size_t bufferSize)
   : m_Buffer(bufferSize + 1)
   , m_Response(response)

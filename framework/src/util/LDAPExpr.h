@@ -171,7 +171,7 @@ private:
                         int pi);
 
   //! Shared pointer
-  SharedDataPointer<LDAPExprData> d;
+  std::shared_ptr<LDAPExprData> d;
 };
 }
 

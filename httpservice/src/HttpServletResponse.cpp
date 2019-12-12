@@ -405,7 +405,7 @@ std::streambuf* HttpServletResponse::GetOutputStreamBuffer()
 {
   if (d->m_HttpOutputStreamBuf == nullptr) {
     d->m_HttpOutputStreamBuf =
-      new HttpOutputStreamBuffer(d.Data(), this->GetBufferSize());
+      new HttpOutputStreamBuffer(d, this->GetBufferSize());
   }
   return d->m_HttpOutputStreamBuf;
 }
@@ -416,7 +416,7 @@ void HttpServletResponse::SetOutputStreamBuffer(std::streambuf* sb)
   d->m_StreamBuf = sb;
 }
 
-HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
+HttpServletResponse::HttpServletResponse(std::shared_ptr<HttpServletResponsePrivate> d)
   : d(d)
 {}
 }

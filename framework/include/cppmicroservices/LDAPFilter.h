@@ -186,7 +186,7 @@ public:
   LDAPFilter& operator=(const LDAPFilter& filter);
 
 protected:
-  SharedDataPointer<LDAPFilterData> d;
+  std::shared_ptr<LDAPFilterData> d;
 };
 
 /**

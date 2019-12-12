@@ -129,7 +129,7 @@ public:
   void error(const std::string& m) const;
 };
 
-class LDAPExprData : public SharedData
+class LDAPExprData
 {
 public:
   LDAPExprData(int op, std::vector<LDAPExpr>  args)

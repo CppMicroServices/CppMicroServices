@@ -52,12 +52,11 @@ matrix:
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
-            - sudo ln -sf /usr/bin/gcov-8 /usr/bin/gcov
         before_script:
           # Check gcc and gcov versions
-          - sudo ln -sf /usr/bin/gcov-8 /usr/bin/gcov
-          - sudo ln -sf /usr/bin/gcc-8 /usr/bin/gcc
-          - sudo ln -sf /usr/bin/g++-8 /usr/bin/g++
+          #- sudo ln -sf /usr/bin/gcov-8 /usr/bin/gcov
+          #- sudo ln -sf /usr/bin/gcc-8 /usr/bin/gcc
+          #- sudo ln -sf /usr/bin/g++-8 /usr/bin/g++
           - echo $(gcc --version)
           - echo $(gcov --version)
 

@@ -332,7 +332,7 @@ protected:
 
   void SetOutputStreamBuffer(std::streambuf* sb);
 
-  HttpServletResponse(HttpServletResponsePrivate* d);
+  std::shared_ptr<HttpServletResponsePrivate> d;
 
   ExplicitlySharedDataPointer<HttpServletResponsePrivate> d;
 

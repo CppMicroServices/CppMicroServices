@@ -101,7 +101,7 @@ private:
   friend class ServletHandler;
   HttpServletRequest(HttpServletRequestPrivate* d);
 
-  ExplicitlySharedDataPointer<HttpServletRequestPrivate> d;
+  std::shared_ptr<HttpServletRequestPrivate> d;
 };
 }
 

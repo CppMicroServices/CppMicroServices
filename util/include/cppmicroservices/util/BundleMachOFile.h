@@ -20,20 +20,20 @@
 
 =============================================================================*/
 
-#if defined(US_PLATFORM_APPLE)
+#if defined (US_PLATFORM_APPLE)
 
-#  include "BundleObjFile.h"
-#  include "DataContainer.h"
-#  include "MappedFile.h"
+#include "BundleObjFile.h"
+#include "DataContainer.h"
+#include "MappedFile.h"
 
-#  include "cppmicroservices_mach-o.h"
+#include "cppmicroservices_mach-o.h"
 
-#  include <cerrno>
-#  include <cstring>
-#  include <fstream>
-#  include <memory>
+#include <cerrno>
+#include <cstring>
+#include <fstream>
+#include <memory>
 
-#  include <sys/stat.h>
+#include <sys/stat.h>
 
 namespace cppmicroservices {
 
@@ -51,7 +51,7 @@ template<>
 struct MachO<MH_MAGIC>
 {
   typedef mach_header Mhdr;
-  typedef struct nlist symtab_entry;
+  typedef nlist symtab_entry;
 };
 
 template<>
@@ -64,16 +64,16 @@ struct MachO<MH_MAGIC_64>
 template<typename I>
 I readBE(I i)
 {
-#  ifdef US_LITTLE_ENDIAN
+#ifdef US_LITTLE_ENDIAN
   I r = 0;
   for (unsigned int n = 0; n < sizeof(I); ++n) {
     r |= static_cast<I>(*(reinterpret_cast<unsigned char*>(&i) + n))
          << ((sizeof(I) - 1 - n) * 8);
   }
   return r;
-#  else
+#else
   return i;
-#  endif
+#endif
 }
 
 template<class MachOType>
@@ -85,9 +85,7 @@ public:
   typedef typename MachOType::Mhdr Mhdr;
   typedef typename MachOType::symtab_entry symtab_entry;
 
-  BundleMachOFile(std::ifstream& fs,
-                  std::size_t fileOffset,
-                  const std::string& location)
+  BundleMachOFile(std::ifstream& fs, std::size_t fileOffset, const std::string& location)
     : m_rawData()
   {
     fs.seekg(fileOffset);
@@ -97,22 +95,20 @@ public:
       throw InvalidMachOException(
         "Not a Mach-O dynamic shared library or bundle file.");
     }
-
+      
     fs.seekg(fileOffset + sizeof(mach_header_64));
 
     // iterate over all load commands
     uint32_t ncmds = mhdr.ncmds;
     uint32_t lcmd_offset = static_cast<uint32_t>(fs.tellg());
-
+    
     for (uint32_t i = 0; i < ncmds; ++i) {
       load_command lcmd;
       fs.read(reinterpret_cast<char*>(&lcmd), sizeof lcmd);
       if (!m_rawData && LC_SEGMENT_64 == lcmd.cmd) {
-        m_rawData = GetRawBundleResources<segment_command_64, section_64>(
-          fs, location, fileOffset, lcmd_offset);
+        m_rawData = GetRawBundleResources<segment_command_64, section_64>(fs, location, fileOffset, lcmd_offset);
       } else if (!m_rawData && LC_SEGMENT == lcmd.cmd) {
-        m_rawData = GetRawBundleResources<segment_command, section>(
-          fs, location, fileOffset, lcmd_offset);
+        m_rawData = GetRawBundleResources<segment_command, section>(fs, location, fileOffset, lcmd_offset);
       }
 
       lcmd_offset += lcmd.cmdsize;
@@ -121,56 +117,43 @@ public:
   }
 
   template<typename SegmentCommand, typename Section>
-  std::shared_ptr<RawBundleResources> GetRawBundleResources(
-    std::ifstream& fs,
-    const std::string& filePath,
-    std::size_t fileOffset,
-    uint32_t lcmd_offset)
+  std::shared_ptr<RawBundleResources> GetRawBundleResources(std::ifstream& fs, const std::string& filePath, std::size_t fileOffset, uint32_t lcmd_offset)
   {
     fs.seekg(fileOffset + lcmd_offset);
     SegmentCommand segment;
     fs.read(reinterpret_cast<char*>(&segment), sizeof(SegmentCommand));
-    if (0 == strcmp("__TEXT", segment.segname)) {
-      // find "us_resources" section
-      for (uint32_t i = 0; i < segment.nsects; ++i) {
-        Section section;
-        fs.read(reinterpret_cast<char*>(&section), sizeof(Section));
-        if (0 == strcmp("us_resources", section.sectname) && 0 < section.size) {
-          // try to be smart about when to use mmap. Benchmark tests show
-          // that mmap is slower than std::ifstream::read until the file size is around 10mb.
-          constexpr std::size_t zipFileSizeThreshold{ 10485760 };
-          if (section.size >= zipFileSizeThreshold) {
-            off_t pa_offset =
-              (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
-            size_t mappedLength =
-              section.size + (fileOffset + section.offset) - pa_offset;
-            return std::make_shared<RawBundleResources>(
-              std::make_unique<MappedFile>(filePath, mappedLength, pa_offset));
-          } else {
-            void* zipData = malloc(section.size * sizeof(char));
-            if (zipData) {
-              std::unique_ptr<void, void (*)(void*)> scopedData(zipData,
-                                                                ::free);
-              fs.seekg(fileOffset + section.offset);
-              fs.read(reinterpret_cast<char*>(zipData), section.size);
-              return std::make_shared<RawBundleResources>(
-                std::make_unique<RawDataContainer>(std::move(scopedData),
-                                                   section.size));
-            }
-          }
-        }
-        fs.seekg(lcmd_offset + sizeof(SegmentCommand) +
-                 ((i + 1) * sizeof(Section)));
-      }
+    if(0 == strcmp("__TEXT", segment.segname)) {
+       // find "us_resources" section
+       for (uint32_t i = 0; i < segment.nsects; ++i) {
+         Section section;
+         fs.read(reinterpret_cast<char*>(&section), sizeof(Section));
+         if (0 == strcmp("us_resources", section.sectname) &&
+             0 < section.size) {
+           // try to be smart about when to use mmap. Benchmark tests show
+           // that mmap is slower than std::ifstream::read until the file size is around 10mb.
+           constexpr std::size_t zipFileSizeThreshold{10485760};
+           if(section.size >= zipFileSizeThreshold) {
+             off_t pa_offset = (fileOffset + section.offset) & ~(sysconf(_SC_PAGESIZE) - 1);
+             size_t mappedLength = section.size + (fileOffset + section.offset) - pa_offset;
+             return std::make_shared<RawBundleResources>(std::make_unique<MappedFile>(filePath, mappedLength, pa_offset));
+           } else {
+             void* zipData = malloc(section.size * sizeof(char));
+             if (zipData) {
+               std::unique_ptr<void, void(*)(void*)> scopedData(zipData, ::free);
+               fs.seekg(fileOffset + section.offset);
+               fs.read(reinterpret_cast<char*>(zipData), section.size);
+               return std::make_shared<RawBundleResources>( std::make_unique<RawDataContainer>(std::move(scopedData), section.size) );
+             }
+           }
+           
+         }
+         fs.seekg(lcmd_offset + sizeof(SegmentCommand) + ((i+1)*sizeof(Section)));
+       }
     }
     return {};
   }
 
-  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer()
-    const override
-  {
-    return m_rawData;
-  }
+  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override { return m_rawData; }
 
 private:
   std::shared_ptr<RawBundleResources> m_rawData;
@@ -189,8 +172,7 @@ static std::vector<std::vector<uint32_t>> GetMachOIdents(std::ifstream& is)
     is.seekg(0);
     fat_header fatHdr;
     is.read(reinterpret_cast<char*>(&fatHdr), sizeof fatHdr);
-    std::unique_ptr<fat_arch[]> fatArchs(
-      new fat_arch[readBE(fatHdr.nfat_arch)]);
+    std::unique_ptr<fat_arch[]> fatArchs(new fat_arch[readBE(fatHdr.nfat_arch)]);
     is.read(reinterpret_cast<char*>(fatArchs.get()),
             sizeof(fatArchs) * readBE(fatHdr.nfat_arch));
     const fat_arch* currArch = fatArchs.get();
@@ -222,31 +204,30 @@ static std::vector<uint32_t> GetMachOIdent()
   // magic (32 or 64 bit) | cputype | offset
   std::vector<uint32_t> ident(3, 0);
 
-#  ifdef __LP64__
+#ifdef __LP64__
   ident[0] = MH_MAGIC_64;
-#  else
+#else
   ident[0] = MH_MAGIC;
-#  endif
+#endif
 
-#  if defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__)
+#if defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__)
   ident[1] = CPU_TYPE_POWERPC64;
-#  elif defined(__powerpc__) || defined(__ppc__) || defined(__PPC__)
+#elif defined(__powerpc__) || defined(__ppc__) || defined(__PPC__)
   ident[1] = CPU_TYPE_POWERPC;
-#  elif defined(__sparc)
+#elif defined(__sparc)
   ident[1] = CPU_TYPE_SPARC;
-#  elif defined(__x86_64__) || defined(_M_X64)
+#elif defined(__x86_64__) || defined(_M_X64)
   ident[1] = CPU_TYPE_X86_64;
-#  elif defined(__i386) || defined(_M_IX86)
+#elif defined(__i386) || defined(_M_IX86)
   ident[1] = CPU_TYPE_X86;
-#  elif defined(__arm__) || defined(_M_ARM)
+#elif defined(__arm__) || defined(_M_ARM)
   ident[1] = CPU_TYPE_ARM;
-#  endif
+#endif
 
   return ident;
 }
 
-std::unique_ptr<BundleObjFile> CreateBundleMachOFile(
-  const std::string& fileName)
+std::unique_ptr<BundleObjFile> CreateBundleMachOFile(const std::string& fileName)
 {
   struct stat machStat;
   errno = 0;
@@ -282,14 +263,12 @@ std::unique_ptr<BundleObjFile> CreateBundleMachOFile(
   }
 
   if (matchingIdent[0] == MH_MAGIC) {
-    return std::make_unique<BundleMachOFile<MachO<MH_MAGIC>>>(
-      machFile, matchingIdent[2], fileName);
+    return std::make_unique<BundleMachOFile<MachO<MH_MAGIC>>>(machFile, matchingIdent[2], fileName);
   } else if (matchingIdent[0] == MH_MAGIC_64) {
-    return std::make_unique<BundleMachOFile<MachO<MH_MAGIC_64>>>(
-      machFile, matchingIdent[2], fileName);
+    return std::make_unique<BundleMachOFile<MachO<MH_MAGIC_64>>>(machFile, matchingIdent[2], fileName);
   } else {
-    throw InvalidMachOException("Internal error: Mach-O magic field value is "
-                                "neither MH_MAGIC nor MH_MAGIC_64");
+    throw InvalidMachOException(
+      "Internal error: Mach-O magic field value is neither MH_MAGIC nor MH_MAGIC_64");
   }
 }
 }

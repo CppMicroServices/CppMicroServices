@@ -28,7 +28,6 @@ include_directories(
 #-----------------------------------------------------------------------------
 
 set(_tests
-  AnyTest
   AnyMapTest
   BundleRegistryConcurrencyTest
   FrameworkEventTest

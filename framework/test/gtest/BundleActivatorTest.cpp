@@ -27,39 +27,67 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
+#include "TestUtilBundleListener.h"
 #include "TestUtils.h"
-#include "TestingConfig.h"
-#include "TestingMacros.h"
+
+#include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
-// bundle.activator property not specified in the manifest and bundle has no activator class
-void TestNoPropertyNoClass(BundleContext& context)
+class BundleActivatorTest : public ::testing::Test
 {
-  auto bundle = testing::InstallLib(context, "TestBundleR");
-  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleR");
-  US_TEST_NO_EXCEPTION(bundle.Start());
+protected:
+  static void SetUpTestSuite()
+  {
+    f = std::make_shared<cppmicroservices::Framework>(
+      FrameworkFactory().NewFramework());
+    f->Start();
+
+    EXPECT_NO_THROW(ctx = std::make_shared<cppmicroservices::BundleContext>(
+                      f->GetBundleContext()));
+  }
+
+  static void TearDownTestSuite()
+  {
+    f->Stop();
+    f->WaitForStop(std::chrono::milliseconds::zero());
+    f = nullptr;
+    ctx = nullptr;
+  }
+
+  static std::shared_ptr<cppmicroservices::Framework> f;
+  static std::shared_ptr<cppmicroservices::BundleContext> ctx;
+};
+
+std::shared_ptr<cppmicroservices::Framework> BundleActivatorTest::f;
+std::shared_ptr<cppmicroservices::BundleContext> BundleActivatorTest::ctx;
+
+// bundle.activator property not specified in the manifest and bundle has no activator class
+TEST_F(BundleActivatorTest, NoPropertyNoClass)
+{
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleR");
+  EXPECT_TRUE(bundle);
+  EXPECT_NO_THROW(bundle.Start());
 }
 
 // bundle.activator property not specified in the manifest and bundle has an activator class
-void TestNoPropertyWithClass(BundleContext& context)
+TEST_F(BundleActivatorTest, NoPropertyWithClass)
 {
-  auto bundle = testing::InstallLib(context, "TestBundleBA_X1");
-  US_TEST_CONDITION_REQUIRED(bundle,
-                             "Test for existing bundle TestBundleBA_X1");
-  US_TEST_NO_EXCEPTION(bundle.Start());
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleBA_X1");
+  EXPECT_TRUE(bundle);
+  EXPECT_NO_THROW(bundle.Start());
   // verify bundle activator was not called => service not registered
   ServiceReferenceU ref = bundle.GetBundleContext().GetServiceReference(
     "cppmicroservices::TestBundleBA_X1Service");
-  US_TEST_CONDITION(!ref, "Invalid reference");
+  EXPECT_FALSE(ref);
 }
 
 // bundle.activator property set with wrong type in the manifest and bundle has an activator class
-void TestWrongPropertyTypeWithClass(BundleContext& context)
+TEST_F(BundleActivatorTest, WrongPropertyTypeWithClass)
 {
-  auto bundle = testing::InstallLib(context, "TestBundleBA_S1");
-  US_TEST_CONDITION_REQUIRED(bundle,
-                             "Test for existing bundle TestBundleBA_S1");
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleBA_S1");
+  EXPECT_TRUE(bundle);
+
   // Add a framework listener and verify the FrameworkEvent
   bool receivedExpectedEvent = false;
   const FrameworkListener fl = [&](const FrameworkEvent& evt) {
@@ -73,78 +101,52 @@ void TestWrongPropertyTypeWithClass(BundleContext& context)
       }
     }
   };
-  context.AddFrameworkListener(fl);
-  US_TEST_NO_EXCEPTION(bundle.Start());
-  US_TEST_CONDITION(receivedExpectedEvent == true, "Test for FrameworkEvent");
-  context.RemoveFrameworkListener(fl);
+  ctx->AddFrameworkListener(fl);
+  EXPECT_NO_THROW(bundle.Start());
+  EXPECT_TRUE(receivedExpectedEvent);
+  ctx->RemoveFrameworkListener(fl);
   // verify bundle activator was not called => service not registered
   ServiceReferenceU ref = bundle.GetBundleContext().GetServiceReference(
     "cppmicroservices::TestBundleBA_S1Service");
-  US_TEST_CONDITION(!ref, "Invalid reference");
+  EXPECT_FALSE(ref);
 }
 
 // bundle.activator property set to false in the manifest and bundle has no activator class
-void TestPropertyFalseWithoutClass(BundleContext& context)
+TEST_F(BundleActivatorTest, PropertyFalseWithoutClass)
 {
-  auto bundle = testing::InstallLib(context, "TestBundleBA_00");
-  US_TEST_CONDITION_REQUIRED(bundle,
-                             "Test for existing bundle TestBundleBA_00");
-  US_TEST_NO_EXCEPTION(bundle.Start());
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleBA_00");
+  EXPECT_TRUE(bundle);
+  EXPECT_NO_THROW(bundle.Start());
 }
 
 // bundle.activator property set to false in the manifest and bundle has an activator class
-void TestPropertyFalseWithClass(BundleContext& context)
+TEST_F(BundleActivatorTest, PropertyFalseWithClass)
 {
-  auto bundle = testing::InstallLib(context, "TestBundleBA_01");
-  US_TEST_CONDITION_REQUIRED(bundle,
-                             "Test for existing bundle TestBundleBA_01");
-  US_TEST_NO_EXCEPTION(bundle.Start());
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleBA_01");
+  EXPECT_TRUE(bundle);
+  EXPECT_NO_THROW(bundle.Start());
   // verify bundle activator was not called => service not registered
   ServiceReferenceU ref = bundle.GetBundleContext().GetServiceReference(
     "cppmicroservices::TestBundleBA_01Service");
-  US_TEST_CONDITION(!ref, "Invalid reference");
+  EXPECT_FALSE(ref);
 }
 
 // bundle.activator property set to true in the manifest and bundle has no activator class
-void TestPropertyTrueWithoutClass(BundleContext& context)
+TEST_F(BundleActivatorTest, PropertyTrueWithoutClass)
 {
-  auto bundle = testing::InstallLib(context, "TestBundleBA_10");
-  US_TEST_CONDITION_REQUIRED(bundle,
-                             "Test for existing bundle TestBundleBA_10");
-  US_TEST_FOR_EXCEPTION(std::runtime_error, bundle.Start());
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleBA_10");
+  EXPECT_TRUE(bundle);
+  EXPECT_THROW(bundle.Start(), std::runtime_error);
 }
 
 // bundle.activator property set to true in the manifest and bundle has an activator class
-void TestPropertyTrueWithClass(BundleContext& context)
+TEST_F(BundleActivatorTest, PropertyTrueWithClass)
 {
-  auto bundle = testing::InstallLib(context, "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundle, "Test for existing bundle TestBundleA");
-  US_TEST_NO_EXCEPTION(bundle.Start());
+  auto bundle = cppmicroservices::testing::InstallLib(*ctx, "TestBundleA");
+  EXPECT_TRUE(bundle);
+  EXPECT_NO_THROW(bundle.Start());
   // verify bundle activator was called => service is registered
   ServiceReferenceU ref = bundle.GetBundleContext().GetServiceReference(
     "cppmicroservices::TestBundleAService");
-  US_TEST_CONDITION(ref, "Valid reference");
-}
-
-int BundleActivatorTest(int /*argc*/, char* /*argv*/ [])
-{
-  US_TEST_BEGIN("BundleActivatorTest");
-
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
-  auto bc = framework.GetBundleContext();
-
-  // Test points to validate Bundle behavior based on bundle.activator property
-  TestNoPropertyNoClass(bc);
-  TestNoPropertyWithClass(bc);
-  TestWrongPropertyTypeWithClass(bc);
-  TestPropertyFalseWithoutClass(bc);
-  TestPropertyFalseWithClass(bc);
-  TestPropertyTrueWithoutClass(bc);
-  TestPropertyTrueWithClass(bc);
-
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
-
-  US_TEST_END()
+  EXPECT_TRUE(ref);
 }

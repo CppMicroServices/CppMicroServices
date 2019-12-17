@@ -51,12 +51,11 @@ class SharedLibraryPrivate
 {
 public:
   SharedLibraryPrivate()
-    : 
-     m_Suffix(US_LIB_EXT)
+    : m_Suffix(US_LIB_EXT)
     , m_Prefix(US_LIB_PREFIX)
   {}
 
-  void* m_Handle{nullptr};
+  std::shared_ptr<void *> m_Handle{ nullptr };
 
   std::string m_Name;
   std::string m_Path;
@@ -69,7 +68,14 @@ SharedLibrary::SharedLibrary()
   : d(new SharedLibraryPrivate)
 {}
 
-SharedLibrary::SharedLibrary(const SharedLibrary&) = default;
+SharedLibrary::SharedLibrary(const SharedLibrary& other) : d(new SharedLibraryPrivate) {
+  d->m_Handle = other.d->m_Handle;
+  d->m_Name = other.d->m_Name;
+  d->m_Path = other.d->m_Path;
+  d->m_FilePath = other.d->m_FilePath;
+  d->m_Suffix = other.d->m_Suffix;
+  d->m_Prefix = other.d->m_Prefix;
+}
 
 SharedLibrary::SharedLibrary(const std::string& libPath,
                              const std::string& name)
@@ -88,35 +94,51 @@ SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
 
 SharedLibrary::~SharedLibrary() = default;
 
-SharedLibrary& SharedLibrary::operator=(const SharedLibrary&) = default;
+SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other)
+{
+  SharedLibraryPrivate* slp = new SharedLibraryPrivate;
+  slp->m_Handle = other.d->m_Handle;
+  slp->m_Name = other.d->m_Name;
+  slp->m_Path = other.d->m_Path;
+  slp->m_FilePath = other.d->m_FilePath;
+  slp->m_Suffix = other.d->m_Suffix;
+  slp->m_Prefix = other.d->m_Prefix;
+
+  d.reset(std::move(slp));
+
+  return *this;
+}
 
 void SharedLibrary::Load(int flags)
 {
-  if (d->m_Handle)
+  if (d->m_Handle && *(d->m_Handle))
     throw std::logic_error(std::string("Library already loaded: ") +
                            GetFilePath());
   std::string libPath = GetFilePath();
 #ifdef US_PLATFORM_POSIX
-  d->m_Handle = dlopen(libPath.c_str(), flags);
-  if (!d->m_Handle) {
+  d->m_Handle = std::make_shared<void *>(dlopen(libPath.c_str(), flags));
+  if (!*(d->m_Handle)) {
     std::string err_msg = "Error loading " + libPath + ".";
     const char* err = dlerror();
     if (err) {
       err_msg += " " + std::string(err);
     }
 
+    *(d->m_Handle) = nullptr;
     throw std::runtime_error(err_msg);
   }
 #else
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
-  d->m_Handle = LoadLibraryW(wpath.c_str());
-  if (!d->m_Handle) {
+  d->m_Handle = std::make_shared<void *>(LoadLibraryW(wpath.c_str()));
+
+  if (!*(d->m_Handle)) {
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
+    *(d->m_Handle) = nullptr;
     throw std::runtime_error(errMsg);
   }
 #endif
@@ -134,27 +156,32 @@ void SharedLibrary::Load()
 void SharedLibrary::Unload()
 {
   if (d->m_Handle) {
+    if (*(d->m_Handle)) {
 #ifdef US_PLATFORM_POSIX
-    if (dlclose(d->m_Handle)) {
-      std::string err_msg = "Error unloading " + GetLibraryPath() + ".";
-      const char* err = dlerror();
-      if (err) {
-        err_msg += " " + std::string(err);
+      if (dlclose(*(d->m_Handle))) {
+        std::string err_msg = "Error unloading " + GetLibraryPath() + ".";
+        const char* err = dlerror();
+        if (err) {
+          err_msg += " " + std::string(err);
+        }
+
+        *(d->m_Handle) = nullptr;
+        throw std::runtime_error(err_msg);
       }
-
-      throw std::runtime_error(err_msg);
-    }
 #else
-    if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle))) {
-      std::string errMsg = "Unloading ";
-      errMsg.append(GetLibraryPath())
-        .append("failed with error: ")
-        .append(util::GetLastWin32ErrorStr());
+      if (!FreeLibrary(reinterpret_cast<HMODULE>(*(d->m_Handle)))) {
+        std::string errMsg = "Unloading ";
+        errMsg.append(GetLibraryPath())
+          .append("failed with error: ")
+          .append(util::GetLastWin32ErrorStr());
 
-      throw std::runtime_error(errMsg);
-    }
+        *(d->m_Handle) = nullptr;
+        throw std::runtime_error(errMsg);
+      }
 #endif
-    d->m_Handle = nullptr;
+    }
+
+    *(d->m_Handle) = nullptr;
   }
 }
 
@@ -165,7 +192,7 @@ void SharedLibrary::SetName(const std::string& name)
 
   SharedLibraryPrivate p = *d;
   p.m_Name = name;
-  d = std::make_shared<SharedLibraryPrivate>(p);
+  d = std::make_unique<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetName() const
@@ -187,7 +214,7 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
 
   SharedLibraryPrivate p = *d;
   p.m_FilePath = absoluteFilePath;
-  d = std::make_shared<SharedLibraryPrivate>(p);
+  d = std::make_unique<SharedLibraryPrivate>(p);
 
   std::string name = d->m_FilePath;
   std::size_t pos = d->m_FilePath.find_last_of(util::DIR_SEP);
@@ -223,7 +250,7 @@ void SharedLibrary::SetLibraryPath(const std::string& path)
 
   SharedLibraryPrivate p = *d;
   p.m_Path = path;
-  d = std::make_shared<SharedLibraryPrivate>(p);
+  d = std::make_unique<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetLibraryPath() const
@@ -238,7 +265,7 @@ void SharedLibrary::SetSuffix(const std::string& suffix)
 
   SharedLibraryPrivate p = *d;
   p.m_Suffix = suffix;
-  d = std::make_shared<SharedLibraryPrivate>(p);
+  d = std::make_unique<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetSuffix() const
@@ -253,7 +280,7 @@ void SharedLibrary::SetPrefix(const std::string& prefix)
 
   SharedLibraryPrivate p = *d;
   p.m_Prefix = prefix;
-  d = std::make_shared<SharedLibraryPrivate>(p);
+  d = std::make_unique<SharedLibraryPrivate>(p);
 }
 
 std::string SharedLibrary::GetPrefix() const
@@ -263,11 +290,14 @@ std::string SharedLibrary::GetPrefix() const
 
 void* SharedLibrary::GetHandle() const
 {
-  return d->m_Handle;
+  if (d->m_Handle) {
+    return *(d->m_Handle);
+  }
+  return nullptr;
 }
 
 bool SharedLibrary::IsLoaded() const
 {
-  return d->m_Handle != nullptr;
+  return d->m_Handle && *(d->m_Handle) != nullptr;
 }
 }

@@ -209,7 +209,7 @@ public:
   bool IsLoaded() const;
 
 private:
-  std::shared_ptr<SharedLibraryPrivate> d;
+  std::unique_ptr<SharedLibraryPrivate> d;
 };
 }
 

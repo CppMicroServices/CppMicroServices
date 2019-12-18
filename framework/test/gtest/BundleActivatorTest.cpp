@@ -37,7 +37,7 @@ using namespace cppmicroservices;
 class BundleActivatorTest : public ::testing::Test
 {
 protected:
-  static void SetUpTestSuite()
+  void SetUp() override
   {
     f = std::make_shared<cppmicroservices::Framework>(
       FrameworkFactory().NewFramework());
@@ -47,20 +47,15 @@ protected:
                       f->GetBundleContext()));
   }
 
-  static void TearDownTestSuite()
+  void TearDown() override
   {
     f->Stop();
     f->WaitForStop(std::chrono::milliseconds::zero());
-    f = nullptr;
-    ctx = nullptr;
   }
 
-  static std::shared_ptr<cppmicroservices::Framework> f;
-  static std::shared_ptr<cppmicroservices::BundleContext> ctx;
+  std::shared_ptr<cppmicroservices::Framework> f;
+  std::shared_ptr<cppmicroservices::BundleContext> ctx;
 };
-
-std::shared_ptr<cppmicroservices::Framework> BundleActivatorTest::f;
-std::shared_ptr<cppmicroservices::BundleContext> BundleActivatorTest::ctx;
 
 // bundle.activator property not specified in the manifest and bundle has no activator class
 TEST_F(BundleActivatorTest, NoPropertyNoClass)

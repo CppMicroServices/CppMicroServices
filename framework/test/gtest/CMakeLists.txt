@@ -13,7 +13,8 @@ include_directories(
 #-----------------------------------------------------------------------------
 # Add test source files
 #-----------------------------------------------------------------------------
-set(_gtest_tests 
+set(_gtest_tests
+  AnyTest.cpp
   AnyMapTest.cpp
   BundleManifestTest.cpp
   BundleVersionTest.cpp

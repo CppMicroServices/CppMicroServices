@@ -69,7 +69,7 @@ SharedLibrary::SharedLibrary()
 {}
 
 SharedLibrary::SharedLibrary(const SharedLibrary& other) 
-  : d(std::make_unique<SharedLibraryPrivate>(SharedLibraryPrivate(*other.d))) {
+  : d(std::make_unique<SharedLibraryPrivate>(*other.d)) {
 
 }
 

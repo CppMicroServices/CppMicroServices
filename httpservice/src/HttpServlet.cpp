@@ -36,7 +36,7 @@ namespace cppmicroservices {
 class NoBodyOutputStreamBuffer : public HttpOutputStreamBuffer
 {
 public:
-  explicit NoBodyOutputStreamBuffer(std::shared_ptr<HttpServletResponsePrivate> response)
+  explicit NoBodyOutputStreamBuffer(HttpServletResponsePrivate* response)
     : HttpOutputStreamBuffer(response)
     , m_ContentLength(0)
   {}
@@ -75,7 +75,7 @@ private:
 class NoBodyResponse : public HttpServletResponse
 {
 public:
-  NoBodyResponse(std::shared_ptr<HttpServletResponsePrivate> d)
+  NoBodyResponse(HttpServletResponsePrivate* d)
     : HttpServletResponse(d)
     , m_NoBodyBuffer(new NoBodyOutputStreamBuffer(d))
   //, m_DidSetContentLength(false)

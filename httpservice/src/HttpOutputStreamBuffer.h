@@ -36,7 +36,7 @@ struct HttpServletResponsePrivate;
 class HttpOutputStreamBuffer : public std::streambuf
 {
 public:
-  explicit HttpOutputStreamBuffer(std::shared_ptr<HttpServletResponsePrivate> response,
+  explicit HttpOutputStreamBuffer(HttpServletResponsePrivate* response,
                                   std::size_t bufferSize = 1024);
   ~HttpOutputStreamBuffer();
 
@@ -55,7 +55,7 @@ private:
 
 private:
   std::vector<char> m_Buffer;
-  std::shared_ptr<HttpServletResponsePrivate> m_Response;
+  HttpServletResponsePrivate* m_Response;
   bool m_ChunkedCoding;
 };
 }

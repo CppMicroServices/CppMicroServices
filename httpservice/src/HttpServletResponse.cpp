@@ -417,7 +417,7 @@ void HttpServletResponse::SetOutputStreamBuffer(std::streambuf* sb)
   d->m_StreamBuf = sb;
 }
 
-HttpServletResponse::HttpServletResponse(std::shared_ptr<HttpServletResponsePrivate> d)
+HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
   : d(d)
 {}
 }

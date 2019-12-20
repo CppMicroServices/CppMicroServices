@@ -328,12 +328,12 @@ public:
   void SendRedirect(const std::string& location);
 
 protected:
-  HttpServletResponse(std::shared_ptr<HttpServletResponsePrivate> d);
+  HttpServletResponse(HttpServletResponsePrivate* d);
   virtual std::streambuf* GetOutputStreamBuffer();
 
   void SetOutputStreamBuffer(std::streambuf* sb);
 
-  std::shared_ptr<HttpServletResponsePrivate> d;
+  HttpServletResponsePrivate* d;
 
 private:
   friend class HttpServlet;

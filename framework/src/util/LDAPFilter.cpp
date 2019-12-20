@@ -57,7 +57,7 @@ LDAPFilter::LDAPFilter(const std::string& filter)
   : d(nullptr)
 {
   try {
-    d = std::make_shared<LDAPFilterData>(LDAPFilterData(filter));
+    d = std::make_shared<LDAPFilterData>(filter);
   } catch (const std::exception& e) {
     throw std::invalid_argument(e.what());
   }

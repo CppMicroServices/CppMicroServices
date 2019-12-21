@@ -55,7 +55,7 @@ public:
     , m_Prefix(US_LIB_PREFIX)
   {}
 
-  std::shared_ptr<void *> m_Handle{ nullptr };
+  void * m_Handle{ nullptr };
 
   std::string m_Name;
   std::string m_Path;
@@ -69,9 +69,7 @@ SharedLibrary::SharedLibrary()
 {}
 
 SharedLibrary::SharedLibrary(const SharedLibrary& other) 
-  : d(std::make_unique<SharedLibraryPrivate>(*other.d)) {
-
-}
+  : d(other.d) {}
 
 SharedLibrary::SharedLibrary(const std::string& libPath,
                              const std::string& name)
@@ -92,41 +90,41 @@ SharedLibrary::~SharedLibrary() = default;
 
 SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other)
 {
-  d.reset(new SharedLibraryPrivate(*other.d));
+  d = other.d;
 
   return *this;
 }
 
 void SharedLibrary::Load(int flags)
 {
-  if (d->m_Handle && *(d->m_Handle))
+  if (d->m_Handle)
     throw std::logic_error(std::string("Library already loaded: ") +
                            GetFilePath());
   std::string libPath = GetFilePath();
 #ifdef US_PLATFORM_POSIX
-  d->m_Handle = std::make_shared<void *>(dlopen(libPath.c_str(), flags));
-  if (!*(d->m_Handle)) {
+  d->m_Handle = dlopen(libPath.c_str(), flags);
+  if (!d->m_Handle) {
     std::string err_msg = "Error loading " + libPath + ".";
     const char* err = dlerror();
     if (err) {
       err_msg += " " + std::string(err);
     }
 
-    *(d->m_Handle) = nullptr;
+    d->m_Handle = nullptr;
     throw std::runtime_error(err_msg);
   }
 #else
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
-  d->m_Handle = std::make_shared<void *>(LoadLibraryW(wpath.c_str()));
+  d->m_Handle = LoadLibraryW(wpath.c_str());
 
-  if (!*(d->m_Handle)) {
+  if (!d->m_Handle) {
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
-    *(d->m_Handle) = nullptr;
+    d->m_Handle = nullptr;
     throw std::runtime_error(errMsg);
   }
 #endif
@@ -144,32 +142,30 @@ void SharedLibrary::Load()
 void SharedLibrary::Unload()
 {
   if (d->m_Handle) {
-    if (*(d->m_Handle)) {
 #ifdef US_PLATFORM_POSIX
-      if (dlclose(*(d->m_Handle))) {
-        std::string err_msg = "Error unloading " + GetLibraryPath() + ".";
-        const char* err = dlerror();
-        if (err) {
-          err_msg += " " + std::string(err);
-        }
-
-        *(d->m_Handle) = nullptr;
-        throw std::runtime_error(err_msg);
+    if (dlclose(d->m_Handle)) {
+      std::string err_msg = "Error unloading " + GetLibraryPath() + ".";
+      const char* err = dlerror();
+      if (err) {
+        err_msg += " " + std::string(err);
       }
-#else
-      if (!FreeLibrary(reinterpret_cast<HMODULE>(*(d->m_Handle)))) {
-        std::string errMsg = "Unloading ";
-        errMsg.append(GetLibraryPath())
-          .append("failed with error: ")
-          .append(util::GetLastWin32ErrorStr());
 
-        *(d->m_Handle) = nullptr;
-        throw std::runtime_error(errMsg);
-      }
-#endif
+      d->m_Handle = nullptr;
+      throw std::runtime_error(err_msg);
     }
+#else
+    if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle))) {
+      std::string errMsg = "Unloading ";
+      errMsg.append(GetLibraryPath())
+        .append("failed with error: ")
+        .append(util::GetLastWin32ErrorStr());
 
-    *(d->m_Handle) = nullptr;
+      d->m_Handle = nullptr;
+      throw std::runtime_error(errMsg);
+    }
+#endif
+
+    d->m_Handle = nullptr;
   }
 }
 
@@ -268,14 +264,11 @@ std::string SharedLibrary::GetPrefix() const
 
 void* SharedLibrary::GetHandle() const
 {
-  if (d->m_Handle) {
-    return *(d->m_Handle);
-  }
-  return nullptr;
+  return d->m_Handle;
 }
 
 bool SharedLibrary::IsLoaded() const
 {
-  return d->m_Handle && *(d->m_Handle) != nullptr;
+  return d->m_Handle != nullptr;
 }
 }

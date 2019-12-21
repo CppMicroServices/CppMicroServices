@@ -102,11 +102,9 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/ [])
   US_TEST_CONDITION(lib3.GetFilePath() == libAFilePath, "Compare file path")
   lib3.Load();
   US_TEST_CONDITION(lib3.IsLoaded(), "lib3 loaded")
-  US_TEST_CONDITION(!lib2.IsLoaded(), "lib2 not loaded")
+  US_TEST_CONDITION(lib2.IsLoaded(), "lib2 loaded")
   lib1 = lib3;
   US_TEST_FOR_EXCEPTION(std::logic_error, lib1.Load())
-  lib2.SetPrefix(US_LIB_PREFIX);
-  lib2.Load();
 
   lib3.Unload();
   US_TEST_CONDITION(!lib3.IsLoaded(), "lib3 unloaded")

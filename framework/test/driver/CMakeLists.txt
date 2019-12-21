@@ -45,7 +45,6 @@ set(_tests
   MultipleListenersTest
   ResourceCompilerTest
   ShrinkableMapTest
-  ShrinkableVectorTest
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest

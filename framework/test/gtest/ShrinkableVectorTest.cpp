@@ -22,14 +22,14 @@
 
 #include "cppmicroservices/ShrinkableVector.h"
 
-#include "TestUtils.h"
-#include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
-namespace cppmicroservices {
+using namespace cppmicroservices;
 
 // Fake a BundleHooks class so we can create
 // ShrinkableVector instances
+namespace cppmicroservices 
+{
 class BundleHooks
 {
 
@@ -42,25 +42,17 @@ public:
 };
 }
 
-using namespace cppmicroservices;
-
-int ShrinkableVectorTest(int /*argc*/, char* /*argv*/ [])
+TEST(ShrinkableVectorTest, ShrinkableVector)
 {
-  US_TEST_BEGIN("ShrinkableVectorTest");
-
-  ShrinkableVector<int>::container_type vec{ 1, 2, 3 };
-
+  ShrinkableVector<int32_t>::container_type vec({1, 2, 3});
   auto shrinkable = BundleHooks::MakeVector(vec);
 
-  US_TEST_CONDITION(vec.size() == 3, "Original size")
-  US_TEST_CONDITION(vec.size() == shrinkable.size(), "Equal size")
-  US_TEST_CONDITION(shrinkable.at(0) == 1, "At access")
-  US_TEST_CONDITION(shrinkable.back() == 3, "back() access")
+  EXPECT_EQ(vec.size(), 3);
+  EXPECT_EQ(vec.size(), shrinkable.size());
+  EXPECT_EQ(shrinkable.at(0), 1);
+  EXPECT_EQ(shrinkable.back(), 3);
 
   shrinkable.pop_back();
-  US_TEST_CONDITION(shrinkable.back() == 2, "back() access")
-
-  US_TEST_FOR_EXCEPTION(std::out_of_range, shrinkable.at(3))
-
-  US_TEST_END()
+  EXPECT_EQ(shrinkable.back(), 2);
+  EXPECT_THROW(shrinkable.at(3), std::out_of_range);
 }

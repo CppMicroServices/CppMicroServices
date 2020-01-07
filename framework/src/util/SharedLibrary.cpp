@@ -68,8 +68,7 @@ SharedLibrary::SharedLibrary()
   : d(new SharedLibraryPrivate)
 {}
 
-SharedLibrary::SharedLibrary(const SharedLibrary& other) 
-  : d(other.d) {}
+SharedLibrary::SharedLibrary(const SharedLibrary&) = default;
 
 SharedLibrary::SharedLibrary(const std::string& libPath,
                              const std::string& name)
@@ -88,12 +87,7 @@ SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
 
 SharedLibrary::~SharedLibrary() = default;
 
-SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other)
-{
-  d = other.d;
-
-  return *this;
-}
+SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other) = default;
 
 void SharedLibrary::Load(int flags)
 {

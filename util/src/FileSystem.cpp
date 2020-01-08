@@ -77,14 +77,14 @@ namespace util {
 #ifdef US_PLATFORM_WINDOWS
 bool not_found_win32_error(int errval)
 {
-  return errval == ERROR_FILE_NOT_FOUND || errval == ERROR_PATH_NOT_FOUND ||
-         errval == ERROR_INVALID_NAME // "//foo"
-         ||
-         errval == ERROR_INVALID_DRIVE // USB card reader with no card inserted
-         || errval == ERROR_NOT_READY  // CD/DVD drive with no disc inserted
-         || errval == ERROR_INVALID_PARAMETER // ":sys:stat.h"
-         || errval == ERROR_BAD_PATHNAME      // "//nosuch" on Win64
-         || errval == ERROR_BAD_NETPATH;      // "//nosuch" on Win32
+  return (errval == ERROR_FILE_NOT_FOUND
+          || errval == ERROR_PATH_NOT_FOUND
+          || errval == ERROR_INVALID_NAME // "//foo"
+          || errval == ERROR_INVALID_DRIVE // USB card reader with no card inserted
+          || errval == ERROR_NOT_READY  // CD/DVD drive with no disc inserted
+          || errval == ERROR_INVALID_PARAMETER // ":sys:stat.h"
+          || errval == ERROR_BAD_PATHNAME      // "//nosuch" on Win64
+          || errval == ERROR_BAD_NETPATH);      // "//nosuch" on Win32
 }
 #endif
 
@@ -154,7 +154,7 @@ std::string GetExecutablePath()
 #endif
 }
 
-std::string InitCurrentWorkingDirectory()
+std::string GetCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
   DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
@@ -165,23 +165,26 @@ std::string InitCurrentWorkingDirectory()
     return util::ToUTF8String(buf.data());
   }
 #else
-  std::size_t bufSize = PATH_MAX;
-  for (;; bufSize *= 2) {
+  errno = 0;                    // reset errno to zero in case it was set to some other
+                                // value before this call.
+  for (std::size_t bufSize = PATH_MAX;
+       (0 == errno) || (ERANGE == errno); // break out of the loop if any error other than
+                                          // ERANGE occurs. In the case of ERANGE, we
+                                          // double the bufSize and try again.
+       bufSize *= 2)
+  {
     std::vector<char> buf(bufSize, '\0');
-    errno = 0;
-    if (getcwd(buf.data(), bufSize) != nullptr && errno != ERANGE) {
-      return std::string(buf.data());
+    const char* rval = getcwd(buf.data(), bufSize);
+    if (rval != nullptr) {
+      // if we get here, getcwd returned non-null and therefore rval points to the correct
+      // results. Return those results.
+      return std::string(rval);
     }
   }
 #endif
-  return std::string();
-}
-
-static const std::string s_CurrWorkingDir = InitCurrentWorkingDirectory();
-
-std::string GetCurrentWorkingDirectory()
-{
-  return s_CurrWorkingDir;
+  // If we get here, something happened that we don't know how to handle, so just return
+  // empty string.
+  return std::string("");
 }
 
 bool Exists(const std::string& path)

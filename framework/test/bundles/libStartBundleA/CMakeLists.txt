@@ -1,0 +1,3 @@
+
+usFunctionCreateTestBundleWithResources(TestStartBundleA SOURCES TestStartBundleA.cpp RESOURCES manifest.json LINK_RESOURCES)
+

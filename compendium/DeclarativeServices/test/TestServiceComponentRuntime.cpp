@@ -71,19 +71,16 @@ TEST_F(TestServiceComponentRuntime, testServiceAvailability)
   auto dsPluginPath = GetDSRuntimePluginFilePath();
   auto bundles = framework.GetBundleContext().InstallBundles(dsPluginPath);
   EXPECT_EQ(bundles.size(), 1ul) << "DS Runtime bundle found at" << dsPluginPath;
-  for (auto bundle : bundles)
-  {
+  for (auto bundle : bundles) {
     bundle.Start();
   }
 
   // verify that the DS runtime bundle publishes the expected servcie
   auto context = framework.GetBundleContext();
   auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
-  if (sRef)
-  {
-    auto service = context.GetService<scr::ServiceComponentRuntime>(sRef);
-    ASSERT_NE(service, nullptr);
-  }
+  ASSERT_TRUE(sRef);
+  auto service = context.GetService<scr::ServiceComponentRuntime>(sRef);
+  ASSERT_NE(service, nullptr);
 }
 
 } // end of anonymous namespace

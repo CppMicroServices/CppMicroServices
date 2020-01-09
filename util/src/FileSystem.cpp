@@ -154,7 +154,12 @@ std::string GetExecutablePath()
 #endif
 }
 
-std::string GetCurrentWorkingDirectory()
+
+namespace {
+
+// no reason to export this function... only used to initialize static local variable in
+// GetCurrentWorkingDirectory. 
+std::string InitCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
   DWORD bufSize = ::GetCurrentDirectoryW(0, NULL);
@@ -182,9 +187,14 @@ std::string GetCurrentWorkingDirectory()
     }
   }
 #endif
-  // If we get here, something happened that we don't know how to handle, so just return
-  // empty string.
-  return std::string("");
+  return std::string();
+}
+} // anonymous namespace
+
+std::string GetCurrentWorkingDirectory()
+{
+  static const std::string currentWorkingDir = InitCurrentWorkingDirectory();
+  return currentWorkingDir;
 }
 
 bool Exists(const std::string& path)

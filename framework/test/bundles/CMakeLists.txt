@@ -58,3 +58,5 @@ add_subdirectory(DataOnlyTestBundle)
 add_subdirectory(dummyService)
 add_subdirectory(largeBundle)
 
+add_subdirectory(libStartBundleA)
+add_subdirectory(libStopBundleA)

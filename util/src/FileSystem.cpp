@@ -189,12 +189,13 @@ std::string InitCurrentWorkingDirectory()
 #endif
   return std::string();
 }
+const std::string s_CurrentWorkingDir = InitCurrentWorkingDirectory();
+
 } // anonymous namespace
 
 std::string GetCurrentWorkingDirectory()
 {
-  static const std::string currentWorkingDir = InitCurrentWorkingDirectory();
-  return currentWorkingDir;
+  return s_CurrentWorkingDir;
 }
 
 bool Exists(const std::string& path)

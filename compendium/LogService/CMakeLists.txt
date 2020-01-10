@@ -47,6 +47,14 @@ install(TARGETS ${${PROJECT_NAME}_TARGET}
           LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
           ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices
+        DESTINATION ${HEADER_INSTALL_DIR}
+        OPTIONAL)
+
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices
+        DESTINATION ${HEADER_INSTALL_DIR}
+        OPTIONAL)
+          
 # Version information
 configure_file(
   ${US_CMAKE_DIR}/usBundleConfigVersion.cmake.in

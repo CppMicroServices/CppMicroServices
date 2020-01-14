@@ -67,7 +67,8 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const met
   for (auto const& refMetadata : this->metadata->refsMetadata) {
     auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
                                                              bundle.GetBundleContext(),
-                                                             this->logger);
+                                                             this->logger,
+                                                             this->metadata->name);
     referenceManagers.emplace(refMetadata.name, refManager);
   }
 }

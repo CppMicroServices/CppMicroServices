@@ -31,7 +31,15 @@
 
 namespace test {
 
+/**
+ * Convenience Method to install but not start a bundle given the bundle's symbolic name.
+ */
 void InstallLib(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName);
+
+/**
+ * Convenience Method to install and start a bundle given the bundle's symbolic name.
+ */
+cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName);
 
 /**
  * Convenience Method to extract service-id from a service reference

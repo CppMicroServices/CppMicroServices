@@ -60,6 +60,7 @@ set(_declarativeservices_tests
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
   TestReferenceMetadataParserV1.cpp
+  TestReferenceSelfSatisfyDeadLock.cpp
   TestRegistrationManager.cpp
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp

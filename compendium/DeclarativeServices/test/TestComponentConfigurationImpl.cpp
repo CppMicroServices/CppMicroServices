@@ -200,7 +200,25 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
 
 TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
 {
-  std::cout << "unimplemented testpoint" << std::endl;
+  auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+  auto mockRegistry = std::make_shared<MockComponentRegistry>();
+  auto fakeLogger = std::make_shared<FakeLogger>();
+
+  // Test that a call to Register with a component containing both a service
+  // and a reference to the same service interface will not cause a state change.
+  scrimpl::metadata::ReferenceMetadata refMetadata{};
+  refMetadata.interfaceName = "dummy::ServiceImpl";
+  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+  mockMetadata->refsMetadata.push_back(refMetadata);
+  auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
+    mockMetadata, GetFramework(), mockRegistry, fakeLogger);
+
+  auto reg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
+    std::make_shared<dummy::ServiceImpl>());
+
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+    service::component::runtime::dto::UNSATISFIED_REFERENCE);
+  reg.Unregister();
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyRegister)
@@ -211,7 +229,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
   // Test if a call to Register will change the state when the component
   // does not provide a service.
   {
-    auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+    auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                             GetFramework(),
                                                                             mockRegistry,
                                                                             fakeLogger);

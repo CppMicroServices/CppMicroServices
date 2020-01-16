@@ -76,13 +76,22 @@ GetComponentCreatorDeletors(const std::string& compClassName,
     handle = reinterpret_cast<void*>(LoadLibraryW(bundlePathWstr.c_str()));
     if(handle == nullptr)
     {
-      throw std::runtime_error("Unable to load bundle binary. Error code : " + std::to_string(GetLastError()));
+      std::string errMsg("Unable to load bundle binary ");
+      errMsg += fromBundle.GetLocation();
+      errMsg += ". Error: ";
+      errMsg += std::to_string(GetLastError());
+      throw std::runtime_error(errMsg);
     }
 #else
     handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);
     if(handle == nullptr)
     {
-      throw std::runtime_error(std::string("Unable to load bundle binary. Error : ") + dlerror());
+      std::string errMsg("Unable to load bundle binary ");
+      errMsg += fromBundle.GetLocation();
+      errMsg += ". Error: ";
+      const char* dlErrMsg = dlerror();
+      errMsg += (dlErrMsg) ? dlErrMsg : "none";
+      throw std::runtime_error(errMsg);
     }
 #endif
     bundleBinaries.lock()->emplace(bundleLoc, handle);
@@ -98,14 +107,23 @@ GetComponentCreatorDeletors(const std::string& compClassName,
     reinterpret_cast<HMODULE> (handle), deleteInstanceFuncName.c_str()));
   if (sym == nullptr || delsym == nullptr)
   {
-    throw std::runtime_error(std::string("Unable to find entry-point functions in bundle. Error code : ") + std::to_string(GetLastError()));
+    std::string errMsg("Unable to find entry-point functions in bundle ");
+    errMsg += fromBundle.GetLocation();
+    errMsg += ". Error code: ";
+    errMsg += std::to_string(GetLastError());
+    throw std::runtime_error(errMsg);
   }
 #else
   void* sym = dlsym(handle, newInstanceFuncName.c_str());
   void* delsym = dlsym(handle, deleteInstanceFuncName.c_str());
   if (sym == nullptr || delsym == nullptr)
   {
-    throw std::runtime_error(std::string("Unable to find entry-point functions in bundle. Error : ") + dlerror());
+    std::string errMsg("Unable to find entry-point functions in bundle ");
+    errMsg += fromBundle.GetLocation();
+    errMsg += ". Error: ";
+    const char* dlErrMsg = dlerror();
+    errMsg += (dlErrMsg) ? dlErrMsg : "none";
+    throw std::runtime_error(errMsg);
   }
 #endif
 

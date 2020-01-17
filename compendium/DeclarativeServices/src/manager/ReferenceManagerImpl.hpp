@@ -55,7 +55,8 @@ public:
    */
   ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata,
                        const cppmicroservices::BundleContext& bc,
-                       std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                       const std::string& configName);
   ReferenceManagerImpl(const ReferenceManagerImpl&) = delete;
   ReferenceManagerImpl(ReferenceManagerImpl&&) = delete;
   ReferenceManagerImpl& operator=(const ReferenceManagerImpl&) = delete;
@@ -192,6 +193,7 @@ private:
   const metadata::ReferenceMetadata metadata; ///< reference information from the component description
   std::unique_ptr<ServiceTracker<void>> tracker; ///< used to track service availability
   std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger for this runtime
+  const std::string configName; ///< Keep track of which component configuration object this reference manager belongs to.
 
   mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>> boundRefs; ///< guarded set of bound references
   mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>> matchedRefs; ///< guarded set of matched references

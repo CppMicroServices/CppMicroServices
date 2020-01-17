@@ -1,0 +1,25 @@
+{
+  "bundle.symbolic_name" : "TestBundleDSa",
+  "bundle.name" : "TestBundleDSa",
+  "bundle.activator" : false,
+  "scr": {
+    "version": 1,
+    "components": [
+    {
+      "implementation-class": "sample::ServiceComponent",
+      "service": {
+        "scope": "singleton",
+        "interfaces": [
+          "test::Interface1"
+        ]
+      },
+      "references": [
+        {
+          "name": "Interface1",
+          "interface": "test::Interface1"
+        }
+      ],
+      "inject-references": true
+    }]
+  }
+}

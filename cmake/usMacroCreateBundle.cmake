@@ -5,7 +5,7 @@ macro(usMacroCreateBundle _project_name)
 project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
-  "SKIP_EXAMPLES;SKIP_INIT"
+  "SKIP_EXAMPLES;SKIP_INIT;LINK_RESOURCES;APPEND_RESOURCES"
   "VERSION;TARGET;SYMBOLIC_NAME"
   "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
@@ -43,6 +43,22 @@ if(${PROJECT_NAME}_DEPENDS)
   )
 endif()
 
+# Set the resource embedding method
+set(_resource_embed_type )
+if(${PROJECT_NAME}_LINK_RESOURCES AND ${PROJECT_NAME}_APPEND_RESOURCES)
+  message(SEND_ERROR "Both APPEND and LINK options were specified. These options are mutually exclusive.")
+endif()
+
+if(${PROJECT_NAME}_LINK_RESOURCES)
+  set(_resource_embed_type LINK)
+  if(NOT ${US_RESOURCE_LINKING_AVAILABLE} OR ${US_RESOURCE_LINKING_AVAILABLE} EQUAL 0)
+    message(WARNING "Resource linking was specified however its not supported on the system. Defaulting to ${US_DEFAULT_RESOURCE_MODE}.")
+    set(_resource_embed_type ${US_DEFAULT_RESOURCE_MODE})
+  endif()
+elseif(${PROJECT_NAME}_APPEND_RESOURCES)
+  set(_resource_embed_type APPEND)
+endif()
+
 #-----------------------------------------------------------------------------
 # Configure files
 #-----------------------------------------------------------------------------
@@ -75,7 +91,7 @@ if(NOT ${PROJECT_NAME}_SKIP_INIT)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
-  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
+  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES ${_resource_embed_type})
 endif()
 
 list(APPEND ${PROJECT_NAME}_SOURCES $<TARGET_OBJECTS:util>)
@@ -128,7 +144,6 @@ if(${PROJECT_NAME}_LINK_LIBRARIES)
 endif()
 
 # Embed bundle resources
-
 if(${PROJECT_NAME}_RESOURCES)
   set(_wd ${CMAKE_CURRENT_SOURCE_DIR})
   if(${PROJECT_NAME}_RESOURCES)
@@ -145,7 +160,7 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
                          FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
                         )
 endif()
-usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
+usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET} ${_resource_embed_type})
 
 #-----------------------------------------------------------------------------
 # Install support

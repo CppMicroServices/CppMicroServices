@@ -36,6 +36,7 @@ usMacroCreateBundle(DeclarativeServices
   PRIVATE_HEADERS ${_ds_private_headers}
   SOURCES $<TARGET_OBJECTS:DeclarativeServicesObjs> src/SCRActivator.cpp
   BINARY_RESOURCES manifest.json
+  LINK_RESOURCES
   )
 
 include_directories(${CppMicroServices_SOURCE_DIR}/framework/include

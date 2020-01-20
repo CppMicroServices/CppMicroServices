@@ -44,6 +44,7 @@ usMacroCreateBundle(Framework
   PUBLIC_HEADERS ${_framework_public_headers}
   PRIVATE_HEADERS $<TARGET_PROPERTY:absl,INCLUDE_DIRECTORIES> ${_framework_private_headers}
   BINARY_RESOURCES manifest.json
+  LINK_RESOURCES
 )
 
 set_property(

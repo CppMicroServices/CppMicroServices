@@ -237,7 +237,8 @@ std::shared_ptr<ComponentConfigurationState> ComponentConfigurationImpl::GetStat
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if(newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-    std::tie(newCompInstanceFunc, deleteCompInstanceFunc) = GetComponentCreatorDeletors(GetMetadata()->implClassName, GetBundle());
+    const auto compName = GetMetadata()->name.empty() ? GetMetadata()->implClassName : GetMetadata()->name;
+    std::tie(newCompInstanceFunc, deleteCompInstanceFunc) = GetComponentCreatorDeletors(compName, GetBundle());
   }
 }
 

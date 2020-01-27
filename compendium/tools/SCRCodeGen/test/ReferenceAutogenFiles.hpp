@@ -158,6 +158,49 @@ extern "C" US_ABI_EXPORT void DeleteInstance_Foo_Impl2(ComponentInstance* compon
 
 )manifestsrc";
 
+const std::string REF_MULT_COMPS_SAME_IMPL = R"manifestsrc(
+#include <vector>
+#include <cppmicroservices/ServiceInterface.h>
+#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "A.hpp"
+#include "B.hpp"
+#include "C.hpp"
+
+namespace sc = cppmicroservices::service::component;
+namespace scd = cppmicroservices::service::component::detail;
+using scd::ComponentInstance;
+using scd::ComponentInstanceImpl;
+using scd::Binder;
+using scd::StaticBinder;
+using scd::DynamicBinder;
+
+extern "C" US_ABI_EXPORT ComponentInstance* NewInstance_FooImpl1()
+{
+  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<Foo::Impl1, std::tuple<Foo::Interface>>();
+
+  return componentInstance;
+}
+
+extern "C" US_ABI_EXPORT void DeleteInstance_FooImpl1(ComponentInstance* componentInstance)
+{
+  delete componentInstance;
+}
+
+
+extern "C" US_ABI_EXPORT ComponentInstance* NewInstance_FooImpl2()
+{
+  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<Foo::Impl1, std::tuple<Foo::Interface>>();
+
+  return componentInstance;
+}
+
+extern "C" US_ABI_EXPORT void DeleteInstance_FooImpl2(ComponentInstance* componentInstance)
+{
+  delete componentInstance;
+}
+
+)manifestsrc";
+
 } // namespace codegen
 
 #endif //  REFERENCEAUTOGENFILES_HPP

@@ -23,9 +23,9 @@
 #ifndef __BUNDLELOADER_HPP__
 #define __BUNDLELOADER_HPP__
 
-#include <map>
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
+#include <map>
 
 using cppmicroservices::service::component::detail::ComponentInstance;
 //typedef ComponentInstance*(*NewComponentInstanceFuncPtr)();
@@ -38,7 +38,7 @@ namespace scrimpl {
  * delete {@link ComponentInstance} objects associated with a component from
  * a given {@link Bundle}
  *
- * \param compName is the fully qualified C++ class name of the component
+ * \param compName is a unique identifier for the component
  * \param fromBundle is the bundle where the component is located
  *
  * \throws \c std::runtime_error on failure to load the bundle binary.
@@ -47,8 +47,10 @@ namespace scrimpl {
  *         \c std::invalid_argument if location of \c fromBundle cannot be
  *         converted to UTF16 on the Windows platform
  */
-std::tuple<std::function<ComponentInstance*(void)>, std::function<void(ComponentInstance*)>> GetComponentCreatorDeletors(const std::string& compClassName,
-                                                                                                                         const cppmicroservices::Bundle& fromBundle);
+std::tuple<std::function<ComponentInstance*(void)>,
+           std::function<void(ComponentInstance*)>>
+GetComponentCreatorDeletors(const std::string& compName,
+                            const cppmicroservices::Bundle& fromBundle);
 }
 }
 #endif /* __BUNDLELOADER_HPP__ */

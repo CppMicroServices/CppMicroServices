@@ -32,11 +32,11 @@ usMacroCreateBundle(DeclarativeServices
   DEPENDS Framework
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services
+  EMBED_RESOURCE_METHOD LINK
   LINK_LIBRARIES ${_link_libraries} usLogService usServiceComponent
   PRIVATE_HEADERS ${_ds_private_headers}
   SOURCES $<TARGET_OBJECTS:DeclarativeServicesObjs> src/SCRActivator.cpp
   BINARY_RESOURCES manifest.json
-  LINK_RESOURCES
   )
 
 include_directories(${CppMicroServices_SOURCE_DIR}/framework/include

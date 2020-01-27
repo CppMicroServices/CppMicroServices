@@ -5,8 +5,8 @@ macro(usMacroCreateBundle _project_name)
 project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
-  "SKIP_EXAMPLES;SKIP_INIT;LINK_RESOURCES;APPEND_RESOURCES"
-  "VERSION;TARGET;SYMBOLIC_NAME"
+  "SKIP_EXAMPLES;SKIP_INIT"
+  "VERSION;TARGET;SYMBOLIC_NAME;EMBED_RESOURCE_METHOD"
   "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
 )
@@ -45,18 +45,11 @@ endif()
 
 # Set the resource embedding method
 set(_resource_embed_type )
-if(${PROJECT_NAME}_LINK_RESOURCES AND ${PROJECT_NAME}_APPEND_RESOURCES)
-  message(SEND_ERROR "Both APPEND and LINK options were specified. These options are mutually exclusive.")
-endif()
 
-if(${PROJECT_NAME}_LINK_RESOURCES)
-  set(_resource_embed_type LINK)
-  if(NOT ${US_RESOURCE_LINKING_AVAILABLE} OR ${US_RESOURCE_LINKING_AVAILABLE} EQUAL 0)
-    message(WARNING "Resource linking was specified however its not supported on the system. Defaulting to ${US_DEFAULT_RESOURCE_MODE}.")
-    set(_resource_embed_type ${US_DEFAULT_RESOURCE_MODE})
-  endif()
-elseif(${PROJECT_NAME}_APPEND_RESOURCES)
-  set(_resource_embed_type APPEND)
+# No need to check for a valid value as input checking is done in
+# usFunctionEmbedResources.cmake
+if(${PROJECT_NAME}_EMBED_RESOURCE_METHOD)
+  set(_resource_embed_type ${${PROJECT_NAME}_EMBED_RESOURCE_METHOD})
 endif()
 
 #-----------------------------------------------------------------------------

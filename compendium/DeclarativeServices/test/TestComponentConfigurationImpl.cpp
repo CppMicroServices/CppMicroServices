@@ -33,6 +33,9 @@
 #include "../src/manager/states/CCRegisteredState.hpp"
 #include "../src/manager/states/CCActiveState.hpp"
 
+#include "TestUtils.hpp"
+#include <TestInterfaces/Interfaces.hpp>
+
 using cppmicroservices::service::component::ComponentContext;
 
 namespace cppmicroservices {
@@ -594,6 +597,28 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
   EXPECT_EQ(fakeCompConfig->GetAllDependencyManagers().size(), mockMetadata->refsMetadata.size());
   EXPECT_NE(fakeCompConfig->GetDependencyManager("Foo"), nullptr);
   EXPECT_NE(fakeCompConfig->GetDependencyManager("Bar"), nullptr);
+}
+
+TEST_F(ComponentConfigurationImplTest, TestComponentWithUniqueName)
+{
+#if defined(US_BUILD_SHARED_LIBS)
+  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+  auto dsbundles = GetFramework().GetBundleContext().InstallBundles(dsPluginPath);
+  ASSERT_EQ(dsbundles.size(), 1);
+  for (auto& bundle : dsbundles) {
+    ASSERT_TRUE(bundle);
+    bundle.Start();
+  }
+#endif
+
+  auto testBundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI8");
+  ASSERT_TRUE(testBundle);
+  ASSERT_EQ(testBundle.GetSymbolicName(), "TestBundleDSTOI8");
+
+  auto svcRef = testBundle.GetBundleContext().GetServiceReference<test::Interface1>();
+  ASSERT_TRUE(svcRef);
+  auto svc = testBundle.GetBundleContext().GetService<test::Interface1>(svcRef);
+  EXPECT_NE(svc, nullptr);
 }
 }
 }

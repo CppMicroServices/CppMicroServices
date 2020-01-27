@@ -23,9 +23,9 @@
 #include "BundleLoader.hpp"
 #include <regex>
 #if defined(_WIN32)
-#include <Windows.h>
+#  include <Windows.h>
 #else
-#include <dlfcn.h>
+#  include <dlfcn.h>
 #endif
 
 namespace cppmicroservices {
@@ -38,44 +38,41 @@ namespace scrimpl {
  */
 std::wstring UTF8StrToWStr(const std::string& inStr)
 {
-  if (inStr.empty())
-  {
+  if (inStr.empty()) {
     return std::wstring();
   }
   int wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, NULL, 0);
   std::unique_ptr<wchar_t[]> wBuf(new wchar_t[wchar_count]);
-  wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchar_count);
-  if (wchar_count == 0)
-  {
+  wchar_count =
+    MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchar_count);
+  if (wchar_count == 0) {
     std::invalid_argument("Failed to convert " + inStr + " to UTF16.");
   }
   return wBuf.get();
 }
 #endif
 
-std::tuple<std::function<ComponentInstance*(void)>, std::function<void(ComponentInstance*)>>
-GetComponentCreatorDeletors(const std::string& compClassName,
+std::tuple<std::function<ComponentInstance*(void)>,
+           std::function<void(ComponentInstance*)>>
+GetComponentCreatorDeletors(const std::string& compName,
                             const cppmicroservices::Bundle& fromBundle)
 {
-  // cannot use bundle id as key because id is reused when the framework is restarted. 
-  // strings are not optimal but will work fine as long as a binary is not unloaded 
-  // from the process. 
+  // cannot use bundle id as key because id is reused when the framework is restarted.
+  // strings are not optimal but will work fine as long as a binary is not unloaded
+  // from the process.
   // Note: This code is a temporary hack until the core framework supports Bundle#load API.
-  static Guarded<std::map<std::string, void*>> bundleBinaries; ///< map of bundle location and handle pairs
+  static Guarded<std::map<std::string, void*>>
+    bundleBinaries; ///< map of bundle location and handle pairs
   const auto bundleLoc = fromBundle.GetLocation();
 
   void* handle = nullptr;
-  if(bundleBinaries.lock()->count(bundleLoc) != 0u)
-  {
+  if (bundleBinaries.lock()->count(bundleLoc) != 0u) {
     handle = bundleBinaries.lock()->at(bundleLoc);
-  }
-  else
-  {
+  } else {
 #if defined(_WIN32)
     std::wstring bundlePathWstr = UTF8StrToWStr(fromBundle.GetLocation());
     handle = reinterpret_cast<void*>(LoadLibraryW(bundlePathWstr.c_str()));
-    if(handle == nullptr)
-    {
+    if (handle == nullptr) {
       std::string errMsg("Unable to load bundle binary ");
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
@@ -84,8 +81,7 @@ GetComponentCreatorDeletors(const std::string& compClassName,
     }
 #else
     handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);
-    if(handle == nullptr)
-    {
+    if (handle == nullptr) {
       std::string errMsg("Unable to load bundle binary ");
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
@@ -97,16 +93,16 @@ GetComponentCreatorDeletors(const std::string& compClassName,
     bundleBinaries.lock()->emplace(bundleLoc, handle);
   }
 
-  const std::string symbolName = std::regex_replace(compClassName, std::regex("::"), "_");
+  const std::string symbolName =
+    std::regex_replace(compName, std::regex("::"), "_");
   const std::string newInstanceFuncName("NewInstance_" + symbolName);
   const std::string deleteInstanceFuncName("DeleteInstance_" + symbolName);
 #if defined(_WIN32)
-  void* sym = reinterpret_cast<void*> (GetProcAddress(
+  void* sym = reinterpret_cast<void*>(GetProcAddress(
     reinterpret_cast<HMODULE>(handle), newInstanceFuncName.c_str()));
-  void* delsym = reinterpret_cast<void*> (GetProcAddress(
-    reinterpret_cast<HMODULE> (handle), deleteInstanceFuncName.c_str()));
-  if (sym == nullptr || delsym == nullptr)
-  {
+  void* delsym = reinterpret_cast<void*>(GetProcAddress(
+    reinterpret_cast<HMODULE>(handle), deleteInstanceFuncName.c_str()));
+  if (sym == nullptr || delsym == nullptr) {
     std::string errMsg("Unable to find entry-point functions in bundle ");
     errMsg += fromBundle.GetLocation();
     errMsg += ". Error code: ";
@@ -116,8 +112,7 @@ GetComponentCreatorDeletors(const std::string& compClassName,
 #else
   void* sym = dlsym(handle, newInstanceFuncName.c_str());
   void* delsym = dlsym(handle, deleteInstanceFuncName.c_str());
-  if (sym == nullptr || delsym == nullptr)
-  {
+  if (sym == nullptr || delsym == nullptr) {
     std::string errMsg("Unable to find entry-point functions in bundle ");
     errMsg += fromBundle.GetLocation();
     errMsg += ". Error: ";
@@ -127,9 +122,9 @@ GetComponentCreatorDeletors(const std::string& compClassName,
   }
 #endif
 
-  return std::make_tuple(reinterpret_cast<ComponentInstance*(*)(void)>(sym),      // NOLINT
-                         reinterpret_cast<void(*)(ComponentInstance*)>(delsym));  // NOLINT
-
+  return std::make_tuple(
+    reinterpret_cast<ComponentInstance* (*)(void)>(sym),     // NOLINT
+    reinterpret_cast<void (*)(ComponentInstance*)>(delsym)); // NOLINT
 }
 }
 }

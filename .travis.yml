@@ -118,4 +118,4 @@ script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
+  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds || echo "Codecov did not collect coverage reports"

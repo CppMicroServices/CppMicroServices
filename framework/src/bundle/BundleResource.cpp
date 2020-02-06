@@ -113,6 +113,8 @@ BundleResource::BundleResource(
   d->stat.filePath = d->archive->GetResourcePrefix() + d->path + d->fileName;
 
   d->archive->GetResourceContainer()->GetStat(d->stat);
+
+  InitializeChildren();
 }
 
 BundleResource::BundleResource(
@@ -123,6 +125,16 @@ BundleResource::BundleResource(
   d->archive->GetResourceContainer()->GetStat(index, d->stat);
   d->InitFilePath(
     d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
+
+  InitializeChildren();
+}
+
+void BundleResource::InitializeChildren()
+{
+  if (d->children.empty()) {
+    d->archive->GetResourceContainer()->GetChildren(
+      d->stat.filePath, true, d->children, d->childNodes);
+  }
 }
 
 BundleResource::~BundleResource()
@@ -230,10 +242,6 @@ std::vector<std::string> BundleResource::GetChildren() const
   if (!IsValid() || !IsDir())
     return d->children;
 
-  if (d->children.empty()) {
-    d->archive->GetResourceContainer()->GetChildren(
-      d->stat.filePath, true, d->children, d->childNodes);
-  }
   return d->children;
 }
 
@@ -243,11 +251,6 @@ std::vector<BundleResource> BundleResource::GetChildResources() const
 
   if (!IsValid() || !IsDir())
     return childResources;
-
-  if (d->childNodes.empty()) {
-    d->archive->GetResourceContainer()->GetChildren(
-      this->GetResourcePath(), true, d->children, d->childNodes);
-  }
 
   for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(),
                                              iterEnd = d->childNodes.end();

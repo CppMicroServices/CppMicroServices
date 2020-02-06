@@ -28,6 +28,7 @@
 
 #include <cstdlib>
 #include <stdexcept>
+#include <sstream>
 
 using namespace cppmicroservices;
 
@@ -35,16 +36,21 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/ [])
 {
   US_TEST_BEGIN("SharedLibraryTest");
 
-  const std::string libAFilePath = testing::LIB_PATH + util::DIR_SEP +
-                                   US_LIB_PREFIX + "TestBundleA" + US_LIB_EXT;
+  auto lib1Name = "TestBundleA" US_LIB_POSTFIX;
+  
+  const std::string libAFilePath = testing::LIB_PATH
+                                   + util::DIR_SEP
+                                   + US_LIB_PREFIX
+                                   + lib1Name
+                                   + US_LIB_EXT;
   SharedLibrary lib1(libAFilePath);
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "Absolute file path")
   US_TEST_CONDITION(lib1.GetLibraryPath() == testing::LIB_PATH, "Library path")
-  US_TEST_CONDITION(lib1.GetName() == "TestBundleA", "Name")
+  US_TEST_CONDITION(lib1.GetName() == lib1Name, "Name")
   US_TEST_CONDITION(lib1.GetPrefix() == US_LIB_PREFIX, "Prefix")
   US_TEST_CONDITION(lib1.GetSuffix() == US_LIB_EXT, "Suffix")
   lib1.SetName("bla");
-  US_TEST_CONDITION(lib1.GetName() == "TestBundleA", "Name after SetName()")
+  US_TEST_CONDITION(lib1.GetName() == lib1Name, "Name after SetName()")
   lib1.SetLibraryPath("bla");
   US_TEST_CONDITION(lib1.GetLibraryPath() == testing::LIB_PATH,
                     "Library path after SetLibraryPath()")
@@ -77,13 +83,17 @@ int SharedLibraryTest(int /*argc*/, char* /*argv*/ [])
   US_TEST_CONDITION(lib1.GetFilePath() == libAFilePath, "File path")
   lib1.Unload();
 
-  SharedLibrary lib2(testing::LIB_PATH, "TestBundleA");
+  auto lib2Name = "TestBundleA"  US_LIB_POSTFIX;
+  SharedLibrary lib2(testing::LIB_PATH, lib2Name);
   US_TEST_CONDITION(lib2.GetFilePath() == libAFilePath, "File path")
   lib2.SetPrefix("");
   US_TEST_CONDITION(lib2.GetPrefix().empty(), "Lib prefix")
-  US_TEST_CONDITION(lib2.GetFilePath() == testing::LIB_PATH + util::DIR_SEP +
-                                            "TestBundleA" + US_LIB_EXT,
-                    "File path")
+    US_TEST_CONDITION(lib2.GetFilePath() == (testing::LIB_PATH
+                                             + util::DIR_SEP
+                                             + "TestBundleA"
+                                             + US_LIB_POSTFIX
+                                             + US_LIB_EXT)
+                      , "File path")
 
   SharedLibrary lib3 = lib2;
   US_TEST_CONDITION(lib3.GetFilePath() == lib2.GetFilePath(),

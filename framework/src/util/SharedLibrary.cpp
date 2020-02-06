@@ -99,9 +99,13 @@ void SharedLibrary::Load(int flags)
 #ifdef US_PLATFORM_POSIX
   d->m_Handle = dlopen(libPath.c_str(), flags);
   if (!d->m_Handle) {
+    std::string err_msg = "Error loading " + libPath + ".";
     const char* err = dlerror();
-    throw std::runtime_error(err ? std::string(err)
-                                 : (std::string("Error loading ") + libPath));
+    if (err) {
+      err_msg += " " + std::string(err);
+    }
+
+    throw std::runtime_error(err_msg);
   }
 #else
   US_UNUSED(flags);
@@ -132,10 +136,13 @@ void SharedLibrary::Unload()
   if (d->m_Handle) {
 #ifdef US_PLATFORM_POSIX
     if (dlclose(d->m_Handle)) {
+      std::string err_msg = "Error unloading " + GetLibraryPath() + ".";
       const char* err = dlerror();
-      throw std::runtime_error(
-        err ? std::string(err)
-            : (std::string("Error unloading ") + GetLibraryPath()));
+      if (err) {
+        err_msg += " " + std::string(err);
+      }
+
+      throw std::runtime_error(err_msg);
     }
 #else
     if (!FreeLibrary(reinterpret_cast<HMODULE>(d->m_Handle))) {

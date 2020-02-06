@@ -25,8 +25,11 @@
 
 #include "cppmicroservices/detail/Threads.h"
 
+#include <condition_variable>
 #include <map>
+#include <unordered_map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -130,15 +133,45 @@ public:
   void Load();
 
 private:
+  using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
+
   // don't allow copying the BundleRegistry.
-  BundleRegistry(const BundleRegistry&);
-  BundleRegistry& operator=(const BundleRegistry&);
+  BundleRegistry(const BundleRegistry&) = delete;
+  BundleRegistry& operator=(const BundleRegistry&) = delete;
 
   void CheckIllegalState() const;
 
-  CoreBundleContext* coreCtx;
+  void GetAlreadyInstalledBundlesAtLocation(
+    std::pair<BundleMap::iterator, BundleMap::iterator> range,
+    std::vector<Bundle>& res,
+    std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled);
 
-using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
+  void DecrementInitialBundleMapRef(
+    cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
+    const std::string& location);
+
+  /*
+    A struct which contains the necessary objects to utilize condition
+    variables. A thread will wait on this WaitCondition if the waitFlag
+    is set to true.
+  */
+  struct WaitCondition
+  {
+    std::unique_ptr<std::mutex> m;
+    std::unique_ptr<std::condition_variable> cv;
+    bool waitFlag;
+
+    WaitCondition()
+      : m(std::make_unique<std::mutex>())
+      , cv(std::make_unique<std::condition_variable>())
+      , waitFlag(true)
+    {}
+  };
+
+  std::unordered_map<std::string, std::pair<unsigned int, WaitCondition>>
+    initialBundleInstallMap;
+
+  CoreBundleContext* coreCtx;
 
   /**
    * Table of all installed bundles in this framework.

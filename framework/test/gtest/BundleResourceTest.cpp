@@ -71,10 +71,7 @@ TEST(BundleResourceTestNoBundleInstall, getChildResourcesFromInvalidBundle)
 TEST_F(BundleResourceTest, getChildResources)
 {
   BundleResource resource = bundleR.GetResource("icons/");
-  ASSERT_EQ(resource.GetChildResources().size(), static_cast<unsigned int>(0));
 
-  // GetChildResources() should not have a dependency on GetChildren()
-  // to return the correct size
-  resource.GetChildren();
+  // Confirm that GetChildResources() returns the correct number
   ASSERT_EQ(resource.GetChildResources().size(), static_cast<unsigned int>(3));
 }

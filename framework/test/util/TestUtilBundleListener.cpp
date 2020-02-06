@@ -34,13 +34,11 @@ TestBundleListener::TestBundleListener()
 void TestBundleListener::BundleChanged(const BundleEvent& event)
 {
   bundleEvents.push_back(event);
-  std::cout << "BundleEvent:" << event;
 }
 
 void TestBundleListener::ServiceChanged(const ServiceEvent& event)
 {
   serviceEvents.push_back(event);
-  std::cout << "ServiceEvent:" << event;
 }
 
 BundleEvent TestBundleListener::GetBundleEvent() const

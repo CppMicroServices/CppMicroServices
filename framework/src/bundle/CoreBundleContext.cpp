@@ -80,13 +80,11 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(
-  const std::unordered_map<std::string, Any>& props,
-  std::ostream* logger)
+CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>& props
+                                     , std::ostream* logger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
-  , workingDir(ref_any_cast<std::string>(
-      frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+  , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -96,8 +94,7 @@ CoreBundleContext::CoreBundleContext(
   , initCount(0)
   , libraryLoadOptions(0)
 {
-  auto enableDiagLog =
-    any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
+  auto enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
   std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
@@ -162,7 +159,6 @@ void CoreBundleContext::Init()
   bundleRegistry.Init();
 
   serviceHooks.Open();
-  //resolverHooks.Open();
 
   bundleRegistry.Load();
 

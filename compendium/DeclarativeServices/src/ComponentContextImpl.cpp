@@ -200,5 +200,24 @@ void ComponentContextImpl::Invalidate()
   boundServicesCache.clear();
 }
 
+void ComponentContextImpl::BoundServicesCacheAdd(const std::string& refName
+                                            , const cppmicroservices::ServiceReferenceBase& sRef)
+{
+  auto bc = GetBundleContext();
+  cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(ServiceReferenceU(sRef));
+  boundServicesCache[refName].emplace_back(sObjs.GetService());
+}
+    
+void ComponentContextImpl::BoundServicesCacheDel(const std::string& refName
+                                              , const cppmicroservices::ServiceReferenceBase& sRef)
+{
+#if TODO
+  // remove reference from boundServicesCache
+  auto bc = GetBundleContext();
+  cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(ServiceReferenceU(sRef));
+  boundServicesCache[refName].emplace_back(sObjs.GetService());
+#endif
+}
+
 }} 
 

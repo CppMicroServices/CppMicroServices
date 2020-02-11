@@ -409,7 +409,7 @@ void BundleRegistry::Load()
   auto bas = coreCtx->storage->GetAllBundleArchives();
   for (auto const& ba : bas) {
     try {
-      std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
+      std::shared_ptr<BundlePrivate> impl = std::make_shared<BundlePrivate>(coreCtx, ba);
       bundles.v.insert(std::make_pair(impl->location, impl));
     } catch (...) {
       ba->SetAutostartSetting(-1); // Do not start on launch

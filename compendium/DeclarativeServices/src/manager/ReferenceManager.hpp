@@ -51,6 +51,7 @@ struct RefChangeNotification
 {
   std::string senderName;
   RefEvent event;
+  ServiceReferenceBase serviceRef;
 };
 
 /**

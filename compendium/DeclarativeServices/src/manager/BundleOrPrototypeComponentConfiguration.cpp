@@ -115,6 +115,28 @@ void BundleOrPrototypeComponentConfigurationImpl::UngetService(const cppmicroser
     compInstCtxtPairList->erase(itr);
   }
 }
+
+void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  auto instancePairs = compInstanceMap.lock();
+  for (auto const& instancePair : *instancePairs)
+  {
+    auto& context = instancePair.second;
+    context->InvokeBindMethod(refName, ref);
+  }
+}
+
+void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  auto instancePairs = compInstanceMap.lock();
+  for (auto const& instancePair: *instancePairs)
+  {
+    auto& context = instancePair.second;
+    context->InvokeUnbindMethod(refName, ref);
+  }
+}
+
+
 }
 }
 

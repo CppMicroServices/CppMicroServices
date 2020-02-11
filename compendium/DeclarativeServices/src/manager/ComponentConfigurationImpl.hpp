@@ -245,6 +245,9 @@ protected:
     ComponentConfigurationImpl::CompareAndSetState(&oldState, newState);
   }
 
+  virtual void BindReference(const std::string& refName, const ServiceReferenceBase& ref) = 0;
+  virtual void UnbindReference(const std::string& refName, const ServiceReferenceBase& ref) = 0;
+  
 private:
   /**
    * Observer callback method. This method is registered with the dependency

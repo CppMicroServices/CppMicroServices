@@ -82,6 +82,8 @@ public:
   void UngetService(const cppmicroservices::Bundle& bundle,
                     const cppmicroservices::ServiceRegistrationBase& registration,
                     const cppmicroservices::InterfaceMapConstPtr& service) override;
+  void BindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+  void UnbindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
 private:
 
   /**

@@ -211,7 +211,7 @@ void ReferenceManagerImpl::ServiceAdded(const cppmicroservices::ServiceReference
   if(replacementNeeded)
   {
     logger->Log(SeverityLevel::LOG_DEBUG, "Notify UNSATISFIED for reference " + metadata.name);
-    RefChangeNotification notification{metadata.name, RefEvent::BECAME_UNSATISFIED};
+    RefChangeNotification notification{metadata.name, RefEvent::BECAME_UNSATISFIED, reference };
     notifications.push_back(std::move(notification));
     // The following "clear and copy" strategy is sufficient for
     // updating the boundRefs for static binding policy
@@ -225,7 +225,7 @@ void ReferenceManagerImpl::ServiceAdded(const cppmicroservices::ServiceReference
   if(notifySatisfied)
   {
     logger->Log(SeverityLevel::LOG_DEBUG, "Notify SATISFIED for reference " + metadata.name);
-    RefChangeNotification notification{metadata.name, RefEvent::BECAME_SATISFIED};
+    RefChangeNotification notification{metadata.name, RefEvent::BECAME_SATISFIED, reference };
     notifications.push_back(std::move(notification));
   }
   BatchNotifyAllListeners(notifications);

@@ -118,10 +118,10 @@ void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& no
 {
   switch(notification.event) {
     case RefEvent::BECAME_SATISFIED:
-      RefSatisfied(notification.senderName);
+      RefSatisfied(notification);
       break;
     case RefEvent::BECAME_UNSATISFIED:
-      RefUnsatisfied(notification.senderName);
+      RefUnsatisfied(notification);
       break;
     default:
       break;
@@ -185,17 +185,24 @@ private:
   std::string skipKey;
 };
 
-void ComponentConfigurationImpl::RefSatisfied(const std::string& refName)
+void ComponentConfigurationImpl::RefSatisfied(const RefChangeNotification& notification)
 {
-  SatisfiedFunctor f = std::for_each(referenceManagers.begin(), referenceManagers.end(), SatisfiedFunctor(refName));
-  if(f.IsSatisfied()) {
-    GetState()->Register(*this);
+  if (GetState()->GetConfigState() != ACTIVE) {
+    Bind();
+  }
+  else  {
+    SatisfiedFunctor f = std::for_each(referenceManagers.begin()
+                                       , referenceManagers.end()
+                                       , SatisfiedFunctor(notification.senderName));
+    if(f.IsSatisfied()) {
+      GetState()->Register(*this);
+    }
   }
 }
 
-void ComponentConfigurationImpl::RefUnsatisfied(const std::string& refName)
+void ComponentConfigurationImpl::RefUnsatisfied(const RefChangeNotification& notification)
 {
-  if(referenceManagers.count(refName) != 0u) {
+  if(referenceManagers.count(notification.senderName) != 0u) {
     // the state of the rest of the dependency managers is irrelevant.
     // deactivate the configuration
     GetState()->Deactivate(*this);

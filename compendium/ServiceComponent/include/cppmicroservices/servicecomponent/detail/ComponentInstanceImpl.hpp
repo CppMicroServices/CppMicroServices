@@ -128,18 +128,18 @@ public:
 
   void Modified() override { /* no-op for now */};
 
-  void InvokeUnbindMethod(const std::string& refName
-                          , const cppmicroservices::ServiceReferenceBase& sRef) override
-  {
-    size_t index = refBinderMap.at(refName);
-    refBinders.at(index)->UnBind(mContext->GetBundleContext(), sRef, mServiceImpl);
-  };
-
   void InvokeBindMethod(const std::string& refName
                         , const cppmicroservices::ServiceReferenceBase& sRef) override
   {
     size_t index = refBinderMap.at(refName);
     refBinders.at(index)->Bind(mContext->GetBundleContext(), sRef, mServiceImpl);
+  };
+
+  void InvokeUnbindMethod(const std::string& refName
+                          , const cppmicroservices::ServiceReferenceBase& sRef) override
+  {
+    size_t index = refBinderMap.at(refName);
+    refBinders.at(index)->UnBind(mContext->GetBundleContext(), sRef, mServiceImpl);
   };
 
   virtual std::shared_ptr<T> GetInstance() const { return mServiceImpl; };

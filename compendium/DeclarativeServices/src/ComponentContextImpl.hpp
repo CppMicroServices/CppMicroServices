@@ -196,6 +196,12 @@ public:
    */
   void Invalidate();
 
+  void BoundServicesCacheAdd(const std::string& refName
+                             , const cppmicroservices::ServiceReferenceBase& sRef);
+    
+  void BoundServicesCacheDel(const std::string& refName
+                             , const cppmicroservices::ServiceReferenceBase& sRef);
+
 private:
   /**
    * Returns the Id of the bundle containing the component

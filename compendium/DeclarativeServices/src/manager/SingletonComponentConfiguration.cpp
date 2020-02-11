@@ -122,6 +122,20 @@ void SingletonComponentConfigurationImpl::UngetService(const cppmicroservices::B
   // The instance is reset when the component is deactivated.
 }
 
+void SingletonComponentConfigurationImpl::BindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  auto context = GetComponentContext();
+  context->BoundServicesCacheAdd(refName, ref);
+  GetComponentInstance()->InvokeBindMethod(refName, ref);
+}
+
+void SingletonComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  auto context = GetComponentContext();
+  context->BoundServicesCacheDel(refName, ref);
+  GetComponentInstance()->InvokeUnbindMethod(refName, ref);
+}
+
 void SingletonComponentConfigurationImpl::SetComponentInstancePair(InstanceContextPair instCtxtPair)
 {
   auto instanceContextPair = data.lock();

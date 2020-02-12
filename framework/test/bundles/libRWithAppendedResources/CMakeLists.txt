@@ -12,6 +12,6 @@ usFunctionCreateTestBundleWithResources(TestBundleRA
   APPEND_RESOURCES
 )
 
-set_target_properties(TestBundleRA PROPERTIES
-	XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
-)
+if(APPLE)
+	set_target_properties(TestBundleRA PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+endif()

@@ -55,8 +55,6 @@ function(create_initial_cache var _shared _threading)
       BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
       US_BUILD_EXAMPLES:BOOL=ON
-      CMAKE_C_COMPILER=$ENV{MY_CC}
-      CMAKE_CXX_COMPILER=$ENV{MY_CXX}
       ")
 
   set(${var} ${_initial_cache} PARENT_SCOPE)

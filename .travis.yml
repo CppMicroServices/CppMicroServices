@@ -134,8 +134,8 @@ install:
     else
       CMAKE_OS="Darwin";
     fi
-  - CMAKE_VER_DIR="v3.16"
-  - CMAKE_VER="3.16.0"
+  - CMAKE_VER_DIR="v3.13"
+  - CMAKE_VER="3.13.2"
   - CMAKE_DIR="cmake-${CMAKE_VER}-${CMAKE_OS}-x86_64"
   - CMAKE_FILE="${CMAKE_DIR}.tar.gz"
   - CMAKE_SHA_FILE="cmake-${CMAKE_VER}-SHA-256.txt"

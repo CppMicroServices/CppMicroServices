@@ -45,7 +45,7 @@ void TestGetSymbolInvalidBundleInput()
     US_TEST_FOR_EXCEPTION(std::invalid_argument , b.GetSymbol(nullptr,""));
 }
 
-void TestGetSymbolInvalidInput()
+void TestGetSymbolValidBundleWithInvalidSymbolName()
 {
     FrameworkFactory factory;
     auto f = factory.NewFramework();
@@ -53,16 +53,35 @@ void TestGetSymbolInvalidInput()
     auto frameworkCtx = f.GetBundleContext();
     
     auto b = testing::InstallLib(frameworkCtx, "TestBundleA");
-    
-    SharedLibrary sh(b.GetLocation());
-    sh.Load();
-    
-    // Test for invalid inputs on valid bundle
+    b.Start();
+
+    // Test for invalid symbol handle on valid bundle
  
-    US_TEST_FOR_EXCEPTION(std::invalid_argument , b.GetSymbol(sh.GetHandle(),""));
     US_TEST_FOR_EXCEPTION(std::invalid_argument , b.GetSymbol(nullptr,"_us_create_activator_TestBundleA"));
     
     b.Stop();
+    f.Stop();
+}
+
+void TestGetSymbolValidBundleWithInvalidSymbolHandle()
+{
+    FrameworkFactory factory;
+    auto f = factory.NewFramework();
+    f.Start();
+    auto frameworkCtx = f.GetBundleContext();
+    
+    auto b = testing::InstallLib(frameworkCtx, "TestBundleA");
+    b.Start();
+
+    SharedLibrary sh(b.GetLocation());
+    sh.Load();
+    
+    // Test for invalid symbol name on valid bundle
+ 
+    US_TEST_FOR_EXCEPTION(std::invalid_argument , b.GetSymbol(sh.GetHandle(),""));
+    
+    b.Stop();
+    sh.Unload();
     f.Stop();
 }
 
@@ -78,10 +97,9 @@ void TestGetSymbolNotInstalledBundle()
     SharedLibrary sh(b.GetLocation());
     sh.Load();
    
-    // Test for bundle which is not installed
+    // Test for bundle which is not installed but with valid inputs
     US_TEST_FOR_EXCEPTION(std::runtime_error , b.GetSymbol(sh.GetHandle(),"_us_create_activator_TestBundleA"));
 
-    b.Stop();
     sh.Unload();
     f.Stop();
 }
@@ -98,7 +116,7 @@ void TestGetSymbolValidInput()
     SharedLibrary sh(b.GetLocation());
     sh.Load();
 
-    // Test for bundle which is not installed inputs
+    // Test for valid bundle and valid input
     US_TEST_CONDITION(b.GetSymbol(sh.GetHandle(),"_us_create_activator_TestBundleA") != nullptr,"Error : Empty symbol returned from Bundle::GetSymbol !");
 
     b.Stop();
@@ -111,7 +129,11 @@ int BundleGetSymbolTest(int /*argc*/, char* /*argv*/ [])
     US_TEST_BEGIN("BundleGetSymbolTest");
 
    
-    TestGetSymbolInvalidInput();
+    TestGetSymbolInvalidBundleInput();
+
+    TestGetSymbolValidBundleWithInvalidSymbolName();
+    TestGetSymbolValidBundleWithInvalidSymbolHandle();
+
     TestGetSymbolNotInstalledBundle();
     TestGetSymbolValidInput();
 

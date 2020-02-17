@@ -394,7 +394,7 @@ public:
     * @post If the symbol does not exist, the API returns nullptr 
     */
 
-   void* GetSymbol(void * handle, const std::string& symname);
+   void* GetSymbol(void * handle, const std::string& symname) const;
 
   /**
    * Returns the symbolic name of this bundle as specified by the

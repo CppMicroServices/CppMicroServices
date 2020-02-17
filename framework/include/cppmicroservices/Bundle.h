@@ -377,6 +377,26 @@ public:
   std::string GetLocation() const;
 
   /**
+    * Retrieves the resolved symbol from bundle shared library and returns a function pointer associated with it
+    * 
+    * @param1 Handle to the Bundle's shared library
+    * @param2 Name of the symbol
+    *
+    * @return A function pointer to the desired symbol or nullptr if the library is not loaded
+    * 
+    * @throws std::runtime_error if the bundle is not started or active
+    * @throws std::invalid_argument if handle or symname is empty
+    * @throws std::invalid_argument if this bundle is not initialized
+    *
+    * @pre  Bundle is already started and active
+    *
+    * @post The symbol(s) associated with the bundle gets fetched if the library is loaded
+    * @post If the symbol does not exist, the API returns nullptr 
+    */
+
+   void* GetSymbol(void * handle, const std::string& symname);
+
+  /**
    * Returns the symbolic name of this bundle as specified by the
    * US_BUNDLE_NAME preprocessor definition. The bundle symbolic
    * name together with a version must identify a unique bundle.

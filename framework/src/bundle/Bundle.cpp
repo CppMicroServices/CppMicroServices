@@ -316,6 +316,21 @@ Bundle::TimeStamp Bundle::GetLastModified() const
   return d->barchive ? d->barchive->GetLastModified() : d->timeStamp;
 }
 
+void* Bundle::GetSymbol(void * handle, const std::string& symname)
+{
+  if(!d || !handle || symname.empty()) {
+      throw std::invalid_argument("invalid bundle");
+  }
+
+  if(GetState() != STATE_ACTIVE)
+  {
+    throw std::runtime_error("Bundle is not started and active!");
+  }
+
+  // Utility function that fetches the symbol or nullptr
+  return BundleUtils::GetSymbol(handle,symname.c_str());
+}
+
 std::ostream& operator<<(std::ostream& os, Bundle::State state)
 {
   switch (state) {

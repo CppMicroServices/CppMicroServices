@@ -39,6 +39,7 @@ set(_tests
   LogTest
   BundleEventTest
   BundleHooksTest
+  BundleGetSymbolTest
   BundleTest
   BundleResourceTest
   MemcheckTest

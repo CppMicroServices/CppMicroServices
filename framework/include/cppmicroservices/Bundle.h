@@ -379,8 +379,8 @@ public:
   /**
     * Retrieves the resolved symbol from bundle shared library and returns a function pointer associated with it
     * 
-    * @param1 Handle to the Bundle's shared library
-    * @param2 Name of the symbol
+    * @param handle  Handle to the Bundle's shared library
+    * @param symname Name of the symbol
     *
     * @return A function pointer to the desired symbol or nullptr if the library is not loaded
     * 

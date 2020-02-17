@@ -319,11 +319,10 @@ Bundle::TimeStamp Bundle::GetLastModified() const
 void* Bundle::GetSymbol(void * handle, const std::string& symname) const
 {
   if(!d || !handle || symname.empty()) {
-      throw std::invalid_argument("invalid bundle");
+      throw std::invalid_argument("Error : Either bundle or inputs supplied are invalid!");
   }
 
-  if(GetState() != STATE_ACTIVE)
-  {
+  if(STATE_ACTIVE != GetState()) {
     throw std::runtime_error("Bundle is not started and active!");
   }
 

@@ -28,6 +28,7 @@ set(_gtest_tests
   UtilsTest.cpp
   FrameworkTest.cpp
   BundleObjFileTest.cpp
+  BundleGetSymbolTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp

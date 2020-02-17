@@ -36,36 +36,6 @@
 
 using namespace cppmicroservices;
 
-namespace testHelper
-{
-#ifdef US_PLATFORM_WINDOWS
-#  define RTLD_LAZY 0 // unused
-
-#  include <windows.h>
-
-void* dlopen(const char* path, int flag)
-{
-    return reinterpret_cast<void*>(LoadLibraryA(path));
-}
-
-#elif defined(__GNUC__)
-
-#  ifndef _GNU_SOURCE
-#    define _GNU_SOURCE
-#  endif
-
-#  include <dlfcn.h>
-
-#  if defined(__APPLE__)
-#    include <mach-o/dyld.h>
-#    include <sys/param.h>
-#  endif
-
-#  include <unistd.h>
-
-#endif
-}
-
 class BundleGetSymbolTest : public ::testing::Test
 {
 protected:    
@@ -138,10 +108,3 @@ TEST_F(BundleGetSymbolTest, TestGetSymbolValidInput)
     sh.Unload();
 }
 
-// Test for valid bundle and valid input without using SharedLibrary interface
-TEST_F(BundleGetSymbolTest, TestGetSymbolValidInputWithoutUsingSharedLibrary)
-{
-    void *pFuncAct = testHelper::dlopen(bd.GetLocation().c_str(),RTLD_LAZY);
-    EXPECT_TRUE(pFuncAct != nullptr) << "Error : null handle returned for bundle shared library !\n";
-    EXPECT_TRUE(bd.GetSymbol(pFuncAct,"_us_create_activator_TestBundleA") != nullptr) << "Error : Empty symbol returned from Bundle::GetSymbol !\n";
-}

@@ -34,6 +34,9 @@
 
 #include <stdexcept>
 
+// Enable tests only for shared libraries
+#if defined(US_BUILD_SHARED_LIBS)
+
 using namespace cppmicroservices;
 
 class BundleGetSymbolTest : public ::testing::Test
@@ -108,3 +111,4 @@ TEST_F(BundleGetSymbolTest, TestGetSymbolValidInput)
     sh.Unload();
 }
 
+#endif

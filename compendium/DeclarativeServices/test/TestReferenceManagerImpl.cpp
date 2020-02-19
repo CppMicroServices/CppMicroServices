@@ -137,21 +137,24 @@ TEST_P(ReferenceManagerImplTest, TestConstructor)
   metadata::ReferenceMetadata mockReferenceMetadata{};
   auto fakeLogger = std::make_shared<FakeLogger>();
   EXPECT_THROW({
-      ReferenceManagerImpl refManager(mockReferenceMetadata,
-                                      BundleContext(),
-                                      fakeLogger, FakeComponentConfigName);
+      ReferenceManagerImpl refManager(mockReferenceMetadata
+                                      , BundleContext()
+                                      , fakeLogger
+                                      , FakeComponentConfigName);
     }, std::invalid_argument) << "Invalid bundle context must result in a throw";
   EXPECT_THROW({
-      ReferenceManagerImpl refManager(mockReferenceMetadata,
-                                      GetFramework().GetBundleContext(),
-                                      nullptr, FakeComponentConfigName);
+      ReferenceManagerImpl refManager(mockReferenceMetadata
+                                      , GetFramework().GetBundleContext()
+                                      , nullptr
+                                      , FakeComponentConfigName);
     }, std::invalid_argument) << "Invalid logger object must result in a throw";
   EXPECT_NO_THROW({
       mockReferenceMetadata.name = "Foo";
       mockReferenceMetadata.target = "(objectclass=Foo)";
-      ReferenceManagerImpl refManager(mockReferenceMetadata,
-                                      GetFramework().GetBundleContext(),
-                                      fakeLogger, FakeComponentConfigName);
+      ReferenceManagerImpl refManager(mockReferenceMetadata
+                                      , GetFramework().GetBundleContext()
+                                      , fakeLogger
+                                      , FakeComponentConfigName);
       EXPECT_EQ(refManager.GetReferenceName(), "Foo");
       EXPECT_EQ(refManager.GetLDAPString(), "(objectclass=Foo)");
     }) << "No throw expected when valid objects are passed to ReferenceManager constructor";
@@ -168,9 +171,10 @@ TEST_P(ReferenceManagerImplTest, TestIsSatisfied)
   // Register a service and check IsSatisfied is true
   {
     auto fakeMetadata = GetParam();
-    ReferenceManagerImpl refManager(fakeMetadata,
-                                    GetFramework().GetBundleContext(),
-                                    fakeLogger, FakeComponentConfigName);
+    ReferenceManagerImpl refManager(fakeMetadata
+                                    , GetFramework().GetBundleContext()
+                                    , fakeLogger
+                                    , FakeComponentConfigName);
     EXPECT_EQ(refManager.IsSatisfied(), (refManager.IsOptional() ? true : false)) << "Initial state is SATISFIED only if cardinality is optional";
     auto reg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
     EXPECT_EQ(refManager.IsSatisfied(), true) << "State expected to be SATISFIED after service registration";
@@ -188,9 +192,10 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
   // register another service with higher ranking. Observe no change.
   {
     auto fakeMetadata = GetParam();
-    ReferenceManagerImpl refManager(fakeMetadata,
-                                    GetFramework().GetBundleContext(),
-                                    fakeLogger, FakeComponentConfigName);
+    ReferenceManagerImpl refManager(fakeMetadata
+                                    , GetFramework().GetBundleContext()
+                                    , fakeLogger
+                                    , FakeComponentConfigName);
     EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional()) << "Initial state is SATISFIED only for optional cardinality";
     int satisfiedNotificationCount(0);
     int unsatisfiedNotificationCount(0);
@@ -291,9 +296,10 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
-  ReferenceManagerImpl refManager(fakeMetadata,
-                                  GetFramework().GetBundleContext(),
-                                  fakeLogger, FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata
+                                  , GetFramework().GetBundleContext()
+                                  , fakeLogger
+                                  , FakeComponentConfigName);
 
   std::function<ServiceRegistration<dummy::Reference1>()> func = [bc]() mutable {
                                                                    return bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
@@ -313,10 +319,10 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentUnsatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
-  ReferenceManagerImpl refManager(fakeMetadata,
-                                  GetFramework().GetBundleContext(),
-                                  fakeLogger, FakeComponentConfigName);
-
+  ReferenceManagerImpl refManager(fakeMetadata
+                                  , GetFramework().GetBundleContext()
+                                  , fakeLogger
+                                  , FakeComponentConfigName);
   std::promise<void> go;
   std::shared_future<void> ready(go.get_future());
   int numCalls = std::max(64u, std::thread::hardware_concurrency());
@@ -372,9 +378,10 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
-  ReferenceManagerImpl refManager(fakeMetadata,
-                                  GetFramework().GetBundleContext(),
-                                  fakeLogger, FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata
+                                  , GetFramework().GetBundleContext()
+                                  , fakeLogger
+                                  , FakeComponentConfigName);
 
   std::function<ServiceRegistration<dummy::Reference1>()> func = [bc]() mutable {
                                                                    ServiceRegistration<dummy::Reference1> sReg;
@@ -430,9 +437,10 @@ TEST_P(ReferenceManagerImplTest, TestTrackerWithScope_PrototypeRequired)
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
   fakeMetadata.scope = REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
-  ReferenceManagerImpl refManager(fakeMetadata,
-                                  GetFramework().GetBundleContext(),
-                                  fakeLogger, FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata
+                                  , GetFramework().GetBundleContext()
+                                  , fakeLogger
+                                  , FakeComponentConfigName);
 
   // when the reference scope is 'prototype_required', the reference manager's
   // tracker must only bind to the service published with scope==prototype
@@ -463,9 +471,10 @@ TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 
   fakeMetadata.target = "(foo=bar)";
   ReferenceManagerImpl refManager {
-    fakeMetadata,
-    bc,
-    fakeLogger, FakeComponentConfigName
+    fakeMetadata
+    , bc
+    , fakeLogger
+    , FakeComponentConfigName
   };
         
   ASSERT_FALSE(refManager.IsSatisfied());
@@ -492,8 +501,11 @@ TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
 
-  ReferenceManagerImpl refManager{
-    fakeMetadata, bc, fakeLogger, FakeComponentConfigName
+  ReferenceManagerImpl refManager {
+    fakeMetadata
+    , bc
+    , fakeLogger
+    , FakeComponentConfigName
   };
 
   auto reg = bc.RegisterService<dummy::Reference1>(
@@ -502,5 +514,5 @@ TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
     << "State expected to be UNSATISFIED after service registration";
   reg.Unregister();
 }
-}
-}
+
+}}

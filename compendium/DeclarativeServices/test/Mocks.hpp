@@ -252,6 +252,8 @@ public:
   MOCK_METHOD1(CreateAndActivateComponentInstance, std::shared_ptr<ComponentInstance>(const cppmicroservices::Bundle&));
   MOCK_METHOD1(UnbindAndDeactivateComponentInstance, void(std::shared_ptr<ComponentInstance>));
   MOCK_METHOD0(DestroyComponentInstances, void());
+  MOCK_METHOD2(BindReference, void(const std::string&, const ServiceReferenceBase&));
+  MOCK_METHOD2(UnbindReference, void(const std::string&, const ServiceReferenceBase&));
   void SetState(const std::shared_ptr<ComponentConfigurationState>& newState)
   {
     ComponentConfigurationImpl::SetState(newState);

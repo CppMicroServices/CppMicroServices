@@ -50,8 +50,8 @@ enum class RefEvent
 struct RefChangeNotification
 {
   std::string senderName;
-  RefEvent event;
-  ServiceReferenceBase serviceRef;
+  RefEvent event = RefEvent::BECAME_SATISFIED;
+  ServiceReferenceBase serviceRef = ServiceReference<void>();
 };
 
 /**

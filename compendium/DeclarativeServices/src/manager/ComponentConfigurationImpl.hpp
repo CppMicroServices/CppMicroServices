@@ -55,10 +55,10 @@ public:
   /**
    * \throws std::invalid_argument exception if any of the params is a nullptr 
    */
-  explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                                      const Bundle& bundle,
-                                      std::shared_ptr<const ComponentRegistry> registry,
-                                      std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+  explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata
+                                      , const Bundle& bundle
+                                      , std::shared_ptr<const ComponentRegistry> registry
+                                      , std::shared_ptr<cppmicroservices::logservice::LogService> logger);
   ComponentConfigurationImpl(const ComponentConfigurationImpl&) = delete;
   ComponentConfigurationImpl(ComponentConfigurationImpl&&) = delete;
   ComponentConfigurationImpl& operator=(const ComponentConfigurationImpl&) = delete;
@@ -261,14 +261,14 @@ private:
    * This method is called from {@link #RefChangedState} when
    * {@link RefChangeNotification#senderState} is \c SATISFIED
    */
-  void RefSatisfied(const std::string& refName);
+  void RefSatisfied(const RefChangeNotification&);
 
   /**
    * Utility method with actions to be performed when a reference is satisfied
    * This method is called from {@link #RefChangedState} when
    * {@link RefChangeNotification#senderState} is \c UNSATISFIED
    */
-  void RefUnsatisfied(const std::string& refName);
+  void RefUnsatisfied(const RefChangeNotification&);
 
   /**
    * Method is responsible for loading the bundle and populating the function

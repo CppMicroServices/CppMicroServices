@@ -65,10 +65,11 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const met
                                                        this->logger);
   }
   for (auto const& refMetadata : this->metadata->refsMetadata) {
-    auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
-                                                             bundle.GetBundleContext(),
-                                                             this->logger,
-                                                             this->metadata->name);
+    
+    auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata
+                                                             , bundle.GetBundleContext()
+                                                             , this->logger
+                                                             , this->metadata->name);
     referenceManagers.emplace(refMetadata.name, refManager);
   }
 }
@@ -114,7 +115,8 @@ void ComponentConfigurationImpl::Initialize()
   }
 }
 
-void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& notification)
+void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& notification
+                                                )
 {
   switch(notification.event) {
     case RefEvent::BECAME_SATISFIED:
@@ -187,16 +189,11 @@ private:
 
 void ComponentConfigurationImpl::RefSatisfied(const RefChangeNotification& notification)
 {
-  if (GetState()->GetConfigState() != ACTIVE) {
-    Bind();
-  }
-  else  {
-    SatisfiedFunctor f = std::for_each(referenceManagers.begin()
-                                       , referenceManagers.end()
-                                       , SatisfiedFunctor(notification.senderName));
-    if(f.IsSatisfied()) {
-      GetState()->Register(*this);
-    }
+  SatisfiedFunctor f = std::for_each(referenceManagers.begin()
+                                     , referenceManagers.end()
+                                     , SatisfiedFunctor(notification.senderName));
+  if(f.IsSatisfied()) {
+    GetState()->Register(*this);
   }
 }
 

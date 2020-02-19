@@ -32,6 +32,7 @@
 #include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
 #include "../src/manager/states/CCRegisteredState.hpp"
 #include "../src/manager/states/CCActiveState.hpp"
+#include "../src/manager/ReferenceManager.hpp"
 
 #include "TestUtils.hpp"
 #include <TestInterfaces/Interfaces.hpp>
@@ -157,10 +158,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref3", refMgr3));
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
   // callback from refMgr2
-  fakeCompConfig->RefSatisfied("ref2");
+  fakeCompConfig->RefSatisfied(RefChangeNotification{ "ref2" } );
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
   // callback from refMgr3
-  fakeCompConfig->RefSatisfied("ref3");
+  fakeCompConfig->RefSatisfied(RefChangeNotification{ "ref3" } );
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
   EXPECT_EQ(fakeCompConfig->GetServiceReference().operator bool(), true);
   EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(mockMetadata->serviceMetadata.interfaces.at(0)), true);
@@ -194,9 +195,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref1", refMgr1));
   fakeCompConfig->state = mockStatisfiedState;
   EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
-  fakeCompConfig->RefUnsatisfied("invalid_refname");
+  fakeCompConfig->RefUnsatisfied(RefChangeNotification{ "invalid_refname" } );
   EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
-  fakeCompConfig->RefUnsatisfied("ref1");
+  fakeCompConfig->RefUnsatisfied(RefChangeNotification{ "ref1" } );
   EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::UNSATISFIED_REFERENCE);
   fakeCompConfig->referenceManagers.clear(); // remove the mock reference managers
 }
@@ -374,10 +375,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
 }
 
-bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr)
+bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr
+                          )
 {
-  auto vecSize = stateArr.size();
   bool foundInvalidTransition = false;
+  auto vecSize = stateArr.size();
   for(size_t i = 0; i < vecSize && !foundInvalidTransition; ++i)
   {
     auto currState = stateArr[i].first;

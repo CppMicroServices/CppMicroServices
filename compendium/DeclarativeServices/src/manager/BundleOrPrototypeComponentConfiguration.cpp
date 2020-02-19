@@ -116,27 +116,33 @@ void BundleOrPrototypeComponentConfigurationImpl::UngetService(const cppmicroser
   }
 }
 
-void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::string& refName, const ServiceReferenceBase& ref)
+void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::string& refName
+                                                                , const ServiceReferenceBase& ref
+                                                               )
 {
   auto instancePairs = compInstanceMap.lock();
   for (auto const& instancePair : *instancePairs)
   {
+    auto& instance = instancePair.first;
     auto& context = instancePair.second;
-    context->InvokeBindMethod(refName, ref);
+    context->BoundServicesCacheAdd(refName, ref);
+    instance->InvokeBindMethod(refName, ref);
   }
 }
 
-void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
+void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::string& refName
+                                                                  , const ServiceReferenceBase& ref
+                                                                 )
 {
   auto instancePairs = compInstanceMap.lock();
   for (auto const& instancePair: *instancePairs)
   {
+    auto& instance = instancePair.first;
     auto& context = instancePair.second;
-    context->InvokeUnbindMethod(refName, ref);
+    instance->InvokeUnbindMethod(refName, ref);
+    context->BoundServicesCacheDel(refName, ref);
   }
 }
 
-
-}
-}
+}}
 

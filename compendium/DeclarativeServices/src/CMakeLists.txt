@@ -14,6 +14,11 @@ set(_srcs
   manager/ReferenceManagerImpl.cpp
   manager/RegistrationManager.cpp
   manager/SingletonComponentConfiguration.cpp
+  manager/BindingPolicy.cpp
+  manager/BindingPolicyStaticReluctant.cpp
+  manager/BindingPolicyStaticGreedy.cpp
+  manager/BindingPolicyDynamicReluctant.cpp
+  manager/BindingPolicyDynamicGreedy.cpp
   manager/states/CCActiveState.cpp
   manager/states/CCRegisteredState.cpp
   manager/states/CCSatisfiedState.cpp

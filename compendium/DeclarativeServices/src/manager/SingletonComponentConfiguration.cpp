@@ -131,9 +131,9 @@ void SingletonComponentConfigurationImpl::BindReference(const std::string& refNa
 
 void SingletonComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
 {
+  GetComponentInstance()->InvokeUnbindMethod(refName, ref);
   auto context = GetComponentContext();
   context->BoundServicesCacheDel(refName, ref);
-  GetComponentInstance()->InvokeUnbindMethod(refName, ref);
 }
 
 void SingletonComponentConfigurationImpl::SetComponentInstancePair(InstanceContextPair instCtxtPair)

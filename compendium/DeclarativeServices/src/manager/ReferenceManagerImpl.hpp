@@ -33,6 +33,7 @@
 
 namespace cppmicroservices {
 namespace scrimpl {
+
 using RefMgrListenerMap = std::unordered_map<cppmicroservices::ListenerTokenId, std::function<void(const RefChangeNotification&)>>;
 /**
  * This class is responsible for tracking a service reference (dependency)
@@ -44,6 +45,8 @@ class ReferenceManagerImpl final
   , public cppmicroservices::ServiceTrackerCustomizer<void>
 {
 public:
+  class BindingPolicy;
+  
   /**
    * Constructor
    *
@@ -53,10 +56,15 @@ public:
    *
    * \throws \c std::runtime_error if \c bc or \c logger is invalid
    */
-  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata,
-                       const cppmicroservices::BundleContext& bc,
-                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                       const std::string& configName);
+  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
+                       , const cppmicroservices::BundleContext& bc
+                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                       , const std::string& configName);
+  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
+                       , const cppmicroservices::BundleContext& bc
+                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                       , const std::string& configName
+                       , std::unique_ptr<BindingPolicy> policy);
   ReferenceManagerImpl(const ReferenceManagerImpl&) = delete;
   ReferenceManagerImpl(ReferenceManagerImpl&&) = delete;
   ReferenceManagerImpl& operator=(const ReferenceManagerImpl&) = delete;
@@ -145,6 +153,23 @@ public:
    */
   void StopTracking() override;
 
+
+  static std::unique_ptr<BindingPolicy> CreateBindingPolicy(const std::string& policy, const std::string& policyOption);
+  
+  class BindingPolicy
+  {
+  public:
+    virtual void ServiceAdded(ReferenceManagerImpl& refMgr
+                              , const ServiceReferenceBase& reference) = 0;
+    virtual void ServiceRemoved(ReferenceManagerImpl& refMgr
+                                , const ServiceReferenceBase& reference) = 0;
+
+    virtual ~BindingPolicy() = default;
+
+    static bool RemoveBoundRef(const ReferenceManagerImpl& mgr, const ServiceReferenceBase& reference);
+  };
+
+
 private:
 
   FRIEND_TEST(ReferenceManagerImplTest, TestConstructor);
@@ -153,6 +178,8 @@ private:
   FRIEND_TEST(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied);
   FRIEND_TEST(ReferenceManagerImplTest, TestListenerCallbacks);
   FRIEND_TEST(ReferenceManagerImplTest, TestIsSatisfied);
+  
+  static long GetServiceId(const ServiceReferenceBase& sRef);
 
   /**
    * Helper method to copy service references from #matchedRefs to #boundRefs
@@ -162,28 +189,6 @@ private:
    * /return true on success, false otherwise.
    */
   bool UpdateBoundRefs();
-
-  /**
-   * Helper method called from the ServiceTracker#AddingService
-   * callback implemented in this class. This method adds the provided
-   * service reference to the boundRefs member
-   *
-   * \param reference is the service reference of a newly available service
-   *
-   * \note This method is not executed simultaneously from multiple threads.
-   */
-  void ServiceAdded(const cppmicroservices::ServiceReferenceBase& reference);
-
-  /**
-   * Helper method called from the ServiceTracker#RemovedService
-   * callback implemented in this class. This method removes the provided
-   * service reference from the boundRefs member 
-   *
-   * \param reference is the service reference of a service that has been unregistered
-   *
-   * \note This method is not executed simultaneously from multiple threads.
-   */
-  void ServiceRemoved(const cppmicroservices::ServiceReferenceBase& reference);
 
   /**
    * Method used to send notifications to all the listeners
@@ -199,9 +204,61 @@ private:
   mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>> matchedRefs; ///< guarded set of matched references
 
   mutable Guarded<RefMgrListenerMap> listenersMap; ///< guarded map of listeners
-  static std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to generate unique tokens for listeners
+  static std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
+                                                                      ///generate unique
+                                                                      ///tokens for
+                                                                      ///listeners
+
+  std::unique_ptr<BindingPolicy> bindingPolicy;
+
+
+  class BindingPolicyDynamicGreedy
+    : public BindingPolicy
+  {
+  public:
+    void ServiceAdded(ReferenceManagerImpl& refMgr
+                      , const ServiceReferenceBase& reference) override;
+    
+    void ServiceRemoved(ReferenceManagerImpl& refMgr
+                        , const ServiceReferenceBase& reference) override;
+
+  };
+
+  class BindingPolicyDynamicReluctant
+    : public BindingPolicy
+  {
+  public:
+    void ServiceAdded(ReferenceManagerImpl& refMgr
+                      , const ServiceReferenceBase& reference) override;
+    void ServiceRemoved(ReferenceManagerImpl& refMgr
+                        , const ServiceReferenceBase& reference) override;
+  };
+
+  class BindingPolicyStaticGreedy
+    : public BindingPolicy
+  {
+  public:
+    void ServiceAdded(ReferenceManagerImpl& refMgr
+                      , const ServiceReferenceBase& reference) override;
+    
+    void ServiceRemoved(ReferenceManagerImpl& refMgr
+                        , const ServiceReferenceBase& reference) override;
+  };
+
+  class BindingPolicyStaticReluctant
+    : public BindingPolicy
+  {
+  public:
+    
+    void ServiceAdded(ReferenceManagerImpl& refMgr
+                      , const ServiceReferenceBase& reference) override;
+    
+    void ServiceRemoved(ReferenceManagerImpl& refMgr
+                        , const ServiceReferenceBase& reference) override;
+  };
+
 };
-}
-}
+
+}}
 #endif // __REFERENCEMANAGERIMPL_HPP__
 

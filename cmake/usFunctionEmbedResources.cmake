@@ -235,6 +235,13 @@ function(usFunctionEmbedResources)
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM
     )
+    
+    # Disable code-signing on macOS if appending resources.
+	if(APPLE)
+	  set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
+		XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+	endif()
+	
   endif()
 
 endfunction()

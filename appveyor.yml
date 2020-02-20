@@ -184,7 +184,12 @@ build_script:
 after_test:
 - if [%WITH_COVERAGE%]==[1] %APPVEYOR_BUILD_FOLDER%/opencppcoverage_mergereports.bat
 - if [%WITH_COVERAGE%]==[1] python %APPVEYOR_BUILD_FOLDER%/fixcoveragefilepaths.py -i coverage.xml -s %APPVEYOR_BUILD_FOLDER% -o coverage_pathsfixed.xml
-- if [%WITH_COVERAGE%]==[1] codecov -X gcov -f coverage_pathsfixed.xml
+# use codecov bash script. Requires powershell and bash to be installed, which both are on the AppVeyor machine image
+- ps: |
+    $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+    Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+    bash codecov.sh -f "./coverage_pathsfixed.xml"
+#- if [%WITH_COVERAGE%]==[1] codecov -X gcov -f %APPVEYOR_BUILD_FOLDER%/build/coverage_pathsfixed.xml
 
 test_script:
 - cd %APPVEYOR_BUILD_FOLDER%/build

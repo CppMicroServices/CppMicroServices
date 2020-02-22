@@ -11,7 +11,7 @@ project or *Make* files.
 Prerequisites
 -------------
 
--  `CMake <http://www.cmake.org>`_ 3.2 (users of the latest Visual Studio
+-  `CMake <http://www.cmake.org>`_ 3.13.4 (users of the latest Visual Studio
    should typically also use the latest CMake version available)
 
 Configuration
@@ -31,7 +31,7 @@ configuration options at hand.
    .. note::
 
       In version 3.0 and 3.1 this option only supported the *ON* value.
-      The *OFF* configuration is supported again in version 3.2 and later.
+      The *OFF* configuration is supported again in version 3.2 and above and later.
 
  - **BUILD_SHARED_LIBS** Specify if the library should be build
    shared or static. See :any:`concept-static-bundles`

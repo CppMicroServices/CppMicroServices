@@ -71,7 +71,7 @@ your build tree. The following are the absolute minimum requirements:
 
 Recommended minimum required CMake version:
 
-- CMake 3.12.4 
+- CMake 3.13.4 
 
 Below is a list of tested compiler/OS combinations:
 

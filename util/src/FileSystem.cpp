@@ -28,6 +28,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <locale> 
+#include <codecvt>
 
 #ifdef US_PLATFORM_POSIX
 #  include <dirent.h>
@@ -352,7 +354,9 @@ std::string GetTempDirectory()
     temp_dir = wcharFullPath;
   }
 
-  return std::string(temp_dir.cbegin(), temp_dir.cend());
+  using convert_type = std::codecvt_utf8<wchar_t>;
+  std::wstring_convert<convert_type, wchar_t> converter;
+  return converter.to_bytes(temp_dir);
 #else
   char* tempdir = std::getenv("TMPDIR");
   return std::string(((tempdir == nullptr) ? "/tmp" : tempdir));

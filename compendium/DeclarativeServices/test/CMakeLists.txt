@@ -75,6 +75,7 @@ set(_declarativeservices_tests
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
   ImportTestBundles.cpp
+  TestBindingPolicies.cpp
   main.cpp
 )
 

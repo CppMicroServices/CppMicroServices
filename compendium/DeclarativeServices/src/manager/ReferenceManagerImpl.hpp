@@ -39,14 +39,17 @@ using RefMgrListenerMap = std::unordered_map<cppmicroservices::ListenerTokenId, 
  * This class is responsible for tracking a service reference (dependency)
  * and based on the policy criteria, notify the listener about the state
  * changes of the reference
+ *
+ * Note that this is NOT the final implementation class. This class was made in order to
+ * be able to mock this implementation for testing purposes. The "ReferenceManagerImpl"
+ * class at the end of this file is what's instantiated and used by the rest of the
+ * system. 
  */
-class ReferenceManagerImpl final
+class ReferenceManagerBaseImpl
   : public ReferenceManager
   , public cppmicroservices::ServiceTrackerCustomizer<void>
 {
 public:
-  class BindingPolicy;
-  
   /**
    * Constructor
    *
@@ -56,20 +59,15 @@ public:
    *
    * \throws \c std::runtime_error if \c bc or \c logger is invalid
    */
-  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
-                       , const cppmicroservices::BundleContext& bc
-                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger
-                       , const std::string& configName);
-  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
-                       , const cppmicroservices::BundleContext& bc
-                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger
-                       , const std::string& configName
-                       , std::unique_ptr<BindingPolicy> policy);
-  ReferenceManagerImpl(const ReferenceManagerImpl&) = delete;
-  ReferenceManagerImpl(ReferenceManagerImpl&&) = delete;
-  ReferenceManagerImpl& operator=(const ReferenceManagerImpl&) = delete;
-  ReferenceManagerImpl& operator=(ReferenceManagerImpl&&) = delete;
-  ~ReferenceManagerImpl() override;
+  ReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
+                           , const cppmicroservices::BundleContext& bc
+                           , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                           , const std::string& configName);
+  ReferenceManagerBaseImpl(const ReferenceManagerBaseImpl&) = delete;
+  ReferenceManagerBaseImpl(ReferenceManagerBaseImpl&&) = delete;
+  ReferenceManagerBaseImpl& operator=(const ReferenceManagerBaseImpl&) = delete;
+  ReferenceManagerBaseImpl& operator=(ReferenceManagerBaseImpl&&) = delete;
+  ~ReferenceManagerBaseImpl() override;
 
   /**
    * Returns name of the reference as specified in component description
@@ -154,30 +152,86 @@ public:
   void StopTracking() override;
 
 
-  static std::unique_ptr<BindingPolicy> CreateBindingPolicy(const std::string& policy, const std::string& policyOption);
-  
   class BindingPolicy
   {
   public:
-    virtual void ServiceAdded(ReferenceManagerImpl& refMgr
-                              , const ServiceReferenceBase& reference) = 0;
-    virtual void ServiceRemoved(ReferenceManagerImpl& refMgr
-                                , const ServiceReferenceBase& reference) = 0;
+    virtual void ServiceAdded(const ServiceReferenceBase& reference) = 0;
+    virtual void ServiceRemoved(const ServiceReferenceBase& reference) = 0;
 
     virtual ~BindingPolicy() = default;
+  protected:
+    // Some utility code to ensure we don't DRY too much in the subclasses. Code is
+    // common code that was pulled up from the subclasses.
+    void Log(std::string&& logStr, cppmicroservices::logservice::SeverityLevel logLevel = cppmicroservices::logservice::SeverityLevel::LOG_DEBUG);
+    bool ShouldClearBoundRefs(const ServiceReferenceBase& reference);
+    bool ShouldNotifySatisfied();
+    void ClearBoundRefs();
+    std::vector<RefChangeNotification> ReluctantServiceAdded(const ServiceReferenceBase& reference);
+    std::vector<RefChangeNotification> RemoveService(const ServiceReferenceBase& reference);
+    
+    explicit BindingPolicy(ReferenceManagerBaseImpl& parent) : mgr(parent) {}
 
-    static bool RemoveBoundRef(const ReferenceManagerImpl& mgr, const ServiceReferenceBase& reference);
+    ReferenceManagerBaseImpl& mgr;
+    
+    BindingPolicy() = delete;
+    BindingPolicy(const BindingPolicy&) = delete;
+    BindingPolicy(BindingPolicy&&) = delete;
+    BindingPolicy& operator=(const BindingPolicy&) = delete;
+    BindingPolicy& operator=(BindingPolicy&&) = delete;
   };
 
 
-private:
+  class BindingPolicyDynamicGreedy
+    : public BindingPolicy
+  {
+  public:
+    BindingPolicyDynamicGreedy(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    void ServiceAdded(const ServiceReferenceBase& reference) override;
+    void ServiceRemoved(const ServiceReferenceBase& reference) override;
 
-  FRIEND_TEST(ReferenceManagerImplTest, TestConstructor);
-  FRIEND_TEST(ReferenceManagerImplTest, TestConcurrentSatisfied);
-  FRIEND_TEST(ReferenceManagerImplTest, TestConcurrentUnsatisfied);
-  FRIEND_TEST(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied);
-  FRIEND_TEST(ReferenceManagerImplTest, TestListenerCallbacks);
-  FRIEND_TEST(ReferenceManagerImplTest, TestIsSatisfied);
+  };
+
+  class BindingPolicyDynamicReluctant
+    : public BindingPolicy
+  {
+  public:
+    BindingPolicyDynamicReluctant(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    void ServiceAdded(const ServiceReferenceBase& reference) override;
+    void ServiceRemoved(const ServiceReferenceBase& reference) override;
+  };
+
+  class BindingPolicyStaticGreedy
+    : public BindingPolicy
+  {
+  public:
+    BindingPolicyStaticGreedy(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    void ServiceAdded(const ServiceReferenceBase& reference) override;
+    void ServiceRemoved(const ServiceReferenceBase& reference) override;
+  };
+
+  class BindingPolicyStaticReluctant
+    : public BindingPolicy
+  {
+  public:
+    BindingPolicyStaticReluctant(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    void ServiceAdded(const ServiceReferenceBase& reference) override;
+    void ServiceRemoved(const ServiceReferenceBase& reference) override;
+  };
+
+
+  static std::unique_ptr<BindingPolicy> CreateBindingPolicy(ReferenceManagerBaseImpl& mgr
+                                                            , const std::string& policy
+                                                            , const std::string& policyOption);
+  
+  ReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
+                           , const cppmicroservices::BundleContext& bc
+                           , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                           , const std::string& configName
+                           , std::unique_ptr<BindingPolicy> policy);
+  
+private:
+  friend class ReferenceManagerImplTest;
+  friend class BindingPolicyTest;
   
   static long GetServiceId(const ServiceReferenceBase& sRef);
 
@@ -210,55 +264,23 @@ private:
                                                                       ///listeners
 
   std::unique_ptr<BindingPolicy> bindingPolicy;
-
-
-  class BindingPolicyDynamicGreedy
-    : public BindingPolicy
-  {
-  public:
-    void ServiceAdded(ReferenceManagerImpl& refMgr
-                      , const ServiceReferenceBase& reference) override;
-    
-    void ServiceRemoved(ReferenceManagerImpl& refMgr
-                        , const ServiceReferenceBase& reference) override;
-
-  };
-
-  class BindingPolicyDynamicReluctant
-    : public BindingPolicy
-  {
-  public:
-    void ServiceAdded(ReferenceManagerImpl& refMgr
-                      , const ServiceReferenceBase& reference) override;
-    void ServiceRemoved(ReferenceManagerImpl& refMgr
-                        , const ServiceReferenceBase& reference) override;
-  };
-
-  class BindingPolicyStaticGreedy
-    : public BindingPolicy
-  {
-  public:
-    void ServiceAdded(ReferenceManagerImpl& refMgr
-                      , const ServiceReferenceBase& reference) override;
-    
-    void ServiceRemoved(ReferenceManagerImpl& refMgr
-                        , const ServiceReferenceBase& reference) override;
-  };
-
-  class BindingPolicyStaticReluctant
-    : public BindingPolicy
-  {
-  public:
-    
-    void ServiceAdded(ReferenceManagerImpl& refMgr
-                      , const ServiceReferenceBase& reference) override;
-    
-    void ServiceRemoved(ReferenceManagerImpl& refMgr
-                        , const ServiceReferenceBase& reference) override;
-  };
-
 };
 
+/**
+ */
+class ReferenceManagerImpl final
+  : public ReferenceManagerBaseImpl
+{
+public:
+  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
+                       , const cppmicroservices::BundleContext& bc
+                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                       , const std::string& configName)
+    : ReferenceManagerBaseImpl(metadata, bc, logger, configName)
+  {
+  }
+};
+  
 }}
 #endif // __REFERENCEMANAGERIMPL_HPP__
 

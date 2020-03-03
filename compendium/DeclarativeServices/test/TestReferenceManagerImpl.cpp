@@ -36,14 +36,6 @@ using cppmicroservices::service::component::ComponentConstants::REFERENCE_SCOPE_
 namespace cppmicroservices {
 namespace scrimpl {
 // The fixture for testing class ReferenceManagerImpl.
-const std::string ReferencePolicy_Static = "static";
-const std::string ReferencePolicy_Dynamic = "dynamic";
-const std::string ReferencePolicyOption_Reluctant = "reluctant";
-const std::string ReferencePolicyOption_Greedy = "greedy";
-const std::string ReferenceCardinality_OptionalUnary = "0..1";
-const std::string ReferenceCardinality_OptionalMultiple = "0..n";
-const std::string ReferenceCardinality_MandatoryUnary = "1..1";
-const std::string ReferenceCardinality_MandatoryMultiple = "1..n";
 
 const std::string FakeComponentConfigName = "foobar";
 
@@ -95,17 +87,18 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& polic
   fakeMetadata.policy = policy;
   fakeMetadata.policyOption = policyOption;
   fakeMetadata.cardinality = cardinality;
-  if (cardinality == ReferenceCardinality_OptionalUnary)
+
+  if (cardinality == "0..1")
   {
     fakeMetadata.minCardinality = 0;
     fakeMetadata.maxCardinality = 1;
   }
-  else if (cardinality == ReferenceCardinality_OptionalMultiple)
+  else if (cardinality == "0..n")
   {
     fakeMetadata.minCardinality = 0;
     fakeMetadata.maxCardinality = std::numeric_limits<unsigned int>::max();
   }
-  else if (cardinality == ReferenceCardinality_MandatoryUnary)
+  else if (cardinality == "1..1")
   {
     fakeMetadata.minCardinality = 1;
     fakeMetadata.maxCardinality = 1;
@@ -119,18 +112,15 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& polic
 }
 
 INSTANTIATE_TEST_SUITE_P(ReferenceManagerParameterized, ReferenceManagerImplTest,
-                        testing::Values(CreateFakeReferenceMetadata(ReferencePolicy_Static,
-                                                                    ReferencePolicyOption_Reluctant,
-                                                                    ReferenceCardinality_OptionalUnary),
-                                        CreateFakeReferenceMetadata(ReferencePolicy_Static,
-                                                                    ReferencePolicyOption_Reluctant,
-                                                                    ReferenceCardinality_MandatoryUnary),
-                                        CreateFakeReferenceMetadata(ReferencePolicy_Static,
-                                                                    ReferencePolicyOption_Greedy,
-                                                                    ReferenceCardinality_OptionalUnary),
-                                        CreateFakeReferenceMetadata(ReferencePolicy_Static,
-                                                                    ReferencePolicyOption_Greedy,
-                                                                    ReferenceCardinality_MandatoryUnary)));
+                        testing::Values(CreateFakeReferenceMetadata("static", "reluctant", "0..1")
+                                        , CreateFakeReferenceMetadata("static", "reluctant", "1..1")
+                                        , CreateFakeReferenceMetadata("static", "greedy", "0..1")
+                                        , CreateFakeReferenceMetadata("static", "greedy", "1..1")
+                                        , CreateFakeReferenceMetadata("dynamic", "reluctant", "0..1")
+                                        , CreateFakeReferenceMetadata("dynamic", "reluctant", "1..1")
+                                        , CreateFakeReferenceMetadata("dynamic", "greedy", "0..1")
+                                        , CreateFakeReferenceMetadata("dynamic", "greedy", "1..1")
+                                       ));
 
 TEST_P(ReferenceManagerImplTest, TestConstructor)
 {
@@ -228,8 +218,8 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, static-greedy - state change & one satisfied callback
     auto reg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
     EXPECT_EQ(refManager.IsSatisfied(), true);
-    EXPECT_EQ(unsatisfiedNotificationCount, refManager.IsOptional()  && (fakeMetadata.policyOption == ReferencePolicyOption_Greedy) ? 1 : 0) << "UNSATISFIED notification expected only for optional-greedy";
-    EXPECT_EQ(satisfiedNotificationCount, (refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant) ? 0 : 1) << "SATISFIED notification expected except for optional-reluctant";
+    EXPECT_EQ(unsatisfiedNotificationCount, refManager.IsOptional()  && (fakeMetadata.policyOption == "greedy") ? 1 : 0) << "UNSATISFIED notification expected only for optional-greedy";
+    EXPECT_EQ(satisfiedNotificationCount, (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ? 0 : 1) << "SATISFIED notification expected except for optional-reluctant";
     resetCounters();
 
     // Register second service with same rank
@@ -250,8 +240,8 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, static-greedy - no state change, two callbacks expected in sequence UNSATISFIED, SATISFIED
     auto reg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(), {{Constants::SERVICE_RANKING, Any(10)}});
     EXPECT_EQ(refManager.IsSatisfied(), true);
-    EXPECT_EQ(unsatisfiedNotificationCount, fakeMetadata.policyOption == ReferencePolicyOption_Greedy ? 1 :0) << "UNSATISFIED notification must be sent only for greedy policy";
-    EXPECT_EQ(satisfiedNotificationCount, fakeMetadata.policyOption == ReferencePolicyOption_Greedy ? 1: 0) << "SATISFIED notification must be sent only for greedy policy";;
+    EXPECT_EQ(unsatisfiedNotificationCount, fakeMetadata.policyOption == "greedy" ? 1 :0) << "UNSATISFIED notification must be sent only for greedy policy";
+    EXPECT_EQ(satisfiedNotificationCount, fakeMetadata.policyOption == "greedy" ? 1: 0) << "SATISFIED notification must be sent only for greedy policy";;
     resetCounters();
 
     // unregister service 1.
@@ -260,8 +250,8 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, static-reluctant - bound, expect callback with UNSATISFIED
     // mandatory, static-greedy - not bound so no change
     reg.Unregister();
-    EXPECT_EQ(unsatisfiedNotificationCount, fakeMetadata.cardinality == ReferenceCardinality_MandatoryUnary && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant ? 1 : 0) << "UNSATISFIED notification must be sent only for mandatory-unary-static-reluctant";
-    EXPECT_EQ(satisfiedNotificationCount, fakeMetadata.cardinality == ReferenceCardinality_MandatoryUnary && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant ? 1 : 0) << "SATISFIED notification must be sent only for mandatory-unary-static-reluctant";
+    EXPECT_EQ(unsatisfiedNotificationCount, fakeMetadata.cardinality == "1..1" && fakeMetadata.policyOption == "reluctant" ? 1 : 0) << "UNSATISFIED notification must be sent only for mandatory-unary-static-reluctant";
+    EXPECT_EQ(satisfiedNotificationCount, fakeMetadata.cardinality == "1..1" && fakeMetadata.policyOption == "reluctant" ? 1 : 0) << "SATISFIED notification must be sent only for mandatory-unary-static-reluctant";
     resetCounters();
 
     // unregister service 2.
@@ -280,8 +270,8 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, static-reluctant - not bound initially but bound after reg is unregistered.
     // mandatory, static-greedy - bound, expect callback with UNSATISFIED
     reg2.Unregister();
-    EXPECT_EQ(unsatisfiedNotificationCount, refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant ? 0 : 1) << "UNSATISFIED notification must be sent except for optional-static-reluctant";
-    EXPECT_EQ(satisfiedNotificationCount, refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Greedy ? 1 : 0) << "SATISFIED notification must be sent only for optional-static-greedy";;
+    EXPECT_EQ(unsatisfiedNotificationCount, refManager.IsOptional() && fakeMetadata.policyOption == "reluctant" ? 0 : 1) << "UNSATISFIED notification must be sent except for optional-static-reluctant";
+    EXPECT_EQ(satisfiedNotificationCount, refManager.IsOptional() && fakeMetadata.policyOption == "greedy" ? 1 : 0) << "SATISFIED notification must be sent only for optional-static-greedy";;
     resetCounters();
 
     refManager.UnregisterListener(token);
@@ -307,7 +297,7 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfied)
   auto registrations = ConcurrentInvoke(func);
 
   EXPECT_TRUE(refManager.IsSatisfied()) << "Reference Manager must be in satisfied state after concurrent service registrations";
-  EXPECT_EQ(refManager.GetBoundReferences().size(), (refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant) ? 0ul : 1ul) << "A reference must be bound unless the cardinality is optional and binding policy is static";
+  EXPECT_EQ(refManager.GetBoundReferences().size(), (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ? 0ul : 1ul) << "A reference must be bound unless the cardinality is optional and binding policy is static";
   for(auto& reg : registrations)
   {
     reg.Unregister();
@@ -412,14 +402,14 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied)
   // statuc-reluctant, mandatory-unary - depends on which thread's service was bound
   // static-reluctant, optional-unary - none of the services are bound
   if(refManager.IsOptional() &&
-     fakeMetadata.policyOption == ReferencePolicyOption_Reluctant)
+     fakeMetadata.policyOption == "reluctant")
   {
     EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul) << "No references must be bound for OPTIONAL cardinality with RELUCTANT policy";
   }
   // static-greedy, optional-unary - the service with the highest rank is bound
   // static-greedy, mandatory-unary - the service with the highest rank is bound
   if(refManager.IsOptional() &&
-     fakeMetadata.policyOption == ReferencePolicyOption_Greedy)
+     fakeMetadata.policyOption == "greedy")
   {
     EXPECT_EQ(refManager.GetBoundReferences().size(), (registeredServiceCount ? 1ul : 0ul)) << "If any services are available, bound services must not be zero";
   }
@@ -463,9 +453,9 @@ TEST_P(ReferenceManagerImplTest, TestTrackerWithScope_PrototypeRequired)
 TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 {
   namespace constants = cppmicroservices::Constants;
-  auto fakeMetadata   = CreateFakeReferenceMetadata(ReferencePolicy_Static
-                                                    , ReferencePolicyOption_Reluctant
-                                                    , ReferenceCardinality_MandatoryUnary);
+  auto fakeMetadata   = CreateFakeReferenceMetadata("static"
+                                                    , "reluctant"
+                                                    , "1..1");
   auto bc             = GetFramework().GetBundleContext();
   auto fakeLogger     = std::make_shared<FakeLogger>();
 
@@ -493,9 +483,9 @@ TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
 {
   auto fakeMetadata =
-    CreateFakeReferenceMetadata(ReferencePolicy_Static,
-                                ReferencePolicyOption_Reluctant,
-                                ReferenceCardinality_MandatoryUnary);
+    CreateFakeReferenceMetadata("static",
+                                "reluctant",
+                                "1..1");
   fakeMetadata.interfaceName = "dummy::Reference1";
   fakeMetadata.name = "dummy_ref";
   auto bc = GetFramework().GetBundleContext();

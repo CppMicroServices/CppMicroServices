@@ -9,51 +9,80 @@ namespace cppmicroservices { namespace scrimpl {
 
 using namespace cppmicroservices::logservice;
 
-void ReferenceManagerImpl::BindingPolicyDynamicReluctant::ServiceAdded(ReferenceManagerImpl& mgr
-                                                                       ,  const ServiceReferenceBase& reference)
+void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(const ServiceReferenceBase& reference)
 {
-  if (!reference)
-  {
-    mgr.logger->Log(SeverityLevel::LOG_DEBUG, "ServiceAdded: service with id " + std::to_string(GetServiceId(reference)) + " has already been unregistered, no-op");
-    return;
-  }
-  
-  auto notifySatisfied = false;
-  if (!mgr.IsSatisfied())
-  {
-    notifySatisfied = mgr.UpdateBoundRefs(); // becomes satisfied if return value is true
-  }
-
+  // check cardinality... if it's 1..1 or 0..1, do the same thing as StaticReluctant
+  // else...
+  //   update bound refs,
+  //   perform bind/unbind callbacks
   std::vector<RefChangeNotification> notifications;
-  if (notifySatisfied)
+  if (1 == mgr.metadata.maxCardinality)
   {
-    mgr.logger->Log(SeverityLevel::LOG_DEBUG, "Notify SATISFIED for reference " + mgr.metadata.name);
-    notifications.push_back({mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference });
+    notifications = ReluctantServiceAdded(reference);
+  }
+  else // maxCardinality is greater than 1
+  {
+    ServiceReference<void> serviceToUnbind;
+    bool replacementNeeded(false);
+    {    
+      auto boundRefsHandle = mgr.boundRefs.lock(); // acquire lock on boundRefs
+      if (boundRefsHandle->find(reference) == boundRefsHandle->end()) {
+        if (!boundRefsHandle->empty()) {
+          const ServiceReferenceBase& minBound = *(boundRefsHandle->begin());
+          if (minBound < reference) {
+            replacementNeeded = true;
+            serviceToUnbind = minBound;
+          }
+        } else {
+          replacementNeeded = mgr.IsOptional();
+        }
+      }
+    }
+
+    if(replacementNeeded) {
+      mgr.UpdateBoundRefs();
+      // bind reference
+      notifications.push_back({mgr.metadata.name, RefEvent::BIND_REFERENCE, reference });
+      // unbind serviceToUnbind
+      notifications.push_back({mgr.metadata.name, RefEvent::UNBIND_REFERENCE, serviceToUnbind });
+     
+    }
   }
   mgr.BatchNotifyAllListeners(notifications);
-
 }
 
-void ReferenceManagerImpl::BindingPolicyDynamicReluctant::ServiceRemoved(ReferenceManagerImpl& mgr
-                                                                         , const ServiceReferenceBase& reference)
+void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(const ServiceReferenceBase& reference)
 {
-  if(RemoveBoundRef(mgr, reference)) {
-    mgr.logger->Log(SeverityLevel::LOG_DEBUG, "Notify UNSATISFIED for reference " + mgr.metadata.name);
-    std::vector<RefChangeNotification> notifications;
-    notifications.push_back({ mgr.metadata.name, RefEvent::BECAME_UNSATISFIED, reference });
-    {
-      auto boundRefsHandle = mgr.boundRefs.lock();
-      boundRefsHandle->clear();
-    }
-    
-    if (mgr.UpdateBoundRefs())
-    {
-      mgr.logger->Log(SeverityLevel::LOG_DEBUG, "Notify SATISFIED for reference " + mgr.metadata.name);
-      notifications.push_back({ mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference });
-    }
-    mgr.BatchNotifyAllListeners(notifications);
+  std::vector<RefChangeNotification> notifications;
+  if (1 == mgr.metadata.maxCardinality)
+  {
+    notifications = RemoveService(reference);
   }
+  else
+  {
+    // do we need to replace a boundRef
+    auto boundRefsHandle = mgr.boundRefs.lock();
+    bool needsUnbind = (boundRefsHandle->find(reference) != boundRefsHandle->end());
+    if (needsUnbind) {
+      auto matchedRefsHandle = mgr.matchedRefs.lock();
+      std::set<cppmicroservices::ServiceReferenceBase> notBound;
+      
+      std::set_difference(matchedRefsHandle->begin(), matchedRefsHandle->end(),
+                          boundRefsHandle->begin(), boundRefsHandle->end(),
+                          std::inserter(notBound, notBound.begin()));
+      auto serviceToBind = *notBound.rbegin(); // best match not in boundRefs;
+#if TODO
+      // What do I do in the case that notBound is empty? That is, there's no more
+      // services left leaving the current service in an incomplete state (that is,
+      // there's not enough matching services to deal with the cardinality.
+#endif
+      boundRefsHandle->insert(serviceToBind);
+      boundRefsHandle->erase(reference);
+      notifications.push_back({mgr.metadata.name, RefEvent::BIND_REFERENCE, serviceToBind });
+      notifications.push_back({mgr.metadata.name, RefEvent::UNBIND_REFERENCE, reference });
+    }
+  }
+  mgr.BatchNotifyAllListeners(notifications);
 }
 
 }}
-

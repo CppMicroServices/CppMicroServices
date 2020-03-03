@@ -135,6 +135,29 @@ public:
   MOCK_METHOD0(StopTracking, void(void));
 };
 
+class MockReferenceManagerBaseImpl
+  : public ReferenceManagerBaseImpl
+{
+public:
+  MockReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
+                               , const cppmicroservices::BundleContext& bc
+                               , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                               , const std::string& configName)
+    : ReferenceManagerBaseImpl(metadata, bc, logger, configName)
+  {}
+  
+  MOCK_CONST_METHOD0(GetReferenceName, std::string(void));
+  MOCK_CONST_METHOD0(GetReferenceScope, std::string(void));
+  MOCK_CONST_METHOD0(GetLDAPString, std::string(void));
+  MOCK_CONST_METHOD0(IsSatisfied, bool(void));
+  MOCK_CONST_METHOD0(IsOptional, bool(void));
+  MOCK_CONST_METHOD0(GetBoundReferences, std::set<cppmicroservices::ServiceReferenceBase>());
+  MOCK_CONST_METHOD0(GetTargetReferences, std::set<cppmicroservices::ServiceReferenceBase>());
+  MOCK_METHOD1(RegisterListener, cppmicroservices::ListenerTokenId(std::function<void(const RefChangeNotification&)>));
+  MOCK_METHOD1(UnregisterListener, void(cppmicroservices::ListenerTokenId));
+  MOCK_METHOD0(StopTracking, void(void));
+};
+
 class MockComponentConfiguration
   : public ComponentConfiguration
 {

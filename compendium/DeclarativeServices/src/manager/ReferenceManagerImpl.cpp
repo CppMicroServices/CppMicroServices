@@ -57,19 +57,19 @@ LDAPFilter GetReferenceLDAPFilter(const metadata::ReferenceMetadata& refMetadata
   return LDAPFilter(expr);
 }
 
-ReferenceManagerImpl::ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
+ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
                                            , const cppmicroservices::BundleContext& bc
                                            , std::shared_ptr<cppmicroservices::logservice::LogService> logger
                                            , const std::string& configName)
-  : ReferenceManagerImpl(metadata
-                         , bc
-                         , logger
-                         , configName
-                         , CreateBindingPolicy(metadata.policy, metadata.policyOption))
+  : ReferenceManagerBaseImpl(metadata
+                             , bc
+                             , logger
+                             , configName
+                             , CreateBindingPolicy(*this, metadata.policy, metadata.policyOption))
 {
 }
 
-ReferenceManagerImpl::ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
+ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
                                            , const cppmicroservices::BundleContext& bc
                                            , std::shared_ptr<cppmicroservices::logservice::LogService> logger
                                            , const std::string& configName
@@ -97,7 +97,7 @@ ReferenceManagerImpl::ReferenceManagerImpl(const metadata::ReferenceMetadata& me
   }
 }
 
-void ReferenceManagerImpl::StopTracking()
+void ReferenceManagerBaseImpl::StopTracking()
 {
   try
   {
@@ -109,29 +109,29 @@ void ReferenceManagerImpl::StopTracking()
   }
 }
 
-std::set<cppmicroservices::ServiceReferenceBase> ReferenceManagerImpl::GetBoundReferences() const
+std::set<cppmicroservices::ServiceReferenceBase> ReferenceManagerBaseImpl::GetBoundReferences() const
 {
   auto boundRefsHandle = boundRefs.lock();
   return std::set<cppmicroservices::ServiceReferenceBase>(boundRefsHandle->begin(), boundRefsHandle->end());
 }
 
-std::set<cppmicroservices::ServiceReferenceBase> ReferenceManagerImpl::GetTargetReferences() const
+std::set<cppmicroservices::ServiceReferenceBase> ReferenceManagerBaseImpl::GetTargetReferences() const
 {
   auto matchedRefsHandle = matchedRefs.lock();
   return std::set<cppmicroservices::ServiceReferenceBase>(matchedRefsHandle->begin(), matchedRefsHandle->end());
 }
 
-bool ReferenceManagerImpl::IsOptional() const
+bool ReferenceManagerBaseImpl::IsOptional() const
 {
   return (metadata.minCardinality == 0);
 }
 
-bool ReferenceManagerImpl::IsSatisfied() const
+bool ReferenceManagerBaseImpl::IsSatisfied() const
 {
   return (boundRefs.lock()->size() >= metadata.minCardinality);
 }
 
-ReferenceManagerImpl::~ReferenceManagerImpl()
+ReferenceManagerBaseImpl::~ReferenceManagerBaseImpl()
 {
   StopTracking();
 }
@@ -139,7 +139,7 @@ ReferenceManagerImpl::~ReferenceManagerImpl()
 struct dummyRefObj {
 };
 
-bool ReferenceManagerImpl::UpdateBoundRefs()
+bool ReferenceManagerBaseImpl::UpdateBoundRefs()
 {
   auto matchedRefsHandle = matchedRefs.lock(); // acquires lock on matchedRefs
   const auto matchedRefsHandleSize = matchedRefsHandle->size();
@@ -156,7 +156,7 @@ bool ReferenceManagerImpl::UpdateBoundRefs()
   // release locks on matchedRefs and boundRefs
 }
 
-cppmicroservices::InterfaceMapConstPtr ReferenceManagerImpl::AddingService(const cppmicroservices::ServiceReference<void>& reference)
+cppmicroservices::InterfaceMapConstPtr ReferenceManagerBaseImpl::AddingService(const cppmicroservices::ServiceReference<void>& reference)
 {
   // Each service registered by DS contains a service property representing the component configuration name
   // to which it belongs. By checking the component configuration name of a service it can be determined
@@ -179,14 +179,14 @@ cppmicroservices::InterfaceMapConstPtr ReferenceManagerImpl::AddingService(const
   // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sporadically not returning a valid service
   // when a user calls getService, due to a service's references still resolving, was deemed undesirable
   // for user workflows.
-  bindingPolicy->ServiceAdded(*this, reference);
+  bindingPolicy->ServiceAdded(reference);
 
   // A non-null object must be returned to indicate to the ServiceTracker that
   // we are tracking the service and need to be called back when the service is removed.
   return MakeInterfaceMap<dummyRefObj>(std::make_shared<dummyRefObj>());
 }
 
-void ReferenceManagerImpl::ModifiedService(const cppmicroservices::ServiceReference<void>& /*reference*/,
+void ReferenceManagerBaseImpl::ModifiedService(const cppmicroservices::ServiceReference<void>& /*reference*/,
                                            const cppmicroservices::InterfaceMapConstPtr& /*service*/)
 {
   // no-op since there is no use case for property update
@@ -197,7 +197,7 @@ void ReferenceManagerImpl::ModifiedService(const cppmicroservices::ServiceRefere
  * the component configuration must be reactivated and the replacement service is bound to
  * the new component instance.
  */
-void ReferenceManagerImpl::RemovedService(const cppmicroservices::ServiceReference<void>& reference,
+void ReferenceManagerBaseImpl::RemovedService(const cppmicroservices::ServiceReference<void>& reference,
                                           const cppmicroservices::InterfaceMapConstPtr& /*service*/)
 {
   { // acquire lock on matchedRefs
@@ -209,15 +209,15 @@ void ReferenceManagerImpl::RemovedService(const cppmicroservices::ServiceReferen
   // This behavior deviates from what is described in the "synchronous" section in
   // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sometimes not returning a valid service
   // due to a service's references still resolving was deemed undesirable for user workflows.
-  bindingPolicy->ServiceRemoved(*this, reference);
+  bindingPolicy->ServiceRemoved(reference);
 }
 
-std::atomic<cppmicroservices::ListenerTokenId> ReferenceManagerImpl::tokenCounter(0);
+std::atomic<cppmicroservices::ListenerTokenId> ReferenceManagerBaseImpl::tokenCounter(0);
 
 /**
  * Method is used to register a listener for callbacks
  */
-cppmicroservices::ListenerTokenId ReferenceManagerImpl::RegisterListener(std::function<void(const RefChangeNotification&)> notify)
+cppmicroservices::ListenerTokenId ReferenceManagerBaseImpl::RegisterListener(std::function<void(const RefChangeNotification&)> notify)
 {
   auto notifySatisfied = UpdateBoundRefs();
   if(notifySatisfied)
@@ -237,7 +237,7 @@ cppmicroservices::ListenerTokenId ReferenceManagerImpl::RegisterListener(std::fu
 /**
  * Method is used to remove a registered listener
  */
-void ReferenceManagerImpl::UnregisterListener(cppmicroservices::ListenerTokenId token)
+void ReferenceManagerBaseImpl::UnregisterListener(cppmicroservices::ListenerTokenId token)
 {
   auto listenerMapHandle = listenersMap.lock();
   listenerMapHandle->erase(token);
@@ -246,7 +246,7 @@ void ReferenceManagerImpl::UnregisterListener(cppmicroservices::ListenerTokenId 
 /**
  * Method used to notify all listeners
  */
-void ReferenceManagerImpl::BatchNotifyAllListeners(const std::vector<RefChangeNotification>& notifications) noexcept
+void ReferenceManagerBaseImpl::BatchNotifyAllListeners(const std::vector<RefChangeNotification>& notifications) noexcept
 {
   if (notifications.empty() || listenersMap.lock()->empty())
   {
@@ -269,33 +269,33 @@ void ReferenceManagerImpl::BatchNotifyAllListeners(const std::vector<RefChangeNo
 }
 
 // util method to extract service-id from a given reference
-long ReferenceManagerImpl::GetServiceId(const ServiceReferenceBase& sRef)
+long ReferenceManagerBaseImpl::GetServiceId(const ServiceReferenceBase& sRef)
 {
   auto idAny = sRef.GetProperty(cppmicroservices::Constants::SERVICE_ID);
   return cppmicroservices::any_cast<long>(idAny);
 }
 
-std::unique_ptr<ReferenceManagerImpl::BindingPolicy> ReferenceManagerImpl::CreateBindingPolicy(const std::string& policy
-                                                                                               , const std::string& policyOption)
+std::unique_ptr<ReferenceManagerBaseImpl::BindingPolicy> ReferenceManagerBaseImpl::CreateBindingPolicy(ReferenceManagerBaseImpl& ref
+                                                                                                       , const std::string& policy
+                                                                                                       , const std::string& policyOption)
 {
   if (policy == "static") {
     if (policyOption == "reluctant") {
-      return std::make_unique<BindingPolicyStaticReluctant>();
+      return std::make_unique<BindingPolicyStaticReluctant>(ref);
     }
     else { // greedy
-      return std::make_unique<BindingPolicyStaticGreedy>();
+      return std::make_unique<BindingPolicyStaticGreedy>(ref);
     }
   }
   else { // dynamic
     if (policyOption == "reluctant") {
-      return std::make_unique<BindingPolicyDynamicReluctant>();
+      return std::make_unique<BindingPolicyDynamicReluctant>(ref);
     }
     else { // greedy
-      return std::make_unique<BindingPolicyDynamicGreedy>();
+      return std::make_unique<BindingPolicyDynamicGreedy>(ref);
     } 
   }
 }
-
 
 }
 }

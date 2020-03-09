@@ -111,16 +111,16 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& polic
   return fakeMetadata;
 }
 
-INSTANTIATE_TEST_SUITE_P(ReferenceManagerParameterized, ReferenceManagerImplTest,
-                        testing::Values(CreateFakeReferenceMetadata("static", "reluctant", "0..1")
-                                        , CreateFakeReferenceMetadata("static", "reluctant", "1..1")
-                                        , CreateFakeReferenceMetadata("static", "greedy", "0..1")
-                                        , CreateFakeReferenceMetadata("static", "greedy", "1..1")
-                                        , CreateFakeReferenceMetadata("dynamic", "reluctant", "0..1")
-                                        , CreateFakeReferenceMetadata("dynamic", "reluctant", "1..1")
-                                        , CreateFakeReferenceMetadata("dynamic", "greedy", "0..1")
-                                        , CreateFakeReferenceMetadata("dynamic", "greedy", "1..1")
-                                       ));
+INSTANTIATE_TEST_SUITE_P(ReferenceManagerParameterized, ReferenceManagerImplTest
+                         , testing::Values(CreateFakeReferenceMetadata("static"   , "reluctant", "0..1")
+                                           , CreateFakeReferenceMetadata("static" , "reluctant", "1..1")
+                                           , CreateFakeReferenceMetadata("static" , "greedy"   , "0..1")
+                                           , CreateFakeReferenceMetadata("static" , "greedy"   , "1..1")
+                                           , CreateFakeReferenceMetadata("dynamic", "reluctant", "0..1")
+                                           , CreateFakeReferenceMetadata("dynamic", "reluctant", "1..1")
+                                           , CreateFakeReferenceMetadata("dynamic", "greedy"   , "0..1")
+                                           , CreateFakeReferenceMetadata("dynamic", "greedy"   , "1..1")
+                                          ));
 
 TEST_P(ReferenceManagerImplTest, TestConstructor)
 {
@@ -453,9 +453,7 @@ TEST_P(ReferenceManagerImplTest, TestTrackerWithScope_PrototypeRequired)
 TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 {
   namespace constants = cppmicroservices::Constants;
-  auto fakeMetadata   = CreateFakeReferenceMetadata("static"
-                                                    , "reluctant"
-                                                    , "1..1");
+  auto fakeMetadata   = CreateFakeReferenceMetadata("static", "reluctant", "1..1");
   auto bc             = GetFramework().GetBundleContext();
   auto fakeLogger     = std::make_shared<FakeLogger>();
 
@@ -483,9 +481,7 @@ TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
 {
   auto fakeMetadata =
-    CreateFakeReferenceMetadata("static",
-                                "reluctant",
-                                "1..1");
+    CreateFakeReferenceMetadata("static", "reluctant", "1..1");
   fakeMetadata.interfaceName = "dummy::Reference1";
   fakeMetadata.name = "dummy_ref";
   auto bc = GetFramework().GetBundleContext();

@@ -166,6 +166,7 @@ public:
     bool ShouldClearBoundRefs(const ServiceReferenceBase& reference);
     bool ShouldNotifySatisfied();
     void ClearBoundRefs();
+    void GreedyServiceAdded(const ServiceReferenceBase&);
     std::vector<RefChangeNotification> ReluctantServiceAdded(const ServiceReferenceBase& reference);
     std::vector<RefChangeNotification> RemoveService(const ServiceReferenceBase& reference);
     

@@ -43,6 +43,17 @@
 
 namespace cppmicroservices {
 
+// Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
+class InitialBundleMapCleanup {
+public:
+  InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(cleanupFcn) {}
+  ~InitialBundleMapCleanup() {
+	_cleanupFcn();
+  }
+private:
+  std::function<void()> _cleanupFcn;
+};
+
 BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
 {}
@@ -176,17 +187,23 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
         std::make_pair(location, std::move(pairToInsert)));
       l.UnLock();
 
-      // Perform the install
-      auto installedBundles = Install0(location, {}, caller);
+      std::vector<Bundle> installedBundles;
+      
       {
-        // Notify all waiting threads that it is safe to install the bundle
-        std::lock_guard<std::mutex> lock(
-          *(initialBundleInstallMap[location].second.m));
-        initialBundleInstallMap[location].second.waitFlag = false;
-        initialBundleInstallMap[location].second.cv->notify_all();
+        // create instance of clean-up object to ensure RAII
+        InitialBundleMapCleanup cleanup([this, &l, &location](){
+          {
+            // Notify all waiting threads that it is safe to install the bundle
+            std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
+            initialBundleInstallMap[location].second.waitFlag = false;
+            initialBundleInstallMap[location].second.cv->notify_all();
+          }
+          DecrementInitialBundleMapRef(l, location);
+        });
+          
+        // Perform the install
+        installedBundles = Install0(location, {}, caller);
       }
-
-      DecrementInitialBundleMapRef(l, location);
 
       return installedBundles;
     } else {
@@ -217,9 +234,17 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
       GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange, resultingBundles, alreadyInstalled);
 
-      // Perform the install
-      auto newBundles = Install0(location, alreadyInstalled, caller);
-      DecrementInitialBundleMapRef(l, location);
+      std::vector<Bundle> newBundles;
+      
+      {
+        // create instance of clean-up object to ensure RAII
+        InitialBundleMapCleanup cleanup([this, &l, &location](){
+          DecrementInitialBundleMapRef(l, location);
+        });
+
+        // Perform the install
+        newBundles = Install0(location, alreadyInstalled, caller);
+      }
 
       resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
       if (resultingBundles.empty()) {

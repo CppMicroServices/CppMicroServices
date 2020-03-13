@@ -46,7 +46,7 @@ namespace cppmicroservices {
 // Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
 class InitialBundleMapCleanup {
 public:
-  InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(cleanupFcn) {}
+  InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn)) {}
   ~InitialBundleMapCleanup() {
 	_cleanupFcn();
   }

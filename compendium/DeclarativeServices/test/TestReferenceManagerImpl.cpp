@@ -26,10 +26,33 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "../src/manager/ReferenceManagerImpl.hpp"
 
 #include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
+#include "TestUtils.hpp"
+#include "TestInterfaces/Interfaces.hpp"
+
+template <typename Task, typename Predicate>
+bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
+{
+  using namespace std::chrono;
+  auto startTime = system_clock::now();
+  do
+  {
+    t();
+    duration<double> duration = system_clock::now() - startTime;
+    if(duration > milliseconds(30000))
+    {
+      return false;
+    }
+  } while(!p());
+  return true;
+}
+
+
+namespace scr = cppmicroservices::service::component::runtime;
 
 using cppmicroservices::service::component::ComponentConstants::REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 
@@ -77,12 +100,14 @@ private:
 };
 
 // utility method for creating different types of reference metadata objects used in testing
-metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& policy,
-                                                        const std::string& policyOption,
-                                                        const std::string& cardinality)
+metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& policy
+                                                        , const std::string& policyOption
+                                                        , const std::string& cardinality
+                                                        , std::string refName = "ref"
+                                                       )
 {
   metadata::ReferenceMetadata fakeMetadata{};
-  fakeMetadata.name = "ref";
+  fakeMetadata.name = std::move(refName);
   fakeMetadata.interfaceName = us_service_interface_iid<dummy::Reference1>();
   fakeMetadata.policy = policy;
   fakeMetadata.policyOption = policyOption;
@@ -480,8 +505,7 @@ TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 // configuration.
 TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
 {
-  auto fakeMetadata =
-    CreateFakeReferenceMetadata("static", "reluctant", "1..1");
+  auto fakeMetadata = CreateFakeReferenceMetadata("static", "reluctant", "1..1");
   fakeMetadata.interfaceName = "dummy::Reference1";
   fakeMetadata.name = "dummy_ref";
   auto bc = GetFramework().GetBundleContext();
@@ -499,6 +523,96 @@ TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
   EXPECT_FALSE(refManager.IsSatisfied())
     << "State expected to be UNSATISFIED after service registration";
   reg.Unregister();
+}
+
+struct CmpSymbolName
+{
+  CmpSymbolName(std::string c)
+    : cmpTo(c)
+  {
+  }
+
+  bool operator()(const cppmicroservices::Bundle& b)
+  {
+    auto symbolicName = b.GetSymbolicName();
+    return (cmpTo == symbolicName);
+  }
+private:
+  std::string cmpTo;
+};
+
+void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
+{
+  std::vector<cppmicroservices::Bundle> bundles;
+  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+
+#if defined(US_BUILD_SHARED_LIBS)
+  bundles = frameworkCtx.InstallBundles(dsPluginPath);
+#else
+  bundles = frameworkCtx.GetBundles();
+#endif
+
+  for (auto b : bundles) {
+      b.Start();
+  }
+}
+
+
+TEST_F(ReferenceManagerImplTest, TestDynamicGreedy)
+{
+  auto bc = GetFramework().GetBundleContext();
+  InstallAndStartDS(bc);
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI20");
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service must not be available before it's dependency";
+  auto dsRef = bc.GetServiceReference<scr::ServiceComponentRuntime>();
+  EXPECT_TRUE(dsRef);
+  auto dsRuntimeService = bc.GetService<scr::ServiceComponentRuntime>(dsRef);
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
+  auto compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTOs.size(), 1ul);
+  EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+
+
+  auto fakeLogger = std::make_shared<FakeLogger>();
+  ReferenceManagerImpl refManager(CreateFakeReferenceMetadata("dynamic", "greedy", "1..1", "foo")
+                                  , bc
+                                  , fakeLogger
+                                  , "foo");
+  EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional()) << "Initial state is SATISFIED only for optional cardinality";
+  int bindCount = 0;
+  int unbindCount = 0;
+  ListenerTokenId token = refManager.RegisterListener([&](const RefChangeNotification& notification) {
+                                                        switch (notification.event) {
+                                                          case RefEvent::BIND_REFERENCE:
+                                                            bindCount++;
+                                                            break;
+                                                          case RefEvent::UNBIND_REFERENCE:
+                                                            unbindCount++;
+                                                            break;
+                                                          default:
+                                                            break;
+                                                        }
+                                                      });
+
+  bindCount = unbindCount = 0;
+  refManager.UnregisterListener(token);
+
+  
+  auto depBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI21");
+  auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, &dsRuntimeService, &compDescDTO]()
+                                         {
+                                           compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+                                         }, [&compConfigDTOs]()->bool
+                                            {
+                                              return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+                                            });
+
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE after the dependency became available";
+  EXPECT_EQ(1, bindCount);
+  
+  depBundle.Stop();
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service should now NOT be available";
 }
 
 }}

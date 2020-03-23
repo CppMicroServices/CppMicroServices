@@ -31,9 +31,6 @@
 
 namespace cppmicroservices {
 
-class HttpServletRequest;
-class HttpServletResponse;
-
 class WebConsolePluginTracker : public ServiceTracker<HttpServlet>
 {
 
@@ -82,7 +79,7 @@ public:
   void Init(const ServletConfig& config);
 
 private:
-  void Service(HttpServletRequest& request, HttpServletResponse& response);
+  void Service(IHttpServletRequest& request, IHttpServletResponse& response);
 
   AbstractWebConsolePlugin* GetConsolePlugin(const std::string& label) const;
 

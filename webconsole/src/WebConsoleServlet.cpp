@@ -40,11 +40,10 @@ class FilteringResponseWrapper : public HttpServletResponse
 {
 
 public:
-  FilteringResponseWrapper(HttpServletRequest& request,
-                           HttpServletResponse& response,
+  FilteringResponseWrapper(IHttpServletRequest& request,
+                           IHttpServletResponse& response,
                            AbstractWebConsolePlugin* plugin)
     : HttpServletResponse(response)
-    //, m_Stream(nullptr)
     , m_StreamBuf(nullptr)
     , m_Plugin(plugin)
     , m_Request(request)
@@ -71,10 +70,9 @@ private:
     }
   }
 
-  //std::ostream* m_Stream;
   std::streambuf* m_StreamBuf;
   AbstractWebConsolePlugin* m_Plugin;
-  HttpServletRequest& m_Request;
+  IHttpServletRequest& m_Request;
 };
 
 void WebConsolePluginTracker::AddPlugin(const std::string& label,
@@ -176,8 +174,8 @@ void WebConsoleServlet::Init(const ServletConfig& config)
   this->m_PluginTracker.Open(config.GetServletContext());
 }
 
-void WebConsoleServlet::Service(HttpServletRequest& request,
-                                HttpServletResponse& response)
+void WebConsoleServlet::Service(IHttpServletRequest& request,
+                                IHttpServletResponse& response)
 {
   //std::cout << "RequestUrl: " << request.GetRequestUrl() << std::endl;
   //std::cout << "RequestUri: " << request.GetRequestUri() << std::endl;
@@ -244,7 +242,7 @@ void WebConsoleServlet::Service(HttpServletRequest& request,
   } else {
     response.SetCharacterEncoding("utf-8"); //$NON-NLS-1$
     response.SetContentType("text/html");   //$NON-NLS-1$
-    response.SetStatus(HttpServletResponse::SC_NOT_FOUND);
+    response.SetStatus(IHttpServletResponse::SC_NOT_FOUND);
     response.GetOutputStream() << "No plug-in found handling this URL";
   }
 }

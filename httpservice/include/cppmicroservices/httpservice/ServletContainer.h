@@ -27,6 +27,9 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+
+class CivetServer;
 
 namespace cppmicroservices {
 
@@ -44,7 +47,18 @@ public:
   void SetContextPath(const std::string& contextPath);
   std::string GetContextPath() const;
 
+  /*!
+  * Pass an options collection to the underlying CivetWeb server
+  *
+  * See CivetWeb documentation for available parameters
+  */
+  void Start(const std::vector<std::string>& options);
+
+  /*!
+  * Start server with default options
+  */
   void Start();
+
   void Stop();
 
   std::shared_ptr<ServletContext> GetContext(const std::string& uripath) const;

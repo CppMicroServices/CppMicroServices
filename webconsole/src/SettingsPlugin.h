@@ -33,8 +33,8 @@ public:
   SettingsPlugin();
 
 private:
-  void RenderContent(HttpServletRequest& /*request*/,
-                     HttpServletResponse& response);
+  void RenderContent(IHttpServletRequest& /*request*/,
+                     IHttpServletResponse& response);
 
   // WORKAROUND Remove this overload after the HttpService supports
   // registering resources

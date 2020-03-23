@@ -54,6 +54,45 @@ void MakePath(const std::string& path);
 
 void RemoveDirectoryRecursive(const std::string& path);
 
+/*
+* Returns a platform appropriate location for use as temporary storage.
+*/
+std::string GetTempDirectory();
+
+/*
+* Creates a new unique sub-directory in the temporary storage
+* location returned by GetTempDirectory() and returns a string
+* containing the directory path.
+*
+* This is similar to mkdtemp on POSIX systems, but without a
+* custom template string.
+*/
+std::string MakeUniqueTempDirectory();
+
+/*
+* Closes the file descriptor on destruction.
+*/
+struct File
+{
+  File(const File&) = delete;
+  File& operator=(const File&) = delete;
+
+  File();
+
+  // The file descriptor fd is owned by this
+  File(int fd, const std::string& path);
+
+  File(File&& o);
+  File& operator=(File&& o);
+
+  ~File();
+
+  int FileDescr;
+  std::string Path;
+};
+
+File MakeUniqueTempFile(const std::string& base);
+
 } // namespace util
 } // namespace cppmicroservices
 

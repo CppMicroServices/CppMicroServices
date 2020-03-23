@@ -24,8 +24,8 @@
 
 #include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
 
-#include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "cppmicroservices/httpservice/HttpServletResponse.h"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletResponse.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
@@ -40,8 +40,8 @@ SettingsPlugin::SettingsPlugin()
   : SimpleWebConsolePlugin("settings", "Settings", "")
 {}
 
-void SettingsPlugin::RenderContent(HttpServletRequest& request,
-                                   HttpServletResponse& response)
+void SettingsPlugin::RenderContent(IHttpServletRequest& request,
+                                   IHttpServletResponse& response)
 {
   BundleResource res =
     GetBundleContext().GetBundle().GetResource("/templates/settings.html");

@@ -27,6 +27,8 @@
 #include "cppmicroservices/httpservice/HttpServlet.h"
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
 #include "cppmicroservices/webconsole/mustache.hpp"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletResponse.h"
 
 #include <string>
 #include <vector>
@@ -43,8 +45,6 @@ class BundleContext;
 class Bundle;
 class BundleResource;
 
-class HttpServletRequest;
-class HttpServletResponse;
 struct WebConsoleVariableResolver;
 
 struct AbstractWebConsolePluginPrivate;
@@ -58,7 +58,7 @@ struct AbstractWebConsolePluginPrivate;
  *
  * To help rendering the response the Web Console bundle provides two
  * options. One of the options is to extend the AbstractWebConsolePlugin overwriting
- * the RenderContent(HttpServletRequest&, HttpServletResponse&) method.
+ * the RenderContent(HttpServletRequest&, IHttpServletResponse&) method.
  */
 class US_WebConsole_EXPORT AbstractWebConsolePlugin : public HttpServlet
 {
@@ -95,10 +95,10 @@ public:
   virtual std::string GetCategory() const;
 
   virtual std::shared_ptr<WebConsoleVariableResolver> GetVariableResolver(
-    HttpServletRequest& request);
+    IHttpServletRequest& request);
 
   virtual void SetVariableResolver(
-    HttpServletRequest& request,
+    IHttpServletRequest& request,
     const std::shared_ptr<WebConsoleVariableResolver>& resolver);
 
 protected:
@@ -112,17 +112,17 @@ protected:
    * @param request the original request passed from the HTTP server
    * @return <code>true</code> if the page should have headers and footers rendered
    */
-  virtual bool IsHtmlRequest(HttpServletRequest& request);
+  virtual bool IsHtmlRequest(IHttpServletRequest& request);
 
   /**
    * Renders the web console page for the request. This consist of the
    * following five parts called in order:
    * <ol>
    * <li>Send back a requested resource
-   * <li>{@link #StartResponse(HttpServletRequest&, HttpServletResponse&)}</li>
-   * <li>{@link #RenderTopNavigation(HttpServletRequest&, std::ostream&)}</li>
-   * <li>{@link #RenderContent(HttpServletRequest&, HttpServletResponse&)}</li>
-   * <li>{@link #EndResponse(HttpServletRequest&, std::ostream&)}</li>
+   * <li>{@link #StartResponse(IHttpServletRequest&, IHttpServletResponse&)}</li>
+   * <li>{@link #RenderTopNavigation(IHttpServletRequest&, std::ostream&)}</li>
+   * <li>{@link #RenderContent(IHttpServletRequest&, IHttpServletResponse&)}</li>
+   * <li>{@link #EndResponse(IHttpServletRequest&, std::ostream&)}</li>
    * </ol>
    *
    * \rststar
@@ -133,15 +133,15 @@ protected:
    *    and the latter four steps are executed in order.
    * \endrststar
    *
-   * If the {@link #IsHtmlRequest(HttpServletRequest&)} method returns
+   * If the {@link #IsHtmlRequest(IHttpServletRequest&)} method returns
    * <code>false</code> only the
-   * {@link #RenderContent(HttpServletRequest&, HttpServletResponse&)} method is
+   * {@link #RenderContent(IHttpServletRequest&, IHttpServletResponse&)} method is
    * called.
    *
-   * @see HttpServlet#DoGet(HttpServletRequest&, HttpServletResponse&)
+   * @see HttpServlet#DoGet(IHttpServletRequest&, IHttpServletResponse&)
    */
-  virtual void DoGet(HttpServletRequest& request,
-                     HttpServletResponse& response);
+  virtual void DoGet(IHttpServletRequest& request,
+                     IHttpServletResponse& response);
 
   /**
    * This method is used to render the content of the plug-in. It is called internally
@@ -150,8 +150,8 @@ protected:
    * @param request the HTTP request send from the user
    * @param response the HTTP response object, where to render the plugin data.
    */
-  virtual void RenderContent(HttpServletRequest& request,
-                             HttpServletResponse& response) = 0;
+  virtual void RenderContent(IHttpServletRequest& request,
+                             IHttpServletResponse& response) = 0;
 
   /**
    * This method is responsible for generating the top heading of the page.
@@ -159,10 +159,10 @@ protected:
    * @param request the HTTP request coming from the user
    * @param response the HTTP response, where data is rendered
    * @return the stream that was used for generating the response.
-   * @see #EndResponse(HttpServletRequest&, std::ostream&)
+   * @see #EndResponse(IHttpServletRequest&, std::ostream&)
    */
-  std::ostream& StartResponse(HttpServletRequest& request,
-                              HttpServletResponse& response);
+  std::ostream& StartResponse(IHttpServletRequest& request,
+                              IHttpServletResponse& response);
 
   /**
    * This method is called to generate the top level links with the available plug-ins.
@@ -170,16 +170,16 @@ protected:
    * @param request the HTTP request coming from the user
    * @param writer the writer, where the HTML data is rendered
    */
-  void RenderTopNavigation(HttpServletRequest& request, std::ostream& writer);
+  void RenderTopNavigation(IHttpServletRequest& request, std::ostream& writer);
 
   /**
    * This method is responsible for generating the footer of the page.
    *
    * @param request the HTTP request coming from the user
    * @param writer the writer, where the HTML data is rendered
-   * @see #StartResponse(HttpServletRequest&, HttpServletResponse&)
+   * @see #StartResponse(IHttpServletRequest&, IHttpServletResponse&)
    */
-  void EndResponse(HttpServletRequest& request, std::ostream& writer);
+  void EndResponse(IHttpServletRequest& request, std::ostream& writer);
 
   /**
    * Returns a list of CSS reference paths or <code>null</code> if no
@@ -222,8 +222,8 @@ private:
    *
    * @throws std::exception If an error occurs accessing or spooling the resource.
    */
-  bool SpoolResource(HttpServletRequest& request,
-                     HttpServletResponse& response) const;
+  bool SpoolResource(IHttpServletRequest& request,
+                     IHttpServletResponse& response) const;
 };
 }
 

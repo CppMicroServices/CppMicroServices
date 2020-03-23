@@ -27,8 +27,8 @@
 #include "cppmicroservices/webconsole/WebConsoleConstants.h"
 #include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
 
-#include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "cppmicroservices/httpservice/HttpServletResponse.h"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletResponse.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleResource.h"
@@ -96,8 +96,8 @@ BundlesPlugin::BundlesPlugin()
   : SimpleWebConsolePlugin("bundles", "Bundles", "")
 {}
 
-void BundlesPlugin::RenderContent(HttpServletRequest& request,
-                                  HttpServletResponse& response)
+void BundlesPlugin::RenderContent(IHttpServletRequest& request,
+                                  IHttpServletResponse& response)
 {
   switch (static_cast<RequestType>(
     any_cast<int>(request.GetAttribute(REQ_BUNDLE_TYPE)))) {
@@ -164,7 +164,7 @@ void BundlesPlugin::RenderContent(HttpServletRequest& request,
   response.SetStatus(response.SC_NOT_FOUND);
 }
 
-bool BundlesPlugin::IsHtmlRequest(HttpServletRequest& request)
+bool BundlesPlugin::IsHtmlRequest(IHttpServletRequest& request)
 {
   RequestType requestType = RequestType::Unknown;
   long bundleId = -1;

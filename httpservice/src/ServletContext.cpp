@@ -35,7 +35,7 @@ std::string ServletContext::GetContextPath() const
   return m_Container->GetContextPath(this);
 }
 
-std::shared_ptr<ServletContext> ServletContext::GetContext(
+std::shared_ptr<IServletContext> ServletContext::GetContext(
   const std::string& uripath)
 {
   return m_Container->GetContext(uripath);

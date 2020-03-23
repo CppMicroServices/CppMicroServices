@@ -39,9 +39,9 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 using namespace cppmicroservices;
-using cppmicroservices::testing::File;
-using cppmicroservices::testing::GetTempDirectory;
-using cppmicroservices::testing::MakeUniqueTempDirectory;
+using cppmicroservices::util::File;
+using cppmicroservices::util::GetTempDirectory;
+using cppmicroservices::util::MakeUniqueTempDirectory;
 using cppmicroservices::testing::TempDir;
 
 #if !defined(__clang__) && defined(__GNUC__)
@@ -259,7 +259,7 @@ TEST(FrameworkTest, FrameworkStartsWhenFileNamedDataExistsInTempDir)
     const std::string filePath;
   };
 
-  auto frameworkStorage = MakeUniqueTempDirectory();
+  auto frameworkStorage = util::MakeUniqueTempDirectory();
   TempDir scopedDir(
     frameworkStorage); // delete "frameworkStorage" dir on destruction
   ScopedFile scopedFile(
@@ -277,12 +277,10 @@ TEST(FrameworkTest, FrameworkStartsWhenFileNamedDataExistsInTempDir)
 
 TEST(FrameworkTest, TempDataDirIsNotCreatedWhenFrameworkStarts)
 {
-  TempDir frameworkStorage = MakeUniqueTempDirectory();
+  std::string frameworkStorage = MakeUniqueTempDirectory();
   FrameworkConfiguration frameworkConfig;
-  frameworkConfig[Constants::FRAMEWORK_STORAGE] =
-    static_cast<std::string>(frameworkStorage);
-  std::string persistentStoragePath =
-    static_cast<std::string>(frameworkStorage) + util::DIR_SEP + "data";
+  frameworkConfig[Constants::FRAMEWORK_STORAGE] =frameworkStorage;
+  std::string persistentStoragePath = frameworkStorage + util::DIR_SEP + "data";
 
   auto framework = FrameworkFactory().NewFramework(frameworkConfig);
   ASSERT_NO_THROW(framework.Start(););

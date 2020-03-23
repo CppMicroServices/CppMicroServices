@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
+#include "cppmicroservices/httpservice/IServletContext.h"
 
 #include <memory>
 #include <string>
@@ -33,17 +34,19 @@ namespace cppmicroservices {
 
 class ServletContainer;
 
-class US_HttpService_EXPORT ServletContext
+class US_HttpService_EXPORT ServletContext : public IServletContext
 {
 public:
-  std::string GetContextPath() const;
+  std::string GetContextPath() const override;
 
-  std::shared_ptr<ServletContext> GetContext(const std::string& uripath);
+  std::shared_ptr<IServletContext> GetContext(
+    const std::string& uripath) override;
 
-  std::string GetMimeType(const std::string& file) const;
+  std::string GetMimeType(const std::string& file) const override;
 
 private:
   friend struct ServletContainerPrivate;
+  friend class HttpServiceFactory;
 
   ServletContext(ServletContainer* container);
   ServletContainer* m_Container;

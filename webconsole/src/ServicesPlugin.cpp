@@ -24,8 +24,8 @@
 
 #include "cppmicroservices/webconsole/WebConsoleDefaultVariableResolver.h"
 
-#include "cppmicroservices/httpservice/HttpServletRequest.h"
-#include "cppmicroservices/httpservice/HttpServletResponse.h"
+#include "cppmicroservices/httpservice/IHttpServletRequest.h"
+#include "cppmicroservices/httpservice/IHttpServletResponse.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
@@ -44,8 +44,8 @@ ServicesPlugin::ServicesPlugin()
   : SimpleWebConsolePlugin("services", "Services", "")
 {}
 
-void ServicesPlugin::RenderContent(HttpServletRequest& request,
-                                   HttpServletResponse& response)
+void ServicesPlugin::RenderContent(IHttpServletRequest& request,
+                                   IHttpServletResponse& response)
 {
   std::string pathInfo = request.GetPathInfo();
   if (pathInfo == "/services") {

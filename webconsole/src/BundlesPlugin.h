@@ -41,10 +41,10 @@ private:
     Resource
   };
 
-  void RenderContent(HttpServletRequest& request,
-                     HttpServletResponse& response);
+  void RenderContent(IHttpServletRequest& request,
+                     IHttpServletResponse& response);
 
-  bool IsHtmlRequest(HttpServletRequest& request);
+  bool IsHtmlRequest(IHttpServletRequest& request);
 
   TemplateData GetBundlesData() const;
 

@@ -112,6 +112,7 @@ namespace test
       virtual bool IsDeactivated() = 0;
       virtual ~LifeCycleValidation();
     };
+
 }
 
 #endif

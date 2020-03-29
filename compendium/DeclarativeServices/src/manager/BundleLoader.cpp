@@ -20,12 +20,15 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/SharedLibraryException.h"
+
 #include "BundleLoader.hpp"
 #include <regex>
 #if defined(_WIN32)
 #  include <Windows.h>
 #else
 #  include <dlfcn.h>
+#  include <cerrno>
 #endif
 
 namespace cppmicroservices {
@@ -77,17 +80,18 @@ GetComponentCreatorDeletors(const std::string& compName,
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
       errMsg += std::to_string(GetLastError());
-      throw std::runtime_error(errMsg);
+      throw cppmicroservices::SharedLibraryException(std::error_code(), errMsg);
     }
 #else
     handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (handle == nullptr) {
+      std::error_code err_code(errno, std::generic_category());
       std::string errMsg("Unable to load bundle binary ");
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
       const char* dlErrMsg = dlerror();
       errMsg += (dlErrMsg) ? dlErrMsg : "none";
-      throw std::runtime_error(errMsg);
+      throw cppmicroservices::SharedLibraryException(err_code, errMsg, fromBundle);
     }
 #endif
     bundleBinaries.lock()->emplace(bundleLoc, handle);

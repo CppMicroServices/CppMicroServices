@@ -29,6 +29,7 @@ US_MSVC_PUSH_DISABLE_WARNING(
 
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/String.h"
 
@@ -293,7 +294,11 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
     for (auto& bundleListener : bundleListeners.second) {
       try {
         std::get<0>(bundleListener.second)(evt);
-      } catch (...) {
+      } catch (const cppmicroservices::SharedLibraryException &ex) {
+        //TODO: log?
+        throw ex;
+      }
+      catch (...) {
         SendFrameworkEvent(FrameworkEvent(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
           MakeBundle(bundleListeners.first->bundle->shared_from_this()),

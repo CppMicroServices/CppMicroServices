@@ -24,6 +24,7 @@
 #include "CMEnabledState.hpp"
 #include "../ComponentManagerImpl.hpp"
 #include "../ComponentConfiguration.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -44,8 +45,12 @@ std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
   auto bundle = cm.GetBundle();
   auto reg = cm.GetRegistry();
   auto logger = cm.GetLogger();
-  std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task([metadata, bundle, reg, logger](std::shared_ptr<CMEnabledState> eState) {
-                                                                   eState->CreateConfigurations(metadata, bundle, reg, logger);
+  std::packaged_task<void(std::shared_ptr<CMEnabledState>, std::exception_ptr&)> task([metadata, bundle, reg, logger](std::shared_ptr<CMEnabledState> eState, std::exception_ptr& ptr) {
+                                                                   try {
+                                                                     eState->CreateConfigurations(metadata, bundle, reg, logger);
+                                                                   } catch (const cppmicroservices::SharedLibraryException&) {
+                                                                     ptr = std::current_exception();
+                                                                   }
                                                                  });
   auto enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
 
@@ -59,7 +64,11 @@ std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
   if(succeeded) // succeeded in changing the state
   {
     auto futObj = std::async(std::launch::async, [enabledState, transition = std::move(task)]() mutable {
-                                                   transition(enabledState);
+                                                   std::exception_ptr ptr;
+                                                   transition(enabledState, ptr);
+                                                   if (ptr) {
+                                                     std::rethrow_exception(ptr);
+                                                   }
                                                  }).share();
     return futObj;
   }

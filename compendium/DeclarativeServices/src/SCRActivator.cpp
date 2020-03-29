@@ -32,6 +32,7 @@
 #include "manager/ReferenceManager.hpp"
 #include "ServiceComponentRuntimeImpl.hpp"
 
+#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentDescriptionDTO.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
@@ -124,6 +125,11 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
         std::lock_guard<std::mutex> l(bundleRegMutex);
         bundleRegistry.insert(std::make_pair(bundle.GetBundleId(),std::move(ba)));
       }
+    }
+    catch (const cppmicroservices::SharedLibraryException &ex)
+    {
+      // TODO: log
+      throw ex;
     }
     catch (const std::exception&)
     {

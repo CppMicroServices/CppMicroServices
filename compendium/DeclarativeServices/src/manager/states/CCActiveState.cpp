@@ -23,6 +23,7 @@
 #include "CCActiveState.hpp"
 #include "CCUnsatisfiedReferenceState.hpp"
 #include "../ComponentConfigurationImpl.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -37,7 +38,12 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
   auto logger = mgr.GetLogger();
   if(latch.CountUp())
   {
-    instance = mgr.CreateAndActivateComponentInstance(clientBundle);
+    try {
+      instance = mgr.CreateAndActivateComponentInstance(clientBundle);
+    } catch (const cppmicroservices::SharedLibraryException& ex) {
+      latch.CountDown();
+      throw;
+    }
     latch.CountDown();
     if(!instance)
     {

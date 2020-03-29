@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include <iostream>
+#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "SingletonComponentConfiguration.hpp"
 #include "RegistrationManager.hpp"
@@ -70,6 +71,11 @@ std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAn
       auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(Bundle());
       instanceContextPair->first = instCtxtTuple.first;
       instanceContextPair->second = instCtxtTuple.second;
+    }
+    catch (const cppmicroservices::SharedLibraryException &ex)
+    {
+      // TODO: log?
+      throw ex;
     }
     catch(...)
     {

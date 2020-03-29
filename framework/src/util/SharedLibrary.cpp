@@ -28,6 +28,7 @@
 
 #if defined(US_PLATFORM_POSIX)
 #  include <dlfcn.h>
+#  include <cerrno>
 #elif defined(US_PLATFORM_WINDOWS)
 #  include "cppmicroservices/util/Error.h"
 #  include "cppmicroservices/util/String.h"
@@ -99,25 +100,26 @@ void SharedLibrary::Load(int flags)
 #ifdef US_PLATFORM_POSIX
   d->m_Handle = dlopen(libPath.c_str(), flags);
   if (!d->m_Handle) {
+    std::error_code err_code(errno, std::generic_category());
     std::string err_msg = "Error loading " + libPath + ".";
     const char* err = dlerror();
     if (err) {
       err_msg += " " + std::string(err);
     }
-
-    throw std::runtime_error(err_msg);
+    throw std::system_error(err_code, err_msg);
   }
 #else
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
   d->m_Handle = LoadLibraryW(wpath.c_str());
   if (!d->m_Handle) {
+    std::error_code err_code(GetLastError(), std::generic_category());
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
-    throw std::runtime_error(errMsg);
+    throw std::system_error(err_code, errMsg);
   }
 #endif
 }

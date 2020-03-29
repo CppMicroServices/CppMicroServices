@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "SCRBundleExtension.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "metadata/MetadataParserFactory.hpp"
 #include "metadata/MetadataParser.hpp"
@@ -65,6 +66,11 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
         managers.push_back(compManager);
         compManager->Initialize();
       }
+    }
+    catch (const cppmicroservices::SharedLibraryException &ex)
+    {
+      // TODO: log?
+      throw ex;
     }
     catch (const std::exception&)
     {

@@ -26,6 +26,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceFactory.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
@@ -100,6 +101,9 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
+  } catch (const cppmicroservices::SharedLibraryException &ex) {
+    // TODO: log?
+    throw ex;
   } catch (const std::exception& ex) {
     s.reset();
     std::string message = "ServiceFactory threw an unknown exception.";

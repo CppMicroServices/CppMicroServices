@@ -26,6 +26,7 @@
 #include "states/ComponentManagerState.hpp"
 #include "states/CMDisabledState.hpp"
 #include "ConcurrencyUtil.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -70,6 +71,10 @@ void ComponentManagerImpl::Initialize()
     try
     {
       fut.get();
+    }
+    catch (const cppmicroservices::SharedLibraryException &ex) {
+      // TODO: log?
+      throw ex;
     }
     catch(...)
     {

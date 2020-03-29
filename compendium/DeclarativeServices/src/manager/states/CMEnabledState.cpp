@@ -24,6 +24,7 @@
 #include "CMDisabledState.hpp"
 #include "../ComponentManagerImpl.hpp"
 #include "../ComponentConfigurationFactory.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -77,6 +78,11 @@ void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::Compon
                                                                         logger);
     configurations.push_back(cc);
   }
+  catch (const cppmicroservices::SharedLibraryException &ex)
+  {
+    //TODO: log?
+    throw ex;
+  }
   catch(...)
   {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to create component configuration", std::current_exception());
@@ -98,7 +104,11 @@ void CMEnabledState::DeleteConfigurations()
   auto fut = GetFuture();
   if(fut.valid())
   {
-    fut.get(); // wait for the configurations to become available
+    try {
+      fut.get(); // wait for the configurations to become available
+    } catch (...) {
+      std::cout << "exception here" << std::endl;
+    }
     // No exceptions are expected from the future. Exceptions are
     // logged on the otherside of the thread boundary. See #CreateConfigurations
     auto configs = std::move(configurations);

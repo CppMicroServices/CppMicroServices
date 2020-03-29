@@ -105,6 +105,7 @@ void SharedLibrary::Load(int flags)
       err_msg += " " + std::string(err);
     }
 
+    //TODO: throw SharedLibraryException here
     throw std::runtime_error(err_msg);
   }
 #else
@@ -117,6 +118,7 @@ void SharedLibrary::Load(int flags)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
+    //TODO: throw SharedLibraryException here
     throw std::runtime_error(errMsg);
   }
 #endif

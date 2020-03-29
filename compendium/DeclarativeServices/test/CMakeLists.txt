@@ -46,6 +46,7 @@ endif()
 set(_declarativeservices_tests
   ActivatorTest.cpp
   SCRLoggerTest.cpp
+  SharedLibraryExceptionTest.cpp
   TestCCActiveState.cpp
   TestCCRegisteredState.cpp
   TestCCUnsatisfiedReferenceState.cpp

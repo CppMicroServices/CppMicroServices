@@ -139,6 +139,8 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBundleDSSLE1
+  TestBundleDSSLE2
   TestBundleDSTOI1
   TestBundleDSTOI10
   TestBundleDSTOI12

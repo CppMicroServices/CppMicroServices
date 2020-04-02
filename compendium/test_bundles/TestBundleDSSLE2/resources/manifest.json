@@ -1,11 +1,11 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSSLE1",
+    "bundle.symbolic_name" : "TestBundleDSSLE2",
     "scr" : {
         "version" : 1,
         "components" : [{
             "enabled": true,
-            "immediate" : true,
-            "implementation-class": "sample::ServiceComponentDSSLE1",
+            "immediate" : false,
+            "implementation-class": "sample::ServiceComponentDSSLE2",
             "service" : {
                 "interfaces" : ["test::InterfaceSLE"]
             }

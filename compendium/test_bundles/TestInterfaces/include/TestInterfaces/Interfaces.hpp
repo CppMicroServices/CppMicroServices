@@ -112,6 +112,13 @@ namespace test
       virtual bool IsDeactivated() = 0;
       virtual ~LifeCycleValidation();
     };
+
+    class US_TestInterfaces_EXPORT InterfaceSLE
+    {
+      public:
+      virtual ~InterfaceSLE();
+    };
+
 }
 
 #endif

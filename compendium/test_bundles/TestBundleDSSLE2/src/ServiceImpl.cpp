@@ -24,12 +24,12 @@
 #include "ServiceImpl.hpp"
 
 namespace sample {
-  void ServiceComponentDSSLE1::Activate(const std::shared_ptr<ComponentContext>&)
+  void ServiceComponentDSSLE2::Activate(const std::shared_ptr<ComponentContext>&)
   {
     throw cppmicroservices::SharedLibraryException("test");
   };
-  void ServiceComponentDSSLE1::Deactivate(const std::shared_ptr<ComponentContext>&)
+  void ServiceComponentDSSLE2::Deactivate(const std::shared_ptr<ComponentContext>&)
   {
   };
-  ServiceComponentDSSLE1::~ServiceComponentDSSLE1() {};
+  ServiceComponentDSSLE2::~ServiceComponentDSSLE2() {};
 }

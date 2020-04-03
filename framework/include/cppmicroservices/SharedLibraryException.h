@@ -30,7 +30,8 @@
 
 namespace cppmicroservices {
 
-class US_Framework_EXPORT SharedLibraryException : public std::runtime_error
+// TODO: determine whether to ignore warning C4275 or derive from std::exception
+class US_Framework_EXPORT SharedLibraryException : public std::exception
 {
 public:
   explicit SharedLibraryException(const std::string& msg);
@@ -43,6 +44,7 @@ public:
     
 private:
   Bundle origin;  ///< The bundle of the shared library which failed to load.
+  std::string msg;
 };
 
 }

@@ -106,6 +106,6 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)
   EXPECT_EQ(bundle->GetRegisteredServices().size(), 1ul) << "Service from TestBundleDSSLE2 must be registered by DS runtime";
   
   cppmicroservices::ServiceReference<test::InterfaceSLE> serviceRef = context.GetServiceReference<test::InterfaceSLE>();
-  ASSERT_THROW(context.GetService<test::LifeCycleValidation>(serviceRef), cppmicroservices::SharedLibraryException);
+  ASSERT_THROW(context.GetService<test::InterfaceSLE>(serviceRef), cppmicroservices::SharedLibraryException);
 }
 

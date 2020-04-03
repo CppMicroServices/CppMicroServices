@@ -45,4 +45,3 @@ TEST(SharedLibraryException, FrameworkSharedLibraryException)
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 #endif //US_BUILD_SHARED_LIBS
-

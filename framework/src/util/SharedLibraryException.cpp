@@ -26,7 +26,7 @@ namespace cppmicroservices {
 
 SharedLibraryException::~SharedLibraryException() = default;
 
-SharedLibraryException::SharedLibraryException(const std::string& msg) : std::runtime_error(msg)
+SharedLibraryException::SharedLibraryException(const std::string& msg) : msg(msg)
 {
   
 }

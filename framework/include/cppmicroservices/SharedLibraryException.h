@@ -34,7 +34,8 @@ class US_Framework_EXPORT SharedLibraryException : public std::runtime_error
 {
 public:
   explicit SharedLibraryException(const std::string& msg);
-  /*const std::error_code ec,
+                                // TODO: work this in during implementation
+                                /*const std::error_code ec,
                                   const std::string& what,
                                   const cppmicroservices::Bundle& origin);*/
   ~SharedLibraryException() override;

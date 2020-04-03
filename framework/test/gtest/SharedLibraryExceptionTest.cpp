@@ -30,6 +30,7 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#if defined (US_BUILD_SHARED_LIBS)
 TEST(SharedLibraryException, FrameworkSharedLibraryException)
 {
   auto f = cppmicroservices::FrameworkFactory().NewFramework();
@@ -43,3 +44,4 @@ TEST(SharedLibraryException, FrameworkSharedLibraryException)
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
+#endif //US_BUILD_SHARED_LIBS

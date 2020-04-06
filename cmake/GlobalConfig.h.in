@@ -145,7 +145,7 @@ US_MSVC_DISABLE_WARNING(4996)
 #define US_HASH_FUNCTION_BEGIN(type)                         \
 namespace std {                                              \
 template<>                                                   \
-struct hash<type> : std::unary_function<type, std::size_t> { \
+struct hash<type> { \
 std::size_t operator()(const type& arg) const {
 
 #define US_HASH_FUNCTION_END } }; }

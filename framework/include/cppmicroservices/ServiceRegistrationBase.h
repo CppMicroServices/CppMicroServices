@@ -23,6 +23,7 @@
 #ifndef CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H
 #define CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H
 
+#include <functional>
 #include "cppmicroservices/ServiceProperties.h"
 #include "cppmicroservices/ServiceReference.h"
 

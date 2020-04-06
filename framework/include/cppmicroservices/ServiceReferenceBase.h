@@ -23,6 +23,7 @@
 #ifndef CPPMICROSERVICES_SERVICEREFERENCEBASE_H
 #define CPPMICROSERVICES_SERVICEREFERENCEBASE_H
 
+#include <functional>
 #include "cppmicroservices/Any.h"
 
 #include <atomic>

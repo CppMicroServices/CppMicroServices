@@ -47,7 +47,7 @@ public:
   void Start(BundleContext)
   {
     //
-    throw cppmicroservices::SharedLibraryException("test");
+    throw cppmicroservices::SharedLibraryException(std::error_code(), "test");
 //    s = std::make_shared<TestBundleSLE1>();
 //    std::cout << "Registering TestBundleSLE1Service";
 //    sr = context.RegisterService<TestBundleSLE1Service>(s);

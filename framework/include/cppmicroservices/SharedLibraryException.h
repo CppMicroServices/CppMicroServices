@@ -28,13 +28,19 @@
 
 #include <stdexcept>
 
+// ignore warning c4275 per MS documentation
+// https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-2-c4275
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4275)
+#endif
+
 namespace cppmicroservices {
 
-// TODO: determine whether to ignore warning C4275 or derive from std::exception
-class US_Framework_EXPORT SharedLibraryException : public std::exception
+class US_Framework_EXPORT SharedLibraryException : public std::system_error
 {
 public:
-  explicit SharedLibraryException(const std::string& msg);
+  explicit SharedLibraryException(const std::error_code ec, const std::string& msg);
                                 // TODO: work this in during implementation
                                 /*const std::error_code ec,
                                   const std::string& what,

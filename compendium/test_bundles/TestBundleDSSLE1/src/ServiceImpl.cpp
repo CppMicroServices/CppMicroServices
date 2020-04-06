@@ -26,7 +26,7 @@
 namespace sample {
   void ServiceComponentDSSLE1::Activate(const std::shared_ptr<ComponentContext>&)
   {
-    throw cppmicroservices::SharedLibraryException("test");
+    throw cppmicroservices::SharedLibraryException(std::error_code(),"test");
   };
   void ServiceComponentDSSLE1::Deactivate(const std::shared_ptr<ComponentContext>&)
   {

@@ -37,7 +37,7 @@
 
 namespace cppmicroservices {
 
-class US_Framework_EXPORT SharedLibraryException : public std::system_error
+class US_Framework_EXPORT SharedLibraryException final : public std::system_error
 {
 public:
   explicit SharedLibraryException(const std::error_code ec, const std::string& msg);

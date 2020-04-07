@@ -101,11 +101,11 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)
   });
 
   ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE2 not found";
-  bundle->Start();
+  ASSERT_NO_THROW(bundle->Start());
 
   EXPECT_EQ(bundle->GetRegisteredServices().size(), 1ul) << "Service from TestBundleDSSLE2 must be registered by DS runtime";
   
-  cppmicroservices::ServiceReference<test::InterfaceSLE> serviceRef = context.GetServiceReference<test::InterfaceSLE>();
-  ASSERT_THROW(context.GetService<test::InterfaceSLE>(serviceRef), cppmicroservices::SharedLibraryException);
+  cppmicroservices::ServiceReference<test::Interface1> serviceRef = context.GetServiceReference<test::Interface1>();
+  ASSERT_THROW(context.GetService<test::Interface1>(serviceRef), cppmicroservices::SharedLibraryException);
 }
 

@@ -113,12 +113,6 @@ namespace test
       virtual ~LifeCycleValidation();
     };
 
-    class US_TestInterfaces_EXPORT InterfaceSLE
-    {
-      public:
-      virtual ~InterfaceSLE();
-    };
-
 }
 
 #endif

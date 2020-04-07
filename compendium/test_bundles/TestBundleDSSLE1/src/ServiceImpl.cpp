@@ -24,6 +24,10 @@
 #include "ServiceImpl.hpp"
 
 namespace sample {
+  std::string ServiceComponentDSSLE1::Description()
+  {
+    return STRINGIZE(US_BUNDLE_NAME);
+  }
   void ServiceComponentDSSLE1::Activate(const std::shared_ptr<ComponentContext>&)
   {
     throw cppmicroservices::SharedLibraryException(std::error_code(),"test");

@@ -7,10 +7,11 @@
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample {
-  class ServiceComponentDSSLE1 : public test::InterfaceSLE {
+  class ServiceComponentDSSLE1 : public test::Interface1 {
   public:
     ServiceComponentDSSLE1() = default;
     ~ServiceComponentDSSLE1() override;
+    std::string Description() override;
     void Activate(const std::shared_ptr<ComponentContext>& context);
     void Deactivate(const std::shared_ptr<ComponentContext>& context);
   };

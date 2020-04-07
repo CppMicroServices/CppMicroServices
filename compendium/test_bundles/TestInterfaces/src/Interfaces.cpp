@@ -14,6 +14,4 @@ namespace test
     DSGraph07::~DSGraph07() = default;
     
     LifeCycleValidation::~LifeCycleValidation() = default;
-
-    InterfaceSLE::~InterfaceSLE() = default;
 }

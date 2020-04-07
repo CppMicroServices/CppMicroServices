@@ -7,7 +7,7 @@
             "immediate" : true,
             "implementation-class": "sample::ServiceComponentDSSLE1",
             "service" : {
-                "interfaces" : ["test::InterfaceSLE"]
+                "interfaces" : ["test::Interface1"]
             }
         }]
     }

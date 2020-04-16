@@ -118,7 +118,7 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)
   cppmicroservices::ServiceReference<test::Interface1> serviceRef = context.GetServiceReference<test::Interface1>();
   if (serviceRef) {
     try {
-      context.GetService<test::Interface1>(serviceRef);
+      context.GetService<test::Interface1>(serviceRef); // should throw cppmicroservices::SharedLibraryException
       FAIL() << "Exception should have been caught from GetService";
     } catch (const cppmicroservices::SharedLibraryException &ex) {
       // origin bundle captured by SharedLibraryException should

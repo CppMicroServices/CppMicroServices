@@ -101,13 +101,12 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
-  } catch (const cppmicroservices::SharedLibraryException &ex) {
+  } catch (const cppmicroservices::SharedLibraryException&) {
     registration->bundle->coreCtx->listeners.SendFrameworkEvent(
     FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                    MakeBundle(bundle->shared_from_this()),
                    "Failed to load shared library",
-                   std::make_exception_ptr(ServiceException(ex.what(),
-                     ServiceException::Type::FACTORY_EXCEPTION))));
+                   std::current_exception()));
     throw;
   } catch (const std::exception& ex) {
     s.reset();

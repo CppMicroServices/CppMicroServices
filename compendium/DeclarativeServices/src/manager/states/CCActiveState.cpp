@@ -40,7 +40,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
   {
     try {
       instance = mgr.CreateAndActivateComponentInstance(clientBundle);
-    } catch (const cppmicroservices::SharedLibraryException& ex) {
+    } catch (const cppmicroservices::SharedLibraryException&) {
       latch.CountDown();
       throw;
     }

@@ -72,7 +72,7 @@ std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAn
       instanceContextPair->first = instCtxtTuple.first;
       instanceContextPair->second = instCtxtTuple.second;
     }
-    catch (const cppmicroservices::SharedLibraryException &ex)
+    catch (const cppmicroservices::SharedLibraryException&)
     {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception thrown while trying to load a shared library",

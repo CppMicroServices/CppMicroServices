@@ -126,7 +126,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
         bundleRegistry.insert(std::make_pair(bundle.GetBundleId(),std::move(ba)));
       }
     }
-    catch (const cppmicroservices::SharedLibraryException &ex)
+    catch (const cppmicroservices::SharedLibraryException&)
     {
       throw;
     }

@@ -78,7 +78,7 @@ void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::Compon
                                                                         logger);
     configurations.push_back(cc);
   }
-  catch (const cppmicroservices::SharedLibraryException &ex)
+  catch (const cppmicroservices::SharedLibraryException&)
   {
     throw;
   }

@@ -72,7 +72,7 @@ void ComponentManagerImpl::Initialize()
     {
       fut.get();
     }
-    catch (const cppmicroservices::SharedLibraryException &ex) {
+    catch (const cppmicroservices::SharedLibraryException&) {
       throw;
     }
     catch(...)

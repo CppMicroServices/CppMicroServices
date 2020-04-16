@@ -294,7 +294,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
     for (auto& bundleListener : bundleListeners.second) {
       try {
         std::get<0>(bundleListener.second)(evt);
-      } catch (const cppmicroservices::SharedLibraryException &ex) {
+      } catch (const cppmicroservices::SharedLibraryException&) {
         SendFrameworkEvent(FrameworkEvent(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
           MakeBundle(bundleListeners.first->bundle->shared_from_this()),

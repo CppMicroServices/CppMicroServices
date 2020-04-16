@@ -67,7 +67,7 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
         compManager->Initialize();
       }
     }
-    catch (const cppmicroservices::SharedLibraryException &ex)
+    catch (const cppmicroservices::SharedLibraryException&)
     {
       throw;
     }

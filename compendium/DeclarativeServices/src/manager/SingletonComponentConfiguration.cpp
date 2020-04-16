@@ -74,8 +74,10 @@ std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAn
     }
     catch (const cppmicroservices::SharedLibraryException &ex)
     {
-      // TODO: log?
-      throw ex;
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception thrown while trying to load a shared library",
+                       std::current_exception());
+      throw;
     }
     catch(...)
     {

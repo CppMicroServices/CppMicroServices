@@ -521,12 +521,20 @@ std::exception_ptr BundlePrivate::Start0()
       // get a BundleActivator instance
       bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
-//    } catch (const cppmicroservices::SharedLibraryException *ex) {
-//      res = std::make_exception_ptr(ex);
-    } catch (const std::system_error& ex) {
-      // SharedLibrary::Load(int flags) will throw a std::system_error when shared library fails to load
-      // Convert std::system_error to cppmicroservices::SharedLibraryException with origin Bundle information.
-      res = std::make_exception_ptr(cppmicroservices::SharedLibraryException(ex.code(), ex.what(), thisBundle));
+    } catch (cppmicroservices::SharedLibraryException& ex) {
+      // SharedLibrary::Load(int flags) will throw a cppmicroservices::SharedLibraryException without origin bundle
+      // information, when shared library fails to load. Make sure to add the origin Bundle information.
+      if (!ex.GetBundle()) {
+        ex.SetBundle(thisBundle);
+      }
+      res = std::make_exception_ptr(ex);
+      
+      // Log SharedLibraryException
+      coreCtx->listeners.SendFrameworkEvent(
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                       thisBundle,
+                       std::string(),
+                       res));
     } catch (...) {
       res = std::make_exception_ptr(
         std::runtime_error("Bundle#" + util::ToString(id) +

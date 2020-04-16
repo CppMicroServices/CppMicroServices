@@ -80,8 +80,7 @@ void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::Compon
   }
   catch (const cppmicroservices::SharedLibraryException &ex)
   {
-    //TODO: log?
-    throw ex;
+    throw;
   }
   catch(...)
   {

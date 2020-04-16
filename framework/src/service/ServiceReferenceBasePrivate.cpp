@@ -102,8 +102,13 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
     }
     s = smap;
   } catch (const cppmicroservices::SharedLibraryException &ex) {
-    // TODO: log?
-    throw ex;
+    registration->bundle->coreCtx->listeners.SendFrameworkEvent(
+    FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                   MakeBundle(bundle->shared_from_this()),
+                   "Failed to load shared library",
+                   std::make_exception_ptr(ServiceException(ex.what(),
+                     ServiceException::Type::FACTORY_EXCEPTION))));
+    throw;
   } catch (const std::exception& ex) {
     s.reset();
     std::string message = "ServiceFactory threw an unknown exception.";

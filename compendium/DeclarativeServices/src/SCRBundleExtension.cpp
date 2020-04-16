@@ -69,8 +69,7 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
     }
     catch (const cppmicroservices::SharedLibraryException &ex)
     {
-      // TODO: log?
-      throw ex;
+      throw;
     }
     catch (const std::exception&)
     {

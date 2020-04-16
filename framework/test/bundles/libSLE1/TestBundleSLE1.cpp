@@ -46,15 +46,13 @@ public:
 
   void Start(BundleContext)
   {
-    // mimic exception thrown from SharedLibrary::Load(int flags)
-    throw std::system_error(std::error_code(), "test");
+    // Mimic exception thrown from SharedLibrary::Load(int flags)
+    // Bundle of origin information is not set here, because SharedLibrary::Load(int flags)
+    // that information; BundlePrivate::Start0() will set that information.
+    throw cppmicroservices::SharedLibraryException(std::error_code(), "test");
   }
 
   void Stop(BundleContext) {}
-
-//private:
-//  std::shared_ptr<TestBundleSLE1> s;
-//  ServiceRegistration<TestBundleSLE1Service> sr;
 };
 }
 

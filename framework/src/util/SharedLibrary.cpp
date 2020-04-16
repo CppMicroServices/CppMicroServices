@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "cppmicroservices/SharedLibrary.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 #include "cppmicroservices/BundleActivator.h"
 
@@ -106,7 +107,10 @@ void SharedLibrary::Load(int flags)
     if (err) {
       err_msg += " " + std::string(err);
     }
-    throw std::system_error(err_code, err_msg);
+    
+    // Bundle of origin information is not available here. It will be
+    // set later in BundlePrivate::Start0() in a catch statement.
+    throw cppmicroservices::SharedLibraryException(err_code, err_msg);
   }
 #else
   US_UNUSED(flags);
@@ -118,8 +122,10 @@ void SharedLibrary::Load(int flags)
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
-
-    throw std::system_error(err_code, errMsg);
+    
+    // Bundle of origin information is not available here. It will be
+    // set later in BundlePrivate::Start0() in a catch statement.
+    throw cppmicroservices::SharedLibraryException(err_code, errMsg);
   }
 #endif
 }

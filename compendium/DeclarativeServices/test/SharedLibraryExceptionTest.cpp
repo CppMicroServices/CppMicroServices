@@ -87,15 +87,16 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateTrue)
   });
 
   ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE1 not found";
+  
   try {
     bundle->Start(); // should throw cppmicroservices::SharedLibraryException
-    FAIL();
+    FAIL() << "Exception should have been caught from bundle->Start()";
   } catch (cppmicroservices::SharedLibraryException &ex) {
     // origin bundle captured by SharedLibraryException should
     // point to the bundle that threw during Start()
     ASSERT_TRUE(*bundle == ex.GetBundle());
   } catch (...) {
-    FAIL();
+    FAIL() << "SharedLibraryException expected, but a different exception caught.";
   }
 }
 
@@ -116,7 +117,18 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)
   
   cppmicroservices::ServiceReference<test::Interface1> serviceRef = context.GetServiceReference<test::Interface1>();
   if (serviceRef) {
-    ASSERT_THROW(context.GetService<test::Interface1>(serviceRef), cppmicroservices::SharedLibraryException);
+    try {
+      context.GetService<test::Interface1>(serviceRef);
+      FAIL() << "Exception should have been caught from GetService";
+    } catch (const cppmicroservices::SharedLibraryException &ex) {
+      // origin bundle captured by SharedLibraryException should
+      // point to the bundle that threw during Start()
+      ASSERT_TRUE(*bundle == ex.GetBundle());
+    } catch (...) {
+      FAIL() << "SharedLibraryException expected, but a different exception caught.";
+    }
+  } else {
+    FAIL() << "Failed to get a valid service reference.";
   }
 }
 

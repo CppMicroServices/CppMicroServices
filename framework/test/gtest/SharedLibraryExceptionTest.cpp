@@ -39,12 +39,16 @@ TEST(SharedLibraryException, FrameworkSharedLibraryException)
   
   ASSERT_NO_THROW((void)cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleSLE1"));
   auto bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleSLE1");
-  ASSERT_THROW(bundle.Start(), cppmicroservices::SharedLibraryException);
   
   try {
-    bundle.Start();
+    bundle.Start(); // should throw cppmicroservices::SharedLibraryException
+    FAIL() << "Exception should have been caught from bundle.Start()";
   } catch (const cppmicroservices::SharedLibraryException &ex) {
+    // origin bundle captured by SharedLibraryException should
+    // point to the bundle that threw during Start()
     ASSERT_TRUE(bundle == ex.GetBundle());
+  } catch (...) {
+    FAIL() << "SharedLibraryException expected, but a different exception caught.";
   }
   
   f.Stop();

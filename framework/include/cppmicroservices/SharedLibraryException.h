@@ -42,10 +42,9 @@ class US_Framework_EXPORT SharedLibraryException final : public std::system_erro
 public:
   explicit SharedLibraryException(const std::error_code ec,
                                   const std::string& what,
-                                  const cppmicroservices::Bundle& origin = Bundle());
+                                  const cppmicroservices::Bundle origin);
   ~SharedLibraryException() override;
   Bundle GetBundle() const;
-  void SetBundle(const Bundle& bundle);
     
 private:
   Bundle origin;  ///< The bundle of the shared library which failed to load.

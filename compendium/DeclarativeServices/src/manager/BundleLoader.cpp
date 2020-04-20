@@ -80,7 +80,7 @@ GetComponentCreatorDeletors(const std::string& compName,
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
       errMsg += std::to_string(GetLastError());
-      throw cppmicroservices::SharedLibraryException(std::error_code(), errMsg);
+      throw cppmicroservices::SharedLibraryException(std::error_code(), errMsg, std::move(fromBundle));
     }
 #else
     handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);
@@ -91,7 +91,7 @@ GetComponentCreatorDeletors(const std::string& compName,
       errMsg += ". Error: ";
       const char* dlErrMsg = dlerror();
       errMsg += (dlErrMsg) ? dlErrMsg : "none";
-      throw cppmicroservices::SharedLibraryException(err_code, errMsg, fromBundle);
+      throw cppmicroservices::SharedLibraryException(err_code, errMsg, std::move(fromBundle));
     }
 #endif
     bundleBinaries.lock()->emplace(bundleLoc, handle);

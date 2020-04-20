@@ -103,11 +103,7 @@ void CMEnabledState::DeleteConfigurations()
   auto fut = GetFuture();
   if(fut.valid())
   {
-    try {
-      fut.get(); // wait for the configurations to become available
-    } catch (...) {
-      std::cout << "exception here" << std::endl;
-    }
+    fut.get(); // wait for the configurations to become available
     // No exceptions are expected from the future. Exceptions are
     // logged on the otherside of the thread boundary. See #CreateConfigurations
     auto configs = std::move(configurations);

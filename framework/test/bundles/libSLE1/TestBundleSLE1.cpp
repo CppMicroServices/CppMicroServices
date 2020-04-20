@@ -27,8 +27,6 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/GlobalConfig.h"
 
-#include "cppmicroservices/SharedLibraryException.h"
-
 namespace cppmicroservices {
 
 struct TestBundleSLE1 : public TestBundleSLE1Service
@@ -47,9 +45,7 @@ public:
   void Start(BundleContext)
   {
     // Mimic exception thrown from SharedLibrary::Load(int flags)
-    // Bundle of origin information is not set here, because SharedLibrary::Load(int flags)
-    // that information; BundlePrivate::Start0() will set that information.
-    throw cppmicroservices::SharedLibraryException(std::error_code(), "test");
+    throw std::system_error(std::error_code(), "test");
   }
 
   void Stop(BundleContext) {}

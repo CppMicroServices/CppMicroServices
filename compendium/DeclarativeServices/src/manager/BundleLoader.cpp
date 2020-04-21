@@ -76,11 +76,12 @@ GetComponentCreatorDeletors(const std::string& compName,
     std::wstring bundlePathWstr = UTF8StrToWStr(fromBundle.GetLocation());
     handle = reinterpret_cast<void*>(LoadLibraryW(bundlePathWstr.c_str()));
     if (handle == nullptr) {
+      std::error_code err_code(GetLastError(), std::generic_category());
       std::string errMsg("Unable to load bundle binary ");
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
       errMsg += std::to_string(GetLastError());
-      throw cppmicroservices::SharedLibraryException(std::error_code(), errMsg, std::move(fromBundle));
+      throw cppmicroservices::SharedLibraryException(err_code, errMsg, std::move(fromBundle));
     }
 #else
     handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);

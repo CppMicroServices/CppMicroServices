@@ -28,6 +28,19 @@
 namespace cppmicroservices {
 namespace scrimpl {
 
+class LatchScopeGuard {
+public:
+  LatchScopeGuard(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn))
+  {
+    
+  }
+  ~LatchScopeGuard() {
+    _cleanupFcn();
+  }
+private:
+  std::function<void()> _cleanupFcn;
+};
+
 CCActiveState::CCActiveState() = default;
 
 std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfigurationImpl& mgr,
@@ -38,13 +51,16 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
   auto logger = mgr.GetLogger();
   if(latch.CountUp())
   {
-    try {
+    {
+      LatchScopeGuard sg([this]() {
+        latch.CountDown();
+      });
+      
+      // This could throw; a scope guard is put in place to call
+      // latch.CountDown().
       instance = mgr.CreateAndActivateComponentInstance(clientBundle);
-    } catch (const cppmicroservices::SharedLibraryException&) {
-      latch.CountDown();
-      throw;
     }
-    latch.CountDown();
+    
     if(!instance)
     {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Component configuration activation failed");

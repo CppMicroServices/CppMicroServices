@@ -26,8 +26,8 @@ namespace cppmicroservices {
 
 SharedLibraryException::~SharedLibraryException() = default;
 
-SharedLibraryException::SharedLibraryException(const std::error_code ec, const std::string& msg, const Bundle origin)
-	: std::system_error(ec, msg), origin(origin)
+SharedLibraryException::SharedLibraryException(std::error_code ec, std::string msg, Bundle origin)
+	: std::system_error(std::move(ec), std::move(msg)), origin(std::move(origin))
 {
 }
 

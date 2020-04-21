@@ -40,9 +40,9 @@ namespace cppmicroservices {
 class US_Framework_EXPORT SharedLibraryException final : public std::system_error
 {
 public:
-  explicit SharedLibraryException(const std::error_code ec,
-                                  const std::string& what,
-                                  const cppmicroservices::Bundle origin);
+  explicit SharedLibraryException(std::error_code ec,
+                                  std::string what,
+                                  cppmicroservices::Bundle origin);
   ~SharedLibraryException() override;
   Bundle GetBundle() const;
     

@@ -31,14 +31,55 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #if defined (US_BUILD_SHARED_LIBS)
-TEST(SharedLibraryException, FrameworkSharedLibraryException)
+
+class SharedLibraryExceptionTest : public ::testing::Test
 {
-  auto f = cppmicroservices::FrameworkFactory().NewFramework();
-  ASSERT_TRUE(f);
-  f.Start();
+protected:
+  SharedLibraryExceptionTest()
+    : f(cppmicroservices::FrameworkFactory().NewFramework())
+  { }
   
-  ASSERT_NO_THROW((void)cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleSLE1"));
-  auto bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleSLE1");
+  virtual ~SharedLibraryExceptionTest() = default;
+  
+  virtual void SetUp()
+  {
+    f.Start();
+    ASSERT_NO_THROW((void)cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleSLE1"));
+    b = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleSLE1");
+  }
+  
+  virtual void TearDown()
+  {
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+  }
+  
+  cppmicroservices::Bundle& GetBundle()
+  {
+    return b;
+  }
+  
+private:
+  cppmicroservices::Framework f;
+  cppmicroservices::Bundle b;
+};
+
+TEST_F(SharedLibraryExceptionTest, testConstructSharedLibraryException)
+{
+  auto bundle = GetBundle();
+  std::error_code errco(0, std::system_category());
+  std::string exception_str("Test String");
+  
+  auto ex = cppmicroservices::SharedLibraryException(errco, exception_str, bundle);
+  
+  ASSERT_EQ(ex.code(), errco);
+  ASSERT_EQ(ex.what(), exception_str);
+  ASSERT_EQ(ex.GetBundle(), bundle);
+}
+
+TEST_F(SharedLibraryExceptionTest, testFrameworkSharedLibraryExceptionHandling)
+{
+  auto bundle = GetBundle();
   
   try {
     bundle.Start(); // should throw cppmicroservices::SharedLibraryException
@@ -51,7 +92,5 @@ TEST(SharedLibraryException, FrameworkSharedLibraryException)
     FAIL() << "SharedLibraryException expected, but a different exception caught.";
   }
   
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 #endif //US_BUILD_SHARED_LIBS

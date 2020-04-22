@@ -32,6 +32,8 @@ limitations under the License.
 
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
+#include "../src/manager/BundleLoader.hpp"
+
 #include "TestInterfaces/Interfaces.hpp"
 #include "TestUtils.hpp"
 
@@ -75,6 +77,14 @@ protected:
 private:
   cppmicroservices::Framework framework;
 };
+
+TEST_F(SharedLibraryExceptionTest, testDSBundleLoaderFailure)
+{
+  // Using the framework bundle here, as it passes the GetLocation validity test,
+  // but fails at dlopen.
+  ASSERT_THROW(cppmicroservices::scrimpl::GetComponentCreatorDeletors("invalid::name", GetFramework()),
+               cppmicroservices::SharedLibraryException);
+}
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateTrue)
 {

@@ -46,7 +46,6 @@ endif()
 set(_declarativeservices_tests
   ActivatorTest.cpp
   SCRLoggerTest.cpp
-  SharedLibraryExceptionTest.cpp
   TestCCActiveState.cpp
   TestCCRegisteredState.cpp
   TestCCUnsatisfiedReferenceState.cpp
@@ -75,6 +74,7 @@ set(_declarativeservices_tests
   TestFixture.hpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
+  TestSharedLibraryException.cpp
   ImportTestBundles.cpp
   main.cpp
 )

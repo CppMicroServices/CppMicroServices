@@ -24,6 +24,7 @@ limitations under the License.
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "TestUtils.h"
@@ -64,6 +65,14 @@ private:
   cppmicroservices::Bundle b;
 };
 
+TEST_F(SharedLibraryExceptionTest, testSharedLibraryFailure)
+{
+  // Call SharedLibrary::Load() on framework to get a std::system_error
+  // exception thrown.
+  auto lib = cppmicroservices::SharedLibrary("invalidpath");
+  ASSERT_THROW(lib.Load(), std::system_error);
+}
+
 TEST_F(SharedLibraryExceptionTest, testConstructSharedLibraryException)
 {
   auto bundle = GetBundle();
@@ -73,7 +82,7 @@ TEST_F(SharedLibraryExceptionTest, testConstructSharedLibraryException)
   auto ex = cppmicroservices::SharedLibraryException(errco, exception_str, bundle);
   
   ASSERT_EQ(ex.code(), errco);
-  ASSERT_EQ(ex.what(), exception_str);
+  ASSERT_EQ(std::string(ex.what()).rfind(exception_str, 0), 0); // make sure the exception message starts with exception_str
   ASSERT_EQ(ex.GetBundle(), bundle);
 }
 

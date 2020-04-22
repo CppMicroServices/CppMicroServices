@@ -53,8 +53,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
   {
     {
       LatchScopeGuard sg([this, logger]() {
-        // This lambda function will be called during LatchScopeGuard's dtor.
-        // By using try/catch here, we want to ensure that this function doens't
+        // By using try/catch here, we ensure that this lambda function doesn't
         // throw inside LatchScopeGuard's dtor.
         try {
           latch.CountDown();

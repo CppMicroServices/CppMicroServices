@@ -52,8 +52,15 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
   if(latch.CountUp())
   {
     {
-      LatchScopeGuard sg([this]() {
-        latch.CountDown();
+      LatchScopeGuard sg([this, logger]() {
+        // This lambda function will be called during LatchScopeGuard's dtor.
+        // By using try/catch here, we want to ensure that this function doens't
+        // throw inside LatchScopeGuard's dtor.
+        try {
+          latch.CountDown();
+        } catch (...) {
+          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "latch.CountDown() threw an exception during LatchScopeGuard cleanup.", std::current_exception());
+        }
       });
       
       // This could throw; a scope guard is put in place to call

@@ -27,8 +27,8 @@
 #include "cppmicroservices/util/FileSystem.h"
 
 #if defined(US_PLATFORM_POSIX)
-#  include <dlfcn.h>
 #  include <cerrno>
+#  include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
 #  include "cppmicroservices/util/Error.h"
 #  include "cppmicroservices/util/String.h"
@@ -106,7 +106,7 @@ void SharedLibrary::Load(int flags)
     if (err) {
       err_msg += " " + std::string(err);
     }
-    
+
     // Bundle of origin information is not available here. It will be
     // BundlePrivate::Start0() will catch this system_error and create
     // a SharedLibraryException.
@@ -122,7 +122,7 @@ void SharedLibrary::Load(int flags)
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
-    
+
     // Bundle of origin information is not available here. It will be
     // BundlePrivate::Start0() will catch this system_error and create
     // a SharedLibraryException.

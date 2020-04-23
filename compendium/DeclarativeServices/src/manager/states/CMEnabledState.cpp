@@ -21,9 +21,9 @@
   =============================================================================*/
 
 #include "CMEnabledState.hpp"
-#include "CMDisabledState.hpp"
-#include "../ComponentManagerImpl.hpp"
 #include "../ComponentConfigurationFactory.hpp"
+#include "../ComponentManagerImpl.hpp"
+#include "CMDisabledState.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
@@ -77,13 +77,9 @@ void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::Compon
                                                                         registry,
                                                                         logger);
     configurations.push_back(cc);
-  }
-  catch (const cppmicroservices::SharedLibraryException&)
-  {
+  } catch (const cppmicroservices::SharedLibraryException&) {
     throw;
-  }
-  catch(...)
-  {
+  } catch (...) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to create component configuration", std::current_exception());
   }
 }

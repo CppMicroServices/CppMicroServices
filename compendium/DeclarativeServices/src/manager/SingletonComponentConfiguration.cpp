@@ -20,15 +20,15 @@
 
   =============================================================================*/
 
-#include <iostream>
-#include "cppmicroservices/SharedLibraryException.h"
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "SingletonComponentConfiguration.hpp"
-#include "RegistrationManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
-#include "states/ComponentConfigurationState.hpp"
+#include "RegistrationManager.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "states/CCUnsatisfiedReferenceState.hpp"
+#include "states/ComponentConfigurationState.hpp"
+#include <iostream>
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
@@ -71,16 +71,12 @@ std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAn
       auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(Bundle());
       instanceContextPair->first = instCtxtTuple.first;
       instanceContextPair->second = instCtxtTuple.second;
-    }
-    catch (const cppmicroservices::SharedLibraryException&)
-    {
+    } catch (const cppmicroservices::SharedLibraryException&) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception thrown while trying to load a shared library",
                        std::current_exception());
       throw;
-    }
-    catch(...)
-    {
+    } catch (...) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception received from user code while activating the component configuration",
                        std::current_exception());

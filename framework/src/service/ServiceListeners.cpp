@@ -301,8 +301,7 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
           std::string("Bundle listener threw an exception"),
           std::current_exception()));
         throw;
-      }
-      catch (...) {
+      } catch (...) {
         SendFrameworkEvent(FrameworkEvent(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
           MakeBundle(bundleListeners.first->bundle->shared_from_this()),

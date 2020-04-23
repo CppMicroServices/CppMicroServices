@@ -21,22 +21,21 @@
   =============================================================================*/
 
 #include "CCActiveState.hpp"
-#include "CCUnsatisfiedReferenceState.hpp"
 #include "../ComponentConfigurationImpl.hpp"
+#include "CCUnsatisfiedReferenceState.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-class LatchScopeGuard {
+class LatchScopeGuard
+{
 public:
-  LatchScopeGuard(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn))
-  {
-    
-  }
-  ~LatchScopeGuard() {
-    _cleanupFcn();
-  }
+  LatchScopeGuard(std::function<void()> cleanupFcn)
+    : _cleanupFcn(std::move(cleanupFcn))
+  {}
+  ~LatchScopeGuard() { _cleanupFcn(); }
+
 private:
   std::function<void()> _cleanupFcn;
 };
@@ -58,15 +57,18 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
         try {
           latch.CountDown();
         } catch (...) {
-          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "latch.CountDown() threw an exception during LatchScopeGuard cleanup.", std::current_exception());
+          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                      "latch.CountDown() threw an exception during "
+                      "LatchScopeGuard cleanup.",
+                      std::current_exception());
         }
       });
-      
+
       // This could throw; a scope guard is put in place to call
       // latch.CountDown().
       instance = mgr.CreateAndActivateComponentInstance(clientBundle);
     }
-    
+
     if(!instance)
     {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Component configuration activation failed");

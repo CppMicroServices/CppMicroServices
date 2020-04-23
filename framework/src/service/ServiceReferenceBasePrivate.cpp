@@ -103,10 +103,10 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
     s = smap;
   } catch (const cppmicroservices::SharedLibraryException&) {
     registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-    FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                   MakeBundle(bundle->shared_from_this()),
-                   "Failed to load shared library",
-                   std::current_exception()));
+      FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                     MakeBundle(bundle->shared_from_this()),
+                     "Failed to load shared library",
+                     std::current_exception()));
     throw;
   } catch (const std::exception& ex) {
     s.reset();

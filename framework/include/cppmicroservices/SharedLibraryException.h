@@ -37,7 +37,8 @@
 
 namespace cppmicroservices {
 
-class US_Framework_EXPORT SharedLibraryException final : public std::system_error
+class US_Framework_EXPORT SharedLibraryException final
+  : public std::system_error
 {
 public:
   explicit SharedLibraryException(std::error_code ec,
@@ -45,12 +46,11 @@ public:
                                   cppmicroservices::Bundle origin);
   ~SharedLibraryException() override;
   Bundle GetBundle() const;
-    
+
 private:
-  Bundle origin;  ///< The bundle of the shared library which failed to load.
+  Bundle origin; ///< The bundle of the shared library which failed to load.
 };
 
 }
-
 
 #endif /* CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H */

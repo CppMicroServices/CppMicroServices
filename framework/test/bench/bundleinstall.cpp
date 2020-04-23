@@ -5,8 +5,16 @@
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
-#include <future>
+#include <cppmicroservices/Any.h>
+#include <cppmicroservices/AnyMap.h>
 
+#include <future>
+#include <fstream>
+#include <sys/stat.h>
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
+#include "JSONUtils.h"
 #include "TestUtils.h"
 #include "benchmark/benchmark.h"
 
@@ -121,56 +129,71 @@ protected:
     framework.WaitForStop(milliseconds::zero());
   }
 };
-BENCHMARK_DEFINE_F(BundleInstallFixture, BundleInstallCppFramework)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(BundleInstallFixture, BundleInstallCppFramework)(benchmark::State& state)
 {
   InstallWithCppFramework(state, "dummyService");
 }
 
-BENCHMARK_DEFINE_F(BundleInstallFixture, LargeBundleInstallCppFramework)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(BundleInstallFixture, LargeBundleInstallCppFramework)(benchmark::State& state)
 {
   InstallWithCppFramework(state, "largeBundle");
 }
 
+BENCHMARK_DEFINE_F(BundleInstallFixture, CacheInstall)(benchmark::State& state)
+{
+  using namespace std::chrono;
+  using namespace cppmicroservices;
+
+  for (auto _ : state) {
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+    auto context = framework.GetBundleContext();
+    // read in json file
+    // convert it to anymap by calling ParseJsonObject after moving into util function
+    auto bundle = testing::InstallLib(context, "ManifestCacheService");
+    bundle.Start();
+    
+    auto start = high_resolution_clock::now();
+    testing::InstallLib(context, "ManifestCacheBundle");
+    auto end = high_resolution_clock::now();
+    
+    auto elapsed = duration_cast<duration<double>>(end - start);
+    state.SetIterationTime(elapsed.count());
+    
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+}
+
 #if defined(PERFORM_LARGE_CONCURRENCY_TEST)
-BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall1Thread)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall1Thread)(benchmark::State& state)
 {
   InstallConcurrently(state, 1);
 }
 
-BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)(benchmark::State& state)
 {
   InstallConcurrently(state, 2);
 }
 
-BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)(benchmark::State& state)
 {
   InstallConcurrently(state, 4);
 }
 
-BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
-(benchmark::State& state)
+BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)(benchmark::State& state)
 {
   InstallConcurrently(state, std::thread::hardware_concurrency());
 }
 #endif
 
 // Register functions as benchmark
-BENCHMARK_REGISTER_F(BundleInstallFixture, BundleInstallCppFramework)
-  ->UseManualTime();
-BENCHMARK_REGISTER_F(BundleInstallFixture, LargeBundleInstallCppFramework)
-  ->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, BundleInstallCppFramework)->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, LargeBundleInstallCppFramework)->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, CacheInstall)->UseManualTime();
 #if defined(PERFORM_LARGE_CONCURRENCY_TEST)
-BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall1Thread)
-  ->UseManualTime();
-BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)
-  ->UseManualTime();
-BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)
-  ->UseManualTime();
-BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
-  ->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall1Thread)->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)->UseManualTime();
 #endif

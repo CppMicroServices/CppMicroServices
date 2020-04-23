@@ -82,6 +82,7 @@ struct BundleStorage
    */
   virtual void Close() = 0;
 
+  virtual long NextFreeId() = 0;
 private:
   friend struct BundleArchive;
 

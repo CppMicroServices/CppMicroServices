@@ -7,6 +7,7 @@ set(us_bench_test_exe_name usFrameworkBenchTests)
 include_directories(
   ${CMAKE_SOURCE_DIR}/third_party/benchmark/include
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../src/util
   )
 
 #-----------------------------------------------------------------------------

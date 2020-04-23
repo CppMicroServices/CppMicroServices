@@ -33,20 +33,19 @@ class BundleStorageFile : public BundleStorage
 public:
   BundleStorageFile();
 
-  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
-    const std::string& location);
+  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(const std::string& location) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
-    const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::vector<std::string>& topLevelEntries);
+  std::vector<std::shared_ptr<BundleArchive>> InsertArchives(const std::shared_ptr<BundleResourceContainer>& resCont
+                                                             , const std::vector<std::string>& topLevelEntries) override;
 
-  bool RemoveArchive(const BundleArchive* ba);
+  bool RemoveArchive(const BundleArchive* ba) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const;
+  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const override;
 
-  std::vector<long> GetStartOnLaunchBundles() const;
+  std::vector<long> GetStartOnLaunchBundles() const override;
 
-  void Close();
+  void Close() override;
+  long NextFreeId() override { return 0; }
 };
 }
 

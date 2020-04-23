@@ -137,17 +137,17 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
     thread is currently installing.
 
     If 1): Create an entry in the initialBundleInstallMap which keeps track of whether
-      or not a given bundle is being installed for the first time. After creating this
-      entry, the thread performs the install and notifies all threads waiting on that
-      install to finish so that they too can perform an install (but in the context of it
-      being already installed).
+    or not a given bundle is being installed for the first time. After creating this
+    entry, the thread performs the install and notifies all threads waiting on that
+    install to finish so that they too can perform an install (but in the context of it
+    being already installed).
 
     If 2): Increment the reference counter for the bundle in the initialBundleInstallMap.
-      This ensures that when we decrement the count after the installing thread is done,
-      the map entry isn't deleted since the current thread needs access to the
-      condition_variable and boolean flag. Once the installing thread notifies the thread
-      that it is able to continue with it's install, it goes ahead and performs the regular
-      install procedure.
+    This ensures that when we decrement the count after the installing thread is done,
+    the map entry isn't deleted since the current thread needs access to the
+    condition_variable and boolean flag. Once the installing thread notifies the thread
+    that it is able to continue with it's install, it goes ahead and performs the regular
+    install procedure.
   */
   if (bundlesAtLocationRange.first != bundlesAtLocationRange.second) {
     l.UnLock();
@@ -192,14 +192,14 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       {
         // create instance of clean-up object to ensure RAII
         InitialBundleMapCleanup cleanup([this, &l, &location](){
-          {
-            // Notify all waiting threads that it is safe to install the bundle
-            std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
-            initialBundleInstallMap[location].second.waitFlag = false;
-            initialBundleInstallMap[location].second.cv->notify_all();
-          }
-          DecrementInitialBundleMapRef(l, location);
-        });
+                                          {
+                                            // Notify all waiting threads that it is safe to install the bundle
+                                            std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
+                                            initialBundleInstallMap[location].second.waitFlag = false;
+                                            initialBundleInstallMap[location].second.cv->notify_all();
+                                          }
+                                          DecrementInitialBundleMapRef(l, location);
+                                        });
           
         // Perform the install
         installedBundles = Install0(location, {}, caller);
@@ -221,8 +221,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
         // as a whole acts as the while statement's predicate; once the timeout is reached, wait_for exits and the
         // statement is re-evaluated since it would have returned false.
         while (!initialBundleInstallMap[location].second.cv->wait_for(lock, 0.1ms, [&location, this] {
-          return !initialBundleInstallMap[location].second.waitFlag;
-          }));
+                                                                                     return !initialBundleInstallMap[location].second.waitFlag;
+                                                                                   }));
       }
       
       // Re-acquire the range because while this thread was waiting, the installing
@@ -239,8 +239,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
       {
         // create instance of clean-up object to ensure RAII
         InitialBundleMapCleanup cleanup([this, &l, &location](){
-          DecrementInitialBundleMapRef(l, location);
-        });
+                                          DecrementInitialBundleMapRef(l, location);
+                                        });
 
         // Perform the install
         newBundles = Install0(location, alreadyInstalled, caller);
@@ -256,10 +256,45 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
   }
 }
 
-std::vector<Bundle> BundleRegistry::Install0(
-  const std::string& location,
-  const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
-  BundlePrivate* /*caller*/)
+std::vector<Bundle> BundleRegistry::Install(const std::string& location
+                                            , const AnyMap& bundleManifest
+                                           )
+{
+  using namespace std::chrono_literals;
+
+  CheckIllegalState();
+
+  // Search the multimap for the current bundle location
+  auto bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
+  if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
+    // bundle already exists, so don't bother instantiating with bundleManifest
+  {
+    return {};
+  }
+
+  try {
+    auto d = std::make_shared<BundlePrivate>(coreCtx, location, bundleManifest);
+    auto b = MakeBundle(d);
+    {
+      auto l = bundles.Lock();
+      US_UNUSED(l);
+      bundles.v.insert(std::make_pair(location, b.d));
+    }
+
+    coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
+    return { b };
+  }
+  catch (...) {
+    throw std::runtime_error("Failed to install bundle library at "
+                             + location
+                             + ": "
+                             + util::GetLastExceptionStr());
+  }
+}
+
+std::vector<Bundle> BundleRegistry::Install0(const std::string& location
+                                             , const std::vector<std::shared_ptr<BundlePrivate>>& exclude
+                                             , BundlePrivate* /*caller*/)
 {
   std::vector<Bundle> res;
   std::vector<std::shared_ptr<BundleArchive>> barchives;

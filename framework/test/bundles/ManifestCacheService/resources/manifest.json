@@ -1,0 +1,4 @@
+{
+  "bundle.symbolic_name" : "ManifestCacheService",
+  "bundle.activator" : true
+}

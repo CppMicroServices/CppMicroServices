@@ -24,7 +24,7 @@
 #define CPPMICROSERVICES_BUNDLEREGISTRY_H
 
 #include "cppmicroservices/detail/Threads.h"
-
+#include "cppmicroservices/AnyMap.h"
 #include <condition_variable>
 #include <map>
 #include <unordered_map>
@@ -32,6 +32,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <rapidjson/document.h>
 
 namespace cppmicroservices {
 
@@ -64,8 +65,11 @@ public:
    * @param caller The bundle performing the install
    * @return A vector of bundles installed
    */
-  std::vector<Bundle> Install(const std::string& location,
-                              BundlePrivate* caller);
+  std::vector<Bundle> Install(const std::string& location
+                              ,BundlePrivate* caller);
+
+  std::vector<Bundle> Install(const std::string& location
+                              , const AnyMap& bundleManifest);
 
   std::vector<Bundle> Install0(
     const std::string& location,

@@ -1,0 +1,3 @@
+
+usFunctionCreateTestBundleWithResources(ManifestCacheBundle RESOURCES manifest.json)
+

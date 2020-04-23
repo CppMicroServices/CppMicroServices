@@ -15,6 +15,7 @@ set(_srcs
   util/Properties.cpp
   util/SharedLibrary.cpp
   util/Utils.cpp
+  util/JSONUtils.cpp
 
   service/ListenerToken.cpp
   service/ServiceException.cpp
@@ -63,6 +64,7 @@ set(_private_headers
   util/LDAPExpr.h
   util/Properties.h
   util/Utils.h
+  util/JSONUtils.h
 
   service/ServiceHooks.h
   service/ServiceListenerEntry.h

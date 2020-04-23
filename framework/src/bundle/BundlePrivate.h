@@ -82,6 +82,10 @@ using WaitConditionType = WaitCondition<MutexHost>;
   BundlePrivate(CoreBundleContext* coreCtx,
                 const std::shared_ptr<BundleArchive>& ba);
 
+  BundlePrivate(CoreBundleContext* coreCtx
+                , const std::string& location
+                , const AnyMap& manifest);
+  
   virtual ~BundlePrivate();
 
   /**
@@ -183,6 +187,8 @@ using WaitConditionType = WaitCondition<MutexHost>;
 
   void ResetBundleThread();
 
+  void validateManifest();
+  
   /**
    * Framework context.
    */

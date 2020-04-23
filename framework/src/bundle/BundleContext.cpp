@@ -37,6 +37,9 @@
 #include <cstdio>
 #include <memory>
 #include <utility>
+#include <chrono>
+
+#include <sys/stat.h>
 
 namespace cppmicroservices {
 
@@ -482,4 +485,14 @@ std::vector<Bundle> BundleContext::InstallBundles(const std::string& location)
 
   return b->coreCtx->bundleRegistry.Install(location, b);
 }
+
+std::vector<Bundle> BundleContext::InstallBundles(const std::string& location
+                                                  , const AnyMap& bundleManifest)
+{
+  d->CheckValid();
+  auto b = (d->Lock(), d->bundle);
+
+  return b->coreCtx->bundleRegistry.Install(location, bundleManifest);
+}
+
 }

@@ -56,7 +56,7 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
       continue;
     }
 #endif
-    auto id = nextFreeId++;
+    auto id = NextFreeId();
     auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
     std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{ id, ts, -1 });
     auto p = archives.v.insert(std::make_pair(id,

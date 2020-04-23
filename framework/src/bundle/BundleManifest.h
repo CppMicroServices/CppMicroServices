@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/AnyMap.h"
+#include <rapidjson/document.h>
 #include <mutex>
 
 namespace cppmicroservices {
@@ -34,7 +35,8 @@ class BundleManifest
 
 public:
   BundleManifest();
-
+  explicit BundleManifest(const AnyMap& m);
+  
   void Parse(std::istream& is);
 
   const AnyMap& GetHeaders() const;

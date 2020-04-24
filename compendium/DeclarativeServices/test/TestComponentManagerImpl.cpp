@@ -53,44 +53,42 @@ TEST(ComponentManagerImplTest, Ctor)
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   {
-    EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(nullptr,
-                                               mockRegistry,
-                                               bc,
-                                               fakeLogger));
-      }, std::invalid_argument);
+    EXPECT_THROW(
+      {
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(
+          nullptr, mockRegistry, bc, fakeLogger));
+      },
+      std::invalid_argument);
   }
   {
-    EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
-                                               nullptr,
-                                               bc,
-                                               fakeLogger));
-      }, std::invalid_argument);
+    EXPECT_THROW(
+      {
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(
+          mockMetadata, nullptr, bc, fakeLogger));
+      },
+      std::invalid_argument);
   }
   {
-    EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
-                                               mockRegistry,
-                                               BundleContext(),
-                                               fakeLogger));
-      }, std::invalid_argument);
+    EXPECT_THROW(
+      {
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(
+          mockMetadata, mockRegistry, BundleContext(), fakeLogger));
+      },
+      std::invalid_argument);
   }
   {
-    EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
-                                               mockRegistry,
-                                               bc,
-                                               nullptr));
-      }, std::invalid_argument);
+    EXPECT_THROW(
+      {
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(
+          mockMetadata, mockRegistry, bc, nullptr));
+      },
+      std::invalid_argument);
   }
   {
     EXPECT_NO_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
-                                               mockRegistry,
-                                               bc,
-                                               fakeLogger));
-      });
+      US_UNUSED(std::make_shared<ComponentManagerImpl>(
+        mockMetadata, mockRegistry, bc, fakeLogger));
+    });
   }
 }
 

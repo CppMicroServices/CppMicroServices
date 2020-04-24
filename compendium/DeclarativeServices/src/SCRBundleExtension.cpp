@@ -21,12 +21,13 @@
   =============================================================================*/
 
 #include "SCRBundleExtension.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "metadata/MetadataParserFactory.hpp"
-#include "metadata/MetadataParser.hpp"
-#include "metadata/ComponentMetadata.hpp"
-#include "metadata/Util.hpp"
 #include "manager/ComponentManagerImpl.hpp"
+#include "metadata/ComponentMetadata.hpp"
+#include "metadata/MetadataParser.hpp"
+#include "metadata/MetadataParserFactory.hpp"
+#include "metadata/Util.hpp"
 
 using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
 
@@ -65,9 +66,9 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
         managers.push_back(compManager);
         compManager->Initialize();
       }
-    }
-    catch (const std::exception&)
-    {
+    } catch (const cppmicroservices::SharedLibraryException&) {
+      throw;
+    } catch (const std::exception&) {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                   "Failed to create ComponentManager with name " + oneCompMetadata->name + " from bundle with Id " + std::to_string(bundleContext.GetBundle().GetBundleId()),
                   std::current_exception());

@@ -14,6 +14,7 @@ set(_public_headers
   cppmicroservices/ListenerFunctors.h
   cppmicroservices/SharedData.h
   cppmicroservices/SharedLibrary.h
+  cppmicroservices/SharedLibraryException.h
   cppmicroservices/ShrinkableMap.h
   cppmicroservices/ShrinkableVector.h
   cppmicroservices/detail/Log.h

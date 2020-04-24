@@ -37,6 +37,10 @@ add_subdirectory(libSL1)
 add_subdirectory(libSL3)
 add_subdirectory(libSL4)
 
+if(BUILD_SHARED_LIBS)
+  add_subdirectory(libSLE1)
+endif()
+
 add_subdirectory(libRWithResources)
 add_subdirectory(libRWithAppendedResources)
 add_subdirectory(libRWithLinkedResources)

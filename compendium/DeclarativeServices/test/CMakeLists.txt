@@ -74,6 +74,7 @@ set(_declarativeservices_tests
   TestFixture.hpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
+  TestSharedLibraryException.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
   main.cpp
@@ -139,6 +140,8 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBundleDSSLE1
+  TestBundleDSSLE2
   TestBundleDSTOI1
   TestBundleDSTOI10
   TestBundleDSTOI12

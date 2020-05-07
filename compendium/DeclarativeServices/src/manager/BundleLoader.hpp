@@ -41,7 +41,7 @@ namespace scrimpl {
  * \param compName is a unique identifier for the component
  * \param fromBundle is the bundle where the component is located
  *
- * \throws \c std::runtime_error on failure to load the bundle binary.
+ * \throws \c cppmicroservices::SharedLibraryException on failure to load the bundle binary.
  *         \c std::runtime_error if the entry points for \c compName are
  *         not found in the bundle \c fromBundle
  *         \c std::invalid_argument if location of \c fromBundle cannot be

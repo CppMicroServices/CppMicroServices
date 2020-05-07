@@ -26,6 +26,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceFactory.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
@@ -100,6 +101,13 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
+  } catch (const cppmicroservices::SharedLibraryException&) {
+    registration->bundle->coreCtx->listeners.SendFrameworkEvent(
+      FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                     MakeBundle(bundle->shared_from_this()),
+                     "Failed to load shared library",
+                     std::current_exception()));
+    throw;
   } catch (const std::exception& ex) {
     s.reset();
     std::string message = "ServiceFactory threw an unknown exception.";

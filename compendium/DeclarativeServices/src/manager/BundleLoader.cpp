@@ -20,11 +20,14 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/SharedLibraryException.h"
+
 #include "BundleLoader.hpp"
 #include <regex>
 #if defined(_WIN32)
 #  include <Windows.h>
 #else
+#  include <cerrno>
 #  include <dlfcn.h>
 #endif
 
@@ -73,21 +76,25 @@ GetComponentCreatorDeletors(const std::string& compName,
     std::wstring bundlePathWstr = UTF8StrToWStr(fromBundle.GetLocation());
     handle = reinterpret_cast<void*>(LoadLibraryW(bundlePathWstr.c_str()));
     if (handle == nullptr) {
+      std::error_code err_code(GetLastError(), std::generic_category());
       std::string errMsg("Unable to load bundle binary ");
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
       errMsg += std::to_string(GetLastError());
-      throw std::runtime_error(errMsg);
+      throw cppmicroservices::SharedLibraryException(
+        err_code, std::move(errMsg), std::move(fromBundle));
     }
 #else
     handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (handle == nullptr) {
+      std::error_code err_code(errno, std::generic_category());
       std::string errMsg("Unable to load bundle binary ");
       errMsg += fromBundle.GetLocation();
       errMsg += ". Error: ";
       const char* dlErrMsg = dlerror();
       errMsg += (dlErrMsg) ? dlErrMsg : "none";
-      throw std::runtime_error(errMsg);
+      throw cppmicroservices::SharedLibraryException(
+        err_code, std::move(errMsg), std::move(fromBundle));
     }
 #endif
     bundleBinaries.lock()->emplace(bundleLoc, handle);

@@ -573,32 +573,6 @@ TEST_F(ReferenceManagerImplTest, TestDynamicGreedy)
   EXPECT_EQ(compConfigDTOs.size(), 1ul);
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
-
-  auto fakeLogger = std::make_shared<FakeLogger>();
-  ReferenceManagerImpl refManager(CreateFakeReferenceMetadata("dynamic", "greedy", "1..1", "foo")
-                                  , bc
-                                  , fakeLogger
-                                  , "foo");
-  EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional()) << "Initial state is SATISFIED only for optional cardinality";
-  int bindCount = 0;
-  int unbindCount = 0;
-  ListenerTokenId token = refManager.RegisterListener([&](const RefChangeNotification& notification) {
-                                                        switch (notification.event) {
-                                                          case RefEvent::BIND_REFERENCE:
-                                                            bindCount++;
-                                                            break;
-                                                          case RefEvent::UNBIND_REFERENCE:
-                                                            unbindCount++;
-                                                            break;
-                                                          default:
-                                                            break;
-                                                        }
-                                                      });
-
-  bindCount = unbindCount = 0;
-  refManager.UnregisterListener(token);
-
-  
   auto depBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI21");
   auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, &dsRuntimeService, &compDescDTO]()
                                          {
@@ -609,10 +583,15 @@ TEST_F(ReferenceManagerImplTest, TestDynamicGreedy)
                                             });
 
   ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE after the dependency became available";
-  EXPECT_EQ(1, bindCount);
+  auto svcRef = bc.GetServiceReference<test::Interface2>();
+  ASSERT_TRUE(svcRef);
+  auto svc = bc.GetService<test::Interface2>(svcRef);
+  ASSERT_TRUE(svc);
+  EXPECT_NO_THROW(svc->ExtendedDescription());
   
   depBundle.Stop();
   EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service should now NOT be available";
+  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
 }
 
 }}

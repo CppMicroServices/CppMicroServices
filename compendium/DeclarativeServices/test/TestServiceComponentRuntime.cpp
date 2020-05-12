@@ -10,7 +10,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+  =============================================================================*/
 
 #include <iostream>
 #include <gtest/gtest.h>
@@ -32,6 +32,7 @@
 
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include "TestUtils.hpp"
 
 namespace scr = cppmicroservices::service::component::runtime;
 
@@ -61,31 +62,25 @@ protected:
   cppmicroservices::Framework framework;
 };
 
-  /**
-   * Test if the declarative services runtime publishes a service with interface
-   * cppmicroservices::service::component::runtime::ServiceComponentRuntime.
-   */
-  TEST_F(TestServiceComponentRuntime, testServiceAvailability)
-  {
-#if REQUIRES_PORT
-    auto dsPluginPath = GetDSRuntimePluginFilePath();
-    auto const framework = foundation::cppmicroservices::getFramework();
-    auto bundles = foundation::cppmicroservices::install(dsPluginPath);
-    EXPECT_EQ(bundles.size(), 1ul) << "DS Runtime bundle found at" << fl::i18n::to_string(dsPluginPath.string());
-    for (auto bundle : bundles)
-    {
-      bundle.Start();
-    }
-    
-    // verify that the DS runtime bundle publishes the expected servcie
-    auto context = framework.GetBundleContext();
-    auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
-    if (sRef)
-    {
-      auto service = context.GetService<scr::ServiceComponentRuntime>(sRef);
-      ASSERT_NE(service, nullptr);
-    }
-#endif
-
+/**
+ * Test if the declarative services runtime publishes a service with interface
+ * cppmicroservices::service::component::runtime::ServiceComponentRuntime.
+ */
+TEST_F(TestServiceComponentRuntime, testServiceAvailability)
+{
+  auto dsPluginPath = GetDSRuntimePluginFilePath();
+  auto bundles = framework.GetBundleContext().InstallBundles(dsPluginPath);
+  EXPECT_EQ(bundles.size(), 1ul) << "DS Runtime bundle found at" << dsPluginPath;
+  for (auto bundle : bundles) {
+    bundle.Start();
   }
+
+  // verify that the DS runtime bundle publishes the expected servcie
+  auto context = framework.GetBundleContext();
+  auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
+  ASSERT_TRUE(sRef);
+  auto service = context.GetService<scr::ServiceComponentRuntime>(sRef);
+  ASSERT_NE(service, nullptr);
+}
+
 } // end of anonymous namespace

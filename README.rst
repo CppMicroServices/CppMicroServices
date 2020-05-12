@@ -6,7 +6,9 @@
 |             +-------------------------+--------------------------+------------------------+
 |             | Xcode 7.3 and 10.3      | Visual Studio 2017       |                        |
 |             +-------------------------+--------------------------+------------------------+
-|             | Clang 3.5 and 6.0       | MinGW-w64                |                        |
+|             | Clang 3.5 and 6.0       | Visual Studio 2019       |                        |
+|             +-------------------------+--------------------------+------------------------+
+|             |                         | MinGW-w64                |                        |
 +=============+=========================+==========================+========================+
 | master      | |Linux Build Status|    | |Windows Build status|   | |Code Coverage Status| |
 +-------------+-------------------------+--------------------------+------------------------+
@@ -83,6 +85,7 @@ Below is a list of tested compiler/OS combinations:
 - Clang Xcode 10.3 (OS X 10.14) via Travis CI
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via Appveyor
+- Visual Studio 2019 via Appveyor
 - MinGW-w64 via Appveyor
 
 Legal

@@ -28,7 +28,6 @@ include_directories(
 #-----------------------------------------------------------------------------
 
 set(_tests
-  AnyTest
   AnyMapTest
   BundleRegistryConcurrencyTest
   FrameworkEventTest
@@ -38,7 +37,6 @@ set(_tests
   LDAPFilterTest
   LDAPQueryTest
   LogTest
-  BundleActivatorTest
   BundleEventTest
   BundleHooksTest
   BundleTest
@@ -47,7 +45,6 @@ set(_tests
   MultipleListenersTest
   ResourceCompilerTest
   ShrinkableMapTest
-  ShrinkableVectorTest
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest

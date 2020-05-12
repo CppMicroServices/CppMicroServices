@@ -428,7 +428,13 @@ void TestBundleStates()
   // Test Start -> Stop for auto-installed bundles
   auto bundles = frameworkCtx.GetBundles();
   for (auto& bundle : bundles) {
-    if (bundle != framework) {
+    // TestStartBundleA and TestStopBundleA start/stop TestBundleA for the purposes
+    // of a different test. Instead of complicating this test code, skip starting 
+    // these bundles. In the future, refactor this test code to execute only for static
+    // builds and to start and stop an explicit list of bundles instead of them all.
+    if (bundle != framework &&
+        "TestStartBundleA" != bundle.GetSymbolicName() &&
+        "TestStopBundleA" != bundle.GetSymbolicName()) {
       US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED,
                         "Test installed bundle state")
       try {

@@ -30,6 +30,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceRegistration.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/FileSystem.h"
@@ -520,6 +521,11 @@ std::exception_ptr BundlePrivate::Start0()
       // get a BundleActivator instance
       bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
+    } catch (std::system_error& ex) {
+      // SharedLibrary::Load(int flags) will throw a std::system_error when a shared library
+      //fails to load. Creating a SharedLibraryException here to throw.
+      res = std::make_exception_ptr(cppmicroservices::SharedLibraryException(
+        ex.code(), ex.what(), std::move(thisBundle)));
     } catch (...) {
       res = std::make_exception_ptr(
         std::runtime_error("Bundle#" + util::ToString(id) +
@@ -569,8 +575,12 @@ std::exception_ptr BundlePrivate::Start0()
   if (res == nullptr) {
     // 10:
     state = Bundle::STATE_ACTIVE;
-    coreCtx->listeners.BundleChanged(BundleEvent(
-      BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
+    try {
+      coreCtx->listeners.BundleChanged(BundleEvent(
+        BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
+    } catch (const cppmicroservices::SharedLibraryException& ex) {
+      res = std::make_exception_ptr(ex);
+    }
   } else if (operation == OP_ACTIVATING) {
     // 8:
     StartFailed();

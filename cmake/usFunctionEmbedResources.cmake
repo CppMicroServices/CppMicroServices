@@ -199,7 +199,7 @@ function(usFunctionEmbedResources)
       add_custom_command(
         OUTPUT ${_source_output}
         COMMAND ${CMAKE_LINKER} -r -b binary -o ${_source_output} ${_zip_archive_name}
-        COMMAND objcopy --rename-section .data=.us_resources,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
+        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.us_resources,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
@@ -235,6 +235,13 @@ function(usFunctionEmbedResources)
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM
     )
+    
+    # Disable code-signing on macOS if appending resources.
+	if(APPLE)
+	  set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
+		XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+	endif()
+	
   endif()
 
 endfunction()

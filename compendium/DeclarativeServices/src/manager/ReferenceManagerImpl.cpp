@@ -26,6 +26,7 @@
 #include "ReferenceManagerImpl.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
+using cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME;
 using cppmicroservices::service::component::ComponentConstants::REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 using cppmicroservices::Constants::SERVICE_SCOPE;
 using cppmicroservices::Constants::SCOPE_PROTOTYPE;
@@ -56,10 +57,12 @@ LDAPFilter GetReferenceLDAPFilter(const metadata::ReferenceMetadata& refMetadata
 
 ReferenceManagerImpl::ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata,
                                            const cppmicroservices::BundleContext& bc,
-                                           std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+                                           std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                           const std::string& configName)
   : metadata(metadata)
   , tracker(nullptr)
   , logger(std::move(logger))
+  , configName(configName)
 {
   if(!bc || !this->logger)
   {
@@ -230,13 +233,26 @@ void ReferenceManagerImpl::ServiceAdded(const cppmicroservices::ServiceReference
 
 cppmicroservices::InterfaceMapConstPtr ReferenceManagerImpl::AddingService(const cppmicroservices::ServiceReference<void>& reference)
 {
-  { // acquire lock on matchedRefs
+  // Each service registered by DS contains a service property representing the component configuration name
+  // to which it belongs. By checking the component configuration name of a service it can be determined
+  // whether this service will satisfy its own reference. If it would, it is not a matched reference as
+  // a service from the same component configuration can't satisfy its own reference.
+  //
+  // ASSUMPTION: If there is no component configuration name then its assumed this service was not registered by
+  // DS and could not satisfy itself since it is not managed by DS.
+  auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
+  if ((!compConfigName.Empty() && configName != compConfigName.ToStringNoExcept()) ||
+    compConfigName.Empty()) { 
+    // acquire lock on matchedRefs
     auto matchedRefsHandle = matchedRefs.lock();
     matchedRefsHandle->insert(reference);
   } // release lock on matchedRefs
 
-  // After updating the bound references on this thread, notifying listeners happens on a separate thread
-  // see "synchronous" section in https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432
+  // After updating the bound references on this thread, notifying listeners happens on the same thread.
+  // This behavior deviates from what is described in the "synchronous" section in
+  // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sporadically not returning a valid service
+  // when a user calls getService, due to a service's references still resolving, was deemed undesirable
+  // for user workflows.
   ServiceAdded(reference);
 
   // A non-null object must be returned to indicate to the ServiceTracker that
@@ -306,8 +322,10 @@ void ReferenceManagerImpl::RemovedService(const cppmicroservices::ServiceReferen
     matchedRefsHandle->erase(reference);
   } // release lock on matchedRefs
 
-  // After updating the bound references on this thread, notifying listeners happens on a separate thread
-  // see "synchronous" section in https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432
+  // After updating the bound references on this thread, notifying listeners happens on the same thread.
+  // This behavior deviates from what is described in the "synchronous" section in
+  // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sometimes not returning a valid service
+  // due to a service's references still resolving was deemed undesirable for user workflows.
   ServiceRemoved(reference);
 }
 

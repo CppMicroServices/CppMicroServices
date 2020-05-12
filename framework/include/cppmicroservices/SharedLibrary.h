@@ -82,7 +82,7 @@ public:
    * to work around RTTI problems across shared library boundaries.
    *
    * @throws std::logic_error If the library is already loaded.
-   * @throws std::runtime_error If loading the library failed.
+   * @throws std::system_error If loading the library failed.
    */
   void Load();
 
@@ -91,7 +91,7 @@ public:
    * using the specified flags on POSIX systems.
    *
    * @throws std::logic_error If the library is already loaded.
-   * @throws std::runtime_error If loading the library failed.
+   * @throws std::system_error If loading the library failed.
    */
   void Load(int flags);
 

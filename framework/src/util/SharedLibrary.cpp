@@ -27,6 +27,7 @@
 #include "cppmicroservices/util/FileSystem.h"
 
 #if defined(US_PLATFORM_POSIX)
+#  include <cerrno>
 #  include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
 #  include "cppmicroservices/util/Error.h"
@@ -98,14 +99,20 @@ void SharedLibrary::Load(int flags)
 #ifdef US_PLATFORM_POSIX
   d->m_Handle = dlopen(libPath.c_str(), flags);
   if (!d->m_Handle) {
+    std::error_code err_code(errno, std::generic_category());
     std::string err_msg = "Error loading " + libPath + ".";
     const char* err = dlerror();
     if (err) {
       err_msg += " " + std::string(err);
     }
 
+
     d->m_Handle = nullptr;
-    throw std::runtime_error(err_msg);
+
+    // Bundle of origin information is not available here. It will be
+    // BundlePrivate::Start0() will catch this system_error and create
+    // a SharedLibraryException.
+    throw std::system_error(err_code, err_msg);
   }
 #else
   US_UNUSED(flags);
@@ -113,13 +120,18 @@ void SharedLibrary::Load(int flags)
   d->m_Handle = LoadLibraryW(wpath.c_str());
 
   if (!d->m_Handle) {
+    std::error_code err_code(GetLastError(), std::generic_category());
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
     d->m_Handle = nullptr;
-    throw std::runtime_error(errMsg);
+
+    // Bundle of origin information is not available here. It will be
+    // BundlePrivate::Start0() will catch this system_error and create
+    // a SharedLibraryException.
+    throw std::system_error(err_code, errMsg);
   }
 #endif
 }

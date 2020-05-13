@@ -20,6 +20,8 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundleLoader.hpp"
@@ -72,31 +74,15 @@ GetComponentCreatorDeletors(const std::string& compName,
   if (bundleBinaries.lock()->count(bundleLoc) != 0u) {
     handle = bundleBinaries.lock()->at(bundleLoc);
   } else {
-#if defined(_WIN32)
-    std::wstring bundlePathWstr = UTF8StrToWStr(fromBundle.GetLocation());
-    handle = reinterpret_cast<void*>(LoadLibraryW(bundlePathWstr.c_str()));
-    if (handle == nullptr) {
-      std::error_code err_code(GetLastError(), std::generic_category());
-      std::string errMsg("Unable to load bundle binary ");
-      errMsg += fromBundle.GetLocation();
-      errMsg += ". Error: ";
-      errMsg += std::to_string(GetLastError());
-      throw cppmicroservices::SharedLibraryException(
-        err_code, std::move(errMsg), std::move(fromBundle));
+    SharedLibrary sh(bundleLoc);
+    try {
+      sh.Load();
+    } catch (const std::system_error& ex) {
+      // SharedLibrary::Load() will throw a std::system_error when a shared library
+      // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.
+      throw cppmicroservices::SharedLibraryException(ex.code(), ex.what(), std::move(fromBundle));
     }
-#else
-    handle = dlopen(fromBundle.GetLocation().c_str(), RTLD_LAZY | RTLD_LOCAL);
-    if (handle == nullptr) {
-      std::error_code err_code(errno, std::generic_category());
-      std::string errMsg("Unable to load bundle binary ");
-      errMsg += fromBundle.GetLocation();
-      errMsg += ". Error: ";
-      const char* dlErrMsg = dlerror();
-      errMsg += (dlErrMsg) ? dlErrMsg : "none";
-      throw cppmicroservices::SharedLibraryException(
-        err_code, std::move(errMsg), std::move(fromBundle));
-    }
-#endif
+    handle = sh.GetHandle();
     bundleBinaries.lock()->emplace(bundleLoc, handle);
   }
 
@@ -104,30 +90,23 @@ GetComponentCreatorDeletors(const std::string& compName,
     std::regex_replace(compName, std::regex("::"), "_");
   const std::string newInstanceFuncName("NewInstance_" + symbolName);
   const std::string deleteInstanceFuncName("DeleteInstance_" + symbolName);
-#if defined(_WIN32)
-  void* sym = reinterpret_cast<void*>(GetProcAddress(
-    reinterpret_cast<HMODULE>(handle), newInstanceFuncName.c_str()));
-  void* delsym = reinterpret_cast<void*>(GetProcAddress(
-    reinterpret_cast<HMODULE>(handle), deleteInstanceFuncName.c_str()));
+  
+  void* sym = fromBundle.GetSymbol(handle, newInstanceFuncName);
+  void* delsym = fromBundle.GetSymbol(handle, deleteInstanceFuncName);
+  
   if (sym == nullptr || delsym == nullptr) {
     std::string errMsg("Unable to find entry-point functions in bundle ");
     errMsg += fromBundle.GetLocation();
+#if defined(_WIN32)
     errMsg += ". Error code: ";
     errMsg += std::to_string(GetLastError());
-    throw std::runtime_error(errMsg);
-  }
 #else
-  void* sym = dlsym(handle, newInstanceFuncName.c_str());
-  void* delsym = dlsym(handle, deleteInstanceFuncName.c_str());
-  if (sym == nullptr || delsym == nullptr) {
-    std::string errMsg("Unable to find entry-point functions in bundle ");
-    errMsg += fromBundle.GetLocation();
     errMsg += ". Error: ";
     const char* dlErrMsg = dlerror();
     errMsg += (dlErrMsg) ? dlErrMsg : "none";
+#endif
     throw std::runtime_error(errMsg);
   }
-#endif
 
   return std::make_tuple(
     reinterpret_cast<ComponentInstance* (*)(void)>(sym),     // NOLINT

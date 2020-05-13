@@ -123,9 +123,9 @@ void SharedLibrary::Load(int flags)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
-    // Bundle of origin information is not available here. It will be
-    // BundlePrivate::Start0() will catch this system_error and create
-    // a SharedLibraryException.
+    // Bundle of origin information is not available here. Use try/catch
+    // around SharedLibrary::Load(), and throw a SharedLibraryException
+    // inside the catch statement, with the available bundle of origin.
     throw std::system_error(err_code, errMsg);
   }
 #endif

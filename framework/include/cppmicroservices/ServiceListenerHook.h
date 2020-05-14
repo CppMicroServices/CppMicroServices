@@ -25,7 +25,6 @@
 
 #include <functional>
 #include "cppmicroservices/ServiceInterface.h"
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/ShrinkableVector.h"
 
 #include <string>

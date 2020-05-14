@@ -48,16 +48,15 @@
 
 namespace cppmicroservices {
 
-class SharedLibraryPrivate : public SharedData
+class SharedLibraryPrivate
 {
 public:
   SharedLibraryPrivate()
-    : 
-     m_Suffix(US_LIB_EXT)
+    : m_Suffix(US_LIB_EXT)
     , m_Prefix(US_LIB_PREFIX)
   {}
 
-  void* m_Handle{nullptr};
+  void * m_Handle{ nullptr };
 
   std::string m_Name;
   std::string m_Path;
@@ -89,7 +88,7 @@ SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
 
 SharedLibrary::~SharedLibrary() = default;
 
-SharedLibrary& SharedLibrary::operator=(const SharedLibrary&) = default;
+SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other) = default;
 
 void SharedLibrary::Load(int flags)
 {
@@ -107,6 +106,9 @@ void SharedLibrary::Load(int flags)
       err_msg += " " + std::string(err);
     }
 
+
+    d->m_Handle = nullptr;
+
     // Bundle of origin information is not available here. It will be
     // BundlePrivate::Start0() will catch this system_error and create
     // a SharedLibraryException.
@@ -116,12 +118,15 @@ void SharedLibrary::Load(int flags)
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
   d->m_Handle = LoadLibraryW(wpath.c_str());
+
   if (!d->m_Handle) {
     std::error_code err_code(GetLastError(), std::generic_category());
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
+
+    d->m_Handle = nullptr;
 
     // Bundle of origin information is not available here. It will be
     // BundlePrivate::Start0() will catch this system_error and create
@@ -151,6 +156,7 @@ void SharedLibrary::Unload()
         err_msg += " " + std::string(err);
       }
 
+      d->m_Handle = nullptr;
       throw std::runtime_error(err_msg);
     }
 #else
@@ -160,9 +166,11 @@ void SharedLibrary::Unload()
         .append("failed with error: ")
         .append(util::GetLastWin32ErrorStr());
 
+      d->m_Handle = nullptr;
       throw std::runtime_error(errMsg);
     }
 #endif
+
     d->m_Handle = nullptr;
   }
 }
@@ -171,7 +179,7 @@ void SharedLibrary::SetName(const std::string& name)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Name = name;
 }
 
@@ -192,7 +200,6 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
   if (IsLoaded())
     return;
 
-  d.Detach();
   d->m_FilePath = absoluteFilePath;
 
   std::string name = d->m_FilePath;
@@ -226,7 +233,7 @@ void SharedLibrary::SetLibraryPath(const std::string& path)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Path = path;
 }
 
@@ -239,7 +246,7 @@ void SharedLibrary::SetSuffix(const std::string& suffix)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Suffix = suffix;
 }
 
@@ -252,7 +259,7 @@ void SharedLibrary::SetPrefix(const std::string& prefix)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Prefix = prefix;
 }
 

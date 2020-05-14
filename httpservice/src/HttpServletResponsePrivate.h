@@ -23,8 +23,6 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H
 #define CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H
 
-#include "cppmicroservices/SharedData.h"
-
 #include <map>
 #include <string>
 
@@ -35,7 +33,7 @@ namespace cppmicroservices {
 
 class HttpServletRequest;
 
-struct HttpServletResponsePrivate : public SharedData
+struct HttpServletResponsePrivate
 {
   HttpServletResponsePrivate(HttpServletRequest* request,
                              CivetServer* server,

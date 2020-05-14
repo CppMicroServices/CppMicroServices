@@ -144,7 +144,7 @@ public:
     US_TEST_CONDITION_REQUIRED(!sr1, "service from bundle A must not exist yet")
 
     // Check manifest headers
-    auto headers = buA.GetHeaders();
+    const auto& headers = buA.GetHeaders();
     US_TEST_CONDITION_REQUIRED(headers.size() > 0,
                                "One or more manifest header")
     US_TEST_CONDITION(headers.at("bundle.symbolic_name") ==
@@ -248,7 +248,7 @@ public:
     }
 
     // Check manifest headers in stopped state
-    auto headers = buA.GetHeaders();
+    const auto& headers = buA.GetHeaders();
     US_TEST_CONDITION_REQUIRED(headers.size() > 0,
                                "One ore more manifest header")
     US_TEST_CONDITION(headers.at("bundle.symbolic_name") ==

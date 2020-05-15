@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
@@ -76,7 +77,13 @@ GetComponentCreatorDeletors(const std::string& compName,
   } else {
     SharedLibrary sh(bundleLoc);
     try {
-      sh.Load();
+      auto ctx = fromBundle.GetBundleContext();
+      auto opts = ctx.GetProperty(Constants::LIBRARY_LOAD_OPTIONS);
+      if (!opts.Empty()) {
+        sh.Load(any_cast<int>(opts));
+      } else {
+        sh.Load();
+      }
     } catch (const std::system_error& ex) {
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.

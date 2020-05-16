@@ -77,6 +77,7 @@ GetComponentCreatorDeletors(const std::string& compName,
   } else {
     SharedLibrary sh(bundleLoc);
     try {
+#ifdef US_PLATFORM_POSIX
       auto ctx = fromBundle.GetBundleContext();
       auto opts = ctx.GetProperty(Constants::LIBRARY_LOAD_OPTIONS);
       if (!opts.Empty()) {
@@ -84,6 +85,9 @@ GetComponentCreatorDeletors(const std::string& compName,
       } else {
         sh.Load();
       }
+#else
+      sh.Load();
+#endif
     } catch (const std::system_error& ex) {
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.

@@ -453,7 +453,7 @@ std::exception_ptr BundlePrivate::Start0()
   coreCtx->listeners.BundleChanged(
     BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
 
-  auto headers = thisBundle.GetHeaders();
+  const auto& headers = thisBundle.GetHeaders();
   Any bundleActivatorVal;
   if (headers.count(Constants::BUNDLE_ACTIVATOR) > 0) {
     bundleActivatorVal = headers.find(Constants::BUNDLE_ACTIVATOR)->second;

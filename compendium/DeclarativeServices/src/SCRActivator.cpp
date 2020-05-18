@@ -100,7 +100,7 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
 
 void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
 {
-  auto headers = bundle.GetHeaders();
+  const auto& headers = bundle.GetHeaders();
   // bundle has no "scr" property
   if (headers.count(SERVICE_COMPONENT) == 0u)
   {
@@ -139,7 +139,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
 
 void SCRActivator::DisposeExtension(const cppmicroservices::Bundle& bundle)
 {
-  auto headers = bundle.GetHeaders();
+  const auto& headers = bundle.GetHeaders();
   // bundle has no scr-component property
   if (headers.count(SERVICE_COMPONENT) == 0u)
   {

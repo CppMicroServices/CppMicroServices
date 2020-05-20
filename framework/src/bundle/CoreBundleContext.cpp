@@ -76,8 +76,7 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS,
                                        RTLD_LAZY | RTLD_LOCAL));
 #else
-  configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS,
-                                       0));
+  configuration[Constants::LIBRARY_LOAD_OPTIONS] = int(0);
 #endif
 
   return configuration;

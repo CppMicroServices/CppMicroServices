@@ -77,17 +77,9 @@ GetComponentCreatorDeletors(const std::string& compName,
   } else {
     SharedLibrary sh(bundleLoc);
     try {
-#ifdef US_PLATFORM_POSIX
       auto ctx = fromBundle.GetBundleContext();
       auto opts = ctx.GetProperty(Constants::LIBRARY_LOAD_OPTIONS);
-      if (!opts.Empty()) {
-        sh.Load(any_cast<int>(opts));
-      } else {
-        sh.Load();
-      }
-#else
-      sh.Load();
-#endif
+      sh.Load(any_cast<int>(opts));
     } catch (const std::system_error& ex) {
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.
@@ -102,10 +94,10 @@ GetComponentCreatorDeletors(const std::string& compName,
   const std::string newInstanceFuncName("NewInstance_" + symbolName);
   const std::string deleteInstanceFuncName("DeleteInstance_" + symbolName);
   
-  void* sym = fromBundle.GetSymbol(handle, newInstanceFuncName);
+  void* newsym = fromBundle.GetSymbol(handle, newInstanceFuncName);
   void* delsym = fromBundle.GetSymbol(handle, deleteInstanceFuncName);
   
-  if (sym == nullptr || delsym == nullptr) {
+  if (newsym == nullptr || delsym == nullptr) {
     std::string errMsg("Unable to find entry-point functions in bundle ");
     errMsg += fromBundle.GetLocation();
 #if defined(_WIN32)
@@ -120,7 +112,7 @@ GetComponentCreatorDeletors(const std::string& compName,
   }
 
   return std::make_tuple(
-    reinterpret_cast<ComponentInstance* (*)(void)>(sym),     // NOLINT
+    reinterpret_cast<ComponentInstance* (*)(void)>(newsym),  // NOLINT
     reinterpret_cast<void (*)(ComponentInstance*)>(delsym)); // NOLINT
 }
 }

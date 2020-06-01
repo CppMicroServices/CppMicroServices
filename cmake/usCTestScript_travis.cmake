@@ -14,7 +14,11 @@ else()
   set(CTEST_DASHBOARD_ROOT "/tmp/us_builds")
 endif()
 #set(CTEST_COMPILER "gcc-4.5")
-set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+if(APPLE)
+  set(CTEST_CMAKE_GENERATOR "Xcode")
+else()
+  set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+endif()
 if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   # gcc in combination with gcov seems to consume a lot of memory
   # and may lead to OOM error on Travis containers. Hence we compile

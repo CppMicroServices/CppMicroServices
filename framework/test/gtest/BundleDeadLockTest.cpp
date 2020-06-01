@@ -24,10 +24,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/util/FileSystem.h"
-
 #include "TestUtils.h"
-#include <TestingConfig.h>
 
 #include "gtest/gtest.h"
 
@@ -58,36 +55,6 @@ TEST(BundleDeadLock, BundleActivatorCallsStop)
   ASSERT_NO_THROW(bundle.Start());
   ASSERT_NO_THROW(bundle.Stop());
 
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
-}
-
-TEST(BundleDeadLock, BundleInstall0Throws)
-{
-  auto f = cppmicroservices::FrameworkFactory().NewFramework();
-  ASSERT_TRUE(f);
-  f.Start();
-  
-  // Test that multiple calls to installing a bundle with the same symbolic name and
-  // different paths produce the same result (i.e. an exception).
-  ASSERT_NO_THROW((void)cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA"));
-    
-  const std::string nonCanonicalBundleInstallPath(cppmicroservices::testing::LIB_PATH
-                                                  + cppmicroservices::util::DIR_SEP
-                                                  + "."
-                                                  + cppmicroservices::util::DIR_SEP
-                                                  + US_LIB_PREFIX
-                                                  + "TestBundleA"
-                                                  + US_LIB_POSTFIX
-                                                  + US_LIB_EXT);
-  auto frameworkCtx = f.GetBundleContext();
-  ASSERT_THROW(frameworkCtx.InstallBundles(nonCanonicalBundleInstallPath), std::runtime_error);
-  
-  // This install call could hang if BundleRegistry::Install doesn't
-  // implement proper RAII for resources that need to be cleaned up
-  // in cases where BundleRegistry::Install0 throws.
-  ASSERT_THROW(frameworkCtx.InstallBundles(nonCanonicalBundleInstallPath), std::runtime_error);
-    
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }

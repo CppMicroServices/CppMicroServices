@@ -54,42 +54,42 @@ TEST(ComponentManagerImplTest, Ctor)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   {
     EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(nullptr,
+        std::make_shared<ComponentManagerImpl>(nullptr,
                                                mockRegistry,
                                                bc,
-                                               fakeLogger));
+                                               fakeLogger);
       }, std::invalid_argument);
   }
   {
     EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+        std::make_shared<ComponentManagerImpl>(mockMetadata,
                                                nullptr,
                                                bc,
-                                               fakeLogger));
+                                               fakeLogger);
       }, std::invalid_argument);
   }
   {
     EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+        std::make_shared<ComponentManagerImpl>(mockMetadata,
                                                mockRegistry,
                                                BundleContext(),
-                                               fakeLogger));
+                                               fakeLogger);
       }, std::invalid_argument);
   }
   {
     EXPECT_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+        std::make_shared<ComponentManagerImpl>(mockMetadata,
                                                mockRegistry,
                                                bc,
-                                               nullptr));
+                                               nullptr);
       }, std::invalid_argument);
   }
   {
     EXPECT_NO_THROW({
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+        std::make_shared<ComponentManagerImpl>(mockMetadata,
                                                mockRegistry,
                                                bc,
-                                               fakeLogger));
+                                               fakeLogger);
       });
   }
 }

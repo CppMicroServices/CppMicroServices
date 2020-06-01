@@ -28,7 +28,7 @@ configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/logservice/LogServiceExport.h
   )
            
-add_library(usLogService ${_srcs} ${_public_headers})
+add_library(usLogService ${_srcs})
 
 target_include_directories(usLogService
   PUBLIC

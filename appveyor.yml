@@ -136,71 +136,6 @@ environment:
     gen: "Visual Studio 15 2017 Win64"
     US_SHARED: 1
     US_THREADED: 1
-  # ---------- Visual Studio 2019 ------------
-  #---- Win32
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 0
-    US_THREADED: 0
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 1
-    US_THREADED: 0
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 0
-    US_THREADED: 1
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: Win32
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 1
-    US_THREADED: 1
-  #---- Win64
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: x64
-    configuration: Debug
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 0
-    US_THREADED: 1
-    WITH_COVERAGE: 1
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: x64
-    configuration: Debug
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 1
-    US_THREADED: 1
-    WITH_COVERAGE: 1
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 0
-    US_THREADED: 0
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 1
-    US_THREADED: 0
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 0
-    US_THREADED: 1
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    platform: x64
-    configuration: Release
-    gen: "Visual Studio 16 2019"
-    US_SHARED: 1
-    US_THREADED: 1
   # ---------- MinGW-w64 (via MSYS2) ------------
   - platform: mingw-w64
     configuration: Release
@@ -239,6 +174,7 @@ before_build:
 
 install:
 - if [%WITH_COVERAGE%]==[1] choco install opencppcoverage
+- if [%WITH_COVERAGE%]==[1] pip install codecov
 - git submodule update --init --recursive
 
 build_script:
@@ -253,6 +189,7 @@ after_test:
     $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
     Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
     bash codecov.sh -f "./coverage_pathsfixed.xml"
+#- if [%WITH_COVERAGE%]==[1] codecov -X gcov -f %APPVEYOR_BUILD_FOLDER%/build/coverage_pathsfixed.xml
 
 test_script:
 - cd %APPVEYOR_BUILD_FOLDER%/build

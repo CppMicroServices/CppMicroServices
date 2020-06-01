@@ -70,7 +70,7 @@ function(create_initial_cache var _shared _threading)
   endif()
 
   string(REPLACE " " "-" _fixedGenerator ${_generator})
-  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-${_fixedGenerator}" PARENT_SCOPE)
+  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-(${_fixedGenerator})" PARENT_SCOPE)
 
 endfunction()
 
@@ -91,11 +91,7 @@ set(config2     1       0     )
 set(config3     0       0     )
 
 if(NOT US_CMAKE_GENERATOR)
-  if(APPLE)
-    set(US_CMAKE_GENERATOR "Xcode")
-  else()
-    set(US_CMAKE_GENERATOR "Unix Makefiles")
-  endif()
+  set(US_CMAKE_GENERATOR "Unix Makefiles")
 endif()
 
 foreach (_generator ${US_CMAKE_GENERATOR})

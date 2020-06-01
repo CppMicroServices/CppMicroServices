@@ -135,8 +135,7 @@ if(US_BUILD_TESTING)
                        "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                        "${CMAKE_CURRENT_LIST_DIR}")
       set_tests_properties(DocCodeConfigureTest-${config} PROPERTIES
-                           DEPENDS "InstallTest;DocCodeCreateDirTest"
-                           ENVIRONMENT "LDFLAGS=-fprofile-arcs")
+                           DEPENDS "InstallTest;DocCodeCreateDirTest")
 
       add_test(NAME DocCodeBuildTest-${config} CONFIGURATIONS ${config}
                WORKING_DIRECTORY ${_doc_code_binary_dir}
@@ -159,8 +158,7 @@ if(US_BUILD_TESTING)
                      "-DCppMicroServices_DIR:PATH=${_install_dir}/${AUXILIARY_CMAKE_INSTALL_DIR}"
                      "${CMAKE_CURRENT_LIST_DIR}")
     set_tests_properties(DocCodeConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
-                         DEPENDS "InstallTest;DocCodeCreateDirTest"
-                         ENVIRONMENT "LDFLAGS=-fprofile-arcs")
+                         DEPENDS "InstallTest;DocCodeCreateDirTest")
 
     add_test(NAME DocCodeBuildTest-${CMAKE_BUILD_TYPE}
              WORKING_DIRECTORY ${_doc_code_binary_dir}

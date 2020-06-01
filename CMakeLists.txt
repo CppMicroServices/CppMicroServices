@@ -547,6 +547,12 @@ endif()
 
 usFunctionCheckResourceLinking()
 
+if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${US_LINK_FLAGS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${US_LINK_FLAGS}")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${US_LINK_FLAGS}")
+endif()
+
 #-----------------------------------------------------------------------------
 # US Header Checks
 #-----------------------------------------------------------------------------

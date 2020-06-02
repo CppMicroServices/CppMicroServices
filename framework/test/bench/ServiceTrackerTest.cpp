@@ -128,6 +128,31 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalability)(benchmark::
   }
 }
 
+/// Benchmark service tracker scalability (use case: one ServiceTracker, multiple service impls)
+BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultiplieImplOneInterfaceServiceTrackerScalability)(benchmark::State& state)
+{
+  using namespace benchmark::test;
+  using namespace cppmicroservices;
+
+  auto fc = framework->GetBundleContext();
+
+  int64_t maxServices{ state.range(0) };
+  std::vector<std::shared_ptr<FooImpl>> impls;
+  for (int64_t i = 0; i < maxServices; ++i) {
+    impls.emplace_back(std::make_shared<FooImpl>());
+  }
+  std::unique_ptr<ServiceTracker<Foo>> tracker = std::make_unique<ServiceTracker<Foo>>(fc);
+  tracker->Open();
+
+  for (auto _ : state) {
+    for (int64_t i = 0; i < maxServices; ++i) {
+      fc.RegisterService<Foo>(impls[i]);
+    }
+  }
+
+  tracker->Close();
+}
+
 // Register benchmark functions
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)->UseManualTime();
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithBundleContext)->UseManualTime();
@@ -137,3 +162,8 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)->Arg(1)
                                                                       ->Arg(4000)
                                                                       ->Arg(10000);
+BENCHMARK_REGISTER_F(ServiceTrackerFixture,
+                     MultiplieImplOneInterfaceServiceTrackerScalability)->Arg(1)
+                                                                        ->Arg(4000)
+                                                                        ->Arg(10000);
+                               

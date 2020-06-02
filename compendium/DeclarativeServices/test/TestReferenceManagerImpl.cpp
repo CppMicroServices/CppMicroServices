@@ -34,24 +34,6 @@
 #include "TestUtils.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 
-template <typename Task, typename Predicate>
-bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
-{
-  using namespace std::chrono;
-  auto startTime = system_clock::now();
-  do
-  {
-    t();
-    duration<double> duration = system_clock::now() - startTime;
-    if(duration > milliseconds(30000))
-    {
-      return false;
-    }
-  } while(!p());
-  return true;
-}
-
-
 namespace scr = cppmicroservices::service::component::runtime;
 
 using cppmicroservices::service::component::ComponentConstants::REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
@@ -541,27 +523,15 @@ private:
   std::string cmpTo;
 };
 
-void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
+TEST_F(ReferenceManagerImplTest, TestDuplicateReferenceName)
 {
-  std::vector<cppmicroservices::Bundle> bundles;
-  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-
-#if defined(US_BUILD_SHARED_LIBS)
-  bundles = frameworkCtx.InstallBundles(dsPluginPath);
-#else
-  bundles = frameworkCtx.GetBundles();
-#endif
-
-  for (auto b : bundles) {
-      b.Start();
-  }
+  
 }
-
 
 TEST_F(ReferenceManagerImplTest, TestDynamicGreedy)
 {
   auto bc = GetFramework().GetBundleContext();
-  InstallAndStartDS(bc);
+  test::InstallAndStartDS(bc);
 
   auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI20");
   EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service must not be available before it's dependency";
@@ -574,7 +544,7 @@ TEST_F(ReferenceManagerImplTest, TestDynamicGreedy)
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
   auto depBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI21");
-  auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, &dsRuntimeService, &compDescDTO]()
+  auto result = test::RepeatTaskUntilOrTimeout([&compConfigDTOs, &dsRuntimeService, &compDescDTO]()
                                          {
                                            compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
                                          }, [&compConfigDTOs]()->bool

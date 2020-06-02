@@ -30,17 +30,18 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "../src/manager/ReferenceManagerImpl.hpp"
 
 #include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
+#include "TestUtils.hpp"
+#include "TestInterfaces/Interfaces.hpp"
+
+
+namespace scr = cppmicroservices::service::component::runtime;
 
 namespace cppmicroservices { namespace scrimpl {
-
-class DummyServiceRefT
-  : public ServiceReference<void>
-{
-};
 
 struct TestParam
 {
@@ -57,30 +58,6 @@ protected:
   {}
   
   virtual ~BindingPolicyTest() = default;
-
-  virtual void SetUp() {
-    framework.Start();
-  }
-
-  virtual void TearDown() {
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
-
-  cppmicroservices::Framework& GetFramework() { return framework; }
-private:
-  cppmicroservices::Framework framework;
-};
-
-class StaticGreedyTest
-  : public ::testing::Test
-{
-protected:
-  StaticGreedyTest()
-    : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
-  
-  virtual ~StaticGreedyTest() = default;
 
   virtual void SetUp() {
     framework.Start();
@@ -116,7 +93,9 @@ using namespace cppmicroservices::scrimpl;
 INSTANTIATE_TEST_SUITE_P(BindingPolicyTestParameterized
                          , BindingPolicyTest
                          , testing::Values(TestParam{"static", "greedy", typeid(ReferenceManagerBaseImpl::BindingPolicyStaticGreedy) }
-                                           , TestParam{"static", "reluctant", typeid(ReferenceManagerBaseImpl::BindingPolicyStaticReluctant) }
+                                           , TestParam{"static", "reluctant", typeid(ReferenceManagerBaseImpl::BindingPolicyStaticReluctant)}
+                                           , TestParam{"dynamic", "greedy", typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy)}
+                                           , TestParam{"dynamic", "reluctant", typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant)}
                                ));
 
 TEST_P(BindingPolicyTest, TestPolicyCreation)
@@ -139,11 +118,12 @@ TEST_P(BindingPolicyTest, TestPolicyCreation)
   
   EXPECT_EQ(param.policyType, typeid(*bindingPolicyData));
 }
-#if NEVER
-TEST_F(StaticGreedyTest, NullReference)
+
+TEST_P(BindingPolicyTest, InvalidServiceReference)
 {
   auto bc = GetFramework().GetBundleContext();
-  auto fakeMetadata = CreateFakeReferenceMetadata("static", "greedy");
+  auto const& param = GetParam();
+  auto fakeMetadata = CreateFakeReferenceMetadata(param.policy, param.policyOption);
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata
                                                             , bc
@@ -155,14 +135,77 @@ TEST_F(StaticGreedyTest, NullReference)
                                                                      , fakeMetadata.policyOption);
 
   // set up mock logger to expect call
-  bindingPolicy->ServiceAdded(DummyServiceRefT());
-  EXPECT_TRUE(true);
+  EXPECT_THROW(bindingPolicy->ServiceAdded(ServiceReferenceU()), std::invalid_argument);
+
 }
 
-TEST_F(StaticGreedyTest, ServiceAddedNotSatisfied)
+// test binding a service under the following reference policy, referencep policy options and cardinality
+// Cardinality: 0..1, 1..1
+// reference policy: dynamic
+// reference policy options: reluctant, greedy
+TEST_F(BindingPolicyTest, TestBindingWithDynamicPolicyOptions)
 {
   auto bc = GetFramework().GetBundleContext();
-  auto fakeMetadata = CreateFakeReferenceMetadata("static", "greedy");
+  test::InstallAndStartDS(bc);
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI20");
+}
+
+// test error handling and logging when the bind and unbind methods throw an exception
+TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
+{
+  auto bc = GetFramework().GetBundleContext();
+  test::InstallAndStartDS(bc);
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI22");
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service must not be available before it's dependency";
+  auto dsRef = bc.GetServiceReference<scr::ServiceComponentRuntime>();
+  EXPECT_TRUE(dsRef);
+  auto dsRuntimeService = bc.GetService<scr::ServiceComponentRuntime>(dsRef);
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+    testBundle, "sample::ServiceComponent22");
+  auto compConfigDTOs =
+    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTOs.size(), 1ul);
+  EXPECT_EQ(compConfigDTOs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+
+  auto depBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI21");
+  auto result = test::RepeatTaskUntilOrTimeout(
+    [&compConfigDTOs, &dsRuntimeService, &compDescDTO]() {
+      compConfigDTOs =
+        dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+    },
+    [&compConfigDTOs]() -> bool {
+      return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+    });
+
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
+                         "after the dependency became available";
+  auto svcRef = bc.GetServiceReference<test::Interface2>();
+  ASSERT_FALSE(svcRef);
+
+  depBundle.Stop();
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service should now NOT be available";
+}
+
+// test that dynamic greedy re-binding does not happen if a lower ranked service is registered.
+TEST_F(BindingPolicyTest, TestDynamicGreedyReBind) {}
+
+// test that binding happens only once for dynamic reluctant reference policy
+TEST_F(BindingPolicyTest, TestDynamicReluctantReBind) {}
+
+
+
+/*
+TEST_P(BindingPolicyTest, ServiceAddedNotSatisfied)
+{
+  auto bc = GetFramework().GetBundleContext();
+  auto const& param = GetParam();
+  auto fakeMetadata =
+    CreateFakeReferenceMetadata(param.policy, param.policyOption);
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata
                                                             , bc
@@ -180,9 +223,8 @@ TEST_F(StaticGreedyTest, ServiceAddedNotSatisfied)
   ON_CALL(*mgr, IsSatisfied()).WillByDefault(Return(true));
   
   // set up mock logger to expect call
-  bindingPolicy->ServiceAdded(DummyServiceRefT());
-  EXPECT_TRUE(true);
-}
-#endif
+  bindingPolicy->ServiceAdded(ServiceReferenceU());
 
+}
+*/
 }}

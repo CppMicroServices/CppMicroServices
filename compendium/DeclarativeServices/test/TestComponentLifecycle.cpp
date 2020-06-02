@@ -83,23 +83,6 @@ TEST_F(tServiceComponent, testThrowingLifeCycleHooks) //DS_TOI_9
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED) << "state must be SATISFIED, and never progresses to ACTIVE";
 }
 
-template <typename Task, typename Predicate>
-bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
-{
-  using namespace std::chrono;
-  auto startTime = system_clock::now();
-  do
-  {
-    t();
-    duration<double> duration = system_clock::now() - startTime;
-    if(duration > milliseconds(30000))
-    {
-      return false;
-    }
-  } while(!p());
-  return true;
-}
-
 /**
  * verify state progressions for a immediate component
  * UNSATISFIED_REFERENCE -> ACTIVE -> UNSATISFIED_REFERENCE

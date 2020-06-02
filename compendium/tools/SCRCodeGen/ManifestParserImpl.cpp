@@ -89,6 +89,10 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
         refInfo.name =
           JsonValueValidator(jsonRefInfo, "name", Json::ValueType::stringValue)
             .GetString();
+        // reference names for a service component must be unique.
+        if (1 == componentInfo.references.count(refInfo.name)) {
+          throw std::invalid_argument("Duplicate service reference names found. Reference names must be unique.");
+        }
         refInfo.interface = JsonValueValidator(jsonRefInfo,
                                                "interface",
                                                Json::ValueType::stringValue)
@@ -114,7 +118,7 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
                                               Json::ValueType::stringValue)
                              .GetString();
         }
-        componentInfo.references.push_back(refInfo);
+        componentInfo.references.emplace(refInfo.name, refInfo);
       }
     }
     componentInfos.push_back(componentInfo);

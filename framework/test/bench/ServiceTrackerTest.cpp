@@ -138,6 +138,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultiplieImplOneInterfaceServiceTracke
 
   int64_t maxServices{ state.range(0) };
   std::vector<std::shared_ptr<FooImpl>> impls;
+  impls.reserve(maxServices);
   for (int64_t i = 0; i < maxServices; ++i) {
     impls.emplace_back(std::make_shared<FooImpl>());
   }

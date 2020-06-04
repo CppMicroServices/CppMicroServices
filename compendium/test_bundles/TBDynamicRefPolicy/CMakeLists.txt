@@ -1,0 +1,8 @@
+usFunctionCreateDSTestBundle(TBDynamicRefPolicy)
+
+usFunctionCreateTestBundleWithResources(TBDynamicRefPolicy
+  SOURCES src/ServiceComponentDynamicGreedyOptionalUnary.cpp src/ServiceComponentDynamicGreedyMandatoryUnary.cpp src/ServiceComponentDynamicReluctantOptionalUnary.cpp src/ServiceComponentDynamicReluctantMandatoryUnary.cpp ${_glue_file}
+  RESOURCES manifest.json
+  BUNDLE_SYMBOLIC_NAME TBDynamicRefPolicy
+  OTHER_LIBRARIES usTestInterfaces usServiceComponent usServiceComponent)
+

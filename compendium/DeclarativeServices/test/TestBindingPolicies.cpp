@@ -22,60 +22,111 @@
 
 #include <random>
 #include <tuple>
-#include <typeinfo>
 #include <typeindex>
+#include <typeinfo>
 
+#include "../src/manager/ReferenceManagerImpl.hpp"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
-#include "../src/manager/ReferenceManagerImpl.hpp"
 
-#include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
-#include "TestUtils.hpp"
+#include "Mocks.hpp"
 #include "TestInterfaces/Interfaces.hpp"
-
+#include "TestUtils.hpp"
 
 namespace scr = cppmicroservices::service::component::runtime;
 
-namespace cppmicroservices { namespace scrimpl {
+namespace test {
+class InterfaceImpl
+  : public Interface1
+  , public Interface3
+  , public Interface4
+  , public Interface5
+  , public Interface6
+{
+public:
+  InterfaceImpl(std::string str)
+    : str_(std::move(str))
+  {}
+  virtual ~InterfaceImpl() = default;
+  virtual std::string Description() { return str_; }
 
-struct TestParam
+private:
+  std::string str_;
+};
+}
+
+namespace cppmicroservices {
+namespace scrimpl {
+
+struct Policy
 {
   const char* policy;
   const char* policyOption;
   std::type_index policyType;
 };
-    
-class BindingPolicyTest
-  : public ::testing::TestWithParam<TestParam> {
+
+class BindingPolicyTest : public ::testing::TestWithParam<Policy>
+{
 protected:
   BindingPolicyTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
   {}
-  
+
   virtual ~BindingPolicyTest() = default;
 
-  virtual void SetUp() {
-    framework.Start();
-  }
+  virtual void SetUp() { framework.Start(); }
 
-  virtual void TearDown() {
+  virtual void TearDown()
+  {
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 
   cppmicroservices::Framework& GetFramework() { return framework; }
+
+private:
+  cppmicroservices::Framework framework;
+};
+
+struct DynamicRefPolicy
+{
+  const char* verificationMessage;
+  const char* implClassName;
+  InterfaceMapConstPtr interfaceMap;
+};
+
+class DynamicRefPolicyTest : public ::testing::TestWithParam<DynamicRefPolicy>
+{
+protected:
+  DynamicRefPolicyTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
+
+  virtual ~DynamicRefPolicyTest() = default;
+
+  virtual void SetUp() { framework.Start(); }
+
+  virtual void TearDown()
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+
+  cppmicroservices::Framework& GetFramework() { return framework; }
+
 private:
   cppmicroservices::Framework framework;
 };
 
 // utility method for creating different types of reference metadata objects used in testing
-metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& policy,
-                                                        const std::string& policyOption)
+metadata::ReferenceMetadata CreateFakeReferenceMetadata(
+  const std::string& policy,
+  const std::string& policyOption)
 {
   metadata::ReferenceMetadata fakeMetadata{};
   fakeMetadata.name = "ref";
@@ -90,32 +141,40 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& polic
 
 using namespace cppmicroservices::scrimpl;
 
-INSTANTIATE_TEST_SUITE_P(BindingPolicyTestParameterized
-                         , BindingPolicyTest
-                         , testing::Values(TestParam{"static", "greedy", typeid(ReferenceManagerBaseImpl::BindingPolicyStaticGreedy) }
-                                           , TestParam{"static", "reluctant", typeid(ReferenceManagerBaseImpl::BindingPolicyStaticReluctant)}
-                                           , TestParam{"dynamic", "greedy", typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy)}
-                                           , TestParam{"dynamic", "reluctant", typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant)}
-                               ));
+INSTANTIATE_TEST_SUITE_P(
+  BindingPolicies,
+  BindingPolicyTest,
+  testing::Values(
+    Policy{ "static",
+               "greedy",
+               typeid(ReferenceManagerBaseImpl::BindingPolicyStaticGreedy) },
+    Policy{ "static",
+               "reluctant",
+               typeid(ReferenceManagerBaseImpl::BindingPolicyStaticReluctant) },
+    Policy{ "dynamic",
+               "greedy",
+               typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy) },
+    Policy{
+      "dynamic",
+      "reluctant",
+      typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant) }));
 
 TEST_P(BindingPolicyTest, TestPolicyCreation)
 {
   auto bc = GetFramework().GetBundleContext();
   auto const& param = GetParam();
 
-  auto fakeMetadata = CreateFakeReferenceMetadata(param.policy, param.policyOption);
+  auto fakeMetadata =
+    CreateFakeReferenceMetadata(param.policy, param.policyOption);
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata
-                                                            , bc
-                                                            , fakeLogger
-                                                            , "foo");
-  
-  auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr
-                                                                     , fakeMetadata.policy
-                                                                     , fakeMetadata.policyOption);
+  auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(
+    fakeMetadata, bc, fakeLogger, "foo");
+
+  auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(
+    *mgr, fakeMetadata.policy, fakeMetadata.policyOption);
   EXPECT_TRUE(bindingPolicy);
   auto* bindingPolicyData = bindingPolicy.get();
-  
+
   EXPECT_EQ(param.policyType, typeid(*bindingPolicyData));
 }
 
@@ -123,32 +182,96 @@ TEST_P(BindingPolicyTest, InvalidServiceReference)
 {
   auto bc = GetFramework().GetBundleContext();
   auto const& param = GetParam();
-  auto fakeMetadata = CreateFakeReferenceMetadata(param.policy, param.policyOption);
+  auto fakeMetadata =
+    CreateFakeReferenceMetadata(param.policy, param.policyOption);
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata
-                                                            , bc
-                                                            , fakeLogger
-                                                            , "foo");
-  
-  auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr
-                                                                     , fakeMetadata.policy
-                                                                     , fakeMetadata.policyOption);
+  auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(
+    fakeMetadata, bc, fakeLogger, "foo");
 
-  // set up mock logger to expect call
-  EXPECT_THROW(bindingPolicy->ServiceAdded(ServiceReferenceU()), std::invalid_argument);
+  auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(
+    *mgr, fakeMetadata.policy, fakeMetadata.policyOption);
 
+  EXPECT_THROW(bindingPolicy->ServiceAdded(ServiceReferenceU()),
+               std::invalid_argument);
 }
 
-// test binding a service under the following reference policy, referencep policy options and cardinality
+INSTANTIATE_TEST_SUITE_P(
+  DynamicReferencePolicies,
+  DynamicRefPolicyTest,
+  testing::Values(
+    DynamicRefPolicy{
+      "ServiceComponentDynamicReluctantMandatoryUnary depends on Interface3",
+      "sample::ServiceComponentDynamicReluctantMandatoryUnary",
+      MakeInterfaceMap<test::Interface3>(std::make_shared<test::InterfaceImpl>("Interface3")) },
+    DynamicRefPolicy{
+      "ServiceComponentDynamicGreedyMandatoryUnary depends on Interface4",
+      "sample::ServiceComponentDynamicGreedyMandatoryUnary",
+      MakeInterfaceMap<test::Interface4>(std::make_shared<test::InterfaceImpl>("Interface4")) },
+    DynamicRefPolicy{
+      "ServiceComponentDynamicReluctantOptionalUnary depends on Interface5",
+      "sample::ServiceComponentDynamicReluctantOptionalUnary",
+      MakeInterfaceMap<test::Interface5>(std::make_shared<test::InterfaceImpl>("Interface5")) },
+    DynamicRefPolicy{
+      "ServiceComponentDynamicGreedyOptionalUnary depends on Interface6",
+      "sample::ServiceComponentDynamicGreedyOptionalUnary",
+      MakeInterfaceMap<test::Interface6>(std::make_shared<test::InterfaceImpl>("Interface6")) }));
+
+// test binding a service under the following reference policy, reference policy options and cardinality
 // Cardinality: 0..1, 1..1
 // reference policy: dynamic
 // reference policy options: reluctant, greedy
-TEST_F(BindingPolicyTest, TestBindingWithDynamicPolicyOptions)
+TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
 {
   auto bc = GetFramework().GetBundleContext();
   test::InstallAndStartDS(bc);
 
-  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI20");
+  auto const& param = GetParam();
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TBDynamicRefPolicy");
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service must not be available before it's dependency";
+  auto dsRef = bc.GetServiceReference<scr::ServiceComponentRuntime>();
+  EXPECT_TRUE(dsRef);
+  auto dsRuntimeService = bc.GetService<scr::ServiceComponentRuntime>(dsRef);
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+    testBundle, param.implClassName);
+  auto compConfigDTOs =
+    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTOs.size(), 1ul);
+  EXPECT_EQ(compConfigDTOs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+
+  // register the dependent service to trigger the bind
+  auto depSvcReg = bc.RegisterService(param.interfaceMap);
+  ASSERT_TRUE(depSvcReg);
+
+  auto result = test::RepeatTaskUntilOrTimeout(
+    [&compConfigDTOs, &dsRuntimeService, &compDescDTO]() {
+      compConfigDTOs =
+        dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+    },
+    [&compConfigDTOs]() -> bool {
+      return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+    });
+
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
+                         "after the dependency became available";
+  auto svcRef = bc.GetServiceReference<test::Interface2>();
+  ASSERT_TRUE(svcRef);
+  auto svc = bc.GetService<test::Interface2>(svcRef);
+  ASSERT_TRUE(svc);
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ(
+    param.verificationMessage,
+    svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
+
+  depSvcReg.Unregister();
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service should now NOT be available";
+  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
+  testBundle.Stop();
 }
 
 // test error handling and logging when the bind and unbind methods throw an exception
@@ -171,7 +294,67 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
   EXPECT_EQ(compConfigDTOs.at(0).state,
             scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
-  auto depBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI21");
+  auto depSvcReg = bc.RegisterService<test::Interface1>(
+    std::make_shared<test::InterfaceImpl>("Interface1"));
+  ASSERT_TRUE(depSvcReg);
+  auto result = test::RepeatTaskUntilOrTimeout(
+    [&compConfigDTOs, &dsRuntimeService, &compDescDTO]() {
+      compConfigDTOs =
+        dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+    },
+    [&compConfigDTOs]() -> bool {
+      return compConfigDTOs.at(0).state == scr::dto::ComponentState::SATISFIED;
+    });
+
+  ASSERT_TRUE(result)
+    << "Timed out waiting for state to change to SATISFIED "
+       "after the dependency became available";
+
+  // TODO: what is the correct behavior as it relates to service references
+  // and service objects returned to the service consumer if the bind/unbind method throws?
+  // currently the service reference is valid and the service object is nullptr
+  auto svcRef = bc.GetServiceReference<test::Interface2>();
+  ASSERT_TRUE(svcRef);
+  auto svc = bc.GetService<test::Interface2>(svcRef);
+  ASSERT_TRUE(svc);
+  ASSERT_THROW(svc->ExtendedDescription(), std::runtime_error);
+
+  depSvcReg.Unregister();
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service should now NOT be available";
+
+  // TODO: test when unbind throws
+
+
+  testBundle.Stop();
+}
+
+// test that:
+//  a new higher ranked service causes a re-bind
+//  a new lower ranked service does not cause a re-bind 
+TEST_F(BindingPolicyTest, TestDynamicGreedyReBind)
+{
+  auto bc = GetFramework().GetBundleContext();
+  test::InstallAndStartDS(bc);
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TBDynamicRefPolicy");
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service must not be available before it's dependency";
+  auto dsRef = bc.GetServiceReference<scr::ServiceComponentRuntime>();
+  EXPECT_TRUE(dsRef);
+  auto dsRuntimeService = bc.GetService<scr::ServiceComponentRuntime>(dsRef);
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+    testBundle, "sample::ServiceComponentDynamicGreedyMandatoryUnary");
+  auto compConfigDTOs =
+    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTOs.size(), 1ul);
+  EXPECT_EQ(compConfigDTOs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+
+  // register the dependent service to trigger the bind
+  auto depSvcReg = bc.RegisterService<test::Interface4>(std::make_shared<test::InterfaceImpl>("Interface4"));
+  ASSERT_TRUE(depSvcReg);
+
   auto result = test::RepeatTaskUntilOrTimeout(
     [&compConfigDTOs, &dsRuntimeService, &compDescDTO]() {
       compConfigDTOs =
@@ -184,47 +367,117 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
   ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
                          "after the dependency became available";
   auto svcRef = bc.GetServiceReference<test::Interface2>();
-  ASSERT_FALSE(svcRef);
+  ASSERT_TRUE(svcRef);
+  auto svc = bc.GetService<test::Interface2>(svcRef);
+  ASSERT_TRUE(svc);
+  EXPECT_NO_THROW(svc->ExtendedDescription()); 
+  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on Interface4", svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
 
-  depBundle.Stop();
+  // registering a new service with a higher rank which should cause a re-binding and use of the new service
+  ASSERT_TRUE(bc.RegisterService<test::Interface4>(
+    std::make_shared<test::InterfaceImpl>("higher ranked Interface4"),
+    { { Constants::SERVICE_RANKING, Any(10000) } }));
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ(
+    "ServiceComponentDynamicGreedyMandatoryUnary depends on higher ranked Interface4",
+    svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
+
+  // registering a new service with a lower rank should NOT cause re-binding and use of the new service
+  ASSERT_TRUE(bc.RegisterService<test::Interface4>(
+    std::make_shared<test::InterfaceImpl>("lower ranked Interface4"),
+    { { Constants::SERVICE_RANKING, Any(1) } }));
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ(
+    "ServiceComponentDynamicGreedyMandatoryUnary depends on Interface4",
+    svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
+
+  depSvcReg.Unregister();
   EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
     << "Service should now NOT be available";
+  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
+  testBundle.Stop();
 }
-
-// test that dynamic greedy re-binding does not happen if a lower ranked service is registered.
-TEST_F(BindingPolicyTest, TestDynamicGreedyReBind) {}
 
 // test that binding happens only once for dynamic reluctant reference policy
-TEST_F(BindingPolicyTest, TestDynamicReluctantReBind) {}
-
-
-
-/*
-TEST_P(BindingPolicyTest, ServiceAddedNotSatisfied)
+TEST_F(BindingPolicyTest, TestDynamicReluctantReBind)
 {
   auto bc = GetFramework().GetBundleContext();
-  auto const& param = GetParam();
-  auto fakeMetadata =
-    CreateFakeReferenceMetadata(param.policy, param.policyOption);
-  auto fakeLogger = std::make_shared<FakeLogger>();
-  auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(fakeMetadata
-                                                            , bc
-                                                            , fakeLogger
-                                                            , "foo");
+  test::InstallAndStartDS(bc);
 
-  
-  auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(*mgr
-                                                                     , fakeMetadata.policy
-                                                                     , fakeMetadata.policyOption);
+  auto testBundle = test::InstallAndStartBundle(bc, "TBDynamicRefPolicy");
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service must not be available before it's dependency";
+  auto dsRef = bc.GetServiceReference<scr::ServiceComponentRuntime>();
+  EXPECT_TRUE(dsRef);
+  auto dsRuntimeService = bc.GetService<scr::ServiceComponentRuntime>(dsRef);
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+    testBundle, "sample::ServiceComponentDynamicReluctantMandatoryUnary");
+  auto compConfigDTOs =
+    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTOs.size(), 1ul);
+  EXPECT_EQ(compConfigDTOs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
+  // register the dependent service to trigger the bind
+  auto depSvcReg = bc.RegisterService<test::Interface3>(
+    std::make_shared<test::InterfaceImpl>("Interface3"));
+  ASSERT_TRUE(depSvcReg);
 
-  using ::testing::Return;
-  
-  ON_CALL(*mgr, IsSatisfied()).WillByDefault(Return(true));
-  
-  // set up mock logger to expect call
-  bindingPolicy->ServiceAdded(ServiceReferenceU());
+  auto result = test::RepeatTaskUntilOrTimeout(
+    [&compConfigDTOs, &dsRuntimeService, &compDescDTO]() {
+      compConfigDTOs =
+        dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+    },
+    [&compConfigDTOs]() -> bool {
+      return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+    });
+
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
+                         "after the dependency became available";
+  auto svcRef = bc.GetServiceReference<test::Interface2>();
+  ASSERT_TRUE(svcRef);
+  auto svc = bc.GetService<test::Interface2>(svcRef);
+  ASSERT_TRUE(svc);
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ(
+    "ServiceComponentDynamicReluctantMandatoryUnary depends on Interface3",
+    svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
+
+  // registering a new service with a higher rank should not cause re-binding
+  ASSERT_TRUE(bc.RegisterService<test::Interface3>(
+    std::make_shared<test::InterfaceImpl>("higher ranked Interface4"),
+    { { Constants::SERVICE_RANKING, Any(10000) } }));
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on Interface3",
+               svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
+
+  // registering a new service with a lower rank should NOT cause re-binding
+  ASSERT_TRUE(bc.RegisterService<test::Interface3>(
+    std::make_shared<test::InterfaceImpl>("lower ranked Interface4"),
+    { { Constants::SERVICE_RANKING, Any(1) } }));
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ(
+    "ServiceComponentDynamicReluctantMandatoryUnary depends on Interface3",
+    svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
+
+  depSvcReg.Unregister();
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service should now NOT be available";
+  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
+  testBundle.Stop();
+}
 
 }
-*/
-}}
+}

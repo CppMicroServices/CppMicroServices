@@ -90,11 +90,10 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(
                           boundRefsHandle->end(),
                           std::inserter(notBound, notBound.begin()));
       auto serviceToBind = *notBound.rbegin(); // best match not in boundRefs;
-#if TODO
+
       // What do I do in the case that notBound is empty? That is, there's no more
       // services left leaving the current service in an incomplete state (that is,
       // there's not enough matching services to deal with the cardinality.
-#endif
       boundRefsHandle->insert(serviceToBind);
       boundRefsHandle->erase(reference);
       notifications.push_back(

@@ -523,45 +523,4 @@ private:
   std::string cmpTo;
 };
 
-TEST_F(ReferenceManagerImplTest, TestDuplicateReferenceName)
-{
-  
-}
-
-TEST_F(ReferenceManagerImplTest, TestDynamicGreedy)
-{
-  auto bc = GetFramework().GetBundleContext();
-  test::InstallAndStartDS(bc);
-
-  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI20");
-  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service must not be available before it's dependency";
-  auto dsRef = bc.GetServiceReference<scr::ServiceComponentRuntime>();
-  EXPECT_TRUE(dsRef);
-  auto dsRuntimeService = bc.GetService<scr::ServiceComponentRuntime>(dsRef);
-  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
-  auto compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-  EXPECT_EQ(compConfigDTOs.size(), 1ul);
-  EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE);
-
-  auto depBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI21");
-  auto result = test::RepeatTaskUntilOrTimeout([&compConfigDTOs, &dsRuntimeService, &compDescDTO]()
-                                         {
-                                           compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-                                         }, [&compConfigDTOs]()->bool
-                                            {
-                                              return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
-                                            });
-
-  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE after the dependency became available";
-  auto svcRef = bc.GetServiceReference<test::Interface2>();
-  ASSERT_TRUE(svcRef);
-  auto svc = bc.GetService<test::Interface2>(svcRef);
-  ASSERT_TRUE(svc);
-  EXPECT_NO_THROW(svc->ExtendedDescription());
-  
-  depBundle.Stop();
-  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service should now NOT be available";
-  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
-}
-
 }}

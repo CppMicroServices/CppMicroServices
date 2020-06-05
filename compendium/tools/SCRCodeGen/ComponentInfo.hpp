@@ -23,7 +23,7 @@
 #define COMPONENTINFO_HPP
 
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 namespace codegen {
 namespace datamodel {
@@ -51,7 +51,7 @@ struct ComponentInfo
   std::string implClassName;
   bool injectReferences;
   ServiceInfo service;
-  std::unordered_map<std::string, ReferenceInfo> references;
+  std::vector<ReferenceInfo> references;
 };
 
 // These functions return the string representations for the data model

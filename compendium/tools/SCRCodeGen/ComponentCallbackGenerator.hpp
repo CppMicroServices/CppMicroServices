@@ -103,10 +103,10 @@ private:
       for(const auto& ref : componentInfo.references)
       {
         if ((false == componentInfo.injectReferences)
-            || (ref.second.policy == "dynamic"))
+            || (ref.policy == "dynamic"))
         {
           mStrStream << "  binders.push_back("
-                     << util::Substitute(datamodel::GetReferenceBinderStr(ref.second, componentInfo.injectReferences)
+                     << util::Substitute(datamodel::GetReferenceBinderStr(ref, componentInfo.injectReferences)
                                          , componentInfo.implClassName)
                      << ");"
                      << std::endl;

@@ -22,6 +22,8 @@
 #include "ManifestParserImpl.hpp"
 #include "Util.hpp"
 
+#include <unordered_map>
+
 using codegen::datamodel::ComponentInfo;
 using codegen::datamodel::ReferenceInfo;
 using codegen::util::JsonValueValidator;
@@ -84,15 +86,18 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
     if (jsonComponent.isMember("references")) {
       const auto jsonRefInfos = JsonValueValidator(
         jsonComponent, "references", Json::ValueType::arrayValue)();
+        
+      std::unordered_map<std::string, std::size_t> duplicateRefs;
+      duplicateRefs.reserve(jsonRefInfos.size());
       for (const auto& jsonRefInfo : jsonRefInfos) {
         ReferenceInfo refInfo;
         refInfo.name =
           JsonValueValidator(jsonRefInfo, "name", Json::ValueType::stringValue)
             .GetString();
         // reference names for a service component must be unique.
-        if (1 == componentInfo.references.count(refInfo.name)) {
-          throw std::invalid_argument("Duplicate service reference names found. Reference names must be unique.");
-        }
+        // track all duplicates and produce an error message afterwards.
+        duplicateRefs[refInfo.name]++;
+
         refInfo.interface = JsonValueValidator(jsonRefInfo,
                                                "interface",
                                                Json::ValueType::stringValue)
@@ -118,7 +123,20 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
                                               Json::ValueType::stringValue)
                              .GetString();
         }
-        componentInfo.references.emplace(refInfo.name, refInfo);
+        componentInfo.references.push_back(refInfo);
+      }
+        
+      std::string listOfDuplicateRefNames;
+      for(auto const& dupRef : duplicateRefs) {
+        if(dupRef.second > 1) {
+          listOfDuplicateRefNames += dupRef.first + " ";
+        }
+      }
+      if(!listOfDuplicateRefNames.empty()) {
+        std::string exceptionMessage("Duplicate service reference names found. Reference names must be unique. ");
+        exceptionMessage += "Duplicate names: ";
+        exceptionMessage += listOfDuplicateRefNames;
+        throw std::invalid_argument(exceptionMessage);
       }
     }
     componentInfos.push_back(componentInfo);

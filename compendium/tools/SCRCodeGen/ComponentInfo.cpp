@@ -54,9 +54,9 @@ std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo)
   for (const auto& reference :  compInfo.references)
   {
     if ((true == compInfo.injectReferences)
-        && (reference.second.policy == "static"))
+        && (reference.policy == "static"))
     {
-      result += (sep + reference.second.interface);
+      result += (sep + reference.interface);
     }
   }
   return result;
@@ -71,9 +71,9 @@ std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo)
   for (const auto& reference :  compInfo.references)
   {
     if ((true == compInfo.injectReferences)
-        && (reference.second.policy == "static"))
+        && (reference.policy == "static"))
     {
-      resultStr << sep << "\"" << reference.second.name << "\"";
+      resultStr << sep << "\"" << reference.name << "\"";
       sep = ", ";
     }
   }

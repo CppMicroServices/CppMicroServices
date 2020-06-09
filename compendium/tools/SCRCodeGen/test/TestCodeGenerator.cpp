@@ -361,6 +361,24 @@ const std::string manifest_illegal_ref_name = R"manifest(
   }
   )manifest";
 
+const std::string manifest_duplicate_ref_name = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                       "references": [{
+                         "name": "foo",
+                         "interface": "Bar"
+                       },
+                       {
+                         "name": "foo",
+                         "interface": "Bar"
+                       }]
+                       }]
+           }
+  }
+  )manifest";
+
 const std::string manifest_illegal_comp = R"manifest(
   {
     "scr" : { "version" : 1,
@@ -648,6 +666,9 @@ INSTANTIATE_TEST_SUITE_P(
     CodegenInvalidManifestState(
       manifest_illegal_ref_name,
       "Invalid value for the name 'name'. Expected non-empty string"),
+    CodegenInvalidManifestState(
+        manifest_duplicate_ref_name,
+        "Duplicate service reference names found. Reference names must be unique. Duplicate names: foo "),
     CodegenInvalidManifestState(
       manifest_no_ref_interface,
       "Mandatory name 'interface' missing from the manifest"),

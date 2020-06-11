@@ -13,17 +13,15 @@ void ServiceComponentDynamicGreedyOptionalUnary::Deactivate(const std::shared_pt
 
 std::string ServiceComponentDynamicGreedyOptionalUnary::ExtendedDescription()
 {
-  if(!foo)
-  {
-    throw std::runtime_error("Dependency not available");
-  }
   std::string result("ServiceComponentDynamicGreedyOptionalUnary ");
   result.append("depends on ");
-  result.append(foo->Description());
+  if (foo) {
+    result.append(foo->Description());
+  }
   return result;
 }
 
-void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(const std::shared_ptr<test::Interface6>& theFoo)
+void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo != theFoo)
   {
@@ -31,7 +29,7 @@ void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(const std::shared_ptr<t
   }
 }
 
-void ServiceComponentDynamicGreedyOptionalUnary::Unbindfoo(const std::shared_ptr<test::Interface6>& theFoo)
+void ServiceComponentDynamicGreedyOptionalUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo == theFoo)
   {

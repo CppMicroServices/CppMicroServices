@@ -22,10 +22,7 @@ void ServiceComponent22::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo
 
 void ServiceComponent22::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo == theFoo)
-  {
-    foo = nullptr;
-  }
+  throw std::runtime_error("throw from unbind method");
 }
 
 } // namespaces

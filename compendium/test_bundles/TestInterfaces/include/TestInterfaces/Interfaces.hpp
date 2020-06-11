@@ -48,34 +48,6 @@ namespace test
       virtual std::string ExtendedDescription() = 0;
       virtual ~Interface2();
     };
-
-    class US_TestInterfaces_EXPORT Interface3
-    {
-    public:
-      virtual std::string Description() = 0;
-      virtual ~Interface3();
-    };
-
-    class US_TestInterfaces_EXPORT Interface4
-    {
-    public:
-      virtual std::string Description() = 0;
-      virtual ~Interface4();
-    };
-
-    class US_TestInterfaces_EXPORT Interface5
-    {
-    public:
-      virtual std::string Description() = 0;
-      virtual ~Interface5();
-    };
-
-    class US_TestInterfaces_EXPORT Interface6
-    {
-    public:
-      virtual std::string Description() = 0;
-      virtual ~Interface6();
-    };
     
     // Interfaces for declarative services dependency graph resolution benchmarks. The
     // implentations of these interfaces have dependencies that form a complete 3 level tree:

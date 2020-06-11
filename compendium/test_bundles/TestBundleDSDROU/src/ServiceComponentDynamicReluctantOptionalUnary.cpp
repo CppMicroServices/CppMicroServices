@@ -13,17 +13,15 @@ void ServiceComponentDynamicReluctantOptionalUnary::Deactivate(const std::shared
 
 std::string ServiceComponentDynamicReluctantOptionalUnary::ExtendedDescription()
 {
-  if(!foo)
-  {
-    throw std::runtime_error("Dependency not available");
-  }
   std::string result("ServiceComponentDynamicReluctantOptionalUnary ");
   result.append("depends on ");
-  result.append(foo->Description());
+  if (foo) {
+    result.append(foo->Description());
+  }
   return result;
 }
 
-void ServiceComponentDynamicReluctantOptionalUnary::Bindfoo(const std::shared_ptr<test::Interface5>& theFoo)
+void ServiceComponentDynamicReluctantOptionalUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo != theFoo)
   {
@@ -31,7 +29,7 @@ void ServiceComponentDynamicReluctantOptionalUnary::Bindfoo(const std::shared_pt
   }
 }
 
-void ServiceComponentDynamicReluctantOptionalUnary::Unbindfoo(const std::shared_ptr<test::Interface5>& theFoo)
+void ServiceComponentDynamicReluctantOptionalUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo == theFoo)
   {

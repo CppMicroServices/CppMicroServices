@@ -23,7 +23,7 @@ std::string ServiceComponentDynamicGreedyMandatoryUnary::ExtendedDescription()
   return result;
 }
 
-void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface4>& theFoo)
+void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo != theFoo)
   {
@@ -31,7 +31,7 @@ void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(const std::shared_ptr<
   }
 }
 
-void ServiceComponentDynamicGreedyMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface4>& theFoo)
+void ServiceComponentDynamicGreedyMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo == theFoo)
   {

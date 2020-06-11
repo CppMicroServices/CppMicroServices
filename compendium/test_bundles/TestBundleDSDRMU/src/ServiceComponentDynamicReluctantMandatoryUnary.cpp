@@ -23,7 +23,7 @@ std::string ServiceComponentDynamicReluctantMandatoryUnary::ExtendedDescription(
   return result;
 }
 
-void ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface3>& theFoo)
+void ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo != theFoo)
   {
@@ -31,7 +31,7 @@ void ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(const std::shared_p
   }
 }
 
-void ServiceComponentDynamicReluctantMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface3>& theFoo)
+void ServiceComponentDynamicReluctantMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
   if (foo == theFoo)
   {

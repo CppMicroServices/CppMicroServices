@@ -31,4 +31,7 @@ add_subdirectory(DSSpellChecker)
 add_subdirectory(DSFrenchDictionary)
 add_subdirectory(EnglishDictionary)
 
-add_subdirectory(TBDynamicRefPolicy)
+add_subdirectory(TestBundleDSDRMU)
+add_subdirectory(TestBundleDSDROU)
+add_subdirectory(TestBundleDSDGMU)
+add_subdirectory(TestBundleDSDGOU)

@@ -236,8 +236,8 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, static-greedy - no state change, no callback expected
     auto reg1 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
     EXPECT_EQ(refManager.IsSatisfied(), true);
-    EXPECT_EQ(satisfiedNotificationCount, 0) << "no notification expected since the service registered has teh same rank";
-    EXPECT_EQ(unsatisfiedNotificationCount, 0) << "no notification expected since the service registered has teh same rank";
+    EXPECT_EQ(satisfiedNotificationCount, 0) << "no notification expected since the service registered has the same rank";
+    EXPECT_EQ(unsatisfiedNotificationCount, 0) << "no notification expected since the service registered has the same rank";
     resetCounters();
 
     // Register third service with higher rank
@@ -457,10 +457,10 @@ TEST_P(ReferenceManagerImplTest, TestTrackerWithScope_PrototypeRequired)
   reg.Unregister();
 }
 
-TEST_F(ReferenceManagerImplTest, TestTargetProperty)
+TEST_P(ReferenceManagerImplTest, TestTargetProperty)
 {
   namespace constants = cppmicroservices::Constants;
-  auto fakeMetadata   = CreateFakeReferenceMetadata("static", "reluctant", "1..1");
+  auto fakeMetadata = GetParam();
   auto bc             = GetFramework().GetBundleContext();
   auto fakeLogger     = std::make_shared<FakeLogger>();
 
@@ -471,12 +471,15 @@ TEST_F(ReferenceManagerImplTest, TestTargetProperty)
     , fakeLogger
     , FakeComponentConfigName
   };
-        
-  ASSERT_FALSE(refManager.IsSatisfied());
+
+  // an optional service reference means that the reference manager is satisfied
+  // without registering a service
+
+  ASSERT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied());
         
   (void)bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>())
                                               , {{constants::SERVICE_SCOPE, constants::SCOPE_BUNDLE}});
-  ASSERT_FALSE(refManager.IsSatisfied());
+  ASSERT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied());
 
   (void)bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>())
                                               , {{"foo", std::string("bar")}});
@@ -485,9 +488,9 @@ TEST_F(ReferenceManagerImplTest, TestTargetProperty)
 
 // A service dependency cannot be satisfied by a service published from the same component
 // configuration.
-TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
+TEST_P(ReferenceManagerImplTest, TestSelfSatisfy)
 {
-  auto fakeMetadata = CreateFakeReferenceMetadata("static", "reluctant", "1..1");
+  auto fakeMetadata = GetParam();
   fakeMetadata.interfaceName = "dummy::Reference1";
   fakeMetadata.name = "dummy_ref";
   auto bc = GetFramework().GetBundleContext();
@@ -502,25 +505,11 @@ TEST_F(ReferenceManagerImplTest, TestSelfSatisfy)
 
   auto reg = bc.RegisterService<dummy::Reference1>(
     std::make_shared<dummy::Reference1>());
-  EXPECT_FALSE(refManager.IsSatisfied())
+  // an optional service reference means that the reference manager is satisfied
+  // without registering a service
+  EXPECT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied())
     << "State expected to be UNSATISFIED after service registration";
   reg.Unregister();
 }
-
-struct CmpSymbolName
-{
-  CmpSymbolName(std::string c)
-    : cmpTo(c)
-  {
-  }
-
-  bool operator()(const cppmicroservices::Bundle& b)
-  {
-    auto symbolicName = b.GetSymbolicName();
-    return (cmpTo == symbolicName);
-  }
-private:
-  std::string cmpTo;
-};
 
 }}

@@ -1,0 +1,20 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSDRMU",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponentDynamicReluctantMandatoryUnary",
+            "service": {
+                "interfaces": ["test::Interface2"]
+            },
+            "references":[{
+                "name" : "foo",
+                "policy" : "Dynamic",
+                "policyOption" : "Reluctant",
+                "interface" : "test::Interface1"
+            }],
+            "inject-references": false
+        }]
+    }
+}

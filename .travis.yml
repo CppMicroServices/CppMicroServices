@@ -177,5 +177,5 @@ script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
-  - cd /tmp/cppmicroservices_builds
+  - cd /Users/travis/build
   - bash <(curl -s https://codecov.io/bash) -s "/tmp/cppmicroservices_builds"

@@ -181,7 +181,7 @@ after_success:
     then
       bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds";
     else
-      cd /tmp/cppmicroservices_builds/CppMicroServices_static-Xcode/framework/CppMicroServices.build/Release/CppMicroServices.build/Objects-normal/x86_64;
+      cd /tmp/cppmicroservices_builds/CppMicroServices_static-Xcode;
       bash <(curl -s https://codecov.io/bash) -s "/tmp/cppmicroservices_builds";
     fi
   

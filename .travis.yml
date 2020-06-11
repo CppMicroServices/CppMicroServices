@@ -179,10 +179,10 @@ script:
 after_success:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]];
     then
-      - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds";
+      bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds";
     else
-      - cd /tmp/cppmicroservices_builds/CppMicroServices_static-Xcode/framework/CppMicroServices.build/Release/CppMicroServices.build/Objects-normal/x86_64;
-      - bash <(curl -s https://codecov.io/bash) -s "/tmp/cppmicroservices_builds";
+      cd /tmp/cppmicroservices_builds/CppMicroServices_static-Xcode/framework/CppMicroServices.build/Release/CppMicroServices.build/Objects-normal/x86_64;
+      bash <(curl -s https://codecov.io/bash) -s "/tmp/cppmicroservices_builds";
     fi
   
   

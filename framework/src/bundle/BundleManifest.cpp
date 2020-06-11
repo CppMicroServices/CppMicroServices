@@ -141,6 +141,11 @@ BundleManifest::BundleManifest()
   : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
 
+BundleManifest::BundleManifest(const AnyMap& m)
+  : m_Headers(m)
+{
+}
+
 void BundleManifest::Parse(std::istream& is)
 {
   rapidjson::IStreamWrapper jsonStream(is);

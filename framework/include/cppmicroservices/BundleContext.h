@@ -1075,6 +1075,8 @@ public:
    * @throws std::invalid_argument If the location is not a valid UTF8 string
    */
   std::vector<Bundle> InstallBundles(const std::string& location);
+  std::vector<Bundle> InstallBundles(const std::string& location
+                                     , const AnyMap& bundleManifest);
 
 private:
   friend US_Framework_EXPORT BundleContext

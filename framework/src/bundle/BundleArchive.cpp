@@ -23,6 +23,7 @@
 #include "BundleArchive.h"
 
 #include <utility>
+#include <iostream>
 
 #include "cppmicroservices/BundleResource.h"
 
@@ -40,21 +41,26 @@ BundleArchive::BundleArchive()
   : storage(nullptr)
 {}
 
-BundleArchive::BundleArchive(BundleStorage* storage,
-                             std::unique_ptr<Data>&& data,
-                             std::shared_ptr<BundleResourceContainer>  resourceContainer,
-                             std::string  resourcePrefix,
-                             std::string  location)
+BundleArchive::BundleArchive(BundleStorage* storage
+                             , std::shared_ptr<BundleResourceContainer>  resourceContainer
+                             , std::string  prefix
+                             , std::string  location
+                             , long id
+                             , int64_t ts
+                             , int32_t setting)
   : storage(storage)
-  , data(std::move(data))
   , resourceContainer(std::move(resourceContainer))
-  , resourcePrefix(std::move(resourcePrefix))
+  , resourcePrefix(std::move(prefix))
   , location(std::move(location))
-{}
+  , bundleId(id)
+  , lastModified(ts)
+  , autostartSetting(setting)
+{
+}
 
 bool BundleArchive::IsValid() const
 {
-  return data != nullptr;
+  return bool(bundleId >= 0);
 }
 
 void BundleArchive::Purge()
@@ -64,7 +70,7 @@ void BundleArchive::Purge()
 
 long BundleArchive::GetBundleId() const
 {
-  return data->bundleId;
+  return bundleId;
 }
 
 std::string BundleArchive::GetBundleLocation() const
@@ -116,24 +122,24 @@ std::vector<BundleResource> BundleArchive::FindResources(
 
 BundleArchive::TimeStamp BundleArchive::GetLastModified() const
 {
-  return TimeStamp() + std::chrono::milliseconds(data->lastModified);
+  return TimeStamp() + std::chrono::milliseconds(lastModified);
 }
 
 void BundleArchive::SetLastModified(const TimeStamp& ts)
 {
-  data->lastModified =
-    std::chrono::duration_cast<std::chrono::milliseconds>(ts.time_since_epoch())
-      .count();
+  using std::chrono::duration_cast;
+  
+  lastModified = duration_cast<std::chrono::milliseconds>(ts.time_since_epoch()).count();
 }
 
 int32_t BundleArchive::GetAutostartSetting() const
 {
-  return data->autostartSetting;
+  return autostartSetting;
 }
 
 void BundleArchive::SetAutostartSetting(int32_t setting)
 {
-  data->autostartSetting = setting;
+  autostartSetting = setting;
 }
 
 std::shared_ptr<BundleResourceContainer>

@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "BundlePrivate.h"
+#include "BundleStorage.h"
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
@@ -716,6 +717,42 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
     }
   }
 
+  validateManifest();
+}
+
+BundlePrivate::BundlePrivate(CoreBundleContext* ctx
+                             , const std::string& l
+                             , const AnyMap& m)
+  : coreCtx(ctx)
+  , id(ctx->storage->NextFreeId())
+  , location(l)
+  , state(Bundle::STATE_INSTALLED)
+  , barchive()
+  , bundleDir(ctx->GetDataStorage(id))
+  , bundleContext()
+  , destroyActivatorHook(nullptr)
+  , bactivator(nullptr, nullptr)
+  , operation(static_cast<uint8_t>(OP_IDLE))
+  , resolveFailException()
+  , wasStarted(false)
+  , aborted(static_cast<uint8_t>(Aborted::NONE))
+  , bundleThread()
+  , symbolicName(m.at("bundle.symbolic_name").ToString())
+  , version(CppMicroServices_VERSION_MAJOR
+            , CppMicroServices_VERSION_MINOR
+            , CppMicroServices_VERSION_PATCH)
+  , timeStamp(std::chrono::steady_clock::now())
+  , bundleManifest(m)
+  , lib()
+  , SetBundleContext(nullptr)
+{
+  validateManifest();
+}
+
+
+void BundlePrivate::validateManifest()
+{
+  
   // Check if we got version information and validate the version identifier
   if (bundleManifest.Contains(Constants::BUNDLE_VERSION)) {
     Any versionAny = bundleManifest.GetValue(Constants::BUNDLE_VERSION);

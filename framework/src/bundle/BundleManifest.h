@@ -34,6 +34,7 @@ class BundleManifest
 
 public:
   BundleManifest();
+  explicit BundleManifest(const AnyMap& m);
 
   void Parse(std::istream& is);
 

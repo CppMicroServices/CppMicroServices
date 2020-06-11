@@ -39,6 +39,8 @@ struct BundleArchive;
 struct BundleStorage
 {
 
+  BundleStorage() : nextFreeId(1) {}
+  
   virtual ~BundleStorage() {}
 
   /**
@@ -82,9 +84,11 @@ struct BundleStorage
    */
   virtual void Close() = 0;
 
+  long NextFreeId() { return nextFreeId++; }
 private:
+  long nextFreeId;
+  
   friend struct BundleArchive;
-
   /**
    * Remove bundle archive from archives list.
    *

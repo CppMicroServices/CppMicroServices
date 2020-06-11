@@ -256,6 +256,41 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
   }
 }
 
+std::vector<Bundle> BundleRegistry::Install(const std::string& location
+                                            , const AnyMap& bundleManifest)
+{
+  using namespace std::chrono_literals;
+ 
+  CheckIllegalState();
+ 
+  // Search the multimap for the current bundle location
+  auto bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
+  if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
+    // bundle already exists, so don't bother instantiating with bundleManifest
+  {
+    return {};
+  }
+ 
+  try {
+    auto d = std::make_shared<BundlePrivate>(coreCtx, location, bundleManifest);
+    auto b = MakeBundle(d);
+    {
+      auto l = bundles.Lock();
+      US_UNUSED(l);
+      bundles.v.insert(std::make_pair(location, b.d));
+    }
+ 
+    coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
+    return { b };
+  }
+  catch (...) {
+    throw std::runtime_error("Failed to install bundle library at "
+                             + location
+                             + ": "
+                             + util::GetLastExceptionStr());
+  }
+}
+
 std::vector<Bundle> BundleRegistry::Install0(
   const std::string& location,
   const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
@@ -279,8 +314,7 @@ std::vector<Bundle> BundleRegistry::Install0(
     }
 
     for (auto& ba : barchives) {
-      auto d = std::shared_ptr<BundlePrivate>(
-        new BundlePrivate(coreCtx, std::move(ba)));
+      auto d = std::make_shared<BundlePrivate>(coreCtx, std::move(ba));
       res.emplace_back(MakeBundle(d));
     }
 
@@ -409,7 +443,7 @@ void BundleRegistry::Load()
   auto bas = coreCtx->storage->GetAllBundleArchives();
   for (auto const& ba : bas) {
     try {
-      std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
+      auto impl = std::make_shared<BundlePrivate>(coreCtx, ba);
       bundles.v.insert(std::make_pair(impl->location, impl));
     } catch (...) {
       ba->SetAutostartSetting(-1); // Do not start on launch

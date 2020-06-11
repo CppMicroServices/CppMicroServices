@@ -41,23 +41,18 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 {
   using TimeStamp = std::chrono::steady_clock::time_point;
 
-  struct Data
-  {
-    long bundleId;
-    int64_t lastModified;
-    int32_t autostartSetting;
-  };
-
   BundleArchive(const BundleArchive&) = delete;
   BundleArchive& operator=(const BundleArchive&) = delete;
 
   BundleArchive();
 
-  BundleArchive(BundleStorage* storage,
-                std::unique_ptr<Data>&& data,
-                std::shared_ptr<BundleResourceContainer>  resourceContainer,
-                std::string  resourcePrefix,
-                std::string  location);
+  BundleArchive(BundleStorage* storage
+                , std::shared_ptr<BundleResourceContainer>  resourceContainer
+                , std::string  resourcePrefix
+                , std::string  location
+                , long id
+                , int64_t ts
+                , int32_t setting);
 
   /**
    * Autostart setting stopped.
@@ -158,10 +153,14 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
 private:
   BundleStorage* const storage;
-  const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
   const std::string location;
+
+  long bundleId;
+  int64_t lastModified;
+  int32_t autostartSetting;
+
 };
 }
 

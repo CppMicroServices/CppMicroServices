@@ -32,7 +32,7 @@
 namespace cppmicroservices {
 
 BundleStorageMemory::BundleStorageMemory()
-  : nextFreeId(1)
+  : BundleStorage()
 {}
 
 std::vector<std::shared_ptr<BundleArchive>>
@@ -56,15 +56,18 @@ std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
       continue;
     }
 #endif
-    auto id = nextFreeId++;
-    auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-    std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{ id, ts, -1 });
-    auto p = archives.v.insert(std::make_pair(id,
-                                              std::make_shared<BundleArchive>(this,
-                                                                              std::move(data),
-                                                                              resCont,
-                                                                              prefix,
-                                                                              resCont->GetLocation())));
+    using namespace std::chrono;
+    
+    auto id = NextFreeId();
+    auto ts = duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+    auto p  = archives.v.insert(std::make_pair(id
+                                               , std::make_shared<BundleArchive>(this
+                                                                                 , resCont
+                                                                                 , prefix
+                                                                                 , resCont->GetLocation()
+                                                                                 , id
+                                                                                 , ts
+                                                                                 , -1)));
     res.push_back(p.first->second);
   }
   return res;

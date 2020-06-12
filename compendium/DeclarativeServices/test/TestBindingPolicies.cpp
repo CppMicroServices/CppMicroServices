@@ -651,26 +651,26 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
   //  to be a target service, or the policy-option is greedy and a better 
   //  target service becomes available then SCR must attempt to replace the 
   //  bound service with a new bound service.
-  // unregistering the higher ranked service should cause a re-bind to the lower ranked service.
-  higherRankedSvc.Unregister();
+  // unregistering the bound service should cause a re-bind to the higher ranked service.
+  depSvcReg.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on lower "
+  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on higher "
                "ranked Interface1",
                svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
-  // unregistering the lower ranked service should cause a re-bind to the last registered service.
-  lowerRankedSvc.Unregister();
+  // unregistering the higher ranked service should cause a re-bind to the lower ranked service.
+  higherRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
   EXPECT_STREQ(
-    "ServiceComponentDynamicReluctantMandatoryUnary depends on ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+    "ServiceComponentDynamicReluctantMandatoryUnary depends on lower ranked Interface1",
     svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
-  // unregistering the last service now causes the dependent service to be unregistered.
-  depSvcReg.Unregister();
+  // unregistering the lower ranked service now causes the dependent service to be unregistered.
+  lowerRankedSvc.Unregister();
   EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
     << "Service should NOT be available";
   EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);

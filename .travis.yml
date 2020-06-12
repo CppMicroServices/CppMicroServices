@@ -177,12 +177,12 @@ script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]];
-    then
-      bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds";
-    else
-      cd /tmp/cppmicroservices_builds;
-      bash <(curl -s https://codecov.io/bash) -s "/tmp/cppmicroservices_builds";
-    fi
+  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
+  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]];
+  #  then
+  #    bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds";
+  #  else
+  #    bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds";
+  #  fi
   
   

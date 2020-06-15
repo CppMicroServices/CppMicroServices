@@ -1,6 +1,6 @@
 
 if(APPLE)
-  find_program(CTEST_COVERAGE_COMMAND NAMES gcov-8)
+  find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
 else()
   find_program(CTEST_COVERAGE_COMMAND NAMES $ENV{MY_COVERAGE})
 endif()

@@ -129,7 +129,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalability)(benchmark::
 }
 
 /// Benchmark service tracker scalability (use case: one ServiceTracker, multiple service impls)
-BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultiplieImplOneInterfaceServiceTrackerScalability)(benchmark::State& state)
+BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultipleImplOneInterfaceServiceTrackerScalability)(benchmark::State& state)
 {
   using namespace benchmark::test;
   using namespace cppmicroservices;
@@ -138,7 +138,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultiplieImplOneInterfaceServiceTracke
 
   int64_t maxServices{ state.range(0) };
   std::vector<std::shared_ptr<FooImpl>> impls;
-  impls.reserve(maxServices);
+  impls.reserve((size_t)maxServices);
   for (int64_t i = 0; i < maxServices; ++i) {
     impls.emplace_back(std::make_shared<FooImpl>());
   }
@@ -189,9 +189,9 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)->Arg(1)
                                                                       ->Arg(4000)
                                                                       ->Arg(10000);
 BENCHMARK_REGISTER_F(ServiceTrackerFixture,
-                     MultiplieImplOneInterfaceServiceTrackerScalability)->Arg(1)
-                                                                        ->Arg(4000)
-                                                                        ->Arg(10000);
+                     MultipleImplOneInterfaceServiceTrackerScalability)->Arg(1)
+                                                                       ->Arg(4000)
+                                                                       ->Arg(10000);
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalabilityWithLDAPFilter)->Arg(1)
                                                                                     ->Arg(4000)
                                                                                     ->Arg(10000);

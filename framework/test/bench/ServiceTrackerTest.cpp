@@ -138,7 +138,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultipleImplOneInterfaceServiceTracker
 
   int64_t maxServices{ state.range(0) };
   std::vector<std::shared_ptr<FooImpl>> impls;
-  impls.reserve((size_t)maxServices);
+  impls.reserve(static_cast<size_t>(maxServices));
   for (int64_t i = 0; i < maxServices; ++i) {
     impls.emplace_back(std::make_shared<FooImpl>());
   }
@@ -147,7 +147,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultipleImplOneInterfaceServiceTracker
 
   for (auto _ : state) {
     for (int64_t i = 0; i < maxServices; ++i) {
-      fc.RegisterService<Foo>(impls[i]);
+      fc.RegisterService<Foo>(impls[static_cast<size_t>(i)]);
     }
   }
 

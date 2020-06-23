@@ -53,15 +53,9 @@ BundleStorageFile::BundleStorageFile()
   throw std::logic_error("not implemented");
 }
 
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertBundleLib(
-  const std::string& /*location*/)
-{
-  throw std::logic_error("not implemented");
-}
-
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertArchives(
-  const std::shared_ptr<BundleResourceContainer>& /*resCont*/,
-  const std::vector<std::string>& /*topLevelEntries*/)
+std::shared_ptr<BundleArchive> BundleStorageFile::CreateAndInsertArchive(const std::shared_ptr<BundleResourceContainer>& /*resCont*/
+                                                                         , const std::string& /*topLevelEntries*/
+                                                                         , const ManifestT&)
 {
   throw std::logic_error("not implemented");
 }

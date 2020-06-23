@@ -284,9 +284,8 @@ uint32_t BundleResource::GetCrc32() const
 
 std::size_t BundleResource::Hash() const
 {
-  using namespace std;
-  return hash<std::string>()(d->archive->GetResourcePrefix() +
-                             this->GetResourcePath());
+  return std::hash<std::string>()(d->archive->GetResourcePrefix()
+                                  + this->GetResourcePath());
 }
 
 std::unique_ptr<void, void (*)(void*)> BundleResource::GetData() const

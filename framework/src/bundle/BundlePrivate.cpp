@@ -23,6 +23,7 @@
 #include "BundlePrivate.h"
 #include "BundleStorage.h"
 
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
@@ -671,8 +672,8 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   , SetBundleContext(nullptr)
 {}
 
-BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
-                             const std::shared_ptr<BundleArchive>& ba)
+BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx
+                             , const std::shared_ptr<BundleArchive>& ba)
   : coreCtx(coreCtx)
   , id(ba->GetBundleId())
   , location(ba->GetBundleLocation())
@@ -690,65 +691,12 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
   , symbolicName(ba->GetResourcePrefix())
   , version()
   , timeStamp(ba->GetLastModified())
-  , bundleManifest()
+  , bundleManifest(ba->GetManifest())
   , lib(location)
   , SetBundleContext(nullptr)
 {
-  // Check if the bundle provides a manifest.json file and if yes, parse it.
-  if (barchive->IsValid()) {
-    auto manifestRes = barchive->GetResource("/manifest.json");
-    if (manifestRes) {
-      BundleResourceStream manifestStream(manifestRes);
-      try {
-        bundleManifest.Parse(manifestStream);
-      } catch (...) {
-        throw std::runtime_error(
-          std::string("Parsing of manifest.json for bundle ") + symbolicName +
-          " at " + location + " failed: " + util::GetLastExceptionStr());
-      }
-    }
-    // It is unlikely that clients will access bundle resources
-    // if the only resource is the manifest file. On this assumption,
-    // close the open file handle to the zip file to improve performance
-    // and avoid exceeding OS open file handle limits.
-    auto resContainer = barchive->GetResourceContainer();
-    if (OnlyContainsManifest(resContainer)) {
-      resContainer->CloseContainer();
-    }
-  }
-
   validateManifest();
 }
-
-BundlePrivate::BundlePrivate(CoreBundleContext* ctx
-                             , const std::string& l
-                             , const AnyMap& m)
-  : coreCtx(ctx)
-  , id(ctx->storage->NextFreeId())
-  , location(l)
-  , state(Bundle::STATE_INSTALLED)
-  , barchive()
-  , bundleDir(ctx->GetDataStorage(id))
-  , bundleContext()
-  , destroyActivatorHook(nullptr)
-  , bactivator(nullptr, nullptr)
-  , operation(static_cast<uint8_t>(OP_IDLE))
-  , resolveFailException()
-  , wasStarted(false)
-  , aborted(static_cast<uint8_t>(Aborted::NONE))
-  , bundleThread()
-  , symbolicName(m.at("bundle.symbolic_name").ToString())
-  , version(CppMicroServices_VERSION_MAJOR
-            , CppMicroServices_VERSION_MINOR
-            , CppMicroServices_VERSION_PATCH)
-  , timeStamp(std::chrono::steady_clock::now())
-  , bundleManifest(m)
-  , lib()
-  , SetBundleContext(nullptr)
-{
-  validateManifest();
-}
-
 
 void BundlePrivate::validateManifest()
 {

@@ -34,10 +34,32 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "cppmicroservices/BundleResourceStream.h"
+#include "../../src/bundle/BundleManifest.h"
+
 using namespace cppmicroservices;
 
 namespace
 {
+
+std::string libName(const std::string& libBase)
+{
+  return (US_LIB_PREFIX
+          + libBase
+          + US_LIB_POSTFIX
+          + US_LIB_EXT);
+}
+
+std::string fullLibPath(const std::string& libBase)
+{
+  namespace cu = cppmicroservices::util;
+  namespace ct = cppmicroservices::testing;
+
+  return (ct::LIB_PATH
+          + cu::DIR_SEP
+          + libName(libBase));
+}
+
 /**
  * recursively compare the content of headers with deprecated. "headers" is an AnyMap, which
  * stores any hierarchical values in AnyMaps also. The purpose of this function is to
@@ -188,6 +210,207 @@ TEST(BundleManifestTest, ParseManifest)
   ASSERT_EQ(m["list"].Type(), typeid(std::vector<Any>));
   ASSERT_EQ(any_cast<std::vector<Any>>(m["list"]).size(), 2ul);
 
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+namespace cppmicroservices {
+
+struct TestBundleAService
+{
+  virtual ~TestBundleAService() {}
+};
+
+}
+
+TEST(BundleManifestTest, DirectManifestInstall)
+{
+  
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto ctx = framework.GetBundleContext();
+
+
+  cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
+    { "A", 1.5 }
+    , { "B", std::string("Test") }
+    , { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
+
+  auto const& bundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  ASSERT_EQ(1, bundles.size());
+  auto headers = bundles[0].GetHeaders();
+  auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);
+  for (auto m : manifest)
+    // check to make sure that all the headers in the manifest are there
+  {
+    ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
+  }
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+TEST(BundleManifestTest, DirectManifestInstallMulti)
+{
+  // Support the static linking case in which we have multiple bundles in one location that need to
+  // be installed, so the "manifests" passed in contains a vector of bundle manifests, one for each
+  // bundle at the location.
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto ctx = framework.GetBundleContext();
+
+
+  cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
+    { "A", 1.5 }
+    , { "B", std::string("Test") }
+    , { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
+  cppmicroservices::AnyMap::unordered_any_cimap testBundleBManifest = {
+    { "bundle.symbolic_name", std::string("TestBundleB") }
+    , { "bundle.activator", true }
+  };
+  manifests["TestBundleB"] = cppmicroservices::AnyMap(testBundleBManifest);
+
+  auto const& bundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  ASSERT_EQ(2, bundles.size());
+  for (auto const& b : bundles) {
+    auto headers = b.GetHeaders();
+    auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests[b.GetSymbolicName()]);
+    for (auto m : manifest)
+      // check to make sure that all the headers in the manifest are there
+    {
+      ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
+    }
+  }
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+TEST(BundleManifestTest, DirectManifestInstallAndStart)
+{
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto ctx = framework.GetBundleContext();
+
+  cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
+    { "A", 1.5 }
+    , { "B", std::string("Test") }
+    , { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
+
+  auto location = fullLibPath("TestBundleA");
+  auto const& bundles = ctx.InstallBundles(location, manifests);
+  ASSERT_EQ(1, bundles.size());
+  auto b = bundles[0];
+  b.Start();
+  auto headers = b.GetHeaders();
+  auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);
+  for (auto m : manifest)
+    // check to make sure that all the headers in the manifest are there
+  {
+    ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
+  }
+  auto ref = ctx.GetServiceReference<cppmicroservices::TestBundleAService>();
+  auto svc = ctx.GetService(ref);
+  ASSERT_TRUE(!!svc);
+  
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
+{
+  namespace cppms = cppmicroservices;
+  namespace sc = std::chrono;
+  using ucimap = cppms::AnyMap::unordered_any_cimap;
+  
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto ctx = framework.GetBundleContext();
+
+  cppms::AnyMap manifests(cppms::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+
+  ucimap aManifest = {
+    { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  ucimap aLocationMap = {
+    { "TestBundleA", cppms::AnyMap(aManifest) }
+  };
+  manifests[libName("TestBundleA")] = cppms::AnyMap(aLocationMap);
+
+  ucimap a2Manifest = {
+    { "bundle.symbolic_name", std::string("TestBundleA2") }
+    , { "bundle.activator", true }
+  };
+  ucimap a2LocationMap = {
+    { "TestBundleA2", cppms::AnyMap(a2Manifest) }
+  };
+  manifests[libName("TestBundleA2")] = cppms::AnyMap(a2LocationMap);
+  
+  // Now simulate what processing the list of manifests would look like when processing the cache. 
+  auto bundleRoot = cppms::testing::LIB_PATH
+                    + util::DIR_SEP;
+  for (auto const& m : manifests) {
+    auto const& libPath = m.first;
+    auto const& fullLibPath = bundleRoot + libPath;
+    auto const& bundles = ctx.InstallBundles(fullLibPath
+                                             , cppms::any_cast<cppms::AnyMap>((m.second)));
+    ASSERT_EQ(1, bundles.size());
+    for (auto b : bundles) {
+      b.Start();
+    }
+  }
+  
+  framework.Stop();
+  framework.WaitForStop(sc::milliseconds::zero());
+}
+
+
+TEST(BundleManifestTest, IgnoreSecondManifestInstall)
+{
+  namespace cppms = cppmicroservices;
+  using cppms::AnyMap;
+  using cppms::any_map;
+  using cppms::any_cast;
+  using cimap = AnyMap::unordered_any_cimap;
+  
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto ctx = framework.GetBundleContext();
+
+  AnyMap manifests(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cimap firstTimeManifest = {
+    { "test", true }
+    , { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  cimap secondTimeManifest = {
+    { "test", false }
+    , { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  manifests["TestBundleA"] = AnyMap(firstTimeManifest);
+  auto const& firstBundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  auto const& firstHeaders = firstBundles[0].GetHeaders();
+  ASSERT_TRUE(any_cast<bool>(firstHeaders.at("test")));
+
+  // on second installation the manifest should be ignored, so our test value should remain true. 
+  manifests["TestBundleA"] = AnyMap(secondTimeManifest);
+  auto const& secondBundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  auto const& secondHeaders = secondBundles[0].GetHeaders();
+  // should still be true after install.
+  ASSERT_TRUE(any_cast<bool>(secondHeaders.at("test")));
+  
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
 }

@@ -28,6 +28,8 @@
 #include <vector>
 #include <chrono>
 
+#include "BundleManifest.h"
+
 namespace cppmicroservices {
 
 class BundleResource;
@@ -51,8 +53,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
                 , std::string  resourcePrefix
                 , std::string  location
                 , long id
-                , int64_t ts
-                , int32_t setting);
+                , AnyMap m);
 
   /**
    * Autostart setting stopped.
@@ -151,6 +152,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
+  const AnyMap& GetManifest() const;
 private:
   BundleStorage* const storage;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
@@ -161,6 +163,13 @@ private:
   int64_t lastModified;
   int32_t autostartSetting;
 
+  /** The BundleManifest for this BundleArchive.
+   *
+   * Needs to be mutable to allow for lazy loading from the file. The "GetManifest()" method is
+   * "const". A BundleArchive is constructed with an empty manifest will read its manifest from the
+   * file the first time it's asked for, and stored here.
+   */
+  mutable BundleManifest manifest;
 };
 }
 

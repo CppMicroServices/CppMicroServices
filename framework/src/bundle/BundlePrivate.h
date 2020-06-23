@@ -79,11 +79,8 @@ using WaitConditionType = WaitCondition<MutexHost>;
    * @throws std::runtime_error If we have duplicate symbolic name and version.
    * @throws std::invalid_argument Faulty manifest for bundle
    */
-  BundlePrivate(CoreBundleContext* coreCtx,
-                const std::shared_ptr<BundleArchive>& ba);
   BundlePrivate(CoreBundleContext* coreCtx
-                , const std::string& location
-                , const AnyMap& manifest);
+                , const std::shared_ptr<BundleArchive>& ba);
 
   virtual ~BundlePrivate();
 

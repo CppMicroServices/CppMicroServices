@@ -28,6 +28,7 @@
 #include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
+#include "cppmicroservices/AnyMap.h"
 
 #include <memory>
 
@@ -1074,9 +1075,10 @@ public:
    * @throws std::logic_error If the framework instance is no longer active
    * @throws std::invalid_argument If the location is not a valid UTF8 string
    */
+using ManifestT = cppmicroservices::AnyMap;
   std::vector<Bundle> InstallBundles(const std::string& location);
   std::vector<Bundle> InstallBundles(const std::string& location
-                                     , const AnyMap& bundleManifest);
+                                     , const ManifestT& bundleManifest);
 
 private:
   friend US_Framework_EXPORT BundleContext

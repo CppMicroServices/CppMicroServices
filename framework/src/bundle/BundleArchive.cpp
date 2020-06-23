@@ -26,19 +26,51 @@
 #include <iostream>
 
 #include "cppmicroservices/BundleResource.h"
+#include "cppmicroservices/BundleResourceStream.h"
+#include "cppmicroservices/util/Error.h"
 
 #include "BundleResourceContainer.h"
+#include "BundleManifest.h"
 #include "BundleStorage.h"
 
 namespace cppmicroservices {
 
-const std::string BundleArchive::AUTOSTART_SETTING_STOPPED = "stopped";
-const std::string BundleArchive::AUTOSTART_SETTING_EAGER = "eager";
-const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
-  "activation_policy";
+namespace {
+
+int64_t now()
+{
+  namespace sc = std::chrono;
+  return sc::duration_cast<sc::milliseconds>(sc::steady_clock::now()
+                                             .time_since_epoch()).count();
+}
+
+bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer)
+{
+  auto topLevelDirs = resContainer->GetTopLevelDirs();
+  for (auto const& dir : topLevelDirs) {
+    std::vector<std::string> names;
+    std::vector<uint32_t> indices;
+    resContainer->GetChildren(dir + "/", true, names, indices);
+    for (auto const& name : names) {
+      // If we find any entry OTHER THAN "manifest.json", the top level entries contain something
+      // other than the manifest, so return false.
+      if (name != std::string("manifest.json"))
+        return false;
+    }
+  }
+  // Didn't find anything else, so return true.
+  return true;
+}
+
+}
+
+const std::string BundleArchive::AUTOSTART_SETTING_STOPPED           = "stopped";
+const std::string BundleArchive::AUTOSTART_SETTING_EAGER             = "eager";
+const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY = "activation_policy";
 
 BundleArchive::BundleArchive()
   : storage(nullptr)
+  , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
 
 BundleArchive::BundleArchive(BundleStorage* storage
@@ -46,15 +78,15 @@ BundleArchive::BundleArchive(BundleStorage* storage
                              , std::string  prefix
                              , std::string  location
                              , long id
-                             , int64_t ts
-                             , int32_t setting)
+                             , AnyMap m)
   : storage(storage)
   , resourceContainer(std::move(resourceContainer))
   , resourcePrefix(std::move(prefix))
   , location(std::move(location))
   , bundleId(id)
-  , lastModified(ts)
-  , autostartSetting(setting)
+  , lastModified(now())
+  , autostartSetting(-1)
+  , manifest(m)
 {
 }
 
@@ -122,14 +154,14 @@ std::vector<BundleResource> BundleArchive::FindResources(
 
 BundleArchive::TimeStamp BundleArchive::GetLastModified() const
 {
-  return TimeStamp() + std::chrono::milliseconds(lastModified);
+  return TimeStamp { std::chrono::milliseconds(lastModified) };
 }
 
 void BundleArchive::SetLastModified(const TimeStamp& ts)
 {
-  using std::chrono::duration_cast;
+  namespace sc = std::chrono;
   
-  lastModified = duration_cast<std::chrono::milliseconds>(ts.time_since_epoch()).count();
+  lastModified = sc::duration_cast<sc::milliseconds>(ts.time_since_epoch()).count();
 }
 
 int32_t BundleArchive::GetAutostartSetting() const
@@ -147,4 +179,38 @@ BundleArchive::GetResourceContainer() const
 {
   return resourceContainer;
 }
+
+const AnyMap& BundleArchive::GetManifest() const
+{
+  // Only take the time to read the manifest out of the BundleArchive file if we don't already have
+  // a manifest.
+  if (true == manifest.GetHeaders().empty()) {
+    // Check if the bundle provides a manifest.json file and if yes, parse it.
+    if (IsValid()) {
+      auto manifestRes = GetResource("/manifest.json");
+      if (manifestRes) {
+        BundleResourceStream manifestStream(manifestRes);
+        try {
+          manifest.Parse(manifestStream);
+        } catch (...) {
+          throw std::runtime_error(std::string("Parsing of manifest.json for bundle ")
+                                   + resourcePrefix
+                                   + " at "
+                                   + location
+                                   + " failed: "
+                                   + util::GetLastExceptionStr());
+        }
+        // It is unlikely that clients will access bundle resources
+        // if the only resource is the manifest file. On this assumption,
+        // close the open file handle to the zip file to improve performance
+        // and avoid exceeding OS open file handle limits.
+        if (OnlyContainsManifest(resourceContainer)) {
+          resourceContainer->CloseContainer();
+        }
+      }
+    }
+  }
+  return manifest.GetHeaders();
+}
+
 }

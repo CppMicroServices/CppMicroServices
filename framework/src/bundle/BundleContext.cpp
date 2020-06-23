@@ -472,24 +472,22 @@ std::string BundleContext::GetDataFile(const std::string& filename) const
 
 std::vector<Bundle> BundleContext::InstallBundles(const std::string& location)
 {
+  namespace cppms = cppmicroservices;
+  
+  return InstallBundles(location
+                        , cppms::AnyMap(cppms::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
+}
+
+std::vector<Bundle> BundleContext::InstallBundles(const std::string& location
+                                                  , const ManifestT& bundleManifest)
+{
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
-
   // CONCURRENCY NOTE: This is a check-then-act situation,
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
-
-  return b->coreCtx->bundleRegistry.Install(location, b);
-}
-
-std::vector<Bundle> BundleContext::InstallBundles(const std::string& location
-                                                  , const AnyMap& bundleManifest)
-{
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
-  
-  return b->coreCtx->bundleRegistry.Install(location, std::move(bundleManifest));
+  return b->coreCtx->bundleRegistry.Install(location, b, bundleManifest);
 }
 
 }

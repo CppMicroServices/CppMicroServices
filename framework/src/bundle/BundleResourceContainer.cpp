@@ -40,26 +40,38 @@
 
 namespace cppmicroservices {
 
-BundleResourceContainer::BundleResourceContainer(const std::string& location)
+BundleResourceContainer::BundleResourceContainer(const std::string& location
+                                                 , const ManifestT& bundleManifest)
   : m_Location(location)
   , m_ZipArchive()
   , m_ObjFile()
   , m_ZipFileMutex()
   , m_IsContainerOpen(false)
 {
-  if (!util::Exists(location)) {
-    throw std::runtime_error(m_Location + " does not exist");
+  if (false == bundleManifest.empty()) {
+    // If the bundleManifest is not empty, it contains a list of manifests for location. The data
+    // contains not only the manifests but the "top level dirs".
+    //
+    // If bundleManifest is not empty, we should pull the top level entries out of it, store them in
+    // m_SortedTopLevelDirs, and leave this object with m_IsContainerOpen=false, never reading the
+    // zip info out.
+    for (auto b : bundleManifest) {
+      m_SortedToplevelDirs.insert(b.first);
+    }
+  } else {
+    if (!util::Exists(location)) {
+      throw std::runtime_error(m_Location + " does not exist");
+    }
+    
+    InitMiniz();
+    
+    InitSortedEntries();
+    if (m_SortedToplevelDirs.empty()) {
+      throw std::runtime_error("Invalid zip archive layout for bundle at " +
+                               m_Location);
+    }
+    m_IsContainerOpen = true;
   }
-
-  InitMiniz();
- 
-  InitSortedEntries();
-  if (m_SortedToplevelDirs.empty()) {
-    throw std::runtime_error("Invalid zip archive layout for bundle at " +
-                             m_Location);
-  }
-
-  m_IsContainerOpen = true;
 }
 
 BundleResourceContainer::~BundleResourceContainer()

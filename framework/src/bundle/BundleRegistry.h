@@ -32,7 +32,10 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include <rapidjson/document.h>
+
+#include "BundleResourceContainer.h"
 
 namespace cppmicroservices {
 
@@ -65,16 +68,18 @@ public:
    * @param caller The bundle performing the install
    * @return A vector of bundles installed
    */
+  using ManifestT = cppmicroservices::AnyMap;
   std::vector<Bundle> Install(const std::string& location
                               , BundlePrivate* caller);
-
   std::vector<Bundle> Install(const std::string& location
-                              , const AnyMap& bundleManifest);
+                              , BundlePrivate* caller
+                              , const ManifestT& bundleManifest);
   
-  std::vector<Bundle> Install0(
-    const std::string& location,
-    const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
-    BundlePrivate* caller);
+  std::vector<Bundle> Install0(const std::string& location
+                               , const std::shared_ptr<BundleResourceContainer>& resCont
+                               , const std::unordered_set<std::string>& exclude
+                               , BundlePrivate* caller
+                               , const ManifestT& bundleManifest);
 
   /**
    * Remove bundle registration.
@@ -145,10 +150,11 @@ private:
 
   void CheckIllegalState() const;
 
-  void GetAlreadyInstalledBundlesAtLocation(
-    std::pair<BundleMap::iterator, BundleMap::iterator> range,
-    std::vector<Bundle>& res,
-    std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled);
+  std::shared_ptr<BundleResourceContainer> GetAlreadyInstalledBundlesAtLocation(std::pair<BundleMap::iterator, BundleMap::iterator> range
+                                                                                , const std::string& location
+                                                                                , const ManifestT& bundleManifest
+                                                                                , std::vector<Bundle>& res
+                                                                                , std::unordered_set<std::string>& alreadyInstalled);
 
   void DecrementInitialBundleMapRef(
     cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,

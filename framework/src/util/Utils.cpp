@@ -57,7 +57,10 @@ bool IsBundleFile(const std::string& location)
     // If this location is a bundle, a top level directory will
     // contain a manifest.json file at its root. There is no need
     // to recursively search nested directories.
-    BundleResourceContainer resContainer(location);
+    namespace cppms = cppmicroservices;
+    using cppmicroservices::AnyMap;
+    using cppmicroservices::any_map;
+    BundleResourceContainer resContainer(location, AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
     auto topLevelDirs = resContainer.GetTopLevelDirs();
     return std::any_of(
       topLevelDirs.begin(),
@@ -67,12 +70,11 @@ bool IsBundleFile(const std::string& location)
         std::vector<uint32_t> indices;
 
         resContainer.GetChildren(dir + "/", true, names, indices);
-        return std::any_of(names.begin(),
-                           names.end(),
-                           [](const std::string& resourceName) -> bool {
-                             return resourceName ==
-                               std::string("manifest.json");
-                           });
+        return std::any_of(names.begin()
+                           , names.end()
+                           , [](const std::string& resourceName) -> bool {
+                               return (resourceName == std::string("manifest.json"));
+                             });
       });
   } catch (...) {
     return false;

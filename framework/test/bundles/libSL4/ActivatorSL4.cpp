@@ -34,7 +34,7 @@ class FooServiceImpl : public FooService
 {
 
 public:
-  void foo() { std::cout << "TestBundleSL4: Doing foo"; }
+  void foo() {}
 };
 
 class ActivatorSL4 : public BundleActivator
@@ -45,9 +45,7 @@ public:
 
   void Start(BundleContext context)
   {
-    sr =
-      context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
-    std::cout << "TestBundleSL4: Registered " << sr;
+    sr = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
   }
 
   void Stop(BundleContext /*context*/) {}

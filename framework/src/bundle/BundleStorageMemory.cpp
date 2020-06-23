@@ -21,56 +21,44 @@
 =============================================================================*/
 
 #include "BundleStorageMemory.h"
-
 #include "cppmicroservices/Constants.h"
+#include "cppmicroservices/AnyMap.h"
 
 #include "BundleArchive.h"
 #include "BundleResourceContainer.h"
 
 #include <chrono>
+#include <iostream>
 
 namespace cppmicroservices {
+namespace sc = std::chrono;
 
 BundleStorageMemory::BundleStorageMemory()
   : BundleStorage()
+  , nextFreeId(1)
 {}
 
-std::vector<std::shared_ptr<BundleArchive>>
-BundleStorageMemory::InsertBundleLib(const std::string& location)
+std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(const std::shared_ptr<BundleResourceContainer>& resCont
+                                                                           , const std::string& prefix
+                                                                           , const ManifestT& bundleManifest)
 {
-  auto resCont = std::make_shared<BundleResourceContainer>(location);
-  return InsertArchives(resCont, resCont->GetTopLevelDirs());
-}
-
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
-  const std::shared_ptr<BundleResourceContainer>& resCont,
-  const std::vector<std::string>& topLevelEntries)
-{
-  std::vector<std::shared_ptr<BundleArchive>> res;
   auto l = archives.Lock();
   US_UNUSED(l);
-  for (auto const& prefix : topLevelEntries) {
 #ifndef US_BUILD_SHARED_LIBS
-    // The system bundle is already installed
-    if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME) {
-      continue;
-    }
-#endif
-    using namespace std::chrono;
-    
-    auto id = NextFreeId();
-    auto ts = duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
-    auto p  = archives.v.insert(std::make_pair(id
-                                               , std::make_shared<BundleArchive>(this
-                                                                                 , resCont
-                                                                                 , prefix
-                                                                                 , resCont->GetLocation()
-                                                                                 , id
-                                                                                 , ts
-                                                                                 , -1)));
-    res.push_back(p.first->second);
+  // The system bundle is already installed
+  if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME) {
+    return {}
   }
-  return res;
+#endif
+  auto id = nextFreeId++;
+  auto p  = archives.v.insert(std::make_pair(id
+                                             , std::make_shared<BundleArchive>(this
+                                                                               , resCont
+                                                                               , prefix
+                                                                               , resCont->GetLocation()
+                                                                               , id
+                                                                               , bundleManifest)));
+  return p.first->second;
 }
 
 bool BundleStorageMemory::RemoveArchive(const BundleArchive* ba)

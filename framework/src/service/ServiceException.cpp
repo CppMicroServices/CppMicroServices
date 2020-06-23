@@ -48,9 +48,7 @@ ServiceException::Type ServiceException::GetType() const
 }
 }
 
-using namespace cppmicroservices;
-
-std::ostream& operator<<(std::ostream& os, const ServiceException& exc)
+std::ostream& operator<<(std::ostream& os, const cppmicroservices::ServiceException& exc)
 {
   return os << "ServiceException: " << exc.what();
 }

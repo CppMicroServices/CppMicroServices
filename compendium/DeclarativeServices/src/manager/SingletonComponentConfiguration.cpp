@@ -129,15 +129,30 @@ void SingletonComponentConfigurationImpl::UngetService(const cppmicroservices::B
 void SingletonComponentConfigurationImpl::BindReference(const std::string& refName, const ServiceReferenceBase& ref)
 {
   auto context = GetComponentContext();
-  context->BoundServicesCacheAdd(refName, ref);
-  GetComponentInstance()->InvokeBindMethod(refName, ref);
+  context->AddToBoundServicesCache(refName, ref);
+  try {
+    GetComponentInstance()->InvokeBindMethod(refName, ref);
+  } catch (const std::exception&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception received from user code while binding a "
+                     "service reference.",
+                     std::current_exception());
+  }
+  
 }
 
 void SingletonComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
 {
-  GetComponentInstance()->InvokeUnbindMethod(refName, ref);
+  try {
+    GetComponentInstance()->InvokeUnbindMethod(refName, ref);
+  } catch (const std::exception&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception received from user code while unbinding a "
+                     "service reference.",
+                     std::current_exception());
+  }
   auto context = GetComponentContext();
-  context->BoundServicesCacheDel(refName, ref);
+  context->RemoveFromBoundServicesCache(refName, ref);
 }
 
 void SingletonComponentConfigurationImpl::SetComponentInstancePair(InstanceContextPair instCtxtPair)

@@ -45,7 +45,7 @@ public:
   CMDisabledState();
 
   /**
-   * Contruct with a future object
+   * Construct with a future object
    *
    * /param fut is the future associated with this state. This future represents
    *        the task performed when the ComponentManager changes it's state from

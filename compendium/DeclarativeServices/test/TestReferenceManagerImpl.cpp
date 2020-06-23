@@ -20,23 +20,24 @@
 
   =============================================================================*/
 
-#include <random>
+#include "../src/manager/ReferenceManagerImpl.hpp"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
-#include "../src/manager/ReferenceManagerImpl.hpp"
+#include <random>
 
-#include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
-#include "TestUtils.hpp"
+#include "Mocks.hpp"
 #include "TestInterfaces/Interfaces.hpp"
+#include "TestUtils.hpp"
 
 namespace scr = cppmicroservices::service::component::runtime;
 
-using cppmicroservices::service::component::ComponentConstants::REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+using cppmicroservices::service::component::ComponentConstants::
+  REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -61,32 +62,35 @@ std::ostream& operator<<(std::ostream& os, const ReferenceMetadata& data)
 
 }
 
-class ReferenceManagerImplTest : public ::testing::TestWithParam<metadata::ReferenceMetadata> {
+class ReferenceManagerImplTest
+  : public ::testing::TestWithParam<metadata::ReferenceMetadata>
+{
 protected:
-  ReferenceManagerImplTest() : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  { }
+  ReferenceManagerImplTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
   virtual ~ReferenceManagerImplTest() = default;
 
-  virtual void SetUp() {
-    framework.Start();
-  }
+  virtual void SetUp() { framework.Start(); }
 
-  virtual void TearDown() {
+  virtual void TearDown()
+  {
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 
   cppmicroservices::Framework& GetFramework() { return framework; }
+
 private:
   cppmicroservices::Framework framework;
 };
 
 // utility method for creating different types of reference metadata objects used in testing
-metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& policy
-                                                        , const std::string& policyOption
-                                                        , const std::string& cardinality
-                                                        , std::string refName = "ref"
-                                                       )
+metadata::ReferenceMetadata CreateFakeReferenceMetadata(
+  const std::string& policy,
+  const std::string& policyOption,
+  const std::string& cardinality,
+  std::string refName = "ref")
 {
   metadata::ReferenceMetadata fakeMetadata{};
   fakeMetadata.name = std::move(refName);
@@ -95,66 +99,67 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(const std::string& polic
   fakeMetadata.policyOption = policyOption;
   fakeMetadata.cardinality = cardinality;
 
-  if (cardinality == "0..1")
-  {
+  if (cardinality == "0..1") {
     fakeMetadata.minCardinality = 0;
     fakeMetadata.maxCardinality = 1;
-  }
-  else if (cardinality == "0..n")
-  {
+  } else if (cardinality == "0..n") {
     fakeMetadata.minCardinality = 0;
     fakeMetadata.maxCardinality = std::numeric_limits<unsigned int>::max();
-  }
-  else if (cardinality == "1..1")
-  {
+  } else if (cardinality == "1..1") {
     fakeMetadata.minCardinality = 1;
     fakeMetadata.maxCardinality = 1;
-  }
-  else
-  {
+  } else {
     fakeMetadata.minCardinality = 1;
     fakeMetadata.maxCardinality = std::numeric_limits<unsigned int>::max();
   }
   return fakeMetadata;
 }
 
-INSTANTIATE_TEST_SUITE_P(ReferenceManagerParameterized, ReferenceManagerImplTest
-                         , testing::Values(CreateFakeReferenceMetadata("static"   , "reluctant", "0..1")
-                                           , CreateFakeReferenceMetadata("static" , "reluctant", "1..1")
-                                           , CreateFakeReferenceMetadata("static" , "greedy"   , "0..1")
-                                           , CreateFakeReferenceMetadata("static" , "greedy"   , "1..1")
-                                           , CreateFakeReferenceMetadata("dynamic", "reluctant", "0..1")
-                                           , CreateFakeReferenceMetadata("dynamic", "reluctant", "1..1")
-                                           , CreateFakeReferenceMetadata("dynamic", "greedy"   , "0..1")
-                                           , CreateFakeReferenceMetadata("dynamic", "greedy"   , "1..1")
-                                          ));
+INSTANTIATE_TEST_SUITE_P(
+  ReferenceManagerParameterized,
+  ReferenceManagerImplTest,
+  testing::Values(CreateFakeReferenceMetadata("static", "reluctant", "0..1"),
+                  CreateFakeReferenceMetadata("static", "reluctant", "1..1"),
+                  CreateFakeReferenceMetadata("static", "greedy", "0..1"),
+                  CreateFakeReferenceMetadata("static", "greedy", "1..1"),
+                  CreateFakeReferenceMetadata("dynamic", "reluctant", "0..1"),
+                  CreateFakeReferenceMetadata("dynamic", "reluctant", "1..1"),
+                  CreateFakeReferenceMetadata("dynamic", "greedy", "0..1"),
+                  CreateFakeReferenceMetadata("dynamic", "greedy", "1..1")));
 
 TEST_P(ReferenceManagerImplTest, TestConstructor)
 {
   metadata::ReferenceMetadata mockReferenceMetadata{};
   auto fakeLogger = std::make_shared<FakeLogger>();
-  EXPECT_THROW({
-      ReferenceManagerImpl refManager(mockReferenceMetadata
-                                      , BundleContext()
-                                      , fakeLogger
-                                      , FakeComponentConfigName);
-    }, std::invalid_argument) << "Invalid bundle context must result in a throw";
-  EXPECT_THROW({
-      ReferenceManagerImpl refManager(mockReferenceMetadata
-                                      , GetFramework().GetBundleContext()
-                                      , nullptr
-                                      , FakeComponentConfigName);
-    }, std::invalid_argument) << "Invalid logger object must result in a throw";
+  EXPECT_THROW(
+    {
+      ReferenceManagerImpl refManager(mockReferenceMetadata,
+                                      BundleContext(),
+                                      fakeLogger,
+                                      FakeComponentConfigName);
+    },
+    std::invalid_argument)
+    << "Invalid bundle context must result in a throw";
+  EXPECT_THROW(
+    {
+      ReferenceManagerImpl refManager(mockReferenceMetadata,
+                                      GetFramework().GetBundleContext(),
+                                      nullptr,
+                                      FakeComponentConfigName);
+    },
+    std::invalid_argument)
+    << "Invalid logger object must result in a throw";
   EXPECT_NO_THROW({
-      mockReferenceMetadata.name = "Foo";
-      mockReferenceMetadata.target = "(objectclass=Foo)";
-      ReferenceManagerImpl refManager(mockReferenceMetadata
-                                      , GetFramework().GetBundleContext()
-                                      , fakeLogger
-                                      , FakeComponentConfigName);
-      EXPECT_EQ(refManager.GetReferenceName(), "Foo");
-      EXPECT_EQ(refManager.GetLDAPString(), "(objectclass=Foo)");
-    }) << "No throw expected when valid objects are passed to ReferenceManager constructor";
+    mockReferenceMetadata.name = "Foo";
+    mockReferenceMetadata.target = "(objectclass=Foo)";
+    ReferenceManagerImpl refManager(mockReferenceMetadata,
+                                    GetFramework().GetBundleContext(),
+                                    fakeLogger,
+                                    FakeComponentConfigName);
+    EXPECT_EQ(refManager.GetReferenceName(), "Foo");
+    EXPECT_EQ(refManager.GetLDAPString(), "(objectclass=Foo)");
+  }) << "No throw expected when valid objects are passed to ReferenceManager "
+        "constructor";
 }
 
 TEST_P(ReferenceManagerImplTest, TestIsSatisfied)
@@ -168,13 +173,17 @@ TEST_P(ReferenceManagerImplTest, TestIsSatisfied)
   // Register a service and check IsSatisfied is true
   {
     auto fakeMetadata = GetParam();
-    ReferenceManagerImpl refManager(fakeMetadata
-                                    , GetFramework().GetBundleContext()
-                                    , fakeLogger
-                                    , FakeComponentConfigName);
-    EXPECT_EQ(refManager.IsSatisfied(), (refManager.IsOptional() ? true : false)) << "Initial state is SATISFIED only if cardinality is optional";
-    auto reg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
-    EXPECT_EQ(refManager.IsSatisfied(), true) << "State expected to be SATISFIED after service registration";
+    ReferenceManagerImpl refManager(fakeMetadata,
+                                    GetFramework().GetBundleContext(),
+                                    fakeLogger,
+                                    FakeComponentConfigName);
+    EXPECT_EQ(refManager.IsSatisfied(),
+              (refManager.IsOptional() ? true : false))
+      << "Initial state is SATISFIED only if cardinality is optional";
+    auto reg = bc.RegisterService<dummy::Reference1>(
+      std::make_shared<dummy::Reference1>());
+    EXPECT_EQ(refManager.IsSatisfied(), true)
+      << "State expected to be SATISFIED after service registration";
     reg.Unregister();
   }
 }
@@ -189,33 +198,50 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
   // register another service with higher ranking. Observe no change.
   {
     auto fakeMetadata = GetParam();
-    ReferenceManagerImpl refManager(fakeMetadata
-                                    , GetFramework().GetBundleContext()
-                                    , fakeLogger
-                                    , FakeComponentConfigName);
-    EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional()) << "Initial state is SATISFIED only for optional cardinality";
+    ReferenceManagerImpl refManager(fakeMetadata,
+                                    GetFramework().GetBundleContext(),
+                                    fakeLogger,
+                                    FakeComponentConfigName);
+    EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional())
+      << "Initial state is SATISFIED only for optional cardinality";
     int satisfiedNotificationCount(0);
     int unsatisfiedNotificationCount(0);
-    auto resetCounters = [&satisfiedNotificationCount, &unsatisfiedNotificationCount]() {
-                           satisfiedNotificationCount = 0;
-                           unsatisfiedNotificationCount = 0;
-                         };
+    int bindNotificationCount(0);
+    int unbindNotificationCount(0);
+    auto resetCounters = [&satisfiedNotificationCount,
+                          &unsatisfiedNotificationCount,
+                          &bindNotificationCount,
+                          &unbindNotificationCount]() {
+      satisfiedNotificationCount = 0;
+      unsatisfiedNotificationCount = 0;
+      bindNotificationCount = 0;
+      unbindNotificationCount = 0;
+    };
 
-    ListenerTokenId token = refManager.RegisterListener([&](const RefChangeNotification& notification) {
-                                                          switch (notification.event) {
-                                                            case RefEvent::BECAME_SATISFIED:
-                                                              satisfiedNotificationCount++;
-                                                              break;
-                                                            case RefEvent::BECAME_UNSATISFIED:
-                                                              unsatisfiedNotificationCount++;
-                                                              break;
-                                                            default:
-                                                              break;
-                                                          }
-                                                        });
+    ListenerTokenId token = refManager.RegisterListener(
+      [&](const RefChangeNotification& notification) {
+        switch (notification.event) {
+          case RefEvent::BECAME_SATISFIED:
+            satisfiedNotificationCount++;
+            break;
+          case RefEvent::BECAME_UNSATISFIED:
+            unsatisfiedNotificationCount++;
+            break;
+          case RefEvent::BIND:
+            bindNotificationCount++;
+            break;
+          case RefEvent::UNBIND:
+            unbindNotificationCount++;
+            break;
+          default:
+            break;
+        }
+      });
     // Expect a callback as soon as registered for optional dependency
-    EXPECT_EQ(satisfiedNotificationCount, (refManager.IsOptional() ? 1: 0)) << "SATISFIED notification expected for optional cardinality";
-    EXPECT_EQ(unsatisfiedNotificationCount, 0) << "No UNSATISFIED notification expected";
+    EXPECT_EQ(satisfiedNotificationCount, (refManager.IsOptional() ? 1 : 0))
+      << "SATISFIED notification expected for optional cardinality";
+    EXPECT_EQ(unsatisfiedNotificationCount, 0)
+      << "No UNSATISFIED notification expected";
     resetCounters();
 
     // Register first service
@@ -223,10 +249,34 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // optional, static-greedy - no change in final state, one call back each for unsatisfied and satisfied
     // mandatory, static-reluctant - state change & one satisfied callback
     // mandatory, static-greedy - state change & one satisfied callback
-    auto reg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
+    // optional, dynamic-reluctant - no change in state & no callback expected
+    // optional, dynamic-greedy - no change in state & no callback expected
+    // mandatory, dynamic-reluctant - state change & one satisfied callback
+    // mandatory, dynamic-greedy - state change & one satisfied callback
+    auto reg = bc.RegisterService<dummy::Reference1>(
+      std::make_shared<dummy::Reference1>());
     EXPECT_EQ(refManager.IsSatisfied(), true);
-    EXPECT_EQ(unsatisfiedNotificationCount, refManager.IsOptional()  && (fakeMetadata.policyOption == "greedy") ? 1 : 0) << "UNSATISFIED notification expected only for optional-greedy";
-    EXPECT_EQ(satisfiedNotificationCount, (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ? 0 : 1) << "SATISFIED notification expected except for optional-reluctant";
+    EXPECT_EQ(unsatisfiedNotificationCount,
+              refManager.IsOptional() &&
+                  (fakeMetadata.policyOption == "greedy") &&
+                  !("dynamic" == fakeMetadata.policy)
+                ? 1
+                : 0)
+      << "UNSATISFIED notification expected only for static-optional-greedy";
+    EXPECT_EQ(
+      satisfiedNotificationCount,
+      (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ||
+          (refManager.IsOptional() && ("dynamic" == fakeMetadata.policy))
+        ? 0
+        : 1)
+      << "SATISFIED notification expected except for static-optional-reluctant";
+
+    if ("dynamic" == fakeMetadata.policy) {
+        // the bind notification is sent only if the service component is already active
+        // e.g. when the service ref was already satisfied because it's optional 
+      EXPECT_EQ(bindNotificationCount, refManager.IsOptional() ? 1 : 0)
+          << "Incorrect number of bind notifications sent";
+    }
     resetCounters();
 
     // Register second service with same rank
@@ -234,10 +284,23 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // optional, static-greedy - no state change, no callback expected
     // mandatory, static-reluctant - no state change, no callback expected
     // mandatory, static-greedy - no state change, no callback expected
-    auto reg1 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
+    // optional, dynamic-reluctant - no state change & no callback expected
+    // optional, dynamic-greedy - no state change & no callback expected
+    // mandatory, dynamic-reluctant - no state change & no callback expected
+    // mandatory, dynamic-greedy - no state change & no callback expected
+    auto reg1 = bc.RegisterService<dummy::Reference1>(
+      std::make_shared<dummy::Reference1>());
     EXPECT_EQ(refManager.IsSatisfied(), true);
-    EXPECT_EQ(satisfiedNotificationCount, 0) << "no notification expected since the service registered has the same rank";
-    EXPECT_EQ(unsatisfiedNotificationCount, 0) << "no notification expected since the service registered has the same rank";
+    EXPECT_EQ(satisfiedNotificationCount, 0)
+      << "no notification expected since the service registered has the same "
+         "rank";
+    EXPECT_EQ(unsatisfiedNotificationCount, 0)
+      << "no notification expected since the service registered has the same "
+         "rank";
+    if ("dynamic" == fakeMetadata.policy) {
+      EXPECT_EQ(bindNotificationCount, 0);
+      EXPECT_EQ(unbindNotificationCount, 0);
+    }
     resetCounters();
 
     // Register third service with higher rank
@@ -245,10 +308,33 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // optional, static-greedy - no state change, two callbacks expected in sequence UNSATISFIED, SATISFIED
     // mandatory, static-reluctant - no state change, no callback expected
     // mandatory, static-greedy - no state change, two callbacks expected in sequence UNSATISFIED, SATISFIED
-    auto reg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(), {{Constants::SERVICE_RANKING, Any(10)}});
+    // optional, dynamic-reluctant - no state change, no callback expected
+    // optional, dynamic-greedy - no state change, no callback expected
+    // mandatory, dynamic-reluctant - no state change, no callback expected
+    // mandatory, dynamic-greedy - no state change, no callback expected
+    auto reg2 = bc.RegisterService<dummy::Reference1>(
+      std::make_shared<dummy::Reference1>(),
+      { { Constants::SERVICE_RANKING, Any(10) } });
     EXPECT_EQ(refManager.IsSatisfied(), true);
-    EXPECT_EQ(unsatisfiedNotificationCount, fakeMetadata.policyOption == "greedy" ? 1 :0) << "UNSATISFIED notification must be sent only for greedy policy";
-    EXPECT_EQ(satisfiedNotificationCount, fakeMetadata.policyOption == "greedy" ? 1: 0) << "SATISFIED notification must be sent only for greedy policy";;
+    EXPECT_EQ(unsatisfiedNotificationCount,
+              fakeMetadata.policyOption == "greedy" &&
+                  !("dynamic" == fakeMetadata.policy)
+                ? 1
+                : 0)
+      << "UNSATISFIED notification must be sent only for static-greedy policy";
+    EXPECT_EQ(satisfiedNotificationCount,
+              fakeMetadata.policyOption == "greedy" &&
+                  !("dynamic" == fakeMetadata.policy)
+                ? 1
+                : 0)
+      << "SATISFIED notification must be sent only for static-greedy policy";
+
+    if ("dynamic" == fakeMetadata.policy) {
+      EXPECT_EQ(bindNotificationCount,
+                "greedy" == fakeMetadata.policyOption ? 1 : 0);
+      EXPECT_EQ(unbindNotificationCount,
+                "greedy" == fakeMetadata.policyOption ? 1 : 0);
+    }
     resetCounters();
 
     // unregister service 1.
@@ -256,9 +342,34 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // optional, static-greedy - not bound so no change
     // mandatory, static-reluctant - bound, expect callback with UNSATISFIED
     // mandatory, static-greedy - not bound so no change
+    // optional, dynamic-reluctant - bound and still satisfied, expect no SATISFIED/UNSATISFIED callback
+    // optional, dynamic-greedy - not bound so no change
+    // mandatory, dynamic-reluctant - bound and still satisfied after rebind, expect no SATISFIED/UNSATISFIED callback
+    // mandatory, dynamic-greedy - not bound so no change
     reg.Unregister();
-    EXPECT_EQ(unsatisfiedNotificationCount, fakeMetadata.cardinality == "1..1" && fakeMetadata.policyOption == "reluctant" ? 1 : 0) << "UNSATISFIED notification must be sent only for mandatory-unary-static-reluctant";
-    EXPECT_EQ(satisfiedNotificationCount, fakeMetadata.cardinality == "1..1" && fakeMetadata.policyOption == "reluctant" ? 1 : 0) << "SATISFIED notification must be sent only for mandatory-unary-static-reluctant";
+    EXPECT_EQ(unsatisfiedNotificationCount,
+              fakeMetadata.cardinality == "1..1" &&
+                  fakeMetadata.policyOption == "reluctant" &&
+                  !(fakeMetadata.policy == "dynamic")
+                ? 1
+                : 0)
+      << "UNSATISFIED notification must be sent only for "
+         "mandatory-unary-static-reluctant";
+    EXPECT_EQ(satisfiedNotificationCount,
+              fakeMetadata.cardinality == "1..1" &&
+                  fakeMetadata.policyOption == "reluctant" &&
+                  !(fakeMetadata.policy == "dynamic")
+                ? 1
+                : 0)
+      << "SATISFIED notification must be sent only for "
+         "mandatory-unary-static-reluctant";
+
+    if ("dynamic" == fakeMetadata.policy) {
+      EXPECT_EQ(bindNotificationCount,
+                "reluctant" == fakeMetadata.policyOption ? 1 : 0);
+      EXPECT_EQ(unbindNotificationCount,
+                "reluctant" == fakeMetadata.policyOption ? 1 : 0);
+    }
     resetCounters();
 
     // unregister service 2.
@@ -266,9 +377,19 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // optional, static-greedy - not bound so no change
     // mandatory, static-reluctant - not bound so no change
     // mandatory, static-greedy - not bound so no change
+    // optional, dynamic-reluctant - not bound so no change
+    // optional, dynamic-greedy - not bound so no change
+    // mandatory, dynamic-reluctant - not bound so no change
+    // mandatory, dynamic-greedy - not bound so no change
     reg1.Unregister();
-    EXPECT_EQ(satisfiedNotificationCount, 0) << "No changes in bindings so no SATISFIED notification expected";
-    EXPECT_EQ(unsatisfiedNotificationCount, 0) << "No changes in bindings so no UNSATISFIED notification expected";
+    EXPECT_EQ(satisfiedNotificationCount, 0)
+      << "No changes in bindings so no SATISFIED notification expected";
+    EXPECT_EQ(unsatisfiedNotificationCount, 0)
+      << "No changes in bindings so no UNSATISFIED notification expected";
+    if ("dynamic" == fakeMetadata.policy) {
+      EXPECT_EQ(bindNotificationCount, 0);
+      EXPECT_EQ(unbindNotificationCount, 0);
+    }
     resetCounters();
 
     // unregister service 3.
@@ -276,9 +397,34 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // optional, static-greedy - bound, expect callback with UNSATISFIED & SATISFIED
     // mandatory, static-reluctant - not bound initially but bound after reg is unregistered.
     // mandatory, static-greedy - bound, expect callback with UNSATISFIED
+    // optional, dynamic-reluctant - no change
+    // optional, dynamic-greedy - no change
+    // mandatory, dynamic-reluctant - expect callback with UNSATISFIED
+    // mandatory, dynamic-greedy - expect callback with UNSATISFIED
     reg2.Unregister();
-    EXPECT_EQ(unsatisfiedNotificationCount, refManager.IsOptional() && fakeMetadata.policyOption == "reluctant" ? 0 : 1) << "UNSATISFIED notification must be sent except for optional-static-reluctant";
-    EXPECT_EQ(satisfiedNotificationCount, refManager.IsOptional() && fakeMetadata.policyOption == "greedy" ? 1 : 0) << "SATISFIED notification must be sent only for optional-static-greedy";;
+    EXPECT_EQ(
+      unsatisfiedNotificationCount,
+      (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ||
+        (refManager.IsOptional() && fakeMetadata.policy == "dynamic") ? 0
+                                                                          : 1)
+      << "UNSATISFIED notification must be sent except for "
+         "optional-static-reluctant";
+    EXPECT_EQ(
+      satisfiedNotificationCount,
+              refManager.IsOptional() &&
+                    fakeMetadata.policyOption == "greedy" &&
+                  !(fakeMetadata.policy == "dynamic")
+                ? 1
+                : 0)
+      << "SATISFIED notification must be sent only for optional-static-greedy";
+    
+    if ("dynamic" == fakeMetadata.policy) {
+      EXPECT_EQ(bindNotificationCount, 0)
+        << "No bind notifications are expected when there is nothing to bind to";
+      EXPECT_EQ(unbindNotificationCount, refManager.IsOptional() ? 1 : 0)
+        << "Mandatory service references move straight to UNSATISFIED without "
+           "an unbind notification";
+    }
     resetCounters();
 
     refManager.UnregisterListener(token);
@@ -293,20 +439,28 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
-  ReferenceManagerImpl refManager(fakeMetadata
-                                  , GetFramework().GetBundleContext()
-                                  , fakeLogger
-                                  , FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata,
+                                  GetFramework().GetBundleContext(),
+                                  fakeLogger,
+                                  FakeComponentConfigName);
 
-  std::function<ServiceRegistration<dummy::Reference1>()> func = [bc]() mutable {
-                                                                   return bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
-                                                                 };
+  std::function<ServiceRegistration<dummy::Reference1>()> func =
+    [bc]() mutable {
+      return bc.RegisterService<dummy::Reference1>(
+        std::make_shared<dummy::Reference1>());
+    };
   auto registrations = ConcurrentInvoke(func);
 
-  EXPECT_TRUE(refManager.IsSatisfied()) << "Reference Manager must be in satisfied state after concurrent service registrations";
-  EXPECT_EQ(refManager.GetBoundReferences().size(), (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ? 0ul : 1ul) << "A reference must be bound unless the cardinality is optional and binding policy is static";
-  for(auto& reg : registrations)
-  {
+  EXPECT_TRUE(refManager.IsSatisfied())
+    << "Reference Manager must be in satisfied state after concurrent service "
+       "registrations";
+  EXPECT_EQ(
+    refManager.GetBoundReferences().size(),
+    (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant" && !("dynamic" == fakeMetadata.policy)) ? 0ul
+                                                                          : 1ul)
+    << "A reference must be bound unless the cardinality is optional and "
+       "binding policy is static";
+  for (auto& reg : registrations) {
     reg.Unregister();
   }
 }
@@ -316,58 +470,58 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentUnsatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
-  ReferenceManagerImpl refManager(fakeMetadata
-                                  , GetFramework().GetBundleContext()
-                                  , fakeLogger
-                                  , FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata,
+                                  GetFramework().GetBundleContext(),
+                                  fakeLogger,
+                                  FakeComponentConfigName);
   std::promise<void> go;
   std::shared_future<void> ready(go.get_future());
   int numCalls = std::max(64u, std::thread::hardware_concurrency());
   std::vector<std::promise<void>> readies(numCalls);
   std::vector<std::future<void>> serviceUnregFutures(numCalls);
   std::vector<ServiceRegistration<dummy::Reference1>> sRegs(numCalls);
-  try
-  {
-    for(int i=0; i<numCalls; i++)
-    {
-      sRegs[i] = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
+  try {
+    for (int i = 0; i < numCalls; i++) {
+      sRegs[i] = bc.RegisterService<dummy::Reference1>(
+        std::make_shared<dummy::Reference1>());
     }
-    EXPECT_TRUE(refManager.IsSatisfied()) << "Reference manager must be satisfied after service registrations";
-    EXPECT_FALSE(refManager.GetTargetReferences().empty()) << "since multiple services are registered, target references must be non-empty";
-    if(!refManager.IsOptional())
-    {
-      EXPECT_FALSE(refManager.GetBoundReferences().empty()) << "atleast one reference must be bound";
+    EXPECT_TRUE(refManager.IsSatisfied())
+      << "Reference manager must be satisfied after service registrations";
+    EXPECT_FALSE(refManager.GetTargetReferences().empty())
+      << "since multiple services are registered, target references must be "
+         "non-empty";
+    if (!refManager.IsOptional()) {
+      EXPECT_FALSE(refManager.GetBoundReferences().empty())
+        << "atleast one reference must be bound";
     }
-    for(int i=0; i<numCalls; i++)
-    {
-      serviceUnregFutures[i] = std::async(std::launch::async,
-                                          [ready, &readies, i, &sRegs]()
-                                          {
-                                            readies[i].set_value();
-                                            ready.wait();
-                                            sRegs[i].Unregister();
-                                          });
+    for (int i = 0; i < numCalls; i++) {
+      serviceUnregFutures[i] =
+        std::async(std::launch::async, [ready, &readies, i, &sRegs]() {
+          readies[i].set_value();
+          ready.wait();
+          sRegs[i].Unregister();
+        });
     }
-    for(auto&& ready : readies)
-    {
+    for (auto&& ready : readies) {
       ready.get_future().wait();
     }
     go.set_value();
-    for(auto&& sUnregFuture : serviceUnregFutures)
-    {
+    for (auto&& sUnregFuture : serviceUnregFutures) {
       sUnregFuture.wait();
     }
-  }
-  catch(const std::exception& ex)
-  {
-    ASSERT_FALSE(true) << "Error: unexpected exception caught ... " << ex.what();
+  } catch (const std::exception& ex) {
+    ASSERT_FALSE(true) << "Error: unexpected exception caught ... "
+                       << ex.what();
     go.set_value();
     throw std::current_exception();
   }
 
-  EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional()) << "Reference manager must be satisfied only if cardinality is soptional";
-  EXPECT_EQ(refManager.GetTargetReferences().size(), 0ul) << "matched references must be 0 since all services are unregistered";
-  EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul) << "bound references must be 0 since all services are unregistered";
+  EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional())
+    << "Reference manager must be satisfied only if cardinality is soptional";
+  EXPECT_EQ(refManager.GetTargetReferences().size(), 0ul)
+    << "matched references must be 0 since all services are unregistered";
+  EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul)
+    << "bound references must be 0 since all services are unregistered";
 }
 
 TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied)
@@ -375,58 +529,58 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
-  ReferenceManagerImpl refManager(fakeMetadata
-                                  , GetFramework().GetBundleContext()
-                                  , fakeLogger
-                                  , FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata,
+                                  GetFramework().GetBundleContext(),
+                                  fakeLogger,
+                                  FakeComponentConfigName);
 
-  std::function<ServiceRegistration<dummy::Reference1>()> func = [bc]() mutable {
-                                                                   ServiceRegistration<dummy::Reference1> sReg;
-                                                                   std::random_device rd;
-                                                                   std::mt19937 gen(rd());
-                                                                   std::uniform_int_distribution<unsigned int> dis(20,80);
-                                                                   int randVal = dis(gen); // random number in range [20, 80)
-                                                                   // if randval is odd, a service exists in service registry by
-                                                                   // the end of this loop. If randVal is even, no service is
-                                                                   // registered by this thread, by the end of this loop
-                                                                   for(int j = 0; j < randVal; j++)
-                                                                   {
-                                                                     if((j & 0x1) == 0x0)
-                                                                     {
-                                                                       sReg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>());
-                                                                     }
-                                                                     else
-                                                                     {
-                                                                       sReg.Unregister();
-                                                                     }
-                                                                   }
-                                                                   return sReg;
-                                                                 };
+  std::function<ServiceRegistration<dummy::Reference1>()> func =
+    [bc]() mutable {
+      ServiceRegistration<dummy::Reference1> sReg;
+      std::random_device rd;
+      std::mt19937 gen(rd());
+      std::uniform_int_distribution<unsigned int> dis(20, 80);
+      int randVal = dis(gen); // random number in range [20, 80)
+      // if randval is odd, a service exists in service registry by
+      // the end of this loop. If randVal is even, no service is
+      // registered by this thread, by the end of this loop
+      for (int j = 0; j < randVal; j++) {
+        if ((j & 0x1) == 0x0) {
+          sReg = bc.RegisterService<dummy::Reference1>(
+            std::make_shared<dummy::Reference1>());
+        } else {
+          sReg.Unregister();
+        }
+      }
+      return sReg;
+    };
   auto registrations = ConcurrentInvoke(func);
 
   auto registeredServiceRefs = bc.GetServiceReferences<dummy::Reference1>();
   auto registeredServiceCount = registeredServiceRefs.size();
   // statuc-reluctant, mandatory-unary - depends on which thread's service was bound
   // static-reluctant, optional-unary - none of the services are bound
-  if(refManager.IsOptional() &&
-     fakeMetadata.policyOption == "reluctant")
-  {
-    EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul) << "No references must be bound for OPTIONAL cardinality with RELUCTANT policy";
+  if (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant" && !("dynamic" == fakeMetadata.policy)) {
+    EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul)
+      << "No references must be bound for OPTIONAL cardinality with RELUCTANT "
+         "policy";
   }
   // static-greedy, optional-unary - the service with the highest rank is bound
   // static-greedy, mandatory-unary - the service with the highest rank is bound
-  if(refManager.IsOptional() &&
-     fakeMetadata.policyOption == "greedy")
-  {
-    EXPECT_EQ(refManager.GetBoundReferences().size(), (registeredServiceCount ? 1ul : 0ul)) << "If any services are available, bound services must not be zero";
+  if (refManager.IsOptional() && fakeMetadata.policyOption == "greedy") {
+    EXPECT_EQ(refManager.GetBoundReferences().size(),
+              (registeredServiceCount ? 1ul : 0ul))
+      << "If any services are available, bound services must not be zero";
   }
 
-
-  if(refManager.IsOptional())
-  {
-    EXPECT_TRUE(refManager.IsSatisfied()) << "Ref should only be satisfied if it is optional";;
+  if (refManager.IsOptional()) {
+    EXPECT_TRUE(refManager.IsSatisfied())
+      << "Ref should only be satisfied if it is optional";
+    ;
   }
-  EXPECT_EQ(refManager.GetTargetReferences().size(), registeredServiceCount) << "TargetReferences must be the same as any available services in the framework";
+  EXPECT_EQ(refManager.GetTargetReferences().size(), registeredServiceCount)
+    << "TargetReferences must be the same as any available services in the "
+       "framework";
 }
 TEST_P(ReferenceManagerImplTest, TestTrackerWithScope_PrototypeRequired)
 {
@@ -434,26 +588,34 @@ TEST_P(ReferenceManagerImplTest, TestTrackerWithScope_PrototypeRequired)
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto fakeMetadata = GetParam();
   fakeMetadata.scope = REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
-  ReferenceManagerImpl refManager(fakeMetadata
-                                  , GetFramework().GetBundleContext()
-                                  , fakeLogger
-                                  , FakeComponentConfigName);
+  ReferenceManagerImpl refManager(fakeMetadata,
+                                  GetFramework().GetBundleContext(),
+                                  fakeLogger,
+                                  FakeComponentConfigName);
 
   // when the reference scope is 'prototype_required', the reference manager's
   // tracker must only bind to the service published with scope==prototype
   ASSERT_TRUE(refManager.GetTargetReferences().empty());
-  auto reg = bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>()),
-                                                   {{cppmicroservices::Constants::SERVICE_SCOPE, cppmicroservices::Constants::SCOPE_BUNDLE}});
-  ASSERT_TRUE(refManager.GetTargetReferences().empty()) << "service registered with BUNDLE scope must not match the tracker";
+  auto reg = bc.RegisterService<dummy::Reference1>(
+    ToFactory(std::make_shared<MockFactory>()),
+    { { cppmicroservices::Constants::SERVICE_SCOPE,
+        cppmicroservices::Constants::SCOPE_BUNDLE } });
+  ASSERT_TRUE(refManager.GetTargetReferences().empty())
+    << "service registered with BUNDLE scope must not match the tracker";
   reg.Unregister();
 
-  reg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>()); // singleton scope
-  ASSERT_TRUE(refManager.GetTargetReferences().empty()) << "service registered with SINGLETON scope must not match the tracker";
+  reg = bc.RegisterService<dummy::Reference1>(
+    std::make_shared<dummy::Reference1>()); // singleton scope
+  ASSERT_TRUE(refManager.GetTargetReferences().empty())
+    << "service registered with SINGLETON scope must not match the tracker";
   reg.Unregister();
 
-  reg = bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>()),
-                                              {{cppmicroservices::Constants::SERVICE_SCOPE, cppmicroservices::Constants::SCOPE_PROTOTYPE}});
-  ASSERT_FALSE(refManager.GetTargetReferences().empty()) << "service registered with PROTOTYPE scope must match the tracker";
+  reg = bc.RegisterService<dummy::Reference1>(
+    ToFactory(std::make_shared<MockFactory>()),
+    { { cppmicroservices::Constants::SERVICE_SCOPE,
+        cppmicroservices::Constants::SCOPE_PROTOTYPE } });
+  ASSERT_FALSE(refManager.GetTargetReferences().empty())
+    << "service registered with PROTOTYPE scope must match the tracker";
   reg.Unregister();
 }
 
@@ -461,28 +623,27 @@ TEST_P(ReferenceManagerImplTest, TestTargetProperty)
 {
   namespace constants = cppmicroservices::Constants;
   auto fakeMetadata = GetParam();
-  auto bc             = GetFramework().GetBundleContext();
-  auto fakeLogger     = std::make_shared<FakeLogger>();
+  auto bc = GetFramework().GetBundleContext();
+  auto fakeLogger = std::make_shared<FakeLogger>();
 
   fakeMetadata.target = "(foo=bar)";
-  ReferenceManagerImpl refManager {
-    fakeMetadata
-    , bc
-    , fakeLogger
-    , FakeComponentConfigName
+  ReferenceManagerImpl refManager{
+    fakeMetadata, bc, fakeLogger, FakeComponentConfigName
   };
 
   // an optional service reference means that the reference manager is satisfied
   // without registering a service
 
   ASSERT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied());
-        
-  (void)bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>())
-                                              , {{constants::SERVICE_SCOPE, constants::SCOPE_BUNDLE}});
+
+  (void)bc.RegisterService<dummy::Reference1>(
+    ToFactory(std::make_shared<MockFactory>()),
+    { { constants::SERVICE_SCOPE, constants::SCOPE_BUNDLE } });
   ASSERT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied());
 
-  (void)bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>())
-                                              , {{"foo", std::string("bar")}});
+  (void)bc.RegisterService<dummy::Reference1>(
+    ToFactory(std::make_shared<MockFactory>()),
+    { { "foo", std::string("bar") } });
   ASSERT_TRUE(refManager.IsSatisfied());
 }
 
@@ -496,11 +657,8 @@ TEST_P(ReferenceManagerImplTest, TestSelfSatisfy)
   auto bc = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
 
-  ReferenceManagerImpl refManager {
-    fakeMetadata
-    , bc
-    , fakeLogger
-    , FakeComponentConfigName
+  ReferenceManagerImpl refManager{
+    fakeMetadata, bc, fakeLogger, FakeComponentConfigName
   };
 
   auto reg = bc.RegisterService<dummy::Reference1>(
@@ -512,4 +670,5 @@ TEST_P(ReferenceManagerImplTest, TestSelfSatisfy)
   reg.Unregister();
 }
 
-}}
+}
+}

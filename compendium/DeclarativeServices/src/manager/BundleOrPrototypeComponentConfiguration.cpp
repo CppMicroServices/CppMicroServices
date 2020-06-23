@@ -125,7 +125,7 @@ void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::strin
   {
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
-    context->BoundServicesCacheAdd(refName, ref);
+    context->AddToBoundServicesCache(refName, ref);
     instance->InvokeBindMethod(refName, ref);
   }
 }
@@ -140,7 +140,7 @@ void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::str
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
     instance->InvokeUnbindMethod(refName, ref);
-    context->BoundServicesCacheDel(refName, ref);
+    context->RemoveFromBoundServicesCache(refName, ref);
   }
 }
 

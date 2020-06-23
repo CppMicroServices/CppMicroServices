@@ -200,7 +200,7 @@ void ComponentContextImpl::Invalidate()
   boundServicesCache.clear();
 }
 
-void ComponentContextImpl::BoundServicesCacheAdd(const std::string& refName
+void ComponentContextImpl::AddToBoundServicesCache(const std::string& refName
                                                  , const cppmicroservices::ServiceReferenceBase& sRef)
 {
   auto bc = GetBundleContext();
@@ -208,13 +208,24 @@ void ComponentContextImpl::BoundServicesCacheAdd(const std::string& refName
   boundServicesCache[refName].emplace_back(sObjs.GetService());
 }
     
-void ComponentContextImpl::BoundServicesCacheDel(const std::string& refName
+void ComponentContextImpl::RemoveFromBoundServicesCache(const std::string& refName
                                                  , const cppmicroservices::ServiceReferenceBase& sRef)
 {
-  // remove reference from boundServicesCache
   auto bc = GetBundleContext();
   cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(ServiceReferenceU(sRef));
-  boundServicesCache[refName].emplace_back(sObjs.GetService());
+
+  auto& services = boundServicesCache.at(refName);
+  const auto removedService = sObjs.GetService();
+  const auto& serviceInterface = removedService->begin()->first;
+  services.erase(std::remove_if(
+    services.begin(),
+    services.end(),
+      [&removedService, &serviceInterface](
+        const cppmicroservices::InterfaceMapConstPtr& servicesMap) {
+        return (1 == servicesMap->count(serviceInterface)) &&
+               (removedService->at(serviceInterface) ==
+                servicesMap->at(serviceInterface));
+    }), services.end());
 }
 
 }} 

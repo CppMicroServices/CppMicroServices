@@ -108,8 +108,7 @@ public:
     , refBinders(binders)
   {
     // move all binders into a map
-    for(size_t i = 0; i < refBinders.size(); i++)
-    {
+    for(size_t i = 0; i < refBinders.size(); i++) {
       refBinderMap[refBinders.at(i)->GetReferenceName()] = i;
     }
   }
@@ -238,16 +237,14 @@ public:
     bool isConstructorInjected = Injection::value;
     std::shared_ptr<T> implObj = DoCreate(isConstructorInjected); // appropriate
     this->mServiceImpl = implObj;
-    for(auto& binder : this->refBinders)
-    {
+    for(auto& binder : this->refBinders) {
       binder->Bind(ctxt, this->mServiceImpl);
     }
   }
 
   void UnbindReferences() override
   {
-    for(auto& binder : this->refBinders)
-    {
+    for(auto& binder : this->refBinders) {
       binder->Unbind(this->mContext, this->mServiceImpl);
     }
   }

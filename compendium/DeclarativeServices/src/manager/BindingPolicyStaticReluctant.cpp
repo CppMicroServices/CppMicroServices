@@ -20,25 +20,40 @@
 
   =============================================================================*/
 
-#include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "cppmicroservices/logservice/LogService.hpp"
 #include "ReferenceManagerImpl.hpp"
+#include "cppmicroservices/ServiceReference.h"
+#include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
-namespace cppmicroservices { namespace scrimpl {
+namespace cppmicroservices {
+namespace scrimpl {
 
 using namespace cppmicroservices::logservice;
 
-void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(const ServiceReferenceBase& reference)
+void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(
+  const ServiceReferenceBase& reference)
 {
-  auto notifications = ReluctantServiceAdded(reference);
+  std::vector<RefChangeNotification> notifications;
+  if (!reference) {
+    Log("BindingPolicyStaticReluctant::ServiceAdded called with an invalid "
+        "service reference");
+    return;
+  }
+  auto notifySatisfied = ShouldNotifySatisfied();
+  if (notifySatisfied) {
+    Log("Notify SATISFIED for reference " + mgr.metadata.name);
+    notifications.push_back(
+      { mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference });
+  }
+
   mgr.BatchNotifyAllListeners(notifications);
 }
 
-void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceRemoved(const ServiceReferenceBase& reference)
+void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceRemoved(
+  const ServiceReferenceBase& reference)
 {
-  auto notifications = RemoveService(reference);
-  mgr.BatchNotifyAllListeners(notifications);
+  mgr.BatchNotifyAllListeners(RemoveService(reference));
 }
 
-}} // namespaces
+}
+} // namespaces

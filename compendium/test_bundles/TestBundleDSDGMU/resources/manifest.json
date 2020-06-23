@@ -10,8 +10,8 @@
             },
             "references":[{
                 "name" : "foo",
-                "policy" : "Dynamic",
-                "policyOption" : "Greedy",
+                "policy" : "dynamic",
+                "policy-option" : "greedy",
                 "interface" : "test::Interface1"
             }],
             "inject-references": false

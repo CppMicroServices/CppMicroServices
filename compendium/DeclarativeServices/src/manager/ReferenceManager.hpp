@@ -41,8 +41,10 @@ enum class RefEvent
                         become satisfied */
   BECAME_UNSATISFIED,/* used to notify the listener that the reference has
                         become unsatisfied */
-  BIND_REFERENCE,    /* TODO */
-  UNBIND_REFERENCE,  /* TODO */
+  BIND,              /* used to notify the listener that a service needs to
+                        be bound */
+  UNBIND,            /* used to notify the listener that a service needs to
+                        be unbound */
 };
 
 /**

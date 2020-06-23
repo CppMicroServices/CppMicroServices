@@ -125,6 +125,12 @@ void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& no
     case RefEvent::BECAME_UNSATISFIED:
       RefUnsatisfied(notification);
       break;
+    case RefEvent::BIND:
+      BindReference(notification.senderName, notification.serviceRef);
+      break;
+    case RefEvent::UNBIND:
+      UnbindReference(notification.senderName, notification.serviceRef);
+      break;
     default:
       break;
   }
@@ -256,7 +262,14 @@ InstanceContextPair ComponentConfigurationImpl::CreateAndActivateComponentInstan
 {
   auto componentInstance = CreateComponentInstance();
   auto ctxt = std::make_shared<ComponentContextImpl>(shared_from_this(), bundle);
-  componentInstance->CreateInstanceAndBindReferences(ctxt);
+  try {
+    componentInstance->CreateInstanceAndBindReferences(ctxt);
+  } catch (const std::exception& ) {
+    logger->Log(
+      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+      "Exception while creating component instance and binding references.",
+      std::current_exception());
+  }
   componentInstance->Activate();
   return std::make_pair(componentInstance, ctxt);
 }

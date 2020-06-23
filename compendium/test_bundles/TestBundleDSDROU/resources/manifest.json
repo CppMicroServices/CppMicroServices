@@ -11,8 +11,8 @@
             "references":[{
                 "name" : "foo",
 				"cardinality" : "0..1",
-                "policy" : "Dynamic",
-                "policyOption" : "Reluctant",
+                "policy" : "dynamic",
+                "policy-option" : "reluctant",
                 "interface" : "test::Interface1"
             }],
             "inject-references": false

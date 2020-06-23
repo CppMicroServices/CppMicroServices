@@ -43,7 +43,7 @@ namespace scr = cppmicroservices::service::component::runtime;
 
 
 namespace {
-    // convenience function to get the SCR service
+// convenience function to get the SCR service
 std::shared_ptr<scr::ServiceComponentRuntime> GetServiceComponentRuntime(
   cppmicroservices::BundleContext bc)
 {
@@ -122,6 +122,7 @@ struct DynamicRefPolicy
 {
   const char* bundleFileName;
   const char* verificationMessage;
+  const char* verificationMessageAfterUnregister;
   const char* implClassName;
   bool optional;
   InterfaceMapConstPtr interfaceMap;
@@ -211,15 +212,19 @@ TEST_P(BindingPolicyTest, InvalidServiceReference)
   auto const& param = GetParam();
   auto fakeMetadata =
     CreateFakeReferenceMetadata(param.policy, param.policyOption);
-  auto fakeLogger = std::make_shared<FakeLogger>();
+  auto mockLogger = std::make_shared<MockLogger>();
   auto mgr = std::make_shared<MockReferenceManagerBaseImpl>(
-    fakeMetadata, bc, fakeLogger, "foo");
+    fakeMetadata, bc, mockLogger, "foo");
 
   auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(
     *mgr, fakeMetadata.policy, fakeMetadata.policyOption);
 
-  EXPECT_THROW(bindingPolicy->ServiceAdded(ServiceReferenceU()),
-               std::invalid_argument);
+  EXPECT_CALL(*mockLogger.get(),
+              Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                  testing::_))
+    .Times(1);
+
+  EXPECT_NO_THROW(bindingPolicy->ServiceAdded(ServiceReferenceU()));
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -229,23 +234,27 @@ INSTANTIATE_TEST_SUITE_P(
     DynamicRefPolicy{
       "TestBundleDSDRMU",
       "ServiceComponentDynamicReluctantMandatoryUnary depends on ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+      "",
       "sample::ServiceComponentDynamicReluctantMandatoryUnary",
       false,
       MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicReluctantMandatoryUnary Interface1")) },
     DynamicRefPolicy{
       "TestBundleDSDGMU",
       "ServiceComponentDynamicGreedyMandatoryUnary depends on ServiceComponentDynamicGreedyMandatoryUnary Interface1",
+      "",
       "sample::ServiceComponentDynamicGreedyMandatoryUnary",
       false,
       MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicGreedyMandatoryUnary Interface1")) },
     DynamicRefPolicy{
       "TestBundleDSDROU",
+      "ServiceComponentDynamicReluctantOptionalUnary depends on ServiceComponentDynamicReluctantOptionalUnary Interface1",
       "ServiceComponentDynamicReluctantOptionalUnary depends on ",
       "sample::ServiceComponentDynamicReluctantOptionalUnary",
       true,
       MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicReluctantOptionalUnary Interface1")) },
     DynamicRefPolicy{
       "TestBundleDSDGOU",
+      "ServiceComponentDynamicGreedyOptionalUnary depends on ServiceComponentDynamicGreedyOptionalUnary Interface1",
       "ServiceComponentDynamicGreedyOptionalUnary depends on ",
       "sample::ServiceComponentDynamicGreedyOptionalUnary",
       true,
@@ -309,7 +318,8 @@ TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
     EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
       << "Service should NOT be available";
     EXPECT_NO_THROW(svc->ExtendedDescription());
-    EXPECT_STREQ(param.verificationMessage, svc->ExtendedDescription().c_str())
+    EXPECT_STREQ(param.verificationMessageAfterUnregister,
+                 svc->ExtendedDescription().c_str())
       << "String value returned was not expected. Was the correct service "
          "dependency bound?";
   } else {
@@ -321,6 +331,14 @@ TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
 }
 
 // test error handling and logging when the bind and unbind methods throw an exception
+// this test ensures that exception handling when binding and unbinding for both 
+// 0..1 and 1..1 cardinalities works.
+//
+// According to OSGi Compendium Release 7 Sections 112.5.10 and 112.5.18, if a
+// bind/unbind method throws the activate/deactivation of the component configuration
+// does not fail. This indicates that the service reference and service objects are
+// both valid and usable by clients.
+//
 TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
 {
   auto bc = GetFramework().GetBundleContext();
@@ -330,53 +348,46 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
 
   test::InstallAndStartDS(bc);
 
-  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSTOI22");
-  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
-    << "Service must not be available before it's dependency";
+  // The expectation is that Log(...) with a log severity of LOG_ERROR will be called
+  // exactly 6 times - 3 bind and 3 unbind calls for both service components
+  EXPECT_CALL(*mockLogger.get(),
+              Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  testing::_,
+                  testing::_))
+    .Times(6);
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TestBindUnbindThrows");
+  EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
+    << "Service must be available before it's dependency";
   
   auto dsRuntimeService = GetServiceComponentRuntime(bc);
 
   CheckComponentConfigurationState(
     dsRuntimeService,
     testBundle,
-    "sample::ServiceComponent22",
+    "sample::ServiceComponentDGMU",
     scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
-  // The expectation is that Log(...) with a log severity of LOG_ERROR will be called
-  // exactly two times - once when the bind throws and again when the unbind throws.
-  EXPECT_CALL(*mockLogger.get(),
-              Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  testing::_,
-                  testing::_))
-    .Times(2);
+  CheckComponentConfigurationState(dsRuntimeService,
+                                   testBundle,
+                                   "sample::ServiceComponentDGOU",
+                                   scr::dto::ComponentState::ACTIVE);
 
   // trigger the bind to be called.
   auto depSvcReg = bc.RegisterService<test::Interface1>(
     std::make_shared<test::InterfaceImpl>("Interface1"));
   ASSERT_TRUE(depSvcReg);
 
-  CheckComponentConfigurationState(
-    dsRuntimeService,
-    testBundle,
-    "sample::ServiceComponent22",
-    scr::dto::ComponentState::SATISFIED);
+  CheckComponentConfigurationState(dsRuntimeService,
+                                   testBundle,
+                                   "sample::ServiceComponentDGMU",
+                                   scr::dto::ComponentState::ACTIVE);
 
-  // TODO: what is the correct behavior as it relates to service references
-  // and service objects returned to the service consumer if the bind/unbind method throws?
-  // currently the service reference is valid and the service object is nullptr
-   
-  // According to OSGi Compendium Release 7 Sections 112.5.10 and 112.5.18, if a
-  // bind/unbind method throws the activate/deactivation of the component configuration
-  // does not fail. This indicates that that service reference and service objects are
-  // both valid and usable by clients.
-  // Section 112.5.6 - Once the component configuration is deactivated or fails to activate due to an exception,
-  //  SCR must unbind all the component's bound services and discard all references to the component instance
-  //  associated with the activation.
-  // Section 112.5.7 Bound Services - 
-  // Obtaining the service object for a bound service may result in activating a component configuration of the 
-  // bound service which could result in an exception. If the loss of the bound service due to the exception 
-  // causes the reference's cardinality constraint to be violated, then activation of this component configuration 
-  // will fail. Otherwise the bound service which failed to activate will be considered unbound.
+  CheckComponentConfigurationState(dsRuntimeService,
+                                   testBundle,
+                                   "sample::ServiceComponentDGOU",
+                                   scr::dto::ComponentState::ACTIVE);
+
   auto svcRef = bc.GetServiceReference<test::Interface2>();
   ASSERT_TRUE(svcRef);
   auto svc = bc.GetService<test::Interface2>(svcRef);
@@ -385,8 +396,8 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
 
   // trigger the unbind to be called.
   depSvcReg.Unregister();
-  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
-    << "Service should NOT be available";
+  EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
+    << "Service should be available";
 
   testBundle.Stop();
 }
@@ -576,9 +587,13 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyOptionalUnaryReBind)
 
   // unregistering the last service now causes the dependent service to be unregistered.
   depSvcReg.Unregister();
-  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
-    << "Service should NOT be available";
-  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
+  EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
+    << "Service should be available";
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ("ServiceComponentDynamicGreedyOptionalUnary depends on ",
+               svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
   testBundle.Stop();
 }
 
@@ -752,23 +767,19 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
-  // OSGi Compendium Release 7 section 112.5.12 Bound Service Replacement
-  //  If an active component configuration has a dynamic reference with unary
-  //  cardinality and the bound service is modified or unregistered and ceases
-  //  to be a target service, or the policy-option is greedy and a better
-  //  target service becomes available then SCR must attempt to replace the
-  //  bound service with a new bound service.
-  // unregistering the higher ranked service should cause a re-bind to the lower ranked service.
+  // unregistering the higher ranked service should not cause a re-bind to the lower ranked service
+  // since the lower ranked service wasn't bound.
   higherRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
   EXPECT_STREQ(
-    "ServiceComponentDynamicReluctantOptionalUnary depends on lower "
-    "ranked Interface1",
+    "ServiceComponentDynamicReluctantOptionalUnary depends on "
+    "ServiceComponentDynamicReluctantOptionalUnary Interface1",
     svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
-  // unregistering the lower ranked service should cause a re-bind to the last registered service.
+  // unregistering the lower ranked service should not cause a re-bind since the lower ranked service
+  // was not the bound service.
   lowerRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
   EXPECT_STREQ("ServiceComponentDynamicReluctantOptionalUnary depends on "
@@ -777,11 +788,16 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
-  // unregistering the last service now causes the dependent service to be unregistered.
+  // unregistering the last service should still cause the service component to be satisfied since
+  // the reference cardinality is optional.
   depSvcReg.Unregister();
-  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+  EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
     << "Service should NOT be available";
-  EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ("ServiceComponentDynamicReluctantOptionalUnary depends on ",
+               svc->ExtendedDescription().c_str())
+    << "String value returned was not expected. Was the correct service "
+       "dependency bound?";
   testBundle.Stop();
 }
 

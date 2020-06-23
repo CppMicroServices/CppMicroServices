@@ -73,8 +73,10 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
   std::vector<RefChangeNotification> notifications;
   if (replacementNeeded) {
     Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-    notifications.push_back(
-      { mgr.metadata.name, RefEvent::BECAME_UNSATISFIED, reference });
+    RefChangeNotification notification{ mgr.metadata.name,
+                                        RefEvent::BECAME_UNSATISFIED,
+                                        reference };
+    notifications.push_back(std::move(notification));
     // The following "clear and copy" strategy is sufficient for
     // updating the boundRefs for static binding policy
     if (serviceToUnbind) {
@@ -84,8 +86,10 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
   }
   if (notifySatisfied) {
     Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    notifications.push_back(
-      { mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference });
+    RefChangeNotification notification{ mgr.metadata.name,
+                                        RefEvent::BECAME_SATISFIED,
+                                        reference };
+    notifications.push_back(std::move(notification));
   }
   mgr.BatchNotifyAllListeners(notifications);
 }

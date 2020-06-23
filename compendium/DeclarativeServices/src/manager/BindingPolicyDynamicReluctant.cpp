@@ -37,7 +37,6 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
     return;
   }
 
-  auto replacementNeeded = false;
   auto notifySatisfied = false;
 
   if (!mgr.IsSatisfied()) {
@@ -112,7 +111,8 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(
       bool needRebind = false;
       ServiceReference<void> svcRefToBind;
       {
-        auto boundRefsHandle = mgr.boundRefs.lock(); // acquires lock on boundRefs
+        auto boundRefsHandle =
+          mgr.boundRefs.lock(); // acquires lock on boundRefs
         if (0 < boundRefsHandle->size()) {
           svcRefToBind = *(boundRefsHandle->begin());
           needRebind = true;
@@ -121,13 +121,17 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(
 
       if (needRebind) {
         Log("Notify BIND for reference " + mgr.metadata.name);
-        notifications.push_back(RefChangeNotification{
-          mgr.metadata.name, RefEvent::BIND, svcRefToBind });
+        RefChangeNotification notification{ mgr.metadata.name,
+                                            RefEvent::BIND,
+                                            svcRefToBind };
+        notifications.push_back(std::move(notification));
       }
 
       Log("Notify UNBIND for reference " + mgr.metadata.name);
-        notifications.push_back(RefChangeNotification{
-        mgr.metadata.name, RefEvent::UNBIND, reference });
+      RefChangeNotification notification{ mgr.metadata.name,
+                                          RefEvent::UNBIND,
+                                          reference };
+      notifications.push_back(std::move(notification));
     } else if (!mgr.IsSatisfied()) {
       Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
       RefChangeNotification notification{ mgr.metadata.name,

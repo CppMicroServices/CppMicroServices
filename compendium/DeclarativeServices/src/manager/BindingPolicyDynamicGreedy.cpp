@@ -133,13 +133,17 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceRemoved(
 
       if (needRebind) {
         Log("Notify BIND for reference " + mgr.metadata.name);
-        notifications.push_back(RefChangeNotification{
-          mgr.metadata.name, RefEvent::BIND, svcRefToBind });
+        RefChangeNotification notification{ mgr.metadata.name,
+                                            RefEvent::BIND,
+                                            svcRefToBind };
+        notifications.push_back(std::move(notification));
       }
 
       Log("Notify UNBIND for reference " + mgr.metadata.name);
-      notifications.push_back(RefChangeNotification{
-        mgr.metadata.name, RefEvent::UNBIND, reference });
+      RefChangeNotification notification{ mgr.metadata.name,
+                                          RefEvent::UNBIND,
+                                          reference };
+      notifications.push_back(std::move(notification));
     } else if (!mgr.IsSatisfied()) {
       Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
       RefChangeNotification notification{ mgr.metadata.name,

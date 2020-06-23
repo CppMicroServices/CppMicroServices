@@ -42,8 +42,10 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(
   auto notifySatisfied = ShouldNotifySatisfied();
   if (notifySatisfied) {
     Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    notifications.push_back(
-      { mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference });
+    RefChangeNotification notification{ mgr.metadata.name,
+                                        RefEvent::BECAME_SATISFIED,
+                                        reference };
+    notifications.push_back(std::move(notification));
   }
 
   mgr.BatchNotifyAllListeners(notifications);

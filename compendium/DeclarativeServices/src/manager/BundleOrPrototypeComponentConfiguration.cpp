@@ -126,7 +126,14 @@ void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::strin
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
     context->AddToBoundServicesCache(refName, ref);
-    instance->InvokeBindMethod(refName, ref);
+    try {
+      instance->InvokeBindMethod(refName, ref);
+    } catch (const std::exception&) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                      "Exception received from user code while binding a "
+                      "service reference.",
+                      std::current_exception());
+    } 
   }
 }
 
@@ -139,7 +146,15 @@ void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::str
   {
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
-    instance->InvokeUnbindMethod(refName, ref);
+    try {
+      instance->InvokeUnbindMethod(refName, ref);
+    } catch (const std::exception&) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception received from user code while unbinding a "
+                       "service reference.",
+                       std::current_exception());
+    }
+    
     context->RemoveFromBoundServicesCache(refName, ref);
   }
 }

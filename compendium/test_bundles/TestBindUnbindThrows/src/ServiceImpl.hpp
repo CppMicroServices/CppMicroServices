@@ -36,6 +36,20 @@ private:
   std::shared_ptr<test::Interface1> foo;
 };
 
+class ServiceComponentFactory : public test::Interface2
+{
+public:
+  ServiceComponentFactory() = default;
+  std::string ExtendedDescription() override;
+  ~ServiceComponentFactory() = default;
+
+  void Bindfactory(const std::shared_ptr<test::Interface1>&);
+  void Unbindfactory(const std::shared_ptr<test::Interface1>&);
+
+private:
+  std::shared_ptr<test::Interface1> foo;
+};
+
 } // namespaces
 
 #endif // _SERVICE_IMPL_HPP_

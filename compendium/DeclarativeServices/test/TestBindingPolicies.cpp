@@ -349,12 +349,14 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
   test::InstallAndStartDS(bc);
 
   // The expectation is that Log(...) with a log severity of LOG_ERROR will be called
-  // exactly 6 times - 3 bind and 3 unbind calls for both service components
+  // exactly 10 times - 1 bind and 1 unbind per service component of which there are three,
+  // plus an additional bind and unbind for each service component with optional cardinality
+  // of which there are two.
   EXPECT_CALL(*mockLogger.get(),
               Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                   testing::_,
                   testing::_))
-    .Times(6);
+    .Times(10);
 
   auto testBundle = test::InstallAndStartBundle(bc, "TestBindUnbindThrows");
   EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())

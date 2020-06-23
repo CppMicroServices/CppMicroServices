@@ -30,6 +30,22 @@
                 "interface" : "test::Interface1"
             }],
             "inject-references": false
+		},
+		{
+		    "immediate": true,
+            "implementation-class": "sample::ServiceComponentFactory",
+            "service": {
+			    "scope" : "prototype",
+                "interfaces": ["test::Interface2"]
+            },
+            "references":[{
+                "name" : "factory",
+				"cardinality" : "0..1",
+                "policy" : "dynamic",
+                "policy-option" : "greedy",
+                "interface" : "test::Interface1"
+            }],
+            "inject-references": false
 		}]
     }
 }

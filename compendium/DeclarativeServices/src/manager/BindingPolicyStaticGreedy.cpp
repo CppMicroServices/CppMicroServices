@@ -20,52 +20,50 @@
 
   =============================================================================*/
 
-#include "cppmicroservices/ServiceReference.h"
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "cppmicroservices/logservice/LogService.hpp"
 #include "ReferenceManagerImpl.hpp"
+#include "cppmicroservices/ServiceReference.h"
+#include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
-namespace cppmicroservices { namespace scrimpl {
+namespace cppmicroservices {
+namespace scrimpl {
 
 using namespace cppmicroservices::logservice;
 
-void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(const ServiceReferenceBase& reference)
+void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
+  const ServiceReferenceBase& reference)
 {
   if (!reference) {
-    Log("BindingPolicyStaticGreedy::ServiceAdded called with an invalid service reference");
+    Log("BindingPolicyStaticGreedy::ServiceAdded called with an invalid "
+        "service reference");
     return;
   }
 
-  // If no service is bound, bind to better target service. Otherwise, unbind the bound
-  // service and bind the better target service.
-
-  // else Unbind the bound service, then bind the new service.
+  // If no service is bound, reactivate the component to bind to the better target service.
+  // Otherwise, check if the service is a higher rank and if so, reactivate the component to bind
+  // to the better target service
 
   auto replacementNeeded = false;
   ServiceReference<void> serviceToUnbind;
-  if (mgr.IsSatisfied())
-  // means that a service is bound because the refmgr is satisfied.
-  {
-
+  if (mgr.IsSatisfied()) {
+    // means that a service is bound because the refmgr is satisfied.
     auto boundRefsHandle = mgr.boundRefs.lock(); // acquire lock on boundRefs
-    if (boundRefsHandle->find(reference) == boundRefsHandle->end())
-    // Means that reference is to a different service than what's bound, so unbind the
-    // old service and then bind to the new service.
-    {
-      if (!boundRefsHandle->empty())
-      // We only need to unbind if there's actually a bound ref.
-      {
+    if (boundRefsHandle->find(reference) == boundRefsHandle->end()) {
+      // Means that reference is to a different service than what's bound, so unbind the
+      // old service and then bind to the new service.
+      if (!boundRefsHandle->empty()) {
+        // We only need to unbind if there's actually a bound ref.
         const ServiceReferenceBase& minBound = *(boundRefsHandle->begin());
-        if (minBound < reference)
-        // And we only need to unbind if the new reference is a better match than the
-        // current best match (i.e. boundRefs are stored in reverse order with the best
-        // match in the first position).
-        {
+        if (minBound < reference) {
+          // And we only need to unbind if the new reference is a better match than the
+          // current best match (i.e. boundRefs are stored in reverse order with the best
+          // match in the first position).
           replacementNeeded = true;
           serviceToUnbind = minBound; // remember which service to unbind.
         }
       } else {
-        // not sure this is right.
+        // A replacement is needed if there are no bounds refs
+        // and the service reference is optional.
         replacementNeeded = mgr.IsOptional();
       }
     }
@@ -92,9 +90,11 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(const Ser
   mgr.BatchNotifyAllListeners(notifications);
 }
 
-void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceRemoved(const ServiceReferenceBase& reference)
+void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceRemoved(
+  const ServiceReferenceBase& reference)
 {
   mgr.BatchNotifyAllListeners(RemoveService(reference));
 }
 
-}}
+}
+}

@@ -47,7 +47,7 @@ std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(const
 #ifndef US_BUILD_SHARED_LIBS
   // The system bundle is already installed
   if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME) {
-    return {}
+    return {};
   }
 #endif
   auto id = nextFreeId++;

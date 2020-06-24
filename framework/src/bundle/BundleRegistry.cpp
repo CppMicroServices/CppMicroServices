@@ -315,6 +315,13 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
       if (0 == exclude.count(symbolicName))
         // only install non-excluded entries
       {
+#ifndef US_BUILD_SHARED_LIBS
+        // The system bundle is already installed, so skip it.
+        if (Constants::SYSTEM_BUNDLE_SYMBOLICNAME == symbolicName) {
+          continue;
+        }
+#endif
+
         // Either use the manifest found in the passed in bundleManifest list for the current entry,
         // or construct an empty one
         auto manifest = (0 != bundleManifest.count(symbolicName))

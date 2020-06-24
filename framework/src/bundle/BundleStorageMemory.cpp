@@ -44,12 +44,6 @@ std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(const
 {
   auto l = archives.Lock();
   US_UNUSED(l);
-#ifndef US_BUILD_SHARED_LIBS
-  // The system bundle is already installed
-  if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME) {
-    return {};
-  }
-#endif
   auto id = nextFreeId++;
   auto p  = archives.v.insert(std::make_pair(id
                                              , std::make_shared<BundleArchive>(this

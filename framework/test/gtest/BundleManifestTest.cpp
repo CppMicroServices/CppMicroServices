@@ -37,11 +37,14 @@
 #include "cppmicroservices/BundleResourceStream.h"
 #include "../../src/bundle/BundleManifest.h"
 
+#include <iostream>
+
 using namespace cppmicroservices;
 
 namespace
 {
 
+#ifdef US_BUILD_SHARED_LIBS
 std::string libName(const std::string& libBase)
 {
   return (US_LIB_PREFIX
@@ -59,6 +62,7 @@ std::string fullLibPath(const std::string& libBase)
           + cu::DIR_SEP
           + libName(libBase));
 }
+#endif
 
 /**
  * recursively compare the content of headers with deprecated. "headers" is an AnyMap, which
@@ -230,24 +234,36 @@ TEST(BundleManifestTest, DirectManifestInstall)
   framework.Start();
   auto ctx = framework.GetBundleContext();
 
-
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
-    { "A", 1.5 }
-    , { "B", std::string("Test") }
-    , { "bundle.symbolic_name", std::string("TestBundleA") }
+    { "bundle.symbolic_name", std::string("TestBundleA") }
     , { "bundle.activator", true }
   };
   manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
-  auto const& bundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+#ifdef US_BUILD_SHARED_LIBS
+  auto libPath = fullLibPath("TestBundleA");
+#else
+  auto libPath = cppmicroservices::testing::BIN_PATH
+                 + cppmicroservices::util::DIR_SEP
+                 + "usFrameworkTests"
+                 ;
+#endif
+  auto const& bundles = ctx.InstallBundles(libPath, manifests);
+#ifdef US_BUILD_SHARED_LIBS
+  // If it's a static build, bundles contains all bundles in the executable.
   ASSERT_EQ(1, bundles.size());
-  auto headers = bundles[0].GetHeaders();
-  auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);
-  for (auto m : manifest)
-    // check to make sure that all the headers in the manifest are there
-  {
-    ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
+#endif
+  for (auto b : bundles) {
+    if (b.GetSymbolicName() != "TestBundleA") continue;
+    auto headers = b.GetHeaders();
+    auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);
+    for (auto m : manifest)
+      // check to make sure that all the headers in the manifest are there
+    {
+      ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
+    }
+    break;
   }
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
@@ -255,6 +271,7 @@ TEST(BundleManifestTest, DirectManifestInstall)
 
 TEST(BundleManifestTest, DirectManifestInstallMulti)
 {
+#ifdef US_BUILD_SHARED_LIBS
   // Support the static linking case in which we have multiple bundles in one location that need to
   // be installed, so the "manifests" passed in contains a vector of bundle manifests, one for each
   // bundle at the location.
@@ -290,10 +307,12 @@ TEST(BundleManifestTest, DirectManifestInstallMulti)
   }
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
+#endif
 }
 
 TEST(BundleManifestTest, DirectManifestInstallAndStart)
 {
+#ifdef US_BUILD_SHARED_LIBS
   auto framework = FrameworkFactory().NewFramework();
   framework.Start();
   auto ctx = framework.GetBundleContext();
@@ -325,10 +344,12 @@ TEST(BundleManifestTest, DirectManifestInstallAndStart)
   
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
+#endif
 }
 
 TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
 {
+#ifdef US_BUILD_SHARED_LIBS
   namespace cppms = cppmicroservices;
   namespace sc = std::chrono;
   using ucimap = cppms::AnyMap::unordered_any_cimap;
@@ -373,11 +394,13 @@ TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
   
   framework.Stop();
   framework.WaitForStop(sc::milliseconds::zero());
+#endif
 }
 
 
 TEST(BundleManifestTest, IgnoreSecondManifestInstall)
 {
+#ifdef US_BUILD_SHARED_LIBS
   namespace cppms = cppmicroservices;
   using cppms::AnyMap;
   using cppms::any_map;
@@ -413,4 +436,5 @@ TEST(BundleManifestTest, IgnoreSecondManifestInstall)
   
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
+#endif
 }

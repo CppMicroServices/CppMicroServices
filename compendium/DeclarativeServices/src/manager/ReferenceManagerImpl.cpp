@@ -222,7 +222,7 @@ cppmicroservices::ListenerTokenId ReferenceManagerBaseImpl::RegisterListener(std
   auto notifySatisfied = UpdateBoundRefs();
   if(notifySatisfied)
   {
-    RefChangeNotification notification { metadata.name, RefEvent::BECAME_SATISFIED, ServiceReference<void>() };
+    RefChangeNotification notification { metadata.name, RefEvent::BECAME_SATISFIED };
     notify(notification);
   }
 

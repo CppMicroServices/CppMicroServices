@@ -60,16 +60,14 @@ ReferenceManagerBaseImpl::BindingPolicy::RemoveService(
   if (ShouldClearBoundRefs(reference)) {
     Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
     RefChangeNotification notification{ mgr.metadata.name,
-                                        RefEvent::BECAME_UNSATISFIED,
-                                        reference };
+                                        RefEvent::BECAME_UNSATISFIED };
     notifications.push_back(std::move(notification));
 
     ClearBoundRefs();
     if (mgr.UpdateBoundRefs()) {
       Log("Notify SATISFIED for reference " + mgr.metadata.name);
       RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::BECAME_SATISFIED,
-                                          reference };
+                                          RefEvent::BECAME_SATISFIED };
       notifications.push_back(std::move(notification));
     }
   }

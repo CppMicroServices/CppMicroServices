@@ -103,7 +103,7 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
                                                                                               , const std::string& location
                                                                                               , const ManifestT& bundleManifest
                                                                                               , std::vector<Bundle>& resultingBundles
-                                                                                              , std::unordered_set<std::string>& alreadyInstalled)
+                                                                                              , std::vector<std::string>& alreadyInstalled)
 {
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
@@ -113,7 +113,7 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
 
   while (foundBundles.first != foundBundles.second) {
     auto installedBundlePrivate = foundBundles.first->second;
-    alreadyInstalled.insert(installedBundlePrivate->symbolicName);
+    alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
     auto actualBundle = coreCtx->bundleHooks.FilterBundle(MakeBundleContext(installedBundlePrivate->bundleContext.Load())
                                                           , MakeBundle(installedBundlePrivate));
     if (actualBundle) {
@@ -179,7 +179,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
     l.UnLock();
 
     std::vector<Bundle> resultingBundles;
-    std::unordered_set<std::string> alreadyInstalled;
+    std::vector<std::string> alreadyInstalled;
     // Populate the res and alreadyInstalled vectors with the appropriate data
     // based on what bundles are already installed
     auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange
@@ -260,7 +260,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       l.UnLock();
 
       std::vector<Bundle> resultingBundles;
-      std::unordered_set<std::string> alreadyInstalled;
+      std::vector<std::string> alreadyInstalled;
       auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange
                                                           , location
                                                           , bundleManifest
@@ -291,7 +291,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 
 std::vector<Bundle> BundleRegistry::Install0(const std::string& location
                                              , const std::shared_ptr<BundleResourceContainer>& resCont
-                                             , const std::unordered_set<std::string>& exclude
+                                             , const std::vector<std::string>& alreadyInstalled
                                              , BundlePrivate* /*caller*/
                                              , const ManifestT& bundleManifest)
 {
@@ -302,6 +302,7 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
   
   std::vector<Bundle> res;
   std::vector<std::shared_ptr<BundleArchive>> barchives;
+  std::unordered_set<std::string> exclude { alreadyInstalled.begin(), alreadyInstalled.end() };
   try {
     // Create a BundleArchive for each entry in the resource container... that is, top level entries
     // (symbolic names) in the zip file for the bundle at 'location'.

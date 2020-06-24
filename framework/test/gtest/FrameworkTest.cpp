@@ -602,8 +602,8 @@ TEST(FrameworkTest, Events)
   f.Start();
 
   auto fmc = f.GetBundleContext();
-  fmc.AddBundleListener(std::bind(
-    &TestBundleListener::BundleChanged, &listener, std::placeholders::_1));
+  fmc.AddBundleListener(std::bind(&TestBundleListener::BundleChanged, &listener, std::placeholders::_1));
+
 #ifdef US_BUILD_SHARED_LIBS
   auto install = [&pEvts, &fmc](const std::string& libName) {
     auto bundle = cppmicroservices::testing::InstallLib(fmc, libName);

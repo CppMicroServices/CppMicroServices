@@ -77,7 +77,7 @@ public:
   
   std::vector<Bundle> Install0(const std::string& location
                                , const std::shared_ptr<BundleResourceContainer>& resCont
-                               , const std::unordered_set<std::string>& exclude
+                               , const std::vector<std::string>& alreadyInstalled
                                , BundlePrivate* caller
                                , const ManifestT& bundleManifest);
 
@@ -154,7 +154,7 @@ private:
                                                                                 , const std::string& location
                                                                                 , const ManifestT& bundleManifest
                                                                                 , std::vector<Bundle>& res
-                                                                                , std::unordered_set<std::string>& alreadyInstalled);
+                                                                                , std::vector<std::string>& alreadyInstalled);
 
   void DecrementInitialBundleMapRef(
     cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,

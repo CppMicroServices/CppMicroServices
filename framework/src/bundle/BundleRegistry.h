@@ -142,7 +142,7 @@ public:
   void Load();
 
 private:
-  using BundleMap = std::unordered_multimap<std::string, std::shared_ptr<BundlePrivate>>;
+  using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
 
   // don't allow copying the BundleRegistry.
   BundleRegistry(const BundleRegistry&) = delete;

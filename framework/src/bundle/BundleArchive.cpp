@@ -33,6 +33,8 @@
 #include "BundleManifest.h"
 #include "BundleStorage.h"
 
+#include "Utils.h"
+
 namespace cppmicroservices {
 
 namespace {
@@ -40,26 +42,7 @@ namespace {
 int64_t now()
 {
   namespace sc = std::chrono;
-  return sc::duration_cast<sc::milliseconds>(sc::steady_clock::now()
-                                             .time_since_epoch()).count();
-}
-
-bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer)
-{
-  auto topLevelDirs = resContainer->GetTopLevelDirs();
-  for (auto const& dir : topLevelDirs) {
-    std::vector<std::string> names;
-    std::vector<uint32_t> indices;
-    resContainer->GetChildren(dir + "/", true, names, indices);
-    for (auto const& name : names) {
-      // If we find any entry OTHER THAN "manifest.json", the top level entries contain something
-      // other than the manifest, so return false.
-      if (name != std::string("manifest.json"))
-        return false;
-    }
-  }
-  // Didn't find anything else, so return true.
-  return true;
+  return sc::duration_cast<sc::milliseconds>(sc::steady_clock::now().time_since_epoch()).count();
 }
 
 }

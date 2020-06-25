@@ -229,7 +229,7 @@ struct TestBundleAService
 
 TEST(BundleManifestTest, DirectManifestInstall)
 {
-  
+#ifdef US_BUILD_SHARED_LIBS
   auto framework = FrameworkFactory().NewFramework();
   framework.Start();
   auto ctx = framework.GetBundleContext();
@@ -241,19 +241,10 @@ TEST(BundleManifestTest, DirectManifestInstall)
   };
   manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
-#ifdef US_BUILD_SHARED_LIBS
   auto libPath = fullLibPath("TestBundleA");
-#else
-  auto libPath = cppmicroservices::testing::BIN_PATH
-                 + cppmicroservices::util::DIR_SEP
-                 + "usFrameworkTests"
-                 ;
-#endif
   auto const& bundles = ctx.InstallBundles(libPath, manifests);
-#ifdef US_BUILD_SHARED_LIBS
   // If it's a static build, bundles contains all bundles in the executable.
   ASSERT_EQ(1, bundles.size());
-#endif
   for (auto b : bundles) {
     if (b.GetSymbolicName() != "TestBundleA") continue;
     auto headers = b.GetHeaders();
@@ -267,6 +258,7 @@ TEST(BundleManifestTest, DirectManifestInstall)
   }
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
+#endif
 }
 
 TEST(BundleManifestTest, DirectManifestInstallMulti)

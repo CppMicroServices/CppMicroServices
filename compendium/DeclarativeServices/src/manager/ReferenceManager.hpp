@@ -53,6 +53,14 @@ enum class RefEvent
  */
 struct RefChangeNotification
 {
+  RefChangeNotification(std::string name,
+                        const RefEvent evt = RefEvent::BECAME_SATISFIED,
+                        const ServiceReference<void> svcRef = ServiceReference<void>())
+    : senderName(std::move(name))
+    , event(evt)
+    , serviceRef(svcRef)
+  {}
+
   std::string senderName;
   RefEvent event = RefEvent::BECAME_SATISFIED;
   ServiceReference<void> serviceRef = ServiceReference<void>();

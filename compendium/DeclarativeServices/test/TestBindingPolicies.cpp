@@ -93,6 +93,13 @@ struct Policy
   const char* policy;
   const char* policyOption;
   std::type_index policyType;
+
+  friend std::ostream& operator<<(std::ostream& os, const Policy& obj)
+  {
+    return os << "Policy: " << obj.policy << "\n"
+              << "Policy option: " << obj.policyOption << "\n"
+              << "Policy type: " << obj.policyType.name() << "\n";
+  }
 };
 
 class BindingPolicyTest : public ::testing::TestWithParam<Policy>
@@ -126,6 +133,20 @@ struct DynamicRefPolicy
   const char* implClassName;
   bool optional;
   InterfaceMapConstPtr interfaceMap;
+
+  friend std::ostream& operator<<(std::ostream& os, const DynamicRefPolicy& obj)
+  {
+    return os << "Test Bundle Filename: " << obj.bundleFileName << "\n"
+              << "Expected Verification Message: " << obj.verificationMessage
+              << "\n"
+              << "Expected Verification Message after unregistering a "
+                 "service: "
+              << obj.verificationMessageAfterUnregister << "\n"
+              << "Service implementation class name: " << obj.implClassName
+              << "\n"
+              << "Is the reference optional?: "
+              << ((obj.optional) ? "Yes" : "No") << "\n";
+  }
 };
 
 class DynamicRefPolicyTest : public ::testing::TestWithParam<DynamicRefPolicy>

@@ -824,5 +824,47 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
   testBundle.Stop();
 }
 
+// 
+TEST_F(BindingPolicyTest, TestConcurrentBindUnbind)
+{
+  auto bc = GetFramework().GetBundleContext();
+  test::InstallAndStartDS(bc);
+
+  auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSDRMU");
+  EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
+    << "Service must not be available before it's dependency";
+
+  auto dsRuntimeService = GetServiceComponentRuntime(bc);
+
+  std::function<bool()> func = [&bc]() -> bool {
+    // register the dependent service to trigger the bind
+    auto depSvcReg = bc.RegisterService<test::Interface1>(
+      std::make_shared<test::InterfaceImpl>(
+        "ServiceComponentDynamicReluctantMandatoryUnary Interface1"));
+
+    // registering a new service with a higher rank should not cause re-binding
+    auto higherRankedSvc = bc.RegisterService<test::Interface1>(
+      std::make_shared<test::InterfaceImpl>("higher ranked Interface1"),
+      { { Constants::SERVICE_RANKING, Any(10000) } });
+
+    // registering a new service with a lower rank should NOT cause re-binding
+    auto lowerRankedSvc = bc.RegisterService<test::Interface1>(
+      std::make_shared<test::InterfaceImpl>("lower ranked Interface1"),
+      { { Constants::SERVICE_RANKING, Any(1) } });
+
+    depSvcReg.Unregister();
+    higherRankedSvc.Unregister();
+    lowerRankedSvc.Unregister();
+    return true;
+  };
+
+  auto results = ConcurrentInvoke(func);
+  EXPECT_TRUE(!results.empty());
+  EXPECT_TRUE(std::all_of(
+    results.cbegin(), results.cend(), [](bool result) { return result; }));
+  testBundle.Stop();
+  
+}
+
 }
 }

@@ -37,6 +37,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include "manager/ComponentConfiguration.hpp"
+#include "manager/ConcurrencyUtil.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -214,7 +215,7 @@ private:
 
   std::weak_ptr<ComponentConfiguration> configManager;
   cppmicroservices::Bundle usingBundle;
-  std::unordered_map<std::string, std::vector<cppmicroservices::InterfaceMapConstPtr>> boundServicesCache;
+  mutable Guarded<std::unordered_map<std::string, std::vector<cppmicroservices::InterfaceMapConstPtr>>> boundServicesCache;
 };
 }
 }

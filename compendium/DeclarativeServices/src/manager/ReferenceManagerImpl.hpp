@@ -25,16 +25,18 @@
 
 #include <mutex>
 
-#include "gtest/gtest_prod.h"
+#include "ConcurrencyUtil.hpp"
+#include "ReferenceManager.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
-#include "ReferenceManager.hpp"
-#include "ConcurrencyUtil.hpp"
+#include "gtest/gtest_prod.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-using RefMgrListenerMap = std::unordered_map<cppmicroservices::ListenerTokenId, std::function<void(const RefChangeNotification&)>>;
+using RefMgrListenerMap =
+  std::unordered_map<cppmicroservices::ListenerTokenId,
+                     std::function<void(const RefChangeNotification&)>>;
 /**
  * This class is responsible for tracking a service reference (dependency)
  * and based on the policy criteria, notify the listener about the state
@@ -59,10 +61,11 @@ public:
    *
    * \throws \c std::runtime_error if \c bc or \c logger is invalid
    */
-  ReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
-                           , const cppmicroservices::BundleContext& bc
-                           , std::shared_ptr<cppmicroservices::logservice::LogService> logger
-                           , const std::string& configName);
+  ReferenceManagerBaseImpl(
+    const metadata::ReferenceMetadata& metadata,
+    const cppmicroservices::BundleContext& bc,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    const std::string& configName);
   ReferenceManagerBaseImpl(const ReferenceManagerBaseImpl&) = delete;
   ReferenceManagerBaseImpl(ReferenceManagerBaseImpl&&) = delete;
   ReferenceManagerBaseImpl& operator=(const ReferenceManagerBaseImpl&) = delete;
@@ -93,13 +96,15 @@ public:
    * Returns a set containing all {@link ServiceReferenceBase} objects that are
    * bound when the dependency criteria is satisfied
    */
-  std::set<cppmicroservices::ServiceReferenceBase> GetBoundReferences() const override;
+  std::set<cppmicroservices::ServiceReferenceBase> GetBoundReferences()
+    const override;
 
   /**
    * Returns a set containing all {@link ServiceReferenceBase} objects that match
    * the dependency criteria
    */
-  std::set<cppmicroservices::ServiceReferenceBase> GetTargetReferences() const override;
+  std::set<cppmicroservices::ServiceReferenceBase> GetTargetReferences()
+    const override;
 
   /**
    * Returns true if the cardinality for this reference is "optional"
@@ -119,27 +124,31 @@ public:
    * \return A dummy object is returned from this method to the framework inorder to
    * receive the #RemovedService callback.
    */
-  cppmicroservices::InterfaceMapConstPtr AddingService(const cppmicroservices::ServiceReferenceU& reference) override;
+  cppmicroservices::InterfaceMapConstPtr AddingService(
+    const cppmicroservices::ServiceReferenceU& reference) override;
 
   /**
    * Implementation of the {@link ServiceTrackerCustomizer#ModifiedService} method.
    * No-op at this time
    */
-  void ModifiedService(const cppmicroservices::ServiceReferenceU& reference,
-                       const cppmicroservices::InterfaceMapConstPtr& service) override;
+  void ModifiedService(
+    const cppmicroservices::ServiceReferenceU& reference,
+    const cppmicroservices::InterfaceMapConstPtr& service) override;
 
   /**
    * Implementation of the {@link ServiceTrackerCustomizer#RemovedService} method.
    * The matched references and bound references are updated based on the
    * reference policy criteria
    */
-  void RemovedService(const cppmicroservices::ServiceReferenceU& reference,
-                      const cppmicroservices::InterfaceMapConstPtr& service) override;
+  void RemovedService(
+    const cppmicroservices::ServiceReferenceU& reference,
+    const cppmicroservices::InterfaceMapConstPtr& service) override;
 
   /**
    * Method is used to receive callbacks when the dependency is satisfied
    */
-  cppmicroservices::ListenerTokenId RegisterListener(std::function<void(const RefChangeNotification&)> notify) override;
+  cppmicroservices::ListenerTokenId RegisterListener(
+    std::function<void(const RefChangeNotification&)> notify) override;
 
   /**
    * Method is used to remove the callbacks registered using RegisterListener
@@ -151,7 +160,6 @@ public:
    */
   void StopTracking() override;
 
-
   class BindingPolicy
   {
   public:
@@ -159,19 +167,25 @@ public:
     virtual void ServiceRemoved(const ServiceReferenceBase& reference) = 0;
 
     virtual ~BindingPolicy() = default;
+
   protected:
     // Some utility code to ensure we don't DRY too much in the subclasses. Code is
     // common code that was pulled up from the subclasses.
-    void Log(std::string&& logStr, cppmicroservices::logservice::SeverityLevel logLevel = cppmicroservices::logservice::SeverityLevel::LOG_DEBUG);
+    void Log(std::string&& logStr,
+             cppmicroservices::logservice::SeverityLevel logLevel =
+               cppmicroservices::logservice::SeverityLevel::LOG_DEBUG);
     bool ShouldClearBoundRefs(const ServiceReferenceBase& reference);
     bool ShouldNotifySatisfied();
     void ClearBoundRefs();
-    std::vector<RefChangeNotification> RemoveService(const ServiceReferenceBase& reference);
-    
-    explicit BindingPolicy(ReferenceManagerBaseImpl& parent) : mgr(parent) {}
+    void StaticRemoveService(const ServiceReferenceBase& reference);
+    void DynamicRemoveService(const ServiceReferenceBase& reference);
+
+    explicit BindingPolicy(ReferenceManagerBaseImpl& parent)
+      : mgr(parent)
+    {}
 
     ReferenceManagerBaseImpl& mgr;
-    
+
     BindingPolicy() = delete;
     BindingPolicy(const BindingPolicy&) = delete;
     BindingPolicy(BindingPolicy&&) = delete;
@@ -179,59 +193,62 @@ public:
     BindingPolicy& operator=(BindingPolicy&&) = delete;
   };
 
-
-  class BindingPolicyDynamicGreedy
-    : public BindingPolicy
+  class BindingPolicyDynamicGreedy : public BindingPolicy
   {
   public:
-    BindingPolicyDynamicGreedy(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
-    void ServiceAdded(const ServiceReferenceBase& reference) override;
-    void ServiceRemoved(const ServiceReferenceBase& reference) override;
-
-  };
-
-  class BindingPolicyDynamicReluctant
-    : public BindingPolicy
-  {
-  public:
-    BindingPolicyDynamicReluctant(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    BindingPolicyDynamicGreedy(ReferenceManagerBaseImpl& parent)
+      : BindingPolicy(parent)
+    {}
     void ServiceAdded(const ServiceReferenceBase& reference) override;
     void ServiceRemoved(const ServiceReferenceBase& reference) override;
   };
 
-  class BindingPolicyStaticGreedy
-    : public BindingPolicy
+  class BindingPolicyDynamicReluctant : public BindingPolicy
   {
   public:
-    BindingPolicyStaticGreedy(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    BindingPolicyDynamicReluctant(ReferenceManagerBaseImpl& parent)
+      : BindingPolicy(parent)
+    {}
     void ServiceAdded(const ServiceReferenceBase& reference) override;
     void ServiceRemoved(const ServiceReferenceBase& reference) override;
   };
 
-  class BindingPolicyStaticReluctant
-    : public BindingPolicy
+  class BindingPolicyStaticGreedy : public BindingPolicy
   {
   public:
-    BindingPolicyStaticReluctant(ReferenceManagerBaseImpl& parent) : BindingPolicy(parent) {}
+    BindingPolicyStaticGreedy(ReferenceManagerBaseImpl& parent)
+      : BindingPolicy(parent)
+    {}
     void ServiceAdded(const ServiceReferenceBase& reference) override;
     void ServiceRemoved(const ServiceReferenceBase& reference) override;
   };
 
+  class BindingPolicyStaticReluctant : public BindingPolicy
+  {
+  public:
+    BindingPolicyStaticReluctant(ReferenceManagerBaseImpl& parent)
+      : BindingPolicy(parent)
+    {}
+    void ServiceAdded(const ServiceReferenceBase& reference) override;
+    void ServiceRemoved(const ServiceReferenceBase& reference) override;
+  };
 
-  static std::unique_ptr<BindingPolicy> CreateBindingPolicy(ReferenceManagerBaseImpl& mgr
-                                                            , const std::string& policy
-                                                            , const std::string& policyOption);
-  
-  ReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
-                           , const cppmicroservices::BundleContext& bc
-                           , std::shared_ptr<cppmicroservices::logservice::LogService> logger
-                           , const std::string& configName
-                           , std::unique_ptr<BindingPolicy> policy);
-  
+  static std::unique_ptr<BindingPolicy> CreateBindingPolicy(
+    ReferenceManagerBaseImpl& mgr,
+    const std::string& policy,
+    const std::string& policyOption);
+
+  ReferenceManagerBaseImpl(
+    const metadata::ReferenceMetadata& metadata,
+    const cppmicroservices::BundleContext& bc,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    const std::string& configName,
+    std::unique_ptr<BindingPolicy> policy);
+
 private:
   friend class ReferenceManagerImplTest;
   friend class BindingPolicyTest;
-  
+
   static long GetServiceId(const ServiceReferenceBase& sRef);
 
   /**
@@ -246,40 +263,47 @@ private:
   /**
    * Method used to send notifications to all the listeners
    */
-  void BatchNotifyAllListeners(const std::vector<RefChangeNotification>& notification) noexcept;
+  void BatchNotifyAllListeners(
+    const std::vector<RefChangeNotification>& notification) noexcept;
 
-  const metadata::ReferenceMetadata metadata; ///< reference information from the component description
-  std::unique_ptr<ServiceTracker<void>> tracker; ///< used to track service availability
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger for this runtime
-  const std::string configName; ///< Keep track of which component configuration object this reference manager belongs to.
+  const metadata::ReferenceMetadata
+    metadata; ///< reference information from the component description
+  std::unique_ptr<ServiceTracker<void>>
+    tracker; ///< used to track service availability
+  std::shared_ptr<cppmicroservices::logservice::LogService>
+    logger; ///< logger for this runtime
+  const std::string
+    configName; ///< Keep track of which component configuration object this reference manager belongs to.
 
-  mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>> boundRefs; ///< guarded set of bound references
-  mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>> matchedRefs; ///< guarded set of matched references
+  mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
+    boundRefs; ///< guarded set of bound references
+  mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
+    matchedRefs; ///< guarded set of matched references
 
   mutable Guarded<RefMgrListenerMap> listenersMap; ///< guarded map of listeners
-  static std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
-                                                                      ///generate unique
-                                                                      ///tokens for
-                                                                      ///listeners
+  static std::atomic<cppmicroservices::ListenerTokenId>
+    tokenCounter; ///< used to
+                  ///generate unique
+                  ///tokens for
+                  ///listeners
 
   std::unique_ptr<BindingPolicy> bindingPolicy;
 };
 
 /**
  */
-class ReferenceManagerImpl final
-  : public ReferenceManagerBaseImpl
+class ReferenceManagerImpl final : public ReferenceManagerBaseImpl
 {
 public:
-  ReferenceManagerImpl(const metadata::ReferenceMetadata& metadata
-                       , const cppmicroservices::BundleContext& bc
-                       , std::shared_ptr<cppmicroservices::logservice::LogService> logger
-                       , const std::string& configName)
+  ReferenceManagerImpl(
+    const metadata::ReferenceMetadata& metadata,
+    const cppmicroservices::BundleContext& bc,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    const std::string& configName)
     : ReferenceManagerBaseImpl(metadata, bc, logger, configName)
-  {
-  }
+  {}
 };
-  
-}}
-#endif // __REFERENCEMANAGERIMPL_HPP__
 
+}
+}
+#endif // __REFERENCEMANAGERIMPL_HPP__

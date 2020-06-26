@@ -96,62 +96,7 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(
 void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceRemoved(
   const ServiceReferenceBase& reference)
 {
-  // OSGi Compendium Release 7 section 112.5.12 Bound Service Replacement
-  //  If an active component configuration has a dynamic reference with unary
-  //  cardinality and the bound service is modified or unregistered and ceases
-  //  to be a target service, or the policy-option is greedy and a better
-  //  target service becomes available then SCR must attempt to replace the
-  //  bound service with a new bound service.
-  auto removeBoundRef = false;
-  std::vector<RefChangeNotification> notifications;
-
-  { // acquire lock on boundRefs
-    auto boundRefsHandle = mgr.boundRefs.lock();
-    auto itr = boundRefsHandle->find(reference);
-    removeBoundRef = (itr != boundRefsHandle->end());
-  } // end lock on boundRefs
-
-  if (removeBoundRef) {
-    ClearBoundRefs();
-
-    auto notifyRebind = mgr.UpdateBoundRefs();
-
-    if (notifyRebind) {
-      // The bind notification must happen before the unbind notification
-      // to eliminate any gaps between unbinding the current bound target service
-      // and binding to the new bound target service.
-      bool needRebind = false;
-      ServiceReference<void> svcRefToBind;
-      {
-        auto boundRefsHandle =
-          mgr.boundRefs.lock(); // acquires lock on boundRefs
-        if (0 < boundRefsHandle->size()) {
-          svcRefToBind = *(boundRefsHandle->begin());
-          needRebind = true;
-        }
-      }
-
-      if (needRebind) {
-        Log("Notify BIND for reference " + mgr.metadata.name);
-        RefChangeNotification notification{ mgr.metadata.name,
-                                            RefEvent::BIND,
-                                            svcRefToBind };
-        notifications.push_back(std::move(notification));
-      }
-
-      Log("Notify UNBIND for reference " + mgr.metadata.name);
-      RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::UNBIND,
-                                          reference };
-      notifications.push_back(std::move(notification));
-    } else if (!mgr.IsSatisfied()) {
-      Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-      RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::BECAME_UNSATISFIED };
-      notifications.push_back(std::move(notification));
-    }
-    mgr.BatchNotifyAllListeners(notifications);
-  }
+  DynamicRemoveService(reference);
 }
 
 }

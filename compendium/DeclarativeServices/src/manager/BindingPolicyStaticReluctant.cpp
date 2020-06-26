@@ -54,7 +54,7 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(
 void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceRemoved(
   const ServiceReferenceBase& reference)
 {
-  mgr.BatchNotifyAllListeners(RemoveService(reference));
+  StaticRemoveService(reference);
 }
 
 }

@@ -97,7 +97,7 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
 void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceRemoved(
   const ServiceReferenceBase& reference)
 {
-  mgr.BatchNotifyAllListeners(RemoveService(reference));
+  StaticRemoveService(reference);
 }
 
 }

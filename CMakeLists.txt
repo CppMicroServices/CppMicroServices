@@ -33,7 +33,7 @@ endforeach()
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
 # source files in C mode. Because we mix C and C++ code in the test driver

@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <vector>
 #include <memory>
+#include <random>
 #include "gmock/gmock.h"
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkFactory.h>
@@ -47,7 +48,9 @@ std::string GenRandomString()
 {
   static const std::string name("com::servicecomponentimpl.testcompname");
   std::string tempName = name;
-  std::random_shuffle(tempName.begin(), tempName.end());
+  std::random_device rd;
+  std::mt19937 g(rd());
+  std::shuffle(tempName.begin(), tempName.end(), g);
   return tempName;
 }
 

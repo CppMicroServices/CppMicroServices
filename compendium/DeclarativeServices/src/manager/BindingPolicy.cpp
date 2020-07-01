@@ -101,28 +101,20 @@ void ReferenceManagerBaseImpl::BindingPolicy::DynamicRemoveService(
       // The bind notification must happen before the unbind notification
       // to eliminate any gaps between unbinding the current bound target service
       // and binding to the new bound target service.
-      bool needRebind = false;
       ServiceReference<void> svcRefToBind;
       {
         auto boundRefsHandle =
           mgr.boundRefs.lock(); // acquires lock on boundRefs
         if (!boundRefsHandle->empty()) {
           svcRefToBind = *(boundRefsHandle->begin());
-          needRebind = true;
+          Log("Notify BIND for reference " + mgr.metadata.name);
         }
-      }
-
-      if (needRebind) {
-        Log("Notify BIND for reference " + mgr.metadata.name);
-        RefChangeNotification notification{ mgr.metadata.name,
-                                            RefEvent::BIND,
-                                            svcRefToBind };
-        notifications.push_back(std::move(notification));
       }
 
       Log("Notify UNBIND for reference " + mgr.metadata.name);
       RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::UNBIND,
+                                          RefEvent::REBIND,
+                                          svcRefToBind,
                                           reference };
       notifications.push_back(std::move(notification));
     }

@@ -28,6 +28,7 @@
 #include <memory>
 #include <future>
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/ServiceReference.h"
 
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
@@ -74,6 +75,21 @@ public:
    * \param mgr is the {@link ComponentConfigurationImpl} object whose state needs to change
    */
   virtual void Deactivate(ComponentConfigurationImpl& mgr) = 0;
+
+  /**
+   * Implementation must handle dynamic rebinding in any state.
+   *
+   * \param mgr is the {@link ComponentConfigurationImpl} object whose state needs to change
+   * \param refName is the name of the reference as defined in the SCR JSON
+   * \param svcRefToBind is the service reference to the target service to bind. A default
+   *  constructed \c ServiceReference<void> denotes that there is no service to bind.
+   * \param svcRefToUnbind is the service reference to the target service to unbind.
+   *  A default constructed \c ServiceReference<void> denotes that there is no service to unbind.
+   */
+  virtual void Rebind(ComponentConfigurationImpl& mgr,
+                      const std::string& refName,
+                      const ServiceReference<void>& svcRefToBind,
+                      const ServiceReference<void>& svcRefToUnbind) = 0;
 
   /**
    * Returns the state as a {@link ComponentState} enum value

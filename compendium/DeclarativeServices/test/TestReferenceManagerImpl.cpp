@@ -41,7 +41,15 @@ using cppmicroservices::service::component::ComponentConstants::
 
 namespace cppmicroservices {
 namespace scrimpl {
-// The fixture for testing class ReferenceManagerImpl.
+
+const std::string ReferencePolicy_Static = "static";
+const std::string ReferencePolicy_Dynamic = "dynamic";
+const std::string ReferencePolicyOption_Reluctant = "reluctant";
+const std::string ReferencePolicyOption_Greedy = "greedy";
+const std::string ReferenceCardinality_OptionalUnary = "0..1";
+const std::string ReferenceCardinality_OptionalMultiple = "0..n";
+const std::string ReferenceCardinality_MandatoryUnary = "1..1";
+const std::string ReferenceCardinality_MandatoryMultiple = "1..n";
 
 const std::string FakeComponentConfigName = "foobar";
 
@@ -62,6 +70,7 @@ std::ostream& operator<<(std::ostream& os, const ReferenceMetadata& data)
 
 }
 
+// The fixture for testing class ReferenceManagerImpl.
 class ReferenceManagerImplTest
   : public ::testing::TestWithParam<metadata::ReferenceMetadata>
 {
@@ -99,13 +108,13 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(
   fakeMetadata.policyOption = policyOption;
   fakeMetadata.cardinality = cardinality;
 
-  if (cardinality == "0..1") {
+  if (cardinality == ReferenceCardinality_OptionalUnary) {
     fakeMetadata.minCardinality = 0;
     fakeMetadata.maxCardinality = 1;
-  } else if (cardinality == "0..n") {
+  } else if (cardinality == ReferenceCardinality_OptionalMultiple) {
     fakeMetadata.minCardinality = 0;
     fakeMetadata.maxCardinality = std::numeric_limits<unsigned int>::max();
-  } else if (cardinality == "1..1") {
+  } else if (cardinality == ReferenceCardinality_MandatoryUnary) {
     fakeMetadata.minCardinality = 1;
     fakeMetadata.maxCardinality = 1;
   } else {
@@ -118,14 +127,31 @@ metadata::ReferenceMetadata CreateFakeReferenceMetadata(
 INSTANTIATE_TEST_SUITE_P(
   ReferenceManagerParameterized,
   ReferenceManagerImplTest,
-  testing::Values(CreateFakeReferenceMetadata("static", "reluctant", "0..1"),
-                  CreateFakeReferenceMetadata("static", "reluctant", "1..1"),
-                  CreateFakeReferenceMetadata("static", "greedy", "0..1"),
-                  CreateFakeReferenceMetadata("static", "greedy", "1..1"),
-                  CreateFakeReferenceMetadata("dynamic", "reluctant", "0..1"),
-                  CreateFakeReferenceMetadata("dynamic", "reluctant", "1..1"),
-                  CreateFakeReferenceMetadata("dynamic", "greedy", "0..1"),
-                  CreateFakeReferenceMetadata("dynamic", "greedy", "1..1")));
+  testing::Values(
+    CreateFakeReferenceMetadata(ReferencePolicy_Static,
+                                ReferencePolicyOption_Reluctant,
+                                ReferenceCardinality_OptionalUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Static,
+                                ReferencePolicyOption_Reluctant,
+                                ReferenceCardinality_MandatoryUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Static,
+                                ReferencePolicyOption_Greedy,
+                                ReferenceCardinality_OptionalUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Static,
+                                ReferencePolicyOption_Greedy,
+                                ReferenceCardinality_MandatoryUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Dynamic,
+                                ReferencePolicyOption_Reluctant,
+                                ReferenceCardinality_OptionalUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Dynamic,
+                                ReferencePolicyOption_Reluctant,
+                                ReferenceCardinality_MandatoryUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Dynamic,
+                                ReferencePolicyOption_Greedy,
+                                ReferenceCardinality_OptionalUnary),
+    CreateFakeReferenceMetadata(ReferencePolicy_Dynamic,
+                                ReferencePolicyOption_Greedy,
+                                ReferenceCardinality_MandatoryUnary)));
 
 TEST_P(ReferenceManagerImplTest, TestConstructor)
 {
@@ -227,11 +253,13 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
           case RefEvent::BECAME_UNSATISFIED:
             unsatisfiedNotificationCount++;
             break;
-          case RefEvent::BIND:
-            bindNotificationCount++;
-            break;
-          case RefEvent::UNBIND:
-            unbindNotificationCount++;
+          case RefEvent::REBIND:
+            if (notification.serviceRefToBind) {
+              bindNotificationCount++;
+            }
+            if (notification.serviceRefToUnbind) {
+              unbindNotificationCount++;
+            }
             break;
           default:
             break;
@@ -258,24 +286,25 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     EXPECT_EQ(refManager.IsSatisfied(), true);
     EXPECT_EQ(unsatisfiedNotificationCount,
               refManager.IsOptional() &&
-                  (fakeMetadata.policyOption == "greedy") &&
-                  !("dynamic" == fakeMetadata.policy)
+                  (ReferencePolicyOption_Greedy == fakeMetadata.policyOption) &&
+                  !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                 ? 1
                 : 0)
       << "UNSATISFIED notification expected only for static-optional-greedy";
-    EXPECT_EQ(
-      satisfiedNotificationCount,
-      (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ||
-          (refManager.IsOptional() && ("dynamic" == fakeMetadata.policy))
-        ? 0
-        : 1)
+    EXPECT_EQ(satisfiedNotificationCount,
+              (refManager.IsOptional() &&
+               ReferencePolicyOption_Reluctant == fakeMetadata.policyOption) ||
+                  (refManager.IsOptional() &&
+                   (ReferencePolicy_Dynamic == fakeMetadata.policy))
+                ? 0
+                : 1)
       << "SATISFIED notification expected except for static-optional-reluctant";
 
-    if ("dynamic" == fakeMetadata.policy) {
-        // the bind notification is sent only if the service component is already active
-        // e.g. when the service ref was already satisfied because it's optional 
+    if (ReferencePolicy_Dynamic == fakeMetadata.policy) {
+      // the bind notification is sent only if the service component is already active
+      // e.g. when the service ref was already satisfied because it's optional
       EXPECT_EQ(bindNotificationCount, refManager.IsOptional() ? 1 : 0)
-          << "Incorrect number of bind notifications sent";
+        << "Incorrect number of bind notifications sent";
     }
     resetCounters();
 
@@ -297,7 +326,7 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     EXPECT_EQ(unsatisfiedNotificationCount, 0)
       << "no notification expected since the service registered has the same "
          "rank";
-    if ("dynamic" == fakeMetadata.policy) {
+    if (ReferencePolicy_Dynamic == fakeMetadata.policy) {
       EXPECT_EQ(bindNotificationCount, 0);
       EXPECT_EQ(unbindNotificationCount, 0);
     }
@@ -317,23 +346,25 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
       { { Constants::SERVICE_RANKING, Any(10) } });
     EXPECT_EQ(refManager.IsSatisfied(), true);
     EXPECT_EQ(unsatisfiedNotificationCount,
-              fakeMetadata.policyOption == "greedy" &&
-                  !("dynamic" == fakeMetadata.policy)
+              ReferencePolicyOption_Greedy == fakeMetadata.policyOption &&
+                  !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                 ? 1
                 : 0)
       << "UNSATISFIED notification must be sent only for static-greedy policy";
     EXPECT_EQ(satisfiedNotificationCount,
-              fakeMetadata.policyOption == "greedy" &&
-                  !("dynamic" == fakeMetadata.policy)
+              ReferencePolicyOption_Greedy == fakeMetadata.policyOption &&
+                  !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                 ? 1
                 : 0)
       << "SATISFIED notification must be sent only for static-greedy policy";
 
-    if ("dynamic" == fakeMetadata.policy) {
+    if (ReferencePolicy_Dynamic == fakeMetadata.policy) {
       EXPECT_EQ(bindNotificationCount,
-                "greedy" == fakeMetadata.policyOption ? 1 : 0);
+                ReferencePolicyOption_Greedy == fakeMetadata.policyOption ? 1
+                                                                          : 0);
       EXPECT_EQ(unbindNotificationCount,
-                "greedy" == fakeMetadata.policyOption ? 1 : 0);
+                ReferencePolicyOption_Greedy == fakeMetadata.policyOption ? 1
+                                                                          : 0);
     }
     resetCounters();
 
@@ -348,27 +379,31 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, dynamic-greedy - not bound so no change
     reg.Unregister();
     EXPECT_EQ(unsatisfiedNotificationCount,
-              fakeMetadata.cardinality == "1..1" &&
-                  fakeMetadata.policyOption == "reluctant" &&
-                  !(fakeMetadata.policy == "dynamic")
+              ReferenceCardinality_MandatoryUnary == fakeMetadata.cardinality &&
+                  ReferencePolicyOption_Reluctant ==
+                    fakeMetadata.policyOption &&
+                  !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                 ? 1
                 : 0)
       << "UNSATISFIED notification must be sent only for "
          "mandatory-unary-static-reluctant";
     EXPECT_EQ(satisfiedNotificationCount,
-              fakeMetadata.cardinality == "1..1" &&
-                  fakeMetadata.policyOption == "reluctant" &&
-                  !(fakeMetadata.policy == "dynamic")
+              ReferenceCardinality_MandatoryUnary == fakeMetadata.cardinality &&
+                  ReferencePolicyOption_Reluctant ==
+                    fakeMetadata.policyOption &&
+                  !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                 ? 1
                 : 0)
       << "SATISFIED notification must be sent only for "
          "mandatory-unary-static-reluctant";
 
-    if ("dynamic" == fakeMetadata.policy) {
-      EXPECT_EQ(bindNotificationCount,
-                "reluctant" == fakeMetadata.policyOption ? 1 : 0);
-      EXPECT_EQ(unbindNotificationCount,
-                "reluctant" == fakeMetadata.policyOption ? 1 : 0);
+    if (ReferencePolicy_Dynamic == fakeMetadata.policy) {
+      EXPECT_EQ(
+        bindNotificationCount,
+        ReferencePolicyOption_Reluctant == fakeMetadata.policyOption ? 1 : 0);
+      EXPECT_EQ(
+        unbindNotificationCount,
+        ReferencePolicyOption_Reluctant == fakeMetadata.policyOption ? 1 : 0);
     }
     resetCounters();
 
@@ -386,7 +421,7 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
       << "No changes in bindings so no SATISFIED notification expected";
     EXPECT_EQ(unsatisfiedNotificationCount, 0)
       << "No changes in bindings so no UNSATISFIED notification expected";
-    if ("dynamic" == fakeMetadata.policy) {
+    if (ReferencePolicy_Dynamic == fakeMetadata.policy) {
       EXPECT_EQ(bindNotificationCount, 0);
       EXPECT_EQ(unbindNotificationCount, 0);
     }
@@ -402,25 +437,27 @@ TEST_P(ReferenceManagerImplTest, TestListenerCallbacks)
     // mandatory, dynamic-reluctant - expect callback with UNSATISFIED
     // mandatory, dynamic-greedy - expect callback with UNSATISFIED
     reg2.Unregister();
-    EXPECT_EQ(
-      unsatisfiedNotificationCount,
-      (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant") ||
-        (refManager.IsOptional() && fakeMetadata.policy == "dynamic") ? 0
-                                                                          : 1)
+    EXPECT_EQ(unsatisfiedNotificationCount,
+              (refManager.IsOptional() &&
+               ReferencePolicyOption_Reluctant == fakeMetadata.policyOption) ||
+                  (refManager.IsOptional() &&
+                   ReferencePolicy_Dynamic == fakeMetadata.policy)
+                ? 0
+                : 1)
       << "UNSATISFIED notification must be sent except for "
          "optional-static-reluctant";
-    EXPECT_EQ(
-      satisfiedNotificationCount,
+    EXPECT_EQ(satisfiedNotificationCount,
               refManager.IsOptional() &&
-                    fakeMetadata.policyOption == "greedy" &&
-                  !(fakeMetadata.policy == "dynamic")
+                  ReferencePolicyOption_Greedy == fakeMetadata.policyOption &&
+                  !(ReferencePolicy_Dynamic == fakeMetadata.policy)
                 ? 1
                 : 0)
       << "SATISFIED notification must be sent only for optional-static-greedy";
-    
-    if ("dynamic" == fakeMetadata.policy) {
+
+    if (ReferencePolicy_Dynamic == fakeMetadata.policy) {
       EXPECT_EQ(bindNotificationCount, 0)
-        << "No bind notifications are expected when there is nothing to bind to";
+        << "No bind notifications are expected when there is nothing to bind "
+           "to";
       EXPECT_EQ(unbindNotificationCount, refManager.IsOptional() ? 1 : 0)
         << "Mandatory service references move straight to UNSATISFIED without "
            "an unbind notification";
@@ -454,10 +491,12 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfied)
   EXPECT_TRUE(refManager.IsSatisfied())
     << "Reference Manager must be in satisfied state after concurrent service "
        "registrations";
-  EXPECT_EQ(
-    refManager.GetBoundReferences().size(),
-    (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant" && !("dynamic" == fakeMetadata.policy)) ? 0ul
-                                                                          : 1ul)
+  EXPECT_EQ(refManager.GetBoundReferences().size(),
+            (refManager.IsOptional() &&
+             fakeMetadata.policyOption == ReferencePolicyOption_Reluctant &&
+             !(ReferencePolicy_Dynamic == fakeMetadata.policy))
+              ? 0ul
+              : 1ul)
     << "A reference must be bound unless the cardinality is optional and "
        "binding policy is static";
   for (auto& reg : registrations) {
@@ -560,14 +599,17 @@ TEST_P(ReferenceManagerImplTest, TestConcurrentSatisfiedUnsatisfied)
   auto registeredServiceCount = registeredServiceRefs.size();
   // statuc-reluctant, mandatory-unary - depends on which thread's service was bound
   // static-reluctant, optional-unary - none of the services are bound
-  if (refManager.IsOptional() && fakeMetadata.policyOption == "reluctant" && !("dynamic" == fakeMetadata.policy)) {
+  if (refManager.IsOptional() &&
+      fakeMetadata.policyOption == ReferencePolicyOption_Reluctant &&
+      !(ReferencePolicy_Dynamic == fakeMetadata.policy)) {
     EXPECT_EQ(refManager.GetBoundReferences().size(), 0ul)
       << "No references must be bound for OPTIONAL cardinality with RELUCTANT "
          "policy";
   }
   // static-greedy, optional-unary - the service with the highest rank is bound
   // static-greedy, mandatory-unary - the service with the highest rank is bound
-  if (refManager.IsOptional() && fakeMetadata.policyOption == "greedy") {
+  if (refManager.IsOptional() &&
+      fakeMetadata.policyOption == ReferencePolicyOption_Greedy) {
     EXPECT_EQ(refManager.GetBoundReferences().size(),
               (registeredServiceCount ? 1ul : 0ul))
       << "If any services are available, bound services must not be zero";

@@ -72,6 +72,15 @@ public:
   };
 
   /**
+   * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op
+   */
+  void Rebind(ComponentConfigurationImpl&,
+              const std::string&,
+              const ServiceReference<void>&,
+              const ServiceReference<void>&) override
+  {}
+
+  /**
    * Returns {\code ComponentState::UNSATISFIED_REFERENCE} to indicate the
    * state represented by this object
    */

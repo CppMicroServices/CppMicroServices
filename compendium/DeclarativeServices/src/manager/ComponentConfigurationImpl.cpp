@@ -115,21 +115,21 @@ void ComponentConfigurationImpl::Initialize()
   }
 }
 
-void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& notification
-                                                )
+void ComponentConfigurationImpl::RefChangedState(
+  const RefChangeNotification& notification)
 {
-  switch(notification.event) {
+  switch (notification.event) {
     case RefEvent::BECAME_SATISFIED:
       RefSatisfied(notification);
       break;
     case RefEvent::BECAME_UNSATISFIED:
       RefUnsatisfied(notification);
       break;
-    case RefEvent::BIND:
-      BindReference(notification.senderName, notification.serviceRef);
-      break;
-    case RefEvent::UNBIND:
-      UnbindReference(notification.senderName, notification.serviceRef);
+    case RefEvent::REBIND:
+      GetState()->Rebind(*this,
+                         notification.senderName,
+                         notification.serviceRefToBind,
+                         notification.serviceRefToUnbind);
       break;
     default:
       break;

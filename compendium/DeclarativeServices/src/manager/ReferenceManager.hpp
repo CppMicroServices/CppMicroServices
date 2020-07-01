@@ -41,10 +41,8 @@ enum class RefEvent
                         become satisfied */
   BECAME_UNSATISFIED,/* used to notify the listener that the reference has
                         become unsatisfied */
-  BIND,              /* used to notify the listener that a service needs to
-                        be bound */
-  UNBIND,            /* used to notify the listener that a service needs to
-                        be unbound */
+  REBIND,            /* used to notify the listener that dynamic rebinding
+                        needs to happen */
 };
 
 /**
@@ -53,17 +51,21 @@ enum class RefEvent
  */
 struct RefChangeNotification
 {
-  RefChangeNotification(std::string name,
-                        const RefEvent evt = RefEvent::BECAME_SATISFIED,
-                        const ServiceReference<void> svcRef = ServiceReference<void>())
+  RefChangeNotification(
+    std::string name,
+    const RefEvent evt = RefEvent::BECAME_SATISFIED,
+    const ServiceReference<void> svcRefToBind = ServiceReference<void>(),
+    const ServiceReference<void> svcRefToUnbind = ServiceReference<void>())
     : senderName(std::move(name))
     , event(evt)
-    , serviceRef(svcRef)
+    , serviceRefToBind(svcRefToBind)
+    , serviceRefToUnbind(svcRefToUnbind)
   {}
 
   std::string senderName;
   RefEvent event = RefEvent::BECAME_SATISFIED;
-  ServiceReference<void> serviceRef = ServiceReference<void>();
+  ServiceReference<void> serviceRefToBind = ServiceReference<void>();
+  ServiceReference<void> serviceRefToUnbind = ServiceReference<void>();
 };
 
 /**

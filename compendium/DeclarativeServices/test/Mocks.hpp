@@ -190,6 +190,7 @@ public:
   MOCK_METHOD1(Register, void(ComponentConfigurationImpl&));
   MOCK_METHOD2(Activate, std::shared_ptr<ComponentInstance>(ComponentConfigurationImpl&, const cppmicroservices::Bundle&));
   MOCK_METHOD1(Deactivate, void(ComponentConfigurationImpl&));
+  MOCK_METHOD4(Rebind, void(ComponentConfigurationImpl&, const std::string&, const ServiceReference<void>&, const ServiceReference<void>&));
   MOCK_CONST_METHOD0(GetValue, ComponentState(void));
   MOCK_METHOD0(WaitForTransitionTask, void());
 };

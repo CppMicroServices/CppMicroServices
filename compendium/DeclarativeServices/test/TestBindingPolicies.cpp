@@ -358,7 +358,7 @@ TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
 // According to OSGi Compendium Release 7 Sections 112.5.10 and 112.5.18, if a
 // bind/unbind method throws the activate/deactivation of the component configuration
 // does not fail. This indicates that the service reference and service objects are
-// both valid and usable by clients.
+// both valid and usable by service consumers.
 //
 TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
 {
@@ -427,7 +427,8 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
 
 // test that:
 //  a new higher ranked service causes a re-bind
-//  a new lower ranked service does not cause a re-bind 
+//  a new lower ranked service does not cause a re-bind
+//  unregistering services causes correct re-binds
 TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
 {
   auto bc = GetFramework().GetBundleContext();
@@ -516,6 +517,7 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
 // test that:
 //  a new higher ranked service causes a re-bind
 //  a new lower ranked service does not cause a re-bind
+//  unregistering services causes correct re-binds
 TEST_F(BindingPolicyTest, TestDynamicGreedyOptionalUnaryReBind)
 {
   auto bc = GetFramework().GetBundleContext();
@@ -683,12 +685,6 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
-  // OSGi Compendium Release 7 section 112.5.12 Bound Service Replacement
-  //  If an active component configuration has a dynamic reference with unary 
-  //  cardinality and the bound service is modified or unregistered and ceases 
-  //  to be a target service, or the policy-option is greedy and a better 
-  //  target service becomes available then SCR must attempt to replace the 
-  //  bound service with a new bound service.
   // unregistering the bound service should cause a re-bind to the higher ranked service.
   depSvcReg.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -824,7 +820,8 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
   testBundle.Stop();
 }
 
-// 
+// test that concurrent service registrations and unregistrations
+// do not cause crashes.
 TEST_F(BindingPolicyTest, TestConcurrentBindUnbind)
 {
   auto bc = GetFramework().GetBundleContext();

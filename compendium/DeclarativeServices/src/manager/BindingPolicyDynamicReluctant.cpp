@@ -54,7 +54,7 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
       mgr.UpdateBoundRefs();
 
       RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::BIND,
+                                          RefEvent::REBIND,
                                           reference };
       notifications.push_back(std::move(notification));
     }
@@ -69,18 +69,6 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
   mgr.BatchNotifyAllListeners(notifications);
 }
 
-/**
- *  If the removed service is found in the #boundRefs
- *   clear the #boundRefs member
- *   copy #matchedRefs to #boundRefs
- *   If #matchedRefs is not empty
- *     send a BIND notification to listeners
- *     send an UNBIND notification to listeners
- *   else if the service reference is not optional
- *     send an UNSATISFIED notification to listeners
- *   endif
- * endif
- */
 void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(
   const ServiceReferenceBase& reference)
 {

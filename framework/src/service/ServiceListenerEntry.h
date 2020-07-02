@@ -66,6 +66,7 @@ public:
   void CallDelegate(const ServiceEvent& event) const;
 
   bool operator==(const ServiceListenerEntry& other) const;
+  bool operator<(const ServiceListenerEntry& other) const;
 
   bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
                 ListenerTokenId tokenId) const;

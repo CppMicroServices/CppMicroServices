@@ -143,10 +143,17 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->context == nullptr || other.d->context == nullptr) ||
-          d->context == other.d->context) &&
-         (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
-         ServiceListenerCompare()(d->listener, other.d->listener);
+  return (d->data == other.d->data)
+         && (d->tokenId == other.d->tokenId)
+         && ServiceListenerCompare()(d->listener, other.d->listener)
+         && ((d->context == nullptr
+              || other.d->context == nullptr)
+            || d->context == other.d->context);
+}
+
+bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const 
+{
+  return d->tokenId < other.d->tokenId;
 }
 
 bool ServiceListenerEntry::Contains(

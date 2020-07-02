@@ -265,3 +265,88 @@
    ...
    fun:main
 }
+
+{
+   <string-globals>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPKcEEvT_S8_St20forward_iterator_tag
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:__libc_csu_init
+   fun:(below main)
+}
+
+{
+   <general-globals>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:__libc_csu_init
+   fun:(below main)
+}
+
+{
+   <calloc-globals>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:__new_exitfn
+   fun:__internal_atexit
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:__libc_csu_init
+   fun:(below main)
+}
+
+{
+   <new-gtest-internal>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   ...
+   fun:_ZN7testing8internal23MakeAndRegisterTestInfoEPKcS2_S2_S2_NS0_12CodeLocationEPKvPFvvES7_PNS0_15TestFactoryBaseE
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+}
+
+{
+   <malloc-gtest-internal>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   ...
+}
+
+{
+   <realloc-gtest-internal>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   ...
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing13ContainsRegexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   ...
+}
+
+{
+   <new-global-string>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPKcEEvT_S8_St20forward_iterator_tag
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   ...
+}
+

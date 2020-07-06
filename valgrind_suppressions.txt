@@ -267,24 +267,14 @@
 }
 
 {
-   <string-globals>
+   <globals>
    Memcheck:Leak
    fun:_Znwm
-   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPKcEEvT_S8_St20forward_iterator_tag
-   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:*static_initialization_and_destruction_0*
    ...
    fun:__libc_csu_init
-   fun:(below main)
-}
-
-{
-   <general-globals>
-   Memcheck:Leak
-   fun:_Znwm
-   fun:_Z41__static_initialization_and_destruction_0ii
    ...
-   fun:__libc_csu_init
-   fun:(below main)
 }
 
 {
@@ -296,16 +286,16 @@
    fun:_Z41__static_initialization_and_destruction_0ii
    ...
    fun:__libc_csu_init
-   fun:(below main)
+   ...
 }
 
 {
-   <new-gtest-internal>
+   <gtest-globals>
    Memcheck:Leak
    fun:_Znwm
    ...
    fun:_ZN7testing8internal23MakeAndRegisterTestInfoEPKcS2_S2_S2_NS0_12CodeLocationEPKvPFvvES7_PNS0_15TestFactoryBaseE
-   fun:_Z41__static_initialization_and_destruction_0ii
+   fun:*static_initialization_and_destruction_0*
    ...
 }
 
@@ -343,3 +333,146 @@
    ...
 }
 
+{
+   <gtest>
+   Memcheck:Leak
+   fun:calloc
+   fun:create_cd_newstate
+   fun:re_acquire_state_context
+   fun:create_initial_state
+   fun:re_compile_internal
+   fun:regcomp
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing13ContainsRegexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing8internal20MakeDeathTestMatcherB5cxx11EPKc
+   fun:_ZN30AnyMapTest_MoveAssignment_Test8TestBodyEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing4Test3RunEv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:__new_exitfn
+   fun:__internal_atexit
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/usr/lib/x86_64-linux-gnu/ld-2.28.so
+   obj:*
+   obj:*
+   obj:*
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:_ZNKSt8_Rb_treeINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESt4pairIKS5_N16cppmicroservices3AnyEESt10_Select1stISA_ESt4lessIS5_ESaISA_EE4sizeEv
+   fun:_ZNKSt3mapINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEN16cppmicroservices3AnyESt4lessIS5_ESaISt4pairIKS5_S7_EEE4sizeEv
+   fun:_ZNK16cppmicroservices7any_map4sizeEv
+   fun:_ZN30AnyMapTest_MoveAssignment_Test8TestBodyEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing4Test3RunEv
+   fun:_ZN7testing8TestInfo3RunEv
+   fun:_ZN7testing9TestSuite3RunEv
+   fun:_ZN7testing8internal12UnitTestImpl11RunAllTestsEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS0_12UnitTestImplEbEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS0_12UnitTestImplEbEET0_PT_MS4_FS3_vEPKc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN7testing4TestC1Ev
+   fun:_ZN30AnyMapTest_MoveAssignment_TestC1Ev
+   fun:_ZN7testing8internal15TestFactoryImplI30AnyMapTest_MoveAssignment_TestE10CreateTestEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS0_15TestFactoryBaseEPNS_4TestEEET0_PT_MS6_FS5_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS0_15TestFactoryBaseEPNS_4TestEEET0_PT_MS6_FS5_vEPKc
+   fun:_ZN7testing8TestInfo3RunEv
+   fun:_ZN7testing9TestSuite3RunEv
+   fun:_ZN7testing8internal12UnitTestImpl11RunAllTestsEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS0_12UnitTestImplEbEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS0_12UnitTestImplEbEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8UnitTest3RunEv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm
+   fun:_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE14_M_replace_auxEmmmc
+   fun:_ZStplIcSt11char_traitsIcESaIcEENSt7__cxx1112basic_stringIT_T0_T1_EERKS8_S5_
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:__libc_csu_init
+   fun:(below main)
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZN7testing13ContainsRegexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing8internal20MakeDeathTestMatcherB5cxx11EPKc
+   fun:_ZN30AnyMapTest_MoveAssignment_Test8TestBodyEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing4Test3RunEv
+   fun:_ZN7testing8TestInfo3RunEv
+   fun:_ZN7testing9TestSuite3RunEv
+   fun:_ZN7testing8internal12UnitTestImpl11RunAllTestsEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS0_12UnitTestImplEbEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS0_12UnitTestImplEbEET0_PT_MS4_FS3_vEPKc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:init_dfa
+   fun:re_compile_internal
+   fun:regcomp
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing13ContainsRegexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing8internal20MakeDeathTestMatcherB5cxx11EPKc
+   fun:_ZN30AnyMapTest_MoveAssignment_Test8TestBodyEv
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing4Test3RunEv
+   fun:_ZN7testing8TestInfo3RunEv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_Z41__static_initialization_and_destruction_0ii
+   ...
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/usr/lib/x86_64-linux-gnu/ld-2.28.so
+   obj:*
+   obj:*
+   obj:*
+}

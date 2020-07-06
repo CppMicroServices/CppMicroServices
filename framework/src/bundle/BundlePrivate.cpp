@@ -695,11 +695,6 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx
   , lib(location)
   , SetBundleContext(nullptr)
 {
-  validateManifest();
-}
-
-void BundlePrivate::validateManifest()
-{
   
   // Check if we got version information and validate the version identifier
   if (bundleManifest.Contains(Constants::BUNDLE_VERSION)) {

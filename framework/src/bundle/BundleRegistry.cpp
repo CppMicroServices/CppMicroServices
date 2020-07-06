@@ -90,15 +90,6 @@ void BundleRegistry::DecrementInitialBundleMapRef(
   l.UnLock();
 }
 
-/** This function populates the res and alreadyInstalled vectors with the appropriate entries so
- * that they can be used by the Install0 call. This was extracted from Install() for convenience.
- *
- * @param foundBundles
- * @param location
- * @param bundleManifest
- * @param resultingBundles
- * @param alreadyInstalled
- */
 std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBundlesAtLocation(std::pair<BundleMap::iterator, BundleMap::iterator> foundBundles
                                                                                               , const std::string& location
                                                                                               , const ManifestT& bundleManifest
@@ -180,7 +171,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 
     std::vector<Bundle> resultingBundles;
     std::vector<std::string> alreadyInstalled;
-    // Populate the res and alreadyInstalled vectors with the appropriate data
+    // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
     // based on what bundles are already installed
     auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange
                                                         , location
@@ -346,9 +337,8 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
       res.emplace_back(MakeBundle(d));
     }
 
-    // For each bundle that we created, add into the map of location->bundle. This is the whole
-    // thing we're trying to do with caching... insert this entry without having to read the bundle
-    // file and parse the manifest.
+    // For each bundle that we created, add into the map of location->bundle, completing the
+    // addition of the bundle into the registry with the given manifest.
     {
       auto l = bundles.Lock();
       US_UNUSED(l);

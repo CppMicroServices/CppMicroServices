@@ -292,8 +292,8 @@ TEST(BundleManifestTest, DirectManifestInstallMulti)
     auto headers = b.GetHeaders();
     auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests[b.GetSymbolicName()]);
     for (auto m : manifest)
-      // check to make sure that all the headers in the manifest are there
     {
+      // check to make sure that all the headers in the manifest are there
       ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
     }
   }
@@ -370,7 +370,7 @@ TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
   };
   manifests[libName("TestBundleA2")] = cppms::AnyMap(a2LocationMap);
   
-  // Now simulate what processing the list of manifests would look like when processing the cache. 
+  // Now use the new API to install bundles with the path and a manifest stored in an AnyMap. 
   auto bundleRoot = cppms::testing::LIB_PATH
                     + util::DIR_SEP;
   for (auto const& m : manifests) {

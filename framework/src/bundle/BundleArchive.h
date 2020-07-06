@@ -52,8 +52,8 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
                 , std::shared_ptr<BundleResourceContainer>  resourceContainer
                 , std::string  resourcePrefix
                 , std::string  location
-                , long id
-                , AnyMap m);
+                , long bundleId
+                , AnyMap bundleManifest);
 
   /**
    * Autostart setting stopped.

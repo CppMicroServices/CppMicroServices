@@ -183,8 +183,6 @@ using WaitConditionType = WaitCondition<MutexHost>;
 
   void ResetBundleThread();
 
-  void validateManifest();
-  
   /**
    * Framework context.
    */

@@ -60,16 +60,16 @@ BundleArchive::BundleArchive(BundleStorage* storage
                              , std::shared_ptr<BundleResourceContainer>  resourceContainer
                              , std::string  prefix
                              , std::string  location
-                             , long id
-                             , AnyMap m)
+                             , long bundleId
+                             , AnyMap bundleManifest)
   : storage(storage)
   , resourceContainer(std::move(resourceContainer))
   , resourcePrefix(std::move(prefix))
   , location(std::move(location))
-  , bundleId(id)
+  , bundleId(bundleId)
   , lastModified(now())
   , autostartSetting(-1)
-  , manifest(m)
+  , manifest(bundleManifest)
 {
 }
 

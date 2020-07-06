@@ -150,6 +150,17 @@ private:
 
   void CheckIllegalState() const;
 
+  /** This function populates the res and alreadyInstalled vectors with the appropriate entries so
+   * that they can be used by the Install0 call. This was extracted from Install() for convenience.
+   *
+   * @param range            range containing bundles found at location
+   * @param location         the location on disk to look for installed bundles
+   * @param bundleManifest   the manifest for the bundle to be installed. Used when creating the
+   *                         returned BundleResourceContainer
+   * @param resultingBundles An output vector of the bundles already installed at location 
+   * @param alreadyInstalled An output vector of symbolic names of the already installed bundles at
+   *                         location. 
+   */
   std::shared_ptr<BundleResourceContainer> GetAlreadyInstalledBundlesAtLocation(std::pair<BundleMap::iterator, BundleMap::iterator> range
                                                                                 , const std::string& location
                                                                                 , const ManifestT& bundleManifest

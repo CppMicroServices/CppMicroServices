@@ -444,7 +444,7 @@ void BundlePrivate::Start(uint32_t options)
 
 const AnyMap& BundlePrivate::GetHeaders() const
 {
-  return barchive->GetManifest();
+  return bundleManifest.GetHeaders();
 }
 
 std::exception_ptr BundlePrivate::Start0()

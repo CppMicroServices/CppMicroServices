@@ -110,7 +110,28 @@ bool compare_deprecated_properties(const AnyMap& headers
 
 }
 
-TEST(BundleManifestTest, UnicodeProperty)
+class BundleManifestTest
+  : public ::testing::Test
+{
+protected:
+  BundleManifestTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+  virtual ~BundleManifestTest() = default;
+
+  virtual void SetUp() {
+    framework.Start();
+  }
+
+  virtual void TearDown() {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+
+  cppmicroservices::Framework framework;
+};
+
+
+
+TEST_F(BundleManifestTest, UnicodeProperty)
 {
   // 1. building static libraries (test bundle is included in the executable)
   // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
@@ -119,8 +140,6 @@ TEST(BundleManifestTest, UnicodeProperty)
   !defined(US_CXX_UNICODE_LITERALS)
   SUCCEED() << "Skipping test point for unicode path";
 #else
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   std::string path_utf8 = testing::LIB_PATH
                           + cppmicroservices::util::DIR_SEP
                           + u8"くいりのまちとこしくそ"
@@ -137,15 +156,11 @@ TEST(BundleManifestTest, UnicodeProperty)
   std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
   ASSERT_STREQ(expectedValue,actualValue) <<
                     "Unicode data from manifest.json doesn't match expected value.";
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 #endif
 }
 
-TEST(BundleManifestTest, InstallBundleWithDeepManifest)
+TEST_F(BundleManifestTest, InstallBundleWithDeepManifest)
 {
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleWithDeepManifest");
   const auto& headers = bundle.GetHeaders();
   ASSERT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
@@ -155,15 +170,10 @@ TEST(BundleManifestTest, InstallBundleWithDeepManifest)
   auto deprecatedProperties = bundle.GetProperties();
   ASSERT_TRUE(compare_deprecated_properties(headers, deprecatedProperties)) << "Deprecated properties mismatch";
   
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-TEST(BundleManifestTest, ParseManifest)
+TEST_F(BundleManifestTest, ParseManifest)
 {
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
-
   auto bundleM = cppmicroservices::testing::InstallLib(framework.GetBundleContext()
                                                        , "TestBundleM");
   
@@ -213,9 +223,6 @@ TEST(BundleManifestTest, ParseManifest)
   ASSERT_EQ(any_cast<int>(m["number"]), 4);
   ASSERT_EQ(m["list"].Type(), typeid(std::vector<Any>));
   ASSERT_EQ(any_cast<std::vector<Any>>(m["list"]).size(), 2ul);
-
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 namespace cppmicroservices {
@@ -227,11 +234,9 @@ struct TestBundleAService
 
 }
 
-TEST(BundleManifestTest, DirectManifestInstall)
+TEST_F(BundleManifestTest, DirectManifestInstall)
 {
 #ifdef US_BUILD_SHARED_LIBS
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto ctx = framework.GetBundleContext();
 
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -257,16 +262,12 @@ TEST(BundleManifestTest, DirectManifestInstall)
     }
     break;
   }
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 #endif
 }
 
-TEST(BundleManifestTest, DirectManifestInstallBadLocation)
+TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)
 {
 #ifdef US_BUILD_SHARED_LIBS
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto ctx = framework.GetBundleContext();
 
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -282,14 +283,12 @@ TEST(BundleManifestTest, DirectManifestInstallBadLocation)
 #endif
 }
 
-TEST(BundleManifestTest, DirectManifestInstallMulti)
+TEST_F(BundleManifestTest, DirectManifestInstallMulti)
 {
 #ifdef US_BUILD_SHARED_LIBS
   // Support the static linking case in which we have multiple bundles in one location that need to
   // be installed, so the "manifests" passed in contains a vector of bundle manifests, one for each
   // bundle at the location.
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto ctx = framework.GetBundleContext();
 
 
@@ -319,16 +318,12 @@ TEST(BundleManifestTest, DirectManifestInstallMulti)
       ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
     }
   }
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 #endif
 }
 
-TEST(BundleManifestTest, DirectManifestInstallAndStart)
+TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
 {
 #ifdef US_BUILD_SHARED_LIBS
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto ctx = framework.GetBundleContext();
 
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -355,21 +350,16 @@ TEST(BundleManifestTest, DirectManifestInstallAndStart)
   auto ref = ctx.GetServiceReference<cppmicroservices::TestBundleAService>();
   auto svc = ctx.GetService(ref);
   ASSERT_TRUE(!!svc);
-  
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 #endif
 }
 
-TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
+TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
 {
 #ifdef US_BUILD_SHARED_LIBS
   namespace cppms = cppmicroservices;
   namespace sc = std::chrono;
   using ucimap = cppms::AnyMap::unordered_any_cimap;
   
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto ctx = framework.GetBundleContext();
 
   cppms::AnyMap manifests(cppms::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -405,14 +395,11 @@ TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
       ASSERT_NO_THROW(b.Start());
     }
   }
-  
-  framework.Stop();
-  framework.WaitForStop(sc::milliseconds::zero());
 #endif
 }
 
 
-TEST(BundleManifestTest, IgnoreSecondManifestInstall)
+TEST_F(BundleManifestTest, IgnoreSecondManifestInstall)
 {
 #ifdef US_BUILD_SHARED_LIBS
   namespace cppms = cppmicroservices;
@@ -421,8 +408,6 @@ TEST(BundleManifestTest, IgnoreSecondManifestInstall)
   using cppms::any_cast;
   using cimap = AnyMap::unordered_any_cimap;
   
-  auto framework = FrameworkFactory().NewFramework();
-  framework.Start();
   auto ctx = framework.GetBundleContext();
 
   AnyMap manifests(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -448,8 +433,5 @@ TEST(BundleManifestTest, IgnoreSecondManifestInstall)
   auto const& secondHeaders = secondBundles[0].GetHeaders();
   // should still be true after install.
   ASSERT_TRUE(any_cast<bool>(secondHeaders.at("test")));
-  
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 #endif
 }

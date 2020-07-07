@@ -156,7 +156,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    * Return the manifest for the bundle in this bundlearchive. If manifest is currently empty, read
    * the manifest from the bundle at location and then return it.
    */
-  const AnyMap& GetManifest() const;
+  const AnyMap& GetInjectedManifest() const;
 private:
   BundleStorage* const storage;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
@@ -173,7 +173,7 @@ private:
    * "const". A BundleArchive is constructed with an empty manifest will read its manifest from the
    * file the first time it's asked for, and stored here.
    */
-  mutable BundleManifest manifest;
+  AnyMap manifest;
 };
 }
 

@@ -331,9 +331,9 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     
     // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
     // that are returned, one for each BundlePrivate that's created.
-    for (auto& ba : barchives)
+    for (auto const& ba : barchives)
     {
-      auto d = std::make_shared<BundlePrivate>(coreCtx, std::move(ba));
+      auto d = std::make_shared<BundlePrivate>(coreCtx, ba);
       res.emplace_back(MakeBundle(d));
     }
 

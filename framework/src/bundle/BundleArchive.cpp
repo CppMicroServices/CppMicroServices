@@ -70,7 +70,7 @@ BundleArchive::BundleArchive(BundleStorage* storage
   , bundleId(bundleId)
   , lastModified(now())
   , autostartSetting(-1)
-  , manifest(bundleManifest)
+  , manifest(std::move(bundleManifest))
 {
 }
 
@@ -164,37 +164,9 @@ BundleArchive::GetResourceContainer() const
   return resourceContainer;
 }
 
-const AnyMap& BundleArchive::GetManifest() const
+const AnyMap& BundleArchive::GetInjectedManifest() const
 {
-  // Only take the time to read the manifest out of the BundleArchive file if we don't already have
-  // a manifest.
-  if (true == manifest.GetHeaders().empty()) {
-    // Check if the bundle provides a manifest.json file and if yes, parse it.
-    if (IsValid()) {
-      auto manifestRes = GetResource("/manifest.json");
-      if (manifestRes) {
-        BundleResourceStream manifestStream(manifestRes);
-        try {
-          manifest.Parse(manifestStream);
-        } catch (...) {
-          throw std::runtime_error(std::string("Parsing of manifest.json for bundle ")
-                                   + resourcePrefix
-                                   + " at "
-                                   + location
-                                   + " failed: "
-                                   + util::GetLastExceptionStr());
-        }
-        // It is unlikely that clients will access bundle resources
-        // if the only resource is the manifest file. On this assumption,
-        // close the open file handle to the zip file to improve performance
-        // and avoid exceeding OS open file handle limits.
-        if (OnlyContainsManifest(resourceContainer)) {
-          resourceContainer->CloseContainer();
-        }
-      }
-    }
-  }
-  return manifest.GetHeaders();
+  return manifest;
 }
 
 }

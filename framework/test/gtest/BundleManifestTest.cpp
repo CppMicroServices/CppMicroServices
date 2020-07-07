@@ -241,16 +241,17 @@ TEST(BundleManifestTest, DirectManifestInstall)
   };
   manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
-  auto libPath = fullLibPath("TestBundleA");
+  auto const libPath = fullLibPath("TestBundleA");
   auto const& bundles = ctx.InstallBundles(libPath, manifests);
-  // If it's a static build, bundles contains all bundles in the executable.
+
   ASSERT_EQ(1, bundles.size());
   for (auto b : bundles) {
     if (b.GetSymbolicName() != "TestBundleA") continue;
     auto headers = b.GetHeaders();
     auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);
+    
+    // check to make sure that all the headers in the manifest are there
     for (auto m : manifest)
-      // check to make sure that all the headers in the manifest are there
     {
       ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
     }
@@ -258,6 +259,26 @@ TEST(BundleManifestTest, DirectManifestInstall)
   }
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
+#endif
+}
+
+TEST(BundleManifestTest, DirectManifestInstallBadLocation)
+{
+#ifdef US_BUILD_SHARED_LIBS
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto ctx = framework.GetBundleContext();
+
+  cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
+    { "bundle.symbolic_name", std::string("TestBundleA") }
+    , { "bundle.activator", true }
+  };
+  manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
+
+  auto const libPath = fullLibPath("TestBundleA");
+
+  EXPECT_THROW({ctx.InstallBundles("/non/existent/path/to/bundle.dylib", manifests);}, std::runtime_error);
 #endif
 }
 
@@ -286,7 +307,8 @@ TEST(BundleManifestTest, DirectManifestInstallMulti)
   };
   manifests["TestBundleB"] = cppmicroservices::AnyMap(testBundleBManifest);
 
-  auto const& bundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  auto const libPath = fullLibPath("TestBundleA");
+  auto const& bundles = ctx.InstallBundles(libPath, manifests);
   ASSERT_EQ(2, bundles.size());
   for (auto const& b : bundles) {
     auto headers = b.GetHeaders();
@@ -380,7 +402,7 @@ TEST(BundleManifestTest, DirectManifestInstallAndStartMulti)
                                              , cppms::any_cast<cppms::AnyMap>((m.second)));
     ASSERT_EQ(1, bundles.size());
     for (auto b : bundles) {
-      b.Start();
+      ASSERT_NO_THROW(b.Start());
     }
   }
   
@@ -415,13 +437,14 @@ TEST(BundleManifestTest, IgnoreSecondManifestInstall)
     , { "bundle.activator", true }
   };
   manifests["TestBundleA"] = AnyMap(firstTimeManifest);
-  auto const& firstBundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  auto const libPath = fullLibPath("TestBundleA");
+  auto const& firstBundles = ctx.InstallBundles(libPath, manifests);
   auto const& firstHeaders = firstBundles[0].GetHeaders();
   ASSERT_TRUE(any_cast<bool>(firstHeaders.at("test")));
 
   // on second installation the manifest should be ignored, so our test value should remain true. 
   manifests["TestBundleA"] = AnyMap(secondTimeManifest);
-  auto const& secondBundles = ctx.InstallBundles("/my/favorite/location.dylib", manifests);
+  auto const& secondBundles = ctx.InstallBundles(libPath, manifests);
   auto const& secondHeaders = secondBundles[0].GetHeaders();
   // should still be true after install.
   ASSERT_TRUE(any_cast<bool>(secondHeaders.at("test")));

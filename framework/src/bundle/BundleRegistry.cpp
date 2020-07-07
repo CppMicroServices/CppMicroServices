@@ -98,9 +98,9 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
 {
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
-  auto rval = (foundBundles.first == foundBundles.second)
-              ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
-              : foundBundles.first->second->GetBundleArchive()->GetResourceContainer();
+  auto resourceContainer = (foundBundles.first == foundBundles.second)
+                           ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
+                           : foundBundles.first->second->GetBundleArchive()->GetResourceContainer();
 
   while (foundBundles.first != foundBundles.second) {
     auto installedBundlePrivate = foundBundles.first->second;
@@ -113,7 +113,7 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
     ++foundBundles.first;
   }
   
-  return rval;
+  return resourceContainer;
 
 }
 
@@ -210,7 +210,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       std::vector<Bundle> installedBundles;
       
       {
-        // create instance of clean-unp object to ensure RAII
+        // create instance of clean-up object to ensure RAII
         InitialBundleMapCleanup cleanup([this, &l, &location]() {
                                           {
                                             // Notify all waiting threads that it is safe to install the bundle
@@ -299,8 +299,8 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     // (symbolic names) in the zip file for the bundle at 'location'.
     //
     // Note: We MUST use the values from "GetTopLevelDirs()" because eventhough the keys in the
-    // "bundleManifest" are also the "SymbolicNames", bundleManifest only contains information in
-    // the event we're processing a cache bundle.
+    // "bundleManifest" are also the "SymbolicNames", bundleManifest can be empty and will only
+    // contain the symbolicName entries if it's not.
     auto entries = resCont->GetTopLevelDirs();
     for (auto const& symbolicName : entries)
     {
@@ -329,9 +329,9 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
       }
     }
     
+    // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
+    // that are returned, one for each BundlePrivate that's created.
     for (auto& ba : barchives)
-      // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
-      // that are returned, one for each BundlePrivate that's created.
     {
       auto d = std::make_shared<BundlePrivate>(coreCtx, std::move(ba));
       res.emplace_back(MakeBundle(d));
@@ -468,7 +468,7 @@ void BundleRegistry::Load()
   auto bas = coreCtx->storage->GetAllBundleArchives();
   for (auto const& ba : bas) {
     try {
-      auto impl = std::make_shared<BundlePrivate>(coreCtx, ba); // TODO: fix this
+      auto impl = std::make_shared<BundlePrivate>(coreCtx, ba);
       bundles.v.insert(std::make_pair(impl->location, impl));
     } catch (...) {
       ba->SetAutostartSetting(-1); // Do not start on launch

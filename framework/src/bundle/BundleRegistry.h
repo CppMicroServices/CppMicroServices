@@ -33,7 +33,6 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
-#include <rapidjson/document.h>
 
 #include "BundleResourceContainer.h"
 

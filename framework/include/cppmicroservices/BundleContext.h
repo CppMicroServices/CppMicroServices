@@ -1070,15 +1070,22 @@ public:
    * which may contain several bundles, i. e. acts as a bundle library.
    *
    * @param location The location of the bundle library to install.
+   * @param bundleManifest the manifest of the bundle at "location". If non-empty
+   *        this will be used without opening the bundle at "location". Otherwise, the bundle will
+   *        be opened and the manifest read from there.
    * @return The Bundle objects of the installed bundle library.
    * @throws std::runtime_error If the BundleContext is no longer valid, or if the installation failed.
    * @throws std::logic_error If the framework instance is no longer active
    * @throws std::invalid_argument If the location is not a valid UTF8 string
    */
-using ManifestT = cppmicroservices::AnyMap;
-  std::vector<Bundle> InstallBundles(const std::string& location);
   std::vector<Bundle> InstallBundles(const std::string& location
-                                     , const ManifestT& bundleManifest);
+                                     , const cppmicroservices::AnyMap& bundleManifest);
+
+  /**
+   * Installs all bundles from the bundle library at the specified location.
+   * Calls InstallBundles(location, {})
+   */
+  std::vector<Bundle> InstallBundles(const std::string& location);
 
 private:
   friend US_Framework_EXPORT BundleContext

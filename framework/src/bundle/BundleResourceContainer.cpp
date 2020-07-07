@@ -48,6 +48,12 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location
   , m_ZipFileMutex()
   , m_IsContainerOpen(false)
 {
+  // Ensure that the location exists even if we are injecting a manifest.
+  
+  if (!util::Exists(location)) {
+    throw std::runtime_error(m_Location + " does not exist");
+  }
+    
   if (false == bundleManifest.empty()) {
     // If the bundleManifest is not empty, it contains a list of manifests for location. The data
     // contains not only the manifests but the "top level dirs".
@@ -59,10 +65,6 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location
       m_SortedToplevelDirs.insert(b.first);
     }
   } else {
-    if (!util::Exists(location)) {
-      throw std::runtime_error(m_Location + " does not exist");
-    }
-    
     InitMiniz();
     
     InitSortedEntries();

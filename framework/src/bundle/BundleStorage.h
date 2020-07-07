@@ -48,7 +48,7 @@ struct BundleStorage
    * Insert bundles from a container into persistent storagedata.
    *
    * @param resCont The container for the bundle data and resources.
-   * @param topLevelEntrie The top level entries in the container to be inserted as bundle archives.
+   * @param topLevelEntry The top level entries in the container to be inserted as bundle archives.
    * @return A shared_ptr to the BundleArchive representing the installed bundles.
    */
   using ManifestT = cppmicroservices::AnyMap;

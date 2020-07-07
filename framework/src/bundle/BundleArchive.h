@@ -152,6 +152,10 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
+  /**
+   * Return the manifest for the bundle in this bundlearchive. If manifest is currently empty, read
+   * the manifest from the bundle at location and then return it.
+   */
   const AnyMap& GetManifest() const;
 private:
   BundleStorage* const storage;
@@ -159,7 +163,7 @@ private:
   const std::string resourcePrefix;
   const std::string location;
 
-  long bundleId;
+  const long bundleId;
   int64_t lastModified;
   int32_t autostartSetting;
 

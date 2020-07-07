@@ -28,25 +28,6 @@
 
 namespace cppmicroservices {
 
-//static const std::size_t MAX_ARCHIVE_SIZE = 512;
-static const std::size_t MAX_LOCATION_LEN = 256;
-
-struct ExtraData
-{
-  int32_t loc_index; // -1 -> use location field
-  char location[MAX_LOCATION_LEN];
-};
-
-struct PeristentData
-{
-#if NEVER
-  BundleArchive::Data data;
-  char reserved[MAX_ARCHIVE_SIZE - sizeof(BundleArchive::Data) -
-                sizeof(ExtraData)];
-#endif
-  ExtraData extra;
-};
-
 BundleStorageFile::BundleStorageFile()
   : BundleStorage()
 {

@@ -69,7 +69,7 @@ protected:
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();
     framework.Start();
 
-    std::vector<std::string> str5kBundles(2048, bundleBasePath);
+    std::vector<std::string> str5kBundles(5000, bundleBasePath);
     //Generate paths to each bundle
     uint32_t count = 1;
     std::transform(str5kBundles.begin(),
@@ -165,7 +165,7 @@ BENCHMARK_DEFINE_F(BundleInstallFixture,
                    ConcurrentBundleInstall1ThreadPerBundle)
 (benchmark::State& state)
 {
-  InstallConcurrently(state, 2048);
+  InstallConcurrently(state, 5000);
 }
 #endif
 

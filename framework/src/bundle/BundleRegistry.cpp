@@ -189,7 +189,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
     */
     if (alreadyInstallingIterator == initialBundleInstallMap.end()) {
       // Insert entry into the initialBundleInstallMap to prevent other threads from
-      // trying to install this bundle simultaneously at the same time
+      // trying to install this bundle simultaneously
       auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
       initialBundleInstallMap.insert(
         std::make_pair(location, std::move(pairToInsert)));

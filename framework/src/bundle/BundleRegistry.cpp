@@ -132,6 +132,9 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
                                                                                               , std::vector<Bundle>& resultingBundles
                                                                                               , std::vector<std::string>& alreadyInstalled)
 {
+  auto l = bundles.Lock();
+  US_UNUSED(l);
+  
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
   auto resourceContainer = (foundBundles.first == foundBundles.second
@@ -186,8 +189,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 
     If the bundle isn't installed, then one of two things can happen: 1) either
     the current thread is the first thread trying to install this bundle or 2) the
-    current thread is trying to install a bundle that is not installed which another
-    thread is currently installing.
+    current thread is trying to install a bundle that is not installed but another
+    thread is currently installing that bundle.
 
     If 1): Create an entry in the initialBundleInstallMap which keeps track of whether
       or not a given bundle is being installed for the first time. After creating this
@@ -236,7 +239,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 
     /*
       If no other thread is installing the desired bundle, create a map entry,
-      install the bundle, and notify all other threads wanting to install this bundle
+      install the bundle, and notify all other threads waiting to install this bundle
       that it is safe to do so. If the current thread is not the installing thread, then
       it will increment the reference count in the initialBundleInstallMap so that the map
       entry isn't prematurely deleted, wait to be notified that the install thread is done,
@@ -244,7 +247,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
     */
     if (alreadyInstallingIterator == initialBundleInstallMap.end()) {
       // Insert entry into the initialBundleInstallMap to prevent other threads from
-      // trying to install this uninstalled bundle at the same time
+      // trying to install this bundle simultaneously
       auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
       initialBundleInstallMap.insert(std::make_pair(location, std::move(pairToInsert)));
       l.UnLock();
@@ -256,10 +259,14 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
         scope_guard cleanup = [this, &l, &location]()
                               {
                                 {
+                                  l.Lock();
+                                  auto& p = initialBundleInstallMap[location];
+                                  
                                   // Notify all waiting threads that it is safe to install the bundle
-                                  std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
-                                  initialBundleInstallMap[location].second.waitFlag = false;
-                                  initialBundleInstallMap[location].second.cv->notify_all();
+                                  std::lock_guard<std::mutex> lock(*(p.second.m));
+                                  p.second.waitFlag = false;
+                                  p.second.cv->notify_all();
+                                  l.UnLock();
                                 }
                                 DecrementInitialBundleMapRef(l, location);
                               };
@@ -276,20 +283,26 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       {
         // Wait for the install thread to notify this thread that it is safe
         // to install the current bundle
-        std::unique_lock<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
+        auto& p = initialBundleInstallMap[location];
+        l.UnLock();
+        std::unique_lock<std::mutex> lock(*(p.second.m));
 
         // This while loop exists to prevent a known race condition. If the installing thread notifies before
         // another thread trying to install the same bundle reaches this wait, it will wait indefinitely. To
-        // fix this, a wait_for is used intead (which utilizes a timeout to avoid this race) and the wait statement
+        // fix this, a wait_for is used instead (which utilizes a timeout to avoid this race) and the wait statement
         // as a whole acts as the while statement's predicate; once the timeout is reached, wait_for exits and the
         // statement is re-evaluated since it would have returned false.
-        while (!initialBundleInstallMap[location].second.cv->wait_for(lock, 0.1ms, [&location, this] {
-          return !initialBundleInstallMap[location].second.waitFlag;
-          }));
+        while (!p.second.cv->wait_for(lock
+                                      , 0.1ms
+                                      , [&p]
+                                        {
+                                          return !p.second.waitFlag;
+                                        }));
       }
       
       // Re-acquire the range because while this thread was waiting, the installing
       // thread made a modification to bundles.v
+      l.Lock();
       bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
       l.UnLock();
 
@@ -377,7 +390,11 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
         purge_on_error.emplace_back(archive);
         auto bundle = MakeBundle(std::make_shared<BundlePrivate>(coreCtx, archive));
         installed_bundles.emplace_back(bundle);
-        bundles.v.insert(std::make_pair(location, bundle.d));
+        {
+          auto l = bundles.Lock();
+          US_UNUSED(l);
+          bundles.v.insert(std::make_pair(location, bundle.d));
+        }
         coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
       }
     }
@@ -501,7 +518,7 @@ void BundleRegistry::Load()
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::cerr << "Failed to load bundle " << util::ToString(ba->GetBundleId())
                 << " (" + ba->GetBundleLocation() + ") uninstalled it!"
-                << " (execption: "
+                << " (exception: "
                 << util::GetExceptionStr(std::current_exception()) << ")"
                 << std::endl;
     }

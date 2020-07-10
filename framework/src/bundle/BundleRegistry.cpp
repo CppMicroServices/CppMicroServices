@@ -45,33 +45,60 @@
 
 namespace {
 
-class scope_guard {
+/**
+ * scope_guard implementation found on stack exchange.
+ *
+ * This implementation has the following features:
+ * 1) Can be configured to only launch if destructor is fired during stack unwinding while handling
+ *    an uncaught exception
+ * 2) Has a "dismiss" method to allow for clearing the scope action
+ * 3) Actions can be added by using the "+=" operator with a lambda
+ */
+class scope_guard
+{
 public:
   enum execution { always, no_exception, exception };
-
+  
   scope_guard(scope_guard &&) = default;
   explicit scope_guard(execution policy = always) : policy(policy) {}
 
   template<class Callable>
-  scope_guard(Callable && func, execution policy = always) : policy(policy) {
+  scope_guard(Callable&& func
+              , execution policy = always)
+    : policy(policy)
+  {
     this->operator += <Callable>(std::forward<Callable>(func));
   }
 
   template<class Callable>
-  scope_guard& operator += (Callable && func) try {
-    handlers.emplace_front(std::forward<Callable>(func));
-    return *this;
-  } catch(...) {
-    if(policy != no_exception) func();
-    throw;
+  scope_guard& operator += (Callable && func)
+  {
+    try
+    {
+      handlers.emplace_front(std::forward<Callable>(func));
+      return *this;
+    }
+    catch(...)
+    {
+      if(policy != no_exception) func();
+      throw;
+    }
   }
 
-  ~scope_guard() {
-    if(policy == always || (std::uncaught_exception() == (policy == exception))) {
-      for(auto &f : handlers) try {
+  ~scope_guard()
+  {
+    if (policy == always
+        || (std::uncaught_exception() == (policy == exception)))
+    {
+      for(auto &f : handlers)
+      {
+        try
+        {
           f(); // must not throw
-        } catch(...) { /* std::terminate(); ? */ }
-  }
+        }
+        catch(...) { /* std::terminate(); ? */ }
+      }
+    }
   }
 
   void dismiss() noexcept {
@@ -98,8 +125,8 @@ BundleRegistry::~BundleRegistry() = default;
 
 void BundleRegistry::Init()
 {
-  bundles.v.insert(
-    std::make_pair(coreCtx->systemBundle->location, coreCtx->systemBundle));
+  bundles.v.insert(std::make_pair(coreCtx->systemBundle->location
+                                  , coreCtx->systemBundle));
 }
 
 void BundleRegistry::Clear()
@@ -114,13 +141,13 @@ void BundleRegistry::Clear()
   for the specified bundle. If this decrement causes the count to be
   0, it is erased from the initialBundleInstallMap map.
 */
-void BundleRegistry::DecrementInitialBundleMapRef(
-  cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
-  const std::string& location)
+void BundleRegistry::DecrementInitialBundleMapRef(cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l
+                                                  , const std::string& location)
 {
   l.Lock();
   initialBundleInstallMap[location].first--;
-  if (initialBundleInstallMap[location].first == 0) {
+  if (initialBundleInstallMap[location].first == 0)
+  {
     initialBundleInstallMap.erase(location);
   }
   l.UnLock();
@@ -137,23 +164,23 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
   
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
-  auto resourceContainer = (foundBundles.first == foundBundles.second)
-                           ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
-                           : foundBundles.first->second->GetBundleArchive()->GetResourceContainer();
+  auto resourceContainer = (foundBundles.first == foundBundles.second
+                            ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
+                            : foundBundles.first->second->GetBundleArchive()->GetResourceContainer());
 
-  while (foundBundles.first != foundBundles.second) {
+  while (foundBundles.first != foundBundles.second)
+  {
     auto installedBundlePrivate = foundBundles.first->second;
     alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
     auto actualBundle = coreCtx->bundleHooks.FilterBundle(MakeBundleContext(installedBundlePrivate->bundleContext.Load())
                                                           , MakeBundle(installedBundlePrivate));
-    if (actualBundle) {
+    if (actualBundle)
+    {
       resultingBundles.push_back(actualBundle);
     }
     ++foundBundles.first;
   }
-  
   return resourceContainer;
-
 }
 
 std::vector<Bundle> BundleRegistry::Install(const std::string& location
@@ -205,7 +232,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       that it is able to continue with it's install, it goes ahead and performs the regular
       install procedure.
   */
-  if (bundlesAtLocationRange.first != bundlesAtLocationRange.second) {
+  if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
+  {
     l.UnLock();
 
     std::vector<Bundle> resultingBundles;
@@ -221,12 +249,14 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
     // Perform the install
     auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
     resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
-    if (resultingBundles.empty()) {
+    if (resultingBundles.empty())
+    {
       throw std::runtime_error("All bundles rejected by a bundle hook");
-    } else {
-      return resultingBundles;
     }
-  } else {
+    return resultingBundles;
+  }
+  else
+  {
     // Check to see if another thread is currently in the process of installing this
     // bundle for the first time.
     auto alreadyInstallingIterator = initialBundleInstallMap.find(location);
@@ -239,7 +269,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       entry isn't prematurely deleted, wait to be notified that the install thread is done,
       and then perform the regular install procedure.
     */
-    if (alreadyInstallingIterator == initialBundleInstallMap.end()) {
+    if (alreadyInstallingIterator == initialBundleInstallMap.end())
+    {
       // Insert entry into the initialBundleInstallMap to prevent other threads from
       // trying to install this uninstalled bundle at the same time
       auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
@@ -247,7 +278,6 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       l.UnLock();
 
       std::vector<Bundle> installedBundles;
-      
       {
         // create instance of clean-up object to ensure RAII
         scope_guard cleanup = [this, &l, &location]()
@@ -268,11 +298,11 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
         auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
         installedBundles = Install0(location, resCont, {}, bundleManifest);
       }
-
       return installedBundles;
-    } else {
+    }
+    else
+    {
       initialBundleInstallMap[location].first++;
-      
       {
         // Wait for the install thread to notify this thread that it is safe
         // to install the current bundle
@@ -309,7 +339,6 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
                                                           , alreadyInstalled);
 
       std::vector<Bundle> newBundles;
-      
       {
         // create instance of clean-up object to ensure RAII
         scope_guard cleanup = [this, &l, &location]()
@@ -322,11 +351,11 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       }
 
       resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
-      if (resultingBundles.empty()) {
+      if (resultingBundles.empty())
+      {
         throw std::runtime_error("All bundles rejected by a bundle hook");
-      } else {
-        return resultingBundles;
       }
+      return resultingBundles;
     }
   }
 }
@@ -361,21 +390,22 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     auto entries = resCont->GetTopLevelDirs();
     for (auto const& symbolicName : entries)
     {
+      // only install non-excluded entries
       if (0 == exclude.count(symbolicName))
-        // only install non-excluded entries
       {
 #ifndef US_BUILD_SHARED_LIBS
         // The system bundle is already installed, so skip it.
-        if (Constants::SYSTEM_BUNDLE_SYMBOLICNAME == symbolicName) {
+        if (Constants::SYSTEM_BUNDLE_SYMBOLICNAME == symbolicName)
+        {
           continue;
         }
 #endif
 
         // Either use the manifest found in the passed in bundleManifest list for the current entry,
         // or construct an empty one
-        auto manifest = (0 != bundleManifest.count(symbolicName))
-                        ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
-                        : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        auto manifest = (0 != bundleManifest.count(symbolicName)
+                         ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
+                         : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
 
         // Now, create a BundleArchive with the given manifest at 'entry' in the
         // BundleResourceContainer, and remember the created BundleArchive here for later
@@ -399,22 +429,26 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     {
       auto l = bundles.Lock();
       US_UNUSED(l);
-      for (auto& b : installedBundles) {
+      for (auto& b : installedBundles)
+      {
         bundles.v.insert(std::make_pair(location, b.d));
       }
     }
 
     // Now fire off the bundle event listeners.
-    for (auto& b : installedBundles) {
+    for (auto& b : installedBundles)
+    {
       coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
     }
-  } catch (...) {
+  }
+  catch (...)
+  {
     throw std::runtime_error("Failed to install bundle library at "
                              + location
                              + ": "
                              + util::GetLastExceptionStr());
   }
-  // If we get here, no need to purge, so dismiss.
+  // If we get here, no need to purge, so dismiss the cleanup action.
   purge_on_error.dismiss();
   
   // And finally return the results.
@@ -426,8 +460,10 @@ void BundleRegistry::Remove(const std::string& location, long id)
   auto l = bundles.Lock();
   US_UNUSED(l);
   auto range = bundles.v.equal_range(location);
-  for (auto iter = range.first; iter != range.second; ++iter) {
-    if (iter->second->id == id) {
+  for (auto iter = range.first; iter != range.second; ++iter)
+  {
+    if (iter->second->id == id)
+    {
       bundles.v.erase(iter);
       return;
     }
@@ -441,16 +477,17 @@ std::shared_ptr<BundlePrivate> BundleRegistry::GetBundle(long id) const
   auto l = bundles.Lock();
   US_UNUSED(l);
 
-  for (auto& m : bundles.v) {
-    if (m.second->id == id) {
+  for (auto& m : bundles.v)
+  {
+    if (m.second->id == id)
+    {
       return m.second;
     }
   }
   return nullptr;
 }
 
-std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(
-  const std::string& location) const
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(const std::string& location) const
 {
   CheckIllegalState();
 
@@ -459,16 +496,15 @@ std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(
 
   auto range = bundles.v.equal_range(location);
   std::vector<std::shared_ptr<BundlePrivate>> result;
-  std::transform(range.first,
-                 range.second,
-                 std::back_inserter(result),
-                 [](const BundleMap::value_type& p) { return p.second; });
+  std::transform(range.first
+                 , range.second
+                 , std::back_inserter(result)
+                 , [](const BundleMap::value_type& p) { return p.second; });
   return result;
 }
 
-std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(
-  const std::string& name,
-  const BundleVersion& version) const
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(const std::string& name
+                                                                       , const BundleVersion& version) const
 {
   CheckIllegalState();
 
@@ -477,9 +513,11 @@ std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles(
   auto l = bundles.Lock();
   US_UNUSED(l);
 
-  for (auto& p : bundles.v) {
+  for (auto& p : bundles.v)
+  {
     auto& b = p.second;
-    if (name == b->symbolicName && version == b->version) {
+    if (name == b->symbolicName && version == b->version)
+    {
       res.push_back(b);
     }
   }
@@ -493,24 +531,25 @@ std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetBundles() const
   US_UNUSED(l);
 
   std::vector<std::shared_ptr<BundlePrivate>> result;
-  std::transform(bundles.v.begin(),
-                 bundles.v.end(),
-                 std::back_inserter(result),
-                 [](const BundleMap::value_type& p) { return p.second; });
+  std::transform(bundles.v.begin()
+                 , bundles.v.end()
+                 , std::back_inserter(result)
+                 , [](const BundleMap::value_type& p) { return p.second; });
   return result;
 }
 
-std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetActiveBundles()
-  const
+std::vector<std::shared_ptr<BundlePrivate>> BundleRegistry::GetActiveBundles() const
 {
   CheckIllegalState();
   std::vector<std::shared_ptr<BundlePrivate>> result;
 
   auto l = bundles.Lock();
   US_UNUSED(l);
-  for (auto& b : bundles.v) {
+  for (auto& b : bundles.v)
+  {
     auto s = b.second->state.load();
-    if (s == Bundle::STATE_ACTIVE || s == Bundle::STATE_STARTING) {
+    if (s == Bundle::STATE_ACTIVE || s == Bundle::STATE_STARTING)
+    {
       result.push_back(b.second);
     }
   }
@@ -522,11 +561,15 @@ void BundleRegistry::Load()
   auto l = this->Lock();
   US_UNUSED(l);
   auto bas = coreCtx->storage->GetAllBundleArchives();
-  for (auto const& ba : bas) {
-    try {
+  for (auto const& ba : bas)
+  {
+    try
+    {
       auto impl = std::make_shared<BundlePrivate>(coreCtx, ba);
       bundles.v.insert(std::make_pair(impl->location, impl));
-    } catch (...) {
+    }
+    catch (...)
+    {
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::cerr << "Failed to load bundle " << util::ToString(ba->GetBundleId())
                 << " (" + ba->GetBundleLocation() + ") uninstalled it!"
@@ -539,8 +582,10 @@ void BundleRegistry::Load()
 
 void BundleRegistry::CheckIllegalState() const
 {
-  if (coreCtx == nullptr) {
+  if (coreCtx == nullptr)
+  {
     throw std::logic_error("This framework instance is not active.");
   }
 }
+
 }

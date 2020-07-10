@@ -341,7 +341,7 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
   using cppms::any_cast;
   using cppms::any_map;
   
-  std::vector<Bundle> res;
+  std::vector<Bundle> installedBundles;
   std::vector<std::shared_ptr<BundleArchive>> barchives;
   scope_guard purge_on_error = [&barchives]()
                                {
@@ -391,7 +391,7 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     for (auto const& ba : barchives)
     {
       auto d = std::make_shared<BundlePrivate>(coreCtx, ba);
-      res.emplace_back(MakeBundle(d));
+      installedBundles.emplace_back(MakeBundle(d));
     }
 
     // For each bundle that we created, add into the map of location->bundle, completing the
@@ -399,13 +399,13 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     {
       auto l = bundles.Lock();
       US_UNUSED(l);
-      for (auto& b : res) {
+      for (auto& b : installedBundles) {
         bundles.v.insert(std::make_pair(location, b.d));
       }
     }
 
     // Now fire off the bundle event listeners.
-    for (auto& b : res) {
+    for (auto& b : installedBundles) {
       coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
     }
   } catch (...) {
@@ -418,7 +418,7 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
   purge_on_error.dismiss();
   
   // And finally return the results.
-  return res;
+  return installedBundles;
 }
 
 void BundleRegistry::Remove(const std::string& location, long id)

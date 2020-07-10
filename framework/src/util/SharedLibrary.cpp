@@ -27,6 +27,7 @@
 #include "cppmicroservices/util/FileSystem.h"
 
 #if defined(US_PLATFORM_POSIX)
+#  include <cerrno>
 #  include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
 #  include "cppmicroservices/util/Error.h"
@@ -47,16 +48,15 @@
 
 namespace cppmicroservices {
 
-class SharedLibraryPrivate : public SharedData
+class SharedLibraryPrivate
 {
 public:
   SharedLibraryPrivate()
-    : 
-     m_Suffix(US_LIB_EXT)
+    : m_Suffix(US_LIB_EXT)
     , m_Prefix(US_LIB_PREFIX)
   {}
 
-  void* m_Handle{nullptr};
+  void * m_Handle{ nullptr };
 
   std::string m_Name;
   std::string m_Path;
@@ -88,7 +88,7 @@ SharedLibrary::SharedLibrary(const std::string& absoluteFilePath)
 
 SharedLibrary::~SharedLibrary() = default;
 
-SharedLibrary& SharedLibrary::operator=(const SharedLibrary&) = default;
+SharedLibrary& SharedLibrary::operator=(const SharedLibrary& other) = default;
 
 void SharedLibrary::Load(int flags)
 {
@@ -99,25 +99,39 @@ void SharedLibrary::Load(int flags)
 #ifdef US_PLATFORM_POSIX
   d->m_Handle = dlopen(libPath.c_str(), flags);
   if (!d->m_Handle) {
+    std::error_code err_code(errno, std::generic_category());
     std::string err_msg = "Error loading " + libPath + ".";
     const char* err = dlerror();
     if (err) {
       err_msg += " " + std::string(err);
     }
 
-    throw std::runtime_error(err_msg);
+
+    d->m_Handle = nullptr;
+
+    // Bundle of origin information is not available here. It will be
+    // BundlePrivate::Start0() will catch this system_error and create
+    // a SharedLibraryException.
+    throw std::system_error(err_code, err_msg);
   }
 #else
   US_UNUSED(flags);
   std::wstring wpath(cppmicroservices::util::ToWString(libPath));
   d->m_Handle = LoadLibraryW(wpath.c_str());
+
   if (!d->m_Handle) {
+    std::error_code err_code(GetLastError(), std::generic_category());
     std::string errMsg = "Loading ";
     errMsg.append(libPath)
       .append("failed with error: ")
       .append(util::GetLastWin32ErrorStr());
 
-    throw std::runtime_error(errMsg);
+    d->m_Handle = nullptr;
+
+    // Bundle of origin information is not available here. Use try/catch
+    // around SharedLibrary::Load(), and throw a SharedLibraryException
+    // inside the catch statement, with the available bundle of origin.
+    throw std::system_error(err_code, errMsg);
   }
 #endif
 }
@@ -142,6 +156,7 @@ void SharedLibrary::Unload()
         err_msg += " " + std::string(err);
       }
 
+      d->m_Handle = nullptr;
       throw std::runtime_error(err_msg);
     }
 #else
@@ -151,9 +166,11 @@ void SharedLibrary::Unload()
         .append("failed with error: ")
         .append(util::GetLastWin32ErrorStr());
 
+      d->m_Handle = nullptr;
       throw std::runtime_error(errMsg);
     }
 #endif
+
     d->m_Handle = nullptr;
   }
 }
@@ -162,7 +179,7 @@ void SharedLibrary::SetName(const std::string& name)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Name = name;
 }
 
@@ -183,7 +200,6 @@ void SharedLibrary::SetFilePath(const std::string& absoluteFilePath)
   if (IsLoaded())
     return;
 
-  d.Detach();
   d->m_FilePath = absoluteFilePath;
 
   std::string name = d->m_FilePath;
@@ -217,7 +233,7 @@ void SharedLibrary::SetLibraryPath(const std::string& path)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Path = path;
 }
 
@@ -230,7 +246,7 @@ void SharedLibrary::SetSuffix(const std::string& suffix)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Suffix = suffix;
 }
 
@@ -243,7 +259,7 @@ void SharedLibrary::SetPrefix(const std::string& prefix)
 {
   if (IsLoaded() || !d->m_FilePath.empty())
     return;
-  d.Detach();
+
   d->m_Prefix = prefix;
 }
 

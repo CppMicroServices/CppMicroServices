@@ -72,10 +72,10 @@ std::string constructNestedKey(unsigned int depth
 
 BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath)(benchmark::State& state)
 {
-  auto         bundleProps = testBundle.GetHeaders();
-  Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto&  bundleProps = testBundle.GetHeaders();
+  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
+  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
   unsigned int depth       = static_cast<unsigned int>(state.range(0));
   std::string  key(constructNestedKey(depth, "relativelylongkeyname_map", "relativelylongkeyname_element"));
 
@@ -92,10 +92,10 @@ BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath)(benchmark::State& state)
 
 BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, ErrorPath)(benchmark::State& state)
 {
-  auto         bundleProps = testBundle.GetHeaders();
-  Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto&  bundleProps = testBundle.GetHeaders();
+  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
+  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
   unsigned int depth       = static_cast<unsigned int>(state.range(0));
   std::string  key(constructNestedKey(depth, "relativelylongkeyname_map", "relativelylongkeyname_unknown"));
 
@@ -113,10 +113,10 @@ BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, ErrorPath)(benchmark::State& state)
 
 BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath_NoThrowOverload)(benchmark::State& state)
 {
-  auto         bundleProps = testBundle.GetHeaders();
-  Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto&  bundleProps = testBundle.GetHeaders();
+  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
+  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
   unsigned int depth       = static_cast<unsigned int>(state.range(0));
   std::string  key(constructNestedKey(depth, "relativelylongkeyname_map", "relativelylongkeyname_element"));
 
@@ -134,10 +134,10 @@ BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath_NoThrowOverload)(benchmark::
 
 BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, ErrorPath_NoThrowOverload)(benchmark::State& state)
 {
-  auto         bundleProps = testBundle.GetHeaders();
-  Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto&  bundleProps = testBundle.GetHeaders();
+  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
+  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
   unsigned int depth       = static_cast<unsigned int>(state.range(0));
   std::string  key(constructNestedKey(depth
                                       , "relativelylongkeyname_map"

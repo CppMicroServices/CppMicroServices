@@ -33,7 +33,7 @@
 
 namespace cppmicroservices {
 
-class LDAPFilterData : public SharedData
+class LDAPFilterData
 {
 public:
   LDAPFilterData()
@@ -57,7 +57,7 @@ LDAPFilter::LDAPFilter(const std::string& filter)
   : d(nullptr)
 {
   try {
-    d = new LDAPFilterData(filter);
+    d = std::make_shared<LDAPFilterData>(filter);
   } catch (const std::exception& e) {
     throw std::invalid_argument(e.what());
   }

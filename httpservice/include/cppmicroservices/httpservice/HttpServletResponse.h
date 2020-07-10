@@ -23,10 +23,10 @@
 #ifndef CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 #define CPPMICROSERVICES_HTTPSERVLETRESPONSE_H
 
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
 #include <ctime>
+#include <memory>
 #include <string>
 
 namespace cppmicroservices {
@@ -328,13 +328,12 @@ public:
   void SendRedirect(const std::string& location);
 
 protected:
+  HttpServletResponse(HttpServletResponsePrivate* d);
   virtual std::streambuf* GetOutputStreamBuffer();
 
   void SetOutputStreamBuffer(std::streambuf* sb);
 
-  HttpServletResponse(HttpServletResponsePrivate* d);
-
-  ExplicitlySharedDataPointer<HttpServletResponsePrivate> d;
+  HttpServletResponsePrivate* d;
 
 private:
   friend class HttpServlet;

@@ -28,6 +28,7 @@
 
 #include "civetweb/civetweb.h"
 
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <ctime>
@@ -405,7 +406,7 @@ std::streambuf* HttpServletResponse::GetOutputStreamBuffer()
 {
   if (d->m_HttpOutputStreamBuf == nullptr) {
     d->m_HttpOutputStreamBuf =
-      new HttpOutputStreamBuffer(d.Data(), this->GetBufferSize());
+      new HttpOutputStreamBuffer(d, this->GetBufferSize());
   }
   return d->m_HttpOutputStreamBuf;
 }

@@ -40,55 +40,19 @@
 
 #include <cassert>
 #include <map>
-#include <deque>
-#include <functional>
-
-namespace {
-
-class scope_guard {
-public:
-  enum execution { always, no_exception, exception };
-
-  scope_guard(scope_guard &&) = default;
-  explicit scope_guard(execution policy = always) : policy(policy) {}
-
-  template<class Callable>
-  scope_guard(Callable && func, execution policy = always) : policy(policy) {
-    this->operator += <Callable>(std::forward<Callable>(func));
-  }
-
-  template<class Callable>
-  scope_guard& operator += (Callable && func) try {
-    handlers.emplace_front(std::forward<Callable>(func));
-    return *this;
-  } catch(...) {
-    if(policy != no_exception) func();
-    throw;
-  }
-
-  ~scope_guard() {
-    if(policy == always || (std::uncaught_exception() == (policy == exception))) {
-      for(auto &f : handlers) try {
-          f(); // must not throw
-        } catch(...) { /* std::terminate(); ? */ }
-    }
-  }
-
-  void dismiss() noexcept {
-    handlers.clear();
-  }
-
-private:
-  scope_guard(const scope_guard&) = delete;
-  void operator = (const scope_guard&) = delete;
-
-  std::deque<std::function<void()>> handlers;
-  execution policy = always;
-};
-
-}
 
 namespace cppmicroservices {
+
+// Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
+class InitialBundleMapCleanup {
+public:
+  InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn)) {}
+  ~InitialBundleMapCleanup() {
+	_cleanupFcn();
+  }
+private:
+  std::function<void()> _cleanupFcn;
+};
 
 BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
@@ -134,9 +98,9 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
 {
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
-  auto resourceContainer = (foundBundles.first == foundBundles.second
-                            ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
-                            : foundBundles.first->second->GetBundleArchive()->GetResourceContainer());
+  auto resourceContainer = (foundBundles.first == foundBundles.second)
+                           ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
+                           : foundBundles.first->second->GetBundleArchive()->GetResourceContainer();
 
   while (foundBundles.first != foundBundles.second) {
     auto installedBundlePrivate = foundBundles.first->second;
@@ -202,8 +166,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       that it is able to continue with it's install, it goes ahead and performs the regular
       install procedure.
   */
-  if (bundlesAtLocationRange.first != bundlesAtLocationRange.second)
-  {
+  if (bundlesAtLocationRange.first != bundlesAtLocationRange.second) {
     l.UnLock();
 
     std::vector<Bundle> resultingBundles;
@@ -219,17 +182,12 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
     // Perform the install
     auto newBundles = Install0(location, resCont, alreadyInstalled, caller, bundleManifest);
     resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
-    if (resultingBundles.empty())
-    {
+    if (resultingBundles.empty()) {
       throw std::runtime_error("All bundles rejected by a bundle hook");
-    }
-    else
-    {
+    } else {
       return resultingBundles;
     }
-  }
-  else
-  {
+  } else {
     // Check to see if another thread is currently in the process of installing this
     // bundle for the first time.
     auto alreadyInstallingIterator = initialBundleInstallMap.find(location);
@@ -253,16 +211,15 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       
       {
         // create instance of clean-up object to ensure RAII
-        scope_guard cleanup = [this, &l, &location]()
-                              {
-                                {
-                                  // Notify all waiting threads that it is safe to install the bundle
-                                  std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
-                                  initialBundleInstallMap[location].second.waitFlag = false;
-                                  initialBundleInstallMap[location].second.cv->notify_all();
-                                }
-                                DecrementInitialBundleMapRef(l, location);
-                              };
+        InitialBundleMapCleanup cleanup([this, &l, &location]() {
+                                          {
+                                            // Notify all waiting threads that it is safe to install the bundle
+                                            std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
+                                            initialBundleInstallMap[location].second.waitFlag = false;
+                                            initialBundleInstallMap[location].second.cv->notify_all();
+                                          }
+                                          DecrementInitialBundleMapRef(l, location);
+                                        });
           
         // Perform the install
         auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
@@ -305,10 +262,9 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       
       {
         // create instance of clean-up object to ensure RAII
-        scope_guard cleanup = [this, &l, &location]()
-                              {
-                                DecrementInitialBundleMapRef(l, location);
-                              };
+        InitialBundleMapCleanup cleanup([this, &l, &location](){
+          DecrementInitialBundleMapRef(l, location);
+        });
 
         // Perform the install
         newBundles = Install0(location, resCont, alreadyInstalled, caller, bundleManifest);
@@ -335,14 +291,8 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
   using cppms::any_cast;
   using cppms::any_map;
   
-  std::vector<Bundle> installed_bundles;
-  std::vector<std::shared_ptr<BundleArchive>> purge_on_error;
-  scope_guard guard = [&purge_on_error]() {
-                        for (auto& ba : purge_on_error) {
-                          ba->Purge();
-                        }
-                      };
-  
+  std::vector<Bundle> res;
+  std::vector<std::shared_ptr<BundleArchive>> barchives;
   std::unordered_set<std::string> exclude { alreadyInstalled.begin(), alreadyInstalled.end() };
   try {
     // Create a BundleArchive for each entry in the resource container... that is, top level entries
@@ -352,9 +302,11 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     // "bundleManifest" are also the "SymbolicNames", bundleManifest can be empty and will only
     // contain the symbolicName entries if it's not.
     auto entries = resCont->GetTopLevelDirs();
-    for (auto const& symbolicName : entries) {
-      // only install non-excluded entries
-      if (0 == exclude.count(symbolicName)) {
+    for (auto const& symbolicName : entries)
+    {
+      if (0 == exclude.count(symbolicName))
+        // only install non-excluded entries
+      {
 #ifndef US_BUILD_SHARED_LIBS
         // The system bundle is already installed, so skip it.
         if (Constants::SYSTEM_BUNDLE_SYMBOLICNAME == symbolicName) {
@@ -364,32 +316,53 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
 
         // Either use the manifest found in the passed in bundleManifest list for the current entry,
         // or construct an empty one
-        auto const& manifest = (0 != bundleManifest.count(symbolicName)
-                                ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
-                                : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
-        
+        auto manifest = (0 != bundleManifest.count(symbolicName))
+                        ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
+                        : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+
         // Now, create a BundleArchive with the given manifest at 'entry' in the
         // BundleResourceContainer, and remember the created BundleArchive here for later
         // processing, including purging any items created if an exception is thrown.
-        auto archive = coreCtx->storage->CreateAndInsertArchive(resCont
-                                                                , symbolicName
-                                                                , manifest);
-        purge_on_error.emplace_back(archive);
-        auto bundle = MakeBundle(std::make_shared<BundlePrivate>(coreCtx, archive));
-        installed_bundles.emplace_back(bundle);
-        bundles.v.insert(std::make_pair(location, bundle.d));
-        coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
+        barchives.push_back(coreCtx->storage->CreateAndInsertArchive(resCont
+                                                                     , symbolicName
+                                                                     , manifest));
       }
     }
-  }
-  catch (...) {
+    
+    // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
+    // that are returned, one for each BundlePrivate that's created.
+    for (auto const& ba : barchives)
+    {
+      auto d = std::make_shared<BundlePrivate>(coreCtx, ba);
+      res.emplace_back(MakeBundle(d));
+    }
+
+    // For each bundle that we created, add into the map of location->bundle, completing the
+    // addition of the bundle into the registry with the given manifest.
+    {
+      auto l = bundles.Lock();
+      US_UNUSED(l);
+      for (auto& b : res) {
+        bundles.v.insert(std::make_pair(location, b.d));
+      }
+    }
+
+    // Now fire off the bundle event listeners.
+    for (auto& b : res) {
+      coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
+    }
+
+    // And finally return the results.
+    return res;
+  } catch (...) {
+    for (auto& ba : barchives) {
+      ba->Purge();
+    }
     throw std::runtime_error("Failed to install bundle library at "
                              + location
                              + ": "
                              + util::GetLastExceptionStr());
   }
-  guard.dismiss();
-  return installed_bundles;
 }
 
 void BundleRegistry::Remove(const std::string& location, long id)

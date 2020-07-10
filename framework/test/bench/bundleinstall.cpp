@@ -65,7 +65,7 @@ protected:
   {
     using namespace std::chrono;
 
-    std::string bundleBasePath = "bundles\\test_bundle_";
+    std::string bundleBasePath = "bundles\\bundle_";
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();
     framework.Start();
 
@@ -157,6 +157,12 @@ BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
 {
   InstallConcurrently(state, std::thread::hardware_concurrency());
 }
+BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstall1ThreadPerBundle)
+  (benchmark::State& state)
+{
+  InstallConcurrently(state, 5000);
+}
+
 #endif
 
 // Register functions as benchmark
@@ -172,5 +178,7 @@ BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)
   ->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
+  ->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall1ThreadPerBundle)
   ->UseManualTime();
 #endif

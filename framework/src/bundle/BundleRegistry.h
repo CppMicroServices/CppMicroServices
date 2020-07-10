@@ -77,7 +77,6 @@ public:
   std::vector<Bundle> Install0(const std::string& location
                                , const std::shared_ptr<BundleResourceContainer>& resCont
                                , const std::vector<std::string>& alreadyInstalled
-                               , BundlePrivate* caller
                                , const ManifestT& bundleManifest);
 
   /**

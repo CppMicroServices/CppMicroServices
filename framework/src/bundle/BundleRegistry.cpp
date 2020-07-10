@@ -40,19 +40,55 @@
 
 #include <cassert>
 #include <map>
+#include <deque>
+#include <functional>
+
+namespace {
+
+class scope_guard {
+public:
+  enum execution { always, no_exception, exception };
+
+  scope_guard(scope_guard &&) = default;
+  explicit scope_guard(execution policy = always) : policy(policy) {}
+
+  template<class Callable>
+  scope_guard(Callable && func, execution policy = always) : policy(policy) {
+    this->operator += <Callable>(std::forward<Callable>(func));
+  }
+
+  template<class Callable>
+  scope_guard& operator += (Callable && func) try {
+    handlers.emplace_front(std::forward<Callable>(func));
+    return *this;
+  } catch(...) {
+    if(policy != no_exception) func();
+    throw;
+  }
+
+  ~scope_guard() {
+    if(policy == always || (std::uncaught_exception() == (policy == exception))) {
+      for(auto &f : handlers) try {
+          f(); // must not throw
+        } catch(...) { /* std::terminate(); ? */ }
+  }
+  }
+
+  void dismiss() noexcept {
+    handlers.clear();
+  }
+
+private:
+  scope_guard(const scope_guard&) = delete;
+  void operator = (const scope_guard&) = delete;
+
+  std::deque<std::function<void()>> handlers;
+  execution policy = always;
+};
+
+}
 
 namespace cppmicroservices {
-
-// Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
-class InitialBundleMapCleanup {
-public:
-  InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn)) {}
-  ~InitialBundleMapCleanup() {
-	_cleanupFcn();
-  }
-private:
-  std::function<void()> _cleanupFcn;
-};
 
 BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
@@ -96,6 +132,9 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
                                                                                               , std::vector<Bundle>& resultingBundles
                                                                                               , std::vector<std::string>& alreadyInstalled)
 {
+  auto l = bundles.Lock();
+  US_UNUSED(l);
+  
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
   auto resourceContainer = (foundBundles.first == foundBundles.second)
@@ -129,7 +168,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 }
 
 std::vector<Bundle> BundleRegistry::Install(const std::string& location
-                                            , BundlePrivate* caller
+                                            , BundlePrivate*
                                             , const ManifestT& bundleManifest)
 {
   using namespace std::chrono_literals;
@@ -180,7 +219,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
                                                         , alreadyInstalled);
 
     // Perform the install
-    auto newBundles = Install0(location, resCont, alreadyInstalled, caller, bundleManifest);
+    auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
     resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
     if (resultingBundles.empty()) {
       throw std::runtime_error("All bundles rejected by a bundle hook");
@@ -211,19 +250,23 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       
       {
         // create instance of clean-up object to ensure RAII
-        InitialBundleMapCleanup cleanup([this, &l, &location]() {
-                                          {
-                                            // Notify all waiting threads that it is safe to install the bundle
-                                            std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
-                                            initialBundleInstallMap[location].second.waitFlag = false;
-                                            initialBundleInstallMap[location].second.cv->notify_all();
-                                          }
-                                          DecrementInitialBundleMapRef(l, location);
-                                        });
+        scope_guard cleanup = [this, &l, &location]()
+                              {
+                                {
+                                  l.Lock();
+                                  auto& p = initialBundleInstallMap[location];
+                                  // Notify all waiting threads that it is safe to install the bundle
+                                  std::lock_guard<std::mutex> lock(*(p.second.m));
+                                  p.second.waitFlag = false;
+                                  p.second.cv->notify_all();
+                                  l.UnLock();
+                                }
+                                DecrementInitialBundleMapRef(l, location);
+                              };
           
         // Perform the install
         auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
-        installedBundles = Install0(location, resCont, {}, caller, bundleManifest);
+        installedBundles = Install0(location, resCont, {}, bundleManifest);
       }
 
       return installedBundles;
@@ -233,20 +276,27 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       {
         // Wait for the install thread to notify this thread that it is safe
         // to install the current bundle
-        std::unique_lock<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
+        auto& p = initialBundleInstallMap[location];
+        l.UnLock();
+        std::unique_lock<std::mutex> lock(*(p.second.m));
 
         // This while loop exists to prevent a known race condition. If the installing thread notifies before
         // another thread trying to install the same bundle reaches this wait, it will wait indefinitely. To
         // fix this, a wait_for is used intead (which utilizes a timeout to avoid this race) and the wait statement
         // as a whole acts as the while statement's predicate; once the timeout is reached, wait_for exits and the
         // statement is re-evaluated since it would have returned false.
-        while (!initialBundleInstallMap[location].second.cv->wait_for(lock, 0.1ms, [&location, this] {
-          return !initialBundleInstallMap[location].second.waitFlag;
-          }));
+        while (!p.second.cv->wait_for(lock
+                                      , 0.1ms
+                                      , [&p]
+                                        {
+                                          return !p.second.waitFlag;
+                                        }
+                                     ));
       }
       
       // Re-acquire the range because while this thread was waiting, the installing
       // thread made a modification to bundles.v
+      l.Lock();
       bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
       l.UnLock();
 
@@ -262,12 +312,13 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
       
       {
         // create instance of clean-up object to ensure RAII
-        InitialBundleMapCleanup cleanup([this, &l, &location](){
-          DecrementInitialBundleMapRef(l, location);
-        });
+        scope_guard cleanup = [this, &l, &location]()
+                              {
+                                DecrementInitialBundleMapRef(l, location);
+                              };
 
         // Perform the install
-        newBundles = Install0(location, resCont, alreadyInstalled, caller, bundleManifest);
+        newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
       }
 
       resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
@@ -283,7 +334,6 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 std::vector<Bundle> BundleRegistry::Install0(const std::string& location
                                              , const std::shared_ptr<BundleResourceContainer>& resCont
                                              , const std::vector<std::string>& alreadyInstalled
-                                             , BundlePrivate* /*caller*/
                                              , const ManifestT& bundleManifest)
 {
   namespace cppms = cppmicroservices;
@@ -293,6 +343,13 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
   
   std::vector<Bundle> res;
   std::vector<std::shared_ptr<BundleArchive>> barchives;
+  scope_guard purge_on_error = [&barchives]()
+                               {
+                                 for (auto& ba : barchives) {
+                                   ba->Purge();
+                                 }
+                               };
+  
   std::unordered_set<std::string> exclude { alreadyInstalled.begin(), alreadyInstalled.end() };
   try {
     // Create a BundleArchive for each entry in the resource container... that is, top level entries
@@ -351,18 +408,17 @@ std::vector<Bundle> BundleRegistry::Install0(const std::string& location
     for (auto& b : res) {
       coreCtx->listeners.BundleChanged(BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
     }
-
-    // And finally return the results.
-    return res;
   } catch (...) {
-    for (auto& ba : barchives) {
-      ba->Purge();
-    }
     throw std::runtime_error("Failed to install bundle library at "
                              + location
                              + ": "
                              + util::GetLastExceptionStr());
   }
+  // If we get here, no need to purge, so dismiss.
+  purge_on_error.dismiss();
+  
+  // And finally return the results.
+  return res;
 }
 
 void BundleRegistry::Remove(const std::string& location, long id)
@@ -474,7 +530,7 @@ void BundleRegistry::Load()
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::cerr << "Failed to load bundle " << util::ToString(ba->GetBundleId())
                 << " (" + ba->GetBundleLocation() + ") uninstalled it!"
-                << " (execption: "
+                << " (exception: "
                 << util::GetExceptionStr(std::current_exception()) << ")"
                 << std::endl;
     }

@@ -153,8 +153,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
   /**
-   * Return the manifest for the bundle in this bundlearchive. If manifest is currently empty, read
-   * the manifest from the bundle at location and then return it.
+   * Return the manifest for the bundle in this bundlearchive.
    */
   const AnyMap& GetInjectedManifest() const;
 private:

@@ -155,7 +155,7 @@ void BundleRegistry::DecrementInitialBundleMapRef(cppmicroservices::detail::Mute
 
 std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBundlesAtLocation(std::pair<BundleMap::iterator, BundleMap::iterator> foundBundles
                                                                                               , const std::string& location
-                                                                                              , const ManifestT& bundleManifest
+                                                                                              , const cppmicroservices::AnyMap& bundleManifest
                                                                                               , std::vector<Bundle>& resultingBundles
                                                                                               , std::vector<std::string>& alreadyInstalled)
 {
@@ -184,19 +184,8 @@ std::shared_ptr<BundleResourceContainer> BundleRegistry::GetAlreadyInstalledBund
 }
 
 std::vector<Bundle> BundleRegistry::Install(const std::string& location
-                                            , BundlePrivate* caller)
-{
-  using cppmicroservices::AnyMap;
-  using cppmicroservices::any_map;
-  
-  return Install(location
-                 , caller
-                 , AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
-}
-
-std::vector<Bundle> BundleRegistry::Install(const std::string& location
                                             , BundlePrivate*
-                                            , const ManifestT& bundleManifest)
+                                            , const cppmicroservices::AnyMap& bundleManifest)
 {
   using namespace std::chrono_literals;
 
@@ -363,7 +352,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location
 std::vector<Bundle> BundleRegistry::Install0(const std::string& location
                                              , const std::shared_ptr<BundleResourceContainer>& resCont
                                              , const std::vector<std::string>& alreadyInstalled
-                                             , const ManifestT& bundleManifest)
+                                             , const cppmicroservices::AnyMap& bundleManifest)
 {
   namespace cppms = cppmicroservices;
   using cppms::AnyMap;

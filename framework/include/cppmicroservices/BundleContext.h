@@ -1054,8 +1054,42 @@ public:
    */
   std::string GetDataFile(const std::string& filename) const;
 
+/**
+ * Installs all bundles from the bundle library at the specified location.
+ *
+ * The following steps are required to install a bundle:
+ * -# If a bundle containing the same install location is already installed, the Bundle object for that
+ *    bundle is returned.
+ * -# The bundle's associated resources are allocated. The associated resources minimally consist of a
+ *    unique identifier and a persistent storage area if the platform has file system support. If this step
+ *    fails, a std::runtime_error is thrown.
+ * -# A bundle event of type <code>BundleEvent::BUNDLE_INSTALLED</code> is fired.
+ * -# The Bundle object for the newly or previously installed bundle is returned.
+ *
+ * @remarks An install location is an absolute path to a shared library or executable file
+ * which may contain several bundles, i. e. acts as a bundle library.
+ *
+ * @remarks If the bundleManifest is passed in, it is installed. When the bundle is Started, the
+ * BundleManifest is NOT read from the file (as it has already been installed). In the event that
+ * the injected bundle manifest does NOT match the manifest in the bundle's file, the behavior of
+ * the system is undefined. That is, the content of the injected manifest and the manifest on disk
+ * are expected to be the same and are not compared.
+ * 
+ * @param location The location of the bundle library to install.
+ * @param bundleManifest the manifest of the bundle at "location". If non-empty
+ *        this will be used without opening the bundle at "location". Otherwise, the bundle will
+ *        be opened and the manifest read from there.
+ * @return The Bundle objects of the installed bundle library.
+ * @throws std::runtime_error If the BundleContext is no longer valid, or if the installation failed.
+ * @throws std::logic_error If the framework instance is no longer active
+ * @throws std::invalid_argument If the location is not a valid UTF8 string
+ */
+  std::vector<Bundle> InstallBundles(const std::string& location
+                                     , const cppmicroservices::AnyMap& bundleManifest);
+
   /**
    * Installs all bundles from the bundle library at the specified location.
+   * Calls InstallBundles(location, {})
    *
    * The following steps are required to install a bundle:
    * -# If a bundle containing the same install location is already installed, the Bundle object for that
@@ -1070,20 +1104,10 @@ public:
    * which may contain several bundles, i. e. acts as a bundle library.
    *
    * @param location The location of the bundle library to install.
-   * @param bundleManifest the manifest of the bundle at "location". If non-empty
-   *        this will be used without opening the bundle at "location". Otherwise, the bundle will
-   *        be opened and the manifest read from there.
    * @return The Bundle objects of the installed bundle library.
    * @throws std::runtime_error If the BundleContext is no longer valid, or if the installation failed.
    * @throws std::logic_error If the framework instance is no longer active
    * @throws std::invalid_argument If the location is not a valid UTF8 string
-   */
-  std::vector<Bundle> InstallBundles(const std::string& location
-                                     , const cppmicroservices::AnyMap& bundleManifest);
-
-  /**
-   * Installs all bundles from the bundle library at the specified location.
-   * Calls InstallBundles(location, {})
    */
   std::vector<Bundle> InstallBundles(const std::string& location);
 

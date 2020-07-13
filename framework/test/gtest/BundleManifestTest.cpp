@@ -44,7 +44,6 @@ using namespace cppmicroservices;
 namespace
 {
 
-#ifdef US_BUILD_SHARED_LIBS
 std::string libName(const std::string& libBase)
 {
   return (US_LIB_PREFIX
@@ -53,6 +52,7 @@ std::string libName(const std::string& libBase)
           + US_LIB_EXT);
 }
 
+#ifdef US_BUILD_SHARED_LIBS
 std::string fullLibPath(const std::string& libBase)
 {
   namespace cu = cppmicroservices::util;
@@ -234,9 +234,9 @@ struct TestBundleAService
 
 }
 
+#ifdef US_BUILD_SHARED_LIBS
 TEST_F(BundleManifestTest, DirectManifestInstall)
 {
-#ifdef US_BUILD_SHARED_LIBS
   auto ctx = framework.GetBundleContext();
 
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -262,12 +262,10 @@ TEST_F(BundleManifestTest, DirectManifestInstall)
     }
     break;
   }
-#endif
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)
 {
-#ifdef US_BUILD_SHARED_LIBS
   auto ctx = framework.GetBundleContext();
 
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -280,12 +278,10 @@ TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)
   auto const libPath = fullLibPath("TestBundleA");
 
   EXPECT_THROW({ctx.InstallBundles("/non/existent/path/to/bundle.dylib", manifests);}, std::runtime_error);
-#endif
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallMulti)
 {
-#ifdef US_BUILD_SHARED_LIBS
   // Support the static linking case in which we have multiple bundles in one location that need to
   // be installed, so the "manifests" passed in contains a vector of bundle manifests, one for each
   // bundle at the location.
@@ -318,12 +314,10 @@ TEST_F(BundleManifestTest, DirectManifestInstallMulti)
       ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
     }
   }
-#endif
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
 {
-#ifdef US_BUILD_SHARED_LIBS
   auto ctx = framework.GetBundleContext();
 
   cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -350,12 +344,10 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
   auto ref = ctx.GetServiceReference<cppmicroservices::TestBundleAService>();
   auto svc = ctx.GetService(ref);
   ASSERT_TRUE(!!svc);
-#endif
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
 {
-#ifdef US_BUILD_SHARED_LIBS
   namespace cppms = cppmicroservices;
   namespace sc = std::chrono;
   using ucimap = cppms::AnyMap::unordered_any_cimap;
@@ -395,13 +387,11 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
       ASSERT_NO_THROW(b.Start());
     }
   }
-#endif
 }
 
 
 TEST_F(BundleManifestTest, IgnoreSecondManifestInstall)
 {
-#ifdef US_BUILD_SHARED_LIBS
   namespace cppms = cppmicroservices;
   using cppms::AnyMap;
   using cppms::any_map;
@@ -433,5 +423,40 @@ TEST_F(BundleManifestTest, IgnoreSecondManifestInstall)
   auto const& secondHeaders = secondBundles[0].GetHeaders();
   // should still be true after install.
   ASSERT_TRUE(any_cast<bool>(secondHeaders.at("test")));
-#endif
 }
+
+TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
+{
+  namespace cppms = cppmicroservices;
+  namespace sc = std::chrono;
+  using ucimap = cppms::AnyMap::unordered_any_cimap;
+  
+  auto ctx = framework.GetBundleContext();
+
+  cppms::AnyMap manifests(cppms::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+
+  ucimap bManifest = {
+    { "bundle.symbolic_name", std::string("TestBundleB") }
+    , { "bundle.activator", true }
+  };
+  ucimap b2Manifest = {
+    { "bundle.symbolic_name", std::string("TestBundleImportedByB") }
+    , { "bundle.activator", true }
+  };
+  ucimap bLocationMap = {
+    { "TestBundleB", cppms::AnyMap(bManifest) }
+    , { "TestBundleImportedByB", cppms::AnyMap(b2Manifest) }
+  };
+  // Now use the new API to install bundles with the path and a manifest stored in an AnyMap. 
+  auto bundleRoot = cppms::testing::LIB_PATH
+                    + util::DIR_SEP;
+  auto const& libPath = libName("TestBundleB");
+  auto const& fullLibPath = bundleRoot + libPath;
+  auto const& bundles = ctx.InstallBundles(fullLibPath
+                                           , cppms::AnyMap(bLocationMap));
+  ASSERT_EQ(2, bundles.size());
+  for (auto b : bundles) {
+    ASSERT_NO_THROW(b.Start());
+  }
+}
+#endif

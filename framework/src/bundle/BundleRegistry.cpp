@@ -96,7 +96,9 @@ void BundleRegistry::DecrementInitialBundleMapRef(
   This function populates the res and alreadyInstalled vectors with the
   appropriate entries so that they can be used by the Install0 call. This was
   extracted from Install() for convenience. We lock the 'bundles' object to
-  prevent any installs from writing to the map while this operation is occurring.
+  prevent any installs from writing to the map while this operation is occurring
+  since the map can trigger a re-balancing of the tree nodes and cause some of
+  the iterators to be incorrect.
 */
 void BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
   std::pair<BundleMap::iterator, BundleMap::iterator> foundBundles,

@@ -262,6 +262,10 @@ TEST_F(BundleManifestTest, DirectManifestInstallNoSymbolicName)
   cppmicroservices::AnyMap manifests(
     cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
+    // We need to have at least one entry in the manifest to check and make sure it has what's
+    // required. This is because if the manifest is empty, it is assumed that we are NOT injecting a
+    // manifest and we go through the standard install by reading the manifest from the bundle
+    // itself. 
     { "foo" , std::string("bar") }
   };
   manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);

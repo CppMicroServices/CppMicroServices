@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_BUNDLESTORAGE_H
 #define CPPMICROSERVICES_BUNDLESTORAGE_H
 
-#include "cppmicroservices/AnyMap.h"
 #include "BundleResourceContainer.h"
+#include "cppmicroservices/AnyMap.h"
 
 #include <memory>
 #include <string>
@@ -41,7 +41,7 @@ struct BundleStorage
 {
 
   BundleStorage() {}
-  
+
   virtual ~BundleStorage() {}
 
   /**
@@ -52,16 +52,18 @@ struct BundleStorage
    * @return A shared_ptr to the BundleArchive representing the installed bundles.
    */
   using ManifestT = cppmicroservices::AnyMap;
-  virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(const std::shared_ptr<BundleResourceContainer>& resCont
-                                                                , const std::string& topLevelEntry
-                                                                , const ManifestT&) = 0;
+  virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::string& topLevelEntry,
+    const ManifestT&) = 0;
 
   /**
    * Get all bundle archive objects.
    *
    * @return A list with bundle archive objects.
    */
-  virtual std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const = 0;
+  virtual std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
+    const = 0;
 
   /**
    * Get all bundles tagged to start at next launch of framework.

@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 #define CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 
-#include "cppmicroservices/util/BundleObjFile.h"
 #include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/util/BundleObjFile.h"
 
 #include "miniz.h"
 
@@ -96,7 +96,7 @@ public:
   void CloseContainer();
 
 private:
-using NameIndexPair = std::pair<std::string, int>;
+  using NameIndexPair = std::pair<std::string, int>;
 
   struct PairComp
   {

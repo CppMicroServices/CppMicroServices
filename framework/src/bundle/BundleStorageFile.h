@@ -33,13 +33,15 @@ class BundleStorageFile : public BundleStorage
 public:
   BundleStorageFile();
 
-  std::shared_ptr<BundleArchive> CreateAndInsertArchive(const std::shared_ptr<BundleResourceContainer>& resCont
-                                                        , const std::string& topLevelEntry
-                                                        , const ManifestT&) override;
+  std::shared_ptr<BundleArchive> CreateAndInsertArchive(
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::string& topLevelEntry,
+    const ManifestT&) override;
 
   bool RemoveArchive(const BundleArchive* ba) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const override;
+  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
+    const override;
 
   std::vector<long> GetStartOnLaunchBundles() const override;
 

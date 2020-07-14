@@ -23,12 +23,12 @@
 #ifndef CPPMICROSERVICES_BUNDLECONTEXT_H
 #define CPPMICROSERVICES_BUNDLECONTEXT_H
 
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ListenerToken.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceRegistration.h"
-#include "cppmicroservices/AnyMap.h"
 
 #include <memory>
 
@@ -1054,7 +1054,7 @@ public:
    */
   std::string GetDataFile(const std::string& filename) const;
 
-/**
+  /**
  * Installs all bundles from the bundle library at the specified location.
  *
  * The following steps are required to install a bundle:
@@ -1084,8 +1084,9 @@ public:
  * @throws std::logic_error If the framework instance is no longer active
  * @throws std::invalid_argument If the location is not a valid UTF8 string
  */
-  std::vector<Bundle> InstallBundles(const std::string& location
-                                     , const cppmicroservices::AnyMap& bundleManifest);
+  std::vector<Bundle> InstallBundles(
+    const std::string& location,
+    const cppmicroservices::AnyMap& bundleManifest);
 
   /**
    * Installs all bundles from the bundle library at the specified location.
@@ -1118,7 +1119,7 @@ private:
     const std::shared_ptr<BundleContextPrivate>&);
   friend std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext&);
 
-  BundleContext(std::shared_ptr<BundleContextPrivate>  ctx);
+  BundleContext(std::shared_ptr<BundleContextPrivate> ctx);
   // allow templated code to use the internal logger
   template<class S, class TTT, class R>
   friend class detail::BundleAbstractTracked;

@@ -23,10 +23,10 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include "BundleManifest.h"
 
@@ -48,12 +48,12 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   BundleArchive();
 
-  BundleArchive(BundleStorage* storage
-                , std::shared_ptr<BundleResourceContainer>  resourceContainer
-                , std::string  resourcePrefix
-                , std::string  location
-                , long bundleId
-                , AnyMap bundleManifest);
+  BundleArchive(BundleStorage* storage,
+                std::shared_ptr<BundleResourceContainer> resourceContainer,
+                std::string resourcePrefix,
+                std::string location,
+                long bundleId,
+                AnyMap bundleManifest);
 
   /**
    * Autostart setting stopped.
@@ -156,6 +156,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    * Return the manifest for the bundle in this bundlearchive.
    */
   const AnyMap& GetInjectedManifest() const;
+
 private:
   BundleStorage* const storage;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;

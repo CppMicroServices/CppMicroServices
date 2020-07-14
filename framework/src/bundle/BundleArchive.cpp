@@ -22,15 +22,15 @@
 
 #include "BundleArchive.h"
 
-#include <utility>
 #include <iostream>
+#include <utility>
 
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
 #include "cppmicroservices/util/Error.h"
 
-#include "BundleResourceContainer.h"
 #include "BundleManifest.h"
+#include "BundleResourceContainer.h"
 #include "BundleStorage.h"
 
 #include "Utils.h"
@@ -42,14 +42,17 @@ namespace {
 int64_t now()
 {
   namespace sc = std::chrono;
-  return sc::duration_cast<sc::milliseconds>(sc::steady_clock::now().time_since_epoch()).count();
+  return sc::duration_cast<sc::milliseconds>(
+           sc::steady_clock::now().time_since_epoch())
+    .count();
 }
 
 }
 
-const std::string BundleArchive::AUTOSTART_SETTING_STOPPED           = "stopped";
-const std::string BundleArchive::AUTOSTART_SETTING_EAGER             = "eager";
-const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY = "activation_policy";
+const std::string BundleArchive::AUTOSTART_SETTING_STOPPED = "stopped";
+const std::string BundleArchive::AUTOSTART_SETTING_EAGER = "eager";
+const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
+  "activation_policy";
 
 BundleArchive::BundleArchive()
   : storage(nullptr)
@@ -57,12 +60,13 @@ BundleArchive::BundleArchive()
   , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
 
-BundleArchive::BundleArchive(BundleStorage* storage
-                             , std::shared_ptr<BundleResourceContainer>  resourceContainer
-                             , std::string  prefix
-                             , std::string  location
-                             , long bundleId
-                             , AnyMap bundleManifest)
+BundleArchive::BundleArchive(
+  BundleStorage* storage,
+  std::shared_ptr<BundleResourceContainer> resourceContainer,
+  std::string prefix,
+  std::string location,
+  long bundleId,
+  AnyMap bundleManifest)
   : storage(storage)
   , resourceContainer(std::move(resourceContainer))
   , resourcePrefix(std::move(prefix))
@@ -71,8 +75,7 @@ BundleArchive::BundleArchive(BundleStorage* storage
   , lastModified(now())
   , autostartSetting(-1)
   , manifest(std::move(bundleManifest))
-{
-}
+{}
 
 bool BundleArchive::IsValid() const
 {
@@ -138,14 +141,15 @@ std::vector<BundleResource> BundleArchive::FindResources(
 
 BundleArchive::TimeStamp BundleArchive::GetLastModified() const
 {
-  return TimeStamp { std::chrono::milliseconds(lastModified) };
+  return TimeStamp{ std::chrono::milliseconds(lastModified) };
 }
 
 void BundleArchive::SetLastModified(const TimeStamp& ts)
 {
   namespace sc = std::chrono;
-  
-  lastModified = sc::duration_cast<sc::milliseconds>(ts.time_since_epoch()).count();
+
+  lastModified =
+    sc::duration_cast<sc::milliseconds>(ts.time_since_epoch()).count();
 }
 
 int32_t BundleArchive::GetAutostartSetting() const
@@ -158,8 +162,8 @@ void BundleArchive::SetAutostartSetting(int32_t setting)
   autostartSetting = setting;
 }
 
-std::shared_ptr<BundleResourceContainer>
-BundleArchive::GetResourceContainer() const
+std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
+  const
 {
   return resourceContainer;
 }

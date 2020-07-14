@@ -93,7 +93,8 @@ public:
 
 ServiceListenerEntry::ServiceListenerEntry() = default;
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) = default;
+ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) =
+  default;
 
 ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListenerHook::ListenerInfo& info)
@@ -173,14 +174,16 @@ ListenerTokenId ServiceListenerEntry::Id() const
 std::size_t ServiceListenerEntry::Hash() const
 {
   using std::hash;
-  
+
   if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0) {
-    static_cast<ServiceListenerEntryData*>(d.get())->hashValue = ((hash<BundleContextPrivate*>()(d->context.get())
-                                                                   ^(hash<void*>()(d->data) << 1)) >> 1)
-                                                                 ^((hash<ServiceListener>()(d->listener))
-                                                                   ^(hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
+    static_cast<ServiceListenerEntryData*>(d.get())->hashValue =
+      ((hash<BundleContextPrivate*>()(d->context.get()) ^
+        (hash<void*>()(d->data) << 1)) >>
+       1) ^
+      ((hash<ServiceListener>()(d->listener)) ^
+       (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
-  
+
   return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
 }
 }

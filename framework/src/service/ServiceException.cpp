@@ -48,7 +48,8 @@ ServiceException::Type ServiceException::GetType() const
 }
 }
 
-std::ostream& operator<<(std::ostream& os, const cppmicroservices::ServiceException& exc)
+std::ostream& operator<<(std::ostream& os,
+                         const cppmicroservices::ServiceException& exc)
 {
   return os << "ServiceException: " << exc.what();
 }

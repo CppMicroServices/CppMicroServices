@@ -45,7 +45,8 @@ public:
 
   void Start(BundleContext context)
   {
-    sr = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+    sr =
+      context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
   }
 
   void Stop(BundleContext /*context*/) {}

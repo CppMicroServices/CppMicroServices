@@ -21,8 +21,8 @@
 =============================================================================*/
 
 #include "BundleStorageMemory.h"
-#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/Constants.h"
 
 #include "BundleArchive.h"
 #include "BundleResourceContainer.h"
@@ -38,20 +38,18 @@ BundleStorageMemory::BundleStorageMemory()
   , nextFreeId(1)
 {}
 
-std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(const std::shared_ptr<BundleResourceContainer>& resCont
-                                                                           , const std::string& prefix
-                                                                           , const ManifestT& bundleManifest)
+std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(
+  const std::shared_ptr<BundleResourceContainer>& resCont,
+  const std::string& prefix,
+  const ManifestT& bundleManifest)
 {
   auto l = archives.Lock();
   US_UNUSED(l);
   auto id = nextFreeId++;
-  auto p  = archives.v.insert(std::make_pair(id
-                                             , std::make_shared<BundleArchive>(this
-                                                                               , resCont
-                                                                               , prefix
-                                                                               , resCont->GetLocation()
-                                                                               , id
-                                                                               , bundleManifest)));
+  auto p = archives.v.insert(std::make_pair(
+    id,
+    std::make_shared<BundleArchive>(
+      this, resCont, prefix, resCont->GetLocation(), id, bundleManifest)));
   return p.first->second;
 }
 

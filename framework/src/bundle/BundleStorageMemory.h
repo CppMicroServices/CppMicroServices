@@ -32,20 +32,21 @@
 
 namespace cppmicroservices {
 
-class BundleStorageMemory
-  : public BundleStorage
+class BundleStorageMemory : public BundleStorage
 {
 
 public:
   BundleStorageMemory();
 
-  std::shared_ptr<BundleArchive> CreateAndInsertArchive(const std::shared_ptr<BundleResourceContainer>& resCont
-                                                        , const std::string& topLevelEntry
-                                                        , const ManifestT& bundleManifest) override;
+  std::shared_ptr<BundleArchive> CreateAndInsertArchive(
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::string& topLevelEntry,
+    const ManifestT& bundleManifest) override;
 
   bool RemoveArchive(const BundleArchive* ba) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const override;
+  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
+    const override;
 
   std::vector<long> GetStartOnLaunchBundles() const override;
 

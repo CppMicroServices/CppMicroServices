@@ -43,12 +43,12 @@ using namespace cppmicroservices;
 
 namespace {
 
+#ifdef US_BUILD_SHARED_LIBS
 std::string libName(const std::string& libBase)
 {
   return (US_LIB_PREFIX + libBase + US_LIB_POSTFIX + US_LIB_EXT);
 }
 
-#ifdef US_BUILD_SHARED_LIBS
 std::string fullLibPath(const std::string& libBase)
 {
   namespace cu = cppmicroservices::util;

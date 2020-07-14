@@ -1078,7 +1078,7 @@ public:
  * TODO: Add documentation of bundleManifest schema here
  * 
  * @param location The location of the bundle library to install.
- * @param bundleManifest the manifest of the bundle at "location". If non-empty
+ * @param bundleManifest <b>OPTIONAL</b> - the manifest of the bundle at "location". If non-empty
  *        this will be used without opening the bundle at "location". Otherwise, the bundle will
  *        be opened and the manifest read from there.
  * @return The Bundle objects of the installed bundle library.

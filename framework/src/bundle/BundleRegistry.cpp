@@ -360,12 +360,6 @@ std::vector<Bundle> BundleRegistry::Install0(
 
   std::vector<Bundle> installedBundles;
   std::vector<std::shared_ptr<BundleArchive>> barchives;
-  scope_guard purge_on_error = [&barchives]() {
-    for (auto& ba : barchives) {
-      ba->Purge();
-    }
-  };
-
   std::unordered_set<std::string> exclude{ alreadyInstalled.begin(),
                                            alreadyInstalled.end() };
   try {
@@ -424,12 +418,13 @@ std::vector<Bundle> BundleRegistry::Install0(
         BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
     }
   } catch (...) {
+    for (auto& ba : barchives) {
+      ba->Purge();
+    }
+
     throw std::runtime_error("Failed to install bundle library at " + location +
                              ": " + util::GetLastExceptionStr());
   }
-  // If we get here, no need to purge, so dismiss the cleanup action.
-  purge_on_error.dismiss();
-
   // And finally return the results.
   return installedBundles;
 }

@@ -470,15 +470,6 @@ std::string BundleContext::GetDataFile(const std::string& filename) const
   return std::string();
 }
 
-std::vector<Bundle> BundleContext::InstallBundles(const std::string& location)
-{
-  namespace cppms = cppmicroservices;
-
-  return InstallBundles(
-    location,
-    cppms::AnyMap(cppms::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
-}
-
 std::vector<Bundle> BundleContext::InstallBundles(
   const std::string& location,
   const cppmicroservices::AnyMap& bundleManifest)

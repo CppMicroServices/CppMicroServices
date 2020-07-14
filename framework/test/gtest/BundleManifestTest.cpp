@@ -255,6 +255,22 @@ TEST_F(BundleManifestTest, DirectManifestInstall)
   }
 }
 
+TEST_F(BundleManifestTest, DirectManifestInstallNoSymbolicName)
+{
+  auto ctx = framework.GetBundleContext();
+
+  cppmicroservices::AnyMap manifests(
+    cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
+    { "foo" , std::string("bar") }
+  };
+  manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
+
+  auto const libPath = fullLibPath("TestBundleA");
+
+  EXPECT_THROW( { ctx.InstallBundles(libPath, manifests); }, std::runtime_error);
+}
+
 TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)
 {
   auto ctx = framework.GetBundleContext();

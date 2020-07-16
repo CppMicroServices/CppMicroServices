@@ -69,6 +69,8 @@ protected:
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();
     framework.Start();
 
+    // Generate paths to each bundle
+    uint32_t count = 1;
     std::vector<std::string> str5kBundles(5000, bundleBasePath);
     std::transform(str5kBundles.begin(),
                    str5kBundles.end(),

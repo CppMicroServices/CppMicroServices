@@ -1070,11 +1070,9 @@ public:
  * which may contain several bundles, i. e. acts as a bundle library.
  *
  * @remarks
- *     If the bundleManifest is passed in, it is installed. When the bundle is Started, the
- *     BundleManifest is NOT read from the file (as it has already been installed). In the event
- *     that the injected bundle manifest does NOT match the manifest in the bundle's file, the
- *     behavior of the system is undefined. That is, the content of the injected manifest and the
- *     manifest on disk are expected to be the same and are not compared.
+ *     If the bundleManifest is passed in, it is installed. In the event that the injected bundle
+ *     manifest does NOT match the manifest in the bundle's file, the behavior of the system is
+ *     undefined.
  * @remarks
  *     The bundleManifest is expected to be in a particular form. The AnyMap must have a root object
  *     containing N number of key/value pairs. Each key name must be the symbolic bundle name and

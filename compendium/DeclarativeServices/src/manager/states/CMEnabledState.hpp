@@ -23,7 +23,11 @@
 #ifndef CMEnabledState_hpp
 #define CMEnabledState_hpp
 
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "ComponentManagerState.hpp"
 #include "../../ComponentRegistry.hpp"

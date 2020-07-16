@@ -23,7 +23,11 @@
 #ifndef __COMPONENTMANAGERIMPL_HPP__
 #define __COMPONENTMANAGERIMPL_HPP__
 
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "ComponentManager.hpp"

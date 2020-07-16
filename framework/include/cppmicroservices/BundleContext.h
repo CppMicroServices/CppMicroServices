@@ -1069,13 +1069,34 @@ public:
  * @remarks An install location is an absolute path to a shared library or executable file
  * which may contain several bundles, i. e. acts as a bundle library.
  *
- * @remarks If the bundleManifest is passed in, it is installed. When the bundle is Started, the
- * BundleManifest is NOT read from the file (as it has already been installed). In the event that
- * the injected bundle manifest does NOT match the manifest in the bundle's file, the behavior of
- * the system is undefined. That is, the content of the injected manifest and the manifest on disk
- * are expected to be the same and are not compared.
- *
- * TODO: Add documentation of bundleManifest schema here
+ * @remarks
+ *     If the bundleManifest is passed in, it is installed. When the bundle is Started, the
+ *     BundleManifest is NOT read from the file (as it has already been installed). In the event
+ *     that the injected bundle manifest does NOT match the manifest in the bundle's file, the
+ *     behavior of the system is undefined. That is, the content of the injected manifest and the
+ *     manifest on disk are expected to be the same and are not compared.
+ * @remarks
+ *     The bundleManifest is expected to be in a particular form. The AnyMap must have a root object
+ *     containing N number of key/value pairs. Each key name must be the symbolic bundle name and
+ *     it's value must be the verbatim contents of it's manifest file.
+ * @remarks
+ *     Example JSON representation of manifest AnyMap:
+ *     <pre>
+ *     {
+ *         "SymbolicNameBundle2" : {
+ *             "bundle.activator" : true,
+ *             "bundle.symbolic_name" : "SymbolicNameBundle2",
+ *             "bundle.vendor" : "MyCo Inc.",
+ *             ...
+ *         },
+ *         "SymbolicNameBundle3" : {
+ *             "bundle.activator" : true,
+ *             "bundle.symbolic_name" : "SymbolicNameBundle3",
+ *             "bundle.vendor" : "MyCo Inc.",
+ *             ...
+ *         }
+ *     }
+ *     </pre>
  * 
  * @param location The location of the bundle library to install.
  * @param bundleManifest <b>OPTIONAL</b> - the manifest of the bundle at "location". If non-empty

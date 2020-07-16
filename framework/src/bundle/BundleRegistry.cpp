@@ -45,71 +45,17 @@
 
 namespace {
 
-/**
- * scope_guard implementation found on stack exchange.
- *
- * This implementation has the following features:
- * 1) Can be configured to only launch if destructor is fired during stack unwinding while handling
- *    an uncaught exception
- * 2) Has a "dismiss" method to allow for clearing the scope action
- * 3) Actions can be added by using the "+=" operator with a lambda
- */
-class scope_guard
-{
+// Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
+class InitialBundleMapCleanup {
 public:
-  enum execution
-  {
-    always,
-    no_exception,
-    exception
-  };
-
-  scope_guard(scope_guard&&) = default;
-  explicit scope_guard(execution policy = always)
-    : policy(policy)
+  InitialBundleMapCleanup(std::function<void()> cleanupFcn)
+    : _cleanupFcn(std::move(cleanupFcn))
   {}
-
-  template<class Callable>
-  scope_guard(Callable&& func, execution policy = always)
-    : policy(policy)
-  {
-    this->operator+=<Callable>(std::forward<Callable>(func));
+  ~InitialBundleMapCleanup() {
+    _cleanupFcn();
   }
-
-  template<class Callable>
-  scope_guard& operator+=(Callable&& func)
-  {
-    try {
-      handlers.emplace_front(std::forward<Callable>(func));
-      return *this;
-    } catch (...) {
-      if (policy != no_exception)
-        func();
-      throw;
-    }
-  }
-
-  ~scope_guard()
-  {
-    if (policy == always ||
-        (std::uncaught_exception() == (policy == exception))) {
-      for (auto& f : handlers) {
-        try {
-          f();          // must not throw
-        } catch (...) { /* std::terminate(); ? */
-        }
-      }
-    }
-  }
-
-  void dismiss() noexcept { handlers.clear(); }
-
 private:
-  scope_guard(const scope_guard&) = delete;
-  void operator=(const scope_guard&) = delete;
-
-  std::deque<std::function<void()>> handlers;
-  execution policy = always;
+  std::function<void()> _cleanupFcn;
 };
 
 }
@@ -271,18 +217,18 @@ std::vector<Bundle> BundleRegistry::Install(
       std::vector<Bundle> installedBundles;
       {
         // create instance of clean-up object to ensure RAII
-        scope_guard cleanup = [this, &l, &location]() {
-          {
-            l.Lock();
-            auto& p = initialBundleInstallMap[location];
-            // Notify all waiting threads that it is safe to install the bundle
-            std::lock_guard<std::mutex> lock(*(p.second.m));
-            p.second.waitFlag = false;
-            p.second.cv->notify_all();
-            l.UnLock();
-          }
-          DecrementInitialBundleMapRef(l, location);
-        };
+        InitialBundleMapCleanup cleanup ([this, &l, &location]() {
+                                            {
+                                              l.Lock();
+                                              auto& p = initialBundleInstallMap[location];
+                                              // Notify all waiting threads that it is safe to install the bundle
+                                              std::lock_guard<std::mutex> lock(*(p.second.m));
+                                              p.second.waitFlag = false;
+                                              p.second.cv->notify_all();
+                                              l.UnLock();
+                                            }
+                                            DecrementInitialBundleMapRef(l, location);
+                                         });
 
         // Perform the install
         auto resCont =
@@ -328,9 +274,9 @@ std::vector<Bundle> BundleRegistry::Install(
       std::vector<Bundle> newBundles;
       {
         // create instance of clean-up object to ensure RAII
-        scope_guard cleanup = [this, &l, &location]() {
-          DecrementInitialBundleMapRef(l, location);
-        };
+        InitialBundleMapCleanup cleanup ([this, &l, &location]() {
+                                           DecrementInitialBundleMapRef(l, location);
+                                         });
 
         // Perform the install
         newBundles =

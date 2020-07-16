@@ -22,7 +22,6 @@
 
 #include "BundleArchive.h"
 
-#include <iostream>
 #include <utility>
 
 #include "cppmicroservices/BundleResource.h"

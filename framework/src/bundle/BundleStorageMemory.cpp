@@ -28,7 +28,6 @@
 #include "BundleResourceContainer.h"
 
 #include <chrono>
-#include <iostream>
 
 namespace cppmicroservices {
 namespace sc = std::chrono;

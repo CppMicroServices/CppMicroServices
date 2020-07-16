@@ -203,8 +203,7 @@ TEST_P(ReferenceManagerImplTest, TestIsSatisfied)
                                     GetFramework().GetBundleContext(),
                                     fakeLogger,
                                     FakeComponentConfigName);
-    EXPECT_EQ(refManager.IsSatisfied(),
-              (refManager.IsOptional() ? true : false))
+    EXPECT_EQ(refManager.IsSatisfied(), refManager.IsOptional())
       << "Initial state is SATISFIED only if cardinality is optional";
     auto reg = bc.RegisterService<dummy::Reference1>(
       std::make_shared<dummy::Reference1>());

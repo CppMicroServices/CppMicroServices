@@ -58,16 +58,12 @@ void ReferenceManagerBaseImpl::BindingPolicy::StaticRemoveService(
   std::vector<RefChangeNotification> notifications;
   if (ShouldClearBoundRefs(reference)) {
     Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-    RefChangeNotification notification{ mgr.metadata.name,
-                                        RefEvent::BECAME_UNSATISFIED };
-    notifications.push_back(std::move(notification));
+    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_UNSATISFIED);
 
     ClearBoundRefs();
     if (mgr.UpdateBoundRefs()) {
       Log("Notify SATISFIED for reference " + mgr.metadata.name);
-      RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::BECAME_SATISFIED };
-      notifications.push_back(std::move(notification));
+      notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
     }
 
     mgr.BatchNotifyAllListeners(notifications);
@@ -86,11 +82,7 @@ void ReferenceManagerBaseImpl::BindingPolicy::DynamicRemoveService(
   auto removeBoundRef = false;
   std::vector<RefChangeNotification> notifications;
 
-  { // acquire lock on boundRefs
-    auto boundRefsHandle = mgr.boundRefs.lock();
-    auto itr = boundRefsHandle->find(reference);
-    removeBoundRef = (itr != boundRefsHandle->end());
-  } // end lock on boundRefs
+  removeBoundRef = ShouldClearBoundRefs(reference);
 
   if (removeBoundRef) {
     ClearBoundRefs();
@@ -112,18 +104,14 @@ void ReferenceManagerBaseImpl::BindingPolicy::DynamicRemoveService(
       }
 
       Log("Notify UNBIND for reference " + mgr.metadata.name);
-      RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::REBIND,
-                                          svcRefToBind,
-                                          reference };
-      notifications.push_back(std::move(notification));
+      notifications.emplace_back(
+        mgr.metadata.name, RefEvent::REBIND, svcRefToBind, reference);
     }
 
     if (!mgr.IsSatisfied()) {
       Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-      RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::BECAME_UNSATISFIED };
-      notifications.push_back(std::move(notification));
+      notifications.emplace_back(mgr.metadata.name,
+                                 RefEvent::BECAME_UNSATISFIED);
     }
 
     mgr.BatchNotifyAllListeners(notifications);

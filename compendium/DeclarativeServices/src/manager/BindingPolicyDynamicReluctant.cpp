@@ -47,24 +47,20 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
     // If the service was previously satisfied then either there is
     // nothing to do or a rebind needs to happen if the cardinality
     // is optional and there are no bound refs.
-    if (mgr.IsOptional() && 0 == mgr.GetBoundReferences().size()) {
+    if (0 == mgr.GetBoundReferences().size()) {
       Log("Notify BIND for reference " + mgr.metadata.name);
 
       ClearBoundRefs();
       mgr.UpdateBoundRefs();
 
-      RefChangeNotification notification{ mgr.metadata.name,
-                                          RefEvent::REBIND,
-                                          reference };
-      notifications.push_back(std::move(notification));
+      notifications.emplace_back(
+        mgr.metadata.name, RefEvent::REBIND, reference);
     }
   }
 
   if (notifySatisfied) {
     Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    RefChangeNotification notification{ mgr.metadata.name,
-                                        RefEvent::BECAME_SATISFIED };
-    notifications.push_back(std::move(notification));
+    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
   }
   mgr.BatchNotifyAllListeners(notifications);
 }

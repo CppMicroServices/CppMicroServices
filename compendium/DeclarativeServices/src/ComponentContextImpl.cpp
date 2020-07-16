@@ -73,7 +73,7 @@ void ComponentContextImpl::InitializeServicesCache()
           ServiceReferenceU sRefU(sRef);
           auto bc = GetBundleContext();
           auto boundServicesCacheHandle = boundServicesCache.lock();
-          auto& serviceMap = boundServicesCacheHandle->operator[](refName);
+          auto& serviceMap = (*boundServicesCacheHandle)[refName];
           if (refScope == cppmicroservices::Constants::SCOPE_BUNDLE) {
             serviceMap.push_back(bc.GetService(sRefU));
           } else {
@@ -216,7 +216,7 @@ void ComponentContextImpl::AddToBoundServicesCache(
   cppmicroservices::ServiceObjects<void> sObjs =
     bc.GetServiceObjects(ServiceReferenceU(sRef));
   auto boundServicesCacheHandle = boundServicesCache.lock();
-  boundServicesCacheHandle->operator[](refName).emplace_back(
+  (*boundServicesCacheHandle)[refName].emplace_back(
     sObjs.GetService());
 }
 
@@ -232,6 +232,12 @@ void ComponentContextImpl::RemoveFromBoundServicesCache(
   const auto& serviceInterface = removedService->begin()->first;
   auto boundServicesCacheHandle = boundServicesCache.lock();
   auto& services = boundServicesCacheHandle->at(refName);
+  // std::remove_if doesn't actually remove the elements from
+  // 'services'. Instead it shifts them to the end of the range
+  // and returns a past-the-end iterator for the new end range.
+  // erase is then called to remove all elements that were shifted,
+  // which are those starting from the past-the-end iterator to
+  // the end of `services`.
   services.erase(
     std::remove_if(
       services.begin(),

@@ -46,7 +46,7 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
   auto replacementNeeded = false;
   ServiceReference<void> serviceToUnbind;
   if (mgr.IsSatisfied()) {
-    // means that a service is bound because the refmgr is satisfied.
+    // either a service is bound or the service reference is optional
     auto boundRefsHandle = mgr.boundRefs.lock(); // acquire lock on boundRefs
     if (boundRefsHandle->find(reference) == boundRefsHandle->end()) {
       // Means that reference is to a different service than what's bound, so unbind the
@@ -73,10 +73,8 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
   std::vector<RefChangeNotification> notifications;
   if (replacementNeeded) {
     Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-    RefChangeNotification notification{ mgr.metadata.name,
-                                        RefEvent::BECAME_UNSATISFIED,
-                                        reference };
-    notifications.push_back(std::move(notification));
+    notifications.emplace_back(
+      mgr.metadata.name, RefEvent::BECAME_UNSATISFIED, reference);
     // The following "clear and copy" strategy is sufficient for
     // updating the boundRefs for static binding policy
     if (serviceToUnbind) {
@@ -86,10 +84,8 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
   }
   if (notifySatisfied) {
     Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    RefChangeNotification notification{ mgr.metadata.name,
-                                        RefEvent::BECAME_SATISFIED,
-                                        reference };
-    notifications.push_back(std::move(notification));
+    notifications.emplace_back(
+      mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference);
   }
   mgr.BatchNotifyAllListeners(notifications);
 }

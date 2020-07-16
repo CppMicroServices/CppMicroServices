@@ -29,7 +29,6 @@
 #include "ReferenceManager.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
-#include "gtest/gtest_prod.h"
 
 namespace cppmicroservices {
 namespace scrimpl {

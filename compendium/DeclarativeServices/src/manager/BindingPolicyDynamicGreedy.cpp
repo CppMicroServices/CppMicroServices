@@ -59,10 +59,8 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(
     {
       auto boundRefsHandle = mgr.boundRefs.lock(); // acquires lock on boundRefs
       if (boundRefsHandle->empty()) {
-        RefChangeNotification notification{ mgr.metadata.name,
-                                            RefEvent::REBIND,
-                                            reference };
-        notifications.push_back(std::move(notification));
+        notifications.emplace_back(
+          mgr.metadata.name, RefEvent::REBIND, reference);
       } else { // there are bound refs, determine whether to rebind
         svcRefToUnBind = *(boundRefsHandle->begin());
         needRebind = svcRefToUnBind < reference;
@@ -83,9 +81,7 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(
 
   if (notifySatisfied) {
     Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    RefChangeNotification notification{ mgr.metadata.name,
-                                        RefEvent::BECAME_SATISFIED };
-    notifications.push_back(std::move(notification));
+    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
   }
   mgr.BatchNotifyAllListeners(notifications);
 }

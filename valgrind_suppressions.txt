@@ -265,3 +265,85 @@
    ...
    fun:main
 }
+
+{
+   <globals>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:*static_initialization_and_destruction_0*
+   ...
+   fun:__libc_csu_init
+   ...
+}
+
+{
+   <gtest-globals>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_ZN7testing8internal23MakeAndRegisterTestInfoEPKcS2_S2_S2_NS0_12CodeLocationEPKvPFvvES7_PNS0_15TestFactoryBaseE
+   fun:*static_initialization_and_destruction_0*
+   ...
+}
+
+{
+   <malloc-gtest-internal>
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   ...
+}
+
+{
+   <realloc-gtest-internal>
+   Memcheck:Leak
+   fun:realloc
+   ...
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing13ContainsRegexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   ...
+}
+
+{
+   <gtest-death-test>
+   Memcheck:Leak
+   ...
+   fun:_ZN7testing8internal2RE4InitEPKc
+   fun:_ZN7testing8internal2REC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing13ContainsRegexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+   fun:_ZN7testing8internal20MakeDeathTestMatcherB5cxx11EPKc
+   ...
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing4Test3RunEv
+}
+
+{
+   <gtest-death-test>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_ZN7testing8internal38HandleSehExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   fun:_ZN7testing8internal35HandleExceptionsInMethodIfSupportedINS_4TestEvEET0_PT_MS4_FS3_vEPKc
+   ...
+}
+
+{
+   <dl_init>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:*static_initialization_and_destruction_0*
+   ...
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/usr/lib/x86_64-linux-gnu/ld-2.28.so
+   obj:*
+   obj:*
+   obj:*
+}

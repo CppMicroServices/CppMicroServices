@@ -91,7 +91,7 @@ set(config2     1       0     )
 set(config3     0       0     )
 
 if(NOT US_CMAKE_GENERATOR)
-  if(APPLE)
+  if(APPLE AND NOT WITH_COVERAGE)
     set(US_CMAKE_GENERATOR "Xcode")
   else()
     set(US_CMAKE_GENERATOR "Unix Makefiles")

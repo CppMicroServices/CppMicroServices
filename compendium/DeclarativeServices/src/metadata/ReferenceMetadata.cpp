@@ -71,7 +71,7 @@ std::tuple<std::size_t, std::size_t> GetReferenceCardinalityExtents(const std::s
       break;
     }
   }
-  return std::make_tuple(maxCardinality, minCardinality);
+  return std::make_tuple(minCardinality, maxCardinality);
 }
 }
 }

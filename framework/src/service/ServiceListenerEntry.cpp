@@ -34,7 +34,7 @@ US_MSVC_PUSH_DISABLE_WARNING(
 namespace cppmicroservices {
 
 struct ServiceListenerCompare
-  : std::binary_function<ServiceListener, ServiceListener, bool>
+  : std::function<bool(ServiceListener, ServiceListener)>
 {
   bool operator()(const ServiceListener& f1, const ServiceListener& f2) const
   {
@@ -144,10 +144,17 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->context == nullptr || other.d->context == nullptr) ||
-          d->context == other.d->context) &&
-         (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
-         ServiceListenerCompare()(d->listener, other.d->listener);
+  return (d->data == other.d->data)
+         && (d->tokenId == other.d->tokenId)
+         && ServiceListenerCompare()(d->listener, other.d->listener)
+         && ((d->context == nullptr
+              || other.d->context == nullptr)
+            || d->context == other.d->context);
+}
+
+bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const 
+{
+  return d->tokenId < other.d->tokenId;
 }
 
 bool ServiceListenerEntry::Contains(

@@ -46,7 +46,8 @@
 namespace {
 
 // Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
-class InitialBundleMapCleanup {
+class InitialBundleMapCleanup
+{
 public:
   InitialBundleMapCleanup(std::function<void()> cleanupFcn)
     : _cleanupFcn(std::move(cleanupFcn))
@@ -54,6 +55,7 @@ public:
   ~InitialBundleMapCleanup() {
     _cleanupFcn();
   }
+
 private:
   std::function<void()> _cleanupFcn;
 };
@@ -101,7 +103,10 @@ void BundleRegistry::DecrementInitialBundleMapRef(
 /*
   This function populates the res and alreadyInstalled vectors with the
   appropriate entries so that they can be used by the Install0 call. This was
-  extracted from Install() for convenience.
+  extracted from Install() for convenience. We lock the 'bundles' object to
+  prevent any installs from writing to the map while this operation is occurring
+  since the map can trigger a re-balancing of the tree nodes and cause some of
+  the iterators to be incorrect.
 */
 std::shared_ptr<BundleResourceContainer>
 BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
@@ -113,7 +118,6 @@ BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
 {
   auto l = bundles.Lock();
   US_UNUSED(l);
-
   // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
   // made yet for this location), or use one from another BundleArchive at this location.
   auto resourceContainer =
@@ -121,7 +125,7 @@ BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
        ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
        : foundBundles.first->second->GetBundleArchive()
            ->GetResourceContainer());
-
+  
   while (foundBundles.first != foundBundles.second) {
     auto installedBundlePrivate = foundBundles.first->second;
     alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
@@ -160,8 +164,8 @@ std::vector<Bundle> BundleRegistry::Install(
 
     If the bundle isn't installed, then one of two things can happen: 1) either
     the current thread is the first thread trying to install this bundle or 2) the
-    current thread is trying to install a bundle that is not installed which another
-    thread is currently installing.
+    current thread is trying to install a bundle that is not installed but another
+    thread is currently installing that bundle.
 
     If 1): Create an entry in the initialBundleInstallMap which keeps track of whether
       or not a given bundle is being installed for the first time. After creating this
@@ -178,7 +182,6 @@ std::vector<Bundle> BundleRegistry::Install(
   */
   if (bundlesAtLocationRange.first != bundlesAtLocationRange.second) {
     l.UnLock();
-
     std::vector<Bundle> resultingBundles;
     std::vector<std::string> alreadyInstalled;
     // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
@@ -205,7 +208,7 @@ std::vector<Bundle> BundleRegistry::Install(
 
     /*
       If no other thread is installing the desired bundle, create a map entry,
-      install the bundle, and notify all other threads wanting to install this bundle
+      install the bundle, and notify all other threads waiting to install this bundle
       that it is safe to do so. If the current thread is not the installing thread, then
       it will increment the reference count in the initialBundleInstallMap so that the map
       entry isn't prematurely deleted, wait to be notified that the install thread is done,
@@ -213,7 +216,7 @@ std::vector<Bundle> BundleRegistry::Install(
     */
     if (alreadyInstallingIterator == initialBundleInstallMap.end()) {
       // Insert entry into the initialBundleInstallMap to prevent other threads from
-      // trying to install this uninstalled bundle at the same time
+      // trying to install this bundle simultaneously
       auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
       initialBundleInstallMap.insert(
         std::make_pair(location, std::move(pairToInsert)));
@@ -252,7 +255,7 @@ std::vector<Bundle> BundleRegistry::Install(
 
         // This while loop exists to prevent a known race condition. If the installing thread notifies before
         // another thread trying to install the same bundle reaches this wait, it will wait indefinitely. To
-        // fix this, a wait_for is used intead (which utilizes a timeout to avoid this race) and the wait statement
+        // fix this, a wait_for is used instead (which utilizes a timeout to avoid this race) and the wait statement
         // as a whole acts as the while statement's predicate; once the timeout is reached, wait_for exits and the
         // statement is re-evaluated since it would have returned false.
         while (!p.second.cv->wait_for(

@@ -1074,9 +1074,8 @@ public:
  *     manifest does NOT match the manifest in the bundle's file, the behavior of the system is
  *     undefined.
  * @remarks
- *     The bundleManifest is expected to be in a particular form. The AnyMap must have a root object
- *     containing N number of key/value pairs. Each key name must be the symbolic bundle name and
- *     it's value must be the verbatim contents of it's manifest file.
+ *     If the provided bundleManifest does not match the manifest embedded in the bundle's file the
+ *     behavior of that bundle in CppMicroServices is undefined. 
  * @remarks
  *     Example JSON representation of manifest AnyMap:
  *     <pre>

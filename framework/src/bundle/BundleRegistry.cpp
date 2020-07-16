@@ -98,6 +98,11 @@ void BundleRegistry::DecrementInitialBundleMapRef(
   l.UnLock();
 }
 
+/*
+  This function populates the res and alreadyInstalled vectors with the
+  appropriate entries so that they can be used by the Install0 call. This was
+  extracted from Install() for convenience.
+*/
 std::shared_ptr<BundleResourceContainer>
 BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
   std::pair<BundleMap::iterator, BundleMap::iterator> foundBundles,

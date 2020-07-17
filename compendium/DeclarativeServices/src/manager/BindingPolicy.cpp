@@ -27,7 +27,7 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 void ReferenceManagerBaseImpl::BindingPolicy::Log(
-  std::string&& logStr,
+  const std::string& logStr,
   cppmicroservices::logservice::SeverityLevel logLevel)
 {
   mgr.logger->Log(logLevel, logStr);

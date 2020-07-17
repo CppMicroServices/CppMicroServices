@@ -170,7 +170,7 @@ public:
   protected:
     // Some utility code to ensure we don't DRY too much in the subclasses. Code is
     // common code that was pulled up from the subclasses.
-    void Log(std::string&& logStr,
+    void Log(const std::string& logStr,
              cppmicroservices::logservice::SeverityLevel logLevel =
                cppmicroservices::logservice::SeverityLevel::LOG_DEBUG);
     bool ShouldClearBoundRefs(const ServiceReferenceBase& reference);

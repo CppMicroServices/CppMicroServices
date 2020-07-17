@@ -278,14 +278,14 @@ private:
    * This method is called from {@link #RefChangedState} when
    * {@link RefChangeNotification#senderState} is \c SATISFIED
    */
-  void RefSatisfied(const RefChangeNotification&);
+  void RefSatisfied(const std::string& refName);
 
   /**
    * Utility method with actions to be performed when a reference is satisfied
    * This method is called from {@link #RefChangedState} when
    * {@link RefChangeNotification#senderState} is \c UNSATISFIED
    */
-  void RefUnsatisfied(const RefChangeNotification&);
+  void RefUnsatisfied(const std::string& refName);
 
   /**
    * Method is responsible for loading the bundle and populating the function

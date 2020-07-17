@@ -158,10 +158,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref3", refMgr3));
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
   // callback from refMgr2
-  fakeCompConfig->RefSatisfied(RefChangeNotification{ "ref2" } );
+  fakeCompConfig->RefSatisfied("ref2");
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
   // callback from refMgr3
-  fakeCompConfig->RefSatisfied(RefChangeNotification{ "ref3" } );
+  fakeCompConfig->RefSatisfied("ref3");
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
   EXPECT_EQ(fakeCompConfig->GetServiceReference().operator bool(), true);
   EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(mockMetadata->serviceMetadata.interfaces.at(0)), true);
@@ -195,9 +195,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref1", refMgr1));
   fakeCompConfig->state = mockStatisfiedState;
   EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
-  fakeCompConfig->RefUnsatisfied(RefChangeNotification{ "invalid_refname" } );
+  fakeCompConfig->RefUnsatisfied("invalid_refname");
   EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
-  fakeCompConfig->RefUnsatisfied(RefChangeNotification{ "ref1" } );
+  fakeCompConfig->RefUnsatisfied("ref1");
   EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::UNSATISFIED_REFERENCE);
   fakeCompConfig->referenceManagers.clear(); // remove the mock reference managers
 }

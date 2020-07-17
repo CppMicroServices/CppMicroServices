@@ -32,6 +32,7 @@
 #include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
 #include "../src/manager/states/CCRegisteredState.hpp"
 #include "../src/manager/states/CCActiveState.hpp"
+#include "../src/manager/ReferenceManager.hpp"
 
 #include "TestUtils.hpp"
 #include <TestInterfaces/Interfaces.hpp>
@@ -374,10 +375,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
 }
 
-bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr)
+bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr
+                          )
 {
-  auto vecSize = stateArr.size();
   bool foundInvalidTransition = false;
+  auto vecSize = stateArr.size();
   for(size_t i = 0; i < vecSize && !foundInvalidTransition; ++i)
   {
     auto currState = stateArr[i].first;

@@ -115,4 +115,20 @@ std::string GetTestPluginsPath()
           + cppmicroservices::util::DIR_SEP);
 }
 
+void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
+{
+  std::vector<cppmicroservices::Bundle> bundles;
+  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+
+#if defined(US_BUILD_SHARED_LIBS)
+  bundles = frameworkCtx.InstallBundles(dsPluginPath);
+#else
+  bundles = frameworkCtx.GetBundles();
+#endif
+
+  for (auto b : bundles) {
+    b.Start();
+  }
+}
+
 } // namespaces

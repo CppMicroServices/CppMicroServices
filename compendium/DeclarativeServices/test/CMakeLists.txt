@@ -76,6 +76,7 @@ set(_declarativeservices_tests
   TestServiceProvider.cpp
   TestSharedLibraryException.cpp
   ImportTestBundles.cpp
+  TestBindingPolicies.cpp
   main.cpp
 )
 

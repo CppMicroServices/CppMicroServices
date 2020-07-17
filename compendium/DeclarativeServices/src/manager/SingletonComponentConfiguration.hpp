@@ -83,6 +83,25 @@ public:
   void UngetService(const cppmicroservices::Bundle& bundle,
                     const cppmicroservices::ServiceRegistrationBase& registration,
                     const cppmicroservices::InterfaceMapConstPtr& service) override;
+
+  /**
+   * Calls the service component's bind method while performing a dynamic rebind.
+   *
+   * \param refName is the name of the reference as defined in the SCR JSON
+   * \param ref is the service reference to the target service to bind. A default
+   *  constructed \c ServiceReferenceBase denotes that there is no service to bind.
+   */
+  void BindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+
+  /**
+   * Calls the service component's unbind method while performing a dynamic rebind.
+   *
+   * \param refName is the name of the reference as defined in the SCR JSON
+   * \param ref is the service reference to the target service to unbind. A default
+   *  constructed \c ServiceReferenceBase denotes that there is no service to unbind.
+   */  
+  void UnbindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+
 private:
   FRIEND_TEST(SingletonComponentConfigurationTest, TestConcurrentCreateAndActivateComponentInstance);
   FRIEND_TEST(SingletonComponentConfigurationTest, TestCreateAndActivateComponentInstance);

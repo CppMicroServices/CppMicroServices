@@ -55,10 +55,10 @@ public:
   /**
    * \throws std::invalid_argument exception if any of the params is a nullptr 
    */
-  explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                                      const Bundle& bundle,
-                                      std::shared_ptr<const ComponentRegistry> registry,
-                                      std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+  explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata
+                                      , const Bundle& bundle
+                                      , std::shared_ptr<const ComponentRegistry> registry
+                                      , std::shared_ptr<cppmicroservices::logservice::LogService> logger);
   ComponentConfigurationImpl(const ComponentConfigurationImpl&) = delete;
   ComponentConfigurationImpl(ComponentConfigurationImpl&&) = delete;
   ComponentConfigurationImpl& operator=(const ComponentConfigurationImpl&) = delete;
@@ -214,6 +214,26 @@ public:
    */
   std::shared_ptr<logservice::LogService> GetLogger() const { return logger; }
 
+  /**
+   * Method called while performing a dynamic rebind. Subclasses must
+   * implement this method to call a service component's bind method.
+   * \param refName is the name of the reference as defined in the SCR JSON
+   * \param ref is the service reference to the target service to bind. A default
+   *  constructed \c ServiceReferenceBase denotes that there is no service to bind.
+   */
+  virtual void BindReference(const std::string& refName,
+                             const ServiceReferenceBase& ref) = 0;
+
+  /**
+   * Method called while performing a dynamic rebind. Subclasses must
+   * implement this method to call a service component's unbind method.
+   * \param refName is the name of the reference as defined in the SCR JSON
+   * \param ref is the service reference to the target service to unbind. A default
+   *  constructed \c ServiceReferenceBase denotes that there is no service to unbind.
+   */
+  virtual void UnbindReference(const std::string& refName,
+                               const ServiceReferenceBase& ref) = 0;
+
 protected:
   /**
    * This method is responsible for creating a {@link ComponentInstance} object
@@ -244,7 +264,7 @@ protected:
     auto oldState = ComponentConfigurationImpl::GetState();
     ComponentConfigurationImpl::CompareAndSetState(&oldState, newState);
   }
-
+  
 private:
   /**
    * Observer callback method. This method is registered with the dependency

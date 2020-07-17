@@ -65,10 +65,11 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const met
                                                        this->logger);
   }
   for (auto const& refMetadata : this->metadata->refsMetadata) {
-    auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
-                                                             bundle.GetBundleContext(),
-                                                             this->logger,
-                                                             this->metadata->name);
+    
+    auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata
+                                                             , bundle.GetBundleContext()
+                                                             , this->logger
+                                                             , this->metadata->name);
     referenceManagers.emplace(refMetadata.name, refManager);
   }
 }
@@ -114,14 +115,21 @@ void ComponentConfigurationImpl::Initialize()
   }
 }
 
-void ComponentConfigurationImpl::RefChangedState(const RefChangeNotification& notification)
+void ComponentConfigurationImpl::RefChangedState(
+  const RefChangeNotification& notification)
 {
-  switch(notification.event) {
+  switch (notification.event) {
     case RefEvent::BECAME_SATISFIED:
       RefSatisfied(notification.senderName);
       break;
     case RefEvent::BECAME_UNSATISFIED:
       RefUnsatisfied(notification.senderName);
+      break;
+    case RefEvent::REBIND:
+      GetState()->Rebind(*this,
+                         notification.senderName,
+                         notification.serviceRefToBind,
+                         notification.serviceRefToUnbind);
       break;
     default:
       break;
@@ -187,7 +195,9 @@ private:
 
 void ComponentConfigurationImpl::RefSatisfied(const std::string& refName)
 {
-  SatisfiedFunctor f = std::for_each(referenceManagers.begin(), referenceManagers.end(), SatisfiedFunctor(refName));
+  SatisfiedFunctor f = std::for_each(referenceManagers.begin()
+                                     , referenceManagers.end(),
+                                     SatisfiedFunctor(refName));
   if(f.IsSatisfied()) {
     GetState()->Register(*this);
   }
@@ -252,7 +262,14 @@ InstanceContextPair ComponentConfigurationImpl::CreateAndActivateComponentInstan
 {
   auto componentInstance = CreateComponentInstance();
   auto ctxt = std::make_shared<ComponentContextImpl>(shared_from_this(), bundle);
-  componentInstance->CreateInstanceAndBindReferences(ctxt);
+  try {
+    componentInstance->CreateInstanceAndBindReferences(ctxt);
+  } catch (const std::exception& ) {
+    logger->Log(
+      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+      "Exception while creating component instance and binding references.",
+      std::current_exception());
+  }
   componentInstance->Activate();
   return std::make_pair(componentInstance, ctxt);
 }

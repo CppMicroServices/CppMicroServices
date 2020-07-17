@@ -42,14 +42,14 @@ private:
 
 CCActiveState::CCActiveState() = default;
 
-std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfigurationImpl& mgr,
-                                                           const cppmicroservices::Bundle& clientBundle)
+std::shared_ptr<ComponentInstance> CCActiveState::Activate(
+  ComponentConfigurationImpl& mgr,
+  const cppmicroservices::Bundle& clientBundle)
 {
   // no state change, already in active state. create and return a ComponentInstance object
   std::shared_ptr<ComponentInstance> instance;
   auto logger = mgr.GetLogger();
-  if(latch.CountUp())
-  {
+  if (latch.CountUp()) {
     {
       LatchScopeGuard sg([this, logger]() {
         // By using try/catch here, we ensure that this lambda function doesn't
@@ -69,17 +69,49 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(ComponentConfiguratio
       instance = mgr.CreateAndActivateComponentInstance(clientBundle);
     }
 
-    if(!instance)
-    {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Component configuration activation failed");
+    if (!instance) {
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  "Component configuration activation failed");
     }
     return instance;
   }
 
   // do not allow any new component instances to be created if Deactivate was called
-  logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, "Component configuration activation failed because component is not in active state");
+  logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+              "Component configuration activation failed because component is "
+              "not in active state");
   return nullptr;
+}
+
+void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
+                           const std::string& refName,
+                           const ServiceReference<void>& svcRefToBind,
+                           const ServiceReference<void>& svcRefToUnbind)
+{
+  if (latch.CountUp()) {
+    if (svcRefToBind) {
+      try {
+        mgr.BindReference(refName, svcRefToBind);
+      } catch (const std::exception&) {
+        mgr.GetLogger()->Log(
+          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+          "Exception while dynamically binding a reference. ", std::current_exception());
+      }
       
+    }
+
+    if (svcRefToUnbind) {
+      try {
+        mgr.UnbindReference(refName, svcRefToUnbind);
+      } catch (const std::exception&) {
+        mgr.GetLogger()->Log(
+          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+          "Exception while dynamically unbinding a reference. ",
+          std::current_exception());
+      }
+    }
+    latch.CountDown();
+  }
 }
 }
 }

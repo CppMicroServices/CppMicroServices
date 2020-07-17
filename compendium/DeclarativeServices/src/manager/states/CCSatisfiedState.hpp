@@ -49,6 +49,15 @@ public:
   void Deactivate(ComponentConfigurationImpl& mgr) override;
 
   /**
+   * Rebinding while in a \c SATISFIED state is a no-op
+   */
+  void Rebind(ComponentConfigurationImpl&,
+              const std::string&,
+              const ServiceReference<void>&,
+              const ServiceReference<void>&) override
+  {}
+
+  /**
    * Returns {@link ComponentState::SATISFIED} to indicate the
    * state represented by this object
    */

@@ -28,37 +28,18 @@
 
 namespace cppmicroservices {
 
-static const std::size_t MAX_ARCHIVE_SIZE = 512;
-static const std::size_t MAX_LOCATION_LEN = 256;
-
-struct ExtraData
-{
-  int32_t loc_index; // -1 -> use location field
-  char location[MAX_LOCATION_LEN];
-};
-
-struct PeristentData
-{
-  BundleArchive::Data data;
-  char reserved[MAX_ARCHIVE_SIZE - sizeof(BundleArchive::Data) -
-                sizeof(ExtraData)];
-  ExtraData extra;
-};
-
 BundleStorageFile::BundleStorageFile()
+  : BundleStorage()
 {
   throw std::logic_error("not implemented");
 }
 
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertBundleLib(
-  const std::string& /*location*/)
-{
-  throw std::logic_error("not implemented");
-}
-
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageFile::InsertArchives(
-  const std::shared_ptr<BundleResourceContainer>& /*resCont*/,
-  const std::vector<std::string>& /*topLevelEntries*/)
+std::shared_ptr<BundleArchive> BundleStorageFile::CreateAndInsertArchive(
+  const std::shared_ptr<BundleResourceContainer>& /*resCont*/
+  ,
+  const std::string& /*topLevelEntries*/
+  ,
+  const ManifestT&)
 {
   throw std::logic_error("not implemented");
 }

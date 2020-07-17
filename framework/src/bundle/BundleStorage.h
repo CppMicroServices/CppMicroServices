@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_BUNDLESTORAGE_H
 
 #include "BundleResourceContainer.h"
+#include "cppmicroservices/AnyMap.h"
 
 #include <memory>
 #include <string>
@@ -39,27 +40,22 @@ struct BundleArchive;
 struct BundleStorage
 {
 
-  virtual ~BundleStorage() {}
+  BundleStorage() {}
 
-  /**
-   * Insert bundle library into persistent storagedata.
-   *
-   * @param location Location of bundle to install.
-   * @return A list of BundleArchive instances representing the installed bundles.
-   */
-  virtual std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
-    const std::string& location) = 0;
+  virtual ~BundleStorage() {}
 
   /**
    * Insert bundles from a container into persistent storagedata.
    *
    * @param resCont The container for the bundle data and resources.
-   * @param topLevelEntries The top level entries in the container to be inserted as bundle archives.
-   * @return A list of BundleArchive instances representing the installed bundles.
+   * @param topLevelEntry The top level entries in the container to be inserted as bundle archives.
+   * @return A shared_ptr to the BundleArchive representing the installed bundles.
    */
-  virtual std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
+  using ManifestT = cppmicroservices::AnyMap;
+  virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(
     const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::vector<std::string>& topLevelEntries) = 0;
+    const std::string& topLevelEntry,
+    const ManifestT&) = 0;
 
   /**
    * Get all bundle archive objects.
@@ -84,7 +80,6 @@ struct BundleStorage
 
 private:
   friend struct BundleArchive;
-
   /**
    * Remove bundle archive from archives list.
    *

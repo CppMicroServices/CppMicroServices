@@ -21,7 +21,7 @@
 =============================================================================*/
 
 #include "BundleStorageMemory.h"
-
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Constants.h"
 
 #include "BundleArchive.h"
@@ -30,44 +30,26 @@
 #include <chrono>
 
 namespace cppmicroservices {
+namespace sc = std::chrono;
 
 BundleStorageMemory::BundleStorageMemory()
-  : nextFreeId(1)
+  : BundleStorage()
+  , nextFreeId(1)
 {}
 
-std::vector<std::shared_ptr<BundleArchive>>
-BundleStorageMemory::InsertBundleLib(const std::string& location)
-{
-  auto resCont = std::make_shared<BundleResourceContainer>(location);
-  return InsertArchives(resCont, resCont->GetTopLevelDirs());
-}
-
-std::vector<std::shared_ptr<BundleArchive>> BundleStorageMemory::InsertArchives(
+std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(
   const std::shared_ptr<BundleResourceContainer>& resCont,
-  const std::vector<std::string>& topLevelEntries)
+  const std::string& prefix,
+  const ManifestT& bundleManifest)
 {
-  std::vector<std::shared_ptr<BundleArchive>> res;
   auto l = archives.Lock();
   US_UNUSED(l);
-  for (auto const& prefix : topLevelEntries) {
-#ifndef US_BUILD_SHARED_LIBS
-    // The system bundle is already installed
-    if (prefix == Constants::SYSTEM_BUNDLE_SYMBOLICNAME) {
-      continue;
-    }
-#endif
-    auto id = nextFreeId++;
-    auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-    std::unique_ptr<BundleArchive::Data> data(new BundleArchive::Data{ id, ts, -1 });
-    auto p = archives.v.insert(std::make_pair(id,
-                                              std::make_shared<BundleArchive>(this,
-                                                                              std::move(data),
-                                                                              resCont,
-                                                                              prefix,
-                                                                              resCont->GetLocation())));
-    res.push_back(p.first->second);
-  }
-  return res;
+  auto id = nextFreeId++;
+  auto p = archives.v.insert(std::make_pair(
+    id,
+    std::make_shared<BundleArchive>(
+      this, resCont, prefix, resCont->GetLocation(), id, bundleManifest)));
+  return p.first->second;
 }
 
 bool BundleStorageMemory::RemoveArchive(const BundleArchive* ba)

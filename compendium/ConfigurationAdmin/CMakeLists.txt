@@ -6,8 +6,6 @@ foreach(_src ${_srcs})
   list(APPEND _ca_srcs ${CMAKE_CURRENT_SOURCE_DIR}/src/${_src})
 endforeach()
 
-message(STATUS ${_ca_srcs})
-
 set(_ca_private_headers)
 foreach(_header ${_private_headers})
   list(APPEND _ca_private_headers ${CMAKE_CURRENT_SOURCE_DIR}/src/${_header})

@@ -58,7 +58,7 @@ namespace cppmicroservices {
          * @param reason The reason for the exception.
          * @param property The property which caused the excpetion, if applicable.
          */
-        ConfigurationException(std::string rsn, std::string prop)
+        ConfigurationException(std::string rsn, std::string prop="")
           : std::runtime_error(makeMessage(rsn, prop).c_str())
           , reason(std::move(rsn))
           , property(std::move(prop))

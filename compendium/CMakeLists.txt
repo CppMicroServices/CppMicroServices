@@ -4,6 +4,6 @@ endif()
 add_subdirectory(LogService)
 add_subdirectory(ServiceComponent)
 add_subdirectory(DeclarativeServices)
+add_subdirectory(ConfigurationAdmin)
+add_subdirectory(CMInterface)
 add_subdirectory(tools)
-
-

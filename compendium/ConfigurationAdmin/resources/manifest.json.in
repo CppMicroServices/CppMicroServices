@@ -1,0 +1,6 @@
+{
+    "bundle.symbolic_name": "configuration_admin",
+    "bundle.name" : "Configuration Admin",
+    "bundle.version" : "1.0.0",
+    "bundle.activator" : true
+}

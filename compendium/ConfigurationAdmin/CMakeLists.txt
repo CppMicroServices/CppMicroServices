@@ -45,7 +45,7 @@ usMacroCreateBundle(ConfigurationAdmin
 )
 
 target_include_directories(ConfigurationAdmin PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CppMicroServices_BINARY_DIR}/include
   ${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/framework/include

@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "cppmicroservices/cminterface/CMInterfaceExport.h"
+#include "cppmicroservices/cm/CMExport.h"
 
 #include "cppmicroservices/AnyMap.h"
 
@@ -56,7 +56,7 @@ namespace cppmicroservices {
        * The Removed method will be invoked whenever any Configuration which this factory
        * has previously been configured with is removed from the ConfigurationAdmin implementation.</p>
        */
-      class US_CMInterface_EXPORT ManagedServiceFactory {
+      class US_cm_EXPORT ManagedServiceFactory {
       public:
         virtual ~ManagedServiceFactory() noexcept = default;
 

@@ -25,7 +25,7 @@
 
 #include <mutex>
 
-#include "cppmicroservices/cminterface/Configuration.hpp"
+#include "cppmicroservices/cm/Configuration.hpp"
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationPrivate.hpp"

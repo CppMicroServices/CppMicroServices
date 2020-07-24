@@ -23,7 +23,7 @@
 #ifndef ConfigurationException_hpp
 #define ConfigurationException_hpp
 
-#include "cppmicroservices/cminterface/CMInterfaceExport.h"
+#include "cppmicroservices/cm/CMExport.h"
 
 #include <stdexcept>
 #include <string>
@@ -48,7 +48,7 @@ namespace cppmicroservices {
        * std::throw_with_nested - the ConfigurationAdmin implementation will attempt
        * to print the details of any nested exceptions as well.
        */
-      class US_CMInterface_EXPORT ConfigurationException : public std::runtime_error {
+      class US_cm_EXPORT ConfigurationException : public std::runtime_error {
       public:
 
         /**

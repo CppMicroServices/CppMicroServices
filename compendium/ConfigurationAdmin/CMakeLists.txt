@@ -47,6 +47,6 @@ target_include_directories(ConfigurationAdmin PRIVATE
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
-  ${CppMicroServices_BINARY_DIR}/compendium/CMInterface/include
-  ${CppMicroServices_SOURCE_DIR}/compendium/CMInterface/include
+  ${CppMicroServices_BINARY_DIR}/compendium/CM/include
+  ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   )

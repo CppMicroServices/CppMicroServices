@@ -23,7 +23,7 @@
 #ifndef ManagedService_hpp
 #define ManagedService_hpp
 
-#include "cppmicroservices/cminterface/CMInterfaceExport.h"
+#include "cppmicroservices/cm/CMExport.h"
 
 #include "cppmicroservices/AnyMap.h"
 
@@ -43,7 +43,7 @@ namespace cppmicroservices {
        * singleton scope, where there will only be one implementation of a given
        * interface.
        */
-      class US_CMInterface_EXPORT ManagedService {
+      class US_cm_EXPORT ManagedService {
       public:
         virtual ~ManagedService() noexcept = default;
 

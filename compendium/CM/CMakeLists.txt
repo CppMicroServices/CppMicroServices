@@ -1,19 +1,19 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/include/CMakeLists.txt)
 
 set(_version "1.0.0")
-project(CMInterface VERSION ${_version})
+project(cm VERSION ${_version})
 
 if (NOT ${PROJECT_NAME}_TARGET)
-  set(${PROJECT_NAME}_TARGET usCMInterface)
+  set(${PROJECT_NAME}_TARGET usCM)
 endif()
 set(PROJECT_TARGET ${${PROJECT_NAME}_TARGET})
 
 configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/cminterface/CMInterfaceExport.h
+  ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/cm/CMExport.h
   )
 
-add_library(CMInterface INTERFACE)
-target_include_directories(CMInterface INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+add_library(cm INTERFACE)
+target_include_directories(cm INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 # install support
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices

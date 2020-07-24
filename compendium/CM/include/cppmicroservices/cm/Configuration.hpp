@@ -23,7 +23,7 @@
 #ifndef Configuration_hpp
 #define Configuration_hpp
 
-#include "cppmicroservices/cminterface/CMInterfaceExport.h"
+#include "cppmicroservices/cm/CMExport.h"
 
 #include <string>
 
@@ -38,7 +38,7 @@ namespace cppmicroservices {
        * is the principal means for clients of ConfigurationAdmin to inspect or update the
        * Configuration of a given service or service factory.
        */
-      class US_CMInterface_EXPORT Configuration {
+      class US_cm_EXPORT Configuration {
       public:
         virtual ~Configuration() noexcept = default;
 

@@ -23,9 +23,9 @@
 #ifndef ConfigurationAdmin_hpp
 #define ConfigurationAdmin_hpp
 
-#include "cppmicroservices/cminterface/CMInterfaceExport.h"
+#include "cppmicroservices/cm/CMExport.h"
 
-#include "cppmicroservices/cminterface/Configuration.hpp"
+#include "cppmicroservices/cm/Configuration.hpp"
 
 #include <memory>
 #include <string>
@@ -41,7 +41,7 @@ namespace cppmicroservices {
        * Configuration objects, which can in turn be queried for their properties or be used to
        * update the properties of a given service or service factory.
        */
-      class US_CMInterface_EXPORT ConfigurationAdmin {
+      class US_cm_EXPORT ConfigurationAdmin {
       public:
         virtual ~ConfigurationAdmin() noexcept = default;
 

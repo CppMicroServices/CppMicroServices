@@ -32,9 +32,9 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
-#include "cppmicroservices/cminterface/ConfigurationAdmin.hpp"
-#include "cppmicroservices/cminterface/ManagedService.hpp"
-#include "cppmicroservices/cminterface/ManagedServiceFactory.hpp"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "cppmicroservices/cm/ManagedService.hpp"
+#include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
 #include "ConfigurationAdminPrivate.hpp"

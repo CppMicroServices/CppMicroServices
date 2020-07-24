@@ -25,7 +25,7 @@
 #include <thread>
 
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/cminterface/ConfigurationException.hpp"
+#include "cppmicroservices/cm/ConfigurationException.hpp"
 
 #include "CMConstants.hpp"
 #include "ConfigurationAdminImpl.hpp"

@@ -347,3 +347,21 @@
    obj:*
    obj:*
 }
+
+{
+   <usConfigurationAdminTestSuppression0>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_ZN16cppmicroservices6cmimpl44TestCMLogger_VerifyWithoutLoggerService_Test8TestBodyEv
+   ...
+}
+
+{
+   <usConfigurationAdminTestSuppression1>
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_ZN16cppmicroservices6cmimpl41TestCMLogger_VerifyWithLoggerService_Test8TestBodyEv
+   ...
+}

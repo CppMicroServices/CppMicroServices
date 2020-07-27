@@ -81,7 +81,7 @@ namespace cppmicroservices {
 
     void CMLogger::Log(logservice::SeverityLevel level,
                         const std::string &message,
-                        const std::exception_ptr ex)
+                        std::exception_ptr ex)
     {
       auto currLogger = std::atomic_load(&logService);
       if (currLogger)
@@ -104,7 +104,7 @@ namespace cppmicroservices {
     void CMLogger::Log(const cppmicroservices::ServiceReferenceBase &sr,
                         logservice::SeverityLevel level,
                         const std::string &message,
-                        const std::exception_ptr ex)
+                        std::exception_ptr ex)
     {
       auto currLogger = std::atomic_load(&logService);
       if (currLogger)

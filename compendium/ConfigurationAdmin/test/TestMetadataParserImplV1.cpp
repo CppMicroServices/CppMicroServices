@@ -215,7 +215,7 @@ namespace {
     }, std::exception);
   }
 
-  INSTANTIATE_TEST_CASE_P(FailureModes, TestInvalidMetadata,
+  INSTANTIATE_TEST_SUITE_P(FailureModes, TestInvalidMetadata,
     testing::Values(
       MetadataInvalidManifestState("manifest_illegal_ver",
         "Unsupported manifest file version '0'"),
@@ -275,7 +275,7 @@ namespace {
     EXPECT_THAT(logger->msg, ::testing::HasSubstr("Could not load the configuration with index: " + params.errorOutput));
   }
 
-  INSTANTIATE_TEST_CASE_P(FailureModes, TestInvalidMetadataThroughLogger,
+  INSTANTIATE_TEST_SUITE_P(FailureModes, TestInvalidMetadataThroughLogger,
     testing::Values(
       MetadataInvalidManifestState("manifest_missing_pid", "0"),
       MetadataInvalidManifestState("manifest_missing_properties", "0"),

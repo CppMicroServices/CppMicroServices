@@ -25,8 +25,6 @@
 
 #include <string>
 
-#include "cppmicroservices/cm/CMExport.h"
-
 #include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {

@@ -23,8 +23,6 @@
 #ifndef ConfigurationAdmin_hpp
 #define ConfigurationAdmin_hpp
 
-#include "cppmicroservices/cm/CMExport.h"
-
 #include "cppmicroservices/cm/Configuration.hpp"
 
 #include <memory>

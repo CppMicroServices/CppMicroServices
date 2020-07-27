@@ -23,8 +23,6 @@
 #ifndef ManagedService_hpp
 #define ManagedService_hpp
 
-#include "cppmicroservices/cm/CMExport.h"
-
 #include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {

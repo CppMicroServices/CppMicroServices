@@ -23,8 +23,6 @@
 #ifndef Configuration_hpp
 #define Configuration_hpp
 
-#include "cppmicroservices/cm/CMExport.h"
-
 #include <string>
 
 #include "cppmicroservices/AnyMap.h"

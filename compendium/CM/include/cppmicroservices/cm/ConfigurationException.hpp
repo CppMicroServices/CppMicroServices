@@ -23,8 +23,6 @@
 #ifndef ConfigurationException_hpp
 #define ConfigurationException_hpp
 
-#include "cppmicroservices/cm/CMExport.h"
-
 #include <stdexcept>
 #include <string>
 

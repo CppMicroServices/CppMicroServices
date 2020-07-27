@@ -40,7 +40,6 @@ if(MSVC)
 endif()
 
 set(_configurationadmin_tests
-  #Mocks.hpp
   TestCMActivator.cpp
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
@@ -176,4 +175,9 @@ if(BUILD_SHARED_LIBS)
   # Add resources
   usFunctionEmbedResources(TARGET ${us_configurationadmin_test_exe_name}
                            FILES manifest.json)
+else()
+  # Add resources
+  usFunctionEmbedResources(TARGET ${us_configurationadmin_test_exe_name}
+                           FILES manifest.json
+                           ZIP_ARCHIVES ${Framework_TARGET})
 endif()

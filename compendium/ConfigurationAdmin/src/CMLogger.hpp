@@ -51,9 +51,9 @@ namespace cppmicroservices {
 
       // methods from the cppmicroservices::logservice::LogService interface
       void Log(logservice::SeverityLevel level, const std::string& message) override;
-      void Log(logservice::SeverityLevel level, const std::string& message, std::exception_ptr ex) override;
+      void Log(logservice::SeverityLevel level, const std::string& message, const std::exception_ptr ex) override;
       void Log(const ServiceReferenceBase& sr, logservice::SeverityLevel level, const std::string& message) override;
-      void Log(const ServiceReferenceBase& sr, logservice::SeverityLevel level, const std::string& message, std::exception_ptr ex) override;
+      void Log(const ServiceReferenceBase& sr, logservice::SeverityLevel level, const std::string& message, const std::exception_ptr ex) override;
 
       // methods from the cppmicroservices::ServiceTrackerCustomizer interface
       std::shared_ptr<TrackedParamType> AddingService(const ServiceReference<cppmicroservices::logservice::LogService>& reference) override;

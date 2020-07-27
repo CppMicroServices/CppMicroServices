@@ -93,7 +93,8 @@ public:
 
 ServiceListenerEntry::ServiceListenerEntry() = default;
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) = default;
+ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) =
+  default;
 
 ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListenerHook::ListenerInfo& info)
@@ -179,7 +180,7 @@ ListenerTokenId ServiceListenerEntry::Id() const
 
 std::size_t ServiceListenerEntry::Hash() const
 {
-  using namespace std;
+  using std::hash;
 
   if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0) {
     static_cast<ServiceListenerEntryData*>(d.get())->hashValue =
@@ -189,6 +190,7 @@ std::size_t ServiceListenerEntry::Hash() const
       ((hash<ServiceListener>()(d->listener)) ^
        (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
+
   return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
 }
 }

@@ -40,18 +40,17 @@ using AnyVector = std::vector<cppmicroservices::Any>;
  * stores any hierarchical values in AnyMaps also. The purpose of this function is to
  * store the data in a std::map hierarchy instead.
  */
-void copy_deprecated_properties(const AnyMap& headers
-                                  , AnyOrderedMap& deprecated)
+void copy_deprecated_properties(const AnyMap& headers,
+                                AnyOrderedMap& deprecated)
 {
   for (auto const& h : headers) {
     if (typeid(AnyMap) == h.second.Type()) {
       // recursively copy the anymap to a std::map and store in deprecated.
       AnyOrderedMap deprecated_headers;
-      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second)
-                                 , deprecated_headers);
+      copy_deprecated_properties(cppmicroservices::any_cast<AnyMap>(h.second),
+                                 deprecated_headers);
       deprecated.emplace(h.first, std::move(deprecated_headers));
-    }
-    else {
+    } else {
       deprecated.emplace(h.first, h.second);
     }
   }
@@ -68,7 +67,6 @@ void ParseJsonObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap);
 void ParseJsonArray(const rapidjson::Value& jsonArray,
                     AnyVector& anyVector,
                     bool ci);
-
 
 Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
 {
@@ -125,7 +123,9 @@ void ParseJsonObject(const rapidjson::Value& jsonObject, AnyMap& anyMap)
   }
 }
 
-void ParseJsonArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, bool ci)
+void ParseJsonArray(const rapidjson::Value& jsonArray,
+                    AnyVector& anyVector,
+                    bool ci)
 {
   for (const auto& jsonValue : jsonArray.GetArray()) {
     Any anyValue = ParseJsonValue(jsonValue, ci);
@@ -141,6 +141,10 @@ BundleManifest::BundleManifest()
   : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
 
+BundleManifest::BundleManifest(const AnyMap& m)
+  : m_Headers(m)
+{}
+
 void BundleManifest::Parse(std::istream& is)
 {
   rapidjson::IStreamWrapper jsonStream(is);
@@ -153,7 +157,6 @@ void BundleManifest::Parse(std::istream& is)
     throw std::runtime_error("The Json root element must be an object.");
   }
 
-  
   ParseJsonObject(root, m_Headers);
 }
 
@@ -170,8 +173,7 @@ bool BundleManifest::Contains(const std::string& key) const
 Any BundleManifest::GetValue(const std::string& key) const
 {
   auto iter = m_Headers.find(key);
-  if (m_Headers.cend() != iter)
-  {
+  if (m_Headers.cend() != iter) {
     return iter->second;
   }
   return Any();
@@ -179,8 +181,9 @@ Any BundleManifest::GetValue(const std::string& key) const
 
 void BundleManifest::CopyDeprecatedProperties() const
 {
-  std::call_once(m_DidCopyDeprecatedProperties
-                 , [&]() { copy_deprecated_properties(m_Headers, m_PropertiesDeprecated); });
+  std::call_once(m_DidCopyDeprecatedProperties, [&]() {
+    copy_deprecated_properties(m_Headers, m_PropertiesDeprecated);
+  });
 }
 
 Any BundleManifest::GetValueDeprecated(const std::string& key) const

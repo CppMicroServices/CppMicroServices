@@ -38,7 +38,8 @@ class CCUnsatisfiedReferenceStateTest
   : public ::testing::Test
 {
 protected:
-  CCUnsatisfiedReferenceStateTest() : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  CCUnsatisfiedReferenceStateTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
   { }
   virtual ~CCUnsatisfiedReferenceStateTest() = default;
 

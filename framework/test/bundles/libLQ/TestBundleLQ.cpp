@@ -48,7 +48,6 @@ public:
 
     ServiceProperties props;
     props["service.testproperty"] = std::string("YES");
-    std::cout << "Registering TestBundleLQService";
     sr = context.RegisterService<TestBundleLQService>(s, props);
   }
 

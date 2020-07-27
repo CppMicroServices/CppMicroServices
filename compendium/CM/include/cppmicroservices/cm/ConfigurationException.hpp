@@ -48,7 +48,7 @@ namespace cppmicroservices {
        * std::throw_with_nested - the ConfigurationAdmin implementation will attempt
        * to print the details of any nested exceptions as well.
        */
-      class US_cm_EXPORT ConfigurationException : public std::runtime_error {
+      class ConfigurationException : public std::runtime_error {
       public:
 
         /**
@@ -69,7 +69,7 @@ namespace cppmicroservices {
          *
          * @return The reason for this exception.
          */
-        std::string GetReason() const
+        inline std::string GetReason() const
         {
           return reason;
         }
@@ -80,7 +80,7 @@ namespace cppmicroservices {
          *
          * @return The property which caused this exception.
          */
-        std::string GetProperty() const
+        inline std::string GetProperty() const
         {
           return property;
         }

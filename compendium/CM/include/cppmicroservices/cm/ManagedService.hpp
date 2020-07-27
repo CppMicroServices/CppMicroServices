@@ -43,7 +43,7 @@ namespace cppmicroservices {
        * singleton scope, where there will only be one implementation of a given
        * interface.
        */
-      class US_cm_EXPORT ManagedService {
+      class ManagedService {
       public:
         virtual ~ManagedService() noexcept = default;
 

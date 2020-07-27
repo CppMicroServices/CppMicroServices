@@ -56,7 +56,7 @@ namespace cppmicroservices {
        * The Removed method will be invoked whenever any Configuration which this factory
        * has previously been configured with is removed from the ConfigurationAdmin implementation.</p>
        */
-      class US_cm_EXPORT ManagedServiceFactory {
+      class ManagedServiceFactory {
       public:
         virtual ~ManagedServiceFactory() noexcept = default;
 

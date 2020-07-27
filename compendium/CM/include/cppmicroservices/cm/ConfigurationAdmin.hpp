@@ -41,7 +41,7 @@ namespace cppmicroservices {
        * Configuration objects, which can in turn be queried for their properties or be used to
        * update the properties of a given service or service factory.
        */
-      class US_cm_EXPORT ConfigurationAdmin {
+      class ConfigurationAdmin {
       public:
         virtual ~ConfigurationAdmin() noexcept = default;
 

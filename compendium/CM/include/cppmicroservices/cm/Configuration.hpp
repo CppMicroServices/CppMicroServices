@@ -38,7 +38,7 @@ namespace cppmicroservices {
        * is the principal means for clients of ConfigurationAdmin to inspect or update the
        * Configuration of a given service or service factory.
        */
-      class US_cm_EXPORT Configuration {
+      class Configuration {
       public:
         virtual ~Configuration() noexcept = default;
 

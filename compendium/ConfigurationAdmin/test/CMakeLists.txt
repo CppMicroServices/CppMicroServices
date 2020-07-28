@@ -91,7 +91,8 @@ target_include_directories(${us_configurationadmin_test_exe_name}
   PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 # See https://github.com/google/googletest/blob/master/googlemock/docs/gmock_faq.md#msvc-gives-me-warning-c4301-or-c4373-when-i-define-a-mock-method-with-a-const-parameter-why
-if (MSVC)
+# MSVC_VERSION 1900 = MS Visual Studio 2015
+if (MSVC AND MSVC_VERSION EQUAL 1900)
   target_compile_options(${us_configurationadmin_test_exe_name} PRIVATE "/wd4373")
 endif()
 

@@ -1,5 +1,5 @@
-#ifndef DECLARATIVE_SERVICES_TESTINGCONFIG_H
-#define DECLARATIVE_SERVICES_TESTINGCONFIG_H
+#ifndef CONFIGURATION_ADMIN_TESTINGCONFIG_H
+#define CONFIGURATION_ADMIN_TESTINGCONFIG_H
 
 #include <string>
 
@@ -11,7 +11,7 @@
 #define US_RUNTIME_OUTPUT_DIRECTORY "@CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE@"
 #endif
 
-#define US_DeclarativeServices_VERSION_MAJOR "@DeclarativeServices_VERSION_MAJOR@"
+#define US_ConfigurationAdmin_VERSION_MAJOR "@ConfigurationAdmin_VERSION_MAJOR@"
 
 namespace cppmicroservices
 {

@@ -371,61 +371,30 @@
 {
    <usConfigurationAdminTestSuppression2>
    Memcheck:Value8
+   ...
    fun:_itoa_word
-   fun:vfprintf
-   fun:vsnprintf
-   fun:snprintf
-   fun:_ZN7testing12_GLOBAL__N_126PrintByteSegmentInObjectToEPKhmmPSo
-   fun:_ZN7testing9internal220PrintBytesInObjectToEPKhmPSo
+   ...
    fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
-   fun:_ZN7testing8internal12UnitTestImpl19PostFlagParsingInitEv.part.635
-   fun:_ZN7testing8internal18InitGoogleTestImplIcEEvPiPPT_
-   fun:_ZN7testing8internal18InitGoogleMockImplIcEEvPiPPT_
-   fun:main
+   ...
 }
 
 {
    <usConfigurationAdminTestSuppression3>
    Memcheck:Cond
+   ...
    fun:_itoa_word
-   fun:vfprintf
-   fun:vsnprintf
-   fun:snprintf
-   fun:_ZN7testing12_GLOBAL__N_126PrintByteSegmentInObjectToEPKhmmPSo
-   fun:_ZN7testing9internal220PrintBytesInObjectToEPKhmPSo
+   ...
    fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
-   fun:_ZN7testing8internal12UnitTestImpl19PostFlagParsingInitEv.part.635
-   fun:_ZN7testing8internal18InitGoogleTestImplIcEEvPiPPT_
-   fun:_ZN7testing8internal18InitGoogleMockImplIcEEvPiPPT_
-   fun:main
+   ...
 }
 
 {
    <usConfigurationAdminTestSuppression4>
    Memcheck:Cond
+   ...
    fun:vfprintf
-   fun:vsnprintf
-   fun:snprintf
-   fun:_ZN7testing12_GLOBAL__N_126PrintByteSegmentInObjectToEPKhmmPSo
-   fun:_ZN7testing9internal220PrintBytesInObjectToEPKhmPSo
+   ...
    fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
-   fun:_ZN7testing8internal12UnitTestImpl19PostFlagParsingInitEv.part.635
-   fun:_ZN7testing8internal18InitGoogleTestImplIcEEvPiPPT_
-   fun:_ZN7testing8internal18InitGoogleMockImplIcEEvPiPPT_
-   fun:main
+   ...
 }
 
-{
-   <usConfigurationAdminTestSuppression5>
-   Memcheck:Cond
-   fun:vfprintf
-   fun:vsnprintf
-   fun:snprintf
-   fun:_ZN7testing12_GLOBAL__N_126PrintByteSegmentInObjectToEPKhmmPSo
-   fun:_ZN7testing9internal220PrintBytesInObjectToEPKhmPSo
-   fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
-   fun:_ZN7testing8internal12UnitTestImpl19PostFlagParsingInitEv.part.635
-   fun:_ZN7testing8internal18InitGoogleTestImplIcEEvPiPPT_
-   fun:_ZN7testing8internal18InitGoogleMockImplIcEEvPiPPT_
-   fun:main
-}

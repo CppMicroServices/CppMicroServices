@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef ManagedService_hpp
-#define ManagedService_hpp
+#ifndef CppMicroServices_CM_ManagedService_hpp
+#define CppMicroServices_CM_ManagedService_hpp
 
 #include "cppmicroservices/AnyMap.h"
 

@@ -54,10 +54,10 @@ namespace cppmicroservices {
     class FakeLogger : public cppmicroservices::logservice::LogService
     {
     public:
-      void Log(cppmicroservices::logservice::SeverityLevel /* level */, const std::string& /* message */) override {}
-      void Log(cppmicroservices::logservice::SeverityLevel /* level */, const std::string& /* message */, const std::exception_ptr /* ex */) override {}
-      void Log(const ServiceReferenceBase& /* sr */, cppmicroservices::logservice::SeverityLevel /* level */, const std::string& /* message */) override {}
-      void Log(const ServiceReferenceBase& /* sr */, cppmicroservices::logservice::SeverityLevel /* level */, const std::string& /* message */, const std::exception_ptr /* ex */) override {}
+      void Log(cppmicroservices::logservice::SeverityLevel, const std::string&) override {}
+      void Log(cppmicroservices::logservice::SeverityLevel, const std::string&, const std::exception_ptr) override {}
+      void Log(const ServiceReferenceBase&, cppmicroservices::logservice::SeverityLevel, const std::string&) override {}
+      void Log(const ServiceReferenceBase&, cppmicroservices::logservice::SeverityLevel, const std::string&, const std::exception_ptr) override {}
     };
 
     /**

@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef Configuration_hpp
-#define Configuration_hpp
+#ifndef CppMicroServices_CM_Configuration_hpp
+#define CppMicroServices_CM_Configuration_hpp
 
 #include <string>
 

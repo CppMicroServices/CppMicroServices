@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef ConfigurationException_hpp
-#define ConfigurationException_hpp
+#ifndef CppMicroServices_CM_ConfigurationException_hpp
+#define CppMicroServices_CM_ConfigurationException_hpp
 
 #include <stdexcept>
 #include <string>
@@ -67,7 +67,7 @@ namespace cppmicroservices {
          *
          * @return The reason for this exception.
          */
-        inline std::string GetReason() const
+        std::string GetReason() const
         {
           return reason;
         }
@@ -78,7 +78,7 @@ namespace cppmicroservices {
          *
          * @return The property which caused this exception.
          */
-        inline std::string GetProperty() const
+        std::string GetProperty() const
         {
           return property;
         }
@@ -86,8 +86,8 @@ namespace cppmicroservices {
         virtual ~ConfigurationException() noexcept {}
 
       private:
-        std::string reason;
-        std::string property;
+        const std::string reason;
+        const std::string property;
       };
     }
   }

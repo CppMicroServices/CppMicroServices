@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef ConfigurationAdmin_hpp
-#define ConfigurationAdmin_hpp
+#ifndef CppMicroServices_CM_ConfigurationAdmin_hpp
+#define CppMicroServices_CM_ConfigurationAdmin_hpp
 
 #include "cppmicroservices/cm/Configuration.hpp"
 

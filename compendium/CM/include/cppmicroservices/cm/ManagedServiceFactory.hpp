@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef ManagedServiceFactory_hpp
-#define ManagedServiceFactory_hpp
+#ifndef CppMicroServices_CM_ManagedServiceFactory_hpp
+#define CppMicroServices_CM_ManagedServiceFactory_hpp
 
 #include <string>
 

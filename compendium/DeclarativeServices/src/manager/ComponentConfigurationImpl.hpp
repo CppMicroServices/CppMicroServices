@@ -24,7 +24,11 @@
 #define __COMPONENTCONFIGURATIONIMPL_HPP__
 
 #include <memory>
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"

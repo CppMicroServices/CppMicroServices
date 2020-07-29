@@ -23,7 +23,11 @@
 #ifndef CMDisabledState_hpp
 #define CMDisabledState_hpp
 
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "ComponentManagerState.hpp"
 
 namespace cppmicroservices {

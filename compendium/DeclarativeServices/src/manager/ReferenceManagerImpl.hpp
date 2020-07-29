@@ -25,6 +25,11 @@
 
 #include <mutex>
 
+#if defined(USING_GTEST)
+#include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "ConcurrencyUtil.hpp"
 #include "ReferenceManager.hpp"
 #include "cppmicroservices/BundleContext.h"

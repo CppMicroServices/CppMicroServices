@@ -13,8 +13,8 @@ void ServiceComponentDynamicGreedyMandatoryUnary::Deactivate(const std::shared_p
 
 std::string ServiceComponentDynamicGreedyMandatoryUnary::ExtendedDescription()
 {
-  if(!foo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if(!foo) {
     throw std::runtime_error("Dependency not available");
   }
   std::string result("ServiceComponentDynamicGreedyMandatoryUnary ");
@@ -25,16 +25,16 @@ std::string ServiceComponentDynamicGreedyMandatoryUnary::ExtendedDescription()
 
 void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo != theFoo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if (foo != theFoo) {
     foo = theFoo;
   }
 }
 
 void ServiceComponentDynamicGreedyMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo == theFoo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if (foo == theFoo) {
     foo = nullptr;
   }
 }

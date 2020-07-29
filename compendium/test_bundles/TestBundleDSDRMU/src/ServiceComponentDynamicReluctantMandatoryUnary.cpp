@@ -13,8 +13,8 @@ void ServiceComponentDynamicReluctantMandatoryUnary::Deactivate(const std::share
 
 std::string ServiceComponentDynamicReluctantMandatoryUnary::ExtendedDescription()
 {
-  if(!foo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if(!foo) {
     throw std::runtime_error("Dependency not available");
   }
   std::string result("ServiceComponentDynamicReluctantMandatoryUnary ");
@@ -25,16 +25,16 @@ std::string ServiceComponentDynamicReluctantMandatoryUnary::ExtendedDescription(
 
 void ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo != theFoo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if (foo != theFoo) {
     foo = theFoo;
   }
 }
 
 void ServiceComponentDynamicReluctantMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo == theFoo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if (foo == theFoo) {
     foo = nullptr;
   }
 }

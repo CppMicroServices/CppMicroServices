@@ -1,6 +1,8 @@
 #ifndef _SERVICE_IMPL_HPP_
 #define _SERVICE_IMPL_HPP_
 
+#include <mutex>
+
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -22,6 +24,7 @@ public:
   void Unbindfoo(const std::shared_ptr<test::Interface1>&);
 private:
   std::shared_ptr<test::Interface1> foo;
+  std::mutex fooMutex;
 };
 
 } // namespaces

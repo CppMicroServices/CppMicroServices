@@ -15,6 +15,7 @@ std::string ServiceComponentDynamicGreedyOptionalUnary::ExtendedDescription()
 {
   std::string result("ServiceComponentDynamicGreedyOptionalUnary ");
   result.append("depends on ");
+  std::lock_guard<std::mutex> lock(fooMutex);
   if (foo) {
     result.append(foo->Description());
   }
@@ -23,16 +24,16 @@ std::string ServiceComponentDynamicGreedyOptionalUnary::ExtendedDescription()
 
 void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo != theFoo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if (foo != theFoo) {
     foo = theFoo;
   }
 }
 
 void ServiceComponentDynamicGreedyOptionalUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo == theFoo)
-  {
+  std::lock_guard<std::mutex> lock(fooMutex);
+  if (foo == theFoo) {
     foo = nullptr;
   }
 }

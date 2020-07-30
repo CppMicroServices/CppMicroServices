@@ -347,3 +347,54 @@
    obj:*
    obj:*
 }
+
+{
+   <usConfigurationAdminTestSuppression0>
+   Memcheck:Leak
+   ...
+   fun:_Znwm
+   ...
+   fun:_ZN16cppmicroservices6cmimpl44TestCMLogger_VerifyWithoutLoggerService_Test8TestBodyEv
+   ...
+}
+
+{
+   <usConfigurationAdminTestSuppression1>
+   Memcheck:Leak
+   ...
+   fun:_Znwm
+   ...
+   fun:_ZN16cppmicroservices6cmimpl41TestCMLogger_VerifyWithLoggerService_Test8TestBodyEv
+   ...
+}
+
+{
+   <usConfigurationAdminTestSuppression2>
+   Memcheck:Value8
+   ...
+   fun:_itoa_word
+   ...
+   fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
+   ...
+}
+
+{
+   <usConfigurationAdminTestSuppression3>
+   Memcheck:Cond
+   ...
+   fun:_itoa_word
+   ...
+   fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
+   ...
+}
+
+{
+   <usConfigurationAdminTestSuppression4>
+   Memcheck:Cond
+   ...
+   fun:vfprintf
+   ...
+   fun:_ZN7testing8internal26ParameterizedTestSuiteInfoIN12_GLOBAL__N_119TestInvalidMetadataEE13RegisterTestsEv
+   ...
+}
+

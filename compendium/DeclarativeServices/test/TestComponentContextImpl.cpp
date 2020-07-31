@@ -205,7 +205,7 @@ TEST_F(ComponentContextImplTest, DISABLED_VerifyLocateServiceWithReferenceScopes
       {
         bundle.Start(); // In case the pkgtest bundle is not started
         auto bundleContext = bundle.GetBundleContext();
-        auto mockRefMgrFoo = std::make_shared<ReferenceManagerImpl>(fakeRefMetadata, bundleContext, fakeLogger);
+        auto mockRefMgrFoo = std::make_shared<ReferenceManagerImpl>(fakeRefMetadata, bundleContext, fakeLogger, "foobar");
         std::vector<std::shared_ptr<ReferenceManager>> depMgrs{mockRefMgrFoo};
         EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).WillRepeatedly(testing::Return(depMgrs));
         EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(bundle));

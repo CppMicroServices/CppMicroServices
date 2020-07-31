@@ -121,7 +121,7 @@ TEST(BundleManifestTest, InstallBundleWithDeepManifest)
   auto framework = FrameworkFactory().NewFramework();
   framework.Start();
   auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleWithDeepManifest");
-  auto headers = bundle.GetHeaders();
+  const auto& headers = bundle.GetHeaders();
   ASSERT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
               , ::testing::StrEq("TestBundleWithDeepManifest")) << "Bundle symblic name doesn't match.";
 
@@ -143,7 +143,7 @@ TEST(BundleManifestTest, ParseManifest)
   
   ASSERT_TRUE(bundleM) << "Failed to install TestBundleM";
 
-  auto headers = bundleM.GetHeaders();
+  const auto& headers = bundleM.GetHeaders();
   
   EXPECT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString()
               , ::testing::StrEq("TestBundleM"));

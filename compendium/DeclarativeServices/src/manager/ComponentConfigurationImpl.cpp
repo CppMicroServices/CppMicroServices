@@ -67,7 +67,8 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const met
   for (auto const& refMetadata : this->metadata->refsMetadata) {
     auto refManager = std::make_shared<ReferenceManagerImpl>(refMetadata,
                                                              bundle.GetBundleContext(),
-                                                             this->logger);
+                                                             this->logger,
+                                                             this->metadata->name);
     referenceManagers.emplace(refMetadata.name, refManager);
   }
 }
@@ -236,7 +237,8 @@ std::shared_ptr<ComponentConfigurationState> ComponentConfigurationImpl::GetStat
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if(newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-    std::tie(newCompInstanceFunc, deleteCompInstanceFunc) = GetComponentCreatorDeletors(GetMetadata()->implClassName, GetBundle());
+    const auto compName = GetMetadata()->name.empty() ? GetMetadata()->implClassName : GetMetadata()->name;
+    std::tie(newCompInstanceFunc, deleteCompInstanceFunc) = GetComponentCreatorDeletors(compName, GetBundle());
   }
 }
 

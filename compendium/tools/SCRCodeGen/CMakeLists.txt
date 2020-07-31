@@ -40,9 +40,9 @@ else()
   # Export the host scr code gen tool target to a file so it can be imported when cross-compiling.
   # Use the NAMESPACE option of EXPORT() to get a different target name for ${US_SCRCODEGEN_EXECUTABLE_TARGET}
   # when exporting.
-  # Doing this allows the host built usResourceCompiler to be used when cross-compiling and allows
+  # Doing this allows the host built SCRCodeGen to be used when cross-compiling and allows
   # the scr code gen tool to be built and installed for the target machine.
-  export( TARGETS ${US_SCRCODEGEN_EXECUTABLE_TARGET} FILE ${IMPORT_EXECUTABLES} NAMESPACE native-)
+  export( TARGETS ${US_SCRCODEGEN_EXECUTABLE_TARGET} APPEND FILE ${IMPORT_EXECUTABLES} NAMESPACE native-)
 endif()
 
 if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")

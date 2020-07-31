@@ -28,7 +28,7 @@ configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/logservice/LogServiceExport.h
   )
            
-add_library(usLogService ${_srcs})
+add_library(usLogService ${_srcs} ${_public_headers})
 
 target_include_directories(usLogService
   PUBLIC
@@ -47,6 +47,14 @@ install(TARGETS ${${PROJECT_NAME}_TARGET}
           LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
           ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices
+        DESTINATION ${HEADER_INSTALL_DIR}
+        OPTIONAL)
+
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices
+        DESTINATION ${HEADER_INSTALL_DIR}
+        OPTIONAL)
+          
 # Version information
 configure_file(
   ${US_CMAKE_DIR}/usBundleConfigVersion.cmake.in

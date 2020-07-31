@@ -20,17 +20,39 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_DEBUG_H
-#define CPPMICROSERVICES_DEBUG_H
+#include "cppmicroservices/ShrinkableVector.h"
 
-namespace cppmicroservices {
+#include "gtest/gtest.h"
 
-struct Debug
+using namespace cppmicroservices;
+
+// Fake a BundleHooks class so we can create
+// ShrinkableVector instances
+namespace cppmicroservices 
 {
-  Debug();
+class BundleHooks
+{
 
-  bool lazyActivation{false};
+public:
+  template<class E>
+  static ShrinkableVector<E> MakeVector(std::vector<E>& c)
+  {
+    return ShrinkableVector<E>(c);
+  }
 };
 }
 
-#endif // CPPMICROSERVICES_DEBUG_H
+TEST(ShrinkableVectorTest, ShrinkableVector)
+{
+  ShrinkableVector<int32_t>::container_type vec({1, 2, 3});
+  auto shrinkable = BundleHooks::MakeVector(vec);
+
+  EXPECT_EQ(vec.size(), 3);
+  EXPECT_EQ(vec.size(), shrinkable.size());
+  EXPECT_EQ(shrinkable.at(0), 1);
+  EXPECT_EQ(shrinkable.back(), 3);
+
+  shrinkable.pop_back();
+  EXPECT_EQ(shrinkable.back(), 2);
+  EXPECT_THROW(shrinkable.at(3), std::out_of_range);
+}

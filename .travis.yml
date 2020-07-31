@@ -48,28 +48,28 @@ matrix:
       # Test all build configuration with the latest available GCC
       - os: linux
         addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
-        env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1
+        env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
 
       - os: linux
         addons: *gcc8-valgrind
-        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
 
       - os: linux
         addons: *gcc8-valgrind
-        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
 
       - os: linux
         addons: *gcc8-valgrind
-        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
@@ -89,22 +89,28 @@ matrix:
       - os: osx
         osx_image: xcode10.3
         compiler: clang
+        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14
+
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.14
+
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.14
+
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
+        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.14
+
+# To generate codecov reports
+      - os: osx
+        osx_image: xcode10.3
+        compiler: clang
         env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
-
-      - os: osx
-        osx_image: xcode10.3
-        compiler: clang
-        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
-
-      - os: osx
-        osx_image: xcode10.3
-        compiler: clang
-        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
-
-      - os: osx
-        osx_image: xcode10.3
-        compiler: clang
-        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 
 cache:
   directories:

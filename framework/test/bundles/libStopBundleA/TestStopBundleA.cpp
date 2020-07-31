@@ -20,47 +20,38 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/ShrinkableVector.h"
+#include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleActivator.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/GlobalConfig.h"
 
-#include "TestUtils.h"
-#include "TestingConfig.h"
-#include "TestingMacros.h"
+#include <algorithm>
+#include <iostream>
 
 namespace cppmicroservices {
 
-// Fake a BundleHooks class so we can create
-// ShrinkableVector instances
-class BundleHooks
+class TestStopBundleAActivator : public BundleActivator
 {
-
 public:
-  template<class E>
-  static ShrinkableVector<E> MakeVector(std::vector<E>& c)
+  TestStopBundleAActivator() {}
+  ~TestStopBundleAActivator() {}
+
+  void Start(BundleContext) { }
+
+  void Stop(BundleContext context) 
   {
-    return ShrinkableVector<E>(c);
+    auto bundles = context.GetBundles();
+    auto bundleA = std::find_if(bundles.begin(),
+                                bundles.end(),
+                                [](const cppmicroservices::Bundle& b) { return "TestBundleA" == b.GetSymbolicName(); });
+
+    if (std::end(bundles) != bundleA)
+    {
+      (*bundleA).Stop();
+    }      
   }
 };
+
 }
 
-using namespace cppmicroservices;
-
-int ShrinkableVectorTest(int /*argc*/, char* /*argv*/ [])
-{
-  US_TEST_BEGIN("ShrinkableVectorTest");
-
-  ShrinkableVector<int>::container_type vec{ 1, 2, 3 };
-
-  auto shrinkable = BundleHooks::MakeVector(vec);
-
-  US_TEST_CONDITION(vec.size() == 3, "Original size")
-  US_TEST_CONDITION(vec.size() == shrinkable.size(), "Equal size")
-  US_TEST_CONDITION(shrinkable.at(0) == 1, "At access")
-  US_TEST_CONDITION(shrinkable.back() == 3, "back() access")
-
-  shrinkable.pop_back();
-  US_TEST_CONDITION(shrinkable.back() == 2, "back() access")
-
-  US_TEST_FOR_EXCEPTION(std::out_of_range, shrinkable.at(3))
-
-  US_TEST_END()
-}
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestStopBundleAActivator)

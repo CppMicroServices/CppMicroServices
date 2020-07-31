@@ -19,16 +19,23 @@
   limitations under the License.
 
 =============================================================================*/
+#include "cppmicroservices/SharedLibraryException.h"
 
-#include "Debug.h"
+#include "ServiceImpl.hpp"
 
-namespace cppmicroservices {
-
-Debug::Debug()
-   
+namespace sample {
+std::string ServiceComponentDSSLE2::Description()
 {
-#ifdef _DEBUG
-  lazyActivation = true;
-#endif
+  return STRINGIZE(US_BUNDLE_NAME);
 }
+void ServiceComponentDSSLE2::Activate(
+  const std::shared_ptr<ComponentContext>& ctx)
+{
+  cppmicroservices::BundleContext bc = ctx->GetBundleContext();
+  throw cppmicroservices::SharedLibraryException(
+    std::error_code(), "test", bc.GetBundle());
+};
+void ServiceComponentDSSLE2::Deactivate(
+  const std::shared_ptr<ComponentContext>&){};
+ServiceComponentDSSLE2::~ServiceComponentDSSLE2(){};
 }

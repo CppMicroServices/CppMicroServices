@@ -21,9 +21,10 @@
   =============================================================================*/
 
 #include "CMEnabledState.hpp"
-#include "CMDisabledState.hpp"
-#include "../ComponentManagerImpl.hpp"
 #include "../ComponentConfigurationFactory.hpp"
+#include "../ComponentManagerImpl.hpp"
+#include "CMDisabledState.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -76,9 +77,9 @@ void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::Compon
                                                                         registry,
                                                                         logger);
     configurations.push_back(cc);
-  }
-  catch(...)
-  {
+  } catch (const cppmicroservices::SharedLibraryException&) {
+    throw;
+  } catch (...) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to create component configuration", std::current_exception());
   }
 }

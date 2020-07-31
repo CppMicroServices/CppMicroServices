@@ -1,0 +1,15 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI8",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponent8",
+            "name": "ServiceComponent8",
+            "service": {
+                "interfaces": ["test::Interface1"]
+            },
+            "inject-references": false
+        }]
+    }
+}

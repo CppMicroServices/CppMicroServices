@@ -144,7 +144,7 @@ public:
     US_TEST_CONDITION_REQUIRED(!sr1, "service from bundle A must not exist yet")
 
     // Check manifest headers
-    auto headers = buA.GetHeaders();
+    const auto& headers = buA.GetHeaders();
     US_TEST_CONDITION_REQUIRED(headers.size() > 0,
                                "One or more manifest header")
     US_TEST_CONDITION(headers.at("bundle.symbolic_name") ==
@@ -248,7 +248,7 @@ public:
     }
 
     // Check manifest headers in stopped state
-    auto headers = buA.GetHeaders();
+    const auto& headers = buA.GetHeaders();
     US_TEST_CONDITION_REQUIRED(headers.size() > 0,
                                "One ore more manifest header")
     US_TEST_CONDITION(headers.at("bundle.symbolic_name") ==
@@ -428,7 +428,13 @@ void TestBundleStates()
   // Test Start -> Stop for auto-installed bundles
   auto bundles = frameworkCtx.GetBundles();
   for (auto& bundle : bundles) {
-    if (bundle != framework) {
+    // TestStartBundleA and TestStopBundleA start/stop TestBundleA for the purposes
+    // of a different test. Instead of complicating this test code, skip starting 
+    // these bundles. In the future, refactor this test code to execute only for static
+    // builds and to start and stop an explicit list of bundles instead of them all.
+    if (bundle != framework &&
+        "TestStartBundleA" != bundle.GetSymbolicName() &&
+        "TestStopBundleA" != bundle.GetSymbolicName()) {
       US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED,
                         "Test installed bundle state")
       try {
@@ -1246,9 +1252,6 @@ int BundleTest(int /*argc*/, char* /*argv*/ [])
   TestBundleGetProperty();
 
   // will not test:
-  // Fragments - unable to test without defining what a Fragment is and implementing it
-  //    Fragment code path in BundlePrivate::GetUpdatedState
-  // lazy activation code path - requires defining lazy activation for C++ and implementing it.
   // BundlePrivate::GetAutoStartSetting() - no callers, internal or external
   // invalid json use case - this is automatically checked by usResourceCompiler.
 #if defined(US_BUILD_SHARED_LIBS)

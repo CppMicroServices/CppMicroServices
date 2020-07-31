@@ -547,6 +547,19 @@ endif()
 
 usFunctionCheckResourceLinking()
 
+# For building with Xcode, "CMAKE_*_LINKER_FLAGS" need to include US_LINK_FLAGS
+# to include coverage flags "-fprofile-arcs" and "-ftest-coverage" if US_ENABLE_COVERAGE
+# is set.
+# Previously, macOS builds using Unix Makefiles automatically set compile flags
+# to be used as linker flags (see the following CMake bug report for more details:
+# https://cmake.org/Bug/view.php?id=15427), so linker flags didn't need to be set.
+
+if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${US_LINK_FLAGS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${US_LINK_FLAGS}")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${US_LINK_FLAGS}")
+endif()
+
 #-----------------------------------------------------------------------------
 # US Header Checks
 #-----------------------------------------------------------------------------

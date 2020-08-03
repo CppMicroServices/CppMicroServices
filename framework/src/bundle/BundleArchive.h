@@ -166,6 +166,7 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
    */
   void UnregisterOpenedResource() const;
 
+  /**
    * Return the manifest for the bundle in this bundlearchive.
    */
   const AnyMap& GetInjectedManifest() const;

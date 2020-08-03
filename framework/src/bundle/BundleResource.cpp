@@ -38,10 +38,8 @@ class BundleResourcePrivate
 {
 
 public:
-  BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive)
-    : archive(std::move(archive))
-    , ref(1)
-  {}
+  BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive);
+  ~BundleResourcePrivate();
 
   void InitFilePath(const std::string& file);
 
@@ -70,7 +68,7 @@ BundleResourcePrivate::BundleResourcePrivate(std::shared_ptr<const BundleArchive
   }
 }
 
-BundleResourcePrivate::~BundleResourcePrivate()
+BundleResourcePrivate::~BundleResourcePrivate() 
 {
   if (this->archive) {
     this->archive->UnregisterOpenedResource();

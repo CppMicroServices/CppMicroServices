@@ -34,7 +34,7 @@ US_MSVC_PUSH_DISABLE_WARNING(
 namespace cppmicroservices {
 
 struct ServiceListenerCompare
-  : std::binary_function<ServiceListener, ServiceListener, bool>
+  : std::function<bool(ServiceListener, ServiceListener)>
 {
   bool operator()(const ServiceListener& f1, const ServiceListener& f2) const
   {
@@ -93,7 +93,8 @@ public:
 
 ServiceListenerEntry::ServiceListenerEntry() = default;
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) = default;
+ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) =
+  default;
 
 ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListenerHook::ListenerInfo& info)
@@ -143,10 +144,17 @@ void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
 
 bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
 {
-  return ((d->context == nullptr || other.d->context == nullptr) ||
-          d->context == other.d->context) &&
-         (d->data == other.d->data) && (d->tokenId == other.d->tokenId) &&
-         ServiceListenerCompare()(d->listener, other.d->listener);
+  return (d->data == other.d->data)
+         && (d->tokenId == other.d->tokenId)
+         && ServiceListenerCompare()(d->listener, other.d->listener)
+         && ((d->context == nullptr
+              || other.d->context == nullptr)
+            || d->context == other.d->context);
+}
+
+bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const 
+{
+  return d->tokenId < other.d->tokenId;
 }
 
 bool ServiceListenerEntry::Contains(
@@ -172,7 +180,7 @@ ListenerTokenId ServiceListenerEntry::Id() const
 
 std::size_t ServiceListenerEntry::Hash() const
 {
-  using namespace std;
+  using std::hash;
 
   if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0) {
     static_cast<ServiceListenerEntryData*>(d.get())->hashValue =
@@ -182,6 +190,7 @@ std::size_t ServiceListenerEntry::Hash() const
       ((hash<ServiceListener>()(d->listener)) ^
        (hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
   }
+
   return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
 }
 }

@@ -38,9 +38,10 @@ class BundleResourcePrivate
 {
 
 public:
-  BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive);
-
-  ~BundleResourcePrivate();
+  BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive)
+    : archive(std::move(archive))
+    , ref(1)
+  {}
 
   void InitFilePath(const std::string& file);
 
@@ -127,6 +128,8 @@ BundleResource::BundleResource(const std::string& file,
   d->stat.filePath = d->archive->GetResourcePrefix() + d->path + d->fileName;
 
   d->archive->GetResourceContainer()->GetStat(d->stat);
+
+  InitializeChildren();
 }
 
 BundleResource::BundleResource(int index,
@@ -136,6 +139,16 @@ BundleResource::BundleResource(int index,
   d->archive->GetResourceContainer()->GetStat(index, d->stat);
   d->InitFilePath(
     d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
+
+  InitializeChildren();
+}
+
+void BundleResource::InitializeChildren()
+{
+  if (d->children.empty()) {
+    d->archive->GetResourceContainer()->GetChildren(
+      d->stat.filePath, true, d->children, d->childNodes);
+  }
 }
 
 BundleResource::~BundleResource()
@@ -243,10 +256,6 @@ std::vector<std::string> BundleResource::GetChildren() const
   if (!IsValid() || !IsDir())
     return d->children;
 
-  if (d->children.empty()) {
-    d->archive->GetResourceContainer()->GetChildren(
-      d->stat.filePath, true, d->children, d->childNodes);
-  }
   return d->children;
 }
 
@@ -256,11 +265,6 @@ std::vector<BundleResource> BundleResource::GetChildResources() const
 
   if (!IsValid() || !IsDir())
     return childResources;
-
-  if (d->childNodes.empty()) {
-    d->archive->GetResourceContainer()->GetChildren(
-      this->GetResourcePath(), true, d->children, d->childNodes);
-  }
 
   for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(),
                                              iterEnd = d->childNodes.end();
@@ -294,9 +298,8 @@ uint32_t BundleResource::GetCrc32() const
 
 std::size_t BundleResource::Hash() const
 {
-  using namespace std;
-  return hash<std::string>()(d->archive->GetResourcePrefix() +
-                             this->GetResourcePath());
+  return std::hash<std::string>()(d->archive->GetResourcePrefix() +
+                                  this->GetResourcePath());
 }
 
 std::unique_ptr<void, void (*)(void*)> BundleResource::GetData() const

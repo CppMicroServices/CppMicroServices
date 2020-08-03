@@ -75,6 +75,8 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
 #ifdef US_PLATFORM_POSIX
   configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS,
                                        RTLD_LAZY | RTLD_LOCAL));
+#else
+  configuration[Constants::LIBRARY_LOAD_OPTIONS] = int(0);
 #endif
 
   return configuration;
@@ -159,7 +161,6 @@ void CoreBundleContext::Init()
   bundleRegistry.Init();
 
   serviceHooks.Open();
-  //resolverHooks.Open();
 
   bundleRegistry.Load();
 
@@ -193,6 +194,9 @@ void CoreBundleContext::Init()
   } catch (...) {
       DIAG_LOG(*sink) << "Unable to read default library load options from config.";
       libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
+    
+      // override non-integer framework property value to reflect default library load option for POSIX
+      frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS] = libraryLoadOptions;
   }
   DIAG_LOG(*sink) << "Library Load Options = " << libraryLoadOptions;
 #endif

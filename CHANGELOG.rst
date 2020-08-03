@@ -6,10 +6,10 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased v4.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2018-XX-XX)
+`Unreleased v4.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2020-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.3.0...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.5.0...development>`_
 
 Added
 -----
@@ -25,6 +25,102 @@ Deprecated
 
 Fixed
 -----
+
+v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.4.0...v3.5.0>`_
+
+Added
+-----
+
+- `Bundle::GetSymbol API <https://github.com/CppMicroServices/rfcs/blob/master/text/0005-Bundle-Load-API.md>`_
+- `SharedLibraryException <https://github.com/CppMicroServices/rfcs/blob/master/text/0004-ds-dlopen-error-handling.md>`_
+
+Changed
+-------
+
+- Migrate a handful of tests from the legacy test suite to gtest based test suite
+- `Improve shared library loading error messages <https://github.com/CppMicroServices/CppMicroServices/commit/1920dacd4bc11865a66a87b2806a81f0cd6e6e7f>`_
+- c++17 compatible
+  - https://github.com/CppMicroServices/CppMicroServices/pull/465
+  - https://github.com/CppMicroServices/CppMicroServices/pull/479
+
+Removed
+-------
+
+- `Remove dead code and partially implemented features <https://github.com/CppMicroServices/CppMicroServices/issues/415>`_
+- `Remove code with license conflicts <https://github.com/CppMicroServices/CppMicroServices/issues/419>`_
+
+Deprecated
+----------
+
+Fixed
+-----
+
+- Correctly install Declarative Services and LogService headers
+- `Infinite loop in GetCurrentWorkingDir <https://github.com/CppMicroServices/CppMicroServices/pull/431>`_
+- `Use cross build objcopy <https://github.com/CppMicroServices/CppMicroServices/commit/a92460244748b5f12edaaa91ac6bd7ea7ecabdc2>`_
+- `Service reference dependency deadlock <https://github.com/CppMicroServices/CppMicroServices/commit/ce0d8bfe505509f0b4cea9ab1b4347532c8b7cbb>`_
+- `Instantiating multiple service implementations within the same service component <https://github.com/CppMicroServices/CppMicroServices/commit/48f36a7f06ebce05fd3181c1f32eaf8415cb2a69>`_
+- Codecov integration
+- `BundleRegistry deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/463>`_
+- `Remove unnecessary copying of AnyMap <https://github.com/CppMicroServices/CppMicroServices/pull/468>`_
+- `Minimum and maximum cardinality values <https://github.com/CppMicroServices/CppMicroServices/issues/475>`_
+- `Error if duplicate service component reference names are used <https://github.com/CppMicroServices/CppMicroServices/pull/474>`_
+- `Improve performance of ServiceTrackers <https://github.com/CppMicroServices/CppMicroServices/pull/480>`_
+
+
+`v3.4.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.4.0>`_ (2019-12-10)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.3.0...v3.4.0>`_
+
+Added
+-----
+- `Declarative Services <https://github.com/CppMicroServices/rfcs/blob/master/text/0003-declarative-services.md>`_
+- `Expose checksum from zip archive. <https://github.com/CppMicroServices/CppMicroServices/issues/307>`_
+- Framework property (org.cppmicroservices.library.load.options) to control library loading options on macOS and Linux.
+- `Add gmock <https://github.com/CppMicroServices/CppMicroServices/issues/327>`_
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+- The following Bundle method functions:
+
+  - ``GetProperties``
+  - ``GetProperty``
+  - ``GetPropertyKeys``
+
+Fixed
+-----
+- `static ServiceTracker object crashes in ServiceTracker::Close() <https://github.com/CppMicroServices/CppMicroServices/issues/281>`_
+- `Does the ServiceTracker deleter close the service? <https://github.com/CppMicroServices/CppMicroServices/issues/267>`_
+- `Optimize peak heap allocation when installing bundles <https://github.com/CppMicroServices/CppMicroServices/issues/297>`_
+- `Change GetHeaders API to return a const ref <https://github.com/CppMicroServices/CppMicroServices/issues/322>`_
+- `How do service consumers know whether to use BundleContext::GetService or ServiceObjects? <https://github.com/CppMicroServices/CppMicroServices/issues/325>`_
+- `Add a testpoint to validate the return value of ServiceFactory::GetService <https://github.com/CppMicroServices/CppMicroServices/issues/328>`_
+- `Invalid Bundle causes crash on method invocation <https://github.com/CppMicroServices/CppMicroServices/issues/263>`_
+- `Use correct framework event severity and exception types for service factory errors <https://github.com/CppMicroServices/CppMicroServices/issues/217>`_
+- `Raspberry Pi arm build failing <https://github.com/CppMicroServices/CppMicroServices/issues/388>`_
+- `Service ctor exception crash <https://github.com/CppMicroServices/CppMicroServices/pull/409>`_
+- `Update library loading error messages <https://github.com/CppMicroServices/CppMicroServices/pull/399>`_
+- `Unknown Cmake Command "add_compile_definitions" <https://github.com/CppMicroServices/CppMicroServices/issues/412>`_
+- `GetChildResources() should not have a dependency on GetChildren() <https://github.com/CppMicroServices/CppMicroServices/issues/397>`_
+- Improved code coverage to 90%
+- Various performance improvements to:
+
+  * Reduce the number of open file handles
+  * Reduce peak heap memory utilization
+  * AtCompoundKey
+  * ServiceTracker
+  * Service look up
+  * Bundle installs
 
 
 `v3.3.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.3.0>`_ (2018-02-20)

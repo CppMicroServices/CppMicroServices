@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_SERVICELISTENERHOOK_H
 #define CPPMICROSERVICES_SERVICELISTENERHOOK_H
 
+#include <functional>
 #include "cppmicroservices/ServiceInterface.h"
-#include "cppmicroservices/SharedData.h"
 #include "cppmicroservices/ShrinkableVector.h"
 
 #include <string>

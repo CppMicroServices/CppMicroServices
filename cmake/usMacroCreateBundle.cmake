@@ -6,7 +6,7 @@ project(${_project_name})
 
 cmake_parse_arguments(${PROJECT_NAME}
   "SKIP_EXAMPLES;SKIP_INIT"
-  "VERSION;TARGET;SYMBOLIC_NAME"
+  "VERSION;TARGET;SYMBOLIC_NAME;EMBED_RESOURCE_METHOD"
   "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
 )
@@ -43,6 +43,15 @@ if(${PROJECT_NAME}_DEPENDS)
   )
 endif()
 
+# Set the resource embedding method
+set(_resource_embed_type )
+
+# No need to check for a valid value as input checking is done in
+# usFunctionEmbedResources.cmake
+if(${PROJECT_NAME}_EMBED_RESOURCE_METHOD)
+  set(_resource_embed_type ${${PROJECT_NAME}_EMBED_RESOURCE_METHOD})
+endif()
+
 #-----------------------------------------------------------------------------
 # Configure files
 #-----------------------------------------------------------------------------
@@ -75,7 +84,7 @@ if(NOT ${PROJECT_NAME}_SKIP_INIT)
 endif()
 
 if(${PROJECT_NAME}_RESOURCES OR ${PROJECT_NAME}_BINARY_RESOURCES)
-  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES)
+  usFunctionGetResourceSource(TARGET ${${PROJECT_NAME}_TARGET} OUT ${PROJECT_NAME}_SOURCES ${_resource_embed_type})
 endif()
 
 list(APPEND ${PROJECT_NAME}_SOURCES $<TARGET_OBJECTS:util>)
@@ -128,7 +137,6 @@ if(${PROJECT_NAME}_LINK_LIBRARIES)
 endif()
 
 # Embed bundle resources
-
 if(${PROJECT_NAME}_RESOURCES)
   set(_wd ${CMAKE_CURRENT_SOURCE_DIR})
   if(${PROJECT_NAME}_RESOURCES)
@@ -145,7 +153,7 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
                          FILES ${${PROJECT_NAME}_BINARY_RESOURCES}
                         )
 endif()
-usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET})
+usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET} ${_resource_embed_type})
 
 #-----------------------------------------------------------------------------
 # Install support

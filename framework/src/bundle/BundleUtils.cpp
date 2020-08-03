@@ -37,11 +37,9 @@
 
 #  define RTLD_LAZY 0 // unused
 
-const char* dlerror(void)
+std::string dlerror(void)
 {
-  static std::string errStr;
-  errStr = cppmicroservices::util::GetLastWin32ErrorStr();
-  return errStr.c_str();
+  return cppmicroservices::util::GetLastWin32ErrorStr();
 }
 
 void* dlopen(const char* path, int)
@@ -98,10 +96,10 @@ void* GetSymbol(void* libHandle, const char* symbol)
 {
   void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
   if (!addr) {
-    const char* dlerrorMsg = dlerror();
+    const std::string dlerrorMsg = dlerror();
     DIAG_LOG(*GetFrameworkLogSink())
       << "GetSymbol() failed to find (" << symbol
-      << ") with error : " << (dlerrorMsg ? dlerrorMsg : "unknown");
+      << ") with error : " << (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
   }
   return addr;
 }

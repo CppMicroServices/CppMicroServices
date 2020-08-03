@@ -26,10 +26,11 @@
 #include "DataContainer.h"
 #include "MappedFile.h"
 
-#include "cppmicroservices_mach-o.h"
-
 #include <cerrno>
 #include <cstring>
+#include <mach-o/fat.h>
+#include <mach-o/loader.h>
+#include <mach-o/nlist.h>
 #include <fstream>
 #include <memory>
 
@@ -51,7 +52,7 @@ template<>
 struct MachO<MH_MAGIC>
 {
   typedef mach_header Mhdr;
-  typedef nlist symtab_entry;
+  typedef struct nlist symtab_entry;
 };
 
 template<>

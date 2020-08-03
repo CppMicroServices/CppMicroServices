@@ -1,0 +1,176 @@
+{
+  "bundle.symbolic_name" : "main",
+  "bundle.version" : "0.1.0",
+  "bundle.activator": true,
+  "cm_test_0": {
+    "version": 1,
+    "configurations": [{
+      "pid": "test",
+      "properties": {
+        "exampleProperty": "exampleValue",
+        "exampleBool": false,
+        "exampleDict": {
+          "exampleSubProperty": "exampleSubValue"
+        }
+      }
+    }]
+  },
+  "test_metadata": {
+    "manifest_json": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+            "exampleProperty": "exampleValue",
+            "exampleBool": false,
+            "exampleDict": {
+              "exampleSubProperty": "exampleSubValue"
+            }
+          }
+        }]
+      }
+    },
+    "manifest_empty_props": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test",
+          "properties": {}
+        }]
+      }
+    },
+    "manifest_empty_conf": {
+      "cm": {
+        "version": 1,
+        "configurations": []
+      }
+    },
+    "manifest_mult_conf": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        },
+        {
+          "pid": "test2",
+          "properties": {
+            "exampleProperty": "exampleValue2",
+            "exampleProperty2": "exampleValue2"
+          }
+        }]
+      }
+    },
+    "manifest_illegal_ver": {
+      "cm": {
+        "version": 0,
+        "configurations": [{}]
+      }
+    },
+    "manifest_missing_ver": {
+      "cm": {
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        }]
+      }
+    },
+    "manifest_illegal_ver2": {
+      "cm": {
+        "version": "",
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        }]
+      }
+    },
+    "manifest_illegal_ver3": {
+      "cm": {
+        "version": "one",
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        }]
+      }
+    },
+    "manifest_no_conf": {
+      "cm": {
+        "version": 1
+      }
+    },
+    "manifest_bad_conf": {
+      "cm": {
+        "version": 1,
+        "configurations": "aString"
+      }
+    },
+    "manifest_bad_arraytype": {
+      "cm": {
+        "version": 1,
+        "configurations": ["string1", "string2"]
+      }
+    },
+    "manifest_missing_pid": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        }]
+      }
+    },
+    "manifest_missing_properties": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test"
+        }]
+      }
+    },
+    "manifest_bad_pid": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": false,
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        }]
+      }
+    },
+    "manifest_bad_properties": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test",
+          "properties": "foo"
+        }]
+      }
+    },
+    "manifest_bad_index1": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+            "exampleProperty": "exampleValue"
+          }
+        },
+        {
+          "pid": "test",
+          "properties": "foo"
+        }]
+      }
+    }
+  }
+}

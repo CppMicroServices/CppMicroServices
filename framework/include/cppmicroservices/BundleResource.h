@@ -23,6 +23,7 @@
 #ifndef CPPMICROSERVICES_BUNDLERESOURCE_H
 #define CPPMICROSERVICES_BUNDLERESOURCE_H
 
+#include <functional>
 #include "cppmicroservices/FrameworkExport.h"
 
 #include <cstdint>
@@ -302,6 +303,10 @@ private:
 
   BundleResource(int index,
                  const std::shared_ptr<const BundleArchive>& archive);
+
+  /// Helper function which initializes the childNodes member in BundleResourcePrivate;
+  /// this is called during BundleResource construction.
+  void InitializeChildren();
 
   friend struct BundleArchive;
   friend class BundleResourceContainer;

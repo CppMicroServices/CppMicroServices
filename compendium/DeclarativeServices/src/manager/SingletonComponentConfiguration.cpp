@@ -20,14 +20,15 @@
 
   =============================================================================*/
 
-#include <iostream>
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "SingletonComponentConfiguration.hpp"
-#include "RegistrationManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
-#include "states/ComponentConfigurationState.hpp"
+#include "RegistrationManager.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "states/CCUnsatisfiedReferenceState.hpp"
+#include "states/ComponentConfigurationState.hpp"
+#include <iostream>
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
@@ -70,9 +71,12 @@ std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAn
       auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(Bundle());
       instanceContextPair->first = instCtxtTuple.first;
       instanceContextPair->second = instCtxtTuple.second;
-    }
-    catch(...)
-    {
+    } catch (const cppmicroservices::SharedLibraryException&) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception thrown while trying to load a shared library",
+                       std::current_exception());
+      throw;
+    } catch (...) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception received from user code while activating the component configuration",
                        std::current_exception());
@@ -120,6 +124,35 @@ void SingletonComponentConfigurationImpl::UngetService(const cppmicroservices::B
 {
   // The singleton instance is not reset when UngetService is called.
   // The instance is reset when the component is deactivated.
+}
+
+void SingletonComponentConfigurationImpl::BindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  auto context = GetComponentContext();
+  context->AddToBoundServicesCache(refName, ref);
+  try {
+    GetComponentInstance()->InvokeBindMethod(refName, ref);
+  } catch (const std::exception&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception received from user code while binding a "
+                     "service reference.",
+                     std::current_exception());
+  }
+  
+}
+
+void SingletonComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  try {
+    GetComponentInstance()->InvokeUnbindMethod(refName, ref);
+  } catch (const std::exception&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception received from user code while unbinding a "
+                     "service reference.",
+                     std::current_exception());
+  }
+  auto context = GetComponentContext();
+  context->RemoveFromBoundServicesCache(refName, ref);
 }
 
 void SingletonComponentConfigurationImpl::SetComponentInstancePair(InstanceContextPair instCtxtPair)

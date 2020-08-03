@@ -13,8 +13,11 @@ include_directories(
 #-----------------------------------------------------------------------------
 # Add test source files
 #-----------------------------------------------------------------------------
-set(_gtest_tests 
+set(_gtest_tests
+  AnyTest.cpp
   AnyMapTest.cpp
+  BundleActivatorTest.cpp
+  BundleDeadLockTest.cpp
   BundleManifestTest.cpp
   BundleVersionTest.cpp
   InvalidBundleTest.cpp
@@ -25,10 +28,13 @@ set(_gtest_tests
   UtilsTest.cpp
   FrameworkTest.cpp
   BundleObjFileTest.cpp
+  BundleGetSymbolTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp
   ServiceFactoryTest.cpp
+  SharedLibraryExceptionTest.cpp
+  ShrinkableVectorTest.cpp
   BundleEventTest.cpp
   BundleResourceTest.cpp
   BundleStreamOperatorTest.cpp

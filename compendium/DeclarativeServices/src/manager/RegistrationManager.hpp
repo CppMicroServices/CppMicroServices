@@ -22,7 +22,11 @@
 
 #ifndef __REGISTRATION_MANAGER_HPP__
 #define __REGISTRATION_MANAGER_HPP__
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/ServiceProperties.h"

@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "TestUtils.hpp"
+#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include <iostream>
@@ -57,6 +58,30 @@ void InstallLib(
 #endif
 }
 
+cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName)
+{
+  std::vector<cppmicroservices::Bundle> bundles;
+
+#if defined(US_BUILD_SHARED_LIBS)
+  bundles = frameworkCtx.InstallBundles(cppmicroservices::testing::LIB_PATH
+        + cppmicroservices::util::DIR_SEP
+        + US_LIB_PREFIX
+        + libName
+        + US_LIB_POSTFIX
+        + US_LIB_EXT);
+#else
+  bundles = frameworkCtx.GetBundles();
+#endif
+
+  for (auto b : bundles) {
+    if (b.GetSymbolicName() == libName) {
+        b.Start();
+        return b;
+    }
+  }
+  return {};
+}
+
 long GetServiceId(const ::cppmicroservices::ServiceReferenceBase& sRef)
 {
   long serviceId = 0;
@@ -88,6 +113,22 @@ std::string GetTestPluginsPath()
 {
   return (cppmicroservices::testing::LIB_PATH
           + cppmicroservices::util::DIR_SEP);
+}
+
+void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
+{
+  std::vector<cppmicroservices::Bundle> bundles;
+  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+
+#if defined(US_BUILD_SHARED_LIBS)
+  bundles = frameworkCtx.InstallBundles(dsPluginPath);
+#else
+  bundles = frameworkCtx.GetBundles();
+#endif
+
+  for (auto b : bundles) {
+    b.Start();
+  }
 }
 
 } // namespaces

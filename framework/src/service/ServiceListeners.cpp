@@ -29,6 +29,7 @@ US_MSVC_PUSH_DISABLE_WARNING(
 
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/String.h"
 
@@ -293,6 +294,13 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
     for (auto& bundleListener : bundleListeners.second) {
       try {
         std::get<0>(bundleListener.second)(evt);
+      } catch (const cppmicroservices::SharedLibraryException&) {
+        SendFrameworkEvent(FrameworkEvent(
+          FrameworkEvent::Type::FRAMEWORK_ERROR,
+          MakeBundle(bundleListeners.first->bundle->shared_from_this()),
+          std::string("Bundle listener threw an exception"),
+          std::current_exception()));
+        throw;
       } catch (...) {
         SendFrameworkEvent(FrameworkEvent(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -450,8 +458,8 @@ void ServiceListeners::RemoveFromCache_unlocked(const ServiceListenerEntry& sle)
       CacheType& keymap = cache[i];
       std::vector<std::string>& filters = sle.GetLocalCache()[i];
       for (auto const& filter : filters) {
-        std::list<ServiceListenerEntry>& sles = keymap[filter];
-        sles.remove(sle);
+        std::set<ServiceListenerEntry>& sles = keymap[filter];
+        sles.erase(sle);
         if (sles.empty()) {
           keymap.erase(filter);
         }
@@ -475,8 +483,8 @@ void ServiceListeners::CheckSimple_unlocked(const ServiceListenerEntry& sle)
                local_cache[i].begin();
              it != local_cache[i].end();
              ++it) {
-          std::list<ServiceListenerEntry>& sles = cache[i][*it];
-          sles.push_back(sle);
+          std::set<ServiceListenerEntry>& sles = cache[i][*it];
+          sles.insert(sle);
         }
       }
     } else {
@@ -491,14 +499,11 @@ void ServiceListeners::AddToSet_unlocked(
   int cache_ix,
   const std::string& val)
 {
-  std::list<ServiceListenerEntry>& l = cache[cache_ix][val];
+  std::set<ServiceListenerEntry>& l = cache[cache_ix][val];
   if (!l.empty()) {
-
-    for (std::list<ServiceListenerEntry>::const_iterator entry = l.begin();
-         entry != l.end();
-         ++entry) {
-      if (receivers.count(*entry)) {
-        set.insert(*entry);
+    for (const ServiceListenerEntry& entry : l) {
+      if (receivers.count(entry)) {
+        set.insert(entry);
       }
     }
   }

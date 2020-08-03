@@ -213,7 +213,7 @@ AbstractWebConsolePlugin::TemplateData BundlesPlugin::GetBundlesData() const
   for (auto& bundle : bundles) {
     TemplateData entry;
 
-    AnyMap headers = bundle.GetHeaders();
+    const AnyMap& headers = bundle.GetHeaders();
 
     entry["id"] = NumToString(bundle.GetBundleId());
     entry["bsn"] = bundle.GetSymbolicName();
@@ -328,7 +328,7 @@ void BundlesPlugin::GetBundleData(long id,
   if (!bundle)
     return;
 
-  auto headers = bundle.GetHeaders();
+  const auto& headers = bundle.GetHeaders();
   SetIfExists(data, "bundle-name", Constants::BUNDLE_NAME, headers);
   data["bundle-bsn"] = bundle.GetSymbolicName();
 

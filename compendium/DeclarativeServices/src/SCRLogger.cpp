@@ -35,7 +35,6 @@ SCRLogger::SCRLogger(cppmicroservices::BundleContext context)
 
 SCRLogger::~SCRLogger()
 {
-  //StopTracking(); // ServiceTracker::Close can't be called during static destruction. see g1883392
 }
 
 void SCRLogger::StopTracking()

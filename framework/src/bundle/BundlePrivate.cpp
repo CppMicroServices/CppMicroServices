@@ -21,7 +21,9 @@
 =============================================================================*/
 
 #include "BundlePrivate.h"
+#include "BundleStorage.h"
 
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
@@ -30,6 +32,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceRegistration.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/FileSystem.h"
@@ -41,14 +44,13 @@
 #include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
-#include "Fragment.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cstring>
 #include <iterator>
-#include <chrono>
 
 namespace cppmicroservices {
 
@@ -63,10 +65,6 @@ void BundlePrivate::Stop(uint32_t options)
 
   {
     auto l = coreCtx->resolver.Lock();
-    if (IsFragment()) {
-      throw std::runtime_error("Bundle#" + util::ToString(id) +
-                               ", can not stop a fragment");
-    }
 
     // 1:
     if (state == Bundle::STATE_UNINSTALLED) {
@@ -229,63 +227,17 @@ void BundlePrivate::WaitOnOperation(WaitConditionType& wc,
   }
 }
 
-Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger,
-                                             LockType& l)
+Bundle::State BundlePrivate::GetUpdatedState(LockType& l)
 {
   if (state == Bundle::STATE_INSTALLED) {
     try {
       WaitOnOperation(coreCtx->resolver, l, "Bundle.resolve", true);
       if (state == Bundle::STATE_INSTALLED) {
-        if (trigger != nullptr) {
-          coreCtx->resolverHooks.BeginResolve(trigger);
-        }
-        if (IsFragment()) {
-          for (auto host : fragment->Targets()) {
-            if (host->state == Bundle::STATE_INSTALLED) {
-              // Try resolve our host
-              // NYI! Detect circular attach
-              host->GetUpdatedState(nullptr, l);
-            } else {
-              if (!fragment->IsHost(host)) {
-                // TODO: attach to host
-                //AttachToFragmentHost(host);
-              }
-            }
-          }
-
-          if (state == Bundle::STATE_INSTALLED && fragment->HasHosts()) {
-            // TODO wiring
-            // SetWired();
-            state = Bundle::STATE_RESOLVED;
-            operation = OP_RESOLVING;
-            GetBundleThread()->BundleChanged(
-              { BundleEvent::BUNDLE_RESOLVED, this->shared_from_this() }, l);
-            operation = OP_IDLE;
-          }
-        } else {
-          // TDOD resolve
-          if (true) // ResolvePackages(trigger))
-          {
-            // TODO wiring
-            // SetWired();
-            state = Bundle::STATE_RESOLVED;
-            operation = OP_RESOLVING;
-            // update state of fragments
-            for (BundlePrivate* f : fragments) {
-              f->GetUpdatedState(nullptr, l);
-            }
-            GetBundleThread()->BundleChanged(
-              { BundleEvent::BUNDLE_RESOLVED, this->shared_from_this() }, l);
-            operation = OP_IDLE;
-          } else {
-            // std::string reason = GetResolveFailReason();
-            //throw std::runtime_error("Bundle#" + cppmicroservices::ToString(info.id) + ", unable to resolve: "
-            //                          + reason);
-          }
-        }
-        if (trigger != nullptr) {
-          coreCtx->resolverHooks.EndResolve(trigger);
-        }
+        state = Bundle::STATE_RESOLVED;
+        operation = OP_RESOLVING;
+        GetBundleThread()->BundleChanged(
+          { BundleEvent::BUNDLE_RESOLVED, this->shared_from_this() }, l);
+        operation = OP_IDLE;
       }
     } catch (...) {
       resolveFailException = std::current_exception();
@@ -294,19 +246,6 @@ Bundle::State BundlePrivate::GetUpdatedState(BundlePrivate* trigger,
                        MakeBundle(this->shared_from_this()),
                        std::string(),
                        std::current_exception()));
-
-      if (trigger != nullptr) {
-        try {
-          coreCtx->resolverHooks.EndResolve(trigger);
-        } catch (...) {
-          resolveFailException = std::current_exception();
-          coreCtx->listeners.SendFrameworkEvent(
-            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                           MakeBundle(this->shared_from_this()),
-                           std::string(),
-                           std::current_exception()));
-        }
-      }
     }
   }
   return static_cast<Bundle::State>(state.load());
@@ -319,11 +258,7 @@ void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
   if ((ctx = bundleContext.Exchange(ctx))) {
     ctx->Invalidate();
   }
-  if (IsFragment()) {
-    fragment->RemoveHost(nullptr);
-  }
-  // TODO Wiring
-  //ClearWiring();
+
   state = Bundle::STATE_INSTALLED;
   if (sendEvent) {
     operation = OP_UNRESOLVING;
@@ -337,7 +272,7 @@ void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
 void BundlePrivate::FinalizeActivation(LockType& l)
 {
   // 4: Resolve bundle (if needed)
-  switch (GetUpdatedState(this, l)) {
+  switch (GetUpdatedState(l)) {
     case Bundle::STATE_INSTALLED: {
       std::rethrow_exception(resolveFailException);
     }
@@ -352,9 +287,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
       // 6:
       state = Bundle::STATE_STARTING;
       operation = OP_ACTIVATING;
-      if (coreCtx->debug.lazyActivation) {
-        DIAG_LOG(*coreCtx->sink) << "activating #" << id;
-      }
+
       // 7:
       std::shared_ptr<BundleContextPrivate> null_expected;
       std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(this));
@@ -385,7 +318,6 @@ void BundlePrivate::Uninstall()
   {
     auto l = coreCtx->resolver.Lock();
     US_UNUSED(l);
-    //BundleGeneration current = current();
 
     switch (static_cast<Bundle::State>(state.load())) {
       case Bundle::STATE_UNINSTALLED:
@@ -451,10 +383,7 @@ void BundlePrivate::Uninstall()
           { BundleEvent::BUNDLE_UNRESOLVED, shared_from_this() }, l);
         bactivator = nullptr;
         state = Bundle::STATE_UNINSTALLED;
-        // Purge old archive
-        //BundleGeneration oldGen = current;
-        //generations.set(0, new BundleGeneration(oldGen));
-        //oldGen.purge(false);
+
         Purge();
         barchive->SetLastModified(std::chrono::steady_clock::now());
         operation = BundlePrivate::OP_IDLE;
@@ -491,55 +420,26 @@ std::string BundlePrivate::GetLocation() const
 
 void BundlePrivate::Start(uint32_t options)
 {
-  {
-    auto l = coreCtx->resolver.Lock();
-    if (state == Bundle::STATE_UNINSTALLED) {
-      throw std::logic_error("Bundle is uninstalled");
-    }
-    coreCtx->resolverHooks.CheckResolveBlocked();
-
-    // Initialize the activation; checks initialization of lazy
-    // activation.
-
-    // 1: If an operation is in progress, wait a little
-    WaitOnOperation(coreCtx->resolver, l, "Bundle::Start", false);
-
-    // 2: Start() is idempotent, i.e., nothing to do when already started
-    if (state == Bundle::STATE_ACTIVE) {
-      return;
-    }
-
-    // 3: Record non-transient start requests.
-    if ((options & Bundle::START_TRANSIENT) == 0) {
-      //setAutostartSetting(options);
-    }
-
-    // 5: Lazy?
-    if ((options & Bundle::START_ACTIVATION_POLICY) != 0 && lazyActivation) {
-      // 4: Resolve bundle (if needed)
-      if (Bundle::STATE_INSTALLED == GetUpdatedState(this, l)) {
-        throw resolveFailException;
-      }
-      if (Bundle::STATE_STARTING == state) {
-        return;
-      }
-      state = Bundle::STATE_STARTING;
-      bundleContext.Store(std::make_shared<BundleContextPrivate>(this));
-      operation = BundlePrivate::OP_ACTIVATING;
-    } else {
-      FinalizeActivation(l);
-      return;
-    }
+  auto l = coreCtx->resolver.Lock();
+  if (state == Bundle::STATE_UNINSTALLED) {
+    throw std::logic_error("Bundle is uninstalled");
   }
-  // Last step of lazy activation
-  coreCtx->listeners.BundleChanged(BundleEvent(
-    BundleEvent::BUNDLE_LAZY_ACTIVATION, MakeBundle(this->shared_from_this())));
-  {
-    auto l = coreCtx->resolver.Lock();
-    US_UNUSED(l);
-    operation = BundlePrivate::OP_IDLE;
-    coreCtx->resolver.NotifyAll();
+
+  // 1: If an operation is in progress, wait a little
+  WaitOnOperation(coreCtx->resolver, l, "Bundle::Start", false);
+
+  // 2: Start() is idempotent, i.e., nothing to do when already started
+  if (state == Bundle::STATE_ACTIVE) {
+    return;
   }
+
+  // 3: Record non-transient start requests.
+  if ((options & Bundle::START_TRANSIENT) == 0) {
+    SetAutostartSetting(options);
+  }
+
+  FinalizeActivation(l);
+  return;
 }
 
 const AnyMap& BundlePrivate::GetHeaders() const
@@ -555,7 +455,7 @@ std::exception_ptr BundlePrivate::Start0()
   coreCtx->listeners.BundleChanged(
     BundleEvent(BundleEvent::BUNDLE_STARTING, thisBundle));
 
-  auto headers = thisBundle.GetHeaders();
+  const auto& headers = thisBundle.GetHeaders();
   Any bundleActivatorVal;
   if (headers.count(Constants::BUNDLE_ACTIVATOR) > 0) {
     bundleActivatorVal = headers.find(Constants::BUNDLE_ACTIVATOR)->second;
@@ -598,20 +498,26 @@ std::exception_ptr BundlePrivate::Start0()
 
       // save this bundle's context so that it can be accessible anywhere
       // from within this bundle's code.
-      std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
-      BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func);
-      
+      std::string set_bundle_context_func =
+        US_STR(US_SET_CTX_PREFIX) + symbolicName;
+      BundleUtils::GetSymbol(
+        SetBundleContext, libHandle, set_bundle_context_func);
+
       if (SetBundleContext) {
         SetBundleContext(ctx.get());
       }
 
       // get the create/destroy activator callbacks
-      std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
+      std::string create_activator_func =
+        US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
       std::function<BundleActivator*(void)> createActivatorHook;
-      BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func);
+      BundleUtils::GetSymbol(
+        createActivatorHook, libHandle, create_activator_func);
 
-      std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-      BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func);
+      std::string destroy_activator_func =
+        US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
+      BundleUtils::GetSymbol(
+        destroyActivatorHook, libHandle, destroy_activator_func);
 
       if (!createActivatorHook) {
         throw std::runtime_error("Bundle activator constructor not found");
@@ -621,8 +527,14 @@ std::exception_ptr BundlePrivate::Start0()
       }
 
       // get a BundleActivator instance
-      bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(createActivatorHook(), destroyActivatorHook);
+      bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(
+        createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
+    } catch (std::system_error& ex) {
+      // SharedLibrary::Load(int flags) will throw a std::system_error when a shared library
+      //fails to load. Creating a SharedLibraryException here to throw.
+      res = std::make_exception_ptr(cppmicroservices::SharedLibraryException(
+        ex.code(), ex.what(), std::move(thisBundle)));
     } catch (...) {
       res = std::make_exception_ptr(
         std::runtime_error("Bundle#" + util::ToString(id) +
@@ -669,15 +581,15 @@ std::exception_ptr BundlePrivate::Start0()
     }
   }
 
-  if (coreCtx->debug.lazyActivation) {
-    DIAG_LOG(*coreCtx->sink) << "activating #" << id << " completed.";
-  }
-
   if (res == nullptr) {
     // 10:
     state = Bundle::STATE_ACTIVE;
-    coreCtx->listeners.BundleChanged(BundleEvent(
-      BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
+    try {
+      coreCtx->listeners.BundleChanged(BundleEvent(
+        BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
+    } catch (const cppmicroservices::SharedLibraryException& ex) {
+      res = std::make_exception_ptr(ex);
+    }
   } else if (operation == OP_ACTIVATING) {
     // 8:
     StartFailed();
@@ -742,11 +654,6 @@ void BundlePrivate::ResetBundleThread()
   bundleThread = nullptr;
 }
 
-bool BundlePrivate::IsFragment() const
-{
-  return fragment != nullptr;
-}
-
 BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
   , id(0)
@@ -766,10 +673,7 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   , version(CppMicroServices_VERSION_MAJOR,
             CppMicroServices_VERSION_MINOR,
             CppMicroServices_VERSION_PATCH)
-  , fragment()
-  , lazyActivation(false)
   , timeStamp(std::chrono::steady_clock::now())
-  , fragments()
   , bundleManifest()
   , lib()
   , SetBundleContext(nullptr)
@@ -793,34 +697,35 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
   , bundleThread()
   , symbolicName(ba->GetResourcePrefix())
   , version()
-  , fragment()
-  , lazyActivation(false)
   , timeStamp(ba->GetLastModified())
-  , fragments()
-  , bundleManifest()
+  , bundleManifest(ba->GetInjectedManifest())
   , lib(location)
   , SetBundleContext(nullptr)
 {
-  // Check if the bundle provides a manifest.json file and if yes, parse it.
-  if (barchive->IsValid()) {
-    auto manifestRes = barchive->GetResource("/manifest.json");
-    if (manifestRes) {
-      BundleResourceStream manifestStream(manifestRes);
-      try {
-        bundleManifest.Parse(manifestStream);
-      } catch (...) {
-        throw std::runtime_error(
-          std::string("Parsing of manifest.json for bundle ") + symbolicName +
-          " at " + location + " failed: " + util::GetLastExceptionStr());
+  // Only take the time to read the manifest out of the BundleArchive file if we don't already have
+  // a manifest.
+  if (true == bundleManifest.GetHeaders().empty()) {
+    // Check if the bundle provides a manifest.json file and if yes, parse it.
+    if (ba->IsValid()) {
+      auto manifestRes = ba->GetResource("/manifest.json");
+      if (manifestRes) {
+        BundleResourceStream manifestStream(manifestRes);
+        try {
+          bundleManifest.Parse(manifestStream);
+        } catch (...) {
+          throw std::runtime_error(
+            std::string("Parsing of manifest.json for bundle ") +
+            ba->GetResourcePrefix() + " at " + location +
+            " failed: " + util::GetLastExceptionStr());
+        }
+        // It is unlikely that clients will access bundle resources
+        // if the only resource is the manifest file. On this assumption,
+        // close the open file handle to the zip file to improve performance
+        // and avoid exceeding OS open file handle limits.
+        if (OnlyContainsManifest(ba->GetResourceContainer())) {
+          ba->GetResourceContainer()->CloseContainer();
+        }
       }
-    }
-    // It is unlikely that clients will access bundle resources
-    // if the only resource is the manifest file. On this assumption,
-    // close the open file handle to the zip file to improve performance
-    // and avoid exceeding OS open file handle limits.
-    auto resContainer = barchive->GetResourceContainer();
-    if (OnlyContainsManifest(resContainer)) {
-      resContainer->CloseContainer();
     }
   }
 
@@ -867,17 +772,6 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
       "is already installed (" + symbolicName + ", " + version.ToString() +
       ")");
   }
-
-  // $TODO extensions
-  // Activate extension as soon as they are installed so that
-  // they get added in bundle id order.
-  /*
-  if (gen.IsExtension() && AttachToFragmentHost(coreCtx->systemBundle->Current()))
-  {
-    gen.SetWired();
-    state = Bundle::STATE_RESOLVED;
-  }
-  */
 }
 
 BundlePrivate::~BundlePrivate() = default;
@@ -895,7 +789,7 @@ void BundlePrivate::RemoveBundleResources()
 
   std::vector<ServiceRegistrationBase> srs;
   coreCtx->services.GetRegisteredByBundle(this, srs);
-  for (auto & sr : srs) {
+  for (auto& sr : srs) {
     try {
       sr.Unregister();
     } catch (const std::logic_error& /*ignore*/) {
@@ -918,11 +812,9 @@ void BundlePrivate::RemoveBundleResources()
 
 void BundlePrivate::Purge()
 {
-  //coreCtx->bundles.RemoveZombie(this);
   if (barchive->IsValid()) {
     barchive->Purge();
   }
-  //ClearWiring();
 }
 
 std::shared_ptr<BundleArchive> BundlePrivate::GetBundleArchive() const

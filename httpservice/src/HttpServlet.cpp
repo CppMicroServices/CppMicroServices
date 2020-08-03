@@ -231,7 +231,7 @@ void HttpServlet::DoGet(HttpServletRequest& request,
 void HttpServlet::DoHead(HttpServletRequest& request,
                          HttpServletResponse& response)
 {
-  NoBodyResponse noBodyResponse(response.d.Data());
+  NoBodyResponse noBodyResponse(response.d);
 
   DoGet(request, noBodyResponse);
   noBodyResponse.SetContentLength();

@@ -25,10 +25,9 @@
 #include "BundleObjFile.h"
 #include "MappedFile.h"
 
-#include "cppmicroservices_elf.h"
-
 #include <cerrno>
 #include <cstring>
+#include <elf.h>
 #include <fstream>
 #include <map>
 #include <memory>

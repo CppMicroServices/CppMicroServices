@@ -32,6 +32,10 @@
 #include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
 #include "../src/manager/states/CCRegisteredState.hpp"
 #include "../src/manager/states/CCActiveState.hpp"
+#include "../src/manager/ReferenceManager.hpp"
+
+#include "TestUtils.hpp"
+#include <TestInterfaces/Interfaces.hpp>
 
 using cppmicroservices::service::component::ComponentContext;
 
@@ -200,7 +204,25 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
 
 TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
 {
-  std::cout << "unimplemented testpoint" << std::endl;
+  auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+  auto mockRegistry = std::make_shared<MockComponentRegistry>();
+  auto fakeLogger = std::make_shared<FakeLogger>();
+
+  // Test that a call to Register with a component containing both a service
+  // and a reference to the same service interface will not cause a state change.
+  scrimpl::metadata::ReferenceMetadata refMetadata{};
+  refMetadata.interfaceName = "dummy::ServiceImpl";
+  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+  mockMetadata->refsMetadata.push_back(refMetadata);
+  auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
+    mockMetadata, GetFramework(), mockRegistry, fakeLogger);
+
+  auto reg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
+    std::make_shared<dummy::ServiceImpl>());
+
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+    service::component::runtime::dto::UNSATISFIED_REFERENCE);
+  reg.Unregister();
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyRegister)
@@ -211,7 +233,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
   // Test if a call to Register will change the state when the component
   // does not provide a service.
   {
-    auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+    auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                             GetFramework(),
                                                                             mockRegistry,
                                                                             fakeLogger);
@@ -353,10 +375,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
 }
 
-bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr)
+bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr
+                          )
 {
-  auto vecSize = stateArr.size();
   bool foundInvalidTransition = false;
+  auto vecSize = stateArr.size();
   for(size_t i = 0; i < vecSize && !foundInvalidTransition; ++i)
   {
     auto currState = stateArr[i].first;
@@ -576,6 +599,28 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
   EXPECT_EQ(fakeCompConfig->GetAllDependencyManagers().size(), mockMetadata->refsMetadata.size());
   EXPECT_NE(fakeCompConfig->GetDependencyManager("Foo"), nullptr);
   EXPECT_NE(fakeCompConfig->GetDependencyManager("Bar"), nullptr);
+}
+
+TEST_F(ComponentConfigurationImplTest, TestComponentWithUniqueName)
+{
+#if defined(US_BUILD_SHARED_LIBS)
+  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+  auto dsbundles = GetFramework().GetBundleContext().InstallBundles(dsPluginPath);
+  ASSERT_EQ(dsbundles.size(), 1);
+  for (auto& bundle : dsbundles) {
+    ASSERT_TRUE(bundle);
+    bundle.Start();
+  }
+#endif
+
+  auto testBundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI8");
+  ASSERT_TRUE(testBundle);
+  ASSERT_EQ(testBundle.GetSymbolicName(), "TestBundleDSTOI8");
+
+  auto svcRef = testBundle.GetBundleContext().GetServiceReference<test::Interface1>();
+  ASSERT_TRUE(svcRef);
+  auto svc = testBundle.GetBundleContext().GetService<test::Interface1>(svcRef);
+  EXPECT_NE(svc, nullptr);
 }
 }
 }

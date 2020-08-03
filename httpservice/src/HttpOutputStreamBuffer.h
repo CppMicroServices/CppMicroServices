@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 
+#include <memory>
 #include <streambuf>
 #include <vector>
 

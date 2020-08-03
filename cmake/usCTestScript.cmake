@@ -68,7 +68,8 @@ function(create_initial_cache var _shared _threading)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
   endif()
 
-  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME} (${_generator})" PARENT_SCOPE)
+  string(REPLACE " " "-" _fixedGenerator ${_generator})
+  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-${_fixedGenerator}" PARENT_SCOPE)
 
 endfunction()
 
@@ -89,7 +90,11 @@ set(config2     1       0     )
 set(config3     0       0     )
 
 if(NOT US_CMAKE_GENERATOR)
-  set(US_CMAKE_GENERATOR "Unix Makefiles")
+  if(APPLE AND NOT WITH_COVERAGE)
+    set(US_CMAKE_GENERATOR "Xcode")
+  else()
+    set(US_CMAKE_GENERATOR "Unix Makefiles")
+  endif()
 endif()
 
 foreach (_generator ${US_CMAKE_GENERATOR})

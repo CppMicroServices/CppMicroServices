@@ -14,6 +14,11 @@ set(_srcs
   manager/ReferenceManagerImpl.cpp
   manager/RegistrationManager.cpp
   manager/SingletonComponentConfiguration.cpp
+  manager/BindingPolicy.cpp
+  manager/BindingPolicyStaticReluctant.cpp
+  manager/BindingPolicyStaticGreedy.cpp
+  manager/BindingPolicyDynamicReluctant.cpp
+  manager/BindingPolicyDynamicGreedy.cpp
   manager/states/CCActiveState.cpp
   manager/states/CCRegisteredState.cpp
   manager/states/CCSatisfiedState.cpp
@@ -63,7 +68,7 @@ set(_private_headers
   metadata/Util.hpp
   )
   
-add_library(DeclarativeServicesObjs OBJECT ${_srcs})
+add_library(DeclarativeServicesObjs OBJECT ${_srcs} ${_private_headers})
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
   get_property(_compile_flags TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS)

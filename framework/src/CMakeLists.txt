@@ -14,6 +14,7 @@ set(_srcs
   util/LDAPProp.cpp
   util/Properties.cpp
   util/SharedLibrary.cpp
+  util/SharedLibraryException.cpp
   util/Utils.cpp
 
   service/ListenerToken.cpp
@@ -54,7 +55,6 @@ set(_srcs
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
-  bundle/Debug.cpp
   ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
@@ -87,8 +87,6 @@ set(_private_headers
   bundle/BundleThread.h
   bundle/BundleUtils.h
   bundle/CoreBundleContext.h
-  bundle/Debug.h
-  bundle/Fragment.h
   bundle/Resolver.h
 )
 

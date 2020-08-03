@@ -32,10 +32,10 @@
 #include "BundleArchive.h"
 #include "BundleManifest.h"
 
+#include <functional>
 #include <memory>
 #include <ostream>
 #include <thread>
-#include <functional>
 
 namespace cppmicroservices {
 
@@ -44,7 +44,6 @@ class Bundle;
 class BundleContextPrivate;
 class BundleThread;
 struct BundleActivator;
-class Fragment;
 
 /**
  * \ingroup MicroServices
@@ -56,9 +55,9 @@ class BundlePrivate
 {
 
 public:
-using MutexHost = MutexLockingStrategy<>;
-using LockType = MutexHost::UniqueLock;
-using WaitConditionType = WaitCondition<MutexHost>;
+  using MutexHost = MutexLockingStrategy<>;
+  using LockType = MutexHost::UniqueLock;
+  using WaitConditionType = WaitCondition<MutexHost>;
 
   BundlePrivate(const BundlePrivate&) = delete;
   BundlePrivate& operator=(const BundlePrivate&) = delete;
@@ -125,7 +124,7 @@ using WaitConditionType = WaitCondition<MutexHost>;
    *
    * @return Bundles state
    */
-  Bundle::State GetUpdatedState(BundlePrivate* trigger, LockType& l);
+  Bundle::State GetUpdatedState(LockType& l);
 
   /**
    * Set state to BUNDLE_INSTALLED.
@@ -185,11 +184,6 @@ using WaitConditionType = WaitCondition<MutexHost>;
   void ResetBundleThread();
 
   /**
-   * Checks if this bundle is a fragment
-   */
-  bool IsFragment() const;
-
-  /**
    * Framework context.
    */
   CoreBundleContext* coreCtx;
@@ -227,7 +221,7 @@ using WaitConditionType = WaitCondition<MutexHost>;
   detail::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
 
   using DestroyActivatorHook = std::function<void(BundleActivator*)>;
-  
+
   DestroyActivatorHook destroyActivatorHook;
 
   std::unique_ptr<BundleActivator, DestroyActivatorHook> bactivator;
@@ -272,8 +266,6 @@ using WaitConditionType = WaitCondition<MutexHost>;
   /** current bundle thread */
   std::shared_ptr<BundleThread> bundleThread;
 
-  // ------ This belongs to the BundleGeneration class when we introduce it --------
-
   /**
    * Bundle symbolic name.
    */
@@ -286,25 +278,10 @@ using WaitConditionType = WaitCondition<MutexHost>;
   BundleVersion version;
 
   /**
-   * Fragment description. This is null when the bundle isn't a fragment bundle.
-   */
-  std::unique_ptr<Fragment> fragment;
-
-  /**
-   * True when this bundle has its activation policy set to "lazy"
-   */
-  bool lazyActivation;
-
-  /**
    * Time when bundle was last modified.
    *
    */
   Bundle::TimeStamp timeStamp;
-
-  /**
-   * All fragment bundles this bundle hosts.
-   */
-  std::vector<BundlePrivate*> fragments;
 
   // Does not need to be locked by "this" when accessed.
   BundleManifest bundleManifest;
@@ -317,7 +294,7 @@ using WaitConditionType = WaitCondition<MutexHost>;
    */
   SharedLibrary lib;
 
-  using SetBundleContextHook = std::function<void (BundleContextPrivate*)>;
+  using SetBundleContextHook = std::function<void(BundleContextPrivate*)>;
   SetBundleContextHook SetBundleContext;
 };
 

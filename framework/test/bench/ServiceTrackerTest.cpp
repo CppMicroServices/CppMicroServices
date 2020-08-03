@@ -128,6 +128,57 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalability)(benchmark::
   }
 }
 
+/// Benchmark service tracker scalability (use case: one ServiceTracker, multiple service impls)
+BENCHMARK_DEFINE_F(ServiceTrackerFixture, MultipleImplOneInterfaceServiceTrackerScalability)(benchmark::State& state)
+{
+  using namespace benchmark::test;
+  using namespace cppmicroservices;
+
+  auto fc = framework->GetBundleContext();
+
+  int64_t maxServices{ state.range(0) };
+  std::vector<std::shared_ptr<FooImpl>> impls;
+  impls.reserve(static_cast<size_t>(maxServices));
+  for (int64_t i = 0; i < maxServices; ++i) {
+    impls.emplace_back(std::make_shared<FooImpl>());
+  }
+  std::unique_ptr<ServiceTracker<Foo>> tracker = std::make_unique<ServiceTracker<Foo>>(fc);
+  tracker->Open();
+
+  for (auto _ : state) {
+    for (int64_t i = 0; i < maxServices; ++i) {
+      fc.RegisterService<Foo>(impls[static_cast<size_t>(i)]);
+    }
+  }
+
+  tracker->Close();
+}
+
+BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalabilityWithLDAPFilter)(benchmark::State& state)
+{
+  using namespace benchmark::test;
+  using namespace cppmicroservices;
+
+  auto fc = framework->GetBundleContext();
+
+  int64_t maxServiceTrackers{ state.range(0) };
+  std::vector<std::unique_ptr<ServiceTracker<Foo>>> trackers;
+  for (int64_t i = 0; i < maxServiceTrackers; ++i) {
+    auto fooTracker = std::make_unique<ServiceTracker<Foo>>(fc, cppmicroservices::LDAPFilter(std::string("(bundle.symbolic_name=main)")));
+    fooTracker->Open();
+    trackers.emplace_back(std::move(fooTracker));
+  }
+
+  // how long does it take for N trackers to receive the register service event?
+  for (auto _ : state) {
+    fc.RegisterService<Foo>(std::make_shared<FooImpl>());
+  }
+
+  for (auto& tracker : trackers) {
+    tracker->Close();
+  }
+}
+
 // Register benchmark functions
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)->UseManualTime();
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithBundleContext)->UseManualTime();
@@ -137,3 +188,11 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)->Arg(1)
                                                                       ->Arg(4000)
                                                                       ->Arg(10000);
+BENCHMARK_REGISTER_F(ServiceTrackerFixture,
+                     MultipleImplOneInterfaceServiceTrackerScalability)->Arg(1)
+                                                                       ->Arg(4000)
+                                                                       ->Arg(10000);
+BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalabilityWithLDAPFilter)->Arg(1)
+                                                                                    ->Arg(4000)
+                                                                                    ->Arg(10000);
+                               

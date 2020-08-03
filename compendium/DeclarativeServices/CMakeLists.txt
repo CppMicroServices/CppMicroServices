@@ -20,18 +20,23 @@ endif()
 
 # Configure the bundles manifest.json file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
-               ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
+	       ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 
 if(MINGW)
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
 endif()
-               
+
+if (US_BUILD_TESTING)
+  add_compile_options(-DUSING_GTEST)
+endif()
+
 usMacroCreateBundle(DeclarativeServices
   VERSION "1.0.0"
   DEPENDS Framework
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services
+  EMBED_RESOURCE_METHOD LINK
   LINK_LIBRARIES ${_link_libraries} usLogService usServiceComponent
   PRIVATE_HEADERS ${_ds_private_headers}
   SOURCES $<TARGET_OBJECTS:DeclarativeServicesObjs> src/SCRActivator.cpp

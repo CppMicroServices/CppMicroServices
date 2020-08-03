@@ -58,7 +58,7 @@ public:
     BundleListenerMap value;
   } bundleListenerMap;
 
-  using CacheType = std::unordered_map<std::string, std::list<ServiceListenerEntry>>;
+  using CacheType = std::unordered_map<std::string, std::set<ServiceListenerEntry>>;
   using ServiceListenerEntries = std::unordered_set<ServiceListenerEntry>;
 
   using FrameworkListenerEntry = std::tuple<FrameworkListener, void*>;

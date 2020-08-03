@@ -92,6 +92,26 @@ const std::string manifest_mult_comp = R"manifest(
   }
   )manifest";
 
+const std::string manifest_mult_comp_same_impl = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                      "implementation-class": "Foo::Impl1",
+                      "name": "FooImpl1",
+                         "service": {
+                         "interfaces": ["Foo::Interface"]
+                         }
+                       },
+                       {"implementation-class": "Foo::Impl1",
+                        "name": "FooImpl2",
+                         "service": {
+                         "interfaces": ["Foo::Interface"]
+                         }
+                       }]
+            }
+  }
+  )manifest";
+
 const std::string manifest_no_scr = R"manifest(
   {
   }
@@ -341,6 +361,24 @@ const std::string manifest_illegal_ref_name = R"manifest(
   }
   )manifest";
 
+const std::string manifest_duplicate_ref_name = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                       "references": [{
+                         "name": "foo",
+                         "interface": "Bar"
+                       },
+                       {
+                         "name": "foo",
+                         "interface": "Bar"
+                       }]
+                       }]
+           }
+  }
+  )manifest";
+
 const std::string manifest_illegal_comp = R"manifest(
   {
     "scr" : { "version" : 1,
@@ -487,10 +525,9 @@ TEST_P(ValidCodegenTest, TestCodegenFunctionality)
 {
   CodegenValidManifestState vcs = GetParam();
   auto scr = GetManifestSCRData(vcs.manifest);
-  auto version = util::JsonValueValidator(scr
-                                          , "version"
-                                          , Json::ValueType::intValue)();
-  
+  auto version =
+    util::JsonValueValidator(scr, "version", Json::ValueType::intValue)();
+
   auto manifestParser = ManifestParserFactory::Create(version.asInt());
   auto componentInfos = manifestParser->ParseAndGetComponentInfos(scr);
   ComponentCallbackGenerator compGen(vcs.headers, componentInfos);
@@ -512,7 +549,11 @@ INSTANTIATE_TEST_SUITE_P(
     // valid manifest with multiple components
     CodegenValidManifestState(manifest_mult_comp,
                               { "A.hpp", "B.hpp", "C.hpp" },
-                              REF_MULT_COMPS)));
+                              REF_MULT_COMPS),
+    // valid manifest with multiple components of the same implementation class
+    CodegenValidManifestState(manifest_mult_comp_same_impl,
+                              { "A.hpp", "B.hpp", "C.hpp" },
+                              REF_MULT_COMPS_SAME_IMPL)));
 
 // For the manifest specified in the member manifest, we expect the exception message
 // output by the code-generator to be exactly errorOutput.
@@ -625,6 +666,9 @@ INSTANTIATE_TEST_SUITE_P(
     CodegenInvalidManifestState(
       manifest_illegal_ref_name,
       "Invalid value for the name 'name'. Expected non-empty string"),
+    CodegenInvalidManifestState(
+        manifest_duplicate_ref_name,
+        "Duplicate service reference names found. Reference names must be unique. Duplicate names: foo "),
     CodegenInvalidManifestState(
       manifest_no_ref_interface,
       "Mandatory name 'interface' missing from the manifest"),

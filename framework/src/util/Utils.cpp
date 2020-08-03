@@ -57,7 +57,11 @@ bool IsBundleFile(const std::string& location)
     // If this location is a bundle, a top level directory will
     // contain a manifest.json file at its root. There is no need
     // to recursively search nested directories.
-    BundleResourceContainer resContainer(location);
+    namespace cppms = cppmicroservices;
+    using cppmicroservices::any_map;
+    using cppmicroservices::AnyMap;
+    BundleResourceContainer resContainer(
+      location, AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
     auto topLevelDirs = resContainer.GetTopLevelDirs();
     return std::any_of(
       topLevelDirs.begin(),
@@ -70,8 +74,8 @@ bool IsBundleFile(const std::string& location)
         return std::any_of(names.begin(),
                            names.end(),
                            [](const std::string& resourceName) -> bool {
-                             return resourceName ==
-                               std::string("manifest.json");
+                             return (resourceName ==
+                                     std::string("manifest.json"));
                            });
       });
   } catch (...) {
@@ -79,7 +83,8 @@ bool IsBundleFile(const std::string& location)
   }
 }
 
-bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer)
+bool OnlyContainsManifest(
+  const std::shared_ptr<BundleResourceContainer>& resContainer)
 {
   auto topLevelDirs = resContainer->GetTopLevelDirs();
   return std::all_of(
@@ -93,8 +98,7 @@ bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resCon
       return std::all_of(names.begin(),
                          names.end(),
                          [](const std::string& resourceName) -> bool {
-                           return resourceName ==
-                             std::string("manifest.json");
+                           return resourceName == std::string("manifest.json");
                          });
     });
 }
@@ -147,7 +151,7 @@ std::string GetPersistentStoragePath(CoreBundleContext* ctx,
 
 void TerminateForDebug(const std::exception_ptr ex)
 {
-#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && \
+#if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) &&                \
   defined(_CRT_ERROR)
   std::string message = util::GetLastExceptionStr();
 
@@ -181,7 +185,8 @@ std::string GetDemangledName(const std::type_info& typeInfo)
   std::string result;
 #ifdef US_HAVE_CXXABI_H
   int status = 0;
-  char* demangled = abi::__cxa_demangle(typeInfo.name(), nullptr, nullptr, &status);
+  char* demangled =
+    abi::__cxa_demangle(typeInfo.name(), nullptr, nullptr, &status);
   if (demangled && status == 0) {
     result = demangled;
     free(demangled);
@@ -213,4 +218,5 @@ std::string GetDemangledName(const std::type_info& typeInfo)
   return result;
 }
 
-}} // namespaces
+}
+} // namespaces

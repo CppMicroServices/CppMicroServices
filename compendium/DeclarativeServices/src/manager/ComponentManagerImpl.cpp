@@ -20,12 +20,13 @@
 
   =============================================================================*/
 
+#include "ComponentManagerImpl.hpp"
+#include "ConcurrencyUtil.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
+#include "states/CMDisabledState.hpp"
+#include "states/ComponentManagerState.hpp"
 #include <cassert>
 #include <utility>
-#include "ComponentManagerImpl.hpp"
-#include "states/ComponentManagerState.hpp"
-#include "states/CMDisabledState.hpp"
-#include "ConcurrencyUtil.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -70,9 +71,9 @@ void ComponentManagerImpl::Initialize()
     try
     {
       fut.get();
-    }
-    catch(...)
-    {
+    } catch (const cppmicroservices::SharedLibraryException&) {
+      throw;
+    } catch (...) {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to enable component with name" + GetName(), std::current_exception());
     }
   }

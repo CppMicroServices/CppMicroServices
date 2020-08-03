@@ -60,6 +60,7 @@ set(_declarativeservices_tests
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
   TestReferenceMetadataParserV1.cpp
+  TestReferenceSelfSatisfyDeadLock.cpp
   TestRegistrationManager.cpp
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp
@@ -73,7 +74,9 @@ set(_declarativeservices_tests
   TestFixture.hpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
+  TestSharedLibraryException.cpp
   ImportTestBundles.cpp
+  TestBindingPolicies.cpp
   main.cpp
 )
 
@@ -137,6 +140,8 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBundleDSSLE1
+  TestBundleDSSLE2
   TestBundleDSTOI1
   TestBundleDSTOI10
   TestBundleDSTOI12

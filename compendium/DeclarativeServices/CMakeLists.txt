@@ -32,7 +32,7 @@ if (US_BUILD_TESTING)
 endif()
 
 usMacroCreateBundle(DeclarativeServices
-  VERSION "1.0.0"
+  VERSION "1.1.0"
   DEPENDS Framework
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services

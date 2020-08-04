@@ -139,14 +139,13 @@ ReferenceManagerBaseImpl::~ReferenceManagerBaseImpl()
 struct dummyRefObj {
 };
 
-bool ReferenceManagerBaseImpl::ClearThenUpdateBoundRefs()
+bool ReferenceManagerBaseImpl::UpdateBoundRefs()
 {
   auto matchedRefsHandle = matchedRefs.lock(); // acquires lock on matchedRefs
   const auto matchedRefsHandleSize = matchedRefsHandle->size();
   if(matchedRefsHandleSize >= metadata.minCardinality)
   {
     auto boundRefsHandle = boundRefs.lock(); // acquires lock on boundRefs
-    boundRefsHandle->clear();
     std::copy_n(matchedRefsHandle->rbegin(),
                 std::min(metadata.maxCardinality, matchedRefsHandleSize),
                 std::inserter(*(boundRefsHandle),
@@ -220,7 +219,7 @@ std::atomic<cppmicroservices::ListenerTokenId> ReferenceManagerBaseImpl::tokenCo
  */
 cppmicroservices::ListenerTokenId ReferenceManagerBaseImpl::RegisterListener(std::function<void(const RefChangeNotification&)> notify)
 {
-  auto notifySatisfied = ClearThenUpdateBoundRefs();
+  auto notifySatisfied = UpdateBoundRefs();
   if(notifySatisfied)
   {
     RefChangeNotification notification { metadata.name, RefEvent::BECAME_SATISFIED };

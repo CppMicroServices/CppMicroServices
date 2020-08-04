@@ -41,7 +41,7 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
 
   if (!mgr.IsSatisfied()) {
     notifySatisfied =
-      mgr.ClearThenUpdateBoundRefs(); // becomes satisfied if return value is true
+      mgr.UpdateBoundRefs(); // becomes satisfied if return value is true
   } else {
     // previously satisfied
     // If the service was previously satisfied then either there is
@@ -50,7 +50,8 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
     if (0 == mgr.GetBoundReferences().size()) {
       Log("Notify BIND for reference " + mgr.metadata.name);
 
-      mgr.ClearThenUpdateBoundRefs();
+      ClearBoundRefs();
+      mgr.UpdateBoundRefs();
 
       notifications.emplace_back(
         mgr.metadata.name, RefEvent::REBIND, reference);

@@ -44,6 +44,7 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
   // to the better target service
 
   auto replacementNeeded = false;
+  ServiceReference<void> serviceToUnbind;
   if (mgr.IsSatisfied()) {
     // either a service is bound or the service reference is optional
     auto boundRefsHandle = mgr.boundRefs.lock(); // acquire lock on boundRefs
@@ -53,10 +54,13 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
       if (!boundRefsHandle->empty()) {
         // We only need to unbind if there's actually a bound ref.
         const ServiceReferenceBase& minBound = *(boundRefsHandle->begin());
-        // And we only need to unbind if the new reference is a better match than the
-        // current best match (i.e. boundRefs are stored in reverse order with the best
-        // match in the first position).
-        replacementNeeded = (minBound < reference);
+        if (minBound < reference) {
+          // And we only need to unbind if the new reference is a better match than the
+          // current best match (i.e. boundRefs are stored in reverse order with the best
+          // match in the first position).
+          replacementNeeded = true;
+          serviceToUnbind = minBound; // remember which service to unbind.
+        }
       } else {
         // A replacement is needed if there are no bounds refs
         // and the service reference is optional.
@@ -73,7 +77,10 @@ void ReferenceManagerBaseImpl::BindingPolicyStaticGreedy::ServiceAdded(
       mgr.metadata.name, RefEvent::BECAME_UNSATISFIED, reference);
     // The following "clear and copy" strategy is sufficient for
     // updating the boundRefs for static binding policy
-    notifySatisfied = mgr.ClearThenUpdateBoundRefs();
+    if (serviceToUnbind) {
+      ClearBoundRefs();
+    }
+    notifySatisfied = mgr.UpdateBoundRefs();
   }
   if (notifySatisfied) {
     Log("Notify SATISFIED for reference " + mgr.metadata.name);

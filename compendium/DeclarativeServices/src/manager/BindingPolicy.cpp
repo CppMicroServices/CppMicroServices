@@ -43,7 +43,13 @@ bool ReferenceManagerBaseImpl::BindingPolicy::ShouldClearBoundRefs(
 
 bool ReferenceManagerBaseImpl::BindingPolicy::ShouldNotifySatisfied()
 {
-  return (mgr.IsSatisfied() ? false : mgr.ClearThenUpdateBoundRefs());
+  return (mgr.IsSatisfied() ? false : mgr.UpdateBoundRefs());
+}
+
+void ReferenceManagerBaseImpl::BindingPolicy::ClearBoundRefs()
+{
+  auto boundRefsHandle = mgr.boundRefs.lock();
+  boundRefsHandle->clear();
 }
 
 void ReferenceManagerBaseImpl::BindingPolicy::StaticRemoveService(
@@ -54,7 +60,8 @@ void ReferenceManagerBaseImpl::BindingPolicy::StaticRemoveService(
     Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
     notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_UNSATISFIED);
 
-    if (mgr.ClearThenUpdateBoundRefs()) {
+    ClearBoundRefs();
+    if (mgr.UpdateBoundRefs()) {
       Log("Notify SATISFIED for reference " + mgr.metadata.name);
       notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
     }
@@ -72,12 +79,15 @@ void ReferenceManagerBaseImpl::BindingPolicy::DynamicRemoveService(
   //  to be a target service, or the policy-option is greedy and a better
   //  target service becomes available then SCR must attempt to replace the
   //  bound service with a new bound service.
+  auto removeBoundRef = false;
   std::vector<RefChangeNotification> notifications;
 
-  auto removeBoundRef = ShouldClearBoundRefs(reference);
+  removeBoundRef = ShouldClearBoundRefs(reference);
 
   if (removeBoundRef) {
-    auto notifyRebind = mgr.ClearThenUpdateBoundRefs();
+    ClearBoundRefs();
+
+    auto notifyRebind = mgr.UpdateBoundRefs();
 
     if (notifyRebind) {
       // The bind notification must happen before the unbind notification

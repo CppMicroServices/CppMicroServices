@@ -45,7 +45,7 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(
 
   if (!mgr.IsSatisfied()) {
     notifySatisfied =
-      mgr.ClearThenUpdateBoundRefs(); // becomes satisfied if return value is true
+      mgr.UpdateBoundRefs(); // becomes satisfied if return value is true
   } else {
     // previously satisfied
     // either the service has a bound target service or not (in the case of optional cardinality)
@@ -67,7 +67,8 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(
       }
     }
 
-    mgr.ClearThenUpdateBoundRefs();
+    ClearBoundRefs();
+    mgr.UpdateBoundRefs();
 
     if (needRebind) {
       // The bind notification must happen before the unbind notification

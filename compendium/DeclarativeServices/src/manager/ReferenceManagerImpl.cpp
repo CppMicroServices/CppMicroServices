@@ -146,6 +146,7 @@ bool ReferenceManagerBaseImpl::UpdateBoundRefs()
   if(matchedRefsHandleSize >= metadata.minCardinality)
   {
     auto boundRefsHandle = boundRefs.lock(); // acquires lock on boundRefs
+    boundRefsHandle->clear();
     std::copy_n(matchedRefsHandle->rbegin(),
                 std::min(metadata.maxCardinality, matchedRefsHandleSize),
                 std::inserter(*(boundRefsHandle),

@@ -180,7 +180,6 @@ public:
                cppmicroservices::logservice::SeverityLevel::LOG_DEBUG);
     bool ShouldClearBoundRefs(const ServiceReferenceBase& reference);
     bool ShouldNotifySatisfied();
-    void ClearBoundRefs();
     void StaticRemoveService(const ServiceReferenceBase& reference);
     void DynamicRemoveService(const ServiceReferenceBase& reference);
 
@@ -256,13 +255,14 @@ private:
   static long GetServiceId(const ServiceReferenceBase& sRef);
 
   /**
-   * Helper method to copy service references from #matchedRefs to #boundRefs
-   * The copy is performed only if matchedRefs has sufficient items to
-   * satisfy the reference's cardinality
+   * Helper method to clear and then copy service references from 
+   * #matchedRefs to #boundRefs in one atomic operation. The copy 
+   * is performed only if matchedRefs has sufficient items to satisfy
+   * the reference's cardinality
    *
    * /return true on success, false otherwise.
    */
-  bool UpdateBoundRefs();
+  bool ClearThenUpdateBoundRefs();
 
   /**
    * Method used to send notifications to all the listeners

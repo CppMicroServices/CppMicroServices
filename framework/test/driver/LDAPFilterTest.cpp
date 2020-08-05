@@ -46,6 +46,10 @@ int TestParsing()
                       "=Person)(|(sn=Jensen)(cn=Babs J*)))");
     US_TEST_OUTPUT(<< "Parsing (o=univ*of*mich*)")
     ldap = LDAPFilter("(o=univ*of*mich*)");
+    US_TEST_OUTPUT(<< "Parsing (prop=foo(bar))")
+    ldap = LDAPFilter("(prop=foo(bar))");
+    US_TEST_OUTPUT(<< "Parsing (&(one=two(2))(three=four(4)))")
+    ldap = LDAPFilter("(&(one=two(2))(three=four(4)))");
   } catch (const std::invalid_argument& e) {
     US_TEST_OUTPUT(<< e.what());
     return EXIT_FAILURE;
@@ -122,6 +126,17 @@ int TestEvaluate()
     if (eval) {
       return EXIT_FAILURE;
     }
+    
+    // parentheses
+    ldap = LDAPFilter("(prop=foo(bar))");
+    props.clear();
+    props["prop"] = std::string("foo(bar)");
+    US_TEST_OUTPUT(<< "Evaluating prop value with parentheses: " << ldap.ToString())
+    eval = ldap.Match(props);
+    if (!eval) {
+      return EXIT_FAILURE;
+    }
+    
   } catch (const std::invalid_argument& e) {
     US_TEST_OUTPUT(<< e.what())
     return EXIT_FAILURE;

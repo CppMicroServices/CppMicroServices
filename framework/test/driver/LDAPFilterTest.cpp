@@ -48,6 +48,8 @@ int TestParsing()
     ldap = LDAPFilter("(o=univ*of*mich*)");
     US_TEST_OUTPUT(<< "Parsing (prop=foo(bar))")
     ldap = LDAPFilter("(prop=foo(bar))");
+    US_TEST_OUTPUT(<< "Parsing (prop=(foo)(bar))")
+    ldap = LDAPFilter("(prop=(foo)(bar))");
     US_TEST_OUTPUT(<< "Parsing (&(one=two(2))(three=four(4)))")
     ldap = LDAPFilter("(&(one=two(2))(three=four(4)))");
   } catch (const std::invalid_argument& e) {

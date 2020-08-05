@@ -709,14 +709,23 @@ std::string LDAPExpr::ParseState::getAttributeName()
 
 std::string LDAPExpr::ParseState::getAttributeValue()
 {
+  int num_parens = 0;
   std::string sb;
   bool exit = false;
   while (!exit) {
     Byte c = peek();
     switch (c) {
       case '(':
+        num_parens+=1;
+        sb.append(1, c);
+        break;
       case ')':
-        exit = true;
+        if (num_parens > 0) {
+          num_parens-=1;
+          sb.append(1, c);
+        } else {
+          exit = true;
+        }
         break;
       case '*':
         sb.append(1, LDAPExprConstants::WILDCARD());

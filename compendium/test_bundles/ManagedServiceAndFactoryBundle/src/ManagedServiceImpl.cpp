@@ -18,12 +18,10 @@ void TestManagedServiceImpl::Updated(AnyMap const& properties) {
     std::lock_guard<std::mutex> lk(m_counterMtx);
     if (properties.empty()) {
         // Usually corresponds to the configuration being removed
-        std::cout << "    Updated called with empty properties" << std::endl;
         m_counter -= 1;
     }
     else {
         auto const incrementBy = cppmicroservices::any_cast<int>(properties.AtCompoundKey("anInt"));
-        std::cout << "    Updated called with value: " << std::to_string(incrementBy) << std::endl;
         m_counter += incrementBy;
     }
 }

@@ -62,6 +62,18 @@ namespace test
 
         virtual int getValue() = 0;
     };
+
+    class US_TestInterfaces_EXPORT TestManagedServiceFactory {
+      public:
+        TestManagedServiceFactory() = default;
+        virtual ~TestManagedServiceFactory() = default;
+
+        virtual int getUpdatedCounter(std::string const& pid) = 0;
+
+        virtual int getRemovedCounter(std::string const& pid) = 0;
+
+        virtual std::shared_ptr<TestManagedServiceFactoryServiceInterface> create(std::string const& config) = 0;
+    };
     
     // Interfaces for declarative services dependency graph resolution benchmarks. The
     // implentations of these interfaces have dependencies that form a complete 3 level tree:
@@ -125,18 +137,6 @@ namespace test
       virtual bool IsActivated() = 0;
       virtual bool IsDeactivated() = 0;
       virtual ~LifeCycleValidation();
-    };
-
-    class US_TestInterfaces_EXPORT TestManagedServiceFactory {
-      public:
-        TestManagedServiceFactory() = default;
-        virtual ~TestManagedServiceFactory() = default;
-
-        virtual int getUpdatedCounter(std::string const& pid) = 0;
-
-        virtual int getRemovedCounter(std::string const& pid) = 0;
-
-        virtual std::shared_ptr<TestManagedServiceFactoryServiceInterface> create(std::string const& config) = 0;
     };
 }
 

@@ -716,12 +716,12 @@ std::string LDAPExpr::ParseState::getAttributeValue()
     Byte c = peek();
     switch (c) {
       case '(':
-        num_parens+=1;
+        ++num_parens;
         sb.append(1, c);
         break;
       case ')':
         if (num_parens > 0) {
-          num_parens-=1;
+          --num_parens;
           sb.append(1, c);
         } else {
           exit = true;

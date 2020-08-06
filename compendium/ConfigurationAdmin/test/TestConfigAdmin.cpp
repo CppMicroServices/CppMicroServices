@@ -1,5 +1,3 @@
-#include "ConfigurationAdminTestingConfig.h"
-
 #include <gtest/gtest.h>
 
 #include <cppmicroservices/BundleContext.h>
@@ -18,6 +16,8 @@
 #include <thread>
 #include <utility>
 
+#include "ConfigurationAdminTestingConfig.h"
+
 #ifdef US_PLATFORM_WINDOWS
 const char DIR_SEP = cppmicroservices::util::DIR_SEP_WIN32;
 #else
@@ -30,18 +30,64 @@ namespace {
 
 auto const DEFAULT_POLL_PERIOD = std::chrono::milliseconds(2000);
 
-size_t installAndStartTestBundles(cppmicroservices::BundleContext& ctx,
-                                        const std::string& bundleName)
+std::string PathToLib(const std::string& libName)
 {
-  std::string path = US_LIBRARY_OUTPUT_DIRECTORY;
-  path += DIR_SEP;
-  path += US_LIB_PREFIX;
-  path += bundleName;
-  path += US_LIB_POSTFIX;
-  path += US_LIB_EXT;
+  return (cppmicroservices::testing::LIB_PATH +
+          cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + libName +
+          US_LIB_POSTFIX + US_LIB_EXT);
+}
+
+std::string GetDSRuntimePluginFilePath()
+{
+  std::string libName{ "DeclarativeServices" };
+#if defined(US_PLATFORM_WINDOWS)
+  // This is a hack for the time being.
+  // TODO: revisit changing the hard-coded "1" to the DS version dynamically
+  libName += "1";
+#endif
+  return PathToLib(libName);
+}
+
+std::string GetConfigAdminRuntimePluginFilePath()
+{
+  std::string libName{ "ConfigurationAdmin" };
+#if defined(US_PLATFORM_WINDOWS)
+  libName += US_ConfigurationAdmin_VERSION_MAJOR;
+#endif
+  return PathToLib(libName);
+}
+
+void InstallAndStartDSAndConfigAdmin(::cppmicroservices::BundleContext& ctx)
+{
+  std::vector<cppmicroservices::Bundle> DSBundles;
+  std::vector<cppmicroservices::Bundle> CMBundles;
+  auto dsPluginPath = GetDSRuntimePluginFilePath();
+  auto cmPluginPath = GetConfigAdminRuntimePluginFilePath();
+
+#if defined(US_BUILD_SHARED_LIBS)
+  DSBundles = ctx.InstallBundles(dsPluginPath);
+  CMBundles = ctx.InstallBundles(cmPluginPath);
+#else
+  DSBundles = ctx.GetBundles();
+  CMBundles = ctx.GetBundles();
+#endif
+
+  for (auto b : DSBundles) {
+    b.Start();
+  }
+
+  for (auto b : CMBundles) {
+    b.Start();
+  }
+}
+
+size_t installAndStartTestBundles(cppmicroservices::BundleContext& ctx,
+                                  const std::string& bundleName)
+{
+  std::string path = PathToLib(bundleName);
   auto bundles = ctx.InstallBundles(path);
   for (auto& b : bundles) {
-      b.Start();
+    b.Start();
   }
 
   return bundles.size();
@@ -140,12 +186,13 @@ public:
     m_framework.Start();
     auto bc = m_framework.GetBundleContext();
 
-    installAndStartTestBundles(bc, "DeclarativeServices");
-    installAndStartTestBundles(bc, "ConfigurationAdmin");
+    InstallAndStartDSAndConfigAdmin(bc);
+
     auto const numBundles =
       installAndStartTestBundles(bc, "ManagedServiceAndFactoryBundle");
 
-    auto sr = bc.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+    auto sr = bc.GetServiceReference<
+      cppmicroservices::service::cm::ConfigurationAdmin>();
     m_configAdmin = bc.GetService<cm::ConfigurationAdmin>(sr);
 
     ASSERT_EQ(numBundles, 1);

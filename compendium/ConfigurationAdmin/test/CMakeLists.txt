@@ -43,6 +43,7 @@ set(_configurationadmin_tests
   TestCMActivator.cpp
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
+  TestConfigAdmin.cpp
   TestConfigurationAdminImpl.cpp
   TestConfigurationImpl.cpp
   TestMetadataParserFactory.cpp
@@ -107,17 +108,25 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     )
 endif()
 
+set(_test_bundles
+  ManagedServiceAndFactoryBundle
+  )
+
 target_link_libraries(${us_configurationadmin_test_exe_name} 
   PRIVATE
   ${GTEST_BOTH_LIBRARIES}
   ${GMOCK_BOTH_LIBRARIES}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   CppMicroServices
+  cm
   ConfigurationAdminObjs
+  usTestInterfaces
   usLogService
+  usServiceComponent
   gtest
   gmock
   util
+  ${_test_bundles}
 )
 
 # Needed for clock_gettime with glibc < 2.17

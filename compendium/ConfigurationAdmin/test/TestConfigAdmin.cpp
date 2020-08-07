@@ -18,12 +18,6 @@
 
 #include "ConfigurationAdminTestingConfig.h"
 
-#ifdef US_PLATFORM_WINDOWS
-const char DIR_SEP = cppmicroservices::util::DIR_SEP_WIN32;
-#else
-const char DIR_SEP = cppmicroservices::util::DIR_SEP_POSIX;
-#endif
-
 namespace cm = cppmicroservices::service::cm;
 
 namespace {

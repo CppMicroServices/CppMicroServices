@@ -246,13 +246,13 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
   }
 
   auto const initConfiguredCount = service->getCounter();
-  auto expectedCount = initConfiguredCount;
+  int expectedCount = initConfiguredCount;
 
   auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
   EXPECT_EQ(configuration->GetPid(), "cm.testservice");
   EXPECT_FALSE(configuration->GetProperties().empty());
 
-  auto const newIncrement{ 5 };
+  const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props["anInt"] = newIncrement;
@@ -311,7 +311,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   EXPECT_GE(service->getCounter(), 1);
 
   auto const initConfiguredCount = service->getCounter();
-  auto expectedCount = initConfiguredCount;
+  int expectedCount = initConfiguredCount;
 
   auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
 
@@ -339,7 +339,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
     EXPECT_TRUE(result) << diagnostic;
   }
 
-  auto const newIncrement{ 5 };
+  const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props["anInt"] = newIncrement;
@@ -373,12 +373,12 @@ TEST_F(ConfigAdminTests, testServiceFactoryUpdated)
   auto const initConfiguredCount_config1 =
     serviceFactory->getUpdatedCounter("cm.testfactory~config1");
   EXPECT_GE(initConfiguredCount_config1, 1);
-  auto expectedCount_config1 = initConfiguredCount_config1;
+  int expectedCount_config1 = initConfiguredCount_config1;
 
   auto const initConfiguredCount_config2 =
     serviceFactory->getUpdatedCounter("cm.testfactory~config2");
   EXPECT_GE(initConfiguredCount_config1, 1);
-  auto expectedCount_config2 = initConfiguredCount_config2;
+  int expectedCount_config2 = initConfiguredCount_config2;
 
   // Create services using the factory
   auto const svc1_before = serviceFactory->create("cm.testfactory~config1");
@@ -394,7 +394,7 @@ TEST_F(ConfigAdminTests, testServiceFactoryUpdated)
   EXPECT_FALSE(configuration_config1->GetProperties().empty());
 
   // Update config1
-  auto const newIncrement{ 5 };
+  const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props["anInt"] = newIncrement;

@@ -140,6 +140,7 @@ add_test(NAME ${us_configurationadmin_test_exe_name}
   WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
 )
 set_property(TEST ${us_configurationadmin_test_exe_name} PROPERTY LABELS regular)
+set_tests_properties(${us_configurationadmin_test_exe_name} PROPERTIES TIMEOUT 1200)
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)

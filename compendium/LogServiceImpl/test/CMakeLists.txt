@@ -147,6 +147,3 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
 	$<TARGET_FILE_DIR:${us_logservice_test_exe_name}>)
   endforeach(lib_fullpath)
 endif()
-
-
-

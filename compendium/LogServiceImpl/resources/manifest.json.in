@@ -1,0 +1,6 @@
+{
+    "bundle.symbolic_name": "log_service_impl",
+    "bundle.name" : "LogServiceImpl",
+    "bundle.version" : "@LogServiceImpl_VERSION@",
+    "bundle.activator" : true
+}

@@ -40,7 +40,7 @@ public:
   }
 
   void SetUp() override {
-    _sink = std::make_shared<spdlog::sinks::ostream_sink_st>(oss);
+    _sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
     _sink->set_pattern(sinkFormat);
     _impl->AddSink(_sink);
   }
@@ -69,7 +69,6 @@ private:
 
 TEST_F(LogServiceImplTests, ProperLoggerUsage) {
   auto logger = GetLogger();
-  auto& oss = GetStream();
 
   logger->Log(ls::SeverityLevel::LOG_DEBUG, "Bonjour!");
   EXPECT_TRUE(ContainsRegex(log_preamble + "Bonjour!"));
@@ -123,7 +122,6 @@ TEST_F(LogServiceImplTests, ProperLoggerUsage) {
 TEST_F(LogServiceImplTests, InvalidLoggerUsage)
 {
   auto logger = GetLogger();
-  auto& oss = GetStream();
 
   ASSERT_NO_THROW(logger->Log(static_cast<ls::SeverityLevel>(-1), "Test invalid negative severity level"));
   EXPECT_FALSE(ContainsRegex(log_preamble + "Test invalid negative severity level"));

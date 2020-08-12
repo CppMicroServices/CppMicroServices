@@ -43,6 +43,7 @@ set(_configurationadmin_tests
   TestCMActivator.cpp
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
+  TestConfigAdmin.cpp
   TestConfigurationAdminImpl.cpp
   TestConfigurationImpl.cpp
   TestMetadataParserFactory.cpp
@@ -107,17 +108,25 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     )
 endif()
 
-target_link_libraries(${us_configurationadmin_test_exe_name} 
+set(_test_bundles
+  ManagedServiceAndFactoryBundle
+  )
+
+target_link_libraries(${us_configurationadmin_test_exe_name}
   PRIVATE
   ${GTEST_BOTH_LIBRARIES}
   ${GMOCK_BOTH_LIBRARIES}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   CppMicroServices
+  cm
   ConfigurationAdminObjs
+  usTestInterfaces
   usLogService
+  usServiceComponent
   gtest
   gmock
   util
+  ${_test_bundles}
 )
 
 # Needed for clock_gettime with glibc < 2.17
@@ -131,6 +140,7 @@ add_test(NAME ${us_configurationadmin_test_exe_name}
   WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
 )
 set_property(TEST ${us_configurationadmin_test_exe_name} PROPERTY LABELS regular)
+set_tests_properties(${us_configurationadmin_test_exe_name} PROPERTIES TIMEOUT 1200)
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)
@@ -140,6 +150,10 @@ if(US_MEMCHECK_COMMAND)
     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
     )
   set_property(TEST memcheck_${us_configurationadmin_test_exe_name} PROPERTY LABELS valgrind memcheck)
+  # The test, when ran with Valgrind, executes extremely slow and doesn't allow for ConfigAdmin
+  # notifications to properly be received so a higher timeout in the code is necessary. Due to this,
+  # the test times out and we need to increase the timeout time.
+  set_tests_properties(memcheck_${us_configurationadmin_test_exe_name} PROPERTIES TIMEOUT 1200)
 endif()
 
 # Enable code coverage for GTest tests
@@ -167,23 +181,23 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
     set(dll_file "${dir}/${name_no_ext}${CMAKE_SHARED_LIBRARY_SUFFIX}")
     add_custom_command(TARGET ${us_configurationadmin_test_exe_name} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${dll_file}"
-        $<TARGET_FILE_DIR:${us_configurationadmin_test_exe_name}>)
+	"${dll_file}"
+	$<TARGET_FILE_DIR:${us_configurationadmin_test_exe_name}>)
   endforeach(lib_fullpath)
 endif()
 
 #-----------------------------------------------------------------------------
-# Add dependencies on test bundles if building shared libraries or 
+# Add dependencies on test bundles if building shared libraries or
 # link them if building static libraries
 #-----------------------------------------------------------------------------
 
 if(BUILD_SHARED_LIBS)
   # Add resources
   usFunctionEmbedResources(TARGET ${us_configurationadmin_test_exe_name}
-                           FILES manifest.json)
+			   FILES manifest.json)
 else()
   # Add resources
   usFunctionEmbedResources(TARGET ${us_configurationadmin_test_exe_name}
-                           FILES manifest.json
-                           ZIP_ARCHIVES ${Framework_TARGET})
+			   FILES manifest.json
+			   ZIP_ARCHIVES ${Framework_TARGET})
 endif()

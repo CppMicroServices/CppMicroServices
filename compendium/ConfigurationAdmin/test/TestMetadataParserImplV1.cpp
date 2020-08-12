@@ -159,9 +159,17 @@ namespace {
     : manifestName(std::move(manifest))
     , errorOutput(std::move(errorOut))
     {}
-
+ 
     std::string manifestName;
     std::string errorOutput;
+ 
+    friend std::ostream& operator<<(std::ostream& os,
+                                  const MetadataInvalidManifestState& obj)
+    {
+      return os << "Manifest Name: " << obj.manifestName
+                << " error output: " << obj.errorOutput
+                << "\n";
+    }
   };
 
   // Test failure modes where the exceptions are thrown

@@ -35,3 +35,5 @@ add_subdirectory(TestBundleDSDROU)
 add_subdirectory(TestBundleDSDGMU)
 add_subdirectory(TestBundleDSDGOU)
 add_subdirectory(TestBindUnbindThrows)
+
+add_subdirectory(ManagedServiceAndFactoryBundle)

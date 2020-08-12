@@ -36,8 +36,9 @@ std::string GetServiceReferenceInfo(const ServiceReferenceBase& sr)
 
 LogServiceImpl::LogServiceImpl(const std::string& loggerName)
 {
-  m_Logger = spdlog::stdout_color_mt(loggerName);
-  m_Logger->set_pattern("[%T] [%P:%t] %n %^(%l)%$: %v");
+  auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+  m_Logger = std::make_shared<spdlog::logger>(loggerName, sink);
+  m_Logger->set_pattern("[%T] [%P:%t] %n (%^%l%$): %v");
   m_Logger->set_level(spdlog::level::trace);
 }
 
@@ -45,7 +46,7 @@ void LogServiceImpl::Log(SeverityLevel level, const std::string& message)
 {
   switch (level) {
     case SeverityLevel::LOG_DEBUG: {
-      m_Logger->trace(message);
+      m_Logger->debug(message);
       break;
     }
     case SeverityLevel::LOG_INFO: {

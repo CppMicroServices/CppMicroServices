@@ -26,6 +26,38 @@ Deprecated
 Fixed
 -----
 
+
+
+`v3.6.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.0>`_ (2020-08-13)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.5.0...v3.6.0>`_
+
+Added
+-----
+
+- `[Declarative Services] Support dynamic policy reference option <https://github.com/CppMicroServices/CppMicroServices/pull/482>`_
+- `Added initial implementation of Configuration Admin <https://github.com/CppMicroServices/CppMicroServices/pull/487>`_
+
+Changed
+-------
+
+- `BundleContext::InstallBundles <https://github.com/CppMicroServices/CppMicroServices/pull/481>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+- `Fixed data race in BundleRegistry::Install <https://github.com/CppMicroServices/CppMicroServices/pull/484>`_
+- `Fixed race condition in Declarative Services <https://github.com/CppMicroServices/CppMicroServices/pull/492>`_
+- `Removed gtest dependency when not building the tests <https://github.com/CppMicroServices/CppMicroServices/pull/486>`_
+
+
 v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
 ---------------------------------------------------------------------------------------------------------
 

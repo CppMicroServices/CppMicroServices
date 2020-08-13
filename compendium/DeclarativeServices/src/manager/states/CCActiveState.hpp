@@ -54,6 +54,19 @@ public:
                                               const cppmicroservices::Bundle& clientBundle) override;
 
   /**
+   * Rebind to a target service. This operation does not transition to another state.
+   *
+   * When rebinding the new target service must be bound first before the old
+   * target service is unbound.
+   * This reversed order allows the component to not have to handle the inevitable gap 
+   * between the unbind and bind methods.
+   */
+  void Rebind(ComponentConfigurationImpl& mgr,
+              const std::string& refName,
+              const ServiceReference<void>& svcRefToBind,
+              const ServiceReference<void>& svcRefToUnbind) override;
+
+  /**
    * Returns {@link ComponentState::ACTIVE} to indicate the 
    * state represented by this object
    */

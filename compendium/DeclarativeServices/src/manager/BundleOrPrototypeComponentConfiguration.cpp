@@ -115,6 +115,49 @@ void BundleOrPrototypeComponentConfigurationImpl::UngetService(const cppmicroser
     compInstCtxtPairList->erase(itr);
   }
 }
+
+void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::string& refName
+                                                                , const ServiceReferenceBase& ref
+                                                               )
+{
+  auto instancePairs = compInstanceMap.lock();
+  for (auto const& instancePair : *instancePairs)
+  {
+    auto& instance = instancePair.first;
+    auto& context = instancePair.second;
+    context->AddToBoundServicesCache(refName, ref);
+    try {
+      instance->InvokeBindMethod(refName, ref);
+    } catch (const std::exception&) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                      "Exception received from user code while binding a "
+                      "service reference.",
+                      std::current_exception());
+    } 
+  }
 }
+
+void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::string& refName
+                                                                  , const ServiceReferenceBase& ref
+                                                                 )
+{
+  auto instancePairs = compInstanceMap.lock();
+  for (auto const& instancePair: *instancePairs)
+  {
+    auto& instance = instancePair.first;
+    auto& context = instancePair.second;
+    try {
+      instance->InvokeUnbindMethod(refName, ref);
+    } catch (const std::exception&) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception received from user code while unbinding a "
+                       "service reference.",
+                       std::current_exception());
+    }
+    
+    context->RemoveFromBoundServicesCache(refName, ref);
+  }
 }
+
+}}
 

@@ -23,6 +23,7 @@
 #ifndef CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 #define CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H
 
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/util/BundleObjFile.h"
 
 #include "miniz.h"
@@ -44,7 +45,8 @@ class BundleResourceContainer
 {
 
 public:
-  BundleResourceContainer(const std::string& location);
+  using ManifestT = cppmicroservices::AnyMap;
+  BundleResourceContainer(const std::string& location, const ManifestT&);
   ~BundleResourceContainer();
 
   struct Stat
@@ -94,7 +96,7 @@ public:
   void CloseContainer();
 
 private:
-using NameIndexPair = std::pair<std::string, int>;
+  using NameIndexPair = std::pair<std::string, int>;
 
   struct PairComp
   {

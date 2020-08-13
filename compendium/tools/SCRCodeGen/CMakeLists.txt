@@ -1,11 +1,10 @@
-
-set(_srcs 
+set(_srcs
     ComponentInfo.cpp
     Main.cpp
     ManifestParserImpl.cpp
     Util.cpp
       ../../../third_party/jsoncpp.cpp)
-  
+
 set(_private_headers
     ComponentCallbackGenerator.hpp
     ComponentInfo.hpp
@@ -13,23 +12,26 @@ set(_private_headers
     ManifestParserFactory.hpp
     ManifestParserImpl.hpp
     Util.hpp)
-    
+
 include_directories(../../../third_party
-                    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-                    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include)
+		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
+		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include)
 
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
-    
+
 add_executable(${US_SCRCODEGEN_EXECUTABLE_TARGET} ${_srcs} ${_private_headers})
+if (US_BUILD_TESTING)
+  target_compile_definitions(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE USING_GTEST)
+endif()
 
 set_property(TARGET ${US_SCRCODEGEN_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME})
 
 if(NOT US_NO_INSTALL)
     install(TARGETS ${US_SCRCODEGEN_EXECUTABLE_TARGET}
-            EXPORT ${PROJECT_NAME}Targets
-            FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
-            RUNTIME DESTINATION ${TOOLS_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+	    EXPORT ${PROJECT_NAME}Targets
+	    FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
+	    RUNTIME DESTINATION ${TOOLS_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 endif()
 
 if(CMAKE_CROSSCOMPILING)

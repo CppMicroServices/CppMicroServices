@@ -38,6 +38,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   )
 
 add_executable(${scrcodegen_test_exe_name} ${_scrcodegen_tests})
+target_compile_definitions(${scrcodegen_test_exe_name} PRIVATE USING_GTEST)
 
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR

@@ -83,22 +83,6 @@ TEST_F(tServiceComponent, testThrowingLifeCycleHooks) //DS_TOI_9
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED) << "state must be SATISFIED, and never progresses to ACTIVE";
 }
 
-template <typename Task, typename Predicate>
-bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
-{
-  auto startTime = std::chrono::system_clock::now();
-  do
-  {
-    t();
-    std::chrono::duration<double> duration = std::chrono::system_clock::now() - startTime;
-    if(duration > std::chrono::milliseconds(30000))
-    {
-      return false;
-    }
-  } while(!p());
-  return true;
-}
-
 /**
  * verify state progressions for a immediate component
  * UNSATISFIED_REFERENCE -> ACTIVE -> UNSATISFIED_REFERENCE
@@ -116,12 +100,14 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle) // DS_TOI_51
   auto depBundle = StartTestBundle("TestBundleDSTOI1");
 
   // wait for the asynchronous task to take effect
-  auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
-                                           compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
-                                         },
-    [&compConfigDTOs]()->bool {
-      return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
-    });
+  auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()
+                                         {
+                                             compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+                                         }
+                                         , [&compConfigDTOs]()->bool
+                                           {
+                                               return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+                                           });
 
   ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE after the dependency became available";
   auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
@@ -131,12 +117,16 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle) // DS_TOI_51
   ASSERT_NE(service, nullptr);
   EXPECT_NO_THROW(service->ExtendedDescription()) << "Throws if the dependency could not be found";
   depBundle.Stop();
-  result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+  
+  result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()
+                                    {
                                       compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
-                                    },
-    [&compConfigDTOs]()->bool {
-      return compConfigDTOs.at(0).state == scr::dto::ComponentState::UNSATISFIED_REFERENCE;
-    });
+                                    }
+                                    , [&compConfigDTOs]()->bool
+                                      {
+                                          return compConfigDTOs.at(0).state == scr::dto::ComponentState::UNSATISFIED_REFERENCE;
+                                      });
+  
   ASSERT_TRUE(result) << "Timed out waiting for state to change to UNSATISFIED_REFERENCE after the dependency was removed";
   auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
   EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";

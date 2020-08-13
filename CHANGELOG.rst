@@ -6,6 +6,36 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.6.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.0>`_ (2020-08-13)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.5.0...v3.6.0>`_
+
+Added
+-----
+
+- `[Declarative Services] Support dynamic policy reference option <https://github.com/CppMicroServices/CppMicroServices/pull/482>`_
+- `Added initial implementation of Configuration Admin <https://github.com/CppMicroServices/CppMicroServices/pull/487>`_
+
+Changed
+-------
+
+- `BundleContext::InstallBundles <https://github.com/CppMicroServices/CppMicroServices/pull/481>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+- `Fixed data race in BundleRegistry::Install <https://github.com/CppMicroServices/CppMicroServices/pull/484>`_
+- `Fixed race condition in Declarative Services <https://github.com/CppMicroServices/CppMicroServices/pull/492>`_
+- `Removed gtest dependency when not building the tests <https://github.com/CppMicroServices/CppMicroServices/pull/486>`_
+
+
 `v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
 ---------------------------------------------------------------------------------------------------------
 
@@ -13,11 +43,13 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Added
 -----
+
 - `Bundle::GetSymbol API <https://github.com/CppMicroServices/rfcs/blob/master/text/0005-Bundle-Load-API.md>`_
 - `SharedLibraryException <https://github.com/CppMicroServices/rfcs/blob/master/text/0004-ds-dlopen-error-handling.md>`_
 
 Changed
 -------
+
 - Migrate a handful of tests from the legacy test suite to gtest based test suite
 - `Improve shared library loading error messages <https://github.com/CppMicroServices/CppMicroServices/commit/1920dacd4bc11865a66a87b2806a81f0cd6e6e7f>`_
 - c++17 compatible
@@ -35,6 +67,7 @@ Deprecated
 
 Fixed
 -----
+
 - Correctly install Declarative Services and LogService headers
 - `Infinite loop in GetCurrentWorkingDir <https://github.com/CppMicroServices/CppMicroServices/pull/431>`_
 - `Use cross build objcopy <https://github.com/CppMicroServices/CppMicroServices/commit/a92460244748b5f12edaaa91ac6bd7ea7ecabdc2>`_

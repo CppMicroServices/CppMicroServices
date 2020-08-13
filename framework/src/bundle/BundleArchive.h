@@ -23,10 +23,12 @@
 #ifndef CPPMICROSERVICES_BUNDLEARCHIVE_H
 #define CPPMICROSERVICES_BUNDLEARCHIVE_H
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
-#include <chrono>
+
+#include "BundleManifest.h"
 
 namespace cppmicroservices {
 
@@ -41,23 +43,17 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 {
   using TimeStamp = std::chrono::steady_clock::time_point;
 
-  struct Data
-  {
-    long bundleId;
-    int64_t lastModified;
-    int32_t autostartSetting;
-  };
-
   BundleArchive(const BundleArchive&) = delete;
   BundleArchive& operator=(const BundleArchive&) = delete;
 
   BundleArchive();
 
   BundleArchive(BundleStorage* storage,
-                std::unique_ptr<Data>&& data,
-                std::shared_ptr<BundleResourceContainer>  resourceContainer,
-                std::string  resourcePrefix,
-                std::string  location);
+                std::shared_ptr<BundleResourceContainer> resourceContainer,
+                std::string resourcePrefix,
+                std::string location,
+                long bundleId,
+                AnyMap bundleManifest);
 
   /**
    * Autostart setting stopped.
@@ -156,12 +152,28 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
 
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
+  /**
+   * Return the manifest for the bundle in this bundlearchive.
+   */
+  const AnyMap& GetInjectedManifest() const;
+
 private:
   BundleStorage* const storage;
-  const std::unique_ptr<Data> data;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
   const std::string location;
+
+  const long bundleId;
+  int64_t lastModified;
+  int32_t autostartSetting;
+
+  /** The BundleManifest for this BundleArchive.
+   *
+   * Needs to be mutable to allow for lazy loading from the file. The "GetManifest()" method is
+   * "const". A BundleArchive is constructed with an empty manifest will read its manifest from the
+   * file the first time it's asked for, and stored here.
+   */
+  AnyMap manifest;
 };
 }
 

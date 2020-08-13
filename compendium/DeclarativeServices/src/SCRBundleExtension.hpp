@@ -24,7 +24,11 @@
 #define __SCRBUNDLEEXTENSION_HPP__
 
 #include <memory>
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/BundleContext.h"
 #include "ComponentRegistry.hpp"
 #include "manager/ComponentManager.hpp"

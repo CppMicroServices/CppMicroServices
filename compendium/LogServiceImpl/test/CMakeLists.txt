@@ -82,7 +82,6 @@ target_link_libraries(${us_logservice_test_exe_name}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   CppMicroServices
   usLogService
-  usServiceComponent
   gtest
   gmock
   util

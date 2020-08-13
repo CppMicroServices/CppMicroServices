@@ -8,7 +8,7 @@ set(_public_headers
   )
 
 set(_version "1.0.0")
-project(LogService VERSION ${_version})
+project(usLogService VERSION ${_version})
 
 if(NOT ${PROJECT_NAME}_TARGET)
   set(${PROJECT_NAME}_TARGET usLogService)

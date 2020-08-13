@@ -107,16 +107,16 @@ TEST_F(LogServiceImplTests, ProperLoggerUsage) {
   EXPECT_TRUE(ContainsRegex(log_preamble + "Test error message(\\n)" + exception_preamble + "(.)+ uh oh"));
 
   logger->Log(cppmicroservices::ServiceReferenceU{}, ls::SeverityLevel::LOG_DEBUG, "Test debug message", std::exception_ptr{});
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Test debug message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "nullptr"));
+  EXPECT_TRUE(ContainsRegex(log_preamble + "Test debug message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "none"));
 
   logger->Log(cppmicroservices::ServiceReferenceU{}, ls::SeverityLevel::LOG_INFO, "Test info message", std::exception_ptr{});
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Test info message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "nullptr"));
+  EXPECT_TRUE(ContainsRegex(log_preamble + "Test info message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "none"));
 
   logger->Log(cppmicroservices::ServiceReferenceU{}, ls::SeverityLevel::LOG_WARNING, "Test warning message", std::exception_ptr{});
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Test warning message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "nullptr"));
+  EXPECT_TRUE(ContainsRegex(log_preamble + "Test warning message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "none"));
 
   logger->Log(cppmicroservices::ServiceReferenceU{}, ls::SeverityLevel::LOG_ERROR, "Test error message", std::exception_ptr{});
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Test error message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "nullptr"));
+  EXPECT_TRUE(ContainsRegex(log_preamble + "Test error message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "none"));
 }
 
 TEST_F(LogServiceImplTests, InvalidLoggerUsage)
@@ -130,13 +130,13 @@ TEST_F(LogServiceImplTests, InvalidLoggerUsage)
   EXPECT_FALSE(ContainsRegex(log_preamble + "Test invalid maximum severity level"));
 
   ASSERT_NO_THROW(logger->Log(ls::SeverityLevel::LOG_INFO, "Test invalid exception_ptr", nullptr));
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid exception_ptr(\\n)" + exception_preamble + "nullptr"));
+  EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid exception_ptr(\\n)" + exception_preamble + "none"));
 
   ASSERT_NO_THROW(logger->Log(cppmicroservices::ServiceReferenceU{}, ls::SeverityLevel::LOG_INFO, "Test invalid ServiceReferenceBase object", nullptr));
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid ServiceReferenceBase object(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "nullptr"));
+  EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid ServiceReferenceBase object(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "none"));
 }
 
-TEST_F(LogServiceImplTests, ThreadSaftey) {
+TEST_F(LogServiceImplTests, ThreadSafety) {
   auto logger = GetLogger();
   auto& oss = GetStream();
 
@@ -152,7 +152,7 @@ TEST_F(LogServiceImplTests, ThreadSaftey) {
     thread.join();
   }
 
-  std::regex regexp(log_preamble + "Test concurrent log calls(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "nullptr");
+  std::regex regexp(log_preamble + "Test concurrent log calls(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "none");
   std::string stream(oss.str());
   auto regex_iter_end = std::sregex_iterator();
 

@@ -53,7 +53,7 @@ enum class SeverityLevel : uint8_t
  *
  * @remarks This class is thread safe.
  */
-class US_LogService_EXPORT LogService
+class US_usLogService_EXPORT LogService
 {
   public:
   virtual ~LogService();

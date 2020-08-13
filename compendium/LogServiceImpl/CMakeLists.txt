@@ -31,8 +31,8 @@ endif()
 usMacroCreateBundle(LogServiceImpl
   VERSION "1.0.0"
   DEPENDS Framework
-  TARGET LogServiceImpl
-  SYMBOLIC_NAME log_service_impl
+  TARGET LogService
+  SYMBOLIC_NAME log_service
   EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
   LINK_LIBRARIES ${_link_libraries} usLogService
@@ -42,7 +42,7 @@ usMacroCreateBundle(LogServiceImpl
   BINARY_RESOURCES manifest.json
   )
 
-target_include_directories(LogServiceImpl PRIVATE
+target_include_directories(LogService PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CppMicroServices_BINARY_DIR}/include
   ${CppMicroServices_SOURCE_DIR}/framework/include
@@ -56,6 +56,6 @@ target_include_directories(LogServiceImpl PRIVATE
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
-    target_compile_definitions(LogServiceImpl PRIVATE SPDLOG_NO_TLS)
+    target_compile_definitions(LogService PRIVATE SPDLOG_NO_TLS)
   endif()
 endif()

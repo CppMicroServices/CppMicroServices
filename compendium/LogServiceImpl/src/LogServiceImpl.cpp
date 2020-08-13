@@ -21,7 +21,7 @@ std::string GetExceptionMessage(const std::exception_ptr& ex)
     }
     message += stream.str();
   } else {
-    message += "nullptr";
+    message += "none";
   }
 
   return message;
@@ -37,7 +37,7 @@ std::string GetServiceReferenceInfo(const ServiceReferenceBase& sr)
 LogServiceImpl::LogServiceImpl(const std::string& loggerName)
 {
   auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-  m_Logger = std::make_shared<spdlog::logger>(loggerName, sink);
+  m_Logger = std::make_shared<spdlog::logger>(loggerName, std::move(sink));
   m_Logger->set_pattern("[%T] [%P:%t] %n (%^%l%$): %v");
   m_Logger->set_level(spdlog::level::trace);
 }

@@ -58,6 +58,12 @@ set(_logservice_additional_hdrs
 add_executable(${us_logservice_test_exe_name}
   ${_logservice_tests} ${_logservice_additional_srcs} ${_logservice_additional_hdrs})
 
+if(APPLE)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
+    target_compile_definitions(${us_logservice_test_exe_name} PRIVATE SPDLOG_DISABLE_TID_CACHING)
+  endif()
+endif()
+
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR

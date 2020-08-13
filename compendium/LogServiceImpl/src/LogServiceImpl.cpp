@@ -17,9 +17,8 @@ std::string GetExceptionMessage(const std::exception_ptr& ex)
     try {
       std::rethrow_exception(ex);
     } catch (const std::exception& e) {
-      stream << typeid(e).name() << " : " << e.what();
+      message += std::string(typeid(e).name()) + " : " + e.what();
     }
-    message += stream.str();
   } else {
     message += "none";
   }

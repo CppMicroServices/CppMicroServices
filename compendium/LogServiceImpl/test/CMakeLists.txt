@@ -60,7 +60,7 @@ add_executable(${us_logservice_test_exe_name}
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
-    target_compile_definitions(${us_logservice_test_exe_name} PRIVATE SPDLOG_DISABLE_TID_CACHING)
+    target_compile_definitions(${us_logservice_test_exe_name} PRIVATE SPDLOG_NO_TLS)
   endif()
 endif()
 

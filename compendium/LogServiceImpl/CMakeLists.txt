@@ -56,6 +56,6 @@ target_include_directories(LogServiceImpl PRIVATE
 
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
-    target_compile_definitions(LogServiceImpl PRIVATE SPDLOG_DISABLE_TID_CACHING)
+    target_compile_definitions(LogServiceImpl PRIVATE SPDLOG_NO_TLS)
   endif()
 endif()

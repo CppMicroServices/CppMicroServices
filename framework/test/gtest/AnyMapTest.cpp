@@ -270,8 +270,28 @@ TEST(AnyMapTest, GeneralUsage)
   ASSERT_EQ(std::string("val1"), any_cast<std::string>(it.first->second));
   ASSERT_EQ(std::string("val1"), any_cast<std::string>(om["key1"]));
 
+  /* Create a AnyMap with the following JSON representation:
+   *
+   * {
+   *   key1 : "val1",
+   *   uoci : {
+   *     FiRST : 1,
+   *     SECOND : 2,
+   *     vec : [
+   *       "one",
+   *       2,
+   *       {
+   *         hi : "hi",
+   *         there : "there"
+   *       }
+   *     ]
+   *   },
+   *   dot.key : 5
+   * }
+   *
+   */
   AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  uoci["FIRST"] = 1;
+  uoci["FiRST"] = 1;
   uoci["SECOND"] = 2;
 
   AnyMap uo(AnyMap::UNORDERED_MAP);
@@ -310,7 +330,7 @@ TEST(AnyMapTest, GeneralUsage)
 
   auto key = keys.begin();
   ASSERT_EQ(3, keys.size());
-  ASSERT_EQ("FIRST", *key++);
+  ASSERT_EQ("FiRST", *key++);
   ASSERT_EQ("SECOND", *key++);
   ASSERT_EQ("vec", *key++);
 

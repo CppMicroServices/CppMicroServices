@@ -34,7 +34,8 @@ namespace scrimpl {
 ComponentManagerImpl::ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                                            std::shared_ptr<const ComponentRegistry> registry,
                                            BundleContext bundleContext,
-                                           std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+                                           std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                           std::shared_ptr<boost::asio::thread_pool> threadpool)
   : registry(std::move(registry))
   , compDesc(std::move(metadata))
   , bundleContext(std::move(bundleContext))
@@ -45,6 +46,7 @@ ComponentManagerImpl::ComponentManagerImpl(std::shared_ptr<const metadata::Compo
   {
     throw std::invalid_argument("Invalid arguments to ComponentManagerImpl constructor");
   }
+  _threadpool = threadpool;
 }
 
 ComponentManagerImpl::~ComponentManagerImpl()

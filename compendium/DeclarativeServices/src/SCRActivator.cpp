@@ -47,8 +47,12 @@ namespace scrimpl {
 void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
+
+  threadpool = std::make_shared<boost::asio::thread_pool>(1);
+
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
+
   // Create the Logger object used by this runtime
   logger = std::make_shared<SCRLogger>(context);
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting SCR bundle");
@@ -82,6 +86,7 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     {
       DisposeExtension(bundle);
     }
+
     // clear bundle registry
     {
       std::lock_guard<std::mutex> l(bundleRegMutex);
@@ -89,6 +94,10 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     }
     // clear component registry
     componentRegistry->Clear();
+
+    // There should be no more DS operations which involve a thread pool at this point.
+    threadpool->join();
+
     logger->Log(SeverityLevel::LOG_DEBUG, "SCR Bundle stopped.");
   }
   catch (...)
@@ -120,7 +129,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
     try
     {
       auto const& scrMap = ref_any_cast<cppmicroservices::AnyMap>(headers.at(SERVICE_COMPONENT));
-      auto ba = std::make_unique<SCRBundleExtension>(bundle.GetBundleContext(), scrMap, componentRegistry, logger);
+      auto ba = std::make_unique<SCRBundleExtension>(bundle.GetBundleContext(), scrMap, componentRegistry, logger, threadpool);
       {
         std::lock_guard<std::mutex> l(bundleRegMutex);
         bundleRegistry.insert(std::make_pair(bundle.GetBundleId(),std::move(ba)));

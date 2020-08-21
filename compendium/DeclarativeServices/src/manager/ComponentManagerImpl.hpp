@@ -23,6 +23,7 @@
 #ifndef __COMPONENTMANAGERIMPL_HPP__
 #define __COMPONENTMANAGERIMPL_HPP__
 
+#include "boost/asio.hpp"
 #if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
 #else
@@ -50,7 +51,8 @@ public:
   ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                        std::shared_ptr<const ComponentRegistry> registry,
                        cppmicroservices::BundleContext bundleContext,
-                       std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                       std::shared_ptr<boost::asio::thread_pool> threadpool);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
   ComponentManagerImpl(ComponentManagerImpl&&) = delete;
   ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
@@ -137,6 +139,15 @@ public:
    */
   virtual std::shared_ptr<const ComponentRegistry> GetRegistry() const { return registry; }
 
+  /*
+   * Post work to the thread pool
+   */
+  std::shared_future<void> PostWork(
+    std::function<std::shared_future<void>()> work)
+  {
+    boost::asio::post(_threadpool->get_executor(), std::move(work));
+  }
+
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
@@ -147,6 +158,8 @@ private:
   std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
   std::vector<std::shared_future<void>> disableFutures; ///< futures created when the component transitioned to \c DISABLED state
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
+public:
+  std::shared_ptr<boost::asio::thread_pool> _threadpool;
 };
 }
 }

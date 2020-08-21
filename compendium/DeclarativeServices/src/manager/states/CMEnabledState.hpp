@@ -23,6 +23,7 @@
 #ifndef CMEnabledState_hpp
 #define CMEnabledState_hpp
 
+#include "boost/asio.hpp"
 #if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
 #else

@@ -36,7 +36,8 @@ namespace test
     scr::dto::ComponentDescriptionDTO compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent2");
     EXPECT_EQ(compDescDTO.name, compDescDTO.implementationClass) << "component name and implementation class must be different";
     EXPECT_EQ(compDescDTO.implementationClass, "sample::ServiceComponent2") << "Implementation class in the returned component description must be sample::ServiceComponent2";
-    dsRuntimeService->EnableComponent(compDescDTO);
+    auto fut = dsRuntimeService->EnableComponent(compDescDTO);
+    fut.get();
     EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), true) << "current state reported by the runtime service must match the initial state in component description";
     auto bc = framework.GetBundleContext();
     auto sRef = bc.GetServiceReference<test::Interface1>();

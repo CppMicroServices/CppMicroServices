@@ -24,6 +24,7 @@
 #define SCRACTIVATOR_HPP
 #include <map>
 #include <vector>
+#include "boost/asio.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleEvent.h"
@@ -74,6 +75,7 @@ private:
   std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
   std::shared_ptr<SCRLogger> logger;
   ListenerToken bundleListenerToken;
+  std::shared_ptr<boost::asio::thread_pool> threadpool;
 };
 } // scrimpl
 } // cppmicroservices

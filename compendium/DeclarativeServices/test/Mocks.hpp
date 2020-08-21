@@ -231,8 +231,9 @@ public:
   MockComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                            std::shared_ptr<const ComponentRegistry> registry,
                            BundleContext bundleContext,
-                           std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-    : ComponentManagerImpl(metadata, registry, bundleContext, logger)
+                           std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+      std::shared_ptr<boost::asio::thread_pool> pool)
+    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool)
     , statechangecount(0)
   {
   }

@@ -45,16 +45,20 @@ std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
   auto bundle = cm.GetBundle();
   auto reg = cm.GetRegistry();
   auto logger = cm.GetLogger();
-  std::packaged_task<void(std::shared_ptr<CMEnabledState>, std::exception_ptr&)>
-    task([metadata, bundle, reg, logger](std::shared_ptr<CMEnabledState> eState,
-                                         std::exception_ptr& ptr) {
-      try {
-        eState->CreateConfigurations(metadata, bundle, reg, logger);
-      } catch (const cppmicroservices::SharedLibraryException&) {
-        ptr = std::current_exception();
-      }
+
+  std::packaged_task<void(std::shared_ptr<CMEnabledState>)>
+    task([metadata, bundle, reg, logger](std::shared_ptr<CMEnabledState> eState) {
+      eState->CreateConfigurations(metadata, bundle, reg, logger);
     });
-  auto enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
+
+  using Sig = void(std::shared_ptr<CMEnabledState>);
+  using Result = boost::asio::async_result<decltype(task), Sig>;
+  using Handler = typename Result::completion_handler_type;
+
+  Handler handler(std::forward<decltype(task)>(task));
+  Result result(handler);
+
+  auto enabledState = std::make_shared<CMEnabledState>(result.get().share());
 
   // if this object failed to change state and the current state is DISABLED, try again
   auto succeeded = false;
@@ -65,18 +69,14 @@ std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
 
   if(succeeded) // succeeded in changing the state
   {
-    auto futObj =
-      std::async(std::launch::async,
-                 [enabledState, transition = std::move(task)]() mutable {
-                   std::exception_ptr ptr;
-                   transition(enabledState, ptr);
-                   if (ptr) {
-                     std::rethrow_exception(ptr);
-                   }
-                 })
-        .share();
-    return futObj;
+    boost::asio::post(
+             cm._threadpool->get_executor(),
+             [enabledState, transition = std::move(handler)]() mutable {
+               transition(enabledState);
+             });
+    return enabledState->GetFuture();
   }
+
   // return the stored future in the current enabled state object
   return currentState->GetFuture();
 }

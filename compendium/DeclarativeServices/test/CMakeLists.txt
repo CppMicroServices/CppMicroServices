@@ -20,6 +20,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINAR
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
+  ${CppMicroServices_SOURCE_DIR}/third_party/boost/include
   )
 
 
@@ -39,6 +40,10 @@ if(MSVC)
   add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)
   add_compile_definitions(GTEST_LANG_CXX11=1)
 endif()
+
+add_compile_definitions(BOOST_DATE_TIME_NO_LIB=1)
+add_compile_definitions(BOOST_REGEX_NO_LIB=1)
+
 
 #-----------------------------------------------------------------------------
 # Add test source files

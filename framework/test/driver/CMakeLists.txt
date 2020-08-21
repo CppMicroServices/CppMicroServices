@@ -37,7 +37,6 @@ set(_tests
   LDAPFilterTest
   LDAPQueryTest
   LogTest
-  BundleEventTest
   BundleHooksTest
   BundleTest
   BundleResourceTest

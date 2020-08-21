@@ -31,6 +31,10 @@ if (US_BUILD_TESTING)
   add_compile_options(-DUSING_GTEST)
 endif()
 
+add_compile_options(-DBOOST_DATE_TIME_NO_LIB)
+add_compile_options(-DBOOST_REGEX_NO_LIB)
+
+
 usMacroCreateBundle(DeclarativeServices
   VERSION "1.1.0"
   DEPENDS Framework

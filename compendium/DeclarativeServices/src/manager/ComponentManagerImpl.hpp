@@ -139,15 +139,6 @@ public:
    */
   virtual std::shared_ptr<const ComponentRegistry> GetRegistry() const { return registry; }
 
-  /*
-   * Post work to the thread pool
-   */
-  std::shared_future<void> PostWork(
-    std::function<std::shared_future<void>()> work)
-  {
-    boost::asio::post(_threadpool->get_executor(), std::move(work));
-  }
-
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 

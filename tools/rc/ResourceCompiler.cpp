@@ -60,7 +60,7 @@ static std::string get_error_str()
                    NULL,
                    dw,
                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   reinterpret_cast<LPTSTR>(&lpMsgBuf),
+                   reinterpret_cast<LPSTR>(&lpMsgBuf),
                    0,
                    NULL);
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -71,7 +71,7 @@ static std::string get_error_str()
   if (rc == 0) {
     errMsg = "Failed to retrieve error message.";
   } else {
-    errMsg = reinterpret_cast<LPCTSTR>(lpMsgBuf);
+    errMsg = reinterpret_cast<LPSTR>(lpMsgBuf);
     LocalFree(lpMsgBuf);
   }
   return errMsg;

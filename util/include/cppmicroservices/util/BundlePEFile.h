@@ -25,6 +25,7 @@
 #include "BundleObjFile.h"
 #include "DataContainer.h"
 #include "Error.h"
+#include "String.h"
 #include "cppmicroservices_pe.h"
 
 #include <cerrno>
@@ -87,11 +88,12 @@ public:
   BundlePEFile(std::string location)
     : m_rawData(nullptr)
   {
-    HMODULE hBundleResources = LoadLibraryEx(location.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+    std::wstring wpath(cppmicroservices::util::ToWString(location));
+    HMODULE hBundleResources = LoadLibraryExW(wpath.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
     if (hBundleResources) {
       // RAII - automatically free the library handle on object destruction
       auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter{});
-      HRSRC hResource = FindResource(hBundleResources, "US_RESOURCES", MAKEINTRESOURCE(300));
+      HRSRC hResource = FindResourceA(hBundleResources, "US_RESOURCES", MAKEINTRESOURCEA(300));
       HGLOBAL hRes = LoadResource(hBundleResources, hResource);
       const LPVOID res = LockResource(hRes);
       const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);

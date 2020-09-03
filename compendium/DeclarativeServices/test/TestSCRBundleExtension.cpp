@@ -68,7 +68,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
   cppmicroservices::AnyMap headers(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto pool = std::make_shared<boost::asio::thread_pool>();
+  auto pool = std::make_shared<boost::asio::thread_pool>(1);
   EXPECT_THROW({
       SCRBundleExtension bundleExt(BundleContext(),
                                    headers,
@@ -114,7 +114,7 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
   EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_))
     .Times(1);
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto pool = std::make_shared<boost::asio::thread_pool>();
+  auto pool = std::make_shared<boost::asio::thread_pool>(1);
   EXPECT_NO_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    scr,

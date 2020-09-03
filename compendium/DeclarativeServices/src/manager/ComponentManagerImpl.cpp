@@ -41,12 +41,12 @@ ComponentManagerImpl::ComponentManagerImpl(std::shared_ptr<const metadata::Compo
   , bundleContext(std::move(bundleContext))
   , logger(std::move(logger))
   , state(std::make_shared<CMDisabledState>())
+  , _threadpool(threadpool)
 {
   if(!compDesc || !this->registry || !this->bundleContext || !this->logger)
   {
     throw std::invalid_argument("Invalid arguments to ComponentManagerImpl constructor");
   }
-  _threadpool = threadpool;
 }
 
 ComponentManagerImpl::~ComponentManagerImpl()

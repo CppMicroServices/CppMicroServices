@@ -20,8 +20,9 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINAR
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
-  ${CppMicroServices_SOURCE_DIR}/third_party/boost/include
   )
+
+include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
 
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)

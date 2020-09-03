@@ -43,7 +43,7 @@ protected:
     auto fakeLogger = std::make_shared<FakeLogger>();
     auto compDesc = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto pool = std::make_shared <boost::asio::thread_pool>();
+    auto pool = std::make_shared <boost::asio::thread_pool>(1);
     compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                          mockRegistry,
                                                          framework.GetBundleContext(),

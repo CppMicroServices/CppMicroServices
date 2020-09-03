@@ -52,7 +52,7 @@ TEST(ComponentManagerImplTest, Ctor)
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-  auto pool = std::make_shared<boost::asio::thread_pool>();
+  auto pool = std::make_shared<boost::asio::thread_pool>(1);
   {
     EXPECT_THROW(
       {
@@ -127,7 +127,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
   auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
-                                                        fakeLogger, std::make_shared<boost::asio::thread_pool>());
+                                                        fakeLogger, std::make_shared<boost::asio::thread_pool>(1));
   EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
   compMgr->Initialize();
   EXPECT_EQ(compMgr->IsEnabled(), compMgr->GetMetadata()->enabled) << "Illegal state after Initialization";
@@ -140,7 +140,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
   EXPECT_NO_THROW({
       compMgr->Initialize();
       compMgr->Enable();
@@ -157,7 +157,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
   EXPECT_NO_THROW({
       compMgr->Initialize();
       compMgr->Disable();
@@ -173,7 +173,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-                                                            fakeLogger, std::make_shared<boost::asio::thread_pool>());
+                                                            fakeLogger, std::make_shared<boost::asio::thread_pool>(1));
   EXPECT_NO_THROW({
       compMgr->Initialize();
       compMgr->ResetCounter();
@@ -191,7 +191,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
   EXPECT_NO_THROW({
 
       auto prevState = compMgr->IsEnabled();
@@ -220,7 +220,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
 
   compMgr->Initialize();
   compMgr->Disable(); // ensure the component is in DISABLED state
@@ -249,7 +249,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentDisable)
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
 
   compMgr->Initialize();
   compMgr->Enable(); // ensure the component is in ENABLED state
@@ -278,7 +278,7 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnableDisable)
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
   compMgr->Initialize();
   // test concurrent calls to enable and disable from multiple threads
   std::function<std::shared_future<void>()> func = [compMgr]() mutable {
@@ -309,7 +309,7 @@ TEST_P(ComponentManagerImplParameterizedTest, TestAccumulateFutures)
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>());
+    std::make_shared<boost::asio::thread_pool>(1));
 
   EXPECT_EQ(compMgr->disableFutures.size(), 0ul) << "Disabled futures list must be empty before any calls to AccumulateFuture method";
   std::promise<void> p1;

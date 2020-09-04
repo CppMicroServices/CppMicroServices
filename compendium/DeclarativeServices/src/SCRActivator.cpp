@@ -48,7 +48,7 @@ void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
 
-  threadpool = std::make_shared<boost::asio::thread_pool>(1);
+  threadpool = std::make_shared<boost::asio::thread_pool>();
 
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();

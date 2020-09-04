@@ -151,6 +151,8 @@ private:
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
 public:
   std::shared_ptr<boost::asio::thread_pool> _threadpool;
+  std::mutex
+    transitionMutex; ///< mutex to make the state transition and posting the async operations atomic
 };
 }
 }

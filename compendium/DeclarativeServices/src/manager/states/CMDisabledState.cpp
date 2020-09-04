@@ -62,6 +62,7 @@ std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
 
   // if this object failed to change state and the current state is DISABLED, try again
   auto succeeded = false;
+  std::lock_guard<std::mutex> lk(cm.transitionMutex);
   do
   {
     succeeded = cm.CompareAndSetState(&currentState, enabledState);

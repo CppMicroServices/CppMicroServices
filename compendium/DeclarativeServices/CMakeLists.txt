@@ -25,6 +25,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
 if(MINGW)
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+  
+  # needed for boost::asio::thread_pool
+  list(APPEND _link_libraries ws2_32.lib)
 endif()
 
 if (US_BUILD_TESTING)

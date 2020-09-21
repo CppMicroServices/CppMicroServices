@@ -22,6 +22,8 @@ include_directories(
   ${GMOCK_INCLUDE_DIRS}
   )
 
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
 include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
 
 
@@ -42,8 +44,8 @@ if(MSVC)
   add_compile_definitions(GTEST_LANG_CXX11=1)
 endif()
 
-add_compile_definitions(BOOST_DATE_TIME_NO_LIB=1)
-add_compile_definitions(BOOST_REGEX_NO_LIB=1)
+add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
+add_compile_definitions(BOOST_REGEX_NO_LIB)
 
 
 #-----------------------------------------------------------------------------

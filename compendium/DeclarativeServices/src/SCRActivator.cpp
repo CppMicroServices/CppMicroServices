@@ -96,12 +96,18 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     componentRegistry->Clear();
 
     // There should be no more DS operations which involve a thread pool at this point.
-    threadpool->join();
+    if (threadpool) {
+      threadpool->join();
+    }
 
     logger->Log(SeverityLevel::LOG_DEBUG, "SCR Bundle stopped.");
   }
   catch (...)
   {
+    // the thread pool must be joined 
+    if (threadpool) {
+      threadpool->join();
+    }
     logger->Log(SeverityLevel::LOG_DEBUG, "Exception while stopping the declarative services runtime bundle", std::current_exception());
   }
   logger->StopTracking();

@@ -38,45 +38,7 @@ std::shared_future<void> CMEnabledState::Enable(ComponentManagerImpl&)
 std::shared_future<void> CMEnabledState::Disable(ComponentManagerImpl& cm)
 {
   auto currentState = shared_from_this(); // assume this object is the current state object
-
-  std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task([](std::shared_ptr<CMEnabledState> enabledState) {
-                                                                   enabledState->DeleteConfigurations();
-                                                                 });
-
-  using Sig = void(std::shared_ptr<CMEnabledState>);
-  using Result = boost::asio::async_result<decltype(task), Sig>;
-  using Handler = typename Result::completion_handler_type;
-
-  Handler handler(std::forward<decltype(task)>(task));
-  Result result(handler);
-
-  auto disabledState =
-    std::make_shared<CMDisabledState>(result.get().share());
-
-  // if this object failed to change state and the current state is ENABLED, try again
-  bool succeeded = false;
-  std::lock_guard<std::mutex> lk(cm.transitionMutex);
-  do
-  {
-    succeeded = cm.CompareAndSetState(&currentState, disabledState);
-  } while(!succeeded && currentState->IsEnabled(cm));
-
-  if(succeeded) // succeeded in changing the state
-  {
-    std::shared_ptr<CMEnabledState> currEnabledState = std::dynamic_pointer_cast<CMEnabledState>(currentState);
-
-    boost::asio::post(
-      cm._threadpool->get_executor(),
-      [currEnabledState, transition = std::move(handler)]() mutable {
-        transition(currEnabledState);
-      });
-
-    auto fut = disabledState->GetFuture();
-    cm.AccumulateFuture(fut);
-    return fut;
-  }
-  // return the stored future in the current disabled state object
-  return currentState->GetFuture();
+  return cm.PostAsyncEnabledToDisabled(currentState);
 }
 
 void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,

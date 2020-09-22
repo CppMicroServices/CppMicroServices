@@ -24,7 +24,7 @@
 #define __SCRBUNDLEEXTENSION_HPP__
 
 #include <memory>
-#include "boost/asio.hpp"
+#include "boost/asio/thread_pool.hpp"
 #if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
 #else

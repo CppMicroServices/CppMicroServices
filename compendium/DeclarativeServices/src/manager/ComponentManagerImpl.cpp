@@ -20,6 +20,9 @@
 
   =============================================================================*/
 
+#include "boost/asio/async_result.hpp"
+#include "boost/asio/packaged_task.hpp"
+#include "boost/asio/post.hpp"
 #include "ComponentManagerImpl.hpp"
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
@@ -27,6 +30,7 @@
 #include "states/CMEnabledState.hpp"
 #include "states/ComponentManagerState.hpp"
 #include <cassert>
+#include <future>
 #include <utility>
 
 namespace cppmicroservices {

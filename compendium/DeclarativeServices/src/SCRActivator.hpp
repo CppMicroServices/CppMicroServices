@@ -24,7 +24,7 @@
 #define SCRACTIVATOR_HPP
 #include <map>
 #include <vector>
-#include "boost/asio.hpp"
+#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleEvent.h"

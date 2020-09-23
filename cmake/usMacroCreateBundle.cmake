@@ -2,14 +2,21 @@
 
 macro(usMacroCreateBundle _project_name)
 
-project(${_project_name})
-
-cmake_parse_arguments(${PROJECT_NAME}
+cmake_parse_arguments(${_project_name}
   "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET;SYMBOLIC_NAME;EMBED_RESOURCE_METHOD"
   "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
   ${ARGN}
 )
+
+project(${_project_name} VERSION "${${_project_name}_VERSION}")
+
+# ${PROJECT_NAME} is only valid AFTER a call to project()
+message(NOTICE "${_project_name} version is ${${PROJECT_NAME}_VERSION}")
+
+if(NOT ${PROJECT_NAME}_VERSION)
+  message(SEND_ERROR "VERSION argument is required")
+endif()
 
 if(NOT ${PROJECT_NAME}_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
   message(SEND_ERROR "VERSION argument invalid: ${${PROJECT_NAME}_VERSION}")
@@ -72,6 +79,11 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}Config.h.in)
                  ${CMAKE_CURRENT_BINARY_DIR}/include/${${PROJECT_NAME}_INCLUDE_SUBDIR}/${PROJECT_NAME}Config.h)
   list(APPEND ${PROJECT_NAME}_PUBLIC_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/include/${${PROJECT_NAME}_INCLUDE_SUBDIR}/${PROJECT_NAME}Config.h)
+endif()
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
 endif()
 
 #-----------------------------------------------------------------------------

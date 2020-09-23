@@ -9,7 +9,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 `Unreleased v4.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2020-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.5.0...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.6.0...development>`_
 
 Added
 -----

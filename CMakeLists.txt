@@ -5,7 +5,7 @@ set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
-project(CppMicroServices)
+project(CppMicroServices VERSION ${_version})
 
 set(US_GLOBAL_VERSION_SUFFIX ${${PROJECT_NAME}_VERSION_MAJOR})
 if (${PROJECT_NAME}_VERSION_MINOR EQUAL 99)

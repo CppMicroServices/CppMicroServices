@@ -38,6 +38,8 @@
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentDescriptionDTO.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ReferenceDTO.hpp"
 
+#include "cppmicroservices/util/ScopeGuard.h"
+
 using cppmicroservices::logservice::SeverityLevel;
 using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
 
@@ -76,6 +78,17 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
 {
   try
   {
+    cppmicroservices::util::ScopeGuard joinThreadPool{ [this]() {
+      if (threadpool) {
+        try {
+          threadpool->join();
+        } catch (...) {
+          logger->Log(SeverityLevel::LOG_WARNING,
+                      "Exception while joining the threadpool",
+                      std::current_exception());
+        }
+      }
+    } };
     // remove the bundle listener
     context.RemoveListener(std::move(bundleListenerToken));
     // remove the runtime service from the framework
@@ -95,19 +108,10 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     // clear component registry
     componentRegistry->Clear();
 
-    // There should be no more DS operations which involve a thread pool at this point.
-    if (threadpool) {
-      threadpool->join();
-    }
-
     logger->Log(SeverityLevel::LOG_DEBUG, "SCR Bundle stopped.");
   }
   catch (...)
   {
-    // the thread pool must be joined 
-    if (threadpool) {
-      threadpool->join();
-    }
     logger->Log(SeverityLevel::LOG_DEBUG, "Exception while stopping the declarative services runtime bundle", std::current_exception());
   }
   logger->StopTracking();

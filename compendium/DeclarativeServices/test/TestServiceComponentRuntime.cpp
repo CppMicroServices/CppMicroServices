@@ -33,6 +33,7 @@
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "TestUtils.hpp"
+#include "DSTestingConfig.h"
 
 namespace scr = cppmicroservices::service::component::runtime;
 
@@ -61,6 +62,18 @@ protected:
 
   cppmicroservices::Framework framework;
 };
+
+TEST_F(TestServiceComponentRuntime, testBundleProperties)
+{
+  // Test that the build system correctly generated the config admin bundle properties.
+  auto dsPluginPath = GetDSRuntimePluginFilePath();
+  auto bundles = framework.GetBundleContext().InstallBundles(dsPluginPath);
+  EXPECT_EQ(bundles.size(), 1ul)
+    << "DS Runtime bundle found at" << dsPluginPath;
+  auto bundle = bundles.at(0);
+  ASSERT_EQ(bundle.GetSymbolicName(), US_DeclarativeServices_SYMBOLIC_NAME);
+  ASSERT_EQ(bundle.GetVersion().ToString(), US_DeclarativeServices_VERSION_STR);
+}
 
 /**
  * Test if the declarative services runtime publishes a service with interface

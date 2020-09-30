@@ -45,7 +45,7 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
   , registry(registry)
   , logger(logger)
 {
-  if(!bundleContext || !registry || !logger || scrMetadata.empty())
+  if(!bundleContext || !registry || !logger || scrMetadata.empty() || !threadpool)
   {
     throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension constructor");
   }

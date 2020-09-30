@@ -182,6 +182,14 @@ public:
 
     InstallAndStartDSAndConfigAdmin(bc);
 
+    // Instead of using BundleContext::GetBundles() and then filtering to
+    // find the ConfigAdmin bundle, install the bundle again. This is harmless
+    // since installing an already installed bundle is a no-op.
+    auto installedBundles = m_framework.GetBundleContext().InstallBundles(
+      GetConfigAdminRuntimePluginFilePath());
+    ASSERT_EQ(installedBundles.size(), 1ul) << "Only one configadmin bundle should be installed";
+    m_bundle = installedBundles.at(0);
+
     auto const numBundles =
       installAndStartTestBundles(bc, "ManagedServiceAndFactoryBundle");
 
@@ -189,7 +197,7 @@ public:
       cppmicroservices::service::cm::ConfigurationAdmin>();
     m_configAdmin = bc.GetService<cm::ConfigurationAdmin>(sr);
 
-    ASSERT_EQ(numBundles, 1);
+    ASSERT_EQ(numBundles, 1ul);
   }
 
   void TearDown() override
@@ -202,13 +210,25 @@ public:
   }
 
   cppmicroservices::Framework& GetFramework() { return m_framework; }
+  cppmicroservices::Bundle& GetConfigAdminBundle() { return m_bundle; }
 
 protected:
   std::shared_ptr<cm::ConfigurationAdmin> m_configAdmin;
 
 private:
   cppmicroservices::Framework m_framework;
+  cppmicroservices::Bundle m_bundle;  ///< The ConfigAdmin bundle object
 };
+
+TEST_F(ConfigAdminTests, testProperties)
+{
+  // Test that the build system correctly generated the config admin bundle properties.
+  auto b = GetConfigAdminBundle();
+  ASSERT_EQ(
+    b.GetSymbolicName(), US_ConfigurationAdmin_SYMBOLIC_NAME);
+  ASSERT_EQ(
+    b.GetVersion().ToString(), US_ConfigurationAdmin_VERSION_STR);
+}
 
 TEST_F(ConfigAdminTests, testInstallAndStart)
 {

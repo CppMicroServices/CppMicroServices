@@ -75,6 +75,9 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
   set_property(TARGET DeclarativeServicesObjs PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
 endif()
 
+add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
+add_compile_definitions(BOOST_REGEX_NO_LIB)
+
 include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/include
   ${CppMicroServices_BINARY_DIR}/framework/include
@@ -85,4 +88,11 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
+
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
+include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+
+
+
 

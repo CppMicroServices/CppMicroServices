@@ -41,44 +41,7 @@ CMDisabledState::CMDisabledState()
 std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
 {
   auto currentState = shared_from_this(); // assume this object is the current state object.
-  auto metadata = cm.GetMetadata();
-  auto bundle = cm.GetBundle();
-  auto reg = cm.GetRegistry();
-  auto logger = cm.GetLogger();
-  std::packaged_task<void(std::shared_ptr<CMEnabledState>, std::exception_ptr&)>
-    task([metadata, bundle, reg, logger](std::shared_ptr<CMEnabledState> eState,
-                                         std::exception_ptr& ptr) {
-      try {
-        eState->CreateConfigurations(metadata, bundle, reg, logger);
-      } catch (const cppmicroservices::SharedLibraryException&) {
-        ptr = std::current_exception();
-      }
-    });
-  auto enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
-
-  // if this object failed to change state and the current state is DISABLED, try again
-  auto succeeded = false;
-  do
-  {
-    succeeded = cm.CompareAndSetState(&currentState, enabledState);
-  } while(!succeeded && !currentState->IsEnabled(cm));
-
-  if(succeeded) // succeeded in changing the state
-  {
-    auto futObj =
-      std::async(std::launch::async,
-                 [enabledState, transition = std::move(task)]() mutable {
-                   std::exception_ptr ptr;
-                   transition(enabledState, ptr);
-                   if (ptr) {
-                     std::rethrow_exception(ptr);
-                   }
-                 })
-        .share();
-    return futObj;
-  }
-  // return the stored future in the current enabled state object
-  return currentState->GetFuture();
+  return cm.PostAsyncDisabledToEnabled(currentState);
 }
 
 // if already in disabled state, simply return the existing future object. Equivalent to a no-op.

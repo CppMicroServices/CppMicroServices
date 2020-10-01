@@ -172,3 +172,9 @@ https://github.com/gabime/spdlog
 Patches:
 
  * Replaced old-style-cast to long int with static_cast<long int>
+
+Boost
+------
+
+See https://www.boost.org/users/license.html for license information
+1.73.0

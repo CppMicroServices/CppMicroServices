@@ -88,7 +88,10 @@ set(_declarativeservices_tests
   main.cpp
 )
 
-include_directories(${PROJECT_BINARY_DIR}/include)
+include_directories(${PROJECT_BINARY_DIR}/include
+  ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
+  ${CppMicroServices_BINARY_DIR}/compendium/CM/include
+  )
 
 set(_additional_srcs
   TestUtils.cpp

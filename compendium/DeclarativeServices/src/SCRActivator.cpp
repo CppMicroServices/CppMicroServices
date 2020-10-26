@@ -37,6 +37,7 @@
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentDescriptionDTO.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ReferenceDTO.hpp"
+#include "ConfigurationListenerImpl.hpp"
 
 #include "cppmicroservices/util/ScopeGuard.h"
 
@@ -72,6 +73,15 @@ void SCRActivator::Start(BundleContext context)
   // Publish ServiceComponentRuntimeService
   auto service = std::make_shared<ServiceComponentRuntimeImpl>(runtimeContext, componentRegistry, logger);
   scrServiceReg = context.RegisterService<ServiceComponentRuntime>(std::move(service));
+
+  // Publish ConfigurationListener
+  auto configListener =
+    std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(
+      runtimeContext, componentRegistry, logger);
+  configListenerReg =
+    context
+      .RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
+        std::move(configListener));
 }
 
 void SCRActivator::Stop(cppmicroservices::BundleContext context)

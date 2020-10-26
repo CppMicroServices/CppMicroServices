@@ -36,6 +36,7 @@
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
@@ -136,13 +137,14 @@ namespace cppmicroservices {
        */
       void RemoveConfigurations(std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) override;
 
-      /**
-       * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} of an
-       * update to a {@code Configuration}. Performs the notifications asynchronously with the latest state
-       * of the properties at the time.
+       /**
+       * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} or 
+       * {@code ConfigurationListener of an update to a {@code Configuration}. Performs the 
+       * notifications asynchronously with the latest state of the properties at the time.
        *
        * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
        */
+
       void NotifyConfigurationUpdated(const std::string& pid) override;
 
       /**
@@ -195,6 +197,9 @@ namespace cppmicroservices {
       cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedService, TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> managedServiceTracker;
       cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedServiceFactory, TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> managedServiceFactoryTracker;
       std::mt19937 randomGenerator;
+      std::unique_ptr<cppmicroservices::ServiceTracker<
+        cppmicroservices::service::cm::ConfigurationListener>>
+        configListenerTracker;
     };
   } // cmimpl
 } // cppmicroservices

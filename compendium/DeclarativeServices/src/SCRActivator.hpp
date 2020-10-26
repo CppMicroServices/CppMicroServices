@@ -32,6 +32,7 @@
 #include "ComponentRegistry.hpp"
 #include "SCRBundleExtension.hpp"
 #include "SCRLogger.hpp"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 
@@ -76,6 +77,9 @@ private:
   std::shared_ptr<SCRLogger> logger;
   ListenerToken bundleListenerToken;
   std::shared_ptr<boost::asio::thread_pool> threadpool;
+  cppmicroservices::ServiceRegistration<
+    cppmicroservices::service::cm::ConfigurationListener>
+    configListenerReg;
 };
 } // scrimpl
 } // cppmicroservices

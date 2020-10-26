@@ -80,6 +80,24 @@ namespace {
     }
   }
 
+  void notifyListener(
+    const std::string& pid,
+    const std::string& factoryPid,
+    const cppmicroservices::service::cm::ConfigurationEventType type,
+    const cppmicroservices::ServiceReference<
+      cppmicroservices::service::cm::ConfigurationAdmin>& configAdmin,
+    cppmicroservices::service::cm::ConfigurationListener& configListener)
+  {
+    try {
+      auto configEvent =
+        std::make_unique<cppmicroservices::service::cm::ConfigurationEvent>(
+          configAdmin, type, factoryPid, pid);
+
+      configListener.configurationEvent((*configEvent));
+    } catch (...) {
+      //todo
+    }
+  }
   void notifyServiceUpdated(const std::string& pid,
                             cppmicroservices::service::cm::ManagedService& managedService,
                             const cppmicroservices::AnyMap& properties,
@@ -186,10 +204,14 @@ namespace cppmicroservices {
     , futuresID{0u}
     , managedServiceTracker(cmContext, this)
     , managedServiceFactoryTracker(cmContext, this)
+    , configListenerTracker(
+        std::make_unique<cppmicroservices::ServiceTracker<
+          cppmicroservices::service::cm::ConfigurationListener>>(cmContext))
     , randomGenerator(std::random_device{}())
     {
       managedServiceTracker.Open();
       managedServiceFactoryTracker.Open();
+      configListenerTracker->Open();
     }
 
     ConfigurationAdminImpl::~ConfigurationAdminImpl()
@@ -199,6 +221,9 @@ namespace cppmicroservices {
 
       managedServiceFactoryTracker.Close();
       managedServiceTracker.Close();
+      if (configListenerTracker) {
+        configListenerTracker->Close();
+      }
 
       decltype(factoryInstances) factoryInstancesCopy;
       decltype(configurations) configurationsToInvalidate;
@@ -461,6 +486,22 @@ namespace cppmicroservices {
               removed = true;
             }
           }
+        }
+        //TODO - factoryPid
+        const auto configurationListeners =
+          configListenerTracker->GetServices();
+        auto type =
+          removed
+            ? cppmicroservices::service::cm::ConfigurationEventType::CM_REMOVED
+            : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
+
+        for (auto it : configurationListeners) {
+          notifyListener(
+            pid,
+            "",
+            type,
+            cmContext.GetServiceReference("ConfigurationAdminImpl"),
+            *(it));
         }
         const auto managedServiceWrappers = managedServiceTracker.GetServices();
         const auto it = std::find_if(std::begin(managedServiceWrappers), std::end(managedServiceWrappers),

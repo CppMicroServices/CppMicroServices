@@ -325,9 +325,29 @@ namespace cppmicroservices {
       return GetConfiguration(pid);
     }
 
-    std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ConfigurationAdminImpl::ListConfigurations(const std::string& /* filter */)
+    std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     {
-      throw std::invalid_argument("Method not currently implemented");
+      std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> result;
+      {
+        std::lock_guard<std::mutex> lk {configurationsMutex};
+
+        if (filter.empty()) {
+          result.reserve(configurations.size());
+          for (auto it : configurations) {
+            result.push_back(it.second);
+          }
+        } else {
+          LDAPFilter ldap(filter);
+          for (auto it : configurations) {
+            auto props = it.second->GetProperties();
+            if (ldap.Match(props)) {
+              result.push_back(it.second);
+            }
+          }
+        }
+      }
+
+      return result;
     }
 
     std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(std::vector<metadata::ConfigurationMetadata> configurationMetadata)

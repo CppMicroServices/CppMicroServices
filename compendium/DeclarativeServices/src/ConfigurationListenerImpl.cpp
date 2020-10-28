@@ -19,7 +19,7 @@ ConfigurationListenerImpl::ConfigurationListenerImpl(
   }
 }
 
-void ConfigurationListenerImpl::configurationEvent(ConfigurationEvent& event) {
+void ConfigurationListenerImpl::configurationEvent(const ConfigurationEvent& event) {
   auto configAdminRef = event.getReference();
   auto type = event.getType();
 }

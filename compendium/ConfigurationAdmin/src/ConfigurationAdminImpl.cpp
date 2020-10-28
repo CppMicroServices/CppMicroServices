@@ -80,24 +80,7 @@ namespace {
     }
   }
 
-  void notifyListener(
-    const std::string& pid,
-    const std::string& factoryPid,
-    const cppmicroservices::service::cm::ConfigurationEventType type,
-    const cppmicroservices::ServiceReference<
-      cppmicroservices::service::cm::ConfigurationAdmin>& configAdmin,
-    cppmicroservices::service::cm::ConfigurationListener& configListener)
-  {
-    try {
-      auto configEvent =
-        std::make_unique<cppmicroservices::service::cm::ConfigurationEvent>(
-          configAdmin, type, factoryPid, pid);
-
-      configListener.configurationEvent((*configEvent));
-    } catch (...) {
-      //todo
-    }
-  }
+  
   void notifyServiceUpdated(const std::string& pid,
                             cppmicroservices::service::cm::ManagedService& managedService,
                             const cppmicroservices::AnyMap& properties,
@@ -219,10 +202,16 @@ namespace cppmicroservices {
       auto managedServiceWrappers = managedServiceTracker.GetServices();
       auto managedServiceFactoryWrappers = managedServiceFactoryTracker.GetServices();
 
-      managedServiceFactoryTracker.Close();
-      managedServiceTracker.Close();
-      if (configListenerTracker) {
-        configListenerTracker->Close();
+      try {
+          managedServiceFactoryTracker.Close();
+          managedServiceTracker.Close();
+          if (configListenerTracker) {
+            configListenerTracker->Close();
+          }
+      } catch (...) {
+         auto thrownByMessage = "thrown by ConfiguratonAdminImpl destructor "
+                               "while closing the service trackers.\n\t ";
+         logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);
       }
 
       decltype(factoryInstances) factoryInstancesCopy;
@@ -483,6 +472,7 @@ namespace cppmicroservices {
 
     void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
     {
+      
       PerformAsync([this, pid]
       {
         AnyMap properties{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
@@ -514,15 +504,24 @@ namespace cppmicroservices {
           removed
             ? cppmicroservices::service::cm::ConfigurationEventType::CM_REMOVED
             : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
-
+        
+        auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
         for (auto it : configurationListeners) {
-          notifyListener(
-            pid,
-            "",
-            type,
-            cmContext.GetServiceReference("ConfigurationAdminImpl"),
-            *(it));
-        }
+
+            try {
+              auto configEvent = std::make_unique<
+                cppmicroservices::service::cm::ConfigurationEvent>(
+                configAdminRef, type, "", pid);
+
+              it->configurationEvent((*configEvent));
+            } catch (...) {
+              auto thrownByMessage = "thrown by ConfigurationListener "
+                                     "configurationEvent method with PID " +
+                                     pid + "\n\t";
+              logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);           
+            }
+          }
+
         const auto managedServiceWrappers = managedServiceTracker.GetServices();
         const auto it = std::find_if(std::begin(managedServiceWrappers), std::end(managedServiceWrappers),
                                      [&pid](const auto& managedServiceWrapper)

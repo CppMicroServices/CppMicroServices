@@ -30,27 +30,27 @@ namespace cppmicroservices {
 namespace service {
 namespace cm {
 /**
-         * The ConfigurationEventType is passed to a Configuration Listener to 
-         * identify the type of ConfigurationEvent that has occurred.
-         */
+ * The ConfigurationEventType is passed to a Configuration Listener to 
+ * identify the type of ConfigurationEvent that has occurred.
+ */
 enum class ConfigurationEventType
 {
   /* The ConfigurationEvent type for when a Configuration object has been 
-             * updated 
-             */
+   * updated 
+   */
   CM_UPDATED = 1,
 
   /* The ConfigurationEvent type for when a Configuration object has been 
-             * removed 
-             */
+   * removed 
+   */
 
   CM_REMOVED = 2
 };
 
 /**
-	     * The ConfigurationEvent object is passed to the ConfigurationListener when 
-	     * the configuration for any service is updated or removed by ConfigurationAdmin
-	     */
+* The ConfigurationEvent object is passed to the ConfigurationListener when 
+* the configuration for any service is updated or removed by ConfigurationAdmin
+*/
 class ConfigurationEvent
 {
 public:
@@ -59,7 +59,7 @@ public:
                      const std::string _factoryPid,
                      const std::string _pid)
     : configAdmin(_configAdmin)
-    , type(std::move(_type))
+    , type(_type)
     , factoryPid(std::move(_factoryPid))
     , pid(std::move(_pid))
   {}
@@ -72,15 +72,15 @@ public:
   /**
    * Get the PID of this ConfigurationEvent.
    */
-  const std::string getPid() const { return pid; }
+  const std::string& getPid() const { return pid; }
   /**
    * Get the Factory PID which is responsible for this Configuration.
    */
-  const std::string getFactoryPid() const { return factoryPid; }
+  const std::string& getFactoryPid() const { return factoryPid; }
   /**
    * Get the type of this Configuration.
    */
-  const ConfigurationEventType getType() const { return type; }
+  ConfigurationEventType getType() const { return type; }
 
 private:
   const ServiceReference<ConfigurationAdmin>& configAdmin;
@@ -101,9 +101,9 @@ public:
    * Called whenever the Configuration for any service is updated or removed from ConfigurationAdmin,
    * and when the ConfigurationListener is first registered with the Framework, to provide the initial Configuration.
    */
-  virtual void configurationEvent(ConfigurationEvent& event) = 0;
+  virtual void configurationEvent(const ConfigurationEvent& event) = 0;
 };
-}
-}
-}
+} //cm namespace
+} //service namespace
+} //cppmicroservices namespace
 #endif /* CppMicroServices_service_CM_ConfigurationListener_hpp */

@@ -41,7 +41,7 @@ public:
       componentRegistry,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger);
 
-  void configurationEvent(ConfigurationEvent& event) override;
+  void configurationEvent(const ConfigurationEvent& event) override;
 
 private:
   cppmicroservices::BundleContext bundleContext;

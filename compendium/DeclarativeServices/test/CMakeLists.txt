@@ -148,6 +148,9 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBindUnbindThrows
+  TestBundleDSa
+  TestBundleDSb
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1
@@ -160,7 +163,13 @@ set(_test_bundles
   TestBundleDSTOI3
   TestBundleDSTOI5
   TestBundleDSTOI6
+  TestBundleDSTOI7
+  TestBundleDSTOI8
   TestBundleDSTOI9
+  TestBundleDSDGMU
+  TestBundleDSDGOU
+  TestBundleDSDRMU
+  TestBundleDSDROU
   EnglishDictionary
   )
 
@@ -178,6 +187,10 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   gtest
   gmock
   util
+)
+
+add_dependencies(${us_declarativeservices_test_exe_name}
+  DeclarativeServices
   ${_test_bundles}
 )
 

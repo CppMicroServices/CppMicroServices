@@ -20,14 +20,13 @@
 
  =============================================================================*/
 
-#ifndef METADATAPARSERFACTORY_HPP
-#define METADATAPARSERFACTORY_HPP
+#ifndef CM_METADATAPARSERFACTORY_HPP
+#define CM_METADATAPARSERFACTORY_HPP
 
 #include "MetadataParserImpl.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    namespace metadata {
+  namespace util {
       /*
        * Houses a factory member function to return a @c MetadataParser
        */
@@ -53,9 +52,8 @@ namespace cppmicroservices {
           }
         }
       };
-    } // metadata
-  } // cmimpl
+  } // util
 } // cppmicroservices
 
-#endif //METADATAPARSERFACTORY_HPP
+#endif //CM_METADATAPARSERFACTORY_HPP
 

@@ -23,10 +23,10 @@
 #include "cppmicroservices/Bundle.h"
 
 #include "CMBundleExtension.hpp"
-#include "CMConstants.hpp"
-#include "metadata/ConfigurationMetadata.hpp"
-#include "metadata/MetadataParser.hpp"
-#include "metadata/MetadataParserFactory.hpp"
+#include "cppmicroservices/util/CMConstants.hpp"
+#include "cppmicroservices/util/ConfigurationMetadata.hpp"
+#include "cppmicroservices/util/MetadataParser.hpp"
+#include "cppmicroservices/util/MetadataParserFactory.hpp"
 
 namespace cppmicroservices {
   namespace cmimpl {
@@ -43,12 +43,13 @@ namespace cppmicroservices {
         throw std::invalid_argument("Invalid parameters passed to CMBundleExtension constructor");
       }
 
-      if (0u == cmMetadata.count(CMConstants::CM_VERSION))
+      if (0u == cmMetadata.count(cppmicroservices::util::CMConstants::CM_VERSION))
       {
-        throw std::runtime_error(std::string("Metadata is missing mandatory '") + CMConstants::CM_VERSION + "' property");
+        throw std::runtime_error(std::string("Metadata is missing mandatory '") + cppmicroservices::util::CMConstants::CM_VERSION + "' property");
       }
-      auto version = cppmicroservices::any_cast<int>(cmMetadata.at(CMConstants::CM_VERSION));
-      auto metadataParser = metadata::MetadataParserFactory::Create(version, logger);
+      auto version = cppmicroservices::any_cast<int>(cmMetadata.at(cppmicroservices::util::CMConstants::CM_VERSION));
+      auto metadataParser =
+        cppmicroservices::util::MetadataParserFactory::Create(version, logger);
       auto configurationMetadata = metadataParser->ParseAndGetConfigurationMetadata(cmMetadata);
 
       pidsAndChangeCountsAndIDs = configAdminImpl->AddConfigurations(std::move(configurationMetadata));

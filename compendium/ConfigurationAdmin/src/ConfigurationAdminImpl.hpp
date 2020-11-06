@@ -127,8 +127,9 @@ namespace cppmicroservices {
        *
        * See {@code ConfigurationAdminPrivate#AddConfigurations}
        */
-       std::vector<ConfigurationAddedInfo>
-       AddConfigurations(std::vector<metadata::ConfigurationMetadata> configurationMetadata) override;
+       std::vector<ConfigurationAddedInfo> AddConfigurations(
+        std::vector<cppmicroservices::util::ConfigurationMetadata>
+          configurationMetadata) override;
 
       /**
        * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it created

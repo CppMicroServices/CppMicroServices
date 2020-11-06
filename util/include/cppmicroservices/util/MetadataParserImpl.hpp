@@ -20,16 +20,15 @@
 
  =============================================================================*/
 
-#ifndef METADATAPARSERIMPL_HPP
-#define METADATAPARSERIMPL_HPP
+#ifndef CM_METADATAPARSERIMPL_HPP
+#define CM_METADATAPARSERIMPL_HPP
 
 #include "cppmicroservices/logservice/LogService.hpp"
 
 #include "MetadataParser.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    namespace metadata {
+  namespace util {
       /*
        * Represents a concrete implementation (Version 1) of the MetadataParser
        */
@@ -54,8 +53,7 @@ namespace cppmicroservices {
       private:
         std::shared_ptr<cppmicroservices::logservice::LogService> logger;
       };
-    } // metadata
-  } // cmimpl
+  } // util
 } // cppmicroservices
 
-#endif //METADATAPARSERIMPL_HPP
+#endif //CM_METADATAPARSERIMPL_HPP

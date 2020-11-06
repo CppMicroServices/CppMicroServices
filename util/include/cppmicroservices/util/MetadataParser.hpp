@@ -20,14 +20,13 @@
 
  =============================================================================*/
 
-#ifndef METADATAPARSER_HPP
-#define METADATAPARSER_HPP
+#ifndef CM_METADATAPARSER_HPP
+#define CM_METADATAPARSER_HPP
 
 #include "ConfigurationMetadata.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    namespace metadata {
+  namespace util {
 
       /*
        * @brief Represents an abstract metadata parser.
@@ -56,8 +55,7 @@ namespace cppmicroservices {
       protected:
         MetadataParser() = default;
       };
-    } // metadata
-  } // cmimpl
+  } // util
 } // cppmicroservices
 
-#endif //METADATAPARSER_HPP
+#endif //CM_METADATAPARSER_HPP

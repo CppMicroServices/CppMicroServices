@@ -207,17 +207,20 @@ namespace cppmicroservices {
       props["foo"] = std::string{"bar"};
       EXPECT_NO_THROW(conf2->Update(props));
 
-      std::vector<metadata::ConfigurationMetadata> configs;
+      std::vector<cppmicroservices::util::ConfigurationMetadata> configs;
 
-      configs.push_back(metadata::ConfigurationMetadata("test.pid", AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}));
+      configs.push_back(cppmicroservices::util::ConfigurationMetadata(
+        "test.pid", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
 
       AnyMap props2{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
       props2["foo"] = std::string{"baz"};
-      configs.push_back(metadata::ConfigurationMetadata("test.pid2", props2));
+      configs.push_back(
+        cppmicroservices::util::ConfigurationMetadata("test.pid2", props2));
 
       AnyMap props3{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
       props3["bar"] = std::string{"baz"};
-      configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
+      configs.push_back(
+        cppmicroservices::util::ConfigurationMetadata("test.pid3", props3));
 
       auto result = configAdmin.AddConfigurations(std::move(configs));
 
@@ -252,23 +255,28 @@ namespace cppmicroservices {
       const auto conf = configAdmin.GetConfiguration("test.pid");
       const auto conf2 = configAdmin.GetConfiguration("test.pid2");
 
-      std::vector<metadata::ConfigurationMetadata> configs;
+      std::vector<cppmicroservices::util::ConfigurationMetadata> configs;
 
-      configs.push_back(metadata::ConfigurationMetadata("test.pid", AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}));
+      configs.push_back(cppmicroservices::util::ConfigurationMetadata(
+        "test.pid", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
 
       AnyMap props2{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
       props2["foo"] = std::string{"baz"};
-      configs.push_back(metadata::ConfigurationMetadata("test.pid2", props2));
+      configs.push_back(
+        cppmicroservices::util::ConfigurationMetadata("test.pid2", props2));
 
       AnyMap props3{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
       props3["bar"] = std::string{"baz"};
-      configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
+      configs.push_back(
+        cppmicroservices::util::ConfigurationMetadata("test.pid3", props3));
 
       AnyMap props4{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
       props4["baz"] = std::string{"foo"};
-      configs.push_back(metadata::ConfigurationMetadata("test.pid4", props4));
+      configs.push_back(
+        cppmicroservices::util::ConfigurationMetadata("test.pid4", props4));
 
-      configs.push_back(metadata::ConfigurationMetadata("test.pid5", AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}));
+      configs.push_back(cppmicroservices::util::ConfigurationMetadata(
+        "test.pid5", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
 
       auto result = configAdmin.AddConfigurations(std::move(configs));
 

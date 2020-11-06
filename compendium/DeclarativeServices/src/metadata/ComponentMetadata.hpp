@@ -56,6 +56,8 @@ struct ComponentMetadata
   std::vector<ReferenceMetadata> refsMetadata;
   ServiceMetadata serviceMetadata;
   std::unordered_map<std::string, cppmicroservices::Any> properties;
+  std::string configurationPolicy;
+  std::vector<std::string> configurationPids;
 };
 }
 }

@@ -24,6 +24,7 @@
 #include "ComponentMetadata.hpp"
 #include "MetadataParserImpl.hpp"
 #include "Util.hpp"
+#include "cppmicroservices/util/FileSystem.h"
 
 #include <iterator>
 
@@ -119,6 +120,43 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   compMetadata->name = compMetadata->implClassName;
   ObjectValidator(metadata, "name", /*isOptional=*/true).AssignValueTo(compMetadata->name);
 
+  // component.configuration-policy (Optional)
+  ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true)
+    .AssignValueTo(compMetadata->configurationPolicy);
+  if (!((compMetadata->configurationPolicy == "require" |
+       compMetadata->configurationPolicy == "ignore"))) {
+    compMetadata->configurationPolicy = "optional";
+  }
+
+  // component.configuration-pid (Optional)
+
+
+ 
+
+  auto configPid =
+    ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
+  if (!configPid.KeyExists()) {
+    compMetadata->configurationPids.emplace_back(compMetadata->name);
+  }
+  else {
+    std::string configPids;
+    configPid.AssignValueTo(configPids);
+    // configPids contains 1 or more strings separated by spaces. Each string represents
+    // a configuration object on which this service is dependent. $ may be used as a 
+    // shorthand to identify the component name as a pid on which this service is dependent.
+    compMetadata->configurationPids =
+    cppmicroservices::util::SplitString(configPids, " ");
+  
+    //search for $. If present replace with component name. 
+    for (auto it = compMetadata->configurationPids.begin();
+        it != compMetadata->configurationPids.end();++it) {
+        if (*it == "$"){
+          *(it)= compMetadata->name;
+          break;
+        }
+    }   
+}
+  
   // component.properties
   object = ObjectValidator(metadata, "properties", /*isOptional=*/true);
   if (object.KeyExists())

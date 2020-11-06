@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "metadata/ConfigurationMetadata.hpp"
+#include "cppmicroservices/util/ConfigurationMetadata.hpp"
 
 namespace cppmicroservices {
   namespace cmimpl {
@@ -72,8 +72,9 @@ namespace cppmicroservices {
        * @return A vector of ConfigurationAddedInfos, which store the PIDs, changeCounts, and configurationIds of the
        *         Configurations that have been created/updated by this method.
        */
-       virtual std::vector<ConfigurationAddedInfo>
-       AddConfigurations(std::vector<metadata::ConfigurationMetadata> configurationMetadata) = 0;
+       virtual std::vector<ConfigurationAddedInfo> AddConfigurations(
+        std::vector<cppmicroservices::util::ConfigurationMetadata>
+          configurationMetadata) = 0;
 
       /**
        * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it created

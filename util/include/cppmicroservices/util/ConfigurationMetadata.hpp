@@ -28,8 +28,7 @@
 #include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    namespace metadata {
+  namespace util {
       /**
        * Stores configuration information parsed from the configuration properties
        */
@@ -48,8 +47,7 @@ namespace cppmicroservices {
         std::string pid;
         AnyMap properties;
       };
-    } // metadata
-  } // cmimpl
+  } // util
 } // cppmicroservices
 
 #endif //CONFIGURATIONMETADATA_HPP

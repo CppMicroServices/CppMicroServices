@@ -40,6 +40,7 @@
 #include "ConfigurationListenerImpl.hpp"
 
 #include "cppmicroservices/util/ScopeGuard.h"
+#include "cppmicroservices/util/CMConstants.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
 using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
@@ -103,6 +104,9 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     context.RemoveListener(std::move(bundleListenerToken));
     // remove the runtime service from the framework
     scrServiceReg.Unregister();
+    // remove the configuration listener service from the framework
+    configListenerReg.Unregister();
+
     // dispose all components created by SCR
     const auto bundles = context.GetBundles();
     for (auto const& bundle : bundles)
@@ -142,12 +146,13 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
     std::lock_guard<std::mutex> l(bundleRegMutex);
     extensionFound = (bundleRegistry.count(bundle.GetBundleId()) != 0u);
   }
+
   // bundle components have not been loaded, so create the extension which will load the components
-  if (!extensionFound)
+  if (!extensionFound) 
   {
     logger->Log(SeverityLevel::LOG_DEBUG, "Creating SCRBundleExtension ... " + bundle.GetSymbolicName());
     try
-    {
+    { 
       auto const& scrMap = ref_any_cast<cppmicroservices::AnyMap>(headers.at(SERVICE_COMPONENT));
       auto ba = std::make_unique<SCRBundleExtension>(bundle.GetBundleContext(), scrMap, componentRegistry, logger, threadpool);
       {

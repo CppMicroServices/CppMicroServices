@@ -129,34 +129,29 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   }
 
   // component.configuration-pid (Optional)
-
-
- 
-
-  auto configPid =
+  object =
     ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
-  if (!configPid.KeyExists()) {
-    compMetadata->configurationPids.emplace_back(compMetadata->name);
-  }
-  else {
-    std::string configPids;
-    configPid.AssignValueTo(configPids);
-    // configPids contains 1 or more strings separated by spaces. Each string represents
-    // a configuration object on which this service is dependent. $ may be used as a 
-    // shorthand to identify the component name as a pid on which this service is dependent.
-    compMetadata->configurationPids =
-    cppmicroservices::util::SplitString(configPids, " ");
-  
-    //search for $. If present replace with component name. 
+  if (object.KeyExists()) {
+    const auto configPids =
+      object.GetValue<std::vector<cppmicroservices::Any>>();
+    std::transform(std::begin(configPids),
+                   std::end(configPids),
+                   std::back_inserter(compMetadata->configurationPids),
+                   [](const auto& configPid) {
+                     return ObjectValidator(configPid).GetValue<std::string>();
+                   });
+
+    //search for $. If present replace with component name.
     for (auto it = compMetadata->configurationPids.begin();
-        it != compMetadata->configurationPids.end();++it) {
-        if (*it == "$"){
-          *(it)= compMetadata->name;
-          break;
-        }
+         it != compMetadata->configurationPids.end();
+         ++it) {
+      if (*it == "$") {
+        *(it) = compMetadata->name;
+        break;
+      }
     }   
-}
-  
+  }
+
   // component.properties
   object = ObjectValidator(metadata, "properties", /*isOptional=*/true);
   if (object.KeyExists())

@@ -44,6 +44,7 @@ struct ComponentMetadata
     : activateMethodName("Activate")
     , deactivateMethodName("Deactivate")
     , modifiedMethodName("Modified")
+    , configurationPolicy("optional") 
   {}
 
   std::string name;

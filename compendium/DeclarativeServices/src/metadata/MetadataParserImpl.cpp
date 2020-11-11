@@ -142,14 +142,16 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
                    });
 
     //search for $. If present replace with component name.
-    for (auto it = compMetadata->configurationPids.begin();
-         it != compMetadata->configurationPids.end();
-         ++it) {
-      if (*it == "$") {
-        *(it) = compMetadata->name;
-        break;
-      }
-    }   
+    for_each(
+        compMetadata->configurationPids.begin(),
+             compMetadata->configurationPids.end(),
+             [compMetadata](std::string& pid)
+    {
+        if (pid == "$") {
+          pid = compMetadata->name;
+        }
+    });
+  
   }
 
   // component.properties

@@ -22,6 +22,8 @@ limitations under the License.
 
 #include <chrono>
 #include <fstream>
+#include <future>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <type_traits>
@@ -36,6 +38,8 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/util/FileSystem.h"
+#include "cppmicroservices/ServiceTracker.h"
+#include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "gtest/gtest.h"
 
 #ifdef US_PLATFORM_POSIX
@@ -754,4 +758,80 @@ TEST(FrameworkTest, ShutdownAndStart)
   ASSERT_EQ(fwBundle.GetState(), Bundle::STATE_ACTIVE); // "Active framework"
 
   ASSERT_EQ(startCount, 1); // "One framework start notification"
+}
+
+namespace {
+class FooService
+{
+public:
+  virtual ~FooService() = default;
+};
+
+class FooServiceImpl final : public FooService
+{
+public:
+  ~FooServiceImpl() = default;
+};
+
+class CustomFooTracker final
+  : public cppmicroservices::ServiceTrackerCustomizer<FooService>
+{
+  /**
+     * Called when a service is started.
+     */
+  std::shared_ptr<FooService> AddingService(
+    ::cppmicroservices::ServiceReference<FooService> const& reference) override
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    return reference.GetBundle().GetBundleContext().GetService(reference);
+  }
+
+  /**
+     * Called when a service is modified. We don't care about this.
+     */
+  void ModifiedService(::cppmicroservices::ServiceReference<FooService> const&,
+                       std::shared_ptr<FooService> const&) override
+  {}
+
+  /**
+     * Called when a service is removed.
+     */
+  void RemovedService(
+    ::cppmicroservices::ServiceReference<FooService> const& reference,
+    std::shared_ptr<FooService> const& svcProvider) override
+  {}
+};
+}
+
+TEST(FrameworkTest, serviceTrackerCloseRace)
+{
+  // test the thoery that there is a race in SerivceTracker<T>::Close
+  // that leads to a crash inside the service tracker.
+  auto f = FrameworkFactory().NewFramework();
+  f.Start();
+
+  auto customTracker = std::make_unique<CustomFooTracker>();
+  auto tracker = std::make_unique<cppmicroservices::ServiceTracker<FooService>>(
+    f.GetBundleContext(), customTracker.get());
+
+  tracker->Open();
+
+  // attempt to set sleeps at certain points in the code to 
+  // generate the conditions for the race.
+  std::promise<void> gate;
+  auto gateFuture = gate.get_future();
+  auto fut = std::async(
+    std::launch::async, [&f, &gateFuture]() {
+      gateFuture.get();
+      (void)f.GetBundleContext().RegisterService<FooService>(
+        std::make_shared<FooServiceImpl>());
+    });
+
+  gate.set_value();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  tracker->Close();
+
+  fut.get();
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }

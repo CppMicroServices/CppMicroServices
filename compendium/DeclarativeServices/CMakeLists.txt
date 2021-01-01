@@ -56,6 +56,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
+  ${CppMicroServices_BINARY_DIR}/cppmicroservices/cm/include
   ${CppMicroServices_BINARY_DIR}/util/include
   ${CppMicroServices_SOURCE_DIR}/util/include
   ${CppMicroServices_SOURCE_DIR}/compendium/ServiceComponent/include
@@ -63,6 +64,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
+  ${CppMicroServices_SOURCE_DIR}/cppmicroservices/cm/include
   )
 
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost

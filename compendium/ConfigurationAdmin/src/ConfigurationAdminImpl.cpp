@@ -505,7 +505,7 @@ namespace cppmicroservices {
           configListenerTracker->GetServices();
         auto type =
           removed
-            ? cppmicroservices::service::cm::ConfigurationEventType::CM_REMOVED
+            ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
             : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
         
         auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();

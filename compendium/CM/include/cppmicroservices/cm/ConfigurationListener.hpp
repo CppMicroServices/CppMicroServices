@@ -44,7 +44,7 @@ enum class ConfigurationEventType
    * removed 
    */
 
-  CM_REMOVED = 2
+  CM_DELETED = 2
 };
 
 /**

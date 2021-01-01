@@ -12,6 +12,7 @@ set(_srcs
   manager/ComponentConfigurationFactory.cpp
   manager/ComponentConfigurationImpl.cpp
   manager/ComponentManagerImpl.cpp
+  manager/ConfigurationManager.cpp
   manager/ReferenceManagerImpl.cpp
   manager/RegistrationManager.cpp
   manager/SingletonComponentConfiguration.cpp
@@ -48,6 +49,7 @@ set(_private_headers
   manager/ComponentConfigurationImpl.hpp
   manager/ComponentManager.hpp
   manager/ComponentManagerImpl.hpp
+  manager/ConfigurationManager.hpp
   manager/ConcurrencyUtil.hpp
   manager/ReferenceManager.hpp
   manager/ReferenceManagerImpl.hpp

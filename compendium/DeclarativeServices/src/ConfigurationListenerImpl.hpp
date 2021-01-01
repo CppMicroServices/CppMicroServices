@@ -26,26 +26,82 @@
 #include "ComponentRegistry.hpp"
 #include "SCRLogger.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
+#include "manager/ConcurrencyUtil.hpp"
 
 namespace cppmicroservices {
 namespace service {
 namespace cm {
 
-class ConfigurationListenerImpl : public ConfigurationListener
+
+
+/** ConfigChangeNotification
+     * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
+     * about changes to Configuration Objects.
+     */
+struct ConfigChangeNotification final
+{
+  ConfigChangeNotification(const std::string pid,
+                           std::shared_ptr<cppmicroservices::AnyMap> properties,
+                           const ConfigurationEventType evt)
+    : pid(std::move(pid))
+    , newProperties(properties)
+    , event(std::move(evt))
+  {}
+
+  std::string pid;
+  ConfigurationEventType event;
+  std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+};
+
+struct ConfigListenerMapItem final
+{
+  ConfigListenerMapItem(
+    ListenerTokenId token,
+    std::function<void(const ConfigChangeNotification&)> notify)
+    : token(token)
+    , notify(notify)
+  {}
+
+  ListenerTokenId token;
+  std::function<void(const ConfigChangeNotification&)> notify;
+};
+
+class ConfigurationListenerImpl final : public ConfigurationListener
 {
 
 public:
   ConfigurationListenerImpl(
     cppmicroservices::BundleContext context,
-    std::shared_ptr<cppmicroservices::scrimpl::ComponentRegistry>
+    std::shared_ptr<const cppmicroservices::scrimpl::ComponentRegistry>
       componentRegistry,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger);
 
   void configurationEvent(const ConfigurationEvent& event) override;
 
+  cppmicroservices::ListenerTokenId RegisterListener(
+    const std::string pid,
+    std::function<void(const ConfigChangeNotification&)> notify);
+
+  void UnregisterListener(
+    cppmicroservices::ListenerTokenId token);
+
+  //void BatchNotifyAllListeners(
+    //const std::vector<ConfigChangeNotification>& notification) noexcept;
+
+ 
+  //static Guarded<std::multimap<std::string, std::shared_ptr<ConfigListenerMapItem>>> listenersMap; ///< guarded map of listeners
+  static std::mutex listenersMapLock;
+  static std::multimap<std::string, std::shared_ptr<ConfigListenerMapItem>> listenersMap;
+
 private:
+  static std::atomic<cppmicroservices::ListenerTokenId>
+    tokenCounter; ///< used to
+                  ///generate unique
+                  ///tokens for
+                  ///listeners
+
   cppmicroservices::BundleContext bundleContext;
-  std::shared_ptr<cppmicroservices::scrimpl::ComponentRegistry> registry;
+  const std::shared_ptr<const cppmicroservices::scrimpl::ComponentRegistry> registry;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
 };
 

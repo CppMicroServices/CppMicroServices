@@ -37,6 +37,8 @@
 #include "../metadata/ComponentMetadata.hpp"
 #include "ReferenceManager.hpp"
 #include "states/ComponentConfigurationState.hpp"
+#include "ConfigurationManager.hpp"
+#include "../ConfigurationListenerImpl.hpp"
 
 using cppmicroservices::service::component::detail::ComponentInstance;
 using cppmicroservices::scrimpl::ReferenceManager;
@@ -292,6 +294,22 @@ private:
   void RefUnsatisfied(const std::string& refName);
 
   /**
+   * Utility method called to determine if all references for the component
+   * are satisfied. This method is called from {@link #ConfigChangedState} when
+   * Configuration objects are satisfied.
+   */
+  bool AreReferencesSatisfied();
+
+  /**
+   * Observer callback method. This method is registered with the ConfigurationListener.
+   * When a configuration object is \c updated or \c deleted, this
+   * method is called by the ConfigurationListener to process the change to the 
+   * configuration object.
+   */
+  
+  void ConfigChangedState(const cppmicroservices::service::cm::ConfigChangeNotification& notification);
+
+  /**
    * Method is responsible for loading the bundle and populating the function
    * objects \c newCompInstanceFunc & \c deleteCompInstanceFunc used to create
    * and destroy the {@link ComponentInstance} objects from a bundle.
@@ -324,8 +342,10 @@ private:
   std::unique_ptr<RegistrationManager> regManager; ///< registration manager used to manage registration/unregistration of the service provided by this component
   std::unordered_map<std::string, std::shared_ptr<ReferenceManager>> referenceManagers; ///< map of all the reference managers
   std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId> referenceManagerTokens; ///< map of the listener tokens received from the reference managers
+  std::shared_ptr<ConfigurationManager> configManager; ///< manages configuration objects
+  std::shared_ptr<cppmicroservices::service::cm::ConfigurationListenerImpl> configListener; // to get updates for configuration objects
+  std::vector<ListenerTokenId> configListenerTokens; ///< vector of the listener tokens received from the config manager
   std::shared_ptr<ComponentConfigurationState> state; ///< only modified using std::atomic operations
-
   std::function<ComponentInstance*(void)> newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class from the component's bundle
   std::function<void(ComponentInstance*)> deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance} class from the component's bundle
 };

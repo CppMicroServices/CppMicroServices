@@ -32,7 +32,12 @@ ConfigurationManager::ConfigurationManager(
   , logger(std::move(logger))
   , bundleContext(bc)
   , mergedProperties (metadata->properties)
-{}
+{
+  if (!this->metadata || !this->bundleContext || !this->logger) {
+    throw std::invalid_argument(
+      "ConfigurationManagerImpl - Invalid arguments passed to constructor");
+  }
+}
 
 cppmicroservices::AnyMap ConfigurationManager::GetProperties() const noexcept
 {
@@ -40,7 +45,7 @@ cppmicroservices::AnyMap ConfigurationManager::GetProperties() const noexcept
 }
 
 void ConfigurationManager::Initialize() {
-  if (metadata->configurationPids.empty()) return;
+  if (metadata->configurationPids.empty() || metadata->configurationPolicy == "ignore") return;
   auto sr =
     this->bundleContext
       .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();

@@ -47,6 +47,16 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 typedef std::pair<std::shared_ptr<ComponentInstance>, std::shared_ptr<ComponentContextImpl>> InstanceContextPair;
+struct ListenerToken final
+{
+  ListenerToken(const std::string pid, const ListenerTokenId tokenId)
+    : pid(std::move(pid))
+    , tokenId(std::move(tokenId))
+  {}
+  std::string pid;
+  ListenerTokenId tokenId;
+};
+
 /**
  * Abstract class responsible for implementing the state machine
  * for component configurations and some utility methods to create and
@@ -344,7 +354,7 @@ private:
   std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId> referenceManagerTokens; ///< map of the listener tokens received from the reference managers
   std::shared_ptr<ConfigurationManager> configManager; ///< manages configuration objects
   std::shared_ptr<cppmicroservices::service::cm::ConfigurationListenerImpl> configListener; // to get updates for configuration objects
-  std::vector<ListenerTokenId> configListenerTokens; ///< vector of the listener tokens received from the config manager
+  std::vector<std::shared_ptr<ListenerToken>> configListenerTokens; ///< vector of the listener tokens received from the config manager
   std::shared_ptr<ComponentConfigurationState> state; ///< only modified using std::atomic operations
   std::function<ComponentInstance*(void)> newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class from the component's bundle
   std::function<void(ComponentInstance*)> deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance} class from the component's bundle

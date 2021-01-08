@@ -23,7 +23,7 @@
 #include "ComponentConfigurationImpl.hpp"
 #include <cassert>
 #include <iostream>
-
+#include <memory>
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "RegistrationManager.hpp"
 #include "ConfigurationManager.hpp"
@@ -76,12 +76,12 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(std::shared_ptr<const met
                                                              , this->metadata->name);
     referenceManagers.emplace(refMetadata.name, refManager);
   }
-   if (this->metadata->configurationPids.size() > 0) {
-
+   if (this->metadata->configurationPids.size() > 0 && this->metadata->configurationPolicy != "ignore") {
+    cppmicroservices::BundleContext bundleContext = bundle.GetBundleContext();
     configManager = std::make_shared<ConfigurationManager>(
-       this->metadata, bundle.GetBundleContext(), this->logger);
+       this->metadata,bundleContext, this->logger);
      configListener = std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(
-       bundle.GetBundleContext(), registry, logger);
+      bundleContext, this->registry, this->logger);
    
   }
 }
@@ -104,7 +104,7 @@ void ComponentConfigurationImpl::Stop()
   }
   
   for (auto listener : configListenerTokens) {
-    configListener->UnregisterListener(listener);
+    configListener->UnregisterListener(listener->pid, listener->tokenId);
   }
   configListenerTokens.clear();
   
@@ -132,7 +132,8 @@ void ComponentConfigurationImpl::Initialize()
 {
   // Call Register if no dependencies exist
   // If dependencies exist, the dependency tracker mechanism will trigger the call to Register at the appropriate time.
-  if(referenceManagers.empty() && metadata->configurationPids.empty()) {
+  if(referenceManagers.empty() && (metadata->configurationPids.empty()
+      || metadata->configurationPolicy == "ignore" )) {
     GetState()->Register(*this);
   }
   else {
@@ -141,7 +142,7 @@ void ComponentConfigurationImpl::Initialize()
       auto token = refManager->RegisterListener(std::bind(&ComponentConfigurationImpl::RefChangedState, this, std::placeholders::_1));
       referenceManagerTokens.emplace(refManager, token);
     }
-    if (!metadata->configurationPids.empty()) {
+    if (!metadata->configurationPids.empty() && metadata->configurationPolicy != "ignore") {
       
       // Call RegisterListener to register listeners to listen for changes to configuration objects 
       // before calling configManager->Initialize. The Initialize method will get the configuration object
@@ -150,7 +151,8 @@ void ComponentConfigurationImpl::Initialize()
       for (auto pid : metadata->configurationPids) {
         auto token = configListener->RegisterListener(pid
                                ,std::bind(&ComponentConfigurationImpl::ConfigChangedState, this, std::placeholders::_1));
-        configListenerTokens.emplace_back(token);
+        auto listenerToken = std::make_shared<ListenerToken>(pid, token);
+        configListenerTokens.emplace_back(listenerToken);
       }
       configManager->Initialize();
     }

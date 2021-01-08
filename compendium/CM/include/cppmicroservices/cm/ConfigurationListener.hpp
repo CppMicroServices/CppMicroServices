@@ -58,7 +58,7 @@ public:
                      const ConfigurationEventType _type,
                      const std::string _factoryPid,
                      const std::string _pid)
-    : configAdmin(_configAdmin)
+    : configAdmin(std::move(_configAdmin))
     , type(_type)
     , factoryPid(std::move(_factoryPid))
     , pid(std::move(_pid))
@@ -83,7 +83,7 @@ public:
   ConfigurationEventType getType() const { return type; }
 
 private:
-  const ServiceReference<ConfigurationAdmin>& configAdmin;
+  const ServiceReference<ConfigurationAdmin> configAdmin;
   const std::string pid;
   const std::string factoryPid;
   const ConfigurationEventType type;

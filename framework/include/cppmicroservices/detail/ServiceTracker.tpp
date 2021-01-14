@@ -143,7 +143,7 @@ template<class S, class T>
 void ServiceTracker<S,T>::Close()
 {
   std::vector<ServiceReference<S>> references;
-  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Exchange(std::shared_ptr<_TrackedService>());
+  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
   if (outgoing == nullptr)
   {
     return;
@@ -229,7 +229,7 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
       timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
-  } while (!object);
+  } while (!object && !d->Tracked()->closed);
 
   return object;
 }

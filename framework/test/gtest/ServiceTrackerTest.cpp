@@ -410,7 +410,7 @@ TEST_F(ServiceTrackerTestFixture, ServiceTrackerConcurrentOpenClose)
     context, customTracker.get());
 
   size_t numThreads = std::thread::hardware_concurrency();
-  ASSERT_GT(numThreads, 0) << "number of threads is 0";
+  ASSERT_GT(numThreads, 0ull) << "number of threads is 0";
   std::vector<std::future<void>> futures;
   std::promise<void> gate;
   auto gateFuture = gate.get_future().share();

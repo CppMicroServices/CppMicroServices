@@ -368,8 +368,8 @@ class CustomFooTracker final
      * Called when a service is removed.
      */
   void RemovedService(
-    ::cppmicroservices::ServiceReference<FooService> const& reference,
-    std::shared_ptr<FooService> const& svcProvider) override
+    ::cppmicroservices::ServiceReference<FooService> const& ,
+    std::shared_ptr<FooService> const& ) override
   {}
 };
 }
@@ -418,7 +418,7 @@ TEST_F(ServiceTrackerTestFixture, ServiceTrackerConcurrentOpenClose)
     futures.push_back(
       std::async(std::launch::async, [i, &tracker, &gateFuture]() {
         gateFuture.get();
-        for (int i = 0; i < 1000; ++i) {
+        for (int n = 0; n < 1000; ++n) {
           if (i % 2 == 0) {
             tracker->Open();
           } else {

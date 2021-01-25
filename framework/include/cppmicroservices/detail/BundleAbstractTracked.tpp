@@ -104,7 +104,10 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::Close()
 {
+  auto l = this->Lock(); US_UNUSED(l);
   closed = true;
+  tracked.clear();
+  trackingCount = 0;
 }
 
 template<class S, class TTT, class R>

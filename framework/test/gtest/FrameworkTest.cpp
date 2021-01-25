@@ -22,8 +22,6 @@ limitations under the License.
 
 #include <chrono>
 #include <fstream>
-#include <future>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <type_traits>
@@ -38,8 +36,6 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/util/FileSystem.h"
-#include "cppmicroservices/ServiceTracker.h"
-#include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "gtest/gtest.h"
 
 #ifdef US_PLATFORM_POSIX

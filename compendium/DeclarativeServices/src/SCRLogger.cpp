@@ -35,7 +35,6 @@ SCRLogger::SCRLogger(cppmicroservices::BundleContext context)
 
 SCRLogger::~SCRLogger()
 {
-
 }
 
 void SCRLogger::StopTracking()

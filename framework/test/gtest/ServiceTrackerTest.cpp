@@ -37,6 +37,7 @@
 #include <future>
 #include <memory>
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 using namespace cppmicroservices;
@@ -104,6 +105,15 @@ public:
 
 private:
   BundleContext m_context;
+};
+
+template<typename Interface>
+class MockCustomizedServiceTracker : public cppmicroservices::ServiceTrackerCustomizer<Interface>
+{
+public:
+    MOCK_METHOD(std::shared_ptr<Interface>, AddingService,(const ServiceReference<Interface>& reference), (override));
+    MOCK_METHOD(void, ModifiedService, (const ServiceReference<Interface>& reference, const std::shared_ptr<Interface>& service), (override));
+    MOCK_METHOD(void, RemovedService, (const ServiceReference<Interface>& reference, const std::shared_ptr<Interface>& service), (override));
 };
 
 class ServiceTrackerTestFixture : public ::testing::Test
@@ -328,6 +338,21 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   // 20. Test the waitForService method
   auto o9 = st1->WaitForService(std::chrono::milliseconds(50));
   ASSERT_TRUE(o9 && !o9->empty()) << "Checking WaitForService method";
+
+  // Test that there is no RemovedService callback triggered when closing a service tracker
+  MockCustomizedServiceTracker<MyInterfaceOne> customizer;
+
+  // expect that closing the tracker while the service is still registered never results in RemovedService being called.
+  EXPECT_CALL(customizer, AddingService(::testing::_)).Times(::testing::Exactly(1));
+  EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_)).Times(::testing::Exactly(0));
+  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_)).Times(::testing::Exactly(0));
+
+  auto tracker = std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(context, &customizer);
+  tracker->Open();
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+  auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  tracker->Close();
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -435,4 +460,3 @@ TEST_F(ServiceTrackerTestFixture, ServiceTrackerConcurrentOpenClose)
   }
 }
 #endif
-

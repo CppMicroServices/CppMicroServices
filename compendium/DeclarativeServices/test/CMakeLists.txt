@@ -199,6 +199,10 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(${us_declarativeservices_test_exe_name} PRIVATE rt)
 endif()
 
+# Needed for 'TestComponentLifecycle' test 
+if(MINGW)
+  target_link_libraries(${us_declarativeservices_test_exe_name} PRIVATE -lpsapi)
+endif()
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
 # GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.

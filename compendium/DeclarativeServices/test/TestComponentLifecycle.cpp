@@ -188,7 +188,7 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle_Dynamic) // DS_TOI_51
 }
 
 //Function to validate lazy loading of delayed component
-void lazyLoadingValidation(std::string expectedResult)
+std::size_t lazyLoadingValidation()
 {
   #if defined(_WIN32)
 
@@ -212,23 +212,15 @@ void lazyLoadingValidation(std::string expectedResult)
     }
 
     std::size_t found = result.find("TestBundleDSTOI6");
-    if ("loaded" == expectedResult)
-    {
-        EXPECT_NE(found, std::string::npos) << "library must be available";
-    }
-    else
-    {
-        EXPECT_EQ(found, std::string::npos) << "library must not be available";
-    }
 
     CloseHandle(hProcess);
     result.clear();
-
+    return found;
   #else
     auto pid_t = getpid();
     std::string command("lsof -p " + std::to_string(pid_t));
     FILE* fd = popen(command.c_str(), "r");
-    EXPECT_NE(fd, nullptr) << "popen failed";
+    ASSERT_NE(fd, nullptr) << "popen failed";
 
     std::string result;
     char buf[PATH_MAX];
@@ -238,20 +230,11 @@ void lazyLoadingValidation(std::string expectedResult)
     }
 
     std::size_t found = result.find("TestBundleDSTOI6");
-    if ("loaded" == expectedResult)
-    {
-        EXPECT_NE(found, std::string::npos) << "library must be available";
-    }
-    else
-    {
-        EXPECT_EQ(found, std::string::npos) << "library must not be available";
-    }
-
-
+   
     auto fc = pclose(fd);
     EXPECT_NE(fc, -1) << "pclose failed";
     result.clear();
-
+    return found;
   #endif
 }
 
@@ -272,7 +255,8 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   auto sRef = ctxt.GetServiceReference<test::Interface2>();
   EXPECT_FALSE(static_cast<bool>(sRef)) << "Service must not be available before it's dependency";
   
-  lazyLoadingValidation("not loaded");
+  auto result = lazyLoadingValidation();
+  EXPECT_EQ(result, std::string::npos) << "library must not be available";
 
   std::mutex mtx, mtx1;
   std::condition_variable cv, cv1;
@@ -302,7 +286,8 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::SATISFIED);
 
-  lazyLoadingValidation("not loaded");
+  result = lazyLoadingValidation();
+  EXPECT_EQ(result, std::string::npos) << "library must not be available";
 
   auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
   ASSERT_TRUE(static_cast<bool>(sRef1)) << "Service must be available after it's dependency is available";
@@ -312,7 +297,8 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::ACTIVE) << "State must be ACTIVE after call to GetService";
   EXPECT_NO_THROW(service->ExtendedDescription()) << "Throws if the dependency could not be found";
 
-  lazyLoadingValidation("loaded");
+  result = lazyLoadingValidation();
+  EXPECT_NE(result, std::string::npos) << "library must be available";
 
   auto token1 = ctxt.AddServiceListener([&](const cppmicroservices::ServiceEvent& evt) {
                                           //std::cout << evt << std::endl;

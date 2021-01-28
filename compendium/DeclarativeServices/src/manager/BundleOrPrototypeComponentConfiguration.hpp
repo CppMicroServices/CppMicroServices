@@ -26,6 +26,7 @@
 #include "ComponentConfigurationImpl.hpp"
 #include "ConcurrencyUtil.hpp"
 #include <cppmicroservices/ServiceFactory.h>
+#include "boost/asio/thread_pool.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -42,7 +43,9 @@ public:
   explicit BundleOrPrototypeComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                                                        const cppmicroservices::Bundle& bundle,
                                                        std::shared_ptr<const ComponentRegistry> registry,
-                                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+                                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                                       std::shared_ptr<boost::asio::thread_pool> threadpool,
+                                                       std::shared_ptr<ConfigurationNotifier> configNotifier);
   BundleOrPrototypeComponentConfigurationImpl(const BundleOrPrototypeComponentConfigurationImpl&) = delete;
   BundleOrPrototypeComponentConfigurationImpl(BundleOrPrototypeComponentConfigurationImpl&&) = delete;
   BundleOrPrototypeComponentConfigurationImpl& operator=(const BundleOrPrototypeComponentConfigurationImpl&) = delete;

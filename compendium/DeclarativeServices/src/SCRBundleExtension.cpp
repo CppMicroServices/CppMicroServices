@@ -33,6 +33,7 @@
 #include "cppmicroservices/util/MetadataParserImpl.hpp"
 #include "cppmicroservices/util/MetadataParserFactory.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 
 using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
 
@@ -41,16 +42,19 @@ namespace scrimpl {
 
 using metadata::ComponentMetadata;
 using util::ObjectValidator;
+
 SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bundleContext,
                                        const cppmicroservices::AnyMap& scrMetadata,
                                        const std::shared_ptr<ComponentRegistry>& registry,
                                        const std::shared_ptr<LogService>& logger,
-                                       const std::shared_ptr<boost::asio::thread_pool>& threadpool)
+                                       const std::shared_ptr<boost::asio::thread_pool>& threadpool,
+                                       const std::shared_ptr<ConfigurationNotifier>& configNotifier)
   : bundleContext(bundleContext)
   , registry(registry)
   , logger(logger)
+  , configNotifier(configNotifier)
 {
-  if(!bundleContext || !registry || !logger || scrMetadata.empty() || !threadpool)
+  if(!bundleContext || !registry || !logger || scrMetadata.empty() || !threadpool || !configNotifier)
   {
     throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension constructor");
   }
@@ -67,7 +71,8 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
                                                                 registry,
                                                                 bundleContext,
                                                                 logger,
-                                                                threadpool);
+                                                                threadpool,
+                                                                configNotifier);
       if(registry->AddComponentManager(compManager))
       {
         managers.push_back(compManager);

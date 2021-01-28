@@ -40,15 +40,17 @@ ComponentManagerImpl::ComponentManagerImpl(std::shared_ptr<const metadata::Compo
                                            std::shared_ptr<const ComponentRegistry> registry,
                                            BundleContext bundleContext,
                                            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                           std::shared_ptr<boost::asio::thread_pool> threadpool)
+                                           std::shared_ptr<boost::asio::thread_pool> threadpool,
+                                           std::shared_ptr<ConfigurationNotifier> configNotifier)
   : registry(std::move(registry))
   , compDesc(std::move(metadata))
   , bundleContext(std::move(bundleContext))
   , logger(std::move(logger))
   , state(std::make_shared<CMDisabledState>())
   , threadpool(threadpool)
+  , configNotifier(configNotifier)
 {
-  if(!compDesc || !this->registry || !this->bundleContext || !this->logger || !this->threadpool)
+  if(!compDesc || !this->registry || !this->bundleContext || !this->logger || !this->threadpool || !this->configNotifier)
   {
     throw std::invalid_argument("Invalid arguments to ComponentManagerImpl constructor");
   }
@@ -138,10 +140,13 @@ std::shared_future<void> ComponentManagerImpl::PostAsyncDisabledToEnabled(
   auto bundle = GetBundle();
   auto reg = GetRegistry();
   auto logger = GetLogger();
-
+  auto threadpool = GetThreadPool();
+  auto configNotifier = GetConfigNotifier();
+ 
   std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task(
-    [metadata, bundle, reg, logger](std::shared_ptr<CMEnabledState> eState) {
-      eState->CreateConfigurations(metadata, bundle, reg, logger);
+    [metadata, bundle, reg, logger, threadpool, configNotifier](
+      std::shared_ptr<CMEnabledState> eState) { eState->CreateConfigurations(
+        metadata, bundle, reg, logger, threadpool, configNotifier);
     });
 
   using Sig = void(std::shared_ptr<CMEnabledState>);

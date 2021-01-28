@@ -232,8 +232,9 @@ public:
                            std::shared_ptr<const ComponentRegistry> registry,
                            BundleContext bundleContext,
                            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-      std::shared_ptr<boost::asio::thread_pool> pool)
-    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool)
+      std::shared_ptr<boost::asio::thread_pool> pool,
+      std::shared_ptr<ConfigurationNotifier> notifier)
+    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool, notifier)
     , statechangecount(0)
   {
   }
@@ -268,8 +269,10 @@ public:
   MockComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                                  const Bundle& bundle,
                                  std::shared_ptr<const ComponentRegistry> registry,
-                                 std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-    : ComponentConfigurationImpl(metadata, bundle, registry, logger)
+                                 std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                 std::shared_ptr<boost::asio::thread_pool> threadpool,
+                                 std::shared_ptr<ConfigurationNotifier> notifier)
+    : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, notifier)
     , statechangecount(0)
   {}
   virtual ~MockComponentConfigurationImpl() = default;

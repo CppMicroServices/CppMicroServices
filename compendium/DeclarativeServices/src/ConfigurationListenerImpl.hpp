@@ -20,13 +20,13 @@
 
  =============================================================================*/
 
-#ifndef cppmicroservices_service_cm_ConfigurationListeneImpl_HPP
-#define cppmicroservices_service_cm_ConfigurationListeneImpl_HPP
+#ifndef cppmicroservices_service_cm_ConfigurationListenerImpl_HPP
+#define cppmicroservices_service_cm_ConfigurationListenerImpl_HPP
 
-#include "ComponentRegistry.hpp"
 #include "SCRLogger.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "manager/ConcurrencyUtil.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 
 namespace cppmicroservices {
 namespace service {
@@ -38,12 +38,12 @@ namespace cm {
      */
 struct ConfigChangeNotification final
 {
-  ConfigChangeNotification(const std::string _pid,
-                           std::shared_ptr<cppmicroservices::AnyMap> _properties,
-                           const ConfigurationEventType _evt)
-    : pid(std::move(_pid))
-    , newProperties(_properties)
-    , event(std::move(_evt))
+  ConfigChangeNotification(const std::string pid,
+                           std::shared_ptr<cppmicroservices::AnyMap> properties,
+                           const ConfigurationEventType evt)
+    : pid(std::move(pid))
+    , newProperties(std::move(properties))
+    , event(std::move(evt))
   {}
 
   std::string pid;
@@ -54,11 +54,14 @@ class ConfigurationListenerImpl final : public ConfigurationListener
 {
 
 public:
+  /*
+  *@throws std::invalid_argument exception if any of the params is a nullptr 
+  */
   ConfigurationListenerImpl(
-    cppmicroservices::BundleContext _context,
-    std::shared_ptr<const cppmicroservices::scrimpl::ComponentRegistry>
-      _componentRegistry,
-    std::shared_ptr<cppmicroservices::logservice::LogService> _logger);
+    cppmicroservices::BundleContext context,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier
+  );
   ConfigurationListenerImpl(const ConfigurationListenerImpl&) = delete;
   ConfigurationListenerImpl(ConfigurationListenerImpl&&) = delete;
   ConfigurationListenerImpl& operator=(const ConfigurationListenerImpl&) =    delete;
@@ -67,34 +70,16 @@ public:
   
   void configurationEvent(const ConfigurationEvent& event) override;
 
-  cppmicroservices::ListenerTokenId RegisterListener(
-    const std::string& pid,
-    std::function<void(const ConfigChangeNotification&)> notify);
-
-
-  void UnregisterListener(const std::string& pid,
-    const cppmicroservices::ListenerTokenId token);
 
  private:
-  using TokenMap =
-    std::unordered_map<ListenerTokenId,
-                       std::function<void(const ConfigChangeNotification&)>>;
-
-   static cppmicroservices::scrimpl::Guarded < std::unordered_map < std::string,
-     std::shared_ptr <TokenMap>>> listenersMap;
-
-  static std::atomic<cppmicroservices::ListenerTokenId>
-    tokenCounter; ///< used to
-                  ///generate unique
-                  ///tokens for
-                  ///listeners
 
   cppmicroservices::BundleContext bundleContext;
-  const std::shared_ptr<const cppmicroservices::scrimpl::ComponentRegistry> registry;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+  std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>
+    configNotifier;
 };
 
 } // namespace cm
 } // namespace service
 } // namespace cppmicroservices
-#endif //cppmicroservices_service_cm_ConfigurationListeneImpl_HPP
+#endif //cppmicroservices_service_cm_ConfigurationListenerImpl_HPP

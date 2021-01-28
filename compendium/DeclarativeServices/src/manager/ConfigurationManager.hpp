@@ -42,6 +42,9 @@ namespace scrimpl {
 class ConfigurationManager final
 {
 public:
+  /**
+   * @throws std::invalid_argument exception if any of the params is a nullptr 
+   */
   ConfigurationManager::ConfigurationManager(
     std::shared_ptr<const metadata::ComponentMetadata> metadata,
     const cppmicroservices::BundleContext& bc,
@@ -55,6 +58,9 @@ public:
 
   /**
   * Method to initialize a newly constructed Configuration Manager. 
+   * @throws std::runtime_error If BundleContext is no longer valid.
+   * @throws ServiceException if GetServiceReference for ConfigurationAdmin fails.
+   * @throws std::bad_alloc exception if memory cannot be allocated
   */
   void Initialize();
 
@@ -70,11 +76,15 @@ public:
    * If the component has configuration object dependencies then the properties for
    * the component are merged from the component properties and the properties for 
    * the configuration objects. 
+   * @throws std::bad_alloc exception if memory cannot be allocated
    */
   void UpdateMergedProperties(
       const std::string pid,
       std::shared_ptr<cppmicroservices::AnyMap> props,
-    const cppmicroservices::service::cm::ConfigurationEventType type) noexcept;
+    const cppmicroservices::service::cm::ConfigurationEventType type,
+    const ComponentState currentState,
+    bool& configWasSatisfied,
+    bool& configIsNowSatisfied);
  
   /* To be implemented. */
    void SendModifiedPropertiesToComponent();
@@ -85,13 +95,14 @@ public:
    */
    cppmicroservices::AnyMap GetProperties() const noexcept;
 
- protected:
-  ConfigurationManager() = default;
+ private:
+   bool isConfigSatisfied(const ComponentState currentState) const noexcept;
 
   std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger for this runtime
   const std::shared_ptr<const metadata::ComponentMetadata> metadata;
   cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
-  std::unordered_map<std::string, cppmicroservices::AnyMap>  configProperties;  //properties for available configuration objects.
+  mutable std::mutex propertiesMutex; // mutex to protect the configProperties and mergedProperties members
+  std::unordered_map<std::string, cppmicroservices::AnyMap> configProperties; //properties for available configuration objects.
   cppmicroservices::AnyMap mergedProperties;
 };
 }

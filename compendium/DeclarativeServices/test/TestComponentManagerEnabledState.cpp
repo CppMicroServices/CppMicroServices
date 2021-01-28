@@ -48,10 +48,13 @@ protected:
     auto compDesc = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto pool = std::make_shared<boost::asio::thread_pool>(1);
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger);
+
     compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                          mockRegistry,
                                                          framework.GetBundleContext(),
-                                                         fakeLogger, pool);
+                                                         fakeLogger, pool, notifier);
   }
 
   virtual void TearDown() {
@@ -90,7 +93,9 @@ TEST_F(CMEnabledStateTest, TestGetConfigurations)
   enabledState->configurations = { std::make_shared<MockComponentConfigurationImpl>(compMgr->GetMetadata(),
                                                                                     framework,
                                                                                     compMgr->GetRegistry(),
-                                                                                    compMgr->GetLogger()) };
+                                                                                    compMgr->GetLogger(), 
+                                                                                    compMgr->GetThreadPool(), 
+                                                                                    compMgr->GetConfigNotifier()) };
   auto fut = std::async(std::launch::async, [&](){
                                               return enabledState->GetConfigurations(*compMgr);
                                             });
@@ -184,7 +189,7 @@ TEST_F(CMEnabledStateTest, TestCreateConfigurations)
       enabledState->CreateConfigurations(compMgr->GetMetadata(),
                                          compMgr->GetBundle(),
                                          compMgr->GetRegistry(),
-                                         compMgr->GetLogger());
+                                         compMgr->GetLogger(), compMgr->GetThreadPool(), compMgr->GetConfigNotifier());
     });
   EXPECT_EQ(enabledState->configurations.size(), 1ul) << "Must have a configuration created after call to CreateConfigurations";
   enabledState->configurations.clear(); // remove configs due to the call to the private method.

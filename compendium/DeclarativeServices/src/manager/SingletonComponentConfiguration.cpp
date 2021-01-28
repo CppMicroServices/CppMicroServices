@@ -40,8 +40,10 @@ namespace scrimpl {
 SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                                                                          const Bundle& bundle,
                                                                          std::shared_ptr<const ComponentRegistry> registry,
-                                                                         std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  : ComponentConfigurationImpl(metadata, bundle, registry, logger)
+                                                                         std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                                                         std::shared_ptr<boost::asio::thread_pool> threadpool,
+                                                                         std::shared_ptr<ConfigurationNotifier> configNotifier)
+  : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, configNotifier)
 {
 }
 

@@ -32,6 +32,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "ComponentManager.hpp"
+#include "ConfigurationNotifier.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -52,7 +53,8 @@ public:
                        std::shared_ptr<const ComponentRegistry> registry,
                        cppmicroservices::BundleContext bundleContext,
                        std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                       std::shared_ptr<boost::asio::thread_pool> threadpool);
+                       std::shared_ptr<boost::asio::thread_pool> threadpool,
+                       std::shared_ptr<ConfigurationNotifier> configNotifier);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
   ComponentManagerImpl(ComponentManagerImpl&&) = delete;
   ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
@@ -110,6 +112,20 @@ public:
   std::shared_ptr<cppmicroservices::logservice::LogService> GetLogger() const
   { return logger; }
 
+  /**
+   * Returns the configNotifier object associated with this ComponentManager
+   */
+  std::shared_ptr<ConfigurationNotifier> GetConfigNotifier() const
+  {
+    return configNotifier;
+  }
+  /**
+   * Returns the threadpool object associated with this ComponentManager
+   */
+  std::shared_ptr<boost::asio::thread_pool> GetThreadPool() const
+  {
+    return threadpool;
+  }
   /**
    * This method modifies the vector of futures stored in this object. If
    * any of the futures in the vector are ready, the ready future is replaced
@@ -174,6 +190,7 @@ private:
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
   std::shared_ptr<boost::asio::thread_pool> threadpool; ///< thread pool used to execute async work
   std::mutex transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 }
 }

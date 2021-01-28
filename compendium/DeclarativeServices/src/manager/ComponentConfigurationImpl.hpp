@@ -39,6 +39,8 @@
 #include "states/ComponentConfigurationState.hpp"
 #include "ConfigurationManager.hpp"
 #include "../ConfigurationListenerImpl.hpp"
+#include "ConfigurationNotifier.hpp"
+#include "boost/asio/thread_pool.hpp"
 
 using cppmicroservices::service::component::detail::ComponentInstance;
 using cppmicroservices::scrimpl::ReferenceManager;
@@ -74,7 +76,9 @@ public:
   explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata
                                       , const Bundle& bundle
                                       , std::shared_ptr<const ComponentRegistry> registry
-                                      , std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+                                      , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                                      , std::shared_ptr<boost::asio::thread_pool> threadpool
+                                      , std::shared_ptr<ConfigurationNotifier> configNotifier);
   ComponentConfigurationImpl(const ComponentConfigurationImpl&) = delete;
   ComponentConfigurationImpl(ComponentConfigurationImpl&&) = delete;
   ComponentConfigurationImpl& operator=(const ComponentConfigurationImpl&) = delete;
@@ -308,7 +312,7 @@ private:
    * are satisfied. This method is called from {@link #ConfigChangedState} when
    * Configuration objects are satisfied.
    */
-  bool AreReferencesSatisfied();
+  bool AreReferencesSatisfied() const noexcept;
 
   /**
    * Observer callback method. This method is registered with the ConfigurationListener.
@@ -317,7 +321,7 @@ private:
    * configuration object.
    */
   
-  void ConfigChangedState(const cppmicroservices::service::cm::ConfigChangeNotification& notification);
+  void ConfigChangedState(const ConfigChangeNotification& notification);
 
   /**
    * Method is responsible for loading the bundle and populating the function
@@ -352,8 +356,9 @@ private:
   std::unique_ptr<RegistrationManager> regManager; ///< registration manager used to manage registration/unregistration of the service provided by this component
   std::unordered_map<std::string, std::shared_ptr<ReferenceManager>> referenceManagers; ///< map of all the reference managers
   std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId> referenceManagerTokens; ///< map of the listener tokens received from the reference managers
+  std::shared_ptr<boost::asio::thread_pool> threadpool;
   std::shared_ptr<ConfigurationManager> configManager; ///< manages configuration objects
-  std::shared_ptr<cppmicroservices::service::cm::ConfigurationListenerImpl> configListener; // to get updates for configuration objects
+  std::shared_ptr<ConfigurationNotifier> configNotifier; // to get updates for configuration objects
   std::vector<std::shared_ptr<ListenerToken>> configListenerTokens; ///< vector of the listener tokens received from the config manager
   std::shared_ptr<ComponentConfigurationState> state; ///< only modified using std::atomic operations
   std::function<ComponentInstance*(void)> newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class from the component's bundle

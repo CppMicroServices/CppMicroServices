@@ -69,30 +69,33 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
+  auto bundleContext = GetFramework().GetBundleContext();
+  auto notifier =
+    std::make_shared<ConfigurationNotifier>(bundleContext, fakeLogger);
   EXPECT_THROW({
       SCRBundleExtension bundleExt(BundleContext(),
                                    headers,
                                    mockRegistry,
-                                   fakeLogger, pool);
+                                   fakeLogger, pool, notifier);
     }, std::invalid_argument);
   EXPECT_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
-                                   nullptr, fakeLogger, pool);
+                                   nullptr, fakeLogger, pool, notifier);
     }, std::invalid_argument);
   EXPECT_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
                                    mockRegistry,
                                    nullptr,
-                                   pool);
+                                   pool, notifier);
     }, std::invalid_argument);
   EXPECT_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
                                    mockRegistry,
                                    fakeLogger,
-                                   pool);
+                                   pool, notifier);
     }, std::invalid_argument);
 }
 
@@ -115,18 +118,20 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
     .Times(1);
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger);
   EXPECT_NO_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    scr,
                                    mockRegistry,
-                                   fakeLogger, pool);
+                                   fakeLogger, pool, notifier);
       EXPECT_EQ(bundleExt.managers.size(), 0u);
     });
   EXPECT_NO_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    scr,
                                    mockRegistry,
-                                   fakeLogger, pool);
+                                   fakeLogger, pool, notifier);
       EXPECT_EQ(bundleExt.managers.size(), 1u);
     });
 }

@@ -60,6 +60,10 @@ void SCRActivator::Start(BundleContext context)
   // Create the Logger object used by this runtime
   logger = std::make_shared<SCRLogger>(context);
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting SCR bundle");
+
+    // Create configuration object notifier
+  configNotifier = std::make_shared<ConfigurationNotifier>(context, logger);
+
   // Add bundle listener
   bundleListenerToken = context.AddBundleListener(std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
   // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method manually
@@ -74,15 +78,17 @@ void SCRActivator::Start(BundleContext context)
   // Publish ServiceComponentRuntimeService
   auto service = std::make_shared<ServiceComponentRuntimeImpl>(runtimeContext, componentRegistry, logger);
   scrServiceReg = context.RegisterService<ServiceComponentRuntime>(std::move(service));
+  
 
   // Publish ConfigurationListener
   auto configListener =
     std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(
-      runtimeContext, componentRegistry, logger);
+      runtimeContext,logger, configNotifier);
   configListenerReg =
     context
       .RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
         std::move(configListener));
+
 }
 
 void SCRActivator::Stop(cppmicroservices::BundleContext context)
@@ -154,7 +160,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
     try
     { 
       auto const& scrMap = ref_any_cast<cppmicroservices::AnyMap>(headers.at(SERVICE_COMPONENT));
-      auto ba = std::make_unique<SCRBundleExtension>(bundle.GetBundleContext(), scrMap, componentRegistry, logger, threadpool);
+      auto ba = std::make_unique<SCRBundleExtension>(bundle.GetBundleContext(), scrMap, componentRegistry, logger, threadpool, configNotifier);
       {
         std::lock_guard<std::mutex> l(bundleRegMutex);
         bundleRegistry.insert(std::make_pair(bundle.GetBundleId(),std::move(ba)));

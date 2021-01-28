@@ -123,9 +123,9 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   // component.configuration-policy (Optional)
   ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true)
     .AssignValueTo(compMetadata->configurationPolicy);
-  if (!((compMetadata->configurationPolicy == "require" |
-       compMetadata->configurationPolicy == "ignore"))) {
-    compMetadata->configurationPolicy = "optional";
+  if (!((compMetadata->configurationPolicy == compMetadata->configPolicyRequire ||
+         compMetadata->configurationPolicy == compMetadata->configPolicyIgnore))) {
+    compMetadata->configurationPolicy = compMetadata->configPolicyOptional;
   }
 
   // component.configuration-pid (Optional)

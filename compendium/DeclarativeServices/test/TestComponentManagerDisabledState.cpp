@@ -44,10 +44,12 @@ protected:
     auto compDesc = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto pool = std::make_shared <boost::asio::thread_pool>(1);
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger);
     compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                          mockRegistry,
                                                          framework.GetBundleContext(),
-                                                         fakeLogger, pool);
+                                                         fakeLogger, pool, notifier);
   }
 
   virtual void TearDown() {

@@ -58,7 +58,12 @@ struct ComponentMetadata
   ServiceMetadata serviceMetadata;
   std::unordered_map<std::string, cppmicroservices::Any> properties;
   std::string configurationPolicy;
+  // constants for configurationPolicy
+  const std::string configPolicyIgnore = "ignore";
+  const std::string configPolicyRequire = "require";
+  const std::string configPolicyOptional = "optional";
   std::vector<std::string> configurationPids;
+ 
 };
 }
 }

@@ -27,7 +27,7 @@ namespace scrimpl {
 ConfigurationManager::ConfigurationManager(
   const std::shared_ptr<const metadata::ComponentMetadata> metadata,
   const cppmicroservices::BundleContext& bc,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger)
   : metadata(metadata)
   , logger(std::move(logger))
   , bundleContext(bc)
@@ -41,19 +41,25 @@ ConfigurationManager::ConfigurationManager(
 
 cppmicroservices::AnyMap ConfigurationManager::GetProperties() const noexcept
 {
+  std::lock_guard<std::mutex> lock(propertiesMutex);
+
   return mergedProperties;
 }
 
 void ConfigurationManager::Initialize() {
-  if (metadata->configurationPids.empty() || metadata->configurationPolicy == "ignore") return;
+  if ((metadata->configurationPids.empty()) ||
+      (metadata->configurationPolicy == metadata->configPolicyIgnore))
+    return;
   auto sr =
     this->bundleContext
       .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
   auto configAdmin =
     this->bundleContext
       .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
-  
-  for (auto& pid : metadata->configurationPids) {
+
+  std::lock_guard<std::mutex> lock(propertiesMutex);
+
+  for (const auto& pid : metadata->configurationPids) {
     if (configProperties.find(pid) == configProperties.end()) {
       auto config = configAdmin->ListConfigurations("(pid = " + pid + ")");
       if (config.size() > 0) {
@@ -63,7 +69,7 @@ void ConfigurationManager::Initialize() {
           configProperties.erase(it);
         }
         configProperties.emplace(pid, properties);
-        for (auto item : properties) {
+        for (const auto item : properties) {
           mergedProperties[item.first] = item.second;
         }   
       }      
@@ -73,8 +79,16 @@ void ConfigurationManager::Initialize() {
 
 void ConfigurationManager::UpdateMergedProperties(const std::string pid, 
   std::shared_ptr<cppmicroservices::AnyMap> props,
-  const cppmicroservices::service::cm::ConfigurationEventType type) noexcept
+  const cppmicroservices::service::cm::ConfigurationEventType type,
+  const ComponentState currentState,
+  bool& configWasSatisfied,
+  bool& configNowSatisfied)
 {
+  std::lock_guard<std::mutex> lock(propertiesMutex);
+  configWasSatisfied = isConfigSatisfied(currentState);
+
+ 
+
   // delete properties for this pid or replace with new properties in configProperties
   
   auto it = configProperties.find(pid);
@@ -92,14 +106,16 @@ void ConfigurationManager::UpdateMergedProperties(const std::string pid,
 
   mergedProperties = metadata->properties;
 
-  for (auto& pid : metadata->configurationPids) {
+  for (const auto& pid : metadata->configurationPids) {
     auto it = configProperties.find(pid);
     if (it != configProperties.end()) { 
-       for (auto item : it->second) {
+       for (const auto item : it->second) {
           mergedProperties[item.first] = item.second;
         }
       }
   } 
+
+   configNowSatisfied = isConfigSatisfied(currentState);
 }
 
 /**
@@ -108,23 +124,30 @@ void ConfigurationManager::UpdateMergedProperties(const std::string pid,
 bool ConfigurationManager::IsConfigSatisfied(
   const ComponentState currentState) const noexcept
 {
-    bool allConfigsAvailable =
+  std::lock_guard<std::mutex> lock(propertiesMutex);
+
+  return isConfigSatisfied(currentState);
+  
+}
+
+bool ConfigurationManager::isConfigSatisfied(
+  const ComponentState currentState) const noexcept
+{
+  bool allConfigsAvailable =
     configProperties.size() >= metadata->configurationPids.size();
 
-   if ((metadata->configurationPolicy == "ignore")
-      || (allConfigsAvailable)) {
-        return true;
-   }
-  
-  if ((metadata->configurationPolicy == "require") 
-      || ((metadata->configurationPolicy == "optional") &&
-        (currentState == ComponentState::ACTIVE)))
-  {
+  if ((metadata->configurationPolicy == metadata->configPolicyIgnore) ||
+      (allConfigsAvailable)) {
+    return true;
+  }
+
+  if ((metadata->configurationPolicy == metadata->configPolicyRequire) ||
+      ((metadata->configurationPolicy == metadata->configPolicyOptional) &&
+       (currentState == ComponentState::ACTIVE))) {
     return false;
   }
-  
- return true;
-  
+
+  return true;
 }
 void ConfigurationManager::SendModifiedPropertiesToComponent() {
     // see sequence diagram ConfigurationListener::configurationEvent(CM_UPDATED)

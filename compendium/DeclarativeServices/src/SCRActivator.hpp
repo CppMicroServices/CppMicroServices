@@ -33,6 +33,7 @@
 #include "SCRBundleExtension.hpp"
 #include "SCRLogger.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 
@@ -80,6 +81,7 @@ private:
   cppmicroservices::ServiceRegistration<
     cppmicroservices::service::cm::ConfigurationListener>
     configListenerReg;
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 } // scrimpl
 } // cppmicroservices

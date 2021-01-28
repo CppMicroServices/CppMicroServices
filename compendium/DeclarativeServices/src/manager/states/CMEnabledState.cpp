@@ -44,14 +44,18 @@ std::shared_future<void> CMEnabledState::Disable(ComponentManagerImpl& cm)
 void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,
                                           const cppmicroservices::Bundle& bundle,
                                           std::shared_ptr<const ComponentRegistry> registry,
-                                          std::shared_ptr<logservice::LogService> logger)
+                                          std::shared_ptr<logservice::LogService> logger,
+                                          std::shared_ptr<boost::asio::thread_pool> threadpool,
+                                          std::shared_ptr<ConfigurationNotifier> configNotifier)
 {
   try
   {
     auto cc = ComponentConfigurationFactory::CreateConfigurationManager(compDesc,
                                                                         bundle,
                                                                         registry,
-                                                                        logger);
+                                                                        logger,
+                                                                        threadpool,
+                                                                        configNotifier);
     configurations.push_back(cc);
   } catch (const cppmicroservices::SharedLibraryException&) {
     throw;

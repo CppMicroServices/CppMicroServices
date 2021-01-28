@@ -26,7 +26,7 @@
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/ServiceEvent.h"
 
-#if defined(_WIN32)
+#if defined(US_PLATFORM_WINDOWS)
   #include <Windows.h>
   #include <psapi.h>
 #else
@@ -34,7 +34,7 @@
   #include <fstream>
 #endif
 
-#if defined(__linux__)
+#if defined(US_PLATFORM_LINUX)
   #include <linux/limits.h>
 #endif
 
@@ -188,39 +188,51 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle_Dynamic) // DS_TOI_51
 }
 
 //Function to validate lazy loading of delayed component
-std::size_t lazyLoadingValidation()
+bool isBundleLoaded(const std::string bundleName)
 {
-  #if defined(_WIN32)
+  #if defined(US_PLATFORM_WINDOWS)
 
     HMODULE hMods[1024];
     DWORD cbNeeded;
-    unsigned int i;
 
     HANDLE hProcess = GetCurrentProcess();
+
     auto res = EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
+    EXPECT_NE(res, 0) << "Enumeration failed";
     EXPECT_GT(sizeof(hMods), cbNeeded) << "Size of array is too small to hold all module handles";
-    EXPECT_EQ(res, 1) << "Enumeration failed";
+    if ((sizeof(hMods) < cbNeeded) || res == 0)
+    {
+        return false;
+    }
 
     TCHAR szModName[MAX_PATH];
     std::string result;
 
-    for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+    for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
     {
         auto file = GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR));
         EXPECT_NE(file, 0) << "Failed to retrive file path";
         result += szModName;
     }
 
-    std::size_t found = result.find("TestBundleDSTOI6");
-
+    std::size_t found = result.find(bundleName);
     CloseHandle(hProcess);
     result.clear();
-    return found;
+    
+    if (found != std::string::npos)
+    {
+        return true;
+    }
+    return false;
   #else
     auto pid_t = getpid();
     std::string command("lsof -p " + std::to_string(pid_t));
     FILE* fd = popen(command.c_str(), "r");
-    ASSERT_NE(fd, nullptr) << "popen failed";
+    EXPECT_NE(fd, nullptr) << "popen failed";
+    if (nullptr == fd)
+    {
+        return false;
+    }
 
     std::string result;
     char buf[PATH_MAX];
@@ -229,12 +241,17 @@ std::size_t lazyLoadingValidation()
         result += buf;
     }
 
-    std::size_t found = result.find("TestBundleDSTOI6");
-   
+    std::size_t found = result.find(bundleName);
+  
     auto fc = pclose(fd);
     EXPECT_NE(fc, -1) << "pclose failed";
     result.clear();
-    return found;
+
+    if (found != std::string::npos)
+    {
+        return true;
+    }
+    return false;
   #endif
 }
 
@@ -255,8 +272,8 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   auto sRef = ctxt.GetServiceReference<test::Interface2>();
   EXPECT_FALSE(static_cast<bool>(sRef)) << "Service must not be available before it's dependency";
   
-  auto result = lazyLoadingValidation();
-  EXPECT_EQ(result, std::string::npos) << "library must not be available";
+  auto result = isBundleLoaded("TestBundleDSTOI6");
+  EXPECT_FALSE(result) << "library must not be available";
 
   std::mutex mtx, mtx1;
   std::condition_variable cv, cv1;
@@ -286,8 +303,8 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::SATISFIED);
 
-  result = lazyLoadingValidation();
-  EXPECT_EQ(result, std::string::npos) << "library must not be available";
+  result = isBundleLoaded("TestBundleDSTOI6");
+  EXPECT_FALSE(result) << "library must not be available";
 
   auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
   ASSERT_TRUE(static_cast<bool>(sRef1)) << "Service must be available after it's dependency is available";
@@ -297,8 +314,8 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::ACTIVE) << "State must be ACTIVE after call to GetService";
   EXPECT_NO_THROW(service->ExtendedDescription()) << "Throws if the dependency could not be found";
 
-  result = lazyLoadingValidation();
-  EXPECT_NE(result, std::string::npos) << "library must be available";
+  result = isBundleLoaded("TestBundleDSTOI6");
+  EXPECT_TRUE(result) << "library must be available";
 
   auto token1 = ctxt.AddServiceListener([&](const cppmicroservices::ServiceEvent& evt) {
                                           //std::cout << evt << std::endl;

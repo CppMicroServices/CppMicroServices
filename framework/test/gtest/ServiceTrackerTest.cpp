@@ -342,10 +342,11 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   // Test that there is no RemovedService callback triggered when closing a service tracker
   MockCustomizedServiceTracker<MyInterfaceOne> customizer;
 
-  // expect that closing the tracker while the service is still registered never results in RemovedService being called.
+  // expect that closing the tracker results in RemovedService being called.
+  ON_CALL(customizer, AddingService(::testing::_)).WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
   EXPECT_CALL(customizer, AddingService(::testing::_)).Times(::testing::Exactly(1));
   EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_)).Times(::testing::Exactly(0));
-  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_)).Times(::testing::Exactly(0));
+  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_)).Times(::testing::Exactly(1));
 
   auto tracker = std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(context, &customizer);
   tracker->Open();

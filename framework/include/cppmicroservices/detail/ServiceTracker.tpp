@@ -142,7 +142,6 @@ void ServiceTracker<S,T>::Open()
 template<class S, class T>
 void ServiceTracker<S,T>::Close()
 {
-  std::vector<ServiceReference<S>> references;
   std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
   if (outgoing == nullptr) {
     return;
@@ -150,6 +149,7 @@ void ServiceTracker<S,T>::Close()
 
   DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
   outgoing->Close();
+  auto references = GetServiceReferences();
 
   try {
     d->context.RemoveListener(std::move(d->listenerToken));
@@ -159,6 +159,9 @@ void ServiceTracker<S,T>::Close()
 
   d->Modified(); /* clear the cache */
   outgoing->NotifyAll(); /* wake up any waiters */
+  for(auto& ref : references) {
+    outgoing->Untrack(ref, ServiceEvent());
+  }
   
   if (d->context.GetLogSink()->Enabled()) {
     if (!d->cachedReference.Load().GetBundle() &&

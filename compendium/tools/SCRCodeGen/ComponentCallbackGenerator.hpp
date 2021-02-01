@@ -25,7 +25,11 @@
 #include <fstream>
 #include <sstream>
 
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "ComponentInfo.hpp"
 #include "Util.hpp"
 

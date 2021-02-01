@@ -227,6 +227,9 @@ TEST(LDAPExprTest, ParseExceptions)
   // Test various exceptions thrown.
   // Test error condition in LDAPExpr::LDAPExpr()
   EXPECT_THROW(LDAPFilter("(name=abra)zxdzx"), std::invalid_argument);
+  EXPECT_THROW(LDAPFilter("(name=abra(foo)))"), std::invalid_argument);
+  EXPECT_THROW(LDAPFilter("(name=abra"), std::invalid_argument);
+  EXPECT_THROW(LDAPFilter("(name=abra((foo))"), std::invalid_argument);
   // Test error condition in LDAPExpr::ParseExpr()
   EXPECT_THROW(LDAPFilter("(!(name=abra)(name=beta))"), std::invalid_argument);
   // Test attribute name empty error condition in

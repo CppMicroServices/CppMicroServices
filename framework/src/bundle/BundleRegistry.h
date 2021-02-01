@@ -23,15 +23,16 @@
 #ifndef CPPMICROSERVICES_BUNDLEREGISTRY_H
 #define CPPMICROSERVICES_BUNDLEREGISTRY_H
 
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/detail/Threads.h"
-
 #include <condition_variable>
 #include <map>
-#include <unordered_map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
+
+#include "BundleResourceContainer.h"
 
 namespace cppmicroservices {
 
@@ -64,13 +65,11 @@ public:
    * @param caller The bundle performing the install
    * @return A vector of bundles installed
    */
-  std::vector<Bundle> Install(const std::string& location,
-                              BundlePrivate* caller);
-
-  std::vector<Bundle> Install0(
+  std::vector<Bundle> Install(
     const std::string& location,
-    const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
-    BundlePrivate* caller);
+    BundlePrivate* caller,
+    const cppmicroservices::AnyMap& bundleManifest = cppmicroservices::AnyMap(
+      cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
 
   /**
    * Remove bundle registration.
@@ -139,12 +138,31 @@ private:
   BundleRegistry(const BundleRegistry&) = delete;
   BundleRegistry& operator=(const BundleRegistry&) = delete;
 
+  std::vector<Bundle> Install0(
+    const std::string& location,
+    const std::shared_ptr<BundleResourceContainer>& resCont,
+    const std::vector<std::string>& alreadyInstalled,
+    const cppmicroservices::AnyMap& bundleManifest);
+
   void CheckIllegalState() const;
 
-  void GetAlreadyInstalledBundlesAtLocation(
+  /** This function populates the res and alreadyInstalled vectors with the appropriate entries so
+   * that they can be used by the Install0 call. This was extracted from Install() for convenience.
+   *
+   * @param range            range containing bundles found at location
+   * @param location         the location on disk to look for installed bundles
+   * @param bundleManifest   the manifest for the bundle to be installed. Used when creating the
+   *                         returned BundleResourceContainer
+   * @param res              An output vector of the bundles already installed at location 
+   * @param alreadyInstalled An output vector of symbolic names of the already installed bundles at
+   *                         location. 
+   */
+  std::shared_ptr<BundleResourceContainer> GetAlreadyInstalledBundlesAtLocation(
     std::pair<BundleMap::iterator, BundleMap::iterator> range,
+    const std::string& location,
+    const cppmicroservices::AnyMap& bundleManifest,
     std::vector<Bundle>& res,
-    std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled);
+    std::vector<std::string>& alreadyInstalled);
 
   void DecrementInitialBundleMapRef(
     cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,

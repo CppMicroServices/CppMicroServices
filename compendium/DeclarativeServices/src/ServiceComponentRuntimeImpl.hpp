@@ -22,7 +22,12 @@
 
 #ifndef __SERVICECOMPONENTRUNTIMEIMPL_HPP__
 #define __SERVICECOMPONENTRUNTIMEIMPL_HPP__
+
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"

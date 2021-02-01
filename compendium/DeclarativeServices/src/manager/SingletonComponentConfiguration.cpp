@@ -126,6 +126,35 @@ void SingletonComponentConfigurationImpl::UngetService(const cppmicroservices::B
   // The instance is reset when the component is deactivated.
 }
 
+void SingletonComponentConfigurationImpl::BindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  auto context = GetComponentContext();
+  context->AddToBoundServicesCache(refName, ref);
+  try {
+    GetComponentInstance()->InvokeBindMethod(refName, ref);
+  } catch (const std::exception&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception received from user code while binding a "
+                     "service reference.",
+                     std::current_exception());
+  }
+  
+}
+
+void SingletonComponentConfigurationImpl::UnbindReference(const std::string& refName, const ServiceReferenceBase& ref)
+{
+  try {
+    GetComponentInstance()->InvokeUnbindMethod(refName, ref);
+  } catch (const std::exception&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception received from user code while unbinding a "
+                     "service reference.",
+                     std::current_exception());
+  }
+  auto context = GetComponentContext();
+  context->RemoveFromBoundServicesCache(refName, ref);
+}
+
 void SingletonComponentConfigurationImpl::SetComponentInstancePair(InstanceContextPair instCtxtPair)
 {
   auto instanceContextPair = data.lock();

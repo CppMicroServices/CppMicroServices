@@ -22,6 +22,10 @@ include_directories(
   ${GMOCK_INCLUDE_DIRS}
   )
 
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
+include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-inconsistent-missing-override HAS_MISSING_OVERRIDE_FLAG)
@@ -39,6 +43,10 @@ if(MSVC)
   add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)
   add_compile_definitions(GTEST_LANG_CXX11=1)
 endif()
+
+add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
+add_compile_definitions(BOOST_REGEX_NO_LIB)
+
 
 #-----------------------------------------------------------------------------
 # Add test source files
@@ -76,6 +84,7 @@ set(_declarativeservices_tests
   TestServiceProvider.cpp
   TestSharedLibraryException.cpp
   ImportTestBundles.cpp
+  TestBindingPolicies.cpp
   main.cpp
 )
 
@@ -139,6 +148,9 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBindUnbindThrows
+  TestBundleDSa
+  TestBundleDSb
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1
@@ -151,7 +163,13 @@ set(_test_bundles
   TestBundleDSTOI3
   TestBundleDSTOI5
   TestBundleDSTOI6
+  TestBundleDSTOI7
+  TestBundleDSTOI8
   TestBundleDSTOI9
+  TestBundleDSDGMU
+  TestBundleDSDGOU
+  TestBundleDSDRMU
+  TestBundleDSDROU
   EnglishDictionary
   )
 
@@ -169,6 +187,10 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   gtest
   gmock
   util
+)
+
+add_dependencies(${us_declarativeservices_test_exe_name}
+  DeclarativeServices
   ${_test_bundles}
 )
 

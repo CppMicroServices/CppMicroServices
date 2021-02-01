@@ -38,27 +38,22 @@ class BundleStorageMemory : public BundleStorage
 public:
   BundleStorageMemory();
 
-  std::vector<std::shared_ptr<BundleArchive>> InsertBundleLib(
-    const std::string& location);
-
-  std::vector<std::shared_ptr<BundleArchive>> InsertArchives(
+  std::shared_ptr<BundleArchive> CreateAndInsertArchive(
     const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::vector<std::string>& topLevelEntries);
+    const std::string& topLevelEntry,
+    const ManifestT& bundleManifest) override;
 
-  bool RemoveArchive(const BundleArchive* ba);
+  bool RemoveArchive(const BundleArchive* ba) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const;
+  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
+    const override;
 
-  std::vector<long> GetStartOnLaunchBundles() const;
+  std::vector<long> GetStartOnLaunchBundles() const override;
 
-  void Close();
+  void Close() override;
 
 private:
-  /**
-   * Next available bundle id.
-   */
   long nextFreeId;
-
   /**
    * Bundle id sorted list of all active bundle archives.
    */

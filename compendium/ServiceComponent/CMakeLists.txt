@@ -47,6 +47,9 @@ configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
   )
 
 add_library(${PROJECT_TARGET} ${_srcs} ${_public_headers} ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/servicecomponent/ServiceComponentExport.h)
+if (US_BUILD_TESTING)
+  target_compile_definitions(${PROJECT_TARGET} PRIVATE USING_GTEST)
+endif()
 
 target_include_directories(usServiceComponent
   PUBLIC
@@ -60,23 +63,23 @@ target_link_libraries(${PROJECT_TARGET} PUBLIC CppMicroServices)
 
 # install support
 install(TARGETS ${${PROJECT_NAME}_TARGET}
-          EXPORT us${PROJECT_NAME}Targets
-          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+	  EXPORT us${PROJECT_NAME}Targets
+	  RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+	  LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+	  ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices
-        DESTINATION ${HEADER_INSTALL_DIR}
-        OPTIONAL)
+	DESTINATION ${HEADER_INSTALL_DIR}
+	OPTIONAL)
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices
-        DESTINATION ${HEADER_INSTALL_DIR}
-        OPTIONAL)
+	DESTINATION ${HEADER_INSTALL_DIR}
+	OPTIONAL)
 
 if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
   add_subdirectory(test)
 endif()
-          
+
 # Version information
 configure_file(
   ${US_CMAKE_DIR}/usBundleConfigVersion.cmake.in
@@ -89,8 +92,8 @@ export(TARGETS ${${PROJECT_NAME}_TARGET} CppMicroServices
 
 if(NOT US_NO_INSTALL)
   install(EXPORT us${PROJECT_NAME}Targets
-          FILE us${PROJECT_NAME}Targets.cmake
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+	  FILE us${PROJECT_NAME}Targets.cmake
+	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 endif()
 
 # Configure config file for the build tree
@@ -118,7 +121,7 @@ if(NOT US_NO_INSTALL)
     )
 
   install(FILES ${CppMicroServices_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/us${PROJECT_NAME}Config.cmake
-                ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-          ${US_SDK_INSTALL_COMPONENT})
+		${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
+	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+	  ${US_SDK_INSTALL_COMPONENT})
 endif()

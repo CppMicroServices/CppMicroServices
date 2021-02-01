@@ -39,7 +39,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #ifdef US_PLATFORM_POSIX
-#include <dlfcn.h>
+#  include <dlfcn.h>
 #endif
 
 using namespace cppmicroservices;
@@ -237,18 +237,20 @@ TEST(FrameworkTest, CustomConfiguration)
 TEST(FrameworkTest, NonIntegerLibraryLoadOption)
 {
   FrameworkConfiguration configuration;
-  configuration["org.cppmicroservices.library.load.options"] = std::string("bogus");
-  
+  configuration["org.cppmicroservices.library.load.options"] =
+    std::string("bogus");
+
   auto f = FrameworkFactory().NewFramework(configuration);
   ASSERT_TRUE(f);
   ASSERT_NO_THROW(f.Start(););
-  
+
 #ifdef US_PLATFORM_POSIX
-  ASSERT_EQ((RTLD_LAZY | RTLD_LOCAL), any_cast<int>(f.GetProperty(Constants::LIBRARY_LOAD_OPTIONS)));
+  ASSERT_EQ((RTLD_LAZY | RTLD_LOCAL),
+            any_cast<int>(f.GetProperty(Constants::LIBRARY_LOAD_OPTIONS)));
 #else
   ASSERT_EQ(0, any_cast<int>(f.GetProperty(Constants::LIBRARY_LOAD_OPTIONS)));
 #endif
-  
+
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
@@ -369,6 +371,7 @@ TEST(FrameworkTest, Properties)
     f.GetSymbolicName(),
     Constants::SYSTEM_BUNDLE_SYMBOLICNAME); // "Test Framework Bundle Name"
   ASSERT_EQ(f.GetBundleId(), 0);            // "Test Framework Bundle Id"
+  ASSERT_EQ(f.GetVersion().ToString(), US_FRAMEWORK_VERSION_STR); // Test that the build correctly generated the version
 }
 
 TEST(Framework, LifeCycle)
@@ -604,6 +607,7 @@ TEST(FrameworkTest, Events)
   auto fmc = f.GetBundleContext();
   fmc.AddBundleListener(std::bind(
     &TestBundleListener::BundleChanged, &listener, std::placeholders::_1));
+
 #ifdef US_BUILD_SHARED_LIBS
   auto install = [&pEvts, &fmc](const std::string& libName) {
     auto bundle = cppmicroservices::testing::InstallLib(fmc, libName);

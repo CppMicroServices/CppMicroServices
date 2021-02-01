@@ -221,14 +221,16 @@ TEST_F(tServiceComponent, testMultipleInterfaces) //DS_TOI_16
   auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent16");
   EXPECT_EQ(compDescDTO.serviceInterfaces.size(), 2ul);
   auto ctxt = framework.GetBundleContext();
+
   auto sRef = ctxt.GetServiceReference<test::Interface1>();
   EXPECT_TRUE(static_cast<bool>(sRef));
-  auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
-  EXPECT_TRUE(static_cast<bool>(sRef2));
   auto serv1 = ctxt.GetService<test::Interface1>(sRef);
   EXPECT_NE(serv1, nullptr);
-  auto serv2 = ctxt.GetService<test::Interface1>(sRef);
+
+  auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
+  EXPECT_TRUE(static_cast<bool>(sRef2));
+  auto serv2 = ctxt.GetService<test::Interface2>(sRef2);
   EXPECT_NE(serv2, nullptr);
-}
+ }
 
 }

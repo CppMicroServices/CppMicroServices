@@ -27,9 +27,25 @@
 #include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
 
+#include <random>
 #include <string>
 
 namespace test {
+
+template<typename Task, typename Predicate>
+bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
+{
+  using namespace std::chrono;
+  auto startTime = system_clock::now();
+  do {
+    t();
+    duration<double> duration = system_clock::now() - startTime;
+    if (duration > milliseconds(30000)) {
+      return false;
+    }
+  } while (!p());
+  return true;
+}
 
 /**
  * Convenience Method to install but not start a bundle given the bundle's symbolic name.
@@ -40,6 +56,11 @@ void InstallLib(::cppmicroservices::BundleContext frameworkCtx, const std::strin
  * Convenience Method to install and start a bundle given the bundle's symbolic name.
  */
 cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName);
+
+/**
+ * Convenience Method to install and start DS.
+ */
+void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx);
 
 /**
  * Convenience Method to extract service-id from a service reference

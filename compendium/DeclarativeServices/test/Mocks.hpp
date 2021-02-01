@@ -135,6 +135,29 @@ public:
   MOCK_METHOD0(StopTracking, void(void));
 };
 
+class MockReferenceManagerBaseImpl
+  : public ReferenceManagerBaseImpl
+{
+public:
+  MockReferenceManagerBaseImpl(const metadata::ReferenceMetadata& metadata
+                               , const cppmicroservices::BundleContext& bc
+                               , std::shared_ptr<cppmicroservices::logservice::LogService> logger
+                               , const std::string& configName)
+    : ReferenceManagerBaseImpl(metadata, bc, logger, configName)
+  {}
+  
+  MOCK_CONST_METHOD0(GetReferenceName, std::string(void));
+  MOCK_CONST_METHOD0(GetReferenceScope, std::string(void));
+  MOCK_CONST_METHOD0(GetLDAPString, std::string(void));
+  MOCK_CONST_METHOD0(IsSatisfied, bool(void));
+  MOCK_CONST_METHOD0(IsOptional, bool(void));
+  MOCK_CONST_METHOD0(GetBoundReferences, std::set<cppmicroservices::ServiceReferenceBase>());
+  MOCK_CONST_METHOD0(GetTargetReferences, std::set<cppmicroservices::ServiceReferenceBase>());
+  MOCK_METHOD1(RegisterListener, cppmicroservices::ListenerTokenId(std::function<void(const RefChangeNotification&)>));
+  MOCK_METHOD1(UnregisterListener, void(cppmicroservices::ListenerTokenId));
+  MOCK_METHOD0(StopTracking, void(void));
+};
+
 class MockComponentConfiguration
   : public ComponentConfiguration
 {
@@ -167,6 +190,7 @@ public:
   MOCK_METHOD1(Register, void(ComponentConfigurationImpl&));
   MOCK_METHOD2(Activate, std::shared_ptr<ComponentInstance>(ComponentConfigurationImpl&, const cppmicroservices::Bundle&));
   MOCK_METHOD1(Deactivate, void(ComponentConfigurationImpl&));
+  MOCK_METHOD4(Rebind, void(ComponentConfigurationImpl&, const std::string&, const ServiceReference<void>&, const ServiceReference<void>&));
   MOCK_CONST_METHOD0(GetValue, ComponentState(void));
   MOCK_METHOD0(WaitForTransitionTask, void());
 };
@@ -207,8 +231,9 @@ public:
   MockComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                            std::shared_ptr<const ComponentRegistry> registry,
                            BundleContext bundleContext,
-                           std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-    : ComponentManagerImpl(metadata, registry, bundleContext, logger)
+                           std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+      std::shared_ptr<boost::asio::thread_pool> pool)
+    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool)
     , statechangecount(0)
   {
   }
@@ -252,6 +277,8 @@ public:
   MOCK_METHOD1(CreateAndActivateComponentInstance, std::shared_ptr<ComponentInstance>(const cppmicroservices::Bundle&));
   MOCK_METHOD1(UnbindAndDeactivateComponentInstance, void(std::shared_ptr<ComponentInstance>));
   MOCK_METHOD0(DestroyComponentInstances, void());
+  MOCK_METHOD2(BindReference, void(const std::string&, const ServiceReferenceBase&));
+  MOCK_METHOD2(UnbindReference, void(const std::string&, const ServiceReferenceBase&));
   void SetState(const std::shared_ptr<ComponentConfigurationState>& newState)
   {
     ComponentConfigurationImpl::SetState(newState);

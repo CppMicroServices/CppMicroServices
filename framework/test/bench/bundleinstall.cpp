@@ -65,22 +65,25 @@ protected:
   {
     using namespace std::chrono;
 
-    std::string bundleBasePath = "bundles\\test_bundle_";
+    std::string bundleBasePath = "bundles\\bundle_";
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();
     framework.Start();
 
     // Generate paths to each bundle
     uint32_t count = 1;
     std::vector<std::string> str5kBundles(5000, bundleBasePath);
-    std::transform(str5kBundles.begin(), str5kBundles.end(), str5kBundles.begin(),
-      [&count](std::string& s) -> std::string {
-        return s.append(std::to_string(count++));
-      });
+    std::transform(str5kBundles.begin(),
+                   str5kBundles.end(),
+                   str5kBundles.begin(),
+                   [&count](std::string& s) -> std::string {
+                     return s.append(std::to_string(count++));
+                   });
 
     // Split up bundles per thread
     uint32_t numBundlesToInstall = uint32_t(str5kBundles.size()) / numThreads;
     std::vector<std::string>::iterator lowerBound = str5kBundles.begin();
-    std::vector<std::string>::iterator upperBound = str5kBundles.begin() + numBundlesToInstall;
+    std::vector<std::string>::iterator upperBound =
+      str5kBundles.begin() + numBundlesToInstall;
 
     std::vector<std::vector<std::string>> bundlesToInstallPerThread;
     for (uint32_t i = 0; i < numThreads; i++) {
@@ -157,6 +160,12 @@ BENCHMARK_DEFINE_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
 {
   InstallConcurrently(state, std::thread::hardware_concurrency());
 }
+BENCHMARK_DEFINE_F(BundleInstallFixture,
+                   ConcurrentBundleInstall1ThreadPerBundle)
+(benchmark::State& state)
+{
+  InstallConcurrently(state, 5000);
+}
 #endif
 
 // Register functions as benchmark
@@ -172,5 +181,8 @@ BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall2Threads)
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstall4Threads)
   ->UseManualTime();
 BENCHMARK_REGISTER_F(BundleInstallFixture, ConcurrentBundleInstallMaxThreads)
+  ->UseManualTime();
+BENCHMARK_REGISTER_F(BundleInstallFixture,
+                     ConcurrentBundleInstall1ThreadPerBundle)
   ->UseManualTime();
 #endif

@@ -24,7 +24,12 @@
 #define __SCRBUNDLEEXTENSION_HPP__
 
 #include <memory>
+#include "boost/asio/thread_pool.hpp"
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/BundleContext.h"
 #include "ComponentRegistry.hpp"
 #include "manager/ComponentManager.hpp"
@@ -47,7 +52,8 @@ public:
   SCRBundleExtension(const cppmicroservices::BundleContext& bundleContext,
                      const cppmicroservices::AnyMap& scrMetadata,
                      const std::shared_ptr<ComponentRegistry>& registry,
-                     const std::shared_ptr<LogService>& logger);
+                     const std::shared_ptr<LogService>& logger,
+                     const std::shared_ptr<boost::asio::thread_pool>& threadpool);
   SCRBundleExtension(const SCRBundleExtension&) = delete;
   SCRBundleExtension(SCRBundleExtension&&) = delete;
   SCRBundleExtension& operator=(const SCRBundleExtension&) = delete;

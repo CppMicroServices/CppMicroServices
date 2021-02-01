@@ -12,6 +12,12 @@
 #endif
 
 #define US_DeclarativeServices_VERSION_MAJOR "@DeclarativeServices_VERSION_MAJOR@"
+#define US_DeclarativeServices_VERSION_MINOR "@DeclarativeServices_VERSION_MINOR@"
+#define US_DeclarativeServices_VERSION_PATCH "@DeclarativeServices_VERSION_PATCH@"
+#define US_DeclarativeServices_VERSION @DeclarativeServices_VERSION@
+#define US_DeclarativeServices_VERSION_STR "@DeclarativeServices_VERSION@"
+
+#define US_DeclarativeServices_SYMBOLIC_NAME "@DeclarativeServices_SYMBOLIC_NAME@"
 
 namespace cppmicroservices
 {

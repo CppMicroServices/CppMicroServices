@@ -28,13 +28,9 @@ endif()
 if(CMAKE_THREAD_LIBS_INIT)
   list(APPEND _link_libraries ${CMAKE_THREAD_LIBS_INIT})
 endif()
-
-# Configure the bundles manifest.json file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
-               ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
-
+               
 usMacroCreateBundle(Framework
-  VERSION "${CppMicroServices_VERSION}"
+  VERSION "${_version}"
   TARGET CppMicroServices
   SYMBOLIC_NAME system_bundle
   SKIP_INIT # we do it manually

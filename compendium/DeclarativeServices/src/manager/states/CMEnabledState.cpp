@@ -38,31 +38,7 @@ std::shared_future<void> CMEnabledState::Enable(ComponentManagerImpl&)
 std::shared_future<void> CMEnabledState::Disable(ComponentManagerImpl& cm)
 {
   auto currentState = shared_from_this(); // assume this object is the current state object
-
-  std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task([](std::shared_ptr<CMEnabledState> enabledState) {
-                                                                   enabledState->DeleteConfigurations();
-                                                                 });
-
-  auto disabledState = std::make_shared<CMDisabledState>(task.get_future().share());
-
-  // if this object failed to change state and the current state is ENABLED, try again
-  bool succeeded = false;
-  do
-  {
-    succeeded = cm.CompareAndSetState(&currentState, disabledState);
-  } while(!succeeded && currentState->IsEnabled(cm));
-
-  if(succeeded) // succeeded in changing the state
-  {
-    std::shared_ptr<CMEnabledState> currEnabledState = std::dynamic_pointer_cast<CMEnabledState>(currentState);
-    auto fut = std::async(std::launch::async, [currEnabledState, transition = std::move(task)]() mutable {
-                                                transition(currEnabledState);
-                                              }).share();
-    cm.AccumulateFuture(fut);
-    return fut;
-  }
-  // return the stored future in the current disabled state object
-  return currentState->GetFuture();
+  return cm.PostAsyncEnabledToDisabled(currentState);
 }
 
 void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,

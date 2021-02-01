@@ -23,7 +23,11 @@
 #ifndef CMEnabledState_hpp
 #define CMEnabledState_hpp
 
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "ComponentManagerState.hpp"
 #include "../../ComponentRegistry.hpp"
@@ -39,7 +43,7 @@ class CMEnabledState final
 {
 public:
   /**
-   * Contruct with a future object
+   * Construct with a future object
    *
    * /param fut is the future associated with this state. This future represents
    *        the task performed when the ComponentManager changes it's state to

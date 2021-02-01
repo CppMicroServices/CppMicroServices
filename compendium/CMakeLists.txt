@@ -2,8 +2,9 @@ if(US_BUILD_TESTING)
   add_subdirectory(test_bundles)
 endif()
 add_subdirectory(LogService)
+add_subdirectory(LogServiceImpl)
 add_subdirectory(ServiceComponent)
 add_subdirectory(DeclarativeServices)
+add_subdirectory(ConfigurationAdmin)
+add_subdirectory(CM)
 add_subdirectory(tools)
-
-

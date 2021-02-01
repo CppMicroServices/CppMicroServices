@@ -23,7 +23,12 @@
 #ifndef __COMPONENTMANAGERIMPL_HPP__
 #define __COMPONENTMANAGERIMPL_HPP__
 
+#include "boost/asio/thread_pool.hpp"
+#if defined(USING_GTEST)
 #include "gtest/gtest_prod.h"
+#else
+#define FRIEND_TEST(x, y)
+#endif
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "ComponentManager.hpp"
@@ -46,7 +51,8 @@ public:
   ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                        std::shared_ptr<const ComponentRegistry> registry,
                        cppmicroservices::BundleContext bundleContext,
-                       std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                       std::shared_ptr<boost::asio::thread_pool> threadpool);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
   ComponentManagerImpl(ComponentManagerImpl&&) = delete;
   ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
@@ -133,6 +139,29 @@ public:
    */
   virtual std::shared_ptr<const ComponentRegistry> GetRegistry() const { return registry; }
 
+  /**
+   * Attempts to change the state from disabled to enabled and posts asynchronous work
+   * to be completed if the state was successfully changed.
+   * 
+   * \param currentState The current state object
+   * \return a shared_future<void> on which to wait for the asynchronous work to complete.
+   */
+  std::shared_future<void> PostAsyncDisabledToEnabled(
+    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
+      currentState);
+
+  /**
+   * Attempts to change the state from enabled to disabled and posts asynchronous work
+   * to be completed if the state was successfully changed.
+   * 
+   * \param currentState The current state object
+   * \return a shared_future<void> on which to wait for the asynchronous work to complete.
+   */
+  std::shared_future<void> PostAsyncEnabledToDisabled(
+    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
+      currentState);
+
+
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
@@ -143,6 +172,8 @@ private:
   std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
   std::vector<std::shared_future<void>> disableFutures; ///< futures created when the component transitioned to \c DISABLED state
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
+  std::shared_ptr<boost::asio::thread_pool> threadpool; ///< thread pool used to execute async work
+  std::mutex transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
 };
 }
 }

@@ -39,20 +39,30 @@
 #include "FrameworkPrivate.h"
 
 #include <cassert>
+#include <deque>
+#include <functional>
 #include <map>
 
-namespace cppmicroservices {
+namespace {
 
 // Helper class to ensure RAII for InitialBundleMap in case where Install0 throws
-class InitialBundleMapCleanup {
+class InitialBundleMapCleanup
+{
 public:
-  InitialBundleMapCleanup(std::function<void()> cleanupFcn) : _cleanupFcn(std::move(cleanupFcn)) {}
+  InitialBundleMapCleanup(std::function<void()> cleanupFcn)
+    : _cleanupFcn(std::move(cleanupFcn))
+  {}
   ~InitialBundleMapCleanup() {
-	_cleanupFcn();
+    _cleanupFcn();
   }
+
 private:
   std::function<void()> _cleanupFcn;
 };
+
+}
+
+namespace cppmicroservices {
 
 BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
@@ -93,27 +103,47 @@ void BundleRegistry::DecrementInitialBundleMapRef(
 /*
   This function populates the res and alreadyInstalled vectors with the
   appropriate entries so that they can be used by the Install0 call. This was
-  extracted from Install() for convenience.
+  extracted from Install() for convenience. We lock the 'bundles' object to
+  prevent any installs from writing to the map while this operation is occurring
+  since the map can trigger a re-balancing of the tree nodes and cause some of
+  the iterators to be incorrect.
 */
-void BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
+std::shared_ptr<BundleResourceContainer>
+BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
   std::pair<BundleMap::iterator, BundleMap::iterator> foundBundles,
+  const std::string& location,
+  const cppmicroservices::AnyMap& bundleManifest,
   std::vector<Bundle>& resultingBundles,
-  std::vector<std::shared_ptr<BundlePrivate>>& alreadyInstalled)
+  std::vector<std::string>& alreadyInstalled)
 {
+  auto l = bundles.Lock();
+  US_UNUSED(l);
+  // First, get a BundleResourceContainer to work with. Either create a new one (if one hasn't been
+  // made yet for this location), or use one from another BundleArchive at this location.
+  auto resourceContainer =
+    (foundBundles.first == foundBundles.second
+       ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
+       : foundBundles.first->second->GetBundleArchive()
+           ->GetResourceContainer());
+  
   while (foundBundles.first != foundBundles.second) {
     auto installedBundlePrivate = foundBundles.first->second;
-    alreadyInstalled.push_back(installedBundlePrivate);
+    alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
     auto actualBundle = coreCtx->bundleHooks.FilterBundle(
-      MakeBundleContext(installedBundlePrivate->bundleContext.Load()), MakeBundle(installedBundlePrivate));
+      MakeBundleContext(installedBundlePrivate->bundleContext.Load()),
+      MakeBundle(installedBundlePrivate));
     if (actualBundle) {
       resultingBundles.push_back(actualBundle);
     }
     ++foundBundles.first;
   }
+  return resourceContainer;
 }
 
-std::vector<Bundle> BundleRegistry::Install(const std::string& location,
-                                            BundlePrivate* caller)
+std::vector<Bundle> BundleRegistry::Install(
+  const std::string& location,
+  BundlePrivate*,
+  const cppmicroservices::AnyMap& bundleManifest)
 {
   using namespace std::chrono_literals;
 
@@ -125,7 +155,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
   US_UNUSED(l);
 
   // Search the multimap for the current bundle location
-  auto bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
+  auto bundlesAtLocationRange =
+    (bundles.Lock(), bundles.v.equal_range(location));
 
   /*
     If the bundle is already installed, then execute the regular
@@ -133,8 +164,8 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
 
     If the bundle isn't installed, then one of two things can happen: 1) either
     the current thread is the first thread trying to install this bundle or 2) the
-    current thread is trying to install a bundle that is not installed which another
-    thread is currently installing.
+    current thread is trying to install a bundle that is not installed but another
+    thread is currently installing that bundle.
 
     If 1): Create an entry in the initialBundleInstallMap which keeps track of whether
       or not a given bundle is being installed for the first time. After creating this
@@ -151,21 +182,25 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
   */
   if (bundlesAtLocationRange.first != bundlesAtLocationRange.second) {
     l.UnLock();
-
     std::vector<Bundle> resultingBundles;
-    std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
-    // Populate the res and alreadyInstalled vectors with the appropriate data
+    std::vector<std::string> alreadyInstalled;
+    // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
     // based on what bundles are already installed
-    GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange, resultingBundles, alreadyInstalled);
+    auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
+                                                        location,
+                                                        bundleManifest,
+                                                        resultingBundles,
+                                                        alreadyInstalled);
 
     // Perform the install
-    auto newBundles = Install0(location, alreadyInstalled, caller);
-    resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
+    auto newBundles =
+      Install0(location, resCont, alreadyInstalled, bundleManifest);
+    resultingBundles.insert(
+      resultingBundles.end(), newBundles.begin(), newBundles.end());
     if (resultingBundles.empty()) {
       throw std::runtime_error("All bundles rejected by a bundle hook");
-    } else {
-      return resultingBundles;
     }
+    return resultingBundles;
   } else {
     // Check to see if another thread is currently in the process of installing this
     // bundle for the first time.
@@ -173,7 +208,7 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
 
     /*
       If no other thread is installing the desired bundle, create a map entry,
-      install the bundle, and notify all other threads wanting to install this bundle
+      install the bundle, and notify all other threads waiting to install this bundle
       that it is safe to do so. If the current thread is not the installing thread, then
       it will increment the reference count in the initialBundleInstallMap so that the map
       entry isn't prematurely deleted, wait to be notified that the install thread is done,
@@ -181,129 +216,171 @@ std::vector<Bundle> BundleRegistry::Install(const std::string& location,
     */
     if (alreadyInstallingIterator == initialBundleInstallMap.end()) {
       // Insert entry into the initialBundleInstallMap to prevent other threads from
-      // trying to install this uninstalled bundle at the same time
+      // trying to install this bundle simultaneously
       auto pairToInsert = std::make_pair(uint32_t(1), WaitCondition{});
       initialBundleInstallMap.insert(
         std::make_pair(location, std::move(pairToInsert)));
       l.UnLock();
 
       std::vector<Bundle> installedBundles;
-      
       {
         // create instance of clean-up object to ensure RAII
-        InitialBundleMapCleanup cleanup([this, &l, &location](){
-          {
-            // Notify all waiting threads that it is safe to install the bundle
-            std::lock_guard<std::mutex> lock(*(initialBundleInstallMap[location].second.m));
-            initialBundleInstallMap[location].second.waitFlag = false;
-            initialBundleInstallMap[location].second.cv->notify_all();
-          }
-          DecrementInitialBundleMapRef(l, location);
-        });
-          
-        // Perform the install
-        installedBundles = Install0(location, {}, caller);
-      }
+        InitialBundleMapCleanup cleanup ([this, &l, &location]() {
+                                            {
+                                              l.Lock();
+                                              auto& p = initialBundleInstallMap[location];
+                                              // Notify all waiting threads that it is safe to install the bundle
+                                              std::lock_guard<std::mutex> lock(*(p.second.m));
+                                              p.second.waitFlag = false;
+                                              p.second.cv->notify_all();
+                                              l.UnLock();
+                                            }
+                                            DecrementInitialBundleMapRef(l, location);
+                                         });
 
+        // Perform the install
+        auto resCont =
+          std::make_shared<BundleResourceContainer>(location, bundleManifest);
+        installedBundles = Install0(location, resCont, {}, bundleManifest);
+      }
       return installedBundles;
     } else {
       initialBundleInstallMap[location].first++;
-      
       {
         // Wait for the install thread to notify this thread that it is safe
         // to install the current bundle
-        std::unique_lock<std::mutex> lock(
-          *(initialBundleInstallMap[location].second.m));
+        auto& p = initialBundleInstallMap[location];
+        l.UnLock();
+        std::unique_lock<std::mutex> lock(*(p.second.m));
 
         // This while loop exists to prevent a known race condition. If the installing thread notifies before
         // another thread trying to install the same bundle reaches this wait, it will wait indefinitely. To
-        // fix this, a wait_for is used intead (which utilizes a timeout to avoid this race) and the wait statement
+        // fix this, a wait_for is used instead (which utilizes a timeout to avoid this race) and the wait statement
         // as a whole acts as the while statement's predicate; once the timeout is reached, wait_for exits and the
         // statement is re-evaluated since it would have returned false.
-        while (!initialBundleInstallMap[location].second.cv->wait_for(lock, 0.1ms, [&location, this] {
-          return !initialBundleInstallMap[location].second.waitFlag;
-          }));
+        while (!p.second.cv->wait_for(
+          lock, 0.1ms, [&p] { return !p.second.waitFlag; }))
+          ;
       }
-      
+
       // Re-acquire the range because while this thread was waiting, the installing
       // thread made a modification to bundles.v
-      bundlesAtLocationRange = (bundles.Lock(), bundles.v.equal_range(location));
+      l.Lock();
+      bundlesAtLocationRange =
+        (bundles.Lock(), bundles.v.equal_range(location));
       l.UnLock();
 
       std::vector<Bundle> resultingBundles;
-      std::vector<std::shared_ptr<BundlePrivate>> alreadyInstalled;
-      GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange, resultingBundles, alreadyInstalled);
+      std::vector<std::string> alreadyInstalled;
+      auto resCont =
+        GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
+                                             location,
+                                             bundleManifest,
+                                             resultingBundles,
+                                             alreadyInstalled);
 
       std::vector<Bundle> newBundles;
-      
       {
         // create instance of clean-up object to ensure RAII
-        InitialBundleMapCleanup cleanup([this, &l, &location](){
-          DecrementInitialBundleMapRef(l, location);
-        });
+        InitialBundleMapCleanup cleanup ([this, &l, &location]() {
+                                           DecrementInitialBundleMapRef(l, location);
+                                         });
 
         // Perform the install
-        newBundles = Install0(location, alreadyInstalled, caller);
+        newBundles =
+          Install0(location, resCont, alreadyInstalled, bundleManifest);
       }
 
-      resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
+      resultingBundles.insert(
+        resultingBundles.end(), newBundles.begin(), newBundles.end());
       if (resultingBundles.empty()) {
         throw std::runtime_error("All bundles rejected by a bundle hook");
-      } else {
-        return resultingBundles;
       }
+      return resultingBundles;
     }
   }
 }
 
 std::vector<Bundle> BundleRegistry::Install0(
   const std::string& location,
-  const std::vector<std::shared_ptr<BundlePrivate>>& exclude,
-  BundlePrivate* /*caller*/)
+  const std::shared_ptr<BundleResourceContainer>& resCont,
+  const std::vector<std::string>& alreadyInstalled,
+  const cppmicroservices::AnyMap& bundleManifest)
 {
-  std::vector<Bundle> res;
+  namespace cppms = cppmicroservices;
+  using cppms::any_cast;
+  using cppms::any_map;
+  using cppms::AnyMap;
+
+  std::vector<Bundle> installedBundles;
   std::vector<std::shared_ptr<BundleArchive>> barchives;
+  std::unordered_set<std::string> exclude{ alreadyInstalled.begin(),
+                                           alreadyInstalled.end() };
   try {
-    if (exclude.empty()) {
-      barchives = coreCtx->storage->InsertBundleLib(location);
-    } else {
-      auto resCont =
-        exclude.front()->GetBundleArchive()->GetResourceContainer();
-      auto entries = resCont->GetTopLevelDirs();
-      for (auto const& b : exclude) {
-        entries.erase(
-          std::remove(entries.begin(), entries.end(), b->symbolicName),
-          entries.end());
+    // Create a BundleArchive for each entry in the resource container... that is, top level entries
+    // (symbolic names) in the zip file for the bundle at 'location'.
+    //
+    // Note: We MUST use the values from "GetTopLevelDirs()" because eventhough the keys in the
+    // "bundleManifest" are also the "SymbolicNames", bundleManifest can be empty and will only
+    // contain the symbolicName entries if it's not.
+    auto entries = resCont->GetTopLevelDirs();
+    for (auto const& symbolicName : entries) {
+      // only install non-excluded entries
+      if (0 == exclude.count(symbolicName)) {
+#ifndef US_BUILD_SHARED_LIBS
+        // The system bundle is already installed, so skip it.
+        if (Constants::SYSTEM_BUNDLE_SYMBOLICNAME == symbolicName) {
+          continue;
+        }
+#endif
+
+        // Either use the manifest found in the passed in bundleManifest list for the current entry,
+        // or construct an empty one
+        auto manifest =
+          (0 != bundleManifest.count(symbolicName)
+             ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
+             : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
+
+        // Now, create a BundleArchive with the given manifest at 'entry' in the
+        // BundleResourceContainer, and remember the created BundleArchive here for later
+        // processing, including purging any items created if an exception is thrown.
+        barchives.push_back(coreCtx->storage->CreateAndInsertArchive(
+          resCont, symbolicName, manifest));
       }
-      barchives = coreCtx->storage->InsertArchives(resCont, entries);
     }
 
-    for (auto& ba : barchives) {
-      auto d = std::shared_ptr<BundlePrivate>(
-        new BundlePrivate(coreCtx, std::move(ba)));
-      res.emplace_back(MakeBundle(d));
+    // Now, create a BundlePrivate for each BundleArchive, and then add a Bundle to the results
+    // that are returned, one for each BundlePrivate that's created.
+    for (auto const& ba : barchives) {
+      auto d = std::make_shared<BundlePrivate>(coreCtx, ba);
+      installedBundles.emplace_back(MakeBundle(d));
     }
 
+    // For each bundle that we created, add into the map of location->bundle, completing the
+    // addition of the bundle into the registry with the given manifest.
     {
       auto l = bundles.Lock();
       US_UNUSED(l);
-      for (auto& b : res) {
+      for (auto& b : installedBundles) {
         bundles.v.insert(std::make_pair(location, b.d));
       }
     }
 
-    for (auto& b : res) {
+    // Now fire off the bundle event listeners.
+    for (auto& b : installedBundles) {
       coreCtx->listeners.BundleChanged(
         BundleEvent(BundleEvent::BUNDLE_INSTALLED, b));
     }
-    return res;
   } catch (...) {
     for (auto& ba : barchives) {
       ba->Purge();
     }
+
     throw std::runtime_error("Failed to install bundle library at " + location +
                              ": " + util::GetLastExceptionStr());
   }
+  // And finally return the results.
+  return installedBundles;
 }
 
 void BundleRegistry::Remove(const std::string& location, long id)
@@ -409,13 +486,13 @@ void BundleRegistry::Load()
   auto bas = coreCtx->storage->GetAllBundleArchives();
   for (auto const& ba : bas) {
     try {
-      std::shared_ptr<BundlePrivate> impl(new BundlePrivate(coreCtx, ba));
+      auto impl = std::make_shared<BundlePrivate>(coreCtx, ba);
       bundles.v.insert(std::make_pair(impl->location, impl));
     } catch (...) {
       ba->SetAutostartSetting(-1); // Do not start on launch
       std::cerr << "Failed to load bundle " << util::ToString(ba->GetBundleId())
                 << " (" + ba->GetBundleLocation() + ") uninstalled it!"
-                << " (execption: "
+                << " (exception: "
                 << util::GetExceptionStr(std::current_exception()) << ")"
                 << std::endl;
     }
@@ -428,4 +505,5 @@ void BundleRegistry::CheckIllegalState() const
     throw std::logic_error("This framework instance is not active.");
   }
 }
+
 }

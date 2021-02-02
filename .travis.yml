@@ -181,7 +181,7 @@ install:
   
 script:
   - test $TRAVIS_BRANCH != coverity_scan || exit 0
-#  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X gcov -p -s "/tmp/cppmicroservices_builds"

@@ -8,7 +8,7 @@ comment:
 
 coverage:
   ignore:
-    - "third_party/**/*"              # ignore folder and all its contents
+    - "third_party/.*"                # ignore folder and all its contents
     - "**/test/.*"                    # ignore test code
     - "**/cppmicroservices_init.cpp"  # ignore cppmicroservices_init.cpp files
     - "compendium/test_bundles/.*"    # ignore test_bundles and all its contents

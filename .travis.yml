@@ -1,6 +1,8 @@
-sudo: false
+language: cpp
 
 language: cpp
+os: linux
+dist: xenial
 
 env:
   global:
@@ -13,7 +15,7 @@ env:
 # combinations. For now, just the latest compilers being tested will
 # run all build configurations.
 
-matrix:
+jobs:
     include:
 
       # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty

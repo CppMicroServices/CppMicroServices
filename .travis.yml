@@ -180,7 +180,7 @@ install:
   - cmake --version
   
 script:
-  - test $TRAVIS_BRANCH != coverity_scan || exit 0
+#  - test $TRAVIS_BRANCH != coverity_scan || exit 0
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:

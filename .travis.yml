@@ -1,4 +1,6 @@
-sudo: false
+os: linux
+
+dist: xenial
 
 language: cpp
 
@@ -13,7 +15,7 @@ env:
 # combinations. For now, just the latest compilers being tested will
 # run all build configurations.
 
-matrix:
+jobs:
     include:
 
       # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
@@ -47,7 +49,7 @@ matrix:
 
       # Test all build configuration with the latest available GCC
       - os: linux
-        addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+        addons: { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
         env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind

@@ -48,7 +48,7 @@ jobs:
       # Test all build configuration with the latest available GCC
       - os: linux
         addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
-        env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=0 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
@@ -109,7 +109,7 @@ jobs:
 # To generate codecov reports
 # pin xcode version back to 10.3 since 11.6 appears to break code coverage
       - os: osx
-        osx_image: xcode10.3
+        osx_image: xcode11.6
         compiler: clang
         env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.14 WITH_COVERAGE=1
 

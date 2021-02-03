@@ -47,11 +47,11 @@ jobs:
 
       # Test all build configuration with the latest available GCC
       - os: linux
-        addons: { apt: { packages: ["gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+        addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
         env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
-            #- ./install_valgrind.sh
+            - ./install_valgrind.sh
 
       - os: linux
         addons: *gcc8-valgrind
@@ -184,4 +184,4 @@ script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
+  #- bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"

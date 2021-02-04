@@ -346,8 +346,7 @@ std::vector<Bundle> BundleRegistry::Install0(
                                 resCont, symbolicName, std::move(manifest)));
         }
         else {
-          barchives.push_back(coreCtx->storage->CreateAndInsertArchive(
-                                resCont, symbolicName, AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)));
+          barchives.push_back(coreCtx->storage->CreateAndInsertArchive(resCont, symbolicName));
         }
       }
     }

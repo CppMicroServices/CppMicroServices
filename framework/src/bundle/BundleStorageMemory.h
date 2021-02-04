@@ -41,7 +41,7 @@ public:
   std::shared_ptr<BundleArchive> CreateAndInsertArchive(
     const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::string& topLevelEntry,
-    ManifestT bundleManifest) override;
+    ManifestT = AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)) override;
 
   bool RemoveArchive(const BundleArchive* ba) override;
 

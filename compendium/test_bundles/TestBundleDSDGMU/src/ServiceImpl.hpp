@@ -9,13 +9,14 @@
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample {
+
 class ServiceComponentDynamicGreedyMandatoryUnary final : public test::Interface2
 {
 public:
   ServiceComponentDynamicGreedyMandatoryUnary() = default;
   ~ServiceComponentDynamicGreedyMandatoryUnary() = default;
   virtual std::string ExtendedDescription() override;
-
+  
   void Activate(const std::shared_ptr<ComponentContext>&);
   void Deactivate(const std::shared_ptr<ComponentContext>&);
 
@@ -25,6 +26,7 @@ private:
   std::shared_ptr<test::Interface1> foo;
   std::mutex fooMutex;
 };
+
 } // namespaces
 
 #endif // _SERVICE_IMPL_HPP_

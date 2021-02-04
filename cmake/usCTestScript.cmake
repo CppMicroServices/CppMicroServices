@@ -37,7 +37,7 @@ macro(build_and_test)
 
   if(WITH_COVERAGE)
     if(CTEST_COVERAGE_COMMAND)
-      ctest_coverage(QUIET)
+      ctest_coverage(QUIET CAPTURE_CMAKE_ERROR)
     else()
       message(FATAL_ERROR "CMake could not find coverage tool")
     endif()

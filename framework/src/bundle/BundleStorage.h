@@ -55,7 +55,7 @@ struct BundleStorage
   virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(
     const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::string& topLevelEntry,
-    const ManifestT&) = 0;
+    ManifestT) = 0;
 
   /**
    * Get all bundle archive objects.

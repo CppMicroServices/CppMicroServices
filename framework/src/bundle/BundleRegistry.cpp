@@ -143,7 +143,7 @@ BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
 std::vector<Bundle> BundleRegistry::Install(
   const std::string& location,
   BundlePrivate*,
-  const cppmicroservices::AnyMap& bundleManifest)
+  cppmicroservices::AnyMap bundleManifest)
 {
   using namespace std::chrono_literals;
 
@@ -194,7 +194,7 @@ std::vector<Bundle> BundleRegistry::Install(
 
     // Perform the install
     auto newBundles =
-      Install0(location, resCont, alreadyInstalled, bundleManifest);
+      Install0(location, resCont, alreadyInstalled, std::move(bundleManifest));
     resultingBundles.insert(
       resultingBundles.end(), newBundles.begin(), newBundles.end());
     if (resultingBundles.empty()) {
@@ -241,7 +241,7 @@ std::vector<Bundle> BundleRegistry::Install(
         // Perform the install
         auto resCont =
           std::make_shared<BundleResourceContainer>(location, bundleManifest);
-        installedBundles = Install0(location, resCont, {}, bundleManifest);
+        installedBundles = Install0(location, resCont, {}, std::move(bundleManifest));
       }
       return installedBundles;
     } else {
@@ -288,7 +288,7 @@ std::vector<Bundle> BundleRegistry::Install(
 
         // Perform the install
         newBundles =
-          Install0(location, resCont, alreadyInstalled, bundleManifest);
+          Install0(location, resCont, alreadyInstalled, std::move(bundleManifest));
       }
 
       resultingBundles.insert(
@@ -305,10 +305,11 @@ std::vector<Bundle> BundleRegistry::Install0(
   const std::string& location,
   const std::shared_ptr<BundleResourceContainer>& resCont,
   const std::vector<std::string>& alreadyInstalled,
-  const cppmicroservices::AnyMap& bundleManifest)
+  cppmicroservices::AnyMap bundleManifest)
 {
   namespace cppms = cppmicroservices;
   using cppms::any_cast;
+  using cppms::ref_any_cast;
   using cppms::any_map;
   using cppms::AnyMap;
 
@@ -336,16 +337,18 @@ std::vector<Bundle> BundleRegistry::Install0(
 
         // Either use the manifest found in the passed in bundleManifest list for the current entry,
         // or construct an empty one
-        auto manifest =
-          (0 != bundleManifest.count(symbolicName)
-             ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
-             : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
-
         // Now, create a BundleArchive with the given manifest at 'entry' in the
         // BundleResourceContainer, and remember the created BundleArchive here for later
         // processing, including purging any items created if an exception is thrown.
-        barchives.push_back(coreCtx->storage->CreateAndInsertArchive(
-          resCont, symbolicName, manifest));
+        if (0 != bundleManifest.count(symbolicName)) {
+          auto& manifest = ref_any_cast<AnyMap>(bundleManifest.at(symbolicName));
+          barchives.push_back(coreCtx->storage->CreateAndInsertArchive(
+                                resCont, symbolicName, std::move(manifest)));
+        }
+        else {
+          barchives.push_back(coreCtx->storage->CreateAndInsertArchive(
+                                resCont, symbolicName, AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)));
+        }
       }
     }
 

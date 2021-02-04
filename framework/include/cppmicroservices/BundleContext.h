@@ -1098,7 +1098,8 @@ public:
  * @param location The location of the bundle library to install.
  * @param bundleManifest <b>OPTIONAL</b> - the manifest of the bundle at "location". If non-empty
  *        this will be used without opening the bundle at "location". Otherwise, the bundle will
- *        be opened and the manifest read from there.
+ *        be opened and the manifest read from there. The bundleManifest is moved into the bundle
+ *        registry. 
  * @return The Bundle objects of the installed bundle library.
  * @throws std::runtime_error If the BundleContext is no longer valid, or if the installation failed.
  * @throws std::logic_error If the framework instance is no longer active
@@ -1106,7 +1107,7 @@ public:
  */
   std::vector<Bundle> InstallBundles(
     const std::string& location,
-    const cppmicroservices::AnyMap& bundleManifest = cppmicroservices::AnyMap(
+    cppmicroservices::AnyMap bundleManifest = cppmicroservices::AnyMap(
       cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
 
 private:

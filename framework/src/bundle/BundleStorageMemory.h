@@ -41,7 +41,7 @@ public:
   std::shared_ptr<BundleArchive> CreateAndInsertArchive(
     const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::string& topLevelEntry,
-    const ManifestT& bundleManifest) override;
+    ManifestT bundleManifest) override;
 
   bool RemoveArchive(const BundleArchive* ba) override;
 

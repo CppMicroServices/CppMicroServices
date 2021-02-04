@@ -40,7 +40,7 @@ BundleStorageMemory::BundleStorageMemory()
 std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(
   const std::shared_ptr<BundleResourceContainer>& resCont,
   const std::string& prefix,
-  const ManifestT& bundleManifest)
+  ManifestT bundleManifest)
 {
   auto l = archives.Lock();
   US_UNUSED(l);
@@ -48,7 +48,7 @@ std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(
   auto p = archives.v.insert(std::make_pair(
     id,
     std::make_shared<BundleArchive>(
-      this, resCont, prefix, resCont->GetLocation(), id, bundleManifest)));
+      this, resCont, prefix, resCont->GetLocation(), id, std::move(bundleManifest))));
   return p.first->second;
 }
 

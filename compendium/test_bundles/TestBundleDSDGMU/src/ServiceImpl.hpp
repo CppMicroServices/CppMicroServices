@@ -1,3 +1,6 @@
+#ifndef _SERVICE_IMPL_HPP_
+#define _SERVICE_IMPL_HPP_
+
 #include <mutex>
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
@@ -25,3 +28,5 @@ private:
 };
 
 } // namespaces
+
+#endif // _SERVICE_IMPL_HPP_

@@ -16,7 +16,7 @@ public:
   ServiceComponentDynamicGreedyMandatoryUnary() = default;
   ~ServiceComponentDynamicGreedyMandatoryUnary() = default;
   virtual std::string ExtendedDescription() override;
-  
+
   void Activate(const std::shared_ptr<ComponentContext>&);
   void Deactivate(const std::shared_ptr<ComponentContext>&);
 

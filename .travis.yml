@@ -47,7 +47,7 @@ jobs:
 
       # Test all build configuration with the latest available GCC
       - os: linux
-        addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+        addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8", "lcov"], sources: ["ubuntu-toolchain-r-test"] } }
         env: MY_CC=gcc-8 MY_CXX=g++-8 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
@@ -55,21 +55,21 @@ jobs:
 
       - os: linux
         addons: *gcc8-valgrind
-        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=1 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
 
       - os: linux
         addons: *gcc8-valgrind
-        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=2 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
 
       - os: linux
         addons: *gcc8-valgrind
-        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 WITH_COVERAGE=1 MY_COVERAGE=gcov-8
+        env: MY_CC=gcc-8 MY_CXX=g++-8 BUILD_CONFIGURATION=3 MY_COVERAGE=gcov-8
         before_install:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
@@ -181,7 +181,7 @@ install:
   
 script:
   - test $TRAVIS_BRANCH != coverity_scan || exit 0
-  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ] && [ $WITH_COVERAGE == 1 ]; then lcov --directory . ; fi
 
 after_success:
-  #- bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"
+  - bash <(curl -s https://codecov.io/bash) -X gcov -s "/tmp/cppmicroservices_builds"

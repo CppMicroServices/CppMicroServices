@@ -72,6 +72,13 @@ public:
   };
 
   /**
+   * Modifying properties while the component is in the UNSATISFIED_REFERENCE state is a no-op
+   */
+  void Modified(ComponentConfigurationImpl& /*mgr*/) override
+  {
+
+  };
+  /**
    * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op
    */
   void Rebind(ComponentConfigurationImpl&,

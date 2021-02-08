@@ -88,7 +88,7 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(
   }
   if ((this->metadata->configurationPids.size() > 0) &&
       (this->metadata->configurationPolicy !=
-       this->metadata->configPolicyIgnore)) {
+       metadata::ComponentMetadata::CONFIG_POLICY_IGNORE)) {
     cppmicroservices::BundleContext bundleContext = bundle.GetBundleContext();
     configManager = std::make_shared<ConfigurationManager>(
       this->metadata, bundleContext, this->logger);
@@ -143,7 +143,8 @@ void ComponentConfigurationImpl::Initialize()
   // Call Register if no dependencies exist
   // If dependencies exist, the dependency tracker mechanism will trigger the call to Register at the appropriate time.
   if ((referenceManagers.empty() && (metadata->configurationPids.empty()) ||
-       (metadata->configurationPolicy == metadata->configPolicyIgnore))) {
+       (metadata->configurationPolicy ==
+        metadata::ComponentMetadata::CONFIG_POLICY_IGNORE))) {
     GetState()->Register(*this);
   } else {
     for (auto& kv : referenceManagers) {
@@ -155,7 +156,8 @@ void ComponentConfigurationImpl::Initialize()
       referenceManagerTokens.emplace(refManager, token);
     }
     if (!metadata->configurationPids.empty() &&
-        (metadata->configurationPolicy != metadata->configPolicyIgnore)) {
+        (metadata->configurationPolicy !=
+         metadata::ComponentMetadata::CONFIG_POLICY_IGNORE)) {
 
       // Call RegisterListener to register listeners to listen for changes to configuration objects
       // before calling configManager->Initialize. The Initialize method will get the configuration object
@@ -170,6 +172,11 @@ void ComponentConfigurationImpl::Initialize()
         configListenerTokens.emplace_back(listenerToken);
       }
       configManager->Initialize();
+      if (referenceManagers.empty() &&
+          metadata->configurationPolicy ==
+            metadata::ComponentMetadata::CONFIG_POLICY_OPTIONAL) {
+        GetState()->Register(*this);
+      }
     }
   }
 }
@@ -215,9 +222,9 @@ void ComponentConfigurationImpl::ConfigChangedState(
     [this, configWasSatisfied, configNowSatisfied, notification]() 
   {
     if (configWasSatisfied && configNowSatisfied &&
-        ((GetState()->GetValue() == ComponentState::ACTIVE) &&
-         (metadata->configurationPolicy != metadata->configPolicyIgnore))) {
-      configManager->SendModifiedPropertiesToComponent();
+        (metadata->configurationPolicy !=
+            metadata::ComponentMetadata::CONFIG_POLICY_IGNORE)) {
+        GetState()->Modified(*this);
     }
 
     switch (notification.event) {
@@ -355,6 +362,11 @@ std::shared_ptr<ComponentInstance> ComponentConfigurationImpl::Activate(
 void ComponentConfigurationImpl::Deactivate()
 {
   GetState()->Deactivate(*this);
+}
+
+void ComponentConfigurationImpl::Modified()
+{
+  GetState()->Modified(*this);
 }
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const

@@ -54,6 +54,12 @@ public:
                                               const cppmicroservices::Bundle& clientBundle) override;
 
   /**
+   * Modifies the properties of the component instance when a configuration object on 
+   * which it is dependent changes. No state change. 
+   */
+  void Modified(ComponentConfigurationImpl& /*mgr*/) override;
+
+  /**
    * Rebind to a target service. This operation does not transition to another state.
    *
    * When rebinding the new target service must be bound first before the old

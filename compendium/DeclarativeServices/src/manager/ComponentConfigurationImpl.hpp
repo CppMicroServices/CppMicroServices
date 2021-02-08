@@ -225,6 +225,11 @@ public:
   void Deactivate();
 
   /**
+   * Method used to update the properties of a component instance when a configuration
+   * object on which it is dependent changes. 
+   */
+  void Modified();
+  /**
    * Method called to stop the service trackers associated with this configuration's reference managers
    */
   void Stop();

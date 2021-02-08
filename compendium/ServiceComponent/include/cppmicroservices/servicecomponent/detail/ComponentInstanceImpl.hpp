@@ -32,6 +32,7 @@
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include "ComponentInstance.hpp"
 #include "Binders.hpp"
+#include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices { namespace service { namespace component { namespace detail {
 

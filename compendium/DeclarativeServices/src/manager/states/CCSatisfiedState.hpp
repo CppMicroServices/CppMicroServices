@@ -49,6 +49,12 @@ public:
   void Deactivate(ComponentConfigurationImpl& mgr) override;
 
   /**
+   * Modifying properties while the component is in the SATISFIED state is a no-op
+   */
+  void Modified(ComponentConfigurationImpl& /*mgr*/) override{
+
+  };
+  /**
    * Rebinding while in a \c SATISFIED state is a no-op
    */
   void Rebind(ComponentConfigurationImpl&,

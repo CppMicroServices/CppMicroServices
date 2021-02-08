@@ -123,11 +123,7 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   // component.configuration-policy (Optional)
   ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true)
     .AssignValueTo(compMetadata->configurationPolicy);
-  if (!((compMetadata->configurationPolicy == compMetadata->configPolicyRequire ||
-         compMetadata->configurationPolicy == compMetadata->configPolicyIgnore))) {
-    compMetadata->configurationPolicy = compMetadata->configPolicyOptional;
-  }
-
+ 
   // component.configuration-pid (Optional)
   object =
     ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
@@ -140,18 +136,51 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
                    [](const auto& configPid) {
                      return ObjectValidator(configPid).GetValue<std::string>();
                    });
-
-    //search for $. If present replace with component name.
-    for_each(
-        compMetadata->configurationPids.begin(),
-             compMetadata->configurationPids.end(),
-             [compMetadata](std::string& pid)
-    {
+      
+    //search for a configuration pid equal to $. If present replace with component name. 
+    // Also search for duplicates pids. These are errors. 
+    std::unordered_map<std::string, std::string> duplicatePids;
+    for(auto& pid : compMetadata->configurationPids)
+    {  
         if (pid == "$") {
           pid = compMetadata->name;
         }
-    });
-  
+
+        if (duplicatePids.find(pid) != duplicatePids.end()) {
+          std::string msg = "configuration-pid error in the manifest. Duplicate pid detected. ";
+          msg.append(pid);
+          throw std::out_of_range(msg);
+        }
+        duplicatePids.emplace(pid, pid);       
+    };
+    /* There are 3 possible input combinations for configuration-policy 
+     * and configuration-pid that may require default values to be assigned.
+     *  - manifest.json does not have configuration-policy or configuration-pid
+     *    set configuration-policy = "ignore", configuration-pids empty
+     *  - manifest.json does not have configuration-policy but configuration-pid is present.
+     *    set configuration-policy = "optional"
+     *  - manifest.json does not have configuration-pid but configuration-policy is present. 
+     *    if configuration-policy is ignore, leave configuration-pids empty
+     *    if configuration-policy is require or optional, set configuration-pid to component name.
+     */ 
+    if (compMetadata->configurationPolicy == "") {
+        //no configuration-policy in manifest.json but configuration-pid is present.
+      compMetadata->configurationPolicy =
+        metadata::ComponentMetadata::CONFIG_POLICY_OPTIONAL;
+    }
+  } else {
+    if (compMetadata->configurationPolicy == "") {
+       // no configuration-policy or configuration-pid in manifest.json
+      compMetadata->configurationPolicy =
+        metadata::ComponentMetadata::CONFIG_POLICY_IGNORE;
+    } else { 
+        if (compMetadata->configurationPolicy !=
+          metadata::ComponentMetadata::CONFIG_POLICY_IGNORE) {
+            // configuration-policy = require or optional, no configuration-pid in manifest.json
+             compMetadata->configurationPids.emplace_back(compMetadata->name);
+        }
+    }
+    
   }
 
   // component.properties

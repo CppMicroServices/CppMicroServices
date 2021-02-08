@@ -77,6 +77,12 @@ public:
   virtual void Deactivate(ComponentConfigurationImpl& mgr) = 0;
 
   /**
+   * Implementation must modify the properties of a component instance when a configuration
+   * object on which it is dependent changes. 
+   */
+  virtual void Modified(ComponentConfigurationImpl& mgr) = 0;
+
+  /**
    * Implementation must handle dynamic rebinding in any state.
    *
    * \param mgr is the {@link ComponentConfigurationImpl} object whose state needs to change

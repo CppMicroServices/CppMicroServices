@@ -44,7 +44,7 @@ struct ComponentMetadata
     : activateMethodName("Activate")
     , deactivateMethodName("Deactivate")
     , modifiedMethodName("Modified")
-    , configurationPolicy("optional") 
+    , configurationPolicy("") 
   {}
 
   std::string name;
@@ -59,9 +59,9 @@ struct ComponentMetadata
   std::unordered_map<std::string, cppmicroservices::Any> properties;
   std::string configurationPolicy;
   // constants for configurationPolicy
-  const std::string configPolicyIgnore = "ignore";
-  const std::string configPolicyRequire = "require";
-  const std::string configPolicyOptional = "optional";
+  static const std::string CONFIG_POLICY_IGNORE;
+  static const std::string CONFIG_POLICY_REQUIRE;
+  static const std::string CONFIG_POLICY_OPTIONAL;
   std::vector<std::string> configurationPids;
  
 };

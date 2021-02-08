@@ -32,6 +32,7 @@ set(_srcs
   metadata/ReferenceMetadata.cpp
   metadata/ServiceMetadata.cpp
   metadata/Util.cpp
+  metadata/ComponentMetadata.cpp
   )
 
 set(_private_headers

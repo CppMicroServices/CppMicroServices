@@ -83,6 +83,16 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
   return nullptr;
 }
 
+
+void CCActiveState::Modified(ComponentConfigurationImpl& /*mgr*/)
+{
+  if (latch.CountUp()) {
+      // Modify functionality goes here. Not yet implemented
+    latch.CountDown();
+
+  }
+
+  };
 void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
                            const std::string& refName,
                            const ServiceReference<void>& svcRefToBind,

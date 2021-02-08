@@ -49,9 +49,13 @@ struct ComponentInfo
 {
   std::string name;
   std::string implClassName;
+  std::string configurationPolicy;
   bool injectReferences;
   ServiceInfo service;
   std::vector<ReferenceInfo> references;
+  static const std::string CONFIG_POLICY_IGNORE;
+  static const std::string CONFIG_POLICY_REQUIRE;
+  static const std::string CONFIG_POLICY_OPTIONAL;
 };
 
 // These functions return the string representations for the data model

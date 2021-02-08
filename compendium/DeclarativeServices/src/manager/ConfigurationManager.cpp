@@ -48,8 +48,10 @@ cppmicroservices::AnyMap ConfigurationManager::GetProperties() const noexcept
 
 void ConfigurationManager::Initialize() {
   if ((metadata->configurationPids.empty()) ||
-      (metadata->configurationPolicy == metadata->configPolicyIgnore))
+      (metadata->configurationPolicy == metadata::ComponentMetadata::CONFIG_POLICY_IGNORE))
     return;
+  try {
+  
   auto sr =
     this->bundleContext
       .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
@@ -74,7 +76,12 @@ void ConfigurationManager::Initialize() {
         }   
       }      
     } 
-  }  
+  }
+  } catch (...) {
+    // No ConfigAdmin available
+               
+    return;
+  }
 }
 
 void ConfigurationManager::UpdateMergedProperties(const std::string pid, 
@@ -136,13 +143,16 @@ bool ConfigurationManager::isConfigSatisfied(
   bool allConfigsAvailable =
     configProperties.size() >= metadata->configurationPids.size();
 
-  if ((metadata->configurationPolicy == metadata->configPolicyIgnore) ||
+  if ((metadata->configurationPolicy ==
+       metadata::ComponentMetadata::CONFIG_POLICY_IGNORE) ||
       (allConfigsAvailable)) {
     return true;
   }
 
-  if ((metadata->configurationPolicy == metadata->configPolicyRequire) ||
-      ((metadata->configurationPolicy == metadata->configPolicyOptional) &&
+  if ((metadata->configurationPolicy ==
+       metadata::ComponentMetadata::CONFIG_POLICY_REQUIRE) ||
+      ((metadata->configurationPolicy ==
+        metadata::ComponentMetadata::CONFIG_POLICY_OPTIONAL) &&
        (currentState == ComponentState::ACTIVE))) {
     return false;
   }
@@ -152,7 +162,8 @@ bool ConfigurationManager::isConfigSatisfied(
 void ConfigurationManager::SendModifiedPropertiesToComponent() {
     // see sequence diagram ConfigurationListener::configurationEvent(CM_UPDATED)
 
-    // if component has a Modified method, call it with mergedProperties. 
+    // if component has a Modified method, call it with mergedProperties. For service components, update Service Registration object 
+    // once properties have been updated on the service component
     // if component does not have a Modified method, Deactivate and Reactivate the component.
 }
 

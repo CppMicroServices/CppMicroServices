@@ -57,6 +57,19 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
       componentInfo.injectReferences = injectReferences.asBool();
     }
 
+    // configuration-policy
+    componentInfo.configurationPolicy = 
+        codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
+    if (jsonComponent.isMember("configuration-policy")) {
+      componentInfo.configurationPolicy = JsonValueValidator(
+        jsonComponent, "configuration-policy", Json::ValueType::stringValue).GetString();
+    } else {
+      if (jsonComponent.isMember("configuration-pid")) {
+        componentInfo.configurationPolicy =
+          codegen::datamodel::ComponentInfo::CONFIG_POLICY_OPTIONAL;
+      }
+    }
+ 
     // service
     if (jsonComponent.isMember("service")) {
       const auto jsonServiceInfo = JsonValueValidator(

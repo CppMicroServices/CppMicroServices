@@ -37,6 +37,13 @@ macro(build_and_test)
 
   if(WITH_COVERAGE)
     if(CTEST_COVERAGE_COMMAND)
+      set(COVERAGE_EXCLUDES
+      '${US_SOURCE_DIR}/compendium/test_bundles/TestBundleDSDGMU/src/*'
+      '${US_SOURCE_DIR}/compendium/test_bundles/TestBundleDSDGOU/src/*'
+      '${US_SOURCE_DIR}/compendium/test_bundles/TestBundleDSDRMU/src/*'
+      '${US_SOURCE_DIR}/compendium/test_bundles/TestBundleDSDROU/src/*'
+      '${US_SOURCE_DIR}/third_party/boost/include/boost/asio/*'
+      '${US_SOURCE_DIR}/third_party/boost/include/boost/asio/impl/')
       ctest_coverage(QUIET)
     else()
       message(FATAL_ERROR "CMake could not find coverage tool")

@@ -121,66 +121,62 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   ObjectValidator(metadata, "name", /*isOptional=*/true).AssignValueTo(compMetadata->name);
 
   // component.configuration-policy (Optional)
-  ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true)
-    .AssignValueTo(compMetadata->configurationPolicy);
- 
+  compMetadata->configurationPolicy = metadata::ComponentMetadata::CONFIG_POLICY_IGNORE;
+  unsigned short configPolicy = 0;
+  object =
+    ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true);
+  if (object.KeyExists()) {
+    object.AssignValueTo(compMetadata->configurationPolicy);
+    configPolicy = 1;
+  }
+
   // component.configuration-pid (Optional)
+  unsigned short configPid = 0;
   object =
     ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
   if (object.KeyExists()) {
-    const auto configPids =
-      object.GetValue<std::vector<cppmicroservices::Any>>();
-    std::transform(std::begin(configPids),
-                   std::end(configPids),
-                   std::back_inserter(compMetadata->configurationPids),
-                   [](const auto& configPid) {
-                     return ObjectValidator(configPid).GetValue<std::string>();
-                   });
+    configPid = 1;
+    if (configPolicy == 1) {
+        const auto configPids = 
+          object.GetValue<std::vector<cppmicroservices::Any>>();
+        std::transform(std::begin(configPids),
+                       std::end(configPids),
+                       std::back_inserter(compMetadata->configurationPids),
+                       [](const auto& configPid) {
+                         return ObjectValidator(configPid).GetValue<std::string>();
+                       });
       
-    //search for a configuration pid equal to $. If present replace with component name. 
-    // Also search for duplicates pids. These are errors. 
-    std::unordered_map<std::string, std::string> duplicatePids;
-    for(auto& pid : compMetadata->configurationPids)
-    {  
-        if (pid == "$") {
-          pid = compMetadata->name;
-        }
+        //search for a configuration pid equal to $. If present replace with component name. 
+        // Also search for duplicates pids. These are errors. 
+        std::unordered_map<std::string, std::string> duplicatePids;
+        for(auto& pid : compMetadata->configurationPids)
+        {  
+            if (pid == "$") {
+              pid = compMetadata->name;
+            }
 
-        if (duplicatePids.find(pid) != duplicatePids.end()) {
-          std::string msg = "configuration-pid error in the manifest. Duplicate pid detected. ";
-          msg.append(pid);
-          throw std::out_of_range(msg);
-        }
-        duplicatePids.emplace(pid, pid);       
-    };
-    /* There are 3 possible input combinations for configuration-policy 
-     * and configuration-pid that may require default values to be assigned.
-     *  - manifest.json does not have configuration-policy or configuration-pid
-     *    set configuration-policy = "ignore", configuration-pids empty
-     *  - manifest.json does not have configuration-policy but configuration-pid is present.
-     *    set configuration-policy = "optional"
-     *  - manifest.json does not have configuration-pid but configuration-policy is present. 
-     *    if configuration-policy is ignore, leave configuration-pids empty
-     *    if configuration-policy is require or optional, set configuration-pid to component name.
-     */ 
-    if (compMetadata->configurationPolicy == "") {
-        //no configuration-policy in manifest.json but configuration-pid is present.
-      compMetadata->configurationPolicy =
-        metadata::ComponentMetadata::CONFIG_POLICY_OPTIONAL;
-    }
-  } else {
-    if (compMetadata->configurationPolicy == "") {
-       // no configuration-policy or configuration-pid in manifest.json
-      compMetadata->configurationPolicy =
-        metadata::ComponentMetadata::CONFIG_POLICY_IGNORE;
-    } else { 
-        if (compMetadata->configurationPolicy !=
-          metadata::ComponentMetadata::CONFIG_POLICY_IGNORE) {
-            // configuration-policy = require or optional, no configuration-pid in manifest.json
-             compMetadata->configurationPids.emplace_back(compMetadata->name);
-        }
-    }
-    
+            if (duplicatePids.find(pid) != duplicatePids.end()) {
+              std::string msg = "configuration-pid error in the manifest. Duplicate pid detected. ";
+              msg.append(pid);
+              throw std::out_of_range(msg);
+            }
+            duplicatePids.emplace(pid, pid);       
+        };
+    }  
+  }
+  /* In order to participate in ConfigurationAdmin both the configuration-policy
+     * and the configuration-pid must be present in the manifest.json file. 
+     * Otherwise the configuration-policy is set to ignore. If only one is present
+     * a Warning message is logged.
+     */
+  if (configPolicy ^ configPid) {
+    compMetadata->configurationPolicy =
+      metadata::ComponentMetadata::CONFIG_POLICY_IGNORE;
+    std::string msg = "Warning: configuration-policy has been set to ignore.";
+    msg.append(
+      " Both configuration-policy and configuration-pid must be present");
+    msg.append(" to participate in Configuration Admin. ");
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, msg);
   }
 
   // component.properties

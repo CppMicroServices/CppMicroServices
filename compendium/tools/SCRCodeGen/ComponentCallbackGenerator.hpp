@@ -99,7 +99,7 @@ private:
       std::string configuration = "";
       if (componentInfo.configurationPolicy !=
           codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE) {
-        configuration.append(",cppmicroservices::AnyMap");
+        configuration.append(",cppmicroservices::AnyMap&");
       }
       auto isReferencesEmpty = componentInfo.references.empty();
       if(false == isReferencesEmpty)

@@ -28,6 +28,7 @@
 
 #if defined(US_PLATFORM_WINDOWS)
   #include <Windows.h>
+  #include <strsafe.h>
   #include <psapi.h>
 #else
   #include <iostream>
@@ -43,6 +44,9 @@ namespace scr = cppmicroservices::service::component::runtime;
 
 namespace test
 {
+bool isErrored(const std::string functionName);
+bool isBundleLoaded(const std::string bundleName);
+
 /**
  * Verify a component that implements Activate & Deactivate methods receives
  * the callbacks
@@ -187,74 +191,6 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle_Dynamic) // DS_TOI_51
   EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
 }
 
-//Function to validate lazy loading of delayed component
-bool isBundleLoaded(const std::string bundleName)
-{
-  #if defined(US_PLATFORM_WINDOWS)
-
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
-
-    HANDLE hProcess = GetCurrentProcess();
-
-    auto res = EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
-    EXPECT_NE(res, 0) << "Enumeration failed";
-    EXPECT_GT(sizeof(hMods), cbNeeded) << "Size of array is too small to hold all module handles";
-    if ((sizeof(hMods) < cbNeeded) || res == 0)
-    {
-        return false;
-    }
-
-    TCHAR szModName[MAX_PATH];
-    std::string result;
-
-    for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
-    {
-        auto file = GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR));
-        EXPECT_NE(file, 0) << "Failed to retrive file path";
-        result += szModName;
-    }
-
-    std::size_t found = result.find(bundleName);
-    CloseHandle(hProcess);
-    result.clear();
-    
-    if (found != std::string::npos)
-    {
-        return true;
-    }
-    return false;
-  #else
-    auto pid_t = getpid();
-    std::string command("lsof -p " + std::to_string(pid_t));
-    FILE* fd = popen(command.c_str(), "r");
-    EXPECT_NE(fd, nullptr) << "popen failed";
-    if (nullptr == fd)
-    {
-        return false;
-    }
-
-    std::string result;
-    char buf[PATH_MAX];
-    while (nullptr != fgets(buf, PATH_MAX, fd))
-    {
-        result += buf;
-    }
-
-    std::size_t found = result.find(bundleName);
-  
-    auto fc = pclose(fd);
-    EXPECT_NE(fc, -1) << "pclose failed";
-    result.clear();
-
-    if (found != std::string::npos)
-    {
-        return true;
-    }
-    return false;
-  #endif
-}
-
 /**
  * Verify state progressions for a delayed component
  * UNSATISFIED_REFERENCE -> SATISFIED -> ACTIVE -> UNSATISFIED_REFERENCE
@@ -343,4 +279,98 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
   EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
 }
+
+//To check if error occured during a last function call
+bool isErrored(const std::string functionName)
+{
+    // Retrieve the system error message for the last-error code
+    LPSTR lpDisplayBuf;
+    DWORD dw = GetLastError();
+
+    if (dw == 0)
+        return false;
+
+    std::size_t size = FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpDisplayBuf,
+        0, NULL);
+
+    std::cerr << "\n" << functionName << " failed with error " << dw << ": " << lpDisplayBuf << std::endl;
+    LocalFree(lpDisplayBuf);
+    return true;
+}
+
+//Function to validate lazy loading of delayed component
+bool isBundleLoaded(const std::string bundleName)
+{
+#if defined(US_PLATFORM_WINDOWS)
+
+    HMODULE hMods[1024];
+    DWORD cbNeeded;
+
+    HANDLE hProcess = GetCurrentProcess();
+
+    auto res = EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
+    EXPECT_FALSE(isErrored("EnumProcessModules"));
+
+    EXPECT_GT(sizeof(hMods), cbNeeded) << "Size of array is too small to hold all module handles";
+    if ((sizeof(hMods) < cbNeeded))
+    {
+        return false;
+    }
+
+    TCHAR szModName[MAX_PATH];
+    std::size_t found;
+
+    for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+    {
+        auto modulePathLength = GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR));
+        EXPECT_FALSE(isErrored("GetModuleFileNameA"));
+
+        found = std::string(szModName).find(bundleName);
+        if (found != std::string::npos)
+        {
+            CloseHandle(hProcess);
+            EXPECT_FALSE(isErrored("CloseHandle"));
+            return true;
+        }
+    }
+
+    CloseHandle(hProcess);
+    EXPECT_FALSE(isErrored("CloseHandle"));
+    return false;
+#else
+    auto pid_t = getpid();
+    std::string command("lsof -p " + std::to_string(pid_t));
+    FILE* fd = popen(command.c_str(), "r");
+    EXPECT_NE(fd, nullptr) << "popen failed";
+    if (nullptr == fd)
+    {
+        return false;
+    }
+
+    std::size_t found;
+    char buf[PATH_MAX];
+    while (nullptr != fgets(buf, PATH_MAX, fd))
+    {
+        found = std::string(buf).find(bundleName);
+        if (found != std::string::npos)
+        {
+            auto fc = pclose(fd);
+            EXPECT_NE(fc, -1) << "pclose failed";
+            return true;
+        }
+    }
+
+    auto fc = pclose(fd);
+    EXPECT_NE(fc, -1) << "pclose failed";
+    return false;
+#endif
+}
+
 }

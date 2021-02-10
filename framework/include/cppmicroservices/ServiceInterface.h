@@ -165,7 +165,7 @@ const std::string& us_service_interface_iid()
 template<>
 inline const std::string& us_service_interface_iid<void>()
 {
-  static const std::string name("");
+  static const std::string name;
   return name;
 }
 /// \endcond

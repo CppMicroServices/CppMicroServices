@@ -290,14 +290,14 @@ bool isErrored(const std::string functionName)
     if (dw == 0)
         return false;
 
-    std::size_t size = FormatMessage(
+    FormatMessage(
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
         dw,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR)&lpDisplayBuf,
+        reinterpret_cast<LPTSTR>(&lpDisplayBuf),
         0, NULL);
 
     std::cerr << "\nERROR:\n" << functionName << " failed with error " << dw << ": " << lpDisplayBuf << std::endl;
@@ -321,7 +321,7 @@ bool isBundleLoaded(const std::string bundleName)
 
     HANDLE hProcess = GetCurrentProcess();
 
-    auto res = EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
+    EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
     EXPECT_FALSE(isErrored("EnumProcessModules"));
 
     EXPECT_GT(sizeof(hMods), cbNeeded) << "Size of array is too small to hold all module handles";
@@ -335,7 +335,7 @@ bool isBundleLoaded(const std::string bundleName)
 
     for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
     {
-        auto modulePathLength = GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR));
+        GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR));
         EXPECT_FALSE(isErrored("GetModuleFileNameA"));
 
         found = std::string(szModName).find(bundleName);

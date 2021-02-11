@@ -28,7 +28,6 @@
 
 #if defined(US_PLATFORM_WINDOWS)
   #include <Windows.h>
-  #include <strsafe.h>
   #include <psapi.h>
 #else
   #include <iostream>
@@ -280,9 +279,10 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
 }
 
-//To check if error occured during a last function call
+//To check if error occured during a last function call(Windows Only)
 bool isErrored(const std::string functionName)
 {
+#if defined(US_PLATFORM_WINDOWS)
     // Retrieve the system error message for the last-error code
     LPSTR lpDisplayBuf;
     DWORD dw = GetLastError();
@@ -300,9 +300,15 @@ bool isErrored(const std::string functionName)
         (LPTSTR)&lpDisplayBuf,
         0, NULL);
 
-    std::cerr << "\n" << functionName << " failed with error " << dw << ": " << lpDisplayBuf << std::endl;
+    std::cerr << "\nERROR:\n" << functionName << " failed with error " << dw << ": " << lpDisplayBuf << std::endl;
+
+    SetLastError(0);
     LocalFree(lpDisplayBuf);
     return true;
+#else
+    std::cerr<<"isErrored("<<functionName<<") will only work for windows";
+    return true;
+#endif
 }
 
 //Function to validate lazy loading of delayed component
@@ -335,14 +341,10 @@ bool isBundleLoaded(const std::string bundleName)
         found = std::string(szModName).find(bundleName);
         if (found != std::string::npos)
         {
-            CloseHandle(hProcess);
-            EXPECT_FALSE(isErrored("CloseHandle"));
             return true;
         }
     }
 
-    CloseHandle(hProcess);
-    EXPECT_FALSE(isErrored("CloseHandle"));
     return false;
 #else
     auto pid_t = getpid();

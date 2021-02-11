@@ -99,9 +99,6 @@ TEST_F(tServiceComponent, testImmediateComponent_LifeCycle) // DS_TOI_51
   EXPECT_FALSE(static_cast<bool>(sRef)) << "Service must not be available before it's dependency";
   auto depBundle = StartTestBundle("TestBundleDSTOI1");
 
-  
-
-
   // wait for the asynchronous task to take effect
   auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()
                                          {
@@ -288,7 +285,7 @@ TEST_F(tServiceComponent, testDependencyInjection) // DS_TOI_18
     ASSERT_NE(service, nullptr);
     
     //Verify Constructor Injection
-    ASSERT_TRUE(service->isDependencyInjected()) << "Dependency could not be Injected with Constructor";
+    ASSERT_TRUE(service->isDependencyInjected()) << "Constructor based dependency injection failed";
     
     depBundle.Stop();
     result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()

@@ -8,23 +8,24 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample
 {
-  class ServiceComponent18 : public test::Interface3
+  class ServiceComponent18 final : public test::Interface3
     {
     public:
-      bool constructorHit = false;
-     
-      ServiceComponent18(std::shared_ptr<test::Interface1> interface1)
+      ServiceComponent18():constructorHit{false}{}
+
+      ServiceComponent18(std::shared_ptr<test::Interface1> interface1) : constructorHit{false}
       {
-		  if(nullptr != interface1)
+          if (nullptr != interface1)
+          {
               constructorHit = true;
+          }
       } 
 
       bool isDependencyInjected() override;
-      void Activate(const std::shared_ptr<ComponentContext>&);
-      void Deactivate(const std::shared_ptr<ComponentContext>&);
       ~ServiceComponent18() = default;
 
     private:
+        bool constructorHit;
     };
 }
 

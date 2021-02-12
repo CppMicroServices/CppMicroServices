@@ -1,6 +1,6 @@
-sudo: false
-
 language: cpp
+os: linux
+dist: xenial
 
 env:
   global:
@@ -13,7 +13,7 @@ env:
 # combinations. For now, just the latest compilers being tested will
 # run all build configurations.
 
-matrix:
+jobs:
     include:
 
       # Test our minimum GCC version, which is gcc 5.4 on Ubuntu Trusty
@@ -178,7 +178,7 @@ install:
   - popd
   - export CC=$MY_CC CXX=$MY_CXX
   - cmake --version
-  
+
 script:
   - test $TRAVIS_BRANCH != coverity_scan || exit 0
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ctest -VV -S ./cmake/usCTestScript_travis.cmake ; fi

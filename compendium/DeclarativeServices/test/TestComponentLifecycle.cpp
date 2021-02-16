@@ -25,6 +25,7 @@
 #include "TestUtils.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/ServiceEvent.h"
+#include "cppmicroservices/util/Error.h"
 
 #if defined(US_PLATFORM_WINDOWS)
   #include <Windows.h>
@@ -43,7 +44,6 @@ namespace scr = cppmicroservices::service::component::runtime;
 
 namespace test
 {
-bool isErrored(const std::string functionName);
 bool isBundleLoaded(const std::string bundleName);
 
 /**
@@ -279,38 +279,6 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
 }
 
-//To check if error occured during a last function call(Windows Only)
-bool isErrored(const std::string functionName)
-{
-#if defined(US_PLATFORM_WINDOWS)
-    // Retrieve the system error message for the last-error code
-    LPSTR lpDisplayBuf;
-    DWORD dw = GetLastError();
-
-    if (dw == 0)
-        return false;
-
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dw,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPTSTR>(&lpDisplayBuf),
-        0, NULL);
-
-    std::cerr << "\nERROR:\n" << functionName << " failed with error " << dw << ": " << lpDisplayBuf << std::endl;
-
-    SetLastError(0);
-    LocalFree(lpDisplayBuf);
-    return true;
-#else
-    std::cerr<<"isErrored("<<functionName<<") will only work for windows";
-    return true;
-#endif
-}
-
 //Function to validate lazy loading of delayed component
 bool isBundleLoaded(const std::string bundleName)
 {
@@ -321,22 +289,28 @@ bool isBundleLoaded(const std::string bundleName)
 
     HANDLE hProcess = GetCurrentProcess();
 
-    EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
-    EXPECT_FALSE(isErrored("EnumProcessModules"));
-
-    EXPECT_GT(sizeof(hMods), cbNeeded) << "Size of array is too small to hold all module handles";
-    if ((sizeof(hMods) < cbNeeded))
+    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
     {
+        std::cout<<"FAILURE:\n"<<"EnumProcessModules failed : "<<cppmicroservices::util::GetLastWin32ErrorStr()<<std::endl;
+        SetLastError(0);
         return false;
     }
 
-    TCHAR szModName[MAX_PATH];
+    if ((sizeof(hMods) < cbNeeded))
+    {
+        std::cout << "WARNING:\n" << "EnumProcessModules : Size of array is too small to hold all module handles"<< std::endl;
+    }
+
+    TCHAR szModName[MAX_PATH*2];
     std::size_t found;
 
     for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
     {
-        GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR));
-        EXPECT_FALSE(isErrored("GetModuleFileNameA"));
+        if (!GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
+        {
+            std::cout << "WARNING:\n" << "GetModuleFileNameA failed :" << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
+            SetLastError(0);
+        }
 
         found = std::string(szModName).find(bundleName);
         if (found != std::string::npos)

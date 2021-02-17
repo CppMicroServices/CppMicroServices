@@ -79,6 +79,7 @@ public:
     test::InstallLib(context, "TestBundleDSTOI14");
     test::InstallLib(context, "TestBundleDSTOI15");
     test::InstallLib(context, "TestBundleDSTOI16");
+    test::InstallLib(context, "TestBundleDSTOI18");
     test::InstallLib(context, "TestBundleDSTOI2");
     test::InstallLib(context, "TestBundleDSTOI3");
     test::InstallLib(context, "TestBundleDSTOI5");

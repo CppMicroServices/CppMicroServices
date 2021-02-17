@@ -49,6 +49,13 @@ namespace test
       virtual ~Interface2();
     };
 
+    class US_TestInterfaces_EXPORT Interface3
+    {
+      public:
+      virtual bool isDependencyInjected() = 0;
+      virtual ~Interface3();
+    };
+
     class US_TestInterfaces_EXPORT TestManagedServiceInterface {
       public:
         virtual ~TestManagedServiceInterface() = default;

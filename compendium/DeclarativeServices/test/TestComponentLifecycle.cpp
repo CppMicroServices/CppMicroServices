@@ -25,27 +25,12 @@
 #include "TestUtils.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/ServiceEvent.h"
-#include "cppmicroservices/util/Error.h"
-
-#if defined(US_PLATFORM_WINDOWS)
-  #include <Windows.h>
-  #include <psapi.h>
-#else
-  #include <iostream>
-  #include <fstream>
-#endif
-
-#if defined(US_PLATFORM_LINUX)
-  #include <linux/limits.h>
-#endif
 
 namespace sc  = cppmicroservices::service::component;
 namespace scr = cppmicroservices::service::component::runtime;
 
 namespace test
 {
-bool isBundleLoaded(const std::string bundleName);
-
 /**
  * Verify a component that implements Activate & Deactivate methods receives
  * the callbacks
@@ -207,7 +192,7 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   auto sRef = ctxt.GetServiceReference<test::Interface2>();
   EXPECT_FALSE(static_cast<bool>(sRef)) << "Service must not be available before it's dependency";
   
-  auto result = isBundleLoaded("TestBundleDSTOI6");
+  auto result = isBundleLoadedInThisProcess("TestBundleDSTOI6");
   EXPECT_FALSE(result) << "library must not be available";
 
   std::mutex mtx, mtx1;
@@ -238,7 +223,7 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::SATISFIED);
 
-  result = isBundleLoaded("TestBundleDSTOI6");
+  result = isBundleLoadedInThisProcess("TestBundleDSTOI6");
   EXPECT_FALSE(result) << "library must not be available";
 
   auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
@@ -249,7 +234,7 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::ACTIVE) << "State must be ACTIVE after call to GetService";
   EXPECT_NO_THROW(service->ExtendedDescription()) << "Throws if the dependency could not be found";
 
-  result = isBundleLoaded("TestBundleDSTOI6");
+  result = isBundleLoadedInThisProcess("TestBundleDSTOI6");
   EXPECT_TRUE(result) << "library must be available";
 
   auto token1 = ctxt.AddServiceListener([&](const cppmicroservices::ServiceEvent& evt) {
@@ -277,76 +262,6 @@ TEST_F(tServiceComponent, testDelayedComponent_LifeCycle) //DS_TOI_52 //DS_TOI_6
   EXPECT_EQ(compConfigDTOs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE);
   auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
   EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
-}
-
-//Function to validate lazy loading of delayed component
-bool isBundleLoaded(const std::string bundleName)
-{
-#if defined(US_PLATFORM_WINDOWS)
-
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
-
-    HANDLE hProcess = GetCurrentProcess();
-
-    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
-    {
-        std::cout<<"FAILURE:\n"<<"EnumProcessModules failed : "<<cppmicroservices::util::GetLastWin32ErrorStr()<<std::endl;
-        SetLastError(0);
-        return false;
-    }
-
-    if ((sizeof(hMods) < cbNeeded))
-    {
-        std::cout << "WARNING:\n" << "EnumProcessModules : Size of array is too small to hold all module handles"<< std::endl;
-    }
-
-    TCHAR szModName[MAX_PATH*2];
-    std::size_t found;
-
-    for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
-    {
-        if (!GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
-        {
-            std::cout << "WARNING:\n" << "GetModuleFileNameA failed :" << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
-            SetLastError(0);
-        }
-
-        found = std::string(szModName).find(bundleName);
-        if (found != std::string::npos)
-        {
-            return true;
-        }
-    }
-
-    return false;
-#else
-    auto pid_t = getpid();
-    std::string command("lsof -p " + std::to_string(pid_t));
-    FILE* fd = popen(command.c_str(), "r");
-    EXPECT_NE(fd, nullptr) << "popen failed";
-    if (nullptr == fd)
-    {
-        return false;
-    }
-
-    std::size_t found;
-    char buf[PATH_MAX];
-    while (nullptr != fgets(buf, PATH_MAX, fd))
-    {
-        found = std::string(buf).find(bundleName);
-        if (found != std::string::npos)
-        {
-            auto fc = pclose(fd);
-            EXPECT_NE(fc, -1) << "pclose failed";
-            return true;
-        }
-    }
-
-    auto fc = pclose(fd);
-    EXPECT_NE(fc, -1) << "pclose failed";
-    return false;
-#endif
 }
 
 }

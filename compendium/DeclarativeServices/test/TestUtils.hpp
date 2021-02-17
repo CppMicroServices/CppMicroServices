@@ -77,6 +77,11 @@ std::string GetDSRuntimePluginFilePath();
  */
 std::string GetTestPluginsPath();
 
+/**
+ * Method to check if a bundle is loaded in current process
+ */
+bool isBundleLoadedInThisProcess(std::string bundleName);
+
 } // namespaces
 
 #endif /* TestUtils_hpp */

@@ -26,6 +26,19 @@
 #include "cppmicroservices/util/FileSystem.h"
 #include <iostream>
 #include "DSTestingConfig.h"
+#include "cppmicroservices/util/Error.h"
+
+#if defined(US_PLATFORM_WINDOWS)
+  #include <Windows.h>
+  #include <psapi.h>
+#else
+  #include <fstream>
+  #include <unistd.h>
+#endif
+
+#if defined(US_PLATFORM_LINUX)
+  #include <linux/limits.h>
+#endif
 
 namespace {
 
@@ -129,6 +142,79 @@ void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
   for (auto b : bundles) {
     b.Start();
   }
+}
+
+bool isBundleLoadedInThisProcess(std::string bundleName)
+{
+#if defined(US_PLATFORM_WINDOWS)
+
+    HMODULE hMods[1024];
+    DWORD cbNeeded;
+
+    HANDLE hProcess = GetCurrentProcess();
+
+    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+    {
+        std::cout << "FAILURE:\n" << "EnumProcessModules failed : " << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
+        SetLastError(0);
+        return false;
+    }
+
+    if ((sizeof(hMods) < cbNeeded))
+    {
+        std::cout << "WARNING:\n" << "EnumProcessModules : Size of array is too small to hold all module handles" << std::endl;
+    }
+
+    TCHAR szModName[MAX_PATH * 2];
+    std::size_t found;
+
+    for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+    {
+        if (!GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
+        {
+            std::cout << "WARNING:\n" << "GetModuleFileNameA failed :" << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
+            SetLastError(0);
+        }
+
+        found = std::string(szModName).find(bundleName);
+        if (found != std::string::npos)
+        {
+            return true;
+        }
+    }
+
+    return false;
+#else
+    auto pid_t = getpid();
+    std::string command("lsof -p " + std::to_string(pid_t));
+    FILE* fd = popen(command.c_str(), "r");
+    if (nullptr == fd)
+    {
+        std::cout << "FAILURE:\n" << "popen failed" << std::endl;
+        return false;
+    }
+
+    std::size_t found;
+    char buf[PATH_MAX];
+    while (nullptr != fgets(buf, PATH_MAX, fd))
+    {
+        found = std::string(buf).find(bundleName);
+        if (found != std::string::npos)
+        {
+            if(-1 == pclose(fd))
+            {
+                std::cout << "WARNING:\n" << "pclose failed"<< std::endl;
+            }
+            return true;
+        }
+    }
+
+    if(-1 == pclose(fd))
+    {
+        std::cout << "WARNING:\n" << "pclose failed"<< std::endl;
+    }
+    return false;
+#endif
 }
 
 } // namespaces

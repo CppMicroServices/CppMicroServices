@@ -96,11 +96,6 @@ private:
                                      , datamodel::GetComponentNameStr(componentInfo)) << std::endl
                  << "{" << std::endl;
 
-      std::string configuration = "";
-      if (componentInfo.configurationPolicy !=
-          codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE) {
-        configuration.append(",cppmicroservices::AnyMap&");
-      }
       auto isReferencesEmpty = componentInfo.references.empty();
       if(false == isReferencesEmpty)
       {
@@ -122,20 +117,18 @@ private:
         }
       }
       
-      mStrStream << "  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<"
-                 << componentInfo.implClassName
-                 << ", std::tuple<"
+      mStrStream << "  ComponentInstance* componentInstance = new "
+                    "(std::nothrow) ComponentInstanceImpl<"
+                 << componentInfo.implClassName << ", std::tuple<"
                  << datamodel::GetServiceInterfacesStr(componentInfo.service)
                  << ">";
 
       if (true == isReferencesEmpty)
       {
-        mStrStream << configuration
-                   << ">();";
+        mStrStream  << ">();";
       }
       else {
         mStrStream << datamodel::GetCtorInjectedRefTypes(componentInfo)
-                   << configuration
                    << ">("
                    << datamodel::GetCtorInjectedRefNames(componentInfo)
                    << ", binders"

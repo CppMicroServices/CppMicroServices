@@ -142,9 +142,9 @@ void ComponentConfigurationImpl::Initialize()
 {
   // Call Register if no dependencies exist
   // If dependencies exist, the dependency tracker mechanism will trigger the call to Register at the appropriate time.
-  if ((referenceManagers.empty() && (metadata->configurationPids.empty()) ||
-       (metadata->configurationPolicy ==
-        metadata::ComponentMetadata::CONFIG_POLICY_IGNORE))) {
+  if (referenceManagers.empty() && 
+     ((metadata->configurationPids.empty()) ||
+       (metadata->configurationPolicy ==  metadata::ComponentMetadata::CONFIG_POLICY_IGNORE))) {
     GetState()->Register(*this);
   } else {
     for (auto& kv : referenceManagers) {

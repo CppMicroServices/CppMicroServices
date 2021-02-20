@@ -167,6 +167,7 @@ set(_test_bundles
   TestBundleDSTOI7
   TestBundleDSTOI8
   TestBundleDSTOI9
+  TestBundleDSTOI19
   TestBundleDSDGMU
   TestBundleDSDGOU
   TestBundleDSDRMU

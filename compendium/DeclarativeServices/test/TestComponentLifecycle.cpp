@@ -302,7 +302,7 @@ TEST_F(tServiceComponent, testDependencyInjection) // DS_TOI_18
     EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
 }
 
-TEST_F(tServiceComponent, testServiceDependecy_LDAPFilter) // DS_TOI_19
+TEST_F(tServiceComponent, testServiceDependency_LDAPFilter) // DS_TOI_19
 {
     auto testBundle = StartTestBundle("TestBundleDSTOI19");
     auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent19");
@@ -315,6 +315,11 @@ TEST_F(tServiceComponent, testServiceDependecy_LDAPFilter) // DS_TOI_19
     
     //start non-matching bundle
     auto depBundle1 = StartTestBundle("TestBundleDSTOI1");
+    auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
+    EXPECT_FALSE(static_cast<bool>(sRef1)) << "Service must not be available as this dependency does not match the filter";
+
+    //start matching bundle
+    auto depBundle2 = StartTestBundle("TestBundleDSTOI12");
     auto result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()
     {
         compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
@@ -324,40 +329,20 @@ TEST_F(tServiceComponent, testServiceDependecy_LDAPFilter) // DS_TOI_19
         return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
     });
 
-    ASSERT_FALSE(result) << "State must not change to ACTIVE";
-
-
-    //start matching bundle
-    auto depBundle2 = StartTestBundle("TestBundleDSTOI12");
-    result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()
-    {
-        compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
-    }
-    , [&compConfigDTOs]()->bool
-    {
-        return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
-    });
-
     ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE after the dependency became available";
-    auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
-    EXPECT_TRUE(static_cast<bool>(sRef1)) << "Service must be available after it's dependency is available";
-    auto service = ctxt.GetService<test::Interface2>(sRef1);
+    auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
+    EXPECT_TRUE(static_cast<bool>(sRef2)) << "Service must be available after it's dependency is available";
+    auto service = ctxt.GetService<test::Interface2>(sRef2);
     ASSERT_NE(service, nullptr);
     EXPECT_NO_THROW(service->ExtendedDescription()) << "Throws if the dependency could not be found";
     
 
     //stop non matching bundle
     depBundle1.Stop();
-    result = RepeatTaskUntilOrTimeout([&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]()
-    {
-        compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
-    }
-    , [&compConfigDTOs]()->bool
-    {
-        return compConfigDTOs.at(0).state == scr::dto::ComponentState::UNSATISFIED_REFERENCE;
-    });
-
-    ASSERT_FALSE(result) << "Service must not be available";
+    sRef1 = ctxt.GetServiceReference<test::Interface2>();
+    EXPECT_TRUE(static_cast<bool>(sRef1)) << "Service must be available as the removed dependency does not match the filter";
+    service = ctxt.GetService<test::Interface2>(sRef1);
+    ASSERT_NE(service, nullptr);
 
 
     //stop matching bundle
@@ -372,7 +357,7 @@ TEST_F(tServiceComponent, testServiceDependecy_LDAPFilter) // DS_TOI_19
     });
 
     ASSERT_TRUE(result) << "Timed out waiting for state to change to UNSATISFIED_REFERENCE after the dependency was removed";
-    auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
+    sRef2 = ctxt.GetServiceReference<test::Interface2>();
     EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
 }
 

@@ -986,20 +986,27 @@ std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m)
 }
 
 template<>
-std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m)
+std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m, const uint8_t increment, const int32_t indent)
 {
+  if (m.empty()) { os << "{}"; return os; }
+
   os << "{";
   using Iterator = any_map::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin)
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
-    else
-      os << ", "
-         << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    if (i1 == begin) {
+      indent_line(os, increment, indent);
+      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
+    }
+    else {
+      os << ", ";
+      indent_line(os, increment, indent);
+      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
+    }
   }
+  indent_line(os, increment, indent-increment);
   os << "}";
   return os;
 }

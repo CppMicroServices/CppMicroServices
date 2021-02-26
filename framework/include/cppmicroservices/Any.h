@@ -57,14 +57,11 @@ namespace cppmicroservices {
 
 class Any;
 
-US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
-                                                      const Any& any);
-
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-                                                    const Any& val);
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-                                                    const std::string& val);
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val);
+US_Framework_EXPORT std::ostream& indent_line(std::ostream& os, const uint8_t increment, const int32_t indent);
+US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const Any& any);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const Any& val, const uint8_t, const int32_t);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const std::string& val, const uint8_t, const int32_t);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val, const uint8_t, const int32_t);
 
 template<typename ValueType>
 ValueType* any_cast(Any* operand);
@@ -77,7 +74,7 @@ std::ostream& any_value_to_string(std::ostream& os, const T& val)
 }
 
 template<class T>
-std::ostream& any_value_to_json(std::ostream& os, const T& val)
+std::ostream& any_value_to_json(std::ostream& os, const T& val, const uint8_t = 0, const int32_t = 0)
 {
   return os << val;
 }
@@ -106,18 +103,23 @@ std::ostream& container_to_string(std::ostream& os, Iterator i1, Iterator i2)
  * \internal
  */
 template<typename Iterator>
-std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2)
+std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2, const uint8_t increment = 0, const int32_t indent = 0)
 {
+  if (i1 == i2) { os << "[]"; return os; }
+  
   os << "[";
   const Iterator begin = i1;
   for (; i1 != i2; ++i1) {
     if (i1 == begin) {
-      any_value_to_json(os, *i1);
+      indent_line(os, increment, indent);
+      any_value_to_json(os, *i1, increment, indent + increment);
     } else {
       os << ",";
-      any_value_to_json(os, *i1);
+      indent_line(os, increment, indent);
+      any_value_to_json(os, *i1, increment, indent + increment);
     }
   }
+  indent_line(os, increment, indent-increment);
   os << "]";
   return os;
 }
@@ -129,9 +131,9 @@ std::ostream& any_value_to_string(std::ostream& os, const std::vector<E>& vec)
 }
 
 template<class E>
-std::ostream& any_value_to_json(std::ostream& os, const std::vector<E>& vec)
+std::ostream& any_value_to_json(std::ostream& os, const std::vector<E>& vec, const uint8_t increment, const int32_t indent)
 {
-  return container_to_json(os, vec.begin(), vec.end());
+  return container_to_json(os, vec.begin(), vec.end(), increment, indent);
 }
 
 template<class E>
@@ -141,9 +143,9 @@ std::ostream& any_value_to_string(std::ostream& os, const std::list<E>& l)
 }
 
 template<class E>
-std::ostream& any_value_to_json(std::ostream& os, const std::list<E>& l)
+std::ostream& any_value_to_json(std::ostream& os, const std::list<E>& l, const uint8_t increment, const int32_t indent)
 {
-  return container_to_json(os, l.begin(), l.end());
+  return container_to_json(os, l.begin(), l.end(), increment, indent);
 }
 
 template<class E>
@@ -153,9 +155,9 @@ std::ostream& any_value_to_string(std::ostream& os, const std::set<E>& s)
 }
 
 template<class E>
-std::ostream& any_value_to_json(std::ostream& os, const std::set<E>& s)
+std::ostream& any_value_to_json(std::ostream& os, const std::set<E>& s, const uint8_t increment, const int32_t indent)
 {
-  return container_to_json(os, s.begin(), s.end());
+  return container_to_json(os, s.begin(), s.end(), increment, indent);
 }
 
 template<class M>
@@ -165,10 +167,10 @@ template<class K, class V>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m);
 
 template<class M>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<M, Any>& m);
+std::ostream& any_value_to_json(std::ostream& os, const std::map<M, Any>& m, const uint8_t increment, const int32_t indent);
 
 template<class K, class V>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
+std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m, const uint8_t increment, const int32_t indent);
 
 /**
  * \ingroup gr_any
@@ -333,9 +335,26 @@ public:
    * Returns a JSON representation for the content.
    *
    * Custom types should specialize the any_value_to_json template function for meaningful output.
+   * The values of increment and indent are passed around to be able to be used for nicer
+   * formatting. The code that makes use of this is in the any_value_to_json specializations for the
+   * various containers.
+   *
+   * To get pretty output, simply pass a value greater than zero in as the first argument of ToJSON
+   * and the rest of the code will take care of things.
+   *
+   * @param increment The amount of extra indentation to add for each level of JSON. An increment of
+   *                  zero indicates no special formatting
+   * @param indent    The current amount of indent to apply to the current line. 
    */
-  std::string ToJSON() const { return Empty() ? "null" : _content->ToJSON(); }
+  std::string ToJSON(const uint8_t increment, const int32_t indent) const
+  {
+    return Empty() ? "null" : _content->ToJSON(increment, indent);
+  }
 
+  std::string ToJSON(const uint8_t increment = 0) const
+  {
+    return ToJSON(increment, increment);
+  }
   /**
    * Returns the type information of the stored content.
    * If the Any is empty typeid(void) is returned.
@@ -354,7 +373,7 @@ private:
     virtual ~Placeholder() = default;
 
     virtual std::string ToString() const = 0;
-    virtual std::string ToJSON() const = 0;
+    virtual std::string ToJSON(const uint8_t increment = 0, const int32_t indent = 0) const = 0;
 
     virtual const std::type_info& Type() const = 0;
     virtual std::unique_ptr<Placeholder> Clone() const = 0;
@@ -379,10 +398,10 @@ private:
       return ss.str();
     }
 
-    std::string ToJSON() const override
+    std::string ToJSON(const uint8_t increment, const int32_t indent) const override
     {
       std::stringstream ss;
-      any_value_to_json(ss, _held);
+      any_value_to_json(ss, _held, increment, indent);
       return ss.str();
     }
 
@@ -659,39 +678,53 @@ std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m)
 }
 
 template<class K>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m)
+std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m, const uint8_t increment, const int32_t indent)
 {
+  if (m.empty()) { os << "{}"; return os; }
+
   os << "{";
   using Iterator = typename std::map<K, Any>::const_iterator;
   auto i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin)
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
-    else
-      os << ", "
-         << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    if (i1 == begin) {
+      indent_line(os, increment, indent);
+      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
+    }
+    else {
+      os << ", ";
+      indent_line(os, increment, indent);
+      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
+    }
   }
+  indent_line(os, increment, indent-increment);
   os << "}";
   return os;
 }
 
 template<class K, class V>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
+std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m, const uint8_t increment, const int32_t indent)
 {
+  if (m.empty()) { os << "{}"; return os; }
+
   os << "{";
   using Iterator = typename std::map<K, V>::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin)
+    if (i1 == begin) {
+      indent_line(os, increment, indent);
       os << "\"" << i1->first << "\" : " << i1->second;
-    else
-      os << ", "
-         << "\"" << i1->first << "\" : " << i1->second;
+    }
+    else {
+      os << ", ";
+      indent_line(os, increment, indent);
+      os << "\"" << i1->first << "\" : " << i1->second;
+    }
   }
+  indent_line(os, increment, std::max(0, indent-increment));
   os << "}";
   return os;
 }

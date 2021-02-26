@@ -101,12 +101,12 @@ TEST(AnyTest, AnyDouble)
 
 TEST(AnyTest, AnyString)
 {
-  Any anyString = std::string(R"(bon"jour)");
+  Any anyString = std::string("bonjour");
   EXPECT_EQ(anyString.Type(), typeid(std::string));
-  EXPECT_EQ(any_cast<std::string>(anyString), "bon\"jour");
-  EXPECT_EQ(anyString.ToString(), "bon\"jour");
-  EXPECT_EQ(anyString.ToJSON(), "\"bon\\\"jour\"");
-  TestUnsafeAnyCast<std::string>(anyString, std::string("bon\"jour"));
+  EXPECT_EQ(any_cast<std::string>(anyString), "bonjour");
+  EXPECT_EQ(anyString.ToString(), "bonjour");
+  EXPECT_EQ(anyString.ToJSON(), "\"bonjour\"");
+  TestUnsafeAnyCast<std::string>(anyString, std::string("bonjour"));
 }
 
 TEST(AnyTest, AnyVector)
@@ -175,6 +175,50 @@ TEST(AnyTest, AnyMapAny)
   EXPECT_EQ(anyMap.Type(), typeid(std::map<int32_t, Any>));
   EXPECT_EQ(anyMap.ToString(), "{1 : 0.3, 3 : bonjour}");
   EXPECT_EQ(anyMap.ToJSON(), "{\"1\" : 0.3, \"3\" : \"bonjour\"}");
+}
+
+
+TEST(AnyTest, AnyStringEscapeCharacters)
+{
+  Any anyString = std::string(R"("\	
+)");
+  EXPECT_EQ(anyString.ToJSON(), "\"\\\"\\\\\x7F\\t\\n\\r\"");
+}
+
+TEST(AnyTest, AnyToJSONWithFormatting)
+{
+  std::map<int, Any> emptyMap;
+  std::vector<int> emptyVector;
+
+  std::map<int32_t, Any> mapToInsert = {
+    { 1, 0.3 }
+    , { 3, std::string("bonjour") }
+    , { 4, emptyMap }
+    , { 5, emptyVector }
+  };
+  std::vector<int32_t> numbers { 9, 8, 7 };
+  std::map<std::string, Any> map {
+    { "number", 5 }
+    , { "vector", numbers }
+    , { "map", mapToInsert }
+  };
+ 
+  Any anyMap = map;
+  std::string expected = R"({
+    "map" : {
+        "1" : 0.3, 
+        "3" : "bonjour", 
+        "4" : {}, 
+        "5" : []
+    }, 
+    "number" : 5, 
+    "vector" : [
+        9,
+        8,
+        7
+    ]
+ })";
+  EXPECT_EQ(anyMap.ToJSON(4), expected);
 }
 
 TEST(AnyTest, AnyMapComplex)

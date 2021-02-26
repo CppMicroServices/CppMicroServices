@@ -43,19 +43,27 @@ void ThrowBadAnyCastException(const std::string& funcName,
 }
 }
 
+std::ostream& indent_line(std::ostream& os, const uint8_t increment, const int32_t indent)
+{
+  if (increment > 0) {
+    os << std::endl << std::setw(std::max(0,indent)) << ' ';
+  }
+  return os;
+}
+
 std::ostream& any_value_to_string(std::ostream& os, const Any& any)
 {
   os << any.ToString();
   return os;
 }
 
-std::ostream& any_value_to_json(std::ostream& os, const Any& val)
+std::ostream& any_value_to_json(std::ostream& os, const Any& val, const uint8_t increment, const int32_t indent)
 {
-  os << val.ToJSON();
+  os << val.ToJSON(increment, indent);
   return os;
 }
 
-std::ostream& any_value_to_json(std::ostream& o, const std::string& s)
+std::ostream& any_value_to_json(std::ostream& o, const std::string& s, const uint8_t, const int32_t)
 {
 #if NEVER
   // The original code for this function fails to properly escape the characters in the string to
@@ -84,9 +92,9 @@ std::ostream& any_value_to_json(std::ostream& o, const std::string& s)
   return o << '"';
 }
 
-std::ostream& any_value_to_json(std::ostream& os, bool val)
+std::ostream& any_value_to_json(std::ostream& os, bool val, const uint8_t, const int32_t)
 {
-  return os << (val ? "true" : "false");
+  return os << std::boolalpha << val << std::noboolalpha;
 }
 
 // The default constructor implementation needs to be in the implementation file, not the

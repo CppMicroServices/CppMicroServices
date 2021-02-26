@@ -65,11 +65,6 @@ std::ostream& any_value_to_json(std::ostream& os, const Any& val, const uint8_t 
 
 std::ostream& any_value_to_json(std::ostream& o, const std::string& s, const uint8_t, const int32_t)
 {
-#if NEVER
-  // The original code for this function fails to properly escape the characters in the string to
-  // make it a proper JSON string. The new code below does so.
-  return os << '"' << val << '"';
-#endif
   o << '"';
   for (auto c = s.cbegin(); c != s.cend(); c++) {
     switch (*c) {
@@ -94,7 +89,7 @@ std::ostream& any_value_to_json(std::ostream& o, const std::string& s, const uin
 
 std::ostream& any_value_to_json(std::ostream& os, bool val, const uint8_t, const int32_t)
 {
-  return os << std::boolalpha << val << std::noboolalpha;
+  return os << std::boolalpha << val;
 }
 
 // The default constructor implementation needs to be in the implementation file, not the

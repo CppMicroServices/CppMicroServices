@@ -180,9 +180,8 @@ TEST(AnyTest, AnyMapAny)
 
 TEST(AnyTest, AnyStringEscapeCharacters)
 {
-  Any anyString = std::string(R"("\	
-)");
-  EXPECT_EQ(anyString.ToJSON(), "\"\\\"\\\\\x7F\\t\\n\\u000b\"");
+  Any anyString = std::string("\"\\\b\f\n\r\t\x1f");
+  EXPECT_EQ(anyString.ToJSON(), "\"\\\"\\\\\\b\\f\\n\\r\\t\\u001f\"");
 }
 
 TEST(AnyTest, AnyToJSONWithFormatting)

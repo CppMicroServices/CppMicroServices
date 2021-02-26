@@ -350,10 +350,15 @@ public:
   {
     return Empty() ? "null" : _content->ToJSON(increment, indent);
   }
-
-  std::string ToJSON(const uint8_t increment = 0) const
+  std::string ToJSON(const uint8_t increment) const
   {
     return ToJSON(increment, increment);
+  }
+  std::string ToJSON(bool prettyPrint = false) const
+  {
+    // Standard indent by 4 spaces if pretty printing. If you want something else, call the uint8_t
+    // interface directly. 
+    return ToJSON(static_cast<uint8_t>(prettyPrint ? 4 : 0));
   }
   /**
    * Returns the type information of the stored content.

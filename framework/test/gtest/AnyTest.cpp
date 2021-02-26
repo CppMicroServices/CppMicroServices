@@ -218,7 +218,7 @@ TEST(AnyTest, AnyToJSONWithFormatting)
         7
     ]
  })";
-  EXPECT_EQ(anyMap.ToJSON(4), expected);
+  EXPECT_EQ(anyMap.ToJSON(true), expected);
 }
 
 TEST(AnyTest, AnyMapComplex)

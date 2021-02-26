@@ -101,12 +101,12 @@ TEST(AnyTest, AnyDouble)
 
 TEST(AnyTest, AnyString)
 {
-  Any anyString = std::string("bonjour");
+  Any anyString = std::string(R"(bon"jour)");
   EXPECT_EQ(anyString.Type(), typeid(std::string));
-  EXPECT_EQ(any_cast<std::string>(anyString), "bonjour");
-  EXPECT_EQ(anyString.ToString(), "bonjour");
-  EXPECT_EQ(anyString.ToJSON(), "\"bonjour\"");
-  TestUnsafeAnyCast<std::string>(anyString, std::string("bonjour"));
+  EXPECT_EQ(any_cast<std::string>(anyString), "bon\"jour");
+  EXPECT_EQ(anyString.ToString(), "bon\"jour");
+  EXPECT_EQ(anyString.ToJSON(), "\"bon\\\"jour\"");
+  TestUnsafeAnyCast<std::string>(anyString, std::string("bon\"jour"));
 }
 
 TEST(AnyTest, AnyVector)

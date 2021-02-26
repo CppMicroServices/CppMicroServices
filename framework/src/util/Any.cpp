@@ -24,6 +24,7 @@
 #include "Utils.h"
 
 #include <stdexcept>
+#include <iomanip>
 
 namespace cppmicroservices {
 
@@ -54,9 +55,33 @@ std::ostream& any_value_to_json(std::ostream& os, const Any& val)
   return os;
 }
 
-std::ostream& any_value_to_json(std::ostream& os, const std::string& val)
+std::ostream& any_value_to_json(std::ostream& o, const std::string& s)
 {
+#if NEVER
+  // The original code for this function fails to properly escape the characters in the string to
+  // make it a proper JSON string. The new code below does so.
   return os << '"' << val << '"';
+#endif
+  o << '"';
+  for (auto c = s.cbegin(); c != s.cend(); c++) {
+    switch (*c) {
+      case '"' : o << "\\\""; break;
+      case '\\': o << "\\\\"; break;
+      case '\b': o << "\\b";  break;
+      case '\f': o << "\\f";  break;
+      case '\n': o << "\\n";  break;
+      case '\r': o << "\\r";  break;
+      case '\t': o << "\\t";  break;
+      default:
+        if ('\x00' <= *c && *c <= '\x1f') {
+          o << "\\u"
+            << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
+        } else {
+          o << *c;
+        }
+    }
+  }
+  return o << '"';
 }
 
 std::ostream& any_value_to_json(std::ostream& os, bool val)

@@ -43,10 +43,18 @@ void ThrowBadAnyCastException(const std::string& funcName,
 }
 }
 
-std::ostream& indent_line(std::ostream& os, const uint8_t increment, const int32_t indent)
+std::ostream& newline_and_indent(std::ostream& os, const uint8_t increment, const int32_t indent)
 {
   if (increment > 0) {
-    os << std::endl << std::setw(std::max(0,indent)) << ' ';
+    // We only do formatting if increment > 0, because if increment was actually zero everything
+    // would just line up in one column, so there'd be no formatting.
+    //
+    // We always insert a newline if we're formatting
+    os << std::endl;
+    if (indent > 0) {
+      // And if we're indenting past the zeroth column, insert that many spaces
+      os << std::setw(indent) << ' ';
+    }
   }
   return os;
 }

@@ -57,7 +57,7 @@ namespace cppmicroservices {
 
 class Any;
 
-US_Framework_EXPORT std::ostream& indent_line(std::ostream& os, const uint8_t increment, const int32_t indent);
+US_Framework_EXPORT std::ostream& newline_and_indent(std::ostream& os, const uint8_t increment, const int32_t indent);
 US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os, const Any& any);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const Any& val, const uint8_t, const int32_t);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, const std::string& val, const uint8_t, const int32_t);
@@ -110,16 +110,13 @@ std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2, cons
   os << "[";
   const Iterator begin = i1;
   for (; i1 != i2; ++i1) {
-    if (i1 == begin) {
-      indent_line(os, increment, indent);
-      any_value_to_json(os, *i1, increment, indent + increment);
-    } else {
+    if (i1 != begin) {
       os << ",";
-      indent_line(os, increment, indent);
-      any_value_to_json(os, *i1, increment, indent + increment);
     }
+    newline_and_indent(os, increment, indent);
+    any_value_to_json(os, *i1, increment, indent + increment);
   }
-  indent_line(os, increment, indent-increment);
+  newline_and_indent(os, increment, indent-increment);
   os << "]";
   return os;
 }
@@ -350,15 +347,12 @@ public:
   {
     return Empty() ? "null" : _content->ToJSON(increment, indent);
   }
-  std::string ToJSON(const uint8_t increment) const
-  {
-    return ToJSON(increment, increment);
-  }
   std::string ToJSON(bool prettyPrint = false) const
   {
-    // Standard indent by 4 spaces if pretty printing. If you want something else, call the uint8_t
-    // interface directly. 
-    return ToJSON(static_cast<uint8_t>(prettyPrint ? 4 : 0));
+    // Standard indent by 4 spaces if pretty printing. If you want something else, call the general
+    // interface directly.
+    uint8_t increment = prettyPrint ? 4 : 0;
+    return ToJSON(increment, increment);
   }
   /**
    * Returns the type information of the stored content.
@@ -693,17 +687,13 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m, con
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin) {
-      indent_line(os, increment, indent);
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
-    }
-    else {
+    if (i1 != begin) {
       os << ", ";
-      indent_line(os, increment, indent);
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
     }
+    newline_and_indent(os, increment, indent);
+    os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
   }
-  indent_line(os, increment, indent-increment);
+  newline_and_indent(os, increment, indent-increment);
   os << "}";
   return os;
 }
@@ -719,17 +709,13 @@ std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m, const
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin) {
-      indent_line(os, increment, indent);
-      os << "\"" << i1->first << "\" : " << i1->second;
-    }
-    else {
+    if (i1 != begin) {
       os << ", ";
-      indent_line(os, increment, indent);
-      os << "\"" << i1->first << "\" : " << i1->second;
     }
+    newline_and_indent(os, increment, indent);
+    os << "\"" << i1->first << "\" : " << i1->second;
   }
-  indent_line(os, increment, std::max(0, indent-increment));
+  newline_and_indent(os, increment, std::max(0, indent-increment));
   os << "}";
   return os;
 }

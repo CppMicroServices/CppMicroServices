@@ -996,17 +996,13 @@ std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m, const uint8_t
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin) {
-      indent_line(os, increment, indent);
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
-    }
-    else {
+    if (i1 != begin) {
       os << ", ";
-      indent_line(os, increment, indent);
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
     }
+    newline_and_indent(os, increment, indent);
+    os << "\"" << i1->first << "\" : " << i1->second.ToJSON(increment, indent + increment);
   }
-  indent_line(os, increment, indent-increment);
+  newline_and_indent(os, increment, indent-increment);
   os << "}";
   return os;
 }

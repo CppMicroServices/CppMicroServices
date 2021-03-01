@@ -64,6 +64,11 @@ public:
    */
   std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle) override;
 
+   /**
+   * Method called to modify the configuration properties for this component configuration. 
+   * Returns false if the component instance has not provided a Modified method.
+   */
+  bool ModifyComponentInstanceProperties( ) override;
 
   /**
    * Method removes all instances of {@link ComponentInstance} object created by this object.

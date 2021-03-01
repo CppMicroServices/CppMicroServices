@@ -51,8 +51,8 @@ public:
   /**
    * Modifying properties while the component is in the SATISFIED state is a no-op
    */
-  void Modified(ComponentConfigurationImpl& /*mgr*/) override{
-
+  bool Modified(ComponentConfigurationImpl&) override { 
+      return true;
   };
   /**
    * Rebinding while in a \c SATISFIED state is a no-op
@@ -68,7 +68,15 @@ public:
    * state represented by this object
    */
   ComponentState GetValue() const override { return ComponentState::SATISFIED; }
+
+  void WaitForTransitionTask() override { 
+      ready.get(); 
+  }
+
+private:
+  std::shared_future<void> ready;
 };
+
 }
 }
 #endif // CCSatisfiedState_hpp

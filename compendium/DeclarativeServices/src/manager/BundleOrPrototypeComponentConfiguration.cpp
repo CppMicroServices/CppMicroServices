@@ -68,6 +68,20 @@ std::shared_ptr<ComponentInstance> BundleOrPrototypeComponentConfigurationImpl::
   return nullptr;
 }
 
+bool BundleOrPrototypeComponentConfigurationImpl::ModifyComponentInstanceProperties()
+{
+  auto compInstCtxtPairList = compInstanceMap.lock();
+  bool retValue = false;
+  for(const auto& valPair : *compInstCtxtPairList)
+  {
+   retValue =  valPair.first->InvokeModifiedMethod();
+  }
+  // InvokeModifiedMethod returns true if the component instance has a Modified method.
+  // Only need to return the value for the last instance because if one of the instances
+  // has a Modified method, they all do.
+  return retValue;
+}
+
 void BundleOrPrototypeComponentConfigurationImpl::DestroyComponentInstances()
 {
   auto compInstCtxtPairList = compInstanceMap.lock();

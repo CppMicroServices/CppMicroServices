@@ -178,6 +178,12 @@ public:
   virtual std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle) = 0;
 
   /**
+   * Method called to modify the configuration properties for this component configuration. Subclasses
+   * must implement this method. Returns false if the component instance has not provided a Modified method.
+   */
+  virtual bool ModifyComponentInstanceProperties() = 0;
+
+  /**
    * Method called while \c DEACTIVATING this component configuration. Subclasses
    * must implement this method and handle the instance management.
    */
@@ -226,9 +232,19 @@ public:
 
   /**
    * Method used to update the properties of a component instance when a configuration
-   * object on which it is dependent changes. 
+   * object on which it is dependent changes. Returns 
+   *    - true if the component has a Modified method and is still in the 
+   *      active state.
+   *    - false if the component does not have a Modified method. The 
+   *      component has been Deactivated
    */
-  void Modified();
+  bool Modified();
+
+  /**
+   * SetRegistrationProperties. Sets component properties in registration object. 
+   */
+  void SetRegistrationProperties();
+
   /**
    * Method called to stop the service trackers associated with this configuration's reference managers
    */
@@ -279,7 +295,7 @@ protected:
     newCompInstanceFunc = newFunc;
     deleteCompInstanceFunc = deleteFunc;
   }
-
+ 
   /**
    * Utility method used in tests to prepare the object for a test point.
    * Note: Do NOT use this method in production code.

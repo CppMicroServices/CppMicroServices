@@ -53,11 +53,16 @@ public:
   std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
                                               const cppmicroservices::Bundle& clientBundle) override;
 
+  void Deactivate(ComponentConfigurationImpl& mgr) override;
+
   /**
    * Modifies the properties of the component instance when a configuration object on 
-   * which it is dependent changes. No state change. 
+   * which it is dependent changes. No state change. Returns 
+   *    - true if the component has a Modified method.
+   *    - false if the component does not have a Modified method. The 
+   *      component has been Deactivated
    */
-  void Modified(ComponentConfigurationImpl& /*mgr*/) override;
+  bool Modified(ComponentConfigurationImpl&) override;
 
   /**
    * Rebind to a target service. This operation does not transition to another state.
@@ -78,12 +83,12 @@ public:
    */
   ComponentState GetValue() const override { return ComponentState::ACTIVE; }
 
-  void WaitForTransitionTask() override
-  {
-    latch.Wait();
-  }
+ 
 private:
-  CounterLatch latch;
+  // Mutex to make sure that one operation (Activate, Rebind, Modified, etc) completes before another
+  // operation begins. 
+  mutable std::mutex oneAtATimeMutex; 
+  void CCActiveState::DoDeactivateWork(ComponentConfigurationImpl& mgr);
 };
 }
 }

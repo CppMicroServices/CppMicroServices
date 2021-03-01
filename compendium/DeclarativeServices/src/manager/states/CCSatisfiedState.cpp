@@ -28,7 +28,11 @@ using cppmicroservices::service::component::runtime::dto::UNSATISFIED_REFERENCE;
 namespace cppmicroservices {
 namespace scrimpl {
 
-CCSatisfiedState::CCSatisfiedState() = default;
+    CCSatisfiedState::CCSatisfiedState() {
+      std::promise<void> prom;
+      ready = prom.get_future();
+      prom.set_value();
+    }
 
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {

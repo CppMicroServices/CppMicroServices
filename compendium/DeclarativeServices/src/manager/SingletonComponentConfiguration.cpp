@@ -86,6 +86,14 @@ std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAn
   }
   return instanceContextPair->first;
 }
+bool SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()
+{
+  auto instanceContextPair = data.lock();
+  if (instanceContextPair->first) {
+    return instanceContextPair->first->InvokeModifiedMethod();
+  }
+  return false;
+}
 
 void SingletonComponentConfigurationImpl::DestroyComponentInstances()
 {

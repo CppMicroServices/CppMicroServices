@@ -78,9 +78,12 @@ public:
 
   /**
    * Implementation must modify the properties of a component instance when a configuration
-   * object on which it is dependent changes. 
+   * object on which it is dependent changes. Returns 
+   *    - true if the component has a Modified method.
+   *    - false if the component does not have a Modified method. The 
+   *      component has been Deactivated
    */
-  virtual void Modified(ComponentConfigurationImpl& mgr) = 0;
+  virtual bool Modified(ComponentConfigurationImpl& mgr) = 0;
 
   /**
    * Implementation must handle dynamic rebinding in any state.

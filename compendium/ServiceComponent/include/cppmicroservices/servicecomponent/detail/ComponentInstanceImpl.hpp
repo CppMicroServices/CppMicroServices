@@ -56,6 +56,28 @@ public:
 };
 
 /**
+ * Util class to detect if a class has a method named Modified
+ * Member Detector Idiom - https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Member_Detector
+ */
+template<class T, class ReturnT, class... ArgsT>
+class HasModified
+{
+public:
+  struct BadType
+  {};
+
+  template<class U>
+  static decltype(std::declval<U>().Modified(std::declval<ArgsT>()...)) Test(
+    int);
+
+  template<class U>
+  static BadType Test(...);
+
+  static constexpr bool value =
+    std::is_same<decltype(Test<T>(0)), ReturnT>::value;
+};
+
+/**
  * Util class to detect if a class has a method named Deactivate
  * Member Detector Idiom - https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Member_Detector
  */
@@ -125,7 +147,9 @@ public:
     DoDeactivate(mContext);
   };
 
-  void Modified() override { /* no-op for now */};
+  bool InvokeModifiedMethod() override { 
+      return DoModified(mContext); 
+  };
 
   void InvokeBindMethod(const std::string& refName
                         , const cppmicroservices::ServiceReferenceBase& sRef) override
@@ -183,12 +207,30 @@ public:
    * This method is used if the component implementation class provides an Activate method.
    */
   template <class Impl = T,
-            class Z = typename std::enable_if<HasActivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
+            class THasActivateMethod = typename std::enable_if<HasActivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
   void DoActivate(const std::shared_ptr<ComponentContext>& ctxt)
   {
     mServiceImpl->Activate(ctxt);
   }
 
+  template<typename... A>
+  bool  DoModified(A...)
+  {
+    return false;  // no modified method available
+  }
+
+  /**
+   * This method is used if the component implementation class provides a Modified method.
+   */
+  template<class Impl = T,
+           class THasModifiedMethod = typename std::enable_if<
+    HasModified<Impl,void,const std::shared_ptr<ComponentContext>&,const std::shared_ptr<cppmicroservices::AnyMap>&>::value >::type > 
+  bool DoModified(const std::shared_ptr<ComponentContext>& ctxt)
+  {
+    auto properties = std::make_shared<cppmicroservices::AnyMap>(ctxt->GetProperties());
+    mServiceImpl->Modified(ctxt, properties);
+    return true;
+  }
   /**
    * This method is used if the component implementation class does not provide a Deactivate method.
    */
@@ -202,7 +244,7 @@ public:
    * This method is used if the component implementation class provides a Deactivate method.
    */
   template <class Impl = T,
-            class Z = typename std::enable_if<HasDeactivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
+            class THasDeactivateMethod = typename std::enable_if<HasDeactivate<Impl, void, const std::shared_ptr<ComponentContext>&>::value>::type>
   void DoDeactivate(const std::shared_ptr<ComponentContext>& ctxt)
   {
     mServiceImpl->Deactivate(ctxt);
@@ -263,8 +305,8 @@ public:
 
   // this method is used when injection is false and default constructor is provided by the implementation class
   template <class C = T, class I = Injection,
-            class X = typename std::enable_if<I::value == false>::type,
-            class Y = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
+            class InjectionFalse = typename std::enable_if<I::value == false>::type,
+            class THasDefaultConstructor = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
   std::shared_ptr<T> DoCreate(bool)
   {
     return std::make_shared<T>();
@@ -272,8 +314,8 @@ public:
 
    // this method is used when injection is false and a constructor with Configuration properties input parameter is provided by the implementation class
   template <class C = T, class I = Injection,
-           class X = typename std::enable_if<I::value == false>::type,
-           class Y = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>>::value == true>::type>
+           class InjectionFalse = typename std::enable_if<I::value == false>::type,
+           class THasConfigConstructor = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>>::value == true>::type>
   std::shared_ptr<T> DoCreate(bool, bool = true)
   {
    return std::make_shared<T>(std::make_shared<cppmicroservices::AnyMap>(
@@ -283,9 +325,9 @@ public:
   // this method is used when injection is false and neither a default constructor nor a constructor with a
   // Configuration properties input parameter is provided by the implementation class
   template <class C = T, class I = Injection,
-            class X = typename std::enable_if<I::value == false>::type,
-            class Y = typename std::enable_if<std::is_default_constructible<C>::value == false>::type,
-            class Z = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>>::value == false>::type >
+            class InjectionFalse = typename std::enable_if<I::value == false>::type,
+            class THasNoDefaultConstructor = typename std::enable_if<std::is_default_constructible<C>::value == false>::type,
+            class THasNoConfigConstructor = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>>::value == false>::type >
       std::shared_ptr<T> DoCreate(bool, bool = true, bool = true)
   {
     static_assert(std::is_default_constructible<C>::value, "Default Constructor or  Constructor with AnyMap parameter expected when injection is false");
@@ -294,9 +336,9 @@ public:
   
   // this method is used when injection is true and constructor with suitable parameters is not provided by the implementation class
   template <class C = T, class I = Injection,
-            class Y = typename std::enable_if<I::value == true>::type,
-            class X = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value == false>::type,
-            class Z = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>,
+            class InjectionTrue = typename std::enable_if<I::value == true>::type,
+            class THasNoConstructorWithReferences = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value == false>::type,
+            class THasNoConstructorWithRefAndConfig = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>,
                                              const std::shared_ptr<CtorInjectedRefs>&...>::value == false>::type>
             std::shared_ptr<T> DoCreate(const bool&)
   {
@@ -306,8 +348,8 @@ public:
 
   // this method is used when injection is true and constructor with reference parameters is provided by the implementation class
   template <class C = T, class I = Injection,
-            class Y = typename std::enable_if<I::value == true>::type,
-            class X = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value>::type>
+            class InjectionTrue = typename std::enable_if<I::value == true>::type,
+            class THasConstructorWithReferences = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value>::type>
   std::shared_ptr<T> DoCreate(bool& injected)
   {
     std::tuple<std::shared_ptr<CtorInjectedRefs> ...> depObjs = GetAllDependencies(std::make_index_sequence<std::tuple_size<std::tuple<CtorInjectedRefs...>>::value>{});
@@ -319,8 +361,8 @@ public:
    // this method is used when injection is true and constructor with reference parameters and the configuration property parameter
    // is provided by the implementation class
   template <class C = T, class I = Injection,
-            class Y = typename std::enable_if<I::value == true>::type,
-            class X = typename std::enable_if<std::is_constructible< C, std::shared_ptr<cppmicroservices::AnyMap>,
+            class InjectionTrue = typename std::enable_if<I::value == true>::type,
+            class THasConstructorWithRefAndConfig = typename std::enable_if<std::is_constructible< C, std::shared_ptr<cppmicroservices::AnyMap>,
                  const std::shared_ptr<CtorInjectedRefs>&...>::value>::type>
   std::shared_ptr<T> DoCreate(bool& injected, bool = true)
   {

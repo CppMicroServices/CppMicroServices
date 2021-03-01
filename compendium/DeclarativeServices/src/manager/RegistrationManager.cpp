@@ -98,6 +98,12 @@ bool RegistrationManager::RegisterService(const std::shared_ptr<cppmicroservices
   }
   return IsServiceRegistered();
 }
+void RegistrationManager::SetProperties( const cppmicroservices::ServiceProperties& properties)
+{
+  if (IsServiceRegistered() && serviceReg) {
+    serviceReg.SetProperties(properties);
+  }
+}
 
 void RegistrationManager::UnregisterService()
 {

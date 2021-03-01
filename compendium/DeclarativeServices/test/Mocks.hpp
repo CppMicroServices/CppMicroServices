@@ -190,7 +190,7 @@ public:
   MOCK_METHOD1(Register, void(ComponentConfigurationImpl&));
   MOCK_METHOD2(Activate, std::shared_ptr<ComponentInstance>(ComponentConfigurationImpl&, const cppmicroservices::Bundle&));
   MOCK_METHOD1(Deactivate, void(ComponentConfigurationImpl&));
-  MOCK_METHOD1(Modified, void(ComponentConfigurationImpl&));
+  MOCK_METHOD1(Modified, bool(ComponentConfigurationImpl&));
   MOCK_METHOD4(Rebind,
                void(ComponentConfigurationImpl&,
                     const std::string&,
@@ -208,7 +208,7 @@ public:
   MOCK_METHOD0(UnbindReferences, void(void));
   MOCK_METHOD0(Activate, void(void));
   MOCK_METHOD0(Deactivate, void(void));
-  MOCK_METHOD0(Modified, void(void));
+  MOCK_METHOD0(InvokeModifiedMethod, bool(void));
   MOCK_METHOD2(InvokeUnbindMethod, void(const std::string &, const cppmicroservices::ServiceReferenceBase&));
   MOCK_METHOD2(InvokeBindMethod, void(const std::string &, const cppmicroservices::ServiceReferenceBase &));
   MOCK_METHOD0(GetInterfaceMap, cppmicroservices::InterfaceMapPtr(void));
@@ -287,6 +287,7 @@ public:
   MOCK_METHOD0(DestroyComponentInstances, void());
   MOCK_METHOD2(BindReference, void(const std::string&, const ServiceReferenceBase&));
   MOCK_METHOD2(UnbindReference, void(const std::string&, const ServiceReferenceBase&));
+  MOCK_METHOD0(ModifyComponentInstanceProperties, bool());
   void SetState(const std::shared_ptr<ComponentConfigurationState>& newState)
   {
     ComponentConfigurationImpl::SetState(newState);

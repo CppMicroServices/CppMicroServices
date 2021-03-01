@@ -59,8 +59,8 @@ public:
   /**
    * Modifying properties while the component is in the REGISTERED_STATE state is a no-op
    */
-  void Modified(ComponentConfigurationImpl& /*mgr*/) override{
-
+  bool  Modified(ComponentConfigurationImpl& /*mgr*/) override{ 
+      return true;
   };
   /**
    * Method blocks the current thread until the stored future is ready

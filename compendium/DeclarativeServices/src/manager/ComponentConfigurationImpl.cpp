@@ -137,6 +137,13 @@ ComponentConfigurationImpl::GetProperties() const
   props.emplace(COMPONENT_ID, Any(configID));
   return props;
 }
+void ComponentConfigurationImpl::SetRegistrationProperties()
+{
+  auto properties = GetProperties();
+  if (regManager) {
+    regManager->SetProperties(properties);
+  }
+}
 
 void ComponentConfigurationImpl::Initialize()
 {
@@ -224,19 +231,27 @@ void ComponentConfigurationImpl::ConfigChangedState(
     if (configWasSatisfied && configNowSatisfied &&
         (metadata->configurationPolicy !=
             metadata::ComponentMetadata::CONFIG_POLICY_IGNORE)) {
-        GetState()->Modified(*this);
+        if (!this->Modified()) {
+           //The Component does not have a Modified method so the component instance
+           //has been deactivated. 
+           if (this->configManager->IsConfigSatisfied(this->GetState()->GetValue()) &&
+               AreReferencesSatisfied()) {
+             this->Register();
+             return;
+           }
+        }
     }
 
     switch (notification.event) {
       case cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED:
         if (!configWasSatisfied && configNowSatisfied &&
             AreReferencesSatisfied()) {
-          GetState()->Register(*this);
+          this->Register();
         }
         break;
       case cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED:
         if (configWasSatisfied && !configNowSatisfied) {
-          GetState()->Deactivate(*this);
+          this->Deactivate();
         }
         break;
       default:
@@ -364,9 +379,9 @@ void ComponentConfigurationImpl::Deactivate()
   GetState()->Deactivate(*this);
 }
 
-void ComponentConfigurationImpl::Modified()
+bool ComponentConfigurationImpl::Modified()
 {
-  GetState()->Modified(*this);
+  return GetState()->Modified(*this);
 }
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const

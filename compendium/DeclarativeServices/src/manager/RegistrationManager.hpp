@@ -93,6 +93,11 @@ public:
   bool RegisterService(const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
                        const cppmicroservices::ServiceProperties& props);
 
+   /**
+   * SetRegistrationProperties. Sets component properties in registration object. 
+   */
+  void SetProperties(const cppmicroservices::ServiceProperties& properties);
+
   /**
    * This method unregisters the service from the framework service registry. The
    * {@link ServiceRegistration} member of this object is set to null before returning

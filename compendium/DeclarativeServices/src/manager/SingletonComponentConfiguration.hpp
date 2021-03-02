@@ -68,7 +68,7 @@ public:
 
   /**
    * Method called to modify the configuration properties for this component configuration. 
-   * Returns false if the component instance has not provided a Modified method.
+   * @return false if the component instance has not provided a Modified method.
    */
   bool ModifyComponentInstanceProperties() override;
 

@@ -90,7 +90,15 @@ bool SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()
 {
   auto instanceContextPair = data.lock();
   if (instanceContextPair->first) {
-    return instanceContextPair->first->InvokeModifiedMethod();
+    try {
+      return instanceContextPair->first->InvokeModifiedMethod();
+    } catch (...) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception received from user code while modifying "
+                       "component configuration",
+                       std::current_exception());
+      return false;
+    }
   }
   return false;
 }

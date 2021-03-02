@@ -57,7 +57,8 @@ public:
 
   /**
    * Modifies the properties of the component instance when a configuration object on 
-   * which it is dependent changes. No state change. Returns 
+   * which it is dependent changes. No state change. R
+   * @return
    *    - true if the component has a Modified method.
    *    - false if the component does not have a Modified method. The 
    *      component has been Deactivated

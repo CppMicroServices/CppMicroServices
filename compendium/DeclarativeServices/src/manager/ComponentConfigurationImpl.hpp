@@ -179,7 +179,8 @@ public:
 
   /**
    * Method called to modify the configuration properties for this component configuration. Subclasses
-   * must implement this method. Returns false if the component instance has not provided a Modified method.
+   * must implement this method. 
+    @return false if the component instance has not provided a Modified method.
    */
   virtual bool ModifyComponentInstanceProperties() = 0;
 
@@ -232,7 +233,8 @@ public:
 
   /**
    * Method used to update the properties of a component instance when a configuration
-   * object on which it is dependent changes. Returns 
+   * object on which it is dependent changes. 
+   * @return
    *    - true if the component has a Modified method and is still in the 
    *      active state.
    *    - false if the component does not have a Modified method. The 

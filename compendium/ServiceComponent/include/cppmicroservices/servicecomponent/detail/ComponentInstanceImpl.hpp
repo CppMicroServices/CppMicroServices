@@ -306,7 +306,7 @@ public:
   // this method is used when injection is false and default constructor is provided by the implementation class
   template <class C = T, class I = Injection,
             class InjectionFalse = typename std::enable_if<I::value == false>::type,
-            class THasDefaultConstructor = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
+            class TIsDefaultConstructible = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
   std::shared_ptr<T> DoCreate(bool)
   {
     return std::make_shared<T>();

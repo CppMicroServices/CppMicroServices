@@ -31,7 +31,6 @@ set(_tests
   BundleRegistryConcurrencyTest
   FrameworkEventTest
   FrameworkListenerTest
-  FrameworkFactoryTest
   HelgrindTest
   LDAPFilterTest
   LogTest

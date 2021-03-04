@@ -41,6 +41,7 @@ set(_gtest_tests
   BundleStreamOperatorTest.cpp
   ServiceEventStreamOperatorTest.cpp
   LDAPQueryTest.cpp
+  FrameworkFactoryTest.cpp
 )
 
 set(_additional_srcs

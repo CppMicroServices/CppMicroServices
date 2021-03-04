@@ -25,10 +25,6 @@ limitations under the License.
 #include "cppmicroservices/Framework.h"
 #include "gtest/gtest.h"
 
-#include <iostream>
-#include <map>
-#include <string>
-
 using namespace cppmicroservices;
 
 TEST(FrameworkFactoryTest, FrameworkInstantiation) {

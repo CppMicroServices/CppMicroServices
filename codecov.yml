@@ -9,9 +9,8 @@ comment:
 coverage:
   ignore:
     - "third_party/.*"                # ignore folder and all its contents
-    - "*/**/test/*"                   # ignore test code in test directory
-    - "*/**/gtest/*"                  # ignore test code in gtest directory
-    - "framework/test/"               # ignore test code in framework
+    - "*/**/test/**/*"                # ignore test code in test directory
+    - "*/**/gtest/**/*"               # ignore test code in gtest directory
     - "**/cppmicroservices_init.cpp"  # ignore cppmicroservices_init.cpp files
     - "compendium/test_bundles/**/*"  # ignore test_bundles and all its contents
 

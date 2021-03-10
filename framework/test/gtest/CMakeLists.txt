@@ -44,6 +44,12 @@ set(_gtest_tests
   FrameworkFactoryTest.cpp
 )
 
+if(BUILD_SHARED_LIBS)
+  list(APPEND _gtest_tests
+       SharedLibraryTest.cpp
+      )
+endif()
+
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp

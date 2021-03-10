@@ -53,7 +53,6 @@ set(_tests
 if(BUILD_SHARED_LIBS)
   list(APPEND _tests
        ServiceListenerTest
-       SharedLibraryTest
       )
 endif()
 

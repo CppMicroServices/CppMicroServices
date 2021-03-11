@@ -74,21 +74,22 @@ std::ostream& any_value_to_json(std::ostream& os, const Any& val, const uint8_t 
 std::ostream& any_value_to_json(std::ostream& o, const std::string& s, const uint8_t, const int32_t)
 {
   o << '"';
-  for (auto c = s.cbegin(); c != s.cend(); c++) {
-    switch (*c) {
-      case '"' : o << "\\\""; break;
-      case '\\': o << "\\\\"; break;
-      case '\b': o << "\\b";  break;
-      case '\f': o << "\\f";  break;
-      case '\n': o << "\\n";  break;
-      case '\r': o << "\\r";  break;
-      case '\t': o << "\\t";  break;
+  for (auto c : s) {
+    unsigned char cmp = static_cast<unsigned char>(c);
+    switch (cmp) {
+      case '"'  : o << "\\\"" ; break;
+      case '\\' : o << "\\\\" ; break;
+      case '\b' : o << "\\b"  ; break;
+      case '\f' : o << "\\f"  ; break;
+      case '\n' : o << "\\n"  ; break;
+      case '\r' : o << "\\r"  ; break;
+      case '\t' : o << "\\t"  ; break;
       default:
-        if ('\x00' <= *c && *c <= '\x1f') {
+        if (cmp <= '\x1f') {
           o << "\\u"
-            << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
+            << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(c);
         } else {
-          o << *c;
+          o << c;
         }
     }
   }

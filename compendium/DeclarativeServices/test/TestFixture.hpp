@@ -26,21 +26,23 @@
 #include "gtest/gtest.h"
 
 #include <cppmicroservices/Bundle.h>
-#include <cppmicroservices/BundleEvent.h>
 #include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/BundleEvent.h>
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
-#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-
+#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "TestUtils.hpp"
+#include <chrono>
 
 namespace test {
 
+auto const DEFAULT_POLL_PERIOD = std::chrono::milliseconds(1000);
+
 namespace scr = cppmicroservices::service::component::runtime;
-  
 
 /**
  * Test Fixture used for several test points. The setup method installs and starts
@@ -48,16 +50,14 @@ namespace scr = cppmicroservices::service::component::runtime;
  * test bundles.
  * This class also provides convenience methods to start a specific test bundle 
  */
-class tServiceComponent
-  : public testing::Test
+class tServiceComponent : public testing::Test
 {
 public:
   tServiceComponent()
     : ::testing::Test()
     , framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {
-  }
-  
+  {}
+
   void SetUp() override
   {
     framework.Start();
@@ -66,11 +66,14 @@ public:
 #if defined(US_BUILD_SHARED_LIBS)
     auto dsPluginPath = test::GetDSRuntimePluginFilePath();
     auto dsbundles = context.InstallBundles(dsPluginPath);
-    for (auto& bundle : dsbundles)
-    {
+    for (auto& bundle : dsbundles) {
       bundle.Start();
     }
-    
+    auto caPluginPath = test::GetConfigAdminRuntimePluginFilePath();
+    auto cabundles = context.InstallBundles(caPluginPath);
+    for (auto& bundle : cabundles) {
+      bundle.Start();
+    }
     test::InstallLib(context, "DSFrenchDictionary");
     test::InstallLib(context, "EnglishDictionary");
     test::InstallLib(context, "TestBundleDSTOI1");
@@ -85,14 +88,15 @@ public:
     test::InstallLib(context, "TestBundleDSTOI6");
     test::InstallLib(context, "TestBundleDSTOI7");
     test::InstallLib(context, "TestBundleDSTOI9");
+    test::InstallLib(context, "TestBundleDSTOI20");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS
-    auto dsbundles= context.GetBundles();
-    for (auto& bundle : dsbundles)
-    {
-      try { bundle.Start(); }
-      catch (std::exception& e) {
+    auto dsbundles = context.GetBundles();
+    for (auto& bundle : dsbundles) {
+      try {
+        bundle.Start();
+      } catch (std::exception& e) {
         std::cerr << "    " << e.what();
       }
       std::cerr << std::endl;
@@ -102,6 +106,12 @@ public:
     ASSERT_TRUE(sRef);
     dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
     ASSERT_TRUE(dsRuntimeService);
+    auto caRef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+    ASSERT_TRUE(caRef);
+    configAdminService = 
+        context.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(caRef);
+    ASSERT_TRUE(configAdminService);
+
   }
 
   void TearDown() override
@@ -115,11 +125,9 @@ public:
     auto context = framework.GetBundleContext();
     auto bundles = context.GetBundles();
 
-    for (auto& bundle : bundles)
-    {
+    for (auto& bundle : bundles) {
       auto bundleSymbolicName = bundle.GetSymbolicName();
-      if (symbolicName == bundleSymbolicName)
-      {
+      if (symbolicName == bundleSymbolicName) {
         return bundle;
       }
     }
@@ -131,10 +139,13 @@ public:
     cppmicroservices::Bundle testBundle = GetTestBundle(symName);
     EXPECT_EQ(static_cast<bool>(testBundle), true);
     testBundle.Start();
-    EXPECT_EQ(testBundle.GetState(), cppmicroservices::Bundle::STATE_ACTIVE) << " failed to start bundle with symbolic name"+symName;
+    EXPECT_EQ(testBundle.GetState(), cppmicroservices::Bundle::STATE_ACTIVE)
+      << " failed to start bundle with symbolic name" + symName;
     return testBundle;
   }
+
   std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
+  std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
   cppmicroservices::Framework framework;
 };
 

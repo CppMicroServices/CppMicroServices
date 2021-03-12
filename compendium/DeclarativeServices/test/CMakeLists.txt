@@ -64,6 +64,7 @@ set(_declarativeservices_tests
   TestComponentManagerImpl.cpp
   TestComponentRegistry.cpp
   TestCounterLatch.cpp
+  TestFactoryPid.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
@@ -164,6 +165,7 @@ set(_test_bundles
   TestBundleDSTOI5
   TestBundleDSTOI6
   TestBundleDSTOI9
+  TestBundleDSTOI20
   EnglishDictionary
   )
 

@@ -1,0 +1,16 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI20",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": false,
+            "implementation-class": "sample::ServiceComponent20",
+            "configuration-policy" : "require",
+            "configuration-pid" : ["sample::ServiceComponent20"],
+            "service": {
+                "interfaces": ["test::Interface2"]
+            }
+        }]
+    }
+}

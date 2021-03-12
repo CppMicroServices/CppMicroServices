@@ -131,4 +131,16 @@ void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
   }
 }
 
+std::string GetConfigAdminRuntimePluginFilePath()
+{
+  std::string libName{ "ConfigurationAdmin" };
+#if defined(US_PLATFORM_WINDOWS)
+  //libName += US_ConfigurationAdmin_VERSION_MAJOR;
+  // This is a hack for the time being.
+  // TODO: revisit changing the hard-coded "1" to the ConfigAdmin version dynamically
+  libName += "1";
+#endif
+  return PathToLib(libName);
+}
+
 } // namespaces

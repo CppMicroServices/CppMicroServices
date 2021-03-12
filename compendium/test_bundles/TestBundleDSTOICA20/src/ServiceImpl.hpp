@@ -16,8 +16,6 @@ namespace sample
           : properties(*props)
       {
       }
-      void Activate(const std::shared_ptr<ComponentContext>&);
-      void Deactivate(const std::shared_ptr<ComponentContext>&);
       void Modified(
         const std::shared_ptr<ComponentContext>& context,
         const std::shared_ptr<cppmicroservices::AnyMap>& configuration);

@@ -165,7 +165,7 @@ set(_test_bundles
   TestBundleDSTOI5
   TestBundleDSTOI6
   TestBundleDSTOI9
-  TestBundleDSTOI20
+  TestBundleDSTOICA20
   EnglishDictionary
   )
 

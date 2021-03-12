@@ -31,16 +31,16 @@ namespace test {
    */
 TEST_F(tServiceComponent, testFactoryPidConstruction) 
 { 
-     
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSTOI20");
+  std::string factoryComponentName = "sample::ServiceComponent20";  
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSTOICA20");
   
   // Use DS runtime service to validate the component description
   scr::dto::ComponentDescriptionDTO compDescDTO =
     dsRuntimeService->GetComponentDescriptionDTO(testBundle,
-                                                "sample::ServiceComponent20");
-  EXPECT_EQ(compDescDTO.implementationClass, "sample::ServiceComponent20")
+                                                factoryComponentName);
+  EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
     << "Implementation class in the returned component description must be "
-       "sample::ServiceComponent20";
+    <<   factoryComponentName;
 
   // Use DS runtime service to validate the component state. It should be in
   // the UNSATISFIED_REFERENCE state because the component is dependent on 
@@ -51,31 +51,29 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
 
   //Create factory instance, update configuration object 
   auto factoryConfig = configAdminService->CreateFactoryConfiguration(
-    "sample::ServiceComponent20");
+    factoryComponentName);
   auto factoryInstance = factoryConfig->GetPid();
 
   // CreateFactoryConfiguration will send an asynchronous request to DS to 
   // create the component data structures. Must wait until DS is finished before we can 
   // continue. We will know DS is finished when GetComponentDescriptionDTO 
   // returns the correct implementationClass. 
-  // ?? Is this the best way to do this? TestConfigAdmin.cpp has some complicated
-  // polling functions. Do we need that?
   std::string implementationClass;
-  int count = 0;
-  while  (implementationClass.empty() && count < 5) {
-    compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryInstance);
-    implementationClass = compDescDTO.implementationClass;
-    if (implementationClass.empty()){
-      std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
-    } 
-    count++;
-  }
+  auto result = RepeatTaskUntilOrTimeout(
+    [&compDescDTO, service = this->dsRuntimeService, testBundle, factoryInstance]() {
+      compDescDTO = service->GetComponentDescriptionDTO(testBundle,factoryInstance);
+    },
+    [&compDescDTO]() -> bool {
+      return !(compDescDTO.implementationClass.empty());
+    });
+
+  ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
+                         "after the dependency became available";
 
   // Use DS runtime service to validate the component description. 
-    EXPECT_EQ(compDescDTO.implementationClass, "sample::ServiceComponent20")
+    EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
     << "Implementation class in the returned component description must be "
-       "sample::ServiceComponent20";
+    <<   factoryComponentName;
   EXPECT_EQ(compDescDTO.name, factoryInstance)
     << "Name in the returned component description must be " << factoryInstance;
 

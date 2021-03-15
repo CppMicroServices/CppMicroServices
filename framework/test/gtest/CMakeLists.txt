@@ -33,6 +33,7 @@ set(_gtest_tests
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp
   ServiceFactoryTest.cpp
+  ServiceTrackerTest.cpp
   SharedLibraryExceptionTest.cpp
   ShrinkableVectorTest.cpp
   BundleEventTest.cpp

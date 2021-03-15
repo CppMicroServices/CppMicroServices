@@ -406,7 +406,9 @@ US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
 
 template<>
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-                                                    const AnyMap& m);
+                                                    const AnyMap& m,
+                                                    const uint8_t increment,
+                                                    const int32_t indent);
 }
 
 #endif // CPPMICROSERVICES_ANYMAP_H

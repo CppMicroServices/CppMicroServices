@@ -106,12 +106,6 @@ public:
     ASSERT_TRUE(sRef);
     dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
     ASSERT_TRUE(dsRuntimeService);
-    auto caRef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-    ASSERT_TRUE(caRef);
-    configAdminService = 
-        context.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(caRef);
-    ASSERT_TRUE(configAdminService);
-
   }
 
   void TearDown() override
@@ -145,7 +139,6 @@ public:
   }
 
   std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
-  std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
   cppmicroservices::Framework framework;
 };
 

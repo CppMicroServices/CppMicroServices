@@ -71,16 +71,10 @@ void checkResourceInfo(const BundleResource& res,
 
 void testTextResource(const Bundle& bundle)
 {
-  BundleResource res = bundle.GetResource("foo.txt");
-#ifdef US_PLATFORM_WINDOWS
-  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 16, false);
+  BundleResource res = bundle.GetResource("foo.ptxt");
+  checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
-#else
-  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 13, false);
-  const std::streampos ssize(12);
-  const std::string fileData = "foo and\nbar\n";
-#endif
 
   BundleResourceStream rs(res);
 
@@ -117,17 +111,11 @@ void testTextResource(const Bundle& bundle)
 
 void testTextResourceAsBinary(const Bundle& bundle)
 {
-  BundleResource res = bundle.GetResource("foo.txt");
+  BundleResource res = bundle.GetResource("foo.ptxt");
 
-#ifdef US_PLATFORM_WINDOWS
-  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 16, false);
-  const std::streampos ssize(16);
-  const std::string fileData = "foo and\r\nbar\r\n\r\n";
-#else
-  checkResourceInfo(res, "/", "foo", "foo", "txt", "txt", 13, false);
+  checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
-#endif
 
   BundleResourceStream rs(res, std::ios_base::binary);
 
@@ -162,7 +150,8 @@ void testInvalidResource(const Bundle& bundle)
   US_TEST_CONDITION(res.GetChildren().empty(), "Check empty children")
   US_TEST_CONDITION(res.GetSize() == 0, "Check zero size")
   US_TEST_CONDITION(res.GetCompressedSize() == 0, "Check zero compressed size")
-  US_TEST_CONDITION(res.GetLastModified() == 0, "Check zero last modification time")
+  US_TEST_CONDITION(res.GetLastModified() == 0,
+                    "Check zero last modification time")
   US_TEST_CONDITION(res.GetCrc32() == 0, "Check zero CRC-32")
 
   BundleResourceStream rs(res);
@@ -174,32 +163,18 @@ void testInvalidResource(const Bundle& bundle)
 
 void testSpecialCharacters(const Bundle& bundle)
 {
-  BundleResource res = bundle.GetResource("special_chars.dummy.txt");
-#ifdef US_PLATFORM_WINDOWS
+  BundleResource res = bundle.GetResource("special_chars.dummy.ptxt");
   checkResourceInfo(res,
                     "/",
                     "special_chars",
                     "special_chars.dummy",
-                    "txt",
-                    "dummy.txt",
-                    56,
+                    "ptxt",
+                    "dummy.ptxt",
+                    54,
                     false);
   const std::streampos ssize(54);
   const std::string fileData =
     "German Füße (feet)\nFrench garçon de café (waiter)\n";
-#else
-  checkResourceInfo(res,
-                    "/",
-                    "special_chars",
-                    "special_chars.dummy",
-                    "txt",
-                    "dummy.txt",
-                    54,
-                    false);
-  const std::streampos ssize(53);
-  const std::string fileData =
-    "German Füße (feet)\nFrench garçon de café (waiter)";
-#endif
 
   BundleResourceStream rs(res);
 
@@ -332,11 +307,11 @@ void testResourceTree(const Bundle& bundle)
   std::vector<std::string> children = res.GetChildren();
   std::sort(children.begin(), children.end());
   US_TEST_CONDITION_REQUIRED(children.size() == 6, "Check child count")
-  US_TEST_CONDITION(children[0] == "foo.txt", "Check child name")
-  US_TEST_CONDITION(children[1] == "foo2.txt", "Check child name")
+  US_TEST_CONDITION(children[0] == "foo.ptxt", "Check child name")
+  US_TEST_CONDITION(children[1] == "foo2.ptxt", "Check child name")
   US_TEST_CONDITION(children[2] == "icons/", "Check child name")
   US_TEST_CONDITION(children[3] == "manifest.json", "Check child name")
-  US_TEST_CONDITION(children[4] == "special_chars.dummy.txt",
+  US_TEST_CONDITION(children[4] == "special_chars.dummy.ptxt",
                     "Check child name")
   US_TEST_CONDITION(children[5] == "test.xml", "Check child name")
 
@@ -365,24 +340,23 @@ void testResourceTree(const Bundle& bundle)
   // find all .txt files
   std::vector<BundleResource> nodes = bundle.FindResources("", "*.txt", false);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
-  US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
-  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt",
-                    "Check child name")
-  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo2.txt",
-                    "Check child name")
-  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/special_chars.dummy.txt",
-                    "Check child name")
+  US_TEST_CONDITION_REQUIRED(nodes.size() == 0, "Found child count")
 
   nodes = bundle.FindResources("", "*.txt", true);
   std::sort(nodes.begin(), nodes.end(), resourceComparator);
-  US_TEST_CONDITION_REQUIRED(nodes.size() == 4, "Found child count")
-  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.txt",
+  US_TEST_CONDITION_REQUIRED(nodes.size() == 1, "Found child count")
+  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/icons/readme.txt",
                     "Check child name")
-  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo2.txt",
+
+  // find all .ptxt files
+  nodes = bundle.FindResources("", "*.ptxt", false);
+  std::sort(nodes.begin(), nodes.end(), resourceComparator);
+  US_TEST_CONDITION_REQUIRED(nodes.size() == 3, "Found child count")
+  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/foo.ptxt",
                     "Check child name")
-  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/icons/readme.txt",
+  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo2.ptxt",
                     "Check child name")
-  US_TEST_CONDITION(nodes[3].GetResourcePath() == "/special_chars.dummy.txt",
+  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/special_chars.dummy.ptxt",
                     "Check child name")
 
   // find all resources
@@ -400,13 +374,13 @@ void testResourceTree(const Bundle& bundle)
 
   nodes.clear();
   nodes = bundle.FindResources("", "*.txt", true);
-  US_TEST_CONDITION(nodes.size() == 4, "Check recursive pattern matches")
+  US_TEST_CONDITION(nodes.size() == 1, "Check recursive pattern matches")
 }
 
 void testResourceOperators(const Bundle& bundle)
 {
   BundleResource invalid = bundle.GetResource("invalid");
-  BundleResource foo = bundle.GetResource("foo.txt");
+  BundleResource foo = bundle.GetResource("foo.ptxt");
   US_TEST_CONDITION_REQUIRED(foo.IsValid() && foo, "Check valid resource")
   BundleResource foo2(foo);
   US_TEST_CONDITION(foo == foo, "Check equality operator")
@@ -466,7 +440,7 @@ void testResourcesFrom(const std::string& bundleName,
 
 } // end unnamed namespace
 
-int BundleResourceTest(int /*argc*/, char* /*argv*/ [])
+int BundleResourceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleResourceTest");
 
@@ -507,7 +481,7 @@ int BundleResourceTest(int /*argc*/, char* /*argv*/ [])
 
   testCompressedResource(bundleR);
 
-  BundleResource foo = bundleR.GetResource("foo.txt");
+  BundleResource foo = bundleR.GetResource("foo.ptxt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
 
   testResourcesFrom("TestBundleRL", framework.GetBundleContext());

@@ -73,9 +73,15 @@ void testTextResource(const Bundle& bundle)
 {
   BundleResource res = bundle.GetResource("foo.ptxt");
   checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
+
+#ifdef US_PLATFORM_WINDOWS
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
-
+#else
+  const std::streampos ssize(12);
+  const std::string fileData = "foo and\nbar\n";  
+#endif
+  
   BundleResourceStream rs(res);
 
   rs.seekg(0, std::ios::end);
@@ -114,6 +120,17 @@ void testTextResourceAsBinary(const Bundle& bundle)
   BundleResource res = bundle.GetResource("foo.ptxt");
 
   checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
+
+  /*
+    Note: there is no ifdef for platform in this test case because tellg()
+    reports the byte offset from the beginning of the file since it is being
+    read as binary. This is not the case for when the file is read as text.
+
+    The same is true for fileData; when read as binary data, linux will pick up
+    the last newline character, but if read as text, it  won't. In this case, since
+    the data is being read as binary data, no ifdef is necessary
+  */
+  
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
 
@@ -172,9 +189,16 @@ void testSpecialCharacters(const Bundle& bundle)
                     "dummy.ptxt",
                     54,
                     false);
+  
+#ifdef US_PLATFORM_WINDOWS
   const std::streampos ssize(54);
   const std::string fileData =
-    "German Füße (feet)\nFrench garçon de café (waiter)\n";
+      "German Füße (feet)\nFrench garçon de café (waiter)\n";
+#else
+  const std::streampos ssize(53);
+  const std::string fileData =
+      "German Füße (feet)\nFrench garçon de café (waiter)";
+#endif
 
   BundleResourceStream rs(res);
 

@@ -395,7 +395,6 @@ set(US_CXX_COVERAGE_FLAGS )
 if(MSVC)
   set(disabled_warnings
     4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
-    4834 # discarding return value of function with 'nodiscard' attribute
   )
 
   if (${MSVC_VERSION} LESS 1910)

@@ -47,7 +47,7 @@ public:
   {
     f.Start();
     testBundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(),
-                                                       "TestBundleL");
+                                                       "TestBundleLQ");
   }
 
   void TearDown() override
@@ -59,9 +59,9 @@ public:
 
 TEST_F(LDAPQueryTest, TestLDAPFilterMatchBundle)
 {
-  LDAPFilter ldapMatchCase("(testBundle.testproperty=YES)");
-  LDAPFilter ldapKeyMismatchCase("(testBundle.TestProperty=YES)");
-  LDAPFilter ldapValueMismatchCase("(testBundle.testproperty=Yes)");
+  LDAPFilter ldapMatchCase("(bundle.testproperty=YES)");
+  LDAPFilter ldapKeyMismatchCase("(bundle.TestProperty=YES)");
+  LDAPFilter ldapValueMismatchCase("(bundle.testproperty=Yes)");
 
   // Exact string match of both key and value
   ASSERT_TRUE(ldapMatchCase.Match(testBundle));

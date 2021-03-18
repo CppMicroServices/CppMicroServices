@@ -33,7 +33,6 @@ set(_tests
   FrameworkListenerTest
   FrameworkFactoryTest
   HelgrindTest
-  LDAPFilterTest
   LDAPQueryTest
   LogTest
   BundleHooksTest

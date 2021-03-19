@@ -141,7 +141,7 @@ TEST_F(ServiceRegistryTest, TestServiceReferenceMemberFunctions)
   // Test the ostream<< operator of ServiceReference
   std::ostringstream strstream;
   strstream << ref1;
-  ASSERT_GT(strstream.str().size(), 0);
+  ASSERT_GT(static_cast<int>(strstream.str().size()), 0);
 
   // Test the ostream<< operator of an invalid ServiceReference
   ServiceReference<ITestServiceA> invalid_ref;

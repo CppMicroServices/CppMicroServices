@@ -166,7 +166,7 @@ public:
   MOCK_CONST_METHOD0(GetAllDependencyManagers, std::vector<std::shared_ptr<ReferenceManager>>(void));
   MOCK_CONST_METHOD1(GetDependencyManager, std::shared_ptr<ReferenceManager>(const std::string&));
   MOCK_CONST_METHOD0(GetServiceReference, cppmicroservices::ServiceReferenceBase(void));
-  MOCK_CONST_METHOD0(GetRegistry, std::shared_ptr<const ComponentRegistry>(void));
+  MOCK_CONST_METHOD0(GetRegistry, std::shared_ptr<ComponentRegistry>(void));
   MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
   MOCK_CONST_METHOD0(GetId, unsigned long(void));
   MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));
@@ -234,12 +234,13 @@ class MockComponentManagerImpl
 {
 public:
   MockComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                           std::shared_ptr<const ComponentRegistry> registry,
+                           std::shared_ptr<ComponentRegistry> registry,
                            BundleContext bundleContext,
                            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
       std::shared_ptr<boost::asio::thread_pool> pool,
-      std::shared_ptr<ConfigurationNotifier> notifier)
-    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool, notifier)
+      std::shared_ptr<ConfigurationNotifier> notifier,
+      std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool, notifier, managers)
     , statechangecount(0)
   {
   }
@@ -273,11 +274,12 @@ class MockComponentConfigurationImpl
 public:
   MockComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                                  const Bundle& bundle,
-                                 std::shared_ptr<const ComponentRegistry> registry,
+                                 std::shared_ptr<ComponentRegistry> registry,
                                  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                  std::shared_ptr<boost::asio::thread_pool> threadpool,
-                                 std::shared_ptr<ConfigurationNotifier> notifier)
-    : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, notifier)
+                                 std::shared_ptr<ConfigurationNotifier> notifier,
+                                 std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+    : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, notifier, managers)
     , statechangecount(0)
   {}
   virtual ~MockComponentConfigurationImpl() = default;

@@ -23,7 +23,11 @@ ConfigurationListenerImpl::ConfigurationListenerImpl(
 
 void ConfigurationListenerImpl::configurationEvent(const ConfigurationEvent& event)
 {
-  if (!configNotifier->AnyListenersForPid(event.getPid())){
+  auto pid = (event.getPid() != "") ? event.getPid() : event.getFactoryPid();
+  if (pid.empty()) {
+    return;
+  }
+  if (!configNotifier->AnyListenersForPid(pid)){
       return;
   }
   
@@ -36,22 +40,16 @@ void ConfigurationListenerImpl::configurationEvent(const ConfigurationEvent& eve
 
   auto properties = cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   auto type = event.getType();
-  auto pid = event.getPid();
 
-  if (!pid.empty()) {
-    if (type == ConfigurationEventType::CM_UPDATED) {
-      auto configObject = configAdmin->GetConfiguration(pid);
-      if (configObject) {
-        properties = configObject->GetProperties();
-      }
+
+  if (type == ConfigurationEventType::CM_UPDATED) {
+    auto configObject = configAdmin->GetConfiguration(pid);
+    if (configObject) {
+      properties = configObject->GetProperties();
     }
-    auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-  
-    configNotifier->NotifyAllListeners(pid, type, ptr);
- 
   }
-
-
+  auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
+  configNotifier->NotifyAllListeners(pid, type, ptr);
 }
 } // namespace cm
 } // namespace service

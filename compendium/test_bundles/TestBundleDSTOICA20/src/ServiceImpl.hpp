@@ -9,7 +9,7 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample
 {
-  class ServiceComponent20 : public test::Interface2
+  class ServiceComponent20 : public test::CAInterface
     {
     public:
       ServiceComponent20(std::shared_ptr<cppmicroservices::AnyMap> props) 
@@ -19,7 +19,8 @@ namespace sample
       void Modified(
         const std::shared_ptr<ComponentContext>& context,
         const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
-
+      cppmicroservices::AnyMap GetProperties();
+ 
       ~ServiceComponent20() = default;
 
     private:

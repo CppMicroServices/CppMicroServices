@@ -143,21 +143,13 @@ bool ConfigurationManager::isConfigSatisfied(
   bool allConfigsAvailable =
     configProperties.size() >= metadata->configurationPids.size();
 
-  if ((metadata->configurationPolicy ==
-       metadata::ComponentMetadata::CONFIG_POLICY_IGNORE) ||
+  if ((metadata->configurationPolicy !=
+       metadata::ComponentMetadata::CONFIG_POLICY_REQUIRE) ||
       (allConfigsAvailable)) {
     return true;
   }
 
-  if ((metadata->configurationPolicy ==
-       metadata::ComponentMetadata::CONFIG_POLICY_REQUIRE) ||
-      ((metadata->configurationPolicy ==
-        metadata::ComponentMetadata::CONFIG_POLICY_OPTIONAL) &&
-       (currentState == ComponentState::ACTIVE))) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 void ConfigurationManager::SendModifiedPropertiesToComponent() {
     // see sequence diagram ConfigurationListener::configurationEvent(CM_UPDATED)

@@ -10,6 +10,10 @@ void ServiceComponent20::Modified(
   std::lock_guard<std::mutex> lock(propertiesLock);
   properties = *configuration;
 }
-
+cppmicroservices::AnyMap ServiceComponent20::GetProperties()
+{
+  std::lock_guard<std::mutex> lock(propertiesLock);
+  return properties;
+}
 
 }

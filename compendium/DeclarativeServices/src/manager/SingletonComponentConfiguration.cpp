@@ -29,6 +29,7 @@
 #include "states/CCUnsatisfiedReferenceState.hpp"
 #include "states/ComponentConfigurationState.hpp"
 #include <iostream>
+#include "ComponentManager.hpp"
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
@@ -37,13 +38,15 @@ using cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME;
 namespace cppmicroservices {
 namespace scrimpl {
 
-SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                                                                         const Bundle& bundle,
-                                                                         std::shared_ptr<const ComponentRegistry> registry,
-                                                                         std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                                                         std::shared_ptr<boost::asio::thread_pool> threadpool,
-                                                                         std::shared_ptr<ConfigurationNotifier> configNotifier)
-  : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, configNotifier)
+SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,                                                                       
+    const Bundle& bundle,
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> threadpool,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+  : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, configNotifier, managers)
 {
 }
 

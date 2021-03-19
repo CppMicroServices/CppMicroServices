@@ -43,10 +43,11 @@ class SingletonComponentConfigurationImpl final
 public:
   explicit SingletonComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
                                                const cppmicroservices::Bundle& bundle,
-                                               std::shared_ptr<const ComponentRegistry> registry,
+                                               std::shared_ptr<ComponentRegistry> registry,
                                                std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                                std::shared_ptr<boost::asio::thread_pool> threadpool,
-                                               std::shared_ptr<ConfigurationNotifier> configNotifier);
+                                               std::shared_ptr<ConfigurationNotifier> configNotifier,
+                                               std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   SingletonComponentConfigurationImpl(const SingletonComponentConfigurationImpl&) = delete;
   SingletonComponentConfigurationImpl(SingletonComponentConfigurationImpl&&) = delete;
   SingletonComponentConfigurationImpl& operator=(const SingletonComponentConfigurationImpl&) = delete;

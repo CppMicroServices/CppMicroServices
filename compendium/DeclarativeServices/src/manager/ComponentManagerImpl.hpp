@@ -50,11 +50,12 @@ class ComponentManagerImpl
 {
 public:
   ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                       std::shared_ptr<const ComponentRegistry> registry,
+                       std::shared_ptr<ComponentRegistry> registry,
                        cppmicroservices::BundleContext bundleContext,
                        std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                        std::shared_ptr<boost::asio::thread_pool> threadpool,
-                       std::shared_ptr<ConfigurationNotifier> configNotifier);
+                       std::shared_ptr<ConfigurationNotifier> configNotifier,
+                       std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
   ComponentManagerImpl(ComponentManagerImpl&&) = delete;
   ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
@@ -126,6 +127,14 @@ public:
   {
     return threadpool;
   }
+
+  /**
+   * Returns the managers object associated with this ComponentManager
+   */
+  std::shared_ptr < std::vector<std::shared_ptr<ComponentManager>>> GetManagers() const
+  {
+    return managers;
+  }
   /**
    * This method modifies the vector of futures stored in this object. If
    * any of the futures in the vector are ready, the ready future is replaced
@@ -153,7 +162,7 @@ public:
    * Returns the {@link ComponentRegistry} object associated with this
    * runtime instance
    */
-  virtual std::shared_ptr<const ComponentRegistry> GetRegistry() const { return registry; }
+  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const { return registry; }
 
   /**
    * Attempts to change the state from disabled to enabled and posts asynchronous work
@@ -181,7 +190,7 @@ public:
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
-  const std::shared_ptr<const ComponentRegistry> registry; ///< component registry associated with the current runtime
+  const std::shared_ptr<ComponentRegistry> registry; ///< component registry associated with the current runtime
   const std::shared_ptr<const metadata::ComponentMetadata> compDesc; ///< the component description
   cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
   const std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger associated with the current runtime
@@ -191,6 +200,7 @@ private:
   std::shared_ptr<boost::asio::thread_pool> threadpool; ///< thread pool used to execute async work
   std::mutex transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
   std::shared_ptr<ConfigurationNotifier> configNotifier;
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
 };
 }
 }

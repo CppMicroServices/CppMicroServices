@@ -68,7 +68,7 @@ private:
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<ComponentRegistry> registry;
   std::shared_ptr<LogService> logger;
-  std::vector<std::shared_ptr<ComponentManager>> managers;
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
   std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 } // scrimpl

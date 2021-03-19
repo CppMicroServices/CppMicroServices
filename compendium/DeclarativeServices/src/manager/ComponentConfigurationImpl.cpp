@@ -34,6 +34,7 @@
 #include <iostream>
 #include <memory>
 #include "boost/asio/post.hpp"
+#include "ComponentManager.hpp"
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
@@ -45,12 +46,13 @@ namespace scrimpl {
 std::atomic<unsigned long> ComponentConfigurationImpl::idCounter(0);
 
 ComponentConfigurationImpl::ComponentConfigurationImpl(
-  std::shared_ptr<const metadata::ComponentMetadata> metadata,
-  const Bundle& bundle,
-  std::shared_ptr<const ComponentRegistry> registry,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<boost::asio::thread_pool> threadpool,
-  std::shared_ptr<ConfigurationNotifier> configNotifier)
+        std::shared_ptr<const metadata::ComponentMetadata> metadata,
+        const Bundle& bundle,
+        std::shared_ptr<ComponentRegistry> registry,
+        std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+        std::shared_ptr<boost::asio::thread_pool> threadpool,
+        std::shared_ptr<ConfigurationNotifier> configNotifier,
+        std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
   : configID(++idCounter)
   , metadata(std::move(metadata))
   , bundle(bundle)
@@ -62,9 +64,10 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(
   , configManager()
   , threadpool(std::move(threadpool))
   , configNotifier(std::move(configNotifier))
+  , managers(std::move(managers))
 {
   if (!this->metadata || !this->bundle || !this->registry || !this->logger ||
-      !this->configNotifier) {
+      !this->configNotifier || !this->managers) {
     throw std::invalid_argument(
       "ComponentConfigurationImpl - Invalid arguments passed to constructor");
   }
@@ -170,13 +173,16 @@ void ComponentConfigurationImpl::Initialize()
       // before calling configManager->Initialize. The Initialize method will get the configuration object
       // from ConfigAdmin if it exists and a notification will be sent to the listeners.
       for (auto pid : metadata->configurationPids) {
+        
         auto token = configNotifier->RegisterListener(
           pid,
           std::bind(&ComponentConfigurationImpl::ConfigChangedState,
                     this,
-                    std::placeholders::_1));
+                    std::placeholders::_1),
+                    shared_from_this());
         auto listenerToken = std::make_shared<ListenerToken>(pid, token);
         configListenerTokens.emplace_back(listenerToken);
+        
       }
       configManager->Initialize();
       if (referenceManagers.empty() &&
@@ -223,20 +229,20 @@ void ComponentConfigurationImpl::ConfigChangedState(
                                         GetState()->GetValue(),
                                         configWasSatisfied,
                                         configNowSatisfied);
-  
+  auto compManager = shared_from_this();
   boost::asio::post(
     threadpool->get_executor(),
-    [this, configWasSatisfied, configNowSatisfied, notification]() 
+    [compManager, configWasSatisfied, configNowSatisfied, notification]() 
   {
     if (configWasSatisfied && configNowSatisfied &&
-        (metadata->configurationPolicy !=
+        (compManager->metadata->configurationPolicy !=
             metadata::ComponentMetadata::CONFIG_POLICY_IGNORE)) {
-        if (!this->Modified()) {
+        if (!compManager->Modified()) {
            //The Component does not have a Modified method so the component instance
            //has been deactivated. 
-           if (this->configManager->IsConfigSatisfied(this->GetState()->GetValue()) &&
-               AreReferencesSatisfied()) {
-             this->Register();
+           if (compManager->configManager->IsConfigSatisfied(compManager->GetState()->GetValue()) &&
+               compManager->AreReferencesSatisfied()) {
+             compManager->Register();
              return;
            }
         }
@@ -245,13 +251,13 @@ void ComponentConfigurationImpl::ConfigChangedState(
     switch (notification.event) {
       case cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED:
         if (!configWasSatisfied && configNowSatisfied &&
-            AreReferencesSatisfied()) {
-          this->Register();
+            compManager->AreReferencesSatisfied()) {
+          compManager->Register();
         }
         break;
       case cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED:
         if (configWasSatisfied && !configNowSatisfied) {
-          this->Deactivate();
+          compManager->Deactivate();
         }
         break;
       default:
@@ -406,9 +412,19 @@ ComponentConfigurationImpl::GetState() const
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if (newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-    const auto compName = GetMetadata()->name.empty()
-                            ? GetMetadata()->implClassName
-                            : GetMetadata()->name;
+
+    auto compName = GetMetadata()->name;
+    auto position = compName.find("~");
+ 
+    if ((position != std::string::npos)) {
+      // this is a factory pid. Use implementation class 
+      // instead of name to construct the instance. 
+      compName = GetMetadata()->implClassName;
+    } else {
+      compName = GetMetadata()->name.empty() ? GetMetadata()->implClassName
+                                             : GetMetadata()->name;
+    }
+      
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) =
       GetComponentCreatorDeletors(compName, GetBundle());
   }

@@ -125,14 +125,14 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
                                    scr,
                                    mockRegistry,
                                    fakeLogger, pool, notifier);
-      EXPECT_EQ(bundleExt.managers.size(), 0u);
+      EXPECT_EQ(bundleExt.managers->size(), 0u);
     });
   EXPECT_NO_THROW({
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    scr,
                                    mockRegistry,
                                    fakeLogger, pool, notifier);
-      EXPECT_EQ(bundleExt.managers.size(), 1u);
+      EXPECT_EQ(bundleExt.managers->size(), 1u);
     });
 }
 }

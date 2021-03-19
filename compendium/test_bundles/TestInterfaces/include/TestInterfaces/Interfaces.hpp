@@ -23,9 +23,9 @@
 #define _TEST_SAMPLE_HPP_
 
 #include "TestInterfaces/TestInterfacesExport.h"
-
 #include <string>
 #include <memory>
+#include "cppmicroservices/AnyMap.h"
 
 /* This file contains interface declarations for the test bundles
    used in Declarative Services Tests */
@@ -138,6 +138,15 @@ namespace test
       virtual bool IsDeactivated() = 0;
       virtual ~LifeCycleValidation();
     };
-}
+
+    //Use this interface in test bundles testing ConfigAdmin
+    //integration into DS to get information from the component instance.
+    class US_TestInterfaces_EXPORT CAInterface
+    {
+    public:
+      virtual cppmicroservices::AnyMap GetProperties() = 0;
+      virtual ~CAInterface();
+    };
+    }
 
 #endif

@@ -479,6 +479,8 @@ namespace cppmicroservices {
       PerformAsync([this, pid]
       {
         AnyMap properties{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+        std::string fPid = "";
+        std::string nonFPid = "";
         auto removed = false;
         {
           std::lock_guard<std::mutex> lk{configurationsMutex};
@@ -500,7 +502,13 @@ namespace cppmicroservices {
             }
           }
         }
-        //TODO - factoryPid
+     
+        if (pid.find('~') != std::string::npos) {
+            //this is a factory pid
+          fPid = pid;
+        } else {
+          nonFPid = pid;
+        }
         const auto configurationListeners =
           configListenerTracker->GetServices();
         auto type =
@@ -514,7 +522,7 @@ namespace cppmicroservices {
             try {
               auto configEvent = std::make_unique<
                 cppmicroservices::service::cm::ConfigurationEvent>(
-                configAdminRef, type, "", pid);
+                configAdminRef, type, fPid, nonFPid);
 
               it->configurationEvent((*configEvent));
             } catch (...) {

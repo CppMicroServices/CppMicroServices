@@ -69,6 +69,7 @@ public:
     for (auto& bundle : dsbundles) {
       bundle.Start();
     }
+    
     auto caPluginPath = test::GetConfigAdminRuntimePluginFilePath();
     auto cabundles = context.InstallBundles(caPluginPath);
     for (auto& bundle : cabundles) {
@@ -139,6 +140,7 @@ public:
   }
 
   std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
+  //std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
   cppmicroservices::Framework framework;
 };
 

@@ -26,9 +26,11 @@
 #include "../SCRLogger.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "ConcurrencyUtil.hpp"
+//#include "ComponentConfigurationImpl.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
+class ComponentConfigurationImpl;
 
 /** ConfigChangeNotification
      * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
@@ -48,6 +50,19 @@ struct ConfigChangeNotification final
   const std::string pid;
   const cppmicroservices::service::cm::ConfigurationEventType event;
   std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+};
+
+struct Listener final
+{ 
+  Listener(std::function<void(const ConfigChangeNotification&)> notify,
+           std::shared_ptr<ComponentConfigurationImpl> mgr)
+     : notify(std::move(notify)), 
+    mgr(std::move(mgr))
+    {}
+      
+  std::function < void(const ConfigChangeNotification&)> notify;
+  std::shared_ptr<ComponentConfigurationImpl> mgr;
+  
 };
 
 class ConfigurationNotifier final 
@@ -72,7 +87,8 @@ public:
    */
   cppmicroservices::ListenerTokenId RegisterListener(
     const std::string& pid,
-    std::function<void(const ConfigChangeNotification&)> notify);
+    std::function<void(const ConfigChangeNotification&)> notify,
+    std::shared_ptr<ComponentConfigurationImpl> mgr);
 
   void UnregisterListener(const std::string& pid,
     const cppmicroservices::ListenerTokenId token) noexcept;
@@ -85,9 +101,9 @@ public:
     const std::shared_ptr<cppmicroservices::AnyMap> properties);
 
 private:
-  using TokenMap =
-    std::unordered_map<ListenerTokenId,
-                       std::function<void(const ConfigChangeNotification&)>>;
+  void CreateFactoryComponent(std::string factoryName, std::string pid, std::shared_ptr<ComponentConfigurationImpl> mgr);
+
+  using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
   cppmicroservices::scrimpl::Guarded<
     std::unordered_map<std::string, std::shared_ptr<TokenMap>>>

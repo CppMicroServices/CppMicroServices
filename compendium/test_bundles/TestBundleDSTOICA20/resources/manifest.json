@@ -9,7 +9,7 @@
             "configuration-policy" : "require",
             "configuration-pid" : ["sample::ServiceComponent20"],
             "service": {
-                "interfaces": ["test::Interface2"]
+                "interfaces": ["test::CAInterface"]
             }
         }]
     }

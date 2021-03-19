@@ -46,10 +46,14 @@ protected:
     auto pool = std::make_shared <boost::asio::thread_pool>(1);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       framework.GetBundleContext(), fakeLogger);
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+    
     compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                          mockRegistry,
                                                          framework.GetBundleContext(),
-                                                         fakeLogger, pool, notifier);
+                                                         fakeLogger, pool, notifier,
+                                                         managers);
   }
 
   virtual void TearDown() {

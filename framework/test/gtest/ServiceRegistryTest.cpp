@@ -20,17 +20,13 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/GetBundleContext.h"
-#include "cppmicroservices/LDAPFilter.h"
-#include "cppmicroservices/ServiceInterface.h"
 
-#include "TestingMacros.h"
+#include "TestUtils.h"
+#include "gtest/gtest.h"
 
-#include <stdexcept>
 #include <unordered_set>
 
 using namespace cppmicroservices;
@@ -44,27 +40,49 @@ struct ITestServiceB
 {
   virtual ~ITestServiceB(){};
 };
+
+struct TestServiceA : public ITestServiceA
+{};
+
 // Test the optional macro to provide custom name for a service interface class
 CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(ITestServiceB,
                                            "com.mycompany.ITestService/1.0");
 
-void TestServiceInterfaceId()
+class ServiceRegistryTest : public ::testing::Test
 {
-  US_TEST_CONDITION(us_service_interface_iid<int>() == "int",
-                    "Service interface id int")
-  US_TEST_CONDITION(us_service_interface_iid<ITestServiceA>() ==
-                      "ITestServiceA",
-                    "Service interface id ITestServiceA")
-  US_TEST_CONDITION(us_service_interface_iid<ITestServiceB>() ==
-                      "com.mycompany.ITestService/1.0",
-                    "Service interface id com.mycompany.ITestService/1.0")
+protected:
+  Framework framework;
+  BundleContext context;
+
+public:
+  ServiceRegistryTest()
+    : framework(FrameworkFactory().NewFramework()){};
+
+  ~ServiceRegistryTest() override = default;
+
+  void SetUp() override
+  {
+    framework.Start();
+    context = framework.GetBundleContext();
+  }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    //framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+};
+
+TEST_F(ServiceRegistryTest, TestServiceInterfaceId)
+{
+  ASSERT_EQ(us_service_interface_iid<int>(), "int");
+  ASSERT_EQ(us_service_interface_iid<ITestServiceA>(), "ITestServiceA");
+  ASSERT_EQ(us_service_interface_iid<ITestServiceB>(),
+            "com.mycompany.ITestService/1.0");
 }
 
-void TestMultipleServiceRegistrations(BundleContext context)
+TEST_F(ServiceRegistryTest, TestMultipleServiceRegistrations)
 {
-  struct TestServiceA : public ITestServiceA
-  {};
-
   auto s1 = std::make_shared<TestServiceA>();
   auto s2 = std::make_shared<TestServiceA>();
 
@@ -75,39 +93,32 @@ void TestMultipleServiceRegistrations(BundleContext context)
 
   std::vector<ServiceReference<ITestServiceA>> refs =
     context.GetServiceReferences<ITestServiceA>();
-  US_TEST_CONDITION_REQUIRED(
-    refs.size() == 2, "Testing for two registered ITestServiceA services")
+  ASSERT_EQ(refs.size(), 2);
 
   reg2.Unregister();
   refs = context.GetServiceReferences<ITestServiceA>();
-  US_TEST_CONDITION_REQUIRED(
-    refs.size() == 1, "Testing for one registered ITestServiceA services")
+  ASSERT_EQ(refs.size(), 1);
 
   reg1.Unregister();
   refs = context.GetServiceReferences<ITestServiceA>();
-  US_TEST_CONDITION_REQUIRED(refs.empty(),
-                             "Testing for no ITestServiceA services")
+  ASSERT_TRUE(refs.empty());
 
   ServiceReference<ITestServiceA> ref =
     context.GetServiceReference<ITestServiceA>();
-  US_TEST_CONDITION_REQUIRED(!ref, "Testing for invalid service reference")
+  ASSERT_FALSE(ref);
 }
 
-void TestUnregisterFix(BundleContext context)
+TEST_F(ServiceRegistryTest, TestUnregisterFix)
 {
   ServiceRegistration<int> registration =
     context.RegisterService<int>(std::make_shared<int>());
   ServiceReference<int> reference = context.GetServiceReference<int>();
   registration.Unregister();
-  US_TEST_CONDITION_REQUIRED(!reference.IsConvertibleTo("IBooService"),
-                             "Testing for IsConvertibleTo returning false");
+  ASSERT_FALSE(reference.IsConvertibleTo("IBooService"));
 }
 
-void TestServiceReferenceMemberFunctions(BundleContext context)
+TEST_F(ServiceRegistryTest, TestServiceReferenceMemberFunctions)
 {
-  struct TestServiceA : public ITestServiceA
-  {};
-
   auto s1 = std::make_shared<TestServiceA>();
   ServiceProperties props;
   props["StringKey"] = std::string("A string value");
@@ -121,43 +132,34 @@ void TestServiceReferenceMemberFunctions(BundleContext context)
   // Test ServiceReference member functions GetPropertyKeys()
   std::vector<std::string> keys;
   ref1.GetPropertyKeys(keys);
-  US_TEST_CONDITION(std::find(keys.begin(), keys.end(), "StringKey") !=
-                      keys.end(),
-                    "Test existence of key StringKey")
-  US_TEST_CONDITION(std::find(keys.begin(), keys.end(), "Status") != keys.end(),
-                    "Test existence of key Status")
+  ASSERT_NE(std::find(keys.begin(), keys.end(), "StringKey"), keys.end());
+  ASSERT_NE(std::find(keys.begin(), keys.end(), "Status"), keys.end());
 
   auto keys_by_val = ref1.GetPropertyKeys();
-  US_TEST_CONDITION(keys_by_val == keys, "Test keys equality")
+  ASSERT_EQ(keys_by_val, keys);
 
   // Test the ostream<< operator of ServiceReference
   std::ostringstream strstream;
   strstream << ref1;
-  US_TEST_CONDITION(strstream.str().size() > 0,
-                    "Test ostream<< operator of ServiceReference")
+  ASSERT_GT(strstream.str().size(), 0);
 
   // Test the ostream<< operator of an invalid ServiceReference
   ServiceReference<ITestServiceA> invalid_ref;
   std::ostringstream strstream2;
   strstream2 << invalid_ref;
-  US_TEST_CONDITION(strstream2.str() == "Invalid service reference",
-                    "Test ostream<< operator of an invalid ServiceReference")
+  ASSERT_EQ(strstream2.str(), "Invalid service reference");
 
   // Test the custom hash function of ServiceReference
   std::unordered_set<ServiceReferenceBase> sr_ref_set;
   sr_ref_set.insert(ref1);
   sr_ref_set.insert(invalid_ref);
-  US_TEST_CONDITION(sr_ref_set.size() == 2,
-                    "Test ServiceReference set cardinality")
+  ASSERT_EQ(sr_ref_set.size(), 2);
 
   reg1.Unregister();
 }
 
-void TestServicePropertiesUpdate(BundleContext context)
+TEST_F(ServiceRegistryTest, TestServicePropertiesUpdate)
 {
-  struct TestServiceA : public ITestServiceA
-  {};
-
   auto s1 = std::make_shared<TestServiceA>();
   ServiceProperties props;
   props["string"] = std::string("A std::string");
@@ -170,11 +172,8 @@ void TestServicePropertiesUpdate(BundleContext context)
   ServiceReference<ITestServiceA> ref1 =
     context.GetServiceReference<ITestServiceA>();
 
-  US_TEST_CONDITION_REQUIRED(
-    context.GetServiceReferences<ITestServiceA>().size() == 1,
-    "Testing service count")
-  US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == false,
-                             "Testing bool property")
+  ASSERT_EQ(context.GetServiceReferences<ITestServiceA>().size(), 1);
+  ASSERT_FALSE(any_cast<bool>(ref1.GetProperty("bool")));
 
   // register second service with higher rank
   auto s2 = std::make_shared<TestServiceA>();
@@ -189,57 +188,29 @@ void TestServicePropertiesUpdate(BundleContext context)
     context.GetServiceReference<ITestServiceA>();
   auto service =
     std::dynamic_pointer_cast<TestServiceA>(context.GetService(ref2));
-  US_TEST_CONDITION_REQUIRED(service == s2, "Testing highest service rank")
+  ASSERT_EQ(service, s2);
 
   props["bool"] = true;
   // change the service ranking
   props[Constants::SERVICE_RANKING] = 100;
   reg1.SetProperties(props);
 
-  US_TEST_CONDITION_REQUIRED(
-    context.GetServiceReferences<ITestServiceA>().size() == 2,
-    "Testing service count")
-  US_TEST_CONDITION_REQUIRED(any_cast<bool>(ref1.GetProperty("bool")) == true,
-                             "Testing bool property")
-  US_TEST_CONDITION_REQUIRED(
-    any_cast<int>(ref1.GetProperty(Constants::SERVICE_RANKING)) == 100,
-    "Testing updated ranking")
+  ASSERT_EQ(context.GetServiceReferences<ITestServiceA>().size(), 2);
+  ASSERT_TRUE(any_cast<bool>(ref1.GetProperty("bool")));
+  ASSERT_EQ(any_cast<int>(ref1.GetProperty(Constants::SERVICE_RANKING)), 100);
 
   // Service with the highest ranking should now be s1
   service = std::dynamic_pointer_cast<TestServiceA>(
     context.GetService<ITestServiceA>(ref1));
-  US_TEST_CONDITION_REQUIRED(service == s1, "Testing highest service rank")
+  ASSERT_EQ(service, s1);
 
   reg1.Unregister();
-  US_TEST_CONDITION_REQUIRED(
-    context.GetServiceReferences<ITestServiceA>("").size() == 1,
-    "Testing service count")
+  ASSERT_EQ(context.GetServiceReferences<ITestServiceA>("").size(), 1);
 
   service = std::dynamic_pointer_cast<TestServiceA>(
     context.GetService<ITestServiceA>(ref2));
-  US_TEST_CONDITION_REQUIRED(service == s2, "Testing highest service rank")
+  ASSERT_EQ(service, s2);
 
   reg2.Unregister();
-  US_TEST_CONDITION_REQUIRED(
-    context.GetServiceReferences<ITestServiceA>().empty(),
-    "Testing service count")
-}
-
-int ServiceRegistryTest(int /*argc*/, char* /*argv*/ [])
-{
-  US_TEST_BEGIN("ServiceRegistryTest");
-
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-
-  auto context = framework.GetBundleContext();
-
-  TestServiceInterfaceId();
-  TestMultipleServiceRegistrations(context);
-  TestServicePropertiesUpdate(context);
-  TestUnregisterFix(context);
-  TestServiceReferenceMemberFunctions(context);
-
-  US_TEST_END()
+  ASSERT_TRUE(context.GetServiceReferences<ITestServiceA>().empty());
 }

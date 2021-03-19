@@ -40,6 +40,7 @@ set(_gtest_tests
   BundleResourceTest.cpp
   BundleStreamOperatorTest.cpp
   ServiceEventStreamOperatorTest.cpp
+  ServiceRegistryTest.cpp
 )
 
 set(_additional_srcs

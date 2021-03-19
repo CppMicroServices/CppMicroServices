@@ -22,9 +22,9 @@ limitations under the License.
 
 #include "cppmicroservices/Bundle.h"
 
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
-#include "cppmicroservices/Constants.h"
 
 #include "cppmicroservices/ServiceReference.h"
 
@@ -93,19 +93,19 @@ TEST(LDAPFilter, DefaultConstructedMatch)
 TEST(LDAPFilter, TestLDAPExpressions)
 {
   LDAPFilter filter(LDAPProp("bla") == "jo" && !(LDAPProp("ha") == 1) &&
-        (LDAPProp("presence") || !LDAPProp("absence")) &&
-        LDAPProp("le") <= 4.1 && LDAPProp("ge") >= -3 &&
-        LDAPProp("approx").Approx("Approx"));
+                    (LDAPProp("presence") || !LDAPProp("absence")) &&
+                    LDAPProp("le") <= 4.1 && LDAPProp("ge") >= -3 &&
+                    LDAPProp("approx").Approx("Approx"));
   const std::string filterStr =
-        "(&(&(&(&(&(bla=jo)(!(ha=1)))(|(presence=*)(!(absence=*))))(le<=4.1))(ge>=-"
-        "3))(approx~=Approx))";
+    "(&(&(&(&(&(bla=jo)(!(ha=1)))(|(presence=*)(!(absence=*))))(le<=4.1))(ge>=-"
+    "3))(approx~=Approx))";
   ASSERT_EQ(filter.ToString(), filterStr);
 
   std::string emptyValue;
   std::string someValue = "some";
   std::string filter1 = LDAPProp("key2") == someValue && LDAPProp("key3");
   std::string filter2 = LDAPProp("key2") == someValue &&
-        (LDAPProp("key1") == emptyValue || LDAPProp("key3"));
+                        (LDAPProp("key1") == emptyValue || LDAPProp("key3"));
   ASSERT_EQ(filter1, filter2);
 
   LDAPFilter boolFilter(LDAPProp("t") == true || LDAPProp("f") == false);
@@ -118,7 +118,7 @@ TEST(LDAPFilter, TestParsing)
   EXPECT_NO_THROW(LDAPFilter ldap("(cn=Babs Jensen)"));
   EXPECT_NO_THROW(LDAPFilter ldap("(!(cn=Tim Howes))"));
   EXPECT_NO_THROW(LDAPFilter ldap(std::string("(&(") + Constants::OBJECTCLASS +
-       "=Person)(|(sn=Jensen)(cn=Babs J*)))"));
+                                  "=Person)(|(sn=Jensen)(cn=Babs J*)))"));
   EXPECT_NO_THROW(LDAPFilter ldap("(o=univ*of*mich*)"));
   EXPECT_NO_THROW(LDAPFilter ldap("(prop=foo(bar))"));
   EXPECT_NO_THROW(LDAPFilter ldap("(prop=(foo)(bar))"));

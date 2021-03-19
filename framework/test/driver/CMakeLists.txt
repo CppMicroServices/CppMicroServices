@@ -45,7 +45,6 @@ set(_tests
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest
-  ServiceRegistryTest
   ServiceTemplateTest
   StaticBundleResourceTest
   StaticBundleTest

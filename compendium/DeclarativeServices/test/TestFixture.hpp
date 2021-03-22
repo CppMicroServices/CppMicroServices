@@ -90,6 +90,7 @@ public:
     test::InstallLib(context, "TestBundleDSTOI7");
     test::InstallLib(context, "TestBundleDSTOI9");
     test::InstallLib(context, "TestBundleDSTOICA20");
+    test::InstallLib(context, "TestBundleDSCAI1");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS

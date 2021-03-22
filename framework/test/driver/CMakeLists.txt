@@ -118,7 +118,7 @@ endif()
 
 # Add resources
 usFunctionEmbedResources(TARGET ${_test_driver}
-                       FILES TestResource.txt manifest.json
+                       FILES TestResource.ptxt manifest.json
                        ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
 
 # Register tests

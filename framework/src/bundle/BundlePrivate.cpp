@@ -185,7 +185,7 @@ void BundlePrivate::WaitOnOperation(WaitConditionType& /* wc */,
   // nop
 }
 
-Bundle::State BundlePrivate::GetUpdatedState(LockType& l)
+Bundle::State BundlePrivate::GetUpdatedState(LockType& /* l */)
 {
   if (state == Bundle::STATE_INSTALLED) {
     try {
@@ -557,7 +557,7 @@ std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
   return nullptr;
 }
 
-bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
+bool BundlePrivate::IsBundleThread(const std::thread::id& /* id */) const
 {
   return true;
 }

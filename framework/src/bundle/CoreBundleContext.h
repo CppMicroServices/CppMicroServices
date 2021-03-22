@@ -99,15 +99,6 @@ public:
   std::shared_ptr<detail::LogSink> sink;
 
   /**
-   * Threads for running listeners and activators
-   */
-  struct : detail::MultiThreaded<>
-  {
-    std::list<std::shared_ptr<BundleThread>> value;
-    std::list<std::shared_ptr<BundleThread>> zombies;
-  } bundleThreads;
-
-  /**
    * Bundle Storage
    */
   std::unique_ptr<BundleStorage> storage;
@@ -160,7 +151,7 @@ public:
    * Flags to use for dlopen calls on unix systems. Ignored on Windows.
    */
   int libraryLoadOptions;
-  
+
   ~CoreBundleContext();
 
   // thread-safe shared_from_this implementation

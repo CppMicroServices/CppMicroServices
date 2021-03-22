@@ -211,10 +211,15 @@ void FrameworkPrivate::Start(uint32_t)
   {
     auto l = Lock();
     US_UNUSED(l);
+
+    if (state == Bundle::STATE_ACTIVE) {
+      return;
+    }
+
     state = Bundle::STATE_ACTIVE;
     operation = BundlePrivate::OP_IDLE;
   }
-  NotifyAll();
+
   coreCtx->listeners.SendFrameworkEvent(
     FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED,
                    MakeBundle(shared_from_this()),

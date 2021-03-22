@@ -27,6 +27,7 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
 #include "cppmicroservices/Framework.h"
@@ -41,7 +42,6 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundleResourceContainer.h"
-#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
@@ -559,12 +559,7 @@ std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
 
 bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
 {
-#ifdef US_ENABLE_THREADING_SUPPORT
-  return bundleThread != nullptr && *bundleThread == id;
-#else
-  US_UNUSED(id);
   return true;
-#endif
 }
 
 void BundlePrivate::ResetBundleThread()

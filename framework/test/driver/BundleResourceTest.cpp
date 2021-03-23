@@ -79,9 +79,9 @@ void testTextResource(const Bundle& bundle)
   const std::string fileData = "foo and\nbar\n\n";
 #else
   const std::streampos ssize(12);
-  const std::string fileData = "foo and\nbar\n";  
+  const std::string fileData = "foo and\nbar\n";
 #endif
-  
+
   BundleResourceStream rs(res);
 
   rs.seekg(0, std::ios::end);
@@ -130,7 +130,7 @@ void testTextResourceAsBinary(const Bundle& bundle)
     the last newline character, but if read as text, it  won't. In this case, since
     the data is being read as binary data, no ifdef is necessary
   */
-  
+
   const std::streampos ssize(13);
   const std::string fileData = "foo and\nbar\n\n";
 
@@ -189,15 +189,15 @@ void testSpecialCharacters(const Bundle& bundle)
                     "dummy.ptxt",
                     54,
                     false);
-  
+
 #ifdef US_PLATFORM_WINDOWS
   const std::streampos ssize(54);
   const std::string fileData =
-      "German Füße (feet)\nFrench garçon de café (waiter)\n";
+    "German Füße (feet)\nFrench garçon de café (waiter)\n";
 #else
   const std::streampos ssize(53);
   const std::string fileData =
-      "German Füße (feet)\nFrench garçon de café (waiter)";
+    "German Füße (feet)\nFrench garçon de café (waiter)";
 #endif
 
   BundleResourceStream rs(res);
@@ -439,7 +439,7 @@ void testResourceOperators(const Bundle& bundle)
 
 void testResourceFromExecutable(const Bundle& bundle)
 {
-  BundleResource resource = bundle.GetResource("TestResource.txt");
+  BundleResource resource = bundle.GetResource("TestResource.ptxt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(),
                              "Check valid executable resource")
 

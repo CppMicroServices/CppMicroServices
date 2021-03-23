@@ -22,6 +22,7 @@
 
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
 #include "TestUtils.h"
@@ -69,7 +70,7 @@ public:
   void TearDown() override
   {
     framework.Stop();
-    //framework.WaitForStop(std::chrono::milliseconds::zero());
+    framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 };
 
@@ -91,18 +92,22 @@ TEST_F(ServiceRegistryTest, TestMultipleServiceRegistrations)
   ServiceRegistration<ITestServiceA> reg2 =
     context.RegisterService<ITestServiceA>(s2);
 
+  //Test for two registered ITestServiceA services
   std::vector<ServiceReference<ITestServiceA>> refs =
     context.GetServiceReferences<ITestServiceA>();
   ASSERT_EQ(refs.size(), 2);
 
+  //Test for one registered ITestServiceA services
   reg2.Unregister();
   refs = context.GetServiceReferences<ITestServiceA>();
   ASSERT_EQ(refs.size(), 1);
 
+  //Test for no ITestServiceA services
   reg1.Unregister();
   refs = context.GetServiceReferences<ITestServiceA>();
   ASSERT_TRUE(refs.empty());
 
+  //Test for invalid service reference
   ServiceReference<ITestServiceA> ref =
     context.GetServiceReference<ITestServiceA>();
   ASSERT_FALSE(ref);

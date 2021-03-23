@@ -35,8 +35,8 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
 {
   
  // Start the test bundle containing the factory component name.
-  std::string factoryComponentName = "sample::ServiceComponent20";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSTOICA20");
+  std::string factoryComponentName = "sample::ServiceComponentCA20";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA20");
 
   // Use DS runtime service to validate the component description
   scr::dto::ComponentDescriptionDTO compDescDTO =
@@ -80,10 +80,9 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
 
   // The Update properties sends an asynchronous request to DS to
   // update the properties. Must wait until DS is finished before we can continue. 
-  // Use DS runtime service to validate the component properties. Make take more
+  // Use DS runtime service to validate the component properties. May take more
   // than one try. 
-  
-   
+     
    auto result = RepeatTaskUntilOrTimeout(
     [&compDescDTO, &compConfigs, this, &testBundle, &factoryInstance]() { 
        compDescDTO =
@@ -113,11 +112,6 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
 
     //Request a service reference to the new component instance. This will
    //cause DS to construct the instance with the updated properties.
-   //auto sr = this->bundleContext.GetServiceReference<
-   //  cppmicroservices::service::cm::ConfigurationAdmin>();
-   //auto configAdmin =
-   //  this->bundleContext
-   //    .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
 
    cppmicroservices::ServiceReference<test::CAInterface> instanceRef;
    std::shared_ptr<test::CAInterface> instance;

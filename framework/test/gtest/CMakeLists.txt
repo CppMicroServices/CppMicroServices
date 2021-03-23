@@ -41,7 +41,15 @@ set(_gtest_tests
   BundleStreamOperatorTest.cpp
   ServiceEventStreamOperatorTest.cpp
   ServiceRegistryTest.cpp
+  LDAPQueryTest.cpp
+  FrameworkFactoryTest.cpp
 )
+
+if(BUILD_SHARED_LIBS)
+  list(APPEND _gtest_tests
+       SharedLibraryTest.cpp
+      )
+endif()
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp

@@ -31,9 +31,7 @@ set(_tests
   BundleRegistryConcurrencyTest
   FrameworkEventTest
   FrameworkListenerTest
-  FrameworkFactoryTest
   HelgrindTest
-  LDAPQueryTest
   LogTest
   BundleHooksTest
   BundleTest
@@ -53,7 +51,6 @@ set(_tests
 if(BUILD_SHARED_LIBS)
   list(APPEND _tests
        ServiceListenerTest
-       SharedLibraryTest
       )
 endif()
 

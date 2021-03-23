@@ -47,13 +47,14 @@ macro(build_and_test)
 
 endmacro()
 
-function(create_initial_cache var _shared _threading)
+function(create_initial_cache var _shared _threading _tsan)
 
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON
       US_ENABLE_COVERAGE:BOOL=$ENV{WITH_COVERAGE}
       BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
+      US_ENABLE_TSAN:BOOL=${_tsan}
       US_BUILD_EXAMPLES:BOOL=ON
       ")
 
@@ -83,12 +84,12 @@ if(NOT CTEST_PARALLEL_LEVEL)
 endif()
 
 
-#            SHARED THREADING
+#            SHARED THREADING TSAN
 
-set(config0     1       1     )
-set(config1     0       1     )
-set(config2     1       0     )
-set(config3     0       0     )
+set(config0     1       1      1 )
+set(config1     0       1      1 )
+set(config2     1       0      0 )
+set(config3     0       0      0 )
 
 if(NOT US_CMAKE_GENERATOR)
   if(APPLE AND NOT WITH_COVERAGE)

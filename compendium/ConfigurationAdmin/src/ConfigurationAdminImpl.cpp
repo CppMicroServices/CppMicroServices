@@ -187,10 +187,10 @@ namespace cppmicroservices {
     , futuresID{0u}
     , managedServiceTracker(cmContext, this)
     , managedServiceFactoryTracker(cmContext, this)
+    , randomGenerator(std::random_device{}())
     , configListenerTracker(
         std::make_unique<cppmicroservices::ServiceTracker<
           cppmicroservices::service::cm::ConfigurationListener>>(cmContext))
-    , randomGenerator(std::random_device{}())
     {
       managedServiceTracker.Open();
       managedServiceFactoryTracker.Open();

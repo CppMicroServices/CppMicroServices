@@ -58,13 +58,13 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(
   , bundle(bundle)
   , registry(std::move(registry))
   , logger(std::move(logger))
+  , threadpool(std::move(threadpool))
+  , configManager()
+  , configNotifier(std::move(configNotifier))
+  , managers(std::move(managers))
   , state(std::make_shared<CCUnsatisfiedReferenceState>())
   , newCompInstanceFunc(nullptr)
   , deleteCompInstanceFunc(nullptr)
-  , configManager()
-  , threadpool(std::move(threadpool))
-  , configNotifier(std::move(configNotifier))
-  , managers(std::move(managers))
 {
   if (!this->metadata || !this->bundle || !this->registry || !this->logger ||
       !this->configNotifier || !this->managers) {
@@ -359,7 +359,7 @@ bool ComponentConfigurationImpl::AreReferencesSatisfied() const noexcept
 {
   bool isSatisfied = true;
 
-  for (const auto mgr : referenceManagers) {
+  for (const auto &mgr : referenceManagers) {
     if (!mgr.second->IsSatisfied()) {
       isSatisfied = false;
       break;

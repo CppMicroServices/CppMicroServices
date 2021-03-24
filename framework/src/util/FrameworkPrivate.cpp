@@ -62,6 +62,7 @@ void FrameworkPrivate::DoInit()
 void FrameworkPrivate::Init()
 {
   auto l = Lock();
+  US_UNUSED(l);
 
   switch (static_cast<Bundle::State>(state.load())) {
     case Bundle::STATE_INSTALLED:
@@ -166,6 +167,7 @@ void FrameworkPrivate::Start(uint32_t)
   std::vector<long> bundlesToStart;
   {
     auto l = Lock();
+    US_UNUSED(l);
 
     switch (state.load()) {
       case Bundle::STATE_INSTALLED:
@@ -251,6 +253,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
   try {
     {
       auto l = Lock();
+      US_UNUSED(l);
       operation = OP_DEACTIVATING;
       state = Bundle::STATE_STOPPING;
     }

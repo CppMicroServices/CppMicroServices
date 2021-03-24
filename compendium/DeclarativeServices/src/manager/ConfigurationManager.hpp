@@ -45,7 +45,7 @@ public:
   /**
    * @throws std::invalid_argument exception if any of the params is a nullptr 
    */
-  ConfigurationManager::ConfigurationManager(
+  ConfigurationManager(
     std::shared_ptr<const metadata::ComponentMetadata> metadata,
     const cppmicroservices::BundleContext& bc,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger

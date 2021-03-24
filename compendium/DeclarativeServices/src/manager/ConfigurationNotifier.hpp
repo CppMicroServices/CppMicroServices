@@ -43,8 +43,8 @@ struct ConfigChangeNotification final
     std::shared_ptr<cppmicroservices::AnyMap> properties,
     const cppmicroservices::service::cm::ConfigurationEventType evt)
     : pid(std::move(pid))
-    , newProperties(properties)
     , event(std::move(evt))
+    , newProperties(properties)
   {}
 
   const std::string pid;

@@ -32,8 +32,8 @@ ConfigurationManager::ConfigurationManager(
   const std::shared_ptr<const metadata::ComponentMetadata> metadata,
   const cppmicroservices::BundleContext& bc,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  : metadata(metadata)
-  , logger(std::move(logger))
+  : logger(std::move(logger))
+  , metadata(metadata)
   , bundleContext(bc)
   , mergedProperties (metadata->properties)
 {
@@ -120,7 +120,7 @@ void ConfigurationManager::UpdateMergedProperties(const std::string pid,
   for (const auto& pid : metadata->configurationPids) {
     auto it = configProperties.find(pid);
     if (it != configProperties.end()) { 
-       for (const auto item : it->second) {
+      for (const auto &item : it->second) {
           mergedProperties[item.first] = item.second;
         }
       }
@@ -142,7 +142,7 @@ bool ConfigurationManager::IsConfigSatisfied(
 }
 
 bool ConfigurationManager::isConfigSatisfied(
-  const ComponentState currentState) const noexcept
+  const ComponentState /*currentState*/) const noexcept
 {
   bool allConfigsAvailable =
     configProperties.size() >= metadata->configurationPids.size();

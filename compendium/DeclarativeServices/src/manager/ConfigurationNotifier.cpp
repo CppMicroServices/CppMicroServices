@@ -13,9 +13,9 @@ using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 ConfigurationNotifier::ConfigurationNotifier(
    cppmicroservices::BundleContext context,
    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  : bundleContext(std::move(context))
-  , logger(std::move(logger)) 
-  , tokenCounter(0)
+  : tokenCounter(0)
+  , bundleContext(std::move(context))
+  , logger(std::move(logger))
 {
   if (!bundleContext || !(this->logger)) {
     throw std::invalid_argument("ConfigurationNotifier Constructor "

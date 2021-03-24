@@ -65,7 +65,7 @@ void BundlePrivate::Stop(uint32_t options)
   std::exception_ptr savedException;
 
   {
-    auto l = coreCtx->resolver.Lock();
+    auto l = this->Lock();
 
     // 1:
     if (state == Bundle::STATE_UNINSTALLED) {
